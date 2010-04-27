@@ -721,12 +721,7 @@ int static_hysteresis(){
 /// @callergraph
 ///
 /// @details Consists of a sequence of sub-calculations of fixed temperature. The system is initialised 
-/// accoring to the input flag - either randomly or ordered.For the ordered case the temperature sequence
-/// increases from zero, for the random case the temperature decreases from the maximum temperature. After
-/// initialisation the sytem is equilibrated for sim::equilibration timesteps.
-///
-/// @section notes Implementation Notes
-/// Capable of hot>cold or cold>hot calculation. 
+/// ordered. After initialisation a whole hysteresis loop of the system and coercivity are calculated.
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -744,9 +739,11 @@ int static_hysteresis(){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
+
+
 int hysteresis(){
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "program::hysteresis has been called" << std::endl;}
+	if(error_checking::error_check==true){std::cout << "hysteresis has been called" << std::endl;}
 	
 	// Declare function prototype
 	//int calculate_applied_fields(const int,const int);
@@ -762,117 +759,96 @@ int hysteresis(){
 	}
 	
 	 // Setup Hmax and J=Hinc
-	 int Hmax = 2000; // mT
+	 int Hmax = 6000; // mT
 	 int Hinc = 10; // mT	 
 	 
-	 // setup mag_new and mag_old
+	 // setup mag_new(H_new) and mag_old(H_old) for coercive field
 	 double mag_new = 0.0;
 	 double mag_old = 0.0;
-	 
+	 double H_old = 0.0;
+	 double H_new = 0.0;
+	 double H_c_left= 0.0;
+	 double H_c_right = 0.0;
+	 double H_coercive = 0.0;
+	 //std::cout << std::cout.flags() << std::endl;
+        std::cout.unsetf(std::ios_base::floatfield);
+        //std::cout << std::cout.flags() << std::endl;
+	 //std::cout << mp::material[0].mu_s_SI << "\t" << mp::material[0].Ku1_SI << "\t" << 2.0*mp::material[0].Ku1_SI/mp::material[0].mu_s_SI << std::endl;
+	 std::cout << "Estimated Coercivity:" << 2.0*mp::material[0].Ku1_SI/mp::material[0].mu_s_SI << std::endl;
+	 	 
 	 // parity loop
 	 for(int parity=-1;parity<2;parity+=2){
-	// Set up loop variables
-	for (int H = -Hmax; H<= Hmax;H+=Hinc){
+	  // Set up loop variables
+	  for (int H = Hmax; H>= -Hmax;H-=Hinc){
 
-	  sim::H_applied=double(parity)*double(H)*0.001;	// mTesla
+	  sim::H_applied=double(parity)*double(H)*0.001;	// Tesla
 	  
 	  // time loop
-	  	for(sim::time=0;sim::time<sim::loop_time;sim::time+=sim::partial_time){
-		LLG(sim::partial_time);
-		stats::mag_m();
+	    for(sim::time=0;sim::time<sim::loop_time;sim::time+=sim::partial_time){
+	      LLG(sim::partial_time);
+	      stats::mag_m();
 		//if(mpi_generic::my_rank==0){
-				//std::cout << sim::time << "\t" << stats::total_mag_m_norm;
-				//std::cout << "\t" << stats::total_mag_norm[0];
-				//std::cout << "\t" << stats::total_mag_norm[1];
-				//std::cout << "\t" << stats::total_mag_norm[2];
-				//std::cout << std::endl;
+			//std::cout << sim::time<< "\t" << stats::total_mag_m_norm;
+			//std::cout << "\t" << stats::total_mag_norm[0];
+			//std::cout << "\t" << stats::total_mag_norm[1];
+			//std::cout << "\t" << stats::total_mag_norm[2];
+			//std::cout << std::endl;
 		//}
-		
-		}
+	    } 
+	    
+	     if(mpi_generic::my_rank==0){
 		mag_new = stats::total_mag_norm[2];
-		if (mag_new*mag_old < 0){
-		// calculate coercive field
-		
+		H_new = sim::H_applied;
+		if (mag_new*mag_old < 0 & mag_old > mag_new){
+		  // calculate coercive field
+		  H_c_left=(mag_old*H_new-mag_new*H_old)/(mag_old-mag_new);
+		  std::cout << "\t" << "the left coercivity is" << "\t" << H_c_left << "\t" << "Tesla" << std::endl;	
 		}
-		  //stats::mag_m();
-	 		if(vmpi::my_rank==0){
-				std::cout << sim::H_applied << "\t" << stats::total_mag_m_norm; // Tesla
-				std::cout << "\t" << stats::total_mag_norm[0];
-				std::cout << "\t" << stats::total_mag_norm[1];
-				std::cout << "\t" << stats::total_mag_norm[2];
-				std::cout << std::endl;
-				vmag << sim::H_applied << "\t" << stats::total_mag_m_norm;
-				vmag << "\t" << stats::total_mag_norm[0];
-				vmag << "\t" << stats::total_mag_norm[1];
-				vmag << "\t" << stats::total_mag_norm[2];
-				vmag << std::endl;
-		}
+		if (mag_new*mag_old < 0 & mag_old < mag_new){
+		  H_c_right=(mag_old*H_new-mag_new*H_old)/(mag_old-mag_new);
+		  std::cout << "\t" << "the right coercivity is" << "\t" <<  H_c_right << "\t" << "Tesla" << std::endl;
+		}		 		  
+			  
+	      std::cout << sim::H_applied << "\t" << stats::total_mag_m_norm; // Tesla
+	      std::cout << "\t" << stats::total_mag_norm[0];
+	      std::cout << "\t" << stats::total_mag_norm[1];
+	      std::cout << "\t" << stats::total_mag_norm[2];
+	      std::cout << std::endl;
+		// check current and before values
+		//std::cout << "current mag_new is" << mag_new << "\t" << "before mag_old is" << mag_old<< std::endl;
+		//std::cout << "current H_new is" << H_new << "\t" << "before H is" << H_old << std::endl;
+	      vmag << sim::H_applied << "\t" << stats::total_mag_m_norm;
+	      vmag << "\t" << stats::total_mag_norm[0];
+	      vmag << "\t" << stats::total_mag_norm[1];
+	      vmag << "\t" << stats::total_mag_norm[2];
+	      vmag << std::endl;
+	      
+	      // output pov_file
+	      
+	      				
+	      mag_old = mag_new;
+	      H_old = H_new;
+	    }
+	  //if ((H%100)==0){vout::pov_file();}		
+	     // mag_new = stats::total_mag_norm[2];
+	    
+	     // if ((mag_old-0.8)/(mag_new-0.8)<0){
+		//vout::pov_file();	      
+	     // }
+	     // if ((mag_old+0.8)/(mag_new+0.8)<0){
+		//vout::pov_file();	      
+	     // }
+      	     // mag_old = mag_new;
 
-	 mag_old = mag_new;
+	  }
 	 }
+	 if(mpi_generic::my_rank==0){
+	  H_coercive = -H_c_left;   //0.5*(H_c_right-H_c_left);
+	  std::cout << "coercive field of the system is" << "\t" << H_coercive << "\t" << "Tesla" << std::endl;
+	  //vmag << "Hc+ is" << "\t" << H_c_right << "\tTesla" << "Hc- is" << "\t" << H_c_left << "\tTesla" << std::endl;
+	  vmag << "The coercive field of the system is" << "\t" << H_coercive << "\t" << "Tesla" << std::endl;
 	 }
-
-/*
-	double Hmax=2000;
-	double H_step=10;
-	double H_c_left=0.0;
-	double H_c_right=0.0;
-	double H_c=0.0;
-	double H_e=0.0;
-	for (sim::H_applied=Hmax;sim::H_applied>-Hmax;sim::H_applied-=H_step ){
-		// calculate LLG
-		LLG(sim::loop_time);
-		//calculate_applied_fields(pre_comm_si,pre_comm_ei);
-		stats::mag_m();
-			// Output to screen and file after each temperature
-		if(mpi_generic::my_rank==0){
-			std::cout << sim::H_applied << "\t" << stats::total_mag_m_norm;
-			std::cout << "\t" << stats::total_mag_norm[0];
-			std::cout << "\t" << stats::total_mag_norm[1];
-			std::cout << "\t" << stats::total_mag_norm[2];
-			std::cout << std::endl;
-			vmag << sim::H_applied << "\t" << stats::total_mag_m_norm;
-			vmag << "\t" << stats::total_mag_norm[0];
-			vmag << "\t" << stats::total_mag_norm[1];
-			vmag << "\t" << stats::total_mag_norm[2];
-			vmag << std::endl;
-				//if (stats::total_mag_norm[2]<0.01 & stats::total_mag_norm[2]>-0.01){
-				//  H_c_left=sim::H_applied;
-				//  std::cout << H_c_left<< std::endl;
-				//}
-		}
-	//vout::pov_file();
-	}
-	for (sim::H_applied=-Hmax;sim::H_applied<Hmax;sim::H_applied+=H_step ){
-		// calculate LLG
-		LLG(sim::loop_time);
-		//calculate_applied_fields(pre_comm_si,pre_comm_ei);
-		stats::mag_m();
-		// Output to screen and file after each temperature
-		if(mpi_generic::my_rank==0){
-			std::cout << sim::H_applied << "\t" << stats::total_mag_m_norm;
-			std::cout << "\t" << stats::total_mag_norm[0];
-			std::cout << "\t" << stats::total_mag_norm[1];
-			std::cout << "\t" << stats::total_mag_norm[2];
-			std::cout << std::endl;
-			vmag << sim::H_applied << "\t" << stats::total_mag_m_norm;
-			vmag << "\t" << stats::total_mag_norm[0];
-			vmag << "\t" << stats::total_mag_norm[1];
-			vmag << "\t" << stats::total_mag_norm[2];
-			vmag << std::endl;
-				//if (stats::total_mag_norm[2]<0.01 & stats::total_mag_norm[2]>-0.01){
-				//  H_c_right= sim::H_applied;
-				//  std::cout << H_c_right<< std::endl;
-				//}
-		}	
-	//vout::pov_file();	
-	}
-	//H_c=0.5*(H_c_right-H_c_left);
-	//H_e=0.5*(H_c_right+H_c_left);
-	//std::cout << H_c_right << "\t" << H_c <<"\t" << H_c_left << "\t"<< H_e << std::endl;
-	
-  //std::cout << "Hello from Weijia" << std::endl;
-	/*/	
+	 
 	return EXIT_SUCCESS;
   }
 // End of namespace

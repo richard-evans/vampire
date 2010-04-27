@@ -7,27 +7,27 @@
 #------------------------------------------
 #create:particle-array
 #create:truncated-octahedron
-#create:crystal-structure="sc"
+create:crystal-structure="fcc"
 #create:particle-parity=1
-create:single-spin
-#create:voronoi-film
-#create:voronoi-variance=0.1
-#create:voronoi-parity=1
+#create:single-spin
+create:voronoi-film
+create:voronoi-variance=0.0
+create:voronoi-parity=0
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
-dimensions:a=3.0 !A
-dimensions:dx = 6.8 !nm
-dimensions:dy = 6.8 !nm
-dimensions:dz = 6.8 !nm
-dimensions:particle-size = 4 !nm
+dimensions:a=3.54 !A
+dimensions:dx = 21.0 !nm
+dimensions:dy = 21.0 !nm
+dimensions:dz = 7.0 !nm
+dimensions:particle-size = 5 !nm
 dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
 # Material File:
 #------------------------------------------
 material:file="Co.mat"
-#material:file="GdFe.mat"
+material:file="ES.mat"
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
