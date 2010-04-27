@@ -1,0 +1,21 @@
+# Git Ignore file
+# Ignore object file
+.o
+/*/*.o
+/*/*/*.o
+#Ignore temporary editor files
+*~
+/*/*~
+/*/*/*~
+#Povray files
+*.pov
+/*/*.pov
+# Other sundry files
+*.png
+vampire
+crystal.xyz
+vdp
+vmag
+pp.dat
+M_vs_T.txt
+# EOF
