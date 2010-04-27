@@ -67,7 +67,7 @@ int create(){
 	//      Set up Parallel Decomposition if required 
 	//=============================================================
 	#ifdef MPICF
-		if(mpi_generic::mpi_mode==2) vmpi::geometric_decomposition(vmpi::num_processors,mp::system_dimensions);
+		if(vmpi::mpi_mode==2) vmpi::geometric_decomposition(vmpi::num_processors,mp::system_dimensions);
 	#endif
 
 	//=============================================================

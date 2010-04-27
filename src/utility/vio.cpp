@@ -1509,7 +1509,7 @@ int output_pov_file(){
 		using pov::counter;
 
 		#ifdef MPICF
-		const int num_atoms = mpi_comms::num_core_atoms+mpi_comms::num_boundary_atoms;
+		const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 		#else
 		const int num_atoms = atoms::num_atoms;
 		#endif
@@ -1616,15 +1616,15 @@ int output_pov_file(){
 			if(red<0.0) red=0.0;
 			if(green<0.0) green=0.0;
 
-			#ifdef MPICF
-				double cx=mpi_create_variables::mpi_atom_global_coord_array[3*atom+0]*material_parameters::lattice_space_conversion[0];
-				double cy=mpi_create_variables::mpi_atom_global_coord_array[3*atom+1]*material_parameters::lattice_space_conversion[1];
-				double cz=mpi_create_variables::mpi_atom_global_coord_array[3*atom+2]*material_parameters::lattice_space_conversion[2];
-			#else
-				double cx=atoms::x_coord_array[atom]*material_parameters::lattice_space_conversion[0];
-				double cy=atoms::y_coord_array[atom]*material_parameters::lattice_space_conversion[1];
-				double cz=atoms::z_coord_array[atom]*material_parameters::lattice_space_conversion[2];
-			#endif
+			//#ifdef MPICF
+			//	double cx=mpi_create_variables::mpi_atom_global_coord_array[3*atom+0]*material_parameters::lattice_space_conversion[0];
+			//	double cy=mpi_create_variables::mpi_atom_global_coord_array[3*atom+1]*material_parameters::lattice_space_conversion[1];
+			//	double cz=mpi_create_variables::mpi_atom_global_coord_array[3*atom+2]*material_parameters::lattice_space_conversion[2];
+			//#else
+				double cx=atoms::x_coord_array[atom]; //*material_parameters::lattice_space_conversion[0];
+				double cy=atoms::y_coord_array[atom]; //*material_parameters::lattice_space_conversion[1];
+				double cz=atoms::z_coord_array[atom]; //*material_parameters::lattice_space_conversion[2];
+			//#endif
 			double sx=0.5*atoms::x_spin_array[atom];
 			double sy=0.5*atoms::y_spin_array[atom];
 			double sz=0.5*atoms::z_spin_array[atom];

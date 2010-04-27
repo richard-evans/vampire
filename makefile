@@ -3,7 +3,7 @@
 #								Makefile for VAMPIRE
 #
 #===================================================================
-OMPI_CXX=g++
+OMPI_CXX=icc
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'

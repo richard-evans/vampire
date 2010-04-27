@@ -177,7 +177,7 @@ namespace vmpi{
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
 	if(error_checking::error_check==true){
-		std::cout << "vmpi::crystal_xyz has been called " << mpi_generic::my_rank << std::endl;
+		std::cout << "vmpi::crystal_xyz has been called " << vmpi::my_rank << std::endl;
 	}
 
 	const int num_processors=vmpi::num_processors;
