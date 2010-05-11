@@ -1,0 +1,46 @@
+# My vampire input file
+# R F Evans
+# 18/01/10 
+# 
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+#create:particle-array
+#create:truncated-octahedron
+create:crystal-structure="fcc"
+#create:particle-parity=1
+#create:single-spin
+create:voronoi-film
+create:voronoi-variance=0.0
+create:voronoi-parity=0
+#------------------------------------------
+# System Dimensions:
+#------------------------------------------
+dimensions:a=3.54 !A
+dimensions:dx = 21.0 !nm
+dimensions:dy = 21.0 !nm
+dimensions:dz = 7.0 !nm
+dimensions:particle-size = 5 !nm
+dimensions:particle-spacing = 1.0 !nm
+
+#------------------------------------------
+# Material File:
+#------------------------------------------
+material:file="Co.mat"
+material:file="ES.mat"
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:exchange=true
+sim:anisotropy=true
+sim:applied=false
+sim:thermal=true
+sim:temperature=300.0
+sim:Hinc=100.0 !mT
+sim:Hmax=12.0 !T
+sim:Hmin=-12.0 !T
+sim:equilibration-time=1
+sim::partial-time=1000
+sim:total-time=1
+sim:loop-time=10000
+sim:dt=1.0E-15

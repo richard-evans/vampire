@@ -779,24 +779,31 @@ int hysteresis(){
 	 // parity loop
 	 for(int parity=-1;parity<2;parity+=2){
 	  // Set up loop variables
-	  for (int H = Hmax; H>= -Hmax;H-=Hinc){
+	  for (int H = -Hmax; H<= Hmax;H+=Hinc){
 
-	  sim::H_applied=double(parity)*double(H)*0.001;	// Tesla
+	    sim::H_applied=double(parity)*double(H)*0.001;	// Tesla
 	  
 	  // time loop
 	    for(sim::time=0;sim::time<sim::loop_time;sim::time+=sim::partial_time){
 	      LLG(sim::partial_time);
 	      stats::mag_m();
-		//if(mpi_generic::my_rank==0){
-			//std::cout << sim::time<< "\t" << stats::total_mag_m_norm;
-			//std::cout << "\t" << stats::total_mag_norm[0];
-			//std::cout << "\t" << stats::total_mag_norm[1];
-			//std::cout << "\t" << stats::total_mag_norm[2];
-			//std::cout << std::endl;
-		//}
+	      //if(vmpi::my_rank==0){
+	      // 	std::cout << sim::time<< "\t" << stats::total_mag_m_norm;
+	      //	std::cout << "\t" << stats::total_mag_norm[0];
+	      //	std::cout << "\t" << stats::total_mag_norm[1];
+	      //	std::cout << "\t" << stats::total_mag_norm[2];
+	      //	std::cout << std::endl;
+	      //}
 	    } 
 	    
-	     if(mpi_generic::my_rank==0){
+	    std::cout << vmpi::my_rank;
+	    std::cout << "\t" << stats::total_mag_m_norm;
+	    std::cout << "\t" << stats::total_mag_norm[0];
+	    std::cout << "\t" << stats::total_mag_norm[1];
+	    std::cout << "\t" << stats::total_mag_norm[2];
+	    std::cout << std::endl;
+	    
+	     if(vmpi::my_rank==0){
 		mag_new = stats::total_mag_norm[2];
 		H_new = sim::H_applied;
 		if (mag_new*mag_old < 0 & mag_old > mag_new){
@@ -808,7 +815,6 @@ int hysteresis(){
 		  H_c_right=(mag_old*H_new-mag_new*H_old)/(mag_old-mag_new);
 		  std::cout << "\t" << "the right coercivity is" << "\t" <<  H_c_right << "\t" << "Tesla" << std::endl;
 		}		 		  
-			  
 	      std::cout << sim::H_applied << "\t" << stats::total_mag_m_norm; // Tesla
 	      std::cout << "\t" << stats::total_mag_norm[0];
 	      std::cout << "\t" << stats::total_mag_norm[1];
@@ -824,7 +830,7 @@ int hysteresis(){
 	      vmag << std::endl;
 	      
 	      // output pov_file
-	      
+	      vout::pov_file();
 	      				
 	      mag_old = mag_new;
 	      H_old = H_new;
@@ -842,7 +848,7 @@ int hysteresis(){
 
 	  }
 	 }
-	 if(mpi_generic::my_rank==0){
+	 if(vmpi::my_rank==0){
 	  H_coercive = -H_c_left;   //0.5*(H_c_right-H_c_left);
 	  std::cout << "coercive field of the system is" << "\t" << H_coercive << "\t" << "Tesla" << std::endl;
 	  //vmag << "Hc+ is" << "\t" << H_c_right << "\tTesla" << "Hc- is" << "\t" << H_c_left << "\tTesla" << std::endl;

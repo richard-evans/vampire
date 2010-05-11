@@ -216,7 +216,7 @@ int mag_m(){
 			double mx=stats::sublattice_mx_array[mat]*inm;
 			double my=stats::sublattice_my_array[mat]*inm;
 			double mz=stats::sublattice_mz_array[mat]*inm;
-			
+
 			// Calculate magnitudes
 			stats::sublattice_magm_array[mat]=sqrt(mx*mx + my*my + mz*mz);
 			
@@ -253,13 +253,14 @@ int mag_m(){
 			//MPI::COMM_WORLD.Allreduce(&stats::mag[2],&stats::mag[2],1,MPI_DOUBLE,MPI_SUM);
 			
 			// Collect normalised magnetization from each processor
-			MPI::COMM_WORLD.Allreduce(&stats::total_mag_norm[0],&stats::total_mag_norm[0],2,MPI_DOUBLE,MPI_SUM);
-			MPI::COMM_WORLD.Allreduce(&stats::total_mag_norm[1],&stats::total_mag_norm[1],2,MPI_DOUBLE,MPI_SUM);
-			MPI::COMM_WORLD.Allreduce(&stats::total_mag_norm[2],&stats::total_mag_norm[2],2,MPI_DOUBLE,MPI_SUM);
-			stats::total_mag_norm[0]/=vmpi::num_processors;
-			stats::total_mag_norm[1]/=vmpi::num_processors;
-			stats::total_mag_norm[2]/=vmpi::num_processors;
-
+			//MPI::COMM_WORLD.Allreduce(&stats::total_mag_norm[0],&stats::total_mag_norm[0],1,MPI_DOUBLE,MPI_SUM);
+			//MPI::COMM_WORLD.Allreduce(&stats::total_mag_norm[1],&stats::total_mag_norm[1],1,MPI_DOUBLE,MPI_SUM);
+			//MPI::COMM_WORLD.Allreduce(&stats::total_mag_norm[2],&stats::total_mag_norm[2],1,MPI_DOUBLE,MPI_SUM);
+			//stats::total_mag_norm[0]/=vmpi::num_processors;
+			//stats::total_mag_norm[1]/=vmpi::num_processors;
+			//stats::total_mag_norm[2]/=vmpi::num_processors;
+			//std::cout << vmpi::num_processors << std::endl;
+			
 			MPI::COMM_WORLD.Allreduce(&stats::total_mag_m_norm ,&stats::total_mag_m_norm ,1,MPI_DOUBLE,MPI_SUM);
 			stats::total_mag_m_norm/=vmpi::num_processors;
 		#endif
