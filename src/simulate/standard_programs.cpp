@@ -750,12 +750,12 @@ int hysteresis(){
 	// set loop temperature
 	// Setup LLG arrays
 	sim::initialise();
-
+	
 	// Initialise spins to +z
 	for(int atom =0;atom<atoms::num_atoms;atom++){
 		atoms::x_spin_array[atom]=0.0;
 		atoms::y_spin_array[atom]=0.0;
-		atoms::z_spin_array[atom]=1.0;
+		atoms::z_spin_array[atom]=1.0-2.0*double(vmpi::my_rank%2);
 	}
 	
 	 // Setup Hmax and J=Hinc
@@ -775,7 +775,7 @@ int hysteresis(){
         //std::cout << std::cout.flags() << std::endl;
 	 //std::cout << mp::material[0].mu_s_SI << "\t" << mp::material[0].Ku1_SI << "\t" << 2.0*mp::material[0].Ku1_SI/mp::material[0].mu_s_SI << std::endl;
 	 std::cout << "Estimated Coercivity:" << 2.0*mp::material[0].Ku1_SI/mp::material[0].mu_s_SI << std::endl;
-	 	 
+	 vout::pov_file();
 	 // parity loop
 	 for(int parity=-1;parity<2;parity+=2){
 	  // Set up loop variables
@@ -796,6 +796,9 @@ int hysteresis(){
 	      //}
 	    } 
 	    
+		// output pov_file after each field point
+      vout::pov_file();
+		
 	    std::cout << vmpi::my_rank;
 	    std::cout << "\t" << stats::total_mag_m_norm;
 	    std::cout << "\t" << stats::total_mag_norm[0];
@@ -829,12 +832,13 @@ int hysteresis(){
 	      vmag << "\t" << stats::total_mag_norm[2];
 	      vmag << std::endl;
 	      
-	      // output pov_file
-	      vout::pov_file();
+
 	      				
 	      mag_old = mag_new;
 	      H_old = H_new;
 	    }
+		 
+
 	  //if ((H%100)==0){vout::pov_file();}		
 	     // mag_new = stats::total_mag_norm[2];
 	    
@@ -847,6 +851,8 @@ int hysteresis(){
       	     // mag_old = mag_new;
 
 	  }
+
+
 	 }
 	 if(vmpi::my_rank==0){
 	  H_coercive = -H_c_left;   //0.5*(H_c_right-H_c_left);

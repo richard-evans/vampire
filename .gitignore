@@ -18,6 +18,7 @@
 >>>>>>> 7b5667fd8df6805b65d962cfdb506b4afa77a695:.gitignore
 # Other sundry files
 *.png
+info
 vampire
 crystal.xyz
 vdp

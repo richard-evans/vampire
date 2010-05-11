@@ -634,10 +634,11 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 	std::vector <std::vector <int> > tmp_cneighbourlist(new_num_atoms);
 	//tmp_cneighbourlist.reserve(new_num_atoms);
 	
-	// Populate tmp arrays (assuming all mpi_type=3 atoms are at the end of the array)
-	for (unsigned int atom=0;atom<new_num_atoms;atom++){
+	// Populate tmp arrays (assuming all mpi_type=3 atoms are at the end of the array?)
+	for (unsigned int atom=0;atom<new_num_atoms;atom++){ // new atom number
 		unsigned int old_atom_num = mpi_type_vec[atom].atom_number;
 		tmp_catom_array[atom]=catom_array[old_atom_num];
+		tmp_catom_array[atom].mpi_old_atom_number=old_atom_num; // Store old atom numbers for translation after sorting
 		//tmp_cneighbourlist.push_back(std::vector<int>());
 		tmp_cneighbourlist[atom].reserve(cneighbourlist[old_atom_num].size());
 		//Copy neighbourlist using new atom numbers
@@ -751,6 +752,38 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	stati.resize(requests.size());
 	MPI::Request::Waitall(requests.size(),&requests[0],&stati[0]);
 	
+	// Translate atoms to be sent from old atom numbers
+	// Find highest old atom number
+	int highest=0;
+	for(unsigned int atom=0; atom<catom_array.size();atom++){
+          unsigned int old_atom_num=catom_array[atom].mpi_old_atom_number;
+          if(old_atom_num>highest){
+	    highest=old_atom_num;
+	  }
+	}
+	std::cout << vmpi::my_rank << " highest " << highest << std::endl;
+	// Set up atom number translation array
+	std::vector <int> inv_atom_translation_array(highest-1);
+	for(unsigned int atom=0; atom<catom_array.size();atom++){
+	  unsigned int old_atom_num=catom_array[atom].mpi_old_atom_number;
+	  if(old_atom_num>highest){
+	    std::cout << "Old atom number out of range! on rank " << vmpi::my_rank << "; Old atom number: " << old_atom_num << " ; New atom number: " << atom << std::endl;
+	    exit(1);
+	  } 
+	  inv_atom_translation_array[old_atom_num]=atom;
+	}
+
+	// Loop over all atoms to be sent and translate
+	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+	  int si=vmpi::send_start_index_array[cpu];
+	  for(int index=0;index<vmpi::send_num_array[cpu];index++){
+	    int old_atom_number=vmpi::send_atom_translation_array[si+index];
+	    int new_atom_number=inv_atom_translation_array[old_atom_number];
+	    send_atom_translation_array[si+index]=new_atom_number;
+	  }
+        }
+
+
 	return EXIT_SUCCESS;
 }
 	

@@ -50,7 +50,7 @@ namespace cs{
 			int mpi_type;
 			int mpi_cpuid;
 			int mpi_atom_number;
-			
+	  int mpi_old_atom_number;
 			catom_t():
 				x(0.0),
 				y(0.0),
@@ -61,7 +61,8 @@ namespace cs{
 				supercell(0),
 				mpi_type(0),
 				mpi_cpuid(0),
-				mpi_atom_number(0)
+				mpi_atom_number(0),
+				mpi_old_atom_number(0)
 			{};
 };
 /// @brief This is the brief (one line only) description of the function.
