@@ -204,7 +204,27 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 					double oy = catom_array[atom].y-grain_coord_array[nearest_grain][1];
 					double old_range = ox*ox+oy*oy;
 					if(new_range<=old_range){
-						catom_array[atom].include=true;
+					  const int geo=mp::material[catom_array[atom].material].geometry;
+
+					  if(geo==0){
+					    catom_array[atom].include=true;
+					  }
+					  else{
+					    double x = catom_array[atom].x;
+					    double y = catom_array[atom].y;
+					    double px[50];
+					    double py[50];
+					    // Initialise polygon points
+					    for(int p=0;p<geo;p++){
+					      px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*mp::system_dimensions[0];
+					      py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*mp::system_dimensions[1];
+					    }
+					    if(vmath::point_in_polygon(x,y,px,py,geo)==true){
+					      catom_array[atom].include=true;
+					      catom_array[atom].grain=grain;
+					    }
+					  }
+						//catom_array[atom].include=true;
 						catom_array[atom].grain=grain;
 						nearest_grain=grain;
 					}

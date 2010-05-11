@@ -12,6 +12,7 @@ namespace program
 	extern int two_temperature_pulse();
 	extern int bmark();
 	extern int LLB_Boltzmann();
+	extern int hysteresis();
 }
 
 #endif /*PROGRAM_H_*/

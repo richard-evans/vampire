@@ -99,7 +99,8 @@ int simulate_system(){
 	//program::static_hysteresis();
 	//program::two_temperature_pulse();
 	//program::bmark();
-	program::LLB_Boltzmann();
+	//program::LLB_Boltzmann();
+	program::hysteresis();
 	return 0;
 }
   /*
