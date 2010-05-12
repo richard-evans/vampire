@@ -754,19 +754,20 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	
 	// Translate atoms to be sent from old atom numbers
 	// Find highest old atom number
-	int highest=0;
+	int highest=catom_array.size();
 	for(unsigned int atom=0; atom<catom_array.size();atom++){
-          unsigned int old_atom_num=catom_array[atom].mpi_old_atom_number;
+          int old_atom_num=catom_array[atom].mpi_old_atom_number;
           if(old_atom_num>highest){
 	    highest=old_atom_num;
 	  }
 	}
-	std::cout << vmpi::my_rank << " highest " << highest << std::endl;
+	//std::cout << vmpi::my_rank << " highest " << highest << std::endl;
 	// Set up atom number translation array
-	std::vector <int> inv_atom_translation_array(highest-1);
+	std::vector <int> inv_atom_translation_array(highest+1);
 	for(unsigned int atom=0; atom<catom_array.size();atom++){
-	  unsigned int old_atom_num=catom_array[atom].mpi_old_atom_number;
-	  if(old_atom_num>highest){
+	  int old_atom_num=catom_array[atom].mpi_old_atom_number;
+	  //std::cout << "Rank: " << vmpi::my_rank << " Old: " << old_atom_num << " New: " << atom << " Highest: " << highest << std::endl;
+	  if((old_atom_num>highest) || (old_atom_num < 0)){ // || (old_atom_num>catom_array.size())){
 	    std::cout << "Old atom number out of range! on rank " << vmpi::my_rank << "; Old atom number: " << old_atom_num << " ; New atom number: " << atom << std::endl;
 	    exit(1);
 	  } 
@@ -781,8 +782,7 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	    int new_atom_number=inv_atom_translation_array[old_atom_number];
 	    send_atom_translation_array[si+index]=new_atom_number;
 	  }
-        }
-
+	}
 
 	return EXIT_SUCCESS;
 }

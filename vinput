@@ -33,7 +33,7 @@ material:file="ES.mat"
 #------------------------------------------
 sim:exchange=true
 sim:anisotropy=true
-sim:applied=false
+sim:applied=true
 sim:thermal=true
 sim:temperature=300.0
 sim:Hinc=100.0 !mT

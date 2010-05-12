@@ -755,7 +755,8 @@ int hysteresis(){
 	for(int atom =0;atom<atoms::num_atoms;atom++){
 		atoms::x_spin_array[atom]=0.0;
 		atoms::y_spin_array[atom]=0.0;
-		atoms::z_spin_array[atom]=1.0-2.0*double(vmpi::my_rank%2);
+		atoms::z_spin_array[atom]=1.0;
+		//atoms::z_spin_array[atom]=1.0-2.0*double(vmpi::my_rank%2);
 	}
 	
 	 // Setup Hmax and J=Hinc
@@ -797,7 +798,7 @@ int hysteresis(){
 	    } 
 	    
 		// output pov_file after each field point
-      vout::pov_file();
+	    //vout::pov_file();
 		
 	    std::cout << vmpi::my_rank;
 	    std::cout << "\t" << stats::total_mag_m_norm;
