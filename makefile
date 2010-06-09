@@ -7,20 +7,22 @@ export OMPI_CXX=icc
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
-MPICC=mpic++ -DMPICF
+MPICC=/home/rfle500/openmpibin/bin/mpic++ -DMPICF
 export LANG=C
 export LC_ALL=C
 
 # Debug Flags
-ICC_DBCFLAGS= -O0 -C -I./hdr -pg
-ICC_DBLFLAGS= -lstdc++ -C -I./hdr -pg
+ICC_DBCFLAGS= -O0 -C -I./hdr
+ICC_DBLFLAGS= -lstdc++ -C -I./hdr
 
 GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -ansi -Wno-long-long -I./hdr
 GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axSSE3 -ipo -static -fno-alias -align -falign-functions -I./hdr
-ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -axSSE3
+#ICC_CFLAGS= -O3 -axSSE3 -ipo -static -fno-alias -align -falign-functions -I./hdr
+#ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -axSSE3
+ICC_CFLAGS= -O3 -axT -ipo -static -fno-alias -align -falign-functions -I./hdr
+ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -axT
 
 GCC_CFLAGS=-O3 -msse3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr
 GCC_LDFLAGS= -lstdc++ -I./hdr
@@ -37,6 +39,7 @@ obj/create/cs_create_neighbour_list2.o \
 obj/create/cs_set_atom_vars2.o \
 obj/create/cs_particle_shapes.o \
 obj/create/cs_voronoi2.o \
+obj/create/grains.o \
 obj/simulate/simulate_system.o \
 obj/simulate/LLG.o \
 obj/simulate/LLB.o \

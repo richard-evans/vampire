@@ -24,6 +24,7 @@
 #include <fstream>
 #include "public.hpp"
 #include "atoms.hpp"
+#include "grains.hpp"
 #include "material.hpp"
 #include "vmpi.hpp"
 #include "create.hpp"
@@ -107,11 +108,17 @@ int create(){
 		vmpi::init_mpi_comms(catom_array);
 	#endif
 
- 	//=============================================================
+	//=============================================================
 	//      Set atom variables for simulation
 	//=============================================================
 	
 	cs::set_atom_vars(catom_array,cneighbourlist);
+
+	//=============================================================
+	//      Set grain variables for simulation
+	//=============================================================
+
+	grains::set_properties();
 
 	//=============================================================
 	//      Generate system files for storage
@@ -147,68 +154,7 @@ int create(){
 		xyz_file.close();
 		}
 		#endif
-		//exit(0);
-		//exit(1);
-	/*if(1==2){
-	std::ofstream exc_file;
-  	exc_file.open ("exchange.txt");
-  	exc_file << cs_num_atoms << std::endl;
-  	exc_file << "" << std::endl;
-  	
-  	for(atom=0; atom<cs_num_atoms; atom++){
-  		exc_file << atom << "\t";
-  		for(int nn=0;nn<material_parameters::hamiltonian_num_neighbours;nn++){ 
-  					exc_file << cs_neighbourlist_array[atom][nn]<< "\t";
-  		}
-  		exc_file << std::endl;
-  	}
-  	exc_file.close();
-	}*/
 
-	//#endif
-  	//=============================================================
-	//      Deallocate allocated arrays close output files etc
-	//=============================================================
-
-  	//--------------------------
-	// deallocate cs_coord_array
-	//--------------------------
-	/*
-  	try{for(int i=0; i<init_cs_num_atoms ; i++) delete [] cs_coord_array[i];
-    	delete [] cs_coord_array;
-    	cs_coord_array=NULL;
-    	}
-  	catch(...){std::cout << "error deallocating cs_coord_array" << std::endl;exit(1);}
-  	
-	//-------------------------------
-	// deallocate cs_atom_type_array
-	//-------------------------------
-	
-  	try{delete [] cs_atom_type_array;
-  		cs_atom_type_array=NULL;
-  		}
-  	catch(...){std::cout << "error deallocating cs_atom_type_array" << std::endl;exit(1);}
-
-	//-----------------------------------
-	// deallocate cs_neighbourlist_array
-	//-----------------------------------
-	
-  	try{for(int i=0; i<cs_num_atoms ; i++) delete [] cs_neighbourlist_array[i];
-    	delete [] cs_neighbourlist_array;
-    	cs_neighbourlist_array=NULL;
-    	}
-  	catch(...){std::cout << "error deallocating cs_neighbourlist_array" << std::endl;exit(1);}	
-  	
-	
-	if(final_num_atoms>0){
-		if(mpi_generic::my_rank==0){
-			std::cout << "System Generated Successfully" << std::endl;
-		}
-	}
-	else{
-		std::cerr << "No atoms generated, exiting!" << std::endl;
-		exit(1);
-	}*/
 	return EXIT_SUCCESS;
 }
 

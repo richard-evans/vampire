@@ -236,8 +236,8 @@ namespace vmpi{
 		for (int i=0;i<100;i+=5){
 			xyz_file << "O\t" << float(i) << "\t" << 0.0 << "\t" << 0.0 << std::endl;
 			xyz_file << "O\t" << 0.0 << "\t" << float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0] << "\t" << material_parameters::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0]-float(i) << "\t" << 	material_parameters::system_dimensions[1] << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << mp::system_dimensions[0] << "\t" << mp::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << mp::system_dimensions[0]-float(i) << "\t" << mp::system_dimensions[1] << "\t" << 0.0 << std::endl;
 		}
 	  	for(int atom=0; atom<num_atoms; atom++){
 				//if(mpi_create_variables::mpi_comms_identify==true){
@@ -299,7 +299,7 @@ namespace vmpi{
 				else xyz_file << mp::material[mpi_char_array[i]].element << "\t";
 
 				xyz_file << mpi_data_array[3*i];
-				xyz_file << "\t" << mpi_data_array[3*i+1] + double(p)*mp::system_dimensions[0];
+				xyz_file << "\t" << mpi_data_array[3*i+1]; // + double(p)*mp::system_dimensions[0];
 				xyz_file << "\t" << mpi_data_array[3*i+2]; //+material_parameters::system_dimensions[2]*p;
 				xyz_file << std::endl;
 			}

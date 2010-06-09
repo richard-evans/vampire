@@ -455,7 +455,7 @@ int initialise(std::string const infile){
 	// system_creation_flags[2] - Set system type
 	//-------------------------------------------------------------------
 	//		0	Particle
-	//		1	Particle Array
+// 	//		1	Particle Arra
 	//		2	Hexagonal Particle Array
 	//		3	Voronoi Granular Film
 	//		4	Grain Growth 2D Film

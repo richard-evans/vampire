@@ -17,9 +17,9 @@ create:voronoi-parity=0
 # System Dimensions:
 #------------------------------------------
 dimensions:a=3.54 !A
-dimensions:dx = 21.0 !nm
-dimensions:dy = 21.0 !nm
-dimensions:dz = 7.0 !nm
+dimensions:dx = 100.0 !nm
+dimensions:dy = 50.0 !nm
+dimensions:dz = 0.2 !nm
 dimensions:particle-size = 5 !nm
 dimensions:particle-spacing = 1.0 !nm
 
@@ -27,7 +27,7 @@ dimensions:particle-spacing = 1.0 !nm
 # Material File:
 #------------------------------------------
 material:file="Co.mat"
-material:file="ES.mat"
+#material:file="ES.mat"
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
@@ -40,7 +40,7 @@ sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
 sim:Hmin=-12.0 !T
 sim:equilibration-time=1
-sim::partial-time=1000
+sim::partial-time=100
 sim:total-time=1
-sim:loop-time=10000
+sim:loop-time=1000
 sim:dt=1.0E-15

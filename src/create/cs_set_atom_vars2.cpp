@@ -81,6 +81,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
 
 	atoms::type_array.resize(atoms::num_atoms,0);
+	atoms::grain_array.resize(atoms::num_atoms,0);
 	
 	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
@@ -88,6 +89,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);	
 	atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);	
 	atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);	
+	atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);	
+	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);	
+	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);	
 
 	for(int atom=0;atom<atoms::num_atoms;atom++){
 		
@@ -96,6 +100,8 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		atoms::z_coord_array[atom] = catom_array[atom].z;
 		
 		atoms::type_array[atom] = catom_array[atom].material;
+		//std::cout << atom << " grain: " << catom_array[atom].grain << std::endl;
+		atoms::grain_array[atom] = catom_array[atom].grain;
 	}
 
 	//===========================================================
@@ -132,7 +138,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		// Set end index
 		atoms::neighbour_list_end_index[atom]=counter-1;
 	}
-	
+
 	return EXIT_SUCCESS;
 }
 

@@ -6,7 +6,7 @@
 #include "material.hpp"
 #include "public.hpp"
 #include "create.hpp"
-
+#include "vmpi.hpp"
 #include <iostream>
 
 namespace cs{
@@ -56,8 +56,8 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 	}
-
-	const int d[3]={1+round((max[0]-min[0])/mp::lattice_constant[0]),1+round((max[1]-min[1])/mp::lattice_constant[1]),1+round((max[2]-min[2])/mp::lattice_constant[2])};
+	// Added smal correction to avoid rounding errors - RF 8/6/2010
+	const int d[3]={1+round((max[0]-min[0])/mp::lattice_constant[0]+0.001),1+round((max[1]-min[1])/mp::lattice_constant[1]+0.001),1+round((max[2]-min[2])/mp::lattice_constant[2]+0.001)};
 	
 	// offset in whole unit cells
 	const int offset[3] = {int((min[0])/mp::lattice_constant[0]), int((min[1])/mp::lattice_constant[1]), int((min[2])/mp::lattice_constant[2])};
@@ -114,7 +114,10 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				scc[i]=int(c[i]/mp::lattice_constant[i])-offset[i]; // Always round down for supercell coordinates
 				// Always check cell in range
 				if(scc[i]<0 || scc[i]>= d[i]){
-					std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
+				        std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
+					#ifdef MPICF
+					std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
+					#endif 
 					std::cerr << "\tAtom number:      " << atom << std::endl;
 					std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
 					std::cerr << "\tmin coordinates:  " << min[0] << "\t" << min[1] << "\t" << min[2] << "\t" << std::endl;
@@ -123,7 +126,12 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 					std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
 					std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
 					std::cerr << "\tCell offest (dp): " << offset[0]*mp::lattice_constant[0] << "\t" << offset[1]*mp::lattice_constant[1] << "\t" << offset[2]*mp::lattice_constant[2] << std::endl;
+					#ifdef MPICF
+					MPI::COMM_WORLD.Abort(EXIT_FAILURE);
 					exit(EXIT_FAILURE);
+                                        #else
+					exit(EXIT_FAILURE);
+                                        #endif
 				}
 			}
 			
@@ -141,7 +149,13 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
 				std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
 				std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
+				#ifdef MPICF
+				MPI::COMM_WORLD.Abort(EXIT_FAILURE);
 				exit(EXIT_FAILURE);
+                                #else
+				exit(EXIT_FAILURE);
+                                #endif
+
 			}
 		}
 		

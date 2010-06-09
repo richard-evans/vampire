@@ -24,10 +24,8 @@ namespace error_checking
 	bool error_check;
 	
 }
-//==========================================================
-// Namespace grains
-//==========================================================
-namespace grains{
+
+/*namespace grains{
 
 	int num_grains;
 	
@@ -38,7 +36,8 @@ namespace grains{
 	double** grain_pointx_array=NULL;
 	double** grain_pointy_array=NULL;
 
-}
+}*/
+
 
 
 

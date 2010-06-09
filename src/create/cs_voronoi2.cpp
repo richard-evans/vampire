@@ -1,4 +1,5 @@
 #include "create.hpp"
+#include "grains.hpp"
 #include "material.hpp"
 #include "public.hpp"
 #include "random.hpp"
@@ -173,7 +174,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	int nearest_grain=0;
 	
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-			if((atom%num_atoms/10)==0){
+			if((atom%(num_atoms/10))==0){
 				std::cout << "." << std::flush;
 			}
 
@@ -238,6 +239,10 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	}
 
 	std::cout << "done!" << std::endl;
+
+	// set number of grains
+	grains::num_grains = int(grain_coord_array.size());
+
 	return EXIT_SUCCESS;	
 }
 
@@ -320,9 +325,9 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	#else
 	int test_qhull;
 
-	test_qhull=system("qhull 1> /dev/null 2> /dev/null");
+	test_qhull=system("./qvoronoi 1> /dev/null 2> /dev/null");
 	if(test_qhull!=0){
-		std::cerr << "Error! - qhull does not seem to be installed, exiting" << std::endl; 
+		std::cerr << "Error! - qvoronoi does not seem to be installed, exiting" << std::endl; 
 		exit(EXIT_FAILURE);
 	}
 	#endif
@@ -332,14 +337,23 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//--------------------------------------
 
 	std::stringstream vsstr;
-	vsstr << "cat " << grain_file << " | qvoronoi -o -Fv > " << voronoi_file;
+	vsstr << "cat " << grain_file << " | ./qvoronoi -o -Fv > " << voronoi_file;
 	string vstr = vsstr.str();
 	const char* vcstr = vstr.c_str();
 	//std::cout << vcstr << std::endl;
 
 	//system("cat grains.tmp | qvoronoi -o -Fv > voronoi.tmp");
 	int sysstat = system(vcstr);
-	if(sysstat!=0) std::cerr << "Error initiating qhull" << std::endl;
+	if(sysstat!=0){
+	  std::cerr << "Error initiating qvoronoi, exiting" << std::endl;
+        #ifdef MPICF
+	  MPI::COMM_WORLD.Abort(EXIT_FAILURE);
+	  exit(EXIT_FAILURE);
+        #else
+	  exit(EXIT_FAILURE);
+        #endif
+
+	}
 	//--------------------------------------------------------
 	// Read in number of Voronoi vertices
 	//--------------------------------------------------------
@@ -444,85 +458,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 
 }
 
-void deallocate_grain_arrays(){
-	//========================================================================================================
-	//		 							Function to deallocate grain arrays at exit
-	//
-	//														Version 1.0
-	//
-	//												R F Evans 15/07/2009
-	//
-	//========================================================================================================
 
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "deallocate_grain_arrays has been called" << std::endl;}	
-
-	try{for(int i=0;i<grains::num_grains;i++) delete [] grains::grain_coord_array[i];
-    	delete [] grains::grain_coord_array;
-    	grains::grain_coord_array=NULL;
-    	}
-  	catch(...){std::cerr << "error deallocating grain_coord_array" << std::endl;exit(1);}
-
- 	try{for(int i=0;i<grains::num_grains;i++) delete [] grains::grain_spin_array[i];
-    	delete [] grains::grain_spin_array;
-    	grains::grain_spin_array=NULL;
-    	}
-  	catch(...){std::cerr << "error deallocating grain_spin_array" << std::endl;exit(1);}
-
-	try{delete [] grains::grain_volume_array;
-		grains::grain_volume_array=NULL;
-	}
-  	catch(...){std::cerr << "error deallocating grain_volume_array" << std::endl;exit(1);}
-
- 	try{for(int i=0;i<grains::num_grains;i++) delete [] grains::grain_pointx_array[i];
-    	delete [] grains::grain_pointx_array;
-    	grains::grain_pointx_array=NULL;
-    	}
-  	catch(...){std::cerr << "error deallocating grain_pointx_array" << std::endl;exit(1);}
-
- 	try{for(int i=0;i<grains::num_grains;i++) delete [] grains::grain_pointy_array[i];
-    	delete [] grains::grain_pointy_array;
-    	grains::grain_pointy_array=NULL;
-    	}
-  	catch(...){std::cerr << "error deallocating grain_pointy_array" << std::endl;exit(1);}
-
-	try{delete [] grains::num_assoc_vertices_array;
-		grains::num_assoc_vertices_array=NULL;
-	}
-  	catch(...){std::cerr << "error deallocating num_assoc_vertices_array" << std::endl;exit(1);}
-
-}
-
-int cs_calc_grain_vol(int cs_num_atoms,int* particle_include_array){
-	//========================================================================================================
-	//		 				Function to calculate number of atoms in each grain
-	//
-	//														Version 1.0
-	//
-	//												R F Evans 15/07/2009
-	//
-	//========================================================================================================
-
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "cs_calc_grain_vol has been called" << std::endl;}	
-
-	for(int atom=0;atom<cs_num_atoms;atom++){
-		if((particle_include_array[atom]>=0) && (particle_include_array[atom]<grains::num_grains)){
-			grains::grain_volume_array[particle_include_array[atom]]+=1;
-		}
-	}
-
-	return 0;
-
-}
-		
-//return EXIT_SUCCESS;
-
-//}
 
 } // End of cs namespace
 

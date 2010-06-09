@@ -98,9 +98,9 @@ int simulate_system(){
 	//program::hamr_run();
 	//program::static_hysteresis();
 	//program::two_temperature_pulse();
-	//program::bmark();
+	program::bmark();
 	//program::LLB_Boltzmann();
-	program::hysteresis();
+	//program::hysteresis();
 	return 0;
 }
   /*
