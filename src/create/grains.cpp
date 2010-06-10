@@ -8,7 +8,7 @@
 
 namespace grains{
 
-  int num_grains=0;
+  int num_grains=1; // always assume 1 grain 
 
   std::vector <int> grain_size_array(0);
 
