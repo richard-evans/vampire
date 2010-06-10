@@ -80,11 +80,16 @@ int set_properties(){
 
 	// Reduce grain properties on all CPUs
 	#ifdef MPICF
-		MPI::COMM_WORLD.Allreduce(&grains::grain_size_array[0], &grains::grain_size_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(&grains::x_coord_array[0], &grains::x_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(&grains::y_coord_array[0], &grains::y_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(&grains::z_coord_array[0], &grains::z_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(&grains::sat_mag_array[0], &grains::sat_mag_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		//MPI::COMM_WORLD.Allreduce(&grains::grain_size_array[0], &grains::grain_size_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		//MPI::COMM_WORLD.Allreduce(&grains::x_coord_array[0], &grains::x_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		//MPI::COMM_WORLD.Allreduce(&grains::y_coord_array[0], &grains::y_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		//MPI::COMM_WORLD.Allreduce(&grains::z_coord_array[0], &grains::z_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		//MPI::COMM_WORLD.Allreduce(&grains::sat_mag_array[0], &grains::sat_mag_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::grain_size_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::sat_mag_array[0],grains::num_grains, MPI_INT,MPI_SUM);
 	#endif
 
 	// Calculate mean grains coordinates 

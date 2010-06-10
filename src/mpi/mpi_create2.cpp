@@ -373,7 +373,8 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*mp::lattice_constant[2];
 	
 	// Reduce data on all CPUs
-	MPI::COMM_WORLD.Allreduce(&cpu_range_array[0], &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
+	//MPI::COMM_WORLD.Allreduce(&cpu_range_array[0], &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
+	MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
 	
 	//std::cout << vmpi::my_rank << "\t";
 	//for(int i=0;i<6*vmpi::num_processors;i++){

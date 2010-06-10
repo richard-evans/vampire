@@ -261,7 +261,8 @@ int mag_m(){
 			//stats::total_mag_norm[2]/=vmpi::num_processors;
 			//std::cout << vmpi::num_processors << std::endl;
 			
-			MPI::COMM_WORLD.Allreduce(&stats::total_mag_m_norm ,&stats::total_mag_m_norm ,1,MPI_DOUBLE,MPI_SUM);
+			//MPI::COMM_WORLD.Allreduce(&stats::total_mag_m_norm ,&stats::total_mag_m_norm ,1,MPI_DOUBLE,MPI_SUM);
+			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::total_mag_m_norm ,1,MPI_DOUBLE,MPI_SUM);
 			stats::total_mag_m_norm/=vmpi::num_processors;
 		#endif
 

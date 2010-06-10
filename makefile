@@ -3,11 +3,11 @@
 #								Makefile for VAMPIRE
 #
 #===================================================================
-export OMPI_CXX=icc
+#export OMPI_CXX=icc
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
-MPICC=/home/rfle500/openmpibin/bin/mpic++ -DMPICF
+MPICC=mpic++ -DMPICF
 export LANG=C
 export LC_ALL=C
 
