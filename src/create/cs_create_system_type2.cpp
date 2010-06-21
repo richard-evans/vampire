@@ -6,6 +6,7 @@
 
 #include "public.hpp"
 #include "create.hpp"
+#include "grains.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include <string>
@@ -257,18 +258,16 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 			//particle_origin[0] = double(round(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
 			//particle_origin[1] = double(round(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
 			//particle_origin[2] = double(round(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+			// Determine particle origin
+			particle_origin[0] = double(x_particle)*repeat_size + repeat_size;
+			particle_origin[1] = double(y_particle)*repeat_size + repeat_size;
+			particle_origin[2] = double(round(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
 
 			if(mp::particle_creation_parity==1){
 				particle_origin[0]+=mp::lattice_constant[0]*0.5;
 				particle_origin[1]+=mp::lattice_constant[1]*0.5;
 				particle_origin[2]+=mp::lattice_constant[2]*0.5;
 			}
-		
-			// Determine particle origin
-			particle_origin[0] = double(x_particle)*repeat_size + repeat_size;
-			particle_origin[1] = double(y_particle)*repeat_size + repeat_size;
-			particle_origin[2] = double(round(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
-
 			// Check to see if a complete particle fits within the system bounds
 			if((particle_origin[0]<(mp::system_dimensions[0]-mp::particle_scale)) &&
 				(particle_origin[1]<(mp::system_dimensions[1]-mp::particle_scale))){
@@ -293,9 +292,11 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 				}
 				// Increment Particle Number Counter
 				particle_number++;
-		   }
+			}
 		}
 	}
+	grains::num_grains = particle_number;
+	
 	// Clear unneeded atoms
 	//clear_atoms(catom_array);
 	// Re-order atoms by particle number

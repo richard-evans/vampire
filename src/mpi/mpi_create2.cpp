@@ -236,8 +236,8 @@ namespace vmpi{
 		for (int i=0;i<100;i+=5){
 			xyz_file << "O\t" << float(i) << "\t" << 0.0 << "\t" << 0.0 << std::endl;
 			xyz_file << "O\t" << 0.0 << "\t" << float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << mp::system_dimensions[0] << "\t" << mp::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << mp::system_dimensions[0]-float(i) << "\t" << mp::system_dimensions[1] << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << material_parameters::system_dimensions[0] << "\t" << material_parameters::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << material_parameters::system_dimensions[0]-float(i) << "\t" << 	material_parameters::system_dimensions[1] << "\t" << 0.0 << std::endl;
 		}
 	  	for(int atom=0; atom<num_atoms; atom++){
 				//if(mpi_create_variables::mpi_comms_identify==true){
@@ -375,7 +375,6 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	// Reduce data on all CPUs
 	//MPI::COMM_WORLD.Allreduce(&cpu_range_array[0], &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
 	MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
-	
 	//std::cout << vmpi::my_rank << "\t";
 	//for(int i=0;i<6*vmpi::num_processors;i++){
 	//	std::cout << cpu_range_array[i] << "\t";
@@ -723,30 +722,33 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	MPI::Request::Waitall(requests.size(),&requests[0],&stati[0]);
 	
 	// Find total number of boundary atoms I need to send and calculate start index
+
 	int num_boundary_swaps=0;
+	int num_send_data=0;
 	for(int p=0;p<vmpi::num_processors;p++){
 		vmpi::send_start_index_array[p]=num_boundary_swaps;
 		num_boundary_swaps+=vmpi::send_num_array[p];
+		num_send_data+=vmpi::recv_num_array[p];
 	}
 	
 	// Resize translation and data arrays
 	vmpi::send_atom_translation_array.resize(num_boundary_swaps);
 	vmpi::send_spin_data_array.resize(3*num_boundary_swaps);
-
+	std::vector<int> recv_data(num_send_data);
 	// Send and receive atom numbers requested/to be sent
 	requests.resize(0);
 
 	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
 		// Pack remote atom number into 1D array
-		std::vector<int> recv_data(vmpi::recv_num_array[cpu]);
+	  //std::vector<int> recv_data(vmpi::recv_num_array[cpu]); // This is very BAD! isend returns immediately, but local array is detroyed = memory mess!
 		int si=vmpi::recv_start_index_array[cpu];
 		for(int index=0;index<vmpi::recv_num_array[cpu];index++){
 			int local_atom_number=vmpi::recv_atom_translation_array[si+index];
 			int remote_atom_number=catom_array[local_atom_number].mpi_atom_number;
-			recv_data[index]=remote_atom_number;
+			recv_data[si+index]=remote_atom_number;
 		}
 		int rsi=vmpi::send_start_index_array[cpu];
-		requests.push_back(MPI::COMM_WORLD.Isend(&recv_data[0],vmpi::recv_num_array[cpu],MPI_INT,cpu,61));
+		requests.push_back(MPI::COMM_WORLD.Isend(&recv_data[si],vmpi::recv_num_array[cpu],MPI_INT,cpu,61));
 		requests.push_back(MPI::COMM_WORLD.Irecv(&vmpi::send_atom_translation_array[rsi],vmpi::send_num_array[cpu],MPI_INT,cpu,61));
 	}
 

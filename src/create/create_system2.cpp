@@ -96,6 +96,7 @@ int create(){
 	//=============================================================
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
+		MPI::COMM_WORLD.Barrier();
 		vmpi::copy_halo_atoms(catom_array);
 	#else
 		//cs::copy_periodic_boundaries(catom_array);
@@ -104,8 +105,11 @@ int create(){
 	cs::create_neighbourlist(catom_array,cneighbourlist);
 	
 	#ifdef MPICF
+		MPI::COMM_WORLD.Barrier();
 		vmpi::identify_boundary_atoms(catom_array,cneighbourlist);
+		MPI::COMM_WORLD.Barrier();
 		vmpi::init_mpi_comms(catom_array);
+		MPI::COMM_WORLD.Barrier();
 	#endif
 
 	//=============================================================
