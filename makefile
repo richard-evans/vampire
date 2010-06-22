@@ -4,9 +4,11 @@
 #
 #===================================================================
 #export OMPI_CXX=icc
+#export OMPI_CXX=pathCC
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 MPICC=mpic++ -DMPICF
 export LANG=C
 export LC_ALL=C
@@ -18,14 +20,20 @@ ICC_DBLFLAGS= -lstdc++ -C -I./hdr
 GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -ansi -Wno-long-long -I./hdr
 GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr
 
+PCC_DBCFLAGS= -O0 -I./hdr
+PCC_DBLFLAGS= -O0 -I./hdr
+
 # Performance Flags
-#ICC_CFLAGS= -O3 -axSSE3 -ipo -static -fno-alias -align -falign-functions -I./hdr
-#ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -axSSE3
-ICC_CFLAGS= -O3 -axT -ipo -static -fno-alias -align -falign-functions -I./hdr
-ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -axT
+ICC_CFLAGS= -O3 -axSSE3 -ipo -static -fno-alias -align -falign-functions -I./hdr
+ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -axSSE3
+#ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
+#ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
 GCC_CFLAGS=-O3 -msse3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr
 GCC_LDFLAGS= -lstdc++ -I./hdr
+
+PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr
+PCC_LDFLAGS= -lstdc++ -I./hdr -O2 -march=barcelona -ipa
 
 # Objects
 OBJECTS=obj/main/public.o \
@@ -61,11 +69,14 @@ obj/utility/units.o
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 ICCDB_OBJECTS=$(OBJECTS:.o=_idb.o)
 GCCDB_OBJECTS=$(OBJECTS:.o=_gdb.o)
+PCCDB_OBJECTS=$(OBJECTS:.o=_pdb.o)
 
 MPI_OBJECTS=$(OBJECTS:.o=_mpi.o)
 MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_mpi.o)
+MPI_PCC_OBJECTS=$(OBJECTS:.o=_p_mpi.o)
 MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
 MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
+MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 
 EXECUTABLE=vampire
 
@@ -96,6 +107,12 @@ intel-debug: $(ICCDB_OBJECTS)
 $(ICCDB_OBJECTS): obj/%_idb.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
+pathscale-debug: $(ICCDB_OBJECTS)
+	$(PCC) $(PCC_DBLFLAGS) $(PCCDB_OBJECTS) -o $(EXECUTABLE)
+
+$(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
+	$(PCC) -c -o $@ $(PCC_DBCFLAGS) $<
+
 # MPI Targets
 
 mpi-gcc: $(MPI_OBJECTS)
@@ -109,6 +126,11 @@ mpi-intel: $(MPI_ICC_OBJECTS)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<
 
+mpi-pathscale: $(MPI_PCC_OBJECTS)
+	$(MPICC) $(PCC_LDFLAGS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
+$(MPI_PCC_OBJECTS): obj/%_p_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(PCC_CFLAGS) $<
+
 mpi-gcc-debug: $(MPI_GCCDB_OBJECTS)
 	$(MPICC) $(GCC_DBLFLAGS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)
 
@@ -121,6 +143,11 @@ mpi-intel-debug: $(MPI_ICCDB_OBJECTS)
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
+mpi-pathscale-debug: $(MPI_PCCDB_OBJECTS)
+	$(MPICC) $(PCC_DBLFLAGS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
+
+$(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
 
 clean:
 	@rm -f obj/*.o
