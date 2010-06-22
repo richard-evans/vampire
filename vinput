@@ -10,24 +10,23 @@ create:cylinder
 create:crystal-structure="fcc"
 #create:particle-parity=1
 #create:single-spin
-#create:voronoi-film
-#create:voronoi-variance=0.0
+create:voronoi-film
+create:voronoi-variance=0.1
 #create:voronoi-parity=0
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
 dimensions:a=3.54 !A
-dimensions:dx = 5.0 !nm
-dimensions:dy = 5.0 !nm
-dimensions:dz = 8.0 !nm
+dimensions:dx = 100.0 !nm
+dimensions:dy = 50.0 !nm
+dimensions:dz = 6.0 !nm
 dimensions:particle-size = 5 !nm
 dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
 # Material File:
 #------------------------------------------
-material:file="Co.mat"
-#material:file="ES.mat"
+material:file="CoPt.mat"
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
@@ -39,8 +38,8 @@ sim:temperature=300.0
 sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
 sim:Hmin=-12.0 !T
-sim:equilibration-time=1
-sim::partial-time=100
-sim:total-time=1
-sim:loop-time=1000
-sim:dt=1.0E-15
+sim:equilibration-time=100000
+sim::partial-time=1
+sim:total-time=100000
+sim:loop-time=1
+sim:dt=1.0E-16

@@ -95,8 +95,8 @@ int curie_temperature(bool init){
 			atoms::z_spin_array[atom]=2.0*mtrandom::grnd()-1.0;
 		}
 		else{
-			double parity = double(atoms::grain_array[atom]%2);
-			atoms::x_spin_array[atom]=0.0;			
+		    double parity = 1.0; //double(atoms::grain_array[atom]%2);
+			atoms::x_spin_array[atom]=0.01;			
 			atoms::y_spin_array[atom]=0.0;			
 			atoms::z_spin_array[atom]=2.0*parity-1.0;
 		}
@@ -104,13 +104,16 @@ int curie_temperature(bool init){
 		//sim::H_applied=0.0;
 	// Set up loop variables
 	
-	vout::pov_file();
-		
+	//vout::pov_file();
+
 	//      Perform Temperature Loop
-	for(int temperature=0;temperature<=1000;temperature+=10){
+	for(int temperature=0;temperature<=1500;temperature+=10){
 		// Set system temperature
 		sim::temperature=double(temperature); 
 		
+		double meanT=0.0;
+		double count=0.0;
+
 		// Equilibrate system
 		LLG(sim::equilibration_time);
 		
@@ -122,6 +125,8 @@ int curie_temperature(bool init){
 			
 			// Calculate mag_m, mag
 			stats::mag_m();
+			meanT+=stats::total_mag_m_norm;
+			count+=1.0;
 		}
 		// Output to screen and file after each temperature
 		if(vmpi::my_rank==0){
@@ -130,10 +135,10 @@ int curie_temperature(bool init){
 			std::cout << "\t" << stats::total_mag_norm[1];
 			std::cout << "\t" << stats::total_mag_norm[2];
 			std::cout << std::endl;
-			vmag << sim::temperature << "\t" << stats::total_mag_m_norm << std::endl;
+			vmag << sim::temperature << "\t" << stats::total_mag_m_norm << "\t" << meanT/count << std::endl;
 		}
 		
-	vout::pov_file();
+		//vout::pov_file();
 		
 	} // End of temperature loop
 
@@ -161,13 +166,13 @@ int bmark(){
   sim::temperature=300.0;
 
   // Simulate system
-  for(sim::time=0;sim::time<1000;sim::time+=1){
+  for(sim::time=0;sim::time<10000;sim::time+=1){
 
   // Calculate LLG
   LLG(1);
 
       // Calculate mag_m, mag
-  if(sim::time%100==0){
+  if(sim::time%1000==0){
       stats::mag_m();
 		//vout::pov_file();
   if(vmpi::my_rank==0){
@@ -667,9 +672,9 @@ int static_hysteresis(){
 	vout::pov_file();
 	
 	// Setup min and max fields and increment (mT)
-	int iHmax=round(sim::Hmax*1.0E3);
-	int iHmin=round(sim::Hmin*1.0E3);
-	int iHinc=round(sim::Hinc*1.0E3);
+	int iHmax=round(double(sim::Hmax)*1.0E3);
+	int iHmin=round(double(sim::Hmin)*1.0E3);
+	int iHinc=round(double(sim::Hinc)*1.0E3);
 	// Perform Field Loop
 	for(int parity=-1;parity<2;parity+=2){
 		for(int H=iHmin;H<=iHmax;H+=iHinc){

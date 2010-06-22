@@ -397,13 +397,22 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 		}
 	}
 	
+	std::vector<MPI::Request> requests(0);
+	std::vector<MPI::Status> stati(0);
+
 	// Send/receive number of boundary/halo atoms
 	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
 		if(cpu!=vmpi::my_rank){
-			MPI::COMM_WORLD.Bsend(&num_send_atoms[cpu],1,MPI_INT,cpu,35);
-			MPI::COMM_WORLD.Recv(&num_recv_atoms[cpu],1,MPI_INT,cpu,35);
+		    // Bsend requires an explicit buffer, use asynchronous comms instead!
+		    //MPI::COMM_WORLD.Bsend(&num_send_atoms[cpu],1,MPI_INT,cpu,35);
+		    //MPI::COMM_WORLD.Recv(&num_recv_atoms[cpu],1,MPI_INT,cpu,35);
+			requests.push_back(MPI::COMM_WORLD.Isend(&num_send_atoms[cpu],1,MPI_INT,cpu,35));
+			requests.push_back(MPI::COMM_WORLD.Irecv(&num_recv_atoms[cpu],1,MPI_INT,cpu,35));
 		}
 	}
+
+	stati.resize(requests.size());
+	MPI::Request::Waitall(requests.size(),&requests[0],&stati[0]);
 		
 	//std::cout << vmpi::my_rank << "\t";
 	//for(int i=0;i<vmpi::num_processors;i++){
@@ -466,8 +475,8 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	
 	// Exchange boundary/halo data
 	
-	std::vector<MPI::Request> requests(0);
-	std::vector<MPI::Status> stati(0);
+	//std::vector<MPI::Request> requests(0);
+	//std::vector<MPI::Status> stati(0);
 	
 	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
 		if(num_send_atoms[cpu]>0){

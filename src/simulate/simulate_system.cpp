@@ -94,7 +94,7 @@ int initialise(){
 //int output_pov_file();
 
 int simulate_system(){
-  //program::curie_temperature(true);
+    //program::curie_temperature(true);
 	//program::hamr_run();
 	//program::static_hysteresis();
 	//program::two_temperature_pulse();
