@@ -4,6 +4,7 @@
 // Includes
 //==========================================================
 #include "create.hpp"
+#include <cstdlib>
 #include <string>
 #include <vector>
 
@@ -45,11 +46,15 @@ namespace vmpi{
 	#endif
 
 	//functions declarations
+	extern int initialise();
+	extern int hosts();
+	extern int finalise();
 	extern int geometric_decomposition(int, double []);
 	extern int crystal_xyz(std::vector<cs::catom_t> &);
 	extern int copy_halo_atoms(std::vector<cs::catom_t> &);
 	extern int identify_boundary_atoms(std::vector<cs::catom_t> &, std::vector<std::vector <int> > &);
 	extern int init_mpi_comms(std::vector<cs::catom_t> & catom_array);
+
 }
 
 //==========================================================

@@ -3,33 +3,16 @@
 
 #include <iostream>
 #include <vector>
-#include <stdio.h>
 
 #include "create.hpp"
-#include "material.hpp"
 #include "errors.hpp"
+#include "material.hpp"
+#include "sim.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
-//#include <types.h>
-//#include <wait.h>
 
-// comment
-// another comment
-using namespace std;
-
-//int initialise_variables(std::string const);
-//int create_system();
 int simulate_system();
-//int handle_opengl(int, char**);
-#ifdef MPICF
-int initialise_mpi();
-int finalise_mpi();
-int mpi_hosts();
-#endif 
 
-//int initialise_system();
-
-//int main (int argc, char** argv)
 /// Main function for vampire
 /// Prints out program header and calls main program routines
 int main(int argc, char* argv[]){
@@ -59,102 +42,54 @@ int main(int argc, char* argv[]){
 		}
 	}
 	
-	//=============================================================
 	// For parallel execution intialise MPI
-	//=============================================================	
-	
 	#ifdef MPICF
-	initialise_mpi();
+		vmpi::initialise();
 	#endif 
 	
-   //=============================================================
 	//      Output Program Header
-	//=============================================================
 	if(vmpi::my_rank==0){
-		cout << "                   __     __                    _ " << endl;          
-		cout << "                   \\ \\   / /_ _ _ __ ___  _ __ (_)_ __ ___ " << endl;
-		cout << "                    \\ \\ / / _` | '_ ` _ \\| '_ \\| | '__/ _ \\ " << endl;
-		cout << "                     \\ V / (_| | | | | | | |_) | | | |  __/ " << endl;
-		cout << "                      \\_/ \\__,_|_| |_| |_| .__/|_|_|  \\___| " << endl;
-		cout << "                                         |_|                " << endl;
-		cout << " " << endl;
-		cout << "          Visual Atomistic and Micromagnetic Parallel IntegratoR Engine" << endl;
-		cout << " " << endl;
-		cout << "           Contributors: Richard F L Evans, Joe Barker, Thomas Ostler" << endl;
-		cout << "                         Weijia Fan, Roy W Chantrell" << endl;
-		cout << " " << endl;
-		cout << "                      Version 1.0 " << __DATE__ << " " << __TIME__ << endl;
+		std::cout << "                   __     __                    _ " << std::endl;          
+		std::cout << "                   \\ \\   / /_ _ _ __ ___  _ __ (_)_ __ ___ " << std::endl;
+		std::cout << "                    \\ \\ / / _` | '_ ` _ \\| '_ \\| | '__/ _ \\ " << std::endl;
+		std::cout << "                     \\ V / (_| | | | | | | |_) | | | |  __/ " << std::endl;
+		std::cout << "                      \\_/ \\__,_|_| |_| |_| .__/|_|_|  \\___| " << std::endl;
+		std::cout << "                                         |_|                " << std::endl;
+		std::cout << " " << std::endl;
+		std::cout << "          Visual Atomistic and Micromagnetic Parallel IntegratoR Engine" << std::endl;
+		std::cout << " " << std::endl;
+		std::cout << "           Contributors: Richard F L Evans, Joe Barker, Thomas Ostler" << std::endl;
+		std::cout << "                         Weijia Fan, Roy W Chantrell" << std::endl;
+		std::cout << " " << std::endl;
+		std::cout << "                      Version 1.0 " << __DATE__ << " " << __TIME__ << std::endl;
 		#ifdef COMP	
-		cout << "                        Compiled with " << COMP << endl;
+		std::cout << "                        Compiled with " << COMP << std::endl;
 		#endif 
-		cout << " " << endl;
-		cout << "================================================================================" << endl;
+		std::cout << " " << std::endl;
+		std::cout << "================================================================================" << std::endl;
 		int sysstat = system ("date");
 		if(sysstat!=0) std::cerr << "Error retrieving date from system" << std::endl;
 	}
 
 	#ifdef MPICF
-	mpi_hosts();
+		vmpi::hosts();
 	#endif 
 
-	//if(mpi_generic::my_rank==0){
-	//	cout << "================================================================================" << endl;
-	//	cout << " " << endl;
-	//	cout << "Starting Simulation..." << endl;
-	//}
-    //=============================================================
-	//      Initialise material parameters and atomistic variables
-	//=============================================================
-
-	if(vmpi::my_rank==0){
-		cout << "================================================================================" << endl;
-		cout << " " << endl;
-		cout << "Initialising system variables" << endl;
-	}
-	//cout << "Initialising system variables"<< endl;
+	// Initialise system
 	mp::initialise(infile);
 
-	//=============================================================
-	//      Create atomistic system, neighbourlist etc
-	//=============================================================
-     
-	if(vmpi::my_rank==0){
-		cout << "Creating system" << endl;
-	}
-	//  cout << "Creating atomic system"<< endl;
+	// Create system
 	cs::create();
-	//create_system();
 
-	//initialise_mpi();
+	// Simulate system
+	sim::run();
 
-	//cout << mpi_generic::my_rank << endl;
-
-		//initialise_system();
-        
-		//for (int time=0;time<10001;time++){
-	if(vmpi::my_rank==0){
-		cout << "Starting Simulation..." << endl;
-	}
-		//for(;;){
-	simulate_system();
-		//}
-     
-	//=============================================================
-	//      Deallocate allocated arrays close output files etc
-	//=============================================================
-
-	//cout << "Cleaning Up Atomistic System"<< endl;
-	//  cleanup_system();
-
-	//=============================================================
-	//      Finalise MPI
-	//=============================================================
-
+	// Finalise MPI
 	#ifdef MPICF
-	finalise_mpi();
+		vmpi::finalise();
 	#endif
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 /// \mainpage Vampire

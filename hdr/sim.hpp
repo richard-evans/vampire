@@ -22,6 +22,7 @@ namespace sim{
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 	
+	extern int run();
 	extern int initialise();
 	
 	extern int LLB(int);

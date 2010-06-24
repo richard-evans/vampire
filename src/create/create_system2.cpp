@@ -45,6 +45,9 @@ int create(){
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "cs::create has been called" << std::endl;}
 	
+	if(vmpi::my_rank==0){
+		std::cout << "Creating system" << std::endl;
+	}
 	//=============================================================
 	//      System creation variables
 	//=============================================================

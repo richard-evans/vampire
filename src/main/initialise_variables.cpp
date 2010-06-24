@@ -124,6 +124,12 @@ int initialise(std::string const infile){
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "initialise_variables has been called" << std::endl;}
 
+	if(vmpi::my_rank==0){
+		std::cout << "================================================================================" << std::endl;
+		std::cout << " " << std::endl;
+		std::cout << "Initialising system variables" << std::endl;
+	}
+	
 	// Setup default system settings
 	mp::default_system();
 	
