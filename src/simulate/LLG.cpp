@@ -11,7 +11,7 @@
 /// Contains LLG namespace and serial version of the integrator
 #include "atoms.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "LLG.hpp"
 #include "vmpi.hpp"
 
@@ -60,7 +60,7 @@ int set_LLG(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "set_LLG has been called" << std::endl;}
+	if(err::check==true){std::cout << "set_LLG has been called" << std::endl;}
 
 	if(LLG_arrays::LLG_set==true){
 		std::cerr << "Warning - LLG arrays have been reinitialised" << std::endl;
@@ -118,7 +118,7 @@ int set_LLG(){
   	return 0;
 }
 
-
+namespace sim{
 /// Master LLG Function - dispatches code path to desired LLG routine
 /// \f$ \frac{\partial S}{\partial t} \f$
 int LLG(const int num_steps){
@@ -126,7 +126,7 @@ int LLG(const int num_steps){
    //----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "LLG has been called" << std::endl;}
+	if(err::check==true){std::cout << "LLG has been called" << std::endl;}
 
 	#ifdef MPICF
 		LLG_mpi(num_steps);
@@ -135,6 +135,8 @@ int LLG(const int num_steps){
 	#endif
 	
 	return 0;
+}
+
 }
 
 /// Performs serial Heun integration of the Landau-Lifshitz-Gilbert Equation of motion
@@ -285,7 +287,7 @@ int LLG_serial_heun(const int num_steps){
 	return 0;
 	}
 
-
+namespace sim{
 /// Master LLG_relax Function - dispatches code path to desired LLG routine
 /// \f$ \frac{\partial S}{\partial t} \f$
 int LLG_relax(const int num_steps){
@@ -293,7 +295,7 @@ int LLG_relax(const int num_steps){
    //----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "LLG_relax has been called" << std::endl;}
+	if(err::check==true){std::cout << "LLG_relax has been called" << std::endl;}
 
 	#ifdef MPICF
 		std::cerr << "MPI version of LLG_relax is yet to be implemented, exiting" << std::endl;
@@ -304,7 +306,7 @@ int LLG_relax(const int num_steps){
 	
 	return 0;
 }
-
+}
 /// Performs serial Heun integration of the relaxational part of the Landau-Lifshitz-Gilbert Equation of motion
 int LLG_relax_serial_heun(const int num_steps){
 

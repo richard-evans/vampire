@@ -4,7 +4,7 @@
 //
 //======================================================================
 
-#include "public.hpp"
+#include "errors.hpp"
 #include "create.hpp"
 #include "material.hpp"
 #include "vmpi.hpp"
@@ -19,7 +19,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "cs::create_crystal_structure has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::create_crystal_structure has been called" << std::endl;}	
 
 	//-----------------------------------------------------------------------
 	// Pre Determine crystal structure and estimate number of atoms each material

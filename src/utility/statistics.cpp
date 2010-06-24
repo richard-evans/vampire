@@ -24,7 +24,7 @@
 // Headers
 #include "atoms.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "vmpi.hpp"
 #include <iostream>
 
@@ -99,7 +99,7 @@ int mag_m(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "stats::mag_m() has been called" << std::endl;}
+	if(err::check==true){std::cout << "stats::mag_m() has been called" << std::endl;}
 	
 	//------------------------------------------------------------------
 	// Calculate number and inverse number of moments for normalisation

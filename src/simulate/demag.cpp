@@ -9,7 +9,7 @@
 //==================================================================================================== 
 #include "atoms.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "demag.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -59,7 +59,7 @@ int set_demag(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){
+	if(err::check==true){
 		std::cout << "set_demag has been called " << vmpi::my_rank << std::endl;
 	}
 
@@ -297,7 +297,7 @@ int demag_field_update(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){
+	if(err::check==true){
 		std::cout << "demag_field_update has been called " << vmpi::my_rank << std::endl;
 	}
 

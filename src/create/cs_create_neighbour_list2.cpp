@@ -4,7 +4,7 @@
 //
 //======================================================================
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "create.hpp"
 #include "vmpi.hpp"
 #include <iostream>
@@ -22,7 +22,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	//====================================================================================
 	
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::create_neighbourlist has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::create_neighbourlist has been called" << std::endl;}	
 	
 	const int num_atoms = catom_array.size();
 	const int max_atoms_per_supercell=10;

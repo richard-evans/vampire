@@ -24,7 +24,7 @@
 
 // Headers
 #include <iostream>
-#include "public.hpp"
+#include "errors.hpp"
 #include "demag.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
@@ -122,7 +122,7 @@ int initialise(std::string const infile){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "initialise_variables has been called" << std::endl;}
+	if(err::check==true){std::cout << "initialise_variables has been called" << std::endl;}
 
 	// Setup default system settings
 	mp::default_system();
@@ -221,7 +221,7 @@ int default_system(){
 	material[0].element="Ag ";
 
 	// Disable Error Checking
-	error_checking::error_check=false;
+	err::check=false;
 	
 	// Initialise random number generator
 	mtrandom::grnd.seed(1234);
@@ -425,7 +425,7 @@ int initialise(std::string const infile){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "initialise_variables has been called" << std::endl;}
+	if(err::check==true){std::cout << "initialise_variables has been called" << std::endl;}
 
 	// Initialise system creation flags to zero
 	for (int i=0;i<10;i++){
@@ -705,8 +705,8 @@ int initialise(std::string const infile){
 	// Enable/Disable Error Checking
 	//----------------------------------
 
-	error_checking::error_check=false;
-	//error_checking::error_check=true;
+	err::check=false;
+	//err::check=true;
 	
 	// Initialise random number generator
 	

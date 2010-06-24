@@ -13,7 +13,7 @@
 //=====================================================================================
 #ifdef MPICF
 #include "atoms.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "vmpi.hpp"
 //#include <iostream>
 //#include <valarray>
@@ -38,7 +38,7 @@ int mpi_init_halo_swap(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){
+	if(err::check==true){
 		std::cout << "mpi_init_halo_swap has been called" << "\t";
 		std::cout << vmpi::my_rank << std::endl;
 	}
@@ -108,7 +108,7 @@ int mpi_complete_halo_swap(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){
+	if(err::check==true){
 		std::cout << "mpi_complete_halo_swap has been called" << "\t";
 		std::cout << vmpi::my_rank << std::endl;
 	}

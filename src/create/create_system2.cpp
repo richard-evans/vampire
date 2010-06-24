@@ -22,7 +22,7 @@
 ///
 #include <iostream>
 #include <fstream>
-#include "public.hpp"
+#include "errors.hpp"
 #include "atoms.hpp"
 #include "grains.hpp"
 #include "material.hpp"
@@ -43,7 +43,7 @@ int create(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "cs::create has been called" << std::endl;}
+	if(err::check==true){std::cout << "cs::create has been called" << std::endl;}
 	
 	//=============================================================
 	//      System creation variables

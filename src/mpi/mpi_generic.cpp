@@ -12,7 +12,7 @@
 //
 //=====================================================================================
 
-#include "public.hpp"
+#include "errors.hpp"
 //#include <mpi.h>
 #include "vmpi.hpp"
 #include <iostream>
@@ -109,7 +109,7 @@ int initialise_mpi(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "initialise_mpi has been called" << std::endl;}
+	if(err::check==true){std::cout << "initialise_mpi has been called" << std::endl;}
 
 	int resultlen;
 
@@ -157,7 +157,7 @@ int mpi_hosts(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "mpi_hosts has been called" << std::endl;}
+	if(err::check==true){std::cout << "mpi_hosts has been called" << std::endl;}
 
 	//-------------------------
 	// Wait for all processors
@@ -201,7 +201,7 @@ int finalise_mpi(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "finalise_mpi has been called" << std::endl;}
+	if(err::check==true){std::cout << "finalise_mpi has been called" << std::endl;}
 
 	//-------------------------
 	// Wait for all processors

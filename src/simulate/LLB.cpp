@@ -12,7 +12,7 @@
 #include "atoms.hpp"
 #include "material.hpp"
 #include "sim.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "LLG.hpp"
 #include "vmpi.hpp"
 #include "random.hpp"
@@ -83,7 +83,7 @@ int LLB(const int num_steps){
    //----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "LLB has been called" << std::endl;}
+	if(err::check==true){std::cout << "LLB has been called" << std::endl;}
 
 	#ifdef MPICF
 		//LLB_mpi(num_steps);

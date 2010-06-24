@@ -16,7 +16,7 @@
 ///=====================================================================================
 ///
 
-#include "public.hpp"
+#include "errors.hpp"
 #include "create.hpp"
 #include "material.hpp"
 #include "vmath.hpp"
@@ -28,7 +28,7 @@ namespace cs{
 int bulk(std::vector<cs::catom_t> & catom_array, const int grain){
 
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::bulk has been called" << std::endl;}
+	if(err::check==true){std::cout << "cs::bulk has been called" << std::endl;}
 
 	const int max_vertices=50;
 
@@ -68,7 +68,7 @@ int cylinder(double particle_origin[],std::vector<cs::catom_t> & catom_array, co
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "cs::cylinder has been called" << std::endl;}
+	if(err::check==true){std::cout << "cs::cylinder has been called" << std::endl;}
 
 	//-----------------------------------------
 	// Set particle radius
@@ -105,7 +105,7 @@ int sphere(double particle_origin[],std::vector<cs::catom_t> & catom_array, cons
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "cs::sphere has been called" << std::endl;}
+	if(err::check==true){std::cout << "cs::sphere has been called" << std::endl;}
 
 	// Set particle radius
 	double particle_radius_squared = (mp::particle_scale*0.5)*(mp::particle_scale*0.5);
@@ -149,7 +149,7 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 	//====================================================================================
 
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::truncated_octahedron has been called" << std::endl;}
+	if(err::check==true){std::cout << "cs::truncated_octahedron has been called" << std::endl;}
 
 	// Set truncated octahedron parameters
 	const double to_length = mp::particle_scale*0.5*3.0/2.0;

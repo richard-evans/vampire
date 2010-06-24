@@ -4,7 +4,7 @@
 //
 //======================================================================
 
-#include "public.hpp"
+#include "errors.hpp"
 #include "create.hpp"
 #include "grains.hpp"
 #include "material.hpp"
@@ -35,7 +35,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "cs::create_system_type has been called" << std::endl;}
+	if(err::check==true){std::cout << "cs::create_system_type has been called" << std::endl;}
 	
 	//----------------------------------------
 	// function prototypes
@@ -184,7 +184,7 @@ int particle(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "cs::particle has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::particle has been called" << std::endl;}	
 
 	//---------------------------------------------------
 	// Set particle origin to atom at centre of lattice
@@ -239,7 +239,7 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 	//====================================================================================
 
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::particle_array has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::particle_array has been called" << std::endl;}	
 
 	// Set number of particles in x and y directions
 	const double repeat_size = mp::particle_scale+mp::particle_spacing;
@@ -335,7 +335,7 @@ int hex_particle_array(int cs_num_atoms,int** cs_coord_array,int* particle_inclu
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "particle_array has been called" << std::endl;}	
+	if(err::check==true){std::cout << "particle_array has been called" << std::endl;}	
 
 	//----------------------------------------------------------
 	// set initial particle number
@@ -494,7 +494,7 @@ int pop_template_2D(int** template_array_2D,int cs_num_atoms,int** cs_coord_arra
 
 int clear_atoms(std::vector<cs::catom_t> & catom_array){
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::clear_atoms has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::clear_atoms has been called" << std::endl;}	
 	
 	// Get original and new number of atoms
 	const int num_atoms=catom_array.size();
@@ -531,7 +531,7 @@ bool compare(cs::catom_t first,cs::catom_t second){
 	
 int sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array){
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::sort_atoms_by_grain has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::sort_atoms_by_grain has been called" << std::endl;}	
 	
 	// Get number of atoms
 	const int num_atoms=catom_array.size();
@@ -553,7 +553,7 @@ int sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array){
 
 int alloy(std::vector<cs::catom_t> & catom_array){
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::alloy has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::alloy has been called" << std::endl;}	
 
 
 	// loop over all atoms

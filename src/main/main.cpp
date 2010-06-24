@@ -7,7 +7,7 @@
 
 #include "create.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
 //#include <types.h>

@@ -28,8 +28,8 @@ namespace grains{
 
 	extern int set_properties();
 
-};
+}
 
-#endif /*PUBLIC_H_*/
+#endif /*GRAINS_H_*/
 
 

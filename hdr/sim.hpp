@@ -25,6 +25,8 @@ namespace sim{
 	extern int initialise();
 	
 	extern int LLB(int);
+	extern int LLG(int);
+	extern int LLG_relax(int);
 }
 
 #endif /*SIM_H_*/

@@ -1,7 +1,7 @@
 #include "atoms.hpp"  
 #include "grains.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "vmpi.hpp"
 
 #include <iostream>
@@ -37,7 +37,7 @@ int set_properties(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "grains::set_properties has been called" << std::endl;}	
+	if(err::check==true){std::cout << "grains::set_properties has been called" << std::endl;}	
 	#ifdef MPICF
 		const unsigned int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 	#else
@@ -59,7 +59,7 @@ int set_properties(){
 	else std::cerr << "Warning - no grains detected!" << std::endl;
 
 	// loop over atoms to determine grain properties
-	for(int atom=0;atom< num_local_atoms;atom++){
+	for(unsigned int atom=0;atom< num_local_atoms;atom++){
 		const int grain = atoms::grain_array[atom];
 		const int mat = atoms::type_array[atom];
 
@@ -110,4 +110,4 @@ int set_properties(){
 }
 		
 
-}; // End of namespace grains
+} // End of namespace grains

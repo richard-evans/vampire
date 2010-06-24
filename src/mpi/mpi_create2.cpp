@@ -2,7 +2,7 @@
 
 #include "atoms.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "vmpi.hpp"
 #include <iostream>
 #include <list>
@@ -48,7 +48,7 @@ namespace vmpi{
 	int geometric_decomposition(int num_cpus, double system_dimensions[3]){
 
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "vmpi::geometric_decomposition has been called" << std::endl;}
+	if(err::check==true){std::cout << "vmpi::geometric_decomposition has been called" << std::endl;}
 
 	// set local variables
 	int x=num_cpus;
@@ -176,7 +176,7 @@ namespace vmpi{
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){
+	if(err::check==true){
 		std::cout << "vmpi::crystal_xyz has been called " << vmpi::my_rank << std::endl;
 	}
 
@@ -345,7 +345,7 @@ namespace vmpi{
 int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "vmpi::copy_boundary_atoms has been called" << std::endl;}
+	if(err::check==true){std::cout << "vmpi::copy_boundary_atoms has been called" << std::endl;}
 	
 	// Record initial number of atoms
 	//const int num_local_atoms=catom_array.size();
@@ -536,7 +536,7 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> &,std::vector<std::vector <i
 int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <int> > & cneighbourlist){
 	
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "vmpi::identify_boundary_atoms has been called" << std::endl;}
+	if(err::check==true){std::cout << "vmpi::identify_boundary_atoms has been called" << std::endl;}
 	
 	// Find and mark boundary and unneeded halo atoms 
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
@@ -584,7 +584,7 @@ bool compare(data_t first,data_t second){
 int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <int> > & cneighbourlist){
 	
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::sort_atoms_by_mpi_type has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::sort_atoms_by_mpi_type has been called" << std::endl;}	
 
 	// Create list object
 	std::list <data_t> mpi_type_list;
@@ -676,7 +676,7 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "vmpi::init_mpi_comms has been called" << std::endl;}
+	if(err::check==true){std::cout << "vmpi::init_mpi_comms has been called" << std::endl;}
 	
 	// Initialise array with number of transfers from and to all CPU's
 	vmpi::recv_num_array.resize(vmpi::num_processors);

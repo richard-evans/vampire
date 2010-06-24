@@ -26,7 +26,7 @@
 #include "atoms.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "sim.hpp"
 #include "units.hpp"
 #include "vio.hpp"

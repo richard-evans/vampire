@@ -9,7 +9,7 @@
 #include <vector>
 #include "atoms.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "vmpi.hpp"
 #include "create.hpp"
 
@@ -20,7 +20,7 @@ namespace cs{
 int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <int> > & cneighbourlist){
 
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){
+	if(err::check==true){
 		std::cout << "cs::set_atom_vars has been called " << vmpi::my_rank << std::endl;
 	}
 

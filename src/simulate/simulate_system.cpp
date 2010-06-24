@@ -10,7 +10,7 @@
 //==================================================================================================== 
 #include "atoms.hpp"
 #include "program.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "sim.hpp"
 #include <iostream>
 
@@ -49,7 +49,7 @@ int initialise(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "initialise_system has been called" << std::endl;}
+	if(err::check==true){std::cout << "initialise_system has been called" << std::endl;}
 
    //##########################################################
 	//if system simulation is not initialised then
@@ -145,7 +145,7 @@ statistics::inv_num_atoms = 1.0/double(num_atoms);
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "simulate_system has been called" << std::endl;}
+	if(err::check==true){std::cout << "simulate_system has been called" << std::endl;}
 
 	//=============================================================
 	//      Setup LLG arrays

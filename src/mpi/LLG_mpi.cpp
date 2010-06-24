@@ -10,7 +10,7 @@
 #ifdef MPICF
 #include "atoms.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "LLG.hpp"
 #include "vmpi.hpp"
 
@@ -29,7 +29,7 @@ int LLG_mpi(const int num_steps){
 		//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "LLG_mpi has been called" << std::endl;}
+	if(err::check==true){std::cout << "LLG_mpi has been called" << std::endl;}
 	
 	using namespace LLG_arrays;
 	

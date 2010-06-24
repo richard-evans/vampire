@@ -9,7 +9,7 @@
 //==================================================================================================== 
 #include "atoms.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "demag.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -42,7 +42,7 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "calculate_spin_fields has been called" << std::endl;}
+	if(err::check==true){std::cout << "calculate_spin_fields has been called" << std::endl;}
 	
 	// Initialise Total Spin Fields to zero
 	//fill (atoms::x_total_spin_field_array.begin(),atoms::x_total_spin_field_array.end(),0.0);
@@ -87,7 +87,7 @@ int calculate_external_fields(const int start_index,const int end_index){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "calculate_external_fields has been called" << std::endl;}
+	if(err::check==true){std::cout << "calculate_external_fields has been called" << std::endl;}
 
 	// Initialise Total External Fields to zero
 	//for(int atom=start_index;atom<end_index;atom++){
@@ -124,7 +124,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "calculate_exchange_fields has been called" << std::endl;}
+	if(err::check==true){std::cout << "calculate_exchange_fields has been called" << std::endl;}
 
 	const int prank=1;
 	//const int num_atoms = atoms::num_atoms;
@@ -188,7 +188,7 @@ int calculate_uniaxial_anis_fields(const int start_index,const int end_index){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "calculate_uniaxial_anis_fields has been called" << std::endl;}
+	if(err::check==true){std::cout << "calculate_uniaxial_anis_fields has been called" << std::endl;}
 
 	for(int atom=start_index;atom<end_index;atom++){
 		const int imaterial=atoms::type_array[atom];
@@ -227,7 +227,7 @@ int calculate_applied_fields(const int start_index,const int end_index){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "calculate_applied_fields has been called" << std::endl;}
+	if(err::check==true){std::cout << "calculate_applied_fields has been called" << std::endl;}
 
 	for(int atom=start_index;atom<end_index;atom++){
 		atoms::x_total_external_field_array[atom] += sim::H_vec[0]*sim::H_applied;
@@ -253,7 +253,7 @@ int calculate_thermal_fields(const int start_index,const int end_index){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "calculate_thermal_fields has been called" << std::endl;}
+	if(err::check==true){std::cout << "calculate_thermal_fields has been called" << std::endl;}
 
         //const int num_atoms = atoms::num_atoms;
 
@@ -297,7 +297,7 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "calculate_dipolar_fields has been called" << std::endl;}
+	if(err::check==true){std::cout << "calculate_dipolar_fields has been called" << std::endl;}
 	
 	// Check for update of dipolar fields
 	if(demag::update_counter%demag::update_rate==0){

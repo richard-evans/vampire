@@ -19,7 +19,7 @@
 ///=====================================================================================
 ///
 // Headers
-#include "public.hpp"
+#include "errors.hpp"
 #include "units.hpp"
 
 #include <iostream>
@@ -65,7 +65,7 @@ namespace units {
 ///
 int init(){
 		// check calling of routine if error checking is activated
-		if(error_checking::error_check==true){
+		if(err::check==true){
 			std::cout << "units::init has been called " << std::endl;
 		}
 		using units::unit;

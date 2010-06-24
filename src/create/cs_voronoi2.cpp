@@ -1,7 +1,7 @@
 #include "create.hpp"
 #include "grains.hpp"
 #include "material.hpp"
-#include "public.hpp"
+#include "errors.hpp"
 #include "random.hpp"
 #include "vmpi.hpp"
 #include "vmath.hpp"
@@ -21,7 +21,7 @@ namespace cs{
 int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	
 	// check calling of routine if error checking is activated
-	if(error_checking::error_check==true){std::cout << "cs::voronoi_film has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::voronoi_film has been called" << std::endl;}	
 	
 	//====================================================================================
 	//
@@ -273,7 +273,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(error_checking::error_check==true){std::cout << "cs::populate_vertex_points has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::populate_vertex_points has been called" << std::endl;}	
 
 	//--------------------------------------
 	// Scale grain coordinates
