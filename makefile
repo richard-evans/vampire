@@ -47,7 +47,8 @@ obj/create/cs_create_neighbour_list2.o \
 obj/create/cs_set_atom_vars2.o \
 obj/create/cs_particle_shapes.o \
 obj/create/cs_voronoi2.o \
-obj/create/grains.o \
+obj/data/atoms.o \
+obj/data/grains.o \
 obj/simulate/simulate_system.o \
 obj/simulate/LLG.o \
 obj/simulate/LLB.o \

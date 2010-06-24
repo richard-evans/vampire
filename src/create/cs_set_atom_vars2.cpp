@@ -15,47 +15,6 @@
 
 //using namespace atom_variables;
 //using namespace material_parameters;
-using std::vector;
-
-//==========================================================
-// Namespace atom variables
-//==========================================================
-namespace atoms
-{
-	//--------------------------
-	// Single Variables
-	//--------------------------
-	int num_atoms;			// Number of atoms in simulation
-	int num_neighbours;	   	// Maximum number of neighbours for Hamiltonian/Lattice
-	int total_num_neighbours;
-	//--------------------------
-	// Array Variables
-	//--------------------------
-	
-  vector <double> x_coord_array(0);
-	vector <double> y_coord_array(0);
-	vector <double> z_coord_array(0);
-	vector <int> neighbour_list_array(0);
-	vector <int> neighbour_list_start_index(0);
-	vector <int> neighbour_list_end_index(0);
-	vector <int> type_array(0);
-	vector <int> grain_array(0);
-
-	vector <double> x_spin_array(0);
-	vector <double> y_spin_array(0);
-	vector <double> z_spin_array(0);
-
-	vector <double> x_total_spin_field_array(0);		// Total spin dependent fields
-	vector <double> y_total_spin_field_array(0);		// Total spin dependent fields
-	vector <double> z_total_spin_field_array(0);		// Total spin dependent fields
-	vector <double> x_total_external_field_array(0);	// Total external fields
-	vector <double> y_total_external_field_array(0);	// Total external fields
-	vector <double> z_total_external_field_array(0);	// Total external fields
-	vector <double> x_dipolar_field_array(0);			// Dipolar fields
-	vector <double> y_dipolar_field_array(0);			// Dipolar fields
-	vector <double> z_dipolar_field_array(0);			// Dipolar fields
-
-}
 	
 namespace cs{
 int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <int> > & cneighbourlist){
