@@ -28,6 +28,7 @@ namespace sim{
 	
 	double Tmax=300;
 	double temperature;
+        double delta_temperature;
 	double H_applied=0.0;
 	double H_vec[3]={0.0,0.0,1.0};
 	double Hmin=-1.0; // T

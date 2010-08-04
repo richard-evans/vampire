@@ -13,6 +13,7 @@ namespace sim{
 	extern int equilibration_time;
 	extern double Tmax;
 	extern double temperature;
+        extern double delta_temperature;
 	extern double H_applied;
 	extern double H_vec[3];
 	extern double Hmin; // T

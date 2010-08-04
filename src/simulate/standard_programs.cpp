@@ -24,6 +24,7 @@
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
+#include "grains.hpp"
 #include "program.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -86,6 +87,9 @@ int hamr_run(){
 	// Setup LLG arrays
 	sim::initialise();
 
+        // perform 10 sequential runs
+        for(int run=0;run<1;run++){
+
 	// Initialise spins to +z
 	for(int atom =0;atom<atoms::num_atoms;atom++){
 		atoms::x_spin_array[atom]=0.0;
@@ -96,21 +100,25 @@ int hamr_run(){
 	// Set up loop variables
 	sim::H_applied=-0.8;
 	
-	double cooling_time=2.0e-9; // Seconds
-	double max_dT = 300.0; 
+	double cooling_time=0.5e-9; // Seconds
+	double max_dT = sim::delta_temperature; 
 	double RT = 300.0;
 	// Set initial system temperature
 	sim::temperature=300.0;
-	
+
+        // Initialise random number generator
+        mtrandom::grnd.seed(vmpi::my_rank);
+
 	// Equilibrate system
 	sim::LLG(sim::equilibration_time);
-	
+
 	// Simulate system with single timestep resolution
 	for(sim::time=0;sim::time<sim::loop_time;sim::time++){
 		
 		// calculate real time and temperature using gaussian cooling
-		double actual_time = double(sim::time)*mp::dt_SI;
-		sim::temperature=RT+max_dT*exp(-((actual_time*actual_time)/(cooling_time*cooling_time)));
+		double actual_time = (double(run)*double(sim::loop_time)+double(sim::time))*mp::dt_SI;
+		double rtime = double(sim::time)*mp::dt_SI;
+		sim::temperature=RT+max_dT*exp(-((rtime*rtime)/(cooling_time*cooling_time)));
 		
 		// Calculate LLG
 		sim::LLG(1);
@@ -134,7 +142,13 @@ int hamr_run(){
 			}
 		}
 	}
-	//vout::pov_file();
+        }
+	vout::pov_file();
+	// output final grain magnetisations
+	std::ofstream vgrain;
+	vgrain.open("vgrain");
+	grains::output_mag(vgrain);
+	vgrain.close();
 		
 	return EXIT_SUCCESS;
 }

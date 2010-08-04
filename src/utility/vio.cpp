@@ -840,6 +840,20 @@ int match_sim(string const word, string const value, string const unit, int cons
 				exit(1);
 			}
 		}
+                //--------------------------------------------------------------------
+                test="delta-temperature";
+                if(word==test){
+		    double T=atof(value.c_str());
+		    // Test for valid range
+		    if((T>=0.0) && (T<1.0E10)){
+			sim::delta_temperature=T;
+			return EXIT_SUCCESS;
+		    }
+		    else{
+			std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
+			exit(1);
+		    }
+                }
 		//--------------------------------------------------------------------
 		test="H-applied";
 		if(word==test){
