@@ -128,14 +128,14 @@ int mag_m(){
 			m[2] += atoms::z_spin_array[atom];
 		}
 		// Now normalise
-		stats::total_mag_norm[0]=m[0]*=stats::inv_num_atoms;
-		stats::total_mag_norm[1]=m[1]*=stats::inv_num_atoms;
-		stats::total_mag_norm[2]=m[2]*=stats::inv_num_atoms;
+		stats::total_mag_norm[0]=m[0]*stats::inv_num_atoms;
+		stats::total_mag_norm[1]=m[1]*stats::inv_num_atoms;
+		stats::total_mag_norm[2]=m[2]*stats::inv_num_atoms;
 		
 		// Calculate magnitude
-		total_mag_m_norm = sqrt(stats::total_mag_norm[0]*stats::total_mag_norm[0] + 
-										stats::total_mag_norm[1]*stats::total_mag_norm[1] +
-										stats::total_mag_norm[2]*stats::total_mag_norm[2]);
+		stats::total_mag_m_norm = sqrt(stats::total_mag_norm[0]*stats::total_mag_norm[0] + 
+			         	       stats::total_mag_norm[1]*stats::total_mag_norm[1] +
+					       stats::total_mag_norm[2]*stats::total_mag_norm[2]);
 		
 		//stats::total_mag_actual[0]*= stats::max_moment;
 		//stats::total_mag_actual[1]*= stats::max_moment;
@@ -149,10 +149,17 @@ int mag_m(){
 		stats::total_mag_m_actual = stats::total_mag_m_norm*stats::max_moment;
 		
 		#ifdef MPICF
-			//MPI::COMM_WORLD.Allreduce(&statistics::mag[0],&statistics::mag[0],1,MPI_DOUBLE,MPI_SUM);
-			//MPI::COMM_WORLD.Allreduce(&statistics::mag[1],&statistics::mag[1],1,MPI_DOUBLE,MPI_SUM);
-			//MPI::COMM_WORLD.Allreduce(&statistics::mag[2],&statistics::mag[2],1,MPI_DOUBLE,MPI_SUM);
-			//MPI::COMM_WORLD.Allreduce(&statistics::mag_m,&statistics::mag_m,1,MPI_DOUBLE,MPI_SUM);
+		        MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::num_atoms,1,MPI_INT,MPI_SUM);
+			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&m[0],1,MPI_DOUBLE,MPI_SUM);
+			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&m[1],1,MPI_DOUBLE,MPI_SUM);
+			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&m[2],1,MPI_DOUBLE,MPI_SUM);
+			//MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::mag_m,1,MPI_DOUBLE,MPI_SUM);
+			stats::total_mag_norm[0]=m[0]/double(stats::num_atoms);
+			stats::total_mag_norm[1]=m[1]/double(stats::num_atoms);
+			stats::total_mag_norm[2]=m[2]/double(stats::num_atoms);
+			stats::total_mag_m_norm = sqrt(stats::total_mag_norm[0]*stats::total_mag_norm[0] +
+						       stats::total_mag_norm[1]*stats::total_mag_norm[1] +
+						       stats::total_mag_norm[2]*stats::total_mag_norm[2]);
 		#endif
 	}
 	else{

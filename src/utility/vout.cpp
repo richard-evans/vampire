@@ -52,7 +52,7 @@ std::ofstream vmag("vmag");
 /// @internal
 ///=====================================================================================
 ///
-namespace vout{
+    namespace vout{
 /*	
 	int scr(std::stringstream buff){
 		if(num_processors=1){
@@ -292,7 +292,7 @@ int pov_file(){
 	return 0;
 	}
 
-}
+} //end of namespace vout
 /*
 if(1==0){
 		ofstream spin_file;
