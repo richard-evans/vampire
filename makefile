@@ -3,7 +3,7 @@
 #								Makefile for VAMPIRE
 #
 #===================================================================
-#export OMPI_CXX=icc
+export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
@@ -13,28 +13,33 @@ MPICC=mpic++ -DMPICF
 export LANG=C
 export LC_ALL=C
 
+# LIBS
+LIBS=-lstdc++
+CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
 ICC_DBCFLAGS= -O0 -C -I./hdr
-ICC_DBLFLAGS= -lstdc++ -C -I./hdr
+ICC_DBLFLAGS= -C -I./hdr
 
 GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -ansi -Wno-long-long -I./hdr
-GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr
+GCC_DBLFLAGS= -fbounds-check -I./hdr
 
 PCC_DBCFLAGS= -O0 -I./hdr
 PCC_DBLFLAGS= -O0 -I./hdr
 
 # Performance Flags
 ICC_CFLAGS= -O3 -axSSE3 -ipo -static -fno-alias -align -falign-functions -I./hdr
-ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -axSSE3
+ICC_LDFLAGS= -ipo -I./hdr -axSSE3
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
 GCC_CFLAGS=-O3 -msse3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr
-GCC_LDFLAGS= -lstdc++ -I./hdr
+GCC_LDFLAGS= -I./hdr
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr
-PCC_LDFLAGS= -lstdc++ -I./hdr -O2 -march=barcelona -ipa
+PCC_LDFLAGS= -I./hdr -O2 -march=barcelona -ipa
 
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
+NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 # Objects
 OBJECTS= \
 obj/create/create_system2.o \
@@ -85,37 +90,38 @@ MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
 MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 
+CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
 
 all: $(OBJECTS) gcc
 
 # Serial Targets
 gcc: $(OBJECTS)
-	$(GCC) $(GCC_LDFLAGS) $(OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
 intel: $(ICC_OBJECTS)
-	$(ICC) $(ICC_LDFLAGS) $(ICC_OBJECTS) -o $(EXECUTABLE)
+	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $<
 
 gcc-debug: $(GCCDB_OBJECTS)
-	$(GCC) $(GCC_DBLFLAGS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
 
 intel-debug: $(ICCDB_OBJECTS)
-	$(ICC) $(ICC_DBLFLAGS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)
+	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(ICCDB_OBJECTS): obj/%_idb.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
 pathscale-debug: $(ICCDB_OBJECTS)
-	$(PCC) $(PCC_DBLFLAGS) $(PCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(PCC) $(PCC_DBLFLAGS) $(LIBS) $(PCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 	$(PCC) -c -o $@ $(PCC_DBCFLAGS) $<
@@ -123,38 +129,48 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 mpi-gcc: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(MPI_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE)
 #export OMPI_CXX=icc
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
 
 mpi-intel: $(MPI_ICC_OBJECTS)
-	$(MPICC) $(ICC_LDFLAGS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<
 
 mpi-pathscale: $(MPI_PCC_OBJECTS)
-	$(MPICC) $(PCC_LDFLAGS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_PCC_OBJECTS): obj/%_p_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_CFLAGS) $<
 
 mpi-gcc-debug: $(MPI_GCCDB_OBJECTS)
-	$(MPICC) $(GCC_DBLFLAGS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<
 
 mpi-intel-debug: $(MPI_ICCDB_OBJECTS)
-	$(MPICC) $(ICC_DBLFLAGS) $(MPI_ICCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
 mpi-pathscale-debug: $(MPI_PCCDB_OBJECTS)
-	$(MPICC) $(PCC_DBLFLAGS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
+
+# cuda targets
+gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS) 
+	$(ICC) $(ICC_LDFLAGS) $(LIBS)  $(CUDALIBS) $(CUDA_OBJECTS) obj/cuda/LLG_cuda.o -o $(EXECUTABLE)
+
+$(CUDA_OBJECTS): obj/%_cuda.o: src/%.cpp
+	$(ICC) -c -o $@ $(ICC_CFLAGS) -DCUDA $<
+
+obj/cuda/LLG_cuda.o : src/cuda/LLG_cuda.cu
+	nvcc -I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3  -c $< -o $@
 
 clean:
 	@rm -f obj/*.o

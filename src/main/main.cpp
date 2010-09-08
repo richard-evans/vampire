@@ -66,6 +66,14 @@ int main(int argc, char* argv[]){
 		std::cout << "                        Compiled with " << COMP << std::endl;
 		#endif 
 		std::cout << " " << std::endl;
+		std::cout << "                        Compiler Flags:";
+		#ifdef CUDA
+		std::cout << " CUDA ";
+		#endif
+		#ifdef MPICF
+		std::cout << " MPI ";
+		#endif
+		std::cout << std::endl;
 		std::cout << "================================================================================" << std::endl;
 		int sysstat = system ("date");
 		if(sysstat!=0) std::cerr << "Error retrieving date from system" << std::endl;

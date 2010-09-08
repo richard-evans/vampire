@@ -13,7 +13,9 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "LLG.hpp"
+#include "vcuda.hpp"
 #include "vmpi.hpp"
+
 
 #include <iostream>
 int calculate_spin_fields(const int,const int);
@@ -126,10 +128,12 @@ int LLG(const int num_steps){
    //----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(err::check==true){std::cout << "LLG has been called" << std::endl;}
+	if(err::check==true){std::cout << "sim::LLG has been called" << std::endl;}
 
 	#ifdef MPICF
 		LLG_mpi(num_steps);
+	#elif CUDA
+		vcuda::LLG(num_steps);
 	#else
 		LLG_serial_heun(num_steps);
 	#endif
