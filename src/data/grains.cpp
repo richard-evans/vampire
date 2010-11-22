@@ -5,6 +5,7 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
+#include <cmath>
 #include <iostream>
 
 namespace grains{

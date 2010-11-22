@@ -7,7 +7,9 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+
 #include <iostream>
+#include <cmath>
 
 namespace program{
 	

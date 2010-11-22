@@ -169,6 +169,7 @@ tidy:
 	@rm -f *~
 	@rm -f src/*~
 	@rm -f src/*/*~
+	@rm -f hdr/*~
 
 package:
 	@bash .pack

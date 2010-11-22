@@ -31,9 +31,11 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
-#include <sstream>
+
+#include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 int initialise_system();
 	

@@ -16,6 +16,7 @@
 #include "vmpi.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 //========================

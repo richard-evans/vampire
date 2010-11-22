@@ -1,4 +1,4 @@
-#include <valarray>
+#include <vector>
 
 namespace stats
 //==========================================================
@@ -20,10 +20,10 @@ namespace stats
 	extern int mag_m();
 	extern double max_torque();
 	
-	extern std::valarray <double> sublattice_mx_array;
-	extern std::valarray <double> sublattice_my_array;
-	extern std::valarray <double> sublattice_mz_array;
-	extern std::valarray <double> sublattice_magm_array;
-	extern std::valarray <double> sublattice_mom_array;
-	extern std::valarray <int> sublattice_nm_array;
+	extern std::vector <double> sublattice_mx_array;
+	extern std::vector <double> sublattice_my_array;
+	extern std::vector <double> sublattice_mz_array;
+	extern std::vector <double> sublattice_magm_array;
+	extern std::vector <double> sublattice_mom_array;
+	extern std::vector <int> sublattice_nm_array;
 }

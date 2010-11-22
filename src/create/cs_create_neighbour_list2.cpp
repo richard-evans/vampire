@@ -7,6 +7,7 @@
 #include "errors.hpp"
 #include "create.hpp"
 #include "vmpi.hpp"
+#include <cmath>
 #include <iostream>
 
 namespace cs{

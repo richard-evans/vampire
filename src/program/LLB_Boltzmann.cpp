@@ -6,6 +6,8 @@
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
+
+#include <cmath>
 #include <iostream>
 
 namespace program{

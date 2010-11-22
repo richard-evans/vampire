@@ -14,6 +14,7 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
+#include <cmath>
 #include <iostream>
 
 namespace demag{

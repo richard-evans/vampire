@@ -11,15 +11,10 @@
 #include "random.hpp"
 #include <string>
 #include <iostream>
+#include <cmath>
 #include <cstdlib>
 #include <vector>
 #include <list>
-
-
-//int cs_cylinder(int,int**,int*,int[]);
-//int cs_truncated_octahedron(int,int**,int*,int[]);
-//int cs_sphere(int,int**,int*,int[]);
-
 
 namespace cs{
 	
@@ -126,7 +121,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	// Calculate new number of atoms and re-sort cs_* arrays according to included list
 	//----------------------------------------------------------------------------------
 	/*new_num_atoms = 0;
-	std::valarray <int> tmp_grain_no_array(cs_num_atoms);
+	std::vector <int> tmp_grain_no_array(cs_num_atoms);
 	
 	for(atom=0;atom<cs_num_atoms;atom++){
 		if(particle_include_array[atom]!=-1){

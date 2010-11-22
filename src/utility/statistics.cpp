@@ -26,6 +26,8 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "vmpi.hpp"
+
+#include <cmath>
 #include <iostream>
 
 /// @namespace stats
@@ -46,26 +48,13 @@ namespace stats
 	double total_mag_norm[3];	///< Normalised magnetisation components
 	double total_mag_m_norm;	///< Normalised magnitude of total magnetisation
 	
-  std::vector <double> sublattice_mx_array(0);
-  std::vector <double> sublattice_my_array(0);
-  std::vector <double> sublattice_mz_array(0);
-  std::vector <double> sublattice_magm_array(0);
-  std::vector <double> sublattice_mom_array(0);
-  std::vector <int> sublattice_nm_array(0);
+	std::vector <double> sublattice_mx_array(0);
+	std::vector <double> sublattice_my_array(0);
+	std::vector <double> sublattice_mz_array(0);
+	std::vector <double> sublattice_magm_array(0);
+	std::vector <double> sublattice_mom_array(0);
+	std::vector <int> sublattice_nm_array(0);
 	
-	/*double total_mag_actual[3];	///< Actual magnetisation components
-	double total_mag_m_actual;		///< Actual magnitude of total magnetisation
-	
-	double total_mag_norm[3];	///< Normalised magnetisation components
-	double total_mag_m_norm;	///< Normalised magnitude of total magnetisation
-	
-	valarray <double> sublattice_mx_array(0);
-	valarray <double> sublattice_my_array(0);
-	valarray <double> sublattice_mz_array(0);
-	valarray <double> sublattice_magm_array(0);
-	valarray <double> sublattice_mom_array(0);
-	valarray <int> sublattice_nm_array(0);
-	*/
 	bool is_initialised=false;
 
 	double data_counter;		// number of data points for averaging

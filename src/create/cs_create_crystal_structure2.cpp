@@ -12,6 +12,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <cmath>
 
 namespace cs{
 	

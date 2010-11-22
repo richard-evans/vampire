@@ -265,7 +265,7 @@ namespace vmpi{
 
 		for(int p=1;p<num_processors;p++){
 			std::vector<double> mpi_data_array(3*num_atoms_array[p]);
-			//valarray<char> mpi_char_array(3*num_atoms_array[p]);
+			//vector<char> mpi_char_array(3*num_atoms_array[p]);
 			std::vector<int> mpi_char_array(num_atoms_array[p]);
 			std::vector<int> mpi_type_array(num_atoms_array[p]);
 			//vector<int> mpi_comms_array(num_atoms_array[p]);
@@ -307,7 +307,6 @@ namespace vmpi{
 	}
 	else{
 		std::vector<double> mpi_data_array(3*num_atoms);
-		//valarray<char> mpi_char_array(3*num_atoms);
 		std::vector<int> mpi_char_array(num_atoms);
 		std::vector<int> mpi_type_array(num_atoms);
 		//vector<int> mpi_comms_array(num_atoms);

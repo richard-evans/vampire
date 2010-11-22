@@ -23,7 +23,7 @@
 ///
 
 // Headers
-#include <iostream>
+
 #include "errors.hpp"
 #include "demag.hpp"
 #include "voronoi.hpp"
@@ -34,7 +34,8 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
-
+#include <cmath>
+#include <iostream>
 //==========================================================
 // Namespace material_parameters
 //==========================================================
@@ -48,7 +49,7 @@ namespace mp{
 	int num_materials=1;
 
 
-	valarray <materials_t> material(1);
+	std::vector <materials_t> material(1);
 
 
 	

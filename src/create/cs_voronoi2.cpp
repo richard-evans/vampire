@@ -6,10 +6,10 @@
 #include "vmpi.hpp"
 #include "vmath.hpp"
 
-
-#include <sstream>
+#include <cmath>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 namespace create_voronoi{
 	bool parity=0;	// left-right (0) or right-left (1) point initialisation
