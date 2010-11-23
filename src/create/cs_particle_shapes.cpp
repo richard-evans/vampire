@@ -21,6 +21,7 @@
 #include "material.hpp"
 #include "vmath.hpp"
 #include <cmath>
+#include <cstdlib>
 #include <string>
 #include <iostream>
 

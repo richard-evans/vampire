@@ -32,6 +32,7 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <iostream>

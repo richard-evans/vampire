@@ -8,6 +8,7 @@
 #include "vio.hpp"
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 
 namespace program{

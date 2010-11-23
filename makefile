@@ -3,6 +3,7 @@
 #								Makefile for VAMPIRE
 #
 #===================================================================
+export OMPI_CXX=g++
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 # Compilers
@@ -17,8 +18,8 @@ export LC_ALL=C
 ICC_DBCFLAGS= -O0 -C -I./hdr
 ICC_DBLFLAGS= -lstdc++ -C -I./hdr
 
-GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -ansi -Wno-long-long -I./hdr
-GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr
+GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -ansi -Wno-long-long -I./hdr -std=c++98
+GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr -std=c++98
 
 PCC_DBCFLAGS= -O0 -I./hdr
 PCC_DBLFLAGS= -O0 -I./hdr
