@@ -45,6 +45,7 @@ obj/create/cs_particle_shapes.o \
 obj/create/cs_set_atom_vars2.o \
 obj/create/cs_voronoi2.o \
 obj/data/atoms.o \
+obj/data/cells.o \
 obj/data/grains.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \

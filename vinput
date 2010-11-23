@@ -6,12 +6,12 @@
 # Creation attributes:
 #------------------------------------------
 #create:particle-array
-create:cylinder
+#create:cylinder
 create:crystal-structure="fcc"
 #create:particle-parity=1
 #create:single-spin
-create:voronoi-film
-create:voronoi-variance=0.1
+#create:voronoi-film
+#create:voronoi-variance=0.1
 #create:voronoi-parity=0
 #------------------------------------------
 # System Dimensions:
@@ -19,9 +19,9 @@ create:voronoi-variance=0.1
 dimensions:a=3.54 !A
 dimensions:dx = 100.0 !nm
 dimensions:dy = 50.0 !nm
-dimensions:dz = 6.0 !nm
-dimensions:particle-size = 5 !nm
-dimensions:particle-spacing = 1.0 !nm
+dimensions:dz = 3.0 !A
+#dimensions:particle-size = 5 !nm
+#dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
 # Material File:
