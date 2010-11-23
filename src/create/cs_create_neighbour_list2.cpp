@@ -26,13 +26,13 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	if(err::check==true){std::cout << "cs::create_neighbourlist has been called" << std::endl;}	
 	
 	const int num_atoms = catom_array.size();
-	const int max_atoms_per_supercell=10;
+	const int max_atoms_per_supercell=4;
 	int range=1;	// Range of exchange interaction (unit cells)
 	//-----------------------------------------------------
 	// Setup neighbourlist
 	//-----------------------------------------------------
 
-// Reserve space for num_atoms
+	// Reserve space for num_atoms
 	cneighbourlist.reserve(num_atoms);
 
 	// Reserve space for each atom in neighbour list according to material type
@@ -107,9 +107,11 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 
-		// Populate supercell array with atom numbers
-		for(int atom=0;atom<num_atoms;atom++){
-			double c[3]={catom_array[atom].x,catom_array[atom].y,catom_array[atom].z};
+		double atom_offset[3]={0.25*mp::lattice_constant[0],0.25*mp::lattice_constant[1],0.25*mp::lattice_constant[2]};
+
+                // Populate supercell array with atom numbers                                                                                                                     
+                for(int atom=0;atom<num_atoms;atom++){
+		  double c[3]={catom_array[atom].x+atom_offset[0],catom_array[atom].y+atom_offset[1],catom_array[atom].z+atom_offset[2]};
 			int scc[3]={0,0,0}; // super cell coordinates
 			for(int i=0;i<3;i++){
 				scc[i]=int(c[i]/mp::lattice_constant[i])-offset[i]; // Always round down for supercell coordinates
