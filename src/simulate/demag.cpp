@@ -353,12 +353,16 @@ int demag_field_update(){
 				const double dy = demag::demag_coord_y_array[j]-demag::demag_coord_y_array[i];
 				const double dz = demag::demag_coord_z_array[j]-demag::demag_coord_z_array[i];
 				const double rij = demag::rij_matrix[i][j];
-				const double rhat_x = dx*rij;
-				const double rhat_y = dy*rij;
-				const double rhat_z = dz*rij;
-				demag::demag_field_x_array[i]+=(3.0*sx*rhat_x*rhat_x-sx)*rij*rij*rij;
-				demag::demag_field_y_array[i]+=(3.0*sy*rhat_y*rhat_y-sy)*rij*rij*rij;
-				demag::demag_field_z_array[i]+=(3.0*sz*rhat_z*rhat_z-sz)*rij*rij*rij;
+
+				const double ex = dx*rij;
+				const double ey = dy*rij;
+				const double ez = dz*rij;
+
+        const double s_dot_e = (sx * ex + sy * ey + sz * ez);
+
+				demag::demag_field_x_array[i]+=(3.0 * s_dot_e * ex - sx)*rij*rij*rij;
+				demag::demag_field_y_array[i]+=(3.0 * s_dot_e * ey - sy)*rij*rij*rij;
+				demag::demag_field_z_array[i]+=(3.0 * s_dot_e * ez - sz)*rij*rij*rij;
 				//cout << j << "\t" << rij << "\t" << sz << "\t" << demag::demag_field_z_array[i] << endl;
 				//cin.get();
 			}
