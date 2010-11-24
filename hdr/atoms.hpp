@@ -27,6 +27,7 @@ namespace atoms
 	extern std::vector <int> neighbour_list_end_index;
 	extern std::vector <int> type_array;
 	extern std::vector <int> grain_array;
+	extern std::vector <int> cell_array;
 
 	extern std::vector <double> x_spin_array;
 	extern std::vector <double> y_spin_array;
