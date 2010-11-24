@@ -3,6 +3,7 @@
 *.o
 #Ignore temporary editor files
 *~
+*.swp
 #Ignore error files
 *.err
 #Povray files
