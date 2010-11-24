@@ -8,6 +8,7 @@
 //
 //==================================================================================================== 
 #include "atoms.hpp"
+#include "cells.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "demag.hpp"
@@ -311,79 +312,56 @@ int demag_field_update(){
 	}
 
 	//----------------------------------------------------------
-	// Zero macrospin array
-	//----------------------------------------------------------
-	for(int i=0;i<demag::num_demag_cells;i++){
-		demag::demag_spin_x_array[i]=0.0;
-		demag::demag_spin_y_array[i]=0.0;
-		demag::demag_spin_z_array[i]=0.0;
-	}
-
-	//----------------------------------------------------------
-	// Populate macrocells with atomistic spins
-	//----------------------------------------------------------
-	for(int atom=0;atom<atoms::num_atoms;atom++){
-		const int cell = demag::atom_demag_array[atom];
-		const int imaterial=atoms::type_array[atom];
-		const double mu_s = material_parameters::material[imaterial].mu_s_SI;
-
-		// Add spin to macrocell
-		demag::demag_spin_x_array[cell]+=atoms::x_spin_array[atom]*mu_s*demag::prefactor;
-		demag::demag_spin_y_array[cell]+=atoms::y_spin_array[atom]*mu_s*demag::prefactor;
-		demag::demag_spin_z_array[cell]+=atoms::z_spin_array[atom]*mu_s*demag::prefactor;
-	}
-
-	//for(int i=0;i<demag::num_demag_cells;i++){
-		//std::cout << i << "\t" << demag::demag_spin_x_array[i] << "\t" << demag::demag_spin_y_array[i] << "\t" << demag::demag_spin_z_array[i] << std::endl;
-	//}
-
-	//----------------------------------------------------------
 	// Update Dipolar Field Array
 	//----------------------------------------------------------
-	for(int i=0;i<demag::num_demag_cells;i++){
-		demag::demag_field_x_array[i]=0.0;
-		demag::demag_field_y_array[i]=0.0;
-		demag::demag_field_z_array[i]=0.0;
-		for(int j=0;j<demag::num_demag_cells;j++){
+  // Field has units ((T^2 m^2) / (N m^3)) * (J/T) = T
+	for(int i=0;i<cells::num_cells;i++){
+    // zero field arrays
+    cells::x_field_array[i]=0.0;
+    cells::y_field_array[i]=0.0;
+    cells::z_field_array[i]=0.0;
+		for(int j=0;j<cells::num_cells;j++){
 			if(i!=j){
-				const double sx = demag::demag_spin_x_array[j];
-				const double sy = demag::demag_spin_y_array[j];
-				const double sz = demag::demag_spin_z_array[j];
-				const double dx = demag::demag_coord_x_array[j]-demag::demag_coord_x_array[i];
-				const double dy = demag::demag_coord_y_array[j]-demag::demag_coord_y_array[i];
-				const double dz = demag::demag_coord_z_array[j]-demag::demag_coord_z_array[i];
-				const double rij = demag::rij_matrix[i][j];
+				
+        const double mx = cells::x_mag_array[j];
+				const double my = cells::y_mag_array[j];
+				const double mz = cells::z_mag_array[j];
 
-				const double ex = dx*rij;
-				const double ey = dy*rij;
-				const double ez = dz*rij;
+				const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
+				const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
+				const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
 
-        const double s_dot_e = (sx * ex + sy * ey + sz * ez);
+				const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
+        const double drij3 = 3.0*drij;
 
-				demag::demag_field_x_array[i]+=(3.0 * s_dot_e * ex - sx)*rij*rij*rij;
-				demag::demag_field_y_array[i]+=(3.0 * s_dot_e * ey - sy)*rij*rij*rij;
-				demag::demag_field_z_array[i]+=(3.0 * s_dot_e * ez - sz)*rij*rij*rij;
-				//cout << j << "\t" << rij << "\t" << sz << "\t" << demag::demag_field_z_array[i] << endl;
-				//cin.get();
+				const double ex = dx*drij;
+				const double ey = dy*drij;
+				const double ez = dz*drij;
+
+        const double s_dot_e = (mx * ex + my * ey + mz * ez);
+
+				cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
+				cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
+				cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
 			}
 		}
-		//demag::demag_field_x_array[i]*=demag::prefactor;
-		//demag::demag_field_y_array[i]*=demag::prefactor;
-		//demag::demag_field_z_array[i]*=demag::prefactor;
-		vdp << "\t" << demag::demag_coord_x_array[i] << "\t" << demag::demag_coord_y_array[i] << "\t" << demag::demag_coord_z_array[i] << "\t";
-		vdp << demag::demag_field_x_array[i] << "\t" << demag::demag_field_y_array[i] << "\t" << demag::demag_field_z_array[i] << std::endl;
+		cells::x_field_array[i]*=demag::prefactor;
+		cells::y_field_array[i]*=demag::prefactor;
+		cells::z_field_array[i]*=demag::prefactor;
+		
+    //vdp << "\t" << demag::demag_coord_x_array[i] << "\t" << demag::demag_coord_y_array[i] << "\t" << demag::demag_coord_z_array[i] << "\t";
+		//vdp << demag::demag_field_x_array[i] << "\t" << demag::demag_field_y_array[i] << "\t" << demag::demag_field_z_array[i] << std::endl;
 	}
-   exit(0);
 	//----------------------------------------------------------
 	// Update Atomistic Dipolar Field Array
 	//----------------------------------------------------------
 	for(int atom=0;atom<atoms::num_atoms;atom++){
-		const int cell = demag::atom_demag_array[atom];
+		const int cell = atoms::cell_array[atom];
 
 		// Copy field from macrocell to atomistic spin
-		atoms::x_dipolar_field_array[atom]=demag::demag_field_x_array[cell];
-		atoms::y_dipolar_field_array[atom]=demag::demag_field_y_array[cell];
-		atoms::z_dipolar_field_array[atom]=demag::demag_field_z_array[cell];
+		atoms::x_dipolar_field_array[atom]=cells::x_field_array[cell];
+		atoms::y_dipolar_field_array[atom]=cells::y_field_array[cell];
+		atoms::z_dipolar_field_array[atom]=cells::z_field_array[cell];
 	}
 	return 0;
 
