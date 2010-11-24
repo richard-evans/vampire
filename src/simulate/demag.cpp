@@ -25,7 +25,7 @@ namespace demag{
 	int update_rate=1;
 	int update_counter=0;
 
-	const double prefactor=1.0e+23;
+	const double prefactor=4.0*M_PI*1.0e+23;
 
   std::vector<int> atom_demag_array(0);
 
@@ -48,6 +48,7 @@ namespace demag{
 }
 
 int set_demag(){
+  /*
 	//--------------------------------------------------------------------
 	//
 	//											set_demag
@@ -274,12 +275,12 @@ int set_demag(){
 		vinfo << "=========================================================================" << std::endl;
 		vinfo << "  Demag set-up completed" << std::endl;
 		vinfo << "=========================================================================" << std::endl;
-
+*/
 	//----------------------------------------------------------
 	// End of if
 	//----------------------------------------------------------
 		demag::demag_set=true;
-	}
+	//}
 
 	return 0;
 
@@ -311,47 +312,53 @@ int demag_field_update(){
 		set_demag();
 	}
 
+  // Populate magnetisations
+  cells::mag();
+
 	//----------------------------------------------------------
 	// Update Dipolar Field Array
 	//----------------------------------------------------------
   // Field has units ((T^2 m^2) / (N m^3)) * (J/T) = T
 	for(int i=0;i<cells::num_cells;i++){
-    // zero field arrays
-    cells::x_field_array[i]=0.0;
-    cells::y_field_array[i]=0.0;
-    cells::z_field_array[i]=0.0;
-		for(int j=0;j<cells::num_cells;j++){
-			if(i!=j){
-				
-        const double mx = cells::x_mag_array[j];
-				const double my = cells::y_mag_array[j];
-				const double mz = cells::z_mag_array[j];
+    if(cells::num_atoms_in_cell[i] > 0 ) {
+      // zero field arrays
+      cells::x_field_array[i]=0.0;
+      cells::y_field_array[i]=0.0;
+      cells::z_field_array[i]=0.0;
+      for(int j=0;j<cells::num_cells;j++){
+        if(i!=j){
+          
+          const double mx = cells::x_mag_array[j];
+          const double my = cells::y_mag_array[j];
+          const double mz = cells::z_mag_array[j];
 
-				const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
-				const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
-				const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
+          const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
+          const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
+          const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
 
-				const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
-        const double drij3 = 3.0*drij;
+          const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
+          const double drij3 = drij*drij*drij;
 
-				const double ex = dx*drij;
-				const double ey = dy*drij;
-				const double ez = dz*drij;
+          const double ex = dx*drij;
+          const double ey = dy*drij;
+          const double ez = dz*drij;
 
-        const double s_dot_e = (mx * ex + my * ey + mz * ez);
+          const double s_dot_e = (mx * ex + my * ey + mz * ez);
 
-				cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
-				cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
-				cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
-			}
-		}
-		cells::x_field_array[i]*=demag::prefactor;
-		cells::y_field_array[i]*=demag::prefactor;
-		cells::z_field_array[i]*=demag::prefactor;
-		
-    //vdp << "\t" << demag::demag_coord_x_array[i] << "\t" << demag::demag_coord_y_array[i] << "\t" << demag::demag_coord_z_array[i] << "\t";
-		//vdp << demag::demag_field_x_array[i] << "\t" << demag::demag_field_y_array[i] << "\t" << demag::demag_field_z_array[i] << std::endl;
+          cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
+          cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
+          cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
+        }
+      }
+      cells::x_field_array[i]*=demag::prefactor;
+      cells::y_field_array[i]*=demag::prefactor;
+      cells::z_field_array[i]*=demag::prefactor;
+    }
+    vdp << "\t" << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
+		vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
+		vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t" << cells::z_mag_array[i] << std::endl;
 	}
+  exit(0);
 	//----------------------------------------------------------
 	// Update Atomistic Dipolar Field Array
 	//----------------------------------------------------------

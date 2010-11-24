@@ -178,7 +178,7 @@ namespace cells{
 			cells::num_atoms_in_cell[local_cell]++;
 		}
 		return EXIT_SUCCESS;
-	};
+	}
 
 	
 	
@@ -191,8 +191,21 @@ namespace cells{
 int cells::mag() {
   using namespace atoms;
 
+
+  for(int i=0; i<num_cells; ++i) {
+    x_mag_array[i] = 0;
+    y_mag_array[i] = 0;
+    z_mag_array[i] = 0;
+  }
+
+#ifdef MPICF
+    int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+#else
+    int num_local_atoms = atoms::num_atoms;
+#endif
+
   // calulate magnetisation in each cell
-  for(int i=0;i<num_atoms;++i) {
+  for(int i=0;i<num_local_atoms;++i) {
     int cell = cell_array[i];
     int type = type_array[i];
     const double mus = mp::material[type].mu_s_SI;
