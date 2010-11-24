@@ -4,6 +4,16 @@
 #include <fstream>
 #include <string>
 
+#include <iostream> 
+
+struct null_streambuf 
+: public std::streambuf 
+{ 
+  void overflow(char c) 
+  { 
+  } 
+}; 
+
 //==========================================================
 // Global Output Streams
 //==========================================================
@@ -20,15 +30,9 @@ namespace vout{
 	
 	//extern int scr(std::stringstream);
 	extern int pov_file();
-	
-}
-		
-//==========================================================
-// Namespace output
-//==========================================================
-namespace output{
-	extern int output_flags[10];
-	extern int output_inc[10];
-}
 
+  void redirect(std::ostream& strm, std::string filename);
+  void nullify(std::ostream& strm);  
+
+}
 #endif /*VIO_H_*/

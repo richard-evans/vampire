@@ -1490,26 +1490,24 @@ int match_material(string const word, string const value, string const unit, int
 } // end of namespace vin 
 
 
-/*namespace vout{
-	
-	int scr(std::stringstream buff){
-		if(num_processors=1){
-			std::cout << buff; 
-		else if(my_rank==0){
-			std::cout << buff;
-		}
-		
-		return EXIT_SUCCESS;
-	}
+namespace vout{
+  std::ofstream errfile;
+  null_streambuf nullbuf;
 
+  void redirect(std::ostream& strm, std::string filename) {
+    errfile.open(filename.c_str());
+    // redirect ouput into the file
+    strm.rdbuf (errfile.rdbuf());
+  }
+
+  void nullify(std::ostream& strm){
+    strm.rdbuf(&nullbuf);
+  }
+  
 } // end of namespace vout  */
 //==========================================================
 // Namespace output
 //==========================================================
-namespace output{
-	int output_flags[10];
-	int output_inc[10];
-}
 
 namespace pov{
 	int counter=0;

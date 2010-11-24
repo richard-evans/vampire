@@ -3,15 +3,13 @@
 *.o
 #Ignore temporary editor files
 *~
+#Ignore error files
+*.err
 #Povray files
 *.pov
-<<<<<<< HEAD:.gitignore
-=======
 *.pin
 # Mac files
 *.DS_Store
-
->>>>>>> 7b5667fd8df6805b65d962cfdb506b4afa77a695:.gitignore
 # Other sundry files
 *.png
 info
