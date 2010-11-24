@@ -30,10 +30,6 @@ namespace cells{
 	extern std::vector <double> x_field_array;
 	extern std::vector <double> y_field_array;
 	extern std::vector <double> z_field_array;
-	
-	
-	extern std::vector <double> mag_m_array;
-	extern std::vector <double> sat_mag_array;
 
 	extern int initialise();
 	extern int mag();

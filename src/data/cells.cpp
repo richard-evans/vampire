@@ -29,9 +29,6 @@ namespace cells{
 	std::vector <double> y_field_array;
 	std::vector <double> z_field_array;
 	
-	std::vector <double> mag_m_array;
-	std::vector <double> sat_mag_array;
-
 	int initialise();
 	int mag();
 	int output_mag(std::ofstream&);
