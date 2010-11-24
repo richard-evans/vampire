@@ -24,6 +24,7 @@
 #include <fstream>
 #include "errors.hpp"
 #include "atoms.hpp"
+#include "cells.hpp"
 #include "grains.hpp"
 #include "material.hpp"
 #include "vmpi.hpp"
@@ -122,11 +123,12 @@ int create(){
 	cs::set_atom_vars(catom_array,cneighbourlist);
 
 	//=============================================================
-	//      Set grain variables for simulation
+	//      Set grain and cell variables for simulation
 	//=============================================================
 
 	grains::set_properties();
-
+	cells::initialise();
+	
 	//=============================================================
 	//      Generate system files for storage
 	//=============================================================

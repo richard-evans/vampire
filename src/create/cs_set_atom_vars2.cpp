@@ -41,6 +41,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 
 	atoms::type_array.resize(atoms::num_atoms,0);
 	atoms::grain_array.resize(atoms::num_atoms,0);
+	atoms::cell_array.resize(atoms::num_atoms,0);
 	
 	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
