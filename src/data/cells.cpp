@@ -34,3 +34,22 @@ namespace cells{
 	int output_mag(std::ofstream&);
 	
 } // End of namespace cells
+
+// calculate the magnetisation in each cell
+int cells::mag() {
+  using namespace atoms;
+
+  for(int i=0;i<num_atoms;++i) {
+    // lookup which cell atom is in
+    int cell = cell_array[i];
+    int type = type_array[i];
+    const double mus = mp::material[type].mu_s_SI;
+
+    //
+    x_mag_array[cell] += x_spin_array[i]*mus;
+    y_mag_array[cell] += y_spin_array[i]*mus;
+    z_mag_array[cell] += z_spin_array[i]*mus;
+  }
+
+  return EXIT_SUCCESS;
+}
