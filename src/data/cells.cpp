@@ -42,9 +42,9 @@ namespace cells{
 		cells::update_counter=0;
 		
 		// determine number of cells in each direction
-		unsigned int ncellx = ceil((mp::system_dimensions[0]/mp::lattice_constant[0])/double(cells::size));
-		unsigned int ncelly = ceil((mp::system_dimensions[1]/mp::lattice_constant[1])/double(cells::size));
-		unsigned int ncellz = ceil((mp::system_dimensions[2]/mp::lattice_constant[2])/double(cells::size));
+		unsigned int ncellx = static_cast<unsigned int>(ceil((mp::system_dimensions[0]/mp::lattice_constant[0])/double(cells::size)));
+		unsigned int ncelly = static_cast<unsigned int>(ceil((mp::system_dimensions[1]/mp::lattice_constant[1])/double(cells::size)));
+		unsigned int ncellz = static_cast<unsigned int>(ceil((mp::system_dimensions[2]/mp::lattice_constant[2])/double(cells::size)));
 		
 		//update total number of cells
 		cells::num_cells=ncellx*ncelly*ncellz;

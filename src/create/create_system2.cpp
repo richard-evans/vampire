@@ -127,7 +127,7 @@ int create(){
 	//=============================================================
 
 	grains::set_properties();
-	cells::initialise();
+	//cells::initialise();
 	
 	//=============================================================
 	//      Generate system files for storage
@@ -136,7 +136,7 @@ int create(){
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
-		vmpi::crystal_xyz(catom_array);
+		//vmpi::crystal_xyz(catom_array);
 	#else
 		if(1==1){
 		std::ofstream xyz_file;

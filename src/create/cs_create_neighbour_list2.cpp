@@ -58,7 +58,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		}
 	}
 	// Added small correction to avoid rounding errors - RF 8/6/2010
-	const int d[3]={1+round((max[0]-min[0])/mp::lattice_constant[0]+0.001),1+round((max[1]-min[1])/mp::lattice_constant[1]+0.001),1+round((max[2]-min[2])/mp::lattice_constant[2]+0.001)};
+	const int d[3]={1+iround((max[0]-min[0])/mp::lattice_constant[0]+0.001),1+iround((max[1]-min[1])/mp::lattice_constant[1]+0.001),1+iround((max[2]-min[2])/mp::lattice_constant[2]+0.001)};
 	
 	// offset in whole unit cells
 	const int offset[3] = {int((min[0])/mp::lattice_constant[0]), int((min[1])/mp::lattice_constant[1]), int((min[2])/mp::lattice_constant[2])};

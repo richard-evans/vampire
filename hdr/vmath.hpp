@@ -50,3 +50,4 @@ namespace vmath{
 	extern bool point_in_polygon(double, double, double*, double*, int);
 
 }
+

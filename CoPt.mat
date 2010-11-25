@@ -12,7 +12,7 @@ material:num-materials=1
 # Material 0 Cobalt Platinum Generic
 #---------------------------------------------------
 material[0]:name="CoPt Media"
-material[0]:alpha=0.01
+material[0]:alpha=1.0
 material[0]:Jij_matrix[0]=-4.2e-21
 material[0]:mu_s=1.5 !muB
 material[0]:Ku1=-2.2e-22

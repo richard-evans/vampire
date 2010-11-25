@@ -32,16 +32,16 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	const int max_atoms_per_unit_cell=4;
 	int supercell_dim[3];
 
-	supercell_dim[0] = round(mp::system_dimensions[0]/mp::lattice_constant[0]);
-	supercell_dim[1] = round(mp::system_dimensions[1]/mp::lattice_constant[1]);
-	supercell_dim[2] = round(mp::system_dimensions[2]/mp::lattice_constant[2]);
+	supercell_dim[0] = iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
+	supercell_dim[1] = iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
+	supercell_dim[2] = iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
 	
 	int ncell[3];
 	
 	#ifdef MPICF
-		ncell[0] = round((vmpi::max_dimensions[0]-vmpi::min_dimensions[0])/mp::lattice_constant[0]);
-		ncell[1] = round((vmpi::max_dimensions[1]-vmpi::min_dimensions[1])/mp::lattice_constant[1]);
-		ncell[2] = round((vmpi::max_dimensions[2]-vmpi::min_dimensions[2])/mp::lattice_constant[2]);
+		ncell[0] = iround((vmpi::max_dimensions[0]-vmpi::min_dimensions[0])/mp::lattice_constant[0]);
+		ncell[1] = iround((vmpi::max_dimensions[1]-vmpi::min_dimensions[1])/mp::lattice_constant[1]);
+		ncell[2] = iround((vmpi::max_dimensions[2]-vmpi::min_dimensions[2])/mp::lattice_constant[2]);
 	#else
 		ncell[0]=supercell_dim[0];
 		ncell[1]=supercell_dim[1];
@@ -53,7 +53,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	for(int mat=0;mat<mp::num_materials;mat++){
 		mat_cs[mat] = mp::material[mat].crystal_structure;
 		// supercell z min and max
-		mat_min[mat]=round(mp::material[mat].min*mp::system_dimensions[2]/mp::lattice_constant[2]);
+		mat_min[mat]=iround(mp::material[mat].min*mp::system_dimensions[2]/mp::lattice_constant[2]);
 		mat_max[mat]=int(mp::material[mat].max*mp::system_dimensions[2]/mp::lattice_constant[2])+1; //always round up number of cells
 		//std::cout << mat_min[mat] << "\t" << mat_max[mat] << std::endl;
 		

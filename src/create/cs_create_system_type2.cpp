@@ -187,9 +187,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
 
 	double particle_origin[3];
 	// find centre unit cell
-	particle_origin[0] = double(round(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
-	particle_origin[1] = double(round(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
-	particle_origin[2] = double(round(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+	particle_origin[0] = double(iround(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
+	particle_origin[1] = double(iround(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
+	particle_origin[2] = double(iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
 
 	if(mp::particle_creation_parity==1){
 		particle_origin[0]+=mp::lattice_constant[0]*0.5;
@@ -238,8 +238,8 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 
 	// Set number of particles in x and y directions
 	const double repeat_size = mp::particle_scale+mp::particle_spacing;
-	int num_x_particle = round(mp::system_dimensions[0]/repeat_size);
-	int num_y_particle = round(mp::system_dimensions[1]/repeat_size);
+	int num_x_particle = iround(mp::system_dimensions[0]/repeat_size);
+	int num_y_particle = iround(mp::system_dimensions[1]/repeat_size);
 	
 
 	// Loop to generate cubic lattice points
@@ -250,13 +250,13 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 
 			double particle_origin[3];
 			// find centre unit cell
-			//particle_origin[0] = double(round(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
-			//particle_origin[1] = double(round(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
-			//particle_origin[2] = double(round(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+			//particle_origin[0] = double(iround(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
+			//particle_origin[1] = double(iround(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
+			//particle_origin[2] = double(iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
 			// Determine particle origin
 			particle_origin[0] = double(x_particle)*repeat_size + repeat_size;
 			particle_origin[1] = double(y_particle)*repeat_size + repeat_size;
-			particle_origin[2] = double(round(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+			particle_origin[2] = double(iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
 
 			if(mp::particle_creation_parity==1){
 				particle_origin[0]+=mp::lattice_constant[0]*0.5;
@@ -342,16 +342,16 @@ int hex_particle_array(int cs_num_atoms,int** cs_coord_array,int* particle_inclu
 	// Set number of particles in x and y directions
 	//----------------------------------------------------------
 	
-	num_x_particle = 2+round(material_parameters::system_dimensions[0]/material_parameters::particle_scale);
-	num_y_particle = 2+round(material_parameters::system_dimensions[1]/material_parameters::particle_scale);
+	num_x_particle = 2+iround(material_parameters::system_dimensions[0]/material_parameters::particle_scale);
+	num_y_particle = 2+iround(material_parameters::system_dimensions[1]/material_parameters::particle_scale);
 	
 	//----------------------------------------------------------
 	// Set integer equivalents of system/particle dimensions
 	//----------------------------------------------------------
 	
 	//calculate int particle radius
-	int_particle_scale = round(material_parameters::particle_scale/(material_parameters::lattice_constant[1]));
-	//int_particle_spacing = round(material_parameters::particle_spacing/(2.0*material_parameters::lattice_constant[1]));
+	int_particle_scale = iround(material_parameters::particle_scale/(material_parameters::lattice_constant[1]));
+	//int_particle_spacing = iround(material_parameters::particle_spacing/(2.0*material_parameters::lattice_constant[1]));
 	
 	//double delta_particle_x_const = material_parameters::particle_scale/(material_parameters::lattice_constant[1]);
 	//double delta_particle_y_const = material_parameters::particle_scale/(material_parameters::lattice_constant[2])*sqrt(3.0);
@@ -379,8 +379,8 @@ int hex_particle_array(int cs_num_atoms,int** cs_coord_array,int* particle_inclu
 				//particle_coords[0] = 2*x_particle*(int_particle_scale + int_particle_spacing) + 2*int_particle_scale + (particle_parity*(int_particle_scale + int_particle_spacing));
 				//particle_coords[1] = 2*y_particle*(int_particle_scale + int_particle_spacing) + 2*int_particle_scale + (particle_parity*(int_particle_scale + int_particle_spacing));
 				//particle_coords[2] = int_system_dimensions[2]/2;
-				particle_coords[0] = round((1.0+particle_parity)*delta_particle_x_parity + delta_particle_x*x_particle);
-				particle_coords[1] = round((1.0+particle_parity)*delta_particle_y_parity + delta_particle_y*y_particle);
+				particle_coords[0] = iround((1.0+particle_parity)*delta_particle_x_parity + delta_particle_x*x_particle);
+				particle_coords[1] = iround((1.0+particle_parity)*delta_particle_y_parity + delta_particle_y*y_particle);
 				particle_coords[2] = int_system_dimensions[2]/2;
 
 		//---------------------------------------------------
