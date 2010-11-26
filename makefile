@@ -6,12 +6,12 @@
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 #export MPICH_CXX=g++
-export MPICH_CXX=xlc++
+export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
-IBM=xlc++ -DCOMP='"IBM XLC++ Compiler"'
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
 export LANG=C
 export LC_ALL=C
@@ -41,8 +41,8 @@ GCC_LDFLAGS= -lstdc++ -I./hdr
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr
 PCC_LDFLAGS= -lstdc++ -I./hdr -O2 -march=barcelona -ipa
 
-IBM_CFLAGS=-O2 -Wall -I./hdr
-IBM_LDFLAGS= -lstdc++ -I./hdr -O0
+IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr 
+IBM_LDFLAGS= -lstdc++ -I./hdr -O5 -qarch=450 -qtune=450
 # Objects
 OBJECTS= \
 obj/create/create_system2.o \

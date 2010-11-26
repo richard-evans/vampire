@@ -164,9 +164,6 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		
 		// Generate neighbour list
 		std::cout <<"Generating Neighbour list"; 
-		//bool periodicity[3]={false,false,false};
-		//int periodic_index[3];
-		double periodic_offset[3];
 	
 		// Loop over all cells
 		for(int cell=0;cell<num_cells;cell++){
@@ -198,7 +195,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 											if(atom!=natom){
 												double dx=catom_array[natom].x-catom_array[atom].x;
 												double dy=catom_array[natom].y-catom_array[atom].y;
-												double dz=catom_array[natom].z-catom_array[atom].z+periodic_offset[2];
+												double dz=catom_array[natom].z-catom_array[atom].z;
 												double drange=mp::material[catom_array[atom].material].cutoff*mp::lattice_constant[0];
 												if(dx*dx+dy*dy+dz*dz<=drange*drange){
 													if(cneighbourlist[atom].size()<=cneighbourlist[atom].capacity()){
