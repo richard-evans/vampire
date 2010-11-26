@@ -85,9 +85,9 @@ int main(int argc, char* argv[]){
   }
   
   // redirect std::err to file
-  std::stringstream ss;
-  ss << "vampire."<<vmpi::my_rank<<".err";
-  vout::redirect(std::cerr,ss.str());
+  //std::stringstream ss;
+  //ss << "vampire."<<vmpi::my_rank<<".err";
+  //vout::redirect(std::cerr,ss.str());
 	
 
 	// Initialise system
