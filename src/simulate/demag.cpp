@@ -22,7 +22,7 @@ namespace demag{
 
 	int num_demag_cells=0;
 	int demag_resolution=5;
-	int update_rate=1;
+	int update_rate=100;
 	int update_counter=0;
 
 	const double prefactor=4.0*M_PI*1.0e+23;
@@ -307,14 +307,17 @@ int demag_field_update(){
 	//----------------------------------------------------------
 	// If not initialised print warning and do so
 	//----------------------------------------------------------
-	if(demag::demag_set==false){
-		std::cerr << "Warning, demag not initialised - initialising" << std::endl;
-		set_demag();
-	}
+	//if(demag::demag_set==false){
+	//	std::cerr << "Warning, demag not initialised - initialising" << std::endl;
+	//	set_demag();
+	//}
 
   // Populate magnetisations
-  cells::mag();
-
+	if(demag::update_counter%demag::update_rate==0){
+	  cells::mag();
+	  demag::update_counter=1;
+	}
+	
 	//----------------------------------------------------------
 	// Update Dipolar Field Array
 	//----------------------------------------------------------
@@ -354,11 +357,11 @@ int demag_field_update(){
       cells::y_field_array[i]*=demag::prefactor;
       cells::z_field_array[i]*=demag::prefactor;
     }
-    vdp << "\t" << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
-		vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
-		vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t" << cells::z_mag_array[i] << std::endl;
+    //vdp << "\t" << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
+    //		vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
+    //		vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t" << cells::z_mag_array[i] << std::endl;
 	}
-  exit(0);
+	//exit(0);
 	//----------------------------------------------------------
 	// Update Atomistic Dipolar Field Array
 	//----------------------------------------------------------

@@ -16,6 +16,8 @@ namespace cells{
 	int update_rate;
 	int update_counter;
 
+  bool initialised=false;
+
 	std::vector <int> num_atoms_in_cell;
 
 	std::vector <double> x_coord_array;
@@ -49,9 +51,11 @@ namespace cells{
 		//update total number of cells
 		cells::num_cells=ncellx*ncelly*ncellz;
 		
+		if(vmpi::my_rank==0){
 		std::cout << "Cells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
 		std::cout << "Total number of cells: " << cells::num_cells << std::endl;
-		
+		std::cout << "Memory required for cell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
+		}
 		// Determine number of cells in x,y,z
 		const int d[3]={ncellx,ncelly,ncellz};
 	
@@ -158,18 +162,22 @@ namespace cells{
 			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::z_coord_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
 		#endif
 		
+		if(vmpi::my_rank==0){
 		vinfo << "=========================================================================" << std::endl;
 		vinfo << "Number of atoms/cell: cell number, num atoms, coord" << std::endl;
 		vinfo << "=========================================================================" << std::endl;
+		}
 
 		// Now find mean coordinates
 		for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
 			cells::x_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
 			cells::y_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
 			cells::z_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
+			if(vmpi::my_rank==0){
 			vinfo << local_cell << "\t" << cells::num_atoms_in_cell[local_cell] << "\t";
 			vinfo << cells::x_coord_array[local_cell] << "\t" << cells::y_coord_array[local_cell];
 			vinfo << "\t" << cells::z_coord_array[local_cell] << "\t" << std::endl;
+			}
 		}
 		
 		// Now re-update num_atoms in cell for local atoms only
@@ -177,25 +185,28 @@ namespace cells{
 			int local_cell=atoms::cell_array[atom];
 			cells::num_atoms_in_cell[local_cell]++;
 		}
+		
+		
+	        cells:initialised=true;
+		
 		return EXIT_SUCCESS;
 	}
 
 	
 	
 	
-	int mag();
 	int output_mag(std::ofstream&);
 	
-} // End of namespace cells
 
-int cells::mag() {
-  using namespace atoms;
+int mag() {
 
+  // Check for initialised arrays
+  if(cells::initialised!=true) cells::initialise();
 
-  for(int i=0; i<num_cells; ++i) {
-    x_mag_array[i] = 0;
-    y_mag_array[i] = 0;
-    z_mag_array[i] = 0;
+  for(int i=0; i<cells::num_cells; ++i) {
+    cells::x_mag_array[i] = 0.0;
+    cells::y_mag_array[i] = 0.0;
+    cells::z_mag_array[i] = 0.0;
   }
 
 #ifdef MPICF
@@ -206,30 +217,33 @@ int cells::mag() {
 
   // calulate magnetisation in each cell
   for(int i=0;i<num_local_atoms;++i) {
-    int cell = cell_array[i];
-    int type = type_array[i];
+    int cell = atoms::cell_array[i];
+    int type = atoms::type_array[i];
     const double mus = mp::material[type].mu_s_SI;
 
     //
-    x_mag_array[cell] += x_spin_array[i]*mus;
-    y_mag_array[cell] += y_spin_array[i]*mus;
-    z_mag_array[cell] += z_spin_array[i]*mus;
+    cells::x_mag_array[cell] += atoms::x_spin_array[i]*mus;
+    cells::y_mag_array[cell] += atoms::y_spin_array[i]*mus;
+    cells::z_mag_array[cell] += atoms::z_spin_array[i]*mus;
   }
 
 #ifdef MPICF
   // reduce (sum) arrays to root node
-  MPI::COMM_WORLD.Reduce( &(x_mag_array[0]), &(x_mag_array[0]), num_cells,
-      MPI_DOUBLE, MPI_SUM, 0 );
-  MPI::COMM_WORLD.Reduce( &(y_mag_array[0]), &(y_mag_array[0]), num_cells,
-      MPI_DOUBLE, MPI_SUM, 0 );
-  MPI::COMM_WORLD.Reduce( &(z_mag_array[0]), &(z_mag_array[0]), num_cells,
-      MPI_DOUBLE, MPI_SUM, 0 );
+  //MPI::COMM_WORLD.Reduce( MPI_IN_PLACE, &(cells::x_mag_array[0]), cells::num_cells,MPI_DOUBLE, MPI_SUM, 0 );
+  //MPI::COMM_WORLD.Reduce( MPI_IN_PLACE, &(cells::y_mag_array[0]), cells::num_cells,MPI_DOUBLE, MPI_SUM, 0 );
+  //MPI::COMM_WORLD.Reduce( MPI_IN_PLACE, &(cells::z_mag_array[0]), cells::num_cells,MPI_DOUBLE, MPI_SUM, 0 );
 
   // broadcast result of reduction from root node
-  MPI::COMM_WORLD.Bcast( &(x_mag_array[0]), num_cells, MPI_DOUBLE, 0 );
-  MPI::COMM_WORLD.Bcast( &(y_mag_array[0]), num_cells, MPI_DOUBLE, 0 );
-  MPI::COMM_WORLD.Bcast( &(z_mag_array[0]), num_cells, MPI_DOUBLE, 0 );
+  //MPI::COMM_WORLD.Bcast( &(cells::x_mag_array[0]), cells::num_cells, MPI_DOUBLE, 0 );
+  //MPI::COMM_WORLD.Bcast( &(cells::y_mag_array[0]), cells::num_cells, MPI_DOUBLE, 0 );
+  //MPI::COMM_WORLD.Bcast( &(cells::z_mag_array[0]), cells::num_cells, MPI_DOUBLE, 0 );
+
+  MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::x_mag_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
+  MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::y_mag_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
+  MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::z_mag_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
 #endif
 
   return EXIT_SUCCESS;
 }
+
+}  // End of namespace cells   

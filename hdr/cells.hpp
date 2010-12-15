@@ -17,6 +17,8 @@ namespace cells{
 	extern int update_rate;
 	extern int update_counter;
 
+  extern bool initialised;
+
 	extern std::vector <int> num_atoms_in_cell;
 
 	extern std::vector <double> x_coord_array;

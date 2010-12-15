@@ -127,7 +127,7 @@ int create(){
 	//=============================================================
 
 	grains::set_properties();
-	//cells::initialise();
+	cells::initialise();
 	
 	//=============================================================
 	//      Generate system files for storage
