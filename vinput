@@ -20,7 +20,7 @@ dimensions:a=3.54 !A
 dimensions:dx = 5.0 !nm
 dimensions:dy = 5.0 !nm
 dimensions:dz = 5.0 !nm
-#dimensions:particle-size = 5 !nm
+dimensions:particle-size = 5 !nm
 #dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
