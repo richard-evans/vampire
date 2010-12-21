@@ -1,21 +1,16 @@
 # Git Ignore file
 # Ignore object file
-.o
-/*/*.o
-/*/*/*.o
+*.o
 #Ignore temporary editor files
 *~
-/*/*~
-/*/*/*~
+*.swp
+#Ignore error files
+*.err
 #Povray files
 *.pov
-<<<<<<< HEAD:.gitignore
-/*/*.pov
-=======
 *.pin
-/*/*.pov
-/*/*.pin
->>>>>>> 7b5667fd8df6805b65d962cfdb506b4afa77a695:.gitignore
+# Mac files
+*.DS_Store
 # Other sundry files
 *.png
 info

@@ -6,10 +6,10 @@
 #include "vmpi.hpp"
 #include "vmath.hpp"
 
-
-#include <sstream>
+#include <cmath>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 namespace create_voronoi{
 	bool parity=0;	// left-right (0) or right-left (1) point initialisation
@@ -57,8 +57,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	double grain_cell_size_x = size;
 	double grain_cell_size_y = sqrt(3.0)*size;
 
-	int num_x_particle = 4+round(mp::system_dimensions[0]/(grain_cell_size_x));
-	int num_y_particle = 4+round(mp::system_dimensions[1]/(grain_cell_size_y));
+	int num_x_particle = 4+iround(mp::system_dimensions[0]/(grain_cell_size_x));
+	int num_y_particle = 4+iround(mp::system_dimensions[1]/(grain_cell_size_y));
 
 	int init_num_grains = num_x_particle*num_y_particle*2;
 	

@@ -69,19 +69,20 @@ int hosts(){
 	if(err::check==true){std::cout << "mpi_hosts has been called" << std::endl;}
 
 	// Wait for all processors
-   MPI::COMM_WORLD.Barrier();
+	//MPI::COMM_WORLD.Barrier();
 
-	for(int i=0;i<vmpi::num_processors;i++){
-		if(vmpi::my_rank==i){
+   //for(int i=0;i<vmpi::num_processors;i++){
+   //	if(vmpi::my_rank==i){
+	if(vmpi::num_processors<=512){
 			// Output rank, num_procs, hostname to screen
 			std::cout << "Processor " << vmpi::my_rank+1 << " of " << vmpi::num_processors;
 			std::cout << " online on host " << vmpi::hostname << std::endl;
-		}
-	   MPI::COMM_WORLD.Barrier();
+			//	}
+			//MPI::COMM_WORLD.Barrier();
+	   //}
 	}
-
 	// Wait for all processors
-   MPI::COMM_WORLD.Barrier();
+			//MPI::COMM_WORLD.Barrier();
 
 	return EXIT_SUCCESS;	
 }

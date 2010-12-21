@@ -7,6 +7,7 @@
 #include "errors.hpp"
 #include "create.hpp"
 #include "vmpi.hpp"
+#include <cmath>
 #include <iostream>
 
 namespace cs{
@@ -25,13 +26,13 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	if(err::check==true){std::cout << "cs::create_neighbourlist has been called" << std::endl;}	
 	
 	const int num_atoms = catom_array.size();
-	const int max_atoms_per_supercell=10;
+	const int max_atoms_per_supercell=4;
 	int range=1;	// Range of exchange interaction (unit cells)
 	//-----------------------------------------------------
 	// Setup neighbourlist
 	//-----------------------------------------------------
 
-// Reserve space for num_atoms
+	// Reserve space for num_atoms
 	cneighbourlist.reserve(num_atoms);
 
 	// Reserve space for each atom in neighbour list according to material type
@@ -56,8 +57,8 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 	}
-	// Added smal correction to avoid rounding errors - RF 8/6/2010
-	const int d[3]={1+round((max[0]-min[0])/mp::lattice_constant[0]+0.001),1+round((max[1]-min[1])/mp::lattice_constant[1]+0.001),1+round((max[2]-min[2])/mp::lattice_constant[2]+0.001)};
+	// Added small correction to avoid rounding errors - RF 8/6/2010
+	const int d[3]={1+iround((max[0]-min[0])/mp::lattice_constant[0]+0.001),1+iround((max[1]-min[1])/mp::lattice_constant[1]+0.001),1+iround((max[2]-min[2])/mp::lattice_constant[2]+0.001)};
 	
 	// offset in whole unit cells
 	const int offset[3] = {int((min[0])/mp::lattice_constant[0]), int((min[1])/mp::lattice_constant[1]), int((min[2])/mp::lattice_constant[2])};
@@ -106,9 +107,11 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 
-		// Populate supercell array with atom numbers
-		for(int atom=0;atom<num_atoms;atom++){
-			double c[3]={catom_array[atom].x,catom_array[atom].y,catom_array[atom].z};
+		double atom_offset[3]={0.25*mp::lattice_constant[0],0.25*mp::lattice_constant[1],0.25*mp::lattice_constant[2]};
+
+                // Populate supercell array with atom numbers                                                                                                                     
+                for(int atom=0;atom<num_atoms;atom++){
+		  double c[3]={catom_array[atom].x+atom_offset[0],catom_array[atom].y+atom_offset[1],catom_array[atom].z+atom_offset[2]};
 			int scc[3]={0,0,0}; // super cell coordinates
 			for(int i=0;i<3;i++){
 				scc[i]=int(c[i]/mp::lattice_constant[i])-offset[i]; // Always round down for supercell coordinates
@@ -161,9 +164,6 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		
 		// Generate neighbour list
 		std::cout <<"Generating Neighbour list"; 
-		//bool periodicity[3]={false,false,false};
-		//int periodic_index[3];
-		double periodic_offset[3];
 	
 		// Loop over all cells
 		for(int cell=0;cell<num_cells;cell++){
@@ -195,7 +195,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 											if(atom!=natom){
 												double dx=catom_array[natom].x-catom_array[atom].x;
 												double dy=catom_array[natom].y-catom_array[atom].y;
-												double dz=catom_array[natom].z-catom_array[atom].z+periodic_offset[2];
+												double dz=catom_array[natom].z-catom_array[atom].z;
 												double drange=mp::material[catom_array[atom].material].cutoff*mp::lattice_constant[0];
 												if(dx*dx+dy*dy+dz*dz<=drange*drange){
 													if(cneighbourlist[atom].size()<=cneighbourlist[atom].capacity()){

@@ -7,7 +7,9 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+
 #include <iostream>
+#include <cmath>
 
 namespace program{
 	
@@ -99,9 +101,9 @@ int static_hysteresis(){
 	vout::pov_file();
 	
 	// Setup min and max fields and increment (mT)
-	int iHmax=round(double(sim::Hmax)*1.0E3);
-	int iHmin=round(double(sim::Hmin)*1.0E3);
-	int iHinc=round(double(sim::Hinc)*1.0E3);
+	int iHmax=iround(double(sim::Hmax)*1.0E3);
+	int iHmin=iround(double(sim::Hmin)*1.0E3);
+	int iHinc=iround(double(sim::Hinc)*1.0E3);
 	// Perform Field Loop
 	for(int parity=-1;parity<2;parity+=2){
 		for(int H=iHmin;H<=iHmax;H+=iHinc){

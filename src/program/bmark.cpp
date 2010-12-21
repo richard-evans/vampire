@@ -26,13 +26,13 @@ int bmark(){
   sim::temperature=300.0;
 
   // Simulate system
-  for(sim::time=0;sim::time<10000;sim::time+=1){
+  for(sim::time=0;sim::time<sim::total_time;sim::time+=1){
 
   // Calculate LLG
   sim::LLG(1);
 
       // Calculate mag_m, mag
-  if(sim::time%1000==0){
+  if(sim::time%sim::partial_time==0){
       stats::mag_m();
 		//vout::pov_file();
   if(vmpi::my_rank==0){

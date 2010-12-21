@@ -5,11 +5,14 @@
 #===================================================================
 export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
+#export MPICH_CXX=g++
+export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
-MPICC=mpic++ -DMPICF
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+MPICC=mpicxx -DMPICF
 export LANG=C
 export LC_ALL=C
 
@@ -20,11 +23,14 @@ CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 ICC_DBCFLAGS= -O0 -C -I./hdr
 ICC_DBLFLAGS= -C -I./hdr
 
-GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -ansi -Wno-long-long -I./hdr
-GCC_DBLFLAGS= -fbounds-check -I./hdr
+GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++98 -Wno-long-long -I./hdr
+GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr
 
 PCC_DBCFLAGS= -O0 -I./hdr
 PCC_DBLFLAGS= -O0 -I./hdr
+
+IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
+IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
 
 # Performance Flags
 ICC_CFLAGS= -O3 -axSSE3 -ipo -static -fno-alias -align -falign-functions -I./hdr
@@ -32,14 +38,19 @@ ICC_LDFLAGS= -ipo -I./hdr -axSSE3
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-GCC_CFLAGS=-O3 -msse3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr
-GCC_LDFLAGS= -I./hdr
+GCC_CFLAGS=-O3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr
+GCC_LDFLAGS= -lstdc++ -I./hdr
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr
 PCC_LDFLAGS= -I./hdr -O2 -march=barcelona -ipa
 
 NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
 NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
+
+IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr 
+IBM_LDFLAGS= -lstdc++ -I./hdr -O5 -qarch=450 -qtune=450
+
+
 # Objects
 OBJECTS= \
 obj/create/create_system2.o \
@@ -50,6 +61,7 @@ obj/create/cs_particle_shapes.o \
 obj/create/cs_set_atom_vars2.o \
 obj/create/cs_voronoi2.o \
 obj/data/atoms.o \
+obj/data/cells.o \
 obj/data/grains.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
@@ -79,16 +91,20 @@ obj/utility/vmath.o \
 obj/utility/units.o 
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
+IBM_OBJECTS=$(OBJECTS:.o=_ibm.o)
 ICCDB_OBJECTS=$(OBJECTS:.o=_idb.o)
 GCCDB_OBJECTS=$(OBJECTS:.o=_gdb.o)
 PCCDB_OBJECTS=$(OBJECTS:.o=_pdb.o)
+IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb.o)
 
 MPI_OBJECTS=$(OBJECTS:.o=_mpi.o)
 MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_mpi.o)
 MPI_PCC_OBJECTS=$(OBJECTS:.o=_p_mpi.o)
+MPI_IBM_OBJECTS=$(OBJECTS:.o=_ibm_mpi.o)
 MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
 MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
+MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
@@ -108,6 +124,12 @@ intel: $(ICC_OBJECTS)
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $<
 
+ibm: $(IBM_OBJECTS)
+	$(IBM) $(IBM_LDFLAGS) $(IBM_OBJECTS) -o $(EXECUTABLE)
+
+$(IBM_OBJECTS): obj/%_ibm.o: src/%.cpp
+	$(IBM) -c -o $@ $(IBM_CFLAGS) $<
+
 gcc-debug: $(GCCDB_OBJECTS)
 	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)
 
@@ -126,6 +148,12 @@ pathscale-debug: $(ICCDB_OBJECTS)
 $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 	$(PCC) -c -o $@ $(PCC_DBCFLAGS) $<
 
+#ibm-debug: $(ICCDB_OBJECTS)
+#        $(PCC) $(PCC_DBLFLAGS) $(PCCDB_OBJECTS) -o $(EXECUTABLE)
+
+#$(IBMDB_OBJECTS): obj/%_pdb.o: src/%.cpp
+#	$(PCC) -c -o $@ $(PCC_DBCFLAGS) $<
+
 # MPI Targets
 
 mpi-gcc: $(MPI_OBJECTS)
@@ -143,6 +171,11 @@ mpi-pathscale: $(MPI_PCC_OBJECTS)
 	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_PCC_OBJECTS): obj/%_p_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_CFLAGS) $<
+
+mpi-ibm: $(MPI_IBM_OBJECTS)
+	$(MPICC) $(IBM_LDFLAGS) $(MPI_IBM_OBJECTS) -o $(EXECUTABLE)
+$(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
 
 mpi-gcc-debug: $(MPI_GCCDB_OBJECTS)
 	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)

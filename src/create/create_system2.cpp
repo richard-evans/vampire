@@ -9,7 +9,7 @@
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+/// Copyright \htmlonly copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
 ///
 /// @section info File Information
 /// @author  Richard Evans, rfle500@york.ac.uk
@@ -24,6 +24,7 @@
 #include <fstream>
 #include "errors.hpp"
 #include "atoms.hpp"
+#include "cells.hpp"
 #include "grains.hpp"
 #include "material.hpp"
 #include "vmpi.hpp"
@@ -122,11 +123,12 @@ int create(){
 	cs::set_atom_vars(catom_array,cneighbourlist);
 
 	//=============================================================
-	//      Set grain variables for simulation
+	//      Set grain and cell variables for simulation
 	//=============================================================
 
 	grains::set_properties();
-
+	cells::initialise();
+	
 	//=============================================================
 	//      Generate system files for storage
 	//=============================================================
@@ -134,7 +136,14 @@ int create(){
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
-		vmpi::crystal_xyz(catom_array);
+		//vmpi::crystal_xyz(catom_array);
+	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+	int total_num_atoms=0;
+	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
+	if(vmpi::my_rank==0){
+	  std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
+	}
+
 	#else
 		if(1==1){
 		std::ofstream xyz_file;

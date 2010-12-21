@@ -5,6 +5,7 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
+#include <cmath>
 #include <iostream>
 
 namespace grains{
@@ -143,11 +144,11 @@ int set_properties(){
         }
 
 	// Reduce grain properties on all CPUs
-        #ifdef MPICF
-	  MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-	  MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-	  MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-        #endif
+	#ifdef MPICF
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
+	#endif
 
 	// calculate mag_m of each grain and normalised direction
         for(int grain=0;grain<grains::num_grains;grain++){

@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
-#include <valarray>
+#include <vector>
 
 namespace mp
 {
 using std::string;
-using std::valarray;
+
 	//----------------------------------
 	// Material Container
 	//----------------------------------
@@ -67,7 +67,7 @@ using std::valarray;
 
 
 
-	extern valarray <materials_t> material;
+	extern std::vector <materials_t> material;
 
 
 	//extern materials_t material;

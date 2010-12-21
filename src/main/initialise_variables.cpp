@@ -23,7 +23,7 @@
 ///
 
 // Headers
-#include <iostream>
+
 #include "errors.hpp"
 #include "demag.hpp"
 #include "voronoi.hpp"
@@ -34,7 +34,8 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
-
+#include <cmath>
+#include <iostream>
 //==========================================================
 // Namespace material_parameters
 //==========================================================
@@ -48,7 +49,7 @@ namespace mp{
 	int num_materials=1;
 
 
-	valarray <materials_t> material(1);
+	std::vector <materials_t> material(1);
 
 
 	
@@ -140,6 +141,9 @@ int initialise(std::string const infile){
 		exit(1);
 	}
 	
+	// Print out material properties
+	//mp::material[0].print();
+
 	// Check for keyword parameter overide
 	if(mp::single_spin==true){
 		mp::single_spin_system();
@@ -279,9 +283,9 @@ int set_derived_parameters(){
 	mp::lattice_space_conversion[1] = mp::lattice_constant[1]*0.5*0.333333333333333;
 	mp::lattice_space_conversion[2] = mp::lattice_constant[2]*0.5;
 
-	mp::int_system_dimensions[0] = 2*round(mp::system_dimensions[0]/mp::lattice_constant[0]);
-	mp::int_system_dimensions[1] = 6*round(mp::system_dimensions[1]/mp::lattice_constant[1]);
-	mp::int_system_dimensions[2] = 2*round(mp::system_dimensions[2]/mp::lattice_constant[2]);
+	mp::int_system_dimensions[0] = 2*iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
+	mp::int_system_dimensions[1] = 6*iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
+	mp::int_system_dimensions[2] = 2*iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
 		
 	double num_atoms_per_unit_cell=0; 
 	
@@ -703,9 +707,9 @@ int initialise(std::string const infile){
 
 	//exit(0);
 
-	int_system_dimensions[0] = 2*round(system_dimensions[0]/lattice_constant[0]);
-	int_system_dimensions[1] = 6*round(system_dimensions[1]/lattice_constant[1]);
-	int_system_dimensions[2] = 2*round(system_dimensions[2]/lattice_constant[2]);
+	int_system_dimensions[0] = 2*iround(system_dimensions[0]/lattice_constant[0]);
+	int_system_dimensions[1] = 6*iround(system_dimensions[1]/lattice_constant[1]);
+	int_system_dimensions[2] = 2*iround(system_dimensions[2]/lattice_constant[2]);
 
 	//----------------------------------
 	// Enable/Disable Error Checking

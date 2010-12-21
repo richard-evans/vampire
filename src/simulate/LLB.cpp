@@ -17,6 +17,7 @@
 #include "vmpi.hpp"
 #include "random.hpp"
 
+#include <cmath>
 #include <iostream>
 #include <algorithm>
 

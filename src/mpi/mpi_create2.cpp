@@ -53,7 +53,8 @@ namespace vmpi{
 	// set local variables
 	int x=num_cpus;
 	int nx,ny,nz;	// Number of cpus in x,y,z
-	int factor_array[50]; // to store the factors of each given n_cpu
+	std::vector<int> factor_array; // to store the factors of each given n_cpu
+	factor_array.reserve(50);
 	int counter_factor=0; // to count the number of factors
 	int n1=1; // store n solutions temporary
 	int n2=1;
@@ -63,7 +64,7 @@ namespace vmpi{
 	double lz = system_dimensions[2];
 	
 	double surface_volumn=0.0;
-	double compare_sv=1000.0; // set a very large number for comparing each surface_volumn to find the minimum
+	double compare_sv=10000000.0; // set a very large number for comparing each surface_volumn to find the minimum
 	
 	// Check for zero cpu's
 	if(num_cpus==0){
@@ -78,14 +79,14 @@ namespace vmpi{
 	// find all the factors of given n_cpu
 	for (int i=1;i<x+1;i++){
 		if ((x%i)==0){
-			factor_array[counter_factor]=i;
+		  factor_array.push_back(i);
 			//cout << i << "\t"<< counter_factor << "\t" << factor_array[counter_factor] << endl;
 			counter_factor++;
 		}
 	}
 	
 	// set the remaining elements of the array as 1 if there are no other factors
-	for (int i=counter_factor+1;i<51;i++){
+	for (int i=counter_factor+1;i<factor_array.size();i++){
 		factor_array[i]=1;
 	}
 
@@ -265,7 +266,7 @@ namespace vmpi{
 
 		for(int p=1;p<num_processors;p++){
 			std::vector<double> mpi_data_array(3*num_atoms_array[p]);
-			//valarray<char> mpi_char_array(3*num_atoms_array[p]);
+			//vector<char> mpi_char_array(3*num_atoms_array[p]);
 			std::vector<int> mpi_char_array(num_atoms_array[p]);
 			std::vector<int> mpi_type_array(num_atoms_array[p]);
 			//vector<int> mpi_comms_array(num_atoms_array[p]);
@@ -307,7 +308,6 @@ namespace vmpi{
 	}
 	else{
 		std::vector<double> mpi_data_array(3*num_atoms);
-		//valarray<char> mpi_char_array(3*num_atoms);
 		std::vector<int> mpi_char_array(num_atoms);
 		std::vector<int> mpi_type_array(num_atoms);
 		//vector<int> mpi_comms_array(num_atoms);

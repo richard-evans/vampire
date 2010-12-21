@@ -14,6 +14,8 @@
 #include "LLG.hpp"
 #include "vmpi.hpp"
 
+#include <cmath>
+
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
 int set_LLG();

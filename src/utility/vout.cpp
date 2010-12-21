@@ -24,7 +24,6 @@
 
 // Headers
 #include "atoms.hpp"
-//#include "create_voronoi.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "sim.hpp"
@@ -33,6 +32,7 @@
 #include "vmpi.hpp"
 #include "stats.hpp"
 
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <fstream>

@@ -15,8 +15,8 @@
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "vmpi.hpp"
-//#include <iostream>
-//#include <valarray>
+#include <iostream>
+
 
 int mpi_init_halo_swap(){
 	//====================================================================================

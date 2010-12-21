@@ -25,6 +25,7 @@ namespace atoms{
 	std::vector <int> neighbour_list_end_index(0);
 	std::vector <int> type_array(0);
 	std::vector <int> grain_array(0);
+	std::vector <int> cell_array(0);
 
 	std::vector <double> x_spin_array(0);
 	std::vector <double> y_spin_array(0);

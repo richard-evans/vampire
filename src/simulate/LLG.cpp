@@ -16,7 +16,7 @@
 #include "vcuda.hpp"
 #include "vmpi.hpp"
 
-
+#include <cmath>
 #include <iostream>
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
@@ -29,26 +29,26 @@ int LLG_mpi(const int);
 /// 
 /// Arrays are initialised to zero. set_LLG is called after system generation to set size of arrays to the number of atoms
 namespace LLG_arrays{
-	using std::valarray;
+	using std::vector;
 //==========================================================
 // Namespace to store persistant LLG integration arrays
 //==========================================================
 
-	valarray <double> x_euler_array;
-	valarray <double> y_euler_array;	
-	valarray <double> z_euler_array;
+	std::vector <double> x_euler_array;
+	std::vector <double> y_euler_array;	
+	std::vector <double> z_euler_array;
 
-	valarray <double> x_heun_array;	
-	valarray <double> y_heun_array;	
-	valarray <double> z_heun_array;
+	std::vector <double> x_heun_array;	
+	std::vector <double> y_heun_array;	
+	std::vector <double> z_heun_array;
 
-	valarray <double> x_spin_storage_array;	
-	valarray <double> y_spin_storage_array;	
-	valarray <double> z_spin_storage_array;
+	std::vector <double> x_spin_storage_array;	
+	std::vector <double> y_spin_storage_array;	
+	std::vector <double> z_spin_storage_array;
 
-	valarray <double> x_initial_spin_array;	
-	valarray <double> y_initial_spin_array;	
-	valarray <double> z_initial_spin_array;
+	std::vector <double> x_initial_spin_array;	
+	std::vector <double> y_initial_spin_array;	
+	std::vector <double> z_initial_spin_array;
 
 	bool LLG_set=false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 

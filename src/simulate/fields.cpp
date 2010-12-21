@@ -16,6 +16,7 @@
 #include "vmpi.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 //========================
@@ -126,7 +127,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "calculate_exchange_fields has been called" << std::endl;}
 
-	const int prank=1;
+	//const int prank=1;
 	//const int num_atoms = atoms::num_atoms;
 
 	//std::vector<double> spin_array(3*num_atoms);
@@ -159,7 +160,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 		//atoms::x_total_spin_field_array[atom]+=tot[0];
 		//atoms::y_total_spin_field_array[atom]+=tot[1];
 		//atoms::z_total_spin_field_array[atom]+=tot[2];
-		if(vmpi::my_rank==prank){
+		//if(vmpi::my_rank==prank){
 		//std::cout << atom << "\texchange fields\t" << atoms::x_total_spin_field_array[atom] << "\t";
 		//std::cout << atoms::y_total_spin_field_array[atom] << "\t";
 		//std::cout << atoms::z_total_spin_field_array[atom] << std::endl;
@@ -167,7 +168,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 		//std::cout << atom << "\texchange fields\t" << tot[0] << "\t";
 		//std::cout << tot[1] << "\t";
 		//std::cout << tot[2] << std::endl;
-		}
+		//}
 		//std::cin.get();
 	}
 	//system("sleep 2");

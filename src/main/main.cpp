@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 #include "create.hpp"
 #include "errors.hpp"
@@ -16,6 +17,7 @@ int simulate_system();
 /// Main function for vampire
 /// Prints out program header and calls main program routines
 int main(int argc, char* argv[]){
+
 
 	//=============================================================
 	// Check for valid command-line arguments
@@ -75,13 +77,26 @@ int main(int argc, char* argv[]){
 		#endif
 		std::cout << std::endl;
 		std::cout << "================================================================================" << std::endl;
-		int sysstat = system ("date");
-		if(sysstat!=0) std::cerr << "Error retrieving date from system" << std::endl;
+    time_t rawtime = time(NULL);
+    struct tm * timeinfo = localtime(&rawtime);
+    std::cout<<asctime(timeinfo);
 	}
+
 
 	#ifdef MPICF
 		vmpi::hosts();
 	#endif 
+  
+  // nullify non root cout stream
+  if(vmpi::my_rank!=0){
+    vout::nullify(std::cout);
+  }
+  
+  // redirect std::err to file
+  //std::stringstream ss;
+  //ss << "vampire."<<vmpi::my_rank<<".err";
+  //vout::redirect(std::cerr,ss.str());
+	
 
 	// Initialise system
 	mp::initialise(infile);

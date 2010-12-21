@@ -7,7 +7,8 @@
 #------------------------------------------
 #create:particle-array
 #create:cylinder
-create:crystal-structure="sc"
+#create:crystal-structure="sc"
+create:crystal-structure="fcc"
 #create:particle-parity=1
 #create:single-spin
 #create:voronoi-film
@@ -17,10 +18,10 @@ create:crystal-structure="sc"
 # System Dimensions:
 #------------------------------------------
 dimensions:a=3.54 !A
-dimensions:dx = 7.8 !nm
-dimensions:dy = 7.8 !nm
-dimensions:dz = 7.8 !nm
-#dimensions:particle-size = 5 !nm
+dimensions:dx = 5.0 !nm
+dimensions:dy = 5.0 !nm
+dimensions:dz = 5.0 !nm
+dimensions:particle-size = 5 !nm
 #dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
@@ -34,6 +35,7 @@ sim:exchange=true
 sim:anisotropy=true
 sim:applied=true
 sim:thermal=true
+sim:dipolar=true
 sim:temperature=300.0
 sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
