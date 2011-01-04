@@ -38,7 +38,7 @@ namespace cells{
 		if(err::check==true) std::cout << "cells::initialise has been called" << std::endl;
 		
 		// set initial cell variables
-		cells::size=5; // In units of a
+		cells::size=2; // In units of a
 		cells::update_rate=10; // In timesteps
 		cells::num_cells=0;
 		cells::update_counter=0;
@@ -178,6 +178,11 @@ namespace cells{
 			vinfo << cells::x_coord_array[local_cell] << "\t" << cells::y_coord_array[local_cell];
 			vinfo << "\t" << cells::z_coord_array[local_cell] << "\t" << std::endl;
 			}
+		}
+
+		//Set number of atoms in cell to zero
+		for(int cell=0;cell<cells::num_cells;cell++){
+		  cells::num_atoms_in_cell[cell]=0;
 		}
 		
 		// Now re-update num_atoms in cell for local atoms only

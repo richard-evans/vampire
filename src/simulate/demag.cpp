@@ -12,8 +12,10 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "demag.hpp"
+#include "sim.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+
 
 #include <cmath>
 #include <iostream>
@@ -24,6 +26,7 @@ namespace demag{
 	int demag_resolution=5;
 	int update_rate=100;
 	int update_counter=0;
+  int update_time=-1;
 
 	const double prefactor=4.0*M_PI*1.0e+23;
 
@@ -311,25 +314,42 @@ int demag_field_update(){
 	//	std::cerr << "Warning, demag not initialised - initialising" << std::endl;
 	//	set_demag();
 	//}
-
+	//std::cout << demag::update_time << "\t" << sim::time << "\t" << demag::update_counter << "\t" << demag::update_rate << std::endl;
+	// prevent double calculation for split integration (MPI)
+	if(demag::update_time!=sim::time){
   // Populate magnetisations
-	if(demag::update_counter%demag::update_rate==0){
+
+	  if(sim::time%demag::update_rate==0){
+
+	  //if updated record last time at update
+	  demag::update_time=sim::time;
+
+	  std::cout << "Updating demag fields at time " << sim::time <<std::endl;
+	  double custart=MPI_Wtime();
 	  cells::mag();
 	  demag::update_counter=1;
-	}
+	  double cuend=MPI_Wtime();
+	    std::cout << "Time for cell update: " << cuend-custart << " s" << std::endl;
 	
 	//----------------------------------------------------------
 	// Update Dipolar Field Array
 	//----------------------------------------------------------
   // Field has units ((T^2 m^2) / (N m^3)) * (J/T) = T
+	    //MPI::COMM_WORLD.Barrier();
+	  double dmstart=MPI_Wtime();
+
+	  double ncalcs=0.0;
+	  // Loopover all cells
 	for(int i=0;i<cells::num_cells;i++){
+	  // Check for cells including local atoms 
     if(cells::num_atoms_in_cell[i] > 0 ) {
       // zero field arrays
       cells::x_field_array[i]=0.0;
       cells::y_field_array[i]=0.0;
       cells::z_field_array[i]=0.0;
-      for(int j=0;j<cells::num_cells;j++){
-        if(i!=j){
+      // Loop over all other cells to calculate contribution to local cell 
+      for(int j=0;j<i;j++){
+        //if(i!=j){
           
           const double mx = cells::x_mag_array[j];
           const double my = cells::y_mag_array[j];
@@ -351,8 +371,39 @@ int demag_field_update(){
           cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
           cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
           cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
-        }
+
+	  ncalcs+=1.0;
+	  //}
       }
+
+      for(int j=i+1;j<cells::num_cells;j++){
+	//if(i!=j){
+
+	  const double mx = cells::x_mag_array[j];
+	  const double my = cells::y_mag_array[j];
+	  const double mz = cells::z_mag_array[j];
+
+	  const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
+	  const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
+	  const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
+
+	  const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
+	  const double drij3 = drij*drij*drij;
+
+	  const double ex = dx*drij;
+	  const double ey = dy*drij;
+	  const double ez = dz*drij;
+
+	  const double s_dot_e = (mx * ex + my * ey + mz * ez);
+
+	  cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
+	  cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
+	  cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
+
+	  ncalcs+=1.0;
+	  //}
+      }
+
       cells::x_field_array[i]*=demag::prefactor;
       cells::y_field_array[i]*=demag::prefactor;
       cells::z_field_array[i]*=demag::prefactor;
@@ -360,7 +411,10 @@ int demag_field_update(){
     //vdp << "\t" << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
     //		vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
     //		vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t" << cells::z_mag_array[i] << std::endl;
-	}
+	} // end of i loop
+
+	//MPI::COMM_WORLD.Barrier();
+	double dmend=MPI_Wtime();
 	//exit(0);
 	//----------------------------------------------------------
 	// Update Atomistic Dipolar Field Array
@@ -373,6 +427,17 @@ int demag_field_update(){
 		atoms::y_dipolar_field_array[atom]=cells::y_field_array[cell];
 		atoms::z_dipolar_field_array[atom]=cells::z_field_array[cell];
 	}
+
+	//MPI::COMM_WORLD.Barrier();
+	//double dmend=MPI_Wtime();
+	std::cout << "Time for demag calculation: " << dmend-dmstart << " s" << std::endl;
+	std::cout << "Ncalcs: " << ncalcs << "\t" << ncalcs/cells::num_cells << std::endl;
+	std::cout << "Performance: " << (ncalcs*36.0/(dmend-dmstart))*1.0e-6 << " MFlops" << std::endl;
+	} // End of check for update rate
+	  //demag::update_counter++;
+	} // end of check for update time
+	
+	//std::cout << demag::update_counter << "\t" << demag::update_rate << "\t" << demag::update_counter%demag::update_rate << std::endl;
 	return 0;
 
 }

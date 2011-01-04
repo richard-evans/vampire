@@ -199,8 +199,8 @@ int default_system(){
 	sim::temperature = 0.0;	// Constant system temperature
 
 	// demag variables
-	demag::demag_resolution=2;
-	demag::update_rate=10000;
+	//demag::demag_resolution=2;
+	//demag::update_rate=10000;
 	
 	//Integration parameters
 	dt_SI = 1.0e-15;	// seconds
