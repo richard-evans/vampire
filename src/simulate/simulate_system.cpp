@@ -37,7 +37,11 @@ namespace sim{
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-
+	int integrator;
+	
+	// Local function declarations
+	int integrate_serial(int,int,int);
+	int integrate_mpi(int,int,int);
 	
 	int run(){
 		
@@ -58,7 +62,129 @@ namespace sim{
 	return EXIT_SUCCESS;
 }
 	// derived variables
+
+/// @brief Wrapper function to call integrators
+///
+/// @callgraph
+/// @callergraph
+///
+/// @details Calls serial or parallel integrator 
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    05/02/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		05/02/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+int integrate(int n_steps, int istart, int iend){
 	
+	// Check for calling of function
+	if(err::check==true) std::cout << "sim::integrate has been called" << std::endl;
+	
+	// Call serial or parallell depending at compile time
+	#ifdef MPICF
+		//sim::integrate_mpi(n_steps, istart, iend);
+	#else 
+		sim::integrate_serial(n_steps, istart, iend);
+	#endif
+	
+	// return
+	return EXIT_SUCCESS;
+}
+
+/// @brief Wrapper function to call serial integrators
+///
+/// @callgraph
+/// @callergraph
+///
+/// @details Calls serial integrators based on sim::integrator 
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    05/02/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		05/02/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+int integrate_serial(int n_steps, int istart, int iend){
+	
+	// Check for calling of function
+	if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
+	
+	// Case statement to call integrator
+	switch(sim::integrator){
+		case 0: // LLG Heun
+			for(int ti=0;ti<n_steps;ti++){
+				// Select CUDA version if supported
+				#ifdef CUDA
+					sim::LLG_Heun_cuda(istart,iend);
+				#else
+					sim::LLG_Heun(istart,iend);
+				#endif
+			}
+			break;
+		
+		case 1: // Montecarlo
+			for(int ti=0;ti<n_steps;ti++){
+				sim::MonteCarlo(istart,iend);
+			}
+			break;
+		
+		case 2: // LLG Midpoint
+			for(int ti=0;ti<n_steps;ti++){
+				// Select CUDA version if supported
+				#ifdef CUDA
+					sim::LLG_Midpoint_cuda(istart,iend);
+				#else
+					sim::LLG_Midpoint(istart,iend);
+				#endif
+			}
+			break;
+			
+		case 3: // Constrained Monte Carlo
+			for(int ti=0;ti<n_steps;ti++){
+				sim::ConstrainedMonteCarlo(istart,iend);
+			}
+			break;
+			
+		case 4: // Grain Growth Method
+			//grain_growth(cs_num_atoms,cs_coord_array,particle_include_array,cs_atom_type_array);
+			std::cerr << "Grain growth not yet implemented, exiting" << std::endl;
+			exit(0);
+			break;
+			
+		default:{
+			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
+			exit (EXIT_FAILURE);
+			}
+	}
+	
+	// return
+	return EXIT_SUCCESS;
+}
+
+
+
+
 int initialise(){
 
 	//----------------------------------------------------------

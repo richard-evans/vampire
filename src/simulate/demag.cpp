@@ -324,19 +324,19 @@ int demag_field_update(){
 	  //if updated record last time at update
 	  demag::update_time=sim::time;
 
-	  std::cout << "Updating demag fields at time " << sim::time <<std::endl;
-	  double custart=MPI_Wtime();
+	  //std::cout << "Updating demag fields at time " << sim::time <<std::endl;
+	  //double custart=MPI_Wtime();
 	  cells::mag();
 	  demag::update_counter=1;
-	  double cuend=MPI_Wtime();
-	    std::cout << "Time for cell update: " << cuend-custart << " s" << std::endl;
+	  //double cuend=MPI_Wtime();
+	    //std::cout << "Time for cell update: " << cuend-custart << " s" << std::endl;
 	
 	//----------------------------------------------------------
 	// Update Dipolar Field Array
 	//----------------------------------------------------------
   // Field has units ((T^2 m^2) / (N m^3)) * (J/T) = T
 	    //MPI::COMM_WORLD.Barrier();
-	  double dmstart=MPI_Wtime();
+	  //double dmstart=MPI_Wtime();
 
 	  double ncalcs=0.0;
 	  // Loopover all cells
@@ -414,7 +414,7 @@ int demag_field_update(){
 	} // end of i loop
 
 	//MPI::COMM_WORLD.Barrier();
-	double dmend=MPI_Wtime();
+	//double dmend=MPI_Wtime();
 	//exit(0);
 	//----------------------------------------------------------
 	// Update Atomistic Dipolar Field Array
@@ -430,9 +430,9 @@ int demag_field_update(){
 
 	//MPI::COMM_WORLD.Barrier();
 	//double dmend=MPI_Wtime();
-	std::cout << "Time for demag calculation: " << dmend-dmstart << " s" << std::endl;
-	std::cout << "Ncalcs: " << ncalcs << "\t" << ncalcs/cells::num_cells << std::endl;
-	std::cout << "Performance: " << (ncalcs*36.0/(dmend-dmstart))*1.0e-6 << " MFlops" << std::endl;
+	//std::cout << "Time for demag calculation: " << dmend-dmstart << " s" << std::endl;
+	//std::cout << "Ncalcs: " << ncalcs << "\t" << ncalcs/cells::num_cells << std::endl;
+	//std::cout << "Performance: " << (ncalcs*36.0/(dmend-dmstart))*1.0e-6 << " MFlops" << std::endl;
 	} // End of check for update rate
 	  //demag::update_counter++;
 	} // end of check for update time
