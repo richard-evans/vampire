@@ -274,7 +274,7 @@ double calculate_spin_energy(const int atom){
 	energy+=spin_applied_field_energy(atom, imaterial, Sx, Sy, Sz);
 	energy+=spin_uniaxial_energy(atom, imaterial, Sx, Sy, Sz);
 	
-	return energy;
+	return energy; // Tesla
 }
 
 } // end of namespace sim

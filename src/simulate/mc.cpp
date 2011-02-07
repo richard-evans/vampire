@@ -66,7 +66,7 @@ int MonteCarlo(){
 	// calculate number of seps to calculate
 	int nmoves = atoms::num_atoms;
 
-	// Declare arrays for spin statesSave spin position
+	// Declare arrays for spin states
 	double Sold[3];
 	double Snew[3];
 		
@@ -86,6 +86,9 @@ int MonteCarlo(){
 		
 		// pick atom
 		atom = int(nmoves*mtrandom::grnd());
+		
+		// get material id
+		const int imaterial=atoms::type_array[atom];
 
 		// Save old spin position
 		Sold[0] = atoms::x_spin_array[atom];
@@ -115,8 +118,8 @@ int MonteCarlo(){
 		// Calculate new energy
 		Enew = sim::calculate_spin_energy(atom);
 		
-		// Calculate difference
-		DE = Enew-Eold;
+		// Calculate difference in Joules/mu_B
+		DE = (Enew-Eold)*mp::material[imaterial].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 		
 		// Check for lower energy state and accept unconditionally
 		if(DE<0) continue;

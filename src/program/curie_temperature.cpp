@@ -69,7 +69,7 @@ int curie_temperature(bool init){
 	// Set up loop variables
 	
 	//vout::pov_file();
-	sim::integrator=1;
+	sim::integrator=0;
 
 	//      Perform Temperature Loop
 	for(int temperature=0;temperature<=1000;temperature+=10){
