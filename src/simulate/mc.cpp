@@ -58,27 +58,17 @@ namespace sim{
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int MonteCarlo(int istart, int iend){
+int MonteCarlo(){
 	
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::MonteCarlo has been called" << std::endl;
 
 	// calculate number of seps to calculate
-	int nmoves = iend-istart;
-	if(nmoves <=0){
-		std::cerr << "Error in Monte Carlo Integrator, start and end ranges must satisfy the following:" << std::endl;
-		std::cerr << "      istart  <  iend" << std::endl;
-		std::cerr << "      istart  >= 0" << std::endl;
-		std::cerr << "      iend    >  0" << std::endl;
-		std::cerr << "      istart is currently: " << istart << std::endl;
-		std::cerr << "      iend is currently:   " << iend << std::endl;
-		std::cerr << "Exiting" << std::endl;
-		//vexit(vmpi::my_rank);
-	}
+	int nmoves = atoms::num_atoms;
 
-// Declare arrays for spin statesSave spin position
-		double Sold[3];
-		double Snew[3];
+	// Declare arrays for spin statesSave spin position
+	double Sold[3];
+	double Snew[3];
 		
 	// Calculate range for move
 	double sigma=1.0;
@@ -95,7 +85,7 @@ int MonteCarlo(int istart, int iend){
 	for(int i=0;i<nmoves; i++){
 		
 		// pick atom
-		atom = istart+int(nmoves*mtrandom::grnd());
+		atom = int(nmoves*mtrandom::grnd());
 
 		// Save old spin position
 		Sold[0] = atoms::x_spin_array[atom];

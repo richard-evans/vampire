@@ -36,12 +36,12 @@ namespace sim{
 	extern int LLG_relax(int);
 	
 	// New Integrators
-	extern int LLG_Heun(int,int);
-	extern int LLG_Heun_cuda(int,int);
-	extern int LLG_Midpoint(int,int);
-	extern int LLG_Midpoint_cuda(int,int);
-	extern int MonteCarlo(int,int);
-	extern int ConstrainedMonteCarlo(int,int);
+	extern int LLG_Heun();
+	extern int LLG_Heun_cuda();
+	extern int LLG_Midpoint();
+	extern int LLG_Midpoint_cuda();
+	extern int MonteCarlo();
+	extern int ConstrainedMonteCarlo();
 	
 	// Field and energy functions
 	extern double calculate_spin_energy(const int);

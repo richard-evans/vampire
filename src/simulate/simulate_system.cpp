@@ -130,26 +130,22 @@ int integrate_serial(int n_steps){
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
 	
-	// Set start and end indices
-	int istart=0;
-	int iend=atoms::num_atoms;
-	
 	// Case statement to call integrator
 	switch(sim::integrator){
 		case 0: // LLG Heun
 			for(int ti=0;ti<n_steps;ti++){
 				// Select CUDA version if supported
 				#ifdef CUDA
-					sim::LLG_Heun_cuda(istart,iend);
+					sim::LLG_Heun_cuda();
 				#else
-					sim::LLG_Heun(istart,iend);
+					sim::LLG_Heun();
 				#endif
 			}
 			break;
 		
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
-				sim::MonteCarlo(istart,iend);
+				sim::MonteCarlo();
 			}
 			break;
 		
@@ -157,16 +153,16 @@ int integrate_serial(int n_steps){
 			for(int ti=0;ti<n_steps;ti++){
 				// Select CUDA version if supported
 				#ifdef CUDA
-					sim::LLG_Midpoint_cuda(istart,iend);
+					sim::LLG_Midpoint_cuda();
 				#else
-					sim::LLG_Midpoint(istart,iend);
+					sim::LLG_Midpoint();
 				#endif
 			}
 			break;
 			
 		case 3: // Constrained Monte Carlo
 			for(int ti=0;ti<n_steps;ti++){
-				sim::ConstrainedMonteCarlo(istart,iend);
+				sim::ConstrainedMonteCarlo();
 			}
 			break;
 			

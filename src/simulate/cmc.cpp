@@ -25,7 +25,7 @@ namespace sim{
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int ConstrainedMonteCarlo(int istart, int iend){
+int ConstrainedMonteCarlo(){
 	
 	
 

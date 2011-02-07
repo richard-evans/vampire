@@ -26,7 +26,7 @@ namespace sim{
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int LLG_Midpoint(int istart, int iend){
+int LLG_Midpoint(){
 	
 	
 
@@ -56,7 +56,7 @@ int LLG_Midpoint(int istart, int iend){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int LLG_Midpoint_cuda(int istart, int iend){
+int LLG_Midpoint_cuda(){
 	
 	
 	return EXIT_SUCCESS;
