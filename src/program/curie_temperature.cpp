@@ -69,9 +69,10 @@ int curie_temperature(bool init){
 	// Set up loop variables
 	
 	//vout::pov_file();
+	sim::integrator=1;
 
 	//      Perform Temperature Loop
-	for(int temperature=0;temperature<=1500;temperature+=10){
+	for(int temperature=0;temperature<=1000;temperature+=10){
 		// Set system temperature
 		sim::temperature=double(temperature); 
 		
@@ -79,13 +80,17 @@ int curie_temperature(bool init){
 		double count=0.0;
 
 		// Equilibrate system
-		sim::LLG(sim::equilibration_time);
+		sim::integrate(sim::equilibration_time);
+		//sim::LLG(sim::equilibration_time);
 		
 		// Simulate system
 		for(sim::time=0;sim::time<sim::loop_time;sim::time+=sim::partial_time){
 			
+			// Integrate system
+			sim::integrate(sim::partial_time);
+		
 			// Calculate LLG
-			sim::LLG(sim::partial_time);
+			//sim::LLG(sim::partial_time);
 			
 			// Calculate mag_m, mag
 			stats::mag_m();

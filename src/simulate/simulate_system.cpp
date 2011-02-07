@@ -37,11 +37,11 @@ namespace sim{
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-	int integrator;
+	int integrator=0;
 	
 	// Local function declarations
-	int integrate_serial(int,int,int);
-	int integrate_mpi(int,int,int);
+	int integrate_serial(int);
+	int integrate_mpi(int);
 	
 	int run(){
 		
@@ -52,11 +52,11 @@ namespace sim{
 		#endif
 		std::cout << "Starting Simulation..." << std::endl;
 	}
-    //program::curie_temperature(true);
+    program::curie_temperature(true);
 	//program::hamr_run();
 	//program::static_hysteresis();
 	//program::two_temperature_pulse();
-	program::bmark();
+	//program::bmark();
 	//program::LLB_Boltzmann();
 	//program::hysteresis();
 	return EXIT_SUCCESS;
@@ -86,7 +86,7 @@ namespace sim{
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int integrate(int n_steps, int istart, int iend){
+int integrate(int n_steps){
 	
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate has been called" << std::endl;
@@ -95,7 +95,7 @@ int integrate(int n_steps, int istart, int iend){
 	#ifdef MPICF
 		//sim::integrate_mpi(n_steps, istart, iend);
 	#else 
-		sim::integrate_serial(n_steps, istart, iend);
+		sim::integrate_serial(n_steps);
 	#endif
 	
 	// return
@@ -125,10 +125,14 @@ int integrate(int n_steps, int istart, int iend){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int integrate_serial(int n_steps, int istart, int iend){
+int integrate_serial(int n_steps){
 	
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
+	
+	// Set start and end indices
+	int istart=0;
+	int iend=atoms::num_atoms;
 	
 	// Case statement to call integrator
 	switch(sim::integrator){

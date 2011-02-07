@@ -77,6 +77,7 @@ obj/program/LLB_Boltzmann.o \
 obj/program/static_hysteresis.o \
 obj/random/mtrand.o \
 obj/random/random.o \
+obj/simulate/energy.o \
 obj/simulate/fields.o \
 obj/simulate/demag.o \
 obj/simulate/LLB.o \

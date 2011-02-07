@@ -20,6 +20,7 @@
 #include <iostream>
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
+
 int LLG_serial_heun(const int);
 int LLG_relax_serial_heun(const int);
 int LLG_mpi(const int);

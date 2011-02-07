@@ -23,10 +23,12 @@ namespace sim{
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 	
+	extern int integrator;
+	
 	// Wrapper Functions
 	extern int run();
 	extern int initialise();
-	extern int integrate();
+	extern int integrate(int);
 	
 	// Legacy integrators
 	extern int LLB(int);
@@ -41,6 +43,9 @@ namespace sim{
 	extern int MonteCarlo(int,int);
 	extern int ConstrainedMonteCarlo(int,int);
 	
+	// Field and energy functions
+	extern double calculate_spin_energy(const int);
+
 }
 
 #endif /*SIM_H_*/

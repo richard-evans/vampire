@@ -115,7 +115,7 @@ int MonteCarlo(int istart, int iend){
 		Snew[2]*=r;
 
 		// Calculate current energy
-		//Eold = calculate_spin_energy(atom);
+		Eold = sim::calculate_spin_energy(atom);
 		
 		// Copy new spin position
 		atoms::x_spin_array[atom] = Snew[0];
@@ -123,7 +123,7 @@ int MonteCarlo(int istart, int iend){
 		atoms::z_spin_array[atom] = Snew[2];
 
 		// Calculate new energy
-		//Enew = calculate_spin_energy(atom);
+		Enew = sim::calculate_spin_energy(atom);
 		
 		// Calculate difference
 		DE = Enew-Eold;
