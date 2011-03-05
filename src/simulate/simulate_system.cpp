@@ -28,12 +28,14 @@ namespace sim{
 	
 	double Tmax=300;
 	double temperature;
-        double delta_temperature;
+	double delta_temperature;
 	double H_applied=0.0;
 	double H_vec[3]={0.0,0.0,1.0};
 	double Hmin=-1.0; // T
 	double Hmax=+1.0; // T
 	double Hinc= 0.1; // T	
+	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
+	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];

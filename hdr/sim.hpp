@@ -19,7 +19,9 @@ namespace sim{
 	extern double Hmin; // T
 	extern double Hmax; // T
 	extern double Hinc; // T
-	
+	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
+	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
+
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 	
@@ -42,6 +44,9 @@ namespace sim{
 	extern int LLG_Midpoint_cuda();
 	extern int MonteCarlo();
 	extern int ConstrainedMonteCarlo();
+	
+	// Integrator initialisers
+	extern void CMCinit();
 	
 	// Field and energy functions
 	extern double calculate_spin_energy(const int);
