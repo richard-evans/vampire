@@ -19,6 +19,7 @@
 #include "vmath.hpp"
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 
 namespace vmath{
