@@ -30,6 +30,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
+#include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 
@@ -63,7 +64,7 @@ int MonteCarlo(){
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::MonteCarlo has been called" << std::endl;
 
-	// calculate number of seps to calculate
+	// calculate number of steps to calculate
 	int nmoves = atoms::num_atoms;
 
 	// Declare arrays for spin states
@@ -79,7 +80,7 @@ int MonteCarlo(){
 	double Eold=0.0;
 	double Enew=0.0;
 	double DE=0.0;
-	double kBTBohr = sim::temperature*1.3806503e-23/9.27400915e-24;
+	double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
 	
 	// loop over natoms to form a single Monte Carlo step
 	for(int i=0;i<nmoves; i++){
@@ -125,7 +126,7 @@ int MonteCarlo(){
 		if(DE<0) continue;
 		// Otherwise evaluate probability for move
 		else{
-			if(exp(-DE/kBTBohr) >= mtrandom::grnd()) continue;
+			if(exp(-DE*kBTBohr) >= mtrandom::grnd()) continue;
 			// If rejected reset spin coordinates and continue
 			else{
 				atoms::x_spin_array[atom] = Sold[0];
