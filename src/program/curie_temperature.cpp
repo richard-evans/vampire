@@ -5,6 +5,7 @@
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
+#include "vmath.hpp"
 #include "vmpi.hpp"
 #include <iostream>
 
@@ -68,11 +69,16 @@ int curie_temperature(bool init){
 		//sim::H_applied=0.0;
 	// Set up loop variables
 	
+	sim::constraint_phi=0.0;
+	sim::constraint_theta=0.0;
+	
+	sim::CMCinit();
+
 	//vout::pov_file();
-	sim::integrator=0;
+	sim::integrator=3;
 
 	//      Perform Temperature Loop
-	for(int temperature=0;temperature<=1000;temperature+=10){
+	for(int temperature=0;temperature<=1500;temperature+=10){
 		// Set system temperature
 		sim::temperature=double(temperature); 
 		
@@ -103,6 +109,7 @@ int curie_temperature(bool init){
 			std::cout << "\t" << stats::total_mag_norm[0];
 			std::cout << "\t" << stats::total_mag_norm[1];
 			std::cout << "\t" << stats::total_mag_norm[2];
+			std::cout << "\t" << meanT/count;
 			std::cout << std::endl;
 			vmag << sim::temperature << "\t" << stats::total_mag_m_norm << "\t" << meanT/count << std::endl;
 		}
