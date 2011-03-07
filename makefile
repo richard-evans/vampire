@@ -3,7 +3,7 @@
 #								Makefile for VAMPIRE
 #
 #===================================================================
-export OMPI_CXX=icc
+export OMPI_CXX=g++
 #export OMPI_CXX=pathCC
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
@@ -67,6 +67,7 @@ obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
 obj/mpi/LLG_mpi.o \
+obj/mpi/LLGHeun-mpi.o \
 obj/mpi/mpi_generic.o \
 obj/mpi/mpi_create2.o \
 obj/mpi/mpi_comms.o \

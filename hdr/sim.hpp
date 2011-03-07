@@ -39,6 +39,7 @@ namespace sim{
 	
 	// New Integrators
 	extern int LLG_Heun();
+	extern int LLG_Heun_mpi();
 	extern int LLG_Heun_cuda();
 	extern int LLG_Midpoint();
 	extern int LLG_Midpoint_cuda();

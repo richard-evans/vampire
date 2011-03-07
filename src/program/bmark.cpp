@@ -28,7 +28,7 @@ int bmark(){
   	sim::integrator=3;
   
   // Simulate system
-  for(sim::time=0;sim::time<sim::total_time;sim::time+=partial_time){
+  for(sim::time=0;sim::time<sim::total_time;sim::time+=sim::partial_time){
 
   // Calculate LLG
   //sim::LLG(1);
@@ -49,10 +49,6 @@ int bmark(){
   }
 
   }
-  
-  }
-
-
 
 return EXIT_SUCCESS;
 }
