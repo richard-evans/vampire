@@ -25,7 +25,7 @@ int bmark(){
 
   sim::temperature=300.0;
 
-  	sim::integrator=3;
+  	sim::integrator=0;
   
   // Simulate system
   for(sim::time=0;sim::time<sim::total_time;sim::time+=sim::partial_time){

@@ -39,7 +39,7 @@ namespace sim{
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-	int integrator=0;
+	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
 	
 	// Local function declarations
 	int integrate_serial(int);
@@ -218,9 +218,9 @@ int integrate_mpi(int n_steps){
 			for(int ti=0;ti<n_steps;ti++){
 				// Select CUDA version if supported
 				#ifdef CUDA
-					sim::LLG_Heun_cuda_mpi();
+					//sim::LLG_Heun_cuda_mpi();
 				#else
-					//sim::LLG_Heun_mpi();
+					sim::LLG_Heun_mpi();
 				#endif
 			}
 			break;
