@@ -26,6 +26,7 @@ namespace sim{
 	extern int hamiltonian_simulation_flags[10];
 	
 	extern int integrator;
+	extern int program;
 	
 	// Wrapper Functions
 	extern int run();

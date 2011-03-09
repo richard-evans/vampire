@@ -40,30 +40,95 @@ namespace sim{
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
+	int program=0; 
 	
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);
 	
-	int run(){
-		
+/// @brief Function to run one a single program
+///
+/// @callgraph
+/// @callergraph
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.1
+/// @date    09/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		02/10/2008
+///	Revision:	1.1 09/03/2011
+///=====================================================================================
+///
+int run(){
+	// Check for calling of function
+	if(err::check==true) std::cout << "sim::run has been called" << std::endl;
+
+	// For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
 		#ifdef MPICF
 			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
 			vmpi::start_time=MPI_Wtime(); // reset timer
 		#endif
-		std::cout << "Starting Simulation..." << std::endl;
+		std::cout << "Starting Simulation with Program ";
 	}
-   //program::curie_temperature(true);
-	//program::hamr_run();
-	//program::static_hysteresis();
-	//program::two_temperature_pulse();
-	program::bmark();
+	
+	// Select program to run
+	switch(sim::program){
+		case 0:
+			if(vmpi::my_rank==0) std::cout << "Benchmark..." << std::endl; 
+			program::bmark();
+			break;
+		
+		case 1:
+			if(vmpi::my_rank==0) std::cout << "Time-Series..." << std::endl; 
+			//program::time_series();
+			std::cerr << "Error: Time-Series program not yet written. Exiting." << std::endl;
+			exit(EXIT_FAILURE);
+			break;
+		
+		case 2: // LLG Midpoint
+			if(vmpi::my_rank==0) std::cout << "Hysteresis-Loop..." << std::endl; 
+			program::hysteresis();
+			break;
+			
+		case 3: // Constrained Monte Carlo
+			if(vmpi::my_rank==0) std::cout << "Static-Hysteresis-Loop..." << std::endl; 
+			program::static_hysteresis();
+			break;
+			
+		case 4:
+			if(vmpi::my_rank==0) std::cout << "Curie-Temperature..." << std::endl; 
+			program::curie_temperature(true);
+			break;
+			
+		case 5:
+			if(vmpi::my_rank==0) std::cout << "HAMR..." << std::endl; 
+			program::hamr_run();
+			break;
+
+		case 6:
+			if(vmpi::my_rank==0) std::cout << "Two-Temperature-Pulse..." << std::endl; 
+			program::two_temperature_pulse();
+			break;
+			
+		default:{
+			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
+			exit (EXIT_FAILURE);
+			}
+	}
+
 	//program::LLB_Boltzmann();
-	//program::hysteresis();
+
 	return EXIT_SUCCESS;
 }
-	// derived variables
 
 /// @brief Wrapper function to call integrators
 ///
