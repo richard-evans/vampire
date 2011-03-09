@@ -1,3 +1,27 @@
+///
+/// @file
+/// @brief Contains the Curie Temperature program
+///
+/// @details Performs a temperature loop to calculate temperature dependent magnetisation
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section info File Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.1
+/// @date    09/03/2011
+/// @internal
+///	Created:		05/02/2011
+///	Revision:	09/03/2011
+///=====================================================================================
+///
+
+// Standard Libraries
+#include <iostream>
+
+// Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "program.hpp"
@@ -7,7 +31,6 @@
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
-#include <iostream>
 
 namespace program{
 
@@ -30,25 +53,21 @@ namespace program{
 ///
 /// @section Information
 /// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    11/01/2010
+/// @version 1.1
+/// @date    09/03/2011
 ///
 /// @param[in] init Determines whether the system is initialised randomly (0) or ordered (1)
 /// @return EXIT_SUCCESS
 /// 
 /// @internal
 ///	Created:		11/01/2010
-///	Revision:	  ---
+///	Revision:	09/03/2011
 ///=====================================================================================
 ///
 int curie_temperature(bool init){
+
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::curie_temperature has been called" << std::endl;}
-	
-	// function prototypes
-
-	//int output_pov_file();
-
 
 	// Initialise spins to random state
 	for(int atom =0;atom<atoms::num_atoms;atom++){
@@ -64,38 +83,26 @@ int curie_temperature(bool init){
 			atoms::z_spin_array[atom]=2.0*parity-1.0;
 		}
 	}
-		//sim::H_applied=0.0;
-	// Set up loop variables
-	
-	sim::constraint_phi=0.0;
-	sim::constraint_theta=0.0;
-	
-	sim::CMCinit();
 
-	//vout::pov_file();
-	sim::integrator=3;
+	// Set starting temperature
+	sim::temperature=sim::Tmin;
 
-	//      Perform Temperature Loop
-	for(int temperature=0;temperature<=1500;temperature+=10){
-		// Set system temperature
-		sim::temperature=double(temperature); 
-		
+	// Perform Temperature Loop
+	while(sim::temperature<=sim::Tmax){
+				
+		// (re)-initialise mean m and counter (mean ought to be a vector[mat]...)
 		double meanT=0.0;
 		double count=0.0;
 
 		// Equilibrate system
 		sim::integrate(sim::equilibration_time);
-		//sim::LLG(sim::equilibration_time);
 		
 		// Simulate system
-		for(sim::time=0;sim::time<sim::loop_time;sim::time+=sim::partial_time){
+		while(sim::time<sim::loop_time){
 			
 			// Integrate system
 			sim::integrate(sim::partial_time);
 		
-			// Calculate LLG
-			//sim::LLG(sim::partial_time);
-			
 			// Calculate mag_m, mag
 			stats::mag_m();
 			meanT+=stats::total_mag_m_norm;
@@ -113,6 +120,9 @@ int curie_temperature(bool init){
 		}
 		
 		//vout::pov_file();
+		
+		// Increment temperature
+		sim::temperature+=sim::delta_temperature;
 		
 	} // End of temperature loop
 
