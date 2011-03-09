@@ -216,12 +216,14 @@ int integrate_mpi(int n_steps){
 	switch(sim::integrator){
 		case 0: // LLG Heun
 			for(int ti=0;ti<n_steps;ti++){
+			#ifdef MPICF
 				// Select CUDA version if supported
 				#ifdef CUDA
 					//sim::LLG_Heun_cuda_mpi();
 				#else
 					sim::LLG_Heun_mpi();
 				#endif
+			#endif
 			}
 			break;
 		
