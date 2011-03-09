@@ -1,3 +1,27 @@
+///
+/// @file
+/// @brief Contains the standard benchmark program
+///
+/// @details Simulates a system for a number of timesteps
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section info File Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.1
+/// @date    09/03/2011
+/// @internal
+///	Created:		05/02/2011
+///	Revision:	09/03/2011
+///=====================================================================================
+///
+
+// Standard Libraries
+#include <iostream>
+
+// Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "program.hpp"
@@ -5,50 +29,39 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
-#include <iostream>
 
 namespace program{
 	
 int bmark(){
-  // check calling of routine if error checking is activated
-  if(err::check==true){std::cout << "program::bmark has been called" << std::endl;}
+	// check calling of routine if error checking is activated
+	if(err::check==true){std::cout << "program::bmark has been called" << std::endl;}
 
-
+	// add function to set initial spin directions in create::set_atom_vars
 	// Initialise spins to random state
 	for(int atom =0;atom<atoms::num_atoms;atom++){
 		atoms::x_spin_array[atom]=0.0;
 		atoms::y_spin_array[atom]=0.0;
 		atoms::z_spin_array[atom]=1.0;
-  }
-
-  sim::temperature=300.0;
-
-  	sim::integrator=0;
+	}
   
-  // Simulate system
-  for(sim::time=0;sim::time<sim::total_time;sim::time+=sim::partial_time){
+	// Simulate system
+	while(sim::time<sim::total_time){
+		sim::integrate(sim::partial_time);
 
-  // Calculate LLG
-  //sim::LLG(1);
-  	sim::integrate(sim::partial_time);
-
-
-      // Calculate mag_m, mag
-  //if(sim::time%sim::partial_time==0){
+		// Calculate mag_m, mag after sim::partial_time steps
       stats::mag_m();
-		//vout::pov_file();
-  if(vmpi::my_rank==0){
-    std::cout << sim::time << "\t" << stats::total_mag_m_norm;
-    std::cout << "\t" << stats::total_mag_norm[0];
-    std::cout << "\t" << stats::total_mag_norm[1];
-    std::cout << "\t" << stats::total_mag_norm[2];
-    std::cout << std::endl;
-    //vmag << sim::temperature << "\t" << stats::total_mag_m_norm << std::endl;
-  }
 
-  }
-
-return EXIT_SUCCESS;
+		if(vmpi::my_rank==0){
+			std::cout << sim::time << "\t" << stats::total_mag_m_norm;
+			std::cout << "\t" << stats::total_mag_norm[0];
+			std::cout << "\t" << stats::total_mag_norm[1];
+			std::cout << "\t" << stats::total_mag_norm[2];
+			std::cout << std::endl;
+			vmag << sim::temperature << "\t" << stats::total_mag_m_norm << std::endl;
+		}
+	} // end of time loop
+	
+	return EXIT_SUCCESS;
 }
 
 }//end of namespace program
