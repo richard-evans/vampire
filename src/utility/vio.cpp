@@ -683,7 +683,75 @@ int match_sim(string const word, string const value, string const unit, int cons
 		//-------------------------------------------------------------------
 		// System simulation variables
 		//-------------------------------------------------------------------
-		std::string test="exchange";
+		std::string test="integrator";
+		if(word==test){
+			test="LLG-Heun";
+			if(value==test){
+				sim::integrator=0;
+				return EXIT_SUCCESS;
+			}
+			test="Monte-Carlo";
+			if(value==test){
+				sim::integrator=1;
+				return EXIT_SUCCESS;
+			}
+			test="LLG-Midpoint";
+			if(value==test){
+				sim::integrator=2;
+				return EXIT_SUCCESS;
+			}
+			test="Constrained-Monte-Carlo";
+			if(value==test){
+				sim::integrator=3;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+				std::cerr << "\t\"LLG-Heun\"" << std::endl;
+				std::cerr << "\t\"Monte-Carlo\"" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+		}
+		//-------------------------------------------------------------------
+		test="program";
+		if(word==test){
+			test="Benchmark";
+			if(value==test){
+				sim::program=0;
+				return EXIT_SUCCESS;
+			}
+			test="Time-Series";
+			if(value==test){
+				sim::program=1;
+				return EXIT_SUCCESS;
+			}
+			test="Hysteresis-Loop";
+			if(value==test){
+				sim::program=2;
+				return EXIT_SUCCESS;
+			}
+			test="Static-Hysteresis-Loop";
+			if(value==test){
+				sim::program=3;
+				return EXIT_SUCCESS;
+			}
+			test="Curie-Temperature";
+			if(value==test){
+				sim::program=4;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+				std::cerr << "\t\"Benchmark\"" << std::endl;
+				std::cerr << "\t\"Time-Series\"" << std::endl;
+				std::cerr << "\t\"Hysteresis-Loop\"" << std::endl;
+				std::cerr << "\t\"Static-Hysteresis-Loop\"" << std::endl;
+				std::cerr << "\t\"Curie-Temperature\"" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+		}
+		//-------------------------------------------------------------------
+		test="exchange";
 		if(word==test){
 			test="true";
 			if(value==test){
