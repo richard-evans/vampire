@@ -1,22 +1,30 @@
-//====================================================================================================
-//
-//       				                    simulate_system
-//
-//  			 Subroutine to simulate an atomistic system with predefined integration scheme
-//				 simulation time, temperature etc
-//	 
-//								Version 1.0 R Evans 02/10/2008
-//
-//==================================================================================================== 
+///
+/// @file
+/// @brief Contains the sim namespace and wrapper functions for system integration
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section info File Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    09/03/2011
+/// @internal
+///	Created:		09/03/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+
+// Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
 #include "errors.hpp"
 #include "sim.hpp"
 #include "vmpi.hpp"
-#include <iostream>
 
-	int set_LLG();
-	int set_demag();
+// Standard Libraries
+#include <iostream>
 
 namespace sim{
 	std::ofstream mag_file;
@@ -331,31 +339,6 @@ int integrate_mpi(int n_steps){
 	
 	// return
 	return EXIT_SUCCESS;
-}
-
-
-int initialise(){
-
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){std::cout << "initialise_system has been called" << std::endl;}
-
-    for(int atom=0;atom<=atoms::num_atoms-1;atom++){
-		atoms::x_spin_array[atom] = 0.0;
-		atoms::y_spin_array[atom] = 0.1;
-		atoms::z_spin_array[atom] = 0.9;
-	}
-	//std::cout.setf(std::ios::fixed,std::ios::floatfield);
-	
-  	//sim::mag_file.open ("M_vs_T.txt");
-      
-	
-
-	set_LLG();
-	
-	return 0;
-
 }
 
 } // Namespace sim
