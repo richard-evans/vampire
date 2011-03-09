@@ -13,8 +13,6 @@ int bmark(){
   // check calling of routine if error checking is activated
   if(err::check==true){std::cout << "program::bmark has been called" << std::endl;}
 
-  // Setup LLG arrays
-  sim::initialise();
 
 	// Initialise spins to random state
 	for(int atom =0;atom<atoms::num_atoms;atom++){

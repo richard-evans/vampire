@@ -41,8 +41,6 @@ int hysteresis(){
 	// Declare function prototype
 	//int calculate_applied_fields(const int,const int);
 	// set loop temperature
-	// Setup LLG arrays
-	sim::initialise();
 	
 	// Initialise spins to +z
 	for(int atom =0;atom<atoms::num_atoms;atom++){

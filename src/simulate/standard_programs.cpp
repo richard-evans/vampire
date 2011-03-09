@@ -85,10 +85,6 @@ int hamr_run(){
 	
 	// function prototypes
 
-
-	// Setup LLG arrays
-	sim::initialise();
-
         // perform 10 sequential runs
         for(int run=0;run<1;run++){
 
@@ -185,9 +181,6 @@ int two_temperature_pulse(){
 	if(err::check==true){std::cout << "program::two_temperature_pulse has been called" << std::endl;}
 	
 	// function prototypes
-
-	// Setup LLG arrays
-	sim::initialise();
 
 	// Initialise spins to +z
 	for(int atom =0;atom<atoms::num_atoms;atom++){

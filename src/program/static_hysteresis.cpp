@@ -51,8 +51,6 @@ int static_hysteresis(){
 	std::cout << " Running Static Hysteresis Loop Program" << std::endl;
 	std::cout << "--------------------------------------------------------------------------------" << std::endl;
 	
-	// Setup LLG arrays
-	sim::initialise();
 
 	// Initialise spins to near-ordered state
 	for(int atom =0;atom<atoms::num_atoms;atom++){

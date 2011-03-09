@@ -49,8 +49,6 @@ int curie_temperature(bool init){
 
 	//int output_pov_file();
 
-	// Setup LLG arrays
-	sim::initialise();
 
 	// Initialise spins to random state
 	for(int atom =0;atom<atoms::num_atoms;atom++){
