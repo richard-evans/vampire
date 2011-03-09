@@ -1,0 +1,30 @@
+Vampire uses the following main branches:
+
+(maint): - updates for previous release
+master: - current release in progress
+new: - completed features for inclusion in release after next
+
+new is a superset of master is a superset of maint. NEVER merge from maint to master or master to new!
+
+New ideas should be developed in a dedicated branch forked from master.
+ 
+git checkout -b new_feature_name
+git push origin new_feature_name
+
+Once completed and tested this can be merged with new and staged for later inclusion with master. 
+
+(on branch master"git merge new_feature")
+
+At this point the initial development branch should be deleted.  
+
+
+o---o---o---o---o---o---o maint
+ \                     /
+   \                  /
+o---o---o---o---o---o master ----------------o                
+	  \	\                                  /
+		\	 \                                /
+		 \	  o----o---o new feature         /
+		  \            \                   /
+         \            \                 /
+			 o---o---o----o new -----------o
