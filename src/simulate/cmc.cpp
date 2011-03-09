@@ -45,6 +45,8 @@ namespace cmc{
 	double sphere_reject=0.0;
 	double energy_reject=0.0;
 
+	bool is_initialised=false;
+	
 	// Rotational matrices
 	std::vector<std::vector<double> > polar_vector;
 	std::vector<std::vector<double> > polar_matrix_tp;
@@ -171,6 +173,9 @@ void CMCinit(){
 			atoms::z_spin_array[atom]=sz;
 	}
 	
+	// set initialised flag to true
+	cmc::is_initialised=true;
+	
 	return;
 }
 
@@ -189,6 +194,9 @@ int ConstrainedMonteCarlo(){
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::ConstrainedMonteCarlo has been called" << std::endl;
 
+	// check for cmc initialisation
+	if(cmc::is_initialised==false) CMCinit();
+	
 	int atom_number1;
 	int atom_number2;
 	int imat1;
