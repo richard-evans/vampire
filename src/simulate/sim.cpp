@@ -215,12 +215,16 @@ int integrate_serial(int n_steps){
 				#else
 					sim::LLG_Heun();
 				#endif
+				// increment time
+				sim::time++;
 			}
 			break;
 		
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
 				sim::MonteCarlo();
+				// increment time
+				sim::time++;
 			}
 			break;
 		
@@ -232,28 +236,25 @@ int integrate_serial(int n_steps){
 				#else
 					sim::LLG_Midpoint();
 				#endif
+				// increment time
+				sim::time++;
 			}
 			break;
 			
 		case 3: // Constrained Monte Carlo
 			for(int ti=0;ti<n_steps;ti++){
 				sim::ConstrainedMonteCarlo();
+				// increment time
+				sim::time++;
 			}
 			break;
-			
-		case 4: // Grain Growth Method
-			//grain_growth(cs_num_atoms,cs_coord_array,particle_include_array,cs_atom_type_array);
-			std::cerr << "Grain growth not yet implemented, exiting" << std::endl;
-			exit(0);
-			break;
-			
+
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);
 			}
 	}
 	
-	// return
 	return EXIT_SUCCESS;
 }
 
@@ -297,6 +298,8 @@ int integrate_mpi(int n_steps){
 					sim::LLG_Heun_mpi();
 				#endif
 			#endif
+				// increment time
+				sim::time++;
 			}
 			break;
 		
@@ -304,6 +307,8 @@ int integrate_mpi(int n_steps){
 			for(int ti=0;ti<n_steps;ti++){
 				std::cerr << "Error - Monte Carlo Integrator unavailable for parallel execution" << std::endl;
 				exit(EXIT_FAILURE);
+				// increment time
+				sim::time++;
 			}
 			break;
 		
@@ -315,6 +320,8 @@ int integrate_mpi(int n_steps){
 				#else
 					//sim::LLG_Midpoint_mpi();
 				#endif
+				// increment time
+				sim::time++;
 			}
 			break;
 			
@@ -322,13 +329,9 @@ int integrate_mpi(int n_steps){
 			for(int ti=0;ti<n_steps;ti++){
 				std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
 				exit(EXIT_FAILURE);
+				// increment time
+				sim::time++;
 			}
-			break;
-			
-		case 4: // Grain Growth Method
-			//grain_growth(cs_num_atoms,cs_coord_array,particle_include_array,cs_atom_type_array);
-			std::cerr << "Grain growth not yet implemented, exiting" << std::endl;
-			exit(0);
 			break;
 			
 		default:{
@@ -337,7 +340,6 @@ int integrate_mpi(int n_steps){
 			}
 	}
 	
-	// return
 	return EXIT_SUCCESS;
 }
 
