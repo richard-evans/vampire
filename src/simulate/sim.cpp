@@ -34,9 +34,10 @@ namespace sim{
 	int partial_time=1;
 	int equilibration_time=0;
 	
-	double Tmax=300;
-	double temperature;
-	double delta_temperature;
+	double Tmax=300.0;
+	double Tmin=0.0;
+	double temperature=300.0;
+	double delta_temperature=10.0;
 	double H_applied=0.0;
 	double H_vec[3]={0.0,0.0,1.0};
 	double Hmin=-1.0; // T

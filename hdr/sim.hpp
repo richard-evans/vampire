@@ -12,6 +12,7 @@ namespace sim{
 	extern int partial_time;
 	extern int equilibration_time;
 	extern double Tmax;
+	extern double Tmin;
 	extern double temperature;
 	extern double delta_temperature;
 	extern double H_applied;
