@@ -33,6 +33,9 @@ using std::string;
 		double gamma_rel;
 		double Jij_matrix_SI[max_materials];
 
+		double initial_spin[3];
+		bool random_spins;
+		
 		double min;
 		double max;
 		int geometry; ///< 0 (geometry disabled, 1+ geometry enabled with 1+ points

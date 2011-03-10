@@ -1349,6 +1349,50 @@ int match_material(string const word, string const value, string const unit, int
 			read_material[super_index].gamma_rel=atof(value.c_str());
 			return EXIT_SUCCESS;
 		}
+		//------------------------------------------------------------
+		else
+		test="Sx";
+		if(word==test){
+			read_material[super_index].initial_spin[0]=atof(value.c_str());
+			read_material[super_index].random_spins=false;
+			return EXIT_SUCCESS;
+		}
+		//------------------------------------------------------------
+		else
+		test="Sy";
+		if(word==test){
+			read_material[super_index].initial_spin[1]=atof(value.c_str());
+			read_material[super_index].random_spins=false;
+			return EXIT_SUCCESS;
+		}
+		//------------------------------------------------------------
+		else
+		test="Sz";
+		if(word==test){
+			read_material[super_index].initial_spin[2]=atof(value.c_str());
+			read_material[super_index].random_spins=false;
+			return EXIT_SUCCESS;
+		}
+		//------------------------------------------------------------
+		else
+		test="random-spins";
+		if(word==test){
+			string t="true";
+			string f="false";
+			if(value==t){
+				read_material[super_index].random_spins=true;
+				return EXIT_SUCCESS;
+			}
+			else if(value==f){
+				read_material[super_index].random_spins=false;
+				return EXIT_SUCCESS;
+			}
+			else {
+				std::cerr << "Error in input file - material[" << super_index << "]:random-spins must be either true or false" << std::endl;
+				return EXIT_FAILURE;
+			}
+		}
+		//------------------------------------------------------------
 		else
 		test="hamiltonian";
 		if(word==test){

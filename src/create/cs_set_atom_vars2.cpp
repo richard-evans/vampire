@@ -7,11 +7,14 @@
 
 #include <iostream>
 #include <vector>
+
 #include "atoms.hpp"
-#include "material.hpp"
-#include "errors.hpp"
-#include "vmpi.hpp"
 #include "create.hpp"
+#include "errors.hpp"
+#include "material.hpp"
+#include "random.hpp"
+#include "vmpi.hpp"
+
 
 //using namespace atom_variables;
 //using namespace material_parameters;
@@ -62,6 +65,25 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		atoms::type_array[atom] = catom_array[atom].material;
 		//std::cout << atom << " grain: " << catom_array[atom].grain << std::endl;
 		atoms::grain_array[atom] = catom_array[atom].grain;
+
+		// initialise atomic spin positions
+		int mat=atoms::type_array[atom];
+		double sx,sy,sz; // spins 
+		if(mp::material[mat].random_spins==true){
+			sx=2.0*mtrandom::grnd()-1.0;
+			sy=2.0*mtrandom::grnd()-1.0;
+			sz=2.0*mtrandom::grnd()-1.0;
+		}
+		else{
+			sx=mp::material[mat].initial_spin[0];
+			sy=mp::material[mat].initial_spin[1];
+			sz=mp::material[mat].initial_spin[2];
+		}
+		// now normalise spins
+		double modS=1.0/sqrt(sx*sx + sy*sy + sz*sz);
+		atoms::x_spin_array[atom]=sx*modS;
+		atoms::y_spin_array[atom]=sy*modS;
+		atoms::z_spin_array[atom]=sz*modS;
 	}
 
 	//===========================================================
