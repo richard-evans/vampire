@@ -141,7 +141,7 @@ int hamr_run(){
 		}
 	}
         }
-	vout::pov_file();
+	//vout::pov_file();
 	// output final grain magnetisations
 	std::ofstream vgrain;
 	vgrain.open("vgrain");
@@ -195,7 +195,7 @@ int two_temperature_pulse(){
 		atoms::z_spin_array[atom]=1.0;
 		}		
 	}
-	vout::pov_file();
+	//vout::pov_file();
 	// Set up loop variables
 	sim::H_applied=0.0;
 	
@@ -241,7 +241,7 @@ int two_temperature_pulse(){
 			}
 		}
 	}
-	vout::pov_file();
+	//vout::pov_file();
 
 	std::cout << "Equilibration complete" << std::endl;
 
@@ -300,7 +300,7 @@ int two_temperature_pulse(){
 		// }
 	}
 	//vout::pov_file();
-		vout::pov_file();
+		//vout::pov_file();
 	return EXIT_SUCCESS;
 }
 

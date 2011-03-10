@@ -67,7 +67,7 @@ int hysteresis(){
         //std::cout << std::cout.flags() << std::endl;
 	 //std::cout << mp::material[0].mu_s_SI << "\t" << mp::material[0].Ku1_SI << "\t" << 2.0*mp::material[0].Ku1_SI/mp::material[0].mu_s_SI << std::endl;
 	 std::cout << "Estimated Coercivity:" << 2.0*mp::material[0].Ku1_SI/mp::material[0].mu_s_SI << std::endl;
-	 vout::pov_file();
+	 //vout::pov_file();
 	 // parity loop
 	 for(int parity=-1;parity<2;parity+=2){
 	  // Set up loop variables

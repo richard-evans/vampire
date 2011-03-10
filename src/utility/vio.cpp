@@ -28,6 +28,7 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "sim.hpp"
+#include "stats.hpp"
 #include "units.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -62,6 +63,7 @@ int read_mat_file(std::string const);
 int match_create(std::string const, std::string const, int const);
 int match_dimension(std::string const, std::string const, std::string const, int const);
 int match_sim(std::string const, std::string const, std::string const, int const);
+int match_vout_list(std::string const, int const, std::vector<unsigned int> &);
 int match_material(string const, string const, string const, int const, int const, int const);
 
 /// @brief Function to read in variables from a file.
@@ -259,6 +261,24 @@ int match(string const key, string const word, string const value, string const 
 	test="sim";
 	if(key==test){
 		int frs=vin::match_sim(word, value, unit, line);
+		return frs;
+	}
+	//===================================================================
+	// Test for data file output
+	//===================================================================
+	else
+	test="vmag";
+	if(key==test){
+		int frs=vin::match_vout_list(word, line, vout::file_output_list);
+		return frs;
+	}
+	//===================================================================
+	// Test for screen output
+	//===================================================================
+	else
+	test="screen";
+	if(key==test){
+		int frs=vin::match_vout_list(word, line, vout::screen_output_list);
 		return frs;
 	}
 	//-------------------------------------------------------------------
@@ -1042,6 +1062,82 @@ int match_sim(string const word, string const value, string const unit, int cons
 	return EXIT_SUCCESS;
 }
 
+int match_vout_list(string const word, int const line, std::vector<unsigned int> & output_list){
+		//-------------------------------------------------------------------
+		// system_creation_flags[1] - Set system particle shape
+		//-------------------------------------------------------------------
+		std::string test="time";
+		if(word==test){
+			output_list.push_back(0);
+			return EXIT_SUCCESS;
+		}
+		else 
+		test="real-time";
+		if(word==test){
+			output_list.push_back(1);
+			return EXIT_SUCCESS;
+		}
+		else 
+		test="temperature";
+		if(word==test){
+			output_list.push_back(2);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="field";
+		if(word==test){
+			output_list.push_back(3);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="field-vector";
+		if(word==test){
+			output_list.push_back(4);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="magnetisation";
+		if(word==test){
+			output_list.push_back(5);
+			return EXIT_SUCCESS;
+		}
+		else
+		//-------------------------------------------------------------------
+		test="mag-m";
+		if(word==test){
+			output_list.push_back(6);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="mean-mag-m";
+		if(word==test){
+			output_list.push_back(7);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="material-magnetisation";
+		if(word==test){
+			output_list.push_back(8);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="material-mean-mag-m";
+		if(word==test){
+			output_list.push_back(9);
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		// keyword not found
+		//--------------------------------------------------------------------
+		else{
+			std::cerr << "Error - Unknown control statement \'vmag:" << word << "\' on line " << line << " of input file" << std::endl;
+			return EXIT_FAILURE;
+		}
+		
+	return EXIT_SUCCESS;
+}
+
+
 // temporary array of materials for reading in material data
 //std::cout << "here" << std::endl;
   std::vector<mp::materials_t> read_material(0);
@@ -1632,38 +1728,62 @@ int match_material(string const word, string const value, string const unit, int
 
 } // end of namespace vin 
 
+// Global output filestreams
+std::ofstream vinfo("info");
+std::ofstream vdp("vdp");
+std::ofstream vmag("vmag");
+
 
 namespace vout{
-  std::ofstream errfile;
-  null_streambuf nullbuf;
+	
+	// Namespace variable declarations
+	std::vector<unsigned int> file_output_list(0);
+	std::vector<unsigned int> screen_output_list(0);
+	
+	bool output_povray=false;
+	int output_povray_rate=1000;
+	int pov_file_counter=0;
+	bool output_povray_cells=false;
+	int output_povray_cells_rate=1000;
+	int pov_file_cells_counter=0;
+	
+	std::ofstream errfile;
+	null_streambuf nullbuf;
 
-  void redirect(std::ostream& strm, std::string filename) {
-    errfile.open(filename.c_str());
-    // redirect ouput into the file
-    strm.rdbuf (errfile.rdbuf());
-  }
+	void redirect(std::ostream& strm, std::string filename) {
+		errfile.open(filename.c_str());
+		// redirect ouput into the file
+		strm.rdbuf (errfile.rdbuf());
+	}
 
-  void nullify(std::ostream& strm){
-    strm.rdbuf(&nullbuf);
-  }
+	void nullify(std::ostream& strm){
+		strm.rdbuf(&nullbuf);
+	}
   
-} // end of namespace vout  */
-//==========================================================
-// Namespace output
-//==========================================================
+/// @brief Function to output atomistic resolution snapshots for povray
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, rfle500@york.ac.uk
+/// @version 1.0
+/// @date    10/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		28/01/2010
+///	Revision:	  ---
+///=====================================================================================
+///
+	int pov_file(){
 
-namespace pov{
-	int counter=0;
-}
+		// check calling of routine if error checking is activated
+		if(err::check==true){std::cout << "vout::pov_file has been called" << std::endl;}
 
-
-int output_pov_file(){
-//-----------------------------------------------------------------------
-//
-//
-//
-//-----------------------------------------------------------------------
-		using pov::counter;
+		using vout::pov_file_counter;
 
 		#ifdef MPICF
 		const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
@@ -1674,16 +1794,16 @@ int output_pov_file(){
 		std::stringstream pov_file_sstr;
 		pov_file_sstr << "spins.";
 		pov_file_sstr << std::setfill('0') << std::setw(3) << vmpi::my_rank;
-		pov_file_sstr << "." << std::setfill('0') << std::setw(5) << counter;
-		pov_file_sstr << ".pov";
-		//pov_file_sstr << "spins." << mpi_generic::my_rank << "." << counter << ".pov";
+		pov_file_sstr << "." << std::setfill('0') << std::setw(5) << pov_file_counter;
+		pov_file_sstr << ".pin";
+		//pov_file_sstr << "spins." << mpi_generic::my_rank << "." << pov_file_counter << ".pov";
 		std::string pov_file = pov_file_sstr.str();
 		const char* pov_filec = pov_file.c_str();
 		std::ofstream pov_file_ofstr;
 
 		if(vmpi::my_rank==0){
 			std::stringstream pov_hdr_sstr;
-			pov_hdr_sstr << "spins." << counter << ".pov";
+			pov_hdr_sstr << "spins." << std::setfill('0') << std::setw(3) << pov_file_counter << ".pov";
 			std::string pov_hdr = pov_hdr_sstr.str();
 			const char* pov_hdrc = pov_hdr.c_str();
 			pov_file_ofstr.open (pov_hdrc);
@@ -1715,21 +1835,20 @@ int output_pov_file(){
 			pov_file_ofstr << "#declare CX=" << size*vec[0]*6.0 << ";" << std::endl;
 			pov_file_ofstr << "#declare CY=" << size*vec[1]*6.0 << ";" << std::endl;
 			pov_file_ofstr << "#declare CZ=" << size*vec[2]*6.0 << ";" << std::endl;
-			//pov_file_ofstr << "#declare CX=" << material_parameters::system_dimensions[0]*6.0 << ";" << std::endl;
-			//pov_file_ofstr << "#declare CY=" << material_parameters::system_dimensions[1]*6.0 << ";" << std::endl;
-			//pov_file_ofstr << "#declare CZ=" << material_parameters::system_dimensions[2]*6.0 << ";" << std::endl;
 	 		pov_file_ofstr << "#declare ref=0.4;" << std::endl;
 	 		pov_file_ofstr << "#declare sscale=2.0;" << std::endl;
 			pov_file_ofstr << "background { color Gray30 }" << std::endl;
+
 			pov_file_ofstr << "Set_Camera(<CX,CY,CZ>, <LX,LY,LZ>, 15)" << std::endl;
 			pov_file_ofstr << "Set_Camera_Aspect(4,3)" << std::endl;
 			pov_file_ofstr << "Set_Camera_Sky(<0,0,1>)" << std::endl;
-	   	pov_file_ofstr << "light_source { <2*CX, 2*CY, 2*CZ> color White}" << std::endl;
+			pov_file_ofstr << "light_source { <2*CX, 2*CY, 2*CZ> color White}" << std::endl;
+
 			for(int p =0;p<vmpi::num_processors;p++){
 				std::stringstream pov_sstr;
-				pov_sstr << "spins." << std::setfill('0') << std::setw(3) << p << "." << std::setfill('0') << std::setw(5) << counter << ".pov";
+				pov_sstr << "spins." << std::setfill('0') << std::setw(3) << p << "." << std::setfill('0') << std::setw(5) << pov_file_counter << ".pin";
 				pov_file_ofstr << "#include \"" << pov_sstr.str() << "\"" << std::endl;
-				//pov_sstr << "spins." << p << "." << counter << ".pov";
+				//pov_sstr << "spins." << p << "." << pov_file_counter << ".pov";
 				//pov_file_ofstr << "#include \"" << pov_sstr.str() << "\"" << std::endl;
 			}
 			pov_file_ofstr.close();
@@ -1774,13 +1893,13 @@ int output_pov_file(){
 			if(green<0.0) green=0.0;
 
 			//#ifdef MPICF
-			//	double cx=mpi_create_variables::mpi_atom_global_coord_array[3*atom+0]*material_parameters::lattice_space_conversion[0];
-			//	double cy=mpi_create_variables::mpi_atom_global_coord_array[3*atom+1]*material_parameters::lattice_space_conversion[1];
-			//	double cz=mpi_create_variables::mpi_atom_global_coord_array[3*atom+2]*material_parameters::lattice_space_conversion[2];
+				//double cx=mpi_create_variables::mpi_atom_global_coord_array[3*atom+0]*material_parameters::lattice_space_conversion[0];
+				//double cy=mpi_create_variables::mpi_atom_global_coord_array[3*atom+1]*material_parameters::lattice_space_conversion[1];
+				//double cz=mpi_create_variables::mpi_atom_global_coord_array[3*atom+2]*material_parameters::lattice_space_conversion[2];
 			//#else
-				double cx=atoms::x_coord_array[atom]; //*material_parameters::lattice_space_conversion[0];
-				double cy=atoms::y_coord_array[atom]; //*material_parameters::lattice_space_conversion[1];
-				double cz=atoms::z_coord_array[atom]; //*material_parameters::lattice_space_conversion[2];
+				double cx=atoms::x_coord_array[atom];  //*material_parameters::lattice_space_conversion[0];
+				double cy=atoms::y_coord_array[atom];  //*material_parameters::lattice_space_conversion[1];
+				double cz=atoms::z_coord_array[atom];  //*material_parameters::lattice_space_conversion[2];
 			//#endif
 			double sx=0.5*atoms::x_spin_array[atom];
 			double sy=0.5*atoms::y_spin_array[atom];
@@ -1799,30 +1918,160 @@ int output_pov_file(){
 	
 		pov_file_ofstr.close();
 
-		counter++;
+		pov_file_counter++;
 
-	return 0;
+	return EXIT_SUCCESS;
+	}
+  
+	// Output Function 0
+	void time(std::ostream& stream){
+		stream << sim::time << "\t";
 	}
 
-
-/*
-if(1==0){
-		ofstream spin_file;
-		spin_file.open ("spins.dat");
-		spin_file << atoms::num_atoms << endl;
-		spin_file << "" << endl;
-	  	
-	  	for(int atom=0; atom<atoms::num_atoms; atom++){
-	  		spin_file << material_parameters::material[atoms::type_array[atom]].element << "\t" << 
-	  					atoms::x_coord_array[atom]*material_parameters::lattice_space_conversion[0] << "\t" << 
-	  					atoms::y_coord_array[atom]*material_parameters::lattice_space_conversion[1] << "\t" << 
-	  					atoms::z_coord_array[atom]*material_parameters::lattice_space_conversion[2] << "\t" <<
-	  					atoms::x_spin_array[atom] << "\t" << 
-	  					atoms::y_spin_array[atom] << "\t" << 
-	  					atoms::z_spin_array[atom] << "\t" << endl;
-	  	}
-	
-		spin_file.close();
+	// Output Function 1
+	void real_time(std::ostream& stream){
+		stream << sim::time*mp::dt_SI << "\t";
 	}
-	*/
 	
+	// Output Function 2
+	void temperature(std::ostream& stream){
+		stream << sim::temperature << "\t";
+	}
+	
+	// Output Function 3
+	void Happ(std::ostream& stream){
+		stream << sim::H_applied << "\t";
+	}
+	
+	// Output Function 4
+	void Hvec(std::ostream& stream){
+		stream << sim::H_vec[0] << "\t"<< sim::H_vec[1] << "\t"<< sim::H_vec[2] << "\t";
+	}
+	
+	// Output Function 5
+	void mvec(std::ostream& stream){
+		stream << stats::total_mag_norm[0] << "\t";
+		stream << stats::total_mag_norm[1] << "\t";
+		stream << stats::total_mag_norm[2] << "\t";
+	}
+	
+	// Output Function 6
+	void magm(std::ostream& stream){
+		stream << stats::total_mag_m_norm << "\t";
+	}
+	
+	// Output Function 7
+	void mean_magm(std::ostream& stream){
+		stream << stats::total_mag_m_norm << "\t";
+	}
+	
+	// Output Function 8
+	void mat_mvec(std::ostream& stream){
+		for(int mat=0;mat<mp::num_materials;mat++){
+			double imagm = 1.0/stats::sublattice_magm_array[mat];
+			stream << stats::sublattice_mx_array[mat]*imagm << "\t";
+			stream << stats::sublattice_my_array[mat]*imagm << "\t";
+			stream << stats::sublattice_mz_array[mat]*imagm << "\t";
+			stream << stats::sublattice_magm_array[mat] << "\t";
+		}
+	}
+	
+	// Output Function 9
+	void mat_mean_magm(std::ostream& stream){
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stream << stats::sublattice_mean_magm_array[mat] << "\t";
+		}
+	}
+
+	// Data output wrapper function
+	void data(){
+
+		// check calling of routine if error checking is activated
+		if(err::check==true){std::cout << "vout::data has been called" << std::endl;}
+
+		// Output data to vmag
+		for(unsigned int item=0;item<file_output_list.size();item++){
+			switch(file_output_list[item]){
+				case 0:
+					vout::time(vmag);
+					break;
+				case 1:
+					vout::real_time(vmag);
+					break;
+				case 2:
+					vout::temperature(vmag);
+					break;
+				case 3:
+					vout::Happ(vmag);
+					break;
+				case 4:
+					vout::Hvec(vmag);
+					break;
+				case 5:
+					vout::mvec(vmag);
+					break;
+				case 6:
+					vout::magm(vmag);
+					break;
+				case 7:
+					vout::mean_magm(vmag);
+					break;
+				case 8:
+					vout::mat_mvec(vmag);
+					break;
+				case 9:
+					vout::mat_mean_magm(vmag);
+					break;
+			}
+			// Carriage return
+			if(file_output_list.size()>0) vmag << std::endl;
+		}
+		
+		// Output data to cout
+		if(vmpi::my_rank==0){
+		for(unsigned int item=0;item<screen_output_list.size();item++){
+			switch(screen_output_list[item]){
+				case 0:
+					vout::time(std::cout);
+					break;
+				case 1:
+					vout::real_time(std::cout);
+					break;
+				case 2:
+					vout::temperature(std::cout);
+					break;
+				case 3:
+					vout::Happ(std::cout);
+					break;
+				case 4:
+					vout::Hvec(std::cout);
+					break;
+				case 5:
+					vout::mvec(std::cout);
+					break;
+				case 6:
+					vout::magm(std::cout);
+					break;
+				case 7:
+					vout::mean_magm(std::cout);
+					break;
+				case 8:
+					vout::mat_mvec(std::cout);
+					break;
+				case 9:
+					vout::mat_mean_magm(std::cout);
+					break;
+			}
+			// Carriage return
+			if(screen_output_list.size()>0) std::cout << std::endl;
+		}
+		}
+		
+		// Atomistic povray output
+		if(sim::time%vout::output_povray_rate==0){
+			if(vout::output_povray==true) vout::pov_file();
+		}
+	} // end of data
+	
+} // end of namespace vout
+

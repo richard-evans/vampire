@@ -23,16 +23,23 @@ extern std::ofstream vmag;
 
 namespace vin{
 	extern int read(std::string const);
-
 }
 
 namespace vout{
 	
-	//extern int scr(std::stringstream);
-	extern int pov_file();
+	extern std::vector<unsigned int> file_output_list;
+	extern std::vector<unsigned int> screen_output_list;
+	
+	extern bool output_povray;
+	extern int output_povray_rate;
 
-  void redirect(std::ostream& strm, std::string filename);
-  void nullify(std::ostream& strm);  
+	extern bool output_povray_cells;
+	extern int output_povray_cells_rate;
+	
+	extern void data();
+
+	void redirect(std::ostream& strm, std::string filename);
+	void nullify(std::ostream& strm);  
 
 }
 #endif /*VIO_H_*/
