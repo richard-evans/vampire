@@ -36,14 +36,6 @@ int bmark(){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::bmark has been called" << std::endl;}
 
-	// add function to set initial spin directions in create::set_atom_vars
-	// Initialise spins to random state
-	for(int atom =0;atom<atoms::num_atoms;atom++){
-		atoms::x_spin_array[atom]=0.0;
-		atoms::y_spin_array[atom]=0.0;
-		atoms::z_spin_array[atom]=1.0;
-	}
-  
 	// Simulate system
 	while(sim::time<sim::total_time){
 		sim::integrate(sim::partial_time);
