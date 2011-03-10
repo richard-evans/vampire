@@ -48,16 +48,20 @@ namespace stats
 	double total_mag_norm[3];	///< Normalised magnetisation components
 	double total_mag_m_norm;	///< Normalised magnitude of total magnetisation
 	
+	double total_mean_mag_m_actual=0.0;
+	double total_mean_mag_m_norm=0.0;
+	
 	std::vector <double> sublattice_mx_array(0);
 	std::vector <double> sublattice_my_array(0);
 	std::vector <double> sublattice_mz_array(0);
 	std::vector <double> sublattice_magm_array(0);
+	std::vector <double> sublattice_mean_magm_array(0);
 	std::vector <double> sublattice_mom_array(0);
 	std::vector <int> sublattice_nm_array(0);
 	
 	bool is_initialised=false;
 
-	double data_counter;		// number of data points for averaging
+	double data_counter=0.0;		// number of data points for averaging
 	
 // Namespace Functions
 /// @brief Calculates total and sublattice, normalised and actual, magnetic moments of the system.
@@ -109,7 +113,7 @@ int mag_m(){
 
 		// Calculate maximum moment for normalisation
 		stats::max_moment=stats::num_atoms*material_parameters::material[0].mu_s_SI;
-				
+		
 		// Calculate total components
 		for(int atom=0;atom<stats::num_atoms;atom++){
 			m[0] += atoms::x_spin_array[atom];
@@ -148,7 +152,6 @@ int mag_m(){
 	// For multiple materials, use full version
 	//---------------------------------------------------------
 		// Calculate sublattice moments
-		//double m[3]={0.0,0.0,0.0};
 		
 		if(!stats::is_initialised){
 			// Resize arrays
@@ -156,6 +159,7 @@ int mag_m(){
 			stats::sublattice_my_array.resize(mp::num_materials,0);
 			stats::sublattice_mz_array.resize(mp::num_materials,0);
 			stats::sublattice_magm_array.resize(mp::num_materials,0);
+			stats::sublattice_mean_magm_array.resize(mp::num_materials,0);
 			stats::sublattice_mom_array.resize(mp::num_materials,0);
 			stats::sublattice_nm_array.resize(mp::num_materials,0);
 			
@@ -191,6 +195,13 @@ int mag_m(){
 			stats::is_initialised=true;
 		}	
 		
+		// Reinitialise sublattice components
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stats::sublattice_mx_array[mat]=0.0;
+			stats::sublattice_my_array[mat]=0.0;
+			stats::sublattice_mz_array[mat]=0.0;
+		}
+
 		// Calculate sublattice components
 		for(int atom=0;atom<stats::num_atoms;atom++){
 			int mat=atoms::type_array[atom];
@@ -221,16 +232,17 @@ int mag_m(){
 
 			// Calculate magnitudes
 			stats::sublattice_magm_array[mat]=sqrt(mx*mx + my*my + mz*mz);
-			
+			stats::sublattice_mean_magm_array[mat]+=stats::sublattice_magm_array[mat];
+						
 			// Calculate actual total moment
 			stats::total_mag_actual[0]+=stats::sublattice_mx_array[mat]*stats::sublattice_mom_array[mat];
 			stats::total_mag_actual[1]+=stats::sublattice_my_array[mat]*stats::sublattice_mom_array[mat];
 			stats::total_mag_actual[2]+=stats::sublattice_mz_array[mat]*stats::sublattice_mom_array[mat];
 			
-			// save normalised moments
-			stats::sublattice_mx_array[mat]=mx/stats::sublattice_magm_array[mat];
-			stats::sublattice_my_array[mat]=my/stats::sublattice_magm_array[mat];
-			stats::sublattice_mz_array[mat]=mz/stats::sublattice_magm_array[mat];
+			// save (un)normalised moments
+			stats::sublattice_mx_array[mat]=mx; // /stats::sublattice_magm_array[mat];
+			stats::sublattice_my_array[mat]=my; // /stats::sublattice_magm_array[mat];
+			stats::sublattice_mz_array[mat]=mz; // /stats::sublattice_magm_array[mat];
 		}
 
 		stats::total_mag_norm[0]=stats::total_mag_actual[0]/stats::max_moment;
@@ -246,28 +258,14 @@ int mag_m(){
 										  stats::total_mag_actual[1]*stats::total_mag_actual[1] +
 										  stats::total_mag_actual[2]*stats::total_mag_actual[2]);
 
+		stats::total_mean_mag_m_norm+=stats::total_mag_m_norm;
+		stats::total_mean_mag_m_actual+=stats::total_mag_m_actual;
+		
+		// increment data counter
+		stats::data_counter+=1.0;
+
 	}
 	
-		
-		#ifdef MPICF
-			//MPI::COMM_WORLD.Allreduce(&stats::mag[0],&stats::mag[0],1,MPI_DOUBLE,MPI_SUM);
-			//MPI::COMM_WORLD.Allreduce(&stats::mag[1],&stats::mag[1],1,MPI_DOUBLE,MPI_SUM);
-			//MPI::COMM_WORLD.Allreduce(&stats::mag[2],&stats::mag[2],1,MPI_DOUBLE,MPI_SUM);
-			
-			// Collect normalised magnetization from each processor
-			//MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::total_mag_norm[0],1,MPI_DOUBLE,MPI_SUM);
-			//MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::total_mag_norm[1],1,MPI_DOUBLE,MPI_SUM);
-			//MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::total_mag_norm[2],1,MPI_DOUBLE,MPI_SUM);
-			//stats::total_mag_norm[0]/=vmpi::num_processors;
-			//stats::total_mag_norm[1]/=vmpi::num_processors;
-			//stats::total_mag_norm[2]/=vmpi::num_processors;
-			//std::cout << vmpi::num_processors << std::endl;
-			
-			//MPI::COMM_WORLD.Allreduce(&stats::total_mag_m_norm ,&stats::total_mag_m_norm ,1,MPI_DOUBLE,MPI_SUM);
-			//MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::total_mag_m_norm,1,MPI_DOUBLE,MPI_SUM);
-			//stats::total_mag_m_norm/=vmpi::num_processors;
-		#endif
-
 	return EXIT_SUCCESS;
 }
 
