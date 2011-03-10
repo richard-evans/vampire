@@ -115,7 +115,7 @@ int run(){
 			
 		case 4:
 			if(vmpi::my_rank==0) std::cout << "Curie-Temperature..." << std::endl; 
-			program::curie_temperature(true);
+			program::curie_temperature();
 			break;
 			
 		case 5:

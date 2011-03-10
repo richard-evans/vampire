@@ -64,25 +64,10 @@ namespace program{
 ///	Revision:	09/03/2011
 ///=====================================================================================
 ///
-int curie_temperature(bool init){
+int curie_temperature(){
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::curie_temperature has been called" << std::endl;}
-
-	// Initialise spins to random state
-	for(int atom =0;atom<atoms::num_atoms;atom++){
-		if(init==false){
-			atoms::x_spin_array[atom]=2.0*mtrandom::grnd()-1.0;
-			atoms::y_spin_array[atom]=2.0*mtrandom::grnd()-1.0;
-			atoms::z_spin_array[atom]=2.0*mtrandom::grnd()-1.0;
-		}
-		else{
-		    double parity = 1.0; //double(atoms::grain_array[atom]%2);
-			atoms::x_spin_array[atom]=0.01;			
-			atoms::y_spin_array[atom]=0.0;			
-			atoms::z_spin_array[atom]=2.0*parity-1.0;
-		}
-	}
 
 	// Set starting temperature
 	sim::temperature=sim::Tmin;

@@ -6,7 +6,7 @@
 //==========================================================
 namespace program
 {
-	extern int curie_temperature(bool);
+	extern int curie_temperature();
 	extern int hamr_run();
 	extern int static_hysteresis();
 	extern int two_temperature_pulse();
