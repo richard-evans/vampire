@@ -1014,7 +1014,24 @@ int match_sim(string const word, string const value, string const unit, int cons
 				exit(1);
 			}
 		}
-	//double H_vec[3]={0.0,0.0,1.0};
+		//--------------------------------------------------------------------
+		test="Hx";
+		if(word==test){
+			sim::H_vec[0]=atof(value.c_str());
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="Hy";
+		if(word==test){
+			sim::H_vec[1]=atof(value.c_str());
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="Hz";
+		if(word==test){
+			sim::H_vec[2]=atof(value.c_str());
+			return EXIT_SUCCESS;
+		}
 		//--------------------------------------------------------------------
 		else{
 			std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
