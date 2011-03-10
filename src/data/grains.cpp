@@ -76,7 +76,7 @@ int set_properties(){
 		else{
 			std::cerr << "Error - atom " << atom << " belongs to grain " << grain << " which is greater than maximum number of grains ";
 			std::cerr << grains::num_grains << ". Exiting" << std::endl;
-			exit(EXIT_FAILURE);
+			err::vexit();
 		}
 	}
 
@@ -139,7 +139,7 @@ int set_properties(){
 	    else{
 		std::cerr << "Error - atom " << atom << " belongs to grain " << grain << " which is greater than maximum number of grains ";
 		std::cerr << grains::num_grains << ". Exiting" << std::endl;
-		exit(EXIT_FAILURE);
+		err::vexit();
 	    }
         }
 
@@ -181,7 +181,7 @@ int set_properties(){
 	    // check file stream is open
 	    if(!ofile.is_open()){
 		std::cerr << "Error - file stream is unopened for grains::output_mag(), exiting!" << std::endl;
-		exit(EXIT_FAILURE);
+		err::vexit();
 	    }
 
 	    unsigned int id=0; // grain id (excluding grains with zero atoms)

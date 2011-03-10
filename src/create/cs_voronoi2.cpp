@@ -114,7 +114,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	//-----------------------
 	if(grain<1){
 		std::cerr << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
-		exit(EXIT_FAILURE);
+		err::vexit();
 	}
 
 	//-----------------------------------------------
@@ -328,7 +328,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	test_qhull=system("./qvoronoi 1> /dev/null 2> /dev/null");
 	if(test_qhull!=0){
 		std::cerr << "Error! - qvoronoi does not seem to be installed, exiting" << std::endl; 
-		exit(EXIT_FAILURE);
+		err::vexit();
 	}
 	#endif
 
@@ -346,13 +346,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	int sysstat = system(vcstr);
 	if(sysstat!=0){
 	  std::cerr << "Error initiating qvoronoi, exiting" << std::endl;
-        #ifdef MPICF
-	  MPI::COMM_WORLD.Abort(EXIT_FAILURE);
-	  exit(EXIT_FAILURE);
-        #else
-	  exit(EXIT_FAILURE);
-        #endif
-
+	  err::vexit();
 	}
 	//--------------------------------------------------------
 	// Read in number of Voronoi vertices

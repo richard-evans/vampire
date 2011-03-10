@@ -100,7 +100,7 @@ int run(){
 			if(vmpi::my_rank==0) std::cout << "Time-Series..." << std::endl; 
 			//program::time_series();
 			std::cerr << "Error: Time-Series program not yet written. Exiting." << std::endl;
-			exit(EXIT_FAILURE);
+			err::vexit();
 			break;
 		
 		case 2: // LLG Midpoint
@@ -307,7 +307,7 @@ int integrate_mpi(int n_steps){
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
 				std::cerr << "Error - Monte Carlo Integrator unavailable for parallel execution" << std::endl;
-				exit(EXIT_FAILURE);
+				err::vexit();
 				// increment time
 				sim::time++;
 			}
@@ -329,7 +329,7 @@ int integrate_mpi(int n_steps){
 		case 3: // Constrained Monte Carlo
 			for(int ti=0;ti<n_steps;ti++){
 				std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
-				exit(EXIT_FAILURE);
+				err::vexit();
 				// increment time
 				sim::time++;
 			}

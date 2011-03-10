@@ -304,7 +304,7 @@ int LLG_relax(const int num_steps){
 
 	#ifdef MPICF
 		std::cerr << "MPI version of LLG_relax is yet to be implemented, exiting" << std::endl;
-		exit(EXIT_FAILURE);
+		err::vexit();
 	#else
 		LLG_relax_serial_heun(num_steps);
 	#endif

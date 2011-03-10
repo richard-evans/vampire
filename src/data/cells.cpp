@@ -77,7 +77,7 @@ namespace cells{
 				}
 			}
 		}
-		catch(...){std::cerr << "Error allocating supercell_array for cell list calculation" << std::endl;exit(EXIT_FAILURE);}
+		catch(...){std::cerr << "Error allocating supercell_array for cell list calculation" << std::endl;err::vexit();}
 		
 		// offset cells to prevent rounding error
 		double atom_offset[3]={0.25*mp::lattice_constant[0],0.25*mp::lattice_constant[1],0.25*mp::lattice_constant[2]};
@@ -105,12 +105,7 @@ namespace cells{
 					std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
 					std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
 					std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
-					#ifdef MPICF
-						MPI::COMM_WORLD.Abort(EXIT_FAILURE);
-						exit(EXIT_FAILURE);
-					#else
-						exit(EXIT_FAILURE);
-					#endif
+					err::vexit();
 				}
 			}
 			// If no error for range then assign atom to cell.

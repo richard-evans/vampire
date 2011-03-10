@@ -709,7 +709,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"LLG-Heun\"" << std::endl;
 				std::cerr << "\t\"Monte-Carlo\"" << std::endl;
-				exit(EXIT_FAILURE);
+				err::vexit();
 			}
 		}
 		//-------------------------------------------------------------------
@@ -747,7 +747,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 				std::cerr << "\t\"Hysteresis-Loop\"" << std::endl;
 				std::cerr << "\t\"Static-Hysteresis-Loop\"" << std::endl;
 				std::cerr << "\t\"Curie-Temperature\"" << std::endl;
-				exit(EXIT_FAILURE);
+				err::vexit();
 			}
 		}
 		//-------------------------------------------------------------------
@@ -851,7 +851,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 1E-20 - 1.0E-6" << std::endl;
-				exit(EXIT_FAILURE);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------

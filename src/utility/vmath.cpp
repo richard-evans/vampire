@@ -15,7 +15,7 @@
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-
+#include "errors.hpp"
 #include "vmath.hpp"
 
 #include <cmath>
@@ -83,7 +83,7 @@ std::vector<std::vector<double> > matmul(
 	// Check for valid multiplication
 	if(A_num_cols!=B_num_rows){
 		std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
-		exit(EXIT_FAILURE);
+		err::vexit();
 	}
 	
 	// Set number of internal products
@@ -195,7 +195,7 @@ std::vector<std::vector<double> > set_matrix(
 	
 	if(nums.size()!=rows*cols){
 		std::cerr << "Error in matrix initialisation, incorrect number of elements for matrix!" << std::endl;
-		exit(EXIT_FAILURE);
+		err::vexit();
 	}
 	
 	// Declare result matrix 
@@ -228,7 +228,7 @@ std::vector<std::vector<double> > set_matrix(
 	
 	//if(nums.size()!=rows*cols){
 	//	std::cerr << "Error in matrix initialisation, incorrect number of elements for matrix!" << std::endl;
-	//	exit(EXIT_FAILURE);
+	//	err::vexit();
 	//}
 	
 	// Declare result matrix 

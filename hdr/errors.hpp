@@ -6,7 +6,7 @@
 namespace err
 {
 	extern bool check;
-	
+	extern void vexit();
 }
 
 #endif /*ERRORS_H_*/

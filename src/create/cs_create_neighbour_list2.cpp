@@ -78,7 +78,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				}
 			}
 		}
-		catch(...){std::cout << "error allocating supercell_array" << std::endl;exit(EXIT_FAILURE);}
+		catch(...){std::cout << "error allocating supercell_array" << std::endl;err::vexit();}
 		
 		const int num_cells=d[0]*d[1]*d[2];
 		std::vector< std::vector <int> > cell_coord_array;
@@ -129,13 +129,8 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 					std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
 					std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
 					std::cerr << "\tCell offest (dp): " << offset[0]*mp::lattice_constant[0] << "\t" << offset[1]*mp::lattice_constant[1] << "\t" << offset[2]*mp::lattice_constant[2] << std::endl;
-					#ifdef MPICF
-					MPI::COMM_WORLD.Abort(EXIT_FAILURE);
-					exit(EXIT_FAILURE);
-                                        #else
-					exit(EXIT_FAILURE);
-                                        #endif
-				}
+					err::vexit();
+ 				}
 			}
 			
 			// Add atom to supercell
@@ -152,13 +147,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
 				std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
 				std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
-				#ifdef MPICF
-				MPI::COMM_WORLD.Abort(EXIT_FAILURE);
-				exit(EXIT_FAILURE);
-                                #else
-				exit(EXIT_FAILURE);
-                                #endif
-
+				err::vexit();
 			}
 		}
 		
@@ -204,7 +193,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 													else{
 														std::cerr << "Error - number of neighbour atoms exceeded, increase hamiltonian num neighbours" << std::endl;
 														std::cerr << "Size: " << cneighbourlist[atom].size() << "Capacity: " << cneighbourlist[atom].capacity() << std::endl;
-														exit(EXIT_FAILURE);
+														err::vexit();
 													}
 													//std::cout << "\t" << natom << "\t" << dx << "\t" << dy << "\t" << dz << "\t" <<dx*dx+dy*dy+dz*dz << "\t" << drange*drange << std::endl;
 												}

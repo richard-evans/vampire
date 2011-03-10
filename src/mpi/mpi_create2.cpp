@@ -69,7 +69,7 @@ namespace vmpi{
 	// Check for zero cpu's
 	if(num_cpus==0){
 		std::cerr << "Error - zero cpu's for mpi decomposition, check initialisation of mpi variables" << std::endl;
-		exit(EXIT_FAILURE);
+		err::vexit();
 	}
 	
 	//---------------------------------------------------
@@ -93,7 +93,7 @@ namespace vmpi{
 	//cout << counter_factor << endl;
 	if (counter_factor==2 && num_cpus>10) {
 		std::cerr << num_cpus << "\t" << "cpus cannot be decomposed efficiently, exiting" << std::endl;
-		exit(EXIT_FAILURE);
+		err::vexit();
 	}
 	else {
 		for (int i=0;i<counter_factor;i++){
