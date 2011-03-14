@@ -43,14 +43,8 @@ int bmark(){
 		// Calculate mag_m, mag after sim::partial_time steps
       stats::mag_m();
 
-		if(vmpi::my_rank==0){
-			std::cout << sim::time << "\t" << stats::total_mag_m_norm;
-			std::cout << "\t" << stats::total_mag_norm[0];
-			std::cout << "\t" << stats::total_mag_norm[1];
-			std::cout << "\t" << stats::total_mag_norm[2];
-			std::cout << std::endl;
-			vmag << sim::temperature << "\t" << stats::total_mag_m_norm << std::endl;
-		}
+		vout::data();
+
 	} // end of time loop
 	
 	return EXIT_SUCCESS;

@@ -41,7 +41,23 @@ sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
 sim:Hmin=-12.0 !T
 sim:equilibration-time=10000
-sim:partial-time=1
-sim:total-time=1
+sim:partial-time=100
+sim:total-time=5000
 sim:loop-time=10000
-sim:dt=1.0E-16
+sim:dt=5.0E-15
+
+#--------------------------------
+# Program and integrator details
+#--------------------------------
+sim:program=Benchmark
+sim:integrator=LLG-Midpoint
+#sim:integrator=LLG-Heun
+
+# data output
+vmag:time
+vmag:real-time
+vmag:magnetisation
+vmag:mag-m
+
+screen:time
+screen:mag-m
