@@ -89,6 +89,9 @@ int run(){
 		std::cout << "Starting Simulation with Program ";
 	}
 	
+	program::timestep_scaling();
+	return(EXIT_SUCCESS);
+	
 	// Select program to run
 	switch(sim::program){
 		case 0:

@@ -73,6 +73,7 @@ obj/mpi/mpi_create2.o \
 obj/mpi/mpi_comms.o \
 obj/program/bmark.o \
 obj/program/curie_temperature.o \
+obj/program/diagnostics.o \
 obj/program/hysteresis.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/static_hysteresis.o \

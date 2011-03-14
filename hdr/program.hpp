@@ -13,6 +13,7 @@ namespace program
 	extern int bmark();
 	extern int LLB_Boltzmann();
 	extern int hysteresis();
+	extern int timestep_scaling();
 }
 
 #endif /*PROGRAM_H_*/
