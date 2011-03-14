@@ -52,8 +52,8 @@ materials_t::materials_t ():
 		alloy[i]=0.0;
 	}
 	initial_spin[0]=0.0;
-	initial_spin[0]=0.0;
-	initial_spin[0]=1.0;
+	initial_spin[1]=0.0;
+	initial_spin[2]=1.0;
 
 }
 
