@@ -269,6 +269,35 @@ int mag_m(){
 	return EXIT_SUCCESS;
 }
 
+/// @brief Resets mean magnetisation and counter.
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section Information
+/// @author		Richard Evans, rfle500@york.ac.uk
+/// @version	1.0
+/// @date		14/03/2011
+/// @todo		Implement for more than one material - Urgent!
+///
+/// @internal
+///	Created:		11/01/2010
+///	Revision:	  ---
+///=====================================================================================
+///
+void mag_m_reset(){
+	//----------------------------------------------------------
+	// check calling of routine if error checking is activated
+	//----------------------------------------------------------
+	if(err::check==true){std::cout << "stats::mag_m_reset() has been called" << std::endl;}
+	
+	stats::total_mean_mag_m_actual=0.0;
+	stats::total_mean_mag_m_norm=0.0;
+	stats::data_counter=0.0;
+	
+}
+
 double max_torque(){
   //================================================================================================
   //

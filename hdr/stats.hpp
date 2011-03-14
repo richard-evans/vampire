@@ -21,6 +21,7 @@ namespace stats
 
 	// Member Functions
 	extern int mag_m();
+	extern void mag_m_reset();
 	extern double max_torque();
 	
 	extern std::vector <double> sublattice_mx_array;
