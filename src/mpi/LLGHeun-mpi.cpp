@@ -51,6 +51,9 @@ int LLG_Heun_mpi(){
 	
 	using namespace LLG_arrays;
 	
+	// Check for initialisation of LLG integration arrays
+	if(LLG_set==false) sim::LLGinit();
+
 	//----------------------------------------
 	// Local variables for system generation
 	//----------------------------------------

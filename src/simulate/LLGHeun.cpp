@@ -30,14 +30,15 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
+#include "LLG.hpp"
 #include "material.hpp"
 
 //Function prototypes
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
 
-namespace sim{
-
+namespace LLG_arrays{
+	
 	// Local arrays for LLG integration
 	std::vector <double> x_euler_array;
 	std::vector <double> y_euler_array;	
@@ -57,6 +58,10 @@ namespace sim{
 
 	bool LLG_set=false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 
+}
+
+namespace sim{
+	
 /// @brief LLG Initialisation function
 ///
 /// @details Resizes arrays used for Heun integration 
@@ -77,28 +82,30 @@ namespace sim{
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int LLG_init(){
-
+int LLGinit(){
+	
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "sim::LLG_init has been called" << std::endl;}
 
-	sim::x_spin_storage_array.resize(atoms::num_atoms,0.0);
-	sim::y_spin_storage_array.resize(atoms::num_atoms,0.0);
-	sim::z_spin_storage_array.resize(atoms::num_atoms,0.0);
+	using namespace LLG_arrays;
 
-	sim::x_initial_spin_array.resize(atoms::num_atoms,0.0);
-	sim::y_initial_spin_array.resize(atoms::num_atoms,0.0);
-	sim::z_initial_spin_array.resize(atoms::num_atoms,0.0);
+	x_spin_storage_array.resize(atoms::num_atoms,0.0);
+	y_spin_storage_array.resize(atoms::num_atoms,0.0);
+	z_spin_storage_array.resize(atoms::num_atoms,0.0);
 
-	sim::x_euler_array.resize(atoms::num_atoms,0.0);
-	sim::y_euler_array.resize(atoms::num_atoms,0.0);
-	sim::z_euler_array.resize(atoms::num_atoms,0.0);
+	x_initial_spin_array.resize(atoms::num_atoms,0.0);
+	y_initial_spin_array.resize(atoms::num_atoms,0.0);
+	z_initial_spin_array.resize(atoms::num_atoms,0.0);
 
-	sim::x_heun_array.resize(atoms::num_atoms,0.0);
-	sim::y_heun_array.resize(atoms::num_atoms,0.0);
-	sim::z_heun_array.resize(atoms::num_atoms,0.0);
+	x_euler_array.resize(atoms::num_atoms,0.0);
+	y_euler_array.resize(atoms::num_atoms,0.0);
+	z_euler_array.resize(atoms::num_atoms,0.0);
 
-	sim::LLG_set=true;
+	x_heun_array.resize(atoms::num_atoms,0.0);
+	y_heun_array.resize(atoms::num_atoms,0.0);
+	z_heun_array.resize(atoms::num_atoms,0.0);
+
+	LLG_set=true;
 
   	return EXIT_SUCCESS;
 }
@@ -131,8 +138,10 @@ int LLG_Heun(){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "sim::LLG_Heun has been called" << std::endl;}
 
+	using namespace LLG_arrays;
+
 	// Check for initialisation of LLG integration arrays
-	if(sim::LLG_set==false) sim::LLG_init();
+	if(LLG_set==false) sim::LLGinit();
 	
 	// Local variables for system integration
 	const int num_atoms=atoms::num_atoms;

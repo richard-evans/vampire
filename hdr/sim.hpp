@@ -50,6 +50,7 @@ namespace sim{
 	
 	// Integrator initialisers
 	extern void CMCinit();
+	extern int LLGinit();
 	
 	// Field and energy functions
 	extern double calculate_spin_energy(const int);
