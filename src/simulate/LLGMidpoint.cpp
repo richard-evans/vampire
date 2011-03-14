@@ -95,7 +95,7 @@ int LLG_Midpoint(){
 
 		const int imaterial=atoms::type_array[atom];
 		const double alpha = mp::material[imaterial].alpha;
-		const double beta  = mp::dt*mp::material[imaterial].one_oneplusalpha_sq*0.5;
+		const double beta  = -1.0*mp::dt*mp::material[imaterial].one_oneplusalpha_sq*0.5;
 		const double beta2 = beta*beta;
 		
 		// Store local spin in S and local field in H
@@ -136,7 +136,7 @@ int LLG_Midpoint(){
 
 		const int imaterial=atoms::type_array[atom];
 		const double alpha = mp::material[imaterial].alpha;
-		const double beta  = mp::dt*mp::material[imaterial].one_oneplusalpha_sq*0.5;
+		const double beta  = -1.0*mp::dt*mp::material[imaterial].one_oneplusalpha_sq*0.5;
 		const double beta2 = beta*beta;
 		
 		// Store local spin in S and local field in H
