@@ -77,7 +77,7 @@ int hysteresis(){
 	  
 	  // time loop
 	    for(sim::time=0;sim::time<sim::loop_time;sim::time+=sim::partial_time){
-	      sim::LLG(sim::partial_time);
+	      //sim::LLG(sim::partial_time);
 	      stats::mag_m();
 	      //if(vmpi::my_rank==0){
 	      // 	std::cout << sim::time<< "\t" << stats::total_mag_m_norm;

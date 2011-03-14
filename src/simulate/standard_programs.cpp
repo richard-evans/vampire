@@ -108,7 +108,7 @@ int hamr_run(){
         mtrandom::grnd.seed(vmpi::my_rank);
 
 	// Equilibrate system
-	sim::LLG(sim::equilibration_time);
+	//sim::LLG(sim::equilibration_time);
 
 	// Simulate system with single timestep resolution
 	for(sim::time=0;sim::time<sim::loop_time;sim::time++){
@@ -119,7 +119,7 @@ int hamr_run(){
 		sim::temperature=RT+max_dT*exp(-((rtime*rtime)/(cooling_time*cooling_time)));
 		
 		// Calculate LLG
-		sim::LLG(1);
+		//sim::LLG(1);
 		
 		// Calculate mag_m, mag
 		if(sim::time%sim::partial_time==0){
@@ -218,7 +218,7 @@ int two_temperature_pulse(){
 	// Equilibrate system
 	for(sim::time=0;sim::time<sim::equilibration_time;sim::time++){
 		double actual_time = double(sim::time-sim::equilibration_time)*mp::dt_SI;
-		sim::LLG(1);
+		//sim::LLG(1);
 		
 		// Calculate mag_m, mag
 		if(sim::time%sim::partial_time==0){
@@ -267,7 +267,7 @@ int two_temperature_pulse(){
 		
 		sim::temperature=Te;
 		// Calculate LLG
-		sim::LLG(1);
+		//sim::LLG(1);
 		
 		// Calculate mag_m, mag
 		if(sim::time%sim::partial_time==0){

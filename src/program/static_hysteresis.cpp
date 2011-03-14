@@ -82,7 +82,7 @@ int static_hysteresis(){
 	
 	// Equilibrate system in strong positive field
 	sim::H_applied=sim::Hmax;
-	sim::LLG(sim::equilibration_time);
+	sim::integrate(sim::equilibration_time);
 		
 	// Setup min and max fields and increment (mT)
 	int iHmax=iround(double(sim::Hmax)*1.0E3);

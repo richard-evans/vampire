@@ -82,7 +82,6 @@ obj/simulate/energy.o \
 obj/simulate/fields.o \
 obj/simulate/demag.o \
 obj/simulate/LLB.o \
-obj/simulate/LLG.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
 obj/simulate/mc.o \
