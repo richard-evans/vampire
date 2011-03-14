@@ -2023,10 +2023,11 @@ namespace vout{
 					vout::mat_mean_magm(vmag);
 					break;
 			}
-			// Carriage return
-			if(file_output_list.size()>0) vmag << std::endl;
 		}
 		
+		// Carriage return
+		if(file_output_list.size()>0) vmag << std::endl;
+
 		// Output data to cout
 		if(vmpi::my_rank==0){
 		for(unsigned int item=0;item<screen_output_list.size();item++){
@@ -2062,9 +2063,10 @@ namespace vout{
 					vout::mat_mean_magm(std::cout);
 					break;
 			}
-			// Carriage return
-			if(screen_output_list.size()>0) std::cout << std::endl;
 		}
+		
+		// Carriage return
+		if(screen_output_list.size()>0) std::cout << std::endl;
 		}
 		
 		// Atomistic povray output
