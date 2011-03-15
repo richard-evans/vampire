@@ -26,6 +26,7 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "LLG.hpp"
+#include "sim.hpp"
 #include "vmpi.hpp"
 
 #include <cmath>
