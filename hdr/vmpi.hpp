@@ -19,7 +19,7 @@ namespace vmpi{
 	
 	extern int my_rank; 					///< Local CPU ID
 	extern int num_processors;			///< Total number of CPUs
-	extern int mpi_mode; 				///< MPI Simulation Mode (0 = Mirrored, 1 = Statistical Parallelism, 2 = Geometric Decomposition, 3 = granular decomposition)
+	extern int mpi_mode; 				///< MPI Simulation Mode (0 = Geometric Decomposition, 1 = Replicated Data, 2 = Statistical Parallelism)
 	extern int num_core_atoms;			///< Number of atoms on local CPU with no external communication
 	extern int num_bdry_atoms;			///< Number of atoms on local CPU with external communication
 	extern int num_halo_atoms;			///< Number of atoms on remote CPUs needed for boundary atom integration
@@ -52,6 +52,7 @@ namespace vmpi{
 	extern int geometric_decomposition(int, double []);
 	extern int crystal_xyz(std::vector<cs::catom_t> &);
 	extern int copy_halo_atoms(std::vector<cs::catom_t> &);
+	extern int set_replicated_data(std::vector<cs::catom_t> &);
 	extern int identify_boundary_atoms(std::vector<cs::catom_t> &, std::vector<std::vector <int> > &);
 	extern int init_mpi_comms(std::vector<cs::catom_t> & catom_array);
 

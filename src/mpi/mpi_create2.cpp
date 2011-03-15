@@ -531,8 +531,99 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	return EXIT_SUCCESS;
 }
 
+/// @brief Set Replicated Data
+///
+/// @details Sets atom CPU ID for replicated data decomposition 
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    15/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		15/03/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+int set_replicated_data(std::vector<cs::catom_t> & catom_array){
+	
+	// check calling of routine if error checking is activated
+	if(err::check==true){std::cout << "vmpi::set_replicated_data has been called" << std::endl;}
+
+	// check for num_atoms > num_CPUS
+	if(catom_array.size()<vmpi::num_processors){
+		std::cerr << "Error! - number of atoms is less than number of CPUs - replicated data parallelisation is not possible!" << std::endl;
+		err::vexit();
+	}
+
+	// arrays to store atom ranges on each CPU
+	std::vector<int> rd_num_atoms(vmpi::num_processors,0);
+	std::vector<int> rd_start_atom(vmpi::num_processors,0);
+	std::vector<int> rd_end_atom(vmpi::num_processors,0);
+	
+	// Divide system according to atom numbers, replicated on all CPUs
+	for(int p=0;p<vmpi::num_processors;p++){
+		rd_num_atoms[p]=catom_array.size()/vmpi::num_processors;
+		rd_start_atom[p] = p*rd_num_atoms[p];
+		rd_end_atom[p] = (p+1)*rd_num_atoms[p]-1;
+	}
+	
+	// add spare atoms to last CPU
+	rd_end_atom[vmpi::num_processors-1]  = catom_array.size()-1;
+	rd_num_atoms[vmpi::num_processors-1] = rd_end_atom[vmpi::num_processors-1]-rd_start_atom[vmpi::num_processors-1];
+	
+	// Populate atoms with CPU id and mpi_type
+	for(int p=0;p<vmpi::num_processors;p++){
+		if(p==vmpi::my_rank){
+			for(int atom=rd_start_atom[p];atom<=rd_end_atom[p];atom++){
+				catom_array[atom].mpi_cpuid = p;
+				catom_array[atom].mpi_type = 0; // core
+				catom_array[atom].mpi_atom_number=atom; // atom numbers are mirrored on all CPUs
+			}
+		}
+		else{
+			for(int atom=rd_start_atom[p];atom<=rd_end_atom[p];atom++){
+				catom_array[atom].mpi_cpuid = p;
+				catom_array[atom].mpi_type = 2; // halo
+				catom_array[atom].mpi_atom_number=atom; // atom numbers are mirrored on all CPUs
+			}
+		}
+	}
+	
+	return EXIT_SUCCESS;
+}
+
 int sort_atoms_by_mpi_type(std::vector<cs::catom_t> &,std::vector<std::vector <int> > &);
 
+/// @brief Identify Boundary Atoms
+///
+/// @details Determines which atoms interact with the halo, assuming all local atoms are 
+///          initially designated as core (catom_array[atom].mpi_type = 0)
+///          Non-interacting halo atoms (catom_array[atom].mpi_type=3) are marked for 
+///          deletion and removed after sorting atoms to core | boundary | halo 
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    15/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		15/03/2011
+///	Revision:	  ---
+///=====================================================================================
+///
 int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <int> > & cneighbourlist){
 	
 	// check calling of routine if error checking is activated
