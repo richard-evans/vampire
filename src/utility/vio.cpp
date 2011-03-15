@@ -728,7 +728,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"LLG-Heun\"" << std::endl;
+				std::cerr << "\t\"LLG-Midpoint\"" << std::endl;
 				std::cerr << "\t\"Monte-Carlo\"" << std::endl;
+				std::cerr << "\t\"Constrained-Monte-Carlo\"" << std::endl;
 				err::vexit();
 			}
 		}
