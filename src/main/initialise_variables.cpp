@@ -208,7 +208,7 @@ int default_system(){
 	half_dt = 0.5*dt;
 
 	// MPI Mode (Assume decomposition)
-	vmpi::mpi_mode=2;
+	//vmpi::mpi_mode=1;
 	//mpi_create_variables::mpi_interaction_range=2; // Unit cells
 	//mpi_create_variables::mpi_comms_identify=true;
 
@@ -267,7 +267,7 @@ int single_spin_system(){
 	sim::hamiltonian_simulation_flags[4] = 0;	// Dipolar
 
 	// MPI Mode (Homogeneous execution)
-	vmpi::mpi_mode=0;
+	//vmpi::mpi_mode=0;
 	//mpi_create_variables::mpi_interaction_range=2; // Unit cells
 	//mpi_create_variables::mpi_comms_identify=false;
 

@@ -1052,6 +1052,27 @@ int match_sim(string const word, string const value, string const unit, int cons
 			sim::H_vec[2]=atof(value.c_str());
 			return EXIT_SUCCESS;
 		}
+		
+		//-------------------------------------------------------------------
+		test="mpi-mode";
+		if(word==test){
+			test="geometric-decomposition";
+			if(value==test){
+				vmpi::mpi_mode=0;
+				return EXIT_SUCCESS;
+			}
+			test="replicated-data";
+			if(value==test){
+				vmpi::mpi_mode=1;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+				std::cerr << "\t\"geometric-decomposition\"" << std::endl;
+				std::cerr << "\t\"replicated-data\"" << std::endl;
+				err::vexit();
+			}
+		}
 		//--------------------------------------------------------------------
 		else{
 			std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
