@@ -243,6 +243,10 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	// set number of grains
 	grains::num_grains = int(grain_coord_array.size());
 
+	// sort atoms by grain number
+	sort_atoms_by_grain(catom_array);
+
+	
 	return EXIT_SUCCESS;	
 }
 
@@ -337,7 +341,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//--------------------------------------
 
 	std::stringstream vsstr;
-	vsstr << "cat " << grain_file << " | ./qvoronoi -o -Fv > " << voronoi_file;
+	vsstr << "cat " << grain_file << " | qvoronoi -o -Fv > " << voronoi_file;
 	string vstr = vsstr.str();
 	const char* vcstr = vstr.c_str();
 	//std::cout << vcstr << std::endl;
