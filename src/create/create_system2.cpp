@@ -72,7 +72,7 @@ int create(){
 	//      Set up Parallel Decomposition if required 
 	//=============================================================
 	#ifdef MPICF
-		if(vmpi::mpi_mode==2) vmpi::geometric_decomposition(vmpi::num_processors,mp::system_dimensions);
+		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,mp::system_dimensions);
 	#endif
 
 	//=============================================================
@@ -100,8 +100,13 @@ int create(){
 	//=============================================================
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
+	if(vmpi::mpi_mode==0){
 		MPI::COMM_WORLD.Barrier();
 		vmpi::copy_halo_atoms(catom_array);
+	}
+	else if(vmpi::mpi_mode==1){
+		vmpi::set_replicated_data(catom_array);
+	}
 	#else
 		//cs::copy_periodic_boundaries(catom_array);
 	#endif

@@ -10,9 +10,9 @@
 #include <fstream>
 
 namespace vmpi{
-	int mpi_mode;
-	int my_rank;
-	int num_processors;
+	int mpi_mode=0;
+	int my_rank=0;
+	int num_processors=1;
 	int num_core_atoms;
 	int num_bdry_atoms;
 	int num_halo_atoms;
@@ -345,7 +345,7 @@ namespace vmpi{
 int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "vmpi::copy_boundary_atoms has been called" << std::endl;}
+	if(err::check==true){std::cout << "vmpi::copy_halo_atoms has been called" << std::endl;}
 	
 	// Record initial number of atoms
 	//const int num_local_atoms=catom_array.size();
@@ -871,8 +871,8 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	  int old_atom_num=catom_array[atom].mpi_old_atom_number;
 	  //std::cout << "Rank: " << vmpi::my_rank << " Old: " << old_atom_num << " New: " << atom << " Highest: " << highest << std::endl;
 	  if((old_atom_num>highest) || (old_atom_num < 0)){ // || (old_atom_num>catom_array.size())){
-	    std::cout << "Old atom number out of range! on rank " << vmpi::my_rank << "; Old atom number: " << old_atom_num << " ; New atom number: " << atom << std::endl;
-	    exit(1);
+	    std::cerr << "Old atom number out of range! on rank " << vmpi::my_rank << "; Old atom number: " << old_atom_num << " ; New atom number: " << atom << std::endl;
+	    err::vexit();
 	  } 
 	  inv_atom_translation_array[old_atom_num]=atom;
 	}

@@ -39,9 +39,17 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	int ncell[3];
 	
 	#ifdef MPICF
+	if(vmpi::mpi_mode==0){
 		ncell[0] = iround((vmpi::max_dimensions[0]-vmpi::min_dimensions[0])/mp::lattice_constant[0]);
 		ncell[1] = iround((vmpi::max_dimensions[1]-vmpi::min_dimensions[1])/mp::lattice_constant[1]);
 		ncell[2] = iround((vmpi::max_dimensions[2]-vmpi::min_dimensions[2])/mp::lattice_constant[2]);
+	}
+	else{
+		ncell[0]=supercell_dim[0];
+		ncell[1]=supercell_dim[1];
+		ncell[2]=supercell_dim[2];
+	}
+			
 	#else
 		ncell[0]=supercell_dim[0];
 		ncell[1]=supercell_dim[1];
@@ -142,12 +150,22 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		int max_bounds[3];
 		
 		#ifdef MPICF
+		if(vmpi::mpi_mode==0){
 			min_bounds[0] = int(vmpi::min_dimensions[0]/mp::lattice_constant[0]);
 			min_bounds[1] = int(vmpi::min_dimensions[1]/mp::lattice_constant[1]);
 			min_bounds[2] = int(vmpi::min_dimensions[2]/mp::lattice_constant[2]);
 			max_bounds[0] = 1+int(vmpi::max_dimensions[0]/mp::lattice_constant[0]);
 			max_bounds[1] = 1+int(vmpi::max_dimensions[1]/mp::lattice_constant[1]);
 			max_bounds[2] = 1+int(vmpi::max_dimensions[2]/mp::lattice_constant[2]);
+		}
+		else{
+			min_bounds[0]=0;
+			min_bounds[1]=0;
+			min_bounds[2]=0;
+			max_bounds[0]=supercell_dim[0];
+			max_bounds[1]=supercell_dim[1];
+			max_bounds[2]=supercell_dim[2];
+		}
 		#else
 			min_bounds[0]=0;
 			min_bounds[1]=0;
@@ -168,6 +186,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 						double cz = (double(z)+unit_cell_coords[3*uca+2])*mp::lattice_constant[2];
 						if((cz>=min) && (cz<max)){
 							#ifdef MPICF
+							if(vmpi::mpi_mode==0){
 								if(	(cx>=vmpi::min_dimensions[0] && cx<vmpi::max_dimensions[0]) &&
 										(cy>=vmpi::min_dimensions[1] && cy<vmpi::max_dimensions[1]) &&
 										(cz>=vmpi::min_dimensions[2] && cz<vmpi::max_dimensions[2])){
@@ -180,6 +199,15 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 								atom++;
 							#ifdef MPICF
 								}
+							}
+							else{
+								catom_array.push_back(cs::catom_t());
+								catom_array[atom].x=cx;
+								catom_array[atom].y=cy;
+								catom_array[atom].z=cz;
+								catom_array[atom].material=mat;
+								atom++;								
+							}
 							#endif
 						}
 					}
@@ -200,7 +228,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	// Check to see if any atoms have been generated
 	if(atom==0){
 		std::cout << "Error - no atoms have been generated, increase system dimensions!" << std::endl;
-		exit(1);
+		err::vexit();
 	}
 
 	return EXIT_SUCCESS;
