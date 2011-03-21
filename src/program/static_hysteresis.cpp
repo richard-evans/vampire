@@ -19,19 +19,11 @@
 ///
 
 // Vampire Header files
-#include "atoms.hpp"
+#include "create.hpp"
 #include "errors.hpp"
-#include "material.hpp"
-#include "program.hpp"
-#include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
-#include "vmpi.hpp"
-
-// Standard Libraries
-#include <iostream>
-#include <cmath>
 
 namespace program{
 	
@@ -61,12 +53,6 @@ int static_hysteresis(){
 	// Disable temperature as this will prevent convergence
 	sim::temperature = 0.0;
 	sim::hamiltonian_simulation_flags[3] = 0;	// Thermal
-
-	// Ensure H vector is unit length - move this to initialise-variables
-	double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
-	sim::H_vec[0]*=mod_H;
-	sim::H_vec[1]*=mod_H;
-	sim::H_vec[2]*=mod_H;
 	
 	// Equilibrate system in saturation field
 	sim::H_applied=sim::Hmax;
