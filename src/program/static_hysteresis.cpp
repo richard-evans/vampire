@@ -62,25 +62,13 @@ int static_hysteresis(){
 	sim::temperature = 0.0;
 	sim::hamiltonian_simulation_flags[3] = 0;	// Thermal
 
-	// Also set up high alpha to increase convergence rate
-	for(int mat=0;mat<mp::num_materials;mat++){
-		mp::material[mat].alpha=4.0;
-	}
-
-	// Ensure H vector is unit length
+	// Ensure H vector is unit length - move this to initialise-variables
 	double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
 	sim::H_vec[0]*=mod_H;
 	sim::H_vec[1]*=mod_H;
 	sim::H_vec[2]*=mod_H;
 	
-	// Estimate Material Coercivities
-	double Hc = 2.0*mp::material[0].Ku1_SI/mp::material[0].mu_s_SI;
-	
-	std::cout << "\tEstimated Coercivity for FM is: " << Hc << " Tesla" << std::endl;
-	std::cout << "\tmu_s: " << mp::material[0].mu_s_SI << std::endl;
-	std::cout << "\tKu  : " << mp::material[0].Ku1_SI << std::endl;
-	
-	// Equilibrate system in strong positive field
+	// Equilibrate system in saturation field
 	sim::H_applied=sim::Hmax;
 	sim::integrate(sim::equilibration_time);
 		
@@ -96,14 +84,17 @@ int static_hysteresis(){
 			// Set applied field (Tesla)
 			sim::H_applied=double(H)*double(parity)*1.0e-3;
 			
+			// Reset start time
+			int start_time=sim::time;
+			
 			// Simulate system
-			while(sim::time<sim::loop_time){
+			while(sim::time<sim::loop_time+start_time){
 			
 				// Integrate system
 				sim::integrate(sim::partial_time);
 				
-				double torque=stats::max_torque();
-				if((torque<1.0e-5) && (sim::time>100)){
+				double torque=stats::max_torque(); // needs correcting for new integrators
+				if((torque<1.0e-5) && (sim::time-start_time>100)){
 					break;
 				}
 
@@ -113,18 +104,11 @@ int static_hysteresis(){
 			stats::mag_m();
 			
 			// Output to screen and file after each field
-			if(vmpi::my_rank==0){
-				std::cout << "\t" << sim::time << "\t" << sim::H_applied << "\t" << stats::total_mag_norm[0];
-				std::cout << "\t" << stats::total_mag_norm[1] << "\t" << stats::total_mag_norm[2];
-				std::cout << "\t" << stats::total_mag_m_norm << std::endl;
-
-				vmag << sim::time << "\t" << sim::H_applied << "\t" << stats::total_mag_norm[0];
-				vmag << "\t" << stats::total_mag_norm[1] << "\t" << stats::total_mag_norm[2];
-				vmag << "\t" << stats::total_mag_m_norm << std::endl;
-			}
+			vout::data();
 			
 		} // End of field loop
 	} // End of parity loop
+
 	return EXIT_SUCCESS;
 }
 
