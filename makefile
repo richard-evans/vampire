@@ -68,6 +68,7 @@ obj/main/main.o \
 obj/main/material.o \
 obj/mpi/LLG_mpi.o \
 obj/mpi/LLGHeun-mpi.o \
+obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \
 obj/mpi/mpi_create2.o \
 obj/mpi/mpi_comms.o \

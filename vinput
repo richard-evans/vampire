@@ -44,15 +44,16 @@ sim:minimum-temperature=0;
 sim:maximum-temperature=700;
 sim:delta-temperature=10
 sim:equilibration-time=3000
-sim:partial-time=1
-sim:total-time=5000
+sim:partial-time=1000
+sim:total-time=10000
 sim:loop-time=3000
 sim:dt=5.0E-15
 
 #--------------------------------
 # Program and integrator details
 #--------------------------------
-sim:program=Curie-Temperature
+#sim:program=Curie-Temperature
+sim:program=Benchmark
 sim:integrator=LLG-Midpoint
 #sim:integrator=LLG-Heun
 #sim:integrator=Monte-Carlo
@@ -64,5 +65,7 @@ vmag:magnetisation
 vmag:mag-m
 vmag:mean-mag-m
 
-screen:temperature
-screen:mean-mag-m
+#screen:temperature
+screen:time
+#screen:mean-mag-m
+screen:mag-m

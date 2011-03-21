@@ -106,12 +106,12 @@ int run(){
 			err::vexit();
 			break;
 		
-		case 2: // LLG Midpoint
+		case 2: 
 			if(vmpi::my_rank==0) std::cout << "Hysteresis-Loop..." << std::endl; 
 			program::hysteresis();
 			break;
 			
-		case 3: // Constrained Monte Carlo
+		case 3: 
 			if(vmpi::my_rank==0) std::cout << "Static-Hysteresis-Loop..." << std::endl; 
 			program::static_hysteresis();
 			break;
@@ -318,12 +318,14 @@ int integrate_mpi(int n_steps){
 		
 		case 2: // LLG Midpoint
 			for(int ti=0;ti<n_steps;ti++){
-				// Select CUDA version if supported
+			#ifdef MPICF
+			// Select CUDA version if supported
 				#ifdef CUDA
 					//sim::LLG_Midpoint_cuda_mpi();
 				#else
-					//sim::LLG_Midpoint_mpi();
+					sim::LLG_Midpoint_mpi();
 				#endif
+			#endif
 				// increment time
 				sim::time++;
 			}

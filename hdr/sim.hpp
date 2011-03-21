@@ -44,6 +44,7 @@ namespace sim{
 	extern int LLG_Heun_mpi();
 	extern int LLG_Heun_cuda();
 	extern int LLG_Midpoint();
+	extern int LLG_Midpoint_mpi();
 	extern int LLG_Midpoint_cuda();
 	extern int MonteCarlo();
 	extern int ConstrainedMonteCarlo();
