@@ -66,7 +66,6 @@ obj/data/grains.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
-obj/mpi/LLG_mpi.o \
 obj/mpi/LLGHeun-mpi.o \
 obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \
