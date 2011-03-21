@@ -74,44 +74,34 @@ int curie_temperature(){
 
 	// Perform Temperature Loop
 	while(sim::temperature<=sim::Tmax){
-				
-		// (re)-initialise mean m and counter (mean ought to be a vector[mat]...)
-		double meanT=0.0;
-		double count=0.0;
 
 		// Equilibrate system
 		sim::integrate(sim::equilibration_time);
 		
+		// Reset mean magnetisation counters
+		stats::mag_m_reset();
+		
+		// Reset start time
+		int start_time=sim::time;
+
 		// Simulate system
-		while(sim::time<sim::loop_time){
+		while(sim::time<sim::loop_time+start_time){
 			
 			// Integrate system
 			sim::integrate(sim::partial_time);
 		
-			// Calculate mag_m, mag
+			// Calculate magnetisation statistics
 			stats::mag_m();
-			meanT+=stats::total_mag_m_norm;
-			count+=1.0;
-		}
-		// Output to screen and file after each temperature
-		if(vmpi::my_rank==0){
-			std::cout << sim::temperature << "\t" << stats::total_mag_m_norm;
-			std::cout << "\t" << stats::total_mag_norm[0];
-			std::cout << "\t" << stats::total_mag_norm[1];
-			std::cout << "\t" << stats::total_mag_norm[2];
-			std::cout << "\t" << meanT/count;
-			std::cout << std::endl;
-			vmag << sim::temperature << "\t" << stats::total_mag_m_norm << "\t" << meanT/count << std::endl;
+
 		}
 		
-		//vout::pov_file();
+		// Output data
+		vout::data();
 		
 		// Increment temperature
 		sim::temperature+=sim::delta_temperature;
 		
 	} // End of temperature loop
-
-
 		
 	return EXIT_SUCCESS;
 }
