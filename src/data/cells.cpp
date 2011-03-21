@@ -187,7 +187,7 @@ namespace cells{
 		}
 		
 		
-	        cells:initialised=true;
+		cells::initialised=true;
 		
 		return EXIT_SUCCESS;
 	}
