@@ -40,24 +40,29 @@ sim:temperature=300.0
 sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
 sim:Hmin=-12.0 !T
-sim:equilibration-time=10000
-sim:partial-time=100
+sim:minimum-temperature=0;
+sim:maximum-temperature=700;
+sim:delta-temperature=10
+sim:equilibration-time=3000
+sim:partial-time=1
 sim:total-time=5000
-sim:loop-time=10000
+sim:loop-time=3000
 sim:dt=5.0E-15
 
 #--------------------------------
 # Program and integrator details
 #--------------------------------
-sim:program=Benchmark
+sim:program=Curie-Temperature
 sim:integrator=LLG-Midpoint
 #sim:integrator=LLG-Heun
+#sim:integrator=Monte-Carlo
 
 # data output
-vmag:time
 vmag:real-time
+vmag:temperature
 vmag:magnetisation
 vmag:mag-m
+vmag:mean-mag-m
 
-screen:time
-screen:mag-m
+screen:temperature
+screen:mean-mag-m
