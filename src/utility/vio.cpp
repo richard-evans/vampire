@@ -130,7 +130,7 @@ int read(string const filename){
 			char c=line.at(i);
 			last=i;
 			
-			// if character is not "." or "=" or "!" or "#" interpret as key
+			// if character is not ":" or "=" or "!" or "#" interpret as key
 			if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
 				key.push_back(c);
 			}
@@ -1985,7 +1985,7 @@ namespace vout{
 	
 	// Output Function 7
 	void mean_magm(std::ostream& stream){
-		stream << stats::total_mag_m_norm << "\t";
+		stream << stats::total_mean_mag_m_norm/stats::data_counter << "\t";
 	}
 	
 	// Output Function 8
