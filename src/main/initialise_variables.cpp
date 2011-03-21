@@ -23,7 +23,6 @@
 ///
 
 // Headers
-
 #include "errors.hpp"
 #include "demag.hpp"
 #include "voronoi.hpp"
@@ -138,7 +137,7 @@ int initialise(std::string const infile){
 	int iostat = vin::read(infile);
 	if(iostat==EXIT_FAILURE){
 		std::cerr << "Error - input file \'" << infile << "\' not found, exiting" << std::endl;
-		exit(1);
+		err::vexit();
 	}
 	
 	// Print out material properties
@@ -320,6 +319,12 @@ int set_derived_parameters(){
 	mp::dt = mp::dt_SI*mp::gamma_SI; // Must be set before Hth
 	mp::half_dt = 0.5*mp::dt;
 
+	// Ensure H vector is unit length
+	double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
+	sim::H_vec[0]*=mod_H;
+	sim::H_vec[1]*=mod_H;
+	sim::H_vec[2]*=mod_H;
+
 	// Calculate moment, magnetisation, and anisotropy constants
 	for(int mat=0;mat<mp::num_materials;mat++){
 		double V=mp::lattice_constant[0]*mp::lattice_constant[1]*mp::lattice_constant[2];
@@ -343,6 +348,17 @@ int set_derived_parameters(){
 		mp::material[mat].hamiltonian_type="generic";
 		mp::material[mat].one_oneplusalpha_sq			=-mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
 		mp::material[mat].alpha_oneplusalpha_sq			= mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
+		
+		// set initial spins to unit length
+		double sx = mp::material[mat].initial_spin[0];
+		double sy = mp::material[mat].initial_spin[1];
+		double sz = mp::material[mat].initial_spin[2];
+
+		double modS = 1.0/sqrt(sx*sx+sy*sy+sz*sz);
+		mp::material[mat].initial_spin[0]*=modS;
+		mp::material[mat].initial_spin[1]*=modS;
+		mp::material[mat].initial_spin[2]*=modS;
+			
 		for(int j=0;j<mp::num_materials;j++){
 			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
 		}
@@ -411,322 +427,4 @@ int set_derived_parameters(){
 	return EXIT_SUCCESS;
 }
 
-} // end of namespace mp //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-int initialise(std::string const infile){
-	using namespace mp;
-	
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){std::cout << "initialise_variables has been called" << std::endl;}
-
-	// Initialise system creation flags to zero
-	for (int i=0;i<10;i++){
-		system_creation_flags[i] = 0;
-	}
-	
-	//-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-	//  Flag options
-	//-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-	
-	//-------------------------------------------------------------------
-	// system_creation_flags[0] - Create system or read from file
-	//-------------------------------------------------------------------
-	//		0	Create system using code
-	//	x	1	Read system generation information from source file (not yet implemented)
-	//	x	2	Read system information from source file package (not yet implemented)
-	//-------------------------------------------------------------------
-	// system_creation_flags[1] - Set system particle shape
-	//-------------------------------------------------------------------
-	//		0	Full (use all atoms in lattice)
-	//	x	1	Cube
-	//		2	Cylinder
-	//	x	3	Ellipsinder
-	//		4	Sphere
-	//		5	Truncated Octahedron
-	//-------------------------------------------------------------------
-	// system_creation_flags[2] - Set system type
-	//-------------------------------------------------------------------
-	//		0	Particle
-// 	//		1	Particle Arra
-	//		2	Hexagonal Particle Array
-	//		3	Voronoi Granular Film
-	//		4	Grain Growth 2D Film
-	//-------------------------------------------------------------------
-	// system_creation_flags[3] - Set neighbourlist type
-	//-------------------------------------------------------------------
-	//		0	Explicit Jij(i,j,k)
-	//	x	1	Range    Jij(r)
-	//-------------------------------------------------------------------
-	// system_creation_flags[4] - Set Multilayer Flag
-	//-------------------------------------------------------------------
-	//		0	Single Material
-	//		1	Multilayer
-	//		2	Random Intermixing
-	system_creation_flags[0] = 0; // Create new system from scratch
-	system_creation_flags[1] = 5; // Set system particle shape
-	system_creation_flags[2] = 0; // Set system type
-	system_creation_flags[3] = 0; // Set neighbourlist type
-	system_creation_flags[4] = 0; // Set multilayer flag
-	
-	// output flags 
-	// output flag increment mask
-	
-	//===================================================================
-	//	Set hamiltonian Flags
-	//===================================================================
-	//
-	//-------------------------------------------------------------------
-	// hamiltonian_simulation_flags[0] - Calculate Exchange interaction
-	//-------------------------------------------------------------------
-	//		0	Disable Exchange Interaction
-	//		1	Enable Exchange Interaction
-	//-------------------------------------------------------------------
-	// hamiltonian_simulation_flags[1] - Calculate Anisotropy
-	//-------------------------------------------------------------------
-	//		0	Disable Global Anisotropy
-	//		1	Enable Global Uniaxial Anisotropy
-	//		2	Enable Global Cubic Anisotropy
-	//		3	Enable Local Anisotropy
-	//-------------------------------------------------------------------
-	// hamiltonian_simulation_flags[2] - Calculate Applied Fields
-	//-------------------------------------------------------------------
-	//		0	Disable Global Applied Field
-	//		1	Enable Global Applied Field
-	//		2	Enable Local Applied Field
-	//-------------------------------------------------------------------
-	// hamiltonian_simulation_flags[3] - Calculate Thermal Fields
-	//-------------------------------------------------------------------
-	//		0	Disable Thermal Fields
-	//		1	Enable Thermal Fields
-	//		2	Enable Local Thermal Fields
-	//-------------------------------------------------------------------
-	// hamiltonian_simulation_flags[4] - Calculate Dipolar Fields
-	//-------------------------------------------------------------------
-	//		0	Disable Dipolar Fields
-	//		1	Enable Dipolar Fields
-	//-------------------------------------------------------------------
-	// hamiltonian_simulation_flags[5-9] - Calculate Additional Fields
-	//-------------------------------------------------------------------
-	//		0	Disable Additional Fields
-	//		1	Enable Additional Field 1
-	//		2	Enable Additional Field 2 ...
-
-	sim::hamiltonian_simulation_flags[0] = 1;	// Exchange
-	sim::hamiltonian_simulation_flags[1] = 1;	// Anisotropy
-	sim::hamiltonian_simulation_flags[2] = 1;	// Applied
-	sim::hamiltonian_simulation_flags[3] = 1;	// Thermal
-	sim::hamiltonian_simulation_flags[4] = 0;	// Dipolar
-	sim::hamiltonian_simulation_flags[5] = 0;	// Extra Term 2?
-	sim::hamiltonian_simulation_flags[6] = 0;	// Extra Term 3?
-	sim::hamiltonian_simulation_flags[7] = 0;	// Extra Term 4?
-	sim::hamiltonian_simulation_flags[8] = 0;	// Extra Term 5?
-	sim::hamiltonian_simulation_flags[9] = 0;	// Extra Term 6?
-	
-	sim::total_time = 1;			// total simulation time (single run)
-	sim::loop_time = 0;			// time in loop, eg hysteresis, Tc
-	sim::partial_time=1;			// time between statistics collection
-	sim::equilibration_time=0;	// time for equilibration before main loop
-	sim::temperature = 300.0;
-
-	demag::demag_resolution=2;
-	demag::update_rate=10000;
-	//Integration parameters
-	//alpha = 0.1;
-	dt_SI = 1.0e-15;	// seconds
-	dt = dt_SI*material_parameters::gamma_SI; // Must be set before Hth
-	half_dt = 0.5*dt;
-
-
-	//System Parameters
-	//lattice_constant[0] = 2.5;
-	//lattice_constant[1] = 2.5;
-	//lattice_constant[2] = 2.5;
-
-	lattice_constant[0] = 3.54;
-	lattice_constant[1] = 3.54;
-	lattice_constant[2] = 3.54;
-
-	particle_creation_parity=1;
-
-	
-	crystal_structure = "fcc";
-	hamiltonian_type = "generic";
-	atomic_element[0]="Co ";
-	atomic_element[1]="Gd ";
-	
-	system_dimensions[0] = 110.0;
-	system_dimensions[1] = 110.0;
-	system_dimensions[2] = 110.0;
-	
-	particle_scale   = 80.1;
-	particle_spacing = 10.0;
-
-	//----------------------------------------------------------
-	// Multilayer Variables
-	//----------------------------------------------------------
-	multilayers::num_layers=1;
-	multilayers::layer_dir=2; // x,y,z
-	multilayers::interface_roughness=0.0;
-	multilayers::spin_glass_density=0.0;
-	multilayers::layer_limits_array[0]=0.0;
-	multilayers::layer_limits_array[1]=0.2;
-	multilayers::layer_limits_array[2]=0.6;
-	multilayers::layer_limits_array[3]=0.8;
-	//multilayers::layer_is_continuous[1]=true;
-	//----------------------------------------------------------
-	// Voronoi Variables
-	//----------------------------------------------------------
-	create_voronoi::voronoi_sd=0.0;
-	create_voronoi::parity=0;
-	//------------------------------------------------------------------------------
-	// MPI Mode
-	//------------------------------------------------------------------------------
-	// 0 - Serial (Identical code on all nodes)
-	// 1 - Parallel Stats (Same initialisation, different RNG seed, MPI statistics)
-	// 2 - Parallel Decomposition (Different initialisation, code, full comms,etc)
-	mpi_generic::mpi_mode=2;
-	mpi_create_variables::mpi_interaction_range=4; // Unit cells
-	mpi_create_variables::mpi_comms_identify=false;
-
-	//------------------------------------------------------------------------------
-	// Material Definitions
-	//------------------------------------------------------------------------------
-	num_materials=1;
-	material.resize(num_materials);
-
-	//-------------------------------------------------------
-	// Material 0
-	//-------------------------------------------------------
-	material[0].name="CoPt";
-	material[0].alpha=1.0;
-	material[0].Jij_matrix_SI[0]=-3.0e-21;
-	material[0].Jij_matrix_SI[1]=-1.4e-21;
-	material[0].mu_s_SI=1.5*9.27400915e-24;
-	material[0].Ku_SI=-3.58838e-23;
-	material[0].gamma_rel=1.0;
-	material[0].hamiltonian_type="generic";
-	material[0].element="Ag ";
-	//-------------------------------------------------------
-	// Material 1
-	//-------------------------------------------------------
-	if(num_materials>1){
-	material[1].name="Exchange Layer";
-	material[1].alpha=1.0;
-	material[1].Jij_matrix_SI[0]=-1.4e-21; // RE-TM
-	material[1].Jij_matrix_SI[1]=-3.0e-21;  // RE-RE
-	//material[1].Jij_matrix_SI[2]=1.6e-21;
-	material[1].mu_s_SI=1.5*9.27400915e-24;
-	material[1].Ku_SI=-0.807246e-25;
-	material[1].gamma_rel=1.0;
-	material[1].hamiltonian_type="generic";
-	material[1].element="Li ";
-	}
-	//-------------------------------------------------------
-	// Material 2
-	//-------------------------------------------------------
-	if(num_materials>2){
-	material[2].name="Spin Glass";
-	material[2].alpha=0.1;
-	material[2].Jij_matrix_SI[0]=1.6e-21;
-	material[2].Jij_matrix_SI[1]=1.6e-21;
-	material[2].Jij_matrix_SI[2]=-1.6e-21;
-	material[2].mu_s_SI=1.407e-23;
-	material[2].Ku_SI=4.644e-23;
-	material[2].gamma_rel=1.0;
-	material[2].hamiltonian_type="generic";
-	material[2].element="Fe ";
-	}
-	//print_mat();
-	
-	// Open main input file
-	int iostat = vin::read(infile);
-	if(iostat==EXIT_FAILURE){
-		std::cerr << "Error - input file \'" << infile << "\' not found, exiting" << std::endl;
-		exit(1);
-	}
-	
-	
-	lattice_space_conversion[0] = lattice_constant[0]*0.5;
-	lattice_space_conversion[1] = lattice_constant[1]*0.5*0.333333333333333;
-	lattice_space_conversion[2] = lattice_constant[2]*0.5;
-
-	// Open material files
-	
-	
-	
-	
-	//----------------------------------
-	//Derived System Parameters
-	//----------------------------------
-
-	if(crystal_structure=="sc") num_nearest_neighbours = 6;
-	if(crystal_structure=="fcc") num_nearest_neighbours = 12;
-	if(crystal_structure=="rs") num_nearest_neighbours = 18;
-	if(num_nearest_neighbours==0){
-		 std::cout << "Error in determining num_nearest_neighbours for unknown crystal type\'" << crystal_structure << "\'" << std::endl;
-		 exit(1);
-	}
-	
-	if(hamiltonian_type=="generic")	hamiltonian_num_neighbours = num_nearest_neighbours;
-	if(hamiltonian_num_neighbours==0){
-		 std::cout << "Error in determining hamiltonian_num_neighbours - unknown Hamiltonian type!" << std::endl;
-		 exit(1);
-	}
-
-	// Set derived material parameters
-	for(int mat=0;mat<material_parameters::num_materials;mat++){
-		material[mat].num_nearest_neighbours		= num_nearest_neighbours;
-		material[mat].hamiltonian_num_neighbours	= hamiltonian_num_neighbours;
-		material[mat].one_oneplusalpha_sq			=-material[mat].gamma_rel/(1.0+material[mat].alpha*material[mat].alpha);
-		material[mat].alpha_oneplusalpha_sq			= material[mat].alpha*material[mat].one_oneplusalpha_sq;
-		for(int j=0;j<num_materials;j++){
-			material[mat].Jij_matrix[j]				= material[mat].Jij_matrix_SI[j]/material[mat].mu_s_SI;
-		}
-		material[mat].Ku									= material[mat].Ku_SI/material[mat].mu_s_SI;;
-		material[mat].H_th_sigma						= sqrt(2.0*material[mat].alpha*1.3806503e-23/
-																  (material[mat].mu_s_SI*material[mat].gamma_rel*dt));
-	}
-
-	//exit(0);
-
-	int_system_dimensions[0] = 2*iround(system_dimensions[0]/lattice_constant[0]);
-	int_system_dimensions[1] = 6*iround(system_dimensions[1]/lattice_constant[1]);
-	int_system_dimensions[2] = 2*iround(system_dimensions[2]/lattice_constant[2]);
-
-	//----------------------------------
-	// Enable/Disable Error Checking
-	//----------------------------------
-
-	err::check=false;
-	//err::check=true;
-	
-	// Initialise random number generator
-	
-	mtrandom::grnd.seed(1234);
-	//MTRand(1234);
-	//MTRand grnd;
-	//for(int i=0;i<10;i++){
-	//	std::cout << drand() << std::endl;
-	//}
-	//exit (0);
-return 0;
-}
-*/
+} // end of namespace mp
