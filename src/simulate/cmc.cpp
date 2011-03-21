@@ -219,13 +219,11 @@ int ConstrainedMonteCarlo(){
 	double  spin2_init_mvd[3];
 	double  spin2_fin_mvd[3];
 
-	double Mz_other;
 	double M_other[3];
 	double Mz_old;
 	double Mz_new;
 
-	//double random_number1,random_number2;
-	double ran1sq,ran2sq,sqrt_ran;
+	double sqrt_ran;
 
 	double probability;
 	double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);

@@ -75,9 +75,6 @@ int LLG_Midpoint(){
 	
 	// Local variables for system integration
 	const int num_atoms=atoms::num_atoms;
-	double xyz[3];		// Local Delta Spin Components
-	double S_new[3];	// New Local Spin Moment
-	double mod_S;		// magnitude of spin moment 
 
 	// Store initial spin positions		
 	for(int atom=0;atom<num_atoms;atom++){
