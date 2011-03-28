@@ -18,6 +18,9 @@
 ///=====================================================================================
 ///
 
+// Standard Libraries
+#include <cstdlib>
+
 // Vampire Header files
 #include "create.hpp"
 #include "errors.hpp"

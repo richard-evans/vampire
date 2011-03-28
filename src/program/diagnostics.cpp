@@ -20,6 +20,7 @@
 
 // Standard Libraries
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 
 // Vampire Header files
