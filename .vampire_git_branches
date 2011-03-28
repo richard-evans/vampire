@@ -7,7 +7,8 @@ new: - completed features for inclusion in release after next
 new is a superset of master is a superset of maint. NEVER merge from maint to master or master to new!
 
 New ideas should be developed in a dedicated branch forked from master for current release topics, and from new for release after next.
- 
+----------------------------------------------------------------------------------------------------------------------------------------
+
 git checkout -b new_feature_name
 git push origin new_feature_name
 
@@ -28,4 +29,12 @@ o---o---o---o---o---o--o master -------------o
 		  \                                /
          \                              /
 			 o---o---o----o new ----------o
+
+Checkout remote branch to work on locally
+---------------------------------------------------------------------------------------------------------------------
+By default git checks out master branch. To checkout another branch from the repository first create a 
+local branch and then link to the original: 
+
+git checkout -b local-name origin/remote-name
+
 
