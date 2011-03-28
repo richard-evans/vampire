@@ -1,3 +1,25 @@
+///
+/// @file
+/// @brief Contains cells namespace and asssociated functions
+///
+/// @details Cells discretise the system into small blocks suitable for outputting 
+///          magnetisation data for large systems, and also for calculating demag fields
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section info File Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    28/03/2011
+/// @internal
+///	Created:		11/11/2010
+///	Revision:	  ---
+///=====================================================================================
+///
+
+// Vampire Header files
 #include "atoms.hpp"  
 #include "cells.hpp"
 #include "material.hpp"
@@ -5,6 +27,7 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
+// System header files
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -13,10 +36,8 @@ namespace cells{
 	
 	int num_cells=0;
 	int size;
-	int update_rate;
-	int update_counter;
 
-  bool initialised=false;
+	bool initialised=false;
 
 	std::vector <int> num_atoms_in_cell;
 
@@ -31,17 +52,34 @@ namespace cells{
 	std::vector <double> x_field_array;
 	std::vector <double> y_field_array;
 	std::vector <double> z_field_array;
-
-	// Function to initialise cells
+	
+/// @brief Cell initialiser function
+///
+/// @details Determines number of cells, assigns atoms to cells, and sets up cell arrays
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    28/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		05/02/2011
+///	Revision:	  ---
+///=====================================================================================
+///
 	int initialise(){
 		// check calling of routine if error checking is activated
 		if(err::check==true) std::cout << "cells::initialise has been called" << std::endl;
 		
 		// set initial cell variables
 		cells::size=2; // In units of a
-		cells::update_rate=10; // In timesteps
 		cells::num_cells=0;
-		cells::update_counter=0;
 		
 		// determine number of cells in each direction
 		unsigned int ncellx = static_cast<unsigned int>(ceil((mp::system_dimensions[0]/mp::lattice_constant[0])/double(cells::size)));
@@ -52,9 +90,9 @@ namespace cells{
 		cells::num_cells=ncellx*ncelly*ncellz;
 		
 		if(vmpi::my_rank==0){
-		std::cout << "Cells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
-		std::cout << "Total number of cells: " << cells::num_cells << std::endl;
-		std::cout << "Memory required for cell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
+			std::cout << "Cells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
+			std::cout << "Total number of cells: " << cells::num_cells << std::endl;
+			std::cout << "Memory required for cell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
 		}
 		// Determine number of cells in x,y,z
 		const int d[3]={ncellx,ncelly,ncellz};
@@ -64,7 +102,7 @@ namespace cells{
 		
 		// Declare array for create space for 3D supercell array
 		int*** supercell_array;
-		std::cout << "Memory required for cell list calculation:" << 8.0*double(d[0])*double(d[1])*double(d[2])/1.0e6 << " MB" << std::endl;
+		//std::cout << "Memory required for cell list calculation:" << 8.0*double(d[0])*double(d[1])*double(d[2])/1.0e6 << " MB" << std::endl;
 		try{supercell_array=new int**[d[0]];
 			for(int i=0; i<d[0] ; i++){
 				supercell_array[i]=new int*[d[1]];
@@ -157,22 +195,22 @@ namespace cells{
 			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::z_coord_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
 		#endif
 		
-		if(vmpi::my_rank==0){
-		vinfo << "=========================================================================" << std::endl;
-		vinfo << "Number of atoms/cell: cell number, num atoms, coord" << std::endl;
-		vinfo << "=========================================================================" << std::endl;
-		}
+		//if(vmpi::my_rank==0){
+			//vinfo << "=========================================================================" << std::endl;
+			//vinfo << "Number of atoms/cell: cell number, num atoms, coord" << std::endl;
+			//vinfo << "=========================================================================" << std::endl;
+		//}
 
 		// Now find mean coordinates
 		for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
 			cells::x_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
 			cells::y_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
 			cells::z_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
-			if(vmpi::my_rank==0){
-			vinfo << local_cell << "\t" << cells::num_atoms_in_cell[local_cell] << "\t";
-			vinfo << cells::x_coord_array[local_cell] << "\t" << cells::y_coord_array[local_cell];
-			vinfo << "\t" << cells::z_coord_array[local_cell] << "\t" << std::endl;
-			}
+			//if(vmpi::my_rank==0){
+			//vinfo << local_cell << "\t" << cells::num_atoms_in_cell[local_cell] << "\t";
+			//vinfo << cells::x_coord_array[local_cell] << "\t" << cells::y_coord_array[local_cell];
+			//vinfo << "\t" << cells::z_coord_array[local_cell] << "\t" << std::endl;
+			//}
 		}
 
 		//Set number of atoms in cell to zero
@@ -186,18 +224,31 @@ namespace cells{
 			cells::num_atoms_in_cell[local_cell]++;
 		}
 		
-		
 		cells::initialised=true;
 		
 		return EXIT_SUCCESS;
 	}
-
 	
-	
-	
-	int output_mag(std::ofstream&);
-	
-
+/// @brief Cell magnetisation function
+///
+/// @details Determines moment in each cell (J/T)
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    28/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		05/02/2011
+///	Revision:	  ---
+///=====================================================================================
+///
 int mag() {
 
   // Check for initialised arrays
@@ -228,16 +279,7 @@ int mag() {
   }
 
 #ifdef MPICF
-  // reduce (sum) arrays to root node
-  //MPI::COMM_WORLD.Reduce( MPI_IN_PLACE, &(cells::x_mag_array[0]), cells::num_cells,MPI_DOUBLE, MPI_SUM, 0 );
-  //MPI::COMM_WORLD.Reduce( MPI_IN_PLACE, &(cells::y_mag_array[0]), cells::num_cells,MPI_DOUBLE, MPI_SUM, 0 );
-  //MPI::COMM_WORLD.Reduce( MPI_IN_PLACE, &(cells::z_mag_array[0]), cells::num_cells,MPI_DOUBLE, MPI_SUM, 0 );
-
-  // broadcast result of reduction from root node
-  //MPI::COMM_WORLD.Bcast( &(cells::x_mag_array[0]), cells::num_cells, MPI_DOUBLE, 0 );
-  //MPI::COMM_WORLD.Bcast( &(cells::y_mag_array[0]), cells::num_cells, MPI_DOUBLE, 0 );
-  //MPI::COMM_WORLD.Bcast( &(cells::z_mag_array[0]), cells::num_cells, MPI_DOUBLE, 0 );
-
+  // Reduce magnetisation on all nodes
   MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::x_mag_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
   MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::y_mag_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
   MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::z_mag_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
