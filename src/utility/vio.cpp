@@ -782,6 +782,16 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::program=4;
 				return EXIT_SUCCESS;
 			}
+			test="Field-Cool";
+			if(value==test){
+				sim::program=5;
+				return EXIT_SUCCESS;
+			}
+			test="Two-Temperature-Pulse";
+			if(value==test){
+				sim::program=6;
+				return EXIT_SUCCESS;
+			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"Benchmark\"" << std::endl;
@@ -789,6 +799,8 @@ int match_sim(string const word, string const value, string const unit, int cons
 				std::cerr << "\t\"Hysteresis-Loop\"" << std::endl;
 				std::cerr << "\t\"Static-Hysteresis-Loop\"" << std::endl;
 				std::cerr << "\t\"Curie-Temperature\"" << std::endl;
+				std::cerr << "\t\"Field-Cool\"" << std::endl;
+				std::cerr << "\t\"Two-Temperature-Pulse\"" << std::endl;
 				err::vexit();
 			}
 		}
@@ -985,6 +997,20 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
+		test="equilibration-temperature";
+		if(word==test){
+			double T=atof(value.c_str());
+			// Test for valid range
+			if((T>=0.0) && (T<1.0E10)){
+				sim::Teq=T;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
 		test="temperature";
 		if(word==test){
 			double T=atof(value.c_str());
@@ -1062,6 +1088,25 @@ int match_sim(string const word, string const value, string const unit, int cons
 			string str="field";
 			if(unit_type==str){
 				sim::Hmax=H;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="Heq";
+		if(word==test){
+			double H=atof(value.c_str());
+			string unit_type="field";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,H,unit_type);
+			}
+			string str="field";
+			if(unit_type==str){
+				sim::Heq=H;
 				return EXIT_SUCCESS;
 			}
 			else{
