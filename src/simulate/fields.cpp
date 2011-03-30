@@ -29,7 +29,6 @@ int calculate_cubic_anis_fields(const int,const int);
 int calculate_applied_fields(const int,const int);
 int calculate_thermal_fields(const int,const int);
 int calculate_dipolar_fields(const int,const int);
-int demag_field_update();
 
 int calculate_spin_fields(const int start_index,const int end_index){
 	//======================================================
@@ -302,7 +301,7 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
 	
 	// Check for update of dipolar fields
 	//if(demag::update_counter%demag::update_rate==0){
-		demag_field_update();
+		demag::update();
 		//demag::update_counter=0;
 		//}
 

@@ -882,6 +882,38 @@ int match_sim(string const word, string const value, string const unit, int cons
 				exit(1);
 			}
 		}
+		//-------------------------------------------------------------------
+		test="fast-dipolar";
+		if(word==test){
+			test="true";
+			if(value==test){
+				demag::fast=true;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				demag::fast=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
+		test="dipolar-update-rate";
+		if(word==test){
+			int dpur=atoi(value.c_str());
+			// Test for valid range
+			if(dpur>=1){
+				demag::update_rate=dpur;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be greater than zero" << std::endl;
+				err::vexit();
+			}
+		}
 		//--------------------------------------------------------------------
 		test="dt";
 		if(word==test){

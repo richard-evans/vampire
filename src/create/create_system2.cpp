@@ -20,11 +20,15 @@
 ///	Revision:	  ---
 ///=====================================================================================
 ///
+// Standard Headers
 #include <iostream>
 #include <fstream>
+
+// Vampire headers
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "demag.hpp"
 #include "grains.hpp"
 #include "material.hpp"
 #include "vmpi.hpp"
@@ -133,6 +137,7 @@ int create(){
 
 	grains::set_properties();
 	cells::initialise();
+	demag::init();
 	
 	//=============================================================
 	//      Generate system files for storage

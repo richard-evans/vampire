@@ -1,12 +1,46 @@
-//====================================================================================================
-//
-//       				                    		Demag
-//
-//  			 					Subroutines to setup and calculate demag fields
-//	 
-//												Version 1.0 R Evans 18/09/2009
-//
-//==================================================================================================== 
+///
+/// @file
+/// @brief Contains demag namespace and asssociated functions
+///
+/// @details Demag between ceels uses the following format:
+///          For each cell m = SUM(S.mu_s)
+///
+///         mu_o     (  3.(m.r_hat)r_hat - m       m  )                4*pi e-7
+/// H = ---------- . ( ------------------------ - --- ),   prefactor = ---------- = e+23
+///       a^3        (         |r|^3               3  )                4*pi e-30
+///
+///	An optional performaance optimisation can be made with the following matrix multiplication.
+///	This is enable by setting the flag demag::fast=true
+///
+///	H = prem * rij_matrix . m
+///
+///   rij_matrix = [ (3rxrx-1)/rij3 -1/3    3rxry                3rxrz                ]
+///                [ 3rxry-1                (3ryry-1)/rij3 -1/3  3ryrz                ]
+///                [ 3rxrz-1                3ryrz                (3rzrz-1)/rij3 -1/3) ]
+///
+///   The matrix is symmetric, and so only 6 numbers are needed:
+///
+///       rij_matrix[0] = xx
+///       rij_matrix[1] = xy = yx
+///       rij_matrix[2] = xz = zx
+///
+///       rij_matrix[3] = yy
+///       rij_matrix[4] = yz = zy
+///       rij_matrix[5] = zz
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section info File Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    28/03/2011
+/// @internal
+///	Created:		18/09/2009
+///	Revision:	  ---
+///=====================================================================================
+///
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "material.hpp"
@@ -22,422 +56,331 @@
 
 namespace demag{
 
-	int num_demag_cells=0;
-	int demag_resolution=5;
-	int update_rate=100;
-	int update_counter=0;
-  int update_time=-1;
-
-	const double prefactor=4.0*M_PI*1.0e+23;
-
-  std::vector<int> atom_demag_array(0);
-
-  std::vector<double> demag_spin_x_array(0);
-  std::vector<double> demag_spin_y_array(0);
-  std::vector<double> demag_spin_z_array(0);
-
-  std::vector<double> demag_coord_x_array(0);
-  std::vector<double> demag_coord_y_array(0);
-  std::vector<double> demag_coord_z_array(0);
-
-  std::vector<double> demag_field_x_array(0);
-  std::vector<double> demag_field_y_array(0);
-  std::vector<double> demag_field_z_array(0);
-
-	double** rij_matrix=NULL;
-
-	bool demag_set=false;
-
-}
-
-int set_demag(){
-  /*
-	//--------------------------------------------------------------------
-	//
-	//											set_demag
-	//
-	//				Function to initialise demag arrays and variables
-	//
-	//							R F Evans 21/09/09
-	//	
-	//--------------------------------------------------------------------
-
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){
-		std::cout << "set_demag has been called " << vmpi::my_rank << std::endl;
-	}
-
-	//----------------------------------------------------------
-	// If already initialised print warning and do nothing
-	//----------------------------------------------------------
-	if(demag::demag_set==true){
-		std::cerr << "Warning, demag already initialised, ignoring re-initialisation" << std::endl; 
-	}
-
-	//----------------------------------------------------------
-	// If not initialised then set up arrays
-	//----------------------------------------------------------
-	if(demag::demag_set==false){
-		vinfo << "=========================================================================" << std::endl;
-		vinfo << " Setting up Demag Fields using Resolution = " << demag::demag_resolution << std::endl;
-		vinfo << "=========================================================================" << std::endl;
-		//----------------------------------------------------------
-		// Calculate number of demag cells
-		//----------------------------------------------------------
-		//std::cout << material_parameters::int_system_dimensions[0] << "\t" << material_parameters::int_system_dimensions[1] << "\t" << material_parameters::int_system_dimensions[2] << std::endl;
-		if(demag::demag_resolution>0){
-			int nx_cell = ceil(double(material_parameters::int_system_dimensions[0])/double(2*demag::demag_resolution));
-			int ny_cell = ceil(double(material_parameters::int_system_dimensions[1])/double(6*demag::demag_resolution));
-			int nz_cell = ceil(double(material_parameters::int_system_dimensions[2])/double(2*demag::demag_resolution));
-			demag::num_demag_cells=nx_cell*ny_cell*nz_cell;
-			vinfo << "Number of demag cells (nx,ny,nz,total)\t" << nx_cell << "\t" << ny_cell << "\t"; 
-			vinfo << nz_cell << "\t" << demag::num_demag_cells << std::endl;
-		}
-		else{
-			demag::num_demag_cells=atoms::num_atoms; //check correct for mpi?
-			vinfo << "Number of demag cells (= num_atoms)\t" << demag::num_demag_cells << std::endl;
-		}
-		//----------------------------------------------------------
-		// Resize arrays for demag calculation
-		//----------------------------------------------------------
-		demag::atom_demag_array.resize(atoms::num_atoms);
-
-		demag::demag_spin_x_array.resize(demag::num_demag_cells,0.0);
-		demag::demag_spin_y_array.resize(demag::num_demag_cells,0.0);
-		demag::demag_spin_z_array.resize(demag::num_demag_cells,0.0);
-
-		demag::demag_coord_x_array.resize(demag::num_demag_cells,0.0);
-		demag::demag_coord_y_array.resize(demag::num_demag_cells,0.0);
-		demag::demag_coord_z_array.resize(demag::num_demag_cells,0.0);
-
-		demag::demag_field_x_array.resize(demag::num_demag_cells,0.0);
-		demag::demag_field_y_array.resize(demag::num_demag_cells,0.0);
-		demag::demag_field_z_array.resize(demag::num_demag_cells,0.0);
-
-		atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);
-		atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);
-		atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);
-
-		demag::update_counter=0;	// Always recalculate first time
-
-		//-----------------------------------------------------------------------------------------
-		// Find which atoms are in which demag cell and calculate mean coordinates for each cell
-		//-----------------------------------------------------------------------------------------
-		if(demag::demag_resolution>0){
-			const int nx_cell = ceil(double(material_parameters::int_system_dimensions[0])/double(2*demag::demag_resolution));
-			const int ny_cell = ceil(double(material_parameters::int_system_dimensions[1])/double(6*demag::demag_resolution));
-			const int nz_cell = ceil(double(material_parameters::int_system_dimensions[2])/double(2*demag::demag_resolution));
-			// Allocate 3D demag array
-			int*** three_D_coord_array;
-			try{three_D_coord_array=new int**[nx_cell];
-				for(int i=0; i<nx_cell ; i++){
-					three_D_coord_array[i]=new int*[ny_cell];
-					for(int j=0; j<ny_cell ; j++){
-						three_D_coord_array[i][j]=new int[nz_cell];
-					}
-				}
-			}
-			catch(...){std::cout << "error allocating 3D coord array in demag setup" << std::endl;exit(1);}
+	bool fast=false;
 	
-			// Populate cell numbers
-			int cell=0;
-			for(int i=0; i<nx_cell; i++){
-				for(int j=0; j<ny_cell ; j++){
-					for(int k=0; k<nz_cell ; k++){ 
-						three_D_coord_array[i][j][k] = cell;
-						cell++;
-					}
+	int update_rate=100; /// timesteps between updates
+	int update_time=-1; /// last update time
+
+	const double prefactor=1.0e+23;
+
+	std::vector <std::vector < double > > rij_xx;
+	std::vector <std::vector < double > > rij_xy;
+	std::vector <std::vector < double > > rij_xz;
+
+	std::vector <std::vector < double > > rij_yy;
+	std::vector <std::vector < double > > rij_yz;
+	std::vector <std::vector < double > > rij_zz;
+	
+/// @brief Function to set r_ij matrix values
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    28/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		28/03/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+void init(){
+
+	// check for calling of routine
+	if(err::check==true) std::cerr << "demag::set_rij_matrix has been called " << vmpi::my_rank << std::endl;
+	
+	if(demag::fast==true) {
+		
+		// Check memory requirements and print to screen
+		std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells*cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+		
+		// allocate arrays to store data
+		for(int lc=0;lc<cells::num_local_cells; lc++){
+			
+			demag::rij_xx.push_back(std::vector<double>());
+			demag::rij_xx[lc].resize(cells::num_cells,0.0);
+
+			demag::rij_xy.push_back(std::vector<double>());
+			demag::rij_xy[lc].resize(cells::num_cells,0.0);
+
+			demag::rij_xz.push_back(std::vector<double>());
+			demag::rij_xz[lc].resize(cells::num_cells,0.0);
+
+			demag::rij_yy.push_back(std::vector<double>());
+			demag::rij_yy[lc].resize(cells::num_cells,0.0);
+
+			demag::rij_yz.push_back(std::vector<double>());
+			demag::rij_yz[lc].resize(cells::num_cells,0.0);
+
+			demag::rij_zz.push_back(std::vector<double>());
+			demag::rij_zz[lc].resize(cells::num_cells,0.0);
+
+		}
+
+		// calculate matrix prefactors
+		std::cout << "Precalculating rij matrix for demag calculation... ";
+		
+		// loop over local cells
+		for(int lc=0;lc<cells::num_local_cells;lc++){
+			
+			int i = cells::local_cell_array[lc];
+			
+			// Loop over all other cells to calculate contribution to local cell 
+			for(int j=0;j<cells::num_cells;j++){
+				if(i!=j){
+				
+					const double rx = cells::x_coord_array[j]-cells::x_coord_array[i];
+					const double ry = cells::y_coord_array[j]-cells::y_coord_array[i];
+					const double rz = cells::z_coord_array[j]-cells::z_coord_array[i];
+
+					const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);
+					
+					const double ex = rx*rij;
+					const double ey = ry*rij;
+					const double ez = rz*rij;
+
+					const double rij3 = rij*rij*rij;
+
+					rij_xx[i][j] = demag::prefactor*((3.0*ex*ex - 1.0)*rij3);
+					rij_xy[i][j] = demag::prefactor*(3.0*ex*ey)*rij3;
+					rij_xz[i][j] = demag::prefactor*(3.0*ex*ez)*rij3;
+
+					rij_yy[i][j] = demag::prefactor*((3.0*ey*ey - 1.0)*rij3);
+					rij_yz[i][j] = demag::prefactor*(3.0*ey*ez)*rij3;
+					rij_zz[i][j] = demag::prefactor*((3.0*ez*ez - 1.0)*rij3);
+
 				}
 			}
-			if(cell!=demag::num_demag_cells){
-				std::cerr << "error numbering demag cells, exiting" << std::endl;
-				exit(1);
-			} 
-			for(int atom=0;atom<atoms::num_atoms;atom++){
-				int cx=int(double(atoms::x_coord_array[atom])/double(2*demag::demag_resolution));
-				int cy=int(double(atoms::y_coord_array[atom])/double(6*demag::demag_resolution));
-				int cz=int(double(atoms::z_coord_array[atom])/double(2*demag::demag_resolution));
-				demag::atom_demag_array[atom]=three_D_coord_array[cx][cy][cz];
-			}
-			// Deallocate space for 3D atom coord array
-			try{for(int i=0; i<nx_cell ; i++){
-					for(int j=0; j<ny_cell ;j++){
-						delete [] three_D_coord_array[i][j];
-					}
-					delete [] three_D_coord_array[i];
-				}
-				delete [] three_D_coord_array;
-				three_D_coord_array=NULL;
-			}
-			catch(...){std::cerr << "error deallocating 3D coord array" << std::endl; exit(1);}
-			// Calculate number of spins per cell (initialised to zero)
-			std::vector<int> num_spins_per_cell(0,demag::num_demag_cells);
-			for(int atom=0;atom<atoms::num_atoms;atom++){
-				const int cell = demag::atom_demag_array[atom];
-				num_spins_per_cell[cell]++;
-				// Calculate sum of coordinates for each cell
-				demag::demag_coord_x_array[cell]+=double(atoms::x_coord_array[atom]);
-				demag::demag_coord_y_array[cell]+=double(atoms::y_coord_array[atom]);
-				demag::demag_coord_z_array[cell]+=double(atoms::z_coord_array[atom]);
-			}
-			// Calculate mean coordinates and output cell data to vinfo
-			vinfo << "=========================================================================" << std::endl;
-			vinfo << "Number of atoms/cell: cell number, num atoms, coord" << std::endl;
-			vinfo << "=========================================================================" << std::endl;
-			for(int cell=0;cell<demag::num_demag_cells;cell++){
-				demag::demag_coord_x_array[cell]*=material_parameters::lattice_space_conversion[0];
-				demag::demag_coord_y_array[cell]*=material_parameters::lattice_space_conversion[1];
-				demag::demag_coord_z_array[cell]*=material_parameters::lattice_space_conversion[2];
-				demag::demag_coord_x_array[cell]/=double(num_spins_per_cell[cell]);
-				demag::demag_coord_y_array[cell]/=double(num_spins_per_cell[cell]);
-				demag::demag_coord_z_array[cell]/=double(num_spins_per_cell[cell]);
-				vinfo << cell << "\t" << num_spins_per_cell[cell] << "\t";
-				vinfo << demag::demag_coord_x_array[cell] << "\t" << demag::demag_coord_y_array[cell];
-				vinfo << "\t" << demag::demag_coord_z_array[cell] << "\t" << std::endl;
-			}
-		}
-		else{
-			for(int atom=0;atom<atoms::num_atoms;atom++){
-				demag::atom_demag_array[atom]=atom; //check correct for mpi?
-				demag::demag_coord_x_array[atom]=double(atoms::x_coord_array[atom])*material_parameters::lattice_space_conversion[0];
-				demag::demag_coord_y_array[atom]=double(atoms::y_coord_array[atom])*material_parameters::lattice_space_conversion[1];
-				demag::demag_coord_z_array[atom]=double(atoms::z_coord_array[atom])*material_parameters::lattice_space_conversion[2];
-			}
-		}
-		//         mu_o       3.(m.r_hat)r_hat - m                  1.0 e-7
-		// H = ---------- . ------------------------,   prefactor = ------- = 1.0 e+23
-		//      4*pi a^3              |r|^3                        1.0 e-30
-		//
-		// Requires m = SUM(S.mu_s)
-		//------------------------------------------------------------------
-		// Attempt allocation of rij_matrix 
-		//------------------------------------------------------------------
-		vinfo << "=========================================================================" << std::endl;
-		vinfo << "  Estimated memory requirements for rij_matrix: " << double(sizeof(double))*double(demag::num_demag_cells)*double(demag::num_demag_cells)/1.0e6 << " MB" << std::endl;
-		bool super_allocation_success=true;
-		bool sub_allocation_success=true;
-		// Attempt allocation of array of pointers
-		try{demag::rij_matrix=new double*[demag::num_demag_cells];}
-		catch(...){
-			super_allocation_success=false;
-		}
-		if(super_allocation_success==true){
-			// Attempt allocation of internal array of pointers
-			for(int i=0;i<demag::num_demag_cells;i++){
-				try{demag::rij_matrix[i]=new double[demag::num_demag_cells];}
-				catch(...){
-					sub_allocation_success=false;
-					break;
-				}
-			}
-		}
-		else{
-			std::cerr << "Warning - insufficient memory for rij_matrix for demag fields" << std::endl;
-			vinfo << "  Insufficient memory for rij matrix. This will severely impact performance of the code." << std::endl;
-			vinfo << "  Try increasing the demag supercell size from " << demag::demag_resolution << " to reduce memory requirements." << std::endl;
-			try{delete[] demag::rij_matrix; demag::rij_matrix=NULL;}
-			catch(...){std::cerr << "Error deallocating rij_matrix, exiting" << std::endl; exit(1);}
 		}
 		
-		// If allocation failed print error message and clean up memory
-		if(sub_allocation_success==false){
-			std::cerr << "Warning - insufficient memory for rij_matrix for demag fields" << std::endl;
-			vinfo << "Insufficient memory for rij matrix. This will severely impact performance of the code." << std::endl;
-			vinfo << "Try increasing the demag supercell size from " << demag::demag_resolution << " to reduce memory requirements." << std::endl;
-			for(int i=0;i<demag::num_demag_cells;i++){
-				try{if(demag::rij_matrix[i]!=NULL) delete[] demag::rij_matrix[i]; demag::rij_matrix[i]=NULL;}
-				catch(...){std::cerr << "Error deallocating rij_matrix, exiting" << std::endl; exit(1);}
-			}
-			try{delete[] demag::rij_matrix; demag::rij_matrix=NULL;}
-			catch(...){std::cerr << "Error deallocating rij_matrix, exiting" << std::endl; exit(1);}
+		std::cout << "Done!" << std::endl;
+	}
+}
+	
+/// @brief Function to recalculate demag fields using fast update method
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    28/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		28/03/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+inline void fast_update(){
+	
+	// check for callin of routine
+	if(err::check==true) std::cerr << "demag::fast_update has been called " << vmpi::my_rank << std::endl;
+
+	const double inv_three_cell_volume = -demag::prefactor*4.0*M_PI/(3.0*cells::size*cells::size*cells::size); // 1.0/(3*a*a*a)
+
+	// loop over local cells
+	for(int lc=0;lc<cells::num_local_cells;lc++){
+		
+		int i = cells::local_cell_array[lc];
+		
+		cells::x_field_array[i]=inv_three_cell_volume*cells::x_mag_array[i];
+		cells::y_field_array[i]=inv_three_cell_volume*cells::y_mag_array[i];
+		cells::z_field_array[i]=inv_three_cell_volume*cells::z_mag_array[i];
+
+		// Loop over all other cells to calculate contribution to local cell 
+		for(int j=0;j<cells::num_cells;j++){
+			
+			const double mx = cells::x_mag_array[j];
+			const double my = cells::y_mag_array[j];
+			const double mz = cells::z_mag_array[j];
+
+			cells::x_field_array[i]+=(mx*rij_xx[i][j] + my*rij_xy[i][j] + mz*rij_xz[i][j]);
+			cells::y_field_array[i]+=(mx*rij_xy[i][j] + my*rij_yy[i][j] + mz*rij_yz[i][j]);
+			cells::z_field_array[i]+=(mx*rij_xz[i][j] + my*rij_yz[i][j] + mz*rij_zz[i][j]);
+				
 		}
-		else{vinfo << "  rij_matrix allocation successful" << std::endl;
-			//------------------------------------------------------------------
-			// Calculate rij matrix (demag cell cordinates are in angstroms)
-			//------------------------------------------------------------------
-			std::cout << "Calculating rij_matrix for Dipolar fields" << std::flush;
-			for(int i=0;i<demag::num_demag_cells;i++){
-				if(i%(demag::num_demag_cells/20)==0){
-					std::cout << "."<< std::flush;
-				}
-				for(int j=0;j<demag::num_demag_cells;j++){
-					if(i!=j){
-						double dx = demag::demag_coord_x_array[j]-demag::demag_coord_x_array[i];
-						double dy = demag::demag_coord_y_array[j]-demag::demag_coord_y_array[i];
-						double dz = demag::demag_coord_z_array[j]-demag::demag_coord_z_array[i];
-						double rij = sqrt(dx*dx+dy*dy+dz*dz);
-						demag::rij_matrix[i][j]=1.0/rij;
-					}
-				}
-			}
-			std::cout << "Done!"<< std::endl;
-		}
+		
+		// Output data to vdp file
+		//vdp << i << "\t" << cells::num_atoms_in_cell[i] << "\t";
+		//vdp << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
+		//vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
+		//vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t"<< cells::z_mag_array[i] << "\t" << inv_three_cell_volume*cells::z_mag_array[i] << std::endl;
 
-		vinfo << "=========================================================================" << std::endl;
-		vinfo << "  Demag set-up completed" << std::endl;
-		vinfo << "=========================================================================" << std::endl;
-*/
-	//----------------------------------------------------------
-	// End of if
-	//----------------------------------------------------------
-		demag::demag_set=true;
-	//}
-
-	return 0;
-
+	}
+	//err::vexit();
 }
 
-int demag_field_update(){
-	//--------------------------------------------------------------------
-	//
-	//								demag_field_update
-	//
-	//						Function to update demag fields
-	//
-	//							R F Evans 02/11/09
-	//	
-	//--------------------------------------------------------------------
+/// @brief Function to recalculate demag fields using standard update method
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    28/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		28/03/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+inline void std_update(){
+	
+	// check for callin of routine
+	if(err::check==true) std::cerr << "demag::std_update has been called " << vmpi::my_rank << std::endl;
 
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){
-		std::cout << "demag_field_update has been called " << vmpi::my_rank << std::endl;
+	const double inv_three_cell_volume = -4.0*M_PI/(3.0*cells::size*cells::size*cells::size); // 1.0/(3*a*a*a)
+
+	//std::cout << cells::num_local_cells << std::endl;
+
+	// loop over local cells
+	for(int lc=0;lc<cells::num_local_cells;lc++){
+		
+		int i = cells::local_cell_array[lc];
+
+		//std::cout << i << std::endl;
+		// zero field arrays
+		cells::x_field_array[i]=inv_three_cell_volume*cells::x_mag_array[i];
+		cells::y_field_array[i]=inv_three_cell_volume*cells::y_mag_array[i];
+		cells::z_field_array[i]=inv_three_cell_volume*cells::z_mag_array[i];
+		
+		// Loop over all other cells to calculate contribution to local cell 
+		for(int j=0;j<i;j++){
+				
+			const double mx = cells::x_mag_array[j];
+			const double my = cells::y_mag_array[j];
+			const double mz = cells::z_mag_array[j];
+
+			const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
+			const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
+			const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
+
+			const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
+			const double drij3 = drij*drij*drij;
+
+			const double ex = dx*drij;
+			const double ey = dy*drij;
+			const double ez = dz*drij;
+
+			const double s_dot_e = (mx * ex + my * ey + mz * ez);
+
+			cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
+			cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
+			cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
+
+		}
+
+		for(int j=i+1;j<cells::num_cells;j++){
+
+			const double mx = cells::x_mag_array[j];
+			const double my = cells::y_mag_array[j];
+			const double mz = cells::z_mag_array[j];
+
+			const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
+			const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
+			const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
+
+			const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
+			const double drij3 = drij*drij*drij;
+
+			const double ex = dx*drij;
+			const double ey = dy*drij;
+			const double ez = dz*drij;
+
+			const double s_dot_e = (mx * ex + my * ey + mz * ez);
+
+			cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
+			cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
+			cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
+
+		}
+
+		cells::x_field_array[i]*=demag::prefactor;
+		cells::y_field_array[i]*=demag::prefactor;
+		cells::z_field_array[i]*=demag::prefactor;
+		
+		// Output data to vdp file
+		//vdp << i << "\t" << cells::num_atoms_in_cell[i] << "\t";
+		//vdp << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
+		//vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
+		//vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t"<< cells::z_mag_array[i] << "\t" << inv_three_cell_volume*demag::prefactor*cells::z_mag_array[i] << std::endl;
+		
 	}
+	//err::vexit();
+}
 
-	//----------------------------------------------------------
-	// If not initialised print warning and do so
-	//----------------------------------------------------------
-	//if(demag::demag_set==false){
-	//	std::cerr << "Warning, demag not initialised - initialising" << std::endl;
-	//	set_demag();
-	//}
-	//std::cout << demag::update_time << "\t" << sim::time << "\t" << demag::update_counter << "\t" << demag::update_rate << std::endl;
+/// @brief Wrapper Function to update demag fields
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    28/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		28/03/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+void update(){
+
+	if(err::check==true) std::cerr << "demag::update has been called " << vmpi::my_rank << std::endl;
+
 	// prevent double calculation for split integration (MPI)
 	if(demag::update_time!=sim::time){
-  // Populate magnetisations
-
+ 
+		// Check if update required
 	  if(sim::time%demag::update_rate==0){
 
-	  //if updated record last time at update
-	  demag::update_time=sim::time;
+		//if updated record last time at update
+		demag::update_time=sim::time;
 
-	  //std::cout << "Updating demag fields at time " << sim::time <<std::endl;
-	  //double custart=MPI_Wtime();
-	  cells::mag();
-	  demag::update_counter=1;
-	  //double cuend=MPI_Wtime();
-	    //std::cout << "Time for cell update: " << cuend-custart << " s" << std::endl;
-	
-	//----------------------------------------------------------
-	// Update Dipolar Field Array
-	//----------------------------------------------------------
-  // Field has units ((T^2 m^2) / (N m^3)) * (J/T) = T
-	    //MPI::COMM_WORLD.Barrier();
-	  //double dmstart=MPI_Wtime();
+		// update cell magnetisations
+		cells::mag();
+		
+		// recalculate demag fields
+		if(demag::fast==true) fast_update();
+		else std_update();
+		
+		// For MPI version, only add local atoms
+		#ifdef MPICF
+			const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+		#else
+			const int num_local_atoms = atoms::num_atoms;
+		#endif
+			
+		// Update Atomistic Dipolar Field Array
+		for(int atom=0;atom<num_local_atoms;atom++){
+			const int cell = atoms::cell_array[atom];
 
-	  double ncalcs=0.0;
-	  // Loopover all cells
-	for(int i=0;i<cells::num_cells;i++){
-	  // Check for cells including local atoms 
-    if(cells::num_atoms_in_cell[i] > 0 ) {
-      // zero field arrays
-      cells::x_field_array[i]=0.0;
-      cells::y_field_array[i]=0.0;
-      cells::z_field_array[i]=0.0;
-      // Loop over all other cells to calculate contribution to local cell 
-      for(int j=0;j<i;j++){
-        //if(i!=j){
-          
-          const double mx = cells::x_mag_array[j];
-          const double my = cells::y_mag_array[j];
-          const double mz = cells::z_mag_array[j];
+			// Copy field from macrocell to atomistic spin
+			atoms::x_dipolar_field_array[atom]=cells::x_field_array[cell];
+			atoms::y_dipolar_field_array[atom]=cells::y_field_array[cell];
+			atoms::z_dipolar_field_array[atom]=cells::z_field_array[cell];
+		}
 
-          const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
-          const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
-          const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
-
-          const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
-          const double drij3 = drij*drij*drij;
-
-          const double ex = dx*drij;
-          const double ey = dy*drij;
-          const double ez = dz*drij;
-
-          const double s_dot_e = (mx * ex + my * ey + mz * ez);
-
-          cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
-          cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
-          cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
-
-	  ncalcs+=1.0;
-	  //}
-      }
-
-      for(int j=i+1;j<cells::num_cells;j++){
-	//if(i!=j){
-
-	  const double mx = cells::x_mag_array[j];
-	  const double my = cells::y_mag_array[j];
-	  const double mz = cells::z_mag_array[j];
-
-	  const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
-	  const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
-	  const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
-
-	  const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
-	  const double drij3 = drij*drij*drij;
-
-	  const double ex = dx*drij;
-	  const double ey = dy*drij;
-	  const double ez = dz*drij;
-
-	  const double s_dot_e = (mx * ex + my * ey + mz * ez);
-
-	  cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
-	  cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
-	  cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
-
-	  ncalcs+=1.0;
-	  //}
-      }
-
-      cells::x_field_array[i]*=demag::prefactor;
-      cells::y_field_array[i]*=demag::prefactor;
-      cells::z_field_array[i]*=demag::prefactor;
-    }
-    //vdp << "\t" << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
-    //		vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
-    //		vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t" << cells::z_mag_array[i] << std::endl;
-	} // end of i loop
-
-	//MPI::COMM_WORLD.Barrier();
-	//double dmend=MPI_Wtime();
-	//exit(0);
-	//----------------------------------------------------------
-	// Update Atomistic Dipolar Field Array
-	//----------------------------------------------------------
-	for(int atom=0;atom<atoms::num_atoms;atom++){
-		const int cell = atoms::cell_array[atom];
-
-		// Copy field from macrocell to atomistic spin
-		atoms::x_dipolar_field_array[atom]=cells::x_field_array[cell];
-		atoms::y_dipolar_field_array[atom]=cells::y_field_array[cell];
-		atoms::z_dipolar_field_array[atom]=cells::z_field_array[cell];
-	}
-
-	//MPI::COMM_WORLD.Barrier();
-	//double dmend=MPI_Wtime();
-	//std::cout << "Time for demag calculation: " << dmend-dmstart << " s" << std::endl;
-	//std::cout << "Ncalcs: " << ncalcs << "\t" << ncalcs/cells::num_cells << std::endl;
-	//std::cout << "Performance: " << (ncalcs*36.0/(dmend-dmstart))*1.0e-6 << " MFlops" << std::endl;
-	} // End of check for update rate
-	  //demag::update_counter++;
+		} // End of check for update rate
 	} // end of check for update time
 	
-	//std::cout << demag::update_counter << "\t" << demag::update_rate << "\t" << demag::update_counter%demag::update_rate << std::endl;
-	return 0;
-
 }
+
+} // end of namespace demag
+
