@@ -969,6 +969,19 @@ int match_sim(string const word, string const value, string const unit, int cons
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		test="runs";
+		if(word==test){
+			int r=atoi(value.c_str());
+			if(r>0){
+				sim::runs=r;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be grater than zero" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
 		test="maximum-temperature";
 		if(word==test){
 			double T=atof(value.c_str());

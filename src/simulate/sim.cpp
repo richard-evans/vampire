@@ -28,11 +28,12 @@
 
 namespace sim{
 	std::ofstream mag_file;
-	int time;
+	int time=0;
 	int total_time=1;
 	int loop_time=1;
 	int partial_time=1;
 	int equilibration_time=0;
+	int runs=1; // for certain repetitions in programs
 	
 	double Tmax=300.0;
 	double Tmin=0.0;

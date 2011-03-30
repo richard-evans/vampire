@@ -11,6 +11,8 @@ namespace sim{
 	extern int loop_time;
 	extern int partial_time;
 	extern int equilibration_time;
+	extern int runs;
+	
 	extern double Tmax;
 	extern double Tmin;
 	extern double Teq;

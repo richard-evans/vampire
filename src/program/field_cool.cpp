@@ -56,43 +56,48 @@ void field_cool(){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::field_cool has been called" << std::endl;}
 
-	// Set equilibration temperature and field
-	sim::temperature=sim::Teq;
-	
-	// Equilibrate system
-	while(sim::time<sim::equilibration_time){
-		
-		sim::integrate(sim::partial_time);
-		
-		// Output data
-		vout::data();
-	}
-	
-	int start_time=sim::time;
-	
-	// Perform Field Cooling
-	while(sim::time<sim::total_time+start_time){
+	// Perform several runs if desired
+	for(int run=0;run<sim::runs; run++){
 
-		// Calculate Temperature
-		double time_from_start=mp::dt_SI*double(sim::time-start_time);
-		if(sim::cooling_function_flag==0){
-			sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-time_from_start/sim::cooling_time);
-		}
-		else{
-			sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-(time_from_start)*(time_from_start)/((sim::cooling_time)*(sim::cooling_time)));
+		// Set equilibration temperature and field
+		sim::temperature=sim::Teq;
+		
+		// Equilibrate system
+		while(sim::time<sim::equilibration_time){
+			
+			sim::integrate(sim::partial_time);
+			
+			// Output data
+			vout::data();
 		}
 		
-		// Integrate system
-		sim::integrate(sim::partial_time);
+		int start_time=sim::time;
 		
-		// Calculate magnetisation statistics
-		stats::mag_m();
+		// Perform Field Cooling
+		while(sim::time<sim::total_time+start_time){
 
-		// Output data
-		vout::data();
+			// Calculate Temperature
+			double time_from_start=mp::dt_SI*double(sim::time-start_time);
+			if(sim::cooling_function_flag==0){
+				sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-time_from_start/sim::cooling_time);
+			}
+			else{
+				sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-(time_from_start)*(time_from_start)/((sim::cooling_time)*(sim::cooling_time)));
+			}
+			
+			// Integrate system
+			sim::integrate(sim::partial_time);
+			
+			// Calculate magnetisation statistics
+			stats::mag_m();
 
-	}
+			// Output data
+			vout::data();
 
-}
+		}
+		
+	} // end of run loop
+	
+} // end of field_cool()
 
 }//end of namespace program
