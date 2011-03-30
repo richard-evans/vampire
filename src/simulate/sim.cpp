@@ -106,9 +106,7 @@ int run(){
 		
 		case 1:
 			if(vmpi::my_rank==0) std::cout << "Time-Series..." << std::endl; 
-			//program::time_series();
-			std::cerr << "Error: Time-Series program not yet written. Exiting." << std::endl;
-			err::vexit();
+			program::time_series();
 			break;
 		
 		case 2: 

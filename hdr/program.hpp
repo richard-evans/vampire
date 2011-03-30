@@ -13,7 +13,7 @@ namespace program
 	extern int static_hysteresis();
 	extern int curie_temperature();
 	extern void field_cool();
-	extern void two_temperature_pulse();
+	extern int two_temperature_pulse();
 
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();

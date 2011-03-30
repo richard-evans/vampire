@@ -78,6 +78,7 @@ obj/program/field_cool.o \
 obj/program/hysteresis.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/static_hysteresis.o \
+obj/program/time_series.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \

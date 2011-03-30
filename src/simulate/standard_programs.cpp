@@ -54,7 +54,7 @@ namespace program{
 
 
 
-/// @brief Function to calculate a time series with gaussian cooling profile
+/*/// @brief Function to calculate a time series with gaussian cooling profile
 ///
 /// @callgraph
 /// @callergraph
@@ -149,7 +149,7 @@ int hamr_run(){
 	vgrain.close();
 		
 	return EXIT_SUCCESS;
-}
+}*/
 
 /// @brief Function to calculate a time series with two temperature model heating/cooling profile
 ///
