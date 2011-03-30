@@ -223,7 +223,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		delete [] supercell_array;
 		supercell_array=NULL;
 		}
-	catch(...){std::cout << "error deallocating supercell_array" << std::endl; exit(1);}
+	catch(...){std::cout << "error deallocating supercell_array" << std::endl; err::vexit();}
 
 	// Mark surface atoms
 	//for(int atom=0;atom<num_atoms;atom++){

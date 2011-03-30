@@ -205,7 +205,7 @@ int read(string const filename){
 		//std::cout << "\t" << "unit: " << unit << std::endl;
 		int matchcheck = match(key, word, value, unit, line_counter);
 		if(matchcheck==EXIT_FAILURE){
-			exit(1);
+			err::vexit();
 		}
 		}
 	}
@@ -507,7 +507,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -524,7 +524,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -542,7 +542,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -560,7 +560,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -578,7 +578,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -598,7 +598,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -616,7 +616,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -634,7 +634,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -652,7 +652,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -670,7 +670,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -688,7 +688,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -807,7 +807,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//-------------------------------------------------------------------
@@ -825,7 +825,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//-------------------------------------------------------------------
@@ -843,7 +843,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//-------------------------------------------------------------------
@@ -861,7 +861,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//-------------------------------------------------------------------
@@ -879,7 +879,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//-------------------------------------------------------------------
@@ -967,7 +967,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
@@ -981,7 +981,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
@@ -995,7 +995,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
@@ -1009,7 +1009,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
@@ -1028,7 +1028,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
@@ -1047,7 +1047,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
@@ -1066,7 +1066,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
@@ -1085,7 +1085,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
@@ -1231,7 +1231,7 @@ int read_mat_file(std::string const matfile){
 	// Check for opening
 	if(!inputfile.is_open()){
 		std::cerr << "Error opening file " << matfile << "- file does not exist!" << std::endl; 
-		exit(1);   // return to calling function for error checking or message
+		err::vexit();   // return to calling function for error checking or message
 	}
 	//-------------------------------------------------------
 	// Material 0
@@ -1310,7 +1310,7 @@ int read_mat_file(std::string const matfile){
 				else{
 					std::cerr << "Invalid index number " << index << " on line " << line_counter << " in material input file" << std::endl;
 					std::cerr << "Causes could be invalid character or outside of range, ie less than zero or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
-					exit(1);
+					err::vexit();
 				}
 				
 			}
@@ -1320,7 +1320,7 @@ int read_mat_file(std::string const matfile){
 		const int end_key=last;
 		
 		//
-		//exit(1);
+		//err::vexit();
 		// Determine the rest
 		for(int i=end_key;i<linelength;i++){
 			
@@ -1343,7 +1343,7 @@ int read_mat_file(std::string const matfile){
 							if((super_index<0) || (super_index>=mp::max_materials)){
 								std::cerr << "Invalid sub-index number " << index << " on line " << line_counter << " in material input file" << std::endl;
 								std::cerr << "Causes could be invalid character or outside of range, ie less than zero or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
-								exit(1);
+								err::vexit();
 							}
 							// end of word
 							break;
@@ -1402,7 +1402,7 @@ int read_mat_file(std::string const matfile){
 			//std::cout << "\t" << "unit: " << unit << std::endl;
 			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index, sub_index);
 			if(matchcheck==EXIT_FAILURE){
-				exit(1);
+				err::vexit();
 			}
 		}
 	}
@@ -1463,7 +1463,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				exit(1);
+				err::vexit();
 			}
 			//return EXIT_SUCCESS;
 		}
@@ -1485,7 +1485,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -1506,7 +1506,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else
@@ -1528,7 +1528,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				exit(1);
+				err::vexit();
 			}
 		}
 		else

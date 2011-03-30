@@ -165,7 +165,7 @@ namespace cells{
 		delete [] supercell_array;
 		supercell_array=NULL;
 		}
-		catch(...){std::cout << "error deallocating supercell_array" << std::endl; exit(1);}
+		catch(...){std::cout << "error deallocating supercell_array" << std::endl; err::vexit();}
 		
 		// Resize new cell arrays
 		cells::x_coord_array.resize(cells::num_cells,0.0);

@@ -306,13 +306,13 @@ int set_derived_parameters(){
 	}
 	else{
 		 std::cout << "Error in determining num_nearest_neighbours - unknown crystal type \'" << mp::crystal_structure << "\'" << std::endl;
-		 exit(1);
+		 err::vexit();
 	}
 	
 	if(mp::hamiltonian_type=="generic")	mp::hamiltonian_num_neighbours = mp::num_nearest_neighbours;
 	if(mp::hamiltonian_num_neighbours==0){
 		 std::cout << "Error in determining hamiltonian_num_neighbours - unknown Hamiltonian type \'" << mp::hamiltonian_type << "\'" << std::endl;
-		 exit(1);
+		 err::vexit();
 	}
 
 	// Set integration constants

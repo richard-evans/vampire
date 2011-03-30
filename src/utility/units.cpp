@@ -161,7 +161,7 @@ int init(){
 
 		// Error if unit not found
 		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
-		exit(1);
+		err::vexit();
 		
 		return EXIT_SUCCESS;
 		
@@ -211,7 +211,7 @@ int init(){
 
 		// Error if unit not found
 		std::cerr << "Error during unit reversion - unit \'"<< output_unit << "\' not found" << std::endl;
-		exit(1);
+		err::vexit();
 		
 		return EXIT_SUCCESS;
 		

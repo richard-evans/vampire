@@ -141,7 +141,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 			//-----------------------------
 		}
 		
-		if(atoms_per_unit_cell==0){std::cout << "Error determining atoms_per_unit_cell, unknown crystal_type" << std::endl; exit(1);}
+		if(atoms_per_unit_cell==0){std::cout << "Error determining atoms_per_unit_cell, unknown crystal_type" << std::endl; err::vexit();}
 
 		double min=mp::material[mat].min*mp::system_dimensions[2];
 		double max=mp::material[mat].max*mp::system_dimensions[2];

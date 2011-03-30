@@ -371,7 +371,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 
 	try{vertex_array=new double*[num_vertices];
     	for(int i=0; i<num_vertices; i++)vertex_array[i]=new double[2];}
-  	catch(...){std::cerr << "error allocating vertex_array" << std::endl;exit(1);}
+  	catch(...){std::cerr << "error allocating vertex_array" << std::endl;err::vexit();}
 
 	//--------------------------------------
 	// Read in Voronoi vertices and rescale
@@ -450,7 +450,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
     	delete [] vertex_array;
     	vertex_array=NULL;
    }
-  	catch(...){std::cerr << "error deallocating vertex_array" << std::endl;exit(1);}
+  	catch(...){std::cerr << "error deallocating vertex_array" << std::endl;err::vexit();}
 	
 	return EXIT_SUCCESS;
 

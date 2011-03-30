@@ -152,7 +152,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		}
 		else {
 			std::cerr << "Error - Unknown grain number " << grain << " for atom " << atom << std::endl;
-			exit(1);
+			err::vexit();
 		}
 	}*/
 	//---------------------
@@ -213,7 +213,7 @@ int particle(std::vector<cs::catom_t> & catom_array){
 			break;
 		default:
 			std::cout << "Unknown particle type requested for single particle system" << std::endl;
-			exit(1);
+			err::vexit();
 	}
 
 	return EXIT_SUCCESS;	
@@ -283,7 +283,7 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 						break;
 					default:
 						std::cout << "Unknown particle type requested for single particle system" << std::endl;
-						exit(1);
+						err::vexit();
 				}
 				// Increment Particle Number Counter
 				particle_number++;
@@ -436,7 +436,7 @@ int hex_particle_array(int cs_num_atoms,int** cs_coord_array,int* particle_inclu
 					
 				default:
 					std::cout << "Unknown particle type requested for single particle system" << std::endl;
-					exit(1);
+					err::vexit();
 				}
 				
 			//------------------------------------------------------------------
