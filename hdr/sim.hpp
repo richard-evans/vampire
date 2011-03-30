@@ -13,6 +13,7 @@ namespace sim{
 	extern int equilibration_time;
 	extern double Tmax;
 	extern double Tmin;
+	extern double Teq;
 	extern double temperature;
 	extern double delta_temperature;
 	extern double H_applied;
@@ -20,9 +21,13 @@ namespace sim{
 	extern double Hmin; // T
 	extern double Hmax; // T
 	extern double Hinc; // T
+	extern double Heq; //T
 	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
 	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
 
+	extern double cooling_time;
+	extern int cooling_function_flag;
+	
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 	

@@ -6,14 +6,19 @@
 //==========================================================
 namespace program
 {
-	extern int curie_temperature();
-	extern int hamr_run();
-	extern int static_hysteresis();
-	extern int two_temperature_pulse();
+	// program functions
 	extern int bmark();
-	extern int LLB_Boltzmann();
+	extern void time_series();
 	extern int hysteresis();
+	extern int static_hysteresis();
+	extern int curie_temperature();
+	extern void field_cool();
+	extern void two_temperature_pulse();
+
+	// Sundry programs and diagnostics not under general release
+	extern int LLB_Boltzmann();
 	extern int timestep_scaling();
+	
 }
 
 #endif /*PROGRAM_H_*/

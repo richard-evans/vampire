@@ -36,16 +36,21 @@ namespace sim{
 	
 	double Tmax=300.0;
 	double Tmin=0.0;
+	double Teq=300.0;
 	double temperature=300.0;
 	double delta_temperature=10.0;
 	double H_applied=0.0;
 	double H_vec[3]={0.0,0.0,1.0};
 	double Hmin=-1.0; // T
 	double Hmax=+1.0; // T
-	double Hinc= 0.1; // T	
+	double Hinc= 0.1; // T
+	double Heq=0.0;
 	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
 	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
 
+	double cooling_time=100.0e-12; //seconds
+	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
+	
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
@@ -122,8 +127,8 @@ int run(){
 			break;
 			
 		case 5:
-			if(vmpi::my_rank==0) std::cout << "HAMR..." << std::endl; 
-			program::hamr_run();
+			if(vmpi::my_rank==0) std::cout << "Field-Cool..." << std::endl; 
+			program::field_cool();
 			break;
 
 		case 6:
