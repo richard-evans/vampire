@@ -13,13 +13,14 @@
 namespace cells{
 
 	extern int num_cells;
-	extern int size;
-	extern int update_rate;
-	extern int update_counter;
+	extern int num_local_cells;
 
-  extern bool initialised;
+	extern double size;
+
+	extern bool initialised;
 
 	extern std::vector <int> num_atoms_in_cell;
+	extern std::vector <int> local_cell_array;
 
 	extern std::vector <double> x_coord_array;
 	extern std::vector <double> y_coord_array;

@@ -24,6 +24,9 @@
 
 // Headers
 #include "atoms.hpp"
+#include "cells.hpp"
+#include "demag.hpp"
+#include "errors.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -688,7 +691,24 @@ int match_dimension(string const word, string const value, string const unit, in
 				exit(1);
 			}
 		}
-		//else
+		else
+		//--------------------------------------------------------------------
+		test="cell-size";
+		if(word==test){
+			double cs=atof(value.c_str());
+			string unit_type;
+			units::convert(unit,cs,unit_type);
+			string str="length";
+			if(unit_type==str){
+				cells::size=cs;
+				//std::cout << "cell size: " << cells::size << std::endl;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				err::vexit();
+			}
+		}
 		//--------------------------------------------------------------------
 		else{
 			std::cerr << "Error - Unknown control statement \'dimension:"<< word << "\' on line " << line << " of input file" << std::endl;

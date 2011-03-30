@@ -35,11 +35,13 @@
 namespace cells{
 	
 	int num_cells=0;
-	int size;
+	int num_local_cells=0;
+	double size=7.0; // Angstroms
 
 	bool initialised=false;
 
 	std::vector <int> num_atoms_in_cell;
+	std::vector <int> local_cell_array;
 
 	std::vector <double> x_coord_array;
 	std::vector <double> y_coord_array;
@@ -74,17 +76,19 @@ namespace cells{
 ///=====================================================================================
 ///
 	int initialise(){
+		
 		// check calling of routine if error checking is activated
 		if(err::check==true) std::cout << "cells::initialise has been called" << std::endl;
 		
-		// set initial cell variables
-		cells::size=2; // In units of a
 		cells::num_cells=0;
+		cells::num_local_cells=0;
+		
+		std::cout << "Cell size = " << cells::size << std::endl; 
 		
 		// determine number of cells in each direction
-		unsigned int ncellx = static_cast<unsigned int>(ceil((mp::system_dimensions[0]/mp::lattice_constant[0])/double(cells::size)));
-		unsigned int ncelly = static_cast<unsigned int>(ceil((mp::system_dimensions[1]/mp::lattice_constant[1])/double(cells::size)));
-		unsigned int ncellz = static_cast<unsigned int>(ceil((mp::system_dimensions[2]/mp::lattice_constant[2])/double(cells::size)));
+		unsigned int ncellx = static_cast<unsigned int>(ceil(mp::system_dimensions[0]/cells::size));
+		unsigned int ncelly = static_cast<unsigned int>(ceil(mp::system_dimensions[1]/cells::size));
+		unsigned int ncellz = static_cast<unsigned int>(ceil(mp::system_dimensions[2]/cells::size));
 		
 		//update total number of cells
 		cells::num_cells=ncellx*ncelly*ncellz;
@@ -132,7 +136,7 @@ namespace cells{
 			double c[3]={atoms::x_coord_array[atom]+atom_offset[0],atoms::y_coord_array[atom]+atom_offset[1],atoms::z_coord_array[atom]+atom_offset[2]};
 			int scc[3]={0,0,0}; // super cell coordinates
 			for(int i=0;i<3;i++){
-				scc[i]=int(c[i]/(mp::lattice_constant[i]*double(cells::size))); // Always round down for supercell coordinates
+				scc[i]=int(c[i]/cells::size); // Always round down for supercell coordinates
 				// Always check cell in range
 				if(scc[i]<0 || scc[i]>= d[i]){
 					std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
@@ -224,6 +228,16 @@ namespace cells{
 			cells::num_atoms_in_cell[local_cell]++;
 		}
 		
+		// Calculate number of local cells
+		for(int cell=0;cell<cells::num_cells;cell++){
+			if(cells::num_atoms_in_cell[cell]!=0){
+				cells::local_cell_array.push_back(cell);
+				cells::num_local_cells++;
+			}
+		}
+		
+		std::cout << " Number of local cells on CPU " << vmpi::my_rank << " is: " << cells::num_local_cells << std::endl;
+		
 		cells::initialised=true;
 		
 		return EXIT_SUCCESS;
@@ -251,8 +265,11 @@ namespace cells{
 ///
 int mag() {
 
+	// check calling of routine if error checking is activated
+	if(err::check==true) std::cout << "cells::mag has been called" << std::endl;
+
   // Check for initialised arrays
-  if(cells::initialised!=true) cells::initialise();
+  //if(cells::initialised!=true) cells::initialise();
 
   for(int i=0; i<cells::num_cells; ++i) {
     cells::x_mag_array[i] = 0.0;
