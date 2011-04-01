@@ -99,6 +99,12 @@ int create(){
 
 		cs::create_system_type(catom_array);
 	}
+	
+	// Check for zero atoms generated
+	if(catom_array.size()==0){
+		std::cerr << "Error, no atoms generated - increase system dimensions!" << std::endl;
+		err::vexit();
+	}
 	//=============================================================
 	//      Create Neighbour list for system
 	//=============================================================
