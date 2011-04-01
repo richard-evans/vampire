@@ -72,3 +72,6 @@ vmag:mean-mag-m
 screen:time
 #screen:mean-mag-m
 screen:mag-m
+vgrain:output-rate=10000
+vgrain:real-time
+vgrain:magnetisation

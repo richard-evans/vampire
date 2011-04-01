@@ -20,6 +20,7 @@ struct null_streambuf
 extern std::ofstream vinfo;
 extern std::ofstream vdp;
 extern std::ofstream vmag;
+extern std::ofstream vgrain;
 
 namespace vin{
 	extern int read(std::string const);
@@ -29,6 +30,9 @@ namespace vout{
 	
 	extern std::vector<unsigned int> file_output_list;
 	extern std::vector<unsigned int> screen_output_list;
+	extern std::vector<unsigned int> grain_output_list;
+	
+	extern int output_grain_rate;
 	
 	extern bool output_povray;
 	extern int output_povray_rate;

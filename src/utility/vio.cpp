@@ -27,6 +27,7 @@
 #include "cells.hpp"
 #include "demag.hpp"
 #include "errors.hpp"
+#include "grains.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -67,6 +68,7 @@ int match_create(std::string const, std::string const, int const);
 int match_dimension(std::string const, std::string const, std::string const, int const);
 int match_sim(std::string const, std::string const, std::string const, int const);
 int match_vout_list(std::string const, int const, std::vector<unsigned int> &);
+int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_material(string const, string const, string const, int const, int const, int const);
 
 /// @brief Function to read in variables from a file.
@@ -284,6 +286,15 @@ int match(string const key, string const word, string const value, string const 
 		int frs=vin::match_vout_list(word, line, vout::screen_output_list);
 		return frs;
 	}
+	//===================================================================
+	// Test for screen output
+	//===================================================================
+	else
+	test="vgrain";
+	if(key==test){
+		int frs=vin::match_vout_grain_list(word, value, line, vout::grain_output_list);
+		return frs;
+	}	
 	//-------------------------------------------------------------------
 	// Get material filename
 	//-------------------------------------------------------------------
@@ -1259,6 +1270,12 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(9);
 			return EXIT_SUCCESS;
 		}
+		else
+		test="material-mean-mag-m";
+		if(word==test){
+			output_list.push_back(9);
+			return EXIT_SUCCESS;
+		}
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
@@ -1270,7 +1287,76 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 	return EXIT_SUCCESS;
 }
 
-
+int match_vout_grain_list(string const word, string const value, int const line, std::vector<unsigned int> & output_list){
+		//-------------------------------------------------------------------
+		// system_creation_flags[1] - Set system particle shape
+		//-------------------------------------------------------------------
+		std::string test="time";
+		if(word==test){
+			output_list.push_back(0);
+			return EXIT_SUCCESS;
+		}
+		else 
+		test="real-time";
+		if(word==test){
+			output_list.push_back(1);
+			return EXIT_SUCCESS;
+		}
+		else 
+		test="temperature";
+		if(word==test){
+			output_list.push_back(2);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="field";
+		if(word==test){
+			output_list.push_back(3);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="field-vector";
+		if(word==test){
+			output_list.push_back(4);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="magnetisation";
+		if(word==test){
+			output_list.push_back(10);
+			return EXIT_SUCCESS;
+		}
+		else
+		//-------------------------------------------------------------------
+		test="mag-m";
+		if(word==test){
+			output_list.push_back(11);
+			return EXIT_SUCCESS;
+		}
+		else
+		//-------------------------------------------------------------------
+		test="output-rate";
+		if(word==test){
+			int r=atoi(value.c_str());
+			if(r>0){
+				vout::output_grain_rate=r;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - vgrain:" << word << " on line " << line << " of input file must be greater than zero" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		// keyword not found
+		//--------------------------------------------------------------------
+		else{
+			std::cerr << "Error - Unknown control statement \'grain:" << word << "\' on line " << line << " of input file" << std::endl;
+			return EXIT_FAILURE;
+		}
+		
+	return EXIT_SUCCESS;
+}
 // temporary array of materials for reading in material data
 //std::cout << "here" << std::endl;
   std::vector<mp::materials_t> read_material(0);
@@ -1865,6 +1951,7 @@ int match_material(string const word, string const value, string const unit, int
 std::ofstream vinfo("info");
 std::ofstream vdp("vdp");
 std::ofstream vmag("vmag");
+std::ofstream vgrain("vgrain");
 
 
 namespace vout{
@@ -1872,14 +1959,22 @@ namespace vout{
 	// Namespace variable declarations
 	std::vector<unsigned int> file_output_list(0);
 	std::vector<unsigned int> screen_output_list(0);
+	std::vector<unsigned int> grain_output_list(0);
+	
+	int output_grain_rate=1;
 	
 	bool output_povray=false;
 	int output_povray_rate=1000;
 	int pov_file_counter=0;
+
 	bool output_povray_cells=false;
 	int output_povray_cells_rate=1000;
 	int pov_file_cells_counter=0;
 	
+	bool output_povray_grains=false;
+	int output_povray_grain_rate=1000;
+	int pov_file_grains_counter=0;
+
 	std::ofstream errfile;
 	null_streambuf nullbuf;
 
@@ -2116,6 +2211,38 @@ namespace vout{
 		}
 	}
 
+	// Output Function 10
+	void grain_mvec(std::ostream& stream){
+
+		unsigned int id=0; // grain id (excluding grains with zero atoms)
+
+		// loop over all grains
+		for(int grain=0;grain<grains::num_grains;grain++){
+			// check for grains with zero atoms
+			if(grains::grain_size_array[grain]!=0){
+				stream << grains::x_mag_array[grain] << "\t";
+				stream << grains::y_mag_array[grain] << "\t";
+				stream << grains::z_mag_array[grain] << "\t";
+				stream << grains::mag_m_array[grain] << "\t";
+				id++;
+			}
+		}
+	}
+	
+	// Output Function 11
+	void grain_magm(std::ostream& stream){
+		unsigned int id=0; // grain id (excluding grains with zero atoms)
+
+		// loop over all grains
+		for(int grain=0;grain<grains::num_grains;grain++){
+			// check for grains with zero atoms
+			if(grains::grain_size_array[grain]!=0){
+				stream << grains::mag_m_array[grain] << "\t";
+				id++;
+			}
+		}
+	}
+	
 	// Data output wrapper function
 	void data(){
 
@@ -2200,6 +2327,44 @@ namespace vout{
 		
 		// Carriage return
 		if(screen_output_list.size()>0) std::cout << std::endl;
+		}
+		
+		if(sim::time%vout::output_grain_rate==0){
+		// Output data to vgrain
+		if(vmpi::my_rank==0){
+			
+		// calculate grain magnetisations
+		grains::mag();
+		
+		for(unsigned int item=0;item<vout::grain_output_list.size();item++){
+			switch(vout::grain_output_list[item]){
+				case 0:
+					vout::time(vgrain);
+					break;
+				case 1:
+					vout::real_time(vgrain);
+					break;
+				case 2:
+					vout::temperature(vgrain);
+					break;
+				case 3:
+					vout::Happ(vgrain);
+					break;
+				case 4:
+					vout::Hvec(vgrain);
+					break;
+				case 10:
+					vout::grain_mvec(vgrain);
+					break;
+				case 11:
+					vout::grain_magm(vgrain);
+					break;
+			}
+		}
+		
+		// Carriage return
+		if(vout::grain_output_list.size()>0) vgrain << std::endl;
+		}
 		}
 		
 		// Atomistic povray output
