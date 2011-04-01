@@ -1063,6 +1063,39 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
+		test="cooling-time";
+		if(word==test){
+			double T=atof(value.c_str());
+			// Test for valid range
+			if((T>=0.0) && (T<1.0E10)){
+				sim::cooling_time=T;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="cooling-function";
+		if(word==test){
+			test="exponential";
+			if(value==test){
+				sim::cooling_function_flag=0;
+				return EXIT_SUCCESS;
+			}
+			test="gaussian";
+			if(value==test){
+				sim::cooling_function_flag=1;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+				std::cerr << "\t\"exponential\"" << std::endl;
+				std::cerr << "\t\"gaussian\"" << std::endl;
+				err::vexit();
+			}		}
+		//--------------------------------------------------------------------
 		test="H-applied";
 		if(word==test){
 			double H=atof(value.c_str());
