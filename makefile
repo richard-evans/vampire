@@ -15,7 +15,8 @@ ICC=icc -DCOMP='"Intel C++ Compiler"' -DVORONOI=$(voronoi_path)
 GCC=g++ -DCOMP='"GNU C++ Compiler"' -DVORONOI=$(voronoi_path)
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DVORONOI=$(voronoi_path)
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DVORONOI=$(voronoi_path)
-MPICC=mpicxx -DMPICF -DVORONOI=$voronoi_path
+MPICC=mpicxx -DMPICF -DVORONOI=$(voronoi_path)
+
 export LANG=C
 export LC_ALL=C
 
