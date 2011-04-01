@@ -172,9 +172,9 @@ int mag(){
 			double my = grains::y_mag_array[grain]/=grains::sat_mag_array[grain];
 			double mz = grains::z_mag_array[grain]/=grains::sat_mag_array[grain];
 			grains::mag_m_array[grain] = sqrt(mx*mx+my*my+mz*mz);
-			grains::x_mag_array[grain]=mx/grains::mag_m_array[grain];
-			grains::y_mag_array[grain]=my/grains::mag_m_array[grain];
-			grains::z_mag_array[grain]=mz/grains::mag_m_array[grain];		    
+			//grains::x_mag_array[grain]=mx/grains::mag_m_array[grain];
+			//grains::y_mag_array[grain]=my/grains::mag_m_array[grain];
+			//grains::z_mag_array[grain]=mz/grains::mag_m_array[grain];		    
 		}
 	}
 	
