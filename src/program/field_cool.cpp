@@ -67,6 +67,9 @@ void field_cool(){
 			
 			sim::integrate(sim::partial_time);
 			
+			// Calculate magnetisation statistics
+			stats::mag_m();
+			
 			// Output data
 			vout::data();
 		}
