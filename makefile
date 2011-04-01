@@ -3,16 +3,19 @@
 #								Makefile for VAMPIRE
 #
 #===================================================================
+
+voronoi_path='"qvoronoi"'
+
 export OMPI_CXX=g++
 #export OMPI_CXX=pathCC
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -DCOMP='"GNU C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-MPICC=mpicxx -DMPICF
+ICC=icc -DCOMP='"Intel C++ Compiler"' -DVORONOI=$(voronoi_path)
+GCC=g++ -DCOMP='"GNU C++ Compiler"' -DVORONOI=$(voronoi_path)
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DVORONOI=$(voronoi_path)
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DVORONOI=$(voronoi_path)
+MPICC=mpicxx -DMPICF -DVORONOI=$voronoi_path
 export LANG=C
 export LC_ALL=C
 

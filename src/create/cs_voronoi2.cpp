@@ -329,7 +329,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	#else
 	int test_qhull;
 
-	test_qhull=system("./qvoronoi 1> /dev/null 2> /dev/null");
+	test_qhull=system(VORONOI" 1> /dev/null 2> /dev/null");
 	if(test_qhull!=0){
 		std::cerr << "Error! - qvoronoi does not seem to be installed, exiting" << std::endl; 
 		err::vexit();
@@ -341,7 +341,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//--------------------------------------
 
 	std::stringstream vsstr;
-	vsstr << "cat " << grain_file << " | qvoronoi -o -Fv > " << voronoi_file;
+	vsstr << "cat " << grain_file << " | "VORONOI" -o -Fv > " << voronoi_file;
 	string vstr = vsstr.str();
 	const char* vcstr = vstr.c_str();
 	//std::cout << vcstr << std::endl;
