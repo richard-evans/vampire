@@ -2363,13 +2363,14 @@ namespace vout{
 		}
 		
 		if(sim::time%vout::output_grain_rate==0){
-		// Output data to vgrain
-		if(vmpi::my_rank==0){
-			
+
 		// calculate grain magnetisations
 		grains::mag();
 		
-		for(unsigned int item=0;item<vout::grain_output_list.size();item++){
+		// Output data to vgrain
+		if(vmpi::my_rank==0){
+			
+			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
 			switch(vout::grain_output_list[item]){
 				case 0:
 					vout::time(vgrain);
