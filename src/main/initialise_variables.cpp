@@ -412,12 +412,12 @@ int set_derived_parameters(){
 					std::cout << lmin << "\t" << min << "\t" << max << std::endl;
 					std::cout << lmax << "\t" << min << "\t" << max << std::endl;
 					if(((lmin>min) && (lmin<max)) || ((lmax>min) && (lmax<max))){
-						std::cerr << "Error - material " << mat << " overlaps material " << nmat << " - use alloy keyword instead" << std::endl;
+						std::cerr << "Warning - material " << mat << " overlaps material " << nmat << " - possibly use alloy keyword instead" << std::endl;
 						std::cerr << " Material "<< mat << ":min = " << lmin << std::endl;
 						std::cerr << " Material "<< mat << ":max = " << lmax << std::endl;
 						std::cerr << " Material "<< nmat << ":min = " << min << std::endl;
 						std::cerr << " Material "<< nmat << ":max = " << max << std::endl;
-						exit(EXIT_FAILURE);
+						//exit(EXIT_FAILURE);
 					}
 				}
 			}
