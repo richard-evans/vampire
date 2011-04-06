@@ -54,10 +54,20 @@ int timestep_scaling(){
 			// reset derived parameters                                                                                                                                
 			mp::set_derived_parameters();
 
+			double sx = 0.01;
+			double sy = 0.0;
+			double sz = 1.0;
+
+			double modS = 1.0/sqrt(sx*sx + sy*sy + sz*sz);
+
+			sx*=modS;
+			sy*=modS;
+			sz*=modS;
+
 			for(int atom=0; atom<atoms::num_atoms; atom++){
-				atoms::x_spin_array[atom] = 0.01;
-				atoms::y_spin_array[atom] = 0.00;
-				atoms::z_spin_array[atom] = 1.00;
+				atoms::x_spin_array[atom] = sx;
+				atoms::y_spin_array[atom] = sy;
+				atoms::z_spin_array[atom] = sz;
 			}
 
 			sim::integrate(timesteps);
