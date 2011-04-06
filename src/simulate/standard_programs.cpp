@@ -150,7 +150,7 @@ int hamr_run(){
 		
 	return EXIT_SUCCESS;
 }*/
-
+/*
 /// @brief Function to calculate a time series with two temperature model heating/cooling profile
 ///
 /// @callgraph
@@ -302,7 +302,7 @@ int two_temperature_pulse(){
 	//vout::pov_file();
 		//vout::pov_file();
 	return EXIT_SUCCESS;
-}
+}*/
 
 }//end of namespace program
 
