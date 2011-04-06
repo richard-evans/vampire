@@ -20,6 +20,7 @@
 #include "atoms.hpp"
 #include "program.hpp"
 #include "errors.hpp"
+#include "random.hpp"
 #include "sim.hpp"
 #include "vmpi.hpp"
 
@@ -97,6 +98,10 @@ int run(){
 	
 	//program::timestep_scaling();
 	//return(EXIT_SUCCESS);
+	
+	// Initialise random number generator
+	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
+
 	
 	// Select program to run
 	switch(sim::program){

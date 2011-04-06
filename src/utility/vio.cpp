@@ -31,6 +31,7 @@
 #include "voronoi.hpp"
 #include "material.hpp"
 #include "errors.hpp"
+#include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
 #include "units.hpp"
@@ -419,6 +420,14 @@ int match_create(string const word, string const value, int const line){
 				create_voronoi::parity=vp;
 				return EXIT_SUCCESS;
 			}
+		}
+		//--------------------------------------------------------------------
+		else
+		test="voronoi-seed";
+		if(word==test){
+			int vs=atoi(value.c_str());
+				mtrandom::voronoi_seed=vs;
+				return EXIT_SUCCESS;
 		}
 		else
 		//-------------------------------------------------------------------
@@ -1228,6 +1237,13 @@ int match_sim(string const word, string const value, string const unit, int cons
 				std::cerr << "\t\"replicated-data\"" << std::endl;
 				err::vexit();
 			}
+		}
+		//--------------------------------------------------------------------
+		test="integrator-seed";
+		if(word==test){
+			int is=atoi(value.c_str());
+				mtrandom::integration_seed=is;
+				return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
 		else{

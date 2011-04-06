@@ -10,6 +10,9 @@ namespace mtrandom
 //==========================================================
 {
 	
+	int voronoi_seed=1234;
+	int integration_seed=1234;
+	
 	double x1,x2,w;
 	double number1;
 	double number2;

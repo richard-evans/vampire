@@ -87,6 +87,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	double delta_particle_x_parity = delta_particle_x*0.5;
 	double delta_particle_y_parity = delta_particle_y*0.5;
 
+	// Set voronoi seed;
+	mtrandom::grnd.seed(mtrandom::voronoi_seed);
+	
 	// Loop to generate hexagonal lattice points
 	double particle_coords[2]; 
 
