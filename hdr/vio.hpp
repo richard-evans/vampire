@@ -41,6 +41,7 @@ namespace vout{
 	extern int output_povray_cells_rate;
 	
 	extern void data();
+	extern int pov_file();
 
 	void redirect(std::ostream& strm, std::string filename);
 	void nullify(std::ostream& strm);  
