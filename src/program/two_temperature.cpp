@@ -59,8 +59,8 @@ void two_temperature_pulse(){
 	const double Cl = 3.0E06; //photon specific heat
 	const double G = 17.0E17 ;//electron coupling constant
 	
-	double pump_time=20.0e-15; // Seconds
-	double pump_power=2.4e22; // ?
+	//double pump_time=20.0e-15; // Seconds //moved to sim
+	//double pump_power=2.4e22; // ? // moved to sim
 	
 	// Set equilibration temperature and field
 	sim::temperature=sim::Teq;

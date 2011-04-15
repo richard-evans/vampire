@@ -1086,6 +1086,34 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
+		test="pump-time";
+		if(word==test){
+			double pt=atof(value.c_str());
+			// Test for valid range
+			if((pt>=0.0) && (pt<1.0E10)){
+				sim::pump_time=pt;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="pump-power";
+		if(word==test){
+			double pp=atof(value.c_str());
+			// Test for valid range
+			if((T>=0.0) && (T<1.0E40)){
+				sim::pump_power=pp;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
 		test="cooling-function";
 		if(word==test){
 			test="exponential";
