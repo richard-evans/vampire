@@ -94,7 +94,7 @@ void two_temperature_pulse(){
 
 		// Calculate Temperature
 		double time_from_start=mp::dt_SI*double(sim::time-start_time);
-		double pump=pump_power*exp(-((time_from_start-3.*pump_time)/(pump_time) )*((time_from_start-3.*pump_time)/(pump_time) ));
+		double pump=sim::pump_power*exp(-((time_from_start-3.*sim::pump_time)/(sim::pump_time) )*((time_from_start-3.*sim::pump_time)/(sim::pump_time) ));
 
 		Te = (-G*(Te-Tp)+pump)*mp::dt_SI/(Ce*Te) + Te;
 		Tp = ( G*(Te-Tp)     )*mp::dt_SI/Cl + Tp;

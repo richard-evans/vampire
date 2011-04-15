@@ -1104,7 +1104,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 		if(word==test){
 			double pp=atof(value.c_str());
 			// Test for valid range
-			if((T>=0.0) && (T<1.0E40)){
+			if((pp>=0.0) && (pp<1.0E40)){
 				sim::pump_power=pp;
 				return EXIT_SUCCESS;
 			}
