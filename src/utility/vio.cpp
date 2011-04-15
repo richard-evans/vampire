@@ -2142,6 +2142,7 @@ namespace vout{
 			pov_file_ofstr << "#declare CZ=" << size*vec[2]*6.0 << ";" << std::endl;
 	 		pov_file_ofstr << "#declare ref=0.4;" << std::endl;
 	 		pov_file_ofstr << "#declare sscale=2.0;" << std::endl;
+			pov_file_ofstr << "global_settings { assumed_gamma 2.0 }" << std::endl;
 			pov_file_ofstr << "background { color Gray30 }" << std::endl;
 
 			pov_file_ofstr << "Set_Camera(<CX,CY,CZ>, <LX,LY,LZ>, 15)" << std::endl;
