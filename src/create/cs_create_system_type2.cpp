@@ -40,6 +40,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	int particle_array(std::vector<cs::catom_t> &);
 	
 	int alloy(std::vector<cs::catom_t> &);
+	int intermixing(std::vector<cs::catom_t> &);
 	//int particle_array(int,int**,int*);
 	//int hex_particle_array(int,int**,int*);
 	//int voronoi_film(int**,double*,int*);
@@ -93,7 +94,8 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 
 		alloy(catom_array);
 
-
+		// call intermixing function
+		intermixing(catom_array);
 
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
@@ -569,6 +571,50 @@ int alloy(std::vector<cs::catom_t> & catom_array){
 	return EXIT_SUCCESS;	
 }
 
+int intermixing(std::vector<cs::catom_t> & catom_array){
+	// check calling of routine if error checking is activated
+	if(err::check==true){std::cout << "cs::intermixing has been called" << std::endl;}      
+
+	// loop over all atoms
+	for(unsigned int atom=0;atom<catom_array.size();atom++){
+		// get current material
+		int current_material=catom_array[atom].material;
+		int final_material=current_material;
+
+		//loop over all potential intermixing materials
+		for(int mat=0;mat<mp::num_materials;mat++){
+			if(mp::material[current_material].intermixing[mat]>0.0){
+				// find which region atom is in and test for probability of different material
+				double z=catom_array[atom].z;
+				double min = mp::material[mat].min*mp::system_dimensions[2];
+				double max = mp::material[mat].max*mp::system_dimensions[2];
+				double mean = (min+max)/2.0;
+				if(z<=min){
+					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*mp::system_dimensions[2]));
+					if(mtrandom::grnd() < probability) final_material=mat;
+				}
+				else if(z>min && z<=mean){
+					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*mp::system_dimensions[2]));
+					if(mtrandom::grnd() < probability) final_material=mat;
+				}
+				else if(z>mean && z<=max){
+					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*mp::system_dimensions[2]));
+					if(mtrandom::grnd() < probability) final_material=mat;
+				}
+				else if(z>max){
+					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*mp::system_dimensions[2]));
+					//std::cout << current_material << "\t" << mat << "\t" << atom << "\t" << z << "\t" << max << "\t" << probability << std::endl;
+					if(mtrandom::grnd() < probability) final_material=mat;
+				}
+			}
+		}
+		
+		// set final material
+		catom_array[atom].material=final_material;
+	}
+	
+	return EXIT_SUCCESS;    
+}
 
 
 
