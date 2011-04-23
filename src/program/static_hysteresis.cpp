@@ -83,7 +83,7 @@ int static_hysteresis(){
 				sim::integrate(sim::partial_time);
 				
 				double torque=stats::max_torque(); // needs correcting for new integrators
-				if((torque<1.0e-5) && (sim::time-start_time>100)){
+				if((torque<1.0e-6) && (sim::time-start_time>100)){
 					break;
 				}
 
