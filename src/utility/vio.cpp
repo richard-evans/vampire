@@ -1317,7 +1317,12 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			return EXIT_SUCCESS;
 		}
 		else
-		test="magnetisation";
+		test="field-alignment";
+		if(word==test){
+			output_list.push_back(12);
+			return EXIT_SUCCESS;
+		}
+		else		test="magnetisation";
 		if(word==test){
 			output_list.push_back(5);
 			return EXIT_SUCCESS;
@@ -2321,6 +2326,13 @@ namespace vout{
 		}
 	}
 	
+	// Output Function 12
+	void mdoth(std::ostream& stream){
+		
+		double mh=sim::H_vec[0]*stats::total_mag_norm[0]+sim::H_vec[1]*stats::total_mag_norm[1]+sim::H_vec[2]*stats::total_mag_norm[2];
+		stream << mh << "\t";
+	}
+	
 	// Data output wrapper function
 	void data(){
 
@@ -2359,6 +2371,9 @@ namespace vout{
 					break;
 				case 9:
 					vout::mat_mean_magm(vmag);
+					break;
+				case 12:
+					vout::mdoth(vmag);
 					break;
 			}
 		}
@@ -2399,6 +2414,9 @@ namespace vout{
 					break;
 				case 9:
 					vout::mat_mean_magm(std::cout);
+					break;
+				case 12:
+					vout::mdoth(std::cout);
 					break;
 			}
 		}
