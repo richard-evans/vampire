@@ -9,6 +9,8 @@
 #include "grains.hpp"
 #include "material.hpp"
 #include "random.hpp"
+#include "vmath.hpp"
+
 #include <string>
 #include <iostream>
 #include <cmath>
@@ -189,9 +191,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
 
 	double particle_origin[3];
 	// find centre unit cell
-	particle_origin[0] = double(iround(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
-	particle_origin[1] = double(iround(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
-	particle_origin[2] = double(iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+	particle_origin[0] = double(vmath::iround(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
+	particle_origin[1] = double(vmath::iround(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
+	particle_origin[2] = double(vmath::iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
 
 	if(mp::particle_creation_parity==1){
 		particle_origin[0]+=mp::lattice_constant[0]*0.5;
@@ -240,8 +242,8 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 
 	// Set number of particles in x and y directions
 	const double repeat_size = mp::particle_scale+mp::particle_spacing;
-	int num_x_particle = iround(mp::system_dimensions[0]/repeat_size);
-	int num_y_particle = iround(mp::system_dimensions[1]/repeat_size);
+	int num_x_particle = vmath::iround(mp::system_dimensions[0]/repeat_size);
+	int num_y_particle = vmath::iround(mp::system_dimensions[1]/repeat_size);
 	
 
 	// Loop to generate cubic lattice points
@@ -258,7 +260,7 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 			// Determine particle origin
 			particle_origin[0] = double(x_particle)*repeat_size + repeat_size;
 			particle_origin[1] = double(y_particle)*repeat_size + repeat_size;
-			particle_origin[2] = double(iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+			particle_origin[2] = double(vmath::iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
 
 			if(mp::particle_creation_parity==1){
 				particle_origin[0]+=mp::lattice_constant[0]*0.5;

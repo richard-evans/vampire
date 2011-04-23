@@ -17,6 +17,7 @@
 ///
 
 #include<vector>
+#include <cmath>
 
 /// @namespace ns
 /// @brief vmath namespace containing sundry math functions for vampire.
@@ -56,6 +57,8 @@ namespace vmath{
 	extern std::vector<std::vector<double> > set_matrix(const unsigned int, const unsigned int);
 	extern double sign(double);
 	extern int sign(int);
-}
+inline int iround( double value ){
+	return static_cast<int>(floor( value + 0.5 ));
+}}
 
 

@@ -22,7 +22,7 @@
 #include <cstdlib>
 
 // Vampire Header files
-#include "create.hpp"
+#include "vmath.hpp"
 #include "errors.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
@@ -62,9 +62,9 @@ int static_hysteresis(){
 	sim::integrate(sim::equilibration_time);
 		
 	// Setup min and max fields and increment (mT)
-	int iHmax=iround(double(sim::Hmax)*1.0E3);
-	int iHmin=iround(double(sim::Hmin)*1.0E3);
-	int iHinc=iround(double(sim::Hinc)*1.0E3);
+	int iHmax=vmath::iround(double(sim::Hmax)*1.0E3);
+	int iHmin=vmath::iround(double(sim::Hmin)*1.0E3);
+	int iHinc=vmath::iround(double(sim::Hinc)*1.0E3);
 
 	// Perform Field Loop
 	for(int parity=-1;parity<2;parity+=2){

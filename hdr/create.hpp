@@ -33,11 +33,6 @@
 ///=====================================================================================
 ///
 
-inline int iround( double value )
-  {
-  return static_cast<int>(floor( value + 0.5 ));
-  }
-
 namespace cs{
 	class catom_t {
 		public:
