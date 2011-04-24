@@ -96,8 +96,6 @@ void boltzmann_dist(){
 	// check calling of routine if error checking is activated
 	if(err::check==true) std::cout << "program::boltzmann_dist has been called" << std::endl;
 
-	std::cout << " Diagnostic - Boltzmann Distribution" << std::endl;
-
 	// array for binning spin angle
 	std::vector<double> bin(181,0.0);
 	
@@ -106,30 +104,37 @@ void boltzmann_dist(){
 
 	// Equilibrate system
 	sim::integrate(sim::equilibration_time);
-
+	
 	// Simulate system
-	while(sim::time<sim::total_time){
+	while(sim::time<sim::total_time+sim::equilibration_time){
 		
 		// Integrate system
 		sim::integrate(sim::partial_time);
 		
 		// Calculate magnetisation statistics
 		for(int atom=0; atom<atoms::num_atoms; atom++){
-			bin[vmath::iround(acos(atoms::z_spin_array[atom]*180.0/M_PI)+0.5)]+=1.0;
+			double angle = acos(atoms::z_spin_array[atom])*180.0/M_PI;
+			double id = vmath::iround(angle+0.5);
+			bin[id]+=1.0;
 		}
 	}
 	
-	// Find max probability
+	// Find max probability and max P
 	double maxp=0.0;
+	double maxP=0.0;
 	for(int b=0;b<181;b++){
+		double energy = mp::material[0].Ku1_SI;
+		double P = sin(double (b)*M_PI/180)*exp((energy*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0))/(sim::temperature*1.3806503e-23));
 		if((bin[b])>maxp) maxp=bin[b];
+		if(P>maxP) maxP=P;
 	}
 
 	// Output data
+	vmag << "# " << mp::material[0].Ku1_SI/sim::temperature*1.3806503e-23 << std::endl;
 	for(int b=0;b<181;b++){
-		double energy = mp::material[0].Ku;
-		double P = exp(-energy/(sim::temperature*1.3806503e-23));
-		vmag << b << "\t" << bin[b]/maxp << "\t" << P << std::endl;
+		double energy = mp::material[0].Ku1_SI;
+		double P = sin(double (b)*M_PI/180)*exp((energy*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0))/(sim::temperature*1.3806503e-23));
+		vmag << b << "\t" << (bin[b]+bin[180-b])/(2.0*maxp) << "\t" << P/maxP << std::endl;
 	}
 	
 }
