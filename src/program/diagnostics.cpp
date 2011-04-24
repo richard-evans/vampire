@@ -31,6 +31,7 @@
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
+#include "vmath.hpp"
 
 
 namespace program{
@@ -88,6 +89,49 @@ int timestep_scaling(){
 		}
 
 	return EXIT_SUCCESS;
+}
+
+void boltzmann_dist(){
+	
+	// check calling of routine if error checking is activated
+	if(err::check==true) std::cout << "program::boltzmann_dist has been called" << std::endl;
+
+	std::cout << " Diagnostic - Boltzmann Distribution" << std::endl;
+
+	// array for binning spin angle
+	std::vector<double> bin(181,0.0);
+	
+	// Set starting temperature
+	sim::temperature=sim::temperature;
+
+	// Equilibrate system
+	sim::integrate(sim::equilibration_time);
+
+	// Simulate system
+	while(sim::time<sim::total_time){
+		
+		// Integrate system
+		sim::integrate(sim::partial_time);
+		
+		// Calculate magnetisation statistics
+		for(int atom=0; atom<atoms::num_atoms; atom++){
+			bin[vmath::iround(acos(atoms::z_spin_array[atom]*180.0/M_PI)+0.5)]+=1.0;
+		}
+	}
+	
+	// Find max probability
+	double maxp=0.0;
+	for(int b=0;b<181;b++){
+		if((bin[b])>maxp) maxp=bin[b];
+	}
+
+	// Output data
+	for(int b=0;b<181;b++){
+		double energy = mp::material[0].Ku;
+		double P = exp(-energy/(sim::temperature*1.3806503e-23));
+		vmag << b << "\t" << bin[b]/maxp << "\t" << P << std::endl;
+	}
+	
 }
 
 }//end of namespace program
