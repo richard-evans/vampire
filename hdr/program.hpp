@@ -18,6 +18,7 @@ namespace program
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();
 	extern int timestep_scaling();
+	extern void boltzmann_dist();
 	
 }
 

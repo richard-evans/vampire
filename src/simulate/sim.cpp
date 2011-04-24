@@ -142,6 +142,11 @@ int run(){
 			program::two_temperature_pulse();
 			break;
 			
+		case 50:
+			if(vmpi::my_rank==0) std::cout << "Diagnostic-Boltzmann..." << std::endl; 
+			program::boltzmann_dist();
+			break;
+		
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);

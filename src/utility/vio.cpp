@@ -812,7 +812,11 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::program=6;
 				return EXIT_SUCCESS;
 			}
-			else{
+			test="Diagnostic-Boltzmann";
+			if(value==test){
+				sim::program=50;
+				return EXIT_SUCCESS;
+			}			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"Benchmark\"" << std::endl;
 				std::cerr << "\t\"Time-Series\"" << std::endl;
