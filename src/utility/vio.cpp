@@ -1130,12 +1130,25 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::cooling_function_flag=1;
 				return EXIT_SUCCESS;
 			}
+			test="double-gaussian";
+			if(value==test){
+				sim::cooling_function_flag=2;
+				return EXIT_SUCCESS;
+			}
+			test="linear";
+			if(value==test){
+				sim::cooling_function_flag=3;
+				return EXIT_SUCCESS;
+			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"exponential\"" << std::endl;
 				std::cerr << "\t\"gaussian\"" << std::endl;
+				std::cerr << "\t\"double-gaussian\"" << std::endl;
+				std::cerr << "\t\"linear\"" << std::endl;
 				err::vexit();
-			}		}
+			}
+		}
 		//--------------------------------------------------------------------
 		test="H-applied";
 		if(word==test){
