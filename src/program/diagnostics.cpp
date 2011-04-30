@@ -130,7 +130,7 @@ void boltzmann_dist(){
 	}
 
 	// Output data
-	vmag << "# " << mp::material[0].Ku1_SI/sim::temperature*1.3806503e-23 << std::endl;
+	vmag << "# " << mp::material[0].Ku1_SI/(sim::temperature*1.3806503e-23) << std::endl;
 	for(int b=0;b<181;b++){
 		double energy = mp::material[0].Ku1_SI;
 		double P = sin(double (b)*M_PI/180)*exp((energy*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0))/(sim::temperature*1.3806503e-23));
