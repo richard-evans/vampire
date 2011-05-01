@@ -430,6 +430,26 @@ int match_create(string const word, string const value, int const line){
 				return EXIT_SUCCESS;
 		}
 		else
+		test="voronoi-rounded";
+		if(word==test){
+				create_voronoi::rounded=true;
+				return EXIT_SUCCESS;
+		}
+		else
+		//-------------------------------------------------------------------
+		test="voronoi-area-cutoff";
+		if(word==test){
+			double vsd=atof(value.c_str());
+			if((vsd<0.0) || (vsd > 1.0)){
+				std::cerr << "Error in input file - voronoi area-cutoff is outside of valid range (0.0-1.0)" << std::endl;
+				return EXIT_FAILURE;}
+			else{
+				create_voronoi::area_cutoff=vsd;
+				return EXIT_SUCCESS;
+			}
+		}
+		else
+		//-------------------------------------------------------------------
 		//-------------------------------------------------------------------
 		// system_creation_flags[3] - Set neighbourlist type
 		//-------------------------------------------------------------------
