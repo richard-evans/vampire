@@ -273,9 +273,131 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		} // end of grain loop
 	} // end of rounding if
 
+	// Create a 2D supercell array of atom numbers to improve performance for systems with many grains
+	std::vector < std::vector < std::vector < int > > > supercell_array;
+	
+	int min_bounds[3];
+	int max_bounds[3];
+	
+	#ifdef MPICF
+	if(vmpi::mpi_mode==0){
+		min_bounds[0] = int(vmpi::min_dimensions[0]/mp::lattice_constant[0]);
+		min_bounds[1] = int(vmpi::min_dimensions[1]/mp::lattice_constant[1]);
+		min_bounds[2] = int(vmpi::min_dimensions[2]/mp::lattice_constant[2]);
+		max_bounds[0] = vmath::iround(vmpi::max_dimensions[0]/mp::lattice_constant[0]);
+		max_bounds[1] = vmath::iround(vmpi::max_dimensions[1]/mp::lattice_constant[1]);
+		max_bounds[2] = vmath::iround(vmpi::max_dimensions[2]/mp::lattice_constant[2]);
+	}
+	else{
+		min_bounds[0]=0;
+		min_bounds[1]=0;
+		min_bounds[2]=0;
+		max_bounds[0]=vmath::iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
+		max_bounds[1]=vmath::iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
+		max_bounds[2]=vmath::iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
+	}
+	#else
+		min_bounds[0]=0;
+		min_bounds[1]=0;
+		min_bounds[2]=0;
+		max_bounds[0]=vmath::iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
+		max_bounds[1]=vmath::iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
+		max_bounds[2]=vmath::iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
+	#endif
+	
+	// allocate supercell array
+	int dx = max_bounds[0]-min_bounds[0];
+	int dy = max_bounds[1]-min_bounds[1];
+
+	supercell_array.resize(dx);
+	for(int i=0;i<dx;i++){
+		supercell_array[i].resize(dy);
+	}
+	
+	// loop over atoms and populate supercell array
+	for(unsigned int atom=0;atom<catom_array.size();atom++){
+		int cx = int (catom_array[atom].x/mp::lattice_constant[0]);
+		int cy = int (catom_array[atom].y/mp::lattice_constant[1]);
+		supercell_array[cx][cy].push_back(atom);
+	}
+	
 	std::cout <<"Generating Voronoi Grains";
 
-	const int num_atoms = catom_array.size();	
+	// loop over all grains with vertices
+	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
+		// Exclude grains with zero vertices
+
+		if((grain%(grain_coord_array.size()/10))==0){
+			std::cout << "." << std::flush;
+		}
+		if(grain_vertices_array[grain].size()!=0){
+
+			// initialise minimum and max supercell coordintaes for grain
+			int minx=10000000;
+			int maxx=0;
+			int miny=10000000;
+			int maxy=0;
+			
+			// Set temporary vertex coordinates (real) and compute cell ranges
+			int num_vertices = grain_vertices_array[grain].size();
+			for(int vertex=0;vertex<num_vertices;vertex++){
+				tmp_grain_pointx_array[vertex]=grain_vertices_array[grain][vertex][0]+grain_coord_array[grain][0];
+				tmp_grain_pointy_array[vertex]=grain_vertices_array[grain][vertex][1]+grain_coord_array[grain][1];
+				int x = int(tmp_grain_pointx_array[vertex]/mp::lattice_constant[0]);
+				int y = int(tmp_grain_pointy_array[vertex]/mp::lattice_constant[1]);
+				if(x < minx) minx = x;
+				if(x > maxx) maxx = x;
+				if(y < miny) miny = y;
+				if(y > maxy) maxy = y;
+			}
+
+			// loopover cells
+			for(int i=minx;i<=maxx;i++){
+				for(int j=miny;j<=maxy;j++){
+				
+					// loop over atoms in cells;
+					for(int id=0;id<supercell_array[i][j].size();id++){
+						int atom = supercell_array[i][j][id];
+						
+						double x = catom_array[atom].x;
+						double y = catom_array[atom].y;
+						
+						// Check to see if site is within polygon
+						if(vmath::point_in_polygon(x,y,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
+							catom_array[atom].include=true;
+							catom_array[atom].grain=grain;
+						}
+						// Check for continuous media
+						else if(mp::material[catom_array[atom].material].continuous==true){
+							const int geo=mp::material[catom_array[atom].material].geometry;
+
+							if(geo==0){
+								catom_array[atom].include=true;
+							}
+							else{
+								double x = catom_array[atom].x;
+								double y = catom_array[atom].y;
+								double px[50];
+								double py[50];
+								// Initialise polygon points
+								for(int p=0;p<geo;p++){
+									px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*mp::system_dimensions[0];
+									py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*mp::system_dimensions[1];
+								}
+								if(vmath::point_in_polygon(x,y,px,py,geo)==true){
+									catom_array[atom].include=true;
+									catom_array[atom].grain=grain;
+								}
+							}
+							//catom_array[atom].include=true;
+							catom_array[atom].grain=grain;
+						}
+					}
+				}
+			}
+		}
+	}
+	/*const int num_atoms = catom_array.size();	
 	int nearest_grain=0;
 	
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
@@ -341,7 +463,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		//if(catom_array[atom].material==2){
 		//	catom_array[atom].material=catom_array[atom].grain%2+2;
 		//}
-	}
+	}*/
 
 	std::cout << "done!" << std::endl;
 
