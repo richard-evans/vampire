@@ -43,6 +43,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
 
 	atoms::type_array.resize(atoms::num_atoms,0);
+	atoms::category_array.resize(atoms::num_atoms,0);
 	atoms::grain_array.resize(atoms::num_atoms,0);
 	atoms::cell_array.resize(atoms::num_atoms,0);
 	
@@ -63,6 +64,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		atoms::z_coord_array[atom] = catom_array[atom].z;
 		
 		atoms::type_array[atom] = catom_array[atom].material;
+		atoms::category_array[atom] = catom_array[atom].category;
 		//std::cout << atom << " grain: " << catom_array[atom].grain << std::endl;
 		atoms::grain_array[atom] = catom_array[atom].grain;
 
