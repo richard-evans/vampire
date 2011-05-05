@@ -18,11 +18,40 @@
 
 namespace cs{
 	
+	class unit_cell_atom_t {
+	public:
+		double x;
+		double y;
+		double z;
+		unsigned int lc; // lattice category
+		unsigned int hc; // height category
+		
+	};
+	
+	class unit_cell_t {
+	public:
+		
+		unsigned int size;
+		unsigned int lcsize;
+		unsigned int lhsize;
+		// list of atoms in each category
+		std::vector <unit_cell_atom_t> atom;
+		
+	};
+	
+	void unit_cell_set(std::vector<unit_cell_t> &);
+	
 int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "cs::create_crystal_structure has been called" << std::endl;}	
+
+	// declare array of unit cells
+	std::vector<unit_cell_t> unit_cell(0);
+
+	// populate unit cell coordinates
+	unit_cell_set(unit_cell);
 
 	//-----------------------------------------------------------------------
 	// Pre Determine crystal structure and estimate number of atoms each material
@@ -82,69 +111,8 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		//--------------------------------------------------------------
 		// Determine atoms per unit cell and unit cell atom coordinates
 		//--------------------------------------------------------------
-		int atoms_per_unit_cell=0;
-		std::vector <double> unit_cell_coords(0);
+		int atoms_per_unit_cell=unit_cell[mat].size;
 		
-		// Simple Cubic
-		if(mat_cs[mat]=="sc"){
-			atoms_per_unit_cell=1;
-			unit_cell_coords.resize(3*atoms_per_unit_cell);
-			//-----------------------------
-			unit_cell_coords[0]=0.0;
-			unit_cell_coords[1]=0.0;
-			unit_cell_coords[2]=0.0;
-			//-----------------------------
-		}
-		if(mat_cs[mat]=="bcc"){
-			atoms_per_unit_cell=2;
-			unit_cell_coords.resize(3*atoms_per_unit_cell);
-			//-----------------------------
-			unit_cell_coords[0]=0.0;
-			unit_cell_coords[1]=0.0;
-			unit_cell_coords[2]=0.0;
-			//-----------------------------
-			unit_cell_coords[3]=0.5;
-			unit_cell_coords[4]=0.5;
-			unit_cell_coords[5]=0.5;
-			//-----------------------------
-		}
-		if(mat_cs[mat]=="fct"){
-			atoms_per_unit_cell=2;
-			unit_cell_coords.resize(3*atoms_per_unit_cell);
-			//-----------------------------
-			unit_cell_coords[0]=0.0;
-			unit_cell_coords[1]=0.0;
-			unit_cell_coords[2]=0.0;
-			//-----------------------------
-			unit_cell_coords[3]=0.5;
-			unit_cell_coords[4]=0.5;
-			unit_cell_coords[5]=0.0;
-			//-----------------------------
-		}
-		if(mat_cs[mat]=="fcc"){
-			atoms_per_unit_cell=4;
-			unit_cell_coords.resize(3*atoms_per_unit_cell);
-			//-----------------------------
-			unit_cell_coords[0]=0.0;
-			unit_cell_coords[1]=0.0;
-			unit_cell_coords[2]=0.0;
-			//-----------------------------
-			unit_cell_coords[3]=0.5;
-			unit_cell_coords[4]=0.5;
-			unit_cell_coords[5]=0.0;
-			//-----------------------------
-			unit_cell_coords[6]=0.5;
-			unit_cell_coords[7]=0.0;
-			unit_cell_coords[8]=0.5;
-			//-----------------------------
-			unit_cell_coords[9]=0.0;
-			unit_cell_coords[10]=0.5;
-			unit_cell_coords[11]=0.5;
-			//-----------------------------
-		}
-		
-		if(atoms_per_unit_cell==0){std::cout << "Error determining atoms_per_unit_cell, unknown crystal_type" << std::endl; err::vexit();}
-
 		double min=mp::material[mat].min*mp::system_dimensions[2];
 		double max=mp::material[mat].max*mp::system_dimensions[2];
 		
@@ -177,15 +145,17 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 			max_bounds[2]=supercell_dim[2];
 		#endif
 		
+		unsigned int maxlh=2;
+			
 		// Duplicate unit cell
 		for(int z=min_bounds[2];z<max_bounds[2];z++){
 			for(int y=min_bounds[1];y<max_bounds[1];y++){
 				for(int x=min_bounds[0];x<max_bounds[0];x++){
 					// Loop over atoms in unit cell
 					for(int uca=0;uca<atoms_per_unit_cell;uca++){
-						double cx = (double(x)+unit_cell_coords[3*uca+0])*mp::lattice_constant[0];
-						double cy = (double(y)+unit_cell_coords[3*uca+1])*mp::lattice_constant[1];
-						double cz = (double(z)+unit_cell_coords[3*uca+2])*mp::lattice_constant[2];
+						double cx = (double(x)+unit_cell[mat].atom[uca].x)*mp::lattice_constant[0];
+						double cy = (double(y)+unit_cell[mat].atom[uca].y)*mp::lattice_constant[1];
+						double cz = (double(z)+unit_cell[mat].atom[uca].z)*mp::lattice_constant[2];
 						if((cz>=min) && (cz<max)){
 							#ifdef MPICF
 							if(vmpi::mpi_mode==0){
@@ -198,6 +168,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 								catom_array[atom].y=cy;
 								catom_array[atom].z=cz;
 								catom_array[atom].material=mat;
+								catom_array[atom].category=unit_cell[mat].hc+z*maxlh;
 								atom++;
 							#ifdef MPICF
 								}
@@ -235,5 +206,106 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 
 	return EXIT_SUCCESS;
 }
+
+void unit_cell_set(std::vector<unit_cell_t> & unit_cell){
+
+	// check calling of routine if error checking is activated
+	if(err::check==true){std::cout << "cs::unit_cell_set has been called" << std::endl;}	
+
+	// resize unit_cell_array to size of num_materials
+	unit_cell.resize(mp::num_materials);
+	
+	// populate unit cells with structure data
+	for(int mat=0;mat<mp::num_materials;mat++){
+
+		// Simple Cubic
+		if(mp::material[mat].crystal_structure=="sc"){
+			unit_cell[mat].size=1;
+			unit_cell[mat].lcsize=1;
+			unit_cell[mat].hcsize=1;
+			unit_cell[mat].atom.resize(1);
+			//-----------------------------
+			unit_cell[mat].atom[0].x=0.0;
+			unit_cell[mat].atom[0].y=0.0;
+			unit_cell[mat].atom[0].z=0.0;
+			unit_cell[mat].atom[0].lc=0;
+			unit_cell[mat].atom[0].hc=0;
+			//-----------------------------
+		}
+		else if( mp::material[mat].crystal_structure=="bcc"){
+			unit_cell[mat].size=2;
+			unit_cell[mat].lcsize=2;
+			unit_cell[mat].hcsize=2;
+			unit_cell[mat].atom.resize(2);
+			//-----------------------------
+			unit_cell[mat].atom[0].x=0.0;
+			unit_cell[mat].atom[0].y=0.0;
+			unit_cell[mat].atom[0].z=0.0;
+			unit_cell[mat].atom[0].lc=0;
+			unit_cell[mat].atom[0].hc=0;
+			//-----------------------------
+			unit_cell[mat].atom[1].x=0.5;
+			unit_cell[mat].atom[1].y=0.5;
+			unit_cell[mat].atom[1].z=0.5;
+			unit_cell[mat].atom[1].lc=1;
+			unit_cell[mat].atom[1].hc=1;
+			//-----------------------------
+		}
+		else if(mp::material[mat].crystal_structure=="fct"){
+			unit_cell[mat].size=2;
+			unit_cell[mat].lcsize=2;
+			unit_cell[mat].hcsize=1;
+			unit_cell[mat].atom.resize(2);
+			//-----------------------------
+			unit_cell[mat].atom[0].x=0.0;
+			unit_cell[mat].atom[0].y=0.0;
+			unit_cell[mat].atom[0].z=0.0;
+			unit_cell[mat].atom[0].lc=0;
+			unit_cell[mat].atom[0].hc=0;
+			//-----------------------------
+			unit_cell[mat].atom[1].x=0.5;
+			unit_cell[mat].atom[1].y=0.5;
+			unit_cell[mat].atom[1].z=0.0;
+			unit_cell[mat].atom[1].lc=1;
+			unit_cell[mat].atom[1].hc=0;
+			//-----------------------------
+		}
+		else if(mp::material[mat].crystal_structure=="fcc"){
+			unit_cell[mat].size=4;
+			unit_cell[mat].lcsize=4;
+			unit_cell[mat].hcsize=2;
+			unit_cell[mat].atom.resize(4);
+			//-----------------------------
+			unit_cell[mat].atom[0].x=0.0;
+			unit_cell[mat].atom[0].y=0.0;
+			unit_cell[mat].atom[0].z=0.0;
+			unit_cell[mat].atom[0].lc=0;
+			unit_cell[mat].atom[0].hc=0;
+			//-----------------------------
+			unit_cell[mat].atom[1].x=0.5;
+			unit_cell[mat].atom[1].y=0.5;
+			unit_cell[mat].atom[1].z=0.0;
+			unit_cell[mat].atom[1].lc=1;
+			unit_cell[mat].atom[1].hc=0;
+			//-----------------------------
+			unit_cell[mat].atom[2].x=0.5;
+			unit_cell[mat].atom[2].y=0.0;
+			unit_cell[mat].atom[2].z=0.5;
+			unit_cell[mat].atom[2].lc=2;
+			unit_cell[mat].atom[2].hc=1;
+			//-----------------------------
+			unit_cell[mat].atom[3].x=0.0;
+			unit_cell[mat].atom[3].y=0.5;
+			unit_cell[mat].atom[3].z=0.5;
+			unit_cell[mat].atom[3].lc=3;
+			unit_cell[mat].atom[3].hc=1;
+			//-----------------------------
+		}
+		else{
+			std::cerr << "Error -  unknown crystal_type" << std::endl; 
+			err::vexit();
+		}
+
+	}
 
 }
