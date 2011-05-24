@@ -1919,18 +1919,18 @@ int match_material(string const word, string const value, string const unit, int
 		}
 		//--------------------------------------------------------------------
 		else
-		test="alloy-master";
+		test="alloy-master"; // determines host material
 		if(word==test){
 			read_material[super_index].alloy_master=true;
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
 		else
-		test="alloy-class";
+		test="alloy-class"; // determines unit cell category id for ordered alloys
 		if(word==test){
 			int ac=atoi(value.c_str());
-			if((ac<0) || (ac > 0)){
-				std::cerr << "Error in input file - material[" << super_index << "]:alloy-class is outside of valid range (0-0)" << std::endl;
+			if((ac<-1) || (ac > 3)){
+				std::cerr << "Error in input file - material[" << super_index << "]:alloy-class is outside of valid range (0-3)" << std::endl;
 				return EXIT_FAILURE;
 			}
 			else{
@@ -1940,7 +1940,7 @@ int match_material(string const word, string const value, string const unit, int
 		}
 		//--------------------------------------------------------------------
 		else
-		test="alloy";
+		test="alloy"; // determines %mixing for disordered alloys
 		if(word==test){
 			double a=atof(value.c_str());
 			if((a < 0.0) || (a > 1.0)){

@@ -25,7 +25,7 @@ materials_t::materials_t ():
 	density(1.0),
 	cutoff(0.0),
 	alloy_master(false),
-	alloy_class(0),
+	alloy_class(-1),
 	continuous(false),
 	moment_flag(true),
 	anis_flag(true),
