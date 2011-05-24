@@ -47,7 +47,8 @@ namespace cs{
 
 			// Integers
 			int material;
-			int category;
+			int uc_category;
+			int lh_category;
 			int grain;
 			int supercell;
 			int mpi_type;
@@ -60,7 +61,8 @@ namespace cs{
 				z(0.0),
 				include(false),
 				material(0),
-				category(0),
+				uc_category(0),
+				lh_category(0),
 				grain(0),
 				supercell(0),
 				mpi_type(0),

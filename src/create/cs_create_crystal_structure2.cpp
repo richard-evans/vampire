@@ -33,7 +33,7 @@ namespace cs{
 		
 		unsigned int size;
 		unsigned int lcsize;
-		unsigned int lhsize;
+		unsigned int hcsize;
 		// list of atoms in each category
 		std::vector <unit_cell_atom_t> atom;
 		
@@ -168,7 +168,8 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 								catom_array[atom].y=cy;
 								catom_array[atom].z=cz;
 								catom_array[atom].material=mat;
-								catom_array[atom].category=unit_cell[mat].hc+z*maxlh;
+								catom_array[atom].lh_category=unit_cell[mat].atom[uca].hc+z*maxlh;
+								catom_array[atom].uc_category=unit_cell[mat].atom[uca].lc;
 								atom++;
 							#ifdef MPICF
 								}
@@ -309,3 +310,6 @@ void unit_cell_set(std::vector<unit_cell_t> & unit_cell){
 	}
 
 }
+
+} // end of namespace cs
+
