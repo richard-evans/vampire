@@ -2082,17 +2082,6 @@ namespace vout{
 	
 	int output_grain_rate=1;
 	
-	bool output_povray=false;
-	int output_povray_rate=1000;
-	int pov_file_counter=0;
-
-	bool output_povray_cells=false;
-	int output_povray_cells_rate=1000;
-	int pov_file_cells_counter=0;
-	
-	bool output_povray_grains=false;
-	int output_povray_grain_rate=1000;
-	int pov_file_grains_counter=0;
 
 	std::ofstream errfile;
 	null_streambuf nullbuf;
@@ -2501,10 +2490,8 @@ namespace vout{
 		}
 		}
 		
-		// Atomistic povray output
-		if(sim::time%vout::output_povray_rate==0){
-			if(vout::output_povray==true) vout::pov_file();
-		}
+		vout::config();
+
 	} // end of data
 	
 } // end of namespace vout

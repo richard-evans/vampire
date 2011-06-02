@@ -99,6 +99,7 @@ obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
+obj/utility/vconfig.o \
 obj/utility/vio.o \
 obj/utility/vmath.o \
 obj/utility/units.o 

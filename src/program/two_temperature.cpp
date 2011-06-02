@@ -65,9 +65,6 @@ void two_temperature_pulse(){
 	// Set equilibration temperature and field
 	sim::temperature=sim::Teq;
 
-	// Output initial povray
-	vout::pov_file();
-
 	// Equilibrate system
 	while(sim::time<sim::equilibration_time){
 		
@@ -79,9 +76,6 @@ void two_temperature_pulse(){
 		// Output data
 		vout::data();
 	}
-
-	// Output povray after equilibration
-	vout::pov_file();
 
 	// record starting time after equiibration
 	int start_time=sim::time;
@@ -112,10 +106,7 @@ void two_temperature_pulse(){
 
 	}
 
-	// Output final povray
-	vout::pov_file();
-
-} // end of two temperatue pulse
+} // end of two temperature pulse
 
 } // end of namespace program
 
