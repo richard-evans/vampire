@@ -108,6 +108,50 @@ int mag_m(){
 	#endif
 
 	stats::inv_num_atoms = 1.0/double(stats::num_atoms);
+
+	if(!stats::is_initialised){
+		// Resize arrays
+		stats::sublattice_mx_array.resize(mp::num_materials,0);
+		stats::sublattice_my_array.resize(mp::num_materials,0);
+		stats::sublattice_mz_array.resize(mp::num_materials,0);
+		stats::sublattice_magm_array.resize(mp::num_materials,0);
+		stats::sublattice_mean_magm_array.resize(mp::num_materials,0);
+		stats::sublattice_mom_array.resize(mp::num_materials,0);
+		stats::sublattice_nm_array.resize(mp::num_materials,0);
+		
+		stats::max_moment=0.0;
+		
+		// Calculate number of moments in each sublattice
+		for(int atom=0;atom<stats::num_atoms;atom++){
+			int mat=atoms::type_array[atom];
+			
+			// count towards moment
+			stats::sublattice_nm_array[mat]++;
+			// add to max_moment
+			stats::max_moment+=mp::material[mat].mu_s_SI;
+		}
+		int nm=0;
+		// Calculate size of each moment and check num_moments
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stats::sublattice_mom_array[mat]=mp::material[mat].mu_s_SI;
+			nm+=stats::sublattice_nm_array[mat];
+		}
+		// Check correct number of moments found
+		if(nm != stats::num_atoms){
+			std::cerr << "Error in mag_m calculation, missing moments are present:" << stats::num_atoms << " expected, " << nm << " found!" << std::endl;
+		}
+
+		// Calculate global moment for all CPUs
+		#ifdef MPICF
+			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::max_moment,1,MPI_DOUBLE,MPI_SUM);
+			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_nm_array[0],mp::num_materials,MPI_INT,MPI_SUM);
+		#endif
+
+		// Set initilaised flag to true
+		stats::is_initialised=true;
+	}	
+	
+	
 	
 	//---------------------------------------------------------
 	// For single material, use streamlined version for speed
@@ -149,55 +193,21 @@ int mag_m(){
 		// Add to mean magm
 		stats::total_mean_mag_m_norm+=stats::total_mag_m_norm;
 		stats::total_mean_mag_m_actual+=stats::total_mag_m_actual;
+		
+		// Copy to sublattice arrays for output
+		stats::sublattice_mx_array[0] = stats::total_mag_norm[0];
+		stats::sublattice_my_array[0] = stats::total_mag_norm[1];
+		stats::sublattice_mz_array[0] = stats::total_mag_norm[2];
+		stats::sublattice_magm_array[0] = stats::total_mag_m_norm;
+		stats::sublattice_mean_magm_array[0] = stats::total_mean_mag_m_norm;
+		
+		// Increment data counter		
 		stats::data_counter+=1.0;
 	}
 	else{
 	//---------------------------------------------------------
 	// For multiple materials, use full version
 	//---------------------------------------------------------
-		// Calculate sublattice moments
-		
-		if(!stats::is_initialised){
-			// Resize arrays
-			stats::sublattice_mx_array.resize(mp::num_materials,0);
-			stats::sublattice_my_array.resize(mp::num_materials,0);
-			stats::sublattice_mz_array.resize(mp::num_materials,0);
-			stats::sublattice_magm_array.resize(mp::num_materials,0);
-			stats::sublattice_mean_magm_array.resize(mp::num_materials,0);
-			stats::sublattice_mom_array.resize(mp::num_materials,0);
-			stats::sublattice_nm_array.resize(mp::num_materials,0);
-			
-			stats::max_moment=0.0;
-			
-			// Calculate number of moments in each sublattice
-			for(int atom=0;atom<stats::num_atoms;atom++){
-				int mat=atoms::type_array[atom];
-				
-				// count towards moment
-				stats::sublattice_nm_array[mat]++;
-				// add to max_moment
-				stats::max_moment+=mp::material[mat].mu_s_SI;
-			}
-			int nm=0;
-			// Calculate size of each moment and check num_moments
-			for(int mat=0;mat<mp::num_materials;mat++){
-				stats::sublattice_mom_array[mat]=mp::material[mat].mu_s_SI;
-				nm+=stats::sublattice_nm_array[mat];
-			}
-			// Check correct number of moments found
-			if(nm != stats::num_atoms){
-				std::cerr << "Error in mag_m calculation, missing moments are present:" << stats::num_atoms << " expected, " << nm << " found!" << std::endl;
-			}
-
-			// Calculate global moment for all CPUs
-			#ifdef MPICF
-				MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::max_moment,1,MPI_DOUBLE,MPI_SUM);
-				MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_nm_array[0],mp::num_materials,MPI_INT,MPI_SUM);
-			#endif
-
-			// Set initilaised flag to true
-			stats::is_initialised=true;
-		}	
 		
 		// Reinitialise sublattice components
 		for(int mat=0;mat<mp::num_materials;mat++){
