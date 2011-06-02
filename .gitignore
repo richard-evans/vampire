@@ -16,6 +16,8 @@
 *.inc
 info
 vampire
+cfg2povray
+cfg2rasmol
 crystal.xyz
 vdp
 vmag
