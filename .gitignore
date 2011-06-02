@@ -8,11 +8,12 @@
 *.err
 #Povray files
 *.pov
-*.pin
 # Mac files
 *.DS_Store
 # Other sundry files
 *.png
+*.cfg
+*.inc
 info
 vampire
 crystal.xyz
