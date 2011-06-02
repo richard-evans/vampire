@@ -2096,7 +2096,7 @@ namespace vout{
 		strm.rdbuf(&nullbuf);
 	}
   
-/// @brief Function to output atomistic resolution snapshots for povray
+/*/// @brief Function to output atomistic resolution snapshots for povray
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -2116,6 +2116,9 @@ namespace vout{
 ///
 	int pov_file(){
 
+		
+		std::cout << "Outputting povray" << std::endl;
+		
 		// check calling of routine if error checking is activated
 		if(err::check==true){std::cout << "vout::pov_file has been called" << std::endl;}
 
@@ -2172,7 +2175,7 @@ namespace vout{
 			pov_file_ofstr << "#declare CY=" << size*vec[1]*6.0 << ";" << std::endl;
 			pov_file_ofstr << "#declare CZ=" << size*vec[2]*6.0 << ";" << std::endl;
 	 		pov_file_ofstr << "#declare ref=0.4;" << std::endl;
-	 		pov_file_ofstr << "#declare sscale=2.0;" << std::endl;
+	 		//pov_file_ofstr << "#declare sscale=2.0;" << std::endl;
 			pov_file_ofstr << "global_settings { assumed_gamma 2.0 }" << std::endl;
 			pov_file_ofstr << "background { color Gray30 }" << std::endl;
 
@@ -2181,6 +2184,16 @@ namespace vout{
 			pov_file_ofstr << "Set_Camera_Sky(<0,0,1>)" << std::endl;
 			pov_file_ofstr << "light_source { <2*CX, 2*CY, 2*CZ> color White}" << std::endl;
 
+			for(int mat=0;mat<mp::num_materials;mat++){
+				pov_file_ofstr << "#declare sscale"<< mat << "=2.0;" << std::endl;
+				pov_file_ofstr << "#declare rscale"<< mat << "=1.2;" << std::endl;
+				pov_file_ofstr << "#declare cones"<< mat << "=0;" << std::endl;
+				pov_file_ofstr << "#declare arrows"<< mat << "=1;" << std::endl;
+				pov_file_ofstr << "#declare spheres"<< mat << "=1;" << std::endl;
+				pov_file_ofstr << "#declare spincolors"<< mat << "=1;" << std::endl;
+				pov_file_ofstr << "#declare spincolor"<< mat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+			}
+			
 			for(int p =0;p<vmpi::num_processors;p++){
 				std::stringstream pov_sstr;
 				pov_sstr << "spins." << std::setfill('0') << std::setw(3) << p << "." << std::setfill('0') << std::setw(5) << pov_file_counter << ".pin";
@@ -2198,6 +2211,7 @@ namespace vout{
 	
 			double red,green,blue,ireal;
 			ireal = atoms::z_spin_array[atom];
+			int mat= atoms::type_array[atom];
 
 			if(ireal>0.8){
 				red = 0.0;
@@ -2234,23 +2248,38 @@ namespace vout{
 				//double cy=mpi_create_variables::mpi_atom_global_coord_array[3*atom+1]*material_parameters::lattice_space_conversion[1];
 				//double cz=mpi_create_variables::mpi_atom_global_coord_array[3*atom+2]*material_parameters::lattice_space_conversion[2];
 			//#else
-				double cx=atoms::x_coord_array[atom];  //*material_parameters::lattice_space_conversion[0];
-				double cy=atoms::y_coord_array[atom];  //*material_parameters::lattice_space_conversion[1];
-				double cz=atoms::z_coord_array[atom];  //*material_parameters::lattice_space_conversion[2];
+				double cx=atoms::x_coord_array[atom]+0.5*mtrandom::grnd();  //*material_parameters::lattice_space_conversion[0];
+				double cy=atoms::y_coord_array[atom]+0.5*mtrandom::grnd();  //*material_parameters::lattice_space_conversion[1];
+				double cz=atoms::z_coord_array[atom]+0.5*mtrandom::grnd();  //*material_parameters::lattice_space_conversion[2];
 			//#endif
 			double sx=0.5*atoms::x_spin_array[atom];
 			double sy=0.5*atoms::y_spin_array[atom];
 			double sz=0.5*atoms::z_spin_array[atom];
 
-
-	  		pov_file_ofstr << "cone {<" << cx << "+" << sx << "*sscale,"
-										 << cy << "+" << sy << "*sscale,"
-										 << cz << "+" << sz << "*sscale>,0.0 <"
-										 << cx << "-" << sx << "*sscale,"
-										 << cy << "-" << sy << "*sscale,"
-										 << cz << "-" << sz << "*sscale>,sscale*0.5 "
-						<< "texture { pigment {color rgb <" << red << " " << green << " " << blue << ">}"
-						<< "finish {reflection {ref} diffuse 1 ambient 0}}}" << std::endl;
+			pov_file_ofstr << "union{" << std::endl;
+			pov_file_ofstr << "#if(spheres" << mat << ") sphere {<" << cx << ","<< cy << ","<< cz << ">,0.5*rscale"<< mat <<"} #end" << std::endl;
+			pov_file_ofstr << "#if(arrows" << mat << ") cylinder {<" << cx << "+" << sx << "*sscale"<< mat <<","
+										 << cy << "+" << sy << "*sscale"<< mat <<","
+										 << cz << "+" << sz << "*sscale"<< mat <<">,<"
+										 << cx << "-" << sx << "*sscale"<< mat <<","
+										 << cy << "-" << sy << "*sscale"<< mat <<","
+										 << cz << "-" << sz << "*sscale"<< mat <<">,sscale"<< mat <<"*0.12}";
+			pov_file_ofstr << "cone {<" << cx << "+" << sx << "*sscale"<< mat <<","
+										 << cy << "+" << sy << "*sscale"<< mat <<","
+										 << cz << "+" << sz << "*1.6*sscale"<< mat <<">,sscale"<< mat <<"*0.0 <"
+										 << cx << "+" << sx << "*sscale"<< mat <<","
+										 << cy << "+" << sy << "*sscale"<< mat <<","
+										 << cz << "+" << sz << "*sscale"<< mat <<">,sscale"<< mat <<"*0.2} #end" << std::endl;
+			pov_file_ofstr << "#if(cones" << mat << ") cone {<" << cx << "+" << sx << "*sscale"<< mat <<","
+										 << cy << "+" << sy << "*sscale"<< mat <<","
+										 << cz << "+" << sz << "*sscale"<< mat <<">,0.0 <"
+										 << cx << "-" << sx << "*sscale"<< mat <<","
+										 << cy << "-" << sy << "*sscale"<< mat <<","
+										 << cz << "-" << sz << "*sscale"<< mat <<">,sscale"<< mat <<"*0.5} #end" << std::endl;
+						
+			pov_file_ofstr << "#if(spincolors" << mat << ") texture { pigment {color rgb <" << red << " " << green << " " << blue << ">}" << "finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
+			pov_file_ofstr << "#else texture { spincolor" << mat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
+			pov_file_ofstr << "}" << std::endl;
 	  	}
 	
 		pov_file_ofstr.close();
@@ -2258,7 +2287,7 @@ namespace vout{
 		pov_file_counter++;
 
 	return EXIT_SUCCESS;
-	}
+	}*/
   
 	// Output Function 0
 	void time(std::ostream& stream){
