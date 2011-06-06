@@ -207,9 +207,11 @@ namespace cells{
 
 		// Now find mean coordinates
 		for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
-			cells::x_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
-			cells::y_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
-			cells::z_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
+			if(cells::num_atoms_in_cell[local_cell]>0){
+				cells::x_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
+				cells::y_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
+				cells::z_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
+			}
 			//if(vmpi::my_rank==0){
 			//vinfo << local_cell << "\t" << cells::num_atoms_in_cell[local_cell] << "\t";
 			//vinfo << cells::x_coord_array[local_cell] << "\t" << cells::y_coord_array[local_cell];
