@@ -13,6 +13,8 @@ namespace sim{
 	extern int equilibration_time;
 	extern int runs;
 	
+	extern bool ext_demag;
+		
 	extern double Tmax;
 	extern double Tmin;
 	extern double Teq;
@@ -24,6 +26,8 @@ namespace sim{
 	extern double Hmax; // T
 	extern double Hinc; // T
 	extern double Heq; //T
+	extern double demag_factor[3];
+	
 	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
 	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
 

@@ -36,6 +36,8 @@ namespace sim{
 	int equilibration_time=0;
 	int runs=1; // for certain repetitions in programs
 	
+	bool ext_demag=false;
+	
 	double Tmax=300.0;
 	double Tmin=0.0;
 	double Teq=300.0;
@@ -47,6 +49,7 @@ namespace sim{
 	double Hmax=+1.0; // T
 	double Hinc= 0.1; // T
 	double Heq=0.0;
+	double demag_factor[3]={0.0,0.0,0.0};
 	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
 	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
 

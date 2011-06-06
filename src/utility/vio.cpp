@@ -1282,7 +1282,42 @@ int match_sim(string const word, string const value, string const unit, int cons
 			sim::H_vec[2]=atof(value.c_str());
 			return EXIT_SUCCESS;
 		}
-		
+		//--------------------------------------------------------------------
+		test="External-Demag";
+		if(word==test){
+			test="true";
+			if(value==test){
+				sim::ext_demag=true;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				sim::ext_demag=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="Dx";
+		if(word==test){
+			sim::demag_factor[0]=atof(value.c_str());
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="Dy";
+		if(word==test){
+			sim::demag_factor[1]=atof(value.c_str());
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="Dz";
+		if(word==test){
+			sim::demag_factor[2]=atof(value.c_str());
+			return EXIT_SUCCESS;
+		}
 		//-------------------------------------------------------------------
 		test="mpi-mode";
 		if(word==test){

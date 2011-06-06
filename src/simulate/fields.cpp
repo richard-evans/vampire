@@ -13,6 +13,7 @@
 #include "demag.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "stats.hpp"
 #include "vmpi.hpp"
 
 #include <algorithm>
@@ -238,6 +239,29 @@ int calculate_applied_fields(const int start_index,const int end_index){
 		//std::cout << sim::H_vec[1]*sim::H_applied << "\t";
 		//std::cout << sim::H_vec[2]*sim::H_applied << std::endl;
 	}
+
+	// Add external field from thin film sample
+	if(sim::ext_demag==true){
+		
+		// calculate system magnetisation
+		stats::mag_m();
+		
+		// calculate global demag field -mu_0 M D, M = m/V
+		const double mu_0= -4.0*M_PI*1.0e-7/(mp::system_dimensions[0]*mp::system_dimensions[1]*mp::system_dimensions[2]*1.0e-30);
+		const double HD[3]={	mu_0*sim::demag_factor[0]*stats::total_mag_actual[0],
+									mu_0*sim::demag_factor[1]*stats::total_mag_actual[1],
+									mu_0*sim::demag_factor[2]*stats::total_mag_actual[2]};
+		
+		//std::cout << "mu_0" << "\t" << mu_0 << std::endl;
+		//std::cout << "Magnetisation " << stats::total_mag_actual[0] << "\t" << stats::total_mag_actual[1] << "\t" << stats::total_mag_actual[2] << std::endl;  
+		//std::cout << "External Demag Field " << HD[0] << "\t" << HD[1] << "\t" << HD[2] << std::endl;  
+		for(int atom=start_index;atom<end_index;atom++){
+			atoms::x_total_external_field_array[atom] += HD[0];
+			atoms::y_total_external_field_array[atom] += HD[1];
+			atoms::z_total_external_field_array[atom] += HD[2];
+		}
+	}
+
 	return 0;
 }
 
