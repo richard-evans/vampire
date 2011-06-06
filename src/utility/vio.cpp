@@ -71,6 +71,7 @@ int match_sim(std::string const, std::string const, std::string const, int const
 int match_vout_list(std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_material(string const, string const, string const, int const, int const, int const);
+int match_config(string const, string const, int const);
 
 /// @brief Function to read in variables from a file.
 ///
@@ -288,12 +289,21 @@ int match(string const key, string const word, string const value, string const 
 		return frs;
 	}
 	//===================================================================
-	// Test for screen output
+	// Test for grain output
 	//===================================================================
 	else
 	test="vgrain";
 	if(key==test){
 		int frs=vin::match_vout_grain_list(word, value, line, vout::grain_output_list);
+		return frs;
+	}	
+	//===================================================================
+	// Test for config output
+	//===================================================================
+	else
+	test="config";
+	if(key==test){
+		int frs=vin::match_config(word, value, line);
 		return frs;
 	}	
 	//-------------------------------------------------------------------
@@ -1355,6 +1365,113 @@ int match_sim(string const word, string const value, string const unit, int cons
 	return EXIT_SUCCESS;
 }
 
+int match_config(string const word, string const value, int const line){
+
+	// System output config variables
+
+	std::string test="atoms";
+	if(word==test){
+		vout::output_atoms_config=true;
+		return EXIT_SUCCESS;
+	}
+	//-----------------------------------------
+	test="atoms-output-rate";
+	if(word==test){
+		int i=atoi(value.c_str());
+		if(i >= 0){
+			vout::output_atoms_config_rate=i;
+			return EXIT_SUCCESS;
+		}
+		else{
+			std::cerr << "Error in input file - config:atoms-output-rate is outside of valid range ( >=0)" << std::endl;
+			return EXIT_FAILURE;
+		}
+	}
+	//--------------------------------------------------------------------
+	test="atoms-min-x";
+	if(word==test){
+		double x=atof(value.c_str());
+		if((x<0.0) || (x>1.0)){
+			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
+			return EXIT_FAILURE;
+		}
+		else{
+			vout::atoms_output_min[0]=x;
+			return EXIT_SUCCESS;
+		}
+	}
+	//--------------------------------------------------------------------
+	test="atoms-min-y";
+	if(word==test){
+		double y=atof(value.c_str());
+		if((y<0.0) || (y>1.0)){
+			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
+			return EXIT_FAILURE;
+		}
+		else{
+			vout::atoms_output_min[1]=y;
+			return EXIT_SUCCESS;
+		}
+	}
+	//--------------------------------------------------------------------
+	test="atoms-min-z";
+	if(word==test){
+		double z=atof(value.c_str());
+		if((z<0.0) || (z>1.0)){
+			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
+			return EXIT_FAILURE;
+		}
+		else{
+			vout::atoms_output_min[2]=z;
+			return EXIT_SUCCESS;
+		}
+	}
+	//--------------------------------------------------------------------
+	test="atoms-max-x";
+	if(word==test){
+		double x=atof(value.c_str());
+		if((x<0.0) || (x>1.0)){
+			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
+			return EXIT_FAILURE;
+		}
+		else{
+			vout::atoms_output_max[0]=x;
+			return EXIT_SUCCESS;
+		}
+	}
+	//--------------------------------------------------------------------
+	test="atoms-max-y";
+	if(word==test){
+		double y=atof(value.c_str());
+		if((y<0.0) || (y>1.0)){
+			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
+			return EXIT_FAILURE;
+		}
+		else{
+			vout::atoms_output_max[1]=y;
+			return EXIT_SUCCESS;
+		}
+	}
+	//--------------------------------------------------------------------
+	test="atoms-max-z";
+	if(word==test){
+		double z=atof(value.c_str());
+		if((z<0.0) || (z>1.0)){
+			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
+			return EXIT_FAILURE;
+		}
+		else{
+			vout::atoms_output_max[2]=z;
+			return EXIT_SUCCESS;
+		}
+	}
+	//--------------------------------------------------------------------
+	else{
+		std::cerr << "Error - Unknown control statement \'config:"<< word << "\' on line " << line << " of input file" << std::endl;
+		return EXIT_FAILURE;
+	}
+}
+		
 int match_vout_list(string const word, int const line, std::vector<unsigned int> & output_list){
 		//-------------------------------------------------------------------
 		// system_creation_flags[1] - Set system particle shape

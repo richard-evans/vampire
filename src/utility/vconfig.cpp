@@ -83,8 +83,6 @@ void config(){
 
 	stats::mag_m();
 
-	vout::output_atoms_config=true;
-
 	// atoms output
 	if((vout::output_atoms_config==true) && (vout::output_atoms_rate_counter%output_atoms_config_rate==0)){
 		if(output_atoms_file_counter==0) vout::atoms_coords();

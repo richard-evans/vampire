@@ -81,3 +81,11 @@ screen:mag-m
 vgrain:output-rate=10000
 vgrain:real-time
 vgrain:magnetisation
+config:atoms
+config:atoms-output-rate=10
+config:atoms-min-x=0.0
+config:atoms-min-y=0.0
+config:atoms-min-z=0.49
+config:atoms-max-x=1.0
+config:atoms-max-y=1.0
+config:atoms-max-z=0.51
