@@ -31,6 +31,10 @@ namespace sim{
 	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
 	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
 
+	extern double head_position[2];
+	extern double head_speed;
+	extern bool   head_laser_on;
+	
 	extern double cooling_time;
 	extern int cooling_function_flag;
 	extern double pump_time;

@@ -20,6 +20,7 @@
 #include "atoms.hpp"
 #include "program.hpp"
 #include "errors.hpp"
+#include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "vmpi.hpp"
@@ -52,6 +53,9 @@ namespace sim{
 	double demag_factor[3]={0.0,0.0,0.0};
 	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
 	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
+	double head_position[2]={0.0,mp::system_dimensions[1]*0.5}; // A
+	double head_speed=30.0; // nm/ns
+	bool   head_laser_on=false;
 
 	double cooling_time=100.0e-12; //seconds
 	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
@@ -66,6 +70,31 @@ namespace sim{
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);
+	
+/// @brief Function to increment time counter and associted variables
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.1
+/// @date    09/03/2011
+///
+/// @return EXIT_SUCCESS
+/// 
+/// @internal
+///	Created:		02/10/2008
+///	Revision:	1.1 09/03/2011
+///=====================================================================================
+///
+	void increment_time(){
+		
+		sim::time++;
+		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
+		
+	}
 	
 /// @brief Function to run one a single program
 ///
@@ -239,7 +268,7 @@ int integrate_serial(int n_steps){
 					sim::LLG_Heun();
 				#endif
 				// increment time
-				sim::time++;
+				increment_time();
 			}
 			break;
 		
@@ -247,7 +276,7 @@ int integrate_serial(int n_steps){
 			for(int ti=0;ti<n_steps;ti++){
 				sim::MonteCarlo();
 				// increment time
-				sim::time++;
+				increment_time();
 			}
 			break;
 		
@@ -260,7 +289,7 @@ int integrate_serial(int n_steps){
 					sim::LLG_Midpoint();
 				#endif
 				// increment time
-				sim::time++;
+				increment_time();
 			}
 			break;
 			
@@ -268,7 +297,7 @@ int integrate_serial(int n_steps){
 			for(int ti=0;ti<n_steps;ti++){
 				sim::ConstrainedMonteCarlo();
 				// increment time
-				sim::time++;
+				increment_time();
 			}
 			break;
 
@@ -322,7 +351,7 @@ int integrate_mpi(int n_steps){
 				#endif
 			#endif
 				// increment time
-				sim::time++;
+				increment_time();
 			}
 			break;
 		
@@ -331,7 +360,7 @@ int integrate_mpi(int n_steps){
 				std::cerr << "Error - Monte Carlo Integrator unavailable for parallel execution" << std::endl;
 				err::vexit();
 				// increment time
-				sim::time++;
+				increment_time();
 			}
 			break;
 		
@@ -346,7 +375,7 @@ int integrate_mpi(int n_steps){
 				#endif
 			#endif
 				// increment time
-				sim::time++;
+				increment_time();
 			}
 			break;
 			
@@ -355,7 +384,7 @@ int integrate_mpi(int n_steps){
 				std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
 				err::vexit();
 				// increment time
-				sim::time++;
+				increment_time();
 			}
 			break;
 			
