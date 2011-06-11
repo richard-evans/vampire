@@ -442,8 +442,20 @@ int match_create(string const word, string const value, int const line){
 		else
 		test="voronoi-rounded";
 		if(word==test){
+			test="true";
+			if(value==test){
 				create_voronoi::rounded=true;
 				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				create_voronoi::rounded=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'create:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
 		}
 		else
 		//-------------------------------------------------------------------
