@@ -854,6 +854,11 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::program=6;
 				return EXIT_SUCCESS;
 			}
+			test="HAMR-Simulation";
+			if(value==test){
+				sim::program=7;
+				return EXIT_SUCCESS;
+			}
 			test="Diagnostic-Boltzmann";
 			if(value==test){
 				sim::program=50;

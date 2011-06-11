@@ -174,6 +174,11 @@ int run(){
 			program::two_temperature_pulse();
 			break;
 			
+		case 7:
+			if(vmpi::my_rank==0) std::cout << "HAMR-Simulation..." << std::endl; 
+			program::hamr();
+			break;
+		
 		case 50:
 			if(vmpi::my_rank==0) std::cout << "Diagnostic-Boltzmann..." << std::endl; 
 			program::boltzmann_dist();

@@ -14,6 +14,7 @@ namespace program
 	extern int curie_temperature();
 	extern void field_cool();
 	extern void two_temperature_pulse();
+	extern void hamr();
 
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();

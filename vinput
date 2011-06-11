@@ -7,22 +7,22 @@
 #------------------------------------------
 #create:particle-array
 #create:cylinder
-create:crystal-structure="sc"
-#create:crystal-structure="fcc"
+#create:crystal-structure="sc"
+create:crystal-structure="fcc"
 #create:particle-parity=1
 #create:single-spin
-#create:voronoi-film
-#create:voronoi-variance=0.1
-#create:voronoi-parity=0
+create:voronoi-film
+create:voronoi-variance=0.15
+create:voronoi-parity=1
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
 dimensions:a=3.54 !A
-dimensions:dx = 7.7 !nm
-dimensions:dy = 7.7 !nm
-dimensions:dz = 7.7 !nm
-dimensions:particle-size = 5 !nm
-#dimensions:particle-spacing = 1.0 !nm
+dimensions:dx = 50 !nm
+dimensions:dy = 50 !nm
+dimensions:dz = 5 !nm
+dimensions:particle-size = 5.0 !nm
+dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
 # Material File:
@@ -35,8 +35,6 @@ sim:exchange=true
 sim:anisotropy=true
 sim:applied=true
 sim:thermal=true
-sim:dipolar=true
-sim:fast-dipolar=true
 sim:dipolar=false
 sim:fast-dipolar=false
 #sim:fast-dipolar=false
@@ -45,24 +43,29 @@ sim:temperature=300.0
 sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
 sim:Hmin=-12.0 !T
-sim:minimum-temperature=0;
-sim:maximum-temperature=700;
 sim:Dx=0.0
 sim:Dy=0.0
 sim:Dz=1.0
 sim:External-Demag=true
+sim:minimum-temperature=300
+sim:maximum-temperature=800
+sim:equilibration-temperature=800
 sim:delta-temperature=10
-sim:equilibration-time=3000
-sim:partial-time=1000
-sim:total-time=10000
+sim:equilibration-time=1000
+sim:cooling-time=10.0e-12
+sim:cooling-function=gaussian
+sim:partial-time=1
+sim:total-time=1
 sim:loop-time=3000
-sim:dt=5.0E-15
+sim:dt=1.0E-15
 
 #--------------------------------
 # Program and integrator details
 #--------------------------------
 #sim:program=Curie-Temperature
 sim:program=Benchmark
+#sim:program=Field-Cool
+
 sim:integrator=LLG-Midpoint
 #sim:integrator=LLG-Heun
 #sim:integrator=Monte-Carlo
@@ -78,9 +81,11 @@ vmag:mean-mag-m
 screen:time
 #screen:mean-mag-m
 screen:mag-m
-vgrain:output-rate=10000
-vgrain:real-time
-vgrain:magnetisation
+
+#vgrain:output-rate=100
+#vgrain:real-time
+#vgrain:magnetisation
+
 config:atoms
 config:atoms-output-rate=10
 config:atoms-min-x=0.0
