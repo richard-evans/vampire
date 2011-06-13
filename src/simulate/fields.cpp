@@ -352,7 +352,7 @@ void calculate_hamr_fields(const int start_index,const int end_index){
 
 	// declare head-field variables
 	const double H_bounds_min[2]={-400.0,-250.0}; // A
-	const double H_bounds_max[2]={-100.0,-250.0}; // A
+	const double H_bounds_max[2]={-100.0,+250.0}; // A
 	const double H_osc_freq=200.0; // A
 	const double Hloc_min_x=sim::head_position[0]+H_bounds_min[0];
 	const double Hloc_min_y=sim::head_position[1]+H_bounds_min[1];
@@ -373,8 +373,8 @@ void calculate_hamr_fields(const int start_index,const int end_index){
 			const int imaterial=atoms::type_array[atom];
 			const double cx = atoms::x_coord_array[atom];
 			const double cy = atoms::y_coord_array[atom];		
-			const double r2 = (cx-px)*(cx-px)+(cy-py)*(cx-px);
-			const double sqrt_T = sim::Tmin+DeltaT*exp(-r2/fwhm2);
+			const double r2 = (cx-px)*(cx-px)+(cy-py)*(cy-py);
+			const double sqrt_T = sqrt(sim::Tmin+DeltaT*exp(-r2/fwhm2));
 			const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
 			atoms::x_total_external_field_array[atom] *= H_th_sigma; //*mtrandom::gaussian();
 			atoms::y_total_external_field_array[atom] *= H_th_sigma; //*mtrandom::gaussian();
