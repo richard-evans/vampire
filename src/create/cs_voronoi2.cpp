@@ -225,9 +225,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 					//update area
 					varea=0.0;
 					for(int i=0;i<48;i++){
-						int nv = i+1;
-						if(nv>=48) nv=0;
-						varea+=0.5*sqrt((rnd[nv][0]-rnd[i][0])*(rnd[nv][0]-rnd[i][0]))*sqrt((rnd[nv][1]-rnd[i][1])*(rnd[nv][1]-rnd[i][1]));
+						int nvi = i+1;
+						if(nvi>=48) nvi=0;
+						varea+=0.5*sqrt((rnd[nvi][0]-rnd[i][0])*(rnd[nvi][0]-rnd[i][0]))*sqrt((rnd[nvi][1]-rnd[i][1])*(rnd[nvi][1]-rnd[i][1]));
 					}
 				}
 
@@ -258,9 +258,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 					//update area
 					area=0.0;
 					for(int i=0;i<48;i++){
-						int nv = i+1;
-						if(nv>=48) nv=0;
-						area+=0.5*sqrt((rnd[nv][0]-rnd[i][0])*(rnd[nv][0]-rnd[i][0]))*sqrt((rnd[nv][1]-rnd[i][1])*(rnd[nv][1]-rnd[i][1]));
+						int nvi = i+1;
+						if(nvi>=48) nvi=0;
+						area+=0.5*sqrt((rnd[nvi][0]-rnd[i][0])*(rnd[nvi][0]-rnd[i][0]))*sqrt((rnd[nvi][1]-rnd[i][1])*(rnd[nvi][1]-rnd[i][1]));
 					}
 				}
 			}
