@@ -966,6 +966,24 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//-------------------------------------------------------------------
+		test="fmr";
+		if(word==test){
+			test="true";
+			if(value==test){
+				sim::hamiltonian_simulation_flags[5]=1;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				sim::hamiltonian_simulation_flags[5]=0;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
 		test="fast-dipolar";
 		if(word==test){
 			test="true";

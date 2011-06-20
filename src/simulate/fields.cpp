@@ -31,6 +31,7 @@ int calculate_applied_fields(const int,const int);
 int calculate_thermal_fields(const int,const int);
 int calculate_dipolar_fields(const int,const int);
 void calculate_hamr_fields(const int,const int);
+void calculate_fmr_fields(const int,const int);
 
 int calculate_spin_fields(const int start_index,const int end_index){
 	//======================================================
@@ -107,6 +108,9 @@ int calculate_external_fields(const int start_index,const int end_index){
 
 	}
 	
+	// FMR Fields
+	if(sim::hamiltonian_simulation_flags[5]==1) calculate_fmr_fields(start_index,end_index);
+
 	// Dipolar Fields
 	if(sim::hamiltonian_simulation_flags[4]==1) calculate_dipolar_fields(start_index,end_index);
 	
@@ -408,6 +412,28 @@ void calculate_hamr_fields(const int start_index,const int end_index){
 			atoms::y_total_external_field_array[atom] *= H_th_sigma; //*mtrandom::gaussian();
 			atoms::z_total_external_field_array[atom] *= H_th_sigma; //*mtrandom::gaussian();
 		}
+	}
+}
+
+void calculate_fmr_fields(const int start_index,const int end_index){
+	
+	if(err::check==true){std::cout << "calculate_fmr_fields has been called" << std::endl;}
+
+	// Declare fmr variables
+	const double real_time=sim::time*mp::dt_SI;
+	const double osc_freq=20.0e9; // Hz
+	const double osc_period=1.0/osc_freq;
+	const double Hfmr_vec[3]={1.0,0.0,0.0};
+	const double Hfmr=0.001; // T
+	const double Hx=Hfmr_vec[0]*Hfmr*sin(2.0*M_PI*real_time/osc_period);
+	const double Hy=Hfmr_vec[1]*Hfmr*sin(2.0*M_PI*real_time/osc_period);
+	const double Hz=Hfmr_vec[2]*Hfmr*sin(2.0*M_PI*real_time/osc_period);
+	
+	// Add localised applied field
+	for(int atom=start_index;atom<end_index;atom++){
+			atoms::x_total_external_field_array[atom] += Hx;
+			atoms::y_total_external_field_array[atom] += Hy;
+			atoms::z_total_external_field_array[atom] += Hz;
 	}
 }
 
