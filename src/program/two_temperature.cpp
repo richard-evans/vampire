@@ -78,13 +78,16 @@ void two_temperature_pulse(){
 		// Output data
 		vout::data();
 	}
-
-	// record starting time after equiibration
-	int start_time=sim::time;
 	
 	double Te=sim::temperature;
 	double Tp=sim::temperature;
 	
+	//loop 5 times
+	for(int r=0; r<sim::runs;r++){
+		
+	// record starting time after equiibration/last pulse
+	int start_time=sim::time;
+
 	// Simulate temperature pulse
 	while(sim::time<sim::total_time+start_time){
 
@@ -107,6 +110,8 @@ void two_temperature_pulse(){
 		// Output data
 		vout::data();
 
+	}
+	
 	}
 
 } // end of two temperature pulse
