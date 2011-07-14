@@ -232,6 +232,29 @@ int bulk(std::vector<cs::catom_t> &,const int);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
+int cube(double[], std::vector<cs::catom_t> &,const int);
+
+/// @brief This is the brief (one line only) description of the function.
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, rfle500@york.ac.uk
+/// @version 1.0
+/// @date    05/03/2010
+///
+/// @param[in] input variable
+/// @param[out] ouput variable
+/// @param[in,out] input/output variable
+/// @return variable returned from the function
+///
+/// @internal
+///	Created:		05/03/2010
+///	Revision:	  ---
+///=====================================================================================
+///
 int sphere(double[], std::vector<cs::catom_t> &,const int);
 	
 

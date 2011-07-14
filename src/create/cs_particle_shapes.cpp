@@ -190,4 +190,30 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 	return EXIT_SUCCESS;	
 }
 
+int cube(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+	//----------------------------------------------------------
+	// check calling of routine if error checking is activated
+	//----------------------------------------------------------
+	if(err::check==true){std::cout << "cs::cube has been called" << std::endl;}
+
+	// Set particle size
+	double side_length=mp::particle_scale*0.5;
+
+	// Loop over all atoms and mark atoms in cube
+	const int num_atoms = catom_array.size();
+	
+ 	for(int atom=0;atom<num_atoms;atom++){
+		double dx=fabs(catom_array[atom].x-particle_origin[0]);
+		double dy=fabs(catom_array[atom].y-particle_origin[1]);
+		
+		if((dx<=side_length) && (dy<=side_length)){
+			catom_array[atom].include=true;
+			catom_array[atom].grain=grain;
+		}
+	}
+	return EXIT_SUCCESS;	
+
+}
+	
+	
 }

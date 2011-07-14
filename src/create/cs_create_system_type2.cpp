@@ -207,6 +207,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
 		case 0: // Bulk
 			bulk(catom_array,0);
 			break;
+		case 1: // Cube
+			cube(particle_origin,catom_array,0);
+			break;
 		case 2: // Cylinder
 			cylinder(particle_origin,catom_array,0);
 			break;
@@ -276,6 +279,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 				switch(material_parameters::system_creation_flags[1]){
 					case 0: // Bulk
 						bulk(catom_array,particle_number);
+						break;
+					case 1: // Cube
+						cube(particle_origin,catom_array,particle_number);
 						break;
 					case 2: // Cylinder
 						cylinder(particle_origin,catom_array,particle_number);
