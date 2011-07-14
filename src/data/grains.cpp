@@ -10,20 +10,25 @@
 
 namespace grains{
 
-  int num_grains=1; // always assume 1 grain 
+	int num_grains=1; // always assume 1 grain 
 
-  std::vector <int> grain_size_array(0);
+	std::vector <int> grain_size_array(0);
 
-  std::vector <double> x_coord_array(0);
-  std::vector <double> y_coord_array(0);
-  std::vector <double> z_coord_array(0);
+	std::vector <double> x_coord_array(0);
+	std::vector <double> y_coord_array(0);
+	std::vector <double> z_coord_array(0);
 
-  std::vector <double> x_mag_array(0);
-  std::vector <double> y_mag_array(0);
-  std::vector <double> z_mag_array(0);
-  std::vector <double> mag_m_array(0);
+	std::vector <double> x_mag_array(0);
+	std::vector <double> y_mag_array(0);
+	std::vector <double> z_mag_array(0);
+	std::vector <double> mag_m_array(0);
+	std::vector <double> sat_mag_array(0);
 
-  std::vector <double> sat_mag_array(0);
+	std::vector <double> x_mat_mag_array(0);
+	std::vector <double> y_mat_mag_array(0);
+	std::vector <double> z_mat_mag_array(0);
+	std::vector <double> mat_mag_m_array(0);
+	std::vector <double> mat_sat_mag_array(0);
 
 
 int set_properties(){
@@ -57,6 +62,14 @@ int set_properties(){
 		grains::z_mag_array.resize(grains::num_grains,0.0);
 		grains::mag_m_array.resize(grains::num_grains,0.0);
 		grains::sat_mag_array.resize(grains::num_grains,0.0);
+		
+		if(mp::num_materials>1){
+			grains::x_mat_mag_array.resize(grains::num_grains*mp::num_materials,0.0);
+			grains::y_mat_mag_array.resize(grains::num_grains*mp::num_materials,0.0);
+			grains::z_mat_mag_array.resize(grains::num_grains*mp::num_materials,0.0);
+			grains::mat_mag_m_array.resize(grains::num_grains*mp::num_materials,0.0);
+			grains::mat_sat_mag_array.resize(grains::num_grains*mp::num_materials,0.0);
+		}
 	}
 	else std::cerr << "Warning - no grains detected!" << std::endl;
 
@@ -72,6 +85,7 @@ int set_properties(){
 			grains::y_coord_array[grain]+=atoms::y_coord_array[atom];
 			grains::z_coord_array[grain]+=atoms::z_coord_array[atom];
 			grains::sat_mag_array[grain]+=mp::material[mat].mu_s_SI;
+			if(mp::num_materials>1) grains::mat_sat_mag_array[grain*mp::num_materials+mat]+=mp::material[mat].mu_s_SI;
 		}
 		else{
 			std::cerr << "Error - atom " << atom << " belongs to grain " << grain << " which is greater than maximum number of grains ";
@@ -92,6 +106,7 @@ int set_properties(){
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::sat_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
+		if(mp::num_materials>1) MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::mat_sat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
 	#endif
 
 	//vinfo << "-------------------------------------------------------------------------------------------------------------------" << std::endl;
@@ -133,6 +148,15 @@ int mag(){
 		grains::y_mag_array[grain]=0.0;
 		grains::z_mag_array[grain]=0.0;
 		grains::mag_m_array[grain]=0.0;
+		if(mp::num_materials>1){
+			// loop over materials
+			for(int mat=0;mat<mp::num_materials;mat++){
+				grains::x_mat_mag_array[grain*mp::num_materials+mat]=0.0;
+				grains::y_mat_mag_array[grain*mp::num_materials+mat]=0.0;
+				grains::z_mat_mag_array[grain*mp::num_materials+mat]=0.0;
+				grains::mat_mag_m_array[grain*mp::num_materials+mat]=0.0;
+			}
+		}
 	}
 
 	// function to calculate grain magnetisations
@@ -146,6 +170,12 @@ int mag(){
 			grains::x_mag_array[grain]+=(atoms::x_spin_array[atom]*mp::material[mat].mu_s_SI);
 			grains::y_mag_array[grain]+=(atoms::y_spin_array[atom]*mp::material[mat].mu_s_SI);
 			grains::z_mag_array[grain]+=(atoms::z_spin_array[atom]*mp::material[mat].mu_s_SI);
+			if(mp::num_materials>1){
+				grains::x_mat_mag_array[grain*mp::num_materials+mat]+=(atoms::x_spin_array[atom]*mp::material[mat].mu_s_SI);
+				grains::y_mat_mag_array[grain*mp::num_materials+mat]+=(atoms::y_spin_array[atom]*mp::material[mat].mu_s_SI);
+				grains::z_mat_mag_array[grain*mp::num_materials+mat]+=(atoms::z_spin_array[atom]*mp::material[mat].mu_s_SI);
+			}
+			
 		}
 		else{
 			std::cerr << "Error - atom " << atom << " belongs to grain " << grain << " which is greater than maximum number of grains ";
@@ -159,6 +189,9 @@ int mag(){
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
 	#endif
 
 	// calculate mag_m of each grain and normalised direction
@@ -172,9 +205,14 @@ int mag(){
 			double my = grains::y_mag_array[grain]/=grains::sat_mag_array[grain];
 			double mz = grains::z_mag_array[grain]/=grains::sat_mag_array[grain];
 			grains::mag_m_array[grain] = sqrt(mx*mx+my*my+mz*mz);
-			//grains::x_mag_array[grain]=mx/grains::mag_m_array[grain];
-			//grains::y_mag_array[grain]=my/grains::mag_m_array[grain];
-			//grains::z_mag_array[grain]=mz/grains::mag_m_array[grain];		    
+			// loop over all materials and normalise    
+			for(int mat=0;mat<mp::num_materials;mat++){
+				const unsigned int idx=grain*mp::num_materials+mat;
+				double mx = grains::x_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
+				double my = grains::y_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
+				double mz = grains::z_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
+				grains::mat_mag_m_array[idx] = sqrt(mx*mx+my*my+mz*mz);
+			}
 		}
 	}
 	
@@ -214,6 +252,39 @@ int output_mag(std::ofstream& ofile){
 	}
 
 	return EXIT_SUCCESS;
+}
+
+void output_mat_mag(std::ostream& stream){
+	// loop over all grains
+	for(int grain=0;grain<grains::num_grains;grain++){
+		// check for grains with zero atoms
+		if(grains::grain_size_array[grain]!=0){
+			if(mp::num_materials>1){
+				// loop over all materials
+				for(int mat=0;mat<mp::num_materials;mat++){
+					const unsigned int idx=grain*mp::num_materials+mat;
+					const double imagm = 1.0; //grains::mat_sat_mag_array[idx];
+					//stream << grains::grain_size_array[grain] << "\t";
+					//stream << grains::mat_sat_mag_array[idx] << "\t";
+					stream << grains::x_mat_mag_array[idx]*imagm << "\t";
+					stream << grains::y_mat_mag_array[idx]*imagm << "\t";
+					stream << grains::z_mat_mag_array[idx]*imagm << "\t";
+					stream << grains::mat_mag_m_array[idx] << "\t";
+				}
+			}
+			else{
+				for(int grain=0;grain<grains::num_grains;grain++){
+					// check for grains with zero atoms
+					if(grains::grain_size_array[grain]!=0){
+						stream << grains::x_mag_array[grain] << "\t";
+						stream << grains::y_mag_array[grain] << "\t";
+						stream << grains::z_mag_array[grain] << "\t";
+						stream << grains::mag_m_array[grain] << "\t";
+					}
+				}
+			}
+		}
+	}
 }
 
 } // End of namespace grains

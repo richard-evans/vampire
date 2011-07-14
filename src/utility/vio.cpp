@@ -1640,6 +1640,12 @@ int match_vout_grain_list(string const word, string const value, int const line,
 			return EXIT_SUCCESS;
 		}
 		else
+		test="material-magnetisation";
+		if(word==test){
+			output_list.push_back(13);
+			return EXIT_SUCCESS;
+		}
+		else
 		//-------------------------------------------------------------------
 		test="output-rate";
 		if(word==test){
@@ -2556,6 +2562,7 @@ namespace vout{
 	
 	// Output Function 11
 	void grain_magm(std::ostream& stream){
+
 		unsigned int id=0; // grain id (excluding grains with zero atoms)
 
 		// loop over all grains
@@ -2573,6 +2580,13 @@ namespace vout{
 		
 		double mh=sim::H_vec[0]*stats::total_mag_norm[0]+sim::H_vec[1]*stats::total_mag_norm[1]+sim::H_vec[2]*stats::total_mag_norm[2];
 		stream << mh << "\t";
+	}
+	
+	// Output Function 13
+	void grain_mat_mvec(std::ostream& stream){
+
+		grains::output_mat_mag(stream);
+		
 	}
 	
 	// Data output wrapper function
@@ -2697,6 +2711,9 @@ namespace vout{
 					break;
 				case 11:
 					vout::grain_magm(vgrain);
+					break;
+				case 13:
+					vout::grain_mat_mvec(vgrain);
 					break;
 			}
 		}

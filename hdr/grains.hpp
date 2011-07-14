@@ -30,6 +30,7 @@ namespace grains{
 	extern int set_properties();
 	extern int mag();
 	extern int output_mag(std::ofstream&);
+	extern void output_mat_mag(std::ostream&);
 }
 
 #endif /*GRAINS_H_*/
