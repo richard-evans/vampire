@@ -53,8 +53,8 @@ int bulk(std::vector<cs::catom_t> & catom_array, const int grain){
 			double py[max_vertices];
 			// Initialise polygon points
 			for(int p=0;p<geo;p++){
-				px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*mp::system_dimensions[0];
-				py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*mp::system_dimensions[1];
+				px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
+				py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
 			}
 			if(vmath::point_in_polygon(x,y,px,py,geo)==true){
 				catom_array[atom].include=true;
@@ -75,7 +75,7 @@ int cylinder(double particle_origin[],std::vector<cs::catom_t> & catom_array, co
 	//-----------------------------------------
 	// Set particle radius
 	//-----------------------------------------
-	double particle_radius_squared = (mp::particle_scale*0.5)*(mp::particle_scale*0.5);
+	double particle_radius_squared = (cs::particle_scale*0.5)*(cs::particle_scale*0.5);
 	
 	//-----------------------------------------------
 	// Loop over all atoms and mark atoms in sphere
@@ -110,7 +110,7 @@ int sphere(double particle_origin[],std::vector<cs::catom_t> & catom_array, cons
 	if(err::check==true){std::cout << "cs::sphere has been called" << std::endl;}
 
 	// Set particle radius
-	double particle_radius_squared = (mp::particle_scale*0.5)*(mp::particle_scale*0.5);
+	double particle_radius_squared = (cs::particle_scale*0.5)*(cs::particle_scale*0.5);
 	
 	// Loop over all atoms and mark atoms in sphere
 	const int num_atoms = catom_array.size();
@@ -154,8 +154,8 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 	if(err::check==true){std::cout << "cs::truncated_octahedron has been called" << std::endl;}
 
 	// Set truncated octahedron parameters
-	const double to_length = mp::particle_scale*0.5*3.0/2.0;
-	const double to_height = mp::particle_scale*0.5;
+	const double to_length = cs::particle_scale*0.5*3.0/2.0;
+	const double to_height = cs::particle_scale*0.5;
 	double x_vector[3];
 	
 	// Loop over all atoms and mark atoms in truncate octahedron
@@ -197,7 +197,7 @@ int cube(double particle_origin[],std::vector<cs::catom_t> & catom_array, const 
 	if(err::check==true){std::cout << "cs::cube has been called" << std::endl;}
 
 	// Set particle size
-	double side_length=mp::particle_scale*0.5;
+	double side_length=cs::particle_scale*0.5;
 
 	// Loop over all atoms and mark atoms in cube
 	const int num_atoms = catom_array.size();

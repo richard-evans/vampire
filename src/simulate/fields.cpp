@@ -249,7 +249,7 @@ int calculate_applied_fields(const int start_index,const int end_index){
 		stats::mag_m();
 		
 		// calculate global demag field -mu_0 M D, M = m/V
-		const double mu_0= -4.0*M_PI*1.0e-7/(mp::system_dimensions[0]*mp::system_dimensions[1]*mp::system_dimensions[2]*1.0e-30);
+		const double mu_0= -4.0*M_PI*1.0e-7/(cs::system_dimensions[0]*cs::system_dimensions[1]*cs::system_dimensions[2]*1.0e-30);
 		const double HD[3]={	mu_0*sim::demag_factor[0]*stats::total_mag_actual[0],
 									mu_0*sim::demag_factor[1]*stats::total_mag_actual[1],
 									mu_0*sim::demag_factor[2]*stats::total_mag_actual[2]};

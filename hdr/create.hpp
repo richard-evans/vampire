@@ -34,6 +34,59 @@
 ///
 
 namespace cs{
+	
+	// System Dimensions
+	extern double system_dimensions[3];
+	extern double unit_cell_size[3];
+	extern unsigned int total_num_unit_cells[3];
+	extern unsigned int local_num_unit_cells[3];
+	extern std::string crystal_structure;
+
+	// System Parameters
+	extern int particle_creation_parity;
+	extern double particle_scale;
+	extern double particle_spacing;
+
+	// Other directives and flags
+	extern bool single_spin;
+	extern int system_creation_flags[10];
+	
+	class unit_cell_atom_t {
+	public:
+		double x; // atom x-coordinate
+		double y; // atom y-coordinate
+		double z; // atom z-coordinate
+		unsigned int lc; // lattice category
+		unsigned int hc; // height category
+		
+	};
+	
+	class unit_cell_interaction_t {
+	public:
+		unsigned int i; // atom unit cell id
+		unsigned int j; // neighbour atom unit cell id
+		int dx; // delta x in unit cells
+		int dy; // delta y in unit cells
+		int dz; // delta z in unit cells
+	};
+	
+	class unit_cell_t {
+	public:
+		
+		unsigned int size;
+		unsigned int lcsize;
+		unsigned int hcsize;
+
+		// list of atoms in each unit cell
+		std::vector <unit_cell_atom_t> atom;
+
+		// list of interactions in each unit cell
+		std::vector <unit_cell_interaction_t> interaction;
+
+	};
+	
+	extern cs::unit_cell_t unit_cell;
+	
 	class catom_t {
 		public:
 			
@@ -54,7 +107,11 @@ namespace cs{
 			int mpi_type;
 			int mpi_cpuid;
 			int mpi_atom_number;
-	  int mpi_old_atom_number;
+			int mpi_old_atom_number;
+			int scx;
+			int scy;
+			int scz;
+			
 			catom_t():
 				x(0.0),
 				y(0.0),
@@ -68,7 +125,10 @@ namespace cs{
 				mpi_type(0),
 				mpi_cpuid(0),
 				mpi_atom_number(0),
-				mpi_old_atom_number(0)
+				mpi_old_atom_number(0),
+				scx(0),
+				scy(0),
+				scz(0)
 			{};
 };
 /// @brief This is the brief (one line only) description of the function.

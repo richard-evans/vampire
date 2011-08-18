@@ -44,6 +44,26 @@
 ///
 namespace cs{
 
+	// System Dimensions
+	double system_dimensions[3]={77.0,77.0,77.0};	// Size of system (A)
+	double unit_cell_size[3]={3.54,3.54,3.54};		// Unit Cell Size (A) [Will eventually be local to unit cells]
+	unsigned int total_num_unit_cells[3]={0,0,0};	// Unit cells for entire system (x,y,z)
+	unsigned int local_num_unit_cells[3]={0,0,0};	// Unit cells on local processor (x,y,z)
+	std::string crystal_structure="sc";
+	
+	// System Parameters
+	int particle_creation_parity=0; // Offset of particle centre (odd/even)
+	double particle_scale=50.0;     // Diameter of particles/grains (A)
+	double particle_spacing=10.0;   // Spacing Between particles (A)
+
+
+	// Other directives and flags
+	bool single_spin=false;
+	int system_creation_flags[10]={0,0,0,0,0,0,0,0,0,0};
+	
+	// unit cell container
+	cs::unit_cell_t unit_cell;
+	
 int create(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
@@ -83,7 +103,7 @@ int create(){
 	//      Initialise variables for system creation
 	//=============================================================
 	
-	if(mp::system_creation_flags[0]==1){
+	if(cs::system_creation_flags[0]==1){
 		// read_coord_file();
 	}
 	else{
@@ -161,7 +181,7 @@ int create(){
 	}
 
 	#else
-		if(1==1){
+		if(1==0){
 		std::ofstream xyz_file;
 		xyz_file.open ("crystal.xyz");
 		xyz_file << num_atoms+80 << std::endl;
@@ -179,8 +199,8 @@ int create(){
 			xyz_file << "O\t" << float(i) << "\t" << 0.0 << "\t" << 0.0 << std::endl;
 			xyz_file << "O\t" << 0.0 << "\t" << float(i) << "\t" << 0.0 << std::endl;
 	
-			xyz_file << "O\t" << material_parameters::system_dimensions[0] << "\t" << material_parameters::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0]-float(i) << "\t" << 	material_parameters::system_dimensions[1] << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << cs::system_dimensions[0]-float(i) << "\t" << 	cs::system_dimensions[1] << "\t" << 0.0 << std::endl;
 		}
 		
 		xyz_file.close();

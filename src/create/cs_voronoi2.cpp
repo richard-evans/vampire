@@ -57,12 +57,12 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	double grain_sd=create_voronoi::voronoi_sd;
 
 	// Set number of particles in x and y directions
-	double size = material_parameters::particle_scale+material_parameters::particle_spacing;
+	double size = cs::particle_scale+cs::particle_spacing;
 	double grain_cell_size_x = size;
 	double grain_cell_size_y = sqrt(3.0)*size;
 
-	int num_x_particle = 4+vmath::iround(mp::system_dimensions[0]/(grain_cell_size_x));
-	int num_y_particle = 4+vmath::iround(mp::system_dimensions[1]/(grain_cell_size_y));
+	int num_x_particle = 4+vmath::iround(cs::system_dimensions[0]/(grain_cell_size_x));
+	int num_y_particle = 4+vmath::iround(cs::system_dimensions[1]/(grain_cell_size_y));
 
 	int init_num_grains = num_x_particle*num_y_particle*2;
 	
@@ -154,7 +154,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	//std::cout << "here" << std::endl;
 	
 	// Shrink Voronoi vertices in reduced coordinates to get spacing
-	double shrink_factor = mp::particle_scale/(mp::particle_scale+mp::particle_spacing);
+	double shrink_factor = cs::particle_scale/(cs::particle_scale+cs::particle_spacing);
 	
 	// Reduce vertices to relative coordinates
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
@@ -281,28 +281,28 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		min_bounds[0] = int(vmpi::min_dimensions[0]/mp::lattice_constant[0]);
-		min_bounds[1] = int(vmpi::min_dimensions[1]/mp::lattice_constant[1]);
-		min_bounds[2] = int(vmpi::min_dimensions[2]/mp::lattice_constant[2]);
-		max_bounds[0] = vmath::iround(vmpi::max_dimensions[0]/mp::lattice_constant[0]);
-		max_bounds[1] = vmath::iround(vmpi::max_dimensions[1]/mp::lattice_constant[1]);
-		max_bounds[2] = vmath::iround(vmpi::max_dimensions[2]/mp::lattice_constant[2]);
+		min_bounds[0] = int(vmpi::min_dimensions[0]/cs::unit_cell_size[0]);
+		min_bounds[1] = int(vmpi::min_dimensions[1]/cs::unit_cell_size[1]);
+		min_bounds[2] = int(vmpi::min_dimensions[2]/cs::unit_cell_size[2]);
+		max_bounds[0] = vmath::iround(vmpi::max_dimensions[0]/cs::unit_cell_size[0]);
+		max_bounds[1] = vmath::iround(vmpi::max_dimensions[1]/cs::unit_cell_size[1]);
+		max_bounds[2] = vmath::iround(vmpi::max_dimensions[2]/cs::unit_cell_size[2]);
 	}
 	else{
 		min_bounds[0]=0;
 		min_bounds[1]=0;
 		min_bounds[2]=0;
-		max_bounds[0]=vmath::iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
-		max_bounds[1]=vmath::iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
-		max_bounds[2]=vmath::iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
+		max_bounds[0]=vmath::iround(cs::system_dimensions[0]/cs::unit_cell_size[0]);
+		max_bounds[1]=vmath::iround(cs::system_dimensions[1]/cs::unit_cell_size[1]);
+		max_bounds[2]=vmath::iround(cs::system_dimensions[2]/cs::unit_cell_size[2]);
 	}
 	#else
 		min_bounds[0]=0;
 		min_bounds[1]=0;
 		min_bounds[2]=0;
-		max_bounds[0]=vmath::iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
-		max_bounds[1]=vmath::iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
-		max_bounds[2]=vmath::iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
+		max_bounds[0]=vmath::iround(cs::system_dimensions[0]/cs::unit_cell_size[0]);
+		max_bounds[1]=vmath::iround(cs::system_dimensions[1]/cs::unit_cell_size[1]);
+		max_bounds[2]=vmath::iround(cs::system_dimensions[2]/cs::unit_cell_size[2]);
 	#endif
 	
 	// allocate supercell array
@@ -316,8 +316,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	
 	// loop over atoms and populate supercell array
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		int cx = int (catom_array[atom].x/mp::lattice_constant[0]);
-		int cy = int (catom_array[atom].y/mp::lattice_constant[1]);
+		int cx = int (catom_array[atom].x/cs::unit_cell_size[0]);
+		int cy = int (catom_array[atom].y/cs::unit_cell_size[1]);
 		supercell_array[cx][cy].push_back(atom);
 	}
 	
@@ -343,8 +343,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			for(int vertex=0;vertex<num_vertices;vertex++){
 				tmp_grain_pointx_array[vertex]=grain_vertices_array[grain][vertex][0]+grain_coord_array[grain][0];
 				tmp_grain_pointy_array[vertex]=grain_vertices_array[grain][vertex][1]+grain_coord_array[grain][1];
-				int x = int(tmp_grain_pointx_array[vertex]/mp::lattice_constant[0]);
-				int y = int(tmp_grain_pointy_array[vertex]/mp::lattice_constant[1]);
+				int x = int(tmp_grain_pointx_array[vertex]/cs::unit_cell_size[0]);
+				int y = int(tmp_grain_pointy_array[vertex]/cs::unit_cell_size[1]);
 				if(x < minx) minx = x;
 				if(x > maxx) maxx = x;
 				if(y < miny) miny = y;
@@ -381,8 +381,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 								double py[50];
 								// Initialise polygon points
 								for(int p=0;p<geo;p++){
-									px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*mp::system_dimensions[0];
-									py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*mp::system_dimensions[1];
+									px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
+									py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
 								}
 								if(vmath::point_in_polygon(x,y,px,py,geo)==true){
 									catom_array[atom].include=true;
@@ -444,8 +444,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 					    double py[50];
 					    // Initialise polygon points
 					    for(int p=0;p<geo;p++){
-					      px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*mp::system_dimensions[0];
-					      py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*mp::system_dimensions[1];
+					      px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
+					      py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
 					    }
 					    if(vmath::point_in_polygon(x,y,px,py,geo)==true){
 					      catom_array[atom].include=true;
@@ -631,8 +631,8 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 			// check for unbounded grains
 			if(vertex_number==0) inf=true;
 			// check for bounded grains with vertices outside bounding box
-			if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>mp::system_dimensions[0])) inf=true;
-			if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>mp::system_dimensions[1])) inf=true;
+			if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>cs::system_dimensions[0])) inf=true;
+			if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>cs::system_dimensions[1])) inf=true;
 		}
 
 		//-------------------------------------------------------------------
