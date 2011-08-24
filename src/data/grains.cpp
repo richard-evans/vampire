@@ -189,9 +189,9 @@ int mag(){
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
+		if(mp::num_materials>1) MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
+		if(mp::num_materials>1) MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
+		if(mp::num_materials>1) MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
 	#endif
 
 	// calculate mag_m of each grain and normalised direction
@@ -205,7 +205,8 @@ int mag(){
 			double my = grains::y_mag_array[grain]/=grains::sat_mag_array[grain];
 			double mz = grains::z_mag_array[grain]/=grains::sat_mag_array[grain];
 			grains::mag_m_array[grain] = sqrt(mx*mx+my*my+mz*mz);
-			// loop over all materials and normalise    
+
+			// loop over all materials and normalise
 			if(mp::num_materials>1){
 			for(int mat=0;mat<mp::num_materials;mat++){
 				const unsigned int idx=grain*mp::num_materials+mat;

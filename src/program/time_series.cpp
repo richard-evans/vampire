@@ -54,6 +54,25 @@ void time_series(){
 	// check calling of routine if error checking is activated
 	if(err::check==true) std::cout << "program::time_series has been called" << std::endl;
 
+	double temp=sim::temperature;
+	
+	// Set equilibration temperature and field
+	sim::temperature=sim::Teq;
+	
+	// Equilibrate system
+	while(sim::time<sim::equilibration_time){
+		
+		sim::integrate(sim::partial_time);
+		
+		// Calculate magnetisation statistics
+		stats::mag_m();
+		
+		// Output data
+		vout::data();
+	}
+	
+	sim::temperature=temp;
+		
 	// Perform Time Series
 	while(sim::time<sim::total_time){
 
