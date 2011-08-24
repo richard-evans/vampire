@@ -308,6 +308,7 @@ void mag_m_reset(){
 	
 	stats::total_mean_mag_m_actual=0.0;
 	stats::total_mean_mag_m_norm=0.0;
+	for(int mat=0;mat<mp::num_materials;mat++) stats::sublattice_mean_magm_array[mat]=0.0;
 	stats::data_counter=0.0;
 	
 }
