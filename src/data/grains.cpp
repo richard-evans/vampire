@@ -206,12 +206,14 @@ int mag(){
 			double mz = grains::z_mag_array[grain]/=grains::sat_mag_array[grain];
 			grains::mag_m_array[grain] = sqrt(mx*mx+my*my+mz*mz);
 			// loop over all materials and normalise    
+			if(mp::num_materials>1){
 			for(int mat=0;mat<mp::num_materials;mat++){
 				const unsigned int idx=grain*mp::num_materials+mat;
 				double mx = grains::x_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
 				double my = grains::y_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
 				double mz = grains::z_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
 				grains::mat_mag_m_array[idx] = sqrt(mx*mx+my*my+mz*mz);
+			}
 			}
 		}
 	}
