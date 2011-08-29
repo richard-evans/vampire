@@ -28,6 +28,7 @@
 // Standard Libraries
 #include <cmath>
 #include <iostream>
+#include <limits>
 
 namespace cs{
 
@@ -63,11 +64,12 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	}
 
 	// Calculate system dimensions and number of supercells
-	double min[3]={1.0e20,1.0e20,1.0e20};
-	double max[3]={-1.0e20,-1.0e20,-1.0e20};
-	
+	unsigned int max_val=std::numeric_limits<unsigned int>::max();
+	unsigned int min[3]={max_val,max_val,max_val}; // lowest cell id
+	unsigned int max[3]={0,0,0}; // highest cell id
+
 	for(int atom=0;atom<num_atoms;atom++){
-		double c[3]={catom_array[atom].x,catom_array[atom].y,catom_array[atom].z};
+		unsigned int c[3]={catom_array[atom].scx,catom_array[atom].scy,catom_array[atom].scz};
 		for(int i=0;i<3;i++){
 			if(c[i]<min[i]){
 				min[i]=c[i];
@@ -79,42 +81,41 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	}
 	
 	// calculate offset and cell maximum in whole unit cells
-	const int offset[3] = {int((min[0])/cs::unit_cell_size[0]), int((min[1])/cs::unit_cell_size[1]), int((min[2])/cs::unit_cell_size[2])};
-	const int max_cell[3] = {ceil((max[0])/cs::unit_cell_size[0]), ceil((max[1])/cs::unit_cell_size[1]), ceil((max[2])/cs::unit_cell_size[2])};
-
-	// calculate number of cells needed
-	const int d[3]={max_cell[0]-offset[0],max_cell[1]-offset[1],max_cell[2]-offset[2]};
+	const unsigned int offset[3] = {min[0], min[1], min[2]};
+	const unsigned int max_cell[3] = {max[0],max[1],max[2]};
 	
+	// calculate number of cells needed = max-min+1 ( if max_cell = 25, then 0-25 = 26
+	const unsigned int d[3]={max_cell[0]-offset[0]+1,max_cell[1]-offset[1]+1,max_cell[2]-offset[2]+1};
+
 	// Declare array for create space for 3D supercell array
 	std::vector<std::vector<std::vector<std::vector<int> > > > supercell_array;
 
 	std::cout << "Memory required for neighbourlist calculation:" << 8.0*double(d[0])*double(d[1])*double(d[2])*double(unit_cell.atom.size())/1.0e6 << " MB" << std::endl;
 	supercell_array.resize(d[0]);
-	for(int i=0; i<d[0] ; i++){
+	for(unsigned int i=0; i<d[0] ; i++){
 		supercell_array[i].resize(d[1]);
-		for(int j=0; j<d[1] ; j++){
+		for(unsigned int j=0; j<d[1] ; j++){
 			supercell_array[i][j].resize(d[2]);
-			for(int k=0; k<d[2] ; k++){
+			for(unsigned int k=0; k<d[2] ; k++){
 				supercell_array[i][j][k].resize(unit_cell.atom.size(),-1);
 			}
 		}
 	}
 
 	// declare cell array to loop over
-	const int num_cells=d[0]*d[1]*d[2];
+	const unsigned int num_cells=d[0]*d[1]*d[2];
 	std::vector< std::vector <int> > cell_coord_array;
 	cell_coord_array.reserve(num_cells);
-	for(int i=0;i<num_cells;i++){
+	for(unsigned int i=0;i<num_cells;i++){
 		cell_coord_array.push_back(std::vector<int>());
 		cell_coord_array[i].resize(3);
 	}
 
-
 	// Initialise cell_array
-	int cell=0;
-	for(int x=0;x<d[0];x++){
-		for(int y=0;y<d[1];y++){
-			for(int z=0;z<d[2];z++){
+	unsigned int cell=0;
+	for(unsigned int x=0;x<d[0];x++){
+		for(unsigned int y=0;y<d[1];y++){
+			for(unsigned int z=0;z<d[2];z++){
 				//save cell coordinates
 				cell_coord_array[cell][0]=x;
 				cell_coord_array[cell][1]=y;
@@ -131,10 +132,10 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		double c[3]={catom_array[atom].x,catom_array[atom].y,catom_array[atom].z};
 		//std::cout << atom << "\t" << c[0] << "\t" << c[1] <<"\t" << c[2] << std::endl;
 		for(int i=0;i<3;i++){
-			//scc[i]=int(c[i]/cs::unit_cell_size[i])-offset[i]; // Always round down for supercell coordinates
+			scc[i]=int(c[i]/cs::unit_cell_size[i])-offset[i]; // Always round down for supercell coordinates
 			// Always check cell in range
-			if(scc[i]<0 || scc[i]> d[i]){
-				std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
+			if(scc[i]<0 || scc[i]>= d[i]){
+				//std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
 				#ifdef MPICF
 				std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
 				#endif 
@@ -149,7 +150,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				err::vexit();
 			}
 		}
-		
+
 		// Check for atoms greater than max_atoms_per_supercell
 		if(catom_array[atom].uc_category<unit_cell.atom.size()){
 			// Add atom to supercell
@@ -163,26 +164,26 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
 			std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
 			std::cerr << "\tAtoms in Current Cell:" << std::endl;
-			for(int ix=0;ix<supercell_array[scc[0]][scc[1]][scc[2]].size();ix++){
+			for(unsigned int ix=0;ix<supercell_array[scc[0]][scc[1]][scc[2]].size();ix++){
 				const int ixatom=supercell_array[scc[0]][scc[1]][scc[2]][ix];
 				std::cerr << "\t\t [id x y z] "<< ix << "\t" << ixatom << "\t" << catom_array[ixatom].x << "\t" << catom_array[ixatom].y << "\t" << catom_array[ixatom].z << std::endl;
 			}
 			err::vexit();
 		}
 	}
-		
+
 	// Generate neighbour list
-	std::cout <<"Generating Neighbour list"; 
+	std::cout <<"Generating Neighbour list"<< std::flush; 
 
 	// Loop over all cells
-	for(int cell=0;cell<num_cells;cell++){
+	for(unsigned int cell=0;cell<num_cells;cell++){
 		if(cell%(num_cells/10+1)==0){
 			std::cout << "." << std::flush;
 		}
 		//std::cout << "cell: " << cell << ":>" << std::flush; // << std::endl;
 		int scc[3]={cell_coord_array[cell][0],cell_coord_array[cell][1],cell_coord_array[cell][2]};
 		// Loop over all interactions
-		for(int i=0;i<cs::unit_cell.interaction.size();i++){
+		for(unsigned int i=0;i<cs::unit_cell.interaction.size();i++){
 			const int atom=cs::unit_cell.interaction[i].i;
 			const int natom=cs::unit_cell.interaction[i].j;
 			const int nx=cs::unit_cell.interaction[i].dx+scc[0];
@@ -201,9 +202,9 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	std::cout << "done!" << std::endl;
 
 	// Deallocate supercell array
-	for(int i=0; i<d[0] ; i++){
-		for(int j=0; j<d[1] ;j++){
-			for(int k=0; k<d[2] ;k++){
+	for(unsigned int i=0; i<d[0] ; i++){
+		for(unsigned int j=0; j<d[1] ;j++){
+			for(unsigned int k=0; k<d[2] ;k++){
 				supercell_array[i][j][k].resize(0);
 				}
 				supercell_array[i][j].resize(0);

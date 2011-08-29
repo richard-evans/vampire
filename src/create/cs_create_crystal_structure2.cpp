@@ -150,7 +150,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 			}
 		}
 
-	// Check to see if actual nad expected number of atoms agree, if not trim the excess
+	// Check to see if actual and expected number of atoms agree, if not trim the excess
 	if(atom!=num_atoms){
 		std::vector<cs::catom_t> tmp_catom_array(num_atoms);
 		tmp_catom_array=catom_array;
