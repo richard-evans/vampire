@@ -31,6 +31,7 @@
 #include "demag.hpp"
 #include "grains.hpp"
 #include "material.hpp"
+#include "vmath.hpp"
 #include "vmpi.hpp"
 #include "create.hpp"
 
@@ -47,6 +48,7 @@ namespace cs{
 	// System Dimensions
 	double system_dimensions[3]={77.0,77.0,77.0};	// Size of system (A)
 	double unit_cell_size[3]={3.54,3.54,3.54};		// Unit Cell Size (A) [Will eventually be local to unit cells]
+	bool pbc[3]={false,false,false};						// Periodic boundary conditions
 	unsigned int total_num_unit_cells[3]={0,0,0};	// Unit cells for entire system (x,y,z)
 	unsigned int local_num_unit_cells[3]={0,0,0};	// Unit cells on local processor (x,y,z)
 	std::string crystal_structure="sc";
@@ -85,6 +87,11 @@ int create(){
 	std::vector<cs::catom_t> catom_array; 
 	std::vector<std::vector<int> > cneighbourlist; 
 
+	// check for pbc and if so round up system dimensions
+	if(cs::pbc[0]==true) cs::system_dimensions[0]=cs::unit_cell_size[0]*(int(vmath::iceil(cs::system_dimensions[0]/cs::unit_cell_size[0])));
+	if(cs::pbc[1]==true) cs::system_dimensions[1]=cs::unit_cell_size[1]*(int(vmath::iceil(cs::system_dimensions[1]/cs::unit_cell_size[1])));
+	if(cs::pbc[2]==true) cs::system_dimensions[2]=cs::unit_cell_size[2]*(int(vmath::iceil(cs::system_dimensions[2]/cs::unit_cell_size[2])));
+	
 	// Set up Parallel Decomposition if required 
 	#ifdef MPICF
 		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,cs::system_dimensions);

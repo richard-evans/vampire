@@ -14,6 +14,9 @@ create:crystal-structure="sc"
 #create:voronoi-film
 #create:voronoi-variance=0.15
 #create:voronoi-parity=1
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+#create:periodic-boundaries-z
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
@@ -90,7 +93,7 @@ config:atoms
 config:atoms-output-rate=100
 config:atoms-min-x=0.0
 config:atoms-min-y=0.0
-config:atoms-min-z=0.49
+config:atoms-min-z=0.0
 config:atoms-max-x=1.0
 config:atoms-max-y=1.0
-config:atoms-max-z=0.51
+config:atoms-max-z=1.0

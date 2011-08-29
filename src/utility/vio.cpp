@@ -540,6 +540,27 @@ int match_create(string const word, string const value, int const line){
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-x";
+		if(word==test){
+			cs::pbc[0]=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-y";
+		if(word==test){
+			cs::pbc[1]=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-z";
+		if(word==test){
+			cs::pbc[2]=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{

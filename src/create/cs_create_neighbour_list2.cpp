@@ -186,9 +186,25 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		for(unsigned int i=0;i<cs::unit_cell.interaction.size();i++){
 			const int atom=cs::unit_cell.interaction[i].i;
 			const int natom=cs::unit_cell.interaction[i].j;
-			const int nx=cs::unit_cell.interaction[i].dx+scc[0];
-			const int ny=cs::unit_cell.interaction[i].dy+scc[1];
-			const int nz=cs::unit_cell.interaction[i].dz+scc[2];
+			int nx=cs::unit_cell.interaction[i].dx+scc[0];
+			int ny=cs::unit_cell.interaction[i].dy+scc[1];
+			int nz=cs::unit_cell.interaction[i].dz+scc[2];
+			#ifdef MPICF
+			#else
+			// Wrap aound for periodic boundaries
+			if(cs::pbc[0]==true){
+				if(nx>=int(d[0])) nx=nx-d[0];
+				else if(nx<0) nx=nx+d[0];
+			}
+			if(cs::pbc[1]==true){
+				if(ny>=int(d[1])) ny=ny-d[1];
+				else if(ny<0) ny=ny+d[1];
+			}
+			if(cs::pbc[2]==true){
+				if(nz>=int(d[0])) nz=nz-d[2];
+				else if(nz<0) nz=nz+d[2];
+			}
+			#endif
 			// check for out-of-bounds access
 			if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
 				if((supercell_array[nx][ny][nz][atom]!=-1) || (supercell_array[nx][ny][nz][natom]!=-1)){
