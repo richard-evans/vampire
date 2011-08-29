@@ -189,6 +189,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			const int nx=cs::unit_cell.interaction[i].dx+scc[0];
 			const int ny=cs::unit_cell.interaction[i].dy+scc[1];
 			const int nz=cs::unit_cell.interaction[i].dz+scc[2];
+			// check for out-of-bounds access
 			if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
 				if((supercell_array[nx][ny][nz][atom]!=-1) || (supercell_array[nx][ny][nz][natom]!=-1)){
 					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].push_back(supercell_array[nx][ny][nz][natom]);

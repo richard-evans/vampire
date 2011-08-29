@@ -103,69 +103,11 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
 		
-	//----------------------------------------------------------------------------------
-	// Set post construction atom identifiers for multispecies system
-	//----------------------------------------------------------------------------------
-	//if(material_parameters::system_creation_flags[4]==1){
-	//	multilayer(cs_num_atoms,cs_coord_array,cs_atom_type_array,particle_include_array);
-	//}
-	//else if(material_parameters::system_creation_flags[4]==2){
-	//	intermixing(cs_num_atoms,cs_coord_array,cs_atom_type_array,particle_include_array);
-	//}
-
-	//-------------------------------------------------------------
-	//      Clean Up Parallel Decomposition if required 
-	//-------------------------------------------------------------
-	//#ifdef MPICF
-	//	if(mpi_generic::mpi_mode==2){
-	//		mpi_create_system_type(cs_num_atoms,cs_coord_array,cs_atom_type_array,particle_include_array);
-	//	}
-	//#endif
-
-	//----------------------------------------------------------------------------------
-	// Calculate new number of atoms and re-sort cs_* arrays according to included list
-	//----------------------------------------------------------------------------------
-	/*new_num_atoms = 0;
-	std::vector <int> tmp_grain_no_array(cs_num_atoms);
-	
-	for(atom=0;atom<cs_num_atoms;atom++){
-		if(particle_include_array[atom]!=-1){
-			tmp_grain_no_array[new_num_atoms]=particle_include_array[atom];
-			cs_coord_array[new_num_atoms][0] = cs_coord_array[atom][0];
-			cs_coord_array[new_num_atoms][1] = cs_coord_array[atom][1];			
-			cs_coord_array[new_num_atoms][2] = cs_coord_array[atom][2];
-			cs_atom_type_array[new_num_atoms] = cs_atom_type_array[atom];
-			#ifdef MPICF
-				using namespace mpi_create_variables;
-				mpi_atom_comm_class_array[new_num_atoms]=mpi_atom_comm_class_array[atom];
-				mpi_atom_location_array[new_num_atoms]=mpi_atom_location_array[atom];
-				mpi_atom_global_coord_array[3*new_num_atoms+0]=mpi_atom_global_coord_array[3*atom+0];
-				mpi_atom_global_coord_array[3*new_num_atoms+1]=mpi_atom_global_coord_array[3*atom+1];
-				mpi_atom_global_coord_array[3*new_num_atoms+2]=mpi_atom_global_coord_array[3*atom+2];
-			#endif
-			new_num_atoms++;
-		}	
-	}*/
-/*
-	// Save grain numbers
-	//std::cout << "Saving grain numbers for " << grains::num_grains << std::endl;
-	atoms::grain_array.resize(new_num_atoms,0);
-	for(atom=0;atom<new_num_atoms;atom++){
-		int grain = tmp_grain_no_array[atom];
-		if((grain >= 0) && (grain < (grains::num_grains + mp::num_materials))){
-			atoms::grain_array[atom]=grain;
-		}
-		else {
-			std::cerr << "Error - Unknown grain number " << grain << " for atom " << atom << std::endl;
+		// Check for zero atoms generated
+		if(catom_array.size()==0){
+			std::cerr << "Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!" << std::endl;
 			err::vexit();
 		}
-	}*/
-	//---------------------
-	// Reset cs_num_atoms
-	//---------------------
-	//cs_num_atoms = new_num_atoms;
-	
-	//std::cout << "num atoms\t" << cs_num_atoms << std::endl; 
 
 	return 0;
 }

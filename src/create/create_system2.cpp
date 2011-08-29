@@ -85,49 +85,21 @@ int create(){
 	std::vector<cs::catom_t> catom_array; 
 	std::vector<std::vector<int> > cneighbourlist; 
 
-	//std::vector<std::vector<int> > vecvec;
-	//vecvec.push_back(std::vector<int>());
-	//vecvec[0].push_back(3);
-	//int i = vecvec[0][0];
-	//OK, vecvec.size() == 1; vecvec[0].size() == 1, vecvec[0][0] == 3
-
-	
-	//=============================================================
-	//      Set up Parallel Decomposition if required 
-	//=============================================================
+	// Set up Parallel Decomposition if required 
 	#ifdef MPICF
-		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,mp::system_dimensions);
+		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,cs::system_dimensions);
 	#endif
 
-	//=============================================================
-	//      Initialise variables for system creation
-	//=============================================================
-	
+	//      Initialise variables for system creation	
 	if(cs::system_creation_flags[0]==1){
 		// read_coord_file();
 	}
-	else{
-		//=============================================================
-		//      Create block of crystal of desired size
-		//=============================================================
-
-		cs::create_crystal_structure(catom_array);
-     
-		//=============================================================
-		//      Cut system to the correct type, species etc
-		//=============================================================
-
-		cs::create_system_type(catom_array);
-	}
+	// Create block of crystal of desired size
+	cs::create_crystal_structure(catom_array);
 	
-	// Check for zero atoms generated
-	if(catom_array.size()==0){
-		std::cerr << "Error, no atoms generated - increase system dimensions!" << std::endl;
-		err::vexit();
-	}
-	//=============================================================
-	//      Create Neighbour list for system
-	//=============================================================
+	// Cut system to the correct type, species etc
+	cs::create_system_type(catom_array);
+	
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
@@ -141,6 +113,7 @@ int create(){
 		//cs::copy_periodic_boundaries(catom_array);
 	#endif
 	
+	// Create Neighbour list for system
 	cs::create_neighbourlist(catom_array,cneighbourlist);
 	
 	#ifdef MPICF
@@ -151,23 +124,15 @@ int create(){
 		MPI::COMM_WORLD.Barrier();
 	#endif
 
-	//=============================================================
 	//      Set atom variables for simulation
-	//=============================================================
-	
 	cs::set_atom_vars(catom_array,cneighbourlist);
 
-	//=============================================================
 	//      Set grain and cell variables for simulation
-	//=============================================================
-
 	grains::set_properties();
 	cells::initialise();
 	demag::init();
 	
-	//=============================================================
 	//      Generate system files for storage
-	//=============================================================
 	num_atoms=catom_array.size();
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
