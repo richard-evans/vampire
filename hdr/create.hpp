@@ -76,6 +76,7 @@ namespace cs{
 		unsigned int size;
 		unsigned int lcsize;
 		unsigned int hcsize;
+		unsigned int interaction_range;
 
 		// list of atoms in each unit cell
 		std::vector <unit_cell_atom_t> atom;
