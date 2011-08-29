@@ -439,7 +439,8 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	std::vector<int> recv_cpuid_array(num_halo_atoms,0);
 	std::vector<int> send_mpi_atom_num_array(num_bdry_atoms,0);
 	std::vector<int> recv_mpi_atom_num_array(num_halo_atoms,0);
-
+	std::vector<int> send_mpi_uc_id_array(num_bdry_atoms,0);
+	std::vector<int> recv_mpi_uc_id_array(num_halo_atoms,0);
 	
 	// Pack up data for sending
 	int counter=0;	// array index
@@ -459,6 +460,7 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 					send_material_array[counter]  = catom_array[atom].material;
 					send_cpuid_array[counter]  	= vmpi::my_rank; //catom_array[atom].mpi_cpu;
 					send_mpi_atom_num_array[counter] = atom;
+					send_uc_id_array[counter] = catom_array[atom].uc_category;
 					counter++;
 				}
 			}
@@ -488,6 +490,7 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_material_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,51));
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_cpuid_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,52));
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_num_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,53));
+			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_uc_id_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,55));
 			//std::cout << "Send complete on CPU " << vmpi::my_rank << " to CPU " << cpu << " at index " << send_index  << std::endl;
 			send_index+=num_send_atoms[cpu];
 		}
@@ -497,6 +500,7 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_material_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,51));
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_cpuid_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,52));
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_num_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,53));
+			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_uc_id_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,55));
 			//std::cout << "Receive complete on CPU " << vmpi::my_rank << " from CPU " << cpu << " at index " << recv_index << " at address " << &recv_mpi_atom_num_array[recv_index] << std::endl;
 			recv_index+=num_recv_atoms[cpu];
 		}
@@ -518,6 +522,7 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 		catom_array[atom].mpi_cpuid = recv_cpuid_array[index];
 		catom_array[atom].mpi_type = 2; // mark as halo atom
 		catom_array[atom].mpi_atom_number = recv_mpi_atom_num_array[index];
+		catom_array[atom].uc_category = recv_mpi_uc_id_array[index];
 	}
 		
 		
