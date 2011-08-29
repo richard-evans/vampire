@@ -237,8 +237,8 @@ namespace vmpi{
 		for (int i=0;i<100;i+=5){
 			xyz_file << "O\t" << float(i) << "\t" << 0.0 << "\t" << 0.0 << std::endl;
 			xyz_file << "O\t" << 0.0 << "\t" << float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0] << "\t" << material_parameters::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0]-float(i) << "\t" << 	material_parameters::system_dimensions[1] << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << cs::system_dimensions[0]-float(i) << "\t" << cs::system_dimensions[1] << "\t" << 0.0 << std::endl;
 		}
 	  	for(int atom=0; atom<num_atoms; atom++){
 				//if(mpi_create_variables::mpi_comms_identify==true){
@@ -359,18 +359,15 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	std::vector<double> cpu_range_array(6*vmpi::num_processors,0.0); // Linear Memory for MPI comms
 	
 	// Determine range+interaction range of all CPU's
-	double max_interaction_range=0.0;
-	for(int mat=0;mat<mp::num_materials;mat++){
-		if(mp::material[mat].cutoff > max_interaction_range) max_interaction_range = mp::material[mat].cutoff;
-	}
+	double max_interaction_range=double(cs::unit_cell.interaction_range);
 	
 	// Populate local ranges
-	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*mp::lattice_constant[0];
-	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*mp::lattice_constant[1];
-	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*mp::lattice_constant[2];
-	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*mp::lattice_constant[0];
-	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*mp::lattice_constant[1];
-	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*mp::lattice_constant[2];
+	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*cs::unit_cell_size[0];
+	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*cs::unit_cell_size[1];
+	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*cs::unit_cell_size[2];
+	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*cs::unit_cell_size[0];
+	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*cs::unit_cell_size[1];
+	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*cs::unit_cell_size[2];
 	
 	// Reduce data on all CPUs
 	//MPI::COMM_WORLD.Allreduce(&cpu_range_array[0], &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
@@ -434,6 +431,8 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	// Arrays for sending/receiving data
 	std::vector<double> send_coord_array(3*num_bdry_atoms,0.0);
 	std::vector<double> recv_coord_array(3*num_halo_atoms,0.0);
+	std::vector<int> send_mpi_atom_supercell_array(3*num_bdry_atoms,0);
+	std::vector<int> recv_mpi_atom_supercell_array(3*num_halo_atoms,0);
 	std::vector<int> send_material_array(num_bdry_atoms,0);
 	std::vector<int> recv_material_array(num_halo_atoms,0);
 	std::vector<int> send_cpuid_array(num_bdry_atoms,0);
@@ -441,6 +440,7 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	std::vector<int> send_mpi_atom_num_array(num_bdry_atoms,0);
 	std::vector<int> recv_mpi_atom_num_array(num_halo_atoms,0);
 
+	
 	// Pack up data for sending
 	int counter=0;	// array index
 
@@ -453,6 +453,9 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 					send_coord_array[3*counter+0] = catom_array[atom].x;
 					send_coord_array[3*counter+1] = catom_array[atom].y;
 					send_coord_array[3*counter+2] = catom_array[atom].z;
+					send_mpi_atom_supercell_array[3*counter+0] = catom_array[atom].scx;
+					send_mpi_atom_supercell_array[3*counter+1] = catom_array[atom].scy;
+					send_mpi_atom_supercell_array[3*counter+2] = catom_array[atom].scz;
 					send_material_array[counter]  = catom_array[atom].material;
 					send_cpuid_array[counter]  	= vmpi::my_rank; //catom_array[atom].mpi_cpu;
 					send_mpi_atom_num_array[counter] = atom;
@@ -480,12 +483,8 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	
 	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
 		if(num_send_atoms[cpu]>0){
-			//MPI::COMM_WORLD.Ssend(&send_coord_array[3*send_index],3*num_send_atoms[cpu],MPI_DOUBLE,cpu,50);
-			//MPI::COMM_WORLD.Ssend(&send_material_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,51);
-			//MPI::COMM_WORLD.Ssend(&send_cpuid_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,52);
-			//MPI::COMM_WORLD.Ssend(&send_mpi_atom_num_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,53);
-			
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_coord_array[3*send_index],3*num_send_atoms[cpu],MPI_DOUBLE,cpu,50));
+			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_supercell_array[3*send_index],3*num_send_atoms[cpu],MPI_INT,cpu,54));
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_material_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,51));
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_cpuid_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,52));
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_num_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,53));
@@ -493,11 +492,8 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 			send_index+=num_send_atoms[cpu];
 		}
 		if(num_recv_atoms[cpu]>0){
-			//MPI::COMM_WORLD.Recv(&recv_coord_array[3*recv_index],3*num_recv_atoms[cpu],MPI_DOUBLE,cpu,50);
-			//MPI::COMM_WORLD.Recv(&recv_material_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,51);
-			//MPI::COMM_WORLD.Recv(&recv_cpuid_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,52);
-			//MPI::COMM_WORLD.Recv(&recv_mpi_atom_num_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,53);
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_coord_array[3*recv_index],3*num_recv_atoms[cpu],MPI_DOUBLE,cpu,50));
+			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_supercell_array[3*recv_index],3*num_recv_atoms[cpu],MPI_INT,cpu,54));
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_material_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,51));
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_cpuid_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,52));
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_num_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,53));
@@ -515,6 +511,9 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 		catom_array[atom].x = recv_coord_array[3*index+0];
 		catom_array[atom].y = recv_coord_array[3*index+1];
 		catom_array[atom].z = recv_coord_array[3*index+2];
+		catom_array[atom].scx = recv_mpi_atom_supercell_array[3*index+0];
+		catom_array[atom].scy = recv_mpi_atom_supercell_array[3*index+1];
+		catom_array[atom].scz = recv_mpi_atom_supercell_array[3*index+2];
 		catom_array[atom].material = recv_material_array[index];
 		catom_array[atom].mpi_cpuid = recv_cpuid_array[index];
 		catom_array[atom].mpi_type = 2; // mark as halo atom
