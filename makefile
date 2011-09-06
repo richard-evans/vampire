@@ -122,7 +122,7 @@ MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
-EXECUTABLE=vampire
+EXECUTABLE=zspin
 
 all: $(OBJECTS) gcc
 
