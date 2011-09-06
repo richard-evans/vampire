@@ -1,0 +1,28 @@
+# Git Ignore file
+# Ignore object file
+*.o
+#Ignore temporary editor files
+*~
+*.swp
+#Ignore error files
+*.err
+#Povray files
+*.pov
+# Mac files
+*.DS_Store
+# Other sundry files
+*.png
+*.cfg
+*.inc
+info
+vampire
+cfg2povray
+cfg2rasmol
+crystal.xyz
+vdp
+vmag
+vgrain
+pp.dat
+M_vs_T.txt
+# EOF
+zspin

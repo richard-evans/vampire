@@ -1,0 +1,39 @@
+#======================================================
+# Vampire material file for a GdFe Ferrimagnet
+#======================================================
+#
+# R F Evans 08/03/10
+#
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=2
+#---------------------------------------------------
+# Material 0 Fe (TM)
+#---------------------------------------------------
+material[0]:name="TM"
+material[0]:alpha=0.02
+material[0]:Jij_matrix[0]=-2.835e-21
+material[0]:Jij_matrix[1]=1.09e-21
+material[0]:mu_s=1.92 !muB
+material[0]:Ku1=-8.07246e-24
+material[0]:element="Fe"
+material[0]:min=0.0
+material[0]:max=1.0
+#material[0]:crystal-structure="fcc"
+material[0]:alloy-master
+material[0]:alloy-class=0
+material[0]:alloy[1]=0.25
+#---------------------------------------------------
+# Material 1 Gd (RE)
+#---------------------------------------------------
+material[1]:name="RE"
+material[1]:alpha=0.02
+material[1]:Jij_matrix[0]=1.09e-21
+material[1]:Jij_matrix[1]=-1.26e-21
+material[1]:mu_s=7.63 !muB
+material[1]:Ku1=-8.07246e-24
+material[1]:element="Ag"
+material[1]:min=0.0
+material[1]:max=0.0
+#material[1]:crystal-structure="fcc"
