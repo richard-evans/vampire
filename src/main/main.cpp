@@ -60,8 +60,8 @@ int main(int argc, char* argv[]){
 		std::cout << " " << std::endl;
 		std::cout << "          Visual Atomistic and Micromagnetic Parallel IntegratoR Engine" << std::endl;
 		std::cout << " " << std::endl;
-		std::cout << "           Contributors: Richard F L Evans, Joe Barker, Thomas Ostler" << std::endl;
-		std::cout << "                         Weijia Fan, Roy W Chantrell" << std::endl;
+		std::cout << "           Contributors: Richard F L Evans, Weijia Fan, Joe Barker, " << std::endl;
+		std::cout << "                         Thomas Ostler, Phanwadee Chureemart, Roy W Chantrell" << std::endl;
 		std::cout << " " << std::endl;
 		std::cout << "                      Version 1.0 " << __DATE__ << " " << __TIME__ << std::endl;
 		#ifdef COMP	
