@@ -306,8 +306,11 @@ void mag_m_reset(){
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "stats::mag_m_reset() has been called" << std::endl;}
 	
+	if(!stats::is_initialised) stats::mag_m();
+	
 	stats::total_mean_mag_m_actual=0.0;
 	stats::total_mean_mag_m_norm=0.0;
+	for(int mat=0;mat<mp::num_materials;mat++) stats::sublattice_mean_magm_array[mat]=0.0;
 	stats::data_counter=0.0;
 	
 }

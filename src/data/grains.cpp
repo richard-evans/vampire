@@ -205,6 +205,7 @@ int mag(){
 			double my = grains::y_mag_array[grain]/=grains::sat_mag_array[grain];
 			double mz = grains::z_mag_array[grain]/=grains::sat_mag_array[grain];
 			grains::mag_m_array[grain] = sqrt(mx*mx+my*my+mz*mz);
+
 			// loop over all materials and normalise
 			if(mp::num_materials>1){
 			for(int mat=0;mat<mp::num_materials;mat++){

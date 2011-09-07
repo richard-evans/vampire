@@ -1,4 +1,4 @@
-/// Program to convert vampire cfg files to rasmol format
+/// Program to convert zspin cfg files to rasmol format
 ///
 /// ./cfg2rasmol 
 
@@ -154,7 +154,7 @@ int main(){
 			char *asctime( const struct tm *time_ptr );
 
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Atomistic coordinates configuration file for vampire"<< std::endl;
+			cfg_file_ofstr << "# Atomistic coordinates configuration file for zspin"<< std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "# Date: "<< asctime << std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;

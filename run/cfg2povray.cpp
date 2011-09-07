@@ -1,4 +1,4 @@
-/// Program to convert vampire cfg files to povray format
+/// Program to convert zspin cfg files to povray format
 ///
 /// ./cfg2rasmol 
 

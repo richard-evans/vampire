@@ -27,7 +27,7 @@
 #include <cmath>
 
 /// @namespace
-/// @brief Contains all functions and data associated with system creation in vampire.
+/// @brief Contains all functions and data associated with system creation in zspin.
 /// 
 /// @internal
 ///=====================================================================================

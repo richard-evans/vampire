@@ -51,17 +51,14 @@ int main(int argc, char* argv[]){
 	
 	//      Output Program Header
 	if(vmpi::my_rank==0){
-		std::cout << "                   __     __                    _ " << std::endl;          
-		std::cout << "                   \\ \\   / /_ _ _ __ ___  _ __ (_)_ __ ___ " << std::endl;
-		std::cout << "                    \\ \\ / / _` | '_ ` _ \\| '_ \\| | '__/ _ \\ " << std::endl;
-		std::cout << "                     \\ V / (_| | | | | | | |_) | | | |  __/ " << std::endl;
-		std::cout << "                      \\_/ \\__,_|_| |_| |_| .__/|_|_|  \\___| " << std::endl;
-		std::cout << "                                         |_|                " << std::endl;
-		std::cout << " " << std::endl;
-		std::cout << "          Visual Atomistic and Micromagnetic Parallel IntegratoR Engine" << std::endl;
-		std::cout << " " << std::endl;
-		std::cout << "           Contributors: Richard F L Evans, Joe Barker, Thomas Ostler" << std::endl;
-		std::cout << "                         Weijia Fan, Roy W Chantrell" << std::endl;
+		std::cout << "                                ___      _" << std::endl;
+		std::cout << "                            ___/ __|_ __(_)_ _" << std::endl;
+		std::cout << "                           |_ /\\__ \\ '_ \\ | ' \\" << std::endl;
+		std::cout << "                           /__||___/ .__/_|_||_|" << std::endl;
+		std::cout << "                                   |_|" << std::endl;
+		std::cout << std::endl;
+		std::cout << "           Contributors: Richard F L Evans, Weijia Fan, Joe Barker, " << std::endl;
+		std::cout << "                         Thomas Ostler, Phanwadee Chureemart, Roy W Chantrell" << std::endl;
 		std::cout << " " << std::endl;
 		std::cout << "                      Version 1.0 " << __DATE__ << " " << __TIME__ << std::endl;
 		#ifdef COMP	

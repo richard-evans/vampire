@@ -2561,7 +2561,7 @@ namespace vout{
 	// Output Function 9
 	void mat_mean_magm(std::ostream& stream){
 		for(int mat=0;mat<mp::num_materials;mat++){
-			stream << stats::sublattice_mean_magm_array[mat] << "\t";
+			stream << stats::sublattice_mean_magm_array[mat]/stats::data_counter << "\t";
 		}
 	}
 
