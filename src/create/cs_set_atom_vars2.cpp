@@ -104,6 +104,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::total_num_neighbours = counter;
 	
 	atoms::neighbour_list_array.resize(atoms::total_num_neighbours,0);
+	atoms::neighbour_interaction_type_array.resize(atoms::total_num_neighbours,0);
 	atoms::neighbour_list_start_index.resize(atoms::num_atoms,0);
 	atoms::neighbour_list_end_index.resize(atoms::num_atoms,0);
 
@@ -123,6 +124,89 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		// Set end index
 		atoms::neighbour_list_end_index[atom]=counter-1;
 	}
+	
+	// condense interaction list
+	atoms::exchange_type=unit_cell.exchange_type;
+	
+	// temporary class variables
+	zval_t tmp_zval;
+	zvec_t tmp_zvec;
+	zten_t tmp_zten;
+	
+	switch(atoms::exchange_type){
+		case -1:
+			// unroll material calculations
+			std::cout << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+			atoms::i_exchange_list.reserve(atoms::neighbour_list_array.size());
+			// loop over all interactions
+			for(int atom=0;atom<atoms::num_atoms;atom++){
+				const int imaterial=atoms::type_array[atom];
+				for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
+					const int natom = atoms::neighbour_list_array[nn];
+					const int jmaterial=atoms::type_array[natom];
+					atoms::i_exchange_list.push_back(tmp_zval);
+					atoms::i_exchange_list[atom].Jij= mp::material[imaterial].Jij_matrix[jmaterial];
+				}
+			}
+			// now set exchange type to normal isotropic case
+			atoms::exchange_type=0;
+			break;
+		case 0:
+			std::cout << "Unrolled exchange template requires " << 1.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+			// unroll isotopic interactions
+			atoms::i_exchange_list.reserve(unit_cell.interaction.size());
+			for(int i=0;i<unit_cell.interaction.size();i++){
+				int iatom = unit_cell.interaction[i].i;
+				int imat = unit_cell.atom[iatom].mat;
+				atoms::i_exchange_list.push_back(tmp_zval);
+				atoms::i_exchange_list[i].Jij=unit_cell.interaction[i].Jij[0][0]*1.0e-21/mp::material[imat].mu_s_SI;
+			}
+			break;
+		case 1:
+			std::cout << "Unrolled exchange template requires " << 3.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+			// unroll isotopic interactions
+			atoms::v_exchange_list.reserve(unit_cell.interaction.size());
+			for(int i=0;i<unit_cell.interaction.size();i++){
+				int iatom = unit_cell.interaction[i].i;
+				int imat = unit_cell.atom[iatom].mat;
+				atoms::v_exchange_list.push_back(tmp_zvec);
+				atoms::v_exchange_list[i].Jij[0]=unit_cell.interaction[i].Jij[0][0]*1.0e-21/mp::material[imat].mu_s_SI;
+				atoms::v_exchange_list[i].Jij[1]=unit_cell.interaction[i].Jij[1][1]*1.0e-21/mp::material[imat].mu_s_SI;
+				atoms::v_exchange_list[i].Jij[2]=unit_cell.interaction[i].Jij[2][2]*1.0e-21/mp::material[imat].mu_s_SI;
+			}
+			break;
+		case 2:
+			std::cout << "Unrolled exchange template requires " << 9.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+			// unroll isotopic interactions
+			atoms::t_exchange_list.reserve(unit_cell.interaction.size());
+			for(int i=0;i<unit_cell.interaction.size();i++){
+				int iatom = unit_cell.interaction[i].i;
+				int imat = unit_cell.atom[iatom].mat;
+				atoms::t_exchange_list.push_back(tmp_zten);
+				
+				atoms::t_exchange_list[i].Jij[0][0]=unit_cell.interaction[i].Jij[0][0]*1.0e-21/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[0][1]=unit_cell.interaction[i].Jij[0][1]*1.0e-21/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[0][2]=unit_cell.interaction[i].Jij[0][2]*1.0e-21/mp::material[imat].mu_s_SI;
+
+				atoms::t_exchange_list[i].Jij[1][0]=unit_cell.interaction[i].Jij[1][0]*1.0e-21/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[1][1]=unit_cell.interaction[i].Jij[1][1]*1.0e-21/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[1][2]=unit_cell.interaction[i].Jij[1][2]*1.0e-21/mp::material[imat].mu_s_SI;
+
+				atoms::t_exchange_list[i].Jij[2][0]=unit_cell.interaction[i].Jij[2][0]*1.0e-21/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[2][1]=unit_cell.interaction[i].Jij[2][1]*1.0e-21/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[2][2]=unit_cell.interaction[i].Jij[2][2]*1.0e-21/mp::material[imat].mu_s_SI;
+			}
+			break;
+		default:
+			std::cerr << "Error! - Unknown unit cell exchange type " << atoms::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;
+			err::vexit();
+			break;
+	}
+	
+	// now remove unit cell interactions data
+	unit_cell.interaction.resize(0);
+	unit_cell.atom.resize(0);
+	
 
 	return EXIT_SUCCESS;
 }
