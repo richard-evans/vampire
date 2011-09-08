@@ -134,14 +134,14 @@ int particle(std::vector<cs::catom_t> & catom_array){
 
 	double particle_origin[3];
 	// find centre unit cell
-	particle_origin[0] = double(vmath::iround(cs::system_dimensions[0]/(2.0*cs::unit_cell_size[0])))*cs::unit_cell_size[0];
-	particle_origin[1] = double(vmath::iround(cs::system_dimensions[1]/(2.0*cs::unit_cell_size[1])))*cs::unit_cell_size[1];
-	particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
+	particle_origin[0] = double(vmath::iround(cs::system_dimensions[0]/(2.0*unit_cell.dimensions[0])))*unit_cell.dimensions[0];
+	particle_origin[1] = double(vmath::iround(cs::system_dimensions[1]/(2.0*unit_cell.dimensions[1])))*unit_cell.dimensions[1];
+	particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
 
 	if(cs::particle_creation_parity==1){
-		particle_origin[0]+=cs::unit_cell_size[0]*0.5;
-		particle_origin[1]+=cs::unit_cell_size[1]*0.5;
-		particle_origin[2]+=cs::unit_cell_size[2]*0.5;
+		particle_origin[0]+=unit_cell.dimensions[0]*0.5;
+		particle_origin[1]+=unit_cell.dimensions[1]*0.5;
+		particle_origin[2]+=unit_cell.dimensions[2]*0.5;
 	}
 	
 	// Use particle type flags to determine which particle shape to cut
@@ -209,9 +209,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
 
 			if(cs::particle_creation_parity==1){
-				particle_origin[0]+=cs::unit_cell_size[0]*0.5;
-				particle_origin[1]+=cs::unit_cell_size[1]*0.5;
-				particle_origin[2]+=cs::unit_cell_size[2]*0.5;
+				particle_origin[0]+=unit_cell.dimensions[0]*0.5;
+				particle_origin[1]+=unit_cell.dimensions[1]*0.5;
+				particle_origin[2]+=unit_cell.dimensions[2]*0.5;
 			}
 			// Check to see if a complete particle fits within the system bounds
 			if((particle_origin[0]<(cs::system_dimensions[0]-cs::particle_scale)) &&

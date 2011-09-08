@@ -328,6 +328,25 @@ int match(string const key, string const word, string const value, string const 
 				return EXIT_FAILURE;
 			}
 		}
+		//-------------------------------------------------------------------
+		// Get unit cell filename
+		//-------------------------------------------------------------------
+		test="unit-cell-file";
+		if(word==test){
+			std::string matfile=value;
+			// strip quotes
+			matfile.erase(remove(matfile.begin(), matfile.end(), '\"'), matfile.end());
+			test="";
+			if(matfile!=test){
+				//std::cout << matfile << std::endl;
+				cs::unit_cell_file=matfile;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
+				return EXIT_FAILURE;
+			}
+		}
 		else{
 			std::cerr << "Error - Unknown control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;

@@ -362,12 +362,12 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	double max_interaction_range=double(cs::unit_cell.interaction_range);
 	
 	// Populate local ranges
-	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*cs::unit_cell_size[0];
-	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*cs::unit_cell_size[1];
-	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*cs::unit_cell_size[2];
-	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*cs::unit_cell_size[0];
-	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*cs::unit_cell_size[1];
-	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*cs::unit_cell_size[2];
+	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*unit_cell.dimensions[0];
+	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*unit_cell.dimensions[1];
+	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*unit_cell.dimensions[2];
+	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*unit_cell.dimensions[0];
+	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*unit_cell.dimensions[1];
+	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*unit_cell.dimensions[2];
 	
 	// Reduce data on all CPUs
 	//MPI::COMM_WORLD.Allreduce(&cpu_range_array[0], &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);

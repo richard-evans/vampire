@@ -27,11 +27,13 @@
 #include "vmpi.hpp"
 
 // Standard Libraries
-#include <string>
-#include <iostream>
-#include <cstdlib>
-#include <vector>
 #include <cmath>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
 
 namespace cs{
 	
@@ -47,21 +49,21 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	unit_cell_set(cs::unit_cell);
 
 	// Calculate number of global and local unit cells required (rounding up)
-	cs::total_num_unit_cells[0]=int(vmath::iceil(cs::system_dimensions[0]/cs::unit_cell_size[0]));
-	cs::total_num_unit_cells[1]=int(vmath::iceil(cs::system_dimensions[1]/cs::unit_cell_size[1]));
-	cs::total_num_unit_cells[2]=int(vmath::iceil(cs::system_dimensions[2]/cs::unit_cell_size[2]));
+	cs::total_num_unit_cells[0]=int(vmath::iceil(cs::system_dimensions[0]/unit_cell.dimensions[0]));
+	cs::total_num_unit_cells[1]=int(vmath::iceil(cs::system_dimensions[1]/unit_cell.dimensions[1]));
+	cs::total_num_unit_cells[2]=int(vmath::iceil(cs::system_dimensions[2]/unit_cell.dimensions[2]));
 	
 	int min_bounds[3];
 	int max_bounds[3];
 	
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		min_bounds[0] = int(vmpi::min_dimensions[0]/cs::unit_cell_size[0]);
-		min_bounds[1] = int(vmpi::min_dimensions[1]/cs::unit_cell_size[1]);
-		min_bounds[2] = int(vmpi::min_dimensions[2]/cs::unit_cell_size[2]);
-		max_bounds[0] = vmath::iceil(vmpi::max_dimensions[0]/cs::unit_cell_size[0]);
-		max_bounds[1] = vmath::iceil(vmpi::max_dimensions[1]/cs::unit_cell_size[1]);
-		max_bounds[2] = vmath::iceil(vmpi::max_dimensions[2]/cs::unit_cell_size[2]);
+		min_bounds[0] = int(vmpi::min_dimensions[0]/unit_cell.dimensions[0]);
+		min_bounds[1] = int(vmpi::min_dimensions[1]/unit_cell.dimensions[1]);
+		min_bounds[2] = int(vmpi::min_dimensions[2]/unit_cell.dimensions[2]);
+		max_bounds[0] = vmath::iceil(vmpi::max_dimensions[0]/unit_cell.dimensions[0]);
+		max_bounds[1] = vmath::iceil(vmpi::max_dimensions[1]/unit_cell.dimensions[1]);
+		max_bounds[2] = vmath::iceil(vmpi::max_dimensions[2]/unit_cell.dimensions[2]);
 	}
 	else{
 		min_bounds[0]=0;
@@ -98,11 +100,13 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	for(int z=min_bounds[2];z<max_bounds[2];z++){
 		for(int y=min_bounds[1];y<max_bounds[1];y++){
 			for(int x=min_bounds[0];x<max_bounds[0];x++){
+				
+				// need to change this to accept non-orthogonal lattices
 				// Loop over atoms in unit cell
 				for(int uca=0;uca<unit_cell.atom.size();uca++){
-					double cx = (double(x)+unit_cell.atom[uca].x)*cs::unit_cell_size[0];
-					double cy = (double(y)+unit_cell.atom[uca].y)*cs::unit_cell_size[1];
-					double cz = (double(z)+unit_cell.atom[uca].z)*cs::unit_cell_size[2];
+					double cx = (double(x)+unit_cell.atom[uca].x)*unit_cell.dimensions[0];
+					double cy = (double(y)+unit_cell.atom[uca].y)*unit_cell.dimensions[1];
+					double cz = (double(z)+unit_cell.atom[uca].z)*unit_cell.dimensions[2];
 
 					#ifdef MPICF
 						if(vmpi::mpi_mode==0){
@@ -189,14 +193,226 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	return EXIT_SUCCESS;
 }
 
+void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
+	
+	// check calling of routine if error checking is activated
+	if(err::check==true){std::cout << "cs::read_unit_cell has been called" << std::endl;}	
+
+	std::cout << "Reading in unit cell data..." << std::flush;
+
+	// ifstream declaration
+	std::ifstream inputfile;
+	
+	// Open file read only
+	inputfile.open(filename.c_str());
+	
+	// Check for opening
+	if(!inputfile.is_open()){
+		std::cerr << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
+		err::vexit();
+	}
+
+	// keep record of current line
+	unsigned int line_counter=0;
+	unsigned int line_id=0;
+	// Loop over all lines
+	while (! inputfile.eof() ){
+		line_counter++;
+		// read in whole line
+		std::string line;
+		getline(inputfile,line);
+		//std::cout << line.c_str() << std::endl;
+
+		// ignore blank lines
+		std::string empty="";
+		if(line==empty) continue;
+		
+		// set character triggers
+		const char* hash="#";	// Comment identifier
+		
+		bool has_hash=false;
+		// Determine if line is a comment line
+		for(int i=0;i<line.length();i++){
+			char c=line.at(i);
+
+			if(c== *hash){
+					has_hash=true;
+					break;
+			}
+		}
+		// if hash character found then read next line
+		if(has_hash==true) continue;
+		
+		// convert line to string stream
+		std::istringstream iss(line,std::istringstream::in);
+		
+		// defaults for interaction list
+		int exc_type=-1; // assume isotropic
+		int num_interactions=0; // assume no interactions
+		int interaction_range=1; // assume +-1 unit cell as default
+				
+		// non-comment line found - check for line number
+		switch(line_id){
+			case 0:
+				iss >> unit_cell.dimensions[0] >> unit_cell.dimensions[1] >> unit_cell.dimensions[2];
+				break;
+			case 1:
+				iss >> unit_cell.shape[0][0] >> unit_cell.shape[0][1] >> unit_cell.shape[0][2];
+				break;
+			case 2:
+				iss >> unit_cell.shape[1][0] >> unit_cell.shape[1][1] >> unit_cell.shape[1][2];
+				break;
+			case 3:
+				iss >> unit_cell.shape[2][0] >> unit_cell.shape[2][1] >> unit_cell.shape[2][2];
+				break;
+			case 4:
+				int num_uc_atoms;
+				iss >> num_uc_atoms;
+				//std::cout << "Reading in " << num_uc_atoms << " atoms" << std::endl;
+				// resize unit_cell.atom array if within allowable bounds
+				if( (num_uc_atoms >0) && (num_uc_atoms <= 1000000)) unit_cell.atom.resize(num_uc_atoms);
+				else { std::cerr << "Error! Requested number of atoms " << num_uc_atoms << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-1,000,000. Exiting" << std::endl; err::vexit();}  
+				// loop over all atoms and read into class
+				for (int i=0; i<unit_cell.atom.size(); i++){
+					line_counter++;
+					// declare safe temporaries for atom input
+					int id=i;
+					double cx=2.0, cy=2.0,cz=2.0; // coordinates - default will give an error
+					int mat_id=0, lcat_id=0, hcat_id=0; // sensible defaults if omitted
+					// get line
+					std::string atom_line;
+					getline(inputfile,atom_line);
+					std::istringstream atom_iss(atom_line,std::istringstream::in);
+					atom_iss >> id >> cx >> cy >> cz >> mat_id >> lcat_id >> hcat_id;
+					//inputfile >> id >> cx >> cy >> cz >> mat_id >> lcat_id >> hcat_id;
+					// now check for mostly sane input
+					if(cx>=0.0 && cx <=1.0) unit_cell.atom[i].x=cx;
+					else{std::cerr << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					if(cy>=0.0 && cy <=1.0) unit_cell.atom[i].y=cy;
+					else{std::cerr << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					if(cz>=0.0 && cz <=1.0) unit_cell.atom[i].z=cz;
+					else{std::cerr << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					if(mat_id >=0 && mat_id<mp::num_materials) unit_cell.atom[i].mat=mat_id;
+					else{ std::cerr << "Error! Requested material id " << mat_id << "for atom number " << id <<  " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-" << mp::num_materials << ". Exiting" << std::endl; err::vexit();} 
+					unit_cell.atom[i].lc=lcat_id;
+					unit_cell.atom[i].hc=hcat_id;
+					//std::cout << i << "\t" << id << "\t" << cx << "\t" << cy << "\t" << cz << "\t" << mat_id << "\t" << lcat_id << "\t" << hcat_id << std::endl;
+				}
+				break;
+			case 5:
+				iss >> num_interactions >> exc_type;
+				//std::cout << num_interactions << "\t" << exc_type << std::endl;
+				if(num_interactions>=0) unit_cell.interaction.resize(num_interactions);
+				else { std::cerr << "Error! Requested number of interactions " << num_interactions << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is less than 0. Exiting" << std::endl; err::vexit();}
+				// if exchange type omitted, then assume isotropic values from material file
+				if(exc_type==-1) unit_cell.exchange_type=0;
+				// loop over all interactions and read into class
+				for (int i=0; i<num_interactions; i++){
+					//std::cout << "setting up interaction "<< i+1<< " of " << num_interactions << " interactions" << std::endl; 
+					// declare safe temporaries for interaction input
+					int id=i;
+					int iatom=-1,jatom=-1; // atom pairs
+					int dx=0, dy=0,dz=0; // relative unit cell coordinates
+					// get line
+					std::string int_line;
+					getline(inputfile,int_line);
+					//std::cout << int_line.c_str() << std::endl;
+					std::istringstream int_iss(int_line,std::istringstream::in);
+					int_iss >> id >> iatom >> jatom >> dx >> dy >> dz;
+					//inputfile >> id >> iatom >> jatom >> dx >> dy >> dz;
+					line_counter++;
+					// check for sane input
+					if(iatom>=0 && iatom < unit_cell.atom.size()) unit_cell.interaction[i].i=iatom;
+					else{std::cerr << "Error! iatom number "<< iatom <<" for interaction id " << id << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"<< unit_cell.atom.size()-1 << ". Exiting" << std::endl; err::vexit();}
+					if(iatom>=0 && jatom < unit_cell.atom.size()) unit_cell.interaction[i].j=jatom;
+					else{std::cerr << "Error! jatom number "<< jatom <<" for interaction id " << id << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"<< unit_cell.atom.size()-1 << ". Exiting" << std::endl; err::vexit();}
+					unit_cell.interaction[i].dx=dx;
+					unit_cell.interaction[i].dy=dy;
+					unit_cell.interaction[i].dz=dz;
+					// check for long range interactions
+					if(abs(dx)>interaction_range) interaction_range=abs(dx);
+					if(abs(dy)>interaction_range) interaction_range=abs(dy);
+					if(abs(dz)>interaction_range) interaction_range=abs(dz);
+					
+					int iatom_mat = unit_cell.atom[iatom].mat;
+					int jatom_mat = unit_cell.atom[jatom].mat;
+					switch(exc_type){
+						case -1: // assume isotropic
+							unit_cell.interaction[i].Jij[0][0]=mp::material[iatom_mat].Jij_matrix[jatom_mat];
+							break;
+						case 0:
+							int_iss >> unit_cell.interaction[i].Jij[0][0];
+							break;
+						case 1:
+							int_iss >> unit_cell.interaction[i].Jij[0][0] >> unit_cell.interaction[i].Jij[1][1] >> unit_cell.interaction[i].Jij[2][2];
+							break;
+						case 2:
+							int_iss >> unit_cell.interaction[i].Jij[0][0] >> unit_cell.interaction[i].Jij[0][1] >> unit_cell.interaction[i].Jij[0][2];
+							int_iss >> unit_cell.interaction[i].Jij[1][0] >> unit_cell.interaction[i].Jij[1][1] >> unit_cell.interaction[i].Jij[1][2];
+							int_iss >> unit_cell.interaction[i].Jij[2][0] >> unit_cell.interaction[i].Jij[2][1] >> unit_cell.interaction[i].Jij[2][2];
+							break;
+						default:
+							std::cerr << "Error! Requested exchange type " << exc_type << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0-2. Exiting" << std::endl; err::vexit();
+					}
+				}
+				// set interaction range
+				unit_cell.interaction_range=interaction_range;
+				break;
+			default:
+				std::cerr << "Error! Unknown line type on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << ". Exiting" << std::endl; err::vexit();
+		}
+		line_id++;
+	} // end of while loop
+	
+	std::cout << "Done!" << std::endl;
+	std::cout << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
+	std::cout << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
+	std::cout << "\t" << "Calculated interaction range: " << unit_cell.interaction_range << " Unit Cells" << std::endl;
+
+	return;
+}
+
 void unit_cell_set(unit_cell_t & unit_cell){
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::unit_cell_set has been called" << std::endl;}	
 
+	// check for read-in of unit cell
+	std::string blank="";
+	if(cs::unit_cell_file.c_str()!=blank){
+		read_unit_cell(unit_cell, cs::unit_cell_file);
+		return;
+	}
+	
+	// global values
+	unit_cell.dimensions[0]=cs::unit_cell_size[0];
+	unit_cell.dimensions[1]=cs::unit_cell_size[1];
+	unit_cell.dimensions[2]=cs::unit_cell_size[2];
+	
+	unit_cell.shape[0][0]=1.0;
+	unit_cell.shape[0][1]=0.0;
+	unit_cell.shape[0][2]=0.0;
+
+	unit_cell.shape[1][0]=0.0;
+	unit_cell.shape[1][1]=1.0;
+	unit_cell.shape[1][2]=0.0;
+
+	unit_cell.shape[2][0]=0.0;
+	unit_cell.shape[2][1]=0.0;
+	unit_cell.shape[2][2]=1.0;
+
 		// Simple Cubic
 		if(cs::crystal_structure=="sc"){
-			unit_cell.size=1;
 			unit_cell.lcsize=1;
 			unit_cell.hcsize=1;
 			unit_cell.interaction_range=1;
@@ -248,7 +464,6 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			//-----------------------------
 		}
 		else if(cs::crystal_structure=="bcc"){
-			unit_cell.size=2;
 			unit_cell.lcsize=2;
 			unit_cell.hcsize=2;
 			unit_cell.interaction_range=1;
@@ -268,7 +483,6 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			//-----------------------------
 		}
 		else if(cs::crystal_structure=="fct"){
-			unit_cell.size=2;
 			unit_cell.lcsize=2;
 			unit_cell.hcsize=1;
 			unit_cell.interaction_range=1;
@@ -288,7 +502,6 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			//-----------------------------
 		}
 		else if(cs::crystal_structure=="fcc"){
-			unit_cell.size=4;
 			unit_cell.lcsize=4;
 			unit_cell.hcsize=2;
 			unit_cell.interaction_range=1;

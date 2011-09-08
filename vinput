@@ -29,9 +29,10 @@ dimensions:particle-size = 7.7 !nm
 dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
-# Material File:
+# Material Files:
 #------------------------------------------
 material:file="Co.mat"
+material:unit-cell-file=SimpleCubic.ucf
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------

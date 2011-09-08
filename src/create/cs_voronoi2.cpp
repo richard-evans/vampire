@@ -281,28 +281,28 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		min_bounds[0] = int(vmpi::min_dimensions[0]/cs::unit_cell_size[0]);
-		min_bounds[1] = int(vmpi::min_dimensions[1]/cs::unit_cell_size[1]);
-		min_bounds[2] = int(vmpi::min_dimensions[2]/cs::unit_cell_size[2]);
-		max_bounds[0] = vmath::iround(vmpi::max_dimensions[0]/cs::unit_cell_size[0]);
-		max_bounds[1] = vmath::iround(vmpi::max_dimensions[1]/cs::unit_cell_size[1]);
-		max_bounds[2] = vmath::iround(vmpi::max_dimensions[2]/cs::unit_cell_size[2]);
+		min_bounds[0] = int(vmpi::min_dimensions[0]/unit_cell.dimensions[0]);
+		min_bounds[1] = int(vmpi::min_dimensions[1]/unit_cell.dimensions[1]);
+		min_bounds[2] = int(vmpi::min_dimensions[2]/unit_cell.dimensions[2]);
+		max_bounds[0] = vmath::iround(vmpi::max_dimensions[0]/unit_cell.dimensions[0]);
+		max_bounds[1] = vmath::iround(vmpi::max_dimensions[1]/unit_cell.dimensions[1]);
+		max_bounds[2] = vmath::iround(vmpi::max_dimensions[2]/unit_cell.dimensions[2]);
 	}
 	else{
 		min_bounds[0]=0;
 		min_bounds[1]=0;
 		min_bounds[2]=0;
-		max_bounds[0]=vmath::iround(cs::system_dimensions[0]/cs::unit_cell_size[0]);
-		max_bounds[1]=vmath::iround(cs::system_dimensions[1]/cs::unit_cell_size[1]);
-		max_bounds[2]=vmath::iround(cs::system_dimensions[2]/cs::unit_cell_size[2]);
+		max_bounds[0]=vmath::iround(cs::system_dimensions[0]/unit_cell.dimensions[0]);
+		max_bounds[1]=vmath::iround(cs::system_dimensions[1]/unit_cell.dimensions[1]);
+		max_bounds[2]=vmath::iround(cs::system_dimensions[2]/unit_cell.dimensions[2]);
 	}
 	#else
 		min_bounds[0]=0;
 		min_bounds[1]=0;
 		min_bounds[2]=0;
-		max_bounds[0]=vmath::iround(cs::system_dimensions[0]/cs::unit_cell_size[0]);
-		max_bounds[1]=vmath::iround(cs::system_dimensions[1]/cs::unit_cell_size[1]);
-		max_bounds[2]=vmath::iround(cs::system_dimensions[2]/cs::unit_cell_size[2]);
+		max_bounds[0]=vmath::iround(cs::system_dimensions[0]/unit_cell.dimensions[0]);
+		max_bounds[1]=vmath::iround(cs::system_dimensions[1]/unit_cell.dimensions[1]);
+		max_bounds[2]=vmath::iround(cs::system_dimensions[2]/unit_cell.dimensions[2]);
 	#endif
 	
 	// allocate supercell array
@@ -316,8 +316,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	
 	// loop over atoms and populate supercell array
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		int cx = int (catom_array[atom].x/cs::unit_cell_size[0]);
-		int cy = int (catom_array[atom].y/cs::unit_cell_size[1]);
+		int cx = int (catom_array[atom].x/unit_cell.dimensions[0]);
+		int cy = int (catom_array[atom].y/unit_cell.dimensions[1]);
 		supercell_array[cx][cy].push_back(atom);
 	}
 	
@@ -343,8 +343,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			for(int vertex=0;vertex<num_vertices;vertex++){
 				tmp_grain_pointx_array[vertex]=grain_vertices_array[grain][vertex][0]+grain_coord_array[grain][0];
 				tmp_grain_pointy_array[vertex]=grain_vertices_array[grain][vertex][1]+grain_coord_array[grain][1];
-				int x = int(tmp_grain_pointx_array[vertex]/cs::unit_cell_size[0]);
-				int y = int(tmp_grain_pointy_array[vertex]/cs::unit_cell_size[1]);
+				int x = int(tmp_grain_pointx_array[vertex]/unit_cell.dimensions[0]);
+				int y = int(tmp_grain_pointy_array[vertex]/unit_cell.dimensions[1]);
 				if(x < minx) minx = x;
 				if(x > maxx) maxx = x;
 				if(y < miny) miny = y;

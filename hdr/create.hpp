@@ -51,12 +51,14 @@ namespace cs{
 	// Other directives and flags
 	extern bool single_spin;
 	extern int system_creation_flags[10];
+	extern std::string unit_cell_file;
 	
 	class unit_cell_atom_t {
 	public:
 		double x; // atom x-coordinate
 		double y; // atom y-coordinate
 		double z; // atom z-coordinate
+		unsigned int mat; // material
 		unsigned int lc; // lattice category
 		unsigned int hc; // height category
 		
@@ -69,15 +71,19 @@ namespace cs{
 		int dx; // delta x in unit cells
 		int dy; // delta y in unit cells
 		int dz; // delta z in unit cells
+		double Jij[3][3]; // Exchange tensor
 	};
 	
 	class unit_cell_t {
 	public:
 		
-		unsigned int size;
-		unsigned int lcsize;
-		unsigned int hcsize;
-		unsigned int interaction_range;
+		double dimensions[3];
+		double shape[3][3];
+		
+		unsigned int lcsize; // number of local categories
+		unsigned int hcsize; // number of height categories
+		unsigned int interaction_range; // maximum range in unit cells
+		unsigned int exchange_type; // 0=isotropic, 1=vector, or 2=tensor
 
 		// list of atoms in each unit cell
 		std::vector <unit_cell_atom_t> atom;
