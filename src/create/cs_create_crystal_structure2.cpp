@@ -311,7 +311,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				else { std::cerr << "Error! Requested number of interactions " << num_interactions << " on line " << line_counter
 					<< " of unit cell input file " << filename.c_str() << " is less than 0. Exiting" << std::endl; err::vexit();}
 				// if exchange type omitted, then assume isotropic values from material file
-				if(exc_type==-1) unit_cell.exchange_type=0;
+				//if(exc_type==-1) unit_cell.exchange_type=0;
 				// loop over all interactions and read into class
 				for (int i=0; i<num_interactions; i++){
 					//std::cout << "setting up interaction "<< i+1<< " of " << num_interactions << " interactions" << std::endl; 
@@ -398,6 +398,8 @@ void unit_cell_set(unit_cell_t & unit_cell){
 	unit_cell.dimensions[0]=cs::unit_cell_size[0];
 	unit_cell.dimensions[1]=cs::unit_cell_size[1];
 	unit_cell.dimensions[2]=cs::unit_cell_size[2];
+	
+	unit_cell.exchange_type=-1;
 	
 	unit_cell.shape[0][0]=1.0;
 	unit_cell.shape[0][1]=0.0;

@@ -86,7 +86,7 @@ int create(){
 	
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array; 
-	std::vector<std::vector<int> > cneighbourlist; 
+	std::vector<std::vector<neighbour_t> > cneighbourlist; 
 
 	// check for pbc and if so round up system dimensions
 	if(cs::pbc[0]==true) cs::system_dimensions[0]=cs::unit_cell_size[0]*(int(vmath::iceil(cs::system_dimensions[0]/cs::unit_cell_size[0])));

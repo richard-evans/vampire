@@ -1,6 +1,7 @@
 
 
 #include "atoms.hpp"
+#include "create.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "vmpi.hpp"
@@ -362,12 +363,12 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	double max_interaction_range=double(cs::unit_cell.interaction_range);
 	
 	// Populate local ranges
-	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*unit_cell.dimensions[0];
-	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*unit_cell.dimensions[1];
-	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*unit_cell.dimensions[2];
-	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*unit_cell.dimensions[0];
-	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*unit_cell.dimensions[1];
-	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*unit_cell.dimensions[2];
+	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*cs::unit_cell.dimensions[0];
+	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*cs::unit_cell.dimensions[1];
+	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*cs::unit_cell.dimensions[2];
+	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*cs::unit_cell.dimensions[0];
+	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*cs::unit_cell.dimensions[1];
+	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*cs::unit_cell.dimensions[2];
 	
 	// Reduce data on all CPUs
 	//MPI::COMM_WORLD.Allreduce(&cpu_range_array[0], &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
@@ -460,7 +461,7 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 					send_material_array[counter]  = catom_array[atom].material;
 					send_cpuid_array[counter]  	= vmpi::my_rank; //catom_array[atom].mpi_cpu;
 					send_mpi_atom_num_array[counter] = atom;
-					send_uc_id_array[counter] = catom_array[atom].uc_id;
+					send_mpi_uc_id_array[counter] = catom_array[atom].uc_id;
 					counter++;
 				}
 			}
@@ -603,7 +604,7 @@ int set_replicated_data(std::vector<cs::catom_t> & catom_array){
 	return EXIT_SUCCESS;
 }
 
-int sort_atoms_by_mpi_type(std::vector<cs::catom_t> &,std::vector<std::vector <int> > &);
+int sort_atoms_by_mpi_type(std::vector<cs::catom_t> &,std::vector<std::vector <cs::neighbour_t> > &);
 
 /// @brief Identify Boundary Atoms
 ///
@@ -628,7 +629,7 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> &,std::vector<std::vector <i
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <int> > & cneighbourlist){
+int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <cs::neighbour_t> > & cneighbourlist){
 	
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "vmpi::identify_boundary_atoms has been called" << std::endl;}
@@ -639,7 +640,7 @@ int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<s
 		bool boundary=false;
 		bool non_interacting_halo=true;
 		for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
-			int nn_mpi_type = catom_array[cneighbourlist[atom][nn]].mpi_type;
+			int nn_mpi_type = catom_array[cneighbourlist[atom][nn].nn].mpi_type;
 			// Test for interaction with halo
 			if((my_mpi_type==0) && (nn_mpi_type == 2)){
 				boundary=true;
@@ -676,7 +677,7 @@ bool compare(data_t first,data_t second){
 	else return false;
 }
 	
-int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <int> > & cneighbourlist){
+int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <cs::neighbour_t> > & cneighbourlist){
 	
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::sort_atoms_by_mpi_type has been called" << std::endl;}	
@@ -735,7 +736,7 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 		std::cout << vmpi::num_core_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms + vmpi::num_halo_atoms << std::endl;
 	// create temporary catom and cneighbourlist arrays for copying data
 	std::vector <cs::catom_t> tmp_catom_array(new_num_atoms);
-	std::vector <std::vector <int> > tmp_cneighbourlist(new_num_atoms);
+	std::vector <std::vector <cs::neighbour_t> > tmp_cneighbourlist(new_num_atoms);
 	//tmp_cneighbourlist.reserve(new_num_atoms);
 	
 	// Populate tmp arrays (assuming all mpi_type=3 atoms are at the end of the array?)
@@ -748,9 +749,13 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 		//Copy neighbourlist using new atom numbers
 		//if(vmpi::my_rank==1) std::cout << vmpi::my_rank << " old " << old_atom_num << " nn: ";
 		for(unsigned int nn=0;nn<cneighbourlist[old_atom_num].size();nn++){
-			unsigned int old_nn_number = cneighbourlist[old_atom_num][nn];
+			unsigned int old_nn_number = cneighbourlist[old_atom_num][nn].nn;
+			unsigned int interaction_id= cneighbourlist[old_atom_num][nn].i;
 			unsigned int new_nn_number = inv_mpi_type_vec[old_nn_number];
-			tmp_cneighbourlist[atom].push_back(new_nn_number);
+			cs::neighbour_t temp_nt;
+			temp_nt.nn=new_nn_number;
+			temp_nt.i=interaction_id;
+			tmp_cneighbourlist[atom].push_back(temp_nt);
 			//if(vmpi::my_rank==1) std::cout << cneighbourlist[old_atom_num][nn] << "\t";
 		}
 		//if(vmpi::my_rank==1) std::cout <<std::endl;

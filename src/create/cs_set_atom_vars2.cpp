@@ -20,7 +20,7 @@
 //using namespace material_parameters;
 	
 namespace cs{
-int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <int> > & cneighbourlist){
+int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbour_t> > & cneighbourlist){
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){
@@ -114,7 +114,8 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		// Set start index
 		atoms::neighbour_list_start_index[atom]=counter;
 		for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
-			atoms::neighbour_list_array[counter] = cneighbourlist[atom][nn];
+			atoms::neighbour_list_array[counter] = cneighbourlist[atom][nn].nn;
+			atoms::neighbour_interaction_type_array[counter] = cneighbourlist[atom][nn].i;
 			//std::cout << cneighbourlist[atom][nn] << " ";
 			counter++;
 		}

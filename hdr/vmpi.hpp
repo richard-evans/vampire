@@ -53,7 +53,7 @@ namespace vmpi{
 	extern int crystal_xyz(std::vector<cs::catom_t> &);
 	extern int copy_halo_atoms(std::vector<cs::catom_t> &);
 	extern int set_replicated_data(std::vector<cs::catom_t> &);
-	extern int identify_boundary_atoms(std::vector<cs::catom_t> &, std::vector<std::vector <int> > &);
+	extern int identify_boundary_atoms(std::vector<cs::catom_t> &, std::vector<std::vector <cs::neighbour_t> > &);
 	extern int init_mpi_comms(std::vector<cs::catom_t> & catom_array);
 
 }

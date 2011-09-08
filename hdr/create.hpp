@@ -83,13 +83,21 @@ namespace cs{
 		unsigned int lcsize; // number of local categories
 		unsigned int hcsize; // number of height categories
 		unsigned int interaction_range; // maximum range in unit cells
-		unsigned int exchange_type; // 0=isotropic, 1=vector, or 2=tensor
+		int exchange_type; // -1=isotropic(local material), 0=isotropic, 1=vector, or 2=tensor
 
 		// list of atoms in each unit cell
 		std::vector <unit_cell_atom_t> atom;
 
 		// list of interactions in each unit cell
 		std::vector <unit_cell_interaction_t> interaction;
+
+	};
+	
+	class neighbour_t {
+	public:
+		
+		int nn;
+		int i;
 
 	};
 	
@@ -231,7 +239,7 @@ int create_system_type(std::vector<cs::catom_t> &);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int create_neighbourlist(std::vector<cs::catom_t> &, std::vector<std::vector <int> > &);
+int create_neighbourlist(std::vector<cs::catom_t> &, std::vector<std::vector <neighbour_t> > &);
 
 /// @brief This is the brief (one line only) description of the function.
 ///
@@ -254,7 +262,7 @@ int create_neighbourlist(std::vector<cs::catom_t> &, std::vector<std::vector <in
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int set_atom_vars(std::vector<cs::catom_t> &, std::vector<std::vector <int> > &);
+int set_atom_vars(std::vector<cs::catom_t> &, std::vector<std::vector <neighbour_t> > &);
 
 int voronoi_film(std::vector<cs::catom_t> &);
 

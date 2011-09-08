@@ -45,7 +45,7 @@ namespace cs{
 ///  In this example offset=4, and max_cell = 8. Therefore 4 cells are needed.
 ///
 ///
-int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <int> > & cneighbourlist){
+int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbour_t> > & cneighbourlist){
 	
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::create_neighbourlist has been called" << std::endl;}	
@@ -59,7 +59,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	// Reserve space for each atom in neighbour list according to material type
 	for(int atom=0;atom<num_atoms;atom++){
 		int max_nn = 4;
-		cneighbourlist.push_back(std::vector<int>());
+		cneighbourlist.push_back(std::vector<neighbour_t>());
 		cneighbourlist[atom].reserve(max_nn);
 	}
 
@@ -174,7 +174,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 
 	// Generate neighbour list
 	std::cout <<"Generating Neighbour list"<< std::flush; 
-
+	neighbour_t tmp_nt;
 	// Loop over all cells
 	for(unsigned int cell=0;cell<num_cells;cell++){
 		if(cell%(num_cells/10+1)==0){
@@ -208,7 +208,13 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			// check for out-of-bounds access
 			if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
 				if((supercell_array[nx][ny][nz][atom]!=-1) || (supercell_array[nx][ny][nz][natom]!=-1)){
-					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].push_back(supercell_array[nx][ny][nz][natom]);
+					// get current index
+					int index=cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].size();
+					// push back array of class
+					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].push_back(tmp_nt);
+					// now save atom id and interaction type
+					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].nn=supercell_array[nx][ny][nz][natom];
+					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].i=i;
 					//std::cout << supercell_array[nx][ny][nz][atom] << "\t" << supercell_array[nx][ny][nz][natom] << std::endl;
 					//std::cin.get();
 				}
