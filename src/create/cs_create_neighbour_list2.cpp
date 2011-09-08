@@ -132,7 +132,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		double c[3]={catom_array[atom].x,catom_array[atom].y,catom_array[atom].z};
 		//std::cout << atom << "\t" << c[0] << "\t" << c[1] <<"\t" << c[2] << std::endl;
 		for(int i=0;i<3;i++){
-			scc[i]=int(c[i]/cs::unit_cell_size[i])-offset[i]; // Always round down for supercell coordinates
+			//scc[i]=int(c[i]/cs::unit_cell_size[i])-offset[i]; // Always round down for supercell coordinates
 			// Always check cell in range
 			if(scc[i]<0 || scc[i]>= d[i]){
 				//std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
