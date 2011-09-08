@@ -56,9 +56,11 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	// Reserve space for num_atoms
 	cneighbourlist.reserve(num_atoms);
 
+	// estimate number of interactions per atom
+	const int max_nn=int(1.1*(double(unit_cell.interaction.size())/double(unit_cell.atom.size())));
+	
 	// Reserve space for each atom in neighbour list according to material type
 	for(int atom=0;atom<num_atoms;atom++){
-		int max_nn = 4;
 		cneighbourlist.push_back(std::vector<neighbour_t>());
 		cneighbourlist[atom].reserve(max_nn);
 	}
