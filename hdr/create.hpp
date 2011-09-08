@@ -102,6 +102,7 @@ namespace cs{
 
 			// Integers
 			int material;
+			unsigned int uc_id;
 			int uc_category;
 			int lh_category;
 			int grain;
@@ -120,6 +121,7 @@ namespace cs{
 				z(0.0),
 				include(false),
 				material(0),
+				uc_id(0),
 				uc_category(0),
 				lh_category(0),
 				grain(0),

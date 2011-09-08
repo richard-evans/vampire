@@ -460,7 +460,7 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 					send_material_array[counter]  = catom_array[atom].material;
 					send_cpuid_array[counter]  	= vmpi::my_rank; //catom_array[atom].mpi_cpu;
 					send_mpi_atom_num_array[counter] = atom;
-					send_uc_id_array[counter] = catom_array[atom].uc_category;
+					send_uc_id_array[counter] = catom_array[atom].uc_id;
 					counter++;
 				}
 			}
@@ -522,7 +522,7 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 		catom_array[atom].mpi_cpuid = recv_cpuid_array[index];
 		catom_array[atom].mpi_type = 2; // mark as halo atom
 		catom_array[atom].mpi_atom_number = recv_mpi_atom_num_array[index];
-		catom_array[atom].uc_category = recv_mpi_uc_id_array[index];
+		catom_array[atom].uc_id = recv_mpi_uc_id_array[index];
 	}
 		
 		

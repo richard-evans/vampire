@@ -152,9 +152,9 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		}
 
 		// Check for atoms greater than max_atoms_per_supercell
-		if(catom_array[atom].uc_category<unit_cell.atom.size()){
+		if(catom_array[atom].uc_id<unit_cell.atom.size()){
 			// Add atom to supercell
-			supercell_array[scc[0]][scc[1]][scc[2]][catom_array[atom].uc_category]=atom;
+			supercell_array[scc[0]][scc[1]][scc[2]][catom_array[atom].uc_id]=atom;
 		}
 		else{
 			std::cerr << "Error, number of atoms per supercell exceeded" << std::endl;

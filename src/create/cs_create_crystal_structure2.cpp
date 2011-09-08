@@ -118,6 +118,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].z=cz;
 							//std::cout << atom << "\t" << cx << "\t" << cy <<"\t" << cz << std::endl;
 							catom_array[atom].material=0;
+							catom_array[atom].uc_id=uca;
 							catom_array[atom].lh_category=unit_cell.atom[uca].hc+z*maxlh;
 							catom_array[atom].uc_category=unit_cell.atom[uca].lc;
 							catom_array[atom].scx=x;
@@ -135,7 +136,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].y=cy;
 							catom_array[atom].z=cz;
 							catom_array[atom].material=0;
-							catom_array[atom].material=0;
+							catom_array[atom].uc_id=uca;
 							catom_array[atom].lh_category=unit_cell.atom[uca].hc+z*maxlh;
 							catom_array[atom].uc_category=unit_cell.atom[uca].lc;
 							catom_array[atom].scx=x;
