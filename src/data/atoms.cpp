@@ -12,7 +12,7 @@ namespace atoms{
 	int num_atoms;			// Number of atoms in simulation
 	int num_neighbours;	   	// Maximum number of neighbours for Hamiltonian/Lattice
 	int total_num_neighbours;
-
+	int exchange_type;
 	//--------------------------
 	// Array Variables
 	//--------------------------
@@ -21,6 +21,7 @@ namespace atoms{
 	std::vector <double> y_coord_array(0);
 	std::vector <double> z_coord_array(0);
 	std::vector <int> neighbour_list_array(0);
+	std::vector <int> neighbour_interaction_type_array(0);
 	std::vector <int> neighbour_list_start_index(0);
 	std::vector <int> neighbour_list_end_index(0);
 	std::vector <int> type_array(0);
@@ -41,5 +42,9 @@ namespace atoms{
 	std::vector <double> x_dipolar_field_array(0);			// Dipolar fields
 	std::vector <double> y_dipolar_field_array(0);			// Dipolar fields
 	std::vector <double> z_dipolar_field_array(0);			// Dipolar fields
+	
+	std::vector <zval_t> i_exchange_list(0);
+	std::vector <zvec_t> v_exchange_list(0);
+	std::vector <zten_t> t_exchange_list(0);
 
 }

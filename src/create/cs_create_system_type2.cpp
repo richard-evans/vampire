@@ -65,7 +65,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------------------------------
 	// Choose which system type to create
 	//----------------------------------------------------------------------------------
-	switch(material_parameters::system_creation_flags[2]){
+	switch(cs::system_creation_flags[2]){
 		case 0: // Isolated particle
 			particle(catom_array);
 			break;
@@ -103,69 +103,11 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
 		
-	//----------------------------------------------------------------------------------
-	// Set post construction atom identifiers for multispecies system
-	//----------------------------------------------------------------------------------
-	//if(material_parameters::system_creation_flags[4]==1){
-	//	multilayer(cs_num_atoms,cs_coord_array,cs_atom_type_array,particle_include_array);
-	//}
-	//else if(material_parameters::system_creation_flags[4]==2){
-	//	intermixing(cs_num_atoms,cs_coord_array,cs_atom_type_array,particle_include_array);
-	//}
-
-	//-------------------------------------------------------------
-	//      Clean Up Parallel Decomposition if required 
-	//-------------------------------------------------------------
-	//#ifdef MPICF
-	//	if(mpi_generic::mpi_mode==2){
-	//		mpi_create_system_type(cs_num_atoms,cs_coord_array,cs_atom_type_array,particle_include_array);
-	//	}
-	//#endif
-
-	//----------------------------------------------------------------------------------
-	// Calculate new number of atoms and re-sort cs_* arrays according to included list
-	//----------------------------------------------------------------------------------
-	/*new_num_atoms = 0;
-	std::vector <int> tmp_grain_no_array(cs_num_atoms);
-	
-	for(atom=0;atom<cs_num_atoms;atom++){
-		if(particle_include_array[atom]!=-1){
-			tmp_grain_no_array[new_num_atoms]=particle_include_array[atom];
-			cs_coord_array[new_num_atoms][0] = cs_coord_array[atom][0];
-			cs_coord_array[new_num_atoms][1] = cs_coord_array[atom][1];			
-			cs_coord_array[new_num_atoms][2] = cs_coord_array[atom][2];
-			cs_atom_type_array[new_num_atoms] = cs_atom_type_array[atom];
-			#ifdef MPICF
-				using namespace mpi_create_variables;
-				mpi_atom_comm_class_array[new_num_atoms]=mpi_atom_comm_class_array[atom];
-				mpi_atom_location_array[new_num_atoms]=mpi_atom_location_array[atom];
-				mpi_atom_global_coord_array[3*new_num_atoms+0]=mpi_atom_global_coord_array[3*atom+0];
-				mpi_atom_global_coord_array[3*new_num_atoms+1]=mpi_atom_global_coord_array[3*atom+1];
-				mpi_atom_global_coord_array[3*new_num_atoms+2]=mpi_atom_global_coord_array[3*atom+2];
-			#endif
-			new_num_atoms++;
-		}	
-	}*/
-/*
-	// Save grain numbers
-	//std::cout << "Saving grain numbers for " << grains::num_grains << std::endl;
-	atoms::grain_array.resize(new_num_atoms,0);
-	for(atom=0;atom<new_num_atoms;atom++){
-		int grain = tmp_grain_no_array[atom];
-		if((grain >= 0) && (grain < (grains::num_grains + mp::num_materials))){
-			atoms::grain_array[atom]=grain;
-		}
-		else {
-			std::cerr << "Error - Unknown grain number " << grain << " for atom " << atom << std::endl;
+		// Check for zero atoms generated
+		if(catom_array.size()==0){
+			std::cerr << "Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!" << std::endl;
 			err::vexit();
 		}
-	}*/
-	//---------------------
-	// Reset cs_num_atoms
-	//---------------------
-	//cs_num_atoms = new_num_atoms;
-	
-	//std::cout << "num atoms\t" << cs_num_atoms << std::endl; 
 
 	return 0;
 }
@@ -192,18 +134,18 @@ int particle(std::vector<cs::catom_t> & catom_array){
 
 	double particle_origin[3];
 	// find centre unit cell
-	particle_origin[0] = double(vmath::iround(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
-	particle_origin[1] = double(vmath::iround(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
-	particle_origin[2] = double(vmath::iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+	particle_origin[0] = double(vmath::iround(cs::system_dimensions[0]/(2.0*unit_cell.dimensions[0])))*unit_cell.dimensions[0];
+	particle_origin[1] = double(vmath::iround(cs::system_dimensions[1]/(2.0*unit_cell.dimensions[1])))*unit_cell.dimensions[1];
+	particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
 
-	if(mp::particle_creation_parity==1){
-		particle_origin[0]+=mp::lattice_constant[0]*0.5;
-		particle_origin[1]+=mp::lattice_constant[1]*0.5;
-		particle_origin[2]+=mp::lattice_constant[2]*0.5;
+	if(cs::particle_creation_parity==1){
+		particle_origin[0]+=unit_cell.dimensions[0]*0.5;
+		particle_origin[1]+=unit_cell.dimensions[1]*0.5;
+		particle_origin[2]+=unit_cell.dimensions[2]*0.5;
 	}
 	
 	// Use particle type flags to determine which particle shape to cut
-	switch(material_parameters::system_creation_flags[1]){
+	switch(cs::system_creation_flags[1]){
 		case 0: // Bulk
 			bulk(catom_array,0);
 			break;
@@ -245,9 +187,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 	if(err::check==true){std::cout << "cs::particle_array has been called" << std::endl;}	
 
 	// Set number of particles in x and y directions
-	const double repeat_size = mp::particle_scale+mp::particle_spacing;
-	int num_x_particle = vmath::iround(mp::system_dimensions[0]/repeat_size);
-	int num_y_particle = vmath::iround(mp::system_dimensions[1]/repeat_size);
+	const double repeat_size = cs::particle_scale+cs::particle_spacing;
+	int num_x_particle = vmath::iround(cs::system_dimensions[0]/repeat_size);
+	int num_y_particle = vmath::iround(cs::system_dimensions[1]/repeat_size);
 	
 
 	// Loop to generate cubic lattice points
@@ -258,25 +200,25 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 
 			double particle_origin[3];
 			// find centre unit cell
-			//particle_origin[0] = double(iround(mp::system_dimensions[0]/(2.0*mp::lattice_constant[0])))*mp::lattice_constant[0];
-			//particle_origin[1] = double(iround(mp::system_dimensions[1]/(2.0*mp::lattice_constant[1])))*mp::lattice_constant[1];
-			//particle_origin[2] = double(iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+			//particle_origin[0] = double(iround(cs::system_dimensions[0]/(2.0*cs::unit_cell_size[0])))*cs::unit_cell_size[0];
+			//particle_origin[1] = double(iround(cs::system_dimensions[1]/(2.0*cs::unit_cell_size[1])))*cs::unit_cell_size[1];
+			//particle_origin[2] = double(iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
 			// Determine particle origin
 			particle_origin[0] = double(x_particle)*repeat_size + repeat_size;
 			particle_origin[1] = double(y_particle)*repeat_size + repeat_size;
-			particle_origin[2] = double(vmath::iround(mp::system_dimensions[2]/(2.0*mp::lattice_constant[2])))*mp::lattice_constant[2];
+			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
 
-			if(mp::particle_creation_parity==1){
-				particle_origin[0]+=mp::lattice_constant[0]*0.5;
-				particle_origin[1]+=mp::lattice_constant[1]*0.5;
-				particle_origin[2]+=mp::lattice_constant[2]*0.5;
+			if(cs::particle_creation_parity==1){
+				particle_origin[0]+=unit_cell.dimensions[0]*0.5;
+				particle_origin[1]+=unit_cell.dimensions[1]*0.5;
+				particle_origin[2]+=unit_cell.dimensions[2]*0.5;
 			}
 			// Check to see if a complete particle fits within the system bounds
-			if((particle_origin[0]<(mp::system_dimensions[0]-mp::particle_scale)) &&
-				(particle_origin[1]<(mp::system_dimensions[1]-mp::particle_scale))){
+			if((particle_origin[0]<(cs::system_dimensions[0]-cs::particle_scale)) &&
+				(particle_origin[1]<(cs::system_dimensions[1]-cs::particle_scale))){
 
 				// Use particle type flags to determine which particle shape to cut
-				switch(material_parameters::system_creation_flags[1]){
+				switch(cs::system_creation_flags[1]){
 					case 0: // Bulk
 						bulk(catom_array,particle_number);
 						break;
@@ -610,23 +552,23 @@ int intermixing(std::vector<cs::catom_t> & catom_array){
 			if(mp::material[current_material].intermixing[mat]>0.0){
 				// find which region atom is in and test for probability of different material
 				double z=catom_array[atom].z;
-				double min = mp::material[mat].min*mp::system_dimensions[2];
-				double max = mp::material[mat].max*mp::system_dimensions[2];
+				double min = mp::material[mat].min*cs::system_dimensions[2];
+				double max = mp::material[mat].max*cs::system_dimensions[2];
 				double mean = (min+max)/2.0;
 				if(z<=min){
-					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*mp::system_dimensions[2]));
+					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
 					if(mtrandom::grnd() < probability) final_material=mat;
 				}
 				else if(z>min && z<=mean){
-					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*mp::system_dimensions[2]));
+					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
 					if(mtrandom::grnd() < probability) final_material=mat;
 				}
 				else if(z>mean && z<=max){
-					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*mp::system_dimensions[2]));
+					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
 					if(mtrandom::grnd() < probability) final_material=mat;
 				}
 				else if(z>max){
-					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*mp::system_dimensions[2]));
+					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
 					//std::cout << current_material << "\t" << mat << "\t" << atom << "\t" << z << "\t" << max << "\t" << probability << std::endl;
 					if(mtrandom::grnd() < probability) final_material=mat;
 				}

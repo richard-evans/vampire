@@ -17,9 +17,7 @@ using std::string;
 		public:
 		// input parameters
 		string name;
-		string hamiltonian_type;
 		string element;
-		string crystal_structure;
 		
 		double alpha;
 		double mu_s_SI;
@@ -53,10 +51,6 @@ using std::string;
 		bool continuous;	///< Specifies if a material is continuous (overrides granularity in the layer)
 		bool moment_flag;	///< Specifies whether moment is set explicitly or from magnetisation
 		bool anis_flag;	///< Specifies whether anisotropy is set explicitly or as energy density
-		//int ianis_flag;
-		// derived parameters
-		int num_nearest_neighbours;
-		int hamiltonian_num_neighbours;
 		
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
@@ -89,37 +83,7 @@ using std::string;
 	//extern double Jij;
 	//extern double Ku;
 	//extern double H_th_sigma;
-	//----------------------------------
-	//Input System Parameters
-	//----------------------------------
-	extern int particle_creation_parity;
-	extern double system_dimensions[3];
-	extern double particle_scale;
-	extern double particle_spacing;
-	
-	
-	//System Parameters
-	extern double lattice_constant[3];
-	extern double lattice_space_conversion[3];
-	extern string crystal_structure;
-	extern bool single_spin;
-	extern string hamiltonian_type;
-	//extern string atomic_element[4];
-	
-	
-	
-	//----------------------------------
-	//Derived System Parameters
-	//----------------------------------
-	//extern int num_nearest_neighbours;
-	extern int hamiltonian_num_neighbours;
-	extern int int_system_dimensions[3];
-	
-	//----------------------------------
-	// System creation flags
-	//----------------------------------
-	
-	extern int system_creation_flags[10];
+
 	
 	// Functions
 	extern int initialise(std::string);

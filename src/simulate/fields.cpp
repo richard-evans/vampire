@@ -121,29 +121,74 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 	//======================================================
 	// 		Subroutine to calculate exchange fields
 	//
-	//			Version 1.0 R Evans 20/10/2008
+	//			Version 2.0 Richard Evans 08/09/2011
 	//======================================================
 
-	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
 	if(err::check==true){std::cout << "calculate_exchange_fields has been called" << std::endl;}
 
-	//const int prank=1;
-	//const int num_atoms = atoms::num_atoms;
+	// Use appropriate function for exchange calculation
+	switch(atoms::exchange_type){
+		case 0: // isotropic
+			for(int atom=start_index;atom<end_index;atom++){
+				for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
+			
+					const int natom = atoms::neighbour_list_array[nn];
+					const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij;
+					
+					atoms::x_total_spin_field_array[atom] -= Jij*atoms::x_spin_array[natom];
+					atoms::y_total_spin_field_array[atom] -= Jij*atoms::y_spin_array[natom];
+					atoms::z_total_spin_field_array[atom] -= Jij*atoms::z_spin_array[natom];
+				}
+			}
+			break;
+		case 1: // vector
+			for(int atom=start_index;atom<end_index;atom++){
+				for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
+			
+					const int natom = atoms::neighbour_list_array[nn];
+					const double Jij[3]={atoms::v_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[0],
+												atoms::v_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[1],
+												atoms::v_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[2]};
+					
+					atoms::x_total_spin_field_array[atom] -= Jij[0]*atoms::x_spin_array[natom];
+					atoms::y_total_spin_field_array[atom] -= Jij[1]*atoms::y_spin_array[natom];
+					atoms::z_total_spin_field_array[atom] -= Jij[2]*atoms::z_spin_array[natom];
+				}
+			}
+			break;
+		case 2: // tensor
+			for(int atom=start_index;atom<end_index;atom++){
+				for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
+			
+					const int natom = atoms::neighbour_list_array[nn];
+					const double Jij[3][3]={atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[0][0],
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[0][1],
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[0][2],
+						
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[1][0],
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[1][1],
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[1][2],
 
-	//std::vector<double> spin_array(3*num_atoms);
-	//for(int i=0;i<num_atoms;i++){
-	//	spin_array[3*i+0]=atoms::x_spin_array[i];
-	//	spin_array[3*i+1]=atoms::y_spin_array[i];
-	//	spin_array[3*i+2]=atoms::z_spin_array[i];
-	//}
-		//if(vmpi::my_rank==prank){
-		//std::cout << "--------------------------------------------------------------------------------------" << std::endl;
-		//}
-	for(int atom=start_index;atom<end_index;atom++){
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[2][0],
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[2][1],
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[atom]].Jij[2][2],};
+					
+					const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
+					
+					atoms::x_total_spin_field_array[atom] -= (Jij[0][0]*S[0] + Jij[0][1]*S[1] +Jij[0][2]*S[2]);
+					atoms::y_total_spin_field_array[atom] -= (Jij[1][0]*S[0] + Jij[1][1]*S[1] +Jij[1][2]*S[2]);
+					atoms::z_total_spin_field_array[atom] -= (Jij[2][0]*S[0] + Jij[2][1]*S[1] +Jij[2][2]*S[2]);
+				}
+			}
+			break;
+	}
+
+	/*for(int atom=start_index;atom<end_index;atom++){
 		const int imaterial=atoms::type_array[atom];
 		//double tot[3]={0.0,0.0,0.0};
+		
+		
 		for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
 			
 			const int natom = atoms::neighbour_list_array[nn];
@@ -152,31 +197,10 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 			atoms::x_total_spin_field_array[atom] -= Jij*atoms::x_spin_array[natom];
 			atoms::y_total_spin_field_array[atom] -= Jij*atoms::y_spin_array[natom];
 			atoms::z_total_spin_field_array[atom] -= Jij*atoms::z_spin_array[natom];
-			//tot[0]-=Jij*spin_array[3*natom+0];
-			//tot[1]-=Jij*spin_array[3*natom+1];
-			//tot[2]-=Jij*spin_array[3*natom+2];
-			//if(vmpi::my_rank==prank){
-			//std::cout << "\t" << atom << " " << natom << " " << atoms::x_spin_array[natom] << " " << atoms::y_spin_array[natom] << " " << atoms::z_spin_array[natom] << std::endl;
-			//}
 			}
-		//atoms::x_total_spin_field_array[atom]+=tot[0];
-		//atoms::y_total_spin_field_array[atom]+=tot[1];
-		//atoms::z_total_spin_field_array[atom]+=tot[2];
-		//if(vmpi::my_rank==prank){
-		//std::cout << atom << "\texchange fields\t" << atoms::x_total_spin_field_array[atom] << "\t";
-		//std::cout << atoms::y_total_spin_field_array[atom] << "\t";
-		//std::cout << atoms::z_total_spin_field_array[atom] << std::endl;
-		//std::cout << "\t=================================================================" << std::endl;
-		//std::cout << atom << "\texchange fields\t" << tot[0] << "\t";
-		//std::cout << tot[1] << "\t";
-		//std::cout << tot[2] << std::endl;
-		//}
-		//std::cin.get();
-	}
-	//system("sleep 2");
-	//exit(0);
+	}*/
 	
-	return EXIT_SUCCESS;
+		return EXIT_SUCCESS;
 	}
 
 int calculate_uniaxial_anis_fields(const int start_index,const int end_index){
@@ -249,7 +273,7 @@ int calculate_applied_fields(const int start_index,const int end_index){
 		stats::mag_m();
 		
 		// calculate global demag field -mu_0 M D, M = m/V
-		const double mu_0= -4.0*M_PI*1.0e-7/(mp::system_dimensions[0]*mp::system_dimensions[1]*mp::system_dimensions[2]*1.0e-30);
+		const double mu_0= -4.0*M_PI*1.0e-7/(cs::system_dimensions[0]*cs::system_dimensions[1]*cs::system_dimensions[2]*1.0e-30);
 		const double HD[3]={	mu_0*sim::demag_factor[0]*stats::total_mag_actual[0],
 									mu_0*sim::demag_factor[1]*stats::total_mag_actual[1],
 									mu_0*sim::demag_factor[2]*stats::total_mag_actual[2]};

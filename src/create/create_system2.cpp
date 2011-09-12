@@ -31,6 +31,7 @@
 #include "demag.hpp"
 #include "grains.hpp"
 #include "material.hpp"
+#include "vmath.hpp"
 #include "vmpi.hpp"
 #include "create.hpp"
 
@@ -44,6 +45,28 @@
 ///
 namespace cs{
 
+	// System Dimensions
+	double system_dimensions[3]={77.0,77.0,77.0};	// Size of system (A)
+	double unit_cell_size[3]={3.54,3.54,3.54};		// Unit Cell Size (A) [Will eventually be local to unit cells]
+	bool pbc[3]={false,false,false};						// Periodic boundary conditions
+	unsigned int total_num_unit_cells[3]={0,0,0};	// Unit cells for entire system (x,y,z)
+	unsigned int local_num_unit_cells[3]={0,0,0};	// Unit cells on local processor (x,y,z)
+	std::string crystal_structure="sc";
+	
+	// System Parameters
+	int particle_creation_parity=0; // Offset of particle centre (odd/even)
+	double particle_scale=50.0;     // Diameter of particles/grains (A)
+	double particle_spacing=10.0;   // Spacing Between particles (A)
+
+
+	// Other directives and flags
+	bool single_spin=false;
+	int system_creation_flags[10]={0,0,0,0,0,0,0,0,0,0};
+	std::string unit_cell_file="";
+	
+	// unit cell container
+	cs::unit_cell_t unit_cell;
+	
 int create(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
@@ -63,51 +86,28 @@ int create(){
 	
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array; 
-	std::vector<std::vector<int> > cneighbourlist; 
+	std::vector<std::vector<neighbour_t> > cneighbourlist; 
 
-	//std::vector<std::vector<int> > vecvec;
-	//vecvec.push_back(std::vector<int>());
-	//vecvec[0].push_back(3);
-	//int i = vecvec[0][0];
-	//OK, vecvec.size() == 1; vecvec[0].size() == 1, vecvec[0][0] == 3
-
+	// check for pbc and if so round up system dimensions
+	if(cs::pbc[0]==true) cs::system_dimensions[0]=cs::unit_cell_size[0]*(int(vmath::iceil(cs::system_dimensions[0]/cs::unit_cell_size[0])));
+	if(cs::pbc[1]==true) cs::system_dimensions[1]=cs::unit_cell_size[1]*(int(vmath::iceil(cs::system_dimensions[1]/cs::unit_cell_size[1])));
+	if(cs::pbc[2]==true) cs::system_dimensions[2]=cs::unit_cell_size[2]*(int(vmath::iceil(cs::system_dimensions[2]/cs::unit_cell_size[2])));
 	
-	//=============================================================
-	//      Set up Parallel Decomposition if required 
-	//=============================================================
+	// Set up Parallel Decomposition if required 
 	#ifdef MPICF
-		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,mp::system_dimensions);
+		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,cs::system_dimensions);
 	#endif
 
-	//=============================================================
-	//      Initialise variables for system creation
-	//=============================================================
-	
-	if(mp::system_creation_flags[0]==1){
+	//      Initialise variables for system creation	
+	if(cs::system_creation_flags[0]==1){
 		// read_coord_file();
 	}
-	else{
-		//=============================================================
-		//      Create block of crystal of desired size
-		//=============================================================
-
-		cs::create_crystal_structure(catom_array);
-     
-		//=============================================================
-		//      Cut system to the correct type, species etc
-		//=============================================================
-
-		cs::create_system_type(catom_array);
-	}
+	// Create block of crystal of desired size
+	cs::create_crystal_structure(catom_array);
 	
-	// Check for zero atoms generated
-	if(catom_array.size()==0){
-		std::cerr << "Error, no atoms generated - increase system dimensions!" << std::endl;
-		err::vexit();
-	}
-	//=============================================================
-	//      Create Neighbour list for system
-	//=============================================================
+	// Cut system to the correct type, species etc
+	cs::create_system_type(catom_array);
+	
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
@@ -121,6 +121,7 @@ int create(){
 		//cs::copy_periodic_boundaries(catom_array);
 	#endif
 	
+	// Create Neighbour list for system
 	cs::create_neighbourlist(catom_array,cneighbourlist);
 	
 	#ifdef MPICF
@@ -131,23 +132,15 @@ int create(){
 		MPI::COMM_WORLD.Barrier();
 	#endif
 
-	//=============================================================
 	//      Set atom variables for simulation
-	//=============================================================
-	
 	cs::set_atom_vars(catom_array,cneighbourlist);
 
-	//=============================================================
 	//      Set grain and cell variables for simulation
-	//=============================================================
-
 	grains::set_properties();
 	cells::initialise();
 	demag::init();
 	
-	//=============================================================
 	//      Generate system files for storage
-	//=============================================================
 	num_atoms=catom_array.size();
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
@@ -161,7 +154,7 @@ int create(){
 	}
 
 	#else
-		if(1==1){
+		if(1==0){
 		std::ofstream xyz_file;
 		xyz_file.open ("crystal.xyz");
 		xyz_file << num_atoms+80 << std::endl;
@@ -179,8 +172,8 @@ int create(){
 			xyz_file << "O\t" << float(i) << "\t" << 0.0 << "\t" << 0.0 << std::endl;
 			xyz_file << "O\t" << 0.0 << "\t" << float(i) << "\t" << 0.0 << std::endl;
 	
-			xyz_file << "O\t" << material_parameters::system_dimensions[0] << "\t" << material_parameters::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0]-float(i) << "\t" << 	material_parameters::system_dimensions[1] << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << cs::system_dimensions[0]-float(i) << "\t" << 	cs::system_dimensions[1] << "\t" << 0.0 << std::endl;
 		}
 		
 		xyz_file.close();

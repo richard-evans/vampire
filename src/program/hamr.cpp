@@ -76,7 +76,7 @@ void hamr(){
 
 		// now enable laser
 		sim::head_position[0]=0.0;
-		sim::head_position[1]=mp::system_dimensions[1]*0.5; // A
+		sim::head_position[1]=cs::system_dimensions[1]*0.5; // A
 		sim::head_speed=30.0; // nm/ns
 		sim::head_laser_on=true;
 		

@@ -174,7 +174,7 @@ void config(){
 			cfg_file_ofstr << "# Date: "<< asctime << std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "Number of spins: "<< vout::total_output_atoms << std::endl;
-			cfg_file_ofstr << "System dimensions:" << mp::system_dimensions[0] << "\t" << mp::system_dimensions[1] << "\t" << mp::system_dimensions[2] << std::endl;
+			cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
 			cfg_file_ofstr << "Coordinates-file: atoms-coord.cfg"<< std::endl;
 			cfg_file_ofstr << "Time: " << double(sim::time)*mp::dt_SI << std::endl;
 			cfg_file_ofstr << "Field: " << sim::H_applied << std::endl;
@@ -262,13 +262,13 @@ void config(){
 		local_output_atom_list.resize(0);
 		
 		// get output bounds
-		double minB[3]={vout::atoms_output_min[0]*mp::system_dimensions[0],
-							vout::atoms_output_min[1]*mp::system_dimensions[1],
-							vout::atoms_output_min[2]*mp::system_dimensions[2]};
+		double minB[3]={vout::atoms_output_min[0]*cs::system_dimensions[0],
+							vout::atoms_output_min[1]*cs::system_dimensions[1],
+							vout::atoms_output_min[2]*cs::system_dimensions[2]};
 		
-		double maxB[3]={vout::atoms_output_max[0]*mp::system_dimensions[0],
-							vout::atoms_output_max[1]*mp::system_dimensions[1],
-							vout::atoms_output_max[2]*mp::system_dimensions[2]};
+		double maxB[3]={vout::atoms_output_max[0]*cs::system_dimensions[0],
+							vout::atoms_output_max[1]*cs::system_dimensions[1],
+							vout::atoms_output_max[2]*cs::system_dimensions[2]};
 
 		// loop over all local atoms and record output list
 		for(int atom=0;atom<num_atoms;atom++){

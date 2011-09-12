@@ -328,6 +328,25 @@ int match(string const key, string const word, string const value, string const 
 				return EXIT_FAILURE;
 			}
 		}
+		//-------------------------------------------------------------------
+		// Get unit cell filename
+		//-------------------------------------------------------------------
+		test="unit-cell-file";
+		if(word==test){
+			std::string matfile=value;
+			// strip quotes
+			matfile.erase(remove(matfile.begin(), matfile.end(), '\"'), matfile.end());
+			test="";
+			if(matfile!=test){
+				//std::cout << matfile << std::endl;
+				cs::unit_cell_file=matfile;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
+				return EXIT_FAILURE;
+			}
+		}
 		else{
 			std::cerr << "Error - Unknown control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;
@@ -345,37 +364,37 @@ int match_create(string const word, string const value, int const line){
 		//-------------------------------------------------------------------
 		std::string test="full";
 		if(word==test){
-			mp::system_creation_flags[1]=0;
+			cs::system_creation_flags[1]=0;
 			return EXIT_SUCCESS;
 		}
 		else 
 		test="cube";
 		if(word==test){
-			mp::system_creation_flags[1]=1;
+			cs::system_creation_flags[1]=1;
 			return EXIT_SUCCESS;
 		}
 		else 
 		test="cylinder";
 		if(word==test){
-			mp::system_creation_flags[1]=2;
+			cs::system_creation_flags[1]=2;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="ellipsinder";
 		if(word==test){
-			mp::system_creation_flags[1]=3;
+			cs::system_creation_flags[1]=3;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="sphere";
 		if(word==test){
-			mp::system_creation_flags[1]=4;
+			cs::system_creation_flags[1]=4;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="truncated-octahedron";
 		if(word==test){
-			mp::system_creation_flags[1]=5;
+			cs::system_creation_flags[1]=5;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -384,25 +403,25 @@ int match_create(string const word, string const value, int const line){
 		//-------------------------------------------------------------------
 		test="particle";
 		if(word==test){
-			mp::system_creation_flags[2]=0;
+			cs::system_creation_flags[2]=0;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="particle-array";
 		if(word==test){
-			mp::system_creation_flags[2]=1;
+			cs::system_creation_flags[2]=1;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="hex-particle-array";
 		if(word==test){
-			mp::system_creation_flags[2]=2;
+			cs::system_creation_flags[2]=2;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="voronoi-film";
 		if(word==test){
-			mp::system_creation_flags[2]=3;
+			cs::system_creation_flags[2]=3;
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
@@ -477,7 +496,7 @@ int match_create(string const word, string const value, int const line){
 		//-------------------------------------------------------------------
 		test="Jij-explicit";
 		if(word==test){
-			mp::system_creation_flags[3]=0;
+			cs::system_creation_flags[3]=0;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -486,7 +505,7 @@ int match_create(string const word, string const value, int const line){
 		//-------------------------------------------------------------------
 		/*test="multilayer";
 		if(word==test){
-			mp::system_creation_flags[4]=1;
+			cs::system_creation_flags[4]=1;
 			// test for multilayer lines
 			test=">";
 			if(value==test){
@@ -511,15 +530,15 @@ int match_create(string const word, string const value, int const line){
 		else
 		test="intermixed";
 		if(word==test){
-			mp::system_creation_flags[4]=2;
+			cs::system_creation_flags[4]=2;
 			return EXIT_SUCCESS;
 		}
 		else*/
 		test="particle-parity";
 		if(word==test){
 			int pp=atoi(value.c_str());
-				mp::particle_creation_parity=pp;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::particle_creation_parity=pp;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
@@ -529,14 +548,35 @@ int match_create(string const word, string const value, int const line){
 			// Strip quotes
 			std::string cs=value;
 			cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
-			mp::crystal_structure=cs;
+			cs::crystal_structure=cs;
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
 		else
 		test="single-spin";
 		if(word==test){
-			mp::single_spin=true;
+			cs::single_spin=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-x";
+		if(word==test){
+			cs::pbc[0]=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-y";
+		if(word==test){
+			cs::pbc[1]=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-z";
+		if(word==test){
+			cs::pbc[2]=true;
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
@@ -561,10 +601,10 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,a,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[0]=a;
-				mp::lattice_constant[1]=a;
-				mp::lattice_constant[2]=a;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[0]=a;
+				cs::unit_cell_size[1]=a;
+				cs::unit_cell_size[2]=a;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -580,8 +620,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,c,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[2]=c;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[2]=c;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -598,8 +638,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,ax,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[0]=ax;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[0]=ax;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -616,8 +656,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,ay,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[1]=ay;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[1]=ay;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -634,8 +674,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,az,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[2]=az;
-				//std::cout << "az: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[2]=az;
+				//std::cout << "az: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -652,10 +692,10 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,d,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::system_dimensions[0]=d;
-				mp::system_dimensions[1]=d;
-				mp::system_dimensions[2]=d;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::system_dimensions[0]=d;
+				cs::system_dimensions[1]=d;
+				cs::system_dimensions[2]=d;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -672,8 +712,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,dx,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::system_dimensions[0]=dx;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::system_dimensions[0]=dx;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -690,8 +730,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,dy,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::system_dimensions[1]=dy;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::system_dimensions[1]=dy;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -708,8 +748,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,dz,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::system_dimensions[2]=dz;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::system_dimensions[2]=dz;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -726,7 +766,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,psize,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::particle_scale=psize;
+				cs::particle_scale=psize;
 				//std::cout << "particle_size: " << mp::particle_scale << std::endl;
 				return EXIT_SUCCESS;
 			}
@@ -744,7 +784,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,pspacing,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::particle_spacing=pspacing;
+				cs::particle_spacing=pspacing;
 				//std::cout << "particle_spacing: " << mp::particle_spacing << std::endl;
 				return EXIT_SUCCESS;
 			}
@@ -2040,7 +2080,8 @@ int match_material(string const word, string const value, string const unit, int
 		else
 		test="hamiltonian";
 		if(word==test){
-			read_material[super_index].hamiltonian_type=value;
+			std::cout << "Warning: material[" << super_index << "]:hamiltonian is deprecated and has no effect" << std::endl;
+			//read_material[super_index].hamiltonian_type=value;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -2066,7 +2107,8 @@ int match_material(string const word, string const value, string const unit, int
 		else
 		test="crystal-structure";
 		if(word==test){
-			read_material[super_index].crystal_structure=value;
+			std::cout << "Warning: material[" << super_index << "]:crystal-structure is deprecated and has no effect. Globally set crystal type is used instead." << std::endl;
+			//read_material[super_index].crystal_structure=value;
 			return EXIT_SUCCESS;
 		}
 		else

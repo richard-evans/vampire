@@ -34,6 +34,75 @@
 ///
 
 namespace cs{
+	
+	// System Dimensions
+	extern double system_dimensions[3];
+	extern double unit_cell_size[3];
+	extern bool pbc[3];
+	extern unsigned int total_num_unit_cells[3];
+	extern unsigned int local_num_unit_cells[3];
+	extern std::string crystal_structure;
+
+	// System Parameters
+	extern int particle_creation_parity;
+	extern double particle_scale;
+	extern double particle_spacing;
+
+	// Other directives and flags
+	extern bool single_spin;
+	extern int system_creation_flags[10];
+	extern std::string unit_cell_file;
+	
+	class unit_cell_atom_t {
+	public:
+		double x; // atom x-coordinate
+		double y; // atom y-coordinate
+		double z; // atom z-coordinate
+		unsigned int mat; // material
+		unsigned int lc; // lattice category
+		unsigned int hc; // height category
+		
+	};
+	
+	class unit_cell_interaction_t {
+	public:
+		unsigned int i; // atom unit cell id
+		unsigned int j; // neighbour atom unit cell id
+		int dx; // delta x in unit cells
+		int dy; // delta y in unit cells
+		int dz; // delta z in unit cells
+		double Jij[3][3]; // Exchange tensor
+	};
+	
+	class unit_cell_t {
+	public:
+		
+		double dimensions[3];
+		double shape[3][3];
+		
+		unsigned int lcsize; // number of local categories
+		unsigned int hcsize; // number of height categories
+		unsigned int interaction_range; // maximum range in unit cells
+		int exchange_type; // -1=isotropic(local material), 0=isotropic, 1=vector, or 2=tensor
+
+		// list of atoms in each unit cell
+		std::vector <unit_cell_atom_t> atom;
+
+		// list of interactions in each unit cell
+		std::vector <unit_cell_interaction_t> interaction;
+
+	};
+	
+	class neighbour_t {
+	public:
+		
+		int nn;
+		int i;
+
+	};
+	
+	extern cs::unit_cell_t unit_cell;
+	
 	class catom_t {
 		public:
 			
@@ -47,6 +116,7 @@ namespace cs{
 
 			// Integers
 			int material;
+			unsigned int uc_id;
 			int uc_category;
 			int lh_category;
 			int grain;
@@ -54,13 +124,18 @@ namespace cs{
 			int mpi_type;
 			int mpi_cpuid;
 			int mpi_atom_number;
-	  int mpi_old_atom_number;
+			int mpi_old_atom_number;
+			int scx;
+			int scy;
+			int scz;
+			
 			catom_t():
 				x(0.0),
 				y(0.0),
 				z(0.0),
 				include(false),
 				material(0),
+				uc_id(0),
 				uc_category(0),
 				lh_category(0),
 				grain(0),
@@ -68,7 +143,10 @@ namespace cs{
 				mpi_type(0),
 				mpi_cpuid(0),
 				mpi_atom_number(0),
-				mpi_old_atom_number(0)
+				mpi_old_atom_number(0),
+				scx(0),
+				scy(0),
+				scz(0)
 			{};
 };
 /// @brief This is the brief (one line only) description of the function.
@@ -161,7 +239,7 @@ int create_system_type(std::vector<cs::catom_t> &);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int create_neighbourlist(std::vector<cs::catom_t> &, std::vector<std::vector <int> > &);
+int create_neighbourlist(std::vector<cs::catom_t> &, std::vector<std::vector <neighbour_t> > &);
 
 /// @brief This is the brief (one line only) description of the function.
 ///
@@ -184,7 +262,7 @@ int create_neighbourlist(std::vector<cs::catom_t> &, std::vector<std::vector <in
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int set_atom_vars(std::vector<cs::catom_t> &, std::vector<std::vector <int> > &);
+int set_atom_vars(std::vector<cs::catom_t> &, std::vector<std::vector <neighbour_t> > &);
 
 int voronoi_film(std::vector<cs::catom_t> &);
 

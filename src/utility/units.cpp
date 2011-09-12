@@ -45,7 +45,7 @@ namespace units {
 
 /// @brief Initialises system units for conversion.
 ///
-/// @details Sets units::initialised=true. Example usage @code units::init() /@code.
+/// @details Sets units::initialised=true. Example usage
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.

@@ -14,6 +14,10 @@ create:crystal-structure="sc"
 #create:voronoi-film
 #create:voronoi-variance=0.15
 #create:voronoi-parity=1
+#create:periodic-boundaries-x
+#create:periodic-boundaries-y
+#create:periodic-boundaries-z
+
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
@@ -25,9 +29,10 @@ dimensions:particle-size = 7.7 !nm
 dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
-# Material File:
+# Material Files:
 #------------------------------------------
 material:file="Co.mat"
+material:unit-cell-file=SimpleCubic.ucf
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
@@ -37,7 +42,7 @@ sim:applied=true
 sim:thermal=true
 sim:dipolar=false
 sim:fast-dipolar=false
-#sim:fast-dipolar=false
+#sim:fast-dipolar=true
 sim:dipolar-update-rate=10
 sim:temperature=300.0
 sim:Hinc=100.0 !mT
@@ -94,3 +99,4 @@ screen:mag-m
 #config:atoms-max-x=1.0
 #config:atoms-max-y=1.0
 #config:atoms-max-z=0.51
+

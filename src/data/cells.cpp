@@ -86,9 +86,9 @@ namespace cells{
 		std::cout << "Cell size = " << cells::size << std::endl; 
 		
 		// determine number of cells in each direction
-		unsigned int ncellx = static_cast<unsigned int>(ceil(mp::system_dimensions[0]/cells::size));
-		unsigned int ncelly = static_cast<unsigned int>(ceil(mp::system_dimensions[1]/cells::size));
-		unsigned int ncellz = static_cast<unsigned int>(ceil(mp::system_dimensions[2]/cells::size));
+		unsigned int ncellx = static_cast<unsigned int>(ceil(cs::system_dimensions[0]/cells::size));
+		unsigned int ncelly = static_cast<unsigned int>(ceil(cs::system_dimensions[1]/cells::size));
+		unsigned int ncellz = static_cast<unsigned int>(ceil(cs::system_dimensions[2]/cells::size));
 		
 		//update total number of cells
 		cells::num_cells=ncellx*ncelly*ncellz;
@@ -122,7 +122,7 @@ namespace cells{
 		catch(...){std::cerr << "Error allocating supercell_array for cell list calculation" << std::endl;err::vexit();}
 		
 		// offset cells to prevent rounding error
-		double atom_offset[3]={0.25*mp::lattice_constant[0],0.25*mp::lattice_constant[1],0.25*mp::lattice_constant[2]};
+		double atom_offset[3]={0.0,0.0,0.0}; //0.25*cs::unit_cell_size[0],0.25*cs::unit_cell_size[1],0.25*cs::unit_cell_size[2]};
 
 		// For MPI version, only add local atoms
 		#ifdef MPICF

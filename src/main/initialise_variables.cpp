@@ -65,40 +65,6 @@ namespace mp{
 	double dt;
 	double half_dt;
 	
-	//----------------------------------
-	//Input System Parameters
-	//----------------------------------
-	int particle_creation_parity;	// Offset of particle centre (odd/even)
-	int int_system_dimensions[3];
-	double system_dimensions[3];	// Size of system (A)
-	double particle_scale;			// Diameter of particles/grains (A)
-	double particle_spacing;		// Spacing Between particles (A)
-	
-	//----------------------------------
-	//Derived System Parameters
-	//----------------------------------
-	double lattice_constant[3];
-	double lattice_space_conversion[3];
-	string crystal_structure;
-	bool single_spin=false;
-	string hamiltonian_type; 	// generic
-								// LR_FePt
-								// SR_FePt
-								// LR_Co
-								// LR_Fe
-								// LR_Ni
-								
-	string atomic_element[4]; // Different atomic species
-	
-	int num_nearest_neighbours = 0;
-	int hamiltonian_num_neighbours = 0;
-	
-	//----------------------------------
-	// System creation flags
-	//----------------------------------
-	
-	int system_creation_flags[10];
-	
 ///
 /// @brief Function to initialise program variables prior to system creation.
 ///
@@ -145,7 +111,7 @@ int initialise(std::string const infile){
 	//mp::material[0].print();
 
 	// Check for keyword parameter overide
-	if(mp::single_spin==true){
+	if(cs::single_spin==true){
 		mp::single_spin_system();
 	}
 	
@@ -160,25 +126,24 @@ int default_system(){
 
 	// Initialise system creation flags to zero
 	for (int i=0;i<10;i++){
-		mp::system_creation_flags[i] = 0;
+		cs::system_creation_flags[i] = 0;
 		sim::hamiltonian_simulation_flags[i] = 0; 
 	}
 	
 	// Set system dimensions !Angstroms
-	mp::lattice_constant[0] = 3.0;
-	mp::lattice_constant[1] = 3.0;
-	mp::lattice_constant[2] = 3.0;
+	cs::unit_cell_size[0] = 3.0;
+	cs::unit_cell_size[1] = 3.0;
+	cs::unit_cell_size[2] = 3.0;
 
-	mp::system_dimensions[0] = 100.0;
-	mp::system_dimensions[1] = 100.0;
-	mp::system_dimensions[2] = 100.0;
+	cs::system_dimensions[0] = 100.0;
+	cs::system_dimensions[1] = 100.0;
+	cs::system_dimensions[2] = 100.0;
 
-	mp::particle_scale   = 50.0;
-	mp::particle_spacing = 10.0;
+	cs::particle_scale   = 50.0;
+	cs::particle_spacing = 10.0;
 	
-	mp::particle_creation_parity=0;
-	mp::crystal_structure = "sc";
-	mp::hamiltonian_type = "generic";
+	cs::particle_creation_parity=0;
+	cs::crystal_structure = "sc";
 
 	// Voronoi Variables
 	create_voronoi::voronoi_sd=0.1;
@@ -227,7 +192,6 @@ int default_system(){
 	material[0].mu_s_SI=1.5*9.27400915e-24;
 	material[0].Ku1_SI=-4.644e-24;
 	material[0].gamma_rel=1.0;
-	material[0].hamiltonian_type="generic";
 	material[0].element="Ag ";
 
 	// Disable Error Checking
@@ -243,24 +207,23 @@ int single_spin_system(){
 
 	// Reset system creation flags to zero
 	for (int i=0;i<10;i++){
-		mp::system_creation_flags[i] = 0;
+		cs::system_creation_flags[i] = 0;
 	}
 	
 	// Set system dimensions !Angstroms
-	mp::lattice_constant[0] = 3.0;
-	mp::lattice_constant[1] = 3.0;
-	mp::lattice_constant[2] = 3.0;
+	cs::unit_cell_size[0] = 3.0;
+	cs::unit_cell_size[1] = 3.0;
+	cs::unit_cell_size[2] = 3.0;
 
-	mp::system_dimensions[0] = 2.0;
-	mp::system_dimensions[1] = 2.0;
-	mp::system_dimensions[2] = 2.0;
+	cs::system_dimensions[0] = 2.0;
+	cs::system_dimensions[1] = 2.0;
+	cs::system_dimensions[2] = 2.0;
 
-	mp::particle_scale   = 50.0;
-	mp::particle_spacing = 10.0;
+	cs::particle_scale   = 50.0;
+	cs::particle_spacing = 10.0;
 	
-	mp::particle_creation_parity=0;
-	mp::crystal_structure = "sc";
-	mp::hamiltonian_type = "generic";
+	cs::particle_creation_parity=0;
+	cs::crystal_structure = "sc";
 	
 	// Turn off multi-spin Flags
 	sim::hamiltonian_simulation_flags[0] = 0;	// Exchange
@@ -275,47 +238,7 @@ int single_spin_system(){
 }
 
 int set_derived_parameters(){
-
-	//----------------------------------
-	//Derived System Parameters
-	//----------------------------------
-	mp::lattice_space_conversion[0] = mp::lattice_constant[0]*0.5;
-	mp::lattice_space_conversion[1] = mp::lattice_constant[1]*0.5*0.333333333333333;
-	mp::lattice_space_conversion[2] = mp::lattice_constant[2]*0.5;
-
-	mp::int_system_dimensions[0] = 2*vmath::iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
-	mp::int_system_dimensions[1] = 6*vmath::iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
-	mp::int_system_dimensions[2] = 2*vmath::iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
 		
-	double num_atoms_per_unit_cell=0; 
-	
-	if(mp::crystal_structure=="sc"){
-		mp::num_nearest_neighbours = 6;
-		num_atoms_per_unit_cell=1.0;
-	}
-	else if(mp::crystal_structure=="bcc"){
-		mp::num_nearest_neighbours = 8;
-		num_atoms_per_unit_cell=2.0;
-	}
-	else if(mp::crystal_structure=="fct"){
-		mp::num_nearest_neighbours = 4;
-		num_atoms_per_unit_cell=2.0;
-	}
-	else if(mp::crystal_structure=="fcc"){
-		mp::num_nearest_neighbours = 12;
-		num_atoms_per_unit_cell=4.0;
-	}
-	else{
-		 std::cout << "Error in determining num_nearest_neighbours - unknown crystal type \'" << mp::crystal_structure << "\'" << std::endl;
-		 err::vexit();
-	}
-	
-	if(mp::hamiltonian_type=="generic")	mp::hamiltonian_num_neighbours = mp::num_nearest_neighbours;
-	if(mp::hamiltonian_num_neighbours==0){
-		 std::cout << "Error in determining hamiltonian_num_neighbours - unknown Hamiltonian type \'" << mp::hamiltonian_type << "\'" << std::endl;
-		 err::vexit();
-	}
-
 	// Set integration constants
 	mp::dt = mp::dt_SI*mp::gamma_SI; // Must be set before Hth
 	mp::half_dt = 0.5*mp::dt;
@@ -327,26 +250,25 @@ int set_derived_parameters(){
 	sim::H_vec[2]*=mod_H;
 
 	// Calculate moment, magnetisation, and anisotropy constants
-	for(int mat=0;mat<mp::num_materials;mat++){
-		double V=mp::lattice_constant[0]*mp::lattice_constant[1]*mp::lattice_constant[2];
+	/*for(int mat=0;mat<mp::num_materials;mat++){
+		double V=cs::unit_cell_size[0]*cs::unit_cell_size[1]*cs::unit_cell_size[2];
 		// Set magnetisation from mu_s and a
 		if(material[mat].moment_flag==true){
-			material[mat].magnetisation=num_atoms_per_unit_cell*material[mat].mu_s_SI/V;
+			//material[mat].magnetisation=num_atoms_per_unit_cell*material[mat].mu_s_SI/V;
 		}
 		// Set mu_s from magnetisation and a
 		else {
-			material[mat].mu_s_SI=material[mat].magnetisation*V/num_atoms_per_unit_cell;
+			//material[mat].mu_s_SI=material[mat].magnetisation*V/num_atoms_per_unit_cell;
 		}
 		// Set K as energy/atom
 		if(material[mat].anis_flag==false){
 			material[mat].Ku1_SI=material[mat].Ku1_SI*V/num_atoms_per_unit_cell;
 			std::cout << "setting " << material[mat].Ku1_SI << std::endl;
 		}
-	}
+	}*/
 	const string blank="";
 	// Set derived material parameters
 	for(int mat=0;mat<mp::num_materials;mat++){
-		mp::material[mat].hamiltonian_type="generic";
 		mp::material[mat].one_oneplusalpha_sq			=-mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
 		mp::material[mat].alpha_oneplusalpha_sq			= mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
 		
@@ -366,41 +288,7 @@ int set_derived_parameters(){
 		mp::material[mat].Ku									= mp::material[mat].Ku1_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
 																  (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
-		// If local crystal is unset, use global type
-		if(mp::material[mat].crystal_structure==blank){
-			mp::material[mat].crystal_structure=mp::crystal_structure;
-		}
-		// calculate number of neighbours for each material
-		if(mp::material[mat].hamiltonian_type=="generic"){
-			if(mp::material[mat].crystal_structure=="sc"){
-				mp::material[mat].num_nearest_neighbours		= 6;
-				mp::material[mat].hamiltonian_num_neighbours	= 6;
-				mp::material[mat].cutoff = 1.01;
-			}
-			else if(mp::material[mat].crystal_structure=="bcc"){
-				mp::material[mat].num_nearest_neighbours		= 8;
-				mp::material[mat].hamiltonian_num_neighbours	= 8;
-				mp::material[mat].cutoff = sqrt(3.0)*0.5*1.01;
 
-			}
-			else if(mp::material[mat].crystal_structure=="fcc"){
-				mp::material[mat].num_nearest_neighbours		= 12;
-				mp::material[mat].hamiltonian_num_neighbours	= 12;
-				mp::material[mat].cutoff = sqrt(2.0)*0.5*1.01;
-
-			}
-			else{
-				std::cerr << "Error in determining num_nearest_neighbours - unknown crystal type \'";
-				std::cerr << mp::material[mat].crystal_structure << "\'" << std::endl;
-				exit(EXIT_FAILURE);
-			}
-		}
-		else{
-			std::cerr << "Error, only generic hamiltonians are implemented at present, exiting" << std::endl;
-			exit(EXIT_FAILURE);
-		}
-		
-		
 		//std::cout << "checking range exclusivity" << std::endl;
 		// Check for exclusivity of range
 		if(material[mat].geometry!=0){

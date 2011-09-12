@@ -53,7 +53,7 @@ namespace sim{
 	double demag_factor[3]={0.0,0.0,0.0};
 	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
 	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
-	double head_position[2]={0.0,mp::system_dimensions[1]*0.5}; // A
+	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; // nm/ns
 	bool   head_laser_on=false;
 
