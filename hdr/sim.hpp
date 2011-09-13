@@ -45,6 +45,10 @@ namespace sim{
 	
 	extern int integrator;
 	extern int program;
+
+	extern bool surface_anisotropy;
+	extern bool identify_surface_atoms;
+	extern unsigned int surface_anisotropy_threshold;
 	
 	// Wrapper Functions
 	extern int run();

@@ -67,6 +67,11 @@ namespace sim{
 	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
 	int program=0; 
 	
+	bool surface_anisotropy=false; // flag to enable surface anisotropy
+	bool identify_surface_atoms=true; // flag to idenify surface atoms in config coordinate file
+	unsigned int surface_anisotropy_threshold=6; // threshold for surface atoms
+
+	
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);

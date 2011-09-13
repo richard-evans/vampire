@@ -1055,6 +1055,56 @@ int match_sim(string const word, string const value, string const unit, int cons
 				err::vexit();
 			}
 		}
+		//-------------------------------------------------------------------
+		test="surface-anisotropy";
+		if(word==test){
+			test="true";
+			if(value==test){
+				sim::surface_anisotropy=true;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				sim::surface_anisotropy=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
+		test="identify-surface-atoms";
+		if(word==test){
+			test="true";
+			if(value==test){
+				sim::identify_surface_atoms=true;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				sim::identify_surface_atoms=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
+		test="surface-anisotropy-threshold";
+		if(word==test){
+			int sat=atoi(value.c_str());
+			// Test for valid range
+			if(sat>=0){
+				sim::surface_anisotropy_threshold=sat;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be and integer greater than or equal to 0." << std::endl;
+				err::vexit();
+			}
+		}
 		//--------------------------------------------------------------------
 		test="dt";
 		if(word==test){
@@ -2005,6 +2055,7 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
+		//------------------------------------------------------------
 		else
 		test="Ku1";
 		if(word==test){
@@ -2027,6 +2078,30 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
+		//------------------------------------------------------------
+		else
+		test="Ks";
+		if(word==test){
+			double K=atof(value.c_str());
+			string unit_type="anisotropy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+				//read_material[super_index].anis_flag=false;
+				//std::cout << "setting flag to false" << std::endl;
+			}
+			string str="anisotropy";
+			if(unit_type==str){
+				// Set moment flag
+				read_material[super_index].Ks_SI=K;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'material:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
 		else
 		test="gamma-rel";
 		if(word==test){

@@ -32,6 +32,7 @@ int calculate_thermal_fields(const int,const int);
 int calculate_dipolar_fields(const int,const int);
 void calculate_hamr_fields(const int,const int);
 void calculate_fmr_fields(const int,const int);
+void calculate_surface_anisotropy_fields(const int,const int);
 
 int calculate_spin_fields(const int start_index,const int end_index){
 	//======================================================
@@ -72,7 +73,7 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	if(sim::hamiltonian_simulation_flags[1]==1) calculate_uniaxial_anis_fields(start_index,end_index);
 	if(sim::hamiltonian_simulation_flags[1]==2) calculate_cubic_anis_fields(start_index,end_index);
 	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
-	
+	if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
 	// Spin Dependent Extra Fields
 	//if(sim::hamiltonian_simulation_flags[4]==1) calculate_??_fields();
 	
@@ -241,6 +242,35 @@ int calculate_cubic_anis_fields(const int start_index,const int end_index){
   for(int i=start_index;i<end_index;i++){
   }
 	return 0;
+}
+
+void calculate_surface_anisotropy_fields(const int start_index,const int end_index){
+	//======================================================
+	// 		Subroutine to calculate surface anisotropy fields
+	//
+	//			Version 1.0 Richard Evans 13/09/2011
+	//======================================================
+
+	// check calling of routine if error checking is activated
+	if(err::check==true){std::cout << "calculate_surface_anisotropy_fields has been called" << std::endl;}
+
+	for(int atom=start_index;atom<end_index;atom++){
+		// only calculate for surface atoms
+		if(atoms::surface_array[atom]==true){
+			const int imaterial=atoms::type_array[atom];
+			const double Ks=2.0*mp::material[imaterial].Ks; // note factor two here from differentiation
+			const double S[3]={atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
+		
+			for(int nn=atoms::nearest_neighbour_list_si[atom];nn<atoms::nearest_neighbour_list_ei[atom];nn++){
+				const double si_dot_eij=(S[0]*atoms::eijx[nn]+S[1]*atoms::eijy[nn]+S[2]*atoms::eijz[nn]);
+				atoms::x_total_spin_field_array[atom]-=Ks*si_dot_eij*atoms::eijx[nn];
+				atoms::y_total_spin_field_array[atom]-=Ks*si_dot_eij*atoms::eijy[nn];
+				atoms::z_total_spin_field_array[atom]-=Ks*si_dot_eij*atoms::eijz[nn];
+			}
+		}
+	}
+	
+	return;
 }
 
 int calculate_applied_fields(const int start_index,const int end_index){

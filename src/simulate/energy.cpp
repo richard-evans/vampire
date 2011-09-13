@@ -234,6 +234,44 @@ inline double spin_applied_field_energy(const int atom, const int imaterial, con
 
 }
 
+/// @brief Calculates the surface anisotropy energy for a single spin.
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, rfle500@york.ac.uk
+/// @version 1.0
+/// @date    07/02/2011
+///
+/// @param[in] atom atom number 
+/// @param[in] imaterial material of local atom
+/// @param[in] Sx x-spin of local atom  
+/// @param[in] Sy y-spin of local atom 
+/// @param[in] Sz z-spin of local atom 
+/// @return exchange energy
+///
+/// @internal
+///	Created:		13/09/2011
+///	Revision:	  ---
+///=====================================================================================
+///
+inline double spin_surface_anisotropy_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){
+	
+	double energy=0.0;
+
+	if(atoms::surface_array[atom]==true){
+		const double Ks=mp::material[imaterial].Ks;
+		for(int nn=atoms::nearest_neighbour_list_si[atom];nn<atoms::nearest_neighbour_list_ei[atom];nn++){
+			const double si_dot_eij=(Sx*atoms::eijx[nn]+Sy*atoms::eijy[nn]+Sz*atoms::eijz[nn]);
+			energy+=Ks*si_dot_eij*si_dot_eij;
+		}
+	}
+	
+	return energy;
+}
+
 /// @brief Calculates the total energy for a single spin.
 ///
 /// @section License
@@ -273,6 +311,7 @@ double calculate_spin_energy(const int atom){
 	energy+=spin_exchange_energy_isotropic(atom, imaterial, Sx, Sy, Sz);
 	energy+=spin_applied_field_energy(atom, imaterial, Sx, Sy, Sz);
 	energy+=spin_uniaxial_energy(atom, imaterial, Sx, Sy, Sz);
+	energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);
 	
 	return energy; // Tesla
 }

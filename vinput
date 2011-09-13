@@ -45,6 +45,9 @@ sim:fast-dipolar=false
 #sim:fast-dipolar=true
 sim:dipolar-update-rate=10
 sim:temperature=300.0
+sim:surface-anisotropy=true
+sim:identify-surface-atoms=true
+sim:surface-anisotropy-threshold=6
 sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
 sim:Hmin=-12.0 !T
@@ -91,8 +94,8 @@ screen:mag-m
 #vgrain:real-time
 #vgrain:magnetisation
 
-#config:atoms
-#config:atoms-output-rate=10
+config:atoms
+config:atoms-output-rate=10
 #config:atoms-min-x=0.0
 #config:atoms-min-y=0.0
 #config:atoms-min-z=0.49

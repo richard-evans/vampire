@@ -56,6 +56,7 @@ using std::string;
 		double alpha_oneplusalpha_sq;
 		double Jij_matrix[max_materials];
 		double Ku;
+		double Ks;
 		double H_th_sigma;
 		
 		materials_t();
