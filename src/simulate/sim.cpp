@@ -51,12 +51,20 @@ namespace sim{
 	double Hinc= 0.1; // T
 	double Heq=0.0;
 	double demag_factor[3]={0.0,0.0,0.0};
-	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
-	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; // nm/ns
 	bool   head_laser_on=false;
 
+	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
+	double constraint_phi_min=0.0; // loop angle min [degrees]
+	double constraint_phi_max=0.0; // loop angle max [degrees]
+	double constraint_phi_delta=5.0; // loop angle delta [degrees]
+
+	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
+	double constraint_theta_min=0.0; // loop angle min [degrees]
+	double constraint_theta_max=0.0; // loop angle max [degrees]
+	double constraint_theta_delta=5.0; // loop angle delta [degrees]
+	
 	double cooling_time=100.0e-12; //seconds
 	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
 	double pump_power=2.4e22;
@@ -66,6 +74,11 @@ namespace sim{
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
 	int program=0; 
+	
+	bool surface_anisotropy=false; // flag to enable surface anisotropy
+	bool identify_surface_atoms=true; // flag to idenify surface atoms in config coordinate file
+	unsigned int surface_anisotropy_threshold=6; // threshold for surface atoms
+
 	
 	// Local function declarations
 	int integrate_serial(int);
@@ -178,6 +191,11 @@ int run(){
 			if(vmpi::my_rank==0) std::cout << "HAMR-Simulation..." << std::endl; 
 			program::hamr();
 			break;
+			
+		case 8:
+			if(vmpi::my_rank==0) std::cout << "CMC-Anisotropy..." << std::endl; 
+			program::cmc_anisotropy();
+			break;
 		
 		case 50:
 			if(vmpi::my_rank==0) std::cout << "Diagnostic-Boltzmann..." << std::endl; 
@@ -188,6 +206,16 @@ int run(){
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);
 			}
+	}
+
+	// output Monte Carlo Statistics if applicable
+	if(sim::integrator==3){
+		std::cout << "Constrained Monte Carlo Statistics:" << std::endl;
+		std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
+		std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0 << "% Accepted" << std::endl;
+		std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+		std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+		
 	}
 
 	//program::LLB_Boltzmann();

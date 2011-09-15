@@ -63,6 +63,20 @@ namespace stats
 	std::vector <double> sublattice_mom_array(0);
 	std::vector <int> sublattice_nm_array(0);
 	
+	// torque calculation
+	bool calculate_torque=false;
+	double total_system_torque[3]={0.0,0.0,0.0};
+	double total_mean_system_torque[3]={0.0,0.0,0.0};
+	
+	std::vector <double> sublattice_torque_x_array(0);
+	std::vector <double> sublattice_torque_y_array(0);
+	std::vector <double> sublattice_torque_z_array(0);
+	
+	double torque_data_counter=0.0;
+	
+	// function prototypes
+	void system_torque();
+	
 	bool is_initialised=false;
 
 	double data_counter=0.0;		// number of data points for averaging
@@ -151,7 +165,8 @@ int mag_m(){
 		stats::is_initialised=true;
 	}	
 	
-	
+	// optionally calculate system torque
+	if(stats::calculate_torque==true) stats::system_torque();
 	
 	//---------------------------------------------------------
 	// For single material, use streamlined version for speed
@@ -290,10 +305,9 @@ int mag_m(){
 /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
 ///
 /// @section Information
-/// @author		Richard Evans, rfle500@york.ac.uk
-/// @version	1.0
-/// @date		14/03/2011
-/// @todo		Implement for more than one material - Urgent!
+/// @author		Richard Evans, richard.evans@york.ac.uk
+/// @version	1.1
+/// @date		14/09/2011
 ///
 /// @internal
 ///	Created:		11/01/2010
@@ -306,12 +320,19 @@ void mag_m_reset(){
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "stats::mag_m_reset() has been called" << std::endl;}
 	
+	// if stats not initialised then call mag_m() to do so.
 	if(!stats::is_initialised) stats::mag_m();
 	
 	stats::total_mean_mag_m_actual=0.0;
 	stats::total_mean_mag_m_norm=0.0;
 	for(int mat=0;mat<mp::num_materials;mat++) stats::sublattice_mean_magm_array[mat]=0.0;
 	stats::data_counter=0.0;
+	
+	stats::total_mean_system_torque[0]=0.0;
+	stats::total_mean_system_torque[1]=0.0;
+	stats::total_mean_system_torque[2]=0.0;
+	
+	stats::torque_data_counter=0.0;
 	
 }
 
@@ -362,5 +383,58 @@ double max_torque(){
 
 }
 
+///
+/// @brief      Calculates the torque on the system
+///
+/// Calculates the instantaneous value of the system torque T = sum (Si x Hi)
+///
+/// @return     void
+///
+void system_torque(){
+
+	// parallel version, multiple materials, initialisation
+	
+	double torque[3]={0.0,0.0,0.0};
+
+	// calculate net fields
+	calculate_spin_fields(0,atoms::num_atoms);
+	calculate_external_fields(0,atoms::num_atoms);
+		
+	for(int atom=0;atom<stats::num_atoms;atom++){
+
+		// get atomic moment
+		const int imat=atoms::type_array[atom];
+		const double mu = mp::material[imat].mu_s_SI;
+		
+		// Store local spin in Sand local field in H
+		const double S[3] = {atoms::x_spin_array[atom]*mu,atoms::y_spin_array[atom]*mu,atoms::z_spin_array[atom]*mu};
+		const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom],
+									atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom],
+									atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]};
+
+		torque[0] += S[1]*H[2]-S[2]*H[1];
+		torque[1] += S[2]*H[0]-S[0]*H[2];
+		torque[2] += S[0]*H[1]-S[1]*H[0];
+
+	}
+
+	// reduce torque on all nodes
+	#ifdef MPICF
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&torque[0],3,MPI_DOUBLE,MPI_SUM);
+	#endif
+
+	// Set stats values
+	stats::total_system_torque[0]=torque[0];
+	stats::total_system_torque[1]=torque[1];
+	stats::total_system_torque[2]=torque[2];
+
+	stats::total_mean_system_torque[0]+=torque[0];
+	stats::total_mean_system_torque[1]+=torque[1];
+	stats::total_mean_system_torque[2]+=torque[2];
+
+	stats::torque_data_counter+=1.0;
+	return;
+
+}
 
 } // End of Namespace

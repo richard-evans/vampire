@@ -81,66 +81,66 @@ void polar_rot_matrix(
 	// Initialise varibales 
 	//--------------------------------------------------
 
-  ddx = 0.0;
-  ddy = phi;
-  ddz = theta;// assumues x = cos(theta)sin(phi), y = sin(theta)sin(phi)
+	ddx = 0.0;
+	ddy = phi;
+	ddz = theta;// assumues x = cos(theta)sin(phi), y = sin(theta)sin(phi)
 
-  dx = (ddx/360.0)*2.0*pi;
-  dy = (ddy/360.0)*2.0*pi;
-  dz = (ddz/360.0)*2.0*pi;
+	dx = (ddx/360.0)*2.0*pi;
+	dy = (ddy/360.0)*2.0*pi;
+	dz = (ddz/360.0)*2.0*pi;
 
-  reference_vector[0] = 0.0;
-  reference_vector[1] = 0.0;
-  reference_vector[2] = 1.0;
-  
-  sin_x = sin(dx);
-  cos_x = cos(dx);
-  sin_y = sin(dy);
-  cos_y = cos(dy);
-  sin_z = sin(dz);
-  cos_z = cos(dz);
+	reference_vector[0] = 0.0;
+	reference_vector[1] = 0.0;
+	reference_vector[2] = 1.0;
+	
+	sin_x = sin(dx);
+	cos_x = cos(dx);
+	sin_y = sin(dy);
+	cos_y = cos(dy);
+	sin_z = sin(dz);
+	cos_z = cos(dz);
 
-  std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix,ref_vec;
-  
-  x_rotation_matrix=vmath::set_matrix(3,3);
-  y_rotation_matrix=vmath::set_matrix(3,3);
-  z_rotation_matrix=vmath::set_matrix(3,3);
-  ref_vec=vmath::set_matrix(3,1,reference_vector);
+	std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix,ref_vec;
+	
+	x_rotation_matrix=vmath::set_matrix(3,3);
+	y_rotation_matrix=vmath::set_matrix(3,3);
+	z_rotation_matrix=vmath::set_matrix(3,3);
+	ref_vec=vmath::set_matrix(1,3,reference_vector);
 
-  
-  x_rotation_matrix[0][0] = 1.0;
-  x_rotation_matrix[0][1] = 0.0;
-  x_rotation_matrix[0][2] = 0.0;
-  x_rotation_matrix[1][0] = 0.0;
-  x_rotation_matrix[1][1] = cos_x;
-  x_rotation_matrix[1][2] = -sin_x;
-  x_rotation_matrix[2][0] = 0.0;
-  x_rotation_matrix[2][1] = sin_x;
-  x_rotation_matrix[2][2] = cos_x;
+	
+	x_rotation_matrix[0][0] = 1.0;
+	x_rotation_matrix[1][0] = 0.0;
+	x_rotation_matrix[2][0] = 0.0;
+	x_rotation_matrix[0][1] = 0.0;
+	x_rotation_matrix[1][1] = cos_x;
+	x_rotation_matrix[2][1] = -sin_x;
+	x_rotation_matrix[0][2] = 0.0;
+	x_rotation_matrix[1][2] = sin_x;
+	x_rotation_matrix[2][2] = cos_x;
 
-  y_rotation_matrix[0][0] = cos_y;
-  y_rotation_matrix[0][1] = 0.0;
-  y_rotation_matrix[0][2] = sin_y;
-  y_rotation_matrix[1][0] = 0.0;
-  y_rotation_matrix[1][1] = 1.0;
-  y_rotation_matrix[1][2] = 0.0;
-  y_rotation_matrix[2][0] = -sin_y;
-  y_rotation_matrix[2][1] = 0.0;
-  y_rotation_matrix[2][2] = cos_y;
+	y_rotation_matrix[0][0] = cos_y;
+	y_rotation_matrix[1][0] = 0.0;
+	y_rotation_matrix[2][0] = sin_y;
+	y_rotation_matrix[0][1] = 0.0;
+	y_rotation_matrix[1][1] = 1.0;
+	y_rotation_matrix[2][1] = 0.0;
+	y_rotation_matrix[0][2] = -sin_y;
+	y_rotation_matrix[1][2] = 0.0;
+	y_rotation_matrix[2][2] = cos_y;
 
-  z_rotation_matrix[0][0] = cos_z;
-  z_rotation_matrix[0][1] = -sin_z;
-  z_rotation_matrix[0][2] = 0.0;
-  z_rotation_matrix[1][0] = sin_z;
-  z_rotation_matrix[1][1] = cos_z;
-  z_rotation_matrix[1][2] = 0.0;
-  z_rotation_matrix[2][0] = 0.0;
-  z_rotation_matrix[2][1] = 0.0;
-  z_rotation_matrix[2][2] = 1.0;
+	z_rotation_matrix[0][0] = cos_z;
+	z_rotation_matrix[1][0] = -sin_z;
+	z_rotation_matrix[2][0] = 0.0;
+	z_rotation_matrix[0][1] = sin_z;
+	z_rotation_matrix[1][1] = cos_z;
+	z_rotation_matrix[2][1] = 0.0;
+	z_rotation_matrix[0][2] = 0.0;
+	z_rotation_matrix[1][2] = 0.0;
+	z_rotation_matrix[2][2] = 1.0;
 
-  polar_matrix = vmath::matmul(y_rotation_matrix,z_rotation_matrix);
-  polar_matrix_tp = vmath::transpose(polar_matrix);
-  polar_vector = vmath::matmul(polar_matrix,ref_vec);
+	polar_matrix = vmath::matmul(y_rotation_matrix,z_rotation_matrix);
+	polar_matrix_tp = vmath::transpose(polar_matrix);
+	polar_vector = vmath::matmul(ref_vec,polar_matrix);
 
 }
 
@@ -164,14 +164,17 @@ void CMCinit(){
 	cmc::polar_rot_matrix(sim::constraint_phi,sim::constraint_theta, cmc::polar_matrix, cmc::polar_matrix_tp, cmc::polar_vector);
 
 	// Initialise all spins along the constraint direction.
-	double sx=sin(sim::constraint_phi)*cos(sim::constraint_theta);
-	double sy=sin(sim::constraint_phi)*sin(sim::constraint_theta);
-	double sz=cos(sim::constraint_phi);
+	double sx=sin(sim::constraint_phi*M_PI/180.0)*cos(sim::constraint_theta*M_PI/180.0);
+	double sy=sin(sim::constraint_phi*M_PI/180.0)*sin(sim::constraint_theta*M_PI/180.0);
+	double sz=cos(sim::constraint_phi*M_PI/180.0);
 	for(int atom =0;atom<atoms::num_atoms;atom++){
-			atoms::x_spin_array[atom]=sx;			
-			atoms::y_spin_array[atom]=sy;			
+			atoms::x_spin_array[atom]=sx;
+			atoms::y_spin_array[atom]=sy;
 			atoms::z_spin_array[atom]=sz;
 	}
+	
+	// disable thermal field calculation
+	sim::hamiltonian_simulation_flags[3]=0;
 	
 	// set initialised flag to true
 	cmc::is_initialised=true;
@@ -215,9 +218,9 @@ int ConstrainedMonteCarlo(){
 	double spin2_final[3];
 
 	double spin1_init_mvd[3];
-	double  spin1_fin_mvd[3];
-	double  spin2_init_mvd[3];
-	double  spin2_fin_mvd[3];
+	double spin1_fin_mvd[3];
+	double spin2_init_mvd[3];
+	double spin2_fin_mvd[3];
 
 	double M_other[3];
 	double Mz_old;
@@ -234,7 +237,7 @@ int ConstrainedMonteCarlo(){
 	double ppolar_matrix_tp[3][3];
 
 	for (int i=0;i<3;i++){
-		ppolar_vector[i]=cmc::polar_vector[i][0];
+		ppolar_vector[i]=cmc::polar_vector[0][i];
 		for (int j=0;j<3;j++){
 			ppolar_matrix[i][j]=cmc::polar_matrix[i][j];
 			ppolar_matrix_tp[i][j]=cmc::polar_matrix_tp[i][j];

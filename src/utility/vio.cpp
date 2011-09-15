@@ -899,6 +899,11 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::program=7;
 				return EXIT_SUCCESS;
 			}
+			test="CMC-Anisotropy";
+			if(value==test){
+				sim::program=8;
+				return EXIT_SUCCESS;
+			}
 			test="Diagnostic-Boltzmann";
 			if(value==test){
 				sim::program=50;
@@ -1052,6 +1057,56 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			else{
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be greater than zero" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
+		test="surface-anisotropy";
+		if(word==test){
+			test="true";
+			if(value==test){
+				sim::surface_anisotropy=true;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				sim::surface_anisotropy=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
+		test="identify-surface-atoms";
+		if(word==test){
+			test="true";
+			if(value==test){
+				sim::identify_surface_atoms=true;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				sim::identify_surface_atoms=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
+		test="surface-anisotropy-threshold";
+		if(word==test){
+			int sat=atoi(value.c_str());
+			// Test for valid range
+			if(sat>=0){
+				sim::surface_anisotropy_threshold=sat;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be and integer greater than or equal to 0." << std::endl;
 				err::vexit();
 			}
 		}
@@ -1431,6 +1486,118 @@ int match_sim(string const word, string const value, string const unit, int cons
 				return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		test="constraint-angle-theta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
 		else{
 			std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;
@@ -1617,9 +1784,31 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			return EXIT_SUCCESS;
 		}
 		else
-		test="material-mean-mag-m";
+		test="system-torque";
 		if(word==test){
-			output_list.push_back(9);
+			stats::calculate_torque=true;
+			output_list.push_back(14);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="mean-system-torque";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(15);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="constraint-phi";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(16);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="constraint-theta";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(17);
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
@@ -2005,6 +2194,7 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
+		//------------------------------------------------------------
 		else
 		test="Ku1";
 		if(word==test){
@@ -2027,6 +2217,30 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
+		//------------------------------------------------------------
+		else
+		test="Ks";
+		if(word==test){
+			double K=atof(value.c_str());
+			string unit_type="anisotropy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+				//read_material[super_index].anis_flag=false;
+				//std::cout << "setting flag to false" << std::endl;
+			}
+			string str="anisotropy";
+			if(unit_type==str){
+				// Set moment flag
+				read_material[super_index].Ks_SI=K;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'material:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
 		else
 		test="gamma-rel";
 		if(word==test){
@@ -2551,9 +2765,9 @@ namespace vout{
 	
 	// Output Function 5
 	void mvec(std::ostream& stream){
-		stream << stats::total_mag_norm[0] << "\t";
-		stream << stats::total_mag_norm[1] << "\t";
-		stream << stats::total_mag_norm[2] << "\t";
+		stream << stats::total_mag_norm[0]/stats::total_mag_m_norm << "\t";
+		stream << stats::total_mag_norm[1]/stats::total_mag_m_norm << "\t";
+		stream << stats::total_mag_norm[2]/stats::total_mag_m_norm << "\t";
 	}
 	
 	// Output Function 6
@@ -2631,6 +2845,30 @@ namespace vout{
 		
 	}
 	
+	// Output Function 14
+	void systorque(std::ostream& stream){
+		stream << stats::total_system_torque[0] << "\t";
+		stream << stats::total_system_torque[1] << "\t";
+		stream << stats::total_system_torque[2] << "\t";
+	}
+	
+	// Output Function 15
+	void mean_systorque(std::ostream& stream){
+		stream << stats::total_mean_system_torque[0]/stats::torque_data_counter << "\t";
+		stream << stats::total_mean_system_torque[1]/stats::torque_data_counter << "\t";
+		stream << stats::total_mean_system_torque[2]/stats::torque_data_counter << "\t";
+	}
+	
+	// Output Function 16
+	void constraint_phi(std::ostream& stream){
+		stream << sim::constraint_phi << "\t";
+	}
+	
+	// Output Function 17
+	void constraint_theta(std::ostream& stream){
+		stream << sim::constraint_theta << "\t";
+	}
+	
 	// Data output wrapper function
 	void data(){
 
@@ -2673,6 +2911,19 @@ namespace vout{
 				case 12:
 					vout::mdoth(vmag);
 					break;
+				case 14:
+					vout::systorque(vmag);
+					break;
+				case 15:
+					vout::mean_systorque(vmag);
+					break;
+				case 16:
+					vout::constraint_phi(vmag);
+					break;
+				case 17:
+					vout::constraint_theta(vmag);
+					break;
+
 			}
 		}
 		
@@ -2715,6 +2966,18 @@ namespace vout{
 					break;
 				case 12:
 					vout::mdoth(std::cout);
+					break;
+				case 14:
+					vout::systorque(std::cout);
+					break;
+				case 15:
+					vout::mean_systorque(std::cout);
+					break;
+				case 16:
+					vout::constraint_phi(std::cout);
+					break;
+				case 17:
+					vout::constraint_theta(std::cout);
 					break;
 			}
 		}

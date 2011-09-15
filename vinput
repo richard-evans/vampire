@@ -32,7 +32,7 @@ dimensions:particle-spacing = 1.0 !nm
 # Material Files:
 #------------------------------------------
 material:file="Co.mat"
-material:unit-cell-file=SimpleCubic.ucf
+#material:unit-cell-file=SimpleCubic.ucf
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
@@ -45,6 +45,9 @@ sim:fast-dipolar=false
 #sim:fast-dipolar=true
 sim:dipolar-update-rate=10
 sim:temperature=300.0
+sim:surface-anisotropy=false
+sim:identify-surface-atoms=true
+sim:surface-anisotropy-threshold=6
 sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
 sim:Hmin=-12.0 !T
@@ -64,12 +67,21 @@ sim:total-time=10000
 sim:loop-time=3000
 sim:dt=1.0E-15
 
+sim:constraint-angle-theta=0.0
+sim:constraint-angle-theta-min=0.0
+sim:constraint-angle-theta-max=0.0
+sim:constraint-angle-theta-delta=5.0
+sim:constraint-angle-phi=45.0
+sim:constraint-angle-phi-min=0.0
+sim:constraint-angle-phi-max=180.0
+sim:constraint-angle-phi-delta=5.0
 #--------------------------------
 # Program and integrator details
 #--------------------------------
 #sim:program=Curie-Temperature
 sim:program=Benchmark
 #sim:program=Field-Cool
+sim:program=CMC-Anisotropy
 
 #sim:integrator=LLG-Midpoint
 sim:integrator=LLG-Heun
@@ -77,22 +89,30 @@ sim:integrator=LLG-Heun
 
 # data output
 vmag:real-time
+vmag:constraint-theta
+vmag:constraint-phi
 vmag:temperature
 vmag:magnetisation
 vmag:mag-m
 vmag:mean-mag-m
+#vmag:system-torque
+#vmag:mean-system-torque
+vmag:mean-system-torque
 
 #screen:temperature
 screen:time
 #screen:mean-mag-m
 screen:mag-m
+screen:constraint-phi
+#screen:system-torque
+#screen:mean-system-torque
 
 #vgrain:output-rate=100
 #vgrain:real-time
 #vgrain:magnetisation
 
-#config:atoms
-#config:atoms-output-rate=10
+config:atoms
+config:atoms-output-rate=10
 #config:atoms-min-x=0.0
 #config:atoms-min-y=0.0
 #config:atoms-min-z=0.49

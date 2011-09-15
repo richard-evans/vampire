@@ -46,5 +46,14 @@ namespace atoms{
 	std::vector <zval_t> i_exchange_list(0);
 	std::vector <zvec_t> v_exchange_list(0);
 	std::vector <zten_t> t_exchange_list(0);
+	
+	// surface anisotropy
+	std::vector<bool> surface_array(0);
+	std::vector<int> nearest_neighbour_list(0);
+	std::vector<int> nearest_neighbour_list_si(0);
+	std::vector<int> nearest_neighbour_list_ei(0);
+	std::vector<double> eijx(0);
+	std::vector<double> eijy(0);
+	std::vector<double> eijz(0);
 
 }

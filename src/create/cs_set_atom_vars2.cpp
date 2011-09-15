@@ -13,6 +13,7 @@
 #include "errors.hpp"
 #include "material.hpp"
 #include "random.hpp"
+#include "sim.hpp"
 #include "vmpi.hpp"
 
 
@@ -207,7 +208,66 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	unit_cell.interaction.resize(0);
 	unit_cell.atom.resize(0);
 	
+	//-------------------------------------------------
+	//	Optionally set up surface anisotropy
+	//-------------------------------------------------
+	if(sim::surface_anisotropy==true){
 
+		// initialise counters
+		int nncounter = 0; // number of nearest neighbours
+		int sacounter = 0; // number of surface atoms
+
+		// loop over all atoms and count number of surface atoms
+		for(int atom=0;atom<atoms::num_atoms;atom++){
+			if(cneighbourlist[atom].size()<sim::surface_anisotropy_threshold){
+				sacounter++;
+				nncounter+=cneighbourlist[atom].size();
+			}
+		}
+	
+		atoms::surface_array.resize(atoms::num_atoms);
+		atoms::nearest_neighbour_list_si.resize(atoms::num_atoms);
+		atoms::nearest_neighbour_list_ei.resize(atoms::num_atoms);
+		atoms::nearest_neighbour_list.reserve(nncounter);
+	
+		// counter for index arrays
+		int counter=0;
+		
+		//	Populate surface atom and 1D nearest neighbour list and index arrays
+		for(int atom=0;atom<atoms::num_atoms;atom++){
+			atoms::surface_array[atom]=false;
+			atoms::nearest_neighbour_list_si[atom]=0;
+			atoms::nearest_neighbour_list_ei[atom]=0;
+			if(cneighbourlist[atom].size()<sim::surface_anisotropy_threshold){
+				// identify atom as surface
+				atoms::surface_array[atom]=true;
+				// Set start index
+				atoms::nearest_neighbour_list_si[atom]=counter;
+				// loop over neighbours
+				for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
+					atoms::nearest_neighbour_list.push_back(cneighbourlist[atom][nn].nn);
+					
+					double eij[3]={atoms::x_coord_array[cneighbourlist[atom][nn].nn]-atoms::x_coord_array[atom],
+										atoms::y_coord_array[cneighbourlist[atom][nn].nn]-atoms::y_coord_array[atom],
+										atoms::z_coord_array[cneighbourlist[atom][nn].nn]-atoms::z_coord_array[atom],};
+					double invrij=1.0/sqrt(eij[0]*eij[0]+eij[1]*eij[1]+eij[2]*eij[2]);
+					atoms::eijx.push_back(eij[0]*invrij);
+					atoms::eijy.push_back(eij[1]*invrij);
+					atoms::eijz.push_back(eij[2]*invrij);
+					counter++;
+				}
+			}
+			// push back final start index
+			atoms::nearest_neighbour_list_ei[atom]=counter;
+		}
+
+		
+		// Output statistics to screen
+		std::cout << sacounter << " surface atoms found" << std::endl;
+		
+	} // end of surface anisotropy initialisation
+		
+	
 	return EXIT_SUCCESS;
 }
 

@@ -31,6 +31,16 @@ namespace sim{
 	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
 	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
 
+	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
+	extern double constraint_phi_min; // loop angle min [degrees]
+	extern double constraint_phi_max; // loop angle max [degrees]
+	extern double constraint_phi_delta; // loop angle delta [degrees]
+
+	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
+	extern double constraint_theta_min; // loop angle min [degrees]
+	extern double constraint_theta_max; // loop angle max [degrees]
+	extern double constraint_theta_delta; // loop angle delta [degrees]
+	
 	extern double head_position[2];
 	extern double head_speed;
 	extern bool   head_laser_on;
@@ -45,6 +55,10 @@ namespace sim{
 	
 	extern int integrator;
 	extern int program;
+
+	extern bool surface_anisotropy;
+	extern bool identify_surface_atoms;
+	extern unsigned int surface_anisotropy_threshold;
 	
 	// Wrapper Functions
 	extern int run();
@@ -73,6 +87,13 @@ namespace sim{
 	// Field and energy functions
 	extern double calculate_spin_energy(const int);
 
+}
+
+namespace cmc{
+	extern double mc_success;
+	extern double mc_total;
+	extern double sphere_reject;
+	extern double energy_reject;
 }
 
 #endif /*SIM_H_*/
