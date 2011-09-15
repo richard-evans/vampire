@@ -146,6 +146,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].scx=x;
 							catom_array[atom].scy=y;
 							catom_array[atom].scz=z;
+							catom_array[atom].include=false; // assume no atoms until classification complete
 							atom++;
 							}
 						}
@@ -180,10 +181,16 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
 		for(int mat=0;mat<mp::num_materials;mat++){
 			const double cz=catom_array[atom].z;
-			if((cz>=mat_min[mat]) && (cz<mat_max[mat])) catom_array[atom].material=mat;
+			if((cz>=mat_min[mat]) && (cz<mat_max[mat])){
+				catom_array[atom].material=mat;
+				catom_array[atom].include=true;
+			}
 		}
 	}
 
+	// Delete unneeded atoms
+	clear_atoms(catom_array);
+		
 	// Check to see if any atoms have been generated
 	if(atom==0){
 		std::cout << "Error - no atoms have been generated, increase system dimensions!" << std::endl;
