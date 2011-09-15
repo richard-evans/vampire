@@ -261,7 +261,7 @@ inline double spin_surface_anisotropy_energy(const int atom, const int imaterial
 	
 	double energy=0.0;
 
-	if(atoms::surface_array[atom]==true){
+	if(atoms::surface_array[atom]==true && sim::surface_anisotropy==true){
 		const double Ks=mp::material[imaterial].Ks;
 		for(int nn=atoms::nearest_neighbour_list_si[atom];nn<atoms::nearest_neighbour_list_ei[atom];nn++){
 			const double si_dot_eij=(Sx*atoms::eijx[nn]+Sy*atoms::eijy[nn]+Sz*atoms::eijz[nn]);

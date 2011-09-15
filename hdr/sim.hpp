@@ -79,4 +79,11 @@ namespace sim{
 
 }
 
+namespace cmc{
+	extern double mc_success;
+	extern double mc_total;
+	extern double sphere_reject;
+	extern double energy_reject;
+}
+
 #endif /*SIM_H_*/

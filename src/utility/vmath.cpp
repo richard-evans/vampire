@@ -98,18 +98,18 @@ std::vector<std::vector<double> > matmul(
 	C.resize(C_num_rows);
 	for(unsigned int row=0;row<C_num_rows;row++) C[row].resize(C_num_cols,0.0);
 
-	std::cout << "Product is:" << std::endl;
-	// C[i][j] = Ari . Bcj
+	//std::cout << "Product is:" << std::endl;
+	//C[i][j] = Ari . Bcj
 	// Calculate product
 	for(unsigned int i=0;i<C_num_rows;i++){
-		std::cout << "[";
+		//std::cout << "[";
 		for(unsigned int j=0;j<C_num_cols;j++){
 			for(unsigned int k=0; k<product ;k++){
 				C[i][j]+=A[i][k]*B[k][j];
 			}
-			std::cout << C[i][j] << "\t";
+			//std::cout << C[i][j] << "\t";
 		}
-		std::cout << "]"<< std::endl;
+		//std::cout << "]"<< std::endl;
 	}
 	
 	// Return 
@@ -152,16 +152,16 @@ std::vector<std::vector<double> > transpose(
 	B.resize(B_num_rows);
 	for(unsigned int row=0;row<B_num_rows;row++) B[row].resize(B_num_cols,0.0);
 
-	std::cout << "Transpose is:" << std::endl;
+	//std::cout << "Transpose is:" << std::endl;
 	// C[i][j] = A[j][i]
 	// Calculate product
 	for(unsigned int i=0;i<B_num_rows;i++){
-		std::cout << "[";
+		//std::cout << "[";
 		for(unsigned int j=0;j<B_num_cols;j++){
 				B[i][j]=A[j][i];
-			std::cout << B[i][j] << "\t";
+			//std::cout << B[i][j] << "\t";
 		}
-		std::cout << "]"<< std::endl;
+		//std::cout << "]"<< std::endl;
 	}
 	
 	// Return 
@@ -206,15 +206,15 @@ std::vector<std::vector<double> > set_matrix(
 	//counter
 	unsigned int counter=0;
 
-	std::cout << "matrix initialised as:" << std::endl;
+	//std::cout << "matrix initialised as:" << std::endl;
 	for(unsigned int row=0;row<rows;row++){
-		std::cout << "[";
+		//std::cout << "[";
 		for(unsigned int col=0;col<cols;col++){
 			C[row][col]=nums[counter];
-			std::cout << C[row][col] << "\t";
+			//std::cout << C[row][col] << "\t";
 			counter++;
 		}
-		std::cout << "]" << std::endl;
+		//std::cout << "]" << std::endl;
 	}
 	
 	// Return 

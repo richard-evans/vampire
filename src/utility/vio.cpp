@@ -1481,6 +1481,34 @@ int match_sim(string const word, string const value, string const unit, int cons
 				return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		test="constraint-angle-theta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
 		else{
 			std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;
@@ -1667,12 +1695,19 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			return EXIT_SUCCESS;
 		}
 		else
-		test="material-mean-mag-m";
+		test="system-torque";
 		if(word==test){
-			output_list.push_back(9);
+			stats::calculate_torque=true;
+			output_list.push_back(14);
 			return EXIT_SUCCESS;
 		}
-		//--------------------------------------------------------------------
+		else
+		test="mean-system-torque";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(15);
+			return EXIT_SUCCESS;
+		}		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
@@ -2626,9 +2661,9 @@ namespace vout{
 	
 	// Output Function 5
 	void mvec(std::ostream& stream){
-		stream << stats::total_mag_norm[0] << "\t";
-		stream << stats::total_mag_norm[1] << "\t";
-		stream << stats::total_mag_norm[2] << "\t";
+		stream << stats::total_mag_norm[0]/stats::total_mag_m_norm << "\t";
+		stream << stats::total_mag_norm[1]/stats::total_mag_m_norm << "\t";
+		stream << stats::total_mag_norm[2]/stats::total_mag_m_norm << "\t";
 	}
 	
 	// Output Function 6
@@ -2706,6 +2741,20 @@ namespace vout{
 		
 	}
 	
+	// Output Function 14
+	void systorque(std::ostream& stream){
+		stream << stats::total_system_torque[0] << "\t";
+		stream << stats::total_system_torque[1] << "\t";
+		stream << stats::total_system_torque[2] << "\t";
+	}
+	
+	// Output Function 15
+	void mean_systorque(std::ostream& stream){
+		stream << stats::total_mean_system_torque[0]/stats::torque_data_counter << "\t";
+		stream << stats::total_mean_system_torque[1]/stats::torque_data_counter << "\t";
+		stream << stats::total_mean_system_torque[2]/stats::torque_data_counter << "\t";
+	}
+	
 	// Data output wrapper function
 	void data(){
 
@@ -2747,6 +2796,12 @@ namespace vout{
 					break;
 				case 12:
 					vout::mdoth(vmag);
+					break;
+				case 14:
+					vout::systorque(vmag);
+					break;
+				case 15:
+					vout::mean_systorque(vmag);
 					break;
 			}
 		}
@@ -2790,6 +2845,12 @@ namespace vout{
 					break;
 				case 12:
 					vout::mdoth(std::cout);
+					break;
+				case 14:
+					vout::systorque(std::cout);
+					break;
+				case 15:
+					vout::mean_systorque(std::cout);
 					break;
 			}
 		}

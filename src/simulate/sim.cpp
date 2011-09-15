@@ -195,6 +195,16 @@ int run(){
 			}
 	}
 
+	// output Monte Carlo Statistics if applicable
+	if(sim::integrator==3){
+		std::cout << "Constrained Monte Carlo Statistics:" << std::endl;
+		std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
+		std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0 << "% Accepted" << std::endl;
+		std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+		std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+		
+	}
+
 	//program::LLB_Boltzmann();
 
 	return EXIT_SUCCESS;
