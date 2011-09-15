@@ -899,6 +899,11 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::program=7;
 				return EXIT_SUCCESS;
 			}
+			test="CMC-Anisotropy";
+			if(value==test){
+				sim::program=8;
+				return EXIT_SUCCESS;
+			}
 			test="Diagnostic-Boltzmann";
 			if(value==test){
 				sim::program=50;
@@ -1495,12 +1500,96 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
+		test="constraint-angle-theta-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
 		test="constraint-angle-phi";
 		if(word==test){
 			double angle=atof(value.c_str());
 			// Test for valid range
 			if((angle>=0.0) && (angle<=180.0)){
 				sim::constraint_phi=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_delta=angle;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1707,7 +1796,22 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			stats::calculate_torque=true;
 			output_list.push_back(15);
 			return EXIT_SUCCESS;
-		}		//--------------------------------------------------------------------
+		}
+		else
+		test="constraint-phi";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(16);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="constraint-theta";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(17);
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
@@ -2755,6 +2859,16 @@ namespace vout{
 		stream << stats::total_mean_system_torque[2]/stats::torque_data_counter << "\t";
 	}
 	
+	// Output Function 16
+	void constraint_phi(std::ostream& stream){
+		stream << sim::constraint_phi << "\t";
+	}
+	
+	// Output Function 17
+	void constraint_theta(std::ostream& stream){
+		stream << sim::constraint_theta << "\t";
+	}
+	
 	// Data output wrapper function
 	void data(){
 
@@ -2803,6 +2917,13 @@ namespace vout{
 				case 15:
 					vout::mean_systorque(vmag);
 					break;
+				case 16:
+					vout::constraint_phi(vmag);
+					break;
+				case 17:
+					vout::constraint_theta(vmag);
+					break;
+
 			}
 		}
 		
@@ -2851,6 +2972,12 @@ namespace vout{
 					break;
 				case 15:
 					vout::mean_systorque(std::cout);
+					break;
+				case 16:
+					vout::constraint_phi(std::cout);
+					break;
+				case 17:
+					vout::constraint_theta(std::cout);
 					break;
 			}
 		}
