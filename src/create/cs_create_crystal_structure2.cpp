@@ -197,6 +197,11 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		err::vexit();
 	}
 
+	// Now unselect all atoms by default for particle shape cutting
+	for(unsigned int atom=0;atom<catom_array.size();atom++){
+		catom_array[atom].include=false;
+	}
+
 	return EXIT_SUCCESS;
 }
 

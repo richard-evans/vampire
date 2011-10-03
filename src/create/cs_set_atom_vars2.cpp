@@ -266,7 +266,16 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		std::cout << sacounter << " surface atoms found" << std::endl;
 		
 	} // end of surface anisotropy initialisation
-		
+	// if not surface anisotropy then still identify surface atoms
+	else{
+		atoms::surface_array.resize(atoms::num_atoms);
+		for(int atom=0;atom<atoms::num_atoms;atom++){
+			if(cneighbourlist[atom].size()<sim::surface_anisotropy_threshold){
+				// identify atom as surface
+				atoms::surface_array[atom]=true;
+			}
+		}
+	}
 	
 	return EXIT_SUCCESS;
 }
