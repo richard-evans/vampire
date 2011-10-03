@@ -209,7 +209,8 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			#endif
 			// check for out-of-bounds access
 			if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
-				if((supercell_array[nx][ny][nz][atom]!=-1) || (supercell_array[nx][ny][nz][natom]!=-1)){
+			  // check for missing atoms
+				if((supercell_array[nx][ny][nz][atom]!=-1) && (supercell_array[nx][ny][nz][natom]!=-1)){
 					// get current index
 					int index=cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].size();
 					// push back array of class
@@ -217,8 +218,9 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 					// now save atom id and interaction type
 					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].nn=supercell_array[nx][ny][nz][natom];
 					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].i=i;
-					//std::cout << supercell_array[nx][ny][nz][atom] << "\t" << supercell_array[nx][ny][nz][natom] << std::endl;
-					//std::cin.get();
+					//if((supercell_array[nx][ny][nz][atom]==-1) || (supercell_array[nx][ny][nz][natom]==-1)){
+					//std::cout << "err " << supercell_array[nx][ny][nz][atom] << "\t" << supercell_array[nx][ny][nz][natom] << std::endl;
+					//}//std::cin.get();
 				}
 			}
 		}
