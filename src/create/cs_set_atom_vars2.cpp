@@ -146,7 +146,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 					const int natom = atoms::neighbour_list_array[nn];
 					const int jmaterial=atoms::type_array[natom];
 					atoms::i_exchange_list.push_back(tmp_zval);
-					atoms::i_exchange_list[atom].Jij= mp::material[imaterial].Jij_matrix[jmaterial];
+					atoms::i_exchange_list[nn].Jij= mp::material[imaterial].Jij_matrix[jmaterial];
+					// reset interation id to neighbour number
+					atoms::neighbour_interaction_type_array[nn]=nn;
 				}
 			}
 			// now set exchange type to normal isotropic case
