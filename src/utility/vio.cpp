@@ -2504,7 +2504,24 @@ int match_material(string const word, string const value, string const unit, int
 			}
 		}
 		//--------------------------------------------------------------------
-
+		else
+		test="constrained"; // determines use of alternate integrator
+		if(word==test){
+			string t="true";
+			string f="false";
+			if(value==t){
+				read_material[super_index].integrator=true;
+				return EXIT_SUCCESS;
+			}
+			else if(value==f){
+				read_material[super_index].integrator=false;
+				return EXIT_SUCCESS;
+			}
+			else {
+				std::cerr << "Error in input file - material[" << super_index << "]:constrained must be either true or false" << std::endl;
+				return EXIT_FAILURE;
+			}
+		}
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------

@@ -58,6 +58,7 @@ using std::string;
 		double Ku;
 		double Ks;
 		double H_th_sigma;
+		bool integrator; // specifies primary or alternate integrator
 		
 		materials_t();
 		int print();

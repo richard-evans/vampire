@@ -31,7 +31,8 @@ materials_t::materials_t ():
 	alpha_oneplusalpha_sq(0.5),
 	Ku(0.0),
 	Ks(0.0),
-	H_th_sigma(0.0)
+	H_th_sigma(0.0),
+	integrator(false)
 	
 	{
 
