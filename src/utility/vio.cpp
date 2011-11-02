@@ -909,6 +909,11 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::program=8;
 				return EXIT_SUCCESS;
 			}
+			test="Hybrid-CMC";
+			if(value==test){
+				sim::program=9;
+				return EXIT_SUCCESS;
+			}
 			test="Diagnostic-Boltzmann";
 			if(value==test){
 				sim::program=50;
@@ -922,6 +927,8 @@ int match_sim(string const word, string const value, string const unit, int cons
 				std::cerr << "\t\"Curie-Temperature\"" << std::endl;
 				std::cerr << "\t\"Field-Cool\"" << std::endl;
 				std::cerr << "\t\"Two-Temperature-Pulse\"" << std::endl;
+				std::cerr << "\t\"CMC-Anisotropy\"" << std::endl;
+				std::cerr << "\t\"Hybrid-CMC\"" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1758,7 +1765,8 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(12);
 			return EXIT_SUCCESS;
 		}
-		else		test="magnetisation";
+		else
+		test="magnetisation";
 		if(word==test){
 			output_list.push_back(5);
 			return EXIT_SUCCESS;
@@ -1814,6 +1822,20 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 		if(word==test){
 			stats::calculate_torque=true;
 			output_list.push_back(17);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="material-constraint-phi";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(18);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="material-constraint-theta";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(19);
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
@@ -2510,11 +2532,11 @@ int match_material(string const word, string const value, string const unit, int
 			string t="true";
 			string f="false";
 			if(value==t){
-				read_material[super_index].integrator=true;
+				read_material[super_index].constrained=true;
 				return EXIT_SUCCESS;
 			}
 			else if(value==f){
-				read_material[super_index].integrator=false;
+				read_material[super_index].constrained=false;
 				return EXIT_SUCCESS;
 			}
 			else {
@@ -2891,6 +2913,20 @@ namespace vout{
 		stream << sim::constraint_theta << "\t";
 	}
 	
+	// Output Function 18
+	void material_constraint_phi(std::ostream& stream){
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stream << cmc::cmc_mat[mat].constraint_phi << "\t";
+		}
+	}
+	
+	// Output Function 19
+	void material_constraint_theta(std::ostream& stream){
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stream << cmc::cmc_mat[mat].constraint_theta << "\t";
+		}
+	}
+	
 	// Data output wrapper function
 	void data(){
 
@@ -2945,7 +2981,12 @@ namespace vout{
 				case 17:
 					vout::constraint_theta(vmag);
 					break;
-
+				case 18:
+					vout::material_constraint_phi(vmag);
+					break;
+				case 19:
+					vout::material_constraint_theta(vmag);
+					break;
 			}
 		}
 		
@@ -3000,6 +3041,12 @@ namespace vout{
 					break;
 				case 17:
 					vout::constraint_theta(std::cout);
+					break;
+				case 18:
+					vout::material_constraint_phi(std::cout);
+					break;
+				case 19:
+					vout::material_constraint_theta(std::cout);
 					break;
 			}
 		}

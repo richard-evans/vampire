@@ -34,7 +34,7 @@
 
 // local cmc namespace
 namespace cmc{
-
+	
 	std::vector<std::vector< int > > atom_list;
 	std::vector<cmc_material_t> cmc_mat;
 
@@ -165,14 +165,22 @@ void CMCMCinit(){
 		cmc::atom_list[mat].push_back(atom);
 	}
 	
-	// Initialise all spins along the constraint direction.
-	double sx=sin(sim::constraint_phi*M_PI/180.0)*cos(sim::constraint_theta*M_PI/180.0);
-	double sy=sin(sim::constraint_phi*M_PI/180.0)*sin(sim::constraint_theta*M_PI/180.0);
-	double sz=cos(sim::constraint_phi*M_PI/180.0);
+	// Initialise all spins along the constraint direction(s).
 	for(int atom =0;atom<atoms::num_atoms;atom++){
+		int imat=atoms::type_array[atom];
+		if(mp::material[imat].constrained==true){
+			double sx=sin(cmc::cmc_mat[imat].constraint_phi*M_PI/180.0)*cos(cmc::cmc_mat[imat].constraint_theta*M_PI/180.0);
+			double sy=sin(cmc::cmc_mat[imat].constraint_phi*M_PI/180.0)*sin(cmc::cmc_mat[imat].constraint_theta*M_PI/180.0);
+			double sz=cos(cmc::cmc_mat[imat].constraint_phi*M_PI/180.0);
 			atoms::x_spin_array[atom]=sx;
 			atoms::y_spin_array[atom]=sy;
 			atoms::z_spin_array[atom]=sz;
+		}
+		else{
+			atoms::x_spin_array[atom]=mp::material[imat].initial_spin[0];
+			atoms::y_spin_array[atom]=mp::material[imat].initial_spin[1];
+			atoms::z_spin_array[atom]=mp::material[imat].initial_spin[2];
+		}
 	}
 	
 	// disable thermal field calculation
@@ -254,7 +262,7 @@ int ConstrainedMonteCarloMonteCarlo(){
 		imat1=atoms::type_array[atom_number1];
 		
 		// check for constrained or unconstrained
-		if(mp::material[imat1].integrator==false){
+		if(mp::material[imat1].constrained==false){
 			// normal MC
 
 			// Save old spin position
@@ -351,10 +359,11 @@ int ConstrainedMonteCarloMonteCarlo(){
 		// Compute second move
 
 		// Randomly select spin number 2 (i/=j) of same material type
-		atom_number2 = int(mtrandom::grnd()*cmc::atom_list[imat1].size());
+		atom_number2 = cmc::atom_list[imat1][int(mtrandom::grnd()*cmc::atom_list[imat1].size())];
 		imat2=atoms::type_array[atom_number2];
 		if(imat1!=imat2){
 			std::cerr << "Error in MC/CMC integration! - atoms pairs are not from same material!" << std::endl;
+			
 			err::vexit();
 		}
 		

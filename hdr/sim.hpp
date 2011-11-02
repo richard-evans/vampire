@@ -113,6 +113,24 @@ namespace cmc{
 		
 		// vector magnetisation
 		double M_other[3];
+		
+	cmc_material_t():
+		constraint_phi(0.0),
+		constraint_phi_min(0.0),
+		constraint_phi_max(0.0),
+		constraint_phi_delta(5.0),
+		constraint_theta(0.0),
+		constraint_theta_min(0.0),
+		constraint_theta_max(0.0),
+		constraint_theta_delta(5.0)
+	
+	{
+
+	//for(int i=0;i<100;i++){
+	//	geometry_coords[i][0]=0.0;
+	//	geometry_coords[i][1]=0.0;
+	//}	
+}
 	};
 	
 	extern std::vector<cmc_material_t> cmc_mat;

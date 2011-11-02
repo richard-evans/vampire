@@ -196,7 +196,12 @@ int run(){
 			if(vmpi::my_rank==0) std::cout << "CMC-Anisotropy..." << std::endl; 
 			program::cmc_anisotropy();
 			break;
-		
+			
+		case 9:
+			if(vmpi::my_rank==0) std::cout << "Hybrid-CMC..." << std::endl; 
+			program::hybrid_cmc();
+			break;
+			
 		case 50:
 			if(vmpi::my_rank==0) std::cout << "Diagnostic-Boltzmann..." << std::endl; 
 			program::boltzmann_dist();

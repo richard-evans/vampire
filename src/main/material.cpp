@@ -32,7 +32,7 @@ materials_t::materials_t ():
 	Ku(0.0),
 	Ks(0.0),
 	H_th_sigma(0.0),
-	integrator(false)
+	constrained(false)
 	
 	{
 
