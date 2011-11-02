@@ -334,6 +334,14 @@ int integrate_serial(int n_steps){
 			}
 			break;
 
+		case 4: // Hybrid Constrained Monte Carlo
+			for(int ti=0;ti<n_steps;ti++){
+				sim::ConstrainedMonteCarloMonteCarlo();
+				// increment time
+				increment_time();
+			}
+			break;
+		
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);

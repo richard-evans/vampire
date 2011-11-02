@@ -97,6 +97,7 @@ obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
 obj/simulate/mc.o \
 obj/simulate/cmc.o \
+obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/utility/errors.o \

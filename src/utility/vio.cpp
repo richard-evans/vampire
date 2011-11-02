@@ -847,6 +847,11 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::integrator=3;
 				return EXIT_SUCCESS;
 			}
+			test="Hybrid-Constrained-Monte-Carlo";
+			if(value==test){
+				sim::integrator=4;
+				return EXIT_SUCCESS;
+			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"LLG-Heun\"" << std::endl;
