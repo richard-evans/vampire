@@ -230,7 +230,7 @@ inline double spin_uniaxial_energy(const int atom, const int imaterial, const do
 ///
 inline double spin_applied_field_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){;
 
-	return sim::H_applied*(sim::H_vec[0]*Sx + sim::H_vec[1]*Sy + sim::H_vec[2]*Sz);
+	return -sim::H_applied*(sim::H_vec[0]*Sx + sim::H_vec[1]*Sy + sim::H_vec[2]*Sz);
 
 }
 
