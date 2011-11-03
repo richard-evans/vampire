@@ -71,45 +71,8 @@ void hybrid_cmc(){
 		err::vexit();
 	}
 	
+	// resize cmc array to include correct number of materials
 	cmc::cmc_mat.resize(mp::num_materials);
-	
-	// set up material constraints
-	int mat=0;
-	cmc::cmc_mat[mat].constraint_phi=0.0;
-	cmc::cmc_mat[mat].constraint_phi_min=0.0;
-	cmc::cmc_mat[mat].constraint_phi_max=180.0;
-	cmc::cmc_mat[mat].constraint_phi_delta=5.0;
-
-	cmc::cmc_mat[mat].constraint_theta=0.0;
-	cmc::cmc_mat[mat].constraint_theta_min=0.0;
-	cmc::cmc_mat[mat].constraint_theta_max=0.0;
-	cmc::cmc_mat[mat].constraint_theta_delta=5.0;
-	mp::material[mat].constrained=true;
-	
-	mat=1;
-	cmc::cmc_mat[mat].constraint_phi=0.0;
-	cmc::cmc_mat[mat].constraint_phi_min=0.0;
-	cmc::cmc_mat[mat].constraint_phi_max=180.0;
-	cmc::cmc_mat[mat].constraint_phi_delta=5.0;
-
-	cmc::cmc_mat[mat].constraint_theta=0.0;
-	cmc::cmc_mat[mat].constraint_theta_min=0.0;
-	cmc::cmc_mat[mat].constraint_theta_max=0.0;
-	cmc::cmc_mat[mat].constraint_theta_delta=5.0;
-	mp::material[mat].constrained=true;
-	/*
-	mat=0;
-	cmc::cmc_mat[mat].constraint_phi=0.0;
-	cmc::cmc_mat[mat].constraint_phi_min=0.0;
-	cmc::cmc_mat[mat].constraint_phi_max=180.0;
-	cmc::cmc_mat[mat].constraint_phi_delta=5.0;
-
-	cmc::cmc_mat[mat].constraint_theta=0.0;
-	cmc::cmc_mat[mat].constraint_theta_min=0.0;
-	cmc::cmc_mat[mat].constraint_theta_max=0.0;
-	cmc::cmc_mat[mat].constraint_theta_delta=0.0;
-	mp::material[mat].integrator=true;*/
-	
 	
 	// loop over all materials
 	for (int mat=0;mat<mp::num_materials;mat++){

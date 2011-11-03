@@ -1936,7 +1936,8 @@ int read_mat_file(std::string const matfile){
 	
 	// resize temporary materials array for storage of variables
 	read_material.resize(mp::max_materials);
-
+	cmc::cmc_mat.resize(mp::max_materials);
+	
 	// Open file read only
 	inputfile.open(matfile.c_str());
 	
@@ -2542,6 +2543,118 @@ int match_material(string const word, string const value, string const unit, int
 			else {
 				std::cerr << "Error in input file - material[" << super_index << "]:constrained must be either true or false" << std::endl;
 				return EXIT_FAILURE;
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				cmc::cmc_mat[super_index].constraint_theta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				cmc::cmc_mat[super_index].constraint_theta_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				cmc::cmc_mat[super_index].constraint_theta_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				cmc::cmc_mat[super_index].constraint_theta_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				cmc::cmc_mat[super_index].constraint_phi_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				cmc::cmc_mat[super_index].constraint_phi=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				cmc::cmc_mat[super_index].constraint_phi_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				cmc::cmc_mat[super_index].constraint_phi_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
