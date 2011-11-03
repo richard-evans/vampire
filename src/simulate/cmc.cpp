@@ -362,7 +362,7 @@ int ConstrainedMonteCarlo(){
 						(M_other[2] + spin1_final[2] + spin2_final[2]- spin1_initial[2] - spin2_initial[2])*ppolar_vector[2];
 
 			// Check for lower energy state and accept unconditionally
-			if(delta_energy21<0.0) continue;
+			if((delta_energy21<0.0) && (Mz_new>=0.0)) continue;
 			
 			// Otherwise evaluate probability for move
 			else{

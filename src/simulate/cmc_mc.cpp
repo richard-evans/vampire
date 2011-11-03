@@ -177,9 +177,9 @@ void CMCMCinit(){
 			atoms::z_spin_array[atom]=sz;
 		}
 		else{
-			atoms::x_spin_array[atom]=mp::material[imat].initial_spin[0];
-			atoms::y_spin_array[atom]=mp::material[imat].initial_spin[1];
-			atoms::z_spin_array[atom]=mp::material[imat].initial_spin[2];
+			//atoms::x_spin_array[atom]=mp::material[imat].initial_spin[0];
+			//atoms::y_spin_array[atom]=mp::material[imat].initial_spin[1];
+			//atoms::z_spin_array[atom]=mp::material[imat].initial_spin[2];
 		}
 	}
 	
@@ -416,7 +416,7 @@ int ConstrainedMonteCarloMonteCarlo(){
 						(cmc::cmc_mat[imat].M_other[2] + spin1_final[2] + spin2_final[2]- spin1_initial[2] - spin2_initial[2])*cmc::cmc_mat[imat].ppolar_vector[2];
 
 			// Check for lower energy state and accept unconditionally
-			if(delta_energy21<0.0) continue;
+			if((delta_energy21<0.0) && (Mz_new>=0.0) ) continue;
 			
 			// Otherwise evaluate probability for move
 			else{
