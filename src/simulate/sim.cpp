@@ -196,7 +196,12 @@ int run(){
 			if(vmpi::my_rank==0) std::cout << "CMC-Anisotropy..." << std::endl; 
 			program::cmc_anisotropy();
 			break;
-		
+			
+		case 9:
+			if(vmpi::my_rank==0) std::cout << "Hybrid-CMC..." << std::endl; 
+			program::hybrid_cmc();
+			break;
+			
 		case 50:
 			if(vmpi::my_rank==0) std::cout << "Diagnostic-Boltzmann..." << std::endl; 
 			program::boltzmann_dist();
@@ -334,6 +339,14 @@ int integrate_serial(int n_steps){
 			}
 			break;
 
+		case 4: // Hybrid Constrained Monte Carlo
+			for(int ti=0;ti<n_steps;ti++){
+				sim::ConstrainedMonteCarloMonteCarlo();
+				// increment time
+				increment_time();
+			}
+			break;
+		
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);

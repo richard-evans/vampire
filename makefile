@@ -82,6 +82,7 @@ obj/program/curie_temperature.o \
 obj/program/diagnostics.o \
 obj/program/field_cool.o \
 obj/program/hamr.o \
+obj/program/hybrid_cmc.o \
 obj/program/hysteresis.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/static_hysteresis.o \
@@ -97,6 +98,7 @@ obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
 obj/simulate/mc.o \
 obj/simulate/cmc.o \
+obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/utility/errors.o \

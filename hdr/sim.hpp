@@ -79,10 +79,12 @@ namespace sim{
 	extern int LLG_Midpoint_cuda();
 	extern int MonteCarlo();
 	extern int ConstrainedMonteCarlo();
+	extern int ConstrainedMonteCarloMonteCarlo();
 	
 	// Integrator initialisers
 	extern void CMCinit();
 	extern int LLGinit();
+	extern void CMCMCinit();
 	
 	// Field and energy functions
 	extern double calculate_spin_energy(const int);
@@ -90,6 +92,52 @@ namespace sim{
 }
 
 namespace cmc{
+	
+	class cmc_material_t {
+	public:
+
+		double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
+		double constraint_phi_min; // loop angle min [degrees]
+		double constraint_phi_max; // loop angle max [degrees]
+		double constraint_phi_delta; // loop angle delta [degrees]
+
+		double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
+		double constraint_theta_min; // loop angle min [degrees]
+		double constraint_theta_max; // loop angle max [degrees]
+		double constraint_theta_delta; // loop angle delta [degrees]
+		
+		// performance optimised rotational matrices
+		double ppolar_vector[3];
+		double ppolar_matrix[3][3];
+		double ppolar_matrix_tp[3][3];
+		
+		// vector magnetisation
+		double M_other[3];
+		
+	cmc_material_t():
+		constraint_phi(0.0),
+		constraint_phi_min(0.0),
+		constraint_phi_max(0.0),
+		constraint_phi_delta(5.0),
+		constraint_theta(0.0),
+		constraint_theta_min(0.0),
+		constraint_theta_max(0.0),
+		constraint_theta_delta(5.0)
+	
+	{
+
+	//for(int i=0;i<100;i++){
+	//	geometry_coords[i][0]=0.0;
+	//	geometry_coords[i][1]=0.0;
+	//}	
+}
+	};
+	
+	extern std::vector<cmc_material_t> cmc_mat;
+	
+	extern bool is_initialised;
+	
+	extern std::vector<std::vector< int > > atom_list;
 	extern double mc_success;
 	extern double mc_total;
 	extern double sphere_reject;
