@@ -235,6 +235,8 @@ int ConstrainedMonteCarlo(){
 	double ppolar_vector[3];
 	double ppolar_matrix[3][3];
 	double ppolar_matrix_tp[3][3];
+	
+	double sigma = pow(1.0/kBTBohr,0.2)*0.08;
 
 	for (int i=0;i<3;i++){
 		ppolar_vector[i]=cmc::polar_vector[0][i];
@@ -273,9 +275,9 @@ int ConstrainedMonteCarlo(){
 		spin1_init_mvd[2]=ppolar_matrix[2][0]*spin1_initial[0]+ppolar_matrix[2][1]*spin1_initial[1]+ppolar_matrix[2][2]*spin1_initial[2];
 
 		// move spin randomly cf Pierre Asselin
-		spin1_final[0] = mtrandom::gaussian()+atoms::x_spin_array[atom_number1];
-		spin1_final[1] = mtrandom::gaussian()+atoms::y_spin_array[atom_number1];
-		spin1_final[2] = mtrandom::gaussian()+atoms::z_spin_array[atom_number1];
+		spin1_final[0] = mtrandom::gaussian()*sigma+atoms::x_spin_array[atom_number1];
+		spin1_final[1] = mtrandom::gaussian()*sigma+atoms::y_spin_array[atom_number1];
+		spin1_final[2] = mtrandom::gaussian()*sigma+atoms::z_spin_array[atom_number1];
 
 		sqrt_ran = 1.0/sqrt(spin1_final[0]*spin1_final[0] + spin1_final[1]*spin1_final[1] + spin1_final[2]*spin1_final[2]);
 
