@@ -364,13 +364,13 @@ int ConstrainedMonteCarlo(){
 						(M_other[2] + spin1_final[2] + spin2_final[2]- spin1_initial[2] - spin2_initial[2])*ppolar_vector[2];
 
 			// Check for lower energy state and accept unconditionally
-			if((delta_energy21<0.0) && (Mz_new>=0.0)) continue;
+			//if((delta_energy21<0.0) && (Mz_new>0.0)) continue;
 			
 			// Otherwise evaluate probability for move
-			else{
+			//else{
 				// If move is favorable then accept
 				probability = exp(-delta_energy21*kBTBohr)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
-				if((probability>=mtrandom::grnd()) && (Mz_new>=0.0) ){
+				if((probability>=mtrandom::grnd()) && (Mz_new>0.0) ){
 					M_other[0] = M_other[0] + spin1_final[0] + spin2_final[0] - spin1_initial[0] - spin2_initial[0];
 					M_other[1] = M_other[1] + spin1_final[1] + spin2_final[1] - spin1_initial[1] - spin2_initial[1];
 					M_other[2] = M_other[2] + spin1_final[2] + spin2_final[2] - spin1_initial[2] - spin2_initial[2];
@@ -389,7 +389,7 @@ int ConstrainedMonteCarlo(){
 
 					cmc::energy_reject += 1.0;
 				}
-			}
+			//}
 		}
 		// if s2 not on unit sphere
 		else{ 
