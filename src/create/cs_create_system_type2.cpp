@@ -43,6 +43,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	
 	int alloy(std::vector<cs::catom_t> &);
 	int intermixing(std::vector<cs::catom_t> &);
+	void dilute(std::vector<cs::catom_t> &);
 	//int particle_array(int,int**,int*);
 	//int hex_particle_array(int,int**,int*);
 	//int voronoi_film(int**,double*,int*);
@@ -100,6 +101,9 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		// call alloy function
 		alloy(catom_array);
 
+                // call dilution function
+		dilute(catom_array);
+		
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
 		
@@ -582,7 +586,19 @@ int intermixing(std::vector<cs::catom_t> & catom_array){
 	return EXIT_SUCCESS;    
 }
 
+void dilute (std::vector<cs::catom_t> & catom_array){
+    // check calling of routine if error checking is activated
+    if(err::check==true){std::cout << "cs::dilute has been called" << std::endl;}
+    
+    // loop over all atoms
+    for(unsigned int atom=0;atom<catom_array.size();atom++){
+      // if atom material is alloy master
+      int local_material=catom_array[atom].material;
+      double probability = mp::material[local_material].density;
+      if(mtrandom::grnd() > probability) catom_array[atom].include=false;
+    }
 
-
+    return;
+  }
 
 }
