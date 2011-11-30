@@ -36,9 +36,9 @@ namespace stats
 	extern double total_system_torque[3];
 	extern double total_mean_system_torque[3];
 	
-	extern std::vector <double> sublattice_torque_x_array;
-	extern std::vector <double> sublattice_torque_y_array;
-	extern std::vector <double> sublattice_torque_z_array;
+	extern std::vector <double> sublattice_mean_torque_x_array;
+	extern std::vector <double> sublattice_mean_torque_y_array;
+	extern std::vector <double> sublattice_mean_torque_z_array;
 
 	extern double torque_data_counter;
 }

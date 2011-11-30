@@ -68,9 +68,9 @@ namespace stats
 	double total_system_torque[3]={0.0,0.0,0.0};
 	double total_mean_system_torque[3]={0.0,0.0,0.0};
 	
-	std::vector <double> sublattice_torque_x_array(0);
-	std::vector <double> sublattice_torque_y_array(0);
-	std::vector <double> sublattice_torque_z_array(0);
+	std::vector <double> sublattice_mean_torque_x_array(0);
+	std::vector <double> sublattice_mean_torque_y_array(0);
+	std::vector <double> sublattice_mean_torque_z_array(0);
 	
 	double torque_data_counter=0.0;
 	
@@ -125,14 +125,16 @@ int mag_m(){
 
 	if(!stats::is_initialised){
 		// Resize arrays
-		stats::sublattice_mx_array.resize(mp::num_materials,0);
-		stats::sublattice_my_array.resize(mp::num_materials,0);
-		stats::sublattice_mz_array.resize(mp::num_materials,0);
-		stats::sublattice_magm_array.resize(mp::num_materials,0);
-		stats::sublattice_mean_magm_array.resize(mp::num_materials,0);
-		stats::sublattice_mom_array.resize(mp::num_materials,0);
+		stats::sublattice_mx_array.resize(mp::num_materials,0.0);
+		stats::sublattice_my_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mz_array.resize(mp::num_materials,0.0);
+		stats::sublattice_magm_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mean_magm_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mom_array.resize(mp::num_materials,0.0);
 		stats::sublattice_nm_array.resize(mp::num_materials,0);
-		
+		stats::sublattice_mean_torque_x_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mean_torque_y_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mean_torque_z_array.resize(mp::num_materials,0.0);
 		stats::max_moment=0.0;
 		
 		// Calculate number of moments in each sublattice
@@ -332,6 +334,11 @@ void mag_m_reset(){
 	stats::total_mean_system_torque[1]=0.0;
 	stats::total_mean_system_torque[2]=0.0;
 	
+	for(int mat=0;mat<mp::num_materials;mat++){
+		stats::sublattice_mean_torque_x_array[mat]=0.0;
+		stats::sublattice_mean_torque_y_array[mat]=0.0;
+		stats::sublattice_mean_torque_z_array[mat]=0.0;
+	}
 	stats::torque_data_counter=0.0;
 	
 }
@@ -416,11 +423,17 @@ void system_torque(){
 		torque[1] += S[2]*H[0]-S[0]*H[2];
 		torque[2] += S[0]*H[1]-S[1]*H[0];
 
+		stats::sublattice_mean_torque_x_array[imat]+=S[1]*H[2]-S[2]*H[1];
+		stats::sublattice_mean_torque_y_array[imat]+=S[2]*H[0]-S[0]*H[2];
+		stats::sublattice_mean_torque_z_array[imat]+=S[0]*H[1]-S[1]*H[0];
 	}
 
 	// reduce torque on all nodes
 	#ifdef MPICF
 		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&torque[0],3,MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_x_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_y_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_z_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
 	#endif
 
 	// Set stats values

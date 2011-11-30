@@ -1838,6 +1838,13 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(19);
 			return EXIT_SUCCESS;
 		}
+		else
+		test="material-mean-system-torque";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(20);
+			return EXIT_SUCCESS;
+		}
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
@@ -3039,7 +3046,15 @@ namespace vout{
 			stream << cmc::cmc_mat[mat].constraint_theta << "\t";
 		}
 	}
-	
+
+	// Output Function 20
+	void material_mean_systorque(std::ostream& stream){
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stream << stats::sublattice_mean_torque_x_array[mat]/stats::torque_data_counter << "\t";
+			stream << stats::sublattice_mean_torque_y_array[mat]/stats::torque_data_counter << "\t";
+			stream << stats::sublattice_mean_torque_z_array[mat]/stats::torque_data_counter << "\t";
+		}
+	}
 	// Data output wrapper function
 	void data(){
 
@@ -3099,6 +3114,9 @@ namespace vout{
 					break;
 				case 19:
 					vout::material_constraint_theta(vmag);
+					break;
+				case 20:
+					vout::material_mean_systorque(vmag);
 					break;
 			}
 		}
@@ -3160,6 +3178,9 @@ namespace vout{
 					break;
 				case 19:
 					vout::material_constraint_theta(std::cout);
+					break;
+				case 20:
+					vout::material_mean_systorque(std::cout);
 					break;
 			}
 		}
