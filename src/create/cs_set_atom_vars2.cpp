@@ -117,6 +117,13 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		atoms::neighbour_list_start_index[atom]=counter;
 		for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
 			atoms::neighbour_list_array[counter] = cneighbourlist[atom][nn].nn;
+			if(cneighbourlist[atom][nn].nn > atoms::num_atoms){
+				std::cerr << "Fatal Error - neighbour " << cneighbourlist[atom][nn].nn <<" is out of valid range 0-" 
+				<< atoms::num_atoms << " on rank " << vmpi::my_rank << std::endl;
+				std::cerr << "Atom " << atom << " of MPI type " << catom_array[atom].mpi_type << std::endl;
+				err::vexit;
+			}
+			
 			atoms::neighbour_interaction_type_array[counter] = cneighbourlist[atom][nn].i;
 			//std::cout << cneighbourlist[atom][nn] << " ";
 			counter++;
@@ -147,7 +154,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 					const int jmaterial=atoms::type_array[natom];
 					atoms::i_exchange_list.push_back(tmp_zval);
 					atoms::i_exchange_list[nn].Jij= mp::material[imaterial].Jij_matrix[jmaterial];
-					// reset interation id to neighbour number
+					// reset interation id to neighbour number - causes segfault if nn out of range
 					atoms::neighbour_interaction_type_array[nn]=nn;
 				}
 			}

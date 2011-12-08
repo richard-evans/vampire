@@ -636,7 +636,7 @@ int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<s
 	
 	// Find and mark boundary and unneeded halo atoms 
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		int my_mpi_type=catom_array[atom].mpi_type;
+		const int my_mpi_type=catom_array[atom].mpi_type;
 		bool boundary=false;
 		bool non_interacting_halo=true;
 		for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
@@ -648,7 +648,11 @@ int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<s
 			// Test for halo interacting with non-halo
 			if((my_mpi_type==2) && ((nn_mpi_type == 0) || (nn_mpi_type == 1))){
 				non_interacting_halo=false;
+				//std::cout << "Found interacting halo,     atom: " << atom << "\t MPI_t: " << my_mpi_type << " Neighbour: " << cneighbourlist[atom][nn].nn << "\t MPI_t: " <<  nn_mpi_type << " Flag: " << non_interacting_halo << std::endl;
+
 			}
+			//else 	std::cout << "Found non-interacting halo, atom: " << atom << "\t MPI_t: " << my_mpi_type << " Neighbour: " << cneighbourlist[atom][nn].nn << "\t MPI_t: " <<  nn_mpi_type << " Flag: " << non_interacting_halo << std::endl;
+	 
 		}
 		// Mark atoms appropriately
 		if((my_mpi_type==2) && (non_interacting_halo==true)){
@@ -716,18 +720,28 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 	vmpi::num_bdry_atoms=0;
 	vmpi::num_halo_atoms=0;
 
-	// Also need inverse array for reconstructing neighbour list
+	// Also need inverse array of atoms for reconstructing neighbour list
 	std::vector<int> inv_mpi_type_vec(catom_array.size());
 	
+	// loop over new atom list
 	for (unsigned int atom=0;atom<catom_array.size();atom++){
+		// store new atom number in array of old atom numbers
 		inv_mpi_type_vec[mpi_type_vec[atom].atom_number]=atom;
 
 		if(mpi_type_vec[atom].mpi_type !=3) new_num_atoms++;
 		if(mpi_type_vec[atom].mpi_type ==0) vmpi::num_core_atoms++;
 		if(mpi_type_vec[atom].mpi_type ==1) vmpi::num_bdry_atoms++;
 		if(mpi_type_vec[atom].mpi_type ==2) vmpi::num_halo_atoms++;
+				
 	}
 	
+	// Print out neighbourlist before sorting
+	//for (unsigned int atom=0;atom<catom_array.size();atom++){
+	//	std::cout << atom << " MPI_t: " <<  catom_array[atom].mpi_type << "NL: ";
+	//	for(int i=0;i<cneighbourlist[atom].size();i++) std::cout << cneighbourlist[atom][i].nn << "\t";
+	//	std::cout << " on rank " << vmpi::my_rank << std::endl;
+	//}
+		
 		//for (unsigned int atom=0;atom<catom_array.size();atom++){
 		//if(vmpi::my_rank==1){
 		//	std::cout << atom << " "<< inv_mpi_type_vec[atom] << " mpi type " << catom_array[atom].mpi_type << std::endl;
@@ -744,10 +758,9 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 		unsigned int old_atom_num = mpi_type_vec[atom].atom_number;
 		tmp_catom_array[atom]=catom_array[old_atom_num];
 		tmp_catom_array[atom].mpi_old_atom_number=old_atom_num; // Store old atom numbers for translation after sorting
-		//tmp_cneighbourlist.push_back(std::vector<int>());
 		tmp_cneighbourlist[atom].reserve(cneighbourlist[old_atom_num].size());
 		//Copy neighbourlist using new atom numbers
-		//if(vmpi::my_rank==1) std::cout << vmpi::my_rank << " old " << old_atom_num << " nn: ";
+		//if(vmpi::my_rank==0) std::cout << vmpi::my_rank << " old " << old_atom_num << " nn: ";
 		for(unsigned int nn=0;nn<cneighbourlist[old_atom_num].size();nn++){
 			unsigned int old_nn_number = cneighbourlist[old_atom_num][nn].nn;
 			unsigned int interaction_id= cneighbourlist[old_atom_num][nn].i;
@@ -755,20 +768,33 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 			cs::neighbour_t temp_nt;
 			temp_nt.nn=new_nn_number;
 			temp_nt.i=interaction_id;
+			// ignore all halo-x interactions but not x-halo
+			//if(!((mpi_type_vec[atom].mpi_type==2) && (mpi_type_vec[new_nn_number].mpi_type==2)))
+			if(!(mpi_type_vec[atom].mpi_type==2))
 			tmp_cneighbourlist[atom].push_back(temp_nt);
-			//if(vmpi::my_rank==1) std::cout << cneighbourlist[old_atom_num][nn] << "\t";
+			//else std::cerr << "ignoring interaction " << atom << "\t" << new_nn_number << " on " << vmpi::my_rank << std::endl;
+			//if(vmpi::my_rank==0) std::cout << cneighbourlist[old_atom_num][nn].nn << "\t";
 		}
-		//if(vmpi::my_rank==1) std::cout <<std::endl;
-		//if(vmpi::my_rank==1) std::cout << vmpi::my_rank << " new " << atom << " nn: ";
+		//if(vmpi::my_rank==0) std::cout <<std::endl;
+		//if(vmpi::my_rank==0) std::cout << vmpi::my_rank << " new " << atom << " nn: ";
 		//for(unsigned int nn=0;nn<tmp_cneighbourlist[atom].size();nn++){
-			//if(vmpi::my_rank==1) std::cout << tmp_cneighbourlist[atom][nn] << "\t";
+		//	if(vmpi::my_rank==0) std::cout << tmp_cneighbourlist[atom][nn].nn << "\t";
 		//}
-		//if(vmpi::my_rank==1) std::cout <<std::endl;
+		//if(vmpi::my_rank==0) std::cout <<std::endl;
 	}
 
 	// Copy tmp data over old data
 	catom_array=tmp_catom_array;
 	cneighbourlist=tmp_cneighbourlist; // This actually works(!) - COPIES both pointers and elements of pointers
+	
+	// Print out final neighbourlist
+	//for (unsigned int atom=0;atom<new_num_atoms;atom++){
+	//	std::cout << "Atom: " << atom << " MPI_type: " << catom_array[atom].mpi_type;
+	//	for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
+	//		std::cout << "\t" << cneighbourlist[atom][nn].nn;
+	//	}
+	//	std::cout << std::endl;
+	//}
 	
 	return EXIT_SUCCESS;
 }
