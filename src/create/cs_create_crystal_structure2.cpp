@@ -483,9 +483,9 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.interaction_range=1;
 			unit_cell.atom.resize(2);
 			//-----------------------------
-			unit_cell.atom[0].x=0.0;
-			unit_cell.atom[0].y=0.0;
-			unit_cell.atom[0].z=0.0;
+			unit_cell.atom[0].x=0;
+			unit_cell.atom[0].y=0;
+			unit_cell.atom[0].z=0;
 			unit_cell.atom[0].lc=0;
 			unit_cell.atom[0].hc=0;
 			//-----------------------------
@@ -495,6 +495,103 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.atom[1].lc=1;
 			unit_cell.atom[1].hc=1;
 			//-----------------------------
+			unit_cell.interaction.resize(16);
+			//-----------------------------
+			unit_cell.interaction[0].i=0;
+			unit_cell.interaction[0].j=1;
+			unit_cell.interaction[0].dx=-1;
+			unit_cell.interaction[0].dy=-1;
+			unit_cell.interaction[0].dz=-1;
+			//-----------------------------
+			unit_cell.interaction[1].i=0;
+			unit_cell.interaction[1].j=1;
+			unit_cell.interaction[1].dx=-1;
+			unit_cell.interaction[1].dy=-1;
+			unit_cell.interaction[1].dz=0;
+			//-----------------------------
+			unit_cell.interaction[2].i=0;
+			unit_cell.interaction[2].j=1;
+			unit_cell.interaction[2].dx=-1;
+			unit_cell.interaction[2].dy=0;
+			unit_cell.interaction[2].dz=-1;
+			//-----------------------------
+			unit_cell.interaction[3].i=0;
+			unit_cell.interaction[3].j=1;
+			unit_cell.interaction[3].dx=-1;
+			unit_cell.interaction[3].dy=0;
+			unit_cell.interaction[3].dz=0;
+			//-----------------------------
+			unit_cell.interaction[4].i=0;
+			unit_cell.interaction[4].j=1;
+			unit_cell.interaction[4].dx=0;
+			unit_cell.interaction[4].dy=-1;
+			unit_cell.interaction[4].dz=-1;
+			//-----------------------------
+			unit_cell.interaction[5].i=0;
+			unit_cell.interaction[5].j=1;
+			unit_cell.interaction[5].dx=0;
+			unit_cell.interaction[5].dy=-1;
+			unit_cell.interaction[5].dz=0;
+			//-----------------------------
+			unit_cell.interaction[6].i=0;
+			unit_cell.interaction[6].j=1;
+			unit_cell.interaction[6].dx=0;
+			unit_cell.interaction[6].dy=0;
+			unit_cell.interaction[6].dz=-1;
+			//-----------------------------
+			unit_cell.interaction[7].i=0;
+			unit_cell.interaction[7].j=1;
+			unit_cell.interaction[7].dx=0;
+			unit_cell.interaction[7].dy=0;
+			unit_cell.interaction[7].dz=0;
+			//-----------------------------
+			unit_cell.interaction[8].i=1;
+			unit_cell.interaction[8].j=0;
+			unit_cell.interaction[8].dx=0;
+			unit_cell.interaction[8].dy=0;
+			unit_cell.interaction[8].dz=0;
+			//-----------------------------
+			unit_cell.interaction[9].i=1;
+			unit_cell.interaction[9].j=0;
+			unit_cell.interaction[9].dx=0;
+			unit_cell.interaction[9].dy=0;
+			unit_cell.interaction[9].dz=1;
+			//-----------------------------
+			unit_cell.interaction[10].i=1;
+			unit_cell.interaction[10].j=0;
+			unit_cell.interaction[10].dx=0;
+			unit_cell.interaction[10].dy=1;
+			unit_cell.interaction[10].dz=0;
+			//-----------------------------
+			unit_cell.interaction[11].i=1;
+			unit_cell.interaction[11].j=0;
+			unit_cell.interaction[11].dx=0;
+			unit_cell.interaction[11].dy=1;
+			unit_cell.interaction[11].dz=1;
+			//-----------------------------
+			unit_cell.interaction[12].i=1;
+			unit_cell.interaction[12].j=0;
+			unit_cell.interaction[12].dx=1;
+			unit_cell.interaction[12].dy=0;
+			unit_cell.interaction[12].dz=0;
+			//-----------------------------
+			unit_cell.interaction[13].i=1;
+			unit_cell.interaction[13].j=0;
+			unit_cell.interaction[13].dx=1;
+			unit_cell.interaction[13].dy=0;
+			unit_cell.interaction[13].dz=1;
+			//-----------------------------
+			unit_cell.interaction[14].i=1;
+			unit_cell.interaction[14].j=0;
+			unit_cell.interaction[14].dx=1;
+			unit_cell.interaction[14].dy=1;
+			unit_cell.interaction[14].dz=0;
+			//-----------------------------
+			unit_cell.interaction[15].i=1;
+			unit_cell.interaction[15].j=0;
+			unit_cell.interaction[15].dx=1;
+			unit_cell.interaction[15].dy=1;
+			unit_cell.interaction[15].dz=1;
 		}
 		else if(cs::crystal_structure=="fct"){
 			unit_cell.lcsize=2;
