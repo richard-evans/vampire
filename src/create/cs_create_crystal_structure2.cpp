@@ -378,6 +378,8 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				}
 				// set interaction range
 				unit_cell.interaction_range=interaction_range;
+				// set exchange type
+				unit_cell.exchange_type=exc_type;
 				break;
 			default:
 				std::cerr << "Error! Unknown line type on line " << line_counter
@@ -389,6 +391,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	std::cout << "Done!" << std::endl;
 	std::cout << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
 	std::cout << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
+	std::cout << "\t" << "Exchange type: " exc_type << std::endl;
 	std::cout << "\t" << "Calculated interaction range: " << unit_cell.interaction_range << " Unit Cells" << std::endl;
 
 	return;
