@@ -1,0 +1,3 @@
+The mat or material directory includes various material files for zspin simulations. 
+Simply copy the desired files into the running directory and reference the in the zinput file.
+
