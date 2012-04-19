@@ -31,6 +31,7 @@
 #include "demag.hpp"
 #include "grains.hpp"
 #include "material.hpp"
+#include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
 #include "create.hpp"

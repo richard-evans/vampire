@@ -93,11 +93,10 @@ namespace cells{
 		//update total number of cells
 		cells::num_cells=ncellx*ncelly*ncellz;
 		
-		if(vmpi::my_rank==0){
-			std::cout << "Cells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
-			std::cout << "Total number of cells: " << cells::num_cells << std::endl;
-			std::cout << "Memory required for cell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
-		}
+		zlog << zTs() << "Cells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
+		zlog << zTs() << "Total number of cells: " << cells::num_cells << std::endl;
+		zlog << zTs() << "Memory required for cell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
+
 		// Determine number of cells in x,y,z
 		const int d[3]={ncellx,ncelly,ncellz};
 	
@@ -165,7 +164,7 @@ namespace cells{
 		delete [] supercell_array;
 		supercell_array=NULL;
 		}
-		catch(...){std::cout << "error deallocating supercell_array" << std::endl; err::vexit();}
+		catch(...){zlog << zTs() << "error deallocating supercell_array" << std::endl; err::vexit();}
 		
 		// Resize new cell arrays
 		cells::x_coord_array.resize(cells::num_cells,0.0);
@@ -238,7 +237,7 @@ namespace cells{
 			}
 		}
 		
-		std::cout << " Number of local cells on CPU " << vmpi::my_rank << " is: " << cells::num_local_cells << std::endl;
+		zlog << zTs() << "Number of local cells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
 		
 		cells::initialised=true;
 		

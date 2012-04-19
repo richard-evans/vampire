@@ -6,6 +6,11 @@
 
 #include <iostream> 
 
+#include <time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <vmpi.hpp>
+
 struct null_streambuf 
 : public std::streambuf 
 { 
@@ -14,13 +19,14 @@ struct null_streambuf
   } 
 }; 
 
-//==========================================================
 // Global Output Streams
-//==========================================================
-extern std::ofstream vinfo;
-extern std::ofstream vdp;
-extern std::ofstream vmag;
-extern std::ofstream vgrain;
+extern std::ofstream zinfo;
+extern std::ofstream zmag;
+extern std::ofstream zgrain;
+extern std::ofstream zlog;
+
+// global timestap function
+extern std::string zTs();
 
 namespace vin{
 	extern int read(std::string const);
@@ -54,6 +60,8 @@ namespace vout{
 	
 	extern void data();
 	extern void config();
+	extern void zLogTsInit(std::string);
+	
 	//extern int pov_file();
 
 	void redirect(std::ostream& strm, std::string filename);

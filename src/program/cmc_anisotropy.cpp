@@ -66,8 +66,7 @@ void cmc_anisotropy(){
 
 	// Check integrator is CMC, if not then exit disgracefully
 	if(sim::integrator!=3){
-		std::cerr << "Error! cmc-anisotropy program requires Constrained Monte Carlo as the integrator. Exiting." << std::endl; 
-		err::vexit();
+		err::zexit("Program CMC-anisotropy requires Constrained Monte Carlo as the integrator. Check input file.");
 	}
 	
 	// set minimum rotational angle

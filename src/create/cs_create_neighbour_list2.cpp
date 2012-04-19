@@ -22,6 +22,7 @@
 // Vampire Header files
 #include "create.hpp"
 #include "errors.hpp"
+#include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
 
@@ -92,7 +93,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	// Declare array for create space for 3D supercell array
 	std::vector<std::vector<std::vector<std::vector<int> > > > supercell_array;
 
-	std::cout << "Memory required for neighbourlist calculation:" << 8.0*double(d[0])*double(d[1])*double(d[2])*double(unit_cell.atom.size())/1.0e6 << " MB" << std::endl;
+	zlog << zTs() << "Memory required for neighbourlist calculation:" << 8.0*double(d[0])*double(d[1])*double(d[2])*double(unit_cell.atom.size())/1.0e6 << " MB" << std::endl;
 	supercell_array.resize(d[0]);
 	for(unsigned int i=0; i<d[0] ; i++){
 		supercell_array[i].resize(d[1]);

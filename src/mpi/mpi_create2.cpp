@@ -4,6 +4,7 @@
 #include "create.hpp"
 #include "material.hpp"
 #include "errors.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 #include <iostream>
 #include <list>
@@ -747,8 +748,12 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 		//	std::cout << atom << " "<< inv_mpi_type_vec[atom] << " mpi type " << catom_array[atom].mpi_type << std::endl;
 		//}
 		//}
-		std::cout << vmpi::num_core_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms + vmpi::num_halo_atoms << std::endl;
-	// create temporary catom and cneighbourlist arrays for copying data
+		//std::cout << vmpi::num_core_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms + vmpi::num_halo_atoms << std::endl;
+		zlog << zTs() << "Number of core  atoms: " << vmpi::num_core_atoms << std::endl;
+		zlog << zTs() << "Number of local atoms: " << vmpi::num_core_atoms +vmpi::num_bdry_atoms << std::endl;
+		zlog << zTs() << "Number of total atoms: " << vmpi::num_core_atoms +vmpi::num_bdry_atoms + vmpi::num_halo_atoms << std::endl;
+		
+		// create temporary catom and cneighbourlist arrays for copying data
 	std::vector <cs::catom_t> tmp_catom_array(new_num_atoms);
 	std::vector <std::vector <cs::neighbour_t> > tmp_cneighbourlist(new_num_atoms);
 	//tmp_cneighbourlist.reserve(new_num_atoms);

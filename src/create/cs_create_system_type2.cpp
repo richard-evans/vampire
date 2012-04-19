@@ -86,12 +86,12 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		case 4: // Grain Growth Method
 			//grain_growth(cs_num_atoms,cs_coord_array,particle_include_array,cs_atom_type_array);
 			std::cerr << "Grain growth not yet implemented, exiting" << std::endl;
-			exit(0);
+			err::vexit();
 			break;
 			
 		default:{
 			std::cerr << "Unknown system type requested, exiting" << std::endl;
-			exit (1);
+			err::vexit();
 			}
 		}
 

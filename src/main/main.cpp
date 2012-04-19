@@ -49,7 +49,10 @@ int main(int argc, char* argv[]){
 		vmpi::initialise();
 	#endif 
 	
-	//      Output Program Header
+	// Initialise log file
+	vout::zLogTsInit(std::string(argv[0]));
+		
+	// Output Program Header
 	if(vmpi::my_rank==0){
 		std::cout << "                                ___      _" << std::endl;
 		std::cout << "                            ___/ __|_ __(_)_ _" << std::endl;
@@ -74,9 +77,9 @@ int main(int argc, char* argv[]){
 		#endif
 		std::cout << std::endl;
 		std::cout << "================================================================================" << std::endl;
-    time_t rawtime = time(NULL);
-    struct tm * timeinfo = localtime(&rawtime);
-    std::cout<<asctime(timeinfo);
+		time_t rawtime = time(NULL);
+		struct tm * timeinfo = localtime(&rawtime);
+		std::cout<<asctime(timeinfo);
 	}
 
 
@@ -107,9 +110,13 @@ int main(int argc, char* argv[]){
 	// Finalise MPI
 	#ifdef MPICF
 		vmpi::finalise();
+		// concatenate log, sort, and appen departure message.
+		if(vmpi::num_processors!=1) system("ls zlog.* | xargs cat | sort -n > zlog");
 	#endif
 
-  return EXIT_SUCCESS;
+	zlog << zTs() << "Program ended gracefully. Exiting." << std::endl;
+
+	return EXIT_SUCCESS;
 }
 
 /// \mainpage Vampire

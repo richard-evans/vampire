@@ -106,7 +106,7 @@ obj/utility/statistics.o \
 obj/utility/vconfig.o \
 obj/utility/vio.o \
 obj/utility/vmath.o \
-obj/utility/units.o 
+obj/utility/units.o
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 IBM_OBJECTS=$(OBJECTS:.o=_ibm.o)

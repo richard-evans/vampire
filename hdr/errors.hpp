@@ -7,6 +7,8 @@ namespace err
 {
 	extern bool check;
 	extern void vexit();
+	extern void zexit(std::string);
+	
 }
 
 #endif /*ERRORS_H_*/

@@ -14,6 +14,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 
 
@@ -33,8 +34,10 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	//-------------------------------------------------
 
 	atoms::num_atoms = catom_array.size();
-	std::cout << "rank:\t" << vmpi::my_rank << "\tnum atoms:\t" << atoms::num_atoms-vmpi::num_halo_atoms << std::endl; 
+	zlog << zTs() << "Number of atoms generated on rank " << vmpi::my_rank << ": " << atoms::num_atoms-vmpi::num_halo_atoms << std::endl; 
+	zlog << zTs() << "Memory required for copying to performance array on rank " << vmpi::my_rank << ": " << 19.0*double(atoms::num_atoms)*8.0/1.0e6 << " MB RAM"<< std::endl; 
 
+	
 	atoms::x_coord_array.resize(atoms::num_atoms,0);
 	atoms::y_coord_array.resize(atoms::num_atoms,0);
 	atoms::z_coord_array.resize(atoms::num_atoms,0);
@@ -93,6 +96,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	// Create 1-D neighbourlist
 	//===========================================================
 
+	zlog << zTs() << "Memory required for creation of 1D neighbour list on rank " << vmpi::my_rank << ": ";
+	zlog << (2.0*double(atoms::num_atoms)+2.0*double(atoms::total_num_neighbours))*8.0/1.0e6 << " MB RAM"<< std::endl; 
+
 	//-------------------------------------------------
 	//	Calculate total number of neighbours
 	//-------------------------------------------------
@@ -145,7 +151,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		case -1:
 			// unroll material calculations
 			std::cout << "Using generic form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-			std::cout << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
 			atoms::i_exchange_list.reserve(atoms::neighbour_list_array.size());
 			// loop over all interactions
 			for(int atom=0;atom<atoms::num_atoms;atom++){
@@ -164,7 +170,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			break;
 		case 0:
 			std::cout << "Using isotropic form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-			std::cout << "Unrolled exchange template requires " << 1.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
 			// unroll isotopic interactions
 			atoms::i_exchange_list.reserve(unit_cell.interaction.size());
 			for(int i=0;i<unit_cell.interaction.size();i++){
@@ -176,7 +182,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			break;
 		case 1:
 			std::cout << "Using vectorial form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-			std::cout << "Unrolled exchange template requires " << 3.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
 			// unroll isotopic interactions
 			atoms::v_exchange_list.reserve(unit_cell.interaction.size());
 			for(int i=0;i<unit_cell.interaction.size();i++){
@@ -190,7 +196,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			break;
 		case 2:
 			std::cout << "Using tensorial form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-			std::cout << "Unrolled exchange template requires " << 9.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+			zlog << zTs() << "Unrolled exchange template requires " << 9.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
 			// unroll isotopic interactions
 			atoms::t_exchange_list.reserve(unit_cell.interaction.size());
 			for(int i=0;i<unit_cell.interaction.size();i++){
@@ -275,8 +281,8 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		}
 
 		
-		// Output statistics to screen
-		std::cout << sacounter << " surface atoms found" << std::endl;
+		// Output statistics to log file
+		zlog << zTs() << sacounter << " surface atoms found" << std::endl;
 		
 	} // end of surface anisotropy initialisation
 	// if not surface anisotropy then still identify surface atoms

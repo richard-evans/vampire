@@ -46,12 +46,123 @@
 #include <sstream>
 #include <string>
 
-//==========================================================
-// Global Output Streams
-//==========================================================
-//std::ofstream vinfo("info");
-//std::ofstream vdp("vdp");
-//std::ofstream vmag("vmag");
+// Global output filestreams
+std::ofstream vinfo("zinfo");
+std::ofstream zlog;
+std::ofstream vmag("zmag");
+std::ofstream vgrain("zgrain");
+
+
+namespace vout{
+	
+	std::string zLogProgramName; // Program Name
+	pid_t 		zLogPid; // Process ID
+	bool			zLogInitialised=false; // Initialised flag
+	
+	//const char * StringStream2ConstChar(std::stringstream file_sstr){
+	//	static std::string cfg_file = file_sstr.str();
+	//	return cfg_file.c_str();
+	//}
+	
+	void zLogTsInit(std::string tmp){
+		
+		// Get program name and process ID
+		std::string tmprev;
+		int linelength = tmp.length();
+
+		// set character triggers
+		const char* key="/";	// Word identifier
+
+		// copy characters after last /
+		for(int i=linelength-1;i>=0;i--){
+
+			char c=tmp.at(i);
+
+			if(c != *key){
+				tmprev.push_back(c);
+			}
+			else break;
+		}
+		
+		//reverse read into program name
+		linelength=tmprev.size();
+		for(int i=linelength-1;i>=0;i--){
+			char c=tmprev.at(i);
+			zLogProgramName.push_back(c);
+		}
+
+		// Now get process ID
+		zLogPid = getpid();
+		
+		// Remove previous log files
+		system("rm zlog*");
+		
+		// Set unique filename for log if num_procs > 1
+		std::stringstream logfn;
+		if(vmpi::num_processors==1) logfn << "zlog";
+		else logfn << "zlog."<<vmpi::my_rank;
+		
+		// Open log filename
+		std::string log_file = logfn.str();
+		const char* log_filec = log_file.c_str();
+		zlog.open(log_filec);
+		//zlog.open(StringStream2ConstChar(logfn));
+		
+		// Mark as initialised;
+		zLogInitialised=true;
+		
+		zlog << zTs() << "Logfile opened" << std::endl;
+		
+	}
+	
+}
+
+/// @brief Function to output timestamp to stream
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2012. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    19/04/2012
+///
+/// @return TS
+///
+/// @internal
+///	Created:		19/04/2012
+///	Revision:	  ---
+///=====================================================================================
+///
+std::string zTs(){
+	
+	if(vout::zLogInitialised==true){
+		std::ostringstream Ts;
+		
+		// varibale for time
+		time_t seconds;
+
+		// get current time
+		seconds = time (NULL);
+		struct tm * timeinfo;
+		char logtime [80];
+
+		timeinfo = localtime ( &seconds );
+		// Format time string
+		strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
+  
+		Ts << logtime << vout::zLogProgramName << " [" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
+	
+		return Ts.str();
+
+	}
+	else{
+		std::cerr << "Error! - zlog not initialised, exiting" << std::endl;
+		err::vexit();
+	}
+	
+}
 
 /// @namespace
 /// @brief Contains variables and functions for reading in program data.
@@ -2679,13 +2790,6 @@ int match_material(string const word, string const value, string const unit, int
 
 } // end of namespace vin 
 
-// Global output filestreams
-std::ofstream vinfo("info");
-std::ofstream vdp("vdp");
-std::ofstream vmag("vmag");
-std::ofstream vgrain("vgrain");
-
-
 namespace vout{
 	
 	// Namespace variable declarations
@@ -2708,7 +2812,7 @@ namespace vout{
 	void nullify(std::ostream& strm){
 		strm.rdbuf(&nullbuf);
 	}
-  
+	
 /*/// @brief Function to output atomistic resolution snapshots for povray
 ///
 /// @section License
