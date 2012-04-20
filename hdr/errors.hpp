@@ -1,3 +1,5 @@
+#include <string>
+
 #ifndef ERRORS_H_
 #define ERRORS_H_
 //==========================================================
