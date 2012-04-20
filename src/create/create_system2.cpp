@@ -234,9 +234,9 @@ int create(){
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 	int total_num_atoms=0;
 	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
-	if(vmpi::my_rank==0){
-	  std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
-	}
+	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
+	#else
+	std::cout << "Number of atoms generated: " << atoms::num_atoms << std::endl; 
 
 	#endif
 
