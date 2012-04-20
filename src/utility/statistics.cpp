@@ -74,8 +74,16 @@ namespace stats
 	
 	double torque_data_counter=0.0;
 	
+	// susceptibility (chi) calculation
+	bool CalculateSusceptibility=false;
+	double MeanChi[3]={0.0,0.0,0.0};
+	double MeanChiSquared[3]={0.0,0.0,0.0};
+	double MeanChiDataCounter=0.0;
+	double ChiAtoms=0;
+	
 	// function prototypes
 	void system_torque();
+	void SystemSusceptibility();
 	
 	bool is_initialised=false;
 
@@ -169,6 +177,9 @@ int mag_m(){
 	
 	// optionally calculate system torque
 	if(stats::calculate_torque==true) stats::system_torque();
+	
+	//optionally calculate system susceptibility
+	if(stats::CalculateSusceptibility==true) stats::SystemSusceptibility();
 	
 	//---------------------------------------------------------
 	// For single material, use streamlined version for speed
@@ -341,6 +352,16 @@ void mag_m_reset(){
 	}
 	stats::torque_data_counter=0.0;
 	
+	// Reset Chi Data
+	stats::MeanChi[0]=0.0;
+	stats::MeanChi[1]=0.0;
+	stats::MeanChi[2]=0.0;
+
+	stats::MeanChiSquared[0]=0.0;
+	stats::MeanChiSquared[1]=0.0;
+	stats::MeanChiSquared[2]=0.0;
+
+	stats::MeanChiDataCounter=0.0;
 }
 
 double max_torque(){
@@ -450,4 +471,56 @@ void system_torque(){
 
 }
 
+///
+/// @brief      Calculates the chi_l for the system
+///
+/// @return     void
+///
+void SystemSusceptibility(){
+
+	double chi[3]={0.0,0.0,0.0};
+	double chiM[3]={0.0,0.0,0.0};
+	int chi_atoms=stats::num_atoms;
+	
+	for(int atom=0;atom<stats::num_atoms;atom++){
+
+		// get atomic moment
+		const int imat=atoms::type_array[atom];
+		const double mu = mp::material[imat].mu_s_SI;
+		
+		chi[0]+=atoms::x_spin_array[atom];
+		chi[1]+=atoms::y_spin_array[atom];
+		chi[2]+=atoms::z_spin_array[atom];
+		
+	}
+
+	// reduce torque on all nodes
+	#ifdef MPICF
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&chi[0],3,MPI_DOUBLE,MPI_SUM);
+		//MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&chisq[0],3,MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&chi_atoms,1,MPI_INT,MPI_SUM);
+	#endif
+
+	stats::ChiAtoms=double(chi_atoms);
+	double norm = 1.0/stats::ChiAtoms;
+	
+	chiM[0]=chi[0]*norm;
+	chiM[1]=chi[1]*norm;
+	chiM[2]=chi[2]*norm;
+	
+	// Calculate running totals
+	stats::MeanChi[0]+=chiM[0];
+	stats::MeanChi[1]+=chiM[1];
+	stats::MeanChi[2]+=chiM[2];
+
+	stats::MeanChiSquared[0]+=chiM[0]*chiM[0];
+	stats::MeanChiSquared[1]+=chiM[1]*chiM[1];
+	stats::MeanChiSquared[2]+=chiM[2]*chiM[2];
+
+	stats::MeanChiDataCounter+=1.0;
+
+	return;
+
+}
+	
 } // End of Namespace

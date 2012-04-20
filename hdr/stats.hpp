@@ -41,4 +41,11 @@ namespace stats
 	extern std::vector <double> sublattice_mean_torque_z_array;
 
 	extern double torque_data_counter;
+	
+	extern double MeanChi[3];
+	extern double MeanChiSquared[3];
+	extern double MeanChiDataCounter;
+	extern double ChiAtoms;
+	extern bool CalculateSusceptibility;
+	
 }

@@ -1978,6 +1978,12 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(20);
 			return EXIT_SUCCESS;
 		}
+		test="mean-system-susceptibility";
+		if(word==test){
+			stats::CalculateSusceptibility=true;
+			output_list.push_back(21);
+			return EXIT_SUCCESS;
+		}
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
@@ -3181,6 +3187,20 @@ namespace vout{
 			stream << stats::sublattice_mean_torque_z_array[mat]/stats::torque_data_counter << "\t";
 		}
 	}
+
+	// Output Function 21
+	void MeanSystemSusceptibility(std::ostream& stream){
+
+		double Susx,Susy,Susz;
+		const double norm = mp::material[0].mu_s_SI*stats::ChiAtoms/(1.3806503e-23*sim::temperature);
+		
+		Susx = norm*(stats::MeanChiSquared[0]/stats::MeanChiDataCounter-stats::MeanChi[0]*stats::MeanChi[0]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
+		Susy = norm*(stats::MeanChiSquared[1]/stats::MeanChiDataCounter-stats::MeanChi[1]*stats::MeanChi[1]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
+		Susz = norm*(stats::MeanChiSquared[2]/stats::MeanChiDataCounter-stats::MeanChi[2]*stats::MeanChi[2]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
+		
+		stream << Susx << "\t" << Susy << "\t" << Susz << "\t";
+	}
+	
 	// Data output wrapper function
 	void data(){
 
@@ -3243,6 +3263,9 @@ namespace vout{
 					break;
 				case 20:
 					vout::material_mean_systorque(vmag);
+					break;
+				case 21:
+					vout::MeanSystemSusceptibility(vmag);
 					break;
 			}
 		}
@@ -3307,6 +3330,9 @@ namespace vout{
 					break;
 				case 20:
 					vout::material_mean_systorque(std::cout);
+					break;
+				case 21:
+					vout::MeanSystemSusceptibility(std::cout);
 					break;
 			}
 		}
