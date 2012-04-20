@@ -99,7 +99,7 @@ void two_temperature_pulse(){
 		Tp = ( G*(Te-Tp)     )*mp::dt_SI/Cl + Tp; // - (Tp-sim::Tmin)*3.0e11*mp::dt_SI;
 		
 		sim::temperature=Te;
-		vinfo << sim::time << "\t" << Te << "\t" << Tp << std::endl;
+		zinfo << sim::time << "\t" << Te << "\t" << Tp << std::endl;
 		
 		// Integrate system
 		sim::integrate(sim::partial_time);

@@ -47,9 +47,9 @@
 #include <string>
 
 // Global output filestreams
-std::ofstream vinfo("zinfo");
+std::ofstream zinfo("zinfo");
 std::ofstream zlog;
-std::ofstream vmag("zmag");
+std::ofstream zmag("zmag");
 std::ofstream vgrain("zgrain");
 
 
@@ -385,7 +385,7 @@ int match(string const key, string const word, string const value, string const 
 	// Test for data file output
 	//===================================================================
 	else
-	test="vmag";
+	test="zmag";
 	if(key==test){
 		int frs=vin::match_vout_list(word, line, vout::file_output_list);
 		return frs;
@@ -1988,7 +1988,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
-			std::cerr << "Error - Unknown control statement \'vmag:" << word << "\' on line " << line << " of input file" << std::endl;
+			std::cerr << "Error - Unknown control statement \'zmag:" << word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;
 		}
 		
@@ -3207,71 +3207,71 @@ namespace vout{
 		// check calling of routine if error checking is activated
 		if(err::check==true){std::cout << "vout::data has been called" << std::endl;}
 
-		// Output data to vmag
+		// Output data to zmag
 		for(unsigned int item=0;item<file_output_list.size();item++){
 			switch(file_output_list[item]){
 				case 0:
-					vout::time(vmag);
+					vout::time(zmag);
 					break;
 				case 1:
-					vout::real_time(vmag);
+					vout::real_time(zmag);
 					break;
 				case 2:
-					vout::temperature(vmag);
+					vout::temperature(zmag);
 					break;
 				case 3:
-					vout::Happ(vmag);
+					vout::Happ(zmag);
 					break;
 				case 4:
-					vout::Hvec(vmag);
+					vout::Hvec(zmag);
 					break;
 				case 5:
-					vout::mvec(vmag);
+					vout::mvec(zmag);
 					break;
 				case 6:
-					vout::magm(vmag);
+					vout::magm(zmag);
 					break;
 				case 7:
-					vout::mean_magm(vmag);
+					vout::mean_magm(zmag);
 					break;
 				case 8:
-					vout::mat_mvec(vmag);
+					vout::mat_mvec(zmag);
 					break;
 				case 9:
-					vout::mat_mean_magm(vmag);
+					vout::mat_mean_magm(zmag);
 					break;
 				case 12:
-					vout::mdoth(vmag);
+					vout::mdoth(zmag);
 					break;
 				case 14:
-					vout::systorque(vmag);
+					vout::systorque(zmag);
 					break;
 				case 15:
-					vout::mean_systorque(vmag);
+					vout::mean_systorque(zmag);
 					break;
 				case 16:
-					vout::constraint_phi(vmag);
+					vout::constraint_phi(zmag);
 					break;
 				case 17:
-					vout::constraint_theta(vmag);
+					vout::constraint_theta(zmag);
 					break;
 				case 18:
-					vout::material_constraint_phi(vmag);
+					vout::material_constraint_phi(zmag);
 					break;
 				case 19:
-					vout::material_constraint_theta(vmag);
+					vout::material_constraint_theta(zmag);
 					break;
 				case 20:
-					vout::material_mean_systorque(vmag);
+					vout::material_mean_systorque(zmag);
 					break;
 				case 21:
-					vout::MeanSystemSusceptibility(vmag);
+					vout::MeanSystemSusceptibility(zmag);
 					break;
 			}
 		}
 		
 		// Carriage return
-		if(file_output_list.size()>0) vmag << std::endl;
+		if(file_output_list.size()>0) zmag << std::endl;
 
 		// Output data to cout
 		if(vmpi::my_rank==0){

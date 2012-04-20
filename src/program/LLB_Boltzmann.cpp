@@ -118,7 +118,7 @@ int LLB_Boltzmann(){
 		std::cout << "\t" << atoms::z_spin_array[0];
 		std::cout << "\t" << mean_M/counter;
 		std::cout << std::endl;
-		vmag << sim::temperature << "\t" << mean_M/counter << std::endl;
+		zmag << sim::temperature << "\t" << mean_M/counter << std::endl;
 		std::ofstream pfile("LLBprob");
 		const double Tc = 661.1;
 		const double chi_para = chi_parallel(sim::temperature, Tc);
