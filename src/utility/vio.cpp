@@ -1592,12 +1592,34 @@ int match_sim(string const word, string const value, string const unit, int cons
 			test="replicated-data";
 			if(value==test){
 				vmpi::mpi_mode=1;
+				vmpi::replicated_data_staged=false;
+				return EXIT_SUCCESS;
+			}
+			test="replicated-data-staged";
+			if(value==test){
+				vmpi::mpi_mode=1;
+				vmpi::replicated_data_staged=true;
 				return EXIT_SUCCESS;
 			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"geometric-decomposition\"" << std::endl;
 				std::cerr << "\t\"replicated-data\"" << std::endl;
+				std::cerr << "\t\"replicated-data-staged\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="mpi-ppn";
+		if(word==test){
+			int ppn=atoi(value.c_str());
+			// Test for valid range
+			if((ppn>=0) && (ppn<=1024)){
+				vmpi::ppn=ppn;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1024" << std::endl;
 				err::vexit();
 			}
 		}

@@ -13,12 +13,15 @@
 
 namespace vmpi{
 	int mpi_mode=0;
+	int ppn=1;						///< Processors per node
 	int my_rank=0;
 	int num_processors=1;
 	int num_core_atoms;
 	int num_bdry_atoms;
 	int num_halo_atoms;
 
+	bool replicated_data_staged=false;
+	
 	char hostname[20];
 	double start_time;
 	double end_time;
@@ -787,11 +790,13 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 		//}
 		//if(vmpi::my_rank==0) std::cout <<std::endl;
 	}
-
-	// Copy tmp data over old data
-	catom_array=tmp_catom_array;
-	cneighbourlist=tmp_cneighbourlist; // This actually works(!) - COPIES both pointers and elements of pointers
 	
+
+		
+	// Swap tmp data over old data more efficient and saves memory
+	catom_array.swap(tmp_catom_array);
+	cneighbourlist.swap(tmp_cneighbourlist); // This actually works(!) - COPIES both pointers and elements of pointers
+
 	// Print out final neighbourlist
 	//for (unsigned int atom=0;atom<new_num_atoms;atom++){
 	//	std::cout << "Atom: " << atom << " MPI_type: " << catom_array[atom].mpi_type;

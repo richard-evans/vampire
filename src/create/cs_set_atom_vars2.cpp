@@ -36,7 +36,6 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::num_atoms = catom_array.size();
 	zlog << zTs() << "Number of atoms generated on rank " << vmpi::my_rank << ": " << atoms::num_atoms-vmpi::num_halo_atoms << std::endl; 
 	zlog << zTs() << "Memory required for copying to performance array on rank " << vmpi::my_rank << ": " << 19.0*double(atoms::num_atoms)*8.0/1.0e6 << " MB RAM"<< std::endl; 
-
 	
 	atoms::x_coord_array.resize(atoms::num_atoms,0);
 	atoms::y_coord_array.resize(atoms::num_atoms,0);
@@ -295,6 +294,12 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			}
 		}
 	}
+	
+	// Now nuke generation vectors to free memory NOW
+	std::vector<cs::catom_t> zerov; 
+	std::vector<std::vector <neighbour_t> > zerovv;
+	catom_array.swap(zerov);
+	cneighbourlist.swap(zerovv);
 	
 	return EXIT_SUCCESS;
 }

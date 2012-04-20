@@ -103,6 +103,50 @@ int create(){
 	if(cs::system_creation_flags[0]==1){
 		// read_coord_file();
 	}
+	
+	#ifdef MPICF
+	// check for staged replicated data generation
+	if(vmpi::replicated_data_staged==true && vmpi::mpi_mode==1){
+	
+		// copy ppn to constant temporary
+		const int ppn=vmpi::ppn;
+		
+		for(int n=0;n<ppn;n++){
+			bool i_am_it=false;
+			if(vmpi::my_rank%ppn==n) i_am_it=true;
+			
+			// Only generate system if I am it
+			if(i_am_it){
+				
+				zlog << zTs() << "Generating staged system on rank " << vmpi::my_rank << "..." << std::endl;
+				//std::cerr << zTs() << "Generating staged system on rank " << vmpi::my_rank << "..." << std::endl;
+				
+				// Create block of crystal of desired size
+				cs::create_crystal_structure(catom_array);
+				
+				// Cut system to the correct type, species etc
+				cs::create_system_type(catom_array);
+				
+				vmpi::set_replicated_data(catom_array);
+
+				// Create Neighbour list for system
+				cs::create_neighbourlist(catom_array,cneighbourlist);
+				
+				// Identify needed atoms and destroy the rest
+				vmpi::identify_boundary_atoms(catom_array,cneighbourlist);
+
+				zlog << zTs() << "Staged system generation on rank " << vmpi::my_rank << " completed." << std::endl;
+				//std::cerr << zTs() << "Staged system generation on rank " << vmpi::my_rank << " completed." << std::endl;
+			}
+			
+			// Wait for process who is it
+			MPI::COMM_WORLD.Barrier();
+			
+		} // end of loop over processes
+	}
+	else{
+	#endif
+	
 	// Create block of crystal of desired size
 	cs::create_crystal_structure(catom_array);
 	
@@ -112,8 +156,9 @@ int create(){
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		MPI::COMM_WORLD.Barrier();
+		MPI::COMM_WORLD.Barrier(); // wait for everyone
 		vmpi::copy_halo_atoms(catom_array);
+		MPI::COMM_WORLD.Barrier(); // sync after halo atoms copied
 	}
 	else if(vmpi::mpi_mode==1){
 		vmpi::set_replicated_data(catom_array);
@@ -126,23 +171,62 @@ int create(){
 	cs::create_neighbourlist(catom_array,cneighbourlist);
 	
 	#ifdef MPICF
-		MPI::COMM_WORLD.Barrier();
 		vmpi::identify_boundary_atoms(catom_array,cneighbourlist);
-		MPI::COMM_WORLD.Barrier();
+	#endif
+
+
+	#ifdef MPICF	
+	} // stop if for staged generation here
+	// ** Must be done in parallel **
 		vmpi::init_mpi_comms(catom_array);
 		MPI::COMM_WORLD.Barrier();
 	#endif
 
-	//      Set atom variables for simulation
-	cs::set_atom_vars(catom_array,cneighbourlist);
+	// Set atom variables for simulation
+	#ifdef MPICF
+	// check for staged replicated data generation
+	if(vmpi::replicated_data_staged==true && vmpi::mpi_mode==1){
+	
+		// copy ppn to constant temporary
+		const int ppn=vmpi::ppn;
+		
+		for(int n=0;n<ppn;n++){
+			bool i_am_it=false;
+			if(vmpi::my_rank%ppn==n) i_am_it=true;
+			
+			// Only generate system if I am it
+			if(i_am_it){
+				
+				zlog << zTs() << "Copying system data to optimised data structures on rank " << vmpi::my_rank << "..." << std::endl;
+				//std::cerr << zTs() << "Copying system data to optimised data structures on rank " << vmpi::my_rank << "..." << std::endl;
+				cs::set_atom_vars(catom_array,cneighbourlist);
+				zlog << zTs() << "Copying on rank " << vmpi::my_rank << " completed." << std::endl;
+				//std::cerr << zTs() << "Copying on rank " << vmpi::my_rank << " completed." << std::endl;
+			}
+			
+			// Wait for process who is it
+			MPI::COMM_WORLD.Barrier();
+			
+		} // end of loop over processes
+	}
+	else{
+	#endif
 
-	//      Set grain and cell variables for simulation
+	// Print informative message
+	std::cout << "Copying system data to optimised data structures." << std::endl;
+	zlog << zTs() << "Copying system data to optimised data structures." << std::endl;
+
+	cs::set_atom_vars(catom_array,cneighbourlist);
+	
+	#ifdef MPICF	
+	} // stop if for staged generation here
+	#endif
+
+	// Set grain and cell variables for simulation
 	grains::set_properties();
 	cells::initialise();
 	demag::init();
 	
-	//      Generate system files for storage
-	num_atoms=catom_array.size();
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
@@ -154,32 +238,7 @@ int create(){
 	  std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
 	}
 
-	#else
-		if(1==0){
-		std::ofstream xyz_file;
-		xyz_file.open ("crystal.xyz");
-		xyz_file << num_atoms+80 << std::endl;
-		xyz_file << "" << std::endl;
-	  	
-	  	for(int atom=0; atom<num_atoms; atom++){
-	  		xyz_file << material_parameters::material[catom_array[atom].material].element << "\t" << 
-	  					catom_array[atom].x << "\t" << 
-	  					catom_array[atom].y << "\t" << 
-	  					catom_array[atom].z << "\t" << std::endl;
-	  	}
-	
-		// Output axes
-		for (int i=0;i<100;i+=5){
-			xyz_file << "O\t" << float(i) << "\t" << 0.0 << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << 0.0 << "\t" << float(i) << "\t" << 0.0 << std::endl;
-	
-			xyz_file << "O\t" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << cs::system_dimensions[0]-float(i) << "\t" << 	cs::system_dimensions[1] << "\t" << 0.0 << std::endl;
-		}
-		
-		xyz_file.close();
-		}
-		#endif
+	#endif
 
 	return EXIT_SUCCESS;
 }
