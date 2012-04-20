@@ -95,7 +95,7 @@ namespace vout{
 		zLogPid = getpid();
 		
 		// Remove previous log files
-		system("rm zlog*");
+		//system("rm zlog*"); This doesn't work in parallel
 		
 		// Set unique filename for log if num_procs > 1
 		std::stringstream logfn;
