@@ -113,6 +113,7 @@ namespace vout{
 		
 		zlog << zTs() << "Logfile opened" << std::endl;
 		
+		return;
 	}
 	
 }
@@ -136,7 +137,10 @@ namespace vout{
 ///=====================================================================================
 ///
 std::string zTs(){
-	
+
+  std::string NullString;
+  NullString="";
+
 	if(vout::zLogInitialised==true){
 		std::ostringstream Ts;
 		
@@ -161,7 +165,8 @@ std::string zTs(){
 		std::cerr << "Error! - zlog not initialised, exiting" << std::endl;
 		err::vexit();
 	}
-	
+
+	return NullString;
 }
 
 /// @namespace
