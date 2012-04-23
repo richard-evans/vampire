@@ -166,12 +166,13 @@ void config(){
 		// Output masterfile header on root process
 		if(vmpi::my_rank==0){
 			// Get system date
-			char *asctime( const struct tm *time_ptr );
+		  time_t rawtime = time(NULL);
+		  struct tm * timeinfo = localtime(&rawtime);
 
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "# Atomistic spin configuration file for vampire"<< std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Date: "<< asctime << std::endl;
+			cfg_file_ofstr << "# Date: "<< asctime(timeinfo) << std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "Number of spins: "<< vout::total_output_atoms << std::endl;
 			cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
@@ -317,12 +318,13 @@ void config(){
 		// Output masterfile header on root process
 		if(vmpi::my_rank==0){
 			// Get system date
-			char *asctime( const struct tm *time_ptr );
+                  time_t rawtime = time(NULL);
+		  struct tm * timeinfo = localtime(&rawtime);
 
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "# Atomistic coordinates configuration file for vampire"<< std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Date: "<< asctime << std::endl;
+			cfg_file_ofstr << "# Date: "<< asctime(timeinfo) << std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "Number of atoms: "<< vout::total_output_atoms << std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
