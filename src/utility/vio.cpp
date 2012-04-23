@@ -2834,6 +2834,8 @@ namespace vout{
 	
 
 	std::ofstream errfile;
+
+  #ifdef MPICF
 	null_streambuf nullbuf;
 
 	void redirect(std::ostream& strm, std::string filename) {
@@ -2845,7 +2847,7 @@ namespace vout{
 	void nullify(std::ostream& strm){
 		strm.rdbuf(&nullbuf);
 	}
-	
+	#endif
 /*/// @brief Function to output atomistic resolution snapshots for povray
 ///
 /// @section License

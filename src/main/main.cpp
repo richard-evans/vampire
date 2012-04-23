@@ -87,11 +87,12 @@ int main(int argc, char* argv[]){
 		vmpi::hosts();
 	#endif 
   
+#ifdef MPICF
   // nullify non root cout stream
   if(vmpi::my_rank!=0){
     vout::nullify(std::cout);
   }
-  
+  #endif
   // redirect std::err to file
   //std::stringstream ss;
   //ss << "vampire."<<vmpi::my_rank<<".err";

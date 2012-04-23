@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <vmpi.hpp>
 
+#ifdef MPICF
 struct null_streambuf 
 : public std::streambuf 
 { 
@@ -18,6 +19,7 @@ struct null_streambuf
   { 
   } 
 }; 
+#endif
 
 // Global Output Streams
 extern std::ofstream zinfo;
