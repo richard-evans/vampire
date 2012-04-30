@@ -81,38 +81,38 @@ sim:constraint-angle-phi-delta=5.0
 #sim:program=Curie-Temperature
 sim:program=Benchmark
 #sim:program=Field-Cool
-sim:program=CMC-Anisotropy
+#sim:program=CMC-Anisotropy
 
 #sim:integrator=LLG-Midpoint
 sim:integrator=LLG-Heun
 #sim:integrator=Monte-Carlo
 
 # data output
-vmag:real-time
-vmag:constraint-theta
-vmag:constraint-phi
-vmag:temperature
-vmag:magnetisation
-vmag:mag-m
-vmag:mean-mag-m
-#vmag:system-torque
-#vmag:mean-system-torque
-vmag:mean-system-torque
+zmag:real-time
+#zmag:constraint-theta
+#zmag:constraint-phi
+zmag:temperature
+zmag:magnetisation
+zmag:mag-m
+#zmag:mean-mag-m
+#zmag:system-torque
+#zmag:mean-system-torque
+#zmag:mean-system-torque
 
 #screen:temperature
 screen:time
 #screen:mean-mag-m
 screen:mag-m
-screen:constraint-phi
+#screen:constraint-phi
 #screen:system-torque
 #screen:mean-system-torque
 
-#vgrain:output-rate=100
-#vgrain:real-time
-#vgrain:magnetisation
+#zgrain:output-rate=100
+#zgrain:real-time
+#zgrain:magnetisation
 
-config:atoms
-config:atoms-output-rate=10
+#config:atoms
+#config:atoms-output-rate=10
 #config:atoms-min-x=0.0
 #config:atoms-min-y=0.0
 #config:atoms-min-z=0.49

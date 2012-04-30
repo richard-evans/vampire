@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
 	//=============================================================
 	// Check for valid command-line arguments
 	//=============================================================
-	std::string infile="vinput";
+	std::string infile="zinput";
 	
 	for(int arg = 1; arg < argc; arg++){
 		std::string sw=argv[arg];
