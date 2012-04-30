@@ -99,6 +99,7 @@ public:
   MTRand() : MTRand_int32() {}
   MTRand(unsigned long seed) : MTRand_int32(seed) {}
   MTRand(const unsigned long* seed, int size) : MTRand_int32(seed, size) {}
+  unsigned long i32() { return rand_int32(); }
   ~MTRand() {}
   double operator()() {
     return static_cast<double>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32
