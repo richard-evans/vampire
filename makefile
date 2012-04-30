@@ -7,6 +7,7 @@
 voronoi_path='"qvoronoi"'
 
 export OMPI_CXX=g++
+#export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
