@@ -37,8 +37,8 @@ IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axSSE3 -ipo -static -fno-alias -align -falign-functions -I./hdr
-ICC_LDFLAGS= -ipo -I./hdr -axSSE3
+ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr
+ICC_LDFLAGS= -I./hdr -axSSE3
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
