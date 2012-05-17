@@ -154,8 +154,10 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 	if(err::check==true){std::cout << "cs::truncated_octahedron has been called" << std::endl;}
 
 	// Set truncated octahedron parameters
-	const double to_length = cs::particle_scale*0.5*3.0/2.0;
-	const double to_height = cs::particle_scale*0.5;
+	//const double to_length = cs::particle_scale*0.5*3.0/2.0;
+	//const double to_height = cs::particle_scale*0.5;
+        const double to_length = cs::particle_scale*0.5;
+	const double to_height = to_length*2.0/3.0;
 	double x_vector[3];
 	
 	// Loop over all atoms and mark atoms in truncate octahedron
