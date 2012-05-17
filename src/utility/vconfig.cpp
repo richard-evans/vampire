@@ -172,7 +172,7 @@ void config(){
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "# Atomistic spin configuration file for vampire"<< std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Date: "<< asctime(timeinfo) << std::endl;
+			cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "Number of spins: "<< vout::total_output_atoms << std::endl;
 			cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
@@ -324,7 +324,7 @@ void config(){
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "# Atomistic coordinates configuration file for vampire"<< std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Date: "<< asctime(timeinfo) << std::endl;
+			cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "Number of atoms: "<< vout::total_output_atoms << std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
