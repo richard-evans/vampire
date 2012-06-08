@@ -92,6 +92,7 @@ namespace demag{
 ///
 void init(){
 
+	std::cout << "Initialising demagnetisation tensor" << std::endl;
 	// check for calling of routine
 	if(err::check==true) std::cerr << "demag::set_rij_matrix has been called " << vmpi::my_rank << std::endl;
 	
@@ -102,7 +103,8 @@ void init(){
 		t1 = time (NULL);
 	
 		// Check memory requirements and print to screen
-		zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells*cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+		zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells)*double(cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+		std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells)*double(cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 		
 		// allocate arrays to store data [nloccell x ncells]
 		for(int lc=0;lc<cells::num_local_cells; lc++){

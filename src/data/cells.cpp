@@ -83,7 +83,7 @@ namespace cells{
 		cells::num_cells=0;
 		cells::num_local_cells=0;
 		
-		std::cout << "Cell size = " << cells::size << std::endl; 
+		zlog << zTs() << "Cell size = " << cells::size << std::endl; 
 		
 		// determine number of cells in each direction
 		unsigned int ncellx = static_cast<unsigned int>(ceil(cs::system_dimensions[0]/cells::size));
