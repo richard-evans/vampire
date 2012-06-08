@@ -231,6 +231,12 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	//-------------------------------------------------
 	if(sim::surface_anisotropy==true){
 
+		// initialise surface threshold if not overidden by input file
+		if(sim::surface_anisotropy_threshold==123456789) sim::surface_anisotropy_threshold=unit_cell.surface_threshold;
+		zlog << zTs() << "Using surface anisotropy for atoms with < threshold number of nearest neighbours" << std::endl;
+		zlog << zTs() << "Surface anisotropy threshold is " << sim::surface_anisotropy_threshold << std::endl;
+
+		
 		// initialise counters
 		int nncounter = 0; // number of nearest neighbours
 		int sacounter = 0; // number of surface atoms
@@ -274,14 +280,15 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 					atoms::eijz.push_back(eij[2]*invrij);
 					counter++;
 				}
+				// push back final start index only if atom is a surface atom
+				// [si x x x x x ][ei/si x x x x x][ei/si x x x x x]
+				atoms::nearest_neighbour_list_ei[atom]=counter;
 			}
-			// push back final start index
-			atoms::nearest_neighbour_list_ei[atom]=counter;
 		}
 
 		
 		// Output statistics to log file
-		zlog << zTs() << sacounter << " surface atoms found" << std::endl;
+		zlog << zTs() << sacounter << " surface atoms found." << std::endl;
 		
 	} // end of surface anisotropy initialisation
 	// if not surface anisotropy then still identify surface atoms

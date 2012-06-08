@@ -77,7 +77,7 @@ namespace sim{
 	
 	bool surface_anisotropy=false; // flag to enable surface anisotropy
 	bool identify_surface_atoms=true; // flag to idenify surface atoms in config coordinate file
-	unsigned int surface_anisotropy_threshold=6; // threshold for surface atoms
+	unsigned int surface_anisotropy_threshold=123456789; // threshold for surface atoms
 
 	
 	// Local function declarations

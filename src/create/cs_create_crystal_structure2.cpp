@@ -434,6 +434,7 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.hcsize=1;
 			unit_cell.interaction_range=1;
 			unit_cell.atom.resize(1);
+			unit_cell.surface_threshold=6;
 			//-----------------------------
 			unit_cell.atom[0].x=0.0;
 			unit_cell.atom[0].y=0.0;
@@ -485,6 +486,7 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.hcsize=2;
 			unit_cell.interaction_range=1;
 			unit_cell.atom.resize(2);
+			unit_cell.surface_threshold=8;
 			//-----------------------------
 			unit_cell.atom[0].x=0;
 			unit_cell.atom[0].y=0;
@@ -601,6 +603,7 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.hcsize=1;
 			unit_cell.interaction_range=1;
 			unit_cell.atom.resize(2);
+			unit_cell.surface_threshold=4;
 			//-----------------------------
 			unit_cell.atom[0].x=0.0;
 			unit_cell.atom[0].y=0.0;
@@ -620,6 +623,7 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.hcsize=2;
 			unit_cell.interaction_range=1;
 			unit_cell.atom.resize(4);
+			unit_cell.surface_threshold=12;
 			//-----------------------------
 			unit_cell.atom[0].x=0.0;
 			unit_cell.atom[0].y=0.0;

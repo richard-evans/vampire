@@ -84,6 +84,7 @@ namespace cs{
 		unsigned int lcsize; // number of local categories
 		unsigned int hcsize; // number of height categories
 		unsigned int interaction_range; // maximum range in unit cells
+		unsigned int surface_threshold; // threshold for surface atoms
 		int exchange_type; // -1=isotropic(local material), 0=isotropic, 1=vector, or 2=tensor
 
 		// list of atoms in each unit cell
