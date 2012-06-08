@@ -31,6 +31,7 @@
 #include "demag.hpp"
 #include "grains.hpp"
 #include "material.hpp"
+#include "sim.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
@@ -225,7 +226,7 @@ int create(){
 	// Set grain and cell variables for simulation
 	grains::set_properties();
 	cells::initialise();
-	demag::init();
+	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
 	
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF

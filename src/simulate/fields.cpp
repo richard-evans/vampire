@@ -378,12 +378,6 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "calculate_dipolar_fields has been called" << std::endl;}
-	
-	// Check for update of dipolar fields
-	//if(demag::update_counter%demag::update_rate==0){
-		
-		//demag::update_counter=0;
-		//}
 
 	// Add dipolar fields
 	for(int atom=start_index;atom<end_index;atom++){
@@ -391,8 +385,6 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
 		atoms::y_total_external_field_array[atom] += atoms::y_dipolar_field_array[atom];
 		atoms::z_total_external_field_array[atom] += atoms::z_dipolar_field_array[atom];
 	}
-	// Update counter
-	//demag::update_counter++;
 
 	return 0;
 }

@@ -107,7 +107,7 @@ namespace sim{
 		
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-		demag::update();
+		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
 	}
 	
 /// @brief Function to run one a single program
