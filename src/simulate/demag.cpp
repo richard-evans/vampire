@@ -2,15 +2,15 @@
 /// @file
 /// @brief Contains demag namespace and asssociated functions
 ///
-/// @details Demag between ceels uses the following format:
+/// @details Demag between cells uses the following format:
 ///          For each cell m = SUM(S.mu_s)
 ///
-///         mu_o     (  3.(m.r_hat)r_hat - m       m  )                4*pi e-7
-/// H = ---------- . ( ------------------------ - --- ),   prefactor = ---------- = e+23
-///       a^3        (         |r|^3               3  )                4*pi e-30
+///         mu_o     (  3.(m.r_hat)r_hat - m    [    m  ])                4*pi e-7
+/// H = ---------- . ( ------------------------ [ - --- ]),   prefactor = ---------- = e+23
+///       a^3        (         |r|^3            [    3  ])                4*pi e-30
 ///
 ///	An optional performaance optimisation can be made with the following matrix multiplication.
-///	This is enable by setting the flag demag::fast=true
+///	This is enabled by setting the flag demag::fast=true
 ///
 ///	H = prem * rij_matrix . m
 ///
@@ -53,6 +53,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <time.h>
 
 namespace demag{
 
@@ -96,10 +97,14 @@ void init(){
 	
 	if(demag::fast==true) {
 		
+		// timing function
+		time_t t1;
+		t1 = time (NULL);
+	
 		// Check memory requirements and print to screen
-		std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells*cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+		zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells*cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 		
-		// allocate arrays to store data
+		// allocate arrays to store data [nloccell x ncells]
 		for(int lc=0;lc<cells::num_local_cells; lc++){
 			
 			demag::rij_xx.push_back(std::vector<double>());
@@ -123,11 +128,12 @@ void init(){
 		}
 
 		// calculate matrix prefactors
-		std::cout << "Precalculating rij matrix for demag calculation... ";
+		zlog << zTs() << "Precalculating rij matrix for demag calculation... " << std::endl;
 		
 		// loop over local cells
 		for(int lc=0;lc<cells::num_local_cells;lc++){
 			
+			// reference global cell ID
 			int i = cells::local_cell_array[lc];
 			
 			// Loop over all other cells to calculate contribution to local cell 
@@ -146,20 +152,36 @@ void init(){
 
 					const double rij3 = rij*rij*rij;
 
-					rij_xx[i][j] = demag::prefactor*((3.0*ex*ex - 1.0)*rij3);
-					rij_xy[i][j] = demag::prefactor*(3.0*ex*ey)*rij3;
-					rij_xz[i][j] = demag::prefactor*(3.0*ex*ez)*rij3;
+					rij_xx[lc][j] = demag::prefactor*((3.0*ex*ex - 1.0)*rij3);
+					rij_xy[lc][j] = demag::prefactor*(3.0*ex*ey)*rij3;
+					rij_xz[lc][j] = demag::prefactor*(3.0*ex*ez)*rij3;
 
-					rij_yy[i][j] = demag::prefactor*((3.0*ey*ey - 1.0)*rij3);
-					rij_yz[i][j] = demag::prefactor*(3.0*ey*ez)*rij3;
-					rij_zz[i][j] = demag::prefactor*((3.0*ez*ez - 1.0)*rij3);
+					rij_yy[lc][j] = demag::prefactor*((3.0*ey*ey - 1.0)*rij3);
+					rij_yz[lc][j] = demag::prefactor*(3.0*ey*ez)*rij3;
+					rij_zz[lc][j] = demag::prefactor*((3.0*ez*ez - 1.0)*rij3);
 
 				}
 			}
 		}
 		
-		std::cout << "Done!" << std::endl;
+		time_t t2;
+		t2 = time (NULL);
+		zlog << zTs() << "Precalculation of rij matrix for demag calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
+		
 	}
+	
+	// timing function
+	time_t t1;
+	t1 = time (NULL);
+		
+	// now calculate fields
+	demag::update();
+
+	// timing function
+	time_t t2;
+	t2 = time (NULL);
+	zlog << zTs() << "Time required for demag update: " << t2-t1 << "s." << std::endl;
+	
 }
 	
 /// @brief Function to recalculate demag fields using fast update method
@@ -203,9 +225,9 @@ inline void fast_update(){
 			const double my = cells::y_mag_array[j];
 			const double mz = cells::z_mag_array[j];
 
-			cells::x_field_array[i]+=(mx*rij_xx[i][j] + my*rij_xy[i][j] + mz*rij_xz[i][j]);
-			cells::y_field_array[i]+=(mx*rij_xy[i][j] + my*rij_yy[i][j] + mz*rij_yz[i][j]);
-			cells::z_field_array[i]+=(mx*rij_xz[i][j] + my*rij_yz[i][j] + mz*rij_zz[i][j]);
+			cells::x_field_array[i]+=(mx*rij_xx[lc][j] + my*rij_xy[lc][j] + mz*rij_xz[lc][j]);
+			cells::y_field_array[i]+=(mx*rij_xy[lc][j] + my*rij_yy[lc][j] + mz*rij_yz[lc][j]);
+			cells::z_field_array[i]+=(mx*rij_xz[lc][j] + my*rij_yz[lc][j] + mz*rij_zz[lc][j]);
 				
 		}
 		
@@ -241,7 +263,7 @@ inline void std_update(){
 	
 	// check for callin of routine
 	if(err::check==true) std::cerr << "demag::std_update has been called " << vmpi::my_rank << std::endl;
-
+	
 	const double inv_three_cell_volume = -4.0*M_PI/(3.0*cells::size*cells::size*cells::size); // 1.0/(3*a*a*a)
 
 	//std::cout << cells::num_local_cells << std::endl;
@@ -249,6 +271,7 @@ inline void std_update(){
 	// loop over local cells
 	for(int lc=0;lc<cells::num_local_cells;lc++){
 		
+		// get global cell ID
 		int i = cells::local_cell_array[lc];
 
 		//std::cout << i << std::endl;
