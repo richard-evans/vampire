@@ -272,6 +272,34 @@ inline double spin_surface_anisotropy_energy(const int atom, const int imaterial
 	return energy;
 }
 
+/// @brief Calculates the magnetostatic energy for a single spin.
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2012. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    08/06/2012
+///
+/// @param[in] atom atom number 
+/// @param[in] imaterial material of local atom
+/// @param[in] Sx x-spin of local atom  
+/// @param[in] Sy y-spin of local atom 
+/// @param[in] Sz z-spin of local atom 
+/// @return magnetostatic energy
+///
+/// @internal
+///	Created:		08/06/2012
+///	Revision:	  ---
+///=====================================================================================
+///
+inline double spin_magnetostatic_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){
+	
+	return -1.0*(atoms::x_dipolar_field_array[atom]*Sx+atoms::y_dipolar_field_array[atom]*Sy+atoms::z_dipolar_field_array[atom]*Sz);
+}
+
 /// @brief Calculates the total energy for a single spin.
 ///
 /// @section License
@@ -312,6 +340,7 @@ double calculate_spin_energy(const int atom){
 	energy+=spin_applied_field_energy(atom, imaterial, Sx, Sy, Sz);
 	energy+=spin_uniaxial_energy(atom, imaterial, Sx, Sy, Sz);
 	energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);
+	energy+=spin_magnetostatic_energy(atom, imaterial, Sx, Sy, Sz);
 	
 	return energy; // Tesla
 }
