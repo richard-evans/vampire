@@ -19,6 +19,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
+#include "demag.hpp"
 #include "errors.hpp"
 #include "material.hpp"
 #include "random.hpp"
@@ -106,7 +107,7 @@ namespace sim{
 		
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-		
+		demag::update();
 	}
 	
 /// @brief Function to run one a single program

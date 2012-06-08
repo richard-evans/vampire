@@ -381,7 +381,7 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
 	
 	// Check for update of dipolar fields
 	//if(demag::update_counter%demag::update_rate==0){
-		demag::update();
+		
 		//demag::update_counter=0;
 		//}
 
