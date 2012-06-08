@@ -56,6 +56,7 @@ std::ofstream vgrain("zgrain");
 namespace vout{
 	
 	std::string zLogProgramName; // Program Name
+	std::string zLogHostName; // Host Name
 	pid_t 		zLogPid; // Process ID
 	bool			zLogInitialised=false; // Initialised flag
 	
@@ -91,6 +92,12 @@ namespace vout{
 			zLogProgramName.push_back(c);
 		}
 
+		// Get hostname
+		char loghostname [80];
+		int GHS=gethostname(loghostname, 80);
+		if(GHS!=0) std::cerr << "Warning: Unable to retrieve hostname for zlog file." << std::endl; 
+		zLogHostName = loghostname;
+		
 		// Now get process ID
 		zLogPid = getpid();
 		
@@ -156,7 +163,7 @@ std::string zTs(){
 		// Format time string
 		strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
   
-		Ts << logtime << vout::zLogProgramName << " [" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
+		Ts << logtime << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
 	
 		return Ts.str();
 
