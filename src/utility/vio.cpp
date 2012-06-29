@@ -1412,6 +1412,20 @@ int match_sim(string const word, string const value, string const unit, int cons
 				err::vexit();
 			}
 		}
+                //--------------------------------------------------------------------
+		test="heat-sink-coupling";
+		if(word==test){
+		  double hscc=atof(value.c_str());
+		  // Test for valid range
+		  if((hscc>=0.0) && (hscc<1.0E40)){
+		    sim::HeatSinkCouplingConstant=hscc;
+		    return EXIT_SUCCESS;
+		  }
+		  else{
+		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+		    err::vexit();
+		  }
+		}
 		//--------------------------------------------------------------------
 		test="cooling-function";
 		if(word==test){

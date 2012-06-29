@@ -70,7 +70,8 @@ namespace sim{
 	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
 	double pump_power=2.4e22;
 	double pump_time=20.0e-15; 
-	
+  double HeatSinkCouplingConstant=0.0; //1.1e12 ~ sensible value
+
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 

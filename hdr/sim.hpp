@@ -49,6 +49,7 @@ namespace sim{
 	extern int cooling_function_flag;
 	extern double pump_time;
 	extern double pump_power;
+        extern double HeatSinkCouplingConstant;
 	
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];

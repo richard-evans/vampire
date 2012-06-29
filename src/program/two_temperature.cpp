@@ -96,7 +96,7 @@ void two_temperature_pulse(){
 		double pump=sim::pump_power*exp(-((time_from_start-3.*sim::pump_time)/(sim::pump_time) )*((time_from_start-3.*sim::pump_time)/(sim::pump_time) ));
 
 		Te = (-G*(Te-Tp)+pump)*mp::dt_SI/(Ce*Te) + Te;
-		Tp = ( G*(Te-Tp)     )*mp::dt_SI/Cl + Tp; // - (Tp-sim::Tmin)*3.0e11*mp::dt_SI;
+		Tp = ( G*(Te-Tp)     )*mp::dt_SI/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*mp::dt_SI;
 		
 		sim::temperature=Te;
 		zinfo << sim::time << "\t" << Te << "\t" << Tp << std::endl;
