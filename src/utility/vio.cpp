@@ -585,7 +585,8 @@ int match_create(string const word, string const value, int const line){
 		test="voronoi-rounded";
 		if(word==test){
 			test="true";
-			if(value==test){
+			std::string blank="";
+			if(value==test || value==blank){
 				create_voronoi::rounded=true;
 				return EXIT_SUCCESS;
 			}
@@ -614,15 +615,6 @@ int match_create(string const word, string const value, int const line){
 		}
 		else
 		//-------------------------------------------------------------------
-		//-------------------------------------------------------------------
-		// system_creation_flags[3] - Set neighbourlist type
-		//-------------------------------------------------------------------
-		test="Jij-explicit";
-		if(word==test){
-			cs::system_creation_flags[3]=0;
-			return EXIT_SUCCESS;
-		}
-		else
 		//-------------------------------------------------------------------
 		// system_creation_flags[4] - Set Multilayer Flag
 		//-------------------------------------------------------------------
