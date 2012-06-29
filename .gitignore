@@ -32,3 +32,5 @@ zlog
 zgrain
 zlog.*
 zinfo
+zspin-parallel
+zspin-serial
