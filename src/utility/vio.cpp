@@ -50,7 +50,7 @@
 std::ofstream zinfo("zinfo");
 std::ofstream zlog;
 std::ofstream zmag("zmag");
-std::ofstream vgrain("zgrain");
+std::ofstream zgrain("zgrain");
 
 
 namespace vout{
@@ -415,7 +415,7 @@ int match(string const key, string const word, string const value, string const 
 	// Test for grain output
 	//===================================================================
 	else
-	test="vgrain";
+	test="zgrain";
 	if(key==test){
 		int frs=vin::match_vout_grain_list(word, value, line, vout::grain_output_list);
 		return frs;
@@ -2069,7 +2069,7 @@ int match_vout_grain_list(string const word, string const value, int const line,
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - vgrain:" << word << " on line " << line << " of input file must be greater than zero" << std::endl;
+				std::cerr << "Error - zgrain:" << word << " on line " << line << " of input file must be greater than zero" << std::endl;
 				err::vexit();
 			}
 		}
@@ -3360,40 +3360,40 @@ namespace vout{
 		// calculate grain magnetisations
 		grains::mag();
 		
-		// Output data to vgrain
+		// Output data to zgrain
 		if(vmpi::my_rank==0){
 			
 			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
 			switch(vout::grain_output_list[item]){
 				case 0:
-					vout::time(vgrain);
+					vout::time(zgrain);
 					break;
 				case 1:
-					vout::real_time(vgrain);
+					vout::real_time(zgrain);
 					break;
 				case 2:
-					vout::temperature(vgrain);
+					vout::temperature(zgrain);
 					break;
 				case 3:
-					vout::Happ(vgrain);
+					vout::Happ(zgrain);
 					break;
 				case 4:
-					vout::Hvec(vgrain);
+					vout::Hvec(zgrain);
 					break;
 				case 10:
-					vout::grain_mvec(vgrain);
+					vout::grain_mvec(zgrain);
 					break;
 				case 11:
-					vout::grain_magm(vgrain);
+					vout::grain_magm(zgrain);
 					break;
 				case 13:
-					vout::grain_mat_mvec(vgrain);
+					vout::grain_mat_mvec(zgrain);
 					break;
 			}
 		}
 		
 		// Carriage return
-		if(vout::grain_output_list.size()>0) vgrain << std::endl;
+		if(vout::grain_output_list.size()>0) zgrain << std::endl;
 		}
 		}
 		
