@@ -187,9 +187,6 @@ int mag_m(){
 	if(material_parameters::num_materials==1){
 		double m[3]={0.0,0.0,0.0};
 
-		// Calculate maximum moment for normalisation
-		stats::max_moment=stats::num_atoms*material_parameters::material[0].mu_s_SI;
-		
 		// Calculate total components
 		for(int atom=0;atom<stats::num_atoms;atom++){
 			m[0] += atoms::x_spin_array[atom];
