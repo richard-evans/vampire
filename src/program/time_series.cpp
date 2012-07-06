@@ -74,7 +74,7 @@ void time_series(){
 	sim::temperature=temp;
 		
 	// Perform Time Series
-	while(sim::time<sim::total_time){
+	while(sim::time<sim::equilibration_time+sim::total_time){
 
 		// Integrate system
 		sim::integrate(sim::partial_time);
