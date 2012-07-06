@@ -226,13 +226,14 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	unit_cell.interaction.resize(0);
 	unit_cell.atom.resize(0);
 	
+	// initialise surface threshold if not overidden by input file
+	if(sim::surface_anisotropy_threshold==123456789) sim::surface_anisotropy_threshold=unit_cell.surface_threshold;
+	
 	//-------------------------------------------------
 	//	Optionally set up surface anisotropy
 	//-------------------------------------------------
 	if(sim::surface_anisotropy==true){
 
-		// initialise surface threshold if not overidden by input file
-		if(sim::surface_anisotropy_threshold==123456789) sim::surface_anisotropy_threshold=unit_cell.surface_threshold;
 		zlog << zTs() << "Using surface anisotropy for atoms with < threshold number of nearest neighbours" << std::endl;
 		zlog << zTs() << "Surface anisotropy threshold is " << sim::surface_anisotropy_threshold << std::endl;
 
