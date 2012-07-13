@@ -187,7 +187,7 @@ namespace vin{
 // Function Prototypes
 //int read(string const);
 int match(string const, string const, string const, string const, int const);
-int read_mat_file(std::string const);
+  int read_mat_file(std::string const, int const);
 int match_create(std::string const, std::string const, int const);
 int match_dimension(std::string const, std::string const, std::string const, int const);
 int match_sim(std::string const, std::string const, std::string const, int const);
@@ -218,14 +218,24 @@ int match_config(string const, string const, int const);
 int read(string const filename){
 	// ifstream declaration
 	std::ifstream inputfile;
+
+	// Print informative message to zlog file
+	zlog << zTs() << "Opening main input file \"" << filename << "\"." << std::endl; 
 	
 	// Open file read only
 	inputfile.open(filename.c_str());
 	
 	// Check for opening
 	if(!inputfile.is_open()){
-		return EXIT_FAILURE;   // return to calling function for error checking or message
+	  std::cerr << "Error opening main input file \"" << filename << "\". File does not exist!" << std::endl;
+	  zlog << zTs() << "Error: Main input file \"" << filename << "\" cannot be opened or does not exist." << std::endl;
+	  zlog << zTs() << "If file exists then check file permissions to ensure it is readable by the user." << std::endl;
+	  err::vexit();   // return to calling function for error checking or message
 	}
+
+        // Print informative message to zlog file
+	zlog << zTs() << "Parsing system parameters from main input file." << std::endl;
+	
 	int line_counter=0;
 	// Loop over all lines and pass keyword to matching function
 	while (! inputfile.eof() ){
@@ -238,6 +248,9 @@ int read(string const filename){
 		line.erase(remove(line.begin(), line.end(), '\t'), line.end());
 		line.erase(remove(line.begin(), line.end(), ' '), line.end());
 
+		// clear carriage return for dos formatted files
+		line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+		
 		// strip key,word,unit,value
 		std::string key="";
 		std::string word="";
@@ -443,7 +456,7 @@ int match(string const key, string const word, string const value, string const 
 			test="";
 			if(matfile!=test){
 				//std::cout << matfile << std::endl;
-				read_mat_file(matfile);
+			  read_mat_file(matfile,line);
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -2135,7 +2148,7 @@ int match_vout_grain_list(string const word, string const value, int const line,
 //std::cout << "here" << std::endl;
   std::vector<mp::materials_t> read_material(0);
 
-int read_mat_file(std::string const matfile){
+  int read_mat_file(std::string const matfile, int const LineNumber){
 	
 	// Declare input stream
 	std::ifstream inputfile;
@@ -2144,12 +2157,17 @@ int read_mat_file(std::string const matfile){
 	read_material.resize(mp::max_materials);
 	cmc::cmc_mat.resize(mp::max_materials);
 	
+        // Print informative message to zlog file
+	zlog << zTs() << "Opening material file \"" << matfile << "\"." << std::endl;
+	
 	// Open file read only
 	inputfile.open(matfile.c_str());
 	
 	// Check for opening
 	if(!inputfile.is_open()){
-		std::cerr << "Error opening file " << matfile << "- file does not exist!" << std::endl; 
+		std::cerr << "Error opening material file " << matfile << ". File does not exist!" << std::endl;
+		zlog << zTs() << "Error: Material file \"" << matfile << "\" on line number " << LineNumber << " of input file cannot be opened or does not exist." << std::endl;
+		zlog << zTs() << "If file exists then check file permissions to ensure it is readable by the user." << std::endl; 
 		err::vexit();   // return to calling function for error checking or message
 	}
 	//-------------------------------------------------------
@@ -2157,6 +2175,8 @@ int read_mat_file(std::string const matfile){
 	//-------------------------------------------------------
 
 
+        // Print informative message to zlog file
+	zlog << zTs() << "Parsing material file for parameters." << std::endl;
 	
 	int line_counter=0;
 	// Loop over all lines and pass keyword to matching function
@@ -2171,6 +2191,9 @@ int read_mat_file(std::string const matfile){
 		line.erase(remove(line.begin(), line.end(), ' '), line.end());
 		line.erase(remove(line.begin(), line.end(), '\"'), line.end());
 
+		// remove carriage returns for dos formatted files
+                line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+		
 		// strip key,word,unit,value
 		std::string key="";
 		std::string word="";

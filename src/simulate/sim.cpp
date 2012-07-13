@@ -81,7 +81,7 @@ namespace sim{
 	int program=0; 
 	
 	bool surface_anisotropy=false; // flag to enable surface anisotropy
-	bool identify_surface_atoms=true; // flag to idenify surface atoms in config coordinate file
+	bool identify_surface_atoms=false; // flag to idenify surface atoms in config coordinate file
 	unsigned int surface_anisotropy_threshold=123456789; // threshold for surface atoms
 
 	

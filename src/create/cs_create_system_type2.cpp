@@ -9,6 +9,7 @@
 #include "grains.hpp"
 #include "material.hpp"
 #include "random.hpp"
+#include "vio.hpp"
 #include "vmath.hpp"
 
 #include <string>
@@ -507,12 +508,14 @@ int alloy(std::vector<cs::catom_t> & catom_array){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::alloy has been called" << std::endl;}	
 
+	zlog<< zTs() << "Determining alloy concentrations" << std::endl; 
 
 	// loop over all atoms
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		// if atom material is alloy master
+		// if atom material is alloy master then reassign according to % chance
 		int local_material=catom_array[atom].material;
 		if(mp::material[local_material].alloy_master==true){
+		  // now check for unordered alloy
 			if(mp::material[local_material].alloy_class==-1){
 				//loop over all potential alloy materials
 				for(int mat=0;mat<mp::num_materials;mat++){
@@ -522,13 +525,15 @@ int alloy(std::vector<cs::catom_t> & catom_array){
 					}
 				}
 			}
+			// if not ordered, then assume ordered
 			else{
 				// loop over all alloy materials
 				for(int mat=0;mat<mp::num_materials;mat++){
 					// get class of alloy material
 					int alloy_class = mp::material[mat].alloy_class;
 					// check for matching class and uc
-					// ----- DOES NOT WORK for > 1 alloy!! ------------
+					// ----- DOES NOT WORK for > 1 alloy!! 
+					// need to check for correct alloy master material ------------
 					if(catom_array[atom].uc_category==alloy_class){
 						// set material
 						catom_array[atom].material=mat;
@@ -537,7 +542,12 @@ int alloy(std::vector<cs::catom_t> & catom_array){
 			}
 		}
 	}
-				
+
+	// Determine number of atoms of each class and output to log
+	std::vector<unsigned int> MaterialNumbers(mp::num_materials,0);
+	for(unsigned int atom=0;atom<catom_array.size();atom++) MaterialNumbers.at(catom_array[atom].material)++;
+	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
+
 	return EXIT_SUCCESS;	
 }
 

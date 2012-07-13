@@ -25,6 +25,7 @@
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 
 #include <cmath>
@@ -154,6 +155,7 @@ int mag_m(){
 			// add to max_moment
 			stats::max_moment+=mp::material[mat].mu_s_SI;
 		}
+		
 		int nm=0;
 		// Calculate size of each moment and check num_moments
 		for(int mat=0;mat<mp::num_materials;mat++){
@@ -171,6 +173,10 @@ int mag_m(){
 			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_nm_array[0],mp::num_materials,MPI_INT,MPI_SUM);
 		#endif
 
+		// Output maximum moment to file
+		zlog << zTs() << "Maximum spin moment for sample is " << stats::max_moment << " [J/T]" << std::endl;
+		zlog << zTs() << "Maximum spin moment per atom is " << (stats::max_moment/double(stats::num_atoms))/9.27400915e-24 << " [mu_B/atom]" << std::endl;
+			
 		// Set initilaised flag to true
 		stats::is_initialised=true;
 	}	
@@ -187,9 +193,6 @@ int mag_m(){
 	if(material_parameters::num_materials==1){
 		double m[3]={0.0,0.0,0.0};
 
-		// Calculate maximum moment for normalisation
-		stats::max_moment=stats::num_atoms*material_parameters::material[0].mu_s_SI;
-		
 		// Calculate total components
 		for(int atom=0;atom<stats::num_atoms;atom++){
 			m[0] += atoms::x_spin_array[atom];
