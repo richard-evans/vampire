@@ -71,7 +71,10 @@ namespace sim{
 	double pump_power=2.4e22;
 	double pump_time=20.0e-15; 
   double HeatSinkCouplingConstant=0.0; //1.1e12 ~ sensible value
-
+  double TTCe = 7.0E02; //electron specific heat
+  double TTCl = 3.0E06; //phonon specific heat
+  double TTG = 17.0E17 ;//electron coupling constant
+  
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 

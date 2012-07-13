@@ -50,7 +50,10 @@ namespace sim{
 	extern double pump_time;
 	extern double pump_power;
         extern double HeatSinkCouplingConstant;
-	
+        extern double TTCe; //electron specific heat
+        extern double TTCl; //phonon specific heat
+        extern double TTG;//electron coupling constant    
+
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 	

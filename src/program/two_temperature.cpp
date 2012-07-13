@@ -54,16 +54,7 @@ void two_temperature_pulse(){
 	
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::two_temperature_pulse has been called" << std::endl;}
-	
-	const double Ce = 7.0E02; //electron specific heat 
-	const double Cl = 3.0E06; //phonon specific heat
-	const double G = 17.0E17 ;//electron coupling constant
-	const double Q = 1.0E10; // heatsink specific heat
-	const double K = 20.0E17; // phonon-heatsink coupling
-	
-	//double pump_time=20.0e-15; // Seconds //moved to sim
-	//double pump_power=2.4e22; // ? // moved to sim
-	
+		
 	// Set equilibration temperature and field
 	sim::temperature=sim::Teq;
 
@@ -95,8 +86,8 @@ void two_temperature_pulse(){
 		double time_from_start=mp::dt_SI*double(sim::time-start_time);
 		double pump=sim::pump_power*exp(-((time_from_start-3.*sim::pump_time)/(sim::pump_time) )*((time_from_start-3.*sim::pump_time)/(sim::pump_time) ));
 
-		Te = (-G*(Te-Tp)+pump)*mp::dt_SI/(Ce*Te) + Te;
-		Tp = ( G*(Te-Tp)     )*mp::dt_SI/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*mp::dt_SI;
+		Te = (-sim::TTG*(Te-Tp)+pump)*mp::dt_SI/(sim::TTCe*Te) + Te;
+		Tp = ( sim::TTG*(Te-Tp)     )*mp::dt_SI/sim::TTCl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*mp::dt_SI;
 		
 		sim::temperature=Te;
 		zinfo << sim::time << "\t" << Te << "\t" << Tp << std::endl;

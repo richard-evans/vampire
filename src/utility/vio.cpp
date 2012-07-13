@@ -1418,6 +1418,48 @@ int match_sim(string const word, string const value, string const unit, int cons
 		    err::vexit();
 		  }
 		}
+                //--------------------------------------------------------------------
+                test="two-temperature-electron-heat-capacity";
+		if(word==test){
+		  double hscc=atof(value.c_str());
+		  // Test for valid range
+		  if((hscc>=0.0) && (hscc<1.0E40)){
+		    sim::TTCe=hscc;
+		    return EXIT_SUCCESS;
+		  }
+		  else{
+		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+		    err::vexit();
+		  }
+		}
+                //--------------------------------------------------------------------
+		test="two-temperature-phonon-heat-capacity";
+		if(word==test){
+		  double hscc=atof(value.c_str());
+		  // Test for valid range
+		  if((hscc>=0.0) && (hscc<1.0E40)){
+		    sim::TTCl=hscc;
+		    return EXIT_SUCCESS;
+		  }
+		  else{
+		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+		    err::vexit();
+		  }
+		}
+                //--------------------------------------------------------------------
+		test="two-temperature-electron-phonon-coupling";
+		if(word==test){
+		  double hscc=atof(value.c_str());
+		  // Test for valid range
+		  if((hscc>=0.0) && (hscc<1.0E40)){
+		    sim::TTG=hscc;
+		    return EXIT_SUCCESS;
+		  }
+		  else{
+		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+		    err::vexit();
+		  }
+		}
 		//--------------------------------------------------------------------
 		test="cooling-function";
 		if(word==test){
