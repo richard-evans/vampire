@@ -119,7 +119,7 @@ int init(){
 	
 /// @brief Converts external units to internal units.
 ///
-/// @details Example usage @code units::convert(string "nm", double& var, string& unit_type) /@code
+/// @details Example usage units::convert(string "nm", double& var, string& unit_type)
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -167,6 +167,54 @@ int init(){
 		
 	}
 
+/// @brief Converts array of external units to internal units.
+///
+/// @details Example usage units::convert(string "nm", std::vector<double>& var, string& unit_type)
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, rfle500@york.ac.uk
+/// @version 1.0
+/// @date    21/07/2012
+///
+/// @param[in] input_unit name of unit to be converted
+/// @param[in] value vector of variables to be converted
+/// @param[out] type unit type, eg length, volume 
+/// @return EXIT_SUCCESS
+///
+/// @internal
+///	Created:		21/07/2012
+///	Revision:	  ---
+///=====================================================================================
+///
+	void convert(std::string input_unit, std::vector<double>& value, std::string& type){
+
+		// Populate unit array;
+		if(units::initialised==false){
+			units::init();
+		}
+		
+		// loop over all possible units
+		for(int i=0;i<max_units;i++){
+			if(input_unit==units::unit[i]){
+				// Convert unit
+				for(unsigned int idx=0; idx < value.size(); idx++) value.at(idx)*=conversion[i];
+				// Set unit type
+				type=units::type[i];
+
+				return;
+			}
+		}
+
+		// Error if unit not found
+		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
+		err::vexit();
+
+	}
+	
 /// @brief Reverts internal units to external units.
 ///
 /// @details Example usage @code units::revert(string "nm", double& var, string& unit_type) /@code

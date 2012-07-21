@@ -24,9 +24,13 @@ using std::string;
 		double magnetisation;
 		double Ku1_SI;
 		double Ku2_SI;
+		std::vector<double> KuVec_SI;
+		double Ku;
+		std::vector<double> KuVec;
 		double Kc1_SI;
 		double Kc2_SI;
 		double Ks_SI;
+		double Ks;
 		
 		double gamma_rel;
 		double Jij_matrix_SI[max_materials];
@@ -55,8 +59,6 @@ using std::string;
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
 		double Jij_matrix[max_materials];
-		double Ku;
-		double Ks;
 		double H_th_sigma;
 		bool constrained; // specifies primary or alternate integrator
 		

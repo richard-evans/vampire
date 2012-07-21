@@ -290,6 +290,76 @@ int set_derived_parameters(){
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
 																  (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
 
+		// Check for which anisotropy function(s) are to be used
+		if(sim::UniaxialVectorAnisotropy==true && sim::UniaxialTensorAnisotropy==false){
+			sim::UniaxialScalarAnisotropy=false; // turn off scalar anisotropy calculation
+			// loop over materials and convert all scalar anisotropy to vector (along z)
+			for(int mat=0;mat<mp::num_materials; mat++){
+				
+				const double one_o_mu=1.0/mp::material[mat].mu_s_SI;
+
+				if(mp::material.at(mat).KuVec_SI.size()==0){
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku);
+				}
+				else if(mp::material.at(mat).KuVec_SI.size()==3){
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(0)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(1)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(2)*one_o_mu);
+				}
+			}
+		}
+		
+		if(sim::UniaxialTensorAnisotropy==true){
+			sim::UniaxialScalarAnisotropy=false; // turn off scalar anisotropy calculation
+			sim::UniaxialScalarAnisotropy=false; // turn off vector anisotropy calculation
+			// loop over materials and convert all scalar anisotropy to tensor (along z)
+			for(int mat=0;mat<mp::num_materials; mat++){
+				
+				const double one_o_mu=1.0/mp::material[mat].mu_s_SI;
+
+				if(mp::material.at(mat).KuVec_SI.size()==0){
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(0.0);
+
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(0.0);
+
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku);
+				}
+				else if(mp::material.at(mat).KuVec_SI.size()==3){
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(0)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(0.0);
+
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(1)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(0.0);
+
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(2)*one_o_mu);
+				}
+				else if(mp::material.at(mat).KuVec_SI.size()==9){
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(0)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(1)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(2)*one_o_mu);
+
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(3)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(4)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(5)*one_o_mu);
+
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(6)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(7)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(8)*one_o_mu);
+				}
+			}
+		}
 		//std::cout << "checking range exclusivity" << std::endl;
 		// Check for exclusivity of range
 		if(material[mat].geometry!=0){

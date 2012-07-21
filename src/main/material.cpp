@@ -10,9 +10,13 @@ materials_t::materials_t ():
 	magnetisation(0.0),
 	Ku1_SI(0.0),
 	Ku2_SI(0.0),
+	KuVec_SI(0),
+	Ku(0.0),
+	KuVec(0),
 	Kc1_SI(0.0),
 	Kc2_SI(0.0),
 	Ks_SI(0.0),
+	Ks(0.0),
 	gamma_rel(1.0),
 	random_spins(false),
 	min(0.0),
@@ -29,8 +33,6 @@ materials_t::materials_t ():
 	anis_flag(true),
 	one_oneplusalpha_sq(0.5),
 	alpha_oneplusalpha_sq(0.5),
-	Ku(0.0),
-	Ks(0.0),
 	H_th_sigma(0.0),
 	constrained(false)
 	

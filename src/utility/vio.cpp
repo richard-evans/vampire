@@ -196,6 +196,29 @@ int match_vout_grain_list(std::string const, std::string const, int const, std::
 int match_material(string const, string const, string const, int const, int const, int const);
 int match_config(string const, string const, int const);
 
+// Function to extract all variables from a string and return a vector
+std::vector<double> DoublesFromString(std::string value){
+	
+	// array for stroing variables
+	std::vector<double> array(0);
+	
+	std::istringstream source(value);
+
+	double temp = 0.0;
+	std::string field;
+ 
+	while(getline(source,field,',')){
+		
+		std::stringstream fs( field );
+		fs >> temp;
+		array.push_back(temp);
+		std::cout << temp << std::endl;
+		
+	}
+	return array;
+	
+}
+
 /// @brief Function to read in variables from a file.
 ///
 /// @section License
@@ -2467,6 +2490,95 @@ int match_material(string const word, string const value, string const unit, int
 			if(unit_type==str){
 				// Set moment flag
 				read_material[super_index].Ku1_SI=K;
+				std::cerr << "Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
+		else
+		test="uniaxial-anisotropy-constant";
+		if(word==test){
+			double K=atof(value.c_str());
+			string unit_type="energy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+				//read_material[super_index].anis_flag=false;
+				//std::cout << "setting flag to false" << std::endl;
+			}
+			string str="energy";
+			if(unit_type==str){
+				// Set moment flag
+				read_material[super_index].Ku1_SI=K;
+				sim::UniaxialScalarAnisotropy=true;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
+		else
+		test="uniaxial-anisotropy-vector";
+		if(word==test){
+			std::vector<double> K(3);
+			// read values from string
+			K=DoublesFromString(value);
+			// check size
+			if(K.size()!=3){
+				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-vector must have three values." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-vector must have three values." << std::endl;
+				return EXIT_FAILURE;
+			}
+			string unit_type="energy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+				//read_material[super_index].anis_flag=false;
+				//std::cout << "setting flag to false" << std::endl;
+			}
+			string str="energy";
+			if(unit_type==str){
+				// Copy anisotropy vector to material
+				read_material[super_index].KuVec_SI=K;
+				sim::UniaxialVectorAnisotropy=true;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
+		else
+		test="uniaxial-anisotropy-tensor";
+		if(word==test){
+			std::vector<double> K;
+			// read values from string
+			K=DoublesFromString(value);
+			// check size
+			if(K.size()!=9){
+				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
+				return EXIT_FAILURE;
+			}
+			string unit_type="energy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+				//read_material[super_index].anis_flag=false;
+				//std::cout << "setting flag to false" << std::endl;
+			}
+			string str="energy";
+			if(unit_type==str){
+				// Copy anisotropy vector to material
+				read_material[super_index].KuVec_SI=K;
+				sim::UniaxialTensorAnisotropy=true;
 				return EXIT_SUCCESS;
 			}
 			else{
