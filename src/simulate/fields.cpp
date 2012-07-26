@@ -166,7 +166,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 					const double Jij[3][3]={atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][0],
 													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][1],
 													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][2],
-						
+
 													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][0],
 													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][1],
 													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][2],
@@ -183,24 +183,8 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 				}
 			}
 			break;
-	}
+		}
 
-	/*for(int atom=start_index;atom<end_index;atom++){
-		const int imaterial=atoms::type_array[atom];
-		//double tot[3]={0.0,0.0,0.0};
-		
-		
-		for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
-			
-			const int natom = atoms::neighbour_list_array[nn];
-			const int jmaterial=atoms::type_array[natom]; // 1D array?
-			const double Jij = material_parameters::material[imaterial].Jij_matrix[jmaterial];
-			atoms::x_total_spin_field_array[atom] -= Jij*atoms::x_spin_array[natom];
-			atoms::y_total_spin_field_array[atom] -= Jij*atoms::y_spin_array[natom];
-			atoms::z_total_spin_field_array[atom] -= Jij*atoms::z_spin_array[natom];
-			}
-	}*/
-	
 		return EXIT_SUCCESS;
 	}
 
@@ -211,21 +195,18 @@ int calculate_uniaxial_anis_fields(const int start_index,const int end_index){
 	//			Version 1.0 R Evans 20/10/2008
 	//======================================================
 
-	//const int num_atoms = atoms::num_atoms;
-
-	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
 	if(err::check==true){std::cout << "calculate_uniaxial_anis_fields has been called" << std::endl;}
 
+	// unroll Ku
+	std::vector<double> KuPre(0);
+	for(int mat=0;mat<mp::material.size();mat++) KuPre.push_back(2.0*mp::material[mat].Ku);
+	
 	for(int atom=start_index;atom<end_index;atom++){
 		const int imaterial=atoms::type_array[atom];
-		atoms::z_total_spin_field_array[atom] -= 2.0*mp::material[imaterial].Ku*atoms::z_spin_array[atom];
-		//std::cout << atom << "\tanisotropy fields\t" << mp::material[imaterial].Ku << "\t";
-		//std::cout << atoms::x_total_spin_field_array[atom] << "\t";
-		//std::cout << atoms::y_total_spin_field_array[atom] << "\t";
-		//std::cout << atoms::z_total_spin_field_array[atom] << std::endl;
+		atoms::z_total_spin_field_array[atom] -= KuPre[imaterial]*atoms::z_spin_array[atom];
 	}
+
 	return 0;
 }
 
@@ -325,44 +306,31 @@ int calculate_thermal_fields(const int start_index,const int end_index){
 	//======================================================
 	// 		Subroutine to calculate thermal fields
 	//
-	//			Version 1.0 R Evans 20/10/2009
+	//			Version 1.1 R Evans 26/07/2012
 	//======================================================
 
-	//const int num_atoms = atoms::num_atoms;
 	const double sqrt_T=sqrt(sim::temperature);
-	//----------------------------------------------------------
+
 	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
 	if(err::check==true){std::cout << "calculate_thermal_fields has been called" << std::endl;}
 
-        //const int num_atoms = atoms::num_atoms;
+	// unroll Sigma
+	std::vector<double> SigmaPre(0);
+	for(int mat=0;mat<mp::material.size();mat++) SigmaPre.push_back(sqrt_T*mp::material[mat].H_th_sigma);
 
-        //std::vector<double> tfield_array(3*num_atoms);
-	generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-        generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-        generate (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-	//generate (tfield_array.begin()+3*start_index,tfield_array.begin()+3*end_index, mtrandom::gaussian);
+ 	generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+	generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+	generate (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index, mtrandom::gaussian);
 
 	for(int atom=start_index;atom<end_index;atom++){
-		const int imaterial=atoms::type_array[atom];
-		const double H_th_sigma = sqrt_T*material_parameters::material[imaterial].H_th_sigma;
-		atoms::x_total_external_field_array[atom] *= H_th_sigma; //*mtrandom::gaussian();
-		atoms::y_total_external_field_array[atom] *= H_th_sigma; //*mtrandom::gaussian();
-		atoms::z_total_external_field_array[atom] *= H_th_sigma; //*mtrandom::gaussian();
-		//for(int i=0;i<3;i++){
-		//  tfield_array[3*atom+i]*=H_th_sigma;
-		//}
-		//atoms::x_total_external_field_array[atom]+=tfield_array[3*atom+0];
-                //atoms::y_total_external_field_array[atom]+=tfield_array[3*atom+1];
-		//atoms::z_total_external_field_array[atom]+=tfield_array[3*atom+2];
- 
-	}
 
-	//for(int atom=start_index;atom<end_index;atom++){
-	//  atoms::x_total_external_field_array[atom]+=tfield_array[3*atom+0];
-	//  atoms::y_total_external_field_array[atom]+=tfield_array[3*atom+1];
-	//  atoms::z_total_external_field_array[atom]+=tfield_array[3*atom+2];
-	//}
+		const int imaterial=atoms::type_array[atom];
+		const double H_th_sigma = SigmaPre[imaterial];
+
+		atoms::x_total_external_field_array[atom] *= H_th_sigma;
+		atoms::y_total_external_field_array[atom] *= H_th_sigma;
+		atoms::z_total_external_field_array[atom] *= H_th_sigma; 
+	}
 
 	return EXIT_SUCCESS;
 }
