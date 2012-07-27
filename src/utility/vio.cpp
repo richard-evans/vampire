@@ -731,6 +731,18 @@ int match_create(string const word, string const value, int const line){
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		else
+		test="select-material-by-height";
+		if(word==test){
+			cs::SelectMaterialByZHeight=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::SelectMaterialByZHeight=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{

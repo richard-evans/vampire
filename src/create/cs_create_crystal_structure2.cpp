@@ -23,6 +23,7 @@
 #include "create.hpp"
 #include "errors.hpp"
 #include "material.hpp"
+#include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
 
@@ -121,7 +122,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].y=cy;
 							catom_array[atom].z=cz;
 							//std::cout << atom << "\t" << cx << "\t" << cy <<"\t" << cz << std::endl;
-							catom_array[atom].material=0;
+							catom_array[atom].material=unit_cell.atom[uca].mat;
 							catom_array[atom].uc_id=uca;
 							catom_array[atom].lh_category=unit_cell.atom[uca].hc+z*maxlh;
 							catom_array[atom].uc_category=unit_cell.atom[uca].lc;
@@ -139,7 +140,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].x=cx;
 							catom_array[atom].y=cy;
 							catom_array[atom].z=cz;
-							catom_array[atom].material=0;
+							catom_array[atom].material=unit_cell.atom[uca].mat;
 							catom_array[atom].uc_id=uca;
 							catom_array[atom].lh_category=unit_cell.atom[uca].hc+z*maxlh;
 							catom_array[atom].uc_category=unit_cell.atom[uca].lc;
@@ -167,33 +168,41 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		tmp_catom_array.resize(0);
 	}
 	
-	// determine z-bounds for materials
-	std::vector<double> mat_min(mp::num_materials);
-	std::vector<double> mat_max(mp::num_materials);
 
-	for(int mat=0;mat<mp::num_materials;mat++){
-		mat_min[mat]=mp::material[mat].min*cs::system_dimensions[2];
-		mat_max[mat]=mp::material[mat].max*cs::system_dimensions[2];
-		if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
-	}
-	
-	// Assign materials to generated atoms
-	for(unsigned int atom=0;atom<catom_array.size();atom++){
+	// If z-height material selection is enabled then do so
+	if(cs::SelectMaterialByZHeight==true){
+		
+		// determine z-bounds for materials
+		std::vector<double> mat_min(mp::num_materials);
+		std::vector<double> mat_max(mp::num_materials);
+
 		for(int mat=0;mat<mp::num_materials;mat++){
-			const double cz=catom_array[atom].z;
-			if((cz>=mat_min[mat]) && (cz<mat_max[mat])){
-				catom_array[atom].material=mat;
-				catom_array[atom].include=true;
+			mat_min[mat]=mp::material[mat].min*cs::system_dimensions[2];
+			mat_max[mat]=mp::material[mat].max*cs::system_dimensions[2];
+			// alloys generally are not defined by height, and so have max = 0.0
+			if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
+		}
+		
+		// Assign materials to generated atoms
+		for(unsigned int atom=0;atom<catom_array.size();atom++){
+			for(int mat=0;mat<mp::num_materials;mat++){
+				const double cz=catom_array[atom].z;
+				if((cz>=mat_min[mat]) && (cz<mat_max[mat])){
+					catom_array[atom].material=mat;
+					catom_array[atom].include=true;
+				}
 			}
 		}
-	}
 
-	// Delete unneeded atoms
-	clear_atoms(catom_array);
+		// Delete unneeded atoms
+		clear_atoms(catom_array);
 		
+	}
+	
 	// Check to see if any atoms have been generated
 	if(atom==0){
 		std::cout << "Error - no atoms have been generated, increase system dimensions!" << std::endl;
+		zlog << zTs() << "Error: No atoms have been generated. Increase system dimensions." << std::endl;
 		err::vexit();
 	}
 
@@ -297,6 +306,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					getline(inputfile,atom_line);
 					std::istringstream atom_iss(atom_line,std::istringstream::in);
 					atom_iss >> id >> cx >> cy >> cz >> mat_id >> lcat_id >> hcat_id;
+					//std::cout << id << "\t" << cx << "\t" << cy << "\t" << cz<< "\t"  << mat_id << "\t" << lcat_id << "\t" << hcat_id << std::endl;
 					//inputfile >> id >> cx >> cy >> cz >> mat_id >> lcat_id >> hcat_id;
 					// now check for mostly sane input
 					if(cx>=0.0 && cx <=1.0) unit_cell.atom[i].x=cx;
@@ -362,6 +372,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 							break;
 						case 0:
 							int_iss >> unit_cell.interaction[i].Jij[0][0];
+							//std::cout << i << "\t" << unit_cell.interaction[i].Jij[0][0] << std::endl;
 							break;
 						case 1:
 							int_iss >> unit_cell.interaction[i].Jij[0][0] >> unit_cell.interaction[i].Jij[1][1] >> unit_cell.interaction[i].Jij[2][2];
@@ -388,11 +399,11 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		line_id++;
 	} // end of while loop
 	
-	std::cout << "Done!" << std::endl;
-	std::cout << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
-	std::cout << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
-	std::cout << "\t" << "Exchange type: " <<  unit_cell.exchange_type << std::endl;
-	std::cout << "\t" << "Calculated interaction range: " << unit_cell.interaction_range << " Unit Cells" << std::endl;
+	zlog << zTs() << "Done!" << std::endl;
+	zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
+	zlog << zTs() << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
+	zlog << zTs() << "\t" << "Exchange type: " <<  unit_cell.exchange_type << std::endl;
+	zlog << zTs() << "\t" << "Calculated interaction range: " << unit_cell.interaction_range << " Unit Cells" << std::endl;
 
 	return;
 }
