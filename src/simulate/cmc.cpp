@@ -236,8 +236,9 @@ int ConstrainedMonteCarlo(){
 	double ppolar_matrix[3][3];
 	double ppolar_matrix_tp[3][3];
 	
-	double sigma = pow(1.0/kBTBohr,0.2)*0.08;
-
+	const double sigma = pow(1.0/kBTBohr,0.2)*0.08;
+	const int AtomExchangeType=atoms::exchange_type;
+	
 	for (int i=0;i<3;i++){
 		ppolar_vector[i]=cmc::polar_vector[0][i];
 		for (int j=0;j<3;j++){
@@ -294,7 +295,7 @@ int ConstrainedMonteCarlo(){
 		//call calc_one_spin_energy(delta_energy1,spin1_final,atom_number1)
 
 		// Calculate current energy
-		Eold = sim::calculate_spin_energy(atom_number1);
+		Eold = sim::calculate_spin_energy(atom_number1, AtomExchangeType);
 			
 		// Copy new spin position (provisionally accept move)
 		atoms::x_spin_array[atom_number1] = spin1_final[0];
@@ -302,7 +303,7 @@ int ConstrainedMonteCarlo(){
 		atoms::z_spin_array[atom_number1] = spin1_final[2];
 
 		// Calculate new energy
-		Enew = sim::calculate_spin_energy(atom_number1);
+		Enew = sim::calculate_spin_energy(atom_number1, AtomExchangeType);
 			
 		// Calculate difference in Joules/mu_B
 		delta_energy1 = (Enew-Eold)*mp::material[imat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
@@ -340,7 +341,7 @@ int ConstrainedMonteCarlo(){
 
 			//Calculate Energy Difference 2
 			// Calculate current energy
-			Eold = sim::calculate_spin_energy(atom_number2);
+			Eold = sim::calculate_spin_energy(atom_number2, AtomExchangeType);
 			
 			// Copy new spin position (provisionally accept move)
 			atoms::x_spin_array[atom_number2] = spin2_final[0];
@@ -348,7 +349,7 @@ int ConstrainedMonteCarlo(){
 			atoms::z_spin_array[atom_number2] = spin2_final[2];
 
 			// Calculate new energy
-			Enew = sim::calculate_spin_energy(atom_number2);
+			Enew = sim::calculate_spin_energy(atom_number2, AtomExchangeType);
 			
 			// Calculate difference in Joules/mu_B
 			delta_energy2 = (Enew-Eold)*mp::material[imat2].mu_s_SI*1.07828231e23; //1/9.27400915e-24

@@ -97,7 +97,7 @@ namespace sim{
 	extern void CMCMCinit();
 	
 	// Field and energy functions
-	extern double calculate_spin_energy(const int);
+	extern double calculate_spin_energy(const int, const int);
 
 }
 

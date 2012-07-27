@@ -80,7 +80,8 @@ int MonteCarlo(){
 	double Eold=0.0;
 	double Enew=0.0;
 	double DE=0.0;
-	double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
+	const double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
+	const int AtomExchangeType=atoms::exchange_type;
 	
 	// loop over natoms to form a single Monte Carlo step
 	for(int i=0;i<nmoves; i++){
@@ -109,7 +110,7 @@ int MonteCarlo(){
 		Snew[2]*=r;
 
 		// Calculate current energy
-		Eold = sim::calculate_spin_energy(atom);
+		Eold = sim::calculate_spin_energy(atom, AtomExchangeType);
 		
 		// Copy new spin position
 		atoms::x_spin_array[atom] = Snew[0];
@@ -117,7 +118,7 @@ int MonteCarlo(){
 		atoms::z_spin_array[atom] = Snew[2];
 
 		// Calculate new energy
-		Enew = sim::calculate_spin_energy(atom);
+		Enew = sim::calculate_spin_energy(atom, AtomExchangeType);
 		
 		// Calculate difference in Joules/mu_B
 		DE = (Enew-Eold)*mp::material[imaterial].mu_s_SI*1.07828231e23; //1/9.27400915e-24
