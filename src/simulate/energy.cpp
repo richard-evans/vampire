@@ -163,7 +163,7 @@ inline double spin_exchange_energy_tensor(const int atom, const double Sx, const
 
 										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][0],
 										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][1],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2],};
+										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2]};
 				
 		const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
 		

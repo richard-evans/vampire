@@ -386,6 +386,8 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 							std::cerr << "Error! Requested exchange type " << exc_type << " on line " << line_counter
 					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0-2. Exiting" << std::endl; err::vexit();
 					}
+					// increment number of interactions for atom i
+					unit_cell.atom[iatom].ni++;
 				}
 				// set interaction range
 				unit_cell.interaction_range=interaction_range;
@@ -452,6 +454,7 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.atom[0].z=0.0;
 			unit_cell.atom[0].lc=0;
 			unit_cell.atom[0].hc=0;
+			unit_cell.atom[0].ni=6;
 			//-----------------------------
 			unit_cell.interaction.resize(6);
 			//-----------------------------
@@ -504,12 +507,14 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.atom[0].z=0;
 			unit_cell.atom[0].lc=0;
 			unit_cell.atom[0].hc=0;
+			unit_cell.atom[0].ni=8;
 			//-----------------------------
 			unit_cell.atom[1].x=0.5;
 			unit_cell.atom[1].y=0.5;
 			unit_cell.atom[1].z=0.5;
 			unit_cell.atom[1].lc=1;
 			unit_cell.atom[1].hc=1;
+			unit_cell.atom[1].ni=8;
 			//-----------------------------
 			unit_cell.interaction.resize(16);
 			//-----------------------------
@@ -621,12 +626,14 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.atom[0].z=0.0;
 			unit_cell.atom[0].lc=0;
 			unit_cell.atom[0].hc=0;
+			unit_cell.atom[0].ni=4;
 			//-----------------------------
 			unit_cell.atom[1].x=0.5;
 			unit_cell.atom[1].y=0.5;
 			unit_cell.atom[1].z=0.0;
 			unit_cell.atom[1].lc=1;
 			unit_cell.atom[1].hc=0;
+			unit_cell.atom[1].ni=4;
 			//-----------------------------
 		}
 		else if(cs::crystal_structure=="fcc"){
@@ -641,24 +648,28 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.atom[0].z=0.0;
 			unit_cell.atom[0].lc=0;
 			unit_cell.atom[0].hc=0;
+			unit_cell.atom[0].ni=12;
 			//-----------------------------
 			unit_cell.atom[1].x=0.5;
 			unit_cell.atom[1].y=0.5;
 			unit_cell.atom[1].z=0.0;
 			unit_cell.atom[1].lc=1;
 			unit_cell.atom[1].hc=0;
+			unit_cell.atom[1].ni=12;
 			//-----------------------------
 			unit_cell.atom[2].x=0.5;
 			unit_cell.atom[2].y=0.0;
 			unit_cell.atom[2].z=0.5;
 			unit_cell.atom[2].lc=2;
 			unit_cell.atom[2].hc=1;
+			unit_cell.atom[2].ni=12;
 			//-----------------------------
 			unit_cell.atom[3].x=0.0;
 			unit_cell.atom[3].y=0.5;
 			unit_cell.atom[3].z=0.5;
 			unit_cell.atom[3].lc=3;
 			unit_cell.atom[3].hc=1;
+			unit_cell.atom[3].ni=12;
 			//-----------------------------
 			unit_cell.interaction.resize(48);
 			//-----------------------------

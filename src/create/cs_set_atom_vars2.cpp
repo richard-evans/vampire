@@ -126,7 +126,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 				std::cerr << "Fatal Error - neighbour " << cneighbourlist[atom][nn].nn <<" is out of valid range 0-" 
 				<< atoms::num_atoms << " on rank " << vmpi::my_rank << std::endl;
 				std::cerr << "Atom " << atom << " of MPI type " << catom_array[atom].mpi_type << std::endl;
-				err::vexit;
+				err::vexit();
 			}
 			
 			atoms::neighbour_interaction_type_array[counter] = cneighbourlist[atom][nn].i;
@@ -172,7 +172,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
 			// unroll isotopic interactions
 			atoms::i_exchange_list.reserve(unit_cell.interaction.size());
-			for(int i=0;i<unit_cell.interaction.size();i++){
+			for(unsigned int i=0;i<unit_cell.interaction.size();i++){
 				int iatom = unit_cell.interaction[i].i;
 				int imat = unit_cell.atom[iatom].mat;
 				atoms::i_exchange_list.push_back(tmp_zval);
@@ -184,7 +184,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
 			// unroll isotopic interactions
 			atoms::v_exchange_list.reserve(unit_cell.interaction.size());
-			for(int i=0;i<unit_cell.interaction.size();i++){
+			for(unsigned int i=0;i<unit_cell.interaction.size();i++){
 				int iatom = unit_cell.interaction[i].i;
 				int imat = unit_cell.atom[iatom].mat;
 				atoms::v_exchange_list.push_back(tmp_zvec);
@@ -198,7 +198,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			zlog << zTs() << "Unrolled exchange template requires " << 9.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
 			// unroll isotopic interactions
 			atoms::t_exchange_list.reserve(unit_cell.interaction.size());
-			for(int i=0;i<unit_cell.interaction.size();i++){
+			for(unsigned int i=0;i<unit_cell.interaction.size();i++){
 				int iatom = unit_cell.interaction[i].i;
 				int imat = unit_cell.atom[iatom].mat;
 				atoms::t_exchange_list.push_back(tmp_zten);
@@ -222,21 +222,33 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			break;
 	}
 	
-	// now remove unit cell interactions data
-	unit_cell.interaction.resize(0);
-	unit_cell.atom.resize(0);
-	
 	// initialise surface threshold if not overidden by input file
 	if(sim::surface_anisotropy_threshold==123456789) sim::surface_anisotropy_threshold=unit_cell.surface_threshold;
 	
 	//-------------------------------------------------
 	//	Optionally set up surface anisotropy
 	//-------------------------------------------------
+
+	// create temporary array for storing surface threshold
+	zlog << zTs() << "Initialising surface identification threshold." << std::endl;
+	std::vector<unsigned int> surface_anisotropy_threshold_array(atoms::num_atoms, sim::surface_anisotropy_threshold);
+	std::cout << "here" << std::endl;
+	// if using native (local) surface threshold then repopulate threshold array
+	if(sim::NativeSurfaceAnisotropyThreshold){
+		for(int atom=0;atom<atoms::num_atoms;atom++){
+			unsigned int atom_uc_id=catom_array.at(atom).uc_id;
+			surface_anisotropy_threshold_array.at(atom)=unit_cell.atom.at(atom_uc_id).ni;
+		}
+	}
 	if(sim::surface_anisotropy==true){
 
-		zlog << zTs() << "Using surface anisotropy for atoms with < threshold number of nearest neighbours" << std::endl;
-		zlog << zTs() << "Surface anisotropy threshold is " << sim::surface_anisotropy_threshold << std::endl;
-
+		zlog << zTs() << "Using surface anisotropy for atoms with < threshold number of nearest neighbours." << std::endl;
+		if(sim::NativeSurfaceAnisotropyThreshold){
+			zlog << zTs() << "Surface anisotropy threshold is native (site dependent)." << std::endl;
+		}
+		else{
+			zlog << zTs() << "Surface anisotropy threshold is " << sim::surface_anisotropy_threshold << std::endl;
+		}
 		
 		// initialise counters
 		int nncounter = 0; // number of nearest neighbours
@@ -244,7 +256,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 
 		// loop over all atoms and count number of surface atoms
 		for(int atom=0;atom<atoms::num_atoms;atom++){
-			if(cneighbourlist[atom].size()<sim::surface_anisotropy_threshold){
+			if(cneighbourlist[atom].size()<surface_anisotropy_threshold_array.at(atom)){
 				sacounter++;
 				nncounter+=cneighbourlist[atom].size();
 			}
@@ -263,7 +275,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			atoms::surface_array[atom]=false;
 			atoms::nearest_neighbour_list_si[atom]=0;
 			atoms::nearest_neighbour_list_ei[atom]=0;
-			if(cneighbourlist[atom].size()<sim::surface_anisotropy_threshold){
+			if(cneighbourlist[atom].size()<surface_anisotropy_threshold_array.at(atom)){
 				// identify atom as surface
 				atoms::surface_array[atom]=true;
 				// Set start index
@@ -296,12 +308,16 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	else{
 		atoms::surface_array.resize(atoms::num_atoms);
 		for(int atom=0;atom<atoms::num_atoms;atom++){
-			if(cneighbourlist[atom].size()<sim::surface_anisotropy_threshold){
+			if(cneighbourlist[atom].size()<surface_anisotropy_threshold_array.at(atom)){
 				// identify atom as surface
 				atoms::surface_array[atom]=true;
 			}
 		}
 	}
+
+	// now remove unit cell interactions data
+	unit_cell.interaction.resize(0);
+	unit_cell.atom.resize(0);
 	
 	// Now nuke generation vectors to free memory NOW
 	std::vector<cs::catom_t> zerov; 

@@ -83,8 +83,9 @@ namespace sim{
 	
 	bool surface_anisotropy=false; // flag to enable surface anisotropy
 	bool identify_surface_atoms=false; // flag to idenify surface atoms in config coordinate file
-	unsigned int surface_anisotropy_threshold=123456789; // threshold for surface atoms
-
+	unsigned int surface_anisotropy_threshold=123456789; // global threshold for surface atoms
+	bool NativeSurfaceAnisotropyThreshold=false; // enables site-dependent surface threshold
+	
 	// Anisotropy control booleans
 	bool UniaxialScalarAnisotropy=false; // Enables scalar uniaxial anisotropy
 	bool TensorAnisotropy=false; // Overrides scalar uniaxial anisotropy

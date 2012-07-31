@@ -63,7 +63,7 @@ namespace cs{
 		unsigned int mat; // material
 		unsigned int lc; // lattice category
 		unsigned int hc; // height category
-		
+		unsigned int ni; // number of interactions
 	};
 	
 	class unit_cell_interaction_t {

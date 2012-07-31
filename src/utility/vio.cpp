@@ -1285,6 +1285,12 @@ int match_sim(string const word, string const value, string const unit, int cons
 		//-------------------------------------------------------------------
 		test="surface-anisotropy-threshold";
 		if(word==test){
+			// test for native keyword
+			test="native";
+			if(value==test){
+				sim::NativeSurfaceAnisotropyThreshold=true;
+				return EXIT_SUCCESS;
+			}
 			int sat=atoi(value.c_str());
 			// Test for valid range
 			if(sat>=0){
@@ -1292,11 +1298,11 @@ int match_sim(string const word, string const value, string const unit, int cons
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be and integer greater than or equal to 0." << std::endl;
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be an integer greater than or equal to 0, or \"native\"." << std::endl;
 				err::vexit();
 			}
 		}
-		//--------------------------------------------------------------------
+		//-------------------------------------------------------------------
 		test="dt";
 		if(word==test){
 			double dt=atof(value.c_str());
