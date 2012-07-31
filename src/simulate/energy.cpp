@@ -200,10 +200,49 @@ inline double spin_exchange_energy_tensor(const int atom, const double Sx, const
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_uniaxial_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){
+inline double spin_scalar_anisotropy_energy(const int imaterial, const double Sz){
 	
-	return mp::material[imaterial].Ku*Sz*Sz;
+	return mp::MaterialScalarAnisotropyArray[imaterial].K*Sz*Sz;
 	
+}
+// E = Ku(S . e)(S . e) = (Sxex + Syey + Szez)**2 = Sx exSxex + 2*Sx exSyey + 2*Sx exSzez + SyeySyey + 2*SyeySzez+ SzezSzez ==
+//
+//
+//   ( Sx Sy Sz ) ( exex exey exez ) ( Sx )
+//                ( eyex eyey eyez ) ( Sy ) = SxexexSx + SxexeySy + SxexezSz + SyeyexSx + SyeyeySy + SyeyezSz + SzezexSx + SzezeySy + SzezezSz
+//                ( ezex ezey ezez ) ( Sz )
+//
+inline double spin_tensor_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
+	const double K[3][3]={2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
+								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
+								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][2],
+
+								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
+								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
+								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][2],
+
+								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
+								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
+								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]};
+
+	return (K[0][0]*Sx*Sx + K[0][1]*Sx*Sy +K[0][2]*Sx*Sz) +
+			 (K[1][0]*Sx*Sy + K[1][1]*Sy*Sy +K[1][2]*Sy*Sz) +
+			 (K[2][0]*Sx*Sz + K[2][1]*Sy*Sz +K[2][2]*Sz*Sz);
+	
+}
+
+inline double spin_cubic_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
+	//------------------------------------------------------
+	// 	Function to calculate cubic anisotropy energy
+	//
+	//			Version 1.0 R Evans 28/07/2012
+	//
+	//		E = -0.5 Kc (Sx^4 + Sy^4 + Sz^4)
+	//	
+	//------------------------------------------------------
+	//std::cout << "here" << imaterial << "\t" << std::endl; 
+	return 0.5*mp::MaterialCubicAnisotropyArray[imaterial]*(Sx*Sx*Sx*Sx + Sy*Sy*Sy*Sy + Sz*Sz*Sz*Sz);
+
 }
 
 /// @brief Calculates the applied field energy for a single spin.
@@ -229,7 +268,7 @@ inline double spin_uniaxial_energy(const int atom, const int imaterial, const do
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_applied_field_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){;
+inline double spin_applied_field_energy(const double Sx, const double Sy, const double Sz){;
 
 	return -sim::H_applied*(sim::H_vec[0]*Sx + sim::H_vec[1]*Sy + sim::H_vec[2]*Sz);
 
@@ -296,7 +335,7 @@ inline double spin_surface_anisotropy_energy(const int atom, const int imaterial
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_magnetostatic_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){
+inline double spin_magnetostatic_energy(const int atom, const double Sx, const double Sy, const double Sz){
 	
 	return -1.0*(atoms::x_dipolar_field_array[atom]*Sx+atoms::y_dipolar_field_array[atom]*Sy+atoms::z_dipolar_field_array[atom]*Sz);
 }
@@ -341,12 +380,18 @@ double calculate_spin_energy(const int atom, const int AtomExchangeType){
 		case 0: energy+=spin_exchange_energy_isotropic(atom, Sx, Sy, Sz); break;
 		case 1: energy+=spin_exchange_energy_vector(atom, Sx, Sy, Sz); break;
 		case 2: energy+=spin_exchange_energy_tensor(atom, Sx, Sy, Sz); break;
-		default: zlog << zTs() << "Error. atoms::exchange_type has value " << AtomExchangeType << " which is outside of valid range 0-2. Exiting." << std::endl; err::vexit();  
+		default: zlog << zTs() << "Error. atoms::exchange_type has value " << AtomExchangeType << " which is outside of valid range 0-2. Exiting." << std::endl; err::vexit();
 	}
-	energy+=spin_applied_field_energy(atom, imaterial, Sx, Sy, Sz);
-	energy+=spin_uniaxial_energy(atom, imaterial, Sx, Sy, Sz);
-	energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);
-	energy+=spin_magnetostatic_energy(atom, imaterial, Sx, Sy, Sz);
+	switch(sim::AnisotropyType){
+		case 0: energy+=spin_scalar_anisotropy_energy(imaterial, Sz); break;
+		case 1: energy+=spin_tensor_anisotropy_energy(imaterial, Sx, Sy, Sz); break;
+		case 2: ; break; // skip
+		default: zlog << zTs() << "Error. sim::AnisotropyType has value " << sim::AnisotropyType << " which is outside of valid range 0-1. Exiting." << std::endl; err::vexit();
+	}
+	if(sim::CubicScalarAnisotropy==true) energy+=spin_cubic_anisotropy_energy(imaterial, Sx, Sy, Sz);
+	if(sim::surface_anisotropy==true) energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);
+	energy+=spin_applied_field_energy(Sx, Sy, Sz);
+	energy+=spin_magnetostatic_energy(atom, Sx, Sy, Sz);
 	
 	return energy; // Tesla
 }

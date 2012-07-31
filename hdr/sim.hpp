@@ -59,17 +59,19 @@ namespace sim{
 	
 	extern int integrator;
 	extern int program;
-
+	extern int AnisotropyType;
+	
 	extern bool surface_anisotropy;
 	extern bool identify_surface_atoms;
 	extern unsigned int surface_anisotropy_threshold;
 	
 	// Anisotropy control booleans
 	extern bool UniaxialScalarAnisotropy; // Enables scalar uniaxial anisotropy
-	extern bool UniaxialVectorAnisotropy; // Overrides scalar uniaxial anisotropy (slower)
-	extern bool UniaxialTensorAnisotropy; // Overrides vector uniaxial anisotropy (even slower)
+	extern bool TensorAnisotropy; // Overrides vector uniaxial anisotropy (even slower)
 	extern bool CubicScalarAnisotropy; // Enables scalar cubic anisotropy
+	extern bool EnableUniaxialAnisotropyUnitVector; // enables anisotropy tensor if any material has non z-axis K
 
+	
 	// Wrapper Functions
 	extern int run();
 	extern int initialise();

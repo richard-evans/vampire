@@ -25,8 +25,8 @@
 //========================
 
 int calculate_exchange_fields(const int,const int);
-int calculate_uniaxial_anis_fields(const int,const int);
-int calculate_cubic_anis_fields(const int,const int);
+int calculate_anisotropy_fields(const int,const int);
+int calculate_cubic_anisotropy_fields(const int,const int);
 int calculate_applied_fields(const int,const int);
 int calculate_thermal_fields(const int,const int);
 int calculate_dipolar_fields(const int,const int);
@@ -41,37 +41,20 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	//			Version 1.0 R Evans 20/10/2008
 	//======================================================
 
-	//const int num_atoms = atoms::num_atoms;
-
-	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
 	if(err::check==true){std::cout << "calculate_spin_fields has been called" << std::endl;}
 	
 	// Initialise Total Spin Fields to zero
-	//fill (atoms::x_total_spin_field_array.begin(),atoms::x_total_spin_field_array.end(),0.0);
 	fill (atoms::x_total_spin_field_array.begin()+start_index,atoms::x_total_spin_field_array.begin()+end_index,0.0);
-        fill (atoms::y_total_spin_field_array.begin()+start_index,atoms::y_total_spin_field_array.begin()+end_index,0.0);
-        fill (atoms::z_total_spin_field_array.begin()+start_index,atoms::z_total_spin_field_array.begin()+end_index,0.0);
-	//for(int atom=start_index;atom<end_index;atom++){
-	//	atoms::x_total_spin_field_array[atom] = 0.0;
-	//atoms::y_total_spin_field_array[atom] = 0.0;
-	//	atoms::z_total_spin_field_array[atom] = 0.0;
-	//}
-	
-	//const int num_atoms = atoms::num_atoms;
-	//std::vector<double> spin_array(3*num_atoms);
-        //for(int i=0;i<num_atoms;i++){
-        //  spin_array[3*i+0]=atoms::x_spin_array[i];
-        //  spin_array[3*i+1]=atoms::y_spin_array[i];
-        //  spin_array[3*i+2]=atoms::z_spin_array[i];
-        //}
+	fill (atoms::y_total_spin_field_array.begin()+start_index,atoms::y_total_spin_field_array.begin()+end_index,0.0);
+	fill (atoms::z_total_spin_field_array.begin()+start_index,atoms::z_total_spin_field_array.begin()+end_index,0.0);
+
 	// Exchange Fields
 	if(sim::hamiltonian_simulation_flags[0]==1) calculate_exchange_fields(start_index,end_index);
 	
 	// Anisotropy Fields
-	if(sim::hamiltonian_simulation_flags[1]==1) calculate_uniaxial_anis_fields(start_index,end_index);
-	if(sim::hamiltonian_simulation_flags[1]==2) calculate_cubic_anis_fields(start_index,end_index);
+	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
+	if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
 	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
 	if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
 	// Spin Dependent Extra Fields
@@ -173,7 +156,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 
 													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][0],
 													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][1],
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2],};
+													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2]};
 					
 					const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
 					
@@ -188,7 +171,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 		return EXIT_SUCCESS;
 	}
 
-int calculate_uniaxial_anis_fields(const int start_index,const int end_index){
+int calculate_anisotropy_fields(const int start_index,const int end_index){
 	//======================================================
 	// 	Subroutine to calculate uniaxial anisotropy fields
 	//
@@ -196,33 +179,72 @@ int calculate_uniaxial_anis_fields(const int start_index,const int end_index){
 	//======================================================
 
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "calculate_uniaxial_anis_fields has been called" << std::endl;}
+	if(err::check==true){std::cout << "calculate_anisotropy_fields has been called" << std::endl;}
 
-	// unroll Ku
-	std::vector<double> KuPre(0);
-	for(int mat=0;mat<mp::material.size();mat++) KuPre.push_back(2.0*mp::material[mat].Ku);
-	
-	for(int atom=start_index;atom<end_index;atom++){
-		const int imaterial=atoms::type_array[atom];
-		atoms::z_total_spin_field_array[atom] -= KuPre[imaterial]*atoms::z_spin_array[atom];
-	}
+		// Use appropriate function for anisotropy calculation
+	switch(sim::AnisotropyType){
+		case 0: // scalar
+			for(int atom=start_index;atom<end_index;atom++){
+				const int imaterial=atoms::type_array[atom];
+				atoms::z_total_spin_field_array[atom] -= 2.0*mp::MaterialScalarAnisotropyArray[imaterial].K*atoms::z_spin_array[atom];
+			}
+			break;
+		case 1: // tensor
+			for(int atom=start_index;atom<end_index;atom++){
+				const int imaterial=atoms::type_array[atom];
 
-	return 0;
+				const double K[3][3]={2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
+												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
+												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][2],
+
+												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
+												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
+												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][2],
+
+												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
+												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
+												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]};
+					
+				const double S[3]={atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
+
+				atoms::x_total_spin_field_array[atom] -= (K[0][0]*S[0] + K[0][1]*S[1] +K[0][2]*S[2]);
+				atoms::y_total_spin_field_array[atom] -= (K[1][0]*S[0] + K[1][1]*S[1] +K[1][2]*S[2]);
+				atoms::z_total_spin_field_array[atom] -= (K[2][0]*S[0] + K[2][1]*S[1] +K[2][2]*S[2]);
+			}
+			break;
+		}
+
+	return EXIT_SUCCESS;
 }
 
-int calculate_cubic_anis_fields(const int start_index,const int end_index){
-	//======================================================
-	// 	Subroutine to calculate cubic anisotropy fields
+int calculate_cubic_anisotropy_fields(const int start_index,const int end_index){
+	//------------------------------------------------------
+	// 	Function to calculate cubic anisotropy fields
 	//
-	//			Version 1.0 R Evans 20/10/2008
-	//======================================================
-	//const int num_atoms = atom_variables::num_atoms;
-	//for(int atom=0;atom<num_atoms;atom++){
-	//	atom_fields::total_spin_field_array[atom][2] += 2.0*material_parameters::Ku*atom_variables::spin_array[atom][2];
-	//}
-  for(int i=start_index;i<end_index;i++){
-  }
-	return 0;
+	//			Version 1.0 R Evans 28/07/2012
+	//
+	//		E = -0.5 Kc (Sx^4 + Sy^4 + Sz^4)
+	//		Hx = +2 Kc*(Sx^3)
+	//		Hy = +2 Kc*(Sy^3)
+	//		Hz = +2 Kc*(Sz^3)
+	//	
+	//------------------------------------------------------
+	//std::cout << "here" << std::endl;
+	for(int atom=start_index;atom<end_index;atom++){
+		const int imaterial=atoms::type_array[atom];
+		const double Kc=2.0*mp::MaterialCubicAnisotropyArray[imaterial];
+
+		const double Sx=atoms::x_spin_array[atom];
+		atoms::x_total_spin_field_array[atom] -= Kc*Sx*Sx*Sx;
+		
+		const double Sy=atoms::y_spin_array[atom];
+		atoms::y_total_spin_field_array[atom] -= Kc*Sy*Sy*Sy;
+
+		const double Sz=atoms::z_spin_array[atom];
+		atoms::z_total_spin_field_array[atom] -= Kc*Sz*Sz*Sz;
+		
+	}
+	return EXIT_SUCCESS;
 }
 
 void calculate_surface_anisotropy_fields(const int start_index,const int end_index){

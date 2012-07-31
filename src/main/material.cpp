@@ -13,6 +13,7 @@ materials_t::materials_t ():
 	KuVec_SI(0),
 	Ku(0.0),
 	KuVec(0),
+	UniaxialAnisotropyUnitVector(3),
 	Kc1_SI(0.0),
 	Kc2_SI(0.0),
 	Ks_SI(0.0),
@@ -54,7 +55,9 @@ materials_t::materials_t ():
 	initial_spin[0]=0.0;
 	initial_spin[1]=0.0;
 	initial_spin[2]=1.0;
-
+	UniaxialAnisotropyUnitVector.at(0)=0.0;
+	UniaxialAnisotropyUnitVector.at(1)=0.0;
+	UniaxialAnisotropyUnitVector.at(2)=1.0;
 }
 
 int materials_t::print(){

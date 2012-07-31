@@ -199,22 +199,33 @@ int match_config(string const, string const, int const);
 // Function to extract all variables from a string and return a vector
 std::vector<double> DoublesFromString(std::string value){
 	
-	// array for stroing variables
+	// array for storing variables
 	std::vector<double> array(0);
 	
+	// set source for ss
 	std::istringstream source(value);
 
+	// double variable to store values
 	double temp = 0.0;
+	
+	// string to store text
 	std::string field;
  
+	// loop over all comma separated values
 	while(getline(source,field,',')){
 		
-		std::stringstream fs( field );
+		// convert string to ss
+		std::stringstream fs(field);
+
+		// read in variable
 		fs >> temp;
+		
+		// push data value back to array
 		array.push_back(temp);
-		std::cout << temp << std::endl;
 		
 	}
+	
+	// return values to calling function
 	return array;
 	
 }
@@ -2519,13 +2530,12 @@ int match_material(string const word, string const value, string const unit, int
 			// if no unit given, assume internal
 			if(unit.size() != 0){
 				units::convert(unit,K,unit_type);
-				//read_material[super_index].anis_flag=false;
-				//std::cout << "setting flag to false" << std::endl;
 			}
 			string str="energy";
 			if(unit_type==str){
-				// Set moment flag
+				// set anisotropy
 				read_material[super_index].Ku1_SI=K;
+				// enable global anisotropy flag
 				sim::UniaxialScalarAnisotropy=true;
 				return EXIT_SUCCESS;
 			}
@@ -2536,17 +2546,9 @@ int match_material(string const word, string const value, string const unit, int
 		}
 		//------------------------------------------------------------
 		else
-		test="uniaxial-anisotropy-vector";
+		test="cubic-anisotropy-constant";
 		if(word==test){
-			std::vector<double> K(3);
-			// read values from string
-			K=DoublesFromString(value);
-			// check size
-			if(K.size()!=3){
-				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-vector must have three values." << std::endl;
-				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-vector must have three values." << std::endl;
-				return EXIT_FAILURE;
-			}
+			double K=atof(value.c_str());
 			string unit_type="energy";
 			// if no unit given, assume internal
 			if(unit.size() != 0){
@@ -2556,15 +2558,53 @@ int match_material(string const word, string const value, string const unit, int
 			}
 			string str="energy";
 			if(unit_type==str){
-				// Copy anisotropy vector to material
-				read_material[super_index].KuVec_SI=K;
-				sim::UniaxialVectorAnisotropy=true;
+				// Set moment flag
+				read_material[super_index].Kc1_SI=K;
+				sim::CubicScalarAnisotropy=true;
 				return EXIT_SUCCESS;
 			}
 			else{
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
 				err::vexit();
 			}
+		}
+		//------------------------------------------------------------
+		else
+		test="uniaxial-anisotropy-direction";
+		if(word==test){
+			// temporary storage container
+			std::vector<double> u(3);
+
+			// read values from string
+			u=DoublesFromString(value);
+			
+			// check size
+			if(u.size()!=3){
+				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must have three values." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must have three values." << std::endl;
+				return EXIT_FAILURE;
+			}
+			
+			// Normalise 
+			double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+			
+			// Check for correct length unit vector
+			if(ULength < 1.0e-9){
+				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must be normalisable (possibly all zero)." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must be normalisable (possibly all zero)." << std::endl;
+				return EXIT_FAILURE;
+			}
+			u.at(0)/=ULength;
+			u.at(1)/=ULength;
+			u.at(2)/=ULength;
+			
+			// Copy anisotropy direction to material
+			read_material[super_index].UniaxialAnisotropyUnitVector=u;
+
+			// Enable global tensor anisotropy flag
+			sim::TensorAnisotropy=true;
+			return EXIT_SUCCESS;
+
 		}
 		//------------------------------------------------------------
 		else
@@ -2590,7 +2630,7 @@ int match_material(string const word, string const value, string const unit, int
 			if(unit_type==str){
 				// Copy anisotropy vector to material
 				read_material[super_index].KuVec_SI=K;
-				sim::UniaxialTensorAnisotropy=true;
+				sim::TensorAnisotropy=true;
 				return EXIT_SUCCESS;
 			}
 			else{

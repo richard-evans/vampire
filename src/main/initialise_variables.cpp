@@ -65,6 +65,12 @@ namespace mp{
 	double dt;
 	double half_dt;
 	
+	// Unrolled material parameters for speed
+	std::vector <double> MaterialMuSSIArray(0);
+	std::vector <zkval_t> MaterialScalarAnisotropyArray(0);
+	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
+	std::vector <double> MaterialCubicAnisotropyArray(0);
+
 ///
 /// @brief Function to initialise program variables prior to system creation.
 ///
@@ -176,7 +182,7 @@ int default_system(){
 	//vmpi::mpi_mode=1;
 	//mpi_create_variables::mpi_interaction_range=2; // Unit cells
 	//mpi_create_variables::mpi_comms_identify=true;
-
+	
 	//------------------------------------------------------------------------------
 	// Material Definitions
 	//------------------------------------------------------------------------------
@@ -286,64 +292,35 @@ int set_derived_parameters(){
 			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
 		}
 		mp::material[mat].Ku									= mp::material[mat].Ku1_SI/mp::material[mat].mu_s_SI;
+		mp::material[mat].Kc									= mp::material[mat].Kc1_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].Ks									= mp::material[mat].Ks_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
 																  (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
 
-		// Check for which anisotropy function(s) are to be used
-		if(sim::UniaxialVectorAnisotropy==true && sim::UniaxialTensorAnisotropy==false){
+		// Check for which anisotropy function(s) are to be used		
+		if(sim::TensorAnisotropy==true){
 			sim::UniaxialScalarAnisotropy=false; // turn off scalar anisotropy calculation
-			// loop over materials and convert all scalar anisotropy to vector (along z)
-			for(int mat=0;mat<mp::num_materials; mat++){
-				
-				const double one_o_mu=1.0/mp::material[mat].mu_s_SI;
-
-				if(mp::material.at(mat).KuVec_SI.size()==0){
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku);
-				}
-				else if(mp::material.at(mat).KuVec_SI.size()==3){
-					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(0)*one_o_mu);
-					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(1)*one_o_mu);
-					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(2)*one_o_mu);
-				}
-			}
-		}
-		
-		if(sim::UniaxialTensorAnisotropy==true){
-			sim::UniaxialScalarAnisotropy=false; // turn off scalar anisotropy calculation
-			sim::UniaxialScalarAnisotropy=false; // turn off vector anisotropy calculation
 			// loop over materials and convert all scalar anisotropy to tensor (along z)
 			for(int mat=0;mat<mp::num_materials; mat++){
 				
 				const double one_o_mu=1.0/mp::material[mat].mu_s_SI;
 
+				// If tensor is unset
 				if(mp::material.at(mat).KuVec_SI.size()==0){
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(0.0);
+					const double ex = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
+					const double ey = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
+					const double ez = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ex*ex);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ex*ey);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ex*ez);
 
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(0.0);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ey*ex);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ey*ey);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ey*ez);
 
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku);
-				}
-				else if(mp::material.at(mat).KuVec_SI.size()==3){
-					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(0)*one_o_mu);
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(0.0);
-
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(1)*one_o_mu);
-					mp::material.at(mat).KuVec.push_back(0.0);
-
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(0.0);
-					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(2)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ez*ex);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ez*ey);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ez*ez);
 				}
 				else if(mp::material.at(mat).KuVec_SI.size()==9){
 					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(0)*one_o_mu);
@@ -360,6 +337,42 @@ int set_derived_parameters(){
 				}
 			}
 		}
+		
+		// Unroll anisotropy values for speed
+		if(sim::UniaxialScalarAnisotropy==true){
+			zlog << zTs() << "Setting scalar uniaxial anisotropy." << std::endl;
+			// Set global anisotropy type
+			sim::AnisotropyType=0;
+			MaterialScalarAnisotropyArray.resize(mp::num_materials);
+			for(int mat=0;mat<mp::num_materials; mat++) MaterialScalarAnisotropyArray[mat].K=mp::material[mat].Ku;
+		}
+		else if(sim::TensorAnisotropy==true){
+			zlog << zTs() << "Setting tensor uniaxial anisotropy." << std::endl;
+			// Set global anisotropy type
+			sim::AnisotropyType=1;
+			MaterialTensorAnisotropyArray.resize(mp::num_materials);
+			for(int mat=0;mat<mp::num_materials; mat++){
+				MaterialTensorAnisotropyArray[mat].K[0][0]=mp::material.at(mat).KuVec.at(0);
+				MaterialTensorAnisotropyArray[mat].K[0][1]=mp::material.at(mat).KuVec.at(1);
+				MaterialTensorAnisotropyArray[mat].K[0][2]=mp::material.at(mat).KuVec.at(2);
+
+				MaterialTensorAnisotropyArray[mat].K[1][0]=mp::material.at(mat).KuVec.at(3);
+				MaterialTensorAnisotropyArray[mat].K[1][1]=mp::material.at(mat).KuVec.at(4);
+				MaterialTensorAnisotropyArray[mat].K[1][2]=mp::material.at(mat).KuVec.at(5);
+
+				MaterialTensorAnisotropyArray[mat].K[2][0]=mp::material.at(mat).KuVec.at(6);
+				MaterialTensorAnisotropyArray[mat].K[2][1]=mp::material.at(mat).KuVec.at(7);
+				MaterialTensorAnisotropyArray[mat].K[2][2]=mp::material.at(mat).KuVec.at(8);
+
+			}
+		}
+		// Unroll cubic anisotropy values for speed
+		if(sim::CubicScalarAnisotropy==true){
+			zlog << zTs() << "Setting scalar cubic anisotropy." << std::endl;
+			MaterialCubicAnisotropyArray.resize(mp::num_materials);
+			for(int mat=0;mat<mp::num_materials; mat++) MaterialCubicAnisotropyArray.at(mat)=mp::material[mat].Kc;
+		}
+		
 		//std::cout << "checking range exclusivity" << std::endl;
 		// Check for exclusivity of range
 		if(material[mat].geometry!=0){

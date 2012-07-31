@@ -70,15 +70,16 @@ namespace sim{
 	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
 	double pump_power=2.4e22;
 	double pump_time=20.0e-15; 
-  double HeatSinkCouplingConstant=0.0; //1.1e12 ~ sensible value
-  double TTCe = 7.0E02; //electron specific heat
-  double TTCl = 3.0E06; //phonon specific heat
-  double TTG = 17.0E17 ;//electron coupling constant
+	double HeatSinkCouplingConstant=0.0; //1.1e12 ~ sensible value
+	double TTCe = 7.0E02; //electron specific heat
+	double TTCl = 3.0E06; //phonon specific heat
+	double TTG = 17.0E17 ;//electron coupling constant
   
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
 	int program=0; 
+	int AnisotropyType=2; // Controls scalar (0) or tensor(1) anisotropy (off(2))
 	
 	bool surface_anisotropy=false; // flag to enable surface anisotropy
 	bool identify_surface_atoms=false; // flag to idenify surface atoms in config coordinate file
@@ -86,8 +87,7 @@ namespace sim{
 
 	// Anisotropy control booleans
 	bool UniaxialScalarAnisotropy=false; // Enables scalar uniaxial anisotropy
-	bool UniaxialVectorAnisotropy=false; // Overrides scalar uniaxial anisotropy (slower)
-	bool UniaxialTensorAnisotropy=false; // Overrides vector uniaxial anisotropy (even slower)
+	bool TensorAnisotropy=false; // Overrides scalar uniaxial anisotropy
 	bool CubicScalarAnisotropy=false; // Enables scalar cubic anisotropy
 	
 	// Local function declarations

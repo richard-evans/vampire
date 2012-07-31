@@ -2,6 +2,38 @@
 #include <string>
 #include <vector>
 
+class zkval_t{
+	public:
+	double K;
+	
+	// constructor
+	zkval_t():
+		K(0.0)
+	{
+	};
+};
+
+class zkten_t{
+	public:
+	double K[3][3];
+	
+	// constructor
+	zkten_t()
+	{
+		K[0][0]=0.0;
+		K[0][1]=0.0;
+		K[0][2]=0.0;
+
+		K[1][0]=0.0;
+		K[1][1]=0.0;
+		K[1][2]=0.0;
+
+		K[2][0]=0.0;
+		K[2][1]=0.0;
+		K[2][2]=0.0;
+	};
+};
+
 namespace mp
 {
 using std::string;
@@ -22,13 +54,15 @@ using std::string;
 		double alpha;
 		double mu_s_SI;
 		double magnetisation;
-		double Ku1_SI;
+		double Ku1_SI; // SI uniaxial anisotropy constant
 		double Ku2_SI;
-		std::vector<double> KuVec_SI;
-		double Ku;
-		std::vector<double> KuVec;
+		std::vector<double> KuVec_SI; // SI anisotropy tensor
+		double Ku; // normalised uniaxial anisotropy constant
+		std::vector<double> KuVec; // normalised anisotropy tensor
+		std::vector<double> UniaxialAnisotropyUnitVector; // unit vector for material uniaxial anisotropy
 		double Kc1_SI;
 		double Kc2_SI;
+		double Kc;
 		double Ks_SI;
 		double Ks;
 		
@@ -70,23 +104,16 @@ using std::string;
 
 	extern std::vector <materials_t> material;
 
-
-	//extern materials_t material;
-	//Integration parameters
-	//extern double alpha;
 	extern double dt_SI;
 	extern double dt;
 	extern double half_dt;
 	extern double gamma_SI;
-	//extern double Jij_SI;
-	//extern double mu_s_SI;
-	//extern double Ku_SI;
-	
-	//extern double one_oneplusalpha_sq;
-	//extern double alpha_oneplusalpha_sq;
-	//extern double Jij;
-	//extern double Ku;
-	//extern double H_th_sigma;
+
+	// Unrolled material parameters for speed
+	extern std::vector <double> MaterialMuSSIArray;
+	extern std::vector <zkval_t> MaterialScalarAnisotropyArray;
+	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
+	extern std::vector <double> MaterialCubicAnisotropyArray;
 
 	
 	// Functions
