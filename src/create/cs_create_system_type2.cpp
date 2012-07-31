@@ -138,12 +138,20 @@ int particle(std::vector<cs::catom_t> & catom_array){
 	//---------------------------------------------------
 
 	double particle_origin[3];
-	// find centre unit cell
-	particle_origin[0] = double(vmath::iround(cs::system_dimensions[0]/(2.0*unit_cell.dimensions[0])))*unit_cell.dimensions[0];
-	particle_origin[1] = double(vmath::iround(cs::system_dimensions[1]/(2.0*unit_cell.dimensions[1])))*unit_cell.dimensions[1];
-	particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
+	// find centre unit cell -- unsafe for large unit cells
+	//particle_origin[0] = double(vmath::iround(cs::system_dimensions[0]/(2.0*unit_cell.dimensions[0])))*unit_cell.dimensions[0];
+	//particle_origin[1] = double(vmath::iround(cs::system_dimensions[1]/(2.0*unit_cell.dimensions[1])))*unit_cell.dimensions[1];
+	//particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
 
-	if(cs::particle_creation_parity==1){
+	particle_origin[0] = cs::system_dimensions[0]*0.5; 
+	particle_origin[1] = cs::system_dimensions[1]*0.5;
+	particle_origin[2] = cs::system_dimensions[2]*0.5;
+
+	// check for move in particle origin and that unit cell size < 0.5 system size
+	if(cs::particle_creation_parity==1 && 
+		(2.0*unit_cell.dimensions[0]<cs::system_dimensions[0]) && 
+		(2.0*unit_cell.dimensions[1]<cs::system_dimensions[1]) &&
+		(2.0*unit_cell.dimensions[2]<cs::system_dimensions[2])){
 		particle_origin[0]+=unit_cell.dimensions[0]*0.5;
 		particle_origin[1]+=unit_cell.dimensions[1]*0.5;
 		particle_origin[2]+=unit_cell.dimensions[2]*0.5;
