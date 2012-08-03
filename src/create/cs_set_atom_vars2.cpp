@@ -230,25 +230,20 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	//-------------------------------------------------
 
 	// create temporary array for storing surface threshold
-	zlog << zTs() << "Initialising surface identification threshold." << std::endl;
 	std::vector<unsigned int> surface_anisotropy_threshold_array(atoms::num_atoms, sim::surface_anisotropy_threshold);
-	std::cout << "here" << std::endl;
 	// if using native (local) surface threshold then repopulate threshold array
 	if(sim::NativeSurfaceAnisotropyThreshold){
-		for(int atom=0;atom<atoms::num_atoms;atom++){
+	  zlog << zTs() << "Identifying surface atoms using native (site dependent) threshold." << std::endl;
+	  for(int atom=0;atom<atoms::num_atoms;atom++){
 			unsigned int atom_uc_id=catom_array.at(atom).uc_id;
 			surface_anisotropy_threshold_array.at(atom)=unit_cell.atom.at(atom_uc_id).ni;
 		}
 	}
+	else zlog << zTs() << "Identifying surface atoms using global threshold value of " << sim::surface_anisotropy_threshold << "." << std::endl;
+	
 	if(sim::surface_anisotropy==true){
 
 		zlog << zTs() << "Using surface anisotropy for atoms with < threshold number of nearest neighbours." << std::endl;
-		if(sim::NativeSurfaceAnisotropyThreshold){
-			zlog << zTs() << "Surface anisotropy threshold is native (site dependent)." << std::endl;
-		}
-		else{
-			zlog << zTs() << "Surface anisotropy threshold is " << sim::surface_anisotropy_threshold << std::endl;
-		}
 		
 		// initialise counters
 		int nncounter = 0; // number of nearest neighbours
@@ -306,13 +301,17 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	} // end of surface anisotropy initialisation
 	// if not surface anisotropy then still identify surface atoms
 	else{
+	  int sacounter=0;
 		atoms::surface_array.resize(atoms::num_atoms);
 		for(int atom=0;atom<atoms::num_atoms;atom++){
 			if(cneighbourlist[atom].size()<surface_anisotropy_threshold_array.at(atom)){
 				// identify atom as surface
 				atoms::surface_array[atom]=true;
+				sacounter++;
 			}
 		}
+                // Output statistics to log file
+		zlog << zTs() << sacounter << " surface atoms found." << std::endl;
 	}
 
 	// now remove unit cell interactions data
