@@ -204,7 +204,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				else if(ny<0) ny=ny+d[1];
 			}
 			if(cs::pbc[2]==true){
-				if(nz>=int(d[0])) nz=nz-d[2];
+				if(nz>=int(d[2])) nz=nz-d[2];
 				else if(nz<0) nz=nz+d[2];
 			}
 			#endif
@@ -245,7 +245,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	//for(int atom=0;atom<catom_array.size();atom++){
 	//	std::cout << atom << "\t";
 	//	for(int nn=0;nn<cneighbourlist[atom].size();nn++){
-	//		std::cout << cneighbourlist[atom][nn] << "\t";
+	//		std::cout << cneighbourlist[atom][nn].nn << "\t";
 	//	}
 	//	std::cout << std::endl;
 	//}
