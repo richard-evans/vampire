@@ -387,6 +387,10 @@ int truncated_octahedron(double[], std::vector<cs::catom_t> &,const int);
 
 int sort_atoms_by_grain(std::vector<cs::catom_t> &);
 int clear_atoms(std::vector<cs::catom_t> &);
+
+  // unit cell initialisation function
+  void unit_cell_set(cs::unit_cell_t &);
+  
 }
 
 #endif /*CREATE_H_*/

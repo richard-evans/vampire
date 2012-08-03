@@ -91,11 +91,18 @@ int create(){
 	std::vector<cs::catom_t> catom_array; 
 	std::vector<std::vector<neighbour_t> > cneighbourlist; 
 
+	// initialise unit cell for system
+	unit_cell_set(cs::unit_cell);
+
+	cs::unit_cell_size[0]=unit_cell.dimensions[0];
+	cs::unit_cell_size[1]=unit_cell.dimensions[1];
+	cs::unit_cell_size[2]=unit_cell.dimensions[2];
+	
 	// check for pbc and if so round up system dimensions
 	if(cs::pbc[0]==true) cs::system_dimensions[0]=cs::unit_cell_size[0]*(int(vmath::iceil(cs::system_dimensions[0]/cs::unit_cell_size[0])));
 	if(cs::pbc[1]==true) cs::system_dimensions[1]=cs::unit_cell_size[1]*(int(vmath::iceil(cs::system_dimensions[1]/cs::unit_cell_size[1])));
 	if(cs::pbc[2]==true) cs::system_dimensions[2]=cs::unit_cell_size[2]*(int(vmath::iceil(cs::system_dimensions[2]/cs::unit_cell_size[2])));
-	
+
 	// Set up Parallel Decomposition if required 
 	#ifdef MPICF
 		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,cs::system_dimensions);
