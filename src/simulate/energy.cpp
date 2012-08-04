@@ -213,18 +213,18 @@ inline double spin_scalar_anisotropy_energy(const int imaterial, const double Sz
 //                ( ezex ezey ezez ) ( Sz )
 //
 inline double spin_tensor_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
-	const double K[3][3]={2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
-								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
-								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][2],
+	const double K[3][3]={mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
+								 mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
+								 mp::MaterialTensorAnisotropyArray[imaterial].K[0][2],
 
-								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
-								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
-								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][2],
+								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
+								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
+								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][2],
 
-								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
-								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
-								 2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]};
-
+								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
+								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
+								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]};
+								 
 	return (K[0][0]*Sx*Sx + K[0][1]*Sx*Sy +K[0][2]*Sx*Sz) +
 			 (K[1][0]*Sx*Sy + K[1][1]*Sy*Sy +K[1][2]*Sy*Sz) +
 			 (K[2][0]*Sx*Sz + K[2][1]*Sy*Sz +K[2][2]*Sz*Sz);

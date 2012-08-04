@@ -296,7 +296,7 @@ int set_derived_parameters(){
 		mp::material[mat].Ks									= mp::material[mat].Ks_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
 																  (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
-
+	}
 		// Check for which anisotropy function(s) are to be used		
 		if(sim::TensorAnisotropy==true){
 			sim::UniaxialScalarAnisotropy=false; // turn off scalar anisotropy calculation
@@ -372,7 +372,8 @@ int set_derived_parameters(){
 			MaterialCubicAnisotropyArray.resize(mp::num_materials);
 			for(int mat=0;mat<mp::num_materials; mat++) MaterialCubicAnisotropyArray.at(mat)=mp::material[mat].Kc;
 		}
-		
+
+		for(int mat=0;mat<mp::num_materials;mat++){
 		//std::cout << "checking range exclusivity" << std::endl;
 		// Check for exclusivity of range
 		if(material[mat].geometry!=0){
