@@ -51,7 +51,7 @@ namespace cs{
 	double system_dimensions[3]={77.0,77.0,77.0};	// Size of system (A)
 	double unit_cell_size[3]={3.54,3.54,3.54};		// Unit Cell Size (A) [Will eventually be local to unit cells]
 	bool pbc[3]={false,false,false};						// Periodic boundary conditions
-	bool SelectMaterialByZHeight=true;						// Toggle overwriting of material id by z-height
+	bool SelectMaterialByZHeight=false;						// Toggle overwriting of material id by z-height
 	unsigned int total_num_unit_cells[3]={0,0,0};	// Unit cells for entire system (x,y,z)
 	unsigned int local_num_unit_cells[3]={0,0,0};	// Unit cells on local processor (x,y,z)
 	std::string crystal_structure="sc";

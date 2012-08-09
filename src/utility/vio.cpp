@@ -2838,6 +2838,7 @@ int match_material(string const word, string const value, string const unit, int
 				std::cerr << "Error in input file - material[" << super_index << "]:min is outside of valid range (0.0-1.0)" << std::endl;
 				return EXIT_FAILURE;}
 			else{
+				cs::SelectMaterialByZHeight=true;
 				read_material[super_index].min=min;
 				return EXIT_SUCCESS;
 			}
@@ -2851,6 +2852,7 @@ int match_material(string const word, string const value, string const unit, int
 				std::cerr << "Error in input file - material[" << super_index << "]:max is outside of valid range (0.0-1.0)" << std::endl;
 				return EXIT_FAILURE;}
 			else{
+				cs::SelectMaterialByZHeight=true;
 				read_material[super_index].max=max;
 				return EXIT_SUCCESS;
 			}
