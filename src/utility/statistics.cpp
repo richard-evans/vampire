@@ -173,6 +173,11 @@ int mag_m(){
 			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_nm_array[0],mp::num_materials,MPI_INT,MPI_SUM);
 		#endif
 
+		// Check for zero moments and reset NM to zero
+		for(int mat=0;mat<mp::num_materials;mat++){
+			if(stats::sublattice_nm_array.at(mat)==0) stats::sublattice_nm_array.at(mat)=1;
+		}
+
 		// Output maximum moment to file
 		zlog << zTs() << "Maximum spin moment for sample is " << stats::max_moment << " [J/T]" << std::endl;
 		zlog << zTs() << "Maximum spin moment per atom is " << (stats::max_moment/double(stats::num_atoms))/9.27400915e-24 << " [mu_B/atom]" << std::endl;
