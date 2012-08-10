@@ -34,3 +34,4 @@ zlog.*
 zinfo
 zspin-parallel
 zspin-serial
+run/unit-cell-creator

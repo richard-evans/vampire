@@ -1,0 +1,33 @@
+#==============================================
+# Generated material file for input into zspin
+#==============================================
+#
+# File timestamp: 
+#
+#----------------------------------------------
+# Number of Materials
+#----------------------------------------------
+material:num-materials=2
+#----------------------------------------------
+# Material 0 (RE)
+#----------------------------------------------
+material[0]:name="RE"
+material[0]:alpha=0.1
+material[0]:mu_s=7.63 !muB
+material[0]:uniaxial-anisotropy-constant=-8.07246e-24
+material[0]:element="Ag"
+material[0]:Sx=0
+material[0]:Sy=0
+material[0]:Sz=-1
+#----------------------------------------------
+# Material 1 (TM)
+#----------------------------------------------
+material[1]:name="TM"
+material[1]:alpha=0.1
+material[1]:mu_s=1.92 !muB
+material[1]:uniaxial-anisotropy-constant=-8.07246e-24
+material[1]:element="Fe"
+material[1]:Sx=0
+material[1]:Sy=0
+material[1]:Sz=1
+#----------------------------------------------
