@@ -216,6 +216,66 @@ int cube(double particle_origin[],std::vector<cs::catom_t> & catom_array, const 
 	return EXIT_SUCCESS;	
 
 }
+
+// Teardrop
+int tear_drop(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+	//----------------------------------------------------------
+	// check calling of routine if error checking is activated
+	//----------------------------------------------------------
+	if(err::check==true){std::cout << "cs::cube has been called" << std::endl;}
+
+	// teapdrop dimensions
+	// 0.01242725414 = 6nm/(6nm + 6nm +500nm)
+	double TeardropMinZ=0.01242725414; // Frac system height
+	double TeardropMaxZ=0.01242725414+0.01242725414;
+	double TeardropRadius=TeardropMaxZ-TeardropMinZ;
+	double TeardropMinRadius=1.5; // Angstroms
 	
+	// Set particle size
+	double side_length=cs::particle_scale*0.5;
+
+	// Loop over all atoms and mark atoms in cube
+	const int num_atoms = catom_array.size();
 	
+ 	for(int atom=0;atom<num_atoms;atom++){
+		double dx=fabs(catom_array[atom].x-particle_origin[0]);
+		double dy=fabs(catom_array[atom].y-particle_origin[1]);
+		
+		// check for atoms constrained by box
+		if((dx<=side_length) && (dy<=side_length)){
+			
+			// // check for lower box
+			if(catom_array[atom].z <= cs::system_dimensions[2]*TeardropMinZ){
+			catom_array[atom].include=true;
+			catom_array[atom].grain=grain;
+			}
+			else if(catom_array[atom].z >= cs::system_dimensions[2]*(1.0-TeardropMinZ)){
+			catom_array[atom].include=true;
+			catom_array[atom].grain=grain;
+			}
+			// check for teardrop part
+			else{
+				double Height;
+				// z < 0.5
+				if(catom_array[atom].z <= cs::system_dimensions[2]*0.5){
+					Height=catom_array[atom].z-cs::system_dimensions[2]*TeardropMinZ;
+				}
+				else{
+					Height=cs::system_dimensions[2]*(1.0-TeardropMinZ)-catom_array[atom].z;
+				}
+				double RadiusAtHeight=cs::particle_scale*0.5*exp(-Height/(TeardropRadius*cs::system_dimensions[2]))+TeardropMinRadius;
+				double RadiusSquared=dx*dx+dy*dy;
+				if(RadiusSquared<=RadiusAtHeight*RadiusAtHeight){
+					catom_array[atom].include=true;
+					catom_array[atom].grain=grain;
+				}
+
+			}
+			
+		}
+	}
+	return EXIT_SUCCESS;	
+
+}
+
 }

@@ -174,6 +174,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
 		case 5: // Truncated Octahedron
 			truncated_octahedron(particle_origin,catom_array,0);
 			break;
+		case 6: // Teardrop
+			tear_drop(particle_origin,catom_array,0);
+			break;
 		default:
 			std::cout << "Unknown particle type requested for single particle system" << std::endl;
 			err::vexit();
@@ -246,6 +249,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 						break;
 					case 5: // Truncated Octahedron
 						truncated_octahedron(particle_origin,catom_array,particle_number);
+						break;
+					case 6: // Teardrop
+						tear_drop(particle_origin,catom_array,particle_number);
 						break;
 					default:
 						std::cout << "Unknown particle type requested for single particle system" << std::endl;

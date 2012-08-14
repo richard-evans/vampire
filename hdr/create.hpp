@@ -384,6 +384,7 @@ int cylinder(double[], std::vector<cs::catom_t> &,const int);
 ///=====================================================================================
 ///
 int truncated_octahedron(double[], std::vector<cs::catom_t> &,const int);
+int tear_drop(double[], std::vector<cs::catom_t> &,const int);
 
 int sort_atoms_by_grain(std::vector<cs::catom_t> &);
 int clear_atoms(std::vector<cs::catom_t> &);

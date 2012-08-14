@@ -568,6 +568,12 @@ int match_create(string const word, string const value, int const line){
 			return EXIT_SUCCESS;
 		}
 		else
+		test="tear-drop";
+		if(word==test){
+			cs::system_creation_flags[1]=6;
+			return EXIT_SUCCESS;
+		}
+		else
 		//-------------------------------------------------------------------
 		// system_creation_flags[2] - Set system type
 		//-------------------------------------------------------------------
