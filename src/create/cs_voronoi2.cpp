@@ -353,7 +353,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].grain=grain;
 						}
 						// Check for continuous media
-						else if(mp::material[catom_array[atom].material].continuous==true){
+						/*else if(mp::material[catom_array[atom].material].continuous==true){
 							const int geo=mp::material[catom_array[atom].material].geometry;
 
 							if(geo==0){
@@ -376,7 +376,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							}
 							//catom_array[atom].include=true;
 							catom_array[atom].grain=grain;
-						}
+							}*/
 					}
 				}
 			}
@@ -385,6 +385,19 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	std::cout << "done!" << std::endl;
 	zlog << "done!" << std::endl;
 
+	// add final grain for continuous layer
+	grain_coord_array.push_back(std::vector <double>());
+	grain_coord_array[grain_coord_array.size()-1].push_back(0.0); // x
+	grain_coord_array[grain_coord_array.size()-1].push_back(0.0); // y
+
+	// check for continuous layer
+	for(int atom=0; atom < catom_array.size(); atom++){
+	  if(mp::material[catom_array[atom].material].continuous==true){
+	    catom_array[atom].include=true;
+	    catom_array[atom].grain=int(grain_coord_array.size()-1);
+	  }
+	}
+  
 	// set number of grains
 	grains::num_grains = int(grain_coord_array.size());
 
