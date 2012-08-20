@@ -115,15 +115,23 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 	switch(atoms::exchange_type){
 		case 0: // isotropic
 			for(int atom=start_index;atom<end_index;atom++){
-				for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
+			  register double Hx=0.0;
+			  register double Hy=0.0;
+			  register double Hz=0.0;
+			  const int start=atoms::neighbour_list_start_index[atom];
+			  const int end=atoms::neighbour_list_end_index[atom]+1;
+				for(int nn=start;nn<end;nn++){
 			
 					const int natom = atoms::neighbour_list_array[nn];
-					const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
+					const double Jij=atoms::i_exchange_list[nn].Jij;
 					
-					atoms::x_total_spin_field_array[atom] -= Jij*atoms::x_spin_array[natom];
-					atoms::y_total_spin_field_array[atom] -= Jij*atoms::y_spin_array[natom];
-					atoms::z_total_spin_field_array[atom] -= Jij*atoms::z_spin_array[natom];
+					Hx -= Jij*atoms::x_spin_array[natom];
+					Hy -= Jij*atoms::y_spin_array[natom];
+					Hz -= Jij*atoms::z_spin_array[natom];
 				}
+				atoms::x_total_spin_field_array[atom] += Hx;
+				atoms::y_total_spin_field_array[atom] += Hy;
+				atoms::z_total_spin_field_array[atom] += Hz;
 			}
 			break;
 		case 1: // vector
