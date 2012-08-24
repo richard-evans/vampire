@@ -141,9 +141,10 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 				const int end=atoms::neighbour_list_end_index[atom]+1;
 				for(int nn=start;nn<end;nn++){
 					const int natom = atoms::neighbour_list_array[nn];
-					const double Jij[3]={atoms::v_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0],
-												atoms::v_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1],
-												atoms::v_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2]};
+					const int iid = atoms::neighbour_interaction_type_array[nn]; // interaction id
+					const double Jij[3]={atoms::v_exchange_list[iid].Jij[0],
+												atoms::v_exchange_list[iid].Jij[1],
+												atoms::v_exchange_list[iid].Jij[2]};
 					
 					Hx -= Jij[0]*atoms::x_spin_array[natom];
 					Hy -= Jij[1]*atoms::y_spin_array[natom];
@@ -163,17 +164,18 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 				const int end=atoms::neighbour_list_end_index[atom]+1;
 				for(int nn=start;nn<end;nn++){
 					const int natom = atoms::neighbour_list_array[nn];
-					const double Jij[3][3]={atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][0],
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][1],
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][2],
+					const int iid = atoms::neighbour_interaction_type_array[nn]; // interaction id
+					const double Jij[3][3]={atoms::t_exchange_list[iid].Jij[0][0],
+													atoms::t_exchange_list[iid].Jij[0][1],
+													atoms::t_exchange_list[iid].Jij[0][2],
 
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][0],
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][1],
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][2],
+													atoms::t_exchange_list[iid].Jij[1][0],
+													atoms::t_exchange_list[iid].Jij[1][1],
+													atoms::t_exchange_list[iid].Jij[1][2],
 
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][0],
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][1],
-													atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2]};
+													atoms::t_exchange_list[iid].Jij[2][0],
+													atoms::t_exchange_list[iid].Jij[2][1],
+													atoms::t_exchange_list[iid].Jij[2][2]};
 					
 					const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
 					
