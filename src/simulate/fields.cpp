@@ -122,7 +122,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 				const int end=atoms::neighbour_list_end_index[atom]+1;
 				for(int nn=start;nn<end;nn++){
 					const int natom = atoms::neighbour_list_array[nn];
-					const double Jij=atoms::i_exchange_list[nn].Jij;
+					const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
 					Hx -= Jij*atoms::x_spin_array[natom];
 					Hy -= Jij*atoms::y_spin_array[natom];
 					Hz -= Jij*atoms::z_spin_array[natom];
