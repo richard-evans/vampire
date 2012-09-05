@@ -2525,7 +2525,9 @@ int match_material(string const word, string const value, string const unit, int
 			if(unit_type==str){
 				// Set moment flag
 				read_material[super_index].Ku1_SI=K;
-				std::cerr << "Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
+				// enable global anisotropy flag                                                                                                                                              
+				sim::UniaxialScalarAnisotropy=true;
+ 				std::cerr << "Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
