@@ -290,7 +290,7 @@ int voronoi_film(std::vector<cs::catom_t> &);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int bulk(std::vector<cs::catom_t> &,const int);
+int bulk(std::vector<cs::catom_t> &);
 
 /// @brief This is the brief (one line only) description of the function.
 ///

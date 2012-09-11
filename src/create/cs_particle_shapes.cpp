@@ -27,41 +27,18 @@
 
 namespace cs{
 
-int bulk(std::vector<cs::catom_t> & catom_array, const int grain){
+int bulk(std::vector<cs::catom_t> & catom_array){
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::bulk has been called" << std::endl;}
 
-	const int max_vertices=50;
-
-	//----------------------------------------------------
-	// Loop over all atoms and mark atoms within geometry
-	//----------------------------------------------------
+	// Loop over all atoms and mark as selected
 	const int num_atoms = catom_array.size();
 	
  	for(int atom=0;atom<num_atoms;atom++){
-
-		const int geo=mp::material[catom_array[atom].material].geometry;
-
-		if(geo==0){
-			catom_array[atom].include=true;
-		}
-		else{
-			double x = catom_array[atom].x;
-			double y = catom_array[atom].y;
-			double px[max_vertices];
-			double py[max_vertices];
-			// Initialise polygon points
-			for(int p=0;p<geo;p++){
-				px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
-				py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
-			}
-			if(vmath::point_in_polygon(x,y,px,py,geo)==true){
-				catom_array[atom].include=true;
-				catom_array[atom].grain=grain;
-			}
-		}
+		catom_array[atom].include=true;
 	}
+	
 	return EXIT_SUCCESS;	
 }
 

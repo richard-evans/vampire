@@ -45,6 +45,8 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	int alloy(std::vector<cs::catom_t> &);
 	int intermixing(std::vector<cs::catom_t> &);
 	void dilute(std::vector<cs::catom_t> &);
+	void geometry(std::vector<cs::catom_t> &);
+
 	//int particle_array(int,int**,int*);
 	//int hex_particle_array(int,int**,int*);
 	//int voronoi_film(int**,double*,int*);
@@ -96,13 +98,16 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			}
 		}
 
+		// call geometry function
+		geometry(catom_array);
+		
 		// call intermixing function - must be before alloy function
 		intermixing(catom_array);
 
 		// call alloy function
 		alloy(catom_array);
 
-                // call dilution function
+		// call dilution function
 		dilute(catom_array);
 		
 		// Delete unneeded atoms
@@ -160,7 +165,7 @@ int particle(std::vector<cs::catom_t> & catom_array){
 	// Use particle type flags to determine which particle shape to cut
 	switch(cs::system_creation_flags[1]){
 		case 0: // Bulk
-			bulk(catom_array,0);
+			bulk(catom_array);
 			break;
 		case 1: // Cube
 			cube(particle_origin,catom_array,0);
@@ -236,7 +241,7 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 				// Use particle type flags to determine which particle shape to cut
 				switch(cs::system_creation_flags[1]){
 					case 0: // Bulk
-						bulk(catom_array,particle_number);
+						bulk(catom_array);
 						break;
 					case 1: // Cube
 						cube(particle_origin,catom_array,particle_number);
@@ -624,5 +629,50 @@ void dilute (std::vector<cs::catom_t> & catom_array){
 
     return;
   }
+  
+void geometry (std::vector<cs::catom_t> & catom_array){
+	// check calling of routine if error checking is activated
+	if(err::check==true){std::cout << "cs::geometry has been called" << std::endl;}
+    
+	// Check for any geometry
+	bool cut=false;
+	
+	for(int mat=0; mat<mp::num_materials; mat++){
+		if(mp::material[mat].geometry>0) cut=true;
+	}
+	
+	// Return from function if no geometry is defined. 
+	if(cut==false) return;
+	
+	// Otherwise proceed
+	zlog << zTs() << "Cutting materials within defined geometry." << std::endl; 
+    
+	// loop over all atoms
+	for(unsigned int atom=0;atom<catom_array.size();atom++){
+		 
+		// check for geometry information
+ 		const int geo=mp::material[catom_array[atom].material].geometry;
 
+		// if exists, then remove atoms outside polygon
+		if(geo!=0){
+			double x = catom_array[atom].x;
+			double y = catom_array[atom].y;
+			std::vector<double> px(geo);
+			std::vector<double> py(geo);
+			// Initialise polygon points
+			for(int p=0;p<geo;p++){
+				px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
+				py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
+			}
+			// check if point is outside of polygon, if so delete it 
+			if(vmath::point_in_polygon2(x,y,px,py,geo)==false){
+				catom_array[atom].include=false;
+			}
+		}
+		 
+	}
+
+	return;
 }
+  
+} // end of namespace
