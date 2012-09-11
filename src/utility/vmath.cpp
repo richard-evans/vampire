@@ -49,6 +49,41 @@ bool point_in_polygon(double x, double y,double *polyX, double *polyY,int polySi
 
 }
 
+bool point_in_polygon2(double x, double y, std::vector<double>& polyX, std::vector<double>& polyY, const int polySides) {
+	//========================================================================================================
+	//		 						Function to decide if point is within polygon
+	//														Version 2.0
+	//												R F Evans 11/09/2012
+	//========================================================================================================
+
+	/*// Check for correct calling of function
+	bool error = false;
+	if(polyX.size()!=polySides) error=true;
+	if(polyY.size()!=polySides) error=true;
+	
+	// check for error
+	if(error){
+		zlog << zTs() << "Internal error in determining point in polygon. Number of sides " << polySides << 
+		" must be equal to length of vectors " << polyX.size() << " and " << polyY.size() << ". Exiting." << std::endl;
+		err::vexit();
+	}*/
+	
+	int j=polySides-1 ;
+	bool oddNodes=false;
+	
+	for (int i=0; i<polySides; i++) {
+		if ((polyY[i]<y && polyY[j]>=y) || (polyY[j]<y && polyY[i]>=y)) {
+			if (polyX[i]+(y-polyY[i])/(polyY[j]-polyY[i])*(polyX[j]-polyX[i])<x) {
+				oddNodes=!oddNodes; 
+			}
+		}
+		j=i; 
+	}
+
+  return oddNodes; 
+
+}
+
 /// @brief Matrix Multiplication Function
 ///
 /// @section License
