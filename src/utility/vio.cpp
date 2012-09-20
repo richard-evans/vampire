@@ -2115,6 +2115,12 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(21);
 			return EXIT_SUCCESS;
 		}
+		test="MPI-Timings";
+		if(word==test){
+			vmpi::DetailedMPITiming=true;
+			output_list.push_back(60);
+			return EXIT_SUCCESS;
+		}
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
@@ -3466,12 +3472,43 @@ namespace vout{
 		stream << Susx << "\t" << Susy << "\t" << Susz << "\t";
 	}
 	
+	// Output Function 60
+	void MPITimings(std::ostream& stream){
+
+		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
+		stream << "\t" << vmpi::MaximumComputeTime << "\t" << vmpi::MaximumWaitTime << "\t";
+	}
+	
 	// Data output wrapper function
 	void data(){
 
 		// check calling of routine if error checking is activated
 		if(err::check==true){std::cout << "vout::data has been called" << std::endl;}
 
+		// Calculate MPI Timings since last data output
+		#ifdef MPICF
+		if(vmpi::DetailedMPITiming){
+
+			// Calculate Average times
+			MPI_Reduce (&vmpi::TotalComputeTime,&vmpi::AverageComputeTime,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD); 
+			MPI_Reduce (&vmpi::TotalWaitTime,&vmpi::AverageWaitTime,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+			vmpi::AverageComputeTime/=double(vmpi::num_processors);
+			vmpi::AverageWaitTime/=double(vmpi::num_processors);
+			
+			// Calculate Maximum times
+			MPI_Reduce (&vmpi::TotalComputeTime,&vmpi::MaximumComputeTime,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
+			MPI_Reduce (&vmpi::TotalWaitTime,&vmpi::MaximumWaitTime,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
+
+			// Save times for timing matrix
+			vmpi::ComputeTimeArray.push_back(vmpi::TotalComputeTime);
+			vmpi::WaitTimeArray.push_back(vmpi::TotalWaitTime);
+
+			// reset until next data output
+			vmpi::TotalComputeTime=0.0;
+			vmpi::TotalWaitTime=0.0;
+		}
+		#endif
+		
 		// Output data to zmag
 		for(unsigned int item=0;item<file_output_list.size();item++){
 			switch(file_output_list[item]){
@@ -3531,6 +3568,9 @@ namespace vout{
 					break;
 				case 21:
 					vout::MeanSystemSusceptibility(zmag);
+					break;
+				case 60:
+					vout::MPITimings(zmag);
 					break;
 			}
 		}
@@ -3598,6 +3638,9 @@ namespace vout{
 					break;
 				case 21:
 					vout::MeanSystemSusceptibility(std::cout);
+					break;
+				case 60:
+					vout::MPITimings(std::cout);
 					break;
 			}
 		}

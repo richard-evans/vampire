@@ -28,10 +28,23 @@ namespace vmpi{
 	extern bool replicated_data_staged; ///< Flag for staged system generation
 	
 	extern char hostname[20];			///< Hostname of local CPU
-	extern double start_time;			///< Simulation start time on local CPU
-	extern double end_time;				///< Simulation end time on local CPU
 	extern double min_dimensions[3]; 	///< Minimum coordinates of system on local cpu
 	extern double max_dimensions[3]; 	///< Maximum coordinates of system on local cpu
+
+	// Timing variables
+	extern double start_time;			///< Simulation start time on local CPU
+	extern double end_time;				///< Simulation end time on local CPU
+	extern double ComputeTime;			// Temporary for storing time 
+	extern double WaitTime;				// Temporary for storing time
+	extern double TotalComputeTime;	// Total time spent in computation
+	extern double TotalWaitTime;		// Total time spent waiting
+	extern double AverageComputeTime;
+	extern double AverageWaitTime;
+	extern double MaximumComputeTime;
+	extern double MaximumWaitTime;
+	extern std::vector<double> ComputeTimeArray;
+	extern std::vector<double> WaitTimeArray;
+	extern bool DetailedMPITiming; // flag to control logging of compute and wait times
 	
 	extern std::vector<int> send_atom_translation_array;
 	extern std::vector<int> send_start_index_array;
@@ -58,6 +71,7 @@ namespace vmpi{
 	extern int set_replicated_data(std::vector<cs::catom_t> &);
 	extern int identify_boundary_atoms(std::vector<cs::catom_t> &, std::vector<std::vector <cs::neighbour_t> > &);
 	extern int init_mpi_comms(std::vector<cs::catom_t> & catom_array);
+	extern double SwapTimer(double, double&);
 
 }
 

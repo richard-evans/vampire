@@ -103,6 +103,7 @@ zmag:mag-m
 screen:time
 #screen:mean-mag-m
 screen:mag-m
+screen:MPI-Timings
 #screen:constraint-phi
 #screen:system-torque
 #screen:mean-system-torque

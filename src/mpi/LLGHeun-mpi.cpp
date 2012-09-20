@@ -299,13 +299,16 @@ int LLG_Heun_mpi(){
 			atoms::z_spin_array[atom]=S_new[2];
 		}
 
-		//----------------------------------------
-		// Wait for other processors
-		//----------------------------------------	
+	// Swap timers compute -> wait
+	vmpi::TotalComputeTime+=vmpi::SwapTimer(vmpi::ComputeTime, vmpi::WaitTime);
 
-		MPI::COMM_WORLD.Barrier();
+	// Wait for other processors
+	MPI::COMM_WORLD.Barrier();
 
-		return EXIT_SUCCESS;
+	// Swap timers wait -> compute
+	vmpi::TotalWaitTime+=vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
+
+	return EXIT_SUCCESS;
 }
 
 } // end of namespace sim

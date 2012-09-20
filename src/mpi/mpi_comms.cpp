@@ -98,32 +98,24 @@ int mpi_complete_halo_swap(){
 	//										Version 1.0 R Evans 16/09/2009
 	//
 	//====================================================================================
-	//
-	//		Locally allocated variables: 	
-	//
-	//====================================================================================
 
-	//using namespace mpi_comms;
-
-	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
 	if(err::check==true){
 		std::cout << "mpi_complete_halo_swap has been called" << "\t";
 		std::cout << vmpi::my_rank << std::endl;
 	}
 
-	//----------------------------------------------------------
+	// Swap timers compute -> wait
+	vmpi::TotalComputeTime+=vmpi::SwapTimer(vmpi::ComputeTime, vmpi::WaitTime);
+	
 	// Wait for all comms to complete
-	//----------------------------------------------------------
-
 	vmpi::stati.resize(vmpi::requests.size());
 	MPI::Request::Waitall(vmpi::requests.size(),&vmpi::requests[0],&vmpi::stati[0]);
 
-	//----------------------------------------------------------
+	// Swap timers wait -> compute
+	vmpi::TotalWaitTime+=vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
+	
 	// Unpack received spins
-	//----------------------------------------------------------
-
 	for(unsigned int i=0;i<vmpi::recv_atom_translation_array.size();i++){
 		atoms::x_spin_array[vmpi::recv_atom_translation_array[i]] = vmpi::recv_spin_data_array[3*i+0];
 		atoms::y_spin_array[vmpi::recv_atom_translation_array[i]] = vmpi::recv_spin_data_array[3*i+1];
@@ -134,7 +126,6 @@ int mpi_complete_halo_swap(){
 		//std::cout << atoms::z_spin_array[vmpi::recv_atom_translation_array[i]] << std::endl;
 	}
 
-	//system("sleep 1");
 	return 0;
 
 }

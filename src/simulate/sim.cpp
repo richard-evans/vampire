@@ -153,10 +153,15 @@ int run(){
 		#endif
 		std::cout << "Starting Simulation with Program ";
 	}
-	
-	//program::timestep_scaling();
-	//return(EXIT_SUCCESS);
-	
+
+	// Now set initial compute time
+	#ifdef MPICF
+	vmpi::ComputeTime=MPI_Wtime();
+	vmpi::WaitTime=MPI_Wtime();
+	vmpi::TotalComputeTime=0.0;
+	vmpi::TotalWaitTime=0.0;
+	#endif
+
 	// Initialise random number generator
 	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
 

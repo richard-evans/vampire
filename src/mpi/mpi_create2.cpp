@@ -23,8 +23,22 @@ namespace vmpi{
 	bool replicated_data_staged=false;
 	
 	char hostname[20];
+
+	// timing variables
 	double start_time;
 	double end_time;
+	double ComputeTime;			// Temporary for storing time 
+	double WaitTime;				// Temporary for storing time
+	double TotalComputeTime;	// Total time spent in computation
+	double TotalWaitTime;		// Total time spent waiting
+	double AverageComputeTime;
+	double AverageWaitTime;
+	double MaximumComputeTime;
+	double MaximumWaitTime;
+	bool DetailedMPITiming=false;
+	std::vector<double> ComputeTimeArray(0);
+	std::vector<double> WaitTimeArray(0);
+
 	double min_dimensions[3]; ///< Minimum coordinates of system on local cpu
 	double max_dimensions[3]; ///< Maximum coordinates of system on local cpu
 	
