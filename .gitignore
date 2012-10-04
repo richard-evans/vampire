@@ -19,21 +19,12 @@ vampire
 cfg2povray
 cfg2rasmol
 crystal.xyz
-vdp
-vmag
-vgrain
-pp.dat
-M_vs_T.txt
-# EOF
-zspin
-run/ec
-zmag
-zlog
-zgrain
-zlog.*
-zinfo
-zspin-parallel
-zspin-serial
+log
+grain
+log.*
+info
+output
 run/unit-cell-creator
 MPI-compute-times
 MPI-wait-times
+#EOF

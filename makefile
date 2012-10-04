@@ -104,10 +104,11 @@ obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
+obj/utility/units.o \
 obj/utility/vconfig.o \
 obj/utility/vio.o \
-obj/utility/vmath.o \
-obj/utility/units.o
+obj/utility/vmath.o
+
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 IBM_OBJECTS=$(OBJECTS:.o=_ibm.o)
@@ -126,7 +127,7 @@ MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
-EXECUTABLE=zspin
+EXECUTABLE=vampire
 
 all: $(OBJECTS) gcc
 
@@ -235,6 +236,7 @@ purge:
 
 tidy:	
 	@rm -f *~
+	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
 

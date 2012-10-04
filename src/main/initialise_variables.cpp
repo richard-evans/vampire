@@ -99,7 +99,6 @@ int initialise(std::string const infile){
 
 	if(vmpi::my_rank==0){
 		std::cout << "================================================================================" << std::endl;
-		std::cout << " " << std::endl;
 		std::cout << "Initialising system variables" << std::endl;
 	}
 	

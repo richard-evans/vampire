@@ -71,10 +71,10 @@
 #include <string>
 
 // Global output filestreams
-std::ofstream zinfo("zinfo");
+std::ofstream zinfo("info");
 std::ofstream zlog;
-std::ofstream zmag("zmag");
-std::ofstream zgrain("zgrain");
+std::ofstream zmag("output");
+std::ofstream zgrain("grain");
 
 
 namespace vout{
@@ -130,8 +130,8 @@ namespace vout{
 		
 		// Set unique filename for log if num_procs > 1
 		std::stringstream logfn;
-		if(vmpi::num_processors==1) logfn << "zlog";
-		else logfn << "zlog."<<vmpi::my_rank;
+		if(vmpi::num_processors==1) logfn << "log";
+		else logfn << "log."<<vmpi::my_rank;
 		
 		// Open log filename
 		std::string log_file = logfn.str();
@@ -468,7 +468,7 @@ int match(string const key, string const word, string const value, string const 
 	// Test for data file output
 	//===================================================================
 	else
-	test="zmag";
+	test="output";
 	if(key==test){
 		int frs=vin::match_vout_list(word, line, vout::file_output_list);
 		return frs;
@@ -486,7 +486,7 @@ int match(string const key, string const word, string const value, string const 
 	// Test for grain output
 	//===================================================================
 	else
-	test="zgrain";
+	test="grain";
 	if(key==test){
 		int frs=vin::match_vout_grain_list(word, value, line, vout::grain_output_list);
 		return frs;

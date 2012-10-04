@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
 	//=============================================================
 	// Check for valid command-line arguments
 	//=============================================================
-	std::string infile="zinput";
+	std::string infile="input";
 	
 	for(int arg = 1; arg < argc; arg++){
 		std::string sw=argv[arg];
@@ -75,27 +75,34 @@ int main(int argc, char* argv[]){
 		
 	// Output Program Header
 	if(vmpi::my_rank==0){
-		std::cout << "                                ___      _" << std::endl;
-		std::cout << "                            ___/ __|_ __(_)_ _" << std::endl;
-		std::cout << "                           |_ /\\__ \\ '_ \\ | ' \\" << std::endl;
-		std::cout << "                           /__||___/ .__/_|_||_|" << std::endl;
-		std::cout << "                                   |_|" << std::endl;
+		std::cout << "                                                _          " << std::endl;
+		std::cout << "                                               (_)         " << std::endl;
+		std::cout << "                    __   ____ _ _ __ ___  _ __  _ _ __ ___ " << std::endl;
+		std::cout << "                    \\ \\ / / _` | '_ ` _ \\| '_ \\| | '__/ _ \\" << std::endl;
+		std::cout << "                     \\ V / (_| | | | | | | |_) | | | |  __/" << std::endl;
+		std::cout << "                      \\_/ \\__,_|_| |_| |_| .__/|_|_|  \\___|" << std::endl;
+		std::cout << "                                         | |               " << std::endl;
+		std::cout << "                                         |_|               " << std::endl;
 		std::cout << std::endl;
-		std::cout << "           Contributors: Richard F L Evans, Weijia Fan, Joe Barker, " << std::endl;
-		std::cout << "                         Thomas Ostler, Phanwadee Chureemart, Roy W Chantrell" << std::endl;
+		std::cout << "                       Version 2.0 " << __DATE__ << " " << __TIME__ << std::endl;
+		std::cout << std::endl;
+
+		std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
+		std::cout << std::endl;
+		std::cout << "  Contributors: Richard F L Evans, Weijia Fan, Joe Barker, " << std::endl;
+		std::cout << "                Thomas Ostler, Phanwadee Chureemart, Roy W Chantrell" << std::endl;
 		std::cout << " " << std::endl;
-		std::cout << "                      Version 1.0 " << __DATE__ << " " << __TIME__ << std::endl;
 		#ifdef COMP	
-		std::cout << "                        Compiled with " << COMP << std::endl;
+		std::cout << "                Compiled with:  " << COMP << std::endl;
 		#endif 
-		std::cout << " " << std::endl;
-		std::cout << "                        Compiler Flags:";
+		std::cout << "                Compiler Flags: ";
 		#ifdef CUDA
-		std::cout << " CUDA ";
+		std::cout << "CUDA ";
 		#endif
 		#ifdef MPICF
-		std::cout << " MPI ";
+		std::cout << "MPI ";
 		#endif
+		std::cout << std::endl;
 		std::cout << std::endl;
 		std::cout << "================================================================================" << std::endl;
 		time_t rawtime = time(NULL);

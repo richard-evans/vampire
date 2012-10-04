@@ -88,29 +88,29 @@ sim:integrator=LLG-Heun
 #sim:integrator=Monte-Carlo
 
 # data output
-zmag:real-time
-#zmag:constraint-theta
-#zmag:constraint-phi
-zmag:temperature
-zmag:magnetisation
-zmag:mag-m
-#zmag:mean-mag-m
-#zmag:system-torque
-#zmag:mean-system-torque
-#zmag:mean-system-torque
+output:real-time
+#output:constraint-theta
+#output:constraint-phi
+output:temperature
+output:magnetisation
+output:mag-m
+#output:mean-mag-m
+#output:system-torque
+#output:mean-system-torque
+#output:mean-system-torque
 
 #screen:temperature
 screen:time
 #screen:mean-mag-m
 screen:mag-m
-screen:MPI-Timings
+#screen:MPI-Timings
 #screen:constraint-phi
 #screen:system-torque
 #screen:mean-system-torque
 
-#zgrain:output-rate=100
-#zgrain:real-time
-#zgrain:magnetisation
+#grain:output-rate=100
+#grain:real-time
+#grain:magnetisation
 
 #config:atoms
 #config:atoms-output-rate=10
