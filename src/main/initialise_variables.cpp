@@ -1,33 +1,33 @@
-///
-/// @file
-/// @brief This is the brief (one line only) description of the function of this file. 
-///
-/// @details This is the detailed description of the funtion of this file
-///
-/// @section notes Implementation Notes
-/// This is a list of other notes, not related to functionality but rather to implementation. 
-/// Also include references, formulae and other notes here.
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section info File Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    11/01/2010
-/// @internal
-///	Created:		11/01/2010
-///	Revision:	  ---
-///=====================================================================================
-///
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 
 // Headers
 #include "errors.hpp"
 #include "demag.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
-//#include "multilayer.hpp"
 #include "sim.hpp"
 #include "random.hpp"
 #include "vio.hpp"

@@ -1,4 +1,4 @@
-// mtrand.h
+// mtrand.hpp
 // C++ include file for MT19937, with initialization improved 2002/1/26.
 // Coded by Takuji Nishimura and Makoto Matsumoto.
 // Ported to C++ by Jasper Bedaux 2003/1/1 (see http://www.bedaux.net/mtrand/).
