@@ -373,30 +373,27 @@ int set_derived_parameters(){
 			for(int mat=0;mat<mp::num_materials; mat++) MaterialCubicAnisotropyArray.at(mat)=mp::material[mat].Kc;
 		}
 
+		// Loop over materials to check for invalid input and warn appropriately
 		for(int mat=0;mat<mp::num_materials;mat++){
-		//std::cout << "checking range exclusivity" << std::endl;
-		// Check for exclusivity of range
-		if(material[mat].geometry!=0){
 			const double lmin=material[mat].min;
 			const double lmax=material[mat].max;
 			for(int nmat=0;nmat<mp::num_materials;nmat++){
 				if(nmat!=mat){
 					double min=material[nmat].min;
 					double max=material[nmat].max;
-					std::cout << lmin << "\t" << min << "\t" << max << std::endl;
-					std::cout << lmax << "\t" << min << "\t" << max << std::endl;
 					if(((lmin>min) && (lmin<max)) || ((lmax>min) && (lmax<max))){
-						std::cerr << "Warning - material " << mat << " overlaps material " << nmat << " - possibly use alloy keyword instead" << std::endl;
-						std::cerr << " Material "<< mat << ":min = " << lmin << std::endl;
-						std::cerr << " Material "<< mat << ":max = " << lmax << std::endl;
-						std::cerr << " Material "<< nmat << ":min = " << min << std::endl;
-						std::cerr << " Material "<< nmat << ":max = " << max << std::endl;
-						//exit(EXIT_FAILURE);
+						std::cerr << "Warning: Overlapping material heights found. Check log for details." << std::endl;
+						zlog << zTs() << "Warning: material " << mat << " overlaps material " << nmat << "." << std::endl;
+						zlog << zTs() << "If you have defined geometry then this may be OK, or possibly you meant to specify alloy keyword instead." << std::endl;
+						zlog << zTs() << "----------------------------------------------------" << std::endl;
+						zlog << zTs() << "  Material "<< mat << ":min = " << lmin << std::endl;
+						zlog << zTs() << "  Material "<< mat << ":max = " << lmax << std::endl;
+						zlog << zTs() << "  Material "<< nmat << ":min = " << min << std::endl;
+						zlog << zTs() << "  Material "<< nmat << ":max = " << max << std::endl;
 					}
 				}
 			}
 		}
-	}
 	
 	return EXIT_SUCCESS;
 }

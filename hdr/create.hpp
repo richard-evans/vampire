@@ -41,6 +41,7 @@ namespace cs{
 	extern double unit_cell_size[3];
 	extern bool pbc[3];
 	extern bool SelectMaterialByZHeight;
+	extern bool SelectMaterialByGeometry;
 	extern unsigned int total_num_unit_cells[3];
 	extern unsigned int local_num_unit_cells[3];
 	extern std::string crystal_structure;

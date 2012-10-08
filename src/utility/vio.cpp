@@ -760,6 +760,18 @@ int match_create(string const word, string const value, int const line){
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		else
+		test="select-material-by-geometry";
+		if(word==test){
+			cs::SelectMaterialByGeometry=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::SelectMaterialByGeometry=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
