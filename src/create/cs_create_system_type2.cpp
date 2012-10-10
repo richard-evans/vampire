@@ -678,12 +678,13 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 	}
 	else{
 	
-		// Re-identify all atoms as material 0 
+		// Re-identify all atoms as material 0 and exclude by default
 		for(unsigned int atom=0;atom<catom_array.size();atom++){
 			catom_array[atom].material=0;
+			catom_array[atom].include=false;
 		}
 		
-		// loop over all materials and include accoring to geometry
+		// loop over all materials and include according to geometry
 
 		// determine z-bounds for materials
 		std::vector<double> mat_min(mp::num_materials);
