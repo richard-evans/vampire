@@ -53,9 +53,11 @@ namespace vmath{
 	extern bool point_in_polygon(double, double, double*, double*, int);
 	extern bool point_in_polygon2(double, double, std::vector<double>&, std::vector<double>&, int);
 	extern std::vector<std::vector<double> > matmul(std::vector<std::vector<double> > &, std::vector<std::vector<double> > &);
+	extern std::vector<double> matmul(std::vector<double> &, std::vector<std::vector<double> > &);
 	extern std::vector<std::vector<double> > transpose(std::vector<std::vector<double> > &);
 	extern std::vector<std::vector<double> > set_matrix(const unsigned int, const unsigned int, std::vector<double> &);
 	extern std::vector<std::vector<double> > set_matrix(const unsigned int, const unsigned int);
+	extern void print_matrix( std::vector<std::vector<double> >&);
 	extern double sign(double);
 	extern int sign(int);
 	inline int iround( double value ){

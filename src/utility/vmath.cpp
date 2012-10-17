@@ -151,6 +151,60 @@ std::vector<std::vector<double> > matmul(
 	return C;
 }
 
+/// @brief Overloaded Matrix Multiplication Function for Vectors
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    05/02/2011
+///
+/// @return Matrix C
+/// 
+/// @internal
+///	Created:		05/02/2011
+///	Revision:	  ---
+///	Reference from Matmul guide at http://www.purplemath.com/modules/mtrxmult3.htm
+///=====================================================================================
+///
+std::vector<double> matmul(
+	std::vector<double>& V, 
+	std::vector<std::vector<double> >& M)
+{
+	
+	// Get sizes of vector V and matrix M
+	const unsigned int V_num_cols = V.size();
+	
+	const unsigned int M_num_rows = M.size();
+	const unsigned int M_num_cols = M[0].size();
+
+	// Check for valid multiplication
+	if(V_num_cols!=M_num_rows){
+		std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
+		err::vexit();
+	}
+	
+	// Set sizes of result matrix C
+	const unsigned int C_num_cols = M_num_cols;
+	
+	// Declare result matrix 
+	std::vector<double> C(C_num_cols,0.0);
+
+	// Calculate product
+	for(unsigned int j=0;j<C_num_cols;j++){
+		for(unsigned int k=0; k<V_num_cols ;k++){
+			C[j]+=V[k]*M[k][j];
+		}
+	}
+	
+	
+	// Return 
+	return C;
+}
+
 /// @brief Matrix Transpose Function
 ///
 /// @section License
@@ -288,7 +342,24 @@ std::vector<std::vector<double> > set_matrix(
 	// Return 
 	return C;
 }
-		  
+
+void print_matrix( std::vector<std::vector<double> >& A){
+	
+	// Get sizes of matrix A
+	const unsigned int A_num_rows = A.size();
+	const unsigned int A_num_cols = A[0].size();
+	
+	for(unsigned int i=0;i<A_num_rows;i++){
+		std::cout << "[ ";
+		for(unsigned int j=0;j<A_num_cols;j++){
+			std::cout << A[i][j] << " ";
+		}
+		std::cout << "]"<< std::endl;
+	}
+	
+	// Return 
+	return;
+}
 // sign functions
 double sign(double a){
 		if(a<0.0) return -1.0;
