@@ -58,6 +58,8 @@ namespace vmath{
 	extern std::vector<std::vector<double> > set_matrix(const unsigned int, const unsigned int, std::vector<double> &);
 	extern std::vector<std::vector<double> > set_matrix(const unsigned int, const unsigned int);
 	extern void print_matrix( std::vector<std::vector<double> >&);
+	extern void set_rotational_matrix(double, double, double, std::vector< std::vector<double> > &, std::vector< std::vector<double> > &, std::vector< std::vector<double> > &);
+	
 	extern double sign(double);
 	extern int sign(int);
 	inline int iround( double value ){

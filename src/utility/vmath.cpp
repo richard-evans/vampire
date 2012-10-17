@@ -360,6 +360,70 @@ void print_matrix( std::vector<std::vector<double> >& A){
 	// Return 
 	return;
 }
+
+void set_rotational_matrix(
+	double ddx,
+	double ddy,
+	double ddz,
+	std::vector< std::vector<double> > & x_rotation_matrix, 
+	std::vector< std::vector<double> > & y_rotation_matrix, 
+	std::vector< std::vector<double> > & z_rotation_matrix)
+{
+	double dx,dy,dz; //change in angle in radians
+	double sin_x,sin_y,sin_z,cos_x,cos_y,cos_z;
+	double pi=3.14159265358979323846264338327;
+
+	//--------------------------------------------------
+	// Initialise varibales 
+	//--------------------------------------------------
+
+	dx = (ddx/360.0)*2.0*pi;
+	dy = (ddy/360.0)*2.0*pi;
+	dz = (ddz/360.0)*2.0*pi;
+	
+	sin_x = sin(dx);
+	cos_x = cos(dx);
+	sin_y = sin(dy);
+	cos_y = cos(dy);
+	sin_z = sin(dz);
+	cos_z = cos(dz);
+
+	x_rotation_matrix=vmath::set_matrix(3,3);
+	y_rotation_matrix=vmath::set_matrix(3,3);
+	z_rotation_matrix=vmath::set_matrix(3,3);
+	
+	x_rotation_matrix[0][0] = 1.0;
+	x_rotation_matrix[1][0] = 0.0;
+	x_rotation_matrix[2][0] = 0.0;
+	x_rotation_matrix[0][1] = 0.0;
+	x_rotation_matrix[1][1] = cos_x;
+	x_rotation_matrix[2][1] = -sin_x;
+	x_rotation_matrix[0][2] = 0.0;
+	x_rotation_matrix[1][2] = sin_x;
+	x_rotation_matrix[2][2] = cos_x;
+
+	y_rotation_matrix[0][0] = cos_y;
+	y_rotation_matrix[1][0] = 0.0;
+	y_rotation_matrix[2][0] = sin_y;
+	y_rotation_matrix[0][1] = 0.0;
+	y_rotation_matrix[1][1] = 1.0;
+	y_rotation_matrix[2][1] = 0.0;
+	y_rotation_matrix[0][2] = -sin_y;
+	y_rotation_matrix[1][2] = 0.0;
+	y_rotation_matrix[2][2] = cos_y;
+
+	z_rotation_matrix[0][0] = cos_z;
+	z_rotation_matrix[1][0] = -sin_z;
+	z_rotation_matrix[2][0] = 0.0;
+	z_rotation_matrix[0][1] = sin_z;
+	z_rotation_matrix[1][1] = cos_z;
+	z_rotation_matrix[2][1] = 0.0;
+	z_rotation_matrix[0][2] = 0.0;
+	z_rotation_matrix[1][2] = 0.0;
+	z_rotation_matrix[2][2] = 1.0;
+
+}
+
 // sign functions
 double sign(double a){
 		if(a<0.0) return -1.0;
