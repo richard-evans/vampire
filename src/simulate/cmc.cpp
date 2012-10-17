@@ -35,10 +35,11 @@
 #include "random.hpp"
 #include "sim.hpp"
 #include "vmath.hpp"
+#include "vio.hpp"
 
 // local cmc namespace
 namespace cmc{
-	
+
 	// Statistics collection
 	double mc_success=0.0;
 	double mc_total=0.0;
@@ -46,7 +47,7 @@ namespace cmc{
 	double energy_reject=0.0;
 
 	bool is_initialised=false;
-	
+
 	// Rotational matrices
 	std::vector<std::vector<double> > polar_vector;
 	std::vector<std::vector<double> > polar_matrix_tp;
@@ -92,7 +93,7 @@ void polar_rot_matrix(
 	reference_vector[0] = 0.0;
 	reference_vector[1] = 0.0;
 	reference_vector[2] = 1.0;
-	
+
 	sin_x = sin(dx);
 	cos_x = cos(dx);
 	sin_y = sin(dy);
@@ -101,7 +102,7 @@ void polar_rot_matrix(
 	cos_z = cos(dz);
 
 	std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix,ref_vec;
-	
+
 	x_rotation_matrix=vmath::set_matrix(3,3);
 	y_rotation_matrix=vmath::set_matrix(3,3);
 	z_rotation_matrix=vmath::set_matrix(3,3);
@@ -144,6 +145,66 @@ void polar_rot_matrix(
 
 }
 
+// Function to rotate all spin around the z-axis
+void rotate_spins_around_z_axis(double ddz){
+
+	std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix;
+
+	// determine rotational matrices for phi, theta rotation
+	vmath::set_rotational_matrix(0.0, 0.0, ddz, x_rotation_matrix,y_rotation_matrix,z_rotation_matrix);
+
+	// loop over all spins and rotate by theta around z
+	for(int atom =0;atom<atoms::num_atoms;atom++){
+			std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
+
+			// Load spin coordinates
+			Sold[0]=atoms::x_spin_array[atom];
+			Sold[1]=atoms::y_spin_array[atom];
+			Sold[2]=atoms::z_spin_array[atom];
+
+			// Calculate new spin positions
+			Snew = vmath::matmul(Sold,z_rotation_matrix);
+
+			// Set new spin positions
+			atoms::x_spin_array[atom]=Snew[0];
+			atoms::y_spin_array[atom]=Snew[1];
+			atoms::z_spin_array[atom]=Snew[2];
+		}
+
+	return;
+}
+
+// Function to rotate all spin around the x-axis
+void rotate_spins_around_x_axis(double ddx){
+
+	std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix;
+
+	// determine rotational matrices for phi, theta rotation
+	vmath::set_rotational_matrix(ddx, 0.0, 0.0, x_rotation_matrix,y_rotation_matrix,z_rotation_matrix);
+
+	//vmath::print_matrix(x_rotation_matrix);
+
+	// loop over all spins and rotate by phi around x
+	for(int atom =0;atom<atoms::num_atoms;atom++){
+		std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
+
+		// Load spin coordinates
+		Sold[0]=atoms::x_spin_array[atom];
+		Sold[1]=atoms::y_spin_array[atom];
+		Sold[2]=atoms::z_spin_array[atom];
+
+		// Calculate new spin positions
+		Snew = vmath::matmul(Sold,x_rotation_matrix);
+
+		// Set new spin positions
+		atoms::x_spin_array[atom]=Snew[0];
+		atoms::y_spin_array[atom]=Snew[1];
+		atoms::z_spin_array[atom]=Snew[2];
+	}
+
+	return;
+}
+
 } // end of cmc namespace
 
 namespace sim{
@@ -159,26 +220,67 @@ void CMCinit(){
 
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::CMCinit has been called" << std::endl;
-	
+
 	// Create rotational matrices for cmc
 	cmc::polar_rot_matrix(sim::constraint_phi,sim::constraint_theta, cmc::polar_matrix, cmc::polar_matrix_tp, cmc::polar_vector);
 
-	// Initialise all spins along the constraint direction.
-	double sx=sin(sim::constraint_phi*M_PI/180.0)*cos(sim::constraint_theta*M_PI/180.0);
-	double sy=sin(sim::constraint_phi*M_PI/180.0)*sin(sim::constraint_theta*M_PI/180.0);
-	double sz=cos(sim::constraint_phi*M_PI/180.0);
-	for(int atom =0;atom<atoms::num_atoms;atom++){
+	// Check for rotational update
+	if(sim::constraint_rotation==false || (sim::constraint_theta_changed==false && sim::constraint_phi_changed==false)){
+
+		// Output message showing constraint direction re-initialisation
+		zlog << zTs() << "Initialising spins to new constraint direction (phi, theta) " <<  sim::constraint_phi << " , " << sim::constraint_theta << std::endl;
+
+		// Initialise all spins along the constraint direction.
+		double sx=sin(sim::constraint_phi*M_PI/180.0)*cos(sim::constraint_theta*M_PI/180.0);
+		double sy=sin(sim::constraint_phi*M_PI/180.0)*sin(sim::constraint_theta*M_PI/180.0);
+		double sz=cos(sim::constraint_phi*M_PI/180.0);
+
+		for(int atom =0;atom<atoms::num_atoms;atom++){
 			atoms::x_spin_array[atom]=sx;
 			atoms::y_spin_array[atom]=sy;
 			atoms::z_spin_array[atom]=sz;
+		}
 	}
-	
+	else{
+
+		// Output message showing constraint direction re-initialisation
+		zlog << zTs() << "Initialising spins by rotation from last constraint direction to new constraint direction (phi, theta) " 
+		<<  sim::constraint_phi << " , " << sim::constraint_theta << std::endl;
+
+		// Rotate spins from old to new constraint direction
+
+		// Determine angles to rotate spins by
+		double theta_old = sim::constraint_theta;
+		double theta_new = sim::constraint_theta;
+
+		double phi_old = sim::constraint_phi;
+		double phi_new = sim::constraint_phi;
+
+		// note - sim::constraint_phi, sim::constraint_theta are already at new angle
+		if(sim::constraint_theta_changed) theta_old = sim::constraint_theta - sim::constraint_theta_delta;
+		if(sim::constraint_phi_changed) phi_old     = sim::constraint_phi   - sim::constraint_phi_delta;
+
+		// Rotate all spins from theta_old to theta = 0 (reference direction along x)
+		cmc::rotate_spins_around_z_axis(-theta_old);
+
+		// Rotate all spins from phi_old to phi_new
+		cmc::rotate_spins_around_x_axis(phi_new-phi_old);
+
+		// Rotate all spins from theta = 0 to theta = theta_new
+		cmc::rotate_spins_around_z_axis(theta_new);
+
+		// reset rotation flags
+		sim::constraint_theta_changed = false;
+		sim::constraint_phi_changed   = false;
+
+	}
+
 	// disable thermal field calculation
 	sim::hamiltonian_simulation_flags[3]=0;
-	
+
 	// set initialised flag to true
 	cmc::is_initialised=true;
-	
+
 	return;
 }
 

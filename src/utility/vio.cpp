@@ -1774,6 +1774,17 @@ int match_sim(string const word, string const value, string const unit, int cons
 				return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		test="constraint-rotation-update";
+		if(word==test){
+			sim::constraint_rotation=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				sim::constraint_rotation=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		test="constraint-angle-theta";
 		if(word==test){
 			double angle=atof(value.c_str());

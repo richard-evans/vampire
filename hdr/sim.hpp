@@ -31,6 +31,10 @@ namespace sim{
 	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
 	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
 
+	extern bool constraint_rotation; // enables rotation of spins to new constraint direction
+	extern bool constraint_phi_changed; // flag to note change in phi
+	extern bool constraint_theta_changed; // flag to note change in theta
+
 	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
 	extern double constraint_phi_min; // loop angle min [degrees]
 	extern double constraint_phi_max; // loop angle max [degrees]
@@ -49,10 +53,10 @@ namespace sim{
 	extern int cooling_function_flag;
 	extern double pump_time;
 	extern double pump_power;
-        extern double HeatSinkCouplingConstant;
-        extern double TTCe; //electron specific heat
-        extern double TTCl; //phonon specific heat
-        extern double TTG;//electron coupling constant    
+	extern double HeatSinkCouplingConstant;
+	extern double TTCe; //electron specific heat
+	extern double TTCl; //phonon specific heat
+	extern double TTG;//electron coupling constant    
 
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];

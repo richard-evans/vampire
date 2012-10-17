@@ -120,12 +120,14 @@ void cmc_anisotropy(){
 			
 			// Increment azimuthal angle
 			sim::constraint_phi+=sim::constraint_phi_delta;
+			sim::constraint_phi_changed=true;
 			
 		} // End of azimuthal angle sweep
 		
 		// Increment rotational angle
 		sim::constraint_theta+=sim::constraint_theta_delta;
-			
+		sim::constraint_theta_changed=true;
+		
 	} // End of rotational angle sweep
 
 	return;

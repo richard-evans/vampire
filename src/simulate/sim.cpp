@@ -56,11 +56,15 @@ namespace sim{
 	double head_speed=30.0; // nm/ns
 	bool   head_laser_on=false;
 
+	bool   constraint_rotation=false; // enables rotation of spins to new constraint direction
+	
+	bool   constraint_phi_changed=false; // flag to note change in phi
 	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
 	double constraint_phi_min=0.0; // loop angle min [degrees]
 	double constraint_phi_max=0.0; // loop angle max [degrees]
 	double constraint_phi_delta=5.0; // loop angle delta [degrees]
 
+	bool   constraint_theta_changed=false;
 	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
 	double constraint_theta_min=0.0; // loop angle min [degrees]
 	double constraint_theta_max=0.0; // loop angle max [degrees]
