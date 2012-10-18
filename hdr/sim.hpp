@@ -154,6 +154,8 @@ namespace cmc{
 	
 	extern bool is_initialised;
 	
+	extern int active_material; // material in current hybrid loop
+	
 	extern std::vector<std::vector< int > > atom_list;
 	extern double mc_success;
 	extern double mc_total;

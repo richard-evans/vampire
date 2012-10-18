@@ -31,12 +31,14 @@
 #include "random.hpp"
 #include "sim.hpp"
 #include "vmath.hpp"
+#include "vio.hpp"
 
 // local cmc namespace
 namespace cmc{
 	
 	std::vector<std::vector< int > > atom_list;
 	std::vector<cmc_material_t> cmc_mat;
+	int active_material=0;
 
 ///
 /// @brief Sets up matrices for performing CMC in an arbitrary space
@@ -139,6 +141,70 @@ void mat_polar_rot_matrix()
 	
 } // end of polar rotation initialisation
 
+// Function to rotate all spin around the z-axis
+void rotate_material_spins_around_z_axis(double ddz, int material){
+
+	std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix;
+
+	// determine rotational matrices for phi, theta rotation
+	vmath::set_rotational_matrix(0.0, 0.0, ddz, x_rotation_matrix,y_rotation_matrix,z_rotation_matrix);
+
+	// loop over all spins and rotate by theta around z
+	for(int atom =0;atom<atoms::num_atoms;atom++){
+		int mat=atoms::type_array[atom];
+		if(mat==material){
+			std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
+
+			// Load spin coordinates
+			Sold[0]=atoms::x_spin_array[atom];
+			Sold[1]=atoms::y_spin_array[atom];
+			Sold[2]=atoms::z_spin_array[atom];
+
+			// Calculate new spin positions
+			Snew = vmath::matmul(Sold,z_rotation_matrix);
+
+			// Set new spin positions
+			atoms::x_spin_array[atom]=Snew[0];
+			atoms::y_spin_array[atom]=Snew[1];
+			atoms::z_spin_array[atom]=Snew[2];
+		}
+	}
+
+	return;
+}
+
+// Function to rotate all spin around the x-axis
+void rotate_material_spins_around_x_axis(double ddx, int material){
+
+	std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix;
+
+	// determine rotational matrices for phi, theta rotation
+	vmath::set_rotational_matrix(ddx, 0.0, 0.0, x_rotation_matrix,y_rotation_matrix,z_rotation_matrix);
+
+	// loop over all spins and rotate by phi around x
+	for(int atom =0;atom<atoms::num_atoms;atom++){
+		int mat=atoms::type_array[atom];
+		if(mat==material){
+			std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
+
+			// Load spin coordinates
+			Sold[0]=atoms::x_spin_array[atom];
+			Sold[1]=atoms::y_spin_array[atom];
+			Sold[2]=atoms::z_spin_array[atom];
+
+			// Calculate new spin positions
+			Snew = vmath::matmul(Sold,x_rotation_matrix);
+
+			// Set new spin positions
+			atoms::x_spin_array[atom]=Snew[0];
+			atoms::y_spin_array[atom]=Snew[1];
+			atoms::z_spin_array[atom]=Snew[2];
+		}
+	}
+
+	return;
+}
+
 } // end of cmc namespace
 
 namespace sim{
@@ -165,6 +231,12 @@ void CMCMCinit(){
 		cmc::atom_list[mat].push_back(atom);
 	}
 	
+		// Check for rotational update
+	if(sim::constraint_rotation==false || (sim::constraint_theta_changed==false && sim::constraint_phi_changed==false)){
+
+		// Output message showing constraint direction re-initialisation
+		zlog << zTs() << "Initialising spins in all materials to new constraint directions." << std::endl;
+
 	// Initialise all spins along the constraint direction(s).
 	for(int atom =0;atom<atoms::num_atoms;atom++){
 		int imat=atoms::type_array[atom];
@@ -176,13 +248,43 @@ void CMCMCinit(){
 			atoms::y_spin_array[atom]=sy;
 			atoms::z_spin_array[atom]=sz;
 		}
-		else{
-			//atoms::x_spin_array[atom]=mp::material[imat].initial_spin[0];
-			//atoms::y_spin_array[atom]=mp::material[imat].initial_spin[1];
-			//atoms::z_spin_array[atom]=mp::material[imat].initial_spin[2];
-		}
 	}
 	
+	}
+	else{
+
+		// Output message showing constraint direction re-initialisation
+		zlog << zTs() << "Initialising spins in material " << cmc::active_material << " by rotation to new constraint direction (phi, theta) " 
+		<<  cmc::cmc_mat[cmc::active_material].constraint_phi << " , " << cmc::cmc_mat[cmc::active_material].constraint_theta << std::endl;
+
+		// Rotate spins from old to new constraint direction
+
+		// Determine angles to rotate spins by
+		double theta_old = cmc::cmc_mat[cmc::active_material].constraint_theta; 
+		double theta_new = cmc::cmc_mat[cmc::active_material].constraint_theta;
+
+		double phi_old = cmc::cmc_mat[cmc::active_material].constraint_phi;
+		double phi_new = cmc::cmc_mat[cmc::active_material].constraint_phi;
+
+		// note - sim::constraint_phi, sim::constraint_theta are already at new angle
+		if(sim::constraint_theta_changed) theta_old = cmc::cmc_mat[cmc::active_material].constraint_theta - cmc::cmc_mat[cmc::active_material].constraint_theta_delta;
+		if(sim::constraint_phi_changed) phi_old     = cmc::cmc_mat[cmc::active_material].constraint_phi - cmc::cmc_mat[cmc::active_material].constraint_phi_delta;
+		
+		// Rotate all spins in active material from theta_old to theta = 0 (reference direction along x)
+		cmc::rotate_material_spins_around_z_axis(-theta_old, cmc::active_material);
+
+		// Rotate all spins in active material from phi_old to phi_new
+		cmc::rotate_material_spins_around_x_axis(phi_new-phi_old, cmc::active_material);
+
+		// Rotate all spins in active material from theta = 0 to theta = theta_new
+		cmc::rotate_material_spins_around_z_axis(theta_new, cmc::active_material);
+
+		// reset rotation flags
+		sim::constraint_theta_changed = false;
+		sim::constraint_phi_changed   = false;
+
+	}
+
 	// disable thermal field calculation
 	sim::hamiltonian_simulation_flags[3]=0;
 	

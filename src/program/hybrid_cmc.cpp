@@ -76,7 +76,13 @@ void hybrid_cmc(){
 	
 	// loop over all materials
 	for (int mat=0;mat<mp::num_materials;mat++){
-	std::cout << "Hybrid CMC loop for material " << mat << std::endl; 
+	
+	// Set active material (used for calculating rotational update of spin directions)
+	cmc::active_material=mat;
+
+	// Output informative message to log file
+	zlog << zTs() << "Starting Hybrid CMC loop for material " << mat << std::endl;
+	
 	// set minimum rotational angle
 	cmc::cmc_mat[mat].constraint_theta=cmc::cmc_mat[mat].constraint_theta_min;
 
@@ -129,13 +135,13 @@ void hybrid_cmc(){
 			// Increment azimuthal angle
 			if(cmc::cmc_mat[mat].constraint_phi+cmc::cmc_mat[mat].constraint_phi_delta>cmc::cmc_mat[mat].constraint_phi_max) break;
 			cmc::cmc_mat[mat].constraint_phi+=cmc::cmc_mat[mat].constraint_phi_delta;
-			
+			sim::constraint_phi_changed=true;
 		} // End of azimuthal angle sweep
 		
 		// Increment rotational angle
 		if(cmc::cmc_mat[mat].constraint_theta+cmc::cmc_mat[mat].constraint_theta_delta>cmc::cmc_mat[mat].constraint_theta_max) break;
 		cmc::cmc_mat[mat].constraint_theta+=cmc::cmc_mat[mat].constraint_theta_delta;
-			
+		sim::constraint_theta_changed=true;
 	} // End of rotational angle sweep
 
 	} // end of material loop
