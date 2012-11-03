@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 #include "create.hpp"
 #include "grains.hpp"
 #include "material.hpp"
@@ -25,7 +49,7 @@ namespace cs{
 int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::voronoi_film has been called" << std::endl;}	
+	if(err::check==true){std::cerr << "cs::voronoi_film has been called" << std::endl;}	
 	
 	//====================================================================================
 	//
@@ -57,12 +81,12 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	double grain_sd=create_voronoi::voronoi_sd;
 
 	// Set number of particles in x and y directions
-	double size = material_parameters::particle_scale+material_parameters::particle_spacing;
+	double size = cs::particle_scale+cs::particle_spacing;
 	double grain_cell_size_x = size;
 	double grain_cell_size_y = sqrt(3.0)*size;
 
-	int num_x_particle = 4+vmath::iround(mp::system_dimensions[0]/(grain_cell_size_x));
-	int num_y_particle = 4+vmath::iround(mp::system_dimensions[1]/(grain_cell_size_y));
+	int num_x_particle = 4+vmath::iround(cs::system_dimensions[0]/(grain_cell_size_x));
+	int num_y_particle = 4+vmath::iround(cs::system_dimensions[1]/(grain_cell_size_y));
 
 	int init_num_grains = num_x_particle*num_y_particle*2;
 	
@@ -121,6 +145,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	//-----------------------
 	if(grain<1){
 		std::cerr << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
+		zlog << zTs() << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
 		err::vexit();
 	}
 
@@ -151,10 +176,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		}
 	}
 
-	//std::cout << "here" << std::endl;
-	
 	// Shrink Voronoi vertices in reduced coordinates to get spacing
-	double shrink_factor = mp::particle_scale/(mp::particle_scale+mp::particle_spacing);
+	double shrink_factor = cs::particle_scale/(cs::particle_scale+cs::particle_spacing);
 	
 	// Reduce vertices to relative coordinates
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
@@ -276,63 +299,49 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	// Create a 2D supercell array of atom numbers to improve performance for systems with many grains
 	std::vector < std::vector < std::vector < int > > > supercell_array;
 	
+        // Calculate number of global unit cells required
+	cs::total_num_unit_cells[0]=int(vmath::iceil(cs::system_dimensions[0]/unit_cell.dimensions[0]));
+	cs::total_num_unit_cells[1]=int(vmath::iceil(cs::system_dimensions[1]/unit_cell.dimensions[1]));
+	cs::total_num_unit_cells[2]=int(vmath::iceil(cs::system_dimensions[2]/unit_cell.dimensions[2]));
+
 	int min_bounds[3];
 	int max_bounds[3];
-	
-	#ifdef MPICF
-	if(vmpi::mpi_mode==0){
-		min_bounds[0] = int(vmpi::min_dimensions[0]/mp::lattice_constant[0]);
-		min_bounds[1] = int(vmpi::min_dimensions[1]/mp::lattice_constant[1]);
-		min_bounds[2] = int(vmpi::min_dimensions[2]/mp::lattice_constant[2]);
-		max_bounds[0] = vmath::iround(vmpi::max_dimensions[0]/mp::lattice_constant[0]);
-		max_bounds[1] = vmath::iround(vmpi::max_dimensions[1]/mp::lattice_constant[1]);
-		max_bounds[2] = vmath::iround(vmpi::max_dimensions[2]/mp::lattice_constant[2]);
-	}
-	else{
-		min_bounds[0]=0;
-		min_bounds[1]=0;
-		min_bounds[2]=0;
-		max_bounds[0]=vmath::iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
-		max_bounds[1]=vmath::iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
-		max_bounds[2]=vmath::iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
-	}
-	#else
-		min_bounds[0]=0;
-		min_bounds[1]=0;
-		min_bounds[2]=0;
-		max_bounds[0]=vmath::iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
-		max_bounds[1]=vmath::iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
-		max_bounds[2]=vmath::iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
-	#endif
+
+	min_bounds[0]=0;
+	min_bounds[1]=0;
+	min_bounds[2]=0;
+	max_bounds[0]=cs::total_num_unit_cells[0];
+	max_bounds[1]=cs::total_num_unit_cells[1];
+	max_bounds[2]=cs::total_num_unit_cells[2];
 	
 	// allocate supercell array
 	int dx = max_bounds[0]-min_bounds[0];
 	int dy = max_bounds[1]-min_bounds[1];
 
 	supercell_array.resize(dx);
-	for(int i=0;i<dx;i++){
-		supercell_array[i].resize(dy);
-	}
+	for(int i=0;i<dx;i++) supercell_array[i].resize(dy);
 	
 	// loop over atoms and populate supercell array
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		int cx = int (catom_array[atom].x/mp::lattice_constant[0]);
-		int cy = int (catom_array[atom].y/mp::lattice_constant[1]);
-		supercell_array[cx][cy].push_back(atom);
+		int cx = int (catom_array[atom].x/unit_cell.dimensions[0]);
+		int cy = int (catom_array[atom].y/unit_cell.dimensions[1]);
+		supercell_array.at(cx).at(cy).push_back(atom);
 	}
 	
 	std::cout <<"Generating Voronoi Grains";
+	zlog << zTs() << "Generating Voronoi Grains";
 
 	// loop over all grains with vertices
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
 		// Exclude grains with zero vertices
 
 		if((grain%(grain_coord_array.size()/10))==0){
-			std::cout << "." << std::flush;
+		  std::cout << "." << std::flush;
+		  zlog << "." << std::flush;
 		}
 		if(grain_vertices_array[grain].size()!=0){
 
-			// initialise minimum and max supercell coordintaes for grain
+			// initialise minimum and max supercell coordinates for grain
 			int minx=10000000;
 			int maxx=0;
 			int miny=10000000;
@@ -343,8 +352,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			for(int vertex=0;vertex<num_vertices;vertex++){
 				tmp_grain_pointx_array[vertex]=grain_vertices_array[grain][vertex][0]+grain_coord_array[grain][0];
 				tmp_grain_pointy_array[vertex]=grain_vertices_array[grain][vertex][1]+grain_coord_array[grain][1];
-				int x = int(tmp_grain_pointx_array[vertex]/mp::lattice_constant[0]);
-				int y = int(tmp_grain_pointy_array[vertex]/mp::lattice_constant[1]);
+				int x = int(tmp_grain_pointx_array[vertex]/unit_cell.dimensions[0]);
+				int y = int(tmp_grain_pointy_array[vertex]/unit_cell.dimensions[1]);
 				if(x < minx) minx = x;
 				if(x > maxx) maxx = x;
 				if(y < miny) miny = y;
@@ -368,7 +377,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].grain=grain;
 						}
 						// Check for continuous media
-						else if(mp::material[catom_array[atom].material].continuous==true){
+						/*else if(mp::material[catom_array[atom].material].continuous==true){
 							const int geo=mp::material[catom_array[atom].material].geometry;
 
 							if(geo==0){
@@ -381,8 +390,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 								double py[50];
 								// Initialise polygon points
 								for(int p=0;p<geo;p++){
-									px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*mp::system_dimensions[0];
-									py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*mp::system_dimensions[1];
+									px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
+									py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
 								}
 								if(vmath::point_in_polygon(x,y,px,py,geo)==true){
 									catom_array[atom].include=true;
@@ -391,89 +400,34 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							}
 							//catom_array[atom].include=true;
 							catom_array[atom].grain=grain;
-						}
+							}*/
 					}
 				}
 			}
 		}
 	}
-	/*const int num_atoms = catom_array.size();	
-	int nearest_grain=0;
-	
-	for(unsigned int atom=0;atom<catom_array.size();atom++){
-			if((atom%(num_atoms/10))==0){
-				std::cout << "." << std::flush;
-			}
-
-		// Loop over grains to find if point is in grain
-		for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
-			// Exclude grains with zero vertices
-			if(grain_vertices_array[grain].size()!=0){
-				double x = catom_array[atom].x-grain_coord_array[grain][0];
-				double y = catom_array[atom].y-grain_coord_array[grain][1];
-
-				// Set temporary vertex coordinates
-				int num_vertices = grain_vertices_array[grain].size();
-				for(int vertex=0;vertex<num_vertices;vertex++){
-					tmp_grain_pointx_array[vertex]=grain_vertices_array[grain][vertex][0];
-					tmp_grain_pointy_array[vertex]=grain_vertices_array[grain][vertex][1];
-				}
-
-				// Check to see if site is within polygon
-				if(vmath::point_in_polygon(x,y,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
-					catom_array[atom].include=true;
-					catom_array[atom].grain=grain;
-					break;
-				}
-				// Check for continuous media
-				else if(mp::material[catom_array[atom].material].continuous==true){
-					double new_range = x*x+y*y;
-					double ox = catom_array[atom].x-grain_coord_array[nearest_grain][0];
-					double oy = catom_array[atom].y-grain_coord_array[nearest_grain][1];
-					double old_range = ox*ox+oy*oy;
-					if(new_range<=old_range){
-					  const int geo=mp::material[catom_array[atom].material].geometry;
-
-					  if(geo==0){
-					    catom_array[atom].include=true;
-					  }
-					  else{
-					    double x = catom_array[atom].x;
-					    double y = catom_array[atom].y;
-					    double px[50];
-					    double py[50];
-					    // Initialise polygon points
-					    for(int p=0;p<geo;p++){
-					      px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*mp::system_dimensions[0];
-					      py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*mp::system_dimensions[1];
-					    }
-					    if(vmath::point_in_polygon(x,y,px,py,geo)==true){
-					      catom_array[atom].include=true;
-					      catom_array[atom].grain=grain;
-					    }
-					  }
-						//catom_array[atom].include=true;
-						catom_array[atom].grain=grain;
-						nearest_grain=grain;
-					}
-				}
-			}
-		}
-		// Identify atoms by grain parity
-		//if(catom_array[atom].material==2){
-		//	catom_array[atom].material=catom_array[atom].grain%2+2;
-		//}
-	}*/
-
 	std::cout << "done!" << std::endl;
+	zlog << "done!" << std::endl;
 
+	// add final grain for continuous layer
+	grain_coord_array.push_back(std::vector <double>());
+	grain_coord_array[grain_coord_array.size()-1].push_back(0.0); // x
+	grain_coord_array[grain_coord_array.size()-1].push_back(0.0); // y
+
+	// check for continuous layer
+	for(int atom=0; atom < catom_array.size(); atom++){
+	  if(mp::material[catom_array[atom].material].continuous==true){
+	    catom_array[atom].include=true;
+	    catom_array[atom].grain=int(grain_coord_array.size()-1);
+	  }
+	}
+  
 	// set number of grains
 	grains::num_grains = int(grain_coord_array.size());
 
 	// sort atoms by grain number
 	sort_atoms_by_grain(catom_array);
 
-	
 	return EXIT_SUCCESS;	
 }
 
@@ -504,7 +458,7 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(err::check==true){std::cout << "cs::populate_vertex_points has been called" << std::endl;}	
+	if(err::check==true){std::cerr << "cs::populate_vertex_points has been called" << std::endl;}	
 
 	//--------------------------------------
 	// Scale grain coordinates
@@ -594,11 +548,10 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//----------------------------------------------------------
 	// Allocate vertex_array
 	//----------------------------------------------------------
-	double** vertex_array;
+	std::vector<std::vector<double> > vertex_array;
 
-	try{vertex_array=new double*[num_vertices];
-    	for(int i=0; i<num_vertices; i++)vertex_array[i]=new double[2];}
-  	catch(...){std::cerr << "error allocating vertex_array" << std::endl;err::vexit();}
+    	vertex_array.resize(num_vertices);
+	for(int i=0; i<num_vertices; i++) vertex_array[i].resize(2);
 
 	//--------------------------------------
 	// Read in Voronoi vertices and rescale
@@ -631,8 +584,8 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 			// check for unbounded grains
 			if(vertex_number==0) inf=true;
 			// check for bounded grains with vertices outside bounding box
-			if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>mp::system_dimensions[0])) inf=true;
-			if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>mp::system_dimensions[1])) inf=true;
+			if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>cs::system_dimensions[0])) inf=true;
+			if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>cs::system_dimensions[1])) inf=true;
 		}
 
 		//-------------------------------------------------------------------
@@ -666,19 +619,6 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	if(sysstat!=0) std::cerr << "Error removing temporary voronoi files" << std::endl;
 	}
 		
-	//system("rm -f grains.tmp");
-	//system("rm -f voronoi.tmp");
-
-	//-------------------------------------------------------------------
-	// Deallocate vertex array
-	//-------------------------------------------------------------------
-	
- 	try{for(int i=0;i<num_vertices;i++) delete [] vertex_array[i];
-    	delete [] vertex_array;
-    	vertex_array=NULL;
-   }
-  	catch(...){std::cerr << "error deallocating vertex_array" << std::endl;err::vexit();}
-	
 	return EXIT_SUCCESS;
 
 }

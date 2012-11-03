@@ -1,6 +1,27 @@
-/// \file main.cpp
-/// Vampire Program Entry
-
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 #include <iostream>
 #include <vector>
 #include <sstream>
@@ -22,7 +43,7 @@ int main(int argc, char* argv[]){
 	//=============================================================
 	// Check for valid command-line arguments
 	//=============================================================
-	std::string infile="vinput";
+	std::string infile="input";
 	
 	for(int arg = 1; arg < argc; arg++){
 		std::string sw=argv[arg];
@@ -49,34 +70,44 @@ int main(int argc, char* argv[]){
 		vmpi::initialise();
 	#endif 
 	
-	//      Output Program Header
+	// Initialise log file
+	vout::zLogTsInit(std::string(argv[0]));
+		
+	// Output Program Header
 	if(vmpi::my_rank==0){
-		std::cout << "                                ___      _" << std::endl;
-		std::cout << "                            ___/ __|_ __(_)_ _" << std::endl;
-		std::cout << "                           |_ /\\__ \\ '_ \\ | ' \\" << std::endl;
-		std::cout << "                           /__||___/ .__/_|_||_|" << std::endl;
-		std::cout << "                                   |_|" << std::endl;
+		std::cout << "                                                _          " << std::endl;
+		std::cout << "                                               (_)         " << std::endl;
+		std::cout << "                    __   ____ _ _ __ ___  _ __  _ _ __ ___ " << std::endl;
+		std::cout << "                    \\ \\ / / _` | '_ ` _ \\| '_ \\| | '__/ _ \\" << std::endl;
+		std::cout << "                     \\ V / (_| | | | | | | |_) | | | |  __/" << std::endl;
+		std::cout << "                      \\_/ \\__,_|_| |_| |_| .__/|_|_|  \\___|" << std::endl;
+		std::cout << "                                         | |               " << std::endl;
+		std::cout << "                                         |_|               " << std::endl;
 		std::cout << std::endl;
-		std::cout << "           Contributors: Richard F L Evans, Weijia Fan, Joe Barker, " << std::endl;
-		std::cout << "                         Thomas Ostler, Phanwadee Chureemart, Roy W Chantrell" << std::endl;
+		std::cout << "                       Version 2.0 " << __DATE__ << " " << __TIME__ << std::endl;
+		std::cout << std::endl;
+
+		std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
+		std::cout << std::endl;
+		std::cout << "  Contributors: Richard F L Evans, Weijia Fan, Joe Barker, " << std::endl;
+		std::cout << "                Thomas Ostler, Phanwadee Chureemart, Roy W Chantrell" << std::endl;
 		std::cout << " " << std::endl;
-		std::cout << "                      Version 1.0 " << __DATE__ << " " << __TIME__ << std::endl;
 		#ifdef COMP	
-		std::cout << "                        Compiled with " << COMP << std::endl;
+		std::cout << "                Compiled with:  " << COMP << std::endl;
 		#endif 
-		std::cout << " " << std::endl;
-		std::cout << "                        Compiler Flags:";
+		std::cout << "                Compiler Flags: ";
 		#ifdef CUDA
-		std::cout << " CUDA ";
+		std::cout << "CUDA ";
 		#endif
 		#ifdef MPICF
-		std::cout << " MPI ";
+		std::cout << "MPI ";
 		#endif
 		std::cout << std::endl;
+		std::cout << std::endl;
 		std::cout << "================================================================================" << std::endl;
-    time_t rawtime = time(NULL);
-    struct tm * timeinfo = localtime(&rawtime);
-    std::cout<<asctime(timeinfo);
+		time_t rawtime = time(NULL);
+		struct tm * timeinfo = localtime(&rawtime);
+		std::cout<<asctime(timeinfo);
 	}
 
 
@@ -84,11 +115,12 @@ int main(int argc, char* argv[]){
 		vmpi::hosts();
 	#endif 
   
+#ifdef MPICF
   // nullify non root cout stream
   if(vmpi::my_rank!=0){
     vout::nullify(std::cout);
   }
-  
+  #endif
   // redirect std::err to file
   //std::stringstream ss;
   //ss << "vampire."<<vmpi::my_rank<<".err";
@@ -107,9 +139,13 @@ int main(int argc, char* argv[]){
 	// Finalise MPI
 	#ifdef MPICF
 		vmpi::finalise();
+		// concatenate log, sort, and appen departure message.
+		if(vmpi::num_processors!=1) system("ls zlog.* | xargs cat | sort -n > zlog");
 	#endif
 
-  return EXIT_SUCCESS;
+	zlog << zTs() << "Program ended gracefully. Exiting." << std::endl;
+
+	return EXIT_SUCCESS;
 }
 
 /// \mainpage Vampire

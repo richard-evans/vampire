@@ -1,8 +1,34 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 
 
 #include "atoms.hpp"
+#include "create.hpp"
 #include "material.hpp"
 #include "errors.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 #include <iostream>
 #include <list>
@@ -11,15 +37,32 @@
 
 namespace vmpi{
 	int mpi_mode=0;
+	int ppn=1;						///< Processors per node
 	int my_rank=0;
 	int num_processors=1;
 	int num_core_atoms;
 	int num_bdry_atoms;
 	int num_halo_atoms;
 
+	bool replicated_data_staged=false;
+	
 	char hostname[20];
+
+	// timing variables
 	double start_time;
 	double end_time;
+	double ComputeTime;			// Temporary for storing time 
+	double WaitTime;				// Temporary for storing time
+	double TotalComputeTime;	// Total time spent in computation
+	double TotalWaitTime;		// Total time spent waiting
+	double AverageComputeTime;
+	double AverageWaitTime;
+	double MaximumComputeTime;
+	double MaximumWaitTime;
+	bool DetailedMPITiming=false;
+	std::vector<double> ComputeTimeArray(0);
+	std::vector<double> WaitTimeArray(0);
+
 	double min_dimensions[3]; ///< Minimum coordinates of system on local cpu
 	double max_dimensions[3]; ///< Maximum coordinates of system on local cpu
 	
@@ -237,8 +280,8 @@ namespace vmpi{
 		for (int i=0;i<100;i+=5){
 			xyz_file << "O\t" << float(i) << "\t" << 0.0 << "\t" << 0.0 << std::endl;
 			xyz_file << "O\t" << 0.0 << "\t" << float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0] << "\t" << material_parameters::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0]-float(i) << "\t" << 	material_parameters::system_dimensions[1] << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
+			xyz_file << "O\t" << cs::system_dimensions[0]-float(i) << "\t" << cs::system_dimensions[1] << "\t" << 0.0 << std::endl;
 		}
 	  	for(int atom=0; atom<num_atoms; atom++){
 				//if(mpi_create_variables::mpi_comms_identify==true){
@@ -359,18 +402,15 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	std::vector<double> cpu_range_array(6*vmpi::num_processors,0.0); // Linear Memory for MPI comms
 	
 	// Determine range+interaction range of all CPU's
-	double max_interaction_range=0.0;
-	for(int mat=0;mat<mp::num_materials;mat++){
-		if(mp::material[mat].cutoff > max_interaction_range) max_interaction_range = mp::material[mat].cutoff;
-	}
+	double max_interaction_range=double(cs::unit_cell.interaction_range);
 	
 	// Populate local ranges
-	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*mp::lattice_constant[0];
-	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*mp::lattice_constant[1];
-	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*mp::lattice_constant[2];
-	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*mp::lattice_constant[0];
-	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*mp::lattice_constant[1];
-	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*mp::lattice_constant[2];
+	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*cs::unit_cell.dimensions[0];
+	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*cs::unit_cell.dimensions[1];
+	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*cs::unit_cell.dimensions[2];
+	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*cs::unit_cell.dimensions[0];
+	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*cs::unit_cell.dimensions[1];
+	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*cs::unit_cell.dimensions[2];
 	
 	// Reduce data on all CPUs
 	//MPI::COMM_WORLD.Allreduce(&cpu_range_array[0], &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
@@ -434,13 +474,17 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	// Arrays for sending/receiving data
 	std::vector<double> send_coord_array(3*num_bdry_atoms,0.0);
 	std::vector<double> recv_coord_array(3*num_halo_atoms,0.0);
+	std::vector<int> send_mpi_atom_supercell_array(3*num_bdry_atoms,0);
+	std::vector<int> recv_mpi_atom_supercell_array(3*num_halo_atoms,0);
 	std::vector<int> send_material_array(num_bdry_atoms,0);
 	std::vector<int> recv_material_array(num_halo_atoms,0);
 	std::vector<int> send_cpuid_array(num_bdry_atoms,0);
 	std::vector<int> recv_cpuid_array(num_halo_atoms,0);
 	std::vector<int> send_mpi_atom_num_array(num_bdry_atoms,0);
 	std::vector<int> recv_mpi_atom_num_array(num_halo_atoms,0);
-
+	std::vector<int> send_mpi_uc_id_array(num_bdry_atoms,0);
+	std::vector<int> recv_mpi_uc_id_array(num_halo_atoms,0);
+	
 	// Pack up data for sending
 	int counter=0;	// array index
 
@@ -453,9 +497,13 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 					send_coord_array[3*counter+0] = catom_array[atom].x;
 					send_coord_array[3*counter+1] = catom_array[atom].y;
 					send_coord_array[3*counter+2] = catom_array[atom].z;
+					send_mpi_atom_supercell_array[3*counter+0] = catom_array[atom].scx;
+					send_mpi_atom_supercell_array[3*counter+1] = catom_array[atom].scy;
+					send_mpi_atom_supercell_array[3*counter+2] = catom_array[atom].scz;
 					send_material_array[counter]  = catom_array[atom].material;
 					send_cpuid_array[counter]  	= vmpi::my_rank; //catom_array[atom].mpi_cpu;
 					send_mpi_atom_num_array[counter] = atom;
+					send_mpi_uc_id_array[counter] = catom_array[atom].uc_id;
 					counter++;
 				}
 			}
@@ -480,27 +528,22 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	
 	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
 		if(num_send_atoms[cpu]>0){
-			//MPI::COMM_WORLD.Ssend(&send_coord_array[3*send_index],3*num_send_atoms[cpu],MPI_DOUBLE,cpu,50);
-			//MPI::COMM_WORLD.Ssend(&send_material_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,51);
-			//MPI::COMM_WORLD.Ssend(&send_cpuid_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,52);
-			//MPI::COMM_WORLD.Ssend(&send_mpi_atom_num_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,53);
-			
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_coord_array[3*send_index],3*num_send_atoms[cpu],MPI_DOUBLE,cpu,50));
+			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_supercell_array[3*send_index],3*num_send_atoms[cpu],MPI_INT,cpu,54));
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_material_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,51));
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_cpuid_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,52));
 			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_num_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,53));
+			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_uc_id_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,55));
 			//std::cout << "Send complete on CPU " << vmpi::my_rank << " to CPU " << cpu << " at index " << send_index  << std::endl;
 			send_index+=num_send_atoms[cpu];
 		}
 		if(num_recv_atoms[cpu]>0){
-			//MPI::COMM_WORLD.Recv(&recv_coord_array[3*recv_index],3*num_recv_atoms[cpu],MPI_DOUBLE,cpu,50);
-			//MPI::COMM_WORLD.Recv(&recv_material_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,51);
-			//MPI::COMM_WORLD.Recv(&recv_cpuid_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,52);
-			//MPI::COMM_WORLD.Recv(&recv_mpi_atom_num_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,53);
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_coord_array[3*recv_index],3*num_recv_atoms[cpu],MPI_DOUBLE,cpu,50));
+			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_supercell_array[3*recv_index],3*num_recv_atoms[cpu],MPI_INT,cpu,54));
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_material_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,51));
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_cpuid_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,52));
 			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_num_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,53));
+			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_uc_id_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,55));
 			//std::cout << "Receive complete on CPU " << vmpi::my_rank << " from CPU " << cpu << " at index " << recv_index << " at address " << &recv_mpi_atom_num_array[recv_index] << std::endl;
 			recv_index+=num_recv_atoms[cpu];
 		}
@@ -515,10 +558,14 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 		catom_array[atom].x = recv_coord_array[3*index+0];
 		catom_array[atom].y = recv_coord_array[3*index+1];
 		catom_array[atom].z = recv_coord_array[3*index+2];
+		catom_array[atom].scx = recv_mpi_atom_supercell_array[3*index+0];
+		catom_array[atom].scy = recv_mpi_atom_supercell_array[3*index+1];
+		catom_array[atom].scz = recv_mpi_atom_supercell_array[3*index+2];
 		catom_array[atom].material = recv_material_array[index];
 		catom_array[atom].mpi_cpuid = recv_cpuid_array[index];
 		catom_array[atom].mpi_type = 2; // mark as halo atom
 		catom_array[atom].mpi_atom_number = recv_mpi_atom_num_array[index];
+		catom_array[atom].uc_id = recv_mpi_uc_id_array[index];
 	}
 		
 		
@@ -599,7 +646,7 @@ int set_replicated_data(std::vector<cs::catom_t> & catom_array){
 	return EXIT_SUCCESS;
 }
 
-int sort_atoms_by_mpi_type(std::vector<cs::catom_t> &,std::vector<std::vector <int> > &);
+int sort_atoms_by_mpi_type(std::vector<cs::catom_t> &,std::vector<std::vector <cs::neighbour_t> > &);
 
 /// @brief Identify Boundary Atoms
 ///
@@ -624,18 +671,18 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> &,std::vector<std::vector <i
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <int> > & cneighbourlist){
+int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <cs::neighbour_t> > & cneighbourlist){
 	
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "vmpi::identify_boundary_atoms has been called" << std::endl;}
 	
 	// Find and mark boundary and unneeded halo atoms 
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		int my_mpi_type=catom_array[atom].mpi_type;
+		const int my_mpi_type=catom_array[atom].mpi_type;
 		bool boundary=false;
 		bool non_interacting_halo=true;
 		for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
-			int nn_mpi_type = catom_array[cneighbourlist[atom][nn]].mpi_type;
+			int nn_mpi_type = catom_array[cneighbourlist[atom][nn].nn].mpi_type;
 			// Test for interaction with halo
 			if((my_mpi_type==0) && (nn_mpi_type == 2)){
 				boundary=true;
@@ -643,7 +690,11 @@ int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<s
 			// Test for halo interacting with non-halo
 			if((my_mpi_type==2) && ((nn_mpi_type == 0) || (nn_mpi_type == 1))){
 				non_interacting_halo=false;
+				//std::cout << "Found interacting halo,     atom: " << atom << "\t MPI_t: " << my_mpi_type << " Neighbour: " << cneighbourlist[atom][nn].nn << "\t MPI_t: " <<  nn_mpi_type << " Flag: " << non_interacting_halo << std::endl;
+
 			}
+			//else 	std::cout << "Found non-interacting halo, atom: " << atom << "\t MPI_t: " << my_mpi_type << " Neighbour: " << cneighbourlist[atom][nn].nn << "\t MPI_t: " <<  nn_mpi_type << " Flag: " << non_interacting_halo << std::endl;
+	 
 		}
 		// Mark atoms appropriately
 		if((my_mpi_type==2) && (non_interacting_halo==true)){
@@ -672,7 +723,7 @@ bool compare(data_t first,data_t second){
 	else return false;
 }
 	
-int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <int> > & cneighbourlist){
+int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<std::vector <cs::neighbour_t> > & cneighbourlist){
 	
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::sort_atoms_by_mpi_type has been called" << std::endl;}	
@@ -711,27 +762,41 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 	vmpi::num_bdry_atoms=0;
 	vmpi::num_halo_atoms=0;
 
-	// Also need inverse array for reconstructing neighbour list
+	// Also need inverse array of atoms for reconstructing neighbour list
 	std::vector<int> inv_mpi_type_vec(catom_array.size());
 	
+	// loop over new atom list
 	for (unsigned int atom=0;atom<catom_array.size();atom++){
+		// store new atom number in array of old atom numbers
 		inv_mpi_type_vec[mpi_type_vec[atom].atom_number]=atom;
 
 		if(mpi_type_vec[atom].mpi_type !=3) new_num_atoms++;
 		if(mpi_type_vec[atom].mpi_type ==0) vmpi::num_core_atoms++;
 		if(mpi_type_vec[atom].mpi_type ==1) vmpi::num_bdry_atoms++;
 		if(mpi_type_vec[atom].mpi_type ==2) vmpi::num_halo_atoms++;
+				
 	}
 	
+	// Print out neighbourlist before sorting
+	//for (unsigned int atom=0;atom<catom_array.size();atom++){
+	//	std::cout << atom << " MPI_t: " <<  catom_array[atom].mpi_type << "NL: ";
+	//	for(int i=0;i<cneighbourlist[atom].size();i++) std::cout << cneighbourlist[atom][i].nn << "\t";
+	//	std::cout << " on rank " << vmpi::my_rank << std::endl;
+	//}
+		
 		//for (unsigned int atom=0;atom<catom_array.size();atom++){
 		//if(vmpi::my_rank==1){
 		//	std::cout << atom << " "<< inv_mpi_type_vec[atom] << " mpi type " << catom_array[atom].mpi_type << std::endl;
 		//}
 		//}
-		std::cout << vmpi::num_core_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms + vmpi::num_halo_atoms << std::endl;
-	// create temporary catom and cneighbourlist arrays for copying data
+		//std::cout << vmpi::num_core_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms << " " << vmpi::num_core_atoms+vmpi::num_bdry_atoms + vmpi::num_halo_atoms << std::endl;
+		zlog << zTs() << "Number of core  atoms: " << vmpi::num_core_atoms << std::endl;
+		zlog << zTs() << "Number of local atoms: " << vmpi::num_core_atoms +vmpi::num_bdry_atoms << std::endl;
+		zlog << zTs() << "Number of total atoms: " << vmpi::num_core_atoms +vmpi::num_bdry_atoms + vmpi::num_halo_atoms << std::endl;
+		
+		// create temporary catom and cneighbourlist arrays for copying data
 	std::vector <cs::catom_t> tmp_catom_array(new_num_atoms);
-	std::vector <std::vector <int> > tmp_cneighbourlist(new_num_atoms);
+	std::vector <std::vector <cs::neighbour_t> > tmp_cneighbourlist(new_num_atoms);
 	//tmp_cneighbourlist.reserve(new_num_atoms);
 	
 	// Populate tmp arrays (assuming all mpi_type=3 atoms are at the end of the array?)
@@ -739,27 +804,45 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 		unsigned int old_atom_num = mpi_type_vec[atom].atom_number;
 		tmp_catom_array[atom]=catom_array[old_atom_num];
 		tmp_catom_array[atom].mpi_old_atom_number=old_atom_num; // Store old atom numbers for translation after sorting
-		//tmp_cneighbourlist.push_back(std::vector<int>());
 		tmp_cneighbourlist[atom].reserve(cneighbourlist[old_atom_num].size());
 		//Copy neighbourlist using new atom numbers
-		//if(vmpi::my_rank==1) std::cout << vmpi::my_rank << " old " << old_atom_num << " nn: ";
+		//if(vmpi::my_rank==0) std::cout << vmpi::my_rank << " old " << old_atom_num << " nn: ";
 		for(unsigned int nn=0;nn<cneighbourlist[old_atom_num].size();nn++){
-			unsigned int old_nn_number = cneighbourlist[old_atom_num][nn];
+			unsigned int old_nn_number = cneighbourlist[old_atom_num][nn].nn;
+			unsigned int interaction_id= cneighbourlist[old_atom_num][nn].i;
 			unsigned int new_nn_number = inv_mpi_type_vec[old_nn_number];
-			tmp_cneighbourlist[atom].push_back(new_nn_number);
-			//if(vmpi::my_rank==1) std::cout << cneighbourlist[old_atom_num][nn] << "\t";
+			cs::neighbour_t temp_nt;
+			temp_nt.nn=new_nn_number;
+			temp_nt.i=interaction_id;
+			// ignore all halo-x interactions but not x-halo
+			//if(!((mpi_type_vec[atom].mpi_type==2) && (mpi_type_vec[new_nn_number].mpi_type==2)))
+			if(!(mpi_type_vec[atom].mpi_type==2))
+			tmp_cneighbourlist[atom].push_back(temp_nt);
+			//else std::cerr << "ignoring interaction " << atom << "\t" << new_nn_number << " on " << vmpi::my_rank << std::endl;
+			//if(vmpi::my_rank==0) std::cout << cneighbourlist[old_atom_num][nn].nn << "\t";
 		}
-		//if(vmpi::my_rank==1) std::cout <<std::endl;
-		//if(vmpi::my_rank==1) std::cout << vmpi::my_rank << " new " << atom << " nn: ";
+		//if(vmpi::my_rank==0) std::cout <<std::endl;
+		//if(vmpi::my_rank==0) std::cout << vmpi::my_rank << " new " << atom << " nn: ";
 		//for(unsigned int nn=0;nn<tmp_cneighbourlist[atom].size();nn++){
-			//if(vmpi::my_rank==1) std::cout << tmp_cneighbourlist[atom][nn] << "\t";
+		//	if(vmpi::my_rank==0) std::cout << tmp_cneighbourlist[atom][nn].nn << "\t";
 		//}
-		//if(vmpi::my_rank==1) std::cout <<std::endl;
+		//if(vmpi::my_rank==0) std::cout <<std::endl;
 	}
+	
 
-	// Copy tmp data over old data
-	catom_array=tmp_catom_array;
-	cneighbourlist=tmp_cneighbourlist; // This actually works(!) - COPIES both pointers and elements of pointers
+		
+	// Swap tmp data over old data more efficient and saves memory
+	catom_array.swap(tmp_catom_array);
+	cneighbourlist.swap(tmp_cneighbourlist); // This actually works(!) - COPIES both pointers and elements of pointers
+
+	// Print out final neighbourlist
+	//for (unsigned int atom=0;atom<new_num_atoms;atom++){
+	//	std::cout << "Atom: " << atom << " MPI_type: " << catom_array[atom].mpi_type;
+	//	for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
+	//		std::cout << "\t" << cneighbourlist[atom][nn].nn;
+	//	}
+	//	std::cout << std::endl;
+	//}
 	
 	return EXIT_SUCCESS;
 }

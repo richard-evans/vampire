@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains vin and vout namespaces for file input.output in vampire. 
@@ -46,12 +70,135 @@
 #include <sstream>
 #include <string>
 
-//==========================================================
-// Global Output Streams
-//==========================================================
-//std::ofstream vinfo("info");
-//std::ofstream vdp("vdp");
-//std::ofstream vmag("vmag");
+// Global output filestreams
+std::ofstream zinfo("info");
+std::ofstream zlog;
+std::ofstream zmag("output");
+std::ofstream zgrain("grain");
+
+
+namespace vout{
+	
+	std::string zLogProgramName; // Program Name
+	std::string zLogHostName; // Host Name
+	pid_t 		zLogPid; // Process ID
+	bool			zLogInitialised=false; // Initialised flag
+	
+	//const char * StringStream2ConstChar(std::stringstream file_sstr){
+	//	static std::string cfg_file = file_sstr.str();
+	//	return cfg_file.c_str();
+	//}
+	
+	void zLogTsInit(std::string tmp){
+		
+		// Get program name and process ID
+		std::string tmprev;
+		int linelength = tmp.length();
+
+		// set character triggers
+		const char* key="/";	// Word identifier
+
+		// copy characters after last /
+		for(int i=linelength-1;i>=0;i--){
+
+			char c=tmp.at(i);
+
+			if(c != *key){
+				tmprev.push_back(c);
+			}
+			else break;
+		}
+		
+		//reverse read into program name
+		linelength=tmprev.size();
+		for(int i=linelength-1;i>=0;i--){
+			char c=tmprev.at(i);
+			zLogProgramName.push_back(c);
+		}
+
+		// Get hostname
+		char loghostname [80];
+		int GHS=gethostname(loghostname, 80);
+		if(GHS!=0) std::cerr << "Warning: Unable to retrieve hostname for zlog file." << std::endl; 
+		zLogHostName = loghostname;
+		
+		// Now get process ID
+		zLogPid = getpid();
+		
+		// Remove previous log files
+		//system("rm zlog*"); This doesn't work in parallel
+		
+		// Set unique filename for log if num_procs > 1
+		std::stringstream logfn;
+		if(vmpi::num_processors==1) logfn << "log";
+		else logfn << "log."<<vmpi::my_rank;
+		
+		// Open log filename
+		std::string log_file = logfn.str();
+		const char* log_filec = log_file.c_str();
+		zlog.open(log_filec);
+		//zlog.open(StringStream2ConstChar(logfn));
+		
+		// Mark as initialised;
+		zLogInitialised=true;
+		
+		zlog << zTs() << "Logfile opened" << std::endl;
+		
+		return;
+	}
+	
+}
+
+/// @brief Function to output timestamp to stream
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2012. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    19/04/2012
+///
+/// @return TS
+///
+/// @internal
+///	Created:		19/04/2012
+///	Revision:	  ---
+///=====================================================================================
+///
+std::string zTs(){
+
+  std::string NullString;
+  NullString="";
+
+	if(vout::zLogInitialised==true){
+		std::ostringstream Ts;
+		
+		// varibale for time
+		time_t seconds;
+
+		// get current time
+		seconds = time (NULL);
+		struct tm * timeinfo;
+		char logtime [80];
+
+		timeinfo = localtime ( &seconds );
+		// Format time string
+		strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
+  
+		Ts << logtime << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
+	
+		return Ts.str();
+
+	}
+	else{
+		std::cerr << "Error! - zlog not initialised, exiting" << std::endl;
+		err::vexit();
+	}
+
+	return NullString;
+}
 
 /// @namespace
 /// @brief Contains variables and functions for reading in program data.
@@ -64,7 +211,7 @@ namespace vin{
 // Function Prototypes
 //int read(string const);
 int match(string const, string const, string const, string const, int const);
-int read_mat_file(std::string const);
+  int read_mat_file(std::string const, int const);
 int match_create(std::string const, std::string const, int const);
 int match_dimension(std::string const, std::string const, std::string const, int const);
 int match_sim(std::string const, std::string const, std::string const, int const);
@@ -72,6 +219,40 @@ int match_vout_list(std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_material(string const, string const, string const, int const, int const, int const);
 int match_config(string const, string const, int const);
+
+// Function to extract all variables from a string and return a vector
+std::vector<double> DoublesFromString(std::string value){
+	
+	// array for storing variables
+	std::vector<double> array(0);
+	
+	// set source for ss
+	std::istringstream source(value);
+
+	// double variable to store values
+	double temp = 0.0;
+	
+	// string to store text
+	std::string field;
+ 
+	// loop over all comma separated values
+	while(getline(source,field,',')){
+		
+		// convert string to ss
+		std::stringstream fs(field);
+
+		// read in variable
+		fs >> temp;
+		
+		// push data value back to array
+		array.push_back(temp);
+		
+	}
+	
+	// return values to calling function
+	return array;
+	
+}
 
 /// @brief Function to read in variables from a file.
 ///
@@ -95,14 +276,24 @@ int match_config(string const, string const, int const);
 int read(string const filename){
 	// ifstream declaration
 	std::ifstream inputfile;
+
+	// Print informative message to zlog file
+	zlog << zTs() << "Opening main input file \"" << filename << "\"." << std::endl; 
 	
 	// Open file read only
 	inputfile.open(filename.c_str());
 	
 	// Check for opening
 	if(!inputfile.is_open()){
-		return EXIT_FAILURE;   // return to calling function for error checking or message
+	  std::cerr << "Error opening main input file \"" << filename << "\". File does not exist!" << std::endl;
+	  zlog << zTs() << "Error: Main input file \"" << filename << "\" cannot be opened or does not exist." << std::endl;
+	  zlog << zTs() << "If file exists then check file permissions to ensure it is readable by the user." << std::endl;
+	  err::vexit();   // return to calling function for error checking or message
 	}
+
+        // Print informative message to zlog file
+	zlog << zTs() << "Parsing system parameters from main input file." << std::endl;
+	
 	int line_counter=0;
 	// Loop over all lines and pass keyword to matching function
 	while (! inputfile.eof() ){
@@ -115,6 +306,9 @@ int read(string const filename){
 		line.erase(remove(line.begin(), line.end(), '\t'), line.end());
 		line.erase(remove(line.begin(), line.end(), ' '), line.end());
 
+		// clear carriage return for dos formatted files
+		line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+		
 		// strip key,word,unit,value
 		std::string key="";
 		std::string word="";
@@ -274,7 +468,7 @@ int match(string const key, string const word, string const value, string const 
 	// Test for data file output
 	//===================================================================
 	else
-	test="vmag";
+	test="output";
 	if(key==test){
 		int frs=vin::match_vout_list(word, line, vout::file_output_list);
 		return frs;
@@ -292,7 +486,7 @@ int match(string const key, string const word, string const value, string const 
 	// Test for grain output
 	//===================================================================
 	else
-	test="vgrain";
+	test="grain";
 	if(key==test){
 		int frs=vin::match_vout_grain_list(word, value, line, vout::grain_output_list);
 		return frs;
@@ -320,7 +514,26 @@ int match(string const key, string const word, string const value, string const 
 			test="";
 			if(matfile!=test){
 				//std::cout << matfile << std::endl;
-				read_mat_file(matfile);
+			  read_mat_file(matfile,line);
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
+				return EXIT_FAILURE;
+			}
+		}
+		//-------------------------------------------------------------------
+		// Get unit cell filename
+		//-------------------------------------------------------------------
+		test="unit-cell-file";
+		if(word==test){
+			std::string matfile=value;
+			// strip quotes
+			matfile.erase(remove(matfile.begin(), matfile.end(), '\"'), matfile.end());
+			test="";
+			if(matfile!=test){
+				//std::cout << matfile << std::endl;
+				cs::unit_cell_file=matfile;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -345,37 +558,43 @@ int match_create(string const word, string const value, int const line){
 		//-------------------------------------------------------------------
 		std::string test="full";
 		if(word==test){
-			mp::system_creation_flags[1]=0;
+			cs::system_creation_flags[1]=0;
 			return EXIT_SUCCESS;
 		}
 		else 
 		test="cube";
 		if(word==test){
-			mp::system_creation_flags[1]=1;
+			cs::system_creation_flags[1]=1;
 			return EXIT_SUCCESS;
 		}
 		else 
 		test="cylinder";
 		if(word==test){
-			mp::system_creation_flags[1]=2;
+			cs::system_creation_flags[1]=2;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="ellipsinder";
 		if(word==test){
-			mp::system_creation_flags[1]=3;
+			cs::system_creation_flags[1]=3;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="sphere";
 		if(word==test){
-			mp::system_creation_flags[1]=4;
+			cs::system_creation_flags[1]=4;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="truncated-octahedron";
 		if(word==test){
-			mp::system_creation_flags[1]=5;
+			cs::system_creation_flags[1]=5;
+			return EXIT_SUCCESS;
+		}
+		else
+		test="tear-drop";
+		if(word==test){
+			cs::system_creation_flags[1]=6;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -384,25 +603,25 @@ int match_create(string const word, string const value, int const line){
 		//-------------------------------------------------------------------
 		test="particle";
 		if(word==test){
-			mp::system_creation_flags[2]=0;
+			cs::system_creation_flags[2]=0;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="particle-array";
 		if(word==test){
-			mp::system_creation_flags[2]=1;
+			cs::system_creation_flags[2]=1;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="hex-particle-array";
 		if(word==test){
-			mp::system_creation_flags[2]=2;
+			cs::system_creation_flags[2]=2;
 			return EXIT_SUCCESS;
 		}
 		else
 		test="voronoi-film";
 		if(word==test){
-			mp::system_creation_flags[2]=3;
+			cs::system_creation_flags[2]=3;
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
@@ -443,7 +662,8 @@ int match_create(string const word, string const value, int const line){
 		test="voronoi-rounded";
 		if(word==test){
 			test="true";
-			if(value==test){
+			std::string blank="";
+			if(value==test || value==blank){
 				create_voronoi::rounded=true;
 				return EXIT_SUCCESS;
 			}
@@ -473,20 +693,11 @@ int match_create(string const word, string const value, int const line){
 		else
 		//-------------------------------------------------------------------
 		//-------------------------------------------------------------------
-		// system_creation_flags[3] - Set neighbourlist type
-		//-------------------------------------------------------------------
-		test="Jij-explicit";
-		if(word==test){
-			mp::system_creation_flags[3]=0;
-			return EXIT_SUCCESS;
-		}
-		else
-		//-------------------------------------------------------------------
 		// system_creation_flags[4] - Set Multilayer Flag
 		//-------------------------------------------------------------------
 		/*test="multilayer";
 		if(word==test){
-			mp::system_creation_flags[4]=1;
+			cs::system_creation_flags[4]=1;
 			// test for multilayer lines
 			test=">";
 			if(value==test){
@@ -511,15 +722,15 @@ int match_create(string const word, string const value, int const line){
 		else
 		test="intermixed";
 		if(word==test){
-			mp::system_creation_flags[4]=2;
+			cs::system_creation_flags[4]=2;
 			return EXIT_SUCCESS;
 		}
 		else*/
 		test="particle-parity";
 		if(word==test){
 			int pp=atoi(value.c_str());
-				mp::particle_creation_parity=pp;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::particle_creation_parity=pp;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
@@ -529,14 +740,59 @@ int match_create(string const word, string const value, int const line){
 			// Strip quotes
 			std::string cs=value;
 			cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
-			mp::crystal_structure=cs;
+			cs::crystal_structure=cs;
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
 		else
 		test="single-spin";
 		if(word==test){
-			mp::single_spin=true;
+			cs::single_spin=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-x";
+		if(word==test){
+			cs::pbc[0]=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-y";
+		if(word==test){
+			cs::pbc[1]=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="periodic-boundaries-z";
+		if(word==test){
+			cs::pbc[2]=true;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="select-material-by-height";
+		if(word==test){
+			cs::SelectMaterialByZHeight=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::SelectMaterialByZHeight=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		else
+		test="select-material-by-geometry";
+		if(word==test){
+			cs::SelectMaterialByGeometry=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::SelectMaterialByGeometry=false;
+			}
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
@@ -561,10 +817,10 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,a,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[0]=a;
-				mp::lattice_constant[1]=a;
-				mp::lattice_constant[2]=a;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[0]=a;
+				cs::unit_cell_size[1]=a;
+				cs::unit_cell_size[2]=a;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -580,8 +836,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,c,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[2]=c;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[2]=c;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -598,8 +854,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,ax,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[0]=ax;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[0]=ax;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -616,8 +872,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,ay,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[1]=ay;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[1]=ay;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -634,8 +890,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,az,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::lattice_constant[2]=az;
-				//std::cout << "az: " << mp::lattice_constant[0] << std::endl;
+				cs::unit_cell_size[2]=az;
+				//std::cout << "az: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -652,10 +908,10 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,d,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::system_dimensions[0]=d;
-				mp::system_dimensions[1]=d;
-				mp::system_dimensions[2]=d;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::system_dimensions[0]=d;
+				cs::system_dimensions[1]=d;
+				cs::system_dimensions[2]=d;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -672,8 +928,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,dx,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::system_dimensions[0]=dx;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::system_dimensions[0]=dx;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -690,8 +946,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,dy,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::system_dimensions[1]=dy;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::system_dimensions[1]=dy;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -708,8 +964,8 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,dz,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::system_dimensions[2]=dz;
-				//std::cout << "ax: " << mp::lattice_constant[0] << std::endl;
+				cs::system_dimensions[2]=dz;
+				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -726,7 +982,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,psize,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::particle_scale=psize;
+				cs::particle_scale=psize;
 				//std::cout << "particle_size: " << mp::particle_scale << std::endl;
 				return EXIT_SUCCESS;
 			}
@@ -744,7 +1000,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			units::convert(unit,pspacing,unit_type);
 			string str="length";
 			if(unit_type==str){
-				mp::particle_spacing=pspacing;
+				cs::particle_spacing=pspacing;
 				//std::cout << "particle_spacing: " << mp::particle_spacing << std::endl;
 				return EXIT_SUCCESS;
 			}
@@ -807,6 +1063,11 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::integrator=3;
 				return EXIT_SUCCESS;
 			}
+			test="Hybrid-Constrained-Monte-Carlo";
+			if(value==test){
+				sim::integrator=4;
+				return EXIT_SUCCESS;
+			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"LLG-Heun\"" << std::endl;
@@ -859,6 +1120,16 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::program=7;
 				return EXIT_SUCCESS;
 			}
+			test="CMC-Anisotropy";
+			if(value==test){
+				sim::program=8;
+				return EXIT_SUCCESS;
+			}
+			test="Hybrid-CMC";
+			if(value==test){
+				sim::program=9;
+				return EXIT_SUCCESS;
+			}
 			test="Diagnostic-Boltzmann";
 			if(value==test){
 				sim::program=50;
@@ -872,6 +1143,8 @@ int match_sim(string const word, string const value, string const unit, int cons
 				std::cerr << "\t\"Curie-Temperature\"" << std::endl;
 				std::cerr << "\t\"Field-Cool\"" << std::endl;
 				std::cerr << "\t\"Two-Temperature-Pulse\"" << std::endl;
+				std::cerr << "\t\"CMC-Anisotropy\"" << std::endl;
+				std::cerr << "\t\"Hybrid-CMC\"" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1015,7 +1288,63 @@ int match_sim(string const word, string const value, string const unit, int cons
 				err::vexit();
 			}
 		}
-		//--------------------------------------------------------------------
+		//-------------------------------------------------------------------
+		test="surface-anisotropy";
+		if(word==test){
+			test="true";
+			if(value==test){
+				sim::surface_anisotropy=true;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				sim::surface_anisotropy=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
+		test="identify-surface-atoms";
+		if(word==test){
+			test="true";
+			if(value==test){
+				sim::identify_surface_atoms=true;
+				return EXIT_SUCCESS;
+			}
+			test="false";
+			if(value==test){
+				sim::identify_surface_atoms=false;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
+		test="surface-anisotropy-threshold";
+		if(word==test){
+			// test for native keyword
+			test="native";
+			if(value==test){
+				sim::NativeSurfaceAnisotropyThreshold=true;
+				return EXIT_SUCCESS;
+			}
+			int sat=atoi(value.c_str());
+			// Test for valid range
+			if(sat>=0){
+				sim::surface_anisotropy_threshold=sat;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be an integer greater than or equal to 0, or \"native\"." << std::endl;
+				err::vexit();
+			}
+		}
+		//-------------------------------------------------------------------
 		test="dt";
 		if(word==test){
 			double dt=atof(value.c_str());
@@ -1181,6 +1510,62 @@ int match_sim(string const word, string const value, string const unit, int cons
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
 				err::vexit();
 			}
+		}
+                //--------------------------------------------------------------------
+		test="heat-sink-coupling";
+		if(word==test){
+		  double hscc=atof(value.c_str());
+		  // Test for valid range
+		  if((hscc>=0.0) && (hscc<1.0E40)){
+		    sim::HeatSinkCouplingConstant=hscc;
+		    return EXIT_SUCCESS;
+		  }
+		  else{
+		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+		    err::vexit();
+		  }
+		}
+                //--------------------------------------------------------------------
+                test="two-temperature-electron-heat-capacity";
+		if(word==test){
+		  double hscc=atof(value.c_str());
+		  // Test for valid range
+		  if((hscc>=0.0) && (hscc<1.0E40)){
+		    sim::TTCe=hscc;
+		    return EXIT_SUCCESS;
+		  }
+		  else{
+		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+		    err::vexit();
+		  }
+		}
+                //--------------------------------------------------------------------
+		test="two-temperature-phonon-heat-capacity";
+		if(word==test){
+		  double hscc=atof(value.c_str());
+		  // Test for valid range
+		  if((hscc>=0.0) && (hscc<1.0E40)){
+		    sim::TTCl=hscc;
+		    return EXIT_SUCCESS;
+		  }
+		  else{
+		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+		    err::vexit();
+		  }
+		}
+                //--------------------------------------------------------------------
+		test="two-temperature-electron-phonon-coupling";
+		if(word==test){
+		  double hscc=atof(value.c_str());
+		  // Test for valid range
+		  if((hscc>=0.0) && (hscc<1.0E40)){
+		    sim::TTG=hscc;
+		    return EXIT_SUCCESS;
+		  }
+		  else{
+		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+		    err::vexit();
+		  }
 		}
 		//--------------------------------------------------------------------
 		test="cooling-function";
@@ -1374,12 +1759,34 @@ int match_sim(string const word, string const value, string const unit, int cons
 			test="replicated-data";
 			if(value==test){
 				vmpi::mpi_mode=1;
+				vmpi::replicated_data_staged=false;
+				return EXIT_SUCCESS;
+			}
+			test="replicated-data-staged";
+			if(value==test){
+				vmpi::mpi_mode=1;
+				vmpi::replicated_data_staged=true;
 				return EXIT_SUCCESS;
 			}
 			else{
 				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
 				std::cerr << "\t\"geometric-decomposition\"" << std::endl;
 				std::cerr << "\t\"replicated-data\"" << std::endl;
+				std::cerr << "\t\"replicated-data-staged\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="mpi-ppn";
+		if(word==test){
+			int ppn=atoi(value.c_str());
+			// Test for valid range
+			if((ppn>=0) && (ppn<=1024)){
+				vmpi::ppn=ppn;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1024" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1389,6 +1796,129 @@ int match_sim(string const word, string const value, string const unit, int cons
 			int is=atoi(value.c_str());
 				mtrandom::integration_seed=is;
 				return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="constraint-rotation-update";
+		if(word==test){
+			sim::constraint_rotation=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				sim::constraint_rotation=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				sim::constraint_theta_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				sim::constraint_phi_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
 		}
 		//--------------------------------------------------------------------
 		else{
@@ -1546,7 +2076,8 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(12);
 			return EXIT_SUCCESS;
 		}
-		else		test="magnetisation";
+		else
+		test="magnetisation";
 		if(word==test){
 			output_list.push_back(5);
 			return EXIT_SUCCESS;
@@ -1577,16 +2108,71 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			return EXIT_SUCCESS;
 		}
 		else
-		test="material-mean-mag-m";
+		test="system-torque";
 		if(word==test){
-			output_list.push_back(9);
+			stats::calculate_torque=true;
+			output_list.push_back(14);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="mean-system-torque";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(15);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="constraint-phi";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(16);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="constraint-theta";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(17);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="material-constraint-phi";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(18);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="material-constraint-theta";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(19);
+			return EXIT_SUCCESS;
+		}
+		else
+		test="material-mean-system-torque";
+		if(word==test){
+			stats::calculate_torque=true;
+			output_list.push_back(20);
+			return EXIT_SUCCESS;
+		}
+		test="mean-system-susceptibility";
+		if(word==test){
+			stats::CalculateSusceptibility=true;
+			output_list.push_back(21);
+			return EXIT_SUCCESS;
+		}
+		test="MPI-Timings";
+		if(word==test){
+			vmpi::DetailedMPITiming=true;
+			output_list.push_back(60);
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
-			std::cerr << "Error - Unknown control statement \'vmag:" << word << "\' on line " << line << " of input file" << std::endl;
+			std::cerr << "Error - Unknown control statement \'zmag:" << word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;
 		}
 		
@@ -1655,7 +2241,7 @@ int match_vout_grain_list(string const word, string const value, int const line,
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - vgrain:" << word << " on line " << line << " of input file must be greater than zero" << std::endl;
+				std::cerr << "Error - zgrain:" << word << " on line " << line << " of input file must be greater than zero" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1673,20 +2259,26 @@ int match_vout_grain_list(string const word, string const value, int const line,
 //std::cout << "here" << std::endl;
   std::vector<mp::materials_t> read_material(0);
 
-int read_mat_file(std::string const matfile){
+  int read_mat_file(std::string const matfile, int const LineNumber){
 	
 	// Declare input stream
 	std::ifstream inputfile;
 	
 	// resize temporary materials array for storage of variables
 	read_material.resize(mp::max_materials);
-
+	cmc::cmc_mat.resize(mp::max_materials);
+	
+        // Print informative message to zlog file
+	zlog << zTs() << "Opening material file \"" << matfile << "\"." << std::endl;
+	
 	// Open file read only
 	inputfile.open(matfile.c_str());
 	
 	// Check for opening
 	if(!inputfile.is_open()){
-		std::cerr << "Error opening file " << matfile << "- file does not exist!" << std::endl; 
+		std::cerr << "Error opening material file " << matfile << ". File does not exist!" << std::endl;
+		zlog << zTs() << "Error: Material file \"" << matfile << "\" on line number " << LineNumber << " of input file cannot be opened or does not exist." << std::endl;
+		zlog << zTs() << "If file exists then check file permissions to ensure it is readable by the user." << std::endl; 
 		err::vexit();   // return to calling function for error checking or message
 	}
 	//-------------------------------------------------------
@@ -1694,6 +2286,8 @@ int read_mat_file(std::string const matfile){
 	//-------------------------------------------------------
 
 
+        // Print informative message to zlog file
+	zlog << zTs() << "Parsing material file for parameters." << std::endl;
 	
 	int line_counter=0;
 	// Loop over all lines and pass keyword to matching function
@@ -1708,6 +2302,9 @@ int read_mat_file(std::string const matfile){
 		line.erase(remove(line.begin(), line.end(), ' '), line.end());
 		line.erase(remove(line.begin(), line.end(), '\"'), line.end());
 
+		// remove carriage returns for dos formatted files
+                line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+		
 		// strip key,word,unit,value
 		std::string key="";
 		std::string word="";
@@ -1965,21 +2562,25 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
+		//------------------------------------------------------------
 		else
 		test="Ku1";
 		if(word==test){
 			double K=atof(value.c_str());
-			string unit_type="anisotropy";
+			string unit_type="energy";
 			// if no unit given, assume internal
 			if(unit.size() != 0){
 				units::convert(unit,K,unit_type);
 				//read_material[super_index].anis_flag=false;
 				//std::cout << "setting flag to false" << std::endl;
 			}
-			string str="anisotropy";
+			string str="energy";
 			if(unit_type==str){
 				// Set moment flag
 				read_material[super_index].Ku1_SI=K;
+				// enable global anisotropy flag                                                                                                                                              
+				sim::UniaxialScalarAnisotropy=true;
+ 				std::cerr << "Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1987,6 +2588,147 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
+		//------------------------------------------------------------
+		else
+		test="uniaxial-anisotropy-constant";
+		if(word==test){
+			double K=atof(value.c_str());
+			string unit_type="energy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+			}
+			string str="energy";
+			if(unit_type==str){
+				// set anisotropy
+				read_material[super_index].Ku1_SI=K;
+				// enable global anisotropy flag
+				sim::UniaxialScalarAnisotropy=true;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
+		else
+		test="cubic-anisotropy-constant";
+		if(word==test){
+			double K=atof(value.c_str());
+			string unit_type="energy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+				//read_material[super_index].anis_flag=false;
+				//std::cout << "setting flag to false" << std::endl;
+			}
+			string str="energy";
+			if(unit_type==str){
+				// Set moment flag
+				read_material[super_index].Kc1_SI=K;
+				sim::CubicScalarAnisotropy=true;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
+		else
+		test="uniaxial-anisotropy-direction";
+		if(word==test){
+			// temporary storage container
+			std::vector<double> u(3);
+
+			// read values from string
+			u=DoublesFromString(value);
+			
+			// check size
+			if(u.size()!=3){
+				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must have three values." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must have three values." << std::endl;
+				return EXIT_FAILURE;
+			}
+			
+			// Normalise 
+			double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+			
+			// Check for correct length unit vector
+			if(ULength < 1.0e-9){
+				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must be normalisable (possibly all zero)." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must be normalisable (possibly all zero)." << std::endl;
+				return EXIT_FAILURE;
+			}
+			u.at(0)/=ULength;
+			u.at(1)/=ULength;
+			u.at(2)/=ULength;
+			
+			// Copy anisotropy direction to material
+			read_material[super_index].UniaxialAnisotropyUnitVector=u;
+
+			// Enable global tensor anisotropy flag
+			sim::TensorAnisotropy=true;
+			return EXIT_SUCCESS;
+
+		}
+		//------------------------------------------------------------
+		else
+		test="uniaxial-anisotropy-tensor";
+		if(word==test){
+			std::vector<double> K;
+			// read values from string
+			K=DoublesFromString(value);
+			// check size
+			if(K.size()!=9){
+				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
+				return EXIT_FAILURE;
+			}
+			string unit_type="energy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+				//read_material[super_index].anis_flag=false;
+				//std::cout << "setting flag to false" << std::endl;
+			}
+			string str="energy";
+			if(unit_type==str){
+				// Copy anisotropy vector to material
+				read_material[super_index].KuVec_SI=K;
+				sim::TensorAnisotropy=true;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
+		else
+		test="Ks";
+		if(word==test){
+			double K=atof(value.c_str());
+			string unit_type="energy";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,K,unit_type);
+				//read_material[super_index].anis_flag=false;
+				//std::cout << "setting flag to false" << std::endl;
+			}
+			string str="energy";
+			if(unit_type==str){
+				// Set moment flag
+				read_material[super_index].Ks_SI=K;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'material:" << word << "\'"<< std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
 		else
 		test="gamma-rel";
 		if(word==test){
@@ -2040,7 +2782,8 @@ int match_material(string const word, string const value, string const unit, int
 		else
 		test="hamiltonian";
 		if(word==test){
-			read_material[super_index].hamiltonian_type=value;
+			std::cout << "Warning: material[" << super_index << "]:hamiltonian is deprecated and has no effect" << std::endl;
+			//read_material[super_index].hamiltonian_type=value;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -2066,7 +2809,8 @@ int match_material(string const word, string const value, string const unit, int
 		else
 		test="crystal-structure";
 		if(word==test){
-			read_material[super_index].crystal_structure=value;
+			std::cout << "Warning: material[" << super_index << "]:crystal-structure is deprecated and has no effect. Globally set crystal type is used instead." << std::endl;
+			//read_material[super_index].crystal_structure=value;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -2155,6 +2899,7 @@ int match_material(string const word, string const value, string const unit, int
 				std::cerr << "Error in input file - material[" << super_index << "]:min is outside of valid range (0.0-1.0)" << std::endl;
 				return EXIT_FAILURE;}
 			else{
+				cs::SelectMaterialByZHeight=true;
 				read_material[super_index].min=min;
 				return EXIT_SUCCESS;
 			}
@@ -2168,6 +2913,7 @@ int match_material(string const word, string const value, string const unit, int
 				std::cerr << "Error in input file - material[" << super_index << "]:max is outside of valid range (0.0-1.0)" << std::endl;
 				return EXIT_FAILURE;}
 			else{
+				cs::SelectMaterialByZHeight=true;
 				read_material[super_index].max=max;
 				return EXIT_SUCCESS;
 			}
@@ -2243,7 +2989,136 @@ int match_material(string const word, string const value, string const unit, int
 			}
 		}
 		//--------------------------------------------------------------------
-
+		else
+		test="constrained"; // determines use of alternate integrator
+		if(word==test){
+			string t="true";
+			string f="false";
+			if(value==t){
+				read_material[super_index].constrained=true;
+				return EXIT_SUCCESS;
+			}
+			else if(value==f){
+				read_material[super_index].constrained=false;
+				return EXIT_SUCCESS;
+			}
+			else {
+				std::cerr << "Error in input file - material[" << super_index << "]:constrained must be either true or false" << std::endl;
+				return EXIT_FAILURE;
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				cmc::cmc_mat[super_index].constraint_theta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				cmc::cmc_mat[super_index].constraint_theta_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				cmc::cmc_mat[super_index].constraint_theta_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-theta-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				cmc::cmc_mat[super_index].constraint_theta_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-min";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				cmc::cmc_mat[super_index].constraint_phi_min=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				cmc::cmc_mat[super_index].constraint_phi=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-max";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				cmc::cmc_mat[super_index].constraint_phi_max=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="constraint-angle-phi-delta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				cmc::cmc_mat[super_index].constraint_phi_delta=angle;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				err::vexit();
+			}
+		}
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
@@ -2259,13 +3134,6 @@ int match_material(string const word, string const value, string const unit, int
 
 } // end of namespace vin 
 
-// Global output filestreams
-std::ofstream vinfo("info");
-std::ofstream vdp("vdp");
-std::ofstream vmag("vmag");
-std::ofstream vgrain("vgrain");
-
-
 namespace vout{
 	
 	// Namespace variable declarations
@@ -2277,6 +3145,8 @@ namespace vout{
 	
 
 	std::ofstream errfile;
+
+  #ifdef MPICF
 	null_streambuf nullbuf;
 
 	void redirect(std::ostream& strm, std::string filename) {
@@ -2288,7 +3158,7 @@ namespace vout{
 	void nullify(std::ostream& strm){
 		strm.rdbuf(&nullbuf);
 	}
-  
+	#endif
 /*/// @brief Function to output atomistic resolution snapshots for povray
 ///
 /// @section License
@@ -2509,9 +3379,9 @@ namespace vout{
 	
 	// Output Function 5
 	void mvec(std::ostream& stream){
-		stream << stats::total_mag_norm[0] << "\t";
-		stream << stats::total_mag_norm[1] << "\t";
-		stream << stats::total_mag_norm[2] << "\t";
+		stream << stats::total_mag_norm[0]/stats::total_mag_m_norm << "\t";
+		stream << stats::total_mag_norm[1]/stats::total_mag_m_norm << "\t";
+		stream << stats::total_mag_norm[2]/stats::total_mag_m_norm << "\t";
 	}
 	
 	// Output Function 6
@@ -2589,53 +3459,171 @@ namespace vout{
 		
 	}
 	
+	// Output Function 14
+	void systorque(std::ostream& stream){
+		stream << stats::total_system_torque[0] << "\t";
+		stream << stats::total_system_torque[1] << "\t";
+		stream << stats::total_system_torque[2] << "\t";
+	}
+	
+	// Output Function 15
+	void mean_systorque(std::ostream& stream){
+		stream << stats::total_mean_system_torque[0]/stats::torque_data_counter << "\t";
+		stream << stats::total_mean_system_torque[1]/stats::torque_data_counter << "\t";
+		stream << stats::total_mean_system_torque[2]/stats::torque_data_counter << "\t";
+	}
+	
+	// Output Function 16
+	void constraint_phi(std::ostream& stream){
+		stream << sim::constraint_phi << "\t";
+	}
+	
+	// Output Function 17
+	void constraint_theta(std::ostream& stream){
+		stream << sim::constraint_theta << "\t";
+	}
+	
+	// Output Function 18
+	void material_constraint_phi(std::ostream& stream){
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stream << cmc::cmc_mat[mat].constraint_phi << "\t";
+		}
+	}
+	
+	// Output Function 19
+	void material_constraint_theta(std::ostream& stream){
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stream << cmc::cmc_mat[mat].constraint_theta << "\t";
+		}
+	}
+
+	// Output Function 20
+	void material_mean_systorque(std::ostream& stream){
+		for(int mat=0;mat<mp::num_materials;mat++){
+			stream << stats::sublattice_mean_torque_x_array[mat]/stats::torque_data_counter << "\t";
+			stream << stats::sublattice_mean_torque_y_array[mat]/stats::torque_data_counter << "\t";
+			stream << stats::sublattice_mean_torque_z_array[mat]/stats::torque_data_counter << "\t";
+		}
+	}
+
+	// Output Function 21
+	void MeanSystemSusceptibility(std::ostream& stream){
+
+		double Susx,Susy,Susz;
+		const double norm = mp::material[0].mu_s_SI*stats::ChiAtoms/(1.3806503e-23*sim::temperature);
+		
+		Susx = norm*(stats::MeanChiSquared[0]/stats::MeanChiDataCounter-stats::MeanChi[0]*stats::MeanChi[0]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
+		Susy = norm*(stats::MeanChiSquared[1]/stats::MeanChiDataCounter-stats::MeanChi[1]*stats::MeanChi[1]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
+		Susz = norm*(stats::MeanChiSquared[2]/stats::MeanChiDataCounter-stats::MeanChi[2]*stats::MeanChi[2]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
+		
+		stream << Susx << "\t" << Susy << "\t" << Susz << "\t";
+	}
+	
+	// Output Function 60
+	void MPITimings(std::ostream& stream){
+
+		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
+		stream << "\t" << vmpi::MaximumComputeTime << "\t" << vmpi::MaximumWaitTime << "\t";
+	}
+	
 	// Data output wrapper function
 	void data(){
 
 		// check calling of routine if error checking is activated
 		if(err::check==true){std::cout << "vout::data has been called" << std::endl;}
 
-		// Output data to vmag
+		// Calculate MPI Timings since last data output
+		#ifdef MPICF
+		if(vmpi::DetailedMPITiming){
+
+			// Calculate Average times
+			MPI_Reduce (&vmpi::TotalComputeTime,&vmpi::AverageComputeTime,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD); 
+			MPI_Reduce (&vmpi::TotalWaitTime,&vmpi::AverageWaitTime,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+			vmpi::AverageComputeTime/=double(vmpi::num_processors);
+			vmpi::AverageWaitTime/=double(vmpi::num_processors);
+			
+			// Calculate Maximum times
+			MPI_Reduce (&vmpi::TotalComputeTime,&vmpi::MaximumComputeTime,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
+			MPI_Reduce (&vmpi::TotalWaitTime,&vmpi::MaximumWaitTime,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
+
+			// Save times for timing matrix
+			vmpi::ComputeTimeArray.push_back(vmpi::TotalComputeTime);
+			vmpi::WaitTimeArray.push_back(vmpi::TotalWaitTime);
+
+			// reset until next data output
+			vmpi::TotalComputeTime=0.0;
+			vmpi::TotalWaitTime=0.0;
+		}
+		#endif
+		
+		// Output data to zmag
 		for(unsigned int item=0;item<file_output_list.size();item++){
 			switch(file_output_list[item]){
 				case 0:
-					vout::time(vmag);
+					vout::time(zmag);
 					break;
 				case 1:
-					vout::real_time(vmag);
+					vout::real_time(zmag);
 					break;
 				case 2:
-					vout::temperature(vmag);
+					vout::temperature(zmag);
 					break;
 				case 3:
-					vout::Happ(vmag);
+					vout::Happ(zmag);
 					break;
 				case 4:
-					vout::Hvec(vmag);
+					vout::Hvec(zmag);
 					break;
 				case 5:
-					vout::mvec(vmag);
+					vout::mvec(zmag);
 					break;
 				case 6:
-					vout::magm(vmag);
+					vout::magm(zmag);
 					break;
 				case 7:
-					vout::mean_magm(vmag);
+					vout::mean_magm(zmag);
 					break;
 				case 8:
-					vout::mat_mvec(vmag);
+					vout::mat_mvec(zmag);
 					break;
 				case 9:
-					vout::mat_mean_magm(vmag);
+					vout::mat_mean_magm(zmag);
 					break;
 				case 12:
-					vout::mdoth(vmag);
+					vout::mdoth(zmag);
+					break;
+				case 14:
+					vout::systorque(zmag);
+					break;
+				case 15:
+					vout::mean_systorque(zmag);
+					break;
+				case 16:
+					vout::constraint_phi(zmag);
+					break;
+				case 17:
+					vout::constraint_theta(zmag);
+					break;
+				case 18:
+					vout::material_constraint_phi(zmag);
+					break;
+				case 19:
+					vout::material_constraint_theta(zmag);
+					break;
+				case 20:
+					vout::material_mean_systorque(zmag);
+					break;
+				case 21:
+					vout::MeanSystemSusceptibility(zmag);
+					break;
+				case 60:
+					vout::MPITimings(zmag);
 					break;
 			}
 		}
 		
 		// Carriage return
-		if(file_output_list.size()>0) vmag << std::endl;
+		if(file_output_list.size()>0) zmag << std::endl;
 
 		// Output data to cout
 		if(vmpi::my_rank==0){
@@ -2674,6 +3662,33 @@ namespace vout{
 				case 12:
 					vout::mdoth(std::cout);
 					break;
+				case 14:
+					vout::systorque(std::cout);
+					break;
+				case 15:
+					vout::mean_systorque(std::cout);
+					break;
+				case 16:
+					vout::constraint_phi(std::cout);
+					break;
+				case 17:
+					vout::constraint_theta(std::cout);
+					break;
+				case 18:
+					vout::material_constraint_phi(std::cout);
+					break;
+				case 19:
+					vout::material_constraint_theta(std::cout);
+					break;
+				case 20:
+					vout::material_mean_systorque(std::cout);
+					break;
+				case 21:
+					vout::MeanSystemSusceptibility(std::cout);
+					break;
+				case 60:
+					vout::MPITimings(std::cout);
+					break;
 			}
 		}
 		
@@ -2686,40 +3701,40 @@ namespace vout{
 		// calculate grain magnetisations
 		grains::mag();
 		
-		// Output data to vgrain
+		// Output data to zgrain
 		if(vmpi::my_rank==0){
 			
 			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
 			switch(vout::grain_output_list[item]){
 				case 0:
-					vout::time(vgrain);
+					vout::time(zgrain);
 					break;
 				case 1:
-					vout::real_time(vgrain);
+					vout::real_time(zgrain);
 					break;
 				case 2:
-					vout::temperature(vgrain);
+					vout::temperature(zgrain);
 					break;
 				case 3:
-					vout::Happ(vgrain);
+					vout::Happ(zgrain);
 					break;
 				case 4:
-					vout::Hvec(vgrain);
+					vout::Hvec(zgrain);
 					break;
 				case 10:
-					vout::grain_mvec(vgrain);
+					vout::grain_mvec(zgrain);
 					break;
 				case 11:
-					vout::grain_magm(vgrain);
+					vout::grain_magm(zgrain);
 					break;
 				case 13:
-					vout::grain_mat_mvec(vgrain);
+					vout::grain_mat_mvec(zgrain);
 					break;
 			}
 		}
 		
 		// Carriage return
-		if(vout::grain_output_list.size()>0) vgrain << std::endl;
+		if(vout::grain_output_list.size()>0) zgrain << std::endl;
 		}
 		}
 		

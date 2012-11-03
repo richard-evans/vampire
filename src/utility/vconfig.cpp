@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains routines for outputting magnetisation snapshots
@@ -166,15 +190,16 @@ void config(){
 		// Output masterfile header on root process
 		if(vmpi::my_rank==0){
 			// Get system date
-			char *asctime( const struct tm *time_ptr );
+		  time_t rawtime = time(NULL);
+		  struct tm * timeinfo = localtime(&rawtime);
 
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "# Atomistic spin configuration file for vampire"<< std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Date: "<< asctime << std::endl;
+			cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "Number of spins: "<< vout::total_output_atoms << std::endl;
-			cfg_file_ofstr << "System dimensions:" << mp::system_dimensions[0] << "\t" << mp::system_dimensions[1] << "\t" << mp::system_dimensions[2] << std::endl;
+			cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
 			cfg_file_ofstr << "Coordinates-file: atoms-coord.cfg"<< std::endl;
 			cfg_file_ofstr << "Time: " << double(sim::time)*mp::dt_SI << std::endl;
 			cfg_file_ofstr << "Field: " << sim::H_applied << std::endl;
@@ -262,13 +287,13 @@ void config(){
 		local_output_atom_list.resize(0);
 		
 		// get output bounds
-		double minB[3]={vout::atoms_output_min[0]*mp::system_dimensions[0],
-							vout::atoms_output_min[1]*mp::system_dimensions[1],
-							vout::atoms_output_min[2]*mp::system_dimensions[2]};
+		double minB[3]={vout::atoms_output_min[0]*cs::system_dimensions[0],
+							vout::atoms_output_min[1]*cs::system_dimensions[1],
+							vout::atoms_output_min[2]*cs::system_dimensions[2]};
 		
-		double maxB[3]={vout::atoms_output_max[0]*mp::system_dimensions[0],
-							vout::atoms_output_max[1]*mp::system_dimensions[1],
-							vout::atoms_output_max[2]*mp::system_dimensions[2]};
+		double maxB[3]={vout::atoms_output_max[0]*cs::system_dimensions[0],
+							vout::atoms_output_max[1]*cs::system_dimensions[1],
+							vout::atoms_output_max[2]*cs::system_dimensions[2]};
 
 		// loop over all local atoms and record output list
 		for(int atom=0;atom<num_atoms;atom++){
@@ -317,12 +342,13 @@ void config(){
 		// Output masterfile header on root process
 		if(vmpi::my_rank==0){
 			// Get system date
-			char *asctime( const struct tm *time_ptr );
+                  time_t rawtime = time(NULL);
+		  struct tm * timeinfo = localtime(&rawtime);
 
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "# Atomistic coordinates configuration file for vampire"<< std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Date: "<< asctime << std::endl;
+			cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
 			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 			cfg_file_ofstr << "Number of atoms: "<< vout::total_output_atoms << std::endl;
 			cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
@@ -340,8 +366,9 @@ void config(){
 	  	for(int i=0; i<vout::local_output_atom_list.size(); i++){
 			const int atom = vout::local_output_atom_list[i];
 			cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" << 
-			atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t" << 
-			mp::material[atoms::type_array[atom]].element << std::endl;
+			atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
+			if(sim::identify_surface_atoms==true && atoms::surface_array[atom]==true) cfg_file_ofstr << "O " << std::endl;
+			else cfg_file_ofstr << mp::material[atoms::type_array[atom]].element << std::endl;
 		}
 	
 		cfg_file_ofstr.close();

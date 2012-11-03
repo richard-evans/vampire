@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains cells namespace and asssociated functions
@@ -83,21 +107,20 @@ namespace cells{
 		cells::num_cells=0;
 		cells::num_local_cells=0;
 		
-		std::cout << "Cell size = " << cells::size << std::endl; 
+		zlog << zTs() << "Cell size = " << cells::size << std::endl; 
 		
 		// determine number of cells in each direction
-		unsigned int ncellx = static_cast<unsigned int>(ceil(mp::system_dimensions[0]/cells::size));
-		unsigned int ncelly = static_cast<unsigned int>(ceil(mp::system_dimensions[1]/cells::size));
-		unsigned int ncellz = static_cast<unsigned int>(ceil(mp::system_dimensions[2]/cells::size));
+		unsigned int ncellx = static_cast<unsigned int>(ceil(cs::system_dimensions[0]/cells::size));
+		unsigned int ncelly = static_cast<unsigned int>(ceil(cs::system_dimensions[1]/cells::size));
+		unsigned int ncellz = static_cast<unsigned int>(ceil(cs::system_dimensions[2]/cells::size));
 		
 		//update total number of cells
 		cells::num_cells=ncellx*ncelly*ncellz;
 		
-		if(vmpi::my_rank==0){
-			std::cout << "Cells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
-			std::cout << "Total number of cells: " << cells::num_cells << std::endl;
-			std::cout << "Memory required for cell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
-		}
+		zlog << zTs() << "Cells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
+		zlog << zTs() << "Total number of cells: " << cells::num_cells << std::endl;
+		zlog << zTs() << "Memory required for cell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
+
 		// Determine number of cells in x,y,z
 		const int d[3]={ncellx,ncelly,ncellz};
 	
@@ -122,7 +145,7 @@ namespace cells{
 		catch(...){std::cerr << "Error allocating supercell_array for cell list calculation" << std::endl;err::vexit();}
 		
 		// offset cells to prevent rounding error
-		double atom_offset[3]={0.25*mp::lattice_constant[0],0.25*mp::lattice_constant[1],0.25*mp::lattice_constant[2]};
+		double atom_offset[3]={0.0,0.0,0.0}; //0.25*cs::unit_cell_size[0],0.25*cs::unit_cell_size[1],0.25*cs::unit_cell_size[2]};
 
 		// For MPI version, only add local atoms
 		#ifdef MPICF
@@ -165,7 +188,7 @@ namespace cells{
 		delete [] supercell_array;
 		supercell_array=NULL;
 		}
-		catch(...){std::cout << "error deallocating supercell_array" << std::endl; err::vexit();}
+		catch(...){zlog << zTs() << "error deallocating supercell_array" << std::endl; err::vexit();}
 		
 		// Resize new cell arrays
 		cells::x_coord_array.resize(cells::num_cells,0.0);
@@ -238,7 +261,7 @@ namespace cells{
 			}
 		}
 		
-		std::cout << " Number of local cells on CPU " << vmpi::my_rank << " is: " << cells::num_local_cells << std::endl;
+		zlog << zTs() << "Number of local cells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
 		
 		cells::initialised=true;
 		

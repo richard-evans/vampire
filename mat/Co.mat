@@ -1,24 +1,21 @@
 #===================================================
-# Vampire material file for CoPt Generic
+# Vampire material file for Co
 #===================================================
 #
-# R F Evans 21/06/10
+# R F Evans 03/11/12
 #
 #---------------------------------------------------
 # Number of Materials
 #---------------------------------------------------
 material:num-materials=1
 #---------------------------------------------------
-# Material 0 Cobalt Platinum Generic
+# Material 0 Cobalt Generic
 #---------------------------------------------------
-material[0]:name="CoPt Media"
+material[0]:name="Co"
 material[0]:alpha=0.1
-material[0]:Jij_matrix[0]=-4.2e-21
+material[0]:Jij_matrix[0]=-4.8e-21
 material[0]:mu_s=1.5 !muB
-material[0]:Ku1=-2.2e-22
+material[0]:Ku1=-1.0e-23
 material[0]:element="Ag"
 material[0]:min=0.0
 material[0]:max=1.0
-material[0]:Sx=0.707
-material[0]:Sy=0.0
-material[0]:Sz=0.707

@@ -1,4 +1,4 @@
-// mtrand.h
+// mtrand.hpp
 // C++ include file for MT19937, with initialization improved 2002/1/26.
 // Coded by Takuji Nishimura and Makoto Matsumoto.
 // Ported to C++ by Jasper Bedaux 2003/1/1 (see http://www.bedaux.net/mtrand/).
@@ -99,6 +99,7 @@ public:
   MTRand() : MTRand_int32() {}
   MTRand(unsigned long seed) : MTRand_int32(seed) {}
   MTRand(const unsigned long* seed, int size) : MTRand_int32(seed, size) {}
+  unsigned long i32() { return rand_int32(); }
   ~MTRand() {}
   double operator()() {
     return static_cast<double>(rand_int32()) * (1. / 4294967296.); } // divided by 2^32

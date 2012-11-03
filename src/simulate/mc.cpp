@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains the Monte Carlo integrator
@@ -80,7 +104,8 @@ int MonteCarlo(){
 	double Eold=0.0;
 	double Enew=0.0;
 	double DE=0.0;
-	double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
+	const double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
+	const int AtomExchangeType=atoms::exchange_type;
 	
 	// loop over natoms to form a single Monte Carlo step
 	for(int i=0;i<nmoves; i++){
@@ -109,7 +134,7 @@ int MonteCarlo(){
 		Snew[2]*=r;
 
 		// Calculate current energy
-		Eold = sim::calculate_spin_energy(atom);
+		Eold = sim::calculate_spin_energy(atom, AtomExchangeType);
 		
 		// Copy new spin position
 		atoms::x_spin_array[atom] = Snew[0];
@@ -117,7 +142,7 @@ int MonteCarlo(){
 		atoms::z_spin_array[atom] = Snew[2];
 
 		// Calculate new energy
-		Enew = sim::calculate_spin_energy(atom);
+		Enew = sim::calculate_spin_energy(atom, AtomExchangeType);
 		
 		// Calculate difference in Joules/mu_B
 		DE = (Enew-Eold)*mp::material[imaterial].mu_s_SI*1.07828231e23; //1/9.27400915e-24

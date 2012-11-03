@@ -1,4 +1,4 @@
-# My zspin input file
+# My vampire input file
 # R F Evans
 # 18/01/10 
 # 
@@ -14,6 +14,10 @@ create:crystal-structure="sc"
 #create:voronoi-film
 #create:voronoi-variance=0.15
 #create:voronoi-parity=1
+#create:periodic-boundaries-x
+#create:periodic-boundaries-y
+#create:periodic-boundaries-z
+
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
@@ -25,9 +29,10 @@ dimensions:particle-size = 7.7 !nm
 dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
-# Material File:
+# Material Files:
 #------------------------------------------
 material:file="Co.mat"
+#material:unit-cell-file=SimpleCubic.ucf
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
@@ -37,9 +42,12 @@ sim:applied=true
 sim:thermal=true
 sim:dipolar=false
 sim:fast-dipolar=false
-#sim:fast-dipolar=false
+#sim:fast-dipolar=true
 sim:dipolar-update-rate=10
 sim:temperature=300.0
+sim:surface-anisotropy=false
+sim:identify-surface-atoms=true
+sim:surface-anisotropy-threshold=6
 sim:Hinc=100.0 !mT
 sim:Hmax=12.0 !T
 sim:Hmin=-12.0 !T
@@ -59,32 +67,50 @@ sim:total-time=10000
 sim:loop-time=3000
 sim:dt=1.0E-15
 
+sim:constraint-angle-theta=0.0
+sim:constraint-angle-theta-min=0.0
+sim:constraint-angle-theta-max=0.0
+sim:constraint-angle-theta-delta=5.0
+sim:constraint-angle-phi=45.0
+sim:constraint-angle-phi-min=0.0
+sim:constraint-angle-phi-max=180.0
+sim:constraint-angle-phi-delta=5.0
 #--------------------------------
 # Program and integrator details
 #--------------------------------
 #sim:program=Curie-Temperature
 sim:program=Benchmark
 #sim:program=Field-Cool
+#sim:program=CMC-Anisotropy
 
 #sim:integrator=LLG-Midpoint
 sim:integrator=LLG-Heun
 #sim:integrator=Monte-Carlo
 
 # data output
-vmag:real-time
-vmag:temperature
-vmag:magnetisation
-vmag:mag-m
-vmag:mean-mag-m
+output:real-time
+#output:constraint-theta
+#output:constraint-phi
+output:temperature
+output:magnetisation
+output:mag-m
+#output:mean-mag-m
+#output:system-torque
+#output:mean-system-torque
+#output:mean-system-torque
 
 #screen:temperature
 screen:time
 #screen:mean-mag-m
 screen:mag-m
+#screen:MPI-Timings
+#screen:constraint-phi
+#screen:system-torque
+#screen:mean-system-torque
 
-#vgrain:output-rate=100
-#vgrain:real-time
-#vgrain:magnetisation
+#grain:output-rate=100
+#grain:real-time
+#grain:magnetisation
 
 #config:atoms
 #config:atoms-output-rate=10
@@ -94,3 +120,4 @@ screen:mag-m
 #config:atoms-max-x=1.0
 #config:atoms-max-y=1.0
 #config:atoms-max-z=0.51
+

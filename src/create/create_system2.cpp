@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 /// @file
 /// @brief Contains master function for system creation and cs namespace. 
 ///
@@ -31,6 +55,9 @@
 #include "demag.hpp"
 #include "grains.hpp"
 #include "material.hpp"
+#include "sim.hpp"
+#include "vio.hpp"
+#include "vmath.hpp"
 #include "vmpi.hpp"
 #include "create.hpp"
 
@@ -44,6 +71,31 @@
 ///
 namespace cs{
 
+	// System Dimensions
+	double system_dimensions[3]={77.0,77.0,77.0};	// Size of system (A)
+	double unit_cell_size[3]={3.54,3.54,3.54};		// Unit Cell Size (A) [Will eventually be local to unit cells]
+	bool pbc[3]={false,false,false};						// Periodic boundary conditions
+	bool SelectMaterialByZHeight=false;					// Toggle overwriting of material id by z-height
+	bool SelectMaterialByGeometry=false;					// Toggle override of input material type by geometry
+	unsigned int total_num_unit_cells[3]={0,0,0};	// Unit cells for entire system (x,y,z)
+	unsigned int local_num_unit_cells[3]={0,0,0};	// Unit cells on local processor (x,y,z)
+	std::string crystal_structure="sc";
+	
+	// System Parameters
+	int particle_creation_parity=0; // Offset of particle centre (odd/even)
+	double particle_scale=50.0;     // Diameter of particles/grains (A)
+	double particle_spacing=10.0;   // Spacing Between particles (A)
+
+
+	// Other directives and flags
+	bool single_spin=false;
+	int system_creation_flags[10]={0,0,0,0,0,0,0,0,0,0};
+	std::string unit_cell_file="";
+	
+	
+	// unit cell container
+	cs::unit_cell_t unit_cell;
+	
 int create(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
@@ -63,56 +115,85 @@ int create(){
 	
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array; 
-	std::vector<std::vector<int> > cneighbourlist; 
+	std::vector<std::vector<neighbour_t> > cneighbourlist; 
 
-	//std::vector<std::vector<int> > vecvec;
-	//vecvec.push_back(std::vector<int>());
-	//vecvec[0].push_back(3);
-	//int i = vecvec[0][0];
-	//OK, vecvec.size() == 1; vecvec[0].size() == 1, vecvec[0][0] == 3
+	// initialise unit cell for system
+	unit_cell_set(cs::unit_cell);
 
+	cs::unit_cell_size[0]=unit_cell.dimensions[0];
+	cs::unit_cell_size[1]=unit_cell.dimensions[1];
+	cs::unit_cell_size[2]=unit_cell.dimensions[2];
 	
-	//=============================================================
-	//      Set up Parallel Decomposition if required 
-	//=============================================================
+	// check for pbc and if so round up system dimensions
+	if(cs::pbc[0]==true) cs::system_dimensions[0]=cs::unit_cell_size[0]*(int(vmath::iceil(cs::system_dimensions[0]/cs::unit_cell_size[0])));
+	if(cs::pbc[1]==true) cs::system_dimensions[1]=cs::unit_cell_size[1]*(int(vmath::iceil(cs::system_dimensions[1]/cs::unit_cell_size[1])));
+	if(cs::pbc[2]==true) cs::system_dimensions[2]=cs::unit_cell_size[2]*(int(vmath::iceil(cs::system_dimensions[2]/cs::unit_cell_size[2])));
+
+	// Set up Parallel Decomposition if required 
 	#ifdef MPICF
-		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,mp::system_dimensions);
+		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,cs::system_dimensions);
 	#endif
 
-	//=============================================================
-	//      Initialise variables for system creation
-	//=============================================================
-	
-	if(mp::system_creation_flags[0]==1){
+	//      Initialise variables for system creation	
+	if(cs::system_creation_flags[0]==1){
 		// read_coord_file();
 	}
-	else{
-		//=============================================================
-		//      Create block of crystal of desired size
-		//=============================================================
-
-		cs::create_crystal_structure(catom_array);
-     
-		//=============================================================
-		//      Cut system to the correct type, species etc
-		//=============================================================
-
-		cs::create_system_type(catom_array);
-	}
 	
-	// Check for zero atoms generated
-	if(catom_array.size()==0){
-		std::cerr << "Error, no atoms generated - increase system dimensions!" << std::endl;
-		err::vexit();
+	#ifdef MPICF
+	// check for staged replicated data generation
+	if(vmpi::replicated_data_staged==true && vmpi::mpi_mode==1){
+	
+		// copy ppn to constant temporary
+		const int ppn=vmpi::ppn;
+		
+		for(int n=0;n<ppn;n++){
+			bool i_am_it=false;
+			if(vmpi::my_rank%ppn==n) i_am_it=true;
+			
+			// Only generate system if I am it
+			if(i_am_it){
+				
+				zlog << zTs() << "Generating staged system on rank " << vmpi::my_rank << "..." << std::endl;
+				//std::cerr << zTs() << "Generating staged system on rank " << vmpi::my_rank << "..." << std::endl;
+				
+				// Create block of crystal of desired size
+				cs::create_crystal_structure(catom_array);
+				
+				// Cut system to the correct type, species etc
+				cs::create_system_type(catom_array);
+				
+				vmpi::set_replicated_data(catom_array);
+
+				// Create Neighbour list for system
+				cs::create_neighbourlist(catom_array,cneighbourlist);
+				
+				// Identify needed atoms and destroy the rest
+				vmpi::identify_boundary_atoms(catom_array,cneighbourlist);
+
+				zlog << zTs() << "Staged system generation on rank " << vmpi::my_rank << " completed." << std::endl;
+				//std::cerr << zTs() << "Staged system generation on rank " << vmpi::my_rank << " completed." << std::endl;
+			}
+			
+			// Wait for process who is it
+			MPI::COMM_WORLD.Barrier();
+			
+		} // end of loop over processes
 	}
-	//=============================================================
-	//      Create Neighbour list for system
-	//=============================================================
+	else{
+	#endif
+	
+	// Create block of crystal of desired size
+	cs::create_crystal_structure(catom_array);
+	
+	// Cut system to the correct type, species etc
+	cs::create_system_type(catom_array);
+	
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		MPI::COMM_WORLD.Barrier();
+		MPI::COMM_WORLD.Barrier(); // wait for everyone
 		vmpi::copy_halo_atoms(catom_array);
+		MPI::COMM_WORLD.Barrier(); // sync after halo atoms copied
 	}
 	else if(vmpi::mpi_mode==1){
 		vmpi::set_replicated_data(catom_array);
@@ -121,34 +202,66 @@ int create(){
 		//cs::copy_periodic_boundaries(catom_array);
 	#endif
 	
+	// Create Neighbour list for system
 	cs::create_neighbourlist(catom_array,cneighbourlist);
 	
 	#ifdef MPICF
-		MPI::COMM_WORLD.Barrier();
 		vmpi::identify_boundary_atoms(catom_array,cneighbourlist);
-		MPI::COMM_WORLD.Barrier();
+	#endif
+
+
+	#ifdef MPICF	
+	} // stop if for staged generation here
+	// ** Must be done in parallel **
 		vmpi::init_mpi_comms(catom_array);
 		MPI::COMM_WORLD.Barrier();
 	#endif
 
-	//=============================================================
-	//      Set atom variables for simulation
-	//=============================================================
+	// Set atom variables for simulation
+	#ifdef MPICF
+	// check for staged replicated data generation
+	if(vmpi::replicated_data_staged==true && vmpi::mpi_mode==1){
 	
+		// copy ppn to constant temporary
+		const int ppn=vmpi::ppn;
+		
+		for(int n=0;n<ppn;n++){
+			bool i_am_it=false;
+			if(vmpi::my_rank%ppn==n) i_am_it=true;
+			
+			// Only generate system if I am it
+			if(i_am_it){
+				
+				zlog << zTs() << "Copying system data to optimised data structures on rank " << vmpi::my_rank << "..." << std::endl;
+				//std::cerr << zTs() << "Copying system data to optimised data structures on rank " << vmpi::my_rank << "..." << std::endl;
+				cs::set_atom_vars(catom_array,cneighbourlist);
+				zlog << zTs() << "Copying on rank " << vmpi::my_rank << " completed." << std::endl;
+				//std::cerr << zTs() << "Copying on rank " << vmpi::my_rank << " completed." << std::endl;
+			}
+			
+			// Wait for process who is it
+			MPI::COMM_WORLD.Barrier();
+			
+		} // end of loop over processes
+	}
+	else{
+	#endif
+
+	// Print informative message
+	std::cout << "Copying system data to optimised data structures." << std::endl;
+	zlog << zTs() << "Copying system data to optimised data structures." << std::endl;
+
 	cs::set_atom_vars(catom_array,cneighbourlist);
+	
+	#ifdef MPICF	
+	} // stop if for staged generation here
+	#endif
 
-	//=============================================================
-	//      Set grain and cell variables for simulation
-	//=============================================================
-
+	// Set grain and cell variables for simulation
 	grains::set_properties();
 	cells::initialise();
-	demag::init();
+	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
 	
-	//=============================================================
-	//      Generate system files for storage
-	//=============================================================
-	num_atoms=catom_array.size();
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
@@ -156,36 +269,11 @@ int create(){
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 	int total_num_atoms=0;
 	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
-	if(vmpi::my_rank==0){
-	  std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
-	}
-
+	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
 	#else
-		if(1==1){
-		std::ofstream xyz_file;
-		xyz_file.open ("crystal.xyz");
-		xyz_file << num_atoms+80 << std::endl;
-		xyz_file << "" << std::endl;
-	  	
-	  	for(int atom=0; atom<num_atoms; atom++){
-	  		xyz_file << material_parameters::material[catom_array[atom].material].element << "\t" << 
-	  					catom_array[atom].x << "\t" << 
-	  					catom_array[atom].y << "\t" << 
-	  					catom_array[atom].z << "\t" << std::endl;
-	  	}
-	
-		// Output axes
-		for (int i=0;i<100;i+=5){
-			xyz_file << "O\t" << float(i) << "\t" << 0.0 << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << 0.0 << "\t" << float(i) << "\t" << 0.0 << std::endl;
-	
-			xyz_file << "O\t" << material_parameters::system_dimensions[0] << "\t" << material_parameters::system_dimensions[1]-float(i) << "\t" << 0.0 << std::endl;
-			xyz_file << "O\t" << material_parameters::system_dimensions[0]-float(i) << "\t" << 	material_parameters::system_dimensions[1] << "\t" << 0.0 << std::endl;
-		}
-		
-		xyz_file.close();
-		}
-		#endif
+	std::cout << "Number of atoms generated: " << atoms::num_atoms << std::endl; 
+
+	#endif
 
 	return EXIT_SUCCESS;
 }

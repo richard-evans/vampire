@@ -1,20 +1,47 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 #include "material.hpp"
 
 namespace mp{
 	// Constructor
 materials_t::materials_t ():
 	name(""),
-	hamiltonian_type("generic"),
 	element("   "),
-	crystal_structure(""),
 	alpha(1.0),
 	mu_s_SI(9.27400915e-24),
 	magnetisation(0.0),
 	Ku1_SI(0.0),
 	Ku2_SI(0.0),
+	KuVec_SI(0),
+	Ku(0.0),
+	KuVec(0),
+	UniaxialAnisotropyUnitVector(3),
 	Kc1_SI(0.0),
 	Kc2_SI(0.0),
 	Ks_SI(0.0),
+	Ks(0.0),
 	gamma_rel(1.0),
 	random_spins(false),
 	min(0.0),
@@ -23,18 +50,16 @@ materials_t::materials_t ():
 	core_shell_size(0.0),
 	interface_roughness(0.0),
 	density(1.0),
-	cutoff(0.0),
+	cutoff(0.8),
 	alloy_master(false),
 	alloy_class(-1),
 	continuous(false),
 	moment_flag(true),
 	anis_flag(true),
-	num_nearest_neighbours(0),
-	hamiltonian_num_neighbours(0),
 	one_oneplusalpha_sq(0.5),
 	alpha_oneplusalpha_sq(0.5),
-	Ku(0.0),
-	H_th_sigma(0.0)
+	H_th_sigma(0.0),
+	constrained(false)
 	
 	{
 
@@ -54,7 +79,9 @@ materials_t::materials_t ():
 	initial_spin[0]=0.0;
 	initial_spin[1]=0.0;
 	initial_spin[2]=1.0;
-
+	UniaxialAnisotropyUnitVector.at(0)=0.0;
+	UniaxialAnisotropyUnitVector.at(1)=0.0;
+	UniaxialAnisotropyUnitVector.at(2)=1.0;
 }
 
 int materials_t::print(){

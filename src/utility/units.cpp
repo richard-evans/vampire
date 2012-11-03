@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains the units namespace for program parameters and unit conversion. 
@@ -45,7 +69,7 @@ namespace units {
 
 /// @brief Initialises system units for conversion.
 ///
-/// @details Sets units::initialised=true. Example usage @code units::init() /@code.
+/// @details Sets units::initialised=true. Example usage
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -119,7 +143,7 @@ int init(){
 	
 /// @brief Converts external units to internal units.
 ///
-/// @details Example usage @code units::convert(string "nm", double& var, string& unit_type) /@code
+/// @details Example usage units::convert(string "nm", double& var, string& unit_type)
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -167,6 +191,54 @@ int init(){
 		
 	}
 
+/// @brief Converts array of external units to internal units.
+///
+/// @details Example usage units::convert(string "nm", std::vector<double>& var, string& unit_type)
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, rfle500@york.ac.uk
+/// @version 1.0
+/// @date    21/07/2012
+///
+/// @param[in] input_unit name of unit to be converted
+/// @param[in] value vector of variables to be converted
+/// @param[out] type unit type, eg length, volume 
+/// @return EXIT_SUCCESS
+///
+/// @internal
+///	Created:		21/07/2012
+///	Revision:	  ---
+///=====================================================================================
+///
+	void convert(std::string input_unit, std::vector<double>& value, std::string& type){
+
+		// Populate unit array;
+		if(units::initialised==false){
+			units::init();
+		}
+		
+		// loop over all possible units
+		for(int i=0;i<max_units;i++){
+			if(input_unit==units::unit[i]){
+				// Convert unit
+				for(unsigned int idx=0; idx < value.size(); idx++) value.at(idx)*=conversion[i];
+				// Set unit type
+				type=units::type[i];
+
+				return;
+			}
+		}
+
+		// Error if unit not found
+		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
+		err::vexit();
+
+	}
+	
 /// @brief Reverts internal units to external units.
 ///
 /// @details Example usage @code units::revert(string "nm", double& var, string& unit_type) /@code

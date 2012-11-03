@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains the sim namespace and wrapper functions for system integration
@@ -19,6 +43,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
+#include "demag.hpp"
 #include "errors.hpp"
 #include "material.hpp"
 #include "random.hpp"
@@ -51,21 +76,48 @@ namespace sim{
 	double Hinc= 0.1; // T
 	double Heq=0.0;
 	double demag_factor[3]={0.0,0.0,0.0};
-	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
-	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
-	double head_position[2]={0.0,mp::system_dimensions[1]*0.5}; // A
+	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; // nm/ns
 	bool   head_laser_on=false;
 
+	bool   constraint_rotation=false; // enables rotation of spins to new constraint direction
+	
+	bool   constraint_phi_changed=false; // flag to note change in phi
+	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
+	double constraint_phi_min=0.0; // loop angle min [degrees]
+	double constraint_phi_max=0.0; // loop angle max [degrees]
+	double constraint_phi_delta=5.0; // loop angle delta [degrees]
+
+	bool   constraint_theta_changed=false;
+	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
+	double constraint_theta_min=0.0; // loop angle min [degrees]
+	double constraint_theta_max=0.0; // loop angle max [degrees]
+	double constraint_theta_delta=5.0; // loop angle delta [degrees]
+	
 	double cooling_time=100.0e-12; //seconds
 	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
 	double pump_power=2.4e22;
 	double pump_time=20.0e-15; 
-	
+	double HeatSinkCouplingConstant=0.0; //1.1e12 ~ sensible value
+	double TTCe = 7.0E02; //electron specific heat
+	double TTCl = 3.0E06; //phonon specific heat
+	double TTG = 17.0E17 ;//electron coupling constant
+  
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
 	int program=0; 
+	int AnisotropyType=2; // Controls scalar (0) or tensor(1) anisotropy (off(2))
+	
+	bool surface_anisotropy=false; // flag to enable surface anisotropy
+	bool identify_surface_atoms=false; // flag to idenify surface atoms in config coordinate file
+	unsigned int surface_anisotropy_threshold=123456789; // global threshold for surface atoms
+	bool NativeSurfaceAnisotropyThreshold=false; // enables site-dependent surface threshold
+	
+	// Anisotropy control booleans
+	bool UniaxialScalarAnisotropy=false; // Enables scalar uniaxial anisotropy
+	bool TensorAnisotropy=false; // Overrides scalar uniaxial anisotropy
+	bool CubicScalarAnisotropy=false; // Enables scalar cubic anisotropy
 	
 	// Local function declarations
 	int integrate_serial(int);
@@ -93,7 +145,7 @@ namespace sim{
 		
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-		
+		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
 	}
 	
 /// @brief Function to run one a single program
@@ -129,10 +181,15 @@ int run(){
 		#endif
 		std::cout << "Starting Simulation with Program ";
 	}
-	
-	//program::timestep_scaling();
-	//return(EXIT_SUCCESS);
-	
+
+	// Now set initial compute time
+	#ifdef MPICF
+	vmpi::ComputeTime=MPI_Wtime();
+	vmpi::WaitTime=MPI_Wtime();
+	vmpi::TotalComputeTime=0.0;
+	vmpi::TotalWaitTime=0.0;
+	#endif
+
 	// Initialise random number generator
 	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
 
@@ -178,7 +235,17 @@ int run(){
 			if(vmpi::my_rank==0) std::cout << "HAMR-Simulation..." << std::endl; 
 			program::hamr();
 			break;
-		
+			
+		case 8:
+			if(vmpi::my_rank==0) std::cout << "CMC-Anisotropy..." << std::endl; 
+			program::cmc_anisotropy();
+			break;
+			
+		case 9:
+			if(vmpi::my_rank==0) std::cout << "Hybrid-CMC..." << std::endl; 
+			program::hybrid_cmc();
+			break;
+			
 		case 50:
 			if(vmpi::my_rank==0) std::cout << "Diagnostic-Boltzmann..." << std::endl; 
 			program::boltzmann_dist();
@@ -188,6 +255,16 @@ int run(){
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);
 			}
+	}
+
+	// output Monte Carlo Statistics if applicable
+	if(sim::integrator==3){
+		std::cout << "Constrained Monte Carlo Statistics:" << std::endl;
+		std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
+		std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0 << "% Accepted" << std::endl;
+		std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+		std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+		
 	}
 
 	//program::LLB_Boltzmann();
@@ -306,6 +383,14 @@ int integrate_serial(int n_steps){
 			}
 			break;
 
+		case 4: // Hybrid Constrained Monte Carlo
+			for(int ti=0;ti<n_steps;ti++){
+				sim::ConstrainedMonteCarloMonteCarlo();
+				// increment time
+				increment_time();
+			}
+			break;
+		
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);

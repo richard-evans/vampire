@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 #include <vector>
 
 namespace stats
@@ -31,4 +55,21 @@ namespace stats
 	extern std::vector <double> sublattice_mean_magm_array;
 	extern std::vector <double> sublattice_mom_array;
 	extern std::vector <int> sublattice_nm_array;
+	
+	extern bool calculate_torque;
+	extern double total_system_torque[3];
+	extern double total_mean_system_torque[3];
+	
+	extern std::vector <double> sublattice_mean_torque_x_array;
+	extern std::vector <double> sublattice_mean_torque_y_array;
+	extern std::vector <double> sublattice_mean_torque_z_array;
+
+	extern double torque_data_counter;
+	
+	extern double MeanChi[3];
+	extern double MeanChiSquared[3];
+	extern double MeanChiDataCounter;
+	extern double ChiAtoms;
+	extern bool CalculateSusceptibility;
+	
 }

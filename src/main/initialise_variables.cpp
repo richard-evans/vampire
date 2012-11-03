@@ -1,33 +1,33 @@
-///
-/// @file
-/// @brief This is the brief (one line only) description of the function of this file. 
-///
-/// @details This is the detailed description of the funtion of this file
-///
-/// @section notes Implementation Notes
-/// This is a list of other notes, not related to functionality but rather to implementation. 
-/// Also include references, formulae and other notes here.
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section info File Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    11/01/2010
-/// @internal
-///	Created:		11/01/2010
-///	Revision:	  ---
-///=====================================================================================
-///
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 
 // Headers
 #include "errors.hpp"
 #include "demag.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
-//#include "multilayer.hpp"
 #include "sim.hpp"
 #include "random.hpp"
 #include "vio.hpp"
@@ -65,40 +65,12 @@ namespace mp{
 	double dt;
 	double half_dt;
 	
-	//----------------------------------
-	//Input System Parameters
-	//----------------------------------
-	int particle_creation_parity;	// Offset of particle centre (odd/even)
-	int int_system_dimensions[3];
-	double system_dimensions[3];	// Size of system (A)
-	double particle_scale;			// Diameter of particles/grains (A)
-	double particle_spacing;		// Spacing Between particles (A)
-	
-	//----------------------------------
-	//Derived System Parameters
-	//----------------------------------
-	double lattice_constant[3];
-	double lattice_space_conversion[3];
-	string crystal_structure;
-	bool single_spin=false;
-	string hamiltonian_type; 	// generic
-								// LR_FePt
-								// SR_FePt
-								// LR_Co
-								// LR_Fe
-								// LR_Ni
-								
-	string atomic_element[4]; // Different atomic species
-	
-	int num_nearest_neighbours = 0;
-	int hamiltonian_num_neighbours = 0;
-	
-	//----------------------------------
-	// System creation flags
-	//----------------------------------
-	
-	int system_creation_flags[10];
-	
+	// Unrolled material parameters for speed
+	std::vector <double> MaterialMuSSIArray(0);
+	std::vector <zkval_t> MaterialScalarAnisotropyArray(0);
+	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
+	std::vector <double> MaterialCubicAnisotropyArray(0);
+
 ///
 /// @brief Function to initialise program variables prior to system creation.
 ///
@@ -127,7 +99,6 @@ int initialise(std::string const infile){
 
 	if(vmpi::my_rank==0){
 		std::cout << "================================================================================" << std::endl;
-		std::cout << " " << std::endl;
 		std::cout << "Initialising system variables" << std::endl;
 	}
 	
@@ -145,7 +116,7 @@ int initialise(std::string const infile){
 	//mp::material[0].print();
 
 	// Check for keyword parameter overide
-	if(mp::single_spin==true){
+	if(cs::single_spin==true){
 		mp::single_spin_system();
 	}
 	
@@ -160,25 +131,24 @@ int default_system(){
 
 	// Initialise system creation flags to zero
 	for (int i=0;i<10;i++){
-		mp::system_creation_flags[i] = 0;
+		cs::system_creation_flags[i] = 0;
 		sim::hamiltonian_simulation_flags[i] = 0; 
 	}
 	
 	// Set system dimensions !Angstroms
-	mp::lattice_constant[0] = 3.0;
-	mp::lattice_constant[1] = 3.0;
-	mp::lattice_constant[2] = 3.0;
+	cs::unit_cell_size[0] = 3.0;
+	cs::unit_cell_size[1] = 3.0;
+	cs::unit_cell_size[2] = 3.0;
 
-	mp::system_dimensions[0] = 100.0;
-	mp::system_dimensions[1] = 100.0;
-	mp::system_dimensions[2] = 100.0;
+	cs::system_dimensions[0] = 100.0;
+	cs::system_dimensions[1] = 100.0;
+	cs::system_dimensions[2] = 100.0;
 
-	mp::particle_scale   = 50.0;
-	mp::particle_spacing = 10.0;
+	cs::particle_scale   = 50.0;
+	cs::particle_spacing = 10.0;
 	
-	mp::particle_creation_parity=0;
-	mp::crystal_structure = "sc";
-	mp::hamiltonian_type = "generic";
+	cs::particle_creation_parity=0;
+	cs::crystal_structure = "sc";
 
 	// Voronoi Variables
 	create_voronoi::voronoi_sd=0.1;
@@ -211,7 +181,7 @@ int default_system(){
 	//vmpi::mpi_mode=1;
 	//mpi_create_variables::mpi_interaction_range=2; // Unit cells
 	//mpi_create_variables::mpi_comms_identify=true;
-
+	
 	//------------------------------------------------------------------------------
 	// Material Definitions
 	//------------------------------------------------------------------------------
@@ -227,7 +197,6 @@ int default_system(){
 	material[0].mu_s_SI=1.5*9.27400915e-24;
 	material[0].Ku1_SI=-4.644e-24;
 	material[0].gamma_rel=1.0;
-	material[0].hamiltonian_type="generic";
 	material[0].element="Ag ";
 
 	// Disable Error Checking
@@ -243,24 +212,23 @@ int single_spin_system(){
 
 	// Reset system creation flags to zero
 	for (int i=0;i<10;i++){
-		mp::system_creation_flags[i] = 0;
+		cs::system_creation_flags[i] = 0;
 	}
 	
 	// Set system dimensions !Angstroms
-	mp::lattice_constant[0] = 3.0;
-	mp::lattice_constant[1] = 3.0;
-	mp::lattice_constant[2] = 3.0;
+	cs::unit_cell_size[0] = 3.0;
+	cs::unit_cell_size[1] = 3.0;
+	cs::unit_cell_size[2] = 3.0;
 
-	mp::system_dimensions[0] = 2.0;
-	mp::system_dimensions[1] = 2.0;
-	mp::system_dimensions[2] = 2.0;
+	cs::system_dimensions[0] = 2.0;
+	cs::system_dimensions[1] = 2.0;
+	cs::system_dimensions[2] = 2.0;
 
-	mp::particle_scale   = 50.0;
-	mp::particle_spacing = 10.0;
+	cs::particle_scale   = 50.0;
+	cs::particle_spacing = 10.0;
 	
-	mp::particle_creation_parity=0;
-	mp::crystal_structure = "sc";
-	mp::hamiltonian_type = "generic";
+	cs::particle_creation_parity=0;
+	cs::crystal_structure = "sc";
 	
 	// Turn off multi-spin Flags
 	sim::hamiltonian_simulation_flags[0] = 0;	// Exchange
@@ -275,47 +243,7 @@ int single_spin_system(){
 }
 
 int set_derived_parameters(){
-
-	//----------------------------------
-	//Derived System Parameters
-	//----------------------------------
-	mp::lattice_space_conversion[0] = mp::lattice_constant[0]*0.5;
-	mp::lattice_space_conversion[1] = mp::lattice_constant[1]*0.5*0.333333333333333;
-	mp::lattice_space_conversion[2] = mp::lattice_constant[2]*0.5;
-
-	mp::int_system_dimensions[0] = 2*vmath::iround(mp::system_dimensions[0]/mp::lattice_constant[0]);
-	mp::int_system_dimensions[1] = 6*vmath::iround(mp::system_dimensions[1]/mp::lattice_constant[1]);
-	mp::int_system_dimensions[2] = 2*vmath::iround(mp::system_dimensions[2]/mp::lattice_constant[2]);
 		
-	double num_atoms_per_unit_cell=0; 
-	
-	if(mp::crystal_structure=="sc"){
-		mp::num_nearest_neighbours = 6;
-		num_atoms_per_unit_cell=1.0;
-	}
-	else if(mp::crystal_structure=="bcc"){
-		mp::num_nearest_neighbours = 8;
-		num_atoms_per_unit_cell=2.0;
-	}
-	else if(mp::crystal_structure=="fct"){
-		mp::num_nearest_neighbours = 4;
-		num_atoms_per_unit_cell=2.0;
-	}
-	else if(mp::crystal_structure=="fcc"){
-		mp::num_nearest_neighbours = 12;
-		num_atoms_per_unit_cell=4.0;
-	}
-	else{
-		 std::cout << "Error in determining num_nearest_neighbours - unknown crystal type \'" << mp::crystal_structure << "\'" << std::endl;
-		 err::vexit();
-	}
-	
-	if(mp::hamiltonian_type=="generic")	mp::hamiltonian_num_neighbours = mp::num_nearest_neighbours;
-	if(mp::hamiltonian_num_neighbours==0){
-		 std::cout << "Error in determining hamiltonian_num_neighbours - unknown Hamiltonian type \'" << mp::hamiltonian_type << "\'" << std::endl;
-		 err::vexit();
-	}
-
 	// Set integration constants
 	mp::dt = mp::dt_SI*mp::gamma_SI; // Must be set before Hth
 	mp::half_dt = 0.5*mp::dt;
@@ -327,26 +255,25 @@ int set_derived_parameters(){
 	sim::H_vec[2]*=mod_H;
 
 	// Calculate moment, magnetisation, and anisotropy constants
-	for(int mat=0;mat<mp::num_materials;mat++){
-		double V=mp::lattice_constant[0]*mp::lattice_constant[1]*mp::lattice_constant[2];
+	/*for(int mat=0;mat<mp::num_materials;mat++){
+		double V=cs::unit_cell_size[0]*cs::unit_cell_size[1]*cs::unit_cell_size[2];
 		// Set magnetisation from mu_s and a
 		if(material[mat].moment_flag==true){
-			material[mat].magnetisation=num_atoms_per_unit_cell*material[mat].mu_s_SI/V;
+			//material[mat].magnetisation=num_atoms_per_unit_cell*material[mat].mu_s_SI/V;
 		}
 		// Set mu_s from magnetisation and a
 		else {
-			material[mat].mu_s_SI=material[mat].magnetisation*V/num_atoms_per_unit_cell;
+			//material[mat].mu_s_SI=material[mat].magnetisation*V/num_atoms_per_unit_cell;
 		}
 		// Set K as energy/atom
 		if(material[mat].anis_flag==false){
 			material[mat].Ku1_SI=material[mat].Ku1_SI*V/num_atoms_per_unit_cell;
 			std::cout << "setting " << material[mat].Ku1_SI << std::endl;
 		}
-	}
+	}*/
 	const string blank="";
 	// Set derived material parameters
 	for(int mat=0;mat<mp::num_materials;mat++){
-		mp::material[mat].hamiltonian_type="generic";
 		mp::material[mat].one_oneplusalpha_sq			=-mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
 		mp::material[mat].alpha_oneplusalpha_sq			= mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
 		
@@ -364,66 +291,108 @@ int set_derived_parameters(){
 			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
 		}
 		mp::material[mat].Ku									= mp::material[mat].Ku1_SI/mp::material[mat].mu_s_SI;
+		mp::material[mat].Kc									= mp::material[mat].Kc1_SI/mp::material[mat].mu_s_SI;
+		mp::material[mat].Ks									= mp::material[mat].Ks_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
 																  (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
-		// If local crystal is unset, use global type
-		if(mp::material[mat].crystal_structure==blank){
-			mp::material[mat].crystal_structure=mp::crystal_structure;
-		}
-		// calculate number of neighbours for each material
-		if(mp::material[mat].hamiltonian_type=="generic"){
-			if(mp::material[mat].crystal_structure=="sc"){
-				mp::material[mat].num_nearest_neighbours		= 6;
-				mp::material[mat].hamiltonian_num_neighbours	= 6;
-				mp::material[mat].cutoff = 1.01;
-			}
-			else if(mp::material[mat].crystal_structure=="bcc"){
-				mp::material[mat].num_nearest_neighbours		= 8;
-				mp::material[mat].hamiltonian_num_neighbours	= 8;
-				mp::material[mat].cutoff = sqrt(3.0)*0.5*1.01;
+	}
+		// Check for which anisotropy function(s) are to be used		
+		if(sim::TensorAnisotropy==true){
+			sim::UniaxialScalarAnisotropy=false; // turn off scalar anisotropy calculation
+			// loop over materials and convert all scalar anisotropy to tensor (along z)
+			for(int mat=0;mat<mp::num_materials; mat++){
+				
+				const double one_o_mu=1.0/mp::material[mat].mu_s_SI;
 
-			}
-			else if(mp::material[mat].crystal_structure=="fcc"){
-				mp::material[mat].num_nearest_neighbours		= 12;
-				mp::material[mat].hamiltonian_num_neighbours	= 12;
-				mp::material[mat].cutoff = sqrt(2.0)*0.5*1.01;
+				// If tensor is unset
+				if(mp::material.at(mat).KuVec_SI.size()==0){
+					const double ex = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
+					const double ey = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
+					const double ez = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ex*ex);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ex*ey);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ex*ez);
 
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ey*ex);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ey*ey);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ey*ez);
+
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ez*ex);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ez*ey);
+					mp::material.at(mat).KuVec.push_back(mp::material[mat].Ku*ez*ez);
+				}
+				else if(mp::material.at(mat).KuVec_SI.size()==9){
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(0)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(1)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(2)*one_o_mu);
+
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(3)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(4)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(5)*one_o_mu);
+
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(6)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(7)*one_o_mu);
+					mp::material.at(mat).KuVec.push_back(mp::material.at(mat).KuVec_SI.at(8)*one_o_mu);
+				}
 			}
-			else{
-				std::cerr << "Error in determining num_nearest_neighbours - unknown crystal type \'";
-				std::cerr << mp::material[mat].crystal_structure << "\'" << std::endl;
-				exit(EXIT_FAILURE);
-			}
-		}
-		else{
-			std::cerr << "Error, only generic hamiltonians are implemented at present, exiting" << std::endl;
-			exit(EXIT_FAILURE);
 		}
 		
-		
-		//std::cout << "checking range exclusivity" << std::endl;
-		// Check for exclusivity of range
-		if(material[mat].geometry!=0){
+		// Unroll anisotropy values for speed
+		if(sim::UniaxialScalarAnisotropy==true){
+			zlog << zTs() << "Setting scalar uniaxial anisotropy." << std::endl;
+			// Set global anisotropy type
+			sim::AnisotropyType=0;
+			MaterialScalarAnisotropyArray.resize(mp::num_materials);
+			for(int mat=0;mat<mp::num_materials; mat++) MaterialScalarAnisotropyArray[mat].K=mp::material[mat].Ku;
+		}
+		else if(sim::TensorAnisotropy==true){
+			zlog << zTs() << "Setting tensor uniaxial anisotropy." << std::endl;
+			// Set global anisotropy type
+			sim::AnisotropyType=1;
+			MaterialTensorAnisotropyArray.resize(mp::num_materials);
+			for(int mat=0;mat<mp::num_materials; mat++){
+				MaterialTensorAnisotropyArray[mat].K[0][0]=mp::material.at(mat).KuVec.at(0);
+				MaterialTensorAnisotropyArray[mat].K[0][1]=mp::material.at(mat).KuVec.at(1);
+				MaterialTensorAnisotropyArray[mat].K[0][2]=mp::material.at(mat).KuVec.at(2);
+
+				MaterialTensorAnisotropyArray[mat].K[1][0]=mp::material.at(mat).KuVec.at(3);
+				MaterialTensorAnisotropyArray[mat].K[1][1]=mp::material.at(mat).KuVec.at(4);
+				MaterialTensorAnisotropyArray[mat].K[1][2]=mp::material.at(mat).KuVec.at(5);
+
+				MaterialTensorAnisotropyArray[mat].K[2][0]=mp::material.at(mat).KuVec.at(6);
+				MaterialTensorAnisotropyArray[mat].K[2][1]=mp::material.at(mat).KuVec.at(7);
+				MaterialTensorAnisotropyArray[mat].K[2][2]=mp::material.at(mat).KuVec.at(8);
+
+			}
+		}
+		// Unroll cubic anisotropy values for speed
+		if(sim::CubicScalarAnisotropy==true){
+			zlog << zTs() << "Setting scalar cubic anisotropy." << std::endl;
+			MaterialCubicAnisotropyArray.resize(mp::num_materials);
+			for(int mat=0;mat<mp::num_materials; mat++) MaterialCubicAnisotropyArray.at(mat)=mp::material[mat].Kc;
+		}
+
+		// Loop over materials to check for invalid input and warn appropriately
+		for(int mat=0;mat<mp::num_materials;mat++){
 			const double lmin=material[mat].min;
 			const double lmax=material[mat].max;
 			for(int nmat=0;nmat<mp::num_materials;nmat++){
 				if(nmat!=mat){
 					double min=material[nmat].min;
 					double max=material[nmat].max;
-					std::cout << lmin << "\t" << min << "\t" << max << std::endl;
-					std::cout << lmax << "\t" << min << "\t" << max << std::endl;
 					if(((lmin>min) && (lmin<max)) || ((lmax>min) && (lmax<max))){
-						std::cerr << "Warning - material " << mat << " overlaps material " << nmat << " - possibly use alloy keyword instead" << std::endl;
-						std::cerr << " Material "<< mat << ":min = " << lmin << std::endl;
-						std::cerr << " Material "<< mat << ":max = " << lmax << std::endl;
-						std::cerr << " Material "<< nmat << ":min = " << min << std::endl;
-						std::cerr << " Material "<< nmat << ":max = " << max << std::endl;
-						//exit(EXIT_FAILURE);
+						std::cerr << "Warning: Overlapping material heights found. Check log for details." << std::endl;
+						zlog << zTs() << "Warning: material " << mat << " overlaps material " << nmat << "." << std::endl;
+						zlog << zTs() << "If you have defined geometry then this may be OK, or possibly you meant to specify alloy keyword instead." << std::endl;
+						zlog << zTs() << "----------------------------------------------------" << std::endl;
+						zlog << zTs() << "  Material "<< mat << ":min = " << lmin << std::endl;
+						zlog << zTs() << "  Material "<< mat << ":max = " << lmax << std::endl;
+						zlog << zTs() << "  Material "<< nmat << ":min = " << min << std::endl;
+						zlog << zTs() << "  Material "<< nmat << ":max = " << max << std::endl;
 					}
 				}
 			}
 		}
-	}
 	
 	return EXIT_SUCCESS;
 }

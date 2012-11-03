@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains the standard benchmark program
@@ -82,7 +106,7 @@ int timestep_scaling(){
 				stats::mag_m();
 
 			} // end of time loop                                                                                                                                      
-			vmag << mp::dt_SI << "\t";
+			zmag << mp::dt_SI << "\t";
 			std::cout << mp::dt_SI << "\t";
 			vout::data();
 			}
@@ -130,11 +154,11 @@ void boltzmann_dist(){
 	}
 
 	// Output data
-	vmag << "# " << mp::material[0].Ku1_SI/(sim::temperature*1.3806503e-23) << std::endl;
+	zmag << "# " << mp::material[0].Ku1_SI/(sim::temperature*1.3806503e-23) << std::endl;
 	for(int b=0;b<181;b++){
 		double energy = mp::material[0].Ku1_SI;
 		double P = sin(double (b)*M_PI/180)*exp((energy*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0))/(sim::temperature*1.3806503e-23));
-		vmag << b << "\t" << (bin[b]+bin[180-b])/(2.0*maxp) << "\t" << P/maxP << std::endl;
+		zmag << b << "\t" << (bin[b]+bin[180-b])/(2.0*maxp) << "\t" << P/maxP << std::endl;
 	}
 	
 }

@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains functions and variables for calcuation of statistics. 
@@ -25,6 +49,7 @@
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 
 #include <cmath>
@@ -62,6 +87,28 @@ namespace stats
 	std::vector <double> sublattice_mean_magm_array(0);
 	std::vector <double> sublattice_mom_array(0);
 	std::vector <int> sublattice_nm_array(0);
+	
+	// torque calculation
+	bool calculate_torque=false;
+	double total_system_torque[3]={0.0,0.0,0.0};
+	double total_mean_system_torque[3]={0.0,0.0,0.0};
+	
+	std::vector <double> sublattice_mean_torque_x_array(0);
+	std::vector <double> sublattice_mean_torque_y_array(0);
+	std::vector <double> sublattice_mean_torque_z_array(0);
+	
+	double torque_data_counter=0.0;
+	
+	// susceptibility (chi) calculation
+	bool CalculateSusceptibility=false;
+	double MeanChi[3]={0.0,0.0,0.0};
+	double MeanChiSquared[3]={0.0,0.0,0.0};
+	double MeanChiDataCounter=0.0;
+	double ChiAtoms=0;
+	
+	// function prototypes
+	void system_torque();
+	void SystemSusceptibility();
 	
 	bool is_initialised=false;
 
@@ -111,14 +158,16 @@ int mag_m(){
 
 	if(!stats::is_initialised){
 		// Resize arrays
-		stats::sublattice_mx_array.resize(mp::num_materials,0);
-		stats::sublattice_my_array.resize(mp::num_materials,0);
-		stats::sublattice_mz_array.resize(mp::num_materials,0);
-		stats::sublattice_magm_array.resize(mp::num_materials,0);
-		stats::sublattice_mean_magm_array.resize(mp::num_materials,0);
-		stats::sublattice_mom_array.resize(mp::num_materials,0);
+		stats::sublattice_mx_array.resize(mp::num_materials,0.0);
+		stats::sublattice_my_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mz_array.resize(mp::num_materials,0.0);
+		stats::sublattice_magm_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mean_magm_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mom_array.resize(mp::num_materials,0.0);
 		stats::sublattice_nm_array.resize(mp::num_materials,0);
-		
+		stats::sublattice_mean_torque_x_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mean_torque_y_array.resize(mp::num_materials,0.0);
+		stats::sublattice_mean_torque_z_array.resize(mp::num_materials,0.0);
 		stats::max_moment=0.0;
 		
 		// Calculate number of moments in each sublattice
@@ -130,6 +179,7 @@ int mag_m(){
 			// add to max_moment
 			stats::max_moment+=mp::material[mat].mu_s_SI;
 		}
+		
 		int nm=0;
 		// Calculate size of each moment and check num_moments
 		for(int mat=0;mat<mp::num_materials;mat++){
@@ -147,11 +197,24 @@ int mag_m(){
 			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_nm_array[0],mp::num_materials,MPI_INT,MPI_SUM);
 		#endif
 
+		// Check for zero moments and reset NM to zero
+		for(int mat=0;mat<mp::num_materials;mat++){
+			if(stats::sublattice_nm_array.at(mat)==0) stats::sublattice_nm_array.at(mat)=1;
+		}
+
+		// Output maximum moment to file
+		zlog << zTs() << "Maximum spin moment for sample is " << stats::max_moment << " [J/T]" << std::endl;
+		zlog << zTs() << "Maximum spin moment per atom is " << (stats::max_moment/double(stats::num_atoms))/9.27400915e-24 << " [mu_B/atom]" << std::endl;
+			
 		// Set initilaised flag to true
 		stats::is_initialised=true;
 	}	
 	
+	// optionally calculate system torque
+	if(stats::calculate_torque==true) stats::system_torque();
 	
+	//optionally calculate system susceptibility
+	if(stats::CalculateSusceptibility==true) stats::SystemSusceptibility();
 	
 	//---------------------------------------------------------
 	// For single material, use streamlined version for speed
@@ -159,9 +222,6 @@ int mag_m(){
 	if(material_parameters::num_materials==1){
 		double m[3]={0.0,0.0,0.0};
 
-		// Calculate maximum moment for normalisation
-		stats::max_moment=stats::num_atoms*material_parameters::material[0].mu_s_SI;
-		
 		// Calculate total components
 		for(int atom=0;atom<stats::num_atoms;atom++){
 			m[0] += atoms::x_spin_array[atom];
@@ -290,10 +350,9 @@ int mag_m(){
 /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
 ///
 /// @section Information
-/// @author		Richard Evans, rfle500@york.ac.uk
-/// @version	1.0
-/// @date		14/03/2011
-/// @todo		Implement for more than one material - Urgent!
+/// @author		Richard Evans, richard.evans@york.ac.uk
+/// @version	1.1
+/// @date		14/09/2011
 ///
 /// @internal
 ///	Created:		11/01/2010
@@ -306,6 +365,7 @@ void mag_m_reset(){
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "stats::mag_m_reset() has been called" << std::endl;}
 	
+	// if stats not initialised then call mag_m() to do so.
 	if(!stats::is_initialised) stats::mag_m();
 	
 	stats::total_mean_mag_m_actual=0.0;
@@ -313,6 +373,27 @@ void mag_m_reset(){
 	for(int mat=0;mat<mp::num_materials;mat++) stats::sublattice_mean_magm_array[mat]=0.0;
 	stats::data_counter=0.0;
 	
+	stats::total_mean_system_torque[0]=0.0;
+	stats::total_mean_system_torque[1]=0.0;
+	stats::total_mean_system_torque[2]=0.0;
+	
+	for(int mat=0;mat<mp::num_materials;mat++){
+		stats::sublattice_mean_torque_x_array[mat]=0.0;
+		stats::sublattice_mean_torque_y_array[mat]=0.0;
+		stats::sublattice_mean_torque_z_array[mat]=0.0;
+	}
+	stats::torque_data_counter=0.0;
+	
+	// Reset Chi Data
+	stats::MeanChi[0]=0.0;
+	stats::MeanChi[1]=0.0;
+	stats::MeanChi[2]=0.0;
+
+	stats::MeanChiSquared[0]=0.0;
+	stats::MeanChiSquared[1]=0.0;
+	stats::MeanChiSquared[2]=0.0;
+
+	stats::MeanChiDataCounter=0.0;
 }
 
 double max_torque(){
@@ -362,5 +443,116 @@ double max_torque(){
 
 }
 
+///
+/// @brief      Calculates the torque on the system
+///
+/// Calculates the instantaneous value of the system torque T = sum (Si x Hi)
+///
+/// @return     void
+///
+void system_torque(){
 
+	// parallel version, multiple materials, initialisation
+	
+	double torque[3]={0.0,0.0,0.0};
+
+	// calculate net fields
+	calculate_spin_fields(0,atoms::num_atoms);
+	calculate_external_fields(0,atoms::num_atoms);
+		
+	for(int atom=0;atom<stats::num_atoms;atom++){
+
+		// get atomic moment
+		const int imat=atoms::type_array[atom];
+		const double mu = mp::material[imat].mu_s_SI;
+		
+		// Store local spin in Sand local field in H
+		const double S[3] = {atoms::x_spin_array[atom]*mu,atoms::y_spin_array[atom]*mu,atoms::z_spin_array[atom]*mu};
+		const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom],
+									atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom],
+									atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]};
+
+		torque[0] += S[1]*H[2]-S[2]*H[1];
+		torque[1] += S[2]*H[0]-S[0]*H[2];
+		torque[2] += S[0]*H[1]-S[1]*H[0];
+
+		stats::sublattice_mean_torque_x_array[imat]+=S[1]*H[2]-S[2]*H[1];
+		stats::sublattice_mean_torque_y_array[imat]+=S[2]*H[0]-S[0]*H[2];
+		stats::sublattice_mean_torque_z_array[imat]+=S[0]*H[1]-S[1]*H[0];
+	}
+
+	// reduce torque on all nodes
+	#ifdef MPICF
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&torque[0],3,MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_x_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_y_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_z_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
+	#endif
+
+	// Set stats values
+	stats::total_system_torque[0]=torque[0];
+	stats::total_system_torque[1]=torque[1];
+	stats::total_system_torque[2]=torque[2];
+
+	stats::total_mean_system_torque[0]+=torque[0];
+	stats::total_mean_system_torque[1]+=torque[1];
+	stats::total_mean_system_torque[2]+=torque[2];
+
+	stats::torque_data_counter+=1.0;
+	return;
+
+}
+
+///
+/// @brief      Calculates the chi_l for the system
+///
+/// @return     void
+///
+void SystemSusceptibility(){
+
+	double chi[3]={0.0,0.0,0.0};
+	double chiM[3]={0.0,0.0,0.0};
+	int chi_atoms=stats::num_atoms;
+	
+	for(int atom=0;atom<stats::num_atoms;atom++){
+
+		// get atomic moment
+		const int imat=atoms::type_array[atom];
+		const double mu = mp::material[imat].mu_s_SI;
+		
+		chi[0]+=atoms::x_spin_array[atom];
+		chi[1]+=atoms::y_spin_array[atom];
+		chi[2]+=atoms::z_spin_array[atom];
+		
+	}
+
+	// reduce torque on all nodes
+	#ifdef MPICF
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&chi[0],3,MPI_DOUBLE,MPI_SUM);
+		//MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&chisq[0],3,MPI_DOUBLE,MPI_SUM);
+		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&chi_atoms,1,MPI_INT,MPI_SUM);
+	#endif
+
+	stats::ChiAtoms=double(chi_atoms);
+	double norm = 1.0/stats::ChiAtoms;
+	
+	chiM[0]=chi[0]*norm;
+	chiM[1]=chi[1]*norm;
+	chiM[2]=chi[2]*norm;
+	
+	// Calculate running totals
+	stats::MeanChi[0]+=chiM[0];
+	stats::MeanChi[1]+=chiM[1];
+	stats::MeanChi[2]+=chiM[2];
+
+	stats::MeanChiSquared[0]+=chiM[0]*chiM[0];
+	stats::MeanChiSquared[1]+=chiM[1]*chiM[1];
+	stats::MeanChiSquared[2]+=chiM[2]*chiM[2];
+
+	stats::MeanChiDataCounter+=1.0;
+
+	return;
+
+}
+	
 } // End of Namespace

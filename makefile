@@ -7,6 +7,7 @@
 voronoi_path='"qvoronoi"'
 
 export OMPI_CXX=g++
+#export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
@@ -37,8 +38,8 @@ IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axSSE3 -ipo -static -fno-alias -align -falign-functions -I./hdr
-ICC_LDFLAGS= -ipo -I./hdr -axSSE3
+ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr
+ICC_LDFLAGS= -I./hdr -axSSE3
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
@@ -77,10 +78,12 @@ obj/mpi/mpi_generic.o \
 obj/mpi/mpi_create2.o \
 obj/mpi/mpi_comms.o \
 obj/program/bmark.o \
+obj/program/cmc_anisotropy.o \
 obj/program/curie_temperature.o \
 obj/program/diagnostics.o \
 obj/program/field_cool.o \
 obj/program/hamr.o \
+obj/program/hybrid_cmc.o \
 obj/program/hysteresis.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/static_hysteresis.o \
@@ -96,14 +99,16 @@ obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
 obj/simulate/mc.o \
 obj/simulate/cmc.o \
+obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
+obj/utility/units.o \
 obj/utility/vconfig.o \
 obj/utility/vio.o \
-obj/utility/vmath.o \
-obj/utility/units.o 
+obj/utility/vmath.o
+
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 IBM_OBJECTS=$(OBJECTS:.o=_ibm.o)
@@ -122,7 +127,7 @@ MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
-EXECUTABLE=zspin
+EXECUTABLE=vampire
 
 all: $(OBJECTS) gcc
 
@@ -231,6 +236,7 @@ purge:
 
 tidy:	
 	@rm -f *~
+	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
 

@@ -1,6 +1,62 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 #include <iostream>
 #include <string>
 #include <vector>
+
+class zkval_t{
+	public:
+	double K;
+	
+	// constructor
+	zkval_t():
+		K(0.0)
+	{
+	};
+};
+
+class zkten_t{
+	public:
+	double K[3][3];
+	
+	// constructor
+	zkten_t()
+	{
+		K[0][0]=0.0;
+		K[0][1]=0.0;
+		K[0][2]=0.0;
+
+		K[1][0]=0.0;
+		K[1][1]=0.0;
+		K[1][2]=0.0;
+
+		K[2][0]=0.0;
+		K[2][1]=0.0;
+		K[2][2]=0.0;
+	};
+};
 
 namespace mp
 {
@@ -17,18 +73,22 @@ using std::string;
 		public:
 		// input parameters
 		string name;
-		string hamiltonian_type;
 		string element;
-		string crystal_structure;
 		
 		double alpha;
 		double mu_s_SI;
 		double magnetisation;
-		double Ku1_SI;
+		double Ku1_SI; // SI uniaxial anisotropy constant
 		double Ku2_SI;
+		std::vector<double> KuVec_SI; // SI anisotropy tensor
+		double Ku; // normalised uniaxial anisotropy constant
+		std::vector<double> KuVec; // normalised anisotropy tensor
+		std::vector<double> UniaxialAnisotropyUnitVector; // unit vector for material uniaxial anisotropy
 		double Kc1_SI;
 		double Kc2_SI;
+		double Kc;
 		double Ks_SI;
+		double Ks;
 		
 		double gamma_rel;
 		double Jij_matrix_SI[max_materials];
@@ -53,16 +113,12 @@ using std::string;
 		bool continuous;	///< Specifies if a material is continuous (overrides granularity in the layer)
 		bool moment_flag;	///< Specifies whether moment is set explicitly or from magnetisation
 		bool anis_flag;	///< Specifies whether anisotropy is set explicitly or as energy density
-		//int ianis_flag;
-		// derived parameters
-		int num_nearest_neighbours;
-		int hamiltonian_num_neighbours;
 		
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
 		double Jij_matrix[max_materials];
-		double Ku;
 		double H_th_sigma;
+		bool constrained; // specifies primary or alternate integrator
 		
 		materials_t();
 		int print();
@@ -72,54 +128,17 @@ using std::string;
 
 	extern std::vector <materials_t> material;
 
-
-	//extern materials_t material;
-	//Integration parameters
-	//extern double alpha;
 	extern double dt_SI;
 	extern double dt;
 	extern double half_dt;
 	extern double gamma_SI;
-	//extern double Jij_SI;
-	//extern double mu_s_SI;
-	//extern double Ku_SI;
-	
-	//extern double one_oneplusalpha_sq;
-	//extern double alpha_oneplusalpha_sq;
-	//extern double Jij;
-	//extern double Ku;
-	//extern double H_th_sigma;
-	//----------------------------------
-	//Input System Parameters
-	//----------------------------------
-	extern int particle_creation_parity;
-	extern double system_dimensions[3];
-	extern double particle_scale;
-	extern double particle_spacing;
-	
-	
-	//System Parameters
-	extern double lattice_constant[3];
-	extern double lattice_space_conversion[3];
-	extern string crystal_structure;
-	extern bool single_spin;
-	extern string hamiltonian_type;
-	//extern string atomic_element[4];
-	
-	
-	
-	//----------------------------------
-	//Derived System Parameters
-	//----------------------------------
-	//extern int num_nearest_neighbours;
-	extern int hamiltonian_num_neighbours;
-	extern int int_system_dimensions[3];
-	
-	//----------------------------------
-	// System creation flags
-	//----------------------------------
-	
-	extern int system_creation_flags[10];
+
+	// Unrolled material parameters for speed
+	extern std::vector <double> MaterialMuSSIArray;
+	extern std::vector <zkval_t> MaterialScalarAnisotropyArray;
+	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
+	extern std::vector <double> MaterialCubicAnisotropyArray;
+
 	
 	// Functions
 	extern int initialise(std::string);

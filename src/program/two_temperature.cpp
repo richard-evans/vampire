@@ -1,3 +1,27 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
 ///
 /// @file
 /// @brief Contains the Two Temperature Pulse program
@@ -54,16 +78,7 @@ void two_temperature_pulse(){
 	
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::two_temperature_pulse has been called" << std::endl;}
-	
-	const double Ce = 7.0E02; //electron specific heat 
-	const double Cl = 3.0E06; //phonon specific heat
-	const double G = 17.0E17 ;//electron coupling constant
-	const double Q = 1.0E10; // heatsink specific heat
-	const double K = 20.0E17; // phonon-heatsink coupling
-	
-	//double pump_time=20.0e-15; // Seconds //moved to sim
-	//double pump_power=2.4e22; // ? // moved to sim
-	
+		
 	// Set equilibration temperature and field
 	sim::temperature=sim::Teq;
 
@@ -95,11 +110,11 @@ void two_temperature_pulse(){
 		double time_from_start=mp::dt_SI*double(sim::time-start_time);
 		double pump=sim::pump_power*exp(-((time_from_start-3.*sim::pump_time)/(sim::pump_time) )*((time_from_start-3.*sim::pump_time)/(sim::pump_time) ));
 
-		Te = (-G*(Te-Tp)+pump)*mp::dt_SI/(Ce*Te) + Te;
-		Tp = ( G*(Te-Tp)     )*mp::dt_SI/Cl + Tp - (Tp-sim::Tmin)*3.0e11*mp::dt_SI;
+		Te = (-sim::TTG*(Te-Tp)+pump)*mp::dt_SI/(sim::TTCe*Te) + Te;
+		Tp = ( sim::TTG*(Te-Tp)     )*mp::dt_SI/sim::TTCl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*mp::dt_SI;
 		
 		sim::temperature=Te;
-		vinfo << sim::time << "\t" << Te << "\t" << Tp << std::endl;
+		zinfo << sim::time << "\t" << Te << "\t" << Tp << std::endl;
 		
 		// Integrate system
 		sim::integrate(sim::partial_time);
