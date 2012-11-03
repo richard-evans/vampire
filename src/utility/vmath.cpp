@@ -181,6 +181,60 @@ std::vector<std::vector<double> > matmul(
 	return C;
 }
 
+/// @brief Overloaded Matrix Multiplication Function for Vectors
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    05/02/2011
+///
+/// @return Matrix C
+/// 
+/// @internal
+///	Created:		05/02/2011
+///	Revision:	  ---
+///	Reference from Matmul guide at http://www.purplemath.com/modules/mtrxmult3.htm
+///=====================================================================================
+///
+std::vector<double> matmul(
+	std::vector<double>& V, 
+	std::vector<std::vector<double> >& M)
+{
+	
+	// Get sizes of vector V and matrix M
+	const unsigned int V_num_cols = V.size();
+	
+	const unsigned int M_num_rows = M.size();
+	const unsigned int M_num_cols = M[0].size();
+
+	// Check for valid multiplication
+	if(V_num_cols!=M_num_rows){
+		std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
+		err::vexit();
+	}
+	
+	// Set sizes of result matrix C
+	const unsigned int C_num_cols = M_num_cols;
+	
+	// Declare result matrix 
+	std::vector<double> C(C_num_cols,0.0);
+
+	// Calculate product
+	for(unsigned int j=0;j<C_num_cols;j++){
+		for(unsigned int k=0; k<V_num_cols ;k++){
+			C[j]+=V[k]*M[k][j];
+		}
+	}
+	
+	
+	// Return 
+	return C;
+}
+
 /// @brief Matrix Transpose Function
 ///
 /// @section License
@@ -318,7 +372,88 @@ std::vector<std::vector<double> > set_matrix(
 	// Return 
 	return C;
 }
-		  
+
+void print_matrix( std::vector<std::vector<double> >& A){
+	
+	// Get sizes of matrix A
+	const unsigned int A_num_rows = A.size();
+	const unsigned int A_num_cols = A[0].size();
+	
+	for(unsigned int i=0;i<A_num_rows;i++){
+		std::cout << "[ ";
+		for(unsigned int j=0;j<A_num_cols;j++){
+			std::cout << A[i][j] << " ";
+		}
+		std::cout << "]"<< std::endl;
+	}
+	
+	// Return 
+	return;
+}
+
+void set_rotational_matrix(
+	double ddx,
+	double ddy,
+	double ddz,
+	std::vector< std::vector<double> > & x_rotation_matrix, 
+	std::vector< std::vector<double> > & y_rotation_matrix, 
+	std::vector< std::vector<double> > & z_rotation_matrix)
+{
+	double dx,dy,dz; //change in angle in radians
+	double sin_x,sin_y,sin_z,cos_x,cos_y,cos_z;
+	double pi=3.14159265358979323846264338327;
+
+	//--------------------------------------------------
+	// Initialise varibales 
+	//--------------------------------------------------
+
+	dx = (ddx/360.0)*2.0*pi;
+	dy = (ddy/360.0)*2.0*pi;
+	dz = (ddz/360.0)*2.0*pi;
+	
+	sin_x = sin(dx);
+	cos_x = cos(dx);
+	sin_y = sin(dy);
+	cos_y = cos(dy);
+	sin_z = sin(dz);
+	cos_z = cos(dz);
+
+	x_rotation_matrix=vmath::set_matrix(3,3);
+	y_rotation_matrix=vmath::set_matrix(3,3);
+	z_rotation_matrix=vmath::set_matrix(3,3);
+	
+	x_rotation_matrix[0][0] = 1.0;
+	x_rotation_matrix[1][0] = 0.0;
+	x_rotation_matrix[2][0] = 0.0;
+	x_rotation_matrix[0][1] = 0.0;
+	x_rotation_matrix[1][1] = cos_x;
+	x_rotation_matrix[2][1] = -sin_x;
+	x_rotation_matrix[0][2] = 0.0;
+	x_rotation_matrix[1][2] = sin_x;
+	x_rotation_matrix[2][2] = cos_x;
+
+	y_rotation_matrix[0][0] = cos_y;
+	y_rotation_matrix[1][0] = 0.0;
+	y_rotation_matrix[2][0] = sin_y;
+	y_rotation_matrix[0][1] = 0.0;
+	y_rotation_matrix[1][1] = 1.0;
+	y_rotation_matrix[2][1] = 0.0;
+	y_rotation_matrix[0][2] = -sin_y;
+	y_rotation_matrix[1][2] = 0.0;
+	y_rotation_matrix[2][2] = cos_y;
+
+	z_rotation_matrix[0][0] = cos_z;
+	z_rotation_matrix[1][0] = -sin_z;
+	z_rotation_matrix[2][0] = 0.0;
+	z_rotation_matrix[0][1] = sin_z;
+	z_rotation_matrix[1][1] = cos_z;
+	z_rotation_matrix[2][1] = 0.0;
+	z_rotation_matrix[0][2] = 0.0;
+	z_rotation_matrix[1][2] = 0.0;
+	z_rotation_matrix[2][2] = 1.0;
+
+}
+
 // sign functions
 double sign(double a){
 		if(a<0.0) return -1.0;

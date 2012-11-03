@@ -784,6 +784,18 @@ int match_create(string const word, string const value, int const line){
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		else
+		test="select-material-by-geometry";
+		if(word==test){
+			cs::SelectMaterialByGeometry=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::SelectMaterialByGeometry=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
@@ -1786,6 +1798,17 @@ int match_sim(string const word, string const value, string const unit, int cons
 				return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		test="constraint-rotation-update";
+		if(word==test){
+			sim::constraint_rotation=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				sim::constraint_rotation=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		test="constraint-angle-theta";
 		if(word==test){
 			double angle=atof(value.c_str());
@@ -2544,14 +2567,14 @@ int match_material(string const word, string const value, string const unit, int
 		test="Ku1";
 		if(word==test){
 			double K=atof(value.c_str());
-			string unit_type="anisotropy";
+			string unit_type="energy";
 			// if no unit given, assume internal
 			if(unit.size() != 0){
 				units::convert(unit,K,unit_type);
 				//read_material[super_index].anis_flag=false;
 				//std::cout << "setting flag to false" << std::endl;
 			}
-			string str="anisotropy";
+			string str="energy";
 			if(unit_type==str){
 				// Set moment flag
 				read_material[super_index].Ku1_SI=K;
@@ -2687,14 +2710,14 @@ int match_material(string const word, string const value, string const unit, int
 		test="Ks";
 		if(word==test){
 			double K=atof(value.c_str());
-			string unit_type="anisotropy";
+			string unit_type="energy";
 			// if no unit given, assume internal
 			if(unit.size() != 0){
 				units::convert(unit,K,unit_type);
 				//read_material[super_index].anis_flag=false;
 				//std::cout << "setting flag to false" << std::endl;
 			}
-			string str="anisotropy";
+			string str="energy";
 			if(unit_type==str){
 				// Set moment flag
 				read_material[super_index].Ks_SI=K;
