@@ -30,6 +30,35 @@ Vampire is designed to be highly flexible to deal with a wide variety of problem
 -Nanoparticles - spheres, cubes, truncated octahedra, cylinders
 -Voronoi granular structures
 -Nanoparticle arrays
+-Core-shell nanoparticles
+-Multilayer thin films
+-Interface roughness and intermixing
+-Dilute magnetic systems
+-Lithographically defined geometries
+-SC, FCC, HCP, and BCC crystal structures
+-User-defined atomic structures - for example from Molecular Dynamics simulations
+
+**Magnetic properties**
+-Ferromagnets
+-Antiferromagnets
+-Ferrimagnets
+-Spin glass
+-Single-ion, 2-ion and cubic anisotropies
+-Scalar, vector and tensor forms of exchange including the DM interaction
+-User-defined Hamiltonian from ab-initio Density Functional Theory (DFT) calculations
+-Demagnetisation fields (macrocell approximation)
+
+**Code features**
+-Modular object-oriented C++
+-Simple to use textfile input
+-High performance code
+-Parallelisation using the MPI library
+-Variety of geometric decomposition algorithms
+-Usable on a laptop to a supercomputer with thousands of cores
+-Output to PoVRAY for visualisation and publication quality graphics
+-Output to rasmol/jmol for structural inspection
+-Minimal dependence on external libraries for portability
+-Freely available open source code
 
 License
 ---------------
