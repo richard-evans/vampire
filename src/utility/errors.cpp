@@ -44,7 +44,7 @@
 #include <cstdlib>
 #include <iostream>
 
-// zspin header files
+// vampire header files
 #include "errors.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"

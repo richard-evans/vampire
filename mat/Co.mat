@@ -2,53 +2,20 @@
 # Vampire material file for Co
 #===================================================
 #
-# R F Evans 22/01/10
+# R F Evans 03/11/12
 #
 #---------------------------------------------------
 # Number of Materials
 #---------------------------------------------------
 material:num-materials=1
 #---------------------------------------------------
-# Material 0 Cobalt Platinum Generic
+# Material 0 Cobalt Generic
 #---------------------------------------------------
-material[0]:name="CoPt Media"
-material[0]:alpha=1.0
+material[0]:name="Co"
+material[0]:alpha=0.1
 material[0]:Jij_matrix[0]=-4.8e-21
-material[0]:Jij_matrix[1]=-2.4e-21
-material[0]:Jij_matrix[2]=-4.8e-21
 material[0]:mu_s=1.5 !muB
-material[0]:Ku1=-4.644e-23
+material[0]:Ku1=-1.0e-23
 material[0]:element="Ag"
 material[0]:min=0.0
 material[0]:max=1.0
-material[0]:interface-roughness=0.0
-#---------------------------------------------------
-# Material 1 Exchange Layer
-#---------------------------------------------------
-material[1]:name="Exchange Layer"
-material[1]:alpha=0.1
-material[1]:Jij_matrix[0]=-2.2e-21
-material[1]:Jij_matrix[1]=-4.2e-21
-material[1]:Jij_matrix[2]=0.0
-material[1]:mu_s=1.5 !muB
-material[1]:Ku1=-4.644e-25 # Weak Ku
-material[1]:element="H"
-material[1]:min=0.8
-material[1]:max=1.0
-material[1]:continuous=false
-material[1]:interface-roughness=0.0
-#---------------------------------------------------
-# Material 2 Soft Layer
-#---------------------------------------------------
-material[2]:name="Soft Layer"
-material[2]:alpha=0.1
-material[2]:Jij_matrix[0]=-4.8e-21
-material[2]:Jij_matrix[1]=0.0
-material[2]:Jij_matrix[2]=-4.8e-21
-material[2]:mu_s=1.5 !muB
-material[2]:Ku1=-4.644e-24
-material[2]:element="Na"
-material[2]:min=0.1
-material[2]:max=0.6
-material[2]:continuous=false
-material[2]:interface-roughness=0.0

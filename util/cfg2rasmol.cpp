@@ -1,4 +1,4 @@
-/// Program to convert zspin cfg files to rasmol format
+/// Program to convert vampire cfg files to rasmol format
 ///
 /// ./cfg2rasmol 
 

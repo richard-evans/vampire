@@ -244,22 +244,22 @@ int main(){
   std::ofstream mat_file;
   // open it (file_name)
   mat_file.open ("MAT.mat");
-  mat_file << "#==============================================" << std::endl;
-  mat_file << "# Generated material file for input into zspin" << std::endl;
-  mat_file << "#==============================================" << std::endl;
+  mat_file << "#================================================" << std::endl;
+  mat_file << "# Generated material file for input into vampire" << std::endl;
+  mat_file << "#================================================" << std::endl;
   mat_file << "#" << std::endl;
   mat_file << "# File timestamp: " << std::endl;
   mat_file << "#" << std::endl;
-  mat_file << "#----------------------------------------------" << std::endl;
+  mat_file << "#------------------------------------------------" << std::endl;
   mat_file << "# Number of Materials" << std::endl;
-  mat_file << "#----------------------------------------------" << std::endl;
+  mat_file << "#------------------------------------------------" << std::endl;
   mat_file << "material:num-materials=" << num_materials << std::endl;
-  mat_file << "#----------------------------------------------" << std::endl;
+  mat_file << "#------------------------------------------------" << std::endl;
   
   // Loop over all materials
   for(int m=0;m<materials.size();m++){
     mat_file << "# Material " << m << " (" << materials.at(m).name << ")" << std::endl;
-    mat_file << "#----------------------------------------------" << std::endl;
+    mat_file << "#------------------------------------------------" << std::endl;
     mat_file << "material[" << m << "]:name=\"" << materials.at(m).name << "\"" << std::endl;
     mat_file << "material[" << m << "]:alpha=" << materials.at(m).alpha << std::endl;
     mat_file << "material[" << m << "]:mu_s="<< materials.at(m).mu_s << " !muB" << std::endl;
@@ -269,7 +269,7 @@ int main(){
     mat_file << "material[" << m << "]:Sx="<< materials.at(m).Sx << std::endl;
     mat_file << "material[" << m << "]:Sy="<< materials.at(m).Sy << std::endl;
     mat_file << "material[" << m << "]:Sz="<< materials.at(m).Sz << std::endl;
-    mat_file << "#----------------------------------------------" << std::endl;
+    mat_file << "#------------------------------------------------" << std::endl;
   }
   return 0;
 }

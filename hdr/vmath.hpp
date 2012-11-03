@@ -24,7 +24,7 @@
 //
 ///
 /// @file
-/// @brief Contains the vmath header namespace for sundry math utilities in zspin. 
+/// @brief Contains the vmath header namespace for sundry math utilities in vampire. 
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -44,7 +44,7 @@
 #include <cmath>
 
 /// @namespace ns
-/// @brief vmath namespace containing sundry math functions for zspin.
+/// @brief vmath namespace containing sundry math functions for vampire.
 /// 
 /// @internal
 ///=====================================================================================
