@@ -28,6 +28,9 @@
 //Headers
 #include <fstream>
 
+// Enumerated lists for code readability
+enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
+
 namespace sim{
 	extern std::ofstream mag_file;
 	extern int time;
@@ -75,13 +78,20 @@ namespace sim{
 	
 	extern double cooling_time;
 	extern int cooling_function_flag;
+	extern pump_functions_t pump_function;
 	extern double pump_time;
 	extern double pump_power;
+	extern double double_pump_time;
+	extern double double_pump_power;
+	extern double double_pump_Tmax;
+	extern double double_pump_delay;
 	extern double HeatSinkCouplingConstant;
 	extern double TTCe; //electron specific heat
 	extern double TTCl; //phonon specific heat
 	extern double TTG;//electron coupling constant    
-
+	extern double TTTe; // electron temperature
+	extern double TTTp; // phonon temperature
+	
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 	

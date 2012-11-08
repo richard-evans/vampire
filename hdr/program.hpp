@@ -37,7 +37,7 @@ namespace program
 	extern int static_hysteresis();
 	extern int curie_temperature();
 	extern void field_cool();
-	extern void two_temperature_pulse();
+	extern void temperature_pulse();
 	extern void hamr();
 	extern void cmc_anisotropy();
 	extern void hybrid_cmc();

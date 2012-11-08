@@ -96,12 +96,19 @@ namespace sim{
 	
 	double cooling_time=100.0e-12; //seconds
 	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
+	pump_functions_t pump_function=two_temperature;
 	double pump_power=2.4e22;
 	double pump_time=20.0e-15; 
+	double double_pump_power=2.2e22;
+	double double_pump_Tmax=500.0;
+	double double_pump_time=10.0e-15; 
+	double double_pump_delay=10.0e-12;
 	double HeatSinkCouplingConstant=0.0; //1.1e12 ~ sensible value
 	double TTCe = 7.0E02; //electron specific heat
 	double TTCl = 3.0E06; //phonon specific heat
 	double TTG = 17.0E17 ;//electron coupling constant
+	double TTTe = 0.0; // electron temperature
+	double TTTp = 0.0; // phonon temperature
   
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
@@ -146,6 +153,7 @@ namespace sim{
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
 		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
+		
 	}
 	
 /// @brief Function to run one a single program
@@ -227,8 +235,8 @@ int run(){
 			break;
 
 		case 6:
-			if(vmpi::my_rank==0) std::cout << "Two-Temperature-Pulse..." << std::endl; 
-			program::two_temperature_pulse();
+			if(vmpi::my_rank==0) std::cout << "Temperature-Pulse..." << std::endl; 
+			program::temperature_pulse();
 			break;
 			
 		case 7:

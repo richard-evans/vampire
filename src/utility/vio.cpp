@@ -1113,6 +1113,12 @@ int match_sim(string const word, string const value, string const unit, int cons
 			test="Two-Temperature-Pulse";
 			if(value==test){
 				sim::program=6;
+				std::cerr << "Two-Temperature-Pulse keyword in input file is deprecated. Use \"Temperature-Pulse\" instead." << std::endl;
+				return EXIT_SUCCESS;
+			}
+			test="Temperature-Pulse";
+			if(value==test){
+				sim::program=6;
 				return EXIT_SUCCESS;
 			}
 			test="HAMR-Simulation";
@@ -1484,6 +1490,36 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
+		test="pump-function";
+		if(word==test){
+			test="square";
+			if(value==test){
+				sim::pump_function=square;
+				return EXIT_SUCCESS;
+			}
+			test="two-temperature";
+			if(value==test){
+				sim::pump_function=two_temperature;
+				return EXIT_SUCCESS;
+			}
+			test="double-pump-two-temperature";
+			if(value==test){
+				sim::pump_function=double_pump_two_temperature;
+				return EXIT_SUCCESS;
+			}
+			test="double-pump-square";
+			if(value==test){
+				sim::pump_function=double_pump_square;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+				std::cerr << "\t\"square\"" << std::endl;
+				std::cerr << "\t\"two-temperature\"" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
 		test="pump-time";
 		if(word==test){
 			double pt=atof(value.c_str());
@@ -1507,11 +1543,67 @@ int match_sim(string const word, string const value, string const unit, int cons
 				return EXIT_SUCCESS;
 			}
 			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="double-pump-time";
+		if(word==test){
+			double pt=atof(value.c_str());
+			// Test for valid range
+			if((pt>=0.0) && (pt<1.0E10)){
+				sim::double_pump_time=pt;
+				return EXIT_SUCCESS;
+			}
+			else{
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
 				err::vexit();
 			}
 		}
-                //--------------------------------------------------------------------
+		//--------------------------------------------------------------------
+		test="double-pump-power";
+		if(word==test){
+			double pp=atof(value.c_str());
+			// Test for valid range
+			if((pp>=0.0) && (pp<1.0E40)){
+				sim::double_pump_power=pp;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="double-pump-maximum-temperature";
+		if(word==test){
+			double TMax=atof(value.c_str());
+			// Test for valid range
+			if((TMax>=0.0) && (TMax<1.0E5)){
+				sim::double_pump_Tmax=TMax;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 100000.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="double-pump-delay";
+		if(word==test){
+			double pp=atof(value.c_str());
+			// Test for valid range
+			if((pp>=0.0) && (pp<1.0E40)){
+				sim::double_pump_delay=pp;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
 		test="heat-sink-coupling";
 		if(word==test){
 		  double hscc=atof(value.c_str());
@@ -1525,8 +1617,8 @@ int match_sim(string const word, string const value, string const unit, int cons
 		    err::vexit();
 		  }
 		}
-                //--------------------------------------------------------------------
-                test="two-temperature-electron-heat-capacity";
+		//--------------------------------------------------------------------
+		test="two-temperature-electron-heat-capacity";
 		if(word==test){
 		  double hscc=atof(value.c_str());
 		  // Test for valid range
@@ -2160,6 +2252,18 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 		if(word==test){
 			stats::CalculateSusceptibility=true;
 			output_list.push_back(21);
+			return EXIT_SUCCESS;
+		}
+		//-------------------------------------------------------------------
+		test="electron-temperature"; // identical to temperature
+		if(word==test){
+			output_list.push_back(2);
+			return EXIT_SUCCESS;
+		}
+		//-------------------------------------------------------------------
+		test="phonon-temperature";
+		if(word==test){
+			output_list.push_back(22);
 			return EXIT_SUCCESS;
 		}
 		test="MPI-Timings";
@@ -3519,6 +3623,11 @@ namespace vout{
 		stream << Susx << "\t" << Susy << "\t" << Susz << "\t";
 	}
 	
+	// Output Function 22
+	void phonon_temperature(std::ostream& stream){
+		stream << sim::TTTp << "\t";
+	}
+	
 	// Output Function 60
 	void MPITimings(std::ostream& stream){
 
@@ -3616,6 +3725,9 @@ namespace vout{
 				case 21:
 					vout::MeanSystemSusceptibility(zmag);
 					break;
+				case 22:
+					vout::phonon_temperature(zmag);
+					break;
 				case 60:
 					vout::MPITimings(zmag);
 					break;
@@ -3685,6 +3797,9 @@ namespace vout{
 					break;
 				case 21:
 					vout::MeanSystemSusceptibility(std::cout);
+					break;
+				case 22:
+					vout::phonon_temperature(std::cout);
 					break;
 				case 60:
 					vout::MPITimings(std::cout);
