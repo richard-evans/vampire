@@ -103,12 +103,20 @@ int hysteresis(){
 			// Reset start time
 			int start_time=sim::time;
 			
+			// Reset mean magnetisation counters
+			stats::mag_m_reset();
+
 			// Integrate system
-			while(sim::time<sim::loop_time+start_time) sim::integrate(sim::partial_time);
+			while(sim::time<sim::loop_time+start_time){
+
+				// Integrate system
+				sim::integrate(sim::partial_time);
 			
-			// Calculate mag_m, mag
-			stats::mag_m();
-			
+				// Calculate mag_m, mag
+				stats::mag_m();
+
+			}
+
 			// Output to screen and file after each field
 			vout::data();
 			
