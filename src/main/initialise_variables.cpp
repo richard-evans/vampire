@@ -160,27 +160,11 @@ int default_system(){
 	sim::hamiltonian_simulation_flags[2] = 1;	// Applied
 	sim::hamiltonian_simulation_flags[3] = 1;	// Thermal
 	sim::hamiltonian_simulation_flags[4] = 0;	// Dipolar
-
-	// Setup Simulation Variables
-	sim::total_time = 1000000;			// total simulation time (single run)
-	sim::loop_time = 0;			// time in loop, eg hysteresis, Tc
-	sim::partial_time=100;			// time between statistics collection
-	sim::equilibration_time=100000;	// time for equilibration before main loop
-	sim::temperature = 0.0;	// Constant system temperature
-
-	// demag variables
-	//demag::demag_resolution=2;
-	//demag::update_rate=10000;
 	
 	//Integration parameters
 	dt_SI = 1.0e-15;	// seconds
 	dt = dt_SI*mp::gamma_SI; // Must be set before Hth
 	half_dt = 0.5*dt;
-
-	// MPI Mode (Assume decomposition)
-	//vmpi::mpi_mode=1;
-	//mpi_create_variables::mpi_interaction_range=2; // Unit cells
-	//mpi_create_variables::mpi_comms_identify=true;
 	
 	//------------------------------------------------------------------------------
 	// Material Definitions
