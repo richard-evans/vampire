@@ -56,9 +56,9 @@
 namespace sim{
 	std::ofstream mag_file;
 	int time=0;
-	int total_time=1;
-	int loop_time=1;
-	int partial_time=1;
+	int total_time=10000;
+	int loop_time=0;
+	int partial_time=1000;
 	int equilibration_time=0;
 	int runs=1; // for certain repetitions in programs
 	
@@ -79,9 +79,7 @@ namespace sim{
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; // nm/ns
 	bool   head_laser_on=false;
-
 	bool   constraint_rotation=false; // enables rotation of spins to new constraint direction
-	
 	bool   constraint_phi_changed=false; // flag to note change in phi
 	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
 	double constraint_phi_min=0.0; // loop angle min [degrees]
