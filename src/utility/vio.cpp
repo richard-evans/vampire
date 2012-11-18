@@ -3017,7 +3017,7 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
 				err::vexit();
 			}
 		}
@@ -3031,7 +3031,7 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
 				err::vexit();
 			}
 		}
@@ -3045,7 +3045,7 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
 				err::vexit();
 			}
 		}
@@ -3059,7 +3059,7 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
 				err::vexit();
 			}
 		}
@@ -3073,7 +3073,7 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
 				err::vexit();
 			}
 		}
@@ -3087,7 +3087,7 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
 				err::vexit();
 			}
 		}
@@ -3101,7 +3101,7 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
 				err::vexit();
 			}
 		}
@@ -3115,7 +3115,7 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
 				err::vexit();
 			}
 		}
