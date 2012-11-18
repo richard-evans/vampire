@@ -126,6 +126,10 @@ namespace sim{
 	bool TensorAnisotropy=false; // Overrides scalar uniaxial anisotropy
 	bool CubicScalarAnisotropy=false; // Enables scalar cubic anisotropy
 	
+	bool local_temperature=false; // flag to enable material specific temperature
+	bool local_applied_field=false; // flag to enable material specific applied field
+	bool local_fmr_field=false; // flag to enable material specific fmr field
+	
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);

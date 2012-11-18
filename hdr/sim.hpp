@@ -109,6 +109,11 @@ namespace sim{
 	extern bool TensorAnisotropy; // Overrides vector uniaxial anisotropy (even slower)
 	extern bool CubicScalarAnisotropy; // Enables scalar cubic anisotropy
 	extern bool EnableUniaxialAnisotropyUnitVector; // enables anisotropy tensor if any material has non z-axis K
+	
+	// Local system variables
+	extern bool local_temperature; // flag to enable material specific temperature
+	extern bool local_applied_field; // flag to enable material specific applied field
+	extern bool local_fmr_field; // flag to enable material specific fmr field
 
 	
 	// Wrapper Functions

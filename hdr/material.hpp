@@ -119,6 +119,13 @@ using std::string;
 		double Jij_matrix[max_materials];
 		double H_th_sigma;
 		bool constrained; // specifies primary or alternate integrator
+
+		double temperature; // Kelvin
+		double applied_field_strength; // Tesla
+		std::vector<double> applied_field_unit_vector; // unit vector for material uniaxial anisotropy
+		double fmr_field_strength; // Tesla
+		double fmr_field_frequency; // Hz
+		std::vector<double> fmr_field_unit_vector; // unit vector for material uniaxial anisotropy
 		
 		materials_t();
 		int print();

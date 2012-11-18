@@ -59,7 +59,13 @@ materials_t::materials_t ():
 	one_oneplusalpha_sq(0.5),
 	alpha_oneplusalpha_sq(0.5),
 	H_th_sigma(0.0),
-	constrained(false)
+	constrained(false),
+	temperature(0.0),
+	applied_field_strength(0.0),
+	applied_field_unit_vector(3,0.0),
+	fmr_field_strength(0.0),
+	fmr_field_frequency(0.0),
+	fmr_field_unit_vector(3,0.0)
 	
 	{
 
@@ -82,6 +88,16 @@ materials_t::materials_t ():
 	UniaxialAnisotropyUnitVector.at(0)=0.0;
 	UniaxialAnisotropyUnitVector.at(1)=0.0;
 	UniaxialAnisotropyUnitVector.at(2)=1.0;
+
+	// Applied field direction default initialisation
+	applied_field_unit_vector.at(0)=0.0;
+	applied_field_unit_vector.at(1)=0.0;
+	applied_field_unit_vector.at(2)=1.0;
+
+	// FMR field direction default initialisation
+	fmr_field_unit_vector.at(0)=0.0;
+	fmr_field_unit_vector.at(1)=0.0;
+	fmr_field_unit_vector.at(2)=1.0;
 }
 
 int materials_t::print(){

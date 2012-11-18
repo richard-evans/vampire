@@ -2266,6 +2266,25 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(22);
 			return EXIT_SUCCESS;
 		}
+		//-------------------------------------------------------------------
+		test="material-temperature";
+		if(word==test){
+			output_list.push_back(23);
+			return EXIT_SUCCESS;
+		}
+		//-------------------------------------------------------------------
+		test="material-applied-field-strength";
+		if(word==test){
+			output_list.push_back(24);
+			return EXIT_SUCCESS;
+		}
+		//-------------------------------------------------------------------
+		test="material-fmr-field-strength";
+		if(word==test){
+			output_list.push_back(25);
+			return EXIT_SUCCESS;
+		}
+		//-------------------------------------------------------------------
 		test="MPI-Timings";
 		if(word==test){
 			vmpi::DetailedMPITiming=true;
@@ -3220,8 +3239,171 @@ int match_material(string const word, string const value, string const unit, int
 			}
 			else{
 				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
+		//--------------------------------------------------------------------
+		test="temperature";
+		if(word==test){
+			double T=atof(value.c_str());
+			// Test for valid range
+			if((T>=0.0) && (T<1.0E5)){
+				read_material[super_index].temperature=T;
+				// set local temperature flag
+				sim::local_temperature=true;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
 				err::vexit();
 			}
+		}
+		//--------------------------------------------------------------------
+		test="applied-field-strength";
+		if(word==test){
+			double H=atof(value.c_str());
+			// test for unit
+			string unit_type="field";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,H,unit_type);
+			}
+			string str="field";
+			if(unit_type==str){
+				// Test for valid range
+				if((H>=0.0) && (H<1.0E5)){
+					read_material[super_index].applied_field_strength=H;
+					// set local applied field flag
+					sim::local_applied_field=true;
+					return EXIT_SUCCESS;
+				}
+				else{
+					std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+					err::vexit();
+				}
+			}
+			else{
+				std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
+		test="applied-field-unit-vector";
+		if(word==test){
+			// temporary storage container
+			std::vector<double> u(3);
+
+			// read values from string
+			u=DoublesFromString(value);
+
+			// check size
+			if(u.size()!=3){
+				std::cerr << "Error in input file - material[" << super_index << "]:"<< word << " must have three values." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:"<< word << " must have three values." << std::endl;
+				return EXIT_FAILURE;
+			}
+
+			// Normalise
+			double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+
+			// Check for correct length unit vector
+			if(ULength < 1.0e-9){
+				std::cerr << "Error in input file - material[" << super_index << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+				zlog << zTs() << "Error in input file - material[" << super_index << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+				return EXIT_FAILURE;
+			}
+			u.at(0)/=ULength;
+			u.at(1)/=ULength;
+			u.at(2)/=ULength;
+
+			// Copy anisotropy direction to material
+			read_material[super_index].applied_field_unit_vector=u;
+
+			// set local applied field flag
+			sim::local_applied_field=true;
+
+			return EXIT_SUCCESS;
+
+		}
+		//--------------------------------------------------------------------
+		test="fmr-field-strength";
+		if(word==test){
+			double H=atof(value.c_str());
+			// test for unit
+			string unit_type="field";
+			// if no unit given, assume internal
+			if(unit.size() != 0){
+				units::convert(unit,H,unit_type);
+			}
+			string str="field";
+			if(unit_type==str){
+				// Test for valid range
+				if((H>=0.0) && (H<1.0E5)){
+					read_material[super_index].applied_field_strength=H;
+					// set local fmr flag
+					sim::local_fmr_field=true;
+					return EXIT_SUCCESS;
+				}
+				else{
+					std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E5" << std::endl;
+					err::vexit();
+				}
+			}
+			else{
+				std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="fmr-field-frequency";
+		if(word==test){
+			double f=atof(value.c_str());
+			// Test for valid range
+			if((f>=0.0) && (f<1.0E20)){
+				read_material[super_index].fmr_field_frequency=f;
+				// set local fmr flag
+				sim::local_fmr_field=true;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " is outside of valid range 0.0 - 1.0E20" << std::endl;
+				err::vexit();
+			}
+		}
+		//------------------------------------------------------------
+		test="fmr-field-unit-vector";
+		if(word==test){
+			// temporary storage container
+			std::vector<double> u(3);
+
+			// read values from string
+			u=DoublesFromString(value);
+
+			// check size
+			if(u.size()!=3){
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " must have three values." << std::endl;
+				zlog << zTs() << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " must have three values." << std::endl;
+				return EXIT_FAILURE;
+			}
+
+			// Normalise
+			double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+
+			// Check for correct length unit vector
+			if(ULength < 1.0e-9){
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+				zlog << zTs() << "Error on line " << line << " of material file - material[" << super_index << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+				return EXIT_FAILURE;
+			}
+			u.at(0)/=ULength;
+			u.at(1)/=ULength;
+			u.at(2)/=ULength;
+
+			// Copy anisotropy direction to material
+			read_material[super_index].fmr_field_unit_vector=u;
+
+			// set local applied field flag
+			sim::local_fmr_field=true;
+
+			return EXIT_SUCCESS;
+
 		}
 		//--------------------------------------------------------------------
 		// keyword not found
@@ -3628,6 +3810,30 @@ namespace vout{
 		stream << sim::TTTp << "\t";
 	}
 	
+	// Output Function 23
+	void material_temperature(std::ostream& stream){
+		for(int mat=0;mat<mp::material.size();mat++){
+			stream << mp::material[mat].temperature << "\t";
+		}
+	}
+
+	// Output Function 24
+	void material_applied_field_strength(std::ostream& stream){
+		for(int mat=0;mat<mp::material.size();mat++){
+			stream << mp::material[mat].applied_field_strength << "\t";
+		}
+	}
+
+	// Output Function 25
+	void material_fmr_field_strength(std::ostream& stream){
+		const double real_time=sim::time*mp::dt_SI;
+
+		for(int mat=0;mat<mp::material.size();mat++){
+			const double Hsinwt_local=mp::material[mat].fmr_field_strength*sin(2.0*M_PI*real_time*mp::material[mat].fmr_field_frequency);
+			stream << Hsinwt_local << "\t";
+		}
+	}
+
 	// Output Function 60
 	void MPITimings(std::ostream& stream){
 
@@ -3728,12 +3934,21 @@ namespace vout{
 				case 22:
 					vout::phonon_temperature(zmag);
 					break;
+				case 23:
+					vout::material_temperature(zmag);
+					break;
+				case 24:
+					vout::material_applied_field_strength(zmag);
+					break;
+				case 25:
+					vout::material_fmr_field_strength(zmag);
+					break;
 				case 60:
 					vout::MPITimings(zmag);
 					break;
 			}
 		}
-		
+
 		// Carriage return
 		if(file_output_list.size()>0) zmag << std::endl;
 

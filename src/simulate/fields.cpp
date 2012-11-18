@@ -323,26 +323,53 @@ void calculate_surface_anisotropy_fields(const int start_index,const int end_ind
 }
 
 int calculate_applied_fields(const int start_index,const int end_index){
-	//======================================================
-	// 	Subroutine to calculate applied fields
+	//==========================================================================
 	//
-	//			Version 1.0 R Evans 20/10/2008
-	//======================================================
-	//const int num_atoms = atoms::num_atoms;
+	// 	Function to calculate applied fields
+	//
+	//		Version 1.0 R Evans 20/10/2008
+	//		Version 2.0 R F L Evans 18/11/2012
+	//
+	//==========================================================================
 
-	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
 	if(err::check==true){std::cout << "calculate_applied_fields has been called" << std::endl;}
 
-	for(int atom=start_index;atom<end_index;atom++){
-		atoms::x_total_external_field_array[atom] += sim::H_vec[0]*sim::H_applied;
-		atoms::y_total_external_field_array[atom] += sim::H_vec[1]*sim::H_applied;
-		atoms::z_total_external_field_array[atom] += sim::H_vec[2]*sim::H_applied;
+	// Declare constant temporaries for global field
+	const double Hx=sim::H_vec[0]*sim::H_applied;
+	const double Hy=sim::H_vec[1]*sim::H_applied;
+	const double Hz=sim::H_vec[2]*sim::H_applied;
 
-		//std::cout << atom << "\tapplied fields\t" << sim::H_vec[0]*sim::H_applied << "\t";
-		//std::cout << sim::H_vec[1]*sim::H_applied << "\t";
-		//std::cout << sim::H_vec[2]*sim::H_applied << std::endl;
+	// Declare array for local (material specific) applied field
+	std::vector<double> Hlocal(0);
+
+	// Check for local applied field
+	if(sim::local_applied_field==true){
+		Hlocal.reserve(3*mp::material.size());
+		
+		// Loop over all materials
+		for(int mat=0;mat<mp::material.size();mat++){
+			Hlocal.push_back(mp::material[mat].applied_field_strength*mp::material[mat].applied_field_unit_vector[0]);
+			Hlocal.push_back(mp::material[mat].applied_field_strength*mp::material[mat].applied_field_unit_vector[1]);
+			Hlocal.push_back(mp::material[mat].applied_field_strength*mp::material[mat].applied_field_unit_vector[2]);
+		}
+
+		// Add local field AND global field
+		for(int atom=start_index;atom<end_index;atom++){
+			const int imaterial=atoms::type_array[atom];
+			atoms::x_total_external_field_array[atom] += Hx + Hlocal[3*imaterial + 0];
+			atoms::y_total_external_field_array[atom] += Hy + Hlocal[3*imaterial + 1];
+			atoms::z_total_external_field_array[atom] += Hz + Hlocal[3*imaterial + 2];
+		}
+	}
+	else{
+		// Calculate global field
+		for(int atom=start_index;atom<end_index;atom++){
+			atoms::x_total_external_field_array[atom] += Hx;
+			atoms::y_total_external_field_array[atom] += Hy;
+			atoms::z_total_external_field_array[atom] += Hz;
+		}
+
 	}
 
 	// Add external field from thin film sample
@@ -382,9 +409,22 @@ int calculate_thermal_fields(const int start_index,const int end_index){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "calculate_thermal_fields has been called" << std::endl;}
 
-	// unroll Sigma
+	// unroll Sigma for speed
 	std::vector<double> SigmaPre(0);
-	for(int mat=0;mat<mp::material.size();mat++) SigmaPre.push_back(sqrt_T*mp::material[mat].H_th_sigma);
+	SigmaPre.reserve(mp::material.size());
+	
+	// Calculate global temperature
+	if(sim::local_temperature==false){
+		for(int mat=0;mat<mp::material.size();mat++){
+			SigmaPre.push_back(sqrt_T*mp::material[mat].H_th_sigma);
+		}
+	}
+	// Calculate (material spcific) local temperature 
+	else{
+		for(int mat=0;mat<mp::material.size();mat++){
+			SigmaPre.push_back(sqrt(mp::material[mat].temperature)*mp::material[mat].H_th_sigma);
+		}
+	}
 
  	generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
 	generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
@@ -448,7 +488,7 @@ void calculate_hamr_fields(const int start_index,const int end_index){
 	const double Hvecx=sim::H_vec[0];
 	const double Hvecy=sim::H_vec[1];
 	const double Hvecz=sim::H_vec[2];
-	
+
 	// Add localised thermal field
 	generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
 	generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
@@ -505,17 +545,47 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 	const double real_time=sim::time*mp::dt_SI;
 	const double osc_freq=20.0e9; // Hz
 	const double osc_period=1.0/osc_freq;
-	const double Hfmr_vec[3]={1.0,0.0,0.0};
-	const double Hfmr=0.001; // T
-	const double Hx=Hfmr_vec[0]*Hfmr*sin(2.0*M_PI*real_time/osc_period);
-	const double Hy=Hfmr_vec[1]*Hfmr*sin(2.0*M_PI*real_time/osc_period);
-	const double Hz=Hfmr_vec[2]*Hfmr*sin(2.0*M_PI*real_time/osc_period);
-	
-	// Add localised applied field
-	for(int atom=start_index;atom<end_index;atom++){
-			atoms::x_total_external_field_array[atom] += Hx;
-			atoms::y_total_external_field_array[atom] += Hy;
-			atoms::z_total_external_field_array[atom] += Hz;
+	const double Hfmrx=1.0;
+	const double Hfmry=0.0;
+	const double Hfmrz=0.0;
+	const double Hfmr=0.0; // 0.001 T
+	const double Hsinwt=Hfmr*sin(2.0*M_PI*real_time/osc_period);
+	const double Hx=Hfmrx*Hsinwt; 
+	const double Hy=Hfmry*Hsinwt;
+	const double Hz=Hfmrz*Hsinwt;
+
+	if(sim::local_fmr_field==true){
+
+		std::vector<double> H_fmr_local;
+		H_fmr_local.reserve(3*mp::material.size());
+
+		// Loop over all materials
+		for(int mat=0;mat<mp::material.size();mat++){
+			const double Hsinwt_local=mp::material[mat].fmr_field_strength*sin(2.0*M_PI*real_time*mp::material[mat].fmr_field_frequency);
+
+			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[0]);
+			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[1]);
+			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[2]);
+		}
+
+		// Add local field AND global field
+		for(int atom=start_index;atom<end_index;atom++){
+			const int imaterial=atoms::type_array[atom];
+			atoms::x_total_external_field_array[atom] += Hx + H_fmr_local[3*imaterial + 0];
+			atoms::y_total_external_field_array[atom] += Hy + H_fmr_local[3*imaterial + 1];
+			atoms::z_total_external_field_array[atom] += Hz + H_fmr_local[3*imaterial + 2];
+		}
 	}
+	else{
+		// Add fmr field
+		for(int atom=start_index;atom<end_index;atom++){
+				atoms::x_total_external_field_array[atom] += Hx;
+				atoms::y_total_external_field_array[atom] += Hy;
+				atoms::z_total_external_field_array[atom] += Hz;
+		}
+
+	}
+
+	return;
 }
 
