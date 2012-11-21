@@ -71,10 +71,10 @@
 #include <string>
 
 // Global output filestreams
-std::ofstream zinfo("info");
+std::ofstream zinfo;
 std::ofstream zlog;
 std::ofstream zmag("output");
-std::ofstream zgrain("grain");
+std::ofstream zgrain;
 
 
 namespace vout{
@@ -3674,6 +3674,9 @@ namespace vout{
 		
 		// Output data to zgrain
 		if(vmpi::my_rank==0){
+			
+			// check for open ofstream
+			if(!zgrain.is_open()) zgrain.open("grain");
 			
 			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
 			switch(vout::grain_output_list[item]){
