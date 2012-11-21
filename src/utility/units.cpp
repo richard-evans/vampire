@@ -45,6 +45,7 @@
 // Headers
 #include "errors.hpp"
 #include "units.hpp"
+#include "vio.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -57,7 +58,7 @@
 ///
 namespace units {
 	
-	const int max_units=34;
+	const int max_units=35;
 
 	const double pi=3.14;
 	//const double bohr_magneton=7.0;
@@ -119,7 +120,7 @@ int init(){
 		unit[19]="erg/G";		conversion[19]=1.0E-3; 				type[19]="moment";		// Erg/Gauss
 		unit[20]="abAcmcm";	conversion[20]=1.0E-3; 				type[20]="moment";		// Abampere centimetre squared
 		unit[21]="muB";		conversion[21]=9.27400915e-24; 	type[21]="moment";		// Bohr Magnetons
-		unit[22]="eV/T";		conversion[22]=1.602176487e-19;	type[22]="moment";		// Amps/metre squared
+		unit[22]="eV/T";		conversion[22]=1.602176487e-19;	type[22]="moment";		// Electron volts/Tesla
 		unit[23]="erg/Oe";	conversion[23]=1.0E-3; 				type[23]="moment";		// Erg/Oersted
 		// Magnetisation
 		unit[24]="A/m";		conversion[24]=2.17987208E-18;	type[24]="magnetisation";	// Amps/metre
@@ -132,8 +133,9 @@ int init(){
 		// Field
 		unit[30]="T";			conversion[30]=1.0; 					type[30]="field";		// Tesla
 		unit[31]="mT";			conversion[31]=1.0E-3;		 		type[31]="field";		// milliTesla
-		unit[32]="Oe";			conversion[32]=1.0E-4;				type[32]="field";		// Oersted
-		unit[33]="kOe";		conversion[33]=1.0E-1; 				type[33]="field";		// kilo Oersted
+		unit[32]="uT";			conversion[32]=1.0E-6;		 		type[32]="field";		// microTesla
+		unit[33]="Oe";			conversion[33]=1.0E-4;				type[33]="field";		// Oersted
+		unit[34]="kOe";		conversion[34]=1.0E-1; 				type[34]="field";		// kilo Oersted
 
 		// Set initialised flag
 		units::initialised=true;
@@ -185,6 +187,7 @@ int init(){
 
 		// Error if unit not found
 		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
+		zlog << zTs() << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
 		err::vexit();
 		
 		return EXIT_SUCCESS;
@@ -235,6 +238,7 @@ int init(){
 
 		// Error if unit not found
 		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
+		zlog << zTs() << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
 		err::vexit();
 
 	}
