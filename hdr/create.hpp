@@ -79,6 +79,7 @@ namespace cs{
 	extern bool single_spin;
 	extern int system_creation_flags[10];
 	extern std::string unit_cell_file;
+	extern bool fill_core_shell;
 	
 	class unit_cell_atom_t {
 	public:

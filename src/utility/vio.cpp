@@ -796,6 +796,17 @@ int match_create(string const word, string const value, int const line){
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		test="fill-core-shell-particles";
+		if(word==test){
+			cs::fill_core_shell=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::fill_core_shell=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
