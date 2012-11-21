@@ -232,11 +232,19 @@ int set_derived_parameters(){
 	mp::dt = mp::dt_SI*mp::gamma_SI; // Must be set before Hth
 	mp::half_dt = 0.5*mp::dt;
 
+	// Check to see if field direction is set by angle
+	if(sim::applied_field_set_by_angle){
+		sim::H_vec[0]=sin(sim::applied_field_angle_phi*M_PI/180.0)*cos(sim::applied_field_angle_theta*M_PI/180.0);
+		sim::H_vec[1]=sin(sim::applied_field_angle_phi*M_PI/180.0)*sin(sim::applied_field_angle_theta*M_PI/180.0);
+		sim::H_vec[2]=cos(sim::applied_field_angle_phi*M_PI/180.0);
+	}
+	
 	// Ensure H vector is unit length
-	double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
-	sim::H_vec[0]*=mod_H;
-	sim::H_vec[1]*=mod_H;
-	sim::H_vec[2]*=mod_H;
+	// **RE edit 21.11.12 - no longer necessary as value checked on user input**
+	//double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
+	//sim::H_vec[0]*=mod_H;
+	//sim::H_vec[1]*=mod_H;
+	//sim::H_vec[2]*=mod_H;
 
 	// Calculate moment, magnetisation, and anisotropy constants
 	/*for(int mat=0;mat<mp::num_materials;mat++){

@@ -1038,6 +1038,10 @@ int match_dimension(string const word, string const value, string const unit, in
 }
 
 int match_sim(string const word, string const value, string const unit, int const line){
+	
+		std::string prefix="sim:";
+		std::string deprec="";
+	
 		//-------------------------------------------------------------------
 		// System simulation variables
 		//-------------------------------------------------------------------
@@ -1511,7 +1515,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 				err::vexit();
 			}
 		}
-                //--------------------------------------------------------------------
+		//--------------------------------------------------------------------
 		test="heat-sink-coupling";
 		if(word==test){
 		  double hscc=atof(value.c_str());
@@ -1525,8 +1529,8 @@ int match_sim(string const word, string const value, string const unit, int cons
 		    err::vexit();
 		  }
 		}
-                //--------------------------------------------------------------------
-                test="two-temperature-electron-heat-capacity";
+		//--------------------------------------------------------------------
+		test="two-temperature-electron-heat-capacity";
 		if(word==test){
 		  double hscc=atof(value.c_str());
 		  // Test for valid range
@@ -1539,7 +1543,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 		    err::vexit();
 		  }
 		}
-                //--------------------------------------------------------------------
+		//--------------------------------------------------------------------
 		test="two-temperature-phonon-heat-capacity";
 		if(word==test){
 		  double hscc=atof(value.c_str());
@@ -1553,7 +1557,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 		    err::vexit();
 		  }
 		}
-                //--------------------------------------------------------------------
+		//--------------------------------------------------------------------
 		test="two-temperature-electron-phonon-coupling";
 		if(word==test){
 		  double hscc=atof(value.c_str());
@@ -1600,8 +1604,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="H-applied";
-		if(word==test){
+		test="applied-field-strength";
+		deprec="H-applied";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1610,7 +1615,15 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::H_applied=H;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1619,8 +1632,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="Hmin";
-		if(word==test){
+		test="minimum-applied-field-strength";
+		deprec="Hmin";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1629,7 +1643,15 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::Hmin=H;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1638,8 +1660,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="Hmax";
-		if(word==test){
+		test="maximum-applied-field-strength";
+		deprec="Hmax";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1648,7 +1671,15 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::Hmax=H;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1657,8 +1688,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="Heq";
-		if(word==test){
+		test="equilibration-applied-field-strength";
+		deprec="Heq";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1667,7 +1699,15 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::Heq=H;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1676,8 +1716,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="Hinc";
-		if(word==test){
+		test="applied-field-strength-increment";
+		deprec="Hinc";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1686,31 +1727,115 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::Hinc=H;
+				if(word==deprec) std::cerr << "Warning: Use of" << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
+				std::cerr << "Error: Unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
 				err::vexit();
 			}
+		}
+		//--------------------------------------------------------------------
+		test="applied-field-angle-theta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				// set angle
+				sim::applied_field_angle_theta=angle;
+				// set flag
+				sim::applied_field_set_by_angle=true;
+				// return
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error: sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="applied-field-angle-phi";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				// set angle
+				sim::applied_field_angle_phi=angle;
+				// set flag
+				sim::applied_field_set_by_angle=true;
+				// return
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error: sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="applied-field-unit-vector";
+		if(word==test){
+			// temporary storage container
+			std::vector<double> u(3);
+
+			// read values from string
+			u=DoublesFromString(value);
+
+			// check size
+			if(u.size()!=3){
+				std::cerr << "Error on line " << line << " of input file: " << prefix << word << " must have three values." << std::endl;
+				zlog << zTs() << "Error on line " << line << " of input file: " << prefix << word << " must have three values." << std::endl;
+				return EXIT_FAILURE;
+			}
+
+			// Normalise 
+			double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+
+			// Check for correct length unit vector
+			if(ULength < 1.0e-9){
+				std::cerr << "Error on line " << line << " of input file: " << prefix << word << " must be normalisable (possibly all zero)." << std::endl;
+				zlog << zTs() << "Error on line " << line << " of input file: " << prefix << word << " must be normalisable (possibly all zero)." << std::endl;
+				return EXIT_FAILURE;
+			}
+			u.at(0)/=ULength;
+			u.at(1)/=ULength;
+			u.at(2)/=ULength;
+
+			// Copy direction to global variable
+			sim::H_vec[0]=u.at(0);
+			sim::H_vec[1]=u.at(1);
+			sim::H_vec[2]=u.at(2);
+
+			// Unset set by angle flag
+			sim::applied_field_set_by_angle=false;
+			
+			return EXIT_SUCCESS;
+
 		}
 		//--------------------------------------------------------------------
 		test="Hx";
 		if(word==test){
-			sim::H_vec[0]=atof(value.c_str());
-			return EXIT_SUCCESS;
+			std::cerr << "Error: Use of sim:Hx keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
+			err::vexit();
 		}
 		//--------------------------------------------------------------------
 		test="Hy";
 		if(word==test){
-			sim::H_vec[1]=atof(value.c_str());
-			return EXIT_SUCCESS;
+			std::cerr << "Error: Use of sim:Hy keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
+			err::vexit();
 		}
 		//--------------------------------------------------------------------
 		test="Hz";
 		if(word==test){
-			sim::H_vec[2]=atof(value.c_str());
-			return EXIT_SUCCESS;
+			std::cerr << "Error: Use of sim:Hz keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
+			err::vexit();
 		}
 		//--------------------------------------------------------------------
 		test="External-Demag";
@@ -2038,6 +2163,9 @@ int match_config(string const word, string const value, int const line){
 }
 		
 int match_vout_list(string const word, int const line, std::vector<unsigned int> & output_list){
+
+		std::string prefix="output:";
+		std::string deprec="";
 		//-------------------------------------------------------------------
 		// system_creation_flags[1] - Set system particle shape
 		//-------------------------------------------------------------------
@@ -2059,21 +2187,27 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field";
-		if(word==test){
+		test="applied-field-strength";
+		deprec="field";
+		if(word==test || word==deprec){
 			output_list.push_back(3);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field-vector";
-		if(word==test){
+		test="applied-field-unit-vector";
+		deprec="field-vector";
+		if(word==test || word==deprec){
 			output_list.push_back(4);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field-alignment";
-		if(word==test){
+		test="applied-field-alignment";
+		deprec="field-alignment";
+		if(word==test || word==deprec){
 			output_list.push_back(12);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -2172,7 +2306,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
-			std::cerr << "Error - Unknown control statement \'zmag:" << word << "\' on line " << line << " of input file" << std::endl;
+			std::cerr << "Error - Unknown control statement "<< prefix << word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;
 		}
 		
@@ -2183,6 +2317,8 @@ int match_vout_grain_list(string const word, string const value, int const line,
 		//-------------------------------------------------------------------
 		// system_creation_flags[1] - Set system particle shape
 		//-------------------------------------------------------------------
+		std::string prefix="grain:";
+		std::string deprec="";
 		std::string test="time";
 		if(word==test){
 			output_list.push_back(0);
@@ -2201,15 +2337,19 @@ int match_vout_grain_list(string const word, string const value, int const line,
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field";
-		if(word==test){
+		test="applied-field-strength";
+		deprec="field";
+		if(word==test || word==deprec){
 			output_list.push_back(3);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field-vector";
-		if(word==test){
+		test="applied-field-unit-vector";
+		deprec="field-vector";
+		if(word==test || word==deprec){
 			output_list.push_back(4);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -2580,7 +2720,7 @@ int match_material(string const word, string const value, string const unit, int
 				read_material[super_index].Ku1_SI=K;
 				// enable global anisotropy flag                                                                                                                                              
 				sim::UniaxialScalarAnisotropy=true;
- 				std::cerr << "Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
+ 				std::cerr << "Use of Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
