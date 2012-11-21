@@ -1766,7 +1766,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 		if(word==test){
 			double angle=atof(value.c_str());
 			// Test for valid range
-			if((angle>=0.0) && (angle<=360.0)){
+			if((angle>=0.0) && (angle<=180.0)){
 				// set angle
 				sim::applied_field_angle_phi=angle;
 				// set flag
