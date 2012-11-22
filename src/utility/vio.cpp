@@ -2309,7 +2309,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 		}
 		test="material-applied-field-alignment";
 		if(word==test){
-			output_list.push_back(22);
+			output_list.push_back(26);
 			return EXIT_SUCCESS;
 		}
 		test="MPI-Timings";
@@ -3483,7 +3483,7 @@ namespace vout{
 		stream << Susx << "\t" << Susy << "\t" << Susz << "\t";
 	}
 	
-	// Output Function 22
+	// Output Function 26
 	void mat_mdoth(std::ostream& stream){
 		const double H[3]={sim::H_vec[0],sim::H_vec[1],sim::H_vec[2]};
 		for(int mat=0;mat<mp::num_materials;mat++){
@@ -3592,7 +3592,7 @@ namespace vout{
 				case 21:
 					vout::MeanSystemSusceptibility(zmag);
 					break;
-				case 22:
+				case 26:
 					vout::mat_mdoth(zmag);
 					break;
 				case 60:
@@ -3665,7 +3665,7 @@ namespace vout{
 				case 21:
 					vout::MeanSystemSusceptibility(std::cout);
 					break;
-				case 22:
+				case 26:
 					vout::mat_mdoth(std::cout);
 					break;
 				case 60:
