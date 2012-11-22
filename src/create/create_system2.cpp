@@ -91,7 +91,7 @@ namespace cs{
 	bool single_spin=false;
 	int system_creation_flags[10]={0,0,0,0,0,0,0,0,0,0};
 	std::string unit_cell_file="";
-	
+	bool fill_core_shell=true;
 	
 	// unit cell container
 	cs::unit_cell_t unit_cell;

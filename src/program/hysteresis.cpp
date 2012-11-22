@@ -85,20 +85,20 @@ int hysteresis(){
 	if(err::check==true){std::cout << "program::hysteresis has been called" << std::endl;}
 	
 	// Equilibrate system in saturation field
-	sim::H_applied=sim::Hmax;
+	sim::H_applied=sim::Heq;
 	sim::integrate(sim::equilibration_time);
 		
-	// Setup min and max fields and increment (mT)
-	int iHmax=vmath::iround(double(sim::Hmax)*1.0E3);
-	int iHmin=vmath::iround(double(sim::Hmin)*1.0E3);
-	int iHinc=vmath::iround(double(sim::Hinc)*1.0E3);
+	// Setup min and max fields and increment (uT)
+	int iHmax=vmath::iround(double(sim::Hmax)*1.0E6);
+	int iHmin=vmath::iround(double(sim::Hmin)*1.0E6);
+	int iHinc=vmath::iround(double(sim::Hinc)*1.0E6);
 
 	// Perform Field Loop
 	for(int parity=-1;parity<2;parity+=2){
 		for(int H=iHmin;H<=iHmax;H+=iHinc){
 			
 			// Set applied field (Tesla)
-			sim::H_applied=double(H)*double(parity)*1.0e-3;
+			sim::H_applied=double(H)*double(parity)*1.0e-6;
 			
 			// Reset start time
 			int start_time=sim::time;

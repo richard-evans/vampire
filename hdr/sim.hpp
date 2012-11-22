@@ -53,6 +53,10 @@ namespace sim{
 	extern double Hmax; // T
 	extern double Hinc; // T
 	extern double Heq; //T
+	extern double applied_field_angle_phi;
+	extern double applied_field_angle_theta;
+	extern bool applied_field_set_by_angle;
+	
 	extern double demag_factor[3];
 	
 	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]

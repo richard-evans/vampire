@@ -75,6 +75,10 @@ namespace sim{
 	double Hmax=+1.0; // T
 	double Hinc= 0.1; // T
 	double Heq=0.0;
+	double applied_field_angle_phi=0.0;
+	double applied_field_angle_theta=0.0;
+	bool applied_field_set_by_angle=false;
+	
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; // nm/ns

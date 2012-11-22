@@ -86,7 +86,29 @@ int cylinder(double particle_origin[],std::vector<cs::catom_t> & catom_array, co
  	for(int atom=0;atom<num_atoms;atom++){
 		double range_squared = 	(catom_array[atom].x-particle_origin[0])*(catom_array[atom].x-particle_origin[0]) + 
 										(catom_array[atom].y-particle_origin[1])*(catom_array[atom].y-particle_origin[1]);
-		if(range_squared<=particle_radius_squared){
+		if(mp::material[catom_array[atom].material].core_shell_size>0.0){
+			// Reverse Loop over materials
+			for(int mat=mp::num_materials-1;mat>-1;mat--){
+				double my_radius = mp::material[mat].core_shell_size;
+				double max_range = my_radius*my_radius*particle_radius_squared;
+				double maxz=mp::material[mat].max*cs::system_dimensions[2];
+				double minz=mp::material[mat].min*cs::system_dimensions[2];
+				double cz=catom_array[atom].z;
+				// check for within core shell range
+				if(range_squared<=max_range){
+					if((cz>=minz) && (cz<maxz)){
+					catom_array[atom].include=true;
+					catom_array[atom].material=mat;
+					catom_array[atom].grain=grain;
+					}
+					// if set to clear atoms then remove atoms within radius
+					else if(cs::fill_core_shell==false){
+						catom_array[atom].include=false;
+					}
+				}
+			}
+		}
+		else if(range_squared<=particle_radius_squared){
 			catom_array[atom].include=true;
 			catom_array[atom].grain=grain;
 		}
@@ -125,10 +147,20 @@ int sphere(double particle_origin[],std::vector<cs::catom_t> & catom_array, cons
 			for(int mat=mp::num_materials-1;mat>-1;mat--){
 				double my_radius = mp::material[mat].core_shell_size;
 				double max_range = my_radius*my_radius*particle_radius_squared;
+				double maxz=mp::material[mat].max*cs::system_dimensions[2];
+				double minz=mp::material[mat].min*cs::system_dimensions[2];
+				double cz=catom_array[atom].z;
+				// check for within core shell range
 				if(range_squared<=max_range){
-					catom_array[atom].include=true;
-					catom_array[atom].material=mat;
-					catom_array[atom].grain=grain;
+					if((cz>=minz) && (cz<maxz)){
+						catom_array[atom].include=true;
+						catom_array[atom].material=mat;
+						catom_array[atom].grain=grain;
+					}
+					// if set to clear atoms then remove atoms within radius
+					else if(cs::fill_core_shell==false){
+						catom_array[atom].include=false;
+					}
 				}
 			}
 		}
@@ -176,11 +208,20 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 				double my_radius = mp::material[mat].core_shell_size;
 				double my_to_height = my_radius*to_height;
 				double my_to_length = my_radius*to_length;
-				
+				double maxz=mp::material[mat].max*cs::system_dimensions[2];
+				double minz=mp::material[mat].min*cs::system_dimensions[2];
+				double cz=catom_array[atom].z;
+				// check for within core shell range
 				if((range<=my_to_length) && (x_vector[0] <= my_to_height) && (x_vector[1] <= my_to_height) && (x_vector[2] <= my_to_height)){
-					catom_array[atom].include=true;
-					catom_array[atom].material=mat;
-					catom_array[atom].grain=grain;
+					if((cz>=minz) && (cz<maxz)){
+						catom_array[atom].include=true;
+						catom_array[atom].material=mat;
+						catom_array[atom].grain=grain;
+					}
+					// if set to clear atoms then remove atoms within radius
+					else if(cs::fill_core_shell==false){
+						catom_array[atom].include=false;
+					}
 				}
 			}
 		}
@@ -208,8 +249,29 @@ int cube(double particle_origin[],std::vector<cs::catom_t> & catom_array, const 
  	for(int atom=0;atom<num_atoms;atom++){
 		double dx=fabs(catom_array[atom].x-particle_origin[0]);
 		double dy=fabs(catom_array[atom].y-particle_origin[1]);
-		
-		if((dx<=side_length) && (dy<=side_length)){
+		if(mp::material[catom_array[atom].material].core_shell_size>0.0){
+			// Reverse Loop over materials
+			for(int mat=mp::num_materials-1;mat>-1;mat--){
+				double my_length = mp::material[mat].core_shell_size;
+				double max_length = my_length*side_length;
+				double maxz=mp::material[mat].max*cs::system_dimensions[2];
+				double minz=mp::material[mat].min*cs::system_dimensions[2];
+				double cz=catom_array[atom].z;
+				// check for within core shell range
+				if((dx<=max_length) && (dy<=max_length)){
+					if((cz>=minz) && (cz<maxz)){
+						catom_array[atom].include=true;
+						catom_array[atom].material=mat;
+						catom_array[atom].grain=grain;
+					}
+					// if set to clear atoms then remove atoms within radius
+					else if(cs::fill_core_shell==false){
+						catom_array[atom].include=false;
+					}
+				}
+			}
+		}
+		else if((dx<=side_length) && (dy<=side_length)){
 			catom_array[atom].include=true;
 			catom_array[atom].grain=grain;
 		}

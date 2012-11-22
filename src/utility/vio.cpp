@@ -71,10 +71,10 @@
 #include <string>
 
 // Global output filestreams
-std::ofstream zinfo("info");
+std::ofstream zinfo;
 std::ofstream zlog;
 std::ofstream zmag("output");
-std::ofstream zgrain("grain");
+std::ofstream zgrain;
 
 
 namespace vout{
@@ -796,6 +796,17 @@ int match_create(string const word, string const value, int const line){
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
+		test="fill-core-shell-particles";
+		if(word==test){
+			cs::fill_core_shell=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::fill_core_shell=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
@@ -1038,6 +1049,10 @@ int match_dimension(string const word, string const value, string const unit, in
 }
 
 int match_sim(string const word, string const value, string const unit, int const line){
+	
+		std::string prefix="sim:";
+		std::string deprec="";
+	
 		//-------------------------------------------------------------------
 		// System simulation variables
 		//-------------------------------------------------------------------
@@ -1631,7 +1646,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 		    err::vexit();
 		  }
 		}
-                //--------------------------------------------------------------------
+		//--------------------------------------------------------------------
 		test="two-temperature-phonon-heat-capacity";
 		if(word==test){
 		  double hscc=atof(value.c_str());
@@ -1645,7 +1660,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 		    err::vexit();
 		  }
 		}
-                //--------------------------------------------------------------------
+		//--------------------------------------------------------------------
 		test="two-temperature-electron-phonon-coupling";
 		if(word==test){
 		  double hscc=atof(value.c_str());
@@ -1692,8 +1707,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="H-applied";
-		if(word==test){
+		test="applied-field-strength";
+		deprec="H-applied";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1702,7 +1718,15 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::H_applied=H;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1711,8 +1735,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="Hmin";
-		if(word==test){
+		test="minimum-applied-field-strength";
+		deprec="Hmin";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1721,7 +1746,15 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::Hmin=H;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1730,8 +1763,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="Hmax";
-		if(word==test){
+		test="maximum-applied-field-strength";
+		deprec="Hmax";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1740,7 +1774,15 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::Hmax=H;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1749,8 +1791,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="Heq";
-		if(word==test){
+		test="equilibration-applied-field-strength";
+		deprec="Heq";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1759,7 +1802,15 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::Heq=H;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1768,8 +1819,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 		}
 		//--------------------------------------------------------------------
-		test="Hinc";
-		if(word==test){
+		test="applied-field-strength-increment";
+		deprec="Hinc";
+		if(word==test || word==deprec){
 			double H=atof(value.c_str());
 			string unit_type="field";
 			// if no unit given, assume internal
@@ -1778,31 +1830,115 @@ int match_sim(string const word, string const value, string const unit, int cons
 			}
 			string str="field";
 			if(unit_type==str){
+				// Check for valid range
+				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+					err::vexit();
+				}
+				else
 				sim::Hinc=H;
+				if(word==deprec) std::cerr << "Warning: Use of" << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
+				std::cerr << "Error: Unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
 				err::vexit();
 			}
+		}
+		//--------------------------------------------------------------------
+		test="applied-field-angle-theta";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=360.0)){
+				// set angle
+				sim::applied_field_angle_theta=angle;
+				// set flag
+				sim::applied_field_set_by_angle=true;
+				// return
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error: sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="applied-field-angle-phi";
+		if(word==test){
+			double angle=atof(value.c_str());
+			// Test for valid range
+			if((angle>=0.0) && (angle<=180.0)){
+				// set angle
+				sim::applied_field_angle_phi=angle;
+				// set flag
+				sim::applied_field_set_by_angle=true;
+				// return
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error: sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
+				err::vexit();
+			}
+		}
+		//--------------------------------------------------------------------
+		test="applied-field-unit-vector";
+		if(word==test){
+			// temporary storage container
+			std::vector<double> u(3);
+
+			// read values from string
+			u=DoublesFromString(value);
+
+			// check size
+			if(u.size()!=3){
+				std::cerr << "Error on line " << line << " of input file: " << prefix << word << " must have three values." << std::endl;
+				zlog << zTs() << "Error on line " << line << " of input file: " << prefix << word << " must have three values." << std::endl;
+				return EXIT_FAILURE;
+			}
+
+			// Normalise 
+			double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+
+			// Check for correct length unit vector
+			if(ULength < 1.0e-9){
+				std::cerr << "Error on line " << line << " of input file: " << prefix << word << " must be normalisable (possibly all zero)." << std::endl;
+				zlog << zTs() << "Error on line " << line << " of input file: " << prefix << word << " must be normalisable (possibly all zero)." << std::endl;
+				return EXIT_FAILURE;
+			}
+			u.at(0)/=ULength;
+			u.at(1)/=ULength;
+			u.at(2)/=ULength;
+
+			// Copy direction to global variable
+			sim::H_vec[0]=u.at(0);
+			sim::H_vec[1]=u.at(1);
+			sim::H_vec[2]=u.at(2);
+
+			// Unset set by angle flag
+			sim::applied_field_set_by_angle=false;
+			
+			return EXIT_SUCCESS;
+
 		}
 		//--------------------------------------------------------------------
 		test="Hx";
 		if(word==test){
-			sim::H_vec[0]=atof(value.c_str());
-			return EXIT_SUCCESS;
+			std::cerr << "Error: Use of sim:Hx keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
+			err::vexit();
 		}
 		//--------------------------------------------------------------------
 		test="Hy";
 		if(word==test){
-			sim::H_vec[1]=atof(value.c_str());
-			return EXIT_SUCCESS;
+			std::cerr << "Error: Use of sim:Hy keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
+			err::vexit();
 		}
 		//--------------------------------------------------------------------
 		test="Hz";
 		if(word==test){
-			sim::H_vec[2]=atof(value.c_str());
-			return EXIT_SUCCESS;
+			std::cerr << "Error: Use of sim:Hz keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
+			err::vexit();
 		}
 		//--------------------------------------------------------------------
 		test="External-Demag";
@@ -2130,6 +2266,9 @@ int match_config(string const word, string const value, int const line){
 }
 		
 int match_vout_list(string const word, int const line, std::vector<unsigned int> & output_list){
+
+		std::string prefix="output:";
+		std::string deprec="";
 		//-------------------------------------------------------------------
 		// system_creation_flags[1] - Set system particle shape
 		//-------------------------------------------------------------------
@@ -2151,21 +2290,27 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field";
-		if(word==test){
+		test="applied-field-strength";
+		deprec="field";
+		if(word==test || word==deprec){
 			output_list.push_back(3);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field-vector";
-		if(word==test){
+		test="applied-field-unit-vector";
+		deprec="field-vector";
+		if(word==test || word==deprec){
 			output_list.push_back(4);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field-alignment";
-		if(word==test){
+		test="applied-field-alignment";
+		deprec="field-alignment";
+		if(word==test || word==deprec){
 			output_list.push_back(12);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -2285,6 +2430,11 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			return EXIT_SUCCESS;
 		}
 		//-------------------------------------------------------------------
+		test="material-applied-field-alignment";
+		if(word==test){
+			output_list.push_back(26);
+			return EXIT_SUCCESS;
+		}
 		test="MPI-Timings";
 		if(word==test){
 			vmpi::DetailedMPITiming=true;
@@ -2295,7 +2445,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
-			std::cerr << "Error - Unknown control statement \'zmag:" << word << "\' on line " << line << " of input file" << std::endl;
+			std::cerr << "Error - Unknown control statement "<< prefix << word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;
 		}
 		
@@ -2306,6 +2456,8 @@ int match_vout_grain_list(string const word, string const value, int const line,
 		//-------------------------------------------------------------------
 		// system_creation_flags[1] - Set system particle shape
 		//-------------------------------------------------------------------
+		std::string prefix="grain:";
+		std::string deprec="";
 		std::string test="time";
 		if(word==test){
 			output_list.push_back(0);
@@ -2324,15 +2476,19 @@ int match_vout_grain_list(string const word, string const value, int const line,
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field";
-		if(word==test){
+		test="applied-field-strength";
+		deprec="field";
+		if(word==test || word==deprec){
 			output_list.push_back(3);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
-		test="field-vector";
-		if(word==test){
+		test="applied-field-unit-vector";
+		deprec="field-vector";
+		if(word==test || word==deprec){
 			output_list.push_back(4);
+			if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		else
@@ -2703,7 +2859,7 @@ int match_material(string const word, string const value, string const unit, int
 				read_material[super_index].Ku1_SI=K;
 				// enable global anisotropy flag                                                                                                                                              
 				sim::UniaxialScalarAnisotropy=true;
- 				std::cerr << "Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
+ 				std::cerr << "Use of Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -3448,198 +3604,6 @@ namespace vout{
 		strm.rdbuf(&nullbuf);
 	}
 	#endif
-/*/// @brief Function to output atomistic resolution snapshots for povray
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    10/03/2011
-///
-/// @return EXIT_SUCCESS
-/// 
-/// @internal
-///	Created:		28/01/2010
-///	Revision:	  ---
-///=====================================================================================
-///
-	int pov_file(){
-
-		
-		std::cout << "Outputting povray" << std::endl;
-		
-		// check calling of routine if error checking is activated
-		if(err::check==true){std::cout << "vout::pov_file has been called" << std::endl;}
-
-		using vout::pov_file_counter;
-
-		#ifdef MPICF
-		const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-		#else
-		const int num_atoms = atoms::num_atoms;
-		#endif
-		
-		std::stringstream pov_file_sstr;
-		pov_file_sstr << "spins.";
-		pov_file_sstr << std::setfill('0') << std::setw(3) << vmpi::my_rank;
-		pov_file_sstr << "." << std::setfill('0') << std::setw(5) << pov_file_counter;
-		pov_file_sstr << ".pin";
-		//pov_file_sstr << "spins." << mpi_generic::my_rank << "." << pov_file_counter << ".pov";
-		std::string pov_file = pov_file_sstr.str();
-		const char* pov_filec = pov_file.c_str();
-		std::ofstream pov_file_ofstr;
-
-		if(vmpi::my_rank==0){
-			std::stringstream pov_hdr_sstr;
-			pov_hdr_sstr << "spins." << std::setfill('0') << std::setw(3) << pov_file_counter << ".pov";
-			std::string pov_hdr = pov_hdr_sstr.str();
-			const char* pov_hdrc = pov_hdr.c_str();
-			pov_file_ofstr.open (pov_hdrc);
-	
-			double size, mag_vec;
-			double vec[3];
-
-			size = sqrt(material_parameters::system_dimensions[0]*material_parameters::system_dimensions[0] +
-					material_parameters::system_dimensions[1]*material_parameters::system_dimensions[1] +
-					material_parameters::system_dimensions[2]*material_parameters::system_dimensions[2]);
-
-			vec[0] = (1.0/material_parameters::system_dimensions[0]);
-			vec[1] = (1.0/material_parameters::system_dimensions[1]);
-			vec[2] = (1.0/material_parameters::system_dimensions[2]);
-			mag_vec = sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);
-			vec[0]/=mag_vec;
-			vec[1]/=mag_vec;
-			vec[2]/=mag_vec;
-
-			//---------------------------------------------------
-			// Output file header (rank 0)
-			//---------------------------------------------------
-			pov_file_ofstr << "#include \"colors.inc\"" << std::endl;
-			pov_file_ofstr << "#include \"metals.inc\""	<< std::endl;
-			pov_file_ofstr << "#include \"screen.inc\""	<< std::endl;
-			pov_file_ofstr << "#declare LX=" << material_parameters::system_dimensions[0]*0.5 << ";" << std::endl;
-			pov_file_ofstr << "#declare LY=" << material_parameters::system_dimensions[1]*0.5 << ";" << std::endl;
-			pov_file_ofstr << "#declare LZ=" << material_parameters::system_dimensions[2]*0.5 << ";" << std::endl;
-			pov_file_ofstr << "#declare CX=" << size*vec[0]*6.0 << ";" << std::endl;
-			pov_file_ofstr << "#declare CY=" << size*vec[1]*6.0 << ";" << std::endl;
-			pov_file_ofstr << "#declare CZ=" << size*vec[2]*6.0 << ";" << std::endl;
-	 		pov_file_ofstr << "#declare ref=0.4;" << std::endl;
-	 		//pov_file_ofstr << "#declare sscale=2.0;" << std::endl;
-			pov_file_ofstr << "global_settings { assumed_gamma 2.0 }" << std::endl;
-			pov_file_ofstr << "background { color Gray30 }" << std::endl;
-
-			pov_file_ofstr << "Set_Camera(<CX,CY,CZ>, <LX,LY,LZ>, 15)" << std::endl;
-			pov_file_ofstr << "Set_Camera_Aspect(4,3)" << std::endl;
-			pov_file_ofstr << "Set_Camera_Sky(<0,0,1>)" << std::endl;
-			pov_file_ofstr << "light_source { <2*CX, 2*CY, 2*CZ> color White}" << std::endl;
-
-			for(int mat=0;mat<mp::num_materials;mat++){
-				pov_file_ofstr << "#declare sscale"<< mat << "=2.0;" << std::endl;
-				pov_file_ofstr << "#declare rscale"<< mat << "=1.2;" << std::endl;
-				pov_file_ofstr << "#declare cones"<< mat << "=0;" << std::endl;
-				pov_file_ofstr << "#declare arrows"<< mat << "=1;" << std::endl;
-				pov_file_ofstr << "#declare spheres"<< mat << "=1;" << std::endl;
-				pov_file_ofstr << "#declare spincolors"<< mat << "=1;" << std::endl;
-				pov_file_ofstr << "#declare spincolor"<< mat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
-			}
-			
-			for(int p =0;p<vmpi::num_processors;p++){
-				std::stringstream pov_sstr;
-				pov_sstr << "spins." << std::setfill('0') << std::setw(3) << p << "." << std::setfill('0') << std::setw(5) << pov_file_counter << ".pin";
-				pov_file_ofstr << "#include \"" << pov_sstr.str() << "\"" << std::endl;
-				//pov_sstr << "spins." << p << "." << pov_file_counter << ".pov";
-				//pov_file_ofstr << "#include \"" << pov_sstr.str() << "\"" << std::endl;
-			}
-			pov_file_ofstr.close();
-		}
-
-
-		pov_file_ofstr.open (pov_filec);
-
-	  	for(int atom=0; atom<num_atoms; atom++){
-	
-			double red,green,blue,ireal;
-			ireal = atoms::z_spin_array[atom];
-			int mat= atoms::type_array[atom];
-
-			if(ireal>0.8){
-				red = 0.0;
-				green = 0.0;
-				blue = 1.0;
-			}
-			else if(ireal>=0.0){
-				red = 1.0-ireal*1.2;
-				green = 1.0-ireal*1.2;
-				blue = 1.0;
-			}
-			else if(ireal>=-0.8){
-				red = 1.0;
-				green = 1.0+ireal*1.2;
-				blue = 1.0+ireal*1.2;
-			}
-			else if(ireal<-0.8){
-				red = 1.0;
-				green = 0.0;
-				blue = 0.0;
-			}
-			else{
-				red = 1.0;
-				green = 1.0;
-				blue = 1.0;
-			}
-
-			if(blue<0.0) blue=0.0;
-			if(red<0.0) red=0.0;
-			if(green<0.0) green=0.0;
-
-			//#ifdef MPICF
-				//double cx=mpi_create_variables::mpi_atom_global_coord_array[3*atom+0]*material_parameters::lattice_space_conversion[0];
-				//double cy=mpi_create_variables::mpi_atom_global_coord_array[3*atom+1]*material_parameters::lattice_space_conversion[1];
-				//double cz=mpi_create_variables::mpi_atom_global_coord_array[3*atom+2]*material_parameters::lattice_space_conversion[2];
-			//#else
-				double cx=atoms::x_coord_array[atom]+0.5*mtrandom::grnd();  //*material_parameters::lattice_space_conversion[0];
-				double cy=atoms::y_coord_array[atom]+0.5*mtrandom::grnd();  //*material_parameters::lattice_space_conversion[1];
-				double cz=atoms::z_coord_array[atom]+0.5*mtrandom::grnd();  //*material_parameters::lattice_space_conversion[2];
-			//#endif
-			double sx=0.5*atoms::x_spin_array[atom];
-			double sy=0.5*atoms::y_spin_array[atom];
-			double sz=0.5*atoms::z_spin_array[atom];
-
-			pov_file_ofstr << "union{" << std::endl;
-			pov_file_ofstr << "#if(spheres" << mat << ") sphere {<" << cx << ","<< cy << ","<< cz << ">,0.5*rscale"<< mat <<"} #end" << std::endl;
-			pov_file_ofstr << "#if(arrows" << mat << ") cylinder {<" << cx << "+" << sx << "*sscale"<< mat <<","
-										 << cy << "+" << sy << "*sscale"<< mat <<","
-										 << cz << "+" << sz << "*sscale"<< mat <<">,<"
-										 << cx << "-" << sx << "*sscale"<< mat <<","
-										 << cy << "-" << sy << "*sscale"<< mat <<","
-										 << cz << "-" << sz << "*sscale"<< mat <<">,sscale"<< mat <<"*0.12}";
-			pov_file_ofstr << "cone {<" << cx << "+" << sx << "*sscale"<< mat <<","
-										 << cy << "+" << sy << "*sscale"<< mat <<","
-										 << cz << "+" << sz << "*1.6*sscale"<< mat <<">,sscale"<< mat <<"*0.0 <"
-										 << cx << "+" << sx << "*sscale"<< mat <<","
-										 << cy << "+" << sy << "*sscale"<< mat <<","
-										 << cz << "+" << sz << "*sscale"<< mat <<">,sscale"<< mat <<"*0.2} #end" << std::endl;
-			pov_file_ofstr << "#if(cones" << mat << ") cone {<" << cx << "+" << sx << "*sscale"<< mat <<","
-										 << cy << "+" << sy << "*sscale"<< mat <<","
-										 << cz << "+" << sz << "*sscale"<< mat <<">,0.0 <"
-										 << cx << "-" << sx << "*sscale"<< mat <<","
-										 << cy << "-" << sy << "*sscale"<< mat <<","
-										 << cz << "-" << sz << "*sscale"<< mat <<">,sscale"<< mat <<"*0.5} #end" << std::endl;
-						
-			pov_file_ofstr << "#if(spincolors" << mat << ") texture { pigment {color rgb <" << red << " " << green << " " << blue << ">}" << "finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
-			pov_file_ofstr << "#else texture { spincolor" << mat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
-			pov_file_ofstr << "}" << std::endl;
-	  	}
-	
-		pov_file_ofstr.close();
-
-		pov_file_counter++;
-
-	return EXIT_SUCCESS;
-	}*/
   
 	// Output Function 0
 	void time(std::ostream& stream){
@@ -3837,6 +3801,18 @@ namespace vout{
 		}
 	}
 
+	// Output Function 26
+	void mat_mdoth(std::ostream& stream){
+		const double H[3]={sim::H_vec[0],sim::H_vec[1],sim::H_vec[2]};
+		for(int mat=0;mat<mp::num_materials;mat++){
+			const double imagm = 1.0/stats::sublattice_magm_array[mat];
+			double mh = stats::sublattice_mx_array[mat]*imagm*H[0] + 
+							stats::sublattice_my_array[mat]*imagm*H[1] + 
+							stats::sublattice_mz_array[mat]*imagm*H[2];
+			stream << mh << "\t";
+		}
+	}
+	
 	// Output Function 60
 	void MPITimings(std::ostream& stream){
 
@@ -3946,6 +3922,9 @@ namespace vout{
 				case 25:
 					vout::material_fmr_field_strength(zmag);
 					break;
+				case 26:
+					vout::mat_mdoth(zmag);
+					break;
 				case 60:
 					vout::MPITimings(zmag);
 					break;
@@ -4028,6 +4007,9 @@ namespace vout{
 				case 25:
 					vout::material_fmr_field_strength(std::cout);
 					break;
+				case 26:
+					vout::mat_mdoth(std::cout);
+					break;
 				case 60:
 					vout::MPITimings(std::cout);
 					break;
@@ -4045,6 +4027,9 @@ namespace vout{
 		
 		// Output data to zgrain
 		if(vmpi::my_rank==0){
+			
+			// check for open ofstream
+			if(!zgrain.is_open()) zgrain.open("grain");
 			
 			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
 			switch(vout::grain_output_list[item]){
