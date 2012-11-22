@@ -4019,6 +4019,15 @@ namespace vout{
 				case 22:
 					vout::phonon_temperature(std::cout);
 					break;
+				case 23:
+					vout::material_temperature(std::cout);
+					break;
+				case 24:
+					vout::material_applied_field_strength(std::cout);
+					break;
+				case 25:
+					vout::material_fmr_field_strength(std::cout);
+					break;
 				case 60:
 					vout::MPITimings(std::cout);
 					break;
