@@ -254,6 +254,59 @@ std::vector<double> DoublesFromString(std::string value){
 	
 }
 
+//
+// Function to check for correct unit type and valid variable range
+//-----------------------------------------------------------------------
+//
+void check_for_valid_value(double& value, // value of variable as in input file
+									std::string word, // input file keyword
+									int line, // input file line
+									std::string prefix, // input file prefix
+									std::string unit, // unit specified in input file
+									std::string unit_type, // expected unit type
+									double range_min, // acceptable minimum value for variable
+									double range_max, // acceptable maximum value for variable
+									std::string input_file_type, //input file name
+									std::string range_text) // customised text
+{
+
+	std::cout << "Checking..." << std::endl;
+	// Define test unit
+	std::string test_unit_type=unit_type;
+
+	// Define integer for unit conversion status
+	int convert_status=0;
+
+	// If no unit given, assume internal, otherwise convert to internal units
+	if(unit.size() != 0) convert_status = units::convert(unit,value,test_unit_type);
+
+	// Test for valid conversion
+	if(convert_status==EXIT_FAILURE){
+		std::cerr << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+		zlog << zTs() << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+		err::vexit();
+	}
+
+	// Test for change in unit type in case of wrong unit type
+	if(unit_type!=test_unit_type){
+		std::cerr << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+		zlog << zTs() << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+		err::vexit();
+	}
+
+	// Check for valid range
+	if((fabs(value)<range_min) || (fabs(value)>range_max)){
+		std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+		zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+		err::vexit();
+	}
+
+	std::cout << "Done" << std::endl;
+
+	return;
+
+}
+
 /// @brief Function to read in variables from a file.
 ///
 /// @section License
@@ -1369,15 +1422,13 @@ int match_sim(string const word, string const value, string const unit, int cons
 		test="dt";
 		if(word==test){
 			double dt=atof(value.c_str());
+
 			// Test for valid range
-			if((dt>=1.0E-20) && (dt<1.0E-6)){
-				mp::dt_SI=dt;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 1E-20 - 1.0E-6" << std::endl;
-				err::vexit();
-			}
+			check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
+
+			mp::dt_SI=dt;
+
+			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
 		test="total-time";
@@ -1494,15 +1545,13 @@ int match_sim(string const word, string const value, string const unit, int cons
 		test="cooling-time";
 		if(word==test){
 			double T=atof(value.c_str());
-			// Test for valid range
-			if((T>=0.0) && (T<1.0E10)){
-				sim::cooling_time=T;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
+
+			check_for_valid_value(T, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+
+			sim::cooling_time=T;
+
+			return EXIT_SUCCESS;
+
 		}
 		//--------------------------------------------------------------------
 		test="pump-function";
@@ -1538,15 +1587,13 @@ int match_sim(string const word, string const value, string const unit, int cons
 		test="pump-time";
 		if(word==test){
 			double pt=atof(value.c_str());
-			// Test for valid range
-			if((pt>=0.0) && (pt<1.0E10)){
-				sim::pump_time=pt;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
+			
+			check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+
+			sim::pump_time=pt;
+
+			return EXIT_SUCCESS;
+
 		}
 		//--------------------------------------------------------------------
 		test="pump-power";
@@ -1566,15 +1613,13 @@ int match_sim(string const word, string const value, string const unit, int cons
 		test="double-pump-time";
 		if(word==test){
 			double pt=atof(value.c_str());
-			// Test for valid range
-			if((pt>=0.0) && (pt<1.0E10)){
-				sim::double_pump_time=pt;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
+
+			check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+
+			sim::double_pump_time=pt;
+
+			return EXIT_SUCCESS;
+
 		}
 		//--------------------------------------------------------------------
 		test="double-pump-power";
@@ -1607,16 +1652,14 @@ int match_sim(string const word, string const value, string const unit, int cons
 		//--------------------------------------------------------------------
 		test="double-pump-delay";
 		if(word==test){
-			double pp=atof(value.c_str());
-			// Test for valid range
-			if((pp>=0.0) && (pp<1.0E40)){
-				sim::double_pump_delay=pp;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
+			double pd=atof(value.c_str());
+
+			check_for_valid_value(pd, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+
+			sim::double_pump_delay=pd;
+
+			return EXIT_SUCCESS;
+
 		}
 		//--------------------------------------------------------------------
 		test="heat-sink-coupling";

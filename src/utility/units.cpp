@@ -58,7 +58,7 @@
 ///
 namespace units {
 	
-	const int max_units=35;
+	const int max_units=43;
 
 	const double pi=3.14;
 	//const double bohr_magneton=7.0;
@@ -136,6 +136,15 @@ int init(){
 		unit[32]="uT";			conversion[32]=1.0E-6;		 		type[32]="field";		// microTesla
 		unit[33]="Oe";			conversion[33]=1.0E-4;				type[33]="field";		// Oersted
 		unit[34]="kOe";		conversion[34]=1.0E-1; 				type[34]="field";		// kilo Oersted
+		// Time
+		unit[35]="s";			conversion[35]=1.0;					type[35]="time"; // seconds
+		unit[36]="ms";			conversion[36]=1.0E-3;				type[36]="time"; // milliseconds
+		unit[37]="us";			conversion[37]=1.0E-6;				type[37]="time"; // microseconds
+		unit[38]="ns";			conversion[38]=1.0E-9;				type[38]="time"; // nanoseconds
+		unit[39]="ps";			conversion[39]=1.0E-12;				type[39]="time"; // picoseconds
+		unit[40]="fs";			conversion[40]=1.0E-15;				type[40]="time"; // femtoseconds
+		unit[41]="as";			conversion[41]=1.0E-18;				type[41]="time"; // attoseconds
+		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
 
 		// Set initialised flag
 		units::initialised=true;
@@ -185,13 +194,8 @@ int init(){
 			}
 		}
 
-		// Error if unit not found
-		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
-		zlog << zTs() << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
-		err::vexit();
-		
-		return EXIT_SUCCESS;
-		
+		return EXIT_FAILURE;
+
 	}
 
 /// @brief Converts array of external units to internal units.
