@@ -1762,9 +1762,9 @@ int match_sim(string const word, string const value, string const unit, int cons
 			string str="field";
 			if(unit_type==str){
 				// Check for valid range
-				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
-					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
+				if((fabs(H)<-1.0e4) || (fabs(H)>1.0e4)){
+					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range +/- 10 kT." << std::endl;
+					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range +/- 10 kT." << std::endl;
 					err::vexit();
 				}
 				else
