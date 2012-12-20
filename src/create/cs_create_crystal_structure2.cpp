@@ -114,7 +114,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 									(cy>=vmpi::min_dimensions[1] && cy<vmpi::max_dimensions[1]) &&
 									(cz>=vmpi::min_dimensions[2] && cz<vmpi::max_dimensions[2])){
 						#endif
-							if((cx<=cs::system_dimensions[0]) && (cy<=cs::system_dimensions[1]) && (cz<=cs::system_dimensions[2])){
+							if((cx<cs::system_dimensions[0]) && (cy<cs::system_dimensions[1]) && (cz<cs::system_dimensions[2])){
 							catom_array.push_back(cs::catom_t());
 							catom_array[atom].x=cx;
 							catom_array[atom].y=cy;
@@ -133,7 +133,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							}
 						}
 						else{
-							if((cx<=cs::system_dimensions[0]) && (cy<=cs::system_dimensions[1]) && (cz<=cs::system_dimensions[2])){
+							if((cx<cs::system_dimensions[0]) && (cy<cs::system_dimensions[1]) && (cz<cs::system_dimensions[2])){
 							catom_array.push_back(cs::catom_t());
 							catom_array[atom].x=cx;
 							catom_array[atom].y=cy;
