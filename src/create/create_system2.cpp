@@ -93,6 +93,18 @@ namespace cs{
 	std::string unit_cell_file="";
 	bool fill_core_shell=true;
 	
+	// Variables for interfacial roughness control
+	bool interfacial_roughness=false;
+	bool interfacial_roughness_local_height_field=false;
+	int interfacial_roughness_type=0; // Sets peaks (1), troughs (-1) or both (0)
+	unsigned int interfacial_roughness_random_seed=23456;
+	unsigned int interfacial_roughness_seed_count=20; // Number of seeds
+	double interfacial_roughness_height_field_resolution=3.5; // Angstroms
+	double interfacial_roughness_mean_seed_radius=30.0; // Angstroms
+	double interfacial_roughness_seed_radius_variance=0.5; // Variance as fraction of mean radius
+	double interfacial_roughness_mean_seed_height=3.0; // Angstroms
+	double interfacial_roughness_seed_height_max=1.8; // Angstroms
+	
 	// unit cell container
 	cs::unit_cell_t unit_cell;
 	

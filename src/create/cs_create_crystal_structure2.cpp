@@ -170,31 +170,37 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	// If z-height material selection is enabled then do so
 	if(cs::SelectMaterialByZHeight==true){
 		
-		// determine z-bounds for materials
-		std::vector<double> mat_min(mp::num_materials);
-		std::vector<double> mat_max(mp::num_materials);
-
-		for(int mat=0;mat<mp::num_materials;mat++){
-			mat_min[mat]=mp::material[mat].min*cs::system_dimensions[2];
-			mat_max[mat]=mp::material[mat].max*cs::system_dimensions[2];
-			// alloys generally are not defined by height, and so have max = 0.0
-			if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
-		}
+		// Check for interfacial roughness and call custom material assignment routine
+		if(cs::interfacial_roughness==true) cs::roughness(catom_array);
 		
-		// Assign materials to generated atoms
-		for(unsigned int atom=0;atom<catom_array.size();atom++){
+		// Otherwise perform normal assignement of materials
+		else{
+
+			// determine z-bounds for materials
+			std::vector<double> mat_min(mp::num_materials);
+			std::vector<double> mat_max(mp::num_materials);
+
 			for(int mat=0;mat<mp::num_materials;mat++){
-				const double cz=catom_array[atom].z;
-				if((cz>=mat_min[mat]) && (cz<mat_max[mat])){
-					catom_array[atom].material=mat;
-					catom_array[atom].include=true;
+				mat_min[mat]=mp::material[mat].min*cs::system_dimensions[2];
+				mat_max[mat]=mp::material[mat].max*cs::system_dimensions[2];
+				// alloys generally are not defined by height, and so have max = 0.0
+				if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
+			}
+
+			// Assign materials to generated atoms
+			for(unsigned int atom=0;atom<catom_array.size();atom++){
+				for(int mat=0;mat<mp::num_materials;mat++){
+					const double cz=catom_array[atom].z;
+					if((cz>=mat_min[mat]) && (cz<mat_max[mat])){
+						catom_array[atom].material=mat;
+						catom_array[atom].include=true;
+					}
 				}
 			}
 		}
 
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
-		
 	}
 	
 	// Check to see if any atoms have been generated
@@ -962,7 +968,8 @@ void unit_cell_set(unit_cell_t & unit_cell){
 
 		}
 		else{
-			std::cerr << "Error -  unknown crystal_type" << std::endl; 
+			std::cerr << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl; 
+			zlog << zTs() << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl; 
 			err::vexit();
 		}
 

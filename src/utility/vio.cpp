@@ -212,7 +212,7 @@ namespace vin{
 //int read(string const);
 int match(string const, string const, string const, string const, int const);
   int read_mat_file(std::string const, int const);
-int match_create(std::string const, std::string const, int const);
+int match_create(std::string const, std::string const, std::string const, int const);
 int match_dimension(std::string const, std::string const, std::string const, int const);
 int match_sim(std::string const, std::string const, std::string const, int const);
 int match_vout_list(std::string const, int const, std::vector<unsigned int> &);
@@ -493,7 +493,7 @@ int match(string const key, string const word, string const value, string const 
 	//===================================================================
 	test="create";
 	if(key==test){
-		int frs=vin::match_create(word, value, line);
+		int frs=vin::match_create(word, value, unit, line);
 		return frs;
 	}
 	//===================================================================
@@ -602,10 +602,13 @@ int match(string const key, string const word, string const value, string const 
 
 } // end of match function
 
-int match_create(string const word, string const value, int const line){
+int match_create(string const word, string const value, string const unit, int const line){
 		//-------------------------------------------------------------------
 		// system_creation_flags[1] - Set system particle shape
 		//-------------------------------------------------------------------
+
+		std::string prefix="create:";
+
 		std::string test="full";
 		if(word==test){
 			cs::system_creation_flags[1]=0;
@@ -854,6 +857,113 @@ int match_create(string const word, string const value, int const line){
 			if(value==VFalse){
 				cs::fill_core_shell=false;
 			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness";
+		if(word==test){
+			cs::interfacial_roughness=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::interfacial_roughness=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="material-interfacial-roughness";
+		if(word==test){
+			cs::interfacial_roughness_local_height_field=true; // default
+			// also check for value
+			std::string VFalse="false";
+			if(value==VFalse){
+				cs::interfacial_roughness_local_height_field=false;
+			}
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness-random-seed";
+		if(word==test){
+			unsigned int vs=atoi(value.c_str());
+			cs::interfacial_roughness_random_seed=vs;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness-seed-points";
+		if(word==test){
+			int sc=atoi(value.c_str());
+			if(sc>=0){
+				cs::interfacial_roughness_seed_count=sc;
+				return EXIT_SUCCESS;
+			}
+			else{
+				std::cerr << "Error on line " << line << " of input file: " << prefix << word << " must be a positive integer." << std::endl;
+				zlog << zTs() << "Error on line " << line << " of input file: " << prefix << word << " must be a positive integer." << std::endl;
+				return EXIT_FAILURE;
+			}
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness-type";
+		if(word==test){
+			std::string loctest="peaks";
+			if(value==loctest){
+				cs::interfacial_roughness_type=1;
+				return EXIT_SUCCESS;
+			}
+			else
+			loctest="troughs";
+			if(value==loctest){
+				cs::interfacial_roughness_type=-1;
+				return EXIT_SUCCESS;
+			}
+			else{
+				cs::interfacial_roughness_type=0;
+				return EXIT_SUCCESS;
+			}
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness-seed-radius";
+		if(word==test){
+			double irsr=atof(value.c_str());
+			// Test for valid range
+			check_for_valid_value(irsr, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 1 micrometre");
+			cs::interfacial_roughness_mean_seed_radius=irsr;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness-seed-radius-variance";
+		if(word==test){
+			double irsrv=atof(value.c_str());
+			// Test for valid range
+			check_for_valid_value(irsrv, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+			cs::interfacial_roughness_seed_radius_variance=irsrv;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness-mean-height";
+		if(word==test){
+			double irmh=atof(value.c_str());
+			// Test for valid range
+			check_for_valid_value(irmh, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+			cs::interfacial_roughness_mean_seed_height=irmh;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness-max-height";
+		if(word==test){
+			double shm=atof(value.c_str());
+			// Test for valid range
+			check_for_valid_value(shm, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+			cs::interfacial_roughness_seed_height_max=shm;
+			return EXIT_SUCCESS;
+		}
+		//--------------------------------------------------------------------
+		test="interfacial-roughness-height-field-resolution";
+		if(word==test){
+			double irhfr=atof(value.c_str());
+			// Test for valid range
+			check_for_valid_value(irhfr, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+			cs::interfacial_roughness_height_field_resolution=irhfr;
 			return EXIT_SUCCESS;
 		}
 		//--------------------------------------------------------------------
