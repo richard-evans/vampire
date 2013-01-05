@@ -96,7 +96,7 @@ int init(){
 		using units::unit;
 		using units::conversion;
 		// Distances
-		unit[0]="";				conversion[0]=1.0; 			type[0]="length";		// Default (No conversion)
+		unit[0]="";				conversion[0]=1.0; 			type[0]="none";		// Default (No conversion)
 		unit[1]="A";			conversion[1]=1.0; 			type[1]="length";		// Angstrom (Internal)
 		unit[2]="m";			conversion[2]=1.0E10; 		type[2]="length";		// Metres
 		unit[3]="cm";			conversion[3]=1.0E8; 		type[3]="length";		// Centimetres
