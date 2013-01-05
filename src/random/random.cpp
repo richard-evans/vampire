@@ -243,6 +243,33 @@ double gaussian(){
   return  sign ? x : -x;
 }
 
+// Overloaded gaussian function taking custom random generator
+double gaussianc(MTRand& grnd){
+  unsigned long  U, sign, i, j;
+  double  x, y;
+
+  while (1) {
+    U = grnd.i32();
+    i = U & 0x0000007F;		/* 7 bit to choose the step */
+    sign = U & 0x00000080;	/* 1 bit for the sign */
+    j = U>>8;			/* 24 bit for the x-value */
+
+    x = j*wtab[i];
+    if (j < ktab[i])  break;
+
+    if (i<127) {
+      double  y0, y1;
+      y0 = ytab[i];
+      y1 = ytab[i+1];
+      y = y1+(y0-y1)*grnd();
+    } else {
+      x = PARAM_R - log(1.0-grnd())/PARAM_R;
+      y = exp(-PARAM_R*(x-0.5*PARAM_R))*grnd();
+    }
+    if (y < exp(-0.5*x*x))  break;
+  }
+  return  sign ? x : -x;
+}
 
 } // end of namespace random
 
