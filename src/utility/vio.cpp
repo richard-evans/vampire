@@ -270,7 +270,6 @@ void check_for_valid_value(double& value, // value of variable as in input file
 									std::string range_text) // customised text
 {
 
-	std::cout << "Checking..." << std::endl;
 	// Define test unit
 	std::string test_unit_type=unit_type;
 
@@ -300,8 +299,6 @@ void check_for_valid_value(double& value, // value of variable as in input file
 		zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
 		err::vexit();
 	}
-
-	std::cout << "Done" << std::endl;
 
 	return;
 
