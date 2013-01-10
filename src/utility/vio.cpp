@@ -1988,7 +1988,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 				}
 				else
 				sim::Hinc=H;
-				if(word==deprec) std::cerr << "Warning: Use of" << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
+				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
