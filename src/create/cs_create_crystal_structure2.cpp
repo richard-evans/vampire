@@ -224,7 +224,8 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	if(err::check==true){std::cout << "cs::read_unit_cell has been called" << std::endl;}	
 
 	std::cout << "Reading in unit cell data..." << std::flush;
-
+	zlog << zTs() << "Reading in unit cell data..." << std::flush;
+	
 	// ifstream declaration
 	std::ifstream inputfile;
 	
@@ -234,6 +235,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	// Check for opening
 	if(!inputfile.is_open()){
 		std::cerr << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
+		zlog << zTs() << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
 		err::vexit();
 	}
 
@@ -314,17 +316,35 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					//inputfile >> id >> cx >> cy >> cz >> mat_id >> lcat_id >> hcat_id;
 					// now check for mostly sane input
 					if(cx>=0.0 && cx <=1.0) unit_cell.atom[i].x=cx;
-					else{std::cerr << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					else{
+						std::cerr << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						zlog << zTs() << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						err::vexit();
+					}
 					if(cy>=0.0 && cy <=1.0) unit_cell.atom[i].y=cy;
-					else{std::cerr << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					else{
+						std::cerr << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						zlog << zTs() << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
+									     << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						err::vexit();
+					}
 					if(cz>=0.0 && cz <=1.0) unit_cell.atom[i].z=cz;
-					else{std::cerr << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					else{
+						std::cerr << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
+						<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						zlog << zTs() << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
+										  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						err::vexit();
+					}
 					if(mat_id >=0 && mat_id<mp::num_materials) unit_cell.atom[i].mat=mat_id;
-					else{ std::cerr << "Error! Requested material id " << mat_id << "for atom number " << id <<  " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-" << mp::num_materials << ". Exiting" << std::endl; err::vexit();} 
+					else{ 
+						std::cerr << "Error! Requested material id " << mat_id << "for atom number " << id <<  " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 1-" << mp::num_materials << ". Exiting" << std::endl;  
+						zlog << zTs() << "Error! Requested material id " << mat_id << "for atom number " << id <<  " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 1-" << mp::num_materials << ". Exiting" << std::endl; err::vexit();} 
 					unit_cell.atom[i].lc=lcat_id;
 					unit_cell.atom[i].hc=hcat_id;
 					//std::cout << i << "\t" << id << "\t" << cx << "\t" << cy << "\t" << cz << "\t" << mat_id << "\t" << lcat_id << "\t" << hcat_id << std::endl;
@@ -405,7 +425,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		line_id++;
 	} // end of while loop
 	
-	zlog << zTs() << "Done!" << std::endl;
+	zlog << "Done!" << std::endl;
 	zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
 	zlog << zTs() << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
 	zlog << zTs() << "\t" << "Exchange type: " <<  unit_cell.exchange_type << std::endl;
