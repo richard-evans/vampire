@@ -48,6 +48,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 
 // Standard Libraries
@@ -191,9 +192,11 @@ int run(){
 	if(vmpi::my_rank==0){
 		#ifdef MPICF
 			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
+			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
 			vmpi::start_time=MPI_Wtime(); // reset timer
 		#endif
 		std::cout << "Starting Simulation with Program ";
+		zlog << zTs() << "Starting Simulation with Program ";
 	}
 
 	// Now set initial compute time
@@ -211,62 +214,96 @@ int run(){
 	// Select program to run
 	switch(sim::program){
 		case 0:
-			if(vmpi::my_rank==0) std::cout << "Benchmark..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Benchmark..." << std::endl;
+				zlog << "Benchmark..." << std::endl;
+			}
 			program::bmark();
 			break;
 		
 		case 1:
-			if(vmpi::my_rank==0) std::cout << "Time-Series..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Time-Series..." << std::endl;
+				zlog << "Time-Series..." << std::endl;
+			}
 			program::time_series();
 			break;
 		
 		case 2: 
-			if(vmpi::my_rank==0) std::cout << "Hysteresis-Loop..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Hysteresis-Loop..." << std::endl;
+				zlog << "Hysteresis-Loop..." << std::endl;
+			}
 			program::hysteresis();
 			break;
 			
 		case 3: 
-			if(vmpi::my_rank==0) std::cout << "Static-Hysteresis-Loop..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Static-Hysteresis-Loop..." << std::endl;
+				zlog << "Static-Hysteresis-Loop..." << std::endl;
+			}
 			program::static_hysteresis();
 			break;
 			
 		case 4:
-			if(vmpi::my_rank==0) std::cout << "Curie-Temperature..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Curie-Temperature..." << std::endl;
+				zlog << "Curie-Temperature..." << std::endl;
+			}
 			program::curie_temperature();
 			break;
 			
 		case 5:
-			if(vmpi::my_rank==0) std::cout << "Field-Cool..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Field-Cool..." << std::endl;
+				zlog << "Field-Cool..." << std::endl;
+			}
 			program::field_cool();
 			break;
 
 		case 6:
-			if(vmpi::my_rank==0) std::cout << "Temperature-Pulse..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Temperature-Pulse..." << std::endl;
+				zlog << "Temperature-Pulse..." << std::endl;
+			}
 			program::temperature_pulse();
 			break;
 			
 		case 7:
-			if(vmpi::my_rank==0) std::cout << "HAMR-Simulation..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "HAMR-Simulation..." << std::endl;
+				zlog << "HAMR-Simulation..." << std::endl;
+			}
 			program::hamr();
 			break;
 			
 		case 8:
-			if(vmpi::my_rank==0) std::cout << "CMC-Anisotropy..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "CMC-Anisotropy..." << std::endl;
+				zlog << "CMC-Anisotropy..." << std::endl;
+			}
 			program::cmc_anisotropy();
 			break;
 			
 		case 9:
-			if(vmpi::my_rank==0) std::cout << "Hybrid-CMC..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Hybrid-CMC..." << std::endl;
+				zlog << "Hybrid-CMC..." << std::endl;
+			}
 			program::hybrid_cmc();
 			break;
 			
 		case 50:
-			if(vmpi::my_rank==0) std::cout << "Diagnostic-Boltzmann..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Diagnostic-Boltzmann..." << std::endl;
+				zlog << "Diagnostic-Boltzmann..." << std::endl;
+			}
 			program::boltzmann_dist();
 			break;
 		
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
+			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);
 			}
 	}
