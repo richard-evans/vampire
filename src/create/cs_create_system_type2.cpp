@@ -71,6 +71,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	void dilute(std::vector<cs::catom_t> &);
 	void geometry(std::vector<cs::catom_t> &);
 	void roughness(std::vector<cs::catom_t> &);
+	void calculate_atomic_composition(std::vector<cs::catom_t> &);
 
 	//int particle_array(int,int**,int*);
 	//int hex_particle_array(int,int**,int*);
@@ -142,6 +143,9 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
 		
+		// Calculate final atomic composition
+		calculate_atomic_composition(catom_array);
+
 		// Check for zero atoms generated
 		if(catom_array.size()==0){
 			std::cerr << "Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!" << std::endl;
@@ -556,8 +560,6 @@ int alloy(std::vector<cs::catom_t> & catom_array){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::alloy has been called" << std::endl;}	
 
-	zlog<< zTs() << "Determining alloy concentrations" << std::endl; 
-
 	// loop over all atoms
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
 		// if atom material is alloy master then reassign according to % chance
@@ -591,12 +593,22 @@ int alloy(std::vector<cs::catom_t> & catom_array){
 		}
 	}
 
+	return EXIT_SUCCESS;	
+}
+
+void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
+
+	zlog<< zTs() << "Determining atomic composition" << std::endl;
+
 	// Determine number of atoms of each class and output to log
 	std::vector<unsigned int> MaterialNumbers(mp::num_materials,0);
 	for(unsigned int atom=0;atom<catom_array.size();atom++) MaterialNumbers.at(catom_array[atom].material)++;
+	
+	// Output composition to log file 
 	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
 
-	return EXIT_SUCCESS;	
+	return;
+
 }
 
 int intermixing(std::vector<cs::catom_t> & catom_array){
