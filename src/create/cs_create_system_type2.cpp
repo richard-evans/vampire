@@ -907,10 +907,8 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 				for(unsigned int atom=0;atom<catom_array.size();atom++){
 					double x = catom_array[atom].x;
 					double y = catom_array[atom].y;
-					double z = catom_array[atom].z;
-
-					const double cz=catom_array[atom].z;
-					if((cz>=mat_min[mat]) && (cz<mat_max[mat]) && (vmath::point_in_polygon2(x,y,px,py,geo)==true)){
+					const double z = catom_array[atom].z;
+					if((z>=mat_min[mat]) && (z<mat_max[mat]) && (vmath::point_in_polygon2(x,y,px,py,geo)==true)){
 						catom_array[atom].material=mat;
 						catom_array[atom].include=true;
 					}
