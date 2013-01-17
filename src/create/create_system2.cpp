@@ -85,7 +85,8 @@ namespace cs{
 	int particle_creation_parity=0; // Offset of particle centre (odd/even)
 	double particle_scale=50.0;     // Diameter of particles/grains (A)
 	double particle_spacing=10.0;   // Spacing Between particles (A)
-
+	double particle_array_offset_x=0.0; // Offset particle array along x-direction;
+	double particle_array_offset_y=0.0; // Offset particle array along y-direction;
 
 	// Other directives and flags
 	bool single_spin=false;

@@ -74,6 +74,8 @@ namespace cs{
 	extern int particle_creation_parity;
 	extern double particle_scale;
 	extern double particle_spacing;
+	extern double particle_array_offset_x; // Offset particle array along x-direction;
+	extern double particle_array_offset_y; // Offset particle array along y-direction;
 
 	// Other directives and flags
 	extern bool single_spin;

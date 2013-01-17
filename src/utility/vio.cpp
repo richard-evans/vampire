@@ -981,6 +981,8 @@ int match_dimension(string const word, string const value, string const unit, in
 		//-------------------------------------------------------------------
 		// System dimension variables
 		//-------------------------------------------------------------------
+		std::string prefix="dimension:";
+		
 		std::string test="a";
 		if(word==test){
 			double a=atof(value.c_str());
@@ -1179,6 +1181,34 @@ int match_dimension(string const word, string const value, string const unit, in
 				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
 				err::vexit();
 			}
+		}
+		else
+		//--------------------------------------------------------------------
+		test="particle-array-offset-x";
+		if(word==test){
+			double paox=atof(value.c_str());
+
+			// Test for valid range
+			check_for_valid_value(paox, word, line, prefix, unit, "length", 0.0, 1.0e4,"input","0.0 - 1.0 micrometre");
+
+			// If within valid range assign value and return
+			cs::particle_array_offset_x=paox;
+
+			return EXIT_SUCCESS;
+		}
+		else
+		//--------------------------------------------------------------------
+		test="particle-array-offset-y";
+		if(word==test){
+			double paoy=atof(value.c_str());
+
+			// Test for valid range
+			check_for_valid_value(paoy, word, line, prefix, unit, "length", 0.0, 1.0e4,"input","0.0 - 1.0 micrometre");
+
+			// If within valid range assign value and return
+			cs::particle_array_offset_y=paoy;
+
+			return EXIT_SUCCESS;
 		}
 		else
 		//--------------------------------------------------------------------

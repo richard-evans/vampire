@@ -233,7 +233,6 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 	//
 	//							Version 1.0 R Evans 23/09/2008
 	//
-	//					Note: particle counter doesn't do anything (yet)
 	//
 	//====================================================================================
 
@@ -242,9 +241,8 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 
 	// Set number of particles in x and y directions
 	const double repeat_size = cs::particle_scale+cs::particle_spacing;
-	int num_x_particle = vmath::iround(cs::system_dimensions[0]/repeat_size);
-	int num_y_particle = vmath::iround(cs::system_dimensions[1]/repeat_size);
-	
+	int num_x_particle = vmath::iceil(cs::system_dimensions[0]/repeat_size);
+	int num_y_particle = vmath::iceil(cs::system_dimensions[1]/repeat_size);
 
 	// Loop to generate cubic lattice points
 	int particle_number=0;
@@ -253,13 +251,10 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 		for (int y_particle=0;y_particle < num_y_particle;y_particle++){
 
 			double particle_origin[3];
-			// find centre unit cell
-			//particle_origin[0] = double(iround(cs::system_dimensions[0]/(2.0*cs::unit_cell_size[0])))*cs::unit_cell_size[0];
-			//particle_origin[1] = double(iround(cs::system_dimensions[1]/(2.0*cs::unit_cell_size[1])))*cs::unit_cell_size[1];
-			//particle_origin[2] = double(iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
+
 			// Determine particle origin
-			particle_origin[0] = double(x_particle)*repeat_size + repeat_size;
-			particle_origin[1] = double(y_particle)*repeat_size + repeat_size;
+			particle_origin[0] = double(x_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_x;
+			particle_origin[1] = double(y_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_y;
 			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
 
 			if(cs::particle_creation_parity==1){
@@ -268,8 +263,8 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 				particle_origin[2]+=unit_cell.dimensions[2]*0.5;
 			}
 			// Check to see if a complete particle fits within the system bounds
-			if((particle_origin[0]<(cs::system_dimensions[0]-cs::particle_scale)) &&
-				(particle_origin[1]<(cs::system_dimensions[1]-cs::particle_scale))){
+			if((particle_origin[0]<=(cs::system_dimensions[0]-cs::particle_scale*0.5)) &&
+				(particle_origin[1]<=(cs::system_dimensions[1]-cs::particle_scale*0.5))){
 
 				// Use particle type flags to determine which particle shape to cut
 				switch(cs::system_creation_flags[1]){
@@ -301,12 +296,17 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 		}
 	}
 	grains::num_grains = particle_number;
-	
-	// Clear unneeded atoms
-	//clear_atoms(catom_array);
+
+	// Check for no generated particles and print error message
+	if(particle_number==0){
+		zlog << zTs() << "Error: no particles generated in particle array." << std::endl; 
+		zlog << zTs() << "Info: Particle arrays require that at least 1 complete particle fits within the system dimensions." << std::endl;
+		zlog << zTs() << "Info: Increase x and y system dimensions to at least one particle-scale." << std::endl;
+	}
+
 	// Re-order atoms by particle number
 	sort_atoms_by_grain(catom_array);
-	
+
 	return EXIT_SUCCESS;	
 }
 /*

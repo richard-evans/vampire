@@ -239,6 +239,21 @@ int set_derived_parameters(){
 		sim::H_vec[2]=cos(sim::applied_field_angle_phi*M_PI/180.0);
 	}
 	
+	// Check for valid particle array offsets
+	if(cs::particle_array_offset_x >= cs::system_dimensions[0]){
+		std::cerr << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl; 
+		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		zlog << zTs() << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl; 
+		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+	}
+	if(cs::particle_array_offset_y >= cs::system_dimensions[1]){
+		std::cerr << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl; 
+		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		zlog << zTs() << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl; 
+		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+	}
+	
+	
 	// Ensure H vector is unit length
 	// **RE edit 21.11.12 - no longer necessary as value checked on user input**
 	//double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
