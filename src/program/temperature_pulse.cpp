@@ -108,7 +108,7 @@ double double_pump_two_temperature_function(double ftime){
 		const double pump1=sim::pump_power*exp(-reduced_time*reduced_time);
 
 		const double reduced_time2 =  (ftime-sim::double_pump_delay-3.*sim::double_pump_time)/(sim::double_pump_time);
-		const double pump2=sim::pump_power*exp(-reduced_time2*reduced_time2);
+		const double pump2=sim::double_pump_power*exp(-reduced_time2*reduced_time2);
 
 		const double Te = sim::TTTe;
 		const double Tp = sim::TTTp;
