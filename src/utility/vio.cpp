@@ -2690,6 +2690,18 @@ int match_vout_grain_list(string const word, string const value, int const line,
 			output_list.push_back(13);
 			return EXIT_SUCCESS;
 		}
+		//-------------------------------------------------------------------
+		test="electron-temperature"; // identical to temperature
+		if(word==test){
+			output_list.push_back(2);
+			return EXIT_SUCCESS;
+		}
+		//-------------------------------------------------------------------
+		test="phonon-temperature";
+		if(word==test){
+			output_list.push_back(22);
+			return EXIT_SUCCESS;
+		}
 		else
 		//-------------------------------------------------------------------
 		test="output-rate";
