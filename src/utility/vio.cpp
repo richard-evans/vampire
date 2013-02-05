@@ -1791,7 +1791,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 		if(word==test){
 			double pd=atof(value.c_str());
 
-			check_for_valid_value(pd, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+			check_for_valid_value(pd, word, line, prefix, unit, "time", 0.0, 1.0,"input","0 - 1 s");
 
 			sim::double_pump_delay=pd;
 
