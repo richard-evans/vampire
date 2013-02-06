@@ -4249,6 +4249,9 @@ namespace vout{
 				case 13:
 					vout::grain_mat_mvec(zgrain);
 					break;
+			        case 22:
+					vout::phonon_temperature(zgrain);
+                                        break;
 			}
 		}
 		
