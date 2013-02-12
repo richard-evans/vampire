@@ -293,6 +293,14 @@ int run(){
 			program::hybrid_cmc();
 			break;
 			
+      case 10:
+         if(vmpi::my_rank==0){
+            std::cout << "Reverse-Hybrid-CMC..." << std::endl;
+            zlog << "Reverse-Hybrid-CMC..." << std::endl;
+         }
+         program::reverse_hybrid_cmc();
+         break;
+
 		case 50:
 			if(vmpi::my_rank==0){
 				std::cout << "Diagnostic-Boltzmann..." << std::endl;

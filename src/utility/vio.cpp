@@ -83,7 +83,6 @@ namespace vout{
 	std::string zLogHostName; // Host Name
 	pid_t 		zLogPid; // Process ID
 	bool			zLogInitialised=false; // Initialised flag
-	
 	//const char * StringStream2ConstChar(std::stringstream file_sstr){
 	//	static std::string cfg_file = file_sstr.str();
 	//	return cfg_file.c_str();
@@ -1342,7 +1341,12 @@ int match_sim(string const word, string const value, string const unit, int cons
 				sim::program=9;
 				return EXIT_SUCCESS;
 			}
-			test="Diagnostic-Boltzmann";
+         test="Reverse-Hybrid-CMC";
+         if(value==test){
+            sim::program=10;
+            return EXIT_SUCCESS;
+         }
+         test="Diagnostic-Boltzmann";
 			if(value==test){
 				sim::program=50;
 				return EXIT_SUCCESS;
@@ -1357,6 +1361,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 				std::cerr << "\t\"Two-Temperature-Pulse\"" << std::endl;
 				std::cerr << "\t\"CMC-Anisotropy\"" << std::endl;
 				std::cerr << "\t\"Hybrid-CMC\"" << std::endl;
+            std::cerr << "\t\"Reverse-Hybrid-CMC\"" << std::endl;
 				err::vexit();
 			}
 		}
