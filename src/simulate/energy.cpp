@@ -86,7 +86,7 @@ namespace sim{
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_exchange_energy_isotropic(const int atom, const double Sx, const double Sy, const double Sz){
+double spin_exchange_energy_isotropic(const int atom, const double Sx, const double Sy, const double Sz){
 	
 	// energy
 	double energy=0.0;
@@ -126,7 +126,7 @@ inline double spin_exchange_energy_isotropic(const int atom, const double Sx, co
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_exchange_energy_vector(const int atom, const double Sx, const double Sy, const double Sz){
+double spin_exchange_energy_vector(const int atom, const double Sx, const double Sy, const double Sz){
 	
 	// energy
 	double energy=0.0;
@@ -168,7 +168,7 @@ inline double spin_exchange_energy_vector(const int atom, const double Sx, const
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_exchange_energy_tensor(const int atom, const double Sx, const double Sy, const double Sz){
+double spin_exchange_energy_tensor(const int atom, const double Sx, const double Sy, const double Sz){
 	
 	// energy
 	double energy=0.0;
@@ -224,7 +224,7 @@ inline double spin_exchange_energy_tensor(const int atom, const double Sx, const
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_scalar_anisotropy_energy(const int imaterial, const double Sz){
+double spin_scalar_anisotropy_energy(const int imaterial, const double Sz){
 	
 	return mp::MaterialScalarAnisotropyArray[imaterial].K*Sz*Sz;
 	
@@ -236,7 +236,7 @@ inline double spin_scalar_anisotropy_energy(const int imaterial, const double Sz
 //                ( eyex eyey eyez ) ( Sy ) = SxexexSx + SxexeySy + SxexezSz + SyeyexSx + SyeyeySy + SyeyezSz + SzezexSx + SzezeySy + SzezezSz
 //                ( ezex ezey ezez ) ( Sz )
 //
-inline double spin_tensor_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
+double spin_tensor_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
 	const double K[3][3]={mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
 								 mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
 								 mp::MaterialTensorAnisotropyArray[imaterial].K[0][2],
@@ -255,7 +255,7 @@ inline double spin_tensor_anisotropy_energy(const int imaterial, const double Sx
 	
 }
 
-inline double spin_cubic_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
+double spin_cubic_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
 	//------------------------------------------------------
 	// 	Function to calculate cubic anisotropy energy
 	//
@@ -292,7 +292,7 @@ inline double spin_cubic_anisotropy_energy(const int imaterial, const double Sx,
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_applied_field_energy(const double Sx, const double Sy, const double Sz){;
+double spin_applied_field_energy(const double Sx, const double Sy, const double Sz){;
 
 	return -sim::H_applied*(sim::H_vec[0]*Sx + sim::H_vec[1]*Sy + sim::H_vec[2]*Sz);
 
@@ -321,7 +321,7 @@ inline double spin_applied_field_energy(const double Sx, const double Sy, const 
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_surface_anisotropy_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){
+double spin_surface_anisotropy_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){
 	
 	double energy=0.0;
 
@@ -359,7 +359,7 @@ inline double spin_surface_anisotropy_energy(const int atom, const int imaterial
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-inline double spin_magnetostatic_energy(const int atom, const double Sx, const double Sy, const double Sz){
+double spin_magnetostatic_energy(const int atom, const double Sx, const double Sy, const double Sz){
 	
 	return -1.0*(atoms::x_dipolar_field_array[atom]*Sx+atoms::y_dipolar_field_array[atom]*Sy+atoms::z_dipolar_field_array[atom]*Sz);
 }

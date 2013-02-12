@@ -148,6 +148,15 @@ namespace sim{
 	
 	// Field and energy functions
 	extern double calculate_spin_energy(const int, const int);
+   extern double spin_exchange_energy_isotropic(const int, const double, const double , const double );
+   extern double spin_exchange_energy_vector(const int, const double, const double, const double);
+   extern double spin_exchange_energy_tensor(const int, const double, const double, const double);
+   extern double spin_scalar_anisotropy_energy(const int, const double);
+   extern double spin_cubic_anisotropy_energy(const int, const double, const double, const double);
+   extern double spin_tensor_anisotropy_energy(const int, const double, const double, const double);
+   extern double spin_surface_anisotropy_energy(const int, const int, const double, const double, const double);
+   extern double spin_applied_field_energy(const double, const double, const double);
+   extern double spin_magnetostatic_energy(const int, const double, const double, const double);
 
 }
 
