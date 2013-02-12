@@ -51,6 +51,8 @@
 #include "errors.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "sim.hpp"
+#include "stats.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -88,6 +90,26 @@ namespace stats
 	std::vector <double> sublattice_mom_array(0);
 	std::vector <int> sublattice_nm_array(0);
 	
+	// energy
+   double total_energy                    = 0.0;
+   double total_exchange_energy           = 0.0;
+   double total_anisotropy_energy         = 0.0;
+   double total_cubic_anisotropy_energy   = 0.0;
+   double total_surface_anisotropy_energy = 0.0;
+   double total_applied_field_energy      = 0.0;
+   double total_magnetostatic_energy      = 0.0;
+
+   double mean_total_energy                    = 0.0;
+   double mean_total_exchange_energy           = 0.0;
+   double mean_total_anisotropy_energy         = 0.0;
+   double mean_total_cubic_anisotropy_energy   = 0.0;
+   double mean_total_surface_anisotropy_energy = 0.0;
+   double mean_total_applied_field_energy      = 0.0;
+   double mean_total_magnetostatic_energy     = 0.0;
+
+   double energy_data_counter = 0.0;
+   bool calculate_energy = false;
+
 	// torque calculation
 	bool calculate_torque=false;
 	double total_system_torque[3]={0.0,0.0,0.0};
@@ -109,6 +131,7 @@ namespace stats
 	// function prototypes
 	void system_torque();
 	void SystemSusceptibility();
+	void system_energy();
 	
 	bool is_initialised=false;
 
@@ -216,6 +239,9 @@ int mag_m(){
 	//optionally calculate system susceptibility
 	if(stats::CalculateSusceptibility==true) stats::SystemSusceptibility();
 	
+   // optionally calculate energy
+   if(stats::calculate_energy==true) stats::system_energy();
+
 	//---------------------------------------------------------
 	// For single material, use streamlined version for speed
 	//---------------------------------------------------------
@@ -384,6 +410,17 @@ void mag_m_reset(){
 	}
 	stats::torque_data_counter=0.0;
 	
+   // Reset energy data
+   stats::mean_total_energy                    = 0.0;
+   stats::mean_total_exchange_energy           = 0.0;
+   stats::mean_total_anisotropy_energy         = 0.0;
+   stats::mean_total_cubic_anisotropy_energy   = 0.0;
+   stats::mean_total_surface_anisotropy_energy = 0.0;
+   stats::mean_total_applied_field_energy      = 0.0;
+   stats::mean_total_magnetostatic_energy      = 0.0;
+
+   stats::energy_data_counter=0.0;
+
 	// Reset Chi Data
 	stats::MeanChi[0]=0.0;
 	stats::MeanChi[1]=0.0;
@@ -501,6 +538,237 @@ void system_torque(){
 	stats::torque_data_counter+=1.0;
 	return;
 
+}
+
+//---------------------------------------------------------------------------
+//
+//                     Function to calculate system energy
+//
+//        Wraps the single spin energy functions used for MC calculation
+//
+//---------------------------------------------------------------------------
+void system_energy(){
+
+   // Reinitialise stats values
+   stats::total_energy=0.0;
+   stats::total_exchange_energy=0.0;
+   stats::total_anisotropy_energy=0.0;
+   stats::total_cubic_anisotropy_energy=0.0;
+   stats::total_surface_anisotropy_energy=0.0;
+   stats::total_applied_field_energy=0.0;
+   stats::total_magnetostatic_energy=0.0;
+
+   //------------------------------
+   // Calculate exchange energy
+   //------------------------------
+   if(atoms::exchange_type==0){ // Isotropic
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         double Sx=atoms::x_spin_array[atom];
+         double Sy=atoms::y_spin_array[atom];
+         double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_exchange_energy_isotropic(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_exchange_energy=energy;
+   }
+   else if(atoms::exchange_type==1){ // Anisotropic
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         double Sx=atoms::x_spin_array[atom];
+         double Sy=atoms::y_spin_array[atom];
+         double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_exchange_energy_vector(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_exchange_energy=energy;
+   }
+   else if(atoms::exchange_type==2){ // Tensor
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         double Sx=atoms::x_spin_array[atom];
+         double Sy=atoms::y_spin_array[atom];
+         double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_exchange_energy_tensor(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_exchange_energy=energy;
+   }
+   //------------------------------
+   // Calculate anisotropy energy
+   //------------------------------
+   if(sim::AnisotropyType==0){ // Isotropic
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         const double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_scalar_anisotropy_energy(imaterial, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_anisotropy_energy=energy;
+   }
+   else if(sim::AnisotropyType==1){ // Tensor
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         const double Sx=atoms::x_spin_array[atom];
+         const double Sy=atoms::y_spin_array[atom];
+         const double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_tensor_anisotropy_energy(imaterial, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_anisotropy_energy=energy;
+   }
+   //------------------------------
+   // Calculate other energy
+   //------------------------------
+   if(sim::CubicScalarAnisotropy==true){
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         const double Sx=atoms::x_spin_array[atom];
+         const double Sy=atoms::y_spin_array[atom];
+         const double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_cubic_anisotropy_energy(imaterial, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_cubic_anisotropy_energy=energy;
+   }
+   if(sim::surface_anisotropy==true){
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         const double Sx=atoms::x_spin_array[atom];
+         const double Sy=atoms::y_spin_array[atom];
+         const double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_surface_anisotropy_energy=energy;
+   }
+   {
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         const double Sx=atoms::x_spin_array[atom];
+         const double Sy=atoms::y_spin_array[atom];
+         const double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_applied_field_energy(Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_applied_field_energy=energy;
+   }
+   {
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         const double Sx=atoms::x_spin_array[atom];
+         const double Sy=atoms::y_spin_array[atom];
+         const double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_magnetostatic_energy(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_magnetostatic_energy=energy;
+   }
+
+   // Calculate total energy
+   stats::total_energy = stats::total_exchange_energy +
+                         stats::total_anisotropy_energy +
+                         stats::total_cubic_anisotropy_energy +
+                         stats::total_surface_anisotropy_energy +
+                         stats::total_applied_field_energy +
+                         stats::total_magnetostatic_energy;
+
+   // reduce energies to root node
+   #ifdef MPICF
+      MPI_Reduce(MPI_IN_PLACE, &stats::total_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &stats::total_exchange_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &stats::total_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &stats::total_cubic_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &stats::total_surface_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &stats::total_applied_field_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &stats::total_magnetostatic_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+   #endif
+
+   // Add calculated values to mean
+   stats::mean_total_energy                    += stats::total_energy;
+   stats::mean_total_exchange_energy           += stats::total_exchange_energy;
+   stats::mean_total_anisotropy_energy         += stats::total_anisotropy_energy;
+   stats::mean_total_cubic_anisotropy_energy   += stats::total_cubic_anisotropy_energy;
+   stats::mean_total_surface_anisotropy_energy += stats::total_surface_anisotropy_energy;
+   stats::mean_total_applied_field_energy      += stats::total_applied_field_energy;
+   stats::mean_total_magnetostatic_energy      += stats::total_magnetostatic_energy;
+
+   stats::energy_data_counter+=1.0;
+
+}
+
+//----------------------------------------------------------------------
+// Master function to output energy variables to stream
+//----------------------------------------------------------------------
+void output_energy(std::ostream& stream, enum energy_t energy_type, enum stat_t stat_type){
+
+   switch(stat_type){
+      case total :
+      {
+         switch(energy_type){
+            case all :
+               stream << stats::total_energy << "\t";
+               break;
+            case exchange :
+               stream << stats::total_exchange_energy << "\t";
+               break;
+            case anisotropy :
+               stream << stats::total_anisotropy_energy << "\t";
+               break;
+            case cubic_anisotropy :
+               stream << stats::total_cubic_anisotropy_energy << "\t";
+               break;
+            case surface_anisotropy :
+               stream << stats::total_surface_anisotropy_energy << "\t";
+               break;
+            case applied_field :
+               stream << stats::total_applied_field_energy << "\t";
+               break;
+            case magnetostatic :
+               stream << stats::total_magnetostatic_energy << "\t";
+               break;
+            default :
+               stream << "PE:Unknown:energy_t\t";
+               break;
+         }
+         break;
+      }
+      case mean :
+      {
+         switch(energy_type){
+            case all :
+               stream << stats::mean_total_energy/stats::energy_data_counter << "\t";
+               break;
+            case exchange :
+               stream << stats::mean_total_exchange_energy/stats::energy_data_counter << "\t";
+               break;
+            case anisotropy :
+               stream << stats::mean_total_anisotropy_energy/stats::energy_data_counter << "\t";
+               break;
+            case cubic_anisotropy :
+               stream << stats::mean_total_cubic_anisotropy_energy/stats::energy_data_counter << "\t";
+               break;
+            case surface_anisotropy :
+               stream << stats::mean_total_surface_anisotropy_energy/stats::energy_data_counter << "\t";
+               break;
+            case applied_field :
+               stream << stats::mean_total_applied_field_energy/stats::energy_data_counter << "\t";
+               break;
+            case magnetostatic :
+               stream << stats::mean_total_magnetostatic_energy/stats::energy_data_counter << "\t";
+               break;
+            default :
+               stream << "PE:Unknown:energy_t\t";
+               break;
+         }
+         break;
+      }
+      default :
+         stream << "PE:Unknown:stat_t\t";
+         break;
+   }
+
+   return;
 }
 
 ///

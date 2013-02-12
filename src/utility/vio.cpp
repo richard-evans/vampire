@@ -2615,7 +2615,105 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(26);
 			return EXIT_SUCCESS;
 		}
-		test="MPI-Timings";
+      //-------------------------------------------------------------------
+      test="total-energy";
+      if(word==test){
+         output_list.push_back(27);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-total-energy";
+      if(word==test){
+         output_list.push_back(28);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="anisotropy-energy";
+      if(word==test){
+         output_list.push_back(29);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(30);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="cubic-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(31);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-cubic-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(32);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="surface-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(33);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-surface-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(34);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="exchange-energy";
+      if(word==test){
+         output_list.push_back(35);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-exchange-energy";
+      if(word==test){
+         output_list.push_back(36);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="applied-field-energy";
+      if(word==test){
+         output_list.push_back(37);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-applied-field-energy";
+      if(word==test){
+         output_list.push_back(38);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="magnetostatic-energy";
+      if(word==test){
+         output_list.push_back(39);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-magnetostatic-energy";
+      if(word==test){
+         output_list.push_back(40);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      test="MPI-Timings";
 		if(word==test){
 			vmpi::DetailedMPITiming=true;
 			output_list.push_back(60);
@@ -4005,7 +4103,77 @@ namespace vout{
 		}
 	}
 	
-	// Output Function 60
+   // Output Function 27
+   void total_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::all, stats::total);
+   }
+
+   // Output Function 28
+   void mean_total_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::all, stats::mean);
+   }
+
+   // Output Function 29
+   void total_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::anisotropy, stats::total);
+   }
+
+   // Output Function 30
+   void mean_total_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::anisotropy, stats::mean);
+   }
+
+   // Output Function 31
+   void total_cubic_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::cubic_anisotropy, stats::total);
+   }
+
+   // Output Function 32
+   void mean_total_cubic_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::cubic_anisotropy, stats::mean);
+   }
+
+   // Output Function 33
+   void total_surface_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::surface_anisotropy, stats::total);
+   }
+
+   // Output Function 34
+   void mean_total_surface_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::surface_anisotropy, stats::mean);
+   }
+
+   // Output Function 35
+   void total_exchange_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::exchange, stats::total);
+   }
+
+   // Output Function 36
+   void mean_total_exchange_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::exchange, stats::mean);
+   }
+
+   // Output Function 37
+   void total_applied_field_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::applied_field, stats::total);
+   }
+
+   // Output Function 38
+   void mean_total_applied_field_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::applied_field, stats::mean);
+   }
+
+   // Output Function 39
+   void total_magnetostatic_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::magnetostatic, stats::total);
+   }
+
+   // Output Function 40
+   void mean_total_magnetostatic_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::magnetostatic, stats::mean);
+   }
+
+   // Output Function 60
 	void MPITimings(std::ostream& stream){
 
 		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
@@ -4117,7 +4285,49 @@ namespace vout{
 				case 26:
 					vout::mat_mdoth(zmag);
 					break;
-				case 60:
+            case 27:
+               vout::total_energy(zmag);
+               break;
+            case 28:
+               vout::mean_total_energy(zmag);
+               break;
+            case 29:
+               vout::total_anisotropy_energy(zmag);
+               break;
+            case 30:
+               vout::mean_total_anisotropy_energy(zmag);
+               break;
+            case 31:
+               vout::total_cubic_anisotropy_energy(zmag);
+               break;
+            case 32:
+               vout::mean_total_cubic_anisotropy_energy(zmag);
+               break;
+            case 33:
+               vout::total_surface_anisotropy_energy(zmag);
+               break;
+            case 34:
+               vout::mean_total_surface_anisotropy_energy(zmag);
+               break;
+            case 35:
+               vout::total_exchange_energy(zmag);
+               break;
+            case 36:
+               vout::mean_total_exchange_energy(zmag);
+               break;
+            case 37:
+               vout::total_applied_field_energy(zmag);
+               break;
+            case 38:
+               vout::mean_total_applied_field_energy(zmag);
+               break;
+            case 39:
+               vout::total_magnetostatic_energy(zmag);
+               break;
+            case 40:
+               vout::mean_total_magnetostatic_energy(zmag);
+               break;
+            case 60:
 					vout::MPITimings(zmag);
 					break;
 			}
@@ -4202,7 +4412,49 @@ namespace vout{
 				case 26:
 					vout::mat_mdoth(std::cout);
 					break;
-				case 60:
+            case 27:
+               vout::total_energy(std::cout);
+               break;
+            case 28:
+               vout::mean_total_energy(std::cout);
+               break;
+            case 29:
+               vout::total_anisotropy_energy(std::cout);
+               break;
+            case 30:
+               vout::mean_total_anisotropy_energy(std::cout);
+               break;
+            case 31:
+               vout::total_cubic_anisotropy_energy(std::cout);
+               break;
+            case 32:
+               vout::mean_total_cubic_anisotropy_energy(std::cout);
+               break;
+            case 33:
+               vout::total_surface_anisotropy_energy(std::cout);
+               break;
+            case 34:
+               vout::mean_total_surface_anisotropy_energy(std::cout);
+               break;
+            case 35:
+               vout::total_exchange_energy(std::cout);
+               break;
+            case 36:
+               vout::mean_total_exchange_energy(std::cout);
+               break;
+            case 37:
+               vout::total_applied_field_energy(std::cout);
+               break;
+            case 38:
+               vout::mean_total_applied_field_energy(std::cout);
+               break;
+            case 39:
+               vout::total_magnetostatic_energy(std::cout);
+               break;
+            case 40:
+               vout::mean_total_magnetostatic_energy(std::cout);
+               break;
+            case 60:
 					vout::MPITimings(std::cout);
 					break;
 			}
