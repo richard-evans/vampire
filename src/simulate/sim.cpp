@@ -58,7 +58,7 @@ namespace sim{
 	std::ofstream mag_file;
 	int time=0;
 	int total_time=10000;
-	int loop_time=0;
+	int loop_time=10000;
 	int partial_time=1000;
 	int equilibration_time=0;
 	int runs=1; // for certain repetitions in programs
