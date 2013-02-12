@@ -982,6 +982,7 @@ int match_dimension(string const word, string const value, string const unit, in
 		// System dimension variables
 		//-------------------------------------------------------------------
 		std::string prefix="dimension:";
+      std::string none = "none";
 		
 		std::string test="a";
 		if(word==test){
@@ -989,7 +990,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,a,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::unit_cell_size[0]=a;
 				cs::unit_cell_size[1]=a;
 				cs::unit_cell_size[2]=a;
@@ -997,7 +998,7 @@ int match_dimension(string const word, string const value, string const unit, in
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1008,13 +1009,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,c,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::unit_cell_size[2]=c;
 				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1026,13 +1027,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,ax,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::unit_cell_size[0]=ax;
 				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1044,13 +1045,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,ay,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::unit_cell_size[1]=ay;
 				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1062,13 +1063,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,az,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::unit_cell_size[2]=az;
 				//std::cout << "az: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1080,7 +1081,7 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,d,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::system_dimensions[0]=d;
 				cs::system_dimensions[1]=d;
 				cs::system_dimensions[2]=d;
@@ -1088,7 +1089,7 @@ int match_dimension(string const word, string const value, string const unit, in
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1100,13 +1101,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,dx,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::system_dimensions[0]=dx;
 				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1118,13 +1119,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,dy,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::system_dimensions[1]=dy;
 				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1136,13 +1137,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,dz,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::system_dimensions[2]=dz;
 				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
 				err::vexit();
 			}
 		}
@@ -1154,13 +1155,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,psize,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::particle_scale=psize;
 				//std::cout << "particle_size: " << mp::particle_scale << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1172,13 +1173,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,pspacing,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cs::particle_spacing=pspacing;
 				//std::cout << "particle_spacing: " << mp::particle_spacing << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
@@ -1218,13 +1219,13 @@ int match_dimension(string const word, string const value, string const unit, in
 			string unit_type;
 			units::convert(unit,cs,unit_type);
 			string str="length";
-			if(unit_type==str){
+			if(unit_type==str || unit_type==none){
 				cells::size=cs;
 				//std::cout << "cell size: " << cells::size << std::endl;
 				return EXIT_SUCCESS;
 			}
 			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << std::endl;
+				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
 				err::vexit();
 			}
 		}
