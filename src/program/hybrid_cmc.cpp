@@ -161,6 +161,7 @@ void hybrid_cmc(){
 			cmc::cmc_mat[mat].constraint_phi+=cmc::cmc_mat[mat].constraint_phi_delta;
 			sim::constraint_phi_changed=true;
 		} // End of azimuthal angle sweep
+		if(vout::gnuplot_array_format) zmag << std::endl;
 		
 		// Increment rotational angle
 		if(cmc::cmc_mat[mat].constraint_theta+cmc::cmc_mat[mat].constraint_theta_delta>cmc::cmc_mat[mat].constraint_theta_max) break;

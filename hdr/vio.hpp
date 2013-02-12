@@ -65,6 +65,7 @@ namespace vout{
 	extern std::vector<unsigned int> grain_output_list;
 	
 	extern int output_grain_rate;
+   extern bool gnuplot_array_format;
 	
 	extern bool output_atoms_config;
 	extern int output_atoms_config_rate;

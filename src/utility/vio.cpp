@@ -2720,6 +2720,13 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
 			output_list.push_back(60);
 			return EXIT_SUCCESS;
 		}
+      //--------------------------------------------------------------------
+      test="gnuplot-array-format";
+      if(word==test){
+         vout::gnuplot_array_format=true;
+         return EXIT_SUCCESS;
+      }
+
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
@@ -3878,7 +3885,8 @@ namespace vout{
 	std::vector<unsigned int> grain_output_list(0);
 	
 	int output_grain_rate=1;
-	
+
+   bool gnuplot_array_format=false;
 
 	std::ofstream errfile;
 

@@ -147,7 +147,8 @@ void cmc_anisotropy(){
 			sim::constraint_phi_changed=true;
 			
 		} // End of azimuthal angle sweep
-		
+      if(vout::gnuplot_array_format) zmag << std::endl;
+
 		// Increment rotational angle
 		sim::constraint_theta+=sim::constraint_theta_delta;
 		sim::constraint_theta_changed=true;
