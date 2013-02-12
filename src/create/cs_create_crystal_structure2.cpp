@@ -224,7 +224,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	if(err::check==true){std::cout << "cs::read_unit_cell has been called" << std::endl;}	
 
 	std::cout << "Reading in unit cell data..." << std::flush;
-	zlog << zTs() << "Reading in unit cell data..." << std::flush;
+	zlog << zTs() << "Reading in unit cell data..." << std::endl;
 	
 	// ifstream declaration
 	std::ifstream inputfile;
@@ -341,10 +341,10 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					}
 					if(mat_id >=0 && mat_id<mp::num_materials) unit_cell.atom[i].mat=mat_id;
 					else{ 
-						std::cerr << "Error! Requested material id " << mat_id << "for atom number " << id <<  " on line " << line_counter
-									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 1-" << mp::num_materials << ". Exiting" << std::endl;  
-						zlog << zTs() << "Error! Requested material id " << mat_id << "for atom number " << id <<  " on line " << line_counter
-									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 1-" << mp::num_materials << ". Exiting" << std::endl; err::vexit();} 
+						std::cerr << "Error! Requested material id " << mat_id << " for atom number " << id <<  " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl;
+						zlog << zTs() << "Error! Requested material id " << mat_id << " for atom number " << id <<  " on line " << line_counter
+                            << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl; err::vexit();}
 					unit_cell.atom[i].lc=lcat_id;
 					unit_cell.atom[i].hc=hcat_id;
 					//std::cout << i << "\t" << id << "\t" << cx << "\t" << cy << "\t" << cz << "\t" << mat_id << "\t" << lcat_id << "\t" << hcat_id << std::endl;
