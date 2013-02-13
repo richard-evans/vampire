@@ -347,8 +347,8 @@ int ConstrainedMonteCarloMonteCarlo(){
 	double Eold;
 	double Enew;
 
-	double spin1_initial[3];
-	double spin1_final[3];
+   std::valarray<double> spin1_initial(3);
+	std::valarray<double> spin1_final(3);
 	double spin2_initial[3];
 	double spin2_final[3];
 
@@ -366,7 +366,8 @@ int ConstrainedMonteCarloMonteCarlo(){
 	
 	const double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
 
-	const double sigma = pow(1.0/kBTBohr,0.2)*0.08;
+   // Calculate range for move
+   sim::mc_delta_angle=pow(1.0/kBTBohr,0.2)*0.08;
 	
 	const int AtomExchangeType=atoms::exchange_type; // Cast as constant and pass to energy calculation for speed
 	
@@ -398,17 +399,8 @@ int ConstrainedMonteCarloMonteCarlo(){
 			spin1_initial[1] = atoms::y_spin_array[atom_number1];
 			spin1_initial[2] = atoms::z_spin_array[atom_number1];
 
-			// Calculate new spin position cf Pierre Asselin
-			spin1_final[0] = mtrandom::gaussian()*sigma+spin1_initial[0];
-			spin1_final[1] = mtrandom::gaussian()*sigma+spin1_initial[1];
-			spin1_final[2] = mtrandom::gaussian()*sigma+spin1_initial[2];
-
-			// Calculate new spin length and normalise
-			double r = 1.0/sqrt (spin1_final[0]*spin1_final[0]+spin1_final[1]*spin1_final[1]+spin1_final[2]*spin1_final[2]); 
-
-			spin1_final[0]*=r;
-			spin1_final[1]*=r;
-			spin1_final[2]*=r;
+         // Make Monte Carlo move
+         spin1_final=sim::mc_move(spin1_initial);
 
 			// Calculate current energy
 			Eold = sim::calculate_spin_energy(atom_number1, AtomExchangeType);
@@ -425,20 +417,22 @@ int ConstrainedMonteCarloMonteCarlo(){
 			delta_energy1 = (Enew-Eold)*mp::material[imat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 			
 			// Check for lower energy state and accept unconditionally
-			if(delta_energy1<0) continue;
+			if(delta_energy1<0){
+            cmc::mc_success += 1.0;
+         }
 			// Otherwise evaluate probability for move
 			else{
-				if(exp(-delta_energy1*kBTBohr) >= mtrandom::grnd()) continue;
+				if(exp(-delta_energy1*kBTBohr) >= mtrandom::grnd()){
+               cmc::mc_success += 1.0;
+            }
 				// If rejected reset spin coordinates and continue
 				else{
 					atoms::x_spin_array[atom_number1] = spin1_initial[0];
 					atoms::y_spin_array[atom_number1] = spin1_initial[1];
 					atoms::z_spin_array[atom_number1] = spin1_initial[2];
-					continue;
+               cmc::energy_reject += 1.0;
 				}
 			}
-			
-			
 		}
 		else{
 		// constrained MC move
@@ -454,16 +448,8 @@ int ConstrainedMonteCarloMonteCarlo(){
 		spin1_init_mvd[1]=cmc::cmc_mat[imat].ppolar_matrix[1][0]*spin1_initial[0]+cmc::cmc_mat[imat].ppolar_matrix[1][1]*spin1_initial[1]+cmc::cmc_mat[imat].ppolar_matrix[1][2]*spin1_initial[2];
 		spin1_init_mvd[2]=cmc::cmc_mat[imat].ppolar_matrix[2][0]*spin1_initial[0]+cmc::cmc_mat[imat].ppolar_matrix[2][1]*spin1_initial[1]+cmc::cmc_mat[imat].ppolar_matrix[2][2]*spin1_initial[2];
 
-		// move spin randomly cf Pierre Asselin
-		spin1_final[0] = mtrandom::gaussian()*sigma+atoms::x_spin_array[atom_number1];
-		spin1_final[1] = mtrandom::gaussian()*sigma+atoms::y_spin_array[atom_number1];
-		spin1_final[2] = mtrandom::gaussian()*sigma+atoms::z_spin_array[atom_number1];
-
-		sqrt_ran = 1.0/sqrt(spin1_final[0]*spin1_final[0] + spin1_final[1]*spin1_final[1] + spin1_final[2]*spin1_final[2]);
-
-		spin1_final[0] = spin1_final[0]*sqrt_ran;
-		spin1_final[1] = spin1_final[1]*sqrt_ran;
-		spin1_final[2] = spin1_final[2]*sqrt_ran;
+      // Make Monte Carlo move
+      spin1_final=sim::mc_move(spin1_initial);
 
 		//spin1_fin_mvd = matmul(polar_matrix, spin1_final)
 		spin1_fin_mvd[0]=cmc::cmc_mat[imat].ppolar_matrix[0][0]*spin1_final[0]+cmc::cmc_mat[imat].ppolar_matrix[0][1]*spin1_final[1]+cmc::cmc_mat[imat].ppolar_matrix[0][2]*spin1_final[2];
@@ -491,7 +477,6 @@ int ConstrainedMonteCarloMonteCarlo(){
 		imat2=atoms::type_array[atom_number2];
 		if(imat1!=imat2){
 			std::cerr << "Error in MC/CMC integration! - atoms pairs are not from same material!" << std::endl;
-			
 			err::vexit();
 		}
 		
@@ -521,16 +506,16 @@ int ConstrainedMonteCarloMonteCarlo(){
 			//Calculate Energy Difference 2
 			// Calculate current energy
 			Eold = sim::calculate_spin_energy(atom_number2, AtomExchangeType);
-			
-			// Copy new spin position (provisionally accept move)
+
+         // Copy new spin position (provisionally accept move)
 			atoms::x_spin_array[atom_number2] = spin2_final[0];
 			atoms::y_spin_array[atom_number2] = spin2_final[1];
 			atoms::z_spin_array[atom_number2] = spin2_final[2];
 
 			// Calculate new energy
 			Enew = sim::calculate_spin_energy(atom_number2, AtomExchangeType);
-			
-			// Calculate difference in Joules/mu_B
+
+         // Calculate difference in Joules/mu_B
 			delta_energy2 = (Enew-Eold)*mp::material[imat2].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 
 			// Calculate Delta E for both spins
@@ -579,7 +564,6 @@ int ConstrainedMonteCarloMonteCarlo(){
 			cmc::sphere_reject+=1.0;
 		}
 		} // end of cmc move
-
 		cmc::mc_total += 1.0;
 	} // end of mc loop
 	

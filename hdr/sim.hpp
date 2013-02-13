@@ -27,6 +27,8 @@
 
 //Headers
 #include <fstream>
+#include <valarray>
+#include <vector>
 
 // Enumerated lists for code readability
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
@@ -75,7 +77,12 @@ namespace sim{
 	extern double constraint_theta_min; // loop angle min [degrees]
 	extern double constraint_theta_max; // loop angle max [degrees]
 	extern double constraint_theta_delta; // loop angle delta [degrees]
-	
+
+	// Monte Carlo variables
+	extern double mc_delta_angle; // Tuned angle for Monte Carlo trial move
+	enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak};
+   extern mc_algorithms mc_algorithm; // Selected algorith for Monte Carlo simulations
+
 	extern double head_position[2];
 	extern double head_speed;
 	extern bool   head_laser_on;
@@ -140,12 +147,13 @@ namespace sim{
 	extern int MonteCarlo();
 	extern int ConstrainedMonteCarlo();
 	extern int ConstrainedMonteCarloMonteCarlo();
-	
+	extern std::valarray<double> mc_move(std::valarray<double>&);
+
 	// Integrator initialisers
 	extern void CMCinit();
 	extern int LLGinit();
 	extern void CMCMCinit();
-	
+
 	// Field and energy functions
 	extern double calculate_spin_energy(const int, const int);
    extern double spin_exchange_energy_isotropic(const int, const double, const double , const double );

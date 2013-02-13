@@ -92,12 +92,9 @@ int MonteCarlo(){
 	int nmoves = atoms::num_atoms;
 
 	// Declare arrays for spin states
-	double Sold[3];
-	double Snew[3];
-		
-	// Calculate range for move
-	double sigma=1.0;
-	
+	std::valarray<double> Sold(3);
+	std::valarray<double> Snew(3);
+
 	// Temporaries
 	int atom=0;
 	double r=1.0;
@@ -107,6 +104,9 @@ int MonteCarlo(){
 	const double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
 	const int AtomExchangeType=atoms::exchange_type;
 	
+   // Calculate range for move
+   sim::mc_delta_angle=pow(1.0/kBTBohr,0.2)*0.08;
+
 	// loop over natoms to form a single Monte Carlo step
 	for(int i=0;i<nmoves; i++){
 		
@@ -121,17 +121,8 @@ int MonteCarlo(){
 		Sold[1] = atoms::y_spin_array[atom];
 		Sold[2] = atoms::z_spin_array[atom];
 
-		// Calculate new spin position cf Pierre Asselin
-		Snew[0] = mtrandom::gaussian()*sigma+Sold[0];
-		Snew[1] = mtrandom::gaussian()*sigma+Sold[1];
-		Snew[2] = mtrandom::gaussian()*sigma+Sold[2];
-
-		// Calculate new spin length and normalise
-		r = 1.0/sqrt (Snew[0]*Snew[0]+Snew[1]*Snew[1]+Snew[2]*Snew[2]); 
-
-		Snew[0]*=r;
-		Snew[1]*=r;
-		Snew[2]*=r;
+      // Make Monte Carlo move
+      Snew=sim::mc_move(Sold);
 
 		// Calculate current energy
 		Eold = sim::calculate_spin_energy(atom, AtomExchangeType);

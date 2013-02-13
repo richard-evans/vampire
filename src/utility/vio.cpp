@@ -2334,7 +2334,41 @@ int match_sim(string const word, string const value, string const unit, int cons
 				err::vexit();
 			}
 		}
-		//--------------------------------------------------------------------
+      //--------------------------------------------------------------------
+      test="monte-carlo-algorithm";
+      if(word==test){
+         // include namesapce here to access enum values
+         using namespace sim;
+         test="spin-flip";
+         if(value==test){
+            sim::mc_algorithm=spin_flip;
+            return EXIT_SUCCESS;
+         }
+         test="uniform";
+         if(value==test){
+            sim::mc_algorithm=uniform;
+            return EXIT_SUCCESS;
+         }
+         test="angle";
+         if(value==test){
+            sim::mc_algorithm=angle;
+            return EXIT_SUCCESS;
+         }
+         test="hinzke-nowak";
+         if(value==test){
+            sim::mc_algorithm=hinzke_nowak;
+            return EXIT_SUCCESS;
+         }
+         else{
+            std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"spin-flip\"" << std::endl;
+            std::cerr << "\t\"uniform\"" << std::endl;
+            std::cerr << "\t\"angle\"" << std::endl;
+            std::cerr << "\t\"hinzke-nowak\"" << std::endl;
+            err::vexit();
+         }
+      }
+      //--------------------------------------------------------------------
 		else{
 			std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
 			return EXIT_FAILURE;
