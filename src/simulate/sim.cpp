@@ -320,7 +320,7 @@ int run(){
 	}
 
 	// output Monte Carlo Statistics if applicable
-	if(sim::integrator==3){
+	if(sim::integrator==3 || sim::integrator==4){
 		std::cout << "Constrained Monte Carlo Statistics:" << std::endl;
 		std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
 		std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0 << "% Accepted" << std::endl;
