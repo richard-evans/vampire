@@ -108,7 +108,12 @@ obj/utility/statistics.o \
 obj/utility/units.o \
 obj/utility/vconfig.o \
 obj/utility/vio.o \
-obj/utility/vmath.o
+obj/utility/vmath.o \
+obj/vio/dimensions.o \
+obj/vio/match.o \
+obj/vio/parser.o \
+obj/vio/vio_utilities.o \
+obj/vio/vlog.o
 
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)

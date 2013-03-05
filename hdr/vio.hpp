@@ -95,4 +95,30 @@ namespace vout{
 	void nullify(std::ostream& strm);  
 
 }
+
+namespace vio{
+
+   // Master vlog output
+   extern std::ofstream vlog;
+
+   // timestamp function and initialiser for vlog output
+   extern std::string vTs();
+   extern void initialise_vlog_timestamp(std::string);
+
+   // Master parser for vampire input file
+   extern void parse_vampire_input_file(std::string const);
+
+   // Variable to set help output
+   extern bool vio_help;
+   extern int keyword_help(string const);
+
+   // Initialisation functions
+   extern void initialise_dimensions();
+
+   // match functions
+   int match_keyword(std::string const, std::string const, std::string const, std::string const, int const);
+   int match_dimension(std::string const,std::string const, std::string const, std::string const, int const);
+
+}
+
 #endif /*VIO_H_*/

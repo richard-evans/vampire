@@ -1,0 +1,292 @@
+//-----------------------------------------------------------------------------
+//
+//  Vampire - A code for atomistic simulation of magnetic materials
+//
+//  Copyright (C) 2009-2012 R.F.L.Evans
+//
+//  Email:richard.evans@york.ac.uk
+//
+//  This program is free software; you can redistribute it and/or modify 
+//  it under the terms of the GNU General Public License as published by 
+//  the Free Software Foundation; either version 2 of the License, or 
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful, but 
+//  WITHOUT ANY WARRANTY; without even the implied warranty of 
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License 
+//  along with this program; if not, write to the Free Software Foundation, 
+//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+//
+// ----------------------------------------------------------------------------
+//
+//  Internal header file for vio class structures (not to be accessed externally)
+//
+//  (c) R F L Evans 2013
+//
+// c++ headers
+#include <iostream>
+#include <string>
+
+// vampire headers
+#include "errors.hpp"
+#include "units.hpp"
+#include "vio.hpp"
+
+
+namespace vio{
+
+   extern int match_keyword(std::string, std::string, std::string, std::string, int);  
+   
+   extern void initialise_dimensions();
+
+   //--------------------------------------------------------------
+   // Classes defining vector and tensor types 
+   //--------------------------------------------------------------
+   class vector_t{
+   public: 
+      double x;
+      double y;
+      double z;
+   };
+
+   class uvector_t{
+   public: 
+      double x;
+      double y;
+      double z;
+   };
+   
+   class tensor_t{      
+   public: 
+      double xx;
+      double xy;
+      double xz;
+
+      double yx;
+      double yy;
+      double yz;
+
+      double zx;
+      double zy;
+      double zz;
+   };
+
+   //--------------------------------------------------------------
+   // Overloaded functions converting strings to variables
+   //--------------------------------------------------------------
+   extern int string_to_value(std::string, double&);
+   extern int string_to_value(std::string, int&);
+   extern int string_to_value(std::string, bool&);
+   extern int string_to_value(std::string, vector_t&);
+   extern int string_to_value(std::string, uvector_t&);
+   extern int string_to_value(std::string, tensor_t&);
+
+   //--------------------------------------------------------------
+   // Templated function checking for valid range
+   //--------------------------------------------------------------
+   /*template <class T>
+   bool out_of_range(T value, T min, T max);
+   template <>
+   bool out_of_range(bool, bool, bool);
+   template <>
+   bool out_of_range(unsigned int, unsigned int, unsigned int);
+   template <>
+   bool out_of_range(vector_t, vector_t, vector_t);
+   template <>
+   bool out_of_range(uvector_t, uvector_t, uvector_t);   
+   template <>
+   bool out_of_range(tensor_t, tensor_t, tensor_t);*/
+      //--------------------------------------------------------------
+   // Templated function checking for valid range
+   //--------------------------------------------------------------
+   template <class T>
+   inline bool out_of_range(T value, T min, T max){
+      std::cout << value << "\t" << min << "\t" << max << "\t" << fabs(value) << std::endl;
+      if((fabs(value)<min) || (fabs(value)>max)) return true;
+      else return false;
+   }
+
+   // Specialisation
+   template <>
+   inline bool out_of_range(bool value, bool min, bool max){
+      return false;
+   }
+   template <>
+   inline bool out_of_range(unsigned int value, unsigned int min, unsigned int max){
+      if((value<min) || (value>max)) return true;
+      return false;
+   }
+   template <>
+   inline bool out_of_range(vector_t value, vector_t min, vector_t max){
+      double master_min=min.x;
+      double master_max=max.x;
+      
+      if((fabs(value.x)<master_min) || (fabs(value.x)>master_max)) return true;
+      if((fabs(value.y)<master_min) || (fabs(value.y)>master_max)) return true;
+      if((fabs(value.z)<master_min) || (fabs(value.z)>master_max)) return true;
+      
+      return false;
+   }
+   template <>
+   inline bool out_of_range(uvector_t value, uvector_t min, uvector_t max){
+      double master_min=min.x;
+      double master_max=max.x;
+      
+      if((fabs(value.x)<master_min) || (fabs(value.x)>master_max)) return true;
+      if((fabs(value.y)<master_min) || (fabs(value.y)>master_max)) return true;
+      if((fabs(value.z)<master_min) || (fabs(value.z)>master_max)) return true;
+      
+      return false;
+   }   
+   template <>
+   inline bool out_of_range(tensor_t value, tensor_t min, tensor_t max){
+      double master_min=min.xx;
+      double master_max=max.xx;
+      
+      if((fabs(value.xx)<master_min) || (fabs(value.xx)>master_max)) return true;
+      if((fabs(value.xy)<master_min) || (fabs(value.xy)>master_max)) return true;
+      if((fabs(value.xz)<master_min) || (fabs(value.xz)>master_max)) return true;
+      
+      if((fabs(value.yx)<master_min) || (fabs(value.yx)>master_max)) return true;
+      if((fabs(value.yy)<master_min) || (fabs(value.yy)>master_max)) return true;
+      if((fabs(value.yz)<master_min) || (fabs(value.yz)>master_max)) return true;
+
+      if((fabs(value.zx)<master_min) || (fabs(value.zx)>master_max)) return true;
+      if((fabs(value.zy)<master_min) || (fabs(value.zy)>master_max)) return true;
+      if((fabs(value.zz)<master_min) || (fabs(value.zz)>master_max)) return true;
+
+      return false;
+   }
+
+   //--------------------------------------------------------------
+   // Class defining parameters for all input variables
+   //--------------------------------------------------------------
+   template <class T>
+   class vampire_iv_t{
+      
+   public:
+
+   // Fixed data
+   std::string name; // Keyword eg sphere
+   std::string category; // Category of variable, eg create, sim etc
+   std::string unit_type; // Unit type, eg length, field etc
+   std::string file_type; // input, material etc
+   bool deprecated; // Flag to enable deprecation
+   bool is_initialised; // Assumes default constructor (false)
+   // Values
+   T value;
+   T min_value;
+   T max_value;
+   
+   // Text
+   std::string range_error_message;
+   std::string list_error_alternatives;
+   std::string deprecated_alternative;
+   std::string documentation;
+
+   // Function to test equality of keyword
+   //----------------------------------------------------------------
+   bool test(std::string const test_name){
+       if(!is_initialised){
+         std::cerr << "Program error: attempted access of uninitialised input variable class, possibly named \'"<< test_name <<"\'. Exiting." << std::endl;
+         vlog << vTs() << "Program error: attempted access of uninitialised input variable class, possibly named \'"<< test_name <<"\'. Exiting." << std::endl;
+         err::vexit();
+      }
+      if(test_name==name){
+         if(vio::vio_help==true) show_docs(); // print documentation to screen and exit
+         return true;
+      }
+      else return false;
+   }
+   
+   // Function to print formatted documentation to screen and exit
+   //----------------------------------------------------------------
+   void show_docs(){
+      // std::string formatted_docs=meta_to_text(category, name, documentation);
+      //std::cout << formatted_docs << std::endl;
+      std::cout << "\x1b[4m" << category << "\x1b[0m:\x1b[4m" << name << "\x1b[0m" << std::endl << std::endl;
+      std::cout << documentation << std::endl << std::endl;
+      exit(EXIT_SUCCESS);
+   }
+   
+   // Function to verify valid input and return validated variable
+   //----------------------------------------------------------------
+   T check_value(std::string test_value, std::string test_keyword, int line, std::string test_unit){
+   
+      // Convert string value to real value (defined in vio_utilities.cpp)
+      T value;
+      int convert_string_status;
+      convert_string_status = string_to_value(test_value,value);
+
+      // Check for conversion error
+      switch(convert_string_status){
+         // bool error
+         case 1:
+            std::cerr << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << " file must be either true or false." << std::endl;
+            vlog << vTs() << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << " file must be either true or false." << std::endl;
+            err::vexit();
+            break;
+         // vector_t error
+         case 2:
+            std::cerr << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << " is a vector and must have three values." << std::endl;
+            vlog << vTs() << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << " is a vector and must have three values." << std::endl;
+            err::vexit();
+            break;
+         // uvector_t normalisation error
+         case 3:
+            std::cerr << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << "  must be normalisable (possibly all zero)." << std::endl;
+            vlog << vTs() << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << "  must be normalisable (possibly all zero)." << std::endl;
+            err::vexit();
+            break;
+         // tensor_t error
+         case 4:
+            std::cerr << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << " is a tensor and must have nine values." << std::endl;
+            vlog << vTs() << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << " is a tensor and must have nine values." << std::endl;
+            err::vexit();
+            break;
+         // Everyone else
+         default:
+            break;
+      };
+      
+      // Define test unit
+      std::string test_unit_type=unit_type;
+
+      // Define integer for unit conversion status
+      int convert_status=0;
+      
+      // If no unit given, assume internal, otherwise convert to internal units
+      if(test_unit.size() != 0) convert_status = units::convert(test_unit,value,test_unit_type);
+
+      // Test for valid conversion
+      if(convert_status==EXIT_FAILURE){
+         std::cerr << "Input error: Unit \'" << test_unit << "\' specified on line " << line << " of " << file_type << " file is not a valid unit." << std::endl;
+         vio::vlog << vio::vTs() << "Input error: Unit \'" << test_unit << "\' specified on line " << line << " of " << file_type << " file is not a valid unit." << std::endl;
+         err::vexit();
+      }
+
+      // Test for change in unit type in case of wrong unit type
+      if(unit_type!=test_unit_type){
+         std::cerr << "Input error: Unit \'" << test_unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << file_type << " is invalid for parameter " << category << ":" << test_keyword << " which must be of type \'" << unit_type << "\'."<< std::endl;
+         vio::vlog << vio::vTs() << "Input error: Unit \'" << test_unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << file_type << " is invalid for parameter " << category << ":" << test_keyword << " which must be of type \'" << unit_type << "\'."<< std::endl;
+         err::vexit();
+      }
+
+      // Check for valid range
+      if(out_of_range(value, min_value, max_value)){
+            std::cerr << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << " file must be in the range " << range_error_message << "." << std::endl;
+            vlog << vTs() << "Input error: Variable " << category << ":" << test_keyword << " on line " << line << " of " << file_type << " file must be in the range " << range_error_message << "." << std::endl;
+            err::vexit();
+      }
+
+      // Return validated value
+      return value;
+
+   }
+   
+};
+   
+}
