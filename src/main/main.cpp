@@ -59,6 +59,61 @@ int main(int argc, char* argv[]){
 				return EXIT_FAILURE;
 			}
 		}
+      if(sw=="--help"){
+         // Output mini-header
+         std::cout << "vampire 2.0.1 http://vampire.york.ac.uk/" << std::endl;
+         std::cout << "Copyright (c) 2009-2013 R F L Evans" << std::endl << std::endl;
+         // check number of args not exceeded
+         if(arg+1 < argc){
+            arg++;
+            std::string keyword=string(argv[arg]);
+            vio::keyword_help(keyword);
+            return EXIT_SUCCESS;
+            exit(EXIT_SUCCESS);
+         }
+         else{
+            std::cout << "\x1b[1m" << "NAME" << "\x1b[0m" << std::endl;
+            std::cout << "        vampire - atomistic simulator for magnetic materials" << std::endl << std::endl;
+            std::cout << "\x1b[1m" << "SYNOPSIS" << "\x1b[0m" << std::endl;
+            std::cout << "        vampire [--version] [--help<keyword>] [-f<input_file>]" << std::endl << std::endl;
+            std::cout << "\x1b[1m" << "DESCRIPTION" << "\x1b[0m" << std::endl;
+            std::cout << "        Vampire is an open source software simulation package for atomistic \n"
+                         "        simulation of magnetic materials developed at the University of York.\n"
+                         "        The objective of vampire is to provide a community standard tool for \n"
+                         "        atomistic simulation of magnetic materials with the highest possible\n"
+                         "        performance." << std::endl << std::endl;
+            std::cout << "        Using a variety of common simulation methods it can calculate the \n"
+                         "        equilibrium and dynamic magnetic properties of a wide variety of \n"
+                         "        magnetic materials and phenomena, including ferro, ferri and \n"
+                         "        antiferromagnets, core-shell nanoparticles, ultrafast spin dynamics,\n"
+                         "        magnetic recording media, heat assisted magnetic recording, exchange\n"
+                         "        bias, magnetic multilayer films and complete devices." << std::endl << std::endl;
+            std::cout << "        Formatted and hyperlinked documentation, as well as tutorials, \n"
+                         "        references and more is available at http://vampire.york.ac.uk/ ." << std::endl << std::endl;
+            std::cout << "\x1b[1m" << "HELP TOPICS" << "\x1b[0m" << std::endl;
+            std::cout << "        The following list provides an overview of the help documentation.\n"
+                         "        Keywords are underlined and detailed information about each one can\n"
+                         "        be accessed using vampire --help<keyword>." << std::endl << std::endl;
+            std::cout << "        \x1b[4moverview\x1b[0m - overview of the program features and capabilities" << std::endl;
+            std::cout << "        \x1b[4mdimensions\x1b[0m - control of system dimensions" << std::endl;
+            std::cout << "        \x1b[4mcreate\x1b[0m - control of structural attributes, eg shape, crystal structure" << std::endl;
+            std::cout << "        \x1b[4msimulate\x1b[0m - control of simulation attributes, eg integrator, timestep" << std::endl;
+            std::cout << "        \x1b[4moutput\x1b[0m - control of output data and statistics" << std::endl;
+            std::cout << "        \x1b[4mmaterials\x1b[0m - definition of magnetic material properties" << std::endl;
+            std::cout << std::endl;
+            std::cout << "\x1b[1m" << "AUTHORS" << "\x1b[0m" << std::endl;
+            std::cout << "        Vampire is principally developed by Dr. Richard Evans, however it would not\n"
+                         "        have been possible without the contributions from many members of the \n"
+                         "        Computational Magnetism Group at York. Special thanks go to Weijia Fan,\n"
+                         "        Phanwadee Chureemart, Thomas Ostler, Joe Barker and Roy Chantrell for \n"
+                         "        their support, development and beta testing of the code." << std::endl << std::endl;
+            std::cout << "\x1b[1m" << "REPORTING BUGS" << "\x1b[0m" << std::endl;
+            std::cout << "        Please report bugs and issues directly to the author via email to\n"
+                         "        richard.evans@york.ac.uk or on the github bug tracker at\n"
+                         "        https://github.com/richard-evans/vampire/issues/" << std::endl << std::endl;
+            return EXIT_SUCCESS;
+         }
+      }
 		else{
 			std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
 			return EXIT_FAILURE;
@@ -71,8 +126,9 @@ int main(int argc, char* argv[]){
 	#endif 
 	
 	// Initialise log file
-	vout::zLogTsInit(std::string(argv[0]));
-		
+   vout::zLogTsInit(std::string(argv[0]));
+   vio::initialise_vlog_timestamp(std::string(argv[0]));
+
 	// Output Program Header
 	if(vmpi::my_rank==0){
 		std::cout << "                                                _          " << std::endl;
