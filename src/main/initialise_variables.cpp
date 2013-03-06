@@ -69,6 +69,7 @@ namespace mp{
 	std::vector <double> MaterialMuSSIArray(0);
 	std::vector <zkval_t> MaterialScalarAnisotropyArray(0);
 	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
+   std::vector <double> material_second_order_anisotropy_constant_array(0);
 	std::vector <double> MaterialCubicAnisotropyArray(0);
 
 ///
@@ -298,6 +299,7 @@ int set_derived_parameters(){
 			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
 		}
 		mp::material[mat].Ku									= mp::material[mat].Ku1_SI/mp::material[mat].mu_s_SI;
+      mp::material[mat].Ku2                        = mp::material[mat].Ku2_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].Kc									= mp::material[mat].Kc1_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].Ks									= mp::material[mat].Ks_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
@@ -372,7 +374,13 @@ int set_derived_parameters(){
 
 			}
 		}
-		// Unroll cubic anisotropy values for speed
+      // Unroll second order uniaxial anisotropy values for speed
+      if(sim::second_order_uniaxial_anisotropy==true){
+         zlog << zTs() << "Setting scalar second order uniaxial anisotropy." << std::endl;
+         mp::material_second_order_anisotropy_constant_array.resize(mp::num_materials);
+         for(int mat=0;mat<mp::num_materials; mat++) mp::material_second_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku2;
+      }
+      // Unroll cubic anisotropy values for speed
 		if(sim::CubicScalarAnisotropy==true){
 			zlog << zTs() << "Setting scalar cubic anisotropy." << std::endl;
 			MaterialCubicAnisotropyArray.resize(mp::num_materials);

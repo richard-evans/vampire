@@ -130,6 +130,7 @@ namespace sim{
 	// Anisotropy control booleans
 	bool UniaxialScalarAnisotropy=false; // Enables scalar uniaxial anisotropy
 	bool TensorAnisotropy=false; // Overrides scalar uniaxial anisotropy
+	bool second_order_uniaxial_anisotropy=false; // Enables second order uniaxial anisotropy
 	bool CubicScalarAnisotropy=false; // Enables scalar cubic anisotropy
 	
 	bool local_temperature=false; // flag to enable material specific temperature

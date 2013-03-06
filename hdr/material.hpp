@@ -82,6 +82,7 @@ using std::string;
 		double Ku2_SI;
 		std::vector<double> KuVec_SI; // SI anisotropy tensor
 		double Ku; // normalised uniaxial anisotropy constant
+      double Ku2; // normalised uniaxial anisotropy constant
 		std::vector<double> KuVec; // normalised anisotropy tensor
 		std::vector<double> UniaxialAnisotropyUnitVector; // unit vector for material uniaxial anisotropy
 		double Kc1_SI;
@@ -144,6 +145,7 @@ using std::string;
 	extern std::vector <double> MaterialMuSSIArray;
 	extern std::vector <zkval_t> MaterialScalarAnisotropyArray;
 	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
+   extern std::vector <double> material_second_order_anisotropy_constant_array;
 	extern std::vector <double> MaterialCubicAnisotropyArray;
 
 	

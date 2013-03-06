@@ -2753,6 +2753,21 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
          stats::calculate_energy=true;
          return EXIT_SUCCESS;
       }
+      //-------------------------------------------------------------------
+      test="second-order-uniaxial-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(41);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-second-order-uniaxial-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(42);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
       test="MPI-Timings";
 		if(word==test){
 			vmpi::DetailedMPITiming=true;
@@ -3227,7 +3242,30 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
-		//------------------------------------------------------------
+      //------------------------------------------------------------
+      else
+      test="second-uniaxial-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         string unit_type="energy";
+         // if no unit given, assume internal
+         if(unit.size() != 0){
+            units::convert(unit,K,unit_type);
+         }
+         string str="energy";
+         if(unit_type==str){
+            // set anisotropy
+            read_material[super_index].Ku2_SI=K;
+            // enable global anisotropy flag
+            sim::second_order_uniaxial_anisotropy=true;
+            return EXIT_SUCCESS;
+         }
+         else{
+            std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+            err::vexit();
+         }
+      }
+      //------------------------------------------------------------
 		else
 		test="cubic-anisotropy-constant";
 		if(word==test){
@@ -4221,6 +4259,16 @@ namespace vout{
       stats::output_energy(stream, stats::magnetostatic, stats::mean);
    }
 
+   // Output Function 41
+   void total_so_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::second_order_anisotropy, stats::total);
+   }
+
+   // Output Function 42
+   void mean_total_so_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::second_order_anisotropy, stats::mean);
+   }
+
    // Output Function 60
 	void MPITimings(std::ostream& stream){
 
@@ -4375,6 +4423,12 @@ namespace vout{
             case 40:
                vout::mean_total_magnetostatic_energy(zmag);
                break;
+            case 41:
+               vout::total_so_anisotropy_energy(zmag);
+               break;
+            case 42:
+               vout::mean_total_so_anisotropy_energy(zmag);
+               break;
             case 60:
 					vout::MPITimings(zmag);
 					break;
@@ -4501,6 +4555,12 @@ namespace vout{
                break;
             case 40:
                vout::mean_total_magnetostatic_energy(std::cout);
+               break;
+            case 41:
+               vout::total_so_anisotropy_energy(std::cout);
+               break;
+            case 42:
+               vout::mean_total_so_anisotropy_energy(std::cout);
                break;
             case 60:
 					vout::MPITimings(std::cout);

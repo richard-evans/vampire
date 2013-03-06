@@ -36,6 +36,7 @@ materials_t::materials_t ():
 	Ku2_SI(0.0),
 	KuVec_SI(0),
 	Ku(0.0),
+   Ku2(0.0),
 	KuVec(0),
 	UniaxialAnisotropyUnitVector(3),
 	Kc1_SI(0.0),

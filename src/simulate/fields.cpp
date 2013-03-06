@@ -50,6 +50,7 @@
 
 int calculate_exchange_fields(const int,const int);
 int calculate_anisotropy_fields(const int,const int);
+void calculate_second_order_uniaxial_anisotropy_fields(const int,const int);
 int calculate_cubic_anisotropy_fields(const int,const int);
 int calculate_applied_fields(const int,const int);
 int calculate_thermal_fields(const int,const int);
@@ -78,7 +79,8 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	
 	// Anisotropy Fields
 	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
-	if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
+   if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
+   if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
 	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
 	if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
 	// Spin Dependent Extra Fields
@@ -258,9 +260,30 @@ int calculate_anisotropy_fields(const int start_index,const int end_index){
 				atoms::z_total_spin_field_array[atom] -= (K[2][0]*S[0] + K[2][1]*S[1] +K[2][2]*S[2]);
 			}
 			break;
-		}
-
+   }
 	return EXIT_SUCCESS;
+}
+
+//------------------------------------------------------
+//  Function to calculate second order uniaxial
+//  anisotropy fields
+//
+//  (c) R F L Evans 2013
+//
+//  E = K2 (-2Sz^2 + Sz^4)
+//  Hx = 0
+//  Hy = 0
+//  Hz = -K2 (-4Sz + 4Sz^3) = 4*K2*Sz*(1-Sz^2)
+//
+//------------------------------------------------------
+void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,const int end_index){
+   for(int atom=start_index;atom<end_index;atom++){
+      const int imaterial=atoms::type_array[atom];
+      const double Ku2=4.0*mp::material_second_order_anisotropy_constant_array[imaterial];
+      const double Sz=atoms::z_spin_array[atom];
+      atoms::z_total_spin_field_array[atom] -= Ku2*Sz*(1.0 - Sz*Sz);
+   }
+   return;
 }
 
 int calculate_cubic_anisotropy_fields(const int start_index,const int end_index){
