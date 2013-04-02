@@ -28,7 +28,7 @@ namespace mp{
 	// Constructor
 materials_t::materials_t ():
 	name(""),
-	element("   "),
+	element("Fe"),
 	alpha(1.0),
 	mu_s_SI(9.27400915e-24),
 	magnetisation(0.0),
