@@ -479,6 +479,11 @@ double max_torque(){
 
 	}
 
+   // find max torque on all nodes
+   #ifdef MPICF
+      MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&max_torque[0],1,MPI_DOUBLE,MPI_MAXIMUM);
+   #endif
+
   return max_torque;
 
 }
