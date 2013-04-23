@@ -95,7 +95,7 @@ int static_hysteresis(){
 		for(int H=iHmin;H<=iHmax;H+=iHinc){
 			
 			// Set applied field (Tesla)
-			sim::H_applied=double(H)*double(parity)*1.0e-3;
+			sim::H_applied=double(H)*double(parity)*1.0e-6;
 			
 			// Reset start time
 			int start_time=sim::time;
