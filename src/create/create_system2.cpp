@@ -87,6 +87,9 @@ namespace cs{
 	double particle_spacing=10.0;   // Spacing Between particles (A)
 	double particle_array_offset_x=0.0; // Offset particle array along x-direction;
 	double particle_array_offset_y=0.0; // Offset particle array along y-direction;
+   double particle_shape_factor_x=1.0; // Normalised particle shape
+   double particle_shape_factor_y=1.0; // Normalised particle shape
+   double particle_shape_factor_z=1.0; // Normalised particle shape
 
 	// Other directives and flags
 	bool single_spin=false;

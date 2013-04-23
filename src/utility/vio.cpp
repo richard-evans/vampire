@@ -626,7 +626,7 @@ int match_create(string const word, string const value, string const unit, int c
 			return EXIT_SUCCESS;
 		}
 		else
-		test="ellipsinder";
+		test="ellipsoid";
 		if(word==test){
 			cs::system_creation_flags[1]=3;
 			return EXIT_SUCCESS;
@@ -1182,6 +1182,30 @@ int match_dimension(string const word, string const value, string const unit, in
 				err::vexit();
 			}
 		}
+      else
+      //--------------------------------------------------------------------
+      test="particle-shape-factor-x";
+      if(word==test){
+         double sfx=atof(value.c_str());
+         check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+         cs::particle_shape_factor_x=sfx;
+      }
+      else
+      //--------------------------------------------------------------------
+      test="particle-shape-factor-y";
+      if(word==test){
+         double sfy=atof(value.c_str());
+         check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+         cs::particle_shape_factor_y=sfy;
+      }
+      else
+      //--------------------------------------------------------------------
+      test="particle-shape-factor-z";
+      if(word==test){
+         double sfz=atof(value.c_str());
+         check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+         cs::particle_shape_factor_z=sfz;
+      }
 		else
 		//--------------------------------------------------------------------
 		test="particle-array-offset-x";

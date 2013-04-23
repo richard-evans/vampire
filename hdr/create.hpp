@@ -76,6 +76,9 @@ namespace cs{
 	extern double particle_spacing;
 	extern double particle_array_offset_x; // Offset particle array along x-direction;
 	extern double particle_array_offset_y; // Offset particle array along y-direction;
+   extern double particle_shape_factor_x; // Normalised particle shape
+   extern double particle_shape_factor_y; // Normalised particle shape
+   extern double particle_shape_factor_z; // Normalised particle shape
 
 	// Other directives and flags
 	extern bool single_spin;
@@ -378,6 +381,7 @@ int cube(double[], std::vector<cs::catom_t> &,const int);
 ///
 int sphere(double[], std::vector<cs::catom_t> &,const int);
 	
+extern void ellipsoid(double[], std::vector<cs::catom_t> &,const int);
 
 /// @brief This is the brief (one line only) description of the function.
 ///
