@@ -1346,6 +1346,11 @@ int match_sim(string const word, string const value, string const unit, int cons
             sim::program=10;
             return EXIT_SUCCESS;
          }
+         test="LaGrange-Multiplier";
+         if(value==test){
+            sim::program=11;
+            return EXIT_SUCCESS;
+         }
          test="Diagnostic-Boltzmann";
 			if(value==test){
 				sim::program=50;

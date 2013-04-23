@@ -58,6 +58,7 @@ int calculate_dipolar_fields(const int,const int);
 void calculate_hamr_fields(const int,const int);
 void calculate_fmr_fields(const int,const int);
 void calculate_surface_anisotropy_fields(const int,const int);
+void calculate_lagrange_fields(const int,const int);
 
 int calculate_spin_fields(const int start_index,const int end_index){
 	//======================================================
@@ -85,7 +86,8 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
 	// Spin Dependent Extra Fields
 	//if(sim::hamiltonian_simulation_flags[4]==1) calculate_??_fields();
-	
+	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
+
 	return 0;
 }
 
@@ -612,3 +614,52 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 	return;
 }
 
+//------------------------------------------------------
+//  Function to calculate LaGrange multiplier fields for
+//  constrained minimization
+//
+//  (c) R F L Evans 2013
+//
+//------------------------------------------------------
+void calculate_lagrange_fields(const int start_index,const int end_index){
+
+   // LaGrange Multiplier
+   const double lx=sim::lagrange_lambda_x;
+   const double ly=sim::lagrange_lambda_y;
+   const double lz=sim::lagrange_lambda_z;
+
+   // Constraint vector
+   const double nu_x=cos(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
+   const double nu_y=sin(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
+   const double nu_z=cos(sim::constraint_phi*M_PI/180.0);
+
+   // Magnetisation
+   const double imm=1.0/sim::lagrange_m;
+   const double imm3=1.0/(sim::lagrange_m*sim::lagrange_m*sim::lagrange_m);
+
+   const double N=sim::lagrange_N;
+
+   // Calculate LaGrange fields
+   for(int atom=start_index;atom<end_index;atom++){
+      const double sx=atoms::x_spin_array[atom];
+      const double sy=atoms::y_spin_array[atom];
+      const double sz=atoms::z_spin_array[atom];
+
+      //std::cout << "S " << sx << "\t" << sy << "\t" << sz << std::endl;
+      //std::cout << "L " << lx << "\t" << ly << "\t" << lz << std::endl;
+      //std::cout << imm << "\t" << imm3 << std::endl;
+
+      const double lambda_dot_s = lx*sx + ly*sy + lz*sz;
+
+      atoms::x_total_spin_field_array[atom]+=N*(lx*imm - lambda_dot_s*sx*imm3 - nu_x);
+      atoms::y_total_spin_field_array[atom]+=N*(ly*imm - lambda_dot_s*sy*imm3 - nu_y);
+      atoms::z_total_spin_field_array[atom]+=N*(lz*imm - lambda_dot_s*sz*imm3 - nu_z);
+
+      //std::cout << "\t" << N*(lx*imm - lambda_dot_s*sx*imm3 - nu_x) << std::endl;
+      //std::cout << "\t" << N*(ly*imm - lambda_dot_s*sy*imm3 - nu_y) << std::endl;
+      //std::cout << "\t" << N*(lz*imm - lambda_dot_s*sz*imm3 - nu_z) << std::endl;
+      //std::cin.get();
+   }
+   return;
+
+}
