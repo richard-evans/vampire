@@ -298,11 +298,6 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	// Create a 2D supercell array of atom numbers to improve performance for systems with many grains
 	std::vector < std::vector < std::vector < int > > > supercell_array;
-	
-        // Calculate number of global unit cells required
-	cs::total_num_unit_cells[0]=int(vmath::iceil(cs::system_dimensions[0]/unit_cell.dimensions[0]));
-	cs::total_num_unit_cells[1]=int(vmath::iceil(cs::system_dimensions[1]/unit_cell.dimensions[1]));
-	cs::total_num_unit_cells[2]=int(vmath::iceil(cs::system_dimensions[2]/unit_cell.dimensions[2]));
 
 	int min_bounds[3];
 	int max_bounds[3];
