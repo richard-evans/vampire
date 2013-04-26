@@ -264,7 +264,10 @@ namespace cells{
 		zlog << zTs() << "Number of local cells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
 		
 		cells::initialised=true;
-		
+
+      // Precalculate cell magnetisation
+      cells::mag();
+
 		return EXIT_SUCCESS;
 	}
 	

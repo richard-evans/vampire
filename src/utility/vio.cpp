@@ -2508,6 +2508,25 @@ int match_config(string const word, string const value, int const line){
 		}
 	}
 	//--------------------------------------------------------------------
+	test="cells";
+   if(word==test){
+      vout::output_cells_config=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="cells-output-rate";
+   if(word==test){
+      int i=atoi(value.c_str());
+      if(i >= 0){
+         vout::output_cells_config_rate=i;
+         return EXIT_SUCCESS;
+      }
+      else{
+         std::cerr << "Error in input file - config:cells-output-rate is outside of valid range ( >=0)" << std::endl;
+         return EXIT_FAILURE;
+      }
+   }
+   //-----------------------------------------
 	else{
 		std::cerr << "Error - Unknown control statement \'config:"<< word << "\' on line " << line << " of input file" << std::endl;
 		return EXIT_FAILURE;
