@@ -29,9 +29,9 @@
 /// @details Demag between cells uses the following format:
 ///          For each cell m = SUM(S.mu_s)
 ///
-///         mu_o     (  3.(m.r_hat)r_hat - m    [    m  ])                4*pi e-7
-/// H = ---------- . ( ------------------------ [ - --- ]),   prefactor = ---------- = e+23
-///       a^3        (         |r|^3            [    3  ])                4*pi e-30
+///         mu_o     (  3.(m.r_hat)r_hat - m   )    [    mu_o m   ])                4*pi e-7
+/// H = ---------- . ( ------------------------) -  [ - --------  ]),   prefactor = ---------- = e+23
+///         4*pi     (         |r|^3           )    [      3V     ])                4*pi e-30
 ///
 ///	An optional performaance optimisation can be made with the following matrix multiplication.
 ///	This is enabled by setting the flag demag::fast=true
@@ -86,7 +86,7 @@ namespace demag{
 	int update_rate=100; /// timesteps between updates
 	int update_time=-1; /// last update time
 
-	const double prefactor=1.0e+23;
+	const double prefactor=1.0e+23; // 1e-7/1e30
 
 	std::vector <std::vector < double > > rij_xx;
 	std::vector <std::vector < double > > rij_xy;
@@ -116,16 +116,19 @@ namespace demag{
 ///
 void init(){
 
-	std::cout << "Initialising demagnetisation tensor" << std::endl;
+	std::cout << "Initialising demagnetisation field calculation" << std::endl;
 	// check for calling of routine
 	if(err::check==true) std::cerr << "demag::set_rij_matrix has been called " << vmpi::my_rank << std::endl;
 	
 	if(demag::fast==true) {
 		
-		// timing function
-		time_t t1;
-		t1 = time (NULL);
-	
+      // timing function
+      #ifdef MPICF
+         double t1 = MPI_Wtime();
+      #else
+         time_t t1;
+         t1 = time (NULL);
+      #endif
 		// Check memory requirements and print to screen
 		zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells)*double(cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 		std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells)*double(cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
@@ -166,7 +169,7 @@ void init(){
 			for(int j=0;j<cells::num_cells;j++){
 				if(i!=j){
 				
-					const double rx = cells::x_coord_array[j]-cells::x_coord_array[i];
+					const double rx = cells::x_coord_array[j]-cells::x_coord_array[i]; // Angstroms
 					const double ry = cells::y_coord_array[j]-cells::y_coord_array[i];
 					const double rz = cells::z_coord_array[j]-cells::z_coord_array[i];
 
@@ -176,7 +179,7 @@ void init(){
 					const double ey = ry*rij;
 					const double ez = rz*rij;
 
-					const double rij3 = rij*rij*rij;
+					const double rij3 = rij*rij*rij; // Angstroms
 
 					rij_xx[lc][j] = demag::prefactor*((3.0*ex*ex - 1.0)*rij3);
 					rij_xy[lc][j] = demag::prefactor*(3.0*ex*ey)*rij3;
@@ -190,23 +193,36 @@ void init(){
 			}
 		}
 		
-		time_t t2;
-		t2 = time (NULL);
+      #ifdef MPICF
+         double t2 = MPI_Wtime();
+      #else
+         time_t t2;
+         t2 = time (NULL);
+      #endif
 		zlog << zTs() << "Precalculation of rij matrix for demag calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
 		
 	}
 	
 	// timing function
-	time_t t1;
-	t1 = time (NULL);
-		
+   #ifdef MPICF
+      double t1 = MPI_Wtime();
+   #else
+      time_t t1;
+      t1 = time (NULL);
+   #endif
+
 	// now calculate fields
 	demag::update();
 
 	// timing function
-	time_t t2;
-	t2 = time (NULL);
-	zlog << zTs() << "Time required for demag update: " << t2-t1 << "s." << std::endl;
+   #ifdef MPICF
+      double t2 = MPI_Wtime();
+   #else
+      time_t t2;
+      t2 = time (NULL);
+   #endif
+
+   zlog << zTs() << "Time required for demag update: " << t2-t1 << "s." << std::endl;
 	
 }
 	
@@ -233,16 +249,19 @@ inline void fast_update(){
 	// check for callin of routine
 	if(err::check==true) std::cerr << "demag::fast_update has been called " << vmpi::my_rank << std::endl;
 
-	const double inv_three_cell_volume = -demag::prefactor*4.0*M_PI/(3.0*cells::size*cells::size*cells::size); // 1.0/(3*a*a*a)
-
 	// loop over local cells
 	for(int lc=0;lc<cells::num_local_cells;lc++){
 		
 		int i = cells::local_cell_array[lc];
 		
-		cells::x_field_array[i]=inv_three_cell_volume*cells::x_mag_array[i];
-		cells::y_field_array[i]=inv_three_cell_volume*cells::y_mag_array[i];
-		cells::z_field_array[i]=inv_three_cell_volume*cells::z_mag_array[i];
+      // Calculate inverse volume from number of atoms in macrocell
+      // V in A^3 == 1e-30 m3, mu_0 = 4pie-7 -> prefactor = pi*4e23/3V
+      const double mu0_three_cell_volume = -4.0e23*M_PI/(3.0*cells::volume_array[i]);
+
+      // Add self-demagnetisation
+		cells::x_field_array[i]=mu0_three_cell_volume*cells::x_mag_array[i];
+		cells::y_field_array[i]=mu0_three_cell_volume*cells::y_mag_array[i];
+		cells::z_field_array[i]=mu0_three_cell_volume*cells::z_mag_array[i];
 
 		// Loop over all other cells to calculate contribution to local cell 
 		for(int j=0;j<cells::num_cells;j++){
@@ -290,21 +309,21 @@ inline void std_update(){
 	// check for callin of routine
 	if(err::check==true) std::cerr << "demag::std_update has been called " << vmpi::my_rank << std::endl;
 	
-	const double inv_three_cell_volume = -4.0*M_PI/(3.0*cells::size*cells::size*cells::size); // 1.0/(3*a*a*a)
-
-	//std::cout << cells::num_local_cells << std::endl;
-
 	// loop over local cells
 	for(int lc=0;lc<cells::num_local_cells;lc++){
 		
 		// get global cell ID
 		int i = cells::local_cell_array[lc];
 
-		//std::cout << i << std::endl;
-		// zero field arrays
-		cells::x_field_array[i]=inv_three_cell_volume*cells::x_mag_array[i];
-		cells::y_field_array[i]=inv_three_cell_volume*cells::y_mag_array[i];
-		cells::z_field_array[i]=inv_three_cell_volume*cells::z_mag_array[i];
+      // Calculate inverse volume from number of atoms in macrocell
+      // V in A^3 == 1e-30 m3, mu_0 = 4pie-7 -> prefactor = pi*4e23/3V
+      // But multiplied out at the end -> prefactor = pi*4/3V
+      const double mu0_three_cell_volume = -4.0*M_PI/(3.0*cells::volume_array[i]);
+
+      // Add self-demagnetisation
+		cells::x_field_array[i]=mu0_three_cell_volume*cells::x_mag_array[i];
+		cells::y_field_array[i]=mu0_three_cell_volume*cells::y_mag_array[i];
+		cells::z_field_array[i]=mu0_three_cell_volume*cells::z_mag_array[i];
 		
 		// Loop over all other cells to calculate contribution to local cell 
 		for(int j=0;j<i;j++){
@@ -318,7 +337,7 @@ inline void std_update(){
 			const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
 
 			const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
-			const double drij3 = drij*drij*drij;
+			const double drij3 = drij*drij*drij; // Angstroms
 
 			const double ex = dx*drij;
 			const double ey = dy*drij;
@@ -395,7 +414,7 @@ void update(){
 
 	// prevent double calculation for split integration (MPI)
 	if(demag::update_time!=sim::time){
- 
+
 		// Check if update required
 	  if(sim::time%demag::update_rate==0){
 

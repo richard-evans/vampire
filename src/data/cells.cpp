@@ -78,6 +78,8 @@ namespace cells{
 	std::vector <double> x_field_array;
 	std::vector <double> y_field_array;
 	std::vector <double> z_field_array;
+
+   std::vector <double> volume_array;
 	
 /// @brief Cell initialiser function
 ///
@@ -204,14 +206,20 @@ namespace cells{
 		cells::z_field_array.resize(cells::num_cells,0.0);
 		
 		cells::num_atoms_in_cell.resize(cells::num_cells,0);
-		
-		// Now add atoms to each cell
+      cells::volume_array.resize(cells::num_cells,0.0);
+
+      std::vector<double> total_moment_array(cells::num_cells,0.0);
+
+		// Now add atoms to each cell as magnetic 'centre of mass'
 		for(int atom=0;atom<num_local_atoms;atom++){
 			int local_cell=atoms::cell_array[atom];
-			cells::x_coord_array[local_cell]+=atoms::x_coord_array[atom];
-			cells::y_coord_array[local_cell]+=atoms::y_coord_array[atom];
-			cells::z_coord_array[local_cell]+=atoms::z_coord_array[atom];
-			cells::num_atoms_in_cell[local_cell]++;
+         int type = atoms::type_array[atom];
+         const double mus = mp::material[type].mu_s_SI;
+			cells::x_coord_array[local_cell]+=atoms::x_coord_array[atom]*mus;
+			cells::y_coord_array[local_cell]+=atoms::y_coord_array[atom]*mus;
+			cells::z_coord_array[local_cell]+=atoms::z_coord_array[atom]*mus;
+         total_moment_array[local_cell]+=mus;
+         cells::num_atoms_in_cell[local_cell]++;
 		}
 
 		// For MPI sum coordinates from all CPUs
@@ -220,7 +228,8 @@ namespace cells{
 			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::x_coord_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
 			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::y_coord_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
 			MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::z_coord_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
-		#endif
+         MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&total_moment_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
+      #endif
 		
 		//if(vmpi::my_rank==0){
 			//vinfo << "=========================================================================" << std::endl;
@@ -228,12 +237,17 @@ namespace cells{
 			//vinfo << "=========================================================================" << std::endl;
 		//}
 
-		// Now find mean coordinates
+      // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
+      const double atomic_volume = cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[2]/cs::unit_cell.atom.size();
+
+		// Now find mean coordinates via magnetic 'centre of mass'
 		for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
 			if(cells::num_atoms_in_cell[local_cell]>0){
-				cells::x_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
-				cells::y_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
-				cells::z_coord_array[local_cell]/=double(cells::num_atoms_in_cell[local_cell]);
+            const double n_local_cells=double(cells::num_atoms_in_cell[local_cell]);
+            cells::x_coord_array[local_cell] = cells::x_coord_array[local_cell]/(n_local_cells*total_moment_array[local_cell]);
+            cells::y_coord_array[local_cell] = cells::y_coord_array[local_cell]/(n_local_cells*total_moment_array[local_cell]);
+            cells::z_coord_array[local_cell] = cells::z_coord_array[local_cell]/(n_local_cells*total_moment_array[local_cell]);
+            cells::volume_array[local_cell] = n_local_cells*atomic_volume;
 			}
 			//if(vmpi::my_rank==0){
 			//vinfo << local_cell << "\t" << cells::num_atoms_in_cell[local_cell] << "\t";
@@ -311,13 +325,12 @@ int mag() {
     int num_local_atoms = atoms::num_atoms;
 #endif
 
-  // calulate magnetisation in each cell
+  // calulate total moment in each cell
   for(int i=0;i<num_local_atoms;++i) {
     int cell = atoms::cell_array[i];
     int type = atoms::type_array[i];
     const double mus = mp::material[type].mu_s_SI;
 
-    //
     cells::x_mag_array[cell] += atoms::x_spin_array[i]*mus;
     cells::y_mag_array[cell] += atoms::y_spin_array[i]*mus;
     cells::z_mag_array[cell] += atoms::z_spin_array[i]*mus;

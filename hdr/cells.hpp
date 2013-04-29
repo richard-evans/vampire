@@ -58,6 +58,8 @@ namespace cells{
 	extern std::vector <double> y_field_array;
 	extern std::vector <double> z_field_array;
 
+   extern std::vector <double> volume_array;
+
 	extern int initialise();
 	extern int mag();
 	extern int output_mag(std::ofstream&);
