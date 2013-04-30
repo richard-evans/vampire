@@ -38,6 +38,7 @@ namespace cells{
 
 	extern int num_cells;
 	extern int num_local_cells;
+   extern int num_atoms_in_unit_cell;
 
 	extern double size;
 

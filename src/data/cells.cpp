@@ -60,6 +60,7 @@ namespace cells{
 	
 	int num_cells=0;
 	int num_local_cells=0;
+   int num_atoms_in_unit_cell=0;
 	double size=7.0; // Angstroms
 
 	bool initialised=false;
@@ -111,10 +112,10 @@ namespace cells{
 		
 		zlog << zTs() << "Cell size = " << cells::size << std::endl; 
 		
-		// determine number of cells in each direction
-		unsigned int ncellx = static_cast<unsigned int>(ceil(cs::system_dimensions[0]/cells::size));
-		unsigned int ncelly = static_cast<unsigned int>(ceil(cs::system_dimensions[1]/cells::size));
-		unsigned int ncellz = static_cast<unsigned int>(ceil(cs::system_dimensions[2]/cells::size));
+		// determine number of cells in each direction (with small shift to prevent the fence post problem)
+		unsigned int ncellx = static_cast<unsigned int>(ceil((cs::system_dimensions[0]+0.01)/cells::size));
+		unsigned int ncelly = static_cast<unsigned int>(ceil((cs::system_dimensions[1]+0.01)/cells::size));
+		unsigned int ncellz = static_cast<unsigned int>(ceil((cs::system_dimensions[2]+0.01)/cells::size));
 		
 		//update total number of cells
 		cells::num_cells=ncellx*ncelly*ncellz;
@@ -146,8 +147,8 @@ namespace cells{
 		}
 		catch(...){std::cerr << "Error allocating supercell_array for cell list calculation" << std::endl;err::vexit();}
 		
-		// offset cells to prevent rounding error
-		double atom_offset[3]={0.0,0.0,0.0}; //0.25*cs::unit_cell_size[0],0.25*cs::unit_cell_size[1],0.25*cs::unit_cell_size[2]};
+		// slightly offset atomic coordinates to prevent fence post problem
+      double atom_offset[3]={0.01,0.01,0.01};
 
 		// For MPI version, only add local atoms
 		#ifdef MPICF
@@ -238,17 +239,16 @@ namespace cells{
 		//}
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
-      const double atomic_volume = cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[2]/cs::unit_cell.atom.size();
+      const double atomic_volume = cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[2]/cells::num_atoms_in_unit_cell;
 
 		// Now find mean coordinates via magnetic 'centre of mass'
 		for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
 			if(cells::num_atoms_in_cell[local_cell]>0){
-            const double n_local_cells=double(cells::num_atoms_in_cell[local_cell]);
-            cells::x_coord_array[local_cell] = cells::x_coord_array[local_cell]/(n_local_cells*total_moment_array[local_cell]);
-            cells::y_coord_array[local_cell] = cells::y_coord_array[local_cell]/(n_local_cells*total_moment_array[local_cell]);
-            cells::z_coord_array[local_cell] = cells::z_coord_array[local_cell]/(n_local_cells*total_moment_array[local_cell]);
-            cells::volume_array[local_cell] = n_local_cells*atomic_volume;
-			}
+            cells::x_coord_array[local_cell] = cells::x_coord_array[local_cell]/(total_moment_array[local_cell]);
+            cells::y_coord_array[local_cell] = cells::y_coord_array[local_cell]/(total_moment_array[local_cell]);
+            cells::z_coord_array[local_cell] = cells::z_coord_array[local_cell]/(total_moment_array[local_cell]);
+            cells::volume_array[local_cell] = double(cells::num_atoms_in_cell[local_cell])*atomic_volume;
+         }
 			//if(vmpi::my_rank==0){
 			//vinfo << local_cell << "\t" << cells::num_atoms_in_cell[local_cell] << "\t";
 			//vinfo << cells::x_coord_array[local_cell] << "\t" << cells::y_coord_array[local_cell];

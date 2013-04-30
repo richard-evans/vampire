@@ -433,6 +433,20 @@ void cells(){
    std::string cfg_file = file_sstr.str();
    const char* cfg_filec = cfg_file.c_str();
 
+   #ifdef MPICF
+   // Reduce demagnetisation fields to processor 0
+   if(vmpi::my_rank==0){
+      MPI_Reduce(MPI_IN_PLACE, &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+   }
+   else{
+      MPI_Reduce(&cells::x_field_array[0], &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&cells::y_field_array[0], &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&cells::z_field_array[0], &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+   }
+   #endif
+
    // Output masterfile header on root process
    if(vmpi::my_rank==0){
 
