@@ -283,6 +283,24 @@ double spin_second_order_uniaxial_anisotropy_energy(const int imaterial, const d
    return -mp::material_second_order_anisotropy_constant_array[imaterial]*(Sz2*Sz2-2.0*Sz2);
 }
 
+//------------------------------------------------------
+//  Function to calculate lattice anisotropy energy
+//
+//  (c) R F L Evans 2013
+//
+//  Assume temperature dependent anisotropy constant:
+//
+//                   tanh((T-Ti)/Tw) - fmin
+//  kappa = Klatt * ------------------------
+//                        fmax-fmin
+//
+//  E = kappa * S_z^2
+//
+//------------------------------------------------------
+double spin_lattice_anisotropy_energy(const int imaterial, const double Sz){
+   return sim::lattice_anisotropy_function(sim::temperature, imaterial)*Sz*Sz;
+}
+
 /// @brief Calculates the applied field energy for a single spin.
 ///
 /// @section License
@@ -428,6 +446,7 @@ double calculate_spin_energy(const int atom, const int AtomExchangeType){
 	}
 	if(second_order_uniaxial_anisotropy) energy+=spin_second_order_uniaxial_anisotropy_energy(imaterial, Sz);
 	if(sim::CubicScalarAnisotropy==true) energy+=spin_cubic_anisotropy_energy(imaterial, Sx, Sy, Sz);
+   if(sim::lattice_anisotropy_flag) energy+=spin_lattice_anisotropy_energy(imaterial, Sz);
 	if(sim::surface_anisotropy==true) energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);
 	energy+=spin_applied_field_energy(Sx, Sy, Sz);
 	energy+=spin_magnetostatic_energy(atom, Sx, Sy, Sz);

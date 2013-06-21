@@ -95,6 +95,7 @@ namespace stats
    double total_exchange_energy           = 0.0;
    double total_anisotropy_energy         = 0.0;
    double total_so_anisotropy_energy      = 0.0;
+   double total_lattice_anisotropy_energy = 0.0;
    double total_cubic_anisotropy_energy   = 0.0;
    double total_surface_anisotropy_energy = 0.0;
    double total_applied_field_energy      = 0.0;
@@ -104,10 +105,11 @@ namespace stats
    double mean_total_exchange_energy           = 0.0;
    double mean_total_anisotropy_energy         = 0.0;
    double mean_total_so_anisotropy_energy      = 0.0;
+   double mean_total_lattice_anisotropy_energy = 0.0;
    double mean_total_cubic_anisotropy_energy   = 0.0;
    double mean_total_surface_anisotropy_energy = 0.0;
    double mean_total_applied_field_energy      = 0.0;
-   double mean_total_magnetostatic_energy     = 0.0;
+   double mean_total_magnetostatic_energy      = 0.0;
 
    double energy_data_counter = 0.0;
    bool calculate_energy = false;
@@ -561,6 +563,7 @@ void system_energy(){
    stats::total_energy=0.0;
    stats::total_exchange_energy=0.0;
    stats::total_anisotropy_energy=0.0;
+   stats::total_lattice_anisotropy_energy=0.0;
    stats::total_so_anisotropy_energy=0.0;
    stats::total_cubic_anisotropy_energy=0.0;
    stats::total_surface_anisotropy_energy=0.0;
@@ -649,6 +652,15 @@ void system_energy(){
       }
       stats::total_so_anisotropy_energy=energy;
    }
+   if(sim::lattice_anisotropy_flag){
+      double register energy=0.0;
+      for(int atom=0; atom<stats::num_atoms; atom++){
+         const double Sz=atoms::z_spin_array[atom];
+         const int imaterial=atoms::type_array[atom];
+         energy+=sim::spin_lattice_anisotropy_energy(imaterial, Sz)*mp::material[imaterial].mu_s_SI;
+      }
+      stats::total_lattice_anisotropy_energy=energy;
+   }
    if(sim::surface_anisotropy==true){
       double register energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
@@ -687,6 +699,7 @@ void system_energy(){
    stats::total_energy = stats::total_exchange_energy +
                          stats::total_anisotropy_energy +
                          stats::total_so_anisotropy_energy +
+                         stats::total_lattice_anisotropy_energy +
                          stats::total_cubic_anisotropy_energy +
                          stats::total_surface_anisotropy_energy +
                          stats::total_applied_field_energy +
@@ -698,6 +711,7 @@ void system_energy(){
       MPI_Reduce(MPI_IN_PLACE, &stats::total_exchange_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
       MPI_Reduce(MPI_IN_PLACE, &stats::total_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
       MPI_Reduce(MPI_IN_PLACE, &stats::total_so_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &stats::total_lattice_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
       MPI_Reduce(MPI_IN_PLACE, &stats::total_cubic_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
       MPI_Reduce(MPI_IN_PLACE, &stats::total_surface_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
       MPI_Reduce(MPI_IN_PLACE, &stats::total_applied_field_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -709,6 +723,7 @@ void system_energy(){
    stats::mean_total_exchange_energy           += stats::total_exchange_energy;
    stats::mean_total_anisotropy_energy         += stats::total_anisotropy_energy;
    stats::mean_total_so_anisotropy_energy      += stats::total_so_anisotropy_energy;
+   stats::mean_total_lattice_anisotropy_energy += stats::total_lattice_anisotropy_energy;
    stats::mean_total_cubic_anisotropy_energy   += stats::total_cubic_anisotropy_energy;
    stats::mean_total_surface_anisotropy_energy += stats::total_surface_anisotropy_energy;
    stats::mean_total_applied_field_energy      += stats::total_applied_field_energy;

@@ -80,10 +80,15 @@ using std::string;
 		double magnetisation;
 		double Ku1_SI; // SI uniaxial anisotropy constant
 		double Ku2_SI;
+      double Klatt_SI;
 		std::vector<double> KuVec_SI; // SI anisotropy tensor
 		double Ku; // normalised uniaxial anisotropy constant
       double Ku2; // normalised uniaxial anisotropy constant
-		std::vector<double> KuVec; // normalised anisotropy tensor
+      double Klatt; // normalised lattice anisotropy
+      double Klatt_inflection_temperature;
+      double Klatt_unity_tmperature;
+      double Klatt_width_temperature;
+      std::vector<double> KuVec; // normalised anisotropy tensor
 		std::vector<double> UniaxialAnisotropyUnitVector; // unit vector for material uniaxial anisotropy
 		double Kc1_SI;
 		double Kc2_SI;

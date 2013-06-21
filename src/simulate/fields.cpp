@@ -51,6 +51,7 @@
 int calculate_exchange_fields(const int,const int);
 int calculate_anisotropy_fields(const int,const int);
 void calculate_second_order_uniaxial_anisotropy_fields(const int,const int);
+void calculate_lattice_anisotropy_fields(const int, const int);
 int calculate_cubic_anisotropy_fields(const int,const int);
 int calculate_applied_fields(const int,const int);
 int calculate_thermal_fields(const int,const int);
@@ -81,6 +82,7 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	// Anisotropy Fields
 	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
    if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
+   if(sim::lattice_anisotropy_flag) calculate_lattice_anisotropy_fields(start_index,end_index);
    if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
 	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
 	if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
@@ -284,6 +286,59 @@ void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,con
       const double Ku2=4.0*mp::material_second_order_anisotropy_constant_array[imaterial];
       const double Sz=atoms::z_spin_array[atom];
       atoms::z_total_spin_field_array[atom] -= Ku2*Sz*(1.0 - Sz*Sz);
+   }
+   return;
+}
+
+namespace sim{
+//------------------------------------------------------
+//  Function to calculate lattice anisotropy constant
+//
+//  (c) R F L Evans 2013
+//
+//  Assume temperature dependent anisotropy constant:
+//
+//                   tanh((T-Ti)/Tw) - fmin
+//  kappa = Klatt * ------------------------
+//                        fmax-fmin
+//
+//------------------------------------------------------
+double lattice_anisotropy_function(const double T, const int imaterial){
+   const double Klatt = mp::material[imaterial].Klatt;
+   const double Ti = mp::material[imaterial].Klatt_inflection_temperature;
+   const double Tu = mp::material[imaterial].Klatt_unity_tmperature;
+   const double Tw = mp::material[imaterial].Klatt_width_temperature;
+   const double fmin=tanh(-Ti/Tw);
+   const double fmax=tanh((Tu-Ti)/Tw);
+   return Klatt*((tanh((T-Ti)/Tw) - fmin)/(fmax-fmin));
+}
+} // end of sim namespace
+
+//------------------------------------------------------
+//  Function to calculate lattice anisotropy fields
+//
+//  (c) R F L Evans 2013
+//
+//  E = kappa * S_z^2
+//
+//  Hx = 0
+//  Hy = 0
+//  Hz = -2*kappa*S_z
+//
+//------------------------------------------------------
+void calculate_lattice_anisotropy_fields(const int start_index,const int end_index){
+
+   // Precalculate material lattice anisotropy constants
+   std::vector<double> klatt_array(0);
+   klatt_array.reserve(mp::num_materials);
+   for(int imat=0; imat<mp::num_materials; imat++) klatt_array.push_back(sim::lattice_anisotropy_function(sim::temperature, imat));
+
+   // Now calculate fields
+   for(int atom=start_index;atom<end_index;atom++){
+      const int imaterial=atoms::type_array[atom];
+      const double Klattice=-2.0*klatt_array[imaterial];
+      const double Sz=atoms::z_spin_array[atom];
+      atoms::z_total_spin_field_array[atom] += Klattice*Sz*Sz;
    }
    return;
 }

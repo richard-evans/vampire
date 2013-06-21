@@ -300,6 +300,7 @@ int set_derived_parameters(){
 		}
 		mp::material[mat].Ku									= mp::material[mat].Ku1_SI/mp::material[mat].mu_s_SI;
       mp::material[mat].Ku2                        = mp::material[mat].Ku2_SI/mp::material[mat].mu_s_SI;
+      mp::material[mat].Klatt                      = mp::material[mat].Klatt_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].Kc									= mp::material[mat].Kc1_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].Ks									= mp::material[mat].Ks_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
