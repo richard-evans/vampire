@@ -285,7 +285,7 @@ void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,con
       const int imaterial=atoms::type_array[atom];
       const double Ku2=4.0*mp::material_second_order_anisotropy_constant_array[imaterial];
       const double Sz=atoms::z_spin_array[atom];
-      atoms::z_total_spin_field_array[atom] -= Ku2*Sz*(1.0 - Sz*Sz);
+      atoms::z_total_spin_field_array[atom] -= Ku2*Sz*Sz*Sz;
    }
    return;
 }
