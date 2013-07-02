@@ -67,6 +67,7 @@ materials_t::materials_t ():
 	H_th_sigma(0.0),
 	constrained(false),
 	temperature(0.0),
+	couple_to_phonon_temperature(false),
 	applied_field_strength(0.0),
 	applied_field_unit_vector(3,0.0),
 	fmr_field_strength(0.0),

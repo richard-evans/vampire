@@ -299,7 +299,40 @@ void check_for_valid_value(double& value, // value of variable as in input file
 		err::vexit();
 	}
 
+	// Success - input is sane!
 	return;
+
+}
+
+//-----------------------------------------------------------------------
+// Function to check for valid boolean
+//
+// (c) R F L Evans 2013
+//
+// If input is invalid, then function will output error message and
+// program will exit from here. Otherwise returns a sanitised bool.
+//
+//-----------------------------------------------------------------------
+bool check_for_valid_bool( std::string value, // variable as in input file
+                           std::string word, // input file keyword
+                           int line, // input file line
+                           std::string prefix, // input file prefix
+                           std::string input_file_type) //input file name
+{
+   // Define string constants
+   const std::string t="true";
+   const std::string f="false";
+   const std::string b="";
+
+   // Check for three possible correct answers
+   if(value==t) return true;
+   if(value==f) return false;
+   if(value==b) return true;
+
+   // Invalid input - print error and exit
+   std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
+   zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
+   err::vexit();
 
 }
 
@@ -3880,6 +3913,26 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
+      //--------------------------------------------------------------------
+      test="use-phonon-temperature";
+      /*
+        logical use-phonon-temperature
+           This flag enables specific materials to couple to the phonon temperature
+           of the system for simulations using the two temperature model. The default 
+           is for all materials to use the electron temperature. Valid values are true, 
+           false or (blank) [same as true].
+       */
+      if(word==test){
+         // Test for sane input
+         bool sanitised_bool=check_for_valid_bool(value, word, line, prefix,"material");
+
+         // set flag
+         read_material[super_index].couple_to_phonon_temperature=sanitised_bool;
+
+         // enable local temperature flag
+         sim::local_temperature=true;
+         return EXIT_SUCCESS;
+      }
 		//--------------------------------------------------------------------
 		test="applied-field-strength";
 		if(word==test){

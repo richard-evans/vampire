@@ -127,6 +127,7 @@ using std::string;
 		bool constrained; // specifies primary or alternate integrator
 
 		double temperature; // Kelvin
+		bool couple_to_phonon_temperature; //true/false
 		double applied_field_strength; // Tesla
 		std::vector<double> applied_field_unit_vector; // unit vector for material uniaxial anisotropy
 		double fmr_field_strength; // Tesla
