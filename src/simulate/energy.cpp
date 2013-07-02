@@ -280,7 +280,7 @@ double spin_cubic_anisotropy_energy(const int imaterial, const double Sx, const 
 //---------------------------------------------------------------
 double spin_second_order_uniaxial_anisotropy_energy(const int imaterial, const double Sz){
    const double Sz2=Sz*Sz;
-   return -mp::material_second_order_anisotropy_constant_array[imaterial]*(Sz2*Sz2);
+   return mp::material_second_order_anisotropy_constant_array[imaterial]*(Sz2*Sz2);
 }
 
 //------------------------------------------------------
