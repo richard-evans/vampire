@@ -303,7 +303,40 @@ void check_for_valid_value(double& value, // value of variable as in input file
 		err::vexit();
 	}
 
+	// Success - input is sane!
 	return;
+
+}
+
+//-----------------------------------------------------------------------
+// Function to check for valid boolean
+//
+// (c) R F L Evans 2013
+//
+// If input is invalid, then function will output error message and
+// program will exit from here. Otherwise returns a sanitised bool.
+//
+//-----------------------------------------------------------------------
+bool check_for_valid_bool( std::string value, // variable as in input file
+                           std::string word, // input file keyword
+                           int line, // input file line
+                           std::string prefix, // input file prefix
+                           std::string input_file_type) //input file name
+{
+   // Define string constants
+   const std::string t="true";
+   const std::string f="false";
+   const std::string b="";
+
+   // Check for three possible correct answers
+   if(value==t) return true;
+   if(value==f) return false;
+   if(value==b) return true;
+
+   // Invalid input - print error and exit
+   std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
+   zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
+   err::vexit();
 
 }
 
@@ -630,7 +663,7 @@ int match_create(string const word, string const value, string const unit, int c
 			return EXIT_SUCCESS;
 		}
 		else
-		test="ellipsinder";
+		test="ellipsoid";
 		if(word==test){
 			cs::system_creation_flags[1]=3;
 			return EXIT_SUCCESS;
@@ -1186,6 +1219,30 @@ int match_dimension(string const word, string const value, string const unit, in
 				err::vexit();
 			}
 		}
+      else
+      //--------------------------------------------------------------------
+      test="particle-shape-factor-x";
+      if(word==test){
+         double sfx=atof(value.c_str());
+         check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+         cs::particle_shape_factor_x=sfx;
+      }
+      else
+      //--------------------------------------------------------------------
+      test="particle-shape-factor-y";
+      if(word==test){
+         double sfy=atof(value.c_str());
+         check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+         cs::particle_shape_factor_y=sfy;
+      }
+      else
+      //--------------------------------------------------------------------
+      test="particle-shape-factor-z";
+      if(word==test){
+         double sfz=atof(value.c_str());
+         check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+         cs::particle_shape_factor_z=sfz;
+      }
 		else
 		//--------------------------------------------------------------------
 		test="particle-array-offset-x";
@@ -1348,6 +1405,11 @@ int match_sim(string const word, string const value, string const unit, int cons
          test="Reverse-Hybrid-CMC";
          if(value==test){
             sim::program=10;
+            return EXIT_SUCCESS;
+         }
+         test="LaGrange-Multiplier";
+         if(value==test){
+            sim::program=11;
             return EXIT_SUCCESS;
          }
          test="Diagnostic-Boltzmann";
@@ -2483,6 +2545,25 @@ int match_config(string const word, string const value, int const line){
 		}
 	}
 	//--------------------------------------------------------------------
+	test="cells";
+   if(word==test){
+      vout::output_cells_config=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="cells-output-rate";
+   if(word==test){
+      int i=atoi(value.c_str());
+      if(i >= 0){
+         vout::output_cells_config_rate=i;
+         return EXIT_SUCCESS;
+      }
+      else{
+         std::cerr << "Error in input file - config:cells-output-rate is outside of valid range ( >=0)" << std::endl;
+         return EXIT_FAILURE;
+      }
+   }
+   //-----------------------------------------
 	else{
 		std::cerr << "Error - Unknown control statement \'config:"<< word << "\' on line " << line << " of input file" << std::endl;
 		return EXIT_FAILURE;
@@ -2757,6 +2838,21 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
          stats::calculate_energy=true;
          return EXIT_SUCCESS;
       }
+      //-------------------------------------------------------------------
+      test="second-order-uniaxial-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(41);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="mean-second-order-uniaxial-anisotropy-energy";
+      if(word==test){
+         output_list.push_back(42);
+         stats::calculate_energy=true;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
       test="MPI-Timings";
 		if(word==test){
 			vmpi::DetailedMPITiming=true;
@@ -3103,6 +3199,8 @@ int match_material(string const word, string const value, string const unit, int
 		//-------------------------------------------------------------------
 		// system_creation_flags[1] - Set system particle shape
 		//-------------------------------------------------------------------
+      std::string prefix="material:";
+
 		std::string test="num-materials";
 		if(word==test){
 			mp::num_materials=atoi(value.c_str());
@@ -3231,7 +3329,71 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
-		//------------------------------------------------------------
+      //------------------------------------------------------------
+      else
+      test="second-uniaxial-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         string unit_type="energy";
+         // if no unit given, assume internal
+         if(unit.size() != 0){
+            units::convert(unit,K,unit_type);
+         }
+         string str="energy";
+         if(unit_type==str){
+            // set anisotropy
+            read_material[super_index].Ku2_SI=K;
+            // enable global anisotropy flag
+            sim::second_order_uniaxial_anisotropy=true;
+            return EXIT_SUCCESS;
+         }
+         else{
+            std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+            err::vexit();
+         }
+      }
+      //------------------------------------------------------------
+      else
+      test="lattice-anisotropy-constant";
+      if(word==test){
+         double Klatt=atof(value.c_str());
+         // Test for valid range
+         check_for_valid_value(Klatt, word, line, prefix, unit, "energy", -1.0e-18, 1.0e18,"material","-1e18 - 1e18");
+         read_material[super_index].Klatt_SI=Klatt;
+         sim::lattice_anisotropy_flag=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="lattice-anisotropy-inflection-temperature";
+      if(word==test){
+         double KlattTinf=atof(value.c_str());
+         // Test for valid range
+         check_for_valid_value(KlattTinf, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
+         read_material[super_index].Klatt_inflection_temperature=KlattTinf;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="lattice-anisotropy-unity-temperature";
+      if(word==test){
+         double KlattTu=atof(value.c_str());
+         // Test for valid range
+         check_for_valid_value(KlattTu, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
+         read_material[super_index].Klatt_unity_tmperature=KlattTu;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="lattice-anisotropy-temperature-width";
+      if(word==test){
+         double KlattTw=atof(value.c_str());
+         // Test for valid range
+         check_for_valid_value(KlattTw, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
+         read_material[super_index].Klatt_width_temperature=KlattTw;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
 		else
 		test="cubic-anisotropy-constant";
 		if(word==test){
@@ -3755,6 +3917,26 @@ int match_material(string const word, string const value, string const unit, int
 				err::vexit();
 			}
 		}
+      //--------------------------------------------------------------------
+      test="use-phonon-temperature";
+      /*
+        logical use-phonon-temperature
+           This flag enables specific materials to couple to the phonon temperature
+           of the system for simulations using the two temperature model. The default 
+           is for all materials to use the electron temperature. Valid values are true, 
+           false or (blank) [same as true].
+       */
+      if(word==test){
+         // Test for sane input
+         bool sanitised_bool=check_for_valid_bool(value, word, line, prefix,"material");
+
+         // set flag
+         read_material[super_index].couple_to_phonon_temperature=sanitised_bool;
+
+         // enable local temperature flag
+         sim::local_temperature=true;
+         return EXIT_SUCCESS;
+      }
 		//--------------------------------------------------------------------
 		test="applied-field-strength";
 		if(word==test){
@@ -4225,6 +4407,16 @@ namespace vout{
       stats::output_energy(stream, stats::magnetostatic, stats::mean);
    }
 
+   // Output Function 41
+   void total_so_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::second_order_anisotropy, stats::total);
+   }
+
+   // Output Function 42
+   void mean_total_so_anisotropy_energy(std::ostream& stream){
+      stats::output_energy(stream, stats::second_order_anisotropy, stats::mean);
+   }
+
    // Output Function 60
 	void MPITimings(std::ostream& stream){
 
@@ -4379,6 +4571,12 @@ namespace vout{
             case 40:
                vout::mean_total_magnetostatic_energy(zmag);
                break;
+            case 41:
+               vout::total_so_anisotropy_energy(zmag);
+               break;
+            case 42:
+               vout::mean_total_so_anisotropy_energy(zmag);
+               break;
             case 60:
 					vout::MPITimings(zmag);
 					break;
@@ -4505,6 +4703,12 @@ namespace vout{
                break;
             case 40:
                vout::mean_total_magnetostatic_energy(std::cout);
+               break;
+            case 41:
+               vout::total_so_anisotropy_energy(std::cout);
+               break;
+            case 42:
+               vout::mean_total_so_anisotropy_energy(std::cout);
                break;
             case 60:
 					vout::MPITimings(std::cout);

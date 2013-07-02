@@ -38,6 +38,7 @@ namespace cells{
 
 	extern int num_cells;
 	extern int num_local_cells;
+   extern int num_atoms_in_unit_cell;
 
 	extern double size;
 
@@ -57,6 +58,8 @@ namespace cells{
 	extern std::vector <double> x_field_array;
 	extern std::vector <double> y_field_array;
 	extern std::vector <double> z_field_array;
+
+   extern std::vector <double> volume_array;
 
 	extern int initialise();
 	extern int mag();

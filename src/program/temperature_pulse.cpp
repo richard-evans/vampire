@@ -83,7 +83,7 @@ double temperature_pulse_function(double function_time){
 
 // Calculates temperature for single Gaussian pulse using the two-temperature model
 double two_temperature_function(double ftime){
-		
+
 		const double reduced_time =  (ftime-3.*sim::pump_time)/(sim::pump_time);
 		const double pump=sim::pump_power*exp(-reduced_time*reduced_time);
 
@@ -93,9 +93,17 @@ double two_temperature_function(double ftime){
 		const double Ce = sim::TTCe;
 		const double Cl = sim::TTCl;
 		const double dt = mp::dt_SI;
-		
+
 		sim::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
 		sim::TTTp = ( G*(Te-Tp)     )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
+
+      // Optionally set material specific temperatures
+      if(sim::local_temperature==true){
+         for(int mat=0;mat<mp::material.size();mat++){
+            if(mp::material[mat].couple_to_phonon_temperature==true) mp::material[mat].temperature=sim::TTTp;
+            else mp::material[mat].temperature=sim::TTTe;
+         }
+      }
 
 		return sim::TTTe;
 
@@ -116,10 +124,18 @@ double double_pump_two_temperature_function(double ftime){
 		const double Ce = sim::TTCe;
 		const double Cl = sim::TTCl;
 		const double dt = mp::dt_SI;
-		
+
 		sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/(Ce*Te) + Te;
 		sim::TTTp = ( G*(Te-Tp)           )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
-	
+
+      // Optionally set material specific temperatures
+      if(sim::local_temperature==true){
+         for(int mat=0;mat<mp::material.size();mat++){
+            if(mp::material[mat].couple_to_phonon_temperature==true) mp::material[mat].temperature=sim::TTTp;
+            else mp::material[mat].temperature=sim::TTTe;
+         }
+      }
+
 		return sim::TTTe;
 }
 
@@ -193,19 +209,27 @@ void temperature_pulse(){
 	// Initialise electron and phonon temperature
 	sim::TTTe=sim::temperature;
 	sim::TTTp=sim::temperature;
-	
-	// Equilibrate system
+
+   // If local temperature is set then also initalise local temperatures
+   if(sim::local_temperature==true){
+      for(int mat=0;mat<mp::material.size();mat++){
+         if(mp::material[mat].couple_to_phonon_temperature==true) mp::material[mat].temperature=sim::TTTp;
+         else mp::material[mat].temperature=sim::TTTe;
+      }
+   }
+
+   // Equilibrate system
 	while(sim::time<sim::equilibration_time){
-		
+
 		sim::integrate(sim::partial_time);
-		
+
 		// Calculate magnetisation statistics
 		stats::mag_m();
-		
+
 		// Output data
 		vout::data();
 	}
-	
+
 	//loop sim::runs times
 	for(int r=0; r<sim::runs;r++){
 		

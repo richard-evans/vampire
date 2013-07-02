@@ -80,9 +80,15 @@ using std::string;
 		double magnetisation;
 		double Ku1_SI; // SI uniaxial anisotropy constant
 		double Ku2_SI;
+      double Klatt_SI;
 		std::vector<double> KuVec_SI; // SI anisotropy tensor
 		double Ku; // normalised uniaxial anisotropy constant
-		std::vector<double> KuVec; // normalised anisotropy tensor
+      double Ku2; // normalised uniaxial anisotropy constant
+      double Klatt; // normalised lattice anisotropy
+      double Klatt_inflection_temperature;
+      double Klatt_unity_tmperature;
+      double Klatt_width_temperature;
+      std::vector<double> KuVec; // normalised anisotropy tensor
 		std::vector<double> UniaxialAnisotropyUnitVector; // unit vector for material uniaxial anisotropy
 		double Kc1_SI;
 		double Kc2_SI;
@@ -121,6 +127,7 @@ using std::string;
 		bool constrained; // specifies primary or alternate integrator
 
 		double temperature; // Kelvin
+		bool couple_to_phonon_temperature; //true/false
 		double applied_field_strength; // Tesla
 		std::vector<double> applied_field_unit_vector; // unit vector for material uniaxial anisotropy
 		double fmr_field_strength; // Tesla
@@ -144,6 +151,7 @@ using std::string;
 	extern std::vector <double> MaterialMuSSIArray;
 	extern std::vector <zkval_t> MaterialScalarAnisotropyArray;
 	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
+   extern std::vector <double> material_second_order_anisotropy_constant_array;
 	extern std::vector <double> MaterialCubicAnisotropyArray;
 
 	

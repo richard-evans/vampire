@@ -47,11 +47,6 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "cs::create_crystal_structure has been called" << std::endl;}	
 
-	// Calculate number of global and local unit cells required (rounding up)
-	cs::total_num_unit_cells[0]=int(vmath::iceil(cs::system_dimensions[0]/unit_cell.dimensions[0]));
-	cs::total_num_unit_cells[1]=int(vmath::iceil(cs::system_dimensions[1]/unit_cell.dimensions[1]));
-	cs::total_num_unit_cells[2]=int(vmath::iceil(cs::system_dimensions[2]/unit_cell.dimensions[2]));
-
 	int min_bounds[3];
 	int max_bounds[3];
 	

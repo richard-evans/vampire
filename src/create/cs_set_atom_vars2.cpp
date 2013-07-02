@@ -33,6 +33,7 @@
 #include <vector>
 
 #include "atoms.hpp"
+#include "cells.hpp"
 #include "create.hpp"
 #include "errors.hpp"
 #include "material.hpp"
@@ -340,7 +341,11 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 
 	// now remove unit cell interactions data
 	unit_cell.interaction.resize(0);
-	unit_cell.atom.resize(0);
+
+   // Save number of atoms in unit cell first
+   cells::num_atoms_in_unit_cell=unit_cell.atom.size();
+   std::cout << "\t\t" << unit_cell.atom.size() << "\t" << cells::num_atoms_in_unit_cell << std::endl;
+   unit_cell.atom.resize(0);
 	
 	// Now nuke generation vectors to free memory NOW
 	std::vector<cs::catom_t> zerov; 

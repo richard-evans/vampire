@@ -42,6 +42,7 @@ namespace program
 	extern void cmc_anisotropy();
 	extern void hybrid_cmc();
    extern void reverse_hybrid_cmc();
+   extern void lagrange_multiplier();
 
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();

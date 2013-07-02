@@ -206,6 +206,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
 		case 2: // Cylinder
 			cylinder(particle_origin,catom_array,0);
 			break;
+      case 3: // Ellipsoid
+         ellipsoid(particle_origin,catom_array,0);
+         break;
 		case 4: // Sphere
 			sphere(particle_origin,catom_array,0);
 			break;
@@ -277,6 +280,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 					case 2: // Cylinder
 						cylinder(particle_origin,catom_array,particle_number);
 						break;
+               case 3: // Ellipsoid
+                  ellipsoid(particle_origin,catom_array,particle_number);
+                  break;
 					case 4: // Sphere
 						sphere(particle_origin,catom_array,particle_number);
 						break;

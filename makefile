@@ -85,6 +85,7 @@ obj/program/field_cool.o \
 obj/program/hamr.o \
 obj/program/hybrid_cmc.o \
 obj/program/hysteresis.o \
+obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/static_hysteresis.o \
 obj/program/time_series.o \

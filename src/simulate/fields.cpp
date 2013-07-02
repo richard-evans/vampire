@@ -50,6 +50,8 @@
 
 int calculate_exchange_fields(const int,const int);
 int calculate_anisotropy_fields(const int,const int);
+void calculate_second_order_uniaxial_anisotropy_fields(const int,const int);
+void calculate_lattice_anisotropy_fields(const int, const int);
 int calculate_cubic_anisotropy_fields(const int,const int);
 int calculate_applied_fields(const int,const int);
 int calculate_thermal_fields(const int,const int);
@@ -57,6 +59,7 @@ int calculate_dipolar_fields(const int,const int);
 void calculate_hamr_fields(const int,const int);
 void calculate_fmr_fields(const int,const int);
 void calculate_surface_anisotropy_fields(const int,const int);
+void calculate_lagrange_fields(const int,const int);
 
 int calculate_spin_fields(const int start_index,const int end_index){
 	//======================================================
@@ -78,12 +81,15 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	
 	// Anisotropy Fields
 	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
-	if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
+   if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
+   if(sim::lattice_anisotropy_flag) calculate_lattice_anisotropy_fields(start_index,end_index);
+   if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
 	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
 	if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
 	// Spin Dependent Extra Fields
 	//if(sim::hamiltonian_simulation_flags[4]==1) calculate_??_fields();
-	
+	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
+
 	return 0;
 }
 
@@ -258,9 +264,83 @@ int calculate_anisotropy_fields(const int start_index,const int end_index){
 				atoms::z_total_spin_field_array[atom] -= (K[2][0]*S[0] + K[2][1]*S[1] +K[2][2]*S[2]);
 			}
 			break;
-		}
-
+   }
 	return EXIT_SUCCESS;
+}
+
+//------------------------------------------------------
+//  Function to calculate second order uniaxial
+//  anisotropy fields
+//
+//  (c) R F L Evans 2013
+//
+//  E = K2 (-2Sz^2 + Sz^4)
+//  Hx = 0
+//  Hy = 0
+//  Hz = -K2 (-4Sz + 4Sz^3) = 4*K2*Sz*(1-Sz^2)
+//
+//------------------------------------------------------
+void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,const int end_index){
+   for(int atom=start_index;atom<end_index;atom++){
+      const int imaterial=atoms::type_array[atom];
+      const double Ku2=4.0*mp::material_second_order_anisotropy_constant_array[imaterial];
+      const double Sz=atoms::z_spin_array[atom];
+      atoms::z_total_spin_field_array[atom] -= Ku2*Sz*Sz*Sz;
+   }
+   return;
+}
+
+namespace sim{
+//------------------------------------------------------
+//  Function to calculate lattice anisotropy constant
+//
+//  (c) R F L Evans 2013
+//
+//  Assume temperature dependent anisotropy constant:
+//
+//                   tanh((T-Ti)/Tw) - fmin
+//  kappa = Klatt * ------------------------
+//                        fmax-fmin
+//
+//------------------------------------------------------
+double lattice_anisotropy_function(const double T, const int imaterial){
+   const double Klatt = mp::material[imaterial].Klatt;
+   const double Ti = mp::material[imaterial].Klatt_inflection_temperature;
+   const double Tu = mp::material[imaterial].Klatt_unity_tmperature;
+   const double Tw = mp::material[imaterial].Klatt_width_temperature;
+   const double fmin=tanh(-Ti/Tw);
+   const double fmax=tanh((Tu-Ti)/Tw);
+   return Klatt*((tanh((T-Ti)/Tw) - fmin)/(fmax-fmin));
+}
+} // end of sim namespace
+
+//------------------------------------------------------
+//  Function to calculate lattice anisotropy fields
+//
+//  (c) R F L Evans 2013
+//
+//  E = kappa * S_z^2
+//
+//  Hx = 0
+//  Hy = 0
+//  Hz = -2*kappa*S_z
+//
+//------------------------------------------------------
+void calculate_lattice_anisotropy_fields(const int start_index,const int end_index){
+
+   // Precalculate material lattice anisotropy constants
+   std::vector<double> klatt_array(0);
+   klatt_array.reserve(mp::num_materials);
+   for(int imat=0; imat<mp::num_materials; imat++) klatt_array.push_back(sim::lattice_anisotropy_function(sim::temperature, imat));
+
+   // Now calculate fields
+   for(int atom=start_index;atom<end_index;atom++){
+      const int imaterial=atoms::type_array[atom];
+      const double Klattice=-2.0*klatt_array[imaterial];
+      const double Sz=atoms::z_spin_array[atom];
+      atoms::z_total_spin_field_array[atom] += Klattice*Sz*Sz;
+   }
+   return;
 }
 
 int calculate_cubic_anisotropy_fields(const int start_index,const int end_index){
@@ -589,3 +669,52 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 	return;
 }
 
+//------------------------------------------------------
+//  Function to calculate LaGrange multiplier fields for
+//  constrained minimization
+//
+//  (c) R F L Evans 2013
+//
+//------------------------------------------------------
+void calculate_lagrange_fields(const int start_index,const int end_index){
+
+   // LaGrange Multiplier
+   const double lx=sim::lagrange_lambda_x;
+   const double ly=sim::lagrange_lambda_y;
+   const double lz=sim::lagrange_lambda_z;
+
+   // Constraint vector
+   const double nu_x=cos(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
+   const double nu_y=sin(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);
+   const double nu_z=cos(sim::constraint_phi*M_PI/180.0);
+
+   // Magnetisation
+   const double imm=1.0/sim::lagrange_m;
+   const double imm3=1.0/(sim::lagrange_m*sim::lagrange_m*sim::lagrange_m);
+
+   const double N=sim::lagrange_N;
+
+   // Calculate LaGrange fields
+   for(int atom=start_index;atom<end_index;atom++){
+      const double sx=atoms::x_spin_array[atom];
+      const double sy=atoms::y_spin_array[atom];
+      const double sz=atoms::z_spin_array[atom];
+
+      //std::cout << "S " << sx << "\t" << sy << "\t" << sz << std::endl;
+      //std::cout << "L " << lx << "\t" << ly << "\t" << lz << std::endl;
+      //std::cout << imm << "\t" << imm3 << std::endl;
+
+      const double lambda_dot_s = lx*sx + ly*sy + lz*sz;
+
+      atoms::x_total_spin_field_array[atom]+=N*(lx*imm - lambda_dot_s*sx*imm3 - nu_x);
+      atoms::y_total_spin_field_array[atom]+=N*(ly*imm - lambda_dot_s*sy*imm3 - nu_y);
+      atoms::z_total_spin_field_array[atom]+=N*(lz*imm - lambda_dot_s*sz*imm3 - nu_z);
+
+      //std::cout << "\t" << N*(lx*imm - lambda_dot_s*sx*imm3 - nu_x) << std::endl;
+      //std::cout << "\t" << N*(ly*imm - lambda_dot_s*sy*imm3 - nu_y) << std::endl;
+      //std::cout << "\t" << N*(lz*imm - lambda_dot_s*sz*imm3 - nu_z) << std::endl;
+      //std::cin.get();
+   }
+   return;
+
+}

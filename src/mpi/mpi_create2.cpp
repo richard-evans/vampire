@@ -272,7 +272,7 @@ namespace vmpi{
 		std::cout << "Total atoms(all cpu's): " << total_num_atoms << std::endl;
 	
 		std::ofstream xyz_file;
-	  	xyz_file.open ("crystal.xyz");
+	  	xyz_file.open ("mpi.xyz");
 	  	xyz_file << total_num_atoms + 80<< std::endl;
 	  	xyz_file << "" << std::endl;
 
@@ -293,9 +293,10 @@ namespace vmpi{
 				//else xyz_file << material_parameters::material[atoms::type_array[atom]].element << "\t";
 	  		//xyz_file << mp::material[catom_array[atom].material].element << "\t" << 
 	  		xyz_file << catom_array[atom].x << "\t" << 
-	  					catom_array[atom].y << "\t" << 
-	  					catom_array[atom].z << "\t" << std::endl;
-	  		
+	  					catom_array[atom].y << "\t";
+         if(catom_array[atom].mpi_type==2) xyz_file << catom_array[atom].z-3.0 << "\t" << std::endl;
+         else xyz_file << catom_array[atom].z << "\t" << std::endl;
+         
 			//xyz_file << (coord_array[atom][0]+int_mpi_offset[0])*material_parameters::lattice_space_conversion[0] << "\t" << 
   			//				(coord_array[atom][1]+int_mpi_offset[1])*material_parameters::lattice_space_conversion[1] << "\t" << 
   			//				(coord_array[atom][2]+int_mpi_offset[2])*material_parameters::lattice_space_conversion[2] << std::endl;
@@ -344,8 +345,9 @@ namespace vmpi{
 
 				xyz_file << mpi_data_array[3*i];
 				xyz_file << "\t" << mpi_data_array[3*i+1]; // + double(p)*mp::system_dimensions[0];
-				xyz_file << "\t" << mpi_data_array[3*i+2]; //+material_parameters::system_dimensions[2]*p;
-				xyz_file << std::endl;
+				if(mpi_type_array[i]==2) xyz_file << "\t" << mpi_data_array[3*i+2]+6.0*p-3.0; //2.0*cs::system_dimensions[2]*p;
+				else xyz_file << "\t" << mpi_data_array[3*i+2]+6.0*p; //2.0*cs::system_dimensions[2]*p-3.0;
+                xyz_file << std::endl;
 			}
 		}
 	}
@@ -384,6 +386,77 @@ namespace vmpi{
 	return EXIT_SUCCESS;
 }
 
+// Structure to store key information about virtual atoms
+struct virtual_particle_t{
+
+   int atom; // real atom number
+   double x,y,z; // atomic positions
+   int scx, scy, scz; // super cell coordinates
+   int material; // material id
+   int cpuid; // cpu where real atom resides
+   int ucid; // unit cell id of atom
+
+};
+
+//-----------------------------------------------------------------
+//
+//   Function to populate array of virtual particles including
+//   periodic boundary conditions.
+//
+//   (c) R F L Evans 26/04/2013
+//
+//-----------------------------------------------------------------
+void atom_needed_by_remote_cpu(int atom, // atom number
+                               int cpu_rank,
+                               double x,
+                               double y,
+                               double z,
+                               int scx_offset,
+                               int scy_offset,
+                               int scz_offset,
+                               std::vector<cs::catom_t> & catom_array,
+                               std::vector<std::vector<virtual_particle_t> >& virtual_particle_array, 
+                               std::vector<double> minimax,
+                               bool self_interaction
+                              ){
+
+   // Unpack data to constants
+   const double min_x = minimax[0];
+   const double min_y = minimax[1];
+   const double min_z = minimax[2];
+   const double max_x = minimax[3];
+   const double max_y = minimax[4];
+   const double max_z = minimax[5];
+
+   // temporary virtual particle
+   virtual_particle_t temp_vp;
+
+   // Check for atom within area needed by other CPU
+   if(cpu_rank!=vmpi::my_rank || self_interaction==true){
+      if(( (x >= min_x) && (x <= max_x) ) &&
+         ( (y >= min_y) && (y <= max_y) ) &&
+         ( (z >= min_z) && (z <= max_z) ) ){
+
+         temp_vp.atom = atom;
+         temp_vp.x=x;
+         temp_vp.y=y;
+         temp_vp.z=z;
+         temp_vp.scx=catom_array[atom].scx+scx_offset;
+         temp_vp.scy=catom_array[atom].scy+scy_offset;
+         temp_vp.scz=catom_array[atom].scz+scz_offset;
+         temp_vp.material=catom_array[atom].material;
+         temp_vp.cpuid=vmpi::my_rank;
+         temp_vp.ucid=catom_array[atom].uc_id;
+
+         // pushback list of virtual particles
+         virtual_particle_array[cpu_rank].push_back(temp_vp);
+
+         return;
+      }
+   }
+
+   return;
+}
 
 int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	
@@ -405,151 +478,223 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	double max_interaction_range=double(cs::unit_cell.interaction_range);
 	
 	// Populate local ranges
-	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*cs::unit_cell.dimensions[0];
-	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*cs::unit_cell.dimensions[1];
-	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*cs::unit_cell.dimensions[2];
-	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*cs::unit_cell.dimensions[0];
-	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*cs::unit_cell.dimensions[1];
-	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*cs::unit_cell.dimensions[2];
+	cpu_range_array[6*vmpi::my_rank+0]=vmpi::min_dimensions[0] - max_interaction_range*cs::unit_cell.dimensions[0]-0.01;
+	cpu_range_array[6*vmpi::my_rank+1]=vmpi::min_dimensions[1] - max_interaction_range*cs::unit_cell.dimensions[1]-0.01;
+	cpu_range_array[6*vmpi::my_rank+2]=vmpi::min_dimensions[2] - max_interaction_range*cs::unit_cell.dimensions[2]-0.01;
+	cpu_range_array[6*vmpi::my_rank+3]=vmpi::max_dimensions[0] + max_interaction_range*cs::unit_cell.dimensions[0]+0.01;
+	cpu_range_array[6*vmpi::my_rank+4]=vmpi::max_dimensions[1] + max_interaction_range*cs::unit_cell.dimensions[1]+0.01;
+	cpu_range_array[6*vmpi::my_rank+5]=vmpi::max_dimensions[2] + max_interaction_range*cs::unit_cell.dimensions[2]+0.01;
 	
 	// Reduce data on all CPUs
-	//MPI::COMM_WORLD.Allreduce(&cpu_range_array[0], &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
 	MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cpu_range_array[0],6*vmpi::num_processors, MPI_DOUBLE,MPI_SUM);
-	//std::cout << vmpi::my_rank << "\t";
-	//for(int i=0;i<6*vmpi::num_processors;i++){
-	//	std::cout << cpu_range_array[i] << "\t";
-	//}
-	//std::cout << std::endl;
 	
+   // Copy ranges to 2D array
+   std::vector<std::vector<double> > cpu_range_array2D(vmpi::num_processors);
+   for(int cpu=0; cpu< vmpi::num_processors; cpu++){
+      cpu_range_array2D[cpu].resize(6);
+      cpu_range_array2D[cpu][0]=cpu_range_array[6*cpu+0];
+      cpu_range_array2D[cpu][1]=cpu_range_array[6*cpu+1];
+      cpu_range_array2D[cpu][2]=cpu_range_array[6*cpu+2];
+      cpu_range_array2D[cpu][3]=cpu_range_array[6*cpu+3];
+      cpu_range_array2D[cpu][4]=cpu_range_array[6*cpu+4];
+      cpu_range_array2D[cpu][5]=cpu_range_array[6*cpu+5];
+   }
+
 	// Determine number of atoms on local CPU needed by other CPUs
 	std::vector<int> num_send_atoms(vmpi::num_processors,0);
 	std::vector<int> num_recv_atoms(vmpi::num_processors,0);
-	
-	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		for(int cpu=0;cpu<vmpi::num_processors;cpu++){
-			if(cpu!=vmpi::my_rank){
-				if(	((catom_array[atom].x >= cpu_range_array[6*cpu+0]) && (catom_array[atom].x <= cpu_range_array[6*cpu+3])) &&
-						((catom_array[atom].y >= cpu_range_array[6*cpu+1]) && (catom_array[atom].y <= cpu_range_array[6*cpu+4])) &&
-						((catom_array[atom].z >= cpu_range_array[6*cpu+2]) && (catom_array[atom].z <= cpu_range_array[6*cpu+5]))) {
-					num_send_atoms[cpu]++;
-				}
-			}
-		}
-	}
-	
-	std::vector<MPI::Request> requests(0);
-	std::vector<MPI::Status> stati(0);
 
-	// Send/receive number of boundary/halo atoms
-	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
-		if(cpu!=vmpi::my_rank){
-		    // Bsend requires an explicit buffer, use asynchronous comms instead!
-		    //MPI::COMM_WORLD.Bsend(&num_send_atoms[cpu],1,MPI_INT,cpu,35);
-		    //MPI::COMM_WORLD.Recv(&num_recv_atoms[cpu],1,MPI_INT,cpu,35);
-			requests.push_back(MPI::COMM_WORLD.Isend(&num_send_atoms[cpu],1,MPI_INT,cpu,35));
-			requests.push_back(MPI::COMM_WORLD.Irecv(&num_recv_atoms[cpu],1,MPI_INT,cpu,35));
-		}
-	}
+   // Declare array of virtual particles
+   std::vector<std::vector<virtual_particle_t> >virtual_particle_array;
+   virtual_particle_array.resize(vmpi::num_processors);
 
-	stati.resize(requests.size());
-	MPI::Request::Waitall(requests.size(),&requests[0],&stati[0]);
-		
-	//std::cout << vmpi::my_rank << "\t";
-	//for(int i=0;i<vmpi::num_processors;i++){
-	//	std::cout << " CPU: " << i << " S " << num_send_atoms[i] << " R " << num_recv_atoms[i] << "\t";
-	//}
-	//std::cout << std::endl;
-	
-	// Calculate total number of boundary and halo atoms on local CPU
-	int num_halo_atoms=0;
-	int num_bdry_atoms=0;
-	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
-		num_halo_atoms += num_recv_atoms[cpu];
-		num_bdry_atoms += num_send_atoms[cpu];
-	}
-	
-	// Reserve catom array to accomodate halo atoms for neighbourlist calculation
-	catom_array.reserve(catom_array.size()+num_halo_atoms);
-	
-	// Arrays for sending/receiving data
-	std::vector<double> send_coord_array(3*num_bdry_atoms,0.0);
-	std::vector<double> recv_coord_array(3*num_halo_atoms,0.0);
-	std::vector<int> send_mpi_atom_supercell_array(3*num_bdry_atoms,0);
-	std::vector<int> recv_mpi_atom_supercell_array(3*num_halo_atoms,0);
-	std::vector<int> send_material_array(num_bdry_atoms,0);
-	std::vector<int> recv_material_array(num_halo_atoms,0);
-	std::vector<int> send_cpuid_array(num_bdry_atoms,0);
-	std::vector<int> recv_cpuid_array(num_halo_atoms,0);
-	std::vector<int> send_mpi_atom_num_array(num_bdry_atoms,0);
-	std::vector<int> recv_mpi_atom_num_array(num_halo_atoms,0);
-	std::vector<int> send_mpi_uc_id_array(num_bdry_atoms,0);
-	std::vector<int> recv_mpi_uc_id_array(num_halo_atoms,0);
-	
-	// Pack up data for sending
-	int counter=0;	// array index
+   // Array of minima, maxima
+   std::vector<double> minimax;
 
-	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
-		if(cpu!=vmpi::my_rank){
-			for(unsigned int atom=0;atom<catom_array.size();atom++){
-				if(	((catom_array[atom].x >= cpu_range_array[6*cpu+0]) && (catom_array[atom].x <= cpu_range_array[6*cpu+3])) &&
-						((catom_array[atom].y >= cpu_range_array[6*cpu+1]) && (catom_array[atom].y <= cpu_range_array[6*cpu+4])) &&
-						((catom_array[atom].z >= cpu_range_array[6*cpu+2]) && (catom_array[atom].z <= cpu_range_array[6*cpu+5]))) {
-					send_coord_array[3*counter+0] = catom_array[atom].x;
-					send_coord_array[3*counter+1] = catom_array[atom].y;
-					send_coord_array[3*counter+2] = catom_array[atom].z;
-					send_mpi_atom_supercell_array[3*counter+0] = catom_array[atom].scx;
-					send_mpi_atom_supercell_array[3*counter+1] = catom_array[atom].scy;
-					send_mpi_atom_supercell_array[3*counter+2] = catom_array[atom].scz;
-					send_material_array[counter]  = catom_array[atom].material;
-					send_cpuid_array[counter]  	= vmpi::my_rank; //catom_array[atom].mpi_cpu;
-					send_mpi_atom_num_array[counter] = atom;
-					send_mpi_uc_id_array[counter] = catom_array[atom].uc_id;
-					counter++;
-				}
-			}
-		}
-	}
-	
-	int send_index=0;
-	int recv_index=0;
-	
-	// Wait for everyone to get here
-	//MPI::COMM_WORLD.Barrier();
-	//std::cout << vmpi::my_rank << " Exchanging Data ";
-	//for(int i=0;i<vmpi::num_processors;i++){
-	//	std::cout << " CPU: " << i << " S " << num_send_atoms[i] << " R " << num_recv_atoms[i] << "\t";
-	//}
-	//std::cout << std::endl;
-	
-	// Exchange boundary/halo data
-	
-	//std::vector<MPI::Request> requests(0);
-	//std::vector<MPI::Status> stati(0);
-	
-	for(int cpu=0;cpu<vmpi::num_processors;cpu++){
-		if(num_send_atoms[cpu]>0){
-			requests.push_back(MPI::COMM_WORLD.Isend(&send_coord_array[3*send_index],3*num_send_atoms[cpu],MPI_DOUBLE,cpu,50));
-			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_supercell_array[3*send_index],3*num_send_atoms[cpu],MPI_INT,cpu,54));
-			requests.push_back(MPI::COMM_WORLD.Isend(&send_material_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,51));
-			requests.push_back(MPI::COMM_WORLD.Isend(&send_cpuid_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,52));
-			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_num_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,53));
-			requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_uc_id_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,55));
-			//std::cout << "Send complete on CPU " << vmpi::my_rank << " to CPU " << cpu << " at index " << send_index  << std::endl;
-			send_index+=num_send_atoms[cpu];
-		}
-		if(num_recv_atoms[cpu]>0){
-			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_coord_array[3*recv_index],3*num_recv_atoms[cpu],MPI_DOUBLE,cpu,50));
-			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_supercell_array[3*recv_index],3*num_recv_atoms[cpu],MPI_INT,cpu,54));
-			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_material_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,51));
-			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_cpuid_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,52));
-			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_num_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,53));
-			requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_uc_id_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,55));
-			//std::cout << "Receive complete on CPU " << vmpi::my_rank << " from CPU " << cpu << " at index " << recv_index << " at address " << &recv_mpi_atom_num_array[recv_index] << std::endl;
-			recv_index+=num_recv_atoms[cpu];
-		}
-	}
-	stati.resize(requests.size());
-	MPI::Request::Waitall(requests.size(),&requests[0],&stati[0]);
+   // Real offsets for periodic boundary calculations
+   const double dx = cs::system_dimensions[0];
+   const double dy = cs::system_dimensions[1];
+   const double dz = cs::system_dimensions[2];
+
+   // Supercell offsets for periodic boundary calculations
+   const int sx = cs::total_num_unit_cells[0];
+   const int sy = cs::total_num_unit_cells[1];
+   const int sz = cs::total_num_unit_cells[2];
+
+   for(unsigned int atom=0;atom<catom_array.size();atom++){
+      const double x = catom_array[atom].x;
+      const double y = catom_array[atom].y;
+      const double z = catom_array[atom].z;
+      for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+
+         // Copy minima/maxima
+         minimax=cpu_range_array2D[cpu];
+
+         // Populate virtual particles
+         atom_needed_by_remote_cpu(atom, cpu, x, y, z, 0, 0, 0, catom_array, virtual_particle_array, minimax, false);
+
+         // Move atoms by +/- unit cell dimensions in different directions to calculate periodic boundaries
+         if(cs::pbc[0]==true){
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y, z, sx, 0, 0, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y, z,-sx, 0, 0, catom_array, virtual_particle_array, minimax, true);
+         }
+
+         if(cs::pbc[1]==true){
+            atom_needed_by_remote_cpu(atom, cpu, x, y+dy, z, 0, sy, 0, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x, y-dy, z, 0,-sy, 0, catom_array, virtual_particle_array, minimax, true);
+         }
+
+         if(cs::pbc[2]==true){
+            atom_needed_by_remote_cpu(atom, cpu, x, y, z+dz, 0, 0, sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x, y, z-dz, 0, 0, -sz, catom_array, virtual_particle_array, minimax, true);
+         }
+
+         if( cs::pbc[0]==true && cs::pbc[1]==true ){
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y+dy, z, sx, sy, 0, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y+dy, z,-sx, sy, 0, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y-dy, z, sx,-sy, 0, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y-dy, z,-sx,-sy, 0, catom_array, virtual_particle_array, minimax, true);
+         }
+
+         if( cs::pbc[0]==true && cs::pbc[2]==true ){
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y, z+dz, sx, 0, sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y, z+dz,-sx, 0, sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y, z-dz, sx, 0,-sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y, z-dz,-sx, 0,-sz, catom_array, virtual_particle_array, minimax, true);
+         }
+
+         if( cs::pbc[1]==true && cs::pbc[2]==true ){
+            atom_needed_by_remote_cpu(atom, cpu, x, y+dy, z+dz, 0, sy, sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x, y-dy, z+dz, 0,-sy, sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x, y+dy, z-dz, 0, sy,-sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x, y-dy, z-dz, 0,-sy,-sz, catom_array, virtual_particle_array, minimax, true);
+         }
+
+         if( cs::pbc[0]==true && cs::pbc[1]==true && cs::pbc[2]==true){
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y-dy, z-dz, -sx, -sy, -sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y-dy, z-dz, +sx, -sy, -sz, catom_array, virtual_particle_array, minimax, true);
+
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y+dy, z-dz, -sx, +sy, -sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y+dy, z-dz, +sx, +sy, -sz, catom_array, virtual_particle_array, minimax, true);
+
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y-dy, z+dz, -sx, -sy, +sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y-dy, z+dz, +sx, -sy, +sz, catom_array, virtual_particle_array, minimax, true);
+
+            atom_needed_by_remote_cpu(atom, cpu, x-dx, y+dy, z+dz, -sx, +sy, +sz, catom_array, virtual_particle_array, minimax, true);
+            atom_needed_by_remote_cpu(atom, cpu, x+dx, y+dy, z+dz, +sx, +sy, +sz, catom_array, virtual_particle_array, minimax, true);
+         }
+      }
+   }
+
+   // Calulate number of virtual particles for each cpu
+   for(int cpu=0;cpu<vmpi::num_processors;cpu++) num_send_atoms[cpu]=virtual_particle_array[cpu].size();
+
+   std::vector<MPI::Request> requests(0);
+   std::vector<MPI::Status> stati(0);
+
+   // Send/receive number of boundary/halo atoms
+   for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+      requests.push_back(MPI::COMM_WORLD.Isend(&num_send_atoms[cpu],1,MPI_INT,cpu,35));
+      requests.push_back(MPI::COMM_WORLD.Irecv(&num_recv_atoms[cpu],1,MPI_INT,cpu,35));
+   }
+
+   stati.resize(requests.size());
+   MPI::Request::Waitall(requests.size(),&requests[0],&stati[0]);
+
+   // Calculate total number of boundary and halo atoms on local CPU
+   int num_halo_atoms=0;
+   int num_bdry_atoms=0;
+   for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+      num_halo_atoms += num_recv_atoms[cpu];
+      num_bdry_atoms += num_send_atoms[cpu];
+   }
+
+   // Reserve catom array to accomodate halo atoms for neighbourlist calculation
+   catom_array.reserve(catom_array.size()+num_halo_atoms);
+
+   // Arrays for sending/receiving data
+   std::vector<double> send_coord_array(3*num_bdry_atoms,0.0);
+   std::vector<double> recv_coord_array(3*num_halo_atoms,0.0);
+   std::vector<int> send_mpi_atom_supercell_array(3*num_bdry_atoms,0);
+   std::vector<int> recv_mpi_atom_supercell_array(3*num_halo_atoms,0);
+   std::vector<int> send_material_array(num_bdry_atoms,0);
+   std::vector<int> recv_material_array(num_halo_atoms,0);
+   std::vector<int> send_cpuid_array(num_bdry_atoms,0);
+   std::vector<int> recv_cpuid_array(num_halo_atoms,0);
+   std::vector<int> send_mpi_atom_num_array(num_bdry_atoms,0);
+   std::vector<int> recv_mpi_atom_num_array(num_halo_atoms,0);
+   std::vector<int> send_mpi_uc_id_array(num_bdry_atoms,0);
+   std::vector<int> recv_mpi_uc_id_array(num_halo_atoms,0);
+
+   // Pack up data for sending
+   int counter=0;	// array index
+
+   /* for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+         if(cpu!=vmpi::my_rank){
+            for(unsigned int atom=0;atom<catom_array.size();atom++){
+               if(   ((catom_array[atom].x >= cpu_range_array[6*cpu+0]) && (catom_array[atom].x <= cpu_range_array[6*cpu+3])) &&
+                     ((catom_array[atom].y >= cpu_range_array[6*cpu+1]) && (catom_array[atom].y <= cpu_range_array[6*cpu+4])) &&
+                     ((catom_array[atom].z >= cpu_range_array[6*cpu+2]) && (catom_array[atom].z <= cpu_range_array[6*cpu+5]))) {
+                  send_coord_array[3*counter+0] = catom_array[atom].x;
+                  send_coord_array[3*counter+1] = catom_array[atom].y;
+                  send_coord_array[3*counter+2] = catom_array[atom].z;
+                  send_mpi_atom_supercell_array[3*counter+0] = catom_array[atom].scx;
+                  send_mpi_atom_supercell_array[3*counter+1] = catom_array[atom].scy;
+                  send_mpi_atom_supercell_array[3*counter+2] = catom_array[atom].scz;
+                  send_material_array[counter]  = catom_array[atom].material;
+                  send_cpuid_array[counter]  	= vmpi::my_rank; //catom_array[atom].mpi_cpu;
+                  send_mpi_atom_num_array[counter] = atom;
+                  send_mpi_uc_id_array[counter] = catom_array[atom].uc_id;
+                  counter++;
+               }
+            }
+         }
+   }*/
+
+   for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+      for(int vpidx=0; vpidx<virtual_particle_array[cpu].size(); vpidx++){
+         send_mpi_atom_num_array[counter]           = virtual_particle_array[cpu][vpidx].atom;
+         send_coord_array[3*counter+0]              = virtual_particle_array[cpu][vpidx].x;
+         send_coord_array[3*counter+1]              = virtual_particle_array[cpu][vpidx].y;
+         send_coord_array[3*counter+2]              = virtual_particle_array[cpu][vpidx].z;
+         send_mpi_atom_supercell_array[3*counter+0] = virtual_particle_array[cpu][vpidx].scx;
+         send_mpi_atom_supercell_array[3*counter+1] = virtual_particle_array[cpu][vpidx].scy;
+         send_mpi_atom_supercell_array[3*counter+2] = virtual_particle_array[cpu][vpidx].scz;
+         send_material_array[counter]               = virtual_particle_array[cpu][vpidx].material;
+         send_cpuid_array[counter]                  = virtual_particle_array[cpu][vpidx].cpuid;
+         send_mpi_uc_id_array[counter]              = virtual_particle_array[cpu][vpidx].ucid;
+         counter++;
+      }
+   }
+
+   int send_index=0;
+   int recv_index=0;
+
+   // Exchange boundary/halo data
+   for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+      if(num_send_atoms[cpu]>0){
+         requests.push_back(MPI::COMM_WORLD.Isend(&send_coord_array[3*send_index],3*num_send_atoms[cpu],MPI_DOUBLE,cpu,50));
+         requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_supercell_array[3*send_index],3*num_send_atoms[cpu],MPI_INT,cpu,54));
+         requests.push_back(MPI::COMM_WORLD.Isend(&send_material_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,51));
+         requests.push_back(MPI::COMM_WORLD.Isend(&send_cpuid_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,52));
+         requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_atom_num_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,53));
+         requests.push_back(MPI::COMM_WORLD.Isend(&send_mpi_uc_id_array[send_index],num_send_atoms[cpu],MPI_INT,cpu,55));
+         //std::cout << "Send complete on CPU " << vmpi::my_rank << " to CPU " << cpu << " at index " << send_index  << std::endl;
+         send_index+=num_send_atoms[cpu];
+      }
+      if(num_recv_atoms[cpu]>0){
+         requests.push_back(MPI::COMM_WORLD.Irecv(&recv_coord_array[3*recv_index],3*num_recv_atoms[cpu],MPI_DOUBLE,cpu,50));
+         requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_supercell_array[3*recv_index],3*num_recv_atoms[cpu],MPI_INT,cpu,54));
+         requests.push_back(MPI::COMM_WORLD.Irecv(&recv_material_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,51));
+         requests.push_back(MPI::COMM_WORLD.Irecv(&recv_cpuid_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,52));
+         requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_atom_num_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,53));
+         requests.push_back(MPI::COMM_WORLD.Irecv(&recv_mpi_uc_id_array[recv_index],num_recv_atoms[cpu],MPI_INT,cpu,55));
+         //std::cout << "Receive complete on CPU " << vmpi::my_rank << " from CPU " << cpu << " at index " << recv_index << " at address " << &recv_mpi_atom_num_array[recv_index] << std::endl;
+         recv_index+=num_recv_atoms[cpu];
+      }
+   }
+   stati.resize(requests.size());
+   MPI::Request::Waitall(requests.size(),&requests[0],&stati[0]);
 
 	// Populate halo atoms with data
 	for(int index=0;index<num_halo_atoms;index++){
@@ -567,15 +712,11 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 		catom_array[atom].mpi_atom_number = recv_mpi_atom_num_array[index];
 		catom_array[atom].uc_id = recv_mpi_uc_id_array[index];
 	}
-		
-		
-	// Wait for everyone to get here
-	//MPI::COMM_WORLD.Barrier();
-	//MPI::Finalize();
-	
-	//exit(0);
-	
-	return EXIT_SUCCESS;
+
+   // crystal_xyz(catom_array);
+
+   return EXIT_SUCCESS;
+
 }
 
 /// @brief Set Replicated Data

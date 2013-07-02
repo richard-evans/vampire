@@ -97,6 +97,14 @@ namespace sim{
 	double constraint_theta_max=0.0; // loop angle max [degrees]
 	double constraint_theta_delta=5.0; // loop angle delta [degrees]
 	
+	// LaGrange multiplier variables
+	double lagrange_lambda_x=0.0;
+   double lagrange_lambda_y=0.0;
+   double lagrange_lambda_z=0.0;
+   double lagrange_m=1.0;
+   double lagrange_N=1000.0;
+   bool   lagrange_multiplier=false;
+
 	double cooling_time=100.0e-12; //seconds
 	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
 	pump_functions_t pump_function=two_temperature;
@@ -130,12 +138,14 @@ namespace sim{
 	// Anisotropy control booleans
 	bool UniaxialScalarAnisotropy=false; // Enables scalar uniaxial anisotropy
 	bool TensorAnisotropy=false; // Overrides scalar uniaxial anisotropy
+	bool second_order_uniaxial_anisotropy=false; // Enables second order uniaxial anisotropy
 	bool CubicScalarAnisotropy=false; // Enables scalar cubic anisotropy
-	
+   bool lattice_anisotropy_flag=false; // Enables lattice anisotropy
+
 	bool local_temperature=false; // flag to enable material specific temperature
 	bool local_applied_field=false; // flag to enable material specific applied field
 	bool local_fmr_field=false; // flag to enable material specific fmr field
-	
+
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);
@@ -163,7 +173,7 @@ namespace sim{
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
 		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
-		
+		if(sim::lagrange_multiplier) update_lagrange_lambda();
 	}
 	
 /// @brief Function to run one a single program
@@ -302,6 +312,14 @@ int run(){
             zlog << "Reverse-Hybrid-CMC..." << std::endl;
          }
          program::reverse_hybrid_cmc();
+         break;
+
+      case 11:
+         if(vmpi::my_rank==0){
+            std::cout << "LaGrange-Multiplier..." << std::endl;
+            zlog << "LaGrange-Multiplier..." << std::endl;
+         }
+         program::lagrange_multiplier();
          break;
 
 		case 50:

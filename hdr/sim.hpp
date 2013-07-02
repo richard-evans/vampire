@@ -118,9 +118,11 @@ namespace sim{
 	// Anisotropy control booleans
 	extern bool UniaxialScalarAnisotropy; // Enables scalar uniaxial anisotropy
 	extern bool TensorAnisotropy; // Overrides vector uniaxial anisotropy (even slower)
+	extern bool second_order_uniaxial_anisotropy; // Enables second order uniaxial anisotropy
 	extern bool CubicScalarAnisotropy; // Enables scalar cubic anisotropy
 	extern bool EnableUniaxialAnisotropyUnitVector; // enables anisotropy tensor if any material has non z-axis K
-	
+   extern bool lattice_anisotropy_flag; // Enables lattice anisotropy
+
 	// Local system variables
 	extern bool local_temperature; // flag to enable material specific temperature
 	extern bool local_applied_field; // flag to enable material specific applied field
@@ -160,12 +162,23 @@ namespace sim{
    extern double spin_exchange_energy_vector(const int, const double, const double, const double);
    extern double spin_exchange_energy_tensor(const int, const double, const double, const double);
    extern double spin_scalar_anisotropy_energy(const int, const double);
+   extern double spin_second_order_uniaxial_anisotropy_energy(const int, const double);
+   extern double spin_lattice_anisotropy_energy(const int, const double);
    extern double spin_cubic_anisotropy_energy(const int, const double, const double, const double);
    extern double spin_tensor_anisotropy_energy(const int, const double, const double, const double);
    extern double spin_surface_anisotropy_energy(const int, const int, const double, const double, const double);
    extern double spin_applied_field_energy(const double, const double, const double);
    extern double spin_magnetostatic_energy(const int, const double, const double, const double);
+   extern double lattice_anisotropy_function(const double, const int);
 
+   // LaGrange multiplier variables
+   extern double lagrange_lambda_x;
+   extern double lagrange_lambda_y;
+   extern double lagrange_lambda_z;
+   extern double lagrange_m;
+   extern double lagrange_N;
+   extern bool   lagrange_multiplier;
+   extern void   update_lagrange_lambda();
 }
 
 namespace cmc{

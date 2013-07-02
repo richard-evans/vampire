@@ -269,6 +269,38 @@ double spin_cubic_anisotropy_energy(const int imaterial, const double Sx, const 
 
 }
 
+//--------------------------------------------------------------
+//
+//  Function to calculate 2nd order uniaxial anisotropy energy
+//
+//  (c) R F L Evans 2013
+//
+//  E = K2 (-2Sz^2 + Sz^4)
+//
+//---------------------------------------------------------------
+double spin_second_order_uniaxial_anisotropy_energy(const int imaterial, const double Sz){
+   const double Sz2=Sz*Sz;
+   return mp::material_second_order_anisotropy_constant_array[imaterial]*(Sz2*Sz2);
+}
+
+//------------------------------------------------------
+//  Function to calculate lattice anisotropy energy
+//
+//  (c) R F L Evans 2013
+//
+//  Assume temperature dependent anisotropy constant:
+//
+//                   tanh((T-Ti)/Tw) - fmin
+//  kappa = Klatt * ------------------------
+//                        fmax-fmin
+//
+//  E = kappa * S_z^2
+//
+//------------------------------------------------------
+double spin_lattice_anisotropy_energy(const int imaterial, const double Sz){
+   return sim::lattice_anisotropy_function(sim::temperature, imaterial)*Sz*Sz;
+}
+
 /// @brief Calculates the applied field energy for a single spin.
 ///
 /// @section License
@@ -412,7 +444,9 @@ double calculate_spin_energy(const int atom, const int AtomExchangeType){
 		case 2: ; break; // skip
 		default: zlog << zTs() << "Error. sim::AnisotropyType has value " << sim::AnisotropyType << " which is outside of valid range 0-1. Exiting." << std::endl; err::vexit();
 	}
+	if(second_order_uniaxial_anisotropy) energy+=spin_second_order_uniaxial_anisotropy_energy(imaterial, Sz);
 	if(sim::CubicScalarAnisotropy==true) energy+=spin_cubic_anisotropy_energy(imaterial, Sx, Sy, Sz);
+   if(sim::lattice_anisotropy_flag) energy+=spin_lattice_anisotropy_energy(imaterial, Sz);
 	if(sim::surface_anisotropy==true) energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);
 	energy+=spin_applied_field_energy(Sx, Sy, Sz);
 	energy+=spin_magnetostatic_energy(atom, Sx, Sy, Sz);
