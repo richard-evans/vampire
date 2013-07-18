@@ -143,7 +143,8 @@ int main(int argc, char* argv[]){
 		if(vmpi::num_processors!=1) system("ls zlog.* | xargs cat | sort -n > zlog");
 	#endif
 
-	zlog << zTs() << "Program ended gracefully. Exiting." << std::endl;
+	zlog << zTs() << "Simulation ended gracefully." << std::endl;
+   std::cout << "Simulation ended gracefully." << std::endl;
 
 	return EXIT_SUCCESS;
 }
