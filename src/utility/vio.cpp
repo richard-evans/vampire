@@ -3644,6 +3644,13 @@ int match_material(string const word, string const value, string const unit, int
 		test="alloy-class"; // determines unit cell category id for ordered alloys
 		if(word==test){
 			int ac=atoi(value.c_str());
+         // test for 'disordered'
+         std::string dis="disordered";
+         if(value==dis){
+            read_material[super_index].alloy_class=-1; // value for random alloy
+            return EXIT_SUCCESS;
+         }
+         // test for valid ordered alloy, value of -1 will be deprecated
 			if((ac<-1) || (ac > 3)){
 				std::cerr << "Error in input file - material[" << super_index << "]:alloy-class is outside of valid range (0-3)" << std::endl;
 				return EXIT_FAILURE;
