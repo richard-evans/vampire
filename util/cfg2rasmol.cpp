@@ -25,6 +25,7 @@ int main(){
 	// check for open file
 	if(!coord_file.is_open()){
 		std::cerr << "Error! Coordinate file atoms-coords.cfg cannot be opened. Exiting" << std::endl;
+      exit(1);
 	}
 	
 	// read in file header
