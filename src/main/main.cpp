@@ -83,13 +83,15 @@ int main(int argc, char* argv[]){
       std::cout << "                                         | |               " << std::endl;
       std::cout << "                                         |_|               " << std::endl;
       std::cout << std::endl;
-      std::cout << "                       Version 2.0 " << __DATE__ << " " << __TIME__ << std::endl;
+      std::cout << "                       Version 3.0 " << __DATE__ << " " << __TIME__ << std::endl;
       std::cout << std::endl;
 
       std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
       std::cout << std::endl;
-      std::cout << "  Contributors: Richard F L Evans, Weijia Fan, Joe Barker, " << std::endl;
-      std::cout << "                Thomas Ostler, Phanwadee Chureemart, Roy W Chantrell" << std::endl;
+      std::cout << "  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>" << std::endl;
+      std::cout << std::endl;
+      std::cout << "  Contributors: Weijia Fan, Phanwadee Chureemart, Joe Barker, " << std::endl;
+      std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
       std::cout << "                Compiled with:  " << COMP << std::endl;
