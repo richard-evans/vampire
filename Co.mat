@@ -1,21 +1,20 @@
 #===================================================
-# Vampire material file for Co
+# Sample vampire material file
 #===================================================
-#
-# R F Evans 03/11/12
-#
+
 #---------------------------------------------------
 # Number of Materials
 #---------------------------------------------------
 material:num-materials=1
+
 #---------------------------------------------------
 # Material 0 Cobalt Generic
 #---------------------------------------------------
 material[0]:name="Co"
 material[0]:alpha=0.1
-material[0]:Jij_matrix[0]=-4.8e-21
+material[0]:Jij_matrix[0]=-12.2e-21
 material[0]:mu_s=1.5 !muB
-material[0]:Ku1=-1.0e-23
+material[0]:uniaxial-anisotropy-constant=1.0e-24
 material[0]:element="Ag"
 material[0]:min=0.0
 material[0]:max=1.0

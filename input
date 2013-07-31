@@ -1,22 +1,13 @@
-# My vampire input file
-# R F Evans
-# 18/01/10 
-# 
+#------------------------------------------
+# Sample vampire input file to perform
+# benchmark calculations
+#
+#------------------------------------------
+
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
-#create:particle-array
-#create:cylinder
 create:crystal-structure="sc"
-#create:crystal-structure="fcc"
-#create:particle-parity=1
-#create:single-spin
-#create:voronoi-film
-#create:voronoi-variance=0.15
-#create:voronoi-parity=1
-#create:periodic-boundaries-x
-#create:periodic-boundaries-y
-#create:periodic-boundaries-z
 
 #------------------------------------------
 # System Dimensions:
@@ -25,99 +16,34 @@ dimensions:a=3.54 !A
 dimensions:dx = 7.7 !nm
 dimensions:dy = 7.7 !nm
 dimensions:dz = 7.7 !nm
-dimensions:particle-size = 7.7 !nm
-dimensions:particle-spacing = 1.0 !nm
 
 #------------------------------------------
 # Material Files:
 #------------------------------------------
 material:file="Co.mat"
-#material:unit-cell-file=SimpleCubic.ucf
+
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:exchange=true
-sim:anisotropy=true
-sim:applied=true
-sim:thermal=true
-sim:dipolar=false
-sim:fast-dipolar=false
-#sim:fast-dipolar=true
-sim:dipolar-update-rate=10
 sim:temperature=300.0
-sim:surface-anisotropy=false
-sim:identify-surface-atoms=true
-sim:surface-anisotropy-threshold=6
-sim:Hinc=100.0 !mT
-sim:Hmax=12.0 !T
-sim:Hmin=-12.0 !T
-sim:Dx=0.0
-sim:Dy=0.0
-sim:Dz=1.0
-sim:External-Demag=false
-sim:minimum-temperature=300
-sim:maximum-temperature=800
-sim:equilibration-temperature=800
-sim:delta-temperature=10
-sim:equilibration-time=0
-sim:cooling-time=10.0e-12
-sim:cooling-function=gaussian
 sim:partial-time=1000
 sim:total-time=10000
-sim:loop-time=3000
 sim:dt=1.0E-15
 
-sim:constraint-angle-theta=0.0
-sim:constraint-angle-theta-min=0.0
-sim:constraint-angle-theta-max=0.0
-sim:constraint-angle-theta-delta=5.0
-sim:constraint-angle-phi=45.0
-sim:constraint-angle-phi-min=0.0
-sim:constraint-angle-phi-max=180.0
-sim:constraint-angle-phi-delta=5.0
-#--------------------------------
+#------------------------------------------
 # Program and integrator details
-#--------------------------------
-#sim:program=Curie-Temperature
+#------------------------------------------
 sim:program=Benchmark
-#sim:program=Field-Cool
-#sim:program=CMC-Anisotropy
-
-#sim:integrator=LLG-Midpoint
 sim:integrator=LLG-Heun
-#sim:integrator=Monte-Carlo
 
+#------------------------------------------
 # data output
+#------------------------------------------
 output:real-time
-#output:constraint-theta
-#output:constraint-phi
 output:temperature
 output:magnetisation
 output:mag-m
-#output:mean-mag-m
-#output:system-torque
-#output:mean-system-torque
-#output:mean-system-torque
 
-#screen:temperature
 screen:time
-#screen:mean-mag-m
 screen:mag-m
-#screen:MPI-Timings
-#screen:constraint-phi
-#screen:system-torque
-#screen:mean-system-torque
-
-#grain:output-rate=100
-#grain:real-time
-#grain:magnetisation
-
-#config:atoms
-#config:atoms-output-rate=10
-#config:atoms-min-x=0.0
-#config:atoms-min-y=0.0
-#config:atoms-min-z=0.49
-#config:atoms-max-x=1.0
-#config:atoms-max-y=1.0
-#config:atoms-max-z=0.51
 
