@@ -46,6 +46,11 @@ namespace create_voronoi{
 
 namespace cs{
 	
+   //----------------------------------------
+   // Function prototypes
+   //----------------------------------------
+   int populate_vertex_points(std::vector <std::vector <double> > &, std::vector <std::vector <std::vector <double> > > &);
+
 int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	
 	// check calling of routine if error checking is activated
@@ -68,11 +73,6 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	//
 	//=====================================================================================
 
-	//----------------------------------------
-	// Function prototypes
-	//----------------------------------------
-
-	int populate_vertex_points(std::vector <std::vector <double> > &, std::vector <std::vector <std::vector <double> > > &);
 
 	//---------------------------------------------------
 	// Local constants
@@ -503,13 +503,17 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//--------------------------------------
 	#ifdef MPICF
 	#else
-	int test_qhull;
+      int test_qhull;
+      #ifdef WIN_COMPILE
+         test_qhull=system(VORONOI" 1> NUL");
+      #else
+         test_qhull=system(VORONOI" 1> /dev/null 2> /dev/null");
+      #endif
 
-	test_qhull=system(VORONOI" 1> /dev/null 2> /dev/null");
-	if(test_qhull!=0){
-		std::cerr << "Error! - qvoronoi does not seem to be installed, exiting" << std::endl; 
-		err::vexit();
-	}
+      if(test_qhull!=0){
+         std::cerr << "Error! - qvoronoi does not seem to be installed, exiting" << std::endl;
+         err::vexit();
+      }
 	#endif
 
 	//--------------------------------------
@@ -517,17 +521,20 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//--------------------------------------
 
 	std::stringstream vsstr;
-	vsstr << "cat " << grain_file << " | "VORONOI" -o -Fv > " << voronoi_file;
-	string vstr = vsstr.str();
-	const char* vcstr = vstr.c_str();
-	//std::cout << vcstr << std::endl;
+   #ifdef WIN_COMPILE
+        vsstr << "type " << grain_file << " | "VORONOI" -o -Fv > " << voronoi_file;
+   #else
+        vsstr << "cat " << grain_file << " | "VORONOI" -o -Fv > " << voronoi_file;
+   #endif
+   string vstr = vsstr.str();
+   const char* vcstr = vstr.c_str();
 
-	//system("cat grains.tmp | qvoronoi -o -Fv > voronoi.tmp");
-	int sysstat = system(vcstr);
-	if(sysstat!=0){
-	  std::cerr << "Error initiating qvoronoi, exiting" << std::endl;
-	  err::vexit();
-	}
+   int sysstat = system(vcstr);
+   if(sysstat!=0){
+      std::cerr << "Error initiating qvoronoi, exiting" << std::endl;
+      err::vexit();
+   }
+
 	//--------------------------------------------------------
 	// Read in number of Voronoi vertices
 	//--------------------------------------------------------
@@ -562,59 +569,66 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 		vertex_array[i][1]=(vertex_array[i][1]+0.5)*scale_factor;
 	}
 
-	//--------------------------------------
-	// Read in Voronoi vertex associations
-	//--------------------------------------
+   //--------------------------------------
+   // Read in Voronoi vertex associations
+   //--------------------------------------
+   for(int i=0;i<num_grains;i++){
+      int num_assoc_vertices;	// Number of vertices associated with point i
+      int vertex_number;		// temporary vertex number
+      vertices_file >> num_assoc_vertices;
+      bool inf=false;
+      for(int j=0;j<num_assoc_vertices;j++){
+         vertices_file >> vertex_number;
+         grain_vertices_array[i].push_back(std::vector <double>());
+         grain_vertices_array[i][j].push_back(vertex_array[vertex_number][0]);
+         grain_vertices_array[i][j].push_back(vertex_array[vertex_number][1]);
+         // check for unbounded grains
+         if(vertex_number==0) inf=true;
+         // check for bounded grains with vertices outside bounding box
+         if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>cs::system_dimensions[0])) inf=true;
+         if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>cs::system_dimensions[1])) inf=true;
+      }
 
-	for(int i=0;i<num_grains;i++){
-		int num_assoc_vertices;	// Number of vertices associated with point i
-		int vertex_number;		// temporary vertex number
-		vertices_file >> num_assoc_vertices;
-		bool inf=false;
-		for(int j=0;j<num_assoc_vertices;j++){
-			vertices_file >> vertex_number;
-			grain_vertices_array[i].push_back(std::vector <double>());
-			grain_vertices_array[i][j].push_back(vertex_array[vertex_number][0]);
-			grain_vertices_array[i][j].push_back(vertex_array[vertex_number][1]);
-			// check for unbounded grains
-			if(vertex_number==0) inf=true;
-			// check for bounded grains with vertices outside bounding box
-			if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>cs::system_dimensions[0])) inf=true;
-			if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>cs::system_dimensions[1])) inf=true;
-		}
+      //-------------------------------------------------------------------
+      // Set unbounded grains to zero vertices for later removal
+      //-------------------------------------------------------------------
+      if(inf==true){
+         for(int k=0;k<num_assoc_vertices;k++){
+            grain_vertices_array[i][k].resize(0);
+         }
+         grain_vertices_array[i].resize(0);
+      }
+   }
 
-		//-------------------------------------------------------------------
-		// Set unbounded grains to zero vertices for later removal
-		//-------------------------------------------------------------------
-		if(inf==true){
-			for(int k=0;k<num_assoc_vertices;k++){
-				grain_vertices_array[i][k].resize(0);
-			}
-			grain_vertices_array[i].resize(0);
-		}
-	}
+   //-------------------------------------------------------------------
+   // Remove Temporary voronoi files
+   //-------------------------------------------------------------------
+   {
+      std::stringstream rmfsstr;
+      #ifdef WIN_COMPILE
+         rmfsstr << "del /f " << grain_file;
+      #else
+         rmfsstr << "rm -f " << grain_file;
+      #endif
+      string rmfstr = rmfsstr.str();
+      const char* rmfcstr = rmfstr.c_str();
+      int sysstat=system(rmfcstr);
+      if(sysstat!=0) std::cerr << "Error removing temporary grain files" << std::endl;
+   }
+   {
+      std::stringstream rmfsstr;
+      #ifdef WIN_COMPILE
+         rmfsstr << "del /f " << voronoi_file;
+      #else
+         rmfsstr << "rm -f " << voronoi_file;
+      #endif
+      string rmfstr = rmfsstr.str();
+      const char* rmfcstr = rmfstr.c_str();
+      int sysstat=system(rmfcstr);
+      if(sysstat!=0) std::cerr << "Error removing temporary voronoi files" << std::endl;
+   }
 
-	//-------------------------------------------------------------------
-	// Remove Temporary voronoi files
-	//-------------------------------------------------------------------
-	{
-	std::stringstream rmfsstr;
-	rmfsstr << "rm -f " << grain_file;
-	string rmfstr = rmfsstr.str();
-	const char* rmfcstr = rmfstr.c_str();
-	int sysstat=system(rmfcstr);
-	if(sysstat!=0) std::cerr << "Error removing temporary grain files" << std::endl;
-	}
-	{
-	std::stringstream rmfsstr;
-	rmfsstr << "rm -f " << voronoi_file;
-	string rmfstr = rmfsstr.str();
-	const char* rmfcstr = rmfstr.c_str();
-	int sysstat=system(rmfcstr);
-	if(sysstat!=0) std::cerr << "Error removing temporary voronoi files" << std::endl;
-	}
-		
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 
 }
 

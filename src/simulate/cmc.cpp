@@ -49,6 +49,7 @@
 
 // Standard Libraries
 #include <cmath>
+#include <math.h>
 #include <cstdlib>
 #include <iostream>
 

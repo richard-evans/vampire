@@ -44,34 +44,31 @@
 #include <list>
 
 namespace cs{
-	
-	
-	
-	//======================================================================
-	//                         create_system_type
-	//   Subroutine to set system size and create desired crystal structure
-	//
-	//======================================================================	
+
+   //----------------------------------------
+   // function prototypes
+   //----------------------------------------
+   int particle(std::vector<cs::catom_t> &);
+   int particle_array(std::vector<cs::catom_t> &);
+
+   int alloy(std::vector<cs::catom_t> &);
+   int intermixing(std::vector<cs::catom_t> &);
+   void dilute(std::vector<cs::catom_t> &);
+   void geometry(std::vector<cs::catom_t> &);
+   void roughness(std::vector<cs::catom_t> &);
+   void calculate_atomic_composition(std::vector<cs::catom_t> &);
+
+//======================================================================
+//                         create_system_type
+//   Subroutine to set system size and create desired crystal structure
+//
+//======================================================================
 int create_system_type(std::vector<cs::catom_t> & catom_array){
 
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "cs::create_system_type has been called" << std::endl;}
-	
-	//----------------------------------------
-	// function prototypes
-	//----------------------------------------
-	
-	int particle(std::vector<cs::catom_t> &);
-	int particle_array(std::vector<cs::catom_t> &);
-	
-	int alloy(std::vector<cs::catom_t> &);
-	int intermixing(std::vector<cs::catom_t> &);
-	void dilute(std::vector<cs::catom_t> &);
-	void geometry(std::vector<cs::catom_t> &);
-	void roughness(std::vector<cs::catom_t> &);
-	void calculate_atomic_composition(std::vector<cs::catom_t> &);
 
 	//int particle_array(int,int**,int*);
 	//int hex_particle_array(int,int**,int*);

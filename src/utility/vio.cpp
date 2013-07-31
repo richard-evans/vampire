@@ -78,74 +78,79 @@ std::ofstream zgrain;
 
 
 namespace vout{
-	
-	std::string zLogProgramName; // Program Name
-	std::string zLogHostName; // Host Name
-	pid_t 		zLogPid; // Process ID
-	bool			zLogInitialised=false; // Initialised flag
-	//const char * StringStream2ConstChar(std::stringstream file_sstr){
-	//	static std::string cfg_file = file_sstr.str();
-	//	return cfg_file.c_str();
-	//}
-	
-	void zLogTsInit(std::string tmp){
-		
-		// Get program name and process ID
-		std::string tmprev;
-		int linelength = tmp.length();
 
-		// set character triggers
-		const char* key="/";	// Word identifier
+   std::string zLogProgramName; // Program Name
+   std::string zLogHostName; // Host Name
+   bool        zLogInitialised=false; // Initialised flag
+   #ifdef WIN_COMPILE
+      int      zLogPid; // Process ID
+   #else
+      pid_t    zLogPid; // Process ID
+   #endif
 
-		// copy characters after last /
-		for(int i=linelength-1;i>=0;i--){
+   void zLogTsInit(std::string tmp){
 
-			char c=tmp.at(i);
+      // Get program name and process ID
+      std::string tmprev;
+      int linelength = tmp.length();
 
-			if(c != *key){
-				tmprev.push_back(c);
-			}
-			else break;
-		}
-		
-		//reverse read into program name
-		linelength=tmprev.size();
-		for(int i=linelength-1;i>=0;i--){
-			char c=tmprev.at(i);
-			zLogProgramName.push_back(c);
-		}
+      // set character triggers
+      const char* key="/";	// Word identifier
 
-		// Get hostname
-		char loghostname [80];
-		int GHS=gethostname(loghostname, 80);
-		if(GHS!=0) std::cerr << "Warning: Unable to retrieve hostname for zlog file." << std::endl; 
-		zLogHostName = loghostname;
-		
-		// Now get process ID
-		zLogPid = getpid();
-		
-		// Remove previous log files
-		//system("rm zlog*"); This doesn't work in parallel
-		
-		// Set unique filename for log if num_procs > 1
-		std::stringstream logfn;
-		if(vmpi::num_processors==1) logfn << "log";
-		else logfn << "log."<<vmpi::my_rank;
-		
-		// Open log filename
-		std::string log_file = logfn.str();
-		const char* log_filec = log_file.c_str();
-		zlog.open(log_filec);
-		//zlog.open(StringStream2ConstChar(logfn));
-		
-		// Mark as initialised;
-		zLogInitialised=true;
-		
-		zlog << zTs() << "Logfile opened" << std::endl;
-		
-		return;
-	}
-	
+      // copy characters after last /
+      for(int i=linelength-1;i>=0;i--){
+
+         char c=tmp.at(i);
+
+         if(c != *key){
+            tmprev.push_back(c);
+         }
+         else break;
+      }
+
+      //reverse read into program name
+      linelength=tmprev.size();
+      for(int i=linelength-1;i>=0;i--){
+         char c=tmprev.at(i);
+         zLogProgramName.push_back(c);
+      }
+
+      // Get hostname
+      char loghostname [80];
+      #ifdef WIN_COMPILE
+         DWORD sizelhn = sizeof ( loghostname );
+         int GHS=!GetComputerName(loghostname, &sizelhn); //GetComputerName returns true when retrieves hostname
+      #else
+         int GHS=gethostname(loghostname, 80);
+      #endif
+      if(GHS!=0) std::cerr << "Warning: Unable to retrieve hostname for zlog file." << std::endl;
+      zLogHostName = loghostname;
+
+      // Now get process ID
+      #ifdef WIN_COMPILE
+         zLogPid = _getpid();
+      #else
+         zLogPid = getpid();
+      #endif
+
+      // Set unique filename for log if num_procs > 1
+      std::stringstream logfn;
+      if(vmpi::num_processors==1) logfn << "log";
+      else logfn << "log."<<vmpi::my_rank;
+
+      // Open log filename
+      std::string log_file = logfn.str();
+      const char* log_filec = log_file.c_str();
+      zlog.open(log_filec);
+
+      // Mark as initialised;
+      zLogInitialised=true;
+
+      zlog << zTs() << "Logfile opened" << std::endl;
+
+      return;
+   }
+
 }
 
 /// @brief Function to output timestamp to stream
