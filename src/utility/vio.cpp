@@ -3940,7 +3940,26 @@ int match_material(string const word, string const value, string const unit, int
          sim::local_temperature=true;
          return EXIT_SUCCESS;
       }
-		//--------------------------------------------------------------------
+      //--------------------------------------------------------------------
+      test="fill-space";
+      /*
+        logical fill-space [false]
+           This flag causes the material to be a fill material, instead of
+           have atoms generated as part of the usual structure, for example
+           particle shpaes, particle arrays and voronoi films. The default
+           value is false for all materials. Valid values are true,
+           false or (blank) [same as true].
+       */
+      if(word==test){
+         // Test for sane input
+         bool sanitised_bool=check_for_valid_bool(value, word, line, prefix,"material");
+
+         // set flag
+         read_material[super_index].fill=sanitised_bool;
+
+         return EXIT_SUCCESS;
+      }
+      //--------------------------------------------------------------------
 		test="applied-field-strength";
 		if(word==test){
 			double H=atof(value.c_str());
