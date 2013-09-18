@@ -70,6 +70,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	int intermixing(std::vector<cs::catom_t> &);
 	void dilute(std::vector<cs::catom_t> &);
 	void geometry(std::vector<cs::catom_t> &);
+   void fill(std::vector<cs::catom_t> &);
 	void roughness(std::vector<cs::catom_t> &);
 	void calculate_atomic_composition(std::vector<cs::catom_t> &);
 
@@ -124,9 +125,12 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			}
 		}
 
+		// call fill function to fill in void
+		fill(catom_array);
+
 		// call geometry function
 		geometry(catom_array);
-		
+
 		// call intermixing function - must be before alloy function
 		intermixing(catom_array);
 
@@ -791,6 +795,7 @@ void roughness(std::vector<cs::catom_t> & catom_array){
 			double min=mp::material[mat].min*cs::system_dimensions[2];
 			double max=mp::material[mat].max*cs::system_dimensions[2];
 			double local_height = height_field.at(hx).at(hy);
+         bool fill = mp::material[mat].fill;
 
 			// optionally specify a material specific height here -- not yet implemented
 			//if(cs::interfacial_roughness_local_height_field==true){
@@ -799,7 +804,7 @@ void roughness(std::vector<cs::catom_t> & catom_array){
 
 			// Include atoms if within material height
 			const double cz=catom_array[atom].z;
-			if((cz>=min+local_height) && (cz<max+local_height)){
+			if((cz>=min+local_height) && (cz<max+local_height) && (fill==false)){
 				catom_array[atom].material=mat;
 				catom_array[atom].include=true;
 			}
@@ -925,5 +930,42 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 	
 	return;
 }
-  
+
+//-----------------------------------------------------------
+//
+//  Function to replace deleted atoms with in-fill material
+//
+//  Can be used to create embedded nanoparticle arrays or
+//  granular recording media.
+//
+//  v1 18/09/2013
+//  (c) R F L Evans
+//
+//-----------------------------------------------------------
+void fill(std::vector<cs::catom_t> & catom_array){
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "cs::fill has been called" << std::endl;}
+
+   //loop over all potential intermixing materials
+   for(int mat=0;mat<mp::num_materials;mat++){
+      if(mp::material[mat].fill){
+         double min = mp::material[mat].min*cs::system_dimensions[2];
+         double max = mp::material[mat].max*cs::system_dimensions[2];
+
+         // loop over all atoms selecting only deselected atoms within min/max
+         for(unsigned int atom=0;atom<catom_array.size();atom++){
+            if( (catom_array[atom].z < max) && (catom_array[atom].z >= min) && (catom_array[atom].include==false)){
+               // set atom to fill material
+               catom_array[atom].material=mat;
+               // re-include atom
+               catom_array[atom].include=true;
+            }
+         }
+      }
+   }
+
+   return;
+
+}
+
 } // end of namespace

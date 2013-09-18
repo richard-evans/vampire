@@ -72,7 +72,8 @@ materials_t::materials_t ():
 	applied_field_unit_vector(3,0.0),
 	fmr_field_strength(0.0),
 	fmr_field_frequency(0.0),
-	fmr_field_unit_vector(3,0.0)
+	fmr_field_unit_vector(3,0.0),
+   fill(false)
 	
 	{
 
