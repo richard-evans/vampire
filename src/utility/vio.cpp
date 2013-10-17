@@ -193,7 +193,11 @@ std::string zTs(){
 	}
 	else{
 		std::cerr << "Error! - zlog not initialised, exiting" << std::endl;
-		err::vexit();
+		// This can be recursive - vexit calls zTs()
+      //err::vexit();
+      // Exit manually
+      std::cerr << "Fatal error: Aborting program. See log file for details." << std::endl;
+      exit(EXIT_FAILURE);
 	}
 
 	return NullString;
