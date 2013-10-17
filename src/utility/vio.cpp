@@ -3230,7 +3230,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 			string str="energy";
 			if(unit_type==str){
-				read_material[super_index].Jij_matrix_SI[sub_index]=Jij;
+				read_material[super_index].Jij_matrix_SI[sub_index]=-Jij; // Import exchange as field, *-1
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -3296,7 +3296,7 @@ int match_material(string const word, string const value, string const unit, int
 			string str="energy";
 			if(unit_type==str){
 				// Set moment flag
-				read_material[super_index].Ku1_SI=K;
+				read_material[super_index].Ku1_SI=-K; // Import anisotropy as field, *-1
 				// enable global anisotropy flag                                                                                                                                              
 				sim::UniaxialScalarAnisotropy=true;
  				std::cerr << "Use of Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
@@ -3320,7 +3320,7 @@ int match_material(string const word, string const value, string const unit, int
 			string str="energy";
 			if(unit_type==str){
 				// set anisotropy
-				read_material[super_index].Ku1_SI=K;
+				read_material[super_index].Ku1_SI=-K; // Import anisotropy as field, *-1
 				// enable global anisotropy flag
 				sim::UniaxialScalarAnisotropy=true;
 				return EXIT_SUCCESS;
@@ -3343,7 +3343,7 @@ int match_material(string const word, string const value, string const unit, int
          string str="energy";
          if(unit_type==str){
             // set anisotropy
-            read_material[super_index].Ku2_SI=K;
+            read_material[super_index].Ku2_SI=-K; // Import anisotropy as field, *-1
             // enable global anisotropy flag
             sim::second_order_uniaxial_anisotropy=true;
             return EXIT_SUCCESS;
@@ -3360,7 +3360,7 @@ int match_material(string const word, string const value, string const unit, int
          double Klatt=atof(value.c_str());
          // Test for valid range
          check_for_valid_value(Klatt, word, line, prefix, unit, "energy", -1.0e-18, 1.0e18,"material","-1e18 - 1e18");
-         read_material[super_index].Klatt_SI=Klatt;
+         read_material[super_index].Klatt_SI=-Klatt; // Import anisotropy as field, *-1
          sim::lattice_anisotropy_flag=true;
          return EXIT_SUCCESS;
       }
@@ -3409,7 +3409,7 @@ int match_material(string const word, string const value, string const unit, int
 			string str="energy";
 			if(unit_type==str){
 				// Set moment flag
-				read_material[super_index].Kc1_SI=K;
+				read_material[super_index].Kc1_SI=-K; // Import anisotropy as field, *-1
 				sim::CubicScalarAnisotropy=true;
 				return EXIT_SUCCESS;
 			}
@@ -3479,7 +3479,7 @@ int match_material(string const word, string const value, string const unit, int
 			string str="energy";
 			if(unit_type==str){
 				// Copy anisotropy vector to material
-				read_material[super_index].KuVec_SI=K;
+				read_material[super_index].KuVec_SI=-K; // Import anisotropy as field, *-1
 				sim::TensorAnisotropy=true;
 				return EXIT_SUCCESS;
 			}
@@ -3503,7 +3503,7 @@ int match_material(string const word, string const value, string const unit, int
 			string str="energy";
 			if(unit_type==str){
 				// Set moment flag
-				read_material[super_index].Ks_SI=K;
+				read_material[super_index].Ks_SI=-K;// Import anisotropy as field, *-1
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -3562,13 +3562,6 @@ int match_material(string const word, string const value, string const unit, int
 			}
 		}
 		//------------------------------------------------------------
-		else
-		test="hamiltonian";
-		if(word==test){
-			std::cout << "Warning: material[" << super_index << "]:hamiltonian is deprecated and has no effect" << std::endl;
-			//read_material[super_index].hamiltonian_type=value;
-			return EXIT_SUCCESS;
-		}
 		else
 		test="element";
 		if(word==test){
