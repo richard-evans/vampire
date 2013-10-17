@@ -174,19 +174,22 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 			// determine z-bounds for materials
 			std::vector<double> mat_min(mp::num_materials);
 			std::vector<double> mat_max(mp::num_materials);
+         std::vector<bool> mat_fill(mp::num_materials);
 
+         // Unroll min, max and fill for performance
 			for(int mat=0;mat<mp::num_materials;mat++){
 				mat_min[mat]=mp::material[mat].min*cs::system_dimensions[2];
 				mat_max[mat]=mp::material[mat].max*cs::system_dimensions[2];
 				// alloys generally are not defined by height, and so have max = 0.0
 				if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
+            mat_fill[mat]=mp::material[mat].fill;
 			}
 
 			// Assign materials to generated atoms
 			for(unsigned int atom=0;atom<catom_array.size();atom++){
 				for(int mat=0;mat<mp::num_materials;mat++){
 					const double cz=catom_array[atom].z;
-					if((cz>=mat_min[mat]) && (cz<mat_max[mat])){
+					if((cz>=mat_min[mat]) && (cz<mat_max[mat]) && (mat_fill[mat]==false)){
 						catom_array[atom].material=mat;
 						catom_array[atom].include=true;
 					}

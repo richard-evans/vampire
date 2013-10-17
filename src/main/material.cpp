@@ -53,7 +53,7 @@ materials_t::materials_t ():
 	min(0.0),
 	max(1.0),
 	geometry(0),
-	core_shell_size(0.0),
+	core_shell_size(1.0),
 	interface_roughness(0.0),
 	density(1.0),
 	cutoff(0.8),
@@ -72,7 +72,8 @@ materials_t::materials_t ():
 	applied_field_unit_vector(3,0.0),
 	fmr_field_strength(0.0),
 	fmr_field_frequency(0.0),
-	fmr_field_unit_vector(3,0.0)
+	fmr_field_unit_vector(3,0.0),
+   fill(false)
 	
 	{
 
