@@ -278,9 +278,14 @@ double spin_cubic_anisotropy_energy(const int imaterial, const double Sx, const 
 //  E = K2 (-2Sz^2 + Sz^4)
 //
 //---------------------------------------------------------------
-double spin_second_order_uniaxial_anisotropy_energy(const int imaterial, const double Sz){
-   const double Sz2=Sz*Sz;
-   return mp::material_second_order_anisotropy_constant_array[imaterial]*(Sz2*Sz2);
+double spin_second_order_uniaxial_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
+   const double ex = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(0);
+   const double ey = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(1);
+   const double ez = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(2);
+   const double Sdote=Sx*ex + Sy*ey + Sz*ez;
+   const double Sdote2=Sdote*Sdote;
+   const double Sdote4=Sdote2*Sdote2;
+   return mp::material_second_order_anisotropy_constant_array[imaterial]*(Sdote4);
 }
 
 //------------------------------------------------------
@@ -444,7 +449,7 @@ double calculate_spin_energy(const int atom, const int AtomExchangeType){
 		case 2: ; break; // skip
 		default: zlog << zTs() << "Error. sim::AnisotropyType has value " << sim::AnisotropyType << " which is outside of valid range 0-1. Exiting." << std::endl; err::vexit();
 	}
-	if(second_order_uniaxial_anisotropy) energy+=spin_second_order_uniaxial_anisotropy_energy(imaterial, Sz);
+	if(second_order_uniaxial_anisotropy) energy+=spin_second_order_uniaxial_anisotropy_energy(imaterial, Sx, Sy, Sz);
 	if(sim::CubicScalarAnisotropy==true) energy+=spin_cubic_anisotropy_energy(imaterial, Sx, Sy, Sz);
    if(sim::lattice_anisotropy_flag) energy+=spin_lattice_anisotropy_energy(imaterial, Sz);
 	if(sim::surface_anisotropy==true) energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);

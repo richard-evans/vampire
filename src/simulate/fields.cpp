@@ -274,18 +274,28 @@ int calculate_anisotropy_fields(const int start_index,const int end_index){
 //
 //  (c) R F L Evans 2013
 //
-//  E = K2 (-2Sz^2 + Sz^4)
-//  Hx = 0
-//  Hy = 0
-//  Hz = -K2 (-4Sz + 4Sz^3) = 4*K2*Sz*(1-Sz^2)
+//  E = k4*(S . e)^4
+//  Hx = -4*k4*(S . e)^3 e_x
+//  Hy = -4*k4*(S . e)^3 e_y
+//  Hz = -4*k4*(S . e)^3 e_z
 //
 //------------------------------------------------------
 void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,const int end_index){
    for(int atom=start_index;atom<end_index;atom++){
       const int imaterial=atoms::type_array[atom];
-      const double Ku2=4.0*mp::material_second_order_anisotropy_constant_array[imaterial];
-      const double Sz=atoms::z_spin_array[atom];
-      atoms::z_total_spin_field_array[atom] -= Ku2*Sz*Sz*Sz;
+      const double ex = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(0);
+      const double ey = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(1);
+      const double ez = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(2);
+      const double Sx = atoms::x_spin_array[atom];
+      const double Sy = atoms::y_spin_array[atom];
+      const double Sz = atoms::z_spin_array[atom];
+      const double Ku2 = 4.0*mp::material_second_order_anisotropy_constant_array[imaterial];
+      const double Sdote = (Sx*ex + Sy*ey + Sz*ez);
+      const double Sdote3 = Sdote*Sdote*Sdote;
+
+      atoms::x_total_spin_field_array[atom] -= Ku2*ex*Sdote3;
+      atoms::y_total_spin_field_array[atom] -= Ku2*ey*Sdote3;
+      atoms::z_total_spin_field_array[atom] -= Ku2*ez*Sdote3;
    }
    return;
 }
