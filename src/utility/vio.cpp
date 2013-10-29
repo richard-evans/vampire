@@ -1175,13 +1175,8 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-array-offset-x";
    if(word==test){
       double paox=atof(value.c_str());
-
-      // Test for valid range
       check_for_valid_value(paox, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
-
-      // If within valid range assign value and return
       cs::particle_array_offset_x=paox;
-
       return EXIT_SUCCESS;
    }
    else
@@ -1189,18 +1184,13 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-array-offset-y";
    if(word==test){
       double paoy=atof(value.c_str());
-
-      // Test for valid range
       check_for_valid_value(paoy, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
-
-      // If within valid range assign value and return
       cs::particle_array_offset_y=paoy;
-
       return EXIT_SUCCESS;
    }
    else
    //--------------------------------------------------------------------
-   test="cell-size";
+   test="macro-cell-size";
    if(word==test){
       double cs=atof(value.c_str());
       check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
@@ -1866,10 +1856,10 @@ int match_sim(string const word, string const value, string const unit, int cons
       }
    }
    //--------------------------------------------------------------------
-   //else{
+   else{
       std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
       return EXIT_FAILURE;
-   //}
+   }
 
 
    return EXIT_SUCCESS;
