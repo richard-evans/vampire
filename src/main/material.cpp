@@ -27,10 +27,10 @@
 namespace mp{
 	// Constructor
 materials_t::materials_t ():
-	name(""),
+	name("material#n"),
 	element("Fe"),
 	alpha(1.0),
-	mu_s_SI(9.27400915e-24),
+	mu_s_SI(1.72*9.27400915e-24),
 	magnetisation(0.0),
 	Ku1_SI(0.0),
 	Ku2_SI(0.0),

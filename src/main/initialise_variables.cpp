@@ -36,6 +36,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <sstream>
 //==========================================================
 // Namespace material_parameters
 //==========================================================
@@ -282,8 +283,8 @@ int set_derived_parameters(){
 	const string blank="";
 	// Set derived material parameters
 	for(int mat=0;mat<mp::num_materials;mat++){
-		mp::material[mat].one_oneplusalpha_sq			=-mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
-		mp::material[mat].alpha_oneplusalpha_sq			= mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
+		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
+		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
 		
 		// set initial spins to unit length
 		double sx = mp::material[mat].initial_spin[0];
@@ -305,6 +306,14 @@ int set_derived_parameters(){
 		mp::material[mat].Ks									= mp::material[mat].Ks_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
 																  (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
+
+      // Rename un-named materials with material id
+      std::string defname="material#n";
+      if(mp::material[mat].name==defname){
+         std::stringstream newname;
+         newname << "material" << mat+1;
+         mp::material[mat].name=newname.str();
+      }
 	}
 		// Check for which anisotropy function(s) are to be used		
 		if(sim::TensorAnisotropy==true){
