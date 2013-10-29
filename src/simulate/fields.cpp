@@ -397,7 +397,7 @@ void calculate_surface_anisotropy_fields(const int start_index,const int end_ind
 		// only calculate for surface atoms
 		if(atoms::surface_array[atom]==true){
 			const int imaterial=atoms::type_array[atom];
-			const double Ks=2.0*mp::material[imaterial].Ks; // note factor two here from differentiation
+			const double Ks=0.5*2.0*mp::material[imaterial].Ks; // note factor two here from differentiation
 			const double S[3]={atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
 		
 			for(int nn=atoms::nearest_neighbour_list_si[atom];nn<atoms::nearest_neighbour_list_ei[atom];nn++){

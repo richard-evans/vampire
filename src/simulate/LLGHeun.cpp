@@ -188,7 +188,7 @@ int LLG_Heun(){
 	for(int atom=0;atom<num_atoms;atom++){
 
 		const int imaterial=atoms::type_array[atom];
-		const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
+		const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq; // material specific alpha and gamma
 		const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
 
 		// Store local spin in Sand local field in H

@@ -184,7 +184,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 					const int natom = atoms::neighbour_list_array[nn];
 					const int jmaterial=atoms::type_array[natom];
 					atoms::i_exchange_list.push_back(tmp_zval);
-					atoms::i_exchange_list[nn].Jij= mp::material[imaterial].Jij_matrix[jmaterial];
+					atoms::i_exchange_list[nn].Jij=mp::material[imaterial].Jij_matrix[jmaterial];
 					// reset interation id to neighbour number - causes segfault if nn out of range
 					atoms::neighbour_interaction_type_array[nn]=nn;
 				}
@@ -201,7 +201,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 				int iatom = unit_cell.interaction[i].i;
 				int imat = unit_cell.atom[iatom].mat;
 				atoms::i_exchange_list.push_back(tmp_zval);
-				atoms::i_exchange_list[i].Jij=unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
+				atoms::i_exchange_list[i].Jij=-unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
 			}
 			break;
 		case 1:
@@ -213,9 +213,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 				int iatom = unit_cell.interaction[i].i;
 				int imat = unit_cell.atom[iatom].mat;
 				atoms::v_exchange_list.push_back(tmp_zvec);
-				atoms::v_exchange_list[i].Jij[0]=unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
-				atoms::v_exchange_list[i].Jij[1]=unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
-				atoms::v_exchange_list[i].Jij[2]=unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
+				atoms::v_exchange_list[i].Jij[0]=-unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
+				atoms::v_exchange_list[i].Jij[1]=-unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
+				atoms::v_exchange_list[i].Jij[2]=-unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
 			}
 			break;
 		case 2:
@@ -228,17 +228,17 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 				int imat = unit_cell.atom[iatom].mat;
 				atoms::t_exchange_list.push_back(tmp_zten);
 				
-				atoms::t_exchange_list[i].Jij[0][0]=unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[0][1]=unit_cell.interaction[i].Jij[0][1]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[0][2]=unit_cell.interaction[i].Jij[0][2]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[0][0]=-unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[0][1]=-unit_cell.interaction[i].Jij[0][1]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[0][2]=-unit_cell.interaction[i].Jij[0][2]/mp::material[imat].mu_s_SI;
 
-				atoms::t_exchange_list[i].Jij[1][0]=unit_cell.interaction[i].Jij[1][0]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[1][1]=unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[1][2]=unit_cell.interaction[i].Jij[1][2]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[1][0]=-unit_cell.interaction[i].Jij[1][0]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[1][1]=-unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[1][2]=-unit_cell.interaction[i].Jij[1][2]/mp::material[imat].mu_s_SI;
 
-				atoms::t_exchange_list[i].Jij[2][0]=unit_cell.interaction[i].Jij[2][0]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[2][1]=unit_cell.interaction[i].Jij[2][1]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[2][2]=unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[2][0]=-unit_cell.interaction[i].Jij[2][0]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[2][1]=-unit_cell.interaction[i].Jij[2][1]/mp::material[imat].mu_s_SI;
+				atoms::t_exchange_list[i].Jij[2][2]=-unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
 			}
 			break;
 		default:
