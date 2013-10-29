@@ -7,15 +7,15 @@
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
-create:crystal-structure="sc"
+create:crystal-structure=sc
 
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
-dimensions:a=3.54 !A
-dimensions:dx = 7.7 !nm
-dimensions:dy = 7.7 !nm
-dimensions:dz = 7.7 !nm
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 7.7 !nm
+dimensions:system-size-y = 7.7 !nm
+dimensions:system-size-z = 7.7 !nm
 
 #------------------------------------------
 # Material Files:
@@ -26,15 +26,15 @@ material:file="Co.mat"
 # Simulation attributes:
 #------------------------------------------
 sim:temperature=300.0
-sim:partial-time=1000
-sim:total-time=10000
-sim:dt=1.0E-15
+sim:partial-time-steps=1000
+sim:total-time-steps=10000
+sim:time-step=1.0E-15
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
-sim:program=Benchmark
-sim:integrator=LLG-Heun
+sim:program=benchmark
+sim:integrator=llg-heun
 
 #------------------------------------------
 # data output

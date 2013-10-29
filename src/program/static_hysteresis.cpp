@@ -92,7 +92,7 @@ int static_hysteresis(){
 
 	// Perform Field Loop
 	for(int parity=-1;parity<2;parity+=2){
-		for(int H=iHmin;H<=iHmax;H+=iHinc){
+		for(int H=-iHmax;H<=iHmax;H+=iHinc){
 			
 			// Set applied field (Tesla)
 			sim::H_applied=double(H)*double(parity)*1.0e-6;

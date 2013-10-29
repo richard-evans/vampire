@@ -146,6 +146,7 @@ int init(){
 		unit[41]="as";			conversion[41]=1.0E-18;				type[41]="time"; // attoseconds
 		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
 
+      // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag
 		units::initialised=true;
 		

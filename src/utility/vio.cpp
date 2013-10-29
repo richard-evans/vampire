@@ -834,7 +834,7 @@ int match_create(string const word, string const value, string const unit, int c
    test="voronoi-random-seed";
    if(word==test){
       int vs=atoi(value.c_str());
-      check_for_valid_int(vs, word, line, prefix, unit, "none", 0, 2000000000,"input","0 - 2,000,000,000");
+      check_for_valid_int(vs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       mtrandom::voronoi_seed=vs;
          return EXIT_SUCCESS;
    }
@@ -966,7 +966,7 @@ int match_create(string const word, string const value, string const unit, int c
    test="interfacial-roughness-number-of-seed-points";
    if(word==test){
       int sc=atoi(value.c_str());
-      check_for_valid_int(sc, word, line, prefix, unit, "none", 0, 100000,"input","0 - 100,000");
+      check_for_valid_int(sc, word, line, prefix, 0, 100000,"input","0 - 100,000");
       cs::interfacial_roughness_seed_count=sc;
       return EXIT_SUCCESS;
    }
@@ -1046,1434 +1046,833 @@ int match_create(string const word, string const value, string const unit, int c
 }
 
 int match_dimension(string const word, string const value, string const unit, int const line){
-		//-------------------------------------------------------------------
-		// System dimension variables
-		//-------------------------------------------------------------------
-		std::string prefix="dimension:";
-      std::string none = "none";
-		
-		std::string test="a";
-		if(word==test){
-			double a=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,a,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::unit_cell_size[0]=a;
-				cs::unit_cell_size[1]=a;
-				cs::unit_cell_size[2]=a;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		test="c";
-		if(word==test){
-			double c=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,c,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::unit_cell_size[2]=c;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="ax";
-		if(word==test){
-			double ax=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,ax,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::unit_cell_size[0]=ax;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="ay";
-		if(word==test){
-			double ay=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,ay,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::unit_cell_size[1]=ay;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="az";
-		if(word==test){
-			double az=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,az,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::unit_cell_size[2]=az;
-				//std::cout << "az: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="d";
-		if(word==test){
-			double d=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,d,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::system_dimensions[0]=d;
-				cs::system_dimensions[1]=d;
-				cs::system_dimensions[2]=d;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="dx";
-		if(word==test){
-			double dx=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,dx,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::system_dimensions[0]=dx;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="dy";
-		if(word==test){
-			double dy=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,dy,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::system_dimensions[1]=dy;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="dz";
-		if(word==test){
-			double dz=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,dz,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::system_dimensions[2]=dz;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="particle-size";
-		if(word==test){
-			double psize=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,psize,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::particle_scale=psize;
-				//std::cout << "particle_size: " << mp::particle_scale << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="particle-spacing";
-		if(word==test){
-			double pspacing=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,pspacing,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cs::particle_spacing=pspacing;
-				//std::cout << "particle_spacing: " << mp::particle_spacing << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-      else
-      //--------------------------------------------------------------------
-      test="particle-shape-factor-x";
-      if(word==test){
-         double sfx=atof(value.c_str());
-         check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
-         cs::particle_shape_factor_x=sfx;
-      }
-      else
-      //--------------------------------------------------------------------
-      test="particle-shape-factor-y";
-      if(word==test){
-         double sfy=atof(value.c_str());
-         check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
-         cs::particle_shape_factor_y=sfy;
-      }
-      else
-      //--------------------------------------------------------------------
-      test="particle-shape-factor-z";
-      if(word==test){
-         double sfz=atof(value.c_str());
-         check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
-         cs::particle_shape_factor_z=sfz;
-      }
-		else
-		//--------------------------------------------------------------------
-		test="particle-array-offset-x";
-		if(word==test){
-			double paox=atof(value.c_str());
+   //-------------------------------------------------------------------
+   // System dimension variables
+   //-------------------------------------------------------------------
+   std::string prefix="dimension:";
 
-			// Test for valid range
-			check_for_valid_value(paox, word, line, prefix, unit, "length", 0.0, 1.0e4,"input","0.0 - 1.0 micrometre");
+   std::string test="unit-cell-size";
+   if(word==test){
+      double a=atof(value.c_str());
+      check_for_valid_value(a, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::unit_cell_size[0]=a;
+      cs::unit_cell_size[1]=a;
+      cs::unit_cell_size[2]=a;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="unit-cell-size-x";
+   if(word==test){
+      double ax=atof(value.c_str());
+      check_for_valid_value(ax, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::unit_cell_size[0]=ax;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="unit-cell-size-y";
+   if(word==test){
+      double ay=atof(value.c_str());
+      check_for_valid_value(ay, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::unit_cell_size[1]=ay;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="unit-cell-size-z";
+   if(word==test){
+      double az=atof(value.c_str());
+      check_for_valid_value(az, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::unit_cell_size[2]=az;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="system-size";
+   if(word==test){
+      double d=atof(value.c_str());
+      check_for_valid_value(d, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::system_dimensions[0]=d;
+      cs::system_dimensions[1]=d;
+      cs::system_dimensions[2]=d;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="system-size-x";
+   if(word==test){
+      double dx=atof(value.c_str());
+      check_for_valid_value(dx, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::system_dimensions[0]=dx;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="system-size-y";
+   if(word==test){
+      double dy=atof(value.c_str());
+      check_for_valid_value(dy, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::system_dimensions[1]=dy;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="system-size-z";
+   if(word==test){
+      double dz=atof(value.c_str());
+      check_for_valid_value(dz, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::system_dimensions[2]=dz;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="particle-size";
+   if(word==test){
+      double psize=atof(value.c_str());
+      check_for_valid_value(psize, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::particle_scale=psize;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="particle-spacing";
+   if(word==test){
+      double pspacing=atof(value.c_str());
+      check_for_valid_value(pspacing, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+      cs::particle_spacing=pspacing;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="particle-shape-factor-x";
+   if(word==test){
+      double sfx=atof(value.c_str());
+      check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      cs::particle_shape_factor_x=sfx;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="particle-shape-factor-y";
+   if(word==test){
+      double sfy=atof(value.c_str());
+      check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      cs::particle_shape_factor_y=sfy;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="particle-shape-factor-z";
+   if(word==test){
+      double sfz=atof(value.c_str());
+      check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      cs::particle_shape_factor_z=sfz;
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="particle-array-offset-x";
+   if(word==test){
+      double paox=atof(value.c_str());
 
-			// If within valid range assign value and return
-			cs::particle_array_offset_x=paox;
+      // Test for valid range
+      check_for_valid_value(paox, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
 
-			return EXIT_SUCCESS;
-		}
-		else
-		//--------------------------------------------------------------------
-		test="particle-array-offset-y";
-		if(word==test){
-			double paoy=atof(value.c_str());
+      // If within valid range assign value and return
+      cs::particle_array_offset_x=paox;
 
-			// Test for valid range
-			check_for_valid_value(paoy, word, line, prefix, unit, "length", 0.0, 1.0e4,"input","0.0 - 1.0 micrometre");
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="particle-array-offset-y";
+   if(word==test){
+      double paoy=atof(value.c_str());
 
-			// If within valid range assign value and return
-			cs::particle_array_offset_y=paoy;
+      // Test for valid range
+      check_for_valid_value(paoy, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
 
-			return EXIT_SUCCESS;
-		}
-		else
-		//--------------------------------------------------------------------
-		test="cell-size";
-		if(word==test){
-			double cs=atof(value.c_str());
-			string unit_type;
-			units::convert(unit,cs,unit_type);
-			string str="length";
-			if(unit_type==str || unit_type==none){
-				cells::size=cs;
-				//std::cout << "cell size: " << cells::size << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		else{
-			std::cerr << "Error - Unknown control statement \'dimension:"<< word << "\' on line " << line << " of input file" << std::endl;
-			return EXIT_FAILURE;
-		}
-	
-	
-	return EXIT_SUCCESS;
+      // If within valid range assign value and return
+      cs::particle_array_offset_y=paoy;
+
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="cell-size";
+   if(word==test){
+      double cs=atof(value.c_str());
+      check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
+      cells::size=cs;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else{
+      std::cerr << "Error - Unknown control statement \'dimension:"<< word << "\' on line " << line << " of input file" << std::endl;
+      return EXIT_FAILURE;
+   }
+
+   return EXIT_SUCCESS;
 }
 
 int match_sim(string const word, string const value, string const unit, int const line){
-	
-		std::string prefix="sim:";
-		std::string deprec="";
-	
-		//-------------------------------------------------------------------
-		// System simulation variables
-		//-------------------------------------------------------------------
-		std::string test="integrator";
-		if(word==test){
-			test="LLG-Heun";
-			if(value==test){
-				sim::integrator=0;
-				return EXIT_SUCCESS;
-			}
-			test="Monte-Carlo";
-			if(value==test){
-				sim::integrator=1;
-				return EXIT_SUCCESS;
-			}
-			test="LLG-Midpoint";
-			if(value==test){
-				sim::integrator=2;
-				return EXIT_SUCCESS;
-			}
-			test="Constrained-Monte-Carlo";
-			if(value==test){
-				sim::integrator=3;
-				return EXIT_SUCCESS;
-			}
-			test="Hybrid-Constrained-Monte-Carlo";
-			if(value==test){
-				sim::integrator=4;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-				std::cerr << "\t\"LLG-Heun\"" << std::endl;
-				std::cerr << "\t\"LLG-Midpoint\"" << std::endl;
-				std::cerr << "\t\"Monte-Carlo\"" << std::endl;
-				std::cerr << "\t\"Constrained-Monte-Carlo\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="program";
-		if(word==test){
-			test="Benchmark";
-			if(value==test){
-				sim::program=0;
-				return EXIT_SUCCESS;
-			}
-			test="Time-Series";
-			if(value==test){
-				sim::program=1;
-				return EXIT_SUCCESS;
-			}
-			test="Hysteresis-Loop";
-			if(value==test){
-				sim::program=2;
-				return EXIT_SUCCESS;
-			}
-			test="Static-Hysteresis-Loop";
-			if(value==test){
-				sim::program=3;
-				return EXIT_SUCCESS;
-			}
-			test="Curie-Temperature";
-			if(value==test){
-				sim::program=4;
-				return EXIT_SUCCESS;
-			}
-			test="Field-Cool";
-			if(value==test){
-				sim::program=5;
-				return EXIT_SUCCESS;
-			}
-			test="Two-Temperature-Pulse";
-			if(value==test){
-				sim::program=6;
-				std::cerr << "Two-Temperature-Pulse keyword in input file is deprecated. Use \"Temperature-Pulse\" instead." << std::endl;
-				return EXIT_SUCCESS;
-			}
-			test="Temperature-Pulse";
-			if(value==test){
-				sim::program=6;
-				return EXIT_SUCCESS;
-			}
-			test="HAMR-Simulation";
-			if(value==test){
-				sim::program=7;
-				return EXIT_SUCCESS;
-			}
-			test="CMC-Anisotropy";
-			if(value==test){
-				sim::program=8;
-				return EXIT_SUCCESS;
-			}
-			test="Hybrid-CMC";
-			if(value==test){
-				sim::program=9;
-				return EXIT_SUCCESS;
-			}
-         test="Reverse-Hybrid-CMC";
-         if(value==test){
-            sim::program=10;
-            return EXIT_SUCCESS;
-         }
-         test="LaGrange-Multiplier";
-         if(value==test){
-            sim::program=11;
-            return EXIT_SUCCESS;
-         }
-         test="Diagnostic-Boltzmann";
-			if(value==test){
-				sim::program=50;
-				return EXIT_SUCCESS;
-			}			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-				std::cerr << "\t\"Benchmark\"" << std::endl;
-				std::cerr << "\t\"Time-Series\"" << std::endl;
-				std::cerr << "\t\"Hysteresis-Loop\"" << std::endl;
-				std::cerr << "\t\"Static-Hysteresis-Loop\"" << std::endl;
-				std::cerr << "\t\"Curie-Temperature\"" << std::endl;
-				std::cerr << "\t\"Field-Cool\"" << std::endl;
-				std::cerr << "\t\"Two-Temperature-Pulse\"" << std::endl;
-				std::cerr << "\t\"CMC-Anisotropy\"" << std::endl;
-				std::cerr << "\t\"Hybrid-CMC\"" << std::endl;
-            std::cerr << "\t\"Reverse-Hybrid-CMC\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="exchange";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[0]=1;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[0]=0;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="anisotropy";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[1]=1;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[1]=0;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="applied";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[2]=1;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[2]=0;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="thermal";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[3]=1;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[3]=0;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="dipolar";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[4]=1;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[4]=0;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="fmr";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[5]=1;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::hamiltonian_simulation_flags[5]=0;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="fast-dipolar";
-		if(word==test){
-			test="true";
-			if(value==test){
-				demag::fast=true;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				demag::fast=false;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="dipolar-update-rate";
-		if(word==test){
-			int dpur=atoi(value.c_str());
-			// Test for valid range
-			if(dpur>=1){
-				demag::update_rate=dpur;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be greater than zero" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="surface-anisotropy";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::surface_anisotropy=true;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::surface_anisotropy=false;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="identify-surface-atoms";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::identify_surface_atoms=true;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::identify_surface_atoms=false;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="surface-anisotropy-threshold";
-		if(word==test){
-			// test for native keyword
-			test="native";
-			if(value==test){
-				sim::NativeSurfaceAnisotropyThreshold=true;
-				return EXIT_SUCCESS;
-			}
-			int sat=atoi(value.c_str());
-			// Test for valid range
-			if(sat>=0){
-				sim::surface_anisotropy_threshold=sat;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be an integer greater than or equal to 0, or \"native\"." << std::endl;
-				err::vexit();
-			}
-		}
-		//-------------------------------------------------------------------
-		test="dt";
-		if(word==test){
-			double dt=atof(value.c_str());
 
-			// Test for valid range
-			check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
+   std::string prefix="sim:";
 
-			mp::dt_SI=dt;
-
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="total-time";
-		if(word==test){
-			int tt=atoi(value.c_str());
-			sim::total_time=tt;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="loop-time";
-		if(word==test){
-			int tt=atoi(value.c_str());
-			sim::loop_time=tt;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="partial-time";
-		if(word==test){
-			int tt=atoi(value.c_str());
-			sim::partial_time=tt;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="equilibration-time";
-		if(word==test){
-			int tt=atoi(value.c_str());
-			sim::equilibration_time=tt;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="runs";
-		if(word==test){
-			int r=atoi(value.c_str());
-			if(r>0){
-				sim::runs=r;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be grater than zero" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="maximum-temperature";
-		if(word==test){
-			double T=atof(value.c_str());
-			// Test for valid range
-			if((T>=0.0) && (T<1.0E10)){
-				sim::Tmax=T;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="minimum-temperature";
-		if(word==test){
-			double T=atof(value.c_str());
-			// Test for valid range
-			if((T>=0.0) && (T<1.0E10)){
-				sim::Tmin=T;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="equilibration-temperature";
-		if(word==test){
-			double T=atof(value.c_str());
-			// Test for valid range
-			if((T>=0.0) && (T<1.0E10)){
-				sim::Teq=T;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="temperature";
-		if(word==test){
-			double T=atof(value.c_str());
-			// Test for valid range
-			if((T>=0.0) && (T<1.0E10)){
-				sim::temperature=T;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="delta-temperature";
-		if(word==test){
-			double T=atof(value.c_str());
-			// Test for valid range
-			if((T>=0.0) && (T<1.0E10)){
-				sim::delta_temperature=T;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E10" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="cooling-time";
-		if(word==test){
-			double T=atof(value.c_str());
-
-			check_for_valid_value(T, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
-
-			sim::cooling_time=T;
-
-			return EXIT_SUCCESS;
-
-		}
-		//--------------------------------------------------------------------
-		test="pump-function";
-		if(word==test){
-			test="square";
-			if(value==test){
-				sim::pump_function=square;
-				return EXIT_SUCCESS;
-			}
-			test="two-temperature";
-			if(value==test){
-				sim::pump_function=two_temperature;
-				return EXIT_SUCCESS;
-			}
-			test="double-pump-two-temperature";
-			if(value==test){
-				sim::pump_function=double_pump_two_temperature;
-				return EXIT_SUCCESS;
-			}
-			test="double-pump-square";
-			if(value==test){
-				sim::pump_function=double_pump_square;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-				std::cerr << "\t\"square\"" << std::endl;
-				std::cerr << "\t\"two-temperature\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="pump-time";
-		if(word==test){
-			double pt=atof(value.c_str());
-			
-			check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
-
-			sim::pump_time=pt;
-
-			return EXIT_SUCCESS;
-
-		}
-		//--------------------------------------------------------------------
-		test="pump-power";
-		if(word==test){
-			double pp=atof(value.c_str());
-			// Test for valid range
-			if((pp>=0.0) && (pp<1.0E40)){
-				sim::pump_power=pp;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="double-pump-time";
-		if(word==test){
-			double pt=atof(value.c_str());
-
-			check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
-
-			sim::double_pump_time=pt;
-
-			return EXIT_SUCCESS;
-
-		}
-		//--------------------------------------------------------------------
-		test="double-pump-power";
-		if(word==test){
-			double pp=atof(value.c_str());
-			// Test for valid range
-			if((pp>=0.0) && (pp<1.0E40)){
-				sim::double_pump_power=pp;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="double-pump-maximum-temperature";
-		if(word==test){
-			double TMax=atof(value.c_str());
-			// Test for valid range
-			if((TMax>=0.0) && (TMax<1.0E5)){
-				sim::double_pump_Tmax=TMax;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 100000.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="double-pump-delay";
-		if(word==test){
-			double pd=atof(value.c_str());
-
-			check_for_valid_value(pd, word, line, prefix, unit, "time", 0.0, 1.0,"input","0 - 1 s");
-
-			sim::double_pump_delay=pd;
-
-			return EXIT_SUCCESS;
-
-		}
-		//--------------------------------------------------------------------
-		test="heat-sink-coupling";
-		if(word==test){
-		  double hscc=atof(value.c_str());
-		  // Test for valid range
-		  if((hscc>=0.0) && (hscc<1.0E40)){
-		    sim::HeatSinkCouplingConstant=hscc;
-		    return EXIT_SUCCESS;
-		  }
-		  else{
-		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
-		    err::vexit();
-		  }
-		}
-		//--------------------------------------------------------------------
-		test="two-temperature-electron-heat-capacity";
-		if(word==test){
-		  double hscc=atof(value.c_str());
-		  // Test for valid range
-		  if((hscc>=0.0) && (hscc<1.0E40)){
-		    sim::TTCe=hscc;
-		    return EXIT_SUCCESS;
-		  }
-		  else{
-		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
-		    err::vexit();
-		  }
-		}
-		//--------------------------------------------------------------------
-		test="two-temperature-phonon-heat-capacity";
-		if(word==test){
-		  double hscc=atof(value.c_str());
-		  // Test for valid range
-		  if((hscc>=0.0) && (hscc<1.0E40)){
-		    sim::TTCl=hscc;
-		    return EXIT_SUCCESS;
-		  }
-		  else{
-		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
-		    err::vexit();
-		  }
-		}
-		//--------------------------------------------------------------------
-		test="two-temperature-electron-phonon-coupling";
-		if(word==test){
-		  double hscc=atof(value.c_str());
-		  // Test for valid range
-		  if((hscc>=0.0) && (hscc<1.0E40)){
-		    sim::TTG=hscc;
-		    return EXIT_SUCCESS;
-		  }
-		  else{
-		    std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E40" << std::endl;
-		    err::vexit();
-		  }
-		}
-		//--------------------------------------------------------------------
-		test="cooling-function";
-		if(word==test){
-			test="exponential";
-			if(value==test){
-				sim::cooling_function_flag=0;
-				return EXIT_SUCCESS;
-			}
-			test="gaussian";
-			if(value==test){
-				sim::cooling_function_flag=1;
-				return EXIT_SUCCESS;
-			}
-			test="double-gaussian";
-			if(value==test){
-				sim::cooling_function_flag=2;
-				return EXIT_SUCCESS;
-			}
-			test="linear";
-			if(value==test){
-				sim::cooling_function_flag=3;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-				std::cerr << "\t\"exponential\"" << std::endl;
-				std::cerr << "\t\"gaussian\"" << std::endl;
-				std::cerr << "\t\"double-gaussian\"" << std::endl;
-				std::cerr << "\t\"linear\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="applied-field-strength";
-		deprec="H-applied";
-		if(word==test || word==deprec){
-			double H=atof(value.c_str());
-			string unit_type="field";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,H,unit_type);
-			}
-			string str="field";
-			if(unit_type==str){
-				// Check for valid range
-				if((fabs(H)<-1.0e4) || (fabs(H)>1.0e4)){
-					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range +/- 10 kT." << std::endl;
-					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range +/- 10 kT." << std::endl;
-					err::vexit();
-				}
-				else
-				sim::H_applied=H;
-				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="minimum-applied-field-strength";
-		deprec="Hmin";
-		if(word==test || word==deprec){
-			double H=atof(value.c_str());
-			string unit_type="field";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,H,unit_type);
-			}
-			string str="field";
-			if(unit_type==str){
-				// Check for valid range
-				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
-					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					err::vexit();
-				}
-				else
-				sim::Hmin=H;
-				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="maximum-applied-field-strength";
-		deprec="Hmax";
-		if(word==test || word==deprec){
-			double H=atof(value.c_str());
-			string unit_type="field";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,H,unit_type);
-			}
-			string str="field";
-			if(unit_type==str){
-				// Check for valid range
-				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
-					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					err::vexit();
-				}
-				else
-				sim::Hmax=H;
-				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="equilibration-applied-field-strength";
-		deprec="Heq";
-		if(word==test || word==deprec){
-			double H=atof(value.c_str());
-			string unit_type="field";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,H,unit_type);
-			}
-			string str="field";
-			if(unit_type==str){
-				// Check for valid range
-				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
-					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					err::vexit();
-				}
-				else
-				sim::Heq=H;
-				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="applied-field-strength-increment";
-		deprec="Hinc";
-		if(word==test || word==deprec){
-			double H=atof(value.c_str());
-			string unit_type="field";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,H,unit_type);
-			}
-			string str="field";
-			if(unit_type==str){
-				// Check for valid range
-				if((fabs(H)<1.0e-6) || (fabs(H)>1.0e3)){
-					std::cerr << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of input file must be in the range 1 uT - 1 kT." << std::endl;
-					err::vexit();
-				}
-				else
-				sim::Hinc=H;
-				if(word==deprec) std::cerr << "Warning: Use of " << prefix << deprec << " keyword on line " << line << " of input file is deprecated. Use \"" << prefix << test << "\" instead." << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error: Unit type \'" << unit_type << "\' is invalid for parameter \'sim:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="applied-field-angle-theta";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=360.0)){
-				// set angle
-				sim::applied_field_angle_theta=angle;
-				// set flag
-				sim::applied_field_set_by_angle=true;
-				// return
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error: sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="applied-field-angle-phi";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=180.0)){
-				// set angle
-				sim::applied_field_angle_phi=angle;
-				// set flag
-				sim::applied_field_set_by_angle=true;
-				// return
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error: sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="applied-field-unit-vector";
-		if(word==test){
-			// temporary storage container
-			std::vector<double> u(3);
-
-			// read values from string
-			u=DoublesFromString(value);
-
-			// check size
-			if(u.size()!=3){
-				std::cerr << "Error on line " << line << " of input file: " << prefix << word << " must have three values." << std::endl;
-				zlog << zTs() << "Error on line " << line << " of input file: " << prefix << word << " must have three values." << std::endl;
-				return EXIT_FAILURE;
-			}
-
-			// Normalise 
-			double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
-
-			// Check for correct length unit vector
-			if(ULength < 1.0e-9){
-				std::cerr << "Error on line " << line << " of input file: " << prefix << word << " must be normalisable (possibly all zero)." << std::endl;
-				zlog << zTs() << "Error on line " << line << " of input file: " << prefix << word << " must be normalisable (possibly all zero)." << std::endl;
-				return EXIT_FAILURE;
-			}
-			u.at(0)/=ULength;
-			u.at(1)/=ULength;
-			u.at(2)/=ULength;
-
-			// Copy direction to global variable
-			sim::H_vec[0]=u.at(0);
-			sim::H_vec[1]=u.at(1);
-			sim::H_vec[2]=u.at(2);
-
-			// Unset set by angle flag
-			sim::applied_field_set_by_angle=false;
-			
-			return EXIT_SUCCESS;
-
-		}
-		//--------------------------------------------------------------------
-		test="Hx";
-		if(word==test){
-			std::cerr << "Error: Use of sim:Hx keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
-			err::vexit();
-		}
-		//--------------------------------------------------------------------
-		test="Hy";
-		if(word==test){
-			std::cerr << "Error: Use of sim:Hy keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
-			err::vexit();
-		}
-		//--------------------------------------------------------------------
-		test="Hz";
-		if(word==test){
-			std::cerr << "Error: Use of sim:Hz keyword on line " << line << " of input file is invalid. Use \"sim:applied-field-unit-vector=Hx,Hy,Hz\" instead." << std::endl;
-			err::vexit();
-		}
-		//--------------------------------------------------------------------
-		test="External-Demag";
-		if(word==test){
-			test="true";
-			if(value==test){
-				sim::ext_demag=true;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				sim::ext_demag=false;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="Dx";
-		if(word==test){
-			sim::demag_factor[0]=atof(value.c_str());
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="Dy";
-		if(word==test){
-			sim::demag_factor[1]=atof(value.c_str());
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="Dz";
-		if(word==test){
-			sim::demag_factor[2]=atof(value.c_str());
-			return EXIT_SUCCESS;
-		}
-		//-------------------------------------------------------------------
-		test="mpi-mode";
-		if(word==test){
-			test="geometric-decomposition";
-			if(value==test){
-				vmpi::mpi_mode=0;
-				return EXIT_SUCCESS;
-			}
-			test="replicated-data";
-			if(value==test){
-				vmpi::mpi_mode=1;
-				vmpi::replicated_data_staged=false;
-				return EXIT_SUCCESS;
-			}
-			test="replicated-data-staged";
-			if(value==test){
-				vmpi::mpi_mode=1;
-				vmpi::replicated_data_staged=true;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-				std::cerr << "\t\"geometric-decomposition\"" << std::endl;
-				std::cerr << "\t\"replicated-data\"" << std::endl;
-				std::cerr << "\t\"replicated-data-staged\"" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="mpi-ppn";
-		if(word==test){
-			int ppn=atoi(value.c_str());
-			// Test for valid range
-			if((ppn>=0) && (ppn<=1024)){
-				vmpi::ppn=ppn;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1024" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="integrator-seed";
-		if(word==test){
-			int is=atoi(value.c_str());
-				mtrandom::integration_seed=is;
-				return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="constraint-rotation-update";
-		if(word==test){
-			sim::constraint_rotation=true; // default
-			// also check for value
-			std::string VFalse="false";
-			if(value==VFalse){
-				sim::constraint_rotation=false;
-			}
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="constraint-angle-theta";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=360.0)){
-				sim::constraint_theta=angle;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="constraint-angle-theta-min";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=360.0)){
-				sim::constraint_theta_min=angle;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="constraint-angle-theta-max";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=360.0)){
-				sim::constraint_theta_max=angle;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="constraint-angle-theta-delta";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=360.0)){
-				sim::constraint_theta_delta=angle;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 360.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="constraint-angle-phi";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=180.0)){
-				sim::constraint_phi=angle;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="constraint-angle-phi-min";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=180.0)){
-				sim::constraint_phi_min=angle;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="constraint-angle-phi-max";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=180.0)){
-				sim::constraint_phi_max=angle;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
-				err::vexit();
-			}
-		}
-		//--------------------------------------------------------------------
-		test="constraint-angle-phi-delta";
-		if(word==test){
-			double angle=atof(value.c_str());
-			// Test for valid range
-			if((angle>=0.0) && (angle<=180.0)){
-				sim::constraint_phi_delta=angle;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0.0 - 180.0" << std::endl;
-				err::vexit();
-			}
-		}
-      //--------------------------------------------------------------------
-      test="monte-carlo-algorithm";
-      if(word==test){
-         // include namesapce here to access enum values
-         using namespace sim;
-         test="spin-flip";
-         if(value==test){
-            sim::mc_algorithm=spin_flip;
-            return EXIT_SUCCESS;
-         }
-         test="uniform";
-         if(value==test){
-            sim::mc_algorithm=uniform;
-            return EXIT_SUCCESS;
-         }
-         test="angle";
-         if(value==test){
-            sim::mc_algorithm=angle;
-            return EXIT_SUCCESS;
-         }
-         test="hinzke-nowak";
-         if(value==test){
-            sim::mc_algorithm=hinzke_nowak;
-            return EXIT_SUCCESS;
-         }
-         else{
-            std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-            std::cerr << "\t\"spin-flip\"" << std::endl;
-            std::cerr << "\t\"uniform\"" << std::endl;
-            std::cerr << "\t\"angle\"" << std::endl;
-            std::cerr << "\t\"hinzke-nowak\"" << std::endl;
-            err::vexit();
-         }
+   //-------------------------------------------------------------------
+   // System simulation variables
+   //-------------------------------------------------------------------
+   std::string test="integrator";
+   if(word==test){
+      test="llg-heun";
+      if(value==test){
+         sim::integrator=0;
+         return EXIT_SUCCESS;
       }
-      //--------------------------------------------------------------------
-		else{
-			std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
-			return EXIT_FAILURE;
-		}
-	
-	
-	return EXIT_SUCCESS;
+      test="monte-carlo";
+      if(value==test){
+         sim::integrator=1;
+         return EXIT_SUCCESS;
+      }
+      test="llg-midpoint";
+      if(value==test){
+         sim::integrator=2;
+         return EXIT_SUCCESS;
+      }
+      test="constrained-monte-carlo";
+      if(value==test){
+         sim::integrator=3;
+         return EXIT_SUCCESS;
+      }
+      test="hybrid-constrained-monte-carlo";
+      if(value==test){
+         sim::integrator=4;
+         return EXIT_SUCCESS;
+      }
+      else{
+         std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"llg-heun\"" << std::endl;
+         std::cerr << "\t\"llg-midpoint\"" << std::endl;
+         std::cerr << "\t\"monte-carlo\"" << std::endl;
+         std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
+         err::vexit();
+      }
+   }
+   //-------------------------------------------------------------------
+   test="program";
+   if(word==test){
+      test="benchmark";
+      if(value==test){
+         sim::program=0;
+         return EXIT_SUCCESS;
+      }
+      test="time-series";
+      if(value==test){
+         sim::program=1;
+         return EXIT_SUCCESS;
+      }
+      test="hysteresis-loop";
+      if(value==test){
+         sim::program=2;
+         return EXIT_SUCCESS;
+      }
+      test="static-hysteresis-loop";
+      if(value==test){
+         sim::program=3;
+         return EXIT_SUCCESS;
+      }
+      test="curie-temperature";
+      if(value==test){
+         sim::program=4;
+         return EXIT_SUCCESS;
+      }
+      test="field-cool";
+      if(value==test){
+         sim::program=5;
+         return EXIT_SUCCESS;
+      }
+      test="laser-pulse";
+      if(value==test){
+         sim::program=6;
+         return EXIT_SUCCESS;
+      }
+      test="hamr-simulation";
+      if(value==test){
+         sim::program=7;
+         return EXIT_SUCCESS;
+      }
+      test="cmc-anisotropy";
+      if(value==test){
+         sim::program=8;
+         return EXIT_SUCCESS;
+      }
+      test="hybrid-cmc";
+      if(value==test){
+         sim::program=9;
+         return EXIT_SUCCESS;
+      }
+      test="reverse-hybrid-cmc";
+      if(value==test){
+         sim::program=10;
+         return EXIT_SUCCESS;
+      }
+      test="LaGrange-Multiplier";
+      if(value==test){
+         sim::program=11;
+         return EXIT_SUCCESS;
+      }
+      test="diagnostic-boltzmann";
+      if(value==test){
+         sim::program=50;
+         return EXIT_SUCCESS;
+      }
+      else{
+         std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"benchmark\"" << std::endl;
+         std::cerr << "\t\"time-series\"" << std::endl;
+         std::cerr << "\t\"hysteresis-loop\"" << std::endl;
+         std::cerr << "\t\"static-hysteresis-loop\"" << std::endl;
+         std::cerr << "\t\"curie-temperature\"" << std::endl;
+         std::cerr << "\t\"field-cool\"" << std::endl;
+         std::cerr << "\t\"laser-pulse\"" << std::endl;
+         std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
+         std::cerr << "\t\"hybrid-cmc\"" << std::endl;
+         std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
+         err::vexit();
+      }
+   }
+   //-------------------------------------------------------------------
+   test="enable-dipole-fields";
+   if(word==test){
+      sim::hamiltonian_simulation_flags[4]=1;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="enable-fmr-field";
+   if(word==test){
+      sim::hamiltonian_simulation_flags[5]=1;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="enable-fast-dipole-fields";
+   if(word==test){
+      demag::fast=true;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="dipole-field-update-rate";
+   if(word==test){
+      int dpur=atoi(value.c_str());
+      check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+      demag::update_rate=dpur;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="enable-surface-anisotropy";
+   if(word==test){
+      sim::surface_anisotropy=true;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="identify-surface-atoms";
+   if(word==test){
+      sim::identify_surface_atoms=true;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="surface-anisotropy-threshold";
+   if(word==test){
+      // test for native keyword
+      test="native";
+      if(value==test){
+         sim::NativeSurfaceAnisotropyThreshold=true;
+         return EXIT_SUCCESS;
+      }
+      int sat=atoi(value.c_str());
+      // Test for valid range
+      check_for_valid_int(sat, word, line, prefix, 0, 1000000000,"input","0 - 1,000,000,000");
+      sim::surface_anisotropy_threshold=sat;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="time-step";
+   if(word==test){
+      double dt=atof(value.c_str());
+      check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
+      mp::dt_SI=dt;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="total-time-steps";
+   if(word==test){
+      int tt=atoi(value.c_str());
+      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      sim::total_time=tt;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="loop-time-steps";
+   if(word==test){
+      int tt=atoi(value.c_str());
+      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      sim::loop_time=tt;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="partial-time-steps";
+   if(word==test){
+      int tt=atoi(value.c_str());
+      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      sim::partial_time=tt;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="equilibration-time-steps";
+   if(word==test){
+      int tt=atoi(value.c_str());
+      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      sim::equilibration_time=tt;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="simulation-cycles";
+   if(word==test){
+      int r=atoi(value.c_str());
+      check_for_valid_int(r, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      sim::runs=r;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="maximum-temperature";
+   if(word==test){
+      double T=atof(value.c_str());
+      check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+      sim::Tmax=T;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="minimum-temperature";
+   if(word==test){
+      double T=atof(value.c_str());
+      check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+      sim::Tmin=T;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="equilibration-temperature";
+   if(word==test){
+      double T=atof(value.c_str());
+      check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+      sim::Teq=T;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="temperature";
+   if(word==test){
+      double T=atof(value.c_str());
+      check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+      sim::temperature=T;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="temperature-increment";
+   if(word==test){
+      double T=atof(value.c_str());
+      check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+      sim::delta_temperature=T;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="cooling-time";
+   if(word==test){
+      double T=atof(value.c_str());
+      check_for_valid_value(T, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+      sim::cooling_time=T;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="laser-pulse-temporal-profile";
+   if(word==test){
+      test="square";
+      if(value==test){
+         sim::pump_function=square;
+         return EXIT_SUCCESS;
+      }
+      test="two-temperature";
+      if(value==test){
+         sim::pump_function=two_temperature;
+         return EXIT_SUCCESS;
+      }
+      test="double-pulse-two-temperature";
+      if(value==test){
+         sim::pump_function=double_pump_two_temperature;
+         return EXIT_SUCCESS;
+      }
+      test="double-pulse-square";
+      if(value==test){
+         sim::pump_function=double_pump_square;
+         return EXIT_SUCCESS;
+      }
+      else{
+         std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"square\"" << std::endl;
+         std::cerr << "\t\"double-pulse-square\"" << std::endl;
+         std::cerr << "\t\"two-temperature\"" << std::endl;
+         std::cerr << "\t\"double-pulse-two-temperature\"" << std::endl;
+         err::vexit();
+      }
+   }
+   //--------------------------------------------------------------------
+   test="laser-pulse-time";
+   if(word==test){
+      double pt=atof(value.c_str());
+      check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+      sim::pump_time=pt;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="laser-pulse-power";
+   if(word==test){
+      double pp=atof(value.c_str());
+      check_for_valid_value(pp, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+      sim::pump_power=pp;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="second-laser-pulse-time";
+   if(word==test){
+      double pt=atof(value.c_str());
+      check_for_valid_value(pt, word, line, prefix, unit, "time", 1.0e-18, 1.0,"input","1 attosecond - 1 s");
+      sim::double_pump_time=pt;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="second-laser-pulse-power";
+   if(word==test){
+      double pp=atof(value.c_str());
+      check_for_valid_value(pp, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+      sim::double_pump_power=pp;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="second-laser-pulse-maximum-temperature";
+   if(word==test){
+      double T=atof(value.c_str());
+      check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+      sim::double_pump_Tmax=T;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="second-laser-pulse-delay-time";
+   if(word==test){
+      double pd=atof(value.c_str());
+      check_for_valid_value(pd, word, line, prefix, unit, "time", 0.0, 1.0,"input","0 - 1 s");
+      sim::double_pump_delay=pd;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="two-temperature-heat-sink-coupling";
+   if(word==test){
+      double hscc=atof(value.c_str());
+      check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+      sim::HeatSinkCouplingConstant=hscc;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="two-temperature-electron-heat-capacity";
+   if(word==test){
+      double hscc=atof(value.c_str());
+      check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+      sim::TTCe=hscc;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="two-temperature-phonon-heat-capacity";
+   if(word==test){
+      double hscc=atof(value.c_str());
+      check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+      sim::TTCl=hscc;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="two-temperature-electron-phonon-coupling";
+   if(word==test){
+      double hscc=atof(value.c_str());
+      check_for_valid_value(hscc, word, line, prefix, unit, "none", 0.0, 1.0e40,"input","0.0 - 1.0E40");
+      sim::TTG=hscc;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="cooling-function";
+   if(word==test){
+      test="exponential";
+      if(value==test){
+         sim::cooling_function_flag=0;
+         return EXIT_SUCCESS;
+      }
+      test="gaussian";
+      if(value==test){
+         sim::cooling_function_flag=1;
+         return EXIT_SUCCESS;
+      }
+      test="double-gaussian";
+      if(value==test){
+         sim::cooling_function_flag=2;
+         return EXIT_SUCCESS;
+      }
+      test="linear";
+      if(value==test){
+         sim::cooling_function_flag=3;
+         return EXIT_SUCCESS;
+      }
+      else{
+         std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"exponential\"" << std::endl;
+         std::cerr << "\t\"gaussian\"" << std::endl;
+         std::cerr << "\t\"double-gaussian\"" << std::endl;
+         std::cerr << "\t\"linear\"" << std::endl;
+         err::vexit();
+      }
+   }
+   //--------------------------------------------------------------------
+   test="applied-field-strength";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      sim::H_applied=H;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="minimum-applied-field-strength";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", 1.0e-6, 1.0e3,"input","1 uT - 1,000 T");
+      sim::Hmin=H;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="maximum-applied-field-strength";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", 1.0e-6, 1.0e3,"input","1 uT - 1,000 T");
+      sim::Hmax=H;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="equilibration-applied-field-strength";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", 1.0e-6, 1.0e3,"input","1 uT - 1,000 T");
+      sim::Heq=H;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="applied-field-strength-increment";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", 1.0e-6, 1.0e3,"input","1 uT - 1,000 T");
+      sim::Hinc=H;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="applied-field-angle-theta";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::applied_field_angle_theta=angle;
+      sim::applied_field_set_by_angle=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="applied-field-angle-phi";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::applied_field_angle_phi=angle;
+      sim::applied_field_set_by_angle=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="applied-field-unit-vector";
+   if(word==test){
+      std::vector<double> u(3);
+      u=DoublesFromString(value);
+      check_for_valid_unit_vector(u, word, line, prefix, "material");
+      sim::H_vec[0]=u.at(0);
+      sim::H_vec[1]=u.at(1);
+      sim::H_vec[2]=u.at(2);
+      sim::applied_field_set_by_angle=false;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="demagnetisation-factor";
+   if(word==test){
+      std::vector<double> u(3);
+      u=DoublesFromString(value);
+      check_for_valid_unit_vector(u, word, line, prefix, "material");
+      sim::demag_factor[0]=u.at(0);
+      sim::demag_factor[1]=u.at(1);
+      sim::demag_factor[2]=u.at(2);
+      sim::ext_demag=true;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="mpi-mode";
+   if(word==test){
+      test="geometric-decomposition";
+      if(value==test){
+         vmpi::mpi_mode=0;
+         return EXIT_SUCCESS;
+      }
+      test="replicated-data";
+      if(value==test){
+         vmpi::mpi_mode=1;
+         vmpi::replicated_data_staged=false;
+         return EXIT_SUCCESS;
+      }
+      test="replicated-data-staged";
+      if(value==test){
+         vmpi::mpi_mode=1;
+         vmpi::replicated_data_staged=true;
+         return EXIT_SUCCESS;
+      }
+      else{
+         std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"geometric-decomposition\"" << std::endl;
+         std::cerr << "\t\"replicated-data\"" << std::endl;
+         std::cerr << "\t\"replicated-data-staged\"" << std::endl;
+         err::vexit();
+      }
+   }
+   //--------------------------------------------------------------------
+   test="mpi-ppn";
+   if(word==test){
+      int ppn=atoi(value.c_str());
+      check_for_valid_int(ppn, word, line, prefix, 1, 1024,"input","1 - 1024");
+      vmpi::ppn=ppn;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="integrator-random-seed";
+   if(word==test){
+      int is=atoi(value.c_str());
+      check_for_valid_int(is, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      mtrandom::integration_seed=is;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-rotation-update";
+   if(word==test){
+      sim::constraint_rotation=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-angle-theta";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::constraint_theta=angle;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-angle-theta-min";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::constraint_theta_min=angle;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-angle-theta-max";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::constraint_theta_max=angle;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-angle-theta-delta";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::constraint_theta_delta=angle;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-angle-phi";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::constraint_phi=angle;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-angle-phi-min";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::constraint_phi_min=angle;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-angle-phi-max";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::constraint_phi_max=angle;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="constraint-angle-phi-delta";
+   if(word==test){
+      double angle=atof(value.c_str());
+      check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+      sim::constraint_phi_delta=angle;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="monte-carlo-algorithm";
+   if(word==test){
+      // include namesapce here to access enum values
+      using namespace sim;
+      test="spin-flip";
+      if(value==test){
+         sim::mc_algorithm=spin_flip;
+         return EXIT_SUCCESS;
+      }
+      test="uniform";
+      if(value==test){
+         sim::mc_algorithm=uniform;
+         return EXIT_SUCCESS;
+      }
+      test="angle";
+      if(value==test){
+         sim::mc_algorithm=angle;
+         return EXIT_SUCCESS;
+      }
+      test="hinzke-nowak";
+      if(value==test){
+         sim::mc_algorithm=hinzke_nowak;
+         return EXIT_SUCCESS;
+      }
+      else{
+         std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"spin-flip\"" << std::endl;
+         std::cerr << "\t\"uniform\"" << std::endl;
+         std::cerr << "\t\"angle\"" << std::endl;
+         std::cerr << "\t\"hinzke-nowak\"" << std::endl;
+         err::vexit();
+      }
+   }
+   //--------------------------------------------------------------------
+   //else{
+      std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
+      return EXIT_FAILURE;
+   //}
+
+
+   return EXIT_SUCCESS;
 }
 
 int match_config(string const word, string const value, int const line){
