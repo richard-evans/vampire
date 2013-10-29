@@ -732,378 +732,317 @@ int match(string const key, string const word, string const value, string const 
 } // end of match function
 
 int match_create(string const word, string const value, string const unit, int const line){
-		//-------------------------------------------------------------------
-		// system_creation_flags[1] - Set system particle shape
-		//-------------------------------------------------------------------
+   //-------------------------------------------------------------------
+   // system_creation_flags[1] - Set system particle shape
+   //-------------------------------------------------------------------
 
-		std::string prefix="create:";
+   std::string prefix="create:";
 
-		std::string test="full";
-		if(word==test){
-			cs::system_creation_flags[1]=0;
-			return EXIT_SUCCESS;
-		}
-		else 
-		test="cube";
-		if(word==test){
-			cs::system_creation_flags[1]=1;
-			return EXIT_SUCCESS;
-		}
-		else 
-		test="cylinder";
-		if(word==test){
-			cs::system_creation_flags[1]=2;
-			return EXIT_SUCCESS;
-		}
-		else
-		test="ellipsoid";
-		if(word==test){
-			cs::system_creation_flags[1]=3;
-			return EXIT_SUCCESS;
-		}
-		else
-		test="sphere";
-		if(word==test){
-			cs::system_creation_flags[1]=4;
-			return EXIT_SUCCESS;
-		}
-		else
-		test="truncated-octahedron";
-		if(word==test){
-			cs::system_creation_flags[1]=5;
-			return EXIT_SUCCESS;
-		}
-		else
-		test="tear-drop";
-		if(word==test){
-			cs::system_creation_flags[1]=6;
-			return EXIT_SUCCESS;
-		}
-		else
-		//-------------------------------------------------------------------
-		// system_creation_flags[2] - Set system type
-		//-------------------------------------------------------------------
-		test="particle";
-		if(word==test){
-			cs::system_creation_flags[2]=0;
-			return EXIT_SUCCESS;
-		}
-		else
-		test="particle-array";
-		if(word==test){
-			cs::system_creation_flags[2]=1;
-			return EXIT_SUCCESS;
-		}
-		else
-		test="hex-particle-array";
-		if(word==test){
-			cs::system_creation_flags[2]=2;
-			return EXIT_SUCCESS;
-		}
-		else
-		test="voronoi-film";
-		if(word==test){
-			cs::system_creation_flags[2]=3;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="voronoi-variance";
-		if(word==test){
-			double vsd=atof(value.c_str());
-			if((vsd<0.0) || (vsd > 1.0)){
-				std::cerr << "Error in input file - voronoi variance is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				create_voronoi::voronoi_sd=vsd;
-				return EXIT_SUCCESS;
-			}
-		}
-		//--------------------------------------------------------------------
-		else
-		test="voronoi-parity";
-		if(word==test){
-			int vp=atoi(value.c_str());
-			if((vp !=0) && (vp !=1)){
-				std::cerr << "Error in input file - voronoi parity must be either 0 or 1, you input "<< vp << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				create_voronoi::parity=vp;
-				return EXIT_SUCCESS;
-			}
-		}
-		//--------------------------------------------------------------------
-		else
-		test="voronoi-seed";
-		if(word==test){
-			int vs=atoi(value.c_str());
-				mtrandom::voronoi_seed=vs;
-				return EXIT_SUCCESS;
-		}
-		else
-		test="voronoi-rounded";
-		if(word==test){
-			test="true";
-			std::string blank="";
-			if(value==test || value==blank){
-				create_voronoi::rounded=true;
-				return EXIT_SUCCESS;
-			}
-			test="false";
-			if(value==test){
-				create_voronoi::rounded=false;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - value for \'create:" << word << "\' must be either \"true\" or \"false\"" << std::endl;
-				err::vexit();
-			}
-		}
-		else
-		//-------------------------------------------------------------------
-		test="voronoi-area-cutoff";
-		if(word==test){
-			double vsd=atof(value.c_str());
-			if((vsd<0.0) || (vsd > 1.0)){
-				std::cerr << "Error in input file - voronoi area-cutoff is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				create_voronoi::area_cutoff=vsd;
-				return EXIT_SUCCESS;
-			}
-		}
-		else
-		//-------------------------------------------------------------------
-		//-------------------------------------------------------------------
-		// system_creation_flags[4] - Set Multilayer Flag
-		//-------------------------------------------------------------------
-		/*test="multilayer";
-		if(word==test){
-			cs::system_creation_flags[4]=1;
-			// test for multilayer lines
-			test=">";
-			if(value==test){
-				//read_multilayer();
-				std::cout << "read data" << std::endl;
-				return EXIT_SUCCESS;
-			}
-			// test for missing parameter
-			else
-			test="";
-			if(value==test){
-				std::cerr << "Error - multilayers require additional parameters and none are specified" << std::endl;
-				return EXIT_FAILURE;
-			}
-			else{
-				//read_multilayer(value);
-				std::cout << "read data from file "<< value << std::endl;
-				return EXIT_SUCCESS;
-			}
-			
-		}
-		else
-		test="intermixed";
-		if(word==test){
-			cs::system_creation_flags[4]=2;
-			return EXIT_SUCCESS;
-		}
-		else*/
-		test="particle-parity";
-		if(word==test){
-			int pp=atoi(value.c_str());
-				cs::particle_creation_parity=pp;
-				//std::cout << "ax: " << cs::unit_cell_size[0] << std::endl;
-				return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="crystal-structure";
-		if(word==test){
-			// Strip quotes
-			std::string cs=value;
-			cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
-			cs::crystal_structure=cs;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="single-spin";
-		if(word==test){
-			cs::single_spin=true;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="periodic-boundaries-x";
-		if(word==test){
-			cs::pbc[0]=true;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="periodic-boundaries-y";
-		if(word==test){
-			cs::pbc[1]=true;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="periodic-boundaries-z";
-		if(word==test){
-			cs::pbc[2]=true;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="select-material-by-height";
-		if(word==test){
-			cs::SelectMaterialByZHeight=true; // default
-			// also check for value
-			std::string VFalse="false";
-			if(value==VFalse){
-				cs::SelectMaterialByZHeight=false;
-			}
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="select-material-by-geometry";
-		if(word==test){
-			cs::SelectMaterialByGeometry=true; // default
-			// also check for value
-			std::string VFalse="false";
-			if(value==VFalse){
-				cs::SelectMaterialByGeometry=false;
-			}
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="fill-core-shell-particles";
-		if(word==test){
-			cs::fill_core_shell=true; // default
-			// also check for value
-			std::string VFalse="false";
-			if(value==VFalse){
-				cs::fill_core_shell=false;
-			}
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness";
-		if(word==test){
-			cs::interfacial_roughness=true; // default
-			// also check for value
-			std::string VFalse="false";
-			if(value==VFalse){
-				cs::interfacial_roughness=false;
-			}
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="material-interfacial-roughness";
-		if(word==test){
-			cs::interfacial_roughness_local_height_field=true; // default
-			// also check for value
-			std::string VFalse="false";
-			if(value==VFalse){
-				cs::interfacial_roughness_local_height_field=false;
-			}
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness-random-seed";
-		if(word==test){
-			unsigned int vs=atoi(value.c_str());
-			cs::interfacial_roughness_random_seed=vs;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness-seed-points";
-		if(word==test){
-			int sc=atoi(value.c_str());
-			if(sc>=0){
-				cs::interfacial_roughness_seed_count=sc;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error on line " << line << " of input file: " << prefix << word << " must be a positive integer." << std::endl;
-				zlog << zTs() << "Error on line " << line << " of input file: " << prefix << word << " must be a positive integer." << std::endl;
-				return EXIT_FAILURE;
-			}
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness-type";
-		if(word==test){
-			std::string loctest="peaks";
-			if(value==loctest){
-				cs::interfacial_roughness_type=1;
-				return EXIT_SUCCESS;
-			}
-			else
-			loctest="troughs";
-			if(value==loctest){
-				cs::interfacial_roughness_type=-1;
-				return EXIT_SUCCESS;
-			}
-			else{
-				cs::interfacial_roughness_type=0;
-				return EXIT_SUCCESS;
-			}
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness-seed-radius";
-		if(word==test){
-			double irsr=atof(value.c_str());
-			// Test for valid range
-			check_for_valid_value(irsr, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 1 micrometre");
-			cs::interfacial_roughness_mean_seed_radius=irsr;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness-seed-radius-variance";
-		if(word==test){
-			double irsrv=atof(value.c_str());
-			// Test for valid range
-			check_for_valid_value(irsrv, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-			cs::interfacial_roughness_seed_radius_variance=irsrv;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness-mean-height";
-		if(word==test){
-			double irmh=atof(value.c_str());
-			// Test for valid range
-			check_for_valid_value(irmh, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-			cs::interfacial_roughness_mean_seed_height=irmh;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness-max-height";
-		if(word==test){
-			double shm=atof(value.c_str());
-			// Test for valid range
-			check_for_valid_value(shm, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-			cs::interfacial_roughness_seed_height_max=shm;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		test="interfacial-roughness-height-field-resolution";
-		if(word==test){
-			double irhfr=atof(value.c_str());
-			// Test for valid range
-			check_for_valid_value(irhfr, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-			cs::interfacial_roughness_height_field_resolution=irhfr;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		// keyword not found
-		//--------------------------------------------------------------------
-		else{
-			std::cerr << "Error - Unknown control statement \'create:" << word << "\' on line " << line << " of input file" << std::endl;
-			return EXIT_FAILURE;
-		}
-		
-	return EXIT_SUCCESS;
+   // cs::system_creation_flags needs refactoring for readability and bug resistance
+   std::string test="full";
+   if(word==test){
+      cs::system_creation_flags[1]=0;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   test="cube";
+   if(word==test){
+      cs::system_creation_flags[1]=1;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   test="cylinder";
+   if(word==test){
+      cs::system_creation_flags[1]=2;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   test="ellipsoid";
+   if(word==test){
+      cs::system_creation_flags[1]=3;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   test="sphere";
+   if(word==test){
+      cs::system_creation_flags[1]=4;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   test="truncated-octahedron";
+   if(word==test){
+      cs::system_creation_flags[1]=5;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   test="tear-drop";
+   if(word==test){
+      cs::system_creation_flags[1]=6;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   // system_creation_flags[2] - Set system type
+   //-------------------------------------------------------------------
+   test="particle";
+   if(word==test){
+      cs::system_creation_flags[2]=0;
+      return EXIT_SUCCESS;
+   }
+   else
+   test="particle-array";
+   if(word==test){
+      cs::system_creation_flags[2]=1;
+      return EXIT_SUCCESS;
+   }
+   else
+   test="hexagonal-particle-array";
+   if(word==test){
+      cs::system_creation_flags[2]=2;
+      return EXIT_SUCCESS;
+   }
+   else
+   test="voronoi-film";
+   if(word==test){
+      cs::system_creation_flags[2]=3;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="voronoi-size-variance";
+   if(word==test){
+      double vsd=atof(value.c_str());
+      check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+      create_voronoi::voronoi_sd=vsd;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="voronoi-row-offset";
+   if(word==test){
+      create_voronoi::parity=1;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="voronoi-random-seed";
+   if(word==test){
+      int vs=atoi(value.c_str());
+      check_for_valid_int(vs, word, line, prefix, unit, "none", 0, 2000000000,"input","0 - 2,000,000,000");
+      mtrandom::voronoi_seed=vs;
+         return EXIT_SUCCESS;
+   }
+   else
+   test="voronoi-rounded-grains";
+   if(word==test){
+      create_voronoi::rounded=true;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   test="voronoi-rounded-grains-area";
+   if(word==test){
+      double vsd=atof(value.c_str());
+      check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+      create_voronoi::area_cutoff=vsd;
+      return EXIT_SUCCESS;
+   }
+   else
+   //-------------------------------------------------------------------
+   test="particle-centre-offset"; //parity
+   if(word==test){
+      cs::particle_creation_parity=1;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="crystal-structure";
+   if(word==test){
+      // Strip quotes
+      std::string cs=value;
+      cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
+      cs::crystal_structure=cs;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="single-spin";
+   if(word==test){
+      cs::single_spin=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="periodic-boundaries-x";
+   if(word==test){
+      cs::pbc[0]=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="periodic-boundaries-y";
+   if(word==test){
+      cs::pbc[1]=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="periodic-boundaries-z";
+   if(word==test){
+      cs::pbc[2]=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="select-material-by-height";
+   if(word==test){
+      cs::SelectMaterialByZHeight=true; // default
+      // also check for value
+      std::string VFalse="false";
+      if(value==VFalse){
+         cs::SelectMaterialByZHeight=false;
+      }
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   else
+   test="select-material-by-geometry";
+   if(word==test){
+      cs::SelectMaterialByGeometry=true; // default
+      // also check for value
+      std::string VFalse="false";
+      if(value==VFalse){
+         cs::SelectMaterialByGeometry=false;
+      }
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="fill-core-shell-particles";
+   if(word==test){
+      cs::fill_core_shell=true; // default
+      // also check for value
+      std::string VFalse="false";
+      if(value==VFalse){
+         cs::fill_core_shell=false;
+      }
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness";
+   if(word==test){
+      cs::interfacial_roughness=true; // default
+      // also check for value
+      std::string VFalse="false";
+      if(value==VFalse){
+         cs::interfacial_roughness=false;
+      }
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="material-interfacial-roughness";
+   if(word==test){
+      cs::interfacial_roughness_local_height_field=true; // default
+      // also check for value
+      std::string VFalse="false";
+      if(value==VFalse){
+         cs::interfacial_roughness_local_height_field=false;
+      }
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness-random-seed";
+   if(word==test){
+      unsigned int vs=atoi(value.c_str());
+      cs::interfacial_roughness_random_seed=vs;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness-number-of-seed-points";
+   if(word==test){
+      int sc=atoi(value.c_str());
+      check_for_valid_int(sc, word, line, prefix, unit, "none", 0, 100000,"input","0 - 100,000");
+      cs::interfacial_roughness_seed_count=sc;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness-type";
+   if(word==test){
+      std::string loctest="peaks";
+      if(value==loctest){
+         cs::interfacial_roughness_type=1;
+         return EXIT_SUCCESS;
+      }
+      else
+      loctest="troughs";
+      if(value==loctest){
+         cs::interfacial_roughness_type=-1;
+         return EXIT_SUCCESS;
+      }
+      else{
+         cs::interfacial_roughness_type=0;
+         return EXIT_SUCCESS;
+      }
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness-seed-radius";
+   if(word==test){
+      double irsr=atof(value.c_str());
+      // Test for valid range
+      check_for_valid_value(irsr, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 1 micrometre");
+      cs::interfacial_roughness_mean_seed_radius=irsr;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness-seed-radius-variance";
+   if(word==test){
+      double irsrv=atof(value.c_str());
+      // Test for valid range
+      check_for_valid_value(irsrv, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
+      cs::interfacial_roughness_seed_radius_variance=irsrv;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness-mean-height";
+   if(word==test){
+      double irmh=atof(value.c_str());
+      // Test for valid range
+      check_for_valid_value(irmh, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+      cs::interfacial_roughness_mean_seed_height=irmh;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness-maximum-height";
+   if(word==test){
+      double shm=atof(value.c_str());
+      // Test for valid range
+      check_for_valid_value(shm, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+      cs::interfacial_roughness_seed_height_max=shm;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="interfacial-roughness-height-field-resolution";
+   if(word==test){
+      double irhfr=atof(value.c_str());
+      // Test for valid range
+      check_for_valid_value(irhfr, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
+      cs::interfacial_roughness_height_field_resolution=irhfr;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   // keyword not found
+   //--------------------------------------------------------------------
+   else{
+      std::cerr << "Error - Unknown control statement \'create:" << word << "\' on line " << line << " of input file" << std::endl;
+      return EXIT_FAILURE;
+   }
+
+   return EXIT_SUCCESS;
 }
 
 int match_dimension(string const word, string const value, string const unit, int const line){
