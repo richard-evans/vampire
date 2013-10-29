@@ -1867,130 +1867,91 @@ int match_sim(string const word, string const value, string const unit, int cons
 
 int match_config(string const word, string const value, int const line){
 
-	// System output config variables
+   std::string prefix="config:";
 
-	std::string test="atoms";
-	if(word==test){
-		vout::output_atoms_config=true;
-		return EXIT_SUCCESS;
-	}
-	//-----------------------------------------
-	test="atoms-output-rate";
-	if(word==test){
-		int i=atoi(value.c_str());
-		if(i >= 0){
-			vout::output_atoms_config_rate=i;
-			return EXIT_SUCCESS;
-		}
-		else{
-			std::cerr << "Error in input file - config:atoms-output-rate is outside of valid range ( >=0)" << std::endl;
-			return EXIT_FAILURE;
-		}
-	}
-	//--------------------------------------------------------------------
-	test="atoms-min-x";
-	if(word==test){
-		double x=atof(value.c_str());
-		if((x<0.0) || (x>1.0)){
-			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
-			return EXIT_FAILURE;
-		}
-		else{
-			vout::atoms_output_min[0]=x;
-			return EXIT_SUCCESS;
-		}
-	}
-	//--------------------------------------------------------------------
-	test="atoms-min-y";
-	if(word==test){
-		double y=atof(value.c_str());
-		if((y<0.0) || (y>1.0)){
-			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
-			return EXIT_FAILURE;
-		}
-		else{
-			vout::atoms_output_min[1]=y;
-			return EXIT_SUCCESS;
-		}
-	}
-	//--------------------------------------------------------------------
-	test="atoms-min-z";
-	if(word==test){
-		double z=atof(value.c_str());
-		if((z<0.0) || (z>1.0)){
-			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
-			return EXIT_FAILURE;
-		}
-		else{
-			vout::atoms_output_min[2]=z;
-			return EXIT_SUCCESS;
-		}
-	}
-	//--------------------------------------------------------------------
-	test="atoms-max-x";
-	if(word==test){
-		double x=atof(value.c_str());
-		if((x<0.0) || (x>1.0)){
-			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
-			return EXIT_FAILURE;
-		}
-		else{
-			vout::atoms_output_max[0]=x;
-			return EXIT_SUCCESS;
-		}
-	}
-	//--------------------------------------------------------------------
-	test="atoms-max-y";
-	if(word==test){
-		double y=atof(value.c_str());
-		if((y<0.0) || (y>1.0)){
-			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
-			return EXIT_FAILURE;
-		}
-		else{
-			vout::atoms_output_max[1]=y;
-			return EXIT_SUCCESS;
-		}
-	}
-	//--------------------------------------------------------------------
-	test="atoms-max-z";
-	if(word==test){
-		double z=atof(value.c_str());
-		if((z<0.0) || (z>1.0)){
-			std::cerr << "Error in input file - config:atoms-min-x is outside of valid range (0.0-1.0)" << std::endl;
-			return EXIT_FAILURE;
-		}
-		else{
-			vout::atoms_output_max[2]=z;
-			return EXIT_SUCCESS;
-		}
-	}
-	//--------------------------------------------------------------------
-	test="cells";
+   // System output config variables
+   std::string test="atoms";
+   if(word==test){
+      vout::output_atoms_config=true;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="atoms-output-rate";
+   if(word==test){
+      int i=atoi(value.c_str());
+      check_for_valid_int(i, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+      vout::output_atoms_config_rate=i;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="atoms-minimum-x";
+   if(word==test){
+      double x=atof(value.c_str());
+      check_for_valid_value(x, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      vout::atoms_output_min[0]=x;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="atoms-minimum-y";
+   if(word==test){
+      double y=atof(value.c_str());
+      check_for_valid_value(y, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      vout::atoms_output_min[1]=y;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="atoms-minimum-z";
+   if(word==test){
+      double z=atof(value.c_str());
+      check_for_valid_value(z, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      vout::atoms_output_min[2]=z;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="atoms-maximum-x";
+   if(word==test){
+      double x=atof(value.c_str());
+      check_for_valid_value(x, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      vout::atoms_output_max[0]=x;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="atoms-maximum-y";
+   if(word==test){
+      double y=atof(value.c_str());
+      check_for_valid_value(y, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      vout::atoms_output_max[1]=y;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="atoms-maximum-z";
+   if(word==test){
+      double z=atof(value.c_str());
+      check_for_valid_value(z, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      vout::atoms_output_max[2]=z;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="macro-cells";
    if(word==test){
       vout::output_cells_config=true;
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
-   test="cells-output-rate";
+   test="macro-cells-output-rate";
    if(word==test){
       int i=atoi(value.c_str());
-      if(i >= 0){
-         vout::output_cells_config_rate=i;
-         return EXIT_SUCCESS;
-      }
-      else{
-         std::cerr << "Error in input file - config:cells-output-rate is outside of valid range ( >=0)" << std::endl;
-         return EXIT_FAILURE;
-      }
+      check_for_valid_int(i, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+      vout::output_cells_config_rate=i;
+      return EXIT_SUCCESS;
    }
    //-----------------------------------------
-	else{
-		std::cerr << "Error - Unknown control statement \'config:"<< word << "\' on line " << line << " of input file" << std::endl;
-		return EXIT_FAILURE;
-	}
+   else{
+      std::cerr << "Error - Unknown control statement \'config:"<< word << "\' on line " << line << " of input file" << std::endl;
+      return EXIT_FAILURE;
+   }
 }
-		
+
 int match_vout_list(string const word, int const line, std::vector<unsigned int> & output_list){
 
 		std::string prefix="output:";
