@@ -3288,162 +3288,75 @@ int match_vout_grain_list(string const word, string const value, int const line,
 	
 }
 
+//-------------------------------------------------------------------
+// Function to match material key words
+//-------------------------------------------------------------------
 int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
-		//-------------------------------------------------------------------
-		// system_creation_flags[1] - Set system particle shape
-		//-------------------------------------------------------------------
       std::string prefix="material:";
 
-		std::string test="num-materials";
-		if(word==test){
-			mp::num_materials=atoi(value.c_str());
-			return EXIT_SUCCESS;
-		}
-		else 
-		test="name";
-		if(word==test){
-			read_material[super_index].name=value;
-			return EXIT_SUCCESS;
-		}
-		else 
-		test="alpha";
-		if(word==test){
-			read_material[super_index].alpha=atof(value.c_str());
-			return EXIT_SUCCESS;
-		}
-		else
-		test="Jij_matrix";
-		if(word==test){
-			double Jij=atof(value.c_str());
-			string unit_type="energy";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,Jij,unit_type);
-			}
-			string str="energy";
-			if(unit_type==str){
-				read_material[super_index].Jij_matrix_SI[sub_index]=-Jij; // Import exchange as field, *-1
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-			//return EXIT_SUCCESS;
-		}
-		else
-		test="mu_s";
-		if(word==test){
-			double mu_s=atof(value.c_str());
-			string unit_type="moment";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,mu_s,unit_type);
-			}
-			string str="moment";
-			if(unit_type==str){
-				// Set moment flag
-				read_material[super_index].moment_flag=true;
-				read_material[super_index].mu_s_SI=mu_s;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		else
-		test="magnetisation";
-		if(word==test){
-			double mag=atof(value.c_str());
-			string unit_type="magnetisation";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,mag,unit_type);
-			}
-			string str="magnetisation";
-			if(unit_type==str){
-				// Set moment flag
-				read_material[super_index].moment_flag=false;
-				read_material[super_index].magnetisation=mag;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//------------------------------------------------------------
-		else
-		test="Ku1";
-		if(word==test){
-			double K=atof(value.c_str());
-			string unit_type="energy";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,K,unit_type);
-				//read_material[super_index].anis_flag=false;
-				//std::cout << "setting flag to false" << std::endl;
-			}
-			string str="energy";
-			if(unit_type==str){
-				// Set moment flag
-				read_material[super_index].Ku1_SI=-K; // Import anisotropy as field, *-1
-				// enable global anisotropy flag                                                                                                                                              
-				sim::UniaxialScalarAnisotropy=true;
- 				std::cerr << "Use of Ku1 keyword in material input file is deprecated. Use \"uniaxial-anisotropy-constant\" instead." << std::endl;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//------------------------------------------------------------
-		else
-		test="uniaxial-anisotropy-constant";
-		if(word==test){
-			double K=atof(value.c_str());
-			string unit_type="energy";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,K,unit_type);
-			}
-			string str="energy";
-			if(unit_type==str){
-				// set anisotropy
-				read_material[super_index].Ku1_SI=-K; // Import anisotropy as field, *-1
-				// enable global anisotropy flag
-				sim::UniaxialScalarAnisotropy=true;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
+      //------------------------------------------------------------
+      std::string test="num-materials";
+      if(word==test){
+         unsigned int nm = atoi(value.c_str());
+         check_for_valid_int(nm, word, line, prefix, 1, 100,"material","1 - 100");
+         mp::num_materials=nm;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="material-name";
+      if(word==test){
+         read_material[super_index].name=value;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="damping-constant";
+      if(word==test){
+         double damping=atof(value.c_str());
+         check_for_valid_value(damping, word, line, prefix, unit, "none", 0.0, 10.0,"material","0.0 - 10.0");
+         read_material[super_index].alpha=damping;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="exchange-matrix";
+      if(word==test){
+         double Jij=atof(value.c_str());
+         check_for_valid_value(Jij, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
+         read_material[super_index].Jij_matrix_SI[sub_index]=-Jij; // Import exchange as field, *-1
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="atomic-spin-moment";
+      if(word==test){
+         double mu_s=atof(value.c_str());
+         check_for_valid_value(mu_s, word, line, prefix, unit, "moment", 0.1*9.24e-24, 1e8*9.24e-24,"material","0.1 - 1e8 mu_B");
+         read_material[super_index].moment_flag=true;
+         read_material[super_index].mu_s_SI=mu_s;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="uniaxial-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].Ku1_SI=-K; // Import anisotropy as field, *-1
+         // enable global anisotropy flag
+         sim::UniaxialScalarAnisotropy=true;
+         return EXIT_SUCCESS;
+      }
       //------------------------------------------------------------
       else
       test="second-uniaxial-anisotropy-constant";
       if(word==test){
          double K=atof(value.c_str());
-         string unit_type="energy";
-         // if no unit given, assume internal
-         if(unit.size() != 0){
-            units::convert(unit,K,unit_type);
-         }
-         string str="energy";
-         if(unit_type==str){
-            // set anisotropy
-            read_material[super_index].Ku2_SI=-K; // Import anisotropy as field, *-1
-            // enable global anisotropy flag
-            sim::second_order_uniaxial_anisotropy=true;
-            return EXIT_SUCCESS;
-         }
-         else{
-            std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-            err::vexit();
-         }
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].Ku2_SI=-K; // Import anisotropy as field, *-1
+         sim::second_order_uniaxial_anisotropy=true;
+         return EXIT_SUCCESS;
       }
       //------------------------------------------------------------
       else
@@ -3487,253 +3400,193 @@ int match_material(string const word, string const value, string const unit, int
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------
-		else
-		test="cubic-anisotropy-constant";
-		if(word==test){
-			double K=atof(value.c_str());
-			string unit_type="energy";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,K,unit_type);
-				//read_material[super_index].anis_flag=false;
-				//std::cout << "setting flag to false" << std::endl;
-			}
-			string str="energy";
-			if(unit_type==str){
-				// Set moment flag
-				read_material[super_index].Kc1_SI=-K; // Import anisotropy as field, *-1
-				sim::CubicScalarAnisotropy=true;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//------------------------------------------------------------
-		else
-		test="uniaxial-anisotropy-direction";
-		if(word==test){
-			// temporary storage container
-			std::vector<double> u(3);
+      else
+      test="cubic-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         // Test for valid range
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].Kc1_SI=-K; // Import anisotropy as field, *-1
+         sim::CubicScalarAnisotropy=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="uniaxial-anisotropy-direction";
+      if(word==test){
+         // temporary storage container
+         std::vector<double> u(3);
 
-			// read values from string
-			u=DoublesFromString(value);
-			
-			// check size
-			if(u.size()!=3){
-				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must have three values." << std::endl;
-				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must have three values." << std::endl;
-				return EXIT_FAILURE;
-			}
-			
-			// Normalise 
-			double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
-			
-			// Check for correct length unit vector
-			if(ULength < 1.0e-9){
-				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must be normalisable (possibly all zero)." << std::endl;
-				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-direction must be normalisable (possibly all zero)." << std::endl;
-				return EXIT_FAILURE;
-			}
-			u.at(0)/=ULength;
-			u.at(1)/=ULength;
-			u.at(2)/=ULength;
-			
-			// Copy anisotropy direction to material
-			read_material[super_index].UniaxialAnisotropyUnitVector=u;
+         // read values from string
+         u=DoublesFromString(value);
 
-			// Enable global tensor anisotropy flag
-			sim::TensorAnisotropy=true;
-			return EXIT_SUCCESS;
+         // check for sane input and normalise if necessary
+         check_for_valid_unit_vector(u, word, line, prefix, "material");
 
-		}
-		//------------------------------------------------------------
-		else
-		test="uniaxial-anisotropy-tensor";
-		if(word==test){
-			std::vector<double> K;
-			// read values from string
-			K=DoublesFromString(value);
-			// check size
-			if(K.size()!=9){
-				std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
-				zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
-				return EXIT_FAILURE;
-			}
-			string unit_type="energy";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,K,unit_type);
-				//read_material[super_index].anis_flag=false;
-				//std::cout << "setting flag to false" << std::endl;
-			}
-			string str="energy";
-			if(unit_type==str){
-				// Copy anisotropy vector to material
-				read_material[super_index].KuVec_SI=-K; // Import anisotropy as field, *-1
-				sim::TensorAnisotropy=true;
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//------------------------------------------------------------
-		else
-		test="Ks";
-		if(word==test){
-			double K=atof(value.c_str());
-			string unit_type="energy";
-			// if no unit given, assume internal
-			if(unit.size() != 0){
-				units::convert(unit,K,unit_type);
-				//read_material[super_index].anis_flag=false;
-				//std::cout << "setting flag to false" << std::endl;
-			}
-			string str="energy";
-			if(unit_type==str){
-				// Set moment flag
-				read_material[super_index].Ks_SI=-K;// Import anisotropy as field, *-1
-				return EXIT_SUCCESS;
-			}
-			else{
-				std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'material:" << word << "\'"<< std::endl;
-				err::vexit();
-			}
-		}
-		//------------------------------------------------------------
-		else
-		test="gamma-rel";
-		if(word==test){
-			read_material[super_index].gamma_rel=atof(value.c_str());
-			return EXIT_SUCCESS;
-		}
-		//------------------------------------------------------------
-		else
-		test="Sx";
-		if(word==test){
-			read_material[super_index].initial_spin[0]=atof(value.c_str());
-			read_material[super_index].random_spins=false;
-			return EXIT_SUCCESS;
-		}
-		//------------------------------------------------------------
-		else
-		test="Sy";
-		if(word==test){
-			read_material[super_index].initial_spin[1]=atof(value.c_str());
-			read_material[super_index].random_spins=false;
-			return EXIT_SUCCESS;
-		}
-		//------------------------------------------------------------
-		else
-		test="Sz";
-		if(word==test){
-			read_material[super_index].initial_spin[2]=atof(value.c_str());
-			read_material[super_index].random_spins=false;
-			return EXIT_SUCCESS;
-		}
-		//------------------------------------------------------------
-		else
-		test="random-spins";
-		if(word==test){
-			string t="true";
-			string f="false";
-			if(value==t){
-				read_material[super_index].random_spins=true;
-				return EXIT_SUCCESS;
-			}
-			else if(value==f){
-				read_material[super_index].random_spins=false;
-				return EXIT_SUCCESS;
-			}
-			else {
-				std::cerr << "Error in input file - material[" << super_index << "]:random-spins must be either true or false" << std::endl;
-				return EXIT_FAILURE;
-			}
-		}
-		//------------------------------------------------------------
-		else
-		test="element";
-		if(word==test){
-			// Test for 3 characters
-			if(value.length()>3){
-				std::cerr << "Error - element identifier on line "<<  line << " of material file must be a maximum of three characters long" << std::endl;
-			}
-			else{
-				// pad value to be equal to 3 characters
-				string tmp="   ";
-				for(unsigned int i=0;i<3;i++){
-					if(i<value.length()){
-						tmp.at(i)=value.at(i);
-					}
-				}
-				read_material[super_index].element=tmp;
-				return EXIT_SUCCESS;
-			}
-		}
-		//--------------------------------------------------------------------
-		else
-		test="crystal-structure";
-		if(word==test){
-			std::cout << "Warning: material[" << super_index << "]:crystal-structure is deprecated and has no effect. Globally set crystal type is used instead." << std::endl;
-			//read_material[super_index].crystal_structure=value;
-			return EXIT_SUCCESS;
-		}
-		else
-		test="geometry";
-		if(word==test){
-			// Open geometry file
-			std::ifstream gfile(value.c_str());
-			if(!gfile.is_open()){
-				std::cerr << "Error - geometry file " << value.c_str() << " not found, exiting!" << std::endl;
-				return EXIT_FAILURE;
-			}
-			gfile >> read_material[super_index].geometry;
-			if((read_material[super_index].geometry<3) || (read_material[super_index].geometry>100)){
-				std::cerr << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100"<< std::endl;
-				return EXIT_FAILURE;
-			}
-			//std::cout << "ngp " << read_material[super_index].geometry << std::endl;
-			for(int c=0;c<read_material[super_index].geometry;c++){
-				for(int xy=0;xy<2;xy++){
-					double var;
-					gfile >> var;
-					if(gfile.eof()){
-						std::cerr << "Error in geometry input file " << value.c_str() << " end of file reached before reading all coordinates" << std::endl;
-						return EXIT_FAILURE;
-					}
-					read_material[super_index].geometry_coords[c][xy];
-					if((var<0.0) || (var > 1.0)){
-						std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
-						return EXIT_FAILURE;
-					}
-					else read_material[super_index].geometry_coords[c][xy]=var;
-				}
-				//std::cout << read_material[super_index].geometry_coords[c][0] << "\t" << read_material[super_index].geometry_coords[c][1] << std::endl;
-			}
-			//double min=atof(value.c_str());
-			//if((min<-0.11) || (min > 1.11)){
-			//	std::cerr << "Error in input file - material[" << super_index << "]:min is outside of valid range (0.0-1.0)" << std::endl;
-			//	return EXIT_FAILURE;}
-			//else{
-			//	read_material[super_index].min=min;
-				return EXIT_SUCCESS;
-			//}
-		}
-		//--------------------------------------------------------------------
-		else
-		test="alloy-master"; // determines host material
-		if(word==test){
-			read_material[super_index].alloy_master=true;
-			return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="alloy-class"; // determines unit cell category id for ordered alloys
-		if(word==test){
-			int ac=atoi(value.c_str());
+         // Copy sanitised unit vector to material
+         read_material[super_index].UniaxialAnisotropyUnitVector=u;
+
+         // Enable global tensor anisotropy flag
+         sim::TensorAnisotropy=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="uniaxial-anisotropy-tensor";
+      if(word==test){
+         std::vector<double> K;
+         // read values from string
+         K=DoublesFromString(value);
+         // check size
+         if(K.size()!=9){
+            std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
+            zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
+            return EXIT_FAILURE;
+         }
+
+         string unit_type="energy";
+         // if no unit given, assume internal
+         if(unit.size() != 0){
+            units::convert(unit,K,unit_type);
+            //read_material[super_index].anis_flag=false;
+            //std::cout << "setting flag to false" << std::endl;
+         }
+         string str="energy";
+         if(unit_type==str){
+            // Copy anisotropy vector to material
+            read_material[super_index].KuVec_SI=K;
+            sim::TensorAnisotropy=true;
+            return EXIT_SUCCESS;
+         }
+         else{
+            std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimension:" << word << "\'"<< std::endl;
+            err::vexit();
+         }
+      }
+      //------------------------------------------------------------
+      else
+      test="surface-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         // Test for valid range
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].Ks_SI=-K;// Import anisotropy as field, *-1
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="relative-gamma";
+      if(word==test){
+         double gr = atof(value.c_str());
+         // Test for valid range
+         check_for_valid_value(gr, word, line, prefix, unit, "none", 0.01, 100.0,"material"," 0.01 - 100.0");
+         read_material[super_index].gamma_rel=gr;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="initial-spin-direction";
+      if(word==test){
+         // first test for random spins
+         test="random";
+         if(value==test){
+            read_material[super_index].random_spins=true;
+         }
+         else{
+            // temporary storage container
+            std::vector<double> u(3);
+
+            // read values from string
+            u=DoublesFromString(value);
+
+            // check for sane input and normalise if necessary
+            check_for_valid_unit_vector(u, word, line, prefix, "material");
+
+            // Copy sanitised unit vector to material
+            read_material[super_index].initial_spin[0]=u.at(0);
+            read_material[super_index].initial_spin[1]=u.at(1);
+            read_material[super_index].initial_spin[2]=u.at(2);
+
+            // ensure random spins is unset
+            read_material[super_index].random_spins=false;
+         }
+         // return
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="material-element";
+      if(word==test){
+         // Test for 3 characters
+         if(value.length()>3){
+            std::cerr << "Error - element identifier on line "<<  line << " of material file must be a maximum of three characters long" << std::endl;
+         }
+         else{
+            // pad value to be equal to 3 characters
+            string tmp="   ";
+            for(unsigned int i=0;i<3;i++){
+               if(i<value.length()){
+                  tmp.at(i)=value.at(i);
+               }
+            }
+            read_material[super_index].element=tmp;
+            return EXIT_SUCCESS;
+         }
+      }
+      //--------------------------------------------------------------------
+      else
+      test="geometry-file";
+      if(word==test){
+         // Open geometry file
+         std::ifstream gfile(value.c_str());
+         if(!gfile.is_open()){
+            std::cerr << "Error - geometry file " << value.c_str() << " not found, exiting!" << std::endl;
+            return EXIT_FAILURE;
+         }
+         gfile >> read_material[super_index].geometry;
+         if((read_material[super_index].geometry<3) || (read_material[super_index].geometry>100)){
+            std::cerr << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100"<< std::endl;
+            return EXIT_FAILURE;
+         }
+         //std::cout << "ngp " << read_material[super_index].geometry << std::endl;
+         for(int c=0;c<read_material[super_index].geometry;c++){
+            for(int xy=0;xy<2;xy++){
+               double var;
+               gfile >> var;
+               if(gfile.eof()){
+                  std::cerr << "Error in geometry input file " << value.c_str() << " end of file reached before reading all coordinates" << std::endl;
+                  return EXIT_FAILURE;
+               }
+               read_material[super_index].geometry_coords[c][xy];
+               if((var<0.0) || (var > 1.0)){
+                  std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
+                  return EXIT_FAILURE;
+               }
+               else read_material[super_index].geometry_coords[c][xy]=var;
+            }
+            //std::cout << read_material[super_index].geometry_coords[c][0] << "\t" << read_material[super_index].geometry_coords[c][1] << std::endl;
+         }
+         //double min=atof(value.c_str());
+         //if((min<-0.11) || (min > 1.11)){
+         //	std::cerr << "Error in input file - material[" << super_index << "]:min is outside of valid range (0.0-1.0)" << std::endl;
+         //	return EXIT_FAILURE;}
+         //else{
+         //	read_material[super_index].min=min;
+            return EXIT_SUCCESS;
+         //}
+      }
+      //--------------------------------------------------------------------
+      else
+      test="alloy-host"; // determines host material
+      if(word==test){
+         read_material[super_index].alloy_master=true; // if this keyword is set, then atoms of this type will be scanned for alloy materials
+         return EXIT_SUCCESS;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="alloy-class"; // determines unit cell category id for ordered alloys
+      if(word==test){
+         int ac=atoi(value.c_str());
          // test for 'disordered'
          std::string dis="disordered";
          if(value==dis){
@@ -3741,128 +3594,97 @@ int match_material(string const word, string const value, string const unit, int
             return EXIT_SUCCESS;
          }
          // test for valid ordered alloy, value of -1 will be deprecated
-			if((ac<-1) || (ac > 3)){
-				std::cerr << "Error in input file - material[" << super_index << "]:alloy-class is outside of valid range (0-3)" << std::endl;
-				return EXIT_FAILURE;
-			}
-			else{
-				read_material[super_index].alloy_class=ac;
-				return EXIT_SUCCESS;
-			}
-		}
-		//--------------------------------------------------------------------
-		else
-		test="alloy"; // determines %mixing for disordered alloys
-		if(word==test){
-			double a=atof(value.c_str());
-			if((a < 0.0) || (a > 1.0)){
-				std::cerr << "Error in input file - material[" << super_index << "]:alloy["<< sub_index << "] is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;
-			}
-			else{
-				read_material[super_index].alloy[sub_index]=a;
-				return EXIT_SUCCESS;
-			}
-			//return EXIT_SUCCESS;
-		}
-		//--------------------------------------------------------------------
-		else
-		test="min";
-		if(word==test){
-			double min=atof(value.c_str());
-			if((min<0.0) || (min > 1.0)){
-				std::cerr << "Error in input file - material[" << super_index << "]:min is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				cs::SelectMaterialByZHeight=true;
-				read_material[super_index].min=min;
-				return EXIT_SUCCESS;
-			}
-		}
-		//--------------------------------------------------------------------
-		else
-		test="max";
-		if(word==test){
-			double max=atof(value.c_str());
-			if((max<0.0) || (max > 1.0)){
-				std::cerr << "Error in input file - material[" << super_index << "]:max is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				cs::SelectMaterialByZHeight=true;
-				read_material[super_index].max=max;
-				return EXIT_SUCCESS;
-			}
-		}
-		else
-		//--------------------------------------------------------------------
-		test="core-shell-size";
-		if(word==test){
-			double css=atof(value.c_str());
-			if((css<0.0) || (css > 1.0)){
-				std::cerr << "Error in input file - material[" << super_index << "]:core-shell-size is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				read_material[super_index].core_shell_size=css;
-				return EXIT_SUCCESS;
-			}
-		}
-		//-------------------------------------------------------------------
-		else
-		test="interface-roughness";
-		if(word==test){
-			double ir=atof(value.c_str());
-			if((ir<0.0) || (ir > 1.0)){
-				std::cerr << "Error in input file - material[" << super_index << "]:interface-roughness is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				read_material[super_index].interface_roughness=ir;
-				return EXIT_SUCCESS;
-			}
-		}
-		else
-		//-------------------------------------------------------------------
-		test="density";
-		if(word==test){
-			double d=atof(value.c_str());
-			if((d<0.0) || (d > 1.0)){
-				std::cerr << "Error in input file - material[" << super_index << "]:density is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				read_material[super_index].density=d;
-				return EXIT_SUCCESS;
-			}
-		}
-		else
-		test="continuous";
-		if(word==test){
-			string t="true";
-			string f="false";
-			if(value==t){
-				read_material[super_index].continuous=true;
-				return EXIT_SUCCESS;
-			}
-			else if(value==f){
-				read_material[super_index].continuous=false;
-				return EXIT_SUCCESS;
-			}
-			else {
-				std::cerr << "Error in input file - material[" << super_index << "]:continuous must be either true or false" << std::endl;
-				return EXIT_FAILURE;
-			}
-		}
-		else
-		//-------------------------------------------------------------------
-		test="intermixing";
-		if(word==test){
-			double i=atof(value.c_str());
-			if((i<0.0) || (i > 1.0)){
-				std::cerr << "Error in input file - material[" << super_index << "]:intermixing[" << sub_index <<"] is outside of valid range (0.0-1.0)" << std::endl;
-				return EXIT_FAILURE;}
-			else{
-				read_material[super_index].intermixing[sub_index]=i;
-				return EXIT_SUCCESS;
-			}
-		}
+         if((ac<-1) || (ac > 3)){
+            std::cerr << "Error in input file - material[" << super_index << "]:alloy-class is outside of valid range (0-3)" << std::endl;
+            return EXIT_FAILURE;
+         }
+         else{
+            read_material[super_index].alloy_class=ac;
+            return EXIT_SUCCESS;
+         }
+      }
+      //--------------------------------------------------------------------
+      else
+      test="alloy-fraction"; // determines %mixing for disordered alloys
+      if(word==test){
+         double a=atof(value.c_str());
+         if((a < 0.0) || (a > 1.0)){
+            std::cerr << "Error in input file - material[" << super_index << "]:alloy["<< sub_index << "] is outside of valid range (0.0-1.0)" << std::endl;
+            return EXIT_FAILURE;
+         }
+         else{
+            read_material[super_index].alloy[sub_index]=a;
+            return EXIT_SUCCESS;
+         }
+         //return EXIT_SUCCESS;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="minimum-height";
+      if(word==test){
+         double min=atof(value.c_str());
+         check_for_valid_value(min, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         cs::SelectMaterialByZHeight=true;
+         read_material[super_index].min=min;
+         return EXIT_SUCCESS;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="maximum-height";
+      if(word==test){
+         double max=atof(value.c_str());
+         check_for_valid_value(max, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         cs::SelectMaterialByZHeight=true;
+         read_material[super_index].max=max;
+         return EXIT_SUCCESS;
+      }
+      else
+      //--------------------------------------------------------------------
+      test="core-shell-size";
+      if(word==test){
+         double css=atof(value.c_str());
+         check_for_valid_value(css, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         read_material[super_index].core_shell_size=css;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      else
+      test="interface-roughness";
+      if(word==test){
+         double ir=atof(value.c_str());
+         check_for_valid_value(ir, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         read_material[super_index].interface_roughness=ir;
+         return EXIT_SUCCESS;
+      }
+      else
+      //-------------------------------------------------------------------
+      test="density";
+      if(word==test){
+         double d=atof(value.c_str());
+         check_for_valid_value(d, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         read_material[super_index].density=d;
+         return EXIT_SUCCESS;
+      }
+      else
+      test="continuous";
+      if(word==test){
+         read_material[super_index].continuous=true;
+         return EXIT_SUCCESS;
+      }
+      else
+      //-------------------------------------------------------------------
+      test="intermixing";
+      if(word==test){
+         double i=atof(value.c_str());
+         //check_for_valid_value(i, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         if((i<0.0) || (i > 1.0)){
+            std::cerr << "Error in input file - material[" << super_index << "]:intermixing[" << sub_index <<"] is outside of valid range (0.0-1.0)" << std::endl;
+            return EXIT_FAILURE;}
+         else{
+            read_material[super_index].intermixing[sub_index]=i;
+            return EXIT_SUCCESS;
+         }
+      }
 		//--------------------------------------------------------------------
 		else
 		test="constrained"; // determines use of alternate integrator
@@ -4021,10 +3843,10 @@ int match_material(string const word, string const value, string const unit, int
        */
       if(word==test){
          // Test for sane input
-         bool sanitised_bool=check_for_valid_bool(value, word, line, prefix,"material");
+         //bool sanitised_bool=check_for_valid_bool(value, word, line, prefix,"material");
 
          // set flag
-         read_material[super_index].couple_to_phonon_temperature=sanitised_bool;
+         read_material[super_index].couple_to_phonon_temperature=true; //sanitised_bool;
 
          // enable local temperature flag
          sim::local_temperature=true;
@@ -4042,10 +3864,10 @@ int match_material(string const word, string const value, string const unit, int
        */
       if(word==test){
          // Test for sane input
-         bool sanitised_bool=check_for_valid_bool(value, word, line, prefix,"material");
+         //bool sanitised_bool=check_for_valid_bool(value, word, line, prefix,"material");
 
          // set flag
-         read_material[super_index].fill=sanitised_bool;
+         read_material[super_index].fill=true; //sanitised_bool;
 
          return EXIT_SUCCESS;
       }
