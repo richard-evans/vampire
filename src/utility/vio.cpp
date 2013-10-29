@@ -1365,12 +1365,6 @@ int match_sim(string const word, string const value, string const unit, int cons
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
-   test="identify-surface-atoms";
-   if(word==test){
-      sim::identify_surface_atoms=true;
-      return EXIT_SUCCESS;
-   }
-   //-------------------------------------------------------------------
    test="surface-anisotropy-threshold";
    if(word==test){
       // test for native keyword
@@ -1943,6 +1937,12 @@ int match_config(string const word, string const value, int const line){
       int i=atoi(value.c_str());
       check_for_valid_int(i, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       vout::output_cells_config_rate=i;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="identify-surface-atoms";
+   if(word==test){
+      sim::identify_surface_atoms=true;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
