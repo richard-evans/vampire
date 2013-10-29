@@ -313,6 +313,58 @@ void check_for_valid_value(double& value, // value of variable as in input file
 
 }
 
+//
+// Function to check for valid int variable range
+//-----------------------------------------------------------------------
+//
+void check_for_valid_int(  int& value, // value of variable as in input file
+                           std::string word, // input file keyword
+                           int line, // input file line
+                           std::string prefix, // input file prefix
+                           int range_min, // acceptable minimum value for variable
+                           int range_max, // acceptable maximum value for variable
+                           std::string input_file_type, //input file name
+                           std::string range_text) // customised text
+{
+
+   // Check for valid range
+   if((value<range_min) || (value>range_max)){
+      std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+      zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+      err::vexit();
+   }
+
+   // Success - input is sane!
+   return;
+
+}
+
+//
+// Overloaded function to check for valid uint variable range
+//-----------------------------------------------------------------------
+//
+void check_for_valid_int(  unsigned int& value, // value of variable as in input file
+                           std::string word, // input file keyword
+                           int line, // input file line
+                           std::string prefix, // input file prefix
+                           unsigned int range_min, // acceptable minimum value for variable
+                           unsigned int range_max, // acceptable maximum value for variable
+                           std::string input_file_type, //input file name
+                           std::string range_text) // customised text
+{
+
+   // Check for valid range
+   if((value<range_min) || (value>range_max)){
+      std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+      zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+      err::vexit();
+   }
+
+   // Success - input is sane!
+   return;
+
+}
+
 //-----------------------------------------------------------------------
 // Function to check for valid boolean
 //
@@ -342,6 +394,42 @@ bool check_for_valid_bool( std::string value, // variable as in input file
    std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
    zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
    err::vexit();
+
+}
+
+//
+// Function to check for correct 3-component vector and ensure length of 1
+//-------------------------------------------------------------------------
+//
+void check_for_valid_unit_vector(std::vector<double>& u, // unit vector
+                           std::string word, // input file keyword
+                           int line, // input file line
+                           std::string prefix, // input file prefix
+                           std::string input_file_type) //input file name
+{
+
+   // check size
+   if(u.size()!=3){
+      std::cerr << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+      zlog << zTs() << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+      err::vexit();
+   }
+
+   // Normalise
+   double ULength=sqrt(u.at(0)*u.at(0)+u.at(1)*u.at(1)+u.at(2)*u.at(2));
+
+   // Check for correct length unit vector
+   if(ULength < 1.0e-9){
+      std::cerr << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
+      zlog << zTs() << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
+      err::vexit();
+   }
+   u.at(0)/=ULength;
+   u.at(1)/=ULength;
+   u.at(2)/=ULength;
+
+   // Success - input is sane!
+   return;
 
 }
 
