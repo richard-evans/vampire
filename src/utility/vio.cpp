@@ -3166,12 +3166,12 @@ int match_vout_grain_list(string const word, string const value, int const line,
 				
 				// check for valid index
 				super_index = atoi(index.c_str());
-				if((super_index>=0) && (super_index<mp::max_materials)){
+				if((super_index>=1) && (super_index<mp::max_materials+1)){
 					break;
 				}
 				else{
 					std::cerr << "Invalid index number " << index << " on line " << line_counter << " in material input file" << std::endl;
-					std::cerr << "Causes could be invalid character or outside of range, ie less than zero or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
+					std::cerr << "Causes could be invalid character or outside of range, ie less than 1 or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
 					err::vexit();
 				}
 				
@@ -3202,9 +3202,9 @@ int match_vout_grain_list(string const word, string const value, int const line,
 							}
 							sub_index=atoi(index.c_str());
 							// Check for valid index
-							if((super_index<0) || (super_index>=mp::max_materials)){
+							if((sub_index<1) || (sub_index>=mp::max_materials)){
 								std::cerr << "Invalid sub-index number " << index << " on line " << line_counter << " in material input file" << std::endl;
-								std::cerr << "Causes could be invalid character or outside of range, ie less than zero or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
+								std::cerr << "Causes could be invalid character or outside of range, ie less than 1 or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
 								err::vexit();
 							}
 							// end of word
@@ -3262,7 +3262,7 @@ int match_vout_grain_list(string const word, string const value, int const line,
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
-			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index, sub_index);
+			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
 			if(matchcheck==EXIT_FAILURE){
 				err::vexit();
 			}
