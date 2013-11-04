@@ -74,11 +74,29 @@ namespace cs{
 	extern int particle_creation_parity;
 	extern double particle_scale;
 	extern double particle_spacing;
+	extern double particle_array_offset_x; // Offset particle array along x-direction;
+	extern double particle_array_offset_y; // Offset particle array along y-direction;
+   extern double particle_shape_factor_x; // Normalised particle shape
+   extern double particle_shape_factor_y; // Normalised particle shape
+   extern double particle_shape_factor_z; // Normalised particle shape
 
 	// Other directives and flags
 	extern bool single_spin;
 	extern int system_creation_flags[10];
 	extern std::string unit_cell_file;
+	extern bool fill_core_shell;
+	
+	// Variables for interfacial roughness control
+	extern bool interfacial_roughness;
+	extern bool interfacial_roughness_local_height_field;
+	extern int interfacial_roughness_type; // Sets peaks (1), troughs (-1) or both (0)
+	extern unsigned int interfacial_roughness_random_seed;
+	extern unsigned int interfacial_roughness_seed_count; // Number of seeds
+	extern double interfacial_roughness_height_field_resolution; // Angstroms
+	extern double interfacial_roughness_mean_seed_radius; // Angstroms
+	extern double interfacial_roughness_seed_radius_variance; // Variance as fraction of mean radius
+	extern double interfacial_roughness_mean_seed_height; // Angstroms
+	extern double interfacial_roughness_seed_height_max; // Angstroms
 	
 	class unit_cell_atom_t {
 	public:
@@ -363,6 +381,7 @@ int cube(double[], std::vector<cs::catom_t> &,const int);
 ///
 int sphere(double[], std::vector<cs::catom_t> &,const int);
 	
+extern void ellipsoid(double[], std::vector<cs::catom_t> &,const int);
 
 /// @brief This is the brief (one line only) description of the function.
 ///
@@ -413,6 +432,8 @@ int tear_drop(double[], std::vector<cs::catom_t> &,const int);
 
 int sort_atoms_by_grain(std::vector<cs::catom_t> &);
 int clear_atoms(std::vector<cs::catom_t> &);
+
+void roughness(std::vector<cs::catom_t> &);
 
   // unit cell initialisation function
   void unit_cell_set(cs::unit_cell_t &);

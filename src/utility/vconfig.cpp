@@ -31,7 +31,7 @@
 /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section info File Information
-/// @author  Richard Evans, richard.evans@nanohpc.com
+/// @author  Richard Evans, richard.evans@york.ac.uk
 /// @version 1.0
 /// @date    30/05/2011
 /// @internal
@@ -53,11 +53,13 @@
 
 // Vampire Header files
 #include "atoms.hpp"
+#include "cells.hpp"
 #include "errors.hpp"
 #include "LLG.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 
 namespace vout{
@@ -65,7 +67,7 @@ namespace vout{
 	bool output_atoms_config=false;
 	int output_atoms_config_rate=1000;
 	int output_atoms_file_counter=0;
-	int output_atoms_rate_counter=0;
+	int output_rate_counter=0;
 	
 	double atoms_output_min[3]={0.0,0.0,0.0};
 	double atoms_output_max[3]={1.0,1.0,1.0};
@@ -83,6 +85,8 @@ namespace vout{
 	// function headers
 	void atoms();
 	void atoms_coords();
+   void cells();
+   void cells_coords();
 	
 /// @brief Config master output function
 ///
@@ -91,7 +95,7 @@ namespace vout{
 /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
-/// @author  Richard Evans, richard.evans@nanohpc.com
+/// @author  Richard Evans, richard.evans@york.ac.uk
 /// @version 1.0
 /// @date    31/05/2011
 ///
@@ -108,13 +112,19 @@ void config(){
 	stats::mag_m();
 
 	// atoms output
-	if((vout::output_atoms_config==true) && (vout::output_atoms_rate_counter%output_atoms_config_rate==0)){
+	if((vout::output_atoms_config==true) && (vout::output_rate_counter%output_atoms_config_rate==0)){
 		if(output_atoms_file_counter==0) vout::atoms_coords();
 		vout::atoms();
 	}
 	
+   // cells output
+   if((vout::output_cells_config==true) && (vout::output_rate_counter%output_cells_config_rate==0)){
+      if(output_cells_file_counter==0) vout::cells_coords();
+      vout::cells();
+   }
+   
 	// increment rate counter
-	vout::output_atoms_rate_counter++;
+	vout::output_rate_counter++;
 	
 }
 /// @brief Atomistic output function
@@ -151,7 +161,7 @@ void config(){
 /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
-/// @author  Richard Evans, richard.evans@nanohpc.com
+/// @author  Richard Evans, richard.evans@york.ac.uk
 /// @version 1.0
 /// @date    30/05/2011
 ///
@@ -263,7 +273,7 @@ void config(){
 /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
-/// @author  Richard Evans, richard.evans@nanohpc.com
+/// @author  Richard Evans, richard.evans@york.ac.uk
 /// @version 1.0
 /// @date    31/05/2011
 ///
@@ -374,4 +384,196 @@ void config(){
 		cfg_file_ofstr.close();
 
 	}
+
+/// @brief Cell output function
+///
+/// @details Outputs formatted data snapshot for visualisation
+///
+///   #------------------------------------------------------
+///   # Cell configuration file for vampire
+///   #------------------------------------------------------
+///   # Date: xx/xx/xxxx xx.xx.xx
+///   #------------------------------------------------------
+///   Number of cells: $n_cells
+///   System dimensions: $max_x $max_y $max_z
+///   Coordinates-file: $coord_file
+///   Time: $t
+///   Field: $H
+///   Temperature: $T
+///   Magnetisation: $mx $my $mz
+///   Number of Materials: $n_mat
+///   Material Properties 1:  $mu_s $mmx $mmy $mmz $mm
+///   Material Properties 2:  $mu_s $mmx $mmy $mmz ...
+///   #------------------------------------------------------
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    26/04/2013
+///
+/// @internal
+///   Created:    26/04/2013
+///   Revision:     ---
+///=====================================================================================
+///
+void cells(){
+
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "vout::cells has been called" << std::endl;}
+
+   // Set local output filename
+   std::stringstream file_sstr;
+   file_sstr << "cells-";
+   file_sstr << std::setfill('0') << std::setw(8) << output_cells_file_counter;
+   file_sstr << ".cfg";
+   std::string cfg_file = file_sstr.str();
+   const char* cfg_filec = cfg_file.c_str();
+
+   #ifdef MPICF
+   // Reduce demagnetisation fields to processor 0
+   if(vmpi::my_rank==0){
+      MPI_Reduce(MPI_IN_PLACE, &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+   }
+   else{
+      MPI_Reduce(&cells::x_field_array[0], &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&cells::y_field_array[0], &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&cells::z_field_array[0], &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+   }
+   #endif
+
+   // Output masterfile header on root process
+   if(vmpi::my_rank==0){
+
+      zlog << zTs() << "Outputting cell configuration " << output_cells_file_counter << " to disk." << std::endl;
+
+      // Declare and open output file
+      std::ofstream cfg_file_ofstr;
+      cfg_file_ofstr.open (cfg_filec);
+
+      // Get system date
+      time_t rawtime = time(NULL);
+      struct tm * timeinfo = localtime(&rawtime);
+
+      cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+      cfg_file_ofstr << "# Cell configuration file for vampire"<< std::endl;
+      cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+      cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
+      cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+      cfg_file_ofstr << "# Number of spins: "<< cells::num_cells << std::endl;
+      cfg_file_ofstr << "# System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
+      cfg_file_ofstr << "# Coordinates-file: cells-coord.cfg"<< std::endl;
+      cfg_file_ofstr << "# Time: " << double(sim::time)*mp::dt_SI << std::endl;
+      cfg_file_ofstr << "# Field: " << sim::H_applied << std::endl;
+      cfg_file_ofstr << "# Temperature: "<< sim::temperature << std::endl;
+      cfg_file_ofstr << "# Magnetisation: " << stats::total_mag_norm[0] << "\t" << stats::total_mag_norm[1] << "\t" << stats::total_mag_norm[2] << std::endl;
+      cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+
+      // Root process now outputs the cell magnetisations
+      for(int cell=0; cell < cells::num_cells; cell++){
+         cfg_file_ofstr << cells::x_mag_array[cell] << "\t" << cells::y_mag_array[cell] << "\t" << cells::z_mag_array[cell]<< "\t";
+         cfg_file_ofstr << cells::x_field_array[cell] << "\t" << cells::y_field_array[cell] << "\t" << cells::z_field_array[cell] << std::endl;
+      }
+
+      cfg_file_ofstr.close();
+
+   }
+
+   output_cells_file_counter++;
+
+   return;
+
+}
+
+/// @brief Cells output function
+///
+/// @details Outputs formatted data snapshot for visualisation
+///
+///   //------------------------------------------------------
+///   // Atomistic coordinate configuration file for vampire
+///   //------------------------------------------------------
+///   // Date: xx/xx/xxxx xx.xx.xx
+///   //------------------------------------------------------
+///   Number of cells: $n_cells
+///   //------------------------------------------------------
+///   Number of atom files: $n_files
+///   atoms-coords-00CPU0.cfg
+///   atoms-coords-00CPU1.cfg
+///   atoms-coords-00CPU2.cfg
+///   //------------------------------------------------------
+///   Number of local cells: $n_loc_cells
+///   $material $category $x $y $z $species
+///   $material $category $x $y $z $species
+///   $material $category $x ...
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @version 1.0
+/// @date    31/05/2011
+///
+/// @internal
+///   Created:    31/05/2011
+///   Revision:     ---
+///=====================================================================================
+///
+void cells_coords(){
+
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "vout::atoms_coords has been called" << std::endl;}
+
+   // Set local output filename
+   std::stringstream file_sstr;
+   file_sstr << "cells-coords";
+   file_sstr << ".cfg";
+   std::string cfg_file = file_sstr.str();
+   const char* cfg_filec = cfg_file.c_str();
+
+   // Output masterfile header on root process
+   if(vmpi::my_rank==0){
+
+      std::cout << "Outputting cell coordinates to disk." << std::endl;
+      zlog << zTs() << "Outputting cell coordinates to disk." << std::endl;
+
+      // Declare and open output file
+      std::ofstream cfg_file_ofstr;
+      cfg_file_ofstr.open (cfg_filec);
+
+      // Get system date
+      time_t rawtime = time(NULL);
+      struct tm * timeinfo = localtime(&rawtime);
+
+      cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+      cfg_file_ofstr << "# Cell coordinates configuration file for vampire"<< std::endl;
+      cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+      cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
+      cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+      cfg_file_ofstr << "# Number of cells: "<< cells::num_cells << std::endl;
+      cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
+      cfg_file_ofstr << "#" << std::endl;
+      cfg_file_ofstr << "#" << std::endl;
+      cfg_file_ofstr << "#" << std::endl;
+      cfg_file_ofstr << "#" << std::endl;
+      cfg_file_ofstr << "#" << std::endl;
+      cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+
+      for(int cell=0; cell<cells::num_cells; cell++){
+         cfg_file_ofstr << cells::x_coord_array[cell] << "\t" << cells::y_coord_array[cell] << "\t" << cells::z_coord_array[cell] << std::endl;
+      }
+
+      cfg_file_ofstr.close();
+   }
+
+   return;
+
+}
+
 } // End of namespace vout

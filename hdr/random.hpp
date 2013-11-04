@@ -32,6 +32,7 @@ namespace mtrandom
 {
 	extern MTRand grnd; // single sequence of random numbers
 	extern double gaussian();
+	extern double gaussianc(MTRand&);
 	
 	extern int voronoi_seed;
 	extern int integration_seed;

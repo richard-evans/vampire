@@ -47,11 +47,6 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "cs::create_crystal_structure has been called" << std::endl;}	
 
-	// Calculate number of global and local unit cells required (rounding up)
-	cs::total_num_unit_cells[0]=int(vmath::iceil(cs::system_dimensions[0]/unit_cell.dimensions[0]));
-	cs::total_num_unit_cells[1]=int(vmath::iceil(cs::system_dimensions[1]/unit_cell.dimensions[1]));
-	cs::total_num_unit_cells[2]=int(vmath::iceil(cs::system_dimensions[2]/unit_cell.dimensions[2]));
-
 	int min_bounds[3];
 	int max_bounds[3];
 	
@@ -114,7 +109,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 									(cy>=vmpi::min_dimensions[1] && cy<vmpi::max_dimensions[1]) &&
 									(cz>=vmpi::min_dimensions[2] && cz<vmpi::max_dimensions[2])){
 						#endif
-							if((cx<=cs::system_dimensions[0]) && (cy<=cs::system_dimensions[1]) && (cz<=cs::system_dimensions[2])){
+							if((cx<cs::system_dimensions[0]) && (cy<cs::system_dimensions[1]) && (cz<cs::system_dimensions[2])){
 							catom_array.push_back(cs::catom_t());
 							catom_array[atom].x=cx;
 							catom_array[atom].y=cy;
@@ -133,7 +128,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							}
 						}
 						else{
-							if((cx<=cs::system_dimensions[0]) && (cy<=cs::system_dimensions[1]) && (cz<=cs::system_dimensions[2])){
+							if((cx<cs::system_dimensions[0]) && (cy<cs::system_dimensions[1]) && (cz<cs::system_dimensions[2])){
 							catom_array.push_back(cs::catom_t());
 							catom_array[atom].x=cx;
 							catom_array[atom].y=cy;
@@ -170,31 +165,40 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	// If z-height material selection is enabled then do so
 	if(cs::SelectMaterialByZHeight==true){
 		
-		// determine z-bounds for materials
-		std::vector<double> mat_min(mp::num_materials);
-		std::vector<double> mat_max(mp::num_materials);
-
-		for(int mat=0;mat<mp::num_materials;mat++){
-			mat_min[mat]=mp::material[mat].min*cs::system_dimensions[2];
-			mat_max[mat]=mp::material[mat].max*cs::system_dimensions[2];
-			// alloys generally are not defined by height, and so have max = 0.0
-			if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
-		}
+		// Check for interfacial roughness and call custom material assignment routine
+		if(cs::interfacial_roughness==true) cs::roughness(catom_array);
 		
-		// Assign materials to generated atoms
-		for(unsigned int atom=0;atom<catom_array.size();atom++){
+		// Otherwise perform normal assignement of materials
+		else{
+
+			// determine z-bounds for materials
+			std::vector<double> mat_min(mp::num_materials);
+			std::vector<double> mat_max(mp::num_materials);
+         std::vector<bool> mat_fill(mp::num_materials);
+
+         // Unroll min, max and fill for performance
 			for(int mat=0;mat<mp::num_materials;mat++){
-				const double cz=catom_array[atom].z;
-				if((cz>=mat_min[mat]) && (cz<mat_max[mat])){
-					catom_array[atom].material=mat;
-					catom_array[atom].include=true;
+				mat_min[mat]=mp::material[mat].min*cs::system_dimensions[2];
+				mat_max[mat]=mp::material[mat].max*cs::system_dimensions[2];
+				// alloys generally are not defined by height, and so have max = 0.0
+				if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
+            mat_fill[mat]=mp::material[mat].fill;
+			}
+
+			// Assign materials to generated atoms
+			for(unsigned int atom=0;atom<catom_array.size();atom++){
+				for(int mat=0;mat<mp::num_materials;mat++){
+					const double cz=catom_array[atom].z;
+					if((cz>=mat_min[mat]) && (cz<mat_max[mat]) && (mat_fill[mat]==false)){
+						catom_array[atom].material=mat;
+						catom_array[atom].include=true;
+					}
 				}
 			}
 		}
 
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
-		
 	}
 	
 	// Check to see if any atoms have been generated
@@ -218,7 +222,8 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	if(err::check==true){std::cout << "cs::read_unit_cell has been called" << std::endl;}	
 
 	std::cout << "Reading in unit cell data..." << std::flush;
-
+	zlog << zTs() << "Reading in unit cell data..." << std::endl;
+	
 	// ifstream declaration
 	std::ifstream inputfile;
 	
@@ -228,6 +233,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	// Check for opening
 	if(!inputfile.is_open()){
 		std::cerr << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
+		zlog << zTs() << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
 		err::vexit();
 	}
 
@@ -308,17 +314,35 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					//inputfile >> id >> cx >> cy >> cz >> mat_id >> lcat_id >> hcat_id;
 					// now check for mostly sane input
 					if(cx>=0.0 && cx <=1.0) unit_cell.atom[i].x=cx;
-					else{std::cerr << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					else{
+						std::cerr << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						zlog << zTs() << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						err::vexit();
+					}
 					if(cy>=0.0 && cy <=1.0) unit_cell.atom[i].y=cy;
-					else{std::cerr << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					else{
+						std::cerr << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						zlog << zTs() << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
+									     << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						err::vexit();
+					}
 					if(cz>=0.0 && cz <=1.0) unit_cell.atom[i].z=cz;
-					else{std::cerr << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; err::vexit();}
+					else{
+						std::cerr << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
+						<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						zlog << zTs() << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
+										  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						err::vexit();
+					}
 					if(mat_id >=0 && mat_id<mp::num_materials) unit_cell.atom[i].mat=mat_id;
-					else{ std::cerr << "Error! Requested material id " << mat_id << "for atom number " << id <<  " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-" << mp::num_materials << ". Exiting" << std::endl; err::vexit();} 
+					else{ 
+						std::cerr << "Error! Requested material id " << mat_id << " for atom number " << id <<  " on line " << line_counter
+									 << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl;
+						zlog << zTs() << "Error! Requested material id " << mat_id << " for atom number " << id <<  " on line " << line_counter
+                            << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl; err::vexit();}
 					unit_cell.atom[i].lc=lcat_id;
 					unit_cell.atom[i].hc=hcat_id;
 					//std::cout << i << "\t" << id << "\t" << cx << "\t" << cy << "\t" << cz << "\t" << mat_id << "\t" << lcat_id << "\t" << hcat_id << std::endl;
@@ -399,7 +423,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		line_id++;
 	} // end of while loop
 	
-	zlog << zTs() << "Done!" << std::endl;
+	zlog << "Done!" << std::endl;
 	zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
 	zlog << zTs() << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
 	zlog << zTs() << "\t" << "Exchange type: " <<  unit_cell.exchange_type << std::endl;
@@ -962,7 +986,8 @@ void unit_cell_set(unit_cell_t & unit_cell){
 
 		}
 		else{
-			std::cerr << "Error -  unknown crystal_type" << std::endl; 
+			std::cerr << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl; 
+			zlog << zTs() << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl; 
 			err::vexit();
 		}
 

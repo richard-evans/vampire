@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\data">
+      <UniqueIdentifier>{408c37d7-ced6-4f10-a191-e28128f0b337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\main">
+      <UniqueIdentifier>{f1d65fef-7ad8-4435-ad14-7eda8b446e85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\create">
+      <UniqueIdentifier>{41594a74-4e9b-47b0-b101-b5a4aa9f2a73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mpi">
+      <UniqueIdentifier>{010898f3-6bb0-4a66-a104-202f629743bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\program">
+      <UniqueIdentifier>{d060fff8-4146-4ad4-9b76-b2e20fc9422e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\random">
+      <UniqueIdentifier>{bb6a8ba8-d65e-43e4-9c10-5a48ee7e1ab2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\simulate">
+      <UniqueIdentifier>{7cead295-b07c-450e-bffe-897f1c912ee5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utility">
+      <UniqueIdentifier>{c7ee6562-f695-4de1-9535-3822100c203c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="hdr\atoms.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\category.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\cells.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\create.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\demag.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\errors.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\grains.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\LLG.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\material.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\mtrand.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\program.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\random.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\sim.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\stats.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\vcuda.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\vio.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\vmath.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\vmpi.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\voronoi.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\data\atoms.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\data\category.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\data\cells.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\data\grains.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main\material.cpp">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main\main.cpp">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main\initialise_variables.cpp">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="src\create\cs_voronoi2.cpp">
+      <Filter>Source Files\create</Filter>
+    </ClCompile>
+    <ClCompile Include="src\create\cs_set_atom_vars2.cpp">
+      <Filter>Source Files\create</Filter>
+    </ClCompile>
+    <ClCompile Include="src\create\cs_particle_shapes.cpp">
+      <Filter>Source Files\create</Filter>
+    </ClCompile>
+    <ClCompile Include="src\create\cs_create_system_type2.cpp">
+      <Filter>Source Files\create</Filter>
+    </ClCompile>
+    <ClCompile Include="src\create\cs_create_neighbour_list2.cpp">
+      <Filter>Source Files\create</Filter>
+    </ClCompile>
+    <ClCompile Include="src\create\cs_create_crystal_structure2.cpp">
+      <Filter>Source Files\create</Filter>
+    </ClCompile>
+    <ClCompile Include="src\create\create_system2.cpp">
+      <Filter>Source Files\create</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpi\mpi_generic.cpp">
+      <Filter>Source Files\mpi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpi\mpi_create2.cpp">
+      <Filter>Source Files\mpi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpi\mpi_comms.cpp">
+      <Filter>Source Files\mpi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpi\LLGMidpoint-mpi.cpp">
+      <Filter>Source Files\mpi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpi\LLGHeun-mpi.cpp">
+      <Filter>Source Files\mpi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\bmark.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\cmc_anisotropy.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\curie_temperature.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\diagnostics.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\field_cool.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\hamr.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\hybrid_cmc.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\hysteresis.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\LLB_Boltzmann.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\static_hysteresis.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\time_series.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\random\random.cpp">
+      <Filter>Source Files\random</Filter>
+    </ClCompile>
+    <ClCompile Include="src\random\mtrand.cpp">
+      <Filter>Source Files\random</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\cmc.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\cmc_mc.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\demag.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\energy.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\fields.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\LLB.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\LLGHeun.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\LLGMidpoint.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\mc.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\sim.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\standard_programs.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility\errors.cpp">
+      <Filter>Source Files\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility\statistics.cpp">
+      <Filter>Source Files\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility\units.cpp">
+      <Filter>Source Files\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility\vconfig.cpp">
+      <Filter>Source Files\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility\vio.cpp">
+      <Filter>Source Files\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utility\vmath.cpp">
+      <Filter>Source Files\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simulate\mc_moves.cpp">
+      <Filter>Source Files\simulate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\temperature_pulse.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\lagrange.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

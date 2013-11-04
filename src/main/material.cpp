@@ -27,15 +27,21 @@
 namespace mp{
 	// Constructor
 materials_t::materials_t ():
-	name(""),
-	element("   "),
+	name("material#n"),
+	element("Fe"),
 	alpha(1.0),
-	mu_s_SI(9.27400915e-24),
+	mu_s_SI(1.72*9.27400915e-24),
 	magnetisation(0.0),
 	Ku1_SI(0.0),
 	Ku2_SI(0.0),
+   Klatt_SI(0.0),
 	KuVec_SI(0),
 	Ku(0.0),
+   Ku2(0.0),
+   Klatt(0.0),
+   Klatt_inflection_temperature(0.0),
+   Klatt_unity_tmperature(1000.0),
+   Klatt_width_temperature(100.0),
 	KuVec(0),
 	UniaxialAnisotropyUnitVector(3),
 	Kc1_SI(0.0),
@@ -47,7 +53,7 @@ materials_t::materials_t ():
 	min(0.0),
 	max(1.0),
 	geometry(0),
-	core_shell_size(0.0),
+	core_shell_size(1.0),
 	interface_roughness(0.0),
 	density(1.0),
 	cutoff(0.8),
@@ -59,7 +65,15 @@ materials_t::materials_t ():
 	one_oneplusalpha_sq(0.5),
 	alpha_oneplusalpha_sq(0.5),
 	H_th_sigma(0.0),
-	constrained(false)
+	constrained(false),
+	temperature(0.0),
+	couple_to_phonon_temperature(false),
+	applied_field_strength(0.0),
+	applied_field_unit_vector(3,0.0),
+	fmr_field_strength(0.0),
+	fmr_field_frequency(0.0),
+	fmr_field_unit_vector(3,0.0),
+   fill(false)
 	
 	{
 
@@ -82,6 +96,16 @@ materials_t::materials_t ():
 	UniaxialAnisotropyUnitVector.at(0)=0.0;
 	UniaxialAnisotropyUnitVector.at(1)=0.0;
 	UniaxialAnisotropyUnitVector.at(2)=1.0;
+
+	// Applied field direction default initialisation
+	applied_field_unit_vector.at(0)=0.0;
+	applied_field_unit_vector.at(1)=0.0;
+	applied_field_unit_vector.at(2)=1.0;
+
+	// FMR field direction default initialisation
+	fmr_field_unit_vector.at(0)=0.0;
+	fmr_field_unit_vector.at(1)=0.0;
+	fmr_field_unit_vector.at(2)=1.0;
 }
 
 int materials_t::print(){

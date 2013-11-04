@@ -85,10 +85,11 @@ obj/program/field_cool.o \
 obj/program/hamr.o \
 obj/program/hybrid_cmc.o \
 obj/program/hysteresis.o \
+obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/static_hysteresis.o \
 obj/program/time_series.o \
-obj/program/two_temperature.o \
+obj/program/temperature_pulse.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -98,6 +99,7 @@ obj/simulate/LLB.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
 obj/simulate/mc.o \
+obj/simulate/mc_moves.o \
 obj/simulate/cmc.o \
 obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \

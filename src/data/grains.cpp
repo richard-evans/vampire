@@ -225,20 +225,29 @@ int mag(){
 			//std::cerr << "Warning Grain " << grain << " has no constituent atoms!" << std::endl;
 		}
 		else{
-			double mx = grains::x_mag_array[grain]/=grains::sat_mag_array[grain];
-			double my = grains::y_mag_array[grain]/=grains::sat_mag_array[grain];
-			double mz = grains::z_mag_array[grain]/=grains::sat_mag_array[grain];
+			double norm = 1.0/grains::sat_mag_array[grain];
+			double mx = grains::x_mag_array[grain]*norm;
+			double my = grains::y_mag_array[grain]*norm;
+			double mz = grains::z_mag_array[grain]*norm;
 			grains::mag_m_array[grain] = sqrt(mx*mx+my*my+mz*mz);
-
+			// Normalise to unit magnetisation
+			grains::x_mag_array[grain]*=norm;
+			grains::y_mag_array[grain]*=norm;
+			grains::z_mag_array[grain]*=norm;
 			// loop over all materials and normalise
 			if(mp::num_materials>1){
-			for(int mat=0;mat<mp::num_materials;mat++){
-				const unsigned int idx=grain*mp::num_materials+mat;
-				double mx = grains::x_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
-				double my = grains::y_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
-				double mz = grains::z_mat_mag_array[idx]/=grains::mat_sat_mag_array[idx];
-				grains::mat_mag_m_array[idx] = sqrt(mx*mx+my*my+mz*mz);
-			}
+				for(int mat=0;mat<mp::num_materials;mat++){
+					const unsigned int idx=grain*mp::num_materials+mat;
+					const double immm=1.0/grains::mat_sat_mag_array[idx];
+					double mx = grains::x_mat_mag_array[idx]*immm;
+					double my = grains::y_mat_mag_array[idx]*immm;
+					double mz = grains::z_mat_mag_array[idx]*immm;
+					grains::mat_mag_m_array[idx] = sqrt(mx*mx+my*my+mz*mz);
+					// Normalise to unit magnetisation
+					grains::x_mat_mag_array[idx]*=immm;
+					grains::y_mat_mag_array[idx]*=immm;
+					grains::z_mat_mag_array[idx]*=immm;
+				}
 			}
 		}
 	}
@@ -290,7 +299,7 @@ void output_mat_mag(std::ostream& stream){
 				// loop over all materials
 				for(int mat=0;mat<mp::num_materials;mat++){
 					const unsigned int idx=grain*mp::num_materials+mat;
-					const double imagm = 1.0; //grains::mat_sat_mag_array[idx];
+					const double imagm = 1.0/grains::mat_mag_m_array[idx];
 					//stream << grains::grain_size_array[grain] << "\t";
 					//stream << grains::mat_sat_mag_array[idx] << "\t";
 					stream << grains::x_mat_mag_array[idx]*imagm << "\t";
@@ -303,9 +312,10 @@ void output_mat_mag(std::ostream& stream){
 				for(int grain=0;grain<grains::num_grains;grain++){
 					// check for grains with zero atoms
 					if(grains::grain_size_array[grain]!=0){
-						stream << grains::x_mag_array[grain] << "\t";
-						stream << grains::y_mag_array[grain] << "\t";
-						stream << grains::z_mag_array[grain] << "\t";
+						const double imagm = 1.0/grains::mag_m_array[grain];
+						stream << grains::x_mag_array[grain]*imagm << "\t";
+						stream << grains::y_mag_array[grain]*imagm << "\t";
+						stream << grains::z_mag_array[grain]*imagm << "\t";
 						stream << grains::mag_m_array[grain] << "\t";
 					}
 				}

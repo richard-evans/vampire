@@ -49,6 +49,7 @@
 
 // Standard Libraries
 #include <cmath>
+#include <math.h>
 #include <cstdlib>
 #include <iostream>
 
@@ -338,8 +339,8 @@ int ConstrainedMonteCarlo(){
 	double Eold;
 	double Enew;
 
-	double spin1_initial[3];
-	double spin1_final[3];
+	std::valarray<double> spin1_initial(3);
+	std::valarray<double> spin1_final(3);
 	double spin2_initial[3];
 	double spin2_final[3];
 
@@ -401,16 +402,8 @@ int ConstrainedMonteCarlo(){
 		spin1_init_mvd[1]=ppolar_matrix[1][0]*spin1_initial[0]+ppolar_matrix[1][1]*spin1_initial[1]+ppolar_matrix[1][2]*spin1_initial[2];
 		spin1_init_mvd[2]=ppolar_matrix[2][0]*spin1_initial[0]+ppolar_matrix[2][1]*spin1_initial[1]+ppolar_matrix[2][2]*spin1_initial[2];
 
-		// move spin randomly cf Pierre Asselin
-		spin1_final[0] = mtrandom::gaussian()*sigma+atoms::x_spin_array[atom_number1];
-		spin1_final[1] = mtrandom::gaussian()*sigma+atoms::y_spin_array[atom_number1];
-		spin1_final[2] = mtrandom::gaussian()*sigma+atoms::z_spin_array[atom_number1];
-
-		sqrt_ran = 1.0/sqrt(spin1_final[0]*spin1_final[0] + spin1_final[1]*spin1_final[1] + spin1_final[2]*spin1_final[2]);
-
-		spin1_final[0] = spin1_final[0]*sqrt_ran;
-		spin1_final[1] = spin1_final[1]*sqrt_ran;
-		spin1_final[2] = spin1_final[2]*sqrt_ran;
+      // Make Monte Carlo move
+      spin1_final=sim::mc_move(spin1_initial);
 
 		//spin1_fin_mvd = matmul(polar_matrix, spin1_final)
 		spin1_fin_mvd[0]=ppolar_matrix[0][0]*spin1_final[0]+ppolar_matrix[0][1]*spin1_final[1]+ppolar_matrix[0][2]*spin1_final[2];

@@ -48,6 +48,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 
 // Standard Libraries
@@ -56,9 +57,9 @@
 namespace sim{
 	std::ofstream mag_file;
 	int time=0;
-	int total_time=1;
-	int loop_time=1;
-	int partial_time=1;
+	int total_time=10000;
+	int loop_time=10000;
+	int partial_time=1000;
 	int equilibration_time=0;
 	int runs=1; // for certain repetitions in programs
 	
@@ -75,13 +76,15 @@ namespace sim{
 	double Hmax=+1.0; // T
 	double Hinc= 0.1; // T
 	double Heq=0.0;
+	double applied_field_angle_phi=0.0;
+	double applied_field_angle_theta=0.0;
+	bool applied_field_set_by_angle=false;
+	
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; // nm/ns
 	bool   head_laser_on=false;
-
 	bool   constraint_rotation=false; // enables rotation of spins to new constraint direction
-	
 	bool   constraint_phi_changed=false; // flag to note change in phi
 	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
 	double constraint_phi_min=0.0; // loop angle min [degrees]
@@ -94,14 +97,32 @@ namespace sim{
 	double constraint_theta_max=0.0; // loop angle max [degrees]
 	double constraint_theta_delta=5.0; // loop angle delta [degrees]
 	
+	// LaGrange multiplier variables
+	double lagrange_lambda_x=0.0;
+   double lagrange_lambda_y=0.0;
+   double lagrange_lambda_z=0.0;
+   double lagrange_m=1.0;
+   double lagrange_N=1000.0;
+   bool   lagrange_multiplier=false;
+
 	double cooling_time=100.0e-12; //seconds
 	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
+	pump_functions_t pump_function=two_temperature;
 	double pump_power=2.4e22;
 	double pump_time=20.0e-15; 
+	double double_pump_power=2.2e22;
+	double double_pump_Tmax=500.0;
+	double double_pump_time=10.0e-15; 
+	double double_pump_delay=10.0e-12;
 	double HeatSinkCouplingConstant=0.0; //1.1e12 ~ sensible value
 	double TTCe = 7.0E02; //electron specific heat
 	double TTCl = 3.0E06; //phonon specific heat
 	double TTG = 17.0E17 ;//electron coupling constant
+	double TTTe = 0.0; // electron temperature
+	double TTTp = 0.0; // phonon temperature
+  
+   double mc_delta_angle=0.1; // Tuned angle for Monte Carlo trial move
+   mc_algorithms mc_algorithm=hinzke_nowak;
   
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
@@ -117,8 +138,14 @@ namespace sim{
 	// Anisotropy control booleans
 	bool UniaxialScalarAnisotropy=false; // Enables scalar uniaxial anisotropy
 	bool TensorAnisotropy=false; // Overrides scalar uniaxial anisotropy
+	bool second_order_uniaxial_anisotropy=false; // Enables second order uniaxial anisotropy
 	bool CubicScalarAnisotropy=false; // Enables scalar cubic anisotropy
-	
+   bool lattice_anisotropy_flag=false; // Enables lattice anisotropy
+
+	bool local_temperature=false; // flag to enable material specific temperature
+	bool local_applied_field=false; // flag to enable material specific applied field
+	bool local_fmr_field=false; // flag to enable material specific fmr field
+
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);
@@ -146,6 +173,7 @@ namespace sim{
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
 		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
+		if(sim::lagrange_multiplier) update_lagrange_lambda();
 	}
 	
 /// @brief Function to run one a single program
@@ -177,9 +205,11 @@ int run(){
 	if(vmpi::my_rank==0){
 		#ifdef MPICF
 			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
+			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
 			vmpi::start_time=MPI_Wtime(); // reset timer
 		#endif
 		std::cout << "Starting Simulation with Program ";
+		zlog << zTs() << "Starting Simulation with Program ";
 	}
 
 	// Now set initial compute time
@@ -197,68 +227,118 @@ int run(){
 	// Select program to run
 	switch(sim::program){
 		case 0:
-			if(vmpi::my_rank==0) std::cout << "Benchmark..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Benchmark..." << std::endl;
+				zlog << "Benchmark..." << std::endl;
+			}
 			program::bmark();
 			break;
 		
 		case 1:
-			if(vmpi::my_rank==0) std::cout << "Time-Series..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Time-Series..." << std::endl;
+				zlog << "Time-Series..." << std::endl;
+			}
 			program::time_series();
 			break;
 		
 		case 2: 
-			if(vmpi::my_rank==0) std::cout << "Hysteresis-Loop..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Hysteresis-Loop..." << std::endl;
+				zlog << "Hysteresis-Loop..." << std::endl;
+			}
 			program::hysteresis();
 			break;
 			
 		case 3: 
-			if(vmpi::my_rank==0) std::cout << "Static-Hysteresis-Loop..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Static-Hysteresis-Loop..." << std::endl;
+				zlog << "Static-Hysteresis-Loop..." << std::endl;
+			}
 			program::static_hysteresis();
 			break;
 			
 		case 4:
-			if(vmpi::my_rank==0) std::cout << "Curie-Temperature..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Curie-Temperature..." << std::endl;
+				zlog << "Curie-Temperature..." << std::endl;
+			}
 			program::curie_temperature();
 			break;
 			
 		case 5:
-			if(vmpi::my_rank==0) std::cout << "Field-Cool..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Field-Cool..." << std::endl;
+				zlog << "Field-Cool..." << std::endl;
+			}
 			program::field_cool();
 			break;
 
 		case 6:
-			if(vmpi::my_rank==0) std::cout << "Two-Temperature-Pulse..." << std::endl; 
-			program::two_temperature_pulse();
+			if(vmpi::my_rank==0){
+				std::cout << "Temperature-Pulse..." << std::endl;
+				zlog << "Temperature-Pulse..." << std::endl;
+			}
+			program::temperature_pulse();
 			break;
 			
 		case 7:
-			if(vmpi::my_rank==0) std::cout << "HAMR-Simulation..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "HAMR-Simulation..." << std::endl;
+				zlog << "HAMR-Simulation..." << std::endl;
+			}
 			program::hamr();
 			break;
 			
 		case 8:
-			if(vmpi::my_rank==0) std::cout << "CMC-Anisotropy..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "CMC-Anisotropy..." << std::endl;
+				zlog << "CMC-Anisotropy..." << std::endl;
+			}
 			program::cmc_anisotropy();
 			break;
 			
 		case 9:
-			if(vmpi::my_rank==0) std::cout << "Hybrid-CMC..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Hybrid-CMC..." << std::endl;
+				zlog << "Hybrid-CMC..." << std::endl;
+			}
 			program::hybrid_cmc();
 			break;
 			
+      case 10:
+         if(vmpi::my_rank==0){
+            std::cout << "Reverse-Hybrid-CMC..." << std::endl;
+            zlog << "Reverse-Hybrid-CMC..." << std::endl;
+         }
+         program::reverse_hybrid_cmc();
+         break;
+
+      case 11:
+         if(vmpi::my_rank==0){
+            std::cout << "LaGrange-Multiplier..." << std::endl;
+            zlog << "LaGrange-Multiplier..." << std::endl;
+         }
+         program::lagrange_multiplier();
+         break;
+
 		case 50:
-			if(vmpi::my_rank==0) std::cout << "Diagnostic-Boltzmann..." << std::endl; 
+			if(vmpi::my_rank==0){
+				std::cout << "Diagnostic-Boltzmann..." << std::endl;
+				zlog << "Diagnostic-Boltzmann..." << std::endl;
+			}
 			program::boltzmann_dist();
 			break;
 		
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
+			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);
 			}
 	}
 
 	// output Monte Carlo Statistics if applicable
-	if(sim::integrator==3){
+	if(sim::integrator==3 || sim::integrator==4){
 		std::cout << "Constrained Monte Carlo Statistics:" << std::endl;
 		std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
 		std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0 << "% Accepted" << std::endl;

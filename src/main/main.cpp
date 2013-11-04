@@ -39,113 +39,115 @@ int simulate_system();
 /// Prints out program header and calls main program routines
 int main(int argc, char* argv[]){
 
+   //=============================================================
+   // Check for valid command-line arguments
+   //=============================================================
+   std::string infile="input";
 
-	//=============================================================
-	// Check for valid command-line arguments
-	//=============================================================
-	std::string infile="input";
-	
-	for(int arg = 1; arg < argc; arg++){
-		std::string sw=argv[arg];
-		// input file
-		if(sw=="-f"){
-			// check number of args not exceeded
-			if(arg+1 < argc){
-				arg++;
-				infile=string(argv[arg]);
-			}
-			else{
-				std::cerr << "Error - no file specified for \'-f\' command line option" << std::endl;
-				return EXIT_FAILURE;
-			}
-		}
-		else{
-			std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
-			return EXIT_FAILURE;
-		}
-	}
-	
-	// For parallel execution intialise MPI
-	#ifdef MPICF
-		vmpi::initialise();
-	#endif 
-	
-	// Initialise log file
-	vout::zLogTsInit(std::string(argv[0]));
-		
-	// Output Program Header
-	if(vmpi::my_rank==0){
-		std::cout << "                                                _          " << std::endl;
-		std::cout << "                                               (_)         " << std::endl;
-		std::cout << "                    __   ____ _ _ __ ___  _ __  _ _ __ ___ " << std::endl;
-		std::cout << "                    \\ \\ / / _` | '_ ` _ \\| '_ \\| | '__/ _ \\" << std::endl;
-		std::cout << "                     \\ V / (_| | | | | | | |_) | | | |  __/" << std::endl;
-		std::cout << "                      \\_/ \\__,_|_| |_| |_| .__/|_|_|  \\___|" << std::endl;
-		std::cout << "                                         | |               " << std::endl;
-		std::cout << "                                         |_|               " << std::endl;
-		std::cout << std::endl;
-		std::cout << "                       Version 2.0 " << __DATE__ << " " << __TIME__ << std::endl;
-		std::cout << std::endl;
+   for(int arg = 1; arg < argc; arg++){
+      std::string sw=argv[arg];
+      // input file
+      if(sw=="-f"){
+         // check number of args not exceeded
+         if(arg+1 < argc){
+            arg++;
+            infile=string(argv[arg]);
+         }
+         else{
+            std::cerr << "Error - no file specified for \'-f\' command line option" << std::endl;
+            return EXIT_FAILURE;
+         }
+      }
+      else{
+         std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
+         return EXIT_FAILURE;
+      }
+   }
 
-		std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
-		std::cout << std::endl;
-		std::cout << "  Contributors: Richard F L Evans, Weijia Fan, Joe Barker, " << std::endl;
-		std::cout << "                Thomas Ostler, Phanwadee Chureemart, Roy W Chantrell" << std::endl;
-		std::cout << " " << std::endl;
-		#ifdef COMP	
-		std::cout << "                Compiled with:  " << COMP << std::endl;
-		#endif 
-		std::cout << "                Compiler Flags: ";
-		#ifdef CUDA
-		std::cout << "CUDA ";
-		#endif
-		#ifdef MPICF
-		std::cout << "MPI ";
-		#endif
-		std::cout << std::endl;
-		std::cout << std::endl;
-		std::cout << "================================================================================" << std::endl;
-		time_t rawtime = time(NULL);
-		struct tm * timeinfo = localtime(&rawtime);
-		std::cout<<asctime(timeinfo);
-	}
+   // For parallel execution intialise MPI
+   #ifdef MPICF
+      vmpi::initialise();
+   #endif
+
+   // Initialise log file
+   vout::zLogTsInit(std::string(argv[0]));
+
+   // Output Program Header
+   if(vmpi::my_rank==0){
+      std::cout << "                                                _          " << std::endl;
+      std::cout << "                                               (_)         " << std::endl;
+      std::cout << "                    __   ____ _ _ __ ___  _ __  _ _ __ ___ " << std::endl;
+      std::cout << "                    \\ \\ / / _` | '_ ` _ \\| '_ \\| | '__/ _ \\" << std::endl;
+      std::cout << "                     \\ V / (_| | | | | | | |_) | | | |  __/" << std::endl;
+      std::cout << "                      \\_/ \\__,_|_| |_| |_| .__/|_|_|  \\___|" << std::endl;
+      std::cout << "                                         | |               " << std::endl;
+      std::cout << "                                         |_|               " << std::endl;
+      std::cout << std::endl;
+      std::cout << "                       Version 3.0 " << __DATE__ << " " << __TIME__ << std::endl;
+      std::cout << std::endl;
+
+      std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
+      std::cout << std::endl;
+      std::cout << "  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>" << std::endl;
+      std::cout << std::endl;
+      std::cout << "  Contributors: Weijia Fan, Phanwadee Chureemart, Joe Barker, " << std::endl;
+      std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell" << std::endl;
+      std::cout << " " << std::endl;
+      #ifdef COMP
+      std::cout << "                Compiled with:  " << COMP << std::endl;
+      #endif
+      std::cout << "                Compiler Flags: ";
+      #ifdef CUDA
+      std::cout << "CUDA ";
+      #endif
+      #ifdef MPICF
+      std::cout << "MPI ";
+      #endif
+      std::cout << std::endl;
+      std::cout << std::endl;
+      std::cout << "================================================================================" << std::endl;
+      time_t rawtime = time(NULL);
+      struct tm * timeinfo = localtime(&rawtime);
+      std::cout<<asctime(timeinfo);
+   }
 
 
-	#ifdef MPICF
-		vmpi::hosts();
-	#endif 
+   #ifdef MPICF
+      vmpi::hosts();
+   #endif
   
-#ifdef MPICF
-  // nullify non root cout stream
-  if(vmpi::my_rank!=0){
-    vout::nullify(std::cout);
-  }
-  #endif
-  // redirect std::err to file
-  //std::stringstream ss;
-  //ss << "vampire."<<vmpi::my_rank<<".err";
-  //vout::redirect(std::cerr,ss.str());
-	
+   #ifdef MPICF
+      // nullify non root cout stream
+      if(vmpi::my_rank!=0){
+         vout::nullify(std::cout);
+      }
+   #endif
 
-	// Initialise system
-	mp::initialise(infile);
+   // Initialise system
+   mp::initialise(infile);
 
-	// Create system
-	cs::create();
+   // Create system
+   cs::create();
 
-	// Simulate system
-	sim::run();
+   // Simulate system
+   sim::run();
 
-	// Finalise MPI
-	#ifdef MPICF
-		vmpi::finalise();
-		// concatenate log, sort, and appen departure message.
-		if(vmpi::num_processors!=1) system("ls zlog.* | xargs cat | sort -n > zlog");
-	#endif
+   // Finalise MPI
+   #ifdef MPICF
+      vmpi::finalise();
+      // concatenate log, sort, and append departure message.
+      #ifdef WIN_COMPILE
+         if(vmpi::num_processors!=1 && vmpi::my_rank==0) system("type log.* 2>NUL | sort > log");
+      #else
+         if(vmpi::num_processors!=1 && vmpi::my_rank==0) system("ls log.* | xargs cat | sort -n > log");
+      #endif
+   #endif
 
-	zlog << zTs() << "Program ended gracefully. Exiting." << std::endl;
+   zlog << zTs() << "Simulation ended gracefully." << std::endl;
+   std::cout << "Simulation ended gracefully." << std::endl;
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
+
 }
 
 /// \mainpage Vampire

@@ -71,5 +71,16 @@ namespace stats
 	extern double MeanChiDataCounter;
 	extern double ChiAtoms;
 	extern bool CalculateSusceptibility;
-	
+
+   extern bool calculate_energy;
+
+   // Statistics energy types
+   enum energy_t { all=0, exchange=1, anisotropy=2, cubic_anisotropy=3, surface_anisotropy=4,applied_field=5, magnetostatic=6, second_order_anisotropy=7 };
+
+   // Statistics types
+   enum stat_t { total=0, mean=1};
+
+   // Statistics output functions
+   extern void output_energy(std::ostream&, enum energy_t, enum stat_t);
+
 }

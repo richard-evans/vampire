@@ -27,6 +27,11 @@
 
 //Headers
 #include <fstream>
+#include <valarray>
+#include <vector>
+
+// Enumerated lists for code readability
+enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
 	extern std::ofstream mag_file;
@@ -50,6 +55,10 @@ namespace sim{
 	extern double Hmax; // T
 	extern double Hinc; // T
 	extern double Heq; //T
+	extern double applied_field_angle_phi;
+	extern double applied_field_angle_theta;
+	extern bool applied_field_set_by_angle;
+	
 	extern double demag_factor[3];
 	
 	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
@@ -68,20 +77,32 @@ namespace sim{
 	extern double constraint_theta_min; // loop angle min [degrees]
 	extern double constraint_theta_max; // loop angle max [degrees]
 	extern double constraint_theta_delta; // loop angle delta [degrees]
-	
+
+	// Monte Carlo variables
+	extern double mc_delta_angle; // Tuned angle for Monte Carlo trial move
+	enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak};
+   extern mc_algorithms mc_algorithm; // Selected algorith for Monte Carlo simulations
+
 	extern double head_position[2];
 	extern double head_speed;
 	extern bool   head_laser_on;
 	
 	extern double cooling_time;
 	extern int cooling_function_flag;
+	extern pump_functions_t pump_function;
 	extern double pump_time;
 	extern double pump_power;
+	extern double double_pump_time;
+	extern double double_pump_power;
+	extern double double_pump_Tmax;
+	extern double double_pump_delay;
 	extern double HeatSinkCouplingConstant;
 	extern double TTCe; //electron specific heat
 	extern double TTCl; //phonon specific heat
 	extern double TTG;//electron coupling constant    
-
+	extern double TTTe; // electron temperature
+	extern double TTTp; // phonon temperature
+	
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 	
@@ -97,8 +118,15 @@ namespace sim{
 	// Anisotropy control booleans
 	extern bool UniaxialScalarAnisotropy; // Enables scalar uniaxial anisotropy
 	extern bool TensorAnisotropy; // Overrides vector uniaxial anisotropy (even slower)
+	extern bool second_order_uniaxial_anisotropy; // Enables second order uniaxial anisotropy
 	extern bool CubicScalarAnisotropy; // Enables scalar cubic anisotropy
 	extern bool EnableUniaxialAnisotropyUnitVector; // enables anisotropy tensor if any material has non z-axis K
+   extern bool lattice_anisotropy_flag; // Enables lattice anisotropy
+
+	// Local system variables
+	extern bool local_temperature; // flag to enable material specific temperature
+	extern bool local_applied_field; // flag to enable material specific applied field
+	extern bool local_fmr_field; // flag to enable material specific fmr field
 
 	
 	// Wrapper Functions
@@ -121,15 +149,36 @@ namespace sim{
 	extern int MonteCarlo();
 	extern int ConstrainedMonteCarlo();
 	extern int ConstrainedMonteCarloMonteCarlo();
-	
+	extern std::valarray<double> mc_move(std::valarray<double>&);
+
 	// Integrator initialisers
 	extern void CMCinit();
 	extern int LLGinit();
 	extern void CMCMCinit();
-	
+
 	// Field and energy functions
 	extern double calculate_spin_energy(const int, const int);
+   extern double spin_exchange_energy_isotropic(const int, const double, const double , const double );
+   extern double spin_exchange_energy_vector(const int, const double, const double, const double);
+   extern double spin_exchange_energy_tensor(const int, const double, const double, const double);
+   extern double spin_scalar_anisotropy_energy(const int, const double);
+   extern double spin_second_order_uniaxial_anisotropy_energy(const int, const double, const double, const double);
+   extern double spin_lattice_anisotropy_energy(const int, const double);
+   extern double spin_cubic_anisotropy_energy(const int, const double, const double, const double);
+   extern double spin_tensor_anisotropy_energy(const int, const double, const double, const double);
+   extern double spin_surface_anisotropy_energy(const int, const int, const double, const double, const double);
+   extern double spin_applied_field_energy(const double, const double, const double);
+   extern double spin_magnetostatic_energy(const int, const double, const double, const double);
+   extern double lattice_anisotropy_function(const double, const int);
 
+   // LaGrange multiplier variables
+   extern double lagrange_lambda_x;
+   extern double lagrange_lambda_y;
+   extern double lagrange_lambda_z;
+   extern double lagrange_m;
+   extern double lagrange_N;
+   extern bool   lagrange_multiplier;
+   extern void   update_lagrange_lambda();
 }
 
 namespace cmc{

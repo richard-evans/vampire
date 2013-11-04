@@ -90,13 +90,13 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		cneighbourlist[atom].reserve(max_nn);
 	}
 
-	// Calculate system dimensions and number of supercells
-	unsigned int max_val=std::numeric_limits<unsigned int>::max();
-	unsigned int min[3]={max_val,max_val,max_val}; // lowest cell id
-	unsigned int max[3]={0,0,0}; // highest cell id
+   // Calculate system dimensions and number of supercells
+   int max_val=std::numeric_limits<int>::max();
+   int min[3]={max_val,max_val,max_val}; // lowest cell id
+   int max[3]={0,0,0}; // highest cell id
 
 	for(int atom=0;atom<num_atoms;atom++){
-		unsigned int c[3]={catom_array[atom].scx,catom_array[atom].scy,catom_array[atom].scz};
+		int c[3]={catom_array[atom].scx,catom_array[atom].scy,catom_array[atom].scz};
 		for(int i=0;i<3;i++){
 			if(c[i]<min[i]){
 				min[i]=c[i];
@@ -106,10 +106,10 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 	}
-	
+
 	// calculate offset and cell maximum in whole unit cells
-	const unsigned int offset[3] = {min[0], min[1], min[2]};
-	const unsigned int max_cell[3] = {max[0],max[1],max[2]};
+	const int offset[3] = {min[0], min[1], min[2]};
+	const int max_cell[3] = {max[0],max[1],max[2]};
 	
 	// calculate number of cells needed = max-min+1 ( if max_cell = 25, then 0-25 = 26
 	const unsigned int d[3]={max_cell[0]-offset[0]+1,max_cell[1]-offset[1]+1,max_cell[2]-offset[2]+1};

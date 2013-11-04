@@ -45,6 +45,7 @@
 // Headers
 #include "errors.hpp"
 #include "units.hpp"
+#include "vio.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -57,7 +58,7 @@
 ///
 namespace units {
 	
-	const int max_units=34;
+	const int max_units=43;
 
 	const double pi=3.14;
 	//const double bohr_magneton=7.0;
@@ -95,7 +96,7 @@ int init(){
 		using units::unit;
 		using units::conversion;
 		// Distances
-		unit[0]="";				conversion[0]=1.0; 			type[0]="length";		// Default (No conversion)
+		unit[0]="";				conversion[0]=1.0; 			type[0]="none";		// Default (No conversion)
 		unit[1]="A";			conversion[1]=1.0; 			type[1]="length";		// Angstrom (Internal)
 		unit[2]="m";			conversion[2]=1.0E10; 		type[2]="length";		// Metres
 		unit[3]="cm";			conversion[3]=1.0E8; 		type[3]="length";		// Centimetres
@@ -119,7 +120,7 @@ int init(){
 		unit[19]="erg/G";		conversion[19]=1.0E-3; 				type[19]="moment";		// Erg/Gauss
 		unit[20]="abAcmcm";	conversion[20]=1.0E-3; 				type[20]="moment";		// Abampere centimetre squared
 		unit[21]="muB";		conversion[21]=9.27400915e-24; 	type[21]="moment";		// Bohr Magnetons
-		unit[22]="eV/T";		conversion[22]=1.602176487e-19;	type[22]="moment";		// Amps/metre squared
+		unit[22]="eV/T";		conversion[22]=1.602176487e-19;	type[22]="moment";		// Electron volts/Tesla
 		unit[23]="erg/Oe";	conversion[23]=1.0E-3; 				type[23]="moment";		// Erg/Oersted
 		// Magnetisation
 		unit[24]="A/m";		conversion[24]=2.17987208E-18;	type[24]="magnetisation";	// Amps/metre
@@ -132,9 +133,20 @@ int init(){
 		// Field
 		unit[30]="T";			conversion[30]=1.0; 					type[30]="field";		// Tesla
 		unit[31]="mT";			conversion[31]=1.0E-3;		 		type[31]="field";		// milliTesla
-		unit[32]="Oe";			conversion[32]=1.0E-4;				type[32]="field";		// Oersted
-		unit[33]="kOe";		conversion[33]=1.0E-1; 				type[33]="field";		// kilo Oersted
+		unit[32]="uT";			conversion[32]=1.0E-6;		 		type[32]="field";		// microTesla
+		unit[33]="Oe";			conversion[33]=1.0E-4;				type[33]="field";		// Oersted
+		unit[34]="kOe";		conversion[34]=1.0E-1; 				type[34]="field";		// kilo Oersted
+		// Time
+		unit[35]="s";			conversion[35]=1.0;					type[35]="time"; // seconds
+		unit[36]="ms";			conversion[36]=1.0E-3;				type[36]="time"; // milliseconds
+		unit[37]="us";			conversion[37]=1.0E-6;				type[37]="time"; // microseconds
+		unit[38]="ns";			conversion[38]=1.0E-9;				type[38]="time"; // nanoseconds
+		unit[39]="ps";			conversion[39]=1.0E-12;				type[39]="time"; // picoseconds
+		unit[40]="fs";			conversion[40]=1.0E-15;				type[40]="time"; // femtoseconds
+		unit[41]="as";			conversion[41]=1.0E-18;				type[41]="time"; // attoseconds
+		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
 
+      // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag
 		units::initialised=true;
 		
@@ -183,12 +195,8 @@ int init(){
 			}
 		}
 
-		// Error if unit not found
-		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
-		err::vexit();
-		
-		return EXIT_SUCCESS;
-		
+		return EXIT_FAILURE;
+
 	}
 
 /// @brief Converts array of external units to internal units.
@@ -235,6 +243,7 @@ int init(){
 
 		// Error if unit not found
 		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
+		zlog << zTs() << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
 		err::vexit();
 
 	}

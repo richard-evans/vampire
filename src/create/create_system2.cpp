@@ -85,13 +85,29 @@ namespace cs{
 	int particle_creation_parity=0; // Offset of particle centre (odd/even)
 	double particle_scale=50.0;     // Diameter of particles/grains (A)
 	double particle_spacing=10.0;   // Spacing Between particles (A)
-
+	double particle_array_offset_x=0.0; // Offset particle array along x-direction;
+	double particle_array_offset_y=0.0; // Offset particle array along y-direction;
+   double particle_shape_factor_x=1.0; // Normalised particle shape
+   double particle_shape_factor_y=1.0; // Normalised particle shape
+   double particle_shape_factor_z=1.0; // Normalised particle shape
 
 	// Other directives and flags
 	bool single_spin=false;
 	int system_creation_flags[10]={0,0,0,0,0,0,0,0,0,0};
 	std::string unit_cell_file="";
+	bool fill_core_shell=true;
 	
+	// Variables for interfacial roughness control
+	bool interfacial_roughness=false;
+	bool interfacial_roughness_local_height_field=false;
+	int interfacial_roughness_type=0; // Sets peaks (1), troughs (-1) or both (0)
+	unsigned int interfacial_roughness_random_seed=23456;
+	unsigned int interfacial_roughness_seed_count=20; // Number of seeds
+	double interfacial_roughness_height_field_resolution=3.5; // Angstroms
+	double interfacial_roughness_mean_seed_radius=30.0; // Angstroms
+	double interfacial_roughness_seed_radius_variance=0.5; // Variance as fraction of mean radius
+	double interfacial_roughness_mean_seed_height=3.0; // Angstroms
+	double interfacial_roughness_seed_height_max=1.8; // Angstroms
 	
 	// unit cell container
 	cs::unit_cell_t unit_cell;
@@ -124,6 +140,12 @@ int create(){
 	cs::unit_cell_size[1]=unit_cell.dimensions[1];
 	cs::unit_cell_size[2]=unit_cell.dimensions[2];
 	
+   // Calculate number of global and local unit cells required (rounding up)
+   // Must be set before rounding up system dimensions for periodic boundary conditions
+   cs::total_num_unit_cells[0]=int(vmath::iceil(cs::system_dimensions[0]/unit_cell.dimensions[0]));
+   cs::total_num_unit_cells[1]=int(vmath::iceil(cs::system_dimensions[1]/unit_cell.dimensions[1]));
+   cs::total_num_unit_cells[2]=int(vmath::iceil(cs::system_dimensions[2]/unit_cell.dimensions[2]));
+
 	// check for pbc and if so round up system dimensions
 	if(cs::pbc[0]==true) cs::system_dimensions[0]=cs::unit_cell_size[0]*(int(vmath::iceil(cs::system_dimensions[0]/cs::unit_cell_size[0])));
 	if(cs::pbc[1]==true) cs::system_dimensions[1]=cs::unit_cell_size[1]*(int(vmath::iceil(cs::system_dimensions[1]/cs::unit_cell_size[1])));

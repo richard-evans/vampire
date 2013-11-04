@@ -36,6 +36,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <sstream>
 //==========================================================
 // Namespace material_parameters
 //==========================================================
@@ -69,6 +70,7 @@ namespace mp{
 	std::vector <double> MaterialMuSSIArray(0);
 	std::vector <zkval_t> MaterialScalarAnisotropyArray(0);
 	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
+   std::vector <double> material_second_order_anisotropy_constant_array(0);
 	std::vector <double> MaterialCubicAnisotropyArray(0);
 
 ///
@@ -160,27 +162,11 @@ int default_system(){
 	sim::hamiltonian_simulation_flags[2] = 1;	// Applied
 	sim::hamiltonian_simulation_flags[3] = 1;	// Thermal
 	sim::hamiltonian_simulation_flags[4] = 0;	// Dipolar
-
-	// Setup Simulation Variables
-	sim::total_time = 1000000;			// total simulation time (single run)
-	sim::loop_time = 0;			// time in loop, eg hysteresis, Tc
-	sim::partial_time=100;			// time between statistics collection
-	sim::equilibration_time=100000;	// time for equilibration before main loop
-	sim::temperature = 0.0;	// Constant system temperature
-
-	// demag variables
-	//demag::demag_resolution=2;
-	//demag::update_rate=10000;
 	
 	//Integration parameters
 	dt_SI = 1.0e-15;	// seconds
 	dt = dt_SI*mp::gamma_SI; // Must be set before Hth
 	half_dt = 0.5*dt;
-
-	// MPI Mode (Assume decomposition)
-	//vmpi::mpi_mode=1;
-	//mpi_create_variables::mpi_interaction_range=2; // Unit cells
-	//mpi_create_variables::mpi_comms_identify=true;
 	
 	//------------------------------------------------------------------------------
 	// Material Definitions
@@ -248,11 +234,34 @@ int set_derived_parameters(){
 	mp::dt = mp::dt_SI*mp::gamma_SI; // Must be set before Hth
 	mp::half_dt = 0.5*mp::dt;
 
+	// Check to see if field direction is set by angle
+	if(sim::applied_field_set_by_angle){
+		sim::H_vec[0]=sin(sim::applied_field_angle_phi*M_PI/180.0)*cos(sim::applied_field_angle_theta*M_PI/180.0);
+		sim::H_vec[1]=sin(sim::applied_field_angle_phi*M_PI/180.0)*sin(sim::applied_field_angle_theta*M_PI/180.0);
+		sim::H_vec[2]=cos(sim::applied_field_angle_phi*M_PI/180.0);
+	}
+	
+	// Check for valid particle array offsets
+	if(cs::particle_array_offset_x >= cs::system_dimensions[0]){
+		std::cerr << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl; 
+		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		zlog << zTs() << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl; 
+		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+	}
+	if(cs::particle_array_offset_y >= cs::system_dimensions[1]){
+		std::cerr << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl; 
+		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		zlog << zTs() << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl; 
+		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+	}
+	
+	
 	// Ensure H vector is unit length
-	double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
-	sim::H_vec[0]*=mod_H;
-	sim::H_vec[1]*=mod_H;
-	sim::H_vec[2]*=mod_H;
+	// **RE edit 21.11.12 - no longer necessary as value checked on user input**
+	//double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
+	//sim::H_vec[0]*=mod_H;
+	//sim::H_vec[1]*=mod_H;
+	//sim::H_vec[2]*=mod_H;
 
 	// Calculate moment, magnetisation, and anisotropy constants
 	/*for(int mat=0;mat<mp::num_materials;mat++){
@@ -274,8 +283,8 @@ int set_derived_parameters(){
 	const string blank="";
 	// Set derived material parameters
 	for(int mat=0;mat<mp::num_materials;mat++){
-		mp::material[mat].one_oneplusalpha_sq			=-mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
-		mp::material[mat].alpha_oneplusalpha_sq			= mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
+		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
+		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
 		
 		// set initial spins to unit length
 		double sx = mp::material[mat].initial_spin[0];
@@ -291,10 +300,20 @@ int set_derived_parameters(){
 			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
 		}
 		mp::material[mat].Ku									= mp::material[mat].Ku1_SI/mp::material[mat].mu_s_SI;
+      mp::material[mat].Ku2                        = mp::material[mat].Ku2_SI/mp::material[mat].mu_s_SI;
+      mp::material[mat].Klatt                      = mp::material[mat].Klatt_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].Kc									= mp::material[mat].Kc1_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].Ks									= mp::material[mat].Ks_SI/mp::material[mat].mu_s_SI;
 		mp::material[mat].H_th_sigma						= sqrt(2.0*mp::material[mat].alpha*1.3806503e-23/
 																  (mp::material[mat].mu_s_SI*mp::material[mat].gamma_rel*dt));
+
+      // Rename un-named materials with material id
+      std::string defname="material#n";
+      if(mp::material[mat].name==defname){
+         std::stringstream newname;
+         newname << "material" << mat+1;
+         mp::material[mat].name=newname.str();
+      }
 	}
 		// Check for which anisotropy function(s) are to be used		
 		if(sim::TensorAnisotropy==true){
@@ -365,7 +384,13 @@ int set_derived_parameters(){
 
 			}
 		}
-		// Unroll cubic anisotropy values for speed
+      // Unroll second order uniaxial anisotropy values for speed
+      if(sim::second_order_uniaxial_anisotropy==true){
+         zlog << zTs() << "Setting scalar second order uniaxial anisotropy." << std::endl;
+         mp::material_second_order_anisotropy_constant_array.resize(mp::num_materials);
+         for(int mat=0;mat<mp::num_materials; mat++) mp::material_second_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku2;
+      }
+      // Unroll cubic anisotropy values for speed
 		if(sim::CubicScalarAnisotropy==true){
 			zlog << zTs() << "Setting scalar cubic anisotropy." << std::endl;
 			MaterialCubicAnisotropyArray.resize(mp::num_materials);
@@ -382,13 +407,13 @@ int set_derived_parameters(){
 					double max=material[nmat].max;
 					if(((lmin>min) && (lmin<max)) || ((lmax>min) && (lmax<max))){
 						std::cerr << "Warning: Overlapping material heights found. Check log for details." << std::endl;
-						zlog << zTs() << "Warning: material " << mat << " overlaps material " << nmat << "." << std::endl;
+						zlog << zTs() << "Warning: material " << mat+1 << " overlaps material " << nmat+1 << "." << std::endl;
 						zlog << zTs() << "If you have defined geometry then this may be OK, or possibly you meant to specify alloy keyword instead." << std::endl;
 						zlog << zTs() << "----------------------------------------------------" << std::endl;
-						zlog << zTs() << "  Material "<< mat << ":min = " << lmin << std::endl;
-						zlog << zTs() << "  Material "<< mat << ":max = " << lmax << std::endl;
-						zlog << zTs() << "  Material "<< nmat << ":min = " << min << std::endl;
-						zlog << zTs() << "  Material "<< nmat << ":max = " << max << std::endl;
+						zlog << zTs() << "  Material "<< mat+1 << ":minimum-height = " << lmin << std::endl;
+						zlog << zTs() << "  Material "<< mat+1 << ":maximum-height = " << lmax << std::endl;
+						zlog << zTs() << "  Material "<< nmat+1 << ":minimum-height = " << min << std::endl;
+						zlog << zTs() << "  Material "<< nmat+1 << ":maximum-height = " << max << std::endl;
 					}
 				}
 			}

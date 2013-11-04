@@ -44,51 +44,36 @@
 #include <list>
 
 namespace cs{
-	
-	
-	
-	//======================================================================
-	//                         create_system_type
-	//   Subroutine to set system size and create desired crystal structure
-	//
-	//======================================================================	
+
+   //----------------------------------------
+   // function prototypes
+   //----------------------------------------
+   int particle(std::vector<cs::catom_t> &);
+   int particle_array(std::vector<cs::catom_t> &);
+
+   int alloy(std::vector<cs::catom_t> &);
+   int intermixing(std::vector<cs::catom_t> &);
+   void dilute(std::vector<cs::catom_t> &);
+   void geometry(std::vector<cs::catom_t> &);
+   void fill(std::vector<cs::catom_t> &);
+   void roughness(std::vector<cs::catom_t> &);
+   void calculate_atomic_composition(std::vector<cs::catom_t> &);
+
+//======================================================================
+//                         create_system_type
+//   Subroutine to set system size and create desired crystal structure
+//
+//======================================================================
 int create_system_type(std::vector<cs::catom_t> & catom_array){
 
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
 	if(err::check==true){std::cout << "cs::create_system_type has been called" << std::endl;}
-	
-	//----------------------------------------
-	// function prototypes
-	//----------------------------------------
-	
-	int particle(std::vector<cs::catom_t> &);
-	int particle_array(std::vector<cs::catom_t> &);
-	
-	int alloy(std::vector<cs::catom_t> &);
-	int intermixing(std::vector<cs::catom_t> &);
-	void dilute(std::vector<cs::catom_t> &);
-	void geometry(std::vector<cs::catom_t> &);
 
-	//int particle_array(int,int**,int*);
-	//int hex_particle_array(int,int**,int*);
-	//int voronoi_film(int**,double*,int*);
-	//int pop_template_2D(int**,int,int**,int*,int*);
-	//int cs_calc_grain_vol(int,int*);
-	//int multilayer(int,int**,int*,int*);
-	//int core_shell(int,int**,int*,int*);
-	//int mpi_create_system_type(int,int**,int*,int*);
 	//----------------------------------------
 	// Local variables
 	//----------------------------------------
-	
-	//int* particle_include_array;
-	//int** template_array_2D;
-	//int atom;
-	//int new_num_atoms;
-
-
 	
 	//----------------------------------------------------------------------------------
 	// Choose which system type to create
@@ -122,11 +107,18 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			}
 		}
 
+		// call fill function to fill in void
+		fill(catom_array);
+
 		// call geometry function
 		geometry(catom_array);
-		
+
 		// call intermixing function - must be before alloy function
 		intermixing(catom_array);
+
+		// call surface roughness function
+		// Formally called here but now moved to crystal structure generation
+		//roughness(catom_array);
 
 		// call alloy function
 		alloy(catom_array);
@@ -137,6 +129,9 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
 		
+		// Calculate final atomic composition
+		calculate_atomic_composition(catom_array);
+
 		// Check for zero atoms generated
 		if(catom_array.size()==0){
 			std::cerr << "Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!" << std::endl;
@@ -197,6 +192,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
 		case 2: // Cylinder
 			cylinder(particle_origin,catom_array,0);
 			break;
+      case 3: // Ellipsoid
+         ellipsoid(particle_origin,catom_array,0);
+         break;
 		case 4: // Sphere
 			sphere(particle_origin,catom_array,0);
 			break;
@@ -224,7 +222,6 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 	//
 	//							Version 1.0 R Evans 23/09/2008
 	//
-	//					Note: particle counter doesn't do anything (yet)
 	//
 	//====================================================================================
 
@@ -233,9 +230,8 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 
 	// Set number of particles in x and y directions
 	const double repeat_size = cs::particle_scale+cs::particle_spacing;
-	int num_x_particle = vmath::iround(cs::system_dimensions[0]/repeat_size);
-	int num_y_particle = vmath::iround(cs::system_dimensions[1]/repeat_size);
-	
+	int num_x_particle = vmath::iceil(cs::system_dimensions[0]/repeat_size);
+	int num_y_particle = vmath::iceil(cs::system_dimensions[1]/repeat_size);
 
 	// Loop to generate cubic lattice points
 	int particle_number=0;
@@ -244,13 +240,10 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 		for (int y_particle=0;y_particle < num_y_particle;y_particle++){
 
 			double particle_origin[3];
-			// find centre unit cell
-			//particle_origin[0] = double(iround(cs::system_dimensions[0]/(2.0*cs::unit_cell_size[0])))*cs::unit_cell_size[0];
-			//particle_origin[1] = double(iround(cs::system_dimensions[1]/(2.0*cs::unit_cell_size[1])))*cs::unit_cell_size[1];
-			//particle_origin[2] = double(iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
+
 			// Determine particle origin
-			particle_origin[0] = double(x_particle)*repeat_size + repeat_size;
-			particle_origin[1] = double(y_particle)*repeat_size + repeat_size;
+			particle_origin[0] = double(x_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_x;
+			particle_origin[1] = double(y_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_y;
 			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
 
 			if(cs::particle_creation_parity==1){
@@ -259,8 +252,8 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 				particle_origin[2]+=unit_cell.dimensions[2]*0.5;
 			}
 			// Check to see if a complete particle fits within the system bounds
-			if((particle_origin[0]<(cs::system_dimensions[0]-cs::particle_scale)) &&
-				(particle_origin[1]<(cs::system_dimensions[1]-cs::particle_scale))){
+			if((particle_origin[0]<=(cs::system_dimensions[0]-cs::particle_scale*0.5)) &&
+				(particle_origin[1]<=(cs::system_dimensions[1]-cs::particle_scale*0.5))){
 
 				// Use particle type flags to determine which particle shape to cut
 				switch(cs::system_creation_flags[1]){
@@ -273,6 +266,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 					case 2: // Cylinder
 						cylinder(particle_origin,catom_array,particle_number);
 						break;
+               case 3: // Ellipsoid
+                  ellipsoid(particle_origin,catom_array,particle_number);
+                  break;
 					case 4: // Sphere
 						sphere(particle_origin,catom_array,particle_number);
 						break;
@@ -292,12 +288,17 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 		}
 	}
 	grains::num_grains = particle_number;
-	
-	// Clear unneeded atoms
-	//clear_atoms(catom_array);
+
+	// Check for no generated particles and print error message
+	if(particle_number==0){
+		zlog << zTs() << "Error: no particles generated in particle array." << std::endl; 
+		zlog << zTs() << "Info: Particle arrays require that at least 1 complete particle fits within the system dimensions." << std::endl;
+		zlog << zTs() << "Info: Increase x and y system dimensions to at least one particle-scale." << std::endl;
+	}
+
 	// Re-order atoms by particle number
 	sort_atoms_by_grain(catom_array);
-	
+
 	return EXIT_SUCCESS;	
 }
 /*
@@ -551,8 +552,6 @@ int alloy(std::vector<cs::catom_t> & catom_array){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::alloy has been called" << std::endl;}	
 
-	zlog<< zTs() << "Determining alloy concentrations" << std::endl; 
-
 	// loop over all atoms
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
 		// if atom material is alloy master then reassign according to % chance
@@ -586,12 +585,22 @@ int alloy(std::vector<cs::catom_t> & catom_array){
 		}
 	}
 
+	return EXIT_SUCCESS;	
+}
+
+void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
+
+	zlog<< zTs() << "Determining atomic composition" << std::endl;
+
 	// Determine number of atoms of each class and output to log
 	std::vector<unsigned int> MaterialNumbers(mp::num_materials,0);
 	for(unsigned int atom=0;atom<catom_array.size();atom++) MaterialNumbers.at(catom_array[atom].material)++;
+	
+	// Output composition to log file 
 	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
 
-	return EXIT_SUCCESS;	
+	return;
+
 }
 
 int intermixing(std::vector<cs::catom_t> & catom_array){
@@ -637,6 +646,154 @@ int intermixing(std::vector<cs::catom_t> & catom_array){
 	}
 	
 	return EXIT_SUCCESS;    
+}
+
+class seed_point_t{
+public:
+
+	double x,y;
+	double radius;
+	double height;
+
+};
+
+//----------------------------------------------------------------------
+//
+//   Function to generate rough surfaces (optionally unique) between 
+//   multiple materials at the interface of min/max.
+//
+//   A local height is defined which overrides the min/max values of
+//   the extent of the material as defined in the material file. No 
+//   atoms are added or removed by the process, but this will override 
+//   structural effects such as core-shell systems.
+//
+//   The roughness is generated by creating seed points with a random
+//   radius with a flat distribution around the mean. Within this 
+//   radius a stepwise change in the local height is defined, again
+//   Gaussian distributed with a mean step height of zero. A maximum 
+//   Height is specified which truncates outlying values. Typical 
+//   values of the maximum step height would be 1-5 monolayers.
+//
+//   The seed points are used to generate a 2D array defining the local
+//   height for any point in space. A loop over all atoms then reassigns
+//   atoms to materials according to the local height, overriding the 
+//   materials set in the crsytal. 
+//
+//------------------------------------------------------------------------
+//
+void roughness(std::vector<cs::catom_t> & catom_array){
+	// check calling of routine if error checking is activated
+	if(err::check==true){std::cout << "cs::roughness has been called" << std::endl;}
+
+	// Output instructuve message to log file
+	zlog << zTs() << "Calculating interfacial roughness for generated system." << std::endl;
+
+	// Construct a 2D array of height according to roughness resoution
+	const double resolution=cs::interfacial_roughness_height_field_resolution; // Angstroms
+	const unsigned int seed_density=cs::interfacial_roughness_seed_count;
+	const double seed_radius=cs::interfacial_roughness_mean_seed_radius;
+	const double seed_height_mean=cs::interfacial_roughness_mean_seed_height;
+	const double seed_height_max=cs::interfacial_roughness_seed_height_max;
+	const double seed_radius_variance=cs::interfacial_roughness_seed_radius_variance;
+
+	// Declare array to store height field
+	std::vector<std::vector<double> >height_field(0);
+
+	// Calculate size of height_field array
+	double nx = int(vmath::iceil(cs::system_dimensions[0]/resolution));
+	double ny = int(vmath::iceil(cs::system_dimensions[1]/resolution));
+
+	// Resize height_field array
+	height_field.resize(nx);
+	for(int i=0; i<nx; i++) height_field.at(i).resize(ny);
+
+	// Generate seed points and radii
+	std::vector<seed_point_t> seed_points(0);
+
+	// Define local random generator for surface roughness
+	MTRand rgrnd;
+
+	// Initialise random number generator
+	rgrnd.seed(cs::interfacial_roughness_random_seed);
+
+	for(int p=0; p < seed_density ; p++){
+		// Generate random point coordinates
+		double x=rgrnd()*cs::system_dimensions[0];
+		double y=rgrnd()*cs::system_dimensions[1];
+
+		// Generate random radius with flat profile r = r0 +/- variance*rnd()
+		double r=seed_radius*(1.0+seed_radius_variance*(2.0*rgrnd()-1.0));
+
+		// Generate random height with gaussian profile
+		double h=seed_height_mean*mtrandom::gaussianc(rgrnd);
+
+		// Overwrite generated height if greater than maximum
+		if(fabs(h)>seed_height_max) h=vmath::sign(h)*seed_height_max;
+
+		// Check for type of roughness
+		// Troughs
+		if(cs::interfacial_roughness_type==-1) h = -1.0*fabs(h);
+		// Peaks
+		else if(cs::interfacial_roughness_type==1) h = fabs(h);
+
+		// Save point characteristics to array
+		seed_point_t tmp;
+		tmp.x = x;
+		tmp.y = y;
+		tmp.radius = r;
+		tmp.height = h;
+		seed_points.push_back(tmp);
+	}
+
+	// Now apply seed points to generate local height field
+	// Loop over all height field coordinates
+	for(int ix = 0; ix < nx; ix++){
+		for(int iy = 0; iy < ny; iy++){
+
+			const double x = double(ix)*resolution; // real space coordinates
+			const double y = double(iy)*resolution;
+
+			// Loop over all seed points
+			for(int p=0; p < seed_density ; p++){
+				double rx=x-seed_points.at(p).x;
+				double ry=y-seed_points.at(p).y;
+
+				// Check for point in range
+				if(rx*rx+ry*ry <= seed_points.at(p).radius*seed_points.at(p).radius) height_field.at(ix).at(iy)=seed_points.at(p).height;
+			}
+		}
+	}
+
+	// Assign materials to generated atoms
+	for(unsigned int atom=0;atom<catom_array.size();atom++){
+
+		// Determine height field coordinates
+		const int hx = int(catom_array[atom].x/resolution);
+		const int hy = int(catom_array[atom].y/resolution);
+
+		// Loop over all materials and determine local height
+		for(int mat=0;mat<mp::num_materials;mat++){
+
+			double min=mp::material[mat].min*cs::system_dimensions[2];
+			double max=mp::material[mat].max*cs::system_dimensions[2];
+			double local_height = height_field.at(hx).at(hy);
+         bool fill = mp::material[mat].fill;
+
+			// optionally specify a material specific height here -- not yet implemented
+			//if(cs::interfacial_roughness_local_height_field==true){
+			//double local_height = height_field.at(mat).at(hx).at(hy);
+			//}
+
+			// Include atoms if within material height
+			const double cz=catom_array[atom].z;
+			if((cz>=min+local_height) && (cz<max+local_height) && (fill==false)){
+				catom_array[atom].material=mat;
+				catom_array[atom].include=true;
+			}
+		}
+	}
+
+	return;
 }
 
 void dilute (std::vector<cs::catom_t> & catom_array){
@@ -743,10 +900,8 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 				for(unsigned int atom=0;atom<catom_array.size();atom++){
 					double x = catom_array[atom].x;
 					double y = catom_array[atom].y;
-					double z = catom_array[atom].z;
-
-					const double cz=catom_array[atom].z;
-					if((cz>=mat_min[mat]) && (cz<mat_max[mat]) && (vmath::point_in_polygon2(x,y,px,py,geo)==true)){
+					const double z = catom_array[atom].z;
+					if((z>=mat_min[mat]) && (z<mat_max[mat]) && (vmath::point_in_polygon2(x,y,px,py,geo)==true)){
 						catom_array[atom].material=mat;
 						catom_array[atom].include=true;
 					}
@@ -757,5 +912,42 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 	
 	return;
 }
-  
+
+//-----------------------------------------------------------
+//
+//  Function to replace deleted atoms with in-fill material
+//
+//  Can be used to create embedded nanoparticle arrays or
+//  granular recording media.
+//
+//  v1 18/09/2013
+//  (c) R F L Evans
+//
+//-----------------------------------------------------------
+void fill(std::vector<cs::catom_t> & catom_array){
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "cs::fill has been called" << std::endl;}
+
+   //loop over all potential intermixing materials
+   for(int mat=0;mat<mp::num_materials;mat++){
+      if(mp::material[mat].fill){
+         double min = mp::material[mat].min*cs::system_dimensions[2];
+         double max = mp::material[mat].max*cs::system_dimensions[2];
+
+         // loop over all atoms selecting only deselected atoms within min/max
+         for(unsigned int atom=0;atom<catom_array.size();atom++){
+            if( (catom_array[atom].z < max) && (catom_array[atom].z >= min) && (catom_array[atom].include==false)){
+               // set atom to fill material
+               catom_array[atom].material=mat;
+               // re-include atom
+               catom_array[atom].include=true;
+            }
+         }
+      }
+   }
+
+   return;
+
+}
+
 } // end of namespace

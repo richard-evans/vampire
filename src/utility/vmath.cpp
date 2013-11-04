@@ -97,6 +97,8 @@ bool point_in_polygon2(double x, double y, std::vector<double>& polyX, std::vect
 		" must be equal to length of vectors " << polyX.size() << " and " << polyY.size() << ". Exiting." << std::endl;
 		err::vexit();
 	}*/
+	x+=1e-10; // Added tiny amount to atomic coordinates to include atoms at 0,0,0
+	y+=1e-10;
 	
 	int j=polySides-1 ;
 	bool oddNodes=false;
