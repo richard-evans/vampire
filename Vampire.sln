@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vampire", "Vampire.vcxproj", "{846409FD-9788-4623-B0ED-E055FBE761CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release-Parallel|Win32 = Release-Parallel|Win32
+		Release-Parallel|x64 = Release-Parallel|x64
+		Release-Serial|Win32 = Release-Serial|Win32
+		Release-Serial|x64 = Release-Serial|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Debug|Win32.Build.0 = Debug|Win32
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Debug|x64.ActiveCfg = Debug|x64
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Debug|x64.Build.0 = Debug|x64
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Release-Parallel|Win32.ActiveCfg = Release-Parallel|Win32
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Release-Parallel|Win32.Build.0 = Release-Parallel|Win32
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Release-Parallel|x64.ActiveCfg = Release-Parallel|x64
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Release-Parallel|x64.Build.0 = Release-Parallel|x64
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Release-Serial|Win32.ActiveCfg = Release-Serial|Win32
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Release-Serial|Win32.Build.0 = Release-Serial|Win32
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Release-Serial|x64.ActiveCfg = Release-Serial|x64
+		{846409FD-9788-4623-B0ED-E055FBE761CE}.Release-Serial|x64.Build.0 = Release-Serial|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

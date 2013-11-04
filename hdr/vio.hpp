@@ -27,12 +27,16 @@
 
 #include <fstream>
 #include <string>
-
-#include <iostream> 
-
+#include <iostream>
 #include <time.h>
 #include <sys/types.h>
-#include <unistd.h>
+#ifdef WIN_COMPILE
+  #include <process.h>
+  #include <windows.h>
+#else
+  #include <unistd.h>
+#endif
+
 #include <vmpi.hpp>
 
 #ifdef MPICF
