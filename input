@@ -1,6 +1,6 @@
 #------------------------------------------
 # Sample vampire input file to perform
-# benchmark calculations
+# benchmark calculation for v3.0
 #
 #------------------------------------------
 
@@ -42,8 +42,7 @@ sim:integrator=llg-heun
 output:real-time
 output:temperature
 output:magnetisation
-output:mag-m
+output:magnetisation-length
 
-screen:time
-screen:mag-m
-
+screen:time-steps
+screen:magnetisation-length
