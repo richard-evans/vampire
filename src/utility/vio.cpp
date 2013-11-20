@@ -1720,7 +1720,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    if(word==test){
       std::vector<double> u(3);
       u=DoublesFromString(value);
-      check_for_valid_unit_vector(u, word, line, prefix, "material");
+      check_for_valid_unit_vector(u, word, line, prefix, "input");
       sim::H_vec[0]=u.at(0);
       sim::H_vec[1]=u.at(1);
       sim::H_vec[2]=u.at(2);
@@ -1732,7 +1732,14 @@ int match_sim(string const word, string const value, string const unit, int cons
    if(word==test){
       std::vector<double> u(3);
       u=DoublesFromString(value);
-      check_for_valid_unit_vector(u, word, line, prefix, "material");
+      check_for_valid_vector(u, word, line, prefix, "input");
+      // Extra check for demagnetisation-factor Nx+Ny+Nz=1
+      double sum=u.at(0)+u.at(1)+u.at(2);
+      if(fabs(1.0-sum)>1.e-4){
+         std::cerr << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
+         zlog << zTs() << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
+         err::vexit();
+      }
       sim::demag_factor[0]=u.at(0);
       sim::demag_factor[1]=u.at(1);
       sim::demag_factor[2]=u.at(2);
