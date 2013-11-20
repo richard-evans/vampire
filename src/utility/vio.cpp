@@ -433,6 +433,45 @@ void check_for_valid_unit_vector(std::vector<double>& u, // unit vector
 
 }
 
+//
+// Function to check for correct 3-component vector and ensure length of 1
+//-------------------------------------------------------------------------
+//
+void check_for_valid_vector(std::vector<double>& u, // unit vector
+                           std::string word, // input file keyword
+                           int line, // input file line
+                           std::string prefix, // input file prefix
+                           std::string input_file_type) //input file name
+{
+
+   // check size
+   if(u.size()!=3){
+      std::cerr << "Error: vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+      zlog << zTs() << "Error: vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+      err::vexit();
+   }
+
+   // Check for valid range
+   if(fabs(u.at(0)) <=1.e10){
+      std::cerr << "Error: first element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      zlog << zTs() << "Error: first element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      err::vexit();
+   }
+   if(fabs(u.at(1)) <=1.e10){
+      std::cerr << "Error: second element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      zlog << zTs() << "Error: second element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      err::vexit();
+   }
+   if(fabs(u.at(2)) <=1.e10){
+      std::cerr << "Error: third element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      zlog << zTs() << "Error: third element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      err::vexit();
+   }
+
+   // Success - input is sane!
+   return;
+
+}
 /// @brief Function to read in variables from a file.
 ///
 /// @section License
