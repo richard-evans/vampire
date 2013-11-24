@@ -1926,7 +1926,7 @@ int match_config(string const word, string const value, int const line){
    test="atoms-minimum-x";
    if(word==test){
       double x=atof(value.c_str());
-      check_for_valid_value(x, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      check_for_valid_value(x, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
       vout::atoms_output_min[0]=x;
       return EXIT_SUCCESS;
    }
@@ -1934,7 +1934,7 @@ int match_config(string const word, string const value, int const line){
    test="atoms-minimum-y";
    if(word==test){
       double y=atof(value.c_str());
-      check_for_valid_value(y, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      check_for_valid_value(y, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
       vout::atoms_output_min[1]=y;
       return EXIT_SUCCESS;
    }
@@ -1942,7 +1942,7 @@ int match_config(string const word, string const value, int const line){
    test="atoms-minimum-z";
    if(word==test){
       double z=atof(value.c_str());
-      check_for_valid_value(z, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      check_for_valid_value(z, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
       vout::atoms_output_min[2]=z;
       return EXIT_SUCCESS;
    }
@@ -1950,7 +1950,7 @@ int match_config(string const word, string const value, int const line){
    test="atoms-maximum-x";
    if(word==test){
       double x=atof(value.c_str());
-      check_for_valid_value(x, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      check_for_valid_value(x, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
       vout::atoms_output_max[0]=x;
       return EXIT_SUCCESS;
    }
@@ -1958,7 +1958,7 @@ int match_config(string const word, string const value, int const line){
    test="atoms-maximum-y";
    if(word==test){
       double y=atof(value.c_str());
-      check_for_valid_value(y, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      check_for_valid_value(y, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
       vout::atoms_output_max[1]=y;
       return EXIT_SUCCESS;
    }
@@ -1966,7 +1966,7 @@ int match_config(string const word, string const value, int const line){
    test="atoms-maximum-z";
    if(word==test){
       double z=atof(value.c_str());
-      check_for_valid_value(z, word, line, prefix, "none", "none", 0.0, 1.0,"input","0.0 - 1.0");
+      check_for_valid_value(z, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
       vout::atoms_output_max[2]=z;
       return EXIT_SUCCESS;
    }
