@@ -2454,8 +2454,8 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		std::string value="";
 		std::string unit="";
 		std::string index="";
-		int super_index=0;
-		int sub_index=0;
+		int super_index=1; // Inital values *as would be read from input file*
+		int sub_index=1;
 
 		// get size of string
 		int linelength = line.length();
@@ -2627,7 +2627,6 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 //-------------------------------------------------------------------
 int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
       std::string prefix="material:";
-
       //------------------------------------------------------------
       std::string test="num-materials";
       if(word==test){
