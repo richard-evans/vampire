@@ -423,7 +423,8 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		line_id++;
 	} // end of while loop
 	
-	zlog << "Done!" << std::endl;
+   std::cout << "Done!" << std::endl;
+   zlog << "Done!" << std::endl;
 	zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
 	zlog << zTs() << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
 	zlog << zTs() << "\t" << "Exchange type: " <<  unit_cell.exchange_type << std::endl;
