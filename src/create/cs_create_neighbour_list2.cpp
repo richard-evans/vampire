@@ -118,6 +118,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	std::vector<std::vector<std::vector<std::vector<int> > > > supercell_array;
 
 	zlog << zTs() << "Memory required for neighbourlist calculation:" << 8.0*double(d[0])*double(d[1])*double(d[2])*double(unit_cell.atom.size())/1.0e6 << " MB" << std::endl;
+   zlog << zTs() << "Allocating memory for supercell array in neighbourlist calculation..."<< std::endl;
 	supercell_array.resize(d[0]);
 	for(unsigned int i=0; i<d[0] ; i++){
 		supercell_array[i].resize(d[1]);
@@ -128,6 +129,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 	}
+   zlog << zTs() << "\tDone"<< std::endl;
 
 	// declare cell array to loop over
 	const unsigned int num_cells=d[0]*d[1]*d[2];
@@ -151,7 +153,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 	}
-
+   zlog << zTs() << "Populating supercell array for neighbourlist calculation..."<< std::endl;
 	// Populate supercell array with atom numbers
 	for(int atom=0;atom<num_atoms;atom++){
 		unsigned int scc[3]={catom_array[atom].scx-offset[0],catom_array[atom].scy-offset[1],catom_array[atom].scz-offset[2]};
@@ -177,7 +179,6 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				err::vexit();
 			}
 		}
-
 		// Check for atoms greater than max_atoms_per_supercell
 		if(catom_array[atom].uc_id<unit_cell.atom.size()){
 			// Add atom to supercell
@@ -199,8 +200,12 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		}
 	}
 
+   zlog << zTs() << "\tDone"<< std::endl;
+
 	// Generate neighbour list
-	std::cout <<"Generating Neighbour list"<< std::flush; 
+	std::cout <<"Generating neighbour list"<< std::flush;
+   zlog << zTs() << "Memory required for neighbour list:" << 8.0*double(num_cells)*double(cs::unit_cell.interaction.size())/1.0e6 << " MB" << std::endl;
+   zlog << zTs() << "Generating neighbour list..."<< std::endl;
 	neighbour_t tmp_nt;
 	// Loop over all cells
 	for(unsigned int cell=0;cell<num_cells;cell++){
@@ -252,8 +257,10 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	}
 	
 	std::cout << "done!" << std::endl;
+   zlog << zTs() << "\tDone"<< std::endl;
 
 	// Deallocate supercell array
+   zlog << zTs() << "Deallocating supercell array for neighbour list calculation" << std::endl;
 	for(unsigned int i=0; i<d[0] ; i++){
 		for(unsigned int j=0; j<d[1] ;j++){
 			for(unsigned int k=0; k<d[2] ;k++){
@@ -264,6 +271,8 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			supercell_array[i].resize(0);
 		}
 	supercell_array.resize(0);
+
+   zlog << zTs() << "\tDone" << std::endl;
 
 	// Print neighbour list
 	//for(int atom=0;atom<catom_array.size();atom++){
