@@ -8,7 +8,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Parallel|Win32'">
-    <LocalDebuggerCommand>C:\Program Files (x86)\MPICH2\bin\mpiexec.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>mpiexec.exe</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Parallel|Win32'">
     <LocalDebuggerCommandArguments>-n 4 $(TargetPath)</LocalDebuggerCommandArguments>
