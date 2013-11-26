@@ -1446,6 +1446,15 @@ int match_sim(string const word, string const value, string const unit, int cons
    if(word==test){
       int tt=atoi(value.c_str());
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      std::cout << "Warning: Keyword \'partial-time-steps\' is deprecated and may be removed in a future release. Please use \'time-steps-increment\' instead." << std::endl; 
+      sim::partial_time=tt;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="time-steps-increment";
+   if(word==test){
+      int tt=atoi(value.c_str());
+      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::partial_time=tt;
       return EXIT_SUCCESS;
    }
