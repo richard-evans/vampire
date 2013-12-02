@@ -131,28 +131,28 @@ MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
 
-all: $(OBJECTS) gcc
+all: $(OBJECTS) serial
 
 # Serial Targets
-gcc: $(OBJECTS)
+serial: $(OBJECTS)
 	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
-intel: $(ICC_OBJECTS)
+serial-intel: $(ICC_OBJECTS)
 	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $<
 
-ibm: $(IBM_OBJECTS)
+serial-ibm: $(IBM_OBJECTS)
 	$(IBM) $(IBM_LDFLAGS) $(IBM_OBJECTS) -o $(EXECUTABLE)
 
 $(IBM_OBJECTS): obj/%_ibm.o: src/%.cpp
 	$(IBM) -c -o $@ $(IBM_CFLAGS) $<
 
-gcc-debug: $(GCCDB_OBJECTS)
+serial-debug: $(GCCDB_OBJECTS)
 	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
@@ -178,40 +178,40 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 
 # MPI Targets
 
-mpi-gcc: $(MPI_OBJECTS)
+parallel: $(MPI_OBJECTS)
 	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE)
 #export OMPI_CXX=icc
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
 
-mpi-intel: $(MPI_ICC_OBJECTS)
+parallel-intel: $(MPI_ICC_OBJECTS)
 	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<
 
-mpi-pathscale: $(MPI_PCC_OBJECTS)
+parallel-pathscale: $(MPI_PCC_OBJECTS)
 	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_PCC_OBJECTS): obj/%_p_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_CFLAGS) $<
 
-mpi-ibm: $(MPI_IBM_OBJECTS)
+parallel-ibm: $(MPI_IBM_OBJECTS)
 	$(MPICC) $(IBM_LDFLAGS) $(MPI_IBM_OBJECTS) -o $(EXECUTABLE)
 $(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
 
-mpi-gcc-debug: $(MPI_GCCDB_OBJECTS)
+parallel-debug: $(MPI_GCCDB_OBJECTS)
 	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<
 
-mpi-intel-debug: $(MPI_ICCDB_OBJECTS)
+parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
 	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
-mpi-pathscale-debug: $(MPI_PCCDB_OBJECTS)
+parallel-pathscale-debug: $(MPI_PCCDB_OBJECTS)
 	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
@@ -241,8 +241,5 @@ tidy:
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
-
-package:
-	@bash .pack
 
 
