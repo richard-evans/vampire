@@ -130,8 +130,8 @@ int create(){
 	//double supercell_size[3];				///> real supercell size (Angstroms)
 	
 	// Atom creation array
-	std::vector<cs::catom_t> catom_array; 
-	std::vector<std::vector<neighbour_t> > cneighbourlist; 
+	std::vector<cs::catom_t> catom_array;
+	std::vector<std::vector<neighbour_t> > cneighbourlist;
 
 	// initialise unit cell for system
 	unit_cell_set(cs::unit_cell);

@@ -142,8 +142,8 @@ namespace cs{
 	class neighbour_t {
 	public:
 		
-		int nn;
-		int i;
+		int nn; // atom id of neighbour
+		int i; // interaction type of neighbour
 
 	};
 	
