@@ -87,6 +87,7 @@ obj/program/hybrid_cmc.o \
 obj/program/hysteresis.o \
 obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
+obj/program/partial_hysteresis.o \
 obj/program/static_hysteresis.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \

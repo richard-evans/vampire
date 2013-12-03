@@ -322,6 +322,14 @@ int run(){
          program::lagrange_multiplier();
          break;
 
+      case 12:
+         if(vmpi::my_rank==0){
+            std::cout << "partial-hysteresis-loop..." << std::endl;
+            zlog << "partial-hysteresis-loop..." << std::endl;
+         }
+         program::partial_hysteresis_loop();
+         break;
+
 		case 50:
 			if(vmpi::my_rank==0){
 				std::cout << "Diagnostic-Boltzmann..." << std::endl;

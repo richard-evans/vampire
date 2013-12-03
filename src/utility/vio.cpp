@@ -1350,6 +1350,11 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::program=11;
          return EXIT_SUCCESS;
       }
+      test="partial-hysteresis-loop";
+      if(value==test){
+         sim::program=12;
+         return EXIT_SUCCESS;
+      }
       test="diagnostic-boltzmann";
       if(value==test){
          sim::program=50;

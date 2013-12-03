@@ -228,6 +228,124 @@ int single_spin_system(){
 	return EXIT_SUCCESS;
 }
 
+// Simple function to check for valid input for hysteresis loop parameters
+void check_hysteresis_loop_parameters(){
+
+   // Only applies to hysteresis loop programs, all others return
+   if(sim::program!=12) return;
+
+   double min=sim::Hmin;
+   double max=sim::Hmax;
+   double inc=sim::Hinc;
+
+   // + + +
+   if(min>=0 && max>=0 && inc>0){
+      if(max<min){
+         if(vmpi::my_rank==0){
+            std::cout << "Error in hysteresis-loop parameters:" << std::endl;
+            std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+            std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+            std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+            std::cout << "Minimum and maximum fields are both positive, but minimum > maximum with a positive increment, causing an infinite loop. Exiting." << std::endl;
+            zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+            zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+            zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+            zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+            zlog << zTs() << "Minimum and maximum fields are both positive, but minimum > maximum with a positive increment, causing an infinite loop. Exiting." << std::endl;
+            err::vexit();
+         }
+      }
+   }
+   // + + -
+   else if(min>=0 && max>=0 && inc<0){
+      if(max>min){
+         if(vmpi::my_rank==0){
+            std::cout << "Error in hysteresis-loop parameters:" << std::endl;
+            std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+            std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+            std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+            std::cout << "Minimum and maximum fields are both positive, but maximum > minimum with a negative increment, causing an infinite loop. Exiting." << std::endl;
+            zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+            zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+            zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+            zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+            zlog << zTs() << "Minimum and maximum fields are both positive, but maximum > minimum with a negative increment, causing an infinite loop. Exiting." << std::endl;
+            err::vexit();
+         }
+      }
+   }
+   // + - +
+   else if(min>=0 && max<0 && inc>0){
+      if(vmpi::my_rank==0){
+         std::cout << "Error in hysteresis-loop parameters:" << std::endl;
+         std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+         std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+         std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+         std::cout << "Minimum field is positive and maximum field is negative with a positive increment, causing an infinite loop. Exiting." << std::endl;
+         zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+         zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+         zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+         zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+         zlog << zTs() << "Minimum field is positive and maximum field is negative with a positive increment, causing an infinite loop. Exiting." << std::endl;
+         err::vexit();
+      }
+   }
+   // - + -
+   else if(min<0 && max>=0 && inc<0){
+      if(vmpi::my_rank==0){
+         std::cout << "Error in hysteresis-loop parameters:" << std::endl;
+         std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+         std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+         std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+         std::cout << "Minimum field is negative and maximum field is positive with a negative increment, causing an infinite loop. Exiting." << std::endl;
+         zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+         zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+         zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+         zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+         zlog << zTs() << "Minimum field is negative and maximum field is positive with a negative increment, causing an infinite loop. Exiting." << std::endl;
+         err::vexit();
+      }
+   }
+   // - - -
+   else if(min<0 && max<0 && inc<0){
+      if(max>min){
+         if(vmpi::my_rank==0){
+            std::cout << "Error in hysteresis-loop parameters:" << std::endl;
+            std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+            std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+            std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+            std::cout << "Minimum and maximum fields are both negative, but minimum < maximum with a negative increment, causing an infinite loop. Exiting." << std::endl;
+            zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+            zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+            zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+            zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+            zlog << zTs() << "Minimum and maximum fields are both negative, but minimum < maximum with a negative increment, causing an infinite loop. Exiting." << std::endl;
+            err::vexit();
+         }
+      }
+   }
+   // - - +
+   else if(min<0 && max<0 && inc>0){
+      if(max<min){
+         if(vmpi::my_rank==0){
+            std::cout << "Error in hysteresis-loop parameters:" << std::endl;
+            std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+            std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+            std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+            std::cout << "Minimum and maximum fields are both negative, but maximum < minimum with a positive increment, causing an infinite loop. Exiting." << std::endl;
+            zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+            zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
+            zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
+            zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
+            zlog << zTs() << "Minimum and maximum fields are both positive, but maximum < minimum with a positive increment, causing an infinite loop. Exiting." << std::endl;
+            err::vexit();
+         }
+      }
+   }
+   return;
+
+}
+
 int set_derived_parameters(){
 		
 	// Set integration constants
@@ -255,6 +373,7 @@ int set_derived_parameters(){
 		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
 	}
 	
+	check_hysteresis_loop_parameters();
 	
 	// Ensure H vector is unit length
 	// **RE edit 21.11.12 - no longer necessary as value checked on user input**
