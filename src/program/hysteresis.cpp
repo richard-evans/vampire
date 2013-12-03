@@ -91,7 +91,8 @@ int hysteresis(){
 	// Setup min and max fields and increment (uT)
 	int iHmax=vmath::iround(double(sim::Hmax)*1.0E6);
 	int iHmin=vmath::iround(double(sim::Hmin)*1.0E6);
-	int iHinc=vmath::iround(double(sim::Hinc)*1.0E6);
+   // Hinc must be positive
+	int iHinc=vmath::iround(double(fabs(sim::Hinc))*1.0E6);
 
 	// Perform Field Loop
 	for(int parity=-1;parity<2;parity+=2){

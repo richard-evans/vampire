@@ -1683,7 +1683,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    test="minimum-applied-field-strength";
    if(word==test){
       double H=atof(value.c_str());
-      check_for_valid_value(H, word, line, prefix, unit, "field", 1.0e-6, 1.0e3,"input","1 uT - 1,000 T");
+      check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e3,"input","0 - 1,000 T");
       sim::Hmin=H;
       return EXIT_SUCCESS;
    }
@@ -1691,7 +1691,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    test="maximum-applied-field-strength";
    if(word==test){
       double H=atof(value.c_str());
-      check_for_valid_value(H, word, line, prefix, unit, "field", 1.0e-6, 1.0e3,"input","1 uT - 1,000 T");
+      check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e3,"input","0 - 1,000 T");
       sim::Hmax=H;
       return EXIT_SUCCESS;
    }
@@ -1699,7 +1699,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    test="equilibration-applied-field-strength";
    if(word==test){
       double H=atof(value.c_str());
-      check_for_valid_value(H, word, line, prefix, unit, "field", 1.0e-6, 1.0e3,"input","1 uT - 1,000 T");
+      check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e3,"input","0 - 1,000 T");
       sim::Heq=H;
       return EXIT_SUCCESS;
    }
