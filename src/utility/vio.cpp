@@ -2149,7 +2149,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="mean-susceptibility";
    if(word==test){
-      stats::CalculateSusceptibility=true;
+      stats::calculate_susceptibility=true;
       output_list.push_back(21);
       return EXIT_SUCCESS;
    }
@@ -3564,19 +3564,21 @@ namespace vout{
 		}
 	}
 
-	// Output Function 21
-	void MeanSystemSusceptibility(std::ostream& stream){
+   // Output Function 21
+   void mean_system_susceptibility(std::ostream& stream){
 
-		double Susx,Susy,Susz;
-		const double norm = mp::material[0].mu_s_SI*stats::ChiAtoms/(1.3806503e-23*sim::temperature);
-		
-		Susx = norm*(stats::MeanChiSquared[0]/stats::MeanChiDataCounter-stats::MeanChi[0]*stats::MeanChi[0]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
-		Susy = norm*(stats::MeanChiSquared[1]/stats::MeanChiDataCounter-stats::MeanChi[1]*stats::MeanChi[1]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
-		Susz = norm*(stats::MeanChiSquared[2]/stats::MeanChiDataCounter-stats::MeanChi[2]*stats::MeanChi[2]/(stats::MeanChiDataCounter*stats::MeanChiDataCounter));
-		
-		stream << Susx << "\t" << Susy << "\t" << Susz << "\t";
-	}
-	
+      const double norm = stats::max_moment/(1.3806503e-23*sim::temperature);
+
+      double sus_x = norm*(stats::mean_susceptibility_squared[0]/stats::data_counter-stats::mean_susceptibility[0]*stats::mean_susceptibility[0]/(stats::data_counter*stats::data_counter));
+      double sus_y = norm*(stats::mean_susceptibility_squared[1]/stats::data_counter-stats::mean_susceptibility[1]*stats::mean_susceptibility[1]/(stats::data_counter*stats::data_counter));
+      double sus_z = norm*(stats::mean_susceptibility_squared[2]/stats::data_counter-stats::mean_susceptibility[2]*stats::mean_susceptibility[2]/(stats::data_counter*stats::data_counter));
+
+      stream << sus_x << "\t" << sus_y << "\t" << sus_z << "\t";
+
+      return;
+
+   }
+
 	// Output Function 22
 	void phonon_temperature(std::ostream& stream){
 		stream << sim::TTTp << "\t";
@@ -3793,7 +3795,7 @@ namespace vout{
 					vout::material_mean_systorque(zmag);
 					break;
 				case 21:
-					vout::MeanSystemSusceptibility(zmag);
+					vout::mean_system_susceptibility(zmag);
 					break;
 				case 22:
 					vout::phonon_temperature(zmag);
@@ -3926,7 +3928,7 @@ namespace vout{
 					vout::material_mean_systorque(std::cout);
 					break;
 				case 21:
-					vout::MeanSystemSusceptibility(std::cout);
+					vout::mean_system_susceptibility(std::cout);
 					break;
 				case 22:
 					vout::phonon_temperature(std::cout);
