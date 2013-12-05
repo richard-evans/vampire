@@ -3567,11 +3567,18 @@ namespace vout{
    // Output Function 21
    void mean_system_susceptibility(std::ostream& stream){
 
-      const double norm = stats::max_moment/(1.3806503e-23*sim::temperature);
+      double norm = stats::max_moment/(1.3806503e-23*sim::temperature);
 
       double sus_x = norm*(stats::mean_susceptibility_squared[0]/stats::data_counter-stats::mean_susceptibility[0]*stats::mean_susceptibility[0]/(stats::data_counter*stats::data_counter));
       double sus_y = norm*(stats::mean_susceptibility_squared[1]/stats::data_counter-stats::mean_susceptibility[1]*stats::mean_susceptibility[1]/(stats::data_counter*stats::data_counter));
       double sus_z = norm*(stats::mean_susceptibility_squared[2]/stats::data_counter-stats::mean_susceptibility[2]*stats::mean_susceptibility[2]/(stats::data_counter*stats::data_counter));
+
+      // check for very low temperature (denormalised number) to prevent nan
+      if(sim:temperature<1.e-300){
+         sus_x=0.0;
+         sus_y=0.0;
+         sus_z=0.0;
+      }
 
       stream << sus_x << "\t" << sus_y << "\t" << sus_z << "\t";
 
