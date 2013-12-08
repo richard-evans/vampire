@@ -112,10 +112,7 @@ using std::string;
 		std::vector<double> KuVec_SI; // SI anisotropy tensor
 		double Ku; // normalised uniaxial anisotropy constant
       double Ku2; // normalised uniaxial anisotropy constant
-      double Klatt; // normalised lattice anisotropy
-      double Klatt_inflection_temperature;
-      double Klatt_unity_tmperature;
-      double Klatt_width_temperature;
+      double Klatt; // normalised lattice anisotropy constant
       std::vector<double> KuVec; // normalised anisotropy tensor
 		std::vector<double> UniaxialAnisotropyUnitVector; // unit vector for material uniaxial anisotropy
 		double Kc1_SI;

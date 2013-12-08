@@ -2718,36 +2718,6 @@ int match_material(string const word, string const value, string const unit, int
       }
       //------------------------------------------------------------
       else
-      test="lattice-anisotropy-inflection-temperature";
-      if(word==test){
-         double KlattTinf=atof(value.c_str());
-         // Test for valid range
-         check_for_valid_value(KlattTinf, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
-         read_material[super_index].Klatt_inflection_temperature=KlattTinf;
-         return EXIT_SUCCESS;
-      }
-      //------------------------------------------------------------
-      else
-      test="lattice-anisotropy-unity-temperature";
-      if(word==test){
-         double KlattTu=atof(value.c_str());
-         // Test for valid range
-         check_for_valid_value(KlattTu, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
-         read_material[super_index].Klatt_unity_tmperature=KlattTu;
-         return EXIT_SUCCESS;
-      }
-      //------------------------------------------------------------
-      else
-      test="lattice-anisotropy-temperature-width";
-      if(word==test){
-         double KlattTw=atof(value.c_str());
-         // Test for valid range
-         check_for_valid_value(KlattTw, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
-         read_material[super_index].Klatt_width_temperature=KlattTw;
-         return EXIT_SUCCESS;
-      }
-      //------------------------------------------------------------
-      else
       test="cubic-anisotropy-constant";
       if(word==test){
          double K=atof(value.c_str());
