@@ -58,6 +58,34 @@ class zkten_t{
 	};
 };
 
+//--------------------------------------------------------------------
+// Class to contain parameters for lattice anisotropy calculation.
+//
+// Tabulated values are read from a file and added point-wise to
+// the class. During variable initialisation interpolating functions
+// are determined to calculate k(T)
+//
+class lattice_anis_t{
+
+   private:
+
+      unsigned int Tmax; // maximum array value in tabulated function
+      double k_Tmax; // value of anisotropy at k_Tmax (used for all T > Tmax)
+
+      std::vector<unsigned int> T; // input temperature points
+      std::vector<double> k; // input lattice anisotropy points
+      std::vector<double> m; // calculated m value
+      std::vector<double> c; // calculated c value
+
+   public:
+
+      void add_point(double, double);
+      void set_interpolation_table();
+      double get_lattice_anisotropy_constant(double);
+      void output_interpolated_function(int);
+
+};
+
 namespace mp
 {
 using std::string;
@@ -134,6 +162,7 @@ using std::string;
 		double fmr_field_frequency; // Hz
 		std::vector<double> fmr_field_unit_vector; // unit vector for material uniaxial anisotropy
 		bool fill; // flag to determine of material fills voided space
+      lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
 		
 		materials_t();
 		int print();

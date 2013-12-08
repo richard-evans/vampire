@@ -69,6 +69,7 @@ obj/data/atoms.o \
 obj/data/category.o \
 obj/data/cells.o \
 obj/data/grains.o \
+obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
