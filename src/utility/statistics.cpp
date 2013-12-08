@@ -657,9 +657,11 @@ void system_energy(){
    if(sim::lattice_anisotropy_flag){
       double register energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
+         const double Sx=atoms::x_spin_array[atom];
+         const double Sy=atoms::y_spin_array[atom];
          const double Sz=atoms::z_spin_array[atom];
          const int imaterial=atoms::type_array[atom];
-         energy+=sim::spin_lattice_anisotropy_energy(imaterial, Sz)*mp::material[imaterial].mu_s_SI;
+         energy+=sim::spin_lattice_anisotropy_energy(imaterial, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
       stats::total_lattice_anisotropy_energy=energy;
    }

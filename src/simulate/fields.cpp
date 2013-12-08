@@ -300,40 +300,10 @@ void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,con
    return;
 }
 
-namespace sim{
-//------------------------------------------------------
-//  Function to calculate lattice anisotropy constant
-//
-//  (c) R F L Evans 2013
-//
-//  Assume temperature dependent anisotropy constant:
-//
-//                   tanh((T-Ti)/Tw) - fmin
-//  kappa = Klatt * ------------------------
-//                        fmax-fmin
-//
-//------------------------------------------------------
-double lattice_anisotropy_function(const double T, const int imaterial){
-   const double Klatt = mp::material[imaterial].Klatt;
-   const double Ti = mp::material[imaterial].Klatt_inflection_temperature;
-   const double Tu = mp::material[imaterial].Klatt_unity_tmperature;
-   const double Tw = mp::material[imaterial].Klatt_width_temperature;
-   const double fmin=tanh(-Ti/Tw);
-   const double fmax=tanh((Tu-Ti)/Tw);
-   return Klatt*((tanh((T-Ti)/Tw) - fmin)/(fmax-fmin));
-}
-} // end of sim namespace
-
 //------------------------------------------------------
 //  Function to calculate lattice anisotropy fields
 //
 //  (c) R F L Evans 2013
-//
-//  E = kappa * S_z^2
-//
-//  Hx = 0
-//  Hy = 0
-//  Hz = -2*kappa*S_z
 //
 //------------------------------------------------------
 void calculate_lattice_anisotropy_fields(const int start_index,const int end_index){
@@ -341,16 +311,37 @@ void calculate_lattice_anisotropy_fields(const int start_index,const int end_ind
    // Precalculate material lattice anisotropy constants
    std::vector<double> klatt_array(0);
    klatt_array.reserve(mp::num_materials);
-   for(int imat=0; imat<mp::num_materials; imat++) klatt_array.push_back(sim::lattice_anisotropy_function(sim::temperature, imat));
+   for(int imat=0; imat<mp::num_materials; imat++) klatt_array.push_back(-2.0*mp::material[imat].Klatt*mp::material[imat].lattice_anisotropy.get_lattice_anisotropy_constant(sim::temperature));
+
+   // Precalculate unit vectors
+   std::vector<double> ex(0);
+   std::vector<double> ey(0);
+   std::vector<double> ez(0);
+
+   ex.reserve(mp::num_materials);
+   ey.reserve(mp::num_materials);
+   ez.reserve(mp::num_materials);
+
+   for(int imat=0; imat<mp::num_materials; imat++) ex.push_back(mp::material.at(imat).UniaxialAnisotropyUnitVector.at(0));
+   for(int imat=0; imat<mp::num_materials; imat++) ey.push_back(mp::material.at(imat).UniaxialAnisotropyUnitVector.at(1));
+   for(int imat=0; imat<mp::num_materials; imat++) ez.push_back(mp::material.at(imat).UniaxialAnisotropyUnitVector.at(2));
 
    // Now calculate fields
    for(int atom=start_index;atom<end_index;atom++){
       const int imaterial=atoms::type_array[atom];
-      const double Klattice=-2.0*klatt_array[imaterial];
-      const double Sz=atoms::z_spin_array[atom];
-      atoms::z_total_spin_field_array[atom] += Klattice*Sz*Sz;
+      const double Sx = atoms::x_spin_array[atom];
+      const double Sy = atoms::y_spin_array[atom];
+      const double Sz = atoms::z_spin_array[atom];
+      const double Sdote = (Sx*ex[imaterial] + Sy*ey[imaterial] + Sz*ez[imaterial]);
+
+      atoms::x_total_spin_field_array[atom] -= klatt_array[imaterial]*ex[imaterial]*Sdote;
+      atoms::y_total_spin_field_array[atom] -= klatt_array[imaterial]*ey[imaterial]*Sdote;
+      atoms::z_total_spin_field_array[atom] -= klatt_array[imaterial]*ez[imaterial]*Sdote;
+
    }
+
    return;
+
 }
 
 int calculate_cubic_anisotropy_fields(const int start_index,const int end_index){

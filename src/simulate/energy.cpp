@@ -302,8 +302,16 @@ double spin_second_order_uniaxial_anisotropy_energy(const int imaterial, const d
 //  E = kappa * S_z^2
 //
 //------------------------------------------------------
-double spin_lattice_anisotropy_energy(const int imaterial, const double Sz){
-   return sim::lattice_anisotropy_function(sim::temperature, imaterial)*Sz*Sz;
+double spin_lattice_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
+
+   const double klatt=mp::material[imaterial].Klatt*mp::material[imaterial].lattice_anisotropy.get_lattice_anisotropy_constant(sim::temperature);
+   const double ex = mp::material.at(imaterial).UniaxialAnisotropyUnitVector[0];
+   const double ey = mp::material.at(imaterial).UniaxialAnisotropyUnitVector[1];
+   const double ez = mp::material.at(imaterial).UniaxialAnisotropyUnitVector[2];
+   const double Sdote=Sx*ex + Sy*ey + Sz*ez;
+
+   return klatt*(Sdote*Sdote);
+
 }
 
 /// @brief Calculates the applied field energy for a single spin.
@@ -451,7 +459,7 @@ double calculate_spin_energy(const int atom, const int AtomExchangeType){
 	}
 	if(second_order_uniaxial_anisotropy) energy+=spin_second_order_uniaxial_anisotropy_energy(imaterial, Sx, Sy, Sz);
 	if(sim::CubicScalarAnisotropy==true) energy+=spin_cubic_anisotropy_energy(imaterial, Sx, Sy, Sz);
-   if(sim::lattice_anisotropy_flag) energy+=spin_lattice_anisotropy_energy(imaterial, Sz);
+   if(sim::lattice_anisotropy_flag) energy+=spin_lattice_anisotropy_energy(imaterial, Sx, Sy, Sz);
 	if(sim::surface_anisotropy==true) energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);
 	energy+=spin_applied_field_energy(Sx, Sy, Sz);
 	energy+=spin_magnetostatic_energy(atom, Sx, Sy, Sz);
