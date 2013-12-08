@@ -467,5 +467,32 @@ int sign(int a){
 		else return 1;
 }
 
+//-----------------------------------------------------
+// functions to interpolate values xi,yi -> xj,yj
+// with straight line fit
+//
+//    dx = xj - xi
+//    dy = yj - yi
+//
+//    m = dy/dx
+//
+//    y = mx + c, solve for c
+//
+//    c = yi-m*xi
+//
+double interpolate_m(double xi,double yi,double xj,double yj){
+
+   return (yj-yi)/(xj-xi);
+
+}
+
+double interpolate_c(double xi,double yi,double xj,double yj){
+
+   double m=(yj-yi)/(xj-xi);
+
+   return yi - m*xi;
+
+}
+
 } // end of namespcae vmath
 
