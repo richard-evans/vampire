@@ -311,7 +311,7 @@ void calculate_lattice_anisotropy_fields(const int start_index,const int end_ind
    // Precalculate material lattice anisotropy constants
    std::vector<double> klatt_array(0);
    klatt_array.reserve(mp::num_materials);
-   for(int imat=0; imat<mp::num_materials; imat++) klatt_array.push_back(-2.0*mp::material[imat].Klatt*mp::material[imat].lattice_anisotropy.get_lattice_anisotropy_constant(sim::temperature));
+   for(int imat=0; imat<mp::num_materials; imat++) klatt_array.push_back(2.0*mp::material[imat].Klatt*mp::material[imat].lattice_anisotropy.get_lattice_anisotropy_constant(sim::temperature));
 
    // Precalculate unit vectors
    std::vector<double> ex(0);
