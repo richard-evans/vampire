@@ -3592,7 +3592,7 @@ namespace vout{
       double sus_z = norm*(stats::mean_susceptibility_squared[2]/stats::data_counter-stats::mean_susceptibility[2]*stats::mean_susceptibility[2]/(stats::data_counter*stats::data_counter));
 
       // check for very low temperature (denormalised number) to prevent nan
-      if(sim:temperature<1.e-300){
+      if(sim::temperature<1.e-300){
          sus_x=0.0;
          sus_y=0.0;
          sus_z=0.0;
