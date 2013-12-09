@@ -433,6 +433,13 @@ int set_derived_parameters(){
          newname << "material" << mat+1;
          mp::material[mat].name=newname.str();
       }
+
+      // initialise lattice anisotropy initialisation
+      mp::material[mat].lattice_anisotropy.set_interpolation_table();
+
+      // output interpolated data to file
+      //mp::material[mat].lattice_anisotropy.output_interpolated_function(mat);
+
 	}
 		// Check for which anisotropy function(s) are to be used		
 		if(sim::TensorAnisotropy==true){

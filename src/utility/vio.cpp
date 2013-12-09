@@ -2718,36 +2718,6 @@ int match_material(string const word, string const value, string const unit, int
       }
       //------------------------------------------------------------
       else
-      test="lattice-anisotropy-inflection-temperature";
-      if(word==test){
-         double KlattTinf=atof(value.c_str());
-         // Test for valid range
-         check_for_valid_value(KlattTinf, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
-         read_material[super_index].Klatt_inflection_temperature=KlattTinf;
-         return EXIT_SUCCESS;
-      }
-      //------------------------------------------------------------
-      else
-      test="lattice-anisotropy-unity-temperature";
-      if(word==test){
-         double KlattTu=atof(value.c_str());
-         // Test for valid range
-         check_for_valid_value(KlattTu, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
-         read_material[super_index].Klatt_unity_tmperature=KlattTu;
-         return EXIT_SUCCESS;
-      }
-      //------------------------------------------------------------
-      else
-      test="lattice-anisotropy-temperature-width";
-      if(word==test){
-         double KlattTw=atof(value.c_str());
-         // Test for valid range
-         check_for_valid_value(KlattTw, word, line, prefix, unit, "none", -1.e6, 1.e6,"material","-1e6 - 1e6");
-         read_material[super_index].Klatt_width_temperature=KlattTw;
-         return EXIT_SUCCESS;
-      }
-      //------------------------------------------------------------
-      else
       test="cubic-anisotropy-constant";
       if(word==test){
          double K=atof(value.c_str());
@@ -2921,6 +2891,54 @@ int match_material(string const word, string const value, string const unit, int
          //	read_material[super_index].min=min;
             return EXIT_SUCCESS;
          //}
+      }
+      //--------------------------------------------------------------------
+      else
+      test="lattice-anisotropy-file";
+      if(word==test){
+
+         // Open file and check for success
+         std::ifstream latt_file(value.c_str());
+         if(!latt_file.is_open()){
+            std::cerr << "Error: lattice file " << value.c_str() << " specified on line " << line << " of material file not found. Exiting." << std::endl;
+            zlog << zTs() << "Error: lattice file " << value.c_str() << " specified on line " << line << " of material file not found. Exiting." << std::endl;
+            return EXIT_FAILURE;
+         }
+
+         // specify number of points to be read
+         int num_pts=0;
+
+         // Read in number of temperature points
+         latt_file >> num_pts;
+
+         // Check for valie number of points
+         if(num_pts<=1){
+            std::cerr << "Error in lattice-anisotropy-file " << value.c_str() << " on line " << line << " of material file. The first number must be an integer greater than 1. Exiting." << std::endl;
+            zlog << zTs() << "Error in lattice-anisotropy-file " << value.c_str() << " on line " << line << " of material file. The first number must be an integer greater than 1. Exiting." << std::endl;
+            return EXIT_FAILURE;
+         }
+
+         // Loop over all lines in file
+         for(int c=0;c<num_pts;c++){
+
+            // temporary variables
+            double T;
+            double k;
+
+            // Read in points and add them to material
+            latt_file >> T >> k;
+
+            // Check for premature end of file
+            if(latt_file.eof()){
+               std::cerr << "Error in lattice anisotropy-file " << value.c_str() << " on line " << line << " of material file. End of file reached before reading all values. Exiting" << std::endl;
+               zlog << zTs() << "Error in lattice anisotropy-file " << value.c_str() << " on line " << line << " of material file. End of file reached before reading all values. Exiting" << std::endl;
+               return EXIT_FAILURE;
+            }
+            read_material[super_index].lattice_anisotropy.add_point(T,k);
+         }
+
+         return EXIT_SUCCESS;
+
       }
       //--------------------------------------------------------------------
       else
