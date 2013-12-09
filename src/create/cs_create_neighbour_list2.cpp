@@ -202,6 +202,11 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 
    zlog << zTs() << "\tDone"<< std::endl;
 
+   // Get unit cell size
+   const double ucdx=cs::unit_cell.dimensions[0];
+   const double ucdy=cs::unit_cell.dimensions[1];
+   const double ucdz=cs::unit_cell.dimensions[2];
+
 	// Generate neighbour list
 	std::cout <<"Generating neighbour list"<< std::flush;
    zlog << zTs() << "Memory required for neighbour list:" << 8.0*double(num_cells)*double(cs::unit_cell.interaction.size())/1.0e6 << " MB" << std::endl;
@@ -216,42 +221,101 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		int scc[3]={cell_coord_array[cell][0],cell_coord_array[cell][1],cell_coord_array[cell][2]};
 		// Loop over all interactions
 		for(unsigned int i=0;i<cs::unit_cell.interaction.size();i++){
+
 			const int atom=cs::unit_cell.interaction[i].i;
 			const int natom=cs::unit_cell.interaction[i].j;
+
 			int nx=cs::unit_cell.interaction[i].dx+scc[0];
 			int ny=cs::unit_cell.interaction[i].dy+scc[1];
 			int nz=cs::unit_cell.interaction[i].dz+scc[2];
-			#ifdef MPICF
+
+         // vector from i->j
+         double vx=0.0;
+         double vy=0.0;
+         double vz=0.0;
+
+         #ifdef MPICF
 			#else
+
 			// Wrap aound for periodic boundaries
+         // Consider virtual atom position for position vector
 			if(cs::pbc[0]==true){
-				if(nx>=int(d[0])) nx=nx-d[0];
-				else if(nx<0) nx=nx+d[0];
+				if(nx>=int(d[0])){
+               nx=nx-d[0];
+               vx=vx+d[0]*ucdx;
+            }
+				else if(nx<0){
+               nx=nx+d[0];
+               vx=vx-d[0]*ucdx;
+            }
 			}
 			if(cs::pbc[1]==true){
-				if(ny>=int(d[1])) ny=ny-d[1];
-				else if(ny<0) ny=ny+d[1];
+				if(ny>=int(d[1])){
+               ny=ny-d[1];
+               vy=vy+d[1]*ucdy;
+            }
+				else if(ny<0){
+               ny=ny+d[1];
+               vy=vy-d[1]*ucdy;
+            }
 			}
 			if(cs::pbc[2]==true){
-				if(nz>=int(d[2])) nz=nz-d[2];
-				else if(nz<0) nz=nz+d[2];
+				if(nz>=int(d[2])){
+               nz=nz-d[2];
+               vz=vz+d[2]*ucdz;
+            }
+				else if(nz<0){
+               nz=nz+d[2];
+               vz=vz-d[2]*ucdz;
+            }
 			}
+
 			#endif
 			// check for out-of-bounds access
 			if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
-			  // check for missing atoms
-			  if((supercell_array[scc[0]][scc[1]][scc[2]][atom]!=-1) && (supercell_array[nx][ny][nz][natom]!=-1)){
-					// get current index
-					int index=cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].size();
-					// push back array of class
-					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].push_back(tmp_nt);
-					// now save atom id and interaction type
-					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].nn=supercell_array[nx][ny][nz][natom];
-					cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].i=i;
-					//if((supercell_array[nx][ny][nz][atom]==-1) || (supercell_array[nx][ny][nz][natom]==-1)){
-					//std::cout << "err " << supercell_array[scc[0]][scc[1]][scc[2]][atom] << "\t" << supercell_array[nx][ny][nz][natom] << std::endl;
-					//}std::cin.get();
-					}
+            // check for missing atoms
+            if((supercell_array[scc[0]][scc[1]][scc[2]][atom]!=-1) && (supercell_array[nx][ny][nz][natom]!=-1)){
+
+               // need actual atom numbers...
+               int atomi = supercell_array[scc[0]][scc[1]][scc[2]][atom];
+               int atomj = supercell_array[nx][ny][nz][natom];
+
+               //std::cout << "int_id: " << i << "\tatom i: " << atomi << "\tatom j: " << atomj << "\tuc_i: " << atom << "\tuc_j: " << natom << std::endl;  
+
+               double ix=catom_array[atomi].x; // Already in A
+               double iy=catom_array[atomi].y;
+               double iz=catom_array[atomi].z;
+               double jx=catom_array[atomj].x;
+               double jy=catom_array[atomj].y;
+               double jz=catom_array[atomj].z;
+
+               //std::cout << "\tpi:    " << ix << "\t" << iy << "\t" << iz << std::endl;
+               //std::cout << "\tpj:    " << jx << "\t" << jy << "\t" << jz << std::endl;
+               //std::cout << "\tv_uc:  " << vx << "\t" << vy << "\t" << vz << std::endl;
+
+               vx+=jx-ix;
+               vy+=jy-iy;
+               vz+=jz-iz;
+
+               //std::cout << "\tv:     " << jx-ix << "\t" << jy-iy << "\t" << jz-iz << std::endl;
+               //std::cout << "\tv_eff: " << vx << "\t" << vy << "\t" << vz << std::endl;
+
+               // get current index
+               int index=cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].size();
+
+               // push back array of class
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].push_back(tmp_nt);
+
+               // now save atom id and interaction type
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].nn=supercell_array[nx][ny][nz][natom];
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].i=i;
+
+               // Add position vector from i-> j
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].vx=vx;
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].vy=vy;
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].vz=vz;
+
+            }
 			}
 		}
 	}

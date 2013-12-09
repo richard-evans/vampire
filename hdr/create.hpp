@@ -145,6 +145,10 @@ namespace cs{
 		int nn; // atom id of neighbour
 		int i; // interaction type of neighbour
 
+      double vx; // vector between atoms i->j
+      double vy;
+      double vz;
+
 	};
 	
 	extern cs::unit_cell_t unit_cell;

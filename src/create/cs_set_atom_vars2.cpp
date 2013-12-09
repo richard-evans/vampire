@@ -290,9 +290,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
       double nndz=double(cs::unit_cell.interaction[itr].dz);
 
       // load positions of i and j atoms to temporary coordinates and convert to angstroms
-      double ix=(unit_cell.atom[cs::unit_cell.interaction[itr].i].x + nndx)*ucdx;
-      double iy=(unit_cell.atom[cs::unit_cell.interaction[itr].i].y + nndy)*ucdy;
-      double iz=(unit_cell.atom[cs::unit_cell.interaction[itr].i].z + nndz)*ucdz;
+      double ix=(unit_cell.atom[cs::unit_cell.interaction[itr].i].x)*ucdx;
+      double iy=(unit_cell.atom[cs::unit_cell.interaction[itr].i].y)*ucdy;
+      double iz=(unit_cell.atom[cs::unit_cell.interaction[itr].i].z)*ucdz;
       double jx=(unit_cell.atom[cs::unit_cell.interaction[itr].j].x + nndx)*ucdx;
       double jy=(unit_cell.atom[cs::unit_cell.interaction[itr].j].y + nndy)*ucdy;
       double jz=(unit_cell.atom[cs::unit_cell.interaction[itr].j].z + nndz)*ucdz;
@@ -406,6 +406,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
          atoms::nearest_neighbour_list_si[atom]=0;
          atoms::nearest_neighbour_list_ei[atom]=0;
 
+         //std::cout << "Atom " << atom << std::endl;
+         //std::cout << "--------------------------------------------" << std::endl;
+
          // Only calculate parameters for atoms with less than full nn coordination
          if(atoms::surface_array[atom]){
 
@@ -421,10 +424,8 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
                   // add interaction to 1D list
                   atoms::nearest_neighbour_list.push_back(cneighbourlist[atom][nn].nn);
 
-                  // calculate atomic position vector i->j
-                  double eij[3]={atoms::x_coord_array[cneighbourlist[atom][nn].nn]-atoms::x_coord_array[atom],
-                                 atoms::y_coord_array[cneighbourlist[atom][nn].nn]-atoms::y_coord_array[atom],
-                                 atoms::z_coord_array[cneighbourlist[atom][nn].nn]-atoms::z_coord_array[atom],};
+                  // get atomic position vector i->j
+                  double eij[3]={cneighbourlist[atom][nn].vx,cneighbourlist[atom][nn].vy,cneighbourlist[atom][nn].vz};
 
                   // normalise to unit vector
                   double invrij=1.0/sqrt(eij[0]*eij[0]+eij[1]*eij[1]+eij[2]*eij[2]);
@@ -432,6 +433,8 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
                   atoms::eijx.push_back(eij[0]*invrij);
                   atoms::eijy.push_back(eij[1]*invrij);
                   atoms::eijz.push_back(eij[2]*invrij);
+
+                  //std::cout << "nn_id: " << nn << " j: " << cneighbourlist[atom][nn].nn << " range: " << 1.0/invrij << std::endl;
 
                   // increment 1D counter
                   counter++;
@@ -441,6 +444,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
             // [si x x x x x ][ei/si x x x x x][ei/si x x x x x]
             atoms::nearest_neighbour_list_ei[atom]=counter;
          }
+         std::cout << std::endl;
       }
 
    } // end of surface anisotropy initialisation
