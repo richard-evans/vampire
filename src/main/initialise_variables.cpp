@@ -435,7 +435,7 @@ int set_derived_parameters(){
       }
 
       // initialise lattice anisotropy initialisation
-      mp::material[mat].lattice_anisotropy.set_interpolation_table();
+      if(sim::lattice_anisotropy_flag==true) mp::material[mat].lattice_anisotropy.set_interpolation_table();
 
       // output interpolated data to file
       //mp::material[mat].lattice_anisotropy.output_interpolated_function(mat);
