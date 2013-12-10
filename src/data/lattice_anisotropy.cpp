@@ -66,6 +66,13 @@ void lattice_anis_t::set_interpolation_table(){
    // Output informative message to log
    zlog << zTs() << "Determining interpolation variables for tabulated lattice anisotropy." << std::endl;
 
+   // Check for undefined lattice anisotropy
+   if(T.size()==0){
+      Tmax=0;
+      k_Tmax=0.0;
+      return;
+   }
+
    // check T(i+1) > T(i)
    for(unsigned int i=1; i<T.size(); i++){
       if(T[i]<T[i-1]){
@@ -167,7 +174,7 @@ double lattice_anis_t::get_lattice_anisotropy_constant(double temperature){
    const unsigned int Ti = int(temperature);
 
    // check for value larger than Tmax
-   if(Ti>Tmax) return k_Tmax;
+   if(Ti>=Tmax) return k_Tmax;
 
    // otherwise return interpolated value
    else return m[Ti]*temperature+c[Ti];
