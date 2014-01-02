@@ -1001,7 +1001,8 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	
 	// Calculate number of spins I need from each CPU
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		if(catom_array[atom].mpi_cpuid!=vmpi::my_rank){
+      // Only receive for halo atoms
+      if(catom_array[atom].mpi_type==2){
 			vmpi::recv_num_array[catom_array[atom].mpi_cpuid]++;
 		}
 	}
@@ -1021,17 +1022,14 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	std::vector<int> recv_counter_array(vmpi::num_processors);
 
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		if(catom_array[atom].mpi_cpuid!=vmpi::my_rank){
+      // Only receive for halo atoms
+      if(catom_array[atom].mpi_type==2){
 			unsigned int p = catom_array[atom].mpi_cpuid;
 			unsigned int index = vmpi::recv_start_index_array[p]+recv_counter_array[p];
 			vmpi::recv_atom_translation_array[index]=atom;
 			recv_counter_array[p]++;
 		}
 	}
-	
-	//for(int i=0;i<num_halo_swaps;i++){
-	//	std::cout << i << "\t" << vmpi::recv_atom_translation_array[i] << std::endl;
-	//}
 
 	// Get number of spins I need to send to each CPU
 	std::vector<MPI::Request> requests(0);
@@ -1046,7 +1044,6 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	MPI::Request::Waitall(requests.size(),&requests[0],&stati[0]);
 	
 	// Find total number of boundary atoms I need to send and calculate start index
-
 	int num_boundary_swaps=0;
 	int num_send_data=0;
 	for(int p=0;p<vmpi::num_processors;p++){
