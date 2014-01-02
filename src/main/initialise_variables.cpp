@@ -285,16 +285,6 @@ int set_derived_parameters(){
 	for(int mat=0;mat<mp::num_materials;mat++){
 		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
 		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
-		
-		// set initial spins to unit length
-		double sx = mp::material[mat].initial_spin[0];
-		double sy = mp::material[mat].initial_spin[1];
-		double sz = mp::material[mat].initial_spin[2];
-
-		double modS = 1.0/sqrt(sx*sx+sy*sy+sz*sz);
-		mp::material[mat].initial_spin[0]*=modS;
-		mp::material[mat].initial_spin[1]*=modS;
-		mp::material[mat].initial_spin[2]*=modS;
 			
 		for(int j=0;j<mp::num_materials;j++){
 			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
