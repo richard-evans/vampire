@@ -1814,7 +1814,7 @@ int match_sim(string const word, string const value, string const unit, int cons
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
-   test="constraint-angle-theta-min";
+   test="constraint-angle-theta-minimum";
    if(word==test){
       double angle=atof(value.c_str());
       check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
@@ -1822,7 +1822,7 @@ int match_sim(string const word, string const value, string const unit, int cons
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
-   test="constraint-angle-theta-max";
+   test="constraint-angle-theta-maximum";
    if(word==test){
       double angle=atof(value.c_str());
       check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
@@ -1846,7 +1846,7 @@ int match_sim(string const word, string const value, string const unit, int cons
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
-   test="constraint-angle-phi-min";
+   test="constraint-angle-phi-minimum";
    if(word==test){
       double angle=atof(value.c_str());
       check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
@@ -1854,7 +1854,7 @@ int match_sim(string const word, string const value, string const unit, int cons
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
-   test="constraint-angle-phi-max";
+   test="constraint-angle-phi-maximum";
    if(word==test){
       double angle=atof(value.c_str());
       check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
@@ -3061,7 +3061,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 		}
 		//--------------------------------------------------------------------
-		test="constraint-angle-theta-min";
+		test="constraint-angle-theta-miniumum";
 		if(word==test){
 			double angle=atof(value.c_str());
 			// Test for valid range
@@ -3075,7 +3075,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 		}
 		//--------------------------------------------------------------------
-		test="constraint-angle-theta-max";
+		test="constraint-angle-theta-maximum";
 		if(word==test){
 			double angle=atof(value.c_str());
 			// Test for valid range
@@ -3103,7 +3103,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 		}
 		//--------------------------------------------------------------------
-		test="constraint-angle-phi-min";
+		test="constraint-angle-phi-minimum";
 		if(word==test){
 			double angle=atof(value.c_str());
 			// Test for valid range
@@ -3131,7 +3131,7 @@ int match_material(string const word, string const value, string const unit, int
 			}
 		}
 		//--------------------------------------------------------------------
-		test="constraint-angle-phi-max";
+		test="constraint-angle-phi-maximum";
 		if(word==test){
 			double angle=atof(value.c_str());
 			// Test for valid range
