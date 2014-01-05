@@ -2707,6 +2707,16 @@ int match_material(string const word, string const value, string const unit, int
       }
       //------------------------------------------------------------
       else
+      test="third-uniaxial-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].Ku3_SI=-K; // Import anisotropy as field, *-1
+         sim::sixth_order_uniaxial_anisotropy=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
       test="lattice-anisotropy-constant";
       if(word==test){
          double Klatt=atof(value.c_str());

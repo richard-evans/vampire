@@ -51,6 +51,7 @@
 int calculate_exchange_fields(const int,const int);
 int calculate_anisotropy_fields(const int,const int);
 void calculate_second_order_uniaxial_anisotropy_fields(const int,const int);
+void calculate_sixth_order_uniaxial_anisotropy_fields(const int,const int);
 void calculate_lattice_anisotropy_fields(const int, const int);
 int calculate_cubic_anisotropy_fields(const int,const int);
 int calculate_applied_fields(const int,const int);
@@ -82,6 +83,7 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	// Anisotropy Fields
 	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
    if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
+   if(sim::sixth_order_uniaxial_anisotropy) calculate_sixth_order_uniaxial_anisotropy_fields(start_index,end_index);
    if(sim::lattice_anisotropy_flag) calculate_lattice_anisotropy_fields(start_index,end_index);
    if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
 	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
@@ -296,6 +298,38 @@ void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,con
       atoms::x_total_spin_field_array[atom] -= Ku2*ex*Sdote3;
       atoms::y_total_spin_field_array[atom] -= Ku2*ey*Sdote3;
       atoms::z_total_spin_field_array[atom] -= Ku2*ez*Sdote3;
+   }
+   return;
+}
+
+//------------------------------------------------------
+//  Function to calculate sixth order uniaxial
+//  anisotropy fields
+//
+//  (c) R F L Evans 2013
+//
+//  E = k6*(S . e)^6
+//  Hx = -6*k6*(S . e)^5 e_x
+//  Hy = -6*k6*(S . e)^5 e_y
+//  Hz = -6*k6*(S . e)^5 e_z
+//
+//------------------------------------------------------
+void calculate_sixth_order_uniaxial_anisotropy_fields(const int start_index,const int end_index){
+   for(int atom=start_index;atom<end_index;atom++){
+      const int imaterial=atoms::type_array[atom];
+      const double ex = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(0);
+      const double ey = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(1);
+      const double ez = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(2);
+      const double Sx = atoms::x_spin_array[atom];
+      const double Sy = atoms::y_spin_array[atom];
+      const double Sz = atoms::z_spin_array[atom];
+      const double Ku3 = 6.0*mp::material_sixth_order_anisotropy_constant_array[imaterial];
+      const double Sdote = (Sx*ex + Sy*ey + Sz*ez);
+      const double Sdote5 = Sdote*Sdote*Sdote*Sdote*Sdote;
+
+      atoms::x_total_spin_field_array[atom] -= Ku3*ex*Sdote5;
+      atoms::y_total_spin_field_array[atom] -= Ku3*ey*Sdote5;
+      atoms::z_total_spin_field_array[atom] -= Ku3*ez*Sdote5;
    }
    return;
 }
