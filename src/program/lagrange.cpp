@@ -40,7 +40,7 @@
 
 namespace sim{
 
-// Function to update lagrange lambda
+/// Function to update lagrange lambda
 void update_lagrange_lambda(){
 
    // Save initial value of lambda
@@ -79,12 +79,12 @@ void update_lagrange_lambda(){
 namespace program{
 
 //-----------------------------------------------------------
-//  Function to perform constrained energy minimisation
-//  using the LaGrange multiplier method
+///  Function to perform constrained energy minimisation
+///  using the LaGrange multiplier method
 //
-//  (c) R F L Evans 2013
+///  (c) R F L Evans 2013
 //
-//  D.A.Garanin Phys. Rev. Lett. 90, 065504 (2003)
+///  D.A.Garanin Phys. Rev. Lett. 90, 065504 (2003)
 //
 //-----------------------------------------------------------
 void lagrange_multiplier(){

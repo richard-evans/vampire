@@ -47,11 +47,11 @@ std::valarray<double> mc_uniform(std::valarray<double>&);
 std::valarray<double> mc_angle(std::valarray<double>&);
 std::valarray<double> mc_hinzke_nowak(std::valarray<double>&);
 
-//--------------------------------------------------------
-//
-//  Master function to call desired Monte Carlo move
-//
-//--------------------------------------------------------
+///--------------------------------------------------------
+///
+///  Master function to call desired Monte Carlo move
+///
+///--------------------------------------------------------
 std::valarray<double> mc_move(std::valarray<double>& old_spin){
    
    // Reference enum list for readability
@@ -79,8 +79,8 @@ std::valarray<double> mc_move(std::valarray<double>& old_spin){
    }
 }
 
-// Angle move
-// Move spin within cone near old position
+/// Angle move
+/// Move spin within cone near old position
 std::valarray<double> mc_angle(std::valarray<double>& old_spin){
    
    // Declare new spin
@@ -100,8 +100,8 @@ std::valarray<double> mc_angle(std::valarray<double>& old_spin){
 
 }
 
-// Spin flip move
-// Reverse spin direction
+/// Spin flip move
+/// Reverse spin direction
 std::valarray<double> mc_spin_flip(std::valarray<double>& old_spin){
    
    // Declare new spin
@@ -115,8 +115,8 @@ std::valarray<double> mc_spin_flip(std::valarray<double>& old_spin){
 
 }
 
-// Random move
-// Place spin randomly on unit sphere
+/// Random move
+/// Place spin randomly on unit sphere
 std::valarray<double> mc_uniform(std::valarray<double>& old_spin){
    
   // Declare new spin
@@ -136,11 +136,11 @@ std::valarray<double> mc_uniform(std::valarray<double>& old_spin){
 
 }
 
-// Combination move selecting random move from spin_flip, angle and random
-//
-// D. Hinzke, U. Nowak, Computer Physics Communications 121–122 (1999) 334–337
-// "Monte Carlo simulation of magnetization switching in a Heisenberg model for small ferromagnetic particles"
-// 
+/// Combination move selecting random move from spin_flip, angle and random
+///
+/// D. Hinzke, U. Nowak, Computer Physics Communications 121–122 (1999) 334–337
+/// "Monte Carlo simulation of magnetization switching in a Heisenberg model for small ferromagnetic particles"
+/// 
 std::valarray<double> mc_hinzke_nowak(std::valarray<double>& old_spin){
    
    // Select random move type

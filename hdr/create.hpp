@@ -74,11 +74,11 @@ namespace cs{
 	extern int particle_creation_parity;
 	extern double particle_scale;
 	extern double particle_spacing;
-	extern double particle_array_offset_x; // Offset particle array along x-direction;
-	extern double particle_array_offset_y; // Offset particle array along y-direction;
-   extern double particle_shape_factor_x; // Normalised particle shape
-   extern double particle_shape_factor_y; // Normalised particle shape
-   extern double particle_shape_factor_z; // Normalised particle shape
+	extern double particle_array_offset_x; /// Offset particle array along x-direction;
+	extern double particle_array_offset_y; /// Offset particle array along y-direction;
+   extern double particle_shape_factor_x; /// Normalised particle shape
+   extern double particle_shape_factor_y; /// Normalised particle shape
+   extern double particle_shape_factor_z; /// Normalised particle shape
 
 	// Other directives and flags
 	extern bool single_spin;
@@ -89,9 +89,9 @@ namespace cs{
 	// Variables for interfacial roughness control
 	extern bool interfacial_roughness;
 	extern bool interfacial_roughness_local_height_field;
-	extern int interfacial_roughness_type; // Sets peaks (1), troughs (-1) or both (0)
+	extern int interfacial_roughness_type; /// Sets peaks (1), troughs (-1) or both (0)
 	extern unsigned int interfacial_roughness_random_seed;
-	extern unsigned int interfacial_roughness_seed_count; // Number of seeds
+	extern unsigned int interfacial_roughness_seed_count; /// Number of seeds
 	extern double interfacial_roughness_height_field_resolution; // Angstroms
 	extern double interfacial_roughness_mean_seed_radius; // Angstroms
 	extern double interfacial_roughness_seed_radius_variance; // Variance as fraction of mean radius
@@ -100,23 +100,23 @@ namespace cs{
 	
 	class unit_cell_atom_t {
 	public:
-		double x; // atom x-coordinate
-		double y; // atom y-coordinate
-		double z; // atom z-coordinate
-		unsigned int mat; // material
-		unsigned int lc; // lattice category
-		unsigned int hc; // height category
-		unsigned int ni; // number of interactions
+		double x; /// atom x-coordinate
+		double y; /// atom y-coordinate
+		double z; /// atom z-coordinate
+		unsigned int mat; /// material
+		unsigned int lc; /// lattice category
+		unsigned int hc; /// height category
+		unsigned int ni; /// number of interactions
 	};
 	
 	class unit_cell_interaction_t {
 	public:
-		unsigned int i; // atom unit cell id
-		unsigned int j; // neighbour atom unit cell id
-		int dx; // delta x in unit cells
-		int dy; // delta y in unit cells
-		int dz; // delta z in unit cells
-		double Jij[3][3]; // Exchange tensor
+		unsigned int i; /// atom unit cell id
+		unsigned int j; /// neighbour atom unit cell id
+		int dx; /// delta x in unit cells
+		int dy; /// delta y in unit cells
+		int dz; /// delta z in unit cells
+		double Jij[3][3]; /// Exchange tensor
 	};
 	
 	class unit_cell_t {
@@ -125,11 +125,11 @@ namespace cs{
 		double dimensions[3];
 		double shape[3][3];
 		
-		unsigned int lcsize; // number of local categories
-		unsigned int hcsize; // number of height categories
-		unsigned int interaction_range; // maximum range in unit cells
-		unsigned int surface_threshold; // threshold for surface atoms
-		int exchange_type; // -1=isotropic(local material), 0=isotropic, 1=vector, or 2=tensor
+		unsigned int lcsize; /// number of local categories
+		unsigned int hcsize; /// number of height categories
+		unsigned int interaction_range; /// maximum range in unit cells
+		unsigned int surface_threshold; /// threshold for surface atoms
+		int exchange_type; /// -1=isotropic(local material), 0=isotropic, 1=vector, or 2=tensor
 
 		// list of atoms in each unit cell
 		std::vector <unit_cell_atom_t> atom;

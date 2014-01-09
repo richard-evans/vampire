@@ -49,13 +49,13 @@
 #include "vmath.hpp"
 #include "vmpi.hpp"
 
-// function forward declarations
+/// function forward declarations
 double two_temperature_function(double ftime);
 double double_pump_two_temperature_function(double ftime);
 double square_temperature_function(double ftime);
 double double_pump_square_temperature_function(double ftime);
 
-// Selects appropriate temperature pulse function according to user input
+/// Selects appropriate temperature pulse function according to user input
 double temperature_pulse_function(double function_time){
 
 	switch(sim::pump_function){
@@ -81,7 +81,7 @@ double temperature_pulse_function(double function_time){
 	}
 }
 
-// Calculates temperature for single Gaussian pulse using the two-temperature model
+/// Calculates temperature for single Gaussian pulse using the two-temperature model
 double two_temperature_function(double ftime){
 
 		const double reduced_time =  (ftime-3.*sim::pump_time)/(sim::pump_time);
@@ -109,7 +109,7 @@ double two_temperature_function(double ftime){
 
 }
 
-// Calculates temperature for double Gaussian pulses using the two-temperature model
+/// Calculates temperature for double Gaussian pulses using the two-temperature model
 double double_pump_two_temperature_function(double ftime){
 	
 		const double reduced_time =  (ftime-3.*sim::pump_time)/(sim::pump_time);
@@ -139,17 +139,17 @@ double double_pump_two_temperature_function(double ftime){
 		return sim::TTTe;
 }
 
-// Calculates temperature for single square pulse
+/// Calculates temperature for single square pulse
 double square_temperature_function(double ftime){
 
 	//
-	//
-	//
-	//            Tmax   |---------------|
-	//                   |               |
-	//                   |               |
-	// ------------------|               |--------------- Teq
-	//                    <- pump time ->
+	///
+	///
+	///            Tmax   |---------------|
+	///                   |               |
+	///                   |               |
+	/// ------------------|               |--------------- Teq
+	///                    <- pump time ->
 	// 
 	
 	if(ftime <= sim::pump_time) return sim::Tmax;
@@ -157,19 +157,19 @@ double square_temperature_function(double ftime){
 	
 }
 
-// Calculates temperature for double square pulse
+/// Calculates temperature for double square pulse
 double double_pump_square_temperature_function(double ftime){
 
-	//
-	//          0               t1                t2              t3
-	//
-	//   Tmax   |---------------|
-	//          |               |                 |---------------| double_pump_Tmax
-	//          |               |                 |               |
-	// ---------|  -  -  -  -   |-----------------|   -   -   -   |------------ Teq
-	//
-	//           <- pump time -> <- dpump_delay -> <- pump time2 ->  
-	//
+	///
+	///          0               t1                t2              t3
+	///
+	///   Tmax   |---------------|
+	///          |               |                 |---------------| double_pump_Tmax
+	///          |               |                 |               |
+	/// ---------|  -  -  -  -   |-----------------|   -   -   -   |------------ Teq
+	///
+	///           <- pump time -> <- dpump_delay -> <- pump time2 ->  
+	///
 	
 	const double t1 = sim::pump_time;
 	const double t2 = t1+sim::double_pump_delay;

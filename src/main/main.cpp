@@ -54,12 +54,16 @@ int main(int argc, char* argv[]){
             infile=string(argv[arg]);
          }
          else{
+      	    terminaltextcolor(RED);
             std::cerr << "Error - no file specified for \'-f\' command line option" << std::endl;
+            terminaltextcolor(WHITE);
             return EXIT_FAILURE;
          }
       }
       else{
+         terminaltextcolor(RED);
          std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
+         terminaltextcolor(WHITE);
          return EXIT_FAILURE;
       }
    }
@@ -71,9 +75,11 @@ int main(int argc, char* argv[]){
 
    // Initialise log file
    vout::zLogTsInit(std::string(argv[0]));
+   
 
    // Output Program Header
    if(vmpi::my_rank==0){
+      terminaltextcolor(YELLOW);
       std::cout << "                                                _          " << std::endl;
       std::cout << "                                               (_)         " << std::endl;
       std::cout << "                    __   ____ _ _ __ ___  _ __  _ _ __ ___ " << std::endl;
@@ -83,9 +89,9 @@ int main(int argc, char* argv[]){
       std::cout << "                                         | |               " << std::endl;
       std::cout << "                                         |_|               " << std::endl;
       std::cout << std::endl;
-      std::cout << "                      Version 3.0.3 " << __DATE__ << " " << __TIME__ << std::endl;
+      std::cout << "                      Version 3.0.2 " << __DATE__ << " " << __TIME__ << std::endl;
       std::cout << std::endl;
-
+	   terminaltextcolor(WHITE);
       std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
       std::cout << std::endl;
       std::cout << "  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>" << std::endl;
@@ -144,7 +150,9 @@ int main(int argc, char* argv[]){
    #endif
 
    zlog << zTs() << "Simulation ended gracefully." << std::endl;
+   terminaltextcolor(GREEN);
    std::cout << "Simulation ended gracefully." << std::endl;
+   terminaltextcolor(WHITE);   
 
    return EXIT_SUCCESS;
 

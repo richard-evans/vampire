@@ -203,7 +203,9 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	
 	// Check to see if any atoms have been generated
 	if(atom==0){
+		terminaltextcolor(RED);
 		std::cout << "Error - no atoms have been generated, increase system dimensions!" << std::endl;
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error: No atoms have been generated. Increase system dimensions." << std::endl;
 		err::vexit();
 	}
@@ -232,7 +234,9 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	
 	// Check for opening
 	if(!inputfile.is_open()){
+		terminaltextcolor(RED);
 		std::cerr << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
 		err::vexit();
 	}
@@ -296,8 +300,12 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				//std::cout << "Reading in " << num_uc_atoms << " atoms" << std::endl;
 				// resize unit_cell.atom array if within allowable bounds
 				if( (num_uc_atoms >0) && (num_uc_atoms <= 1000000)) unit_cell.atom.resize(num_uc_atoms);
-				else { std::cerr << "Error! Requested number of atoms " << num_uc_atoms << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-1,000,000. Exiting" << std::endl; err::vexit();}  
+				else {
+					terminaltextcolor(RED);
+					std::cerr << "Error! Requested number of atoms " << num_uc_atoms << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-1,000,000. Exiting" << std::endl; err::vexit();
+					terminaltextcolor(WHITE);
+				}  
 				// loop over all atoms and read into class
 				for (int i=0; i<unit_cell.atom.size(); i++){
 					line_counter++;
@@ -315,32 +323,40 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					// now check for mostly sane input
 					if(cx>=0.0 && cx <=1.0) unit_cell.atom[i].x=cx;
 					else{
+						terminaltextcolor(RED);
 						std::cerr << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
 									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						terminaltextcolor(WHITE);
 						zlog << zTs() << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
 									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
 						err::vexit();
 					}
 					if(cy>=0.0 && cy <=1.0) unit_cell.atom[i].y=cy;
 					else{
+						terminaltextcolor(RED);
 						std::cerr << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
 									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						terminaltextcolor(WHITE);
 						zlog << zTs() << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
 									     << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
 						err::vexit();
 					}
 					if(cz>=0.0 && cz <=1.0) unit_cell.atom[i].z=cz;
 					else{
+						terminaltextcolor(RED);
 						std::cerr << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
 						<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						terminaltextcolor(WHITE);
 						zlog << zTs() << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
 										  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
 						err::vexit();
 					}
 					if(mat_id >=0 && mat_id<mp::num_materials) unit_cell.atom[i].mat=mat_id;
 					else{ 
+						terminaltextcolor(RED);
 						std::cerr << "Error! Requested material id " << mat_id << " for atom number " << id <<  " on line " << line_counter
 									 << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl;
+						terminaltextcolor(WHITE);
 						zlog << zTs() << "Error! Requested material id " << mat_id << " for atom number " << id <<  " on line " << line_counter
                             << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl; err::vexit();}
 					unit_cell.atom[i].lc=lcat_id;
@@ -352,8 +368,12 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				iss >> num_interactions >> exc_type;
 				//std::cout << num_interactions << "\t" << exc_type << std::endl;
 				if(num_interactions>=0) unit_cell.interaction.resize(num_interactions);
-				else { std::cerr << "Error! Requested number of interactions " << num_interactions << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is less than 0. Exiting" << std::endl; err::vexit();}
+				else {
+					terminaltextcolor(RED);
+					std::cerr << "Error! Requested number of interactions " << num_interactions << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is less than 0. Exiting" << std::endl; err::vexit();
+				    terminaltextcolor(WHITE);
+				}
 				// if exchange type omitted, then assume isotropic values from material file
 				//if(exc_type==-1) unit_cell.exchange_type=0;
 				// loop over all interactions and read into class
@@ -373,11 +393,19 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					line_counter++;
 					// check for sane input
 					if(iatom>=0 && iatom < unit_cell.atom.size()) unit_cell.interaction[i].i=iatom;
-					else{std::cerr << "Error! iatom number "<< iatom <<" for interaction id " << id << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"<< unit_cell.atom.size()-1 << ". Exiting" << std::endl; err::vexit();}
+					else{
+						terminaltextcolor(RED);
+						std::cerr << "Error! iatom number "<< iatom <<" for interaction id " << id << " on line " << line_counter
+								  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"<< unit_cell.atom.size()-1 << ". Exiting" << std::endl; err::vexit();
+						terminaltextcolor(WHITE);
+						}
 					if(iatom>=0 && jatom < unit_cell.atom.size()) unit_cell.interaction[i].j=jatom;
-					else{std::cerr << "Error! jatom number "<< jatom <<" for interaction id " << id << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"<< unit_cell.atom.size()-1 << ". Exiting" << std::endl; err::vexit();}
+					else{
+						terminaltextcolor(RED);
+						std::cerr << "Error! jatom number "<< jatom <<" for interaction id " << id << " on line " << line_counter
+								  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"<< unit_cell.atom.size()-1 << ". Exiting" << std::endl; err::vexit();
+						terminaltextcolor(RED);
+						}
 					unit_cell.interaction[i].dx=dx;
 					unit_cell.interaction[i].dy=dy;
 					unit_cell.interaction[i].dz=dz;
@@ -405,8 +433,10 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 							int_iss >> unit_cell.interaction[i].Jij[2][0] >> unit_cell.interaction[i].Jij[2][1] >> unit_cell.interaction[i].Jij[2][2];
 							break;
 						default:
+							terminaltextcolor(RED);
 							std::cerr << "Error! Requested exchange type " << exc_type << " on line " << line_counter
 					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0-2. Exiting" << std::endl; err::vexit();
+							terminaltextcolor(WHITE);
 					}
 					// increment number of interactions for atom i
 					unit_cell.atom[iatom].ni++;
@@ -417,8 +447,10 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				unit_cell.exchange_type=exc_type;
 				break;
 			default:
+				terminaltextcolor(RED);
 				std::cerr << "Error! Unknown line type on line " << line_counter
 					<< " of unit cell input file " << filename.c_str() << ". Exiting" << std::endl; err::vexit();
+				terminaltextcolor(WHITE);
 		}
 		line_id++;
 	} // end of while loop
@@ -987,7 +1019,9 @@ void unit_cell_set(unit_cell_t & unit_cell){
 
 		}
 		else{
+			terminaltextcolor(RED);
 			std::cerr << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl; 
+			terminaltextcolor(WHITE);
 			zlog << zTs() << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl; 
 			err::vexit();
 		}

@@ -43,11 +43,11 @@ namespace vmpi{
 int initialise(){
 	//====================================================================================
 	//
-	//												initialise_mpi
+	///												initialise_mpi
 	//
-	//									Startup MPI and Output host information
+	///									Startup MPI and Output host information
 	//
-	//										Version 1.0 R Evans 16/07/2009
+	///										Version 1.0 R Evans 16/07/2009
 	//
 	//====================================================================================
 	//
@@ -82,11 +82,11 @@ int initialise(){
 int hosts(){
 	//====================================================================================
 	//
-	//													mpi_hosts
+	///													mpi_hosts
 	//
-	//										Print MPI hostnames to screen
+	///										Print MPI hostnames to screen
 	//
-	//										Version 1.0 R Evans 07/08/2009
+	///										Version 1.0 R Evans 07/08/2009
 	//
 	//====================================================================================
 
@@ -115,11 +115,11 @@ int hosts(){
 int finalise(){
 	//====================================================================================
 	//
-	//												finalise_mpi
+	///												finalise_mpi
 	//
-	//									Finalise MPI and output wall time
+	///									Finalise MPI and output wall time
 	//
-	//										Version 1.0 R Evans 07/08/2009
+	///										Version 1.0 R Evans 07/08/2009
 	//
 	//====================================================================================
 

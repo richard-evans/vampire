@@ -57,7 +57,7 @@
 #include "vmath.hpp"
 #include "vio.hpp"
 
-// local cmc namespace
+/// local cmc namespace
 namespace cmc{
 	
 	std::vector<std::vector< int > > atom_list;
@@ -165,7 +165,7 @@ void mat_polar_rot_matrix()
 	
 } // end of polar rotation initialisation
 
-// Function to rotate all spin around the z-axis
+/// Function to rotate all spin around the z-axis
 void rotate_material_spins_around_z_axis(double ddz, int material){
 
 	std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix;
@@ -197,7 +197,7 @@ void rotate_material_spins_around_z_axis(double ddz, int material){
 	return;
 }
 
-// Function to rotate all spin around the x-axis
+/// Function to rotate all spin around the x-axis
 void rotate_material_spins_around_x_axis(double ddx, int material){
 
 	std::vector< std::vector<double> > x_rotation_matrix,y_rotation_matrix,z_rotation_matrix;
@@ -476,7 +476,9 @@ int ConstrainedMonteCarloMonteCarlo(){
 		atom_number2 = cmc::atom_list[imat1][int(mtrandom::grnd()*cmc::atom_list[imat1].size())];
 		imat2=atoms::type_array[atom_number2];
 		if(imat1!=imat2){
+			terminaltextcolor(RED);
 			std::cerr << "Error in MC/CMC integration! - atoms pairs are not from same material!" << std::endl;
+			terminaltextcolor(WHITE);
 			err::vexit();
 		}
 		

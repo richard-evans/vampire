@@ -4,7 +4,7 @@
 #
 #===================================================================
 
-voronoi_path='"qvoronoi"'
+
 
 export OMPI_CXX=g++
 #export OMPI_CXX=icc
@@ -12,11 +12,11 @@ export OMPI_CXX=g++
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"' -DVORONOI=$(voronoi_path)
-GCC=g++ -DCOMP='"GNU C++ Compiler"' -DVORONOI=$(voronoi_path)
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DVORONOI=$(voronoi_path)
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DVORONOI=$(voronoi_path)
-MPICC=mpicxx -DMPICF -DVORONOI=$(voronoi_path)
+ICC=icc -DCOMP='"Intel C++ Compiler"' 
+GCC=g++ -DCOMP='"GNU C++ Compiler"' 
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' 
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' 
+MPICC=mpicxx -DMPICF 
 
 export LANG=C
 export LC_ALL=C
@@ -25,35 +25,35 @@ export LC_ALL=C
 LIBS=-lstdc++
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
-ICC_DBCFLAGS= -O0 -C -I./hdr
-ICC_DBLFLAGS= -C -I./hdr
+ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
+ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
-GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++98 -Wno-long-long -I./hdr
-GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr
+GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++98 -Wno-long-long -I./hdr -I./src/qvoronoi
+GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr -I./src/qvoronoi
 
-PCC_DBCFLAGS= -O0 -I./hdr
-PCC_DBLFLAGS= -O0 -I./hdr
+PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
+PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
 
-IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
-IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
+IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
+IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr
-ICC_LDFLAGS= -I./hdr -axSSE3
+ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
+ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-GCC_CFLAGS=-O3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr
-GCC_LDFLAGS= -lstdc++ -I./hdr
+GCC_CFLAGS=-O3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
-PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr
-PCC_LDFLAGS= -I./hdr -O2 -march=barcelona -ipa
+PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
+PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
 NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
-IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr 
-IBM_LDFLAGS= -lstdc++ -I./hdr -O5 -qarch=450 -qtune=450
+IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
+IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
 
 # Objects
@@ -69,7 +69,6 @@ obj/data/atoms.o \
 obj/data/category.o \
 obj/data/cells.o \
 obj/data/grains.o \
-obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
@@ -88,7 +87,6 @@ obj/program/hybrid_cmc.o \
 obj/program/hysteresis.o \
 obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
-obj/program/partial_hysteresis.o \
 obj/program/static_hysteresis.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
@@ -111,7 +109,26 @@ obj/utility/statistics.o \
 obj/utility/units.o \
 obj/utility/vconfig.o \
 obj/utility/vio.o \
-obj/utility/vmath.o
+obj/utility/vmath.o\
+obj/qvoronoi/geom.o\
+obj/qvoronoi/geom2.o\
+obj/qvoronoi/global.o\
+obj/qvoronoi/io.o\
+obj/qvoronoi/libqhull.o\
+obj/qvoronoi/mem.o\
+obj/qvoronoi/merge.o\
+obj/qvoronoi/poly.o\
+obj/qvoronoi/poly2.o\
+obj/qvoronoi/qhrandom.o\
+obj/qvoronoi/qset.o\
+obj/qvoronoi/qvoronoi.o\
+obj/qvoronoi/rboxlib.o\
+obj/qvoronoi/stat.o\
+obj/qvoronoi/user.o\
+obj/qvoronoi/usermem.o\
+obj/qvoronoi/userprintf.o\
+obj/qvoronoi/userprintf_rbox.o\
+
 
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
@@ -133,28 +150,28 @@ MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
 
-all: $(OBJECTS) serial
+all: $(OBJECTS) gcc
 
 # Serial Targets
-serial: $(OBJECTS)
+gcc: $(OBJECTS)
 	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
 
-serial-intel: $(ICC_OBJECTS)
+intel: $(ICC_OBJECTS)
 	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $<
 
-serial-ibm: $(IBM_OBJECTS)
+ibm: $(IBM_OBJECTS)
 	$(IBM) $(IBM_LDFLAGS) $(IBM_OBJECTS) -o $(EXECUTABLE)
 
 $(IBM_OBJECTS): obj/%_ibm.o: src/%.cpp
 	$(IBM) -c -o $@ $(IBM_CFLAGS) $<
 
-serial-debug: $(GCCDB_OBJECTS)
+gcc-debug: $(GCCDB_OBJECTS)
 	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
@@ -180,40 +197,40 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 
 # MPI Targets
 
-parallel: $(MPI_OBJECTS)
+mpi-gcc: $(MPI_OBJECTS)
 	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE)
 #export OMPI_CXX=icc
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
 
-parallel-intel: $(MPI_ICC_OBJECTS)
+mpi-intel: $(MPI_ICC_OBJECTS)
 	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<
 
-parallel-pathscale: $(MPI_PCC_OBJECTS)
+mpi-pathscale: $(MPI_PCC_OBJECTS)
 	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_PCC_OBJECTS): obj/%_p_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_CFLAGS) $<
 
-parallel-ibm: $(MPI_IBM_OBJECTS)
+mpi-ibm: $(MPI_IBM_OBJECTS)
 	$(MPICC) $(IBM_LDFLAGS) $(MPI_IBM_OBJECTS) -o $(EXECUTABLE)
 $(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
 
-parallel-debug: $(MPI_GCCDB_OBJECTS)
+mpi-gcc-debug: $(MPI_GCCDB_OBJECTS)
 	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<
 
-parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
+mpi-intel-debug: $(MPI_ICCDB_OBJECTS)
 	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
-parallel-pathscale-debug: $(MPI_PCCDB_OBJECTS)
+mpi-pathscale-debug: $(MPI_PCCDB_OBJECTS)
 	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
@@ -243,5 +260,8 @@ tidy:
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
+
+package:
+	@bash .pack
 
 
