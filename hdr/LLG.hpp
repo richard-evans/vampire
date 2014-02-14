@@ -24,7 +24,7 @@
 //
 #ifndef LLG_H_
 #define LLG_H_
-// Header file for LLG namespace
+/// Header file for LLG namespace
 namespace LLG_arrays{
 	
 //==========================================================

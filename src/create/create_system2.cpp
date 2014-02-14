@@ -72,24 +72,24 @@
 namespace cs{
 
 	// System Dimensions
-	double system_dimensions[3]={77.0,77.0,77.0};	// Size of system (A)
-	double unit_cell_size[3]={3.54,3.54,3.54};		// Unit Cell Size (A) [Will eventually be local to unit cells]
-	bool pbc[3]={false,false,false};						// Periodic boundary conditions
-	bool SelectMaterialByZHeight=false;					// Toggle overwriting of material id by z-height
-	bool SelectMaterialByGeometry=false;					// Toggle override of input material type by geometry
-	unsigned int total_num_unit_cells[3]={0,0,0};	// Unit cells for entire system (x,y,z)
-	unsigned int local_num_unit_cells[3]={0,0,0};	// Unit cells on local processor (x,y,z)
+	double system_dimensions[3]={77.0,77.0,77.0};	/// Size of system (A)
+	double unit_cell_size[3]={3.54,3.54,3.54};		/// Unit Cell Size (A) [Will eventually be local to unit cells]
+	bool pbc[3]={false,false,false};						/// Periodic boundary conditions
+	bool SelectMaterialByZHeight=false;					/// Toggle overwriting of material id by z-height
+	bool SelectMaterialByGeometry=false;					/// Toggle override of input material type by geometry
+	unsigned int total_num_unit_cells[3]={0,0,0};	/// Unit cells for entire system (x,y,z)
+	unsigned int local_num_unit_cells[3]={0,0,0};	/// Unit cells on local processor (x,y,z)
 	std::string crystal_structure="sc";
 	
 	// System Parameters
-	int particle_creation_parity=0; // Offset of particle centre (odd/even)
-	double particle_scale=50.0;     // Diameter of particles/grains (A)
-	double particle_spacing=10.0;   // Spacing Between particles (A)
-	double particle_array_offset_x=0.0; // Offset particle array along x-direction;
-	double particle_array_offset_y=0.0; // Offset particle array along y-direction;
-   double particle_shape_factor_x=1.0; // Normalised particle shape
-   double particle_shape_factor_y=1.0; // Normalised particle shape
-   double particle_shape_factor_z=1.0; // Normalised particle shape
+	int particle_creation_parity=0; /// Offset of particle centre (odd/even)
+	double particle_scale=50.0;     /// Diameter of particles/grains (A)
+	double particle_spacing=10.0;   /// Spacing Between particles (A)
+	double particle_array_offset_x=0.0; /// Offset particle array along x-direction;
+	double particle_array_offset_y=0.0; /// Offset particle array along y-direction;
+   double particle_shape_factor_x=1.0; /// Normalised particle shape
+   double particle_shape_factor_y=1.0; /// Normalised particle shape
+   double particle_shape_factor_z=1.0; /// Normalised particle shape
 
 	// Other directives and flags
 	bool single_spin=false;
@@ -100,14 +100,14 @@ namespace cs{
 	// Variables for interfacial roughness control
 	bool interfacial_roughness=false;
 	bool interfacial_roughness_local_height_field=false;
-	int interfacial_roughness_type=0; // Sets peaks (1), troughs (-1) or both (0)
+	int interfacial_roughness_type=0; /// Sets peaks (1), troughs (-1) or both (0)
 	unsigned int interfacial_roughness_random_seed=23456;
-	unsigned int interfacial_roughness_seed_count=20; // Number of seeds
-	double interfacial_roughness_height_field_resolution=3.5; // Angstroms
-	double interfacial_roughness_mean_seed_radius=30.0; // Angstroms
-	double interfacial_roughness_seed_radius_variance=0.5; // Variance as fraction of mean radius
-	double interfacial_roughness_mean_seed_height=3.0; // Angstroms
-	double interfacial_roughness_seed_height_max=1.8; // Angstroms
+	unsigned int interfacial_roughness_seed_count=20; /// Number of seeds
+	double interfacial_roughness_height_field_resolution=3.5; /// Angstroms
+	double interfacial_roughness_mean_seed_radius=30.0; /// Angstroms
+	double interfacial_roughness_seed_radius_variance=0.5; /// Variance as fraction of mean radius
+	double interfacial_roughness_mean_seed_height=3.0; /// Angstroms
+	double interfacial_roughness_seed_height_max=1.8; /// Angstroms
 	
 	// unit cell container
 	cs::unit_cell_t unit_cell;

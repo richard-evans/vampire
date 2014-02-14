@@ -51,10 +51,10 @@ namespace vmpi{
 	// timing variables
 	double start_time;
 	double end_time;
-	double ComputeTime;			// Temporary for storing time 
-	double WaitTime;				// Temporary for storing time
-	double TotalComputeTime;	// Total time spent in computation
-	double TotalWaitTime;		// Total time spent waiting
+	double ComputeTime;			/// Temporary for storing time 
+	double WaitTime;				/// Temporary for storing time
+	double TotalComputeTime;	/// Total time spent in computation
+	double TotalWaitTime;		/// Total time spent waiting
 	double AverageComputeTime;
 	double AverageWaitTime;
 	double MaximumComputeTime;
@@ -95,11 +95,11 @@ namespace vmpi{
 
 	// set local variables
 	int x=num_cpus;
-	int nx,ny,nz;	// Number of cpus in x,y,z
-	std::vector<int> factor_array; // to store the factors of each given n_cpu
+	int nx,ny,nz;	/// Number of cpus in x,y,z
+	std::vector<int> factor_array; /// to store the factors of each given n_cpu
 	factor_array.reserve(50);
-	int counter_factor=0; // to count the number of factors
-	int n1=1; // store n solutions temporary
+	int counter_factor=0; /// to count the number of factors
+	int n1=1; /// store n solutions temporary
 	int n2=1;
 	int n3=1;
 	double lx = system_dimensions[0];
@@ -107,7 +107,7 @@ namespace vmpi{
 	double lz = system_dimensions[2];
 	
 	double surface_volumn=0.0;
-	double compare_sv=10000000.0; // set a very large number for comparing each surface_volumn to find the minimum
+	double compare_sv=10000000.0; /// set a very large number for comparing each surface_volumn to find the minimum
 	
 	// Check for zero cpu's
 	if(num_cpus==0){
@@ -204,11 +204,11 @@ namespace vmpi{
 	int crystal_xyz(std::vector<cs::catom_t> & catom_array){
 	//====================================================================================
 	//
-	//												mpi_crystal_xyz
+	///												mpi_crystal_xyz
 	//
-	//					Reduce Coordinate data to head node and output xyz file
+	///					Reduce Coordinate data to head node and output xyz file
 	//
-	//										Version 1.0 R Evans 10/08/2009
+	///										Version 1.0 R Evans 10/08/2009
 	//
 	//====================================================================================
 	//
@@ -386,7 +386,7 @@ namespace vmpi{
 	return EXIT_SUCCESS;
 }
 
-// Structure to store key information about virtual atoms
+/// Structure to store key information about virtual atoms
 struct virtual_particle_t{
 
    int atom; // real atom number
@@ -400,10 +400,10 @@ struct virtual_particle_t{
 
 //-----------------------------------------------------------------
 //
-//   Function to populate array of virtual particles including
-//   periodic boundary conditions.
+///   Function to populate array of virtual particles including
+///   periodic boundary conditions.
 //
-//   (c) R F L Evans 26/04/2013
+///   (c) R F L Evans 26/04/2013
 //
 //-----------------------------------------------------------------
 void atom_needed_by_remote_cpu(int atom, // atom number
@@ -852,13 +852,13 @@ int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<s
 	return EXIT_SUCCESS;
 }
 
-	// Define data type storing atom number and mpi_type
+	/// Define data type storing atom number and mpi_type
 	struct data_t {
 		int mpi_type;
 		int atom_number;
 	};
 	
-// comparison function
+/// comparison function
 bool compare(data_t first,data_t second){
 	if(first.mpi_type<second.mpi_type) return true;
 	else return false;

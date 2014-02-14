@@ -45,11 +45,11 @@
 int mpi_init_halo_swap(){
 	//====================================================================================
 	//
-	//												mpi_init_halo_swap
-	//
-	//									Initiates halo swap for spin data
-	//
-	//										Version 1.0 R Evans 16/09/2009
+	///												mpi_init_halo_swap
+	///
+	///									Initiates halo swap for spin data
+	///
+	///										Version 1.0 R Evans 16/09/2009
 	//
 	//====================================================================================
 	//
@@ -114,12 +114,12 @@ int mpi_init_halo_swap(){
 
 int mpi_complete_halo_swap(){
 	//====================================================================================
-	//
-	//												mpi_complete_halo_swap
-	//
-	//									Completes halo swap for spin data
-	//
-	//										Version 1.0 R Evans 16/09/2009
+	///
+	///												mpi_complete_halo_swap
+	///
+	///									Completes halo swap for spin data
+	///
+	///										Version 1.0 R Evans 16/09/2009
 	//
 	//====================================================================================
 

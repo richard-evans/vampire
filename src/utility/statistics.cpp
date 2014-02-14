@@ -69,9 +69,9 @@ int calculate_external_fields(const int,const int);
 ///
 namespace stats
 {
-	int num_atoms;				// Number of atoms for statistic purposes
-	double inv_num_atoms;	//1.0/num_atoms
-	double max_moment;		// Total Maximum moment
+	int num_atoms;				/// Number of atoms for statistic purposes
+	double inv_num_atoms;	///1.0/num_atoms
+	double max_moment;		/// Total Maximum moment
 
 	double total_mag_actual[3];	///< Actual magnetisation components
 	double total_mag_m_actual;		///< Actual magnitude of total magnetisation
@@ -137,7 +137,7 @@ namespace stats
 	
 	bool is_initialised=false;
 
-	double data_counter=0.0;		// number of data points for averaging
+	double data_counter=0.0;		/// number of data points for averaging
 	
 // Namespace Functions
 /// @brief Calculates total and sublattice, normalised and actual, magnetic moments of the system.
@@ -436,13 +436,13 @@ void mag_m_reset(){
 }
 
 double max_torque(){
-  //================================================================================================
-  //
- //                                 subroutine torque
-  //
-  //                      Calculates total torque on the system
-  //
-  //================================================================================================
+  ///================================================================================================
+  ///
+ ///                                 subroutine torque
+  ///
+  ///                      Calculates total torque on the system
+  ///
+  ///================================================================================================
 
   //real(kind=dp) :: H (1:3)
   //real(kind=dp) :: S (1:3)
@@ -547,13 +547,13 @@ void system_torque(){
 
 }
 
-//---------------------------------------------------------------------------
-//
-//                     Function to calculate system energy
-//
-//        Wraps the single spin energy functions used for MC calculation
-//
-//---------------------------------------------------------------------------
+///---------------------------------------------------------------------------
+///
+///                     Function to calculate system energy
+///
+///        Wraps the single spin energy functions used for MC calculation
+///
+///---------------------------------------------------------------------------
 void system_energy(){
 
    // Reinitialise stats values
@@ -734,9 +734,9 @@ void system_energy(){
 
 }
 
-//----------------------------------------------------------------------
-// Master function to output energy variables to stream
-//----------------------------------------------------------------------
+///----------------------------------------------------------------------
+/// Master function to output energy variables to stream
+///----------------------------------------------------------------------
 void output_energy(std::ostream& stream, enum energy_t energy_type, enum stat_t stat_type){
 
    switch(stat_type){

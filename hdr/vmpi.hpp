@@ -58,17 +58,17 @@ namespace vmpi{
 	// Timing variables
 	extern double start_time;			///< Simulation start time on local CPU
 	extern double end_time;				///< Simulation end time on local CPU
-	extern double ComputeTime;			// Temporary for storing time 
-	extern double WaitTime;				// Temporary for storing time
-	extern double TotalComputeTime;	// Total time spent in computation
-	extern double TotalWaitTime;		// Total time spent waiting
+	extern double ComputeTime;			/// Temporary for storing time
+	extern double WaitTime;				/// Temporary for storing time
+	extern double TotalComputeTime;	/// Total time spent in computation
+	extern double TotalWaitTime;		/// Total time spent waiting
 	extern double AverageComputeTime;
 	extern double AverageWaitTime;
 	extern double MaximumComputeTime;
 	extern double MaximumWaitTime;
 	extern std::vector<double> ComputeTimeArray;
 	extern std::vector<double> WaitTimeArray;
-	extern bool DetailedMPITiming; // flag to control logging of compute and wait times
+	extern bool DetailedMPITiming; /// flag to control logging of compute and wait times
 	
 	extern std::vector<int> send_atom_translation_array;
 	extern std::vector<int> send_start_index_array;

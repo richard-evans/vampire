@@ -61,7 +61,7 @@ namespace sim{
 	int loop_time=10000;
 	int partial_time=1000;
 	int equilibration_time=0;
-	int runs=1; // for certain repetitions in programs
+	int runs=1; /// for certain repetitions in programs
 	
 	bool ext_demag=false;
 	
@@ -82,20 +82,20 @@ namespace sim{
 	
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
-	double head_speed=30.0; // nm/ns
+	double head_speed=30.0; /// nm/ns
 	bool   head_laser_on=false;
-	bool   constraint_rotation=false; // enables rotation of spins to new constraint direction
-	bool   constraint_phi_changed=false; // flag to note change in phi
-	double constraint_phi=0.0; // Constrained minimisation vector (azimuthal) [degrees]
-	double constraint_phi_min=0.0; // loop angle min [degrees]
-	double constraint_phi_max=0.0; // loop angle max [degrees]
-	double constraint_phi_delta=5.0; // loop angle delta [degrees]
+	bool   constraint_rotation=false; /// enables rotation of spins to new constraint direction
+	bool   constraint_phi_changed=false; /// flag to note change in phi
+	double constraint_phi=0.0; /// Constrained minimisation vector (azimuthal) [degrees]
+	double constraint_phi_min=0.0; /// loop angle min [degrees]
+	double constraint_phi_max=0.0; /// loop angle max [degrees]
+	double constraint_phi_delta=5.0; /// loop angle delta [degrees]
 
 	bool   constraint_theta_changed=false;
-	double constraint_theta=0.0; // Constrained minimisation vector (rotational) [degrees]
-	double constraint_theta_min=0.0; // loop angle min [degrees]
+	double constraint_theta=0.0; /// Constrained minimisation vector (rotational) [degrees]
+	double constraint_theta_min=0.0; /// loop angle min [degrees]
 	double constraint_theta_max=0.0; // loop angle max [degrees]
-	double constraint_theta_delta=5.0; // loop angle delta [degrees]
+	double constraint_theta_delta=5.0; /// loop angle delta [degrees]
 	
 	// LaGrange multiplier variables
 	double lagrange_lambda_x=0.0;
@@ -105,8 +105,8 @@ namespace sim{
    double lagrange_N=1000.0;
    bool   lagrange_multiplier=false;
 
-	double cooling_time=100.0e-12; //seconds
-	int cooling_function_flag=0; // 0 = exp, 1 = gaussian
+	double cooling_time=100.0e-12; ///seconds
+	int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
 	pump_functions_t pump_function=two_temperature;
 	double pump_power=2.4e22;
 	double pump_time=20.0e-15; 
@@ -114,38 +114,38 @@ namespace sim{
 	double double_pump_Tmax=500.0;
 	double double_pump_time=10.0e-15; 
 	double double_pump_delay=10.0e-12;
-	double HeatSinkCouplingConstant=0.0; //1.1e12 ~ sensible value
-	double TTCe = 7.0E02; //electron specific heat
-	double TTCl = 3.0E06; //phonon specific heat
-	double TTG = 17.0E17 ;//electron coupling constant
-	double TTTe = 0.0; // electron temperature
-	double TTTp = 0.0; // phonon temperature
+	double HeatSinkCouplingConstant=0.0; ///1.1e12 ~ sensible value
+	double TTCe = 7.0E02; ///electron specific heat
+	double TTCl = 3.0E06; ///phonon specific heat
+	double TTG = 17.0E17 ;///electron coupling constant
+	double TTTe = 0.0; /// electron temperature
+	double TTTp = 0.0; /// phonon temperature
   
-   double mc_delta_angle=0.1; // Tuned angle for Monte Carlo trial move
+   double mc_delta_angle=0.1; /// Tuned angle for Monte Carlo trial move
    mc_algorithms mc_algorithm=hinzke_nowak;
   
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-	int integrator=0; // 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
+	int integrator=0; /// 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
 	int program=0; 
-	int AnisotropyType=2; // Controls scalar (0) or tensor(1) anisotropy (off(2))
+	int AnisotropyType=2; /// Controls scalar (0) or tensor(1) anisotropy (off(2))
 	
-	bool surface_anisotropy=false; // flag to enable surface anisotropy
-	bool identify_surface_atoms=false; // flag to idenify surface atoms in config coordinate file
-	unsigned int surface_anisotropy_threshold=123456789; // global threshold for surface atoms
-	bool NativeSurfaceAnisotropyThreshold=false; // enables site-dependent surface threshold
+	bool surface_anisotropy=false; /// flag to enable surface anisotropy
+	bool identify_surface_atoms=false; /// flag to idenify surface atoms in config coordinate file
+	unsigned int surface_anisotropy_threshold=123456789; /// global threshold for surface atoms
+	bool NativeSurfaceAnisotropyThreshold=false; /// enables site-dependent surface threshold
 	
 	// Anisotropy control booleans
-	bool UniaxialScalarAnisotropy=false; // Enables scalar uniaxial anisotropy
-	bool TensorAnisotropy=false; // Overrides scalar uniaxial anisotropy
-	bool second_order_uniaxial_anisotropy=false; // Enables second order uniaxial anisotropy
-   bool sixth_order_uniaxial_anisotropy=false; // Enables sixth order uniaxial anisotropy
-	bool CubicScalarAnisotropy=false; // Enables scalar cubic anisotropy
-   bool lattice_anisotropy_flag=false; // Enables lattice anisotropy
+	bool UniaxialScalarAnisotropy=false; /// Enables scalar uniaxial anisotropy
+	bool TensorAnisotropy=false; /// Overrides scalar uniaxial anisotropy
+	bool second_order_uniaxial_anisotropy=false; /// Enables second order uniaxial anisotropy
+   bool sixth_order_uniaxial_anisotropy=false; /// Enables sixth order uniaxial anisotropy
+	bool CubicScalarAnisotropy=false; /// Enables scalar cubic anisotropy
+   bool lattice_anisotropy_flag=false; /// Enables lattice anisotropy
 
-	bool local_temperature=false; // flag to enable material specific temperature
-	bool local_applied_field=false; // flag to enable material specific applied field
-	bool local_fmr_field=false; // flag to enable material specific fmr field
+	bool local_temperature=false; /// flag to enable material specific temperature
+	bool local_applied_field=false; /// flag to enable material specific applied field
+	bool local_fmr_field=false; /// flag to enable material specific fmr field
 
 	// Local function declarations
 	int integrate_serial(int);

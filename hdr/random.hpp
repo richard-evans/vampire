@@ -30,7 +30,7 @@ namespace mtrandom
 // Namespace mtrandom
 //==========================================================
 {
-	extern MTRand grnd; // single sequence of random numbers
+	extern MTRand grnd; /// single sequence of random numbers
 	extern double gaussian();
 	extern double gaussianc(MTRand&);
 	

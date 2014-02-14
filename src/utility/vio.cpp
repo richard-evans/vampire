@@ -79,13 +79,13 @@ std::ofstream zgrain;
 
 namespace vout{
 
-   std::string zLogProgramName; // Program Name
-   std::string zLogHostName; // Host Name
-   bool        zLogInitialised=false; // Initialised flag
+   std::string zLogProgramName; /// Program Name
+   std::string zLogHostName; /// Host Name
+   bool        zLogInitialised=false; /// Initialised flag
    #ifdef WIN_COMPILE
-      int      zLogPid; // Process ID
+      int      zLogPid; /// Process ID
    #else
-      pid_t    zLogPid; // Process ID
+      pid_t    zLogPid; /// Process ID
    #endif
 
    void zLogTsInit(std::string tmp){
@@ -95,7 +95,7 @@ namespace vout{
       int linelength = tmp.length();
 
       // set character triggers
-      const char* key="/";	// Word identifier
+      const char* key="/";	/// Word identifier
 
       // copy characters after last /
       for(int i=linelength-1;i>=0;i--){
@@ -262,20 +262,20 @@ std::vector<double> DoublesFromString(std::string value){
 	
 }
 
-//
-// Function to check for correct unit type and valid variable range
-//-----------------------------------------------------------------------
-//
-void check_for_valid_value(double& value, // value of variable as in input file
-									std::string word, // input file keyword
-									int line, // input file line
-									std::string prefix, // input file prefix
-									std::string unit, // unit specified in input file
-									std::string unit_type, // expected unit type
-									double range_min, // acceptable minimum value for variable
-									double range_max, // acceptable maximum value for variable
-									std::string input_file_type, //input file name
-									std::string range_text) // customised text
+///
+/// Function to check for correct unit type and valid variable range
+///-----------------------------------------------------------------------
+///
+void check_for_valid_value(double& value, /// value of variable as in input file
+									std::string word, /// input file keyword
+									int line, /// input file line
+									std::string prefix, /// input file prefix
+									std::string unit, /// unit specified in input file
+									std::string unit_type, /// expected unit type
+									double range_min, /// acceptable minimum value for variable
+									double range_max, /// acceptable maximum value for variable
+									std::string input_file_type, ///input file name
+									std::string range_text) /// customised text
 {
 
 	// Define test unit
@@ -313,18 +313,46 @@ void check_for_valid_value(double& value, // value of variable as in input file
 
 }
 
-//
-// Function to check for valid int variable range
-//-----------------------------------------------------------------------
-//
-void check_for_valid_int(  int& value, // value of variable as in input file
-                           std::string word, // input file keyword
-                           int line, // input file line
-                           std::string prefix, // input file prefix
-                           int range_min, // acceptable minimum value for variable
-                           int range_max, // acceptable maximum value for variable
-                           std::string input_file_type, //input file name
-                           std::string range_text) // customised text
+///
+/// Function to check for valid int variable range
+///-----------------------------------------------------------------------
+///
+void check_for_valid_int(  int& value, /// value of variable as in input file
+                           std::string word, /// input file keyword
+                           int line, /// input file line
+                           std::string prefix, /// input file prefix
+                           int range_min, /// acceptable minimum value for variable
+                           int range_max, /// acceptable maximum value for variable
+                           std::string input_file_type, ///input file name
+                           std::string range_text) /// customised text
+{
+
+   // Check for valid range
+   if((value<range_min) || (value>range_max)){
+	  terminaltextcolor(RED);
+      std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+      terminaltextcolor(WHITE);
+	  zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+      err::vexit();
+   }
+
+   // Success - input is sane!
+   return;
+
+}
+
+///
+/// Overloaded function to check for valid uint variable range
+///-----------------------------------------------------------------------
+///
+void check_for_valid_int(  unsigned int& value, /// value of variable as in input file
+                           std::string word, /// input file keyword
+                           int line, /// input file line
+                           std::string prefix, /// input file prefix
+                           unsigned int range_min, /// acceptable minimum value for variable
+                           unsigned int range_max, /// acceptable maximum value for variable
+                           std::string input_file_type, ///input file name
+                           std::string range_text) /// customised text
 {
 
    // Check for valid range
@@ -339,46 +367,20 @@ void check_for_valid_int(  int& value, // value of variable as in input file
 
 }
 
-//
-// Overloaded function to check for valid uint variable range
-//-----------------------------------------------------------------------
-//
-void check_for_valid_int(  unsigned int& value, // value of variable as in input file
-                           std::string word, // input file keyword
-                           int line, // input file line
-                           std::string prefix, // input file prefix
-                           unsigned int range_min, // acceptable minimum value for variable
-                           unsigned int range_max, // acceptable maximum value for variable
-                           std::string input_file_type, //input file name
-                           std::string range_text) // customised text
-{
-
-   // Check for valid range
-   if((value<range_min) || (value>range_max)){
-      std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
-      zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
-      err::vexit();
-   }
-
-   // Success - input is sane!
-   return;
-
-}
-
-//-----------------------------------------------------------------------
-// Function to check for valid boolean
-//
-// (c) R F L Evans 2013
-//
-// If input is invalid, then function will output error message and
-// program will exit from here. Otherwise returns a sanitised bool.
-//
-//-----------------------------------------------------------------------
-bool check_for_valid_bool( std::string value, // variable as in input file
-                           std::string word, // input file keyword
-                           int line, // input file line
-                           std::string prefix, // input file prefix
-                           std::string input_file_type) //input file name
+///-----------------------------------------------------------------------
+/// Function to check for valid boolean
+///
+/// (c) R F L Evans 2013
+///
+/// If input is invalid, then function will output error message and
+/// program will exit from here. Otherwise returns a sanitised bool.
+///
+///-----------------------------------------------------------------------
+bool check_for_valid_bool( std::string value, /// variable as in input file
+                           std::string word, /// input file keyword
+                           int line, /// input file line
+                           std::string prefix, /// input file prefix
+                           std::string input_file_type) ///input file name
 {
    // Define string constants
    const std::string t="true";
@@ -397,15 +399,15 @@ bool check_for_valid_bool( std::string value, // variable as in input file
 
 }
 
-//
-// Function to check for correct 3-component vector and ensure length of 1
-//-------------------------------------------------------------------------
-//
-void check_for_valid_unit_vector(std::vector<double>& u, // unit vector
-                           std::string word, // input file keyword
-                           int line, // input file line
-                           std::string prefix, // input file prefix
-                           std::string input_file_type) //input file name
+///
+/// Function to check for correct 3-component vector and ensure length of 1
+///-------------------------------------------------------------------------
+///
+void check_for_valid_unit_vector(std::vector<double>& u, /// unit vector
+                           std::string word, /// input file keyword
+                           int line, /// input file line
+                           std::string prefix, /// input file prefix
+                           std::string input_file_type) ///input file name
 {
 
    // check size
@@ -433,15 +435,15 @@ void check_for_valid_unit_vector(std::vector<double>& u, // unit vector
 
 }
 
-//
-// Function to check for correct 3-component vector and ensure length of 1
-//-------------------------------------------------------------------------
-//
-void check_for_valid_vector(std::vector<double>& u, // unit vector
-                           std::string word, // input file keyword
-                           int line, // input file line
-                           std::string prefix, // input file prefix
-                           std::string input_file_type) //input file name
+///
+/// Function to check for correct 3-component vector and ensure length of 1
+///-------------------------------------------------------------------------
+///
+void check_for_valid_vector(std::vector<double>& u, /// unit vector
+                           std::string word, /// input file keyword
+                           int line, /// input file line
+                           std::string prefix, /// input file prefix
+                           std::string input_file_type) ///input file name
 {
 
    // check size
@@ -770,9 +772,9 @@ int match(string const key, string const word, string const value, string const 
 } // end of match function
 
 int match_create(string const word, string const value, string const unit, int const line){
-   //-------------------------------------------------------------------
-   // system_creation_flags[1] - Set system particle shape
-   //-------------------------------------------------------------------
+   ///-------------------------------------------------------------------
+   /// system_creation_flags[1] - Set system particle shape
+   ///-------------------------------------------------------------------
 
    std::string prefix="create:";
 
@@ -2636,9 +2638,9 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 	
 }
 
-//-------------------------------------------------------------------
-// Function to match material key words
-//-------------------------------------------------------------------
+///-------------------------------------------------------------------
+/// Function to match material key words
+///-------------------------------------------------------------------
 int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
       std::string prefix="material:";
       //------------------------------------------------------------

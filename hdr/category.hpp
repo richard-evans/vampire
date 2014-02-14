@@ -49,7 +49,7 @@ namespace cat{
 		double phi;
 		
 		// member functions
-		category_t(); // constructor
+		category_t(); /// constructor
 		
 	};
 	

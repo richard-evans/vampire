@@ -65,9 +65,9 @@ int LLG_Heun_mpi(){
 	const int post_comm_si = vmpi::num_core_atoms;
 	const int post_comm_ei = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 	
-	double xyz[3];		// Local Delta Spin Components
-	double S_new[3];	// New Local Spin Moment
-	double mod_S;		// magnitude of spin moment 
+	double xyz[3];		/// Local Delta Spin Components
+	double S_new[3];	/// New Local Spin Moment
+	double mod_S;		/// magnitude of spin moment 
 
 		//----------------------------------------
 		// Initiate halo swap

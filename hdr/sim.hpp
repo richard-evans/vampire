@@ -30,7 +30,7 @@
 #include <valarray>
 #include <vector>
 
-// Enumerated lists for code readability
+/// Enumerated lists for code readability
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
@@ -61,27 +61,27 @@ namespace sim{
 	
 	extern double demag_factor[3];
 	
-	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
-	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
+	extern double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
+	extern double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
 
-	extern bool constraint_rotation; // enables rotation of spins to new constraint direction
-	extern bool constraint_phi_changed; // flag to note change in phi
-	extern bool constraint_theta_changed; // flag to note change in theta
+	extern bool constraint_rotation; /// enables rotation of spins to new constraint direction
+	extern bool constraint_phi_changed; /// flag to note change in phi
+	extern bool constraint_theta_changed; /// flag to note change in theta
 
-	extern double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
-	extern double constraint_phi_min; // loop angle min [degrees]
-	extern double constraint_phi_max; // loop angle max [degrees]
-	extern double constraint_phi_delta; // loop angle delta [degrees]
+	extern double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
+	extern double constraint_phi_min; /// loop angle min [degrees]
+	extern double constraint_phi_max; /// loop angle max [degrees]
+	extern double constraint_phi_delta; /// loop angle delta [degrees]
 
-	extern double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
-	extern double constraint_theta_min; // loop angle min [degrees]
-	extern double constraint_theta_max; // loop angle max [degrees]
-	extern double constraint_theta_delta; // loop angle delta [degrees]
+	extern double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
+	extern double constraint_theta_min; /// loop angle min [degrees]
+	extern double constraint_theta_max; /// loop angle max [degrees]
+	extern double constraint_theta_delta; /// loop angle delta [degrees]
 
 	// Monte Carlo variables
-	extern double mc_delta_angle; // Tuned angle for Monte Carlo trial move
+	extern double mc_delta_angle; /// Tuned angle for Monte Carlo trial move
 	enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak};
-   extern mc_algorithms mc_algorithm; // Selected algorith for Monte Carlo simulations
+   extern mc_algorithms mc_algorithm; /// Selected algorith for Monte Carlo simulations
 
 	extern double head_position[2];
 	extern double head_speed;
@@ -97,11 +97,11 @@ namespace sim{
 	extern double double_pump_Tmax;
 	extern double double_pump_delay;
 	extern double HeatSinkCouplingConstant;
-	extern double TTCe; //electron specific heat
-	extern double TTCl; //phonon specific heat
-	extern double TTG;//electron coupling constant    
-	extern double TTTe; // electron temperature
-	extern double TTTp; // phonon temperature
+	extern double TTCe; ///electron specific heat
+	extern double TTCl; ///phonon specific heat
+	extern double TTG;  ///electron coupling constant
+	extern double TTTe; /// electron temperature
+	extern double TTTp; /// phonon temperature
 	
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
@@ -116,18 +116,18 @@ namespace sim{
 	extern bool NativeSurfaceAnisotropyThreshold;
 	
 	// Anisotropy control booleans
-	extern bool UniaxialScalarAnisotropy; // Enables scalar uniaxial anisotropy
-	extern bool TensorAnisotropy; // Overrides vector uniaxial anisotropy (even slower)
-	extern bool second_order_uniaxial_anisotropy; // Enables second order uniaxial anisotropy
-   extern bool sixth_order_uniaxial_anisotropy; // Enables sixth order uniaxial anisotropy
+	extern bool UniaxialScalarAnisotropy; /// Enables scalar uniaxial anisotropy
+	extern bool TensorAnisotropy; /// Overrides vector uniaxial anisotropy (even slower)
+	extern bool second_order_uniaxial_anisotropy; /// Enables second order uniaxial anisotropy
+  extern bool sixth_order_uniaxial_anisotropy; // Enables sixth order uniaxial anisotropy
 	extern bool CubicScalarAnisotropy; // Enables scalar cubic anisotropy
-	extern bool EnableUniaxialAnisotropyUnitVector; // enables anisotropy tensor if any material has non z-axis K
-   extern bool lattice_anisotropy_flag; // Enables lattice anisotropy
+	extern bool EnableUniaxialAnisotropyUnitVector; /// enables anisotropy tensor if any material has non z-axis K
+  extern bool lattice_anisotropy_flag; /// Enables lattice anisotropy
 
 	// Local system variables
-	extern bool local_temperature; // flag to enable material specific temperature
-	extern bool local_applied_field; // flag to enable material specific applied field
-	extern bool local_fmr_field; // flag to enable material specific fmr field
+	extern bool local_temperature; /// flag to enable material specific temperature
+	extern bool local_applied_field; /// flag to enable material specific applied field
+	extern bool local_fmr_field; /// flag to enable material specific fmr field
 
 	
 	// Wrapper Functions
@@ -188,15 +188,15 @@ namespace cmc{
 	class cmc_material_t {
 	public:
 
-		double constraint_phi; // Constrained minimisation vector (azimuthal) [degrees]
-		double constraint_phi_min; // loop angle min [degrees]
-		double constraint_phi_max; // loop angle max [degrees]
-		double constraint_phi_delta; // loop angle delta [degrees]
+		double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
+		double constraint_phi_min; /// loop angle min [degrees]
+		double constraint_phi_max; /// loop angle max [degrees]
+		double constraint_phi_delta; /// loop angle delta [degrees]
 
-		double constraint_theta; // Constrained minimisation vector (rotational) [degrees]
-		double constraint_theta_min; // loop angle min [degrees]
-		double constraint_theta_max; // loop angle max [degrees]
-		double constraint_theta_delta; // loop angle delta [degrees]
+		double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
+		double constraint_theta_min; /// loop angle min [degrees]
+		double constraint_theta_max; /// loop angle max [degrees]
+		double constraint_theta_delta; /// loop angle delta [degrees]
 		
 		// performance optimised rotational matrices
 		double ppolar_vector[3];
@@ -229,7 +229,7 @@ namespace cmc{
 	
 	extern bool is_initialised;
 	
-	extern int active_material; // material in current hybrid loop
+	extern int active_material; /// material in current hybrid loop
 	
 	extern std::vector<std::vector< int > > atom_list;
 	extern double mc_success;

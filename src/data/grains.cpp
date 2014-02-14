@@ -57,11 +57,11 @@ namespace grains{
 
 int set_properties(){
 	//========================================================================================================
-	//		 				Function to calculate number of atoms in each grain
+	///		 				Function to calculate number of atoms in each grain
 	//
-	//														Version 1.0
+	///														Version 1.0
 	//
-	//												R F Evans 15/07/2009
+	///												R F Evans 15/07/2009
 	//
 	//========================================================================================================
 

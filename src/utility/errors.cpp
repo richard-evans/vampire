@@ -53,7 +53,7 @@ namespace err
    {
    bool check=false;
 
-   // Default vexit
+   /// Default vexit
    void vexit(){
 
       // check calling of routine if error checking is activated
@@ -83,7 +83,7 @@ namespace err
       exit(EXIT_FAILURE);
    }
 
-   // zexit with error message
+   /// zexit with error message
    void zexit(std::string message){
 
       // check calling of routine if error checking is activated
