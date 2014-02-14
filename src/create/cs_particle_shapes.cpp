@@ -55,7 +55,7 @@ struct core_radius_t{
    double radius;
 };
 
-// comparison function for reverse order sorting
+/// comparison function for reverse order sorting
 bool compare_radius(core_radius_t first,core_radius_t second){
    if(first.radius<second.radius) return false;
    else return true;
@@ -143,19 +143,19 @@ int cylinder(double particle_origin[],std::vector<cs::catom_t> & catom_array, co
 void ellipsoid(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
    //--------------------------------------------------------------------------------------------
    //
-   //  Function to cut an ellipsoid particle shape
-   //
-   //  (C) R F L Evans 23/04/2013
-   //
-   //  Equation for an ellipsoid is:
-   //
-   //  (x-h)^2   (y-k)^2    (z-l)^2
-   //  -------   -------    -------  <= 1
-   //   r_x^2     r_y^2      r_z^2
-   //
-   //  Evaluation of the above for particle coordinates h,k,l
-   //  and atomic positions x,y,z will include all atoms within
-   //  ellipse with vertices r_x, r_y and r_z.
+   ///  Function to cut an ellipsoid particle shape
+   ///
+   ///  (C) R F L Evans 23/04/2013
+   ///
+   ///  Equation for an ellipsoid is:
+   ///
+   ///  (x-h)^2   (y-k)^2    (z-l)^2
+   ///  -------   -------    -------  <= 1
+   ///   r_x^2     r_y^2      r_z^2
+   ///
+   ///  Evaluation of the above for particle coordinates h,k,l
+   ///  and atomic positions x,y,z will include all atoms within
+   ///  ellipse with vertices r_x, r_y and r_z.
    //
    //--------------------------------------------------------------------------------------------
 
@@ -221,12 +221,12 @@ void ellipsoid(double particle_origin[],std::vector<cs::catom_t> & catom_array, 
 
 int sphere(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
 	//====================================================================================
-	//
-	//									cs_sphere
-	//
-	//					Subroutine to cut a spherical particle shape
-	//
-	//							Version 1.0 R Evans 22/09/2008
+	///
+	///									cs_sphere
+	///
+	///					Subroutine to cut a spherical particle shape
+	///
+	///							Version 1.0 R Evans 22/09/2008
 	//
 	//====================================================================================
 	
@@ -290,12 +290,12 @@ int sphere(double particle_origin[],std::vector<cs::catom_t> & catom_array, cons
 int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
 	//====================================================================================
 	//
-	//								cs_truncated_octahedron
-	//
-	//				Subroutine to cut a truncated octahedron particle shape
-	//
-	//							Version 1.0 R Evans 22/09/2008
-	//
+	///								cs_truncated_octahedron
+	///
+	///				Subroutine to cut a truncated octahedron particle shape
+	///
+	///							Version 1.0 R Evans 22/09/2008
+	///
 	//====================================================================================
 
 	// check calling of routine if error checking is activated

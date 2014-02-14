@@ -106,17 +106,17 @@ using std::string;
 		double alpha;
 		double mu_s_SI;
 		double magnetisation;
-		double Ku1_SI; // SI uniaxial anisotropy constant
+		double Ku1_SI; /// SI uniaxial anisotropy constant
 		double Ku2_SI;
       double Ku3_SI;
       double Klatt_SI;
-		std::vector<double> KuVec_SI; // SI anisotropy tensor
-		double Ku; // normalised uniaxial anisotropy constant
-      double Ku2; // normalised uniaxial anisotropy constant
-      double Ku3; // normalised uniaxial anisotropy constant
-      double Klatt; // normalised lattice anisotropy constant
-      std::vector<double> KuVec; // normalised anisotropy tensor
-		std::vector<double> UniaxialAnisotropyUnitVector; // unit vector for material uniaxial anisotropy
+		std::vector<double> KuVec_SI; /// SI anisotropy tensor
+		double Ku; /// normalised uniaxial anisotropy constant
+      double Ku2; /// normalised uniaxial anisotropy constant
+      double Ku3; /// normalised uniaxial anisotropy constant
+      double Klatt; /// normalised lattice anisotropy
+      std::vector<double> KuVec; /// normalised anisotropy tensor
+		std::vector<double> UniaxialAnisotropyUnitVector; /// unit vector for material uniaxial anisotropy
 		double Kc1_SI;
 		double Kc2_SI;
 		double Kc;
@@ -151,17 +151,17 @@ using std::string;
 		double alpha_oneplusalpha_sq;
 		double Jij_matrix[max_materials];
 		double H_th_sigma;
-		bool constrained; // specifies primary or alternate integrator
+		bool constrained; /// specifies primary or alternate integrator
 
-		double temperature; // Kelvin
-		bool couple_to_phonon_temperature; //true/false
-		double applied_field_strength; // Tesla
-		std::vector<double> applied_field_unit_vector; // unit vector for material uniaxial anisotropy
+		double temperature; /// Kelvin
+		bool couple_to_phonon_temperature; ///true/false
+		double applied_field_strength; /// Tesla
+		std::vector<double> applied_field_unit_vector; /// unit vector for material uniaxial anisotropy
 		double fmr_field_strength; // Tesla
 		double fmr_field_frequency; // Hz
-		std::vector<double> fmr_field_unit_vector; // unit vector for material uniaxial anisotropy
-		bool fill; // flag to determine of material fills voided space
-      lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
+		std::vector<double> fmr_field_unit_vector; /// unit vector for material uniaxial anisotropy
+		bool fill; /// flag to determine of material fills voided space
+     lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
 		
 		materials_t();
 		int print();
@@ -195,5 +195,5 @@ using std::string;
 
 }
 
-// Alias deprecated material_parameters to mp namespace
+/// Alias deprecated material_parameters to mp namespace
 namespace material_parameters=mp;

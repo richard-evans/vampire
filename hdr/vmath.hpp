@@ -94,7 +94,7 @@ namespace vmath{
 	}
 	
    extern double interpolate_m(double,double,double,double);
-   extern double interpolate_c(double,double,double,double);
+   extern double interpolate_c(double,double,double,double);	
 	
 }
 

@@ -41,6 +41,7 @@
 ///
 #include "errors.hpp"
 #include "vmath.hpp"
+#include "vio.hpp"
 
 #include <cmath>
 #include <cstdlib>
@@ -55,13 +56,13 @@ namespace vmath{
 
 	
 bool point_in_polygon(double x, double y,double *polyX, double *polyY,int polySides) {
-	//========================================================================================================
-	//		 						Function to decide if point is within polygon
-	//
-	//														Version 1.0
-	//
-	//												R F Evans 15/07/2009
-	//========================================================================================================
+	///========================================================================================================
+	///		 						Function to decide if point is within polygon
+	///
+	///														Version 1.0
+	///
+	///												R F Evans 15/07/2009
+	///========================================================================================================
 
 	int   i, j=polySides-1 ;
 	bool  oddNodes=0;
@@ -80,11 +81,11 @@ bool point_in_polygon(double x, double y,double *polyX, double *polyY,int polySi
 }
 
 bool point_in_polygon2(double x, double y, std::vector<double>& polyX, std::vector<double>& polyY, const int polySides) {
-	//========================================================================================================
-	//		 						Function to decide if point is within polygon
-	//														Version 2.0
-	//												R F Evans 11/09/2012
-	//========================================================================================================
+	///========================================================================================================
+	///		 						Function to decide if point is within polygon
+	///														Version 2.0
+	///												R F Evans 11/09/2012
+	///========================================================================================================
 
 	/*// Check for correct calling of function
 	bool error = false;
@@ -149,7 +150,9 @@ std::vector<std::vector<double> > matmul(
 
 	// Check for valid multiplication
 	if(A_num_cols!=B_num_rows){
+		terminaltextcolor(RED);
 		std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	
@@ -215,7 +218,9 @@ std::vector<double> matmul(
 
 	// Check for valid multiplication
 	if(V_num_cols!=M_num_rows){
+		terminaltextcolor(RED);
 		std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	
@@ -315,7 +320,9 @@ std::vector<std::vector<double> > set_matrix(
 {
 	
 	if(nums.size()!=rows*cols){
+		terminaltextcolor(RED);
 		std::cerr << "Error in matrix initialisation, incorrect number of elements for matrix!" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	

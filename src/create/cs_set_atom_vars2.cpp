@@ -85,29 +85,29 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);	
 	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);	
 
-   // Set custom RNG for spin initialisation
-   MTRand random_spin_rng;
-   random_spin_rng.seed(123456+vmpi::my_rank);
+	// Set custom RNG for spin initialisation
+    MTRand random_spin_rng;
+    random_spin_rng.seed(123456+vmpi::my_rank);
 
 	for(int atom=0;atom<atoms::num_atoms;atom++){
 		
 		atoms::x_coord_array[atom] = catom_array[atom].x;
 		atoms::y_coord_array[atom] = catom_array[atom].y;
 		atoms::z_coord_array[atom] = catom_array[atom].z;
-
+		
 		atoms::type_array[atom] = catom_array[atom].material;
 		atoms::category_array[atom] = catom_array[atom].lh_category;
 		//std::cout << atom << " grain: " << catom_array[atom].grain << std::endl;
 		atoms::grain_array[atom] = catom_array[atom].grain;
 
 		// initialise atomic spin positions
-      // Use a normalised gaussian for uniform distribution on a unit sphere
+		  // Use a normalised gaussian for uniform distribution on a unit sphere
 		int mat=atoms::type_array[atom];
 		double sx,sy,sz; // spins 
 		if(mp::material[mat].random_spins==true){
-         sx=mtrandom::gaussianc(random_spin_rng);
-         sy=mtrandom::gaussianc(random_spin_rng);
-         sz=mtrandom::gaussianc(random_spin_rng);
+		   sx=mtrandom::gaussianc(random_spin_rng);
+           sy=mtrandom::gaussianc(random_spin_rng);
+           sz=mtrandom::gaussianc(random_spin_rng);
 		}
 		else{
 			sx=mp::material[mat].initial_spin[0];
@@ -153,9 +153,11 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
 			atoms::neighbour_list_array[counter] = cneighbourlist[atom][nn].nn;
 			if(cneighbourlist[atom][nn].nn > atoms::num_atoms){
+				terminaltextcolor(RED);
 				std::cerr << "Fatal Error - neighbour " << cneighbourlist[atom][nn].nn <<" is out of valid range 0-" 
 				<< atoms::num_atoms << " on rank " << vmpi::my_rank << std::endl;
 				std::cerr << "Atom " << atom << " of MPI type " << catom_array[atom].mpi_type << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 			
@@ -247,7 +249,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			}
 			break;
 		default:
+			terminaltextcolor(RED);
 			std::cerr << "Error! - Unknown unit cell exchange type " << atoms::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;
+			terminaltextcolor(WHITE);
 			err::vexit();
 			break;
 	}

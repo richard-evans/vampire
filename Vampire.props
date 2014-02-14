@@ -3,12 +3,16 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <MPICHDIR>C:\Program Files (x86)\MPICH2</MPICHDIR>
+    <MPICHx64DIR>C:\Program Files\MPICH2</MPICHx64DIR>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
     <BuildMacro Include="MPICHDIR">
       <Value>$(MPICHDIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="MPICHx64DIR">
+      <Value>$(MPICHx64DIR)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

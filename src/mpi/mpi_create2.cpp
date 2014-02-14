@@ -51,10 +51,10 @@ namespace vmpi{
 	// timing variables
 	double start_time;
 	double end_time;
-	double ComputeTime;			// Temporary for storing time 
-	double WaitTime;				// Temporary for storing time
-	double TotalComputeTime;	// Total time spent in computation
-	double TotalWaitTime;		// Total time spent waiting
+	double ComputeTime;			/// Temporary for storing time 
+	double WaitTime;				/// Temporary for storing time
+	double TotalComputeTime;	/// Total time spent in computation
+	double TotalWaitTime;		/// Total time spent waiting
 	double AverageComputeTime;
 	double AverageWaitTime;
 	double MaximumComputeTime;
@@ -95,11 +95,11 @@ namespace vmpi{
 
 	// set local variables
 	int x=num_cpus;
-	int nx,ny,nz;	// Number of cpus in x,y,z
-	std::vector<int> factor_array; // to store the factors of each given n_cpu
+	int nx,ny,nz;	/// Number of cpus in x,y,z
+	std::vector<int> factor_array; /// to store the factors of each given n_cpu
 	factor_array.reserve(50);
-	int counter_factor=0; // to count the number of factors
-	int n1=1; // store n solutions temporary
+	int counter_factor=0; /// to count the number of factors
+	int n1=1; /// store n solutions temporary
 	int n2=1;
 	int n3=1;
 	double lx = system_dimensions[0];
@@ -107,11 +107,13 @@ namespace vmpi{
 	double lz = system_dimensions[2];
 	
 	double surface_volumn=0.0;
-	double compare_sv=10000000.0; // set a very large number for comparing each surface_volumn to find the minimum
+	double compare_sv=10000000.0; /// set a very large number for comparing each surface_volumn to find the minimum
 	
 	// Check for zero cpu's
 	if(num_cpus==0){
+		terminaltextcolor(RED);
 		std::cerr << "Error - zero cpu's for mpi decomposition, check initialisation of mpi variables" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	
@@ -204,11 +206,11 @@ namespace vmpi{
 	int crystal_xyz(std::vector<cs::catom_t> & catom_array){
 	//====================================================================================
 	//
-	//												mpi_crystal_xyz
+	///												mpi_crystal_xyz
 	//
-	//					Reduce Coordinate data to head node and output xyz file
+	///					Reduce Coordinate data to head node and output xyz file
 	//
-	//										Version 1.0 R Evans 10/08/2009
+	///										Version 1.0 R Evans 10/08/2009
 	//
 	//====================================================================================
 	//
@@ -386,7 +388,7 @@ namespace vmpi{
 	return EXIT_SUCCESS;
 }
 
-// Structure to store key information about virtual atoms
+/// Structure to store key information about virtual atoms
 struct virtual_particle_t{
 
    int atom; // real atom number
@@ -400,10 +402,10 @@ struct virtual_particle_t{
 
 //-----------------------------------------------------------------
 //
-//   Function to populate array of virtual particles including
-//   periodic boundary conditions.
+///   Function to populate array of virtual particles including
+///   periodic boundary conditions.
 //
-//   (c) R F L Evans 26/04/2013
+///   (c) R F L Evans 26/04/2013
 //
 //-----------------------------------------------------------------
 void atom_needed_by_remote_cpu(int atom, // atom number
@@ -746,7 +748,9 @@ int set_replicated_data(std::vector<cs::catom_t> & catom_array){
 
 	// check for num_atoms > num_CPUS
 	if(catom_array.size()<vmpi::num_processors){
+		terminaltextcolor(RED);
 		std::cerr << "Error! - number of atoms is less than number of CPUs - replicated data parallelisation is not possible!" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 
@@ -852,13 +856,13 @@ int identify_boundary_atoms(std::vector<cs::catom_t> & catom_array,std::vector<s
 	return EXIT_SUCCESS;
 }
 
-	// Define data type storing atom number and mpi_type
+	/// Define data type storing atom number and mpi_type
 	struct data_t {
 		int mpi_type;
 		int atom_number;
 	};
 	
-// comparison function
+/// comparison function
 bool compare(data_t first,data_t second){
 	if(first.mpi_type<second.mpi_type) return true;
 	else return false;
@@ -1001,8 +1005,8 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	
 	// Calculate number of spins I need from each CPU
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-      // Only receive for halo atoms
-      if(catom_array[atom].mpi_type==2){
+           // Only receive for halo atoms
+           if(catom_array[atom].mpi_type==2){
 			vmpi::recv_num_array[catom_array[atom].mpi_cpuid]++;
 		}
 	}
@@ -1022,14 +1026,15 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	std::vector<int> recv_counter_array(vmpi::num_processors);
 
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
-      // Only receive for halo atoms
-      if(catom_array[atom].mpi_type==2){
+            // Only receive for halo atoms
+            if(catom_array[atom].mpi_type==2){
 			unsigned int p = catom_array[atom].mpi_cpuid;
 			unsigned int index = vmpi::recv_start_index_array[p]+recv_counter_array[p];
 			vmpi::recv_atom_translation_array[index]=atom;
 			recv_counter_array[p]++;
 		}
 	}
+
 
 	// Get number of spins I need to send to each CPU
 	std::vector<MPI::Request> requests(0);
@@ -1092,8 +1097,10 @@ int init_mpi_comms(std::vector<cs::catom_t> & catom_array){
 	  int old_atom_num=catom_array[atom].mpi_old_atom_number;
 	  //std::cout << "Rank: " << vmpi::my_rank << " Old: " << old_atom_num << " New: " << atom << " Highest: " << highest << std::endl;
 	  if((old_atom_num>highest) || (old_atom_num < 0)){ // || (old_atom_num>catom_array.size())){
-	    std::cerr << "Old atom number out of range! on rank " << vmpi::my_rank << "; Old atom number: " << old_atom_num << " ; New atom number: " << atom << std::endl;
-	    err::vexit();
+	    terminaltextcolor(RED);
+		std::cerr << "Old atom number out of range! on rank " << vmpi::my_rank << "; Old atom number: " << old_atom_num << " ; New atom number: " << atom << std::endl;
+	    terminaltextcolor(WHITE);
+		err::vexit();
 	  } 
 	  inv_atom_translation_array[old_atom_num]=atom;
 	}

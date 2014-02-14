@@ -37,6 +37,9 @@
     <Filter Include="Source Files\utility">
       <UniqueIdentifier>{c7ee6562-f695-4de1-9535-3822100c203c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\qvoronoi">
+      <UniqueIdentifier>{0f20e49c-416e-4fd2-9e1f-645f154ff3c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hdr\atoms.hpp">
@@ -95,6 +98,42 @@
     </ClInclude>
     <ClInclude Include="hdr\voronoi.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\qvoronoi.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\libqhull.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\mem.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\qset.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\user.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\geom.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\io.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\merge.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\poly.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\qhull_a.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\stat.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qvoronoi\qhrandom.hpp">
+      <Filter>Source Files\qvoronoi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -254,5 +293,70 @@
     <ClCompile Include="src\program\lagrange.cpp">
       <Filter>Source Files\program</Filter>
     </ClCompile>
+    <ClCompile Include="src\qvoronoi\qvoronoi.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\geom.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\geom2.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\global.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\io.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\libqhull.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\mem.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\merge.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\poly.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\poly2.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\qset.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\rboxlib.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\stat.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\user.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\usermem.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\userprintf.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\userprintf_rbox.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qvoronoi\qhrandom.cpp">
+      <Filter>Source Files\qvoronoi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program\partial_hysteresis.cpp">
+      <Filter>Source Files\program</Filter>
+    </ClCompile>
+    <ClCompile Include="src\data\lattice_anisotropy.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\qvoronoi\qhull-exports.def">
+      <Filter>Source Files\qvoronoi</Filter>
+    </None>
   </ItemGroup>
 </Project>

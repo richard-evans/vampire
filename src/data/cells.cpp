@@ -145,7 +145,10 @@ namespace cells{
 				}
 			}
 		}
-		catch(...){std::cerr << "Error allocating supercell_array for cell list calculation" << std::endl;err::vexit();}
+		catch(...){
+			terminaltextcolor(RED);
+			std::cerr << "Error allocating supercell_array for cell list calculation" << std::endl;err::vexit();
+			terminaltextcolor(WHITE);}
 		
 		// slightly offset atomic coordinates to prevent fence post problem
       double atom_offset[3]={0.01,0.01,0.01};
@@ -165,14 +168,20 @@ namespace cells{
 				scc[i]=int(c[i]/cells::size); // Always round down for supercell coordinates
 				// Always check cell in range
 				if(scc[i]<0 || scc[i]>= d[i]){
+					terminaltextcolor(RED);
 					std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
+					terminaltextcolor(WHITE);
 					#ifdef MPICF
+					terminaltextcolor(RED);
 					std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
+					terminaltextcolor(WHITE);
 					#endif 
+					terminaltextcolor(RED);
 					std::cerr << "\tAtom number:      " << atom << std::endl;
 					std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
 					std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
 					std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
+					terminaltextcolor(WHITE);
 					err::vexit();
 				}
 			}

@@ -256,28 +256,28 @@ double spin_tensor_anisotropy_energy(const int imaterial, const double Sx, const
 }
 
 double spin_cubic_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
-	//------------------------------------------------------
-	// 	Function to calculate cubic anisotropy energy
-	//
-	//			Version 1.0 R Evans 28/07/2012
-	//
-	//		E = -0.5 Kc (Sx^4 + Sy^4 + Sz^4)
-	//	
-	//------------------------------------------------------
+	///------------------------------------------------------
+	/// 	Function to calculate cubic anisotropy energy
+	///
+	///			Version 1.0 R Evans 28/07/2012
+	///
+	///		E = -0.5 Kc (Sx^4 + Sy^4 + Sz^4)
+	///	
+	///------------------------------------------------------
 	//std::cout << "here" << imaterial << "\t" << std::endl; 
 	return 0.5*mp::MaterialCubicAnisotropyArray[imaterial]*(Sx*Sx*Sx*Sx + Sy*Sy*Sy*Sy + Sz*Sz*Sz*Sz);
 
 }
 
-//--------------------------------------------------------------
-//
-//  Function to calculate 2nd order uniaxial anisotropy energy
-//
-//  (c) R F L Evans 2013
-//
-//  E = K2 (Sz^4)
-//
-//---------------------------------------------------------------
+///--------------------------------------------------------------
+///
+///  Function to calculate 2nd order uniaxial anisotropy energy
+///
+///  (c) R F L Evans 2013
+///
+///  E = K2 (-2Sz^2 + Sz^4)
+///
+///---------------------------------------------------------------
 double spin_second_order_uniaxial_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
    const double ex = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(0);
    const double ey = mp::material.at(imaterial).UniaxialAnisotropyUnitVector.at(1);
@@ -290,11 +290,11 @@ double spin_second_order_uniaxial_anisotropy_energy(const int imaterial, const d
 
 //--------------------------------------------------------------
 //
-//  Function to calculate 2nd order uniaxial anisotropy energy
+///  Function to calculate 2nd order uniaxial anisotropy energy
 //
-//  (c) R F L Evans 2013
+///  (c) R F L Evans 2013
 //
-//  E = K3 (Sz^6)
+///  E = K3 (Sz^6)
 //
 //---------------------------------------------------------------
 double spin_sixth_order_uniaxial_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
@@ -308,17 +308,17 @@ double spin_sixth_order_uniaxial_anisotropy_energy(const int imaterial, const do
 }
 
 //------------------------------------------------------
-//  Function to calculate lattice anisotropy energy
+///  Function to calculate lattice anisotropy energy
 //
-//  (c) R F L Evans 2013
+///  (c) R F L Evans 2013
 //
-//  Assume temperature dependent anisotropy constant:
-//
-//                   tanh((T-Ti)/Tw) - fmin
-//  kappa = Klatt * ------------------------
+///  Assume temperature dependent anisotropy constant:
+///
+///                   tanh((T-Ti)/Tw) - fmin
+///  kappa = Klatt * ------------------------
 //                        fmax-fmin
 //
-//  E = kappa * S_z^2
+///  E = kappa * S_z^2
 //
 //------------------------------------------------------
 double spin_lattice_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){

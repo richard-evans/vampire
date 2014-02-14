@@ -55,6 +55,17 @@ extern std::ofstream zmag;
 extern std::ofstream zgrain;
 extern std::ofstream zlog;
 
+enum textcolor { 
+		RED=31,
+		GREEN=32,
+		YELLOW=33, 
+		BLUE=34,
+		PURPLE=35,
+		WHITE=0
+
+};
+void terminaltextcolor(enum textcolor );
+
 // global timestap function
 extern std::string zTs();
 

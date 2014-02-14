@@ -63,11 +63,11 @@ void calculate_surface_anisotropy_fields(const int,const int);
 void calculate_lagrange_fields(const int,const int);
 
 int calculate_spin_fields(const int start_index,const int end_index){
-	//======================================================
-	// 		Subroutine to calculate spin dependent fields
-	//
-	//			Version 1.0 R Evans 20/10/2008
-	//======================================================
+	///======================================================
+	/// 		Subroutine to calculate spin dependent fields
+	///
+	///			Version 1.0 R Evans 20/10/2008
+	///======================================================
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "calculate_spin_fields has been called" << std::endl;}
@@ -96,11 +96,11 @@ int calculate_spin_fields(const int start_index,const int end_index){
 }
 
 int calculate_external_fields(const int start_index,const int end_index){
-	//======================================================
-	// 		Subroutine to calculate external fields
-	//
-	//			Version 1.0 R Evans 20/10/2008
-	//======================================================
+	///======================================================
+	/// 		Subroutine to calculate external fields
+	///
+	///			Version 1.0 R Evans 20/10/2008
+	///======================================================
 	//const int num_atoms = atoms::num_atoms;
 
 	//----------------------------------------------------------
@@ -134,11 +134,11 @@ int calculate_external_fields(const int start_index,const int end_index){
 }
 
 int calculate_exchange_fields(const int start_index,const int end_index){
-	//======================================================
-	// 		Subroutine to calculate exchange fields
-	//
-	//			Version 2.0 Richard Evans 08/09/2011
-	//======================================================
+	///======================================================
+	/// 		Subroutine to calculate exchange fields
+	///
+	///			Version 2.0 Richard Evans 08/09/2011
+	///======================================================
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "calculate_exchange_fields has been called" << std::endl;}
@@ -226,11 +226,11 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 	}
 
 int calculate_anisotropy_fields(const int start_index,const int end_index){
-	//======================================================
-	// 	Subroutine to calculate uniaxial anisotropy fields
-	//
-	//			Version 1.0 R Evans 20/10/2008
-	//======================================================
+	///======================================================
+	/// 	Subroutine to calculate uniaxial anisotropy fields
+	///
+	///			Version 1.0 R Evans 20/10/2008
+	///======================================================
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "calculate_anisotropy_fields has been called" << std::endl;}
@@ -270,18 +270,18 @@ int calculate_anisotropy_fields(const int start_index,const int end_index){
 	return EXIT_SUCCESS;
 }
 
-//------------------------------------------------------
-//  Function to calculate second order uniaxial
-//  anisotropy fields
-//
-//  (c) R F L Evans 2013
-//
-//  E = k4*(S . e)^4
-//  Hx = -4*k4*(S . e)^3 e_x
-//  Hy = -4*k4*(S . e)^3 e_y
-//  Hz = -4*k4*(S . e)^3 e_z
-//
-//------------------------------------------------------
+///------------------------------------------------------
+///  Function to calculate second order uniaxial
+///  anisotropy fields
+///
+///  (c) R F L Evans 2013
+///
+///  E = k4*(S . e)^4
+///  Hx = -4*k4*(S . e)^3 e_x
+///  Hy = -4*k4*(S . e)^3 e_y
+///  Hz = -4*k4*(S . e)^3 e_z
+///
+///------------------------------------------------------
 void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,const int end_index){
    for(int atom=start_index;atom<end_index;atom++){
       const int imaterial=atoms::type_array[atom];
@@ -302,18 +302,18 @@ void calculate_second_order_uniaxial_anisotropy_fields(const int start_index,con
    return;
 }
 
-//------------------------------------------------------
-//  Function to calculate sixth order uniaxial
-//  anisotropy fields
-//
-//  (c) R F L Evans 2013
-//
-//  E = k6*(S . e)^6
-//  Hx = -6*k6*(S . e)^5 e_x
-//  Hy = -6*k6*(S . e)^5 e_y
-//  Hz = -6*k6*(S . e)^5 e_z
-//
-//------------------------------------------------------
+///------------------------------------------------------
+///  Function to calculate sixth order uniaxial
+///  anisotropy fields
+///
+///  (c) R F L Evans 2013
+///
+///  E = k6*(S . e)^6
+///  Hx = -6*k6*(S . e)^5 e_x
+///  Hy = -6*k6*(S . e)^5 e_y
+///  Hz = -6*k6*(S . e)^5 e_z
+///
+///------------------------------------------------------
 void calculate_sixth_order_uniaxial_anisotropy_fields(const int start_index,const int end_index){
    for(int atom=start_index;atom<end_index;atom++){
       const int imaterial=atoms::type_array[atom];
@@ -335,9 +335,9 @@ void calculate_sixth_order_uniaxial_anisotropy_fields(const int start_index,cons
 }
 
 //------------------------------------------------------
-//  Function to calculate lattice anisotropy fields
+///  Function to calculate lattice anisotropy fields
 //
-//  (c) R F L Evans 2013
+///  (c) R F L Evans 2013
 //
 //------------------------------------------------------
 void calculate_lattice_anisotropy_fields(const int start_index,const int end_index){
@@ -379,17 +379,17 @@ void calculate_lattice_anisotropy_fields(const int start_index,const int end_ind
 }
 
 int calculate_cubic_anisotropy_fields(const int start_index,const int end_index){
-	//------------------------------------------------------
-	// 	Function to calculate cubic anisotropy fields
-	//
-	//			Version 1.0 R Evans 28/07/2012
-	//
-	//		E = -0.5 Kc (Sx^4 + Sy^4 + Sz^4)
-	//		Hx = +2 Kc*(Sx^3)
-	//		Hy = +2 Kc*(Sy^3)
-	//		Hz = +2 Kc*(Sz^3)
-	//	
-	//------------------------------------------------------
+	///------------------------------------------------------
+	/// 	Function to calculate cubic anisotropy fields
+	///
+	///			Version 1.0 R Evans 28/07/2012
+	///
+	///		E = -0.5 Kc (Sx^4 + Sy^4 + Sz^4)
+	///		Hx = +2 Kc*(Sx^3)
+	///		Hy = +2 Kc*(Sy^3)
+	///		Hz = +2 Kc*(Sz^3)
+	///	
+	///------------------------------------------------------
 	//std::cout << "here" << std::endl;
 	for(int atom=start_index;atom<end_index;atom++){
 		const int imaterial=atoms::type_array[atom];
@@ -409,11 +409,11 @@ int calculate_cubic_anisotropy_fields(const int start_index,const int end_index)
 }
 
 void calculate_surface_anisotropy_fields(const int start_index,const int end_index){
-	//======================================================
-	// 		Subroutine to calculate surface anisotropy fields
-	//
-	//			Version 1.0 Richard Evans 13/09/2011
-	//======================================================
+	///======================================================
+	/// 		Subroutine to calculate surface anisotropy fields
+	///
+	///			Version 1.0 Richard Evans 13/09/2011
+	///======================================================
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "calculate_surface_anisotropy_fields has been called" << std::endl;}
@@ -438,14 +438,14 @@ void calculate_surface_anisotropy_fields(const int start_index,const int end_ind
 }
 
 int calculate_applied_fields(const int start_index,const int end_index){
-	//==========================================================================
-	//
-	// 	Function to calculate applied fields
-	//
-	//		Version 1.0 R Evans 20/10/2008
-	//		Version 2.0 R F L Evans 18/11/2012
-	//
-	//==========================================================================
+	///==========================================================================
+	///
+	/// 	Function to calculate applied fields
+	///
+	///		Version 1.0 R Evans 20/10/2008
+	///		Version 2.0 R F L Evans 18/11/2012
+	///
+	///==========================================================================
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "calculate_applied_fields has been called" << std::endl;}
@@ -513,11 +513,11 @@ int calculate_applied_fields(const int start_index,const int end_index){
 }
 
 int calculate_thermal_fields(const int start_index,const int end_index){
-	//======================================================
-	// 		Subroutine to calculate thermal fields
-	//
-	//			Version 1.1 R Evans 26/07/2012
-	//======================================================
+	///======================================================
+	/// 		Subroutine to calculate thermal fields
+	///
+	///			Version 1.1 R Evans 26/07/2012
+	///======================================================
 
 	const double sqrt_T=sqrt(sim::temperature);
 
@@ -559,11 +559,11 @@ int calculate_thermal_fields(const int start_index,const int end_index){
 }
 
 int calculate_dipolar_fields(const int start_index,const int end_index){
-	//======================================================
-	// 		Subroutine to calculate dipolar fields
-	//
-	//			Version 1.0 R Evans 02/11/2009
-	//======================================================
+	///======================================================
+	/// 		Subroutine to calculate dipolar fields
+	///
+	///			Version 1.0 R Evans 02/11/2009
+	///======================================================
 
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
@@ -704,13 +704,13 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 	return;
 }
 
-//------------------------------------------------------
-//  Function to calculate LaGrange multiplier fields for
-//  constrained minimization
-//
-//  (c) R F L Evans 2013
-//
-//------------------------------------------------------
+///------------------------------------------------------
+///  Function to calculate LaGrange multiplier fields for
+///  constrained minimization
+///
+///  (c) R F L Evans 2013
+///
+///------------------------------------------------------
 void calculate_lagrange_fields(const int start_index,const int end_index){
 
    // LaGrange Multiplier

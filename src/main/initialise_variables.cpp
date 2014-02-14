@@ -111,7 +111,9 @@ int initialise(std::string const infile){
 	// Read values from input files
 	int iostat = vin::read(infile);
 	if(iostat==EXIT_FAILURE){
+		terminaltextcolor(RED);
 		std::cerr << "Error - input file \'" << infile << "\' not found, exiting" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	
@@ -158,11 +160,11 @@ int default_system(){
 	create_voronoi::parity=0;
 	
 	// Setup Hamiltonian Flags
-	sim::hamiltonian_simulation_flags[0] = 1;	// Exchange
-	sim::hamiltonian_simulation_flags[1] = 1;	// Anisotropy
-	sim::hamiltonian_simulation_flags[2] = 1;	// Applied
-	sim::hamiltonian_simulation_flags[3] = 1;	// Thermal
-	sim::hamiltonian_simulation_flags[4] = 0;	// Dipolar
+	sim::hamiltonian_simulation_flags[0] = 1;	/// Exchange
+	sim::hamiltonian_simulation_flags[1] = 1;	/// Anisotropy
+	sim::hamiltonian_simulation_flags[2] = 1;	/// Applied
+	sim::hamiltonian_simulation_flags[3] = 1;	/// Thermal
+	sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
 	
 	//Integration parameters
 	dt_SI = 1.0e-15;	// seconds
@@ -218,8 +220,8 @@ int single_spin_system(){
 	cs::crystal_structure = "sc";
 	
 	// Turn off multi-spin Flags
-	sim::hamiltonian_simulation_flags[0] = 0;	// Exchange
-	sim::hamiltonian_simulation_flags[4] = 0;	// Dipolar
+	sim::hamiltonian_simulation_flags[0] = 0;	/// Exchange
+	sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
 
 	// MPI Mode (Homogeneous execution)
 	//vmpi::mpi_mode=0;
@@ -228,6 +230,7 @@ int single_spin_system(){
 
 	return EXIT_SUCCESS;
 }
+
 
 // Simple function to check for valid input for hysteresis loop parameters
 void check_hysteresis_loop_parameters(){
@@ -243,11 +246,13 @@ void check_hysteresis_loop_parameters(){
    if(min>=0 && max>=0 && inc>0){
       if(max<min){
          if(vmpi::my_rank==0){
+			terminaltextcolor(RED);
             std::cout << "Error in hysteresis-loop parameters:" << std::endl;
             std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
             std::cout << "Minimum and maximum fields are both positive, but minimum > maximum with a positive increment, causing an infinite loop. Exiting." << std::endl;
+			terminaltextcolor(WHITE);
             zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
             zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
@@ -261,12 +266,14 @@ void check_hysteresis_loop_parameters(){
    else if(min>=0 && max>=0 && inc<0){
       if(max>min){
          if(vmpi::my_rank==0){
+			terminaltextcolor(RED);
             std::cout << "Error in hysteresis-loop parameters:" << std::endl;
             std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
             std::cout << "Minimum and maximum fields are both positive, but maximum > minimum with a negative increment, causing an infinite loop. Exiting." << std::endl;
-            zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+            terminaltextcolor(WHITE);
+			zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
             zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -278,12 +285,14 @@ void check_hysteresis_loop_parameters(){
    // + - +
    else if(min>=0 && max<0 && inc>0){
       if(vmpi::my_rank==0){
+		 terminaltextcolor(RED);
          std::cout << "Error in hysteresis-loop parameters:" << std::endl;
          std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
          std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
          std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
          std::cout << "Minimum field is positive and maximum field is negative with a positive increment, causing an infinite loop. Exiting." << std::endl;
-         zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+         terminaltextcolor(WHITE);
+		 zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
          zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
          zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
          zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -294,12 +303,14 @@ void check_hysteresis_loop_parameters(){
    // - + -
    else if(min<0 && max>=0 && inc<0){
       if(vmpi::my_rank==0){
+		 terminaltextcolor(RED);
          std::cout << "Error in hysteresis-loop parameters:" << std::endl;
          std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
          std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
          std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
          std::cout << "Minimum field is negative and maximum field is positive with a negative increment, causing an infinite loop. Exiting." << std::endl;
-         zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+         terminaltextcolor(WHITE);
+		 zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
          zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
          zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
          zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -311,12 +322,14 @@ void check_hysteresis_loop_parameters(){
    else if(min<0 && max<0 && inc<0){
       if(max>min){
          if(vmpi::my_rank==0){
+			terminaltextcolor(RED);
             std::cout << "Error in hysteresis-loop parameters:" << std::endl;
             std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
             std::cout << "Minimum and maximum fields are both negative, but minimum < maximum with a negative increment, causing an infinite loop. Exiting." << std::endl;
-            zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+            terminaltextcolor(WHITE);
+			zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
             zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -329,12 +342,14 @@ void check_hysteresis_loop_parameters(){
    else if(min<0 && max<0 && inc>0){
       if(max<min){
          if(vmpi::my_rank==0){
+			terminaltextcolor(RED);
             std::cout << "Error in hysteresis-loop parameters:" << std::endl;
             std::cout << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             std::cout << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             std::cout << "\t sim:applied-field-strength-increment = " << inc << std::endl;
             std::cout << "Minimum and maximum fields are both negative, but maximum < minimum with a positive increment, causing an infinite loop. Exiting." << std::endl;
-            zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
+            terminaltextcolor(WHITE);
+			zlog << zTs() << "Error in hysteresis-loop parameters:" << std::endl;
             zlog << zTs() << "\t sim:minimum-applied-field-strength = " << min << std::endl;
             zlog << zTs() << "\t sim:maximum-applied-field-strength = " << max << std::endl;
             zlog << zTs() << "\t sim:applied-field-strength-increment = " << inc << std::endl;
@@ -362,14 +377,18 @@ int set_derived_parameters(){
 	
 	// Check for valid particle array offsets
 	if(cs::particle_array_offset_x >= cs::system_dimensions[0]){
+		terminaltextcolor(RED);
 		std::cerr << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl; 
 		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl; 
 		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
 	}
 	if(cs::particle_array_offset_y >= cs::system_dimensions[1]){
+		terminaltextcolor(RED);
 		std::cerr << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl; 
 		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl; 
 		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
 	}
@@ -405,6 +424,7 @@ int set_derived_parameters(){
 	for(int mat=0;mat<mp::num_materials;mat++){
 		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
 		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
+		
 			
 		for(int j=0;j<mp::num_materials;j++){
 			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
@@ -508,7 +528,7 @@ int set_derived_parameters(){
          mp::material_second_order_anisotropy_constant_array.resize(mp::num_materials);
          for(int mat=0;mat<mp::num_materials; mat++) mp::material_second_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku2;
       }
-      // Unroll sixth order uniaxial anisotropy values for speed
+	  // Unroll sixth order uniaxial anisotropy values for speed
       if(sim::second_order_uniaxial_anisotropy==true){
          zlog << zTs() << "Setting scalar sixth order uniaxial anisotropy." << std::endl;
          mp::material_sixth_order_anisotropy_constant_array.resize(mp::num_materials);
@@ -530,7 +550,9 @@ int set_derived_parameters(){
 					double min=material[nmat].min;
 					double max=material[nmat].max;
 					if(((lmin>min) && (lmin<max)) || ((lmax>min) && (lmax<max))){
+						terminaltextcolor(RED);
 						std::cerr << "Warning: Overlapping material heights found. Check log for details." << std::endl;
+						terminaltextcolor(WHITE);
 						zlog << zTs() << "Warning: material " << mat+1 << " overlaps material " << nmat+1 << "." << std::endl;
 						zlog << zTs() << "If you have defined geometry then this may be OK, or possibly you meant to specify alloy keyword instead." << std::endl;
 						zlog << zTs() << "----------------------------------------------------" << std::endl;
