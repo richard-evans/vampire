@@ -166,8 +166,11 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			if(scc[i]<0 || scc[i]>= d[i]){
 				//std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
 				#ifdef MPICF
+				terminaltextcolor(RED);
 				std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
+				terminaltextcolor(WHITE);
 				#endif 
+				terminaltextcolor(RED);
 				std::cerr << "\tAtom number:      " << atom << std::endl;
 				std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
 				std::cerr << "\tmin coordinates:  " << min[0] << "\t" << min[1] << "\t" << min[2] << "\t" << std::endl;
@@ -176,6 +179,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
 				std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
 				std::cerr << "\tCell offest (dp): " << offset[0]*cs::unit_cell_size[0] << "\t" << offset[1]*cs::unit_cell_size[1] << "\t" << offset[2]*cs::unit_cell_size[2] << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -185,6 +189,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			supercell_array[scc[0]][scc[1]][scc[2]][catom_array[atom].uc_id]=atom;
 		}
 		else{
+			terminaltextcolor(RED);
 			std::cerr << "Error, number of atoms per supercell exceeded" << std::endl;
 			std::cerr << "\tAtom number:      " << atom << std::endl;
 			std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
@@ -196,6 +201,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				const int ixatom=supercell_array[scc[0]][scc[1]][scc[2]][ix];
 				std::cerr << "\t\t [id x y z] "<< ix << "\t" << ixatom << "\t" << catom_array[ixatom].x << "\t" << catom_array[ixatom].y << "\t" << catom_array[ixatom].z << std::endl;
 			}
+			terminaltextcolor(WHITE);
 			err::vexit();
 		}
 	}
@@ -255,8 +261,9 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 	}
-	
+	terminaltextcolor(GREEN);
 	std::cout << "done!" << std::endl;
+	terminaltextcolor(WHITE);
    zlog << zTs() << "\tDone"<< std::endl;
 
 	// Deallocate supercell array

@@ -118,8 +118,11 @@ void init(){
 
 	std::cout << "Initialising demagnetisation field calculation" << std::endl;
 	// check for calling of routine
-	if(err::check==true) std::cerr << "demag::set_rij_matrix has been called " << vmpi::my_rank << std::endl;
-	
+	if(err::check==true){
+		terminaltextcolor(RED);
+		std::cerr << "demag::set_rij_matrix has been called " << vmpi::my_rank << std::endl;
+		terminaltextcolor(WHITE);
+	}
 	if(demag::fast==true) {
 		
       // timing function
@@ -247,8 +250,11 @@ void init(){
 inline void fast_update(){
 	
 	// check for callin of routine
-	if(err::check==true) std::cerr << "demag::fast_update has been called " << vmpi::my_rank << std::endl;
-
+	if(err::check==true) {
+		terminaltextcolor(RED);
+		std::cerr << "demag::fast_update has been called " << vmpi::my_rank << std::endl;
+		terminaltextcolor(WHITE);
+	}
 	// loop over local cells
 	for(int lc=0;lc<cells::num_local_cells;lc++){
 		
@@ -307,8 +313,11 @@ inline void fast_update(){
 inline void std_update(){
 	
 	// check for callin of routine
-	if(err::check==true) std::cerr << "demag::std_update has been called " << vmpi::my_rank << std::endl;
-	
+	if(err::check==true){
+		terminaltextcolor(RED);
+		std::cerr << "demag::std_update has been called " << vmpi::my_rank << std::endl;
+		terminaltextcolor(WHITE);
+	}
 	// loop over local cells
 	for(int lc=0;lc<cells::num_local_cells;lc++){
 		
@@ -410,8 +419,11 @@ inline void std_update(){
 ///
 void update(){
 
-	if(err::check==true) std::cerr << "demag::update has been called " << vmpi::my_rank << std::endl;
-
+	if(err::check==true){
+		terminaltextcolor(RED);
+		std::cerr << "demag::update has been called " << vmpi::my_rank << std::endl;
+		terminaltextcolor(WHITE);
+	}
 	// prevent double calculation for split integration (MPI)
 	if(demag::update_time!=sim::time){
 

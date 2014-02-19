@@ -476,7 +476,9 @@ int ConstrainedMonteCarloMonteCarlo(){
 		atom_number2 = cmc::atom_list[imat1][int(mtrandom::grnd()*cmc::atom_list[imat1].size())];
 		imat2=atoms::type_array[atom_number2];
 		if(imat1!=imat2){
+			terminaltextcolor(RED);
 			std::cerr << "Error in MC/CMC integration! - atoms pairs are not from same material!" << std::endl;
+			terminaltextcolor(WHITE);
 			err::vexit();
 		}
 		

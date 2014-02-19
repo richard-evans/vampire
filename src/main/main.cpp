@@ -54,12 +54,16 @@ int main(int argc, char* argv[]){
             infile=string(argv[arg]);
          }
          else{
+      	    terminaltextcolor(RED);
             std::cerr << "Error - no file specified for \'-f\' command line option" << std::endl;
+            terminaltextcolor(WHITE);
             return EXIT_FAILURE;
          }
       }
       else{
+         terminaltextcolor(RED);
          std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
+         terminaltextcolor(WHITE);
          return EXIT_FAILURE;
       }
    }
@@ -144,7 +148,9 @@ int main(int argc, char* argv[]){
    #endif
 
    zlog << zTs() << "Simulation ended gracefully." << std::endl;
+   terminaltextcolor(GREEN);
    std::cout << "Simulation ended gracefully." << std::endl;
+   terminaltextcolor(WHITE);
 
    return EXIT_SUCCESS;
 

@@ -58,8 +58,11 @@ namespace cs{
 int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cerr << "cs::voronoi_film has been called" << std::endl;}	
-	
+	if(err::check==true){
+      terminaltextcolor(RED);
+      std::cerr << "cs::voronoi_film has been called" << std::endl;
+      terminaltextcolor(WHITE);
+   }
 	//====================================================================================
 	//
 	//														voronoi
@@ -148,7 +151,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	// Check for grains >=1
 	//-----------------------
 	if(grain<1){
+		terminaltextcolor(RED);
 		std::cerr << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
 		err::vexit();
 	}
@@ -405,7 +410,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			}
 		}
 	}
+	terminaltextcolor(GREEN);
 	std::cout << "done!" << std::endl;
+	terminaltextcolor(WHITE);
 	zlog << "done!" << std::endl;
 
 	// add final grain for continuous layer
@@ -457,7 +464,11 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(err::check==true){std::cerr << "cs::populate_vertex_points has been called" << std::endl;}	
+	if(err::check==true){
+		terminaltextcolor(RED);
+		std::cerr << "cs::populate_vertex_points has been called" << std::endl;
+		terminaltextcolor(WHITE);
+	}
 
 	//--------------------------------------
 	// Scale grain coordinates
@@ -591,7 +602,11 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
       string rmfstr = rmfsstr.str();
       const char* rmfcstr = rmfstr.c_str();
       int sysstat=system(rmfcstr);
-      if(sysstat!=0) std::cerr << "Error removing temporary grain files" << std::endl;
+      if(sysstat!=0) {
+		  terminaltextcolor(RED);
+		  std::cerr << "Error removing temporary grain files" << std::endl;
+		  terminaltextcolor(WHITE);
+	  }
    }
    {
       std::stringstream rmfsstr;
@@ -603,9 +618,12 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
       string rmfstr = rmfsstr.str();
       const char* rmfcstr = rmfstr.c_str();
       int sysstat=system(rmfcstr);
-      if(sysstat!=0) std::cerr << "Error removing temporary voronoi files" << std::endl;
+      if(sysstat!=0) {
+		  terminaltextcolor(RED);
+		  std::cerr << "Error removing temporary voronoi files" << std::endl;
+		  terminaltextcolor(WHITE);
+	  }
    }
-
    return EXIT_SUCCESS;
 
 }

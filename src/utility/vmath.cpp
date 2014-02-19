@@ -150,7 +150,9 @@ std::vector<std::vector<double> > matmul(
 
 	// Check for valid multiplication
 	if(A_num_cols!=B_num_rows){
+		terminaltextcolor(RED);
 		std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	
@@ -216,7 +218,9 @@ std::vector<double> matmul(
 
 	// Check for valid multiplication
 	if(V_num_cols!=M_num_rows){
+		terminaltextcolor(RED);
 		std::cerr << "Error in matrix multiplication - matrices do not produce a valid product!" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	
@@ -316,7 +320,9 @@ std::vector<std::vector<double> > set_matrix(
 {
 	
 	if(nums.size()!=rows*cols){
+		terminaltextcolor(RED);
 		std::cerr << "Error in matrix initialisation, incorrect number of elements for matrix!" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	

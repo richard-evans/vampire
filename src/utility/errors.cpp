@@ -57,11 +57,17 @@ namespace err
    void vexit(){
 
       // check calling of routine if error checking is activated
-      if(err::check==true){std::cout << "err::vexit has been called" << std::endl;}
+      if(err::check==true){
+         terminaltextcolor(RED);
+         std::cout << "err::vexit has been called" << std::endl;
+        terminaltextcolor(WHITE);
+      }
 
       // Abort MPI processes for parallel execution
       #ifdef MPICF
+      terminaltextcolor(RED);
       std::cerr << "Fatal error on rank: " << vmpi::my_rank << ": Aborting program." << std::endl;
+      terminaltextcolor(WHITE);
       zlog << zTs() << "Fatal error on rank: " << vmpi::my_rank << ": Aborting program." << std::endl;
       // concatenate log and sort
       #ifdef WIN_COMPILE
@@ -70,14 +76,15 @@ namespace err
          system("ls log.* | xargs cat | sort -n > log");
       #endif
 
-      system("ls log.* | xargs cat | sort -n > log");
       MPI::COMM_WORLD.Abort(EXIT_FAILURE);
       // MPI program dies ungracefully here
       #endif
 
       // Print error message to screen and log
       zlog << zTs() << "Fatal error: Aborting program." << std::endl;
+      terminaltextcolor(RED);
       std::cout << "Fatal error: Aborting program. See log file for details." << std::endl;
+      terminaltextcolor(WHITE);
 
       // Now exit program disgracefully
       exit(EXIT_FAILURE);
@@ -91,8 +98,10 @@ namespace err
 
       // Abort MPI processes for parallel execution
       #ifdef MPICF
+	  terminaltextcolor(RED);
       std::cerr << "Fatal error on rank " << vmpi::my_rank << ": " << message << std::endl;
       std::cerr << "Aborting program." << std::endl;
+	  terminaltextcolor(WHITE);
       zlog << zTs() << "Fatal error on rank " << vmpi::my_rank << ": " << message << std::endl;
       zlog << zTs() << "Aborting program." << std::endl;
 
@@ -106,14 +115,18 @@ namespace err
       // MPI program dies ungracefully here
       #else
          // Print Error message to screen and log
+	     terminaltextcolor(RED);
          std::cerr << "Fatal error: " << message << std::endl;
+		 terminaltextcolor(WHITE);
          zlog << zTs() << "Fatal error: " << message << std::endl;
 
       #endif
 
       // Print error message to screen and log
       zlog << zTs() << "Aborting program." << std::endl;
+	  terminaltextcolor(RED);
       std::cout << "Aborting program. See log file for details." << std::endl;
+	  terminaltextcolor(WHITE);
 
       // Now exit program disgracefully
       exit(EXIT_FAILURE);

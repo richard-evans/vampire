@@ -95,7 +95,11 @@ int set_properties(){
 			grains::mat_sat_mag_array.resize(grains::num_grains*mp::num_materials,0.0);
 		}
 	}
-	else std::cerr << "Warning - no grains detected!" << std::endl;
+	else{
+		terminaltextcolor(RED);
+		std::cerr << "Warning - no grains detected!" << std::endl;
+		terminaltextcolor(WHITE);
+	}
 
 	// loop over atoms to determine grain properties
 	for(unsigned int atom=0;atom< num_local_atoms;atom++){
@@ -112,8 +116,10 @@ int set_properties(){
 			if(mp::num_materials>1) grains::mat_sat_mag_array[grain*mp::num_materials+mat]+=mp::material[mat].mu_s_SI;
 		}
 		else{
+			terminaltextcolor(RED);
 			std::cerr << "Error - atom " << atom << " belongs to grain " << grain << " which is greater than maximum number of grains ";
 			std::cerr << grains::num_grains << ". Exiting" << std::endl;
+			terminaltextcolor(WHITE);
 			err::vexit();
 		}
 	}
@@ -202,8 +208,10 @@ int mag(){
 			
 		}
 		else{
+			terminaltextcolor(RED);
 			std::cerr << "Error - atom " << atom << " belongs to grain " << grain << " which is greater than maximum number of grains ";
 			std::cerr << grains::num_grains << ". Exiting" << std::endl;
+			terminaltextcolor(WHITE);
 			err::vexit();
 		}
 	}
@@ -266,8 +274,9 @@ int output_mag(std::ofstream& ofile){
 		if(vmpi::my_rank==0){
 		// check file stream is open
 		if(!ofile.is_open()){
-			
+			terminaltextcolor(RED);
 			std::cerr << "Error - file stream is unopened for grains::output_mag(), exiting!" << std::endl;
+			terminaltextcolor(WHITE);
 		err::vexit();
 		}
 

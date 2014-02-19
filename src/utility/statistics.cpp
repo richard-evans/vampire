@@ -213,7 +213,9 @@ int mag_m(){
 		}
 		// Check correct number of moments found
 		if(nm != stats::num_atoms){
+			terminaltextcolor(RED);
 			std::cerr << "Error in mag_m calculation, missing moments are present:" << stats::num_atoms << " expected, " << nm << " found!" << std::endl;
+			terminaltextcolor(WHITE);
 		}
 
 		// Calculate global moment for all CPUs

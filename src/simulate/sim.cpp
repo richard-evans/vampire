@@ -536,7 +536,9 @@ int integrate_mpi(int n_steps){
 		
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
+				terminaltextcolor(RED);
 				std::cerr << "Error - Monte Carlo Integrator unavailable for parallel execution" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 				// increment time
 				increment_time();
@@ -560,7 +562,9 @@ int integrate_mpi(int n_steps){
 			
 		case 3: // Constrained Monte Carlo
 			for(int ti=0;ti<n_steps;ti++){
+				terminaltextcolor(RED);
 				std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 				// increment time
 				increment_time();
@@ -568,7 +572,9 @@ int integrate_mpi(int n_steps){
 			break;
 			
 		default:{
+			terminaltextcolor(RED);
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
+			terminaltextcolor(WHITE);
 			exit (EXIT_FAILURE);
 			}
 	}

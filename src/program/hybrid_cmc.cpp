@@ -91,7 +91,9 @@ void hybrid_cmc(){
 
 	// Check integrator is CMC, if not then exit disgracefully
 	if(sim::integrator!=4){
+		terminaltextcolor(RED);
 		std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl; 
+		terminaltextcolor(WHITE);
 		err::vexit();
 	}
 	
@@ -206,7 +208,9 @@ void reverse_hybrid_cmc(){
 
    // Check integrator is CMC, if not then exit disgracefully
    if(sim::integrator!=4){
+	  terminaltextcolor(RED);
       std::cerr << "Error! cmc-anisotropy program requires Hybrid Constrained Monte Carlo as the integrator. Exiting." << std::endl; 
+	  terminaltextcolor(WHITE);
       err::vexit();
    }
 

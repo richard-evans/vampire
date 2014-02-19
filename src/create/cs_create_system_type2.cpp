@@ -134,7 +134,9 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 
 		// Check for zero atoms generated
 		if(catom_array.size()==0){
+			terminaltextcolor(RED);
 			std::cerr << "Error, no atoms generated for requested system shape - increase system dimensions or reduce particle size!" << std::endl;
+			terminaltextcolor(WHITE);
 			err::vexit();
 		}
 

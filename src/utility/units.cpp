@@ -242,7 +242,9 @@ int init(){
 		}
 
 		// Error if unit not found
+		terminaltextcolor(RED);
 		std::cerr << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error during unit conversion - unit \'"<< input_unit << "\' not found" << std::endl;
 		err::vexit();
 
@@ -291,7 +293,9 @@ int init(){
 		}
 
 		// Error if unit not found
+		terminaltextcolor(RED);
 		std::cerr << "Error during unit reversion - unit \'"<< output_unit << "\' not found" << std::endl;
+		terminaltextcolor(WHITE);
 		err::vexit();
 		
 		return EXIT_SUCCESS;

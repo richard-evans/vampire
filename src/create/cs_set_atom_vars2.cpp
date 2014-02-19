@@ -153,9 +153,11 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
 			atoms::neighbour_list_array[counter] = cneighbourlist[atom][nn].nn;
 			if(cneighbourlist[atom][nn].nn > atoms::num_atoms){
+				terminaltextcolor(RED);
 				std::cerr << "Fatal Error - neighbour " << cneighbourlist[atom][nn].nn <<" is out of valid range 0-" 
 				<< atoms::num_atoms << " on rank " << vmpi::my_rank << std::endl;
 				std::cerr << "Atom " << atom << " of MPI type " << catom_array[atom].mpi_type << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 			
@@ -247,7 +249,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			}
 			break;
 		default:
+			terminaltextcolor(RED);
 			std::cerr << "Error! - Unknown unit cell exchange type " << atoms::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;
+			terminaltextcolor(WHITE);
 			err::vexit();
 			break;
 	}

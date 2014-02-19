@@ -77,6 +77,20 @@ std::ofstream zmag("output");
 std::ofstream zgrain;
 
 
+void terminaltextcolor(enum textcolor color){
+#ifdef WIN_COMPILE
+ int fincolor=15;
+ if(color==RED) fincolor=12; if(color==GREEN) fincolor=10; if(color==YELLOW) fincolor=14;
+ if(color==BLUE) fincolor=9; if(color==PURPLE) fincolor=13; 
+ SetConsoleTextAttribute(GetStdHandle( STD_OUTPUT_HANDLE ), fincolor);
+#else
+  std::ostringstream fincolor;
+  fincolor<< color;
+  std::cout << "\033[01;"<<fincolor.str()<<"m";
+  std::cerr << "\033[01;"<<fincolor.str()<<"m";
+#endif
+};
+
 namespace vout{
 
    std::string zLogProgramName; /// Program Name
@@ -123,7 +137,9 @@ namespace vout{
       #else
          int GHS=gethostname(loghostname, 80);
       #endif
+	  terminaltextcolor(YELLOW);
       if(GHS!=0) std::cerr << "Warning: Unable to retrieve hostname for zlog file." << std::endl;
+	  terminaltextcolor(WHITE);
       zLogHostName = loghostname;
 
       // Now get process ID
@@ -197,11 +213,13 @@ std::string zTs(){
 
 	}
 	else{
+		terminaltextcolor(RED);
 		std::cerr << "Error! - zlog not initialised, exiting" << std::endl;
 		// This can be recursive - vexit calls zTs()
       //err::vexit();
       // Exit manually
       std::cerr << "Fatal error: Aborting program. See log file for details." << std::endl;
+	  terminaltextcolor(WHITE);
       exit(EXIT_FAILURE);
 	}
 
@@ -289,21 +307,27 @@ void check_for_valid_value(double& value, /// value of variable as in input file
 
 	// Test for valid conversion
 	if(convert_status==EXIT_FAILURE){
+		terminaltextcolor(RED);
 		std::cerr << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
 		err::vexit();
 	}
 
 	// Test for change in unit type in case of wrong unit type
 	if(unit_type!=test_unit_type){
+		terminaltextcolor(RED);
 		std::cerr << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
 		err::vexit();
 	}
 
 	// Check for valid range
 	if((fabs(value)<range_min) || (fabs(value)>range_max)){
+		terminaltextcolor(RED);
 		std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
 		err::vexit();
 	}
@@ -357,8 +381,10 @@ void check_for_valid_int(  unsigned int& value, /// value of variable as in inpu
 
    // Check for valid range
    if((value<range_min) || (value>range_max)){
+	  terminaltextcolor(RED);
       std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
-      zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+      terminaltextcolor(WHITE);
+	  zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
       err::vexit();
    }
 
@@ -393,7 +419,9 @@ bool check_for_valid_bool( std::string value, /// variable as in input file
    if(value==b) return true;
 
    // Invalid input - print error and exit
+   terminaltextcolor(RED);
    std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
+   terminaltextcolor(WHITE);
    zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
    err::vexit();
 
@@ -412,8 +440,10 @@ void check_for_valid_unit_vector(std::vector<double>& u, /// unit vector
 
    // check size
    if(u.size()!=3){
+	  terminaltextcolor(RED);
       std::cerr << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
-      zlog << zTs() << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+      terminaltextcolor(WHITE);
+	  zlog << zTs() << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
       err::vexit();
    }
 
@@ -422,8 +452,10 @@ void check_for_valid_unit_vector(std::vector<double>& u, /// unit vector
 
    // Check for correct length unit vector
    if(ULength < 1.0e-9){
+	  terminaltextcolor(RED);
       std::cerr << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
-      zlog << zTs() << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
+      terminaltextcolor(WHITE);
+	  zlog << zTs() << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
       err::vexit();
    }
    u.at(0)/=ULength;
@@ -448,24 +480,32 @@ void check_for_valid_vector(std::vector<double>& u, /// unit vector
 
    // check size
    if(u.size()!=3){
+	  terminaltextcolor(RED);
       std::cerr << "Error: vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
-      zlog << zTs() << "Error: vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+      terminaltextcolor(WHITE);
+	  zlog << zTs() << "Error: vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
       err::vexit();
    }
    // Check for valid range
    if(fabs(u.at(0)) >1.e10){
+	  terminaltextcolor(RED);
       std::cerr << "Error: first element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
-      zlog << zTs() << "Error: first element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      terminaltextcolor(WHITE);
+	  zlog << zTs() << "Error: first element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
       err::vexit();
    }
    if(fabs(u.at(1)) >1.e10){
+	  terminaltextcolor(RED);
       std::cerr << "Error: second element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
-      zlog << zTs() << "Error: second element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      terminaltextcolor(WHITE);
+	  zlog << zTs() << "Error: second element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
       err::vexit();
    }
    if(fabs(u.at(2)) >1.e10){
+	  terminaltextcolor(RED);
       std::cerr << "Error: third element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
-      zlog << zTs() << "Error: third element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+      terminaltextcolor(WHITE);
+	  zlog << zTs() << "Error: third element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
       err::vexit();
    }
 
@@ -504,7 +544,9 @@ int read(string const filename){
 	
 	// Check for opening
 	if(!inputfile.is_open()){
+	  terminaltextcolor(RED);
 	  std::cerr << "Error opening main input file \"" << filename << "\". File does not exist!" << std::endl;
+	  terminaltextcolor(WHITE);
 	  zlog << zTs() << "Error: Main input file \"" << filename << "\" cannot be opened or does not exist." << std::endl;
 	  zlog << zTs() << "If file exists then check file permissions to ensure it is readable by the user." << std::endl;
 	  err::vexit();   // return to calling function for error checking or message
@@ -737,7 +779,9 @@ int match(string const key, string const word, string const value, string const 
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
+				terminaltextcolor(WHITE);
 				return EXIT_FAILURE;
 			}
 		}
@@ -756,17 +800,23 @@ int match(string const key, string const word, string const value, string const 
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
+				terminaltextcolor(WHITE);
 				return EXIT_FAILURE;
 			}
 		}
 		else{
+			terminaltextcolor(RED);
 			std::cerr << "Error - Unknown control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
+			terminaltextcolor(WHITE);
 			return EXIT_FAILURE;
 		}
 	}
 	else
+		terminaltextcolor(RED);
 		std::cerr << "Error - Unknown control statement \'" << key <<":"<< word << "\' on line " << line << " of input file" << std::endl;
+		terminaltextcolor(WHITE);
 		return EXIT_FAILURE;
 
 } // end of match function
@@ -1078,8 +1128,10 @@ int match_create(string const word, string const value, string const unit, int c
    // keyword not found
    //--------------------------------------------------------------------
    else{
+	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'create:" << word << "\' on line " << line << " of input file" << std::endl;
-      return EXIT_FAILURE;
+      terminaltextcolor(WHITE);
+	  return EXIT_FAILURE;
    }
 
    return EXIT_SUCCESS;
@@ -1239,8 +1291,10 @@ int match_dimension(string const word, string const value, string const unit, in
    }
    //--------------------------------------------------------------------
    else{
+	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'dimensions:"<< word << "\' on line " << line << " of input file" << std::endl;
-      return EXIT_FAILURE;
+      terminaltextcolor(WHITE);
+	  return EXIT_FAILURE;
    }
 
    return EXIT_SUCCESS;
@@ -1281,11 +1335,13 @@ int match_sim(string const word, string const value, string const unit, int cons
          return EXIT_SUCCESS;
       }
       else{
+		 terminaltextcolor(RED);
          std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
          std::cerr << "\t\"llg-heun\"" << std::endl;
          std::cerr << "\t\"llg-midpoint\"" << std::endl;
          std::cerr << "\t\"monte-carlo\"" << std::endl;
          std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
+		 terminaltextcolor(WHITE);
          err::vexit();
       }
    }
@@ -1363,6 +1419,7 @@ int match_sim(string const word, string const value, string const unit, int cons
          return EXIT_SUCCESS;
       }
       else{
+		 terminaltextcolor(RED);
          std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
          std::cerr << "\t\"benchmark\"" << std::endl;
          std::cerr << "\t\"time-series\"" << std::endl;
@@ -1374,7 +1431,8 @@ int match_sim(string const word, string const value, string const unit, int cons
          std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
          std::cerr << "\t\"hybrid-cmc\"" << std::endl;
          std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
-         err::vexit();
+         terminaltextcolor(WHITE);
+		 err::vexit();
       }
    }
    //-------------------------------------------------------------------
@@ -1453,8 +1511,10 @@ int match_sim(string const word, string const value, string const unit, int cons
    if(word==test){
       int tt=atoi(value.c_str());
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-      std::cout << "Warning: Keyword \'partial-time-steps\' is deprecated and may be removed in a future release. Please use \'time-steps-increment\' instead." << std::endl; 
-      sim::partial_time=tt;
+      terminaltextcolor(YELLOW);
+      std::cout << "Warning: Keyword \'partial-time-steps\' is deprecated and may be removed in a future release. Please use \'time-steps-increment\' instead." << std::endl;
+      terminaltextcolor(WHITE);
+	  sim::partial_time=tt;
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
@@ -1553,11 +1613,13 @@ int match_sim(string const word, string const value, string const unit, int cons
          return EXIT_SUCCESS;
       }
       else{
+		 terminaltextcolor(RED);
          std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
          std::cerr << "\t\"square\"" << std::endl;
          std::cerr << "\t\"double-pulse-square\"" << std::endl;
          std::cerr << "\t\"two-temperature\"" << std::endl;
          std::cerr << "\t\"double-pulse-two-temperature\"" << std::endl;
+		 terminaltextcolor(WHITE);
          err::vexit();
       }
    }
@@ -1665,11 +1727,13 @@ int match_sim(string const word, string const value, string const unit, int cons
          return EXIT_SUCCESS;
       }
       else{
+		 terminaltextcolor(RED);
          std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
          std::cerr << "\t\"exponential\"" << std::endl;
          std::cerr << "\t\"gaussian\"" << std::endl;
          std::cerr << "\t\"double-gaussian\"" << std::endl;
          std::cerr << "\t\"linear\"" << std::endl;
+		 terminaltextcolor(WHITE);
          err::vexit();
       }
    }
@@ -1752,8 +1816,10 @@ int match_sim(string const word, string const value, string const unit, int cons
       // Extra check for demagnetisation-factor Nx+Ny+Nz=1
       double sum=u.at(0)+u.at(1)+u.at(2);
       if(fabs(1.0-sum)>1.e-4){
+		 terminaltextcolor(RED);
          std::cerr << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
-         zlog << zTs() << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
+         terminaltextcolor(WHITE);
+		 zlog << zTs() << "Error: sum of all elements of variable " << prefix << word << " on line " << line << " of input file must equal 1." << std::endl;
          err::vexit();
       }
       sim::demag_factor[0]=u.at(0);
@@ -1783,10 +1849,12 @@ int match_sim(string const word, string const value, string const unit, int cons
          return EXIT_SUCCESS;
       }
       else{
+		 terminaltextcolor(RED);
          std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
          std::cerr << "\t\"geometric-decomposition\"" << std::endl;
          std::cerr << "\t\"replicated-data\"" << std::endl;
          std::cerr << "\t\"replicated-data-staged\"" << std::endl;
+		 terminaltextcolor(WHITE);
          err::vexit();
       }
    }
@@ -1902,18 +1970,22 @@ int match_sim(string const word, string const value, string const unit, int cons
          return EXIT_SUCCESS;
       }
       else{
+		 terminaltextcolor(RED);
          std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
          std::cerr << "\t\"spin-flip\"" << std::endl;
          std::cerr << "\t\"uniform\"" << std::endl;
          std::cerr << "\t\"angle\"" << std::endl;
          std::cerr << "\t\"hinzke-nowak\"" << std::endl;
+		 terminaltextcolor(WHITE);
          err::vexit();
       }
    }
    //--------------------------------------------------------------------
    else{
+	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
-      return EXIT_FAILURE;
+      terminaltextcolor(WHITE);
+	  return EXIT_FAILURE;
    }
 
 
@@ -2008,7 +2080,9 @@ int match_config(string const word, string const value, int const line){
    }
    //-----------------------------------------
    else{
+	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'config:"<< word << "\' on line " << line << " of input file" << std::endl;
+	  terminaltextcolor(WHITE);
       return EXIT_FAILURE;
    }
 }
@@ -2321,8 +2395,10 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    // keyword not found
    //--------------------------------------------------------------------
    else{
+	   terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement "<< prefix << word << "\' on line " << line << " of input file" << std::endl;
-      return EXIT_FAILURE;
+      terminaltextcolor(WHITE);
+	  return EXIT_FAILURE;
    }
    return EXIT_SUCCESS;
 }
@@ -2409,8 +2485,10 @@ int match_vout_grain_list(string const word, string const value, int const line,
    // keyword not found
    //--------------------------------------------------------------------
    else{
+	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'grain:" << word << "\' on line " << line << " of input file" << std::endl;
-      return EXIT_FAILURE;
+      terminaltextcolor(WHITE);
+	  return EXIT_FAILURE;
    }
    return EXIT_SUCCESS;
 }
@@ -2435,7 +2513,9 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 	
 	// Check for opening
 	if(!inputfile.is_open()){
+		terminaltextcolor(RED);
 		std::cerr << "Error opening material file " << matfile << ". File does not exist!" << std::endl;
+		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error: Material file \"" << matfile << "\" on line number " << LineNumber << " of input file cannot be opened or does not exist." << std::endl;
 		zlog << zTs() << "If file exists then check file permissions to ensure it is readable by the user." << std::endl; 
 		err::vexit();   // return to calling function for error checking or message
@@ -2768,8 +2848,10 @@ int match_material(string const word, string const value, string const unit, int
          K=DoublesFromString(value);
          // check size
          if(K.size()!=9){
+			terminaltextcolor(RED);
             std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
-            zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
+            terminaltextcolor(WHITE);
+			zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
             return EXIT_FAILURE;
          }
 
@@ -2788,8 +2870,10 @@ int match_material(string const word, string const value, string const unit, int
             return EXIT_SUCCESS;
          }
          else{
+			 terminaltextcolor(RED);
             std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimensions:" << word << "\'"<< std::endl;
-            err::vexit();
+            terminaltextcolor(WHITE);
+			err::vexit();
          }
       }
       //------------------------------------------------------------
@@ -2848,8 +2932,10 @@ int match_material(string const word, string const value, string const unit, int
       if(word==test){
          // Test for 3 characters
          if(value.length()>3){
+			terminaltextcolor(RED);
             std::cerr << "Error - element identifier on line "<<  line << " of material file must be a maximum of three characters long" << std::endl;
-         }
+            terminaltextcolor(WHITE);
+		 }
          else{
             // pad value to be equal to 3 characters
             string tmp="   ";
@@ -2869,13 +2955,17 @@ int match_material(string const word, string const value, string const unit, int
          // Open geometry file
          std::ifstream gfile(value.c_str());
          if(!gfile.is_open()){
+			terminaltextcolor(RED);
             std::cerr << "Error - geometry file " << value.c_str() << " not found, exiting!" << std::endl;
-            return EXIT_FAILURE;
+            terminaltextcolor(WHITE);
+			return EXIT_FAILURE;
          }
          gfile >> read_material[super_index].geometry;
          if((read_material[super_index].geometry<3) || (read_material[super_index].geometry>100)){
-            std::cerr << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100"<< std::endl;
-            return EXIT_FAILURE;
+            terminaltextcolor(RED);
+			std::cerr << "Error in geometry input file " << value.c_str() << " - first number must be non zero integer in the range 3-100"<< std::endl;
+            terminaltextcolor(WHITE);
+			return EXIT_FAILURE;
          }
          //std::cout << "ngp " << read_material[super_index].geometry << std::endl;
          for(int c=0;c<read_material[super_index].geometry;c++){
@@ -2883,13 +2973,17 @@ int match_material(string const word, string const value, string const unit, int
                double var;
                gfile >> var;
                if(gfile.eof()){
+				  terminaltextcolor(RED);
                   std::cerr << "Error in geometry input file " << value.c_str() << " end of file reached before reading all coordinates" << std::endl;
-                  return EXIT_FAILURE;
+                  terminaltextcolor(WHITE);
+				  return EXIT_FAILURE;
                }
                read_material[super_index].geometry_coords[c][xy];
                if((var<0.0) || (var > 1.0)){
+				  terminaltextcolor(RED);
                   std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
-                  return EXIT_FAILURE;
+                  terminaltextcolor(WHITE);
+				  return EXIT_FAILURE;
                }
                else read_material[super_index].geometry_coords[c][xy]=var;
             }
@@ -2972,8 +3066,10 @@ int match_material(string const word, string const value, string const unit, int
          }
          // test for valid ordered alloy, value of -1 will be deprecated
          if((ac<-1) || (ac > 3)){
+			terminaltextcolor(RED);
             std::cerr << "Error in input file - material[" << super_index+1 << "]:alloy-class is outside of valid range (0-3)" << std::endl;
-            return EXIT_FAILURE;
+            terminaltextcolor(WHITE);
+			return EXIT_FAILURE;
          }
          else{
             read_material[super_index].alloy_class=ac;
@@ -2986,8 +3082,10 @@ int match_material(string const word, string const value, string const unit, int
       if(word==test){
          double a=atof(value.c_str());
          if((a < 0.0) || (a > 1.0)){
+			terminaltextcolor(RED);
             std::cerr << "Error in input file - material[" << super_index+1 << "]:alloy["<< sub_index+1 << "] is outside of valid range (0.0-1.0)" << std::endl;
-            return EXIT_FAILURE;
+            terminaltextcolor(WHITE);
+			return EXIT_FAILURE;
          }
          else{
             read_material[super_index].alloy[sub_index]=a;
@@ -3055,7 +3153,9 @@ int match_material(string const word, string const value, string const unit, int
          double i=atof(value.c_str());
          //check_for_valid_value(i, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
          if((i<0.0) || (i > 1.0)){
+			terminaltextcolor(RED);
             std::cerr << "Error in input file - material[" << super_index+1 << "]:intermixing[" << sub_index+1 <<"] is outside of valid range (0.0-1.0)" << std::endl;
+			terminaltextcolor(WHITE);
             return EXIT_FAILURE;}
          else{
             read_material[super_index].intermixing[sub_index]=i;
@@ -3077,7 +3177,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else {
+				terminaltextcolor(RED);
 				std::cerr << "Error in input file - material[" << super_index+1 << "]:constrained must be either true or false" << std::endl;
+				terminaltextcolor(WHITE);
 				return EXIT_FAILURE;
 			}
 		}
@@ -3091,12 +3193,14 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
 		//--------------------------------------------------------------------
-		test="constraint-angle-theta-miniumum";
+		test="constraint-angle-theta-minimum";
 		if(word==test){
 			double angle=atof(value.c_str());
 			// Test for valid range
@@ -3105,7 +3209,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3119,7 +3225,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3133,7 +3241,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 360.0" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3147,7 +3257,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3161,7 +3273,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3175,7 +3289,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3189,7 +3305,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 180.0" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3205,7 +3323,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3268,12 +3388,16 @@ int match_material(string const word, string const value, string const unit, int
 					return EXIT_SUCCESS;
 				}
 				else{
+					terminaltextcolor(RED);
 					std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+					terminaltextcolor(WHITE);
 					err::vexit();
 				}
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3288,7 +3412,9 @@ int match_material(string const word, string const value, string const unit, int
 
 			// check size
 			if(u.size()!=3){
+				terminaltextcolor(RED);
 				std::cerr << "Error in input file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
+				terminaltextcolor(WHITE);
 				zlog << zTs() << "Error in input file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
 				return EXIT_FAILURE;
 			}
@@ -3298,7 +3424,9 @@ int match_material(string const word, string const value, string const unit, int
 
 			// Check for correct length unit vector
 			if(ULength < 1.0e-9){
+				terminaltextcolor(RED);
 				std::cerr << "Error in input file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+				terminaltextcolor(WHITE);
 				zlog << zTs() << "Error in input file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
 				return EXIT_FAILURE;
 			}
@@ -3335,12 +3463,16 @@ int match_material(string const word, string const value, string const unit, int
 					return EXIT_SUCCESS;
 				}
 				else{
+					terminaltextcolor(RED);
 					std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E5" << std::endl;
+					terminaltextcolor(WHITE);
 					err::vexit();
 				}
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3356,7 +3488,9 @@ int match_material(string const word, string const value, string const unit, int
 				return EXIT_SUCCESS;
 			}
 			else{
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E20" << std::endl;
+				terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -3371,7 +3505,9 @@ int match_material(string const word, string const value, string const unit, int
 
 			// check size
 			if(u.size()!=3){
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
+				terminaltextcolor(WHITE);
 				zlog << zTs() << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must have three values." << std::endl;
 				return EXIT_FAILURE;
 			}
@@ -3381,7 +3517,9 @@ int match_material(string const word, string const value, string const unit, int
 
 			// Check for correct length unit vector
 			if(ULength < 1.0e-9){
+				terminaltextcolor(RED);
 				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
+				terminaltextcolor(WHITE);
 				zlog << zTs() << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " must be normalisable (possibly all zero)." << std::endl;
 				return EXIT_FAILURE;
 			}
@@ -3402,7 +3540,9 @@ int match_material(string const word, string const value, string const unit, int
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
+			terminaltextcolor(RED);
 			std::cerr << "Error - Unknown control statement \'material[" << super_index+1 << "]:" << word << "\' on line " << line << " of material file" << std::endl;
+			terminaltextcolor(WHITE);
 			return EXIT_FAILURE;
 		}
 		
