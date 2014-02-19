@@ -109,6 +109,9 @@ int main(int argc, char* argv[]){
       #endif
       std::cout << std::endl;
       std::cout << std::endl;
+      std::cout << "  Vampire includes a copy of the qhull library from C.B. Barber and The "<< std::endl;
+      std::cout << "  Geometry Center and may be obtained via http from www.qhull.org." << std::endl;
+      std::cout << std::endl;
       std::cout << "================================================================================" << std::endl;
       time_t rawtime = time(NULL);
       struct tm * timeinfo = localtime(&rawtime);
