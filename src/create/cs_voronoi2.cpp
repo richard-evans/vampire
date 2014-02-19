@@ -30,17 +30,21 @@
 #include "vmpi.hpp"
 #include "vmath.hpp"
 #include "vio.hpp"
+#include "qvoronoi.hpp"
+
 
 #include <cmath>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
+
+
 namespace create_voronoi{
-	bool parity=0;	// left-right (0) or right-left (1) point initialisation
+	bool parity=0;	/// left-right (0) or right-left (1) point initialisation
 	bool rounded=false;
 	double area_cutoff=0.8;
-	double voronoi_sd=0.15;			// Standard Deviation of voronoi grains
+	double voronoi_sd=0.15;			/// Standard Deviation of voronoi grains
 	
 }
 
@@ -497,55 +501,29 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 
 	grain_coord_file.close();
 
-	//--------------------------------------
-	// Test for qhull installation
-	// (Except for parallel version)
-	//--------------------------------------
-	#ifdef MPICF
-	#else
-      int test_qhull;
-      #ifdef WIN_COMPILE
-         test_qhull=system(VORONOI" 1> NUL");
-      #else
-         test_qhull=system(VORONOI" 1> /dev/null 2> /dev/null");
-      #endif
+   //--------------------------------------------------------
+   // Use voronoi library creating an import and export temporary files
+   //--------------------------------------------------------
+   FILE *inputqv, *outputqv;
+   int qargc=3;
+   char *qargv[3]={"qvoronoi", "-o", "-Fv"};
+   inputqv=fopen(grain_file.c_str(),"r");
+   outputqv=fopen(voronoi_file.c_str(),"w");
+   qvoronoi(qargc, qargv, inputqv, outputqv);
+   fclose(outputqv);
+   fclose(inputqv);
 
-      if(test_qhull!=0){
-         std::cerr << "Error! - qvoronoi does not seem to be installed, exiting" << std::endl;
-         err::vexit();
-      }
-	#endif
-
-	//--------------------------------------
-	// Generate voronoi vertices with qhull
-	//--------------------------------------
-
-	std::stringstream vsstr;
-   #ifdef WIN_COMPILE
-        vsstr << "type " << grain_file << " | "VORONOI" -o -Fv > " << voronoi_file;
-   #else
-        vsstr << "cat " << grain_file << " | "VORONOI" -o -Fv > " << voronoi_file;
-   #endif
-   string vstr = vsstr.str();
-   const char* vcstr = vstr.c_str();
-
-   int sysstat = system(vcstr);
-   if(sysstat!=0){
-      std::cerr << "Error initiating qvoronoi, exiting" << std::endl;
-      err::vexit();
-   }
-
-	//--------------------------------------------------------
-	// Read in number of Voronoi vertices
-	//--------------------------------------------------------
+   //--------------------------------------------------------
+   // Read in number of Voronoi vertices
+   //--------------------------------------------------------
 
 	int dimensions,num_vertices,num_points,one;
 
 	std::ifstream vertices_file;
   	vertices_file.open (voronoi_filec);
-
 	vertices_file >> dimensions;
 	vertices_file >> num_vertices >> num_points >> one;
+
 
 	//----------------------------------------------------------
 	// Allocate vertex_array
@@ -599,14 +577,14 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
          grain_vertices_array[i].resize(0);
       }
    }
-
+   vertices_file.close();
    //-------------------------------------------------------------------
    // Remove Temporary voronoi files
    //-------------------------------------------------------------------
    {
       std::stringstream rmfsstr;
       #ifdef WIN_COMPILE
-         rmfsstr << "del /f " << grain_file;
+         //rmfsstr << "del /f " << grain_file;
       #else
          rmfsstr << "rm -f " << grain_file;
       #endif

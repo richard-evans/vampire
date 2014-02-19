@@ -4,7 +4,7 @@
 #
 #===================================================================
 
-voronoi_path='"qvoronoi"'
+
 
 export OMPI_CXX=g++
 #export OMPI_CXX=icc
@@ -12,11 +12,11 @@ export OMPI_CXX=g++
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"' -DVORONOI=$(voronoi_path)
-GCC=g++ -DCOMP='"GNU C++ Compiler"' -DVORONOI=$(voronoi_path)
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DVORONOI=$(voronoi_path)
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DVORONOI=$(voronoi_path)
-MPICC=mpicxx -DMPICF -DVORONOI=$(voronoi_path)
+ICC=icc -DCOMP='"Intel C++ Compiler"' 
+GCC=g++ -DCOMP='"GNU C++ Compiler"' 
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' 
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' 
+MPICC=mpicxx -DMPICF 
 
 export LANG=C
 export LC_ALL=C
@@ -25,35 +25,35 @@ export LC_ALL=C
 LIBS=-lstdc++
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
-ICC_DBCFLAGS= -O0 -C -I./hdr
-ICC_DBLFLAGS= -C -I./hdr
+ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
+ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
-GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++98 -Wno-long-long -I./hdr
-GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr
+GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++98 -Wno-long-long -I./hdr -I./src/qvoronoi
+GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr -I./src/qvoronoi
 
-PCC_DBCFLAGS= -O0 -I./hdr
-PCC_DBLFLAGS= -O0 -I./hdr
+PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
+PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
 
-IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
-IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr
+IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
+IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr
-ICC_LDFLAGS= -I./hdr -axSSE3
+ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
+ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-GCC_CFLAGS=-O3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr
-GCC_LDFLAGS= -lstdc++ -I./hdr
+GCC_CFLAGS=-O3 -falign-labels -falign-loops -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
-PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr
-PCC_LDFLAGS= -I./hdr -O2 -march=barcelona -ipa
+PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
+PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
 NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
-IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr 
-IBM_LDFLAGS= -lstdc++ -I./hdr -O5 -qarch=450 -qtune=450
+IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
+IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
 
 # Objects
@@ -111,7 +111,25 @@ obj/utility/statistics.o \
 obj/utility/units.o \
 obj/utility/vconfig.o \
 obj/utility/vio.o \
-obj/utility/vmath.o
+obj/utility/vmath.o\
+obj/qvoronoi/geom.o\
+obj/qvoronoi/geom2.o\
+obj/qvoronoi/global.o\
+obj/qvoronoi/io.o\
+obj/qvoronoi/libqhull.o\
+obj/qvoronoi/mem.o\
+obj/qvoronoi/merge.o\
+obj/qvoronoi/poly.o\
+obj/qvoronoi/poly2.o\
+obj/qvoronoi/qhrandom.o\
+obj/qvoronoi/qset.o\
+obj/qvoronoi/qvoronoi.o\
+obj/qvoronoi/rboxlib.o\
+obj/qvoronoi/stat.o\
+obj/qvoronoi/user.o\
+obj/qvoronoi/usermem.o\
+obj/qvoronoi/userprintf.o\
+obj/qvoronoi/userprintf_rbox.o\
 
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
