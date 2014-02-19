@@ -86,8 +86,8 @@ void terminaltextcolor(enum textcolor color){
 #else
   std::ostringstream fincolor;
   fincolor<< color;
-  std::cout << "\033[01;"<<fincolor.str()<<"m";
-  std::cerr << "\033[01;"<<fincolor.str()<<"m";
+   std::cout << "\033["<<fincolor.str()<<"m";
+   std::cerr << "\033["<<fincolor.str()<<"m";
 #endif
 };
 
