@@ -318,16 +318,11 @@ void output_mat_mag(std::ostream& stream){
 				}
 			}
 			else{
-				for(int grain=0;grain<grains::num_grains;grain++){
-					// check for grains with zero atoms
-					if(grains::grain_size_array[grain]!=0){
-						const double imagm = 1.0/grains::mag_m_array[grain];
-						stream << grains::x_mag_array[grain]*imagm << "\t";
-						stream << grains::y_mag_array[grain]*imagm << "\t";
-						stream << grains::z_mag_array[grain]*imagm << "\t";
-						stream << grains::mag_m_array[grain] << "\t";
-					}
-				}
+            const double imagm = 1.0/grains::mag_m_array[grain];
+            stream << grains::x_mag_array[grain]*imagm << "\t";
+            stream << grains::y_mag_array[grain]*imagm << "\t";
+            stream << grains::z_mag_array[grain]*imagm << "\t";
+            stream << grains::mag_m_array[grain] << "\t";
 			}
 		}
 	}
