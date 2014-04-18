@@ -147,6 +147,13 @@ namespace sim{
 	bool local_applied_field=false; /// flag to enable material specific applied field
 	bool local_fmr_field=false; /// flag to enable material specific fmr field
 
+   // Checkpoint flags and variables
+   bool load_checkpoint_flag=false; // Load spin configurations
+   bool load_checkpoint_continue_flag=true; // Continue simulation from checkpoint time
+   bool save_checkpoint_flag=false; // Save checkpoint
+   bool save_checkpoint_continuous_flag=false; // save checkpoints during simulations
+   int save_checkpoint_rate=1; // Default increment between checkpoints
+
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);
@@ -224,7 +231,9 @@ int run(){
 	// Initialise random number generator
 	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
 
-	
+   // Check for load spin configurations from checkpoint
+   if(sim::load_checkpoint_flag) load_checkpoint();
+
 	// Select program to run
 	switch(sim::program){
 		case 0:
@@ -357,6 +366,9 @@ int run(){
 	}
 
 	//program::LLB_Boltzmann();
+
+   // optionally save checkpoint file
+   if(sim::save_checkpoint_flag && !sim::save_checkpoint_continuous_flag) save_checkpoint();
 
 	return EXIT_SUCCESS;
 }

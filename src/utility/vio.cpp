@@ -73,7 +73,7 @@
 // Global output filestreams
 std::ofstream zinfo;
 std::ofstream zlog;
-std::ofstream zmag("output");
+std::ofstream zmag;
 std::ofstream zgrain;
 
 
@@ -1980,6 +1980,62 @@ int match_sim(string const word, string const value, string const unit, int cons
          err::vexit();
       }
    }
+   //-------------------------------------------------------------------
+   test="save-checkpoint";
+   if(word==test){
+      test="end";
+      if(value==test){
+         sim::save_checkpoint_flag=true; // Save checkpoint
+         sim::save_checkpoint_continuous_flag=false; // do not save checkpoints during simulation
+         return EXIT_SUCCESS;
+      }
+      test="continuous";
+      if(value==test){
+         sim::save_checkpoint_flag=true; // Save checkpoint
+         sim::save_checkpoint_continuous_flag=true; // save checkpoints during simulation
+         return EXIT_SUCCESS;
+      }
+      else{
+         terminaltextcolor(RED);
+         std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"end\"" << std::endl;
+         std::cerr << "\t\"continuous\"" << std::endl;
+         terminaltextcolor(WHITE);
+         err::vexit();
+      }
+   }
+   //--------------------------------------------------------------------
+   test="save-checkpoint-rate";
+   if(word==test){
+      int scr=atoi(value.c_str());
+      check_for_valid_int(scr, word, line, prefix, 1, 2000000000,"input","1 - 2,000,000,000");
+      sim::save_checkpoint_rate=scr;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="load-checkpoint";
+   if(word==test){
+      test="restart";
+      if(value==test){
+         sim::load_checkpoint_flag=true; // Load spin configurations
+         sim::load_checkpoint_continue_flag=false; // Restart simulation with checkpoint configuration
+         return EXIT_SUCCESS;
+      }
+      test="continue";
+      if(value==test){
+         sim::load_checkpoint_flag=true; // Load spin configurations
+         sim::load_checkpoint_continue_flag=true; // Continue simulation from saved time with checkpoint configuration
+         return EXIT_SUCCESS;
+      }
+      else{
+         terminaltextcolor(RED);
+         std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"restart\"" << std::endl;
+         std::cerr << "\t\"continue\"" << std::endl;
+         terminaltextcolor(WHITE);
+         err::vexit();
+      }
+   }
    //--------------------------------------------------------------------
    else{
 	  terminaltextcolor(RED);
@@ -2006,7 +2062,7 @@ int match_config(string const word, string const value, int const line){
    test="atoms-output-rate";
    if(word==test){
       int i=atoi(value.c_str());
-      check_for_valid_int(i, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+      check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
       vout::output_atoms_config_rate=i;
       return EXIT_SUCCESS;
    }
@@ -3913,6 +3969,14 @@ namespace vout{
 			vmpi::TotalWaitTime=0.0;
 		}
 		#endif
+
+      // check for open ofstream
+      if(!zmag.is_open()){
+         // check for checkpoint continue and append data
+         if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
+         // otherwise overwrite file
+         else zmag.open("output",std::ofstream::trunc);
+      }
 		
 		// Output data to zmag
 		for(unsigned int item=0;item<file_output_list.size();item++){
@@ -4189,7 +4253,12 @@ namespace vout{
 		if(vmpi::my_rank==0){
 			
 			// check for open ofstream
-			if(!zgrain.is_open()) zgrain.open("grain");
+         if(!zgrain.is_open()){
+            // check for checkpoint continue and append data
+            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain",std::ofstream::app);
+            // otherwise overwrite file
+            else zgrain.open("grain",std::ofstream::trunc);
+         }
 			
 			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
 			switch(vout::grain_output_list[item]){
@@ -4217,7 +4286,7 @@ namespace vout{
 				case 13:
 					vout::grain_mat_mvec(zgrain);
 					break;
-			        case 22:
+			   case 22:
 					vout::phonon_temperature(zgrain);
                                         break;
 			}
@@ -4229,6 +4298,9 @@ namespace vout{
 		}
 		
 		vout::config();
+
+      // optionally save checkpoint file
+      if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();
 
 	} // end of data
 	

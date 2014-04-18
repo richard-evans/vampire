@@ -110,4 +110,9 @@ namespace vout{
 	void nullify(std::ostream& strm);  
 
 }
+
+// Checkpoint load/save functions
+void load_checkpoint();
+void save_checkpoint();
+
 #endif /*VIO_H_*/

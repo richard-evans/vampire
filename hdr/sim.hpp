@@ -129,7 +129,13 @@ namespace sim{
 	extern bool local_applied_field; /// flag to enable material specific applied field
 	extern bool local_fmr_field; /// flag to enable material specific fmr field
 
-	
+   // Checkpoint flags and variables
+   extern bool load_checkpoint_flag; // Load spin configurations
+   extern bool load_checkpoint_continue_flag; // Continue simulation from checkpoint time
+   extern bool save_checkpoint_flag; // Save checkpoint
+   extern bool save_checkpoint_continuous_flag; // save checkpoints during simulations
+   extern int save_checkpoint_rate; // Default increment between checkpoints
+
 	// Wrapper Functions
 	extern int run();
 	extern int initialise();
