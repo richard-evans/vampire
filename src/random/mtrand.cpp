@@ -24,13 +24,18 @@
 //
 // mtrand.cpp, see include file mtrand.h for information
 
+#include <iostream>
+
 #include "mtrand.hpp"
+#include "errors.hpp"
+
+
 // non-inline function definitions and static member definitions cannot
 // reside in header file because of the risk of multiple declarations
 
 // initialization of static private members
-unsigned long MTRand_int32::state[n] = {0x0UL};
-int MTRand_int32::p = 0;
+uint32_t MTRand_int32::state[n] = {0x0UL};
+int32_t MTRand_int32::p = 0;
 bool MTRand_int32::init = false;
 
 void MTRand_int32::gen_state() { // generate new state vector
@@ -42,7 +47,7 @@ void MTRand_int32::gen_state() { // generate new state vector
   p = 0; // reset position
 }
 
-void MTRand_int32::seed(unsigned long s) {  // init by 32 bit seed
+void MTRand_int32::seed(uint32_t s) {  // init by 32 bit seed
   state[0] = s & 0xFFFFFFFFUL; // for > 32 bit machines
   for (int i = 1; i < n; ++i) {
     state[i] = 1812433253UL * (state[i - 1] ^ (state[i - 1] >> 30)) + i;
@@ -54,7 +59,7 @@ void MTRand_int32::seed(unsigned long s) {  // init by 32 bit seed
   p = n; // force gen_state() to be called for next random number
 }
 
-void MTRand_int32::seed(const unsigned long* array, int size) { // init by array
+void MTRand_int32::seed(const uint32_t* array, int size) { // init by array
   seed(19650218UL);
   int i = 1, j = 0;
   for (int k = ((n > size) ? n : size); k; --k) {
@@ -71,4 +76,43 @@ void MTRand_int32::seed(const unsigned long* array, int size) { // init by array
   }
   state[0] = 0x80000000UL; // MSB is 1; assuring non-zero initial array
   p = n; // force gen_state() to be called for next random number
+}
+
+// Function to get state vector
+int32_t MTRand_int32::get_state(std::vector<uint32_t>& iostate) {
+
+   // check vector is correct size
+   if(iostate.size()!=n){
+      std::cerr << "Programming error in get_state() function. State vector has the wrong number of elements. Exiting." << std::endl;
+      err::vexit();
+   }
+
+   // copy state elements to iostate vector
+   for(int i=0; i<n; ++i){
+      iostate[i] = state[i];
+   }
+
+   // return position of state vector
+   return p;
+
+}
+
+// Function to get state vector
+void MTRand_int32::set_state(std::vector<uint32_t>& iostate, int32_t& iop) {
+
+   // check vector is correct size
+   if(iostate.size()!=n){
+      std::cerr << "Programming error in set_state() function. State vector has the wrong number of elements. Exiting." << std::endl;
+      err::vexit();
+   }
+
+   // copy iostate elements to state vector
+   for(int i=0; i<n; ++i){
+      state[i] = iostate[i];
+   }
+
+   p = iop;
+
+   return;
+
 }
