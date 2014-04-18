@@ -35,11 +35,11 @@ enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, d
 
 namespace sim{
 	extern std::ofstream mag_file;
-	extern int time;
-	extern int total_time;
-	extern int loop_time;
+	extern uint64_t time;
+	extern uint64_t total_time;
+	extern uint64_t loop_time;
 	extern int partial_time;
-	extern int equilibration_time;
+	extern uint64_t equilibration_time;
 	extern int runs;
 	
 	extern bool ext_demag;
