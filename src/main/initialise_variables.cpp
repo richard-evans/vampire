@@ -192,7 +192,7 @@ int default_system(){
 	err::check=false;
 	
 	// Initialise random number generator
-	mtrandom::grnd.seed(1234);
+	mtrandom::grnd.seed(2106975519);
 
 	return EXIT_SUCCESS;
 }

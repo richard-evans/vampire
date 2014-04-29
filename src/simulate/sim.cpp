@@ -231,6 +231,9 @@ int run(){
 	// Initialise random number generator
 	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
 
+   // Seeds with single bit differences are not ideal and may be correlated for first few values - warming up integrator
+   for(int i=0; i<1000; ++i) mtrandom::grnd();
+
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();
 
