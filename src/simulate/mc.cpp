@@ -122,7 +122,7 @@ int MonteCarlo(){
 		Sold[2] = atoms::z_spin_array[atom];
 
       // Make Monte Carlo move
-      Snew=sim::mc_move(Sold);
+      sim::mc_move(Sold, Snew);
 
 		// Calculate current energy
 		Eold = sim::calculate_spin_energy(atom, AtomExchangeType);

@@ -157,7 +157,7 @@ namespace sim{
 	extern int MonteCarlo();
 	extern int ConstrainedMonteCarlo();
 	extern int ConstrainedMonteCarloMonteCarlo();
-	extern std::valarray<double> mc_move(std::valarray<double>&);
+	extern void mc_move(const std::valarray<double>&, std::valarray<double>&);
 
 	// Integrator initialisers
 	extern void CMCinit();
