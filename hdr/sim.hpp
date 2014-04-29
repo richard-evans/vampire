@@ -27,6 +27,7 @@
 
 //Headers
 #include <fstream>
+#include <stdint.h>
 #include <valarray>
 #include <vector>
 

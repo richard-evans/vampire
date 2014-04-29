@@ -46,6 +46,7 @@
 #define MTRAND_H
 
 #include <vector>
+#include <stdint.h>
 
 class MTRand_int32 { // Mersenne Twister random number generator
 public:
