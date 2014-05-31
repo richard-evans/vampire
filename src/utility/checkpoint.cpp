@@ -26,7 +26,7 @@
 void save_checkpoint(){
 
    // convert number of atoms, rank and time to standard long int
-   uint64_t natoms64 = uint64_t(atoms::num_atoms);
+   uint64_t natoms64 = uint64_t(atoms::num_atoms-vmpi::num_halo_atoms);
    int64_t time64 = int64_t(sim::time);
    int64_t eqtime64 = int64_t(sim::equilibration_time);
 
@@ -61,9 +61,9 @@ void save_checkpoint(){
    chkfile.write(reinterpret_cast<const char*>(&mt_state[0]),sizeof(uint32_t)*mt_state.size());
 
    // write spin array to file
-   chkfile.write(reinterpret_cast<const char*>(&atoms::x_spin_array[0]),sizeof(double)*atoms::x_spin_array.size());
-   chkfile.write(reinterpret_cast<const char*>(&atoms::y_spin_array[0]),sizeof(double)*atoms::y_spin_array.size());
-   chkfile.write(reinterpret_cast<const char*>(&atoms::z_spin_array[0]),sizeof(double)*atoms::z_spin_array.size());
+   chkfile.write(reinterpret_cast<const char*>(&atoms::x_spin_array[0]),sizeof(double)*natoms64);
+   chkfile.write(reinterpret_cast<const char*>(&atoms::y_spin_array[0]),sizeof(double)*natoms64);
+   chkfile.write(reinterpret_cast<const char*>(&atoms::z_spin_array[0]),sizeof(double)*natoms64);
 
    // close checkpoint file
    chkfile.close();
@@ -120,11 +120,11 @@ void load_checkpoint(){
    if(sim::load_checkpoint_continue_flag) mtrandom::grnd.set_state(mt_state, mt_p);
 
    // check for rational number of atoms
-   if(atoms::num_atoms!=natoms64){
+   if((atoms::num_atoms-vmpi::num_halo_atoms)!=natoms64){
       terminaltextcolor(RED);
-      std::cerr << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms << "). Exiting." << std::endl;
+      std::cerr << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting." << std::endl;
       terminaltextcolor(WHITE);
-      zlog << zTs() << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms << "). Exiting." << std::endl;
+      zlog << zTs() << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting." << std::endl;
    }
 
    // Load saved time if simulation continuing
