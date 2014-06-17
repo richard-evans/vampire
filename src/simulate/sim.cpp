@@ -48,6 +48,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 
@@ -182,6 +183,11 @@ namespace sim{
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
 		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
+      st::update_spin_torque_fields(atoms::x_spin_array,
+                                  atoms::y_spin_array,
+                                  atoms::z_spin_array,
+                                  atoms::type_array,
+                                  mp::mu_s_array);
 	}
 	
 /// @brief Function to run one a single program
