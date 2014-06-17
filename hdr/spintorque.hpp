@@ -38,6 +38,7 @@
 //
 //
 // System headers
+#include <vector>
 
 // Program headers
 
@@ -48,22 +49,40 @@
 // Namespace for variables and functions to calculate spin torque
 //-----------------------------------------------------------------------------
 namespace st{
-   
-//-----------------------------------------------------------------------------
-// Variables used for the spin torque calculation
-//-----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-// Function to initialise spin torque calculation
-//-----------------------------------------------------------------------------
-void initialise(const double system_dimensions_x,
-                const double system_dimensions_y,
-                const double system_dimensions_z,
-                const std::vector<double>& atom_coords_x,
-                const std::vector<double>& atom_coords_y,
-                const std::vector<double>& atom_coords_z,
-                const std::vector<int>& atom_type_array,
-                const int num_local_atoms);
+   //-----------------------------------------------------------------------------
+   // Variables used for the spin torque calculation
+   //-----------------------------------------------------------------------------
+
+   //-----------------------------------------------------------------------------
+   // Function to initialise spin torque calculation
+   //-----------------------------------------------------------------------------
+   void initialise(const double system_dimensions_x,
+                  const double system_dimensions_y,
+                  const double system_dimensions_z,
+                  const std::vector<double>& atom_coords_x,
+                  const std::vector<double>& atom_coords_y,
+                  const std::vector<double>& atom_coords_z,
+                  const std::vector<int>& atom_type_array,
+                  const int num_local_atoms);
+
+   //-----------------------------------------------------------------------------
+   // Function to copy spin torque fields to external field array
+   //-----------------------------------------------------------------------------
+   void get_spin_torque_fields(std::vector<double>& x_total_external_field_array,
+                               std::vector<double>& y_total_external_field_array,
+                               std::vector<double>& z_total_external_field_array,
+                               const int start_index,
+                               const int end_index);
+
+   //-----------------------------------------------------------------------------
+   // Function for updating spin torque fields
+   //-----------------------------------------------------------------------------
+   void update_spin_torque_fields(const std::vector<double>& x_spin_array,
+                                  const std::vector<double>& y_spin_array,
+                                  const std::vector<double>& z_spin_array,
+                                  const std::vector<int>& atom_type_array,
+                                  const std::vector<double>& mu_s_array);
 
 } // end of st namespace
 

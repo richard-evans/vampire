@@ -25,9 +25,13 @@ namespace st{
       extern double micro_cell_size; /// lateral size of spin torque microcells
       extern double micro_cell_thickness; /// thickness of spin torque microcells (atomistic)
       
+      extern int num_local_atoms; /// number of local atoms (ignores halo atoms in parallel simulation)
       extern int current_direction; /// direction for current x->0, y->1, z->2
       //   std::vector< std::vector< micro_cell_t > > stack;
       extern std::vector<int> atom_st_index; // mc which atom belongs to
+      extern std::vector<double> x_field_array; // arrays to store atomic spin torque field
+      extern std::vector<double> y_field_array;
+      extern std::vector<double> z_field_array;
 
       extern int num_stacks;  // total number of stacks
       extern int num_x_stacks; // number of stacks in x
@@ -46,7 +50,7 @@ namespace st{
       extern std::vector<double> m; // magnetisation
       extern std::vector<double> j; // spin current
       extern std::vector<double> sa; // spin accumulation
-      extern std::vector<double> st; // spin torque
+      extern std::vector<double> spin_torque; // spin torque
       extern std::vector<double> ast; // adiabatic spin torque
       extern std::vector<double> nast; // non-adiabatic spin torque
       
@@ -68,6 +72,7 @@ namespace st{
       // Shared functions used for the spin torque calculation
       //-----------------------------------------------------------------------------
       void output_microcell_data();
+      void calculate_spin_accumulation();
       void update_cell_magnetisation(const std::vector<double>& x_spin_array,
                                      const std::vector<double>& y_spin_array,
                                      const std::vector<double>& z_spin_array,

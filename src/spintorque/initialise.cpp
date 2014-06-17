@@ -101,9 +101,13 @@ void initialise(const double system_dimensions_x,
    st::internal::m.resize(three_vec_array_size); // magnetisation
    st::internal::j.resize(three_vec_array_size); // spin current
    st::internal::sa.resize(three_vec_array_size); // spin accumulation
-   st::internal::st.resize(three_vec_array_size); // spin torque
+   st::internal::spin_torque.resize(three_vec_array_size); // spin torque
    st::internal::ast.resize(three_vec_array_size); // adiabatic spin torque
    st::internal::nast.resize(three_vec_array_size); // non-adiabatic spin torque
+
+   //---------------------------------------------------
+   // Noi Initialise j,sa, st, ast, nast here?
+   //---------------------------------------------------
 
    //---------------------------------------------------
    // Determine which atoms belong to which stacks
@@ -186,6 +190,14 @@ void initialise(const double system_dimensions_x,
    // Determine microcell properties from atomic properties
    //-------------------------------------------------------
    st::internal::set_microcell_properties(atom_type_array, num_local_atoms);
+
+   //-------------------------------------------------------
+   // Save value of local num atoms and resize field arrays
+   //-------------------------------------------------------
+   st::internal::num_local_atoms = num_local_atoms;
+   st::internal::x_field_array.resize(num_local_atoms); // arrays to store atomic spin torque field
+   st::internal::y_field_array.resize(num_local_atoms);
+   st::internal::z_field_array.resize(num_local_atoms);
 
    st::internal::output_microcell_data();
    return; 

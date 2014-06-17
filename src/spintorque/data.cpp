@@ -7,9 +7,7 @@
 //
 //-----------------------------------------------------------------------------
 
-
 // C++ standard library headers
-#include <vector>
 
 // Vampire headers
 #include "spintorque.hpp"
@@ -27,9 +25,13 @@ namespace st{
       double micro_cell_size = 5*3.54; /// lateral size of spin torque microcells
       double micro_cell_thickness = 3.54; /// thickness of spin torque microcells (atomistic)
 
+      int num_local_atoms; /// number of local atoms (ignores halo atoms in parallel simulation)
       int current_direction; /// direction for current x->0, y->1, z->2
       //   std::vector< std::vector< micro_cell_t > > stack;
       std::vector<int> atom_st_index; // mc which atom belongs to
+      std::vector<double> x_field_array; // arrays to store atomic spin torque field
+      std::vector<double> y_field_array;
+      std::vector<double> z_field_array;
 
       int num_stacks;  // total number of stacks
       int num_x_stacks; // number of stacks in x
@@ -48,7 +50,7 @@ namespace st{
       std::vector<double> m; // magnetisation
       std::vector<double> j; // spin current
       std::vector<double> sa; // spin accumulation
-      std::vector<double> st; // spin torque
+      std::vector<double> spin_torque; // spin torque
       std::vector<double> ast; // adiabatic spin torque
       std::vector<double> nast; // non-adiabatic spin torque
 
