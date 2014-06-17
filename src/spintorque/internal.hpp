@@ -68,6 +68,11 @@ namespace st{
       // Shared functions used for the spin torque calculation
       //-----------------------------------------------------------------------------
       void output_microcell_data();
+      void update_cell_magnetisation(const std::vector<double>& x_spin_array,
+                                     const std::vector<double>& y_spin_array,
+                                     const std::vector<double>& z_spin_array,
+                                     const std::vector<int>& atom_type_array,
+                                     const std::vector<double>& mu_s_array);
       
    } // end of iternal namespace
 } // end of st namespace
