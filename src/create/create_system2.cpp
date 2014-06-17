@@ -56,6 +56,7 @@
 #include "grains.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
@@ -282,8 +283,12 @@ int create(){
 	// Set grain and cell variables for simulation
 	grains::set_properties();
 	cells::initialise();
+   // Initialise demagnetisation fields
 	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
-	
+   // Initialise spin torque data
+   //if(sim::spin_torque_enabled)
+   st::initialise();
+
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
