@@ -55,6 +55,9 @@ namespace st{
       // array of material properties
       std::vector<st::internal::mp_t> mp;
 
+      // default material properties
+      st::internal::mp_t default_properties;
+
    } // end of internal namespace
 } // end of st namespace
 

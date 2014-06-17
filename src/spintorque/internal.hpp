@@ -61,6 +61,9 @@ namespace st{
       // array of material properties
       extern std::vector<st::internal::mp_t> mp;
 
+      // default material properties
+      extern st::internal::mp_t default_properties;
+
       //-----------------------------------------------------------------------------
       // Shared functions used for the spin torque calculation
       //-----------------------------------------------------------------------------

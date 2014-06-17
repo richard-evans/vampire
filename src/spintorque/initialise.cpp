@@ -180,7 +180,6 @@ void initialise(const double system_dimensions_x,
       // If no error for range then assign atom to cell.
       st::internal::atom_st_index[atom]=supercell_array[scc[0]][scc[1]][scc[2]+1]; // move cells up by one in z
    }
-
    } // end of supercell assignment of atoms
 
    //-------------------------------------------------------
@@ -188,6 +187,7 @@ void initialise(const double system_dimensions_x,
    //-------------------------------------------------------
    st::internal::set_microcell_properties(atom_type_array, num_local_atoms);
 
+   st::internal::output_microcell_data();
    return; 
 }
 
@@ -203,6 +203,17 @@ namespace internal{
       st::internal::mp.at(0).beta_diff=2.0;
       st::internal::mp.at(0).sa_infinity=3.0;
       st::internal::mp.at(0).lambda_sdl=4.0;
+
+      //-------------------------------------------------------
+      // Determine microcell properties from atomic properties
+      //-------------------------------------------------------
+      st::internal::default_properties.beta_cond = 5.0;
+      st::internal::default_properties.beta_diff = 5.0;
+      st::internal::default_properties.sa_infinity = 5.0;
+      st::internal::default_properties.lambda_sdl = 5.0;
+
+      // Temporary array to hold number of atoms in each cell for averaging
+      std::vector<double> count(st::internal::beta_cond.size(),0.0);
 
       // loop over all atoms
       for(int atom=0;atom<num_local_atoms;atom++){
@@ -221,10 +232,10 @@ namespace internal{
 
          //add atomic properties to microcells
          st::internal::beta_cond.at(id) += beta_cond;
-         st::internal::beta_diff.at(id) += beta_cond;
-         st::internal::sa_infinity.at(id) += beta_cond;
-         st::internal::lambda_sdl.at(id) += beta_cond;
-
+         st::internal::beta_diff.at(id) += beta_diff;
+         st::internal::sa_infinity.at(id) += sa_infinity;
+         st::internal::lambda_sdl.at(id) += lambda_sdl;
+         count.at(id) += 1.0;
       }
 
       // reduce microcell properties on all CPUs
@@ -233,7 +244,26 @@ namespace internal{
          MPI_Allreduce(MPI_IN_PLACE, &st::internal::beta_diff[0],st::internal::beta_diff.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, &st::internal::sa_infinity[0],st::internal::sa_infinity.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, &st::internal::lambda_sdl[0],st::internal::lambda_sdl.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &count[0], count.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
       #endif
+
+      // Calculate average (mean) spin torque parameters
+      for(int cell=0; cell<beta_cond.size(); ++cell){
+         const double nat = count.at(cell);
+         // check for zero atoms in cell
+         if(nat>0.0001){
+            st::internal::beta_cond.at(cell)/=nat;
+            st::internal::beta_diff.at(cell)/=nat;
+            st::internal::sa_infinity.at(cell)/=nat;
+            st::internal::lambda_sdl.at(cell)/=nat;
+         }
+         else{
+            st::internal::beta_cond.at(cell)=st::internal::default_properties.beta_cond;
+            st::internal::beta_diff.at(cell)=st::internal::default_properties.beta_cond;
+            st::internal::sa_infinity.at(cell)=st::internal::default_properties.sa_infinity;
+            st::internal::lambda_sdl.at(cell)=st::internal::default_properties.lambda_sdl;
+         }
+      }
 
       return;
    }
