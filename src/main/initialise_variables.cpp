@@ -67,7 +67,7 @@ namespace mp{
 	double half_dt;
 	
 	// Unrolled material parameters for speed
-	std::vector <double> MaterialMuSSIArray(0);
+	std::vector <double> mu_s_array;
 	std::vector <zkval_t> MaterialScalarAnisotropyArray(0);
 	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
    std::vector <double> material_second_order_anisotropy_constant_array(0);
@@ -539,6 +539,9 @@ int set_derived_parameters(){
 			MaterialCubicAnisotropyArray.resize(mp::num_materials);
 			for(int mat=0;mat<mp::num_materials; mat++) MaterialCubicAnisotropyArray.at(mat)=mp::material[mat].Kc;
 		}
+      // Unroll material spin moment values for speed
+      mp::mu_s_array.resize(mp::num_materials);
+      for(int mat=0;mat<mp::num_materials; mat++) mu_s_array.at(mat)=mp::material[mat].mu_s_SI/9.27400915e-24; // normalise to mu_B
 
 		// Loop over materials to check for invalid input and warn appropriately
 		for(int mat=0;mat<mp::num_materials;mat++){

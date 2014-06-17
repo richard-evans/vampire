@@ -177,7 +177,7 @@ using std::string;
 	extern double gamma_SI;
 
 	// Unrolled material parameters for speed
-	extern std::vector <double> MaterialMuSSIArray;
+	extern std::vector <double> mu_s_array;
 	extern std::vector <zkval_t> MaterialScalarAnisotropyArray;
 	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
    extern std::vector <double> material_second_order_anisotropy_constant_array;
