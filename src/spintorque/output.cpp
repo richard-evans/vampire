@@ -32,7 +32,6 @@ namespace st{
          using st::internal::pos;
          
          // only output on root process
-         std::cout << vmpi::my_rank << "+++" << std::endl;
          if(vmpi::my_rank==0){
             std::ofstream ofile;
             ofile.open("microcells.cfg");
