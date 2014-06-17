@@ -12,69 +12,106 @@
 #include <vector>
 
 // Vampire headers
-#include "atoms.hpp"
 #include "errors.hpp"
+#include "spintorque.hpp"
 #include "vio.hpp"
 
+// Spin Torque headers
+#include "internal.hpp"
+
+//-----------------------------------------------------------------------------
+// Forward function declarations
+//-----------------------------------------------------------------------------
 namespace st{
-   
+   namespace internal{
+      void set_microcell_properties(const std::vector<int>& atom_type_array, const int num_local_atoms);
+   }
+}
+
+namespace st{
+
 //-----------------------------------------------------------------------------
 // Function for initialising spin torque data structure and variables
 //-----------------------------------------------------------------------------
-void initialise(){
-      
-   // determine transformation between x,y,z in actual and spin torque coordinate system
+void initialise(const double system_dimensions_x,
+                const double system_dimensions_y,
+                const double system_dimensions_z,
+                const std::vector<double>& atom_coords_x,
+                const std::vector<double>& atom_coords_y,
+                const std::vector<double>& atom_coords_z,
+                const std::vector<int>& atom_type_array,
+                const int num_local_atoms){
+
+   //-------------------------------------------------------------------------------------
+   // Check for spin torque calculation enabled, if not do nothing
+   //-------------------------------------------------------------------------------------
+   if(!st::internal::enabled) return;
+
+   // output informative message
+   zlog << zTs() << "Initialising data structures for spin torque calculation." << std::endl;
+
+   //-------------------------------------------------------------------------------------
+   // Determine transformation between x,y,z in actual and spin torque coordinate system
+   //-------------------------------------------------------------------------------------
    int stx=0; // indices for x,y,z in the spin torque coordinate system (default z)
    int sty=1;
    int stz=2;
-   if(st::current_direction==0){
+   if(st::internal::current_direction==0){
       stx=1;
       sty=2;
       stz=0;
    }
-   else if(st::current_direction==1){
+   else if(st::internal::current_direction==1){
       stx=0;
       sty=2;
       stz=1;
    }
-   
+
+   //-------------------------------------------------------------------------------------
+   // Calculate number of stacks and microcells
+   //-------------------------------------------------------------------------------------
+
+   // Make a small array for system dimensions
+   double system_dimensions[3]={system_dimensions_x,system_dimensions_y,system_dimensions_z};
+
    // determine number of cells in each stack  (global)
-   st::num_microcells_per_stack = 1+ceil((cs::system_dimensions[stz]+0.01)/st::micro_cell_thickness);
-   
+   st::internal::num_microcells_per_stack = 1+ceil((system_dimensions[stz]+0.01)/st::internal::micro_cell_thickness);
+
    // determine number of stacks in x and y (global)
-   st::num_x_stacks = ceil((cs::system_dimensions[stx]+0.01)/st::micro_cell_size);
-   st::num_y_stacks = ceil((cs::system_dimensions[sty]+0.01)/st::micro_cell_size);
-   
+   st::internal::num_x_stacks = ceil((system_dimensions[stx]+0.01)/st::internal::micro_cell_size);
+   st::internal::num_y_stacks = ceil((system_dimensions[sty]+0.01)/st::internal::micro_cell_size);
+
    // determine total number of stacks
-   st::num_stacks = num_x_stacks*num_y_stacks;
+   st::internal::num_stacks = st::internal::num_x_stacks*st::internal::num_y_stacks;
 
    // allocate array to store index of first element of stack
-   st::stack_index.resize(num_stacks);
+   st::internal::stack_index.resize(st::internal::num_stacks);
    
-   
-   
+
+   //-------------------------------------------------------------------------------------
    // allocate microcell data
-   const int array_size = st::num_stacks*st::num_microcells_per_stack;
-   st::beta_cond.resize(array_size); /// spin polarisation (conductivity)
-   st::beta_diff.resize(array_size); /// spin polarisation (diffusion)
-   st::sa_infinity.resize(array_size); /// intrinsic spin accumulation
-   st::lambda_sdl.resize(array_size); /// spin diffusion length
+   //-------------------------------------------------------------------------------------
+   const int array_size = st::internal::num_stacks*st::internal::num_microcells_per_stack;
+   st::internal::beta_cond.resize(array_size); /// spin polarisation (conductivity)
+   st::internal::beta_diff.resize(array_size); /// spin polarisation (diffusion)
+   st::internal::sa_infinity.resize(array_size); /// intrinsic spin accumulation
+   st::internal::lambda_sdl.resize(array_size); /// spin diffusion length
    const int three_vec_array_size = 3*array_size;
-   st::pos.resize(three_vec_array_size); /// microcell position
-   st::m.resize(three_vec_array_size); // magnetisation
-   st::j.resize(three_vec_array_size); // spin current
-   st::sa.resize(three_vec_array_size); // spin accumulation
-   st::st.resize(three_vec_array_size); // spin torque
-   st::ast.resize(three_vec_array_size); // adiabatic spin torque
-   st::nast.resize(three_vec_array_size); // non-adiabatic spin torque      
+   st::internal::pos.resize(three_vec_array_size); /// microcell position
+   st::internal::m.resize(three_vec_array_size); // magnetisation
+   st::internal::j.resize(three_vec_array_size); // spin current
+   st::internal::sa.resize(three_vec_array_size); // spin accumulation
+   st::internal::st.resize(three_vec_array_size); // spin torque
+   st::internal::ast.resize(three_vec_array_size); // adiabatic spin torque
+   st::internal::nast.resize(three_vec_array_size); // non-adiabatic spin torque
 
    //---------------------------------------------------
    // Determine which atoms belong to which stacks
-   //--------------------------------------------------
+   //---------------------------------------------------
    {
-   int ncx = st::num_x_stacks; // temporary variables for readability
-   int ncy = st::num_y_stacks;
-   int ncz = st::num_microcells_per_stack;
+   int ncx = st::internal::num_x_stacks; // temporary variables for readability
+   int ncy = st::internal::num_y_stacks;
+   int ncz = st::internal::num_microcells_per_stack;
 
    // Set cell counter
    int cell=0;
@@ -87,7 +124,13 @@ void initialise(){
       for(int j=0;j<ncy;++j){
          supercell_array[i][j].resize(ncz);
          for(int k=0; k<ncz; ++k){
+            // associate cell with position i,j,k
             supercell_array[i][j][k]=cell;
+            // save ijk coordinates as microcell positions
+            st::internal::pos.at(3*cell+0)=i;
+            st::internal::pos.at(3*cell+1)=j;
+            st::internal::pos.at(3*cell+2)=k;
+            // increment cell number
             cell++;
          }
       }
@@ -96,28 +139,21 @@ void initialise(){
    // slightly offset atomic coordinates to prevent fence post problem
    double atom_offset[3]={0.01,0.01,0.01};
 
-   // For MPI version, only add local atoms
-   #ifdef MPICF
-      int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-   #else
-      int num_local_atoms = atoms::num_atoms;
-   #endif
-
    // define array to store atom-microcell associations
-   st::atom_st_index.resize(num_local_atoms);
+   st::internal::atom_st_index.resize(num_local_atoms);
 
    // Determine number of cells in x,y,z
    const int d[3]={ncx,ncy,ncz};
-   const double cs[3] = {st::micro_cell_size, st::micro_cell_size, st::micro_cell_thickness}; // cell size
+   const double cs[3] = {st::internal::micro_cell_size, st::internal::micro_cell_size, st::internal::micro_cell_thickness}; // cell size
 
    // Assign atoms to cells                                                                                                                  
    for(int atom=0;atom<num_local_atoms;atom++){
       // temporary for atom coordinates
       double c[3];
       // convert atom coordinates to st reference frame
-      c[stx]=atoms::x_coord_array[atom]+0.01;
-      c[sty]=atoms::y_coord_array[atom]+0.01;
-      c[stz]=atoms::z_coord_array[atom]+0.01;
+      c[stx]=atom_coords_x[atom]+0.01;
+      c[sty]=atom_coords_y[atom]+0.01;
+      c[stz]=atom_coords_z[atom]+0.01;
       int scc[3]={0,0,0}; // super cell coordinates
       for(int i=0;i<3;i++){
          // Determine supercell coordinates for atom (rounding down)
@@ -142,41 +178,66 @@ void initialise(){
          }
       }
       // If no error for range then assign atom to cell.
-      st::atom_st_index[atom]=supercell_array[scc[0]][scc[1]][scc[2]+1]; // move cells up by one in z
+      st::internal::atom_st_index[atom]=supercell_array[scc[0]][scc[1]][scc[2]+1]; // move cells up by one in z
    }
 
    } // end of supercell assignment of atoms
 
-   // reduce mean properties lambda sdl on all CPUs for all materials
+   //-------------------------------------------------------
+   // Determine microcell properties from atomic properties
+   //-------------------------------------------------------
+   st::internal::set_microcell_properties(atom_type_array, num_local_atoms);
 
    return; 
-}   
+}
 
+namespace internal{
 
-      
-   
-   
-//-----------------------------------------------------------------------------
-// calculate microcell magnetisation
-//-----------------------------------------------------------------------------
+   //--------------------------------------------------------------------------------
+   // Function to determine spin torque properties from atomic material properties
+   //--------------------------------------------------------------------------------
+   void set_microcell_properties(const std::vector<int>& atom_type_array, const int num_local_atoms){
 
-// loop over all atoms and add s to microcells
+      st::internal::mp.resize(1);
+      st::internal::mp.at(0).beta_cond=1.0;
+      st::internal::mp.at(0).beta_diff=2.0;
+      st::internal::mp.at(0).sa_infinity=3.0;
+      st::internal::mp.at(0).lambda_sdl=4.0;
 
-// all reduce to have consistent m on all CPUs
-/*   for(int stack=0; stack <num_stacks; stack++){
-   const int idx = start_index[stack];
-   for(int cell=idx; cell<idx+num_microcells_per_stack; ++cell){
-      double mx = st::mx[cell];
-      //...
-   }   
-   
-}*/
+      // loop over all atoms
+      for(int atom=0;atom<num_local_atoms;atom++){
 
-//-----------------------------------------------------------------------------
-// Calculate ST field
-//-----------------------------------------------------------------------------
-   
-// divide stacks among CPUs
-   
+         // get material type
+         int mat = atom_type_array[atom];
+
+         // get microcell id
+         int id = st::internal::atom_st_index[atom];
+
+         // determine atomic properties
+         double beta_cond = st::internal::mp.at(mat).beta_cond;
+         double beta_diff = st::internal::mp.at(mat).beta_diff;
+         double sa_infinity = st::internal::mp.at(mat).sa_infinity;
+         double lambda_sdl = st::internal::mp.at(mat).lambda_sdl;
+
+         //add atomic properties to microcells
+         st::internal::beta_cond.at(id) += beta_cond;
+         st::internal::beta_diff.at(id) += beta_cond;
+         st::internal::sa_infinity.at(id) += beta_cond;
+         st::internal::lambda_sdl.at(id) += beta_cond;
+
+      }
+
+      // reduce microcell properties on all CPUs
+      #ifdef MPICF
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::beta_cond[0],st::internal::beta_cond.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::beta_diff[0],st::internal::beta_diff.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::sa_infinity[0],st::internal::sa_infinity.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::lambda_sdl[0],st::internal::lambda_sdl.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      #endif
+
+      return;
+   }
+}
+
 } // end of st namespace
 

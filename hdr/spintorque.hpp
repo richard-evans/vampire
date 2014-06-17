@@ -52,16 +52,18 @@ namespace st{
 //-----------------------------------------------------------------------------
 // Variables used for the spin torque calculation
 //-----------------------------------------------------------------------------
-extern double micro_cell_size; /// lateral size of spin torque microcells
-extern double micro_cell_thickness; /// thickness of spin torque microcells (atomistic)
-   
-//extern std::vector<int> atom_st_index; // microcell which atom belongs to
 
 //-----------------------------------------------------------------------------
-// Variables for the spin torque calculation
+// Function to initialise spin torque calculation
 //-----------------------------------------------------------------------------
-void initialise();
-
+void initialise(const double system_dimensions_x,
+                const double system_dimensions_y,
+                const double system_dimensions_z,
+                const std::vector<double>& atom_coords_x,
+                const std::vector<double>& atom_coords_y,
+                const std::vector<double>& atom_coords_z,
+                const std::vector<int>& atom_type_array,
+                const int num_local_atoms);
 
 } // end of st namespace
 

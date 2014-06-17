@@ -107,6 +107,8 @@ obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/spintorque/data.o \
+obj/spintorque/initialise.o \
+obj/spintorque/output.o \
 obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \

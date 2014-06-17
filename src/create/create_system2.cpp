@@ -285,9 +285,24 @@ int create(){
 	cells::initialise();
    // Initialise demagnetisation fields
 	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
+
+   // Determine number of local atoms
+   #ifdef MPICF
+      int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   #else
+      int num_local_atoms = atoms::num_atoms;
+   #endif
+   //----------------------------------------
    // Initialise spin torque data
-   //if(sim::spin_torque_enabled)
-   st::initialise();
+   //----------------------------------------
+   st::initialise(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  num_local_atoms);
 
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
