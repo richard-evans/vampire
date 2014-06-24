@@ -359,7 +359,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
    for(int atom=0;atom<atoms::num_atoms;atom++){
 
       // Check for local MPI atoms only
-      if(catom_array[atom].mpi_type==0){
+      if(catom_array[atom].mpi_type!=2){
 
          // Initialise counter for number of nearest neighbour interactions
          int nnn_int=0;
