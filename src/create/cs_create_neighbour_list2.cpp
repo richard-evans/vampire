@@ -235,44 +235,43 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
          double vz=0.0;
 
          #ifdef MPICF
-			#else
-
-			// Wrap aound for periodic boundaries
+           // Parallel periodic boundaries are handled explicitly elsewhere
+         #else
+         // Wrap around for periodic boundaries
          // Consider virtual atom position for position vector
-			if(cs::pbc[0]==true){
-				if(nx>=int(d[0])){
+         if(cs::pbc[0]==true){
+            if(nx>=int(d[0])){
                nx=nx-d[0];
                vx=vx+d[0]*ucdx;
             }
-				else if(nx<0){
+            else if(nx<0){
                nx=nx+d[0];
                vx=vx-d[0]*ucdx;
             }
-			}
-			if(cs::pbc[1]==true){
-				if(ny>=int(d[1])){
+         }
+         if(cs::pbc[1]==true){
+            if(ny>=int(d[1])){
                ny=ny-d[1];
                vy=vy+d[1]*ucdy;
             }
-				else if(ny<0){
+            else if(ny<0){
                ny=ny+d[1];
                vy=vy-d[1]*ucdy;
             }
-			}
-			if(cs::pbc[2]==true){
-				if(nz>=int(d[2])){
+         }
+         if(cs::pbc[2]==true){
+            if(nz>=int(d[2])){
                nz=nz-d[2];
                vz=vz+d[2]*ucdz;
             }
-				else if(nz<0){
+            else if(nz<0){
                nz=nz+d[2];
                vz=vz-d[2]*ucdz;
             }
-			}
-
-			#endif
-			// check for out-of-bounds access
-			if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
+         }
+         #endif
+         // check for out-of-bounds access
+         if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
             // check for missing atoms
             if((supercell_array[scc[0]][scc[1]][scc[2]][atom]!=-1) && (supercell_array[nx][ny][nz][natom]!=-1)){
 
