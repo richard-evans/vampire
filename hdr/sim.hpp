@@ -115,6 +115,7 @@ namespace sim{
 	extern bool identify_surface_atoms;
 	extern unsigned int surface_anisotropy_threshold;
 	extern bool NativeSurfaceAnisotropyThreshold;
+   extern double nearest_neighbour_distance;
 	
 	// Anisotropy control booleans
 	extern bool UniaxialScalarAnisotropy; /// Enables scalar uniaxial anisotropy
