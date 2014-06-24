@@ -434,7 +434,11 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
                   atoms::eijy.push_back(eij[1]*invrij);
                   atoms::eijz.push_back(eij[2]*invrij);
 
-                  //std::cout << "nn_id: " << nn << " j: " << cneighbourlist[atom][nn].nn << " range: " << 1.0/invrij << std::endl;
+                  //int natom = cneighbourlist[atom][nn].nn;
+                  //std::cout << "nn_id: " << nn << " j: " << cneighbourlist[atom][nn].nn << "\trange: " << 1.0/invrij << " ";
+                  //std::cout << "eij: " << eij[0] << " " << eij[1] << " " << eij[2] << "\tatomi: ";
+                  //std::cout << catom_array[atom].x << " " << catom_array[atom].y << " " << catom_array[atom].z << "\tatomj: ";
+                  //std::cout << catom_array[natom].x << " " << catom_array[natom].y << " " << catom_array[natom].z << std::endl;
 
                   // increment 1D counter
                   counter++;
@@ -444,7 +448,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
             // [si x x x x x ][ei/si x x x x x][ei/si x x x x x]
             atoms::nearest_neighbour_list_ei[atom]=counter;
          }
-         std::cout << std::endl;
+         //std::cout << std::endl;
       }
 
    } // end of surface anisotropy initialisation
