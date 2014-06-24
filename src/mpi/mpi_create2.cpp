@@ -955,6 +955,10 @@ int sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array,std::vector<st
 			cs::neighbour_t temp_nt;
 			temp_nt.nn=new_nn_number;
 			temp_nt.i=interaction_id;
+         // Actual neighbours stay the same so simply copy separation vectors
+         temp_nt.vx=cneighbourlist[old_atom_num][nn].vx;
+         temp_nt.vy=cneighbourlist[old_atom_num][nn].vy;
+         temp_nt.vz=cneighbourlist[old_atom_num][nn].vz;
 			// ignore all halo-x interactions but not x-halo
 			//if(!((mpi_type_vec[atom].mpi_type==2) && (mpi_type_vec[new_nn_number].mpi_type==2)))
 			if(!(mpi_type_vec[atom].mpi_type==2))
