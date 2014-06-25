@@ -3043,7 +3043,6 @@ int match_material(string const word, string const value, string const unit, int
                   terminaltextcolor(WHITE);
 				  return EXIT_FAILURE;
                }
-               read_material[super_index].geometry_coords[c][xy];
                if((var<0.0) || (var > 1.0)){
 				  terminaltextcolor(RED);
                   std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
