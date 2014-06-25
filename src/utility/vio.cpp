@@ -425,6 +425,7 @@ bool check_for_valid_bool( std::string value, /// variable as in input file
    zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
    err::vexit();
 
+   return false;
 }
 
 ///
