@@ -1483,6 +1483,15 @@ int match_sim(string const word, string const value, string const unit, int cons
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
+   test="surface-anisotropy-nearest-neighbour-range";
+   if(word==test){
+      // Test for valid range
+      double r=atof(value.c_str());
+      check_for_valid_value(r, word, line, prefix, unit, "length", 0.0, 1.0e9,"input","0.0 - 1,000,000,000");
+      sim::nearest_neighbour_distance=r;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
    test="time-step";
    if(word==test){
       double dt=atof(value.c_str());
