@@ -26,7 +26,7 @@ namespace st{
       double micro_cell_thickness = 3.54; /// thickness of spin torque microcells (atomistic)
 
       int num_local_atoms; /// number of local atoms (ignores halo atoms in parallel simulation)
-      int current_direction; /// direction for current x->0, y->1, z->2
+      int current_direction=2; /// direction for current x->0, y->1, z->2
       //   std::vector< std::vector< micro_cell_t > > stack;
       std::vector<int> atom_st_index; // mc which atom belongs to
       std::vector<double> x_field_array; // arrays to store atomic spin torque field

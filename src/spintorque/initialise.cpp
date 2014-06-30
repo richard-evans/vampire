@@ -57,14 +57,14 @@ void initialise(const double system_dimensions_x,
    int sty=1;
    int stz=2;
    if(st::internal::current_direction==0){
-      stx=1;
-      sty=2;
-      stz=0;
+      stx=2; // c[stx] = c[2] = atom_x // current direction
+      sty=1; // c[sty] = c[1] = atom_y
+      stz=0; // c[stz] = c[0] = atom_z
    }
    else if(st::internal::current_direction==1){
-      stx=0;
-      sty=2;
-      stz=1;
+      stx=0;// c[stx] = c[0] = atom_x
+      sty=2;// c[sty] = c[2] = atom_y // current direction
+      stz=1;// c[stz] = c[1] = atom_z
    }
 
    //-------------------------------------------------------------------------------------
@@ -86,7 +86,6 @@ void initialise(const double system_dimensions_x,
 
    // allocate array to store index of first element of stack
    st::internal::stack_index.resize(st::internal::num_stacks);
-   
 
    //-------------------------------------------------------------------------------------
    // allocate microcell data
@@ -121,7 +120,7 @@ void initialise(const double system_dimensions_x,
    int cell=0;
    int stack=0;
 
-   // Declare array for create space for 3D supercell array
+   // Allocate space for 3D supercell array (ST coordinate system)
    std::vector<std::vector<std::vector<int> > > supercell_array;
    supercell_array.resize(ncx);
    for(int i=0;i<ncx;++i){
@@ -146,13 +145,10 @@ void initialise(const double system_dimensions_x,
       }
    }
 
-   // slightly offset atomic coordinates to prevent fence post problem
-   double atom_offset[3]={0.01,0.01,0.01};
-
    // define array to store atom-microcell associations
    st::internal::atom_st_index.resize(num_local_atoms);
 
-   // Determine number of cells in x,y,z
+   // Determine number of cells in x,y,z (ST coordinate system)
    const int d[3]={ncx,ncy,ncz};
    const double cs[3] = {st::internal::micro_cell_size, st::internal::micro_cell_size, st::internal::micro_cell_thickness}; // cell size
 
@@ -161,9 +157,9 @@ void initialise(const double system_dimensions_x,
       // temporary for atom coordinates
       double c[3];
       // convert atom coordinates to st reference frame
-      c[stx]=atom_coords_x[atom]+0.01;
-      c[sty]=atom_coords_y[atom]+0.01;
-      c[stz]=atom_coords_z[atom]+0.01;
+      c[stx]=atom_coords_x[atom]+0.0001;
+      c[sty]=atom_coords_y[atom]+0.0001;
+      c[stz]=atom_coords_z[atom]+0.0001;
       int scc[3]={0,0,0}; // super cell coordinates
       for(int i=0;i<3;i++){
          // Determine supercell coordinates for atom (rounding down)
@@ -181,6 +177,7 @@ void initialise(const double system_dimensions_x,
             terminaltextcolor(RED);
             std::cerr << "\tAtom number:      " << atom << std::endl;
             std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
+            std::cerr << "\tReal coordinates: " << atom_coords_x[atom] << "\t" << atom_coords_y[atom] << "\t" << atom_coords_z[atom] << "\t" << std::endl;
             std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
             std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
             terminaltextcolor(WHITE);
