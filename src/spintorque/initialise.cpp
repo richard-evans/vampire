@@ -117,8 +117,9 @@ void initialise(const double system_dimensions_x,
    int ncy = st::internal::num_y_stacks;
    int ncz = st::internal::num_microcells_per_stack;
 
-   // Set cell counter
+   // Set cell and stack counters
    int cell=0;
+   int stack=0;
 
    // Declare array for create space for 3D supercell array
    std::vector<std::vector<std::vector<int> > > supercell_array;
@@ -127,6 +128,11 @@ void initialise(const double system_dimensions_x,
       supercell_array[i].resize(ncy);
       for(int j=0;j<ncy;++j){
          supercell_array[i][j].resize(ncz);
+         // set starting cell for each stack
+         st::internal::stack_index[stack]=cell;
+         // increment stack counter
+         stack++;
+         // store cell coordinates
          for(int k=0; k<ncz; ++k){
             // associate cell with position i,j,k
             supercell_array[i][j][k]=cell;
