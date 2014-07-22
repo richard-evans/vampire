@@ -94,7 +94,7 @@ double two_temperature_function(double ftime){
 		const double Cl = sim::TTCl;
 		const double dt = mp::dt_SI;
 
-		sim::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
+		sim::TTTe = (-G*(Te-Tp)+pump)*dt/Ce + Te;
 		sim::TTTp = ( G*(Te-Tp)     )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
 
       // Optionally set material specific temperatures
@@ -125,7 +125,7 @@ double double_pump_two_temperature_function(double ftime){
 		const double Cl = sim::TTCl;
 		const double dt = mp::dt_SI;
 
-		sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/(Ce*Te) + Te;
+		sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/Ce + Te;
 		sim::TTTp = ( G*(Te-Tp)           )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
 
       // Optionally set material specific temperatures

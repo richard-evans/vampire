@@ -115,7 +115,7 @@ namespace sim{
 	double double_pump_time=10.0e-15; 
 	double double_pump_delay=10.0e-12;
 	double HeatSinkCouplingConstant=0.0; ///1.1e12 ~ sensible value
-	double TTCe = 7.0E02; ///electron specific heat
+	double TTCe = 5.6E04; ///electron specific heat
 	double TTCl = 3.0E06; ///phonon specific heat
 	double TTG = 17.0E17 ;///electron coupling constant
 	double TTTe = 0.0; /// electron temperature
