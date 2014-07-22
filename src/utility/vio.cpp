@@ -425,6 +425,7 @@ bool check_for_valid_bool( std::string value, /// variable as in input file
    zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
    err::vexit();
 
+   return false;
 }
 
 ///
@@ -1480,6 +1481,15 @@ int match_sim(string const word, string const value, string const unit, int cons
       // Test for valid range
       check_for_valid_int(sat, word, line, prefix, 0, 1000000000,"input","0 - 1,000,000,000");
       sim::surface_anisotropy_threshold=sat;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="surface-anisotropy-nearest-neighbour-range";
+   if(word==test){
+      // Test for valid range
+      double r=atof(value.c_str());
+      check_for_valid_value(r, word, line, prefix, unit, "length", 0.0, 1.0e9,"input","0.0 - 1,000,000,000");
+      sim::nearest_neighbour_distance=r;
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
@@ -3034,7 +3044,6 @@ int match_material(string const word, string const value, string const unit, int
                   terminaltextcolor(WHITE);
 				  return EXIT_FAILURE;
                }
-               read_material[super_index].geometry_coords[c][xy];
                if((var<0.0) || (var > 1.0)){
 				  terminaltextcolor(RED);
                   std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;

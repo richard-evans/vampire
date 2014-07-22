@@ -89,6 +89,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	int atom=0;
 
 	unsigned int maxlh=2;
+   const double cff = 1.e-9; // Small numerical correction for atoms exactly on the borderline between processors
 
 	// Duplicate unit cell
 	for(int z=min_bounds[2];z<max_bounds[2];z++){
@@ -101,13 +102,12 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 					double cx = (double(x)+unit_cell.atom[uca].x)*unit_cell.dimensions[0];
 					double cy = (double(y)+unit_cell.atom[uca].y)*unit_cell.dimensions[1];
 					double cz = (double(z)+unit_cell.atom[uca].z)*unit_cell.dimensions[2];
-
 					#ifdef MPICF
 						if(vmpi::mpi_mode==0){
 							// only generate atoms within allowed dimensions
-							if(	(cx>=vmpi::min_dimensions[0] && cx<vmpi::max_dimensions[0]) &&
-									(cy>=vmpi::min_dimensions[1] && cy<vmpi::max_dimensions[1]) &&
-									(cz>=vmpi::min_dimensions[2] && cz<vmpi::max_dimensions[2])){
+                     if(   (cx>=vmpi::min_dimensions[0]-cff && cx<vmpi::max_dimensions[0]) &&
+                           (cy>=vmpi::min_dimensions[1]-cff && cy<vmpi::max_dimensions[1]) &&
+                           (cz>=vmpi::min_dimensions[2]-cff && cz<vmpi::max_dimensions[2])){
 						#endif
 							if((cx<cs::system_dimensions[0]) && (cy<cs::system_dimensions[1]) && (cz<cs::system_dimensions[2])){
 							catom_array.push_back(cs::catom_t());
