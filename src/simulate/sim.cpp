@@ -108,16 +108,16 @@ namespace sim{
 	double cooling_time=100.0e-12; ///seconds
 	int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
 	pump_functions_t pump_function=two_temperature;
-	double pump_power=2.4e22;
-	double pump_time=20.0e-15; 
-	double double_pump_power=2.2e22;
+	double pump_power=4.e21;
+	double pump_time=50.0e-15;
+	double double_pump_power=2.e21;
 	double double_pump_Tmax=500.0;
-	double double_pump_time=10.0e-15; 
+	double double_pump_time=50.0e-15;
 	double double_pump_delay=10.0e-12;
 	double HeatSinkCouplingConstant=0.0; ///1.1e12 ~ sensible value
-	double TTCe = 5.6E04; ///electron specific heat
-	double TTCl = 3.0E06; ///phonon specific heat
-	double TTG = 17.0E17 ;///electron coupling constant
+	double TTCe = 222.0; ///electron specific heat (gamma)
+	double TTCl = 2.3E06; ///phonon specific heat
+	double TTG = 6.6E17 ;///electron coupling constant
 	double TTTe = 0.0; /// electron temperature
 	double TTTp = 0.0; /// phonon temperature
   

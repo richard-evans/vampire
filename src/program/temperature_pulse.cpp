@@ -81,7 +81,14 @@ double temperature_pulse_function(double function_time){
 	}
 }
 
-/// Calculates temperature for single Gaussian pulse using the two-temperature model
+///-----------------------------------------------------------------------------------------
+///     Calculates temperature for single Gaussian pulse using the two-temperature model
+///
+///     Uses the free electron approximation in calculating the electron temperature
+///     where C_e = gamma_e T_e (ref Unai Atxitia PhD thesis pp 53).
+///     gamma_e ~ 3e3 J/m^-3/K^-2
+///
+///-----------------------------------------------------------------------------------------
 double two_temperature_function(double ftime){
 
 		const double reduced_time =  (ftime-3.*sim::pump_time)/(sim::pump_time);
@@ -94,7 +101,7 @@ double two_temperature_function(double ftime){
 		const double Cl = sim::TTCl;
 		const double dt = mp::dt_SI;
 
-		sim::TTTe = (-G*(Te-Tp)+pump)*dt/Ce + Te;
+		sim::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
 		sim::TTTp = ( G*(Te-Tp)     )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
 
       // Optionally set material specific temperatures
@@ -125,7 +132,7 @@ double double_pump_two_temperature_function(double ftime){
 		const double Cl = sim::TTCl;
 		const double dt = mp::dt_SI;
 
-		sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/Ce + Te;
+		sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/(Ce*Te) + Te;
 		sim::TTTp = ( G*(Te-Tp)           )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
 
       // Optionally set material specific temperatures
