@@ -142,7 +142,7 @@ void load_checkpoint(){
    chkfile.close();
 
    // log reading checkpoint file 
-   zlog << zTs() << "Checkpoint file loaded at sim::time " << time64 << "." << std::endl;
+   zlog << zTs() << "Checkpoint file loaded at sim::time " << sim::time << "." << std::endl;
 
    return;
 
