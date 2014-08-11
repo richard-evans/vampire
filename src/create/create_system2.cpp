@@ -54,6 +54,7 @@
 #include "cells.hpp"
 #include "demag.hpp"
 #include "grains.hpp"
+#include "ltmp.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "vio.hpp"
@@ -284,6 +285,31 @@ int create(){
 	cells::initialise();
 	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
 	
+   // Determine number of local atoms
+   #ifdef MPICF
+      int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   #else
+      int num_local_atoms = atoms::num_atoms;
+   #endif
+   //----------------------------------------
+   // Initialise local temperature data
+   //----------------------------------------
+   ltmp::initialise(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  num_local_atoms,
+                  sim::Teq,
+                  sim::pump_power,
+                  sim::pump_time,
+                  sim::TTG,
+                  sim::TTCe,
+                  sim::TTCl,
+                  mp::dt_SI);
+
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;

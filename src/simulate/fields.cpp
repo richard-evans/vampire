@@ -35,6 +35,7 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "demag.hpp"
+#include "ltmp.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
@@ -114,6 +115,16 @@ int calculate_external_fields(const int start_index,const int end_index){
 	fill (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index,0.0);
 	
 	if(sim::program==7) calculate_hamr_fields(start_index,end_index);
+   else if(sim::program==13){
+
+      // Local thermal Fields
+      ltmp::get_localised_thermal_fields(atoms::x_total_external_field_array,atoms::y_total_external_field_array,
+                                         atoms::z_total_external_field_array, start_index, end_index);
+
+      // Applied Fields
+      if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
+
+   }
 	else{
 	
 		// Thermal Fields

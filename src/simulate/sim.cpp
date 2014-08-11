@@ -344,6 +344,14 @@ int run(){
          program::partial_hysteresis_loop();
          break;
 
+      case 13:
+         if(vmpi::my_rank==0){
+            std::cout << "localised-temperature-pulse..." << std::endl;
+            zlog << "localised-temperature-pulse..." << std::endl;
+         }
+         program::localised_temperature_pulse();
+         break;
+
 		case 50:
 			if(vmpi::my_rank==0){
 				std::cout << "Diagnostic-Boltzmann..." << std::endl;

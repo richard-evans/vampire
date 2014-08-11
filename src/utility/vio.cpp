@@ -52,6 +52,7 @@
 #include "demag.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
+#include "ltmp.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -761,7 +762,11 @@ int match(string const key, string const word, string const value, string const 
 	if(key==test){
 		int frs=vin::match_config(word, value, line);
 		return frs;
-	}	
+	}
+   //-------------------------------------------------------------------
+	// Test for localised temperature pulse
+   //-------------------------------------------------------------------
+   else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//-------------------------------------------------------------------
 	// Get material filename
 	//-------------------------------------------------------------------
@@ -1412,6 +1417,11 @@ int match_sim(string const word, string const value, string const unit, int cons
       test="partial-hysteresis-loop";
       if(value==test){
          sim::program=12;
+         return EXIT_SUCCESS;
+      }
+      test="localised-temperature-pulse";
+      if(value==test){
+         sim::program=13;
          return EXIT_SUCCESS;
       }
       test="diagnostic-boltzmann";
