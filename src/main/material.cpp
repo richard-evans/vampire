@@ -72,7 +72,9 @@ materials_t::materials_t ():
 	fmr_field_strength(0.0),
 	fmr_field_frequency(0.0),
 	fmr_field_unit_vector(3,0.0),
-   fill(false)
+   fill(false),
+   temperature_rescaling_alpha(1.0),
+   temperature_rescaling_Tc(0.0)
 	
 	{
 

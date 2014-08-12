@@ -3611,6 +3611,24 @@ int match_material(string const word, string const value, string const unit, int
 			return EXIT_SUCCESS;
 
 		}
+      //--------------------------------------------------------------------
+      else
+      test="temperature-rescaling-exponent";
+      if(word==test){
+         double alpha=atof(value.c_str());
+         check_for_valid_value(alpha, word, line, prefix, unit, "none", 0.0, 10.0,"material"," 0.0 - 10.0");
+         read_material[super_index].temperature_rescaling_alpha=alpha;
+         return EXIT_SUCCESS;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="temperature-rescaling-curie-temperature";
+      if(word==test){
+         double Tc=atof(value.c_str());
+         check_for_valid_value(Tc, word, line, prefix, unit, "none", 0.0, 10000.0,"material"," 0 - 10000 K");
+         read_material[super_index].temperature_rescaling_Tc=Tc;
+         return EXIT_SUCCESS;
+      }
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------

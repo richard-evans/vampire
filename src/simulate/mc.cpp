@@ -101,11 +101,18 @@ int MonteCarlo(){
 	double Eold=0.0;
 	double Enew=0.0;
 	double DE=0.0;
-	const double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
 	const int AtomExchangeType=atoms::exchange_type;
 	
-   // Calculate range for move
-   sim::mc_delta_angle=pow(1.0/kBTBohr,0.2)*0.08;
+   // Material dependent temperature rescaling
+   std::vector<double> rescaled_material_kBTBohr(mp::num_materials);
+   std::vector<double> sigma_array(mp::num_materials); // range for tuned gaussian random move
+   for(int m=0; m<mp::num_materials; ++m){
+      double alpha = mp::material[m].temperature_rescaling_alpha;
+      double Tc = mp::material[m].temperature_rescaling_Tc;
+      double rescaled_temperature = sim::temperature < Tc ? Tc*pow(sim::temperature/Tc,alpha) : sim::temperature;
+      rescaled_material_kBTBohr[m] = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
+      sigma_array[m] = pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
+   }
 
 	// loop over natoms to form a single Monte Carlo step
 	for(int i=0;i<nmoves; i++){
@@ -115,6 +122,9 @@ int MonteCarlo(){
 		
 		// get material id
 		const int imaterial=atoms::type_array[atom];
+
+      // Calculate range for move
+      sim::mc_delta_angle=sigma_array[imaterial];
 
 		// Save old spin position
 		Sold[0] = atoms::x_spin_array[atom];
@@ -142,7 +152,7 @@ int MonteCarlo(){
 		if(DE<0) continue;
 		// Otherwise evaluate probability for move
 		else{
-			if(exp(-DE*kBTBohr) >= mtrandom::grnd()) continue;
+			if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
 			// If rejected reset spin coordinates and continue
 			else{
 				atoms::x_spin_array[atom] = Sold[0];
