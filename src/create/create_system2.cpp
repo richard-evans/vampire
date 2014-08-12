@@ -318,8 +318,10 @@ int create(){
 	int total_num_atoms=0;
 	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
 	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
+   zlog << zTs() << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
 	#else
 	std::cout << "Number of atoms generated: " << atoms::num_atoms << std::endl; 
+   zlog << zTs() << "Number of atoms generated: " << atoms::num_atoms << std::endl; 
 
 	#endif
 
