@@ -2960,6 +2960,7 @@ int match_material(string const word, string const value, string const unit, int
          // Test for valid range
          check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
          read_material[super_index].Ks_SI=-K;// Import anisotropy as field, *-1
+         sim::surface_anisotropy=true; // enable surface anisotropy
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------
