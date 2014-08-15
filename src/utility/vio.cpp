@@ -1424,6 +1424,11 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::program=13;
          return EXIT_SUCCESS;
       }
+      test="effective-damping";
+      if(value==test){
+         sim::program=14;
+         return EXIT_SUCCESS;
+      }
       test="diagnostic-boltzmann";
       if(value==test){
          sim::program=50;

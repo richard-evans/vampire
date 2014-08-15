@@ -100,6 +100,7 @@ obj/program/static_hysteresis.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
 obj/program/localised_temperature_pulse.o \
+obj/program/effective_damping.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
