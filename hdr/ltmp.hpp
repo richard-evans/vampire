@@ -53,9 +53,40 @@
 //--------------------------------------------------------------------------------
 namespace ltmp{
 
+   //--------------------------------------------------------------------
+   // Class to contain parameters for tabulated absorption profile
+   //
+   // Tabulated values are read from a file and added point-wise to
+   // the class. During initialisation interpolating functions
+   // are determined to calculate A(z)
+   //
+   class abs_t{
+
+      private:
+
+         int z_max; // maximum array value in tabulated function
+         double A_max; // value of absorption at z_max (used for all z > z_max)
+         bool profile_loaded; // flag indicating profile has been loaded from file
+
+         std::vector<int> z; // input z-height from surface values
+         std::vector<double> A; // input absorption values
+         std::vector<double> m; // calculated m value
+         std::vector<double> c; // calculated c value
+
+      public:
+         abs_t();
+         bool is_set();
+         void add_point(double height, double absorption);
+         void set_interpolation_table();
+         double get_absorption_constant(double height);
+         void output_interpolated_function(int height);
+
+   };
+
    //-----------------------------------------------------------------------------
    // Variables used for the localised temperature pulse calculation
    //-----------------------------------------------------------------------------
+   extern abs_t absorption_profile; // class variable containing tabulated absorption profile
 
    //-----------------------------------------------------------------------------
    // Function to check local temperature pulse is enabled

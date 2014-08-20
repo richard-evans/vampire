@@ -1442,6 +1442,7 @@ int match_sim(string const word, string const value, string const unit, int cons
          std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
          std::cerr << "\t\"hybrid-cmc\"" << std::endl;
          std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
+         std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
          terminaltextcolor(WHITE);
 		 err::vexit();
       }
@@ -3093,7 +3094,7 @@ int match_material(string const word, string const value, string const unit, int
          // Read in number of temperature points
          latt_file >> num_pts;
 
-         // Check for valie number of points
+         // Check for valid number of points
          if(num_pts<=1){
             std::cerr << "Error in lattice-anisotropy-file " << value.c_str() << " on line " << line << " of material file. The first number must be an integer greater than 1. Exiting." << std::endl;
             zlog << zTs() << "Error in lattice-anisotropy-file " << value.c_str() << " on line " << line << " of material file. The first number must be an integer greater than 1. Exiting." << std::endl;

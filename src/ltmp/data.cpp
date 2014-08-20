@@ -16,7 +16,14 @@
 #include "internal.hpp"
 
 namespace ltmp{
+
+   //-----------------------------------------------------------------------------------------------
+   // Externally visible variables
+   //-----------------------------------------------------------------------------------------------
+   abs_t absorption_profile; // class variable containing tabulated absorption profile
+
    namespace internal{
+
       //-----------------------------------------------------------------------------
       // Shared variables used for the local temperature pulse calculation
       //-----------------------------------------------------------------------------
@@ -57,7 +64,7 @@ namespace ltmp{
       std::vector<double> root_temperature_array; /// stored as pairs sqrt(Te), sqrt(Tp) (2 x number of cells) MIRRORED on all CPUs
       std::vector<double> cell_position_array; /// position of cells in x,y,z (3*n) MIRRORED on all CPUs // dont need this
       std::vector<double> delta_temperature_array; /// stored as pairs dTe, dTp LOCAL CPU only
-      std::vector<double> attenuation_array; /// factor reducng incident laser fluence for each cell LOCAL CPU only
+      std::vector<double> attenuation_array; /// factor reducing incident laser fluence for each cell LOCAL CPU only
 
       //std::vector<double> material_kerr_sensitivity_depth; // unrolled list of kerr sensitivity depths for each material
 

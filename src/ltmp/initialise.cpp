@@ -239,6 +239,12 @@ void initialise(const double system_dimensions_x,
      //      void* recv_data, int recv_count, MPI_Datatype recv_datatype,
      //      int root, MPI_Comm communicator)
 
+   // determine if profile is taken from file
+   const bool profile_file=ltmp::absorption_profile.is_set();
+
+   // calculate interpolation for absorption profile
+   ltmp::absorption_profile.set_interpolation_table();
+
    //--------------------------------------------------------------------------------------
    // calculate attenuation for each cell depending on lateral and vertical discretisation
    //--------------------------------------------------------------------------------------
@@ -248,8 +254,13 @@ void initialise(const double system_dimensions_x,
       double r_sq = rx*rx+ry*ry;
       double z = system_dimensions_z - ltmp::internal::cell_position_array[3*cell+2];
       double pre = 4.0*log(2.0);
-      double vattn = ltmp::internal::vertical_discretisation ? exp(-z/ltmp::internal::penetration_depth) : 1.0; // vertical attenuation
+      double vattn = 1.0;
+      if(ltmp::internal::vertical_discretisation){
+         if(profile_file) vattn = ltmp::absorption_profile.get_absorption_constant(z);
+         else vattn = exp(-z/ltmp::internal::penetration_depth); // vertical attenuation
+      }
       double lattn = ltmp::internal::lateral_discretisation ? exp(-r_sq*pre/(ltmp::internal::laser_spot_size*ltmp::internal::laser_spot_size)) : 1.0;
+      // determine attenuation
       ltmp::internal::attenuation_array[cell] = vattn*lattn;
    }
 

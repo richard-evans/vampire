@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
@@ -105,6 +106,46 @@ namespace ltmp{
             terminaltextcolor(WHITE);
             err::vexit();
          }
+      }
+      //--------------------------------------------------------------------
+      test="absorption-profile-file";
+      if(word==test){
+         // Open absorption profile file
+         // Absorption (implicitly vs cell height)
+         std::ifstream afile(value.c_str());
+         if(!afile.is_open()){
+         terminaltextcolor(RED);
+            std::cerr << "Error - absorption profile file " << value.c_str() << " not found. Exiting." << std::endl;
+            zlog << zTs() << "Error - absorption profile file " << value.c_str() << " not found. Exiting." << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+         std::string linestr; // String to hold line of text
+         double z=0.0; // height value
+         double ab=0.0; // absorption
+         // read absorption constants
+         while(getline(afile,linestr)){
+            std::stringstream line_stream(linestr);
+            line_stream >> z >> ab;
+            // check for valid ranges
+            if(z < 0.0 || z > 10000.0){
+              terminaltextcolor(RED);
+              std::cerr << "Error on line " << line << " of absorption profile file. Height value " << z << " is outside of valid range (0.0-10000.0 A). Exiting." << std::endl;
+              zlog << zTs() << "Error on line " << line << " of absorption profile file. Height value " << z << " is outside of valid range (0.0-10000.0 A). Exiting." << std::endl;
+              terminaltextcolor(WHITE);
+              err::vexit();
+            }
+            if(ab < 0.0 || ab > 1.0){
+              terminaltextcolor(RED);
+              std::cerr << "Error on line " << line << " of absorption profile file. Absorption value " << ab << " value is outside of valid range (0.0-1.0). Exiting." << std::endl;
+              zlog << zTs() << "Error on line " << line << " of absorption profile file. Absorption value " << ab << " value is outside of valid range (0.0-1.0). Exiting." << std::endl;
+              terminaltextcolor(WHITE);
+              err::vexit();
+            }
+            // everything is safe, so add point to class
+            ltmp::absorption_profile.add_point(z,ab);
+         }
+         return true;
       }
       //--------------------------------------------------------------------
       else{

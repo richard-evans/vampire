@@ -70,6 +70,7 @@ obj/data/category.o \
 obj/data/cells.o \
 obj/data/grains.o \
 obj/data/lattice_anisotropy.o \
+obj/ltmp/absorption_profile.o \
 obj/ltmp/data.o \
 obj/ltmp/field.o \
 obj/ltmp/initialise.o \
