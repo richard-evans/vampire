@@ -1424,6 +1424,11 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::program=13;
          return EXIT_SUCCESS;
       }
+      test="effective-damping";
+      if(value==test){
+         sim::program=14;
+         return EXIT_SUCCESS;
+      }
       test="diagnostic-boltzmann";
       if(value==test){
          sim::program=50;
@@ -2205,6 +2210,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="applied-field-alignment";
    if(word==test){
+      stats::calculate_system_magnetization=true;
       output_list.push_back(12);
       return EXIT_SUCCESS;
    }
@@ -2212,6 +2218,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="magnetisation";
    if(word==test){
+      stats::calculate_system_magnetization=true;
       output_list.push_back(5);
       return EXIT_SUCCESS;
    }
@@ -2219,6 +2226,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //-------------------------------------------------------------------
    test="magnetisation-length";
    if(word==test){
+      stats::calculate_system_magnetization=true;
       output_list.push_back(6);
       return EXIT_SUCCESS;
    }
@@ -2226,6 +2234,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="mean-magnetisation-length";
    if(word==test){
+      stats::calculate_system_magnetization=true;
       output_list.push_back(7);
       return EXIT_SUCCESS;
    }
@@ -2233,13 +2242,31 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="material-magnetisation";
    if(word==test){
+      stats::calculate_material_magnetization=true;
       output_list.push_back(8);
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="height-magnetisation";
+   if(word==test){
+      stats::calculate_height_magnetization=true;
+      output_list.push_back(43);
+      return EXIT_SUCCESS;
+   }
+   else
+   //--------------------------------------------------------------------
+   test="material-height-magnetisation";
+   if(word==test){
+      stats::calculate_material_height_magnetization=true;
+      output_list.push_back(44);
       return EXIT_SUCCESS;
    }
    else
    //--------------------------------------------------------------------
    test="material-mean-magnetisation-length";
    if(word==test){
+      stats::calculate_material_magnetization=true;
       output_list.push_back(9);
       return EXIT_SUCCESS;
    }
@@ -2339,6 +2366,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //-------------------------------------------------------------------
    test="material-applied-field-alignment";
    if(word==test){
+      stats::calculate_material_magnetization=true;
       output_list.push_back(26);
       return EXIT_SUCCESS;
    }
@@ -3701,39 +3729,29 @@ namespace vout{
 	}
 	
 	// Output Function 5
-	void mvec(std::ostream& stream){
-		stream << stats::total_mag_norm[0]/stats::total_mag_m_norm << "\t";
-		stream << stats::total_mag_norm[1]/stats::total_mag_m_norm << "\t";
-		stream << stats::total_mag_norm[2]/stats::total_mag_m_norm << "\t";
-	}
+   void mvec(std::ostream& stream){
+      stream << stats::system_magnetization.output_normalized_magnetization();
+   }
 	
 	// Output Function 6
-	void magm(std::ostream& stream){
-		stream << stats::total_mag_m_norm << "\t";
-	}
+   void magm(std::ostream& stream){
+      stream << stats::system_magnetization.output_normalized_magnetization_length() << "\t";
+   }
 	
 	// Output Function 7
-	void mean_magm(std::ostream& stream){
-		stream << stats::total_mean_mag_m_norm/stats::data_counter << "\t";
-	}
+   void mean_magm(std::ostream& stream){
+      stream << stats::system_magnetization.output_normalized_mean_magnetization_length();
+   }
 	
 	// Output Function 8
-	void mat_mvec(std::ostream& stream){
-		for(int mat=0;mat<mp::num_materials;mat++){
-			double imagm = 1.0/stats::sublattice_magm_array[mat];
-			stream << stats::sublattice_mx_array[mat]*imagm << "\t";
-			stream << stats::sublattice_my_array[mat]*imagm << "\t";
-			stream << stats::sublattice_mz_array[mat]*imagm << "\t";
-			stream << stats::sublattice_magm_array[mat] << "\t";
-		}
-	}
+   void mat_mvec(std::ostream& stream){
+      stream << stats::material_magnetization.output_normalized_magnetization();
+   }
 	
 	// Output Function 9
-	void mat_mean_magm(std::ostream& stream){
-		for(int mat=0;mat<mp::num_materials;mat++){
-			stream << stats::sublattice_mean_magm_array[mat]/stats::data_counter << "\t";
-		}
-	}
+   void mat_mean_magm(std::ostream& stream){
+      stream << stats::material_magnetization.output_normalized_mean_magnetization_length();
+   }
 
 	// Output Function 10
 	void grain_mvec(std::ostream& stream){
@@ -3770,9 +3788,9 @@ namespace vout{
 	
 	// Output Function 12
 	void mdoth(std::ostream& stream){
-		
-		double mh=sim::H_vec[0]*stats::total_mag_norm[0]+sim::H_vec[1]*stats::total_mag_norm[1]+sim::H_vec[2]*stats::total_mag_norm[2];
-		stream << mh << "\t";
+      // initialise vector of H
+      std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
+      stream << stats::system_magnetization.output_normalized_magnetization_dot_product(H);
 	}
 	
 	// Output Function 13
@@ -3882,14 +3900,9 @@ namespace vout{
 
 	// Output Function 26
 	void mat_mdoth(std::ostream& stream){
-		const double H[3]={sim::H_vec[0],sim::H_vec[1],sim::H_vec[2]};
-		for(int mat=0;mat<mp::num_materials;mat++){
-			const double imagm = 1.0/stats::sublattice_magm_array[mat];
-			double mh = stats::sublattice_mx_array[mat]*imagm*H[0] + 
-							stats::sublattice_my_array[mat]*imagm*H[1] + 
-							stats::sublattice_mz_array[mat]*imagm*H[2];
-			stream << mh << "\t";
-		}
+      // initialise vector of H
+      std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
+      stream << stats::material_magnetization.output_normalized_magnetization_dot_product(H);
 	}
 	
    // Output Function 27
@@ -3970,6 +3983,16 @@ namespace vout{
    // Output Function 42
    void mean_total_so_anisotropy_energy(std::ostream& stream){
       stats::output_energy(stream, stats::second_order_anisotropy, stats::mean);
+   }
+
+   // Output Function 43
+   void height_mvec(std::ostream& stream){
+      stream << stats::height_magnetization.output_normalized_mean_magnetization();
+   }
+
+   // Output Function 44
+   void material_height_mvec(std::ostream& stream){
+      stream << stats::material_height_magnetization.output_normalized_mean_magnetization();
    }
 
    // Output Function 60
@@ -4139,6 +4162,12 @@ namespace vout{
                break;
             case 42:
                vout::mean_total_so_anisotropy_energy(zmag);
+               break;
+            case 43:
+               vout::height_mvec(zmag);
+               break;
+            case 44:
+               vout::material_height_mvec(zmag);
                break;
             case 60:
 					vout::MPITimings(zmag);

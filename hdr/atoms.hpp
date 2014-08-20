@@ -104,6 +104,7 @@ namespace atoms
 	extern std::vector <double> x_spin_array;
 	extern std::vector <double> y_spin_array;
 	extern std::vector <double> z_spin_array;
+   extern std::vector <double> m_spin_array; /// Array of atomic spin moments
 
 	extern std::vector <double> x_total_spin_field_array;		/// Total spin dependent fields
 	extern std::vector <double> y_total_spin_field_array;		/// Total spin dependent fields

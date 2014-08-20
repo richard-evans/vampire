@@ -352,6 +352,14 @@ int run(){
          program::localised_temperature_pulse();
          break;
 
+      case 14:
+         if(vmpi::my_rank==0){
+            std::cout << "effective-damping..." << std::endl;
+            zlog << "effective-damping..." << std::endl;
+         }
+         program::effective_damping();
+         break;
+
 		case 50:
 			if(vmpi::my_rank==0){
 				std::cout << "Diagnostic-Boltzmann..." << std::endl;

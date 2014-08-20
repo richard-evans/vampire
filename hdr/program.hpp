@@ -45,6 +45,7 @@ namespace program
    extern void reverse_hybrid_cmc();
    extern void lagrange_multiplier();
    extern void localised_temperature_pulse();
+   extern void effective_damping();
 
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();

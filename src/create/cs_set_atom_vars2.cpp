@@ -39,6 +39,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 
@@ -69,6 +70,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::x_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::y_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
+   atoms::m_spin_array.resize(atoms::num_atoms,0.0);
 
 	atoms::type_array.resize(atoms::num_atoms,0);
 	atoms::category_array.resize(atoms::num_atoms,0);
@@ -119,6 +121,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		atoms::x_spin_array[atom]=sx*modS;
 		atoms::y_spin_array[atom]=sy*modS;
 		atoms::z_spin_array[atom]=sz*modS;
+      atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
 	}
 
 	//===========================================================
@@ -470,6 +473,54 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
    cells::num_atoms_in_unit_cell=unit_cell.atom.size();
    //std::cout << "\t\t" << unit_cell.atom.size() << "\t" << cells::num_atoms_in_unit_cell << std::endl;
    unit_cell.atom.resize(0);
+
+   //--------------------------------------------------------------
+   // Set up statistics masks for different data sets
+   //--------------------------------------------------------------
+   #ifdef MPICF
+      stats::num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   #else
+      stats::num_atoms = atoms::num_atoms;
+   #endif
+
+   // define vector mask
+   std::vector<int> mask(stats::num_atoms,0);
+
+   // system magnetization
+   if(stats::calculate_system_magnetization){
+      stats::system_magnetization.set_mask(1,mask);
+   }
+
+   // material magnetization
+   if(stats::calculate_material_magnetization){
+      for(int atom=0; atom < stats::num_atoms; ++atom) mask[atom] = atoms::type_array[atom];
+      stats::material_magnetization.set_mask(mp::num_materials,mask);
+   }
+
+   // height magnetization
+   if(stats::calculate_height_magnetization){
+      int max_height=0;
+      for(int atom=0; atom < stats::num_atoms; ++atom){
+         mask[atom] = atoms::category_array[atom];
+         if(mask[atom]>max_height) max_height=mask[atom];
+      }
+      stats::height_magnetization.set_mask(max_height+1,mask);
+   }
+
+   // material height magnetization
+   if(stats::calculate_material_height_magnetization){
+      // store as blocks of material magnetisation for each height [ m1x m1y m1z m1m m2x m2y m2z 2m2 ] [ m1x m1y m1z m1m m2x m2y m2z 2m2 ] ...
+      // num masks = num_materials*num_heights
+      int num_mats = mp::num_materials;
+      int max_height=0;
+      for(int atom=0; atom < stats::num_atoms; ++atom){
+         int height = atoms::category_array[atom];
+         int mat = atoms::type_array[atom];
+         mask[atom] = num_mats*height+mat;
+         if(height>max_height) max_height=height;
+      }
+      stats::material_height_magnetization.set_mask(num_mats*(max_height+1),mask);
+   }
 
    // Now nuke generation vectors to free memory NOW
    std::vector<cs::catom_t> zerov;

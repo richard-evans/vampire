@@ -50,14 +50,16 @@ void update_lagrange_lambda(){
 
    // Calculate magnetisation
    stats::mag_m();
-   sim::lagrange_m = stats::total_mag_m_norm;
 
    //std::cout << "xx " << sim::lagrange_m << std::endl;
 
+   const std::vector<double> mm = stats::system_magnetization.get_magnetization();
+
    // Calculate unit vector of magnetisation
-   const double mx = stats::total_mag_norm[0]/stats::total_mag_m_norm;
-   const double my = stats::total_mag_norm[1]/stats::total_mag_m_norm;
-   const double mz = stats::total_mag_norm[2]/stats::total_mag_m_norm;
+   const double mx = mm[0];
+   const double my = mm[1];
+   const double mz = mm[2];
+   sim::lagrange_m = mm[3];
 
    // Constraint vector
    const double nu_x=cos(sim::constraint_theta*M_PI/180.0)*sin(sim::constraint_phi*M_PI/180.0);

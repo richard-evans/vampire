@@ -101,6 +101,7 @@ obj/program/static_hysteresis.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
 obj/program/localised_temperature_pulse.o \
+obj/program/effective_damping.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -115,6 +116,9 @@ obj/simulate/cmc.o \
 obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
+obj/statistics/data.o \
+obj/statistics/magnetization.o \
+obj/statistics/statistics.o \
 obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \

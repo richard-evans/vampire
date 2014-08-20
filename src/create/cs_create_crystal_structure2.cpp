@@ -88,7 +88,11 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	// Initialise atoms number
 	int atom=0;
 
-	unsigned int maxlh=2;
+   // find maximum height lh_category
+   int maxlh=0;
+   for(int uca=0;uca<unit_cell.atom.size();uca++) if(unit_cell.atom[uca].hc > maxlh) maxlh = unit_cell.atom[uca].hc;
+   maxlh+=1;
+
    const double cff = 1.e-9; // Small numerical correction for atoms exactly on the borderline between processors
 
 	// Duplicate unit cell

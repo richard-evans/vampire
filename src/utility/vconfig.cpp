@@ -214,15 +214,10 @@ void config(){
 			cfg_file_ofstr << "Time: " << double(sim::time)*mp::dt_SI << std::endl;
 			cfg_file_ofstr << "Field: " << sim::H_applied << std::endl;
 			cfg_file_ofstr << "Temperature: "<< sim::temperature << std::endl;
-			cfg_file_ofstr << "Magnetisation: " << stats::total_mag_norm[0] << "\t" << stats::total_mag_norm[1] << "\t" << stats::total_mag_norm[2] << std::endl;
+			cfg_file_ofstr << "Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
 			cfg_file_ofstr << "Number of Materials: " << mp::num_materials << std::endl;
 			for(int mat=0;mat<mp::num_materials;mat++){
-				cfg_file_ofstr << mp::material[mat].mu_s_SI << "\t";
-				double imagm = 1.0/stats::sublattice_magm_array[mat];
-				cfg_file_ofstr << stats::sublattice_mx_array[mat]*imagm << "\t";
-				cfg_file_ofstr << stats::sublattice_my_array[mat]*imagm << "\t";
-				cfg_file_ofstr << stats::sublattice_mz_array[mat]*imagm << "\t";
-				cfg_file_ofstr << stats::sublattice_magm_array[mat] << "\t"<< std::endl;
+				cfg_file_ofstr << mp::material[mat].mu_s_SI << std::endl;
 			}
 			cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
 			cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors-1 << std::endl;
@@ -471,7 +466,7 @@ void cells(){
       cfg_file_ofstr << "# Time: " << double(sim::time)*mp::dt_SI << std::endl;
       cfg_file_ofstr << "# Field: " << sim::H_applied << std::endl;
       cfg_file_ofstr << "# Temperature: "<< sim::temperature << std::endl;
-      cfg_file_ofstr << "# Magnetisation: " << stats::total_mag_norm[0] << "\t" << stats::total_mag_norm[1] << "\t" << stats::total_mag_norm[2] << std::endl;
+      cfg_file_ofstr << "# Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 
       // Root process now outputs the cell magnetisations
