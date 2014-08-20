@@ -500,15 +500,14 @@ int calculate_applied_fields(const int start_index,const int end_index){
 
 	// Add external field from thin film sample
 	if(sim::ext_demag==true){
-		
-		// calculate system magnetisation
-		stats::mag_m();
+
+      const std::vector<double> m_l = stats::system_magnetization.get_magnetization();
 		
 		// calculate global demag field -mu_0 M D, M = m/V
 		const double mu_0= -4.0*M_PI*1.0e-7/(cs::system_dimensions[0]*cs::system_dimensions[1]*cs::system_dimensions[2]*1.0e-30);
-		const double HD[3]={	mu_0*sim::demag_factor[0]*stats::total_mag_actual[0],
-									mu_0*sim::demag_factor[1]*stats::total_mag_actual[1],
-									mu_0*sim::demag_factor[2]*stats::total_mag_actual[2]};
+      const double HD[3]={	mu_0*sim::demag_factor[0]*m_l[0],
+                           mu_0*sim::demag_factor[1]*m_l[1],
+                           mu_0*sim::demag_factor[2]*m_l[2]};
 		
 		//std::cout << "mu_0" << "\t" << mu_0 << std::endl;
 		//std::cout << "Magnetisation " << stats::total_mag_actual[0] << "\t" << stats::total_mag_actual[1] << "\t" << stats::total_mag_actual[2] << std::endl;  
