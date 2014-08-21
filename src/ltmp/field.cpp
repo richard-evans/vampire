@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <algorithm>
 
 // Vampire headers
 #include "ltmp.hpp"
