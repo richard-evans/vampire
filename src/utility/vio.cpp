@@ -4063,6 +4063,7 @@ namespace vout{
       }
 		
 		// Output data to zmag
+      if(vmpi::my_rank==0){
 		for(unsigned int item=0;item<file_output_list.size();item++){
 			switch(file_output_list[item]){
 				case 0:
@@ -4202,10 +4203,9 @@ namespace vout{
 					break;
 			}
 		}
-
 		// Carriage return
 		if(file_output_list.size()>0) zmag << std::endl;
-
+}
 		// Output data to cout
 		if(vmpi::my_rank==0){
 		for(unsigned int item=0;item<screen_output_list.size();item++){
