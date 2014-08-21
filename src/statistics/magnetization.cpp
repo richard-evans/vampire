@@ -28,7 +28,7 @@ magnetization_statistic_t::magnetization_statistic_t (): is_initialized(false){}
 //------------------------------------------------------------------------------------------------------
 // Function to initialize mask
 //------------------------------------------------------------------------------------------------------
-void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int> in_mask){
+void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int> in_mask, const std::vector<double>& mm){
 
    // Check that mask values never exceed mask_size
    for(int atom=0; atom<in_mask.size(); ++atom){
@@ -48,17 +48,36 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
    mask=in_mask; // copy contents of vector
    magnetization.resize(4*mask_size,0.0);
    mean_magnetization.resize(4*mask_size,0.0);
+   saturation.resize(mask_size,0.0);
+
+   // calculate contributions of spins to each magetization category
+   for(int atom=0; atom<num_atoms; ++atom){
+      const int mask_id = mask[atom]; // get mask id
+      saturation[mask_id] += mm[atom];
+   }
+
+   // Add saturation for all CPUs
+   #ifdef MPICF
+      MPI_Allreduce(MPI_IN_PLACE, &saturation[0], mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   #endif
 
    // determine mask id's with no atoms
-   for(int mask_id=0; mask_id<in_mask_size; ++mask_id){
-      bool found_atom=false;
-      for(int atom=0; atom<in_mask.size(); ++atom){
-         if(in_mask[atom] == mask_id){
-            found_atom=true;
-         }
-      }
+   std::vector<int> num_atoms_in_mask(mask_size,0);
+   for(int atom=0; atom<in_mask.size(); ++atom){
+      int mask_id = in_mask[atom];
+      // add atoms to mask
+      num_atoms_in_mask[mask_id]++;
+   }
+
+   // Reduce on all CPUs
+   #ifdef MPICF
+      MPI_Allreduce(MPI_IN_PLACE, &num_atoms_in_mask[0], mask_size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   #endif
+
+   // Check for no atoms in mask on any CPU
+   for(int mask_id=0; mask_id<mask_size; ++mask_id){
       // if no atoms exist then add to zero list
-      if(!found_atom){
+      if(num_atoms_in_mask[mask_id]==0){
          zero_list.push_back(4*mask_id+0);
          zero_list.push_back(4*mask_id+1);
          zero_list.push_back(4*mask_id+2);
@@ -92,7 +111,7 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
 
    // Reduce on all CPUS
    #ifdef MPICF
-      MPI_Allreduce(MPI_IN_PLACE, &magnetization[0], mask_size, MPI_DOUBLE, MPI_SUM, COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &magnetization[0], 4*mask_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
    // Calculate magnetisation length and normalize
@@ -156,6 +175,23 @@ std::string magnetization_statistic_t::output_normalized_magnetization(){
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       result << magnetization[4*mask_id + 0] << "\t" << magnetization[4*mask_id + 1] << "\t" << magnetization[4*mask_id + 2] << "\t" << magnetization[4*mask_id + 3] << "\t";
+   }
+
+   return result.str();
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to output actual magnetisation values as string (in Bohr magnetons)
+//------------------------------------------------------------------------------------------------------
+std::string magnetization_statistic_t::output_magnetization(){
+
+   // result string stream
+   std::ostringstream result;
+
+   // loop over all magnetization values
+   for(int mask_id=0; mask_id<mask_size; ++mask_id){
+      result << magnetization[4*mask_id + 0] << "\t" << magnetization[4*mask_id + 1] << "\t" << magnetization[4*mask_id + 2] << "\t" << magnetization[4*mask_id + 3]*saturation[mask_id] << "\t";
    }
 
    return result.str();

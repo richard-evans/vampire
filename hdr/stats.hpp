@@ -76,10 +76,11 @@ namespace stats
       public:
          //magnetization_statistic_t (const int in_mask_size, std::vector<int> in_mask);
          magnetization_statistic_t ();
-         void set_mask(const int mask_size, std::vector<int> inmask);
+         void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
          void calculate_magnetization(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
          void reset_magnetization_averages();
          const std::vector<double>& get_magnetization();
+         std::string output_magnetization();
          std::string output_normalized_magnetization();
          std::string output_normalized_magnetization_length();
          std::string output_normalized_mean_magnetization();
@@ -95,6 +96,7 @@ namespace stats
          std::vector<double> magnetization;
          std::vector<double> mean_magnetization;
          std::vector<int> zero_list;
+         std::vector<double> saturation;
 
    };
 

@@ -2248,22 +2248,6 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    }
    else
    //--------------------------------------------------------------------
-   test="height-magnetisation";
-   if(word==test){
-      stats::calculate_height_magnetization=true;
-      output_list.push_back(43);
-      return EXIT_SUCCESS;
-   }
-   else
-   //--------------------------------------------------------------------
-   test="material-height-magnetisation";
-   if(word==test){
-      stats::calculate_material_height_magnetization=true;
-      output_list.push_back(44);
-      return EXIT_SUCCESS;
-   }
-   else
-   //--------------------------------------------------------------------
    test="material-mean-magnetisation-length";
    if(word==test){
       stats::calculate_material_magnetization=true;
@@ -2480,6 +2464,34 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    if(word==test){
       output_list.push_back(42);
       stats::calculate_energy=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="height-magnetisation-normalised";
+   if(word==test){
+      stats::calculate_height_magnetization=true;
+      output_list.push_back(43);
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="material-height-magnetisation-normalised";
+   if(word==test){
+      stats::calculate_material_height_magnetization=true;
+      output_list.push_back(44);
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="height-magnetisation";
+   if(word==test){
+      stats::calculate_height_magnetization=true;
+      output_list.push_back(45);
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="material-height-magnetisation";
+   if(word==test){
+      stats::calculate_material_height_magnetization=true;
+      output_list.push_back(46);
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
@@ -3987,12 +3999,22 @@ namespace vout{
 
    // Output Function 43
    void height_mvec(std::ostream& stream){
-      stream << stats::height_magnetization.output_normalized_mean_magnetization();
+      stream << stats::height_magnetization.output_normalized_magnetization();
    }
 
    // Output Function 44
    void material_height_mvec(std::ostream& stream){
-      stream << stats::material_height_magnetization.output_normalized_mean_magnetization();
+      stream << stats::material_height_magnetization.output_normalized_magnetization();
+   }
+
+   // Output Function 45
+   void height_mvec_actual(std::ostream& stream){
+      stream << stats::height_magnetization.output_magnetization();
+   }
+
+   // Output Function 46
+   void material_height_mvec_actual(std::ostream& stream){
+      stream << stats::material_height_magnetization.output_magnetization();
    }
 
    // Output Function 60
@@ -4168,6 +4190,12 @@ namespace vout{
                break;
             case 44:
                vout::material_height_mvec(zmag);
+               break;
+            case 45:
+               vout::height_mvec_actual(zmag);
+               break;
+            case 46:
+               vout::material_height_mvec_actual(zmag);
                break;
             case 60:
 					vout::MPITimings(zmag);

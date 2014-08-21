@@ -488,13 +488,13 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 
    // system magnetization
    if(stats::calculate_system_magnetization){
-      stats::system_magnetization.set_mask(1,mask);
+      stats::system_magnetization.set_mask(1,mask,atoms::m_spin_array);
    }
 
    // material magnetization
    if(stats::calculate_material_magnetization){
       for(int atom=0; atom < stats::num_atoms; ++atom) mask[atom] = atoms::type_array[atom];
-      stats::material_magnetization.set_mask(mp::num_materials,mask);
+      stats::material_magnetization.set_mask(mp::num_materials,mask,atoms::m_spin_array);
    }
 
    // height magnetization
@@ -504,7 +504,11 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
          mask[atom] = atoms::category_array[atom];
          if(mask[atom]>max_height) max_height=mask[atom];
       }
-      stats::height_magnetization.set_mask(max_height+1,mask);
+      // Reduce maximum height on all CPUS
+      #ifdef MPICF
+         MPI_Allreduce(MPI_IN_PLACE, &max_height, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+      #endif
+      stats::height_magnetization.set_mask(max_height+1,mask,atoms::m_spin_array);
    }
 
    // material height magnetization
@@ -519,7 +523,11 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
          mask[atom] = num_mats*height+mat;
          if(height>max_height) max_height=height;
       }
-      stats::material_height_magnetization.set_mask(num_mats*(max_height+1),mask);
+      // Reduce maximum height on all CPUS
+      #ifdef MPICF
+         MPI_Allreduce(MPI_IN_PLACE, &max_height, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+      #endif
+      stats::material_height_magnetization.set_mask(num_mats*(max_height+1),mask,atoms::m_spin_array);
    }
 
    // Now nuke generation vectors to free memory NOW

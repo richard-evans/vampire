@@ -17,9 +17,6 @@
 #include "stats.hpp"
 #include "vmpi.hpp"
 
-// Local temperature pulse headers
-#include "internal.hpp"
-
 namespace stats{
 
    //------------------------------------------------------------------------------------------------------
