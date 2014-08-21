@@ -69,7 +69,7 @@ void ltmp::abs_t::add_point(double height, double absorption){
 
 //--------------------------------------------------
 // Creates a lookup table of interpolated functions
-// to calculate lattice anisotropy
+// to calculate absorption constant
 //
 void ltmp::abs_t::set_interpolation_table(){
 
@@ -106,12 +106,10 @@ void ltmp::abs_t::set_interpolation_table(){
 }
 
 //--------------------------------------------------
-// Creates a lookup table of interpolated functions
-// to calculate lattice anisotropy
+// Returns interpolated absorption constant for
+// a given z-height
 //
 double ltmp::abs_t::get_absorption_constant(double height){
-
-   std::cout << height << "\t" << z_max << std::endl;
 
    // check for value larger than Tmax
    if(height>=z_max) return A_max;
@@ -123,7 +121,6 @@ double ltmp::abs_t::get_absorption_constant(double height){
       // check if within range
       if(height >= zmin && height <= zmax){
          // calculate interpolated value
-         std::cout << height*m[i]+c[i] << std::endl;
          return height*m[i]+c[i];
       }      
    }
