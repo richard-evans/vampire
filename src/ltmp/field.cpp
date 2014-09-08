@@ -9,6 +9,7 @@
 
 // C++ standard library headers
 #include <cmath>
+#include <algorithm>
 
 // Vampire headers
 #include "ltmp.hpp"
