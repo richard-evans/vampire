@@ -25,6 +25,7 @@ namespace ltmp{
       extern bool lateral_discretisation; /// enable lateral temperature profile
       extern bool vertical_discretisation; /// enable vertical temperature profile
       extern bool output_microcell_data; /// enable verbose output data for temperature cells
+      extern bool temperature_rescaling; /// enable rescaled temperature calculation
 
       extern double micro_cell_size; /// lateral size of local temperature microcells (A)
       extern double laser_spot_size; /// laser spot size for lateral profile (A)
@@ -45,6 +46,8 @@ namespace ltmp{
 
       extern std::vector<int> atom_temperature_index; /// defines which temperature cell applies to atom (including Te or Tp)
       extern std::vector<double> atom_sigma; /// unrolled list of thermal prefactor sqrt(2kBalpha/gamma*mu_s*dt)
+      extern std::vector<double> atom_rescaling_root_Tc; /// unrolled list of material Curie temperature for rescaling calculation
+      extern std::vector<double> atom_rescaling_alpha; /// unrolled list of material rescaling exponent
 
       extern std::vector<int> cell_neighbour_list; // list of cell interactions for heat transfer
       extern std::vector<int> cell_neighbour_start_index; // start index of interactions for cell

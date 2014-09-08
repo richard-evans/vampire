@@ -317,6 +317,21 @@ void initialise(const double system_dimensions_x,
       ltmp::internal::atom_sigma[atom] = mp::material[atom_type_array[atom]].H_th_sigma;
    }
 
+   //------------------------------------------------------------------
+   // Optionally unroll temperature rescaling prefactors for all atoms
+   //------------------------------------------------------------------
+   // Determine if rescaling is needed (slower performance) (if Tc > 0)
+   for(int mat=0; mat<mp::num_materials; mat++) if(mp::material[mat].temperature_rescaling_Tc>0.0) ltmp::internal::temperature_rescaling=true;
+
+   if(ltmp::internal::temperature_rescaling){
+      ltmp::internal::atom_rescaling_root_Tc.resize(num_local_atoms);
+      ltmp::internal::atom_rescaling_alpha.resize(num_local_atoms);
+      for(int atom=0; atom<num_local_atoms; ++atom){
+         ltmp::internal::atom_rescaling_root_Tc[atom] = sqrt(mp::material[atom_type_array[atom]].temperature_rescaling_Tc);
+         ltmp::internal::atom_rescaling_alpha[atom] = mp::material[atom_type_array[atom]].temperature_rescaling_alpha;
+      }
+   }
+
    // optionally output temperature cell data 
    if(ltmp::internal::output_microcell_data){
       ltmp::internal::write_microcell_data();
