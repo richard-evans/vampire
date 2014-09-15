@@ -222,6 +222,70 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	return EXIT_SUCCESS;
 }
 
+//-------------------------------------------------------------------
+//
+//   Function to verify symmetry of exchange interactions i->j->i
+//
+//   A non-symmetric interaction list will not work with the MPI
+//   parallelization and makes no physial sense.
+//
+//-------------------------------------------------------------------
+void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename){
+
+   // list of assymetric interactions
+   std::vector<int> asym_interaction_list(0);
+
+   // loop over all interactions
+   for(int i=0; i<unit_cell.interaction.size(); ++i){
+
+      // calculate reciprocal interaction
+      int ia = unit_cell.interaction[i].j;
+      int ja = unit_cell.interaction[i].i;
+      int dx = -unit_cell.interaction[i].dx;
+      int dy = -unit_cell.interaction[i].dy;
+      int dz = -unit_cell.interaction[i].dz;
+
+      // set flag to test for match
+      bool match=false;
+
+      // loop over all interactions for reciprocal interactions i -> j -> i
+      for(int j=0; j<unit_cell.interaction.size(); ++j){
+         if(unit_cell.interaction[j].i==ia && unit_cell.interaction[j].j==ja && unit_cell.interaction[j].dx==dx && unit_cell.interaction[j].dy==dy && unit_cell.interaction[j].dz==dz){
+            match=true;
+            break;
+         }
+      }
+
+      // if no match is found add to list of assymetric interactions
+      if(!match){
+         asym_interaction_list.push_back(i);
+      }
+   }
+
+   // Output error message and list of interactions if found
+   if(asym_interaction_list.size()>0){
+      terminaltextcolor(RED);
+      std::cerr << "Error! Exchange interaction list in unit cell file " << filename << " contains the following assymetric interactions:" << std::endl;
+      terminaltextcolor(WHITE);
+      zlog << zTs() << "Error! Exchange interaction list in unit cell file " << filename << " contains the following assymetric interactions:" << std::endl;
+      for(int i=0; i < asym_interaction_list.size(); ++i){
+         int id=asym_interaction_list[i];
+         terminaltextcolor(RED);
+         std::cerr << id << "\t" << unit_cell.interaction[id].i << "\t" << unit_cell.interaction[id].j << "\t" << unit_cell.interaction[id].dx << "\t" << unit_cell.interaction[id].dy << "\t" << unit_cell.interaction[id].dz << std::endl;
+         terminaltextcolor(WHITE);
+         zlog << "\t\t\t" << id << "\t" << unit_cell.interaction[id].i << "\t" << unit_cell.interaction[id].j << "\t" << unit_cell.interaction[id].dx << "\t" << unit_cell.interaction[id].dy << "\t" << unit_cell.interaction[id].dz << std::endl;
+      }
+      terminaltextcolor(RED);
+      std::cerr << "Assymetric interactions are unphysical: please fix the unit cell file ensuring all interactions are symmetric. Exiting." << std::endl;
+      terminaltextcolor(WHITE);
+      zlog << "\t\t\t" << "Assymetric interactions are unphysical: please fix the unit cell file ensuring all interactions are symmetric. Exiting." << std::endl;
+      err::vexit();
+   }
+
+   return;
+
+}
+
 void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	
 	// check calling of routine if error checking is activated
@@ -459,6 +523,9 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		line_id++;
 	} // end of while loop
 	
+   // Verify exchange interactions are symmetric (required for MPI parallelization)
+   verify_exchange_interactions(unit_cell, filename);
+
    std::cout << "Done!" << std::endl;
    zlog << "Done!" << std::endl;
 	zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
