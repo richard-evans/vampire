@@ -3867,15 +3867,17 @@ namespace vout{
       double sus_x = norm*(stats::mean_susceptibility_squared[0]/stats::data_counter-stats::mean_susceptibility[0]*stats::mean_susceptibility[0]/(stats::data_counter*stats::data_counter));
       double sus_y = norm*(stats::mean_susceptibility_squared[1]/stats::data_counter-stats::mean_susceptibility[1]*stats::mean_susceptibility[1]/(stats::data_counter*stats::data_counter));
       double sus_z = norm*(stats::mean_susceptibility_squared[2]/stats::data_counter-stats::mean_susceptibility[2]*stats::mean_susceptibility[2]/(stats::data_counter*stats::data_counter));
+      double sus_m = norm*(stats::mean_susceptibility_squared[3]/stats::data_counter-stats::mean_susceptibility[3]*stats::mean_susceptibility[3]/(stats::data_counter*stats::data_counter));
 
       // check for very low temperature (denormalised number) to prevent nan
       if(sim::temperature<1.e-300){
          sus_x=0.0;
          sus_y=0.0;
          sus_z=0.0;
+         sus_m=0.0;
       }
 
-      stream << sus_x << "\t" << sus_y << "\t" << sus_z << "\t";
+      stream << sus_x << "\t" << sus_y << "\t" << sus_z << "\t" << sus_m << "\t";
 
       return;
 

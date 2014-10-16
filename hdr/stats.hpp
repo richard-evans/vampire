@@ -52,8 +52,8 @@ namespace stats
 
 	extern double torque_data_counter;
 
-   extern double mean_susceptibility[3];
-   extern double mean_susceptibility_squared[3];
+   extern double mean_susceptibility[4];
+   extern double mean_susceptibility_squared[4];
    extern bool calculate_susceptibility;
 
    extern bool calculate_energy;

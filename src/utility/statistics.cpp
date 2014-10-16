@@ -110,8 +110,8 @@ namespace stats
 
    // susceptibility calculation
    bool calculate_susceptibility=false;
-   double mean_susceptibility[3]={0.0,0.0,0.0};
-   double mean_susceptibility_squared[3]={0.0,0.0,0.0};
+   double mean_susceptibility[4]={0.0,0.0,0.0,0.0};
+   double mean_susceptibility_squared[4]={0.0,0.0,0.0,0.0};
 
 	// function prototypes
 	void system_torque();
@@ -259,10 +259,12 @@ void mag_m_reset(){
 	stats::mean_susceptibility[0]=0.0;
 	stats::mean_susceptibility[1]=0.0;
 	stats::mean_susceptibility[2]=0.0;
+   stats::mean_susceptibility[3]=0.0;
 
 	stats::mean_susceptibility_squared[0]=0.0;
 	stats::mean_susceptibility_squared[1]=0.0;
 	stats::mean_susceptibility_squared[2]=0.0;
+   stats::mean_susceptibility_squared[3]=0.0;
 
 }
 
@@ -662,15 +664,18 @@ void system_susceptibility(){
 
    // copy reduced magnetisation
    const std::vector<double> m_l = stats::system_magnetization.get_magnetization();
+   const double mm = m_l[3]; // temporary constant
 
    // Calculate running totals
-   stats::mean_susceptibility[0]+=m_l[0];
-   stats::mean_susceptibility[1]+=m_l[1];
-   stats::mean_susceptibility[2]+=m_l[2];
+   stats::mean_susceptibility[0]+=m_l[0]*mm;
+   stats::mean_susceptibility[1]+=m_l[1]*mm;
+   stats::mean_susceptibility[2]+=m_l[2]*mm;
+   stats::mean_susceptibility[3]+=mm;
 
-   stats::mean_susceptibility_squared[0]+=m_l[0]*m_l[0];
-   stats::mean_susceptibility_squared[1]+=m_l[1]*m_l[1];
-   stats::mean_susceptibility_squared[2]+=m_l[2]*m_l[2];
+   stats::mean_susceptibility_squared[0]+=m_l[0]*m_l[0]*mm*mm;
+   stats::mean_susceptibility_squared[1]+=m_l[1]*m_l[1]*mm*mm;
+   stats::mean_susceptibility_squared[2]+=m_l[2]*m_l[2]*mm*mm;
+   stats::mean_susceptibility_squared[3]+=mm*mm;
 
    return;
 
