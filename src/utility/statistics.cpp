@@ -541,15 +541,30 @@ void system_energy(){
 
    // reduce energies to root node
    #ifdef MPICF
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_exchange_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_so_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_lattice_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_cubic_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_surface_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_applied_field_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &stats::total_magnetostatic_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      // MPI_IN_PLACE is only valid on root process for MPI_Reduce()
+      // MPI_Reduce(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm)
+      if(vmpi::my_rank==0){
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_exchange_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_so_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_lattice_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_cubic_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_surface_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_applied_field_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(MPI_IN_PLACE, &stats::total_magnetostatic_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      }
+      else{
+         MPI_Reduce(&stats::total_energy, &stats::total_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&stats::total_exchange_energy, &stats::total_exchange_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&stats::total_anisotropy_energy, &stats::total_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&stats::total_so_anisotropy_energy, &stats::total_so_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&stats::total_lattice_anisotropy_energy, &stats::total_lattice_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&stats::total_cubic_anisotropy_energy, &stats::total_cubic_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&stats::total_surface_anisotropy_energy, &stats::total_surface_anisotropy_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&stats::total_applied_field_energy, &stats::total_applied_field_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&stats::total_magnetostatic_energy, &stats::total_magnetostatic_energy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);         
+      }
    #endif
 
    // Add calculated values to mean
