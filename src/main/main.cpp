@@ -87,7 +87,7 @@ int main(int argc, char* argv[]){
       std::cout << "                                         | |               " << std::endl;
       std::cout << "                                         |_|               " << std::endl;
       std::cout << std::endl;
-      std::cout << "                      Version 3.0.3 " << __DATE__ << " " << __TIME__ << std::endl;
+      std::cout << "                      Version 4.0.0 " << __DATE__ << " " << __TIME__ << std::endl;
       std::cout << std::endl;
 
       std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
