@@ -27,7 +27,7 @@ namespace ltmp{
       //-----------------------------------------------------------------------------
       // Shared variables used for the local temperature pulse calculation
       //-----------------------------------------------------------------------------
-      bool enabled=true; //false; /// enable localised local temperature pulse
+      bool enabled=false; /// enable localised local temperature pulse
       bool initialised=false; /// flag set if initialised
       bool lateral_discretisation=false; /// enable lateral temperature profile
       bool vertical_discretisation=true; /// enable vertical temperature profile
