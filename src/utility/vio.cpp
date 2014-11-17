@@ -242,7 +242,7 @@ int match(string const, string const, string const, string const, int const);
 int match_create(std::string const, std::string const, std::string const, int const);
 int match_dimension(std::string const, std::string const, std::string const, int const);
 int match_sim(std::string const, std::string const, std::string const, int const);
-int match_vout_list(std::string const, int const, std::vector<unsigned int> &);
+int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_material(string const, string const, string const, int const, int const, int const);
 int match_config(string const, string const, int const);
@@ -733,7 +733,7 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="output";
 	if(key==test){
-		int frs=vin::match_vout_list(word, line, vout::file_output_list);
+		int frs=vin::match_vout_list(word, value, line, vout::file_output_list);
 		return frs;
 	}
 	//===================================================================
@@ -742,7 +742,7 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="screen";
 	if(key==test){
-		int frs=vin::match_vout_list(word, line, vout::screen_output_list);
+		int frs=vin::match_vout_list(word, value, line, vout::screen_output_list);
 		return frs;
 	}
 	//===================================================================
@@ -2169,7 +2169,7 @@ int match_config(string const word, string const value, int const line){
    }
 }
 
-int match_vout_list(string const word, int const line, std::vector<unsigned int> & output_list){
+int match_vout_list(string const word, string const value, int const line, std::vector<unsigned int> & output_list){
 
    std::string prefix="output:";
 
@@ -2505,6 +2505,14 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    test="gnuplot-array-format";
    if(word==test){
       vout::gnuplot_array_format=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="output-rate";
+   if(word==test){
+      int r=atoi(value.c_str());
+      check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+      vout::output_rate=r;
       return EXIT_SUCCESS;
    }
 
@@ -3695,7 +3703,10 @@ namespace vout{
 	std::vector<unsigned int> screen_output_list(0);
 	std::vector<unsigned int> grain_output_list(0);
 	
-	int output_grain_rate=1;
+   // Variables to control rate of data output to screen, output file and grain file
+   int output_rate=1;
+   int output_grain_rate=1;
+   //int output_screen_rate=1; needs to be implemented
 
    bool gnuplot_array_format=false;
 
@@ -4064,7 +4075,10 @@ namespace vout{
          else zmag.open("output",std::ofstream::trunc);
       }
 		
-		// Output data to zmag
+		// Only output 1/output_rate time steps
+      if(sim::time%vout::output_rate==0){
+
+		// Output data to output
       if(vmpi::my_rank==0){
 		for(unsigned int item=0;item<file_output_list.size();item++){
 			switch(file_output_list[item]){
@@ -4207,10 +4221,15 @@ namespace vout{
 		}
 		// Carriage return
 		if(file_output_list.size()>0) zmag << std::endl;
-}
+
+      } // end of code for rank 0 only
+   } // end of if statement for output rate
+
 		// Output data to cout
 		if(vmpi::my_rank==0){
-		for(unsigned int item=0;item<screen_output_list.size();item++){
+      if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
+
+         for(unsigned int item=0;item<screen_output_list.size();item++){
 			switch(screen_output_list[item]){
 				case 0:
 					vout::time(std::cout);
@@ -4342,6 +4361,8 @@ namespace vout{
 		if(screen_output_list.size()>0) std::cout << std::endl;
 		}
 		
+   } // End of if statement to output data to screen
+
 		if(sim::time%vout::output_grain_rate==0){
 
 		// calculate grain magnetisations
