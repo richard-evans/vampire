@@ -364,7 +364,7 @@ int ConstrainedMonteCarlo(){
       double Tc = mp::material[m].temperature_rescaling_Tc;
       double rescaled_temperature = sim::temperature < Tc ? Tc*pow(sim::temperature/Tc,alpha) : sim::temperature;
       rescaled_material_kBTBohr[m] = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
-      sigma_array[m] = pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
+      sigma_array[m] = rescaled_temperature < 1.0 ? 0.02 : pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
    }
 
 	// copy matrices for speed

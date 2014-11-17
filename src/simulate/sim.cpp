@@ -158,7 +158,11 @@ namespace sim{
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);
-	
+
+   // Monte Carlo statistics counters
+   double mc_statistics_moves = 0.0;
+   double mc_statistics_reject = 0.0;
+
 /// @brief Function to increment time counter and associted variables
 ///
 /// @section License
@@ -375,15 +379,31 @@ int run(){
 			}
 	}
 
-	// output Monte Carlo Statistics if applicable
-	if(sim::integrator==3 || sim::integrator==4){
-		std::cout << "Constrained Monte Carlo Statistics:" << std::endl;
-		std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
-		std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0 << "% Accepted" << std::endl;
-		std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
-		std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
-		
-	}
+   //------------------------------------------------
+   // Output Monte Carlo statistics if applicable
+   //------------------------------------------------
+   if(sim::integrator==1){
+      std::cout << "Monte Carlo statistics:" << std::endl;
+      std::cout << "\tTotal moves: " << long(sim::mc_statistics_moves) << std::endl;
+      std::cout << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
+      std::cout << "\t" << (sim::mc_statistics_reject/sim::mc_statistics_moves)*100.0                              << "% Rejected" << std::endl;
+      zlog << zTs() << "Monte Carlo statistics:" << std::endl;
+      zlog << zTs() << "\tTotal moves: " << sim::mc_statistics_moves << std::endl;
+      zlog << zTs() << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
+      zlog << zTs() << "\t" << (sim::mc_statistics_reject/sim::mc_statistics_moves)*100.0                              << "% Rejected" << std::endl;
+   }
+   if(sim::integrator==3 || sim::integrator==4){
+      std::cout << "Constrained Monte Carlo statistics:" << std::endl;
+      std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
+      std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0    << "% Accepted" << std::endl;
+      std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+      std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+      zlog << zTs() << "Constrained Monte Carlo statistics:" << std::endl;
+      zlog << zTs() << "\tTotal moves: " << cmc::mc_total << std::endl;
+      zlog << zTs() << "\t" << (cmc::mc_success/cmc::mc_total)*100.0    << "% Accepted" << std::endl;
+      zlog << zTs() << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+      zlog << zTs() << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+   }
 
 	//program::LLB_Boltzmann();
 

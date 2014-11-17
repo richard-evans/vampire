@@ -189,6 +189,11 @@ namespace sim{
    extern double lagrange_N;
    extern bool   lagrange_multiplier;
    extern void   update_lagrange_lambda();
+
+   // Monte Carlo statistics counters
+   extern double mc_statistics_moves;
+   extern double mc_statistics_reject;
+
 }
 
 namespace cmc{
