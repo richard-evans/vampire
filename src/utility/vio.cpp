@@ -227,6 +227,51 @@ std::string zTs(){
 	return NullString;
 }
 
+///-------------------------------------------------------
+/// Function to write header information about simulation
+///-------------------------------------------------------
+void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& file_output_list){
+
+   //------------------------------------
+   // Determine current time
+   //------------------------------------
+   time_t seconds;
+
+   // get time now
+   seconds = time (NULL);
+   struct tm * timeinfo;
+   char oftime [80];
+
+   timeinfo = localtime ( &seconds );
+   // format time string
+   strftime (oftime,80,"%Y-%m-%d %X ",timeinfo);
+
+   //------------------------------------
+   // Determine current directory
+   //------------------------------------
+   char directory [256];
+
+   #ifdef WIN_COMPILE
+      _getcwd(directory, sizeof(directory));
+   #else
+      getcwd(directory, sizeof(directory));
+   #endif
+
+   //------------------------------------
+   // Output output file header
+   //------------------------------------
+   ofile << "#----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+   ofile << "# " << "Output file for vampire simulation" << std::endl;
+   ofile << "# " << "  time       : " << oftime << "    process id : " << vout::zLogPid << std::endl;
+   ofile << "# " << "  hostname   : " << vout::zLogHostName << std::endl;
+   ofile << "# " << "  path       : " << directory << std::endl;
+   ofile << "#----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+   //ofile << "# time" << "\t" << "temperature" << "\t" <<  "|m|" << "\t" << "..." << std::endl; // to be concluded...
+
+   return;
+
+}
+
 /// @namespace
 /// @brief Contains variables and functions for reading in program data.
 /// 
@@ -4072,7 +4117,11 @@ namespace vout{
          // check for checkpoint continue and append data
          if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
          // otherwise overwrite file
-         else zmag.open("output",std::ofstream::trunc);
+         else{
+            zmag.open("output",std::ofstream::trunc);
+            // write file header information
+            if(vmpi::my_rank==0) write_output_file_header(zmag, file_output_list);
+         }
       }
 		
 		// Only output 1/output_rate time steps
