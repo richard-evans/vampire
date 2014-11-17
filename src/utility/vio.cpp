@@ -4351,7 +4351,7 @@ namespace vout{
 		if(vmpi::my_rank==0){
 			
 			// check for open ofstream
-         if(!zgrain.is_open()){
+         if(vout::grain_output_list.size() > 0 && !zgrain.is_open()){
             // check for checkpoint continue and append data
             if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain",std::ofstream::app);
             // otherwise overwrite file
@@ -4386,7 +4386,7 @@ namespace vout{
 					break;
 			   case 22:
 					vout::phonon_temperature(zgrain);
-                                        break;
+               break;
 			}
 		}
 		
