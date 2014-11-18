@@ -70,6 +70,14 @@ obj/data/category.o \
 obj/data/cells.o \
 obj/data/grains.o \
 obj/data/lattice_anisotropy.o \
+obj/ltmp/absorption_profile.o \
+obj/ltmp/data.o \
+obj/ltmp/field.o \
+obj/ltmp/initialise.o \
+obj/ltmp/interface.o \
+obj/ltmp/is_enabled.o \
+obj/ltmp/local_temperature.o \
+obj/ltmp/output.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
@@ -92,6 +100,8 @@ obj/program/partial_hysteresis.o \
 obj/program/static_hysteresis.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
+obj/program/localised_temperature_pulse.o \
+obj/program/effective_damping.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -112,6 +122,9 @@ obj/spintorque/initialise.o \
 obj/spintorque/magnetization.o \
 obj/spintorque/output.o \
 obj/spintorque/spinaccumulation.o \
+obj/statistics/data.o \
+obj/statistics/magnetization.o \
+obj/statistics/statistics.o \
 obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \

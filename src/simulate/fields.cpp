@@ -35,6 +35,7 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "demag.hpp"
+#include "ltmp.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
@@ -115,6 +116,16 @@ int calculate_external_fields(const int start_index,const int end_index){
 	fill (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index,0.0);
 	
 	if(sim::program==7) calculate_hamr_fields(start_index,end_index);
+   else if(sim::program==13){
+
+      // Local thermal Fields
+      ltmp::get_localised_thermal_fields(atoms::x_total_external_field_array,atoms::y_total_external_field_array,
+                                         atoms::z_total_external_field_array, start_index, end_index);
+
+      // Applied Fields
+      if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
+
+   }
 	else{
 	
 		// Thermal Fields
@@ -493,15 +504,14 @@ int calculate_applied_fields(const int start_index,const int end_index){
 
 	// Add external field from thin film sample
 	if(sim::ext_demag==true){
-		
-		// calculate system magnetisation
-		stats::mag_m();
+
+      const std::vector<double> m_l = stats::system_magnetization.get_magnetization();
 		
 		// calculate global demag field -mu_0 M D, M = m/V
 		const double mu_0= -4.0*M_PI*1.0e-7/(cs::system_dimensions[0]*cs::system_dimensions[1]*cs::system_dimensions[2]*1.0e-30);
-		const double HD[3]={	mu_0*sim::demag_factor[0]*stats::total_mag_actual[0],
-									mu_0*sim::demag_factor[1]*stats::total_mag_actual[1],
-									mu_0*sim::demag_factor[2]*stats::total_mag_actual[2]};
+      const double HD[3]={	mu_0*sim::demag_factor[0]*m_l[0],
+                           mu_0*sim::demag_factor[1]*m_l[1],
+                           mu_0*sim::demag_factor[2]*m_l[2]};
 		
 		//std::cout << "mu_0" << "\t" << mu_0 << std::endl;
 		//std::cout << "Magnetisation " << stats::total_mag_actual[0] << "\t" << stats::total_mag_actual[1] << "\t" << stats::total_mag_actual[2] << std::endl;  
@@ -520,30 +530,29 @@ int calculate_thermal_fields(const int start_index,const int end_index){
 	///======================================================
 	/// 		Subroutine to calculate thermal fields
 	///
-	///			Version 1.1 R Evans 26/07/2012
+   ///      Version 1.2 R Evans 12/08/2014
 	///======================================================
-
-	const double sqrt_T=sqrt(sim::temperature);
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "calculate_thermal_fields has been called" << std::endl;}
 
-	// unroll Sigma for speed
-	std::vector<double> SigmaPre(0);
-	SigmaPre.reserve(mp::material.size());
-	
-	// Calculate global temperature
-	if(sim::local_temperature==false){
-		for(int mat=0;mat<mp::material.size();mat++){
-			SigmaPre.push_back(sqrt_T*mp::material[mat].H_th_sigma);
-		}
-	}
-	// Calculate (material spcific) local temperature 
-	else{
-		for(int mat=0;mat<mp::material.size();mat++){
-			SigmaPre.push_back(sqrt(mp::material[mat].temperature)*mp::material[mat].H_th_sigma);
-		}
-	}
+   // unroll sigma for speed
+   std::vector<double> sigma_prefactor(0);
+   sigma_prefactor.reserve(mp::material.size());
+
+   // Calculate material temperature (with optional rescaling)
+   for(int mat=0;mat<mp::material.size();mat++){
+      double temperature = sim::temperature;
+      // Check for localised temperature
+      if(sim::local_temperature) temperature = mp::material[mat].temperature;
+      // Calculate temperature rescaling
+      double alpha = mp::material[mat].temperature_rescaling_alpha;
+      double Tc = mp::material[mat].temperature_rescaling_Tc;
+      // if T<Tc T/Tc = (T/Tc)^alpha else T = T
+      double rescaled_temperature = temperature < Tc ? Tc*pow(temperature/Tc,alpha) : temperature;
+      double sqrt_T=sqrt(rescaled_temperature);
+      sigma_prefactor.push_back(sqrt_T*mp::material[mat].H_th_sigma);
+   }
 
  	generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
 	generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
@@ -552,7 +561,7 @@ int calculate_thermal_fields(const int start_index,const int end_index){
 	for(int atom=start_index;atom<end_index;atom++){
 
 		const int imaterial=atoms::type_array[atom];
-		const double H_th_sigma = SigmaPre[imaterial];
+      const double H_th_sigma = sigma_prefactor[imaterial];
 
 		atoms::x_total_external_field_array[atom] *= H_th_sigma;
 		atoms::y_total_external_field_array[atom] *= H_th_sigma;

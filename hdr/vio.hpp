@@ -70,7 +70,23 @@ void terminaltextcolor(enum textcolor );
 extern std::string zTs();
 
 namespace vin{
-	extern int read(std::string const);
+   extern int read(std::string const);
+
+   extern void check_for_valid_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
+                                     double range_min, double range_max, std::string input_file_type, std::string range_text);
+
+   extern void check_for_valid_int(int& value, std::string word, int line, std::string prefix, int range_min, int range_max,
+                                   std::string input_file_type, std::string range_text);
+
+   extern void check_for_valid_int(  unsigned int& value, std::string word, int line, std::string prefix, unsigned int range_min,
+                              unsigned int range_max, std::string input_file_type, std::string range_text);
+
+   extern bool check_for_valid_bool( std::string value, std::string word, int line, std::string prefix, std::string input_file_type);
+
+   extern void check_for_valid_unit_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
+
+   extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
+
 }
 
 namespace vout{
@@ -80,6 +96,8 @@ namespace vout{
 	extern std::vector<unsigned int> grain_output_list;
 	
 	extern int output_grain_rate;
+   extern int output_rate;
+
    extern bool gnuplot_array_format;
 	
 	extern bool output_atoms_config;

@@ -96,7 +96,10 @@ void time_series(){
 	}
 	
 	sim::temperature=temp;
-		
+
+   // Reset mean magnetisation counters
+   stats::mag_m_reset();
+
 	// Perform Time Series
 	while(sim::time<sim::equilibration_time+sim::total_time){
 

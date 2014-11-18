@@ -52,6 +52,7 @@
 #include "demag.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
+#include "ltmp.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -226,6 +227,51 @@ std::string zTs(){
 	return NullString;
 }
 
+///-------------------------------------------------------
+/// Function to write header information about simulation
+///-------------------------------------------------------
+void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& file_output_list){
+
+   //------------------------------------
+   // Determine current time
+   //------------------------------------
+   time_t seconds;
+
+   // get time now
+   seconds = time (NULL);
+   struct tm * timeinfo;
+   char oftime [80];
+
+   timeinfo = localtime ( &seconds );
+   // format time string
+   strftime (oftime,80,"%Y-%m-%d %X ",timeinfo);
+
+   //------------------------------------
+   // Determine current directory
+   //------------------------------------
+   char directory [256];
+
+   #ifdef WIN_COMPILE
+      _getcwd(directory, sizeof(directory));
+   #else
+      getcwd(directory, sizeof(directory));
+   #endif
+
+   //------------------------------------
+   // Output output file header
+   //------------------------------------
+   ofile << "#----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+   ofile << "# " << "Output file for vampire simulation" << std::endl;
+   ofile << "# " << "  time       : " << oftime << "    process id : " << vout::zLogPid << std::endl;
+   ofile << "# " << "  hostname   : " << vout::zLogHostName << std::endl;
+   ofile << "# " << "  path       : " << directory << std::endl;
+   ofile << "#----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+   //ofile << "# time" << "\t" << "temperature" << "\t" <<  "|m|" << "\t" << "..." << std::endl; // to be concluded...
+
+   return;
+
+}
+
 /// @namespace
 /// @brief Contains variables and functions for reading in program data.
 /// 
@@ -241,7 +287,7 @@ int match(string const, string const, string const, string const, int const);
 int match_create(std::string const, std::string const, std::string const, int const);
 int match_dimension(std::string const, std::string const, std::string const, int const);
 int match_sim(std::string const, std::string const, std::string const, int const);
-int match_vout_list(std::string const, int const, std::vector<unsigned int> &);
+int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_material(string const, string const, string const, int const, int const, int const);
 int match_config(string const, string const, int const);
@@ -425,6 +471,7 @@ bool check_for_valid_bool( std::string value, /// variable as in input file
    zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
    err::vexit();
 
+   return false;
 }
 
 ///
@@ -731,7 +778,7 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="output";
 	if(key==test){
-		int frs=vin::match_vout_list(word, line, vout::file_output_list);
+		int frs=vin::match_vout_list(word, value, line, vout::file_output_list);
 		return frs;
 	}
 	//===================================================================
@@ -740,7 +787,7 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="screen";
 	if(key==test){
-		int frs=vin::match_vout_list(word, line, vout::screen_output_list);
+		int frs=vin::match_vout_list(word, value, line, vout::screen_output_list);
 		return frs;
 	}
 	//===================================================================
@@ -760,7 +807,11 @@ int match(string const key, string const word, string const value, string const 
 	if(key==test){
 		int frs=vin::match_config(word, value, line);
 		return frs;
-	}	
+	}
+   //-------------------------------------------------------------------
+	// Test for localised temperature pulse
+   //-------------------------------------------------------------------
+   else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//-------------------------------------------------------------------
 	// Get material filename
 	//-------------------------------------------------------------------
@@ -1413,6 +1464,16 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::program=12;
          return EXIT_SUCCESS;
       }
+      test="localised-temperature-pulse";
+      if(value==test){
+         sim::program=13;
+         return EXIT_SUCCESS;
+      }
+      test="effective-damping";
+      if(value==test){
+         sim::program=14;
+         return EXIT_SUCCESS;
+      }
       test="diagnostic-boltzmann";
       if(value==test){
          sim::program=50;
@@ -1431,6 +1492,7 @@ int match_sim(string const word, string const value, string const unit, int cons
          std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
          std::cerr << "\t\"hybrid-cmc\"" << std::endl;
          std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
+         std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
          terminaltextcolor(WHITE);
 		 err::vexit();
       }
@@ -1480,6 +1542,15 @@ int match_sim(string const word, string const value, string const unit, int cons
       // Test for valid range
       check_for_valid_int(sat, word, line, prefix, 0, 1000000000,"input","0 - 1,000,000,000");
       sim::surface_anisotropy_threshold=sat;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
+   test="surface-anisotropy-nearest-neighbour-range";
+   if(word==test){
+      // Test for valid range
+      double r=atof(value.c_str());
+      check_for_valid_value(r, word, line, prefix, unit, "length", 0.0, 1.0e9,"input","0.0 - 1,000,000,000");
+      sim::nearest_neighbour_distance=r;
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
@@ -2143,7 +2214,7 @@ int match_config(string const word, string const value, int const line){
    }
 }
 
-int match_vout_list(string const word, int const line, std::vector<unsigned int> & output_list){
+int match_vout_list(string const word, string const value, int const line, std::vector<unsigned int> & output_list){
 
    std::string prefix="output:";
 
@@ -2184,6 +2255,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="applied-field-alignment";
    if(word==test){
+      stats::calculate_system_magnetization=true;
       output_list.push_back(12);
       return EXIT_SUCCESS;
    }
@@ -2191,6 +2263,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="magnetisation";
    if(word==test){
+      stats::calculate_system_magnetization=true;
       output_list.push_back(5);
       return EXIT_SUCCESS;
    }
@@ -2198,6 +2271,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //-------------------------------------------------------------------
    test="magnetisation-length";
    if(word==test){
+      stats::calculate_system_magnetization=true;
       output_list.push_back(6);
       return EXIT_SUCCESS;
    }
@@ -2205,6 +2279,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="mean-magnetisation-length";
    if(word==test){
+      stats::calculate_system_magnetization=true;
       output_list.push_back(7);
       return EXIT_SUCCESS;
    }
@@ -2212,6 +2287,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="material-magnetisation";
    if(word==test){
+      stats::calculate_material_magnetization=true;
       output_list.push_back(8);
       return EXIT_SUCCESS;
    }
@@ -2219,6 +2295,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //--------------------------------------------------------------------
    test="material-mean-magnetisation-length";
    if(word==test){
+      stats::calculate_material_magnetization=true;
       output_list.push_back(9);
       return EXIT_SUCCESS;
    }
@@ -2318,6 +2395,7 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    //-------------------------------------------------------------------
    test="material-applied-field-alignment";
    if(word==test){
+      stats::calculate_material_magnetization=true;
       output_list.push_back(26);
       return EXIT_SUCCESS;
    }
@@ -2433,6 +2511,34 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
       stats::calculate_energy=true;
       return EXIT_SUCCESS;
    }
+   //--------------------------------------------------------------------
+   test="height-magnetisation-normalised";
+   if(word==test){
+      stats::calculate_height_magnetization=true;
+      output_list.push_back(43);
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="material-height-magnetisation-normalised";
+   if(word==test){
+      stats::calculate_material_height_magnetization=true;
+      output_list.push_back(44);
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="height-magnetisation";
+   if(word==test){
+      stats::calculate_height_magnetization=true;
+      output_list.push_back(45);
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="material-height-magnetisation";
+   if(word==test){
+      stats::calculate_material_height_magnetization=true;
+      output_list.push_back(46);
+      return EXIT_SUCCESS;
+   }
    //-------------------------------------------------------------------
    test="mpi-timings";
    if(word==test){
@@ -2444,6 +2550,14 @@ int match_vout_list(string const word, int const line, std::vector<unsigned int>
    test="gnuplot-array-format";
    if(word==test){
       vout::gnuplot_array_format=true;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="output-rate";
+   if(word==test){
+      int r=atoi(value.c_str());
+      check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+      vout::output_rate=r;
       return EXIT_SUCCESS;
    }
 
@@ -2940,6 +3054,7 @@ int match_material(string const word, string const value, string const unit, int
          // Test for valid range
          check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
          read_material[super_index].Ks_SI=-K;// Import anisotropy as field, *-1
+         sim::surface_anisotropy=true; // enable surface anisotropy
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------
@@ -3034,7 +3149,6 @@ int match_material(string const word, string const value, string const unit, int
                   terminaltextcolor(WHITE);
 				  return EXIT_FAILURE;
                }
-               read_material[super_index].geometry_coords[c][xy];
                if((var<0.0) || (var > 1.0)){
 				  terminaltextcolor(RED);
                   std::cerr << "Error in geometry input file " << value.c_str() << " value is outside of valid range (0.0-1.0)" << std::endl;
@@ -3073,7 +3187,7 @@ int match_material(string const word, string const value, string const unit, int
          // Read in number of temperature points
          latt_file >> num_pts;
 
-         // Check for valie number of points
+         // Check for valid number of points
          if(num_pts<=1){
             std::cerr << "Error in lattice-anisotropy-file " << value.c_str() << " on line " << line << " of material file. The first number must be an integer greater than 1. Exiting." << std::endl;
             zlog << zTs() << "Error in lattice-anisotropy-file " << value.c_str() << " on line " << line << " of material file. The first number must be an integer greater than 1. Exiting." << std::endl;
@@ -3592,6 +3706,24 @@ int match_material(string const word, string const value, string const unit, int
 			return EXIT_SUCCESS;
 
 		}
+      //--------------------------------------------------------------------
+      else
+      test="temperature-rescaling-exponent";
+      if(word==test){
+         double alpha=atof(value.c_str());
+         check_for_valid_value(alpha, word, line, prefix, unit, "none", 0.0, 10.0,"material"," 0.0 - 10.0");
+         read_material[super_index].temperature_rescaling_alpha=alpha;
+         return EXIT_SUCCESS;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="temperature-rescaling-curie-temperature";
+      if(word==test){
+         double Tc=atof(value.c_str());
+         check_for_valid_value(Tc, word, line, prefix, unit, "none", 0.0, 10000.0,"material"," 0 - 10000 K");
+         read_material[super_index].temperature_rescaling_Tc=Tc;
+         return EXIT_SUCCESS;
+      }
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
@@ -3616,7 +3748,10 @@ namespace vout{
 	std::vector<unsigned int> screen_output_list(0);
 	std::vector<unsigned int> grain_output_list(0);
 	
-	int output_grain_rate=1;
+   // Variables to control rate of data output to screen, output file and grain file
+   int output_rate=1;
+   int output_grain_rate=1;
+   //int output_screen_rate=1; needs to be implemented
 
    bool gnuplot_array_format=false;
 
@@ -3662,39 +3797,29 @@ namespace vout{
 	}
 	
 	// Output Function 5
-	void mvec(std::ostream& stream){
-		stream << stats::total_mag_norm[0]/stats::total_mag_m_norm << "\t";
-		stream << stats::total_mag_norm[1]/stats::total_mag_m_norm << "\t";
-		stream << stats::total_mag_norm[2]/stats::total_mag_m_norm << "\t";
-	}
+   void mvec(std::ostream& stream){
+      stream << stats::system_magnetization.output_normalized_magnetization();
+   }
 	
 	// Output Function 6
-	void magm(std::ostream& stream){
-		stream << stats::total_mag_m_norm << "\t";
-	}
+   void magm(std::ostream& stream){
+      stream << stats::system_magnetization.output_normalized_magnetization_length() << "\t";
+   }
 	
 	// Output Function 7
-	void mean_magm(std::ostream& stream){
-		stream << stats::total_mean_mag_m_norm/stats::data_counter << "\t";
-	}
+   void mean_magm(std::ostream& stream){
+      stream << stats::system_magnetization.output_normalized_mean_magnetization_length();
+   }
 	
 	// Output Function 8
-	void mat_mvec(std::ostream& stream){
-		for(int mat=0;mat<mp::num_materials;mat++){
-			double imagm = 1.0/stats::sublattice_magm_array[mat];
-			stream << stats::sublattice_mx_array[mat]*imagm << "\t";
-			stream << stats::sublattice_my_array[mat]*imagm << "\t";
-			stream << stats::sublattice_mz_array[mat]*imagm << "\t";
-			stream << stats::sublattice_magm_array[mat] << "\t";
-		}
-	}
+   void mat_mvec(std::ostream& stream){
+      stream << stats::material_magnetization.output_normalized_magnetization();
+   }
 	
 	// Output Function 9
-	void mat_mean_magm(std::ostream& stream){
-		for(int mat=0;mat<mp::num_materials;mat++){
-			stream << stats::sublattice_mean_magm_array[mat]/stats::data_counter << "\t";
-		}
-	}
+   void mat_mean_magm(std::ostream& stream){
+      stream << stats::material_magnetization.output_normalized_mean_magnetization_length();
+   }
 
 	// Output Function 10
 	void grain_mvec(std::ostream& stream){
@@ -3731,9 +3856,9 @@ namespace vout{
 	
 	// Output Function 12
 	void mdoth(std::ostream& stream){
-		
-		double mh=sim::H_vec[0]*stats::total_mag_norm[0]+sim::H_vec[1]*stats::total_mag_norm[1]+sim::H_vec[2]*stats::total_mag_norm[2];
-		stream << mh << "\t";
+      // initialise vector of H
+      std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
+      stream << stats::system_magnetization.output_normalized_magnetization_dot_product(H);
 	}
 	
 	// Output Function 13
@@ -3798,15 +3923,17 @@ namespace vout{
       double sus_x = norm*(stats::mean_susceptibility_squared[0]/stats::data_counter-stats::mean_susceptibility[0]*stats::mean_susceptibility[0]/(stats::data_counter*stats::data_counter));
       double sus_y = norm*(stats::mean_susceptibility_squared[1]/stats::data_counter-stats::mean_susceptibility[1]*stats::mean_susceptibility[1]/(stats::data_counter*stats::data_counter));
       double sus_z = norm*(stats::mean_susceptibility_squared[2]/stats::data_counter-stats::mean_susceptibility[2]*stats::mean_susceptibility[2]/(stats::data_counter*stats::data_counter));
+      double sus_m = norm*(stats::mean_susceptibility_squared[3]/stats::data_counter-stats::mean_susceptibility[3]*stats::mean_susceptibility[3]/(stats::data_counter*stats::data_counter));
 
       // check for very low temperature (denormalised number) to prevent nan
       if(sim::temperature<1.e-300){
          sus_x=0.0;
          sus_y=0.0;
          sus_z=0.0;
+         sus_m=0.0;
       }
 
-      stream << sus_x << "\t" << sus_y << "\t" << sus_z << "\t";
+      stream << sus_x << "\t" << sus_y << "\t" << sus_z << "\t" << sus_m << "\t";
 
       return;
 
@@ -3843,14 +3970,9 @@ namespace vout{
 
 	// Output Function 26
 	void mat_mdoth(std::ostream& stream){
-		const double H[3]={sim::H_vec[0],sim::H_vec[1],sim::H_vec[2]};
-		for(int mat=0;mat<mp::num_materials;mat++){
-			const double imagm = 1.0/stats::sublattice_magm_array[mat];
-			double mh = stats::sublattice_mx_array[mat]*imagm*H[0] + 
-							stats::sublattice_my_array[mat]*imagm*H[1] + 
-							stats::sublattice_mz_array[mat]*imagm*H[2];
-			stream << mh << "\t";
-		}
+      // initialise vector of H
+      std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
+      stream << stats::material_magnetization.output_normalized_magnetization_dot_product(H);
 	}
 	
    // Output Function 27
@@ -3933,6 +4055,26 @@ namespace vout{
       stats::output_energy(stream, stats::second_order_anisotropy, stats::mean);
    }
 
+   // Output Function 43
+   void height_mvec(std::ostream& stream){
+      stream << stats::height_magnetization.output_normalized_magnetization();
+   }
+
+   // Output Function 44
+   void material_height_mvec(std::ostream& stream){
+      stream << stats::material_height_magnetization.output_normalized_magnetization();
+   }
+
+   // Output Function 45
+   void height_mvec_actual(std::ostream& stream){
+      stream << stats::height_magnetization.output_magnetization();
+   }
+
+   // Output Function 46
+   void material_height_mvec_actual(std::ostream& stream){
+      stream << stats::material_height_magnetization.output_magnetization();
+   }
+
    // Output Function 60
 	void MPITimings(std::ostream& stream){
 
@@ -3975,10 +4117,18 @@ namespace vout{
          // check for checkpoint continue and append data
          if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
          // otherwise overwrite file
-         else zmag.open("output",std::ofstream::trunc);
+         else{
+            zmag.open("output",std::ofstream::trunc);
+            // write file header information
+            if(vmpi::my_rank==0) write_output_file_header(zmag, file_output_list);
+         }
       }
 		
-		// Output data to zmag
+		// Only output 1/output_rate time steps
+      if(sim::time%vout::output_rate==0){
+
+		// Output data to output
+      if(vmpi::my_rank==0){
 		for(unsigned int item=0;item<file_output_list.size();item++){
 			switch(file_output_list[item]){
 				case 0:
@@ -4101,18 +4251,34 @@ namespace vout{
             case 42:
                vout::mean_total_so_anisotropy_energy(zmag);
                break;
+            case 43:
+               vout::height_mvec(zmag);
+               break;
+            case 44:
+               vout::material_height_mvec(zmag);
+               break;
+            case 45:
+               vout::height_mvec_actual(zmag);
+               break;
+            case 46:
+               vout::material_height_mvec_actual(zmag);
+               break;
             case 60:
 					vout::MPITimings(zmag);
 					break;
 			}
 		}
-
 		// Carriage return
 		if(file_output_list.size()>0) zmag << std::endl;
 
+      } // end of code for rank 0 only
+   } // end of if statement for output rate
+
 		// Output data to cout
 		if(vmpi::my_rank==0){
-		for(unsigned int item=0;item<screen_output_list.size();item++){
+      if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
+
+         for(unsigned int item=0;item<screen_output_list.size();item++){
 			switch(screen_output_list[item]){
 				case 0:
 					vout::time(std::cout);
@@ -4244,6 +4410,8 @@ namespace vout{
 		if(screen_output_list.size()>0) std::cout << std::endl;
 		}
 		
+   } // End of if statement to output data to screen
+
 		if(sim::time%vout::output_grain_rate==0){
 
 		// calculate grain magnetisations
@@ -4253,7 +4421,7 @@ namespace vout{
 		if(vmpi::my_rank==0){
 			
 			// check for open ofstream
-         if(!zgrain.is_open()){
+         if(vout::grain_output_list.size() > 0 && !zgrain.is_open()){
             // check for checkpoint continue and append data
             if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain",std::ofstream::app);
             // otherwise overwrite file
@@ -4288,7 +4456,7 @@ namespace vout{
 					break;
 			   case 22:
 					vout::phonon_temperature(zgrain);
-                                        break;
+               break;
 			}
 		}
 		

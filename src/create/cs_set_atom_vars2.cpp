@@ -39,6 +39,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 
@@ -69,6 +70,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::x_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::y_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
+   atoms::m_spin_array.resize(atoms::num_atoms,0.0);
 
 	atoms::type_array.resize(atoms::num_atoms,0);
 	atoms::category_array.resize(atoms::num_atoms,0);
@@ -119,6 +121,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		atoms::x_spin_array[atom]=sx*modS;
 		atoms::y_spin_array[atom]=sy*modS;
 		atoms::z_spin_array[atom]=sz*modS;
+      atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
 	}
 
 	//===========================================================
@@ -275,94 +278,266 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	}
 	else zlog << zTs() << "Identifying surface atoms using global threshold value of " << sim::surface_anisotropy_threshold << "." << std::endl;
 	
-	if(sim::surface_anisotropy==true){
+   //--------------------------------------------------------------------------------------------
+   // Determine nearest neighbour interactions from unit cell data for a single unit cell
+   //--------------------------------------------------------------------------------------------
 
-		zlog << zTs() << "Using surface anisotropy for atoms with < threshold number of nearest neighbours." << std::endl;
-		
-		// initialise counters
-		int nncounter = 0; // number of nearest neighbours
-		int sacounter = 0; // number of surface atoms
+   // vector to store interactions withn range
+   std::vector<bool> nn_interaction(cs::unit_cell.interaction.size(),false);
 
-		// loop over all atoms and count number of surface atoms
-		for(int atom=0;atom<atoms::num_atoms;atom++){
-			if(cneighbourlist[atom].size()<surface_anisotropy_threshold_array.at(atom)){
-				sacounter++;
-				nncounter+=cneighbourlist[atom].size();
-			}
-		}
-	
-		atoms::surface_array.resize(atoms::num_atoms);
-		atoms::nearest_neighbour_list_si.resize(atoms::num_atoms);
-		atoms::nearest_neighbour_list_ei.resize(atoms::num_atoms);
-		atoms::nearest_neighbour_list.reserve(nncounter);
-	
-		// counter for index arrays
-		int counter=0;
-		
-		//	Populate surface atom and 1D nearest neighbour list and index arrays
-		for(int atom=0;atom<atoms::num_atoms;atom++){
-			atoms::surface_array[atom]=false;
-			atoms::nearest_neighbour_list_si[atom]=0;
-			atoms::nearest_neighbour_list_ei[atom]=0;
-			if(cneighbourlist[atom].size()<surface_anisotropy_threshold_array.at(atom)){
-				// identify atom as surface
-				atoms::surface_array[atom]=true;
-				// Set start index
-				atoms::nearest_neighbour_list_si[atom]=counter;
-				// loop over neighbours
-				for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
-					atoms::nearest_neighbour_list.push_back(cneighbourlist[atom][nn].nn);
-					
-					double eij[3]={atoms::x_coord_array[cneighbourlist[atom][nn].nn]-atoms::x_coord_array[atom],
-										atoms::y_coord_array[cneighbourlist[atom][nn].nn]-atoms::y_coord_array[atom],
-										atoms::z_coord_array[cneighbourlist[atom][nn].nn]-atoms::z_coord_array[atom],};
-					double invrij=1.0/sqrt(eij[0]*eij[0]+eij[1]*eij[1]+eij[2]*eij[2]);
-					atoms::eijx.push_back(eij[0]*invrij);
-					atoms::eijy.push_back(eij[1]*invrij);
-					atoms::eijz.push_back(eij[2]*invrij);
-					counter++;
-				}
-				// push back final start index only if atom is a surface atom
-				// [si x x x x x ][ei/si x x x x x][ei/si x x x x x]
-				atoms::nearest_neighbour_list_ei[atom]=counter;
-			}
-		}
+   // save nn_distance for performance
+   const double rsq=sim::nearest_neighbour_distance*sim::nearest_neighbour_distance;
 
-		
-		// Output statistics to log file
-		zlog << zTs() << sacounter << " surface atoms found." << std::endl;
-		
-	} // end of surface anisotropy initialisation
-	// if not surface anisotropy then still identify surface atoms
-	else{
-	  int sacounter=0;
-		atoms::surface_array.resize(atoms::num_atoms);
-		for(int atom=0;atom<atoms::num_atoms;atom++){
-			if(cneighbourlist[atom].size()<surface_anisotropy_threshold_array.at(atom)){
-				// identify atom as surface
-				atoms::surface_array[atom]=true;
-				sacounter++;
-			}
-		}
-                // Output statistics to log file
-		zlog << zTs() << sacounter << " surface atoms found." << std::endl;
-	}
+   // Get unit cell size
+   const double ucdx=cs::unit_cell.dimensions[0];
+   const double ucdy=cs::unit_cell.dimensions[1];
+   const double ucdz=cs::unit_cell.dimensions[2];
 
-	// now remove unit cell interactions data
-	unit_cell.interaction.resize(0);
+   // loop over all interactions in unit cell
+   for(unsigned int itr=0;itr<cs::unit_cell.interaction.size();itr++){
+
+      // get distance to neighbouring unit cell in unit cells
+      double nndx=double(cs::unit_cell.interaction[itr].dx);
+      double nndy=double(cs::unit_cell.interaction[itr].dy);
+      double nndz=double(cs::unit_cell.interaction[itr].dz);
+
+      // load positions of i and j atoms to temporary coordinates and convert to angstroms
+      double ix=(unit_cell.atom[cs::unit_cell.interaction[itr].i].x)*ucdx;
+      double iy=(unit_cell.atom[cs::unit_cell.interaction[itr].i].y)*ucdy;
+      double iz=(unit_cell.atom[cs::unit_cell.interaction[itr].i].z)*ucdz;
+      double jx=(unit_cell.atom[cs::unit_cell.interaction[itr].j].x + nndx)*ucdx;
+      double jy=(unit_cell.atom[cs::unit_cell.interaction[itr].j].y + nndy)*ucdy;
+      double jz=(unit_cell.atom[cs::unit_cell.interaction[itr].j].z + nndz)*ucdz;
+
+      // calculate reduced coordinates
+      double dx=jx-ix;
+      double dy=jy-iy;
+      double dz=jz-iz;
+
+      // calculate interaction range and check if less than nn distance
+      const double range = (dx*dx + dy*dy + dz*dz);
+      if(range <=rsq) nn_interaction[itr]=true;
+   }
+
+   //------------------------------------------------------------
+   // Identify all nearest neighbour interactions in system
+   //
+   // Nearest neighbour list is a subset of full neighbour list,
+   // and so everything is derived from that.
+   //------------------------------------------------------------
+
+   // vector to identify all nearest neighbour interactions
+   std::vector <std::vector <bool> > nearest_neighbour_interactions_list(atoms::num_atoms);
+
+   // loop over all atoms
+   for(int atom=0;atom<atoms::num_atoms;atom++){
+
+      // set all interactions for atom as non-nearest neighbour by default
+      nearest_neighbour_interactions_list[atom].resize(cneighbourlist[atom].size(),false);
+
+      // counter for number of nearest neighbour interactions
+      int num_nn=0;
+
+      // loop over all interactions for atom
+      for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
+
+         // get interaction type (same as unit cell interaction id)
+         int id = cneighbourlist[atom][nn].i;
+
+         // Ensure valid interaction id
+         if(id>nn_interaction.size()){
+            std::cout << "Error: invalid interaction id " << id << " is greater than number of interactions in unit cell " << nn_interaction.size() << ". Exiting" << std::endl;
+            zlog << zTs() << "Error: invalid interaction id " << id << " is greater than number of interactions in unit cell " << nn_interaction.size() << ". Exiting" << std::endl;
+            err::vexit();
+         }
+
+         // set mask to true or false for non-fully coordinated atoms in the bulk
+         nearest_neighbour_interactions_list[atom][nn]=nn_interaction.at(id);
+      }
+   }
+
+   //----------------------------------------------------------------------------------------
+   // Identify atoms with less than full nearest neighbour coordination
+   //----------------------------------------------------------------------------------------
+
+   // Track total number of surface atoms and total nearest neighbour interactions
+   int num_surface_atoms=0;
+   int total_num_surface_nn=0;
+
+   // Resize surface atoms mask and initialise to false
+   atoms::surface_array.resize(atoms::num_atoms, false);
+
+   // Loop over all *local* atoms
+   for(int atom=0;atom<atoms::num_atoms;atom++){
+
+      // Check for local MPI atoms only
+      if(catom_array[atom].mpi_type!=2){
+
+         // Initialise counter for number of nearest neighbour interactions
+         int nnn_int=0;
+
+         // Loop over all interactions to determine number of nearest neighbour interactions
+         for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
+
+            // If interaction is nn, increment counter
+            if(nearest_neighbour_interactions_list[atom][nn]) nnn_int++;
+
+         }
+
+         // check for atoms with < threshold number of nearest neighbours
+         if(nnn_int<surface_anisotropy_threshold_array.at(atom)){
+            atoms::surface_array[atom]=true;
+            num_surface_atoms++;
+            total_num_surface_nn+=nnn_int;
+         }
+      }
+   }
+
+   // Output statistics to log file
+   zlog << zTs() << num_surface_atoms << " surface atoms found." << std::endl;
+
+   //----------------------------------------------------------------
+   // If surface anisotropy is enabled, calculate necessary data
+   //----------------------------------------------------------------
+   if(sim::surface_anisotropy==true){
+
+      zlog << zTs() << "Using surface anisotropy for atoms with < threshold number of neighbours." << std::endl;
+
+      atoms::surface_array.resize(atoms::num_atoms);
+      atoms::nearest_neighbour_list_si.resize(atoms::num_atoms);
+      atoms::nearest_neighbour_list_ei.resize(atoms::num_atoms);
+      atoms::nearest_neighbour_list.reserve(total_num_surface_nn);
+
+      // counter for index arrays
+      int counter=0;
+
+      //	Populate surface atom and 1D nearest neighbour list and index arrays
+      for(int atom=0;atom<atoms::num_atoms;atom++){
+
+         // initialise 1D index arrays
+         atoms::nearest_neighbour_list_si[atom]=0;
+         atoms::nearest_neighbour_list_ei[atom]=0;
+
+         //std::cout << "Atom " << atom << std::endl;
+         //std::cout << "--------------------------------------------" << std::endl;
+
+         // Only calculate parameters for atoms with less than full nn coordination
+         if(atoms::surface_array[atom]){
+
+            // Set start index
+            atoms::nearest_neighbour_list_si[atom]=counter;
+
+            // loop over all neighbours
+            for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
+
+               // only add nearest neighbours to list
+               if(nearest_neighbour_interactions_list[atom][nn]==true){
+
+                  // add interaction to 1D list
+                  atoms::nearest_neighbour_list.push_back(cneighbourlist[atom][nn].nn);
+
+                  // get atomic position vector i->j
+                  double eij[3]={cneighbourlist[atom][nn].vx,cneighbourlist[atom][nn].vy,cneighbourlist[atom][nn].vz};
+
+                  // normalise to unit vector
+                  double invrij=1.0/sqrt(eij[0]*eij[0]+eij[1]*eij[1]+eij[2]*eij[2]);
+
+                  atoms::eijx.push_back(eij[0]*invrij);
+                  atoms::eijy.push_back(eij[1]*invrij);
+                  atoms::eijz.push_back(eij[2]*invrij);
+
+                  //int natom = cneighbourlist[atom][nn].nn;
+                  //std::cout << "nn_id: " << nn << " j: " << cneighbourlist[atom][nn].nn << "\trange: " << 1.0/invrij << " ";
+                  //std::cout << "eij: " << eij[0] << " " << eij[1] << " " << eij[2] << "\tatomi: ";
+                  //std::cout << catom_array[atom].x << " " << catom_array[atom].y << " " << catom_array[atom].z << "\tatomj: ";
+                  //std::cout << catom_array[natom].x << " " << catom_array[natom].y << " " << catom_array[natom].z << std::endl;
+
+                  // increment 1D counter
+                  counter++;
+               }
+            }
+            // push back final start index only if atom is a surface atom
+            // [si x x x x x ][ei/si x x x x x][ei/si x x x x x]
+            atoms::nearest_neighbour_list_ei[atom]=counter;
+         }
+         //std::cout << std::endl;
+      }
+
+   } // end of surface anisotropy initialisation
+   //-------------------------------------------------------------------------------------------------------------
+
+   // now remove unit cell interactions data
+   unit_cell.interaction.resize(0);
 
    // Save number of atoms in unit cell first
    cells::num_atoms_in_unit_cell=unit_cell.atom.size();
    //std::cout << "\t\t" << unit_cell.atom.size() << "\t" << cells::num_atoms_in_unit_cell << std::endl;
    unit_cell.atom.resize(0);
-	
-	// Now nuke generation vectors to free memory NOW
-	std::vector<cs::catom_t> zerov; 
-	std::vector<std::vector <neighbour_t> > zerovv;
-	catom_array.swap(zerov);
-	cneighbourlist.swap(zerovv);
-	
-	return EXIT_SUCCESS;
+
+   //--------------------------------------------------------------
+   // Set up statistics masks for different data sets
+   //--------------------------------------------------------------
+   #ifdef MPICF
+      stats::num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   #else
+      stats::num_atoms = atoms::num_atoms;
+   #endif
+
+   // define vector mask
+   std::vector<int> mask(stats::num_atoms,0);
+
+   // system magnetization
+   if(stats::calculate_system_magnetization){
+      stats::system_magnetization.set_mask(1,mask,atoms::m_spin_array);
+   }
+
+   // material magnetization
+   if(stats::calculate_material_magnetization){
+      for(int atom=0; atom < stats::num_atoms; ++atom) mask[atom] = atoms::type_array[atom];
+      stats::material_magnetization.set_mask(mp::num_materials,mask,atoms::m_spin_array);
+   }
+
+   // height magnetization
+   if(stats::calculate_height_magnetization){
+      int max_height=0;
+      for(int atom=0; atom < stats::num_atoms; ++atom){
+         mask[atom] = atoms::category_array[atom];
+         if(mask[atom]>max_height) max_height=mask[atom];
+      }
+      // Reduce maximum height on all CPUS
+      #ifdef MPICF
+         MPI_Allreduce(MPI_IN_PLACE, &max_height, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+      #endif
+      stats::height_magnetization.set_mask(max_height+1,mask,atoms::m_spin_array);
+   }
+
+   // material height magnetization
+   if(stats::calculate_material_height_magnetization){
+      // store as blocks of material magnetisation for each height [ m1x m1y m1z m1m m2x m2y m2z 2m2 ] [ m1x m1y m1z m1m m2x m2y m2z 2m2 ] ...
+      // num masks = num_materials*num_heights
+      int num_mats = mp::num_materials;
+      int max_height=0;
+      for(int atom=0; atom < stats::num_atoms; ++atom){
+         int height = atoms::category_array[atom];
+         int mat = atoms::type_array[atom];
+         mask[atom] = num_mats*height+mat;
+         if(height>max_height) max_height=height;
+      }
+      // Reduce maximum height on all CPUS
+      #ifdef MPICF
+         MPI_Allreduce(MPI_IN_PLACE, &max_height, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+      #endif
+      stats::material_height_magnetization.set_mask(num_mats*(max_height+1),mask,atoms::m_spin_array);
+   }
+
+   // Now nuke generation vectors to free memory NOW
+   std::vector<cs::catom_t> zerov;
+   std::vector<std::vector <neighbour_t> > zerovv;
+   catom_array.swap(zerov);
+   cneighbourlist.swap(zerovv);
+
+   return EXIT_SUCCESS;
+
 }
 
 } // End of cs namespace

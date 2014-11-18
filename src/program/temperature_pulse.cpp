@@ -81,7 +81,14 @@ double temperature_pulse_function(double function_time){
 	}
 }
 
-/// Calculates temperature for single Gaussian pulse using the two-temperature model
+///-----------------------------------------------------------------------------------------
+///     Calculates temperature for single Gaussian pulse using the two-temperature model
+///
+///     Uses the free electron approximation in calculating the electron temperature
+///     where C_e = gamma_e T_e (ref Unai Atxitia PhD thesis pp 53).
+///     gamma_e ~ 3e3 J/m^-3/K^-2
+///
+///-----------------------------------------------------------------------------------------
 double two_temperature_function(double ftime){
 
 		const double reduced_time =  (ftime-3.*sim::pump_time)/(sim::pump_time);

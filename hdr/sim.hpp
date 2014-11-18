@@ -115,6 +115,7 @@ namespace sim{
 	extern bool identify_surface_atoms;
 	extern unsigned int surface_anisotropy_threshold;
 	extern bool NativeSurfaceAnisotropyThreshold;
+   extern double nearest_neighbour_distance;
 	
 	// Anisotropy control booleans
 	extern bool UniaxialScalarAnisotropy; /// Enables scalar uniaxial anisotropy
@@ -188,6 +189,11 @@ namespace sim{
    extern double lagrange_N;
    extern bool   lagrange_multiplier;
    extern void   update_lagrange_lambda();
+
+   // Monte Carlo statistics counters
+   extern double mc_statistics_moves;
+   extern double mc_statistics_reject;
+
 }
 
 namespace cmc{

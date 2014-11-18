@@ -109,16 +109,16 @@ namespace sim{
 	double cooling_time=100.0e-12; ///seconds
 	int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
 	pump_functions_t pump_function=two_temperature;
-	double pump_power=2.4e22;
-	double pump_time=20.0e-15; 
-	double double_pump_power=2.2e22;
+	double pump_power=4.e21;
+	double pump_time=50.0e-15;
+	double double_pump_power=2.e21;
 	double double_pump_Tmax=500.0;
-	double double_pump_time=10.0e-15; 
+	double double_pump_time=50.0e-15;
 	double double_pump_delay=10.0e-12;
 	double HeatSinkCouplingConstant=0.0; ///1.1e12 ~ sensible value
-	double TTCe = 7.0E02; ///electron specific heat
-	double TTCl = 3.0E06; ///phonon specific heat
-	double TTG = 17.0E17 ;///electron coupling constant
+	double TTCe = 222.0; ///electron specific heat (gamma)
+	double TTCl = 2.3E06; ///phonon specific heat
+	double TTG = 6.6E17 ;///electron coupling constant
 	double TTTe = 0.0; /// electron temperature
 	double TTTp = 0.0; /// phonon temperature
   
@@ -135,7 +135,8 @@ namespace sim{
 	bool identify_surface_atoms=false; /// flag to idenify surface atoms in config coordinate file
 	unsigned int surface_anisotropy_threshold=123456789; /// global threshold for surface atoms
 	bool NativeSurfaceAnisotropyThreshold=false; /// enables site-dependent surface threshold
-	
+   double nearest_neighbour_distance=1.e9; /// Control surface anisotropy nearest neighbour distance
+
 	// Anisotropy control booleans
 	bool UniaxialScalarAnisotropy=false; /// Enables scalar uniaxial anisotropy
 	bool TensorAnisotropy=false; /// Overrides scalar uniaxial anisotropy
@@ -158,7 +159,11 @@ namespace sim{
 	// Local function declarations
 	int integrate_serial(int);
 	int integrate_mpi(int);
-	
+
+   // Monte Carlo statistics counters
+   double mc_statistics_moves = 0.0;
+   double mc_statistics_reject = 0.0;
+
 /// @brief Function to increment time counter and associted variables
 ///
 /// @section License
@@ -349,6 +354,22 @@ int run(){
          program::partial_hysteresis_loop();
          break;
 
+      case 13:
+         if(vmpi::my_rank==0){
+            std::cout << "localised-temperature-pulse..." << std::endl;
+            zlog << "localised-temperature-pulse..." << std::endl;
+         }
+         program::localised_temperature_pulse();
+         break;
+
+      case 14:
+         if(vmpi::my_rank==0){
+            std::cout << "effective-damping..." << std::endl;
+            zlog << "effective-damping..." << std::endl;
+         }
+         program::effective_damping();
+         break;
+
 		case 50:
 			if(vmpi::my_rank==0){
 				std::cout << "Diagnostic-Boltzmann..." << std::endl;
@@ -364,15 +385,31 @@ int run(){
 			}
 	}
 
-	// output Monte Carlo Statistics if applicable
-	if(sim::integrator==3 || sim::integrator==4){
-		std::cout << "Constrained Monte Carlo Statistics:" << std::endl;
-		std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
-		std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0 << "% Accepted" << std::endl;
-		std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
-		std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
-		
-	}
+   //------------------------------------------------
+   // Output Monte Carlo statistics if applicable
+   //------------------------------------------------
+   if(sim::integrator==1){
+      std::cout << "Monte Carlo statistics:" << std::endl;
+      std::cout << "\tTotal moves: " << long(sim::mc_statistics_moves) << std::endl;
+      std::cout << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
+      std::cout << "\t" << (sim::mc_statistics_reject/sim::mc_statistics_moves)*100.0                              << "% Rejected" << std::endl;
+      zlog << zTs() << "Monte Carlo statistics:" << std::endl;
+      zlog << zTs() << "\tTotal moves: " << sim::mc_statistics_moves << std::endl;
+      zlog << zTs() << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
+      zlog << zTs() << "\t" << (sim::mc_statistics_reject/sim::mc_statistics_moves)*100.0                              << "% Rejected" << std::endl;
+   }
+   if(sim::integrator==3 || sim::integrator==4){
+      std::cout << "Constrained Monte Carlo statistics:" << std::endl;
+      std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
+      std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0    << "% Accepted" << std::endl;
+      std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+      std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+      zlog << zTs() << "Constrained Monte Carlo statistics:" << std::endl;
+      zlog << zTs() << "\tTotal moves: " << cmc::mc_total << std::endl;
+      zlog << zTs() << "\t" << (cmc::mc_success/cmc::mc_total)*100.0    << "% Accepted" << std::endl;
+      zlog << zTs() << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+      zlog << zTs() << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+   }
 
 	//program::LLB_Boltzmann();
 

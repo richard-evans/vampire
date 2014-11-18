@@ -246,7 +246,7 @@ int mag(){
 			if(mp::num_materials>1){
 				for(int mat=0;mat<mp::num_materials;mat++){
 					const unsigned int idx=grain*mp::num_materials+mat;
-					const double immm=1.0/grains::mat_sat_mag_array[idx];
+					const double immm = grains::mat_sat_mag_array[idx] < 1.e-200 ? 1.0 : 1.0/grains::mat_sat_mag_array[idx];
 					double mx = grains::x_mat_mag_array[idx]*immm;
 					double my = grains::y_mat_mag_array[idx]*immm;
 					double mz = grains::z_mat_mag_array[idx]*immm;
@@ -306,9 +306,11 @@ void output_mat_mag(std::ostream& stream){
 		if(grains::grain_size_array[grain]!=0){
 			if(mp::num_materials>1){
 				// loop over all materials
+            //std::cout << "Grain: " << grain << "\t" << grains::grain_size_array[grain] << std::endl;
 				for(int mat=0;mat<mp::num_materials;mat++){
 					const unsigned int idx=grain*mp::num_materials+mat;
-					const double imagm = 1.0/grains::mat_mag_m_array[idx];
+					const double imagm = grains::mat_mag_m_array[idx] < 1.e-200 ? 1.0 : 1.0/grains::mat_mag_m_array[idx];
+               //std::cout << "\t" << mat << "\t" << grains::x_mat_mag_array[idx] << "\t" << grains::y_mat_mag_array[idx] << "\t" << grains::z_mat_mag_array[idx] << "\t" << grains::mat_mag_m_array[idx] << std::endl;
 					//stream << grains::grain_size_array[grain] << "\t";
 					//stream << grains::mat_sat_mag_array[idx] << "\t";
 					stream << grains::x_mat_mag_array[idx]*imagm << "\t";

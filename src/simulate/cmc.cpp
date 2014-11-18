@@ -354,16 +354,24 @@ int ConstrainedMonteCarlo(){
 	double Mz_new;
 
 	double sqrt_ran;
-
 	double probability;
-	double kBTBohr = 9.27400915e-24/(sim::temperature*1.3806503e-23);
+
+   // Material dependent temperature rescaling
+   std::vector<double> rescaled_material_kBTBohr(mp::num_materials);
+   std::vector<double> sigma_array(mp::num_materials); // range for tuned gaussian random move
+   for(int m=0; m<mp::num_materials; ++m){
+      double alpha = mp::material[m].temperature_rescaling_alpha;
+      double Tc = mp::material[m].temperature_rescaling_Tc;
+      double rescaled_temperature = sim::temperature < Tc ? Tc*pow(sim::temperature/Tc,alpha) : sim::temperature;
+      rescaled_material_kBTBohr[m] = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
+      sigma_array[m] = rescaled_temperature < 1.0 ? 0.02 : pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
+   }
 
 	// copy matrices for speed
 	double ppolar_vector[3];
 	double ppolar_matrix[3][3];
 	double ppolar_matrix_tp[3][3];
 	
-	const double sigma = pow(1.0/kBTBohr,0.2)*0.08;
 	const int AtomExchangeType=atoms::exchange_type;
 	
 	for (int i=0;i<3;i++){
@@ -391,6 +399,7 @@ int ConstrainedMonteCarlo(){
 		// Randomly select spin number 1
 		atom_number1 = int(mtrandom::grnd()*atoms::num_atoms);
 		imat1=atoms::type_array[atom_number1];
+      sim::mc_delta_angle=sigma_array[imat1];
 		
 		// Save initial Spin 1
 		spin1_initial[0] = atoms::x_spin_array[atom_number1];
@@ -474,7 +483,7 @@ int ConstrainedMonteCarlo(){
 			delta_energy2 = (Enew-Eold)*mp::material[imat2].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 
 			// Calculate Delta E for both spins
-			delta_energy21 = delta_energy1 + delta_energy2;
+			delta_energy21 = delta_energy1*rescaled_material_kBTBohr[imat1] + delta_energy2*rescaled_material_kBTBohr[imat2];
 
 			// Compute Mz_other, Mz, Mz'
 			Mz_old = M_other[0]*ppolar_vector[0] + M_other[1]*ppolar_vector[1] + M_other[2]*ppolar_vector[2];
@@ -489,7 +498,7 @@ int ConstrainedMonteCarlo(){
 			// Otherwise evaluate probability for move
 			//else{
 				// If move is favorable then accept
-				probability = exp(-delta_energy21*kBTBohr)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
+				probability = exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
 				if((probability>=mtrandom::grnd()) && (Mz_new>0.0) ){
 					M_other[0] = M_other[0] + spin1_final[0] + spin2_final[0] - spin1_initial[0] - spin2_initial[0];
 					M_other[1] = M_other[1] + spin1_final[1] + spin2_final[1] - spin1_initial[1] - spin2_initial[1];

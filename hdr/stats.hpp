@@ -22,7 +22,10 @@
 //
 // ----------------------------------------------------------------------------
 //
+#ifndef STATS_H_
+#define STATS_H_
 #include <vector>
+#include <string>
 
 namespace stats
 //==========================================================
@@ -32,29 +35,12 @@ namespace stats
 	extern int num_atoms;				/// Number of atoms for statistic purposes
 	extern double inv_num_atoms;	///1.0/num_atoms
 	extern double max_moment;		/// Total Maximum moment
-
-	extern double total_mag_actual[3];	///< Actual magnetisation components
-	extern double total_mag_m_actual;	///< Actual magnitude of total magnetisation
-	extern double total_mean_mag_m_actual;	///< Actual magnitude of total magnetisation
-
-	extern double total_mag_norm[3];	///< Normalised magnetisation components
-	extern double total_mag_m_norm;	///< Normalised magnitude of total magnetisation
-	extern double total_mean_mag_m_norm;	///< Normalised magnitude of total magnetisation
-
 	extern double data_counter;		/// number of data points for averaging
 
 	// Member Functions
 	extern int mag_m();
 	extern void mag_m_reset();
 	extern double max_torque();
-
-	extern std::vector <double> sublattice_mx_array;
-	extern std::vector <double> sublattice_my_array;
-	extern std::vector <double> sublattice_mz_array;
-	extern std::vector <double> sublattice_magm_array;
-	extern std::vector <double> sublattice_mean_magm_array;
-	extern std::vector <double> sublattice_mom_array;
-	extern std::vector <int> sublattice_nm_array;
 
 	extern bool calculate_torque;
 	extern double total_system_torque[3];
@@ -66,8 +52,8 @@ namespace stats
 
 	extern double torque_data_counter;
 
-   extern double mean_susceptibility[3];
-   extern double mean_susceptibility_squared[3];
+   extern double mean_susceptibility[4];
+   extern double mean_susceptibility_squared[4];
    extern bool calculate_susceptibility;
 
    extern bool calculate_energy;
@@ -81,4 +67,56 @@ namespace stats
    /// Statistics output functions
    extern void output_energy(std::ostream&, enum energy_t, enum stat_t);
 
+   //-------------------------------------------------
+   // New statistics module functions and variables
+   //-------------------------------------------------
+
+   // Class definition
+   class magnetization_statistic_t{
+
+      public:
+         //magnetization_statistic_t (const int in_mask_size, std::vector<int> in_mask);
+         magnetization_statistic_t ();
+         void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
+         void calculate_magnetization(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
+         void reset_magnetization_averages();
+         const std::vector<double>& get_magnetization();
+         std::string output_magnetization();
+         std::string output_normalized_magnetization();
+         std::string output_normalized_magnetization_length();
+         std::string output_normalized_mean_magnetization();
+         std::string output_normalized_mean_magnetization_length();
+         std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec);
+
+      private:
+         bool is_initialized;
+         int num_atoms;
+         int mask_size;
+         double mean_counter;
+         std::vector<int> mask;
+         std::vector<double> magnetization;
+         std::vector<double> mean_magnetization;
+         std::vector<int> zero_list;
+         std::vector<double> saturation;
+
+   };
+
+   // Statistics control flags
+   extern bool calculate_system_magnetization;
+   extern bool calculate_material_magnetization;
+   extern bool calculate_height_magnetization;
+   extern bool calculate_material_height_magnetization;
+
+   // Statistics classes
+   extern magnetization_statistic_t system_magnetization;
+   extern magnetization_statistic_t material_magnetization;
+   extern magnetization_statistic_t height_magnetization;
+   extern magnetization_statistic_t material_height_magnetization;
+
+   // Control functions
+   void update(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
+   void reset();
+
 }
+
+#endif /*STATS_H_*/
