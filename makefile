@@ -117,6 +117,7 @@ obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/statistics/data.o \
+obj/statistics/initialize.o \
 obj/statistics/magnetization.o \
 obj/statistics/statistics.o \
 obj/utility/checkpoint.o \

@@ -71,7 +71,21 @@ namespace stats
    // New statistics module functions and variables
    //-------------------------------------------------
 
-   // Class definition
+   // Control functions
+   void initialize(const int num_atoms, const int num_materials, const std::vector<double>& magnetic_moment_array, 
+                   const std::vector<int>& material_type_array, const std::vector<int>& height_category_array);
+   void update(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
+   void reset();
+
+   // Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
+   extern bool calculate_system_magnetization;
+   extern bool calculate_material_magnetization;
+   extern bool calculate_height_magnetization;
+   extern bool calculate_material_height_magnetization;
+
+   //----------------------------------
+   // Magnetization Class definition
+   //----------------------------------
    class magnetization_statistic_t{
 
       public:
@@ -101,21 +115,12 @@ namespace stats
 
    };
 
-   // Statistics control flags
-   extern bool calculate_system_magnetization;
-   extern bool calculate_material_magnetization;
-   extern bool calculate_height_magnetization;
-   extern bool calculate_material_height_magnetization;
-
    // Statistics classes
    extern magnetization_statistic_t system_magnetization;
    extern magnetization_statistic_t material_magnetization;
    extern magnetization_statistic_t height_magnetization;
    extern magnetization_statistic_t material_height_magnetization;
 
-   // Control functions
-   void update(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
-   void reset();
 
 }
 
