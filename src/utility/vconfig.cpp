@@ -109,8 +109,6 @@ void config(){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "vout::config has been called" << std::endl;}
 
-	stats::mag_m();
-
 	// atoms output
 	if((vout::output_atoms_config==true) && (vout::output_rate_counter%output_atoms_config_rate==0)){
 		if(output_atoms_file_counter==0) vout::atoms_coords();
