@@ -64,30 +64,30 @@
 
 namespace vout{
 
-	bool output_atoms_config=false;
-	int output_atoms_config_rate=1000;
-	int output_atoms_file_counter=0;
-	int output_rate_counter=0;
-	
-	double atoms_output_min[3]={0.0,0.0,0.0};
-	double atoms_output_max[3]={1.0,1.0,1.0};
-	int total_output_atoms=0;
-	std::vector<int> local_output_atom_list(0);
-	
-	bool output_cells_config=false;
-	int output_cells_config_rate=1000;
-	int output_cells_file_counter=0;
-	
-	bool output_grains_config=false;
-	int output_config_grain_rate=1000;
-	int output_grains_file_counter=0;
-	
-	// function headers
-	void atoms();
-	void atoms_coords();
+   bool output_atoms_config=false;
+   int output_atoms_config_rate=1000;
+   int output_atoms_file_counter=0;
+   int output_rate_counter=0;
+
+   double atoms_output_min[3]={0.0,0.0,0.0};
+   double atoms_output_max[3]={1.0,1.0,1.0};
+   int total_output_atoms=0;
+   std::vector<int> local_output_atom_list(0);
+
+   bool output_cells_config=false;
+   int output_cells_config_rate=1000;
+   int output_cells_file_counter=0;
+
+   bool output_grains_config=false;
+   int output_config_grain_rate=1000;
+   int output_grains_file_counter=0;
+
+   // function headers
+   void atoms();
+   void atoms_coords();
    void cells();
    void cells_coords();
-	
+
 /// @brief Config master output function
 ///
 /// @section License
@@ -105,25 +105,25 @@ namespace vout{
 ///=====================================================================================
 ///
 void config(){
-	
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "vout::config has been called" << std::endl;}
 
-	// atoms output
-	if((vout::output_atoms_config==true) && (vout::output_rate_counter%output_atoms_config_rate==0)){
-		if(output_atoms_file_counter==0) vout::atoms_coords();
-		vout::atoms();
-	}
-	
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "vout::config has been called" << std::endl;}
+
+   // atoms output
+   if((vout::output_atoms_config==true) && (vout::output_rate_counter%output_atoms_config_rate==0)){
+      if(output_atoms_file_counter==0) vout::atoms_coords();
+      vout::atoms();
+   }
+
    // cells output
    if((vout::output_cells_config==true) && (vout::output_rate_counter%output_cells_config_rate==0)){
       if(output_cells_file_counter==0) vout::cells_coords();
       vout::cells();
    }
-   
-	// increment rate counter
-	vout::output_rate_counter++;
-	
+
+   // increment rate counter
+   vout::output_rate_counter++;
+
 }
 /// @brief Atomistic output function
 ///
@@ -168,78 +168,78 @@ void config(){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-	void atoms(){
+   void atoms(){
 
-		// check calling of routine if error checking is activated
-		if(err::check==true){std::cout << "vout::atoms has been called" << std::endl;}
+      // check calling of routine if error checking is activated
+      if(err::check==true){std::cout << "vout::atoms has been called" << std::endl;}
 
-		#ifdef MPICF
-			const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-		#else
-			const int num_atoms = atoms::num_atoms;
-		#endif
-		
-		// Set local output filename
-		std::stringstream file_sstr;
-		file_sstr << "atoms-";
-		// Set CPUID on non-root process
-		if(vmpi::my_rank!=0){
-			file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
-		}
-		file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
-		file_sstr << ".cfg";
-		std::string cfg_file = file_sstr.str();
-		const char* cfg_filec = cfg_file.c_str();
+      #ifdef MPICF
+         const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      #else
+         const int num_atoms = atoms::num_atoms;
+      #endif
 
-		// Declare and open output file
-		std::ofstream cfg_file_ofstr;
-		cfg_file_ofstr.open (cfg_filec);
-		
-		// Output masterfile header on root process
-		if(vmpi::my_rank==0){
-			// Get system date
-		  time_t rawtime = time(NULL);
-		  struct tm * timeinfo = localtime(&rawtime);
+      // Set local output filename
+      std::stringstream file_sstr;
+      file_sstr << "atoms-";
+      // Set CPUID on non-root process
+      if(vmpi::my_rank!=0){
+         file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
+      }
+      file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
+      file_sstr << ".cfg";
+      std::string cfg_file = file_sstr.str();
+      const char* cfg_filec = cfg_file.c_str();
 
-			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Atomistic spin configuration file for vampire"<< std::endl;
-			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
-			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "Number of spins: "<< vout::total_output_atoms << std::endl;
-			cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
-			cfg_file_ofstr << "Coordinates-file: atoms-coord.cfg"<< std::endl;
-			cfg_file_ofstr << "Time: " << double(sim::time)*mp::dt_SI << std::endl;
-			cfg_file_ofstr << "Field: " << sim::H_applied << std::endl;
-			cfg_file_ofstr << "Temperature: "<< sim::temperature << std::endl;
-			cfg_file_ofstr << "Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
-			cfg_file_ofstr << "Number of Materials: " << mp::num_materials << std::endl;
-			for(int mat=0;mat<mp::num_materials;mat++){
-				cfg_file_ofstr << mp::material[mat].mu_s_SI << std::endl;
-			}
-			cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-			cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors-1 << std::endl;
-			for(int p=1;p<vmpi::num_processors;p++){
-				std::stringstream cfg_sstr;
-				cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << output_atoms_file_counter << ".cfg";
-				cfg_file_ofstr << cfg_sstr.str() << std::endl;
-			}
-			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-		}
+      // Declare and open output file
+      std::ofstream cfg_file_ofstr;
+      cfg_file_ofstr.open (cfg_filec);
 
-		// Everyone now outputs their atom list
-		cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
-	  	for(int i=0; i<vout::local_output_atom_list.size(); i++){
-			const int atom = vout::local_output_atom_list[i];
-			cfg_file_ofstr << atoms::x_spin_array[atom] << "\t" << atoms::y_spin_array[atom] << "\t" << atoms::z_spin_array[atom] << std::endl;
-		}
-	
-		cfg_file_ofstr.close();
+      // Output masterfile header on root process
+      if(vmpi::my_rank==0){
+         // Get system date
+      time_t rawtime = time(NULL);
+      struct tm * timeinfo = localtime(&rawtime);
 
-		output_atoms_file_counter++;
+         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+         cfg_file_ofstr << "# Atomistic spin configuration file for vampire"<< std::endl;
+         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+         cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
+         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+         cfg_file_ofstr << "Number of spins: "<< vout::total_output_atoms << std::endl;
+         cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
+         cfg_file_ofstr << "Coordinates-file: atoms-coord.cfg"<< std::endl;
+         cfg_file_ofstr << "Time: " << double(sim::time)*mp::dt_SI << std::endl;
+         cfg_file_ofstr << "Field: " << sim::H_applied << std::endl;
+         cfg_file_ofstr << "Temperature: "<< sim::temperature << std::endl;
+         cfg_file_ofstr << "Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
+         cfg_file_ofstr << "Number of Materials: " << mp::num_materials << std::endl;
+         for(int mat=0;mat<mp::num_materials;mat++){
+            cfg_file_ofstr << mp::material[mat].mu_s_SI << std::endl;
+         }
+         cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
+         cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors-1 << std::endl;
+         for(int p=1;p<vmpi::num_processors;p++){
+            std::stringstream cfg_sstr;
+            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << output_atoms_file_counter << ".cfg";
+            cfg_file_ofstr << cfg_sstr.str() << std::endl;
+         }
+         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+      }
 
-	}
-	
+      // Everyone now outputs their atom list
+      cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
+      for(int i=0; i<vout::local_output_atom_list.size(); i++){
+         const int atom = vout::local_output_atom_list[i];
+         cfg_file_ofstr << atoms::x_spin_array[atom] << "\t" << atoms::y_spin_array[atom] << "\t" << atoms::z_spin_array[atom] << std::endl;
+      }
+
+      cfg_file_ofstr.close();
+
+      output_atoms_file_counter++;
+
+   }
+
 /// @brief Atomistic output function
 ///
 /// @details Outputs formatted data snapshot for visualisation  
@@ -275,108 +275,108 @@ void config(){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-	void atoms_coords(){
-		
-		// check calling of routine if error checking is activated
-		if(err::check==true){std::cout << "vout::atoms_coords has been called" << std::endl;}
+   void atoms_coords(){
 
-		#ifdef MPICF
-			const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-		#else
-			const int num_atoms = atoms::num_atoms;
-		#endif
+      // check calling of routine if error checking is activated
+      if(err::check==true){std::cout << "vout::atoms_coords has been called" << std::endl;}
 
-		// resize atom list to zero
-		local_output_atom_list.resize(0);
-		
-		// get output bounds
-		double minB[3]={vout::atoms_output_min[0]*cs::system_dimensions[0],
-							vout::atoms_output_min[1]*cs::system_dimensions[1],
-							vout::atoms_output_min[2]*cs::system_dimensions[2]};
-		
-		double maxB[3]={vout::atoms_output_max[0]*cs::system_dimensions[0],
-							vout::atoms_output_max[1]*cs::system_dimensions[1],
-							vout::atoms_output_max[2]*cs::system_dimensions[2]};
+      #ifdef MPICF
+         const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      #else
+         const int num_atoms = atoms::num_atoms;
+      #endif
 
-		// loop over all local atoms and record output list
-		for(int atom=0;atom<num_atoms;atom++){
+      // resize atom list to zero
+      local_output_atom_list.resize(0);
 
-			const double cc[3] = {atoms::x_coord_array[atom],atoms::y_coord_array[atom],atoms::z_coord_array[atom]};
-			
-			// check atom within output bounds
-			if((cc[0] >= minB[0]) && (cc[0]<=maxB[0])){
-				if((cc[1] >= minB[1]) && (cc[1]<=maxB[1])){
-					if((cc[2] >= minB[2]) && (cc[2]<=maxB[2])){
-						local_output_atom_list.push_back(atom);
-					}
-				}
-			}
-		}
-		
-		// calculate total atoms to output
-		#ifdef MPICF
-			int local_atoms = local_output_atom_list.size();
-			int total_atoms;
-			//std::cerr << vmpi::my_rank << "\t" << local_atoms << &local_atoms << "\t" << &total_atoms << std::endl;
-			//MPI::COMM_WORLD.Barrier();
-			MPI::COMM_WORLD.Allreduce(&local_atoms, &total_atoms,1, MPI_INT,MPI_SUM);
-			vout::total_output_atoms=total_atoms;
-			//std::cerr << vmpi::my_rank << "\t" << total_atoms << "\t" << &local_atoms << "\t" << &total_atoms << std::endl;
-			//MPI::COMM_WORLD.Barrier();
-		#else
-			vout::total_output_atoms=local_output_atom_list.size();
-		#endif
+      // get output bounds
+      double minB[3]={vout::atoms_output_min[0]*cs::system_dimensions[0],
+                     vout::atoms_output_min[1]*cs::system_dimensions[1],
+                     vout::atoms_output_min[2]*cs::system_dimensions[2]};
 
-		// Set local output filename
-		std::stringstream file_sstr;
-		file_sstr << "atoms-coords";
-		// Set CPUID on non-root process
-		if(vmpi::my_rank!=0){
-			file_sstr << "-" << std::setfill('0') << std::setw(5) << vmpi::my_rank;
-		}
-		file_sstr << ".cfg";
-		std::string cfg_file = file_sstr.str();
-		const char* cfg_filec = cfg_file.c_str();
+      double maxB[3]={vout::atoms_output_max[0]*cs::system_dimensions[0],
+                     vout::atoms_output_max[1]*cs::system_dimensions[1],
+                     vout::atoms_output_max[2]*cs::system_dimensions[2]};
 
-		// Declare and open output file
-		std::ofstream cfg_file_ofstr;
-		cfg_file_ofstr.open (cfg_filec);
-		
-		// Output masterfile header on root process
-		if(vmpi::my_rank==0){
-			// Get system date
+      // loop over all local atoms and record output list
+      for(int atom=0;atom<num_atoms;atom++){
+
+         const double cc[3] = {atoms::x_coord_array[atom],atoms::y_coord_array[atom],atoms::z_coord_array[atom]};
+
+         // check atom within output bounds
+         if((cc[0] >= minB[0]) && (cc[0]<=maxB[0])){
+            if((cc[1] >= minB[1]) && (cc[1]<=maxB[1])){
+               if((cc[2] >= minB[2]) && (cc[2]<=maxB[2])){
+                  local_output_atom_list.push_back(atom);
+               }
+            }
+         }
+      }
+
+      // calculate total atoms to output
+      #ifdef MPICF
+         int local_atoms = local_output_atom_list.size();
+         int total_atoms;
+         //std::cerr << vmpi::my_rank << "\t" << local_atoms << &local_atoms << "\t" << &total_atoms << std::endl;
+         //MPI::COMM_WORLD.Barrier();
+         MPI::COMM_WORLD.Allreduce(&local_atoms, &total_atoms,1, MPI_INT,MPI_SUM);
+         vout::total_output_atoms=total_atoms;
+         //std::cerr << vmpi::my_rank << "\t" << total_atoms << "\t" << &local_atoms << "\t" << &total_atoms << std::endl;
+         //MPI::COMM_WORLD.Barrier();
+      #else
+         vout::total_output_atoms=local_output_atom_list.size();
+      #endif
+
+      // Set local output filename
+      std::stringstream file_sstr;
+      file_sstr << "atoms-coords";
+      // Set CPUID on non-root process
+      if(vmpi::my_rank!=0){
+         file_sstr << "-" << std::setfill('0') << std::setw(5) << vmpi::my_rank;
+      }
+      file_sstr << ".cfg";
+      std::string cfg_file = file_sstr.str();
+      const char* cfg_filec = cfg_file.c_str();
+
+      // Declare and open output file
+      std::ofstream cfg_file_ofstr;
+      cfg_file_ofstr.open (cfg_filec);
+
+      // Output masterfile header on root process
+      if(vmpi::my_rank==0){
+         // Get system date
                   time_t rawtime = time(NULL);
-		  struct tm * timeinfo = localtime(&rawtime);
+      struct tm * timeinfo = localtime(&rawtime);
 
-			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Atomistic coordinates configuration file for vampire"<< std::endl;
-			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
-			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-			cfg_file_ofstr << "Number of atoms: "<< vout::total_output_atoms << std::endl;
-			cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-			cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors-1 << std::endl;
-			for(int p=1;p<vmpi::num_processors;p++){
-				std::stringstream cfg_sstr;
-				cfg_sstr << "atoms-coords-" << std::setfill('0') << std::setw(5) << p << ".cfg";
-				cfg_file_ofstr << cfg_sstr.str() << std::endl;
-			}
-			cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-		}
+         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+         cfg_file_ofstr << "# Atomistic coordinates configuration file for vampire"<< std::endl;
+         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+         cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
+         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+         cfg_file_ofstr << "Number of atoms: "<< vout::total_output_atoms << std::endl;
+         cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
+         cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors-1 << std::endl;
+         for(int p=1;p<vmpi::num_processors;p++){
+            std::stringstream cfg_sstr;
+            cfg_sstr << "atoms-coords-" << std::setfill('0') << std::setw(5) << p << ".cfg";
+            cfg_file_ofstr << cfg_sstr.str() << std::endl;
+         }
+         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+      }
 
-		// Everyone now outputs their atom list
-		cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
-	  	for(int i=0; i<vout::local_output_atom_list.size(); i++){
-			const int atom = vout::local_output_atom_list[i];
-			cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" << 
-			atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
-			if(sim::identify_surface_atoms==true && atoms::surface_array[atom]==true) cfg_file_ofstr << "O " << std::endl;
-			else cfg_file_ofstr << mp::material[atoms::type_array[atom]].element << std::endl;
-		}
-	
-		cfg_file_ofstr.close();
+      // Everyone now outputs their atom list
+      cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
+      for(int i=0; i<vout::local_output_atom_list.size(); i++){
+         const int atom = vout::local_output_atom_list[i];
+         cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" << 
+         atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
+         if(sim::identify_surface_atoms==true && atoms::surface_array[atom]==true) cfg_file_ofstr << "O " << std::endl;
+         else cfg_file_ofstr << mp::material[atoms::type_array[atom]].element << std::endl;
+      }
 
-	}
+      cfg_file_ofstr.close();
+
+   }
 
 /// @brief Cell output function
 ///
