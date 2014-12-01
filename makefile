@@ -120,6 +120,7 @@ obj/statistics/data.o \
 obj/statistics/initialize.o \
 obj/statistics/magnetization.o \
 obj/statistics/statistics.o \
+obj/statistics/susceptibility.o \
 obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \

@@ -72,6 +72,9 @@ namespace stats{
          stats::material_height_magnetization.set_mask(num_materials*(max_height+1),mask,magnetic_moment_array);
       }
 
+      // system susceptibility
+      stats::system_susceptibility.initialize(stats::system_magnetization);
+
       return;
    }
 } // end of namespace stats

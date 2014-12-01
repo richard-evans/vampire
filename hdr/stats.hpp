@@ -52,10 +52,6 @@ namespace stats
 
 	extern double torque_data_counter;
 
-   extern double mean_susceptibility[4];
-   extern double mean_susceptibility_squared[4];
-   extern bool calculate_susceptibility;
-
    extern bool calculate_energy;
 
    /// Statistics energy types
@@ -82,15 +78,21 @@ namespace stats
    extern bool calculate_material_magnetization;
    extern bool calculate_height_magnetization;
    extern bool calculate_material_height_magnetization;
+   extern bool calculate_system_susceptibility;
+
+   class susceptibility_statistic_t;
 
    //----------------------------------
    // Magnetization Class definition
    //----------------------------------
    class magnetization_statistic_t{
 
+      friend class susceptibility_statistic_t;
+
       public:
          //magnetization_statistic_t (const int in_mask_size, std::vector<int> in_mask);
          magnetization_statistic_t ();
+         bool is_initialized();
          void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
          void calculate_magnetization(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
          void reset_magnetization_averages();
@@ -103,7 +105,7 @@ namespace stats
          std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec);
 
       private:
-         bool is_initialized;
+         bool initialized;
          int num_atoms;
          int mask_size;
          double mean_counter;
@@ -115,12 +117,39 @@ namespace stats
 
    };
 
+   //----------------------------------
+   // Susceptibility Class definition
+   //----------------------------------
+   class susceptibility_statistic_t{
+
+      public:
+         susceptibility_statistic_t ();
+         void initialize(magnetization_statistic_t& mag_stat);
+         void calculate(const std::vector<double>& magnetization);
+         void reset_averages();
+         std::string output_mean_susceptibility(const double temperature);
+         //std::string output_mean_absolute_susceptibility();
+
+      private:
+         bool initialized;
+         int num_elements;
+         double mean_counter;
+         std::vector<double> mean_susceptibility;
+         std::vector<double> mean_susceptibility_squared;
+         std::vector<double> mean_absolute_susceptibility;
+         std::vector<double> mean_absolute_susceptibility_squared;
+         std::vector<double> saturation;
+
+   };
+
    // Statistics classes
    extern magnetization_statistic_t system_magnetization;
    extern magnetization_statistic_t material_magnetization;
    extern magnetization_statistic_t height_magnetization;
    extern magnetization_statistic_t material_height_magnetization;
 
+   extern susceptibility_statistic_t system_susceptibility;
+   //extern susceptibility_statistic_t material_susceptibility;
 
 }
 

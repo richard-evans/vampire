@@ -2358,7 +2358,9 @@ int match_vout_list(string const word, string const value, int const line, std::
    //--------------------------------------------------------------------
    test="mean-susceptibility";
    if(word==test){
-      stats::calculate_susceptibility=true;
+      // Set flags for calculations of susceptibility and magnetization
+      stats::calculate_system_susceptibility=true;
+      stats::calculate_system_magnetization=true;
       output_list.push_back(21);
       return EXIT_SUCCESS;
    }
@@ -3917,26 +3919,7 @@ namespace vout{
 
    // Output Function 21
    void mean_system_susceptibility(std::ostream& stream){
-
-      double norm = stats::max_moment/(1.3806503e-23*sim::temperature);
-
-      double sus_x = norm*(stats::mean_susceptibility_squared[0]/stats::data_counter-stats::mean_susceptibility[0]*stats::mean_susceptibility[0]/(stats::data_counter*stats::data_counter));
-      double sus_y = norm*(stats::mean_susceptibility_squared[1]/stats::data_counter-stats::mean_susceptibility[1]*stats::mean_susceptibility[1]/(stats::data_counter*stats::data_counter));
-      double sus_z = norm*(stats::mean_susceptibility_squared[2]/stats::data_counter-stats::mean_susceptibility[2]*stats::mean_susceptibility[2]/(stats::data_counter*stats::data_counter));
-      double sus_m = norm*(stats::mean_susceptibility_squared[3]/stats::data_counter-stats::mean_susceptibility[3]*stats::mean_susceptibility[3]/(stats::data_counter*stats::data_counter));
-
-      // check for very low temperature (denormalised number) to prevent nan
-      if(sim::temperature<1.e-300){
-         sus_x=0.0;
-         sus_y=0.0;
-         sus_z=0.0;
-         sus_m=0.0;
-      }
-
-      stream << sus_x << "\t" << sus_y << "\t" << sus_z << "\t" << sus_m << "\t";
-
-      return;
-
+      stream << stats::system_susceptibility.output_mean_susceptibility(sim::temperature);
    }
 
 	// Output Function 22
