@@ -191,6 +191,9 @@ void config(){
       std::string cfg_file = file_sstr.str();
       const char* cfg_filec = cfg_file.c_str();
 
+      // Output informative message to log file
+      zlog << zTs() << "Outputting configuration file " << cfg_file << " to disk" << std::endl;
+
       // Declare and open output file
       std::ofstream cfg_file_ofstr;
       cfg_file_ofstr.open (cfg_filec);
