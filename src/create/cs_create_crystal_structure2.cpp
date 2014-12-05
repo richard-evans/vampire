@@ -172,6 +172,9 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		// Check for interfacial roughness and call custom material assignment routine
 		if(cs::interfacial_roughness==true) cs::roughness(catom_array);
 		
+      // Check for multilayer system and if required generate multilayers
+      else if(cs::multilayers) cs::generate_multilayers(catom_array);
+
 		// Otherwise perform normal assignement of materials
 		else{
 

@@ -98,6 +98,11 @@ namespace cs{
 	std::string unit_cell_file="";
 	bool fill_core_shell=true;
 	
+   // Variables for multilayer system
+   bool multilayers = false;
+   bool multilayer_height_category = false; // enable height categorization by multilayer number
+   int num_multilayers = 1;
+
 	// Variables for interfacial roughness control
 	bool interfacial_roughness=false;
 	bool interfacial_roughness_local_height_field=false;
