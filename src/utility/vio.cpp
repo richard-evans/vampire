@@ -1106,7 +1106,7 @@ int match_create(string const word, string const value, string const unit, int c
    //--------------------------------------------------------------------
    test="interfacial-roughness-number-of-seed-points";
    if(word==test){
-      int sc=atoi(value.c_str());
+      int sc=int(atof(value.c_str()));
       check_for_valid_int(sc, word, line, prefix, 0, 100000,"input","0 - 100,000");
       cs::interfacial_roughness_seed_count=sc;
       return EXIT_SUCCESS;
@@ -1554,7 +1554,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //-------------------------------------------------------------------
    test="dipole-field-update-rate";
    if(word==test){
-      int dpur=atoi(value.c_str());
+      int dpur=int(atof(value.c_str()));
       check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       demag::update_rate=dpur;
       return EXIT_SUCCESS;
@@ -1574,7 +1574,7 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::NativeSurfaceAnisotropyThreshold=true;
          return EXIT_SUCCESS;
       }
-      int sat=atoi(value.c_str());
+      int sat=int(atof(value.c_str()));
       // Test for valid range
       check_for_valid_int(sat, word, line, prefix, 0, 1000000000,"input","0 - 1,000,000,000");
       sim::surface_anisotropy_threshold=sat;
@@ -1600,7 +1600,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="total-time-steps";
    if(word==test){
-      int tt=atoi(value.c_str());
+      int tt=int(atof(value.c_str()));
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::total_time=tt;
       return EXIT_SUCCESS;
@@ -1608,7 +1608,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="loop-time-steps";
    if(word==test){
-      int tt=atoi(value.c_str());
+      int tt=int(atof(value.c_str()));
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::loop_time=tt;
       return EXIT_SUCCESS;
@@ -1616,8 +1616,8 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="partial-time-steps";
    if(word==test){
-      int tt=atoi(value.c_str());
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      int tt=int(atof(value.c_str()));
       terminaltextcolor(YELLOW);
       std::cout << "Warning: Keyword \'partial-time-steps\' is deprecated and may be removed in a future release. Please use \'time-steps-increment\' instead." << std::endl;
       terminaltextcolor(WHITE);
@@ -1627,15 +1627,15 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="time-steps-increment";
    if(word==test){
-      int tt=atoi(value.c_str());
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      int tt=int(atof(value.c_str()));
       sim::partial_time=tt;
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
    test="equilibration-time-steps";
    if(word==test){
-      int tt=atoi(value.c_str());
+      int tt=int(atof(value.c_str()));
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::equilibration_time=tt;
       return EXIT_SUCCESS;
@@ -1643,7 +1643,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="simulation-cycles";
    if(word==test){
-      int r=atoi(value.c_str());
+      int r=int(atof(value.c_str()));
       check_for_valid_int(r, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::runs=r;
       return EXIT_SUCCESS;
@@ -2114,7 +2114,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="save-checkpoint-rate";
    if(word==test){
-      int scr=atoi(value.c_str());
+      int scr=int(atof(value.c_str()));
       check_for_valid_int(scr, word, line, prefix, 1, 2000000000,"input","1 - 2,000,000,000");
       sim::save_checkpoint_rate=scr;
       return EXIT_SUCCESS;
@@ -2168,7 +2168,7 @@ int match_config(string const word, string const value, int const line){
    //-----------------------------------------
    test="atoms-output-rate";
    if(word==test){
-      int i=atoi(value.c_str());
+      int i=int(atof(value.c_str()));
       check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
       vout::output_atoms_config_rate=i;
       return EXIT_SUCCESS;
@@ -2230,7 +2230,7 @@ int match_config(string const word, string const value, int const line){
    //--------------------------------------------------------------------
    test="macro-cells-output-rate";
    if(word==test){
-      int i=atoi(value.c_str());
+      int i=int(atof(value.c_str()));
       check_for_valid_int(i, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       vout::output_cells_config_rate=i;
       return EXIT_SUCCESS;
@@ -2593,7 +2593,7 @@ int match_vout_list(string const word, string const value, int const line, std::
    //--------------------------------------------------------------------
    test="output-rate";
    if(word==test){
-      int r=atoi(value.c_str());
+      int r=int(atof(value.c_str()));
       check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       vout::output_rate=r;
       return EXIT_SUCCESS;
@@ -2684,7 +2684,7 @@ int match_vout_grain_list(string const word, string const value, int const line,
    //-------------------------------------------------------------------
    test="output-rate";
    if(word==test){
-      int r=atoi(value.c_str());
+      int r=int(atof(value.c_str()));
       check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       vout::output_grain_rate=r;
       return EXIT_SUCCESS;
