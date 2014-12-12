@@ -1616,8 +1616,8 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="partial-time-steps";
    if(word==test){
-      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       int tt=int(atof(value.c_str()));
+      check_for_valid_int(tt, word, line, prefix, 1, 2000000000,"input","1 - 2,000,000,000");
       terminaltextcolor(YELLOW);
       std::cout << "Warning: Keyword \'partial-time-steps\' is deprecated and may be removed in a future release. Please use \'time-steps-increment\' instead." << std::endl;
       terminaltextcolor(WHITE);
@@ -1627,8 +1627,8 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="time-steps-increment";
    if(word==test){
-      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       int tt=int(atof(value.c_str()));
+      check_for_valid_int(tt, word, line, prefix, 1, 2000000000,"input","1 - 2,000,000,000");
       sim::partial_time=tt;
       return EXIT_SUCCESS;
    }
