@@ -108,14 +108,8 @@ namespace stats
 	
 	double torque_data_counter=0.0;
 
-   // susceptibility calculation
-   bool calculate_susceptibility=false;
-   double mean_susceptibility[4]={0.0,0.0,0.0,0.0};
-   double mean_susceptibility_squared[4]={0.0,0.0,0.0,0.0};
-
 	// function prototypes
 	void system_torque();
-	void system_susceptibility();
 	void system_energy();
 	
 	bool is_initialised=false;
@@ -196,9 +190,6 @@ int mag_m(){
    // increment data counter
    stats::data_counter+=1.0;
 
-   //optionally calculate system susceptibility (requires updated magnetisation)
-   if(stats::calculate_susceptibility==true) stats::system_susceptibility();
-
    return EXIT_SUCCESS;
 }
 
@@ -254,17 +245,6 @@ void mag_m_reset(){
    stats::mean_total_magnetostatic_energy      = 0.0;
 
    stats::energy_data_counter=0.0;
-
-	// Reset susceptibility data
-	stats::mean_susceptibility[0]=0.0;
-	stats::mean_susceptibility[1]=0.0;
-	stats::mean_susceptibility[2]=0.0;
-   stats::mean_susceptibility[3]=0.0;
-
-	stats::mean_susceptibility_squared[0]=0.0;
-	stats::mean_susceptibility_squared[1]=0.0;
-	stats::mean_susceptibility_squared[2]=0.0;
-   stats::mean_susceptibility_squared[3]=0.0;
 
 }
 
@@ -660,40 +640,6 @@ void output_energy(std::ostream& stream, enum energy_t energy_type, enum stat_t 
    }
 
    return;
-}
-
-///
-/// @brief      Calculates susceptibility of the system
-///
-/// @return     void
-///
-///       chi_l = sum_i mu_i
-///               ---------   ( <m_l^2> - <m_l>^2 )
-///                 k_B T
-///
-///       m_l = sum_i mu_i S_i
-///             --------------
-///               sum_i mu_i
-///
-void system_susceptibility(){
-
-   // copy reduced magnetisation
-   const std::vector<double> m_l = stats::system_magnetization.get_magnetization();
-   const double mm = m_l[3]; // temporary constant
-
-   // Calculate running totals
-   stats::mean_susceptibility[0]+=m_l[0]*mm;
-   stats::mean_susceptibility[1]+=m_l[1]*mm;
-   stats::mean_susceptibility[2]+=m_l[2]*mm;
-   stats::mean_susceptibility[3]+=mm;
-
-   stats::mean_susceptibility_squared[0]+=m_l[0]*m_l[0]*mm*mm;
-   stats::mean_susceptibility_squared[1]+=m_l[1]*m_l[1]*mm*mm;
-   stats::mean_susceptibility_squared[2]+=m_l[2]*m_l[2]*mm*mm;
-   stats::mean_susceptibility_squared[3]+=mm*mm;
-
-   return;
-
 }
 
 } // End of Namespace

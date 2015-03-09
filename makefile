@@ -65,6 +65,7 @@ obj/create/cs_create_neighbour_list2.o \
 obj/create/cs_particle_shapes.o \
 obj/create/cs_set_atom_vars2.o \
 obj/create/cs_voronoi2.o \
+obj/create/multilayers.o \
 obj/data/atoms.o \
 obj/data/category.o \
 obj/data/cells.o \
@@ -117,8 +118,10 @@ obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/statistics/data.o \
+obj/statistics/initialize.o \
 obj/statistics/magnetization.o \
 obj/statistics/statistics.o \
+obj/statistics/susceptibility.o \
 obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \

@@ -48,6 +48,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 
@@ -238,6 +239,14 @@ int run(){
 
    // Seeds with single bit differences are not ideal and may be correlated for first few values - warming up integrator
    for(int i=0; i<1000; ++i) mtrandom::grnd();
+
+   // Set up statistical data sets
+   #ifdef MPICF
+      int num_atoms_for_statistics = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   #else
+      int num_atoms_for_statistics = atoms::num_atoms;
+   #endif
+   stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array);
 
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();

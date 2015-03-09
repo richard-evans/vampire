@@ -23,7 +23,14 @@ namespace stats{
 //------------------------------------------------------------------------------------------------------
 // Constructor to initialize data structures
 //------------------------------------------------------------------------------------------------------
-magnetization_statistic_t::magnetization_statistic_t (): is_initialized(false){}
+magnetization_statistic_t::magnetization_statistic_t (): initialized(false){}
+
+//------------------------------------------------------------------------------------------------------
+// Function to determine if class is properly initialized
+//------------------------------------------------------------------------------------------------------
+bool magnetization_statistic_t::is_initialized(){
+   return initialized;
+}
 
 //------------------------------------------------------------------------------------------------------
 // Function to initialize mask
@@ -84,6 +91,9 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
          zero_list.push_back(4*mask_id+3);
       }
    }
+
+   // Set flag indicating correct initialization
+   initialized=true;
 
    return;
 
