@@ -3007,6 +3007,36 @@ int match_material(string const word, string const value, string const unit, int
       }
       //------------------------------------------------------------
       else
+      test="second-order-harmonic-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].sh2=K;
+         sim::spherical_harmonics=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="fourth-order-harmonic-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].sh4=K;
+         sim::spherical_harmonics=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="sixth-order-harmonic-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].sh6=K;
+         sim::spherical_harmonics=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
       test="lattice-anisotropy-constant";
       if(word==test){
          double Klatt=atof(value.c_str());
