@@ -743,28 +743,6 @@ void unit_cell_set(unit_cell_t & unit_cell){
 			unit_cell.interaction[15].dy=1;
 			unit_cell.interaction[15].dz=1;
 		}
-		else if(cs::crystal_structure=="fct"){
-			unit_cell.lcsize=2;
-			unit_cell.hcsize=1;
-			unit_cell.interaction_range=1;
-			unit_cell.atom.resize(2);
-			unit_cell.surface_threshold=4;
-			//-----------------------------
-			unit_cell.atom[0].x=0.0;
-			unit_cell.atom[0].y=0.0;
-			unit_cell.atom[0].z=0.0;
-			unit_cell.atom[0].lc=0;
-			unit_cell.atom[0].hc=0;
-			unit_cell.atom[0].ni=4;
-			//-----------------------------
-			unit_cell.atom[1].x=0.5;
-			unit_cell.atom[1].y=0.5;
-			unit_cell.atom[1].z=0.0;
-			unit_cell.atom[1].lc=1;
-			unit_cell.atom[1].hc=0;
-			unit_cell.atom[1].ni=4;
-			//-----------------------------
-		}
 		else if(cs::crystal_structure=="fcc"){
 			unit_cell.lcsize=4;
 			unit_cell.hcsize=2;
