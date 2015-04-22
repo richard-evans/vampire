@@ -73,7 +73,7 @@ namespace stats{
       }
 
       // system susceptibility
-      stats::system_susceptibility.initialize(stats::system_magnetization);
+      if(stats::calculate_system_susceptibility) stats::system_susceptibility.initialize(stats::system_magnetization);
 
       return;
    }

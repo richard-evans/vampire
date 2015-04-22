@@ -1176,6 +1176,42 @@ int match_create(string const word, string const value, string const unit, int c
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
+   test="multilayers";
+   if(word==test){
+      int nmul=atoi(value.c_str());
+      // Test for valid range
+      check_for_valid_int(nmul, word, line, prefix, 1, 100,"input","1 - 100, specifying the number of multilayers to be generated");
+      cs::multilayers = true;
+      cs::num_multilayers = nmul;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="height-categorization";
+   if(word==test){
+      // Test for different options
+      test="default";
+      if(value==test){
+         // do nothing
+         return EXIT_SUCCESS;
+      }
+      test="multilayers";
+      if(value==test){
+         cs::multilayer_height_category = true;
+         return EXIT_SUCCESS;
+      }
+      else{
+         terminaltextcolor(RED);
+         std::cerr << "Error - value for \'create:" << word << "\' must be one of:" << std::endl;
+         std::cerr << "\t\"default\"" << std::endl;
+         std::cerr << "\t\"multilayers\"" << std::endl;
+         zlog << zTs() << "Error - value for \'create:" << word << "\' must be one of:" << std::endl;
+         zlog << zTs() << "\t\"default\"" << std::endl;
+         zlog << zTs() << "\t\"multilayers\"" << std::endl;
+         terminaltextcolor(WHITE);
+         err::vexit();
+      }
+   }
+   //--------------------------------------------------------------------
    // keyword not found
    //--------------------------------------------------------------------
    else{
@@ -2967,6 +3003,36 @@ int match_material(string const word, string const value, string const unit, int
          check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
          read_material[super_index].Ku3_SI=-K; // Import anisotropy as field, *-1
          sim::sixth_order_uniaxial_anisotropy=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="second-order-harmonic-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].sh2=K;
+         sim::spherical_harmonics=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="fourth-order-harmonic-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].sh4=K;
+         sim::spherical_harmonics=true;
+         return EXIT_SUCCESS;
+      }
+      //------------------------------------------------------------
+      else
+      test="sixth-order-harmonic-anisotropy-constant";
+      if(word==test){
+         double K=atof(value.c_str());
+         check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
+         read_material[super_index].sh6=K;
+         sim::spherical_harmonics=true;
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------

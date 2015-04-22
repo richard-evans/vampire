@@ -110,7 +110,7 @@ namespace cells{
 		cells::num_cells=0;
 		cells::num_local_cells=0;
 		
-		zlog << zTs() << "Cell size = " << cells::size << std::endl; 
+		zlog << zTs() << "Macrocell size = " << cells::size << " Angstroms" << std::endl;
 		
 		// determine number of cells in each direction (with small shift to prevent the fence post problem)
 		unsigned int ncellx = static_cast<unsigned int>(ceil((cs::system_dimensions[0]+0.01)/cells::size));
@@ -120,9 +120,9 @@ namespace cells{
 		//update total number of cells
 		cells::num_cells=ncellx*ncelly*ncellz;
 		
-		zlog << zTs() << "Cells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
-		zlog << zTs() << "Total number of cells: " << cells::num_cells << std::endl;
-		zlog << zTs() << "Memory required for cell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
+		zlog << zTs() << "Macrocells in x,y,z: " << ncellx << "\t" << ncelly << "\t" << ncellz << std::endl;
+		zlog << zTs() << "Total number of macrocells: " << cells::num_cells << std::endl;
+		zlog << zTs() << "Memory required for macrocell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
 
 		// Determine number of cells in x,y,z
 		const int d[3]={ncellx,ncelly,ncellz};
@@ -147,8 +147,10 @@ namespace cells{
 		}
 		catch(...){
 			terminaltextcolor(RED);
-			std::cerr << "Error allocating supercell_array for cell list calculation" << std::endl;err::vexit();
+			std::cerr << "Error allocating supercell_array for macrocell list calculation" << std::endl;
 			terminaltextcolor(WHITE);
+         zlog << zTs() << "Error allocating supercell_array for macrocell list calculation" << std::endl;
+         err::vexit();
       }
 		
 		// slightly offset atomic coordinates to prevent fence post problem
@@ -172,6 +174,7 @@ namespace cells{
 					terminaltextcolor(RED);
 					std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
 					terminaltextcolor(WHITE);
+               zlog << zTs() << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
 					#ifdef MPICF
 					terminaltextcolor(RED);
 					std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
@@ -201,7 +204,10 @@ namespace cells{
 		delete [] supercell_array;
 		supercell_array=NULL;
 		}
-		catch(...){zlog << zTs() << "error deallocating supercell_array" << std::endl; err::vexit();}
+		catch(...){
+         zlog << zTs() << "error deallocating supercell_array" << std::endl;
+         err::vexit();
+      }
 		
 		// Resize new cell arrays
 		cells::x_coord_array.resize(cells::num_cells,0.0);
@@ -285,7 +291,7 @@ namespace cells{
 			}
 		}
 		
-		zlog << zTs() << "Number of local cells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
+		zlog << zTs() << "Number of local macrocells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
 		
 		cells::initialised=true;
 

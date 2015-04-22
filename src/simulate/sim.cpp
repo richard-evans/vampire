@@ -142,6 +142,7 @@ namespace sim{
 	bool TensorAnisotropy=false; /// Overrides scalar uniaxial anisotropy
 	bool second_order_uniaxial_anisotropy=false; /// Enables second order uniaxial anisotropy
    bool sixth_order_uniaxial_anisotropy=false; /// Enables sixth order uniaxial anisotropy
+   bool spherical_harmonics=false; // Enables calculation of higher order anistropy with spherical harmonics
 	bool CubicScalarAnisotropy=false; /// Enables scalar cubic anisotropy
    bool lattice_anisotropy_flag=false; /// Enables lattice anisotropy
 

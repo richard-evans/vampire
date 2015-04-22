@@ -98,6 +98,11 @@ namespace cs{
 	extern double interfacial_roughness_mean_seed_height; // Angstroms
 	extern double interfacial_roughness_seed_height_max; // Angstroms
 	
+   // Variables for multilayer system
+   extern bool multilayers;
+   extern int num_multilayers;
+   extern bool multilayer_height_category; // enable height categorization by multilayer number
+
 	class unit_cell_atom_t {
 	public:
 		double x; /// atom x-coordinate
@@ -438,6 +443,7 @@ int sort_atoms_by_grain(std::vector<cs::catom_t> &);
 int clear_atoms(std::vector<cs::catom_t> &);
 
 void roughness(std::vector<cs::catom_t> &);
+void generate_multilayers(std::vector<cs::catom_t> & catom_array);
 
   // unit cell initialisation function
   void unit_cell_set(cs::unit_cell_t &);
