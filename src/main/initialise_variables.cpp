@@ -72,6 +72,7 @@ namespace mp{
 	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
    std::vector <double> material_second_order_anisotropy_constant_array(0);
    std::vector <double> material_sixth_order_anisotropy_constant_array(0);
+   std::vector <double> material_spherical_harmonic_constants_array(0);
 	std::vector <double> MaterialCubicAnisotropyArray(0);
 
 ///
@@ -532,6 +533,16 @@ int set_derived_parameters(){
          zlog << zTs() << "Setting scalar sixth order uniaxial anisotropy." << std::endl;
          mp::material_sixth_order_anisotropy_constant_array.resize(mp::num_materials);
          for(int mat=0;mat<mp::num_materials; mat++) mp::material_sixth_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku3;
+      }
+      // Unroll spherical harmonic anisotropy constants for speed
+      if(sim::spherical_harmonics==true){
+         zlog << zTs() << "Setting spherical harmonics for uniaxial anisotropy" << std::endl;
+         mp::material_spherical_harmonic_constants_array.resize(3*mp::num_materials);
+         for(int mat=0; mat<mp::num_materials; mat++){
+            mp::material_spherical_harmonic_constants_array.at(3*mat+0)=mp::material[mat].sh2/mp::material[mat].mu_s_SI;
+            mp::material_spherical_harmonic_constants_array.at(3*mat+1)=mp::material[mat].sh4/mp::material[mat].mu_s_SI;
+            mp::material_spherical_harmonic_constants_array.at(3*mat+2)=mp::material[mat].sh6/mp::material[mat].mu_s_SI;
+         }
       }
       // Unroll cubic anisotropy values for speed
 		if(sim::CubicScalarAnisotropy==true){

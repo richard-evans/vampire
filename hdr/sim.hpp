@@ -122,6 +122,7 @@ namespace sim{
 	extern bool TensorAnisotropy; /// Overrides vector uniaxial anisotropy (even slower)
 	extern bool second_order_uniaxial_anisotropy; /// Enables second order uniaxial anisotropy
   extern bool sixth_order_uniaxial_anisotropy; // Enables sixth order uniaxial anisotropy
+   extern bool spherical_harmonics; // Enables calculation of higher order anistropy with spherical harmonics
 	extern bool CubicScalarAnisotropy; // Enables scalar cubic anisotropy
 	extern bool EnableUniaxialAnisotropyUnitVector; /// enables anisotropy tensor if any material has non z-axis K
   extern bool lattice_anisotropy_flag; /// Enables lattice anisotropy
