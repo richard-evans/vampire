@@ -163,7 +163,8 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 		for(int i=0;i<3;i++){
 			//scc[i]=int(c[i]/cs::unit_cell_size[i])-offset[i]; // Always round down for supercell coordinates
 			// Always check cell in range
-			if(scc[i]<0 || scc[i]>= d[i]){
+         if(scc[i]>= d[i]){
+			//if(scc[i]<0 || scc[i]>= d[i]){ // Chexk for scc < 0 not required since d and scc are unsigned
 				//std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
 				#ifdef MPICF
 				terminaltextcolor(RED);
