@@ -20,7 +20,7 @@ dimensions:system-size-z = 7.7 !nm
 #------------------------------------------
 # Material Files:
 #------------------------------------------
-material:file="Co.mat"
+material:file=Co.mat
 
 #------------------------------------------
 # Simulation attributes:
