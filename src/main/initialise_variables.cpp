@@ -421,6 +421,38 @@ int set_derived_parameters(){
 		}
 	}*/
 	const string blank="";
+
+   // Check for symmetry of exchange matrix
+   for(int mi = 0; mi < mp::num_materials; mi++){
+
+      for(int mj = 0; mj < mp::num_materials; mj++){
+
+         // Check for non-zero value (avoids divide by zero)
+         if(fabs(material[mi].Jij_matrix_SI[mj]) > 0.0){
+
+            // Calculate ratio of i->j / j-> exchange constants
+            double ratio = material[mj].Jij_matrix_SI[mi]/material[mi].Jij_matrix_SI[mj];
+
+            // Check that ratio ~ 1.0 for symmetric exchange interactions
+            if( (ratio < 0.99999) || (ratio > 1.00001) ){
+
+               // Error found - report to user and terminate program
+               terminaltextcolor(RED);
+                  std::cerr << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << ". Exiting" << std::endl;
+               terminaltextcolor(WHITE);
+
+               zlog << zTs() << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << std::endl;
+               zlog << zTs() << "\tmaterial[" << mi+1 << "]:exchange-matrix[" << mj+1 << "] = " << material[mi].Jij_matrix_SI[mj] << std::endl;
+               zlog << zTs() << "\tmaterial[" << mj+1 << "]:exchange-matrix[" << mi+1 << "] = " << material[mj].Jij_matrix_SI[mi] << std::endl;
+               zlog << zTs() << "\tThe definition of Heisenberg exchange requires that these values are the same. Exiting." << std::endl;
+
+               err::vexit();
+
+            }
+         }
+      }
+   }
+
 	// Set derived material parameters
 	for(int mat=0;mat<mp::num_materials;mat++){
 		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
