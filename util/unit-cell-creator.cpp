@@ -4,9 +4,9 @@
 //
 //  Takes a primitive unit cell and replicates it, 
 //  creating the neighbourlist and populating atomic 
-//  properties for input into zspin
+//  properties for input into vampire
 //
-//  (C) R.F.L.Evans 09/08/2012
+//  (C) R.F.L.Evans 22/04/2015
 //
 //
 //-------------------------------------------------------
@@ -90,10 +90,10 @@ int main(){
   materials.at(1).Sy=0.0;
   materials.at(1).Sz=1.0;
 
-  exchange_constants.at(0).at(0)=-1.26e-21; // Gd-Gd
-  exchange_constants.at(0).at(1)=1.09e-21; // Gd-Fe
-  exchange_constants.at(1).at(0)=1.09e-21; // Fe-Gd
-  exchange_constants.at(1).at(1)=-2.835e-21; // Fe-Fe
+  exchange_constants.at(0).at(0)=1.26e-21; // Gd-Gd
+  exchange_constants.at(0).at(1)=-1.09e-21; // Gd-Fe
+  exchange_constants.at(1).at(0)=-1.09e-21; // Fe-Gd
+  exchange_constants.at(1).at(1)=2.835e-21; // Fe-Fe
   
   // create atoms in unit cell
   std::vector<uc_atom_t> unit_cell(0);
@@ -193,7 +193,7 @@ int main(){
 	      temp.dz=k-1;
 	      temp.Jij=exchange_constants.at(imat).at(jmat);
 	      nn_list.push_back(temp);
-	      std::cout << ai << "\t" << aj << "\t" << i-1 << "\t" << j-1 << "\t" << k-1 << "\t" << sqrt(range_sq) << std::endl;
+	      //std::cout << ai << "\t" << aj << "\t" << i-1 << "\t" << j-1 << "\t" << k-1 << "\t" << sqrt(range_sq) << std::endl;
 	    } 
 	  }
 	}
@@ -258,17 +258,15 @@ int main(){
   
   // Loop over all materials
   for(int m=0;m<materials.size();m++){
-    mat_file << "# Material " << m << " (" << materials.at(m).name << ")" << std::endl;
+    mat_file << "# Material " << m+1 << " (" << materials.at(m).name << ")" << std::endl;
     mat_file << "#------------------------------------------------" << std::endl;
-    mat_file << "material[" << m << "]:name=\"" << materials.at(m).name << "\"" << std::endl;
-    mat_file << "material[" << m << "]:alpha=" << materials.at(m).alpha << std::endl;
-    mat_file << "material[" << m << "]:mu_s="<< materials.at(m).mu_s << " !muB" << std::endl;
-    mat_file << "material[" << m << "]:uniaxial-anisotropy-constant=" << materials.at(m).Ku << std::endl;
+    mat_file << "material[" << m+1 << "]:material-name=" << materials.at(m).name << std::endl;
+    mat_file << "material[" << m+1 << "]:damping-constant=" << materials.at(m).alpha << std::endl;
+    mat_file << "material[" << m+1 << "]:atomic-spin-moment="<< materials.at(m).mu_s << " !muB" << std::endl;
+    mat_file << "material[" << m+1 << "]:uniaxial-anisotropy-constant=" << materials.at(m).Ku << std::endl;
     //mat_file << "material[" << m << "]:uniaxial-anisotropy-direction=" << 0 << "," << 1 << ","<< 0 << std::endl;
-    mat_file << "material[" << m << "]:element=\""<< materials.at(m).element << "\""<< std::endl;
-    mat_file << "material[" << m << "]:Sx="<< materials.at(m).Sx << std::endl;
-    mat_file << "material[" << m << "]:Sy="<< materials.at(m).Sy << std::endl;
-    mat_file << "material[" << m << "]:Sz="<< materials.at(m).Sz << std::endl;
+    mat_file << "material[" << m+1 << "]:material-element="<< materials.at(m).element << ""<< std::endl;
+    mat_file << "material[" << m+1 << "]:initial-spin-direction="<< materials.at(m).Sx << "," << materials.at(m).Sy << "," << materials.at(m).Sz << std::endl;
     mat_file << "#------------------------------------------------" << std::endl;
   }
   return 0;
