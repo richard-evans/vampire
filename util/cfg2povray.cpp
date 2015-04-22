@@ -331,7 +331,7 @@ int main(){
 			pfile << "#declare CX=" << size*vec[0]*6.0 << ";" << std::endl;
 			pfile << "#declare CY=" << size*vec[1]*6.0 << ";" << std::endl;
 			pfile << "#declare CZ=" << size*vec[2]*6.0 << ";" << std::endl;
-	 		pfile << "#declare ref=0.4;" << std::endl;
+	 		pfile << "#declare ref=0.05;" << std::endl;
 			pfile << "global_settings { assumed_gamma 2.0 }" << std::endl;
 			pfile << "background { color Gray30 }" << std::endl;
 
