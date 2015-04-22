@@ -13,7 +13,8 @@ export OMPI_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"' 
-GCC=g++ -DCOMP='"GNU C++ Compiler"' 
+GCC=g++ -DCOMP='"GNU C++ Compiler"'
+LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' 
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' 
 MPICC=mpicxx -DMPICF 
@@ -42,6 +43,9 @@ ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvor
 ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
+
+LLVM_CFLAGS= -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
+LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
 GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi
 GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
@@ -150,6 +154,7 @@ obj/qvoronoi/userprintf_rbox.o\
 
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
+LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)
 IBM_OBJECTS=$(OBJECTS:.o=_ibm.o)
 ICCDB_OBJECTS=$(OBJECTS:.o=_idb.o)
 GCCDB_OBJECTS=$(OBJECTS:.o=_gdb.o)
@@ -158,6 +163,7 @@ IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb.o)
 
 MPI_OBJECTS=$(OBJECTS:.o=_mpi.o)
 MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_mpi.o)
+MPI_LLVM_OBJECTS=$(OBJECTS:.o=_llvm_mpi.o)
 MPI_PCC_OBJECTS=$(OBJECTS:.o=_p_mpi.o)
 MPI_IBM_OBJECTS=$(OBJECTS:.o=_ibm_mpi.o)
 MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
@@ -182,6 +188,12 @@ serial-intel: $(ICC_OBJECTS)
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $<
+
+serial-llvm: $(LLVM_OBJECTS)
+	$(LLVM) $(LLVM_LDFLAGS) $(LIBS) $(LLVM_OBJECTS) -o $(EXECUTABLE)
+
+$(LLVM_OBJECTS): obj/%_llvm.o: src/%.cpp
+	$(LLVM) -c -o $@ $(LLVM_CFLAGS) $<
 
 serial-ibm: $(IBM_OBJECTS)
 	$(IBM) $(IBM_LDFLAGS) $(IBM_OBJECTS) -o $(EXECUTABLE)
@@ -225,6 +237,11 @@ parallel-intel: $(MPI_ICC_OBJECTS)
 	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<
+
+parallel-llvm: $(MPI_LLVM_OBJECTS)
+	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(EXECUTABLE)
+$(MPI_LLVM_OBJECTS): obj/%_llvm_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(LLVM_CFLAGS) $<
 
 parallel-pathscale: $(MPI_PCC_OBJECTS)
 	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
