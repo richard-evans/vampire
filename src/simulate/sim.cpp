@@ -45,6 +45,7 @@
 #include "program.hpp"
 #include "demag.hpp"
 #include "errors.hpp"
+#include "gpu.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -158,7 +159,7 @@ namespace sim{
    int save_checkpoint_rate=1; // Default increment between checkpoints
 
 	// Local function declarations
-	int integrate_serial(int);
+   void integrate_serial(int);
 	int integrate_mpi(int);
 
    // Monte Carlo statistics counters
@@ -251,6 +252,9 @@ int run(){
 
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();
+
+   // Initialize GPU acceleration if enabled
+   if(gpu::acceleration) gpu::initialize();
 
 	// Select program to run
 	switch(sim::program){
@@ -417,6 +421,9 @@ int run(){
 
 	//program::LLB_Boltzmann();
 
+   // De-initialize GPU
+   gpu::finalize();
+
    // optionally save checkpoint file
    if(sim::save_checkpoint_flag && !sim::save_checkpoint_continuous_flag) save_checkpoint();
 
@@ -475,35 +482,32 @@ int integrate(int n_steps){
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.0
-/// @date    05/02/2011
+/// @version 1.1
+/// @date    10/06/2015
 ///
-/// @return EXIT_SUCCESS
-/// 
 /// @internal
 ///	Created:		05/02/2011
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int integrate_serial(int n_steps){
-	
-	// Check for calling of function
-	if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
-	
-	// Case statement to call integrator
-	switch(sim::integrator){
-		case 0: // LLG Heun
-			for(int ti=0;ti<n_steps;ti++){
-				// Select CUDA version if supported
-				#ifdef CUDA
-					sim::LLG_Heun_cuda();
-				#else
-					sim::LLG_Heun();
-				#endif
-				// increment time
-				increment_time();
-			}
-			break;
+void integrate_serial(int n_steps){
+
+   // Check for calling of function
+   if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
+
+   // Case statement to call integrator
+   switch(sim::integrator){
+
+      case 0: // LLG Heun
+         for(int ti=0;ti<n_steps;ti++){
+            // Optionally select GPU accelerated version
+            if(gpu::acceleration) gpu::llg_heun();
+            // Otherwise use CPU version
+            else sim::LLG_Heun();
+            // Increment time
+            increment_time();
+         }
+         break;
 		
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
@@ -512,20 +516,15 @@ int integrate_serial(int n_steps){
 				increment_time();
 			}
 			break;
-		
-		case 2: // LLG Midpoint
-			for(int ti=0;ti<n_steps;ti++){
-				// Select CUDA version if supported
-				#ifdef CUDA
-					sim::LLG_Midpoint_cuda();
-				#else
-					sim::LLG_Midpoint();
-				#endif
-				// increment time
-				increment_time();
-			}
-			break;
-			
+
+      case 2: // LLG Midpoint
+         for(int ti=0;ti<n_steps;ti++){
+            sim::LLG_Midpoint();
+            // increment time
+            increment_time();
+         }
+         break;
+
 		case 3: // Constrained Monte Carlo
 			for(int ti=0;ti<n_steps;ti++){
 				sim::ConstrainedMonteCarlo();
@@ -544,11 +543,11 @@ int integrate_serial(int n_steps){
 		
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
-			exit (EXIT_FAILURE);
-			}
+         err::vexit();
+		}
 	}
 	
-	return EXIT_SUCCESS;
+   return;
 }
 
 /// @brief Wrapper function to call MPI parallel integrators

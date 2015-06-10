@@ -47,6 +47,7 @@
 ///
 // Headers
 #include "atoms.hpp"
+#include "gpu.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
@@ -179,7 +180,8 @@ int mag_m(){
    }
 
    // update statistics - need to eventually replace mag_m() with stats::update()...
-   stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
+   if(gpu::acceleration) gpu::stats_update();
+   else stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
 
    // optionally calculate system torque
    if(stats::calculate_torque==true) stats::system_torque();
