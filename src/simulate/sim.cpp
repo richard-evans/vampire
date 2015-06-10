@@ -253,6 +253,9 @@ int run(){
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();
 
+   // Force GPU implementation ON
+   gpu::acceleration = true;
+
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
