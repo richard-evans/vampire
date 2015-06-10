@@ -12,6 +12,9 @@
 // Vampire headers
 #include "cuda.hpp"
 
+// Local cuda headers
+#include "internal.hpp"
+
 namespace cuda{
 
    //-------------------------------------------------------------------------------
