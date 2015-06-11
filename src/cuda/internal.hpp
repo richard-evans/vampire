@@ -21,6 +21,25 @@ namespace cuda{
       // Shared variables used for the cuda implementation
       //-----------------------------------------------------------------------------
 
+      thrust::device_vector<double> x_spin_array;
+      thrust::device_vector<double> y_spin_array;
+      thrust::device_vector<double> z_spin_array;
+
+      thrust::device_vector<double> x_coord_array;
+      thrust::device_vector<double> y_coord_array;
+      thrust::device_vector<double> z_coord_array;
+
+      thrust::device_vector<double> x_total_spin_field_array;
+      thrust::device_vector<double> y_total_spin_field_array;
+      thrust::device_vector<double> z_total_spin_field_array;
+
+      thrust::device_vector<double> x_total_external_field_array;
+      thrust::device_vector<double> y_total_external_field_array;
+      thrust::device_vector<double> z_total_external_field_array;
+
+      thrust::device_vector<size_t> type_array;
+
+
       //-----------------------------------------------------------------------------
       // Shared functions and kernels used for the cuda implementation
       //-----------------------------------------------------------------------------
