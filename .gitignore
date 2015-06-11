@@ -27,4 +27,6 @@ output
 run/unit-cell-creator
 MPI-compute-times
 MPI-wait-times
+tags
+.vimrc
 #EOF
