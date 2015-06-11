@@ -23,8 +23,18 @@ namespace cuda{
    void llg_heun(){
 
       #ifdef CUDA
- 
-      
+      /* set up and call the kernels */
+      /* assume that you have the data already
+       * in the device */
+
+      llg_heun_first_kernel <<< thin, thang >>> (
+            /*
+               cuda::internal::spins,
+               cuda::internal::other_stuff,
+               ...
+            */
+            );
+
       #endif
 
       return;

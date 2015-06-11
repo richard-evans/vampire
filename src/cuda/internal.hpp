@@ -25,6 +25,8 @@ namespace cuda{
       // Shared functions and kernels used for the cuda implementation
       //-----------------------------------------------------------------------------
 
+      __global__ void llg_heun_first_kernel (/* whole bunch of arrays */);
+
    } // end of iternal namespace
 } // end of cuda namespace
 

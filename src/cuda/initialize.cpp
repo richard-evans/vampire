@@ -9,6 +9,13 @@
 
 // C++ standard library headers
 
+#include <vector>
+
+// Thrust library headers
+
+#include <thrust/device_vector.hpp>
+#include <thrust/copy.hpp>
+
 // Vampire headers
 #include "cuda.hpp"
 
@@ -22,12 +29,16 @@ namespace cuda{
    //-------------------------------------------------------------------------------
    bool initialize(){
 
-      #ifdef CUDA
+#ifdef CUDA
 
-         // Successful initialization
-         return true;
+      // send the spin information
+      // send the material information
+      // send the macro-cell information
 
-      #endif
+      // Successful initialization
+      return true;
+
+#endif
 
       // Default (initializtion failed)
       return false;
