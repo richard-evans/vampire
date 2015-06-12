@@ -4,6 +4,7 @@
 #Ignore temporary editor files
 *~
 *.swp
+*.swo
 #Ignore error files
 *.err
 #Povray files
