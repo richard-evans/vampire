@@ -20,6 +20,7 @@
  */
 
 #include "atoms.hpp"
+#include "cells.hpp"
 #include "material.hpp"
 
 namespace cuda{
@@ -40,6 +41,16 @@ namespace cuda{
       thrust::device_vector<double> y_coord_array;
       thrust::device_vector<double> z_coord_array;
 
+      thrust::device_vector<size_t> type_array;
+
+      thrust::device_vector<size_t> cell_array;
+
+      bool __initialize_atoms ();
+
+      /*
+       * Field information
+       */
+
       thrust::device_vector<double> x_total_spin_field_array;
       thrust::device_vector<double> y_total_spin_field_array;
       thrust::device_vector<double> z_total_spin_field_array;
@@ -56,13 +67,33 @@ namespace cuda{
       thrust::device_vector<double> y_dipolar_field_array;
       thrust::device_vector<double> z_dipolar_field_array;
 
-      thrust::device_vector<size_t> type_array;
+      bool __initialize_fields ();
+
+      /*
+       * Cell information
+       */
+
+      thrust::device_vector<double> cell_x_coord_array;
+      thrust::device_vector<double> cell_y_coord_array;
+      thrust::device_vector<double> cell_z_coord_array;
+
+      thrust::device_vector<double> cell_x_mag_array;
+      thrust::device_vector<double> cell_y_mag_array;
+      thrust::device_vector<double> cell_z_mag_array;
+
+      thrust::device_vector<double> cell_volume_array;
+
+      thrust::device_vector<size_t> cell_num_atoms;
+
+      bool __initialize_cells ();
 
       /*
        * Material information
        */
 
       thrust::device_vector<mp::materials_t> materials;
+
+      bool __initialize_materials ();
 
       //-----------------------------------------------------------------------------
       // Shared functions and kernels used for the cuda implementation
