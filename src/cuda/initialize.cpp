@@ -23,6 +23,8 @@
 // Local cuda headers
 #include "internal.hpp"
 
+namespace cu = cuda::internal;
+
 namespace cuda{
 
    //-------------------------------------------------------------------------------
@@ -39,26 +41,26 @@ namespace cuda{
        * spins of the atoms.
        */
 
-      cuda::internal::x_spin_array.resize(atoms::num_atoms);
-      cuda::internal::y_spin_array.resize(atoms::num_atoms);
-      cuda::internal::z_spin_array.resize(atoms::num_atoms);
+      cu::x_spin_array.resize(atoms::num_atoms);
+      cu::y_spin_array.resize(atoms::num_atoms);
+      cu::z_spin_array.resize(atoms::num_atoms);
 
       thrust::copy(
             atoms::x_spin_array.begin(),
             atoms::x_spin_array.end()
-            cuda::internal::x_spin_array.begin()
+            cu::x_spin_array.begin()
             );
 
       thrust::copy(
             atoms::y_spin_array.begin(),
             atoms::y_spin_array.end()
-            cuda::internal::y_spin_array.begin()
+            cu::y_spin_array.begin()
             );
 
       thrust::copy(
-            cuda::internal::atoms::z_spin_array.begin(),
-            cuda::internal::atoms::z_spin_array.end()
-            cuda::internal::z_spin_array.begin()
+            cu::atoms::z_spin_array.begin(),
+            cu::atoms::z_spin_array.end()
+            cu::z_spin_array.begin()
             );
 
       /*
@@ -66,26 +68,26 @@ namespace cuda{
        * coordinates of the atoms.
        */
 
-      cuda::internal::x_coord_array.resize(atoms::num_atoms);
-      cuda::internal::y_coord_array.resize(atoms::num_atoms);
-      cuda::internal::z_coord_array.resize(atoms::num_atoms);
+      cu::x_coord_array.resize(atoms::num_atoms);
+      cu::y_coord_array.resize(atoms::num_atoms);
+      cu::z_coord_array.resize(atoms::num_atoms);
 
       thrust::copy(
             atoms::x_coord_array.begin(),
             atoms::x_coord_array.end()
-            cuda::internal::x_coord_array.begin()
+            cu::x_coord_array.begin()
             );
 
       thrust::copy(
             atoms::y_coord_array.begin(),
             atoms::y_coord_array.end()
-            cuda::internal::y_coord_array.begin()
+            cu::y_coord_array.begin()
             );
 
       thrust::copy(
             atoms::z_coord_array.begin(),
             atoms::z_coord_array.end()
-            cuda::internal::z_coord_array.begin()
+            cu::z_coord_array.begin()
             );
 
       /*
@@ -93,26 +95,26 @@ namespace cuda{
        * total spin field in each atom.
        */
 
-      cuda::internal::x_total_spin_field_array.resize(atoms::num_atoms);
-      cuda::internal::y_total_spin_field_array.resize(atoms::num_atoms);
-      cuda::internal::z_total_spin_field_array.resize(atoms::num_atoms);
+      cu::x_total_spin_field_array.resize(atoms::num_atoms);
+      cu::y_total_spin_field_array.resize(atoms::num_atoms);
+      cu::z_total_spin_field_array.resize(atoms::num_atoms);
 
       thrust::copy(
             atoms::x_total_spin_field_array.begin(),
             atoms::x_total_spin_field_array.end()
-            cuda::internal::x_total_spin_field_array.begin()
+            cu::x_total_spin_field_array.begin()
             );
 
       thrust::copy(
             atoms::y_total_spin_field_array.begin(),
             atoms::y_total_spin_field_array.end()
-            cuda::internal::y_total_spin_field_array.begin()
+            cu::y_total_spin_field_array.begin()
             );
 
       thrust::copy(
             atoms::z_total_spin_field_array.begin(),
             atoms::z_total_spin_field_array.end()
-            cuda::internal::z_total_spin_field_array.begin()
+            cu::z_total_spin_field_array.begin()
             );
 
       /*
@@ -120,26 +122,53 @@ namespace cuda{
        * total external field in each atom.
        */
 
-      cuda::internal::x_total_external_field_array.resize(atoms::num_atoms);
-      cuda::internal::y_total_external_field_array.resize(atoms::num_atoms);
-      cuda::internal::z_total_external_field_array.resize(atoms::num_atoms);
+      cu::x_total_external_field_array.resize(atoms::num_atoms);
+      cu::y_total_external_field_array.resize(atoms::num_atoms);
+      cu::z_total_external_field_array.resize(atoms::num_atoms);
 
       thrust::copy(
             atoms::x_total_external_field_array.begin(),
             atoms::x_total_external_field_array.end()
-            cuda::internal::x_total_external_field_array.begin()
+            cu::x_total_external_field_array.begin()
             );
 
       thrust::copy(
             atoms::y_total_external_field_array.begin(),
             atoms::y_total_external_field_array.end()
-            cuda::internal::y_total_external_field_array.begin()
+            cu::y_total_external_field_array.begin()
             );
 
       thrust::copy(
             atoms::z_total_external_field_array.begin(),
             atoms::z_total_external_field_array.end()
-            cuda::internal::z_total_external_field_array.begin()
+            cu::z_total_external_field_array.begin()
+            );
+
+      /*
+       * Allocate memory and transfer any existing
+       * initial data for the dipolar field
+       */
+
+      cu::x_dipolar_field_array.resize(atoms::num_atoms);
+      cu::y_dipolar_field_array.resize(atoms::num_atoms);
+      cu::z_dipolar_field_array.resize(atoms::num_atoms);
+
+      thrust::copy(
+            atoms::x_dipolar_field_array.begin(),
+            atoms::x_dipolar_field_array.end()
+            cu::x_dipolar_field_array.begin()
+            );
+
+      thrust::copy(
+            atoms::y_dipolar_field_array.begin(),
+            atoms::y_dipolar_field_array.end()
+            cu::y_dipolar_field_array.begin()
+            );
+
+      thrust::copy(
+            atoms::z_dipolar_field_array.begin(),
+            atoms::z_dipolar_field_array.end()
+            cu::z_dipolar_field_array.begin()
             );
 
       /*
@@ -147,24 +176,24 @@ namespace cuda{
        * atoms
        */
 
-      cuda::internal::type_array.resize(atoms::num_atoms);
+      cu::type_array.resize(atoms::num_atoms);
 
       thrust::copy(
             atoms::type_array.begin(),
             atoms::type_array.end(),
-            cuda::internal::type_array.begin()
+            cu::type_array.begin()
             );
 
       /*
        * Allocate memory and send information about the materias
        */
 
-      cuda::internal::materias.resize(mp::num_materials);
+      cu::materias.resize(mp::num_materials);
 
       thrust::copy(
             mp::materials.begin(),
             mp::materials.end(),
-            cuda::internal::materials.begin()
+            cu::materials.begin()
             );
 
       // send the material information

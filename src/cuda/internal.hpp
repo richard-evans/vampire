@@ -48,6 +48,14 @@ namespace cuda{
       thrust::device_vector<double> y_total_external_field_array;
       thrust::device_vector<double> z_total_external_field_array;
 
+      /*
+       * Required by the total external field calculator
+       * and the dipolar field updater
+       */
+      thrust::device_vector<double> x_dipolar_field_array;
+      thrust::device_vector<double> y_dipolar_field_array;
+      thrust::device_vector<double> z_dipolar_field_array;
+
       thrust::device_vector<size_t> type_array;
 
       /*
