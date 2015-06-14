@@ -517,10 +517,10 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
    //--------------------------------------------------------
    FILE *inputqv, *outputqv;
    int qargc=3;
-   char *qargv[3]={"qvoronoi", "-o", "-Fv"};
+   const char *qargv[3]={"qvoronoi", "-o", "-Fv"};
    inputqv=fopen(grain_file.c_str(),"r");
    outputqv=fopen(voronoi_file.c_str(),"w");
-   qvoronoi(qargc, qargv, inputqv, outputqv);
+   qvoronoi(qargc, const_cast<char**>(qargv), inputqv, outputqv);
    fclose(outputqv);
    fclose(inputqv);
 
