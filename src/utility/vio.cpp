@@ -1933,6 +1933,8 @@ int match_sim(string const word, string const value, string const unit, int cons
       sim::demag_factor[1]=u.at(1);
       sim::demag_factor[2]=u.at(2);
       sim::ext_demag=true;
+      // force calculation of system magnetization
+      stats::calculate_system_magnetization=true;
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
