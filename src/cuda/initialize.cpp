@@ -293,7 +293,7 @@ namespace cuda{
    bool __initialize_materials ()
    {
       /*
-       * Allocate memory and send information about the materias
+       * Allocate memory and send information about the materials
        */
 
       cu::materials.resize(mp::num_materials);
