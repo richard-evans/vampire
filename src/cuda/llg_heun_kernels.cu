@@ -41,22 +41,22 @@ namespace cuda {
 
          //defining the Delta
          float3 Ds;
-         Ds.x = gyro/(1 + alfa*alfa ) * (sxh.x + alfa*sxsxh.x);
-         Ds.y = gyro/(1 + alfa*alfa ) * (sxh.y + alfa*sxsxh.y);
-         Ds.z = gyro/(1 + alfa*alfa ) * (sxh.z + alfa*sxsxh.z);
+         Ds.x = -gyro/(1 + alfa*alfa ) * (sxh.x + alfa*sxsxh.x);
+         Ds.y = -gyro/(1 + alfa*alfa ) * (sxh.y + alfa*sxsxh.y);
+         Ds.z = -gyro/(1 + alfa*alfa ) * (sxh.z + alfa*sxsxh.z);
 
          float3 new_spin;
          new_spin.x = spin.x + Ds.x*dt;
          new_spin.y = spin.y + Ds.y*dt;
          new_spin.z = spin.z + Ds.z*dt;
 
-         mods = sqrtf(new_spin.x*new_spin.x + new_spin.y*new_spin.y + new_spin.z*new_spin.z);
+         mods =1/sqrtf(new_spin.x*new_spin.x + new_spin.y*new_spin.y + new_spin.z*new_spin.z);
 
          //normalized spins
          float3 m;
-         m.x = new_spin.x/mods;
-         m.y = new_spin.y/mods;
-         m.z = new_spin.z/mods;
+         m.x = new_spin.x*mods;
+         m.y = new_spin.y*mods;
+         m.z = new_spin.z*mods;
       }
 
    }
