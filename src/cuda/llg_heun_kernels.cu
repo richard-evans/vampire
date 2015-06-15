@@ -26,15 +26,15 @@ namespace cuda {
 
          //defining the s x h array and s x s x h :warray
          float3 sxh;
-         sxh.x = y_spin[atom] * H.z - z_spin[atom] * H.y;
-         sxh.y = z_spin[atom] * H.x - x_spin[atom] * H.z;
-         sxh.z = x_spin[atom] * H.y - y_spin[atom] * H.x;
+         sxh.x = spin.y * H.z - spin.z * H.y;
+         sxh.y = spin.z * H.x - spin.x * H.z;
+         sxh.z = spin.x * H.y - spin.y * H.x;
 
          //defining the sxsxh
          float3 sxsxh;
-         sxsxh.x = y_spin * sxh.z - z_spin * sxh.y;
-         sxsxh.y = z_spin * sxh.x - x_spin * sxh.z;
-         sxsxh.z = x_spin * sxh.y - y_spin * sxh.x;
+         sxsxh.x = spin.y * sxh.z - z_spin[atom] * sxh.y;
+         sxsxh.y = z_spin[atom] * sxh.x - x_spin[atom] * sxh.z;
+         sxsxh.z = x_spin[atom] * sxh.y - y_spin[atom] * sxh.x;
 
          //the saturation
          float mod_s = 0.0;
@@ -46,9 +46,9 @@ namespace cuda {
          Ds.z = gyro/(1 + alfa*alfa ) * (sxh.z + alfa*sxsxh.z);
 
          float3 new_spin;
-         new_spin.x = x_spin + Ds.x*dt;
-         new_spin.y = y_spin + Ds.y*dt;
-         new_spin.z = z_spin + Ds.z*dt;
+         new_spin.x = x_spin[atom] + Ds.x*dt;
+         new_spin.y = y_spin[atom] + Ds.y*dt;
+         new_spin.z = z_spin[atom] + Ds.z*dt;
 
          mods = sqrtf(new_spin.x*new_spin.x + new_spin.y*new_spin.y + new_spin.z*new_spin.z);
 
