@@ -15,6 +15,9 @@
 // not be accessed outside of the local temperature pulse code.
 //---------------------------------------------------------------------
 
+#include <thrust/copy.h>
+#include <thrust/device_vector.h>
+
 /*
  * requesting data strcutures from the main program
  */
@@ -94,6 +97,28 @@ namespace cuda{
       thrust::device_vector<mp::materials_t> materials;
 
       bool __initialize_materials ();
+
+      /*
+       * Topology information
+       */
+
+      thrust::device_vector<size_t> limits;
+      thrust::device_vector<size_t> neighbours;
+
+      bool __initialize_topology ();
+
+      /*
+       * Functors
+       */
+
+      struct plusone_functor
+      {
+         __host__ __device__
+            size_t operator() (const float& item) const
+            {
+               return item + 1UL;
+            }
+      };
 
       //-----------------------------------------------------------------------------
       // Shared functions and kernels used for the cuda implementation

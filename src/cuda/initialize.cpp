@@ -11,11 +11,6 @@
 
 #include <vector>
 
-// Thrust library headers
-
-#include <thrust/device_vector.h>
-#include <thrust/copy.h>
-
 // Vampire headers
 #include "atoms.hpp"
 #include "cuda.hpp"
@@ -40,6 +35,7 @@ namespace cuda{
       success = success || __initialize_fields ();
       success = success || __initialize_cells ();
       success = success || __initialize_materials ();
+      success = success || __initialize_topology ();
 
       // send topology information
 
@@ -222,8 +218,76 @@ namespace cuda{
    bool __initialize_cells ()
    {
       /*
-       * TODO: Implement initialization for the cells
+       * Allocate memory and initialize coordinates
        */
+
+      cu::cell_x_coord_array.resize(cells::num_cells);
+      cu::cell_y_coord_array.resize(cells::num_cells);
+      cu::cell_z_coord_array.resize(cells::num_cells);
+
+      thrust::copy(
+            cells::x_coord_array.begin(),
+            cells::x_coord_array.end(),
+            cu::cell_x_coord_array.begin()
+            );
+
+      thrust::copy(
+            cells::y_coord_array.begin(),
+            cells::y_coord_array.end(),
+            cu::cell_y_coord_array.begin()
+            );
+
+      thrust::copy(
+            cells::z_coord_array.begin(),
+            cells::z_coord_array.end(),
+            cu::cell_z_coord_array.begin()
+            );
+
+      /*
+       * Allocate memory and initialize cell magnetization
+       */
+
+      cu::cell_x_mag_array.resize(cells::num_cells);
+      cu::cell_y_mag_array.resize(cells::num_cells);
+      cu::cell_z_mag_array.resize(cells::num_cells);
+
+      thrust::copy(
+            cells::x_mag_array.begin(),
+            cells::x_mag_array.end(),
+            cu::cell_x_mag_array.begin()
+            );
+
+      thrust::copy(
+            cells::y_mag_array.begin(),
+            cells::y_mag_array.end(),
+            cu::cell_y_mag_array.begin()
+            );
+
+      thrust::copy(
+            cells::z_mag_array.begin(),
+            cells::z_mag_array.end(),
+            cu::cell_z_mag_array.begin()
+            );
+
+      /*
+       * Copy volume and number of atoms for each cell
+       */
+
+      cu::cell_volume_array.resize(cells::num_cells);
+
+      thrust::copy(
+            cells::volume_array.begin(),
+            cells::volume_array.end(),
+            cu::cell_volume_array.begin()
+            );
+
+      cu::cell_num_atoms.resize(cells::num_cells);
+
+      thrust::copy(
+            cells::num_atoms_in_cell.begin(),
+            cells::num_atoms_in_cell.end(),
+            cu::cell_num_atoms.begin()
+            );
    }
 
    bool __initialize_materials ()
@@ -238,6 +302,41 @@ namespace cuda{
             mp::material.begin(),
             mp::material.end(),
             cu::materials.begin()
+            );
+
+   }
+
+   bool __initialize_topology ()
+   {
+      /*
+       * Send the information for limits and neighbors up to the
+       * device.
+       */
+
+      cu::limits.resize(atoms::num_atoms);
+      cu::neighbours.resize(atoms::total_num_neighbours);
+
+      thrust::copy(
+            atoms::neighbour_list_end_index.begin(),
+            atoms::neighbour_list_end_index.end(),
+            cu::limits.begin()
+            );
+
+      /*
+       * Transform the limits to be one pased the last element
+       * in the neighbors list.
+       */
+      thrust::transform(
+            cu::limits.begin(),
+            cu::limits.end(),
+            cu::limits.begin(),
+            cu::plusone_functor()
+            );
+
+      thrust::copy(
+            atoms::neighbour_list_array.begin(),
+            atoms::neighbour_list_array.end(),
+            cu::neighbours.begin()
             );
 
    }
