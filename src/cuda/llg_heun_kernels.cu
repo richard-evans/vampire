@@ -32,9 +32,9 @@ namespace cuda {
 
          //defining the sxsxh
          float3 sxsxh;
-         sxsxh.x = spin.y * sxh.z - z_spin[atom] * sxh.y;
-         sxsxh.y = z_spin[atom] * sxh.x - x_spin[atom] * sxh.z;
-         sxsxh.z = x_spin[atom] * sxh.y - y_spin[atom] * sxh.x;
+         sxsxh.x = spin.y * sxh.z - spin.z * sxh.y;
+         sxsxh.y = spin.z * sxh.x - spin.x * sxh.z;
+         sxsxh.z = spin.x * sxh.y - spin.y * sxh.x;
 
          //the saturation
          float mod_s = 0.0;
@@ -46,9 +46,9 @@ namespace cuda {
          Ds.z = gyro/(1 + alfa*alfa ) * (sxh.z + alfa*sxsxh.z);
 
          float3 new_spin;
-         new_spin.x = x_spin[atom] + Ds.x*dt;
-         new_spin.y = y_spin[atom] + Ds.y*dt;
-         new_spin.z = z_spin[atom] + Ds.z*dt;
+         new_spin.x = spin.x + Ds.x*dt;
+         new_spin.y = spin.y + Ds.y*dt;
+         new_spin.z = spin.z + Ds.z*dt;
 
          mods = sqrtf(new_spin.x*new_spin.x + new_spin.y*new_spin.y + new_spin.z*new_spin.z);
 

@@ -132,8 +132,9 @@ namespace cuda{
             );
      __global__ void llg_heun_scheme(
 	    double * x_spin, double * y_spin, double * z_spin,   
-	    double 	
-
+	    double * x_sp_field, double * y_sp_field, double * z_sp_field,
+	    double * x_ext_field, double * y_ext_field, double * z_ext_field,
+	    double * x_new_spin, double * y_new_spin, double z_new_spin	
             );
    } // end of iternal namespace
 } // end of cuda namespace
