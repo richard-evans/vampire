@@ -36,8 +36,34 @@ namespace cuda {
 	H.z = z_sp_field[atom] + z_ext_field[atom];
 	
 	//implementing the Heun's Scheme
+	//cross product 
+	float3 SxH;
+	SxH.x = spin.x * H.z - spin.z * H.y;
+	SxH.y = spin.z * H.x - spin.x * H.z
+	SxH.z = spin.x * H.y - spin.y * H.x;
 	
+	float3 SxSxH;
+	SxSxH.x = spin.y * SxH.z - spin.z * SxH.y;
+	SxSxH.y = spin.z * SxH.x - spin.x * SxH.z;
+	SxSxH.z = spin.x * SxH.y - spin.y * SxH.x;
 	
+	float3 DS_prime;
+	DS_prime.x = -gyro/(1 + alfa*alfa ) * (SxH.x + alfa*SxSxH.x);
+	DS_prime.y = -gyro/(1 + alfa*alfa ) * (SxH.y + alfa*SxSxH.y);
+	DS_prime.z = -gyro/(1 + alfa*alfa ) * (SxH.z + alfa*SxSxH.z);
+	
+	float3 S;
+	S.x = spin.x + 0.5 * (Ds.x + DS_prime.x) * dt;
+	S.y = spin.y + 0.5 * (Ds.y + DS_prime.y) * dt;
+	S.z = spin.z + 0.5 * (Ds.z + DS_prime.z) * dt;
+	
+	float mods =0.0;
+	mods = 1/sqrtf(S.x*S.x + S.y*S.y + S.z*S.z);
+	
+	float3 Spin;
+	Spin.x = mods * S.x;
+	Spin.y = mods * S.y;
+	Spin.z = mods * S.z;
 	}    
 }   
   }
