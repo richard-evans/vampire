@@ -22,9 +22,9 @@
  * requesting data strcutures from the main program
  */
 
-#include "atoms.hpp"
-#include "cells.hpp"
-#include "material.hpp"
+#include "../../hdr/atoms.hpp"
+#include "../../hdr/cells.hpp"
+#include "../../hdr/material.hpp"
 
 namespace cuda{
    namespace internal{
@@ -123,6 +123,12 @@ namespace cuda{
       //-----------------------------------------------------------------------------
       // Shared functions and kernels used for the cuda implementation
       //-----------------------------------------------------------------------------
+
+      __global__ void update_non_exchange_spin_fields (
+            double * x_spin, double * y_spin, double * z_spin,
+            size_t * material, size_t * cell,
+            double * x_sp_field, double * y_sp_field, double * z_sp_field
+            );
 
       __global__ void llg_heun_first_kernel (
             double * x_spin, double * y_spin, double * z_spin,
