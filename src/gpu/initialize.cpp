@@ -28,7 +28,7 @@ namespace gpu{
       bool initialized=false;
 
        #ifdef CUDA
-         initialized = cuda::initialize();
+         initialized = vcuda::initialize();
       #elseif OPENCL
          initialized = opencl::initialize();
       #endif

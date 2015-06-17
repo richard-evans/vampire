@@ -19,9 +19,9 @@
 #include "data.hpp"
 #include "internal.hpp"
 
-namespace cu = ::cuda::internal;
+namespace cu = ::vcuda::internal;
 
-namespace cuda{
+namespace vcuda{
 
    //-------------------------------------------------------------------------------
    // Function to initialize GPU data
@@ -359,4 +359,4 @@ namespace cuda{
       }
    }
 
-} // end of namespace cuda
+} // end of namespace vcuda

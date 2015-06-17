@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 
-namespace cuda{
+namespace vcuda{
 
 #ifdef CUDA
 
@@ -27,6 +27,6 @@ namespace cuda{
 
 #endif
 
-} // end of gpu namespace
+} // end of vcuda namespace
 
 #endif //CUDA_H_

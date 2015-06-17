@@ -26,7 +26,7 @@
 #include "../../hdr/cells.hpp"
 #include "../../hdr/material.hpp"
 
-namespace cuda{
+namespace vcuda{
 
 #ifdef CUDA
 

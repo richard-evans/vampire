@@ -9,7 +9,7 @@
  */
 #include "internal.hpp"
 
-namespace cuda
+namespace vcuda
 {
    namespace internal
    {
@@ -73,6 +73,6 @@ namespace cuda
       extern RealArray z_dipolar_field_array;
 
    } /* internal */
-} /* cuda */
+} /* vcuda */
 
 #endif

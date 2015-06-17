@@ -15,7 +15,7 @@
 #include "internal.hpp"
 #include "data.hpp"
 
-namespace cuda{
+namespace vcuda{
    namespace internal{
 
       namespace atoms
@@ -64,4 +64,4 @@ namespace cuda{
 
    } // end of internal namespace
 
-} // end of cuda namespace
+} // end of vcuda namespace

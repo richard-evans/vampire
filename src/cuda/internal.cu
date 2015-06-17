@@ -6,19 +6,10 @@
 #include "data.hpp"
 #include "internal.hpp"
 
-namespace cuda
+namespace vcuda
 {
    namespace internal
    {
-      /*
-       * Initlialization functions
-       */
-
-      bool __initialize_atoms ();
-      bool __initialize_fields ();
-      bool __initialize_cells ();
-      bool __initialize_materials ();
-      bool __initialize_topology ();
 
    } /* internal */
-} /* cuda */
+} /* vcuda */

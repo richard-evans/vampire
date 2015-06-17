@@ -23,7 +23,7 @@ namespace gpu{
    void stats_update(){
 
       #ifdef CUDA
-         cuda::stats_update();
+         vcuda::stats_update();
       #elseif OPENCL
          opencl::stats_update();
       #endif

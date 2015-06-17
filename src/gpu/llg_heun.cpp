@@ -23,7 +23,7 @@ namespace gpu{
    void llg_heun(){
 
       #ifdef CUDA
-         cuda::llg_heun();
+         vcuda::llg_heun();
       #elseif OPENCL
          opencl::llg_heun();
       #endif
