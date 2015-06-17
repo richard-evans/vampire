@@ -12,12 +12,12 @@ export OMPI_CXX=g++
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"' 
+ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' 
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' 
-MPICC=mpicxx -DMPICF 
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+MPICC=mpicxx -DMPICF
 
 export LANG=C
 export LC_ALL=C
@@ -53,7 +53,7 @@ GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
 NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
@@ -275,10 +275,10 @@ $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
 
 # cuda targets
-gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS) 
+gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS)
 	$(ICC) $(ICC_LDFLAGS) $(LIBS)  $(CUDALIBS) $(CUDA_OBJECTS) obj/cuda/LLG_cuda.o -o $(EXECUTABLE)
 
-$(CUDA_OBJECTS): obj/%_cuda.o: src/%.cpp
+$(CUDA_OBJECTS): obj/%_cuda.o: src/%.cu
 	$(ICC) -c -o $@ $(ICC_CFLAGS) -DCUDA $<
 
 obj/cuda/LLG_cuda.o : src/cuda/LLG_cuda.cu
@@ -293,7 +293,7 @@ purge:
 	@rm -f obj/*/*.o
 	@rm -f vampire
 
-tidy:	
+tidy:
 	@rm -f *~
 	@rm -f hdr/*~
 	@rm -f src/*~

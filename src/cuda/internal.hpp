@@ -27,88 +27,49 @@
 #include "../../hdr/material.hpp"
 
 namespace cuda{
+
+#ifdef CUDA
+
    namespace internal{
+      struct material_parameters_t {
+         double alpha;
+         double gamma_rel;
+         double mu_s_SI;
+         double Klatt_SI;
+         double sh2;
+         double sh4;
+         double sh6;
+         double anisotropy_unit_x;
+         double anisotropy_unit_y;
+         double anisotropy_unit_z;
+         double Kc1_SI;
+         double temperature;
+         double temperature_rescaling_alpha;
+         double temperature_rescaling_Tc;
+      };
 
-      //-----------------------------------------------------------------------------
-      // Shared variables used for the cuda implementation
-      //-----------------------------------------------------------------------------
+      struct heun_parameters_t {
+         /**
+          * @var gamma_rel / (1 + alpha ** 2)
+          */
+         double prefactor;
+         /**
+          * @var alpha * prefactor
+          */
+         double lambda_times_prefactor;
+      };
 
       /*
-       * Atom information
+       * Initlialization functions
        */
-      thrust::device_vector<double> x_spin_array;
-      thrust::device_vector<double> y_spin_array;
-      thrust::device_vector<double> z_spin_array;
-
-      thrust::device_vector<double> x_coord_array;
-      thrust::device_vector<double> y_coord_array;
-      thrust::device_vector<double> z_coord_array;
-
-      thrust::device_vector<size_t> type_array;
-
-      thrust::device_vector<size_t> cell_array;
-
       bool __initialize_atoms ();
-
-      /*
-       * Field information
-       */
-
-      thrust::device_vector<double> x_total_spin_field_array;
-      thrust::device_vector<double> y_total_spin_field_array;
-      thrust::device_vector<double> z_total_spin_field_array;
-
-      thrust::device_vector<double> x_total_external_field_array;
-      thrust::device_vector<double> y_total_external_field_array;
-      thrust::device_vector<double> z_total_external_field_array;
-
-      /*
-       * Required by the total external field calculator
-       * and the dipolar field updater
-       */
-      thrust::device_vector<double> x_dipolar_field_array;
-      thrust::device_vector<double> y_dipolar_field_array;
-      thrust::device_vector<double> z_dipolar_field_array;
-
       bool __initialize_fields ();
-
-      /*
-       * Cell information
-       */
-
-      thrust::device_vector<double> cell_x_coord_array;
-      thrust::device_vector<double> cell_y_coord_array;
-      thrust::device_vector<double> cell_z_coord_array;
-
-      thrust::device_vector<double> cell_x_mag_array;
-      thrust::device_vector<double> cell_y_mag_array;
-      thrust::device_vector<double> cell_z_mag_array;
-
-      thrust::device_vector<double> cell_volume_array;
-
-      thrust::device_vector<size_t> cell_num_atoms;
-
       bool __initialize_cells ();
-
-      /*
-       * Material information
-       */
-
-      thrust::device_vector<mp::materials_t> materials;
-
       bool __initialize_materials ();
-
-      /*
-       * Topology information
-       */
-
-      thrust::device_vector<size_t> limits;
-      thrust::device_vector<size_t> neighbours;
-
       bool __initialize_topology ();
 
       /*
-       * Functors
+       * Shared functors for thrust
        */
 
       struct plusone_functor
@@ -120,9 +81,9 @@ namespace cuda{
             }
       };
 
-      //-----------------------------------------------------------------------------
-      // Shared functions and kernels used for the cuda implementation
-      //-----------------------------------------------------------------------------
+      /*
+       * Shared kernel definitions
+       */
 
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
@@ -137,11 +98,12 @@ namespace cuda{
             double dt
             );
      __global__ void llg_heun_scheme(
-	    double * x_spin, double * y_spin, double * z_spin,   
+	    double * x_spin, double * y_spin, double * z_spin,
 	    double * x_sp_field, double * y_sp_field, double * z_sp_field,
 	    double * x_ext_field, double * y_ext_field, double * z_ext_field,
-	    double * x_new_spin, double * y_new_spin, double z_new_spin	
+	    double * x_new_spin, double * y_new_spin, double z_new_spin
             );
+#endif
    } // end of iternal namespace
 } // end of cuda namespace
 
