@@ -97,6 +97,7 @@ namespace cuda{
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
             double dt
             );
+
      __global__ void llg_heun_scheme(
 	    double * x_spin, double * y_spin, double * z_spin,
 	    double * x_sp_field, double * y_sp_field, double * z_sp_field,
