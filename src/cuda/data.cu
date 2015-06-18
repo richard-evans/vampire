@@ -16,6 +16,9 @@
 #include "data.hpp"
 
 namespace vcuda{
+
+#ifdef CUDA
+
    namespace internal{
 
       namespace atoms
@@ -37,14 +40,14 @@ namespace vcuda{
 
       namespace cells
       {
-         RealArray cell_x_coord_array(0UL);
-         RealArray cell_y_coord_array(0UL);
-         RealArray cell_z_coord_array(0UL);
-         RealArray cell_x_mag_array(0UL);
-         RealArray cell_y_mag_array(0UL);
-         RealArray cell_z_mag_array(0UL);
-         RealArray cell_volume_array(0UL);
-         IndexArray cell_num_atoms(0UL);
+         RealArray x_coord_array(0UL);
+         RealArray y_coord_array(0UL);
+         RealArray z_coord_array(0UL);
+         RealArray x_mag_array(0UL);
+         RealArray y_mag_array(0UL);
+         RealArray z_mag_array(0UL);
+         RealArray volume_array(0UL);
+         IndexArray num_atoms(0UL);
       } /* cells */
 
       namespace mp
@@ -63,5 +66,7 @@ namespace vcuda{
       RealArray z_dipolar_field_array(0UL);
 
    } // end of internal namespace
+
+#endif
 
 } // end of vcuda namespace

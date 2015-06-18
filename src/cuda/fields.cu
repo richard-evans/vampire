@@ -2,6 +2,7 @@
 
 namespace cuda
 {
+#ifdef CUDA
    namespace internal
    {
 
@@ -15,5 +16,6 @@ namespace cuda
       }
 
    } /* internal */
+#endif
 } /* cuda */
 
