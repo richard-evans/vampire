@@ -76,6 +76,7 @@ namespace vcuda{
       bool __initialize_cells ();
       bool __initialize_materials ();
       bool __initialize_topology ();
+      bool __initialize_curand ();
 
       /*
        * Clean up function
@@ -98,6 +99,8 @@ namespace vcuda{
       /*
        * Shared kernel definitions
        */
+
+      __global__ void init_rng (curandState * state, size_t seed);
 
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,

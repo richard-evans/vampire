@@ -65,6 +65,8 @@ namespace vcuda{
       RealArray y_dipolar_field_array(0UL);
       RealArray z_dipolar_field_array(0UL);
 
+      curandState * d_rand_state;
+
    } // end of internal namespace
 
 #endif

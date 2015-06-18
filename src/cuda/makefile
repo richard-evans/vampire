@@ -8,6 +8,7 @@
 # List module object filenames
 cuda_objects= \
 	     obj/cuda/data.o \
+	     obj/cuda/internal.o \
 	     obj/cuda/initialize.o \
 	     obj/cuda/fields.o \
 	     obj/cuda/llg_heun.o \

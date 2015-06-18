@@ -74,6 +74,12 @@ namespace vcuda
       extern RealArray y_dipolar_field_array;
       extern RealArray z_dipolar_field_array;
 
+      /*
+       * cuRAND states
+       */
+
+      extern curandState * d_rand_state;
+
    } /* internal */
 #endif
 } /* vcuda */

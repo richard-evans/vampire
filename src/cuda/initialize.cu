@@ -40,6 +40,7 @@ namespace vcuda{
       success = success || cu::__initialize_cells ();
       success = success || cu::__initialize_materials ();
       success = success || cu::__initialize_topology ();
+      success = success || cu::__initialize_curand ();
 
       // Successful initialization
       return success;
@@ -402,6 +403,28 @@ namespace vcuda{
                ::atoms::neighbour_list_array.end(),
                cu::atoms::neighbours.begin()
                );
+
+         return true;
+      }
+
+      bool __initialize_curand ()
+      {
+         size_t blockSize = 256UL;
+         size_t gridSize = ::atoms::num_atoms / blockSize + 1UL;
+
+         cudaMalloc (
+               (void **) &cu::d_rand_state,
+               blockSize * gridSize * sizeof(curandState));
+         /*
+          * TODO: check this call.
+          */
+         cu::init_rng <<< gridSize, blockSize >>> (cu::d_rand_state, 919);
+         /*
+          * TODO: Use the vampire seed.
+          */
+         /*
+          * TODO: Check this call.
+          */
 
          return true;
       }
