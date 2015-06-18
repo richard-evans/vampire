@@ -205,72 +205,72 @@ namespace vcuda{
           * Allocate memory and initialize coordinates
           */
 
-         cu::cells::cell_x_coord_array.resize(::cells::num_cells);
-         cu::cells::cell_y_coord_array.resize(::cells::num_cells);
-         cu::cells::cell_z_coord_array.resize(::cells::num_cells);
+         cu::cells::x_coord_array.resize(::cells::num_cells);
+         cu::cells::y_coord_array.resize(::cells::num_cells);
+         cu::cells::z_coord_array.resize(::cells::num_cells);
 
          thrust::copy(
                ::cells::x_coord_array.begin(),
                ::cells::x_coord_array.end(),
-               cu::cells::cell_x_coord_array.begin()
+               cu::cells::x_coord_array.begin()
                );
 
          thrust::copy(
                ::cells::y_coord_array.begin(),
                ::cells::y_coord_array.end(),
-               cu::cells::cell_y_coord_array.begin()
+               cu::cells::y_coord_array.begin()
                );
 
          thrust::copy(
                ::cells::z_coord_array.begin(),
                ::cells::z_coord_array.end(),
-               cu::cells::cell_z_coord_array.begin()
+               cu::cells::z_coord_array.begin()
                );
 
          /*
           * Allocate memory and initialize cell magnetization
           */
 
-         cu::cells::cell_x_mag_array.resize(::cells::num_cells);
-         cu::cells::cell_y_mag_array.resize(::cells::num_cells);
-         cu::cells::cell_z_mag_array.resize(::cells::num_cells);
+         cu::cells::x_mag_array.resize(::cells::num_cells);
+         cu::cells::y_mag_array.resize(::cells::num_cells);
+         cu::cells::z_mag_array.resize(::cells::num_cells);
 
          thrust::copy(
                ::cells::x_mag_array.begin(),
                ::cells::x_mag_array.end(),
-               cu::cells::cell_x_mag_array.begin()
+               cu::cells::x_mag_array.begin()
                );
 
          thrust::copy(
                ::cells::y_mag_array.begin(),
                ::cells::y_mag_array.end(),
-               cu::cells::cell_y_mag_array.begin()
+               cu::cells::y_mag_array.begin()
                );
 
          thrust::copy(
                ::cells::z_mag_array.begin(),
                ::cells::z_mag_array.end(),
-               cu::cells::cell_z_mag_array.begin()
+               cu::cells::z_mag_array.begin()
                );
 
          /*
           * Copy volume and number of atoms for each cell
           */
 
-         cu::cells::cell_volume_array.resize(::cells::num_cells);
+         cu::cells::volume_array.resize(::cells::num_cells);
 
          thrust::copy(
                ::cells::volume_array.begin(),
                ::cells::volume_array.end(),
-               cu::cells::cell_volume_array.begin()
+               cu::cells::volume_array.begin()
                );
 
-         cu::cells::cell_num_atoms.resize(::cells::num_cells);
+         cu::cells::num_atoms.resize(::cells::num_cells);
 
          thrust::copy(
                ::cells::num_atoms_in_cell.begin(),
                ::cells::num_atoms_in_cell.end(),
-               cu::cells::cell_num_atoms.begin()
+               cu::cells::num_atoms.begin()
                );
 
          return true;
@@ -282,19 +282,47 @@ namespace vcuda{
           * Allocate memory and send information about the materials
           */
 
-         cu::mp::materials.resize(::mp::num_materials);
+         size_t num_mats = ::mp::num_materials;
 
-         /*
-          * TODO: this
-          */
+         cu::mp::materials.resize(num_mats);
+         thrust::host_vector<material_parameters_t> _materials(num_mats);
+         for (size_t i = 0; i < num_mats; i++)
+         {
+            _materials[i].alpha =
+               ::mp::material[i].alpha;
+            _materials[i].gamma_rel =
+               ::mp::material[i].gamma_rel;
+            _materials[i].mu_s_SI =
+               ::mp::material[i].mu_s_SI;
+            _materials[i].Klatt_SI =
+               ::mp::material[i].Klatt_SI;
+            _materials[i].sh2 =
+               ::mp::material[i].sh2;
+            _materials[i].sh4 =
+               ::mp::material[i].sh4;
+            _materials[i].sh6 =
+               ::mp::material[i].sh6;
+            _materials[i].anisotropy_unit_x =
+               ::mp::material[i].UniaxialAnisotropyUnitVector[0];
+            _materials[i].anisotropy_unit_y =
+               ::mp::material[i].UniaxialAnisotropyUnitVector[1];
+            _materials[i].anisotropy_unit_z =
+               ::mp::material[i].UniaxialAnisotropyUnitVector[2];
+            _materials[i].Kc1_SI =
+               ::mp::material[i].Kc1_SI;
+            _materials[i].temperature =
+               ::mp::material[i].temperature;
+            _materials[i].temperature_rescaling_alpha =
+               ::mp::material[i].temperature_rescaling_alpha;
+            _materials[i].temperature_rescaling_Tc =
+               ::mp::material[i].temperature_rescaling_Tc;
+         }
 
-         /*
-            thrust::copy(
-            mp::material.begin(),
-            mp::material.end(),
+         thrust::copy(
+            _materials.begin(),
+            _materials.end(),
             cu::mp::materials.begin()
             );
-          */
 
          return true;
       }
