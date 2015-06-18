@@ -39,16 +39,22 @@ namespace vcuda {
       success = success || cu::__initialize_materials ();
       success = success || cu::__initialize_topology ();
 
-      // send topology information
-
       // Successful initialization
       return success;
 
-#endif
-
+#else
       // Default (initializtion failed)
       return false;
+#endif
+   }
 
+   bool finalize()
+   {
+#ifdef CUDA
+      return cu::__finalize();
+#else
+      return false;
+#endif
    }
 
 } // end of namespace cuda

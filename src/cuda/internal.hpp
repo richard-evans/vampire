@@ -69,6 +69,11 @@ namespace vcuda{
       bool __initialize_topology ();
 
       /*
+       * Clean up function
+       */
+      bool __finalize ();
+
+      /*
        * Shared functors for thrust
        */
 

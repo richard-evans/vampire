@@ -38,17 +38,17 @@ namespace vcuda
 
       namespace cells
       {
-         extern RealArray cell_x_coord_array;
-         extern RealArray cell_y_coord_array;
-         extern RealArray cell_z_coord_array;
+         extern RealArray x_coord_array;
+         extern RealArray y_coord_array;
+         extern RealArray z_coord_array;
 
-         extern RealArray cell_x_mag_array;
-         extern RealArray cell_y_mag_array;
-         extern RealArray cell_z_mag_array;
+         extern RealArray x_mag_array;
+         extern RealArray y_mag_array;
+         extern RealArray z_mag_array;
 
-         extern RealArray cell_volume_array;
+         extern RealArray volume_array;
 
-         extern IndexArray cell_num_atoms;
+         extern IndexArray num_atoms;
       } /* cells */
 
       namespace mp
