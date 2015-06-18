@@ -39,6 +39,9 @@ namespace vcuda{
          double sh2;
          double sh4;
          double sh6;
+         double ku;
+         double ku2;
+         double ku3;
          double anisotropy_unit_x;
          double anisotropy_unit_y;
          double anisotropy_unit_z;
@@ -92,7 +95,7 @@ namespace vcuda{
 
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
-            size_t * material, size_t * cell,
+            size_t * material, size_t * cell, material_parameters_t * material_params,
             double * x_sp_field, double * y_sp_field, double * z_sp_field
             );
 

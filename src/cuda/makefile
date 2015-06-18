@@ -9,6 +9,7 @@
 cuda_objects=\
 obj/cuda/data.o \
 obj/cuda/initialize.o \
+obj/cuda/fields.o \
 obj/cuda/llg_heun.o \
 obj/cuda/finalize.o \
 obj/cuda/statistics.o

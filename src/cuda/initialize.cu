@@ -327,6 +327,12 @@ namespace vcuda{
                ::mp::material[i].sh4;
             _materials[i].sh6 =
                ::mp::material[i].sh6;
+            _materials[i].ku =
+               ::mp::material[i].Ku;
+            _materials[i].ku2 =
+               ::mp::material[i].Ku2;
+            _materials[i].ku3 =
+               ::mp::material[i].Ku3;
             _materials[i].anisotropy_unit_x =
                ::mp::material[i].UniaxialAnisotropyUnitVector[0];
             _materials[i].anisotropy_unit_y =
