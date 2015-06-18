@@ -18,9 +18,11 @@
 // Local cuda headers
 #include "internal.hpp"
 
-namespace cu = cuda::internal;
+#ifdef CUDA
+namespace cu = ::vcuda::internal;
+#endif
 
-namespace cuda {
+namespace vcuda {
 
    //-------------------------------------------------------------------------------
    // Function to initialize GPU data
@@ -31,11 +33,11 @@ namespace cuda {
 
       bool success = true;
 
-      success = success || __initialize_atoms ();
-      success = success || __initialize_fields ();
-      success = success || __initialize_cells ();
-      success = success || __initialize_materials ();
-      success = success || __initialize_topology ();
+      success = success || cu::__initialize_atoms ();
+      success = success || cu::__initialize_fields ();
+      success = success || cu::__initialize_cells ();
+      success = success || cu::__initialize_materials ();
+      success = success || cu::__initialize_topology ();
 
       // send topology information
 

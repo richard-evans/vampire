@@ -19,36 +19,13 @@
 #include "data.hpp"
 #include "internal.hpp"
 
+#ifdef CUDA
 namespace cu = ::vcuda::internal;
+#endif
 
 namespace vcuda{
 
-   //-------------------------------------------------------------------------------
-   // Function to initialize GPU data
-   //-------------------------------------------------------------------------------
-   bool initialize(){
-
 #ifdef CUDA
-
-      bool success = true;
-
-      success = success || cu::__initialize_atoms ();
-      success = success || cu::__initialize_fields ();
-      success = success || cu::__initialize_cells ();
-      success = success || cu::__initialize_materials ();
-      success = success || cu::__initialize_topology ();
-
-      // send topology information
-
-      // Successful initialization
-      return success;
-
-#else
-      // Default (initializtion failed)
-      return false;
-#endif
-
-   }
 
    namespace internal {
 
@@ -358,5 +335,7 @@ namespace vcuda{
          return true;
       }
    }
+
+#endif
 
 } // end of namespace vcuda

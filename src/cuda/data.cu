@@ -16,6 +16,9 @@
 #include "data.hpp"
 
 namespace vcuda{
+
+#ifdef CUDA
+
    namespace internal{
 
       namespace atoms
@@ -63,5 +66,7 @@ namespace vcuda{
       RealArray z_dipolar_field_array(0UL);
 
    } // end of internal namespace
+
+#endif
 
 } // end of vcuda namespace

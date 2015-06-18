@@ -8,8 +8,10 @@
 
 namespace vcuda
 {
+#ifdef CUDA
    namespace internal
    {
 
    } /* internal */
+#endif
 } /* vcuda */

@@ -11,6 +11,7 @@
 
 namespace vcuda
 {
+#ifdef CUDA
    namespace internal
    {
       typedef thrust::device_vector<double> RealArray;
@@ -73,6 +74,7 @@ namespace vcuda
       extern RealArray z_dipolar_field_array;
 
    } /* internal */
+#endif
 } /* vcuda */
 
 #endif

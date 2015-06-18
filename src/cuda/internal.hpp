@@ -104,8 +104,10 @@ namespace vcuda{
 	    double * x_ext_field, double * y_ext_field, double * z_ext_field,
 	    double * x_new_spin, double * y_new_spin, double z_new_spin
             );
-#endif
    } // end of iternal namespace
+
+#endif
+
 } // end of cuda namespace
 
 #endif //CUDA_INTERNAL_H_
