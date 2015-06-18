@@ -24,37 +24,6 @@ namespace cu = ::vcuda::internal;
 
 namespace vcuda {
 
-   //-------------------------------------------------------------------------------
-   // Function to initialize GPU data
-   //-------------------------------------------------------------------------------
-   bool initialize(){
 
-#ifdef CUDA
-
-      bool success = true;
-
-      success = success || cu::__initialize_atoms ();
-      success = success || cu::__initialize_fields ();
-      success = success || cu::__initialize_cells ();
-      success = success || cu::__initialize_materials ();
-      success = success || cu::__initialize_topology ();
-
-      // Successful initialization
-      return success;
-
-#else
-      // Default (initializtion failed)
-      return false;
-#endif
-   }
-
-   bool finalize()
-   {
-#ifdef CUDA
-      return cu::__finalize();
-#else
-      return false;
-#endif
-   }
 
 } // end of namespace cuda
