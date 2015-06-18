@@ -15,6 +15,7 @@
 // not be accessed outside of the local temperature pulse code.
 //---------------------------------------------------------------------
 
+#include <curand_kernel.h>
 #include <thrust/copy.h>
 #include <thrust/device_vector.h>
 
@@ -45,10 +46,15 @@ namespace vcuda{
          double anisotropy_unit_x;
          double anisotropy_unit_y;
          double anisotropy_unit_z;
+         double applied_field_strength;
+         double applied_field_unit_x;
+         double applied_field_unit_y;
+         double applied_field_unit_z;
          double Kc1_SI;
          double temperature;
          double temperature_rescaling_alpha;
          double temperature_rescaling_Tc;
+         double H_th_sigma;
       };
 
       struct heun_parameters_t {
@@ -95,8 +101,16 @@ namespace vcuda{
 
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
-            size_t * material, size_t * cell, material_parameters_t * material_params,
+            size_t * material, material_parameters_t * material_params,
             double * x_sp_field, double * y_sp_field, double * z_sp_field
+            );
+
+      __global__ void update_external_fields (
+            size_t * material, size_t * cell,
+            material_parameters_t * material_params,
+            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            double * x_ext_field, double * y_ext_field, double * z_ext_field,
+            curandState * rand_state
             );
 
       __global__ void llg_heun_first_kernel (

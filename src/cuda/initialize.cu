@@ -303,13 +303,11 @@ namespace vcuda{
 
       bool __initialize_materials ()
       {
+
          /*
-          * Allocate memory and send information about the materials
+          * Serialize material data
           */
-
          size_t num_mats = ::mp::num_materials;
-
-         cu::mp::materials.resize(num_mats);
          thrust::host_vector<material_parameters_t> _materials(num_mats);
          for (size_t i = 0; i < num_mats; i++)
          {
@@ -339,6 +337,14 @@ namespace vcuda{
                ::mp::material[i].UniaxialAnisotropyUnitVector[1];
             _materials[i].anisotropy_unit_z =
                ::mp::material[i].UniaxialAnisotropyUnitVector[2];
+            _materials[i].applied_field_strength =
+               ::mp::material[i].applied_field_strength;
+            _materials[i].applied_field_unit_x =
+               ::mp::material[i].applied_field_unit_vector[0];
+            _materials[i].applied_field_unit_y =
+               ::mp::material[i].applied_field_unit_vector[1];
+            _materials[i].applied_field_unit_z =
+               ::mp::material[i].applied_field_unit_vector[2];
             _materials[i].Kc1_SI =
                ::mp::material[i].Kc1_SI;
             _materials[i].temperature =
@@ -347,8 +353,14 @@ namespace vcuda{
                ::mp::material[i].temperature_rescaling_alpha;
             _materials[i].temperature_rescaling_Tc =
                ::mp::material[i].temperature_rescaling_Tc;
+            _materials[i].H_th_sigma =
+               ::mp::material[i].H_th_sigma;
          }
 
+         /*
+          * Allocate memory and send information about the materials
+          */
+         cu::mp::materials.resize(num_mats);
          thrust::copy(
             _materials.begin(),
             _materials.end(),

@@ -105,6 +105,81 @@ namespace cuda
 
       }
 
+      __global__ void update_external_fields (
+            size_t * material, size_t * cell,
+            vcuda::internal::material_parameters_t * material_params,
+            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            double * x_ext_field, double * y_ext_field, double * z_ext_field,
+            curandState * rand_state
+            )
+      {
+
+         /*
+          * Thread and material identification
+          */
+
+         size_t tid = blockIdx.x * blockDim.x + threadIdx.x;
+         size_t mid = material[tid];
+         vcuda::internal::material_parameters_t mat = material_params[mid];
+
+         double field_x = 0.0;
+         double field_y = 0.0;
+         double field_z = 0.0;
+
+         /*
+          * TODO: HAMR fields
+          */
+
+         /*
+          * Thermal fields
+          */
+
+         double temp = mat.temperature;
+         double alpha = mat.temperature_rescaling_alpha;
+         double sigma = mat.H_th_sigma;
+         double tc = mat.temperature_rescaling_Tc;
+         double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
+         double sq_temp = sqrt(resc_temp);
+
+         field_x += sigma * sq_temp * curand_normal_double (rand_state + tid);
+         field_y += sigma * sq_temp * curand_normal_double (rand_state + tid);
+         field_z += sigma * sq_temp * curand_normal_double (rand_state + tid);
+
+         /*
+          * Applied field
+          */
+
+         double norm_h = mat.applied_field_strength;
+         double hx = mat.applied_field_unit_x;
+         double hy = mat.applied_field_unit_y;
+         double hz = mat.applied_field_unit_z;
+
+         field_x += norm_h * hx;
+         field_y += norm_h * hy;
+         field_z += norm_h * hz;
+
+         /*
+          * TODO: FMR fields?
+          */
+
+         /*
+          * Dipolar fields
+          */
+
+         field_x += x_dip_field[tid];
+         field_y += y_dip_field[tid];
+         field_z += z_dip_field[tid];
+
+         /*
+          * Write back to main memory
+          */
+
+         x_ext_field[tid] += field_x;
+         y_ext_field[tid] += field_y;
+         z_ext_field[tid] += field_z;
+
+      }
+
    } /* internal */
 #endif
 } /* cuda */
