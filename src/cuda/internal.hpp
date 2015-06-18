@@ -71,7 +71,7 @@ namespace vcuda{
       /*
        * Clean up function
        */
-      bool __finalize ();
+      void __finalize ();
 
       /*
        * Shared functors for thrust
