@@ -3,32 +3,34 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2014. All rights reserved.
+// (c) R F L Evans 2015. All rights reserved.
 //
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
 
 // Vampire headers
-#include "gpu.hpp"
 #include "cuda.hpp"
-#include "errors.hpp"
-//#include "opencl.hpp"
 
-namespace gpu{
+// Local cuda headers
+#include "internal.hpp"
+
+namespace vcuda{
 
    //--------------------------------------------------------------------------
-   // Function to call correct llg_heun function depending on cuda,opencl etc
+   // Function to perform a single heun step
    //--------------------------------------------------------------------------
    void llg_heun(){
 
+
       #ifdef CUDA
-         vcuda::llg_heun();
-      #elif OPENCL
-         opencl::llg_heun();
+      /* set up and call the kernels */
+      /* assume that you have the data already
+       * in the device */
+
       #endif
 
       return;
    }
 
-} // end of namespace gpu
+} // end of namespace cuda

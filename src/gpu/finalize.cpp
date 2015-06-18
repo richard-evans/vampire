@@ -24,7 +24,7 @@ namespace gpu{
 
       #ifdef CUDA
          vcuda::finalize();
-      #elseif OPENCL
+      #elif OPENCL
          opencl::finalize();
       #endif
 

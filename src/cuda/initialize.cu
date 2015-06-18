@@ -16,6 +16,8 @@
 #include "../../hdr/cuda.hpp"
 
 // Local cuda headers
+#include "cuda.hpp"
+
 #include "data.hpp"
 #include "internal.hpp"
 

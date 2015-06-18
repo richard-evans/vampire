@@ -15,25 +15,15 @@
 // Local cuda headers
 #include "internal.hpp"
 
-namespace cuda{
+namespace vcuda{
 
-   //--------------------------------------------------------------------------
-   // Function to perform a single heun step
-   //--------------------------------------------------------------------------
-   void llg_heun(){
+   //----------------------------------------------------------------------------------
+   // Function de-initialize gpu data
+   //----------------------------------------------------------------------------------
+   void finalize(){
 
+      // Only compile code if CUDA enabled
       #ifdef CUDA
-      /* set up and call the kernels */
-      /* assume that you have the data already
-       * in the device */
-
-      llg_heun_first_kernel <<< thin, thang >>> (
-            /*
-               cuda::internal::spins,
-               cuda::internal::other_stuff,
-               ...
-            */
-            );
 
       #endif
 

@@ -24,7 +24,8 @@ export LC_ALL=C
 
 # LIBS
 LIBS=-lstdc++
-CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
+CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart
+
 # Debug Flags
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
@@ -275,14 +276,20 @@ $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
 
 # cuda targets
-gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS)
-	$(ICC) $(ICC_LDFLAGS) $(LIBS)  $(CUDALIBS) $(CUDA_OBJECTS) obj/cuda/LLG_cuda.o -o $(EXECUTABLE)
+#gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS)
+#	$(ICC) $(ICC_LDFLAGS) $(LIBS)  $(CUDALIBS) $(CUDA_OBJECTS) obj/cuda/LLG_cuda.o -o $(EXECUTABLE)
+#
+#$(CUDA_OBJECTS): obj/%_cuda.o: src/%.cu
+#	$(ICC) -c -o $@ $(ICC_CFLAGS) -DCUDA $<
+#
+#obj/cuda/LLG_cuda.o : src/cuda/LLG_cuda.cu
+#	nvcc -I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3  -c $< -o $@
 
-$(CUDA_OBJECTS): obj/%_cuda.o: src/%.cu
-	$(ICC) -c -o $@ $(ICC_CFLAGS) -DCUDA $<
 
-obj/cuda/LLG_cuda.o : src/cuda/LLG_cuda.cu
-	nvcc -I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3  -c $< -o $@
+
+
+
+
 
 clean:
 	@rm -f obj/*.o

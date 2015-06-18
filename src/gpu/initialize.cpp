@@ -29,7 +29,7 @@ namespace gpu{
 
        #ifdef CUDA
          initialized = vcuda::initialize();
-      #elseif OPENCL
+      #elif OPENCL
          initialized = opencl::initialize();
       #endif
 
