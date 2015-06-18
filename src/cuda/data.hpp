@@ -3,6 +3,7 @@
 
 #include <thrust/copy.h>
 #include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
 
 /*
  * Provide the definition for the material_t class

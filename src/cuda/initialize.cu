@@ -15,7 +15,7 @@
 #include "../../hdr/atoms.hpp"
 
 // Local cuda headers
-#include "cuda.hpp"
+#include "../../hdr/cuda.hpp"
 
 #include "data.hpp"
 #include "internal.hpp"
@@ -46,15 +46,6 @@ namespace vcuda{
 
 #else
       // Default (initializtion failed)
-      return false;
-#endif
-   }
-
-   bool finalize()
-   {
-#ifdef CUDA
-      return cu::__finalize();
-#else
       return false;
 #endif
    }
