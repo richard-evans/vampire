@@ -35,6 +35,15 @@ namespace vcuda{
 
       bool success = true;
 
+      /*
+       * Set the block_size according to the number of atoms
+       */
+
+      size_t _grid_size = ::atoms::num_atoms / cu::block_size + 1UL;
+
+      if (_grid_size < cu::grid_size)
+         cu::grid_size = _grid_size;
+
       success = success || cu::__initialize_atoms ();
       success = success || cu::__initialize_fields ();
       success = success || cu::__initialize_cells ();
@@ -409,16 +418,13 @@ namespace vcuda{
 
       bool __initialize_curand ()
       {
-         size_t blockSize = 256UL;
-         size_t gridSize = ::atoms::num_atoms / blockSize + 1UL;
-
          cudaMalloc (
                (void **) &cu::d_rand_state,
-               blockSize * gridSize * sizeof(curandState));
+               cu::grid_size * cu::block_size * sizeof(curandState));
          /*
           * TODO: check this call.
           */
-         cu::init_rng <<< gridSize, blockSize >>> (cu::d_rand_state, 919);
+         cu::init_rng <<< cu::grid_size, cu::block_size >>> (cu::d_rand_state, 919);
          /*
           * TODO: Use the vampire seed.
           */

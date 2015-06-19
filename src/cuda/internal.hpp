@@ -32,6 +32,18 @@ namespace vcuda{
 #ifdef CUDA
 
    namespace internal{
+
+      /*
+       * Thread launch parameters
+       */
+
+      extern size_t block_size;
+      extern size_t grid_size;
+
+      /*
+       * Internal data structures
+       */
+
       struct material_parameters_t {
          double alpha;
          double gamma_rel;
