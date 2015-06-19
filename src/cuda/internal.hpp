@@ -117,7 +117,8 @@ namespace vcuda{
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
             size_t * material, material_parameters_t * material_params,
-            double * x_sp_field, double * y_sp_field, double * z_sp_field
+            double * x_sp_field, double * y_sp_field, double * z_sp_field,
+            size_t num_atoms
             );
 
       __global__ void update_external_fields (
@@ -125,7 +126,16 @@ namespace vcuda{
             material_parameters_t * material_params,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
-            curandState * rand_state
+            curandState * rand_state,
+            size_t num_atoms
+            );
+
+      __global__ void update_cell_magnetization (
+            double * x_spin, double * y_spin, double * z_spin,
+            size_t * material, size_t * cell,
+            material_parameters_t * material_params,
+            double * x_mag, double * y_mag, double * z_mag,
+            size_t num_atoms
             );
 
       __global__ void llg_heun_first_kernel (

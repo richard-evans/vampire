@@ -47,6 +47,10 @@ namespace vcuda
          extern RealArray y_mag_array;
          extern RealArray z_mag_array;
 
+         extern RealArray x_field_array;
+         extern RealArray y_field_array;
+         extern RealArray z_field_array;
+
          extern RealArray volume_array;
 
          extern IndexArray num_atoms;

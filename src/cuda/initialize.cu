@@ -289,6 +289,32 @@ namespace vcuda{
                );
 
          /*
+          * Allocate memory and initialize cell fields
+          */
+
+         cu::cells::x_field_array.resize(::cells::num_cells);
+         cu::cells::y_field_array.resize(::cells::num_cells);
+         cu::cells::z_field_array.resize(::cells::num_cells);
+
+         thrust::copy(
+               ::cells::x_field_array.begin(),
+               ::cells::x_field_array.end(),
+               cu::cells::x_field_array.begin()
+               );
+
+         thrust::copy(
+               ::cells::y_field_array.begin(),
+               ::cells::y_field_array.end(),
+               cu::cells::y_field_array.begin()
+               );
+
+         thrust::copy(
+               ::cells::z_field_array.begin(),
+               ::cells::z_field_array.end(),
+               cu::cells::z_field_array.begin()
+               );
+
+         /*
           * Copy volume and number of atoms for each cell
           */
 

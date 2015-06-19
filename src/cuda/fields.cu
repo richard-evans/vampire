@@ -152,9 +152,12 @@ namespace cuda
             double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
             double sq_temp = sqrt(resc_temp);
 
-            field_x += sigma * sq_temp * curand_normal_double (rand_state + tid);
-            field_y += sigma * sq_temp * curand_normal_double (rand_state + tid);
-            field_z += sigma * sq_temp * curand_normal_double (rand_state + tid);
+            field_x += sigma * sq_temp * curand_normal_double (
+                  rand_state + tid);
+            field_y += sigma * sq_temp * curand_normal_double (
+                  rand_state + tid);
+            field_z += sigma * sq_temp * curand_normal_double (
+                  rand_state + tid);
 
             /*
              * Applied field
@@ -192,6 +195,35 @@ namespace cuda
          }
       }
 
+      __global__ void update_cell_magnetization (
+            double * x_spin, double * y_spin, double * z_spin,
+            size_t * material, size_t * cell,
+            material_parameters_t * material_params,
+            double * x_mag, double * y_mag, double * z_mag,
+            size_t num_atoms
+            )
+      {
+         /*
+          * TODO: This is an supremely naïve implementation
+          *       the number of cells can be as big as the number of atoms
+          *       so might as well leave it like this
+          */
+
+         size_t tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+               i < n_atoms;
+               i += blockDim.x * gridDim.x)
+         {
+            size_t mid = material[i];
+            size_t cid = cell[i];
+            double mu_s = material_params[mid].mu_s_SI;
+            atomicAdd(&x_mag[cid], x_spin[i] * mu_s);
+            atomicAdd(&y_mag[cid], y_spin[i] * mu_s);
+            atomicAdd(&z_mag[cid], z_spin[i] * mu_s);
+         }
+
+      }
    } /* internal */
 #endif
 } /* cuda */
