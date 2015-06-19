@@ -109,6 +109,12 @@ namespace vcuda{
       };
 
       /*
+       * Shared device functions
+       */
+
+      __device__ double atomicAdd (double * address, double value);
+
+      /*
        * Shared kernel definitions
        */
 

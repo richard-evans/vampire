@@ -14,8 +14,7 @@ namespace cuda
             size_t n_atoms
             )
       {
-         size_t tid = blockIdx.x * blockDim.x + threadIdx.x;
-         for ( size_t i = tid;
+         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
                i < n_atoms;
                i += blockDim.x * gridDim.x)
          {
@@ -125,7 +124,7 @@ namespace cuda
 
          size_t tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+         for ( size_t i = tid;
                i < n_atoms;
                i += blockDim.x * gridDim.x)
          {
@@ -195,12 +194,25 @@ namespace cuda
          }
       }
 
+      __device__ double atomicAdd (double * address, double value)
+      {
+         unsigned long long int * address_as_ull = (unsigned long long int *) address;
+         unsigned long long int old = *address_as_ull;
+         unsigned long long int assumed;
+         do {
+            assumed = old;
+            old = atomicCAS(address_as_ull, assumed,
+                  __double_as_longlong(value + __longlong_as_double(assumed)));
+         } while (assumed != old);
+         return __longlong_as_double(old);
+      }
+
       __global__ void update_cell_magnetization (
             double * x_spin, double * y_spin, double * z_spin,
             size_t * material, size_t * cell,
-            material_parameters_t * material_params,
+            vcuda::internal::material_parameters_t * material_params,
             double * x_mag, double * y_mag, double * z_mag,
-            size_t num_atoms
+            size_t n_atoms
             )
       {
          /*
@@ -208,8 +220,6 @@ namespace cuda
           *       the number of cells can be as big as the number of atoms
           *       so might as well leave it like this
           */
-
-         size_t tid = blockIdx.x * blockDim.x + threadIdx.x;
 
          for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
                i < n_atoms;
