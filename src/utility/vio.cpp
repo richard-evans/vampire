@@ -289,7 +289,7 @@ int match_dimension(std::string const, std::string const, std::string const, int
 int match_sim(std::string const, std::string const, std::string const, int const);
 int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-int match_material(string const, string const, string const, int const, int const, int const);
+int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
 int match_config(string const, string const, int const);
 
 // Function to extract all variables from a string and return a vector
@@ -2747,6 +2747,9 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		std::string line;
 		getline(inputfile,line);
 
+		// save a copy of the line before stripping characters in case of error
+		std::string original_line = line;
+
 		// Clear whitespace, quotes and tabs
 		line.erase(remove(line.begin(), line.end(), '\t'), line.end());
 		line.erase(remove(line.begin(), line.end(), ' '), line.end());
@@ -2903,7 +2906,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
-			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
+		  int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
 			if(matchcheck==EXIT_FAILURE){
 				err::vexit();
 			}
@@ -2932,7 +2935,15 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 ///-------------------------------------------------------------------
 /// Function to match material key words
 ///-------------------------------------------------------------------
-int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
+  int match_material(string const word,
+		     string const value,
+		     string const unit,
+		     int const line,
+		     int const super_index,
+		     int const sub_index,
+		     std::string const line_string,
+		     std::string const filename_string)
+  {
       std::string prefix="material:";
       //------------------------------------------------------------
       std::string test="num-materials";
@@ -3795,17 +3806,18 @@ int match_material(string const word, string const value, string const unit, int
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
-		//--------------------------------------------------------------------
-		// keyword not found
-		//--------------------------------------------------------------------
-		else{
-			terminaltextcolor(RED);
-			std::cerr << "Error - Unknown control statement \'material[" << super_index+1 << "]:" << word << "\' on line " << line << " of material file" << std::endl;
-			terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-		}
-		
 	return EXIT_SUCCESS;
+      //--------------------------------------------------------------------
+      // keyword not found
+      //--------------------------------------------------------------------
+      else{
+	terminaltextcolor(RED);
+	std::cerr << "Error - Unknown control statement '" << line_string << "' on line " << line << " of material file '" << filename_string << "'" << std::endl;
+	terminaltextcolor(WHITE);
+	zlog << zTs() << "Error - Unknown control statement '" << line_string << " on line " << line << " of material file '" << filename_string << "'" << std::endl;
+	return EXIT_FAILURE;
+      }
+      return EXIT_SUCCESS;
 }
 
 
