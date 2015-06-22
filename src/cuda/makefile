@@ -18,7 +18,7 @@ cuda_objects= \
 # The device linked object for CUDA
 CUDA_DLINK= obj/cuda/vampire_cuda.o
 
-CUDA_CFLAGS= -I./hdr -DCUDA
+CUDA_CFLAGS= -I./hdr -DCUDA -rdc=true
 
 $(cuda_objects): obj/%.o: src/%.cu
 	nvcc -arch=sm_20 $< -c -o $@ -DCUDA $(CUDA_CFLAGS)

@@ -1,5 +1,9 @@
 #include "internal.hpp"
 
+#ifdef CUDA
+namespace cu = vcuda::internal;
+#endif
+
 namespace cuda
 {
 #ifdef CUDA
@@ -130,7 +134,7 @@ namespace cuda
          {
 
             size_t mid = material[i];
-            vcuda::internal::material_parameters_t mat = material_params[mid];
+            cu::material_parameters_t mat = material_params[mid];
 
             double field_x = 0.0;
             double field_y = 0.0;
@@ -194,19 +198,6 @@ namespace cuda
          }
       }
 
-      __device__ double atomicAdd (double * address, double value)
-      {
-         unsigned long long int * address_as_ull = (unsigned long long int *) address;
-         unsigned long long int old = *address_as_ull;
-         unsigned long long int assumed;
-         do {
-            assumed = old;
-            old = atomicCAS(address_as_ull, assumed,
-                  __double_as_longlong(value + __longlong_as_double(assumed)));
-         } while (assumed != old);
-         return __longlong_as_double(old);
-      }
-
       __global__ void update_cell_magnetization (
             double * x_spin, double * y_spin, double * z_spin,
             size_t * material, size_t * cell,
@@ -228,12 +219,69 @@ namespace cuda
             size_t mid = material[i];
             size_t cid = cell[i];
             double mu_s = material_params[mid].mu_s_SI;
-            atomicAdd(&x_mag[cid], x_spin[i] * mu_s);
-            atomicAdd(&y_mag[cid], y_spin[i] * mu_s);
-            atomicAdd(&z_mag[cid], z_spin[i] * mu_s);
+            cu::atomicAdd(&x_mag[cid], x_spin[i] * mu_s);
+            cu::atomicAdd(&y_mag[cid], y_spin[i] * mu_s);
+            cu::atomicAdd(&z_mag[cid], z_spin[i] * mu_s);
          }
-
       }
+
+      __global__ void update_dipolar_fields (
+            double * x_mag, double * y_mag, double * z_mag,
+            double * x_coord, double * y_coord, double * z_coord,
+            double * volume, double prefactor,
+            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            size_t n_cells
+            )
+      {
+         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+               i < n_cells;
+               i += blockDim.x * gridDim.x)
+         {
+            double mx = x_mag[i];
+            double my = y_mag[i];
+            double mz = z_mag[i];
+            double cx = x_coord[i];
+            double cy = y_coord[i];
+            double cz = z_coord[i];
+            /*
+             * Inverse volume from the number of atoms in macro-cell
+             */
+            double vol_prefac = - 4.0 * M_PI / (3.0 * volume[i]);
+
+            double field_x = vol_prefac * mx;
+            double field_y = vol_prefac * my;
+            double field_z = vol_prefac * mz;
+
+            for (size_t j = 0; j < n_cells; j++)
+            {
+               if (i == j) continue;
+               double omx = x_mag[i];
+               double omy = y_mag[i];
+               double omz = z_mag[i];
+
+               double dx = x_coord[j] - cx;
+               double dy = y_coord[j] - cy;
+               double dz = z_coord[j] - cz;
+
+               double drij = 1.0 / sqrtf (dx * dx + dy * dy + dz * dz);
+               double drij3 = drij * drij * drij;
+
+               double sdote = (
+                     omx * dx * drij +
+                     omy * dy * drij +
+                     omz * dz * drij);
+
+               field_x += (3.0 * sdote * dx * drij - omx) * drij3;
+               field_y += (3.0 * sdote * dy * drij - omy) * drij3;
+               field_z += (3.0 * sdote * dz * drij - omz) * drij3;
+            }
+
+            x_dip_field[i] = prefactor * field_x;
+            y_dip_field[i] = prefactor * field_y;
+            z_dip_field[i] = prefactor * field_z;
+         }
+      }
+
    } /* internal */
 #endif
 } /* cuda */

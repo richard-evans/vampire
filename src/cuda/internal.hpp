@@ -144,6 +144,12 @@ namespace vcuda{
             size_t num_atoms
             );
 
+      __global__ void update_dipolar_fields (
+            double * x_mag, double * y_mag, double * z_mag,
+            double * x_coord, double * y_coord, double * z_coord,
+            double * volume, double prefactor, size_t n_cells
+            );
+
       __global__ void llg_heun_first_kernel (
             double * x_spin, double * y_spin, double * z_spin,
             double * x_sp_field, double * y_sp_field, double * z_sp_field,
@@ -151,11 +157,11 @@ namespace vcuda{
             double dt
             );
 
-     __global__ void llg_heun_scheme(
-	    double * x_spin, double * y_spin, double * z_spin,
-	    double * x_sp_field, double * y_sp_field, double * z_sp_field,
-	    double * x_ext_field, double * y_ext_field, double * z_ext_field,
-	    double * x_new_spin, double * y_new_spin, double z_new_spin
+      __global__ void llg_heun_scheme(
+            double * x_spin, double * y_spin, double * z_spin,
+            double * x_sp_field, double * y_sp_field, double * z_sp_field,
+            double * x_ext_field, double * y_ext_field, double * z_ext_field,
+            double * x_new_spin, double * y_new_spin, double z_new_spin
             );
    } // end of iternal namespace
 
