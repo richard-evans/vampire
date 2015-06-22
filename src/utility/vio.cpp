@@ -841,13 +841,14 @@ int match(string const key, string const word, string const value, string const 
 		//-------------------------------------------------------------------
 		test="unit-cell-file";
 		if(word==test){
-			std::string matfile=value;
+			std::string ucffile=value;
 			// strip quotes
-			matfile.erase(remove(matfile.begin(), matfile.end(), '\"'), matfile.end());
+			ucffile.erase(remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
 			test="";
-			if(matfile!=test){
+			// if filename not blank set ucf file name
+			if(ucffile!=test){
 				//std::cout << matfile << std::endl;
-				cs::unit_cell_file=matfile;
+				cs::unit_cell_file=ucffile;
 				return EXIT_SUCCESS;
 			}
 			else{
