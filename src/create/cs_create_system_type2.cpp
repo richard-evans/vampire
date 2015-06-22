@@ -534,7 +534,8 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
     }
     tmp_catom_array.resize(0);
 
-    std::cout << cs::non_magnetic_atoms_array.size() << " non-magnetic atoms identified" << std::endl;
+    zlog << zTs() << "Removed " << cs::non_magnetic_atoms_array.size() << " non-magnetic atoms from system" << std::endl;
+
   }
 
   return;
