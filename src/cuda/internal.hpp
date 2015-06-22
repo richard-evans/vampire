@@ -17,8 +17,9 @@
 
 #include <curand_kernel.h>
 #include <thrust/copy.h>
-#include <thrust/device_vector.h>
+#include <thrust/fill.h>
 #include <thrust/device_ptr.h>
+#include <thrust/device_vector.h>
 
 /*
  * requesting data strcutures from the main program

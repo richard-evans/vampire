@@ -13,6 +13,27 @@ namespace vcuda
 
       void update_spin_fields ()
       {
+         /*
+          * Fill the field vectors with zero
+          */
+
+         thrust::fill(
+               cu::x_total_spin_field_array.begin(),
+               cu::x_total_spin_field_array.end(),
+               0.0);
+         thrust::fill(
+               cu::y_total_spin_field_array.begin(),
+               cu::y_total_spin_field_array.end(),
+               0.0);
+         thrust::fill(
+               cu::z_total_spin_field_array.begin(),
+               cu::z_total_spin_field_array.end(),
+               0.0);
+
+         /*
+          * Find the addresses in the device address space
+          */
+
          double * d_x_spin = thrust::raw_pointer_cast(
                cu::atoms::x_spin_array.data());
          double * d_y_spin = thrust::raw_pointer_cast(
