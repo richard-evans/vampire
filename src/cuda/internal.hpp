@@ -18,6 +18,7 @@
 #include <curand_kernel.h>
 #include <thrust/copy.h>
 #include <thrust/device_vector.h>
+#include <thrust/device_ptr.h>
 
 /*
  * requesting data strcutures from the main program
@@ -94,6 +95,14 @@ namespace vcuda{
        * Clean up function
        */
       void __finalize ();
+
+
+      /*
+       * Field updates
+       */
+
+      void update_spin_fields ();
+      void update_external_fields ();
 
       /*
        * Shared functors for thrust

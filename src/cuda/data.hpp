@@ -10,6 +10,10 @@
  */
 #include "internal.hpp"
 
+#ifdef CUDA
+namespace cu = ::vcuda::internal;
+#endif
+
 namespace vcuda
 {
 #ifdef CUDA
@@ -17,7 +21,8 @@ namespace vcuda
    {
       typedef thrust::device_vector<double> RealArray;
       typedef thrust::device_vector<size_t> IndexArray;
-      typedef thrust::device_vector<material_parameters_t> MaterialParametersArray;
+      typedef thrust::device_vector<cu::material_parameters_t>
+         MaterialParametersArray;
 
       namespace atoms
       {

@@ -1,19 +1,49 @@
 #include "internal.hpp"
+#include "data.hpp"
 
 #ifdef CUDA
 namespace cu = vcuda::internal;
 #endif
 
-namespace cuda
+namespace vcuda
 {
 #ifdef CUDA
    namespace internal
    {
 
+      void update_spin_fields ()
+      {
+         double * d_x_spin = thrust::raw_pointer_cast(
+               cu::atoms::x_spin_array.data());
+         double * d_y_spin = thrust::raw_pointer_cast(
+               cu::atoms::y_spin_array.data());
+         double * d_z_spin = thrust::raw_pointer_cast(
+               cu::atoms::z_spin_array.data());
+
+         size_t * d_materials =
+            thrust::raw_pointer_cast(cu::atoms::type_array.data());
+
+         cu::material_parameters_t * d_material_params =
+            thrust::raw_pointer_cast (cu::mp::materials.data());
+
+         double * d_x_spin_field = thrust::raw_pointer_cast(
+               cu::x_total_spin_field_array.data());
+         double * d_y_spin_field = thrust::raw_pointer_cast(
+               cu::y_total_spin_field_array.data());
+         double * d_z_spin_field = thrust::raw_pointer_cast(
+               cu::z_total_spin_field_array.data());
+
+         cu::update_non_exchange_spin_fields <<< cu::grid_size, cu::block_size >>> (
+               d_x_spin, d_y_spin, d_y_spin,
+               d_materials, d_material_params,
+               d_x_spin_field, d_y_spin_field, d_z_spin_field,
+               ::atoms::num_atoms);
+      }
+
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
             size_t * material,
-            vcuda::internal::material_parameters_t * material_params,
+            cu::material_parameters_t * material_params,
             double * x_sp_field, double * y_sp_field, double * z_sp_field,
             size_t n_atoms
             )
