@@ -3806,7 +3806,24 @@ int read_mat_file(std::string const matfile, int const LineNumber){
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
+      //--------------------------------------------------------------------
+      test="non-magnetic";
+      /*
+        logical non-magnetic [false]
+           This flag causes the material to be identified as non magnetic,
+           with all atoms removed of this type emoved from the simulation.
+	   The atomic positions of non-magnetic atoms are saved separately
+	   with the usual atomic spin configuration for post processing.
+	   The default value is false for all materials. Valid values are
+	   true, false or (blank) [same as true].
+      */
+      if(word==test){
+	// Test for sane input
+	bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
+	// set flag
+	read_material[super_index].non_magnetic = sanitised_bool;
 	return EXIT_SUCCESS;
+      }
       //--------------------------------------------------------------------
       // keyword not found
       //--------------------------------------------------------------------

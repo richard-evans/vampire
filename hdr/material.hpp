@@ -166,7 +166,8 @@ using std::string;
 		bool fill; /// flag to determine of material fills voided space
       double temperature_rescaling_alpha; // temperature rescaling exponent
       double temperature_rescaling_Tc; // temperaure rescaling Tc
-     lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
+	  bool non_magnetic;
+	  lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
 		
 		materials_t();
 		int print();
