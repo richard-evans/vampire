@@ -61,6 +61,58 @@ namespace vcuda
                ::atoms::num_atoms);
       }
 
+      void update_external_fields ()
+      {
+
+         thrust::fill(
+               cu::x_total_external_field_array.begin(),
+               cu::x_total_external_field_array.end(),
+               0.0);
+         thrust::fill(
+               cu::y_total_external_field_array.begin(),
+               cu::y_total_external_field_array.end(),
+               0.0);
+         thrust::fill(
+               cu::z_total_external_field_array.begin(),
+               cu::z_total_external_field_array.end(),
+               0.0);
+
+         /*
+          * Find the addresses in the device address space
+          */
+
+         size_t * d_materials =
+            thrust::raw_pointer_cast(cu::atoms::type_array.data());
+
+         cu::material_parameters_t * d_material_params =
+            thrust::raw_pointer_cast (cu::mp::materials.data());
+
+         size_t * d_cells =
+            thrust::raw_pointer_cast(cu::atoms::cell_array.data());
+
+         double * d_x_dip_field = thrust::raw_pointer_cast(
+               cu::x_dipolar_field_array.data());
+         double * d_y_dip_field = thrust::raw_pointer_cast(
+               cu::y_dipolar_field_array.data());
+         double * d_z_dip_field = thrust::raw_pointer_cast(
+               cu::z_dipolar_field_array.data());
+
+         double * d_x_ext_field = thrust::raw_pointer_cast(
+               cu::x_total_external_field_array.data());
+         double * d_y_ext_field = thrust::raw_pointer_cast(
+               cu::y_total_external_field_array.data());
+         double * d_z_ext_field = thrust::raw_pointer_cast(
+               cu::z_total_external_field_array.data());
+
+         cu::update_external_fields <<< cu::grid_size, cu::block_size >>> (
+               d_materials,
+               d_cells,
+               d_material_params,
+               d_x_dip_field, d_y_dip_field, d_z_dip_field,
+               d_x_ext_field, d_y_ext_field, d_z_ext_field,
+               cu::d_rand_state, ::atoms::num_atoms);
+      }
+
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
             size_t * material,
@@ -90,31 +142,13 @@ namespace vcuda
             double ku = material_params[mid].ku;
             field_z -= 2.0 * ku * sz;
 
-            /*
-             * Second order uniaxial anisotropy
-             */
-
-            double ku2 = 4.0 * material_params[mid].ku2;
-
             double ex = material_params[mid].anisotropy_unit_x;
             double ey = material_params[mid].anisotropy_unit_y;
             double ez = material_params[mid].anisotropy_unit_z;
 
             double sdote = sx * ex + sy * ey + sz * ez;
             double sdote3 = sdote * sdote * sdote;
-            field_x -= ku2 * ex * sdote3;
-            field_y -= ku2 * ey * sdote3;
-            field_z -= ku2 * ez * sdote3;
-
-            /*
-             * Sixth order o¿uniaxial anisotropy
-             */
-
-            double ku3 = 6.0 * material_params[mid].ku3;
             double sdote5 = sdote3 * sdote * sdote;
-            field_x -= ku3 * ex * sdote5;
-            field_y -= ku3 * ey * sdote5;
-            field_z -= ku3 * ez * sdote5;
 
             /*
              * Spherical harmonics
@@ -122,10 +156,9 @@ namespace vcuda
 
             double scale = 0.6666666666666667;
 
-            double mu_s_si = material_params[mid].mu_s_SI;
-            double k2 = material_params[mid].sh2 / mu_s_si;
-            double k4 = material_params[mid].sh4 / mu_s_si;
-            double k6 = material_params[mid].sh6 / mu_s_si;
+            double k2 = material_params[mid].sh2;
+            double k4 = material_params[mid].sh4;
+            double k6 = material_params[mid].sh6;
 
             double ek2 = k2 * 3.0 * sdote;
             double ek4 = k4 * 0.125 * (140.0 * sdote3 - 60.0 *sdote);
@@ -138,10 +171,17 @@ namespace vcuda
 
             /*
              * Lattice anisotropy
+             */
+
+            /*
              * TODO: add the temperature dependence
              */
 
-            double k_latt = 2.0 * material_params[mid].Klatt_SI / mu_s_si;
+            /*
+             * TODO: communicate every timestep
+             */
+
+            double k_latt = 2.0 * material_params[mid].k_latt;
             field_x -= k_latt * ex * sdote;
             field_y -= k_latt * ey * sdote;
             field_z -= k_latt * ez * sdote;
@@ -165,7 +205,8 @@ namespace vcuda
       }
 
       __global__ void update_external_fields (
-            size_t * material, size_t * cell,
+            size_t *  material,
+            size_t * cell,
             vcuda::internal::material_parameters_t * material_params,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
@@ -269,7 +310,7 @@ namespace vcuda
          {
             size_t mid = material[i];
             size_t cid = cell[i];
-            double mu_s = material_params[mid].mu_s_SI;
+            double mu_s = material_params[mid].mu_s_si;
             cu::atomicAdd(&x_mag[cid], x_spin[i] * mu_s);
             cu::atomicAdd(&y_mag[cid], y_spin[i] * mu_s);
             cu::atomicAdd(&z_mag[cid], z_spin[i] * mu_s);

@@ -73,6 +73,10 @@ namespace vcuda{
          cu::x_dipolar_field_array.RealArray::~device_vector ();
          cu::y_dipolar_field_array.RealArray::~device_vector ();
          cu::z_dipolar_field_array.RealArray::~device_vector ();
+
+         cu::llg::x_spin_prima_array.RealArray::~device_vector ();
+         cu::llg::y_spin_prima_array.RealArray::~device_vector ();
+         cu::llg::z_spin_prima_array.RealArray::~device_vector ();
       }
    } /* internal */
 #endif

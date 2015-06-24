@@ -35,6 +35,8 @@ namespace vcuda{
 
    namespace internal{
 
+      typedef double RealType;
+
       /*
        * Thread launch parameters
        */
@@ -49,14 +51,13 @@ namespace vcuda{
       struct material_parameters_t {
          double alpha;
          double gamma_rel;
-         double mu_s_SI;
-         double Klatt_SI;
+         double mu_s_si;
+         double i_mu_s_si;
+         double k_latt;
          double sh2;
          double sh4;
          double sh6;
          double ku;
-         double ku2;
-         double ku3;
          double anisotropy_unit_x;
          double anisotropy_unit_y;
          double anisotropy_unit_z;
