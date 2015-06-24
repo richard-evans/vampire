@@ -13,9 +13,10 @@
 
 // Vampire headers
 #include "../../hdr/atoms.hpp"
+#include "../../hdr/cuda.hpp"
+#include "../../hdr/random.hpp"
 
 // Local cuda headers
-#include "../../hdr/cuda.hpp"
 
 #include "data.hpp"
 #include "internal.hpp"
@@ -347,26 +348,26 @@ namespace vcuda{
          thrust::host_vector<material_parameters_t> _materials(num_mats);
          for (size_t i = 0; i < num_mats; i++)
          {
+            double mu_s_SI = ::mp::material[i].mu_s_SI;
+
             _materials[i].alpha =
                ::mp::material[i].alpha;
             _materials[i].gamma_rel =
                ::mp::material[i].gamma_rel;
-            _materials[i].mu_s_SI =
-               ::mp::material[i].mu_s_SI;
-            _materials[i].Klatt_SI =
-               ::mp::material[i].Klatt_SI;
+            _materials[i].mu_s_si =
+               mu_s_SI;
+            _materials[i].i_mu_s_si =
+               1.0 / mu_s_SI;
+            _materials[i].k_latt =
+               ::mp::material[i].Klatt_SI / mu_s_SI;
             _materials[i].sh2 =
-               ::mp::material[i].sh2;
+               ::mp::material[i].sh2 / mu_s_SI;
             _materials[i].sh4 =
-               ::mp::material[i].sh4;
+               ::mp::material[i].sh4 / mu_s_SI;
             _materials[i].sh6 =
-               ::mp::material[i].sh6;
+               ::mp::material[i].sh6 / mu_s_SI;
             _materials[i].ku =
                ::mp::material[i].Ku;
-            _materials[i].ku2 =
-               ::mp::material[i].Ku2;
-            _materials[i].ku3 =
-               ::mp::material[i].Ku3;
             _materials[i].anisotropy_unit_x =
                ::mp::material[i].UniaxialAnisotropyUnitVector[0];
             _materials[i].anisotropy_unit_y =
@@ -450,7 +451,8 @@ namespace vcuda{
          /*
           * TODO: check this call.
           */
-         cu::init_rng <<< cu::grid_size, cu::block_size >>> (cu::d_rand_state, ::sim::integration_seed);
+         cu::init_rng <<< cu::grid_size, cu::block_size >>> (
+               cu::d_rand_state, ::mtrandom::integration_seed);
          /*
           * TODO: Check this call.
           */
