@@ -77,7 +77,7 @@ namespace vcuda{
           */
          double prefactor;
          /**
-          * @var alpha * prefactor
+          * @var lambda * prefactor
           */
          double lambda_times_prefactor;
       };
