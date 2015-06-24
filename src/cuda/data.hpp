@@ -89,6 +89,13 @@ namespace vcuda
 
       extern curandState * d_rand_state;
 
+      namespace llg
+      {
+         extern RealArray x_spin_prima_array;
+         extern RealArray y_spin_prima_array;
+         extern RealArray z_spin_prima_array;
+      } /* llg */
+
    } /* internal */
 #endif
 } /* vcuda */

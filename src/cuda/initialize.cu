@@ -44,12 +44,12 @@ namespace vcuda{
       if (_grid_size < cu::grid_size)
          cu::grid_size = _grid_size;
 
-      success = success || cu::__initialize_atoms ();
-      success = success || cu::__initialize_fields ();
-      success = success || cu::__initialize_cells ();
-      success = success || cu::__initialize_materials ();
-      success = success || cu::__initialize_topology ();
-      success = success || cu::__initialize_curand ();
+      success = success && cu::__initialize_atoms ();
+      success = success && cu::__initialize_fields ();
+      success = success && cu::__initialize_cells ();
+      success = success && cu::__initialize_materials ();
+      success = success && cu::__initialize_topology ();
+      success = success && cu::__initialize_curand ();
 
       // Successful initialization
       return success;
@@ -450,10 +450,7 @@ namespace vcuda{
          /*
           * TODO: check this call.
           */
-         cu::init_rng <<< cu::grid_size, cu::block_size >>> (cu::d_rand_state, 919);
-         /*
-          * TODO: Use the vampire seed.
-          */
+         cu::init_rng <<< cu::grid_size, cu::block_size >>> (cu::d_rand_state, ::sim::integration_seed);
          /*
           * TODO: Check this call.
           */

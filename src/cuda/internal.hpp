@@ -35,6 +35,8 @@ namespace vcuda{
 
    namespace internal{
 
+      typedef double RealType;
+
       /*
        * Thread launch parameters
        */

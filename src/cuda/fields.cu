@@ -94,9 +94,13 @@ namespace vcuda
              * Second order uniaxial anisotropy
              */
 
+            /*
+             * TODO: Take this out
+             */
+
             double ku2 = 4.0 * material_params[mid].ku2;
 
-            double ex = material_params[mid].anisotropy_unit_x;
+            double ex = material_params[mid].anisolropy_unit_x;
             double ey = material_params[mid].anisotropy_unit_y;
             double ez = material_params[mid].anisotropy_unit_z;
 
@@ -107,7 +111,11 @@ namespace vcuda
             field_z -= ku2 * ez * sdote3;
 
             /*
-             * Sixth order o¿uniaxial anisotropy
+             * Sixth order uniaxial anisotropy
+             */
+
+            /*
+             * TODO: take this out
              */
 
             double ku3 = 6.0 * material_params[mid].ku3;
@@ -122,6 +130,12 @@ namespace vcuda
 
             double scale = 0.6666666666666667;
 
+            /*
+             * TODO: Make mu_s_si and inverse
+             */
+            /*
+             * TODO: Normalize the spherical harmonics in the material_parameters_t
+             */
             double mu_s_si = material_params[mid].mu_s_SI;
             double k2 = material_params[mid].sh2 / mu_s_si;
             double k4 = material_params[mid].sh4 / mu_s_si;
@@ -138,7 +152,14 @@ namespace vcuda
 
             /*
              * Lattice anisotropy
+             */
+
+            /*
              * TODO: add the temperature dependence
+             */
+
+            /*
+             * TODO: normalize and find a way to communicate every timestep
              */
 
             double k_latt = 2.0 * material_params[mid].Klatt_SI / mu_s_si;
@@ -165,7 +186,8 @@ namespace vcuda
       }
 
       __global__ void update_external_fields (
-            size_t * material, size_t * cell,
+            size_t *  material,
+            size_t * cell,
             vcuda::internal::material_parameters_t * material_params,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
