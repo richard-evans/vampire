@@ -106,9 +106,11 @@ namespace vcuda{
             float3 m;
             m.x = new_spin.x*mod_s;
             m.y = new_spin.y*mod_s;
-            m.z = new_spin.z*mod_s;}
+            m.z = new_spin.z*mod_s;
 
-         // Update thetemporary buffers
+            // Update thetemporary buffers
+         }
+
       }
 
       __global__ void llg_heun_scheme(
@@ -133,18 +135,18 @@ namespace vcuda{
 
             double prefactor = heun_parameters[mid].prefactor;
             double lambdatpr = heun_parameters[mid].lambda_times_prefactor;
-            size_t mid = material_id[atom];
+
             //heun step array
             float3 Ds;
-            Ds.x = Ds.x[atom];
-            Ds.y = Ds.y[atom];
-            Ds.z = Ds.z[atom];
+            Ds.x = x_delta_spin[atom];
+            Ds.y = y_delta_spin[atom];
+            Ds.z = z_delta_spin[atom];
 
             //initial spins
             float3 spin_init;
-            spin_init = x_spin[atom];
-            spin_init = y_spin[atom];
-            spin_init = z_spin[atom];
+            spin_init.x = x_spin[atom];
+            spin_init.y = y_spin[atom];
+            spin_init.z = z_spin[atom];
 
             //update the spins
             float3 spin;
@@ -176,17 +178,17 @@ namespace vcuda{
             DS_prime.z = -prefactor * SxH.z + lambdatpr * SxSxH.z;
 
             float3 S;
-            S.x = spin.x + 0.5f * (Ds.x + DS_prime.x) * dt;
-            S.y = spin.y + 0.5f * (Ds.y + DS_prime.y) * dt;
-            S.z = spin.z + 0.5f * (Ds.z + DS_prime.z) * dt;
+            S.x = spin_init.x + 0.5f * (Ds.x + DS_prime.x) * dt;
+            S.y = spin_init.y + 0.5f * (Ds.y + DS_prime.y) * dt;
+            S.z = spin_init.z + 0.5f * (Ds.z + DS_prime.z) * dt;
 
-            float mods =0.0;
-            mods = 1.0f/sqrtf(S.x*S.x + S.y*S.y + S.z*S.z);
+            float mods = 1.0f/sqrtf(S.x*S.x + S.y*S.y + S.z*S.z);
 
             float3 Spin;
             Spin.x = mods * S.x;
             Spin.y = mods * S.y;
-            Spin.z = mods * S.z;}
+            Spin.z = mods * S.z;
+         }
       }
    }
 
