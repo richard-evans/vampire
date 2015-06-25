@@ -5,11 +5,14 @@ namespace cuda {
 
       __global__ void llg_heun_first_kernel (
             double * x_spin, double * y_spin, double * z_spin,
+            double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
+            double * x_delta_spin, double * y_delta_spin, double * z_delta_spin,
             double * x_sp_field, double * y_sp_field, double * z_sp_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
             double dt
             )
       {
+	if (atom<N) {
          int atom = blockIdx.x * blockDim.x + threadIdx.x;
          //the total field array
 
@@ -41,23 +44,24 @@ namespace cuda {
 
          //defining the Delta
          float3 Ds;
-         Ds.x = -gyro/(1 + alfa*alfa ) * (sxh.x + alfa*sxsxh.x);
-         Ds.y = -gyro/(1 + alfa*alfa ) * (sxh.y + alfa*sxsxh.y);
-         Ds.z = -gyro/(1 + alfa*alfa ) * (sxh.z + alfa*sxsxh.z);
+         Ds.x = -gyro/(1.0f + alfa*alfa ) * (sxh.x + alfa*sxsxh.x);
+         Ds.y = -gyro/(1.0f + alfa*alfa ) * (sxh.y + alfa*sxsxh.y);
+         Ds.z = -gyro/(1.0f + alfa*alfa ) * (sxh.z + alfa*sxsxh.z);
 
          float3 new_spin;
          new_spin.x = spin.x + Ds.x*dt;
          new_spin.y = spin.y + Ds.y*dt;
          new_spin.z = spin.z + Ds.z*dt;
 
-         mods =1/sqrtf(new_spin.x*new_spin.x + new_spin.y*new_spin.y + new_spin.z*new_spin.z);
+         mods =1.0f/sqrtf(new_spin.x*new_spin.x + new_spin.y*new_spin.y + new_spin.z*new_spin.z);
 
          //normalized spins
          float3 m;
          m.x = new_spin.x*mods;
          m.y = new_spin.y*mods;
-         m.z = new_spin.z*mods;
+         m.z = new_spin.z*mods;}
+
+         // Update thetemporary buffers
       }
 
    }
-}

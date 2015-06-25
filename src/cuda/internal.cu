@@ -16,6 +16,24 @@ namespace vcuda
 
    namespace internal
    {
+
+      size_t block_size(256UL);
+      size_t grid_size(512UL);
+
+      __device__ double atomicAdd (double * address, double value)
+      {
+         unsigned long long int * address_as_ull =
+            (unsigned long long int *) address;
+         unsigned long long int old = *address_as_ull;
+         unsigned long long int assumed;
+         do {
+            assumed = old;
+            old = atomicCAS(address_as_ull, assumed,
+                  __double_as_longlong(value + __longlong_as_double(assumed)));
+         } while (assumed != old);
+         return __longlong_as_double(old);
+      }
+
       __global__ void init_rng (curandState * state, size_t seed)
       {
          size_t tid = blockIdx.x + blockDim.x + threadIdx.x;

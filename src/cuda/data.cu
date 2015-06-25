@@ -46,6 +46,9 @@ namespace vcuda{
          RealArray x_mag_array(0UL);
          RealArray y_mag_array(0UL);
          RealArray z_mag_array(0UL);
+         RealArray x_field_array(0UL);
+         RealArray y_field_array(0UL);
+         RealArray z_field_array(0UL);
          RealArray volume_array(0UL);
          IndexArray num_atoms(0UL);
       } /* cells */
@@ -66,6 +69,13 @@ namespace vcuda{
       RealArray z_dipolar_field_array(0UL);
 
       curandState * d_rand_state;
+
+      namespace llg
+      {
+         RealArray x_spin_prima_array(0UL);
+         RealArray y_spin_prima_array(0UL);
+         RealArray z_spin_prima_array(0UL);
+      } /* llg */
 
    } // end of internal namespace
 

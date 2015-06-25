@@ -10,6 +10,10 @@
  */
 #include "internal.hpp"
 
+#ifdef CUDA
+namespace cu = ::vcuda::internal;
+#endif
+
 namespace vcuda
 {
 #ifdef CUDA
@@ -17,7 +21,8 @@ namespace vcuda
    {
       typedef thrust::device_vector<double> RealArray;
       typedef thrust::device_vector<size_t> IndexArray;
-      typedef thrust::device_vector<material_parameters_t> MaterialParametersArray;
+      typedef thrust::device_vector<cu::material_parameters_t>
+         MaterialParametersArray;
 
       namespace atoms
       {
@@ -46,6 +51,10 @@ namespace vcuda
          extern RealArray x_mag_array;
          extern RealArray y_mag_array;
          extern RealArray z_mag_array;
+
+         extern RealArray x_field_array;
+         extern RealArray y_field_array;
+         extern RealArray z_field_array;
 
          extern RealArray volume_array;
 
@@ -79,6 +88,13 @@ namespace vcuda
        */
 
       extern curandState * d_rand_state;
+
+      namespace llg
+      {
+         extern RealArray x_spin_prima_array;
+         extern RealArray y_spin_prima_array;
+         extern RealArray z_spin_prima_array;
+      } /* llg */
 
    } /* internal */
 #endif

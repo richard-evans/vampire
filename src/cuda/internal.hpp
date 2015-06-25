@@ -17,6 +17,8 @@
 
 #include <curand_kernel.h>
 #include <thrust/copy.h>
+#include <thrust/fill.h>
+#include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
 
 /*
@@ -32,17 +34,30 @@ namespace vcuda{
 #ifdef CUDA
 
    namespace internal{
+
+      typedef double RealType;
+
+      /*
+       * Thread launch parameters
+       */
+
+      extern size_t block_size;
+      extern size_t grid_size;
+
+      /*
+       * Internal data structures
+       */
+
       struct material_parameters_t {
          double alpha;
          double gamma_rel;
-         double mu_s_SI;
-         double Klatt_SI;
+         double mu_s_si;
+         double i_mu_s_si;
+         double k_latt;
          double sh2;
          double sh4;
          double sh6;
          double ku;
-         double ku2;
-         double ku3;
          double anisotropy_unit_x;
          double anisotropy_unit_y;
          double anisotropy_unit_z;
@@ -63,7 +78,7 @@ namespace vcuda{
           */
          double prefactor;
          /**
-          * @var alpha * prefactor
+          * @var lambda * prefactor
           */
          double lambda_times_prefactor;
       };
@@ -83,6 +98,14 @@ namespace vcuda{
        */
       void __finalize ();
 
+
+      /*
+       * Field updates
+       */
+
+      void update_spin_fields ();
+      void update_external_fields ();
+
       /*
        * Shared functors for thrust
        */
@@ -97,6 +120,12 @@ namespace vcuda{
       };
 
       /*
+       * Shared device functions
+       */
+
+      __device__ double atomicAdd (double * address, double value);
+
+      /*
        * Shared kernel definitions
        */
 
@@ -105,7 +134,8 @@ namespace vcuda{
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
             size_t * material, material_parameters_t * material_params,
-            double * x_sp_field, double * y_sp_field, double * z_sp_field
+            double * x_sp_field, double * y_sp_field, double * z_sp_field,
+            size_t num_atoms
             );
 
       __global__ void update_external_fields (
@@ -113,7 +143,22 @@ namespace vcuda{
             material_parameters_t * material_params,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
-            curandState * rand_state
+            curandState * rand_state,
+            size_t num_atoms
+            );
+
+      __global__ void update_cell_magnetization (
+            double * x_spin, double * y_spin, double * z_spin,
+            size_t * material, size_t * cell,
+            material_parameters_t * material_params,
+            double * x_mag, double * y_mag, double * z_mag,
+            size_t num_atoms
+            );
+
+      __global__ void update_dipolar_fields (
+            double * x_mag, double * y_mag, double * z_mag,
+            double * x_coord, double * y_coord, double * z_coord,
+            double * volume, double prefactor, size_t n_cells
             );
 
       __global__ void llg_heun_first_kernel (
@@ -123,11 +168,11 @@ namespace vcuda{
             double dt
             );
 
-     __global__ void llg_heun_scheme(
-	    double * x_spin, double * y_spin, double * z_spin,
-	    double * x_sp_field, double * y_sp_field, double * z_sp_field,
-	    double * x_ext_field, double * y_ext_field, double * z_ext_field,
-	    double * x_new_spin, double * y_new_spin, double z_new_spin
+      __global__ void llg_heun_scheme(
+            double * x_spin, double * y_spin, double * z_spin,
+            double * x_sp_field, double * y_sp_field, double * z_sp_field,
+            double * x_ext_field, double * y_ext_field, double * z_ext_field,
+            double * x_new_spin, double * y_new_spin, double z_new_spin
             );
    } // end of iternal namespace
 
