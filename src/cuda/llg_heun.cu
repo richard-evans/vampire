@@ -14,6 +14,7 @@
 
 // Local cuda headers
 #include "internal.hpp"
+#include "exchange_fields.hpp"
 
 #ifdef CUDA
 namespace cu = ::vcuda::internal;
@@ -25,6 +26,8 @@ namespace vcuda{
    // Function to perform a single heun step
    //--------------------------------------------------------------------------
    void llg_heun(){
+
+      cu::exchange::calculate_exchange_fields();
 
 
 #ifdef CUDA

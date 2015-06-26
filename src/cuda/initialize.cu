@@ -21,6 +21,8 @@
 #include "data.hpp"
 #include "internal.hpp"
 
+#include "exchange_fields.hpp"
+
 #ifdef CUDA
 namespace cu = ::vcuda::internal;
 #endif
@@ -51,6 +53,9 @@ namespace vcuda{
       success = success && cu::__initialize_materials ();
       success = success && cu::__initialize_topology ();
       success = success && cu::__initialize_curand ();
+
+      // Set up the exchange fields
+      if( cu::exchange::initialise_exchange() != EXIT_SUCCESS) std::cerr << "Failed to initialise exchange" << std::endl;
 
       // Successful initialization
       return success;

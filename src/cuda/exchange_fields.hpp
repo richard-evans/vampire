@@ -7,28 +7,29 @@
 
 namespace vcuda
 {
-
    namespace internal
    {
-
-      inline
-      void cusparse_call( cusparseStatus_t status)
+      namespace exchange
       {
-         if( status != CUSPARSE_STATUS_SUCCESS)
-         {
-            std::cerr << "Error: cusparse failed at " << __FILE__ << ", " << __LINE__ << std::endl;
-         }
-      }
+
+         inline
+            void cusparse_call( cusparseStatus_t status)
+            {
+               if( status != CUSPARSE_STATUS_SUCCESS)
+               {
+                  std::cerr << "Error: cusparse failed at " << __FILE__ << ", " << __LINE__ << std::endl;
+               }
+            }
 
 
-      int initialise_exchange();
+         int initialise_exchange();
 
-      int finalise_exchange();
+         int finalise_exchange();
 
-      int calculate_exchange_fields();
+         int calculate_exchange_fields();
 
+      } // end namespace exchange
    } // end namespace internal
-
 } // end namespace vcuda
 
 #endif

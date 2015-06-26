@@ -16,6 +16,8 @@
 #include "data.hpp"
 #include "internal.hpp"
 
+#include "exchange_fields.hpp"
+
 #ifdef CUDA
 namespace cu = vcuda::internal;
 #endif
@@ -42,6 +44,10 @@ namespace vcuda{
    {
       void __finalize ()
       {
+
+         // De-allocate the exchange fields
+         cu::exchange::finalise_exchange();
+
          cu::atoms::x_spin_array.RealArray::~device_vector ();
          cu::atoms::y_spin_array.RealArray::~device_vector ();
          cu::atoms::z_spin_array.RealArray::~device_vector ();

@@ -1,22 +1,18 @@
 #include "exchange_fields.hpp"
 
+#include "atoms.hpp"
+
 #include "cuda_utils.hpp"
+#include "internal.hpp"
+#include "data.hpp"
+
 
 #include <vector>
 #include <thrust/device_vector.h>
 
-namespace atoms
-{
-   int num_atoms = 100000;
-   int total_num_neighbours = 9;
+int calculate_exchange_fields(int, int);
 
-   int exchange_type = 1;
-
-   std::vector<int> nbr_inds;
-   std::vector<int> nbr_list;
-   std::vector<double> J_vals;
-
-}
+namespace cu = vcuda::internal;
 
 namespace vcuda
 {
@@ -24,368 +20,350 @@ namespace vcuda
    namespace internal
    {
 
-      bool exchange_initialised = false;
-
-      cusparseHandle_t  cusparse_handle;
-
-      // Diagonal components
-      cusparseHybMat_t  Jxx;
-      cusparseHybMat_t  Jyy;
-      cusparseHybMat_t  Jzz;
-      bool Jxx_initialised = false;
-      bool Jyy_initialised = false;
-      bool Jzz_initialised = false;
-
-      cusparseMatDescr_t Jxx_descr;
-      cusparseMatDescr_t Jyy_descr;
-      cusparseMatDescr_t Jzz_descr;
-
-
-      // Off-diagonal components
-      cusparseHybMat_t  Jxy;
-      cusparseHybMat_t  Jxz;
-      cusparseHybMat_t  Jyz;
-
-
-      int initialise_exchange()
+      namespace exchange
       {
 
-         // Initialise the cuSparse handle
-         cusparse_call( cusparseCreate( &cusparse_handle) );
+         bool exchange_initialised = false;
 
-         thrust::device_vector<int> rowptr_d( atoms::nbr_inds);
-         thrust::device_vector<int> colinds_d( atoms::nbr_list);
-         thrust::device_vector<double> Jvals_d( atoms::J_vals);
-         thrust::device_vector<double> Jzvals_d( atoms::J_vals);
+         cusparseHandle_t  cusparse_handle;
 
+         // Exchange matrix stored as CSR sparse matrix
+         thrust::device_vector<int> rowptrs_d;
+         thrust::device_vector<int> colinds_d;
 
+         thrust::device_vector<double> Jxx_vals_d;
+         thrust::device_vector<double> Jyy_vals_d;
+         thrust::device_vector<double> Jzz_vals_d;
 
-         int* rowptr_dptr = thrust::raw_pointer_cast( &rowptr_d[0]);
-         int* colinds_dptr = thrust::raw_pointer_cast( &colinds_d[0]);
-         double* Jvals_dptr = thrust::raw_pointer_cast( &Jvals_d[0]);
-         double* Jzvals_dptr = thrust::raw_pointer_cast( &Jzvals_d[0]);
-         cusparseStatus_t status;
+         bool Jxx_initialised = false;
 
-         size_t avail;
-         size_t total;
-         cudaMemGetInfo( &avail, &total );
-         size_t used = total - avail;
-         std::cout << "Total: " << total << " , Used: " << used << " , Free: " << avail << std::endl;
+         cusparseMatDescr_t J_descr;
 
-         switch( atoms::exchange_type)
-         {
-            case 0: // Isotropic
-
-               //--------------------------------------------------------------
-               // Exchange is isotropic so Jxx = Jyy = Jzz
-               // and Jxy = Jxz = Jyx = 0
-               //--------------------------------------------------------------
-               check_cuda_errors(__FILE__,__LINE__);
-
-
-               // Initialise the  hybrid matrix
-               cusparseCreateHybMat( &Jxx);
-
-
-               cusparseCreateMatDescr(&Jxx_descr);
-               cusparseSetMatType(Jxx_descr,CUSPARSE_MATRIX_TYPE_GENERAL);
-               cusparseSetMatIndexBase(Jxx_descr,CUSPARSE_INDEX_BASE_ZERO);
-
-               status = cusparseDcsr2hyb(
-                     cusparse_handle,
-                     atoms::num_atoms,
-                     atoms::num_atoms,
-                     Jxx_descr,
-                     Jvals_dptr,
-                     rowptr_dptr,
-                     colinds_dptr,
-                     Jxx,
-                     atoms::total_num_neighbours/ atoms::num_atoms,
-                     CUSPARSE_HYB_PARTITION_AUTO);
-
-
-               if( status != CUSPARSE_STATUS_SUCCESS)
-               {
-                  std::cerr << "Error: Failed to conver csr to hyb format" << std::endl;
-               }
-
-               Jxx_initialised = true;
-               check_cuda_errors(__FILE__,__LINE__);
-
-               break;
-
-            case 1: // Vector
-
-
-               cusparseCreateHybMat( &Jxx);
-
-               cusparseCreateMatDescr(&Jxx_descr);
-               cusparseSetMatType(Jxx_descr,CUSPARSE_MATRIX_TYPE_GENERAL);
-               cusparseSetMatIndexBase(Jxx_descr,CUSPARSE_INDEX_BASE_ZERO);
-
-               status = cusparseDcsr2hyb(
-                     cusparse_handle,
-                     atoms::num_atoms,
-                     atoms::num_atoms,
-                     Jxx_descr,
-                     Jvals_dptr,
-                     rowptr_dptr,
-                     colinds_dptr,
-                     Jxx,
-                     atoms::total_num_neighbours/ atoms::num_atoms,
-                     CUSPARSE_HYB_PARTITION_AUTO);
-
-
-               if( status != CUSPARSE_STATUS_SUCCESS)
-               {
-                  std::cerr << "Error: Failed to conver csr to hyb format" << std::endl;
-               }
-
-               Jxx_initialised = true;
-
-
-               cusparseCreateHybMat( &Jyy);
-
-               cusparseCreateMatDescr(&Jyy_descr);
-               cusparseSetMatType(Jyy_descr,CUSPARSE_MATRIX_TYPE_GENERAL);
-               cusparseSetMatIndexBase(Jyy_descr,CUSPARSE_INDEX_BASE_ZERO);
-
-               status = cusparseDcsr2hyb(
-                     cusparse_handle,
-                     atoms::num_atoms,
-                     atoms::num_atoms,
-                     Jyy_descr,
-                     Jvals_dptr,
-                     rowptr_dptr,
-                     colinds_dptr,
-                     Jyy,
-                     atoms::total_num_neighbours/ atoms::num_atoms,
-                     CUSPARSE_HYB_PARTITION_AUTO);
-
-
-               if( status != CUSPARSE_STATUS_SUCCESS)
-               {
-                  std::cerr << "Error: Failed to conver csr to hyb format" << std::endl;
-               }
-
-               Jyy_initialised = true;
-
-               cusparseCreateHybMat( &Jzz);
-
-               cusparseCreateMatDescr(&Jzz_descr);
-               cusparseSetMatType(Jzz_descr,CUSPARSE_MATRIX_TYPE_GENERAL);
-               cusparseSetMatIndexBase(Jzz_descr,CUSPARSE_INDEX_BASE_ZERO);
-
-               status = cusparseDcsr2hyb(
-                     cusparse_handle,
-                     atoms::num_atoms,
-                     atoms::num_atoms,
-                     Jzz_descr,
-                     Jzvals_dptr,
-                     rowptr_dptr,
-                     colinds_dptr,
-                     Jzz,
-                     atoms::total_num_neighbours/ atoms::num_atoms,
-                     CUSPARSE_HYB_PARTITION_AUTO);
-
-
-               if( status != CUSPARSE_STATUS_SUCCESS)
-               {
-                  std::cerr << "Error: Failed to conver csr to hyb format" << std::endl;
-               }
-
-               Jzz_initialised = true;
-
-               break;
-
-            case 2: // Tensor
-               break;
-         }
-
-         exchange_initialised = true;
-
-         std::cout << "Made matrix" << std::endl;
-         size_t avail_new, total_new;
-         cudaError_t err = cudaMemGetInfo( &avail_new, &total_new );
-         if( err != cudaSuccess)
-         {
-            std::cout << "Error fetching memory __LINE__" << std::endl;
-         }
-         size_t used_new = total_new - avail_new;
-         std::cout << "Total: " << total_new << " , Used: " << used_new << " , Free: " << avail_new << std::endl;
-         std::cout << "Memory used by matrix on device: " << used_new - used << " or in mb: " << float(used_new - used)/(1024.0*1024.0) << std::endl;
-
-         check_cuda_errors(__FILE__,__LINE__);
-         return EXIT_SUCCESS;
-      }
-
-
-      int finalise_exchange()
-      {
-         check_cuda_errors(__FILE__,__LINE__);
-         if( exchange_initialised)
+         int initialise_exchange()
          {
 
-            cusparseDestroy( cusparse_handle);
+            // Initialise the cuSparse handle
+            cusparse_call( cusparseCreate( &cusparse_handle) );
 
-            if( Jxx_initialised) cusparseDestroyHybMat( Jxx );
-            if( Jyy_initialised) cusparseDestroyHybMat( Jyy );
-            if( Jzz_initialised) cusparseDestroyHybMat( Jzz );
+            cusparseCreateMatDescr(&J_descr);
+            cusparseSetMatType(J_descr, CUSPARSE_MATRIX_TYPE_GENERAL);
+            cusparseSetMatIndexBase(J_descr,CUSPARSE_INDEX_BASE_ZERO);
 
+            size_t avail;
+            size_t total;
+            cudaMemGetInfo( &avail, &total );
+            size_t used = total - avail;
+            std::cout << "Total: " << total << " , Used: " << used << " , Free: " << avail << std::endl;
+
+
+            // Transfer the row ptrs and col indices to the device
+            std::vector<int> rowptrs_h( ::atoms::num_atoms + 1, 0);
+            for( int atom = 0; atom < ::atoms::num_atoms; atom++)
+               rowptrs_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+
+            rowptrs_d.resize( ::atoms::num_atoms + 1);
+            colinds_d.resize( ::atoms::neighbour_list_array.size() );
+
+
+            thrust::copy(
+                  rowptrs_h.begin(),
+                  rowptrs_h.end(),
+                  rowptrs_d.begin()
+                  );
+
+            thrust::copy(
+                  ::atoms::neighbour_list_array.begin(),
+                  ::atoms::neighbour_list_array.end(),
+                  colinds_d.begin()
+                  );
+
+            std::vector<double> Jxx_vals_h( ::atoms::neighbour_list_array.size());
+            std::vector<double> Jyy_vals_h( ::atoms::neighbour_list_array.size());
+            std::vector<double> Jzz_vals_h( ::atoms::neighbour_list_array.size());
+
+            switch( ::atoms::exchange_type)
+            {
+               case 0: // Isotropic
+
+                  //--------------------------------------------------------------
+                  // Exchange is isotropic so Jxx = Jyy = Jzz
+                  // and Jxy = Jxz = Jyx = 0
+                  //--------------------------------------------------------------
+
+                  std::cerr << "Setting up isotropic exchange interaction" << std::endl;
+
+                  for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)
+                  {
+                     int iid = ::atoms::neighbour_interaction_type_array[i]; // interaction id
+                     double Jij= ::atoms::i_exchange_list[iid].Jij;
+
+                     Jxx_vals_h[i] = -Jij;
+
+                  }
+
+                  Jxx_vals_d.resize( Jxx_vals_h.size() );
+
+                  thrust::copy(
+                        Jxx_vals_h.begin(),
+                        Jxx_vals_h.end(),
+                        Jxx_vals_d.begin()
+                        );
+
+                  Jxx_initialised = true;
+                  check_cuda_errors(__FILE__,__LINE__);
+
+                  break;
+
+               case 1: // Vector
+
+                  for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)
+                  {
+                     int iid = ::atoms::neighbour_interaction_type_array[i]; // interaction id
+                     Jxx_vals_h[i] = -::atoms::v_exchange_list[iid].Jij[0];
+                     Jyy_vals_h[i] = -::atoms::v_exchange_list[iid].Jij[1];
+                     Jzz_vals_h[i] = -::atoms::v_exchange_list[iid].Jij[2];
+
+                  }
+
+                  thrust::copy(
+                        Jxx_vals_h.begin(),
+                        Jxx_vals_h.end(),
+                        Jxx_vals_d.begin()
+                        );
+                  thrust::copy(
+                        Jyy_vals_h.begin(),
+                        Jyy_vals_h.end(),
+                        Jyy_vals_d.begin()
+                        );
+                  thrust::copy(
+                        Jyy_vals_h.begin(),
+                        Jyy_vals_h.end(),
+                        Jyy_vals_d.begin()
+                        );
+
+                  Jxx_initialised = true;
+                  check_cuda_errors(__FILE__,__LINE__);
+
+                  break;
+
+               case 2: // Tensor
+                  break;
+            }
+
+            exchange_initialised = true;
+
+            std::cout << "Made matrix" << std::endl;
+            size_t avail_new, total_new;
+            cudaError_t err = cudaMemGetInfo( &avail_new, &total_new );
+            if( err != cudaSuccess)
+            {
+               std::cout << "Error fetching memory __LINE__" << std::endl;
+            }
+            size_t used_new = total_new - avail_new;
+            std::cout << "Total: " << total_new << " , Used: " << used_new << " , Free: " << avail_new << std::endl;
+            std::cout << "Memory used by matrix on device: " << used_new - used << " or in mb: " << float(used_new - used)/(1024.0*1024.0) << std::endl;
+
+            check_cuda_errors(__FILE__,__LINE__);
+            return EXIT_SUCCESS;
          }
-         return EXIT_SUCCESS;
-      }
 
-      int calculate_exchange_fields()
-      {
 
-         // check calling of routine if error checking is activated
-         if(true){std::cout << "calculate_exchange_fields has been called. N_atoms = "<< atoms::num_atoms  << std::endl;}
-
-         check_cuda_errors(__FILE__,__LINE__);
-
-         thrust::device_vector<double> Sx;
-         thrust::device_vector<double> Sy;
-         thrust::device_vector<double> Sz;
-
-         thrust::device_vector<double> Hx;
-         thrust::device_vector<double> Hy;
-         thrust::device_vector<double> Hz;
-
-         try{
-
-            Sx.assign( atoms::num_atoms, 1.0);
-            Sy.assign( atoms::num_atoms, 1.0);
-            Sz.assign( atoms::num_atoms, 1.0);
-
-            Hx.assign( atoms::num_atoms, 0.0);
-            Hy.assign( atoms::num_atoms, 0.0);
-            Hz.assign( atoms::num_atoms, 0.0);
-         }
-         catch( std::bad_alloc)
+         int finalise_exchange()
          {
-            std::cerr << "Bad alloc thrown." << std::endl;
-            exit(-1);
+            check_cuda_errors(__FILE__,__LINE__);
+            if( exchange_initialised)
+            {
+
+               cusparseDestroy( cusparse_handle);
+               cusparseDestroyMatDescr( J_descr);
+
+            }
+
+            // Manually call the destructors for the thrust vectors
+            rowptrs_d.~device_vector();
+            colinds_d.~device_vector();
+
+            Jxx_vals_d.~device_vector();
+            Jyy_vals_d.~device_vector();
+            Jzz_vals_d.~device_vector();
+
+
+            return EXIT_SUCCESS;
          }
-         catch( thrust::system_error err)
+
+         int calculate_exchange_fields()
          {
-            std::cerr << "Thrust system error caught: " << err.what() << std::endl;
-            exit(-1);
+
+            check_cuda_errors(__FILE__,__LINE__);
+            /*
+             * Fill the field vectors with zero
+             */
+
+            thrust::fill(
+                  cu::x_total_spin_field_array.begin(),
+                  cu::x_total_spin_field_array.end(),
+                  0.0);
+            thrust::fill(
+                  cu::y_total_spin_field_array.begin(),
+                  cu::y_total_spin_field_array.end(),
+                  0.0);
+            thrust::fill(
+                  cu::z_total_spin_field_array.begin(),
+                  cu::z_total_spin_field_array.end(),
+                  0.0);
+
+
+            int * rowptrs_dptr = thrust::raw_pointer_cast( rowptrs_d.data() );
+            int * colinds_dptr = thrust::raw_pointer_cast( colinds_d.data() );
+            double * Jxx_vals_dptr = thrust::raw_pointer_cast( Jxx_vals_d.data() );
+            double * Jyy_vals_dptr = thrust::raw_pointer_cast( Jyy_vals_d.data() );
+            double * Jzz_vals_dptr = thrust::raw_pointer_cast( Jzz_vals_d.data() );
+
+            double * Sx_dptr = thrust::raw_pointer_cast( cu::atoms::x_spin_array.data());
+            double * Sy_dptr = thrust::raw_pointer_cast( cu::atoms::y_spin_array.data());
+            double * Sz_dptr = thrust::raw_pointer_cast( cu::atoms::z_spin_array.data());
+            double * Hx_dptr = thrust::raw_pointer_cast( cu::x_total_spin_field_array.data());
+            double * Hy_dptr = thrust::raw_pointer_cast( cu::y_total_spin_field_array.data());
+            double * Hz_dptr = thrust::raw_pointer_cast( cu::z_total_spin_field_array.data());
+
+            double alpha = 1.0;
+            double beta = 0.0;
+
+            switch( ::atoms::exchange_type)
+            {
+               case 0: // Isotropic
+
+                  //--------------------------------------------------------------
+                  // Exchange is isotropic so Jxx = Jyy = Jzz
+                  // and Jxy = Jxz = Jyx = 0
+                  //--------------------------------------------------------------
+
+                  if( !exchange_initialised) initialise_exchange();
+
+                  cusparseDcsrmv(
+                        cusparse_handle,
+                         CUSPARSE_OPERATION_NON_TRANSPOSE,
+                         ::atoms::num_atoms,
+                         ::atoms::num_atoms,
+                         ::atoms::total_num_neighbours,
+                         &alpha,
+                         J_descr,
+                         Jxx_vals_dptr,
+                         rowptrs_dptr,
+                         colinds_dptr,
+                         Sx_dptr,
+                         &beta,
+                         Hx_dptr);
+
+                  cusparseDcsrmv(
+                        cusparse_handle,
+                         CUSPARSE_OPERATION_NON_TRANSPOSE,
+                         ::atoms::num_atoms,
+                         ::atoms::num_atoms,
+                         ::atoms::total_num_neighbours,
+                         &alpha,
+                         J_descr,
+                         Jxx_vals_dptr,
+                         rowptrs_dptr,
+                         colinds_dptr,
+                         Sy_dptr,
+                         &beta,
+                         Hy_dptr);
+
+                  cusparseDcsrmv(
+                        cusparse_handle,
+                         CUSPARSE_OPERATION_NON_TRANSPOSE,
+                         ::atoms::num_atoms,
+                         ::atoms::num_atoms,
+                         ::atoms::total_num_neighbours,
+                         &alpha,
+                         J_descr,
+                         Jxx_vals_dptr,
+                         rowptrs_dptr,
+                         colinds_dptr,
+                         Sz_dptr,
+                         &beta,
+                         Hz_dptr);
+
+                  break;
+
+               case 1: // Vector exchange
+
+                  std::cout << "Vector Exchange" << std::endl;
+                  //--------------------------------------------------------------
+                  // Exchange is diagonal so Jxx != Jyy != Jzz
+                  // and Jxy = Jxz = Jyx = 0
+                  //--------------------------------------------------------------
+
+                  if( !exchange_initialised) initialise_exchange();
+
+                  cusparseDcsrmv(
+                        cusparse_handle,
+                         CUSPARSE_OPERATION_NON_TRANSPOSE,
+                         ::atoms::num_atoms,
+                         ::atoms::num_atoms,
+                         ::atoms::total_num_neighbours,
+                         &alpha,
+                         J_descr,
+                         Jxx_vals_dptr,
+                         rowptrs_dptr,
+                         colinds_dptr,
+                         Sx_dptr,
+                         &beta,
+                         Hx_dptr);
+
+                  cusparseDcsrmv(
+                        cusparse_handle,
+                         CUSPARSE_OPERATION_NON_TRANSPOSE,
+                         ::atoms::num_atoms,
+                         ::atoms::num_atoms,
+                         ::atoms::total_num_neighbours,
+                         &alpha,
+                         J_descr,
+                         Jyy_vals_dptr,
+                         rowptrs_dptr,
+                         colinds_dptr,
+                         Sy_dptr,
+                         &beta,
+                         Hy_dptr);
+
+                  cusparseDcsrmv(
+                        cusparse_handle,
+                         CUSPARSE_OPERATION_NON_TRANSPOSE,
+                         ::atoms::num_atoms,
+                         ::atoms::num_atoms,
+                         ::atoms::total_num_neighbours,
+                         &alpha,
+                         J_descr,
+                         Jzz_vals_dptr,
+                         rowptrs_dptr,
+                         colinds_dptr,
+                         Sz_dptr,
+                         &beta,
+                         Hz_dptr);
+
+                  break;
+
+            }
+
+            ::atoms::x_total_spin_field_array[0] = 0.0;
+            ::atoms::y_total_spin_field_array[0] = 0.0;
+            ::atoms::z_total_spin_field_array[0] = 0.0;
+
+            ::calculate_exchange_fields(0,::atoms::num_atoms);
+
+            std::cout << cu::x_total_spin_field_array[0] << "\t\t"
+                     <<  cu::y_total_spin_field_array[0] << "\t\t"
+                     <<  cu::z_total_spin_field_array[0] << "\t\t"
+                     << ::atoms::x_total_spin_field_array[0] << "\t\t"
+                     << ::atoms::y_total_spin_field_array[0] << "\t\t"
+                     << ::atoms::z_total_spin_field_array[0] << "\t\t"
+                     << std::endl;
+
+            check_cuda_errors(__FILE__,__LINE__);
+            return EXIT_SUCCESS;
          }
-
-         double alpha_d = 1.0;
-         double beta_d = 1.0;
-
-         double* Sx_dptr = thrust::raw_pointer_cast( &Sx[0]);
-         double* Sy_dptr = thrust::raw_pointer_cast( &Sy[0]);
-         double* Sz_dptr = thrust::raw_pointer_cast( &Sz[0]);
-
-         double* Hx_dptr = thrust::raw_pointer_cast( &Hx[0]);
-         double* Hy_dptr = thrust::raw_pointer_cast( &Hy[0]);
-         double* Hz_dptr = thrust::raw_pointer_cast( &Hz[0]);
-
-         check_cuda_errors(__FILE__,__LINE__);
-         switch( atoms::exchange_type)
-         {
-            case 0: // Isotropic
-
-               std::cout << "Isotropic Exchange" << std::endl;
-
-               //--------------------------------------------------------------
-               // Exchange is isotropic so Jxx = Jyy = Jzz
-               // and Jxy = Jxz = Jyx = 0
-               //--------------------------------------------------------------
-
-               if( !exchange_initialised) initialise_exchange();
-
-               cusparseDhybmv(
-                     cusparse_handle,
-                     CUSPARSE_OPERATION_NON_TRANSPOSE,
-                     &alpha_d,
-                     Jxx_descr,
-                     Jxx,
-                     Sx_dptr,
-                     &beta_d,
-                     Hx_dptr);
-
-               check_cuda_errors(__FILE__,__LINE__);
-               cusparseDhybmv(
-                     cusparse_handle,
-                     CUSPARSE_OPERATION_NON_TRANSPOSE,
-                     &alpha_d,
-                     Jxx_descr,
-                     Jxx,
-                     Sy_dptr,
-                     &beta_d,
-                     Hy_dptr);
-
-         check_cuda_errors(__FILE__,__LINE__);
-               cusparseDhybmv(
-                     cusparse_handle,
-                     CUSPARSE_OPERATION_NON_TRANSPOSE,
-                     &alpha_d,
-                     Jxx_descr,
-                     Jxx,
-                     Sz_dptr,
-                     &beta_d,
-                     Hz_dptr);
-         check_cuda_errors(__FILE__,__LINE__);
-               break;
-
-            case 1: // Vector exchange
-
-               std::cout << "Vector Exchange" << std::endl;
-               //--------------------------------------------------------------
-               // Exchange is diagonal so Jxx != Jyy != Jzz
-               // and Jxy = Jxz = Jyx = 0
-               //--------------------------------------------------------------
-
-               if( !exchange_initialised) initialise_exchange();
-
-               cusparseDhybmv(
-                     cusparse_handle,
-                     CUSPARSE_OPERATION_NON_TRANSPOSE,
-                     &alpha_d,
-                     Jxx_descr,
-                     Jxx,
-                     Sx_dptr,
-                     &beta_d,
-                     Hx_dptr);
-
-               cusparseDhybmv(
-                     cusparse_handle,
-                     CUSPARSE_OPERATION_NON_TRANSPOSE,
-                     &alpha_d,
-                     Jyy_descr,
-                     Jyy,
-                     Sy_dptr,
-                     &beta_d,
-                     Hy_dptr);
-
-               cusparseDhybmv(
-                     cusparse_handle,
-                     CUSPARSE_OPERATION_NON_TRANSPOSE,
-                     &alpha_d,
-                     Jzz_descr,
-                     Jzz,
-                     Sz_dptr,
-                     &beta_d,
-                     Hz_dptr);
-
-
-               break;
-
-         }
-         check_cuda_errors(__FILE__,__LINE__);
-
-         for( int i = 0; i < atoms::num_atoms; i++) std::cerr << i << "\t" << Hx[i] << "\t" << Hy[i] << "\t" << Hz[i] << std::endl;
-
-         std::cout << "Finished field calculation." << std::endl;
-
-         check_cuda_errors(__FILE__,__LINE__);
-         return EXIT_SUCCESS;
-      }
-
+      } // end namespace exchange
 
    } // end namespace internal
 

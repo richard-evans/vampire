@@ -2,43 +2,42 @@
 #                 Makefile for cuda module
 #--------------------------------------------------------------
 
+NVCC_VERSION=$(shell nvcc --version | tail -n 1 | cut -b 38-)
+NVCC=nvcc -DCOMP='"NVCC $(NVCC_VERSION)"'
 
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
+
+CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart -lcusparse
 
 
 # List module object filenames
-cuda_objects= \
+CUDA_OBJECTS= \
 	     obj/cuda/data.o \
 	     obj/cuda/internal.o \
 	     obj/cuda/initialize.o \
 	     obj/cuda/fields.o \
-		 obj/cuda/exchange_fields.o \
 	     obj/cuda/llg_heun.o \
 	     obj/cuda/finalize.o \
+		 obj/cuda/exchange_fields.o \
 	     obj/cuda/statistics.o
 
 # The device linked object for CUDA
 CUDA_DLINK= obj/cuda/vampire_cuda.o
 
-CUDA_CFLAGS= -I./hdr -DCUDA -rdc=true
+CUDA_CFLAGS= -I./hdr -DCUDA -rdc=true -arch=sm_20
 
-$(cuda_objects): obj/%.o: src/%.cu
-	nvcc -arch=sm_20 $< -c -o $@ $(CUDA_CFLAGS)
+$(CUDA_OBJECTS): obj/%.o: src/%.cu
+	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS)
 
-$(CUDA_DLINK): $(cuda_objects)
-	nvcc -arch=sm_20 -dlink $(cuda_objects) -o $@
+# Target for device link -- not working atm
+#$(CUDA_DLINK): $(cuda_objects)
+#	nvcc -arch=sm_20 -dlink $(cuda_objects) -o $@
 
 # Target to link the CUDA enabled vampire
 gcc-cuda: GCC_CFLAGS += -DCUDA
-gcc-cuda: $(OBJECTS) $(cuda_objects)
-	nvcc $(GCC_LDFLAGS) $(LIBS) ${CUDALIBS} $(OBJECTS) $(cuda_objects) -o $(EXECUTABLE)
+gcc-cuda: $(OBJECTS) $(CUDA_OBJECTS)
+	$(NVCC) $(GCC_LDFLAGS) $(LIBS) ${CUDALIBS} $(OBJECTS) $(CUDA_OBJECTS) -o $(EXECUTABLE)
 
 # CUDA debug target
 gcc-cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG
 gcc-cuda-debug: gcc-cuda
-
-gcc-cuda-exchange-test: CUDA_CFLAGS += -DCUDA_DEBUG -DTHRUST_DEBUG
-gcc-cuda-exchange-test: $(cuda_objects) obj/cuda/test_exchange.o
-	nvcc -lcusparse obj/cuda/test_exchange.o obj/cuda/exchange_fields.o -o run_test_exchange
-
-obj/cuda/test_exchange.o: src/cuda/test_exchange.cu
-	nvcc -arch=sm_20 $(CUDA_CFLAGS) $< -c -o $@
