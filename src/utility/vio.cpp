@@ -49,6 +49,7 @@
 // Headers
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "config.hpp"
 #include "demag.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
@@ -290,7 +291,7 @@ int match_sim(std::string const, std::string const, std::string const, int const
 int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
-int match_config(string const, string const, int const);
+//int match_config(string const, string const, int const);
 
 // Function to extract all variables from a string and return a vector
 std::vector<double> DoublesFromString(std::string value){
@@ -802,16 +803,17 @@ int match(string const key, string const word, string const value, string const 
 	//===================================================================
 	// Test for config output
 	//===================================================================
-	else
+	/*else
 	test="config";
 	if(key==test){
 		int frs=vin::match_config(word, value, line);
 		return frs;
-	}
+	}*/
    //-------------------------------------------------------------------
-	// Test for localised temperature pulse
+	// Test for module user interfaces
    //-------------------------------------------------------------------
    else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(config::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//-------------------------------------------------------------------
 	// Get material filename
 	//-------------------------------------------------------------------
@@ -2158,7 +2160,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    return EXIT_SUCCESS;
 }
 
-int match_config(string const word, string const value, int const line){
+/*int match_config(string const word, string const value, int const line){
 
    std::string prefix="config:";
 
@@ -2251,7 +2253,7 @@ int match_config(string const word, string const value, int const line){
 	  terminaltextcolor(WHITE);
       return EXIT_FAILURE;
    }
-}
+}*/
 
 int match_vout_list(string const word, string const value, int const line, std::vector<unsigned int> & output_list){
 
@@ -4546,7 +4548,15 @@ namespace vout{
 		}
 		}
 		
-		vout::config();
+		//vout::config();
+      config::output(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+                     cells::x_mag_array, cells::y_mag_array, cells::z_mag_array,
+                     double(sim::time)*mp::dt_SI,
+                     sim::temperature,
+                     sim::H_applied*sim::H_vec[0],
+                     sim::H_applied*sim::H_vec[1],
+                     sim::H_applied*sim::H_vec[2],
+                     0.0, 0.0, 0.0);
 
       // optionally save checkpoint file
       if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();

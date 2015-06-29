@@ -153,6 +153,7 @@ obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
+include	src/config/makefile
 include src/gpu/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)

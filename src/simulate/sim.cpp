@@ -43,6 +43,8 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
+#include "cells.hpp"
+#include "config.hpp"
 #include "demag.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
@@ -253,6 +255,11 @@ int run(){
    #endif
    stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array);
 
+   // Initialize configuration data output
+   config::initialize(atoms::num_atoms, cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2],
+		      atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+		      cells::x_coord_array, cells::y_coord_array, cells::z_coord_array, atoms::type_array);
+
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
 
@@ -263,135 +270,135 @@ int run(){
 	switch(sim::program){
 		case 0:
 			if(vmpi::my_rank==0){
-				std::cout << "Benchmark..." << std::endl;
-				zlog << "Benchmark..." << std::endl;
+            std::cout << "Starting simulation with program benchmark..." << std::endl;
+            zlog << zTs() << "Starting simulation with program benchmark..." << std::endl;
 			}
 			program::bmark();
 			break;
 		
 		case 1:
 			if(vmpi::my_rank==0){
-				std::cout << "Time-Series..." << std::endl;
-				zlog << "Time-Series..." << std::endl;
+            std::cout << "Starting simulation with program time-series..." << std::endl;
+            zlog << zTs() << "Starting simulation with program time-series..." << std::endl;
 			}
 			program::time_series();
 			break;
 		
 		case 2: 
 			if(vmpi::my_rank==0){
-				std::cout << "Hysteresis-Loop..." << std::endl;
-				zlog << "Hysteresis-Loop..." << std::endl;
+            std::cout << "Starting simulation with program hysteresis-loop..." << std::endl;
+            zlog << zTs() << "Starting simulation with program hysteresis-loop..." << std::endl;
 			}
 			program::hysteresis();
 			break;
 			
 		case 3: 
 			if(vmpi::my_rank==0){
-				std::cout << "Static-Hysteresis-Loop..." << std::endl;
-				zlog << "Static-Hysteresis-Loop..." << std::endl;
+            std::cout << "Starting simulation with program static-hysteresis-loop..." << std::endl;
+            zlog << zTs() << "Starting simulation with program static-hysteresis-loop..." << std::endl;
 			}
 			program::static_hysteresis();
 			break;
 			
 		case 4:
 			if(vmpi::my_rank==0){
-				std::cout << "Curie-Temperature..." << std::endl;
-				zlog << "Curie-Temperature..." << std::endl;
+            std::cout << "Starting simulation with program curie-temperature..." << std::endl;
+            zlog << zTs() << "Starting simulation with program curie-temperature..." << std::endl;
 			}
 			program::curie_temperature();
 			break;
 			
 		case 5:
 			if(vmpi::my_rank==0){
-				std::cout << "Field-Cool..." << std::endl;
-				zlog << "Field-Cool..." << std::endl;
+            std::cout << "Starting simulation with program field-cool..." << std::endl;
+            zlog << zTs() << "Starting simulation with program field-cool..." << std::endl;
 			}
 			program::field_cool();
 			break;
 
 		case 6:
 			if(vmpi::my_rank==0){
-				std::cout << "Temperature-Pulse..." << std::endl;
-				zlog << "Temperature-Pulse..." << std::endl;
+            std::cout << "Starting simulation with program temperature-pulse..." << std::endl;
+            zlog << zTs() << "Starting simulation with program temperature-pulse..." << std::endl;
 			}
 			program::temperature_pulse();
 			break;
 			
 		case 7:
 			if(vmpi::my_rank==0){
-				std::cout << "HAMR-Simulation..." << std::endl;
-				zlog << "HAMR-Simulation..." << std::endl;
+            std::cout << "Starting simulation with program HAMR-simulation..." << std::endl;
+            zlog << zTs() << "Starting simulation with program HAMR-simulation..." << std::endl;
 			}
 			program::hamr();
 			break;
 			
 		case 8:
 			if(vmpi::my_rank==0){
-				std::cout << "CMC-Anisotropy..." << std::endl;
-				zlog << "CMC-Anisotropy..." << std::endl;
+            std::cout << "Starting simulation with program cmc-anisotropy..." << std::endl;
+            zlog << zTs() << "Starting simulation with program cmc-anisotropy..." << std::endl;
 			}
 			program::cmc_anisotropy();
 			break;
 			
 		case 9:
 			if(vmpi::my_rank==0){
-				std::cout << "Hybrid-CMC..." << std::endl;
-				zlog << "Hybrid-CMC..." << std::endl;
+            std::cout << "Starting simulation with program hybrid-cmc..." << std::endl;
+            zlog << zTs() << "Starting simulation with program hybrid-cmc..." << std::endl;
 			}
 			program::hybrid_cmc();
 			break;
 			
       case 10:
          if(vmpi::my_rank==0){
-            std::cout << "Reverse-Hybrid-CMC..." << std::endl;
-            zlog << "Reverse-Hybrid-CMC..." << std::endl;
+            std::cout << "Starting simulation with program reverse-hybrid-cmc..." << std::endl;
+            zlog << zTs() << "Starting simulation with program reverse-hybrid-cmc..." << std::endl;
          }
          program::reverse_hybrid_cmc();
          break;
 
       case 11:
          if(vmpi::my_rank==0){
-            std::cout << "LaGrange-Multiplier..." << std::endl;
-            zlog << "LaGrange-Multiplier..." << std::endl;
+            std::cout << "Starting simulation with program lagrange-multiplier..." << std::endl;
+            zlog << zTs() << "Starting simulation with program lagrange-multiplier..." << std::endl;
          }
          program::lagrange_multiplier();
          break;
 
       case 12:
          if(vmpi::my_rank==0){
-            std::cout << "partial-hysteresis-loop..." << std::endl;
-            zlog << "partial-hysteresis-loop..." << std::endl;
+            std::cout << "Starting simulation with program partial-hysteresis-loop..." << std::endl;
+            zlog << zTs() << "Starting simulation with program partial-hysteresis-loop..." << std::endl;
          }
          program::partial_hysteresis_loop();
          break;
 
       case 13:
          if(vmpi::my_rank==0){
-            std::cout << "localised-temperature-pulse..." << std::endl;
-            zlog << "localised-temperature-pulse..." << std::endl;
+            std::cout << "Starting simulation with program localised-temperature-pulse..." << std::endl;
+            zlog << zTs() << "Starting simulation with program localised-temperature-pulse..." << std::endl;
          }
          program::localised_temperature_pulse();
          break;
 
       case 14:
          if(vmpi::my_rank==0){
-            std::cout << "effective-damping..." << std::endl;
-            zlog << "effective-damping..." << std::endl;
+            std::cout << "Starting simulation with program effective-damping..." << std::endl;
+            zlog << zTs() << "Starting simulation with program effective-damping..." << std::endl;
          }
          program::effective_damping();
          break;
 
 		case 50:
 			if(vmpi::my_rank==0){
-				std::cout << "Diagnostic-Boltzmann..." << std::endl;
-				zlog << "Diagnostic-Boltzmann..." << std::endl;
+            std::cout << "Starting simulation with program Diagnostic-Boltzmann..." << std::endl;
+            zlog << zTs() << "Starting simulation with program Diagnostic-Boltzmann..." << std::endl;
 			}
 			program::boltzmann_dist();
 			break;
 		
 		default:{
-			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
-			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
+         std::cerr << "Error: Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
+         zlog << zTs() << "Error: Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);
 			}
 	}

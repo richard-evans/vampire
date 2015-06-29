@@ -13,6 +13,7 @@
 # Other sundry files
 *.png
 *.cfg
+*.meta
 *.inc
 info
 vampire
