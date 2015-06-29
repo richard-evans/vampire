@@ -113,6 +113,103 @@ namespace vcuda
                cu::d_rand_state, ::atoms::num_atoms);
       }
 
+      void update_dipolar_fields ()
+      {
+         /*
+          * Check if an update is required
+          */
+
+         if (::sim::time == ::demag::update_time) return;
+         if (::sim::time % ::demag::update_rate) return;
+
+         ::demag::update_time = ::sim::time;
+
+         /*
+          * Figure out addresses in device memory space
+          */
+
+         double * d_x_spin = thrust::raw_pointer_cast(
+               cu::atoms::x_spin_array.data());
+         double * d_y_spin = thrust::raw_pointer_cast(
+               cu::atoms::y_spin_array.data());
+         double * d_z_spin = thrust::raw_pointer_cast(
+               cu::atoms::z_spin_array.data());
+
+         size_t * d_materials =
+            thrust::raw_pointer_cast(cu::atoms::type_array.data());
+
+         size_t * d_cells =
+            thrust::raw_pointer_cast(cu::atoms::cell_array.data());
+
+         cu::material_parameters_t * d_material_params =
+            thrust::raw_pointer_cast (cu::mp::materials.data());
+
+         double * d_x_mag = thrust::raw_pointer_cast(
+               cu::cells::x_mag_array.data());
+         double * d_y_mag = thrust::raw_pointer_cast(
+               cu::cells::y_mag_array.data());
+         double * d_z_mag = thrust::raw_pointer_cast(
+               cu::cells::z_mag_array.data());
+
+         double * d_x_cell_field = thrust::raw_pointer_cast(
+               cu::cells::x_field_array.data());
+         double * d_y_cell_field = thrust::raw_pointer_cast(
+               cu::cells::y_field_array.data());
+         double * d_z_cell_field = thrust::raw_pointer_cast(
+               cu::cells::z_field_array.data());
+
+         double * d_x_coord = thrust::raw_pointer_cast(
+               cu::cells::x_coord_array.data());
+         double * d_y_coord = thrust::raw_pointer_cast(
+               cu::cells::y_coord_array.data());
+         double * d_z_coord = thrust::raw_pointer_cast(
+               cu::cells::z_coord_array.data());
+
+         double * d_volume = thrust::raw_pointer_cast(
+               cu::cells::volume_array.data());
+
+         /*
+          * Update cell magnetizations
+          */
+
+         thrust::fill(
+               cu::cells::x_mag_array.begin(),
+               cu::cells::x_mag_array.end(),
+               0.0);
+         thrust::fill(
+               cu::cells::y_mag_array.begin(),
+               cu::cells::y_mag_array.end(),
+               0.0);
+         thrust::fill(
+               cu::cells::z_mag_array.begin(),
+               cu::cells::z_mag_array.end(),
+               0.0);
+
+         update_cell_magnetizations <<< cu::grid_size, cu::block_size >>> (
+               d_x_spin, d_y_spin, d_z_spin,
+               d_materials, d_cells, d_material_params,
+               d_x_mag, d_y_mag, d_z_mag,
+               ::atoms::num_atoms
+               );
+
+         /*
+          * Update cell dipolar fields
+          */
+
+         update_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
+               d_x_mag, d_y_mag, d_z_mag,
+               d_x_coord, d_y_coord, d_z_coord,
+               volume, ::demag::prefactor /* wut? */,
+               d_x_cell_field, d_y_cell_field, d_z_cell_field,
+               ::cells::num_cells
+               );
+
+         update_atomistic_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
+               d_x_cell_field, d_y_cell_field, d_z_cell_field,
+               ::atoms::num_atoms
+               );
+      }
+
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
             size_t * material,
@@ -293,7 +390,7 @@ namespace vcuda
       __global__ void update_cell_magnetization (
             double * x_spin, double * y_spin, double * z_spin,
             size_t * material, size_t * cell,
-            vcuda::internal::material_parameters_t * material_params,
+            cu::material_parameters_t * material_params,
             double * x_mag, double * y_mag, double * z_mag,
             size_t n_atoms
             )
@@ -371,6 +468,26 @@ namespace vcuda
             x_dip_field[i] = prefactor * field_x;
             y_dip_field[i] = prefactor * field_y;
             z_dip_field[i] = prefactor * field_z;
+         }
+      }
+
+      __global__ void update_atomistic_dipolar_fields (
+            double * x_cell_field, double * y_cell_field, double * z_cell_field,
+            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            size_t * cell, size_t n_atoms
+            )
+      {
+         /*
+          * TODO: Warning extremely naïve data access pattern
+          */
+         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+               i < n_atoms;
+               i += blockDim.x * gridDim.x)
+         {
+            size_t cid = cell[i];
+            x_dip_field[i] = x_cell_field[cid];
+            y_dip_field[i] = y_cell_field[cid];
+            z_dip_field[i] = z_cell_field[cid];
          }
       }
 

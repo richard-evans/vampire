@@ -105,6 +105,7 @@ namespace vcuda{
 
       void update_spin_fields ();
       void update_external_fields ();
+      void update_dipolar_fields ();
 
       /*
        * Shared functors for thrust
@@ -158,7 +159,15 @@ namespace vcuda{
       __global__ void update_dipolar_fields (
             double * x_mag, double * y_mag, double * z_mag,
             double * x_coord, double * y_coord, double * z_coord,
-            double * volume, double prefactor, size_t n_cells
+            double * volume, double prefactor,
+            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            size_t n_cells
+            );
+
+      __global__ void update_atomistic_dipolar_fields (
+            double * x_cell_field, double * y_cell_field, double * z_cell_field,
+            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            size_t * cell, size_t n_atoms
             );
 
       __global__ void llg_heun_first_kernel (
