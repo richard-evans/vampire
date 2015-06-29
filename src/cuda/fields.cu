@@ -1,5 +1,7 @@
-#include "internal.hpp"
+#include "cuda_utils.hpp"
+#include "exchange_fields.hpp"
 #include "data.hpp"
+#include "internal.hpp"
 
 #ifdef CUDA
 namespace cu = vcuda::internal;
@@ -59,6 +61,12 @@ namespace vcuda
                d_materials, d_material_params,
                d_x_spin_field, d_y_spin_field, d_z_spin_field,
                ::atoms::num_atoms);
+
+         check_cuda_errors (__FILE__, __LINE__);
+
+         cu::exchange::calculate_exchange_fields ();
+
+         check_cuda_errors (__FILE__, __LINE__);
       }
 
       void update_external_fields ()
@@ -111,6 +119,8 @@ namespace vcuda
                d_x_dip_field, d_y_dip_field, d_z_dip_field,
                d_x_ext_field, d_y_ext_field, d_z_ext_field,
                cu::d_rand_state, ::atoms::num_atoms);
+
+         check_cuda_errors (__FILE__, __LINE__);
       }
 
       void update_dipolar_fields ()
@@ -125,6 +135,8 @@ namespace vcuda
          ::demag::update_time = ::sim::time;
 
          update_cell_magnetizations ();
+
+         check_cuda_errors (__FILE__, __LINE__);
 
          /*
           * Figure out addresses in device memory space
@@ -166,6 +178,8 @@ namespace vcuda
                ::cells::num_cells
                );
 
+         check_cuda_errors (__FILE__, __LINE__);
+
          /*
           * Update atomistic dipolar fields
           */
@@ -186,6 +200,8 @@ namespace vcuda
                d_cells,
                ::atoms::num_atoms
                );
+
+         check_cuda_errors (__FILE__, __LINE__);
       }
 
       void update_cell_magnetizations ()
@@ -237,6 +253,8 @@ namespace vcuda
                d_x_mag, d_y_mag, d_z_mag,
                ::atoms::num_atoms
                );
+
+         check_cuda_errors (__FILE__, __LINE__);
       }
 
       __global__ void update_non_exchange_spin_fields (
