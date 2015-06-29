@@ -70,6 +70,9 @@ namespace vcuda{
          cu::cells::x_mag_array.RealArray::~device_vector ();
          cu::cells::y_mag_array.RealArray::~device_vector ();
          cu::cells::z_mag_array.RealArray::~device_vector ();
+         cu::cells::x_field_array.RealArray::~device_vector ();
+         cu::cells::y_field_array.RealArray::~device_vector ();
+         cu::cells::z_field_array.RealArray::~device_vector ();
          cu::cells::volume_array.RealArray::~device_vector ();
          cu::cells::num_atoms.IndexArray::~device_vector ();
 
@@ -88,7 +91,10 @@ namespace vcuda{
          cu::llg::x_spin_buffer_array.RealArray::~device_vector ();
          cu::llg::y_spin_buffer_array.RealArray::~device_vector ();
          cu::llg::z_spin_buffer_array.RealArray::~device_vector ();
+
          cu::llg::heun_parameters.HeunParametersArray::~device_vector ();
+
+         cudaFree (d_rand_state);
       }
    } /* internal */
 #endif

@@ -147,7 +147,11 @@ namespace vcuda{
                   ::mp::dt, ::atoms::num_atoms
                   );
 
+            check_cuda_errors (__FILE__, __LINE__);
+
             cu::update_spin_fields ();
+
+            check_cuda_errors (__FILE__, __LINE__);
 
             cu::llg::llg_heun_scheme <<< cu::grid_size, cu::block_size >>> (
                   d_x_spin, d_y_spin, d_y_spin,
@@ -157,6 +161,8 @@ namespace vcuda{
                   d_x_spin_buffer, d_y_spin_buffer, d_y_spin_buffer,
                   ::mp::dt, ::atoms::num_atoms
                   );
+
+            check_cuda_errors (__FILE__, __LINE__);
 
             thrust::copy (
                   cu::llg::x_spin_buffer_array.begin(),
