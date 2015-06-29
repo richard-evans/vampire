@@ -173,18 +173,24 @@ namespace vcuda{
             size_t * cells, size_t n_atoms
             );
 
-      __global__ void llg_heun_first_kernel (
+      __global__ void llg_heun_step (
             double * x_spin, double * y_spin, double * z_spin,
+            size_t * material_id,
+            heun_parameters_t * heun_parameters,
             double * x_sp_field, double * y_sp_field, double * z_sp_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
-            double dt
+            double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
+            double dt, size_t num_atoms
             );
 
-      __global__ void llg_heun_scheme(
-            double * x_spin, double * y_spin, double * z_spin,
+      __global__ void llg_heun_scheme (
+            double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
+            size_t * material_id,
+            heun_parameters_t * heun_parameters,
             double * x_sp_field, double * y_sp_field, double * z_sp_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
-            double * x_new_spin, double * y_new_spin, double z_new_spin
+            double * x_spin, double * y_spin, double * z_spin,
+            double dt, size_t num_atoms
             );
    } // end of iternal namespace
 
