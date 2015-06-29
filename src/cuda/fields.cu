@@ -184,7 +184,7 @@ namespace vcuda
           * Update atomistic dipolar fields
           */
 
-         size_t * d_cells =
+         int * d_cells =
             thrust::raw_pointer_cast(cu::atoms::cell_array.data());
 
          double * d_x_atom_field = thrust::raw_pointer_cast(
@@ -213,10 +213,10 @@ namespace vcuda
          double * d_z_spin = thrust::raw_pointer_cast(
                cu::atoms::z_spin_array.data());
 
-         size_t * d_materials =
+         int * d_materials =
             thrust::raw_pointer_cast(cu::atoms::type_array.data());
 
-         size_t * d_cells =
+         int * d_cells =
             thrust::raw_pointer_cast(cu::atoms::cell_array.data());
 
          cu::material_parameters_t * d_material_params =
@@ -522,17 +522,17 @@ namespace vcuda
       __global__ void update_atomistic_dipolar_fields (
             double * x_cell_field, double * y_cell_field, double * z_cell_field,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
-            size_t * cell, size_t n_atoms
+            int * cell, int n_atoms
             )
       {
          /*
           * TODO: Warning extremely naïve data access pattern
           */
-         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+         for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
                i < n_atoms;
                i += blockDim.x * gridDim.x)
          {
-            size_t cid = cell[i];
+            int cid = cell[i];
             x_dip_field[i] = x_cell_field[cid];
             y_dip_field[i] = y_cell_field[cid];
             z_dip_field[i] = z_cell_field[cid];

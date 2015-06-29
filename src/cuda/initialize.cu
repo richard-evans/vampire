@@ -12,9 +12,11 @@
 #include <vector>
 
 // Vampire headers
-#include "../../hdr/atoms.hpp"
-#include "../../hdr/cuda.hpp"
-#include "../../hdr/random.hpp"
+#include "atoms.hpp"
+#include "cuda.hpp"
+#include "random.hpp"
+#include "errors.hpp"
+#include "vio.hpp"
 
 // Local cuda headers
 
@@ -30,12 +32,42 @@ namespace cu = ::vcuda::internal;
 
 namespace vcuda{
 
-    //-------------------------------------------------------------------------------
+   //-------------------------------------------------------------------------------
    // Function to initialize GPU data
    //-------------------------------------------------------------------------------
    bool initialize(){
 
 #ifdef CUDA
+
+      std::cout << "CUDA has been enabled.\n";
+//      std::cout << "compiled with " << COMP << std::endl;
+
+      // Check if there is a compatible devices
+      int n_devices;
+      cudaError_t error = cudaGetDeviceCount(&n_devices);
+
+      if( error == cudaErrorNoDevice )
+      {
+         std::cout << "Error: CUDA is enabled but no CUDA compatible devices are available." << std::endl;
+         zlog << zTs() << "Error: CUDA is enabled but no CUDA compatible devices are available." << std::endl;
+         ::err::vexit();
+      }
+      else if ( error == cudaErrorInsufficientDriver )
+      {
+         std::cout     << "Error: CUDA is enabled but no CUDA drivers are incompatible. Please update drivers." << std::endl;
+         zlog << zTs() << "Error: CUDA is enabled but no CUDA drivers are incompatible. Please update drivers." << std::endl;
+         ::err::vexit();
+      }
+      else if ( error != cudaSuccess)
+      {
+         std::cout     << "Error: CUDA is enabled but error querying devices." << std::endl;
+         zlog << zTs() << "Error: CUDA is enabled but error querying devices." << std::endl;
+         ::err::vexit();
+      }
+
+
+
+
 
       bool success = true;
 
