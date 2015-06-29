@@ -27,7 +27,9 @@
 
 #include "../../hdr/atoms.hpp"
 #include "../../hdr/cells.hpp"
+#include "../../hdr/demag.hpp"
 #include "../../hdr/material.hpp"
+#include "../../hdr/sim.hpp"
 
 namespace vcuda{
 
@@ -105,6 +107,8 @@ namespace vcuda{
 
       void update_spin_fields ();
       void update_external_fields ();
+      void update_dipolar_fields ();
+      void update_cell_magnetizations ();
 
       /*
        * Shared functors for thrust
@@ -158,7 +162,15 @@ namespace vcuda{
       __global__ void update_dipolar_fields (
             double * x_mag, double * y_mag, double * z_mag,
             double * x_coord, double * y_coord, double * z_coord,
-            double * volume, double prefactor, int n_cells
+            double * volume,
+            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            int n_cells
+            );
+
+      __global__ void update_atomistic_dipolar_fields (
+            double * x_cell_field, double * y_cell_field, double * z_cell_field,
+            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            int * cells, int n_atoms
             );
 
       __global__ void llg_heun_first_kernel (

@@ -18,6 +18,7 @@
 
 // Local cuda headers
 
+#include "cuda_utils.hpp"
 #include "data.hpp"
 #include "internal.hpp"
 
@@ -55,7 +56,11 @@ namespace vcuda{
       success = success && cu::__initialize_curand ();
 
       // Set up the exchange fields
-      if( cu::exchange::initialise_exchange() != EXIT_SUCCESS) std::cerr << "Failed to initialise exchange" << std::endl;
+      if( cu::exchange::initialise_exchange() != EXIT_SUCCESS)
+      {
+         std::cerr << "Failed to initialise exchange" << std::endl;
+         success = false;
+      }
 
       // Successful initialization
       return success;
@@ -440,6 +445,7 @@ namespace vcuda{
                cu::plusone_functor()
                );
 
+<<<<<<< HEAD
          thrust::copy(
                ::atoms::neighbour_list_array.begin(),
                ::atoms::neighbour_list_array.end(),
@@ -461,6 +467,9 @@ namespace vcuda{
                limits_h.end(),
                cu::atoms::limits.begin()
                );
+=======
+         cu::atoms::limits[0UL] = 0UL;
+>>>>>>> 8bd7f5f59971fa2b8118b7e64df479f5686492c3
 
          thrust::copy(
                ::atoms::neighbour_list_array.begin(),
@@ -478,14 +487,13 @@ namespace vcuda{
          cudaMalloc (
                (void **) &cu::d_rand_state,
                cu::grid_size * cu::block_size * sizeof(curandState));
-         /*
-          * TODO: check this call.
-          */
+
+         check_cuda_errors (__FILE__, __LINE__);
+
          cu::init_rng <<< cu::grid_size, cu::block_size >>> (
                cu::d_rand_state, ::mtrandom::integration_seed);
-         /*
-          * TODO: Check this call.
-          */
+
+         check_cuda_errors (__FILE__, __LINE__);
 
          return true;
       }

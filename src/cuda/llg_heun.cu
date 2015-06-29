@@ -49,7 +49,6 @@ namespace vcuda{
             size_t * material_id,
             cu::heun_parameters_t * heun_parameters,
             double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
-            double * x_delta_spin, double * y_delta_spin, double * z_delta_spin,
             double * x_sp_field, double * y_sp_field, double * z_sp_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
             double dt, size_t num_atoms
