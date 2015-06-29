@@ -41,6 +41,17 @@ inline void check_cuda_errors(const char *filename, const int line_number)
 #endif
 }
 
+inline void check_device_memory( const char* filename, const int line_number)
+{
+#ifdef CUDA_DEBUG
+   size_t avail;
+   size_t total;
+   cudaMemGetInfo( &avail, &total);
+   size_t used = total - avail;
+   printf( "CUDA device memory usage at %s:%i: Used: %f Mb, Free %f Mb\n", filename, line_number, float(used)/(1024*1024), float(avail)/(1024*1024));
+#endif
+}
+
 
 
 #endif

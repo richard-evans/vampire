@@ -27,7 +27,7 @@ material:file=Co.mat
 #------------------------------------------
 sim:temperature=300.0
 sim:time-steps-increment=10
-sim:total-time-steps=10000
+sim:total-time-steps=10
 sim:time-step=1.0E-15
 
 #------------------------------------------

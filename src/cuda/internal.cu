@@ -17,8 +17,8 @@ namespace vcuda
    namespace internal
    {
 
-      size_t block_size(256UL);
-      size_t grid_size(512UL);
+      int block_size(256UL);
+      int grid_size(512UL);
 
       __device__ double atomicAdd (double * address, double value)
       {
@@ -34,9 +34,9 @@ namespace vcuda
          return __longlong_as_double(old);
       }
 
-      __global__ void init_rng (curandState * state, size_t seed)
+      __global__ void init_rng (curandState * state, int seed)
       {
-         size_t tid = blockIdx.x + blockDim.x + threadIdx.x;
+         int tid = blockIdx.x + blockDim.x + threadIdx.x;
          curand_init (seed, tid, 0, state + tid);
       }
    }

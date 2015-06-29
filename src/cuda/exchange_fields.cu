@@ -23,21 +23,19 @@ namespace vcuda
       namespace exchange
       {
 
-         bool exchange_initialised = false;
 
+         // Cusparse handle to use the csrmv routines
          cusparseHandle_t  cusparse_handle;
 
-         // Exchange matrix stored as CSR sparse matrix
-         thrust::device_vector<int> rowptrs_d;
-         thrust::device_vector<int> colinds_d;
-
-         thrust::device_vector<double> Jxx_vals_d;
-         thrust::device_vector<double> Jyy_vals_d;
-         thrust::device_vector<double> Jzz_vals_d;
-
-         bool Jxx_initialised = false;
-
+         // Cusparse descriptor for exchange matrices
          cusparseMatDescr_t J_descr;
+
+         bool exchange_initialised = false;
+
+         bool J_isot_initialised = false;
+         bool J_vect_initialised = false;
+         bool J_tens_initialised = false;
+
 
          int initialise_exchange()
          {
@@ -45,41 +43,19 @@ namespace vcuda
             // Initialise the cuSparse handle
             cusparse_call( cusparseCreate( &cusparse_handle) );
 
+            // Initialise the matrix description
             cusparseCreateMatDescr(&J_descr);
             cusparseSetMatType(J_descr, CUSPARSE_MATRIX_TYPE_GENERAL);
             cusparseSetMatIndexBase(J_descr,CUSPARSE_INDEX_BASE_ZERO);
 
-            size_t avail;
-            size_t total;
-            cudaMemGetInfo( &avail, &total );
-            size_t used = total - avail;
-            std::cout << "Total: " << total << " , Used: " << used << " , Free: " << avail << std::endl;
 
+            check_device_memory(__FILE__,__LINE__);
 
-            // Transfer the row ptrs and col indices to the device
-            std::vector<int> rowptrs_h( ::atoms::num_atoms + 1, 0);
-            for( int atom = 0; atom < ::atoms::num_atoms; atom++)
-               rowptrs_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
-
-            rowptrs_d.resize( ::atoms::num_atoms + 1);
-            colinds_d.resize( ::atoms::neighbour_list_array.size() );
-
-
-            thrust::copy(
-                  rowptrs_h.begin(),
-                  rowptrs_h.end(),
-                  rowptrs_d.begin()
-                  );
-
-            thrust::copy(
-                  ::atoms::neighbour_list_array.begin(),
-                  ::atoms::neighbour_list_array.end(),
-                  colinds_d.begin()
-                  );
-
-            std::vector<double> Jxx_vals_h( ::atoms::neighbour_list_array.size());
-            std::vector<double> Jyy_vals_h( ::atoms::neighbour_list_array.size());
-            std::vector<double> Jzz_vals_h( ::atoms::neighbour_list_array.size());
+            // Temporary vectors on host to copy exchange values from
+            // They have to be declared outside of case statement
+            std::vector<double> Jxx_vals_h;
+            std::vector<double> Jyy_vals_h;
+            std::vector<double> Jzz_vals_h;
 
             switch( ::atoms::exchange_type)
             {
@@ -90,14 +66,14 @@ namespace vcuda
                   // and Jxy = Jxz = Jyx = 0
                   //--------------------------------------------------------------
 
-                  std::cerr << "Setting up isotropic exchange interaction" << std::endl;
-
+                  // Copy J values from vampire exchange list to values list
                   for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)
                   {
                      int iid = ::atoms::neighbour_interaction_type_array[i]; // interaction id
                      double Jij= ::atoms::i_exchange_list[iid].Jij;
 
-                     Jxx_vals_h[i] = -Jij;
+                     // -ve required for convention
+                     Jxx_vals_h.push_back(-Jij);
 
                   }
 
@@ -109,19 +85,25 @@ namespace vcuda
                         Jxx_vals_d.begin()
                         );
 
-                  Jxx_initialised = true;
+                  J_isot_initialised = true;
                   check_cuda_errors(__FILE__,__LINE__);
 
                   break;
 
                case 1: // Vector
 
+                  //--------------------------------------------------------------
+                  // Exchange is diagonal so Jxx != Jyy != Jzz
+                  // and Jxy = Jxz = Jyx = 0
+                  //--------------------------------------------------------------
+
+                  // Copy J values from vampire exchange list to values list
                   for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)
                   {
                      int iid = ::atoms::neighbour_interaction_type_array[i]; // interaction id
-                     Jxx_vals_h[i] = -::atoms::v_exchange_list[iid].Jij[0];
-                     Jyy_vals_h[i] = -::atoms::v_exchange_list[iid].Jij[1];
-                     Jzz_vals_h[i] = -::atoms::v_exchange_list[iid].Jij[2];
+                     Jxx_vals_h.push_back( -::atoms::v_exchange_list[iid].Jij[0]);
+                     Jyy_vals_h.push_back( -::atoms::v_exchange_list[iid].Jij[1]);
+                     Jzz_vals_h.push_back( -::atoms::v_exchange_list[iid].Jij[2]);
 
                   }
 
@@ -141,7 +123,7 @@ namespace vcuda
                         Jyy_vals_d.begin()
                         );
 
-                  Jxx_initialised = true;
+                  J_vect_initialised = true;
                   check_cuda_errors(__FILE__,__LINE__);
 
                   break;
@@ -152,17 +134,11 @@ namespace vcuda
 
             exchange_initialised = true;
 
-            std::cout << "Made matrix" << std::endl;
-            size_t avail_new, total_new;
-            cudaError_t err = cudaMemGetInfo( &avail_new, &total_new );
-            if( err != cudaSuccess)
-            {
-               std::cout << "Error fetching memory __LINE__" << std::endl;
-            }
-            size_t used_new = total_new - avail_new;
-            std::cout << "Total: " << total_new << " , Used: " << used_new << " , Free: " << avail_new << std::endl;
-            std::cout << "Memory used by matrix on device: " << used_new - used << " or in mb: " << float(used_new - used)/(1024.0*1024.0) << std::endl;
+            std::cout << cu::atoms::limits[0] << "\t\t" << cu::atoms::limits[1] << "\t\t" << cu::atoms::limits[::atoms::num_atoms] << std::endl;
 
+
+            std::cout << "Made matrix" << std::endl;
+            check_device_memory(__FILE__,__LINE__);
             check_cuda_errors(__FILE__,__LINE__);
             return EXIT_SUCCESS;
          }
@@ -171,23 +147,12 @@ namespace vcuda
          int finalise_exchange()
          {
             check_cuda_errors(__FILE__,__LINE__);
+            // de-allocate all the data used in the exchange
             if( exchange_initialised)
             {
-
                cusparseDestroy( cusparse_handle);
                cusparseDestroyMatDescr( J_descr);
-
             }
-
-            // Manually call the destructors for the thrust vectors
-            rowptrs_d.~device_vector();
-            colinds_d.~device_vector();
-
-            Jxx_vals_d.~device_vector();
-            Jyy_vals_d.~device_vector();
-            Jzz_vals_d.~device_vector();
-
-
             return EXIT_SUCCESS;
          }
 
@@ -195,26 +160,9 @@ namespace vcuda
          {
 
             check_cuda_errors(__FILE__,__LINE__);
-            /*
-             * Fill the field vectors with zero
-             */
 
-            thrust::fill(
-                  cu::x_total_spin_field_array.begin(),
-                  cu::x_total_spin_field_array.end(),
-                  0.0);
-            thrust::fill(
-                  cu::y_total_spin_field_array.begin(),
-                  cu::y_total_spin_field_array.end(),
-                  0.0);
-            thrust::fill(
-                  cu::z_total_spin_field_array.begin(),
-                  cu::z_total_spin_field_array.end(),
-                  0.0);
-
-
-            int * rowptrs_dptr = thrust::raw_pointer_cast( rowptrs_d.data() );
-            int * colinds_dptr = thrust::raw_pointer_cast( colinds_d.data() );
+            int * rowptrs_dptr = thrust::raw_pointer_cast( cu::atoms::limits.data() );
+            int * colinds_dptr = thrust::raw_pointer_cast( cu::atoms::neighbours.data() );
             double * Jxx_vals_dptr = thrust::raw_pointer_cast( Jxx_vals_d.data() );
             double * Jyy_vals_dptr = thrust::raw_pointer_cast( Jyy_vals_d.data() );
             double * Jzz_vals_dptr = thrust::raw_pointer_cast( Jzz_vals_d.data() );
@@ -226,8 +174,11 @@ namespace vcuda
             double * Hy_dptr = thrust::raw_pointer_cast( cu::y_total_spin_field_array.data());
             double * Hz_dptr = thrust::raw_pointer_cast( cu::z_total_spin_field_array.data());
 
+
+            // cusparse csrmv calculates y = alpha * OP(A) * x + beta * y
+            // where alpha and beta are scalar constants
             double alpha = 1.0;
-            double beta = 0.0;
+            double beta = 1.0;
 
             switch( ::atoms::exchange_type)
             {
@@ -240,6 +191,8 @@ namespace vcuda
 
                   if( !exchange_initialised) initialise_exchange();
 
+
+                  // Since Jxx = Jyy = Jzz only the Jxx array is used
                   cusparseDcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -289,7 +242,6 @@ namespace vcuda
 
                case 1: // Vector exchange
 
-                  std::cout << "Vector Exchange" << std::endl;
                   //--------------------------------------------------------------
                   // Exchange is diagonal so Jxx != Jyy != Jzz
                   // and Jxy = Jxz = Jyx = 0
@@ -297,6 +249,7 @@ namespace vcuda
 
                   if( !exchange_initialised) initialise_exchange();
 
+                  // Compute the Hx = Jxx * Sx exchange fields
                   cusparseDcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -312,6 +265,7 @@ namespace vcuda
                          &beta,
                          Hx_dptr);
 
+                  // Compute the Hy = Jyy * Sy exchange fields
                   cusparseDcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -327,6 +281,7 @@ namespace vcuda
                          &beta,
                          Hy_dptr);
 
+                  // Compute the Hz = Jzz * Sz exchange fields
                   cusparseDcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -343,22 +298,7 @@ namespace vcuda
                          Hz_dptr);
 
                   break;
-
             }
-
-            ::atoms::x_total_spin_field_array[0] = 0.0;
-            ::atoms::y_total_spin_field_array[0] = 0.0;
-            ::atoms::z_total_spin_field_array[0] = 0.0;
-
-            ::calculate_exchange_fields(0,::atoms::num_atoms);
-
-            std::cout << cu::x_total_spin_field_array[0] << "\t\t"
-                     <<  cu::y_total_spin_field_array[0] << "\t\t"
-                     <<  cu::z_total_spin_field_array[0] << "\t\t"
-                     << ::atoms::x_total_spin_field_array[0] << "\t\t"
-                     << ::atoms::y_total_spin_field_array[0] << "\t\t"
-                     << ::atoms::z_total_spin_field_array[0] << "\t\t"
-                     << std::endl;
 
             check_cuda_errors(__FILE__,__LINE__);
             return EXIT_SUCCESS;
