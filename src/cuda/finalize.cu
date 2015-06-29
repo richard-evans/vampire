@@ -89,6 +89,8 @@ namespace vcuda{
          cu::llg::y_spin_buffer_array.RealArray::~device_vector ();
          cu::llg::z_spin_buffer_array.RealArray::~device_vector ();
          cu::llg::heun_parameters.HeunParametersArray::~device_vector ();
+
+         std::cerr << "CUDA finalise has been called, hopefully everything has been de-allocated now" << std::endl;
       }
    } /* internal */
 #endif

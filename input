@@ -27,13 +27,13 @@ material:file=Co.mat
 #------------------------------------------
 sim:temperature=300.0
 sim:time-steps-increment=10
-sim:total-time-steps=10
+sim:total-time-steps=100
 sim:time-step=1.0E-15
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
-sim:program=benchmark
+sim:program=time-series
 sim:integrator=llg-heun
 
 #------------------------------------------
@@ -43,7 +43,7 @@ output:real-time
 output:temperature
 output:magnetisation
 output:magnetisation-length
-output:output-rate = 1000
+output:output-rate = 10
 
 screen:time-steps
 screen:magnetisation-length
