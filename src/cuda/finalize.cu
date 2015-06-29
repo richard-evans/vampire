@@ -58,9 +58,9 @@ namespace vcuda{
          cu::atoms::cell_array.IndexArray::~device_vector ();
          cu::atoms::limits.IndexArray::~device_vector ();
          cu::atoms::neighbours.IndexArray::~device_vector ();
-         Jxx_vals.RealArray::~device_vector ();
-         Jyy_vals.RealArray::~device_vector ();
-         Jzz_vals.RealArray::~device_vector ();
+         cu::atoms::Jxx_vals.RealArray::~device_vector ();
+         cu::atoms::Jyy_vals.RealArray::~device_vector ();
+         cu::atoms::Jzz_vals.RealArray::~device_vector ();
 
          cu::cells::x_coord_array.RealArray::~device_vector ();
          cu::cells::y_coord_array.RealArray::~device_vector ();

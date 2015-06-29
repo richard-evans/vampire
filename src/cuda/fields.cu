@@ -124,10 +124,72 @@ namespace vcuda
 
          ::demag::update_time = ::sim::time;
 
+         update_cell_magnetizations ();
+
          /*
           * Figure out addresses in device memory space
           */
 
+         double * d_x_mag = thrust::raw_pointer_cast(
+               cu::cells::x_mag_array.data());
+         double * d_y_mag = thrust::raw_pointer_cast(
+               cu::cells::y_mag_array.data());
+         double * d_z_mag = thrust::raw_pointer_cast(
+               cu::cells::z_mag_array.data());
+
+         double * d_x_coord = thrust::raw_pointer_cast(
+               cu::cells::x_coord_array.data());
+         double * d_y_coord = thrust::raw_pointer_cast(
+               cu::cells::y_coord_array.data());
+         double * d_z_coord = thrust::raw_pointer_cast(
+               cu::cells::z_coord_array.data());
+
+         double * d_volume = thrust::raw_pointer_cast(
+               cu::cells::volume_array.data());
+
+         double * d_x_cell_field = thrust::raw_pointer_cast(
+               cu::cells::x_field_array.data());
+         double * d_y_cell_field = thrust::raw_pointer_cast(
+               cu::cells::y_field_array.data());
+         double * d_z_cell_field = thrust::raw_pointer_cast(
+               cu::cells::z_field_array.data());
+
+         /*
+          * Update cell dipolar fields
+          */
+
+         update_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
+               d_x_mag, d_y_mag, d_z_mag,
+               d_x_coord, d_y_coord, d_z_coord,
+               d_volume,
+               d_x_cell_field, d_y_cell_field, d_z_cell_field,
+               ::cells::num_cells
+               );
+
+         /*
+          * Update atomistic dipolar fields
+          */
+
+         size_t * d_cells =
+            thrust::raw_pointer_cast(cu::atoms::cell_array.data());
+
+         double * d_x_atom_field = thrust::raw_pointer_cast(
+               cu::x_dipolar_field_array.data());
+         double * d_y_atom_field = thrust::raw_pointer_cast(
+               cu::y_dipolar_field_array.data());
+         double * d_z_atom_field = thrust::raw_pointer_cast(
+               cu::z_dipolar_field_array.data());
+
+         update_atomistic_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
+               d_x_cell_field, d_y_cell_field, d_z_cell_field,
+               d_x_atom_field, d_y_atom_field, d_z_atom_field,
+               d_cells,
+               ::atoms::num_atoms
+               );
+      }
+
+      void update_cell_magnetizations ()
+      {
          double * d_x_spin = thrust::raw_pointer_cast(
                cu::atoms::x_spin_array.data());
          double * d_y_spin = thrust::raw_pointer_cast(
@@ -151,23 +213,6 @@ namespace vcuda
          double * d_z_mag = thrust::raw_pointer_cast(
                cu::cells::z_mag_array.data());
 
-         double * d_x_cell_field = thrust::raw_pointer_cast(
-               cu::cells::x_field_array.data());
-         double * d_y_cell_field = thrust::raw_pointer_cast(
-               cu::cells::y_field_array.data());
-         double * d_z_cell_field = thrust::raw_pointer_cast(
-               cu::cells::z_field_array.data());
-
-         double * d_x_coord = thrust::raw_pointer_cast(
-               cu::cells::x_coord_array.data());
-         double * d_y_coord = thrust::raw_pointer_cast(
-               cu::cells::y_coord_array.data());
-         double * d_z_coord = thrust::raw_pointer_cast(
-               cu::cells::z_coord_array.data());
-
-         double * d_volume = thrust::raw_pointer_cast(
-               cu::cells::volume_array.data());
-
          /*
           * Update cell magnetizations
           */
@@ -185,27 +230,11 @@ namespace vcuda
                cu::cells::z_mag_array.end(),
                0.0);
 
-         update_cell_magnetizations <<< cu::grid_size, cu::block_size >>> (
+         update_cell_magnetization <<< cu::grid_size, cu::block_size >>> (
                d_x_spin, d_y_spin, d_z_spin,
-               d_materials, d_cells, d_material_params,
+               d_materials, d_cells,
+               d_material_params,
                d_x_mag, d_y_mag, d_z_mag,
-               ::atoms::num_atoms
-               );
-
-         /*
-          * Update cell dipolar fields
-          */
-
-         update_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
-               d_x_mag, d_y_mag, d_z_mag,
-               d_x_coord, d_y_coord, d_z_coord,
-               volume, ::demag::prefactor /* wut? */,
-               d_x_cell_field, d_y_cell_field, d_z_cell_field,
-               ::cells::num_cells
-               );
-
-         update_atomistic_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
-               d_x_cell_field, d_y_cell_field, d_z_cell_field,
                ::atoms::num_atoms
                );
       }
@@ -417,7 +446,7 @@ namespace vcuda
       __global__ void update_dipolar_fields (
             double * x_mag, double * y_mag, double * z_mag,
             double * x_coord, double * y_coord, double * z_coord,
-            double * volume, double prefactor,
+            double * volume,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
             size_t n_cells
             )
@@ -436,6 +465,7 @@ namespace vcuda
              * Inverse volume from the number of atoms in macro-cell
              */
             double vol_prefac = - 4.0 * M_PI / (3.0 * volume[i]);
+            double prefactor = 1.0e+23; // 1e-7/1e30
 
             double field_x = vol_prefac * mx;
             double field_y = vol_prefac * my;

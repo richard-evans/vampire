@@ -439,7 +439,7 @@ namespace vcuda{
                cu::plusone_functor()
                );
 
-         cu::atoms[0UL] = 0UL;
+         cu::atoms::limits[0UL] = 0UL;
 
          thrust::copy(
                ::atoms::neighbour_list_array.begin(),
