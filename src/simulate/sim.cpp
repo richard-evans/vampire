@@ -54,6 +54,8 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "vutil.hpp"
+
 
 // Standard Libraries
 #include <iostream>
@@ -226,8 +228,6 @@ int run(){
 			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
 			vmpi::start_time=MPI_Wtime(); // reset timer
 		#endif
-		std::cout << "Starting Simulation with Program ";
-		zlog << zTs() << "Starting Simulation with Program ";
 	}
 
 	// Now set initial compute time
@@ -265,6 +265,10 @@ int run(){
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
+
+   // start timer
+   vutil::vtimer_t timer;
+   timer.start();
 
 	// Select program to run
 	switch(sim::program){
@@ -402,6 +406,11 @@ int run(){
 			exit (EXIT_FAILURE);
 			}
 	}
+
+   // stop the timer
+   double total_time = timer.elapsed_time(); // milliseconds
+   std::cout << "Total simulation time: " << total_time << " seconds" << std::endl;
+   zlog << zTs() << "Total simulation time: " << total_time << " seconds" << std::endl;
 
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
