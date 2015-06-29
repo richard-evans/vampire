@@ -14,6 +14,7 @@
 
 // Local cuda headers
 #include "data.hpp"
+#include "llg_heun.hpp"
 #include "internal.hpp"
 
 #include "exchange_fields.hpp"

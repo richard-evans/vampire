@@ -78,14 +78,6 @@ namespace vcuda{
 
       curandState * d_rand_state;
 
-      namespace llg
-      {
-         RealArray x_spin_buffer_array(0UL);
-         RealArray y_spin_buffer_array(0UL);
-         RealArray z_spin_buffer_array(0UL);
-         HeunParametersArray heun_parameters(0UL);
-      } /* llg */
-
    } // end of internal namespace
 
 #endif

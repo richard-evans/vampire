@@ -74,17 +74,6 @@ namespace vcuda{
          double H_th_sigma;
       };
 
-      struct heun_parameters_t {
-         /**
-          * @var gamma_rel / (1 + alpha ** 2)
-          */
-         double prefactor;
-         /**
-          * @var lambda * prefactor
-          */
-         double lambda_times_prefactor;
-      };
-
       /*
        * Initlialization functions
        */
@@ -99,7 +88,6 @@ namespace vcuda{
        * Clean up function
        */
       void __finalize ();
-
 
       /*
        * Field updates
@@ -173,25 +161,6 @@ namespace vcuda{
             int * cells, int n_atoms
             );
 
-      __global__ void llg_heun_step (
-            double * x_spin, double * y_spin, double * z_spin,
-            size_t * material_id,
-            heun_parameters_t * heun_parameters,
-            double * x_sp_field, double * y_sp_field, double * z_sp_field,
-            double * x_ext_field, double * y_ext_field, double * z_ext_field,
-            double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
-            double dt, size_t num_atoms
-            );
-
-      __global__ void llg_heun_scheme (
-            double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
-            size_t * material_id,
-            heun_parameters_t * heun_parameters,
-            double * x_sp_field, double * y_sp_field, double * z_sp_field,
-            double * x_ext_field, double * y_ext_field, double * z_ext_field,
-            double * x_spin, double * y_spin, double * z_spin,
-            double dt, size_t num_atoms
-            );
    } // end of iternal namespace
 
 #endif

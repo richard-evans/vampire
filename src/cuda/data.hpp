@@ -23,8 +23,6 @@ namespace vcuda
       typedef thrust::device_vector<int> IndexArray;
       typedef thrust::device_vector<cu::material_parameters_t>
          MaterialParametersArray;
-      typedef thrust::device_vector<cu::heun_parameters_t>
-         HeunParametersArray;
 
       namespace atoms
       {
@@ -101,14 +99,6 @@ namespace vcuda
        */
 
       extern curandState * d_rand_state;
-
-      namespace llg
-      {
-         extern RealArray x_spin_buffer_array;
-         extern RealArray y_spin_buffer_array;
-         extern RealArray z_spin_buffer_array;
-         extern HeunParametersArray heun_parameters;
-      } /* llg */
 
    } /* internal */
 #endif
