@@ -419,13 +419,13 @@ namespace vcuda{
           * device.
           */
 
-         cu::atoms::limits.resize(::atoms::num_atoms);
+         cu::atoms::limits.resize(::atoms::num_atoms + 1UL);
          cu::atoms::neighbours.resize(::atoms::total_num_neighbours);
 
          thrust::copy(
                ::atoms::neighbour_list_end_index.begin(),
                ::atoms::neighbour_list_end_index.end(),
-               cu::atoms::limits.begin()
+               cu::atoms::limits.begin() + 1UL
                );
 
          /*
@@ -438,6 +438,8 @@ namespace vcuda{
                cu::atoms::limits.begin(),
                cu::plusone_functor()
                );
+
+         cu::atoms[0UL] = 0UL;
 
          thrust::copy(
                ::atoms::neighbour_list_array.begin(),

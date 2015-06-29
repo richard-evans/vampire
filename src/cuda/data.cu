@@ -36,6 +36,10 @@ namespace vcuda{
          IndexArray cell_array(0UL);
          IndexArray limits(0UL);
          IndexArray neighbours(0UL);
+         RealArray Jxx_vals(0UL);
+         RealArray Jyy_vals(0UL);
+         RealArray Jzz_vals(0UL);
+
       } /* atoms */
 
       namespace cells

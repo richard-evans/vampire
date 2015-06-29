@@ -40,6 +40,14 @@ namespace vcuda
 
          extern IndexArray limits;
          extern IndexArray neighbours;
+
+         extern RealArray Jxx_vals;
+         extern RealArray Jyy_vals;
+         extern RealArray Jzz_vals;
+
+         /*
+          * TODO: Tensor exchanges
+          */
       } /* atoms */
 
       namespace cells
