@@ -13,10 +13,11 @@
 #include "cuda.hpp"
 
 // Local cuda headers
-#include "llg_heun.hpp"
+#include "cuda_utils.hpp"
 #include "data.hpp"
-#include "internal.hpp"
 #include "exchange_fields.hpp"
+#include "internal.hpp"
+#include "llg_heun.hpp"
 
 #ifdef CUDA
 namespace cu = ::vcuda::internal;
