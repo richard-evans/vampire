@@ -43,8 +43,8 @@ namespace vcuda{
        * Thread launch parameters
        */
 
-      extern size_t block_size;
-      extern size_t grid_size;
+      extern int block_size;
+      extern int grid_size;
 
       /*
        * Internal data structures
@@ -117,7 +117,7 @@ namespace vcuda{
       struct plusone_functor
       {
          __host__ __device__
-            size_t operator() (const float& item) const
+            int operator() (const float& item) const
             {
                return item + 1UL;
             }
@@ -133,30 +133,30 @@ namespace vcuda{
        * Shared kernel definitions
        */
 
-      __global__ void init_rng (curandState * state, size_t seed);
+      __global__ void init_rng (curandState * state, int seed);
 
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
-            size_t * material, material_parameters_t * material_params,
+            int * material, material_parameters_t * material_params,
             double * x_sp_field, double * y_sp_field, double * z_sp_field,
-            size_t num_atoms
+            int num_atoms
             );
 
       __global__ void update_external_fields (
-            size_t * material, size_t * cell,
+            int * material, int * cell,
             material_parameters_t * material_params,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
             curandState * rand_state,
-            size_t num_atoms
+            int num_atoms
             );
 
       __global__ void update_cell_magnetization (
             double * x_spin, double * y_spin, double * z_spin,
-            size_t * material, size_t * cell,
+            int * material, int * cell,
             material_parameters_t * material_params,
             double * x_mag, double * y_mag, double * z_mag,
-            size_t num_atoms
+            int num_atoms
             );
 
       __global__ void update_dipolar_fields (
@@ -164,13 +164,13 @@ namespace vcuda{
             double * x_coord, double * y_coord, double * z_coord,
             double * volume,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
-            size_t n_cells
+            int n_cells
             );
 
       __global__ void update_atomistic_dipolar_fields (
             double * x_cell_field, double * y_cell_field, double * z_cell_field,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
-            size_t * cells, size_t n_atoms
+            int * cells, int n_atoms
             );
 
       __global__ void llg_heun_step (

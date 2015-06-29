@@ -224,8 +224,6 @@ int run(){
 			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
 			vmpi::start_time=MPI_Wtime(); // reset timer
 		#endif
-		std::cout << "Starting Simulation with Program ";
-		zlog << zTs() << "Starting Simulation with Program ";
 	}
 
 	// Now set initial compute time
@@ -259,6 +257,10 @@ int run(){
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
+   if(vmpi::my_rank==0){
+		std::cout << "Starting Simulation with Program ";
+		zlog << zTs() << "Starting Simulation with Program ";
+   }
 	// Select program to run
 	switch(sim::program){
 		case 0:

@@ -43,7 +43,7 @@ namespace vcuda
          double * d_z_spin = thrust::raw_pointer_cast(
                cu::atoms::z_spin_array.data());
 
-         size_t * d_materials =
+         int * d_materials =
             thrust::raw_pointer_cast(cu::atoms::type_array.data());
 
          cu::material_parameters_t * d_material_params =
@@ -89,13 +89,13 @@ namespace vcuda
           * Find the addresses in the device address space
           */
 
-         size_t * d_materials =
+         int * d_materials =
             thrust::raw_pointer_cast(cu::atoms::type_array.data());
 
          cu::material_parameters_t * d_material_params =
             thrust::raw_pointer_cast (cu::mp::materials.data());
 
-         size_t * d_cells =
+         int * d_cells =
             thrust::raw_pointer_cast(cu::atoms::cell_array.data());
 
          double * d_x_dip_field = thrust::raw_pointer_cast(
@@ -259,18 +259,18 @@ namespace vcuda
 
       __global__ void update_non_exchange_spin_fields (
             double * x_spin, double * y_spin, double * z_spin,
-            size_t * material,
+            int * material,
             cu::material_parameters_t * material_params,
             double * x_sp_field, double * y_sp_field, double * z_sp_field,
-            size_t n_atoms
+            int n_atoms
             )
       {
-         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+         for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
                i < n_atoms;
                i += blockDim.x * gridDim.x)
          {
 
-            size_t mid = material[i];
+            int mid = material[i];
 
             double field_x = 0.0;
             double field_y = 0.0;
@@ -349,12 +349,12 @@ namespace vcuda
       }
 
       __global__ void update_external_fields (
-            size_t *  material,
-            size_t * cell,
+            int *  material,
+            int * cell,
             vcuda::internal::material_parameters_t * material_params,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
             double * x_ext_field, double * y_ext_field, double * z_ext_field,
-            curandState * rand_state, size_t n_atoms
+            curandState * rand_state, int n_atoms
             )
       {
 
@@ -362,14 +362,14 @@ namespace vcuda
           * Thread and material identification
           */
 
-         size_t tid = blockIdx.x * blockDim.x + threadIdx.x;
+         int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-         for ( size_t i = tid;
+         for ( int i = tid;
                i < n_atoms;
                i += blockDim.x * gridDim.x)
          {
 
-            size_t mid = material[i];
+            int mid = material[i];
             cu::material_parameters_t mat = material_params[mid];
 
             double field_x = 0.0;
@@ -436,10 +436,10 @@ namespace vcuda
 
       __global__ void update_cell_magnetization (
             double * x_spin, double * y_spin, double * z_spin,
-            size_t * material, size_t * cell,
+            int * material, int * cell,
             cu::material_parameters_t * material_params,
             double * x_mag, double * y_mag, double * z_mag,
-            size_t n_atoms
+            int n_atoms
             )
       {
          /*
@@ -448,12 +448,12 @@ namespace vcuda
           *       so might as well leave it like this
           */
 
-         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+         for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
                i < n_atoms;
                i += blockDim.x * gridDim.x)
          {
-            size_t mid = material[i];
-            size_t cid = cell[i];
+            int mid = material[i];
+            int cid = cell[i];
             double mu_s = material_params[mid].mu_s_si;
             cu::atomicAdd(&x_mag[cid], x_spin[i] * mu_s);
             cu::atomicAdd(&y_mag[cid], y_spin[i] * mu_s);
@@ -466,10 +466,10 @@ namespace vcuda
             double * x_coord, double * y_coord, double * z_coord,
             double * volume,
             double * x_dip_field, double * y_dip_field, double * z_dip_field,
-            size_t n_cells
+            int n_cells
             )
       {
-         for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+         for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
                i < n_cells;
                i += blockDim.x * gridDim.x)
          {
@@ -489,7 +489,7 @@ namespace vcuda
             double field_y = vol_prefac * my;
             double field_z = vol_prefac * mz;
 
-            for (size_t j = 0; j < n_cells; j++)
+            for (int j = 0; j < n_cells; j++)
             {
                if (i == j) continue;
                double omx = x_mag[i];

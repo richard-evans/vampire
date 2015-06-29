@@ -20,7 +20,7 @@ namespace vcuda
    namespace internal
    {
       typedef thrust::device_vector<double> RealArray;
-      typedef thrust::device_vector<size_t> IndexArray;
+      typedef thrust::device_vector<int> IndexArray;
       typedef thrust::device_vector<cu::material_parameters_t>
          MaterialParametersArray;
       typedef thrust::device_vector<cu::heun_parameters_t>
@@ -43,15 +43,18 @@ namespace vcuda
          extern IndexArray limits;
          extern IndexArray neighbours;
 
-         extern RealArray Jxx_vals;
-         extern RealArray Jyy_vals;
-         extern RealArray Jzz_vals;
+      } /* atoms */
 
+
+      namespace exchange
+      {
+         extern RealArray Jxx_vals_d;
+         extern RealArray Jyy_vals_d;
+         extern RealArray Jzz_vals_d;
          /*
           * TODO: Tensor exchanges
           */
-      } /* atoms */
-
+      }
       namespace cells
       {
          extern RealArray x_coord_array;

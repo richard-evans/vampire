@@ -422,9 +422,10 @@ namespace vcuda{
          /*
           * Send the information for limits and neighbors up to the
           * device.
-          */
+          *
 
-         cu::atoms::limits.resize(::atoms::num_atoms + 1UL);
+         // Resize and set all values to 0
+         cu::atoms::limits.assign(::atoms::num_atoms + 1UL, 0);
          cu::atoms::neighbours.resize(::atoms::total_num_neighbours);
 
          thrust::copy(
@@ -433,10 +434,10 @@ namespace vcuda{
                cu::atoms::limits.begin() + 1UL
                );
 
-         /*
+         *
           * Transform the limits to be one pased the last element
           * in the neighbors list.
-          */
+          *
          thrust::transform(
                cu::atoms::limits.begin(),
                cu::atoms::limits.end(),
@@ -444,13 +445,35 @@ namespace vcuda{
                cu::plusone_functor()
                );
 
-         cu::atoms::limits[0UL] = 0UL;
+         thrust::copy(
+               ::atoms::neighbour_list_array.begin(),
+               ::atoms::neighbour_list_array.end(),
+               cu::atoms::neighbours.begin()
+               );
+         */
+
+         // Transfer the row ptrs and col indices to the device
+         std::vector<int> limits_h( ::atoms::num_atoms + 1, 0);
+         for( int atom = 0; atom < ::atoms::num_atoms; atom++)
+            limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+
+         cu::atoms::limits.resize( ::atoms::num_atoms + 1);
+         cu::atoms::neighbours.resize( ::atoms::neighbour_list_array.size() );
+
+
+         thrust::copy(
+               limits_h.begin(),
+               limits_h.end(),
+               cu::atoms::limits.begin()
+               );
 
          thrust::copy(
                ::atoms::neighbour_list_array.begin(),
                ::atoms::neighbour_list_array.end(),
                cu::atoms::neighbours.begin()
                );
+
+
 
          return true;
       }
