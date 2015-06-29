@@ -445,7 +445,6 @@ namespace vcuda{
                cu::plusone_functor()
                );
 
-<<<<<<< HEAD
          thrust::copy(
                ::atoms::neighbour_list_array.begin(),
                ::atoms::neighbour_list_array.end(),
@@ -467,9 +466,6 @@ namespace vcuda{
                limits_h.end(),
                cu::atoms::limits.begin()
                );
-=======
-         cu::atoms::limits[0UL] = 0UL;
->>>>>>> 8bd7f5f59971fa2b8118b7e64df479f5686492c3
 
          thrust::copy(
                ::atoms::neighbour_list_array.begin(),
