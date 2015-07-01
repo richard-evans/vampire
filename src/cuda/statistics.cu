@@ -14,6 +14,7 @@
 
 // Local cuda headers
 #include "internal.hpp"
+#include "statistics.hpp"
 
 namespace vcuda{
 
