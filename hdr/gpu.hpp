@@ -21,8 +21,18 @@ namespace gpu{
    //-----------------------------------------------------------------------------
    extern void initialize();
    extern void llg_heun();
-   extern void stats_update();
    extern void finalize();
+
+   //-----------------------------------------------------------------------------
+   // Functions for GPU ststistics calculation
+   //-----------------------------------------------------------------------------
+   namespace stats{
+
+      extern void update();
+      extern void reset();
+      extern void get();
+
+   }
 
 } // end of gpu namespace
 

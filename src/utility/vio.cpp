@@ -51,6 +51,7 @@
 #include "cells.hpp"
 #include "demag.hpp"
 #include "errors.hpp"
+#include "gpu.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
 #include "voronoi.hpp"
@@ -4178,6 +4179,10 @@ namespace vout{
 
 		// Output data to output
       if(vmpi::my_rank==0){
+
+      // For gpu acceleration get statistics from device
+      gpu::stats::get();
+
 		for(unsigned int item=0;item<file_output_list.size();item++){
 			switch(file_output_list[item]){
 				case 0:

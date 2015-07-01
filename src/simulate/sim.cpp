@@ -427,7 +427,7 @@ int run(){
 	//program::LLB_Boltzmann();
 
    // De-initialize GPU
-   gpu::finalize();
+   if(gpu::acceleration) gpu::finalize();
 
    // optionally save checkpoint file
    if(sim::save_checkpoint_flag && !sim::save_checkpoint_continuous_flag) save_checkpoint();
