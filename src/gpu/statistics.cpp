@@ -17,18 +17,54 @@
 
 namespace gpu{
 
-   //-------------------------------------------------------------------------------
-   // Function to call correct statistics update function
-   //-------------------------------------------------------------------------------
-   void stats_update(){
+   namespace stats{
 
-      #ifdef CUDA
-         cuda::stats_update();
-      #elseif OPENCL
-         opencl::stats_update();
-      #endif
+      //-------------------------------------------------------------------------------
+      // Function to call correct statistics update function on device
+      //-------------------------------------------------------------------------------
+      void update(){
 
-      return;
-   }
+         #ifdef CUDA
+            vcuda::stats::update();
+         #elseif OPENCL
+            opencl::stats::update();
+         #endif
+
+         return;
+      }
+
+      //-------------------------------------------------------------------------------
+      // Function to get statistics module data from device for output
+      //
+      // There is a performance penalty for rapid updates of statistics for output
+      // to disk.
+      //
+      //-------------------------------------------------------------------------------
+      void get(){
+
+         #ifdef CUDA
+            vcuda::stats::get();
+         #elseif OPENCL
+            opencl::stats::get();
+         #endif
+
+         return;
+      }
+
+      //-------------------------------------------------------------------------------
+      // Function to reset statistics counters on device
+      //-------------------------------------------------------------------------------
+      void reset(){
+
+         #ifdef CUDA
+            vcuda::stats::reset();
+         #elseif OPENCL
+            opencl::stats::reset();
+         #endif
+
+         return;
+      }
+
+   } // end of stats namespace
 
 } // end of namespace gpu

@@ -100,6 +100,19 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
 }
 
 //------------------------------------------------------------------------------------------------------
+// Function to get mask needed for gpu acceleration of statistics calculation
+//------------------------------------------------------------------------------------------------------
+void magnetization_statistic_t::get_mask(std::vector<int>& out_mask, std::vector<double>& out_saturation){
+
+   // copy data to objects
+   out_mask = mask;
+   out_saturation = saturation;
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------------------------------
 // Function to calculate magnetisation of spins given a mask and place result in a magnetization array
 //------------------------------------------------------------------------------------------------------
 void magnetization_statistic_t::calculate_magnetization(const std::vector<double>& sx, // spin unit vector
@@ -156,6 +169,25 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
 const std::vector<double>& magnetization_statistic_t::get_magnetization(){
 
    return magnetization;
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to get magnetisation data
+//------------------------------------------------------------------------------------------------------
+void magnetization_statistic_t::set_magnetization(std::vector<double>& new_magnetization, std::vector<double>& new_mean_magnetization, long counter){
+
+   // copy magnetization vector
+   magnetization = new_magnetization;
+   //magnetisation.swap(new_magnetization); fatsre but too dangerous?
+
+   const unsigned int array_size = mean_magnetization.size();
+   for(int i=0; i< array_size; ++i){
+      mean_magnetization[i] += new_mean_magnetization[i];
+   }
+
+   // update counter
+   mean_counter+=double(counter);
 
 }
 

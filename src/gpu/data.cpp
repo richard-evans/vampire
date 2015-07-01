@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <vector>
 
 // Vampire headers
 #include "gpu.hpp"
@@ -18,6 +19,31 @@ namespace gpu{
    // Shared variables used for GPU acceleration
    //-----------------------------------------------------------------------------
    bool acceleration = false; // flag to enable gpu_acceleration
+
+   //-----------------------------------------------------------------------------
+   // Shared data structures for statistics calculation
+   //-----------------------------------------------------------------------------
+   namespace stats{
+
+      long counter; // saves the number of averages accumulated on the gpu
+
+      // temporary arrays for storing system magnetization data from the gpu
+      std::vector<double> system_magnetization(0);
+      std::vector<double> system_mean_magnetization(0);
+
+      // temporary arrays for storing material magnetization data from the gpu
+      std::vector<double> material_magnetization(0);
+      std::vector<double> material_mean_magnetization(0);
+
+      // temporary arrays for storing height magnetization data from the gpu
+      std::vector<double> height_magnetization(0);
+      std::vector<double> height_mean_magnetization(0);
+
+      // temporary arrays for storing height-material magnetization data from the gpu
+      std::vector<double> material_height_magnetization(0);
+      std::vector<double> material_height_mean_magnetization(0);
+
+   } // end of stats namespace
 
    namespace internal{
 
