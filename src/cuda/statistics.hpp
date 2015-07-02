@@ -3,9 +3,11 @@
 
 #include "cuda.hpp"
 #include "internal.hpp"
+#include "data.hpp"
 
 namespace vcuda
 {
+   #ifdef CUDA
    namespace internal
    {
       namespace stats
@@ -58,6 +60,7 @@ namespace vcuda
 
       } /* stats */
    } /* internal */
+   #endif
 } /* vcuda */
 
 #endif

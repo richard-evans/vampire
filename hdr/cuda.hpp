@@ -25,6 +25,13 @@ namespace vcuda{
    extern void stats_update();
    extern void finalize();
 
+   namespace stats
+   {
+      void update ();
+      void get ();
+      void reset ();
+   } /* stats */
+
 #endif
 
 } // end of vcuda namespace
