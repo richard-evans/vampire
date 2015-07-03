@@ -44,76 +44,129 @@ namespace vcuda{
       {
 
          void __update_stat (
-               const RealArray& mask,
-               const RealArray& stat_saturation,
+               const IndexArray & mask,
+               const RealArray & stat_saturation,
                RealArray& stat,
                RealArray& mean_stat
                )
          {
 
-            /*
-             * Copy the data to the temporary arrays as it will be
-             * sorted in place.
-             */
+         }
 
-            thrust::copy (
-                  mask.begin(),
-                  mask.end(),
-                  temp_mask.begin()
-                  );
 
-            thrust::copy (
-                  thrust::make_zip_iterator(thrust::make_tuple(
-                        cu::atoms::x_spin_array.begin(),
-                        cu::atoms::y_spin_array.begin(),
-                        cu::atoms::z_spin_array.begin())),
-                  thrust::make_zip_iterator(thrust::make_tuple(
-                        cu::atoms::x_spin_array.end(),
-                        cu::atoms::y_spin_array.end(),
-                        cu::atoms::z_spin_array.end())),
-                  thrust::make_zip_iterator(thrust::make_tuple(
-                        x_temp_spin.begin(),
-                        y_temp_spin.begin(),
-                        z_temp_spin.begin()))
-                  );
+         __global__ void hist_by_key_small_mask (
+               const double * __restrict__ x_spin,
+               const double * __restrict__ y_spin,
+               const double * __restrict__ z_spin,
+               const double * __restrict__ norm_spin,
+               const int * __restrict__ mask,
+               double * hist,
+               int n_bins,
+               int n_atoms
+               )
+         {
+            extern __shared__ double block_hist[];
 
-            /*
-             * Multiply the spins times the spin norm
-             */
+            for (int i = threadIdx.x; i < 4 * n_bins; i += blockDim.x)
+            {
+               /*
+                * Initialize block memory
+                */
+               block_hist[i] = 0.0;
+            }
 
-            thrust::transform(
-                  x_temp_spin.begin(),
-                  x_temp_spin.end(),
-                  spin_norm.begin(),
-                  x_temp_spin.begin(),
-                  cu::scalar_product_functor<double>()
-                  );
+            __syncthreads ();
 
-            thrust::sort_by_key(
-                  temp_mask.begin(),
-                  temp_mask.end(),
-                  thrust::make_zip_iterator(thrust::make_tuple(
-                        x_temp_spin.begin(),
-                        y_temp_spin.begin(),
-                        z_temp_spin.begin()))
-                  );
+            for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
+                  i < n_atoms;
+                  i += blockDim.x * gridDim.x)
+            {
+               /*
+                * Store stuff in the shared memory
+                */
+               int bin = mask[i];
+               double mu_s = norm_spin[i];
+               cu::atomicAdd (block_hist + 4 * bin + 0, x_spin[i] * mu_s);
+               cu::atomicAdd (block_hist + 4 * bin + 1, y_spin[i] * mu_s);
+               cu::atomicAdd (block_hist + 4 * bin + 2, z_spin[i] * mu_s);
+               cu::atomicAdd (block_hist + 4 * bin + 3, mu_s);
+            }
 
-            size_t mask_size = stat.size() / 4UL;
+            __syncthreads ();
 
-            thrust::reduce_by_key(
-                  temp_mask.begin(),
-                  temp_mask.end(),
-                  thrust::make_zip_iterator(thrust::make_tuple(
-                        x_temp_spin.begin(),
-                        y_temp_spin.begin(),
-                        z_temp_spin.begin())),
-                  thrust::make_discard_iterator(), // We don't need the keys
-                  thrust::make_zip_iterator(thrust::make_tuple(
-                        stat.begin() + 0UL * mask_size,
-                        stat.begin() + 1UL * mask_size,
-                        stat.begin() + 2UL * mask_size)),
-                  cu::tuple3_plus_functor<double>()
-                  );
+            for (int i = threadIdx.x; i < 4 * n_bins; i += blockDim.x)
+            {
+               /*
+                * Store stuff in the main memory
+                */
+               cu::atomicAdd (hist + 4 * i + 0, block_hist[4 * i + 0]);
+               cu::atomicAdd (hist + 4 * i + 1, block_hist[4 * i + 1]);
+               cu::atomicAdd (hist + 4 * i + 2, block_hist[4 * i + 2]);
+               cu::atomicAdd (hist + 4 * i + 3, block_hist[4 * i + 3]);
+            }
+
+         }
+
+
+         __global__ void hist_by_key_big_mask (
+               const double * __restrict__ x_spin,
+               const double * __restrict__ y_spin,
+               const double * __restrict__ z_spin,
+               const double * __restrict__ norm_spin,
+               const int * __restrict__ mask,
+               double * hist,
+               int n_bins,
+               int n_atoms
+               )
+         {
+            for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
+                  i < n_atoms;
+                  i += blockDim.x * gridDim.x)
+            {
+               /*
+                * Store stuff in the main memory
+                */
+               int bin = mask[i];
+               double mu_s = norm_spin[i];
+               cu::atomicAdd (hist + 4 * bin + 0, x_spin[i] * mu_s);
+               cu::atomicAdd (hist + 4 * bin + 1, y_spin[i] * mu_s);
+               cu::atomicAdd (hist + 4 * bin + 2, z_spin[i] * mu_s);
+               cu::atomicAdd (hist + 4 * bin + 3, mu_s);
+            }
+         }
+
+
+         __global__ void update_norm_and_accum (
+               double * hist,
+               double * accum,
+               int n_bins
+               )
+         {
+            for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
+                  i < n_bins;
+                  i += blockDim.x * gridDim.x)
+            {
+               double mx = hist[4 * i + 0];
+               double my = hist[4 * i + 1];
+               double mz = hist[4 * i + 2];
+               double ms = hist[4 * i + 3];
+
+               double mm = sqrtf (
+                     mx * mx +
+                     my * my +
+                     mz * mz
+                     );
+
+               hist[4 * i + 0] = mx / mm;
+               hist[4 * i + 1] = my / mm;
+               hist[4 * i + 2] = mz / mm;
+               hist[4 * i + 3] = mm / ms;
+
+               accum[4 * i + 0] += mx / mm;
+               accum[4 * i + 1] += my / mm;
+               accum[4 * i + 2] += mz / mm;
+               accum[4 * i + 3] += mm / ms;
+            }
          }
 
       } /* stats */

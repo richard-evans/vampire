@@ -139,6 +139,11 @@ namespace vcuda{
             double * d_z_spin_buffer = thrust::raw_pointer_cast(
                   cu::llg::z_spin_buffer_array.data());
 
+            cu::update_spin_fields ();
+            cu::update_external_fields ();
+
+            check_cuda_errors (__FILE__, __LINE__);
+
             cu::llg::llg_heun_step <<< cu::grid_size, cu::block_size >>> (
                   d_x_spin_buffer, d_y_spin_buffer, d_y_spin_buffer,
                   d_materials, d_heun_params,
@@ -154,6 +159,9 @@ namespace vcuda{
 
             check_cuda_errors (__FILE__, __LINE__);
 
+            /*
+             * TODO: Store delta s because of the renormalization
+             */
             cu::llg::llg_heun_scheme <<< cu::grid_size, cu::block_size >>> (
                   d_x_spin, d_y_spin, d_y_spin,
                   d_materials, d_heun_params,
@@ -165,6 +173,11 @@ namespace vcuda{
 
             check_cuda_errors (__FILE__, __LINE__);
 
+            /*
+             * TODO: This copy can go away
+             *       The buffer contains the old spin and spin contains
+             *       the updated version.
+             */
             thrust::copy (
                   cu::llg::x_spin_buffer_array.begin(),
                   cu::llg::x_spin_buffer_array.end(),
@@ -253,8 +266,14 @@ namespace vcuda{
                double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
                int * material_id,
                cu::heun_parameters_t * heun_parameters,
+               /*
+                * receive spin init
+                */
                double * x_sp_field, double * y_sp_field, double * z_sp_field,
                double * x_ext_field, double * y_ext_field, double * z_ext_field,
+               /*
+                * receive spin prima, read a write the final result to it
+                */
                double * x_spin, double * y_spin, double * z_spin,
                double dt, size_t num_atoms
                )
@@ -271,6 +290,9 @@ namespace vcuda{
                double lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
                //heun step array
+               /*
+                * TODO: Update this, read in the delta s
+                */
                double Ds_x = (x_spin_prim[atom] - x_spin[atom]) / dt;
                double Ds_y = (y_spin_prim[atom] - y_spin[atom]) / dt;
                double Ds_z = (z_spin_prim[atom] - z_spin[atom]) / dt;
