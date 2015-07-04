@@ -50,6 +50,69 @@ namespace vcuda{
                RealArray& mean_stat
                )
          {
+            const IndexArray::value_type * d_mask = thrust::raw_pointer_cast (
+                  mask.data());
+            RealArray::value_type * d_stat = thrust::raw_pointer_cast (
+                  stat.data());
+            RealArray::value_type * d_accu = thrust::raw_pointer_cast (
+                  mean_stat.data());
+
+            RealArray::value_type * d_x_spin = thrust::raw_pointer_cast(
+                  cu::atoms::x_spin_array.data());
+            RealArray::value_type * d_y_spin = thrust::raw_pointer_cast(
+                  cu::atoms::y_spin_array.data());
+            RealArray::value_type * d_z_spin = thrust::raw_pointer_cast(
+                  cu::atoms::z_spin_array.data());
+            RealArray::value_type * d_spin_norm = thrust::raw_pointer_cast(
+                  cu::atoms::z_spin_array.data());
+
+            int n_bins = stat.size ();
+            int n_atoms = mask.size ();
+
+            if (n_bins < 128)
+            {
+               /*
+                * Use the shared memory implementation
+                */
+               int n_bytes = 4 * stat.size() * sizeof(RealArray::value_type);
+               hist_by_key_small_mask <<< cu::grid_size, cu::block_size, n_bytes >>> (
+                     d_x_spin,
+                     d_y_spin,
+                     d_z_spin,
+                     d_spin_norm,
+                     d_mask,
+                     d_stat,
+                     n_bins,
+                     n_atoms
+                     );
+            }
+            else
+            {
+               /*
+                * Use the brute force implementation
+                */
+               hist_by_key_big_mask <<< cu::grid_size, cu::block_size >>> (
+                     d_x_spin,
+                     d_y_spin,
+                     d_z_spin,
+                     d_spin_norm,
+                     d_mask,
+                     d_stat,
+                     n_bins,
+                     n_atoms
+                     );
+            }
+
+            /*
+             * Reduce and accumulate
+             */
+
+            int gs = n_bins / cu::block_size + 1;
+            update_norm_and_accum <<< gs , cu::block_size >>> (
+                  d_stat,
+                  d_accu,
+                  n_bins
+                  );
 
          }
 
