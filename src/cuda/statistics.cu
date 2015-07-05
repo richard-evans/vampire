@@ -64,7 +64,7 @@ namespace vcuda{
             RealArray::value_type * d_z_spin = thrust::raw_pointer_cast(
                   cu::atoms::z_spin_array.data());
             RealArray::value_type * d_spin_norm = thrust::raw_pointer_cast(
-                  cu::atoms::z_spin_array.data());
+                  cu::atoms::spin_norm_array.data());
 
             int n_bins = stat.size ();
             int n_atoms = mask.size ();

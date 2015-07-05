@@ -37,6 +37,8 @@ namespace vcuda{
          IndexArray limits(0UL);
          IndexArray neighbours(0UL);
 
+         RealArray spin_norm_array(0UL);
+
       } /* atoms */
 
       namespace exchange

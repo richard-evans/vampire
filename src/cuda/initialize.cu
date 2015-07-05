@@ -188,6 +188,18 @@ namespace vcuda{
                cu::atoms::cell_array.begin()
                );
 
+         /*
+          * Allocate the memory for the unrolled spin norm array
+          */
+
+         cu::atoms::spin_norm_array.resize(::atoms::num_atoms);
+
+         thrust::copy(
+               ::atoms::m_spin_array.begin(),
+               ::atoms::m_spin_array.end(),
+               cu::atoms::spin_norm_array.begin()
+               );
+
          return true;
       }
 

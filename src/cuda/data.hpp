@@ -41,6 +41,11 @@ namespace vcuda
          extern IndexArray limits;
          extern IndexArray neighbours;
 
+         /*
+          * Unrolled spin norm array
+          */
+         extern RealArray spin_norm_array;
+
       } /* atoms */
 
 
