@@ -8,6 +8,7 @@ config_objects=\
 data.o \
 initialize.o \
 interface.o \
+meta.o \
 output.o \
 write.o \
 write_coords.o

@@ -56,9 +56,9 @@ namespace config{
          
          // meta data output
          if(config::internal::output_meta){
-            /*config::internal::write_meta(simulation_time, temperature, 
+            config::internal::write_meta(simulation_time, temperature,
                                          applied_field_x, applied_field_y, applied_field_z,
-                                         magnetization_x, magnetization_y, magnetization_z);*/
+                                         magnetization_x, magnetization_y, magnetization_z);
          }
          
          // atoms output

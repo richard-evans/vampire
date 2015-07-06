@@ -61,8 +61,10 @@ namespace config{
                                const std::vector<double>& z,
                                const std::vector<int>& mask,
                                std::vector<float>& buffer);
-      
+
       void write_data(std::string filename, const std::vector<float>& buffer);
+
+      void write_coordinate_meta();
 
       void write_coordinate_data(const std::vector<double>& spins_cx, // spin coordinates (Angstroms)
                                  const std::vector<double>& spins_cy,

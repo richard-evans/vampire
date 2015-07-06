@@ -9,10 +9,10 @@
 
 // C++ standard library headers
 #include <iomanip>
+#include <fstream>
 #include <sstream>
 
 // Vampire headers
-#include "errors.hpp"
 #include "config.hpp"
 #include "vio.hpp"
 #include "vutil.hpp"

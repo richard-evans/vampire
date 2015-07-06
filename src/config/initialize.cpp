@@ -97,6 +97,7 @@ namespace config{
       
       // resize output buffer to 3*num_output_atoms
       config::internal::output_spin_buffer.resize(3*config::internal::total_output_atoms);
+
       // cell buffer...
       
       //-------------------------------------------------------
@@ -105,62 +106,10 @@ namespace config{
       if(config::internal::output_atoms || config::internal::output_coords){
 
          // write coordinate meta data
+         config::internal::write_coordinate_meta();
 
          // write coordinate and id data
          config::internal::write_coordinate_data(spins_cx, spins_cy, spins_cz, material, category); 
-
-         #ifdef MPICF
-
-
-         #else
-            std::ofstream scmf; // spin coordinate meta file
-            scmf.open("atoms-coords.meta");
-
-            // determine file format
-            std::string format_string;
-
-            switch(config::internal::output_data_format){
-            
-               case config::internal::binary:
-                  format_string = "binary";
-                  break;
-               
-               case config::internal::text:
-                  format_string = "text";
-                  break;
-                  
-            }
-
-            //
-
-            // Get system date
-            time_t rawtime = time(NULL);
-            struct tm * timeinfo = localtime(&rawtime);
-
-            scmf << "#----------------------------------------------------------"<< std::endl;
-            scmf << "# Atomistic coordinates configuration file for vampire V5+"<< std::endl;
-            scmf << "#----------------------------------------------------------"<< std::endl;
-            scmf << "# Date: "<< asctime(timeinfo);
-            scmf << "#--------------------------------------------"<< std::endl;
-            scmf << "Format: "<< format_string << std::endl;
-            scmf << "#--------------------------------------------"<< std::endl;
-            scmf << "Number of atoms: "<< config::internal::total_output_atoms << std::endl;
-            scmf << "#--------------------------------------------" << std::endl;
-            scmf << "Number of materials: " << mp::num_materials << std::endl;
-            for(int mat=0;mat<mp::num_materials;mat++){
-               scmf << mat << "\t" << mp::material[mat].mu_s_SI/9.274e-24 << "\t" << mp::material[mat].element << "\t" << 
-               mp::material[mat].name << std::endl;
-            }
-            scmf << "#--------------------------------------------" << std::endl;
-            scmf << "Number of coord files: " << 1 << std::endl;
-            scmf << "atoms-coords.cfg" << std::endl;
-
-            // number of cell files + file list
-            
-            // close file
-            scmf.close();
-            
-         #endif
          
       }
       
