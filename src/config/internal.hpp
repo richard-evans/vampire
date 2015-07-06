@@ -64,6 +64,12 @@ namespace config{
       
       void write_data(std::string filename, const std::vector<float>& buffer);
 
+      void write_coordinate_data(const std::vector<double>& spins_cx, // spin coordinates (Angstroms)
+                                 const std::vector<double>& spins_cy,
+                                 const std::vector<double>& spins_cz,
+                                 const std::vector<int>& material, // material id
+                                 const std::vector<int>& category);
+
    } // end of internal namespace
 } // end of config namespace
 

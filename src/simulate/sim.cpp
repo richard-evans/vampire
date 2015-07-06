@@ -257,8 +257,9 @@ int run(){
 
    // Initialize configuration data output
    config::initialize(atoms::num_atoms, cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2],
-		      atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
-		      cells::x_coord_array, cells::y_coord_array, cells::z_coord_array, atoms::type_array);
+                      atoms::type_array, atoms::category_array,
+                      atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+                      cells::x_coord_array, cells::y_coord_array, cells::z_coord_array);
 
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);

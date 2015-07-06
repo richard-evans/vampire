@@ -42,13 +42,14 @@ namespace config{
                    const double system_dimensions_x, // system size
                    const double system_dimensions_y,
                    const double system_dimensions_z,
+                   const std::vector<int>& material, // material id
+                   const std::vector<int>& category, // category id
                    const std::vector<double>& spins_cx, // spin coordinates (Angstroms)
                    const std::vector<double>& spins_cy,
                    const std::vector<double>& spins_cz,
                    const std::vector<double>& cells_cx, // cell coordinates (Angstroms)
                    const std::vector<double>& cells_cy,
-                   const std::vector<double>& cells_cz,
-                   const std::vector<int>& spins_mat)  // spin material ID
+                   const std::vector<double>& cells_cz)
    {
 
       // Check if config output is needed
@@ -102,7 +103,12 @@ namespace config{
       // Output spin coordinate meta data
       //-------------------------------------------------------
       if(config::internal::output_atoms || config::internal::output_coords){
-      
+
+         // write coordinate meta data
+
+         // write coordinate and id data
+         config::internal::write_coordinate_data(spins_cx, spins_cy, spins_cz, material, category); 
+
          #ifdef MPICF
 
 
@@ -153,18 +159,6 @@ namespace config{
             
             // close file
             scmf.close();
-            
-            // output coordinate data
-            
-            // determine filename
-            std::stringstream filename;
-            filename << "atoms-coords.cfg";
-
-            // copy to buffer
-            config::internal::copy_data_to_buffer(spins_cx, spins_cy, spins_cz, config::internal::local_output_atom_list, config::internal::output_spin_buffer); 
-            
-            // write buffer to disk
-            config::internal::write_data(filename.str(),config::internal::output_spin_buffer);      
             
          #endif
          

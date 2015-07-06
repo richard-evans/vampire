@@ -9,7 +9,8 @@ data.o \
 initialize.o \
 interface.o \
 output.o \
-write.o
+write.o \
+write_coords.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/config/,$(config_objects))

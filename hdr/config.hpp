@@ -45,13 +45,14 @@ namespace config{
                    const double system_dimensions_x, // system size
                    const double system_dimensions_y,
                    const double system_dimensions_z,
+                   const std::vector<int>& material,
+                   const std::vector<int>& category,
                    const std::vector<double>& spins_cx, // spin coordinates (Angstroms)
                    const std::vector<double>& spins_cy,
                    const std::vector<double>& spins_cz,
                    const std::vector<double>& cells_cx, // cell coordinates (Angstroms)
                    const std::vector<double>& cells_cy,
-                   const std::vector<double>& cells_cz,
-                   const std::vector<int>& spins_mat);
+                   const std::vector<double>& cells_cz);
 
    //-----------------------------------------------------------------------------
    // Function to output spin and macrocell magnetic configurations
