@@ -36,6 +36,8 @@ namespace gpu{
       //-------------------------------------------------------------------------------
       // Function to get statistics module data from device for output
       //
+      // Remember to use the set_magnetization in the magnetization_statistic_t instances
+      //
       // There is a performance penalty for rapid updates of statistics for output
       // to disk.
       //
