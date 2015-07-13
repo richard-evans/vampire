@@ -5,6 +5,8 @@
 #include "internal.hpp"
 #include "data.hpp"
 
+#include "stats.hpp"
+
 namespace vcuda
 {
    #ifdef CUDA
@@ -40,7 +42,18 @@ namespace vcuda
 
          void __update_stat (
                const RealArray& mask,
-               const RealArray& stat_saturation,
+               RealArray& stat,
+               RealArray& mean_stat
+               );
+
+         void __get_stat (
+               const RealArray& stat,
+               const RealArray& mean_stat,
+               ::stats::magnetization_statistic_t& local_stat
+               );
+
+
+         void __reset_stat (
                RealArray& stat,
                RealArray& mean_stat
                );

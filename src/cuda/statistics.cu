@@ -23,19 +23,6 @@ namespace cu = vcuda::internal;
 
 namespace vcuda{
 
-   //-------------------------------------------------------------------------------
-   // Function to update statistics
-   //-------------------------------------------------------------------------------
-   void stats_update(){
-
-      #ifdef CUDA
-
-
-      #endif
-
-      return;
-   }
-
 #ifdef CUDA
 
    namespace internal
@@ -43,9 +30,93 @@ namespace vcuda{
       namespace stats
       {
 
+         void update ()
+         {
+            __update_stat (
+                  system_mask,
+                  system_magnetization,
+                  system_mean_magnetization);
+
+            __update_stat (
+                  material_mask,
+                  material_magnetization,
+                  material_mean_magnetization);
+
+            __update_stat (
+                  height_mask,
+                  height_magnetization,
+                  height_mean_magnetization);
+
+            __update_stat (
+                  material_height_mask,
+                  material_height_magnetization,
+                  material_height_mean_magnetization);
+
+            /*
+             * increase the counter
+             */
+
+            counter++;
+
+         }
+
+         void get ()
+         {
+
+            __get_stat (
+                  system_magnetization,
+                  system_mean_magnetization,
+                  ::stats::system_magnetization
+                  );
+
+            __get_stat (
+                  material_magnetization,
+                  material_mean_magnetization,
+                  ::stats::material_magnetization
+                  );
+
+            __get_stat (
+                  height_magnetization,
+                  height_mean_magnetization,
+                  ::stats::height_magnetization
+                  );
+
+            __get_stat (
+                  material_height_magnetization,
+                  material_height_mean_magnetization,
+                  ::stats::material_height_magnetization
+                  );
+
+         }
+
+         void reset ()
+         {
+            counter = 0L;
+
+            __reset_stat (
+                  system_magnetization,
+                  system_mean_magnetization
+                  );
+
+            __reset_stat (
+                  material_magnetization,
+                  material_mean_magnetization
+                  );
+
+            __reset_stat (
+                  height_magnetization,
+                  height_mean_magnetization
+                  );
+
+            __reset_stat (
+                  material_height_magnetization,
+                  material_height_mean_magnetization
+                  );
+
+         }
+
          void __update_stat (
                const IndexArray & mask,
-               const RealArray & stat_saturation,
                RealArray& stat,
                RealArray& mean_stat
                )
@@ -114,6 +185,48 @@ namespace vcuda{
                   n_bins
                   );
 
+         }
+
+
+         void __get_stat (
+               const RealArray& stat,
+               const RealArray& mean_stat,
+               ::stats::magnetization_statistic_t& local_stat
+               )
+         {
+
+            /*
+             * Copy to local arrays
+             */
+
+            std::vector<double> h_stat(stat.size());
+            std::vector<double> h_mean_stat(mean_stat.size());
+
+            thrust::copy(stat.begin(), stat.end(), h_stat.begin());
+            thrust::copy(mean_stat.begin(), mean_stat.end(), h_mean_stat.begin());
+
+            /*
+             * Call the method in the magnetization_statistic_t instance
+             */
+
+            local_stat.set_magnetization (h_stat, h_mean_stat, counter);
+
+         }
+
+
+         void __reset_stat (
+               RealArray& stat,
+               RealArray& mean_stat
+               )
+         {
+            thrust::fill(
+                  stat.begin(),
+                  stat.end(),
+                  0.0);
+            thrust::fill(
+                  mean_stat.begin(),
+                  mean_stat.end(),
+                  0.0);
          }
 
 
