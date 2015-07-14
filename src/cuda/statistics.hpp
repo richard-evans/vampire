@@ -41,7 +41,7 @@ namespace vcuda
           */
 
          void __update_stat (
-               const RealArray& mask,
+               const IndexArray& mask,
                RealArray& stat,
                RealArray& mean_stat
                );

@@ -49,10 +49,9 @@ namespace vcuda{
                   cu::stats::material_height_magnetization,
                   cu::stats::material_height_mean_magnetization);
 
-            /*
-             * increase the counter
-             */
 
+
+            // increase the counter
             cu::stats::counter++;
 
          }
@@ -126,6 +125,7 @@ namespace vcuda{
                RealArray & mean_stat
                )
          {
+
             const int * d_mask = thrust::raw_pointer_cast (
                   mask.data());
             double * d_stat = thrust::raw_pointer_cast (
@@ -147,9 +147,9 @@ namespace vcuda{
 
             if (n_bins < 128)
             {
-               /*
-                * Use the shared memory implementation
-                */
+
+                // Use the shared memory implementation
+
                int n_bytes = 4 * stat.size() * sizeof(RealArray::value_type);
                hist_by_key_small_mask <<< cu::grid_size, cu::block_size, n_bytes >>> (
                      d_x_spin,
@@ -164,9 +164,9 @@ namespace vcuda{
             }
             else
             {
-               /*
-                * Use the brute force implementation
-                */
+
+               // Use the brute force implementation
+
                hist_by_key_big_mask <<< cu::grid_size, cu::block_size >>> (
                      d_x_spin,
                      d_y_spin,
@@ -179,9 +179,8 @@ namespace vcuda{
                      );
             }
 
-            /*
-             * Reduce and accumulate
-             */
+
+             // Reduce and accumulate
 
             int gs = n_bins / cu::block_size + 1;
             update_norm_and_accum <<< gs , cu::block_size >>> (
@@ -306,13 +305,14 @@ namespace vcuda{
                int n_atoms
                )
          {
+
             for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
                   i < n_atoms;
                   i += blockDim.x * gridDim.x)
             {
-               /*
-                * Store stuff in the main memory
-                */
+
+                // Store stuff in the main memory
+
                int bin = mask[i];
                double mu_s = norm_spin[i];
                cu::atomicAdd (hist + 4 * bin + 0, x_spin[i] * mu_s);
@@ -329,6 +329,7 @@ namespace vcuda{
                int n_bins
                )
          {
+
             for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
                   i < n_bins;
                   i += blockDim.x * gridDim.x)
