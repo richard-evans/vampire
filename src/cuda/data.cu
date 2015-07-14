@@ -14,6 +14,7 @@
 
 #include "internal.hpp"
 #include "data.hpp"
+#include "statistics.hpp"
 
 namespace vcuda{
 
@@ -79,6 +80,24 @@ namespace vcuda{
       RealArray z_dipolar_field_array(0UL);
 
       curandState * d_rand_state;
+
+      namespace stats
+      {
+         long counter(0L);
+
+         IndexArray system_mask(0UL);
+         RealArray  system_magnetization(0UL);
+         RealArray  system_mean_magnetization(0UL);
+         IndexArray material_mask(0UL);
+         RealArray  material_magnetization(0UL);
+         RealArray  material_mean_magnetization(0UL);
+         IndexArray height_mask(0UL);
+         RealArray  height_magnetization(0UL);
+         RealArray  height_mean_magnetization(0UL);
+         IndexArray material_height_mask(0UL);
+         RealArray  material_height_magnetization(0UL);
+         RealArray  material_height_mean_magnetization(0UL);
+      } /* stats */
 
    } // end of internal namespace
 

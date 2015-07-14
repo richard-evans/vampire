@@ -33,8 +33,8 @@ namespace vcuda
          extern RealArray  height_mean_magnetization;
 
          extern IndexArray material_height_mask;
-         extern RealArray  material_height_magnemagnetization;
-         extern RealArray  material_height_mean_mean_magnetization;
+         extern RealArray  material_height_magnetization;
+         extern RealArray  material_height_mean_magnetization;
 
          /*
           * Functions required for statistics

@@ -8,7 +8,6 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
-#include <thrust/sort.h>
 
 // Vampire headers
 #include "cuda.hpp"
@@ -25,65 +24,63 @@ namespace vcuda{
 
 #ifdef CUDA
 
-   namespace internal
+   namespace stats
    {
-      namespace stats
-      {
-
          void update ()
          {
-            __update_stat (
-                  system_mask,
-                  system_magnetization,
-                  system_mean_magnetization);
 
-            __update_stat (
-                  material_mask,
-                  material_magnetization,
-                  material_mean_magnetization);
+            cu::stats::__update_stat (
+                  cu::stats::system_mask,
+                  cu::stats::system_magnetization,
+                  cu::stats::system_mean_magnetization);
 
-            __update_stat (
-                  height_mask,
-                  height_magnetization,
-                  height_mean_magnetization);
+            cu::stats::__update_stat (
+                  cu::stats::material_mask,
+                  cu::stats::material_magnetization,
+                  cu::stats::material_mean_magnetization);
 
-            __update_stat (
-                  material_height_mask,
-                  material_height_magnetization,
-                  material_height_mean_magnetization);
+            cu::stats::__update_stat (
+                  cu::stats::height_mask,
+                  cu::stats::height_magnetization,
+                  cu::stats::height_mean_magnetization);
+
+            cu::stats::__update_stat (
+                  cu::stats::material_height_mask,
+                  cu::stats::material_height_magnetization,
+                  cu::stats::material_height_mean_magnetization);
 
             /*
              * increase the counter
              */
 
-            counter++;
+            cu::stats::counter++;
 
          }
 
          void get ()
          {
 
-            __get_stat (
-                  system_magnetization,
-                  system_mean_magnetization,
+            cu::stats::__get_stat (
+                  cu::stats::system_magnetization,
+                  cu::stats::system_mean_magnetization,
                   ::stats::system_magnetization
                   );
 
-            __get_stat (
-                  material_magnetization,
-                  material_mean_magnetization,
+            cu::stats::__get_stat (
+                  cu::stats::material_magnetization,
+                  cu::stats::material_mean_magnetization,
                   ::stats::material_magnetization
                   );
 
-            __get_stat (
-                  height_magnetization,
-                  height_mean_magnetization,
+            cu::stats::__get_stat (
+                  cu::stats::height_magnetization,
+                  cu::stats::height_mean_magnetization,
                   ::stats::height_magnetization
                   );
 
-            __get_stat (
-                  material_height_magnetization,
-                  material_height_mean_magnetization,
+            cu::stats::__get_stat (
+                  cu::stats::material_height_magnetization,
+                  cu::stats::material_height_mean_magnetization,
                   ::stats::material_height_magnetization
                   );
 
@@ -91,50 +88,58 @@ namespace vcuda{
 
          void reset ()
          {
-            counter = 0L;
+            cu::stats::counter = 0L;
 
-            __reset_stat (
-                  system_magnetization,
-                  system_mean_magnetization
+            cu::stats::__reset_stat (
+                  cu::stats::system_magnetization,
+                  cu::stats::system_mean_magnetization
                   );
 
-            __reset_stat (
-                  material_magnetization,
-                  material_mean_magnetization
+            cu::stats::__reset_stat (
+                  cu::stats::material_magnetization,
+                  cu::stats::material_mean_magnetization
                   );
 
-            __reset_stat (
-                  height_magnetization,
-                  height_mean_magnetization
+            cu::stats::__reset_stat (
+                  cu::stats::height_magnetization,
+                  cu::stats::height_mean_magnetization
                   );
 
-            __reset_stat (
-                  material_height_magnetization,
-                  material_height_mean_magnetization
+            cu::stats::__reset_stat (
+                  cu::stats::material_height_magnetization,
+                  cu::stats::material_height_mean_magnetization
                   );
 
          }
 
+   } /* stats */
+
+   namespace internal
+   {
+      namespace stats
+      {
+
+
          void __update_stat (
                const IndexArray & mask,
-               RealArray& stat,
-               RealArray& mean_stat
+               RealArray & stat,
+               RealArray & mean_stat
                )
          {
-            const IndexArray::value_type * d_mask = thrust::raw_pointer_cast (
+            const int * d_mask = thrust::raw_pointer_cast (
                   mask.data());
-            RealArray::value_type * d_stat = thrust::raw_pointer_cast (
+            double * d_stat = thrust::raw_pointer_cast (
                   stat.data());
-            RealArray::value_type * d_accu = thrust::raw_pointer_cast (
+            double * d_accu = thrust::raw_pointer_cast (
                   mean_stat.data());
 
-            RealArray::value_type * d_x_spin = thrust::raw_pointer_cast(
+            double * d_x_spin = thrust::raw_pointer_cast(
                   cu::atoms::x_spin_array.data());
-            RealArray::value_type * d_y_spin = thrust::raw_pointer_cast(
+            double * d_y_spin = thrust::raw_pointer_cast(
                   cu::atoms::y_spin_array.data());
-            RealArray::value_type * d_z_spin = thrust::raw_pointer_cast(
+            double * d_z_spin = thrust::raw_pointer_cast(
                   cu::atoms::z_spin_array.data());
-            RealArray::value_type * d_spin_norm = thrust::raw_pointer_cast(
+            double * d_spin_norm = thrust::raw_pointer_cast(
                   cu::atoms::spin_norm_array.data());
 
             int n_bins = stat.size ();
@@ -199,8 +204,8 @@ namespace vcuda{
              * Copy to local arrays
              */
 
-            std::vector<double> h_stat(stat.size());
-            std::vector<double> h_mean_stat(mean_stat.size());
+            thrust::host_vector<double> h_stat(stat.size());
+            thrust::host_vector<double> h_mean_stat(mean_stat.size());
 
             thrust::copy(stat.begin(), stat.end(), h_stat.begin());
             thrust::copy(mean_stat.begin(), mean_stat.end(), h_mean_stat.begin());
@@ -209,7 +214,13 @@ namespace vcuda{
              * Call the method in the magnetization_statistic_t instance
              */
 
-            local_stat.set_magnetization (h_stat, h_mean_stat, counter);
+            std::vector<double> stl_stat (h_stat.begin(), h_stat.end());
+            std::vector<double> stl_mean_stat (h_mean_stat.begin(), h_mean_stat.end());
+
+            local_stat.set_magnetization (
+                  stl_stat,
+                  stl_mean_stat,
+                  counter);
 
          }
 
