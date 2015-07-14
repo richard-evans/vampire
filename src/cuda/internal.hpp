@@ -87,6 +87,7 @@ namespace vcuda{
       bool __initialize_materials ();
       bool __initialize_topology ();
       bool __initialize_curand ();
+      bool __initialize_stats ();
 
       /*
        * Clean up function

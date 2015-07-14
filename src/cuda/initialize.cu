@@ -14,8 +14,9 @@
 // Vampire headers
 #include "atoms.hpp"
 #include "cuda.hpp"
-#include "random.hpp"
 #include "errors.hpp"
+#include "random.hpp"
+#include "stats.hpp"
 #include "vio.hpp"
 
 // Local cuda headers
@@ -25,6 +26,7 @@
 #include "internal.hpp"
 
 #include "exchange_fields.hpp"
+#include "statistics.hpp"
 
 #ifdef CUDA
 namespace cu = ::vcuda::internal;
@@ -65,10 +67,6 @@ namespace vcuda{
          ::err::vexit();
       }
 
-
-
-
-
       bool success = true;
 
       /*
@@ -86,6 +84,7 @@ namespace vcuda{
       success = success && cu::__initialize_materials ();
       success = success && cu::__initialize_topology ();
       success = success && cu::__initialize_curand ();
+      success = success && cu::__initialize_stats ();
 
       // Set up the exchange fields
       if( cu::exchange::initialise_exchange() != EXIT_SUCCESS)
@@ -537,6 +536,56 @@ namespace vcuda{
 
          return true;
       }
+
+      bool __initialize_stats ()
+      {
+         std::vector<int> mask;
+         std::vector<double> dummy;
+
+         ::stats::system_magnetization.get_mask(mask, dummy);
+         cu::stats::system_mask.resize(mask.size());
+         thrust::copy (
+               mask.begin(),
+               mask.end(),
+               cu::stats::system_mask.begin()
+               );
+         cu::stats::system_magnetization.resize(mask.size());
+         cu::stats::system_mean_magnetization.resize(mask.size());
+
+         ::stats::material_magnetization.get_mask(mask, dummy);
+         cu::stats::material_mask.resize(mask.size());
+         thrust::copy (
+               mask.begin(),
+               mask.end(),
+               cu::stats::material_mask.begin()
+               );
+         cu::stats::material_magnetization.resize(mask.size());
+         cu::stats::material_mean_magnetization.resize(mask.size());
+
+         ::stats::height_magnetization.get_mask(mask, dummy);
+         cu::stats::height_mask.resize(mask.size());
+         thrust::copy (
+               mask.begin(),
+               mask.end(),
+               cu::stats::height_mask.begin()
+               );
+         cu::stats::height_magnetization.resize(mask.size());
+         cu::stats::height_mean_magnetization.resize(mask.size());
+
+         ::stats::material_height_magnetization.get_mask(mask, dummy);
+         cu::stats::material_height_mask.resize(mask.size());
+         thrust::copy (
+               mask.begin(),
+               mask.end(),
+               cu::stats::material_height_mask.begin()
+               );
+         cu::stats::material_height_magnetization.resize(mask.size());
+         cu::stats::material_height_mean_magnetization.resize(mask.size());
+
+         return true;
+
+      }
+
    }
 
 #endif
