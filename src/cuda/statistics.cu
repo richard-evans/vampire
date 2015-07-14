@@ -161,6 +161,7 @@ namespace vcuda{
                      n_bins,
                      n_atoms
                      );
+               check_cuda_errors (__FILE__, __LINE__);
             }
             else
             {
@@ -177,6 +178,7 @@ namespace vcuda{
                      n_bins,
                      n_atoms
                      );
+               check_cuda_errors (__FILE__, __LINE__);
             }
 
 
@@ -188,6 +190,7 @@ namespace vcuda{
                   d_accu,
                   n_bins
                   );
+            check_cuda_errors (__FILE__, __LINE__);
 
          }
 
@@ -220,6 +223,7 @@ namespace vcuda{
                   stl_stat,
                   stl_mean_stat,
                   counter);
+            check_cuda_errors (__FILE__, __LINE__);
 
          }
 
@@ -237,6 +241,7 @@ namespace vcuda{
                   mean_stat.begin(),
                   mean_stat.end(),
                   0.0);
+            check_cuda_errors (__FILE__, __LINE__);
          }
 
 

@@ -551,6 +551,7 @@ namespace vcuda{
                );
          cu::stats::system_magnetization.resize(mask.size());
          cu::stats::system_mean_magnetization.resize(mask.size());
+         check_cuda_errors (__FILE__, __LINE__);
 
          ::stats::material_magnetization.get_mask(mask, dummy);
          cu::stats::material_mask.resize(mask.size());
@@ -561,6 +562,7 @@ namespace vcuda{
                );
          cu::stats::material_magnetization.resize(mask.size());
          cu::stats::material_mean_magnetization.resize(mask.size());
+         check_cuda_errors (__FILE__, __LINE__);
 
          ::stats::height_magnetization.get_mask(mask, dummy);
          cu::stats::height_mask.resize(mask.size());
@@ -571,6 +573,7 @@ namespace vcuda{
                );
          cu::stats::height_magnetization.resize(mask.size());
          cu::stats::height_mean_magnetization.resize(mask.size());
+         check_cuda_errors (__FILE__, __LINE__);
 
          ::stats::material_height_magnetization.get_mask(mask, dummy);
          cu::stats::material_height_mask.resize(mask.size());
@@ -581,6 +584,7 @@ namespace vcuda{
                );
          cu::stats::material_height_magnetization.resize(mask.size());
          cu::stats::material_height_mean_magnetization.resize(mask.size());
+         check_cuda_errors (__FILE__, __LINE__);
 
          return true;
 
