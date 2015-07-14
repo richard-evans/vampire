@@ -18,6 +18,7 @@
 #include "internal.hpp"
 
 #include "exchange_fields.hpp"
+#include "statistics.hpp"
 
 #ifdef CUDA
 namespace cu = vcuda::internal;
@@ -95,6 +96,20 @@ namespace vcuda{
          cu::llg::heun_parameters.HeunParametersArray::~device_vector ();
 
          cudaFree (d_rand_state);
+
+         cu::stats::system_mask.IndexArray::~device_vector ();
+         cu::stats::system_magnetization.RealArray::~device_vector ();
+         cu::stats::system_mean_magnetization.RealArray::~device_vector ();
+         cu::stats::material_mask.IndexArray::~device_vector ();
+         cu::stats::material_magnetization.RealArray::~device_vector ();
+         cu::stats::material_mean_magnetization.RealArray::~device_vector ();
+         cu::stats::height_mask.IndexArray::~device_vector ();
+         cu::stats::height_magnetization.RealArray::~device_vector ();
+         cu::stats::height_mean_magnetization.RealArray::~device_vector ();
+         cu::stats::material_height_mask.IndexArray::~device_vector ();
+         cu::stats::material_height_magnetization.RealArray::~device_vector ();
+         cu::stats::material_height_mean_magnetization.RealArray::~device_vector ();
+
       }
    } /* internal */
 #endif
