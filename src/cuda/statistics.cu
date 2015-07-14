@@ -13,6 +13,7 @@
 #include "cuda.hpp"
 
 // Local cuda headers
+#include "cuda_utils.hpp"
 #include "internal.hpp"
 #include "statistics.hpp"
 
