@@ -51,9 +51,17 @@
 #include "vmpi.hpp"
 
 // Standard Libraries
+#ifdef WIN_COMPILE
+#define NOMINMAX
+#undef max
+#undef min
+#endif
+
 #include <cmath>
 #include <iostream>
 #include <limits>
+
+
 
 namespace cs{
 
@@ -91,7 +99,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	}
 
    // Calculate system dimensions and number of supercells
-   int max_val=std::numeric_limits<int>::max();
+   int max_val=(std::numeric_limits<int>::max());
    int min[3]={max_val,max_val,max_val}; // lowest cell id
    int max[3]={0,0,0}; // highest cell id
 
