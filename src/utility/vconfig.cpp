@@ -66,11 +66,16 @@ namespace vout{
 
    bool output_atoms_config=false;
    int output_atoms_config_rate=1000;
-   int output_atoms_file_counter=0;
+////   int output_atoms_file_counter=0;
+//   int output_atoms_file_counter=sim::output_atoms_file_counter;
    int output_rate_counter=0;
 
    double atoms_output_min[3]={0.0,0.0,0.0};
    double atoms_output_max[3]={1.0,1.0,1.0};
+   double field_output_min_1=-10000.0;
+   double field_output_max_1=-0.0;
+   double field_output_min_2=0.0;
+   double field_output_max_2=10000.0;
    int total_output_atoms=0;
    std::vector<int> local_output_atom_list(0);
 
@@ -106,19 +111,49 @@ namespace vout{
 ///
 void config(){
 
+   double minField_1=vout::field_output_min_1;
+   double maxField_1=vout::field_output_max_1;
+   double minField_2=vout::field_output_min_2;
+   double maxField_2=vout::field_output_max_2;
+
    // check calling of routine if error checking is activated
    if(err::check==true){std::cout << "vout::config has been called" << std::endl;}
 
    // atoms output
    if((vout::output_atoms_config==true) && (vout::output_rate_counter%output_atoms_config_rate==0)){
-      if(output_atoms_file_counter==0) vout::atoms_coords();
+     if(sim::program!=2){
+      if(sim::output_atoms_file_counter==0) vout::atoms_coords();
       vout::atoms();
+     }
+     else if(sim::program=2){
+      if((sim::H_applied>=minField_1) && (sim::H_applied<=maxField_1)){
+        if(sim::output_atoms_file_counter==0) vout::atoms_coords();
+        vout::atoms();
+      }
+      else if((sim::H_applied>=minField_2) && (sim::H_applied<=maxField_2)){
+        if(sim::output_atoms_file_counter==0) vout::atoms_coords();
+        vout::atoms();
+      }
+     }
    }
 
    // cells output
    if((vout::output_cells_config==true) && (vout::output_rate_counter%output_cells_config_rate==0)){
-      if(output_cells_file_counter==0) vout::cells_coords();
+//     if(!program::hysteresis()){ 
+     if(sim::program!=2){
+      if(sim::output_atoms_file_counter==0) vout::cells_coords();
       vout::cells();
+     }
+     else if(sim::program=2){
+      if((sim::H_applied>=minField_1) && (sim::H_applied<=maxField_1)){
+        if(sim::output_atoms_file_counter==0) vout::cells_coords();
+        vout::cells();
+      }
+      else if((sim::H_applied>=minField_2) && (sim::H_applied<=maxField_2)){
+        if(sim::output_atoms_file_counter==0) vout::cells_coords();
+        vout::cells();
+      }
+     }
    }
 
    // increment rate counter
@@ -186,7 +221,7 @@ void config(){
       if(vmpi::my_rank!=0){
          file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
       }
-      file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
+      file_sstr << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
       file_sstr << ".cfg";
       std::string cfg_file = file_sstr.str();
       const char* cfg_filec = cfg_file.c_str();
@@ -224,7 +259,7 @@ void config(){
          cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors-1 << std::endl;
          for(int p=1;p<vmpi::num_processors;p++){
             std::stringstream cfg_sstr;
-            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << output_atoms_file_counter << ".cfg";
+            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".cfg";
             cfg_file_ofstr << cfg_sstr.str() << std::endl;
          }
          cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
@@ -239,7 +274,7 @@ void config(){
 
       cfg_file_ofstr.close();
 
-      output_atoms_file_counter++;
+      sim::output_atoms_file_counter++;
 
    }
 

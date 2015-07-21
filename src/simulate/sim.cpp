@@ -64,6 +64,8 @@ namespace sim{
 	int partial_time=1000;
 	uint64_t equilibration_time=0;
 	int runs=1; /// for certain repetitions in programs
+	int64_t parity=-1;
+        uint64_t output_atoms_file_counter=0;
 	
 	bool ext_demag=false;
 	
@@ -82,6 +84,10 @@ namespace sim{
 	double applied_field_angle_theta=0.0;
 	bool applied_field_set_by_angle=false;
 	
+	double H=Hmax; // T
+	int64_t iH=1; // uT
+//	uint64_t iH=-1*vmath::iround(double(Hmax)*1.0E6); // uT
+        
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; /// nm/ns
@@ -648,4 +654,10 @@ int integrate_mpi(int n_steps){
 
 } // Namespace sim
 
-
+/*namespace ckp{
+        uint64_t parity=-1;
+        uint64_t output_atoms_file_counter=0;
+        double H=sim::Hmax; // T
+        uint64_t iH=-1*vmath::iround(double(sim::Hmax)*1.0E6); // uT
+} // end namespace ckp
+*/

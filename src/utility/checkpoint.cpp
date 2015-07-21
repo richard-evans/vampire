@@ -19,6 +19,7 @@
 #include "random.hpp"
 #include "sim.hpp"
 #include "vio.hpp"
+#include "program.hpp"
 
 //-----------------------------------------------------------------------------
 // Function to save checkpoint file
@@ -29,6 +30,9 @@ void save_checkpoint(){
    uint64_t natoms64 = uint64_t(atoms::num_atoms-vmpi::num_halo_atoms);
    int64_t time64 = int64_t(sim::time);
    int64_t eqtime64 = int64_t(sim::equilibration_time);
+   int64_t parity64 = int64_t(sim::parity);
+   int64_t iH64 = int64_t(sim::iH);
+   int64_t output_atoms_file_counter64 = int64_t(sim::output_atoms_file_counter);
 
    // determine checkpoint file name
    std::stringstream chkfilenamess;
@@ -57,6 +61,9 @@ void save_checkpoint(){
    chkfile.write(reinterpret_cast<const char*>(&natoms64),sizeof(uint64_t));
    chkfile.write(reinterpret_cast<const char*>(&time64),sizeof(int64_t));
    chkfile.write(reinterpret_cast<const char*>(&eqtime64),sizeof(int64_t));
+   chkfile.write(reinterpret_cast<const char*>(&parity64),sizeof(int64_t));
+   chkfile.write(reinterpret_cast<const char*>(&iH64),sizeof(int64_t));
+   chkfile.write(reinterpret_cast<const char*>(&output_atoms_file_counter64),sizeof(int64_t));
    chkfile.write(reinterpret_cast<const char*>(&mt_p),sizeof(int32_t));
    chkfile.write(reinterpret_cast<const char*>(&mt_state[0]),sizeof(uint32_t)*mt_state.size());
 
@@ -84,6 +91,9 @@ void load_checkpoint(){
    uint64_t natoms64;
    int64_t time64;
    int64_t eqtime64;
+   int64_t parity64;
+   int64_t iH64;
+   int64_t output_atoms_file_counter64;
 
    // variables for loading state of random number generator
    std::vector<uint32_t> mt_state(624); // 624 is hard coded in mt implementation. uint64 assumes same size as unsigned long
@@ -113,6 +123,9 @@ void load_checkpoint(){
    chkfile.read((char*)&natoms64,sizeof(uint64_t));
    chkfile.read((char*)&time64,sizeof(int64_t));
    chkfile.read((char*)&eqtime64,sizeof(int64_t));
+   chkfile.read((char*)&parity64,sizeof(int64_t));
+   chkfile.read((char*)&iH64,sizeof(int64_t));
+   chkfile.read((char*)&output_atoms_file_counter64,sizeof(int64_t));
    chkfile.read((char*)&mt_p,sizeof(int32_t));
    chkfile.read((char*)&mt_state[0],sizeof(uint32_t)*mt_state.size());
 
@@ -129,8 +142,15 @@ void load_checkpoint(){
 
    // Load saved time if simulation continuing
    if(sim::load_checkpoint_continue_flag){
+//      sim::parity = int(parity64);
+      sim::parity = parity64;
+//      program::iH = iH64;
+      sim::iH = iH64;
+//      sim::iH = int(iH64);
       sim::time = time64;
       sim::equilibration_time = eqtime64;
+//      sim::H = (double) sim::iH;
+      sim::output_atoms_file_counter = output_atoms_file_counter64;
    }
 
    // Load spin positions

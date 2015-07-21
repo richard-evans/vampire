@@ -42,6 +42,8 @@ namespace sim{
 	extern int partial_time;
 	extern uint64_t equilibration_time;
 	extern int runs;
+	extern int64_t parity;
+	extern uint64_t output_atoms_file_counter;
 	
 	extern bool ext_demag;
 		
@@ -55,10 +57,13 @@ namespace sim{
 	extern double Hmin; // T
 	extern double Hmax; // T
 	extern double Hinc; // T
-	extern double Heq; //T
+	extern double Heq; // T
 	extern double applied_field_angle_phi;
 	extern double applied_field_angle_theta;
 	extern bool applied_field_set_by_angle;
+
+        extern int64_t iH; 
+        extern double H; // T
 	
 	extern double demag_factor[3];
 	
@@ -251,5 +256,13 @@ namespace cmc{
 	extern double sphere_reject;
 	extern double energy_reject;
 }
+
+/*namespace ckp{
+        extern uint64_t parity;
+        extern uint64_t output_atoms_file_counter;
+        extern double H; // T
+        extern uint64_t iH; // uT
+} // end namespace ckp
+*/
 
 #endif /*SIM_H_*/
