@@ -3,7 +3,7 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2014. All rights reserved.
+// (c) R F L Evans and P Chureemart 2014. All rights reserved.
 //
 //-----------------------------------------------------------------------------
 
@@ -38,12 +38,20 @@ namespace st{
       int num_y_stacks; // number of stack in y
       int num_microcells_per_stack; // number of microcells per stack
 
+      int config_file_counter = 0; // spin torque config file counter
+
+      double je = 1.0e11; // current (C/s/m^2)
+
       std::vector<int> stack_index; // start of stack in microcell arrays
 
-      std::vector<double> beta_cond; /// spin polarisation (conductivity)
-      std::vector<double> beta_diff; /// spin polarisation (diffusion)
+      std::vector<double> beta_cond; /// spin polarisation (conductivity) Beta B
+      std::vector<double> beta_diff; /// spin polarisation (diffusion) Beta' Bp
       std::vector<double> sa_infinity; /// intrinsic spin accumulation
       std::vector<double> lambda_sdl; /// spin diffusion length
+      std::vector<double> diffusion; /// diffusion constant Do
+      std::vector<double> sd_exchange; /// diffusion constant Do
+      std::vector<double> a; // a parameter for spin accumulation
+      std::vector<double> b; // b parameter for spin accumulation
 
       // three-vector arrays
       std::vector<double> pos; /// stack position
@@ -62,4 +70,3 @@ namespace st{
 
    } // end of internal namespace
 } // end of st namespace
-

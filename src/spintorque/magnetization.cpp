@@ -40,9 +40,9 @@ namespace st{
             const int material = atom_type_array[atom];
             const double mus = mu_s_array[material];
 
-            st::internal::m[3*cell+0] = x_spin_array[atom]*mus;
-            st::internal::m[3*cell+1] = y_spin_array[atom]*mus;
-            st::internal::m[3*cell+2] = z_spin_array[atom]*mus;
+            st::internal::m[3*cell+0] += x_spin_array[atom]*mus;
+            st::internal::m[3*cell+1] += y_spin_array[atom]*mus;
+            st::internal::m[3*cell+2] += z_spin_array[atom]*mus;
          }
 
          #ifdef MPICF

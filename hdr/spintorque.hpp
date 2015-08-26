@@ -7,7 +7,7 @@
 //
 //-----------------------------------------------------------------------------
 //
-//   Spin torque calculation is done in 'stacks'. Each stack represents a 
+//   Spin torque calculation is done in 'stacks'. Each stack represents a
 //   number of microcells perpendicular to the current direction
 //
 //                  ---------------------------
@@ -33,11 +33,12 @@
 //   be chosen to be either in the x,y or z direction, and the atoms are
 //   assigned to cells accordingly.
 //
-//   The first cell in the stack contains no atoms, and is given initial 
+//   The first cell in the stack contains no atoms, and is given initial
 //   values for the spin transport parameters.
 //
 //
 // System headers
+#include <string>
 #include <vector>
 
 // Program headers
@@ -83,6 +84,11 @@ namespace st{
                                   const std::vector<double>& z_spin_array,
                                   const std::vector<int>& atom_type_array,
                                   const std::vector<double>& mu_s_array);
+
+   //-----------------------------------------------------------------------------
+   // Function for matching spin torque material parameters
+   //-----------------------------------------------------------------------------
+   int match_material(std::string const word, std::string const value, std::string const unit, int const line, int const super_index);
 
 } // end of st namespace
 

@@ -3,11 +3,12 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2014. All rights reserved.
+// (c) R F L Evans and P Chureemart 2014. All rights reserved.
 //
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <complex>
 #include <iostream>
 #include <vector>
 
@@ -91,10 +92,16 @@ void initialise(const double system_dimensions_x,
    // allocate microcell data
    //-------------------------------------------------------------------------------------
    const int array_size = st::internal::num_stacks*st::internal::num_microcells_per_stack;
+
    st::internal::beta_cond.resize(array_size); /// spin polarisation (conductivity)
    st::internal::beta_diff.resize(array_size); /// spin polarisation (diffusion)
    st::internal::sa_infinity.resize(array_size); /// intrinsic spin accumulation
    st::internal::lambda_sdl.resize(array_size); /// spin diffusion length
+   st::internal::diffusion.resize(array_size); /// diffusion constant Do
+   st::internal::sd_exchange.resize(array_size); /// diffusion constant Do
+   st::internal::a.resize(array_size); // a parameter for spin accumulation
+   st::internal::b.resize(array_size); // b parameter for spin accumulation
+
    const int three_vec_array_size = 3*array_size;
    st::internal::pos.resize(three_vec_array_size); /// microcell position
    st::internal::m.resize(three_vec_array_size); // magnetisation
@@ -107,6 +114,14 @@ void initialise(const double system_dimensions_x,
    //---------------------------------------------------
    // Noi Initialise j,sa, st, ast, nast here?
    //---------------------------------------------------
+   for(int cell = 0; cell < array_size; ++cell){
+      st::internal::sa[3*cell+0] = 0.0;
+      st::internal::sa[3*cell+1] = 0.0;
+      st::internal::sa[3*cell+2] = 1.0;
+      st::internal::j [3*cell+0] = 0.0;
+      st::internal::j [3*cell+1] = 0.0;
+      st::internal::j [3*cell+2] = 0.0;
+   }
 
    //---------------------------------------------------
    // Determine which atoms belong to which stacks
@@ -152,7 +167,7 @@ void initialise(const double system_dimensions_x,
    const int d[3]={ncx,ncy,ncz};
    const double cs[3] = {st::internal::micro_cell_size, st::internal::micro_cell_size, st::internal::micro_cell_thickness}; // cell size
 
-   // Assign atoms to cells                                                                                                                  
+   // Assign atoms to cells
    for(int atom=0;atom<num_local_atoms;atom++){
       // temporary for atom coordinates
       double c[3];
@@ -173,7 +188,7 @@ void initialise(const double system_dimensions_x,
             terminaltextcolor(RED);
             std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
             terminaltextcolor(WHITE);
-            #endif 
+            #endif
             terminaltextcolor(RED);
             std::cerr << "\tAtom number:      " << atom << std::endl;
             std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
@@ -202,8 +217,10 @@ void initialise(const double system_dimensions_x,
    st::internal::y_field_array.resize(num_local_atoms);
    st::internal::z_field_array.resize(num_local_atoms);
 
-   st::internal::output_microcell_data();
-   return; 
+   // optionally output base microcell data
+   st::internal::output_base_microcell_data();
+
+   return;
 }
 
 namespace internal{
@@ -213,19 +230,15 @@ namespace internal{
    //--------------------------------------------------------------------------------
    void set_microcell_properties(const std::vector<int>& atom_type_array, const int num_local_atoms){
 
-      st::internal::mp.resize(1);
-      st::internal::mp.at(0).beta_cond=1.0;
-      st::internal::mp.at(0).beta_diff=2.0;
-      st::internal::mp.at(0).sa_infinity=3.0;
-      st::internal::mp.at(0).lambda_sdl=4.0;
-
       //-------------------------------------------------------
       // Determine microcell properties from atomic properties
       //-------------------------------------------------------
-      st::internal::default_properties.beta_cond = 5.0;
-      st::internal::default_properties.beta_diff = 5.0;
-      st::internal::default_properties.sa_infinity = 5.0;
-      st::internal::default_properties.lambda_sdl = 5.0;
+      st::internal::default_properties.beta_cond = 0.0;
+      st::internal::default_properties.beta_diff = 0.0;
+      st::internal::default_properties.sa_infinity = 0.0;
+      st::internal::default_properties.lambda_sdl = 600.0e-9; // m
+      st::internal::default_properties.diffusion = 0.003; //Angstroms^2/s
+      st::internal::default_properties.sd_exchange = 0.0;
 
       // Temporary array to hold number of atoms in each cell for averaging
       std::vector<double> count(st::internal::beta_cond.size(),0.0);
@@ -240,26 +253,32 @@ namespace internal{
          int id = st::internal::atom_st_index[atom];
 
          // determine atomic properties
-         double beta_cond = st::internal::mp.at(mat).beta_cond;
-         double beta_diff = st::internal::mp.at(mat).beta_diff;
+         double beta_cond = st::internal::mp.at(mat).beta_cond; // beta
+         double beta_diff = st::internal::mp.at(mat).beta_diff; // beta_prime
          double sa_infinity = st::internal::mp.at(mat).sa_infinity;
          double lambda_sdl = st::internal::mp.at(mat).lambda_sdl;
+         double diffusion = st::internal::mp.at(mat).diffusion;
+         double sd_exchange = st::internal::mp.at(mat).sd_exchange;
 
          //add atomic properties to microcells
          st::internal::beta_cond.at(id) += beta_cond;
          st::internal::beta_diff.at(id) += beta_diff;
          st::internal::sa_infinity.at(id) += sa_infinity;
          st::internal::lambda_sdl.at(id) += lambda_sdl;
+         st::internal::diffusion.at(id) += diffusion;
+         st::internal::sd_exchange.at(id) += sd_exchange;
          count.at(id) += 1.0;
       }
 
       // reduce microcell properties on all CPUs
       #ifdef MPICF
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::beta_cond[0],st::internal::beta_cond.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::beta_diff[0],st::internal::beta_diff.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::sa_infinity[0],st::internal::sa_infinity.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::lambda_sdl[0],st::internal::lambda_sdl.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &count[0], count.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::beta_cond[0],   st::internal::beta_cond.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::beta_diff[0],   st::internal::beta_diff.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::sa_infinity[0], st::internal::sa_infinity.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::lambda_sdl[0],  st::internal::lambda_sdl.size(),  MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::diffusion[0],   st::internal::diffusion.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::sd_exchange[0], st::internal::sd_exchange.size(), MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &count[0],                     count.size(),                     MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
       #endif
 
       // Calculate average (mean) spin torque parameters
@@ -267,17 +286,45 @@ namespace internal{
          const double nat = count.at(cell);
          // check for zero atoms in cell
          if(nat>0.0001){
-            st::internal::beta_cond.at(cell)/=nat;
-            st::internal::beta_diff.at(cell)/=nat;
-            st::internal::sa_infinity.at(cell)/=nat;
-            st::internal::lambda_sdl.at(cell)/=nat;
+            st::internal::beta_cond.at(cell)   /= nat;
+            st::internal::beta_diff.at(cell)   /= nat;
+            st::internal::sa_infinity.at(cell) /= nat;
+            st::internal::lambda_sdl.at(cell)  /= nat;
+            st::internal::diffusion.at(cell)   /= nat;
+            st::internal::sd_exchange.at(cell) /= nat;
          }
          else{
-            st::internal::beta_cond.at(cell)=st::internal::default_properties.beta_cond;
-            st::internal::beta_diff.at(cell)=st::internal::default_properties.beta_cond;
-            st::internal::sa_infinity.at(cell)=st::internal::default_properties.sa_infinity;
-            st::internal::lambda_sdl.at(cell)=st::internal::default_properties.lambda_sdl;
+            st::internal::beta_cond.at(cell)   = st::internal::default_properties.beta_cond;
+            st::internal::beta_diff.at(cell)   = st::internal::default_properties.beta_cond;
+            st::internal::sa_infinity.at(cell) = st::internal::default_properties.sa_infinity;
+            st::internal::lambda_sdl.at(cell)  = st::internal::default_properties.lambda_sdl;
+            st::internal::diffusion.at(cell)   = st::internal::default_properties.diffusion;
+            st::internal::sd_exchange.at(cell) = st::internal::default_properties.sd_exchange;
          }
+      }
+
+      // Determine a and b parameters
+      const double hbar = 1.05457162e-34;
+      for(int cell=0; cell<beta_cond.size(); ++cell){
+
+         const double B  = st::internal::beta_cond[cell];
+         const double Bp = st::internal::beta_diff[cell];
+         const double lambda_sdl = st::internal::lambda_sdl[cell];
+         const double Do = st::internal::diffusion[cell];
+         const double Jsd = st::internal::sd_exchange[cell];
+
+         const double BBp = 1.0/sqrt(1.0-B*Bp);
+         const double lambda_sf = lambda_sdl*BBp;
+         const double lambda_j = sqrt(2.0*hbar*Do/Jsd); // Angstroms
+         const double lambda_sf2 = lambda_sf*lambda_sf;
+         const double lambda_j2 = lambda_j*lambda_j;
+
+         std::complex<double> inside (1.0/lambda_sf2, -1.0/lambda_j2);
+         std::complex<double> inv_lplus = sqrt(inside);
+
+         st::internal::a[cell] =  real(inv_lplus);
+         st::internal::b[cell] = -imag(inv_lplus);
+
       }
 
       return;
@@ -285,4 +332,3 @@ namespace internal{
 }
 
 } // end of st namespace
-

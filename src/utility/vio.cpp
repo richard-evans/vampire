@@ -58,6 +58,7 @@
 #include "errors.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "stats.hpp"
 #include "units.hpp"
 #include "vio.hpp"
@@ -2863,8 +2864,15 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
 			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
+         // check for spin torque material parameters
+         if(matchcheck==EXIT_FAILURE) matchcheck = st::match_material(word, value, unit, line_counter, super_index-1);
+         // if no match then return error
 			if(matchcheck==EXIT_FAILURE){
-				err::vexit();
+            terminaltextcolor(RED);
+            std::cerr << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
+            zlog << zTs() << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
 			}
 		}
 	}
@@ -3724,17 +3732,11 @@ int match_material(string const word, string const value, string const unit, int
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
-		//--------------------------------------------------------------------
-		// keyword not found
-		//--------------------------------------------------------------------
-		else{
-			terminaltextcolor(RED);
-			std::cerr << "Error - Unknown control statement \'material[" << super_index+1 << "]:" << word << "\' on line " << line << " of material file" << std::endl;
-			terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-		}
-		
-	return EXIT_SUCCESS;
+      //--------------------------------------------------------------------
+      // keyword not found
+      //--------------------------------------------------------------------
+      return EXIT_FAILURE;
+
 }
 
 
