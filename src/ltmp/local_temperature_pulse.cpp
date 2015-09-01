@@ -23,7 +23,7 @@ namespace ltmp{
       //-----------------------------------------------------------------------------
       // Function to calculate the local temperature using the two temperature model
       //-----------------------------------------------------------------------------
-      void calculate_local_temperature(const double time_from_start){
+      void calculate_local_temperature_pulse(const double time_from_start){
 
          const double reduced_time =  (time_from_start-2.*ltmp::internal::pump_time)/(ltmp::internal::pump_time);
          const double prefactor = 4.0*log(2.0); // normalise to unit width
@@ -34,11 +34,11 @@ namespace ltmp{
          const double Cl = ltmp::internal::TTCl;
          const double dt = ltmp::internal::dt;
 
-         // Parallisation 
+         // Parallisation
          // if vertical only
          // loop over internal cells
          // broadcast result
-         // else 
+         // else
          // loop over 1/n cells
          // calculate dTe dTp from Te, Tp
          //#ifdef MPICF

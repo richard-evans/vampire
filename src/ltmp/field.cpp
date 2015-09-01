@@ -26,7 +26,8 @@ namespace ltmp{
    void update_localised_temperature(const double time_from_start){
 
       // calculate local temperature
-      ltmp::internal::calculate_local_temperature(time_from_start);
+      if(ltmp::internal::gradient == false) ltmp::internal::calculate_local_temperature_pulse(time_from_start);
+      else ltmp::internal::calculate_local_temperature_gradient();
 
       // store number of local atoms as local constant for compiler
       const int num_local_atoms = ltmp::internal::num_local_atoms;

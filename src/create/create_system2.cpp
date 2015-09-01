@@ -313,7 +313,9 @@ int create(){
                   sim::TTG,
                   sim::TTCe,
                   sim::TTCl,
-                  mp::dt_SI);
+                  mp::dt_SI,
+					   sim::Tmin,
+					   sim::Tmax);
 
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
