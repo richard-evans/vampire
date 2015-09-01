@@ -81,7 +81,12 @@ namespace sim{
 	double applied_field_angle_phi=0.0;
 	double applied_field_angle_theta=0.0;
 	bool applied_field_set_by_angle=false;
-	
+	double fmr_field_strength = 0.0; // Oscillating field strength (Tesla)
+	double fmr_field_frequency = 1.0; // Oscillating field frequency (GHz)
+	std::vector<double> fmr_field_unit_vector; // Oscillating field direction
+	double fmr_field = 0.0; // Instantaneous value of the oscillating field strength H sin(wt)
+	bool enable_fmr = false; // Flag to enable fmr field calculation
+
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; /// nm/ns
@@ -380,6 +385,14 @@ int run(){
          }
          program::effective_damping();
          break;
+
+		case 15:
+	  		if(vmpi::my_rank==0){
+	    		std::cout << "fmr..." << std::endl;
+	    		zlog << "fmr..." << std::endl;
+	  		}
+	  		program::fmr();
+	  		break;
 
 		case 50:
 			if(vmpi::my_rank==0){

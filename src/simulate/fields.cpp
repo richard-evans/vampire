@@ -136,13 +136,13 @@ int calculate_external_fields(const int start_index,const int end_index){
 		if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
 
 	}
-	
-	// FMR Fields
-	if(sim::hamiltonian_simulation_flags[5]==1) calculate_fmr_fields(start_index,end_index);
+
+	// FMR Fields only for fmr program
+	if(sim::enable_fmr) calculate_fmr_fields(start_index,end_index);
 
 	// Dipolar Fields
 	if(sim::hamiltonian_simulation_flags[4]==1) calculate_dipolar_fields(start_index,end_index);
-	
+
 	return 0;
 }
 
@@ -731,21 +731,22 @@ void calculate_hamr_fields(const int start_index,const int end_index){
 }
 
 void calculate_fmr_fields(const int start_index,const int end_index){
-	
+
 	if(err::check==true){std::cout << "calculate_fmr_fields has been called" << std::endl;}
 
-	// Declare fmr variables
-	const double real_time=sim::time*mp::dt_SI;
-	const double osc_freq=20.0e9; // Hz
-	const double osc_period=1.0/osc_freq;
-	const double Hfmrx=1.0;
-	const double Hfmry=0.0;
-	const double Hfmrz=0.0;
-	const double Hfmr=0.0; // 0.001 T
-	const double Hsinwt=Hfmr*sin(2.0*M_PI*real_time/osc_period);
-	const double Hx=Hfmrx*Hsinwt; 
-	const double Hy=Hfmry*Hsinwt;
-	const double Hz=Hfmrz*Hsinwt;
+	// Calculate fmr constants
+	const double real_time = sim::time*mp::dt_SI;
+	const double omega = sim::fmr_field_frequency*1.e9; // Hz
+	const double Hfmrx = sim::fmr_field_unit_vector[0];
+	const double Hfmry = sim::fmr_field_unit_vector[1];
+	const double Hfmrz = sim::fmr_field_unit_vector[2];
+	const double Hsinwt = sim::fmr_field_strength * sin(2.0 * M_PI * omega * real_time);
+	const double Hx = Hfmrx * Hsinwt;
+	const double Hy = Hfmry * Hsinwt;
+	const double Hz = Hfmrz * Hsinwt;
+
+	// Save fmr field strength for possible output
+	sim::fmr_field = Hsinwt;
 
 	if(sim::local_fmr_field==true){
 
@@ -772,11 +773,10 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 	else{
 		// Add fmr field
 		for(int atom=start_index;atom<end_index;atom++){
-				atoms::x_total_external_field_array[atom] += Hx;
-				atoms::y_total_external_field_array[atom] += Hy;
-				atoms::z_total_external_field_array[atom] += Hz;
+			atoms::x_total_external_field_array[atom] += Hx;
+			atoms::y_total_external_field_array[atom] += Hy;
+			atoms::z_total_external_field_array[atom] += Hz;
 		}
-
 	}
 
 	return;

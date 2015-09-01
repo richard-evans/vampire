@@ -59,9 +59,14 @@ namespace sim{
 	extern double applied_field_angle_phi;
 	extern double applied_field_angle_theta;
 	extern bool applied_field_set_by_angle;
-	
+	extern double fmr_field_strength; // Oscillating field strength (Tesla)
+	extern double fmr_field_frequency; // Oscillating field frequency (GHz)
+	extern std::vector<double> fmr_field_unit_vector; // Oscillating field direction
+	extern double fmr_field; // Instantaneous value of the oscillating field strength H sin(wt)
+	extern bool enable_fmr; // Flag to enable fmr field calculation
+
 	extern double demag_factor[3];
-	
+
 	extern double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
 	extern double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
 

@@ -1510,6 +1510,11 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::program=14;
          return EXIT_SUCCESS;
       }
+      test="fmr";
+      if(value==test){
+         sim::program=15;
+         return EXIT_SUCCESS;
+      }
       test="diagnostic-boltzmann";
       if(value==test){
          sim::program=50;
@@ -2146,6 +2151,31 @@ int match_sim(string const word, string const value, string const unit, int cons
       }
    }
    //--------------------------------------------------------------------
+   test="fmr-field-strength";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      sim::fmr_field_strength=H;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="fmr-field-frequency";
+   if(word==test){
+      double w = atof(value.c_str());
+      check_for_valid_value(w, word, line, prefix, unit, "none", 0.0, 1.0e4,"input","0 - 10,000 GHz");
+      sim::fmr_field_frequency = w;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="fmr-field-unit-vector";
+   if(word==test){
+      std::vector<double> u(3);
+      u=DoublesFromString(value);
+      check_for_valid_unit_vector(u, word, line, prefix, "input");
+      sim::fmr_field_unit_vector = u;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
    else{
 	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
@@ -2577,6 +2607,12 @@ int match_vout_list(string const word, string const value, int const line, std::
    if(word==test){
       stats::calculate_material_height_magnetization=true;
       output_list.push_back(46);
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="fmr-field-strength";
+   if(word==test){
+      output_list.push_back(47);
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
@@ -4126,13 +4162,18 @@ namespace vout{
       stream << stats::material_height_magnetization.output_magnetization();
    }
 
+   // Output Function 47
+   void fmr_field_strength(std::ostream& stream){
+      stream << sim::fmr_field << "\t";
+   }
+
    // Output Function 60
 	void MPITimings(std::ostream& stream){
 
 		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
 		stream << "\t" << vmpi::MaximumComputeTime << "\t" << vmpi::MaximumWaitTime << "\t";
 	}
-	
+
 	// Data output wrapper function
 	void data(){
 
@@ -4314,6 +4355,9 @@ namespace vout{
             case 46:
                vout::material_height_mvec_actual(zmag);
                break;
+            case 47:
+               vout::fmr_field_strength(zmag);
+               break;
             case 60:
 					vout::MPITimings(zmag);
 					break;
@@ -4451,26 +4495,29 @@ namespace vout{
             case 42:
                vout::mean_total_so_anisotropy_energy(std::cout);
                break;
+            case 47:
+               vout::fmr_field_strength(std::cout);
+               break;
             case 60:
 					vout::MPITimings(std::cout);
 					break;
 			}
 		}
-		
+
 		// Carriage return
 		if(screen_output_list.size()>0) std::cout << std::endl;
 		}
-		
+
    } // End of if statement to output data to screen
 
 		if(sim::time%vout::output_grain_rate==0){
 
 		// calculate grain magnetisations
 		grains::mag();
-		
+
 		// Output data to zgrain
 		if(vmpi::my_rank==0){
-			
+
 			// check for open ofstream
          if(vout::grain_output_list.size() > 0 && !zgrain.is_open()){
             // check for checkpoint continue and append data
