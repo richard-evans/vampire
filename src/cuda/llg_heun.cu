@@ -77,6 +77,13 @@ namespace vcuda{
                 */
                _parameters[i].lambda_times_prefactor =
                   gamma * alpha / (1.0 + alpha * alpha);
+
+#ifdef CUDA_DEBUG
+               std::cout << "Heun parameters: "
+                   << _parameters[i].prefactor << " "
+                   << _parameters[i].lambda_times_prefactor << std::endl;
+#endif
+
             }
 
             cu::llg::heun_parameters.resize(num_mats);
@@ -104,6 +111,12 @@ namespace vcuda{
                   cu::atoms::z_spin_array.end(),
                   cu::llg::z_spin_buffer_array.begin()
                   );
+
+#ifdef CUDA_DEBUG
+            std::cout << cu::atoms::x_spin_array[0] << " "
+                      << cu::atoms::y_spin_array[0] << " "
+                      << cu::atoms::z_spin_array[0] << std::endl;
+#endif
 
             double * d_x_spin = thrust::raw_pointer_cast(
                   cu::atoms::x_spin_array.data());
@@ -145,13 +158,19 @@ namespace vcuda{
             check_cuda_errors (__FILE__, __LINE__);
 
             cu::llg::llg_heun_step <<< cu::grid_size, cu::block_size >>> (
-                  d_x_spin_buffer, d_y_spin_buffer, d_y_spin_buffer,
+                  d_x_spin_buffer, d_y_spin_buffer, d_z_spin_buffer,
                   d_materials, d_heun_params,
                   d_x_spin_field, d_y_spin_field, d_z_spin_field,
                   d_x_external_field, d_y_external_field, d_z_external_field,
-                  d_x_spin, d_y_spin, d_y_spin,
+                  d_x_spin, d_y_spin, d_z_spin,
                   ::mp::dt, ::atoms::num_atoms
                   );
+
+#ifdef CUDA_DEBUG
+            std::cout << cu::atoms::x_spin_array[0] << " "
+                      << cu::atoms::y_spin_array[0] << " "
+                      << cu::atoms::z_spin_array[0] << std::endl;
+#endif
 
             check_cuda_errors (__FILE__, __LINE__);
 
@@ -163,11 +182,11 @@ namespace vcuda{
              * TODO: Store delta s because of the renormalization
              */
             cu::llg::llg_heun_scheme <<< cu::grid_size, cu::block_size >>> (
-                  d_x_spin, d_y_spin, d_y_spin,
+                  d_x_spin, d_y_spin, d_z_spin,
                   d_materials, d_heun_params,
                   d_x_spin_field, d_y_spin_field, d_z_spin_field,
                   d_x_external_field, d_y_external_field, d_z_external_field,
-                  d_x_spin_buffer, d_y_spin_buffer, d_y_spin_buffer,
+                  d_x_spin_buffer, d_y_spin_buffer, d_z_spin_buffer,
                   ::mp::dt, ::atoms::num_atoms
                   );
 
