@@ -78,7 +78,7 @@ namespace vcuda{
                _parameters[i].lambda_times_prefactor =
                   gamma * alpha / (1.0 + alpha * alpha);
 
-#ifdef CUDA_DEBUG
+#ifdef CUDA_SPIN_DEBUG
                std::cout << "Heun parameters: "
                    << _parameters[i].prefactor << " "
                    << _parameters[i].lambda_times_prefactor << std::endl;
@@ -112,7 +112,7 @@ namespace vcuda{
                   cu::llg::z_spin_buffer_array.begin()
                   );
 
-#ifdef CUDA_DEBUG
+#ifdef CUDA_SPIN_DEBUG
             std::cout << cu::atoms::x_spin_array[0] << " "
                       << cu::atoms::y_spin_array[0] << " "
                       << cu::atoms::z_spin_array[0] << std::endl;
@@ -166,7 +166,7 @@ namespace vcuda{
                   ::mp::dt, ::atoms::num_atoms
                   );
 
-#ifdef CUDA_DEBUG
+#ifdef CUDA_SPIN_DEBUG
             std::cout << cu::atoms::x_spin_array[0] << " "
                       << cu::atoms::y_spin_array[0] << " "
                       << cu::atoms::z_spin_array[0] << std::endl;
