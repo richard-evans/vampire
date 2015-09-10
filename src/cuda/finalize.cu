@@ -60,6 +60,7 @@ namespace vcuda{
          cu::atoms::cell_array.IndexArray::~device_vector ();
          cu::atoms::limits.IndexArray::~device_vector ();
          cu::atoms::neighbours.IndexArray::~device_vector ();
+         cu::atoms::spin_norm_array.RealArray::~device_vector ();
 
          exchange::Jxx_vals_d.RealArray::~device_vector ();
          exchange::Jyy_vals_d.RealArray::~device_vector ();
