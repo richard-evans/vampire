@@ -6,28 +6,28 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
 //
 //====================================================================
 //                           set_atom_vars
-//   Subroutine to copy newly created system variables to 
+//   Subroutine to copy newly created system variables to
 //   atom variables for use in integration subroutines
 //
-//==================================================================== 
+//====================================================================
 
 #include <iostream>
 #include <vector>
@@ -47,7 +47,7 @@
 
 //using namespace atom_variables;
 //using namespace material_parameters;
-	
+
 namespace cs{
 int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbour_t> > & cneighbourlist){
 
@@ -61,9 +61,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	//-------------------------------------------------
 
 	atoms::num_atoms = catom_array.size();
-	zlog << zTs() << "Number of atoms generated on rank " << vmpi::my_rank << ": " << atoms::num_atoms-vmpi::num_halo_atoms << std::endl; 
-	zlog << zTs() << "Memory required for copying to performance array on rank " << vmpi::my_rank << ": " << 19.0*double(atoms::num_atoms)*8.0/1.0e6 << " MB RAM"<< std::endl; 
-	
+	zlog << zTs() << "Number of atoms generated on rank " << vmpi::my_rank << ": " << atoms::num_atoms-vmpi::num_halo_atoms << std::endl;
+	zlog << zTs() << "Memory required for copying to performance array on rank " << vmpi::my_rank << ": " << 19.0*double(atoms::num_atoms)*8.0/1.0e6 << " MB RAM"<< std::endl;
+
 	atoms::x_coord_array.resize(atoms::num_atoms,0);
 	atoms::y_coord_array.resize(atoms::num_atoms,0);
 	atoms::z_coord_array.resize(atoms::num_atoms,0);
@@ -77,23 +77,23 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::category_array.resize(atoms::num_atoms,0);
 	atoms::grain_array.resize(atoms::num_atoms,0);
 	atoms::cell_array.resize(atoms::num_atoms,0);
-	
+
 	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::z_total_spin_field_array.resize(atoms::num_atoms,0.0);
-	atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);	
-	atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);	
-	atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);	
-	atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);	
-	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);	
-	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);	
+	atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);
+	atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);
+	atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);
+	atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);
+	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);
+	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);
 
    // Set custom RNG for spin initialisation
    MTRand random_spin_rng;
    random_spin_rng.seed(123456+vmpi::my_rank);
 
 	for(int atom=0;atom<atoms::num_atoms;atom++){
-		
+
 		atoms::x_coord_array[atom] = catom_array[atom].x;
 		atoms::y_coord_array[atom] = catom_array[atom].y;
 		atoms::z_coord_array[atom] = catom_array[atom].z;
@@ -106,7 +106,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		// initialise atomic spin positions
       // Use a normalised gaussian for uniform distribution on a unit sphere
 		int mat=atoms::type_array[atom];
-		double sx,sy,sz; // spins 
+		double sx,sy,sz; // spins
 		if(mp::material[mat].random_spins==true){
          sx=mtrandom::gaussianc(random_spin_rng);
          sy=mtrandom::gaussianc(random_spin_rng);
@@ -130,19 +130,19 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	//===========================================================
 
 	zlog << zTs() << "Memory required for creation of 1D neighbour list on rank " << vmpi::my_rank << ": ";
-	zlog << (2.0*double(atoms::num_atoms)+2.0*double(atoms::total_num_neighbours))*8.0/1.0e6 << " MB RAM"<< std::endl; 
+	zlog << (2.0*double(atoms::num_atoms)+2.0*double(atoms::total_num_neighbours))*8.0/1.0e6 << " MB RAM"<< std::endl;
 
 	//-------------------------------------------------
 	//	Calculate total number of neighbours
 	//-------------------------------------------------
 	int counter = 0;
-	
+
 	for(int atom=0;atom<atoms::num_atoms;atom++){
 		counter+=cneighbourlist[atom].size();
 	}
-	
+
 	atoms::total_num_neighbours = counter;
-	
+
 	atoms::neighbour_list_array.resize(atoms::total_num_neighbours,0);
 	atoms::neighbour_interaction_type_array.resize(atoms::total_num_neighbours,0);
 	atoms::neighbour_list_start_index.resize(atoms::num_atoms,0);
@@ -158,13 +158,13 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			atoms::neighbour_list_array[counter] = cneighbourlist[atom][nn].nn;
 			if(cneighbourlist[atom][nn].nn > atoms::num_atoms){
 				terminaltextcolor(RED);
-				std::cerr << "Fatal Error - neighbour " << cneighbourlist[atom][nn].nn <<" is out of valid range 0-" 
+				std::cerr << "Fatal Error - neighbour " << cneighbourlist[atom][nn].nn <<" is out of valid range 0-"
 				<< atoms::num_atoms << " on rank " << vmpi::my_rank << std::endl;
 				std::cerr << "Atom " << atom << " of MPI type " << catom_array[atom].mpi_type << std::endl;
 				terminaltextcolor(WHITE);
 				err::vexit();
 			}
-			
+
 			atoms::neighbour_interaction_type_array[counter] = cneighbourlist[atom][nn].i;
 			//std::cout << cneighbourlist[atom][nn] << " ";
 			counter++;
@@ -173,15 +173,15 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		// Set end index
 		atoms::neighbour_list_end_index[atom]=counter-1;
 	}
-	
+
 	// condense interaction list
 	atoms::exchange_type=unit_cell.exchange_type;
-	
+
 	// temporary class variables
 	zval_t tmp_zval;
 	zvec_t tmp_zvec;
 	zten_t tmp_zten;
-	
+
 	switch(atoms::exchange_type){
 		case -1:
 			// unroll material calculations
@@ -238,7 +238,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 				int iatom = unit_cell.interaction[i].i;
 				int imat = unit_cell.atom[iatom].mat;
 				atoms::t_exchange_list.push_back(tmp_zten);
-				
+
 				atoms::t_exchange_list[i].Jij[0][0]=-unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
 				atoms::t_exchange_list[i].Jij[0][1]=-unit_cell.interaction[i].Jij[0][1]/mp::material[imat].mu_s_SI;
 				atoms::t_exchange_list[i].Jij[0][2]=-unit_cell.interaction[i].Jij[0][2]/mp::material[imat].mu_s_SI;
@@ -259,10 +259,10 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 			err::vexit();
 			break;
 	}
-	
+
 	// initialise surface threshold if not overidden by input file
 	if(sim::surface_anisotropy_threshold==123456789) sim::surface_anisotropy_threshold=unit_cell.surface_threshold;
-	
+
 	//-------------------------------------------------
 	//	Optionally set up surface anisotropy
 	//-------------------------------------------------
@@ -278,7 +278,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		}
 	}
 	else zlog << zTs() << "Identifying surface atoms using global threshold value of " << sim::surface_anisotropy_threshold << "." << std::endl;
-	
+
    //--------------------------------------------------------------------------------------------
    // Determine nearest neighbour interactions from unit cell data for a single unit cell
    //--------------------------------------------------------------------------------------------

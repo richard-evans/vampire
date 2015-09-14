@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -40,16 +40,16 @@
 #include <vector>
 
 namespace cs{
-	
+
 int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(err::check==true){std::cout << "cs::create_crystal_structure has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::create_crystal_structure has been called" << std::endl;}
 
 	int min_bounds[3];
 	int max_bounds[3];
-	
+
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
 		min_bounds[0] = int(vmpi::min_dimensions[0]/unit_cell.dimensions[0]);
@@ -75,16 +75,16 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		max_bounds[1]=cs::total_num_unit_cells[1];
 		max_bounds[2]=cs::total_num_unit_cells[2];
 	#endif
-		
+
 	cs::local_num_unit_cells[0]=max_bounds[0]-min_bounds[0];
 	cs::local_num_unit_cells[1]=max_bounds[1]-min_bounds[1];
 	cs::local_num_unit_cells[2]=max_bounds[2]-min_bounds[2];
-	
+
 	int num_atoms=cs::local_num_unit_cells[0]*cs::local_num_unit_cells[1]*cs::local_num_unit_cells[2]*unit_cell.atom.size();
 
 	// set catom_array size
 	catom_array.reserve(num_atoms);
-	
+
 	// Initialise atoms number
 	int atom=0;
 
@@ -99,7 +99,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	for(int z=min_bounds[2];z<max_bounds[2];z++){
 		for(int y=min_bounds[1];y<max_bounds[1];y++){
 			for(int x=min_bounds[0];x<max_bounds[0];x++){
-				
+
 				// need to change this to accept non-orthogonal lattices
 				// Loop over atoms in unit cell
 				for(int uca=0;uca<unit_cell.atom.size();uca++){
@@ -164,14 +164,14 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		}
 		tmp_catom_array.resize(0);
 	}
-	
+
 
 	// If z-height material selection is enabled then do so
 	if(cs::SelectMaterialByZHeight==true){
-		
+
 		// Check for interfacial roughness and call custom material assignment routine
 		if(cs::interfacial_roughness==true) cs::roughness(catom_array);
-		
+
       // Check for multilayer system and if required generate multilayers
       else if(cs::multilayers) cs::generate_multilayers(catom_array);
 
@@ -207,7 +207,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		// Delete unneeded atoms
 		clear_atoms(catom_array);
 	}
-	
+
 	// Check to see if any atoms have been generated
 	if(atom==0){
 		terminaltextcolor(RED);
@@ -290,19 +290,19 @@ void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename)
 }
 
 void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
-	
+
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::read_unit_cell has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::read_unit_cell has been called" << std::endl;}
 
 	std::cout << "Reading in unit cell data..." << std::flush;
 	zlog << zTs() << "Reading in unit cell data..." << std::endl;
-	
+
 	// ifstream declaration
 	std::ifstream inputfile;
-	
+
 	// Open file read only
 	inputfile.open(filename.c_str());
-	
+
 	// Check for opening
 	if(!inputfile.is_open()){
 		terminaltextcolor(RED);
@@ -326,10 +326,10 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		// ignore blank lines
 		std::string empty="";
 		if(line==empty) continue;
-		
+
 		// set character triggers
 		const char* hash="#";	// Comment identifier
-		
+
 		bool has_hash=false;
 		// Determine if line is a comment line
 		for(int i=0;i<line.length();i++){
@@ -342,15 +342,15 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		}
 		// if hash character found then read next line
 		if(has_hash==true) continue;
-		
+
 		// convert line to string stream
 		std::istringstream iss(line,std::istringstream::in);
-		
+
 		// defaults for interaction list
 		int exc_type=-1; // assume isotropic
 		int num_interactions=0; // assume no interactions
 		int interaction_range=1; // assume +-1 unit cell as default
-				
+
 		// non-comment line found - check for line number
 		switch(line_id){
 			case 0:
@@ -396,34 +396,34 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					else{
 						terminaltextcolor(RED);
 						std::cerr << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
-									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl;
 						terminaltextcolor(WHITE);
 						zlog << zTs() << "Error! atom x-coordinate for atom " << id << " on line " << line_counter
-									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl;
 						err::vexit();
 					}
 					if(cy>=0.0 && cy <=1.0) unit_cell.atom[i].y=cy;
 					else{
 						terminaltextcolor(RED);
 						std::cerr << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
-									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+									 << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl;
 						terminaltextcolor(WHITE);
 						zlog << zTs() << "Error! atom y-coordinate for atom " << id << " on line " << line_counter
-									     << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+									     << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl;
 						err::vexit();
 					}
 					if(cz>=0.0 && cz <=1.0) unit_cell.atom[i].z=cz;
 					else{
 						terminaltextcolor(RED);
 						std::cerr << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
-						<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+						<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl;
 						terminaltextcolor(WHITE);
 						zlog << zTs() << "Error! atom z-coordinate for atom " << id << " on line " << line_counter
-										  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl; 
+										  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0.0-1.0. Exiting" << std::endl;
 						err::vexit();
 					}
 					if(mat_id >=0 && mat_id<mp::num_materials) unit_cell.atom[i].mat=mat_id;
-					else{ 
+					else{
 						terminaltextcolor(RED);
 						std::cerr << "Error! Requested material id " << mat_id << " for atom number " << id <<  " on line " << line_counter
 									 << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl;
@@ -449,7 +449,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				//if(exc_type==-1) unit_cell.exchange_type=0;
 				// loop over all interactions and read into class
 				for (int i=0; i<num_interactions; i++){
-					//std::cout << "setting up interaction "<< i+1<< " of " << num_interactions << " interactions" << std::endl; 
+					//std::cout << "setting up interaction "<< i+1<< " of " << num_interactions << " interactions" << std::endl;
 					// declare safe temporaries for interaction input
 					int id=i;
 					int iatom=-1,jatom=-1; // atom pairs
@@ -484,7 +484,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					if(abs(dx)>interaction_range) interaction_range=abs(dx);
 					if(abs(dy)>interaction_range) interaction_range=abs(dy);
 					if(abs(dz)>interaction_range) interaction_range=abs(dz);
-					
+
 					int iatom_mat = unit_cell.atom[iatom].mat;
 					int jatom_mat = unit_cell.atom[jatom].mat;
 					switch(exc_type){
@@ -525,7 +525,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		}
 		line_id++;
 	} // end of while loop
-	
+
    // Verify exchange interactions are symmetric (required for MPI parallelization)
    verify_exchange_interactions(unit_cell, filename);
 
@@ -542,7 +542,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 void unit_cell_set(unit_cell_t & unit_cell){
 
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::unit_cell_set has been called" << std::endl;}	
+	if(err::check==true){std::cout << "cs::unit_cell_set has been called" << std::endl;}
 
 	// check for read-in of unit cell
 	std::string blank="";
@@ -550,14 +550,14 @@ void unit_cell_set(unit_cell_t & unit_cell){
 		read_unit_cell(unit_cell, cs::unit_cell_file);
 		return;
 	}
-	
+
 	// global values
 	unit_cell.dimensions[0]=cs::unit_cell_size[0];
 	unit_cell.dimensions[1]=cs::unit_cell_size[1];
 	unit_cell.dimensions[2]=cs::unit_cell_size[2];
-	
+
 	unit_cell.exchange_type=-1;
-	
+
 	unit_cell.shape[0][0]=1.0;
 	unit_cell.shape[0][1]=0.0;
 	unit_cell.shape[0][2]=0.0;
@@ -1403,13 +1403,12 @@ void unit_cell_set(unit_cell_t & unit_cell){
       }
 		else{
 			terminaltextcolor(RED);
-			std::cerr << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl; 
+			std::cerr << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl;
 			terminaltextcolor(WHITE);
-			zlog << zTs() << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl; 
+			zlog << zTs() << "Error: Unknown crystal_type "<< cs::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl;
 			err::vexit();
 		}
 
 	}
 
 } // end of namespace cs
-

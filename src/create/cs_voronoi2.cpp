@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -45,18 +45,18 @@ namespace create_voronoi{
 	bool rounded=false;
 	double area_cutoff=0.8;
 	double voronoi_sd=0.15;			/// Standard Deviation of voronoi grains
-	
+
 }
 
 namespace cs{
-	
+
    //----------------------------------------
    // Function prototypes
    //----------------------------------------
    int populate_vertex_points(std::vector <std::vector <double> > &, std::vector <std::vector <std::vector <double> > > &);
 
 int voronoi_film(std::vector<cs::catom_t> & catom_array){
-	
+
 	// check calling of routine if error checking is activated
 	if(err::check==true){
       terminaltextcolor(RED);
@@ -96,15 +96,15 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	int num_y_particle = 4+vmath::iround(cs::system_dimensions[1]/(grain_cell_size_y));
 
 	int init_num_grains = num_x_particle*num_y_particle*2;
-	
+
 	// Define initial grain arrays
 	std::vector <std::vector <double> > grain_coord_array;
 	std::vector <std::vector <std::vector <double> > > grain_vertices_array;
-	
+
 	// Reserve space for pointers
 	grain_coord_array.reserve(init_num_grains);
 	grain_vertices_array.reserve(init_num_grains);
-	
+
 	// Calculate pointers
 	for(int grain=0;grain<init_num_grains;grain++){
 		grain_coord_array.push_back(std::vector <double>());
@@ -124,17 +124,17 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	// Set voronoi seed;
 	mtrandom::grnd.seed(mtrandom::voronoi_seed);
-	
+
 	// Loop to generate hexagonal lattice points
-	double particle_coords[2]; 
+	double particle_coords[2];
 
 	int vp=int(create_voronoi::parity);
 	int grain=0;
-	
+
 	for (int x_particle=0;x_particle < num_x_particle;x_particle++){
 		for (int y_particle=0;y_particle < num_y_particle;y_particle++){
 			for (int particle_parity=0;particle_parity<2;particle_parity++){
-				
+
 				//particle_coords[0] = (particle_parity)*delta_particle_x_parity + delta_particle_x*x_particle-size + vp*double(1-2*particle_parity)*delta_particle_x_parity;
 				//particle_coords[1] = (particle_parity)*delta_particle_y_parity + delta_particle_y*y_particle-size;
 				particle_coords[0] = (particle_parity)*delta_particle_x_parity + delta_particle_x*x_particle + vp*double(1-2*particle_parity)*delta_particle_x_parity;
@@ -164,7 +164,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	//populate_vertex_points(
 	//	grains::num_grains,init_grain_coord_array,init_grain_pointx_array,
 	//	init_grain_pointy_array,init_num_assoc_vertices_array,vbox_dimensions);
-	
+
 	populate_vertex_points(grain_coord_array, grain_vertices_array);
 
 	// Recalculate grain coordinates as average of vertices
@@ -187,7 +187,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	// Shrink Voronoi vertices in reduced coordinates to get spacing
 	double shrink_factor = cs::particle_scale/(cs::particle_scale+cs::particle_spacing);
-	
+
 	// Reduce vertices to relative coordinates
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
 		//grain_coord_array[grain][0]=0.0;
@@ -218,13 +218,13 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			// Exclude grains with zero vertices
 			if(nv!=0){
 
-				// allocate temporary array for area calculation 
+				// allocate temporary array for area calculation
 				std::vector<std::vector <double> > rnd;
 				rnd.resize(48);
 				for(int idx=0; idx<48;idx++){
 					rnd[idx].resize(2,0.0);
 				}
-				
+
 				double area_frac=create_voronoi::area_cutoff;
 				double deltar=0.5; // Angstroms
 				double radius=0.0; // Strating radius
@@ -253,7 +253,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							rnd[i][1]=y;
 						}
 					}
-					
+
 					//update area
 					varea=0.0;
 					for(int i=0;i<48;i++){
@@ -273,7 +273,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 				for(int r=0;r<100;r++){
 				if(area<area_frac*varea){
 					radius+=deltar;
-					
+
 					//loop over coordinates
 					for(int i=0;i<48;i++){
 						double theta = 2.0*M_PI*double(i)/48.0;
@@ -286,7 +286,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							rnd[i][1]=y;
 						}
 					}
-					
+
 					//update area
 					area=0.0;
 					for(int i=0;i<48;i++){
@@ -299,9 +299,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 			// set new polygon points
 			grain_vertices_array[grain]=rnd;
-				
+
 			} // end of check for nv=0
-		
+
 		} // end of grain loop
 	} // end of rounding if
 
@@ -317,21 +317,21 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	max_bounds[0]=cs::total_num_unit_cells[0];
 	max_bounds[1]=cs::total_num_unit_cells[1];
 	max_bounds[2]=cs::total_num_unit_cells[2];
-	
+
 	// allocate supercell array
 	int dx = max_bounds[0]-min_bounds[0];
 	int dy = max_bounds[1]-min_bounds[1];
 
 	supercell_array.resize(dx);
 	for(int i=0;i<dx;i++) supercell_array[i].resize(dy);
-	
+
 	// loop over atoms and populate supercell array
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
 		int cx = int (catom_array[atom].x/unit_cell.dimensions[0]);
 		int cy = int (catom_array[atom].y/unit_cell.dimensions[1]);
 		supercell_array.at(cx).at(cy).push_back(atom);
 	}
-	
+
 	std::cout <<"Generating Voronoi Grains";
 	zlog << zTs() << "Generating Voronoi Grains";
 
@@ -350,7 +350,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			int maxx=0;
 			int miny=10000000;
 			int maxy=0;
-			
+
 			// Set temporary vertex coordinates (real) and compute cell ranges
 			int num_vertices = grain_vertices_array[grain].size();
 			for(int vertex=0;vertex<num_vertices;vertex++){
@@ -367,14 +367,14 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			// loopover cells
 			for(int i=minx;i<=maxx;i++){
 				for(int j=miny;j<=maxy;j++){
-				
+
 					// loop over atoms in cells;
 					for(int id=0;id<supercell_array[i][j].size();id++){
 						int atom = supercell_array[i][j][id];
-						
+
 						double x = catom_array[atom].x;
 						double y = catom_array[atom].y;
-						
+
 						// Check to see if site is within polygon
 						if(vmath::point_in_polygon(x,y,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
 							catom_array[atom].include=true;
@@ -427,14 +427,14 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	    catom_array[atom].grain=int(grain_coord_array.size()-1);
 	  }
 	}
-  
+
 	// set number of grains
 	grains::num_grains = int(grain_coord_array.size());
 
 	// sort atoms by grain number
 	sort_atoms_by_grain(catom_array);
 
-	return EXIT_SUCCESS;	
+	return EXIT_SUCCESS;
 }
 
 int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_array, std::vector <std::vector <std::vector <double> > > &  grain_vertices_array){
@@ -631,4 +631,3 @@ int populate_vertex_points(std::vector <std::vector <double> > & grain_coord_arr
 
 
 } // End of cs namespace
-
