@@ -75,14 +75,6 @@ obj/data/category.o \
 obj/data/cells.o \
 obj/data/grains.o \
 obj/data/lattice_anisotropy.o \
-obj/ltmp/absorption_profile.o \
-obj/ltmp/data.o \
-obj/ltmp/field.o \
-obj/ltmp/initialise.o \
-obj/ltmp/interface.o \
-obj/ltmp/is_enabled.o \
-obj/ltmp/local_temperature.o \
-obj/ltmp/output.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
@@ -155,6 +147,7 @@ obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
 include src/gpu/makefile
+include src/ltmp/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)

@@ -33,6 +33,7 @@ namespace ltmp{
       bool vertical_discretisation=true; /// enable vertical temperature profile
       bool output_microcell_data=false; /// enable verbose output data for temperature cells
       bool temperature_rescaling=false; /// enable rescaled temperature calculation
+      bool gradient=false; /// enable temperature gradient
 
       double micro_cell_size = 10.0; /// lateral size of local temperature microcells (A)
       double laser_spot_size = 350.0; /// laser spot size for lateral profile (A)
@@ -45,6 +46,9 @@ namespace ltmp{
       double TTCe; // electron heat capacity (T=0)
       double TTCl; // lattice heat capcity
       double dt; // time step
+
+      double minimum_temperature = 0.0; // Minimum temperature in temperature gradient
+      double maximum_temperature = 0.0; // Maximum temperature in temperature gradient
 
       int num_local_atoms; /// number of local atoms (ignores halo atoms in parallel simulation)
       int num_cells; /// number of temperature cells
