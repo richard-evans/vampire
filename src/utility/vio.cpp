@@ -77,6 +77,9 @@ std::ofstream zlog;
 std::ofstream zmag;
 std::ofstream zgrain;
 
+#ifdef WIN_COMPILE
+#include <direct.h>
+#endif
 
 void terminaltextcolor(enum textcolor color){
 #ifdef WIN_COMPILE
