@@ -36,6 +36,7 @@
 #include "cells.hpp"
 #include "create.hpp"
 #include "errors.hpp"
+#include "grains.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -479,6 +480,88 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
    std::vector<std::vector <neighbour_t> > zerovv;
    catom_array.swap(zerov);
    cneighbourlist.swap(zerovv);
+
+   //----------------------------------------------------------------------------
+   // Optionally calculate random atomic anisotropy axes for spherical harmonics
+   //----------------------------------------------------------------------------
+   if(sim::spherical_harmonics && sim::random_anisotropy){
+     	// Resize arrays
+     	atoms::uniaxial_anisotropy_vector_x.resize(atoms::num_atoms,0.0);
+     	atoms::uniaxial_anisotropy_vector_y.resize(atoms::num_atoms,0.0);
+     	atoms::uniaxial_anisotropy_vector_z.resize(atoms::num_atoms,0.0);
+
+     	std::vector<double> grain_anisotropy_directions(0);
+     	// check for grain level random anisotropy
+     	if(grains::random_anisotropy){
+        	// resize array storing grain anisotropy vectors
+        	grain_anisotropy_directions.resize(3*grains::num_grains);
+
+			// calculate anisotropy directions for all grains on root process
+  			if(vmpi::my_rank == 0){
+  	  			for(int g=0; g<grains::num_grains; g++){
+
+            	double x = mtrandom::gaussian();
+            	double y = mtrandom::gaussian();
+            	double z = mtrandom::gaussian();
+
+            	// Calculate vector length
+            	const double r = 1.0/sqrt (x*x + y*y + z*z);
+
+            	grain_anisotropy_directions[3*g + 0] = x*r;
+            	grain_anisotropy_directions[3*g + 1] = y*r;
+            	grain_anisotropy_directions[3*g + 2] = z*r;
+
+				}
+			}
+
+			#ifdef MPICF
+				// Broadcast calculated anisotropy directions to all nodes
+				MPI_Bcast(&grain_anisotropy_directions[0], grain_anisotropy_directions.size(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+			#endif
+
+		}
+
+		// Unroll anisotropy directions
+		for(int atom = 0; atom < atoms::num_atoms; ++atom){
+
+			// Determine material number
+        	int imaterial = atoms::type_array[atom];
+
+		  	// Calculate random anisotropy directions on unit sphere
+		  	if(mp::material[imaterial].random_anisotropy){
+
+			  	double x = mtrandom::gaussian();
+			  	double y = mtrandom::gaussian();
+			  	double z = mtrandom::gaussian();
+
+			  	// Calculate vector length
+			  	const double r = 1.0/sqrt (x*x + y*y + z*z);
+
+     			// Save direction
+     			atoms::uniaxial_anisotropy_vector_x[atom] = x*r;
+     			atoms::uniaxial_anisotropy_vector_y[atom] = y*r;
+     			atoms::uniaxial_anisotropy_vector_z[atom] = z*r;
+
+			}
+        	// If random grain anisotropy defined set local anisotropy to the grain anisotropy direction
+        	else if(mp::material[imaterial].random_grain_anisotropy){
+
+          	const int grain = atoms::grain_array[atom];
+
+          	atoms::uniaxial_anisotropy_vector_x[atom] = grain_anisotropy_directions[3*grain + 0];
+          	atoms::uniaxial_anisotropy_vector_y[atom] = grain_anisotropy_directions[3*grain + 1];
+          	atoms::uniaxial_anisotropy_vector_z[atom] = grain_anisotropy_directions[3*grain + 2];
+
+			}
+			// Otherwise unroll anisotropy directions
+			else{
+	   		atoms::uniaxial_anisotropy_vector_x[atom] = mp::material[imaterial].UniaxialAnisotropyUnitVector[0];
+	   		atoms::uniaxial_anisotropy_vector_y[atom] = mp::material[imaterial].UniaxialAnisotropyUnitVector[1];
+	   		atoms::uniaxial_anisotropy_vector_z[atom] = mp::material[imaterial].UniaxialAnisotropyUnitVector[2];
+			}
+
+		}
+	}
 
    return EXIT_SUCCESS;
 

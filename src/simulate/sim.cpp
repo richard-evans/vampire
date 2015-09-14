@@ -151,6 +151,7 @@ namespace sim{
    bool spherical_harmonics=false; // Enables calculation of higher order anistropy with spherical harmonics
 	bool CubicScalarAnisotropy=false; /// Enables scalar cubic anisotropy
    bool lattice_anisotropy_flag=false; /// Enables lattice anisotropy
+  	bool random_anisotropy = false; // Enables random anisotropy calculation
 
 	bool local_temperature=false; /// flag to enable material specific temperature
 	bool local_applied_field=false; /// flag to enable material specific applied field

@@ -54,6 +54,7 @@ int calculate_anisotropy_fields(const int,const int);
 void calculate_second_order_uniaxial_anisotropy_fields(const int,const int);
 void calculate_sixth_order_uniaxial_anisotropy_fields(const int,const int);
 void calculate_spherical_harmonic_fields(const int,const int);
+void calculate_random_spherical_harmonic_fields(const int,const int);
 void calculate_lattice_anisotropy_fields(const int, const int);
 int calculate_cubic_anisotropy_fields(const int,const int);
 int calculate_applied_fields(const int,const int);
@@ -81,12 +82,13 @@ int calculate_spin_fields(const int start_index,const int end_index){
 
 	// Exchange Fields
 	if(sim::hamiltonian_simulation_flags[0]==1) calculate_exchange_fields(start_index,end_index);
-	
+
 	// Anisotropy Fields
 	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
    if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
    if(sim::sixth_order_uniaxial_anisotropy) calculate_sixth_order_uniaxial_anisotropy_fields(start_index,end_index);
-   if(sim::spherical_harmonics) calculate_spherical_harmonic_fields(start_index,end_index);
+   if(sim::spherical_harmonics && sim::random_anisotropy==false) calculate_spherical_harmonic_fields(start_index,end_index);
+   if(sim::random_anisotropy && sim::spherical_harmonics) calculate_random_spherical_harmonic_fields(start_index,end_index);
    if(sim::lattice_anisotropy_flag) calculate_lattice_anisotropy_fields(start_index,end_index);
    if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
 	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
@@ -411,6 +413,60 @@ void calculate_spherical_harmonic_fields(const int start_index,const int end_ind
    }
 
    return;
+
+}
+
+///--------------------------------------------------------------------------------------------------------------
+///  Function to calculate random spherical harmonic anisotropy fields
+///
+///  (c) R F L Evans 2015
+///
+///  In this function uniaxial anisotropy is calculated using spherical harmonics,
+///  except each atom is allowed a locally defined anisotropy axis. This comes with
+///  a performance cost, and so this version is only caled if needed (defined by the
+///  sim::random_anisotropy flag).
+///
+///--------------------------------------------------------------------------------------------------------------
+void calculate_random_spherical_harmonic_fields(const int start_index,const int end_index){
+
+  // rescaling prefactor
+  const double scale = 2.0/3.0; // Factor to rescale anisotropies to usual scale
+
+  // constant factors
+  const double oneo8 = 1.0/8.0;
+  const double oneo16 = 1.0/16.0;
+
+  // loop over all atoms
+  for(int atom=start_index; atom<end_index; atom++){
+
+    // Determine atom type
+    const int imaterial=atoms::type_array[atom];
+
+    // determine harmonic constants for material
+    const double k2 = mp::material_spherical_harmonic_constants_array[3*imaterial + 0];
+    const double k4 = mp::material_spherical_harmonic_constants_array[3*imaterial + 1];
+    const double k6 = mp::material_spherical_harmonic_constants_array[3*imaterial + 2];
+
+    // determine anisotropy direction and dot product
+    const double ex = atoms::uniaxial_anisotropy_vector_x[atom];
+    const double ey = atoms::uniaxial_anisotropy_vector_y[atom];
+    const double ez = atoms::uniaxial_anisotropy_vector_z[atom];
+    const double sx = atoms::x_spin_array[atom];
+    const double sy = atoms::y_spin_array[atom];
+    const double sz = atoms::z_spin_array[atom];
+
+    const double sdote = (sx*ex + sy*ey + sz*ez);
+    const double sdote3 = sdote*sdote*sdote;
+    const double sdote5 = sdote3*sdote*sdote;
+
+    // calculate field (double negative from scale factor and negative derivative)
+    atoms::x_total_spin_field_array[atom] += scale*ex*(k2*3.0*sdote + k4*oneo8*(140.0*sdote3 - 60.0*sdote) + k6*oneo16*(1386.0*sdote5 - 1260.0*sdote3 + 210.0*sdote));
+    atoms::y_total_spin_field_array[atom] += scale*ey*(k2*3.0*sdote + k4*oneo8*(140.0*sdote3 - 60.0*sdote) + k6*oneo16*(1386.0*sdote5 - 1260.0*sdote3 + 210.0*sdote));
+    atoms::z_total_spin_field_array[atom] += scale*ez*(k2*3.0*sdote + k4*oneo8*(140.0*sdote3 - 60.0*sdote) + k6*oneo16*(1386.0*sdote5 - 1260.0*sdote3 + 210.0*sdote));
+
+  }
+
+  return;
 
 }
 

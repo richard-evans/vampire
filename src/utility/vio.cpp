@@ -3099,20 +3099,38 @@ int match_material(string const word, string const value, string const unit, int
       else
       test="uniaxial-anisotropy-direction";
       if(word==test){
-         // temporary storage container
-         std::vector<double> u(3);
+         // set up test comparisons
+         test="random";
+         std::string test2="random-grain";
+         // test for random anisotropy directions
+         if(value==test){
+            read_material[super_index].random_anisotropy = true;
+            read_material[super_index].random_grain_anisotropy = false;
+            sim::random_anisotropy=true;
+         }
+         // test for random grain anisotropy
+         else if(value==test2){
+            read_material[super_index].random_anisotropy = false;
+            read_material[super_index].random_grain_anisotropy = true;
+            sim::random_anisotropy=true;
+            grains::random_anisotropy = true;
+         }
+         else{
+            // temporary storage container
+            std::vector<double> u(3);
 
-         // read values from string
-         u=DoublesFromString(value);
+            // read values from string
+            u=DoublesFromString(value);
 
-         // check for sane input and normalise if necessary
-         check_for_valid_unit_vector(u, word, line, prefix, "material");
+            // check for sane input and normalise if necessary
+            check_for_valid_unit_vector(u, word, line, prefix, "material");
 
-         // Copy sanitised unit vector to material
-         read_material[super_index].UniaxialAnisotropyUnitVector=u;
+            // Copy sanitised unit vector to material
+            read_material[super_index].UniaxialAnisotropyUnitVector=u;
 
-         // Enable global tensor anisotropy flag
-         sim::TensorAnisotropy=true;
+            // Enable global tensor anisotropy flag
+            sim::TensorAnisotropy=true;
+         }
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------
