@@ -1523,6 +1523,11 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::program=50;
          return EXIT_SUCCESS;
       }
+      test="setting";
+      if(value==test){
+	sim::program=51;
+	return EXIT_SUCCESS;
+      }
       else{
 		 terminaltextcolor(RED);
          std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
