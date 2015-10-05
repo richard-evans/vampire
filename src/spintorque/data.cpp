@@ -49,7 +49,7 @@ namespace st{
       std::vector<double> sa_infinity; /// intrinsic spin accumulation
       std::vector<double> lambda_sdl; /// spin diffusion length
       std::vector<double> diffusion; /// diffusion constant Do
-      std::vector<double> sd_exchange; /// diffusion constant Do
+      std::vector<double> sd_exchange; /// electron(s)-spin(d) exchange interaction
       std::vector<double> a; // a parameter for spin accumulation
       std::vector<double> b; // b parameter for spin accumulation
 
@@ -58,7 +58,7 @@ namespace st{
       std::vector<double> m; // magnetisation
       std::vector<double> j; // spin current
       std::vector<double> sa; // spin accumulation
-      std::vector<double> spin_torque; // spin torque
+      std::vector<double> spin_torque; // spin torque energy (J)
       std::vector<double> ast; // adiabatic spin torque
       std::vector<double> nast; // non-adiabatic spin torque
 

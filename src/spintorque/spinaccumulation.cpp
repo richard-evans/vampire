@@ -49,6 +49,11 @@ namespace st{
 
          // set local constants
          const double je = st::internal::je; // current (C/s)
+         const double i_muB = 1.0/9.274e-24; // J/T
+         const double i_e = 1.0/1.60217662e-19; // electronic charge (Coulombs)
+         const double microcell_volume = (st::internal::micro_cell_size *
+                                          st::internal::micro_cell_size *
+                                          st::internal::micro_cell_thickness)*1.e-30; // m^3
 
          // loop over all 1D stacks (in parallel)
          for(int stack=0; stack <num_stacks; ++stack){
@@ -226,7 +231,13 @@ namespace st{
                st::internal::j[celly] = jmy;
                st::internal::j[cellz] = jmz;
 
-               //... Calculate spin torque...
+               // Calculate spin torque energy for cell (Joules)
+               st::internal::spin_torque[cellx] = microcell_volume * st::internal::sd_exchange[cell] * sax * i_e * i_muB;
+               st::internal::spin_torque[celly] = microcell_volume * st::internal::sd_exchange[cell] * say * i_e * i_muB;
+               st::internal::spin_torque[cellz] = microcell_volume * st::internal::sd_exchange[cell] * saz * i_e * i_muB;
+
+               //std::cout << st::internal::spin_torque[cellx] << "\t" << st::internal::spin_torque[celly] << "\t" <<  st::internal::spin_torque[cellz] << "\t";
+               //std::cout << sax << "\t" << say << "\t" << saz << "\t" << st::internal::sd_exchange[cell] << std::endl;
                // double stx = ...
                // double sty = ...
                // double stz = ...

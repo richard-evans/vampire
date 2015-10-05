@@ -102,7 +102,7 @@ int match_material(string const word, string const value, string const unit, int
       */
    if(word==test){
       double sd=atof(value.c_str());
-      vin::check_for_valid_value(sd, word, line, prefix, unit, "energy", 1.0e-30, 1.e-17,"material"," 1.0e-30 - 1.e-21 J");
+      vin::check_for_valid_value(sd, word, line, prefix, unit, "energy", 1.0e-30, 1.e-17,"material"," 1.0e-30 - 1.e-17 J");
       st::internal::mp[super_index].sd_exchange=sd;
       return EXIT_SUCCESS;
    }

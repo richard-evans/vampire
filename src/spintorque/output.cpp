@@ -79,7 +79,8 @@ namespace st{
             for(int cell=0; cell<num_cells; ++cell){
                ofile << m[3*cell+0] << "\t" << m[3*cell+1] << "\t" << m[3*cell+2] << "\t";
                ofile << sa[3*cell+0] << "\t" << sa[3*cell+1] << "\t" << sa[3*cell+2] << "\t";
-               ofile << j[3*cell+0] << "\t" << j[3*cell+1] << "\t" << j[3*cell+2] << std::endl;
+               ofile << j[3*cell+0] << "\t" << j[3*cell+1] << "\t" << j[3*cell+2] << "\t";
+               ofile << spin_torque[3*cell+0] << "\t" << spin_torque[3*cell+1] << "\t" << spin_torque[3*cell+2] << std::endl;
             }
 
             ofile.close();
