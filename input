@@ -25,10 +25,14 @@ material:file=Co.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature=300.0
-sim:time-steps-increment=10
-sim:total-time-steps=100
-sim:time-step=1.0E-15
+sim:temperature=0.0
+sim:time-steps-increment=1
+sim:total-time-steps=1000
+sim:time-step=1.0E-16
+
+sim:applied-field-strength=1.0 !T
+sim:applied-field-unit-vector=1,0,0
+
 
 #------------------------------------------
 # Program and integrator details
@@ -43,6 +47,7 @@ output:real-time
 output:temperature
 output:magnetisation
 output:magnetisation-length
+output:applied-field-alignment
 output:output-rate = 10
 
 screen:time-steps

@@ -54,6 +54,8 @@ namespace vcuda{
 
          void __llg_init ()
          {
+            initialized=true;
+
             /*
              * Reserve space for the buffers
              */
@@ -169,7 +171,10 @@ namespace vcuda{
 #ifdef CUDA_SPIN_DEBUG
             std::cout << cu::atoms::x_spin_array[0] << " "
                       << cu::atoms::y_spin_array[0] << " "
-                      << cu::atoms::z_spin_array[0] << std::endl;
+                      << cu::atoms::z_spin_array[0] << " "
+                      << cu::z_total_spin_field_array[0] << " "
+                      << cu::z_total_external_field_array[0] << " "
+                      << std::endl;
 #endif
 
             check_cuda_errors (__FILE__, __LINE__);
@@ -333,7 +338,7 @@ namespace vcuda{
 
                //implementing the Heun's Scheme
                //cross product
-               double SxH_x = spin_x * H_z - spin_z * H_y;
+               double SxH_x = spin_y * H_z - spin_z * H_y;
                double SxH_y = spin_z * H_x - spin_x * H_z;
                double SxH_z = spin_x * H_y - spin_y * H_x;
 

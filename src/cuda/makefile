@@ -7,7 +7,7 @@ NVCC=nvcc -DCOMP='"NVCC $(NVCC_VERSION)"'
 
 NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
 
-CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart -lcusparse
+CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart -lcusparse -lcurand
 
 
 # List module object filenames
@@ -39,5 +39,5 @@ gcc-cuda: $(OBJECTS) $(CUDA_OBJECTS)
 	$(NVCC) $(GCC_LDFLAGS) $(LIBS) ${CUDALIBS} $(OBJECTS) $(CUDA_OBJECTS) -o $(EXECUTABLE)
 
 # CUDA debug target
-gcc-cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG
+gcc-cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG
 gcc-cuda-debug: gcc-cuda
