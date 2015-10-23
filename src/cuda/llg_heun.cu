@@ -54,8 +54,6 @@ namespace vcuda{
 
          void __llg_init ()
          {
-            initialized=true;
-
             /*
              * Reserve space for the buffers
              */
@@ -73,12 +71,12 @@ namespace vcuda{
             {
                double alpha = ::mp::material[i].alpha;
                double gamma = ::mp::material[i].gamma_rel;
-               _parameters[i].prefactor = gamma / (1.0 + alpha * alpha);
+               _parameters[i].prefactor = -gamma / (1.0 + alpha * alpha);
                /*
                 * lambda is alpha (LOL)
                 */
                _parameters[i].lambda_times_prefactor =
-                  gamma * alpha / (1.0 + alpha * alpha);
+                  -gamma * alpha / (1.0 + alpha * alpha);
 
 #ifdef CUDA_SPIN_DEBUG
                std::cout << "Heun parameters: "
@@ -94,6 +92,8 @@ namespace vcuda{
                   _parameters.end(),
                   cu::llg::heun_parameters.begin()
                   );
+
+            initialized=true;
          }
 
          void __llg_step ()
@@ -262,9 +262,9 @@ namespace vcuda{
                double mod_s = 0.0;
 
                //defining the Delta
-               double Ds_x = - prefactor * sxh_x + lambdatpr * sxsxh_x;
-               double Ds_y = - prefactor * sxh_y + lambdatpr * sxsxh_y;
-               double Ds_z = - prefactor * sxh_z + lambdatpr * sxsxh_z;
+               double Ds_x = prefactor * sxh_x + lambdatpr * sxsxh_x;
+               double Ds_y = prefactor * sxh_y + lambdatpr * sxsxh_y;
+               double Ds_z = prefactor * sxh_z + lambdatpr * sxsxh_z;
 
                double new_spin_x = sx + Ds_x * dt;
                double new_spin_y = sy + Ds_y * dt;
