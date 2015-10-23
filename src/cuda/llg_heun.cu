@@ -50,6 +50,9 @@ namespace vcuda{
          RealArray x_spin_buffer_array(0UL);
          RealArray y_spin_buffer_array(0UL);
          RealArray z_spin_buffer_array(0UL);
+         RealArray dS_x_array(0UL);
+         RealArray dS_y_array(0UL);
+         RealArray dS_z_array(0UL);
          HeunParametersArray heun_parameters(0UL);
 
          void __llg_init ()
@@ -60,6 +63,10 @@ namespace vcuda{
             cu::llg::x_spin_buffer_array.resize(::atoms::num_atoms);
             cu::llg::y_spin_buffer_array.resize(::atoms::num_atoms);
             cu::llg::z_spin_buffer_array.resize(::atoms::num_atoms);
+
+            cu::llg::dS_x_array.resize(::atoms::num_atoms);
+            cu::llg::dS_y_array.resize(::atoms::num_atoms);
+            cu::llg::dS_z_array.resize(::atoms::num_atoms);
 
             /*
              * Initialize heun parameters
@@ -154,6 +161,13 @@ namespace vcuda{
             double * d_z_spin_buffer = thrust::raw_pointer_cast(
                   cu::llg::z_spin_buffer_array.data());
 
+            double * dS_x_dptr = thrust::raw_pointer_cast(
+                  cu::llg::dS_x_array.data());
+            double * dS_y_dptr = thrust::raw_pointer_cast(
+                  cu::llg::dS_y_array.data());
+            double * dS_z_dptr = thrust::raw_pointer_cast(
+                  cu::llg::dS_z_array.data());
+
             cu::update_spin_fields ();
             cu::update_external_fields ();
 
@@ -165,6 +179,7 @@ namespace vcuda{
                   d_x_spin_field, d_y_spin_field, d_z_spin_field,
                   d_x_external_field, d_y_external_field, d_z_external_field,
                   d_x_spin, d_y_spin, d_z_spin,
+                  dS_x_dptr, dS_y_dptr, dS_z_dptr,
                   ::mp::dt, ::atoms::num_atoms
                   );
 
@@ -192,6 +207,7 @@ namespace vcuda{
                   d_x_spin_field, d_y_spin_field, d_z_spin_field,
                   d_x_external_field, d_y_external_field, d_z_external_field,
                   d_x_spin_buffer, d_y_spin_buffer, d_z_spin_buffer,
+                  dS_x_dptr, dS_y_dptr, dS_z_dptr,
                   ::mp::dt, ::atoms::num_atoms
                   );
 
@@ -226,6 +242,7 @@ namespace vcuda{
                double * x_sp_field, double * y_sp_field, double * z_sp_field,
                double * x_ext_field, double * y_ext_field, double * z_ext_field,
                double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
+               double * dSx, double * dSy, double * dSz,
                double dt, size_t num_atoms
                )
          {
@@ -266,6 +283,10 @@ namespace vcuda{
                double Ds_y = prefactor * sxh_y + lambdatpr * sxsxh_y;
                double Ds_z = prefactor * sxh_z + lambdatpr * sxsxh_z;
 
+               dSx[atom] = Ds_x;
+               dSy[atom] = Ds_y;
+               dSz[atom] = Ds_z;
+
                double new_spin_x = sx + Ds_x * dt;
                double new_spin_y = sy + Ds_y * dt;
                double new_spin_z = sz + Ds_z * dt;
@@ -273,7 +294,7 @@ namespace vcuda{
                /*
                 * TODO: Adjust delta s for the non norm conserving stuff
                 */
-               mod_s = 1.0f / sqrtf(
+               mod_s = 1.0 / sqrt(
                      new_spin_x * new_spin_x +
                      new_spin_y * new_spin_y +
                      new_spin_z * new_spin_z);
@@ -299,6 +320,7 @@ namespace vcuda{
                 * receive spin prima, read a write the final result to it
                 */
                double * x_spin, double * y_spin, double * z_spin,
+               double * dSx, double * dSy, double * dSz,
                double dt, size_t num_atoms
                )
          {
@@ -312,14 +334,6 @@ namespace vcuda{
 
                double prefactor = heun_parameters[mid].prefactor;
                double lambdatpr = heun_parameters[mid].lambda_times_prefactor;
-
-               //heun step array
-               /*
-                * TODO: Update this, read in the delta s
-                */
-               double Ds_x = (x_spin_prim[atom] - x_spin[atom]) / dt;
-               double Ds_y = (y_spin_prim[atom] - y_spin[atom]) / dt;
-               double Ds_z = (z_spin_prim[atom] - z_spin[atom]) / dt;
 
                //initial spins
                double spin_init_x = x_spin[atom];
@@ -346,15 +360,15 @@ namespace vcuda{
                double SxSxH_y = spin_z * SxH_x - spin_x * SxH_z;
                double SxSxH_z = spin_x * SxH_y - spin_y * SxH_x;
 
-               double DS_prime_x = - prefactor * SxH_x + lambdatpr * SxSxH_x;
-               double DS_prime_y = - prefactor * SxH_y + lambdatpr * SxSxH_y;
-               double DS_prime_z = - prefactor * SxH_z + lambdatpr * SxSxH_z;
+               double DS_prime_x = prefactor * SxH_x + lambdatpr * SxSxH_x;
+               double DS_prime_y = prefactor * SxH_y + lambdatpr * SxSxH_y;
+               double DS_prime_z = prefactor * SxH_z + lambdatpr * SxSxH_z;
 
-               double S_x = spin_init_x + 0.5f * (Ds_x + DS_prime_x) * dt;
-               double S_y = spin_init_y + 0.5f * (Ds_y + DS_prime_y) * dt;
-               double S_z = spin_init_z + 0.5f * (Ds_z + DS_prime_z) * dt;
+               double S_x = spin_init_x + 0.5 * (dSx[atom] + DS_prime_x) * dt;
+               double S_y = spin_init_y + 0.5 * (dSy[atom] + DS_prime_y) * dt;
+               double S_z = spin_init_z + 0.5 * (dSz[atom] + DS_prime_z) * dt;
 
-               float mods = 1.0f / sqrtf(
+               float mods = 1.0 / sqrt(
                      S_x*S_x + S_y*S_y + S_z*S_z);
 
                x_spin[atom] = mods * S_x;

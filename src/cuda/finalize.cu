@@ -94,6 +94,10 @@ namespace vcuda{
          cu::llg::y_spin_buffer_array.RealArray::~device_vector ();
          cu::llg::z_spin_buffer_array.RealArray::~device_vector ();
 
+         cu::llg::dS_x_array.RealArray::~device_vector ();
+         cu::llg::dS_y_array.RealArray::~device_vector ();
+         cu::llg::dS_z_array.RealArray::~device_vector ();
+
          cu::llg::heun_parameters.HeunParametersArray::~device_vector ();
 
          cudaFree (d_rand_state);

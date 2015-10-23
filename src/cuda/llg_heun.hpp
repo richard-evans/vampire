@@ -39,6 +39,11 @@ namespace vcuda
          extern RealArray x_spin_buffer_array;
          extern RealArray y_spin_buffer_array;
          extern RealArray z_spin_buffer_array;
+
+         extern RealArray dS_x_array;
+         extern RealArray dS_y_array;
+         extern RealArray dS_z_array;
+
          extern HeunParametersArray heun_parameters;
 
          /*
@@ -57,6 +62,7 @@ namespace vcuda
                double * x_sp_field, double * y_sp_field, double * z_sp_field,
                double * x_ext_field, double * y_ext_field, double * z_ext_field,
                double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
+               double * dS_x, double * dS_y, double * dS_z,
                double dt, size_t num_atoms
                );
 
@@ -67,6 +73,7 @@ namespace vcuda
                double * x_sp_field, double * y_sp_field, double * z_sp_field,
                double * x_ext_field, double * y_ext_field, double * z_ext_field,
                double * x_spin, double * y_spin, double * z_spin,
+               double * dS_x, double * dS_y, double * dS_z,
                double dt, size_t num_atoms
                );
       } /* llg */
