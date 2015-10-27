@@ -6,25 +6,25 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
 //
 ///
 /// @file
-/// @brief Contains the vmath source namespace for sundry math utilities in vampire. 
+/// @brief Contains the vmath source namespace for sundry math utilities in vampire.
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -54,7 +54,7 @@ namespace vmath{
 // (c) 1998,2006,2007 Darel Rex Finley
 //
 
-	
+
 bool point_in_polygon(double x, double y,double *polyX, double *polyY,int polySides) {
 	///========================================================================================================
 	///		 						Function to decide if point is within polygon
@@ -66,17 +66,17 @@ bool point_in_polygon(double x, double y,double *polyX, double *polyY,int polySi
 
 	int   i, j=polySides-1 ;
 	bool  oddNodes=0;
-	
+
 	for (i=0; i<polySides; i++) {
 		if ((polyY[i]<y && polyY[j]>=y) || (polyY[j]<y && polyY[i]>=y)) {
 			if (polyX[i]+(y-polyY[i])/(polyY[j]-polyY[i])*(polyX[j]-polyX[i])<x) {
-				oddNodes=!oddNodes; 
+				oddNodes=!oddNodes;
 			}
 		}
-		j=i; 
+		j=i;
 	}
 
-  return oddNodes; 
+  return oddNodes;
 
 }
 
@@ -91,29 +91,29 @@ bool point_in_polygon2(double x, double y, std::vector<double>& polyX, std::vect
 	bool error = false;
 	if(polyX.size()!=polySides) error=true;
 	if(polyY.size()!=polySides) error=true;
-	
+
 	// check for error
 	if(error){
-		zlog << zTs() << "Internal error in determining point in polygon. Number of sides " << polySides << 
+		zlog << zTs() << "Internal error in determining point in polygon. Number of sides " << polySides <<
 		" must be equal to length of vectors " << polyX.size() << " and " << polyY.size() << ". Exiting." << std::endl;
 		err::vexit();
 	}*/
 	x+=1e-10; // Added tiny amount to atomic coordinates to include atoms at 0,0,0
 	y+=1e-10;
-	
+
 	int j=polySides-1 ;
 	bool oddNodes=false;
-	
+
 	for (int i=0; i<polySides; i++) {
 		if ((polyY[i]<y && polyY[j]>=y) || (polyY[j]<y && polyY[i]>=y)) {
 			if (polyX[i]+(y-polyY[i])/(polyY[j]-polyY[i])*(polyX[j]-polyX[i])<x) {
-				oddNodes=!oddNodes; 
+				oddNodes=!oddNodes;
 			}
 		}
-		j=i; 
+		j=i;
 	}
 
-  return oddNodes; 
+  return oddNodes;
 
 }
 
@@ -129,7 +129,7 @@ bool point_in_polygon2(double x, double y, std::vector<double>& polyX, std::vect
 /// @date    05/02/2011
 ///
 /// @return Matrix C
-/// 
+///
 /// @internal
 ///	Created:		05/02/2011
 ///	Revision:	  ---
@@ -137,14 +137,14 @@ bool point_in_polygon2(double x, double y, std::vector<double>& polyX, std::vect
 ///=====================================================================================
 ///
 std::vector<std::vector<double> > matmul(
-	std::vector<std::vector<double> >& A, 
+	std::vector<std::vector<double> >& A,
 	std::vector<std::vector<double> >& B)
 {
-	
+
 	// Get sizes of matrices A and B
 	const unsigned int A_num_rows = A.size();
 	const unsigned int A_num_cols = A[0].size();
-	
+
 	const unsigned int B_num_rows = B.size();
 	const unsigned int B_num_cols = B[0].size();
 
@@ -155,15 +155,15 @@ std::vector<std::vector<double> > matmul(
 		terminaltextcolor(WHITE);
 		err::vexit();
 	}
-	
+
 	// Set number of internal products
 	const unsigned int product = A_num_cols;
-	
+
 	// Set sizes of result matrix C
 	const unsigned int C_num_rows = A_num_rows;
 	const unsigned int C_num_cols = B_num_cols;
-	
-	// Declare result matrix 
+
+	// Declare result matrix
 	std::vector<std::vector<double> > C;
 	C.resize(C_num_rows);
 	for(unsigned int row=0;row<C_num_rows;row++) C[row].resize(C_num_cols,0.0);
@@ -181,8 +181,8 @@ std::vector<std::vector<double> > matmul(
 		}
 		//std::cout << "]"<< std::endl;
 	}
-	
-	// Return 
+
+	// Return
 	return C;
 }
 
@@ -198,7 +198,7 @@ std::vector<std::vector<double> > matmul(
 /// @date    05/02/2011
 ///
 /// @return Matrix C
-/// 
+///
 /// @internal
 ///	Created:		05/02/2011
 ///	Revision:	  ---
@@ -206,13 +206,13 @@ std::vector<std::vector<double> > matmul(
 ///=====================================================================================
 ///
 std::vector<double> matmul(
-	std::vector<double>& V, 
+	std::vector<double>& V,
 	std::vector<std::vector<double> >& M)
 {
-	
+
 	// Get sizes of vector V and matrix M
 	const unsigned int V_num_cols = V.size();
-	
+
 	const unsigned int M_num_rows = M.size();
 	const unsigned int M_num_cols = M[0].size();
 
@@ -223,11 +223,11 @@ std::vector<double> matmul(
 		terminaltextcolor(WHITE);
 		err::vexit();
 	}
-	
+
 	// Set sizes of result matrix C
 	const unsigned int C_num_cols = M_num_cols;
-	
-	// Declare result matrix 
+
+	// Declare result matrix
 	std::vector<double> C(C_num_cols,0.0);
 
 	// Calculate product
@@ -236,9 +236,9 @@ std::vector<double> matmul(
 			C[j]+=V[k]*M[k][j];
 		}
 	}
-	
-	
-	// Return 
+
+
+	// Return
 	return C;
 }
 
@@ -254,7 +254,7 @@ std::vector<double> matmul(
 /// @date    05/02/2011
 ///
 /// @return Matrix B
-/// 
+///
 /// @internal
 ///	Created:		05/02/2011
 ///	Revision:	  ---
@@ -264,16 +264,16 @@ std::vector<double> matmul(
 std::vector<std::vector<double> > transpose(
 	std::vector<std::vector<double> >& A)
 {
-	
+
 	// Get sizes of matrix A
 	const unsigned int A_num_rows = A.size();
 	const unsigned int A_num_cols = A[0].size();
-	
+
 	// Set sizes of result matrix B
 	const unsigned int B_num_rows = A_num_cols;
 	const unsigned int B_num_cols = A_num_rows;
-	
-	// Declare result matrix 
+
+	// Declare result matrix
 	std::vector<std::vector<double> > B;
 	B.resize(B_num_rows);
 	for(unsigned int row=0;row<B_num_rows;row++) B[row].resize(B_num_cols,0.0);
@@ -289,8 +289,8 @@ std::vector<std::vector<double> > transpose(
 		}
 		//std::cout << "]"<< std::endl;
 	}
-	
-	// Return 
+
+	// Return
 	return B;
 }
 
@@ -306,7 +306,7 @@ std::vector<std::vector<double> > transpose(
 /// @date    05/02/2011
 ///
 /// @return Matrix C
-/// 
+///
 /// @internal
 ///	Created:		05/02/2011
 ///	Revision:	  ---
@@ -318,15 +318,15 @@ std::vector<std::vector<double> > set_matrix(
 	const unsigned int cols,
 	std::vector<double> & nums)
 {
-	
+
 	if(nums.size()!=rows*cols){
 		terminaltextcolor(RED);
 		std::cerr << "Error in matrix initialisation, incorrect number of elements for matrix!" << std::endl;
 		terminaltextcolor(WHITE);
 		err::vexit();
 	}
-	
-	// Declare result matrix 
+
+	// Declare result matrix
 	std::vector<std::vector<double> > C;
 	C.resize(rows);
 	for(unsigned int row=0;row<rows;row++) C[row].resize(cols,0.0);
@@ -344,8 +344,8 @@ std::vector<std::vector<double> > set_matrix(
 		}
 		//std::cout << "]" << std::endl;
 	}
-	
-	// Return 
+
+	// Return
 	return C;
 }
 
@@ -353,13 +353,13 @@ std::vector<std::vector<double> > set_matrix(
 	const unsigned int rows,
 	const unsigned int cols)
 {
-	
+
 	//if(nums.size()!=rows*cols){
 	//	std::cerr << "Error in matrix initialisation, incorrect number of elements for matrix!" << std::endl;
 	//	err::vexit();
 	//}
-	
-	// Declare result matrix 
+
+	// Declare result matrix
 	std::vector<std::vector<double> > C;
 	C.resize(rows);
 	for(unsigned int row=0;row<rows;row++) C[row].resize(cols,0.0);
@@ -377,17 +377,17 @@ std::vector<std::vector<double> > set_matrix(
 		}
 		//std::cout << "]" << std::endl;
 	}
-	
-	// Return 
+
+	// Return
 	return C;
 }
 
 void print_matrix( std::vector<std::vector<double> >& A){
-	
+
 	// Get sizes of matrix A
 	const unsigned int A_num_rows = A.size();
 	const unsigned int A_num_cols = A[0].size();
-	
+
 	for(unsigned int i=0;i<A_num_rows;i++){
 		std::cout << "[ ";
 		for(unsigned int j=0;j<A_num_cols;j++){
@@ -395,8 +395,8 @@ void print_matrix( std::vector<std::vector<double> >& A){
 		}
 		std::cout << "]"<< std::endl;
 	}
-	
-	// Return 
+
+	// Return
 	return;
 }
 
@@ -404,8 +404,8 @@ void set_rotational_matrix(
 	double ddx,
 	double ddy,
 	double ddz,
-	std::vector< std::vector<double> > & x_rotation_matrix, 
-	std::vector< std::vector<double> > & y_rotation_matrix, 
+	std::vector< std::vector<double> > & x_rotation_matrix,
+	std::vector< std::vector<double> > & y_rotation_matrix,
 	std::vector< std::vector<double> > & z_rotation_matrix)
 {
 	double dx,dy,dz; //change in angle in radians
@@ -413,13 +413,13 @@ void set_rotational_matrix(
 	double pi=3.14159265358979323846264338327;
 
 	//--------------------------------------------------
-	// Initialise varibales 
+	// Initialise varibales
 	//--------------------------------------------------
 
 	dx = (ddx/360.0)*2.0*pi;
 	dy = (ddy/360.0)*2.0*pi;
 	dz = (ddz/360.0)*2.0*pi;
-	
+
 	sin_x = sin(dx);
 	cos_x = cos(dx);
 	sin_y = sin(dy);
@@ -430,7 +430,7 @@ void set_rotational_matrix(
 	x_rotation_matrix=vmath::set_matrix(3,3);
 	y_rotation_matrix=vmath::set_matrix(3,3);
 	z_rotation_matrix=vmath::set_matrix(3,3);
-	
+
 	x_rotation_matrix[0][0] = 1.0;
 	x_rotation_matrix[1][0] = 0.0;
 	x_rotation_matrix[2][0] = 0.0;
@@ -502,4 +502,3 @@ double interpolate_c(double xi,double yi,double xj,double yj){
 }
 
 } // end of namespcae vmath
-

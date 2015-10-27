@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -127,7 +127,7 @@ void config(){
 }
 /// @brief Atomistic output function
 ///
-/// @details Outputs formatted data snapshot for visualisation  
+/// @details Outputs formatted data snapshot for visualisation
 ///
 ///	#------------------------------------------------------
 ///	# Atomistic spin configuration file for vampire
@@ -245,7 +245,7 @@ void config(){
 
 /// @brief Atomistic output function
 ///
-/// @details Outputs formatted data snapshot for visualisation  
+/// @details Outputs formatted data snapshot for visualisation
 ///
 ///	//------------------------------------------------------
 ///	// Atomistic coordinate configuration file for vampire
@@ -371,7 +371,7 @@ void config(){
       cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
       for(int i=0; i<vout::local_output_atom_list.size(); i++){
          const int atom = vout::local_output_atom_list[i];
-         cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" << 
+         cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" <<
          atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
          if(sim::identify_surface_atoms==true && atoms::surface_array[atom]==true) cfg_file_ofstr << "O " << std::endl;
          else cfg_file_ofstr << mp::material[atoms::type_array[atom]].element << std::endl;
