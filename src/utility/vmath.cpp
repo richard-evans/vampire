@@ -80,6 +80,30 @@ bool point_in_polygon(double x, double y,double *polyX, double *polyY,int polySi
 
 }
 
+//---------------------------------------------------------------------------------------------
+//
+//	   						Function to determine if point is in scaled polygon
+//
+//												(c) R F L Evans 2015
+//
+//---------------------------------------------------------------------------------------------
+bool point_in_polygon_factor(double x, double y, double factor, double *polyX, double *polyY,int polySides) {
+	int   i, j=polySides-1 ;
+	bool  oddNodes=0;
+
+	for (i=0; i<polySides; i++) {
+		if ((polyY[i]*factor<y && polyY[j]*factor>=y) || (polyY[j]*factor<y && polyY[i]*factor>=y)) {
+			if (polyX[i]*factor+(y-polyY[i]*factor)/(polyY[j]-polyY[i])*(polyX[j]-polyX[i])*factor<x) {
+				oddNodes=!oddNodes;
+			}
+		}
+		j=i;
+	}
+
+  return oddNodes;
+
+}
+
 bool point_in_polygon2(double x, double y, std::vector<double>& polyX, std::vector<double>& polyY, const int polySides) {
 	///========================================================================================================
 	///		 						Function to decide if point is within polygon

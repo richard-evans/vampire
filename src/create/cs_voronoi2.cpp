@@ -32,13 +32,11 @@
 #include "vio.hpp"
 #include "qvoronoi.hpp"
 
-
 #include <cmath>
+#include <list>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-
 
 namespace create_voronoi{
 	bool parity=0;	/// left-right (0) or right-left (1) point initialisation
@@ -46,6 +44,17 @@ namespace create_voronoi{
 	double area_cutoff=0.8;
 	double voronoi_sd=0.15;			/// Standard Deviation of voronoi grains
 
+}
+
+struct core_radius_t{
+   int mat;
+   double radius;
+};
+
+/// comparison function for reverse order sorting
+bool compare_radius_vor(core_radius_t first,core_radius_t second){
+   if(first.radius<second.radius) return false;
+   else return true;
 }
 
 namespace cs{
@@ -332,6 +341,17 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		supercell_array.at(cx).at(cy).push_back(atom);
 	}
 
+	// Determine order for core-shell grains
+   std::list<core_radius_t> material_order(0);
+   for(int mat=0;mat<mp::num_materials;mat++){
+      core_radius_t tmp;
+      tmp.mat=mat;
+      tmp.radius=mp::material[mat].core_shell_size;
+      material_order.push_back(tmp);
+   }
+   // sort by increasing radius
+   material_order.sort(compare_radius_vor);
+
 	std::cout <<"Generating Voronoi Grains";
 	zlog << zTs() << "Generating Voronoi Grains";
 
@@ -354,15 +374,21 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			// Set temporary vertex coordinates (real) and compute cell ranges
 			int num_vertices = grain_vertices_array[grain].size();
 			for(int vertex=0;vertex<num_vertices;vertex++){
-				tmp_grain_pointx_array[vertex]=grain_vertices_array[grain][vertex][0]+grain_coord_array[grain][0];
-				tmp_grain_pointy_array[vertex]=grain_vertices_array[grain][vertex][1]+grain_coord_array[grain][1];
-				int x = int(tmp_grain_pointx_array[vertex]/unit_cell.dimensions[0]);
-				int y = int(tmp_grain_pointy_array[vertex]/unit_cell.dimensions[1]);
+				// determine vertex coordinates
+				tmp_grain_pointx_array[vertex]=grain_vertices_array[grain][vertex][0];
+				tmp_grain_pointy_array[vertex]=grain_vertices_array[grain][vertex][1];
+				// determine unit cell coordinates encompassed by grain
+				int x = int((tmp_grain_pointx_array[vertex]+grain_coord_array[grain][0])/unit_cell.dimensions[0]);
+				int y = int((tmp_grain_pointy_array[vertex]+grain_coord_array[grain][1])/unit_cell.dimensions[1]);
 				if(x < minx) minx = x;
 				if(x > maxx) maxx = x;
 				if(y < miny) miny = y;
 				if(y > maxy) maxy = y;
 			}
+
+			// determine coordinate offset for grains
+			const double x0 = grain_coord_array[grain][0];
+			const double y0 = grain_coord_array[grain][1];
 
 			// loopover cells
 			for(int i=minx;i<=maxx;i++){
@@ -371,12 +397,36 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 					// loop over atoms in cells;
 					for(int id=0;id<supercell_array[i][j].size();id++){
 						int atom = supercell_array[i][j][id];
+						int material = catom_array[atom].material;
 
+						// Get atomic position
 						double x = catom_array[atom].x;
 						double y = catom_array[atom].y;
 
+						if(mp::material[catom_array[atom].material].core_shell_size>0.0){
+							// Iterate over materials
+							for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
+								int mat = (it)->mat;
+								double factor = mp::material[mat].core_shell_size;
+								double maxz=mp::material[mat].max*cs::system_dimensions[2];
+								double minz=mp::material[mat].min*cs::system_dimensions[2];
+								double cz=catom_array[atom].z;
+								// check for within core shell range
+								if(vmath::point_in_polygon_factor(x-x0,y-y0,factor, tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
+									if((cz>=minz) && (cz<maxz)){
+										catom_array[atom].include=true;
+										catom_array[atom].material=mat;
+										catom_array[atom].grain=grain;
+									}
+									// if set to clear atoms then remove atoms within radius
+									else if(cs::fill_core_shell==false){
+										catom_array[atom].include=false;
+									}
+								}
+							}
+						}
 						// Check to see if site is within polygon
-						if(vmath::point_in_polygon(x,y,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
+						else if(vmath::point_in_polygon_factor(x-x0,y-y0,1.0,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
 							catom_array[atom].include=true;
 							catom_array[atom].grain=grain;
 						}
