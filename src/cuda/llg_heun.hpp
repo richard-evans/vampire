@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------------
+//
+// This header file is part of the VAMPIRE open source package under the
+// GNU GPL (version 2) licence (see licence file for details).
+//
+// (c) O Arbelaez Echeverri, M A Ellis & R F L Evans 2015. All rights reserved.
+//
+//------------------------------------------------------------------------------
 #ifndef CUDA_LLG_HEUN_HPP_
 #define CUDA_LLG_HEUN_HPP_
 
@@ -27,24 +35,21 @@ namespace vcuda
          double lambda_times_prefactor;
       };
 
-      typedef thrust::device_vector<heun_parameters_t> HeunParametersArray;
-
       namespace llg
       {
          /*
           * Private data
           */
-
          extern bool initialized;
-         extern RealArray x_spin_buffer_array;
-         extern RealArray y_spin_buffer_array;
-         extern RealArray z_spin_buffer_array;
+         extern cu_real_array_t x_spin_buffer_array;
+         extern cu_real_array_t y_spin_buffer_array;
+         extern cu_real_array_t z_spin_buffer_array;
 
-         extern RealArray dS_x_array;
-         extern RealArray dS_y_array;
-         extern RealArray dS_z_array;
+         extern cu_real_array_t dS_x_array;
+         extern cu_real_array_t dS_y_array;
+         extern cu_real_array_t dS_z_array;
 
-         extern HeunParametersArray heun_parameters;
+         extern thrust::device_vector<heun_parameters_t> heun_parameters_device;
 
          /*
           * Internal functions
@@ -55,26 +60,25 @@ namespace vcuda
          /*
           * Internal kernels
           */
-         __global__ void llg_heun_step (
-               double * x_spin, double * y_spin, double * z_spin,
+         __global__ void llg_heun_predictor_step (
                int * material_id,
                heun_parameters_t * heun_parameters,
-               double * x_sp_field, double * y_sp_field, double * z_sp_field,
-               double * x_ext_field, double * y_ext_field, double * z_ext_field,
-               double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
-               double * dS_x, double * dS_y, double * dS_z,
-               double dt, size_t num_atoms
+               cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
+               cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
+               cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+               cu_real_t * dS_x, cu_real_t * dS_y, cu_real_t * dS_z,
+               cu_real_t dt, size_t num_atoms
                );
 
-         __global__ void llg_heun_scheme (
-               double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
+         __global__ void llg_heun_corrector_step (
                int * material_id,
                heun_parameters_t * heun_parameters,
-               double * x_sp_field, double * y_sp_field, double * z_sp_field,
-               double * x_ext_field, double * y_ext_field, double * z_ext_field,
-               double * x_spin, double * y_spin, double * z_spin,
-               double * dS_x, double * dS_y, double * dS_z,
-               double dt, size_t num_atoms
+               cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
+               cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
+               cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+               cu_real_t * x_spin_buffer, cu_real_t * y_spin_buffer, cu_real_t * z_spin_buffer,
+               cu_real_t * dS_x, cu_real_t * dS_y, cu_real_t * dS_z,
+               cu_real_t dt, size_t num_atoms
                );
       } /* llg */
 

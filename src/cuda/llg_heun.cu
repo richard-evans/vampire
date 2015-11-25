@@ -1,11 +1,11 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2015. All rights reserved.
+// (c) O Arbelaez Echeverri, M A Ellis & R F L Evans 2015. All rights reserved.
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 // C++ standard library headers
 
@@ -19,6 +19,7 @@
 #include "internal.hpp"
 #include "llg_heun.hpp"
 
+// Namespace aliasing for brevity
 #ifdef CUDA
 namespace cu = ::vcuda::internal;
 #endif
@@ -30,36 +31,45 @@ namespace vcuda{
    //--------------------------------------------------------------------------
    void llg_heun(){
 
-#ifdef CUDA
-
-      if (!cu::llg::initialized) cu::llg::__llg_init();
-      cu::llg::__llg_step();
-
-#endif
+      #ifdef CUDA
+        // check for cuda initialization, and initialize if necessary
+        if (!cu::llg::initialized) cu::llg::__llg_init();
+        // perform a single LLG Heun step
+        cu::llg::__llg_step();
+      #endif
 
       return;
    }
 
 #ifdef CUDA
 
-   namespace internal {
+	namespace internal {
 
-      namespace llg
-      {
+		//--------------------------------------------------------------
+      // device data structures and functions for llg integration
+		//--------------------------------------------------------------
+      namespace llg{
+
+         // flag to indicate initialization of llg data structures and variables
          bool initialized(false);
-         RealArray x_spin_buffer_array(0UL);
-         RealArray y_spin_buffer_array(0UL);
-         RealArray z_spin_buffer_array(0UL);
-         RealArray dS_x_array(0UL);
-         RealArray dS_y_array(0UL);
-         RealArray dS_z_array(0UL);
-         HeunParametersArray heun_parameters(0UL);
 
-         void __llg_init ()
-         {
-            /*
-             * Reserve space for the buffers
-             */
+         // arrays for storing temporary spin data for integration
+         cu_real_array_t x_spin_buffer_array(0UL);
+         cu_real_array_t y_spin_buffer_array(0UL);
+         cu_real_array_t z_spin_buffer_array(0UL);
+         cu_real_array_t dS_x_array(0UL);
+         cu_real_array_t dS_y_array(0UL);
+         cu_real_array_t dS_z_array(0UL);
+
+         // array for storing heun integration prefactors
+         thrust::device_vector<heun_parameters_t> heun_parameters_device(0UL);
+
+         //-----------------------------------------------------------
+         // Function to initialize LLG variables on device
+         //-----------------------------------------------------------
+         void __llg_init (){
+
+            // Reserve space for the buffers
             cu::llg::x_spin_buffer_array.resize(::atoms::num_atoms);
             cu::llg::y_spin_buffer_array.resize(::atoms::num_atoms);
             cu::llg::z_spin_buffer_array.resize(::atoms::num_atoms);
@@ -68,260 +78,219 @@ namespace vcuda{
             cu::llg::dS_y_array.resize(::atoms::num_atoms);
             cu::llg::dS_z_array.resize(::atoms::num_atoms);
 
-            /*
-             * Initialize heun parameters
-             */
+            // Initialize host array for heun parameters
             size_t num_mats = ::mp::num_materials;
-            thrust::host_vector<heun_parameters_t> _parameters(num_mats);
+            thrust::host_vector<heun_parameters_t> heun_parameters_host(num_mats);
 
-            for (size_t i = 0; i < num_mats; i++)
-            {
+            // loop over all materials and determine prefactor constants
+            for (size_t i = 0; i < num_mats; i++){
+
+               // temporary variables for readability
                double alpha = ::mp::material[i].alpha;
                double gamma = ::mp::material[i].gamma_rel;
-               _parameters[i].prefactor = -gamma / (1.0 + alpha * alpha);
-               /*
-                * lambda is alpha (LOL)
-                */
-               _parameters[i].lambda_times_prefactor =
-                  -gamma * alpha / (1.0 + alpha * alpha);
 
-#ifdef CUDA_SPIN_DEBUG
-               std::cout << "Heun parameters: "
-                   << _parameters[i].prefactor << " "
-                   << _parameters[i].lambda_times_prefactor << std::endl;
-#endif
+               // save derived variables to host array
+               heun_parameters_host[i].prefactor = -gamma / (1.0 + alpha * alpha);
+               heun_parameters_host[i].lambda_times_prefactor = -gamma * alpha / (1.0 + alpha * alpha);
+
+               #ifdef CUDA_SPIN_DEBUG
+					   // output variables to screen for debugging
+                  std::cout << "Heun parameters: "
+									 << heun_parameters_host[i].prefactor << " "
+									 << heun_parameters_host[i].lambda_times_prefactor << std::endl;
+               #endif
 
             }
 
-            cu::llg::heun_parameters.resize(num_mats);
-            thrust::copy(
-                  _parameters.begin(),
-                  _parameters.end(),
-                  cu::llg::heun_parameters.begin()
-                  );
+            // resize device parameter array to correct size
+            cu::llg::heun_parameters_device.resize(num_mats);
+            // copy host array to device
+            thrust::copy(heun_parameters_host.begin(),heun_parameters_host.end(),cu::llg::heun_parameters_device.begin());
 
+            // set flag to indicate data initialization
             initialized=true;
+
+				// check for errors?
+				return;
+
          }
 
-         void __llg_step ()
-         {
-            thrust::copy (
-                  cu::atoms::x_spin_array.begin(),
-                  cu::atoms::x_spin_array.end(),
-                  cu::llg::x_spin_buffer_array.begin()
-                  );
-            thrust::copy (
-                  cu::atoms::y_spin_array.begin(),
-                  cu::atoms::y_spin_array.end(),
-                  cu::llg::y_spin_buffer_array.begin()
-                  );
-            thrust::copy (
-                  cu::atoms::z_spin_array.begin(),
-                  cu::atoms::z_spin_array.end(),
-                  cu::llg::z_spin_buffer_array.begin()
-                  );
+         //---------------------------------------------------------
+         // Function to calculate single heun step
+         //---------------------------------------------------------
+         void __llg_step(){
 
-#ifdef CUDA_SPIN_DEBUG
-            std::cout << cu::atoms::x_spin_array[0] << " "
-                      << cu::atoms::y_spin_array[0] << " "
-                      << cu::atoms::z_spin_array[0] << std::endl;
-#endif
+            // Make a device to device (D2D) copy of initial spin directions
+            thrust::copy (cu::atoms::x_spin_array.begin(),cu::atoms::x_spin_array.end(),cu::llg::x_spin_buffer_array.begin());
+            thrust::copy (cu::atoms::y_spin_array.begin(),cu::atoms::y_spin_array.end(),cu::llg::y_spin_buffer_array.begin());
+            thrust::copy (cu::atoms::z_spin_array.begin(),cu::atoms::z_spin_array.end(),cu::llg::z_spin_buffer_array.begin());
 
-            double * d_x_spin = thrust::raw_pointer_cast(
-                  cu::atoms::x_spin_array.data());
-            double * d_y_spin = thrust::raw_pointer_cast(
-                  cu::atoms::y_spin_array.data());
-            double * d_z_spin = thrust::raw_pointer_cast(
-                  cu::atoms::z_spin_array.data());
+            #ifdef CUDA_SPIN_DEBUG
+               // Output first spin position
+				   std::cout << cu::atoms::x_spin_array[0] << " "
+								 << cu::atoms::y_spin_array[0] << " "
+								 << cu::atoms::z_spin_array[0] << std::endl;
+            #endif
 
-            int * d_materials =
-               thrust::raw_pointer_cast(cu::atoms::type_array.data());
+            // Cast device pointers for calling kernel function calls
+            cu_real_t * d_x_spin = thrust::raw_pointer_cast(cu::atoms::x_spin_array.data());
+            cu_real_t * d_y_spin = thrust::raw_pointer_cast(cu::atoms::y_spin_array.data());
+            cu_real_t * d_z_spin = thrust::raw_pointer_cast(cu::atoms::z_spin_array.data());
 
-            cu::heun_parameters_t * d_heun_params =
-               thrust::raw_pointer_cast (cu::llg::heun_parameters.data());
+            int * d_materials = thrust::raw_pointer_cast(cu::atoms::type_array.data());
 
-            double * d_x_spin_field = thrust::raw_pointer_cast(
-                  cu::x_total_spin_field_array.data());
-            double * d_y_spin_field = thrust::raw_pointer_cast(
-                  cu::y_total_spin_field_array.data());
-            double * d_z_spin_field = thrust::raw_pointer_cast(
-                  cu::z_total_spin_field_array.data());
+            cu::heun_parameters_t * d_heun_params = thrust::raw_pointer_cast (cu::llg::heun_parameters_device.data());
 
-            double * d_x_external_field = thrust::raw_pointer_cast(
-                  cu::x_total_external_field_array.data());
-            double * d_y_external_field = thrust::raw_pointer_cast(
-                  cu::y_total_external_field_array.data());
-            double * d_z_external_field = thrust::raw_pointer_cast(
-                  cu::z_total_external_field_array.data());
+            cu_real_t * d_x_spin_field = thrust::raw_pointer_cast(cu::x_total_spin_field_array.data());
+            cu_real_t * d_y_spin_field = thrust::raw_pointer_cast(cu::y_total_spin_field_array.data());
+            cu_real_t * d_z_spin_field = thrust::raw_pointer_cast(cu::z_total_spin_field_array.data());
 
-            double * d_x_spin_buffer = thrust::raw_pointer_cast(
-                  cu::llg::x_spin_buffer_array.data());
-            double * d_y_spin_buffer = thrust::raw_pointer_cast(
-                  cu::llg::y_spin_buffer_array.data());
-            double * d_z_spin_buffer = thrust::raw_pointer_cast(
-                  cu::llg::z_spin_buffer_array.data());
+            cu_real_t * d_x_external_field = thrust::raw_pointer_cast(cu::x_total_external_field_array.data());
+            cu_real_t * d_y_external_field = thrust::raw_pointer_cast(cu::y_total_external_field_array.data());
+            cu_real_t * d_z_external_field = thrust::raw_pointer_cast(cu::z_total_external_field_array.data());
 
-            double * dS_x_dptr = thrust::raw_pointer_cast(
-                  cu::llg::dS_x_array.data());
-            double * dS_y_dptr = thrust::raw_pointer_cast(
-                  cu::llg::dS_y_array.data());
-            double * dS_z_dptr = thrust::raw_pointer_cast(
-                  cu::llg::dS_z_array.data());
+            cu_real_t * d_x_spin_buffer = thrust::raw_pointer_cast(cu::llg::x_spin_buffer_array.data());
+            cu_real_t * d_y_spin_buffer = thrust::raw_pointer_cast(cu::llg::y_spin_buffer_array.data());
+            cu_real_t * d_z_spin_buffer = thrust::raw_pointer_cast(cu::llg::z_spin_buffer_array.data());
 
+            cu_real_t * dS_x_dptr = thrust::raw_pointer_cast(cu::llg::dS_x_array.data());
+            cu_real_t * dS_y_dptr = thrust::raw_pointer_cast(cu::llg::dS_y_array.data());
+            cu_real_t * dS_z_dptr = thrust::raw_pointer_cast(cu::llg::dS_z_array.data());
+
+            // Calculate spin dependent fields
             cu::update_spin_fields ();
+
+            // Calculate external fields (fixed for integration step)
             cu::update_external_fields ();
 
+            // Check for cuda errors in file, line
             check_cuda_errors (__FILE__, __LINE__);
 
-            cu::llg::llg_heun_step <<< cu::grid_size, cu::block_size >>> (
-                  d_x_spin_buffer, d_y_spin_buffer, d_z_spin_buffer,
-                  d_materials, d_heun_params,
-                  d_x_spin_field, d_y_spin_field, d_z_spin_field,
-                  d_x_external_field, d_y_external_field, d_z_external_field,
-                  d_x_spin, d_y_spin, d_z_spin,
-                  dS_x_dptr, dS_y_dptr, dS_z_dptr,
-                  ::mp::dt, ::atoms::num_atoms
-                  );
+            // Invoke kernel for heun predictor step
+            cu::llg::llg_heun_predictor_step <<< cu::grid_size, cu::block_size >>> (
+               d_materials, d_heun_params,
+					d_x_spin, d_y_spin, d_z_spin,
+               d_x_spin_field, d_y_spin_field, d_z_spin_field,
+               d_x_external_field, d_y_external_field, d_z_external_field,
+               dS_x_dptr, dS_y_dptr, dS_z_dptr,
+               ::mp::dt, ::atoms::num_atoms);
 
-#ifdef CUDA_SPIN_DEBUG
-            std::cout << cu::atoms::x_spin_array[0] << " "
-                      << cu::atoms::y_spin_array[0] << " "
-                      << cu::atoms::z_spin_array[0] << " "
-                      << cu::z_total_spin_field_array[0] << " "
-                      << cu::z_total_external_field_array[0] << " "
-                      << std::endl;
-#endif
+            #ifdef CUDA_SPIN_DEBUG
+               std::cout << cu::atoms::x_spin_array[0] << " "
+                         << cu::atoms::y_spin_array[0] << " "
+                         << cu::atoms::z_spin_array[0] << " "
+                         << cu::z_total_spin_field_array[0] << " "
+                         << cu::z_total_external_field_array[0] << " "
+                         << std::endl;
+            #endif
 
             check_cuda_errors (__FILE__, __LINE__);
 
+            // Recalculate spin dependent fields
             cu::update_spin_fields ();
 
             check_cuda_errors (__FILE__, __LINE__);
 
-            /*
-             * TODO: Store delta s because of the renormalization
-             */
-            cu::llg::llg_heun_scheme <<< cu::grid_size, cu::block_size >>> (
-                  d_x_spin, d_y_spin, d_z_spin,
-                  d_materials, d_heun_params,
-                  d_x_spin_field, d_y_spin_field, d_z_spin_field,
-                  d_x_external_field, d_y_external_field, d_z_external_field,
-                  d_x_spin_buffer, d_y_spin_buffer, d_z_spin_buffer,
-                  dS_x_dptr, dS_y_dptr, dS_z_dptr,
-                  ::mp::dt, ::atoms::num_atoms
-                  );
+            // Invoke kernel for heun corrector step
+            cu::llg::llg_heun_corrector_step <<< cu::grid_size, cu::block_size >>> (
+               d_materials, d_heun_params,
+					d_x_spin, d_y_spin, d_z_spin,
+               d_x_spin_field, d_y_spin_field, d_z_spin_field,
+               d_x_external_field, d_y_external_field, d_z_external_field,
+               d_x_spin_buffer, d_y_spin_buffer, d_z_spin_buffer,
+               dS_x_dptr, dS_y_dptr, dS_z_dptr,
+               ::mp::dt, ::atoms::num_atoms);
 
             check_cuda_errors (__FILE__, __LINE__);
 
-            /*
-             * TODO: This copy can go away
-             *       The buffer contains the old spin and spin contains
-             *       the updated version.
-             */
-            thrust::copy (
-                  cu::llg::x_spin_buffer_array.begin(),
-                  cu::llg::x_spin_buffer_array.end(),
-                  cu::atoms::x_spin_array.begin()
-                  );
-            thrust::copy (
-                  cu::llg::y_spin_buffer_array.begin(),
-                  cu::llg::y_spin_buffer_array.end(),
-                  cu::atoms::y_spin_array.begin()
-                  );
-            thrust::copy (
-                  cu::llg::z_spin_buffer_array.begin(),
-                  cu::llg::z_spin_buffer_array.end(),
-                  cu::atoms::z_spin_array.begin()
-                  );
+				return;
+
          }
 
-         __global__ void llg_heun_step (
-               double * x_spin, double * y_spin, double * z_spin,
+         //-----------------------------------------------------------------------------
+         // CUDA Kernel to calculate the predictor step of the Landau-Lifshitz-Gilbert
+         // (LLG) equation using the Heun scheme
+         //-----------------------------------------------------------------------------
+         __global__ void llg_heun_predictor_step (
                int * material_id,
                cu::heun_parameters_t * heun_parameters,
-               double * x_sp_field, double * y_sp_field, double * z_sp_field,
-               double * x_ext_field, double * y_ext_field, double * z_ext_field,
-               double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
-               double * dSx, double * dSy, double * dSz,
-               double dt, size_t num_atoms
-               )
-         {
+               cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin, // contains initial spin
+               cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
+               cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+               cu_real_t * dSx, cu_real_t * dSy, cu_real_t * dSz,
+               cu_real_t dt, size_t num_atoms){
 
+            // Loop over blocks for large systems > ~100k spins
             for ( size_t atom = blockIdx.x * blockDim.x + threadIdx.x;
                   atom < num_atoms;
                   atom += blockDim.x * gridDim.x)
             {
 
+               // Determine material id for atom
                size_t mid = material_id[atom];
 
-               double prefactor = heun_parameters[mid].prefactor;
-               double lambdatpr = heun_parameters[mid].lambda_times_prefactor;
+               // prestore prefactors into registers
+               cu_real_t prefactor = heun_parameters[mid].prefactor;
+               cu_real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
-               double sx = x_spin[atom];
-               double sy = y_spin[atom];
-               double sz = z_spin[atom];
+               // load spin direction to registers for later multiple reuse
+               cu_real_t sx = x_spin[atom];
+               cu_real_t sy = y_spin[atom];
+               cu_real_t sz = z_spin[atom];
 
-               double H_x = x_sp_field[atom] + x_ext_field[atom];
-               double H_y = y_sp_field[atom] + y_ext_field[atom];
-               double H_z = z_sp_field[atom] + z_ext_field[atom];
+               // calculate total field
+               cu_real_t H_x = x_sp_field[atom] + x_ext_field[atom];
+               cu_real_t H_y = y_sp_field[atom] + y_ext_field[atom];
+               cu_real_t H_z = z_sp_field[atom] + z_ext_field[atom];
 
-               //defining the s x h array and s x s x h :warray
-               double sxh_x = sy * H_z - sz * H_y;
-               double sxh_y = sz * H_x - sx * H_z;
-               double sxh_z = sx * H_y - sy * H_x;
+               // calculate s x h
+               cu_real_t sxh_x = sy * H_z - sz * H_y;
+               cu_real_t sxh_y = sz * H_x - sx * H_z;
+               cu_real_t sxh_z = sx * H_y - sy * H_x;
 
-               //defining the sxsxh
-               double sxsxh_x = sy * sxh_z - sz * sxh_y;
-               double sxsxh_y = sz * sxh_x - sx * sxh_z;
-               double sxsxh_z = sx * sxh_y - sy * sxh_x;
+               // calculate delta S
+               cu_real_t Ds_x = prefactor * sxh_x + lambdatpr * (sy * sxh_z - sz * sxh_y); // sxsxh_x;
+               cu_real_t Ds_y = prefactor * sxh_y + lambdatpr * (sz * sxh_x - sx * sxh_z); // sxsxh_y;
+               cu_real_t Ds_z = prefactor * sxh_z + lambdatpr * (sx * sxh_y - sy * sxh_x); // sxsxh_z;
 
-               //the saturation
-               double mod_s = 0.0;
-
-               //defining the Delta
-               double Ds_x = prefactor * sxh_x + lambdatpr * sxsxh_x;
-               double Ds_y = prefactor * sxh_y + lambdatpr * sxsxh_y;
-               double Ds_z = prefactor * sxh_z + lambdatpr * sxsxh_z;
-
+               // store initial change in S for second step
                dSx[atom] = Ds_x;
                dSy[atom] = Ds_y;
                dSz[atom] = Ds_z;
 
-               double new_spin_x = sx + Ds_x * dt;
-               double new_spin_y = sy + Ds_y * dt;
-               double new_spin_z = sz + Ds_z * dt;
+               // Calculate intermediate spin position
+               cu_real_t new_spin_x = sx + Ds_x * dt;
+               cu_real_t new_spin_y = sy + Ds_y * dt;
+               cu_real_t new_spin_z = sz + Ds_z * dt;
 
-               /*
-                * TODO: Adjust delta s for the non norm conserving stuff
-                */
-               mod_s = 1.0 / sqrt(
+               // calculate spin length for renormalization (add in float specific code here)
+               cu_real_t mod_s = 1.0 / sqrt(
                      new_spin_x * new_spin_x +
                      new_spin_y * new_spin_y +
                      new_spin_z * new_spin_z);
 
-               //normalized spins
-               x_spin_prim[atom] = new_spin_x * mod_s;
-               y_spin_prim[atom] = new_spin_y * mod_s;
-               z_spin_prim[atom] = new_spin_z * mod_s;
+               // Store normalized intermediate spin direction
+               x_spin[atom] = new_spin_x * mod_s;
+               y_spin[atom] = new_spin_y * mod_s;
+               z_spin[atom] = new_spin_z * mod_s;
+
             }
 
          }
 
-         __global__ void llg_heun_scheme (
-               double * x_spin_prim, double * y_spin_prim, double * z_spin_prim,
+         //-----------------------------------------------------------------------------
+			// CUDA Kernel to calculate the corrector step of the Landau-Lifshitz-Gilbert
+			// (LLG) equation using the Heun scheme
+			//-----------------------------------------------------------------------------
+         __global__ void llg_heun_corrector_step (
                int * material_id,
                cu::heun_parameters_t * heun_parameters,
-               /*
-                * receive spin init
-                */
-               double * x_sp_field, double * y_sp_field, double * z_sp_field,
-               double * x_ext_field, double * y_ext_field, double * z_ext_field,
-               /*
-                * receive spin prima, read a write the final result to it
-                */
-               double * x_spin, double * y_spin, double * z_spin,
-               double * dSx, double * dSy, double * dSz,
-               double dt, size_t num_atoms
+               cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin, // spin from predictor step
+               cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
+               cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+               cu_real_t * x_spin_buffer, cu_real_t * y_spin_buffer, cu_real_t * z_spin_buffer, // initial spin
+               cu_real_t * dSx, cu_real_t * dSy, cu_real_t * dSz,
+               cu_real_t dt, size_t num_atoms
                )
          {
 
@@ -332,48 +301,45 @@ namespace vcuda{
 
                size_t mid = material_id[atom];
 
-               double prefactor = heun_parameters[mid].prefactor;
-               double lambdatpr = heun_parameters[mid].lambda_times_prefactor;
+               cu_real_t prefactor = heun_parameters[mid].prefactor;
+               cu_real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
-               //initial spins
-               double spin_init_x = x_spin[atom];
-               double spin_init_y = y_spin[atom];
-               double spin_init_z = z_spin[atom];
-
-               //update the spins
-               double spin_x = x_spin_prim[atom];
-               double spin_y = y_spin_prim[atom];
-               double spin_z = z_spin_prim[atom];
+               // copy the predictor spins to registers
+               cu_real_t spin_x = x_spin[atom];
+               cu_real_t spin_y = y_spin[atom];
+               cu_real_t spin_z = z_spin[atom];
 
                //the field
-               double H_x = x_sp_field[atom] + x_ext_field[atom];
-               double H_y = y_sp_field[atom] + y_ext_field[atom];
-               double H_z = z_sp_field[atom] + z_ext_field[atom];
+               cu_real_t H_x = x_sp_field[atom] + x_ext_field[atom];
+               cu_real_t H_y = y_sp_field[atom] + y_ext_field[atom];
+               cu_real_t H_z = z_sp_field[atom] + z_ext_field[atom];
 
-               //implementing the Heun's Scheme
-               //cross product
-               double SxH_x = spin_y * H_z - spin_z * H_y;
-               double SxH_y = spin_z * H_x - spin_x * H_z;
-               double SxH_z = spin_x * H_y - spin_y * H_x;
+               // calculate components
+               cu_real_t SxH_x = spin_y * H_z - spin_z * H_y;
+               cu_real_t SxH_y = spin_z * H_x - spin_x * H_z;
+               cu_real_t SxH_z = spin_x * H_y - spin_y * H_x;
 
-               double SxSxH_x = spin_y * SxH_z - spin_z * SxH_y;
-               double SxSxH_y = spin_z * SxH_x - spin_x * SxH_z;
-               double SxSxH_z = spin_x * SxH_y - spin_y * SxH_x;
+               cu_real_t SxSxH_x = spin_y * SxH_z - spin_z * SxH_y;
+               cu_real_t SxSxH_y = spin_z * SxH_x - spin_x * SxH_z;
+               cu_real_t SxSxH_z = spin_x * SxH_y - spin_y * SxH_x;
 
-               double DS_prime_x = prefactor * SxH_x + lambdatpr * SxSxH_x;
-               double DS_prime_y = prefactor * SxH_y + lambdatpr * SxSxH_y;
-               double DS_prime_z = prefactor * SxH_z + lambdatpr * SxSxH_z;
+               // Calculate dS
+               cu_real_t DS_prime_x = prefactor * SxH_x + lambdatpr * SxSxH_x;
+               cu_real_t DS_prime_y = prefactor * SxH_y + lambdatpr * SxSxH_y;
+               cu_real_t DS_prime_z = prefactor * SxH_z + lambdatpr * SxSxH_z;
 
-               double S_x = spin_init_x + 0.5 * (dSx[atom] + DS_prime_x) * dt;
-               double S_y = spin_init_y + 0.5 * (dSy[atom] + DS_prime_y) * dt;
-               double S_z = spin_init_z + 0.5 * (dSz[atom] + DS_prime_z) * dt;
+               // Calculate heun step
+               cu_real_t S_x = x_spin_buffer[atom] + 0.5 * (dSx[atom] + DS_prime_x) * dt;
+               cu_real_t S_y = y_spin_buffer[atom] + 0.5 * (dSy[atom] + DS_prime_y) * dt;
+               cu_real_t S_z = z_spin_buffer[atom] + 0.5 * (dSz[atom] + DS_prime_z) * dt;
 
-               float mods = 1.0 / sqrt(
-                     S_x*S_x + S_y*S_y + S_z*S_z);
+               cu_real_t mods = 1.0 / sqrt(S_x*S_x + S_y*S_y + S_z*S_z);
 
+               // save final spin direction to spin array
                x_spin[atom] = mods * S_x;
                y_spin[atom] = mods * S_y;
                z_spin[atom] = mods * S_z;
+
             }
          }
       } /* llg */
@@ -382,4 +348,3 @@ namespace vcuda{
 #endif
 
 } // end of namespace cuda
-
