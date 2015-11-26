@@ -20,42 +20,42 @@ namespace vcuda
 
          extern long counter;
 
-         extern IndexArray system_mask;
-         extern RealArray  system_magnetization;
-         extern RealArray  system_mean_magnetization;
+         extern cu_index_array_t system_mask;
+         extern cu_real_array_t  system_magnetization;
+         extern cu_real_array_t  system_mean_magnetization;
 
-         extern IndexArray material_mask;
-         extern RealArray  material_magnetization;
-         extern RealArray  material_mean_magnetization;
+         extern cu_index_array_t material_mask;
+         extern cu_real_array_t  material_magnetization;
+         extern cu_real_array_t  material_mean_magnetization;
 
-         extern IndexArray height_mask;
-         extern RealArray  height_magnetization;
-         extern RealArray  height_mean_magnetization;
+         extern cu_index_array_t height_mask;
+         extern cu_real_array_t  height_magnetization;
+         extern cu_real_array_t  height_mean_magnetization;
 
-         extern IndexArray material_height_mask;
-         extern RealArray  material_height_magnetization;
-         extern RealArray  material_height_mean_magnetization;
+         extern cu_index_array_t material_height_mask;
+         extern cu_real_array_t  material_height_magnetization;
+         extern cu_real_array_t  material_height_mean_magnetization;
 
          /*
           * Functions required for statistics
           */
 
          void __update_stat (
-               const IndexArray& mask,
-               RealArray& stat,
-               RealArray& mean_stat
+               const cu_index_array_t& mask,
+               cu_real_array_t& stat,
+               cu_real_array_t& mean_stat
                );
 
          void __get_stat (
-               const RealArray& stat,
-               const RealArray& mean_stat,
+               const cu_real_array_t& stat,
+               const cu_real_array_t& mean_stat,
                ::stats::magnetization_statistic_t& local_stat
                );
 
 
          void __reset_stat (
-               RealArray& stat,
-               RealArray& mean_stat
+               cu_real_array_t& stat,
+               cu_real_array_t& mean_stat
                );
 
          /*

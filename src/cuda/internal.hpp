@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------
 // Defines shared internal data structures and functions for the
 // cuda implementation. These functions should
-// not be accessed outside of the local temperature pulse code.
+// not be accessed outside of the cuda code.
 //---------------------------------------------------------------------
 
 #include <curand_kernel.h>
@@ -35,13 +35,14 @@
 #include "../../hdr/material.hpp"
 #include "../../hdr/sim.hpp"
 
+// Include type definitions for cuda code
+#include "typedefs.hpp"
+
 namespace vcuda{
 
 #ifdef CUDA
 
    namespace internal{
-
-      typedef double RealType;
 
       /*
        * Thread launch parameters
@@ -53,30 +54,6 @@ namespace vcuda{
       /*
        * Internal data structures
        */
-
-      struct material_parameters_t {
-         double alpha;
-         double gamma_rel;
-         double mu_s_si;
-         double i_mu_s_si;
-         double k_latt;
-         double sh2;
-         double sh4;
-         double sh6;
-         double ku;
-         double anisotropy_unit_x;
-         double anisotropy_unit_y;
-         double anisotropy_unit_z;
-         double applied_field_strength;
-         double applied_field_unit_x;
-         double applied_field_unit_y;
-         double applied_field_unit_z;
-         double Kc1_SI;
-         double temperature;
-         double temperature_rescaling_alpha;
-         double temperature_rescaling_Tc;
-         double H_th_sigma;
-      };
 
       /*
        * Initlialization functions
@@ -159,7 +136,7 @@ namespace vcuda{
        * Shared device functions
        */
 
-      __device__ double atomicAdd (double * address, double value);
+      __device__ cu_real_t atomicAdd (cu_real_t * address, cu_real_t value);
 
       /*
        * Shared kernel definitions
@@ -167,41 +144,43 @@ namespace vcuda{
 
       __global__ void init_rng (curandState * state, int seed);
 
-      __global__ void update_non_exchange_spin_fields (
-            double * x_spin, double * y_spin, double * z_spin,
+      __global__ void update_non_exchange_spin_fields_kernel (
             int * material, material_parameters_t * material_params,
-            double * x_sp_field, double * y_sp_field, double * z_sp_field,
+            cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
+            cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
             int num_atoms
             );
 
-      __global__ void update_external_fields (
-            int * material, int * cell,
+      __global__ void update_external_fields_kernel (
+            int * material,
             material_parameters_t * material_params,
-            double * x_dip_field, double * y_dip_field, double * z_dip_field,
-            double * x_ext_field, double * y_ext_field, double * z_ext_field,
+            cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+            cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
             curandState * rand_state,
+            cu_real_t global_temperature,
+            cu_real_t Hx, cu_real_t Hy, cu_real_t Hz,
             int num_atoms
             );
 
       __global__ void update_cell_magnetization (
-            double * x_spin, double * y_spin, double * z_spin,
+            cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
             int * material, int * cell,
             material_parameters_t * material_params,
-            double * x_mag, double * y_mag, double * z_mag,
+            cu_real_t*  x_mag, cu_real_t * y_mag, cu_real_t * z_mag,
             int num_atoms
             );
 
       __global__ void update_dipolar_fields (
-            double * x_mag, double * y_mag, double * z_mag,
-            double * x_coord, double * y_coord, double * z_coord,
-            double * volume,
-            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            cu_real_t * x_mag, cu_real_t * y_mag, cu_real_t * z_mag,
+            cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
+            cu_real_t * volume,
+            cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
             int n_cells
             );
 
       __global__ void update_atomistic_dipolar_fields (
-            double * x_cell_field, double * y_cell_field, double * z_cell_field,
-            double * x_dip_field, double * y_dip_field, double * z_dip_field,
+            cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
+            cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
             int * cells, int n_atoms
             );
 

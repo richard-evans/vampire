@@ -13,6 +13,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 
+#include "typedefs.hpp"
 /*
  * Provide the definition for the material_t class
  */
@@ -27,15 +28,6 @@ namespace vcuda
 #ifdef CUDA
    namespace internal
    {
-      typedef thrust::device_vector<double> RealArray;
-      typedef thrust::device_vector<int> IndexArray;
-      typedef thrust::device_vector<cu::material_parameters_t> MaterialParametersArray;
-
-      // new type definitions (need to be selectable at compile time)
-      typedef double cu_real_t;
-      typedef thrust::device_vector<double> cu_real_array_t;
-      typedef thrust::device_vector<int> cu_index_array_t;
-      typedef thrust::device_vector<cu::material_parameters_t> cu_material_array_t;
 
       namespace atoms
       {
@@ -92,7 +84,7 @@ namespace vcuda
 
       namespace mp
       {
-         extern MaterialParametersArray materials;
+         extern cu_material_array_t materials;
       } /* mp */
 
 

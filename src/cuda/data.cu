@@ -27,57 +27,57 @@ namespace vcuda{
          /*
           * Thrust array instantiation
           */
-         RealArray x_spin_array(0UL);
-         RealArray y_spin_array(0UL);
-         RealArray z_spin_array(0UL);
-         RealArray x_coord_array(0UL);
-         RealArray y_coord_array(0UL);
-         RealArray z_coord_array(0UL);
-         IndexArray type_array(0UL);
-         IndexArray cell_array(0UL);
-         IndexArray limits(0UL);
-         IndexArray neighbours(0UL);
+         cu_real_array_t x_spin_array(0UL);
+         cu_real_array_t y_spin_array(0UL);
+         cu_real_array_t z_spin_array(0UL);
+         cu_real_array_t x_coord_array(0UL);
+         cu_real_array_t y_coord_array(0UL);
+         cu_real_array_t z_coord_array(0UL);
+         cu_index_array_t type_array(0UL);
+         cu_index_array_t cell_array(0UL);
+         cu_index_array_t limits(0UL);
+         cu_index_array_t neighbours(0UL);
 
-         RealArray spin_norm_array(0UL);
+         cu_real_array_t spin_norm_array(0UL);
 
       } /* atoms */
 
       namespace exchange
       {
-         RealArray Jxx_vals_d(0UL);
-         RealArray Jyy_vals_d(0UL);
-         RealArray Jzz_vals_d(0UL);
+         cu_real_array_t Jxx_vals_d(0UL);
+         cu_real_array_t Jyy_vals_d(0UL);
+         cu_real_array_t Jzz_vals_d(0UL);
       }
 
       namespace cells
       {
-         RealArray x_coord_array(0UL);
-         RealArray y_coord_array(0UL);
-         RealArray z_coord_array(0UL);
-         RealArray x_mag_array(0UL);
-         RealArray y_mag_array(0UL);
-         RealArray z_mag_array(0UL);
-         RealArray x_field_array(0UL);
-         RealArray y_field_array(0UL);
-         RealArray z_field_array(0UL);
-         RealArray volume_array(0UL);
-         IndexArray num_atoms(0UL);
+         cu_real_array_t x_coord_array(0UL);
+         cu_real_array_t y_coord_array(0UL);
+         cu_real_array_t z_coord_array(0UL);
+         cu_real_array_t x_mag_array(0UL);
+         cu_real_array_t y_mag_array(0UL);
+         cu_real_array_t z_mag_array(0UL);
+         cu_real_array_t x_field_array(0UL);
+         cu_real_array_t y_field_array(0UL);
+         cu_real_array_t z_field_array(0UL);
+         cu_real_array_t volume_array(0UL);
+         cu_index_array_t num_atoms(0UL);
       } /* cells */
 
       namespace mp
       {
-         MaterialParametersArray materials(0UL);
+         cu_material_array_t materials(0UL);
       } /* mp */
 
-      RealArray x_total_spin_field_array(0UL);
-      RealArray y_total_spin_field_array(0UL);
-      RealArray z_total_spin_field_array(0UL);
-      RealArray x_total_external_field_array(0UL);
-      RealArray y_total_external_field_array(0UL);
-      RealArray z_total_external_field_array(0UL);
-      RealArray x_dipolar_field_array(0UL);
-      RealArray y_dipolar_field_array(0UL);
-      RealArray z_dipolar_field_array(0UL);
+      cu_real_array_t x_total_spin_field_array(0UL);
+      cu_real_array_t y_total_spin_field_array(0UL);
+      cu_real_array_t z_total_spin_field_array(0UL);
+      cu_real_array_t x_total_external_field_array(0UL);
+      cu_real_array_t y_total_external_field_array(0UL);
+      cu_real_array_t z_total_external_field_array(0UL);
+      cu_real_array_t x_dipolar_field_array(0UL);
+      cu_real_array_t y_dipolar_field_array(0UL);
+      cu_real_array_t z_dipolar_field_array(0UL);
 
       curandState * d_rand_state;
 
@@ -85,18 +85,18 @@ namespace vcuda{
       {
          long counter(0L);
 
-         IndexArray system_mask(0UL);
-         RealArray  system_magnetization(0UL);
-         RealArray  system_mean_magnetization(0UL);
-         IndexArray material_mask(0UL);
-         RealArray  material_magnetization(0UL);
-         RealArray  material_mean_magnetization(0UL);
-         IndexArray height_mask(0UL);
-         RealArray  height_magnetization(0UL);
-         RealArray  height_mean_magnetization(0UL);
-         IndexArray material_height_mask(0UL);
-         RealArray  material_height_magnetization(0UL);
-         RealArray  material_height_mean_magnetization(0UL);
+         cu_index_array_t system_mask(0UL);
+         cu_real_array_t  system_magnetization(0UL);
+         cu_real_array_t  system_mean_magnetization(0UL);
+         cu_index_array_t material_mask(0UL);
+         cu_real_array_t  material_magnetization(0UL);
+         cu_real_array_t  material_mean_magnetization(0UL);
+         cu_index_array_t height_mask(0UL);
+         cu_real_array_t  height_magnetization(0UL);
+         cu_real_array_t  height_mean_magnetization(0UL);
+         cu_index_array_t material_height_mask(0UL);
+         cu_real_array_t  material_height_magnetization(0UL);
+         cu_real_array_t  material_height_mean_magnetization(0UL);
       } /* stats */
 
    } // end of internal namespace

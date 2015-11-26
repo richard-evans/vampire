@@ -15,10 +15,12 @@ CUDA_OBJECTS= \
 	     obj/cuda/data.o \
 	     obj/cuda/internal.o \
 	     obj/cuda/initialize.o \
-	     obj/cuda/fields.o \
+	     obj/cuda/spin_fields.o \
+        obj/cuda/external_fields.o \
+        obj/cuda/dipole.o \
 	     obj/cuda/llg_heun.o \
 	     obj/cuda/finalize.o \
-		 obj/cuda/exchange_fields.o \
+	     obj/cuda/exchange_fields.o \
 	     obj/cuda/statistics.o
 
 # The device linked object for CUDA

@@ -1,11 +1,11 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2015. All rights reserved.
+// (c) O Arbelaez Echeverri, M A Ellis & R F L Evans 2015. All rights reserved.
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 // C++ standard library headers
 
@@ -78,7 +78,7 @@ namespace vcuda{
          cu::cells::volume_array.cu_real_array_t::~device_vector ();
          cu::cells::num_atoms.cu_index_array_t::~device_vector ();
 
-         cu::mp::materials.MaterialParametersArray::~device_vector ();
+         cu::mp::materials.cu_material_array_t::~device_vector ();
 
          cu::x_total_spin_field_array.cu_real_array_t::~device_vector ();
          cu::y_total_spin_field_array.cu_real_array_t::~device_vector ();

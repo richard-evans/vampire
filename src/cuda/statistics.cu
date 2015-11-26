@@ -121,26 +121,26 @@ namespace vcuda{
 
 
          void __update_stat (
-               const IndexArray & mask,
-               RealArray & stat,
-               RealArray & mean_stat
+               const cu_index_array_t & mask,
+               cu_real_array_t & stat,
+               cu_real_array_t & mean_stat
                )
          {
 
             const int * d_mask = thrust::raw_pointer_cast (
                   mask.data());
-            double * d_stat = thrust::raw_pointer_cast (
+            cu_real_t * d_stat = thrust::raw_pointer_cast (
                   stat.data());
-            double * d_accu = thrust::raw_pointer_cast (
+            cu_real_t * d_accu = thrust::raw_pointer_cast (
                   mean_stat.data());
 
-            double * d_x_spin = thrust::raw_pointer_cast(
+            cu_real_t * d_x_spin = thrust::raw_pointer_cast(
                   cu::atoms::x_spin_array.data());
-            double * d_y_spin = thrust::raw_pointer_cast(
+            cu_real_t * d_y_spin = thrust::raw_pointer_cast(
                   cu::atoms::y_spin_array.data());
-            double * d_z_spin = thrust::raw_pointer_cast(
+            cu_real_t * d_z_spin = thrust::raw_pointer_cast(
                   cu::atoms::z_spin_array.data());
-            double * d_spin_norm = thrust::raw_pointer_cast(
+            cu_real_t * d_spin_norm = thrust::raw_pointer_cast(
                   cu::atoms::spin_norm_array.data());
 
             int n_bins = stat.size ();
@@ -151,7 +151,7 @@ namespace vcuda{
 
                 // Use the shared memory implementation
 
-               int n_bytes = 4 * stat.size() * sizeof(RealArray::value_type);
+               int n_bytes = 4 * stat.size() * sizeof(cu_real_array_t::value_type);
                hist_by_key_small_mask <<< cu::grid_size, cu::block_size, n_bytes >>> (
                      d_x_spin,
                      d_y_spin,
@@ -197,8 +197,8 @@ namespace vcuda{
 
 
          void __get_stat (
-               const RealArray& stat,
-               const RealArray& mean_stat,
+               const cu_real_array_t& stat,
+               const cu_real_array_t& mean_stat,
                ::stats::magnetization_statistic_t& local_stat
                )
          {
@@ -207,8 +207,8 @@ namespace vcuda{
              * Copy to local arrays
              */
 
-            thrust::host_vector<double> h_stat(stat.size());
-            thrust::host_vector<double> h_mean_stat(mean_stat.size());
+            thrust::host_vector<cu_real_t> h_stat(stat.size());
+            thrust::host_vector<cu_real_t> h_mean_stat(mean_stat.size());
 
             thrust::copy(stat.begin(), stat.end(), h_stat.begin());
             thrust::copy(mean_stat.begin(), mean_stat.end(), h_mean_stat.begin());
@@ -217,8 +217,8 @@ namespace vcuda{
              * Call the method in the magnetization_statistic_t instance
              */
 
-            std::vector<double> stl_stat (h_stat.begin(), h_stat.end());
-            std::vector<double> stl_mean_stat (h_mean_stat.begin(), h_mean_stat.end());
+            std::vector<cu_real_t> stl_stat (h_stat.begin(), h_stat.end());
+            std::vector<cu_real_t> stl_mean_stat (h_mean_stat.begin(), h_mean_stat.end());
 
             local_stat.set_magnetization (
                   stl_stat,
@@ -230,8 +230,8 @@ namespace vcuda{
 
 
          void __reset_stat (
-               RealArray& stat,
-               RealArray& mean_stat
+               cu_real_array_t& stat,
+               cu_real_array_t& mean_stat
                )
          {
             thrust::fill(
@@ -247,17 +247,17 @@ namespace vcuda{
 
 
          __global__ void hist_by_key_small_mask (
-               const double * __restrict__ x_spin,
-               const double * __restrict__ y_spin,
-               const double * __restrict__ z_spin,
-               const double * __restrict__ norm_spin,
+               const cu_real_t * __restrict__ x_spin,
+               const cu_real_t * __restrict__ y_spin,
+               const cu_real_t * __restrict__ z_spin,
+               const cu_real_t * __restrict__ norm_spin,
                const int * __restrict__ mask,
-               double * hist,
+               cu_real_t * hist,
                int n_bins,
                int n_atoms
                )
          {
-            extern __shared__ double block_hist[];
+            extern __shared__ cu_real_t block_hist[];
 
             for (int i = threadIdx.x; i < 4 * n_bins; i += blockDim.x)
             {
@@ -277,7 +277,7 @@ namespace vcuda{
                 * Store stuff in the shared memory
                 */
                int bin = mask[i];
-               double mu_s = norm_spin[i];
+               cu_real_t mu_s = norm_spin[i];
                cu::atomicAdd (block_hist + 4 * bin + 0, x_spin[i] * mu_s);
                cu::atomicAdd (block_hist + 4 * bin + 1, y_spin[i] * mu_s);
                cu::atomicAdd (block_hist + 4 * bin + 2, z_spin[i] * mu_s);
@@ -301,12 +301,12 @@ namespace vcuda{
 
 
          __global__ void hist_by_key_big_mask (
-               const double * __restrict__ x_spin,
-               const double * __restrict__ y_spin,
-               const double * __restrict__ z_spin,
-               const double * __restrict__ norm_spin,
+               const cu_real_t * __restrict__ x_spin,
+               const cu_real_t * __restrict__ y_spin,
+               const cu_real_t * __restrict__ z_spin,
+               const cu_real_t * __restrict__ norm_spin,
                const int * __restrict__ mask,
-               double * hist,
+               cu_real_t * hist,
                int n_bins,
                int n_atoms
                )
@@ -320,7 +320,7 @@ namespace vcuda{
                 // Store stuff in the main memory
 
                int bin = mask[i];
-               double mu_s = norm_spin[i];
+               cu_real_t mu_s = norm_spin[i];
                cu::atomicAdd (hist + 4 * bin + 0, x_spin[i] * mu_s);
                cu::atomicAdd (hist + 4 * bin + 1, y_spin[i] * mu_s);
                cu::atomicAdd (hist + 4 * bin + 2, z_spin[i] * mu_s);
@@ -330,8 +330,8 @@ namespace vcuda{
 
 
          __global__ void update_norm_and_accum (
-               double * hist,
-               double * accum,
+               cu_real_t * hist,
+               cu_real_t * accum,
                int n_bins
                )
          {
@@ -340,12 +340,12 @@ namespace vcuda{
                   i < n_bins;
                   i += blockDim.x * gridDim.x)
             {
-               double mx = hist[4 * i + 0];
-               double my = hist[4 * i + 1];
-               double mz = hist[4 * i + 2];
-               double ms = hist[4 * i + 3];
+               cu_real_t mx = hist[4 * i + 0];
+               cu_real_t my = hist[4 * i + 1];
+               cu_real_t mz = hist[4 * i + 2];
+               cu_real_t ms = hist[4 * i + 3];
 
-               double mm = sqrtf (
+               cu_real_t mm = sqrtf (
                      mx * mx +
                      my * my +
                      mz * mz
