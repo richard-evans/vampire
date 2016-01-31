@@ -749,10 +749,16 @@ int match(string const key, string const word, string const value, string const 
 
 	std::string test;
 
+   //-------------------------------------------------------------------
+	// Call module input parameters
+   //-------------------------------------------------------------------
+   if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+	else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
 	//===================================================================
-	test="create";
+	else
+   test="create";
 	if(key==test){
 		int frs=vin::match_create(word, value, unit, line);
 		return frs;
@@ -811,10 +817,6 @@ int match(string const key, string const word, string const value, string const 
 		int frs=vin::match_config(word, value, line);
 		return frs;
 	}
-   //-------------------------------------------------------------------
-	// Test for localised temperature pulse
-   //-------------------------------------------------------------------
-   else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//-------------------------------------------------------------------
 	// Get material filename
 	//-------------------------------------------------------------------
@@ -3851,6 +3853,11 @@ int match_material(string const word, string const value, string const unit, int
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
+      //-------------------------------------------------------------------
+   	// Call module input parameters
+      //-------------------------------------------------------------------
+      else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
