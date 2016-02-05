@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -66,9 +66,13 @@ namespace vout{
 
    bool output_atoms_config=false;
    int output_atoms_config_rate=1000;
+
 ////   int output_atoms_file_counter=0;
 //   int output_atoms_file_counter=sim::output_atoms_file_counter;
-   int output_rate_counter=0;
+
+   //output_rate_counter_defined globally => not to be redifined here!!
+   //int output_rate_counter=0;
+   int output_rate_counter_coords=0;
 
    double atoms_output_min[3]={0.0,0.0,0.0};
    double atoms_output_max[3]={1.0,1.0,1.0};
@@ -81,7 +85,7 @@ namespace vout{
 
    bool output_cells_config=false;
    int output_cells_config_rate=1000;
-   int output_cells_file_counter=0;
+//   int output_cells_file_counter=0; //Redefined globally in sim.cpp
 
    bool output_grains_config=false;
    int output_config_grain_rate=1000;
@@ -120,49 +124,52 @@ void config(){
    if(err::check==true){std::cout << "vout::config has been called" << std::endl;}
 
    // atoms output
-   if((vout::output_atoms_config==true) && (vout::output_rate_counter%output_atoms_config_rate==0)){
+   if((vout::output_atoms_config==true) && (sim::output_rate_counter%output_atoms_config_rate==0)){
      if(sim::program!=2){
-      if(sim::output_atoms_file_counter==0) vout::atoms_coords();
+      if(vout::output_rate_counter_coords==0) vout::atoms_coords();
       vout::atoms();
      }
      else if(sim::program=2){
       if((sim::H_applied>=minField_1) && (sim::H_applied<=maxField_1)){
-        if(sim::output_atoms_file_counter==0) vout::atoms_coords();
+//        if(sim::output_atoms_file_counter>=0) vout::atoms_coords();
+        if(vout::output_rate_counter_coords==0) vout::atoms_coords();
         vout::atoms();
       }
       else if((sim::H_applied>=minField_2) && (sim::H_applied<=maxField_2)){
-        if(sim::output_atoms_file_counter==0) vout::atoms_coords();
+//        if(sim::output_atoms_file_counter>=0) vout::atoms_coords();
+        if(vout::output_rate_counter_coords==0) vout::atoms_coords();
         vout::atoms();
       }
      }
    }
 
    // cells output
-   if((vout::output_cells_config==true) && (vout::output_rate_counter%output_cells_config_rate==0)){
-//     if(!program::hysteresis()){ 
+   if((vout::output_cells_config==true) && (sim::output_rate_counter%output_cells_config_rate==0)){
+//     if(!program::hysteresis()){
      if(sim::program!=2){
-      if(sim::output_atoms_file_counter==0) vout::cells_coords();
+      if(sim::output_cells_file_counter==0) vout::cells_coords();
       vout::cells();
      }
      else if(sim::program=2){
       if((sim::H_applied>=minField_1) && (sim::H_applied<=maxField_1)){
-        if(sim::output_atoms_file_counter==0) vout::cells_coords();
+        if(sim::output_cells_file_counter==0) vout::cells_coords();
         vout::cells();
       }
       else if((sim::H_applied>=minField_2) && (sim::H_applied<=maxField_2)){
-        if(sim::output_atoms_file_counter==0) vout::cells_coords();
+        if(sim::output_cells_file_counter==0) vout::cells_coords();
         vout::cells();
       }
      }
    }
 
    // increment rate counter
-   vout::output_rate_counter++;
+   vout::output_rate_counter_coords++;
+   sim::output_rate_counter++;
 
 }
 /// @brief Atomistic output function
 ///
-/// @details Outputs formatted data snapshot for visualisation  
+/// @details Outputs formatted data snapshot for visualisation
 ///
 ///	#------------------------------------------------------
 ///	# Atomistic spin configuration file for vampire
@@ -280,7 +287,7 @@ void config(){
 
 /// @brief Atomistic output function
 ///
-/// @details Outputs formatted data snapshot for visualisation  
+/// @details Outputs formatted data snapshot for visualisation
 ///
 ///	//------------------------------------------------------
 ///	// Atomistic coordinate configuration file for vampire
@@ -406,7 +413,7 @@ void config(){
       cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
       for(int i=0; i<vout::local_output_atom_list.size(); i++){
          const int atom = vout::local_output_atom_list[i];
-         cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" << 
+         cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" <<
          atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
          if(sim::identify_surface_atoms==true && atoms::surface_array[atom]==true) cfg_file_ofstr << "O " << std::endl;
          else cfg_file_ofstr << mp::material[atoms::type_array[atom]].element << std::endl;
@@ -459,7 +466,7 @@ void cells(){
    // Set local output filename
    std::stringstream file_sstr;
    file_sstr << "cells-";
-   file_sstr << std::setfill('0') << std::setw(8) << output_cells_file_counter;
+   file_sstr << std::setfill('0') << std::setw(8) << sim::output_cells_file_counter;
    file_sstr << ".cfg";
    std::string cfg_file = file_sstr.str();
    const char* cfg_filec = cfg_file.c_str();
@@ -481,7 +488,7 @@ void cells(){
    // Output masterfile header on root process
    if(vmpi::my_rank==0){
 
-      zlog << zTs() << "Outputting cell configuration " << output_cells_file_counter << " to disk." << std::endl;
+      zlog << zTs() << "Outputting cell configuration " << sim::output_cells_file_counter << " to disk." << std::endl;
 
       // Declare and open output file
       std::ofstream cfg_file_ofstr;
@@ -515,7 +522,7 @@ void cells(){
 
    }
 
-   output_cells_file_counter++;
+   sim::output_cells_file_counter++;
 
    return;
 

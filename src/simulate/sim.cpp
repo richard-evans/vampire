@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -64,11 +64,14 @@ namespace sim{
 	int partial_time=1000;
 	uint64_t equilibration_time=0;
 	int runs=1; /// for certain repetitions in programs
+    //Global definition of some parameters in order to store them in chekcpoint files
 	int64_t parity=-1;
-        uint64_t output_atoms_file_counter=0;
-	
+    uint64_t output_atoms_file_counter=0;
+    uint64_t output_cells_file_counter=0;
+    uint64_t output_rate_counter=0;
+
 	bool ext_demag=false;
-	
+
 	double Tmax=300.0;
 	double Tmin=0.0;
 	double Teq=300.0;
@@ -83,11 +86,11 @@ namespace sim{
 	double applied_field_angle_phi=0.0;
 	double applied_field_angle_theta=0.0;
 	bool applied_field_set_by_angle=false;
-	
+
 	double H=Hmax; // T
 	int64_t iH=1; // uT
 //	uint64_t iH=-1*vmath::iround(double(Hmax)*1.0E6); // uT
-        
+
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
 	double head_speed=30.0; /// nm/ns
@@ -104,7 +107,7 @@ namespace sim{
 	double constraint_theta_min=0.0; /// loop angle min [degrees]
 	double constraint_theta_max=0.0; // loop angle max [degrees]
 	double constraint_theta_delta=5.0; /// loop angle delta [degrees]
-	
+
 	// LaGrange multiplier variables
 	double lagrange_lambda_x=0.0;
    double lagrange_lambda_y=0.0;
@@ -128,16 +131,16 @@ namespace sim{
 	double TTG = 6.6E17 ;///electron coupling constant
 	double TTTe = 0.0; /// electron temperature
 	double TTTp = 0.0; /// phonon temperature
-  
+
    double mc_delta_angle=0.1; /// Tuned angle for Monte Carlo trial move
    mc_algorithms mc_algorithm=hinzke_nowak;
-  
+
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-	int integrator=0; /// 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC 
-	int program=0; 
+	int integrator=0; /// 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC
+	int program=0;
 	int AnisotropyType=2; /// Controls scalar (0) or tensor(1) anisotropy (off(2))
-	
+
 	bool surface_anisotropy=false; /// flag to enable surface anisotropy
 	bool identify_surface_atoms=false; /// flag to idenify surface atoms in config coordinate file
 	unsigned int surface_anisotropy_threshold=123456789; /// global threshold for surface atoms
@@ -184,20 +187,20 @@ namespace sim{
 /// @date    09/03/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		02/10/2008
 ///	Revision:	1.1 09/03/2011
 ///=====================================================================================
 ///
 	void increment_time(){
-		
+
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
 		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
 	}
-	
+
 /// @brief Function to run one a single program
 ///
 /// @callgraph
@@ -213,7 +216,7 @@ namespace sim{
 /// @date    09/03/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		02/10/2008
 ///	Revision:	1.1 09/03/2011
@@ -274,7 +277,7 @@ int run(){
 			}
 			program::bmark();
 			break;
-		
+
 		case 1:
 			if(vmpi::my_rank==0){
 				std::cout << "Time-Series..." << std::endl;
@@ -282,23 +285,23 @@ int run(){
 			}
 			program::time_series();
 			break;
-		
-		case 2: 
+
+		case 2:
 			if(vmpi::my_rank==0){
 				std::cout << "Hysteresis-Loop..." << std::endl;
 				zlog << "Hysteresis-Loop..." << std::endl;
 			}
 			program::hysteresis();
 			break;
-			
-		case 3: 
+
+		case 3:
 			if(vmpi::my_rank==0){
 				std::cout << "Static-Hysteresis-Loop..." << std::endl;
 				zlog << "Static-Hysteresis-Loop..." << std::endl;
 			}
 			program::static_hysteresis();
 			break;
-			
+
 		case 4:
 			if(vmpi::my_rank==0){
 				std::cout << "Curie-Temperature..." << std::endl;
@@ -306,7 +309,7 @@ int run(){
 			}
 			program::curie_temperature();
 			break;
-			
+
 		case 5:
 			if(vmpi::my_rank==0){
 				std::cout << "Field-Cool..." << std::endl;
@@ -322,7 +325,7 @@ int run(){
 			}
 			program::temperature_pulse();
 			break;
-			
+
 		case 7:
 			if(vmpi::my_rank==0){
 				std::cout << "HAMR-Simulation..." << std::endl;
@@ -330,7 +333,7 @@ int run(){
 			}
 			program::hamr();
 			break;
-			
+
 		case 8:
 			if(vmpi::my_rank==0){
 				std::cout << "CMC-Anisotropy..." << std::endl;
@@ -338,7 +341,7 @@ int run(){
 			}
 			program::cmc_anisotropy();
 			break;
-			
+
 		case 9:
 			if(vmpi::my_rank==0){
 				std::cout << "Hybrid-CMC..." << std::endl;
@@ -346,7 +349,7 @@ int run(){
 			}
 			program::hybrid_cmc();
 			break;
-			
+
       case 10:
          if(vmpi::my_rank==0){
             std::cout << "Reverse-Hybrid-CMC..." << std::endl;
@@ -394,7 +397,7 @@ int run(){
 			}
 			program::boltzmann_dist();
 			break;
-		
+
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
@@ -444,7 +447,7 @@ int run(){
 /// @callgraph
 /// @callergraph
 ///
-/// @details Calls serial or parallel integrator 
+/// @details Calls serial or parallel integrator
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -456,24 +459,24 @@ int run(){
 /// @date    05/02/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		05/02/2011
 ///	Revision:	  ---
 ///=====================================================================================
 ///
 int integrate(int n_steps){
-	
+
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate has been called" << std::endl;
-	
+
 	// Call serial or parallell depending at compile time
 	#ifdef MPICF
 		sim::integrate_mpi(n_steps);
-	#else 
+	#else
 		sim::integrate_serial(n_steps);
 	#endif
-	
+
 	// return
 	return EXIT_SUCCESS;
 }
@@ -483,7 +486,7 @@ int integrate(int n_steps){
 /// @callgraph
 /// @callergraph
 ///
-/// @details Calls serial integrators based on sim::integrator 
+/// @details Calls serial integrators based on sim::integrator
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -517,7 +520,7 @@ void integrate_serial(int n_steps){
             increment_time();
          }
          break;
-		
+
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
 				sim::MonteCarlo();
@@ -549,13 +552,13 @@ void integrate_serial(int n_steps){
 				increment_time();
 			}
 			break;
-		
+
 		default:{
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
          err::vexit();
 		}
 	}
-	
+
    return;
 }
 
@@ -564,7 +567,7 @@ void integrate_serial(int n_steps){
 /// @callgraph
 /// @callergraph
 ///
-/// @details Calls parallel integrators based on sim::integrator 
+/// @details Calls parallel integrators based on sim::integrator
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -576,17 +579,17 @@ void integrate_serial(int n_steps){
 /// @date    07/03/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		07/03/2011
 ///	Revision:	  ---
 ///=====================================================================================
 ///
 int integrate_mpi(int n_steps){
-	
+
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate_mpi has been called" << std::endl;
-	
+
 	// Case statement to call integrator
 	switch(sim::integrator){
 		case 0: // LLG Heun
@@ -603,7 +606,7 @@ int integrate_mpi(int n_steps){
 				increment_time();
 			}
 			break;
-		
+
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
 				terminaltextcolor(RED);
@@ -614,7 +617,7 @@ int integrate_mpi(int n_steps){
 				increment_time();
 			}
 			break;
-		
+
 		case 2: // LLG Midpoint
 			for(int ti=0;ti<n_steps;ti++){
 			#ifdef MPICF
@@ -629,7 +632,7 @@ int integrate_mpi(int n_steps){
 				increment_time();
 			}
 			break;
-			
+
 		case 3: // Constrained Monte Carlo
 			for(int ti=0;ti<n_steps;ti++){
 				terminaltextcolor(RED);
@@ -640,7 +643,7 @@ int integrate_mpi(int n_steps){
 				increment_time();
 			}
 			break;
-			
+
 		default:{
 			terminaltextcolor(RED);
 			std::cerr << "Unknown integrator type "<< sim::integrator << " requested, exiting" << std::endl;
@@ -648,7 +651,7 @@ int integrate_mpi(int n_steps){
 			exit (EXIT_FAILURE);
 			}
 	}
-	
+
 	return EXIT_SUCCESS;
 }
 

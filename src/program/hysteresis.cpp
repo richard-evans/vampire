@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ namespace program{
 /// @callgraph
 /// @callergraph
 ///
-/// @details Consists of a sequence of sub-calculations of fixed temperature. The system is initialised 
+/// @details Consists of a sequence of sub-calculations of fixed temperature. The system is initialised
 /// ordered. After initialisation a whole hysteresis loop of the system and coercivity are calculated.
 ///
 /// @section License
@@ -73,21 +73,21 @@ namespace program{
 /// @date    27/01/2010
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		27/01/2010
 ///	Revision:	  ---
 ///=====================================================================================
 ///
 int hysteresis(){
-	
+
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::hysteresis has been called" << std::endl;}
-	
+
 	// Setup min and max fields and increment (uT)
 	int iHmax=vmath::iround(double(sim::Hmax)*1.0E6);
 	int iHmin=vmath::iround(double(sim::Hmin)*1.0E6);
-	int miHmax=-iHmax;       
+	int miHmax=-iHmax;
 	int parity_old;
 	int iH_old;
 	int start_time;
@@ -95,10 +95,10 @@ int hysteresis(){
 	// Equilibrate system in saturation field
 	sim::H_applied=sim::Heq;
 	// Initialise sim::integrate only if it not a checkpoint
-	if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){ 
+	if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
 	}
 	else sim::integrate(sim::equilibration_time);
-	
+
         // Hinc must be positive
 	int iHinc=vmath::iround(double(fabs(sim::Hinc))*1.0E6);
 
@@ -118,6 +118,8 @@ int hysteresis(){
 	while(iparity<2){
 
 		if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
+            //necessary to upload value of iH_old when loading the checkpoint !!!
+		    iH_old=int(sim::iH);
 			if(parity_old<0){
 				if(iparity<0){
 //					if(iH_old<=0) miHmax=iH_old+iHinc;
@@ -125,7 +127,7 @@ int hysteresis(){
 					miHmax=iH_old;
 //					miHmax=iH_old+iHinc;
 				}
-				else if(iparity>0 && iH_old<=0) miHmax=(iHmax-iHinc);
+				else if(iparity>0 && iH_old<=0) miHmax=iH_old; //miHmax=(iHmax-iHinc);
 //				else if(iparity>0 && iH_old>0) miHmax=-iHmax; //iH_old;
 				else if(iparity>0 && iH_old>0) miHmax=-(iHmax);
 			}
@@ -139,16 +141,18 @@ int hysteresis(){
 		}
 		else	Hfield=miHmax;
 
+//        std::cout << iparity << "\t" << Hfield << std::endl;
+
 		// Perform Field Loop -field
 		while(Hfield<=iHmax){
-			
+
 			// Set applied field (Tesla)
 			sim::H_applied=double(Hfield)*double(iparity)*1.0e-6;
-//			sim::H_applied=double(sim::iH)*double(sim::parity)*1.0e-6;
-			
+//			sim::H_applied=double(sim::iH)*double(iparity)*1.0e-6;
+
 			// Reset start time
 			start_time=sim::time;
-			
+
 			// Reset mean magnetisation counters
 			stats::mag_m_reset();
 
@@ -157,7 +161,7 @@ int hysteresis(){
 
 				// Integrate system
 				sim::integrate(sim::partial_time);
-			
+
 				// Calculate mag_m, mag
 				stats::mag_m();
 
@@ -173,16 +177,16 @@ int hysteresis(){
 //			std::cout << iparity << "\t" << Hfield << "\t" << sim::parity << "\t" << sim::iH << "\t" << iHmax << "\t" << iHinc << "\t" << sim::time << "\t" << start_time << "\t" << sim::partial_time << "\t" << sim::loop_time << std::endl;
 
 		} // End of field loop
-                
+
 		// Increment of parity
                 iparity+=2;
                 sim::parity=int64_t(iparity);
 //                sim::parity+=2;
 
-//        std::cout << iparity << "\t" << Hfield << "\t" << sim::parity << "\t" << sim::iH << "\t" << iHmin << "\t" << iHmax << "\t" << sim::Hmin << "\t" << sim::Hmax << "\t" <<std::endl<<std::endl; 
+//        std::cout << iparity << "\t" << Hfield << "\t" << sim::parity << "\t" << sim::iH << "\t" << iHmin << "\t" << iHmax << "\t" << sim::Hmin << "\t" << sim::Hmax << "\t" <<std::endl<<std::endl;
 	} // End of parity loop
 
-//        std::cout << iparity << "\t" << Hfield << "\t" << sim::parity << "\t" << sim::iH << "\t" << iHmin << "\t" << iHmax << "\t" << sim::Hmin << "\t" << sim::Hmax << "\t" <<std::endl<<std::endl; 
+//        std::cout << iparity << "\t" << Hfield << "\t" << sim::parity << "\t" << sim::iH << "\t" << iHmin << "\t" << iHmax << "\t" << sim::Hmin << "\t" << sim::Hmax << "\t" <<std::endl<<std::endl;
 
 
 	return EXIT_SUCCESS;

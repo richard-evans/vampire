@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -44,9 +44,11 @@ namespace sim{
 	extern int runs;
 	extern int64_t parity;
 	extern uint64_t output_atoms_file_counter;
-	
+	extern uint64_t output_cells_file_counter;
+	extern uint64_t output_rate_counter;
+
 	extern bool ext_demag;
-		
+
 	extern double Tmax;
 	extern double Tmin;
 	extern double Teq;
@@ -62,11 +64,11 @@ namespace sim{
 	extern double applied_field_angle_theta;
 	extern bool applied_field_set_by_angle;
 
-        extern int64_t iH; 
+        extern int64_t iH;
         extern double H; // T
-	
+
 	extern double demag_factor[3];
-	
+
 	extern double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
 	extern double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
 
@@ -92,7 +94,7 @@ namespace sim{
 	extern double head_position[2];
 	extern double head_speed;
 	extern bool   head_laser_on;
-	
+
 	extern double cooling_time;
 	extern int cooling_function_flag;
 	extern pump_functions_t pump_function;
@@ -108,20 +110,20 @@ namespace sim{
 	extern double TTG;  ///electron coupling constant
 	extern double TTTe; /// electron temperature
 	extern double TTTp; /// phonon temperature
-	
+
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
-	
+
 	extern int integrator;
 	extern int program;
 	extern int AnisotropyType;
-	
+
 	extern bool surface_anisotropy;
 	extern bool identify_surface_atoms;
 	extern unsigned int surface_anisotropy_threshold;
 	extern bool NativeSurfaceAnisotropyThreshold;
    extern double nearest_neighbour_distance;
-	
+
 	// Anisotropy control booleans
 	extern bool UniaxialScalarAnisotropy; /// Enables scalar uniaxial anisotropy
 	extern bool TensorAnisotropy; /// Overrides vector uniaxial anisotropy (even slower)
@@ -148,12 +150,12 @@ namespace sim{
 	extern int run();
 	extern int initialise();
 	extern int integrate(int);
-	
+
 	// Legacy integrators
 	extern int LLB(int);
 	extern int LLG(int);
 	extern int LLG_relax(int);
-	
+
 	// New Integrators
 	extern int LLG_Heun();
 	extern int LLG_Heun_mpi();
@@ -203,7 +205,7 @@ namespace sim{
 }
 
 namespace cmc{
-	
+
 	class cmc_material_t {
 	public:
 
@@ -216,15 +218,15 @@ namespace cmc{
 		double constraint_theta_min; /// loop angle min [degrees]
 		double constraint_theta_max; /// loop angle max [degrees]
 		double constraint_theta_delta; /// loop angle delta [degrees]
-		
+
 		// performance optimised rotational matrices
 		double ppolar_vector[3];
 		double ppolar_matrix[3][3];
 		double ppolar_matrix_tp[3][3];
-		
+
 		// vector magnetisation
 		double M_other[3];
-		
+
 	cmc_material_t():
 		constraint_phi(0.0),
 		constraint_phi_min(0.0),
@@ -234,22 +236,22 @@ namespace cmc{
 		constraint_theta_min(0.0),
 		constraint_theta_max(0.0),
 		constraint_theta_delta(5.0)
-	
+
 	{
 
 	//for(int i=0;i<100;i++){
 	//	geometry_coords[i][0]=0.0;
 	//	geometry_coords[i][1]=0.0;
-	//}	
+	//}
 }
 	};
-	
+
 	extern std::vector<cmc_material_t> cmc_mat;
-	
+
 	extern bool is_initialised;
-	
+
 	extern int active_material; /// material in current hybrid loop
-	
+
 	extern std::vector<std::vector< int > > atom_list;
 	extern double mc_success;
 	extern double mc_total;
