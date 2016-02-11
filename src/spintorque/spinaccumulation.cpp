@@ -272,8 +272,8 @@ namespace st{
                const double prefac_sc = microcell_volume * st::internal::sd_exchange[cell] * i_e * i_muB;
                const double plus_perp =  (pm_b2*pm_b2 + pm_b3*pm_b3);
                const double minus_perp = (pm_b2*pm_b2 - pm_b3*pm_b3);
-	       double a_constant;
-               double b_constant;
+	            double a_constant; // the ST parameter describing Slonczewski torque
+               double b_constant; // the ST parameter describing filed-like torque
 
 
                 if( ( plus_perp <= 1.0e-7 ) ){
