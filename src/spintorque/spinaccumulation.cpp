@@ -272,22 +272,22 @@ namespace st{
                const double prefac_sc = microcell_volume * st::internal::sd_exchange[cell] * i_e * i_muB;
                const double plus_perp =  (pm_b2*pm_b2 + pm_b3*pm_b3);
                const double minus_perp = (pm_b2*pm_b2 - pm_b3*pm_b3);
-	            double a_constant; // the ST parameter describing Slonczewski torque
-               double b_constant; // the ST parameter describing filed-like torque
+	        double aj; // the ST parameter describing Slonczewski torque
+               double bj; // the ST parameter describing field-like torque
 
 
                 if( ( plus_perp <= 1.0e-7 ) ){
-                    a_constant = 0.0;
-                    b_constant = 0.0; }
+                    aj = 0.0;
+                    bj = 0.0; }
 
                 else{
-                    a_constant  = prefac_sc*(sa_perp2*pm_b3 - sa_perp3*pm_b2)/plus_perp;
-                    b_constant  = prefac_sc*(sa_perp2*pm_b2 + sa_perp3*pm_b3)/plus_perp;
+                    aj  = prefac_sc*(sa_perp2*pm_b3 - sa_perp3*pm_b2)/plus_perp;
+                    bj  = prefac_sc*(sa_perp2*pm_b2 + sa_perp3*pm_b3)/plus_perp;
                 }
 
                 double SxSp[3], SxSxSp[3];
-                st::internal::coeff_ast[cell]  = a_constant;
-                st::internal::coeff_nast[cell] = b_constant;
+                st::internal::coeff_ast[cell]  = aj;
+                st::internal::coeff_nast[cell] = bj;
 
                 SxSp[0]=(m.y*pm.z-m.z*pm.y);
                 SxSp[1]=(m.z*pm.x-m.x*pm.z);
