@@ -3885,7 +3885,7 @@ int match_material(string const word, string const value, string const unit, int
 		}
 
 	return EXIT_SUCCESS;
->>>>>>> develop
+
 }
 
 
