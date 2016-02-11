@@ -23,13 +23,14 @@ namespace ltmp{
       // Local variables for writing temperature data
       //-----------------------------------------------------------------------------
       std::ofstream vertical_temperature_file;
+      std::ofstream lateral_temperature_file;
       int temperature_profile_output_counter;
 
       //-----------------------------------------------------------------------------
       // Function declarations
       //-----------------------------------------------------------------------------
       void write_vertical_temperature_data();
-      //void write_lateral_temperature_data(); // To be implemeneted
+      void write_lateral_temperature_data();
       //void write_lateral_vertical_temperature_data(); // To be implemeneted
 
 
@@ -72,6 +73,18 @@ namespace ltmp{
       }
 
       //-----------------------------------------------------------------------------
+      // Function to open output file for lateral temperature profile
+      //-----------------------------------------------------------------------------
+      void open_lateral_temperature_profile_file(){
+
+         temperature_profile_output_counter = 0;
+         lateral_temperature_file.open("lateral_temperature_profile.dat");
+
+         return;
+
+      }
+
+      //-----------------------------------------------------------------------------
       // Wrapper function to determine microcell temperature writing function
       //-----------------------------------------------------------------------------
       void write_cell_temperature_data(){
@@ -81,7 +94,10 @@ namespace ltmp{
 
          if(!lateral_discretisation && vertical_discretisation) ltmp::internal::write_vertical_temperature_data();
          //if(lateral_discretisation && vertical_discretisation) ltmp::internal::write_lateral_vertical_temperature_data;
-         //if(lateral_discretisation && !vertical_discretisation) ltmp::internal::write_lateral_temperature_data;
+         if(lateral_discretisation && !vertical_discretisation) ltmp::internal::write_lateral_temperature_data();
+
+         // increment counter
+         temperature_profile_output_counter++;
 
          return;
 
@@ -89,7 +105,7 @@ namespace ltmp{
 
       //-----------------------------------------------------------------------------
       // Function to write vertical temperature profile to file
-      //-----------------------------------------------------------------------------      
+      //-----------------------------------------------------------------------------
       void write_vertical_temperature_data(){
 
          using ltmp::internal::root_temperature_array;
@@ -104,8 +120,26 @@ namespace ltmp{
             vertical_temperature_file << std::endl;
          }
 
-         // increment counter
-         temperature_profile_output_counter++;
+         return;
+
+      }
+
+      //-----------------------------------------------------------------------------
+      // Function to write lateral temperature profile to file
+      //-----------------------------------------------------------------------------
+      void write_lateral_temperature_data(){
+
+         using ltmp::internal::root_temperature_array;
+
+         // only output on root process
+         if(vmpi::my_rank==0){
+            lateral_temperature_file << temperature_profile_output_counter << "\t";
+            for(int cell=0; cell<root_temperature_array.size()/2; ++cell){
+               lateral_temperature_file << root_temperature_array[2*cell+0]*root_temperature_array[2*cell+0] << "\t"; //Te
+               lateral_temperature_file << root_temperature_array[2*cell+1]*root_temperature_array[2*cell+1] << "\t"; // Tp
+            }
+            lateral_temperature_file << std::endl;
+         }
 
          return;
 

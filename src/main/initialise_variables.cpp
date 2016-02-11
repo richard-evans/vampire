@@ -72,6 +72,7 @@ namespace mp{
 	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
    std::vector <double> material_second_order_anisotropy_constant_array(0);
    std::vector <double> material_sixth_order_anisotropy_constant_array(0);
+   std::vector <double> material_spherical_harmonic_constants_array(0);
 	std::vector <double> MaterialCubicAnisotropyArray(0);
 
 ///
@@ -420,6 +421,38 @@ int set_derived_parameters(){
 		}
 	}*/
 	const string blank="";
+
+   // Check for symmetry of exchange matrix
+   for(int mi = 0; mi < mp::num_materials; mi++){
+
+      for(int mj = 0; mj < mp::num_materials; mj++){
+
+         // Check for non-zero value (avoids divide by zero)
+         if(fabs(material[mi].Jij_matrix_SI[mj]) > 0.0){
+
+            // Calculate ratio of i->j / j-> exchange constants
+            double ratio = material[mj].Jij_matrix_SI[mi]/material[mi].Jij_matrix_SI[mj];
+
+            // Check that ratio ~ 1.0 for symmetric exchange interactions
+            if( (ratio < 0.99999) || (ratio > 1.00001) ){
+
+               // Error found - report to user and terminate program
+               terminaltextcolor(RED);
+                  std::cerr << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << ". Exiting" << std::endl;
+               terminaltextcolor(WHITE);
+
+               zlog << zTs() << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << std::endl;
+               zlog << zTs() << "\tmaterial[" << mi+1 << "]:exchange-matrix[" << mj+1 << "] = " << material[mi].Jij_matrix_SI[mj] << std::endl;
+               zlog << zTs() << "\tmaterial[" << mj+1 << "]:exchange-matrix[" << mi+1 << "] = " << material[mj].Jij_matrix_SI[mi] << std::endl;
+               zlog << zTs() << "\tThe definition of Heisenberg exchange requires that these values are the same. Exiting." << std::endl;
+
+               err::vexit();
+
+            }
+         }
+      }
+   }
+
 	// Set derived material parameters
 	for(int mat=0;mat<mp::num_materials;mat++){
 		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
@@ -532,6 +565,16 @@ int set_derived_parameters(){
          zlog << zTs() << "Setting scalar sixth order uniaxial anisotropy." << std::endl;
          mp::material_sixth_order_anisotropy_constant_array.resize(mp::num_materials);
          for(int mat=0;mat<mp::num_materials; mat++) mp::material_sixth_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku3;
+      }
+      // Unroll spherical harmonic anisotropy constants for speed
+      if(sim::spherical_harmonics==true){
+         zlog << zTs() << "Setting spherical harmonics for uniaxial anisotropy" << std::endl;
+         mp::material_spherical_harmonic_constants_array.resize(3*mp::num_materials);
+         for(int mat=0; mat<mp::num_materials; mat++){
+            mp::material_spherical_harmonic_constants_array.at(3*mat+0)=mp::material[mat].sh2/mp::material[mat].mu_s_SI;
+            mp::material_spherical_harmonic_constants_array.at(3*mat+1)=mp::material[mat].sh4/mp::material[mat].mu_s_SI;
+            mp::material_spherical_harmonic_constants_array.at(3*mat+2)=mp::material[mat].sh6/mp::material[mat].mu_s_SI;
+         }
       }
       // Unroll cubic anisotropy values for speed
 		if(sim::CubicScalarAnisotropy==true){

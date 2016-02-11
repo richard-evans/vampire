@@ -114,6 +114,9 @@ using std::string;
 		double Ku; /// normalised uniaxial anisotropy constant
       double Ku2; /// normalised uniaxial anisotropy constant
       double Ku3; /// normalised uniaxial anisotropy constant
+      double sh2; // second order spherical harmonic anisotropy constant
+      double sh4; // fourth order spherical harmonic anisotropy constant
+      double sh6; // sixth order spherical harmonic anisotropy constant
       double Klatt; /// normalised lattice anisotropy
       std::vector<double> KuVec; /// normalised anisotropy tensor
 		std::vector<double> UniaxialAnisotropyUnitVector; /// unit vector for material uniaxial anisotropy
@@ -163,6 +166,8 @@ using std::string;
 		bool fill; /// flag to determine of material fills voided space
       double temperature_rescaling_alpha; // temperature rescaling exponent
       double temperature_rescaling_Tc; // temperaure rescaling Tc
+		bool random_anisotropy; // flag to control random anisotropy by material
+		bool random_grain_anisotropy; // flag to control random anisotropy by grain
      lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
 		
 		materials_t();
@@ -184,6 +189,7 @@ using std::string;
 	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
    extern std::vector <double> material_second_order_anisotropy_constant_array;
    extern std::vector <double> material_sixth_order_anisotropy_constant_array;
+   extern std::vector <double> material_spherical_harmonic_constants_array;
 	extern std::vector <double> MaterialCubicAnisotropyArray;
 
 	

@@ -34,7 +34,8 @@
 
 namespace grains{
 
-	int num_grains=1; // always assume 1 grain 
+	int num_grains=1; // always assume 1 grain
+	bool random_anisotropy = false; // flag to control randomly oriented uniaxial anisotropy
 
 	std::vector <int> grain_size_array(0);
 

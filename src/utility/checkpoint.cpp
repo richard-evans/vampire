@@ -68,7 +68,7 @@ void save_checkpoint(){
    // close checkpoint file
    chkfile.close();
 
-   // log writing checkpoint file 
+   // log writing checkpoint file
    zlog << zTs() << "Checkpoint file written to disk." << std::endl;
 
    return;
@@ -141,10 +141,9 @@ void load_checkpoint(){
    // close checkpoint file
    chkfile.close();
 
-   // log reading checkpoint file 
+   // log reading checkpoint file
    zlog << zTs() << "Checkpoint file loaded at sim::time " << sim::time << "." << std::endl;
 
    return;
 
 }
-

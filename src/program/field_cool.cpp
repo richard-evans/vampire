@@ -103,34 +103,38 @@ void field_cool(){
 		// Perform Field Cooling
 		while(sim::time<sim::total_time+start_time){
 
-			// Calculate Temperature using desired cooling function
-			double time_from_start=mp::dt_SI*double(sim::time-start_time);
-			switch(sim::cooling_function_flag){
-				case 0:{ // exponential
-					sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-time_from_start/sim::cooling_time);
-				}
-				break;
-				case 1:{ // gaussian
-					sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-(time_from_start)*(time_from_start)/((sim::cooling_time)*(sim::cooling_time)));
-				}
-				break;
-				case 2:{ // double-gaussian
-					double centre_time = 3.0*sim::cooling_time;
-					double time_from_centre=mp::dt_SI*double(sim::time-start_time)-centre_time;
-					sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-(time_from_centre)*(time_from_centre)/((sim::cooling_time)*(sim::cooling_time)));
-				}
-				break;
-				case 3:{ // linear
-					double Tlinear = sim::Tmax-(sim::Tmax-sim::Tmin)*(time_from_start/sim::cooling_time);
-					if(Tlinear>=sim::Tmin) sim::temperature = Tlinear;
-					else sim::temperature= sim::Tmin;
-				}
-				break;
-			}
-			
-			// Integrate system
-			sim::integrate(sim::partial_time);
-			
+         // loop over partial time
+         for(int tt=0; tt < sim::partial_time; tt++){
+
+            // Calculate Temperature using desired cooling function
+            double time_from_start=mp::dt_SI*double(sim::time-start_time);
+            switch(sim::cooling_function_flag){
+               case 0:{ // exponential
+                  sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-time_from_start/sim::cooling_time);
+               }
+               break;
+               case 1:{ // gaussian
+                  sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-(time_from_start)*(time_from_start)/((sim::cooling_time)*(sim::cooling_time)));
+               }
+               break;
+               case 2:{ // double-gaussian
+                  double centre_time = 3.0*sim::cooling_time;
+                  double time_from_centre=mp::dt_SI*double(sim::time-start_time)-centre_time;
+                  sim::temperature = sim::Tmin + (sim::Tmax-sim::Tmin)*exp(-(time_from_centre)*(time_from_centre)/((sim::cooling_time)*(sim::cooling_time)));
+               }
+               break;
+               case 3:{ // linear
+                  double Tlinear = sim::Tmax-(sim::Tmax-sim::Tmin)*(time_from_start/sim::cooling_time);
+                  if(Tlinear>=sim::Tmin) sim::temperature = Tlinear;
+                  else sim::temperature= sim::Tmin;
+               }
+               break;
+            }
+
+            // Integrate system
+            sim::integrate(1);
+         }
+
 			// Calculate magnetisation statistics
 			stats::mag_m();
 

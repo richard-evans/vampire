@@ -1,0 +1,29 @@
+#================================================
+# Generated material file for input into vampire
+#================================================
+#
+# File timestamp: 
+#
+#------------------------------------------------
+# Number of Materials
+#------------------------------------------------
+material:num-materials=2
+#------------------------------------------------
+# Material 1 (RE)
+#------------------------------------------------
+material[1]:material-name=RE
+material[1]:damping-constant=0.1
+material[1]:atomic-spin-moment=7.63 !muB
+material[1]:uniaxial-anisotropy-constant=-8.07246e-24
+material[1]:material-element=Ag
+material[1]:initial-spin-direction=0,0,-1
+#------------------------------------------------
+# Material 2 (TM)
+#------------------------------------------------
+material[2]:material-name=TM
+material[2]:damping-constant=0.1
+material[2]:atomic-spin-moment=1.92 !muB
+material[2]:uniaxial-anisotropy-constant=-8.07246e-24
+material[2]:material-element=Fe
+material[2]:initial-spin-direction=0,0,1
+#------------------------------------------------

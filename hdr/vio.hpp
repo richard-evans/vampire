@@ -89,7 +89,6 @@ namespace vin{
 
    extern std::vector<double> DoublesFromString(std::string value);
 
-
 }
 
 namespace vout{
