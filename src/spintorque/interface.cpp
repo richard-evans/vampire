@@ -18,6 +18,8 @@
 #include "spintorque.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "sim.hpp"
+
 
 // Spin Torque headers
 #include "internal.hpp"
@@ -115,10 +117,128 @@ int match_material(string const word, string const value, string const unit, int
 }
 
 
-//spin-torque:current-direction = x/y/z
-//spin-torque:micro-cell-size
-//spin-torque:micro-cell-thickness
-//spin-torque:current-density*/
+
+
+   //-----------------------------------------------------------------------------
+   // Function to process input file parameters for ST module
+   //-----------------------------------------------------------------------------
+   bool match_input_parameter(string const key, string const word, string const value, string const unit, int const line){
+
+      // Check for valid key, if no match return false
+      std::string prefix="spin-torque";
+
+
+      if(key!=prefix) return false;
+
+      //----------------------(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;------------
+      // Now test for all valid options
+      //----------------------------------
+
+      std::string test="enable-ST-fields";
+
+       if(word==test){
+         st::internal::enabled = true;
+         return true;
+       }
+
+       //-------------------------------------------------
+
+      test="current-density";
+       if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e13,"input","0.0 - 1.0e13 A/m2");
+         st::internal::je =T;
+         return true;
+        }
+
+      //-------------------------------------------------
+
+       test="current-direction";
+        if(word==test){
+         std::string je_dir="x";
+             if(value==je_dir){
+                st::internal::current_direction=0;
+                return true;
+             }
+             else
+               je_dir ="y";
+             if(value==je_dir){
+              st::internal::current_direction=1;
+              return true;
+            }
+            else{
+              st::internal::current_direction=2;
+              return true;
+            }
+        }
+
+      //-------------------------------------------------
+
+       test="micro-cell-size";
+       if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 20,"input","0.0 - 20 A");
+         st::internal::micro_cell_size =T;
+         return true;
+        }
+
+      //-------------------------------------------------
+
+      test="micro-cell-thickness";
+       if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 20,"input","0.0 - 20 A");
+         st::internal::micro_cell_thickness =T;
+         return true;
+        }
+
+     //-------------------------------------------------
+
+       test="initial-spin-polarisation";
+       if(word==test){
+         double T=atof(value.c_str());
+         vin::check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 20,"input","0.0 - 20 A");
+         st::internal::initial_beta =T;
+         return true;
+        }
+
+    //--------------------------------------------------------------------
+      test="initial-mag-direction";
+      if(word==test){
+      std::vector<double> u(3);
+      u=vin::DoublesFromString(value);
+      vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+      st::internal::initial_m[0]=u.at(0);
+      st::internal::initial_m[1]=u.at(1);
+      st::internal::initial_m[2]=u.at(2);
+      return true;
+   }
+
+      //-------------------------------------------------
+
+       test="ST-output-rate";
+       if(word==test){
+         int T=atoi(value.c_str());
+         vin::check_for_valid_int(T, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         st::internal::ST_output_rate =T;
+         return true;
+        }
+
+
+
+      //--------------------------------------------------------------------
+      // input parameter not found here
+      return false;
+   }
+
+
+
+
+
+
+
+
+
 
 
 } // end of namespace st

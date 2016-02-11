@@ -20,18 +20,20 @@ namespace st{
       //-----------------------------------------------------------------------------
       // Shared variables used for the spin torque calculation
       //-----------------------------------------------------------------------------
-      bool enabled=true; //false; // enable spin torque calculation
+      bool enabled=false; //false; // enable spin torque calculation
 
-      double micro_cell_size = 5*3.54; /// lateral size of spin torque microcells
-      double micro_cell_thickness = 3.54; /// thickness of spin torque microcells (atomistic)
+      double micro_cell_size; // = 5*3.00; /// lateral size of spin torque microcells
+      double micro_cell_thickness; // = 3.00; /// thickness of spin torque microcells (atomistic)
 
       int num_local_atoms; /// number of local atoms (ignores halo atoms in parallel simulation)
-      int current_direction=2; /// direction for current x->0, y->1, z->2
+      int current_direction; //=2; /// direction for current x->0, y->1, z->2
       //   std::vector< std::vector< micro_cell_t > > stack;
       std::vector<int> atom_st_index; // mc which atom belongs to
       std::vector<double> x_field_array; // arrays to store atomic spin torque field
       std::vector<double> y_field_array;
       std::vector<double> z_field_array;
+
+
 
       int num_stacks;  // total number of stacks
       int num_x_stacks; // number of stacks in x
@@ -40,7 +42,10 @@ namespace st{
 
       int config_file_counter = 0; // spin torque config file counter
 
-      double je = 1.0e11; // current (C/s/m^2)
+      double je; // = 1.0e11; // current (C/s/m^2)
+      double initial_beta;
+      int ST_output_rate;
+      std::vector<double> initial_m(3);
 
       std::vector<int> stack_index; // start of stack in microcell arrays
 
@@ -53,6 +58,12 @@ namespace st{
       std::vector<double> a; // a parameter for spin accumulation
       std::vector<double> b; // b parameter for spin accumulation
 
+      std::vector<double> coeff_ast; // adiabatic spin torque
+      std::vector<double> coeff_nast; // non-adiabatic spin torque
+      std::vector<double> cell_natom;
+      std::vector<double> cell_mus;
+
+
       // three-vector arrays
       std::vector<double> pos; /// stack position
       std::vector<double> m; // magnetisation
@@ -61,6 +72,7 @@ namespace st{
       std::vector<double> spin_torque; // spin torque energy (J)
       std::vector<double> ast; // adiabatic spin torque
       std::vector<double> nast; // non-adiabatic spin torque
+      std::vector<double> total_ST; // non-adiabatic spin torque
 
       // array of material properties
       std::vector<st::internal::mp_t> mp;

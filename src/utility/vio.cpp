@@ -812,6 +812,7 @@ int match(string const key, string const word, string const value, string const 
    //-------------------------------------------------------------------
 	// Test for localised temperature pulse
    //-------------------------------------------------------------------
+   else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//-------------------------------------------------------------------
 	// Get material filename
