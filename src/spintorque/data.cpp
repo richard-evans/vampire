@@ -20,13 +20,13 @@ namespace st{
       //-----------------------------------------------------------------------------
       // Shared variables used for the spin torque calculation
       //-----------------------------------------------------------------------------
-      bool enabled=false; //false; // enable spin torque calculation
+      bool enabled=false;  // disable spin torque calculation
 
-      double micro_cell_size; // = 5*3.00; /// lateral size of spin torque microcells
-      double micro_cell_thickness; // = 3.00; /// thickness of spin torque microcells (atomistic)
+      double micro_cell_size= 5*3.00; /// lateral size of spin torque microcells
+      double micro_cell_thickness = 3.00; /// thickness of spin torque microcells (atomistic)
 
       int num_local_atoms; /// number of local atoms (ignores halo atoms in parallel simulation)
-      int current_direction; //=2; /// direction for current x->0, y->1, z->2
+      int current_direction =2; /// direction for current x->0, y->1, z->2
       //   std::vector< std::vector< micro_cell_t > > stack;
       std::vector<int> atom_st_index; // mc which atom belongs to
       std::vector<double> x_field_array; // arrays to store atomic spin torque field
