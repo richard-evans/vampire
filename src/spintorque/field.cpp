@@ -19,6 +19,7 @@
 
 namespace st{
 
+
    //-----------------------------------------------------------------------------
    // Function for updating spin torque fields
    //-----------------------------------------------------------------------------
@@ -27,6 +28,9 @@ namespace st{
                                   const std::vector<double>& z_spin_array,
                                   const std::vector<int>& atom_type_array,
                                   const std::vector<double>& mu_s_array){
+       
+      if(st::internal::enabled==false) return;
+
 
       // update magnetisations
       st::internal::update_cell_magnetisation(x_spin_array, y_spin_array, z_spin_array, atom_type_array, mu_s_array);
@@ -57,6 +61,9 @@ namespace st{
                                std::vector<double>& z_total_external_field_array,
                                const int start_index,
                                const int end_index){
+     
+      if(st::internal::enabled==false) return;
+
 
       // Add spin torque fields
       for(int i=start_index; i<end_index; ++i) x_total_external_field_array[i] += st::internal::x_field_array[i];
