@@ -46,7 +46,8 @@ void initialise(const double system_dimensions_x,
    //-------------------------------------------------------------------------------------
    // Check for spin torque calculation enabled, if not do nothing
    //-------------------------------------------------------------------------------------
-   if(!st::internal::enabled) return;
+   //if(!st::internal::enabled) return;
+    if(st::internal::enabled==false) return;
 
    // output informative message
    zlog << zTs() << "Initialising data structures for spin torque calculation." << std::endl;
