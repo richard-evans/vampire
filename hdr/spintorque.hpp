@@ -88,7 +88,7 @@ namespace st{
    //-----------------------------------------------------------------------------
    // Function for matching spin torque material parameters
    //-----------------------------------------------------------------------------
-   int match_material(std::string const word, std::string const value, std::string const unit, int const line, int const super_index);
+   bool match_material(std::string const word, std::string const value, std::string const unit, int const line, int const super_index);
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
 
 
