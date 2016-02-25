@@ -302,13 +302,13 @@ namespace st{
                 st::internal::total_ST[celly] = prefac_sc*(m.z*sax-m.x*saz);
                 st::internal::total_ST[cellz] = prefac_sc*(m.x*say-m.y*sax);
 
-                st::internal::ast[cellx] = -a_constant*SxSxSp[0];
-                st::internal::ast[celly] = -a_constant*SxSxSp[1];
-                st::internal::ast[cellz] = -a_constant*SxSxSp[2];
+                st::internal::ast[cellx] = -aj*SxSxSp[0];
+                st::internal::ast[celly] = -aj*SxSxSp[1];
+                st::internal::ast[cellz] = -aj*SxSxSp[2];
 
-                st::internal::nast[cellx] = b_constant*SxSp[0];
-                st::internal::nast[celly] = b_constant*SxSp[1];
-                st::internal::nast[cellz] = b_constant*SxSp[2];
+                st::internal::nast[cellx] = bj*SxSp[0];
+                st::internal::nast[celly] = bj*SxSp[1];
+                st::internal::nast[cellz] = bj*SxSp[2];
 
 
 
