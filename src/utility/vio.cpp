@@ -825,6 +825,8 @@ int match(string const key, string const word, string const value, string const 
    else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
+
+
 	//-------------------------------------------------------------------
 	// Get material filename
 	//-------------------------------------------------------------------
@@ -2952,8 +2954,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
 			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
-         // check for spin torque material parameters
-         if(matchcheck==EXIT_FAILURE) matchcheck = st::match_material(word, value, unit, line_counter, super_index-1);
+
          // if no match then return error
 			if(matchcheck==EXIT_FAILURE){
             terminaltextcolor(RED);
@@ -3873,7 +3874,7 @@ int match_material(string const word, string const value, string const unit, int
    	// Call module input parameters
       //-------------------------------------------------------------------
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
-
+      else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
