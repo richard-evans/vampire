@@ -28,6 +28,15 @@
 //
 //======================================================================
 
+// C++ standard library headers
+#include <string>
+#include <iostream>
+#include <cmath>
+#include <cstdlib>
+#include <vector>
+#include <list>
+
+// Vampire headers
 #include "errors.hpp"
 #include "create.hpp"
 #include "grains.hpp"
@@ -36,12 +45,8 @@
 #include "vio.hpp"
 #include "vmath.hpp"
 
-#include <string>
-#include <iostream>
-#include <cmath>
-#include <cstdlib>
-#include <vector>
-#include <list>
+// Internal create header
+#include "internal.hpp"
 
 namespace cs{
 
@@ -51,7 +56,6 @@ namespace cs{
    int particle(std::vector<cs::catom_t> &);
    int particle_array(std::vector<cs::catom_t> &);
 
-   int alloy(std::vector<cs::catom_t> &);
    int intermixing(std::vector<cs::catom_t> &);
    void dilute(std::vector<cs::catom_t> &);
    void geometry(std::vector<cs::catom_t> &);
@@ -121,7 +125,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		//roughness(catom_array);
 
 		// call alloy function
-		alloy(catom_array);
+		create::internal::alloy(catom_array);
 
 		// call dilution function
 		dilute(catom_array);
@@ -546,46 +550,6 @@ int sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array){
 
 	// copy list to data
 	copy(catom_list.begin(), catom_list.end(), catom_array.begin());
-
-	return EXIT_SUCCESS;
-}
-
-int alloy(std::vector<cs::catom_t> & catom_array){
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::alloy has been called" << std::endl;}
-
-	// loop over all atoms
-	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		// if atom material is alloy master then reassign according to % chance
-		int local_material=catom_array[atom].material;
-		if(mp::material[local_material].alloy_master==true){
-		  // now check for unordered alloy
-			if(mp::material[local_material].alloy_class==-1){
-				//loop over all potential alloy materials
-				for(int mat=0;mat<mp::num_materials;mat++){
-					double probability = mp::material[local_material].alloy[mat];
-					if(mtrandom::grnd() < probability){
-						catom_array[atom].material=mat;
-					}
-				}
-			}
-			// if not ordered, then assume ordered
-			else{
-				// loop over all alloy materials
-				for(int mat=0;mat<mp::num_materials;mat++){
-					// get class of alloy material
-					int alloy_class = mp::material[mat].alloy_class;
-					// check for matching class and uc
-					// ----- DOES NOT WORK for > 1 alloy!!
-					// need to check for correct alloy master material ------------
-					if(catom_array[atom].uc_category==alloy_class){
-						// set material
-						catom_array[atom].material=mat;
-					}
-				}
-			}
-		}
-	}
 
 	return EXIT_SUCCESS;
 }

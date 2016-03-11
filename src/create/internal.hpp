@@ -15,6 +15,12 @@
 // not be accessed outside of the create module.
 //---------------------------------------------------------------------
 
+// transitional arrangement - need old create header for catom_t
+// Should eventually move class definition to this file
+#include "create.hpp"
+
+#include "mtrand.hpp"
+
 namespace create{
    namespace internal{
 
@@ -52,6 +58,10 @@ namespace create{
       };
 
       extern std::vector<create::internal::mp_t> mp; // array of material properties
+      extern MTRand grnd; // general random number generator for create functions
+
+      // Internal functions for create module
+      extern void alloy(std::vector<cs::catom_t> & catom_array);
 
    } // end of internal namespace
 } // end of create namespace

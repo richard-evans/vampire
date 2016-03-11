@@ -27,6 +27,7 @@ namespace create{
          // Shared variables used within create module
          //---------------------------------------------------------------------------
          std::vector<create::internal::mp_t> mp; // array of material properties
+         MTRand grnd; // general random number generator for create functions
 
       } // end of internal namespace
 
