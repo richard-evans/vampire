@@ -50,7 +50,7 @@ namespace create{
    //----------------------------------------------------------------------------------
    // material parameter match function
    //----------------------------------------------------------------------------------
-   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index){
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index){
 
       // add prefix string
       std::string prefix="material:";
@@ -59,25 +59,23 @@ namespace create{
       if((unsigned int) super_index + 1 > create::internal::mp.size() && super_index + 1 < 101) create::internal::mp.resize(super_index + 1);
 
       //------------------------------------------------------------
-      /*std::string test="slonczewski-adiabatic-spin-torque";
-      //   aj parameter for material in slonczewski torque calculation
+      std::string test="alloy-host"; // determines host material
       if(word==test){
-         double aj=atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
-         sim::internal::mp[super_index].slonczewski_aj.set(aj);
+         // if this keyword is set, then atoms of this type will be scanned for alloy materials
+         create::internal::mp[super_index].alloy_master=true;
          return true;
       }
-      //------------------------------------------------------------
-      test="slonczewski-non-adiabatic-spin-torque";
-      //   bj parameter for material in slonczewski torque calculation
+      //--------------------------------------------------------------------
+      else
+      test="alloy-fraction"; // determines %mixing for disordered alloys
       if(word==test){
-         double bj=atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
-         sim::internal::mp[super_index].slonczewski_bj.set(bj);
+         double af=atof(value.c_str());
+         vin::check_for_valid_value(af, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         std::cout << "setting alloy fraction " << super_index << "\t" << sub_index << "\t" << af << std::endl;
+         create::internal::mp[super_index].alloy_fraction[sub_index]=af;
          return true;
-      }*/
+      }
+
       //--------------------------------------------------------------------
       // keyword not found
       //--------------------------------------------------------------------

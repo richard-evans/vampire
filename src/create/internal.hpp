@@ -19,6 +19,8 @@
 // Should eventually move class definition to this file
 #include "create.hpp"
 
+// Vampire headers
+#include "material.hpp"
 #include "mtrand.hpp"
 
 namespace create{
@@ -27,34 +29,21 @@ namespace create{
       //-----------------------------------------------------------------------------
       // Internal shared variables used for creation
       //-----------------------------------------------------------------------------
-      // simple initialised class for set variables
-      class set_double_t{
+      // materials class for storing material parameters
+      class mp_t{
 
       private:
-         double value; // value
-         bool setf; // flag specifiying variable has been set
 
       public:
-         // class functions
+         // variables
+         bool alloy_master; // flag specifying if material is host material
+         std::vector<double> alloy_fraction;
          // constructor
-         set_double_t() : value(0.0), setf(false) { }
-
-         // setting function
-         void set(double in_value){
-            value = in_value;
-            setf = true;
-         };
-
-         // get value function
-         double get(){ return value; };
-         // check if variable is set
-         bool is_set(){ return setf; };
-
-      };
-
-      struct mp_t{
-         set_double_t slonczewski_aj; // adiabatic torque
-         set_double_t slonczewski_bj; // field torque (non-adiabatic)
+         mp_t ():
+         	alloy_master(false){
+               // resize array of alloy substitution fractions
+               alloy_fraction.resize(mp::max_materials,0.0);
+            };
       };
 
       extern std::vector<create::internal::mp_t> mp; // array of material properties

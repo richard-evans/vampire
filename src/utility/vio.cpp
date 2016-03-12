@@ -49,6 +49,7 @@
 // Headers
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "create.hpp"
 #include "demag.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
@@ -3347,53 +3348,6 @@ int match_material(string const word, string const value, string const unit, int
       }
       //--------------------------------------------------------------------
       else
-      test="alloy-host"; // determines host material
-      if(word==test){
-         read_material[super_index].alloy_master=true; // if this keyword is set, then atoms of this type will be scanned for alloy materials
-         return EXIT_SUCCESS;
-      }
-      //--------------------------------------------------------------------
-      else
-      test="alloy-class"; // determines unit cell category id for ordered alloys
-      if(word==test){
-         int ac=atoi(value.c_str());
-         // test for 'disordered'
-         std::string dis="disordered";
-         if(value==dis){
-            read_material[super_index].alloy_class=-1; // value for random alloy
-            return EXIT_SUCCESS;
-         }
-         // test for valid ordered alloy, value of -1 will be deprecated
-         if((ac<-1) || (ac > 3)){
-			terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:alloy-class is outside of valid range (0-3)" << std::endl;
-            terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-         }
-         else{
-            read_material[super_index].alloy_class=ac;
-            return EXIT_SUCCESS;
-         }
-      }
-      //--------------------------------------------------------------------
-      else
-      test="alloy-fraction"; // determines %mixing for disordered alloys
-      if(word==test){
-         double a=atof(value.c_str());
-         if((a < 0.0) || (a > 1.0)){
-			terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:alloy["<< sub_index+1 << "] is outside of valid range (0.0-1.0)" << std::endl;
-            terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-         }
-         else{
-            read_material[super_index].alloy[sub_index]=a;
-            return EXIT_SUCCESS;
-         }
-         //return EXIT_SUCCESS;
-      }
-      //--------------------------------------------------------------------
-      else
       test="minimum-height";
       if(word==test){
          double min=atof(value.c_str());
@@ -3857,6 +3811,7 @@ int match_material(string const word, string const value, string const unit, int
    	// Call module input parameters
       //-------------------------------------------------------------------
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+      else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
 		//--------------------------------------------------------------------
 		// keyword not found
