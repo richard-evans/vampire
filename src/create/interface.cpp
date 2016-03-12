@@ -63,6 +63,50 @@ namespace create{
       if(word==test){
          // if this keyword is set, then atoms of this type will be scanned for alloy materials
          create::internal::mp[super_index].alloy_master=true;
+         terminaltextcolor(YELLOW);
+         std::cout << "Warning: Keyword \'alloy-host\' is deprecated and may be removed in a future release. Please use \'host-alloy\' instead." << std::endl;
+         terminaltextcolor(WHITE);
+         zlog << zTs() << "Warning: Keyword \'alloy-host\' is deprecated and may be removed in a future release. Please use \'host-alloy\' instead." << std::endl;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="host-alloy"; // determines host material
+      if(word==test){
+         // if this keyword is set, then atoms of this type will be scanned for alloy materials
+         create::internal::mp[super_index].alloy_master=true;
+         // check for type of host alloy
+         test=""; // blank (assume homogeneous)
+         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::homogeneous;
+         else
+         test="homogeneous"; // default
+         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::homogeneous;
+         else
+         test="random"; // localised distribution
+         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::random;
+         else
+         test="granular"; // create distribution from intrinsic granular structure
+         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::granular;
+         else
+         test="checker-board"; // create distribution from intrinsic granular structure
+         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::checkerboard;
+         // otherwise throw an error
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'material[" << super_index << "]:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"homogeneous\"" << std::endl;
+            std::cerr << "\t\"random\"" << std::endl;
+            std::cerr << "\t\"granular\"" << std::endl;
+            std::cerr << "\t\"checker-board\"" << std::endl;
+            zlog << zTs() << "Error - value for \'material[" << super_index << "]:" << word << "\' must be one of:" << std::endl;
+            zlog << zTs() << "\t\"homogeneous\"" << std::endl;
+            zlog << zTs() << "\t\"random\"" << std::endl;
+            zlog << zTs() << "\t\"granular\"" << std::endl;
+            zlog << zTs() << "\t\"checker-board\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+
          return true;
       }
       //--------------------------------------------------------------------
@@ -71,10 +115,17 @@ namespace create{
       if(word==test){
          double af=atof(value.c_str());
          vin::check_for_valid_value(af, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-         std::cout << "setting alloy fraction " << super_index << "\t" << sub_index << "\t" << af << std::endl;
-         create::internal::mp[super_index].alloy_fraction[sub_index]=af;
+         create::internal::mp[super_index].slave_material[sub_index].fraction=af;
          return true;
       }
+
+/*material[1]:alloy-type[2] = native, reciprocal, homogeneous
+material[1]:alloy-variance[2] = 0,1 pm xx%
+material[1]:host-alloy = random, homogeneous, granular, checker-board
+material[1]:host-alloy-smoothness = sharp, standard, smooth, 0-1
+material[1]:host-alloy-scale = xx !nm
+material[1]:save-alloy-profile (= file.dat)*/
+
 
       //--------------------------------------------------------------------
       // keyword not found

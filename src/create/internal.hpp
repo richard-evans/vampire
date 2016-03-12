@@ -29,6 +29,25 @@ namespace create{
       //-----------------------------------------------------------------------------
       // Internal shared variables used for creation
       //-----------------------------------------------------------------------------
+
+      // alloy datatypes
+      enum host_alloy_t { homogeneous, random, granular, checkerboard };
+      enum slave_alloy_t { native, reciprocal, uniform };
+
+      class slave_material_t{
+
+      public:
+         double fraction;
+         double variance;
+         slave_alloy_t type;
+         // constructor
+         slave_material_t ():
+         	fraction(0.0),
+            variance(0.1),
+            type(native)
+            {};
+      };
+
       // materials class for storing material parameters
       class mp_t{
 
@@ -37,12 +56,13 @@ namespace create{
       public:
          // variables
          bool alloy_master; // flag specifying if material is host material
-         std::vector<double> alloy_fraction;
+         host_alloy_t host_alloy_type; // enum specifying type of alloy distribution
+         std::vector<slave_material_t> slave_material; // array of slave alloys for host
          // constructor
          mp_t ():
          	alloy_master(false){
-               // resize array of alloy substitution fractions
-               alloy_fraction.resize(mp::max_materials,0.0);
+               // resize array of slave materials
+               slave_material.resize(mp::max_materials);
             };
       };
 

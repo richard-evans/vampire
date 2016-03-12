@@ -28,7 +28,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 		if(create::internal::mp[local_material].alloy_master==true){
 			//loop over all potential alloy materials
 			for(int mat=0;mat<mp::num_materials;mat++){
-				double probability = create::internal::mp[local_material].alloy_fraction[mat];
+				double probability = create::internal::mp[local_material].slave_material[mat].fraction;
 				if(create::internal::grnd() < probability){
 					catom_array[atom].material=mat;
 				}
