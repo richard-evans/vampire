@@ -31,20 +31,20 @@ namespace create{
       //-----------------------------------------------------------------------------
 
       // alloy datatypes
-      enum host_alloy_t { homogeneous, random, granular, checkerboard };
-      enum slave_alloy_t { native, reciprocal, uniform };
+      enum host_alloy_d_t { homogeneous, random, granular, checkerboard };
+      enum slave_alloy_d_t { native, reciprocal, uniform };
 
       class slave_material_t{
 
       public:
          double fraction;
          double variance;
-         slave_alloy_t type;
+         slave_alloy_d_t slave_alloy_distribution;
          // constructor
          slave_material_t ():
          	fraction(0.0),
             variance(0.1),
-            type(native)
+            slave_alloy_distribution(native)
             {};
       };
 
@@ -56,11 +56,21 @@ namespace create{
       public:
          // variables
          bool alloy_master; // flag specifying if material is host material
-         host_alloy_t host_alloy_type; // enum specifying type of alloy distribution
+         double host_alloy_smoothness;
+         double host_alloy_scale;
+         bool save_host_alloy_profile;
+         std::string save_file_name;
+         host_alloy_d_t host_alloy_distribution; // enum specifying type of alloy distribution
          std::vector<slave_material_t> slave_material; // array of slave alloys for host
          // constructor
          mp_t ():
-         	alloy_master(false){
+         	alloy_master(false),
+            host_alloy_smoothness(2.0),
+            host_alloy_scale (50.0),
+            save_host_alloy_profile(false),
+            save_file_name(""),
+            host_alloy_distribution(internal::homogeneous)
+            {
                // resize array of slave materials
                slave_material.resize(mp::max_materials);
             };

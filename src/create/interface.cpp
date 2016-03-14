@@ -77,19 +77,19 @@ namespace create{
          create::internal::mp[super_index].alloy_master=true;
          // check for type of host alloy
          test=""; // blank (assume homogeneous)
-         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::homogeneous;
+         if(value==test) create::internal::mp[super_index].host_alloy_distribution = internal::homogeneous;
          else
          test="homogeneous"; // default
-         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::homogeneous;
+         if(value==test) create::internal::mp[super_index].host_alloy_distribution = internal::homogeneous;
          else
          test="random"; // localised distribution
-         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::random;
+         if(value==test) create::internal::mp[super_index].host_alloy_distribution = internal::random;
          else
          test="granular"; // create distribution from intrinsic granular structure
-         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::granular;
+         if(value==test) create::internal::mp[super_index].host_alloy_distribution = internal::granular;
          else
          test="checker-board"; // create distribution from intrinsic granular structure
-         if(value==test) create::internal::mp[super_index].host_alloy_type = internal::checkerboard;
+         if(value==test) create::internal::mp[super_index].host_alloy_distribution = internal::checkerboard;
          // otherwise throw an error
          else{
             terminaltextcolor(RED);
@@ -98,15 +98,68 @@ namespace create{
             std::cerr << "\t\"random\"" << std::endl;
             std::cerr << "\t\"granular\"" << std::endl;
             std::cerr << "\t\"checker-board\"" << std::endl;
+            terminaltextcolor(WHITE);
             zlog << zTs() << "Error - value for \'material[" << super_index << "]:" << word << "\' must be one of:" << std::endl;
             zlog << zTs() << "\t\"homogeneous\"" << std::endl;
             zlog << zTs() << "\t\"random\"" << std::endl;
             zlog << zTs() << "\t\"granular\"" << std::endl;
             zlog << zTs() << "\t\"checker-board\"" << std::endl;
-            terminaltextcolor(WHITE);
             err::vexit();
          }
 
+         return true;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="host-alloy-smoothness"; // determines host material
+      if(word==test){
+         // check for smoothness value of host alloy dispersion
+         test="standard"; // default
+         if(value==test) create::internal::mp[super_index].host_alloy_smoothness = 2.0;
+         else
+         test="sharp"; // default
+         if(value==test) create::internal::mp[super_index].host_alloy_smoothness = 1.0;
+         else
+         test="smooth"; // localised distribution
+         if(value==test) create::internal::mp[super_index].host_alloy_smoothness = 5.0;
+         else{
+            double s=atof(value.c_str());
+            vin::check_for_valid_value(s, word, line, prefix, unit, "none", 0.0, 10.0,"material"," 0.0 - 10.0");
+            create::internal::mp[super_index].host_alloy_smoothness = s;
+         }
+         // otherwise throw an error (need to check here for conversion of string to number)
+         /*else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'material[" << super_index << "]:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"standard\"" << std::endl;
+            std::cerr << "\t\"sharp\"" << std::endl;
+            std::cerr << "\t\"smooth\"" << std::endl;
+            std::cerr << "\t<value>" << std::endl;
+            zlog << zTs() << "Error - value for \'material[" << super_index << "]:" << word << "\' must be one of:" << std::endl;
+            zlog << zTs() << "\t\"standard\"" << std::endl;
+            zlog << zTs() << "\t\"sharp\"" << std::endl;
+            zlog << zTs() << "\t\"smooth\"" << std::endl;
+            zlog << zTs() << "\t\"<value>\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }*/
+         return true;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="host-alloy-scale"; // determines host material
+      if(word==test){
+         double s=atof(value.c_str());
+         vin::check_for_valid_value(s, word, line, prefix, unit, "length", 1, 10000.0,"material"," 0.1 - 1000 nm");
+         create::internal::mp[super_index].host_alloy_scale = s;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="save-host-alloy-distribution"; // saves alloy profile to file
+      if(word==test){
+         create::internal::mp[super_index].save_host_alloy_profile = true;
+         create::internal::mp[super_index].save_file_name = value;
          return true;
       }
       //--------------------------------------------------------------------
@@ -118,13 +171,50 @@ namespace create{
          create::internal::mp[super_index].slave_material[sub_index].fraction=af;
          return true;
       }
+      //--------------------------------------------------------------------
+      else
+      test="alloy-distribution"; // determines type of alloy distribution in slave
+      if(word==test){
+         // check for distribution adopted by slave material
+         test="native"; // (assumes that of host, default)
+         if(value==test) create::internal::mp[super_index].slave_material[sub_index].slave_alloy_distribution = internal::native;
+         else
+         test="reciprocal"; // (assumes inverse of that of host)
+         if(value==test) create::internal::mp[super_index].slave_material[sub_index].slave_alloy_distribution = internal::reciprocal;
+         else
+         test="homogeneous"; // (homogeneous distribution, ignores host distribution)
+         if(value==test) create::internal::mp[super_index].slave_material[sub_index].slave_alloy_distribution = internal::uniform;
+         // otherwise throw an error
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'material[" << super_index << "]:" << word << "[" << sub_index << "]\' must be one of:" << std::endl;
+            std::cerr << "\t\"native\"" << std::endl;
+            std::cerr << "\t\"reciprocal\"" << std::endl;
+            std::cerr << "\t\"homogeneous\"" << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error - value for \'material[" << super_index << "]:" << word << "[" << sub_index << "]\' must be one of:" << std::endl;
+            zlog << zTs() << "\t\"native\"" << std::endl;
+            zlog << zTs() << "\t\"reciprocal\"" << std::endl;
+            zlog << zTs() << "\t\"homogeneous\"" << std::endl;
+            err::vexit();
+         }
+         return true;
+      }
+      //--------------------------------------------------------------------
+      else
+      test="alloy-variance"; // determines range of alloy fraction in host
+      if(word==test){
+         // check for type of host alloy
+         double v=atof(value.c_str());
+         vin::check_for_valid_value(v, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         create::internal::mp[super_index].slave_material[sub_index].variance = v;
+         return true;
+      }
 
-/*material[1]:alloy-type[2] = native, reciprocal, homogeneous
-material[1]:alloy-variance[2] = 0,1 pm xx%
-material[1]:host-alloy = random, homogeneous, granular, checker-board
-material[1]:host-alloy-smoothness = sharp, standard, smooth, 0-1
-material[1]:host-alloy-scale = xx !nm
-material[1]:save-alloy-profile (= file.dat)*/
+
+
+
+
 
 
       //--------------------------------------------------------------------
