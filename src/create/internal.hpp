@@ -5,7 +5,7 @@
 // This header file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2014. All rights reserved.
+// (c) R F L Evans 2016. All rights reserved.
 //
 //-----------------------------------------------------------------------------
 
@@ -27,13 +27,14 @@ namespace create{
    namespace internal{
 
       //-----------------------------------------------------------------------------
-      // Internal shared variables used for creation
+      // Internal data type definitions
       //-----------------------------------------------------------------------------
 
       // alloy datatypes
-      enum host_alloy_d_t { homogeneous, random, granular, checkerboard };
+      enum host_alloy_d_t { homogeneous, random, granular };
       enum slave_alloy_d_t { native, reciprocal, uniform };
 
+      // simple class for slave material properties
       class slave_material_t{
 
       public:
@@ -48,7 +49,9 @@ namespace create{
             {};
       };
 
-      // materials class for storing material parameters
+      //-----------------------------------------------------------------------------
+      // materials class for storing create material parameters
+      //-----------------------------------------------------------------------------
       class mp_t{
 
       private:
@@ -76,10 +79,15 @@ namespace create{
             };
       };
 
+      //-----------------------------------------------------------------------------
+      // Internal shared variables used for creation
+      //-----------------------------------------------------------------------------
       extern std::vector<create::internal::mp_t> mp; // array of material properties
       extern MTRand grnd; // general random number generator for create functions
 
+      //-----------------------------------------------------------------------------
       // Internal functions for create module
+      //-----------------------------------------------------------------------------
       extern void alloy(std::vector<cs::catom_t> & catom_array);
 
    } // end of internal namespace
