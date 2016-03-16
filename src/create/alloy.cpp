@@ -87,9 +87,9 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 			// print informative message to log file
 			zlog << zTs() << "Saving alloy distribution for material " << hm+1 << " to " << filename << std::endl;
 
-			// open file
+			// open file (with annnoying c_str format for pre C++11 compatibility. Maybe we can change this in 2020...)
 			std::ofstream ofile;
-			ofile.open(filename);
+			ofile.open(filename.c_str());
 
 			// write data to file in gnuplot format
 			for(int i=0; i<xcells; ++i){
