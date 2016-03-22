@@ -69,50 +69,42 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 	}
 
 	// save distributions to file if required
-	for(int hm=0; hm<mp::num_materials; ++hm){
-		if(create::internal::mp[hm].save_host_alloy_profile){
+	if(vmpi::my_rank == 0){
+		for(int hm=0; hm<mp::num_materials; ++hm){
+			if(create::internal::mp[hm].save_host_alloy_profile){
 
-			// determine filename
-			std::string filename = "";
-			std::stringstream fname_stream;
-			// check for blank name
-			if(create::internal::mp[hm].save_file_name == filename){
-				fname_stream << "alloy-distribution-" << hm+1 << ".txt";
-			  	filename = fname_stream.str();
-			}
-			else{
-				filename = create::internal::mp[hm].save_file_name;
-			}
-
-			// print informative message to log file
-			zlog << zTs() << "Saving alloy distribution for material " << hm+1 << " to " << filename << std::endl;
-
-			// open file (with annnoying c_str format for pre C++11 compatibility. Maybe we can change this in 2020...)
-			std::ofstream ofile;
-			ofile.open(filename.c_str());
-
-			// write data to file in gnuplot format
-			for(int i=0; i<xcells; ++i){
-				for(int j=0; j<ycells; ++j){
-					ofile << double(i)*resolution << "\t" << double(j)*resolution << "\t" << distributions[hm][i][j] << std::endl;
+				// determine filename
+				std::string filename = "";
+				std::stringstream fname_stream;
+				// check for blank name
+				if(create::internal::mp[hm].save_file_name == filename){
+					fname_stream << "alloy-distribution-" << hm+1 << ".txt";
+				  	filename = fname_stream.str();
 				}
-				ofile << std::endl;
+				else{
+					filename = create::internal::mp[hm].save_file_name;
+				}
+
+				// print informative message to log file
+				zlog << zTs() << "Saving alloy distribution for material " << hm+1 << " to " << filename << std::endl;
+
+				// open file (with annnoying c_str format for pre C++11 compatibility. Maybe we can change this in 2020...)
+				std::ofstream ofile;
+				ofile.open(filename.c_str());
+
+				// write data to file in gnuplot format
+				for(int i=0; i<xcells; ++i){
+					for(int j=0; j<ycells; ++j){
+						ofile << double(i)*resolution << "\t" << double(j)*resolution << "\t" << distributions[hm][i][j] << std::endl;
+					}
+					ofile << std::endl;
+				}
 			}
 		}
 	}
 
-   // predetermine list of host/slave pairs
-   std::vector< std::vector <int> > pair;
-   pair.resize(mp::num_materials);
-   for(int hm=0; hm<mp::num_materials; ++hm){
-		// only add pairs for host materials
-		if(create::internal::mp[hm].alloy_master){
-	      // determine list of slave materials for host
-	      for(int sm=0; sm<mp::num_materials; ++sm){
-	          if(create::internal::mp[hm].slave_material[sm].fraction > 0.0) pair[hm].push_back(sm);
-	      }
-		}
-   }
+	// Wait for all processors just in case anyone else times out
+	MPI::COMM_WORLD.Barrier();
 
 	// re-seed random number generator on each CPU
 	create::internal::grnd.seed(683614233+vmpi::my_rank);
@@ -127,42 +119,43 @@ void alloy(std::vector<cs::catom_t> & catom_array){
       if(create::internal::mp[host_material].alloy_master==true){
 
          //loop over all potential alloy materials for host
-         for(int sm=0;sm<pair[host_material].size(); sm++){
-            int slave_material = pair[host_material][sm];
-            const double fraction = create::internal::mp[host_material].slave_material[slave_material].fraction;
+         for(int sm=0;sm<mp::num_materials; sm++){
+				if(create::internal::mp[host_material].slave_material[sm].fraction > 0.0){
+	            int slave_material = sm;
+	            const double fraction = create::internal::mp[host_material].slave_material[slave_material].fraction;
 
-				// if distribution is homogenoues calculate direct probability
-				if(create::internal::mp[host_material].host_alloy_distribution == homogeneous){
-					if(create::internal::grnd() < fraction) catom_array[atom].material=slave_material;
-				}
-				// otherwise determine probability from distribution
-				else{
-					double probability;
-					const int i = catom_array[atom].x/resolution;
-					const int j = catom_array[atom].y/resolution;
-					const double variance = create::internal::mp[host_material].slave_material[slave_material].variance;
-
-					switch(create::internal::mp[host_material].slave_material[slave_material].slave_alloy_distribution){
-
-						case native:
-							probability = fraction + variance * distributions[host_material][i][j];
-							break;
-					   case reciprocal:
-							probability = fraction - variance * distributions[host_material][i][j];
-					      break;
-					   case uniform:
-							probability = fraction;
-					      break;
-					   default: // native
-							probability = fraction + variance * distributions[host_material][i][j];
-					      break;
+					// if distribution is homogenoues calculate direct probability
+					if(create::internal::mp[host_material].host_alloy_distribution == homogeneous){
+						if(create::internal::grnd() < fraction) catom_array[atom].material=slave_material;
 					}
+					// otherwise determine probability from distribution
+					else{
+						double probability;
+						const int i = catom_array[atom].x/resolution;
+						const int j = catom_array[atom].y/resolution;
+						const double variance = create::internal::mp[host_material].slave_material[slave_material].variance;
 
-					// check if atom is to be replaced
-					if(create::internal::grnd() < probability) catom_array[atom].material=slave_material;
+						switch(create::internal::mp[host_material].slave_material[slave_material].slave_alloy_distribution){
 
-				}
+							case native:
+								probability = fraction + variance * distributions[host_material][i][j];
+								break;
+						   case reciprocal:
+								probability = fraction - variance * distributions[host_material][i][j];
+						      break;
+						   case uniform:
+								probability = fraction;
+						      break;
+						   default: // native
+								probability = fraction + variance * distributions[host_material][i][j];
+						      break;
+						}
 
+						// check if atom is to be replaced
+						if(create::internal::grnd() < probability) catom_array[atom].material=slave_material;
+
+					}
+				} // if sm
 			}
       }
    }
