@@ -104,7 +104,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 	}
 
 	// Wait for all processors just in case anyone else times out
-	MPI::COMM_WORLD.Barrier();
+	vmpi::barrier();
 
 	// re-seed random number generator on each CPU
 	create::internal::grnd.seed(683614233+vmpi::my_rank);

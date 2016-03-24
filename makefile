@@ -83,6 +83,7 @@ obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \
 obj/mpi/mpi_create2.o \
 obj/mpi/mpi_comms.o \
+obj/mpi/wrapper.o \
 obj/program/bmark.o \
 obj/program/cmc_anisotropy.o \
 obj/program/curie_temperature.o \
