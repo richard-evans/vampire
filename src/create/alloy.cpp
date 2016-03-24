@@ -42,9 +42,15 @@ std::vector < std::vector <float> > generate_host_alloy_distribution(std::vector
 //-----------------------------------------------------------------------------
 void alloy(std::vector<cs::catom_t> & catom_array){
 
+	// Alloy properties not guaranteed to exist
+	// return here if unused to avoid segmentation fault
+	if(create::internal::mp.size() == 0) return;
+
+	// Print informative message to screen
 	zlog << zTs() << "Calculating alloy properties of system" << std::endl;
 
 	// Constants for distribution calculation
+	const int num_alloy_materials = mp::num_materials; // local constant for number of materials
 	const double resolution = 5.0; // spatial reolution of concentration map (Angstroms)
 	const double sizex = cs::system_dimensions[0];
 	const double sizey = cs::system_dimensions[1];
@@ -52,10 +58,10 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 	const int ycells = int(sizey/resolution)+1;
 
 	// array for alloy distributions for each material
-	std::vector < std::vector < std::vector <float> > > distributions(mp::num_materials);
+	std::vector < std::vector < std::vector <float> > > distributions(num_alloy_materials);
 
    // generate host alloy distributions for all relevant materials
-	for(int hm=0; hm<mp::num_materials; ++hm){
+	for(int hm=0; hm<num_alloy_materials; ++hm){
 		if(create::internal::mp[hm].alloy_master && (create::internal::mp[hm].host_alloy_distribution == random || create::internal::mp[hm].host_alloy_distribution == granular)){
 
 			const double smoothness = create::internal::mp[hm].host_alloy_smoothness;
@@ -70,7 +76,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 
 	// save distributions to file if required
 	if(vmpi::my_rank == 0){
-		for(int hm=0; hm<mp::num_materials; ++hm){
+		for(int hm=0; hm<num_alloy_materials; ++hm){
 			if(create::internal::mp[hm].save_host_alloy_profile){
 
 				// determine filename
@@ -119,7 +125,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
       if(create::internal::mp[host_material].alloy_master==true){
 
          //loop over all potential alloy materials for host
-         for(int sm=0;sm<mp::num_materials; sm++){
+         for(int sm=0;sm<num_alloy_materials; sm++){
 				if(create::internal::mp[host_material].slave_material[sm].fraction > 0.0){
 	            int slave_material = sm;
 	            const double fraction = create::internal::mp[host_material].slave_material[slave_material].fraction;

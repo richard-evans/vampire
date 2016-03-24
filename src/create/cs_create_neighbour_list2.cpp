@@ -333,9 +333,11 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 	}
-	terminaltextcolor(GREEN);
-	std::cout << "done!" << std::endl;
-	terminaltextcolor(WHITE);
+	if(vmpi::my_rank == 0){
+		terminaltextcolor(GREEN);
+		std::cout << "done!" << std::endl;
+		terminaltextcolor(WHITE);
+	}
    zlog << zTs() << "\tDone"<< std::endl;
 
 	// Deallocate supercell array

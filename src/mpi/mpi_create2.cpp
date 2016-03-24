@@ -716,9 +716,11 @@ int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 	}
 
 	zlog << zTs() << "\tdone!" << std::endl;
-	terminaltextcolor(GREEN);
-	std::cout << "done!" << std::endl;
-	terminaltextcolor(WHITE);
+	if(vmpi::my_rank == 0){
+		terminaltextcolor(GREEN);
+		std::cout << "done!" << std::endl;
+		terminaltextcolor(WHITE);
+	}
 
    return EXIT_SUCCESS;
 

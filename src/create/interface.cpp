@@ -55,8 +55,8 @@ namespace create{
       // add prefix string
       std::string prefix="material:";
 
-      // Check for material id > current array size and if so dynamically expand mp array
-      if((unsigned int) super_index + 1 > create::internal::mp.size() && super_index + 1 < 101) create::internal::mp.resize(super_index + 1);
+      // Check for empty material parameter array and resize
+      if(create::internal::mp.size() == 0) create::internal::mp.resize(mp::max_materials);
 
       //------------------------------------------------------------
       std::string test="alloy-host"; // determines host material
@@ -219,12 +219,6 @@ namespace create{
          create::internal::mp[super_index].slave_material[sub_index].variance = v;
          return true;
       }
-
-
-
-
-
-
 
       //--------------------------------------------------------------------
       // keyword not found
