@@ -103,15 +103,15 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 				// need to change this to accept non-orthogonal lattices
 				// Loop over atoms in unit cell
 				for(int uca=0;uca<unit_cell.atom.size();uca++){
-					double cx = (double(x)+unit_cell.atom[uca].x)*unit_cell.dimensions[0];
-					double cy = (double(y)+unit_cell.atom[uca].y)*unit_cell.dimensions[1];
-					double cz = (double(z)+unit_cell.atom[uca].z)*unit_cell.dimensions[2];
+					double cx = (double(x)+unit_cell.atom[uca].x)*unit_cell.dimensions[0]+cff;
+					double cy = (double(y)+unit_cell.atom[uca].y)*unit_cell.dimensions[1]+cff;
+					double cz = (double(z)+unit_cell.atom[uca].z)*unit_cell.dimensions[2]+cff;
 					#ifdef MPICF
 						if(vmpi::mpi_mode==0){
 							// only generate atoms within allowed dimensions
-                     if(   (cx>=vmpi::min_dimensions[0]-cff && cx<vmpi::max_dimensions[0]) &&
-                           (cy>=vmpi::min_dimensions[1]-cff && cy<vmpi::max_dimensions[1]) &&
-                           (cz>=vmpi::min_dimensions[2]-cff && cz<vmpi::max_dimensions[2])){
+                     if(   (cx>=vmpi::min_dimensions[0] && cx<vmpi::max_dimensions[0]) &&
+                           (cy>=vmpi::min_dimensions[1] && cy<vmpi::max_dimensions[1]) &&
+                           (cz>=vmpi::min_dimensions[2] && cz<vmpi::max_dimensions[2])){
 						#endif
 							if((cx<cs::system_dimensions[0]) && (cy<cs::system_dimensions[1]) && (cz<cs::system_dimensions[2])){
 							catom_array.push_back(cs::catom_t());
