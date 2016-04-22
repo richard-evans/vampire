@@ -195,7 +195,7 @@ std::string create_file_header(std::string author, std::string email){
    cfh_ss << "//------------------------------------------------------------------------------\n";
    cfh_ss << "//\n";
    cfh_ss << "//   This file is part of the VAMPIRE open source package under the\n";
-   cfh_ss << "//   GNU GPL (version 2) licence (see licence file for details).\n";
+   cfh_ss << "//   Free BSD licence (see licence file for details).\n";
    cfh_ss << "//\n";
    if(author != blank){
       cfh_ss << "//   (c) " << author << " 2016. All rights reserved.\n";
