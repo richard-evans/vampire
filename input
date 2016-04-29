@@ -1,6 +1,6 @@
 #------------------------------------------
 # Sample vampire input file to perform
-# benchmark calculation for v3.0
+# benchmark calculation for v4.0
 #
 #------------------------------------------
 
@@ -20,13 +20,13 @@ dimensions:system-size-z = 7.7 !nm
 #------------------------------------------
 # Material Files:
 #------------------------------------------
-material:file="Co.mat"
+material:file=Co.mat
 
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
 sim:temperature=300.0
-sim:partial-time-steps=1000
+sim:time-steps-increment=10
 sim:total-time-steps=10000
 sim:time-step=1.0E-15
 
@@ -43,6 +43,7 @@ output:real-time
 output:temperature
 output:magnetisation
 output:magnetisation-length
+output:output-rate = 1000
 
 screen:time-steps
 screen:magnetisation-length

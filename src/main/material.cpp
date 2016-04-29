@@ -40,6 +40,9 @@ materials_t::materials_t ():
 	Ku(0.0),
    Ku2(0.0),
    Ku3(0.0),
+   sh2(0.0),
+   sh4(0.0),
+   sh6(0.0),
    Klatt(0.0),
 	KuVec(0),
 	UniaxialAnisotropyUnitVector(3),
@@ -74,16 +77,17 @@ materials_t::materials_t ():
 	fmr_field_unit_vector(3,0.0),
    fill(false),
    temperature_rescaling_alpha(1.0),
-   temperature_rescaling_Tc(0.0)
-	
+	temperature_rescaling_Tc(0.0),
+	random_anisotropy(false),
+	random_grain_anisotropy(false)
 	{
 
-	//std::cout << "constructor " << anis_flag << "\t" << ianis_flag << std::endl;	
+	//std::cout << "constructor " << anis_flag << "\t" << ianis_flag << std::endl;
 	// derived parameters
 	for(int i=0;i<100;i++){
 		geometry_coords[i][0]=0.0;
 		geometry_coords[i][1]=0.0;
-	}	
+	}
 	// array variables
 	for(int i=0;i<mp::max_materials;i++){
 		Jij_matrix_SI[i]=0.0;

@@ -33,6 +33,9 @@ namespace stats{
       if(stats::calculate_height_magnetization)          stats::height_magnetization.calculate_magnetization(sx,sy,sz,mm);
       if(stats::calculate_material_height_magnetization) stats::material_height_magnetization.calculate_magnetization(sx,sy,sz,mm);
 
+      // update susceptibility statistics
+      if(stats::calculate_system_susceptibility)         stats::system_susceptibility.calculate(stats::system_magnetization.get_magnetization());
+
       return;
 
    }
@@ -47,6 +50,9 @@ namespace stats{
       if(stats::calculate_material_magnetization)        stats::material_magnetization.reset_magnetization_averages();
       if(stats::calculate_height_magnetization)          stats::height_magnetization.reset_magnetization_averages();
       if(stats::calculate_material_height_magnetization) stats::material_height_magnetization.reset_magnetization_averages();
+
+      // reset susceptibility statistics
+      if(stats::calculate_system_susceptibility) stats::system_susceptibility.reset_averages();
 
       return;
 
