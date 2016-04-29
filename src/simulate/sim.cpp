@@ -117,7 +117,7 @@ namespace sim{
 	pump_functions_t pump_function=two_temperature;
 	double pump_power=4.e21;
 	double pump_time=50.0e-15;
-	double double_pump_power=2.e21;
+	double double_pump_power=20.0; // mJ/cm^2;
 	double double_pump_Tmax=500.0;
 	double double_pump_time=50.0e-15;
 	double double_pump_delay=10.0e-12;
