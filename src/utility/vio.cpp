@@ -2281,38 +2281,34 @@ int match_config(string const word, string const value,int const line){
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
-   test="field-output-min-1";
+   test="field-range-1-minimum";
    if(word==test){
       double H=atof(value.c_str());
-//      check_for_valid_value(H, word, line, prefix, -1.e4, 1.0e4,"input","+/- 10,000 T");
-      check_for_valid_value(H, word, line, prefix,"","none", -10000.0, 10000.0,"input","+/- 10,000");
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
       vout::field_output_min_1=H;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
-   test="field-output-max-1";
+   test="field-range-1-maximum";
    if(word==test){
       double H=atof(value.c_str());
-//      check_for_valid_value(H, word, line, prefix, -1.e4, 1.0e4,"input","+/- 10,000 T");
-      check_for_valid_value(H, word, line, prefix,"","none", -10000.0, 10000.0,"input","+/- 10,000");
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
       vout::field_output_max_1=H;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
-   test="field-output-min-2";
+   test="field-range-2-minimum";
    if(word==test){
       double H=atof(value.c_str());
-//      check_for_valid_value(H, word, line, prefix, -1.e4, 1.0e4,"input","+/- 10,000 T");
-      check_for_valid_value(H, word, line, prefix,"","none", -10000.0, 10000.0,"input"," 0 - 10,000");
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
       vout::field_output_min_2=H;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
-   test="field-output-max-2";
+   test="field-range-2-maximum";
    if(word==test){
       double H=atof(value.c_str());
-//      check_for_valid_value(H, word, line, prefix, -1.e4, 1.0e4,"input","+/- 10,000 T");
-      check_for_valid_value(H, word, line, prefix,"","none", -10000.0, 10000.0,"input","0 - 10,000");
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
       vout::field_output_max_2=H;
       return EXIT_SUCCESS;
    }
