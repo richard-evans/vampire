@@ -66,17 +66,25 @@ namespace vout{
 
    bool output_atoms_config=false;
    int output_atoms_config_rate=1000;
-   int output_atoms_file_counter=0;
-   int output_rate_counter=0;
+
+////   int output_atoms_file_counter=0;
+//   int output_atoms_file_counter=sim::output_atoms_file_counter;
+
+   //output_rate_counter_defined globally => not to be redifined here!!
+   //int output_rate_counter=0;
+   int output_rate_counter_coords=0;
 
    double atoms_output_min[3]={0.0,0.0,0.0};
    double atoms_output_max[3]={1.0,1.0,1.0};
+   double field_output_min_1=-10000.0;
+   double field_output_max_1=-0.0;
+   double field_output_min_2=0.0;
+   double field_output_max_2=10000.0;
    int total_output_atoms=0;
    std::vector<int> local_output_atom_list(0);
 
    bool output_cells_config=false;
    int output_cells_config_rate=1000;
-   int output_cells_file_counter=0;
 
    bool output_grains_config=false;
    int output_config_grain_rate=1000;
@@ -106,23 +114,54 @@ namespace vout{
 ///
 void config(){
 
+   double minField_1=vout::field_output_min_1;
+   double maxField_1=vout::field_output_max_1;
+   double minField_2=vout::field_output_min_2;
+   double maxField_2=vout::field_output_max_2;
+
    // check calling of routine if error checking is activated
    if(err::check==true){std::cout << "vout::config has been called" << std::endl;}
 
    // atoms output
-   if((vout::output_atoms_config==true) && (vout::output_rate_counter%output_atoms_config_rate==0)){
-      if(output_atoms_file_counter==0) vout::atoms_coords();
-      vout::atoms();
+   if((vout::output_atoms_config==true) && (sim::output_rate_counter%output_atoms_config_rate==0)){
+      if(sim::program!=2){
+         if(vout::output_rate_counter_coords==0) vout::atoms_coords();
+         vout::atoms();
+      }
+      else if(sim::program=2){
+         if((sim::H_applied>=minField_1) && (sim::H_applied<=maxField_1)){
+            if(vout::output_rate_counter_coords==0) vout::atoms_coords();
+            vout::atoms();
+         }
+         else if((sim::H_applied>=minField_2) && (sim::H_applied<=maxField_2)){
+            if(vout::output_rate_counter_coords==0) vout::atoms_coords();
+            vout::atoms();
+         }
+      }
    }
 
    // cells output
-   if((vout::output_cells_config==true) && (vout::output_rate_counter%output_cells_config_rate==0)){
-      if(output_cells_file_counter==0) vout::cells_coords();
-      vout::cells();
+   if((vout::output_cells_config==true) && (sim::output_rate_counter%output_cells_config_rate==0)){
+      // if(!program::hysteresis())
+      if(sim::program!=2){
+         if(sim::output_cells_file_counter==0) vout::cells_coords();
+         vout::cells();
+      }
+      else if(sim::program=2){
+         if((sim::H_applied>=minField_1) && (sim::H_applied<=maxField_1)){
+            if(sim::output_cells_file_counter==0) vout::cells_coords();
+            vout::cells();
+         }
+         else if((sim::H_applied>=minField_2) && (sim::H_applied<=maxField_2)){
+            if(sim::output_cells_file_counter==0) vout::cells_coords();
+            vout::cells();
+         }
+      }
    }
 
    // increment rate counter
-   vout::output_rate_counter++;
+   vout::output_rate_counter_coords++;
+   sim::output_rate_counter++;
 
 }
 /// @brief Atomistic output function
@@ -186,7 +225,7 @@ void config(){
       if(vmpi::my_rank!=0){
          file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
       }
-      file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
+      file_sstr << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
       file_sstr << ".cfg";
       std::string cfg_file = file_sstr.str();
       const char* cfg_filec = cfg_file.c_str();
@@ -224,7 +263,7 @@ void config(){
          cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors-1 << std::endl;
          for(int p=1;p<vmpi::num_processors;p++){
             std::stringstream cfg_sstr;
-            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << output_atoms_file_counter << ".cfg";
+            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".cfg";
             cfg_file_ofstr << cfg_sstr.str() << std::endl;
          }
          cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
@@ -239,7 +278,7 @@ void config(){
 
       cfg_file_ofstr.close();
 
-      output_atoms_file_counter++;
+      sim::output_atoms_file_counter++;
 
    }
 
@@ -424,7 +463,7 @@ void cells(){
    // Set local output filename
    std::stringstream file_sstr;
    file_sstr << "cells-";
-   file_sstr << std::setfill('0') << std::setw(8) << output_cells_file_counter;
+   file_sstr << std::setfill('0') << std::setw(8) << sim::output_cells_file_counter;
    file_sstr << ".cfg";
    std::string cfg_file = file_sstr.str();
    const char* cfg_filec = cfg_file.c_str();
@@ -446,7 +485,7 @@ void cells(){
    // Output masterfile header on root process
    if(vmpi::my_rank==0){
 
-      zlog << zTs() << "Outputting cell configuration " << output_cells_file_counter << " to disk." << std::endl;
+      zlog << zTs() << "Outputting cell configuration " << sim::output_cells_file_counter << " to disk." << std::endl;
 
       // Declare and open output file
       std::ofstream cfg_file_ofstr;
@@ -480,7 +519,7 @@ void cells(){
 
    }
 
-   output_cells_file_counter++;
+   sim::output_cells_file_counter++;
 
    return;
 

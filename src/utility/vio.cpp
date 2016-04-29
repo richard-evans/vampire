@@ -2192,8 +2192,8 @@ int match_sim(string const word, string const value, string const unit, int cons
 
    return EXIT_SUCCESS;
 }
-
-int match_config(string const word, string const value, int const line){
+//int match_sim(string const word, string const value, string const unit, int const line){
+int match_config(string const word, string const value,int const line){
 
    std::string prefix="config:";
 
@@ -2208,6 +2208,7 @@ int match_config(string const word, string const value, int const line){
    if(word==test){
       int i=atoi(value.c_str());
       check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
+//      check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
       vout::output_atoms_config_rate=i;
       return EXIT_SUCCESS;
    }
@@ -2277,6 +2278,42 @@ int match_config(string const word, string const value, int const line){
    test="identify-surface-atoms";
    if(word==test){
       sim::identify_surface_atoms=true;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-output-min-1";
+   if(word==test){
+      double H=atof(value.c_str());
+//      check_for_valid_value(H, word, line, prefix, -1.e4, 1.0e4,"input","+/- 10,000 T");
+      check_for_valid_value(H, word, line, prefix,"","none", -10000.0, 10000.0,"input","+/- 10,000");
+      vout::field_output_min_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-output-max-1";
+   if(word==test){
+      double H=atof(value.c_str());
+//      check_for_valid_value(H, word, line, prefix, -1.e4, 1.0e4,"input","+/- 10,000 T");
+      check_for_valid_value(H, word, line, prefix,"","none", -10000.0, 10000.0,"input","+/- 10,000");
+      vout::field_output_max_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-output-min-2";
+   if(word==test){
+      double H=atof(value.c_str());
+//      check_for_valid_value(H, word, line, prefix, -1.e4, 1.0e4,"input","+/- 10,000 T");
+      check_for_valid_value(H, word, line, prefix,"","none", -10000.0, 10000.0,"input"," 0 - 10,000");
+      vout::field_output_min_2=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-output-max-2";
+   if(word==test){
+      double H=atof(value.c_str());
+//      check_for_valid_value(H, word, line, prefix, -1.e4, 1.0e4,"input","+/- 10,000 T");
+      check_for_valid_value(H, word, line, prefix,"","none", -10000.0, 10000.0,"input","0 - 10,000");
+      vout::field_output_max_2=H;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
