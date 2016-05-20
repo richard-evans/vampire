@@ -294,7 +294,7 @@ int match_sim(std::string const, std::string const, std::string const, int const
 int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_material(string const, string const, string const, int const, int const, int const);
-int match_config(string const, string const, int const);
+int match_config(std::string const, std::string const, std::string const, int const);
 
 // Function to extract all variables from a string and return a vector
 std::vector<double> DoublesFromString(std::string value){
@@ -815,7 +815,7 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="config";
 	if(key==test){
-		int frs=vin::match_config(word, value, line);
+		int frs=vin::match_config(word, value, unit, line);
 		return frs;
 	}
 	//-------------------------------------------------------------------
@@ -2192,8 +2192,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 
    return EXIT_SUCCESS;
 }
-//int match_sim(string const word, string const value, string const unit, int const line){
-int match_config(string const word, string const value,int const line){
+int match_config(string const word, string const value, string const unit, int const line){
 
    std::string prefix="config:";
 
