@@ -118,23 +118,22 @@ void config(){
 
    // check that minField_1>maxField_1
    if(vout::field_output_min_1>=vout::field_output_max_1){
-     minField_1=vout::field_output_min_1;
-     maxField_1=vout::field_output_max_1;
+      minField_1=vout::field_output_min_1;
+      maxField_1=vout::field_output_max_1;
    }
    else{
-     minField_1=vout::field_output_max_1;
-     maxField_1=vout::field_output_min_1;
+      minField_1=vout::field_output_max_1;
+      maxField_1=vout::field_output_min_1;
    }
    // check that maxField_2>minField_2
    if(vout::field_output_max_2>=vout::field_output_min_2){
-     minField_2=vout::field_output_min_2;
-     maxField_2=vout::field_output_max_2;
+      minField_2=vout::field_output_min_2;
+      maxField_2=vout::field_output_max_2;
    }
    else{
-     minField_2=vout::field_output_max_2;
-     maxField_2=vout::field_output_min_2;
+      minField_2=vout::field_output_max_2;
+      maxField_2=vout::field_output_min_2;
    }
-
 
    // check calling of routine if error checking is activated
    if(err::check==true){std::cout << "vout::config has been called" << std::endl;}
@@ -144,20 +143,20 @@ void config(){
       if(sim::program!=2){
          if(vout::output_rate_counter_coords==0) vout::atoms_coords();
          vout::atoms();
-   	     vout::output_rate_counter_coords++;
+         vout::output_rate_counter_coords++;
       }
-      else if(sim::program=2){
-	 // output config only in range [minField_1;maxField_1] for decreasing field
+      else if(sim::program==2){
+         // output config only in range [minField_1;maxField_1] for decreasing field
          if((sim::H_applied>=maxField_1) && (sim::H_applied<=minField_1) && (sim::parity<0)){
             if(vout::output_rate_counter_coords==0) vout::atoms_coords();
             vout::atoms();
-   	        vout::output_rate_counter_coords++;
+            vout::output_rate_counter_coords++;
          }
-	 // output config only in range [minField_2;maxField_2] for increasing field
+	      // output config only in range [minField_2;maxField_2] for increasing field
          else if((sim::H_applied>=minField_2) && (sim::H_applied<=maxField_2) && (sim::parity>0)){
             if(vout::output_rate_counter_coords==0) vout::atoms_coords();
             vout::atoms();
-   	        vout::output_rate_counter_coords++;
+            vout::output_rate_counter_coords++;
          }
       }
    }
@@ -170,12 +169,12 @@ void config(){
          vout::cells();
       }
       else if(sim::program=2){
-	 // output config only in range [minField_1;maxField_1] for decreasing field
+         // output config only in range [minField_1;maxField_1] for decreasing field
          if((sim::H_applied>=maxField_1) && (sim::H_applied<=minField_1) && (sim::parity<0)){
             if(sim::output_cells_file_counter==0) vout::cells_coords();
             vout::cells();
          }
-	 // output config only in range [minField_2;maxField_2] for increasing field
+         // output config only in range [minField_2;maxField_2] for increasing field
          else if((sim::H_applied>=minField_2) && (sim::H_applied<=maxField_2) && (sim::parity>0)){
             if(sim::output_cells_file_counter==0) vout::cells_coords();
             vout::cells();
