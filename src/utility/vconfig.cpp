@@ -168,7 +168,7 @@ void config(){
          if(sim::output_cells_file_counter==0) vout::cells_coords();
          vout::cells();
       }
-      else if(sim::program=2){
+      else if(sim::program==2){
          // output config only in range [minField_1;maxField_1] for decreasing field
          if((sim::H_applied>=maxField_1) && (sim::H_applied<=minField_1) && (sim::parity<0)){
             if(sim::output_cells_file_counter==0) vout::cells_coords();
