@@ -30,11 +30,13 @@ struct coord_t{
    // position vectors
    float x;
    float y;
-   float z;   
+   float z;
 };
 
 namespace config{
    namespace internal{
+
+Rory these functions need fixing
 
       // forward function declarations
       void write_coordinate_data_text(const std::vector<double>& spins_cx, // spin coordinates (Angstroms)
@@ -68,14 +70,42 @@ namespace config{
          // Output informative message to log file
          zlog << zTs() << "Outputting configuration file " << filename.str() << " to disk ";
 
+         // copy total number of output data to const for compiler
+         const unsigned int num_data = config::internal::local_output_atom_list.size();
+
+         // initialize temporary buffers
+         std::vector<double> x_buffer(num_data);
+         std::vector<double> y_buffer(num_data);
+         std::vector<double> z_buffer(num_data);
+         std::vector<double> mat_buffer(num_data);
+         std::vector<double> cat_buffer(num_data);
+
+         // loop over all atoms to be output
+         for(int id=0; id < num_data; ++id){
+
+            // determine next datum to be output
+            const int index = config::internal::local_output_atom_list[id];
+
+            // copy and cast data to be output to main output buffer
+            buffer[id].material = material[index];
+            buffer[id].category = category[index];
+            buffer[id].x = float(spins_cx[index]);
+            buffer[id].y = float(spins_cy[index]);
+            buffer[id].z = float(spins_cz[index]);
+
+         }
+
+         // pack cordinate_buffer(); + MPI
+
          switch(config::internal::output_data_format){
 
             case config::internal::binary:
-               write_coordinate_data_binary(spins_cx, spins_cy, spins_cz, material, category, filename.str());
+               write_coordinate_data_binary(buffer, filename.str());
+               //write_coordinate_data_binary(buffer, filename.str());
                break;
 
             case config::internal::text:
-               write_coordinate_data_text(spins_cx, spins_cy, spins_cz, material, category, filename.str());
+               write_coordinate_data_text(buffer, filename.str());
                break;
 
          }
@@ -102,6 +132,8 @@ namespace config{
          //   filename << std::setfill('0') << std::setw(5) << config vmpi::my_rank << "-";
 
          #else
+
+            // mpi::syncronize_coords(cx, cy, cz, material, category);
 
             // instantiate timer
             vutil::vtimer_t timer;
@@ -177,26 +209,9 @@ namespace config{
             // fill temporary buffer
             //--------------------------
 
-            // copy total number of output data to const for compiler
-            const unsigned int num_data = config::internal::local_output_atom_list.size();
 
-            // initialize temporary buffer
-            std::vector<coord_t> buffer(num_data);
 
-            // loop over all atoms to be output
-            for(int id=0; id < num_data; ++id){
 
-               // determine next datum to be output
-               const int index = config::internal::local_output_atom_list[id];
-
-               // copy and cast data to be output to main output buffer
-               buffer[id].material = material[index];
-               buffer[id].category = category[index];
-               buffer[id].x = float(spins_cx[index]);
-               buffer[id].y = float(spins_cy[index]);
-               buffer[id].z = float(spins_cz[index]);
-
-            }
 
             // instantiate timer
             vutil::vtimer_t timer;

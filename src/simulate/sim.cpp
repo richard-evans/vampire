@@ -256,7 +256,7 @@ int run(){
    stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array);
 
    // Initialize configuration data output
-   config::initialize(atoms::num_atoms, cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2],
+   config::initialize(num_atoms_for_statistics, cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2],
                       atoms::type_array, atoms::category_array,
                       atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
                       cells::x_coord_array, cells::y_coord_array, cells::z_coord_array);

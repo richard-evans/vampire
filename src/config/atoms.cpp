@@ -3,163 +3,255 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2014. All rights reserved.
+// (c) R F L Evans 2015. All rights reserved.
 //
 //-----------------------------------------------------------------------------
-
+Rory - this is old and is to be deleted
 // C++ standard library headers
+#include <iomanip>
 #include <sstream>
 
 // Vampire headers
 #include "errors.hpp"
-#include "ltmp.hpp"
+#include "config.hpp"
 #include "vio.hpp"
+#include "vutil.hpp"
 
-// Localised temperature pulse headers
+// config headers
 #include "internal.hpp"
 
-// calculate pitch - number of processors per output node
+namespace config{
+   namespace internal{
 
-// last processor in batch given job of managing data output
+      // forward function declarations
+      void write_data_text(std::string filename, const std::vector<float>& buffer);
+      void write_data_binary(std::string filename, const std::vector<float>& buffer);
 
-// set up MPI routines and storage
+      //--------------------------------------------------------------------------------------------------------
+      //  Function to copy and cast masked 3-vector data array to output buffer (serial and parallel versions)
+      //
+      //  The output buffer stores the data in
+      //
+      //                       | x y z | x y z | x y z | ... | x y z |
+      //
+      //  format which is then written to disk sequentially in binary or text mode.
+      //
+      //  Data which are to be output are predetermined in the mask for improved peformance. Data are also
+      //  cast to float to reduce storage requirements from 24 to 12 bytes per datum for improved write
+      //  performance and file size.
+      //
+      //  Parallel (MPI) mode
+      //  ------------------------
+      //  In parallel mode a temporary buffer is required to store the data on each process which is then
+      //  merged into the output buffer on the master io process, determined from the MPI_COMM_IO
+      //  communicator, doubling the memory requirement for data i/o.
+      //
+      //  output_buffer io_master | x y z | x y z | x y z | x y z | ... | x y z | x y z | x y z | x y z |
+      //
+      //                              ^       ^       ^       ^             ^       ^       ^       ^
+      //                              :       :       :       :             :       :       :       :
+      //                                                                    :       :       :       :
+      //  mpi_buffer process_1    | x y z | x y z | x y z | x y z |         :       :       :       :
+      //
+      //  mpi_buffer process_n                                          | x y z | x y z | x y z | x y z |
+      //
+      //  Best performance is likely achieved for 1 or 2 output processes/node.
+      //
+      //--------------------------------------------------------------------------------------------------------
+      //
+      // Data is imported as 3 x 1D vectors for x,y and z respectively. The mask identifies which data should
+      // be outputted as a sparse list (each mask id lists an array index of data to be output. The float buffer
+      // stores the final complete data to be output to disk and must be 3*mask.size().
+      //
+      void copy_data_to_buffer(const std::vector<double>& x, // vector data
+                               const std::vector<double>& y,
+                               const std::vector<double>& z,
+                               const std::vector<int>& mask,
+                               std::vector<float>& buffer
+                              ){
 
-// cast spin array to float
+         #ifdef MPICF
 
-// all group processors send data to my_io_rank in non-blocking fashion
+         // copy to local buffer
 
-// next time routine is called write data to disk (remember to code for check written function)
+         // transfer to root buffer with MPI_Reduce
 
-// data blocked in [sx][sy][sz]
+         #else
 
-// file format
-// n_spins
-// [sx][sy][sz]
+            // copy total number of output data to const for compiler
+            const int data_size = mask.size();
 
+            // loop over all atoms to be output
+            for(int id=0; id < data_size; ++id){
+               // determine next datum to be output
+               const int index = mask[id];
+               // copy and cast data to be output to main output buffer
+               buffer[3*id + 0] = float(x[index]);
+               buffer[3*id + 1] = float(y[index]);
+               buffer[3*id + 2] = float(z[index]);
+            }
 
+         #endif
 
+         return;
 
-
-
-
-
-
-
-
-/// @brief Atomistic output function
-///
-/// @details Outputs formatted data snapshot for visualisation  
-///
-///   #------------------------------------------------------
-///   # Atomistic spin configuration file for vampire
-///   #------------------------------------------------------
-///   # Date: xx/xx/xxxx xx.xx.xx
-///   #------------------------------------------------------
-///   Number of spins: $n_spins
-///   System dimensions: $max_x $max_y $max_z
-///   Coordinates-file: $coord_file
-///   Time: $t
-///   Field: $H
-///   Temperature: $T
-///   Magnetisation: $mx $my $mz
-///   Number of Materials: $n_mat
-///   Material Properties 1:  $mu_s $mmx $mmy $mmz $mm
-///   Material Properties 2:  $mu_s $mmx $mmy $mmz ...
-///   #------------------------------------------------------
-///   Number of spin files: $n_files
-///   atoms-000ID000-00CPU0.cfg
-///   atoms-000ID000-00CPU1.cfg
-///   atoms-000ID000-00CPU2.cfg
-///   #------------------------------------------------------
-///   Number of local spins: $n_loc_spins
-///   $sx $sy $sz
-///   $sx $sy ...
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.0
-/// @date    30/05/2011
-///
-/// @internal
-///   Created:    30/05/2011
-///   Revision:     ---
-///=====================================================================================
-///
-   void atoms(){
-
-      // check calling of routine if error checking is activated
-      if(err::check==true){std::cout << "vout::atoms has been called" << std::endl;}
-
-      #ifdef MPICF
-         const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-      #else
-         const int num_atoms = atoms::num_atoms;
-      #endif
-
-      // Set local output filename
-      std::stringstream file_sstr;
-      file_sstr << "atoms-";
-      // Set CPUID on non-root process
-      if(vmpi::my_rank!=0){
-         file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
       }
-      file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
-      file_sstr << ".cfg";
-      std::string cfg_file = file_sstr.str();
-      const char* cfg_filec = cfg_file.c_str();
 
-      // Output informative message to log file
-      zlog << zTs() << "Outputting configuration file " << cfg_file << " to disk" << std::endl;
+      //----------------------------------------------------------------------------------------------------
+      // Simple wrapper function to call output function for correct format
+      //----------------------------------------------------------------------------------------------------
+      //
+      void write_data(std::string filename, const std::vector<float>& buffer){
 
-      // Declare and open output file
-      std::ofstream cfg_file_ofstr;
-      cfg_file_ofstr.open (cfg_filec);
+         // Output informative message to log file
+         zlog << zTs() << "Outputting configuration file " << filename << " to disk ";
 
-      // Output masterfile header on root process
-      if(vmpi::my_rank==0){
-         // Get system date
-      time_t rawtime = time(NULL);
-      struct tm * timeinfo = localtime(&rawtime);
+         switch(config::internal::output_data_format){
 
-         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-         cfg_file_ofstr << "# Atomistic spin configuration file for vampire"<< std::endl;
-         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-         cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
-         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-         cfg_file_ofstr << "Number of spins: "<< vout::total_output_atoms << std::endl;
-         cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
-         cfg_file_ofstr << "Coordinates-file: atoms-coord.cfg"<< std::endl;
-         cfg_file_ofstr << "Time: " << double(sim::time)*mp::dt_SI << std::endl;
-         cfg_file_ofstr << "Field: " << sim::H_applied << std::endl;
-         cfg_file_ofstr << "Temperature: "<< sim::temperature << std::endl;
-         cfg_file_ofstr << "Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
-         cfg_file_ofstr << "Number of Materials: " << mp::num_materials << std::endl;
-         for(int mat=0;mat<mp::num_materials;mat++){
-            cfg_file_ofstr << mp::material[mat].mu_s_SI << std::endl;
+            case config::internal::binary:
+               write_data_binary(filename, buffer);
+               break;
+            case config::internal::text:
+               write_data_text(filename, buffer);
+               break;
+
          }
-         cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-         cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors-1 << std::endl;
-         for(int p=1;p<vmpi::num_processors;p++){
-            std::stringstream cfg_sstr;
-            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << output_atoms_file_counter << ".cfg";
-            cfg_file_ofstr << cfg_sstr.str() << std::endl;
-         }
-         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+
+         // increment file counter
+         config::internal::output_file_counter++;
+
+         return;
+
       }
 
-      // Everyone now outputs their atom list
-      cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
-      for(int i=0; i<vout::local_output_atom_list.size(); i++){
-         const int atom = vout::local_output_atom_list[i];
-         cfg_file_ofstr << atoms::x_spin_array[atom] << "\t" << atoms::y_spin_array[atom] << "\t" << atoms::z_spin_array[atom] << std::endl;
+
+      //----------------------------------------------------------------------------------------------------
+      // Function to output spin data formatted as text
+      //----------------------------------------------------------------------------------------------------
+      //
+      void write_data_text(std::string filename, const std::vector<float>& buffer){
+
+         #ifdef MPICF
+
+
+            // Set CPUID on non-root process
+         //   filename << std::setfill('0') << std::setw(5) << config vmpi::my_rank << "-";
+
+         #else
+
+            // determine file name
+            //std::stringstream filename;
+            //filename << "atoms-";
+            //filename << std::setfill('0') << std::setw(8) << config::internal::output_file_counter;
+            //filename << ".cfg";
+
+            // Output informative message to log file
+            //zlog << zTs() << "Outputting configuration file " << filename.str() << " to disk ";
+
+            // instantiate timer
+            vutil::vtimer_t timer;
+
+            // start timer
+            timer.start();
+
+            // Declare and open output file
+            std::ofstream ofile;
+            ofile.open (filename.c_str());
+
+            // determine number of data to output
+            const int buffer_size = buffer.size()/3;
+
+            // output number of data
+            ofile << buffer_size << "\n";
+
+            // output buffer to disk
+            for(int index = 0; index < buffer_size; ++index){
+               ofile << buffer[3*index + 0] << "\t"
+                     << buffer[3*index + 1] << "\t"
+                     << buffer[3*index + 2] << "\n";
+            }
+
+            // close output file
+            ofile.close();
+
+            // stop the timer
+            double total_time = timer.elapsed_time(); // seconds
+
+            // open file at end
+            std::ifstream in(filename.c_str(), std::ios::binary | std::ios::ate);
+
+            // get file size (bytes)
+            double data_size = double(in.tellg());
+
+            // close file
+            in.close();
+
+            // calculate data rate and output to log
+            zlog << 1.0e-6*data_size/total_time << " MB/s" << std::endl;
+
+         #endif
+
+         return;
+
       }
 
-      cfg_file_ofstr.close();
+      //----------------------------------------------------------------------------------------------------
+      // Function to output spin data in binary format
+      //----------------------------------------------------------------------------------------------------
+      //
+      void write_data_binary(std::string filename, const std::vector<float>& buffer){
 
-      output_atoms_file_counter++;
+         #ifdef MPICF
 
-   }
+
+            // Set CPUID on non-root process
+         //   filename << std::setfill('0') << std::setw(5) << config vmpi::my_rank << "-";
+
+         #else
+
+            // determine file name
+            //std::stringstream filename;
+            //filename << "atoms-";
+            //filename << std::setfill('0') << std::setw(8) << config::internal::output_file_counter;
+            //filename << ".cfg";
+
+
+            // instantiate timer
+            vutil::vtimer_t timer;
+
+            // start timer
+            timer.start();
+
+            // Declare and open output file
+            std::ofstream ofile;
+            ofile.open (filename.c_str(),std::ios::binary);
+
+            // determine number of data to output
+            const int buffer_size = buffer.size()/3;
+
+            // output number of data
+            ofile.write(reinterpret_cast<const char*>(&buffer_size),sizeof(unsigned int));
+
+            // output buffer to disk
+            ofile.write(reinterpret_cast<const char*>(&buffer[0]),sizeof(float)*buffer.size());
+
+            // close output file
+            ofile.close();
+
+            // stop the timer
+            double total_time = timer.elapsed_time(); // seconds
+
+            // get file size (bytes)
+            double data_size = double(sizeof(float)*buffer.size());
+
+            // calculate data rate and output to log
+            zlog << 1.0e-6*data_size/total_time << " MB/s" << std::endl;
+
+         #endif
+
+         return;
+
+      }
+
+   } // end of namespace internal
+} // end of namespace config
