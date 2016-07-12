@@ -5,7 +5,7 @@
 NVCC_VERSION=$(shell nvcc --version | tail -n 1 | cut -b 38-)
 NVCC=nvcc -DCOMP='"NVCC $(NVCC_VERSION)"'
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++ --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_20 -O3
 
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart -lcusparse -lcurand
 
@@ -36,6 +36,11 @@ $(CUDA_OBJECTS): obj/%.o: src/%.cu
 #	nvcc -arch=sm_20 -dlink $(cuda_objects) -o $@
 
 # Target to link the CUDA enabled vampire
+ifeq ($(shell uname -s), Darwin)
+gcc-cuda: GCC_CFLAGS=$(LLVM_CFLAGS)
+gcc-cuda: GCC_LDFLAGS=$(LLVM_LDFLAGS)
+gcc-cuda: CUDALIBS=-lcudart -lcusparse -lcurand
+endif
 gcc-cuda: GCC_CFLAGS += -DCUDA
 gcc-cuda: $(OBJECTS) $(CUDA_OBJECTS)
 	$(NVCC) $(GCC_LDFLAGS) $(LIBS) ${CUDALIBS} $(OBJECTS) $(CUDA_OBJECTS) -o $(EXECUTABLE)

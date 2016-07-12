@@ -56,7 +56,6 @@ PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
-
 # Objects
 OBJECTS= \
 obj/create/create_system2.o \
@@ -300,5 +299,3 @@ tidy:
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
-
-
