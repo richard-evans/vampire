@@ -279,12 +279,6 @@ $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 #obj/cuda/LLG_cuda.o : src/cuda/LLG_cuda.cu
 #	nvcc -I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3  -c $< -o $@
 
-
-
-
-
-
-
 clean:
 	@rm -f obj/*.o
 	@rm -f obj/*/*.o
