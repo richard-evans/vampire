@@ -41,7 +41,11 @@ namespace config{
 
       // Buffer variables to store copies of data in float format for reduced file size
       extern std::vector<float> output_spin_buffer; // buffer to store float cast spin array for output to disk
-      
+
+      extern int num_io_nodes; // total number of i/o processes
+      extern bool io_master; // flag set to true if I output data
+      extern bool set_num_io_nodes_to_ppn; // flag to post initialise num_io_nodes
+
       //-----------------------------------------------------------------------------
       // Shared functions used for configuration output
       //-----------------------------------------------------------------------------
@@ -71,6 +75,10 @@ namespace config{
                                  const std::vector<double>& spins_cz,
                                  const std::vector<int>& material, // material id
                                  const std::vector<int>& category);
+
+      namespace mpi{
+         void initialize();
+      }
 
    } // end of internal namespace
 } // end of config namespace

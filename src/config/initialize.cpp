@@ -92,9 +92,10 @@ namespace config{
             }
          }
       }
-      
-      config::internal::total_output_atoms = config::internal::local_output_atom_list.size();
-      
+
+      // initialise mpi here
+      config::internal::mpi::initialize();
+
       // resize output buffer to 3*num_output_atoms
       config::internal::output_spin_buffer.resize(3*config::internal::total_output_atoms);
 

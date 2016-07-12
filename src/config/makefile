@@ -9,6 +9,7 @@ data.o \
 initialize.o \
 interface.o \
 meta.o \
+mpi.o \
 output.o \
 write.o \
 write_coords.o

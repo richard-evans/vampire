@@ -43,17 +43,9 @@ namespace config{
       // Buffer variables to store copies of data in float format for reduced file size
       std::vector<float> output_spin_buffer(0); // buffer to store float cast spin array for output to disk
 
-      namespace mpi{         
-         std::vector<float> storage_buffer(0); // temporary buffer to store output in parallel version
-         int buffer_x_offset = 0; // offsets for mpi buffer locations
-         int buffer_y_offset = 0;
-         int buffer_z_offset = 0;
-
-         int my_io_rank = 0; // my id in i/o communicator
-         int my_io_master = 0; // my master id in i/o communicator who I send data to
-         bool io_master = true; // flag set to true if I output data
-         int num_io_nodes = 0; // total number of i/o processes
-      } // end of mpi namespace
+      int num_io_nodes = 1; // total number of i/o processes
+      bool io_master = false; // flag set to true if I output data
+      bool set_num_io_nodes_to_ppn = false; // flag to post initialise num_io_nodes
 
    } // end of internal namespace
 } // end of config namespace
