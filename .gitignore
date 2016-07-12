@@ -4,6 +4,7 @@
 #Ignore temporary editor files
 *~
 *.swp
+*.swo
 #Ignore error files
 *.err
 #Povray files
@@ -27,4 +28,6 @@ output
 run/unit-cell-creator
 MPI-compute-times
 MPI-wait-times
+tags
+.vimrc
 #EOF

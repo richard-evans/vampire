@@ -12,19 +12,19 @@ export OMPI_CXX=g++
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"' 
+ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' 
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' 
-MPICC=mpicxx -DMPICF 
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+MPICC=mpicxx -DMPICF
 
 export LANG=C
 export LC_ALL=C
 
 # LIBS
 LIBS=-lstdc++
-CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
+
 # Debug Flags
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
@@ -53,12 +53,8 @@ GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
-NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
-
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
-
 
 # Objects
 OBJECTS= \
@@ -174,7 +170,6 @@ MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 
-CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
 
 all: $(OBJECTS) serial
@@ -275,14 +270,20 @@ $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
 
 # cuda targets
-gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS) 
-	$(ICC) $(ICC_LDFLAGS) $(LIBS)  $(CUDALIBS) $(CUDA_OBJECTS) obj/cuda/LLG_cuda.o -o $(EXECUTABLE)
+#gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS)
+#	$(ICC) $(ICC_LDFLAGS) $(LIBS)  $(CUDALIBS) $(CUDA_OBJECTS) obj/cuda/LLG_cuda.o -o $(EXECUTABLE)
+#
+#$(CUDA_OBJECTS): obj/%_cuda.o: src/%.cu
+#	$(ICC) -c -o $@ $(ICC_CFLAGS) -DCUDA $<
+#
+#obj/cuda/LLG_cuda.o : src/cuda/LLG_cuda.cu
+#	nvcc -I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3  -c $< -o $@
 
-$(CUDA_OBJECTS): obj/%_cuda.o: src/%.cpp
-	$(ICC) -c -o $@ $(ICC_CFLAGS) -DCUDA $<
 
-obj/cuda/LLG_cuda.o : src/cuda/LLG_cuda.cu
-	nvcc -I/usr/local/cuda/include -I./hdr --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3  -c $< -o $@
+
+
+
+
 
 clean:
 	@rm -f obj/*.o
@@ -293,10 +294,8 @@ purge:
 	@rm -f obj/*/*.o
 	@rm -f vampire
 
-tidy:	
+tidy:
 	@rm -f *~
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
-
-

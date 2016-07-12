@@ -26,7 +26,7 @@ namespace gpu{
 
          #ifdef CUDA
             vcuda::stats::update();
-         #elseif OPENCL
+         #elif OPENCL
             opencl::stats::update();
          #endif
 
@@ -36,6 +36,8 @@ namespace gpu{
       //-------------------------------------------------------------------------------
       // Function to get statistics module data from device for output
       //
+      // Remember to use the set_magnetization in the magnetization_statistic_t instances
+      //
       // There is a performance penalty for rapid updates of statistics for output
       // to disk.
       //
@@ -44,7 +46,7 @@ namespace gpu{
 
          #ifdef CUDA
             vcuda::stats::get();
-         #elseif OPENCL
+         #elif OPENCL
             opencl::stats::get();
          #endif
 
@@ -58,7 +60,7 @@ namespace gpu{
 
          #ifdef CUDA
             vcuda::stats::reset();
-         #elseif OPENCL
+         #elif OPENCL
             opencl::stats::reset();
          #endif
 

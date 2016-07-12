@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 
-namespace cuda{
+namespace vcuda{
 
 #ifdef CUDA
 
@@ -25,8 +25,15 @@ namespace cuda{
    extern void stats_update();
    extern void finalize();
 
+   namespace stats
+   {
+      void update ();
+      void get ();
+      void reset ();
+   } /* stats */
+
 #endif
 
-} // end of gpu namespace
+} // end of vcuda namespace
 
 #endif //CUDA_H_

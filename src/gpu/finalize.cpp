@@ -23,8 +23,8 @@ namespace gpu{
    void finalize(){
 
       #ifdef CUDA
-         cuda::finalize();
-      #elseif OPENCL
+         vcuda::finalize();
+      #elif OPENCL
          opencl::finalize();
       #endif
 
