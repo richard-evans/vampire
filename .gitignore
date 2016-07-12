@@ -15,7 +15,7 @@
 *.cfg
 *.inc
 info
-vampire
+vampire*
 cfg2povray
 cfg2rasmol
 crystal.xyz

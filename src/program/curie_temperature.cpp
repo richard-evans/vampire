@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -63,13 +63,13 @@ namespace program{
 /// @callgraph
 /// @callergraph
 ///
-/// @details Consists of a sequence of sub-calculations of fixed temperature. The system is initialised 
+/// @details Consists of a sequence of sub-calculations of fixed temperature. The system is initialised
 /// accoring to the input flag - either randomly or ordered.For the ordered case the temperature sequence
 /// increases from zero, for the random case the temperature decreases from the maximum temperature. After
 /// initialisation the sytem is equilibrated for sim::equilibration timesteps.
 ///
 /// @section notes Implementation Notes
-/// Capable of hot>cold or cold>hot calculation. 
+/// Capable of hot>cold or cold>hot calculation.
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -82,7 +82,7 @@ namespace program{
 ///
 /// @param[in] init Determines whether the system is initialised randomly (0) or ordered (1)
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		11/01/2010
 ///	Revision:	09/03/2011
@@ -94,39 +94,44 @@ int curie_temperature(){
 	if(err::check==true){std::cout << "program::curie_temperature has been called" << std::endl;}
 
 	// Set starting temperature
-	sim::temperature=sim::Tmin;
+    // Initialise sim::temperature
+	if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
+		sim::temperature+=sim::delta_temperature;
+    }
+    else sim::temperature=sim::Tmin;
 
 	// Perform Temperature Loop
 	while(sim::temperature<=sim::Tmax){
 
-		// Equilibrate system
-		sim::integrate(sim::equilibration_time);
-		
+		// Equilibrate system only if not checkpoint
+	   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
+		else sim::integrate(sim::equilibration_time);
+
 		// Reset mean magnetisation counters
 		stats::mag_m_reset();
-		
+
 		// Reset start time
 		int start_time=sim::time;
 
 		// Simulate system
 		while(sim::time<sim::loop_time+start_time){
-			
+
 			// Integrate system
 			sim::integrate(sim::partial_time);
-		
+
 			// Calculate magnetisation statistics
 			stats::mag_m();
 
 		}
-		
+
 		// Output data
 		vout::data();
-		
+
 		// Increment temperature
 		sim::temperature+=sim::delta_temperature;
-		
+
 	} // End of temperature loop
-		
+
 	return EXIT_SUCCESS;
 }
 

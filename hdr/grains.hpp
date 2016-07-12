@@ -37,6 +37,7 @@
 namespace grains{
 
 	extern int num_grains;
+	extern bool random_anisotropy; // flag to control randomly oriented uniaxial anisotropy
 
 	extern std::vector <int> grain_size_array;
 
@@ -58,5 +59,3 @@ namespace grains{
 }
 
 #endif /*GRAINS_H_*/
-
-
