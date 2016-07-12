@@ -97,7 +97,7 @@ __global__ void update_non_exchange_spin_fields_kernel (
 
       int mid = material[i];
       // Load parameters from memory
-      cu::material_parameters_t mat = material_params[mid];
+      cu::material_parameters_t material = material_params[mid];
 
       // Initialise register to hold total spin field
       cu_real_t field_x = 0.0;
@@ -111,12 +111,12 @@ __global__ void update_non_exchange_spin_fields_kernel (
       /*
        * Scalar anisotropy
        */
-      cu_real_t ku = material_params[mid].ku;
+      cu_real_t ku = material.ku;
       field_z -= 2.0 * ku * sz;
 
-      cu_real_t ex = material_params[mid].anisotropy_unit_x;
-      cu_real_t ey = material_params[mid].anisotropy_unit_y;
-      cu_real_t ez = material_params[mid].anisotropy_unit_z;
+      cu_real_t ex = material.anisotropy_unit_x;
+      cu_real_t ey = material.anisotropy_unit_y;
+      cu_real_t ez = material.anisotropy_unit_z;
 
       cu_real_t sdote = sx * ex + sy * ey + sz * ez;
       cu_real_t sdote3 = sdote * sdote * sdote;
@@ -128,9 +128,9 @@ __global__ void update_non_exchange_spin_fields_kernel (
 
       cu_real_t scale = 0.6666666666666667;
 
-      cu_real_t k2 = material_params[mid].sh2;
-      cu_real_t k4 = material_params[mid].sh4;
-      cu_real_t k6 = material_params[mid].sh6;
+      cu_real_t k2 = material.sh2;
+      cu_real_t k4 = material.sh4;
+      cu_real_t k6 = material.sh6;
 
       cu_real_t ek2 = k2 * 3.0 * sdote;
       cu_real_t ek4 = k4 * 0.125 * (140.0 * sdote3 - 60.0 *sdote);
@@ -153,7 +153,7 @@ __global__ void update_non_exchange_spin_fields_kernel (
        * TODO: communicate every timestep
        */
 
-      //cu_real_t k_latt = 2.0 * material_params[mid].k_latt;
+      //cu_real_t k_latt = 2.0 * material.k_latt;
       //field_x -= k_latt * ex * sdote;
       //field_y -= k_latt * ey * sdote;
       //field_z -= k_latt * ez * sdote;
