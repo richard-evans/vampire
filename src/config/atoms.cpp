@@ -6,7 +6,7 @@
 // (c) R F L Evans 2015. All rights reserved.
 //
 //-----------------------------------------------------------------------------
-Rory - this is old and is to be deleted
+// Rory - this is old and is to be deleted
 // C++ standard library headers
 #include <iomanip>
 #include <sstream>

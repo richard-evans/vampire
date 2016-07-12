@@ -12,12 +12,12 @@ export OMPI_CXX=g++
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"' 
+ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' 
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' 
-MPICC=mpicxx -DMPICF 
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+MPICC=mpicxx -DMPICF
 
 export LANG=C
 export LC_ALL=C
@@ -53,7 +53,7 @@ GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
 NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
@@ -75,14 +75,6 @@ obj/data/category.o \
 obj/data/cells.o \
 obj/data/grains.o \
 obj/data/lattice_anisotropy.o \
-obj/ltmp/absorption_profile.o \
-obj/ltmp/data.o \
-obj/ltmp/field.o \
-obj/ltmp/initialise.o \
-obj/ltmp/interface.o \
-obj/ltmp/is_enabled.o \
-obj/ltmp/local_temperature.o \
-obj/ltmp/output.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
@@ -92,6 +84,7 @@ obj/mpi/mpi_generic.o \
 obj/mpi/mpi_create2.o \
 obj/mpi/mpi_comms.o \
 obj/mpi/decomposition.o \
+obj/mpi/wrapper.o \
 obj/program/bmark.o \
 obj/program/cmc_anisotropy.o \
 obj/program/curie_temperature.o \
@@ -108,6 +101,7 @@ obj/program/time_series.o \
 obj/program/temperature_pulse.o \
 obj/program/localised_temperature_pulse.o \
 obj/program/effective_damping.o \
+obj/program/fmr.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -154,8 +148,11 @@ obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
-include	src/config/makefile
+include src/config/makefile
+include src/create/makefile
 include src/gpu/makefile
+include src/ltmp/makefile
+include src/simulate/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)
@@ -276,7 +273,7 @@ $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
 
 # cuda targets
-gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS) 
+gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS)
 	$(ICC) $(ICC_LDFLAGS) $(LIBS)  $(CUDALIBS) $(CUDA_OBJECTS) obj/cuda/LLG_cuda.o -o $(EXECUTABLE)
 
 $(CUDA_OBJECTS): obj/%_cuda.o: src/%.cpp
@@ -294,10 +291,8 @@ purge:
 	@rm -f obj/*/*.o
 	@rm -f vampire
 
-tidy:	
+tidy:
 	@rm -f *~
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
-
-

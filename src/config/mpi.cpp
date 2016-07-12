@@ -6,7 +6,7 @@
 // (c) R F L Evans 2015. All rights reserved.
 //
 //-----------------------------------------------------------------------------
-Rory - this works and is nearly finished
+// Rory - this works and is nearly finished
 // C++ standard library headers
 #include <iomanip>
 #include <fstream>

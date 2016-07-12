@@ -36,7 +36,7 @@ struct coord_t{
 namespace config{
    namespace internal{
 
-Rory these functions need fixing
+// Rory these functions need fixing
 
       // forward function declarations
       void write_coordinate_data_text(const std::vector<double>& spins_cx, // spin coordinates (Angstroms)
@@ -87,11 +87,11 @@ Rory these functions need fixing
             const int index = config::internal::local_output_atom_list[id];
 
             // copy and cast data to be output to main output buffer
-            buffer[id].material = material[index];
-            buffer[id].category = category[index];
-            buffer[id].x = float(spins_cx[index]);
-            buffer[id].y = float(spins_cy[index]);
-            buffer[id].z = float(spins_cz[index]);
+            //buffer[id].material = material[index];
+            //buffer[id].category = category[index];
+            //buffer[id].x = float(spins_cx[index]);
+            //buffer[id].y = float(spins_cy[index]);
+            //buffer[id].z = float(spins_cz[index]);
 
          }
 
@@ -100,12 +100,12 @@ Rory these functions need fixing
          switch(config::internal::output_data_format){
 
             case config::internal::binary:
-               write_coordinate_data_binary(buffer, filename.str());
+               //write_coordinate_data_binary(buffer, filename.str());
                //write_coordinate_data_binary(buffer, filename.str());
                break;
 
             case config::internal::text:
-               write_coordinate_data_text(buffer, filename.str());
+               //write_coordinate_data_text(buffer, filename.str());
                break;
 
          }
@@ -224,25 +224,25 @@ Rory these functions need fixing
             ofile.open (filename.c_str(),std::ios::binary);
 
             // determine number of data to output
-            const uint64_t buffer_size = buffer.size();
+            //const uint64_t buffer_size = buffer.size();
 
             // output number of data
-            ofile.write(reinterpret_cast<const char*>(&buffer_size),sizeof(uint64_t));
+            //ofile.write(reinterpret_cast<const char*>(&buffer_size),sizeof(uint64_t));
 
             // output buffer to disk
-            ofile.write(reinterpret_cast<const char*>(&buffer[0]),sizeof(coord_t)*buffer.size());
+            //ofile.write(reinterpret_cast<const char*>(&buffer[0]),sizeof(coord_t)*buffer.size());
 
             // close output file
             ofile.close();
 
             // stop the timer
-            double total_time = timer.elapsed_time(); // seconds
+            //double total_time = timer.elapsed_time(); // seconds
 
             // get file size (bytes)
-            double data_size = double(sizeof(coord_t)*buffer.size());
+            //double data_size = double(sizeof(coord_t)*buffer.size());
 
             // calculate data rate and output to log
-            zlog << 1.0e-6*data_size/total_time << " MB/s" << std::endl;
+            //zlog << 1.0e-6*data_size/total_time << " MB/s" << std::endl;
 
          #endif
 

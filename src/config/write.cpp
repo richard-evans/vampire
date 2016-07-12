@@ -19,7 +19,7 @@
 
 // config headers
 #include "internal.hpp"
-Rory these functions need fixing
+// Rory these functions need fixing
 namespace config{
    namespace internal{
 
