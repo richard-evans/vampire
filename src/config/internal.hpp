@@ -11,7 +11,7 @@
 
 //---------------------------------------------------------------------
 // Defines shared internal data structures and functions for the
-// configuration output implementation. These functions should 
+// configuration output implementation. These functions should
 // not be accessed outside of the configuration output code.
 //---------------------------------------------------------------------
 namespace config{
@@ -20,7 +20,7 @@ namespace config{
       // Shared data structures used for configuration output
       //-----------------------------------------------------------------------------
       enum data_format_t {text, binary};
-      
+
       //-----------------------------------------------------------------------------
       // Shared variables used for configuration output
       //-----------------------------------------------------------------------------
@@ -33,10 +33,10 @@ namespace config{
       extern int output_rate_counter; // configuration output counter
 
       extern data_format_t output_data_format;
-      
+
       extern double atoms_output_min[3]; // Spatial range fr atomic output
       extern double atoms_output_max[3];
-      extern std::vector<int> local_output_atom_list; // list of atoms to be output according to spatial range      
+      extern std::vector<int> local_output_atom_list; // list of atoms to be output according to spatial range
       extern int total_output_atoms; // Total number of atoms to be output on local node
 
       // Buffer variables to store copies of data in float format for reduced file size
@@ -59,7 +59,7 @@ namespace config{
                       const double magnetization_x, // magnetization components (normalized)
                       const double magnetization_y,
                       const double magnetization_z);
-      
+
       void copy_data_to_buffer(const std::vector<double>& x, // vector data
                                const std::vector<double>& y,
                                const std::vector<double>& z,

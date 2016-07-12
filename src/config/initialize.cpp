@@ -25,8 +25,8 @@
 namespace config{
 
    // Forward declaration of functions
-   
-   
+
+
    //-----------------------------------------------------------------------------
    //
    //
@@ -54,21 +54,16 @@ namespace config{
 
       // Check if config output is needed
       if(config::internal::output_meta || config::internal::output_coords){
-         
+
       zlog << zTs() << "Initializing configuration file output" << std::endl;
 
-      // determine number of atoms to output on io process
-      // mpi_all_reduce(num_atoms) MPI_COMM_NODE
-      
-      // allocate temporary storage on vmpi::my_io
-      
       //--------------------------------------------------------------------
       // Determine atoms to output
       //--------------------------------------------------------------------
-      
+
       // resize atom list to zero
       config::internal::local_output_atom_list.resize(0);
-      
+
       // get output bounds
       const double minB[3]={config::internal::atoms_output_min[0]*system_dimensions_x,
                             config::internal::atoms_output_min[1]*system_dimensions_y,
@@ -100,7 +95,7 @@ namespace config{
       config::internal::output_spin_buffer.resize(3*config::internal::total_output_atoms);
 
       // cell buffer...
-      
+
       //-------------------------------------------------------
       // Output spin coordinate meta data
       //-------------------------------------------------------
@@ -110,16 +105,16 @@ namespace config{
          config::internal::write_coordinate_meta();
 
          // write coordinate and id data
-         config::internal::write_coordinate_data(spins_cx, spins_cy, spins_cz, material, category); 
-         
+         config::internal::write_coordinate_data(spins_cx, spins_cy, spins_cz, material, category);
+
       }
-      
+
       }
-      
+
       return;
 
    }
 
-   
-   
+
+
 } // end of namespace config

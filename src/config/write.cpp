@@ -19,7 +19,7 @@
 
 // config headers
 #include "internal.hpp"
-
+Rory these functions need fixing
 namespace config{
    namespace internal{
 
@@ -36,8 +36,8 @@ namespace config{
       //
       //  format which is then written to disk sequentially in binary or text mode.
       //
-      //  Data which are to be output are predetermined in the mask for improved peformance. Data are also 
-      //  cast to float to reduce storage requirements from 24 to 12 bytes per datum for improved write 
+      //  Data which are to be output are predetermined in the mask for improved peformance. Data are also
+      //  cast to float to reduce storage requirements from 24 to 12 bytes per datum for improved write
       //  performance and file size.
       //
       //  Parallel (MPI) mode
@@ -59,7 +59,7 @@ namespace config{
       //
       //--------------------------------------------------------------------------------------------------------
       //
-      // Data is imported as 3 x 1D vectors for x,y and z respectively. The mask identifies which data should 
+      // Data is imported as 3 x 1D vectors for x,y and z respectively. The mask identifies which data should
       // be outputted as a sparse list (each mask id lists an array index of data to be output. The float buffer
       // stores the final complete data to be output to disk and must be 3*mask.size().
       //
@@ -105,9 +105,9 @@ namespace config{
 
          // Output informative message to log file
          zlog << zTs() << "Outputting configuration file " << filename << " to disk ";
-         
+
          switch(config::internal::output_data_format){
-            
+
             case config::internal::binary:
                write_data_binary(filename, buffer);
                break;
@@ -130,13 +130,13 @@ namespace config{
       //----------------------------------------------------------------------------------------------------
       //
       void write_data_text(std::string filename, const std::vector<float>& buffer){
-         
+
          #ifdef MPICF
 
 
             // Set CPUID on non-root process
          //   filename << std::setfill('0') << std::setw(5) << config vmpi::my_rank << "-";
-
+// aggregate bandwidth
          #else
 
             // determine file name
@@ -150,7 +150,7 @@ namespace config{
 
             // instantiate timer
             vutil::vtimer_t timer;
-            
+
             // start timer
             timer.start();
 
@@ -166,8 +166,8 @@ namespace config{
 
             // output buffer to disk
             for(int index = 0; index < buffer_size; ++index){
-               ofile << buffer[3*index + 0] << "\t" 
-                     << buffer[3*index + 1] << "\t" 
+               ofile << buffer[3*index + 0] << "\t"
+                     << buffer[3*index + 1] << "\t"
                      << buffer[3*index + 2] << "\n";
             }
 
@@ -182,7 +182,7 @@ namespace config{
 
             // get file size (bytes)
             double data_size = double(in.tellg());
-            
+
             // close file
             in.close();
 
@@ -200,7 +200,7 @@ namespace config{
       //----------------------------------------------------------------------------------------------------
       //
       void write_data_binary(std::string filename, const std::vector<float>& buffer){
-         
+
          #ifdef MPICF
 
 
@@ -209,7 +209,7 @@ namespace config{
 
          #else
 
-            // determine file name   
+            // determine file name
             //std::stringstream filename;
             //filename << "atoms-";
             //filename << std::setfill('0') << std::setw(8) << config::internal::output_file_counter;
@@ -218,10 +218,10 @@ namespace config{
 
             // instantiate timer
             vutil::vtimer_t timer;
-            
+
             // start timer
             timer.start();
-            
+
             // Declare and open output file
             std::ofstream ofile;
             ofile.open (filename.c_str(),std::ios::binary);
@@ -237,16 +237,16 @@ namespace config{
 
             // close output file
             ofile.close();
-            
+
             // stop the timer
             double total_time = timer.elapsed_time(); // seconds
-            
+
             // get file size (bytes)
             double data_size = double(sizeof(float)*buffer.size());
 
             // calculate data rate and output to log
             zlog << 1.0e-6*data_size/total_time << " MB/s" << std::endl;
-      
+
          #endif
 
          return;

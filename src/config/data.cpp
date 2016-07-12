@@ -37,7 +37,7 @@ namespace config{
 
       double atoms_output_min[3] = {0.0,0.0,0.0}; // Spatial range fr atomic output
       double atoms_output_max[3] = {1.0,1.0,1.0};
-      std::vector<int> local_output_atom_list(0); // list of atoms to be output according to spatial range      
+      std::vector<int> local_output_atom_list(0); // list of atoms to be output according to spatial range
       int total_output_atoms = 0; // Total number of atoms to be output on local node
 
       // Buffer variables to store copies of data in float format for reduced file size
@@ -49,4 +49,3 @@ namespace config{
 
    } // end of internal namespace
 } // end of config namespace
-
