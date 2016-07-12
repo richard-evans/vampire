@@ -82,7 +82,7 @@ namespace vmpi{
          node_dimensions = decompose(my_node_id, num_nodes, system_dimensions, "System", "nodes");
 
          /*if(node_rank == 0){
-            std::cerr << vmpi::my_rank << " " << my_node << " " << num_nodes << " " << num_processors_on_my_node << " " << 
+            std::cerr << vmpi::my_rank << " " << my_node << " " << num_nodes << " " << num_processors_on_my_node << " " <<
             node_dimensions.minx << " " << node_dimensions.miny << " " << node_dimensions.minz << " " <<
             node_dimensions.maxx << " " << node_dimensions.maxy << " " << node_dimensions.maxz << "nd" << std::endl;
          }*/
@@ -178,8 +178,8 @@ namespace vmpi{
       // Calculate local mpi_dimensions assuming box
       //---------------------------------------------------
       const int my_rank = id;
-      const double dx=lx/double(nx); 
-      const double dy=ly/double(ny); 
+      const double dx=lx/double(nx);
+      const double dy=ly/double(ny);
       const double dz=lz/double(nz);
 
       // calculate each rank on x, y, z directions respectively
@@ -199,7 +199,7 @@ namespace vmpi{
       block_dimensions.maxz = double(my_rank_z)*dz + dz + dimensions.minz;
 
       //std::cerr << vmpi::my_rank << "\t" << id << "\t" << nx << "\t" << ny << "\t" << nz << "\trrrrr" << std::endl;
-      
+
       return block_dimensions;
 
    }
