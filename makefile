@@ -60,6 +60,8 @@ IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
 
+#obj/data/cells.o \
+
 # Objects
 OBJECTS= \
 obj/create/create_system2.o \
@@ -72,7 +74,6 @@ obj/create/cs_voronoi2.o \
 obj/create/multilayers.o \
 obj/data/atoms.o \
 obj/data/category.o \
-obj/data/cells.o \
 obj/data/grains.o \
 obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
@@ -103,9 +104,9 @@ obj/program/effective_damping.o \
 obj/program/fmr.o \
 obj/random/mtrand.o \
 obj/random/random.o \
+obj/simulate/demag.o \
 obj/simulate/energy.o \
 obj/simulate/fields.o \
-obj/simulate/demag.o \
 obj/simulate/LLB.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
@@ -148,7 +149,8 @@ obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
 include src/create/makefile
-include src/dipole/makefile
+include src/cells/makefile
+#include src/dipole/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
@@ -178,7 +180,7 @@ all: $(OBJECTS) serial
 
 # Serial Targets
 serial: $(OBJECTS)
-	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE).s
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
@@ -202,7 +204,7 @@ $(IBM_OBJECTS): obj/%_ibm.o: src/%.cpp
 	$(IBM) -c -o $@ $(IBM_CFLAGS) $<
 
 serial-debug: $(GCCDB_OBJECTS)
-	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE).s
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
@@ -228,7 +230,7 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE).p
 #export OMPI_CXX=icc
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
@@ -254,7 +256,7 @@ $(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
 
 parallel-debug: $(MPI_GCCDB_OBJECTS)
-	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE).p
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<

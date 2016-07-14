@@ -14,8 +14,10 @@
 *.png
 *.cfg
 *.inc
+*old.cpp
+*old.hpp
 info
-vampire
+vampire*
 cfg2povray
 cfg2rasmol
 crystal.xyz
@@ -27,4 +29,9 @@ output
 run/unit-cell-creator
 MPI-compute-times
 MPI-wait-times
+src/dipole/data.cpp
+src/dipole/initialize.cpp
+src/dipole/internal.hpp
+src/dipole/field.cpp
+src/dipole/update.cpp
 #EOF

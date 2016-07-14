@@ -285,17 +285,37 @@ int create(){
 	} // stop if for staged generation here
 	#endif
 
-	// Set grain and cell variables for simulation
-	grains::set_properties();
-	cells::initialise();
-	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
-
    // Determine number of local atoms
    #ifdef MPICF
       int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    #else
       int num_local_atoms = atoms::num_atoms;
    #endif
+   std::cout << "num_local_atoms from create_system2.cpp = " << num_local_atoms << std::endl;
+
+	// Set grain and cell variables for simulation
+	grains::set_properties();
+	//cells::initialise();
+   cells::initialize(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  cs::unit_cell.dimensions[0],
+                  cs::unit_cell.dimensions[1],
+                  cs::unit_cell.dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::x_spin_array,
+                  atoms::y_spin_array,
+                  atoms::z_spin_array,
+                  atoms::type_array,
+                  atoms::cell_array,
+                  //num_local_atoms,
+                  atoms::num_atoms
+                  );
+
+	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
+
    //----------------------------------------
    // Initialise local temperature data
    //----------------------------------------
@@ -322,6 +342,7 @@ int create(){
 		//std::cout << "Outputting coordinate data" << std::endl;
 		//vmpi::crystal_xyz(catom_array);
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   std::cout << "my_num_atoms == " << my_num_atoms << std::endl;
 	int total_num_atoms=0;
 	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
 	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
