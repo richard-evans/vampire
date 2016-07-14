@@ -46,7 +46,7 @@ void initialise(const double system_dimensions_x,
    //-------------------------------------------------------------------------------------
    // Check for spin torque calculation enabled, if not do nothing
    //-------------------------------------------------------------------------------------
-   if(!st::internal::enabled) return;
+    if(st::internal::enabled==false) return;
 
    // output informative message
    zlog << zTs() << "Initialising data structures for spin torque calculation." << std::endl;
@@ -101,6 +101,11 @@ void initialise(const double system_dimensions_x,
    st::internal::sd_exchange.resize(array_size); /// diffusion constant Do
    st::internal::a.resize(array_size); // a parameter for spin accumulation
    st::internal::b.resize(array_size); // b parameter for spin accumulation
+   st::internal::coeff_ast.resize(array_size);
+   st::internal::coeff_nast.resize(array_size);
+   st::internal::cell_natom.resize(array_size);
+   st::internal::cell_mus.resize(array_size);
+
 
    const int three_vec_array_size = 3*array_size;
    st::internal::pos.resize(three_vec_array_size); /// microcell position
@@ -110,6 +115,7 @@ void initialise(const double system_dimensions_x,
    st::internal::spin_torque.resize(three_vec_array_size); // spin torque
    st::internal::ast.resize(three_vec_array_size); // adiabatic spin torque
    st::internal::nast.resize(three_vec_array_size); // non-adiabatic spin torque
+   st::internal::total_ST.resize(three_vec_array_size); // non-adiabatic spin torque
 
    //---------------------------------------------------
    // Noi Initialise j,sa, st, ast, nast here?
@@ -233,12 +239,12 @@ namespace internal{
       //-------------------------------------------------------
       // Determine microcell properties from atomic properties
       //-------------------------------------------------------
-      st::internal::default_properties.beta_cond = 0.0;
-      st::internal::default_properties.beta_diff = 0.0;
-      st::internal::default_properties.sa_infinity = 0.0;
-      st::internal::default_properties.lambda_sdl = 600.0e-9; // m
-      st::internal::default_properties.diffusion = 0.003; //Angstroms^2/s
-      st::internal::default_properties.sd_exchange = 0.0;
+      st::internal::default_properties.beta_cond = 0.11;
+      st::internal::default_properties.beta_diff = 0.36;
+      st::internal::default_properties.sa_infinity = 1.0e8;
+      st::internal::default_properties.lambda_sdl = 100.0e-9; // m
+      st::internal::default_properties.diffusion = 0.0001; //Angstroms^2/s
+      st::internal::default_properties.sd_exchange = 1.6e-21; //Joule
 
       // Temporary array to hold number of atoms in each cell for averaging
       std::vector<double> count(st::internal::beta_cond.size(),0.0);
@@ -284,6 +290,9 @@ namespace internal{
       // Calculate average (mean) spin torque parameters
       for(int cell=0; cell<beta_cond.size(); ++cell){
          const double nat = count.at(cell);
+
+          st::internal::cell_natom[cell] = nat;
+
          // check for zero atoms in cell
          if(nat>0.0001){
             st::internal::beta_cond.at(cell)   /= nat;

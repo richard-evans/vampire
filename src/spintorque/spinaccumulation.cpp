@@ -64,10 +64,11 @@ namespace st{
             st::internal::sa[3*idx+0] = 0.0;
             st::internal::sa[3*idx+1] = 0.0;
             st::internal::sa[3*idx+2] = 0.0; //10.e6;// t::internal::default_properties.sa_infinity;
-            st::internal::j [3*idx+0] = 0.0;
-            st::internal::j [3*idx+1] = 0.0;
-            st::internal::j [3*idx+2] = 0.0; //je*0.5; //*st::internal::beta_cond[idx+0]*0.5;
-            st::internal::m [3*idx+2] = 1.0;
+
+            st::internal::j [3*idx+0] = st::internal::initial_beta*je*st::internal::initial_m[0];
+            st::internal::j [3*idx+1] = st::internal::initial_beta*je*st::internal::initial_m[1];
+            st::internal::j [3*idx+2] = st::internal::initial_beta*je*st::internal::initial_m[2];
+
 
             // loop over all cells in stack after first (idx+1)
             for(int cell=idx+1; cell<idx+num_microcells_per_stack; ++cell){
@@ -236,18 +237,71 @@ namespace st{
                st::internal::spin_torque[celly] = microcell_volume * st::internal::sd_exchange[cell] * say * i_e * i_muB;
                st::internal::spin_torque[cellz] = microcell_volume * st::internal::sd_exchange[cell] * saz * i_e * i_muB;
 
-               //std::cout << st::internal::spin_torque[cellx] << "\t" << st::internal::spin_torque[celly] << "\t" <<  st::internal::spin_torque[cellz] << "\t";
-               //std::cout << sax << "\t" << say << "\t" << saz << "\t" << st::internal::sd_exchange[cell] << std::endl;
-               // double stx = ...
-               // double sty = ...
-               // double stz = ...
 
-               // maybe some functions?
-               // update_j();
+              //--------------------------------------------
+              // Step 5 calculate the spin torque of each cell
+              //--------------------------------------------
 
-               // st::internal::spin_torque[cell+0] = stx;
-               // st::internal::spin_torque[cell+1] = sty;
-               // st::internal::spin_torque[cell+2] = stz;
+               //convert M of previous cell into basis b1, b2, b3
+
+               M.xx = b1.x;    M.xy = b2.x;    M.xz = b3.x;
+               M.yx = b1.y;    M.yy = b2.y;    M.yz = b3.y;
+               M.zx = b1.z;    M.zy = b2.z;    M.zz = b3.z;
+
+               V.x = pm.x;
+               V.y = pm.y;
+               V.z = pm.z;
+
+               const st::internal::three_vector_t pm_basis = gaussian_elimination(M, V);
+
+               const double pm_b1 = pm_basis.x;
+               const double pm_b2 = pm_basis.y;
+               const double pm_b3 = pm_basis.z;
+
+               // Calculate the spin torque coefficients describing ast and nast
+
+               const double prefac_sc = microcell_volume * st::internal::sd_exchange[cell] * i_e * i_muB;
+               const double plus_perp =  (pm_b2*pm_b2 + pm_b3*pm_b3);
+               const double minus_perp = (pm_b2*pm_b2 - pm_b3*pm_b3);
+	        double aj; // the ST parameter describing Slonczewski torque
+               double bj; // the ST parameter describing field-like torque
+
+
+                if( ( plus_perp <= 1.0e-7 ) ){
+                    aj = 0.0;
+                    bj = 0.0; }
+
+                else{
+                    aj  = prefac_sc*(sa_perp2*pm_b3 - sa_perp3*pm_b2)/plus_perp;
+                    bj  = prefac_sc*(sa_perp2*pm_b2 + sa_perp3*pm_b3)/plus_perp;
+                }
+
+                double SxSp[3], SxSxSp[3];
+                st::internal::coeff_ast[cell]  = aj;
+                st::internal::coeff_nast[cell] = bj;
+
+                SxSp[0]=(m.y*pm.z-m.z*pm.y);
+                SxSp[1]=(m.z*pm.x-m.x*pm.z);
+                SxSp[2]=(m.x*pm.y-m.y*pm.x);
+
+                SxSxSp[0]= (m.y*SxSp[2]-m.z*SxSp[1]);
+                SxSxSp[1]= (m.z*SxSp[0]-m.x*SxSp[2]);
+                SxSxSp[2]= (m.x*SxSp[1]-m.y*SxSp[0]);
+
+                //calculate directly from J(Sxm)
+                st::internal::total_ST[cellx] = prefac_sc*(m.y*saz-m.z*say);
+                st::internal::total_ST[celly] = prefac_sc*(m.z*sax-m.x*saz);
+                st::internal::total_ST[cellz] = prefac_sc*(m.x*say-m.y*sax);
+
+                st::internal::ast[cellx] = -aj*SxSxSp[0];
+                st::internal::ast[celly] = -aj*SxSxSp[1];
+                st::internal::ast[cellz] = -aj*SxSxSp[2];
+
+                st::internal::nast[cellx] = bj*SxSp[0];
+                st::internal::nast[celly] = bj*SxSp[1];
+                st::internal::nast[cellz] = bj*SxSp[2];
+
+
 
             } // end of cell loop
          } // end of stack loop
@@ -255,6 +309,7 @@ namespace st{
          // Reduce all microcell spin torques on all nodes
          #ifdef MPICF
             MPI_Allreduce(MPI_IN_PLACE, &st::internal::spin_torque[0],st::internal::spin_torque.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &st::internal::total_ST[0],st::internal::total_ST.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
 
          st::internal::output_microcell_data();

@@ -43,6 +43,12 @@ namespace st{
             st::internal::m[3*cell+0] += x_spin_array[atom]*mus;
             st::internal::m[3*cell+1] += y_spin_array[atom]*mus;
             st::internal::m[3*cell+2] += z_spin_array[atom]*mus;
+
+            //calculate average mus of each ST cell
+            const double natom = st::internal::cell_natom[cell];
+            const double i_natom = 1.0/natom;
+            st::internal::cell_mus[cell] += mus*i_natom;
+
          }
 
          #ifdef MPICF

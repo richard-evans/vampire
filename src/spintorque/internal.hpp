@@ -41,6 +41,11 @@ namespace st{
       extern int config_file_counter; // spin torque config file counter
 
       extern double je; // current (C/s)
+      extern double initial_beta;
+      extern int ST_output_rate;
+
+      extern std::vector<double> initial_m;
+
 
       extern std::vector<int> stack_index; // start of stack in microcell arrays
 
@@ -52,6 +57,12 @@ namespace st{
       extern std::vector<double> sd_exchange; /// spin diffusion length
       extern std::vector<double> a; /// spin diffusion length
       extern std::vector<double> b; /// spin diffusion length
+      extern std::vector<double> coeff_ast;
+      extern std::vector<double> coeff_nast;
+
+      extern std::vector<double> cell_natom;
+      extern std::vector<double> cell_mus;
+
 
       // three-vector arrays
       extern std::vector<double> pos; /// stack position
@@ -61,6 +72,8 @@ namespace st{
       extern std::vector<double> spin_torque; // spin torque
       extern std::vector<double> ast; // adiabatic spin torque
       extern std::vector<double> nast; // non-adiabatic spin torque
+      extern std::vector<double> total_ST; // non-adiabatic spin torque
+
 
       // material parameters for spin torque calculation
       struct mp_t{
