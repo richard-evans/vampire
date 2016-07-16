@@ -22,6 +22,11 @@ namespace dipole{
    // Externally visible variables
    //------------------------------------------------------------------------------
    int update_rate=100; /// timesteps between updates
+   bool activated=false;
+
+   std::vector < double > cells_field_array_x;
+   std::vector < double > cells_field_array_y;
+   std::vector < double > cells_field_array_z;
 
    namespace internal{
 
@@ -58,13 +63,17 @@ namespace dipole{
       std::vector < double > atom_dipolar_field_array_y;
       std::vector < double > atom_dipolar_field_array_z;
 
-      std::vector < double > cells_field_array_x;
-      std::vector < double > cells_field_array_y;
-      std::vector < double > cells_field_array_z;
-      std::vector < double > cells_field_array_x;
-      std::vector < double > cells_field_array_y;
-      std::vector < double > cells_field_array_z;
+      int cells_num_cells;
+      int cells_num_local_cells;
+      std::vector <int>  cells_local_cell_array;
+      std::vector <int>  cells_num_atoms_in_cell;
+      std::vector < double > cells_mag_array_x;
+      std::vector < double > cells_mag_array_y;
+      std::vector < double > cells_mag_array_z;
       std::vector < double > cells_volume_array;
+
+      int sim_time;
+
       //------------------------------------------------------------------------
       // Shared functions inside dipole module
       //------------------------------------------------------------------------

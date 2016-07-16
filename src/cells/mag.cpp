@@ -46,7 +46,7 @@ namespace cells{
       #else
          int num_local_atoms = cells::internal::num_atoms;
       #endif
-      std::cout << "num_local_atoms from mag.cpp = " << num_local_atoms << std::endl;
+      //std::cout << "num_local_atoms from mag.cpp = " << num_local_atoms << std::endl;
 
       // calulate total moment in each cell
       for(int i=0;i<num_local_atoms;++i) {

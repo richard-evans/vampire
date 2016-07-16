@@ -13,6 +13,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
 
 // Vampire headers
 #include "dipole.hpp"
@@ -22,13 +23,28 @@
 //--------------------------------------------------------------------------------
 namespace dipole{
 
+   //------------------------------------------------------------------------------
+   // Externally visible variables
+   //------------------------------------------------------------------------------
+   extern int update_rate; /// timesteps between updates
+   extern bool activated;
+
+   extern std::vector<double> cells_field_array_x; /// arrays to store cells field
+   extern std::vector<double> cells_field_array_y;
+   extern std::vector<double> cells_field_array_z;
+
+   //-----------------------------------------------------------------------------
+   // Function to unroll cells dipolar field into atomic field
+   //-----------------------------------------------------------------------------
+   void calculate_field();
+
    //-----------------------------------------------------------------------------
    // Function to initialise dipole module
    //-----------------------------------------------------------------------------
    void initialize(const int cells_num_atoms_in_unit_cell,
                    const int cells_num_cells, /// number of macrocells
                    const int cells_num_local_cells, /// number of local macrocells
-                   const double cells_macro_cell_size
+                   const double cells_macro_cell_size,
                    const std::vector <int>& cells_local_cell_array,
                    const std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                    const std::vector < std::vector <int> >& cells_index_atoms_array,
@@ -50,7 +66,8 @@ namespace dipole{
                    const int num_atoms,
                    const std::vector<double>& atom_dipolar_field_array_x, /// arrays to store atoms dipolar field
                    const std::vector<double>& atom_dipolar_field_array_y,
-                   const std::vector<double>& atom_dipolar_field_array_z
+                   const std::vector<double>& atom_dipolar_field_array_z,
+                   const int sim_time
    );
 
    //---------------------------------------------------------------------------

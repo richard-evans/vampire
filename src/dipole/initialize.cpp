@@ -23,6 +23,11 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
+#include <time.h>
+#include <fenv.h>
+// #include "fp_exception_glibc_extension.h"
+#include <signal.h>
+
 // dipole module headers
 #include "internal.hpp"
 
@@ -34,7 +39,7 @@ namespace dipole{
    void initialize(const int cells_num_atoms_in_unit_cell,
                    const int cells_num_cells, /// number of macrocells
                    const int cells_num_local_cells, /// number of local macrocells
-                   const double cells_macro_cell_size
+                   const double cells_macro_cell_size,
                    const std::vector <int>& cells_local_cell_array,
                    const std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                    const std::vector < std::vector <int> >& cells_index_atoms_array,
@@ -59,14 +64,17 @@ namespace dipole{
 
                    const std::vector<double>& atom_dipolar_field_array_x, /// arrays to store atoms dipolar field
                    const std::vector<double>& atom_dipolar_field_array_y,
-                   const std::vector<double>& atom_dipolar_field_array_z
+                   const std::vector<double>& atom_dipolar_field_array_z,
+                   const int sim_time
 				){
 
 	//-------------------------------------------------------------------------------------
 	// Check for dipole calculation enabled, if not do nothing
 	//-------------------------------------------------------------------------------------
-		if(!dipole::internal::enabled) return;
+      if(!dipole::activated) return;
 
+      //if(!internal::enabled) return;
+      std::cout << "Initialising demagnetisation field calculation" << std::endl;
 		// output informative message
 		zlog << zTs() << "Initialising demagnetisation field calculation" << std::endl;
 
@@ -75,6 +83,15 @@ namespace dipole{
       		zlog << zTs() << "Warning:  Demagnetisation field calculation already initialised. Continuing." << std::endl;
       	return;
 		}
+
+/*      std::cout << "Initialising demagnetisation field calculation" << std::endl;
+      // check for calling of routine
+      if(err::check==true){
+         terminaltextcolor(RED);
+         std::cerr << "demag::set_rij_matrix has been called " << vmpi::my_rank << std::endl;
+         terminaltextcolor(WHITE);
+      } */
+
 
 		//-------------------------------------------------------------------------------------
 		// Set simulation constants
@@ -91,17 +108,24 @@ namespace dipole{
       dipole::internal::atom_dipolar_field_array_y = atom_dipolar_field_array_y;
       dipole::internal::atom_dipolar_field_array_z = atom_dipolar_field_array_z;
 
+      dipole::internal::cells_num_cells            = cells_num_cells;
+      dipole::internal::cells_num_local_cells      = cells_num_local_cells;
+      dipole::internal::cells_local_cell_array     = cells_local_cell_array;
+      dipole::internal::cells_num_atoms_in_cell    = cells_num_atoms_in_cell;
       dipole::internal::cells_mag_array_x          = cells_mag_array_x;
       dipole::internal::cells_mag_array_y          = cells_mag_array_y;
       dipole::internal::cells_mag_array_z          = cells_mag_array_z;
-      dipole::internal::cells_field_array_x        = cells_field_array_x;
-      dipole::internal::cells_field_array_y        = cells_field_array_y;
-      dipole::internal::cells_field_array_z        = cells_field_array_z;
       dipole::internal::cells_volume_array         = cells_volume_array;
 
+      dipole::internal::sim_time                   = sim_time;
+
+      dipole::cells_field_array_x        = cells_field_array_x;
+      dipole::cells_field_array_y        = cells_field_array_y;
+      dipole::cells_field_array_z        = cells_field_array_z;
 		//-------------------------------------------------------------------------------------
 		// Starting calculation of dipolar field
 		//-------------------------------------------------------------------------------------
+
        // timing function
        #ifdef MPICF
           double t1 = MPI_Wtime();
@@ -109,6 +133,7 @@ namespace dipole{
           time_t t1;
           t1 = time (NULL);
        #endif
+
          // Check memory requirements and print to screen
          zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(cells_num_cells)*double(cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
          std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(cells_num_cells)*double(cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
@@ -157,8 +182,8 @@ namespace dipole{
       zlog << zTs() << "Precalculating rij matrix for demag calculation... " << std::endl;
 
 
-      std::cout<< "Number of local cells= "<<cells_num_local_cells << std::endl;
-      std::cout<< "Number of  cells= "<<cells_num_cells << std::endl;
+      //std::cout<< "Number of local cells= "<<cells_num_local_cells << std::endl;
+      //std::cout<< "Number of  cells= "<<cells_num_cells << std::endl;
 
       double cutoff=12.0; //after 12 macrocell of distance, the bare macrocell model gives the same result
 
@@ -184,9 +209,9 @@ namespace dipole{
                  	double tmp_rij_inter_yz = 0.0;
                  	double tmp_rij_inter_zz = 0.0;
 
-                 	double rx = cells_coord_array_x[j] - cells_coord_array_x[i]; // Angstroms
-                 	double ry = cells_coord_array_y[j] - cells_coord_array_y[i];
-                 	double rz = cells_coord_array_z[j] - cells_coord_array_z[i];
+                 	double rx = cells_cell_coords_array_x[j] - cells_cell_coords_array_x[i]; // Angstroms
+                 	double ry = cells_cell_coords_array_y[j] - cells_cell_coords_array_y[i];
+                 	double rz = cells_cell_coords_array_z[j] - cells_cell_coords_array_z[i];
 
                  	double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
                  	double rij_1 = 1.0/rij;
@@ -200,13 +225,13 @@ namespace dipole{
 
                   	double rij3 = (rij*rij*rij); // Angstroms
 
-                  	rij_inter_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
-                  	rij_inter_xy[lc][j] = ( 3.0*ex*ey      )*rij3 ;
-                  	rij_inter_xz[lc][j] = ( 3.0*ex*ez      )*rij3 ;
+                  	dipole::internal::rij_inter_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
+                  	dipole::internal::rij_inter_xy[lc][j] = ( 3.0*ex*ey      )*rij3 ;
+                  	dipole::internal::rij_inter_xz[lc][j] = ( 3.0*ex*ez      )*rij3 ;
 
-                  	rij_inter_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
-                  	rij_inter_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
-                  	rij_inter_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
+                  	dipole::internal::rij_inter_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
+                  	dipole::internal::rij_inter_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
+                  	dipole::internal::rij_inter_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
                   }
                   else if( (1.0/rij)/cells_macro_cell_size <= cutoff){
                      for(int pi=0; pi<cells_num_atoms_in_cell[i]; pi++){
@@ -248,21 +273,21 @@ namespace dipole{
                         }
                      }
 
-                     rij_inter_xx[lc][j] =  (tmp_rij_inter_xx);
-                     rij_inter_xy[lc][j] =  (tmp_rij_inter_xy);
-                     rij_inter_xz[lc][j] =  (tmp_rij_inter_xz);
+                     dipole::internal::rij_inter_xx[lc][j] =  (tmp_rij_inter_xx);
+                     dipole::internal::rij_inter_xy[lc][j] =  (tmp_rij_inter_xy);
+                     dipole::internal::rij_inter_xz[lc][j] =  (tmp_rij_inter_xz);
 
-                     rij_inter_yy[lc][j] =  (tmp_rij_inter_yy);
-                     rij_inter_yz[lc][j] =  (tmp_rij_inter_yz);
-                     rij_inter_zz[lc][j] =  (tmp_rij_inter_zz);
+                     dipole::internal::rij_inter_yy[lc][j] =  (tmp_rij_inter_yy);
+                     dipole::internal::rij_inter_yz[lc][j] =  (tmp_rij_inter_yz);
+                     dipole::internal::rij_inter_zz[lc][j] =  (tmp_rij_inter_zz);
 
-                     rij_inter_xx[lc][j] = rij_inter_xx[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-                     rij_inter_xy[lc][j] = rij_inter_xy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-                     rij_inter_xz[lc][j] = rij_inter_xz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_inter_xx[lc][j] = dipole::internal::rij_inter_xx[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_inter_xy[lc][j] = dipole::internal::rij_inter_xy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_inter_xz[lc][j] = dipole::internal::rij_inter_xz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
 
-                     rij_inter_yy[lc][j] = rij_inter_yy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-                     rij_inter_yz[lc][j] = rij_inter_yz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-                     rij_inter_zz[lc][j] = rij_inter_zz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_inter_yy[lc][j] = dipole::internal::rij_inter_yy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_inter_yz[lc][j] = dipole::internal::rij_inter_yz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_inter_zz[lc][j] = dipole::internal::rij_inter_zz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
                   }  // End of Inter part calculated atomicstically
                } // End of Inter part
 
@@ -290,10 +315,10 @@ namespace dipole{
                    			if( 1.0/rij==0.0 ){
                      			std::cout << ">>>>> (Intra)  Warning: atoms are overlapping in cells i=\t" << i << "\t and j=\t" << j <<"\t<<<<<" << std::endl;
                      			std::cout << "Cell and atomic coordinates used for calculation of Dipolar matrix" << std::endl;
-                     			std::cout << " xqj= " << cells_atom_in_cell_coords_array_x[j][qj] << " yqj= " << cells_atom_in_cell_coords_array_y[j][qj] << " zqj= " << cells_atom_in_cell_coords_arrayz[j][qj] << std::endl;
-                     			std::cout << " xpi= " << cells_atom_in_cell_coords_array_x[i][pi] << " ypi= " << cells_atom_in_cell_coords_array_y[i][pi] << " zpi= " << cells_atom_in_cell_coords_arrayz[i][pi] << std::endl;
-                     			std::cout << " xj= "  << cells_coord_atoms_array_x[j]  << " yj= "  << cells_coord_atoms_array_y[j]  << " zj= "  << cells_coord_atoms_array_y[j] << std::endl;
-                     			std::cout << " xi= "  << cells_coord_atoms_array_x[i]  << " yi= "  << cells_coord_atoms_array_y[i]  << " zi= "  << cells_coord_atoms_array_y[i] << std::endl;
+                     			std::cout << " xqj= " << cells_atom_in_cell_coords_array_x[j][qj] << " yqj= " << cells_atom_in_cell_coords_array_y[j][qj] << " zqj= " << cells_atom_in_cell_coords_array_z[j][qj] << std::endl;
+                     			std::cout << " xpi= " << cells_atom_in_cell_coords_array_x[i][pi] << " ypi= " << cells_atom_in_cell_coords_array_y[i][pi] << " zpi= " << cells_atom_in_cell_coords_array_z[i][pi] << std::endl;
+                              std::cout << " xj= "  << cells_cell_coords_array_x[j]  << " yj= "  << cells_cell_coords_array_y[j]  << " zj= "  << cells_cell_coords_array_z[j] << std::endl;
+                              std::cout << " xi= "  << cells_cell_coords_array_x[i]  << " yi= "  << cells_cell_coords_array_y[i]  << " zi= "  << cells_cell_coords_array_z[i] << std::endl;
                      			std::cout << " rx= "  << rx << " ry= " << ry << " rz= " << rz << std::endl;
                      			std::cout << " rij= " << 1.0/rij << " = " << (1.0/rij)/((cells_macro_cell_size*sqrt(3)+0.01)) << " macro-cells" << std::endl;
                      			return;
@@ -317,43 +342,54 @@ namespace dipole{
                  		}
                 	}
 
-                	rij_intra_xx[lc][i] =  (tmp_rij_intra_xx);
-                	rij_intra_xy[lc][i] =  (tmp_rij_intra_xy);
-                	rij_intra_xz[lc][i] =  (tmp_rij_intra_xz);
+                	dipole::internal::rij_intra_xx[lc][i] =  (tmp_rij_intra_xx);
+                	dipole::internal::rij_intra_xy[lc][i] =  (tmp_rij_intra_xy);
+                	dipole::internal::rij_intra_xz[lc][i] =  (tmp_rij_intra_xz);
 
-                	rij_intra_yy[lc][i] =  (tmp_rij_intra_yy);
-                	rij_intra_yz[lc][i] =  (tmp_rij_intra_yz);
-                	rij_intra_zz[lc][i] =  (tmp_rij_intra_zz);
+                	dipole::internal::rij_intra_yy[lc][i] =  (tmp_rij_intra_yy);
+                	dipole::internal::rij_intra_yz[lc][i] =  (tmp_rij_intra_yz);
+                	dipole::internal::rij_intra_zz[lc][i] =  (tmp_rij_intra_zz);
 
-                	rij_intra_xx[lc][j] = rij_intra_xx[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-                	rij_intra_xy[lc][j] = rij_intra_xy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-                	rij_intra_xz[lc][j] = rij_intra_xz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                	dipole::internal::rij_intra_xx[lc][j] = dipole::internal::rij_intra_xx[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                	dipole::internal::rij_intra_xy[lc][j] = dipole::internal::rij_intra_xy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                	dipole::internal::rij_intra_xz[lc][j] = dipole::internal::rij_intra_xz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
 
-                	rij_intra_yy[lc][j] = rij_intra_yy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-                	rij_intra_yz[lc][j] = rij_intra_yz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-                	rij_intra_zz[lc][j] = rij_intra_zz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                	dipole::internal::rij_intra_yy[lc][j] = dipole::internal::rij_intra_yy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                	dipole::internal::rij_intra_yz[lc][j] = dipole::internal::rij_intra_yz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                	dipole::internal::rij_intra_zz[lc][j] = dipole::internal::rij_intra_zz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
                }
             }
 			}
 		}
 
-
-      // timing function
-      #ifdef MPICF
-			double t1 = MPI_Wtime();
-      #else
-         time_t t1;
-         t1 = time (NULL);
-      #endif
-
-      // now calculate fields
-      dipole::internal::update_field();
-
-      // timing function
       #ifdef MPICF
          double t2 = MPI_Wtime();
       #else
          time_t t2;
+         t2 = time (NULL);
+      #endif
+      zlog << zTs() << "Precalculation of rij matrix for demag calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
+
+
+      // Set initialised flag
+      dipole::internal::initialised=true;
+
+      // timing function
+      #ifdef MPICF
+			t1 = MPI_Wtime();
+      #else
+         //time_t t1;
+         t1 = time (NULL);
+      #endif
+
+      // now calculate fields
+      dipole::calculate_field();
+
+      // timing function
+      #ifdef MPICF
+         t2 = MPI_Wtime();
+      #else
+         //time_t t2;
          t2 = time (NULL);
       #endif
 

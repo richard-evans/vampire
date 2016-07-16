@@ -30,6 +30,18 @@ namespace dipole{
       std::string prefix="dipole";
       if(key!=prefix) return false;
 
+/*      //----------------------------------
+      // Now test for all valid options
+      //----------------------------------
+      test="dipole-field-update-rate";
+      if(word==test){
+			int dpur=atoi(value.c_str());
+         // Test for valid range
+			check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+			dipole::update_rate=dpur;
+         return true;
+      }
+*/
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

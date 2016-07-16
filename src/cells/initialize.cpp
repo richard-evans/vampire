@@ -159,9 +159,9 @@ namespace cells{
       #else
          int num_local_atoms = num_atoms;
       #endif
-      std::cout << "num_local_atoms = " << num_local_atoms << std::endl;
+/*      std::cout << "num_local_atoms = " << num_local_atoms << std::endl;
       std::cout << "vmpi::num_core_atoms+vmpi::num_bdry_atoms =" << vmpi::num_core_atoms << " + " << vmpi::num_bdry_atoms << std::endl;
-      std::cout << "num_atoms = " << num_atoms << "\t" << cells::internal::num_atoms << std::endl;
+      std::cout << "num_atoms = " << num_atoms << "\t" << cells::internal::num_atoms << std::endl; */
 
 
       // Assign atoms to cells
@@ -205,10 +205,10 @@ namespace cells{
          // If no error for range then assign atom to cell
          cells::internal::atom_cell_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
 
-         std::cout << "atom " << atom << std::endl;
+/*         std::cout << "atom " << atom << std::endl;
          std::cout << atom_coords_x[atom] << "\t" << atom_coords_y[atom] << "\t" << atom_coords_z[atom] << "\t" << std::endl;
          std::cout << c[0] << "\t" << c[1] << "\t" << c[2] << std::endl;
-         std::cout << atom_cell_array[atom] << "\t" << scc[0] << "\t" << scc[1] << "\t" << scc[2] << std::endl;
+         std::cout << atom_cell_array[atom] << "\t" << scc[0] << "\t" << scc[1] << "\t" << scc[2] << std::endl; */
       }
 
       //-------------------------------------------------------------------------------------
@@ -281,7 +281,7 @@ namespace cells{
      // Now find mean coordinates via magnetic 'centre of mass'
      for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
          if(cells::num_atoms_in_cell[local_cell]>0){
-            std::cout << cells::num_atoms_in_cell[local_cell] << " in " << local_cell << std::endl;
+            //std::cout << cells::num_atoms_in_cell[local_cell] << " in " << local_cell << std::endl;
             cells::cell_coords_array_x[local_cell] = cells::cell_coords_array_x[local_cell]/(cells::internal::total_moment_array[local_cell]);
             cells::cell_coords_array_y[local_cell] = cells::cell_coords_array_y[local_cell]/(cells::internal::total_moment_array[local_cell]);
             cells::cell_coords_array_z[local_cell] = cells::cell_coords_array_z[local_cell]/(cells::internal::total_moment_array[local_cell]);
@@ -295,12 +295,12 @@ namespace cells{
 
      cells::index_atoms_array.resize(cells::num_cells,std::vector<int>(num_local_atoms));
 
-      std::cout << std::endl;
+/*      std::cout << std::endl;
       for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
          if(cells::num_atoms_in_cell[local_cell]>0){
             std::cout << cells::num_atoms_in_cell[local_cell] << " in " << local_cell << std::endl;
          }
-      }
+      } */
 
       //Set number of atoms in cell to zero
       for(int cell=0;cell<cells::num_cells;cell++){
@@ -331,23 +331,17 @@ namespace cells{
          }
       }
 
-      std::cout << std::endl;
+      //std::cout << std::endl;
       // Calculate number of local cells
       for(int cell=0;cell<cells::num_cells;cell++){
          if(cells::num_atoms_in_cell[cell]!=0){
-            std::cout << cells::num_atoms_in_cell[cell] << " in " << cell << std::endl;
+            //std::cout << cells::num_atoms_in_cell[cell] << " in " << cell << std::endl;
             cells::local_cell_array.push_back(cell);
             cells::num_local_cells++;
             cells::volume_array[cell] = double(cells::num_atoms_in_cell[cell])*atomic_volume;
          }
       }
-      std::cout << std::endl;
-      //Set number of atoms in cell to zero
-      for(int cell=0;cell<cells::num_cells;cell++){
-         cells::num_atoms_in_cell[cell]=0;
-      }
 
-      //std::cout << " variable cells::num_local_cells = " << cells::num_local_cells << std::endl;
       zlog << zTs() << "Number of local macrocells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
 
       // Set initialised flag

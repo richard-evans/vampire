@@ -61,6 +61,7 @@ IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
 
 #obj/data/cells.o \
+obj/simulate/demag.o \
 
 # Objects
 OBJECTS= \
@@ -104,7 +105,6 @@ obj/program/effective_damping.o \
 obj/program/fmr.o \
 obj/random/mtrand.o \
 obj/random/random.o \
-obj/simulate/demag.o \
 obj/simulate/energy.o \
 obj/simulate/fields.o \
 obj/simulate/LLB.o \
@@ -150,7 +150,7 @@ obj/qvoronoi/userprintf_rbox.o\
 # Include supplementary makefiles
 include src/create/makefile
 include src/cells/makefile
-#include src/dipole/makefile
+include src/dipole/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile

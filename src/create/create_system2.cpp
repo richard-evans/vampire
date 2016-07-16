@@ -52,7 +52,8 @@
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
-#include "demag.hpp"
+//#include "demag.hpp"
+#include "dipole.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
 #include "material.hpp"
@@ -291,7 +292,6 @@ int create(){
    #else
       int num_local_atoms = atoms::num_atoms;
    #endif
-   std::cout << "num_local_atoms from create_system2.cpp = " << num_local_atoms << std::endl;
 
 	// Set grain and cell variables for simulation
 	grains::set_properties();
@@ -312,9 +312,39 @@ int create(){
                   atoms::cell_array,
                   //num_local_atoms,
                   atoms::num_atoms
-                  );
+      );
 
-	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
+	//if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
+	if(sim::hamiltonian_simulation_flags[4]==1){
+      dipole::initialize(cells::num_atoms_in_unit_cell,
+                        cells::num_cells,
+                        cells::num_local_cells,
+                        cells::macro_cell_size,
+                        cells::local_cell_array,
+                        cells::num_atoms_in_cell,
+                        cells::index_atoms_array,
+                        cells::volume_array,
+                        cells::cell_coords_array_x,
+                        cells::cell_coords_array_y,
+                        cells::cell_coords_array_z,
+                        cells::atom_in_cell_coords_array_x,
+                        cells::atom_in_cell_coords_array_y,
+                        cells::atom_in_cell_coords_array_z,
+                        cells::mag_array_x,
+                        cells::mag_array_y,
+                        cells::mag_array_z,
+                        cells::field_array_x,
+                        cells::field_array_y,
+                        cells::field_array_z,
+                        atoms::type_array,
+                        atoms::cell_array,
+                        atoms::num_atoms,
+                        atoms::x_dipolar_field_array,
+                        atoms::y_dipolar_field_array,
+                        atoms::z_dipolar_field_array,
+                        sim::time
+      );
+   }
 
    //----------------------------------------
    // Initialise local temperature data
@@ -342,7 +372,7 @@ int create(){
 		//std::cout << "Outputting coordinate data" << std::endl;
 		//vmpi::crystal_xyz(catom_array);
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-   std::cout << "my_num_atoms == " << my_num_atoms << std::endl;
+   //std::cout << "my_num_atoms == " << my_num_atoms << std::endl;
 	int total_num_atoms=0;
 	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
 	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;

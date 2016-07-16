@@ -6,7 +6,9 @@
 dipole_objects =\
 data.o \
 initialize.o \
-interface.o
+interface.o \
+update.o \
+field.o 
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/dipole/,$(dipole_objects))
