@@ -127,9 +127,9 @@ namespace vcuda{
 
             #ifdef CUDA_SPIN_DEBUG
                // Output first spin position
-				   std::cout << cu::atoms::x_spin_array[0] << " "
-								 << cu::atoms::y_spin_array[0] << " "
-								 << cu::atoms::z_spin_array[0] << std::endl;
+				   // std::cout << cu::atoms::x_spin_array[0] << " "
+					// 			 << cu::atoms::y_spin_array[0] << " "
+					// 			 << cu::atoms::z_spin_array[0] << std::endl;
             #endif
 
             // Cast device pointers for calling kernel function calls
@@ -176,12 +176,12 @@ namespace vcuda{
                ::mp::dt, ::atoms::num_atoms);
 
             #ifdef CUDA_SPIN_DEBUG
-               std::cout << cu::atoms::x_spin_array[0] << " "
-                         << cu::atoms::y_spin_array[0] << " "
-                         << cu::atoms::z_spin_array[0] << " "
-                         << cu::z_total_spin_field_array[0] << " "
-                         << cu::z_total_external_field_array[0] << " "
-                         << std::endl;
+               // std::cout << cu::atoms::x_spin_array[0] << " "
+               //           << cu::atoms::y_spin_array[0] << " "
+               //           << cu::atoms::z_spin_array[0] << " "
+               //           << cu::z_total_spin_field_array[0] << " "
+               //           << cu::z_total_external_field_array[0] << " "
+               //           << std::endl;
             #endif
 
             check_cuda_errors (__FILE__, __LINE__);

@@ -33,24 +33,26 @@ namespace vcuda{
             cu::stats::__update_stat (
                   cu::stats::system_mask,
                   cu::stats::system_magnetization,
-                  cu::stats::system_mean_magnetization);
+                  cu::stats::system_mean_magnetization,
+                  cu::stats::system_mask_size);
 
             cu::stats::__update_stat (
                   cu::stats::material_mask,
                   cu::stats::material_magnetization,
-                  cu::stats::material_mean_magnetization);
+                  cu::stats::material_mean_magnetization,
+                  cu::stats::material_mask_size);
 
             cu::stats::__update_stat (
                   cu::stats::height_mask,
                   cu::stats::height_magnetization,
-                  cu::stats::height_mean_magnetization);
+                  cu::stats::height_mean_magnetization,
+                  cu::stats::height_mask_size);
 
             cu::stats::__update_stat (
                   cu::stats::material_height_mask,
                   cu::stats::material_height_magnetization,
-                  cu::stats::material_height_mean_magnetization);
-
-
+                  cu::stats::material_height_mean_magnetization,
+                  cu::stats::material_height_mask_size);
 
             // increase the counter
             cu::stats::counter++;
@@ -123,9 +125,12 @@ namespace vcuda{
          void __update_stat (
                const cu_index_array_t & mask,
                cu_real_array_t & stat,
-               cu_real_array_t & mean_stat
+               cu_real_array_t & mean_stat,
+               int mask_size
                )
          {
+
+            if (mask_size < 1) return; // Nothing to do
 
             const int * d_mask = thrust::raw_pointer_cast (
                   mask.data());
@@ -143,15 +148,28 @@ namespace vcuda{
             cu_real_t * d_spin_norm = thrust::raw_pointer_cast(
                   cu::atoms::spin_norm_array.data());
 
-            int n_bins = stat.size ();
+            int n_bins = mask_size;
             int n_atoms = mask.size ();
 
-            if (n_bins < 128)
+            if (n_bins < 8) {
+               hist_by_key_smaller_mask <<< n_bins * 4, 512 >>> (
+                     d_x_spin,
+                     d_y_spin,
+                     d_z_spin,
+                     d_spin_norm,
+                     d_mask,
+                     d_stat,
+                     n_bins,
+                     n_atoms
+                     );
+               check_cuda_errors (__FILE__, __LINE__);
+            }
+            else if (n_bins < 128)
             {
 
                 // Use the shared memory implementation
 
-               int n_bytes = 4 * stat.size() * sizeof(cu_real_array_t::value_type);
+               int n_bytes = 4 * mask_size * sizeof(cu_real_array_t::value_type);
                hist_by_key_small_mask <<< cu::grid_size, cu::block_size, n_bytes >>> (
                      d_x_spin,
                      d_y_spin,
@@ -217,8 +235,8 @@ namespace vcuda{
              * Call the method in the magnetization_statistic_t instance
              */
 
-            std::vector<cu_real_t> stl_stat (h_stat.begin(), h_stat.end());
-            std::vector<cu_real_t> stl_mean_stat (h_mean_stat.begin(), h_mean_stat.end());
+            std::vector<double> stl_stat (h_stat.begin(), h_stat.end());
+            std::vector<double> stl_mean_stat (h_mean_stat.begin(), h_mean_stat.end());
 
             local_stat.set_magnetization (
                   stl_stat,
@@ -245,7 +263,48 @@ namespace vcuda{
             check_cuda_errors (__FILE__, __LINE__);
          }
 
+         __global__ void hist_by_key_smaller_mask (
+               const cu_real_t * __restrict__ x_spin,
+               const cu_real_t * __restrict__ y_spin,
+               const cu_real_t * __restrict__ z_spin,
+               const cu_real_t * __restrict__ norm_spin,
+               const int * __restrict__ mask,
+               cu_real_t * hist,
+               int n_bins,
+               int n_atoms
+               )
+         {
+            cu_real_t val = 0; // Initialize the register
 
+            int rol = blockIdx.x % 4;
+            int bin = blockIdx.x / 4;
+            // Block stride loop (each block reads the whole array)
+            for ( int i = threadIdx.x;
+                  i < n_atoms;
+                  i += blockDim.x)
+            {
+               // Single spin test
+               // if (i != 0) continue;
+               cu_real_t mu_s = norm_spin[i];
+               if (rol == 0) val += mask[i] == bin ? x_spin[i] * mu_s : 0;
+               if (rol == 1) val += mask[i] == bin ? y_spin[i] * mu_s : 0;
+               if (rol == 2) val += mask[i] == bin ? z_spin[i] * mu_s : 0;
+               if (rol == 3) val += mask[i] == bin ? mu_s : 0;
+            }
+
+            typedef cub::BlockReduce<cu_real_t, 512> BlockReduce;
+            __shared__ typename BlockReduce::TempStorage temp_storage;
+            val = BlockReduce(temp_storage).Sum(val);
+
+            if (threadIdx.x == 0) {
+               hist[4 * bin + rol] = val;
+            }
+         }
+
+         /**
+           * Naivive implementation of histogram using shared memory
+           * FIXME: Prone to improvements
+           */
          __global__ void hist_by_key_small_mask (
                const cu_real_t * __restrict__ x_spin,
                const cu_real_t * __restrict__ y_spin,

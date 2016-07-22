@@ -8,6 +8,7 @@
 //------------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <fstream>
 
 // Vampire headers
 #include "cuda.hpp"
@@ -68,6 +69,12 @@ void update_external_fields (){
    // Check for errors
    check_cuda_errors (__FILE__, __LINE__);
 
+   // std::ofstream fields("should_be_normal.txt");
+   // for (size_t i = 0; i < cu::x_total_external_field_array.size(); ++i) {
+   //    fields << cu::x_total_external_field_array[i] << std::endl;
+   // }
+   // fields.close();
+
    return;
 
 }
@@ -80,7 +87,7 @@ __global__ void update_external_fields_kernel (
       vcuda::internal::material_parameters_t * material_params,
       cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
       cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
-      curandState * rand_state,
+      curandState * rand_states,
       cu_real_t global_temperature,
       cu_real_t Hx_app, cu_real_t Hy_app, cu_real_t Hz_app,
       int n_atoms
@@ -116,9 +123,9 @@ __global__ void update_external_fields_kernel (
       cu_real_t resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
       cu_real_t sq_temp = sqrt(resc_temp);
 
-      field_x += sigma * sq_temp * curand_normal_double (rand_state + tid); //+atom instead of tid?
-      field_y += sigma * sq_temp * curand_normal_double (rand_state + tid);
-      field_z += sigma * sq_temp * curand_normal_double (rand_state + tid);
+      field_x = sigma * sq_temp * curand_normal_double (&rand_states[tid]); //+atom instead of tid?
+      field_y = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
+      field_z = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
 
       // Local applied field
       cu_real_t norm_h = mat.applied_field_strength;
