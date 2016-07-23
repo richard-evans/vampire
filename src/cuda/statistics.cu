@@ -297,6 +297,9 @@ namespace vcuda{
             val = BlockReduce(temp_storage).Sum(val);
 
             if (threadIdx.x == 0) {
+               // FIXME: As oposed to other methods, this one does not
+               // keep the old values in the global histogram, that may be
+               // the root of the extrange behaviour
                hist[4 * bin + rol] = val;
             }
          }
@@ -410,6 +413,9 @@ namespace vcuda{
                      mz * mz
                      );
 
+               // FIXME: Yo, what was I thinking here?
+               // Seems like I update the histogram for the stat
+               // But I dont reset it for the next run
                hist[4 * i + 0] = mx / mm;
                hist[4 * i + 1] = my / mm;
                hist[4 * i + 2] = mz / mm;
