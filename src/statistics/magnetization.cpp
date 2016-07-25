@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 // Vampire headers
 #include "errors.hpp"

@@ -13,8 +13,8 @@ create:crystal-structure=sc
 # System Dimensions:
 #------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 7.7 !nm
-dimensions:system-size-y = 7.7 !nm
+dimensions:system-size-x = 77 !nm
+dimensions:system-size-y = 77 !nm
 dimensions:system-size-z = 7.7 !nm
 
 #------------------------------------------
@@ -26,11 +26,11 @@ material:file=Co.mat
 # Simulation attributes:
 #------------------------------------------
 sim:temperature=10.0
-sim:time-steps-increment=10
+sim:time-steps-increment=1000
 sim:total-time-steps=10000
 sim:time-step=1.0E-15
 
-sim:applied-field-strength=10.0 !T
+sim:applied-field-strength=0.0 !T
 sim:applied-field-unit-vector=1,0,0
 
 

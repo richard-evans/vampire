@@ -88,15 +88,19 @@ namespace vcuda{
          cu_index_array_t system_mask(0UL);
          cu_real_array_t  system_magnetization(0UL);
          cu_real_array_t  system_mean_magnetization(0UL);
+         int system_mask_size(0UL);
          cu_index_array_t material_mask(0UL);
          cu_real_array_t  material_magnetization(0UL);
          cu_real_array_t  material_mean_magnetization(0UL);
+         int material_mask_size(0UL);
          cu_index_array_t height_mask(0UL);
          cu_real_array_t  height_magnetization(0UL);
          cu_real_array_t  height_mean_magnetization(0UL);
+         int height_mask_size(0UL);
          cu_index_array_t material_height_mask(0UL);
          cu_real_array_t  material_height_magnetization(0UL);
          cu_real_array_t  material_height_mean_magnetization(0UL);
+         int material_height_mask_size(0UL);
       } /* stats */
 
    } // end of internal namespace
