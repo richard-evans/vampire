@@ -5,7 +5,7 @@
 NVCC_VERSION=$(shell nvcc --version | tail -n 1 | cut -b 38-)
 NVCC=nvcc -DCOMP='"NVCC $(NVCC_VERSION)"'
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++ --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_30 -O3
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++ --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_20 -O3
 
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart -lcusparse -lcurand
 
@@ -26,7 +26,7 @@ CUDA_OBJECTS= \
 # The device linked object for CUDA
 CUDA_DLINK= obj/cuda/vampire_cuda.o
 
-CUDA_CFLAGS= -I./hdr -DCUDA -rdc=true -arch=sm_30
+CUDA_CFLAGS= -I./hdr -DCUDA -rdc=true -arch=sm_20
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
 	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS)
