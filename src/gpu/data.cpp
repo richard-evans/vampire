@@ -19,6 +19,7 @@ namespace gpu{
    // Shared variables used for GPU acceleration
    //-----------------------------------------------------------------------------
    bool acceleration = false; // flag to enable gpu_acceleration
+   bool cpu_stats = false; // flag to calculate stats using cpu
 
    //-----------------------------------------------------------------------------
    // Shared data structures for statistics calculation

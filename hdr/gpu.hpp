@@ -8,6 +8,7 @@
 // (c) R F L Evans 2015. All rights reserved.
 //
 //-----------------------------------------------------------------------------
+#include <string>
 
 namespace gpu{
 
@@ -15,10 +16,12 @@ namespace gpu{
    // Variables used for GPU acceleration
    //-----------------------------------------------------------------------------
    extern bool acceleration; // flag to enable gpu_acceleration
+   extern bool cpu_stats; // flag to calculate stats using cpu
 
    //-----------------------------------------------------------------------------
    // Functions for GPU acceleration
    //-----------------------------------------------------------------------------
+   extern bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
    extern void initialize();
    extern void llg_heun();
    extern void finalize();
