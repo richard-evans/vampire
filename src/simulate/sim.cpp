@@ -43,7 +43,8 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
-#include "demag.hpp"
+//#include "demag.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
 #include "material.hpp"
@@ -194,7 +195,8 @@ namespace sim{
 
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
+		//if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
+		if(sim::hamiltonian_simulation_flags[4]==1) dipole::calculate_field();
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
 	}
 

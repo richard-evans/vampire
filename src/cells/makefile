@@ -1,14 +1,13 @@
 #--------------------------------------------------------------
-#          Makefile for dipole module
+#          Makefile for cells module
 #--------------------------------------------------------------
 
 # List module object filenames
-dipole_objects =\
+cells_objects =\
 data.o \
 initialize.o \
 interface.o \
-update.o \
-field.o 
+mag.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/dipole/,$(dipole_objects))
+OBJECTS+=$(addprefix obj/cells/,$(cells_objects))

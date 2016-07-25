@@ -50,7 +50,8 @@
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "create.hpp"
-#include "demag.hpp"
+//#include "demag.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
@@ -1373,13 +1374,14 @@ int match_dimension(string const word, string const value, string const unit, in
       cs::particle_array_offset_y=paoy;
       return EXIT_SUCCESS;
    }
-   else
+  else
    //--------------------------------------------------------------------
    test="macro-cell-size";
    if(word==test){
       double cs=atof(value.c_str());
       check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
-      cells::size=cs;
+      //cells::size=cs;
+      cells::macro_cell_size=cs;
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
@@ -1548,6 +1550,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    test="enable-dipole-fields";
    if(word==test){
       sim::hamiltonian_simulation_flags[4]=1;
+      dipole::activated=true;
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
@@ -1556,18 +1559,19 @@ int match_sim(string const word, string const value, string const unit, int cons
       sim::hamiltonian_simulation_flags[5]=1;
       return EXIT_SUCCESS;
    }
-   //-------------------------------------------------------------------
+/*   //-------------------------------------------------------------------
    test="enable-fast-dipole-fields";
    if(word==test){
       demag::fast=true;
       return EXIT_SUCCESS;
-   }
+   } */
    //-------------------------------------------------------------------
    test="dipole-field-update-rate";
    if(word==test){
       int dpur=atoi(value.c_str());
       check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-      demag::update_rate=dpur;
+      //demag::update_rate=dpur;
+      dipole::update_rate=dpur;
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------

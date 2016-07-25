@@ -54,6 +54,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "LLG.hpp"
 #include "material.hpp"
@@ -432,14 +433,14 @@ void cells(){
    #ifdef MPICF
    // Reduce demagnetisation fields to processor 0
    if(vmpi::my_rank==0){
-      MPI_Reduce(MPI_IN_PLACE, &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
    }
    else{
-      MPI_Reduce(&cells::x_field_array[0], &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-      MPI_Reduce(&cells::y_field_array[0], &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-      MPI_Reduce(&cells::z_field_array[0], &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&dipole::cells_field_array_x[0], &dipole::cells_field_array_x[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&dipole::cells_field_array_y[0], &dipole::cells_field_array_y[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&dipole::cells_field_array_z[0], &dipole::cells_field_array_z[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
    }
    #endif
 
@@ -461,7 +462,7 @@ void cells(){
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
       cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-      cfg_file_ofstr << "# Number of spins: "<< cells::num_cells << std::endl;
+      cfg_file_ofstr << "# Number of spins: "<< cells::num_local_cells << std::endl;
       cfg_file_ofstr << "# System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
       cfg_file_ofstr << "# Coordinates-file: cells-coord.cfg"<< std::endl;
       cfg_file_ofstr << "# Time: " << double(sim::time)*mp::dt_SI << std::endl;
@@ -472,8 +473,10 @@ void cells(){
 
       // Root process now outputs the cell magnetisations
       for(int cell=0; cell < cells::num_cells; cell++){
-         cfg_file_ofstr << cells::x_mag_array[cell] << "\t" << cells::y_mag_array[cell] << "\t" << cells::z_mag_array[cell]<< "\t";
-         cfg_file_ofstr << cells::x_field_array[cell] << "\t" << cells::y_field_array[cell] << "\t" << cells::z_field_array[cell] << std::endl;
+         //if(cells::num_atoms_in_cell[cell]>0){
+            cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell]<< "\t";
+            cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << std::endl;
+         //}
       }
 
       cfg_file_ofstr.close();
@@ -552,7 +555,7 @@ void cells_coords(){
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
       cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-      cfg_file_ofstr << "# Number of cells: "<< cells::num_cells << std::endl;
+      cfg_file_ofstr << "# Number of cells: "<< cells::num_local_cells << std::endl;
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
       cfg_file_ofstr << "#" << std::endl;
       cfg_file_ofstr << "#" << std::endl;
@@ -562,7 +565,9 @@ void cells_coords(){
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 
       for(int cell=0; cell<cells::num_cells; cell++){
-         cfg_file_ofstr << cells::x_coord_array[cell] << "\t" << cells::y_coord_array[cell] << "\t" << cells::z_coord_array[cell] << std::endl;
+         //if(cells::num_atoms_in_cell[cell]>0){
+            cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::cell_coords_array_x[cell] << "\t" << cells::cell_coords_array_y[cell] << "\t" << cells::cell_coords_array_z[cell] << std::endl;
+         //}
       }
 
       cfg_file_ofstr.close();
