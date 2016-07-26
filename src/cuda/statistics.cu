@@ -154,10 +154,16 @@ namespace vcuda{
             cu_real_t * d_spin_norm = thrust::raw_pointer_cast(
                   cu::atoms::spin_norm_array.data());
 
+            std::cout << "Random gen pointer in the wild" << " ";
+            std::cout << cu::d_rand_state << std::endl;
+
+            std::cout << "Some spins" << " ";
             std::cout << cu::atoms::x_spin_array[0] << " ";
             std::cout << cu::atoms::x_spin_array[3] << " ";
             std::cout << cu::atoms::x_spin_array[6] << " ";
             std::cout << cu::atoms::x_spin_array[9] << std::endl;
+
+            std::cout << "Some fields" << " ";
             std::cout << cu::x_total_external_field_array[0] << " ";
             std::cout << cu::x_total_external_field_array[3] << " ";
             std::cout << cu::x_total_external_field_array[6] << " ";
