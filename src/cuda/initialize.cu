@@ -529,6 +529,7 @@ namespace vcuda{
 
          check_cuda_errors (__FILE__, __LINE__);
 
+         std::cout << "Init rng called tho it migth be unsucessful" << std::endl;
          cu::init_rng <<< cu::grid_size, cu::block_size >>> (
                cu::d_rand_state, ::mtrandom::integration_seed);
 

@@ -132,6 +132,12 @@ namespace vcuda{
 
             if (mask_size < 1) return; // Nothing to do
 
+            // Clean up the stat buffer
+            thrust::fill(
+                  stat.begin(),
+                  stat.end(),
+                  0.0);
+
             const int * d_mask = thrust::raw_pointer_cast (
                   mask.data());
             cu_real_t * d_stat = thrust::raw_pointer_cast (
@@ -147,6 +153,15 @@ namespace vcuda{
                   cu::atoms::z_spin_array.data());
             cu_real_t * d_spin_norm = thrust::raw_pointer_cast(
                   cu::atoms::spin_norm_array.data());
+
+            std::cout << cu::atoms::x_spin_array[0] << " ";
+            std::cout << cu::atoms::x_spin_array[3] << " ";
+            std::cout << cu::atoms::x_spin_array[6] << " ";
+            std::cout << cu::atoms::x_spin_array[9] << std::endl;
+            std::cout << cu::x_total_external_field_array[0] << " ";
+            std::cout << cu::x_total_external_field_array[3] << " ";
+            std::cout << cu::x_total_external_field_array[6] << " ";
+            std::cout << cu::x_total_external_field_array[9] << std::endl;
 
             int n_bins = mask_size;
             int n_atoms = mask.size ();
@@ -200,6 +215,12 @@ namespace vcuda{
                check_cuda_errors (__FILE__, __LINE__);
             }
 
+            std::cout<< " "
+               << mean_stat[0] << " "
+               << mean_stat[1] << " "
+               << mean_stat[2] << " "
+               << mean_stat[3] << " "
+               << std::endl;
 
              // Reduce and accumulate
 
@@ -209,6 +230,14 @@ namespace vcuda{
                   d_accu,
                   n_bins
                   );
+
+            std::cout<< " "
+               << mean_stat[0] << " "
+               << mean_stat[1] << " "
+               << mean_stat[2] << " "
+               << mean_stat[3] << " "
+               << std::endl;
+
             check_cuda_errors (__FILE__, __LINE__);
 
          }
@@ -297,10 +326,7 @@ namespace vcuda{
             val = BlockReduce(temp_storage).Sum(val);
 
             if (threadIdx.x == 0) {
-               // FIXME: As oposed to other methods, this one does not
-               // keep the old values in the global histogram, that may be
-               // the root of the extrange behaviour
-               hist[4 * bin + rol] = val;
+               hist[4 * bin + rol] += val;
             }
          }
 
@@ -413,9 +439,6 @@ namespace vcuda{
                      mz * mz
                      );
 
-               // FIXME: Yo, what was I thinking here?
-               // Seems like I update the histogram for the stat
-               // But I dont reset it for the next run
                hist[4 * i + 0] = mx / mm;
                hist[4 * i + 1] = my / mm;
                hist[4 * i + 2] = mz / mm;
