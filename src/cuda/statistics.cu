@@ -154,21 +154,6 @@ namespace vcuda{
             cu_real_t * d_spin_norm = thrust::raw_pointer_cast(
                   cu::atoms::spin_norm_array.data());
 
-            std::cout << "Random gen pointer in the wild" << " ";
-            std::cout << cu::d_rand_state << std::endl;
-
-            std::cout << "Some spins" << " ";
-            std::cout << cu::atoms::x_spin_array[0] << " ";
-            std::cout << cu::atoms::x_spin_array[3] << " ";
-            std::cout << cu::atoms::x_spin_array[6] << " ";
-            std::cout << cu::atoms::x_spin_array[9] << std::endl;
-
-            std::cout << "Some fields" << " ";
-            std::cout << cu::x_total_external_field_array[0] << " ";
-            std::cout << cu::x_total_external_field_array[3] << " ";
-            std::cout << cu::x_total_external_field_array[6] << " ";
-            std::cout << cu::x_total_external_field_array[9] << std::endl;
-
             int n_bins = mask_size;
             int n_atoms = mask.size ();
 
@@ -221,13 +206,6 @@ namespace vcuda{
                check_cuda_errors (__FILE__, __LINE__);
             }
 
-            std::cout<< " "
-               << mean_stat[0] << " "
-               << mean_stat[1] << " "
-               << mean_stat[2] << " "
-               << mean_stat[3] << " "
-               << std::endl;
-
              // Reduce and accumulate
 
             int gs = n_bins / cu::block_size + 1;
@@ -236,13 +214,6 @@ namespace vcuda{
                   d_accu,
                   n_bins
                   );
-
-            std::cout<< " "
-               << mean_stat[0] << " "
-               << mean_stat[1] << " "
-               << mean_stat[2] << " "
-               << mean_stat[3] << " "
-               << std::endl;
 
             check_cuda_errors (__FILE__, __LINE__);
 
