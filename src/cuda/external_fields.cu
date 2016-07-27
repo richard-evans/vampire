@@ -123,7 +123,7 @@ __global__ void update_external_fields_kernel (
       cu_real_t resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
       cu_real_t sq_temp = sqrt(resc_temp);
 
-      field_x = sigma * sq_temp * curand_normal_double (&rand_states[tid]); //+atom instead of tid?
+      field_x = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
       field_y = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
       field_z = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
 
