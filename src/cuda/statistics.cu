@@ -85,7 +85,6 @@ namespace vcuda{
                   cu::stats::material_height_mean_magnetization,
                   ::stats::material_height_magnetization
                   );
-
          }
 
          void reset ()
@@ -111,7 +110,6 @@ namespace vcuda{
                   cu::stats::material_height_magnetization,
                   cu::stats::material_height_mean_magnetization
                   );
-
          }
 
    } /* stats */
@@ -244,10 +242,12 @@ namespace vcuda{
             std::vector<double> stl_stat (h_stat.begin(), h_stat.end());
             std::vector<double> stl_mean_stat (h_mean_stat.begin(), h_mean_stat.end());
 
+            // We're keeping the averages in the GPU
+            local_stat.reset_magnetization_averages();
             local_stat.set_magnetization (
                   stl_stat,
                   stl_mean_stat,
-                  counter);
+                  cu::stats::counter);
             check_cuda_errors (__FILE__, __LINE__);
 
          }
