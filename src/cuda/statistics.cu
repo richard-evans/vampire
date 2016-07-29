@@ -106,7 +106,6 @@ namespace vcuda{
                   cu::stats::material_height_mean_magnetization,
                   ::stats::material_height_magnetization
                   );
-
          }
 
          void reset ()
@@ -142,7 +141,6 @@ namespace vcuda{
                   cu::stats::material_height_magnetization,
                   cu::stats::material_height_mean_magnetization
                   );
-
          }
 
    } /* stats */
@@ -162,6 +160,12 @@ namespace vcuda{
          {
 
             if (mask_size < 1) return; // Nothing to do
+
+            // Clean up the stat buffer
+            thrust::fill(
+                  stat.begin(),
+                  stat.end(),
+                  0.0);
 
             const int * d_mask = thrust::raw_pointer_cast (
                   mask.data());
@@ -231,7 +235,6 @@ namespace vcuda{
                check_cuda_errors (__FILE__, __LINE__);
             }
 
-
              // Reduce and accumulate
 
             int gs = n_bins / cu::block_size + 1;
@@ -240,6 +243,7 @@ namespace vcuda{
                   d_accu,
                   n_bins
                   );
+
             check_cuda_errors (__FILE__, __LINE__);
 
          }
@@ -269,10 +273,12 @@ namespace vcuda{
             std::vector<double> stl_stat (h_stat.begin(), h_stat.end());
             std::vector<double> stl_mean_stat (h_mean_stat.begin(), h_mean_stat.end());
 
+            // We're keeping the averages in the GPU
+            local_stat.reset_magnetization_averages();
             local_stat.set_magnetization (
                   stl_stat,
                   stl_mean_stat,
-                  counter);
+                  cu::stats::counter);
             check_cuda_errors (__FILE__, __LINE__);
 
          }
@@ -328,10 +334,7 @@ namespace vcuda{
             val = BlockReduce(temp_storage).Sum(val);
 
             if (threadIdx.x == 0) {
-               // FIXME: As oposed to other methods, this one does not
-               // keep the old values in the global histogram, that may be
-               // the root of the extrange behaviour
-               hist[4 * bin + rol] = val;
+               hist[4 * bin + rol] += val;
             }
          }
 
@@ -444,9 +447,6 @@ namespace vcuda{
                      mz * mz
                      );
 
-               // FIXME: Yo, what was I thinking here?
-               // Seems like I update the histogram for the stat
-               // But I dont reset it for the next run
                hist[4 * i + 0] = mx / mm;
                hist[4 * i + 1] = my / mm;
                hist[4 * i + 2] = mz / mm;

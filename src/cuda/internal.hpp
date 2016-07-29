@@ -136,7 +136,24 @@ namespace vcuda{
        * Shared device functions
        */
 
-      __device__ cu_real_t atomicAdd (cu_real_t * address, cu_real_t value);
+      inline __device__ double atomicAdd (double * address, double value)
+      {
+         unsigned long long int * address_as_ull =
+            (unsigned long long int *) address;
+         unsigned long long int old = *address_as_ull;
+         unsigned long long int assumed;
+         do {
+            assumed = old;
+            old = atomicCAS(address_as_ull, assumed,
+                  __double_as_longlong(value + __longlong_as_double(assumed)));
+         } while (assumed != old);
+         return __longlong_as_double(old);
+      }
+
+      inline __device__ float atomicAdd (float * address, float value)
+      {
+          return ::atomicAdd(address, value);
+      }
 
       /*
        * Shared kernel definitions

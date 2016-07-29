@@ -53,34 +53,4 @@ inline void check_device_memory( const char* filename, const int line_number)
 #endif
 }
 
-/**
- * This will butterfly reduce a value within a wrap, however
- * this won't work with doubles.
- */
-template <typename T>
-__inline__ __device__ T warpReduceSum (T val) {
-    for (int offset = warpSize / 2; offset > 0; offset /= 2)
-        val += __shfl_down(val, offset);
-    return val;
-}
-
-/**
- * This will warp reduce and shared memory reduce a value within a
- * block, this is pretty general but requires the warp reduce, these
- * essentials might be availabe in CUB.
- */
-template <typename T>
-__inline__ __device__ T blockReduceSum (T val) {
-    static __shared__ T shared[32]; // Popamoly this is the max
-    int laneId = threadIdx.x & 0x1f;
-    int warpId = threadIdx.x / warpSize;
-    val = warpReduceSum(val);
-    if (laneId == 0) shared[warpId] = val;
-    __syncthreads(); // Wait for al warp reductions
-    // FIXME: This might need a + 1
-    val = (threadIdx.x < blockDim.x / warpSize) ? shared[laneId] : 0;
-    if (warpId == 0) val = warpReduceSum(val);
-    return val;
-}
-
 #endif
