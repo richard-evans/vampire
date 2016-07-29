@@ -163,22 +163,22 @@ namespace vcuda
 
             int * rowptrs_dptr = thrust::raw_pointer_cast( cu::atoms::limits.data() );
             int * colinds_dptr = thrust::raw_pointer_cast( cu::atoms::neighbours.data() );
-            double * Jxx_vals_dptr = thrust::raw_pointer_cast( Jxx_vals_d.data() );
-            double * Jyy_vals_dptr = thrust::raw_pointer_cast( Jyy_vals_d.data() );
-            double * Jzz_vals_dptr = thrust::raw_pointer_cast( Jzz_vals_d.data() );
+            cu_real_t * Jxx_vals_dptr = thrust::raw_pointer_cast( Jxx_vals_d.data() );
+            cu_real_t * Jyy_vals_dptr = thrust::raw_pointer_cast( Jyy_vals_d.data() );
+            cu_real_t * Jzz_vals_dptr = thrust::raw_pointer_cast( Jzz_vals_d.data() );
 
-            double * Sx_dptr = thrust::raw_pointer_cast( cu::atoms::x_spin_array.data());
-            double * Sy_dptr = thrust::raw_pointer_cast( cu::atoms::y_spin_array.data());
-            double * Sz_dptr = thrust::raw_pointer_cast( cu::atoms::z_spin_array.data());
-            double * Hx_dptr = thrust::raw_pointer_cast( cu::x_total_spin_field_array.data());
-            double * Hy_dptr = thrust::raw_pointer_cast( cu::y_total_spin_field_array.data());
-            double * Hz_dptr = thrust::raw_pointer_cast( cu::z_total_spin_field_array.data());
+            cu_real_t * Sx_dptr = thrust::raw_pointer_cast( cu::atoms::x_spin_array.data());
+            cu_real_t * Sy_dptr = thrust::raw_pointer_cast( cu::atoms::y_spin_array.data());
+            cu_real_t * Sz_dptr = thrust::raw_pointer_cast( cu::atoms::z_spin_array.data());
+            cu_real_t * Hx_dptr = thrust::raw_pointer_cast( cu::x_total_spin_field_array.data());
+            cu_real_t * Hy_dptr = thrust::raw_pointer_cast( cu::y_total_spin_field_array.data());
+            cu_real_t * Hz_dptr = thrust::raw_pointer_cast( cu::z_total_spin_field_array.data());
 
 
             // cusparse csrmv calculates y = alpha * OP(A) * x + beta * y
             // where alpha and beta are scalar constants
-            double alpha = 1.0;
-            double beta = 1.0;
+            cu_real_t alpha = 1.0;
+            cu_real_t beta = 1.0;
 
             switch( ::atoms::exchange_type)
             {
@@ -193,7 +193,7 @@ namespace vcuda
 
 
                   // Since Jxx = Jyy = Jzz only the Jxx array is used
-                  cusparseDcsrmv(
+                  cusparseTcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
                          ::atoms::num_atoms,
@@ -208,7 +208,7 @@ namespace vcuda
                          &beta,
                          Hx_dptr);
 
-                  cusparseDcsrmv(
+                  cusparseTcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
                          ::atoms::num_atoms,
@@ -223,7 +223,7 @@ namespace vcuda
                          &beta,
                          Hy_dptr);
 
-                  cusparseDcsrmv(
+                  cusparseTcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
                          ::atoms::num_atoms,
@@ -250,7 +250,7 @@ namespace vcuda
                   if( !exchange_initialised) initialise_exchange();
 
                   // Compute the Hx = Jxx * Sx exchange fields
-                  cusparseDcsrmv(
+                  cusparseTcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
                          ::atoms::num_atoms,
@@ -266,7 +266,7 @@ namespace vcuda
                          Hx_dptr);
 
                   // Compute the Hy = Jyy * Sy exchange fields
-                  cusparseDcsrmv(
+                  cusparseTcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
                          ::atoms::num_atoms,
@@ -282,7 +282,7 @@ namespace vcuda
                          Hy_dptr);
 
                   // Compute the Hz = Jzz * Sz exchange fields
-                  cusparseDcsrmv(
+                  cusparseTcsrmv(
                         cusparse_handle,
                          CUSPARSE_OPERATION_NON_TRANSPOSE,
                          ::atoms::num_atoms,
