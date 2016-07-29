@@ -30,14 +30,54 @@ namespace gpu{
       //----------------------------------
       std::string test="acceleration";
       if(word==test){
-			gpu::acceleration = true;
-         return true;
+         test="on";
+         // enable (default for gpu compiled version)
+         if(value==test){
+            gpu::acceleration = true;
+            return true;
+         }
+         test="off";
+         // disable (default for cpu compiled version)
+         if(value==test){
+            gpu::acceleration = false;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"on\"" << std::endl;
+            std::cerr << "\t\"off\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
       }
       //--------------------------------------------------------------------
       test="calculate-statistics-on-cpu";
       if(word==test){
-			gpu::cpu_stats = true;
-         return true;
+         test="";
+         if(value==test){
+            gpu::cpu_stats = true;
+            return true;
+         }
+         test="true";
+         if(value==test){
+            gpu::cpu_stats = true;
+            return true;
+         }
+         // default
+         test="false";
+         if(value==test){
+            gpu::cpu_stats = false;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"true\"" << std::endl;
+            std::cerr << "\t\"false\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
       }
       //--------------------------------------------------------------------
       else{
