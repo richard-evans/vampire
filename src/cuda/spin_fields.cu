@@ -67,7 +67,7 @@ void update_spin_fields ()
    // Call kernel to calculate non-exchange spin fields
    cu::update_non_exchange_spin_fields_kernel <<< cu::grid_size, cu::block_size >>> (
          d_materials, d_material_params,
-         d_x_spin, d_y_spin, d_y_spin,
+         d_x_spin, d_y_spin, d_z_spin,
          d_x_spin_field, d_y_spin_field, d_z_spin_field,
          ::atoms::num_atoms);
 

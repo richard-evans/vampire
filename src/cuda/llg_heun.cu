@@ -264,7 +264,7 @@ namespace vcuda{
                cu_real_t new_spin_z = sz + Ds_z * dt;
 
                // calculate spin length for renormalization (add in float specific code here)
-               cu_real_t mod_s = 1.0 / sqrt(
+               cu_real_t mod_s = 1.0 / sqrtf (
                      new_spin_x * new_spin_x +
                      new_spin_y * new_spin_y +
                      new_spin_z * new_spin_z);
@@ -333,7 +333,7 @@ namespace vcuda{
                cu_real_t S_y = y_spin_buffer[atom] + 0.5 * (dSy[atom] + DS_prime_y) * dt;
                cu_real_t S_z = z_spin_buffer[atom] + 0.5 * (dSz[atom] + DS_prime_z) * dt;
 
-               cu_real_t mods = 1.0 / sqrt(S_x*S_x + S_y*S_y + S_z*S_z);
+               cu_real_t mods = 1.0 / sqrtf (S_x*S_x + S_y*S_y + S_z*S_z);
 
                // save final spin direction to spin array
                x_spin[atom] = mods * S_x;

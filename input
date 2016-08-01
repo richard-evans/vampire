@@ -25,16 +25,16 @@ material:file=Co.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature=10.0
-sim:time-steps-increment=1000
-sim:total-time-steps=10000
-sim:time-step=1.0E-15
+sim:temperature=0.0
+sim:time-steps-increment=100
+sim:total-time-steps=100000
+sim:time-step=1.0E-16
 
 sim:applied-field-strength=0.0 !T
 sim:applied-field-unit-vector=1,0,0
 
-gpu:acceleration
-gpu:calculate-statistics-on-cpu
+# gpu:acceleration
+# gpu:calculate-statistics-on-cpu
 
 #------------------------------------------
 # Program and integrator details
@@ -53,4 +53,5 @@ output:applied-field-alignment
 output:output-rate = 50
 
 screen:time-steps
+screen:magnetisation
 screen:magnetisation-length
