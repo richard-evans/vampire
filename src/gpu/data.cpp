@@ -18,7 +18,16 @@ namespace gpu{
    //-----------------------------------------------------------------------------
    // Shared variables used for GPU acceleration
    //-----------------------------------------------------------------------------
-   bool acceleration = false; // flag to enable gpu_acceleration
+   // default is on for GPU compiled code
+   #ifdef CUDA
+      bool acceleration = true; // flag to enable gpu_acceleration
+   #elif OPENCL
+      bool acceleration = true; // flag to enable gpu_acceleration
+   #else
+      bool acceleration = false; // flag to enable gpu_acceleration
+   #endif
+
+   bool cpu_stats = false; // flag to calculate stats using cpu
 
    //-----------------------------------------------------------------------------
    // Shared data structures for statistics calculation

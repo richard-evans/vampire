@@ -83,6 +83,8 @@ namespace vcuda{
 
       namespace stats
       {
+
+         bool use_cpu = false;
          long counter(0L);
 
          cu_index_array_t system_mask(0UL);

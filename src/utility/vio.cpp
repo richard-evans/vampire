@@ -747,6 +747,12 @@ int match(string const key, string const word, string const value, string const 
 
 	std::string test;
 
+   //-------------------------------------------------------------------
+   // Call module input parameters
+   //-------------------------------------------------------------------
+   if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+
 	//===================================================================
 	// Test for create variables
 	//===================================================================
@@ -809,10 +815,6 @@ int match(string const key, string const word, string const value, string const 
 		int frs=vin::match_config(word, value, line);
 		return frs;
 	}
-   //-------------------------------------------------------------------
-	// Test for localised temperature pulse
-   //-------------------------------------------------------------------
-   else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//-------------------------------------------------------------------
 	// Get material filename
 	//-------------------------------------------------------------------
@@ -4181,7 +4183,7 @@ namespace vout{
       if(vmpi::my_rank==0){
 
       // For gpu acceleration get statistics from device
-      gpu::stats::get();
+      if(gpu::acceleration) gpu::stats::get();
 
 		for(unsigned int item=0;item<file_output_list.size();item++){
 			switch(file_output_list[item]){
@@ -4527,4 +4529,3 @@ namespace vout{
 	} // end of data
 
 } // end of namespace vout
-
