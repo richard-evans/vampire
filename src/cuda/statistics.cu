@@ -441,21 +441,22 @@ namespace vcuda{
                cu_real_t mz = hist[4 * i + 2];
                cu_real_t ms = hist[4 * i + 3];
 
-               cu_real_t mm = sqrtf (
-                     mx * mx +
-                     my * my +
-                     mz * mz
-                     );
-
-               hist[4 * i + 0] = mx / mm;
-               hist[4 * i + 1] = my / mm;
-               hist[4 * i + 2] = mz / mm;
-               hist[4 * i + 3] = mm / ms;
-
-               accum[4 * i + 0] += mx / mm;
-               accum[4 * i + 1] += my / mm;
-               accum[4 * i + 2] += mz / mm;
-               accum[4 * i + 3] += mm / ms;
+               if (ms > 0.0) {
+                  cu_real_t mm = sqrtf (mx * mx + my * my + mz * mz);
+                  hist[4 * i + 0] = mx / mm;
+                  hist[4 * i + 1] = my / mm;
+                  hist[4 * i + 2] = mz / mm;
+                  hist[4 * i + 3] = mm / ms;
+                  accum[4 * i + 0] += mx / mm;
+                  accum[4 * i + 1] += my / mm;
+                  accum[4 * i + 2] += mz / mm;
+                  accum[4 * i + 3] += mm / ms;
+               } else {
+                  // Just wipe the histogram
+                  // FIXME Even this could be removed
+                  for (int j = 0; j < 4; j++)
+                     hist[4 * i + j] = 0.0;
+               }
             }
          }
 
