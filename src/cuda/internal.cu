@@ -18,7 +18,7 @@ namespace vcuda
    {
 
       int block_size(256UL);
-      int grid_size(512UL);
+      int grid_size(32UL);
 
    }
 
