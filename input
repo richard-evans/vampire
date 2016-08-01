@@ -33,6 +33,8 @@ sim:time-step=1.0E-15
 sim:applied-field-strength=0.0 !T
 sim:applied-field-unit-vector=1,0,0
 
+gpu:acceleration
+gpu:calculate-statistics-on-cpu
 
 #------------------------------------------
 # Program and integrator details

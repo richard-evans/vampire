@@ -30,6 +30,24 @@ namespace vcuda{
          void update ()
          {
 
+            // If enabled use CPU to calculate statistics by copying data from GPU
+            if(vcuda::internal::stats::use_cpu){
+
+				   // copy spin data to CPU
+               thrust::copy(internal::atoms::x_spin_array.begin(),internal::atoms::x_spin_array.end(),::atoms::x_spin_array.begin());
+               thrust::copy(internal::atoms::y_spin_array.begin(),internal::atoms::y_spin_array.end(),::atoms::y_spin_array.begin());
+               thrust::copy(internal::atoms::z_spin_array.begin(),internal::atoms::z_spin_array.end(),::atoms::z_spin_array.begin());
+
+               // call cpu statistics functions
+               if(::stats::calculate_system_magnetization)          ::stats::system_magnetization.calculate_magnetization(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array);
+               if(::stats::calculate_material_magnetization)        ::stats::material_magnetization.calculate_magnetization(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array);
+               if(::stats::calculate_height_magnetization)          ::stats::height_magnetization.calculate_magnetization(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array);
+               if(::stats::calculate_material_height_magnetization) ::stats::material_height_magnetization.calculate_magnetization(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array);
+
+               // return before doing the GPU version
+               return;
+            }
+
             cu::stats::__update_stat (
                   cu::stats::system_mask,
                   cu::stats::system_magnetization,
@@ -62,6 +80,9 @@ namespace vcuda{
          void get ()
          {
 
+            // If CPU stats calculation do nothing
+            if(vcuda::internal::stats::use_cpu) return;
+
             cu::stats::__get_stat (
                   cu::stats::system_magnetization,
                   cu::stats::system_mean_magnetization,
@@ -89,6 +110,16 @@ namespace vcuda{
 
          void reset ()
          {
+
+            // reset magnetization statistics
+            if(vcuda::internal::stats::use_cpu){
+               if(::stats::calculate_system_magnetization)          ::stats::system_magnetization.reset_magnetization_averages();
+               if(::stats::calculate_material_magnetization)        ::stats::material_magnetization.reset_magnetization_averages();
+               if(::stats::calculate_height_magnetization)          ::stats::height_magnetization.reset_magnetization_averages();
+               if(::stats::calculate_material_height_magnetization) ::stats::material_height_magnetization.reset_magnetization_averages();
+               return;
+            }
+
             cu::stats::counter = 0L;
 
             cu::stats::__reset_stat (

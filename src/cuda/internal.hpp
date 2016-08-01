@@ -201,6 +201,10 @@ namespace vcuda{
             int * cells, int n_atoms
             );
 
+      namespace stats{
+         extern bool use_cpu;
+      }
+
    } // end of iternal namespace
 
 #endif

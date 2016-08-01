@@ -20,7 +20,7 @@ namespace vcuda{
    //-----------------------------------------------------------------------------
    // Functions for cuda GPU acceleration
    //-----------------------------------------------------------------------------
-   extern bool initialize();
+   extern bool initialize(bool cpu_stats);
    extern void llg_heun();
    extern void stats_update();
    extern void finalize();

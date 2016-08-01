@@ -7,6 +7,7 @@ gpu_objects=\
 data.o \
 finalize.o \
 initialize.o \
+interface.o \
 llg_heun.o \
 statistics.o
 

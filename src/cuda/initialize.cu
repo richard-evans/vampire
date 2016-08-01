@@ -37,12 +37,15 @@ namespace vcuda{
    //-------------------------------------------------------------------------------
    // Function to initialize GPU data
    //-------------------------------------------------------------------------------
-   bool initialize(){
+   bool initialize(bool cpu_stats){
 
 #ifdef CUDA
 
       std::cout << "CUDA has been enabled.\n";
 //      std::cout << "compiled with " << COMP << std::endl;
+
+      // set internal cpu statistics flag
+      vcuda::internal::stats::use_cpu = cpu_stats;
 
       // Check if there is a compatible devices
       int n_devices;
