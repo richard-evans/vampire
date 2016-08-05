@@ -67,6 +67,7 @@
 ///
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "gpu.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "demag.hpp"
@@ -424,6 +425,10 @@ namespace demag{
          std::cerr << "demag::update has been called " << vmpi::my_rank << std::endl;
          terminaltextcolor(WHITE);
       }
+
+      // check for gpu acceleration and do nothing
+      if(gpu::acceleration) return;
+
       // prevent double calculation for split integration (MPI)
       if(demag::update_time!=sim::time){
 
@@ -463,4 +468,3 @@ namespace demag{
    }
 
 } // end of namespace demag
-

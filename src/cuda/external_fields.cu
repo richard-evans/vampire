@@ -69,6 +69,9 @@ void update_external_fields (){
    // Check for errors
    check_cuda_errors (__FILE__, __LINE__);
 
+   // update dipole field
+   update_dipolar_fields();
+
    // std::ofstream fields("should_be_normal.txt");
    // for (size_t i = 0; i < cu::x_total_external_field_array.size(); ++i) {
    //    fields << cu::x_total_external_field_array[i] << std::endl;

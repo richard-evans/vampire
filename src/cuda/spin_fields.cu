@@ -76,6 +76,7 @@ void update_spin_fields ()
    cu::exchange::calculate_exchange_fields ();
 
    check_cuda_errors (__FILE__, __LINE__);
+
 }
 
 //------------------------------------------------------------------------------

@@ -36,9 +36,13 @@ void update_dipolar_fields ()
     * Check if an update is required
     */
 
+   // check for previous demag update at same time (avoids recalculation in Heun scheme)
    if (::sim::time == ::demag::update_time) return;
-   if (::sim::time % ::demag::update_rate) return;
 
+   // if remainder of time/rate != 0 return
+   if (::sim::time % ::demag::update_rate != 0) return;
+
+   // save last time of demag update
    ::demag::update_time = ::sim::time;
 
    update_cell_magnetizations ();
@@ -163,10 +167,6 @@ void update_cell_magnetizations ()
 
    check_cuda_errors (__FILE__, __LINE__);
 }
-
-
-
-
 
 __global__ void update_cell_magnetization (
       cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
