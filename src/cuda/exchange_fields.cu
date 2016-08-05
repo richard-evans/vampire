@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <thrust/device_vector.h>
+#include <cusp/csr_matrix.h>
 
 int calculate_exchange_fields(int, int);
 
@@ -57,6 +58,13 @@ namespace vcuda
             std::vector<double> Jyy_vals_h;
             std::vector<double> Jzz_vals_h;
 
+            cusp::csr_matrix < int, cu::cu_real_t, cusp::host_memory > J_xx_matrix_h (
+                  ::atoms::num_atoms,
+                  ::atoms::num_atoms,
+                  ::atoms::neighbour_list_array.size()
+                  );
+
+
             switch( ::atoms::exchange_type)
             {
                case 0: // Isotropic
@@ -65,6 +73,17 @@ namespace vcuda
                   // Exchange is isotropic so Jxx = Jyy = Jzz
                   // and Jxy = Jxz = Jyx = 0
                   //--------------------------------------------------------------
+
+                  J_xx_matrix_h.row_offsets[0] = 0.0;
+
+                  for( int atom = 0; atom < ::atoms::num_atoms; atom++)
+                     J_xx_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+
+                  for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++) {
+                     int iid = ::atoms::neighbour_interaction_type_array[i]; // interaction id
+                     J_xx_matrix_h.values[i] = - ::atoms::i_exchange_list[iid].Jij;
+                     J_xx_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
+                  }
 
                   // Copy J values from vampire exchange list to values list
                   for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)

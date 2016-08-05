@@ -66,6 +66,10 @@ namespace vcuda{
          exchange::Jyy_vals_d.cu_real_array_t::~device_vector ();
          exchange::Jzz_vals_d.cu_real_array_t::~device_vector ();
 
+         /* cu::exchange::J_xx_mat_d.cu_exch_mat_t::~cu_exch_mat_t (); */
+         /* cu::exchange::J_yy_mat_d.cu_exch_mat_t::~cu_exch_mat_t (); */
+         /* cu::exchange::J_zz_mat_d.cu_exch_mat_t::~cu_exch_mat_t (); */
+
          cu::cells::x_coord_array.cu_real_array_t::~device_vector ();
          cu::cells::y_coord_array.cu_real_array_t::~device_vector ();
          cu::cells::z_coord_array.cu_real_array_t::~device_vector ();

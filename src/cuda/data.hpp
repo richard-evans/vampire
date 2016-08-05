@@ -9,10 +9,6 @@
 #ifndef CUDA_DATA_HPP_
 #define CUDA_DATA_HPP_
 
-#include <thrust/copy.h>
-#include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
-
 #include "typedefs.hpp"
 /*
  * Provide the definition for the material_t class
@@ -62,6 +58,15 @@ namespace vcuda
          /*
           * TODO: Tensor exchanges
           */
+
+         /*
+          * This matrices take care of the topology as well
+          */
+
+         extern cu_exch_mat_t J_xx_mat_d;
+         extern cu_exch_mat_t J_yy_mat_d;
+         extern cu_exch_mat_t J_zz_mat_d;
+
       }
       namespace cells
       {

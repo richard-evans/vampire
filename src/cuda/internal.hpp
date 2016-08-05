@@ -15,7 +15,6 @@
 // not be accessed outside of the cuda code.
 //---------------------------------------------------------------------
 
-#include <curand_kernel.h>
 #include <thrust/copy.h>
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
@@ -24,6 +23,7 @@
 #include <thrust/tuple.h>
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
+#include <curand_kernel.h>
 
 /*
  * requesting data strcutures from the main program
