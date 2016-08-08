@@ -36,8 +36,13 @@ namespace vcuda{
 // module internal namespace
 namespace internal{
 
-   // new type definitions (need to be selectable at compile time)
-   typedef double cu_real_t;
+   // new type definitions
+   #ifdef CUDA_DP
+      typedef double cu_real_t;
+   #else
+      typedef float cu_real_t;
+   #endif
+
    typedef thrust::device_vector<cu_real_t> cu_real_array_t;
    typedef thrust::device_vector<int> cu_index_array_t;
 

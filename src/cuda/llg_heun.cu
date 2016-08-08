@@ -263,11 +263,17 @@ namespace vcuda{
                cu_real_t new_spin_y = sy + Ds_y * dt;
                cu_real_t new_spin_z = sz + Ds_z * dt;
 
-               // calculate spin length for renormalization (add in float specific code here)
-               cu_real_t mod_s = 1.0 / sqrtf (
-                     new_spin_x * new_spin_x +
-                     new_spin_y * new_spin_y +
-                     new_spin_z * new_spin_z);
+               // calculate spin length for renormalization
+               #ifdef CUDA_DP
+                  double mod_s = 1.0 / __dsqrt_rn(
+               #else
+                  // cuda intrinsic precise reciprocal square root
+                  float mod_s = __frsqrt_rn(
+               #endif
+                  new_spin_x * new_spin_x +
+                  new_spin_y * new_spin_y +
+                  new_spin_z * new_spin_z
+               );
 
                // Store normalized intermediate spin direction
                x_spin[atom] = new_spin_x * mod_s;
@@ -333,7 +339,12 @@ namespace vcuda{
                cu_real_t S_y = y_spin_buffer[atom] + 0.5 * (dSy[atom] + DS_prime_y) * dt;
                cu_real_t S_z = z_spin_buffer[atom] + 0.5 * (dSz[atom] + DS_prime_z) * dt;
 
-               cu_real_t mods = 1.0 / sqrtf (S_x*S_x + S_y*S_y + S_z*S_z);
+               #ifdef CUDA_DP
+                  double mods = 1.0 / __dsqrt_rn(S_x*S_x + S_y*S_y + S_z*S_z);
+               #else
+                  // cuda intrinsic precise reciprocal square root
+                  float mods = __frsqrt_rn(S_x*S_x + S_y*S_y + S_z*S_z);
+               #endif
 
                // save final spin direction to spin array
                x_spin[atom] = mods * S_x;

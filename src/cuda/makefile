@@ -5,10 +5,7 @@
 NVCC_VERSION=$(shell nvcc --version | tail -n 1 | cut -b 38-)
 NVCC=nvcc -DCOMP='"NVCC $(NVCC_VERSION)"'
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++ --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_20 -O3
-
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart -lcusparse -lcurand
-
 
 # List module object filenames
 CUDA_OBJECTS= \
@@ -27,10 +24,15 @@ CUDA_OBJECTS= \
 # The device linked object for CUDA
 CUDA_DLINK= obj/cuda/vampire_cuda.o
 
-CUDA_CFLAGS= -I./hdr -DCUDA -rdc=true -arch=sm_20
+# set precision for cuda calculation
+#CUDA_PR= -DCUDA_DP
+CUDA_PR= -DCUDA_SP
+#CUDA_PR= -DCUDA_MP
+
+CUDA_CFLAGS= -I./hdr -DCUDA -O3 -rdc=true -arch=sm_20 --use_fast_math -ftz=true
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
-	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS)
+	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS) $(CUDA_PR)
 
 # Target for device link -- not working atm
 #$(CUDA_DLINK): $(cuda_objects)

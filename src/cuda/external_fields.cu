@@ -123,8 +123,14 @@ __global__ void update_external_fields_kernel (
       cu_real_t alpha = mat.temperature_rescaling_alpha;
       cu_real_t sigma = mat.H_th_sigma;
       cu_real_t tc = mat.temperature_rescaling_Tc;
-      cu_real_t resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
-      cu_real_t sq_temp = sqrt(resc_temp);
+
+      #ifdef CUDA_DP
+         double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
+         double sq_temp = sqrt(resc_temp);
+      #else
+         float resc_temp = (temp < tc) ? tc * __powf(temp / tc, alpha) : temp;
+         float sq_temp = sqrtf(resc_temp);
+      #endif
 
       field_x = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
       field_y = sigma * sq_temp * curand_normal_double (&rand_states[tid]);

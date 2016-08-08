@@ -41,8 +41,15 @@ namespace vcuda{
 
 #ifdef CUDA
 
-      std::cout << "CUDA has been enabled.\n";
-//      std::cout << "compiled with " << COMP << std::endl;
+      std::cout << "CUDA has been enabled in ";
+      zlog << zTs() << "CUDA has been enabled in ";
+      #ifdef CUDA_DP
+         std::cout << "double precision mode" << std::endl;
+         zlog << "double precision mode" << std::endl;
+      #else
+         std::cout << "single precision mode" << std::endl;
+         zlog << "single precision mode" << std::endl;
+      #endif
 
       // set internal cpu statistics flag
       vcuda::internal::stats::use_cpu = cpu_stats;

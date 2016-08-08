@@ -442,15 +442,18 @@ namespace vcuda{
                cu_real_t ms = hist[4 * i + 3];
 
                if (ms > 0.0) {
-                  cu_real_t mm = sqrtf (mx * mx + my * my + mz * mz);
-                  hist[4 * i + 0] = mx / mm;
-                  hist[4 * i + 1] = my / mm;
-                  hist[4 * i + 2] = mz / mm;
-                  hist[4 * i + 3] = mm / ms;
-                  accum[4 * i + 0] += mx / mm;
-                  accum[4 * i + 1] += my / mm;
-                  accum[4 * i + 2] += mz / mm;
-                  accum[4 * i + 3] += mm / ms;
+
+                  // cuda overloads reciprocal sqrt for float and double
+                  cu_real_t imm = rsqrt(mx * mx + my * my + mz * mz);
+
+                  hist[4 * i + 0] = mx * imm;
+                  hist[4 * i + 1] = my * imm;
+                  hist[4 * i + 2] = mz * imm;
+                  hist[4 * i + 3] = imm * ms;
+                  accum[4 * i + 0] += mx * imm;
+                  accum[4 * i + 1] += my * imm;
+                  accum[4 * i + 2] += mz * imm;
+                  accum[4 * i + 3] += imm * ms;
                } else {
                   // Just wipe the histogram
                   // FIXME Even this could be removed

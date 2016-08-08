@@ -235,7 +235,7 @@ __global__ void update_dipolar_fields (
          cu_real_t dy = y_coord[j] - cy;
          cu_real_t dz = z_coord[j] - cz;
 
-         cu_real_t drij = 1.0 / sqrtf (dx * dx + dy * dy + dz * dz);
+         cu_real_t drij = rsqrt(dx * dx + dy * dy + dz * dz);
          cu_real_t drij3 = drij * drij * drij;
 
          cu_real_t sdote = (
