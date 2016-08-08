@@ -104,6 +104,9 @@ namespace vout{
       pid_t    zLogPid; /// Process ID
    #endif
 
+   unsigned int precision = 6; // variable to control output precision (digits)
+   bool fixed = false; // fixed precision output
+
    void zLogTsInit(std::string tmp){
 
       // Get program name and process ID
@@ -2601,7 +2604,20 @@ int match_vout_list(string const word, string const value, int const line, std::
       vout::output_rate=r;
       return EXIT_SUCCESS;
    }
-
+   //--------------------------------------------------------------------
+   test="precision";
+   if(word==test){
+      int p=atoi(value.c_str());
+      check_for_valid_int(p, word, line, prefix, 2, 16,"input","2 - 16");
+      vout::precision=p;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="fixed-width";
+   if(word==test){
+      vout::fixed = true;
+      return EXIT_SUCCESS;
+   }
    //--------------------------------------------------------------------
    // keyword not found
    //--------------------------------------------------------------------

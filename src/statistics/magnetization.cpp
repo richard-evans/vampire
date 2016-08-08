@@ -121,7 +121,7 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
                                                          const std::vector<double>& sz,
                                                          const std::vector<double>& mm){
 
-   // initialise magnetization to zero [.end() seems to be optimised away by the compiler...] 
+   // initialise magnetization to zero [.end() seems to be optimised away by the compiler...]
    std::fill(magnetization.begin(),magnetization.end(),0.0);
 
    // calculate contributions of spins to each magetization category
@@ -142,7 +142,7 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       double msat = magnetization[4*mask_id + 3];
       double magm = sqrt(magnetization[4*mask_id + 0]*magnetization[4*mask_id + 0] +
-                         magnetization[4*mask_id + 1]*magnetization[4*mask_id + 1] + 
+                         magnetization[4*mask_id + 1]*magnetization[4*mask_id + 1] +
                          magnetization[4*mask_id + 2]*magnetization[4*mask_id + 2]);
 
       // normalize to msat
@@ -214,6 +214,8 @@ std::string magnetization_statistic_t::output_normalized_magnetization(){
 
    // result string stream
    std::ostringstream result;
+   result.precision(vout::precision);
+   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -231,6 +233,8 @@ std::string magnetization_statistic_t::output_magnetization(){
 
    // result string stream
    std::ostringstream result;
+   result.precision(vout::precision);
+   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -248,10 +252,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization_length(){
 
    // result string stream
    std::ostringstream result;
+   result.precision(vout::precision);
+   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << magnetization[4*mask_id + 3] << "\t"; 
+      result << magnetization[4*mask_id + 3] << "\t";
    }
 
    return result.str();
@@ -265,13 +271,15 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization(){
 
    // result string stream
    std::ostringstream result;
+   result.precision(vout::precision);
+   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
 
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << mean_magnetization[4*mask_id + 0]*ic << "\t" << mean_magnetization[4*mask_id + 1]*ic << "\t" << mean_magnetization[4*mask_id + 2]*ic << "\t" << mean_magnetization[4*mask_id + 3]*ic << "\t"; 
+      result << mean_magnetization[4*mask_id + 0]*ic << "\t" << mean_magnetization[4*mask_id + 1]*ic << "\t" << mean_magnetization[4*mask_id + 2]*ic << "\t" << mean_magnetization[4*mask_id + 3]*ic << "\t";
    }
 
    return result.str();
@@ -285,13 +293,15 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization_leng
 
    // result string stream
    std::ostringstream result;
+   result.precision(vout::precision);
+   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
 
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << mean_magnetization[4*mask_id + 3]*ic << "\t"; 
+      result << mean_magnetization[4*mask_id + 3]*ic << "\t";
    }
 
    return result.str();
@@ -305,6 +315,8 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
 
    // result string stream
    std::ostringstream result;
+   result.precision(vout::precision);
+   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
 
    // check vector has correct size
    if(vec.size()!=3){
