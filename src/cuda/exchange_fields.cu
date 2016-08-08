@@ -140,31 +140,19 @@ namespace vcuda
 
             check_cuda_errors(__FILE__,__LINE__);
 
-            cusp::array1d_view <cu_real_array_t::iterator> x_spin_view (
-                  cu::atoms::x_spin_array.begin(),
-                  cu::atoms::x_spin_array.end()
-                  );
-            cusp::array1d_view <cu_real_array_t::iterator> y_spin_view (
-                  cu::atoms::y_spin_array.begin(),
-                  cu::atoms::y_spin_array.end()
-                  );
-            cusp::array1d_view <cu_real_array_t::iterator> z_spin_view (
-                  cu::atoms::z_spin_array.begin(),
-                  cu::atoms::z_spin_array.end()
-                  );
+            cusp::array1d<cu_real_t, cusp::device_memory> x_spin_view
+               = cu::atoms::x_spin_array;
+            cusp::array1d<cu_real_t, cusp::device_memory> y_spin_view
+               = cu::atoms::y_spin_array;
+            cusp::array1d<cu_real_t, cusp::device_memory> z_spin_view
+               = cu::atoms::z_spin_array;
 
-            cusp::array1d_view <cu_real_array_t::iterator> x_total_spin_field_view (
-                  cu::x_total_spin_field_array.begin(),
-                  cu::x_total_spin_field_array.end()
-                  );
-            cusp::array1d_view <cu_real_array_t::iterator> y_total_spin_field_view (
-                  cu::y_total_spin_field_array.begin(),
-                  cu::y_total_spin_field_array.end()
-                  );
-            cusp::array1d_view <cu_real_array_t::iterator> z_total_spin_field_view (
-                  cu::z_total_spin_field_array.begin(),
-                  cu::z_total_spin_field_array.end()
-                  );
+            cusp::array1d<cu_real_t, cusp::device_memory> x_total_spin_field_view
+               = cu::x_total_spin_field_array;
+            cusp::array1d<cu_real_t, cusp::device_memory> y_total_spin_field_view
+               = cu::y_total_spin_field_array;
+            cusp::array1d<cu_real_t, cusp::device_memory> z_total_spin_field_view
+               = cu::z_total_spin_field_array;
 
             thrust::multiplies<cu_real_t>          combine;
             thrust::plus<cu_real_t>                reduce;
