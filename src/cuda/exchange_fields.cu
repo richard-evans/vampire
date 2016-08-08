@@ -64,6 +64,32 @@ namespace vcuda
                   ::atoms::neighbour_list_array.size()
                   );
 
+            cusp::csr_matrix < int, cu::cu_real_t, cusp::host_memory > J_yy_matrix_h (
+                  ::atoms::num_atoms,
+                  ::atoms::num_atoms,
+                  ::atoms::neighbour_list_array.size()
+                  );
+
+            cusp::csr_matrix < int, cu::cu_real_t, cusp::host_memory > J_zz_matrix_h (
+                  ::atoms::num_atoms,
+                  ::atoms::num_atoms,
+                  ::atoms::neighbour_list_array.size()
+                  );
+
+            J_xx_matrix_h.row_offsets[0] = 0.0;
+            J_yy_matrix_h.row_offsets[0] = 0.0;
+            J_zz_matrix_h.row_offsets[0] = 0.0;
+            for (int atom = 0; atom < ::atoms::num_atoms; atom++) {
+               J_xx_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+               J_yy_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+               J_zz_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+            }
+            for (int i = 0; i < ::atoms::neighbour_list_array.size(); i++) {
+               J_xx_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
+               J_yy_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
+               J_zz_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
+            }
+
 
             switch( ::atoms::exchange_type)
             {
@@ -74,35 +100,12 @@ namespace vcuda
                   // and Jxy = Jxz = Jyx = 0
                   //--------------------------------------------------------------
 
-                  J_xx_matrix_h.row_offsets[0] = 0.0;
-
-                  for( int atom = 0; atom < ::atoms::num_atoms; atom++)
-                     J_xx_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
-
-                  for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++) {
-                     int iid = ::atoms::neighbour_interaction_type_array[i]; // interaction id
+                  for (int i = 0; i < ::atoms::neighbour_list_array.size(); i++) {
+                     int iid = ::atoms::neighbour_interaction_type_array[i];
                      J_xx_matrix_h.values[i] = - ::atoms::i_exchange_list[iid].Jij;
-                     J_xx_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
                   }
 
-                  // Copy J values from vampire exchange list to values list
-                  for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)
-                  {
-                     int iid = ::atoms::neighbour_interaction_type_array[i]; // interaction id
-                     double Jij= ::atoms::i_exchange_list[iid].Jij;
-
-                     // -ve required for convention
-                     Jxx_vals_h.push_back(-Jij);
-
-                  }
-
-                  Jxx_vals_d.resize( Jxx_vals_h.size() );
-
-                  thrust::copy(
-                        Jxx_vals_h.begin(),
-                        Jxx_vals_h.end(),
-                        Jxx_vals_d.begin()
-                        );
+                  cusp::convert(J_xx_matrix_h, J_xx_mat_d);
 
                   J_isot_initialised = true;
                   check_cuda_errors(__FILE__,__LINE__);
@@ -119,28 +122,15 @@ namespace vcuda
                   // Copy J values from vampire exchange list to values list
                   for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)
                   {
-                     int iid = ::atoms::neighbour_interaction_type_array[i]; // interaction id
-                     Jxx_vals_h.push_back( -::atoms::v_exchange_list[iid].Jij[0]);
-                     Jyy_vals_h.push_back( -::atoms::v_exchange_list[iid].Jij[1]);
-                     Jzz_vals_h.push_back( -::atoms::v_exchange_list[iid].Jij[2]);
-
+                     int iid = ::atoms::neighbour_interaction_type_array[i];
+                     J_xx_matrix_h.values[i] = - ::atoms::v_exchange_list[iid].Jij[0];
+                     J_yy_matrix_h.values[i] = - ::atoms::v_exchange_list[iid].Jij[1];
+                     J_zz_matrix_h.values[i] = - ::atoms::v_exchange_list[iid].Jij[2];
                   }
 
-                  thrust::copy(
-                        Jxx_vals_h.begin(),
-                        Jxx_vals_h.end(),
-                        Jxx_vals_d.begin()
-                        );
-                  thrust::copy(
-                        Jyy_vals_h.begin(),
-                        Jyy_vals_h.end(),
-                        Jyy_vals_d.begin()
-                        );
-                  thrust::copy(
-                        Jyy_vals_h.begin(),
-                        Jyy_vals_h.end(),
-                        Jyy_vals_d.begin()
-                        );
+                  cusp::convert(J_xx_matrix_h, J_xx_mat_d);
+                  cusp::convert(J_yy_matrix_h, J_yy_mat_d);
+                  cusp::convert(J_zz_matrix_h, J_zz_mat_d);
 
                   J_vect_initialised = true;
                   check_cuda_errors(__FILE__,__LINE__);
@@ -194,6 +184,36 @@ namespace vcuda
             cu_real_t * Hz_dptr = thrust::raw_pointer_cast( cu::z_total_spin_field_array.data());
 
 
+            cusp::array1d_view <cu_real_array_t::iterator> x_spin_view (
+                  cu::atoms::x_spin_array.begin(),
+                  cu::atoms::x_spin_array.end()
+                  );
+            cusp::array1d_view <cu_real_array_t::iterator> y_spin_view (
+                  cu::atoms::y_spin_array.begin(),
+                  cu::atoms::y_spin_array.end()
+                  );
+            cusp::array1d_view <cu_real_array_t::iterator> z_spin_view (
+                  cu::atoms::z_spin_array.begin(),
+                  cu::atoms::z_spin_array.end()
+                  );
+
+            cusp::array1d_view <cu_real_array_t::iterator> x_total_spin_field_view (
+                  cu::x_total_spin_field_array.begin(),
+                  cu::x_total_spin_field_array.end()
+                  );
+            cusp::array1d_view <cu_real_array_t::iterator> y_total_spin_field_view (
+                  cu::y_total_spin_field_array.begin(),
+                  cu::y_total_spin_field_array.end()
+                  );
+            cusp::array1d_view <cu_real_array_t::iterator> z_total_spin_field_view (
+                  cu::z_total_spin_field_array.begin(),
+                  cu::z_total_spin_field_array.end()
+                  );
+
+            thrust::identity<cu_real_t>   identity;
+            thrust::multiplies<cu_real_t> combine;
+            thrust::plus<cu_real_t>       reduce;
+
             // cusparse csrmv calculates y = alpha * OP(A) * x + beta * y
             // where alpha and beta are scalar constants
             cu_real_t alpha = 1.0;
@@ -210,52 +230,29 @@ namespace vcuda
 
                   if( !exchange_initialised) initialise_exchange();
 
-
+                  // FIXME This maybe boosted
+                  // It should keep the old values stored in the spin field
                   // Since Jxx = Jyy = Jzz only the Jxx array is used
-                  cusparseTcsrmv(
-                        cusparse_handle,
-                         CUSPARSE_OPERATION_NON_TRANSPOSE,
-                         ::atoms::num_atoms,
-                         ::atoms::num_atoms,
-                         ::atoms::total_num_neighbours,
-                         &alpha,
-                         J_descr,
-                         Jxx_vals_dptr,
-                         rowptrs_dptr,
-                         colinds_dptr,
-                         Sx_dptr,
-                         &beta,
-                         Hx_dptr);
+                  cusp::generalized_spgemm(
+                        J_xx_mat_d,
+                        x_spin_view,
+                        x_total_spin_field_view,
+                        identity, combine, reduce
+                        );
 
-                  cusparseTcsrmv(
-                        cusparse_handle,
-                         CUSPARSE_OPERATION_NON_TRANSPOSE,
-                         ::atoms::num_atoms,
-                         ::atoms::num_atoms,
-                         ::atoms::total_num_neighbours,
-                         &alpha,
-                         J_descr,
-                         Jxx_vals_dptr,
-                         rowptrs_dptr,
-                         colinds_dptr,
-                         Sy_dptr,
-                         &beta,
-                         Hy_dptr);
+                  cusp::generalized_spgemm(
+                        J_xx_mat_d,
+                        y_spin_view,
+                        y_total_spin_field_view,
+                        identity, combine, reduce
+                        );
 
-                  cusparseTcsrmv(
-                        cusparse_handle,
-                         CUSPARSE_OPERATION_NON_TRANSPOSE,
-                         ::atoms::num_atoms,
-                         ::atoms::num_atoms,
-                         ::atoms::total_num_neighbours,
-                         &alpha,
-                         J_descr,
-                         Jxx_vals_dptr,
-                         rowptrs_dptr,
-                         colinds_dptr,
-                         Sz_dptr,
-                         &beta,
-                         Hz_dptr);
+                  cusp::generalized_spgemm(
+                        J_xx_mat_d,
+                        z_spin_view,
+                        z_total_spin_field_view,
+                        identity, combine, reduce
+                        );
 
                   break;
 

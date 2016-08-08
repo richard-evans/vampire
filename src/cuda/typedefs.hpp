@@ -16,12 +16,15 @@
 #include <thrust/copy.h>
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
 #include <thrust/fill.h>
-#include <thrust/tuple.h>
+#include <thrust/host_vector.h>
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
+#include <thrust/tuple.h>
+#include <cusp/copy.h>
+#include <cusp/csr_matrix.h>
 #include <cusp/dia_matrix.h>
+#include <cusp/multiply.h>
 
 // Vampire headers
 #include "cuda.hpp"
