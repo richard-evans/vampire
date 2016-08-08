@@ -140,23 +140,6 @@ namespace vcuda
 
             check_cuda_errors(__FILE__,__LINE__);
 
-            cusp::array1d<cu_real_t, cusp::device_memory> x_spin_view
-               = cu::atoms::x_spin_array;
-            cusp::array1d<cu_real_t, cusp::device_memory> y_spin_view
-               = cu::atoms::y_spin_array;
-            cusp::array1d<cu_real_t, cusp::device_memory> z_spin_view
-               = cu::atoms::z_spin_array;
-
-            cusp::array1d<cu_real_t, cusp::device_memory> x_total_spin_field_view
-               = cu::x_total_spin_field_array;
-            cusp::array1d<cu_real_t, cusp::device_memory> y_total_spin_field_view
-               = cu::y_total_spin_field_array;
-            cusp::array1d<cu_real_t, cusp::device_memory> z_total_spin_field_view
-               = cu::z_total_spin_field_array;
-
-            thrust::multiplies<cu_real_t>          combine;
-            thrust::plus<cu_real_t>                reduce;
-
             switch( ::atoms::exchange_type)
             {
                case 0: // Isotropic
@@ -172,31 +155,20 @@ namespace vcuda
                   // It should keep the old values stored in the spin field
                   // Since Jxx = Jyy = Jzz only the Jxx array is used
 
-                  cusp::generalized_spmv(
+                  cusp::multiply(
                         J_xx_mat_d,
-                        x_spin_view,
-                        x_total_spin_field_view,
-                        x_total_spin_field_view,
-                        combine,
-                        reduce
+                        cu::atoms::x_spin_array,
+                        cu::x_total_spin_field_array
                         );
-
-                  cusp::generalized_spmv(
+                  cusp::multiply(
                         J_xx_mat_d,
-                        y_spin_view,
-                        y_total_spin_field_view,
-                        y_total_spin_field_view,
-                        combine,
-                        reduce
+                        cu::atoms::y_spin_array,
+                        cu::y_total_spin_field_array
                         );
-
-                  cusp::generalized_spmv(
+                  cusp::multiply(
                         J_xx_mat_d,
-                        z_spin_view,
-                        z_total_spin_field_view,
-                        z_total_spin_field_view,
-                        combine,
-                        reduce
+                        cu::atoms::z_spin_array,
+                        cu::z_total_spin_field_array
                         );
 
                   break;
@@ -210,31 +182,20 @@ namespace vcuda
 
                   if( !exchange_initialised) initialise_exchange();
 
-                  cusp::generalized_spmv(
+                  cusp::multiply(
                         J_xx_mat_d,
-                        x_spin_view,
-                        x_total_spin_field_view,
-                        x_total_spin_field_view,
-                        combine,
-                        reduce
+                        cu::atoms::x_spin_array,
+                        cu::x_total_spin_field_array
                         );
-
-                  cusp::generalized_spmv(
+                  cusp::multiply(
                         J_yy_mat_d,
-                        y_spin_view,
-                        y_total_spin_field_view,
-                        y_total_spin_field_view,
-                        combine,
-                        reduce
+                        cu::atoms::y_spin_array,
+                        cu::y_total_spin_field_array
                         );
-
-                  cusp::generalized_spmv(
+                  cusp::multiply(
                         J_zz_mat_d,
-                        z_spin_view,
-                        z_total_spin_field_view,
-                        z_total_spin_field_view,
-                        combine,
-                        reduce
+                        cu::atoms::z_spin_array,
+                        cu::z_total_spin_field_array
                         );
 
                   break;
