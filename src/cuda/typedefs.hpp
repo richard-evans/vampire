@@ -12,7 +12,7 @@
 // C++ standard library headers
 
 // CUDA and thrust headers
-#include <cusp/dia_matrix.h>
+#include <curand_kernel.h>
 #include <thrust/copy.h>
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
@@ -21,7 +21,7 @@
 #include <thrust/tuple.h>
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
-#include <curand_kernel.h>
+#include <cusp/dia_matrix.h>
 
 // Vampire headers
 #include "cuda.hpp"

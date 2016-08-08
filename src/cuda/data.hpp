@@ -14,6 +14,8 @@
  * Provide the definition for the material_t class
  */
 #include "internal.hpp"
+#include "statistics.hpp"
+
 
 #ifdef CUDA
 namespace cu = ::vcuda::internal;

@@ -12,9 +12,7 @@
  *        arrays required by the CUDA implementation.
  */
 
-#include "internal.hpp"
 #include "data.hpp"
-#include "statistics.hpp"
 
 namespace vcuda{
 

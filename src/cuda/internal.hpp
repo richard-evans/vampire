@@ -15,15 +15,8 @@
 // not be accessed outside of the cuda code.
 //---------------------------------------------------------------------
 
-#include <thrust/copy.h>
-#include <thrust/device_ptr.h>
-#include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
-#include <thrust/fill.h>
-#include <thrust/tuple.h>
-#include <thrust/iterator/constant_iterator.h>
-#include <thrust/iterator/zip_iterator.h>
-#include <curand_kernel.h>
+// Include type definitions for cuda code
+#include "typedefs.hpp"
 
 /*
  * requesting data strcutures from the main program
@@ -34,9 +27,6 @@
 #include "../../hdr/demag.hpp"
 #include "../../hdr/material.hpp"
 #include "../../hdr/sim.hpp"
-
-// Include type definitions for cuda code
-#include "typedefs.hpp"
 
 namespace vcuda{
 
