@@ -11,6 +11,7 @@
 
 // Vampire headers
 #include "cuda.hpp"
+#include "sim.hpp"
 
 // Local cuda headers
 #include "cuda_utils.hpp"
@@ -32,9 +33,9 @@ namespace internal{
 
 void update_dipolar_fields ()
 {
-   /*
-    * Check if an update is required
-    */
+
+   // check if dipole calculation is enabled
+   if(sim::hamiltonian_simulation_flags[4]!=1) return;
 
    // check for previous demag update at same time (avoids recalculation in Heun scheme)
    if (::sim::time == ::demag::update_time) return;
