@@ -6,10 +6,8 @@
 #include "internal.hpp"
 #include "data.hpp"
 
-
 #include <vector>
-#include <thrust/device_vector.h>
-#include <cusp/csr_matrix.h>
+
 
 int calculate_exchange_fields(int, int);
 
@@ -25,12 +23,6 @@ namespace vcuda
       {
 
 
-         // Cusparse handle to use the csrmv routines
-         cusparseHandle_t  cusparse_handle;
-
-         // Cusparse descriptor for exchange matrices
-         cusparseMatDescr_t J_descr;
-
          bool exchange_initialised = false;
 
          bool J_isot_initialised = false;
@@ -41,22 +33,7 @@ namespace vcuda
          int initialise_exchange()
          {
 
-            // Initialise the cuSparse handle
-            cusparse_call( cusparseCreate( &cusparse_handle) );
-
-            // Initialise the matrix description
-            cusparseCreateMatDescr(&J_descr);
-            cusparseSetMatType(J_descr, CUSPARSE_MATRIX_TYPE_GENERAL);
-            cusparseSetMatIndexBase(J_descr,CUSPARSE_INDEX_BASE_ZERO);
-
-
             check_device_memory(__FILE__,__LINE__);
-
-            // Temporary vectors on host to copy exchange values from
-            // They have to be declared outside of case statement
-            std::vector<double> Jxx_vals_h;
-            std::vector<double> Jyy_vals_h;
-            std::vector<double> Jzz_vals_h;
 
             cusp::csr_matrix < int, cu::cu_real_t, cusp::host_memory > J_xx_matrix_h (
                   ::atoms::num_atoms,
@@ -79,11 +56,13 @@ namespace vcuda
             J_xx_matrix_h.row_offsets[0] = 0.0;
             J_yy_matrix_h.row_offsets[0] = 0.0;
             J_zz_matrix_h.row_offsets[0] = 0.0;
+
             for (int atom = 0; atom < ::atoms::num_atoms; atom++) {
                J_xx_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
                J_yy_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
                J_zz_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
             }
+
             for (int i = 0; i < ::atoms::neighbour_list_array.size(); i++) {
                J_xx_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
                J_yy_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
@@ -143,9 +122,6 @@ namespace vcuda
 
             exchange_initialised = true;
 
-            std::cout << cu::atoms::limits[0] << "\t\t" << cu::atoms::limits[1] << "\t\t" << cu::atoms::limits[::atoms::num_atoms] << std::endl;
-
-
             std::cout << "Made matrix" << std::endl;
             check_device_memory(__FILE__,__LINE__);
             check_cuda_errors(__FILE__,__LINE__);
@@ -156,12 +132,6 @@ namespace vcuda
          int finalise_exchange()
          {
             check_cuda_errors(__FILE__,__LINE__);
-            // de-allocate all the data used in the exchange
-            if( exchange_initialised)
-            {
-               cusparseDestroy( cusparse_handle);
-               cusparseDestroyMatDescr( J_descr);
-            }
             return EXIT_SUCCESS;
          }
 
@@ -169,20 +139,6 @@ namespace vcuda
          {
 
             check_cuda_errors(__FILE__,__LINE__);
-
-            int * rowptrs_dptr = thrust::raw_pointer_cast( cu::atoms::limits.data() );
-            int * colinds_dptr = thrust::raw_pointer_cast( cu::atoms::neighbours.data() );
-            cu_real_t * Jxx_vals_dptr = thrust::raw_pointer_cast( Jxx_vals_d.data() );
-            cu_real_t * Jyy_vals_dptr = thrust::raw_pointer_cast( Jyy_vals_d.data() );
-            cu_real_t * Jzz_vals_dptr = thrust::raw_pointer_cast( Jzz_vals_d.data() );
-
-            cu_real_t * Sx_dptr = thrust::raw_pointer_cast( cu::atoms::x_spin_array.data());
-            cu_real_t * Sy_dptr = thrust::raw_pointer_cast( cu::atoms::y_spin_array.data());
-            cu_real_t * Sz_dptr = thrust::raw_pointer_cast( cu::atoms::z_spin_array.data());
-            cu_real_t * Hx_dptr = thrust::raw_pointer_cast( cu::x_total_spin_field_array.data());
-            cu_real_t * Hy_dptr = thrust::raw_pointer_cast( cu::y_total_spin_field_array.data());
-            cu_real_t * Hz_dptr = thrust::raw_pointer_cast( cu::z_total_spin_field_array.data());
-
 
             cusp::array1d_view <cu_real_array_t::iterator> x_spin_view (
                   cu::atoms::x_spin_array.begin(),
@@ -210,14 +166,8 @@ namespace vcuda
                   cu::z_total_spin_field_array.end()
                   );
 
-            thrust::identity<cu_real_t>   identity;
-            thrust::multiplies<cu_real_t> combine;
-            thrust::plus<cu_real_t>       reduce;
-
-            // cusparse csrmv calculates y = alpha * OP(A) * x + beta * y
-            // where alpha and beta are scalar constants
-            cu_real_t alpha = 1.0;
-            cu_real_t beta = 1.0;
+            thrust::multiplies<cu_real_t>          combine;
+            thrust::plus<cu_real_t>                reduce;
 
             switch( ::atoms::exchange_type)
             {
@@ -233,25 +183,32 @@ namespace vcuda
                   // FIXME This maybe boosted
                   // It should keep the old values stored in the spin field
                   // Since Jxx = Jyy = Jzz only the Jxx array is used
-                  cusp::generalized_spgemm(
+
+                  cusp::generalized_spmv(
                         J_xx_mat_d,
                         x_spin_view,
                         x_total_spin_field_view,
-                        identity, combine, reduce
+                        x_total_spin_field_view,
+                        combine,
+                        reduce
                         );
 
-                  cusp::generalized_spgemm(
+                  cusp::generalized_spmv(
                         J_xx_mat_d,
                         y_spin_view,
                         y_total_spin_field_view,
-                        identity, combine, reduce
+                        y_total_spin_field_view,
+                        combine,
+                        reduce
                         );
 
-                  cusp::generalized_spgemm(
+                  cusp::generalized_spmv(
                         J_xx_mat_d,
                         z_spin_view,
                         z_total_spin_field_view,
-                        identity, combine, reduce
+                        z_total_spin_field_view,
+                        combine,
+                        reduce
                         );
 
                   break;
@@ -265,53 +222,32 @@ namespace vcuda
 
                   if( !exchange_initialised) initialise_exchange();
 
-                  // Compute the Hx = Jxx * Sx exchange fields
-                  cusparseTcsrmv(
-                        cusparse_handle,
-                         CUSPARSE_OPERATION_NON_TRANSPOSE,
-                         ::atoms::num_atoms,
-                         ::atoms::num_atoms,
-                         ::atoms::total_num_neighbours,
-                         &alpha,
-                         J_descr,
-                         Jxx_vals_dptr,
-                         rowptrs_dptr,
-                         colinds_dptr,
-                         Sx_dptr,
-                         &beta,
-                         Hx_dptr);
+                  cusp::generalized_spmv(
+                        J_xx_mat_d,
+                        x_spin_view,
+                        x_total_spin_field_view,
+                        x_total_spin_field_view,
+                        combine,
+                        reduce
+                        );
 
-                  // Compute the Hy = Jyy * Sy exchange fields
-                  cusparseTcsrmv(
-                        cusparse_handle,
-                         CUSPARSE_OPERATION_NON_TRANSPOSE,
-                         ::atoms::num_atoms,
-                         ::atoms::num_atoms,
-                         ::atoms::total_num_neighbours,
-                         &alpha,
-                         J_descr,
-                         Jyy_vals_dptr,
-                         rowptrs_dptr,
-                         colinds_dptr,
-                         Sy_dptr,
-                         &beta,
-                         Hy_dptr);
+                  cusp::generalized_spmv(
+                        J_yy_mat_d,
+                        y_spin_view,
+                        y_total_spin_field_view,
+                        y_total_spin_field_view,
+                        combine,
+                        reduce
+                        );
 
-                  // Compute the Hz = Jzz * Sz exchange fields
-                  cusparseTcsrmv(
-                        cusparse_handle,
-                         CUSPARSE_OPERATION_NON_TRANSPOSE,
-                         ::atoms::num_atoms,
-                         ::atoms::num_atoms,
-                         ::atoms::total_num_neighbours,
-                         &alpha,
-                         J_descr,
-                         Jzz_vals_dptr,
-                         rowptrs_dptr,
-                         colinds_dptr,
-                         Sz_dptr,
-                         &beta,
-                         Hz_dptr);
+                  cusp::generalized_spmv(
+                        J_zz_mat_d,
+                        z_spin_view,
+                        z_total_spin_field_view,
+                        z_total_spin_field_view,
+                        combine,
+                        reduce
+                        );
 
                   break;
             }

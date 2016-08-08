@@ -27,7 +27,7 @@ material:file=Co.mat
 #------------------------------------------
 sim:temperature=0.0
 sim:time-steps-increment=100
-sim:total-time-steps=100
+sim:total-time-steps=100000
 sim:time-step=1.0E-16
 
 sim:applied-field-strength=0.0 !T
