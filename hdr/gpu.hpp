@@ -5,7 +5,7 @@
 // This header file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2015. All rights reserved.
+// (c) R F L Evans 2015, 2016. All rights reserved.
 //
 //-----------------------------------------------------------------------------
 #include <string>
@@ -27,7 +27,14 @@ namespace gpu{
    extern void finalize();
 
    //-----------------------------------------------------------------------------
-   // Functions for GPU ststistics calculation
+   // Functions for GPU configuration output
+   //-----------------------------------------------------------------------------
+   namespace config{
+      extern void synchronise();
+   }
+
+   //-----------------------------------------------------------------------------
+   // Functions for GPU statistics calculation
    //-----------------------------------------------------------------------------
    namespace stats{
 

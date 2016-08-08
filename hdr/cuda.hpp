@@ -25,6 +25,10 @@ namespace vcuda{
    extern void stats_update();
    extern void finalize();
 
+   namespace config{
+      extern void synchronise();
+   }
+
    namespace stats
    {
       void update ();

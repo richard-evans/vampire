@@ -12,15 +12,16 @@ CUDALIBS=-L/usr/local/cuda/lib64/ -lcudart -lcusparse -lcurand
 
 # List module object filenames
 CUDA_OBJECTS= \
+	     obj/cuda/config.o \
 	     obj/cuda/data.o \
-	     obj/cuda/internal.o \
+		  obj/cuda/dipole.o \
+		  obj/cuda/exchange_fields.o \
+		  obj/cuda/external_fields.o \
+		  obj/cuda/finalize.o \
 	     obj/cuda/initialize.o \
+		  obj/cuda/internal.o \
+		  obj/cuda/llg_heun.o \
 	     obj/cuda/spin_fields.o \
-        obj/cuda/external_fields.o \
-        obj/cuda/dipole.o \
-	     obj/cuda/llg_heun.o \
-	     obj/cuda/finalize.o \
-	     obj/cuda/exchange_fields.o \
 	     obj/cuda/statistics.o
 
 # The device linked object for CUDA
