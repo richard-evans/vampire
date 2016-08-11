@@ -17,6 +17,8 @@
 #include "spintorque.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
+#include "sim.hpp"
+#include "material.hpp"
 
 // Spin Torque headers
 #include "internal.hpp"
@@ -67,6 +69,11 @@ namespace st{
 
          // only output on root process
          if(vmpi::my_rank==0){
+
+	   	   
+           if(sim::time%(ST_output_rate) ==0){
+
+
             // determine file name
             std::stringstream filename;
             filename << "st-microcells-" << std::setfill ('0') << std::setw (8) << config_file_counter << ".cfg";
@@ -76,18 +83,26 @@ namespace st{
             std::ofstream ofile;
             ofile.open(std::string(filename.str()).c_str());
 
+	       ofile<<"Time:"<< "\t" << sim::time*mp::dt_SI<< std::endl;
+	    
+	    
+	    
             for(int cell=0; cell<num_cells; ++cell){
                ofile << pos[3*cell+0] << "\t" << pos[3*cell+1] << "\t" << pos[3*cell+2] << "\t";
                ofile << m[3*cell+0] << "\t" << m[3*cell+1] << "\t" << m[3*cell+2] << "\t";
                ofile << sa[3*cell+0] << "\t" << sa[3*cell+1] << "\t" << sa[3*cell+2] << "\t";
                ofile << j[3*cell+0] << "\t" << j[3*cell+1] << "\t" << j[3*cell+2] << "\t";
                ofile << total_ST[3*cell+0] << "\t" << total_ST[3*cell+1] << "\t" << total_ST[3*cell+2] << std::endl;
+
+              // ofile << spin_torque[3*cell+0] << "\t" << spin_torque[3*cell+1] << "\t" << spin_torque[3*cell+2] << std::endl;
             }
 
             ofile.close();
 
             // update config_file_counter
             config_file_counter++;
+
+           }
 
          }
 
