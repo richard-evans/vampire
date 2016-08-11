@@ -21,6 +21,7 @@ namespace st{
       // Shared variables used for the spin torque calculation
       //-----------------------------------------------------------------------------
       extern bool enabled; // enable spin torque calculation
+      extern bool TMRenable;
 
       extern double micro_cell_size; /// lateral size of spin torque microcells
       extern double micro_cell_thickness; /// thickness of spin torque microcells (atomistic)
@@ -42,6 +43,7 @@ namespace st{
 
       extern double je; // current (C/s)
       extern double initial_beta;
+      extern double rel_angle;
       extern int ST_output_rate;
 
       extern std::vector<double> initial_m;
@@ -73,7 +75,11 @@ namespace st{
       extern std::vector<double> ast; // adiabatic spin torque
       extern std::vector<double> nast; // non-adiabatic spin torque
       extern std::vector<double> total_ST; // non-adiabatic spin torque
-
+      extern std::vector<double> magx_mat; // magnetisation of material
+      extern std::vector<double> magy_mat;
+      extern std::vector<double> magz_mat;
+      
+      
 
       // material parameters for spin torque calculation
       struct mp_t{

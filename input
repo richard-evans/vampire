@@ -1,38 +1,54 @@
 #------------------------------------------
-# Sample vampire input file to perform
-# benchmark calculation for v4.0
-#
-#------------------------------------------
-
+# Vampire CoFeB 1.0-1.3nm coupled input file
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
-create:crystal-structure=sc
+create:crystal-structure=bcc
+create:cylinder
 
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
-dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 7.7 !nm
-dimensions:system-size-y = 7.7 !nm
-dimensions:system-size-z = 7.7 !nm
+dimensions:unit-cell-size=2.86 !A
+dimensions:particle-size=30.0 !nm
+dimensions:system-size-x=30.0 !nm
+dimensions:system-size-y=30.0 !nm
+dimensions:system-size-z=3.15 !nm
+dimensions:macro-cell-size=10.51 !A
 
 #------------------------------------------
 # Material Files:
 #------------------------------------------
-material:file=Co.mat
-
-#------------------------------------------
-# Simulation attributes:
-#------------------------------------------
-sim:temperature=300.0
-sim:time-steps-increment=10
-sim:total-time-steps=10000
-sim:time-step=1.0E-15
+material:file=CoFeB_coupled.mat
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
+
+sim:temperature=0.0
+sim:time-steps-increment=1000
+sim:total-time-steps=2000000
+sim:time-step=1.0E-16
+
+
+sim:enable-dipole-fields
+sim:enable-fast-dipole-fields
+sim:dipole-field-update-rate=100
+
+#DW::enable-DW
+
+spin-torque:enable-ST-fields
+spin-torque:TMRenable
+spin-torque:current-density=1.0e11
+spin-torque:current-direction=z
+spin-torque:micro-cell-size= 10.51
+spin-torque:micro-cell-thickness= 3.0
+spin-torque:initial-spin-polarisation=0.56
+spin-torque:initial-mag-direction=0,0,1
+spin-torque:ST-output-rate = 5000
+#--------------------------------
+# Program and integrator details
+#--------------------------------
 sim:program=benchmark
 sim:integrator=llg-heun
 
@@ -40,10 +56,16 @@ sim:integrator=llg-heun
 # data output
 #------------------------------------------
 output:real-time
-output:temperature
-output:magnetisation
-output:magnetisation-length
-output:output-rate = 1000
+output:material-magnetisation
 
-screen:time-steps
-screen:magnetisation-length
+
+screen:real-time
+#screen:temperature
+#screen:applied-field-strength
+#screen:material-applied-field-alignment
+
+config:atoms
+config:atoms-output-rate=5
+config:atoms-minimum-z=0.0
+config:atoms-maximum-z=1.0
+

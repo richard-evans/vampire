@@ -17,6 +17,10 @@
 // Vampire headers
 #include "spintorque.hpp"
 #include "vmpi.hpp"
+#include "material.hpp"
+#include "create.hpp"
+#include <complex>
+
 
 // Spin Torque headers
 #include "internal.hpp"
@@ -48,10 +52,72 @@ namespace st{
          st::internal::three_vector_t b3(0.0,0.0,1.0);
 
 
-       //  std::cout<< st::internal::je << "\t" << st::internal::current_direction << "\t" << micro_cell_thickness << "\t" << micro_cell_size <<   std::endl;
 
          // set local constants
-         const double je = st::internal::je; // current (C/s)
+         double je = st::internal::je; // current (C/s)
+  
+     //---------------------------------------------------------------------------------------------------     
+          //set parameters for TMR calculation
+          if(st::internal::TMRenable == true){
+ 	    int FL = mp::num_materials-1;
+	    double dot = st::internal::magx_mat[0]*st::internal::magx_mat[FL]+
+	                 st::internal::magy_mat[0]*st::internal::magy_mat[FL]+
+	                 st::internal::magz_mat[0]*st::internal::magz_mat[FL];
+			 
+	   double MgO_thickness = (mp::material[2].min - mp::material[1].max)*cs::system_dimensions[2]*1.0e-10;
+	    
+	    //calculate the relative angle of two FMs	
+	    st::internal::rel_angle = acos(dot);
+	    double plus_cos = 1.0+cos(st::internal::rel_angle);
+	    double minus_cos = 1.0-cos(st::internal::rel_angle);
+	    double exp_t = exp(-MgO_thickness/0.25e-9);
+	    
+	    double jtunnel = st::internal::je*0.5*(plus_cos+0.5*minus_cos)*exp_t;
+	    
+	    //set the current je and spin poralisation parameters
+	    je = jtunnel;
+	    st::internal::default_properties.beta_cond = st::internal::mp[0].beta_cond*0.5*(plus_cos+0.5*minus_cos)*exp_t;
+       	    st::internal::default_properties.beta_diff = st::internal::mp[0].beta_diff*0.5*(plus_cos+0.5*minus_cos)*exp_t;
+	    
+	    
+	 // Calculate spin torque parameters
+        for(int cell=0; cell<st::internal::beta_cond.size(); ++cell){
+          
+	    // check for zero atoms in cell
+	    if(st::internal::cell_natom[cell] <= 0.0001){    
+		st::internal::beta_cond[cell]   = st::internal::default_properties.beta_cond;
+		st::internal::beta_diff[cell]   = st::internal::default_properties.beta_diff;
+	      
+		const double hbar = 1.05457162e-34;
+		const double B  = st::internal::beta_cond[cell];
+		const double Bp = st::internal::beta_diff[cell];
+		const double lambda_sdl = st::internal::lambda_sdl[cell];
+		const double Do = st::internal::diffusion[cell];
+		const double Jsd = st::internal::sd_exchange[cell];
+
+		const double BBp = 1.0/sqrt(1.0-B*Bp);
+		const double lambda_sf = lambda_sdl*BBp;
+		const double lambda_j = sqrt(2.0*hbar*Do/Jsd); // Angstroms
+		const double lambda_sf2 = lambda_sf*lambda_sf;
+		const double lambda_j2 = lambda_j*lambda_j;
+
+		std::complex<double> inside (1.0/lambda_sf2, -1.0/lambda_j2);
+		std::complex<double> inv_lplus = sqrt(inside);
+
+		st::internal::a[cell] =  real(inv_lplus);
+		st::internal::b[cell] = -imag(inv_lplus);
+		
+	
+	     }
+        }
+	    
+	   st::internal::output_base_microcell_data();
+    
+ 	 }
+                
+   //---------------------------------------------------------------------------------------------------     
+         
+         
          const double i_muB = 1.0/9.274e-24; // J/T
          const double i_e = 1.0/1.60217662e-19; // electronic charge (Coulombs)
          const double microcell_volume = (st::internal::micro_cell_size *
@@ -69,14 +135,14 @@ namespace st{
 
             st::internal::sa[3*idx+0] = 0.0;
             st::internal::sa[3*idx+1] = 0.0;
-            st::internal::sa[3*idx+2] = 0.0; //10.e6;// t::internal::default_properties.sa_infinity;
+            st::internal::sa[3*idx+2] = 0.0; //10.e6;// st::internal::default_properties.sa_infinity;
 
             st::internal::j [3*idx+0] = st::internal::initial_beta*je*st::internal::initial_m[0];
             st::internal::j [3*idx+1] = st::internal::initial_beta*je*st::internal::initial_m[1];
             st::internal::j [3*idx+2] = st::internal::initial_beta*je*st::internal::initial_m[2];
 
 
-      //  std::cout<< st::internal::initial_beta << "\t" << st::internal::j[0] << "\t" << st::internal::j[1]  << "\t" << st::internal::j[2]  << "\t" << std::endl;
+        //std::cout<< st::internal::initial_beta << "\t" << st::internal::j[0] << "\t" << st::internal::j[1]  << "\t" << st::internal::j[2]  << "\t" << std::endl;
 
 
             // loop over all cells in stack after first (idx+1)
@@ -272,7 +338,7 @@ namespace st{
                const double prefac_sc = microcell_volume * st::internal::sd_exchange[cell] * i_e * i_muB;
                const double plus_perp =  (pm_b2*pm_b2 + pm_b3*pm_b3);
                const double minus_perp = (pm_b2*pm_b2 - pm_b3*pm_b3);
-	        double aj; // the ST parameter describing Slonczewski torque
+	       double aj; // the ST parameter describing Slonczewski torque
                double bj; // the ST parameter describing field-like torque
 
 
@@ -320,7 +386,6 @@ namespace st{
             MPI_Allreduce(MPI_IN_PLACE, &st::internal::spin_torque[0],st::internal::spin_torque.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             MPI_Allreduce(MPI_IN_PLACE, &st::internal::total_ST[0],st::internal::total_ST.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
-
          st::internal::output_microcell_data();
 
          return;

@@ -18,6 +18,7 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 #include "sim.hpp"
+#include "material.hpp"
 
 // Spin Torque headers
 #include "internal.hpp"
@@ -69,6 +70,7 @@ namespace st{
          // only output on root process
          if(vmpi::my_rank==0){
 
+	   	   
            if(sim::time%(ST_output_rate) ==0){
 
 
@@ -81,6 +83,10 @@ namespace st{
             std::ofstream ofile;
             ofile.open(std::string(filename.str()).c_str());
 
+	       ofile<<"Time:"<< "\t" << sim::time*mp::dt_SI<< std::endl;
+	    
+	    
+	    
             for(int cell=0; cell<num_cells; ++cell){
                ofile << pos[3*cell+0] << "\t" << pos[3*cell+1] << "\t" << pos[3*cell+2] << "\t";
                ofile << m[3*cell+0] << "\t" << m[3*cell+1] << "\t" << m[3*cell+2] << "\t";

@@ -1,0 +1,108 @@
+#------------------------------------------
+#
+#
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=4
+#---------------------------------------------------
+# Reference layer
+#---------------------------------------------------
+#---------------------------------------------------
+# Material 1 CoFeB(PL, bulk)
+#---------------------------------------------------
+material[1]:material-name=FeCo
+material[1]:damping-constant=0.003
+material[1]:exchange-matrix[1]=7.735e-21
+material[1]:exchange-matrix[2]=1.547e-20
+material[1]:exchange-matrix[3]=0.0e-21
+material[1]:exchange-matrix[4]=0.0e-21
+material[1]:atomic-spin-moment=1.643 !muB
+material[1]:uniaxial-anisotropy-constant=0.0
+material[1]:material-element=Fe
+material[1]:minimum-height=0.0
+material[1]:maximum-height=0.272
+material[1]:initial-spin-direction = 0,0,1
+material[1]:density=0.96
+
+material[1]:spin-diffusion-length = 12 !nm
+material[1]:diffusion-constant = 0.001
+material[1]:spin-polarisation-conductivity = 0.56
+material[1]:spin-polarisation-diffusion = 0.73
+material[1]:spin-accumulation = 2.62e8
+material[1]:sd-exchange-constant = 1.6e-20
+
+#---------------------------------------------------
+# Material 2 CoFeB-PL,surface
+#---------------------------------------------------
+material[2]:material-name="FeCo"
+material[2]:damping-constant=0.11
+material[2]:exchange-matrix[1]=1.547e-20
+material[2]:exchange-matrix[2]=1.547e-20
+material[2]:exchange-matrix[3]=0.0e-21
+material[2]:exchange-matrix[4]=0.0e-21
+material[2]:atomic-spin-moment=1.643 !muB
+material[2]:uniaxial-anisotropy-constant=1.35e-22
+material[2]:material-element=Ag
+material[2]:minimum-height=0.272
+material[2]:maximum-height=0.317
+material[2]:initial-spin-direction = 0,0,1
+material[2]:density=0.96
+
+material[2]:spin-diffusion-length = 12 !nm
+material[2]:diffusion-constant = 0.001
+material[2]:spin-polarisation-conductivity = 0.56
+material[2]:spin-polarisation-diffusion = 0.73
+material[2]:spin-accumulation = 2.62e8
+material[2]:sd-exchange-constant = 1.6e-20
+#---------------------------------------------------
+# Free layer
+#---------------------------------------------------
+#---------------------------------------------------
+# Material 3 Cobalt Iron Generic
+#---------------------------------------------------
+material[3]:material-name="FeCo"
+material[3]:damping-constant=0.11
+material[3]:exchange-matrix[1]=0.0e-21
+material[3]:exchange-matrix[2]=0.0e-21
+material[3]:exchange-matrix[3]=1.547e-20
+material[3]:exchange-matrix[4]=1.547e-20
+material[3]:atomic-spin-moment=1.643 !muB
+material[3]:uniaxial-anisotropy-constant=1.35e-22
+#material[3]:uniaxial-anisotropy-direction= 0,0,-1
+material[3]:material-element=Ag
+material[3]:minimum-height=0.587
+material[3]:maximum-height=0.629
+material[3]:initial-spin-direction = 0.01745,0,-0.999847
+material[3]:density=0.96
+
+material[3]:spin-diffusion-length = 12 !nm
+material[3]:diffusion-constant = 0.001
+material[3]:spin-polarisation-conductivity = 0.56
+material[3]:spin-polarisation-diffusion = 0.73
+material[3]:spin-accumulation = 2.62e8
+material[3]:sd-exchange-constant = 1.6e-20
+#---------------------------------------------------
+# Material 4 Cobalt Iron Generic
+#---------------------------------------------------
+material[4]:material-name=FeCo
+material[4]:damping-constant=0.003
+material[4]:exchange-matrix[1]=0.0e-21
+material[4]:exchange-matrix[2]=0.0e-21
+material[4]:exchange-matrix[3]=1.547e-20
+material[4]:exchange-matrix[4]=7.735e-21
+material[4]:atomic-spin-moment=1.643 !muB
+material[4]:uniaxial-anisotropy-constant=0.0
+#material[4]:uniaxial-anisotropy-direction= 0,0,-1
+material[4]:material-element=Fe
+material[4]:minimum-height=0.629
+material[4]:maximum-height=1.0
+material[4]:initial-spin-direction = 0.01745,0,-0.999847
+material[4]:density=0.96
+
+material[4]:spin-diffusion-length = 12 !nm
+material[4]:diffusion-constant = 0.001
+material[4]:spin-polarisation-conductivity = 0.56
+material[4]:spin-polarisation-diffusion = 0.73
+material[4]:spin-accumulation = 2.62e8
+material[4]:sd-exchange-constant = 1.6e-20
