@@ -35,22 +35,6 @@ namespace internal{
 //------------------------------------------------------------------------------
 void update_spin_fields ()
 {
-   /*
-    * Fill the field vectors with zero
-    */
-
-   thrust::fill(
-         cu::x_total_spin_field_array.begin(),
-         cu::x_total_spin_field_array.end(),
-         0.0);
-   thrust::fill(
-         cu::y_total_spin_field_array.begin(),
-         cu::y_total_spin_field_array.end(),
-         0.0);
-   thrust::fill(
-         cu::z_total_spin_field_array.begin(),
-         cu::z_total_spin_field_array.end(),
-         0.0);
 
    // Find the addresses in the device address space
    int * d_materials = thrust::raw_pointer_cast(cu::atoms::type_array.data());
@@ -64,6 +48,11 @@ void update_spin_fields ()
    cu_real_t * d_y_spin_field = thrust::raw_pointer_cast(cu::y_total_spin_field_array.data());
    cu_real_t * d_z_spin_field = thrust::raw_pointer_cast(cu::z_total_spin_field_array.data());
 
+   // This exchange field zero out stuff, so they should come first
+   cu::exchange::calculate_exchange_fields ();
+
+   check_cuda_errors (__FILE__, __LINE__);
+
    // Call kernel to calculate non-exchange spin fields
    cu::update_non_exchange_spin_fields_kernel <<< cu::grid_size, cu::block_size >>> (
          d_materials, d_material_params,
@@ -73,9 +62,6 @@ void update_spin_fields ()
 
    check_cuda_errors (__FILE__, __LINE__);
 
-   cu::exchange::calculate_exchange_fields ();
-
-   check_cuda_errors (__FILE__, __LINE__);
 }
 
 //------------------------------------------------------------------------------
@@ -170,9 +156,9 @@ __global__ void update_non_exchange_spin_fields_kernel (
        * Write back to main memory
        */
 
-      x_sp_field[i] = field_x;
-      y_sp_field[i] = field_y;
-      z_sp_field[i] = field_z;
+      x_sp_field[i] += field_x;
+      y_sp_field[i] += field_y;
+      z_sp_field[i] += field_z;
    }
 }
 

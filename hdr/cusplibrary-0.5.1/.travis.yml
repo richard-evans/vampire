@@ -1,0 +1,14 @@
+language: cpp
+
+compiler:
+    - g++
+
+install:
+    - git clone https://github.com/sdalton1/thrust.git
+    - export THRUST_PATH=$PWD/thrust
+    - cd testing
+
+script:
+    - scons compiler=g++ backend=omp
+    - cd device_omp_release
+    - ./tester --verbose
