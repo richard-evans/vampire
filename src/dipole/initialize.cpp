@@ -51,21 +51,10 @@ namespace dipole{
                    const std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
                    const std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
                    const std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                   const std::vector<double>& cells_mag_array_x, /// arrays to store cells magnetisation
-                   const std::vector<double>& cells_mag_array_y,
-                   const std::vector<double>& cells_mag_array_z,
-                   const std::vector<double>& cells_field_array_x, /// arrays to store cells field
-                   const std::vector<double>& cells_field_array_y,
-                   const std::vector<double>& cells_field_array_z,
 
                    const std::vector<int>& atom_type_array,
                    const std::vector<int>& atom_cell_array,
-                   const int num_atoms,
-
-                   const std::vector<double>& atom_dipolar_field_array_x, /// arrays to store atoms dipolar field
-                   const std::vector<double>& atom_dipolar_field_array_y,
-                   const std::vector<double>& atom_dipolar_field_array_z,
-                   const int sim_time
+                   const int num_atoms
 				){
 
 	//-------------------------------------------------------------------------------------
@@ -104,24 +93,13 @@ namespace dipole{
       dipole::internal::num_atoms                  = num_atoms;
       dipole::internal::atom_type_array            = atom_type_array;
       dipole::internal::atom_cell_array            = atom_cell_array;
-      dipole::internal::atom_dipolar_field_array_x = atom_dipolar_field_array_x;
-      dipole::internal::atom_dipolar_field_array_y = atom_dipolar_field_array_y;
-      dipole::internal::atom_dipolar_field_array_z = atom_dipolar_field_array_z;
 
       dipole::internal::cells_num_cells            = cells_num_cells;
       dipole::internal::cells_num_local_cells      = cells_num_local_cells;
       dipole::internal::cells_local_cell_array     = cells_local_cell_array;
       dipole::internal::cells_num_atoms_in_cell    = cells_num_atoms_in_cell;
-      dipole::internal::cells_mag_array_x          = cells_mag_array_x;
-      dipole::internal::cells_mag_array_y          = cells_mag_array_y;
-      dipole::internal::cells_mag_array_z          = cells_mag_array_z;
       dipole::internal::cells_volume_array         = cells_volume_array;
 
-      dipole::internal::sim_time                   = sim_time;
-
-      dipole::cells_field_array_x        = cells_field_array_x;
-      dipole::cells_field_array_y        = cells_field_array_y;
-      dipole::cells_field_array_z        = cells_field_array_z;
 		//-------------------------------------------------------------------------------------
 		// Starting calculation of dipolar field
 		//-------------------------------------------------------------------------------------
@@ -176,6 +154,11 @@ namespace dipole{
 
          dipole::internal::rij_intra_zz.push_back(std::vector<double>());
          dipole::internal::rij_intra_zz[lc].resize(cells_num_cells,0.0);
+
+         dipole::cells_field_array_x.resize(cells_num_cells,0.0);
+         dipole::cells_field_array_y.resize(cells_num_cells,0.0);
+         dipole::cells_field_array_z.resize(cells_num_cells,0.0);
+
       }
 
       // calculate matrix prefactors
@@ -188,12 +171,12 @@ namespace dipole{
       double cutoff=12.0; //after 12 macrocell of distance, the bare macrocell model gives the same result
 
       // loop over local cells
-      for(int lc=0;lc<cells::num_local_cells;lc++){
+      for(int lc=0;lc<cells_num_local_cells;lc++){
 
          // reference global cell ID
          int i = cells_local_cell_array[lc];
 
-         if(cells::num_atoms_in_cell[i]>0){
+         if(cells_num_atoms_in_cell[i]>0){
 
          	// Loop over all other cells to calculate contribution to local cell
           	for(int j=0;j<cells_num_cells;j++){
@@ -292,7 +275,7 @@ namespace dipole{
                } // End of Inter part
 
                // Calculation of INTRA TERM of Dipolar interaction
-               else if( i==j && cells::num_atoms_in_cell[j]>0){
+               else if( i==j && cells_num_atoms_in_cell[j]>0){
 
                double tmp_rij_intra_xx = 0.0;
                double tmp_rij_intra_xy = 0.0;

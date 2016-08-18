@@ -48,6 +48,7 @@ namespace dipole{
     	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
         	int i = dipole::internal::cells_local_cell_array[lc];
+         //std::cout << std::endl << "dipole::internal::cells_local_cell_array[lc] = " << i << std::endl;
 
         		if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
@@ -56,17 +57,17 @@ namespace dipole{
          	double self_demag = eightPI_three_cell_volume;
 
          	// Add self-demagnetisation as mu_0/4_PI * 8PI/3V
-         	dipole::cells_field_array_x[i]=self_demag*(dipole::internal::cells_mag_array_x[i]/9.27400915e-24);
-         	dipole::cells_field_array_y[i]=self_demag*(dipole::internal::cells_mag_array_y[i]/9.27400915e-24);
-         	dipole::cells_field_array_z[i]=self_demag*(dipole::internal::cells_mag_array_z[i]/9.27400915e-24);
+         	dipole::cells_field_array_x[i]=self_demag*(cells::mag_array_x[i]/9.27400915e-24);
+         	dipole::cells_field_array_y[i]=self_demag*(cells::mag_array_y[i]/9.27400915e-24);
+         	dipole::cells_field_array_z[i]=self_demag*(cells::mag_array_z[i]/9.27400915e-24);
 
          	// Loop over all other cells to calculate contribution to local cell
          	for(int j=0;j<dipole::internal::cells_num_cells;j++){
            		if(dipole::internal::cells_num_atoms_in_cell[j]>0){
 
-            		const double mx = dipole::internal::cells_mag_array_x[j]/9.27400915e-24;
-            		const double my = dipole::internal::cells_mag_array_y[j]/9.27400915e-24;
-            		const double mz = dipole::internal::cells_mag_array_z[j]/9.27400915e-24;
+            		const double mx = cells::mag_array_x[j]/9.27400915e-24;
+            		const double my = cells::mag_array_y[j]/9.27400915e-24;
+            		const double mz = cells::mag_array_z[j]/9.27400915e-24;
 
             		if( i!=j ){
                 		dipole::cells_field_array_x[i]+=(mx*internal::rij_inter_xx[lc][j] + my*internal::rij_inter_xy[lc][j] + mz*internal::rij_inter_xz[lc][j]);
@@ -80,12 +81,9 @@ namespace dipole{
             		}
           		}
          	}
-         	dipole::cells_field_array_x[i] *= 9.27400915e-01;
-         	dipole::cells_field_array_y[i] *= 9.27400915e-01;
-         	dipole::cells_field_array_z[i] *= 9.27400915e-01;
-            /*std::cout << dipole::cells_field_array_x[i] << "\t";
-            std::cout << dipole::cells_field_array_y[i] << "\t";
-            std::cout << dipole::cells_field_array_z[i] << std::endl; */
+         	dipole::cells_field_array_x[i] = dipole::cells_field_array_x[i] * 9.27400915e-01;
+         	dipole::cells_field_array_y[i] = dipole::cells_field_array_y[i] * 9.27400915e-01;
+         	dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.27400915e-01;
      		}
     	}
 	}

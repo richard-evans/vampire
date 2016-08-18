@@ -204,7 +204,7 @@ $(IBM_OBJECTS): obj/%_ibm.o: src/%.cpp
 	$(IBM) -c -o $@ $(IBM_CFLAGS) $<
 
 serial-debug: $(GCCDB_OBJECTS)
-	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE).s
+	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE).s-debug
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<

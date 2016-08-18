@@ -24,6 +24,8 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
+#include "atoms.hpp"
+
 // cells module headers
 #include "internal.hpp"
 
@@ -47,12 +49,8 @@ namespace cells{
                    const std::vector<double>& atom_coords_x,
                    const std::vector<double>& atom_coords_y,
                    const std::vector<double>& atom_coords_z,
-                   const std::vector<double>& spin_array_x,
-                   const std::vector<double>& spin_array_y,
-                   const std::vector<double>& spin_array_z,
                    const std::vector<int>& atom_type_array,
                    const std::vector<int>& atom_cell_array,
-                   //const int num_local_atoms,
                    const int num_atoms
    ){
 
@@ -77,14 +75,9 @@ namespace cells{
       // Define variable needed for mag() function
       //-------------------------------------------------------------------------------------
 
-      //cells::internal::num_local_atoms = num_local_atoms;
       cells::internal::num_atoms       = num_atoms;
       cells::internal::atom_type_array = atom_type_array;
-      cells::internal::atom_cell_array = atom_cell_array;
-      cells::internal::spin_array_x    = spin_array_x;
-      cells::internal::spin_array_y    = spin_array_y;
-      cells::internal::spin_array_z    = spin_array_z;
-
+      cells::atom_cell_array           = atom_cell_array;
 
       //-------------------------------------------------------------------------------------
       // Calculate number of microcells
@@ -130,19 +123,6 @@ namespace cells{
             for(int k=0; k<ncz; ++k){
                // associate cell with position i,j,k
                supercell_array[i][j][k]=cell;
-/*
-               // reverse association for neighbour calculation (store i,j,k)
-               uvec tmp;
-               tmp.i = i;
-               tmp.j = j;
-               tmp.k = k;
-               cell_list.push_back(tmp);
-
-               // save ijk coordinates as microcell positions
-               cells::internal::cell_position_array.at(3*cell+0)=double(i)*cells::macro_cell_size;
-               cells::internal::cell_position_array.at(3*cell+1)=double(j)*cells::macro_cell_size;
-               cells::internal::cell_position_array.at(3*cell+2)=double(k)*cells::macro_cell_size;
-*/
                // increment cell number
                cell++;
             }
@@ -159,10 +139,6 @@ namespace cells{
       #else
          int num_local_atoms = num_atoms;
       #endif
-/*      std::cout << "num_local_atoms = " << num_local_atoms << std::endl;
-      std::cout << "vmpi::num_core_atoms+vmpi::num_bdry_atoms =" << vmpi::num_core_atoms << " + " << vmpi::num_bdry_atoms << std::endl;
-      std::cout << "num_atoms = " << num_atoms << "\t" << cells::internal::num_atoms << std::endl; */
-
 
       // Assign atoms to cells
       for(int atom=0;atom<num_local_atoms;atom++){
@@ -181,7 +157,7 @@ namespace cells{
             // Always check cell in range
             if(scc[i]<0 || scc[i]>= d[i]){
                terminaltextcolor(RED);
-               std::cerr << "Error - atom out of supercell range in local temperature microcell calculation!" << std::endl;
+               std::cerr << "Error - atom out of supercell range in dipolar field calculation!" << std::endl;
                terminaltextcolor(WHITE);
                #ifdef MPICF
                terminaltextcolor(RED);
@@ -197,18 +173,10 @@ namespace cells{
                terminaltextcolor(WHITE);
                err::vexit();
             }
-/*            std::cout << "atom " << atom << std::endl;
-            std::cout << atom_coords_x[atom] << "\t" << atom_coords_y[atom] << "\t" << atom_coords_z[atom] << "\t" << std::endl;
-            std::cout << c[0] << "\t" << c[1] << "\t" << c[2] << std::endl;
-            std::cout << atom_cell_array[atom] << "\t" << scc[0] << "\t" << scc[1] << "\t" << scc[2] << std::endl; */
          }
          // If no error for range then assign atom to cell
-         cells::internal::atom_cell_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
+         cells::atom_cell_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
 
-/*         std::cout << "atom " << atom << std::endl;
-         std::cout << atom_coords_x[atom] << "\t" << atom_coords_y[atom] << "\t" << atom_coords_z[atom] << "\t" << std::endl;
-         std::cout << c[0] << "\t" << c[1] << "\t" << c[2] << std::endl;
-         std::cout << atom_cell_array[atom] << "\t" << scc[0] << "\t" << scc[1] << "\t" << scc[2] << std::endl; */
       }
 
       //-------------------------------------------------------------------------------------
@@ -235,7 +203,7 @@ namespace cells{
 
       // Now add atoms to each cell as magnetic 'centre of mass'
       for(int atom=0;atom<num_local_atoms;atom++){
-          int local_cell=cells::internal::atom_cell_array[atom];
+          int local_cell=cells::atom_cell_array[atom];
           int type = cells::internal::atom_type_array[atom];
           const double mus = mp::material[type].mu_s_SI;
           // Consider only magnetic elements
@@ -243,19 +211,10 @@ namespace cells{
               cells::cell_coords_array_x[local_cell]+=atom_coords_x[atom]*mus;
               cells::cell_coords_array_y[local_cell]+=atom_coords_y[atom]*mus;
               cells::cell_coords_array_z[local_cell]+=atom_coords_z[atom]*mus;
-/*
-            std::cout << std::endl;
-            std::cout << "Coordinates of cell " << local_cell << std::endl;
-            std::cout << cells::cell_coords_array_x[local_cell] << "\t";
-            std::cout << cells::cell_coords_array_y[local_cell] << "\t";
-            std::cout << cells::cell_coords_array_z[local_cell] << std::endl;
-            std::cout << " with magnetic moment = " << mus << std::endl;
-*/
+
               cells::internal::total_moment_array[local_cell]+=mus;
               cells::num_atoms_in_cell[local_cell]++;
           }
-
-		 // std::cout << "cells::num_atoms_in_cell[" << local_cell << "] " << cells::num_atoms_in_cell[local_cell] << std::endl;
       }
 
       // For MPI sum coordinates from all CPUs
@@ -266,14 +225,6 @@ namespace cells{
           MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::cell_coords_array_z[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
           MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::internal::total_moment_array[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
       #endif
-
-/*      #ifdef MPICF
-          MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,cells::num_atoms_in_cell.data(),  cells::num_cells,MPI_INT,MPI_SUM);
-          MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,cells::cell_coords_array_x.data(),cells::num_cells,MPI_DOUBLE,MPI_SUM);
-          MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,cells::cell_coords_array_y.data(),cells::num_cells,MPI_DOUBLE,MPI_SUM);
-          MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,cells::cell_coords_array_z.data(),cells::num_cells,MPI_DOUBLE,MPI_SUM);
-          MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,cells::internal::total_moment_array.data(),cells::num_cells,MPI_DOUBLE,MPI_SUM);
-      #endif */
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
       const double atomic_volume = unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/cells::num_atoms_in_unit_cell;
@@ -295,13 +246,6 @@ namespace cells{
 
      cells::index_atoms_array.resize(cells::num_cells,std::vector<int>(num_local_atoms));
 
-/*      std::cout << std::endl;
-      for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
-         if(cells::num_atoms_in_cell[local_cell]>0){
-            std::cout << cells::num_atoms_in_cell[local_cell] << " in " << local_cell << std::endl;
-         }
-      } */
-
       //Set number of atoms in cell to zero
       for(int cell=0;cell<cells::num_cells;cell++){
          cells::num_atoms_in_cell[cell]=0;
@@ -318,7 +262,7 @@ namespace cells{
 
       // Now re-update num_atoms in cell for local atoms only
       for(int atom=0;atom<num_local_atoms;atom++){
-         int local_cell=cells::internal::atom_cell_array[atom];
+         int local_cell=cells::atom_cell_array[atom];
          int type = cells::internal::atom_type_array[atom];
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
@@ -331,7 +275,6 @@ namespace cells{
          }
       }
 
-      //std::cout << std::endl;
       // Calculate number of local cells
       for(int cell=0;cell<cells::num_cells;cell++){
          if(cells::num_atoms_in_cell[cell]!=0){

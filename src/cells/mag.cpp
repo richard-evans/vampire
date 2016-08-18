@@ -21,6 +21,8 @@
 #include "vmpi.hpp"
 #include "create.hpp"
 
+#include "atoms.hpp"
+
 // Local temperature pulse headers
 #include "internal.hpp"
 
@@ -50,13 +52,18 @@ namespace cells{
 
       // calulate total moment in each cell
       for(int i=0;i<num_local_atoms;++i) {
-         int cell = cells::internal::atom_cell_array[i];
+         int cell = cells::atom_cell_array[i];
          int type = cells::internal::atom_type_array[i];
-         const double mus = mp::material[type].mu_s_SI;
-
-         cells::mag_array_x[cell] += cells::internal::spin_array_x[i]*mus;
-         cells::mag_array_y[cell] += cells::internal::spin_array_y[i]*mus;
-         cells::mag_array_z[cell] += cells::internal::spin_array_z[i]*mus;
+         // Consider only cells with n_atoms != 0
+         if(cells::num_atoms_in_cell[cell]>0){
+            const double mus = mp::material[type].mu_s_SI;
+            // Consider only magnetic elements
+            if(mus/(9.274e-24) > 0.5){
+               cells::mag_array_x[cell] += atoms::x_spin_array[i]*mus;
+               cells::mag_array_y[cell] += atoms::y_spin_array[i]*mus;
+               cells::mag_array_z[cell] += atoms::z_spin_array[i]*mus;
+            }
+         }
       }
 
       #ifdef MPICF

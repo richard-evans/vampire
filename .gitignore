@@ -16,6 +16,7 @@
 *.inc
 *old.cpp
 *old.hpp
+*.bkp
 info
 vampire*
 cfg2povray

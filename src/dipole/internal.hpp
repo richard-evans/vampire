@@ -66,24 +66,12 @@ namespace dipole{
       extern int num_atoms;
       extern std::vector < int > atom_type_array;
       extern std::vector < int > atom_cell_array;
-      extern std::vector < double > atom_dipolar_field_array_x;
-      extern std::vector < double > atom_dipolar_field_array_y;
-      extern std::vector < double > atom_dipolar_field_array_z;
 
       extern int cells_num_cells;
       extern int cells_num_local_cells;
       extern std::vector <int>  cells_local_cell_array;
       extern std::vector <int>  cells_num_atoms_in_cell;
-      extern std::vector < double > cells_mag_array_x;
-      extern std::vector < double > cells_mag_array_y;
-      extern std::vector < double > cells_mag_array_z;
-      extern std::vector < double > cells_field_array_x;
-      extern std::vector < double > cells_field_array_y;
-      extern std::vector < double > cells_field_array_z;
       extern std::vector < double > cells_volume_array;
-
-      extern int sim_time;
-
 
       //-------------------------------------------------------------------------
       // Internal function declarations
