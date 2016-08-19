@@ -3017,7 +3017,7 @@ int match_material(string const word, string const value, string const unit, int
       test="atomic-spin-moment";
       if(word==test){
          double mu_s=atof(value.c_str());
-         check_for_valid_value(mu_s, word, line, prefix, unit, "moment", 0.1*9.24e-24, 1e8*9.24e-24,"material","0.1 - 1e8 mu_B");
+         check_for_valid_value(mu_s, word, line, prefix, unit, "moment", 0.01*9.24e-24, 1e8*9.24e-24,"material","0.01 - 1e8 mu_B");
          read_material[super_index].moment_flag=true;
          read_material[super_index].mu_s_SI=mu_s;
          return EXIT_SUCCESS;

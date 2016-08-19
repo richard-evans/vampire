@@ -29,12 +29,6 @@
 // cells module headers
 #include "internal.hpp"
 
-struct uvec{
-  int i;
-  int j;
-  int k;
-};
-
 namespace cells{
 
    //----------------------------------------------------------------------------
