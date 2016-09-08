@@ -155,14 +155,14 @@ namespace vout{
       #endif
 
       // Set unique filename for log if num_procs > 1
-      std::stringstream logfn;
-      if(vmpi::num_processors==1) logfn << "log";
-      else logfn << "log."<<vmpi::my_rank;
+      //std::stringstream logfn;
+      //if(vmpi::num_processors==1) logfn << "log";
+      //else logfn << "log."<<vmpi::my_rank;
 
       // Open log filename
-      std::string log_file = logfn.str();
-      const char* log_filec = log_file.c_str();
-      zlog.open(log_filec);
+      //std::string log_file = logfn.str();
+      //const char* log_filec = log_file.c_str();
+      if(vmpi::my_rank==0) zlog.open("log");
 
       // Mark as initialised;
       zLogInitialised=true;

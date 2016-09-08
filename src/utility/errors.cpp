@@ -70,11 +70,11 @@ namespace err
       terminaltextcolor(WHITE);
       zlog << zTs() << "Fatal error on rank: " << vmpi::my_rank << ": Aborting program." << std::endl;
       // concatenate log and sort
-      #ifdef WIN_COMPILE
+      /*#ifdef WIN_COMPILE
          system("type log.* 2>NUL | sort > log");
       #else
          system("ls log.* | xargs cat | sort -n > log");
-      #endif
+      #endif*/
 
       MPI::COMM_WORLD.Abort(EXIT_FAILURE);
       // MPI program dies ungracefully here
