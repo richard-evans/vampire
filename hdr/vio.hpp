@@ -107,6 +107,11 @@ namespace vout{
 	extern double atoms_output_min[3];
 	extern double atoms_output_max[3];
 
+	extern double field_output_min_1;
+	extern double field_output_max_1;
+	extern double field_output_min_2;
+	extern double field_output_max_2;
+
 	extern bool output_cells_config;
 	extern int output_cells_config_rate;
 
