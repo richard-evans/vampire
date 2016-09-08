@@ -144,11 +144,11 @@ int main(int argc, char* argv[]){
    #ifdef MPICF
       vmpi::finalise();
       // concatenate log, sort, and append departure message.
-      #ifdef WIN_COMPILE
+      /*#ifdef WIN_COMPILE
          if(vmpi::num_processors!=1 && vmpi::my_rank==0) system("type log.* 2>NUL | sort > log");
       #else
          if(vmpi::num_processors!=1 && vmpi::my_rank==0) system("ls log.* | xargs cat | sort -n > log");
-      #endif
+	 #endif*/
    #endif
 
    zlog << zTs() << "Simulation ended gracefully." << std::endl;

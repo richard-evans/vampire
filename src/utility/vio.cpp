@@ -155,14 +155,14 @@ namespace vout{
       #endif
 
       // Set unique filename for log if num_procs > 1
-      std::stringstream logfn;
-      if(vmpi::num_processors==1) logfn << "log";
-      else logfn << "log."<<vmpi::my_rank;
+      //std::stringstream logfn;
+      //if(vmpi::num_processors==1) logfn << "log";
+      //else logfn << "log."<<vmpi::my_rank;
 
       // Open log filename
-      std::string log_file = logfn.str();
-      const char* log_filec = log_file.c_str();
-      zlog.open(log_filec);
+      //std::string log_file = logfn.str();
+      //const char* log_filec = log_file.c_str();
+      if(vmpi::my_rank==0) zlog.open("log");
 
       // Mark as initialised;
       zLogInitialised=true;
@@ -293,8 +293,8 @@ int match_dimension(std::string const, std::string const, std::string const, int
 int match_sim(std::string const, std::string const, std::string const, int const);
 int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-int match_material(string const, string const, string const, int const, int const, int const);
-int match_config(string const, string const, int const);
+int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
+int match_config(std::string const, std::string const, std::string const, int const);
 
 // Function to extract all variables from a string and return a vector
 std::vector<double> DoublesFromString(std::string value){
@@ -815,7 +815,7 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="config";
 	if(key==test){
-		int frs=vin::match_config(word, value, line);
+		int frs=vin::match_config(word, value, unit, line);
 		return frs;
 	}
 	//-------------------------------------------------------------------
@@ -847,13 +847,14 @@ int match(string const key, string const word, string const value, string const 
 		//-------------------------------------------------------------------
 		test="unit-cell-file";
 		if(word==test){
-			std::string matfile=value;
+			std::string ucffile=value;
 			// strip quotes
-			matfile.erase(remove(matfile.begin(), matfile.end(), '\"'), matfile.end());
+			ucffile.erase(remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
 			test="";
-			if(matfile!=test){
+			// if filename not blank set ucf file name
+			if(ucffile!=test){
 				//std::cout << matfile << std::endl;
-				cs::unit_cell_file=matfile;
+				cs::unit_cell_file=ucffile;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -2192,8 +2193,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 
    return EXIT_SUCCESS;
 }
-
-int match_config(string const word, string const value, int const line){
+int match_config(string const word, string const value, string const unit, int const line){
 
    std::string prefix="config:";
 
@@ -2208,6 +2208,7 @@ int match_config(string const word, string const value, int const line){
    if(word==test){
       int i=atoi(value.c_str());
       check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
+//      check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
       vout::output_atoms_config_rate=i;
       return EXIT_SUCCESS;
    }
@@ -2277,6 +2278,38 @@ int match_config(string const word, string const value, int const line){
    test="identify-surface-atoms";
    if(word==test){
       sim::identify_surface_atoms=true;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-1-minimum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_min_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-1-maximum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_max_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-2-minimum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_min_2=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-2-maximum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_max_2=H;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
@@ -2788,6 +2821,9 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		std::string line;
 		getline(inputfile,line);
 
+		// save a copy of the line before stripping characters in case of error
+		std::string original_line = line;
+
 		// Clear whitespace, quotes and tabs
 		line.erase(remove(line.begin(), line.end(), '\t'), line.end());
 		line.erase(remove(line.begin(), line.end(), ' '), line.end());
@@ -2944,7 +2980,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
-			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
+		  int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
 			if(matchcheck==EXIT_FAILURE){
 				err::vexit();
 			}
@@ -2973,7 +3009,15 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 ///-------------------------------------------------------------------
 /// Function to match material key words
 ///-------------------------------------------------------------------
-int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
+  int match_material(string const word,
+		     string const value,
+		     string const unit,
+		     int const line,
+		     int const super_index,
+		     int const sub_index,
+		     std::string const line_string,
+		     std::string const filename_string)
+  {
       std::string prefix="material:";
       //------------------------------------------------------------
       std::string test="num-materials";
@@ -3799,7 +3843,6 @@ int match_material(string const word, string const value, string const unit, int
          return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
-      else
       test="temperature-rescaling-curie-temperature";
       if(word==test){
          double Tc=atof(value.c_str());
@@ -3807,6 +3850,25 @@ int match_material(string const word, string const value, string const unit, int
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
+      //--------------------------------------------------------------------
+      test="non-magnetic";
+      /*
+        logical non-magnetic [false]
+           This flag causes the material to be identified as non magnetic,
+           with all atoms removed of this type removed from the simulation.
+	   The atomic positions of non-magnetic atoms are saved separately
+	   with the usual atomic spin configuration for post processing.
+	   The default value is false for all materials. Valid values are
+	   true, false or (blank) [same as true].
+      */
+      if(word==test){
+         // Test for sane input
+         bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
+         // set flag
+         read_material[super_index].non_magnetic = sanitised_bool;
+         return EXIT_SUCCESS;
+      }
+
       //-------------------------------------------------------------------
    	// Call module input parameters
       //-------------------------------------------------------------------
@@ -3817,13 +3879,13 @@ int match_material(string const word, string const value, string const unit, int
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
-			terminaltextcolor(RED);
-			std::cerr << "Error - Unknown control statement \'material[" << super_index+1 << "]:" << word << "\' on line " << line << " of material file" << std::endl;
-			terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-		}
-
-	return EXIT_SUCCESS;
+         terminaltextcolor(RED);
+         std::cerr << "Error - Unknown control statement '" << line_string << "' on line " << line << " of material file '" << filename_string << "'" << std::endl;
+         terminaltextcolor(WHITE);
+         zlog << zTs() << "Error - Unknown control statement '" << line_string << " on line " << line << " of material file '" << filename_string << "'" << std::endl;
+         return EXIT_FAILURE;
+      }
+      return EXIT_SUCCESS;
 }
 
 
