@@ -10,12 +10,12 @@ export OMPI_CXX=CC
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"' 
+ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' 
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' 
-#MPICC=mpicxx -DMPICF 
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+#MPICC=mpicxx -DMPICF
 MPICC=CC -DMPICF
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
@@ -56,8 +56,8 @@ GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  
---ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3 
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA
+--ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
 NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
@@ -244,7 +244,7 @@ parallel-intel: $(MPI_ICC_OBJECTS)
 	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<intel: $(MPI_ICC_OBJECTS)
-	
+
 parallel-cray: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(EXECUTABLE)
 $(MPI_CRAY_OBJECTS): obj/%_cray_mpi.o: src/%.cpp
@@ -289,7 +289,7 @@ $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
 
 # cuda targets
-gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS) 
+gcc-cuda: obj/cuda/LLG_cuda.o $(CUDA_OBJECTS)
 	$(ICC) $(ICC_LDFLAGS) $(LIBS)  $(CUDALIBS) $(CUDA_OBJECTS) obj/cuda/LLG_cuda.o -o $(EXECUTABLE)
 
 $(CUDA_OBJECTS): obj/%_cuda.o: src/%.cpp
@@ -307,10 +307,8 @@ purge:
 	@rm -f obj/*/*.o
 	@rm -f vampire
 
-tidy:	
+tidy:
 	@rm -f *~
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
-
-
