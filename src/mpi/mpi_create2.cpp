@@ -136,6 +136,7 @@ namespace vmpi{
 	}
 
 	//cout << counter_factor << endl;
+	// Check for prime number of CPUs for n > 10
 	if (counter_factor==2 && num_cpus>10) {
 		std::cerr << num_cpus << "\t" << "cpus cannot be decomposed efficiently, exiting" << std::endl;
 		err::vexit();
@@ -460,6 +461,9 @@ void atom_needed_by_remote_cpu(int atom, // atom number
    return;
 }
 
+//-------------------------------------------------------------------------------------------------------
+// Generalized routine to copy atoms needed by other processors including periodic boundary conditions
+//-------------------------------------------------------------------------------------------------------
 int copy_halo_atoms(std::vector<cs::catom_t> & catom_array){
 
 	zlog << zTs() << "Copying halo atoms to other processors..." << std::endl;

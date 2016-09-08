@@ -118,6 +118,9 @@ namespace cs{
 	// unit cell container
 	cs::unit_cell_t unit_cell;
 
+  // Array for storing non-magnetic atoms
+  std::vector<nm_atom_t> non_magnetic_atoms_array;
+
 int create(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
