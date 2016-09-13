@@ -30,18 +30,20 @@ namespace dipole{
       std::string prefix="dipole";
       if(key!=prefix) return false;
 
-/*      //----------------------------------
-      // Now test for all valid options
-      //----------------------------------
-      test="dipole-field-update-rate";
+      //-------------------------------------------------------------------
+      std::string test="solver";
       if(word==test){
-			int dpur=atoi(value.c_str());
-         // Test for valid range
-			check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-			dipole::update_rate=dpur;
-         return true;
+         // enable dipole calculation
+         dipole::activated=true;
+         return EXIT_SUCCESS;
       }
-*/
+      test="field-update-rate";
+      if(word==test){
+         int dpur=atoi(value.c_str());
+         vin::check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+         dipole::update_rate=dpur;
+         return EXIT_SUCCESS;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -65,4 +67,3 @@ namespace dipole{
    }
 
 } // end of dipole namespace
-

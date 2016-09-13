@@ -62,25 +62,15 @@ namespace dipole{
 	//-------------------------------------------------------------------------------------
       if(!dipole::activated) return;
 
-      //if(!internal::enabled) return;
-      std::cout << "Initialising demagnetisation field calculation" << std::endl;
-		// output informative message
-		zlog << zTs() << "Initialising demagnetisation field calculation" << std::endl;
+      // output informative message
+      std::cout << "Initialising dipole field calculation" << std::endl;
+		zlog << zTs() << "Initialising dipole field calculation" << std::endl;
 
 		// check for prior initialisation
 		if(dipole::internal::initialised){
-      		zlog << zTs() << "Warning:  Demagnetisation field calculation already initialised. Continuing." << std::endl;
+      	zlog << zTs() << "Warning:  Dipole field calculation already initialised. Continuing." << std::endl;
       	return;
 		}
-
-/*      std::cout << "Initialising demagnetisation field calculation" << std::endl;
-      // check for calling of routine
-      if(err::check==true){
-         terminaltextcolor(RED);
-         std::cerr << "demag::set_rij_matrix has been called " << vmpi::my_rank << std::endl;
-         terminaltextcolor(WHITE);
-      } */
-
 
 		//-------------------------------------------------------------------------------------
 		// Set simulation constants
@@ -104,19 +94,19 @@ namespace dipole{
 		// Starting calculation of dipolar field
 		//-------------------------------------------------------------------------------------
 
-       // timing function
-       #ifdef MPICF
-          double t1 = MPI_Wtime();
-       #else
-          time_t t1;
-          t1 = time (NULL);
-       #endif
+      // timing function
+      #ifdef MPICF
+       double t1 = MPI_Wtime();
+      #else
+       time_t t1;
+       t1 = time (NULL);
+      #endif
 
-         // Check memory requirements and print to screen
-         zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(cells_num_cells)*double(cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-         std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(cells_num_cells)*double(cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+      // Check memory requirements and print to screen
+      zlog << zTs() << "Fast dipole field calculation has been enabled and requires " << double(cells_num_cells)*double(cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+      std::cout << "Fast dipole field calculation has been enabled and requires " << double(cells_num_cells)*double(cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 
-       // allocate arrays to store data [nloccell x ncells]
+      // allocate arrays to store data [nloccell x ncells]
       for(int lc=0;lc<cells_num_local_cells; lc++){
 
          dipole::internal::rij_inter_xx.push_back(std::vector<double>());
@@ -162,7 +152,7 @@ namespace dipole{
       }
 
       // calculate matrix prefactors
-      zlog << zTs() << "Precalculating rij matrix for demag calculation... " << std::endl;
+      zlog << zTs() << "Precalculating rij matrix for dipole calculation... " << std::endl;
 
 
       //std::cout<< "Number of local cells= "<<cells_num_local_cells << std::endl;
@@ -351,8 +341,7 @@ namespace dipole{
          time_t t2;
          t2 = time (NULL);
       #endif
-      zlog << zTs() << "Precalculation of rij matrix for demag calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
-
+      zlog << zTs() << "Precalculation of rij matrix for dipole calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
 
       // Set initialised flag
       dipole::internal::initialised=true;
@@ -376,11 +365,10 @@ namespace dipole{
          t2 = time (NULL);
       #endif
 
-      zlog << zTs() << "Time required for demag update: " << t2-t1 << "s." << std::endl;
+      zlog << zTs() << "Time required for dipole update: " << t2-t1 << "s." << std::endl;
 
     	return;
 
     }
 
 } // end of dipole namespace
-

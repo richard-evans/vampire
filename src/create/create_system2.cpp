@@ -309,7 +309,7 @@ int create(){
                   atoms::num_atoms
       );
 
-	if(sim::hamiltonian_simulation_flags[4]==1){
+      // initialise dipole fields
       dipole::initialize(cells::num_atoms_in_unit_cell,
                         cells::num_cells,
                         cells::num_local_cells,
@@ -328,7 +328,6 @@ int create(){
                         cells::atom_cell_array,
                         atoms::num_atoms
       );
-   }
 
    //----------------------------------------
    // Initialise local temperature data
