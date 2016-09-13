@@ -116,6 +116,14 @@ obj/simulate/cmc.o \
 obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
+obj/spintorque/data.o \
+obj/spintorque/field.o \
+obj/spintorque/initialise.o \
+obj/spintorque/interface.o \
+obj/spintorque/magnetization.o \
+obj/spintorque/matrix.o \
+obj/spintorque/output.o \
+obj/spintorque/spinaccumulation.o \
 obj/statistics/data.o \
 obj/statistics/initialize.o \
 obj/statistics/magnetization.o \

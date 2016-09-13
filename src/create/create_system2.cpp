@@ -58,6 +58,7 @@
 #include "ltmp.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
@@ -313,6 +314,18 @@ int create(){
       );
 
    //----------------------------------------
+   // Initialise spin torque data
+   //----------------------------------------
+   st::initialise(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  num_local_atoms);
+
+   //----------------------------------------
    // Initialise local temperature data
    //----------------------------------------
    ltmp::initialise(cs::system_dimensions[0],
@@ -332,6 +345,7 @@ int create(){
                   mp::dt_SI,
 					   sim::Tmin,
 					   sim::Tmax);
+
 
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF

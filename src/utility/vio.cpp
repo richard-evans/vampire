@@ -58,6 +58,7 @@
 #include "errors.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "stats.hpp"
 #include "units.hpp"
 #include "vio.hpp"
@@ -753,7 +754,9 @@ int match(string const key, string const word, string const value, string const 
 	// Call module input parameters
    //-------------------------------------------------------------------
    if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-	else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
 	//===================================================================
@@ -2960,9 +2963,16 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
+
 		  int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
+
+        // if no match then return error
 			if(matchcheck==EXIT_FAILURE){
-				err::vexit();
+            terminaltextcolor(RED);
+            std::cerr << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
+            zlog << zTs() << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
 			}
 		}
 	}
@@ -3830,6 +3840,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
+
       //--------------------------------------------------------------------
       test="non-magnetic";
       /*
@@ -3854,7 +3865,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
       //-------------------------------------------------------------------
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
       else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
-
+      else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
@@ -3866,6 +3877,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
          return EXIT_FAILURE;
       }
       return EXIT_SUCCESS;
+
 }
 
 
