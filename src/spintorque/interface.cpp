@@ -18,6 +18,8 @@
 #include "spintorque.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "sim.hpp"
+
 
 // Spin Torque headers
 #include "internal.hpp"
@@ -141,6 +143,15 @@ bool match_material(string const word, string const value, string const unit, in
 
        //-------------------------------------------------
 
+       test="TMRenable";
+
+       if(word==test){
+         st::internal::TMRenable = true;
+         return true;
+       }
+       
+       
+      //-------------------------------------------------
       test="current-density";
        if(word==test){
          double T=atof(value.c_str());
