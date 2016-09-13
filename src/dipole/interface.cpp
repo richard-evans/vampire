@@ -35,14 +35,14 @@ namespace dipole{
       if(word==test){
          // enable dipole calculation
          dipole::activated=true;
-         return EXIT_SUCCESS;
+         return true;
       }
       test="field-update-rate";
       if(word==test){
          int dpur=atoi(value.c_str());
          vin::check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
          dipole::update_rate=dpur;
-         return EXIT_SUCCESS;
+         return true;
       }
       //--------------------------------------------------------------------
       // Keyword not found

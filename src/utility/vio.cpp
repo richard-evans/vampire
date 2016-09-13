@@ -50,6 +50,7 @@
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "create.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
@@ -754,8 +755,8 @@ int match(string const key, string const word, string const value, string const 
 	// Call module input parameters
    //-------------------------------------------------------------------
    if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-   else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
@@ -3865,6 +3866,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
       //-------------------------------------------------------------------
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
       else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+      else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
 		//--------------------------------------------------------------------
 		// keyword not found
