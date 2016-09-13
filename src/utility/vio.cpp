@@ -1559,12 +1559,12 @@ int match_sim(string const word, string const value, string const unit, int cons
       sim::hamiltonian_simulation_flags[5]=1;
       return EXIT_SUCCESS;
    }
-/*   //-------------------------------------------------------------------
+   //-------------------------------------------------------------------
    test="enable-fast-dipole-fields";
    if(word==test){
-      demag::fast=true;
+      //demag::fast=true;
       return EXIT_SUCCESS;
-   } */
+   }
    //-------------------------------------------------------------------
    test="dipole-field-update-rate";
    if(word==test){

@@ -44,6 +44,7 @@ namespace cells{
    std::vector < std::vector <double> > atom_in_cell_coords_array_x;
    std::vector < std::vector <double> > atom_in_cell_coords_array_y;
    std::vector < std::vector <double> > atom_in_cell_coords_array_z;
+   std::vector<int> atom_cell_array;
    std::vector<double> mag_array_x; /// arrays to store cells magnetisation
    std::vector<double> mag_array_y;
    std::vector<double> mag_array_z;
@@ -71,7 +72,6 @@ namespace cells{
       std::vector<double> spin_array_y;
       std::vector<double> spin_array_z;
       std::vector<int> atom_type_array;
-      std::vector<int> atom_cell_array;
       int num_atoms;
    } // end of internal namespace
 

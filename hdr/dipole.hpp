@@ -32,6 +32,9 @@ namespace dipole{
    extern std::vector<double> cells_field_array_x; /// arrays to store cells field
    extern std::vector<double> cells_field_array_y;
    extern std::vector<double> cells_field_array_z;
+   extern std::vector < double > atom_dipolar_field_array_x;
+   extern std::vector < double > atom_dipolar_field_array_y;
+   extern std::vector < double > atom_dipolar_field_array_z;
 
    //-----------------------------------------------------------------------------
    // Function to unroll cells dipolar field into atomic field
@@ -55,19 +58,9 @@ namespace dipole{
                    const std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
                    const std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
                    const std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                   const std::vector<double>& cells_mag_array_x, /// arrays to store cells magnetisation
-                   const std::vector<double>& cells_mag_array_y,
-                   const std::vector<double>& cells_mag_array_z,
-                   const std::vector<double>& cells_field_array_x, /// arrays to store cells field
-                   const std::vector<double>& cells_field_array_y,
-                   const std::vector<double>& cells_field_array_z,
                    const std::vector<int>& atom_type_array,
                    const std::vector<int>& atom_cell_array,
-                   const int num_atoms,
-                   const std::vector<double>& atom_dipolar_field_array_x, /// arrays to store atoms dipolar field
-                   const std::vector<double>& atom_dipolar_field_array_y,
-                   const std::vector<double>& atom_dipolar_field_array_z,
-                   const int sim_time
+                   const int num_atoms
    );
 
    //---------------------------------------------------------------------------

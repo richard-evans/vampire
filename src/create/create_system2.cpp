@@ -295,7 +295,6 @@ int create(){
 
 	// Set grain and cell variables for simulation
 	grains::set_properties();
-	//cells::initialise();
    cells::initialize(cs::system_dimensions[0],
                   cs::system_dimensions[1],
                   cs::system_dimensions[2],
@@ -305,16 +304,11 @@ int create(){
                   atoms::x_coord_array,
                   atoms::y_coord_array,
                   atoms::z_coord_array,
-                  atoms::x_spin_array,
-                  atoms::y_spin_array,
-                  atoms::z_spin_array,
                   atoms::type_array,
                   atoms::cell_array,
-                  //num_local_atoms,
                   atoms::num_atoms
       );
 
-	//if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
 	if(sim::hamiltonian_simulation_flags[4]==1){
       dipole::initialize(cells::num_atoms_in_unit_cell,
                         cells::num_cells,
@@ -330,19 +324,9 @@ int create(){
                         cells::atom_in_cell_coords_array_x,
                         cells::atom_in_cell_coords_array_y,
                         cells::atom_in_cell_coords_array_z,
-                        cells::mag_array_x,
-                        cells::mag_array_y,
-                        cells::mag_array_z,
-                        cells::field_array_x,
-                        cells::field_array_y,
-                        cells::field_array_z,
                         atoms::type_array,
-                        atoms::cell_array,
-                        atoms::num_atoms,
-                        atoms::x_dipolar_field_array,
-                        atoms::y_dipolar_field_array,
-                        atoms::z_dipolar_field_array,
-                        sim::time
+                        cells::atom_cell_array,
+                        atoms::num_atoms
       );
    }
 

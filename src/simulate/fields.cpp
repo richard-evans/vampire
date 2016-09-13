@@ -713,9 +713,12 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
 
 	// Add dipolar fields
 	for(int atom=start_index;atom<end_index;atom++){
-		atoms::x_total_external_field_array[atom] += atoms::x_dipolar_field_array[atom];
-		atoms::y_total_external_field_array[atom] += atoms::y_dipolar_field_array[atom];
-		atoms::z_total_external_field_array[atom] += atoms::z_dipolar_field_array[atom];
+		atoms::x_total_external_field_array[atom] += dipole::atom_dipolar_field_array_x[atom];
+		atoms::y_total_external_field_array[atom] += dipole::atom_dipolar_field_array_y[atom];
+		atoms::z_total_external_field_array[atom] += dipole::atom_dipolar_field_array_z[atom];
+		/*std::cout << atoms::x_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_x[atom] << "\t";
+		std::cout << atoms::y_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_y[atom] << "\t";
+		std::cout << atoms::z_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_z[atom] << std::endl;*/
 	}
 
 	return 0;

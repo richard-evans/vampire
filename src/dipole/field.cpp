@@ -27,6 +27,8 @@
 // dipole module headers
 #include "internal.hpp"
 
+#include "sim.hpp"
+
 namespace dipole{
 
    //-----------------------------------------------------------------------------
@@ -47,14 +49,15 @@ namespace dipole{
 			std::cerr << "dipole::field has been called " << vmpi::my_rank << std::endl;
 			terminaltextcolor(WHITE);
 		}
+
 		// prevent double calculation for split integration (MPI)
-		if(dipole::internal::update_time!=internal::sim_time){
+		if(dipole::internal::update_time!=sim::time){
 
 			// Check if update required
-		   if(internal::sim_time%dipole::update_rate==0){
+		   if(sim::time%dipole::update_rate==0){
 
 			   //if updated record last time at update
-			   dipole::internal::update_time=internal::sim_time;
+			   dipole::internal::update_time=sim::time;
 
 			   // update cell magnetisations
 			   cells::mag();
@@ -72,14 +75,11 @@ namespace dipole{
 			   // Update Atomistic Dipolar Field Array
 			   for(int atom=0;atom<num_local_atoms;atom++){
 				   const int cell = dipole::internal::atom_cell_array[atom];
-   	         if(internal::cells_num_atoms_in_cell[cell]>0){
+   	         if(dipole::internal::cells_num_atoms_in_cell[cell]>0){
 				      // Copy field from macrocell to atomistic spin
-				      dipole::internal::atom_dipolar_field_array_x[atom]=dipole::cells_field_array_x[cell];
-				      dipole::internal::atom_dipolar_field_array_y[atom]=dipole::cells_field_array_y[cell];
-				      dipole::internal::atom_dipolar_field_array_z[atom]=dipole::cells_field_array_z[cell];
-                  /*std::cout << dipole::internal::atom_dipolar_field_array_x[atom] << "\t";
-                  std::cout << dipole::internal::atom_dipolar_field_array_y[atom] << "\t";
-                  std::cout << dipole::internal::atom_dipolar_field_array_z[atom] << std::endl; */
+				      dipole::atom_dipolar_field_array_x[atom]=dipole::cells_field_array_x[cell];
+				      dipole::atom_dipolar_field_array_y[atom]=dipole::cells_field_array_y[cell];
+				      dipole::atom_dipolar_field_array_z[atom]=dipole::cells_field_array_z[cell];
    	         }
 			   }
 
