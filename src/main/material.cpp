@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -78,6 +78,7 @@ materials_t::materials_t ():
    fill(false),
    temperature_rescaling_alpha(1.0),
 	temperature_rescaling_Tc(0.0),
+	non_magnetic(false),
 	random_anisotropy(false),
 	random_grain_anisotropy(false)
 	{
@@ -126,9 +127,9 @@ int materials_t::print(){
 	std::cout << "mu_s_SI        = " << mu_s_SI << std::endl;
 	std::cout << "Ku1_SI          = " << Ku1_SI << std::endl;
 	std::cout << "gamma_rel      = " << gamma_rel << std::endl;
-	
+
 	return 0;
-	
-}	
+
+}
 
 }

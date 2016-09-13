@@ -302,6 +302,9 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 	if(err::check==true){std::cout << "cs::truncated_octahedron has been called" << std::endl;}
 
 	// Set truncated octahedron parameters
+  const double sfx = cs::particle_shape_factor_x;
+  const double sfy = cs::particle_shape_factor_y;
+  const double sfz = cs::particle_shape_factor_z;
 	const double to_length = cs::particle_scale*0.5*3.0/2.0;
 	const double to_height = cs::particle_scale*0.5;
         //const double to_length = cs::particle_scale*0.5;
@@ -339,7 +342,7 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 				double minz=mp::material[mat].min*cs::system_dimensions[2];
 				double cz=catom_array[atom].z;
 				// check for within core shell range
-				if((range<=my_to_length) && (x_vector[0] <= my_to_height) && (x_vector[1] <= my_to_height) && (x_vector[2] <= my_to_height)){
+				if((range<=my_to_length) && (x_vector[0] <= my_to_height*sfx) && (x_vector[1] <= my_to_height*sfy) && (x_vector[2] <= my_to_height*sfz)){
 					if((cz>=minz) && (cz<maxz)){
 						catom_array[atom].include=true;
 						catom_array[atom].material=mat;
@@ -352,7 +355,7 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 				}
 			}
 		}
-		else if((range<=to_length) && (x_vector[0] <= to_height) && (x_vector[1] <= to_height) && (x_vector[2] <= to_height)){
+		else if((range<=to_length) && (x_vector[0] <= to_height*sfx) && (x_vector[1] <= to_height*sfy) && (x_vector[2] <= to_height*sfz)){
 			catom_array[atom].include=true;
 			catom_array[atom].grain=grain;
 		}
