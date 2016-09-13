@@ -312,26 +312,6 @@ int create(){
                   atoms::num_atoms
       );
 
-      // initialise dipole fields
-      dipole::initialize(cells::num_atoms_in_unit_cell,
-                        cells::num_cells,
-                        cells::num_local_cells,
-                        cells::macro_cell_size,
-                        cells::local_cell_array,
-                        cells::num_atoms_in_cell,
-                        cells::index_atoms_array,
-                        cells::volume_array,
-                        cells::cell_coords_array_x,
-                        cells::cell_coords_array_y,
-                        cells::cell_coords_array_z,
-                        cells::atom_in_cell_coords_array_x,
-                        cells::atom_in_cell_coords_array_y,
-                        cells::atom_in_cell_coords_array_z,
-                        atoms::type_array,
-                        cells::atom_cell_array,
-                        atoms::num_atoms
-      );
-
    //----------------------------------------
    // Initialise local temperature data
    //----------------------------------------
