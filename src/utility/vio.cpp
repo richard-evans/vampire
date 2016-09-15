@@ -1977,6 +1977,8 @@ int match_sim(string const word, string const value, string const unit, int cons
    if(word==test){
       int ppn=atoi(value.c_str());
       check_for_valid_int(ppn, word, line, prefix, 1, 1024,"input","1 - 1024");
+      // If ppn > ncpu then make as large as allowed
+      if(ppn > vmpi::num_processors) ppn = vmpi::num_processors;
       vmpi::ppn=ppn;
       return EXIT_SUCCESS;
    }
