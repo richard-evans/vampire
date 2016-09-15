@@ -15,8 +15,8 @@ GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-#MPICC=mpicxx -DMPICF
-MPICC=CC -DMPICF
+MPICC=mpicxx -DMPICF
+#MPICC=CC -DMPICF
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
@@ -177,7 +177,7 @@ MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
 MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
-MPI_CRAY_OBJECTS=$(OBJECTS:.o=_cray_mpi.o)
+MPI_CRAYDB_OBJECTS=$(OBJECTS:.o=_craydb_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
@@ -278,9 +278,9 @@ parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
-parallel-cray: $(MPI_CRAY_OBJECTS)
-	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(EXECUTABLE)
-$(MPI_CRAY_OBJECTS): obj/%_cray_mpi.o: src/%.cpp
+parallel-cray-debug: $(MPI_CRAY_OBJECTS)
+	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(EXECUTABLE)
+$(MPI_CRAYDB_OBJECTS): obj/%_craydb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(CCC_CFLAGS) $<
 
 parallel-pathscale-debug: $(MPI_PCCDB_OBJECTS)
