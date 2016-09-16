@@ -82,9 +82,9 @@
 namespace demag{
 
 	bool fast=false;
-	
-	int update_rate=100; /// timesteps between updates
-	int update_time=-1; /// last update time
+
+	uint64_t update_rate=100; /// timesteps between updates
+	uint64_t update_time=0; /// last update time
 
 	const double prefactor=1.0e+23; // 1e-7/1e30
 

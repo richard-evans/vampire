@@ -125,8 +125,8 @@ namespace cells{
 		zlog << zTs() << "Memory required for macrocell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
 
 		// Determine number of cells in x,y,z
-		const int d[3]={ncellx,ncelly,ncellz};
-	
+		const unsigned int d[3]={ncellx,ncelly,ncellz};
+
 		// Set cell counter
 		int cell=0;
 		
@@ -134,11 +134,11 @@ namespace cells{
 		int*** supercell_array;
 		//std::cout << "Memory required for cell list calculation:" << 8.0*double(d[0])*double(d[1])*double(d[2])/1.0e6 << " MB" << std::endl;
 		try{supercell_array=new int**[d[0]];
-			for(int i=0; i<d[0] ; i++){
+			for(unsigned int i=0; i<d[0] ; i++){
 				supercell_array[i]=new int*[d[1]];
-				for(int j=0; j<d[1] ; j++){
+				for(unsigned int j=0; j<d[1] ; j++){
 					supercell_array[i][j]=new int[d[2]];
-					for(int k=0; k<d[2] ; k++){
+					for(unsigned int k=0; k<d[2] ; k++){
 						supercell_array[i][j][k]=cell;
 						cell++;
 					}
@@ -170,7 +170,7 @@ namespace cells{
 			for(int i=0;i<3;i++){
 				scc[i]=int(c[i]/cells::size); // Always round down for supercell coordinates
 				// Always check cell in range
-				if(scc[i]<0 || scc[i]>= d[i]){
+				if(scc[i]<0 || static_cast<unsigned int>(scc[i]) >= d[i]){
 					terminaltextcolor(RED);
 					std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
 					terminaltextcolor(WHITE);
@@ -195,8 +195,8 @@ namespace cells{
 		
 		// Deallocate supercell array
 		try{
-			for(int i=0; i<d[0] ; i++){
-				for(int j=0; j<d[1] ;j++){
+			for(unsigned int i=0; i<d[0] ; i++){
+				for(unsigned int j=0; j<d[1] ;j++){
 					delete [] supercell_array[i][j];
 				}
 				delete [] supercell_array[i];

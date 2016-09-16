@@ -177,18 +177,18 @@ double spin_exchange_energy_tensor(const int atom, const double Sx, const double
 	for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
 			
 		const int natom = atoms::neighbour_list_array[nn];
-		const double Jij[3][3]={atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][0],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][1],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][2],
+		const double Jij[3][3]={{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][0],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][1],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][2]},
 
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][0],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][1],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][2],
+										{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][0],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][1],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][2]},
 
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][0],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][1],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2]};
-				
+										{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][0],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][1],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2]}};
+
 		const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
 		
 		energy+=(Jij[0][0]*S[0]*Sx + Jij[0][1]*S[1]*Sx +Jij[0][2]*S[2]*Sx +
@@ -237,18 +237,18 @@ double spin_scalar_anisotropy_energy(const int imaterial, const double Sz){
 //                ( ezex ezey ezez ) ( Sz )
 //
 double spin_tensor_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
-	const double K[3][3]={mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[0][2],
+	const double K[3][3]={{mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[0][2]},
 
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][2],
+								 {mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[1][2]},
 
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]};
-								 
+								 {mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]}};
+
 	return (K[0][0]*Sx*Sx + K[0][1]*Sx*Sy +K[0][2]*Sx*Sz) +
 			 (K[1][0]*Sx*Sy + K[1][1]*Sy*Sy +K[1][2]*Sy*Sz) +
 			 (K[2][0]*Sx*Sz + K[2][1]*Sy*Sz +K[2][2]*Sz*Sz);

@@ -43,7 +43,7 @@ namespace sim{
 // Function declarations
 void mc_gaussian(const std::valarray<double>&, std::valarray<double>&);
 void mc_spin_flip(const std::valarray<double>&, std::valarray<double>&);
-void mc_uniform(const std::valarray<double>&, std::valarray<double>&);
+void mc_uniform(std::valarray<double>&);
 void mc_angle(const std::valarray<double>&, std::valarray<double>&);
 void mc_hinzke_nowak(const std::valarray<double>&, std::valarray<double>&);
 
@@ -65,7 +65,7 @@ void mc_move(const std::valarray<double>& old_spin, std::valarray<double>& new_s
          mc_spin_flip(old_spin, new_spin);
          break;
       case uniform:
-         mc_uniform(old_spin, new_spin);
+         mc_uniform(new_spin);
          break;
       case angle:
          mc_angle(old_spin, new_spin);
@@ -112,7 +112,7 @@ void mc_spin_flip(const std::valarray<double>& old_spin, std::valarray<double>& 
 
 /// Random move
 /// Place spin randomly on unit sphere
-void mc_uniform(const std::valarray<double>& old_spin, std::valarray<double>& new_spin){
+void mc_uniform(std::valarray<double>& new_spin){
 
    new_spin[0]=mtrandom::gaussian();
    new_spin[1]=mtrandom::gaussian();
@@ -143,7 +143,7 @@ void mc_hinzke_nowak(const std::valarray<double>& old_spin, std::valarray<double
             mc_spin_flip(old_spin, new_spin);
             break;
          case 1:
-            mc_uniform(old_spin, new_spin);
+            mc_uniform(new_spin);
             break;
          case 2:
             mc_angle(old_spin, new_spin);

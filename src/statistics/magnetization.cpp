@@ -38,7 +38,7 @@ bool magnetization_statistic_t::is_initialized(){
 void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int> in_mask, const std::vector<double>& mm){
 
    // Check that mask values never exceed mask_size
-   for(int atom=0; atom<in_mask.size(); ++atom){
+   for(unsigned int atom=0; atom<in_mask.size(); ++atom){
       if(in_mask[atom] > in_mask_size-1){
          terminaltextcolor(RED);
          std::cerr << "Programmer Error - mask id " << in_mask[atom] << " is greater than number of elements for mask "<< in_mask_size << std::endl;
@@ -70,7 +70,7 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
 
    // determine mask id's with no atoms
    std::vector<int> num_atoms_in_mask(mask_size,0);
-   for(int atom=0; atom<in_mask.size(); ++atom){
+   for(unsigned int atom=0; atom<in_mask.size(); ++atom){
       int mask_id = in_mask[atom];
       // add atoms to mask
       num_atoms_in_mask[mask_id]++;
@@ -139,7 +139,7 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
    }
 
    // Zero empty mask id's
-   for(int id=0; id<zero_list.size(); ++id) magnetization[zero_list[id]]=0.0;
+   for(unsigned int id=0; id<zero_list.size(); ++id) magnetization[zero_list[id]]=0.0;
 
    // Add magnetisation to mean
    const int msize = magnetization.size();

@@ -97,7 +97,6 @@ int MonteCarlo(){
 
 	// Temporaries
 	int atom=0;
-	double r=1.0;
 	double Eold=0.0;
 	double Enew=0.0;
 	double DE=0.0;

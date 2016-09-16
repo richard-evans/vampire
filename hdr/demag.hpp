@@ -36,7 +36,7 @@
 namespace demag{
 
 	extern bool fast;
-	extern int update_rate;
+	extern uint64_t update_rate;
 	
 	extern void init();
 	extern void update();

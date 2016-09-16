@@ -357,11 +357,9 @@ int ConstrainedMonteCarloMonteCarlo(){
 	double spin2_init_mvd[3];
 	double spin2_fin_mvd[3];
 
-	double M_other[3];
 	double Mz_old;
 	double Mz_new;
 
-	double sqrt_ran;
 	double probability;
 	
    // Material dependent temperature rescaling

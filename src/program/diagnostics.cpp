@@ -72,7 +72,7 @@ int timestep_scaling(){
 		for(int value=1;value<10;value++){
 			mp::dt_SI=double(value)*pow(10.0,-1.0*powerv);
 
-			int timesteps = 5.0e-12/mp::dt_SI;
+			uint64_t timesteps = uint64_t(5.0e-12/mp::dt_SI);
 
 			std::cout << timesteps << std::endl;
 
@@ -97,8 +97,8 @@ int timestep_scaling(){
 
 			sim::integrate(timesteps);
 			stats::mag_m_reset();
-			int start_time=sim::time;
-			// Simulate system                                                                                                                                         
+			uint64_t start_time=sim::time;
+			// Simulate system
 			while(sim::time<timesteps+start_time){
 				sim::integrate(1);
 				
@@ -122,9 +122,6 @@ void boltzmann_dist(){
 
 	// array for binning spin angle
 	std::vector<double> bin(181,0.0);
-	
-	// Set starting temperature
-	sim::temperature=sim::temperature;
 
 	// Equilibrate system
 	sim::integrate(sim::equilibration_time);
