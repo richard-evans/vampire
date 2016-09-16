@@ -24,10 +24,9 @@ namespace micromagnetic{
    // Function to initialize micromagnetic module
    //----------------------------------------------------------------------------
    void initialize(){
-
+      //load cell data.
       return;
 
    }
 
 } // end of micromagnetic namespace
-
