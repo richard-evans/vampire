@@ -99,6 +99,7 @@ obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/partial_hysteresis.o \
 obj/program/static_hysteresis.o \
+obj/program/setting.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
 obj/program/localised_temperature_pulse.o \
