@@ -6,30 +6,30 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
 //
 ///
 /// @file
-/// @brief Contains vin and vout namespaces for file input.output in vampire. 
+/// @brief Contains vin and vout namespaces for file input.output in vampire.
 ///
 /// @details File and screen input and output are controlled via the separate namespaces.
 ///
 /// @section notes Implementation Notes
-/// This is a list of other notes, not related to functionality but rather to implementation. 
+/// This is a list of other notes, not related to functionality but rather to implementation.
 /// Also include references, formulae and other notes here.
 ///
 /// @section License
@@ -49,6 +49,7 @@
 // Headers
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "create.hpp"
 #include "demag.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
@@ -85,7 +86,7 @@ void terminaltextcolor(enum textcolor color){
 #ifdef WIN_COMPILE
  int fincolor=15;
  if(color==RED) fincolor=12; if(color==GREEN) fincolor=10; if(color==YELLOW) fincolor=14;
- if(color==BLUE) fincolor=9; if(color==PURPLE) fincolor=13; 
+ if(color==BLUE) fincolor=9; if(color==PURPLE) fincolor=13;
  SetConsoleTextAttribute(GetStdHandle( STD_OUTPUT_HANDLE ), fincolor);
 #else
   std::ostringstream fincolor;
@@ -198,7 +199,7 @@ std::string zTs(){
 
 	if(vout::zLogInitialised==true){
 		std::ostringstream Ts;
-		
+
 		// varibale for time
 		time_t seconds;
 
@@ -210,9 +211,9 @@ std::string zTs(){
 		timeinfo = localtime ( &seconds );
 		// Format time string
 		strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
-  
+
 		Ts << logtime << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
-	
+
 		return Ts.str();
 
 	}
@@ -277,12 +278,12 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 
 /// @namespace
 /// @brief Contains variables and functions for reading in program data.
-/// 
+///
 /// @internal
 ///=====================================================================================
 ///
 namespace vin{
-	
+
 // Function Prototypes
 //int read(string const);
 int match(string const, string const, string const, string const, int const);
@@ -292,41 +293,41 @@ int match_dimension(std::string const, std::string const, std::string const, int
 int match_sim(std::string const, std::string const, std::string const, int const);
 int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-int match_material(string const, string const, string const, int const, int const, int const);
-int match_config(string const, string const, int const);
+int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
+int match_config(std::string const, std::string const, std::string const, int const);
 
 // Function to extract all variables from a string and return a vector
 std::vector<double> DoublesFromString(std::string value){
-	
+
 	// array for storing variables
 	std::vector<double> array(0);
-	
+
 	// set source for ss
 	std::istringstream source(value);
 
 	// double variable to store values
 	double temp = 0.0;
-	
+
 	// string to store text
 	std::string field;
- 
+
 	// loop over all comma separated values
 	while(getline(source,field,',')){
-		
+
 		// convert string to ss
 		std::stringstream fs(field);
 
 		// read in variable
 		fs >> temp;
-		
+
 		// push data value back to array
 		array.push_back(temp);
-		
+
 	}
-	
+
 	// return values to calling function
 	return array;
-	
+
 }
 
 ///
@@ -574,7 +575,7 @@ void check_for_valid_vector(std::vector<double>& u, /// unit vector
 /// @version 1.1
 /// @date    18/01/2010
 ///
-/// @param[in] filename Name of file to be opened 
+/// @param[in] filename Name of file to be opened
 /// @return EXIT_SUCCESS
 ///
 /// @internal
@@ -587,11 +588,11 @@ int read(string const filename){
 	std::ifstream inputfile;
 
 	// Print informative message to zlog file
-	zlog << zTs() << "Opening main input file \"" << filename << "\"." << std::endl; 
-	
+	zlog << zTs() << "Opening main input file \"" << filename << "\"." << std::endl;
+
 	// Open file read only
 	inputfile.open(filename.c_str());
-	
+
 	// Check for opening
 	if(!inputfile.is_open()){
 	  terminaltextcolor(RED);
@@ -604,7 +605,7 @@ int read(string const filename){
 
         // Print informative message to zlog file
 	zlog << zTs() << "Parsing system parameters from main input file." << std::endl;
-	
+
 	int line_counter=0;
 	// Loop over all lines and pass keyword to matching function
 	while (! inputfile.eof() ){
@@ -619,7 +620,7 @@ int read(string const filename){
 
 		// clear carriage return for dos formatted files
 		line.erase(remove(line.begin(), line.end(), '\r'), line.end());
-		
+
 		// strip key,word,unit,value
 		std::string key="";
 		std::string word="";
@@ -629,19 +630,19 @@ int read(string const filename){
 		// get size of string
 		int linelength = line.length();
 		int last=0;
-		
+
 		// set character triggers
 		const char* colon=":";	// Word identifier
 		const char* eq="=";		// Value identifier
 		const char* exc="!";		// Unit identifier
 		const char* hash="#";	// Comment identifier
 		//const char* arrow=">";	// List identifier
-		
+
 		// Determine key by looping over characters in line
 		for(int i=0;i<linelength;i++){
 			char c=line.at(i);
 			last=i;
-			
+
 			// if character is not ":" or "=" or "!" or "#" interpret as key
 			if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
 				key.push_back(c);
@@ -649,10 +650,10 @@ int read(string const filename){
 			else break;
 		}
 		const int end_key=last;
-		
+
 		// Determine the rest
 		for(int i=end_key;i<linelength;i++){
-			
+
 			char c=line.at(i);
 			//last=i;
 				// period found - interpret as word
@@ -735,8 +736,8 @@ int read(string const filename){
 /// @version 1.1
 /// @date    18/01/2010
 ///
-/// @param[in] keyword Unique string variable linked to an initialisation variable 
-/// @param[in] value Value of keyword linked to initialisation variable 
+/// @param[in] keyword Unique string variable linked to an initialisation variable
+/// @param[in] value Value of keyword linked to initialisation variable
 /// @return EXIT_SUCCESS
 ///
 /// @internal
@@ -749,10 +750,16 @@ int match(string const key, string const word, string const value, string const 
 
 	std::string test;
 
+   //-------------------------------------------------------------------
+	// Call module input parameters
+   //-------------------------------------------------------------------
+   if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+	else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
 	//===================================================================
-	test="create";
+	else
+   test="create";
 	if(key==test){
 		int frs=vin::match_create(word, value, unit, line);
 		return frs;
@@ -801,20 +808,16 @@ int match(string const key, string const word, string const value, string const 
 	if(key==test){
 		int frs=vin::match_vout_grain_list(word, value, line, vout::grain_output_list);
 		return frs;
-	}	
+	}
 	//===================================================================
 	// Test for config output
 	//===================================================================
 	else
 	test="config";
 	if(key==test){
-		int frs=vin::match_config(word, value, line);
+		int frs=vin::match_config(word, value, unit, line);
 		return frs;
 	}
-   //-------------------------------------------------------------------
-	// Test for localised temperature pulse
-   //-------------------------------------------------------------------
-   else if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//-------------------------------------------------------------------
 	// Get material filename
 	//-------------------------------------------------------------------
@@ -844,13 +847,14 @@ int match(string const key, string const word, string const value, string const 
 		//-------------------------------------------------------------------
 		test="unit-cell-file";
 		if(word==test){
-			std::string matfile=value;
+			std::string ucffile=value;
 			// strip quotes
-			matfile.erase(remove(matfile.begin(), matfile.end(), '\"'), matfile.end());
+			ucffile.erase(remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
 			test="";
-			if(matfile!=test){
+			// if filename not blank set ucf file name
+			if(ucffile!=test){
 				//std::cout << matfile << std::endl;
-				cs::unit_cell_file=matfile;
+				cs::unit_cell_file=ucffile;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1330,7 +1334,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-x";
    if(word==test){
       double sfx=atof(value.c_str());
-      check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_x=sfx;
       return EXIT_SUCCESS;
    }
@@ -1339,7 +1343,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-y";
    if(word==test){
       double sfy=atof(value.c_str());
-      check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_y=sfy;
       return EXIT_SUCCESS;
    }
@@ -1348,7 +1352,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-z";
    if(word==test){
       double sfz=atof(value.c_str());
-      check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_z=sfz;
       return EXIT_SUCCESS;
    }
@@ -2194,8 +2198,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 
    return EXIT_SUCCESS;
 }
-
-int match_config(string const word, string const value, int const line){
+int match_config(string const word, string const value, string const unit, int const line){
 
    std::string prefix="config:";
 
@@ -2210,6 +2213,7 @@ int match_config(string const word, string const value, int const line){
    if(word==test){
       int i=atoi(value.c_str());
       check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
+//      check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
       vout::output_atoms_config_rate=i;
       return EXIT_SUCCESS;
    }
@@ -2279,6 +2283,38 @@ int match_config(string const word, string const value, int const line){
    test="identify-surface-atoms";
    if(word==test){
       sim::identify_surface_atoms=true;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-1-minimum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_min_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-1-maximum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_max_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-2-minimum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_min_2=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-2-maximum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_max_2=H;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
@@ -2751,27 +2787,27 @@ int match_vout_grain_list(string const word, string const value, int const line,
   std::vector<mp::materials_t> read_material(0);
 
 int read_mat_file(std::string const matfile, int const LineNumber){
-	
+
 	// Declare input stream
 	std::ifstream inputfile;
-	
+
 	// resize temporary materials array for storage of variables
 	read_material.resize(mp::max_materials);
 	cmc::cmc_mat.resize(mp::max_materials);
-	
+
         // Print informative message to zlog file
 	zlog << zTs() << "Opening material file \"" << matfile << "\"." << std::endl;
-	
+
 	// Open file read only
 	inputfile.open(matfile.c_str());
-	
+
 	// Check for opening
 	if(!inputfile.is_open()){
 		terminaltextcolor(RED);
 		std::cerr << "Error opening material file " << matfile << ". File does not exist!" << std::endl;
 		terminaltextcolor(WHITE);
 		zlog << zTs() << "Error: Material file \"" << matfile << "\" on line number " << LineNumber << " of input file cannot be opened or does not exist." << std::endl;
-		zlog << zTs() << "If file exists then check file permissions to ensure it is readable by the user." << std::endl; 
+		zlog << zTs() << "If file exists then check file permissions to ensure it is readable by the user." << std::endl;
 		err::vexit();   // return to calling function for error checking or message
 	}
 	//-------------------------------------------------------
@@ -2781,7 +2817,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 
         // Print informative message to zlog file
 	zlog << zTs() << "Parsing material file for parameters." << std::endl;
-	
+
 	int line_counter=0;
 	// Loop over all lines and pass keyword to matching function
 	while (! inputfile.eof() ){
@@ -2790,6 +2826,9 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		std::string line;
 		getline(inputfile,line);
 
+		// save a copy of the line before stripping characters in case of error
+		std::string original_line = line;
+
 		// Clear whitespace, quotes and tabs
 		line.erase(remove(line.begin(), line.end(), '\t'), line.end());
 		line.erase(remove(line.begin(), line.end(), ' '), line.end());
@@ -2797,7 +2836,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 
 		// remove carriage returns for dos formatted files
                 line.erase(remove(line.begin(), line.end(), '\r'), line.end());
-		
+
 		// strip key,word,unit,value
 		std::string key="";
 		std::string word="";
@@ -2810,7 +2849,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		// get size of string
 		int linelength = line.length();
 		int last=0;
-		
+
 		// set character triggers
 		const char* colon=":";	// Word identifier
 		const char* eq="=";		// Value identifier
@@ -2818,12 +2857,12 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		const char* hash="#";	// Comment identifier
 		const char* si="[";		// Index identifier
 		const char* ei="]";		// End index identifier
-		
+
 		// Determine key and super index by looping over characters in line
 		for(int i=0;i<linelength;i++){
 			char c=line.at(i);
 			last=i;
-			
+
 			// if character is not ":" or "=" or "!" or "#" interpret as key
 			if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash) && (c != *si) && (c != *ei)){
 				key.push_back(c);
@@ -2847,7 +2886,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 					}
 					last=j;
 				}
-				
+
 				// check for valid index
 				super_index = atoi(index.c_str());
 				if((super_index>=1) && (super_index<mp::max_materials+1)){
@@ -2858,18 +2897,18 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 					std::cerr << "Causes could be invalid character or outside of range, ie less than 1 or greater than max_materials=" << mp::max_materials << ", exiting" << std::endl;
 					err::vexit();
 				}
-				
+
 			}
 			// For anything else
 			else break;
 		}
 		const int end_key=last;
-		
+
 		//
 		//err::vexit();
 		// Determine the rest
 		for(int i=end_key;i<linelength;i++){
-			
+
 			char c=line.at(i);
 			// colon found - interpret as word
 			if(c== *colon){
@@ -2946,36 +2985,44 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
-			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
+		  int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
 			if(matchcheck==EXIT_FAILURE){
 				err::vexit();
 			}
 		}
 	}
-	
+
 	// resize global material array
 	mp::material.resize(mp::num_materials);
-	
+
 	// Copy data to global material array
 	for(int mat=0;mat<mp::num_materials;mat++){
 		mp::material[mat]=read_material[mat];
 	}
-	
+
 	// Resize read array to zero
 	read_material.resize(0);
-	
-	
+
+
 	// Close file
 	inputfile.close();
 
 	return EXIT_SUCCESS;
-	
+
 }
 
 ///-------------------------------------------------------------------
 /// Function to match material key words
 ///-------------------------------------------------------------------
-int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
+  int match_material(string const word,
+		     string const value,
+		     string const unit,
+		     int const line,
+		     int const super_index,
+		     int const sub_index,
+		     std::string const line_string,
+		     std::string const filename_string)
+  {
       std::string prefix="material:";
       //------------------------------------------------------------
       std::string test="num-materials";
@@ -3350,53 +3397,6 @@ int match_material(string const word, string const value, string const unit, int
       }
       //--------------------------------------------------------------------
       else
-      test="alloy-host"; // determines host material
-      if(word==test){
-         read_material[super_index].alloy_master=true; // if this keyword is set, then atoms of this type will be scanned for alloy materials
-         return EXIT_SUCCESS;
-      }
-      //--------------------------------------------------------------------
-      else
-      test="alloy-class"; // determines unit cell category id for ordered alloys
-      if(word==test){
-         int ac=atoi(value.c_str());
-         // test for 'disordered'
-         std::string dis="disordered";
-         if(value==dis){
-            read_material[super_index].alloy_class=-1; // value for random alloy
-            return EXIT_SUCCESS;
-         }
-         // test for valid ordered alloy, value of -1 will be deprecated
-         if((ac<-1) || (ac > 3)){
-			terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:alloy-class is outside of valid range (0-3)" << std::endl;
-            terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-         }
-         else{
-            read_material[super_index].alloy_class=ac;
-            return EXIT_SUCCESS;
-         }
-      }
-      //--------------------------------------------------------------------
-      else
-      test="alloy-fraction"; // determines %mixing for disordered alloys
-      if(word==test){
-         double a=atof(value.c_str());
-         if((a < 0.0) || (a > 1.0)){
-			terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:alloy["<< sub_index+1 << "] is outside of valid range (0.0-1.0)" << std::endl;
-            terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-         }
-         else{
-            read_material[super_index].alloy[sub_index]=a;
-            return EXIT_SUCCESS;
-         }
-         //return EXIT_SUCCESS;
-      }
-      //--------------------------------------------------------------------
-      else
       test="minimum-height";
       if(word==test){
          double min=atof(value.c_str());
@@ -3636,8 +3636,8 @@ int match_material(string const word, string const value, string const unit, int
       /*
         logical use-phonon-temperature
            This flag enables specific materials to couple to the phonon temperature
-           of the system for simulations using the two temperature model. The default 
-           is for all materials to use the electron temperature. Valid values are true, 
+           of the system for simulations using the two temperature model. The default
+           is for all materials to use the electron temperature. Valid values are true,
            false or (blank) [same as true].
        */
       if(word==test){
@@ -3848,7 +3848,6 @@ int match_material(string const word, string const value, string const unit, int
          return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
-      else
       test="temperature-rescaling-curie-temperature";
       if(word==test){
          double Tc=atof(value.c_str());
@@ -3856,30 +3855,55 @@ int match_material(string const word, string const value, string const unit, int
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
+      //--------------------------------------------------------------------
+      test="non-magnetic";
+      /*
+        logical non-magnetic [false]
+           This flag causes the material to be identified as non magnetic,
+           with all atoms removed of this type removed from the simulation.
+	   The atomic positions of non-magnetic atoms are saved separately
+	   with the usual atomic spin configuration for post processing.
+	   The default value is false for all materials. Valid values are
+	   true, false or (blank) [same as true].
+      */
+      if(word==test){
+         // Test for sane input
+         bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
+         // set flag
+         read_material[super_index].non_magnetic = sanitised_bool;
+         return EXIT_SUCCESS;
+      }
+
+      //-------------------------------------------------------------------
+   	// Call module input parameters
+      //-------------------------------------------------------------------
+      else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+      else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
-			terminaltextcolor(RED);
-			std::cerr << "Error - Unknown control statement \'material[" << super_index+1 << "]:" << word << "\' on line " << line << " of material file" << std::endl;
-			terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-		}
-		
-	return EXIT_SUCCESS;
+         terminaltextcolor(RED);
+         std::cerr << "Error - Unknown control statement '" << line_string << "' on line " << line << " of material file '" << filename_string << "'" << std::endl;
+         terminaltextcolor(WHITE);
+         zlog << zTs() << "Error - Unknown control statement '" << line_string << " on line " << line << " of material file '" << filename_string << "'" << std::endl;
+         return EXIT_FAILURE;
+      }
+      return EXIT_SUCCESS;
 }
 
 
 
-} // end of namespace vin 
+} // end of namespace vin
 
 namespace vout{
-	
+
 	// Namespace variable declarations
 	std::vector<unsigned int> file_output_list(0);
 	std::vector<unsigned int> screen_output_list(0);
 	std::vector<unsigned int> grain_output_list(0);
-	
+
    // Variables to control rate of data output to screen, output file and grain file
    int output_rate=1;
    int output_grain_rate=1;
@@ -3902,7 +3926,7 @@ namespace vout{
 		strm.rdbuf(&nullbuf);
 	}
 	#endif
-  
+
 	// Output Function 0
 	void time(std::ostream& stream){
 		stream << sim::time << "\t";
@@ -3912,42 +3936,42 @@ namespace vout{
 	void real_time(std::ostream& stream){
 		stream << sim::time*mp::dt_SI << "\t";
 	}
-	
+
 	// Output Function 2
 	void temperature(std::ostream& stream){
 		stream << sim::temperature << "\t";
 	}
-	
+
 	// Output Function 3
 	void Happ(std::ostream& stream){
 		stream << sim::H_applied << "\t";
 	}
-	
+
 	// Output Function 4
 	void Hvec(std::ostream& stream){
 		stream << sim::H_vec[0] << "\t"<< sim::H_vec[1] << "\t"<< sim::H_vec[2] << "\t";
 	}
-	
+
 	// Output Function 5
    void mvec(std::ostream& stream){
       stream << stats::system_magnetization.output_normalized_magnetization();
    }
-	
+
 	// Output Function 6
    void magm(std::ostream& stream){
       stream << stats::system_magnetization.output_normalized_magnetization_length() << "\t";
    }
-	
+
 	// Output Function 7
    void mean_magm(std::ostream& stream){
       stream << stats::system_magnetization.output_normalized_mean_magnetization_length();
    }
-	
+
 	// Output Function 8
    void mat_mvec(std::ostream& stream){
       stream << stats::material_magnetization.output_normalized_magnetization();
    }
-	
+
 	// Output Function 9
    void mat_mean_magm(std::ostream& stream){
       stream << stats::material_magnetization.output_normalized_mean_magnetization_length();
@@ -3970,7 +3994,7 @@ namespace vout{
 			}
 		}
 	}
-	
+
 	// Output Function 11
 	void grain_magm(std::ostream& stream){
 
@@ -3985,52 +4009,52 @@ namespace vout{
 			}
 		}
 	}
-	
+
 	// Output Function 12
 	void mdoth(std::ostream& stream){
       // initialise vector of H
       std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
       stream << stats::system_magnetization.output_normalized_magnetization_dot_product(H);
 	}
-	
+
 	// Output Function 13
 	void grain_mat_mvec(std::ostream& stream){
 
 		grains::output_mat_mag(stream);
-		
+
 	}
-	
+
 	// Output Function 14
 	void systorque(std::ostream& stream){
 		stream << stats::total_system_torque[0] << "\t";
 		stream << stats::total_system_torque[1] << "\t";
 		stream << stats::total_system_torque[2] << "\t";
 	}
-	
+
 	// Output Function 15
 	void mean_systorque(std::ostream& stream){
 		stream << stats::total_mean_system_torque[0]/stats::torque_data_counter << "\t";
 		stream << stats::total_mean_system_torque[1]/stats::torque_data_counter << "\t";
 		stream << stats::total_mean_system_torque[2]/stats::torque_data_counter << "\t";
 	}
-	
+
 	// Output Function 16
 	void constraint_phi(std::ostream& stream){
 		stream << sim::constraint_phi << "\t";
 	}
-	
+
 	// Output Function 17
 	void constraint_theta(std::ostream& stream){
 		stream << sim::constraint_theta << "\t";
 	}
-	
+
 	// Output Function 18
 	void material_constraint_phi(std::ostream& stream){
 		for(int mat=0;mat<mp::num_materials;mat++){
 			stream << cmc::cmc_mat[mat].constraint_phi << "\t";
 		}
 	}
-	
+
 	// Output Function 19
 	void material_constraint_theta(std::ostream& stream){
 		for(int mat=0;mat<mp::num_materials;mat++){
@@ -4056,7 +4080,7 @@ namespace vout{
 	void phonon_temperature(std::ostream& stream){
 		stream << sim::TTTp << "\t";
 	}
-	
+
 	// Output Function 23
 	void material_temperature(std::ostream& stream){
 		for(int mat=0;mat<mp::material.size();mat++){
@@ -4087,7 +4111,7 @@ namespace vout{
       std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
       stream << stats::material_magnetization.output_normalized_magnetization_dot_product(H);
 	}
-	
+
    // Output Function 27
    void total_energy(std::ostream& stream){
       stats::output_energy(stream, stats::all, stats::total);
@@ -4211,11 +4235,11 @@ namespace vout{
 		if(vmpi::DetailedMPITiming){
 
 			// Calculate Average times
-			MPI_Reduce (&vmpi::TotalComputeTime,&vmpi::AverageComputeTime,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD); 
+			MPI_Reduce (&vmpi::TotalComputeTime,&vmpi::AverageComputeTime,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 			MPI_Reduce (&vmpi::TotalWaitTime,&vmpi::AverageWaitTime,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 			vmpi::AverageComputeTime/=double(vmpi::num_processors);
 			vmpi::AverageWaitTime/=double(vmpi::num_processors);
-			
+
 			// Calculate Maximum times
 			MPI_Reduce (&vmpi::TotalComputeTime,&vmpi::MaximumComputeTime,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 			MPI_Reduce (&vmpi::TotalWaitTime,&vmpi::MaximumWaitTime,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
@@ -4241,7 +4265,7 @@ namespace vout{
             if(vmpi::my_rank==0) write_output_file_header(zmag, file_output_list);
          }
       }
-		
+
 		// Only output 1/output_rate time steps
       if(sim::time%vout::output_rate==0){
 
@@ -4551,7 +4575,7 @@ namespace vout{
             // otherwise overwrite file
             else zgrain.open("grain",std::ofstream::trunc);
          }
-			
+
 			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
 			switch(vout::grain_output_list[item]){
 				case 0:
@@ -4583,18 +4607,17 @@ namespace vout{
                break;
 			}
 		}
-		
+
 		// Carriage return
 		if(vout::grain_output_list.size()>0) zgrain << std::endl;
 		}
 		}
-		
+
 		vout::config();
 
       // optionally save checkpoint file
       if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();
 
 	} // end of data
-	
-} // end of namespace vout
 
+} // end of namespace vout

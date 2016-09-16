@@ -28,6 +28,15 @@
 //
 //======================================================================
 
+// C++ standard library headers
+#include <string>
+#include <iostream>
+#include <cmath>
+#include <cstdlib>
+#include <vector>
+#include <list>
+
+// Vampire headers
 #include "errors.hpp"
 #include "create.hpp"
 #include "grains.hpp"
@@ -36,12 +45,8 @@
 #include "vio.hpp"
 #include "vmath.hpp"
 
-#include <string>
-#include <iostream>
-#include <cmath>
-#include <cstdlib>
-#include <vector>
-#include <list>
+// Internal create header
+#include "internal.hpp"
 
 namespace cs{
 
@@ -51,7 +56,6 @@ namespace cs{
    int particle(std::vector<cs::catom_t> &);
    int particle_array(std::vector<cs::catom_t> &);
 
-   int alloy(std::vector<cs::catom_t> &);
    int intermixing(std::vector<cs::catom_t> &);
    void dilute(std::vector<cs::catom_t> &);
    void geometry(std::vector<cs::catom_t> &);
@@ -121,7 +125,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		//roughness(catom_array);
 
 		// call alloy function
-		alloy(catom_array);
+		create::internal::alloy(catom_array);
 
 		// call dilution function
 		dilute(catom_array);
@@ -491,35 +495,55 @@ int pop_template_2D(int** template_array_2D,int cs_num_atoms,int** cs_coord_arra
 }
 */
 
-int clear_atoms(std::vector<cs::catom_t> & catom_array){
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::clear_atoms has been called" << std::endl;}
+void clear_atoms(std::vector<cs::catom_t> & catom_array){
 
-	// Get original and new number of atoms
-	const int num_atoms=catom_array.size();
-	int num_included=0;
-	for(int a=0;a<num_atoms;a++){
-		if(catom_array[a].include==true){
-			num_included++;
-		}
-	}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "cs::clear_atoms has been called" << std::endl;}
 
-	// check for unneeded
-	if(num_atoms!=num_included){
-		std::vector<cs::catom_t> tmp_catom_array(num_atoms);
-		tmp_catom_array=catom_array;
-		catom_array.resize(num_included);
-		int atom=0;
-		for(int a=0;a<num_atoms;a++){
-			if(catom_array[a].include==true){
-				catom_array[atom]=tmp_catom_array[a];
-				atom++;
-			}
-		}
-		tmp_catom_array.resize(0);
-	}
+   // Get original and new number of atoms
+   const int num_atoms=catom_array.size();
+   int num_included=0;
+   for(int a=0;a<num_atoms;a++){
+      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == false){
+         num_included++;
+      }
+   }
 
-	return EXIT_SUCCESS;
+   // check if there are unneeded atoms
+   if(num_atoms!=num_included){
+      // create temporary copy for atoms
+      std::vector<cs::catom_t> tmp_catom_array(num_atoms);
+      tmp_catom_array=catom_array;
+      // resize original array to new number of atoms
+      catom_array.resize(num_included);
+      int atom=0;
+      // loop over all existing atoms
+      for(int a=0;a<num_atoms;a++){
+         // if atom is to be included and is non-magnetic copy to new array
+         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic == false ){
+            catom_array[atom]=tmp_catom_array[a];
+            atom++;
+         }
+         // if atom is part of a non-magnetic material then save to nm array
+         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == true){
+            cs::nm_atom_t tmp;
+         	tmp.x = catom_array[a].x;
+         	tmp.y = catom_array[a].y;
+         	tmp.z = catom_array[a].z;
+         	tmp.mat = catom_array[a].material;
+         	tmp.element = mp::material[catom_array[a].material].element;
+         	// save atom to non-magnet array
+         	cs::non_magnetic_atoms_array.push_back(tmp);
+         }
+      }
+      tmp_catom_array.resize(0);
+
+      zlog << zTs() << "Removed " << cs::non_magnetic_atoms_array.size() << " non-magnetic atoms from system" << std::endl;
+
+   }
+
+   return;
+
 }
 
 // comparison function
@@ -546,46 +570,6 @@ int sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array){
 
 	// copy list to data
 	copy(catom_list.begin(), catom_list.end(), catom_array.begin());
-
-	return EXIT_SUCCESS;
-}
-
-int alloy(std::vector<cs::catom_t> & catom_array){
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::alloy has been called" << std::endl;}
-
-	// loop over all atoms
-	for(unsigned int atom=0;atom<catom_array.size();atom++){
-		// if atom material is alloy master then reassign according to % chance
-		int local_material=catom_array[atom].material;
-		if(mp::material[local_material].alloy_master==true){
-		  // now check for unordered alloy
-			if(mp::material[local_material].alloy_class==-1){
-				//loop over all potential alloy materials
-				for(int mat=0;mat<mp::num_materials;mat++){
-					double probability = mp::material[local_material].alloy[mat];
-					if(mtrandom::grnd() < probability){
-						catom_array[atom].material=mat;
-					}
-				}
-			}
-			// if not ordered, then assume ordered
-			else{
-				// loop over all alloy materials
-				for(int mat=0;mat<mp::num_materials;mat++){
-					// get class of alloy material
-					int alloy_class = mp::material[mat].alloy_class;
-					// check for matching class and uc
-					// ----- DOES NOT WORK for > 1 alloy!!
-					// need to check for correct alloy master material ------------
-					if(catom_array[atom].uc_category==alloy_class){
-						// set material
-						catom_array[atom].material=mat;
-					}
-				}
-			}
-		}
-	}
 
 	return EXIT_SUCCESS;
 }

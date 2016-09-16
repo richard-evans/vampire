@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -27,10 +27,10 @@
 //       				                    	Fields
 //
 //  			 		Subroutines to calculate fields for the hamiltonian
-//	 
+//
 //									Version 1.0 R Evans 20/10/2008
 //
-//==================================================================================================== 
+//====================================================================================================
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -40,6 +40,9 @@
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
+
+// sim module header
+#include "internal.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -64,6 +67,7 @@ void calculate_hamr_fields(const int,const int);
 void calculate_fmr_fields(const int,const int);
 void calculate_surface_anisotropy_fields(const int,const int);
 void calculate_lagrange_fields(const int,const int);
+void calculate_full_spin_fields(const int start_index,const int end_index);
 
 int calculate_spin_fields(const int start_index,const int end_index){
 	///======================================================
@@ -74,7 +78,7 @@ int calculate_spin_fields(const int start_index,const int end_index){
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "calculate_spin_fields has been called" << std::endl;}
-	
+
 	// Initialise Total Spin Fields to zero
 	fill (atoms::x_total_spin_field_array.begin()+start_index,atoms::x_total_spin_field_array.begin()+end_index,0.0);
 	fill (atoms::y_total_spin_field_array.begin()+start_index,atoms::y_total_spin_field_array.begin()+end_index,0.0);
@@ -97,6 +101,8 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	//if(sim::hamiltonian_simulation_flags[4]==1) calculate_??_fields();
 	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
 
+	calculate_full_spin_fields(start_index,end_index);
+
 	return 0;
 }
 
@@ -117,7 +123,7 @@ int calculate_external_fields(const int start_index,const int end_index){
 	fill (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index,0.0);
 	fill (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index,0.0);
 	fill (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index,0.0);
-	
+
 	if(sim::program==7) calculate_hamr_fields(start_index,end_index);
    else if(sim::program==13){
 
@@ -130,7 +136,7 @@ int calculate_external_fields(const int start_index,const int end_index){
 
    }
 	else{
-	
+
 		// Thermal Fields
 		if(sim::hamiltonian_simulation_flags[3]==1) calculate_thermal_fields(start_index,end_index);
 
@@ -192,7 +198,7 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 					const double Jij[3]={atoms::v_exchange_list[iid].Jij[0],
 												atoms::v_exchange_list[iid].Jij[1],
 												atoms::v_exchange_list[iid].Jij[2]};
-					
+
 					Hx -= Jij[0]*atoms::x_spin_array[natom];
 					Hy -= Jij[1]*atoms::y_spin_array[natom];
 					Hz -= Jij[2]*atoms::z_spin_array[natom];
@@ -223,9 +229,9 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 													atoms::t_exchange_list[iid].Jij[2][0],
 													atoms::t_exchange_list[iid].Jij[2][1],
 													atoms::t_exchange_list[iid].Jij[2][2]};
-					
+
 					const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
-					
+
 					Hx -= (Jij[0][0]*S[0] + Jij[0][1]*S[1] +Jij[0][2]*S[2]);
 					Hy -= (Jij[1][0]*S[0] + Jij[1][1]*S[1] +Jij[1][2]*S[2]);
 					Hz -= (Jij[2][0]*S[0] + Jij[2][1]*S[1] +Jij[2][2]*S[2]);
@@ -273,7 +279,7 @@ int calculate_anisotropy_fields(const int start_index,const int end_index){
 												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
 												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
 												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]};
-					
+
 				const double S[3]={atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
 
 				atoms::x_total_spin_field_array[atom] -= (K[0][0]*S[0] + K[0][1]*S[1] +K[0][2]*S[2]);
@@ -524,7 +530,7 @@ int calculate_cubic_anisotropy_fields(const int start_index,const int end_index)
 	///		Hx = +2 Kc*(Sx^3)
 	///		Hy = +2 Kc*(Sy^3)
 	///		Hz = +2 Kc*(Sz^3)
-	///	
+	///
 	///------------------------------------------------------
 	//std::cout << "here" << std::endl;
 	for(int atom=start_index;atom<end_index;atom++){
@@ -533,13 +539,13 @@ int calculate_cubic_anisotropy_fields(const int start_index,const int end_index)
 
 		const double Sx=atoms::x_spin_array[atom];
 		atoms::x_total_spin_field_array[atom] -= Kc*Sx*Sx*Sx;
-		
+
 		const double Sy=atoms::y_spin_array[atom];
 		atoms::y_total_spin_field_array[atom] -= Kc*Sy*Sy*Sy;
 
 		const double Sz=atoms::z_spin_array[atom];
 		atoms::z_total_spin_field_array[atom] -= Kc*Sz*Sz*Sz;
-		
+
 	}
 	return EXIT_SUCCESS;
 }
@@ -560,7 +566,7 @@ void calculate_surface_anisotropy_fields(const int start_index,const int end_ind
 			const int imaterial=atoms::type_array[atom];
 			const double Ks=0.5*2.0*mp::material[imaterial].Ks; // note factor two here from differentiation
 			const double S[3]={atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
-		
+
 			for(int nn=atoms::nearest_neighbour_list_si[atom];nn<atoms::nearest_neighbour_list_ei[atom];nn++){
 				const double si_dot_eij=(S[0]*atoms::eijx[nn]+S[1]*atoms::eijy[nn]+S[2]*atoms::eijz[nn]);
 				atoms::x_total_spin_field_array[atom]-=Ks*si_dot_eij*atoms::eijx[nn];
@@ -569,7 +575,7 @@ void calculate_surface_anisotropy_fields(const int start_index,const int end_ind
 			}
 		}
 	}
-	
+
 	return;
 }
 
@@ -597,7 +603,7 @@ int calculate_applied_fields(const int start_index,const int end_index){
 	// Check for local applied field
 	if(sim::local_applied_field==true){
 		Hlocal.reserve(3*mp::material.size());
-		
+
 		// Loop over all materials
 		for(int mat=0;mat<mp::material.size();mat++){
 			Hlocal.push_back(mp::material[mat].applied_field_strength*mp::material[mat].applied_field_unit_vector[0]);
@@ -627,16 +633,16 @@ int calculate_applied_fields(const int start_index,const int end_index){
 	if(sim::ext_demag==true){
 
       const std::vector<double> m_l = stats::system_magnetization.get_magnetization();
-		
+
 		// calculate global demag field -mu_0 M D, M = m/V
 		const double mu_0= -4.0*M_PI*1.0e-7/(cs::system_dimensions[0]*cs::system_dimensions[1]*cs::system_dimensions[2]*1.0e-30);
       const double HD[3]={	mu_0*sim::demag_factor[0]*m_l[0],
                            mu_0*sim::demag_factor[1]*m_l[1],
                            mu_0*sim::demag_factor[2]*m_l[2]};
-		
+
 		//std::cout << "mu_0" << "\t" << mu_0 << std::endl;
-		//std::cout << "Magnetisation " << stats::total_mag_actual[0] << "\t" << stats::total_mag_actual[1] << "\t" << stats::total_mag_actual[2] << std::endl;  
-		//std::cout << "External Demag Field " << HD[0] << "\t" << HD[1] << "\t" << HD[2] << std::endl;  
+		//std::cout << "Magnetisation " << stats::total_mag_actual[0] << "\t" << stats::total_mag_actual[1] << "\t" << stats::total_mag_actual[2] << std::endl;
+		//std::cout << "External Demag Field " << HD[0] << "\t" << HD[1] << "\t" << HD[2] << std::endl;
 		for(int atom=start_index;atom<end_index;atom++){
 			atoms::x_total_external_field_array[atom] += HD[0];
 			atoms::y_total_external_field_array[atom] += HD[1];
@@ -686,7 +692,7 @@ int calculate_thermal_fields(const int start_index,const int end_index){
 
 		atoms::x_total_external_field_array[atom] *= H_th_sigma;
 		atoms::y_total_external_field_array[atom] *= H_th_sigma;
-		atoms::z_total_external_field_array[atom] *= H_th_sigma; 
+		atoms::z_total_external_field_array[atom] *= H_th_sigma;
 	}
 
 	return EXIT_SUCCESS;
@@ -715,7 +721,7 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
 }
 
 void calculate_hamr_fields(const int start_index,const int end_index){
-	
+
 	if(err::check==true){std::cout << "calculate_hamr_fields has been called" << std::endl;}
 
 	// Declare hamr variables
@@ -747,7 +753,7 @@ void calculate_hamr_fields(const int start_index,const int end_index){
 		for(int atom=start_index;atom<end_index;atom++){
 			const int imaterial=atoms::type_array[atom];
 			const double cx = atoms::x_coord_array[atom];
-			const double cy = atoms::y_coord_array[atom];		
+			const double cy = atoms::y_coord_array[atom];
 			const double r2 = (cx-px)*(cx-px)+(cy-py)*(cy-py);
 			const double sqrt_T = sqrt(sim::Tmin+DeltaT*exp(-r2/fwhm2));
 			const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
@@ -759,7 +765,7 @@ void calculate_hamr_fields(const int start_index,const int end_index){
 		// Add localised applied field
 		for(int atom=start_index;atom<end_index;atom++){
 			const double cx = atoms::x_coord_array[atom];
-			const double cy = atoms::y_coord_array[atom];		
+			const double cy = atoms::y_coord_array[atom];
 			double Hx=0.0;
 			double Hy=0.0;
 			double Hz=0.0;
@@ -885,5 +891,55 @@ void calculate_lagrange_fields(const int start_index,const int end_index){
       //std::cin.get();
    }
    return;
+
+}
+
+//------------------------------------------------------------------------------
+// Master function to calculate fields in large loop
+//------------------------------------------------------------------------------
+void calculate_full_spin_fields(const int start_index,const int end_index){
+
+	using namespace sim::internal;
+
+   for(int atom=start_index;atom<end_index;atom++){
+
+		// temporary variables for field components
+		double hx = 0.0;
+		double hy = 0.0;
+		double hz = 0.0;
+
+		// temporary constant for spin components
+		const double sx = atoms::x_spin_array[atom];
+		const double sy = atoms::x_spin_array[atom];
+		const double sz = atoms::x_spin_array[atom];
+
+		// get material parameter
+		const int material=atoms::type_array[atom];
+
+		//----------------------------------------------------------------------------------
+		// Slonczewski spin torque field
+		//----------------------------------------------------------------------------------
+
+		// save polarization to temporary constant
+		const double stpx = slonczewski_spin_polarization_unit_vector[0];
+		const double stpy = slonczewski_spin_polarization_unit_vector[1];
+		const double stpz = slonczewski_spin_polarization_unit_vector[2];
+
+		const double staj = slonczewski_aj[material];
+		const double stbj = slonczewski_bj[material];
+
+		// calculate field
+		hx += staj*(sy*stpz - sz*stpy) + stbj*stpx;
+		hy += staj*(sz*stpx - sx*stpz) + stbj*stpy;
+		hz += staj*(sx*stpy - sy*stpx) + stbj*stpz;
+
+		// save field to spin field array
+		atoms::x_total_spin_field_array[atom]+=hx;
+		atoms::y_total_spin_field_array[atom]+=hy;
+		atoms::z_total_spin_field_array[atom]+=hz;
+
+	}
+
+	return;
 
 }

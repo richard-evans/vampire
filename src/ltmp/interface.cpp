@@ -164,12 +164,8 @@ namespace ltmp{
          return true;
       }
       //--------------------------------------------------------------------
-      else{
-         terminaltextcolor(RED);
-         std::cerr << "Error - Unknown control statement \'"<< prefix << ":" << word << "\' on line " << line << " of input file" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
-      }
+      // keyword not found
+      //--------------------------------------------------------------------
       return false;
    }
 } // end of namespace ltmp
