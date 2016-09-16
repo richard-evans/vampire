@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -29,7 +29,7 @@
 /// @details The Monte Carlo integrator...
 ///
 /// @section notes Implementation Notes
-/// This is a list of other notes, not related to functionality but rather to implementation. 
+/// This is a list of other notes, not related to functionality but rather to implementation.
 /// Also include references, formulae and other notes here.
 ///
 /// @section License
@@ -59,13 +59,13 @@
 #include "sim.hpp"
 
 namespace sim{
-	
+
 /// @brief Monte Carlo Integrator
 ///
 /// @callgraph
 /// @callergraph
 ///
-/// @details Integrates the system using a Monte Carlo solver with tuned step width 
+/// @details Integrates the system using a Monte Carlo solver with tuned step width
 ///
 /// @section License
 /// Use of this code, either in source or compiled form, is subject to license from the authors.
@@ -77,14 +77,14 @@ namespace sim{
 /// @date    05/02/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		05/02/2011
 ///	Revision:	  ---
 ///=====================================================================================
 ///
 int MonteCarlo(){
-	
+
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::MonteCarlo has been called" << std::endl;
 
@@ -101,7 +101,7 @@ int MonteCarlo(){
 	double Enew=0.0;
 	double DE=0.0;
 	const int AtomExchangeType=atoms::exchange_type;
-	
+
    // Material dependent temperature rescaling
    std::vector<double> rescaled_material_kBTBohr(mp::num_materials);
    std::vector<double> sigma_array(mp::num_materials); // range for tuned gaussian random move
@@ -118,13 +118,13 @@ int MonteCarlo(){
 
 	// loop over natoms to form a single Monte Carlo step
 	for(int i=0;i<nmoves; i++){
-		
+
       // add one to number of moves counter
       statistics_moves+=1.0;
 
 		// pick atom
 		atom = int(nmoves*mtrandom::grnd());
-		
+
 		// get material id
 		const int imaterial=atoms::type_array[atom];
 
@@ -141,7 +141,7 @@ int MonteCarlo(){
 
 		// Calculate current energy
 		Eold = sim::calculate_spin_energy(atom, AtomExchangeType);
-		
+
 		// Copy new spin position
 		atoms::x_spin_array[atom] = Snew[0];
 		atoms::y_spin_array[atom] = Snew[1];
@@ -149,10 +149,10 @@ int MonteCarlo(){
 
 		// Calculate new energy
 		Enew = sim::calculate_spin_energy(atom, AtomExchangeType);
-		
+
 		// Calculate difference in Joules/mu_B
 		DE = (Enew-Eold)*mp::material[imaterial].mu_s_SI*1.07828231e23; //1/9.27400915e-24
-		
+
 		// Check for lower energy state and accept unconditionally
 		if(DE<0) continue;
 		// Otherwise evaluate probability for move
@@ -169,7 +169,7 @@ int MonteCarlo(){
 			}
 		}
 	}
-	
+
    // Save statistics to sim namespace variable
    sim::mc_statistics_moves += statistics_moves;
    sim::mc_statistics_reject += statistics_reject;
@@ -178,4 +178,3 @@ int MonteCarlo(){
 }
 
 } // End of namespace sim
-

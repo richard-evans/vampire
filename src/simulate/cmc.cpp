@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -89,10 +89,10 @@ namespace cmc{
 /// @return			void
 ///
 void polar_rot_matrix(
-	double phi, 
-	double theta, 
-	std::vector< std::vector<double> > & polar_matrix, 
-	std::vector< std::vector<double> > & polar_matrix_tp, 
+	double phi,
+	double theta,
+	std::vector< std::vector<double> > & polar_matrix,
+	std::vector< std::vector<double> > & polar_matrix_tp,
 	std::vector< std::vector<double> > & polar_vector)
 {
 	double dx,dy,dz; //change in angle in radians
@@ -104,7 +104,7 @@ void polar_rot_matrix(
 	double pi=3.14159265358979323846264338327;
 
 	//--------------------------------------------------
-	// Initialise varibales 
+	// Initialise varibales
 	//--------------------------------------------------
 
 	ddx = 0.0;
@@ -133,7 +133,7 @@ void polar_rot_matrix(
 	z_rotation_matrix=vmath::set_matrix(3,3);
 	ref_vec=vmath::set_matrix(1,3,reference_vector);
 
-	
+
 	x_rotation_matrix[0][0] = 1.0;
 	x_rotation_matrix[1][0] = 0.0;
 	x_rotation_matrix[2][0] = 0.0;
@@ -269,7 +269,7 @@ void CMCinit(){
 	else{
 
 		// Output message showing constraint direction re-initialisation
-		zlog << zTs() << "Initialising spins by rotation from last constraint direction to new constraint direction (phi, theta) " 
+		zlog << zTs() << "Initialising spins by rotation from last constraint direction to new constraint direction (phi, theta) "
 		<<  sim::constraint_phi << " , " << sim::constraint_theta << std::endl;
 
 		// Rotate spins from old to new constraint direction
@@ -320,13 +320,13 @@ void CMCinit(){
 /// @return     void
 ///
 int ConstrainedMonteCarlo(){
-	
+
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::ConstrainedMonteCarlo has been called" << std::endl;
 
 	// check for cmc initialisation
 	if(cmc::is_initialised==false) CMCinit();
-	
+
 	int atom_number1;
 	int atom_number2;
 	int imat1;
@@ -370,9 +370,9 @@ int ConstrainedMonteCarlo(){
 	double ppolar_vector[3];
 	double ppolar_matrix[3][3];
 	double ppolar_matrix_tp[3][3];
-	
+
 	const int AtomExchangeType=atoms::exchange_type;
-	
+
 	for (int i=0;i<3;i++){
 		ppolar_vector[i]=cmc::polar_vector[0][i];
 		for (int j=0;j<3;j++){
@@ -394,17 +394,17 @@ int ConstrainedMonteCarlo(){
 		M_other[2] = M_other[2] + atoms::z_spin_array[atom];
 	}
 
-	for (int mcs=0;mcs<atoms::num_atoms;mcs++){ 
+	for (int mcs=0;mcs<atoms::num_atoms;mcs++){
 		// Randomly select spin number 1
 		atom_number1 = int(mtrandom::grnd()*atoms::num_atoms);
 		imat1=atoms::type_array[atom_number1];
       sim::mc_delta_angle=sigma_array[imat1];
-		
+
 		// Save initial Spin 1
 		spin1_initial[0] = atoms::x_spin_array[atom_number1];
 		spin1_initial[1] = atoms::y_spin_array[atom_number1];
 		spin1_initial[2] = atoms::z_spin_array[atom_number1];
-		
+
 		//spin1_init_mvd = matmul(polar_matrix, spin1_initial)
 		spin1_init_mvd[0]=ppolar_matrix[0][0]*spin1_initial[0]+ppolar_matrix[0][1]*spin1_initial[1]+ppolar_matrix[0][2]*spin1_initial[2];
 		spin1_init_mvd[1]=ppolar_matrix[1][0]*spin1_initial[0]+ppolar_matrix[1][1]*spin1_initial[1]+ppolar_matrix[1][2]*spin1_initial[2];
@@ -423,7 +423,7 @@ int ConstrainedMonteCarlo(){
 
 		// Calculate current energy
 		Eold = sim::calculate_spin_energy(atom_number1, AtomExchangeType);
-			
+
 		// Copy new spin position (provisionally accept move)
 		atoms::x_spin_array[atom_number1] = spin1_final[0];
 		atoms::y_spin_array[atom_number1] = spin1_final[1];
@@ -431,7 +431,7 @@ int ConstrainedMonteCarlo(){
 
 		// Calculate new energy
 		Enew = sim::calculate_spin_energy(atom_number1, AtomExchangeType);
-			
+
 		// Calculate difference in Joules/mu_B
 		delta_energy1 = (Enew-Eold)*mp::material[imat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 
@@ -444,7 +444,7 @@ int ConstrainedMonteCarlo(){
 		spin2_initial[0] = atoms::x_spin_array[atom_number2];
 		spin2_initial[1] = atoms::y_spin_array[atom_number2];
 		spin2_initial[2] = atoms::z_spin_array[atom_number2];
-		
+
 		//spin2_init_mvd = matmul(polar_matrix, spin2_initial)
 		spin2_init_mvd[0]=ppolar_matrix[0][0]*spin2_initial[0]+ppolar_matrix[0][1]*spin2_initial[1]+ppolar_matrix[0][2]*spin2_initial[2];
 		spin2_init_mvd[1]=ppolar_matrix[1][0]*spin2_initial[0]+ppolar_matrix[1][1]*spin2_initial[1]+ppolar_matrix[1][2]*spin2_initial[2];
@@ -454,7 +454,7 @@ int ConstrainedMonteCarlo(){
 		spin2_fin_mvd[0] = spin1_init_mvd[0]+spin2_init_mvd[0]-spin1_fin_mvd[0];
 		spin2_fin_mvd[1] = spin1_init_mvd[1]+spin2_init_mvd[1]-spin1_fin_mvd[1];
 
-		if(((spin2_fin_mvd[0]*spin2_fin_mvd[0]+spin2_fin_mvd[1]*spin2_fin_mvd[1])<1.0) && (atom_number1 != atom_number2)){ 
+		if(((spin2_fin_mvd[0]*spin2_fin_mvd[0]+spin2_fin_mvd[1]*spin2_fin_mvd[1])<1.0) && (atom_number1 != atom_number2)){
 
 			spin2_fin_mvd[2] = vmath::sign(spin2_init_mvd[2])*sqrt(1.0-spin2_fin_mvd[0]*spin2_fin_mvd[0] - spin2_fin_mvd[1]*spin2_fin_mvd[1]);
 
@@ -469,7 +469,7 @@ int ConstrainedMonteCarlo(){
 			//Calculate Energy Difference 2
 			// Calculate current energy
 			Eold = sim::calculate_spin_energy(atom_number2, AtomExchangeType);
-			
+
 			// Copy new spin position (provisionally accept move)
 			atoms::x_spin_array[atom_number2] = spin2_final[0];
 			atoms::y_spin_array[atom_number2] = spin2_final[1];
@@ -477,7 +477,7 @@ int ConstrainedMonteCarlo(){
 
 			// Calculate new energy
 			Enew = sim::calculate_spin_energy(atom_number2, AtomExchangeType);
-			
+
 			// Calculate difference in Joules/mu_B
 			delta_energy2 = (Enew-Eold)*mp::material[imat2].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 
@@ -493,7 +493,7 @@ int ConstrainedMonteCarlo(){
 
 			// Check for lower energy state and accept unconditionally
 			//if((delta_energy21<0.0) && (Mz_new>0.0)) continue;
-			
+
 			// Otherwise evaluate probability for move
 			//else{
 				// If move is favorable then accept
@@ -505,7 +505,7 @@ int ConstrainedMonteCarlo(){
 					cmc::mc_success += 1.0;
 				}
 				//if both p1 and p2 not allowed then
-				else{ 
+				else{
 					// reset spin positions
 					atoms::x_spin_array[atom_number1] = spin1_initial[0];
 					atoms::y_spin_array[atom_number1] = spin1_initial[1];
@@ -520,7 +520,7 @@ int ConstrainedMonteCarlo(){
 			//}
 		}
 		// if s2 not on unit sphere
-		else{ 
+		else{
 			atoms::x_spin_array[atom_number1] = spin1_initial[0];
 			atoms::y_spin_array[atom_number1] = spin1_initial[1];
 			atoms::z_spin_array[atom_number1] = spin1_initial[2];
@@ -533,6 +533,3 @@ int ConstrainedMonteCarlo(){
 }
 
 } // End of namespace sim
-
-
-

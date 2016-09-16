@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -53,7 +53,7 @@
 #include "vio.hpp"
 
 namespace program{
-	
+
 /// @brief Function to calculate a static hysteresis loop
 ///
 /// @section License
@@ -66,21 +66,21 @@ namespace program{
 /// @date    10/03/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		28/01/2010
 ///	Revision:	  ---
 ///=====================================================================================
 ///
 int static_hysteresis(){
-	
+
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::static_hysteresis has been called" << std::endl;}
-	
+
 	// Disable temperature as this will prevent convergence
 	sim::temperature = 0.0;
 	sim::hamiltonian_simulation_flags[3] = 0;	// Thermal
-	
+
 	// Equilibrate system in saturation field
 	sim::H_applied=sim::Hmax;
 	sim::integrate(sim::equilibration_time);
@@ -92,32 +92,32 @@ int static_hysteresis(){
 	// Perform Field Loop
 	for(int parity=-1;parity<2;parity+=2){
 		for(int H=-iHmax;H<=iHmax;H+=iHinc){
-			
+
 			// Set applied field (Tesla)
 			sim::H_applied=double(H)*double(parity)*1.0e-6;
-			
+
 			// Reset start time
 			int start_time=sim::time;
-			
+
 			// Simulate system
 			while(sim::time<sim::loop_time+start_time){
-			
+
 				// Integrate system
 				sim::integrate(sim::partial_time);
-				
+
 				double torque=stats::max_torque(); // needs correcting for new integrators
 				if((torque<1.0e-6) && (sim::time-start_time>100)){
 					break;
 				}
 
 			}
-			
+
 			// Calculate mag_m, mag
 			stats::mag_m();
-			
+
 			// Output to screen and file after each field
 			vout::data();
-			
+
 		} // End of field loop
 	} // End of parity loop
 
@@ -126,4 +126,3 @@ int static_hysteresis(){
 
 
 }//end of namespace program
-
