@@ -234,12 +234,6 @@ void config(){
       // check calling of routine if error checking is activated
       if(err::check==true){std::cout << "vout::atoms has been called" << std::endl;}
 
-      #ifdef MPICF
-         const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-      #else
-         const int num_atoms = atoms::num_atoms;
-      #endif
-
       // Set local output filename
       std::stringstream file_sstr;
       file_sstr << "atoms-";
@@ -293,7 +287,7 @@ void config(){
 
       // Everyone now outputs their atom list
       cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
-      for(int i=0; i<vout::local_output_atom_list.size(); i++){
+      for(unsigned int i=0; i<vout::local_output_atom_list.size(); i++){
          const int atom = vout::local_output_atom_list[i];
          cfg_file_ofstr << atoms::x_spin_array[atom] << "\t" << atoms::y_spin_array[atom] << "\t" << atoms::z_spin_array[atom] << std::endl;
       }
@@ -430,7 +424,7 @@ void config(){
 
       // Everyone now outputs their atom list
       cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
-      for(int i=0; i<vout::local_output_atom_list.size(); i++){
+      for(unsigned int i=0; i<vout::local_output_atom_list.size(); i++){
          const int atom = vout::local_output_atom_list[i];
          cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" <<
          atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";

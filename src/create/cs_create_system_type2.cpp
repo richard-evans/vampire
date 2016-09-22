@@ -702,7 +702,7 @@ void roughness(std::vector<cs::catom_t> & catom_array){
 	// Initialise random number generator
 	rgrnd.seed(cs::interfacial_roughness_random_seed);
 
-	for(int p=0; p < seed_density ; p++){
+	for(unsigned int p=0; p < seed_density ; p++){
 		// Generate random point coordinates
 		double x=rgrnd()*cs::system_dimensions[0];
 		double y=rgrnd()*cs::system_dimensions[1];
@@ -740,7 +740,7 @@ void roughness(std::vector<cs::catom_t> & catom_array){
 			const double y = double(iy)*resolution;
 
 			// Loop over all seed points
-			for(int p=0; p < seed_density ; p++){
+			for(unsigned int p=0; p < seed_density ; p++){
 				double rx=x-seed_points.at(p).x;
 				double ry=y-seed_points.at(p).y;
 

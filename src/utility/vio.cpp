@@ -261,6 +261,13 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
       getcwd(directory, sizeof(directory));
    #endif
 
+   //--------------------------------------
+   // Determine strings for column headers
+   //--------------------------------------
+   // temporary code to use a variable that is not yet needed
+   int col = file_output_list[0];
+   file_output_list[0] = col;
+
    //------------------------------------
    // Output output file header
    //------------------------------------
@@ -4083,14 +4090,14 @@ namespace vout{
 
 	// Output Function 23
 	void material_temperature(std::ostream& stream){
-		for(int mat=0;mat<mp::material.size();mat++){
+		for(unsigned int mat=0;mat<mp::material.size();mat++){
 			stream << mp::material[mat].temperature << "\t";
 		}
 	}
 
 	// Output Function 24
 	void material_applied_field_strength(std::ostream& stream){
-		for(int mat=0;mat<mp::material.size();mat++){
+		for(unsigned int mat=0;mat<mp::material.size();mat++){
 			stream << mp::material[mat].applied_field_strength << "\t";
 		}
 	}
@@ -4099,7 +4106,7 @@ namespace vout{
 	void material_fmr_field_strength(std::ostream& stream){
 		const double real_time=sim::time*mp::dt_SI;
 
-		for(int mat=0;mat<mp::material.size();mat++){
+		for(unsigned int mat=0;mat<mp::material.size();mat++){
 			const double Hsinwt_local=mp::material[mat].fmr_field_strength*sin(2.0*M_PI*real_time*mp::material[mat].fmr_field_frequency);
 			stream << Hsinwt_local << "\t";
 		}
