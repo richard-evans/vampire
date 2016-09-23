@@ -6,27 +6,27 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
 //
 ///
-/// @file 
+/// @file
 /// @brief Neighbourlist generation routine
 ///
-/// Generate list of neighbours for each atom based on unit cell 
+/// Generate list of neighbours for each atom based on unit cell
 /// interaction template
 ///
 /// @author Richard Evans, richard.evans@york.ac.uk
@@ -51,9 +51,17 @@
 #include "vmpi.hpp"
 
 // Standard Libraries
+#ifdef WIN_COMPILE
+#define NOMINMAX
+#undef max
+#undef min
+#endif
+
 #include <cmath>
 #include <iostream>
 #include <limits>
+
+
 
 namespace cs{
 
@@ -65,16 +73,16 @@ namespace cs{
 /// Partial cells can exist so ensure enough cells are generated
 ///
 ///    4    5    6    7    8
-///    | ...|....|....|.   | 
+///    | ...|....|....|.   |
 ///
 ///  In this example offset=4, and max_cell = 8. Therefore 4 cells are needed.
 ///
 ///
 int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbour_t> > & cneighbourlist){
-	
+
 	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::create_neighbourlist has been called" << std::endl;}	
-	
+	if(err::check==true){std::cout << "cs::create_neighbourlist has been called" << std::endl;}
+
 	// put number of atoms into temporary variable
 	const int num_atoms = catom_array.size();
 
@@ -83,7 +91,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 
 	// estimate number of interactions per atom
 	const int max_nn=int(1.1*(double(unit_cell.interaction.size())/double(unit_cell.atom.size())));
-	
+
 	// Reserve space for each atom in neighbour list according to material type
 	for(int atom=0;atom<num_atoms;atom++){
 		cneighbourlist.push_back(std::vector<neighbour_t>());
@@ -91,7 +99,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	}
 
    // Calculate system dimensions and number of supercells
-   int max_val=std::numeric_limits<int>::max();
+   int max_val=(std::numeric_limits<int>::max());
    int min[3]={max_val,max_val,max_val}; // lowest cell id
    int max[3]={0,0,0}; // highest cell id
 
@@ -110,9 +118,11 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	// calculate offset and cell maximum in whole unit cells
 	const int offset[3] = {min[0], min[1], min[2]};
 	const int max_cell[3] = {max[0],max[1],max[2]};
-	
+
 	// calculate number of cells needed = max-min+1 ( if max_cell = 25, then 0-25 = 26
-	const unsigned int d[3]={max_cell[0]-offset[0]+1,max_cell[1]-offset[1]+1,max_cell[2]-offset[2]+1};
+	const unsigned int d[3]={static_cast<unsigned int>(max_cell[0]-offset[0]+1),
+                            static_cast<unsigned int>(max_cell[1]-offset[1]+1),
+                            static_cast<unsigned int>(max_cell[2]-offset[2]+1)};
 
 	// Declare array for create space for 3D supercell array
 	std::vector<std::vector<std::vector<std::vector<int> > > > supercell_array;
@@ -156,20 +166,23 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
    zlog << zTs() << "Populating supercell array for neighbourlist calculation..."<< std::endl;
 	// Populate supercell array with atom numbers
 	for(int atom=0;atom<num_atoms;atom++){
-		unsigned int scc[3]={catom_array[atom].scx-offset[0],catom_array[atom].scy-offset[1],catom_array[atom].scz-offset[2]};
-		
+		unsigned int scc[3]={static_cast<unsigned int>(catom_array[atom].scx-offset[0]),
+                           static_cast<unsigned int>(catom_array[atom].scy-offset[1]),
+                           static_cast<unsigned int>(catom_array[atom].scz-offset[2])};
+
 		double c[3]={catom_array[atom].x,catom_array[atom].y,catom_array[atom].z};
 		//std::cout << atom << "\t" << c[0] << "\t" << c[1] <<"\t" << c[2] << std::endl;
 		for(int i=0;i<3;i++){
 			//scc[i]=int(c[i]/cs::unit_cell_size[i])-offset[i]; // Always round down for supercell coordinates
 			// Always check cell in range
-			if(scc[i]<0 || scc[i]>= d[i]){
+         if(scc[i]>= d[i]){
+			//if(scc[i]<0 || scc[i]>= d[i]){ // Chexk for scc < 0 not required since d and scc are unsigned
 				//std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
 				#ifdef MPICF
 				terminaltextcolor(RED);
 				std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
 				terminaltextcolor(WHITE);
-				#endif 
+				#endif
 				terminaltextcolor(RED);
 				std::cerr << "\tAtom number:      " << atom << std::endl;
 				std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
@@ -277,7 +290,9 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
          }
          #endif
          // check for out-of-bounds access
-         if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
+         if((nx>=0 && static_cast<unsigned int>(nx)<d[0]) &&
+            (ny>=0 && static_cast<unsigned int>(ny)<d[1]) &&
+            (nz>=0 && static_cast<unsigned int>(nz)<d[2])){
             // check for missing atoms
             if((supercell_array[scc[0]][scc[1]][scc[2]][atom]!=-1) && (supercell_array[nx][ny][nz][natom]!=-1)){
 
@@ -285,7 +300,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
                int atomi = supercell_array[scc[0]][scc[1]][scc[2]][atom];
                int atomj = supercell_array[nx][ny][nz][natom];
 
-               //std::cout << "int_id: " << i << "\tatom i: " << atomi << "\tatom j: " << atomj << "\tuc_i: " << atom << "\tuc_j: " << natom << std::endl;  
+               //std::cout << "int_id: " << i << "\tatom i: " << atomi << "\tatom j: " << atomj << "\tuc_i: " << atom << "\tuc_j: " << natom << std::endl;
 
                double ix=catom_array[atomi].x; // Already in A
                double iy=catom_array[atomi].y;
@@ -324,9 +339,11 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 			}
 		}
 	}
-	terminaltextcolor(GREEN);
-	std::cout << "done!" << std::endl;
-	terminaltextcolor(WHITE);
+	if(vmpi::my_rank == 0){
+		terminaltextcolor(GREEN);
+		std::cout << "done!" << std::endl;
+		terminaltextcolor(WHITE);
+	}
    zlog << zTs() << "\tDone"<< std::endl;
 
 	// Deallocate supercell array
@@ -352,7 +369,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	//	}
 	//	std::cout << std::endl;
 	//}
-		
+
 	// Mark surface atoms
 	//for(int atom=0;atom<num_atoms;atom++){
 	//	if(int(cneighbourlist[atom].size())!=mp::material[catom_array[atom].material].hamiltonian_num_neighbours){

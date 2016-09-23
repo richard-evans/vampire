@@ -16,7 +16,7 @@
 namespace cs{
 
    //--------------------------------------------------------------------------
-   // Function to create a multilayer system replicating a standard stack 
+   // Function to create a multilayer system replicating a standard stack
    // structure cs::num_multilayers times
    //
    //   |-----------------------|  1.0          |-----------------------| L2 M2
@@ -24,7 +24,7 @@ namespace cs{
    //   |-----------------------|  0.6   x2     |                       | L2 M2
    //   |                       |        -->    |-----------------------| L1 M1
    //   |      Material 1       |               |-----------------------|
-   //   |                       |               |                       | L1 M2 
+   //   |                       |               |                       | L1 M2
    //   |-----------------------|  0.0          |-----------------------|
    //
    // The multilayers code divides the total system height into n multiples

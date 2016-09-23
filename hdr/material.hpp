@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -26,10 +26,12 @@
 #include <string>
 #include <vector>
 
+#ifndef MATERIAL_H_
+#define MATERIAL_H_
 class zkval_t{
 	public:
 	double K;
-	
+
 	// constructor
 	zkval_t():
 		K(0.0)
@@ -40,7 +42,7 @@ class zkval_t{
 class zkten_t{
 	public:
 	double K[3][3];
-	
+
 	// constructor
 	zkten_t()
 	{
@@ -102,7 +104,7 @@ using std::string;
 		// input parameters
 		string name;
 		string element;
-		
+
 		double alpha;
 		double mu_s_SI;
 		double magnetisation;
@@ -114,6 +116,9 @@ using std::string;
 		double Ku; /// normalised uniaxial anisotropy constant
       double Ku2; /// normalised uniaxial anisotropy constant
       double Ku3; /// normalised uniaxial anisotropy constant
+      double sh2; // second order spherical harmonic anisotropy constant
+      double sh4; // fourth order spherical harmonic anisotropy constant
+      double sh6; // sixth order spherical harmonic anisotropy constant
       double Klatt; /// normalised lattice anisotropy
       std::vector<double> KuVec; /// normalised anisotropy tensor
 		std::vector<double> UniaxialAnisotropyUnitVector; /// unit vector for material uniaxial anisotropy
@@ -122,13 +127,13 @@ using std::string;
 		double Kc;
 		double Ks_SI;
 		double Ks;
-		
+
 		double gamma_rel;
 		double Jij_matrix_SI[max_materials];
 
 		double initial_spin[3];
 		bool random_spins;
-		
+
 		double min;
 		double max;
 		int geometry; ///< 0 (geometry disabled, 1+ geometry enabled with 1+ points
@@ -142,11 +147,11 @@ using std::string;
 		bool alloy_master;
 		int alloy_class;
 		double alloy[max_materials];
-				
+
 		bool continuous;	///< Specifies if a material is continuous (overrides granularity in the layer)
 		bool moment_flag;	///< Specifies whether moment is set explicitly or from magnetisation
 		bool anis_flag;	///< Specifies whether anisotropy is set explicitly or as energy density
-		
+
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
 		double Jij_matrix[max_materials];
@@ -163,8 +168,11 @@ using std::string;
 		bool fill; /// flag to determine of material fills voided space
       double temperature_rescaling_alpha; // temperature rescaling exponent
       double temperature_rescaling_Tc; // temperaure rescaling Tc
-     lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
-		
+      bool non_magnetic;
+		bool random_anisotropy; // flag to control random anisotropy by material
+		bool random_grain_anisotropy; // flag to control random anisotropy by grain
+      lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
+
 		materials_t();
 		int print();
 	};
@@ -184,18 +192,21 @@ using std::string;
 	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
    extern std::vector <double> material_second_order_anisotropy_constant_array;
    extern std::vector <double> material_sixth_order_anisotropy_constant_array;
+   extern std::vector <double> material_spherical_harmonic_constants_array;
 	extern std::vector <double> MaterialCubicAnisotropyArray;
 
-	
+
 	// Functions
 	extern int initialise(std::string);
 	extern int print_mat();
-	extern int default_system();	
+	extern int default_system();
 	extern int single_spin_system();
 	extern int set_derived_parameters();
-	
+
 
 }
 
 /// Alias deprecated material_parameters to mp namespace
 namespace material_parameters=mp;
+
+#endif // MATERIAL_H_

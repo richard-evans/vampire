@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -53,25 +53,26 @@ namespace mp{
 	std::vector <materials_t> material(1);
 
 
-	
+
 	//----------------------------------
 	//Input Integration parameters
 	//----------------------------------
 	double dt_SI;
 	double gamma_SI = 1.76E11;
-	
+
 	//----------------------------------
 	//Derived Integration parameters
 	//----------------------------------
 	double dt;
 	double half_dt;
-	
+
 	// Unrolled material parameters for speed
 	std::vector <double> MaterialMuSSIArray(0);
 	std::vector <zkval_t> MaterialScalarAnisotropyArray(0);
 	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
    std::vector <double> material_second_order_anisotropy_constant_array(0);
    std::vector <double> material_sixth_order_anisotropy_constant_array(0);
+   std::vector <double> material_spherical_harmonic_constants_array(0);
 	std::vector <double> MaterialCubicAnisotropyArray(0);
 
 ///
@@ -104,10 +105,10 @@ int initialise(std::string const infile){
 		std::cout << "================================================================================" << std::endl;
 		std::cout << "Initialising system variables" << std::endl;
 	}
-	
+
 	// Setup default system settings
 	mp::default_system();
-	
+
 	// Read values from input files
 	int iostat = vin::read(infile);
 	if(iostat==EXIT_FAILURE){
@@ -116,7 +117,7 @@ int initialise(std::string const infile){
 		terminaltextcolor(WHITE);
 		err::vexit();
 	}
-	
+
 	// Print out material properties
 	//mp::material[0].print();
 
@@ -124,10 +125,10 @@ int initialise(std::string const infile){
 	if(cs::single_spin==true){
 		mp::single_spin_system();
 	}
-	
+
 	// Set derived system parameters
 	mp::set_derived_parameters();
-	
+
 	// Return
 	return EXIT_SUCCESS;
 }
@@ -137,9 +138,9 @@ int default_system(){
 	// Initialise system creation flags to zero
 	for (int i=0;i<10;i++){
 		cs::system_creation_flags[i] = 0;
-		sim::hamiltonian_simulation_flags[i] = 0; 
+		sim::hamiltonian_simulation_flags[i] = 0;
 	}
-	
+
 	// Set system dimensions !Angstroms
 	cs::unit_cell_size[0] = 3.0;
 	cs::unit_cell_size[1] = 3.0;
@@ -151,26 +152,26 @@ int default_system(){
 
 	cs::particle_scale   = 50.0;
 	cs::particle_spacing = 10.0;
-	
+
 	cs::particle_creation_parity=0;
 	cs::crystal_structure = "sc";
 
 	// Voronoi Variables
 	create_voronoi::voronoi_sd=0.1;
 	create_voronoi::parity=0;
-	
+
 	// Setup Hamiltonian Flags
 	sim::hamiltonian_simulation_flags[0] = 1;	/// Exchange
 	sim::hamiltonian_simulation_flags[1] = 1;	/// Anisotropy
 	sim::hamiltonian_simulation_flags[2] = 1;	/// Applied
 	sim::hamiltonian_simulation_flags[3] = 1;	/// Thermal
 	sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
-	
+
 	//Integration parameters
 	dt_SI = 1.0e-15;	// seconds
 	dt = dt_SI*mp::gamma_SI; // Must be set before Hth
 	half_dt = 0.5*dt;
-	
+
 	//------------------------------------------------------------------------------
 	// Material Definitions
 	//------------------------------------------------------------------------------
@@ -190,7 +191,7 @@ int default_system(){
 
 	// Disable Error Checking
 	err::check=false;
-	
+
 	// Initialise random number generator
 	mtrandom::grnd.seed(2106975519);
 
@@ -203,7 +204,7 @@ int single_spin_system(){
 	for (int i=0;i<10;i++){
 		cs::system_creation_flags[i] = 0;
 	}
-	
+
 	// Set system dimensions !Angstroms
 	cs::unit_cell_size[0] = 3.0;
 	cs::unit_cell_size[1] = 3.0;
@@ -215,10 +216,10 @@ int single_spin_system(){
 
 	cs::particle_scale   = 50.0;
 	cs::particle_spacing = 10.0;
-	
+
 	cs::particle_creation_parity=0;
 	cs::crystal_structure = "sc";
-	
+
 	// Turn off multi-spin Flags
 	sim::hamiltonian_simulation_flags[0] = 0;	/// Exchange
 	sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
@@ -363,7 +364,7 @@ void check_hysteresis_loop_parameters(){
 }
 
 int set_derived_parameters(){
-		
+
 	// Set integration constants
 	mp::dt = mp::dt_SI*mp::gamma_SI; // Must be set before Hth
 	mp::half_dt = 0.5*mp::dt;
@@ -374,27 +375,27 @@ int set_derived_parameters(){
 		sim::H_vec[1]=sin(sim::applied_field_angle_phi*M_PI/180.0)*sin(sim::applied_field_angle_theta*M_PI/180.0);
 		sim::H_vec[2]=cos(sim::applied_field_angle_phi*M_PI/180.0);
 	}
-	
+
 	// Check for valid particle array offsets
 	if(cs::particle_array_offset_x >= cs::system_dimensions[0]){
 		terminaltextcolor(RED);
-		std::cerr << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl; 
-		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		std::cerr << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl;
+		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
 		terminaltextcolor(WHITE);
-		zlog << zTs() << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl; 
-		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		zlog << zTs() << "Warning: requested particle-array-offset-x is greater than system dimensions." << std::endl;
+		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
 	}
 	if(cs::particle_array_offset_y >= cs::system_dimensions[1]){
 		terminaltextcolor(RED);
-		std::cerr << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl; 
-		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		std::cerr << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl;
+		std::cerr << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
 		terminaltextcolor(WHITE);
-		zlog << zTs() << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl; 
-		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl; 
+		zlog << zTs() << "Warning: requested particle-array-offset-y is greater than system dimensions." << std::endl;
+		zlog << zTs() << "Info: This will probably lead to no particles being created and generate an error." << std::endl;
 	}
-	
+
 	check_hysteresis_loop_parameters();
-	
+
 	// Ensure H vector is unit length
 	// **RE edit 21.11.12 - no longer necessary as value checked on user input**
 	//double mod_H=1.0/sqrt(sim::H_vec[0]*sim::H_vec[0]+sim::H_vec[1]*sim::H_vec[1]+sim::H_vec[2]*sim::H_vec[2]);
@@ -420,11 +421,43 @@ int set_derived_parameters(){
 		}
 	}*/
 	const string blank="";
+
+   // Check for symmetry of exchange matrix
+   for(int mi = 0; mi < mp::num_materials; mi++){
+
+      for(int mj = 0; mj < mp::num_materials; mj++){
+
+         // Check for non-zero value (avoids divide by zero)
+         if(fabs(material[mi].Jij_matrix_SI[mj]) > 0.0){
+
+            // Calculate ratio of i->j / j-> exchange constants
+            double ratio = material[mj].Jij_matrix_SI[mi]/material[mi].Jij_matrix_SI[mj];
+
+            // Check that ratio ~ 1.0 for symmetric exchange interactions
+            if( (ratio < 0.99999) || (ratio > 1.00001) ){
+
+               // Error found - report to user and terminate program
+               terminaltextcolor(RED);
+                  std::cerr << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << ". Exiting" << std::endl;
+               terminaltextcolor(WHITE);
+
+               zlog << zTs() << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << std::endl;
+               zlog << zTs() << "\tmaterial[" << mi+1 << "]:exchange-matrix[" << mj+1 << "] = " << material[mi].Jij_matrix_SI[mj] << std::endl;
+               zlog << zTs() << "\tmaterial[" << mj+1 << "]:exchange-matrix[" << mi+1 << "] = " << material[mj].Jij_matrix_SI[mi] << std::endl;
+               zlog << zTs() << "\tThe definition of Heisenberg exchange requires that these values are the same. Exiting." << std::endl;
+
+               err::vexit();
+
+            }
+         }
+      }
+   }
+
 	// Set derived material parameters
 	for(int mat=0;mat<mp::num_materials;mat++){
 		mp::material[mat].one_oneplusalpha_sq   = -mp::material[mat].gamma_rel/(1.0+mp::material[mat].alpha*mp::material[mat].alpha);
 		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
-			
+
 		for(int j=0;j<mp::num_materials;j++){
 			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
 		}
@@ -452,12 +485,12 @@ int set_derived_parameters(){
       //mp::material[mat].lattice_anisotropy.output_interpolated_function(mat);
 
 	}
-		// Check for which anisotropy function(s) are to be used		
+		// Check for which anisotropy function(s) are to be used
 		if(sim::TensorAnisotropy==true){
 			sim::UniaxialScalarAnisotropy=false; // turn off scalar anisotropy calculation
 			// loop over materials and convert all scalar anisotropy to tensor (along z)
 			for(int mat=0;mat<mp::num_materials; mat++){
-				
+
 				const double one_o_mu=1.0/mp::material[mat].mu_s_SI;
 
 				// If tensor is unset
@@ -492,7 +525,7 @@ int set_derived_parameters(){
 				}
 			}
 		}
-		
+
 		// Unroll anisotropy values for speed
 		if(sim::UniaxialScalarAnisotropy==true){
 			zlog << zTs() << "Setting scalar uniaxial anisotropy." << std::endl;
@@ -528,10 +561,20 @@ int set_derived_parameters(){
          for(int mat=0;mat<mp::num_materials; mat++) mp::material_second_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku2;
       }
 	  // Unroll sixth order uniaxial anisotropy values for speed
-      if(sim::second_order_uniaxial_anisotropy==true){
+      if(sim::sixth_order_uniaxial_anisotropy==true){
          zlog << zTs() << "Setting scalar sixth order uniaxial anisotropy." << std::endl;
          mp::material_sixth_order_anisotropy_constant_array.resize(mp::num_materials);
          for(int mat=0;mat<mp::num_materials; mat++) mp::material_sixth_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku3;
+      }
+      // Unroll spherical harmonic anisotropy constants for speed
+      if(sim::spherical_harmonics==true){
+         zlog << zTs() << "Setting spherical harmonics for uniaxial anisotropy" << std::endl;
+         mp::material_spherical_harmonic_constants_array.resize(3*mp::num_materials);
+         for(int mat=0; mat<mp::num_materials; mat++){
+            mp::material_spherical_harmonic_constants_array.at(3*mat+0)=mp::material[mat].sh2/mp::material[mat].mu_s_SI;
+            mp::material_spherical_harmonic_constants_array.at(3*mat+1)=mp::material[mat].sh4/mp::material[mat].mu_s_SI;
+            mp::material_spherical_harmonic_constants_array.at(3*mat+2)=mp::material[mat].sh6/mp::material[mat].mu_s_SI;
+         }
       }
       // Unroll cubic anisotropy values for speed
 		if(sim::CubicScalarAnisotropy==true){
@@ -563,7 +606,7 @@ int set_derived_parameters(){
 				}
 			}
 		}
-	
+
 	return EXIT_SUCCESS;
 }
 

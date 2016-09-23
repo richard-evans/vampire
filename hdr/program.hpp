@@ -46,11 +46,13 @@ namespace program
    extern void lagrange_multiplier();
    extern void localised_temperature_pulse();
    extern void effective_damping();
+   extern void fmr();
 
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();
 	extern int timestep_scaling();
 	extern void boltzmann_dist();
+        extern void setting_process();
 	
 }
 
