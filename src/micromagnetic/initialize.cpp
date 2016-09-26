@@ -23,8 +23,32 @@ namespace micromagnetic{
    //----------------------------------------------------------------------------
    // Function to initialize micromagnetic module
    //----------------------------------------------------------------------------
-   void initialize(){
+   void initialize(
+      //atom cell list
+      //atom exchange lists
+      //neighbours
+      //atomic moments
+      //
+   ){
+
+      //Array of J
+      //Array of Ms
+      //Array of Chi l
+      //Array of Chi x y z
+      //
+
       //load cell data.
+      // create data structures?
+      //1D arrays?
+
+      //calculate the exchange constant accross boundaries?
+      //2D array of each cell with each other cell.
+      //sum over atoms and each atoms neighbours
+      //sum Jij with each atom if atom 1 in 1 cell and atom 2 in the other.
+      //gives each cell an A for its interaction with each cell.
+
+
+
       return;
 
    }
