@@ -561,7 +561,7 @@ int set_derived_parameters(){
          for(int mat=0;mat<mp::num_materials; mat++) mp::material_second_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku2;
       }
 	  // Unroll sixth order uniaxial anisotropy values for speed
-      if(sim::second_order_uniaxial_anisotropy==true){
+      if(sim::sixth_order_uniaxial_anisotropy==true){
          zlog << zTs() << "Setting scalar sixth order uniaxial anisotropy." << std::endl;
          mp::material_sixth_order_anisotropy_constant_array.resize(mp::num_materials);
          for(int mat=0;mat<mp::num_materials; mat++) mp::material_sixth_order_anisotropy_constant_array.at(mat)=mp::material[mat].Ku3;
