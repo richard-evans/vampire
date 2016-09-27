@@ -15,8 +15,8 @@ GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-#MPICC=mpicxx -DMPICF
-MPICC=CC -DMPICF
+MPICC=mpicxx -DMPICF
+#MPICC=CC -DMPICF
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
