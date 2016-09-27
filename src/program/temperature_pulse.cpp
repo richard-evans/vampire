@@ -132,7 +132,7 @@ double two_temperature_function(double ftime){
 
    // Optionally set material specific temperatures
    if(sim::local_temperature==true){
-      for(int mat=0;mat<mp::material.size();mat++){
+      for(unsigned int mat=0;mat<mp::material.size();mat++){
          if(mp::material[mat].couple_to_phonon_temperature==true) mp::material[mat].temperature=sim::TTTp;
          else mp::material[mat].temperature=sim::TTTe;
       }
@@ -171,7 +171,7 @@ double double_pump_two_temperature_function(double ftime){
 
       // Optionally set material specific temperatures
       if(sim::local_temperature==true){
-         for(int mat=0;mat<mp::material.size();mat++){
+         for(unsigned int mat=0;mat<mp::material.size();mat++){
             if(mp::material[mat].couple_to_phonon_temperature==true) mp::material[mat].temperature=sim::TTTp;
             else mp::material[mat].temperature=sim::TTTe;
          }
@@ -253,7 +253,7 @@ void temperature_pulse(){
 
    // If local temperature is set then also initalise local temperatures
    if(sim::local_temperature==true){
-      for(int mat=0;mat<mp::material.size();mat++){
+      for(unsigned int mat=0;mat<mp::material.size();mat++){
          if(mp::material[mat].couple_to_phonon_temperature==true) mp::material[mat].temperature=sim::TTTp;
          else mp::material[mat].temperature=sim::TTTe;
       }

@@ -134,10 +134,6 @@ int create(){
 	//      System creation variables
 	//=============================================================
 
-	int num_atoms=0;							///> num_atoms for generation routines
-	//int supercell_dim[3];				///> integer dimesions of system supercells
-	//double supercell_size[3];				///> real supercell size (Angstroms)
-
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array;
 	std::vector<std::vector<neighbour_t> > cneighbourlist;

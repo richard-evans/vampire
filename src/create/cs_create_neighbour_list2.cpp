@@ -120,7 +120,9 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 	const int max_cell[3] = {max[0],max[1],max[2]};
 
 	// calculate number of cells needed = max-min+1 ( if max_cell = 25, then 0-25 = 26
-	const unsigned int d[3]={max_cell[0]-offset[0]+1,max_cell[1]-offset[1]+1,max_cell[2]-offset[2]+1};
+	const unsigned int d[3]={static_cast<unsigned int>(max_cell[0]-offset[0]+1),
+                            static_cast<unsigned int>(max_cell[1]-offset[1]+1),
+                            static_cast<unsigned int>(max_cell[2]-offset[2]+1)};
 
 	// Declare array for create space for 3D supercell array
 	std::vector<std::vector<std::vector<std::vector<int> > > > supercell_array;
@@ -164,7 +166,9 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
    zlog << zTs() << "Populating supercell array for neighbourlist calculation..."<< std::endl;
 	// Populate supercell array with atom numbers
 	for(int atom=0;atom<num_atoms;atom++){
-		unsigned int scc[3]={catom_array[atom].scx-offset[0],catom_array[atom].scy-offset[1],catom_array[atom].scz-offset[2]};
+		unsigned int scc[3]={static_cast<unsigned int>(catom_array[atom].scx-offset[0]),
+                           static_cast<unsigned int>(catom_array[atom].scy-offset[1]),
+                           static_cast<unsigned int>(catom_array[atom].scz-offset[2])};
 
 		double c[3]={catom_array[atom].x,catom_array[atom].y,catom_array[atom].z};
 		//std::cout << atom << "\t" << c[0] << "\t" << c[1] <<"\t" << c[2] << std::endl;
@@ -286,7 +290,9 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
          }
          #endif
          // check for out-of-bounds access
-         if((nx>=0 && nx<d[0]) && (ny>=0 && ny<d[1]) && (nz>=0 && nz<d[2])){
+         if((nx>=0 && static_cast<unsigned int>(nx)<d[0]) &&
+            (ny>=0 && static_cast<unsigned int>(ny)<d[1]) &&
+            (nz>=0 && static_cast<unsigned int>(nz)<d[2])){
             // check for missing atoms
             if((supercell_array[scc[0]][scc[1]][scc[2]][atom]!=-1) && (supercell_array[nx][ny][nz][natom]!=-1)){
 
