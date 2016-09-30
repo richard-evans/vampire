@@ -79,11 +79,18 @@ namespace dipole{
          }
 
          // resize array for storing cell <-> cpu
-         proc_cell_index_array1D.resize(cells_num_local_cells);
+         //proc_cell_index_array1D.resize(cells_num_local_cells);
          // populate array with my_rank id
-         for(int lc=0; lc<cells_num_local_cells; lc++){
+         //for(int lc=0; lc<cells_num_local_cells; lc++){
+         //   proc_cell_index_array1D[lc]=vmpi::my_rank;
+         //}
+         // resize array for storing cell <-> cpu
+         proc_cell_index_array1D.resize(cells_num_cells);
+         // populate array with my_rank id
+         for(int lc=0; lc<cells_num_cells; lc++){
             proc_cell_index_array1D[lc]=vmpi::my_rank;
          }
+         fprintf(stderr,"proc_cell_index_array1D[cells_num_cells - 1] = %d on rank = %d\n",proc_cell_index_array1D[cells_num_cells - 1],vmpi::my_rank);
 
          MPI::COMM_WORLD.Barrier();
 
@@ -116,31 +123,43 @@ namespace dipole{
                fprintf(stderr,"cpu %d num_recv_cells = %d from cpu %d\n",vmpi::my_rank,num_recv_cells,root);
 
                // resize arrays for storing data
+               int size   = ceil(cells_pos_and_mom_array.size()/4.0);
                int size1D = cells_cell_id_array.size();
+               //////cells_local_cell_array.resize(size1D + num_recv_cells);
+               //cells_pos_and_mom_array.resize(4*(size1D + num_recv_cells));
+               //proc_cell_index_array1D.resize(size1D + num_recv_cells);
                cells_cell_id_array.resize(size1D + num_recv_cells);
-               //cells_local_cell_array.resize(size1D + num_recv_cells);
-               cells_pos_and_mom_array.resize(4*(size1D + num_recv_cells));
-               proc_cell_index_array1D.resize(size1D + num_recv_cells);
-               int size2D = cells_atom_in_cell_coords_array_x.size();
-               /*cells_atom_in_cell_coords_array_x.resize(size2D + num_recv_cells);
-               cells_atom_in_cell_coords_array_y.resize(size2D + num_recv_cells);
-               cells_atom_in_cell_coords_array_z.resize(size2D + num_recv_cells);*/
-               fprintf(stderr,"size2D = %d and cells_atom_in_cell_coords_array_x.size() = %d on my_rank = %d\n",size2D,cells_atom_in_cell_coords_array_x.size(),vmpi::my_rank);
+               cells_pos_and_mom_array.resize(4*(size + num_recv_cells));
+               proc_cell_index_array1D.resize(size + num_recv_cells);
+               //int size2D = cells_atom_in_cell_coords_array_x.size();
+               fprintf(stderr,"size = %d and cells_atom_in_cell_coords_array_x.size() = %d on my_rank = %d\n",size,cells_atom_in_cell_coords_array_x.size(),vmpi::my_rank);
 
                // Save data into arrays
                int counter=0;
-               for(int lc=size1D; lc<(size1D+num_recv_cells); lc++){
-                  fprintf(stderr,"\tlc = %d, lc-size1D = %d, size1D+num_recv_cells = %d, cpu = %d\n",lc,lc-size1D,size1D+num_recv_cells,vmpi::my_rank);
-                  cells_cell_id_array[lc]         = mpi_recv_cells_id[counter];
+               for(int lc=size; lc<(size+num_recv_cells); lc++){
+                  fprintf(stderr,"\tlc = %d, lc-size = %d, size+num_recv_cells = %d, cpu = %d\n",lc,lc-size,size+num_recv_cells,vmpi::my_rank);
+                  cells_cell_id_array[size1D+counter] = mpi_recv_cells_id[counter];
                   //cells_local_cell_array[lc]      = mpi_recv_cells_id[counter];
                   cells_pos_and_mom_array[4*lc+0] = mpi_recv_cells_pos_mom[4*(counter)+0];
                   cells_pos_and_mom_array[4*lc+1] = mpi_recv_cells_pos_mom[4*(counter)+1];
                   cells_pos_and_mom_array[4*lc+2] = mpi_recv_cells_pos_mom[4*(counter)+2];
                   cells_pos_and_mom_array[4*lc+3] = mpi_recv_cells_pos_mom[4*(counter)+3];
                   proc_cell_index_array1D[lc]      = root;
-                  fprintf(stderr,"\t>>> size = %d, cells_cell_id_array[%d] = %d, x = %f y = %f z = %f mu = %f on cpu = %d from root = %d proc_cell_index_array[%d] = %d\n",size1D+num_recv_cells,lc,cells_cell_id_array[lc],cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],cells_pos_and_mom_array[4*lc+3],vmpi::my_rank,root,lc,proc_cell_index_array1D[lc]);
+                  fprintf(stderr,"\t>>> size = %d, cells_cell_id_array[%d] = %d, x = %f y = %f z = %f mu = %e on cpu = %d from root = %d proc_cell_index_array[%d] = %d\n",size+num_recv_cells,lc,cells_cell_id_array[size1D+counter],cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],cells_pos_and_mom_array[4*lc+3],vmpi::my_rank,root,lc,proc_cell_index_array1D[lc]);
                   counter++;
                }
+               //for(int lc=size1D; lc<(size1D+num_recv_cells); lc++){
+               //   fprintf(stderr,"\tlc = %d, lc-size1D = %d, size1D+num_recv_cells = %d, cpu = %d\n",lc,lc-size1D,size1D+num_recv_cells,vmpi::my_rank);
+               //   cells_cell_id_array[lc]         = mpi_recv_cells_id[counter];
+               //   //cells_local_cell_array[lc]      = mpi_recv_cells_id[counter];
+               //   cells_pos_and_mom_array[4*lc+0] = mpi_recv_cells_pos_mom[4*(counter)+0];
+               //   cells_pos_and_mom_array[4*lc+1] = mpi_recv_cells_pos_mom[4*(counter)+1];
+               //   cells_pos_and_mom_array[4*lc+2] = mpi_recv_cells_pos_mom[4*(counter)+2];
+               //   cells_pos_and_mom_array[4*lc+3] = mpi_recv_cells_pos_mom[4*(counter)+3];
+               //   proc_cell_index_array1D[lc]      = root;
+               //   fprintf(stderr,"\t>>> size = %d, cells_cell_id_array[%d] = %d, x = %f y = %f z = %f mu = %e on cpu = %d from root = %d proc_cell_index_array[%d] = %d\n",size1D+num_recv_cells,lc,cells_cell_id_array[lc],cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],cells_pos_and_mom_array[4*lc+3],vmpi::my_rank,root,lc,proc_cell_index_array1D[lc]);
+               //   counter++;
+               //}
             }
          }
          fprintf(stderr,"\n\n");
@@ -279,7 +298,7 @@ namespace dipole{
                         const double mus              = mp::material[type].mu_s_SI/9.27400915e-24;
                         mpi_send_atoms_mom[counter]   = mus;
                         fprintf(stderr,"   atom %d x = %f y = %f z = %f on my_rank = %d\n",atom_id,atom_pos_x[atom_id],atom_pos_y[atom_id],atom_pos_z[atom_id],vmpi::my_rank);
-                        fprintf(stderr,"\tcounter = %d cell_id = %d atom_id = %d  x = %f y = %f z = %f mus = %f,  my_rank = %d\n",counter,mpi_send_atoms_cell[counter],mpi_send_atoms_id[counter],mpi_send_atoms_pos_x[counter],mpi_send_atoms_pos_y[counter],mpi_send_atoms_pos_z[counter],mpi_send_atoms_mom[counter],vmpi::my_rank);
+                        fprintf(stderr,"\tcounter = %d cell_id = %d atom_id = %d  x = %f y = %f z = %f mus = %e,  my_rank = %d\n",counter,mpi_send_atoms_cell[counter],mpi_send_atoms_id[counter],mpi_send_atoms_pos_x[counter],mpi_send_atoms_pos_y[counter],mpi_send_atoms_pos_z[counter],mpi_send_atoms_mom[counter],vmpi::my_rank);
                         counter++;
                      }
                      counter_cells++;
@@ -330,8 +349,8 @@ namespace dipole{
                MPI_Recv(&mpi_recv_atoms_cell[0],   num_recv_atoms, MPI_INT,      cpu_send, 109, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                MPI_Recv(&mpi_recv_num_atoms_in_cell[0],   num_recv_cells, MPI_INT,      cpu_send, 110, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                for(int atom=0; atom<num_recv_atoms; atom++){
-                  //fprintf(stderr,"######cpu %d num_recv_atoms = %d num_recv_cells = %d from cpu %d######\n\tid = %d x = %f y = %f z = %f mus = %f cell = %d num_atoms_in_cell = % d\n",cpu_recv,num_recv_atoms,num_recv_cells,cpu_send,mpi_recv_atoms_id[atom],mpi_recv_atoms_pos_x[atom],mpi_recv_atoms_pos_y[atom],mpi_recv_atoms_pos_z[atom],mpi_recv_atoms_mom[atom],mpi_recv_atoms_cell[atom],mpi_recv_num_atoms_in_cell[atom]);
-                  fprintf(stderr,"######cpu %d num_recv_atoms = %d num_recv_cells = %d from cpu %d######\n\tid = %d x = %f y = %f z = %f mus = %f cell = %d\n",cpu_recv,num_recv_atoms,num_recv_cells,cpu_send,mpi_recv_atoms_id[atom],mpi_recv_atoms_pos_x[atom],mpi_recv_atoms_pos_y[atom],mpi_recv_atoms_pos_z[atom],mpi_recv_atoms_mom[atom],mpi_recv_atoms_cell[atom]);
+                  //fprintf(stderr,"######cpu %d num_recv_atoms = %d num_recv_cells = %d from cpu %d######\n\tid = %d x = %f y = %f z = %f mus = %e cell = %d num_atoms_in_cell = % d\n",cpu_recv,num_recv_atoms,num_recv_cells,cpu_send,mpi_recv_atoms_id[atom],mpi_recv_atoms_pos_x[atom],mpi_recv_atoms_pos_y[atom],mpi_recv_atoms_pos_z[atom],mpi_recv_atoms_mom[atom],mpi_recv_atoms_cell[atom],mpi_recv_num_atoms_in_cell[atom]);
+                  fprintf(stderr,"######cpu %d num_recv_atoms = %d num_recv_cells = %d from cpu %d######\n\tid = %d x = %f y = %f z = %f mus = %e cell = %d\n",cpu_recv,num_recv_atoms,num_recv_cells,cpu_send,mpi_recv_atoms_id[atom],mpi_recv_atoms_pos_x[atom],mpi_recv_atoms_pos_y[atom],mpi_recv_atoms_pos_z[atom],mpi_recv_atoms_mom[atom],mpi_recv_atoms_cell[atom]);
                }
 
                //cells_atom_in_cell_coords_array_x

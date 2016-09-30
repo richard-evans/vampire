@@ -155,7 +155,7 @@ namespace dipole{
          atom_pos_z[atom]=atom_coords_z[atom];
          //int type = atom_type_array[atom];
          //const double mus  = mp::material[type].mu_s_SI/9.27400915e-24;
-         //fprintf(stderr,"  atom = %d type = %d mus = %f atoms::type_array[atom] = %d mp::material[type] = %f on my_rank = %d\n",atom,type,mus,atoms::type_array[atom],mp::material[type].mu_s_SI,vmpi::my_rank);
+         //fprintf(stderr,"  atom = %d type = %d mus = %e atoms::type_array[atom] = %d mp::material[type] = %f on my_rank = %d\n",atom,type,mus,atoms::type_array[atom],mp::material[type].mu_s_SI,vmpi::my_rank);
          //atom_mom[atom] = mus;
       }
       for(int atom=0; atom<num_local_atoms; atom++){
@@ -200,7 +200,7 @@ namespace dipole{
 
          int size = cells::cell_id_array.size();
          for(int lc=0; lc<size; lc++){
-            fprintf(stderr,"size = %d, cells::cell_id_array[%d] = %d, x = %f y = %f z = %f mu = %f on cpu = %d proc_cell_index_array[%d] = %d\n",size,lc,cells::cell_id_array[lc],cells::pos_and_mom_array[4*lc+0],cells::pos_and_mom_array[4*lc+1],cells::pos_and_mom_array[4*lc+2],cells::pos_and_mom_array[4*lc+3],vmpi::my_rank,lc,proc_cell_index_array1D[lc]);
+            fprintf(stderr,"size = %d, cells::cell_id_array[%d] = %d, x = %f y = %f z = %f mu = %e on cpu = %d proc_cell_index_array[%d] = %d\n",size,lc,cells::cell_id_array[lc],cells::pos_and_mom_array[4*lc+0],cells::pos_and_mom_array[4*lc+1],cells::pos_and_mom_array[4*lc+2],cells::pos_and_mom_array[4*lc+3],vmpi::my_rank,lc,proc_cell_index_array1D[lc]);
             MPI::COMM_WORLD.Barrier();
          }
 
@@ -252,9 +252,12 @@ namespace dipole{
       #else
          int dipole_num_local_cells = cells_num_local_cells;
       #endif
+      fprintf(stderr," >>>>>> updated value of cells_num_cells = %d cells_num_local_cells = %d dipole_num_local_cells = %d on my_rank = %d<<<<<<<<< \n",cells_num_cells,cells_num_local_cells,dipole_num_local_cells,vmpi::my_rank);
 
+      fprintf(stderr,"\n !!!! PROBLEMS!!!  just after updating num_local_cells\n");
       // Precalculate cell magnetisation
       cells::mag();
+      fprintf(stderr,"\n !!!! PROBLEMS!!! just after precalculating cells::mag()\n");
 
       for(int i=0;i<cells_num_cells;i++){
          if(cells_num_atoms_in_cell[i]>0){
@@ -266,15 +269,15 @@ namespace dipole{
             	//std::cout << cells_atom_in_cell_coords_array_x[i][j] << "\t";
             	//std::cout << cells_atom_in_cell_coords_array_y[i][j] << "\t";
             	//std::cout << cells_atom_in_cell_coords_array_z[i][j] << std::endl;
-               fprintf(stderr,"\tindex_atoms_array[%d][%d] = %d cells_atom_in_cell_coords_array_x[%d][%d] = %f cells_atom_in_cell_coords_array_y[%d][%d] = %f cells_atom_in_cell_coords_array_z[%d][%d] = %f on my_rank = %d\n",i,j,cells::index_atoms_array[i][j],i,j,cells_atom_in_cell_coords_array_x[i][j],i,j,cells_atom_in_cell_coords_array_y[i][j],i,j,cells_atom_in_cell_coords_array_z[i][j],vmpi::my_rank);
+               fprintf(stderr," index_atoms_array[%d][%d] = %d atom_in_cell_coords_array_x[%d][%d] = %f atom_in_cell_coords_array_y[%d][%d] = %f atom_in_cell_coords_array_z[%d][%d] = %f on rank = %d\n",i,j,cells::index_atoms_array[i][j],i,j,cells_atom_in_cell_coords_array_x[i][j],i,j,cells_atom_in_cell_coords_array_y[i][j],i,j,cells_atom_in_cell_coords_array_z[i][j],vmpi::my_rank);
             }
          }
       }
       std::cout << std::endl << std::flush;
 
        // allocate arrays to store data [nloccell x ncells]
-      //for(int lc=0;lc<cells_num_local_cells; lc++){
-      for(int lc=0;lc<dipole_num_local_cells; lc++){
+      for(int lc=0;lc<cells_num_local_cells; lc++){
+      //for(int lc=0;lc<dipole_num_local_cells; lc++){
 
          dipole::internal::rij_inter_xx.push_back(std::vector<double>());
          dipole::internal::rij_inter_xx[lc].resize(cells_num_cells,0.0);
@@ -328,8 +331,8 @@ namespace dipole{
       //double cutoff=12.0; //after 12 macrocell of distance, the bare macrocell model gives the same result
 
       // loop over local cells
-      //for(int lc=0;lc<cells_num_local_cells;lc++){
-      for(int lc=0;lc<dipole_num_local_cells;lc++){
+      for(int lc=0;lc<cells_num_local_cells;lc++){
+      //for(int lc=0;lc<dipole_num_local_cells;lc++){
 
          // reference global cell ID
          //int i = cells_local_cell_array[lc];

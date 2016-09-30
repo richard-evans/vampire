@@ -471,7 +471,7 @@ namespace cells{
 //    }
 
       for(int lc=0; lc<cells::num_local_cells; lc++){
-            fprintf(stderr,"\tmy_rank=%d\tcell_id_array[lc] %d\tx %f\ty %f\tz %f\tmu %f\n",vmpi::my_rank,cell_id_array[lc],pos_and_mom_array[4*cell_id_array[lc]+0],pos_and_mom_array[4*cell_id_array[lc]+1],pos_and_mom_array[4*cell_id_array[lc]+2],pos_and_mom_array[4*cell_id_array[lc]+3]);
+            fprintf(stderr,"\tmy_rank=%d\tcell_id_array[lc] %d\tx %f\ty %f\tz %f\tmu %e\n",vmpi::my_rank,cell_id_array[lc],pos_and_mom_array[4*cell_id_array[lc]+0],pos_and_mom_array[4*cell_id_array[lc]+1],pos_and_mom_array[4*cell_id_array[lc]+2],pos_and_mom_array[4*cell_id_array[lc]+3]);
       }
 
 

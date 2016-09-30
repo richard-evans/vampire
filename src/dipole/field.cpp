@@ -67,7 +67,7 @@ namespace dipole{
 			   // recalculate demag fields
             dipole::internal::update_field();
             MPI::COMM_WORLD.Barrier();
-            fprintf(stderr,"\n >>>> PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");
+            fprintf(stderr,"\n **** PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");
 
 			   // For MPI version, only add local atoms
 			   #ifdef MPICF
