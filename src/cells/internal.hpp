@@ -52,7 +52,7 @@ namespace cells{
       extern std::vector<double> spin_array_y;
       extern std::vector<double> spin_array_z;
       extern std::vector<int> atom_type_array;
-     // extern std::vector<int> atom_cell_array;
+     // extern std::vector<int> atom_cell_id_array;
       extern int num_atoms;
       //extern int num_local_atoms;
 

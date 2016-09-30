@@ -86,6 +86,26 @@ namespace dipole{
          	dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.27400915e-01;
      		}
     	}
+
+    	for(int lc=0;lc<dipole::internal::cells_num_cells;lc++){
+         //if(dipole::internal::cells_num_atoms_in_cell[lc]>0){
+            std::cout << lc << "\t";
+            std::cout << cells::mag_array_x[lc]<< "\t" << dipole::cells_field_array_x[lc] << "\t";
+            std::cout << cells::mag_array_y[lc]<< "\t" << dipole::cells_field_array_y[lc] << "\t";
+            std::cout << cells::mag_array_z[lc]<< "\t" << dipole::cells_field_array_z[lc] << std::endl;
+         //}
+      }
+
+
+      //#ifdef MPICF
+      //// Reduce field on all CPUs
+      //MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0], dipole::cells_field_array_x.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      //MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0], dipole::cells_field_array_y.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      //MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0], dipole::cells_field_array_z.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      ////MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0], dipole::cells_field_array_x.size(), MPI_DOUBLE, MPI_SUM);
+      ////MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0], dipole::cells_field_array_y.size(), MPI_DOUBLE, MPI_SUM);
+      ////MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0], dipole::cells_field_array_z.size(), MPI_DOUBLE, MPI_SUM);
+      //#endif
 	}
 
 } // end of dipole namespace

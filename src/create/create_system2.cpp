@@ -318,14 +318,18 @@ int create(){
                         cells::num_atoms_in_cell,
                         cells::index_atoms_array,
                         cells::volume_array,
-                        cells::cell_coords_array_x,
+                        /*cells::cell_coords_array_x,
                         cells::cell_coords_array_y,
-                        cells::cell_coords_array_z,
+                        cells::cell_coords_array_z,*/
+                        cells::pos_and_mom_array,
                         cells::atom_in_cell_coords_array_x,
                         cells::atom_in_cell_coords_array_y,
                         cells::atom_in_cell_coords_array_z,
                         atoms::type_array,
-                        cells::atom_cell_array,
+                        cells::atom_cell_id_array,
+                        atoms::x_coord_array,
+                        atoms::y_coord_array,
+                        atoms::z_coord_array,
                         atoms::num_atoms
       );
    }

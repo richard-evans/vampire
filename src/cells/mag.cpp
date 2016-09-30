@@ -52,7 +52,7 @@ namespace cells{
 
       // calulate total moment in each cell
       for(int i=0;i<num_local_atoms;++i) {
-         int cell = cells::atom_cell_array[i];
+         int cell = cells::atom_cell_id_array[i];
          int type = cells::internal::atom_type_array[i];
          // Consider only cells with n_atoms != 0
          if(cells::num_atoms_in_cell[cell]>0){
@@ -68,9 +68,12 @@ namespace cells{
 
       #ifdef MPICF
       // Reduce magnetisation on all nodes
-      MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::mag_array_x[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
-      MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::mag_array_y[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
-      MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&cells::mag_array_z[0],cells::num_cells,MPI_DOUBLE,MPI_SUM);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],   cells::mag_array_x.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],   cells::mag_array_y.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],   cells::mag_array_z.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      //MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],   cells::mag_array_x.size(),   MPI_DOUBLE,MPI_SUM);
+      //MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],   cells::mag_array_y.size(),   MPI_DOUBLE,MPI_SUM);
+      //MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],   cells::mag_array_z.size(),   MPI_DOUBLE,MPI_SUM);
       #endif
 
       return EXIT_SUCCESS;

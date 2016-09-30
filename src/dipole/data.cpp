@@ -31,6 +31,8 @@ namespace dipole{
    std::vector < double > atom_dipolar_field_array_y;
    std::vector < double > atom_dipolar_field_array_z;
 
+   double cutoff = 12.0; /// cutoff distance between cells over which bare macro cell model can be applied
+
    //uint64_t sim_time;
 
    namespace internal{
@@ -63,7 +65,7 @@ namespace dipole{
 
       int num_atoms;
       std::vector < int > atom_type_array;
-      std::vector < int > atom_cell_array;
+      std::vector < int > atom_cell_id_array;
 
       int cells_num_cells;
       int cells_num_local_cells;
