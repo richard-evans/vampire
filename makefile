@@ -78,6 +78,10 @@ obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
+obj/micromagnetic/calculate_A.o \
+obj/micromagnetic/calculate_ku.o \
+obj/micromagnetic/calculate_ms.o \
+obj/micromagnetic/calculate_tc.o \
 obj/mpi/LLGHeun-mpi.o \
 obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \
@@ -151,6 +155,7 @@ obj/qvoronoi/userprintf_rbox.o\
 include src/create/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
+include src/micromagnetic/makefile
 include src/simulate/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)

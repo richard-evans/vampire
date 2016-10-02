@@ -63,6 +63,7 @@
 #include "units.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "micromagnetic.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -287,7 +288,7 @@ namespace vin{
 // Function Prototypes
 //int read(string const);
 int match(string const, string const, string const, string const, int const);
-  int read_mat_file(std::string const, int const);
+int read_mat_file(std::string const, int const);
 int match_create(std::string const, std::string const, std::string const, int const);
 int match_dimension(std::string const, std::string const, std::string const, int const);
 int match_sim(std::string const, std::string const, std::string const, int const);
@@ -3879,7 +3880,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
       //-------------------------------------------------------------------
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
       else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
-
+      else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------

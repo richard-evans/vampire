@@ -15,7 +15,7 @@
 
 // C++ standard library headers
 #include <string>
-
+#include <vector>
 // Vampire headers
 #include "micromagnetic.hpp"
 
@@ -38,6 +38,8 @@ namespace micromagnetic{
    // Function to process material parameters
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+
+//   bool discretisation_micromagnetic;
 
 } // end of micromagnetic namespace
 
