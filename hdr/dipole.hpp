@@ -88,6 +88,20 @@ namespace dipole{
                            int cells_num_cells,
                            int cells_macro_cell_size
                            );
+   /*------------------------------------------------*/
+   /*Function to sort cells/atoms data after sharing */
+   /*------------------------------------------------*/
+   int sort_data(std::vector<int>& proc_cell_index_array1D,
+               std::vector<int>& cells_cell_id_array,
+               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+               std::vector< std::vector <int> >& cells_index_atoms_array,
+               std::vector<double>& cells_pos_and_mom_array,
+               std::vector<int>& cells_num_atoms_in_cell,
+               int cells_num_local_cells,
+               int cells_num_cells
+					);
 
    //-----------------------------------------------------------------------------
    // Function to initialise dipole module

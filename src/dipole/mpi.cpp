@@ -215,12 +215,15 @@ namespace dipole{
 
          for(int cpu=0; cpu<vmpi::num_processors; cpu++){
             num_send_atoms = 0;
-            int size = cells_cell_id_array.size();
+            //int size = cells_cell_id_array.size();
+            int size = ceil(cells_pos_and_mom_array.size()/4.0);
             int counter = 0;
-            for(int lc=cells_num_local_cells; lc<size; lc++){
+            //for(int lc=cells_num_local_cells; lc<size; lc++){ // <-----
+            for(int lc=cells_num_cells; lc<size; lc++){
                int cpu_recv = proc_cell_index_array1D[lc];
                if( cpu == cpu_recv){
-                  for(int i=0; i<cells_num_local_cells; i++){
+                  //for(int i=0; i<cells_num_local_cells; i++){ // <-----
+                  for(int i=0; i<cells_num_cells; i++){
                      int cell = cells_cell_id_array[i];
                      //reciprocal of distance between cells
                      double rij_1 = 1.0/sqrt((cells_pos_and_mom_array[4*lc+0]-cells_pos_and_mom_array[4*i+0])*(cells_pos_and_mom_array[4*lc+0]-cells_pos_and_mom_array[4*i+0]) +
@@ -229,16 +232,18 @@ namespace dipole{
                      //distance between cells
                      double rij = 1.0/rij_1;
                      // if cells coords on different cpus are the same => add to list of send/recv atoms
-                     if((((cells_pos_and_mom_array[4*i+0]==cells_pos_and_mom_array[4*lc+0]) &&
-                          (cells_pos_and_mom_array[4*i+1]==cells_pos_and_mom_array[4*lc+1]) &&
-                          (cells_pos_and_mom_array[4*i+2]==cells_pos_and_mom_array[4*lc+2]) )) ||
-                          (rij/cells_macro_cell_size <= dipole::cutoff)){ // &&
+                     if(((((cells_pos_and_mom_array[4*i+0]==cells_pos_and_mom_array[4*lc+0]) &&
+                           (cells_pos_and_mom_array[4*i+1]==cells_pos_and_mom_array[4*lc+1]) &&
+                           (cells_pos_and_mom_array[4*i+2]==cells_pos_and_mom_array[4*lc+2]) )) ||
+                           (rij/cells_macro_cell_size <= dipole::cutoff)) && cells_num_atoms_in_cell[i]>0){ // &&
                         //(cpu_recv == cpu_recv_1) ){
                         // SEND/RECV ATOMS
                         if(counter < cells_num_local_cells){
                            list_cpu_to_send_to.push_back(cpu_recv);
-                           list_cells_to_send.push_back(cell);
-                           list_cells_to_recv.push_back(cells_cell_id_array[lc]);
+                           //list_cells_to_send.push_back(cell);
+                           //list_cells_to_recv.push_back(cells_cell_id_array[lc]);
+                           list_cells_to_send.push_back(i);
+                           list_cells_to_recv.push_back(lc);
                            fprintf(stderr," cell %d on cpu %d is the same of cell %d on cpu %d or cell %d on cpu %d is inside cutoff radius of cell %d on my_rank %d\n",lc,proc_cell_index_array1D[lc],i,proc_cell_index_array1D[i],lc,proc_cell_index_array1D[lc],i,vmpi::my_rank);
                         }
                         //fprintf(stderr," cell %d on cpu %d is the same of cell %d on cpu %d on my_rank %d\n",lc,proc_cell_index_array1D[lc],i,proc_cell_index_array1D[i],vmpi::my_rank);
@@ -403,6 +408,163 @@ namespace dipole{
          return EXIT_SUCCESS;
       }
 
+      /*------------------------------------------------*/
+      /*Function to sort cells/atoms data after sharing */
+      /*------------------------------------------------*/
+      int sort_data(std::vector<int>& proc_cell_index_array1D,
+                  std::vector<int>& cells_cell_id_array,
+                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                  std::vector< std::vector <int> >& cells_index_atoms_array,
+                  std::vector<double>& cells_pos_and_mom_array,
+                  std::vector<int>& cells_num_atoms_in_cell,
+                  int cells_num_local_cells,
+                  int cells_num_cells
+                  ){
+         // if cells from other cpus have same coordinates => update
+         std::vector<int> same_cells;
+         int counter = 0;
+         //for(int i=0; i<cells_num_local_cells; i++){
+            //int lc = cells_cell_id_array[i];
+         for(int i=0; i<cells_num_cells; i++){
+            int lc = i;
+            int size = ceil(cells_pos_and_mom_array.size()/4.0);
+            for(int j=cells_num_cells; j<size; j++){
+               if( (cells_pos_and_mom_array[4*lc+0]==cells_pos_and_mom_array[4*j+0]) &&
+                   (cells_pos_and_mom_array[4*lc+1]==cells_pos_and_mom_array[4*j+1]) &&
+                   (cells_pos_and_mom_array[4*lc+2]==cells_pos_and_mom_array[4*j+2]) ){
+                  // add atoms coords to local cell with same coords
+                  same_cells.push_back(j);
+                  counter++;
+                  fprintf(stderr,"cell %d\t%f %f %f on cpu %d = cell %d\t%f %f %f on cpu %d\n",lc,cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],proc_cell_index_array1D[lc],j,cells_pos_and_mom_array[4*j+0],cells_pos_and_mom_array[4*j+1],cells_pos_and_mom_array[4*j+2],proc_cell_index_array1D[j]);
+                  fprintf(stderr," num_atoms_in_cell[%d] = %d on cpu = %d\n",j,cells_num_atoms_in_cell[j],proc_cell_index_array1D[j]);
+                  int id_old = cells_num_atoms_in_cell[lc];
+                  for(int k=0; k<cells_num_atoms_in_cell[j]; k++){
+                     fprintf(stderr," num_atoms_in_cell[%d] = %d on my_rank = %d\n",lc,cells_num_atoms_in_cell[lc],vmpi::my_rank);
+                     double x = cells_atom_in_cell_coords_array_x[j][k];
+                     double y = cells_atom_in_cell_coords_array_y[j][k];
+                     double z = cells_atom_in_cell_coords_array_z[j][k];
+                     int id   = cells_index_atoms_array[j][k];
+                     cells_atom_in_cell_coords_array_x[lc].push_back(x);
+                     cells_atom_in_cell_coords_array_y[lc].push_back(y);
+                     cells_atom_in_cell_coords_array_z[lc].push_back(z);
+                     cells_index_atoms_array[lc].push_back(id_old+id);
+                     cells_num_atoms_in_cell[lc]+=1;
+                     fprintf(stderr,"  atom = %d atom_id = %d lc = %d x[%d][%d] = %f y[%d][%d] = %f z[%d][%d] = %f num_atoms_in_cell = %d from cpu = %d\n",k,cells_index_atoms_array[j][k],lc,j,k,cells_atom_in_cell_coords_array_x[j][k],j,k,cells_atom_in_cell_coords_array_y[j][k],j,k,cells_atom_in_cell_coords_array_z[j][k],cells_num_atoms_in_cell[lc],proc_cell_index_array1D[j]);
+                     fprintf(stderr,"  num_atoms_in_cell[%d] = %d on my_rank = %d\n",lc,cells_num_atoms_in_cell[lc],vmpi::my_rank);
+                  }
+               }
+            }
+         }
+
+         MPI::COMM_WORLD.Barrier();
+
+         for(int i=0; i<cells_num_cells; i++){
+            //if(cells_num_atoms_in_cell[i]>0){
+               fprintf(stderr,"  --> cell %d x = %f y = %f z= %f num_atoms = %d on my_rank = %d\n",i,cells_pos_and_mom_array[4*i+0],cells_pos_and_mom_array[4*i+1],cells_pos_and_mom_array[4*i+2],cells_num_atoms_in_cell[i],vmpi::my_rank);
+            //}
+         }
+
+         MPI::COMM_WORLD.Barrier();
+
+         fprintf(stderr,"\n\n >>>>>> Beore removing cellss <<<<<<<< \n\n");
+
+         // remove cells that have same coords
+         for(int i=0; i<counter; i++){
+         //for(int i=counter-1;i>=0;i--){
+            int lc = same_cells[i];
+            fprintf(stderr," removed cell %d in position %d belonging to cpu = %d on my_rank = %d\n",lc,4*lc,proc_cell_index_array1D[lc],vmpi::my_rank);
+            cells_pos_and_mom_array[4*lc+0] = cells_pos_and_mom_array[4*(lc+1)+0];
+            cells_pos_and_mom_array[4*lc+1] = cells_pos_and_mom_array[4*(lc+1)+1];
+            cells_pos_and_mom_array[4*lc+2] = cells_pos_and_mom_array[4*(lc+1)+2];
+            cells_pos_and_mom_array[4*lc+3] = cells_pos_and_mom_array[4*(lc+1)+3];
+            proc_cell_index_array1D[lc]     = proc_cell_index_array1D[lc+1];
+            cells_num_atoms_in_cell[lc]     = cells_num_atoms_in_cell[lc+1];
+            //// reize cells_atom_in_cell_coords_array_x,y,z and cells_index_atoms_array
+            //cells_atom_in_cell_coords_array_x[lc].resize(0);
+            //cells_atom_in_cell_coords_array_y[lc].resize(0);
+            //cells_atom_in_cell_coords_array_z[lc].resize(0);
+            //cells_index_atoms_array[lc].resize(0);
+            //for(int j=0; j<cells_num_atoms_in_cell[lc+1]; j++){
+            //   cells_atom_in_cell_coords_array_x[lc].push_back(cells_atom_in_cell_coords_array_x[lc+1][j]);
+            //   cells_atom_in_cell_coords_array_y[lc].push_back(cells_atom_in_cell_coords_array_y[lc+1][j]);
+            //   cells_atom_in_cell_coords_array_z[lc].push_back(cells_atom_in_cell_coords_array_z[lc+1][j]);
+            //   cells_index_atoms_array[lc].push_back(cells_index_atoms_array[lc+1][j]);
+            //}
+         }
+
+         fprintf(stderr,"\n\n >>>>>> After removing cellss <<<<<<<< \n\n");
+
+         MPI::COMM_WORLD.Barrier();
+
+         fprintf(stderr,"\n\n >>>>>> Beore removing atoms <<<<<<<< \n\n");
+
+         //for(int i=0; i<counter; i++){
+         for(int i=counter-1;i>=0;i--){
+            // reize cells_atom_in_cell_coords_array_x,y,z and cells_index_atoms_array
+            int lc = same_cells[i];
+            cells_atom_in_cell_coords_array_x.erase(cells_atom_in_cell_coords_array_x.begin()+lc);
+            cells_atom_in_cell_coords_array_y.erase(cells_atom_in_cell_coords_array_y.begin()+lc);
+            cells_atom_in_cell_coords_array_z.erase(cells_atom_in_cell_coords_array_z.begin()+lc);
+            cells_index_atoms_array.erase(cells_index_atoms_array.begin()+lc);
+
+            //cells_atom_in_cell_coords_array_x[lc].resize(cells_num_atoms_in_cell[lc+1]);
+            //cells_atom_in_cell_coords_array_y[lc].resize(cells_num_atoms_in_cell[lc+1]);
+            //cells_atom_in_cell_coords_array_z[lc].resize(cells_num_atoms_in_cell[lc+1]);
+            //cells_index_atoms_array[lc].resize(cells_num_atoms_in_cell[lc+1]);
+            //for(int j=0; j<cells_num_atoms_in_cell[lc+1]; j++){
+            //   cells_atom_in_cell_coords_array_x[lc][j] = cells_atom_in_cell_coords_array_x[lc+1][j];
+            //   cells_atom_in_cell_coords_array_y[lc][j] = cells_atom_in_cell_coords_array_y[lc+1][j];
+            //   cells_atom_in_cell_coords_array_z[lc][j] = cells_atom_in_cell_coords_array_z[lc+1][j];
+            //   cells_index_atoms_array[lc][j]           = cells_index_atoms_array[lc+1][j];
+            //}
+            fprintf(stderr," removing atoms in cell %d on my_rank = %d\n",lc,vmpi::my_rank);
+         }
+
+         fprintf(stderr,"\n\n >>>>>> After removing atoms <<<<<<<< \n\n");
+
+         MPI::COMM_WORLD.Barrier();
+
+         fprintf(stderr,"\n BEFORE: cells_pos_and_mom_array.size() =  %lu and proc_cell_index_array1D.size() = %lu on rank = %d\n",cells_pos_and_mom_array.size(),proc_cell_index_array1D.size(),vmpi::my_rank);
+         //resize cells_pos_and_mom_array and proc_cell_index_array1D
+         int size       = cells_pos_and_mom_array.size();
+         int size_new   = size - 4*counter;
+         int size_new_1D= ceil(size_new/4.0);
+         cells_pos_and_mom_array.resize(size_new);
+         proc_cell_index_array1D.resize(size_new_1D);
+         cells_num_atoms_in_cell.resize(size_new_1D);
+         cells_atom_in_cell_coords_array_x.resize(size_new_1D);
+         cells_atom_in_cell_coords_array_y.resize(size_new_1D);
+         cells_atom_in_cell_coords_array_z.resize(size_new_1D);
+         cells_index_atoms_array.resize(size_new_1D);
+
+         MPI::COMM_WORLD.Barrier();
+         fprintf(stderr,"\n AFTER: cells_pos_and_mom_array.size() =  %lu and proc_cell_index_array1D.size() = %lu on rank = %d\n",cells_pos_and_mom_array.size(),proc_cell_index_array1D.size(),vmpi::my_rank);
+
+         MPI::COMM_WORLD.Barrier();
+
+         // update cells_num_cells value
+         cells_num_cells = ceil(cells_pos_and_mom_array.size()/4.0);
+         fprintf(stderr,"\n\n new cells_num_cells = %d on my_rank = %d\n\n",cells_num_cells,vmpi::my_rank);
+
+         MPI::COMM_WORLD.Barrier();
+
+         for(int lc=0; lc<cells_num_cells; lc++){
+
+            fprintf(stderr,"  --> cell %d x = %f y = %f z= %f num_atoms = %d on my_rank = %d\n",lc,cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],cells_num_atoms_in_cell[lc],vmpi::my_rank);
+
+            for(int atom=0; atom<cells_num_atoms_in_cell[lc]; atom++){
+
+               fprintf(stderr," atom = %d atom_id = %d lc = %d x[%d][%d] = %f y[%d][%d] = %f z[%d][%d] = %f num_atoms_in_cell = %d on my_rank = %d\n",atom,cells_index_atoms_array[lc][atom],lc,lc,atom,cells_atom_in_cell_coords_array_x[lc][atom],lc,atom,cells_atom_in_cell_coords_array_y[lc][atom],lc,atom,cells_atom_in_cell_coords_array_z[lc][atom],cells_num_atoms_in_cell[lc],vmpi::my_rank);
+
+            }
+         }
+
+         MPI::COMM_WORLD.Barrier();
+
+         return EXIT_SUCCESS;
+      }
 
    #endif
 

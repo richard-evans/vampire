@@ -81,13 +81,14 @@ namespace dipole{
 			   // Update Atomistic Dipolar Field Array
 			   for(int atom=0;atom<num_local_atoms;atom++){
 				   const int cell = dipole::internal::atom_cell_id_array[atom];
-               fprintf(stderr,"\t\tcell = %d x = %f y = %f z = %f mus = %e on my_rank = %d\n",cell,cells::pos_and_mom_array[4*cell+0],cells::pos_and_mom_array[4*cell+1],cells::pos_and_mom_array[4*cell+2],cells::pos_and_mom_array[4*cell+3],vmpi::my_rank);
+               fprintf(stderr,"\tcell = %d x = %f y = %f z = %f mus = %e on my_rank = %d\n",cell,cells::pos_and_mom_array[4*cell+0],cells::pos_and_mom_array[4*cell+1],cells::pos_and_mom_array[4*cell+2],cells::pos_and_mom_array[4*cell+3],vmpi::my_rank);
    	         if(dipole::internal::cells_num_atoms_in_cell[cell]>0){
 				      // Copy field from macrocell to atomistic spin
 				      dipole::atom_dipolar_field_array_x[atom]=dipole::cells_field_array_x[cell];
 				      dipole::atom_dipolar_field_array_y[atom]=dipole::cells_field_array_y[cell];
 				      dipole::atom_dipolar_field_array_z[atom]=dipole::cells_field_array_z[cell];
-                  //fprintf(stderr,"cell = %d\tcells_field_x = %f\tcells_field_y = %f\tcells_field_z = %f\tatom = %d\tatom_field_x = %f\tatom_field_y = %f\tatom_field_z = %f\ton rank %d\n",cell,dipole::cells_field_array_x[cell],dipole::cells_field_array_y[cell],dipole::cells_field_array_z[cell],atom,dipole::atom_dipolar_field_array_x[atom],dipole::atom_dipolar_field_array_y[atom],dipole::atom_dipolar_field_array_z[atom],vmpi::my_rank);
+                  //fprintf(stderr,"\t cell = %d\tcells_field_x = %f\tcells_field_y = %f\tcells_field_z = %f\n\t atom = %d\tatom_field_x = %f\tatom_field_y = %f\tatom_field_z = %f\ton rank %d\n",cell,dipole::cells_field_array_x[cell],dipole::cells_field_array_y[cell],dipole::cells_field_array_z[cell],atom,dipole::atom_dipolar_field_array_x[atom],dipole::atom_dipolar_field_array_y[atom],dipole::atom_dipolar_field_array_z[atom],vmpi::my_rank);
+                  fprintf(stderr,"\t atom = %d\tatom_field_x = %f\tatom_field_y = %f\tatom_field_z = %f\ton rank %d\n",atom,dipole::atom_dipolar_field_array_x[atom],dipole::atom_dipolar_field_array_y[atom],dipole::atom_dipolar_field_array_z[atom],vmpi::my_rank);
    	         }
 			   }
 

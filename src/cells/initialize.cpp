@@ -532,8 +532,8 @@ namespace cells{
       // Set initialised flag
       cells::internal::initialised=true;
 
-      //// Precalculate cell magnetisation
-      ////cells::mag();
+      // Precalculate cell magnetisation
+      cells::mag();
 
       return;
 

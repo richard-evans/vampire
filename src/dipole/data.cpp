@@ -73,6 +73,8 @@ namespace dipole{
       std::vector <int>  cells_num_atoms_in_cell;
       std::vector < double > cells_volume_array;
 
+      std::vector<double> cells_pos_and_mom_array;
+      std::vector < int > proc_cell_index_array1D;
       //------------------------------------------------------------------------
       // Shared functions inside dipole module
       //------------------------------------------------------------------------
