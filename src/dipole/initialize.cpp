@@ -569,6 +569,26 @@ namespace dipole{
 			}
 		}
 
+      MPI::COMM_WORLD.Barrier();
+      fprintf(stderr,"\n\n >>> printing inter part of dipolar matrix <<<< \n\n");
+      MPI::COMM_WORLD.Barrier();
+      // print to check dipolar martrix inter term
+      for(unsigned int i=0; i<dipole::internal::rij_inter_xx.size(); i++){
+         for(unsigned int j=0; j<dipole::internal::rij_inter_xx[i].size(); j++){
+            fprintf(stderr,"i = %d j = %d\n\trij_inter_xx = %f\trij_inter_xy = %f\trij_inter_xz = %f\n\trij_inter_yx = %f\trij_inter_yy = %f\trij_inter_yz = %f\n\trij_inter_zx = %f\trij_inter_zy = %f\trij_inter_zz = %f\n on rank = %d\n",i,j,internal::rij_inter_xx[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_yy[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_zz[i][j],vmpi::my_rank);
+         }
+      }
+      MPI::COMM_WORLD.Barrier();
+      fprintf(stderr,"\n\n >>> printing intra part of dipolar matrix <<<< \n\n");
+      MPI::COMM_WORLD.Barrier();
+      // print to check dipolar matrix intra term
+      for(unsigned int i=0; i<dipole::internal::rij_intra_xx.size(); i++){
+         for(unsigned int j=0; j<dipole::internal::rij_intra_xx[i].size(); j++){
+            fprintf(stderr,"i = %d j = %d\n\trij_intra_xx = %f\trij_intra_xy = %f\trij_intra_xz = %f\n\trij_intra_yx = %f\trij_intra_yy = %f\trij_intra_yz = %f\n\trij_intra_zx = %f\trij_intra_zy = %f\trij_intra_zz = %f\n on rank = %d\n",i,j,internal::rij_intra_xx[i][j],internal::rij_intra_xy[i][j],internal::rij_intra_xz[i][j],internal::rij_intra_xy[i][j],internal::rij_intra_yy[i][j],internal::rij_intra_yz[i][j],internal::rij_intra_xz[i][j],internal::rij_intra_yz[i][j],internal::rij_intra_zz[i][j],vmpi::my_rank);
+         }
+      }
+      MPI::COMM_WORLD.Barrier();
+
       //dipole::internal::cells_pos_and_mom_array = cells_pos_and_mom_array;
 
       #ifdef MPICF

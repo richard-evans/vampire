@@ -422,15 +422,16 @@ namespace dipole{
                   int cells_num_local_cells,
                   int cells_num_cells
                   ){
+
          // if cells from other cpus have same coordinates => update
          std::vector<int> same_cells;
          int counter = 0;
          //for(int i=0; i<cells_num_local_cells; i++){
             //int lc = cells_cell_id_array[i];
-         for(int i=0; i<cells_num_cells; i++){
-            int lc = i;
-            int size = ceil(cells_pos_and_mom_array.size()/4.0);
-            for(int j=cells_num_cells; j<size; j++){
+         int size = ceil(cells_pos_and_mom_array.size()/4.0);
+         for(int j=cells_num_cells; j<size; j++){
+            for(int i=0; i<cells_num_cells; i++){
+               int lc = i;
                if( (cells_pos_and_mom_array[4*lc+0]==cells_pos_and_mom_array[4*j+0]) &&
                    (cells_pos_and_mom_array[4*lc+1]==cells_pos_and_mom_array[4*j+1]) &&
                    (cells_pos_and_mom_array[4*lc+2]==cells_pos_and_mom_array[4*j+2]) ){
@@ -468,6 +469,13 @@ namespace dipole{
 
          MPI::COMM_WORLD.Barrier();
 
+         // print same_cells array
+         for(unsigned int i=0; i<same_cells.size(); i++){
+            fprintf(stderr," same_cells[%lu] = %d on my_rank = %d\n",i,same_cells[i],vmpi::my_rank);
+         }
+
+         MPI::COMM_WORLD.Barrier();
+
          fprintf(stderr,"\n\n >>>>>> Beore removing cellss <<<<<<<< \n\n");
 
          // remove cells that have same coords
@@ -481,17 +489,6 @@ namespace dipole{
             cells_pos_and_mom_array[4*lc+3] = cells_pos_and_mom_array[4*(lc+1)+3];
             proc_cell_index_array1D[lc]     = proc_cell_index_array1D[lc+1];
             cells_num_atoms_in_cell[lc]     = cells_num_atoms_in_cell[lc+1];
-            //// reize cells_atom_in_cell_coords_array_x,y,z and cells_index_atoms_array
-            //cells_atom_in_cell_coords_array_x[lc].resize(0);
-            //cells_atom_in_cell_coords_array_y[lc].resize(0);
-            //cells_atom_in_cell_coords_array_z[lc].resize(0);
-            //cells_index_atoms_array[lc].resize(0);
-            //for(int j=0; j<cells_num_atoms_in_cell[lc+1]; j++){
-            //   cells_atom_in_cell_coords_array_x[lc].push_back(cells_atom_in_cell_coords_array_x[lc+1][j]);
-            //   cells_atom_in_cell_coords_array_y[lc].push_back(cells_atom_in_cell_coords_array_y[lc+1][j]);
-            //   cells_atom_in_cell_coords_array_z[lc].push_back(cells_atom_in_cell_coords_array_z[lc+1][j]);
-            //   cells_index_atoms_array[lc].push_back(cells_index_atoms_array[lc+1][j]);
-            //}
          }
 
          fprintf(stderr,"\n\n >>>>>> After removing cellss <<<<<<<< \n\n");
@@ -504,22 +501,11 @@ namespace dipole{
          for(int i=counter-1;i>=0;i--){
             // reize cells_atom_in_cell_coords_array_x,y,z and cells_index_atoms_array
             int lc = same_cells[i];
+            fprintf(stderr," removing atoms in cell %d on my_rank = %d\n",lc,vmpi::my_rank);
             cells_atom_in_cell_coords_array_x.erase(cells_atom_in_cell_coords_array_x.begin()+lc);
             cells_atom_in_cell_coords_array_y.erase(cells_atom_in_cell_coords_array_y.begin()+lc);
             cells_atom_in_cell_coords_array_z.erase(cells_atom_in_cell_coords_array_z.begin()+lc);
             cells_index_atoms_array.erase(cells_index_atoms_array.begin()+lc);
-
-            //cells_atom_in_cell_coords_array_x[lc].resize(cells_num_atoms_in_cell[lc+1]);
-            //cells_atom_in_cell_coords_array_y[lc].resize(cells_num_atoms_in_cell[lc+1]);
-            //cells_atom_in_cell_coords_array_z[lc].resize(cells_num_atoms_in_cell[lc+1]);
-            //cells_index_atoms_array[lc].resize(cells_num_atoms_in_cell[lc+1]);
-            //for(int j=0; j<cells_num_atoms_in_cell[lc+1]; j++){
-            //   cells_atom_in_cell_coords_array_x[lc][j] = cells_atom_in_cell_coords_array_x[lc+1][j];
-            //   cells_atom_in_cell_coords_array_y[lc][j] = cells_atom_in_cell_coords_array_y[lc+1][j];
-            //   cells_atom_in_cell_coords_array_z[lc][j] = cells_atom_in_cell_coords_array_z[lc+1][j];
-            //   cells_index_atoms_array[lc][j]           = cells_index_atoms_array[lc+1][j];
-            //}
-            fprintf(stderr," removing atoms in cell %d on my_rank = %d\n",lc,vmpi::my_rank);
          }
 
          fprintf(stderr,"\n\n >>>>>> After removing atoms <<<<<<<< \n\n");
@@ -528,7 +514,7 @@ namespace dipole{
 
          fprintf(stderr,"\n BEFORE: cells_pos_and_mom_array.size() =  %lu and proc_cell_index_array1D.size() = %lu on rank = %d\n",cells_pos_and_mom_array.size(),proc_cell_index_array1D.size(),vmpi::my_rank);
          //resize cells_pos_and_mom_array and proc_cell_index_array1D
-         int size       = cells_pos_and_mom_array.size();
+         size       = cells_pos_and_mom_array.size();
          int size_new   = size - 4*counter;
          int size_new_1D= ceil(size_new/4.0);
          cells_pos_and_mom_array.resize(size_new);
