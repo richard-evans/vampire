@@ -168,6 +168,12 @@ namespace dipole{
       //std::vector<int> proc_cell_index_array1D;
       std::vector< std::vector<int> > proc_cell_index_array2D;
 
+		MPI::COMM_WORLD.Barrier();
+
+      for(int i=0; i<cells_num_cells; i++){
+         fprintf(stderr,"\n\n  >>>> Print volume array before paralle section <<<<<<\n   !!!!!!cells_volume_array[%d] = %f cells_num_atoms_in_cell[%d] = %d on rank = %d\n",i,cells_volume_array[i],i,cells_num_atoms_in_cell[i],vmpi::my_rank);
+      }
+
       #ifdef MPICF
          MPI::COMM_WORLD.Barrier();
 
@@ -201,7 +207,8 @@ namespace dipole{
          fprintf(stderr," >>>>> End of send/recv session for cells <<<<<<\n\n");
 
          int size = cells::cell_id_array.size();
-         for(int lc=0; lc<size; lc++){
+         //for(int lc=0; lc<size; lc++){
+         for(int lc=0; lc<cells_num_cells; lc++){
             fprintf(stderr,"size = %d, cells::cell_id_array[%d] = %d, x = %f y = %f z = %f mu = %e on cpu = %d proc_cell_index_array[%d] = %d\n",size,lc,cells::cell_id_array[lc],cells::pos_and_mom_array[4*lc+0],cells::pos_and_mom_array[4*lc+1],cells::pos_and_mom_array[4*lc+2],cells::pos_and_mom_array[4*lc+3],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
             MPI::COMM_WORLD.Barrier();
          }
@@ -266,6 +273,12 @@ namespace dipole{
 
       fprintf(stderr,"\n !!!! PROBLEMS!!! \n");
 
+		MPI::COMM_WORLD.Barrier();
+
+      for(int i=0; i<cells_num_cells; i++){
+         fprintf(stderr,"\n\n  >>>> Print volume array before paralle section <<<<<<\n   !!!!!!cells_volume_array[%d] = %f cells_num_atoms_in_cell[%d] = %d on rank = %d\n",i,cells_volume_array[i],i,cells_num_atoms_in_cell[i],vmpi::my_rank);
+      }
+
       #ifdef MPICF
          int dipole_num_local_cells = cells_num_local_cells; //cells::cell_id_array.size();
       #else
@@ -273,10 +286,11 @@ namespace dipole{
       #endif
       fprintf(stderr," >>>>>> updated value of cells_num_cells = %d cells_num_local_cells = %d dipole_num_local_cells = %d on my_rank = %d<<<<<<<<< \n",cells_num_cells,cells_num_local_cells,dipole_num_local_cells,vmpi::my_rank);
 
-      fprintf(stderr,"\n !!!! PROBLEMS!!!  just after updating num_local_cells\n");
+      fprintf(stderr,"\n !!!! PROBLEMS!!!  just after updating dipoolenum_local_cells\n");
       //// Precalculate cell magnetisation
       //cells::mag();
-      fprintf(stderr,"\n !!!! PROBLEMS!!! just after precalculating cells::mag()\n");
+      //fprintf(stderr,"\n !!!! PROBLEMS!!! just after precalculating cells::mag()\n");
+      fprintf(stderr,"\n !!!! PROBLEMS!!! just before resize arrays dipole matrix\n");
 
       for(int i=0;i<cells_num_cells;i++){
          if(cells_num_atoms_in_cell[i]>0){
@@ -590,6 +604,8 @@ namespace dipole{
       MPI::COMM_WORLD.Barrier();
 
       //dipole::internal::cells_pos_and_mom_array = cells_pos_and_mom_array;
+      dipole::internal::cells_num_atoms_in_cell = cells_num_atoms_in_cell;
+      dipole::internal::cells_num_cells = cells_num_cells;
 
       #ifdef MPICF
          double t2 = MPI_Wtime();

@@ -248,12 +248,12 @@ namespace cells{
       }
       MPI::COMM_WORLD.Barrier();
 
-      fprintf(stderr,"\n\t--- cells::num_atoms_in_cell.size() = %d cell::num_cells = %d on my_rank = %d\n",cells::num_atoms_in_cell.size(),cells::num_cells,vmpi::my_rank);
+      fprintf(stderr,"\n\t--- cells::num_atoms_in_cell.size() = %lu cell::num_cells = %d on my_rank = %d\n",cells::num_atoms_in_cell.size(),cells::num_cells,vmpi::my_rank);
       #ifdef MPICF
          MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		#endif
-      fprintf(stderr,"\n\t+++ cells::num_atoms_in_cell.size() = %d cell::num_cells = %d on my_rank = %d\n",cells::num_atoms_in_cell.size(),cells::num_cells,vmpi::my_rank);
+      fprintf(stderr,"\n\t+++ cells::num_atoms_in_cell.size() = %lu cell::num_cells = %d on my_rank = %d\n",cells::num_atoms_in_cell.size(),cells::num_cells,vmpi::my_rank);
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
       const double atomic_volume = unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/cells::num_atoms_in_unit_cell;
@@ -268,6 +268,10 @@ namespace cells{
 
             cells::volume_array[local_cell] = double(cells::num_atoms_in_cell[local_cell])*atomic_volume;
          }
+      }
+
+      for(int i=0; i<cells::num_cells; i++){
+         fprintf(stderr,"volume_array[%d] = %f num_atoms_in_cell[%d] = %d on rank = %d\n",i,cells::volume_array[i],i,cells::num_atoms_in_cell[i],vmpi::my_rank);
       }
 
       for(int atom=0; atom<num_local_atoms; atom++){
@@ -378,9 +382,9 @@ namespace cells{
             //std::cout << cells::num_atoms_in_cell[cell] << " in " << cell << std::endl;
             cells::local_cell_array.push_back(cell);
             cells::num_local_cells++;
-            cells::volume_array[cell] = double(cells::num_atoms_in_cell[cell])*atomic_volume;
+            //cells::volume_array[cell] = double(cells::num_atoms_in_cell[cell])*atomic_volume;
             //std::cout << "cell " << cell << " has " << cells::num_atoms_in_cell[cell] << " atoms inside\n" << std::flush;
-            fprintf(stderr,"cell %d of coords %f %f %f has %d atoms inside on cpu=my_rank= %d\n",cell,cells::pos_and_mom_array[4*cell+0],cells::pos_and_mom_array[4*cell+1],cells::pos_and_mom_array[4*cell+2],cells::num_atoms_in_cell[cell],vmpi::my_rank);
+            fprintf(stderr,"cell %d of coords %f %f %f has %d atoms inside and volume %f on cpu=my_rank= %d\n",cell,cells::pos_and_mom_array[4*cell+0],cells::pos_and_mom_array[4*cell+1],cells::pos_and_mom_array[4*cell+2],cells::num_atoms_in_cell[cell],cells::volume_array[cell],vmpi::my_rank);
             std::cerr << std::flush;
          }
       }

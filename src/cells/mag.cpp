@@ -73,21 +73,33 @@ namespace cells{
       //   }
       //}
 
+      MPI::COMM_WORLD.Barrier();
+
+      fprintf(stderr,"\n >>> <<<<<< Before reduction of cells magnetisation vector <<<<<< >>>>>>\n");
+
+      MPI::COMM_WORLD.Barrier();
+
       for(int lc=0; lc< cells::num_local_cells; lc++){
          int cell = cells::cell_id_array[lc];
          fprintf(stderr,"\tcell = %d num_atoms_in_cell = %d mag_x= %e mag_y = %e mag_z = %e on rank = %d\n",cell,cells::num_atoms_in_cell[cell],cells::mag_array_x[cell],cells::mag_array_y[cell],cells::mag_array_z[cell],vmpi::my_rank);
       }
 
-      //#ifdef MPICF
-      //// Reduce magnetisation on all nodes
-      //MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],   cells::mag_array_x.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-      //MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],   cells::mag_array_y.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-      //MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],   cells::mag_array_z.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
-      ////MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],   cells::mag_array_x.size(),   MPI_DOUBLE,MPI_SUM);
-      ////MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],   cells::mag_array_y.size(),   MPI_DOUBLE,MPI_SUM);
-      ////MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],   cells::mag_array_z.size(),   MPI_DOUBLE,MPI_SUM);
-      //#endif
+      MPI::COMM_WORLD.Barrier();
+
+      #ifdef MPICF
+      // Reduce magnetisation on all nodes
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],   cells::mag_array_x.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],   cells::mag_array_y.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],   cells::mag_array_z.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      //MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],   cells::mag_array_x.size(),   MPI_DOUBLE,MPI_SUM);
+      //MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],   cells::mag_array_y.size(),   MPI_DOUBLE,MPI_SUM);
+      //MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],   cells::mag_array_z.size(),   MPI_DOUBLE,MPI_SUM);
+      #endif
+
+      MPI::COMM_WORLD.Barrier();
+
       fprintf(stderr,"\n >>> <<<<<< After reduction of cells magnetisation vector <<<<<< >>>>>>\n");
+
       for(int lc=0; lc< cells::num_local_cells; lc++){
          int cell = cells::cell_id_array[lc];
          fprintf(stderr,"\tcell = %d num_atoms_in_cell = %d mag_x= %e mag_y = %e mag_z = %e on rank = %d\n",cell,cells::num_atoms_in_cell[cell],cells::mag_array_x[cell],cells::mag_array_y[cell],cells::mag_array_z[cell],vmpi::my_rank);
