@@ -56,19 +56,20 @@ namespace micromagnetic{
          // check for type of discretisation
          test="micromagnetic";
          if(value==test){
-      //      discretisation_micromagnetic = true;
+            discretisation_micromagnetic = true;
             // call micromagnetic function?? somehow? create a bool - micromagnetic ==true? but where is the bool stpred?
             return true;
          }
          test="atomistic"; // runs simualtion as normal - do i need to type anything to make it so that?
          if(value==test){
-         //   discretisation_micromagnetic= false;
+            discretisation_micromagnetic= false;
             return true;
          }
          test="multiscale"; // at the moment just runs a normal atomsitic simulation
          if(value==test){
-            //discretisation_micromagnetic = false;
+            discretisation_micromagnetic = false;
             std::cerr << "Error - multiscale not yet implemented" << std::endl;
+            zlog << zTs() << "Error - multiscale not yet implemented" << std::endl;
             return true;
          }
          // otherwise throw an error
