@@ -79,10 +79,14 @@ obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
 obj/micromagnetic/calculate_A.o \
+obj/micromagnetic/calculate_alpha.o \
+obj/micromagnetic/calculate_chi_para.o \
+obj/micromagnetic/calculate_chi_perp.o \
 obj/micromagnetic/calculate_gamma.o \
 obj/micromagnetic/calculate_ku.o \
 obj/micromagnetic/calculate_ms.o \
 obj/micromagnetic/calculate_tc.o \
+obj/micromagnetic/LLB.o \
 obj/mpi/LLGHeun-mpi.o \
 obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \

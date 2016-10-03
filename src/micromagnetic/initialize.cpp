@@ -18,7 +18,6 @@
 // micromagnetic module headers
 #include "internal.hpp"
 
-namespace mm = micromagnetic;
 
 namespace micromagnetic{
 
