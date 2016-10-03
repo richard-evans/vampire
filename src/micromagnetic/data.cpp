@@ -20,6 +20,8 @@
 
 namespace micromagnetic{
 
+//   bool micro;
+
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
@@ -30,7 +32,13 @@ namespace micromagnetic{
       // Shared variables inside micromagnetic module
       //------------------------------------------------------------------------
 
+      std::vector<double> ms;
+      std::vector<double> ku_z;
+      std::vector<double> A;
+      std::vector<double> Chi;
+      std::vector<double> tc;
+      //bool discretisation_micromagnetic(false);
+
    } // end of internal namespace
 
 } // end of micromagnetic namespace
-

@@ -79,6 +79,7 @@ obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
 obj/micromagnetic/calculate_A.o \
+obj/micromagnetic/calculate_gamma.o \
 obj/micromagnetic/calculate_ku.o \
 obj/micromagnetic/calculate_ms.o \
 obj/micromagnetic/calculate_tc.o \

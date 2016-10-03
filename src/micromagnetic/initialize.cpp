@@ -18,6 +18,8 @@
 // micromagnetic module headers
 #include "internal.hpp"
 
+namespace mm = micromagnetic;
+
 namespace micromagnetic{
 
    //----------------------------------------------------------------------------
@@ -34,13 +36,8 @@ namespace micromagnetic{
       const std::vector<int> neighbour_list_end_index,
       const std::vector<int> type_array,
       std::vector <mp::materials_t> material
-
    ){
 
-
-   //   micromagnetic::ms = micromagnetic::calculate_ms(num_cells, num_atoms, magnetic_moment_array);
-   //   ku = std::vector<double> calculate_ku(num_cells, num_atoms, uniaxial_anisotropy_vector_z);
-   //   A = std::vector<double> calculate_A(num_cells, num_atoms);
 
 
 

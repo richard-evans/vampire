@@ -67,7 +67,7 @@ namespace micromagnetic{
          }
          test="multiscale"; // at the moment just runs a normal atomsitic simulation
          if(value==test){
-      //      discretisation_micromagnetic = false;
+            //discretisation_micromagnetic = false;
             std::cerr << "Error - multiscale not yet implemented" << std::endl;
             return true;
          }

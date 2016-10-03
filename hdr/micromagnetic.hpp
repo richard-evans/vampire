@@ -24,6 +24,7 @@
 //--------------------------------------------------------------------------------
 namespace micromagnetic{
 
+//   bool discretisation_micromagnetic;
    //-----------------------------------------------------------------------------
    // Function to initialise micromagnetic module
    //-----------------------------------------------------------------------------
@@ -32,14 +33,13 @@ namespace micromagnetic{
    //---------------------------------------------------------------------------
    // Function to process input file parameters for micromagnetic module
    //---------------------------------------------------------------------------
-   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+   extern bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
 
    //---------------------------------------------------------------------------
    // Function to process material parameters
    //---------------------------------------------------------------------------
-   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+   extern bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
-//   bool discretisation_micromagnetic;
 
 } // end of micromagnetic namespace
 
