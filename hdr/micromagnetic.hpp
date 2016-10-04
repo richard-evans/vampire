@@ -18,18 +18,19 @@
 #include <vector>
 // Vampire headers
 #include "micromagnetic.hpp"
-
+#include "material.hpp"
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for micromagnetic module
 //--------------------------------------------------------------------------------
 namespace micromagnetic{
 
    extern bool discretisation_micromagnetic;
+   extern bool initialised;
    //-----------------------------------------------------------------------------
    // Function to initialise micromagnetic module
    //-----------------------------------------------------------------------------
-//   void initialize();
-
+   void initialize(int num_cells,int num_atoms,int num_materials, std::vector<int> cell_array,std::vector<int> neighbour_list_array,std::vector<int> neighbour_list_start_index, std::vector<int> neighbour_list_end_index,std::vector<int> type_array,std::vector <mp::materials_t> material);
+   extern int LLB(int num_steps,int num_cells,double temperature,std::vector<double> x_mag_array,std::vector<double> y_mag_array,std::vector<double> z_mag_array,double Hx,double Hy,double Hz);
    extern bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
    extern bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 

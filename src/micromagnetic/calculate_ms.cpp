@@ -9,12 +9,12 @@ namespace micromagnetic
 {
    namespace internal
    {
-      std::vector<double> calculate_ms(const int num_atoms, const int num_cells, std::vector<double> magnetic_moment_array, std::vector<int> cell_array)
+      std::vector<double> calculate_ms(const int num_atoms, const int num_cells, std::vector<int> cell_array, const std::vector<int> type_array,  std::vector <mp::materials_t> material)
       {
          std::vector<double> ms(num_cells,0.0);
-         for (int i = 0; i < num_atoms; i++)
+         for (int atom = 0; atom < num_atoms; atom++)
          {
-            ms[cell_array[i]] = ms[cell_array[i]] + magnetic_moment_array[i];
+            ms[cell_array[atom]] = ms[cell_array[atom]] + material[type_array[atom]].mu_s_SI;
          }
          return ms;
       }

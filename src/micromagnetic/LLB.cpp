@@ -47,12 +47,12 @@
 
 namespace mm = micromagnetic::internal;
 
-int LLB_serial_heun(const int);
+int LLB_serial_heun(int num_steps,int num_cells,double temperature,std::vector<double> x_mag_array,std::vector<double> y_mag_array,std::vector<double> z_mag_array,double Hx,double Hy,double Hz);
 
 namespace micromagnetic{
 /// Master LLB Function - dispatches code path to desired LLB routine
 /// \f$ \frac{\partial S}{\partial t} \f$
-int LLB(const int num_steps){
+int LLB(int num_steps,int num_cells,double temperature,std::vector<double> x_mag_array,std::vector<double> y_mag_array,std::vector<double> z_mag_array,double Hx,double Hy,double Hz){
    //----------------------------------------------------------
    // check calling of routine if error checking is activated
    //----------------------------------------------------------
@@ -63,7 +63,7 @@ int LLB(const int num_steps){
    #ifdef MPICF
       //LLB_mpi(num_steps);
    #else
-      LLB_serial_heun(num_steps);
+   LLB_serial_heun(num_steps,num_cells,temperature,x_mag_array,y_mag_array,z_mag_array,Hx,Hy,Hz);
    #endif
 
    return 0;
@@ -73,18 +73,12 @@ int LLB(const int num_steps){
 
 /// Performs serial Heun integration of the Landau-Lifshitz-Bloch Equation of motion
 int LLB_serial_heun(
-   const int num_steps,
-   const int num_cells,
-   const double temperature,
-   std::vector<double> x_cell_array,
-   std::vector<double> y_cell_array,
-   std::vector<double> z_cell_array,
-   std::vector<double> x_total_cell_field_array,
-   std::vector<double> y_total_cell_field_array,
-   std::vector<double> z_total_cell_field_array,
-   std::vector<double> x_total_external_field_array,
-   std::vector<double> y_total_external_field_array,
-   std::vector<double> z_total_external_field_array,
+   int num_steps,
+   int num_cells,
+   double temperature,
+   std::vector<double> x_mag_array,
+   std::vector<double> y_mag_array,
+   std::vector<double> z_mag_array,
    double Hx,
    double Hy,
    double Hz
@@ -158,19 +152,24 @@ int LLB_serial_heun(
    generate (Hty_para.begin(),Hty_para.end(), mtrandom::gaussian);
    generate (Htz_para.begin(),Htz_para.end(), mtrandom::gaussian);
 
-
-   std::vector<double> x_initial_cell_array(num_cells,0.0);
-   std::vector<double> y_initial_cell_array(num_cells,0.0);
-   std::vector<double> z_initial_cell_array(num_cells,0.0);
+   std::vector<double> x_cell_storage_array(num_cells,0.0);
+   std::vector<double> y_cell_storage_array(num_cells,0.0);
+   std::vector<double> z_cell_storage_array(num_cells,0.0);
    std::vector<double> x_euler_array(num_cells,0.0);
    std::vector<double> y_euler_array(num_cells,0.0);
    std::vector<double> z_euler_array(num_cells,0.0);
    std::vector<double> x_heun_array(num_cells,0.0);
    std::vector<double> y_heun_array(num_cells,0.0);
    std::vector<double> z_heun_array(num_cells,0.0);
-   std::vector<double> x_cell_storage_array(num_cells,0.0);
-   std::vector<double> y_cell_storage_array(num_cells,0.0);
-   std::vector<double> z_cell_storage_array(num_cells,0.0);
+   std::vector<double> x_initial_mag_array(num_cells,0.0);
+   std::vector<double> y_initial_mag_array(num_cells,0.0);
+   std::vector<double> z_initial_mag_array(num_cells,0.0);
+   std::vector<double> x_total_cell_field_array(num_cells,0.0);
+   std::vector<double> y_total_cell_field_array(num_cells,0.0);
+   std::vector<double> z_total_cell_field_array(num_cells,0.0);
+   std::vector<double> x_total_external_field_array(num_cells,0.0);
+   std::vector<double> y_total_external_field_array(num_cells,0.0);
+   std::vector<double> z_total_external_field_array(num_cells,0.0);
    std::vector<double> xyz(3,0.0);
 
    for(unsigned int cell=0;cell<num_cells;cell++){
@@ -186,9 +185,9 @@ int LLB_serial_heun(
 
       // Store initial spin positions for each cell
       for(unsigned int cell=0;cell<num_cells;cell++){
-         x_initial_cell_array[cell] = x_cell_array[cell];
-         y_initial_cell_array[cell] = y_cell_array[cell];
-         z_initial_cell_array[cell] = z_cell_array[cell];
+         x_initial_mag_array[cell] = x_mag_array[cell];
+         y_initial_mag_array[cell] = y_mag_array[cell];
+         z_initial_mag_array[cell] = z_mag_array[cell];
       }
 
 
@@ -202,7 +201,7 @@ int LLB_serial_heun(
 
 
       for(unsigned int cell=0;cell<num_cells;cell++){
-			double m[3] = {x_cell_array[cell],y_cell_array[cell],z_cell_array[cell]};
+			double m[3] = {x_mag_array[cell],y_mag_array[cell],z_mag_array[cell]};
 			double m_squared = m[1]*m[1]+m[2]*m[2]+m[0]*m[0];
 			double pf;
 			if(temperature<=mm::Tc[cell]){
@@ -222,7 +221,7 @@ int LLB_serial_heun(
       		for(unsigned int cell=0;cell<num_cells;cell++){
 
       			// Store local spin in Sand local field in H
-      			const double S[3] = {x_cell_array[cell],y_cell_array[cell],z_cell_array[cell]};
+      			const double S[3] = {x_mag_array[cell],y_mag_array[cell],z_mag_array[cell]};
 
       			const double H[3] = {x_total_cell_field_array[cell]+x_total_external_field_array[cell],
       										y_total_cell_field_array[cell]+y_total_external_field_array[cell],
@@ -257,20 +256,19 @@ int LLB_serial_heun(
       			z_cell_storage_array[cell]=S[2]+xyz[2]*dt[cell];
 
       		}
+
             for(unsigned int cell=0;cell<num_cells;cell++){
-               x_cell_array[cell]=x_cell_storage_array[cell];
-               y_cell_array[cell]=y_cell_storage_array[cell];
-               z_cell_array[cell]=z_cell_storage_array[cell];
+               x_mag_array[cell]=x_cell_storage_array[cell];
+               y_mag_array[cell]=y_cell_storage_array[cell];
+               z_mag_array[cell]=z_cell_storage_array[cell];
             }
 
             // Recalculate spin dependent fields
             fill (x_total_cell_field_array.begin(),x_total_cell_field_array.end(),0.0);
             fill (y_total_cell_field_array.begin(),y_total_cell_field_array.end(),0.0);
             fill (z_total_cell_field_array.begin(),z_total_cell_field_array.end(),0.0);
-
-
             for(unsigned int cell=0;cell<num_cells;cell++){
-      			double m[3] = {x_cell_array[cell],y_cell_array[cell],z_cell_array[cell]};
+      			double m[3] = {x_mag_array[cell],y_mag_array[cell],z_mag_array[cell]};
       			double m_squared = m[1]*m[1]+m[2]*m[2]+m[0]*m[0];
       			double pf;
       			if(temperature<=mm::Tc[cell]){
@@ -288,7 +286,7 @@ int LLB_serial_heun(
             for(unsigned int cell=0;cell<num_cells;cell++){
 
                // Store local spin in Sand local field in H
-               const double S[3] = {x_cell_array[cell],y_cell_array[cell],z_cell_array[cell]};
+               const double S[3] = {x_mag_array[cell],y_mag_array[cell],z_mag_array[cell]};
                const double H[3] = {x_total_cell_field_array[cell]+x_total_external_field_array[cell],
                                     y_total_cell_field_array[cell]+y_total_external_field_array[cell],
                                     z_total_cell_field_array[cell]+z_total_external_field_array[cell]};
@@ -315,10 +313,11 @@ int LLB_serial_heun(
                y_heun_array[cell]=xyz[1];
                z_heun_array[cell]=xyz[2];
             }
+
             for(unsigned int cell=0;cell<num_cells;cell++){
-               x_cell_array[cell]=x_initial_cell_array[cell]+0.5*dt[cell]*(x_euler_array[cell]+x_heun_array[cell]);
-               y_cell_array[cell]=y_initial_cell_array[cell]+0.5*dt[cell]*(y_euler_array[cell]+y_heun_array[cell]);
-               z_cell_array[cell]=z_initial_cell_array[cell]+0.5*dt[cell]*(z_euler_array[cell]+z_heun_array[cell]);
+               x_mag_array[cell]=x_initial_mag_array[cell]+0.5*dt[cell]*(x_euler_array[cell]+x_heun_array[cell]);
+               y_mag_array[cell]=y_initial_mag_array[cell]+0.5*dt[cell]*(y_euler_array[cell]+y_heun_array[cell]);
+               z_mag_array[cell]=z_initial_mag_array[cell]+0.5*dt[cell]*(z_euler_array[cell]+z_heun_array[cell]);
             }
 
    }

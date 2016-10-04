@@ -22,6 +22,7 @@ namespace micromagnetic{
 
 //   bool micro;
       bool discretisation_micromagnetic = false;
+      bool initialised = false;
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------

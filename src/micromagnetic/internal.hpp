@@ -56,14 +56,14 @@ namespace micromagnetic{
       // Internal function declarations
       //-------------------------------------------------------------------------
 
-      std::vector<double> calculate_a(int num_atoms, int num_cells, int num_materials, std::vector<int> cell_array, std::vector<int> neighbour_list_start_index,  std::vector<int> neighbour_list_end_index, const std::vector<int> type_array, std::vector <mp::materials_t> material);
+      std::vector<double> calculate_a(int num_atoms, int num_cells, int num_materials, std::vector<int> cell_array,  std::vector<int> neighbour_list_array, std::vector<int> neighbour_list_start_index,  std::vector<int> neighbour_list_end_index, const std::vector<int> type_array, std::vector <mp::materials_t> material);
       std::vector<double> calculate_alpha(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array, std::vector <mp::materials_t> material);
       std::vector<double> calculate_chi_para(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array, std::vector <mp::materials_t> material);
       std::vector<double> calculate_chi_perp(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array, std::vector <mp::materials_t> material);
       std::vector<double> calculate_gamma(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array, std::vector <mp::materials_t> material);
-      std::vector<double> calculate_ku(const int num_atoms, const int num_cells, const std::vector<int> cell_array, const std::vector<double> uniaxial_anisotropy_vector_x);
-      std::vector<double> calculate_ms(const int num_atoms, const int num_cells,std::vector<double> magnetic_moment_array,std::vector<int> cell_array);
-      std::vector<double> calculate_tc(int num_atoms, int num_cells, std::vector<int> cell_array, std::vector<int> neighbour_list_start_index,  std::vector<int> neighbour_list_end_index, const std::vector<int> type_array, std::vector <mp::materials_t> material);
+      std::vector<double> calculate_ku(const int num_atoms, const int num_cells, const std::vector<int> cell_array,  const std::vector<int> type_array, std::vector <mp::materials_t> material);
+      std::vector<double> calculate_ms(const int num_atoms, const int num_cells,std::vector<int> cell_array, const std::vector<int> type_array,  std::vector <mp::materials_t> material);
+      std::vector<double> calculate_tc(int num_atoms, int num_cells, std::vector<int> cell_array, std::vector<int> neighbour_list_array, std::vector<int> neighbour_list_start_index,  std::vector<int> neighbour_list_end_index, const std::vector<int> type_array, std::vector <mp::materials_t> material);
 
    } // end of internal namespace
 

@@ -4,6 +4,7 @@
 
 // micromagnetic module headers
 #include "internal.hpp"
+#include "material.hpp"
 
 namespace micromagnetic
 {
@@ -17,8 +18,8 @@ namespace micromagnetic
          std::vector<double>  N(num_cells,0.0);
 
          for (int atom = 0; atom <num_atoms; atom++){
-
-            alpha[cell_array[atom]] = alpha[cell_array[atom]] + material[type_array[atom]].alpha;
+            int m = type_array[atom];
+            alpha[cell_array[atom]] = alpha[cell_array[atom]]; + mp::material[type_array[atom]].alpha;
             N[cell_array[atom]]++;
          }
 

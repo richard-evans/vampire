@@ -4,6 +4,7 @@
 
 // micromagnetic module headers
 #include "internal.hpp"
+#include "material.hpp"
 
 namespace micromagnetic
 {
@@ -18,7 +19,7 @@ namespace micromagnetic
 
          for (int atom = 0; atom <num_atoms; atom++){
 
-            gamma[cell_array[atom]] = gamma[cell_array[atom]] + material[type_array[atom]].gamma_rel;
+            gamma[cell_array[atom]] = gamma[cell_array[atom]] + mp::material[type_array[atom]].gamma_rel;
             N[cell_array[atom]]++;
          }
 
