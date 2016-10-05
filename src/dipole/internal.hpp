@@ -63,7 +63,7 @@ namespace dipole{
                                  std::vector<int>& cells_num_atoms_in_cell,
                                  int cells_num_local_cells,
                                  int cells_num_cells,
-                                 int cells_macro_cell_size
+                                 double cells_macro_cell_size
                                  );
 
    extern int sort_data(std::vector<int>& proc_cell_index_array1D,
