@@ -52,10 +52,12 @@ namespace dipole{
                               ){
          // temporary variables to send and receive data
          int num_send_cells;
+         std::vector<int> mpi_send_cells_num_atoms_in_cell;
          std::vector<int> mpi_send_cells_id;
          std::vector<double> mpi_send_cells_pos_mom;
 
          int num_recv_cells;
+         std::vector<int> mpi_recv_cells_num_atoms_in_cell;
          std::vector<int> mpi_recv_cells_id;
          std::vector<double> mpi_recv_cells_pos_mom;
 
@@ -67,6 +69,7 @@ namespace dipole{
          num_send_cells = cells_num_local_cells;
          mpi_send_cells_id.resize(num_send_cells);
          mpi_send_cells_pos_mom.resize(4*num_send_cells);
+         mpi_send_cells_num_atoms_in_cell.resize(num_send_cells);
          // populate temporary arrays with data
          for(int lc=0; lc<num_send_cells; lc++){
             int cell = cells_cell_id_array[lc];
@@ -75,6 +78,7 @@ namespace dipole{
             mpi_send_cells_pos_mom[4*lc+1]   = cells_pos_and_mom_array[4*cell+1];
             mpi_send_cells_pos_mom[4*lc+2]   = cells_pos_and_mom_array[4*cell+2];
             mpi_send_cells_pos_mom[4*lc+3]   = cells_pos_and_mom_array[4*cell+3];
+            mpi_send_cells_num_atoms_in_cell[lc] = cells_num_atoms_in_cell[cell];
             //fprintf(stderr,"cell_id = %d x = %f y = %f z = %f,  my_rank = %d\n",mpi_send_cells_id[lc],mpi_send_cells_pos_mom[4*lc+0],mpi_send_cells_pos_mom[4*lc+1],mpi_send_cells_pos_mom[4*lc+2],mpi_send_cells_pos_mom[4*lc+3],vmpi::my_rank);
          }
 
@@ -99,6 +103,7 @@ namespace dipole{
                      MPI_Send(&num_send_cells, 1, MPI_INT, cpu, 100, MPI_COMM_WORLD);
                      MPI_Send(&mpi_send_cells_id[0], num_send_cells, MPI_INT, cpu, 101, MPI_COMM_WORLD);
                      MPI_Send(&mpi_send_cells_pos_mom[0], 4*num_send_cells, MPI_DOUBLE, cpu, 102, MPI_COMM_WORLD);
+                     MPI_Send(&mpi_send_cells_num_atoms_in_cell[0], num_send_cells, MPI_INT, cpu, 112, MPI_COMM_WORLD);
 
                      //fprintf(stderr,"cpu %d sending num_send_cells = %d to cpu %d\n",root,num_send_cells, cpu);
                   }
@@ -110,9 +115,11 @@ namespace dipole{
                // resize tmp recv arrays
                mpi_recv_cells_id.resize(num_recv_cells);
                mpi_recv_cells_pos_mom.resize(4*num_recv_cells);
+               mpi_recv_cells_num_atoms_in_cell.resize(num_recv_cells);
                // receive data for arrays
                MPI_Recv(&mpi_recv_cells_id[0], num_recv_cells, MPI_INT, root, 101, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                MPI_Recv(&mpi_recv_cells_pos_mom[0], 4*num_recv_cells, MPI_DOUBLE, root, 102, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               MPI_Recv(&mpi_recv_cells_num_atoms_in_cell[0], num_recv_cells, MPI_INT, root, 112, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                //fprintf(stderr,"cpu %d num_recv_cells = %d from cpu %d\n",vmpi::my_rank,num_recv_cells,root);
 
@@ -125,6 +132,7 @@ namespace dipole{
                cells_cell_id_array.resize(size1D + num_recv_cells);
                cells_pos_and_mom_array.resize(4*(size + num_recv_cells));
                proc_cell_index_array1D.resize(size + num_recv_cells);
+               cells_num_atoms_in_cell.resize(size + num_recv_cells);
                //int size2D = cells_atom_in_cell_coords_array_x.size();
                //fprintf(stderr,"size = %d and cells_atom_in_cell_coords_array_x.size() = %d on my_rank = %d\n",size,cells_atom_in_cell_coords_array_x.size(),vmpi::my_rank);
 
@@ -134,12 +142,13 @@ namespace dipole{
                   //fprintf(stderr,"\tlc = %d, lc-size = %d, size+num_recv_cells = %d, cpu = %d\n",lc,lc-size,size+num_recv_cells,vmpi::my_rank);
                   cells_cell_id_array[size1D+counter] = mpi_recv_cells_id[counter];
                   //cells_local_cell_array[lc]      = mpi_recv_cells_id[counter];
-                  cells_pos_and_mom_array[4*lc+0] = mpi_recv_cells_pos_mom[4*(counter)+0];
-                  cells_pos_and_mom_array[4*lc+1] = mpi_recv_cells_pos_mom[4*(counter)+1];
-                  cells_pos_and_mom_array[4*lc+2] = mpi_recv_cells_pos_mom[4*(counter)+2];
-                  cells_pos_and_mom_array[4*lc+3] = mpi_recv_cells_pos_mom[4*(counter)+3];
+                  cells_pos_and_mom_array[4*lc+0]  = mpi_recv_cells_pos_mom[4*(counter)+0];
+                  cells_pos_and_mom_array[4*lc+1]  = mpi_recv_cells_pos_mom[4*(counter)+1];
+                  cells_pos_and_mom_array[4*lc+2]  = mpi_recv_cells_pos_mom[4*(counter)+2];
+                  cells_pos_and_mom_array[4*lc+3]  = mpi_recv_cells_pos_mom[4*(counter)+3];
                   proc_cell_index_array1D[lc]      = root;
-                  //fprintf(stderr,"\t>>> size = %d, cells_cell_id_array[%d] = %d, x = %f y = %f z = %f mu = %e on cpu = %d from root = %d proc_cell_index_array[%d] = %d\n",size+num_recv_cells,lc,cells_cell_id_array[size1D+counter],cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],cells_pos_and_mom_array[4*lc+3],vmpi::my_rank,root,lc,proc_cell_index_array1D[lc]);
+                  cells_num_atoms_in_cell[lc]      = mpi_recv_cells_num_atoms_in_cell[counter];
+                  fprintf(stderr,"\t>>> size = %d, cells_cell_id_array[%d] = %d, x = %f y = %f z = %f atoms_in_cell=%d on cpu = %d from root = %d proc_cell_index_array[%d] = %d\n",size+num_recv_cells,lc,cells_cell_id_array[size1D+counter],cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],cells_num_atoms_in_cell[lc],vmpi::my_rank,root,lc,proc_cell_index_array1D[lc]);
                   counter++;
                }
             }
@@ -215,7 +224,6 @@ namespace dipole{
                                                	(cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2])*(cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2]));
                         //distance between cells
                         double rij = 1.0/rij_1;
-                        fprintf(stderr," >>> i=%d %f %f %f,\tlc=%d %f %f %f,\trij = %f, macro_cell_size=%f, rij/cells_macro_cell_size=%f on my_rank=%d <<<<<<<< \n",i,cells_pos_and_mom_array[4*i+0],cells_pos_and_mom_array[4*i+1],cells_pos_and_mom_array[4*i+2],lc,cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],rij,cells_macro_cell_size,(rij/cells_macro_cell_size),vmpi::my_rank);
                         // if cells coords on different cpus are the same => add to list of send/recv atoms
                         //if(((((cells_pos_and_mom_array[4*i+0]==cells_pos_and_mom_array[4*lc+0]) &&
                         //      (cells_pos_and_mom_array[4*i+1]==cells_pos_and_mom_array[4*lc+1]) &&
@@ -237,6 +245,7 @@ namespace dipole{
                         //} // end if statement for comparison of positions
                         //else if(rij/cells_macro_cell_size <= dipole::cutoff){
                         if(rij/cells_macro_cell_size <= dipole::cutoff){
+                           //fprintf(stderr," >>> i=%d %f %f %f,\tlc=%d %f %f %f,\trij = %f, macro_cell_size=%f, rij/cells_macro_cell_size=%f on my_rank=%d <<<<<<<< \n",i,cells_pos_and_mom_array[4*i+0],cells_pos_and_mom_array[4*i+1],cells_pos_and_mom_array[4*i+2],lc,cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],rij,cells_macro_cell_size,(rij/cells_macro_cell_size),vmpi::my_rank);
                            if(counter < cells_num_local_cells){
                               list_cpu_to_send_to.push_back(cpu_recv);
                               //list_cells_to_send.push_back(cell);
