@@ -116,7 +116,7 @@ namespace dipole{
          //}
       //}
 
-      MPI::COMM_WORLD.Barrier();
+      //MPI::COMM_WORLD.Barrier();
 
       //fprintf(stderr,"\n\n  >>>>>>> Before reduction of cells field <<<<<< \n\n");
 
@@ -132,13 +132,13 @@ namespace dipole{
 
       //fprintf(stderr,"\n\n  >>>>>>> After reduction of cells field <<<<<< \n\n");
 
-      MPI::COMM_WORLD.Barrier();
+      //MPI::COMM_WORLD.Barrier();
 
     	//for(int lc=0;lc<dipole::internal::cells_num_cells;lc++){
       //   //fprintf(stderr,"lc = %d\tmag_x = %e\tmag_y = %e\tmag_z = %e\tfield_x = %f\tfield_y = %f\tfield_z = %f on rank = %d\n",lc,cells::mag_array_x[lc],cells::mag_array_y[lc],cells::mag_array_z[lc],dipole::cells_field_array_x[lc],dipole::cells_field_array_y[lc],dipole::cells_field_array_z[lc],vmpi::my_rank);
       //}
 
-      MPI::COMM_WORLD.Barrier();
+      //MPI::COMM_WORLD.Barrier();
 
 	}
 

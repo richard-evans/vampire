@@ -61,12 +61,12 @@ namespace dipole{
 
 			   // update cell magnetisations
 			   cells::mag();
-            MPI::COMM_WORLD.Barrier();
+            //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n >>>> PROBLEMS!!!!!! just after cells::mag()<<<< \n");
 
 			   // recalculate demag fields
             dipole::internal::update_field();
-            MPI::COMM_WORLD.Barrier();
+            //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n **** PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");
 
 			   // For MPI version, only add local atoms
@@ -75,7 +75,7 @@ namespace dipole{
 			   #else
 				   const int num_local_atoms = dipole::internal::num_atoms;
 			   #endif
-            MPI::COMM_WORLD.Barrier();
+            //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n num_local_atoms = %d on my_rank = %d\n",num_local_atoms,vmpi::my_rank);
 
 			   // Update Atomistic Dipolar Field Array

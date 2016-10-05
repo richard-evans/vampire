@@ -86,7 +86,7 @@ namespace dipole{
          }
          //fprintf(stderr,"proc_cell_index_array1D[cells_num_cells - 1] = %d on rank = %d\n",proc_cell_index_array1D[cells_num_cells - 1],vmpi::my_rank);
 
-         MPI::COMM_WORLD.Barrier();
+         //MPI::COMM_WORLD.Barrier();
 
          //fprintf(stderr,"\n\n");
 
@@ -145,7 +145,7 @@ namespace dipole{
             }
          }
          //fprintf(stderr,"\n\n");
-         MPI::COMM_WORLD.Barrier();
+         //MPI::COMM_WORLD.Barrier();
 
          return EXIT_SUCCESS;
       }
@@ -382,7 +382,7 @@ namespace dipole{
                }
             } //end else statement
          } //end for loop
-         MPI::COMM_WORLD.Barrier();
+         //MPI::COMM_WORLD.Barrier();
 
          return EXIT_SUCCESS;
       }
@@ -530,7 +530,7 @@ namespace dipole{
             //}
          //}
 
-         MPI::COMM_WORLD.Barrier();
+         //MPI::COMM_WORLD.Barrier();
 
          return EXIT_SUCCESS;
       }
