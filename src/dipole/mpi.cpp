@@ -148,13 +148,25 @@ namespace dipole{
                   cells_pos_and_mom_array[4*lc+3]  = mpi_recv_cells_pos_mom[4*(counter)+3];
                   proc_cell_index_array1D[lc]      = root;
                   cells_num_atoms_in_cell[lc]      = mpi_recv_cells_num_atoms_in_cell[counter];
-                  fprintf(stderr,"\t>>> size = %d, cells_cell_id_array[%d] = %d, x = %f y = %f z = %f atoms_in_cell=%d on cpu = %d from root = %d proc_cell_index_array[%d] = %d\n",size+num_recv_cells,lc,cells_cell_id_array[size1D+counter],cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],cells_num_atoms_in_cell[lc],vmpi::my_rank,root,lc,proc_cell_index_array1D[lc]);
+                  //fprintf(stderr,"\t>>> size = %d, cells_cell_id_array[%d] = %d, x = %f y = %f z = %f atoms_in_cell=%d on cpu = %d from root = %d proc_cell_index_array[%d] = %d\n",size+num_recv_cells,lc,cells_cell_id_array[size1D+counter],cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],cells_num_atoms_in_cell[lc],vmpi::my_rank,root,lc,proc_cell_index_array1D[lc]);
                   counter++;
                }
             }
          }
          //fprintf(stderr,"\n\n");
          //MPI::COMM_WORLD.Barrier();
+         int new_size = cells_num_atoms_in_cell.size();
+         cells_atom_in_cell_coords_array_x.resize(new_size);
+         cells_atom_in_cell_coords_array_y.resize(new_size);
+         cells_atom_in_cell_coords_array_z.resize(new_size);
+         cells_index_atoms_array.resize(new_size);
+         for(int i=cells_num_cells; i<new_size; i++){
+            int n_atoms = cells_num_atoms_in_cell[i];
+         cells_atom_in_cell_coords_array_x[i].resize(n_atoms);
+         cells_atom_in_cell_coords_array_y[i].resize(n_atoms);
+         cells_atom_in_cell_coords_array_z[i].resize(n_atoms);
+         cells_index_atoms_array[i].resize(n_atoms);
+         }
 
          return EXIT_SUCCESS;
       }
@@ -194,6 +206,7 @@ namespace dipole{
          std::vector<double> mpi_send_atoms_pos_y;
          std::vector<double> mpi_send_atoms_pos_z;
          std::vector<double> mpi_send_atoms_mom;
+         std::vector<double> mpi_send_cells_pos_mom;
 
          int num_recv_atoms;
          int num_recv_cells;
@@ -204,20 +217,25 @@ namespace dipole{
          std::vector<double> mpi_recv_atoms_pos_y;
          std::vector<double> mpi_recv_atoms_pos_z;
          std::vector<double> mpi_recv_atoms_mom;
+         std::vector<double> mpi_recv_cells_pos_mom;
 
          for(int cpu=0; cpu<vmpi::num_processors; cpu++){
             num_send_atoms = 0;
             //int size = cells_cell_id_array.size();
             int size = ceil(cells_pos_and_mom_array.size()/4.0);
             int counter = 0;
+            std::vector<bool> bool_array(cells_num_cells,1); /// bool arrays to check whether a cell has been already considered
+            //fprintf(stderr,"\nsize=%d, cells_pos_and_mom_array.size()=%lu, proc_cell_index_array1D.size()=%lu on my_rank=%d\n",size,cells_pos_and_mom_array.size(),proc_cell_index_array1D.size(),vmpi::my_rank);
             //for(int lc=cells_num_local_cells; lc<size; lc++){ // <-----
             for(int lc=cells_num_cells; lc<size; lc++){
                int cpu_recv = proc_cell_index_array1D[lc];
+               //fprintf(stderr," #####<<<<< cpu=%d lc=%d cpu_recv=%d <-- my_rank=%d\n",cpu,lc,cpu_recv,vmpi::my_rank);
                if( cpu == cpu_recv){
                   //for(int i=0; i<cells_num_local_cells; i++){ // <-----
                   //   int cell = cells_cell_id_array[i];
                   for(int i=0; i<cells_num_cells; i++){
                      if(cells_num_atoms_in_cell[i]>0){
+                     //if(cells_num_atoms_in_cell[i]>0 || cells_num_atoms_in_cell[lc]>0){
                         //reciprocal of distance between cells
                         double rij_1 = 1.0/sqrt((cells_pos_and_mom_array[4*lc+0]-cells_pos_and_mom_array[4*i+0])*(cells_pos_and_mom_array[4*lc+0]-cells_pos_and_mom_array[4*i+0]) +
                                                	(cells_pos_and_mom_array[4*lc+1]-cells_pos_and_mom_array[4*i+1])*(cells_pos_and_mom_array[4*lc+1]-cells_pos_and_mom_array[4*i+1]) +
@@ -245,27 +263,135 @@ namespace dipole{
                         //} // end if statement for comparison of positions
                         //else if(rij/cells_macro_cell_size <= dipole::cutoff){
                         if(rij/cells_macro_cell_size <= dipole::cutoff){
-                           //fprintf(stderr," >>> i=%d %f %f %f,\tlc=%d %f %f %f,\trij = %f, macro_cell_size=%f, rij/cells_macro_cell_size=%f on my_rank=%d <<<<<<<< \n",i,cells_pos_and_mom_array[4*i+0],cells_pos_and_mom_array[4*i+1],cells_pos_and_mom_array[4*i+2],lc,cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],rij,cells_macro_cell_size,(rij/cells_macro_cell_size),vmpi::my_rank);
-                           if(counter < cells_num_local_cells){
+                           if(counter < cells_num_local_cells && bool_array[i]!=0){
+                           ////if(counter < cells_num_local_cells*(size-cells_num_cells)){
+                           //////if(counter < cells_num_local_cells+(size-cells_num_cells)){
+                           //   if(counter==0){
+                           //      //list_cells_to_send.push_back(cell);
+                           //      //list_cells_to_recv.push_back(cells_cell_id_array[lc]);
+                           //      list_cpu_to_send_to.push_back(cpu_recv);
+                           //      list_cells_to_send.push_back(i);
+                           //      list_cells_to_recv.push_back(lc);
+                           //      fprintf(stderr," counter=%d,cell %d on cpu %d is inside cutoff radius of cell %d on my_rank %d\n",counter,lc,proc_cell_index_array1D[lc],i,vmpi::my_rank);
+                           //      counter++;
+                           //   }
+                           //   // save cells that have to send data only if they are counted for the first time
+                           //   else if(counter>0){
+                           //      for(int k=0; k<counter; k++){
+                           //         if(list_cells_to_send[k]!=i){
+                           //            //list_cells_to_send.push_back(cell);
+                           //            //list_cells_to_recv.push_back(cells_cell_id_array[lc]);
+                           //            list_cpu_to_send_to.push_back(cpu_recv);
+                           //            list_cells_to_send.push_back(i);
+                           //            list_cells_to_recv.push_back(lc);
+                           //            fprintf(stderr," counter=%d,cell %d on cpu %d is inside cutoff radius of cell %d on my_rank %d\n",counter,lc,proc_cell_index_array1D[lc],i,vmpi::my_rank);
+                           //            counter++;
+                           //         }
+                           //      }
+                           //   }
                               list_cpu_to_send_to.push_back(cpu_recv);
-                              //list_cells_to_send.push_back(cell);
-                              //list_cells_to_recv.push_back(cells_cell_id_array[lc]);
                               list_cells_to_send.push_back(i);
                               list_cells_to_recv.push_back(lc);
-                              fprintf(stderr," counter=%d,cell %d on cpu %d is inside cutoff radius of cell %d on my_rank %d\n",counter,lc,proc_cell_index_array1D[lc],i,vmpi::my_rank);
+                              //fprintf(stderr," counter=%d,cell %d on cpu %d is inside cutoff radius of cell %d on my_rank %d\n",counter,lc,proc_cell_index_array1D[lc],i,vmpi::my_rank);
+                              counter++;
+                              bool_array[i]=0;
                            }
-                           counter++;
+                           ////counter++;
                         } // end if statement for comparison of distance
+                        else{
+                           //fprintf(stderr," >>> i=%d %f %f %f,\tlc=%d %f %f %f,\trij = %f, macro_cell_size=%f, rij/cells_macro_cell_size=%f on my_rank=%d <<<<<<<< \n",i,cells_pos_and_mom_array[4*i+0],cells_pos_and_mom_array[4*i+1],cells_pos_and_mom_array[4*i+2],lc,cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],rij,cells_macro_cell_size,(rij/cells_macro_cell_size),vmpi::my_rank);
+                        }
                      } // end of if statement fo num_atoms_in_cell
                   } // end of loop over num_cells
                }
             }
          }
+/*
          MPI::COMM_WORLD.Barrier();
-         fprintf(stderr,"\n\n");
-         for(unsigned int i=0; i<list_cpu_to_send_to.size(); i++){
-            fprintf(stderr,"cpu_recv %d cell_send %d cell_recv %d on my_rank = %d\n",list_cpu_to_send_to[i],list_cells_to_send[i],list_cells_to_recv[i],vmpi::my_rank);
+         int counter_erase = list_cpu_to_send_to.size();
+         int array_size = list_cpu_to_send_to.size();
+         std::vector<int> list_to_erase(0,0);
+         for(int i=0; i<array_size; i++){
+            for(int j=array_size-1; j>0; j--){
+               if( (j>i) && ( list_cpu_to_send_to[j]==list_cpu_to_send_to[i] ) && ( list_cells_to_send[j]==list_cells_to_send[i] )){
+                  //list_cpu_to_send_to[j]  list_cpu_to_send_to[j+1];
+                  //list_cells_to_send[j]   list_cells_to_send[j+1];
+                  //list_cells_to_recv[j]   list_cells_to_recv[j+1];
+                  list_to_erase.push_back(j);
+                  fprintf(stderr,"i=%u and j=%d are the same in list_cpu_to_send_to and list_to_erase.size()=%lu on rank %d\n",i,j,list_to_erase.size(),vmpi::my_rank);
+                  counter_erase--;
+               }
+            }
          }
+         MPI::COMM_WORLD.Barrier();
+         // find out elements to remove
+         for(int i=list_to_erase.size(); i>0; i--){
+            if(i-1>=0){
+               int j=list_to_erase[i-1];
+               list_cells_to_recv[j] = -1;
+               fprintf(stderr,"  ^^^^^^ list_cells_to_recv[%d]=%d list_cells_to_send[%d]=%d list_cells_to_recv[%d]=%d on rank=%d ^^^^^^^\n",j,list_cpu_to_send_to[i],i,list_cells_to_send[i],i,list_cells_to_recv[i],vmpi::my_rank);
+            }
+         }
+         MPI::COMM_WORLD.Barrier();
+         fprintf(stderr,"\n\n  >>>>>> After assigning -1 to arrays ..... list_cpu_to_send_to.size() = %lu on rank=%d <<<<<<< \n\n",list_cpu_to_send_to.size(),vmpi::my_rank);
+         MPI::COMM_WORLD.Barrier();
+         int tmp_size = list_cells_to_recv.size();
+         counter_erase = 0;
+         //
+         for(int j=0; j<tmp_size; j++){
+            if(list_cells_to_recv[j]==-1){
+               //list_cpu_to_send_to.erase (list_cpu_to_send_to.begin()+j);
+               //list_cells_to_send.erase  (list_cells_to_send.begin()+j);
+               //list_cells_to_recv.erase  (list_cells_to_recv.begin()+j);
+               //list_cpu_to_send_to[j]  list_cpu_to_send_to[j+1];
+               //list_cells_to_send[j]   list_cells_to_send[j+1];
+               //list_cells_to_recv[j]   list_cells_to_recv[j+1];
+               counter_erase++;
+            }
+            else{
+               fprintf(stderr,"  ^^^^^^ list_cells_to_recv[%d]=%d list_cells_to_send[%d]=%d list_cells_to_recv[%d]=%d on rank=%d ^^^^^^^\n",j,list_cpu_to_send_to[j],j,list_cells_to_send[j],j,list_cells_to_recv[j],vmpi::my_rank);
+            }
+         }
+         list_cpu_to_send_to.resize(tmp_size-counter_erase);
+         list_cells_to_send.resize(tmp_size-counter_erase);
+         list_cells_to_recv.resize(tmp_size-counter_erase);
+
+         MPI::COMM_WORLD.Barrier();
+         fprintf(stderr,"\n\n  >>>>>> After resizing arrays ..... list_cpu_to_send_to.size() = %lu on rank=%d <<<<<<< \n\n",list_cpu_to_send_to.size(),vmpi::my_rank);
+         MPI::COMM_WORLD.Barrier();
+         for(int j=list_cpu_to_send_to.size(); j>0; j--){
+            int i = j-1;
+            if(i>=0){
+               fprintf(stderr," €€€€€€€ list_cpu_to_send_to[%d] = %d on rank=%d\n",i,list_cpu_to_send_to[i],vmpi::my_rank);
+            }
+         }
+
+         //MPI::COMM_WORLD.Barrier();
+         //for(int i=list_to_erase.size(); i>0; i--){
+         //   int j = i-1;
+         //   fprintf(stderr," £££££££ list_to_erase[%d] = %d on rank=%d\n",i,list_to_erase[i],vmpi::my_rank);
+         //}
+         //MPI::COMM_WORLD.Barrier();
+         //fprintf(stderr,"\n\n list_cpu_to_send_to.size() = %d counter_erase = %d on rank %d\n\n",array_size,counter_erase,vmpi::my_rank);
+         //MPI::COMM_WORLD.Barrier();
+         ////for(int i=array_size-counter_erase-1; i>=0; i--){
+         //for(int i=list_to_erase.size(); i>0; i--){
+         //   int k = i-1;
+         //   int j=list_to_erase[i];
+         //   list_cpu_to_send_to.erase (list_cpu_to_send_to.begin()+j);
+         //   list_cells_to_send.erase  (list_cells_to_send.begin()+j);
+         //   list_cells_to_recv.erase  (list_cells_to_recv.begin()+j);
+         //}
+         fprintf(stderr,"\n\n list_cpu_to_send.size() = %lu counter_erase = %d on rank %d\n\n",list_cpu_to_send_to.size(),counter_erase,vmpi::my_rank);
+         //list_cpu_to_send_to.resize(counter_erase);
+         //list_cells_to_send.resize(counter_erase);
+         //list_cells_to_recv.resize(counter_erase);
+*/
+         //MPI::COMM_WORLD.Barrier();
+         //fprintf(stderr,"\n\n");
+         //for(unsigned int i=0; i<list_cpu_to_send_to.size(); i++){
+         //   fprintf(stderr,"cpu_recv %d cell_send %d cell_recv %d on my_rank = %d\n",list_cpu_to_send_to[i],list_cells_to_send[i],list_cells_to_recv[i],vmpi::my_rank);
+         //}
          //fprintf(stderr,"\n\n");
          //MPI::COMM_WORLD.Barrier();
 
@@ -289,10 +415,15 @@ namespace dipole{
                      mpi_send_atoms_pos_z.resize((num_send_atoms)); //+cells_num_atoms_in_cell[cell_send]));
                      mpi_send_atoms_mom.resize((num_send_atoms)); //+cells_num_atoms_in_cell[cell_send]));
                      mpi_send_num_atoms_in_cell.resize((num_send_cells)); //+cells_num_atoms_in_cell[cell_send]));
+                     mpi_send_cells_pos_mom.resize((4*num_send_cells)); //+cells_num_atoms_in_cell[cell_send]));
 
                      //fprintf(stderr,"\t\tnum_send_atoms = %d and num_send_cells = %d to cpu %d from rank =  %d\n",num_send_atoms,num_send_cells,cpu_recv,vmpi::my_rank);
 
-                     mpi_send_num_atoms_in_cell[counter_cells]  = cells_num_atoms_in_cell[cell_send];
+                     // store data about recv cell
+                     mpi_send_num_atoms_in_cell[counter_cells] = cells_num_atoms_in_cell[cell_send];
+                     mpi_send_cells_pos_mom[4*counter_cells+0] = cells_pos_and_mom_array[4*cell_send+0];
+                     mpi_send_cells_pos_mom[4*counter_cells+1] = cells_pos_and_mom_array[4*cell_send+1];
+                     mpi_send_cells_pos_mom[4*counter_cells+2] = cells_pos_and_mom_array[4*cell_send+2];
                      // save tmp atoms data to be sent
                      for(int j=0; j<cells_num_atoms_in_cell[cell_send]; j++){
                         //mpi_send_num_atoms_in_cell[counter]  = cells_num_atoms_in_cell[cell_send];
@@ -306,8 +437,8 @@ namespace dipole{
                         int type                      = atom_type_array[atom_id];
                         const double mus              = mp::material[type].mu_s_SI/9.27400915e-24;
                         mpi_send_atoms_mom[counter]   = mus;
-                        fprintf(stderr,"   atom %d x = %f y = %f z = %f on my_rank = %d\n",atom_id,atom_pos_x[atom_id],atom_pos_y[atom_id],atom_pos_z[atom_id],vmpi::my_rank);
-                        fprintf(stderr,"\tcounter = %d cell_id = %d atom_id = %d  x = %f y = %f z = %f mus = %e,  my_rank = %d\n",counter,mpi_send_atoms_cell[counter],mpi_send_atoms_id[counter],mpi_send_atoms_pos_x[counter],mpi_send_atoms_pos_y[counter],mpi_send_atoms_pos_z[counter],mpi_send_atoms_mom[counter],vmpi::my_rank);
+                        //fprintf(stderr,"   atom %d x = %f y = %f z = %f on my_rank = %d\n",atom_id,atom_pos_x[atom_id],atom_pos_y[atom_id],atom_pos_z[atom_id],vmpi::my_rank);
+                        //fprintf(stderr,"\tcounter = %d cell_id = %d atom_id = %d  x = %f y = %f z = %f mus = %e,  my_rank = %d\n",counter,mpi_send_atoms_cell[counter],mpi_send_atoms_id[counter],mpi_send_atoms_pos_x[counter],mpi_send_atoms_pos_y[counter],mpi_send_atoms_pos_z[counter],mpi_send_atoms_mom[counter],vmpi::my_rank);
                         counter++;
                      }
                      counter_cells++;
@@ -327,8 +458,9 @@ namespace dipole{
                MPI_Send(&mpi_send_atoms_mom[0],    num_send_atoms,   MPI_DOUBLE, cpu_recv, 108, MPI_COMM_WORLD);
                MPI_Send(&mpi_send_atoms_cell[0],   num_send_atoms,   MPI_INT,    cpu_recv, 109, MPI_COMM_WORLD);
                MPI_Send(&mpi_send_num_atoms_in_cell[0],  num_send_cells,   MPI_INT,    cpu_recv, 110, MPI_COMM_WORLD);
+               MPI_Send(&mpi_send_cells_pos_mom[0],  4*num_send_cells,   MPI_DOUBLE,   cpu_recv, 113, MPI_COMM_WORLD);
 
-               fprintf(stderr,"*****cpu %d sending num_send_atoms = %d to cpu %d******\n",cpu_send,num_send_atoms, cpu_recv);
+               //fprintf(stderr,"*****cpu %d sending num_send_atoms = %d to cpu %d******\n",cpu_send,num_send_atoms, cpu_recv);
             }
          }
 
@@ -349,6 +481,7 @@ namespace dipole{
                mpi_recv_atoms_mom.resize(num_recv_atoms);
                mpi_recv_atoms_cell.resize(num_recv_atoms);
                mpi_recv_num_atoms_in_cell.resize(num_recv_cells);
+               mpi_recv_cells_pos_mom.resize(4*num_recv_cells);
                // receive data for arrays
                MPI_Recv(&mpi_recv_atoms_id[0],     num_recv_atoms, MPI_INT,      cpu_send, 104, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                MPI_Recv(&mpi_recv_atoms_pos_x[0],  num_recv_atoms, MPI_DOUBLE,   cpu_send, 105, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -357,30 +490,31 @@ namespace dipole{
                MPI_Recv(&mpi_recv_atoms_mom[0],    num_recv_atoms, MPI_DOUBLE,   cpu_send, 108, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                MPI_Recv(&mpi_recv_atoms_cell[0],   num_recv_atoms, MPI_INT,      cpu_send, 109, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                MPI_Recv(&mpi_recv_num_atoms_in_cell[0],   num_recv_cells, MPI_INT,      cpu_send, 110, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               for(int atom=0; atom<num_recv_atoms; atom++){
-                  fprintf(stderr,"######cpu %d num_recv_atoms = %d num_recv_cells = %d from cpu %d######\n\tid = %d x = %f y = %f z = %f mus = %e cell = %d\n",cpu_recv,num_recv_atoms,num_recv_cells,cpu_send,mpi_recv_atoms_id[atom],mpi_recv_atoms_pos_x[atom],mpi_recv_atoms_pos_y[atom],mpi_recv_atoms_pos_z[atom],mpi_recv_atoms_mom[atom],mpi_recv_atoms_cell[atom]);
-               }
+               MPI_Recv(&mpi_recv_cells_pos_mom[0],   4*num_recv_cells,   MPI_DOUBLE,   cpu_send, 113, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               //for(int atom=0; atom<num_recv_atoms; atom++){
+               //   fprintf(stderr,"######cpu %d num_recv_atoms = %d num_recv_cells = %d from cpu %d######\n\tid = %d x = %f y = %f z = %f mus = %e cell = %d\n",cpu_recv,num_recv_atoms,num_recv_cells,cpu_send,mpi_recv_atoms_id[atom],mpi_recv_atoms_pos_x[atom],mpi_recv_atoms_pos_y[atom],mpi_recv_atoms_pos_z[atom],mpi_recv_atoms_mom[atom],mpi_recv_atoms_cell[atom]);
+               //}
 
                //cells_atom_in_cell_coords_array_x
                // resize arrays for storing data
                int size = cells_atom_in_cell_coords_array_x.size();
-               cells_atom_in_cell_coords_array_x.resize(size+num_recv_cells);
-               cells_atom_in_cell_coords_array_y.resize(size+num_recv_cells);
-               cells_atom_in_cell_coords_array_z.resize(size+num_recv_cells);
-               cells_index_atoms_array.resize(size+num_recv_cells);
-               cells_num_atoms_in_cell.resize(size+num_recv_cells);
+               //cells_atom_in_cell_coords_array_x.resize(size+num_recv_cells);
+               //cells_atom_in_cell_coords_array_y.resize(size+num_recv_cells);
+               //cells_atom_in_cell_coords_array_z.resize(size+num_recv_cells);
+               //cells_index_atoms_array.resize(size+num_recv_cells);
+               //cells_num_atoms_in_cell.resize(size+num_recv_cells);
                //fprintf(stderr,"size = %d and cells_atom_in_cell_coords_array_x.size() = %d and cells_num_cells = %d on my_rank = %d\n",size,cells_atom_in_cell_coords_array_x.size(),cells_num_cells,vmpi::my_rank);
                int size_new = size+num_recv_cells;
 
-               //// Save data into arrays
-               //for(int lc=cells_num_cells; lc<size_new; lc++){
-               //   cells_atom_in_cell_coords_array_x[lc].resize(num_recv_atoms);
-               //   cells_atom_in_cell_coords_array_y[lc].resize(num_recv_atoms);
-               //   cells_atom_in_cell_coords_array_z[lc].resize(num_recv_atoms);
-               //   cells_index_atoms_array[lc].resize(num_recv_atoms);
-               //}
+               //////// Save data into arrays
+               //////for(int lc=cells_num_cells; lc<size_new; lc++){
+               //////   cells_atom_in_cell_coords_array_x[lc].resize(num_recv_atoms);
+               //////   cells_atom_in_cell_coords_array_y[lc].resize(num_recv_atoms);
+               //////   cells_atom_in_cell_coords_array_z[lc].resize(num_recv_atoms);
+               //////   cells_index_atoms_array[lc].resize(num_recv_atoms);
+               //////}
 
-               //for(int lc=0; lc<num_recv_cells; lc++){
+               /*//for(int lc=0; lc<num_recv_cells; lc++){
                for(int lc=size; lc<size_new; lc++){
                   //fprintf(stderr,"*#*#*#* lc = %d num_atoms_in_cell[%d] = %d*#*#*#\n",lc,lc,mpi_recv_num_atoms_in_cell[lc-size]);
                   // resize arrays
@@ -389,24 +523,62 @@ namespace dipole{
                   cells_atom_in_cell_coords_array_z[lc].resize(mpi_recv_num_atoms_in_cell[lc-size]);
                   cells_index_atoms_array[lc].resize(mpi_recv_num_atoms_in_cell[lc-size]);
                   //fprintf(stderr,"cells_index_atoms_array[%d].size() = %d\n",lc,cells_index_atoms_array[lc].size());
+               }*/
+               //for(int lc=0; lc<num_recv_cells; lc++){
+               std::vector<int> recv_cell_id(num_recv_cells);
+               int cell = 0;
+               for(int lc=0; lc<num_recv_cells; lc++){
+                  // resize arrays
+                  for(unsigned int i=cells_num_cells; i<proc_cell_index_array1D.size(); i++){
+                     cell = i;
+                     if((mpi_recv_cells_pos_mom[4*lc+0]==cells_pos_and_mom_array[4*cell+0]) &&
+                        (mpi_recv_cells_pos_mom[4*lc+1]==cells_pos_and_mom_array[4*cell+1]) &&
+                        (mpi_recv_cells_pos_mom[4*lc+2]==cells_pos_and_mom_array[4*cell+2])){
+                        //fprintf(stderr," >>>><<<<<<lc=%d\ti=%d\tmy_rank=%d\n\trecv_x=%f\trecv_y=%f\trecv_z=%f\n\tx=%f\ty=%f\tz=%f\n",lc,i,vmpi::my_rank,mpi_recv_cells_pos_mom[4*lc+0],mpi_recv_cells_pos_mom[4*lc+1],mpi_recv_cells_pos_mom[4*lc+2],cells_pos_and_mom_array[4*cell+0],cells_pos_and_mom_array[4*cell+1],cells_pos_and_mom_array[4*cell+2]);
+                        cells_atom_in_cell_coords_array_x[cell].resize(mpi_recv_num_atoms_in_cell[lc]);
+                        cells_atom_in_cell_coords_array_y[cell].resize(mpi_recv_num_atoms_in_cell[lc]);
+                        cells_atom_in_cell_coords_array_z[cell].resize(mpi_recv_num_atoms_in_cell[lc]);
+                        cells_index_atoms_array[cell].resize(mpi_recv_num_atoms_in_cell[lc]);
+                        recv_cell_id[lc] = cell;
+
+                        //fprintf(stderr,"\n cell %d is going to recv %lu data on rank=%d\n",cell,cells_index_atoms_array[cell].size(),vmpi::my_rank);
+                     }
+                  }
                }
+               //MPI::COMM_WORLD.Barrier();
+               //for(unsigned int i=0; i<recv_cell_id.size(); i++){
+               //   fprintf(stderr,"\t***### i=%u, num_recv_cells=%d, recv_cell_id[%d]=%d, rank=%d ###***\n",i,num_recv_cells,i,recv_cell_id[i],vmpi::my_rank);
+               //}
+
+               //MPI::COMM_WORLD.Barrier();
+               //fprintf(stderr,"\n\n >>> Resized cells_atom_in_cell_coords_array_x,y,x arrays on rank %d<<<< \n\n",vmpi::my_rank);
+               //MPI::COMM_WORLD.Barrier();
 
                int counter_atoms=0;
                for(int lc=0; lc<num_recv_cells; lc++){
-                  cells_num_atoms_in_cell[lc+size]                = mpi_recv_num_atoms_in_cell[lc];
+                  //cells_num_atoms_in_cell[lc+size]  = mpi_recv_num_atoms_in_cell[lc];
+                  int cell = recv_cell_id[lc];
+                  cells_num_atoms_in_cell[cell] = mpi_recv_num_atoms_in_cell[lc];
+                  //fprintf(stderr,"\t***### lc=%u, cell==%d rank=%d ###***\n",lc,cell,vmpi::my_rank);
                   for(int atom=0; atom<mpi_recv_num_atoms_in_cell[lc]; atom++){
-                     int cell_id = mpi_recv_atoms_cell[counter_atoms];
-                     cells_index_atoms_array[lc+size][atom]          = mpi_recv_atoms_id[counter_atoms];
-                     cells_atom_in_cell_coords_array_x[lc+size][atom]= mpi_recv_atoms_pos_x[counter_atoms];
-                     cells_atom_in_cell_coords_array_y[lc+size][atom]= mpi_recv_atoms_pos_y[counter_atoms];
-                     cells_atom_in_cell_coords_array_z[lc+size][atom]= mpi_recv_atoms_pos_z[counter_atoms];
-                     fprintf(stderr,"counter_atoms = %d atom = %d atom_id = %d lc = %d x[%d][%d] = %f y[%d][%d] = %f z[%d][%d] = %f cell_id = %d num_atoms_in_cell = %d on my_rank = %d\n",counter_atoms,atom,cells_index_atoms_array[lc+size][atom],lc,lc+size,atom,cells_atom_in_cell_coords_array_x[lc+size][atom],lc+size,atom,cells_atom_in_cell_coords_array_y[lc+size][atom],lc+size,atom,cells_atom_in_cell_coords_array_z[lc+size][atom],cell_id,cells_num_atoms_in_cell[lc+size],vmpi::my_rank);
+                     //int cell_id = mpi_recv_atoms_cell[counter_atoms];
+                     //cells_index_atoms_array[lc+size][atom]          = mpi_recv_atoms_id[counter_atoms];
+                     //cells_atom_in_cell_coords_array_x[lc+size][atom]= mpi_recv_atoms_pos_x[counter_atoms];
+                     //cells_atom_in_cell_coords_array_y[lc+size][atom]= mpi_recv_atoms_pos_y[counter_atoms];
+                     //cells_atom_in_cell_coords_array_z[lc+size][atom]= mpi_recv_atoms_pos_z[counter_atoms];
+                     int cell_id = cell;
+                     cells_index_atoms_array[cell][atom]           = mpi_recv_atoms_id[counter_atoms];
+                     cells_atom_in_cell_coords_array_x[cell][atom] = mpi_recv_atoms_pos_x[counter_atoms];
+                     cells_atom_in_cell_coords_array_y[cell][atom] = mpi_recv_atoms_pos_y[counter_atoms];
+                     cells_atom_in_cell_coords_array_z[cell][atom] = mpi_recv_atoms_pos_z[counter_atoms];
+                     //fprintf(stderr,"counter_atoms = %d atom = %d atom_id = %d lc = %d x[%d][%d] = %f y[%d][%d] = %f z[%d][%d] = %f cell_id = %d num_atoms_in_cell = %d on my_rank = %d\n",counter_atoms,atom,cells_index_atoms_array[lc+size][atom],lc,lc+size,atom,cells_atom_in_cell_coords_array_x[lc+size][atom],lc+size,atom,cells_atom_in_cell_coords_array_y[lc+size][atom],lc+size,atom,cells_atom_in_cell_coords_array_z[lc+size][atom],cell_id,cells_num_atoms_in_cell[lc+size],vmpi::my_rank);
                      counter_atoms++;
                   }
                }
             } //end else statement
          } //end for loop
-         MPI::COMM_WORLD.Barrier();
+         //MPI::COMM_WORLD.Barrier();
+         //fprintf(stderr,"\n\n >>>> End of send_recv_atoms_data() func ---> cells_pos_and_mom_array.size()=%lu proc_cell_index_array1D.size()=%lu cells_index_atoms_array.size()=%lu cells_num_atoms_in_cell.size()=%lu on my_rank=%d\n\n",cells_pos_and_mom_array.size(),proc_cell_index_array1D.size(),cells_index_atoms_array.size(),cells_num_atoms_in_cell.size(),vmpi::my_rank);
 
          return EXIT_SUCCESS;
       }
@@ -431,10 +603,10 @@ namespace dipole{
          // if cells from other cpus have same coordinates => update
          std::vector<int> same_cells;
          int counter = 0;
-         //for(int i=0; i<cells_num_local_cells; i++){
+         ////for(int i=0; i<cells_num_local_cells; i++){
             //int lc = cells_cell_id_array[i];
          int size = ceil(cells_pos_and_mom_array.size()/4.0);
-         //fprintf(stderr,"cells_num_cells = %d size = %d on rank %d\n",cells_num_cells,size,vmpi::my_rank);
+         //fprintf(stderr,"\n  *** cells_num_cells=%d siz=%d cells_index_atoms_array.size()=%lu on rank %d ***\n\n",cells_num_cells,size,cells_index_atoms_array.size(),vmpi::my_rank);
          for(int j=cells_num_cells; j<size; j++){
             for(int i=0; i<cells_num_cells; i++){
                int lc = i;
@@ -445,21 +617,33 @@ namespace dipole{
                   // add atoms coords to local cell with same coords
                   same_cells.push_back(j);
                   counter++;
-                  //fprintf(stderr,"cell %d\t%f %f %f on cpu %d = cell %d\t%f %f %f on cpu %d\n",lc,cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],proc_cell_index_array1D[lc],j,cells_pos_and_mom_array[4*j+0],cells_pos_and_mom_array[4*j+1],cells_pos_and_mom_array[4*j+2],proc_cell_index_array1D[j]);
-                  //fprintf(stderr," num_atoms_in_cell[%d] = %d on cpu = %d\n",j,cells_num_atoms_in_cell[j],proc_cell_index_array1D[j]);
-                  int id_old = cells_num_atoms_in_cell[lc];
+
+                  //fprintf(stderr,"cell %d\t%f %f %f on cpu %d = cell %d\t%f %f %f on cpu %d on my_rank=%d\n",lc,cells_pos_and_mom_array[4*lc+0],cells_pos_and_mom_array[4*lc+1],cells_pos_and_mom_array[4*lc+2],proc_cell_index_array1D[lc],j,cells_pos_and_mom_array[4*j+0],cells_pos_and_mom_array[4*j+1],cells_pos_and_mom_array[4*j+2],proc_cell_index_array1D[j],vmpi::my_rank);
+                  //fprintf(stderr," num_atoms_in_cell[%d] = %d on cpu = %d num_atoms_in_cell[%d] = %d on cpu = %d\n",lc,cells_num_atoms_in_cell[lc],j,cells_num_atoms_in_cell[j],proc_cell_index_array1D[j],vmpi::my_rank);
+
+                  int size_old = cells_num_atoms_in_cell[lc];
+                  cells_atom_in_cell_coords_array_x[lc].resize(size_old+cells_num_atoms_in_cell[j]);
+                  cells_atom_in_cell_coords_array_y[lc].resize(size_old+cells_num_atoms_in_cell[j]);
+                  cells_atom_in_cell_coords_array_z[lc].resize(size_old+cells_num_atoms_in_cell[j]);
+                  cells_index_atoms_array[lc].resize(size_old+cells_num_atoms_in_cell[j]);
                   for(int k=0; k<cells_num_atoms_in_cell[j]; k++){
                      //fprintf(stderr," num_atoms_in_cell[%d] = %d on my_rank = %d\n",lc,cells_num_atoms_in_cell[lc],vmpi::my_rank);
                      double x = cells_atom_in_cell_coords_array_x[j][k];
                      double y = cells_atom_in_cell_coords_array_y[j][k];
                      double z = cells_atom_in_cell_coords_array_z[j][k];
                      int id   = cells_index_atoms_array[j][k];
-                     cells_atom_in_cell_coords_array_x[lc].push_back(x);
-                     cells_atom_in_cell_coords_array_y[lc].push_back(y);
-                     cells_atom_in_cell_coords_array_z[lc].push_back(z);
-                     cells_index_atoms_array[lc].push_back(id_old+id);
-                     cells_num_atoms_in_cell[lc]+=1;
+                     //cells_atom_in_cell_coords_array_x[lc].push_back(x);
+                     //cells_atom_in_cell_coords_array_y[lc].push_back(y);
+                     //cells_atom_in_cell_coords_array_z[lc].push_back(z);
+                     //cells_index_atoms_array[lc].push_back(id_old+id);
+                     //cells_num_atoms_in_cell[lc]+=1;
                      //fprintf(stderr,"  atom = %d atom_id = %d lc = %d x[%d][%d] = %f y[%d][%d] = %f z[%d][%d] = %f num_atoms_in_cell = %d from cpu = %d\n",k,cells_index_atoms_array[j][k],lc,j,k,cells_atom_in_cell_coords_array_x[j][k],j,k,cells_atom_in_cell_coords_array_y[j][k],j,k,cells_atom_in_cell_coords_array_z[j][k],cells_num_atoms_in_cell[lc],proc_cell_index_array1D[j]);
+                     cells_atom_in_cell_coords_array_x[lc][k+size_old] = x;
+                     cells_atom_in_cell_coords_array_y[lc][k+size_old] = y;
+                     cells_atom_in_cell_coords_array_z[lc][k+size_old] = z;
+                     cells_index_atoms_array[lc][k+size_old]           = id;
+                     cells_num_atoms_in_cell[lc]+=1;
+                     //fprintf(stderr,"  atom = %d atom_id = %d lc = %d x[%d][%d] = %f y[%d][%d] = %f z[%d][%d] = %f num_atoms_in_cell = %d from cpu = %d\n",k+size_old,cells_index_atoms_array[j][k+size_old],lc,j,k+size_old,cells_atom_in_cell_coords_array_x[j][k+size_old],j,k+size_old,cells_atom_in_cell_coords_array_y[j][k+size_old],j,k+size_old,cells_atom_in_cell_coords_array_z[j][k+size_old],cells_num_atoms_in_cell[lc],proc_cell_index_array1D[j]);
                      //fprintf(stderr,"  num_atoms_in_cell[%d] = %d on my_rank = %d\n",lc,cells_num_atoms_in_cell[lc],vmpi::my_rank);
                   }
                }
@@ -483,7 +667,7 @@ namespace dipole{
 
          //MPI::COMM_WORLD.Barrier();
 
-         //fprintf(stderr,"\n\n >>>>>> Beore removing cellss <<<<<<<< \n\n");
+         fprintf(stderr,"\n\n >>>>>> Beore removing cellss <<<<<<<< \n\n");
 
          // remove cells that have same coords
          for(int i=0; i<counter; i++){
@@ -498,11 +682,11 @@ namespace dipole{
             cells_num_atoms_in_cell[lc]     = cells_num_atoms_in_cell[lc+1];
          }
 
-         //fprintf(stderr,"\n\n >>>>>> After removing cellss <<<<<<<< \n\n");
+         fprintf(stderr,"\n\n >>>>>> After removing cellss <<<<<<<< \n\n");
 
          //MPI::COMM_WORLD.Barrier();
 
-         //fprintf(stderr,"\n\n >>>>>> Beore removing atoms <<<<<<<< \n\n");
+         fprintf(stderr,"\n\n >>>>>> Beore removing atoms <<<<<<<< \n\n");
 
          //for(int i=0; i<counter; i++){
          for(int i=counter-1;i>=0;i--){
@@ -515,7 +699,7 @@ namespace dipole{
             cells_index_atoms_array.erase(cells_index_atoms_array.begin()+lc);
          }
 
-         //fprintf(stderr,"\n\n >>>>>> After removing atoms <<<<<<<< \n\n");
+         fprintf(stderr,"\n\n >>>>>> After removing atoms <<<<<<<< \n\n");
 
          //MPI::COMM_WORLD.Barrier();
 
