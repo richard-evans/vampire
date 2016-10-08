@@ -150,28 +150,28 @@ namespace dipole{
       //MPI::COMM_WORLD.Barrier();
 
 
-      std::vector<double> atom_pos_x(num_local_atoms,0.0);
-      std::vector<double> atom_pos_y(num_local_atoms,0.0);
-      std::vector<double> atom_pos_z(num_local_atoms,0.0);
-      //std::vector<double> atom_mom(num_local_atoms,0.0);
-      for(int atom=0; atom<num_local_atoms; atom++){
-         atom_pos_x[atom]=atom_coords_x[atom];
-         atom_pos_y[atom]=atom_coords_y[atom];
-         atom_pos_z[atom]=atom_coords_z[atom];
-         //int type = atom_type_array[atom];
-         //const double mus  = mp::material[type].mu_s_SI/9.27400915e-24;
-         ////////fprintf(stderr,"  atom = %d type = %d mus = %e atoms::type_array[atom] = %d mp::material[type] = %f on my_rank = %d\n",atom,type,mus,atoms::type_array[atom],mp::material[type].mu_s_SI,vmpi::my_rank);
-         //atom_mom[atom] = mus;
-      }
-      //for(int atom=0; atom<num_local_atoms; atom++){
-      //   fprintf(stderr," atom %d x = %f y = %f z = %f in cell %d on my_rank = %d\n",atom,atom_pos_x[atom],atom_pos_y[atom],atom_pos_z[atom],dipole::internal::atom_cell_id_array[atom],vmpi::my_rank);
-      //}
-
-      //for(int i=0; i<dipole::internal::cells_num_cells; i++){
-        // fprintf(stderr,"\n\n  >>>> Print volume array before paralle section <<<<<<\n   !!!!!!cells_volume_array[%d] = %f cells_num_atoms_in_cell[%d] = %d on rank = %d\n",i,dipole::internal::cells_volume_array[i],i,dipole::internal::cells_num_atoms_in_cell[i],vmpi::my_rank);
-      //}
-
       #ifdef MPICF
+         std::vector<double> atom_pos_x(num_local_atoms,0.0);
+         std::vector<double> atom_pos_y(num_local_atoms,0.0);
+         std::vector<double> atom_pos_z(num_local_atoms,0.0);
+         //std::vector<double> atom_mom(num_local_atoms,0.0);
+         for(int atom=0; atom<num_local_atoms; atom++){
+            atom_pos_x[atom]=atom_coords_x[atom];
+            atom_pos_y[atom]=atom_coords_y[atom];
+            atom_pos_z[atom]=atom_coords_z[atom];
+            //int type = atom_type_array[atom];
+            //const double mus  = mp::material[type].mu_s_SI/9.27400915e-24;
+            ////////fprintf(stderr,"  atom = %d type = %d mus = %e atoms::type_array[atom] = %d mp::material[type] = %f on my_rank = %d\n",atom,type,mus,atoms::type_array[atom],mp::material[type].mu_s_SI,vmpi::my_rank);
+            //atom_mom[atom] = mus;
+         }
+         //for(int atom=0; atom<num_local_atoms; atom++){
+         //   fprintf(stderr," atom %d x = %f y = %f z = %f in cell %d on my_rank = %d\n",atom,atom_pos_x[atom],atom_pos_y[atom],atom_pos_z[atom],dipole::internal::atom_cell_id_array[atom],vmpi::my_rank);
+         //}
+
+         //for(int i=0; i<dipole::internal::cells_num_cells; i++){
+           // fprintf(stderr,"\n\n  >>>> Print volume array before paralle section <<<<<<\n   !!!!!!cells_volume_array[%d] = %f cells_num_atoms_in_cell[%d] = %d on rank = %d\n",i,dipole::internal::cells_volume_array[i],i,dipole::internal::cells_num_atoms_in_cell[i],vmpi::my_rank);
+         //}
+
          //MPI::COMM_WORLD.Barrier();
 
          for(int lc=0; lc<dipole::internal::cells_num_cells; lc++){
@@ -267,6 +267,12 @@ namespace dipole{
          //   }
          //}
          //MPI::COMM_WORLD.Barrier();
+
+         //fprintf(stderr,"\n\n new cells_num_cells = %d cell_id_array.size()=%lu  tmp_cells_size=%d on my_rank = %d\n\n",cells_num_cells,tmp_cells_size,vmpi::my_rank);
+         // Clear atom_pos_x,y,z
+         atom_pos_x.clear();
+         atom_pos_y.clear();
+         atom_pos_z.clear();
       #endif
       //MPI::COMM_WORLD.Barrier();
       //fprintf(stderr,"\n\n");
@@ -279,12 +285,6 @@ namespace dipole{
       //   //fprintf(stderr,"\n\n  >>>> Print volume array after paralle section <<<<<<\n   !!!!!!cells_volume_array[%d] = %f cells_num_atoms_in_cell[%d] = %d on rank = %d\n",i,dipole::internal::cells_volume_array[i],i,dipole::internal::cells_num_atoms_in_cell[i],vmpi::my_rank);
       //}
 
-      #ifdef MPICF
-         int dipole_num_local_cells = dipole::internal::cells_num_local_cells; //cells::cell_id_array.size();
-      #else
-         int dipole_num_local_cells = dipole::internal::cells_num_local_cells;
-      #endif
-      //fprintf(stderr," >>>>>> updated value of cells_num_cells = %d cells_num_local_cells = %d dipole_num_local_cells = %d on my_rank = %d<<<<<<<<< \n",dipole::internal::cells_num_cells,dipole::internal::cells_num_local_cells,dipole_num_local_cells,vmpi::my_rank);
 
       //fprintf(stderr,"\n !!!! PROBLEMS!!!  just after updating dipoolenum_local_cells\n");
 
@@ -315,7 +315,6 @@ namespace dipole{
 
        // allocate arrays to store data [nloccell x ncells]
       for(int lc=0;lc<dipole::internal::cells_num_local_cells; lc++){
-      //for(int lc=0;lc<dipole_num_local_cells; lc++){
 
          dipole::internal::rij_inter_xx.push_back(std::vector<double>());
          dipole::internal::rij_inter_xx[lc].resize(dipole::internal::cells_num_cells,0.0);
@@ -370,7 +369,6 @@ namespace dipole{
 
       // loop over local cells
       for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
-      //for(int lc=0;lc<dipole_num_local_cells;lc++){
 
          // reference global cell ID
          //int i = dipole::internal::cells_local_cell_array[lc];
