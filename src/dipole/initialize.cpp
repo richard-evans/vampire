@@ -616,14 +616,14 @@ namespace dipole{
       ////file_sstr << ".cfg";
       //std::string cfg_file = file_sstr.str();
       //const char* cfg_filec = cfg_file.c_str();
-      /
+
       //// Output informative message to log file
       //zlog << zTs() << "Outputting dipole matrix file " << cfg_file << " to disk" << std::endl;
-      /
+
       //// Declare and open output file
       //std::ofstream cfg_file_ofstr;
       //cfg_file_ofstr.open (cfg_filec);
-      /
+
       //// Every cpus print to check dipolar martrix inter term
       //for(int i=0; i<dipole::internal::cells_num_local_cells; i++){
       //   int lc = cells::cell_id_array[i];
@@ -652,7 +652,7 @@ namespace dipole{
       //      }
       //   }
       //}
-      /
+
       //cfg_file_ofstr.close();
 	   ////--------------------------------------------------/
 
