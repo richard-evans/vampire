@@ -603,58 +603,58 @@ namespace dipole{
       //}
       //MPI::COMM_WORLD.Barrier();
 
-	////------- CPUs OUTPUT Dij on different fiels ------------//
-   //// Set local output filename
-   //std::stringstream file_sstr;
-   //file_sstr << "Dij-";
-   //file_sstr << vmpi::my_rank;
-   //// Set CPUID on non-root process
-   ////if(vmpi::my_rank!=0){
-   //   //file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
-   ////}
-   ////file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
-   ////file_sstr << ".cfg";
-   //std::string cfg_file = file_sstr.str();
-   //const char* cfg_filec = cfg_file.c_str();
-
-   //// Output informative message to log file
-   //zlog << zTs() << "Outputting dipole matrix file " << cfg_file << " to disk" << std::endl;
-
-   //// Declare and open output file
-   //std::ofstream cfg_file_ofstr;
-   //cfg_file_ofstr.open (cfg_filec);
-
-   //// Every cpus print to check dipolar martrix inter term
-   //for(int i=0; i<dipole::internal::cells_num_local_cells; i++){
-   //   int lc = cells::cell_id_array[i];
-   //   if(dipole::internal::cells_num_atoms_in_cell[cells::cell_id_array[i]]>0){
-   //      for(unsigned int j=0; j<dipole::internal::rij_inter_xx[i].size(); j++){
-   //         if(dipole::internal::cells_num_atoms_in_cell[j]>0){
-   //            //fprintf(cfg_file_ofstr,"i = %d j = %d\n\trij_inter_xx = %f\trij_inter_xy = %f\trij_inter_xz = %f\n\trij_inter_yx = %f\trij_inter_yy = %f\trij_inter_yz = %f\n\trij_inter_zx = %f\trij_inter_zy = %f\trij_inter_zz = %f\n on rank = %d\n",i,j,internal::rij_inter_xx[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_yy[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_zz[i][j],vmpi::my_rank);
-   //            cfg_file_ofstr << "i = " << i << "\tlc = " << lc << "\t";
-   //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+0] << "\t";
-   //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+1] << "\t";
-   //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+2] << "\t";
-   //            cfg_file_ofstr << " j = " << j << "\t";
-   //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+0] << "\t";
-   //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+1] << "\t";
-   //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+2] << "\t";
-   //            cfg_file_ofstr << "\n";
-   //            cfg_file_ofstr << "rij_intra_xx = " << dipole::internal::rij_intra_xx[i][j] << "\trij_intra_xy = " << dipole::internal::rij_intra_xy[i][j] << "\trij_intra_xz = " << dipole::internal::rij_intra_xz[i][j] << "\n";
-   //            cfg_file_ofstr << "rij_intra_yx = " << dipole::internal::rij_intra_xy[i][j] << "\trij_intra_yy = " << dipole::internal::rij_intra_yy[i][j] << "\trij_intra_yz = " << dipole::internal::rij_intra_yz[i][j] << "\n";
-   //            cfg_file_ofstr << "rij_intra_zx = " << dipole::internal::rij_intra_xz[i][j] << "\trij_intra_zy = " << dipole::internal::rij_intra_yz[i][j] << "\trij_intra_zz = " << dipole::internal::rij_intra_zz[i][j] << "\n";
-   //            cfg_file_ofstr << "\n";
-   //            cfg_file_ofstr << "rij_inter_xx = " << dipole::internal::rij_inter_xx[i][j] << "\trij_inter_xy = " << dipole::internal::rij_inter_xy[i][j] << "\trij_inter_xz = " << dipole::internal::rij_inter_xz[i][j] << "\n";
-   //            cfg_file_ofstr << "rij_inter_yx = " << dipole::internal::rij_inter_xy[i][j] << "\trij_inter_yy = " << dipole::internal::rij_inter_yy[i][j] << "\trij_inter_yz = " << dipole::internal::rij_inter_yz[i][j] << "\n";
-   //            cfg_file_ofstr << "rij_inter_zx = " << dipole::internal::rij_inter_xz[i][j] << "\trij_inter_zy = " << dipole::internal::rij_inter_yz[i][j] << "\trij_inter_zz = " << dipole::internal::rij_inter_zz[i][j] << "\n";
-   //            cfg_file_ofstr << "\n";
-   //         }
-   //      }
-   //   }
-   //}
-
-   //cfg_file_ofstr.close();
-	////--------------------------------------------------/
+	   ////------- CPUs OUTPUT Dij on different fiels ------------//
+      //// Set local output filename
+      //std::stringstream file_sstr;
+      //file_sstr << "Dij-";
+      //file_sstr << vmpi::my_rank;
+      //// Set CPUID on non-root process
+      ////if(vmpi::my_rank!=0){
+      //   //file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
+      ////}
+      ////file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
+      ////file_sstr << ".cfg";
+      //std::string cfg_file = file_sstr.str();
+      //const char* cfg_filec = cfg_file.c_str();
+      /
+      //// Output informative message to log file
+      //zlog << zTs() << "Outputting dipole matrix file " << cfg_file << " to disk" << std::endl;
+      /
+      //// Declare and open output file
+      //std::ofstream cfg_file_ofstr;
+      //cfg_file_ofstr.open (cfg_filec);
+      /
+      //// Every cpus print to check dipolar martrix inter term
+      //for(int i=0; i<dipole::internal::cells_num_local_cells; i++){
+      //   int lc = cells::cell_id_array[i];
+      //   if(dipole::internal::cells_num_atoms_in_cell[cells::cell_id_array[i]]>0){
+      //      for(unsigned int j=0; j<dipole::internal::rij_inter_xx[i].size(); j++){
+      //         if(dipole::internal::cells_num_atoms_in_cell[j]>0){
+      //            //fprintf(cfg_file_ofstr,"i = %d j = %d\n\trij_inter_xx = %f\trij_inter_xy = %f\trij_inter_xz = %f\n\trij_inter_yx = %f\trij_inter_yy = %f\trij_inter_yz = %f\n\trij_inter_zx = %f\trij_inter_zy = %f\trij_inter_zz = %f\n on rank = %d\n",i,j,internal::rij_inter_xx[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_yy[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_zz[i][j],vmpi::my_rank);
+      //            cfg_file_ofstr << "i = " << i << "\tlc = " << lc << "\t";
+      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+0] << "\t";
+      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+1] << "\t";
+      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+2] << "\t";
+      //            cfg_file_ofstr << " j = " << j << "\t";
+      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+0] << "\t";
+      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+1] << "\t";
+      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+2] << "\t";
+      //            cfg_file_ofstr << "\n";
+      //            cfg_file_ofstr << "rij_intra_xx = " << dipole::internal::rij_intra_xx[i][j] << "\trij_intra_xy = " << dipole::internal::rij_intra_xy[i][j] << "\trij_intra_xz = " << dipole::internal::rij_intra_xz[i][j] << "\n";
+      //            cfg_file_ofstr << "rij_intra_yx = " << dipole::internal::rij_intra_xy[i][j] << "\trij_intra_yy = " << dipole::internal::rij_intra_yy[i][j] << "\trij_intra_yz = " << dipole::internal::rij_intra_yz[i][j] << "\n";
+      //            cfg_file_ofstr << "rij_intra_zx = " << dipole::internal::rij_intra_xz[i][j] << "\trij_intra_zy = " << dipole::internal::rij_intra_yz[i][j] << "\trij_intra_zz = " << dipole::internal::rij_intra_zz[i][j] << "\n";
+      //            cfg_file_ofstr << "\n";
+      //            cfg_file_ofstr << "rij_inter_xx = " << dipole::internal::rij_inter_xx[i][j] << "\trij_inter_xy = " << dipole::internal::rij_inter_xy[i][j] << "\trij_inter_xz = " << dipole::internal::rij_inter_xz[i][j] << "\n";
+      //            cfg_file_ofstr << "rij_inter_yx = " << dipole::internal::rij_inter_xy[i][j] << "\trij_inter_yy = " << dipole::internal::rij_inter_yy[i][j] << "\trij_inter_yz = " << dipole::internal::rij_inter_yz[i][j] << "\n";
+      //            cfg_file_ofstr << "rij_inter_zx = " << dipole::internal::rij_inter_xz[i][j] << "\trij_inter_zy = " << dipole::internal::rij_inter_yz[i][j] << "\trij_inter_zz = " << dipole::internal::rij_inter_zz[i][j] << "\n";
+      //            cfg_file_ofstr << "\n";
+      //         }
+      //      }
+      //   }
+      //}
+      /
+      //cfg_file_ofstr.close();
+	   ////--------------------------------------------------/
 
 
 
