@@ -757,6 +757,7 @@ int match(string const key, string const word, string const value, string const 
    if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    //else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
@@ -1376,17 +1377,17 @@ int match_dimension(string const word, string const value, string const unit, in
       cs::particle_array_offset_y=paoy;
       return EXIT_SUCCESS;
    }
-  else
-   //--------------------------------------------------------------------
-   test="macro-cell-size";
-   if(word==test){
-      double cs=atof(value.c_str());
-      check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
-      //cells::size=cs;
-      cells::macro_cell_size=cs;
-      return EXIT_SUCCESS;
-   }
-   //--------------------------------------------------------------------
+   //else
+   ////--------------------------------------------------------------------
+   //test="macro-cell-size";
+   //if(word==test){
+   //   double cs=atof(value.c_str());
+   //   check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
+   //   //cells::size=cs;
+   //   cells::macro_cell_size=cs;
+   //   return EXIT_SUCCESS;
+   //}
+   ////--------------------------------------------------------------------
    else{
 	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'dimensions:"<< word << "\' on line " << line << " of input file" << std::endl;

@@ -31,7 +31,7 @@ namespace cells{
   // int match_dimension(std::string const word,std::string const value,std::string const unit, int const line){
 
       // Check for valid key, if no match return false
-      std::string prefix="cells:";
+      std::string prefix="cells";
       if(key!=prefix) return false;
 
       //----------------------------------
