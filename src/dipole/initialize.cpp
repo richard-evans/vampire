@@ -126,31 +126,24 @@ namespace dipole{
           t1 = time (NULL);
        #endif
 
-         // Check memory requirements and print to screen
-         zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-         std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+       // Check memory requirements and print to screen
+       zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+       std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 
-        // For MPI version, only add local atoms
-         #ifdef MPICF
-            int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-         #else
-            int num_local_atoms = num_atoms;
-         #endif
-
-      /*------------------------------------------------------*/
-      /* parallelisation section                              */
-      /*------------------------------------------------------*/
-      std::cout << "\n\nI'm in here Dipole Module\n\n" << std::flush;
-
-      //for(unsigned int i=0; i<cells::index_atoms_array1D.size(); i++){
-      //   //std::cout << "cells::index_atoms_array1D[" << i << "] = " << cells::index_atoms_array1D[i] << std::endl << std::flush;
-      //   //fprintf(stderr,"cells::index_atoms_array1D[%d] = %d on my_rank %d\n",i,cells::index_atoms_array1D[i],vmpi::my_rank);
-      //}
-      //std::cout << std::endl << std::flush;
-      //MPI::COMM_WORLD.Barrier();
+       // For MPI version, only add local atoms
+       #ifdef MPICF
+          int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+       #else
+          int num_local_atoms = num_atoms;
+       #endif
 
 
       #ifdef MPICF
+         /*------------------------------------------------------*/
+         /*        parallel section                              */
+         /*------------------------------------------------------*/
+         //std::cout << "\n\nI'm in here Dipole Module\n\n" << std::flush;
+
          std::vector<double> atom_pos_x(num_local_atoms,0.0);
          std::vector<double> atom_pos_y(num_local_atoms,0.0);
          std::vector<double> atom_pos_z(num_local_atoms,0.0);
@@ -164,14 +157,6 @@ namespace dipole{
             ////////fprintf(stderr,"  atom = %d type = %d mus = %e atoms::type_array[atom] = %d mp::material[type] = %f on my_rank = %d\n",atom,type,mus,atoms::type_array[atom],mp::material[type].mu_s_SI,vmpi::my_rank);
             //atom_mom[atom] = mus;
          }
-         //for(int atom=0; atom<num_local_atoms; atom++){
-         //   fprintf(stderr," atom %d x = %f y = %f z = %f in cell %d on my_rank = %d\n",atom,atom_pos_x[atom],atom_pos_y[atom],atom_pos_z[atom],dipole::internal::atom_cell_id_array[atom],vmpi::my_rank);
-         //}
-
-         //for(int i=0; i<dipole::internal::cells_num_cells; i++){
-           // fprintf(stderr,"\n\n  >>>> Print volume array before paralle section <<<<<<\n   !!!!!!cells_volume_array[%d] = %f cells_num_atoms_in_cell[%d] = %d on rank = %d\n",i,dipole::internal::cells_volume_array[i],i,dipole::internal::cells_num_atoms_in_cell[i],vmpi::my_rank);
-         //}
-
          //MPI::COMM_WORLD.Barrier();
 
          for(int lc=0; lc<dipole::internal::cells_num_cells; lc++){
@@ -202,7 +187,7 @@ namespace dipole{
          //MPI::COMM_WORLD.Barrier();
          //fprintf(stderr,"\n\n >>>>> End of send/recv session for cells ---> cells_num_cells = %d, cells_num_local_cells = %d on rank = %d<<<<<<\n\n",dipole::internal::cells_num_cells,dipole::internal::cells_num_local_cells,vmpi::my_rank);
 
-         int size = cells::cell_id_array.size();
+         //int size = cells::cell_id_array.size();
          //for(int i=0; i<dipole::internal::cells_num_local_cells; i++){
          //   //int lc = cells::cell_id_array[i];
          //   int lc = dipole::internal::cells_local_cell_array[i];
@@ -274,17 +259,13 @@ namespace dipole{
          atom_pos_y.clear();
          atom_pos_z.clear();
       #endif
-      //MPI::COMM_WORLD.Barrier();
+
       //fprintf(stderr,"\n\n");
-
       //fprintf(stderr,"\n !!!! PROBLEMS!!! \n");
-
 		//MPI::COMM_WORLD.Barrier();
-
       //for(int i=0; i<dipole::internal::cells_num_cells; i++){
       //   //fprintf(stderr,"\n\n  >>>> Print volume array after paralle section <<<<<<\n   !!!!!!cells_volume_array[%d] = %f cells_num_atoms_in_cell[%d] = %d on rank = %d\n",i,dipole::internal::cells_volume_array[i],i,dipole::internal::cells_num_atoms_in_cell[i],vmpi::my_rank);
       //}
-
 
       //fprintf(stderr,"\n !!!! PROBLEMS!!!  just after updating dipoolenum_local_cells\n");
 
@@ -362,10 +343,8 @@ namespace dipole{
       zlog << zTs() << "Precalculating rij matrix for demag calculation... " << std::endl;
 
 
-      //std::cout<< "Number of local cells= "<<dipole::internal::cells_num_local_cells << std::endl;
-      //std::cout<< "Number of  cells= "<<dipole::internal::cells_num_cells << std::endl;
-
-      //double cutoff=12.0; //after 12 macrocell of distance, the bare macrocell model gives the same result
+      std::cout<< "Number of local cells= "<<dipole::internal::cells_num_local_cells << std::endl;
+      std::cout<< "Number of  cells= "<<dipole::internal::cells_num_cells << std::endl;
 
       // loop over local cells
       for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){

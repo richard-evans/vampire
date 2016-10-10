@@ -16,6 +16,9 @@
 #include "errors.hpp"
 #include "vio.hpp"
 
+#include "sim.hpp"  // only until code not fully updated
+#include "material.hpp"
+
 // dipole module headers
 #include "internal.hpp"
 
@@ -30,18 +33,21 @@ namespace dipole{
       std::string prefix="dipole";
       if(key!=prefix) return false;
 
-/*      //----------------------------------
-      // Now test for all valid options
-      //----------------------------------
-      test="dipole-field-update-rate";
+      //-------------------------------------------------------------------
+      std::string test="solver";
       if(word==test){
-			int dpur=atoi(value.c_str());
-         // Test for valid range
-			check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-			dipole::update_rate=dpur;
+         // enable dipole calculation
+         dipole::activated=true;
+         sim::hamiltonian_simulation_flags[4]=1;
          return true;
       }
-*/
+      test="field-update-rate";
+      if(word==test){
+         int dpur=atoi(value.c_str());
+         vin::check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+         dipole::update_rate=dpur;
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -52,10 +58,17 @@ namespace dipole{
    //---------------------------------------------------------------------------
    // Function to process material parameters
    //---------------------------------------------------------------------------
-   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index){
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index, std::vector<mp::materials_t>& read_material){
 
       // add prefix string
       std::string prefix="material:";
+
+      //-------------------------------------------------------------------
+      std::string test="non-magnetic-element";
+      if(word==test){
+         read_material[super_index].non_magnetic_element_flag=true;
+         return true;
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found
@@ -65,4 +78,3 @@ namespace dipole{
    }
 
 } // end of dipole namespace
-

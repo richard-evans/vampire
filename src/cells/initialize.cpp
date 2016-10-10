@@ -24,8 +24,6 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
-#include "dipole.hpp"
-
 #include "atoms.hpp"
 
 // cells module headers
@@ -218,7 +216,8 @@ namespace cells{
          int type = atoms::type_array[atom];
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
-         if(mus/(9.274e-24) > 0.5){
+         //if(mus/(9.274e-24) > 0.5){
+         if(mp::material[type].non_magnetic_element_flag==false){
             /*cells::cell_coords_array_x[local_cell]+=atom_coords_x[atom]*mus;
             cells::cell_coords_array_y[local_cell]+=atom_coords_y[atom]*mus;
             cells::cell_coords_array_z[local_cell]+=atom_coords_z[atom]*mus;
@@ -323,7 +322,8 @@ namespace cells{
          int type = cells::internal::atom_type_array[atom];
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
-         if(mus/(9.274e-24) > 0.5){
+         //if(mus/(9.274e-24) > 0.5){
+         if(mp::material[type].non_magnetic_element_flag==false){
             cells::atom_in_cell_coords_array_x[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_x[atom];
             cells::atom_in_cell_coords_array_y[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_y[atom];
             cells::atom_in_cell_coords_array_z[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_z[atom];

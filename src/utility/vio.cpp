@@ -755,7 +755,9 @@ int match(string const key, string const word, string const value, string const 
 	// Call module input parameters
    //-------------------------------------------------------------------
    if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-	else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   //else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
 	//===================================================================
@@ -1546,32 +1548,32 @@ int match_sim(string const word, string const value, string const unit, int cons
 		 err::vexit();
       }
    }
-   //-------------------------------------------------------------------
-   test="enable-dipole-fields";
-   if(word==test){
-      sim::hamiltonian_simulation_flags[4]=1;
-      dipole::activated=true;
-      return EXIT_SUCCESS;
-   }
+//   //-------------------------------------------------------------------
+//   test="enable-dipole-fields";
+//   if(word==test){
+//      sim::hamiltonian_simulation_flags[4]=1;
+//      dipole::activated=true;
+//      return EXIT_SUCCESS;
+//   }
+//   //-------------------------------------------------------------------
+//   test="enable-fast-dipole-fields";
+//   if(word==test){
+//      //demag::fast=true;
+//      return EXIT_SUCCESS;
+//   }
+//   //-------------------------------------------------------------------
+//   test="dipole-field-update-rate";
+//   if(word==test){
+//      int dpur=atoi(value.c_str());
+//      check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+//      //demag::update_rate=dpur;
+//      dipole::update_rate=dpur;
+//      return EXIT_SUCCESS;
+//   }
    //-------------------------------------------------------------------
    test="enable-fmr-field";
    if(word==test){
       sim::hamiltonian_simulation_flags[5]=1;
-      return EXIT_SUCCESS;
-   }
-   //-------------------------------------------------------------------
-   test="enable-fast-dipole-fields";
-   if(word==test){
-      //demag::fast=true;
-      return EXIT_SUCCESS;
-   }
-   //-------------------------------------------------------------------
-   test="dipole-field-update-rate";
-   if(word==test){
-      int dpur=atoi(value.c_str());
-      check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-      //demag::update_rate=dpur;
-      dipole::update_rate=dpur;
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
@@ -2977,7 +2979,14 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 ///-------------------------------------------------------------------
 /// Function to match material key words
 ///-------------------------------------------------------------------
-int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
+   int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
+
+      //-------------------------------------------------------------------
+	   // Call module material parameters
+      //-------------------------------------------------------------------
+      if(dipole::match_material_parameter(word, value, unit, super_index, sub_index, line, read_material)) return EXIT_SUCCESS;
+      //-------------------------------------------------------------------
+
       std::string prefix="material:";
       //------------------------------------------------------------
       std::string test="num-materials";
