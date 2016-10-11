@@ -232,13 +232,7 @@ namespace cells{
          }
       }
 
-      //MPI::COMM_WORLD.Barrier();
       //fprintf(stderr,"\n\n  >>>> before adjusting coord of cells on rank %d <<<< \n\n",vmpi::my_rank);
-      //for(int i=0; i<cells::num_cells; i++){
-      //   if(cells::num_atoms_in_cell[i]>0){
-      //      fprintf(stderr,"volume_array[%d] = %f num_atoms_in_cell[%d] = %d x=%e y=%e z= %e M=%e on rank = %d\n",i,cells::volume_array[i],i,cells::num_atoms_in_cell[i],cells::pos_and_mom_array[4*i+0],cells::pos_and_mom_array[4*i+1],cells::pos_and_mom_array[4*i+2],cells::pos_and_mom_array[4*i+3],vmpi::my_rank);
-      //   }
-      //}
 
       // Save local cells index
       for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
@@ -248,19 +242,11 @@ namespace cells{
          }
       }
 
-      //for(unsigned int local_cell=0; local_cell<cells::cell_id_array.size(); local_cell++){
-      //   //std::cout << "index " << local_cell << " of cell_id_array = " << cells::cell_id_array[local_cell] << std::endl;
-      //   //std::cout << std::flush;
-      //   fprintf(stderr,"index %d of cell_id_array = %d on rank %d\n",local_cell,cells::cell_id_array[local_cell],vmpi::my_rank);
-      //}
-      //MPI::COMM_WORLD.Barrier();
 
-      //fprintf(stderr,"\n\t--- cells::num_atoms_in_cell.size() = %lu cell::num_cells = %d on my_rank = %d\n",cells::num_atoms_in_cell.size(),cells::num_cells,vmpi::my_rank);
       #ifdef MPICF
          MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		#endif
-      //fprintf(stderr,"\n\t+++ cells::num_atoms_in_cell.size() = %lu cell::num_cells = %d on my_rank = %d\n",cells::num_atoms_in_cell.size(),cells::num_cells,vmpi::my_rank);
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
       const double atomic_volume = unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/cells::num_atoms_in_unit_cell;
@@ -277,21 +263,6 @@ namespace cells{
          }
       }
 
-      //MPI::COMM_WORLD.Barrier();
-      //fprintf(stderr,"\n\n  >>>> after adjusting coord of cells on rank %d <<<< \n\n",vmpi::my_rank);
-      //for(int i=0; i<cells::num_cells; i++){
-      //   if(cells::num_atoms_in_cell[i]>0){
-      //      fprintf(stderr,"volume_array[%d] = %f num_atoms_in_cell[%d] = %d x=%f y=%f z= %f M=%e on rank = %d\n",i,cells::volume_array[i],i,cells::num_atoms_in_cell[i],cells::pos_and_mom_array[4*i+0],cells::pos_and_mom_array[4*i+1],cells::pos_and_mom_array[4*i+2],cells::pos_and_mom_array[4*i+3],vmpi::my_rank);
-      //   }
-      //}
-
-      //for(int atom=0; atom<num_local_atoms; atom++){
-      //   /*std::cout << "atom " << atom << " in cell " << cells::atom_cell_id_array[atom] << std::endl;
-      //   std::cout << std::flush;*/
-      //   //fprintf(stderr,"atom %d with coordinates %f %f %f in cell %d of coordinates %f %f %f in proc %d\n",atom,atom_coords_x[atom],atom_coords_y[atom],atom_coords_z[atom],cells::atom_cell_id_array[atom],cells::pos_and_mom_array[4*cells::atom_cell_id_array[atom]+0],cells::pos_and_mom_array[4*cells::atom_cell_id_array[atom]+1],cells::pos_and_mom_array[4*cells::atom_cell_id_array[atom]+2],vmpi::my_rank);
-      //   //std::cout << std::flush;
-      //}
-      //MPI::COMM_WORLD.Barrier();
 
      cells::atom_in_cell_coords_array_x.resize(cells::num_cells,std::vector<double>(num_local_atoms));
      cells::atom_in_cell_coords_array_y.resize(cells::num_cells,std::vector<double>(num_local_atoms));
@@ -312,7 +283,6 @@ namespace cells{
             cells::atom_in_cell_coords_array_y[i][j]=0.0;
             cells::atom_in_cell_coords_array_z[i][j]=0.0;
             cells::index_atoms_array[i][j]=0;
-            //cells::index_atoms_array1D[j]=0;
          }
       }
 
@@ -341,52 +311,12 @@ namespace cells{
             int atom=cells::index_atoms_array[cells::cell_id_array[lc]][i];
             //cells::index_atoms_array1D.push_back(atom);
             cells::index_atoms_array1D[counter_id_at]=atom;
-            //std::cout << "lc " << lc << " cell " << cells::cell_id_array[lc] << " loc_atom " << i << " atom " << atom << "\n" << std::flush;
-            //fprintf(stderr,"lc %d cell %d with coordinates %f %f %f local_atom %d atom %d\t my_rank %d\n",lc,cells::cell_id_array[lc],cells::pos_and_mom_array[4*lc+0],cells::pos_and_mom_array[4*lc+1],cells::pos_and_mom_array[4*lc+2],i,atom,vmpi::my_rank);
             counter_id_at++;
          }
       }
-      std::cout << "cells::cell_id_array.size() = " << cells::cell_id_array.size() << "\n" << std::flush;
-      std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
+      //std::cout << "cells::cell_id_array.size() = " << cells::cell_id_array.size() << "\n" << std::flush;
+      //std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
 
-      //MPI::COMM_WORLD.Barrier();
-
-      //#ifdef MPICF
-      //   for(int cpu=0;cpu<vmpi::num_processors;cpu++){
-      //      if(vmpi::my_rank==cpu){
-      //         for(int i=0;i<cells::num_cells;i++){
-      //            if(cells::num_atoms_in_cell[i]!=0){
-      //               for(int j=0;j<num_local_atoms;j++){
-      //                //std::cout << "my_rank = " << vmpi::my_rank << "\t";
-      //                //std::cout << cells::index_atoms_array[i][j] << "\t";
-      //                //std::cout << i << "\t";
-      //                //std::cout << j << "\t";
-      //                //std::cout << cells::atom_in_cell_coords_array_x[i][j] << "\t";
-      //                //std::cout << cells::atom_in_cell_coords_array_y[i][j] << "\t";
-      //                //std::cout << cells::atom_in_cell_coords_array_z[i][j] << std::endl;
-      //                //std::cout << std::flush;
-      //                  //fprintf(stderr,"my_rank = %d\t %d\t %d \t%d\t %f\t %f\t %f\n",vmpi::my_rank,cells::index_atoms_array[i][j],i,j,cells::atom_in_cell_coords_array_x[i][j],cells::atom_in_cell_coords_array_y[i][j],cells::atom_in_cell_coords_array_z[i][j]);
-      //               }
-      //            }
-      //         }
-      //      }
-      //   }
-      //   MPI::COMM_WORLD.Barrier();
-      //#else
-      //   for(int i=0;i<cells::num_cells;i++){
-      //      if(cells::num_atoms_in_cell[i]!=0){
-      //         for(int j=0;j<num_local_atoms;j++){
-      //         	//std::cout << cells::index_atoms_array[i][j] << "\t";
-      //         	//std::cout << i << "\t";
-      //         	//std::cout << j << "\t";
-      //         	//std::cout << cells::atom_in_cell_coords_array_x[i][j] << "\t";
-      //         	//std::cout << cells::atom_in_cell_coords_array_y[i][j] << "\t";
-      //         	//std::cout << cells::atom_in_cell_coords_array_z[i][j] << std::endl;
-      //            //std::cout << std::flush;
-      //         }
-      //      }
-      //   }
-      //#endif
 
       // Calculate number of local cells
       for(int cell=0;cell<cells::num_cells;cell++){
@@ -395,51 +325,10 @@ namespace cells{
             cells::local_cell_array.push_back(cell);
             cells::num_local_cells++;
             //cells::volume_array[cell] = double(cells::num_atoms_in_cell[cell])*atomic_volume;
-            //std::cout << "cell " << cell << " has " << cells::num_atoms_in_cell[cell] << " atoms inside\n" << std::flush;
-            //fprintf(stderr,"cell %d of coords %f %f %f has %d atoms inside and volume %f on cpu=my_rank= %d\n",cell,cells::pos_and_mom_array[4*cell+0],cells::pos_and_mom_array[4*cell+1],cells::pos_and_mom_array[4*cell+2],cells::num_atoms_in_cell[cell],cells::volume_array[cell],vmpi::my_rank);
-            //std::cerr << std::flush;
          }
       }
-      std::cout << "cell_id_array.size() = " << cell_id_array.size() << "\n" << std::flush;
-      std::cout << "local_cell_array.size() = " << local_cell_array.size() << "\n" << std::flush;
-      std::cout << "num_local_cells = " << num_local_cells << "\n" << std::flush;
-      for(int lc=0; lc<cells::num_local_cells; lc++){
-         #ifdef MPICF
-            //fprintf(stderr,"%d\t%d\t%f\t%f\t%f\t%e\n",cell_id_array[lc],local_cell_array[lc],pos_and_mom_array[4*cell_id_array[lc]+0],pos_and_mom_array[4*cell_id_array[lc]+1],pos_and_mom_array[4*cell_id_array[lc]+2],pos_and_mom_array[4*cell_id_array[lc]+3]);
-         #else
-            //std::cout << cell_id_array[lc] << "\t";
-            //std::cout << local_cell_array[lc] << "\t";
-            //std::cout << pos_and_mom_array[4*cell_id_array[lc]+0] << "\t";
-            //std::cout << pos_and_mom_array[4*cell_id_array[lc]+1] << "\t";
-            //std::cout << pos_and_mom_array[4*cell_id_array[lc]+2] << "\t";
-            //std::cout << pos_and_mom_array[4*cell_id_array[lc]+3] << "\n" << std::flush;
-            //std::cout << std::endl << std::flush;
-         #endif
-      }
-      //MPI::COMM_WORLD.Barrier();
 
-      std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
-
-      std::vector<double> atom_pos_x(num_local_atoms,0.0);
-      std::vector<double> atom_pos_y(num_local_atoms,0.0);
-      std::vector<double> atom_pos_z(num_local_atoms,0.0);
-      for(int atom=0; atom<num_local_atoms; atom++){
-         atom_pos_x[atom]=atom_coords_x[atom];
-         atom_pos_y[atom]=atom_coords_y[atom];
-         atom_pos_z[atom]=atom_coords_z[atom];
-      }
-
-
-      //for(int lc=0; lc<cells::num_local_cells; lc++){
-      //      //fprintf(stderr,"\tmy_rank=%d\tcell_id_array[lc] %d\tx %f\ty %f\tz %f\tmu %e\n",vmpi::my_rank,cell_id_array[lc],pos_and_mom_array[4*cell_id_array[lc]+0],pos_and_mom_array[4*cell_id_array[lc]+1],pos_and_mom_array[4*cell_id_array[lc]+2],pos_and_mom_array[4*cell_id_array[lc]+3]);
-      //}
-
-
-      //fprintf(stderr,"\n\n");
-      //MPI::COMM_WORLD.Barrier();
-
-      int counter_cell=0;
-      //fprintf(stderr,"\n\n");
+      //std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
 
 
       zlog << zTs() << "Number of local macrocells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;

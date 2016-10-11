@@ -230,6 +230,7 @@ namespace dipole{
          //   }
          //}
          //MPI::COMM_WORLD.Barrier();
+
          //fprintf(stderr,"\n\n >>>>> BEFORE sort_data() func <<<<<<<\n");
 
       	sort_data(dipole::internal::proc_cell_index_array1D,
@@ -244,7 +245,9 @@ namespace dipole{
                   dipole::internal::cells_num_cells
                   );
          //MPI::COMM_WORLD.Barrier();
+
 		   //fprintf(stderr,"\n\n =======> after call of sort_data() func ---> cells_num_cells = %d, cells_num_local_cells = %d cells_pos_and_mom_array.size() = %lu on rank = %d <===========\n\n",dipole::internal::cells_num_cells,dipole::internal::cells_num_local_cells,dipole::internal::cells_pos_and_mom_array.size(),vmpi::my_rank);
+
          //MPI::COMM_WORLD.Barrier();
          //for(int lc=0; lc<ceil(dipole::internal::cells_pos_and_mom_array.size()/4.); lc++){
          //   if( (dipole::internal::cells_num_atoms_in_cell[lc]>0 && lc<dipole::internal::cells_num_cells) || (lc>=dipole::internal::cells_num_cells)){
