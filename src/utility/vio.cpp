@@ -2985,7 +2985,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
       //-------------------------------------------------------------------
 	   // Call module material parameters
       //-------------------------------------------------------------------
-      if(dipole::match_material_parameter(word, value, unit, super_index, sub_index, line, read_material)) return EXIT_SUCCESS;
+      //if(dipole::match_material_parameter(word, value, unit, super_index, sub_index, line, read_material)) return EXIT_SUCCESS;
       //-------------------------------------------------------------------
 
       std::string prefix="material:";
@@ -3002,6 +3002,13 @@ int read_mat_file(std::string const matfile, int const LineNumber){
       test="material-name";
       if(word==test){
          read_material[super_index].name=value;
+         return EXIT_SUCCESS;
+      }
+      //-------------------------------------------------------------------
+      test="non-magnetic-element";
+      if(word==test){
+         read_material[super_index].non_magnetic_element_flag=true;
+         std::cout << "element " << super_index << " is not magnetic" << "\n" << std::flush;
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------

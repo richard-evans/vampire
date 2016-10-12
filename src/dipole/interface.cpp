@@ -63,12 +63,13 @@ namespace dipole{
       // add prefix string
       std::string prefix="material:";
 
-      //-------------------------------------------------------------------
-      std::string test="non-magnetic-element";
-      if(word==test){
-         read_material[super_index].non_magnetic_element_flag=true;
-         return true;
-      }
+      ////-------------------------------------------------------------------
+      //std::string test="non-magnetic-element";
+      //if(word==test){
+      //   read_material[super_index].non_magnetic_element_flag=true;
+      //   std::cout << "element " << super_index << " is not magnetic" << "\n" << std::flush;
+      //   return true;
+      //}
 
       //--------------------------------------------------------------------
       // Keyword not found
