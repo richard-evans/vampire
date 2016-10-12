@@ -26,7 +26,7 @@
 
 // dipole module headers
 #include "internal.hpp"
-
+#include "material.hpp"
 #include "sim.hpp"
 
 namespace dipole{
@@ -81,8 +81,9 @@ namespace dipole{
 			   // Update Atomistic Dipolar Field Array
 			   for(int atom=0;atom<num_local_atoms;atom++){
 				   const int cell = dipole::internal::atom_cell_id_array[atom];
+               int type = dipole::internal::atom_type_array[atom];
                //fprintf(stderr,"\tcell = %d x = %f y = %f z = %f mus = %e on my_rank = %d\n",cell,cells::pos_and_mom_array[4*cell+0],cells::pos_and_mom_array[4*cell+1],cells::pos_and_mom_array[4*cell+2],cells::pos_and_mom_array[4*cell+3],vmpi::my_rank);
-   	         if(dipole::internal::cells_num_atoms_in_cell[cell]>0){
+   	         if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic_element_flag==false){
 				      // Copy field from macrocell to atomistic spin
 				      dipole::atom_dipolar_field_array_x[atom]=dipole::cells_field_array_x[cell];
 				      dipole::atom_dipolar_field_array_y[atom]=dipole::cells_field_array_y[cell];
