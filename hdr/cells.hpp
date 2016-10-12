@@ -31,6 +31,7 @@ namespace cells{
 
    extern std::vector <int> local_cell_array;
    extern std::vector <int> num_atoms_in_cell; /// number of atoms in each cell
+   extern std::vector <int> num_atoms_in_cell_global; /// global number of atoms in each cell
    extern std::vector < std::vector <int> > index_atoms_array;
    extern std::vector<int> index_atoms_array1D;
 

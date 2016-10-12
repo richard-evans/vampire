@@ -204,6 +204,7 @@ namespace cells{
       cells::field_array_z.resize(cells::num_cells,0.0);
 
       cells::num_atoms_in_cell.resize(cells::num_cells,0);
+      cells::num_atoms_in_cell_global.resize(0);
       cells::volume_array.resize(cells::num_cells,0.0);
 
       cells::internal::total_moment_array.resize(cells::num_cells,0.0);
@@ -246,7 +247,10 @@ namespace cells{
       #ifdef MPICF
          MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      cells::num_atoms_in_cell_global.resize(cells::num_cells);
+      cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
 		#endif
+
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
       const double atomic_volume = unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/cells::num_atoms_in_unit_cell;

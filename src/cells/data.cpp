@@ -35,6 +35,7 @@ namespace cells{
 
    std::vector <int> local_cell_array;
    std::vector<int> num_atoms_in_cell; /// number of atoms in each cell
+   std::vector<int> num_atoms_in_cell_global; /// global number of atoms in each cell
    std::vector < std::vector <int> > index_atoms_array; /// array to store list of atoms associated with cells in 2D structure
    std::vector<int> index_atoms_array1D; /// array to store list of atoms associated with cells in 1D structure
 

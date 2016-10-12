@@ -46,6 +46,7 @@ namespace dipole{
                   const double cells_macro_cell_size,
                   std::vector <int>& cells_local_cell_array,
                   std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
+                  std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
                   std::vector < std::vector <int> >& cells_index_atoms_array,
 
                   const std::vector<double>& cells_volume_array,
@@ -143,6 +144,11 @@ namespace dipole{
          /*        parallel section                              */
          /*------------------------------------------------------*/
          //std::cout << "\n\nI'm in here Dipole Module\n\n" << std::flush;
+         //for(int lc=0; lc<dipole::internal::cells_num_cells; lc++){
+         //   fprintf(stderr,"\t *#*#*#* lc = %d  num_atoms_in_cell[%d] = %d num_atoms_in_cell_global[%d] = %d on rank=%d\t*#*#*#\n",lc,lc,dipole::internal::cells_num_atoms_in_cell[lc],lc,cells_num_atoms_in_cell_global[lc],vmpi::my_rank);
+         //}
+         //fprintf(stderr,"\n\n");
+         //MPI::COMM_WORLD.Barrier();
 
          std::vector<double> atom_pos_x(num_local_atoms,0.0);
          std::vector<double> atom_pos_y(num_local_atoms,0.0);
@@ -264,7 +270,18 @@ namespace dipole{
          //}
          //MPI::COMM_WORLD.Barrier();
 
-         //fprintf(stderr,"\n\n new cells_num_cells = %d cell_id_array.size()=%lu  tmp_cells_size=%d on my_rank = %d\n\n",cells_num_cells,tmp_cells_size,vmpi::my_rank);
+         //fprintf(stderr,"\n\n new cells_num_cells = %d cell_id_array.size()=%lu on my_rank = %d\n\n",cells_num_cells,cells::cell_id_array.size(),vmpi::my_rank);
+         //fprintf(stderr,"\n\n >>> dipole::internal::cells_num_atoms_in_cell.size()=%lu \t cells_num_atoms_in_cell_global.size()=%lu ceil(dipole::internal::cells_pos_and_mom_array.size()/4.)=%f on rank=%d <<<< \n\n",dipole::internal::cells_num_atoms_in_cell.size(),cells_num_atoms_in_cell_global.size(),ceil(dipole::internal::cells_pos_and_mom_array.size()/4.),vmpi::my_rank);
+         //fprintf(stderr,"\n\n");
+         for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
+            if(cells_num_atoms_in_cell_global[i]>0 && dipole::internal::cells_num_atoms_in_cell[i]==0){
+               dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
+               //fprintf(stderr,"  >>> cell=%d, cells_num_atoms_in_cell_global=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,cells_num_atoms_in_cell_global[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
+            }
+         }
+         cells_num_atoms_in_cell_global.clear();
+         //fprintf(stderr,"\n\n After updating num_cells \n\n");
+
          // Clear atom_pos_x,y,z
          atom_pos_x.clear();
          atom_pos_y.clear();
@@ -279,9 +296,6 @@ namespace dipole{
       //}
 
       //fprintf(stderr,"\n !!!! PROBLEMS!!!  just after updating dipoolenum_local_cells\n");
-
-      //fprintf(stderr,"\n !!!! PROBLEMS!!! just before printing atom_in_cell_coords_array_x,y,z arrays\n");
-
       //for(int i=0;i<dipole::internal::cells_num_cells;i++){
       //   if(dipole::internal::cells_num_atoms_in_cell[i]>0){
       //      for(int j=0;j<dipole::internal::cells_num_atoms_in_cell[i];j++){
@@ -290,6 +304,7 @@ namespace dipole{
       //   }
       //}
       //MPI::COMM_WORLD.Barrier();
+      //fprintf(stderr,"\n !!!! PROBLEMS!!! just before printing atom_in_cell_coords_array_x,y,z arrays\n");
       //for(int lc=0; lc<ceil(dipole::internal::cells_pos_and_mom_array.size()/4.); lc++){
       //   if( (dipole::internal::cells_num_atoms_in_cell[lc]>0 && lc<dipole::internal::cells_num_cells) || (lc>=dipole::internal::cells_num_cells)){
       //      fprintf(stderr,"cell=%d, num_atoms_in_cell=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,dipole::internal::cells_num_atoms_in_cell[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);

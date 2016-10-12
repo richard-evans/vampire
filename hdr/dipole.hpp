@@ -113,6 +113,7 @@ namespace dipole{
                    const double cells_macro_cell_size,
                    std::vector <int>& cells_local_cell_array,
                    std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
+                   std::vector <int>& cells_num_atoms_in_cell_global, ///global  number of atoms in each cell
                    std::vector < std::vector <int> >& cells_index_atoms_array,
                    const std::vector<double>& cells_volume_array,
                    /*const std::vector<double>& cells_cell_coords_array_x, /// arrays to store cells positions

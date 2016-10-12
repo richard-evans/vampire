@@ -316,11 +316,9 @@ int create(){
                         cells::macro_cell_size,
                         cells::local_cell_array,
                         cells::num_atoms_in_cell,
+                        cells::num_atoms_in_cell_global, // <----
                         cells::index_atoms_array,
                         cells::volume_array,
-                        /*cells::cell_coords_array_x,
-                        cells::cell_coords_array_y,
-                        cells::cell_coords_array_z,*/
                         cells::pos_and_mom_array,
                         cells::atom_in_cell_coords_array_x,
                         cells::atom_in_cell_coords_array_y,
