@@ -151,6 +151,7 @@ obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
 include src/create/makefile
+include src/config/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile

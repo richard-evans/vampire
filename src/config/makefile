@@ -6,7 +6,8 @@
 config_objects =\
 data.o \
 initialize.o \
-interface.o
+interface.o \
+output.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/config/,$(config_objects))

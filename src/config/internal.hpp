@@ -27,6 +27,15 @@
 // config module headers
 #include "internal.hpp"
 
+namespace vout{
+   // function headers
+   void atoms();
+   void atoms_coords();
+   void cells();
+   void cells_coords();
+}
+
+
 namespace config{
 
    namespace internal{
