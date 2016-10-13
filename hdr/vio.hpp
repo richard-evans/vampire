@@ -101,15 +101,6 @@ namespace vout{
 
    extern bool gnuplot_array_format;
 
-	extern bool output_atoms_config;
-	extern int output_atoms_config_rate;
-
-	extern double atoms_output_min[3];
-	extern double atoms_output_max[3];
-
-	extern bool output_cells_config;
-	extern int output_cells_config_rate;
-
 	extern bool output_grains_config;
 	extern int output_config_grain_rate;
 
@@ -120,7 +111,6 @@ namespace vout{
 	//extern int output_povray_cells_rate;
 
 	extern void data();
-	extern void config();
 	extern void zLogTsInit(std::string);
 
 	//extern int pov_file();

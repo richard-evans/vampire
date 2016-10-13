@@ -4,9 +4,7 @@
 #
 #===================================================================
 
-
-
-export OMPI_CXX=g++
+export OMPI_CXX=CC
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 #export MPICH_CXX=g++
@@ -17,13 +15,15 @@ GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-MPICC=mpicxx -DMPICF
+#MPICC=mpicxx -DMPICF
+MPICC=CC -DMPICF
 
 export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=-lstdc++
+LIBS=
+#-lstdc++
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
@@ -53,12 +53,15 @@ GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA
+--ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
 NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
+CRAY_CFLAGS= -O3 -hfp3 -I./hdr -I./src/qvoronoi
+CRAY_LDFLAGS= -I./hdr -I./src/qvoronoi
 
 # Objects
 OBJECTS= \
@@ -148,6 +151,7 @@ obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
 include src/create/makefile
+include src/config/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
@@ -165,6 +169,7 @@ MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_mpi.o)
 MPI_LLVM_OBJECTS=$(OBJECTS:.o=_llvm_mpi.o)
 MPI_PCC_OBJECTS=$(OBJECTS:.o=_p_mpi.o)
 MPI_IBM_OBJECTS=$(OBJECTS:.o=_ibm_mpi.o)
+MPI_CRAY_OBJECTS=$(OBJECTS:.o=_cray_mpi.o)
 MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
 MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
@@ -235,7 +240,12 @@ $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 parallel-intel: $(MPI_ICC_OBJECTS)
 	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<
+	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<intel: $(MPI_ICC_OBJECTS)
+
+parallel-cray: $(MPI_CRAY_OBJECTS)
+	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(EXECUTABLE)
+$(MPI_CRAY_OBJECTS): obj/%_cray_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(CRAY_CFLAGS) $<
 
 parallel-llvm: $(MPI_LLVM_OBJECTS)
 	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(EXECUTABLE)
