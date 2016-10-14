@@ -4,19 +4,20 @@
 #
 #===================================================================
 
-export OMPI_CXX=CC
+# Specify compiler for MPI compilation with openmpi
+#export OMPI_CXX=g++
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
+# Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
-export MPICH_CXX=bgxlc++
+#export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-#MPICC=mpicxx -DMPICF
-MPICC=CC -DMPICF
+MPICC=mpicxx -DMPICF
 
 export LANG=C
 export LC_ALL=C
@@ -131,7 +132,6 @@ obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
 obj/utility/units.o \
-obj/utility/vconfig.o \
 obj/utility/vmath.o\
 obj/qvoronoi/geom.o\
 obj/qvoronoi/geom2.o\
