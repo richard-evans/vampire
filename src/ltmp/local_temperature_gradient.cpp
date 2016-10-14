@@ -30,7 +30,7 @@ namespace ltmp{
          const double Tmax = ltmp::internal::maximum_temperature;
 
          // Calculate new electron and lattice temperatures with temperature gradient
-         for(int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
+         for(unsigned int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
 
             // Determine cell temperature
             const double sqrtT = sqrt(Tmin + Tmax*attenuation_array[cell]);

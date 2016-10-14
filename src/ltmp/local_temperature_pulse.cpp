@@ -56,7 +56,7 @@ namespace ltmp{
          const double dTdiff_prefactor = ltmp::internal::thermal_conductivity/(ltmp::internal::micro_cell_size*ltmp::internal::micro_cell_size*1.e-20);
 
          // Determine change in Te and Tp
-         for(int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
+         for(unsigned int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
 
             const double Te = root_temperature_array[2*cell+0]*root_temperature_array[2*cell+0];
             const double Tp = root_temperature_array[2*cell+1]*root_temperature_array[2*cell+1];
@@ -75,7 +75,7 @@ namespace ltmp{
          } // end of cell loop
 
          // Calculate new electron and lattice temperatures
-         for(int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
+         for(unsigned int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
 
             const double Te = root_temperature_array[2*cell+0]*root_temperature_array[2*cell+0] + delta_temperature_array[2*cell+0];
             const double Tp = root_temperature_array[2*cell+1]*root_temperature_array[2*cell+1] + delta_temperature_array[2*cell+1];

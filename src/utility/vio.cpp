@@ -78,8 +78,7 @@
 #include <direct.h>
 #endif
 
-
-// Unused functions 
+// Unused functions
 //
 //namespace vout{
 //

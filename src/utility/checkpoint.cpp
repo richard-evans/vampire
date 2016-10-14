@@ -145,7 +145,7 @@ void load_checkpoint(){
    if(sim::load_checkpoint_continue_flag) mtrandom::grnd.set_state(mt_state, mt_p);
 
    // check for rational number of atoms
-   if((atoms::num_atoms-vmpi::num_halo_atoms)!=natoms64){
+   if(static_cast<uint64_t>(atoms::num_atoms-vmpi::num_halo_atoms) != natoms64){
       terminaltextcolor(RED);
       std::cerr << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting." << std::endl;
       terminaltextcolor(WHITE);
