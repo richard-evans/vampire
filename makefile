@@ -19,6 +19,9 @@ PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
 
+CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
+CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
+
 export LANG=C
 export LC_ALL=C
 
@@ -85,6 +88,7 @@ obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
+obj/mpi/decomposition.o \
 obj/mpi/LLGHeun-mpi.o \
 obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \
@@ -182,6 +186,7 @@ MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
 MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
+MPI_CRAYDB_OBJECTS=$(OBJECTS:.o=_craydb_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
@@ -287,6 +292,11 @@ parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
+
+parallel-cray-debug: $(MPI_CRAY_OBJECTS)
+	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(EXECUTABLE)
+$(MPI_CRAYDB_OBJECTS): obj/%_craydb_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(CCC_CFLAGS) $<
 
 parallel-pathscale-debug: $(MPI_PCCDB_OBJECTS)
 	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
