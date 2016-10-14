@@ -21,6 +21,8 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
+#include <iostream>
 
 // Vampire headers
 
@@ -33,20 +35,20 @@ namespace vin{
    //----------------------------------------------------------------------------------
    //Funciton protypes for functions inside: match.cpp
    //----------------------------------------------------------------------------------
-   int match(string const, string const, string const, string const, int const);
+   int match(std::string const, std::string const, std::string const, std::string const, int const);
    int match_create(std::string const, std::string const, std::string const, int const);
    int match_dimension(std::string const, std::string const, std::string const, int const);
    int match_sim(std::string const, std::string const, std::string const, int const);
    int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
    int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-   int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
+   int match_material(std::string const, std::string const, std::string const, int const, int const, int const, std::string const, std::string const);
    int match_config(std::string const, std::string const, std::string const, int const);
 
    //----------------------------------------------------------------------------------
    //Funciton protypes for functions inside: read.cpp
    //----------------------------------------------------------------------------------
    std::string GetString(std::string const filename);
-   int read(string const filename);
+   int read(std::string const filename);
    int read_mat_file(std::string const, int const);
 
 }

@@ -11,6 +11,7 @@ globalio.o \
 initialize.o \
 interface.o \
 match.o \
+nullify.o \
 outputfunctions.o \
 read.o
 

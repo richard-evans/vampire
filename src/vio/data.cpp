@@ -39,6 +39,4 @@ namespace vout{
 
 	bool gnuplot_array_format=false;
 
-	std::ofstream errfile;
-
 }
