@@ -278,7 +278,7 @@ int run(){
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
-	if (micromagnetic::discretisation_micromagnetic) micromagnetic::initialize(cells::num_cells,stats::num_atoms, mp::num_materials,atoms::cell_array, atoms::neighbour_list_array,atoms::neighbour_list_start_index, atoms::neighbour_list_end_index,atoms::type_array, mp::material, class material_t);
+	if (micromagnetic::discretisation_micromagnetic) micromagnetic::initialize(cells::num_cells,stats::num_atoms, mp::num_materials,atoms::cell_array, atoms::neighbour_list_array,atoms::neighbour_list_start_index, atoms::neighbour_list_end_index,atoms::type_array, mp::material, atoms::x_coord_array,atoms::y_coord_array,atoms::z_coord_array,cs::unit_cell_size[0],cs::unit_cell_size[1],cs::unit_cell_size[2], cells::volume_array, sim::temperature, cells::num_atoms_in_unit_cell);
 	// Select program to run
 	switch(sim::program){
 		case 0:
@@ -530,7 +530,6 @@ int integrate(int n_steps){
 ///=====================================================================================
 ///
 void integrate_serial(int n_steps){
-
    // Check for calling of function
    if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
 
@@ -541,7 +540,7 @@ void integrate_serial(int n_steps){
          for(int ti=0;ti<n_steps;ti++){
             // Optionally select GPU accelerated version
             if(gpu::acceleration) gpu::llg_heun();
-				else if (micromagnetic::discretisation_micromagnetic) micromagnetic::LLB(n_steps,cells::num_cells, sim::temperature, cells::x_mag_array, cells::y_mag_array, cells::z_mag_array, 0,0,0);
+				else if (micromagnetic::discretisation_micromagnetic) micromagnetic::LLB(n_steps,cells::num_cells, sim::temperature, cells::x_mag_array, cells::y_mag_array, cells::z_mag_array, sim::H_vec[0],sim::H_vec[1],sim::H_vec[2], sim::H_applied, mp::dt, cells::volume_array);
 
             // Otherwise use CPU version
             else sim::LLG_Heun();

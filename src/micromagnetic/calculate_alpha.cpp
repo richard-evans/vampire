@@ -19,7 +19,7 @@ namespace micromagnetic
 
          for (int atom = 0; atom <num_atoms; atom++){
             int m = type_array[atom];
-            alpha[cell_array[atom]] = alpha[cell_array[atom]]; + mp::material[type_array[atom]].alpha;
+            alpha[cell_array[atom]] = alpha[cell_array[atom]] + mp::material[type_array[atom]].alpha;
             N[cell_array[atom]]++;
          }
 

@@ -16,6 +16,7 @@ namespace micromagnetic
          {
             ms[cell_array[atom]] = ms[cell_array[atom]] + material[type_array[atom]].mu_s_SI;
          }
+         std::cout << "\t" << ms[0] <<std::endl;
          return ms;
       }
    }

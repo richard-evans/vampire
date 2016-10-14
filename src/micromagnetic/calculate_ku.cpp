@@ -15,7 +15,8 @@ namespace micromagnetic
          std::vector<double> ku(num_cells,0.0);
          for (int atom = 0; atom < num_atoms; atom++)
          {
-            ku[cell_array[atom]] = ku[cell_array[atom]] +  mp::material[type_array[atom]].Ku3_SI;
+            ku[cell_array[atom]] = ku[cell_array[atom]] +  mp::material[type_array[atom]].Ku1_SI;
+         //   std::cerr <<  mp::material[type_array[atom]].Ku1_SI <<std::endl;
          }
          return ku;
       }
