@@ -1,37 +1,3 @@
-//-----------------------------------------------------------------------------
-//
-//  Vampire - A code for cellistic simulation of magnetic materials
-//
-//  Copyright (C) 2009-2012 R.F.L.Evans
-//
-//  Email:richard.evans@york.ac.uk
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-///====================================================================================================
-///
-///       				                    	LLB
-///
-///  			 Subroutine to simulate an cellistic system with LLB integration scheme
-///
-///									Version 1.0 R Evans 02/10/2008
-///
-///====================================================================================================
-
 
 // Vampire headers
 #include "micromagnetic.hpp"
@@ -44,15 +10,18 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 
 namespace mm = micromagnetic::internal;
 
-int LLB_serial_heun(int num_steps,int num_cells,double temperature,std::vector<double> x_mag_array,std::vector<double> y_mag_array,std::vector<double> z_mag_array,double Hx,double Hy,double Hz);
+
+int LLB_serial_heun(int num_steps,int num_cells,double temperature,std::vector<double>& x_mag_array,std::vector<double>& y_mag_array,std::vector<double>& z_mag_array,double Hx,double Hy,double Hz, double H,double dt,std::vector <double> volume_array);
 
 namespace micromagnetic{
 /// Master LLB Function - dispatches code path to desired LLB routine
 /// \f$ \frac{\partial S}{\partial t} \f$
-int LLB(int num_steps,int num_cells,double temperature,std::vector<double> x_mag_array,std::vector<double> y_mag_array,std::vector<double> z_mag_array,double Hx,double Hy,double Hz){
+int LLB(int num_steps,int num_cells,double temperature,std::vector<double>& x_mag_array,std::vector<double>& y_mag_array,std::vector<double>& z_mag_array,double Hx,double Hy,double Hz, double H,double dt, std::vector <double> volume_array){
+
    //----------------------------------------------------------
    // check calling of routine if error checking is activated
    //----------------------------------------------------------
@@ -63,265 +32,200 @@ int LLB(int num_steps,int num_cells,double temperature,std::vector<double> x_mag
    #ifdef MPICF
       //LLB_mpi(num_steps);
    #else
-   LLB_serial_heun(num_steps,num_cells,temperature,x_mag_array,y_mag_array,z_mag_array,Hx,Hy,Hz);
+   LLB_serial_heun(num_steps,num_cells,temperature,x_mag_array,y_mag_array,z_mag_array,Hx,Hy,Hz,H,dt, volume_array);
    #endif
 
    return 0;
 }
 }
 
-
-/// Performs serial Heun integration of the Landau-Lifshitz-Bloch Equation of motion
 int LLB_serial_heun(
    int num_steps,
    int num_cells,
    double temperature,
-   std::vector<double> x_mag_array,
-   std::vector<double> y_mag_array,
-   std::vector<double> z_mag_array,
+   std::vector<double>& x_mag_array,
+   std::vector<double>& y_mag_array,
+   std::vector<double>& z_mag_array,
    double Hx,
    double Hy,
-   double Hz
+   double Hz,
+   double H,
+   double dt,
+   std::vector <double> volume_array
 ){
 
-   std::vector<double> alpha_para(num_cells,0.0);
-   std::vector<double> alpha_perp(num_cells,0.0);
-   std::vector<double> m_e(num_cells,0.0);
-   std::vector<double> m_e_squared(num_cells,0.0);
-   std::vector<double> one_o_chi_perp(num_cells,0.0);
-   std::vector<double> one_o_2_chi_para(num_cells,0.0);
-   std::vector<double> reduced_temperature(num_cells,0.0);
-   std::vector<double> sigma_para(num_cells,0.0);
-   std::vector<double> sigma_perp(num_cells,0.0);
-   std::vector<double> Tc_o_Tc_m_T(num_cells,0.0);
-   std::vector<double> dt(num_cells,0.0);
-
 	const double kB = 1.3806503e-23;
-   const double dt_SI = 1.0E-15;    //why?!?!?!?!?!?
+   double one_o_chi_perp, one_o_2_chi_para, reduced_temperature, Tc_o_Tc_m_T, m_e, alpha_para, alpha_perp, m_e_squared;
+   std::vector<double> m(3,0.0);
+   std::vector<double> spin_field(3,0.0);
+   std::vector<double> ext_field(3,0.0);
+   std::vector<double> dip_field(3,0.0);
 
-   for (int cell =0; cell <num_cells; cell++)
-   {
-      reduced_temperature[cell] = temperature/mm::Tc[cell];
-      Tc_o_Tc_m_T[cell] = mm::Tc[cell]/(temperature - mm::Tc[cell]);
-   }
+   std::vector<double> x_array(num_cells,0.0);
+   std::vector<double> y_array(num_cells,0.0);
+   std::vector<double> z_array(num_cells,0.0);
 
-   for (int cell =0; cell <num_cells; cell++)
-   {
-      if (temperature<=mm::Tc[cell])
-      {
-         m_e[cell] = pow((mm::Tc[cell]-temperature)/(mm::Tc[cell]),0.365);
-         alpha_para[cell] = (2.0/3.0)*mm::alpha[cell]*reduced_temperature[cell];
-         alpha_perp[cell] = mm::alpha[cell]*(1.0-temperature/(3.0*mm::Tc[cell]));
-      }
-      else
-      {
-         m_e[cell] = 0.0;
-         alpha_para[cell] = mm::alpha[cell]*(2.0/3.0)*reduced_temperature[cell];
-         alpha_perp[cell] = alpha_para[cell];
-      }
-      m_e_squared[cell] = m_e[cell]*m_e[cell];
-      one_o_chi_perp[cell] = 1.0/mm::chi_perp[cell];
-      one_o_2_chi_para[cell] = 1.0/(2.0*mm::chi_para[cell]);
-      dt[cell] = dt_SI*mm::gamma[cell];
-   }
-
-   for (int cell =0; cell <num_cells; cell++)
-   {
-	     if(temperature<0.1)   sigma_para[cell] = 1.0;
-        else                  sigma_para[cell] = sqrt(2.0*kB*temperature/(mm::ms[cell]*mm::gamma[cell]*alpha_para[cell]*dt_SI));
-        sigma_perp[cell] = sqrt(2.0*kB*temperature/(mm::ms[cell]*mm::gamma[cell]*alpha_perp[cell]*dt_SI));
-   }
-
-   //does mu_s*n_spins --> Ms ??
-   //what are alpha/gamma/dt_SI
-
-
-   //replace with an array over the cells?
-   std::vector <double> Htx_perp(num_cells);
-   std::vector <double> Hty_perp(num_cells);
-   std::vector <double> Htz_perp(num_cells);
-   std::vector <double> Htx_para(num_cells);
-   std::vector <double> Hty_para(num_cells);
-   std::vector <double> Htz_para(num_cells);
-
-   // precalculate thermal fields
-   generate (Htx_perp.begin(),Htx_perp.end(), mtrandom::gaussian);
-   generate (Hty_perp.begin(),Hty_perp.end(), mtrandom::gaussian);
-   generate (Htz_perp.begin(),Htz_perp.end(), mtrandom::gaussian);
-   generate (Htx_para.begin(),Htx_para.end(), mtrandom::gaussian);
-   generate (Hty_para.begin(),Hty_para.end(), mtrandom::gaussian);
-   generate (Htz_para.begin(),Htz_para.end(), mtrandom::gaussian);
-
-   std::vector<double> x_cell_storage_array(num_cells,0.0);
-   std::vector<double> y_cell_storage_array(num_cells,0.0);
-   std::vector<double> z_cell_storage_array(num_cells,0.0);
    std::vector<double> x_euler_array(num_cells,0.0);
    std::vector<double> y_euler_array(num_cells,0.0);
    std::vector<double> z_euler_array(num_cells,0.0);
+
    std::vector<double> x_heun_array(num_cells,0.0);
    std::vector<double> y_heun_array(num_cells,0.0);
    std::vector<double> z_heun_array(num_cells,0.0);
-   std::vector<double> x_initial_mag_array(num_cells,0.0);
-   std::vector<double> y_initial_mag_array(num_cells,0.0);
-   std::vector<double> z_initial_mag_array(num_cells,0.0);
-   std::vector<double> x_total_cell_field_array(num_cells,0.0);
-   std::vector<double> y_total_cell_field_array(num_cells,0.0);
-   std::vector<double> z_total_cell_field_array(num_cells,0.0);
-   std::vector<double> x_total_external_field_array(num_cells,0.0);
-   std::vector<double> y_total_external_field_array(num_cells,0.0);
-   std::vector<double> z_total_external_field_array(num_cells,0.0);
-   std::vector<double> xyz(3,0.0);
 
-   for(unsigned int cell=0;cell<num_cells;cell++){
-		Htx_perp[cell] *= sigma_perp[cell];
-		Hty_perp[cell] *= sigma_perp[cell];
-		Htz_perp[cell] *= sigma_perp[cell];
-		Htx_para[cell] *= sigma_para[cell];
-		Hty_para[cell] *= sigma_para[cell];
-		Htz_para[cell] *= sigma_para[cell];
-	}
+   std::vector<double> mx_store(num_cells,0.0);
+   std::vector<double> my_store(num_cells,0.0);
+   std::vector<double> mz_store(num_cells,0.0);
+
+   std::vector<double> mx_init(num_cells,0.0);
+   std::vector<double> my_init(num_cells,0.0);
+   std::vector<double> mz_init(num_cells,0.0);
+
+
+   std::vector <double> GW1x(num_cells);
+   std::vector <double> GW1y(num_cells);
+   std::vector <double> GW1z(num_cells);
+   std::vector <double> GW2x(num_cells);
+   std::vector <double> GW2y(num_cells);
+   std::vector <double> GW2z(num_cells);
+
+   //--------------------------------------------------------------------------------------------------------------------------------
+
+   //----------------------------------------------------Loop over N steps-------------- --------------------------------------------
+
+   //--------------------------------------------------------------------------------------------------------------------------------
+
+   ext_field[0] = H*Hx;
+   ext_field[1] = H*Hy;
+   ext_field[2] = H*Hz;
 
    for(int t=0;t<num_steps;t++){
 
-      // Store initial spin positions for each cell
-      for(unsigned int cell=0;cell<num_cells;cell++){
-         x_initial_mag_array[cell] = x_mag_array[cell];
-         y_initial_mag_array[cell] = y_mag_array[cell];
-         z_initial_mag_array[cell] = z_mag_array[cell];
+      for (int cell = 0; cell < num_cells; cell ++)
+      {
+         x_array[cell] = x_mag_array[cell]/mm::ms[cell];
+         y_array[cell] = x_mag_array[cell]/mm::ms[cell];
+         z_array[cell] = x_mag_array[cell]/mm::ms[cell];
       }
 
-
-
-      fill (x_total_cell_field_array.begin(),x_total_cell_field_array.end(),0.0);
-      fill (y_total_cell_field_array.begin(),y_total_cell_field_array.end(),0.0);
-      fill (z_total_cell_field_array.begin(),z_total_cell_field_array.end(),0.0);
-      fill (x_total_external_field_array.begin(),x_total_external_field_array.end(),Hx);
-      fill (y_total_external_field_array.begin(),y_total_external_field_array.end(),Hy);
-      fill (z_total_external_field_array.begin(),z_total_external_field_array.end(),Hz);
-
-
       for(unsigned int cell=0;cell<num_cells;cell++){
-			double m[3] = {x_mag_array[cell],y_mag_array[cell],z_mag_array[cell]};
-			double m_squared = m[1]*m[1]+m[2]*m[2]+m[0]*m[0];
-			double pf;
-			if(temperature<=mm::Tc[cell]){
-				pf = one_o_2_chi_para[cell]*(1.0 - m_squared/m_e_squared[cell]);
-			}
-			else{
-				pf = -2.0*one_o_2_chi_para[cell]*(1.0 + Tc_o_Tc_m_T[cell]*3.0*m_squared/5.0);
-			}
+         mx_init[cell] = x_array[cell];
+         my_init[cell] = y_array[cell];
+         mz_init[cell] = z_array[cell];
+      }
 
-			x_total_cell_field_array[cell] = (pf-one_o_chi_perp[cell])*m[0];
-			y_total_cell_field_array[cell] = (pf-one_o_chi_perp[cell])*m[1];
-			z_total_cell_field_array[cell] = (pf-0.0				 )*m[2];
-		}
+      mm::chi_para =  mm::calculate_chi_para(num_cells, temperature);
+      mm::chi_perp =  mm::calculate_chi_perp(num_cells, temperature);
+
+      generate (GW1x.begin(),GW1x.end(), mtrandom::gaussian);
+      generate (GW1y.begin(),GW1y.end(), mtrandom::gaussian);
+      generate (GW1z.begin(),GW1z.end(), mtrandom::gaussian);
+      generate (GW2x.begin(),GW2x.end(), mtrandom::gaussian);
+      generate (GW2y.begin(),GW2y.end(), mtrandom::gaussian);
+      generate (GW2z.begin(),GW2z.end(), mtrandom::gaussian);
+
+      //--------------------------------------------------------------------------------------------------------------------------------
+
+      //----------------------------------------------------Calculation of the euler vectors --------------------------------------------
+
+      //--------------------------------------------------------------------------------------------------------------------------------
 
 
-      		// Calculate Euler Step
-      		for(unsigned int cell=0;cell<num_cells;cell++){
+      for (int cell =0; cell <num_cells; cell++)
+      {
+         one_o_chi_perp = 1.0/mm::chi_perp[cell];
+         one_o_2_chi_para = 1.0/(2.0*mm::chi_para[cell]);
+         reduced_temperature = temperature/mm::Tc[cell];
+         Tc_o_Tc_m_T = mm::Tc[cell]/(temperature - mm::Tc[cell]);
 
-      			// Store local spin in Sand local field in H
-      			const double S[3] = {x_mag_array[cell],y_mag_array[cell],z_mag_array[cell]};
+         if (temperature<=mm::Tc[cell])
+         {
+            m_e = pow((mm::Tc[cell]-temperature)/(mm::Tc[cell]),0.365);
+            alpha_para = (2.0/3.0)*mm::alpha[cell]*reduced_temperature;
+            alpha_perp = mm::alpha[cell]*(1.0-temperature/(3.0*mm::Tc[cell]));
+         }
+         else
+         {
+            m_e = 0.0;
+            alpha_para = mm::alpha[cell]*(2.0/3.0)*reduced_temperature;
+            alpha_perp = alpha_para;
+         }
 
-      			const double H[3] = {x_total_cell_field_array[cell]+x_total_external_field_array[cell],
-      										y_total_cell_field_array[cell]+y_total_external_field_array[cell],
-      										z_total_cell_field_array[cell]+z_total_external_field_array[cell]};
+         m_e_squared = m_e*m_e;
+         m[0] = x_array[cell];
+         m[1] = y_array[cell];
+         m[2] = z_array[cell];
 
-      			const double H_perp[3]={H[0]+Htx_perp[cell], H[1]+Hty_perp[cell], H[2]+Htz_perp[cell]};
-      			const double H_para[3]={H[0]+Htx_para[cell], H[1]+Hty_para[cell], H[2]+Htz_para[cell]};
+         const double m_squared = m[1]*m[1]+m[2]*m[2]+m[0]*m[0];
 
-      			const double one_o_m_squared = 1.0/(S[1]*S[1]+S[2]*S[2]+S[0]*S[0]);
+         double pf;
+         if(temperature<=mm::Tc[cell]) pf = one_o_2_chi_para*(1.0 - m_squared/m_e_squared);
+         else pf = -2.0*one_o_2_chi_para*(1.0 + Tc_o_Tc_m_T*3.0*m_squared/5.0);
 
-      			// Calculate Delta S
-      			xyz[0]= 	-(S[1]*H[2]-S[2]*H[1])
-      						+ alpha_para[cell]*S[0]*S[0]*H_para[0]*one_o_m_squared
-      						-alpha_perp[cell]*(S[1]*(S[0]*H_perp[1]-S[1]*H_perp[0])-S[2]*(S[2]*H_perp[0]-S[0]*H_perp[2]))*one_o_m_squared;
 
-      			xyz[1]= 	-(S[2]*H[0]-S[0]*H[2])
-      						+ alpha_para[cell]*S[1]*S[1]*H_para[1]*one_o_m_squared
-      						-alpha_perp[cell]*(S[2]*(S[1]*H_perp[2]-S[2]*H_perp[1])-S[0]*(S[0]*H_perp[1]-S[1]*H_perp[0]))*one_o_m_squared;
 
-      			xyz[2]=	-(S[0]*H[1]-S[1]*H[0])
-      						+ alpha_para[cell]*S[2]*S[2]*H_para[2]*one_o_m_squared
-      						-alpha_perp[cell]*(S[0]*(S[2]*H_perp[0]-S[0]*H_perp[2])-S[1]*(S[1]*H_perp[2]-S[2]*H_perp[1]))*one_o_m_squared;
+         double exchange_field[3]={0.0,0.0,0.0};
+         int j2 = cell*num_cells;
+         double mcell = pow(m[0]*m[0] +m[1]*m[1] + m[2]*m[2],0.5);
+         double mj;
+			for(int j=0;j<num_cells;j++){
+            mj = pow(x_array[j]*x_array[j] +y_array[j]*y_array[j] + z_array[j]*z_array[j],0.5);
+				exchange_field[0]+=pow(m_e,1.66)*(x_array[j]/mj -m[0]/mcell)*mm::Ax[j2];
+				exchange_field[1]+=pow(m_e,1.66)*(y_array[j]/mj -m[1]/mcell)*mm::Ay[j2];
+				exchange_field[2]+=pow(m_e,1.66)*(z_array[j]/mj -m[2]/mcell)*mm::Az[j2];
+            j2++;
+   		}
+         spin_field[0] = (pf)*m[0];// - (one_o_chi_perp)*m[0];// + exchange_field[0];
+         spin_field[1] = (pf)*m[1];// - (one_o_chi_perp)*m[1];// + exchange_field[1];
+         spin_field[2] = (pf - 0             )*m[2];// + exchange_field[2];
 
-      			// Store dS in euler array
-      			x_euler_array[cell]=xyz[0];
-      			y_euler_array[cell]=xyz[1];
-      			z_euler_array[cell]=xyz[2];
+         double g = sqrt(mm::gamma[cell]*mm::gamma[cell]);
+         double sigma_para = sqrt(2*kB*temperature*alpha_para*g/mm::ms[cell])*dt; //why 1e-27
+         double sigma_perp = sqrt(2*kB*temperature*(alpha_perp-alpha_para)/(g*mm::ms[cell]*alpha_perp*alpha_perp))*dt;
 
-      			// Calculate Euler Step
-      			x_cell_storage_array[cell]=S[0]+xyz[0]*dt[cell];
-      			y_cell_storage_array[cell]=S[1]+xyz[1]*dt[cell];
-      			z_cell_storage_array[cell]=S[2]+xyz[2]*dt[cell];
+         const double H[3] = {spin_field[0],// + ext_field[0] + dip_field[0],
+                              spin_field[1],// + ext_field[1] + dip_field[1],
+                              spin_field[2]};// + ext_field[2] + dip_field[2]};
 
-      		}
+         const double GW2t[3] = {GW2x[cell],GW2y[cell],GW2z[cell]};
+         const double one_o_m_squared = 1.0/(m[0]*m[0]+m[1]*m[1]+m[2]*m[2]);
+         const double SdotH = m[0]*H[0] + m[1]*H[1] + m[2]*H[2];
 
-            for(unsigned int cell=0;cell<num_cells;cell++){
-               x_mag_array[cell]=x_cell_storage_array[cell];
-               y_mag_array[cell]=y_cell_storage_array[cell];
-               z_mag_array[cell]=z_cell_storage_array[cell];
-            }
+         double xyz[3];
 
-            // Recalculate spin dependent fields
-            fill (x_total_cell_field_array.begin(),x_total_cell_field_array.end(),0.0);
-            fill (y_total_cell_field_array.begin(),y_total_cell_field_array.end(),0.0);
-            fill (z_total_cell_field_array.begin(),z_total_cell_field_array.end(),0.0);
-            for(unsigned int cell=0;cell<num_cells;cell++){
-      			double m[3] = {x_mag_array[cell],y_mag_array[cell],z_mag_array[cell]};
-      			double m_squared = m[1]*m[1]+m[2]*m[2]+m[0]*m[0];
-      			double pf;
-      			if(temperature<=mm::Tc[cell]){
-      				pf = one_o_2_chi_para[cell]*(1.0 - m_squared/m_e_squared[cell]);
-      			}
-      			else{
-      				pf = -2.0*one_o_2_chi_para[cell]*(1.0 + Tc_o_Tc_m_T[cell]*3.0*m_squared/5.0);
-      			}
+         xyz[0]= 	- mm::gamma[cell]*(m[1]*H[2]-m[2]*H[1])
+                  + g*alpha_para*m[0]*SdotH*one_o_m_squared
+                  - g*alpha_perp*(m[1]*(m[0]*H[1]-m[1]*H[0])-m[2]*(m[2]*H[0]-m[0]*H[2]))*one_o_m_squared
+                  + GW1x[cell]*sigma_para
+                  - g*alpha_perp*(m[1]*(m[0]*GW2t[1]-m[1]*GW2t[0])-m[2]*(m[2]*GW2t[0]-m[0]*GW2t[2]))*one_o_m_squared*GW2x[cell]*sigma_perp;
 
-      			x_total_cell_field_array[cell] = (pf-one_o_chi_perp[cell])*m[0];
-      			y_total_cell_field_array[cell] = (pf-one_o_chi_perp[cell])*m[1];
-      			z_total_cell_field_array[cell] = (pf-0.0				 )*m[2];
-      		}
+         xyz[1]= 	- mm::gamma[cell]*(m[2]*H[0]-m[0]*H[2])
+                  + g*alpha_para*m[1]*SdotH*one_o_m_squared
+                  - g*alpha_perp*(m[2]*(m[1]*H[2]-m[2]*H[1])-m[0]*(m[0]*H[1]-m[1]*H[0]))*one_o_m_squared
+                  + GW1y[cell]*sigma_para
+                  - g*alpha_perp*(m[2]*(m[1]*GW2t[2]-m[2]*GW2t[1])-m[0]*(m[0]*GW2t[1]-m[1]*GW2t[0]))*one_o_m_squared*GW2y[cell]*sigma_perp;
 
-            for(unsigned int cell=0;cell<num_cells;cell++){
+         xyz[2]=	- mm::gamma[cell]*(m[0]*H[1]-m[1]*H[0])
+                  + g*alpha_para*m[2]*SdotH*one_o_m_squared
+                  - g*alpha_perp*(m[0]*(m[2]*H[0]-m[0]*H[2])-m[1]*(m[1]*H[2]-m[2]*H[1]))*one_o_m_squared
+                  + GW1z[cell]*sigma_para
+                  - g*alpha_perp*(m[0]*(m[2]*GW2t[0]-m[0]*GW2t[2])-m[1]*(m[1]*GW2t[2]-m[2]*GW2t[1]))*one_o_m_squared*GW2z[cell]*sigma_perp;
 
-               // Store local spin in Sand local field in H
-               const double S[3] = {x_mag_array[cell],y_mag_array[cell],z_mag_array[cell]};
-               const double H[3] = {x_total_cell_field_array[cell]+x_total_external_field_array[cell],
-                                    y_total_cell_field_array[cell]+y_total_external_field_array[cell],
-                                    z_total_cell_field_array[cell]+z_total_external_field_array[cell]};
 
-               const double H_perp[3]={H[0]+Htx_perp[cell], H[1]+Hty_perp[cell], H[2]+Htz_perp[cell]};
-               const double H_para[3]={H[0]+Htx_para[cell], H[1]+Hty_para[cell], H[2]+Htz_para[cell]};
-               const double one_o_m_squared = 1.0/(S[1]*S[1]+S[2]*S[2]+S[0]*S[0]);
+         x_euler_array[cell]=xyz[0];
+         y_euler_array[cell]=xyz[1];
+         z_euler_array[cell]=xyz[2];
 
-               // Calculate Delta S
-               xyz[0]= 	-(S[1]*H[2]-S[2]*H[1])
-                        + alpha_para[cell]*S[0]*S[0]*H_para[0]*one_o_m_squared
-                        -alpha_perp[cell]*(S[1]*(S[0]*H_perp[1]-S[1]*H_perp[0])-S[2]*(S[2]*H_perp[0]-S[0]*H_perp[2]))*one_o_m_squared;
+         x_array[cell] = m[0]+xyz[0]*dt;
+         y_array[cell] = m[1]+xyz[1]*dt;
+         z_array[cell] = m[2]+xyz[2]*dt;
 
-               xyz[1]= 	-(S[2]*H[0]-S[0]*H[2])
-                        + alpha_para[cell]*S[1]*S[1]*H_para[1]*one_o_m_squared
-                        -alpha_perp[cell]*(S[2]*(S[1]*H_perp[2]-S[2]*H_perp[1])-S[0]*(S[0]*H_perp[1]-S[1]*H_perp[0]))*one_o_m_squared;
+         x_mag_array[cell] = x_array[cell]*mm::ms[cell];
+         y_mag_array[cell] = y_array[cell]*mm::ms[cell];
+         z_mag_array[cell] = z_array[cell]*mm::ms[cell];
 
-               xyz[2]=	-(S[0]*H[1]-S[1]*H[0])
-                        + alpha_para[cell]*S[2]*S[2]*H_para[2]*one_o_m_squared
-                        -alpha_perp[cell]*(S[0]*(S[2]*H_perp[0]-S[0]*H_perp[2])-S[1]*(S[1]*H_perp[2]-S[2]*H_perp[1]))*one_o_m_squared;
-
-               // Store dS in heun array
-               x_heun_array[cell]=xyz[0];
-               y_heun_array[cell]=xyz[1];
-               z_heun_array[cell]=xyz[2];
-            }
-
-            for(unsigned int cell=0;cell<num_cells;cell++){
-               x_mag_array[cell]=x_initial_mag_array[cell]+0.5*dt[cell]*(x_euler_array[cell]+x_heun_array[cell]);
-               y_mag_array[cell]=y_initial_mag_array[cell]+0.5*dt[cell]*(y_euler_array[cell]+y_heun_array[cell]);
-               z_mag_array[cell]=z_initial_mag_array[cell]+0.5*dt[cell]*(z_euler_array[cell]+z_heun_array[cell]);
-            }
+std::cout << temperature << '\t' << x_array[cell] << '\t' << y_array[cell] << "\t" << z_array[cell] << "\t" << m_squared << '\t' << pf << "\t" << one_o_chi_perp << "\t" << xyz[0] <<"\t"<< exchange_field[0] <<std::endl;
+      }
 
    }
-
-
-	return EXIT_SUCCESS;
 }

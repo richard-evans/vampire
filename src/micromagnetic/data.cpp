@@ -34,7 +34,9 @@ namespace micromagnetic{
       //------------------------------------------------------------------------
 
 
-      std::vector<double> A;
+      std::vector<double> Ax;
+      std::vector<double> Ay;
+      std::vector<double> Az;
       std::vector<double> alpha;
       std::vector<double> chi_perp;
       std::vector<double> chi_para;
