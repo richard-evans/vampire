@@ -29,7 +29,7 @@
 #endif
 
 namespace vin{
-   
+
    //----------------------------------------------------------------------------------
    //Funciton protypes for functions inside: match.cpp
    //----------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ namespace vin{
    int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
    int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
    int match_config(std::string const, std::string const, std::string const, int const);
-   
+
    //----------------------------------------------------------------------------------
    //Funciton protypes for functions inside: read.cpp
    //----------------------------------------------------------------------------------

@@ -58,7 +58,7 @@ namespace vin{
 	}
 
 	///
-	/// Function to open file in parrallel 
+	/// Function to open file in parrallel
 	///
 	std::string GetString(std::string const filename){
 
