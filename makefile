@@ -128,7 +128,6 @@ obj/utility/errors.o \
 obj/utility/statistics.o \
 obj/utility/units.o \
 obj/utility/vconfig.o \
-obj/utility/vio.o \
 obj/utility/vmath.o\
 obj/qvoronoi/geom.o\
 obj/qvoronoi/geom2.o\
@@ -149,12 +148,16 @@ obj/qvoronoi/usermem.o\
 obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
+#obj/utility/vio.o \
+
+
 # Include supplementary makefiles
 include src/create/makefile
 include src/config/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
+include src/vio/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)
