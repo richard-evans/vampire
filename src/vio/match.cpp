@@ -11,34 +11,23 @@
 //
 
 // C++ standard library headers
+#include <sstream>
 
 // Vampire headers
 // Headers
-#include "atoms.hpp"
-#include "cells.hpp"
-#include "config.hpp"
-#include "create.hpp"
-#include "demag.hpp"
-#include "errors.hpp"
-#include "grains.hpp"
-#include "ltmp.hpp"
-#include "voronoi.hpp"
-#include "material.hpp"
-#include "errors.hpp"
-#include "random.hpp"
+#include "vio.hpp"
 #include "sim.hpp"
+#include "errors.hpp"
+#include "material.hpp"
+#include "grains.hpp"
 #include "stats.hpp"
 #include "units.hpp"
-#include "vio.hpp"
-#include "vmpi.hpp"
-
-#include <algorithm>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
+#include "config.hpp"
+#include "demag.hpp"
+#include "cells.hpp"
+#include "voronoi.hpp"
+#include "ltmp.hpp"
+#include "random.hpp"
 
 // vio module headers
 #include "internal.hpp"

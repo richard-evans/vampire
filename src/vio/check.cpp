@@ -14,30 +14,9 @@
 
 // Vampire headers
 // Headers
-#include "atoms.hpp"
-#include "cells.hpp"
-#include "create.hpp"
-#include "demag.hpp"
-#include "errors.hpp"
-#include "grains.hpp"
-#include "ltmp.hpp"
-#include "voronoi.hpp"
-#include "material.hpp"
-#include "errors.hpp"
-#include "random.hpp"
-#include "sim.hpp"
-#include "stats.hpp"
-#include "units.hpp"
 #include "vio.hpp"
-#include "vmpi.hpp"
-
-#include <algorithm>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
+#include "errors.hpp"
+#include "units.hpp"
 
 // vio module headers
 #include "internal.hpp"

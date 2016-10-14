@@ -20,34 +20,9 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
-#include <algorithm>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string>
-#include <vector>
-// Vampire headers
-#include "atoms.hpp"
-#include "cells.hpp"
-#include "create.hpp"
-#include "demag.hpp"
-#include "errors.hpp"
-#include "grains.hpp"
-#include "ltmp.hpp"
-#include "voronoi.hpp"
-#include "material.hpp"
-#include "errors.hpp"
-#include "random.hpp"
-#include "sim.hpp"
-#include "stats.hpp"
-#include "units.hpp"
-#include "../hdr/vio.hpp"
-#include "vmpi.hpp"
 
-// vio module headers
-#include "internal.hpp"
+// Vampire headers
 
 #ifdef WIN_COMPILE
    #include <direct.h>
@@ -66,7 +41,6 @@ namespace vin{
    int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
    int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
    int match_config(std::string const, std::string const, std::string const, int const);
-   
    
    //----------------------------------------------------------------------------------
    //Funciton protypes for functions inside: read.cpp
