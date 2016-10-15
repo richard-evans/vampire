@@ -6,6 +6,7 @@
 create_objects=\
 alloy.o \
 data.o \
+faceted.o \
 initialize.o \
 interface.o
 

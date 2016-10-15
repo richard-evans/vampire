@@ -29,6 +29,10 @@ namespace create{
          std::vector<create::internal::mp_t> mp; // array of material properties
          MTRand grnd; // general random number generator for create functions
 
+         double faceted_particle_100_radius = 1.0; // 100 facet particle radius
+         double faceted_particle_110_radius = 1.0; // 110 facet particle radius
+         double faceted_particle_111_radius = 1.0; // 111 facet particle radius
+
       } // end of internal namespace
 
 } // end of create namespace

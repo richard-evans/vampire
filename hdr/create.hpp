@@ -469,6 +469,7 @@ namespace create{
 
 	// Functions
 	bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
 
 } // end of namespace create
 
