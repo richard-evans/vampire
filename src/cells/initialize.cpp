@@ -155,7 +155,7 @@ namespace cells{
             // Always check cell in range
             if(scc[i]<0 || scc[i]>= d[i]){
                terminaltextcolor(RED);
-               std::cerr << "Error - atom out of supercell range in dipolar field calculation!" << std::endl;
+               std::cerr << "Error - atom out of supercell range in cell calculation!" << std::endl;
                terminaltextcolor(WHITE);
                #ifdef MPICF
                terminaltextcolor(RED);
@@ -164,6 +164,7 @@ namespace cells{
                #endif
                terminaltextcolor(RED);
                std::cerr << "\tAtom number:      " << atom << std::endl;
+               std::cerr << "\tCell size:        " << cs[0] << "\t" << cs[1] << "\t" << cs[2] << "\t" << std::endl;
                std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
                std::cerr << "\tReal coordinates: " << atom_coords_x[atom] << "\t" << atom_coords_y[atom] << "\t" << atom_coords_z[atom] << "\t" << std::endl;
                std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
