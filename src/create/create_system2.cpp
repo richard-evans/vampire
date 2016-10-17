@@ -58,6 +58,7 @@
 #include "ltmp.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
@@ -118,6 +119,9 @@ namespace cs{
 
 	// unit cell container
 	cs::unit_cell_t unit_cell;
+
+  // Array for storing non-magnetic atoms
+  std::vector<nm_atom_t> non_magnetic_atoms_array;
 
 int create(){
 	//----------------------------------------------------------
