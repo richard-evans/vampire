@@ -1,19 +1,12 @@
 #--------------------------------------------------------------
-#          Makefile for vio module
+#          Makefile for micromagnetic module
 #--------------------------------------------------------------
 
 # List module object filenames
-vio_objects =\
-check.o \
+micromagnetic_objects =\
 data.o \
-datalog.o \
-globalio.o \
 initialize.o \
-interface.o \
-match.o \
-nullify.o \
-outputfunctions.o \
-read.o
+interface.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/vio/,$(vio_objects))
+OBJECTS+=$(addprefix obj/micromagnetic/,$(micromagnetic_objects))

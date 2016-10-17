@@ -211,7 +211,7 @@ std::vector < seed_point_t > generate_random_seed_points(double size_x, double s
 		bool touching=false;
 
 		// loop over all previous grains and check if point is not touching other grains
-		for(int g=0;g<seeds.size(); g++){
+		for(unsigned int g=0;g<seeds.size(); g++){
 			double dx = grain.x-seeds[g].x;
 			double dy = grain.y-seeds[g].y;
 			double rij = sqrt(dx*dx + dy*dy);
@@ -257,7 +257,7 @@ std::vector < std::vector <float> > generate_host_alloy_distribution(std::vector
 
          double density = 0.0;
 			// loop over all seed points and calculate cumulative density
-			for(int g=0;g<seeds.size(); g++){
+			for(unsigned int g=0;g<seeds.size(); g++){
             double gx = seeds[g].x;
             double gy = seeds[g].y;
             double gr = seeds[g].r;

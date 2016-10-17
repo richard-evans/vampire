@@ -39,16 +39,6 @@
 
 #include <vmpi.hpp>
 
-#ifdef MPICF
-struct null_streambuf
-: public std::streambuf
-{
-  void overflow(char c)
-  {
-  }
-};
-#endif
-
 // Global Output Streams
 extern std::ofstream zinfo;
 extern std::ofstream zmag;

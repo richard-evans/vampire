@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Rory Pond 2016. All rights reserved.
+//   (c) Richard F L Evans and Rory Pond 2016. All rights reserved.
 //
-//   Email: rory.pond@york.ac.uk
+//   Email: richard.evans@york.ac.uk and rory.pond@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -21,6 +21,8 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
+#include <iostream>
 
 // Vampire headers
 
@@ -29,24 +31,24 @@
 #endif
 
 namespace vin{
-   
+
    //----------------------------------------------------------------------------------
    //Funciton protypes for functions inside: match.cpp
    //----------------------------------------------------------------------------------
-   int match(string const, string const, string const, string const, int const);
+   int match(std::string const, std::string const, std::string const, std::string const, int const);
    int match_create(std::string const, std::string const, std::string const, int const);
    int match_dimension(std::string const, std::string const, std::string const, int const);
    int match_sim(std::string const, std::string const, std::string const, int const);
    int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
    int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-   int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
+   int match_material(std::string const, std::string const, std::string const, int const, int const, int const, std::string const, std::string const);
    int match_config(std::string const, std::string const, std::string const, int const);
-   
+
    //----------------------------------------------------------------------------------
    //Funciton protypes for functions inside: read.cpp
    //----------------------------------------------------------------------------------
    std::string GetString(std::string const filename);
-   int read(string const filename);
+   int read(std::string const filename);
    int read_mat_file(std::string const, int const);
 
 }

@@ -47,7 +47,7 @@ namespace ltmp{
             std::ofstream ofile;
             ofile.open("ltmp_cell_coords.cfg");
 
-            for(int cell=0; cell<cell_position_array.size()/3; ++cell){
+            for(unsigned int cell=0; cell<cell_position_array.size()/3; ++cell){
                ofile << cell_position_array[3*cell+0] << "\t" << cell_position_array[3*cell+1] << "\t" << cell_position_array[3*cell+2] << "\t";
                ofile << attenuation_array[cell] << std::endl;
             }
@@ -113,7 +113,7 @@ namespace ltmp{
          // only output on root process
          if(vmpi::my_rank==0){
             vertical_temperature_file << temperature_profile_output_counter << "\t";
-            for(int cell=0; cell<root_temperature_array.size()/2; ++cell){
+            for(unsigned int cell=0; cell<root_temperature_array.size()/2; ++cell){
                vertical_temperature_file << root_temperature_array[2*cell+0]*root_temperature_array[2*cell+0] << "\t"; //Te
                vertical_temperature_file << root_temperature_array[2*cell+1]*root_temperature_array[2*cell+1] << "\t"; // Tp
             }
@@ -134,7 +134,7 @@ namespace ltmp{
          // only output on root process
          if(vmpi::my_rank==0){
             lateral_temperature_file << temperature_profile_output_counter << "\t";
-            for(int cell=0; cell<root_temperature_array.size()/2; ++cell){
+            for(unsigned int cell=0; cell<root_temperature_array.size()/2; ++cell){
                lateral_temperature_file << root_temperature_array[2*cell+0]*root_temperature_array[2*cell+0] << "\t"; //Te
                lateral_temperature_file << root_temperature_array[2*cell+1]*root_temperature_array[2*cell+1] << "\t"; // Tp
             }

@@ -395,9 +395,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 				for(int j=miny;j<=maxy;j++){
 
 					// loop over atoms in cells;
-					for(int id=0;id<supercell_array[i][j].size();id++){
+					for(unsigned int id=0;id<supercell_array[i][j].size();id++){
 						int atom = supercell_array[i][j][id];
-						int material = catom_array[atom].material;
 
 						// Get atomic position
 						double x = catom_array[atom].x;
@@ -471,7 +470,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	grain_coord_array[grain_coord_array.size()-1].push_back(0.0); // y
 
 	// check for continuous layer
-	for(int atom=0; atom < catom_array.size(); atom++){
+	for(unsigned int atom=0; atom < catom_array.size(); atom++){
 	  if(mp::material[catom_array[atom].material].continuous==true && catom_array[atom].include == false ){
 	    catom_array[atom].include=true;
 	    catom_array[atom].grain=int(grain_coord_array.size()-1);
