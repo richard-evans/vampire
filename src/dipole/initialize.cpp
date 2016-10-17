@@ -26,8 +26,6 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
-#include "atoms.hpp"
-
 #include <time.h>
 #include <fenv.h>
 #include <signal.h>
@@ -48,18 +46,11 @@ namespace dipole{
                   std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                   std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
                   std::vector < std::vector <int> >& cells_index_atoms_array,
-
                   const std::vector<double>& cells_volume_array,
-                  /*const std::vector<double>& cells_cell_coords_array_x, /// arrays to store cells positions
-                  const std::vector<double>& cells_cell_coords_array_y,
-                  const std::vector<double>& cells_cell_coords_array_z,*/
-
                   std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
-
                   std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
                   std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
                   std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
-
                   const std::vector<int>& atom_type_array,
                   const std::vector<int>& atom_cell_id_array,
 
@@ -75,25 +66,15 @@ namespace dipole{
 	//-------------------------------------------------------------------------------------
       if(!dipole::activated) return;
 
-      //if(!internal::enabled) return;
-      std::cout << "Initialising demagnetisation field calculation" << std::endl;
-		// output informative message
-		zlog << zTs() << "Initialising demagnetisation field calculation" << std::endl;
+      // output informative message
+      std::cout << "Initialising dipole field calculation" << std::endl;
+		zlog << zTs() << "Initialising dipole field calculation" << std::endl;
 
 		// check for prior initialisation
 		if(dipole::internal::initialised){
-      		zlog << zTs() << "Warning:  Demagnetisation field calculation already initialised. Continuing." << std::endl;
+      	zlog << zTs() << "Warning:  Dipole field calculation already initialised. Continuing." << std::endl;
       	return;
 		}
-
-/*      std::cout << "Initialising demagnetisation field calculation" << std::endl;
-      // check for calling of routine
-      if(err::check==true){
-         terminaltextcolor(RED);
-         std::cerr << "demag::set_rij_matrix has been called " << vmpi::my_rank << std::endl;
-         terminaltextcolor(WHITE);
-      } */
-
 
 		//-------------------------------------------------------------------------------------
 		// Set simulation constants
@@ -128,8 +109,8 @@ namespace dipole{
        #endif
 
        // Check memory requirements and print to screen
-       zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-       std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+       zlog << zTs() << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+       std::cout << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 
        // For MPI version, only add local atoms
        #ifdef MPICF
@@ -153,15 +134,10 @@ namespace dipole{
          std::vector<double> atom_pos_x(num_local_atoms,0.0);
          std::vector<double> atom_pos_y(num_local_atoms,0.0);
          std::vector<double> atom_pos_z(num_local_atoms,0.0);
-         //std::vector<double> atom_mom(num_local_atoms,0.0);
          for(int atom=0; atom<num_local_atoms; atom++){
             atom_pos_x[atom]=atom_coords_x[atom];
             atom_pos_y[atom]=atom_coords_y[atom];
             atom_pos_z[atom]=atom_coords_z[atom];
-            //int type = atom_type_array[atom];
-            //const double mus  = mp::material[type].mu_s_SI/9.27400915e-24;
-            ////////fprintf(stderr,"  atom = %d type = %d mus = %e atoms::type_array[atom] = %d mp::material[type] = %f on my_rank = %d\n",atom,type,mus,atoms::type_array[atom],mp::material[type].mu_s_SI,vmpi::my_rank);
-            //atom_mom[atom] = mus;
          }
          //MPI::COMM_WORLD.Barrier();
 
@@ -313,7 +289,7 @@ namespace dipole{
       //MPI::COMM_WORLD.Barrier();
       //std::cout << std::endl << std::flush;
 
-       // allocate arrays to store data [nloccell x ncells]
+      // allocate arrays to store data [nloccell x ncells]
       for(int lc=0;lc<dipole::internal::cells_num_local_cells; lc++){
 
          dipole::internal::rij_inter_xx.push_back(std::vector<double>());
@@ -359,7 +335,7 @@ namespace dipole{
       }
 
       // calculate matrix prefactors
-      zlog << zTs() << "Precalculating rij matrix for demag calculation... " << std::endl;
+      zlog << zTs() << "Precalculating rij matrix for dipole calculation... " << std::endl;
 
 
       std::cout<< "Number of local cells= "<<dipole::internal::cells_num_local_cells << std::endl;
@@ -670,7 +646,7 @@ namespace dipole{
          time_t t2;
          t2 = time (NULL);
       #endif
-      zlog << zTs() << "Precalculation of rij matrix for demag calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
+      zlog << zTs() << "Precalculation of rij matrix for dipole calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
 
 
       // Set initialised flag
@@ -696,7 +672,7 @@ namespace dipole{
          t2 = time (NULL);
       #endif
 
-      zlog << zTs() << "Time required for demag update: " << t2-t1 << "s." << std::endl;
+      zlog << zTs() << "Time required for dipole update: " << t2-t1 << "s." << std::endl;
 
     	return;
 
