@@ -50,6 +50,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -65,6 +66,11 @@ namespace sim{
 	int partial_time=1000;
 	uint64_t equilibration_time=0;
 	int runs=1; /// for certain repetitions in programs
+    //Global definition of some parameters in order to store them in chekcpoint files
+	int64_t parity=-1;
+   uint64_t output_atoms_file_counter=0;
+   uint64_t output_cells_file_counter=0;
+   uint64_t output_rate_counter=0;
 
 	bool ext_demag=false;
 
@@ -82,11 +88,16 @@ namespace sim{
 	double applied_field_angle_phi=0.0;
 	double applied_field_angle_theta=0.0;
 	bool applied_field_set_by_angle=false;
+
 	double fmr_field_strength = 0.0; // Oscillating field strength (Tesla)
 	double fmr_field_frequency = 1.0; // Oscillating field frequency (GHz)
 	std::vector<double> fmr_field_unit_vector; // Oscillating field direction
 	double fmr_field = 0.0; // Instantaneous value of the oscillating field strength H sin(wt)
 	bool enable_fmr = false; // Flag to enable fmr field calculation
+
+	double H=Hmax; // T
+	int64_t iH=1; // uT
+//	uint64_t iH=-1*vmath::iround(double(Hmax)*1.0E6); // uT
 
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
@@ -118,7 +129,7 @@ namespace sim{
 	pump_functions_t pump_function=two_temperature;
 	double pump_power=4.e21;
 	double pump_time=50.0e-15;
-	double double_pump_power=2.e21;
+	double double_pump_power=20.0; // mJ/cm^2;
 	double double_pump_Tmax=500.0;
 	double double_pump_time=50.0e-15;
 	double double_pump_delay=10.0e-12;
@@ -195,9 +206,13 @@ namespace sim{
 
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-		//if(sim::hamiltonian_simulation_flags[4]==1) dipole::calculate_field();
 		dipole::calculate_field();
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
+      st::update_spin_torque_fields(atoms::x_spin_array,
+                                  atoms::y_spin_array,
+                                  atoms::z_spin_array,
+                                  atoms::type_array,
+                                  mp::mu_s_array);
 	}
 
 /// @brief Function to run one a single program

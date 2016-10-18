@@ -41,7 +41,6 @@ namespace dipole{
       // Shared variables inside dipole module
       //------------------------------------------------------------------------
       bool initialised=false;
-      bool enabled=false;
 
       int update_time=-1; /// last update time
 

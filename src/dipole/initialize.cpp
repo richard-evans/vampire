@@ -100,13 +100,13 @@ namespace dipole{
 		// Starting calculation of dipolar field
 		//-------------------------------------------------------------------------------------
 
-       // timing function
-       #ifdef MPICF
-          double t1 = MPI_Wtime();
-       #else
-          time_t t1;
-          t1 = time (NULL);
-       #endif
+      // timing function
+      #ifdef MPICF
+       double t1 = MPI_Wtime();
+      #else
+       time_t t1;
+       t1 = time (NULL);
+      #endif
 
        // Check memory requirements and print to screen
        zlog << zTs() << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
@@ -647,7 +647,6 @@ namespace dipole{
          t2 = time (NULL);
       #endif
       zlog << zTs() << "Precalculation of rij matrix for dipole calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
-
 
       // Set initialised flag
       dipole::internal::initialised=true;

@@ -68,7 +68,7 @@ namespace mp{
 	double half_dt;
 
 	// Unrolled material parameters for speed
-	std::vector <double> MaterialMuSSIArray(0);
+	std::vector <double> mu_s_array;
 	std::vector <zkval_t> MaterialScalarAnisotropyArray(0);
 	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
    std::vector <double> material_second_order_anisotropy_constant_array(0);
@@ -166,7 +166,6 @@ int default_system(){
 	sim::hamiltonian_simulation_flags[1] = 1;	/// Anisotropy
 	sim::hamiltonian_simulation_flags[2] = 1;	/// Applied
 	sim::hamiltonian_simulation_flags[3] = 1;	/// Thermal
-	//sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
 
 	//Integration parameters
 	dt_SI = 1.0e-15;	// seconds
@@ -223,7 +222,6 @@ int single_spin_system(){
 
 	// Turn off multi-spin Flags
 	sim::hamiltonian_simulation_flags[0] = 0;	/// Exchange
-	//sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
 
 	// MPI Mode (Homogeneous execution)
 	//vmpi::mpi_mode=0;
@@ -583,6 +581,9 @@ int set_derived_parameters(){
 			MaterialCubicAnisotropyArray.resize(mp::num_materials);
 			for(int mat=0;mat<mp::num_materials; mat++) MaterialCubicAnisotropyArray.at(mat)=mp::material[mat].Kc;
 		}
+      // Unroll material spin moment values for speed
+      mp::mu_s_array.resize(mp::num_materials);
+      for(int mat=0;mat<mp::num_materials; mat++) mu_s_array.at(mat)=mp::material[mat].mu_s_SI/9.27400915e-24; // normalise to mu_B
 
 		// Loop over materials to check for invalid input and warn appropriately
 		for(int mat=0;mat<mp::num_materials;mat++){

@@ -83,7 +83,6 @@ namespace dipole{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern bool initialised;
-      //extern bool enabled;
 
       extern int update_time; /// last update time
 

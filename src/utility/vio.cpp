@@ -59,6 +59,7 @@
 #include "errors.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "stats.hpp"
 #include "units.hpp"
 #include "vio.hpp"
@@ -293,8 +294,6 @@ int match_dimension(std::string const, std::string const, std::string const, int
 int match_sim(std::string const, std::string const, std::string const, int const);
 int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-//int match_material(string const, string const, string const, int const, int const, int const);
-//int match_config(string const, string const, int const);
 int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
 int match_config(std::string const, std::string const, std::string const, int const);
 
@@ -759,6 +758,7 @@ int match(string const key, string const word, string const value, string const 
    else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
 	//===================================================================
@@ -819,7 +819,6 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="config";
 	if(key==test){
-		//int frs=vin::match_config(word, value, line);
 		int frs=vin::match_config(word, value, unit, line);
 		return frs;
 	}
@@ -2170,7 +2169,6 @@ int match_sim(string const word, string const value, string const unit, int cons
    return EXIT_SUCCESS;
 }
 
-//int match_config(string const word, string const value, int const line){
 int match_config(string const word, string const value, string const unit, int const line){
 
    std::string prefix="config:";
@@ -2256,6 +2254,38 @@ int match_config(string const word, string const value, string const unit, int c
    test="identify-surface-atoms";
    if(word==test){
       sim::identify_surface_atoms=true;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-1-minimum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_min_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-1-maximum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_max_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-2-minimum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_min_2=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-2-maximum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_max_2=H;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
@@ -2926,16 +2956,16 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
-			//int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
-         int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
 
-         // if no match then return error
+		  int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
+
+        // if no match then return error
 			if(matchcheck==EXIT_FAILURE){
             terminaltextcolor(RED);
             std::cerr << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
             zlog << zTs() << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
             terminaltextcolor(WHITE);
-				err::vexit();
+            err::vexit();
 			}
 		}
 	}
@@ -2962,7 +2992,6 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 ///-------------------------------------------------------------------
 /// Function to match material key words
 ///-------------------------------------------------------------------
-   //int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
   int match_material(string const word,
 		     string const value,
 		     string const unit,
@@ -3830,19 +3859,18 @@ int read_mat_file(std::string const matfile, int const LineNumber){
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
       else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
       else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
-
+      else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
-			terminaltextcolor(RED);
+         terminaltextcolor(RED);
          std::cerr << "Error - Unknown control statement '" << line_string << "' on line " << line << " of material file '" << filename_string << "'" << std::endl;
-			terminaltextcolor(WHITE);
+         terminaltextcolor(WHITE);
          zlog << zTs() << "Error - Unknown control statement '" << line_string << " on line " << line << " of material file '" << filename_string << "'" << std::endl;
-			return EXIT_FAILURE;
-		}
-
-	return EXIT_SUCCESS;
+         return EXIT_FAILURE;
+      }
+      return EXIT_SUCCESS;
 }
 
 

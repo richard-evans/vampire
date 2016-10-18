@@ -37,18 +37,9 @@ namespace dipole{
 
 
 	void calculate_field(){
-      //dipole::internal::enabled=true;
-      /*if(dipole::activated){
-			terminaltextcolor(RED);
-         std::cout << "Calculate dipolar field activated." << std::endl;
-			terminaltextcolor(WHITE);
-		}*/
 
-		if(err::check==true){
-			terminaltextcolor(RED);
-			std::cerr << "dipole::field has been called " << vmpi::my_rank << std::endl;
-			terminaltextcolor(WHITE);
-		}
+      // return if dipole field not enabled
+      if(!dipole::activated) return;
 
 		// prevent double calculation for split integration (MPI)
 		if(dipole::internal::update_time!=sim::time){
@@ -64,7 +55,7 @@ namespace dipole{
             //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n >>>> PROBLEMS!!!!!! just after cells::mag()<<<< \n");
 
-			   // recalculate demag fields
+			   // recalculate dipole fields
             dipole::internal::update_field();
             //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n **** PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");

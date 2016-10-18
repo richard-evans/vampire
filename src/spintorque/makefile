@@ -1,15 +1,18 @@
 #--------------------------------------------------------------
-#          Makefile for dipole module
+#                 Makefile for ltmp module
 #--------------------------------------------------------------
 
 # List module object filenames
-dipole_objects =\
-mpi.o \
+spintorque_objects=\
 data.o \
-initialize.o \
+field.o \
+initialise.o \
 interface.o \
-update.o \
-field.o
+magnetization.o \
+matrix.o \
+output.o \
+spinaccumulation.o \
+
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/dipole/,$(dipole_objects))
+OBJECTS+=$(addprefix obj/spintorque/,$(spintorque_objects))
