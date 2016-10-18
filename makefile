@@ -60,9 +60,6 @@ IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
 
-#obj/data/cells.o \
-obj/simulate/demag.o \
-
 # Objects
 OBJECTS= \
 obj/create/create_system2.o \
