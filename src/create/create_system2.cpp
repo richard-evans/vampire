@@ -58,7 +58,6 @@
 #include "ltmp.hpp"
 #include "material.hpp"
 #include "sim.hpp"
-#include "spintorque.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
@@ -313,28 +312,28 @@ int create(){
                   atoms::num_atoms
       );
 
-	if(sim::hamiltonian_simulation_flags[4]==1){
-      dipole::initialize(cells::num_atoms_in_unit_cell,
-                        cells::num_cells,
-                        cells::num_local_cells,
-                        cells::macro_cell_size,
-                        cells::local_cell_array,
-                        cells::num_atoms_in_cell,
-                        cells::num_atoms_in_cell_global, // <----
-                        cells::index_atoms_array,
-                        cells::volume_array,
-                        cells::pos_and_mom_array,
-                        cells::atom_in_cell_coords_array_x,
-                        cells::atom_in_cell_coords_array_y,
-                        cells::atom_in_cell_coords_array_z,
-                        atoms::type_array,
-                        cells::atom_cell_id_array,
-                        atoms::x_coord_array,
-                        atoms::y_coord_array,
-                        atoms::z_coord_array,
-                        atoms::num_atoms
-      );
-   }
+	//if(sim::hamiltonian_simulation_flags[4]==1){
+   //   dipole::initialize(cells::num_atoms_in_unit_cell,
+   //                     cells::num_cells,
+   //                     cells::num_local_cells,
+   //                     cells::macro_cell_size,
+   //                     cells::local_cell_array,
+   //                     cells::num_atoms_in_cell,
+   //                     cells::num_atoms_in_cell_global, // <----
+   //                     cells::index_atoms_array,
+   //                     cells::volume_array,
+   //                     cells::pos_and_mom_array,
+   //                     cells::atom_in_cell_coords_array_x,
+   //                     cells::atom_in_cell_coords_array_y,
+   //                     cells::atom_in_cell_coords_array_z,
+   //                     atoms::type_array,
+   //                     cells::atom_cell_id_array,
+   //                     atoms::x_coord_array,
+   //                     atoms::y_coord_array,
+   //                     atoms::z_coord_array,
+   //                     atoms::num_atoms
+   //   );
+   //}
 
    //----------------------------------------
    // Initialise local temperature data

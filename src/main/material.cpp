@@ -78,9 +78,9 @@ materials_t::materials_t ():
    fill(false),
    temperature_rescaling_alpha(1.0),
 	temperature_rescaling_Tc(0.0),
+	non_magnetic(false),
 	random_anisotropy(false),
-	random_grain_anisotropy(false),
-   non_magnetic_element_flag(false)
+	random_grain_anisotropy(false)
 	{
 
 	//std::cout << "constructor " << anis_flag << "\t" << ianis_flag << std::endl;

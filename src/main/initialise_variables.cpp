@@ -166,7 +166,7 @@ int default_system(){
 	sim::hamiltonian_simulation_flags[1] = 1;	/// Anisotropy
 	sim::hamiltonian_simulation_flags[2] = 1;	/// Applied
 	sim::hamiltonian_simulation_flags[3] = 1;	/// Thermal
-	sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
+	//sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
 
 	//Integration parameters
 	dt_SI = 1.0e-15;	// seconds
@@ -223,7 +223,7 @@ int single_spin_system(){
 
 	// Turn off multi-spin Flags
 	sim::hamiltonian_simulation_flags[0] = 0;	/// Exchange
-	sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
+	//sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
 
 	// MPI Mode (Homogeneous execution)
 	//vmpi::mpi_mode=0;

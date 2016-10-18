@@ -158,6 +158,18 @@ namespace cs{
 
 	extern cs::unit_cell_t unit_cell;
 
+   // Structure for storing non-magnetic atom data
+   struct nm_atom_t{
+      double x;
+      double y;
+      double z;
+      int mat;
+      std::string element;
+   };
+
+  // Array for storing non-magnetic atoms
+  extern std::vector<nm_atom_t> non_magnetic_atoms_array;
+
 	class catom_t {
 		public:
 

@@ -16,9 +16,6 @@
 #include "errors.hpp"
 #include "vio.hpp"
 
-#include "sim.hpp"  // only until code not fully updated
-#include "material.hpp"
-
 // dipole module headers
 #include "internal.hpp"
 
@@ -38,7 +35,6 @@ namespace dipole{
       if(word==test){
          // enable dipole calculation
          dipole::activated=true;
-         sim::hamiltonian_simulation_flags[4]=1;
          return true;
       }
       test="field-update-rate";
@@ -58,18 +54,10 @@ namespace dipole{
    //---------------------------------------------------------------------------
    // Function to process material parameters
    //---------------------------------------------------------------------------
-   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index, std::vector<mp::materials_t>& read_material){
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index){
 
       // add prefix string
       std::string prefix="material:";
-
-      ////-------------------------------------------------------------------
-      //std::string test="non-magnetic-element";
-      //if(word==test){
-      //   read_material[super_index].non_magnetic_element_flag=true;
-      //   std::cout << "element " << super_index << " is not magnetic" << "\n" << std::flush;
-      //   return true;
-      //}
 
       //--------------------------------------------------------------------
       // Keyword not found

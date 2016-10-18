@@ -22,7 +22,6 @@
 
 // Vampire headers
 #include "dipole.hpp"
-#include "vmpi.hpp"
 
 // dipole module headers
 #include "internal.hpp"
@@ -30,10 +29,7 @@
 namespace dipole{
 
    extern int update_rate; /// timesteps between updates
-
    extern void calculate_field();
-   //extern void send_receive_data(int num_local_atoms,std::vector<double>& atom_coords_x, std::vector<double>& atom_coords_y, std::vector<double>& atom_coords_z);
-   //extern void locate_cells_on_cpu(int cpu,int local_cell,double x,double y,double z,std::vector<int>& proc_index_array1D,std::vector<int>& proc_cell_index_array1D,std::vector< std::vector<int> >& proc_cell_index_array,std::vector<double>& minimax);
    extern int send_recv_cells_data(std::vector<int>& proc_cell_index_array1D,
                                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
                                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
@@ -47,7 +43,6 @@ namespace dipole{
                                  int cells_num_cells
                                  );
 
-   //extern int send_recv_atoms_data(std::vector<int>& proc_cell_index_array2D,std::vector<int>& cell_id_array,std::vector<double>& atom_pos_x,std::vector<double>& atom_pos_y,std::vector<double>& atom_pos_z,std::vector<int>& atom_type_array,int cell,int cpu_send,int cpu_recv,MPI::Status status,MPI::Request send_request,MPI::Request recv_request,int num_local_atoms);
    extern int send_recv_atoms_data(std::vector<int>& proc_cell_index_array2D,
                                  std::vector<int>& cell_id_array,
                                  std::vector<int>& cells_local_cell_array,
@@ -88,7 +83,7 @@ namespace dipole{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern bool initialised;
-      extern bool enabled;
+      //extern bool enabled;
 
       extern int update_time; /// last update time
 

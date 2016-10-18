@@ -50,7 +50,6 @@
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "create.hpp"
-//#include "demag.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
@@ -294,8 +293,10 @@ int match_dimension(std::string const, std::string const, std::string const, int
 int match_sim(std::string const, std::string const, std::string const, int const);
 int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-int match_material(string const, string const, string const, int const, int const, int const);
-int match_config(string const, string const, int const);
+//int match_material(string const, string const, string const, int const, int const, int const);
+//int match_config(string const, string const, int const);
+int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
+int match_config(std::string const, std::string const, std::string const, int const);
 
 // Function to extract all variables from a string and return a vector
 std::vector<double> DoublesFromString(std::string value){
@@ -758,7 +759,6 @@ int match(string const key, string const word, string const value, string const 
    else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-   //else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
 	//===================================================================
@@ -819,7 +819,8 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="config";
 	if(key==test){
-		int frs=vin::match_config(word, value, line);
+		//int frs=vin::match_config(word, value, line);
+		int frs=vin::match_config(word, value, unit, line);
 		return frs;
 	}
 	//-------------------------------------------------------------------
@@ -851,13 +852,14 @@ int match(string const key, string const word, string const value, string const 
 		//-------------------------------------------------------------------
 		test="unit-cell-file";
 		if(word==test){
-			std::string matfile=value;
+			std::string ucffile=value;
 			// strip quotes
-			matfile.erase(remove(matfile.begin(), matfile.end(), '\"'), matfile.end());
+			ucffile.erase(remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
 			test="";
-			if(matfile!=test){
+			// if filename not blank set ucf file name
+			if(ucffile!=test){
 				//std::cout << matfile << std::endl;
-				cs::unit_cell_file=matfile;
+				cs::unit_cell_file=ucffile;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1337,7 +1339,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-x";
    if(word==test){
       double sfx=atof(value.c_str());
-      check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_x=sfx;
       return EXIT_SUCCESS;
    }
@@ -1346,7 +1348,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-y";
    if(word==test){
       double sfy=atof(value.c_str());
-      check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_y=sfy;
       return EXIT_SUCCESS;
    }
@@ -1355,7 +1357,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-z";
    if(word==test){
       double sfz=atof(value.c_str());
-      check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_z=sfz;
       return EXIT_SUCCESS;
    }
@@ -1377,17 +1379,7 @@ int match_dimension(string const word, string const value, string const unit, in
       cs::particle_array_offset_y=paoy;
       return EXIT_SUCCESS;
    }
-   //else
-   ////--------------------------------------------------------------------
-   //test="macro-cell-size";
-   //if(word==test){
-   //   double cs=atof(value.c_str());
-   //   check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
-   //   //cells::size=cs;
-   //   cells::macro_cell_size=cs;
-   //   return EXIT_SUCCESS;
-   //}
-   ////--------------------------------------------------------------------
+   //--------------------------------------------------------------------
    else{
 	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'dimensions:"<< word << "\' on line " << line << " of input file" << std::endl;
@@ -1549,28 +1541,6 @@ int match_sim(string const word, string const value, string const unit, int cons
 		 err::vexit();
       }
    }
-//   //-------------------------------------------------------------------
-//   test="enable-dipole-fields";
-//   if(word==test){
-//      sim::hamiltonian_simulation_flags[4]=1;
-//      dipole::activated=true;
-//      return EXIT_SUCCESS;
-//   }
-//   //-------------------------------------------------------------------
-//   test="enable-fast-dipole-fields";
-//   if(word==test){
-//      //demag::fast=true;
-//      return EXIT_SUCCESS;
-//   }
-//   //-------------------------------------------------------------------
-//   test="dipole-field-update-rate";
-//   if(word==test){
-//      int dpur=atoi(value.c_str());
-//      check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-//      //demag::update_rate=dpur;
-//      dipole::update_rate=dpur;
-//      return EXIT_SUCCESS;
-//   }
    //-------------------------------------------------------------------
    test="enable-fmr-field";
    if(word==test){
@@ -2200,7 +2170,8 @@ int match_sim(string const word, string const value, string const unit, int cons
    return EXIT_SUCCESS;
 }
 
-int match_config(string const word, string const value, int const line){
+//int match_config(string const word, string const value, int const line){
+int match_config(string const word, string const value, string const unit, int const line){
 
    std::string prefix="config:";
 
@@ -2215,6 +2186,7 @@ int match_config(string const word, string const value, int const line){
    if(word==test){
       int i=atoi(value.c_str());
       check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
+//      check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
       vout::output_atoms_config_rate=i;
       return EXIT_SUCCESS;
    }
@@ -2795,13 +2767,16 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		std::string line;
 		getline(inputfile,line);
 
+		// save a copy of the line before stripping characters in case of error
+		std::string original_line = line;
+
 		// Clear whitespace, quotes and tabs
 		line.erase(remove(line.begin(), line.end(), '\t'), line.end());
 		line.erase(remove(line.begin(), line.end(), ' '), line.end());
 		line.erase(remove(line.begin(), line.end(), '\"'), line.end());
 
 		// remove carriage returns for dos formatted files
-                line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+      line.erase(remove(line.begin(), line.end(), '\r'), line.end());
 
 		// strip key,word,unit,value
 		std::string key="";
@@ -2951,8 +2926,15 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
-			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
+			//int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
+         int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
+
+         // if no match then return error
 			if(matchcheck==EXIT_FAILURE){
+            terminaltextcolor(RED);
+            std::cerr << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
+            zlog << zTs() << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
+            terminaltextcolor(WHITE);
 				err::vexit();
 			}
 		}
@@ -2980,14 +2962,16 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 ///-------------------------------------------------------------------
 /// Function to match material key words
 ///-------------------------------------------------------------------
-   int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
-
-      //-------------------------------------------------------------------
-	   // Call module material parameters
-      //-------------------------------------------------------------------
-      //if(dipole::match_material_parameter(word, value, unit, super_index, sub_index, line, read_material)) return EXIT_SUCCESS;
-      //-------------------------------------------------------------------
-
+   //int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
+  int match_material(string const word,
+		     string const value,
+		     string const unit,
+		     int const line,
+		     int const super_index,
+		     int const sub_index,
+		     std::string const line_string,
+		     std::string const filename_string)
+  {
       std::string prefix="material:";
       //------------------------------------------------------------
       std::string test="num-materials";
@@ -3002,13 +2986,6 @@ int read_mat_file(std::string const matfile, int const LineNumber){
       test="material-name";
       if(word==test){
          read_material[super_index].name=value;
-         return EXIT_SUCCESS;
-      }
-      //-------------------------------------------------------------------
-      test="non-magnetic-element";
-      if(word==test){
-         read_material[super_index].non_magnetic_element_flag=true;
-         std::cout << "element " << super_index << " is not magnetic" << "\n" << std::flush;
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------
@@ -3820,7 +3797,6 @@ int read_mat_file(std::string const matfile, int const LineNumber){
          return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
-      else
       test="temperature-rescaling-curie-temperature";
       if(word==test){
          double Tc=atof(value.c_str());
@@ -3828,19 +3804,41 @@ int read_mat_file(std::string const matfile, int const LineNumber){
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
+
+      //--------------------------------------------------------------------
+      test="non-magnetic";
+      /*
+        logical non-magnetic [false]
+           This flag causes the material to be identified as non magnetic,
+           with all atoms removed of this type removed from the simulation.
+	   The atomic positions of non-magnetic atoms are saved separately
+	   with the usual atomic spin configuration for post processing.
+	   The default value is false for all materials. Valid values are
+	   true, false or (blank) [same as true].
+      */
+      if(word==test){
+         // Test for sane input
+         bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
+         // set flag
+         read_material[super_index].non_magnetic = sanitised_bool;
+         return EXIT_SUCCESS;
+      }
+
       //-------------------------------------------------------------------
    	// Call module input parameters
       //-------------------------------------------------------------------
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
       else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+      else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
 			terminaltextcolor(RED);
-			std::cerr << "Error - Unknown control statement \'material[" << super_index+1 << "]:" << word << "\' on line " << line << " of material file" << std::endl;
+         std::cerr << "Error - Unknown control statement '" << line_string << "' on line " << line << " of material file '" << filename_string << "'" << std::endl;
 			terminaltextcolor(WHITE);
+         zlog << zTs() << "Error - Unknown control statement '" << line_string << " on line " << line << " of material file '" << filename_string << "'" << std::endl;
 			return EXIT_FAILURE;
 		}
 
