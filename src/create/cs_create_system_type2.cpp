@@ -504,7 +504,7 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
    const int num_atoms=catom_array.size();
    int num_included=0;
    for(int a=0;a<num_atoms;a++){
-      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == false){
+      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic != 1){
          num_included++;
       }
    }
@@ -520,12 +520,12 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
       // loop over all existing atoms
       for(int a=0;a<num_atoms;a++){
          // if atom is to be included and is non-magnetic copy to new array
-         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic == false ){
+         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic != 1 ){
             catom_array[atom]=tmp_catom_array[a];
             atom++;
          }
          // if atom is part of a non-magnetic material then save to nm array
-         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == true){
+         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == 1){
             cs::nm_atom_t tmp;
          	tmp.x = catom_array[a].x;
          	tmp.y = catom_array[a].y;

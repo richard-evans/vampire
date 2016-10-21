@@ -59,7 +59,7 @@ namespace cells{
             const double mus = mp::material[type].mu_s_SI;
             // Consider only magnetic elements
             //if(mus/(9.274e-24) > 0.5){
-            if(mp::material[type].non_magnetic==false){
+            if(mp::material[type].non_magnetic==0){
                cells::mag_array_x[cell] += atoms::x_spin_array[i]*mus;
                cells::mag_array_y[cell] += atoms::y_spin_array[i]*mus;
                cells::mag_array_z[cell] += atoms::z_spin_array[i]*mus;
