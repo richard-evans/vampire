@@ -596,6 +596,65 @@ namespace dipole{
          return EXIT_SUCCESS;
       }
 
+      /*--------------------------------------------------------*/
+      /*Function to send cells field to be output in cfg file   */
+      /*--------------------------------------------------------*/
+      int send_cells_field(std::vector<int>& cells_cell_id_array,
+                           std::vector<double>& dipole_cells_field_array_x,
+                           std::vector<double>& dipole_cells_field_array_y,
+                           std::vector<double>& dipole_cells_field_array_z,
+                           int cells_num_local_cells
+                  ){
+
+         // allocate memory to send data
+         int num_send_cells = cells_num_local_cells;
+         std::vector<int> mpi_send_cells_id(num_send_cells,0);
+         std::vector<double> mpi_send_cells_field(3*num_send_cells,0.0);
+
+         // loop over local cells to save data to send
+         for(int i=0; i<num_send_cells; i++){
+            mpi_send_cells_id[i] = cells_cell_id_array[i];
+            mpi_send_cells_field[3*i+0] = dipole_cells_field_array_x[mpi_send_cells_id[i]];
+            mpi_send_cells_field[3*i+1] = dipole_cells_field_array_y[mpi_send_cells_id[i]];
+            mpi_send_cells_field[3*i+2] = dipole_cells_field_array_z[mpi_send_cells_id[i]];
+         }
+
+         // send cells dipolar field
+         MPI_Send(&num_send_cells, 1, MPI_INT, 0, 114, MPI_COMM_WORLD);
+         MPI_Send(&mpi_send_cells_id[0], num_send_cells, MPI_INT, 0, 115, MPI_COMM_WORLD);
+         MPI_Send(&mpi_send_cells_field[0], 3*num_send_cells, MPI_DOUBLE, 0, 116, MPI_COMM_WORLD);
+         //fprintf(stderr,"cpu %d sending %d cells to rank 0\n",vmpi::my_rank,num_send_cells);
+
+         // loop over CPUs
+         for(int cpu=0; cpu<vmpi::num_processors; cpu++){
+            // if I am root proc, then I receive cells dipolar field
+            if(vmpi::my_rank == 0){
+               // allocate int to receive num of cells to be received
+               int num_recv_cells;
+               // Receive num_recv_cells
+               MPI_Recv(&num_recv_cells, 1, MPI_INT, cpu, 114, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               // Allocate arrays for field
+               std::vector<int> mpi_recv_cells_id(num_recv_cells,0);
+               std::vector<double> mpi_recv_cells_field(3*num_recv_cells,0.0);
+               // Receive arrays
+               MPI_Recv(&mpi_recv_cells_id[0], num_recv_cells, MPI_INT, cpu, 115, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               MPI_Recv(&mpi_recv_cells_field[0], 3*num_recv_cells, MPI_DOUBLE, cpu, 116, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               //fprintf(stderr,"cpu %d recv %d cells from rank %d\n",vmpi::my_rank,num_recv_cells,cpu);
+
+               // Save received data
+               for(int i=0; i<num_recv_cells; i++){
+                  int lc = mpi_recv_cells_id[i];
+                  dipole_cells_field_array_x[lc] = mpi_recv_cells_field[3*i+0];
+                  dipole_cells_field_array_y[lc] = mpi_recv_cells_field[3*i+1];
+                  dipole_cells_field_array_z[lc] = mpi_recv_cells_field[3*i+2];
+               } // end saving data
+            } // end if I am root proc
+         } // end loop over cpus
+
+         return EXIT_SUCCESS;
+      }
+
+
    #endif
 
 } // end namespace dipole

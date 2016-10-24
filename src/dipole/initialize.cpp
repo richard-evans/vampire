@@ -639,6 +639,8 @@ namespace dipole{
       //dipole::internal::cells_pos_and_mom_array = cells_pos_and_mom_array;
       //dipole::internal::cells_num_atoms_in_cell = cells_num_atoms_in_cell;
       //dipole::internal::cells_num_cells = cells_num_cells;
+      cells::num_cells = dipole::internal::cells_num_cells;
+      cells::num_atoms_in_cell = dipole::internal::cells_num_atoms_in_cell;
 
       #ifdef MPICF
          double t2 = MPI_Wtime();

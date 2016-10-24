@@ -93,6 +93,16 @@ namespace dipole{
                int cells_num_cells
 					);
 
+   //--------------------------------------------------------
+   // Function to send cells field to be output in cfg file
+   //--------------------------------------------------------
+   int send_cells_field(std::vector<int>& cells_cell_id_array,
+                        std::vector<double>& dipole_cells_field_array_x,
+                        std::vector<double>& dipole_cells_field_array_y,
+                        std::vector<double>& dipole_cells_field_array_z,
+                        int cells_num_local_cells
+               );
+
    //-----------------------------------------------------------------------------
    // Function to initialise dipole module
    //-----------------------------------------------------------------------------

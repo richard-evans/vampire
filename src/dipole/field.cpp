@@ -82,7 +82,6 @@ namespace dipole{
                   //fprintf(stderr,"\t atom = %d\tatom_field_x = %f\tatom_field_y = %f\tatom_field_z = %f\ton rank %d\n",atom,dipole::atom_dipolar_field_array_x[atom],dipole::atom_dipolar_field_array_y[atom],dipole::atom_dipolar_field_array_z[atom],vmpi::my_rank);
    	         }
 			   }
-
 		   } // End of check for update rate
 		} // end of check for update time
    }

@@ -111,7 +111,7 @@ namespace dipole{
             //std::cout << lc << "\t";
             //std::cout << cells::mag_array_x[lc]<< "\t" << dipole::cells_field_array_x[lc] << "\t";
             //std::cout << cells::mag_array_y[lc]<< "\t" << dipole::cells_field_array_y[lc] << "\t";
-            //std::cout << cells::mag_array_z[lc]<< "\t" << dipole::cells_field_array_z[lc] << std::endl;
+
             //fprintf(stderr,"lc = %d\tmag_x = %e\tmag_y = %e\tmag_z = %e\tfield_x = %f\tfield_y = %f\tfield_z = %f on rank = %d\n",lc,cells::mag_array_x[lc],cells::mag_array_y[lc],cells::mag_array_z[lc],dipole::cells_field_array_x[lc],dipole::cells_field_array_y[lc],dipole::cells_field_array_z[lc],vmpi::my_rank);
          //}
       //}
@@ -140,6 +140,6 @@ namespace dipole{
 
       //MPI::COMM_WORLD.Barrier();
 
-	}
+	} // end of dipole::internal::update_field() function
 
 } // end of dipole namespace
