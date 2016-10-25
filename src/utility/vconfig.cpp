@@ -531,7 +531,7 @@ void cells(){
       for(int cell=0; cell < cells::num_cells; cell++){
          if(cells::num_atoms_in_cell[cell]>0){
             cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell]<< "\t";
-            cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << "\t" << cells::pos_and_mom_array[4*cell+3] << std::endl;
+            cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << std::endl;
          }
       }
 
@@ -622,7 +622,6 @@ void cells_coords(){
 
       for(int cell=0; cell<cells::num_cells; cell++){
          if(cells::num_atoms_in_cell[cell]>0){
-            //cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::cell_coords_array_x[cell] << "\t" << cells::cell_coords_array_y[cell] << "\t" << cells::cell_coords_array_z[cell] << std::endl;
             cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::pos_and_mom_array[4*cell+0] << "\t" << cells::pos_and_mom_array[4*cell+1] << "\t" << cells::pos_and_mom_array[4*cell+2] <<  std::endl;
          }
       }

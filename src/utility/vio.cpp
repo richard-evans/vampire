@@ -3866,7 +3866,6 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 	   with the usual atomic spin configuration for post processing.
       */
       if(word==test){
-         std::cout << "value = " << value << std::endl;
          std::string test2="keep";
          std::string test1="remove";
          std::string test0="";
