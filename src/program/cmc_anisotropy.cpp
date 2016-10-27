@@ -105,8 +105,8 @@ void cmc_anisotropy(){
 		// perform azimuthal angle sweep
 		while(sim::constraint_phi<=sim::constraint_phi_max){
 
-			// Re-initialise spin moments for CMC only if Tmin neq Tmax
-			if(sim::Tmin!=sim::Tmax) {sim::CMCinit();}
+			// Re-initialise spin moments for CMC
+			sim::CMCinit();
 
 			// Set starting temperature
 			sim::temperature=sim::Tmin;
