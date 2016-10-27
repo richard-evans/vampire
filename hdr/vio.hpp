@@ -91,9 +91,6 @@ namespace vout{
 
    extern bool gnuplot_array_format;
 
-	extern bool output_grains_config;
-	extern int output_config_grain_rate;
-
 	//extern bool output_povray;
 	//extern int output_povray_rate;
 

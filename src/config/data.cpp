@@ -18,16 +18,6 @@
 // config module headers
 #include "internal.hpp"
 
-namespace vout{
-
-   //output_rate_counter_defined globally => not to be redifined here!!
-   
-   bool output_grains_config=false;
-   int output_config_grain_rate=1000;
-   int output_grains_file_counter=0;
-
-}
-
 namespace config{
 
    //------------------------------------------------------------------------------
