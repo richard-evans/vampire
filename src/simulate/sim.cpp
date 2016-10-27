@@ -416,6 +416,14 @@ int run(){
 			program::boltzmann_dist();
 			break;
 
+	    case 51:
+		  	if(vmpi::my_rank==0){
+		       std::cout << "Setting..." << std::endl;
+		       zlog << "Setting..." << std::endl;
+	     	}
+		  	program::setting_process();
+		    break;
+
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;

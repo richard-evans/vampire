@@ -4,19 +4,23 @@
 #
 #===================================================================
 
-export OMPI_CXX=CC
+# Specify compiler for MPI compilation with openmpi
+#export OMPI_CXX=g++
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
+# Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
-export MPICH_CXX=bgxlc++
+#export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-#MPICC=mpicxx -DMPICF
-MPICC=CC -DMPICF
+MPICC=mpicxx -DMPICF
+
+CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
+CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
 
 export LANG=C
 export LC_ALL=C
@@ -37,6 +41,9 @@ PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
 
 IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
+
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi
 
 # Performance Flags
 ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
@@ -81,6 +88,7 @@ obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
+obj/mpi/decomposition.o \
 obj/mpi/LLGHeun-mpi.o \
 obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \
@@ -99,6 +107,7 @@ obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/partial_hysteresis.o \
 obj/program/static_hysteresis.o \
+obj/program/setting.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
 obj/program/localised_temperature_pulse.o \
@@ -127,8 +136,6 @@ obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
 obj/utility/units.o \
-obj/utility/vconfig.o \
-obj/utility/vio.o \
 obj/utility/vmath.o\
 obj/qvoronoi/geom.o\
 obj/qvoronoi/geom2.o\
@@ -149,12 +156,16 @@ obj/qvoronoi/usermem.o\
 obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
+#obj/utility/vio.o \
+
+
 # Include supplementary makefiles
 include src/create/makefile
 include src/config/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
+include src/vio/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)
@@ -163,6 +174,7 @@ ICCDB_OBJECTS=$(OBJECTS:.o=_idb.o)
 GCCDB_OBJECTS=$(OBJECTS:.o=_gdb.o)
 PCCDB_OBJECTS=$(OBJECTS:.o=_pdb.o)
 IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb.o)
+LLVMDB_OBJECTS=$(OBJECTS:.o=_llvmdb.o)
 
 MPI_OBJECTS=$(OBJECTS:.o=_mpi.o)
 MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_mpi.o)
@@ -174,6 +186,7 @@ MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
 MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
+MPI_CRAYDB_OBJECTS=$(OBJECTS:.o=_craydb_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
@@ -210,6 +223,12 @@ serial-debug: $(GCCDB_OBJECTS)
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
+
+serial-llvm-debug: $(LLVMDB_OBJECTS)
+	$(LLVM) $(LLVM_DBLFLAGS) $(LIBS) $(LLVMDB_OBJECTS) -o $(EXECUTABLE)
+
+$(LLVMDB_OBJECTS): obj/%_llvmdb.o: src/%.cpp
+	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $<
 
 intel-debug: $(ICCDB_OBJECTS)
 	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)
@@ -273,6 +292,11 @@ parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
+
+parallel-cray-debug: $(MPI_CRAY_OBJECTS)
+	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(EXECUTABLE)
+$(MPI_CRAYDB_OBJECTS): obj/%_craydb_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(CCC_CFLAGS) $<
 
 parallel-pathscale-debug: $(MPI_PCCDB_OBJECTS)
 	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
