@@ -27,4 +27,5 @@ output
 run/unit-cell-creator
 MPI-compute-times
 MPI-wait-times
+*.json
 #EOF
