@@ -24,26 +24,27 @@
 // Vampire headers
 #include "config.hpp"
 
-// config module headers
-#include "internal.hpp"
-
-namespace vout{
-   // function headers
-   void atoms();
-   void atoms_coords();
-   void cells();
-   void cells_coords();
-}
-
-
 namespace config{
+
 
    namespace internal{
 
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
+      extern bool output_atoms_config;
+      extern int output_atoms_config_rate;
 
+      extern bool output_cells_config;
+      extern int output_cells_config_rate;
+
+      extern double field_output_min_1;
+      extern double field_output_max_1;
+      extern double field_output_min_2;
+      extern double field_output_max_2;
+
+      extern double atoms_output_min[3];
+      extern double atoms_output_max[3];
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
@@ -51,6 +52,10 @@ namespace config{
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
+      void atoms();
+      void atoms_coords();
+      void cells();
+      void cells_coords();
 
    } // end of internal namespace
 
