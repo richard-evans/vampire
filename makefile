@@ -23,7 +23,7 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=-lstdc++
+LIBS=-lstdc++ -lfftw
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
@@ -86,6 +86,7 @@ obj/micromagnetic/calculate_gamma.o \
 obj/micromagnetic/calculate_ku.o \
 obj/micromagnetic/calculate_ms.o \
 obj/micromagnetic/calculate_tc.o \
+obj/micromagnetic/fields.o \
 obj/micromagnetic/LLB.o \
 obj/mpi/LLGHeun-mpi.o \
 obj/mpi/LLGMidpoint-mpi.o \

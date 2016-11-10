@@ -50,12 +50,11 @@ namespace micromagnetic{
       std::vector<double> ms;
       std::vector<double> Tc;
 
-
-      std::vector<double> ext_field;
-
       std::vector<double> x_array;
       std::vector<double> y_array;
       std::vector<double> z_array;
+
+      std::vector<double> ext_field;
 
       std::vector<double> x_euler_array;
       std::vector<double> y_euler_array;
@@ -73,6 +72,9 @@ namespace micromagnetic{
       std::vector<double> my_init;
       std::vector<double> mz_init;
 
+      std::vector<double> macro_neighbour_list_start_index;
+      std::vector<double> macro_neighbour_list_end_index;
+      std::vector<double> macro_neighbour_list_array;
       /*
    	const double prefactor=1.0e+23; // 1e-7/1e30
 

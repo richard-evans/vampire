@@ -13,14 +13,26 @@
 #include <algorithm>
 #include <fstream>
 
+
 namespace mm = micromagnetic::internal;
 
 namespace micromagnetic{
 
-   void mm::step(int num_cells, double temperature, std::vector<double> x_array,std::vector<double> y_array,std::vector<double> z_array, std::vector<double> ext_field, double dt,std::vector<double>& new_x_array,std::vector<double>& new_y_array,std::vector<double>& new_z_array){
+   void mm::step( int num_cells,
+                  double temperature,
+                  std::vector<double> x_array,
+                  std::vector<double> y_array,
+                  std::vector<double> z_array,
+                  std::vector<double> ext_field,
+                  double dt,
+                  std::vector<double>& new_x_array,
+                  std::vector<double>& new_y_array,
+                  std::vector<double>& new_z_array){
 
       const double kB = 1.3806503e-23;
-      double one_o_chi_perp, one_o_2_chi_para, reduced_temperature, Tc_o_Tc_m_T, m_e, alpha_para, alpha_perp, m_e_squared;
+      double one_o_chi_perp, one_o_2_chi_para;
+      double reduced_temperature, Tc_o_Tc_m_T;
+      double m_e, alpha_para, alpha_perp, m_e_squared;
 
       std::vector<double> m(3,0.0);
       std::vector<double> spin_field(3,0.0);
@@ -84,47 +96,26 @@ namespace micromagnetic{
          double sumx =0;
          double sumy = 0;
          double sumz = 0;
-         //if (temperature < mm::Tc[cell]){
-            int j2 = cell*num_cells;
+         int j2 = cell*num_cells;
             //loops over all other cells to sum the interaction
-            double mi = pow(m_e_squared,0.5);
-            for(int j=0;j<num_cells;j++){
-               // calculate magnetization length
-               const double mj = sqrt(x_array[j]*x_array[j] +y_array[j]*y_array[j] + z_array[j]*z_array[j]);
-               // calculate reduced exchange constant factor
-               const double A = mm::Ax[j2]*pow(mj,1.66);
-
-               //if(cell == 63 && mm::Ax[j2] < 0.0){
-               //   std::cout << cell << "\t" << j2-cell*num_cells << "\t" << mm::Ax[j2] << std::endl;
-               //   std::cin.get();
-               //}
-               //if (mj > 0){
-                  //H_exch = sum_j A(T)
-                  //exchange_field[0] = exchange_field[0] - (pow(mi,1.66/2.)*pow(mj,1.66/2.))*(x_array[j] - x_array[cell])*(x_array[j])*mm::Ax[j2]/(mj*mj);
-                  //exchange_field[1] = exchange_field[1] - (pow(mi,1.66/2.)*pow(mj,1.66/2.))*(y_array[j] - y_array[cell])*(y_array[j])*mm::Ay[j2]/(mj*mj);
-                  //exchange_field[2] = exchange_field[2] - (pow(mi,1.66/2.)*pow(mj,1.66/2.))*(z_array[j] - z_array[cell])*(z_array[j])*mm::Az[j2]/(mj*mj);
-                  exchange_field[0] -= A*(x_array[j] - x_array[cell]);
-                  exchange_field[1] -= A*(y_array[j] - y_array[cell]); //- (pow(mi,1.66/2.)*pow(mj,1.66/2.))*(y_array[j] - y_array[cell])*(y_array[j])*mm::Ay[j2]/(mj*mj);
-                  exchange_field[2] -= A*(z_array[j] - z_array[cell]); //- (pow(mi,1.66/2.)*pow(mj,1.66/2.))*(z_array[j] - z_array[cell])*(z_array[j])*mm::Az[j2]/(mj*mj);
-                  //sumx = sumx - mm::Ax[j2];
-                  //sumy = sumy - mm::Ay[j2];
-                  //sumz = sumz - mm::Az[j2];
-   //             exchange_field[0] = exchange_field[0] - (pow(mi,1.66/2.)*pow(mj,1.66/2.))*(x_array[j])*mm::Ax[j2]/(mj*mj);
-      //          exchange_field[1] = exchange_field[1] - (pow(mi,1.66/2.)*pow(mj,1.66/2.))*(y_array[j])*mm::Ay[j2]/(mj*mj);
-         //       exchange_field[2] = exchange_field[2] - (pow(mi,1.66/2.)*pow(mj,1.66/2.))*(z_array[j])*mm::Az[j2]/(mj*mj);
-
-               //}
-               j2++;
-            }
-         //}
-
+         double mi = pow(m_e_squared,0.5);
+         for(int j = mm::macro_neighbour_list_start_index[cell];j<mm::macro_neighbour_list_end_index[cell] +1;j++){
+            // calculate reduced exchange constant factor
+            const int cellj = mm::macro_neighbour_list_array[j];
+            const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
+            const double A = mm::Ax[cellj]*pow(mj,1.66);
+            exchange_field[0] -= A*(x_array[cellj] - x_array[cell]);
+            exchange_field[1] -= A*(y_array[cellj] - y_array[cell]);
+            exchange_field[2] -= A*(z_array[cellj] - z_array[cell]);
+         //   std::cout << mm::macro_neighbour_list_start_index[cell] << '\t' << mm::macro_neighbour_list_end_index[cell] << '\t' << mm::macro_neighbour_list_array[j] <<std::endl;
+         }
 
          //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-         spin_field[0] = pf*m[0] + one_o_chi_perp*m[0] + 1*exchange_field[0] + mm::ext_field[0];
-         spin_field[1] = pf*m[1] + one_o_chi_perp*m[1] + 1*exchange_field[1] + mm::ext_field[1];
-         spin_field[2] = pf*m[2]                       + 1*exchange_field[2] + mm::ext_field[2];
+         spin_field[0] = pf*m[0] + one_o_chi_perp*m[0] + exchange_field[0] + mm::ext_field[0] + cells::x_field_array[cell];
+         spin_field[1] = pf*m[1] + one_o_chi_perp*m[1] + exchange_field[1] + mm::ext_field[1] + cells::y_field_array[cell];
+         spin_field[2] = pf*m[2]                       + exchange_field[2] + mm::ext_field[2] + cells::z_field_array[cell];
 
-         //std::cout << sim::time << '\t' << temperature << '\t' << m[0] << '\t' << m[1] << '\t' << m[2] << '\t' << pf*m[0] << '\t' << sumx << '\t' << sumy << '\t' << sumz << '\t' << pf*m[2] << "\t" << one_o_chi_perp*m[0] << '\t' << one_o_chi_perp*m[1] << "\t" << exchange_field[0] << "\t" << exchange_field[1] << "\t" << exchange_field[2] << std::endl;
+      //   std::cout << temperature << '\t' << cell << '\t' << exchange_field[0] << '\t' << cells::x_field_array[cell] <<std::endl;
          //calculates the stochatic parallel and perpendicular terms
          double sigma_para = sqrt(2*kB*temperature*alpha_para/(mm::ms[cell]*dt)); //why 1e-27
          double sigma_perp = sqrt(2*kB*temperature*(alpha_perp-alpha_para)/(dt*mm::ms[cell]*alpha_perp*alpha_perp));

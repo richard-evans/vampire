@@ -8,6 +8,7 @@
 #include "random.hpp"
 #include "sim.hpp"
 #include "cells.hpp"
+#include "atoms.hpp"
 #include <cmath>
 #include <iostream>
 #include <algorithm>
@@ -65,6 +66,7 @@ int LLB_serial_heun(
    mm::ext_field[1] = H*Hy;
    mm::ext_field[2] = H*Hz;
 
+
    //loop over all cells and calculate m = M/Ms and save it to x,y,z_array
    //there are lots of blank cells so only the cells where ms!=0 are calcualted.
    //save this new m as the initial value, so it can be saved and used in the final equation.
@@ -116,19 +118,26 @@ int LLB_serial_heun(
    double total = 0;
    for (int cell = 0; cell < num_cells; cell ++)
    {
-      if (fabs(mm::ms[cell]) > 1e-100)
-      {
-         x_mag_array[cell] = mm::x_array[cell]*mm::ms[cell];
-         y_mag_array[cell] = mm::y_array[cell]*mm::ms[cell];
-         z_mag_array[cell] = mm::z_array[cell]*mm::ms[cell];
-         x_mag = x_mag + x_mag_array[cell];
-         y_mag = y_mag + y_mag_array[cell];
-         z_mag = z_mag + z_mag_array[cell];
+         cells::x_mag_array[cell] = mm::x_array[cell]*mm::ms[cell];
+         cells::y_mag_array[cell] = mm::y_array[cell]*mm::ms[cell];
+         cells::z_mag_array[cell] = mm::z_array[cell]*mm::ms[cell];
+         x_mag = x_mag + cells::x_mag_array[cell];
+         y_mag = y_mag + cells::y_mag_array[cell];
+         z_mag = z_mag + cells::z_mag_array[cell];
          total = total + mm::ms[cell];
-      }
 
    }
 
+     // calulate total moment in each cell
+     for(int i=0;i<atoms::num_atoms;++i) {
+       int cell = atoms::cell_array[i];
+         atoms::x_spin_array[i] = mm::x_array[cell];
+         atoms::y_spin_array[i] = mm::y_array[cell];
+         atoms::z_spin_array[i] = mm::z_array[cell];
+     }
+
+
+//std::cout << cells::x_mag_array[4] <<std::endl;;
 
 std::cout << sim::time << '\t' << temperature << '\t' << x_mag/total << '\t' << y_mag/total << '\t' << z_mag/total <<std::endl;
 

@@ -67,6 +67,12 @@ namespace micromagnetic{
       mm::ms.resize(num_cells,0.0);
       mm::Tc.resize(num_cells,0.0);
 
+
+      mm::macro_neighbour_list_start_index.resize(num_cells,0.0);
+      mm::macro_neighbour_list_end_index.resize(num_cells,0.0);
+
+
+
       mm::alpha =     mm::calculate_alpha(num_atoms, num_cells, cell_array, type_array, material);
       mm::Tc =        mm::calculate_tc(num_atoms, num_cells, cell_array,neighbour_list_array, neighbour_list_start_index, neighbour_list_end_index, type_array, material);
       mm::ku =        mm::calculate_ku(num_atoms, num_cells, cell_array, type_array, material);
@@ -80,7 +86,7 @@ namespace micromagnetic{
       //mm:: Ay =       mm::calculate_a(num_atoms, num_cells, num_materials, cell_array, neighbour_list_array, neighbour_list_start_index,  neighbour_list_end_index, type_array, material, unit_cell_size_y,  volume_array, y_coord_array, num_atoms_in_unit_cell);
       //mm:: Az =       mm::calculate_a(num_atoms, num_cells, num_materials, cell_array, neighbour_list_array, neighbour_list_start_index,  neighbour_list_end_index, type_array, material, unit_cell_size_z,  volume_array, z_coord_array, num_atoms_in_unit_cell);
 
-      for (int cell = 0; cell < num_cells; cell++) std::cerr << mm::Tc[cell] <<std::endl;
+   //   for (int cell = 0; cell < num_cells; cell++) std::cerr << mm::Tc[cell] <<std::endl;
 
       mm::ext_field.resize(3,0.0);
 
@@ -109,6 +115,7 @@ namespace micromagnetic{
       P1D.resize(1001,0.0);
       mean_M = 0;
       counter = 0;
+
 
 
 //   mm::num_macro_cells_x = int(system_dimensions_x)/int(size);

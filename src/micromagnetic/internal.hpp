@@ -90,7 +90,9 @@ namespace micromagnetic{
       extern std::vector<double> my_init;
       extern std::vector<double> mz_init;
 
-
+      extern std::vector<double> macro_neighbour_list_start_index;
+      extern std::vector<double> macro_neighbour_list_end_index;
+      extern std::vector<double> macro_neighbour_list_array;
 /*
       extern const double prefactor; // 1e-7/1e30
 

@@ -7,6 +7,7 @@
 #include "material.hpp"
 #include "create.hpp"
 #include <stdlib.h>
+#include <vector>
 namespace micromagnetic
 {
 
@@ -41,9 +42,10 @@ namespace micromagnetic
                                         std::vector <double> z_coord_array,
                                         double num_atoms_in_unit_cell){
 
-         std::vector< std::vector< double> > a2d(num_cells, num_cells, 0.0); 
+         std::vector< std::vector< double> > a2d;
          std::vector<double> a;
          a.resize(num_cells*num_cells,0.0);
+         a2d.resize(num_cells, std::vector<double>(num_cells,0.0));
 
          //calculates the atomic volume  = volume of one cell/number of atoms in a unitcell = atomic volume
          const double atomic_volume = cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[2]/num_atoms_in_unit_cell;
@@ -61,31 +63,33 @@ namespace micromagnetic
                 }
             }
          }
-         k = 0;
-         // loops over all cells to turn the 2D array into a 1D array
-         // multiplys A by cell size/2Ms*V_Atomic to ad din the terms of H_Ex
-         for (int i =0; i < num_cells; i++){
-            double cell_size = pow(volume_array[i],1./3.);
-            for (int j =0; j <num_cells; j++){
-               if ((ms[j] != 0) && (ms[i] != 0) && (a2d[i][j] < 0.5)){
-                  k = j*num_cells +i;
-                  a[k] = (a2d[i][j]*cell_size)/(2*ms[i]*atomic_volume);
-               }
-               k++;
-            }
-         }
 
-         int k1,k2;
-         k1 = 0;
          //sums over all interactions to check interaction between cell i j = interaction cell j i
          //non symetric interactions not realistic
          for (int i = 0; i < num_cells; i ++){
             for (int j = 0; j < num_cells; j++){
-               k2 = (j*num_cells) + i;
-               k1 = (i*num_cells) + j;
                if (a2d[i][j] != a2d[j][i]) std::cout << "error: Non symetric exchange" <<"\t"  <<  i << '\t' << j << "\t"  <<  a2d[i][j]<<"\t"  <<  a2d[j][i] <<std::endl;
             }
          }
+         // loops over all cells to turn the 2D array into a 1D array
+         // multiplys A by cell size/2Ms*V_Atomic to ad din the terms of H_Ex
+         int array_index = 0;
+         for (int i =0; i < num_cells; i++){
+            double cell_size = pow(volume_array[i],1./3.);
+            macro_neighbour_list_start_index[i] = array_index;
+            for (int j =0; j <num_cells; j++){
+            //   std::cout << num_neighbours << '\t' << a2d[i][j] <<std::endl;
+               if (a2d[i][j] != 0){
+                  macro_neighbour_list_array.push_back(j);
+                  a[array_index] = (a2d[i][j]*cell_size)/(2*ms[i]*atomic_volume);
+                  macro_neighbour_list_end_index[i] = array_index;
+                  array_index ++;
+               }
+            }
+
+         }
+                  std::cout << "a"<<std::endl;
+
          return a;
       }
    }
