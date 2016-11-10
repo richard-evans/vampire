@@ -35,12 +35,12 @@ namespace micromagnetic
          for (int cell = 0; cell < num_cells; cell ++)
          {
 
-            if(T<(1.065*Tc[cell])) chi_CGS[cell] = a0+ a1*pow(pow(((1.068*Tc[cell]-T)/(1.068*Tc[cell])),0.5),2.)+ a2*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),2.)+ a3*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),3.)+ a4*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),4.) + a5*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),5.) + a6*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),6.) + a7*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),7.)+ a8*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),8.) + a9*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),9.);
+            if(T<(1.068*Tc[cell])) chi_CGS[cell] = a0+ a1*((1.068*Tc[cell]-T)/(1.068*Tc[cell]))+ a2*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),2.)+ a3*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),3.)+ a4*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),4.) + a5*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),5.) + a6*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),6.) + a7*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),7.)+ a8*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),8.) + a9*pow((((1.068*Tc[cell])-T)/(1.068*Tc[cell])),9.);
             else chi_CGS[cell] = (0.8*1.4/660.*Tc[cell])/(4*PI)/(T-Tc[cell]);
 
             chi[cell] = (chi_CGS[cell]*9.54393845712027); // (Tesla)
             chi[cell] = chi[cell]/chi_0;
-            chi[cell] =  -ms[cell]*chi[cell]/ku[cell];
+            chi[cell] = ms[cell]*chi[cell]/ku[cell];
          }
          return chi;
       }

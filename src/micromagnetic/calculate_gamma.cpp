@@ -11,6 +11,7 @@ namespace micromagnetic
 
    namespace internal
    {
+      //gamma = sum(gamma)/N for each cell
       std::vector<double> calculate_gamma(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array, std::vector <mp::materials_t> material)
       {
 
@@ -22,9 +23,8 @@ namespace micromagnetic
             gamma[cell_array[atom]] = gamma[cell_array[atom]] + mp::material[type_array[atom]].gamma_rel;
             N[cell_array[atom]]++;
          }
-
-         for (int cell = 0; cell < num_cells; cell++)
-         {
+         //calculates gamma/N
+         for (int cell = 0; cell < num_cells; cell++){
             gamma[cell] = gamma[cell]/N[cell];
          }
          return gamma;
