@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -82,7 +82,7 @@
 namespace demag{
 
 	bool fast=false;
-	
+
 	int update_rate=100; /// timesteps between updates
 	int update_time=-1; /// last update time
 
@@ -95,7 +95,7 @@ namespace demag{
 	std::vector <std::vector < double > > rij_yy;
 	std::vector <std::vector < double > > rij_yz;
 	std::vector <std::vector < double > > rij_zz;
-	
+
 /// @brief Function to set r_ij matrix values
 ///
 /// @section License
@@ -108,7 +108,7 @@ namespace demag{
 /// @date    28/03/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		28/03/2011
 ///	Revision:	  ---
@@ -124,7 +124,7 @@ void init(){
 		terminaltextcolor(WHITE);
 	}
 	if(demag::fast==true) {
-		
+
       // timing function
       #ifdef MPICF
          double t1 = MPI_Wtime();
@@ -135,10 +135,10 @@ void init(){
 		// Check memory requirements and print to screen
 		zlog << zTs() << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells)*double(cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 		std::cout << "Fast demagnetisation field calculation has been enabled and requires " << double(cells::num_cells)*double(cells::num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-		
+
 		// allocate arrays to store data [nloccell x ncells]
 		for(int lc=0;lc<cells::num_local_cells; lc++){
-			
+
 			demag::rij_xx.push_back(std::vector<double>());
 			demag::rij_xx[lc].resize(cells::num_cells,0.0);
 
@@ -161,23 +161,23 @@ void init(){
 
 		// calculate matrix prefactors
 		zlog << zTs() << "Precalculating rij matrix for demag calculation... " << std::endl;
-		
+
 		// loop over local cells
 		for(int lc=0;lc<cells::num_local_cells;lc++){
-			
+
 			// reference global cell ID
 			int i = cells::local_cell_array[lc];
-			
-			// Loop over all other cells to calculate contribution to local cell 
+
+			// Loop over all other cells to calculate contribution to local cell
 			for(int j=0;j<cells::num_cells;j++){
 				if(i!=j){
-				
+
 					const double rx = cells::x_coord_array[j]-cells::x_coord_array[i]; // Angstroms
 					const double ry = cells::y_coord_array[j]-cells::y_coord_array[i];
 					const double rz = cells::z_coord_array[j]-cells::z_coord_array[i];
 
 					const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);
-					
+
 					const double ex = rx*rij;
 					const double ey = ry*rij;
 					const double ez = rz*rij;
@@ -191,11 +191,11 @@ void init(){
 					rij_yy[lc][j] = demag::prefactor*((3.0*ey*ey - 1.0)*rij3);
 					rij_yz[lc][j] = demag::prefactor*(3.0*ey*ez)*rij3;
 					rij_zz[lc][j] = demag::prefactor*((3.0*ez*ez - 1.0)*rij3);
-
-				}
+		//			std::cout << lc << '\t' << rij_xx[lc][j] << '\t' << rij_xy[lc][j] << '\t' << rij_xz[lc][j] << '\t' << rij_yy[lc][j] << '\t' <<rij_yz[lc][j] << "\t" << rij_zz[lc][j] <<std::endl;
+ 				}
 			}
 		}
-		
+
       #ifdef MPICF
          double t2 = MPI_Wtime();
       #else
@@ -203,9 +203,9 @@ void init(){
          t2 = time (NULL);
       #endif
 		zlog << zTs() << "Precalculation of rij matrix for demag calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
-		
+
 	}
-	
+
 	// timing function
    #ifdef MPICF
       double t1 = MPI_Wtime();
@@ -226,9 +226,9 @@ void init(){
    #endif
 
    zlog << zTs() << "Time required for demag update: " << t2-t1 << "s." << std::endl;
-	
+
 }
-	
+
 /// @brief Function to recalculate demag fields using fast update method
 ///
 /// @section License
@@ -241,14 +241,14 @@ void init(){
 /// @date    28/03/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		28/03/2011
 ///	Revision:	  ---
 ///=====================================================================================
 ///
 inline void fast_update(){
-	
+
 	// check for callin of routine
 	if(err::check==true) {
 		terminaltextcolor(RED);
@@ -257,21 +257,21 @@ inline void fast_update(){
 	}
 	// loop over local cells
 	for(int lc=0;lc<cells::num_local_cells;lc++){
-		
+
 		int i = cells::local_cell_array[lc];
-		
+
       // Calculate inverse volume from number of atoms in macrocell
       // V in A^3 == 1e-30 m3, mu_0 = 4pie-7 -> prefactor = pi*4e23/3V
-      const double mu0_three_cell_volume = -4.0e23*M_PI/(3.0*cells::volume_array[i]);
+      const double mu0_three_cell_volume = 8.0e23*M_PI/(3.0*cells::volume_array[i]);
 
       // Add self-demagnetisation
 		cells::x_field_array[i]=mu0_three_cell_volume*cells::x_mag_array[i];
 		cells::y_field_array[i]=mu0_three_cell_volume*cells::y_mag_array[i];
 		cells::z_field_array[i]=mu0_three_cell_volume*cells::z_mag_array[i];
 
-		// Loop over all other cells to calculate contribution to local cell 
+		// Loop over all other cells to calculate contribution to local cell
 		for(int j=0;j<cells::num_cells;j++){
-			
+
 			const double mx = cells::x_mag_array[j];
 			const double my = cells::y_mag_array[j];
 			const double mz = cells::z_mag_array[j];
@@ -279,9 +279,9 @@ inline void fast_update(){
 			cells::x_field_array[i]+=(mx*rij_xx[lc][j] + my*rij_xy[lc][j] + mz*rij_xz[lc][j]);
 			cells::y_field_array[i]+=(mx*rij_xy[lc][j] + my*rij_yy[lc][j] + mz*rij_yz[lc][j]);
 			cells::z_field_array[i]+=(mx*rij_xz[lc][j] + my*rij_yz[lc][j] + mz*rij_zz[lc][j]);
-				
+
 		}
-		
+
 		// Output data to vdp file
 		//vdp << i << "\t" << cells::num_atoms_in_cell[i] << "\t";
 		//vdp << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
@@ -304,14 +304,14 @@ inline void fast_update(){
 /// @date    28/03/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		28/03/2011
 ///	Revision:	  ---
 ///=====================================================================================
 ///
 inline void std_update(){
-	
+
 	// check for callin of routine
 	if(err::check==true){
 		terminaltextcolor(RED);
@@ -320,7 +320,7 @@ inline void std_update(){
 	}
 	// loop over local cells
 	for(int lc=0;lc<cells::num_local_cells;lc++){
-		
+
 		// get global cell ID
 		int i = cells::local_cell_array[lc];
 
@@ -333,10 +333,10 @@ inline void std_update(){
 		cells::x_field_array[i]=mu0_three_cell_volume*cells::x_mag_array[i];
 		cells::y_field_array[i]=mu0_three_cell_volume*cells::y_mag_array[i];
 		cells::z_field_array[i]=mu0_three_cell_volume*cells::z_mag_array[i];
-		
-		// Loop over all other cells to calculate contribution to local cell 
+
+		// Loop over all other cells to calculate contribution to local cell
 		for(int j=0;j<i;j++){
-				
+
 			const double mx = cells::x_mag_array[j];
 			const double my = cells::y_mag_array[j];
 			const double mz = cells::z_mag_array[j];
@@ -388,13 +388,13 @@ inline void std_update(){
 		cells::x_field_array[i]*=demag::prefactor;
 		cells::y_field_array[i]*=demag::prefactor;
 		cells::z_field_array[i]*=demag::prefactor;
-		
+
 		// Output data to vdp file
 		//vdp << i << "\t" << cells::num_atoms_in_cell[i] << "\t";
 		//vdp << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
 		//vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
 		//vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t"<< cells::z_mag_array[i] << "\t" << inv_three_cell_volume*demag::prefactor*cells::z_mag_array[i] << std::endl;
-		
+
 	}
 	//err::vexit();
 }
@@ -411,7 +411,7 @@ inline void std_update(){
 /// @date    28/03/2011
 ///
 /// @return EXIT_SUCCESS
-/// 
+///
 /// @internal
 ///	Created:		28/03/2011
 ///	Revision:	  ---
@@ -435,18 +435,18 @@ void update(){
 
 		// update cell magnetisations
 		cells::mag();
-		
+
 		// recalculate demag fields
 		if(demag::fast==true) fast_update();
 		else std_update();
-		
+
 		// For MPI version, only add local atoms
 		#ifdef MPICF
 			const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 		#else
 			const int num_local_atoms = atoms::num_atoms;
 		#endif
-			
+
 		// Update Atomistic Dipolar Field Array
 		for(int atom=0;atom<num_local_atoms;atom++){
 			const int cell = atoms::cell_array[atom];
@@ -459,8 +459,7 @@ void update(){
 
 		} // End of check for update rate
 	} // end of check for update time
-	
+
 }
 
 } // end of namespace demag
-

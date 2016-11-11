@@ -111,11 +111,11 @@ namespace micromagnetic{
          }
 
          //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-         spin_field[0] = pf*m[0] + one_o_chi_perp*m[0] + exchange_field[0] + mm::ext_field[0] + cells::x_field_array[cell];
-         spin_field[1] = pf*m[1] + one_o_chi_perp*m[1] + exchange_field[1] + mm::ext_field[1] + cells::y_field_array[cell];
-         spin_field[2] = pf*m[2]                       + exchange_field[2] + mm::ext_field[2] + cells::z_field_array[cell];
+         spin_field[0] = pf*m[0] + one_o_chi_perp*m[0] + exchange_field[0] + mm::ext_field[0] + cells::x_field_array[cell]*cells::num_atoms_in_cell[cell];
+         spin_field[1] = pf*m[1] + one_o_chi_perp*m[1] + exchange_field[1] + mm::ext_field[1] + cells::y_field_array[cell]*cells::num_atoms_in_cell[cell];
+         spin_field[2] = pf*m[2]                       + exchange_field[2] + mm::ext_field[2] + cells::z_field_array[cell]*cells::num_atoms_in_cell[cell];
 
-      //   std::cout << temperature << '\t' << cell << '\t' << exchange_field[0] << '\t' << cells::x_field_array[cell] <<std::endl;
+      //   std::cout << sim::time << '\t' << m[0] << '\t' << m[1] << '\t' << m[2] << '\t' << cells::x_field_array[cell] << "\t" << cells::y_field_array[cell] << '\t' << cells::z_field_array[cell] <<std::endl;
          //calculates the stochatic parallel and perpendicular terms
          double sigma_para = sqrt(2*kB*temperature*alpha_para/(mm::ms[cell]*dt)); //why 1e-27
          double sigma_perp = sqrt(2*kB*temperature*(alpha_perp-alpha_para)/(dt*mm::ms[cell]*alpha_perp*alpha_perp));

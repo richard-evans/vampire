@@ -131,13 +131,20 @@ int LLB_serial_heun(
      // calulate total moment in each cell
      for(int i=0;i<atoms::num_atoms;++i) {
        int cell = atoms::cell_array[i];
-         atoms::x_spin_array[i] = mm::x_array[cell];
-         atoms::y_spin_array[i] = mm::y_array[cell];
-         atoms::z_spin_array[i] = mm::z_array[cell];
+       const double normal = sqrt(mm::x_array[cell]*mm::x_array[cell] + mm::y_array[cell]*mm::y_array[cell] + mm::z_array[cell]*mm::z_array[cell]);
+         atoms::x_spin_array[i] = mm::x_array[cell]/normal;
+         atoms::y_spin_array[i] = mm::y_array[cell]/normal;
+         atoms::z_spin_array[i] = mm::z_array[cell]/normal;
      }
 
 
 //std::cout << cells::x_mag_array[4] <<std::endl;;
+
+std::ofstream pfile("cell_config2");
+for (int cell = 0; cell < cells::num_cells; cell++)
+{
+   pfile << cells::x_coord_array[cell] << '\t' << cells::y_coord_array[cell] << '\t' << cells::z_coord_array[cell] << '\t' <<mm::x_array[cell] << '\t' << mm::y_array[cell]<< '\t' << mm::z_array[cell]<< '\t' << std::endl;
+}
 
 std::cout << sim::time << '\t' << temperature << '\t' << x_mag/total << '\t' << y_mag/total << '\t' << z_mag/total <<std::endl;
 
