@@ -22,7 +22,7 @@ private:
    std::vector <double> cy;
    std::vector <double> cz;
    std::vector <std::string> type;
-}
+};
 
 class cfg
 {
@@ -39,4 +39,4 @@ private:
    data atoms;
    data cells;
 
-}
+};
