@@ -431,7 +431,7 @@ int run(){
 			exit (EXIT_FAILURE);
 			}
 	}
-
+	if (micromagnetic::discretisation_micromagnetic){
 	      std::ofstream pfile("cell_config2");
 			for (int cell = 0; cell < cells::num_cells; cell++)
 			{
@@ -439,7 +439,6 @@ int run(){
 			}
 
 			std::ofstream pfile2D("LLBprob");
-			std::cout << "hey" <<std::endl;
 			for(int para=0;para<101;para++){
 				for(int perp=0;perp<101;perp++){
 					pfile2D << double(para)/100.0 << "\t" << double(perp)/100.0 << "\t" << micromagnetic::P[para][perp] << std::endl;
@@ -451,6 +450,7 @@ int run(){
 				//std::cout << "F: " << F << " PF: " << PF << std::endl;
 				pfile1D << (double(para))/1000.0 << "\t" << micromagnetic::P1D[para] << std::endl;
 			}
+		}
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
    //------------------------------------------------
