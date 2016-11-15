@@ -51,6 +51,7 @@ void build_simple_cubic(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[0].z=0.0;
    unit_cell.atom[0].lc=0;
    unit_cell.atom[0].hc=0;
+   unit_cell.atom[0].ni=6;
 
    unit_cell.cutoff_radius = 1.0; // normalised to unit cell size
 

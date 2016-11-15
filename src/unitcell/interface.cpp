@@ -109,6 +109,49 @@ namespace unitcell{
             return true;
          }
       }
+      // add prefix string
+      prefix="exchange";
+      if(key == prefix){
+         //--------------------------------------------------------------------
+         test="interaction-range";
+         if(word==test){
+            double ir=atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(ir, word, line, prefix, unit, "none", 1.0, 1000.0,"input","1.0 - 1000.0 nearest neighbour distances");
+            uc::internal::exchange_interaction_range = ir;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="decay-length";
+         if(word==test){
+            double dl=atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(dl, word, line, prefix, unit, "length", 0.1, 100.0,"input","1.0 - 100.0 Angstroms");
+            uc::internal::exchange_decay = dl;
+            return true;
+         }         //--------------------------------------------------------------------
+         test="function";
+         if(word==test){
+            test="nearest-neighbour";
+            if(value==test){
+               uc::internal::exchange_function = uc::internal::nearest_neighbour;
+               return true;
+            }
+            test="exponential";
+            if(value==test){
+               uc::internal::exchange_function = uc::internal::exponential;
+               return true;
+            }
+            else{
+               terminaltextcolor(RED);
+               std::cerr << "Error - value for \'exchange:" << word << "\' must be one of:" << std::endl;
+               std::cerr << "\t\"nearest-neighbour\"" << std::endl;
+               std::cerr << "\t\"exponential\"" << std::endl;
+               terminaltextcolor(WHITE);
+               err::vexit();
+            }
+         }
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

@@ -45,6 +45,7 @@ namespace unitcell{
 		int dx; /// delta x in unit cells
 		int dy; /// delta y in unit cells
 		int dz; /// delta z in unit cells
+      double rij; // interaction range (unit cells)
 		double Jij[3][3]; /// Exchange tensor
 	};
 
@@ -54,7 +55,7 @@ namespace unitcell{
 
 		double dimensions[3];
 		double shape[3][3];
-      double cutoff_radius;
+      double cutoff_radius; // nearest neighbours
 
 		unsigned int lcsize; /// number of local categories
 		unsigned int hcsize; /// number of height categories

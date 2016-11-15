@@ -34,6 +34,7 @@ namespace unitcell{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
+      enum exchange_function_t { nearest_neighbour, exponential };
 
       //-------------------------------------------------------------------------
       // Internal shared variables
@@ -45,6 +46,10 @@ namespace unitcell{
       extern double unit_cell_size_y;
       extern double unit_cell_size_z;
 
+      extern exchange_function_t exchange_function;
+      extern double exchange_interaction_range;
+      extern double exchange_decay;
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
@@ -55,6 +60,9 @@ namespace unitcell{
       void calculate_interactions(unit_cell_t& unit_cell);
       void read_unit_cell(unit_cell_t & unit_cell, std::string filename);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
+      double exchange(double range_sq, double nn_cutoff_sq);
+      void normalise_exchange(unitcell::unit_cell_t& unit_cell);
+
 
    } // end of internal namespace
 

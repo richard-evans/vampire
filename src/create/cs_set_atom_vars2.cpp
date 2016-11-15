@@ -195,7 +195,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 					const int natom = atoms::neighbour_list_array[nn];
 					const int jmaterial=atoms::type_array[natom];
 					atoms::i_exchange_list.push_back(tmp_zval);
-					atoms::i_exchange_list[nn].Jij=mp::material[imaterial].Jij_matrix[jmaterial];
+               // get unit cell interaction id
+               int i = atoms::neighbour_interaction_type_array[nn];
+               atoms::i_exchange_list[nn].Jij=unit_cell.interaction[i].Jij[0][0]*mp::material[imaterial].Jij_matrix[jmaterial];
 					// reset interation id to neighbour number - causes segfault if nn out of range
 					atoms::neighbour_interaction_type_array[nn]=nn;
 				}

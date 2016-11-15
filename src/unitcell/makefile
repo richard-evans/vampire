@@ -5,6 +5,7 @@
 # List module object filenames
 unitcell_objects =\
 data.o \
+exchange.o \
 initialize.o \
 interactions.o \
 interface.o \

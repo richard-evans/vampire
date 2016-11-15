@@ -47,7 +47,7 @@ namespace internal{
 void calculate_interactions(unit_cell_t& unit_cell){
 
    // determine neighbour range
-   const double rcut = unit_cell.cutoff_radius*1.001; // reduced to unit cell units
+   const double rcut = unit_cell.cutoff_radius*exchange_interaction_range*1.001; // reduced to unit cell units
    const double rcutsq = rcut*rcut; // reduced to unit cell units
 
    // temporary for unit cell size
@@ -92,6 +92,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
    // Determine exchange type
    unit_cell.exchange_type=-1;
+   const double nnrcut_sq = unit_cell.cutoff_radius*unit_cell.cutoff_radius*1.001*1.001; // nearest neighbour cutoff radius
 
    // loop over all i atoms
    for(int i=0; i < ratoms.size(); ++i){
@@ -106,9 +107,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
             const double rx = ratoms[j].x - ratoms[i].x;
             const double ry = ratoms[j].y - ratoms[i].y;
             const double rz = ratoms[j].z - ratoms[i].z;
-            bool in_range = rx*rx + ry*ry + rz*rz <= rcutsq;
+            double range_sq = rx*rx + ry*ry + rz*rz;
             // check for rij < rcut and i!= j
-            if( in_range && i != j){
+            if( range_sq < rcutsq && i != j ){
                // Neighbour found
                uc::interaction_t tmp;
 
@@ -121,18 +122,21 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.dy = ratoms[j].idy - ratoms[i].idy;
                tmp.dz = ratoms[j].idz - ratoms[i].idz;
 
+               // save interaction range
+               tmp.rij = sqrt(range_sq);
+
                // Determine normalised exchange constants
-               tmp.Jij[0][0] = 1.0; // xx
+               tmp.Jij[0][0] = uc::internal::exchange(range_sq, nnrcut_sq); // xx
                tmp.Jij[0][1] = 0.0; // xy
                tmp.Jij[0][2] = 0.0; // xz
 
                tmp.Jij[1][0] = 0.0; // yx
-               tmp.Jij[1][1] = 1.0; // yy
+               tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq); // yy
                tmp.Jij[1][2] = 0.0; // yz
 
                tmp.Jij[2][0] = 0.0; // zx
                tmp.Jij[2][1] = 0.0; // zy
-               tmp.Jij[2][2] = 1.0; // zz
+               tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq); // zz
 
                unit_cell.interaction.push_back(tmp);
 
@@ -150,13 +154,18 @@ void calculate_interactions(unit_cell_t& unit_cell){
    }
    unit_cell.interaction_range = interaction_range;
 
+   // Normalise exchange interactions
+   uc::internal::normalise_exchange(unit_cell);
+
    // Output interactions to screen
    /*for(int i=0; i<unit_cell.interaction.size(); i++){
       std::cerr << i << "\t" << unit_cell.interaction[i].i << "\t"
                 << unit_cell.interaction[i].j << "\t"
                 << unit_cell.interaction[i].dx << "\t"
                 << unit_cell.interaction[i].dy << "\t"
-                << unit_cell.interaction[i].dz << std::endl;
+                << unit_cell.interaction[i].dz << "\t"
+                << unit_cell.interaction[i].rij << "\t"
+                << unit_cell.interaction[i].Jij[0][0] << std::endl;
    }*/
 
    // Check for interactions
