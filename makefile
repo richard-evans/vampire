@@ -23,7 +23,7 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=-lstdc++ -lfftw
+LIBS=-lstdc++ -lm -lfftw3
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi

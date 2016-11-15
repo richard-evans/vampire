@@ -11,8 +11,14 @@ namespace micromagnetic
 
    namespace internal
    {
-      std::vector<double> calculate_tc(int num_atoms, int num_cells,std::vector<int> cell_array, std::vector<int> neighbour_list_array, std::vector<int> neighbour_list_start_index,  std::vector<int> neighbour_list_end_index, const std::vector<int> type_array, std::vector <mp::materials_t> material)
-      {
+      std::vector<double> calculate_tc(int num_atoms,
+                                       int num_cells,
+                                       std::vector<int> cell_array,
+                                       std::vector<int> neighbour_list_array,
+                                       std::vector<int> neighbour_list_start_index,
+                                       std::vector<int> neighbour_list_end_index,
+                                       const std::vector<int> type_array,
+                                       std::vector <mp::materials_t> material){
 
          std::vector<double>  J(num_cells,0.0);
          std::vector<double>  N(num_cells,0.0);

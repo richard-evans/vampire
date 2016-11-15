@@ -41,21 +41,20 @@ int LLB(int num_steps,int num_cells,double temperature,std::vector<double>& x_ma
 }
 }
 
-int LLB_serial_heun(
-   int num_steps,
-   int num_cells,
-   double temperature,
-   std::vector<double>& x_mag_array,
-   std::vector<double>& y_mag_array,
-   std::vector<double>& z_mag_array,
-   double Hx,
-   double Hy,
-   double Hz,
-   double H,
-   double dt,
-   std::vector <double> volume_array,
-   int N
-){
+int LLB_serial_heun( int num_steps,
+                     int num_cells,
+                     double temperature,
+                     std::vector<double>& x_mag_array,
+                     std::vector<double>& y_mag_array,
+                     std::vector<double>& z_mag_array,
+                     double Hx,
+                     double Hy,
+                     double Hz,
+                     double H,
+                     double dt,
+                     std::vector <double> volume_array,
+                     int N
+                  ){
 
 
 
@@ -97,8 +96,10 @@ int LLB_serial_heun(
          mm::mz_store[cell] = mm::z_array[cell] + mm::z_euler_array[cell]*dt;
       }
    }
+
    //calls a function (step) which calculates a heun step based on the position after the euler step and save it to a heun array
    mm::step(num_cells, temperature, mm::mx_store, mm::my_store, mm::mz_store, mm::ext_field, dt, mm::x_heun_array, mm::y_heun_array, mm::z_heun_array);
+
 
    //calcualtes the final position as x = xinital + 1/2(euler+heun)*dt
    for (int cell = 0; cell < num_cells; cell++){
@@ -111,11 +112,13 @@ int LLB_serial_heun(
 
 
 
+
    //calcualtes the average magnetisation of the system per step.
    double x_mag = 0;
    double y_mag = 0;
    double z_mag = 0;
    double total = 0;
+   
    for (int cell = 0; cell < num_cells; cell ++)
    {
          cells::x_mag_array[cell] = mm::x_array[cell]*mm::ms[cell];
@@ -128,6 +131,7 @@ int LLB_serial_heun(
 
    }
 
+
      // calulate total moment in each cell
      for(int i=0;i<atoms::num_atoms;++i) {
        int cell = atoms::cell_array[i];
@@ -138,15 +142,8 @@ int LLB_serial_heun(
      }
 
 
-//std::cout << cells::x_mag_array[4] <<std::endl;;
 
-std::ofstream pfile("cell_config2");
-for (int cell = 0; cell < cells::num_cells; cell++)
-{
-   pfile << cells::x_coord_array[cell] << '\t' << cells::y_coord_array[cell] << '\t' << cells::z_coord_array[cell] << '\t' <<mm::x_array[cell] << '\t' << mm::y_array[cell]<< '\t' << mm::z_array[cell]<< '\t' << std::endl;
-}
-
-std::cout << sim::time << '\t' << temperature << '\t' << x_mag/total << '\t' << y_mag/total << '\t' << z_mag/total <<std::endl;
+//std::cout << sim::time << '\t' << temperature << '\t' << x_mag/total << '\t' << y_mag/total << '\t' << z_mag/total <<std::endl;
 
 
 /*

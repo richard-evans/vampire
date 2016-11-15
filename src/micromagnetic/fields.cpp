@@ -37,8 +37,6 @@ namespace micromagnetic{
       std::vector<double> m(3,0.0);
       std::vector<double> spin_field(3,0.0);
 
-
-
       //6 arrays of gaussian random numbers to store the stochastic noise terms for x,y,z parallel and perperdicular
       std::vector <double> GW1x(num_cells);
       std::vector <double> GW1y(num_cells);
@@ -55,6 +53,7 @@ namespace micromagnetic{
       generate (GW2y.begin(),GW2y.end(), mtrandom::gaussian);
       generate (GW2z.begin(),GW2z.end(), mtrandom::gaussian);
 
+
    //loops over all the cells to calculate the spin terms per cell - only filled cells where MS>0
    for (int cell =0; cell <num_cells; cell++){
       if (mm::ms[cell] > 1e-100){
@@ -62,6 +61,7 @@ namespace micromagnetic{
          m[1] = y_array[cell];
          m[2] = z_array[cell];
          const double m_squared = m[1]*m[1]+m[2]*m[2]+m[0]*m[0];
+
 
          //chi is usually sued as 2/chi
          one_o_chi_perp = 1.0/mm::chi_perp[cell];
@@ -82,13 +82,15 @@ namespace micromagnetic{
             alpha_para = mm::alpha[cell]*(2.0/3.0)*reduced_temperature;
             alpha_perp = alpha_para;
          }
-
+            std::cout << temperature << '\t' << mm::chi_perp[cell] << '\t' << mm::chi_para[cell] << alpha_para << '\t' << alpha_perp << "\t" << m_e <<std::endl;
          m_e_squared = m_e*m_e;
+
 
          //calculates the final term of the field pf - this is depnedent on temperature.
          double pf;
          if(temperature<=mm::Tc[cell]) pf = one_o_2_chi_para*(1.0 - m_squared/m_e_squared);
          else pf = -2.0*one_o_2_chi_para*(1.0 + Tc_o_Tc_m_T*3.0*m_squared/5.0);
+
 
          //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
          double exchange_field[3]={0.0,0.0,0.0};
@@ -96,29 +98,34 @@ namespace micromagnetic{
          double sumx =0;
          double sumy = 0;
          double sumz = 0;
-         int j2 = cell*num_cells;
+         if (num_cells > 1){
+            int j2 = cell*num_cells;
             //loops over all other cells to sum the interaction
-         double mi = pow(m_e_squared,0.5);
-         for(int j = mm::macro_neighbour_list_start_index[cell];j<mm::macro_neighbour_list_end_index[cell] +1;j++){
-            // calculate reduced exchange constant factor
-            const int cellj = mm::macro_neighbour_list_array[j];
-            const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
-            const double A = mm::Ax[cellj]*pow(mj,1.66);
-            exchange_field[0] -= A*(x_array[cellj] - x_array[cell]);
-            exchange_field[1] -= A*(y_array[cellj] - y_array[cell]);
-            exchange_field[2] -= A*(z_array[cellj] - z_array[cell]);
-         //   std::cout << mm::macro_neighbour_list_start_index[cell] << '\t' << mm::macro_neighbour_list_end_index[cell] << '\t' << mm::macro_neighbour_list_array[j] <<std::endl;
+            double mi = pow(m_e_squared,0.5);
+
+            for(int j = mm::macro_neighbour_list_start_index[cell];j<mm::macro_neighbour_list_end_index[cell] +1;j++){
+               // calculate reduced exchange constant factor
+               const int cellj = mm::macro_neighbour_list_array[j];
+               const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
+               const double A = mm::A[cellj]*pow(mj,1.66);
+               exchange_field[0] -= A*(x_array[cellj] - x_array[cell]);
+               exchange_field[1] -= A*(y_array[cellj] - y_array[cell]);
+               exchange_field[2] -= A*(z_array[cellj] - z_array[cell]);
+               //   std::cout << mm::macro_neighbour_list_start_index[cell] << '\t' << mm::macro_neighbour_list_end_index[cell] << '\t' << mm::macro_neighbour_list_array[j] <<std::endl;
+            }
          }
 
          //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-         spin_field[0] = pf*m[0] + one_o_chi_perp*m[0] + exchange_field[0] + mm::ext_field[0] + cells::x_field_array[cell]*cells::num_atoms_in_cell[cell];
-         spin_field[1] = pf*m[1] + one_o_chi_perp*m[1] + exchange_field[1] + mm::ext_field[1] + cells::y_field_array[cell]*cells::num_atoms_in_cell[cell];
+         spin_field[0] = pf*m[0] - one_o_chi_perp*m[0] + exchange_field[0] + mm::ext_field[0] + cells::x_field_array[cell]*cells::num_atoms_in_cell[cell];
+         spin_field[1] = pf*m[1] - one_o_chi_perp*m[1] + exchange_field[1] + mm::ext_field[1] + cells::y_field_array[cell]*cells::num_atoms_in_cell[cell];
          spin_field[2] = pf*m[2]                       + exchange_field[2] + mm::ext_field[2] + cells::z_field_array[cell]*cells::num_atoms_in_cell[cell];
 
-      //   std::cout << sim::time << '\t' << m[0] << '\t' << m[1] << '\t' << m[2] << '\t' << cells::x_field_array[cell] << "\t" << cells::y_field_array[cell] << '\t' << cells::z_field_array[cell] <<std::endl;
          //calculates the stochatic parallel and perpendicular terms
-         double sigma_para = sqrt(2*kB*temperature*alpha_para/(mm::ms[cell]*dt)); //why 1e-27
-         double sigma_perp = sqrt(2*kB*temperature*(alpha_perp-alpha_para)/(dt*mm::ms[cell]*alpha_perp*alpha_perp));
+         double a;
+         if (micromagnetic::stochastic == true) a = 1.0;
+         else if (micromagnetic::stochastic == false) a = 0.0;
+         double sigma_para = a*sqrt(2*kB*temperature*alpha_para/(mm::ms[cell]*dt)); //why 1e-27
+         double sigma_perp = a*sqrt(2*kB*temperature*(alpha_perp-alpha_para)/(dt*mm::ms[cell]*alpha_perp*alpha_perp));
 
          const double H[3] = {spin_field[0], spin_field[1], spin_field[2]};
 
@@ -126,6 +133,7 @@ namespace micromagnetic{
          const double GW2t[3] = {GW2x[cell],GW2y[cell],GW2z[cell]};
          const double one_o_m_squared = 1.0/(m[0]*m[0]+m[1]*m[1]+m[2]*m[2]);
          const double SdotH = m[0]*H[0] + m[1]*H[1] + m[2]*H[2];
+
 
          double xyz[3];
          //calculates the LLB equation
@@ -153,125 +161,6 @@ namespace micromagnetic{
                   new_z_array[cell] = xyz[2];
          }
 
-
       }
    }
-
-/*
-void demag_FFT(int num_cells,std::vector<double> x_array,std::vector<double> y_array,std::vector<double> z_array,std::vector<double>& dip_field_x,std::vector<double>& dip_field_y,std::vector<double>& dip_field_z)
-{
-
-   Array3D<fftw_complex> Mx; //3D Array for magneetisation
-   Array3D<fftw_complex> My;
-   Array3D<fftw_complex> Mz;
-
-   Array3D<fftw_complex> Hx; //3D Array for dipolar field
-   Array3D<fftw_complex> Hy;
-   Array3D<fftw_complex> Hz;
-
-   Hx.resize(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z);
-   Hy.resize(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z);
-   Hz.resize(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z);
-
-   Mx.resize(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z);
-   My.resize(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z);
-   Mz.resize(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z);
-
-   for (int cell = 0; cell < num_cells; cell++)
-
-      Mx.IFillReal(x_array[cell]);
-      Mx.IFillComplex(0.0);
-      My.IFillReal(y_array[cell]);
-      My.IFillComplex(0.0);
-      Mz.IFillReal(z_array[cell]);
-      Mz.IFillComplex(0.0);
-
-      Hx.IFill(0.0);
-      Hy.IFill(0.0);
-      Hz.IFill(0.0);
-
-
-      // fft calculations
-      fftw_plan NxxP,NxyP,NxzP,NyxP,NyyP,NyzP,NzxP,NzyP,NzzP;
-      fftw_plan MxP,MyP,MzP;
-
-      //deterines the forward transform for the N arrays
-      NxxP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nxx.ptr(),Nxx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NxxP);
-      NyxP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nyx.ptr(),Nyx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NyxP);
-      NzxP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nzx.ptr(),Nzx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NzxP);
-
-      NxyP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nxy.ptr(),Nxy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NxyP);
-      NyyP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nyy.ptr(),Nyy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NyyP);
-      NzyP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nzy.ptr(),Nzy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NzyP);
-
-      NxzP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nxz.ptr(),Nxz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NxzP);
-      NyzP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nyz.ptr(),Nyz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NyzP);
-      NzzP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Nzz.ptr(),Nzz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NzzP);
-
-      MxP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Mx.ptr(),Mx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(MxP);
-      MyP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,My.ptr(),My.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(MyP);
-      MzP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Mz.ptr(),Mz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(MzP);
-
-      // performs the converlusion between Nk and Mk
-      for (int i=0 ; i<2*mm::num_macro_cells_x ; i++){
-      for (int j=0 ; j<2*mm::num_macro_cells_y ; j++){
-          for (int k=0 ; k<2*mm::num_macro_cells_z ; k++){
-           // [Nreal+ iNimag]*(Mreal+iMimag)
-           Hx(i,j,k)[0] = Nxx(i,j,k)[0]*Mx(i,j,k)[0] + Nxy(i,j,k)[0]*My(i,j,k)[0] + Nxz(i,j,k)[0]*Mz(i,j,k)[0]; //summing the real part
-           Hx(i,j,k)[0] -= (Nxx(i,j,k)[1]*Mx(i,j,k)[1] + Nxy(i,j,k)[1]*My(i,j,k)[1] + Nxz(i,j,k)[1]*Mz(i,j,k)[1]);
-           Hx(i,j,k)[1] = Nxx(i,j,k)[0]*Mx(i,j,k)[1] + Nxy(i,j,k)[0]*My(i,j,k)[1] + Nxz(i,j,k)[0]*Mz(i,j,k)[1];
-           Hx(i,j,k)[1] += (Nxx(i,j,k)[1]*Mx(i,j,k)[0] + Nxy(i,j,k)[1]*My(i,j,k)[0] + Nxz(i,j,k)[1]*Mz(i,j,k)[0]);
-
-           Hy(i,j,k)[0] = Nyx(i,j,k)[0]*Mx(i,j,k)[0] + Nyy(i,j,k)[0]*My(i,j,k)[0] + Nyz(i,j,k)[0]*Mz(i,j,k)[0];
-           Hy(i,j,k)[0] -= (Nyx(i,j,k)[1]*Mx(i,j,k)[1] + Nyy(i,j,k)[1]*My(i,j,k)[1] + Nyz(i,j,k)[1]*Mz(i,j,k)[1]);
-           Hy(i,j,k)[1] = Nyx(i,j,k)[0]*Mx(i,j,k)[1] + Nyy(i,j,k)[0]*My(i,j,k)[1] + Nyz(i,j,k)[0]*Mz(i,j,k)[1];
-           Hy(i,j,k)[1] += (Nyx(i,j,k)[1]*Mx(i,j,k)[0] + Nyy(i,j,k)[1]*My(i,j,k)[0] + Nyz(i,j,k)[1]*Mz(i,j,k)[0]);
-
-           Hz(i,j,k)[0] = Nzx(i,j,k)[0]*Mx(i,j,k)[0] + Nzy(i,j,k)[0]*My(i,j,k)[0] + Nzz(i,j,k)[0]*Mz(i,j,k)[0]; //summing the real part
-           Hz(i,j,k)[0] -= (Nzx(i,j,k)[1]*Mx(i,j,k)[1] + Nzy(i,j,k)[1]*My(i,j,k)[1] + Nzz(i,j,k)[1]*Mz(i,j,k)[1]);
-           Hz(i,j,k)[1] = Nzx(i,j,k)[0]*Mx(i,j,k)[1] + Nzy(i,j,k)[0]*My(i,j,k)[1] + Nzz(i,j,k)[0]*Mz(i,j,k)[1];
-           Hz(i,j,k)[1] += (Nzx(i,j,k)[1]*Mx(i,j,k)[0] + Nzy(i,j,k)[1]*My(i,j,k)[0] + Nzz(i,j,k)[1]*Mz(i,j,k)[0]);
-          }
-      }
-   }
-
-   // performs the backward transform to give the dipole field, Hx, Hy, Hz
-   fftw_plan HxP,HyP,HzP;
-
-   HxP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Hx.ptr(),Hx.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
-   fftw_execute(HxP);
-   HyP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Hy.ptr(),Hy.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
-   fftw_execute(HyP);
-   HzP = fftw_plan_dft_3d(2*mm::num_macro_cells_x,2*mm::num_macro_cells_y,2*mm::num_macro_cells_z,Hz.ptr(),Hz.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
-   fftw_execute(HzP);
-
-   for (int i=0 ; i<2*mm::num_macro_cells_x ; i++){
-   for (int j=0 ; j<2*mm::num_macro_cells_y ; j++){
-      for (int k=0 ; k<2*mm::num_macro_cells_z ; k++){
-          if(i==j && i==k){
-           Hx(i,j,k)[0] += Mx(i,j,k)[0]*8.0*pi/3.0;
-           Hy(i,j,k)[0] += My(i,j,k)[0]*8.0*pi/3.0;
-           Hz(i,j,k)[0] += Mz(i,j,k)[0]*8.0*pi/3.0;
-           }
-        myfile << i  << "\t" << j  << "\t" << k << "\t" << 1.0e-7*Ms*Hx(i,j,k)[0]/((3.0*mm::num_macro_cells_x)*(3.0*mm::num_macro_cells_y)*(3.0*mm::num_macro_cells_z)) << "\t" << 1.0e-7*Ms*Hy(i,j,k)[0]/((3.0*mm::num_macro_cells_x)*(3.0*mm::num_macro_cells_y)*(3.0*mm::num_macro_cells_z)) << "\t" << 1.0e-7*Ms*Hz(i,j,k)[0]/((1.0*mm::num_macro_cells_x)*(1.0*mm::num_macro_cells_y)*(1.0*mm::num_macro_cells_z)) << "\n";
-      }
-   }
-   }
-
-   return 0;
-
-
-}*/
 }

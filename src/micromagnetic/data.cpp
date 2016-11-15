@@ -20,12 +20,16 @@
 
 namespace micromagnetic{
 
-//   bool micro;
-      bool discretisation_micromagnetic = false;
-      bool initialised = false;
-   //------------------------------------------------------------------------------
-   // Externally visible variables
-   //------------------------------------------------------------------------------
+
+   //------------------------------------------------------------------------
+   // Externally visiable variables
+   //------------------------------------------------------------------------
+
+
+   //boolean to determine whether the simulation is micromagnetic
+   bool discretisation_micromagnetic = false;
+   //boolean to determine whether the simulation wants stochastic fields
+   bool stochastic = true;
 
    std::vector < std::vector <int > > P;
    std::vector < int > P1D;
@@ -38,10 +42,8 @@ namespace micromagnetic{
       // Shared variables inside micromagnetic module
       //------------------------------------------------------------------------
 
-
-      std::vector<double> Ax;
-      std::vector<double> Ay;
-      std::vector<double> Az;
+      //holds the cell parameters
+      std::vector<double> A;
       std::vector<double> alpha;
       std::vector<double> chi_perp;
       std::vector<double> chi_para;
@@ -50,49 +52,38 @@ namespace micromagnetic{
       std::vector<double> ms;
       std::vector<double> Tc;
 
+      //holds the normalised magnetisation in x,y,z
       std::vector<double> x_array;
       std::vector<double> y_array;
       std::vector<double> z_array;
 
+      //external field vector
       std::vector<double> ext_field;
 
+
+      //euler and heun arrays
       std::vector<double> x_euler_array;
       std::vector<double> y_euler_array;
       std::vector<double> z_euler_array;
-
       std::vector<double> x_heun_array;
       std::vector<double> y_heun_array;
       std::vector<double> z_heun_array;
 
+      //where the magnetisation is stored between euler and heun array steps
       std::vector<double> mx_store;
       std::vector<double> my_store;
       std::vector<double> mz_store;
 
+      //initial magnetisation vectors per step
       std::vector<double> mx_init;
       std::vector<double> my_init;
       std::vector<double> mz_init;
 
+      //macrocell neighbourlists
       std::vector<double> macro_neighbour_list_start_index;
       std::vector<double> macro_neighbour_list_end_index;
       std::vector<double> macro_neighbour_list_array;
-      /*
-   	const double prefactor=1.0e+23; // 1e-7/1e30
 
-      Array3D<fftw_complex> Nxx; // creates the stencil complex array Nxx
-      Array3D<fftw_complex> Nyx; // creates the stencil complex array Nyx
-      Array3D<fftw_complex> Nzx; // creates the stencil complex array Nzx
-
-      Array3D<fftw_complex> Nxy; // creates the stencil complex array Nxy
-      Array3D<fftw_complex> Nyy; // creates the stencil complex array Nyy
-      Array3D<fftw_complex> Nzy; // creates the stencil complex array Nzy
-
-      Array3D<fftw_complex> Nxz; // creates the stencil complex array Nxz
-      Array3D<fftw_complex> Nyz; // creates the stencil complex array Nyz
-      Array3D<fftw_complex> Nzz; // creates the stencil complex array Nzz
-*/
-   //   int num_macro_cells_x;
-   //   int num_macro_cells_y;
-   //   int num_macro_cells_z;
 
 
    } // end of internal namespace

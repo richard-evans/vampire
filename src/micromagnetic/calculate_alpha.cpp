@@ -12,8 +12,11 @@ namespace micromagnetic
    namespace internal
    {
       //alpha = sum(alpha)/N for each cell
-      std::vector<double> calculate_alpha(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array, std::vector <mp::materials_t> material)
-      {
+      std::vector<double> calculate_alpha(int num_atoms,
+                                          int num_cells,
+                                          std::vector<int> cell_array,
+                                          const std::vector<int> type_array,
+                                          std::vector <mp::materials_t> material){
          //stores alpha per cell
          std::vector<double>  alpha(num_cells,0.0);
          //stores the number of atoms in each cell

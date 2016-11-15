@@ -32,8 +32,6 @@ namespace micromagnetic{
       std::string prefix="micromagnetic";
       if(key!=prefix) return false;
 
-
-
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

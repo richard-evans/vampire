@@ -42,10 +42,13 @@ namespace micromagnetic
                                         std::vector <double> z_coord_array,
                                         double num_atoms_in_unit_cell){
 
+         //initialising a vector to store the 2D data
          std::vector< std::vector< double> > a2d;
+         a2d.resize(num_cells, std::vector<double>(num_cells,0.0));
+
+         //1D data storage for A
          std::vector<double> a;
          a.resize(num_cells*num_cells,0.0);
-         a2d.resize(num_cells, std::vector<double>(num_cells,0.0));
 
          //calculates the atomic volume  = volume of one cell/number of atoms in a unitcell = atomic volume
          const double atomic_volume = cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[2]/num_atoms_in_unit_cell;
@@ -71,6 +74,8 @@ namespace micromagnetic
                if (a2d[i][j] != a2d[j][i]) std::cout << "error: Non symetric exchange" <<"\t"  <<  i << '\t' << j << "\t"  <<  a2d[i][j]<<"\t"  <<  a2d[j][i] <<std::endl;
             }
          }
+
+
          // loops over all cells to turn the 2D array into a 1D array
          // multiplys A by cell size/2Ms*V_Atomic to ad din the terms of H_Ex
          int array_index = 0;
@@ -88,8 +93,6 @@ namespace micromagnetic
             }
 
          }
-                  std::cout << "a"<<std::endl;
-
          return a;
       }
    }
