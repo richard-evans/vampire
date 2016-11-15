@@ -82,7 +82,7 @@ namespace micromagnetic{
             alpha_para = mm::alpha[cell]*(2.0/3.0)*reduced_temperature;
             alpha_perp = alpha_para;
          }
-            std::cout << temperature << '\t' << mm::chi_perp[cell] << '\t' << mm::chi_para[cell] << alpha_para << '\t' << alpha_perp << "\t" << m_e <<std::endl;
+         //   std::cout << temperature << '\t' << mm::chi_perp[cell] << '\t' << mm::chi_para[cell] << alpha_para << '\t' << alpha_perp << "\t" << m_e <<std::endl;
          m_e_squared = m_e*m_e;
 
 

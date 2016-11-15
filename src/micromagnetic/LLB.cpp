@@ -70,14 +70,12 @@ int LLB_serial_heun( int num_steps,
    //there are lots of blank cells so only the cells where ms!=0 are calcualted.
    //save this new m as the initial value, so it can be saved and used in the final equation.
    for (int cell = 0; cell < num_cells; cell++){
-      if (mm::ms[cell] > 1e-100){
          mm::x_array[cell] = x_mag_array[cell]/mm::ms[cell];
          mm::y_array[cell] = y_mag_array[cell]/mm::ms[cell];
          mm::z_array[cell] = z_mag_array[cell]/mm::ms[cell];
          mm::mx_init[cell] = mm::x_array[cell];
          mm::my_init[cell] = mm::y_array[cell];
          mm::mz_init[cell] = mm::z_array[cell];
-      }
    }
 
    //calculte chi(T).
@@ -118,7 +116,7 @@ int LLB_serial_heun( int num_steps,
    double y_mag = 0;
    double z_mag = 0;
    double total = 0;
-   
+
    for (int cell = 0; cell < num_cells; cell ++)
    {
          cells::x_mag_array[cell] = mm::x_array[cell]*mm::ms[cell];
@@ -131,15 +129,6 @@ int LLB_serial_heun( int num_steps,
 
    }
 
-
-     // calulate total moment in each cell
-     for(int i=0;i<atoms::num_atoms;++i) {
-       int cell = atoms::cell_array[i];
-       const double normal = sqrt(mm::x_array[cell]*mm::x_array[cell] + mm::y_array[cell]*mm::y_array[cell] + mm::z_array[cell]*mm::z_array[cell]);
-         atoms::x_spin_array[i] = mm::x_array[cell]/normal;
-         atoms::y_spin_array[i] = mm::y_array[cell]/normal;
-         atoms::z_spin_array[i] = mm::z_array[cell]/normal;
-     }
 
 
 
