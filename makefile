@@ -155,6 +155,7 @@ include src/create/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
+include src/unitcell/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)

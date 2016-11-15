@@ -60,6 +60,7 @@
 #include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
+#include "unitcell.hpp"
 #include "units.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -763,6 +764,7 @@ int match(string const key, string const word, string const value, string const 
    if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
 	//===================================================================
 	// Test for create variables
@@ -842,28 +844,6 @@ int match(string const key, string const word, string const value, string const 
 			if(matfile!=test){
 				//std::cout << matfile << std::endl;
 			  read_mat_file(matfile,line);
-				return EXIT_SUCCESS;
-			}
-			else{
-				terminaltextcolor(RED);
-				std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
-				terminaltextcolor(WHITE);
-				return EXIT_FAILURE;
-			}
-		}
-		//-------------------------------------------------------------------
-		// Get unit cell filename
-		//-------------------------------------------------------------------
-		test="unit-cell-file";
-		if(word==test){
-			std::string ucffile=value;
-			// strip quotes
-			ucffile.erase(remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
-			test="";
-			// if filename not blank set ucf file name
-			if(ucffile!=test){
-				//std::cout << matfile << std::endl;
-				cs::unit_cell_file=ucffile;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1015,16 +995,6 @@ int match_create(string const word, string const value, string const unit, int c
    test="particle-centre-offset"; //parity
    if(word==test){
       cs::particle_creation_parity=1;
-      return EXIT_SUCCESS;
-   }
-   //--------------------------------------------------------------------
-   else
-   test="crystal-structure";
-   if(word==test){
-      // Strip quotes
-      std::string cs=value;
-      cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
-      cs::crystal_structure=cs;
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
@@ -1245,46 +1215,8 @@ int match_dimension(string const word, string const value, string const unit, in
    // System dimension variables
    //-------------------------------------------------------------------
    std::string prefix="dimensions:";
-
-   std::string test="unit-cell-size";
-   if(word==test){
-      double a=atof(value.c_str());
-      check_for_valid_value(a, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-      cs::unit_cell_size[0]=a;
-      cs::unit_cell_size[1]=a;
-      cs::unit_cell_size[2]=a;
-      return EXIT_SUCCESS;
-   }
-   else
    //--------------------------------------------------------------------
-   test="unit-cell-size-x";
-   if(word==test){
-      double ax=atof(value.c_str());
-      check_for_valid_value(ax, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-      cs::unit_cell_size[0]=ax;
-      return EXIT_SUCCESS;
-   }
-   else
-   //--------------------------------------------------------------------
-   test="unit-cell-size-y";
-   if(word==test){
-      double ay=atof(value.c_str());
-      check_for_valid_value(ay, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-      cs::unit_cell_size[1]=ay;
-      return EXIT_SUCCESS;
-   }
-   else
-   //--------------------------------------------------------------------
-   test="unit-cell-size-z";
-   if(word==test){
-      double az=atof(value.c_str());
-      check_for_valid_value(az, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-      cs::unit_cell_size[2]=az;
-      return EXIT_SUCCESS;
-   }
-   else
-   //--------------------------------------------------------------------
-   test="system-size";
+   std::string test="system-size";
    if(word==test){
       double d=atof(value.c_str());
       check_for_valid_value(d, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");

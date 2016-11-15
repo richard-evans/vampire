@@ -31,6 +31,7 @@
 #include "sim.hpp"
 #include "random.hpp"
 #include "vio.hpp"
+#include "unitcell.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
 
@@ -142,9 +143,6 @@ int default_system(){
 	}
 
 	// Set system dimensions !Angstroms
-	cs::unit_cell_size[0] = 3.0;
-	cs::unit_cell_size[1] = 3.0;
-	cs::unit_cell_size[2] = 3.0;
 
 	cs::system_dimensions[0] = 100.0;
 	cs::system_dimensions[1] = 100.0;
@@ -153,8 +151,8 @@ int default_system(){
 	cs::particle_scale   = 50.0;
 	cs::particle_spacing = 10.0;
 
-	cs::particle_creation_parity=0;
-	cs::crystal_structure = "sc";
+   cs::particle_creation_parity=0;
+   uc::set_crystal_structure_to_simple_cubic();
 
 	// Voronoi Variables
 	create_voronoi::voronoi_sd=0.1;
@@ -206,9 +204,6 @@ int single_spin_system(){
 	}
 
 	// Set system dimensions !Angstroms
-	cs::unit_cell_size[0] = 3.0;
-	cs::unit_cell_size[1] = 3.0;
-	cs::unit_cell_size[2] = 3.0;
 
 	cs::system_dimensions[0] = 2.0;
 	cs::system_dimensions[1] = 2.0;
@@ -218,7 +213,7 @@ int single_spin_system(){
 	cs::particle_spacing = 10.0;
 
 	cs::particle_creation_parity=0;
-	cs::crystal_structure = "sc";
+	uc::set_crystal_structure_to_simple_cubic();
 
 	// Turn off multi-spin Flags
 	sim::hamiltonian_simulation_flags[0] = 0;	/// Exchange

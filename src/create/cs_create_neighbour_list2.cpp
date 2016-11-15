@@ -191,7 +191,7 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 				std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
 				std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
 				std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
-				std::cerr << "\tCell offest (dp): " << offset[0]*cs::unit_cell_size[0] << "\t" << offset[1]*cs::unit_cell_size[1] << "\t" << offset[2]*cs::unit_cell_size[2] << std::endl;
+				std::cerr << "\tCell offest (dp): " << offset[0]*unit_cell.dimensions[0] << "\t" << offset[1]*unit_cell.dimensions[1] << "\t" << offset[2]*unit_cell.dimensions[2] << std::endl;
 				terminaltextcolor(WHITE);
 				err::vexit();
 			}
