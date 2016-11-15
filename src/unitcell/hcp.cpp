@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include <cmath>
 
 // Vampire headers
 #include "unitcell.hpp"
@@ -21,12 +22,12 @@
 namespace unitcell{
 namespace internal{
 
-void build_simple_cubic(unitcell::unit_cell_t& unit_cell){
+void build_hexagonal_close_packed(unitcell::unit_cell_t& unit_cell){
 
-   // Set basic unit cell properties
-   unit_cell.dimensions[0] = 1.0;
-   unit_cell.dimensions[1] = 1.0;
-   unit_cell.dimensions[2] = 1.0;
+   // rescale y and z unit cell size to preserve unit cell dimensions
+   unit_cell.dimensions[0]=1.0;
+   unit_cell.dimensions[1]=1.0/sqrt(3.0);
+   unit_cell.dimensions[2]=2.0*sqrt(2.0)/3.0;
 
    unit_cell.shape[0][0]=1.0;
    unit_cell.shape[0][1]=0.0;
@@ -40,19 +41,41 @@ void build_simple_cubic(unitcell::unit_cell_t& unit_cell){
    unit_cell.shape[2][1]=0.0;
    unit_cell.shape[2][2]=1.0;
 
-   unit_cell.lcsize=1;
-   unit_cell.hcsize=1;
+   unit_cell.lcsize=4;
+   unit_cell.hcsize=2;
    unit_cell.interaction_range=1;
-   unit_cell.atom.resize(1);
-   unit_cell.surface_threshold=6;
+   unit_cell.atom.resize(4);
+   unit_cell.surface_threshold=12;
    //-----------------------------
-   unit_cell.atom[0].x=0.0;
-   unit_cell.atom[0].y=0.0;
-   unit_cell.atom[0].z=0.0;
-   unit_cell.atom[0].lc=0;
-   unit_cell.atom[0].hc=0;
+   unit_cell.atom[0].x = 0;
+   unit_cell.atom[0].y = 0;
+   unit_cell.atom[0].z = 0;
+   unit_cell.atom[0].lc = 0;
+   unit_cell.atom[0].hc = 0;
+   unit_cell.atom[0].ni = 12;
+   //-----------------------------
+   unit_cell.atom[1].x = 0.5;
+   unit_cell.atom[1].y = 0.5;
+   unit_cell.atom[1].z = 0;
+   unit_cell.atom[1].lc = 1;
+   unit_cell.atom[1].hc = 0;
+   unit_cell.atom[1].ni = 12;
+   //-----------------------------
+   unit_cell.atom[2].x = 0.333333;
+   unit_cell.atom[2].y = 0;
+   unit_cell.atom[2].z = 0.5;
+   unit_cell.atom[2].lc = 2;
+   unit_cell.atom[2].hc = 1;
+   unit_cell.atom[2].ni = 12;
+   //-----------------------------
+   unit_cell.atom[3].x = 0.833333;
+   unit_cell.atom[3].y = 0.5;
+   unit_cell.atom[3].z = 0.5;
+   unit_cell.atom[3].lc = 3;
+   unit_cell.atom[3].hc = 1;
+   unit_cell.atom[3].ni = 12;
 
-   unit_cell.cutoff_radius = 1.0; // normalised to unit cell size
+   unit_cell.cutoff_radius = sqrt(2.0)/2.0; // normalised to unit cell size
 
    uc::internal::calculate_interactions(unit_cell);
 

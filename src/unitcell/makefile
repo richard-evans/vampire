@@ -10,6 +10,9 @@ interactions.o \
 interface.o \
 read.o \
 sc.o \
+bcc.o \
+fcc.o \
+hcp.o \
 verify.o
 
 # Append module objects to global tree

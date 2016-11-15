@@ -49,6 +49,9 @@ namespace unitcell{
       // Internal function declarations
       //-------------------------------------------------------------------------
       void build_simple_cubic(unitcell::unit_cell_t& unit_cell);
+      void build_body_centred_cubic(unitcell::unit_cell_t& unit_cell);
+      void build_face_centred_cubic(unitcell::unit_cell_t& unit_cell);
+      void build_hexagonal_close_packed(unitcell::unit_cell_t& unit_cell);
       void calculate_interactions(unit_cell_t& unit_cell);
       void read_unit_cell(unit_cell_t & unit_cell, std::string filename);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);

@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include <cmath>
 
 // Vampire headers
 #include "unitcell.hpp"
@@ -21,7 +22,7 @@
 namespace unitcell{
 namespace internal{
 
-void build_simple_cubic(unitcell::unit_cell_t& unit_cell){
+void build_body_centred_cubic(unitcell::unit_cell_t& unit_cell){
 
    // Set basic unit cell properties
    unit_cell.dimensions[0] = 1.0;
@@ -40,19 +41,28 @@ void build_simple_cubic(unitcell::unit_cell_t& unit_cell){
    unit_cell.shape[2][1]=0.0;
    unit_cell.shape[2][2]=1.0;
 
-   unit_cell.lcsize=1;
-   unit_cell.hcsize=1;
+   unit_cell.lcsize=2;
+   unit_cell.hcsize=2;
    unit_cell.interaction_range=1;
-   unit_cell.atom.resize(1);
-   unit_cell.surface_threshold=6;
+   unit_cell.atom.resize(2);
+   unit_cell.surface_threshold=8;
    //-----------------------------
    unit_cell.atom[0].x=0.0;
    unit_cell.atom[0].y=0.0;
    unit_cell.atom[0].z=0.0;
    unit_cell.atom[0].lc=0;
    unit_cell.atom[0].hc=0;
+   unit_cell.atom[0].ni=8;
+   //-----------------------------
+   unit_cell.atom[1].x=0.5;
+   unit_cell.atom[1].y=0.5;
+   unit_cell.atom[1].z=0.5;
+   unit_cell.atom[1].lc=1;
+   unit_cell.atom[1].hc=1;
+   unit_cell.atom[1].ni=8;
+   //-----------------------------
 
-   unit_cell.cutoff_radius = 1.0; // normalised to unit cell size
+   unit_cell.cutoff_radius = sqrt(3.0)/2.0; // normalised to unit cell size
 
    uc::internal::calculate_interactions(unit_cell);
 

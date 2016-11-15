@@ -34,15 +34,14 @@ namespace unitcell{
    		return;
    	}
 
-   	// global values
-   	unit_cell.dimensions[0]=uc::internal::unit_cell_size_x;
-   	unit_cell.dimensions[1]=uc::internal::unit_cell_size_y;
-   	unit_cell.dimensions[2]=uc::internal::unit_cell_size_z;
-
-   	unit_cell.exchange_type=-1;
-
+      //------------------------------------------------------------------------
+      // Determine which unit cell to build
+      //------------------------------------------------------------------------
       if(uc::internal::crystal_structure == "sc") uc::internal::build_simple_cubic(unit_cell);
-      //else if(cs::crystal_structure=="bcc"){
+      else if(uc::internal::crystal_structure == "bcc") uc::internal::build_body_centred_cubic(unit_cell);
+      else if(uc::internal::crystal_structure == "fcc") uc::internal::build_face_centred_cubic(unit_cell);
+      else if(uc::internal::crystal_structure == "hcp") uc::internal::build_hexagonal_close_packed(unit_cell);
+      // Otherwise print an error to user
       else{
          terminaltextcolor(RED);
          std::cerr << "Error: Unknown crystal_type "<< uc::internal::crystal_structure << " found during unit cell initialisation. Exiting." << std::endl;
@@ -55,7 +54,9 @@ namespace unitcell{
 
    }
 
+   //------------------------------------------------------------------------
    // simple function to force simple cubic crystal structure
+   //------------------------------------------------------------------------
    void set_crystal_structure_to_simple_cubic(){
       uc::internal::crystal_structure = "sc";
       return;

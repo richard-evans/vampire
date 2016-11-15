@@ -41,9 +41,9 @@ namespace local{
 namespace unitcell{
 namespace internal{
 
-//--------------------------------------------------------------
-//  Function to calculate neighbour interactions
-//--------------------------------------------------------------
+//------------------------------------------------------------------------------
+//  Function to calculate neighbour interactions assuming fractional unit cell
+//------------------------------------------------------------------------------
 void calculate_interactions(unit_cell_t& unit_cell){
 
    // determine neighbour range
@@ -72,9 +72,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
             for(int a=0; a < unit_cell.atom.size(); ++a){
                local::atom_t tmp;
                tmp.mat = unit_cell.atom[a].mat;
-               tmp.x = unit_cell.atom[a].x + double(x)*ucsx;
-               tmp.y = unit_cell.atom[a].y + double(y)*ucsy;
-               tmp.z = unit_cell.atom[a].z + double(z)*ucsz;
+               tmp.x = (unit_cell.atom[a].x + double(x))*ucsx;
+               tmp.y = (unit_cell.atom[a].y + double(y))*ucsy;
+               tmp.z = (unit_cell.atom[a].z + double(z))*ucsz;
                tmp.id = a;
                tmp.idx = x; // unit cell id
                tmp.idy = y;
@@ -90,10 +90,8 @@ void calculate_interactions(unit_cell_t& unit_cell){
    int mid_cell_y = (ny-1)/2;
    int mid_cell_z = (nz-1)/2;
 
-   // determine neighbour range for elliptic neighbour list
-   const double inv_rx_sq = 1.0/(ucsx*ucsx);
-   const double inv_ry_sq = 1.0/(ucsy*ucsy);
-   const double inv_rz_sq = 1.0/(ucsz*ucsz);
+   // Determine exchange type
+   unit_cell.exchange_type=-1;
 
    // loop over all i atoms
    for(int i=0; i < ratoms.size(); ++i){
@@ -108,10 +106,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
             const double rx = ratoms[j].x - ratoms[i].x;
             const double ry = ratoms[j].y - ratoms[i].y;
             const double rz = ratoms[j].z - ratoms[i].z;
-            const double range_x_sq = rx*rx;
-            const double range_y_sq = ry*ry;
-            const double range_z_sq = rz*rz;
-            bool in_range = range_x_sq*inv_rx_sq + range_y_sq*inv_ry_sq +range_z_sq*inv_rz_sq <= rcutsq;
+            bool in_range = rx*rx + ry*ry + rz*rz <= rcutsq;
             // check for rij < rcut and i!= j
             if( in_range && i != j){
                // Neighbour found
@@ -156,13 +151,13 @@ void calculate_interactions(unit_cell_t& unit_cell){
    unit_cell.interaction_range = interaction_range;
 
    // Output interactions to screen
-   for(int i=0; i<unit_cell.interaction.size(); i++){
+   /*for(int i=0; i<unit_cell.interaction.size(); i++){
       std::cerr << i << "\t" << unit_cell.interaction[i].i << "\t"
-                << unit_cell.interaction[i].i << "\t"
+                << unit_cell.interaction[i].j << "\t"
                 << unit_cell.interaction[i].dx << "\t"
                 << unit_cell.interaction[i].dy << "\t"
                 << unit_cell.interaction[i].dz << std::endl;
-   }
+   }*/
 
    // Check for interactions
    if(unit_cell.interaction.size()==0){
