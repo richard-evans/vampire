@@ -42,6 +42,7 @@
 #include "grains.hpp"
 #include "material.hpp"
 #include "random.hpp"
+#include "unitcell.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 
@@ -177,6 +178,37 @@ int particle(std::vector<cs::catom_t> & catom_array){
 	particle_origin[1] = cs::system_dimensions[1]*0.5;
 	particle_origin[2] = cs::system_dimensions[2]*0.5;
 
+   double max_range_sq = 1e123;
+   unsigned int nearest;
+   const double prx = particle_origin[0];
+   const double pry = particle_origin[1];
+   const double prz = particle_origin[2];
+
+   // loop over all atoms to find closest atom (serial only)
+   #ifdef MPICF
+   #else
+ 	for(int atom=0;atom<catom_array.size();atom++){
+      double dx = catom_array[atom].x-particle_origin[0];
+      double dy = catom_array[atom].y-particle_origin[1];
+      double dz = catom_array[atom].z-particle_origin[2];
+      double r = dx*dx + dy*dy + dz*dz;
+      if(r < max_range_sq){
+         max_range_sq = r;
+         nearest = atom;
+      }
+   }
+   #endif
+
+   //reduce max range
+
+   // find cpu which has nearest atom
+
+   // broadcast position to all cpus.
+
+   particle_origin[0] = catom_array[nearest].x;
+   particle_origin[1] = catom_array[nearest].y;
+   particle_origin[2] = catom_array[nearest].z;
+
 	// check for move in particle origin and that unit cell size < 0.5 system size
 	if(cs::particle_creation_parity==1 &&
 		(2.0*unit_cell.dimensions[0]<cs::system_dimensions[0]) &&
@@ -253,7 +285,7 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 			// Determine particle origin
 			particle_origin[0] = double(x_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_x;
 			particle_origin[1] = double(y_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_y;
-			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
+			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
 
 			if(cs::particle_creation_parity==1){
 				particle_origin[0]+=unit_cell.dimensions[0]*0.5;
