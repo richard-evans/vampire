@@ -15,6 +15,7 @@ GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funro
 
 # Objects
 OBJECTS= \
+../../obj/util/cells.o \
 ../../obj/util/colour.o \
 ../../obj/util/manipulate.o \
 ../../obj/util/main.o \

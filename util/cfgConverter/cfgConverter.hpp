@@ -10,6 +10,35 @@ struct material_t{
 };
 
 
+class cells
+{
+public:
+   cells(int numx, int numy, int numz, double maxx, double maxy, double maxz);
+   ~cells();
+
+   void addspin(double cx, double cy, double cz, double sx, double sy, double sz);
+
+   std::vector <double> outcx();
+   std::vector <double> outcy();
+   std::vector <double> outcz();
+   std::vector <double> outsx();
+   std::vector <double> outsy();
+   std::vector <double> outsz();
+
+private:
+   void binning(double cx, double cy, double cz, double sx, double sy, double sz);
+   std::vector <int> cellxEdge;
+   std::vector <int> cellyEdge;
+   std::vector <int> cellzEdge;
+
+   std::vector < std::vector < std::vector < double > > > cellsx;
+   std::vector < std::vector < std::vector < double > > > cellsy;
+   std::vector < std::vector < std::vector < double > > > cellsz;
+
+   std::vector < std::vector < std::vector < int > > > bincount;
+};
+
+
 class data
 {
 public:
