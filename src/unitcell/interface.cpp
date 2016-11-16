@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include <algorithm>
 #include <string>
 
 // Vampire headers
@@ -42,7 +43,7 @@ namespace unitcell{
    		if(word==test){
    			std::string ucffile=value;
    			// strip quotes
-   			ucffile.erase(remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
+   			ucffile.erase(std::remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
    			test="";
    			// if filename not blank set ucf file name
    			if(ucffile!=test){
@@ -67,7 +68,7 @@ namespace unitcell{
          if(word==test){
             // Strip quotes
             std::string cs=value;
-            cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
+            cs.erase(std::remove(cs.begin(), cs.end(), '\"'), cs.end());
             uc::internal::crystal_structure=cs;
             return true;
          }
