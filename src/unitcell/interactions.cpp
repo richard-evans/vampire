@@ -90,8 +90,6 @@ void calculate_interactions(unit_cell_t& unit_cell){
    int mid_cell_y = (ny-1)/2;
    int mid_cell_z = (nz-1)/2;
 
-   // Determine exchange type
-   unit_cell.exchange_type=-1;
    const double nnrcut_sq = unit_cell.cutoff_radius*unit_cell.cutoff_radius*1.001*1.001; // nearest neighbour cutoff radius
 
    // loop over all i atoms
@@ -174,6 +172,17 @@ void calculate_interactions(unit_cell_t& unit_cell){
       std::cerr << "Error! No interactions generated for " << uc::internal::crystal_structure << " crystal structure. Try increasing the interaction range. Aborting." << std::endl;
       terminaltextcolor(WHITE);
       zlog << zTs() << "Error! No interactions generated for " << uc::internal::crystal_structure << " crystal structure. Try increasing the interaction range. Aborting." << std::endl;
+      err::vexit();
+   }
+
+   // Determine exchange type
+   if(uc::internal::exchange_type == isotropic) unit_cell.exchange_type=-1;
+   else if(uc::internal::exchange_type == vectorial) unit_cell.exchange_type=3;
+   else{
+      terminaltextcolor(RED);
+      std::cerr << "Programmer error! Exchange type " << uc::internal::exchange_type << " is not a recognised value!" << std::endl;
+      terminaltextcolor(WHITE);
+      zlog << zTs() << "Programmer error! Exchange type " << uc::internal::exchange_type << " is not a recognised value!" << std::endl;
       err::vexit();
    }
 

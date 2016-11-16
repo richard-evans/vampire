@@ -240,9 +240,9 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					int iatom_mat = unit_cell.atom[iatom].mat;
 					int jatom_mat = unit_cell.atom[jatom].mat;
 					switch(exc_type){
-						case -1: // assume isotropic
-							unit_cell.interaction[i].Jij[0][0]=mp::material[iatom_mat].Jij_matrix[jatom_mat];
-							break;
+						//case -1: // assume isotropic
+						//	unit_cell.interaction[i].Jij[0][0]=mp::material[iatom_mat].Jij_matrix[jatom_mat][0]; // only works if read after mat file
+						//	break;
 						case 0:
 							int_iss >> unit_cell.interaction[i].Jij[0][0];
 							//std::cout << i << "\t" << unit_cell.interaction[i].Jij[0][0] << std::endl;

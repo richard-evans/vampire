@@ -164,7 +164,6 @@ namespace unitcell{
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index){
 
-      // add prefix string
       std::string prefix="material:";
 
       // exchange-matrix[i][j] = val // current
@@ -172,6 +171,36 @@ namespace unitcell{
       // exchange-interaction-range = 1...6 (shells), 0.01-1000 Angstroms
       // exchange-function = nearest-neighbour, exponential, r4, rkky, file.dat (s, Jij)
       //
+      std::string test="exchange-matrix";
+      if(word==test){
+         // extract comma separated values from string
+         std::vector<double> Jij = vin::DoublesFromString(value);
+         if(Jij.size() == 1){
+            vin::check_for_valid_value(Jij[0], word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
+            // set all components in case vectorial form is needed later
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][0]=-Jij[0]; // Import exchange as field, *-1
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][1]=-Jij[0];
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][2]=-Jij[0];
+            return true;
+         }
+         else if(Jij.size() == 3){
+            vin::check_for_valid_vector(Jij, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][0]=-Jij[0]; // Import exchange as field, *-1
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][1]=-Jij[1];
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][2]=-Jij[2];
+            // set vectorial anisotropy
+            uc::internal::exchange_type = uc::internal::vectorial;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error in input file - material[" << super_index << "]:exchange_matrix[" << sub_index << "] must have one or 3 values." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error in input file - material[" << super_index << "]:exchange_matrix[" << sub_index << "] must have one or 3 values." << std::endl;
+            err::vexit();
+            return false;
+         }
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found

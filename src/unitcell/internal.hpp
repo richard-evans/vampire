@@ -35,7 +35,7 @@ namespace unitcell{
       // Internal data type definitions
       //-------------------------------------------------------------------------
       enum exchange_function_t { nearest_neighbour, exponential };
-
+      enum exchange_type_t { isotropic, vectorial };
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
@@ -49,6 +49,8 @@ namespace unitcell{
       extern exchange_function_t exchange_function;
       extern double exchange_interaction_range;
       extern double exchange_decay;
+
+      extern exchange_type_t exchange_type;
 
       //-------------------------------------------------------------------------
       // Internal function declarations

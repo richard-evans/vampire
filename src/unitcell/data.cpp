@@ -40,6 +40,8 @@ namespace unitcell{
       double exchange_interaction_range = 1.0;
       double exchange_decay = 0.4; // Angstroms
 
+      exchange_type_t exchange_type = isotropic;
+
    } // end of internal namespace
 
 } // end of unitcell namespace

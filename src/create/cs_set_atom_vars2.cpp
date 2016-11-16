@@ -197,7 +197,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 					atoms::i_exchange_list.push_back(tmp_zval);
                // get unit cell interaction id
                int i = atoms::neighbour_interaction_type_array[nn];
-               atoms::i_exchange_list[nn].Jij=unit_cell.interaction[i].Jij[0][0]*mp::material[imaterial].Jij_matrix[jmaterial];
+               atoms::i_exchange_list[nn].Jij=unit_cell.interaction[i].Jij[0][0]*mp::material[imaterial].Jij_matrix[jmaterial][0];
 					// reset interation id to neighbour number - causes segfault if nn out of range
 					atoms::neighbour_interaction_type_array[nn]=nn;
 				}
@@ -254,6 +254,31 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 				atoms::t_exchange_list[i].Jij[2][2]=-unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
 			}
 			break;
+
+      case 3: // normalised vectorial exchange
+   			// unroll material calculations
+   			std::cout << "Using vectorial form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
+   			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
+   			atoms::v_exchange_list.reserve(atoms::neighbour_list_array.size());
+   			// loop over all interactions
+   			for(int atom=0;atom<atoms::num_atoms;atom++){
+   				const int imaterial=atoms::type_array[atom];
+   				for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
+   					const int natom = atoms::neighbour_list_array[nn];
+   					const int jmaterial=atoms::type_array[natom];
+   					atoms::v_exchange_list.push_back(tmp_zvec);
+                  // get unit cell interaction id
+                  int i = atoms::neighbour_interaction_type_array[nn];
+                  atoms::v_exchange_list[nn].Jij[0]=unit_cell.interaction[i].Jij[0][0]*mp::material[imaterial].Jij_matrix[jmaterial][0];
+                  atoms::v_exchange_list[nn].Jij[1]=unit_cell.interaction[i].Jij[1][1]*mp::material[imaterial].Jij_matrix[jmaterial][1];
+                  atoms::v_exchange_list[nn].Jij[2]=unit_cell.interaction[i].Jij[2][2]*mp::material[imaterial].Jij_matrix[jmaterial][2];
+   					// reset interation id to neighbour number - causes segfault if nn out of range
+   					atoms::neighbour_interaction_type_array[nn]=nn;
+   				}
+   			}
+   			// now set exchange type to normal vectorial case
+   			atoms::exchange_type=1;
+   			break;
 		default:
 			terminaltextcolor(RED);
 			std::cerr << "Error! - Unknown unit cell exchange type " << atoms::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;

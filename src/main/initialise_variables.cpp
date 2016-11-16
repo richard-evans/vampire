@@ -181,7 +181,7 @@ int default_system(){
 	//-------------------------------------------------------
 	material[0].name="Co";
 	material[0].alpha=0.1;
-	material[0].Jij_matrix_SI[0]=-11.2e-21;
+	material[0].Jij_matrix_SI[0][0]=-11.2e-21;
 	material[0].mu_s_SI=1.5*9.27400915e-24;
 	material[0].Ku1_SI=-4.644e-24;
 	material[0].gamma_rel=1.0;
@@ -422,27 +422,30 @@ int set_derived_parameters(){
 
       for(int mj = 0; mj < mp::num_materials; mj++){
 
-         // Check for non-zero value (avoids divide by zero)
-         if(fabs(material[mi].Jij_matrix_SI[mj]) > 0.0){
+         // loop over components
+         for(int k=0; k<3; k++){
+            // Check for non-zero value (avoids divide by zero)
+            if(fabs(material[mi].Jij_matrix_SI[mj][k]) > 0.0){
 
-            // Calculate ratio of i->j / j-> exchange constants
-            double ratio = material[mj].Jij_matrix_SI[mi]/material[mi].Jij_matrix_SI[mj];
+               // Calculate ratio of i->j / j-> exchange constants
+               double ratio = material[mj].Jij_matrix_SI[mi][k]/material[mi].Jij_matrix_SI[mj][k];
 
-            // Check that ratio ~ 1.0 for symmetric exchange interactions
-            if( (ratio < 0.99999) || (ratio > 1.00001) ){
+               // Check that ratio ~ 1.0 for symmetric exchange interactions
+               if( (ratio < 0.99999) || (ratio > 1.00001) ){
 
-               // Error found - report to user and terminate program
-               terminaltextcolor(RED);
-                  std::cerr << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << ". Exiting" << std::endl;
-               terminaltextcolor(WHITE);
+                  // Error found - report to user and terminate program
+                  terminaltextcolor(RED);
+                     std::cerr << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << ". Exiting" << std::endl;
+                  terminaltextcolor(WHITE);
 
-               zlog << zTs() << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << std::endl;
-               zlog << zTs() << "\tmaterial[" << mi+1 << "]:exchange-matrix[" << mj+1 << "] = " << material[mi].Jij_matrix_SI[mj] << std::endl;
-               zlog << zTs() << "\tmaterial[" << mj+1 << "]:exchange-matrix[" << mi+1 << "] = " << material[mj].Jij_matrix_SI[mi] << std::endl;
-               zlog << zTs() << "\tThe definition of Heisenberg exchange requires that these values are the same. Exiting." << std::endl;
+                  zlog << zTs() << "Error! Non-symmetric exchange interactions for materials " << mi+1 << " and " << mj+1 << std::endl;
+                  zlog << zTs() << "\tmaterial[" << mi+1 << "]:exchange-matrix[" << mj+1 << "] = " << material[mi].Jij_matrix_SI[mj][k] << std::endl;
+                  zlog << zTs() << "\tmaterial[" << mj+1 << "]:exchange-matrix[" << mi+1 << "] = " << material[mj].Jij_matrix_SI[mi][k] << std::endl;
+                  zlog << zTs() << "\tThe definition of Heisenberg exchange requires that these values are the same. Exiting." << std::endl;
 
-               err::vexit();
+                  err::vexit();
 
+               }
             }
          }
       }
@@ -454,7 +457,9 @@ int set_derived_parameters(){
 		mp::material[mat].alpha_oneplusalpha_sq =  mp::material[mat].alpha*mp::material[mat].one_oneplusalpha_sq;
 
 		for(int j=0;j<mp::num_materials;j++){
-			material[mat].Jij_matrix[j]				= mp::material[mat].Jij_matrix_SI[j]/mp::material[mat].mu_s_SI;
+         material[mat].Jij_matrix[j][0]				= mp::material[mat].Jij_matrix_SI[j][0]/mp::material[mat].mu_s_SI;
+         material[mat].Jij_matrix[j][1]				= mp::material[mat].Jij_matrix_SI[j][1]/mp::material[mat].mu_s_SI;
+         material[mat].Jij_matrix[j][2]				= mp::material[mat].Jij_matrix_SI[j][2]/mp::material[mat].mu_s_SI;
 		}
 		mp::material[mat].Ku									= mp::material[mat].Ku1_SI/mp::material[mat].mu_s_SI;
       mp::material[mat].Ku2                        = mp::material[mat].Ku2_SI/mp::material[mat].mu_s_SI;
