@@ -109,7 +109,7 @@ namespace vopencl
          vcl::OCLLOG << "Using default device " << vcl::default_device.getInfo<CL_DEVICE_NAME>() << std::endl;
 #endif // OPENCL_DEBUG
 
-         vcl::context = cl::Context(vcl::default_device);
+         vcl::context = cl::Context({vcl::default_device});
       }
       catch(cl::Error &error)
       {
