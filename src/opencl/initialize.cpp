@@ -47,7 +47,7 @@ namespace vopencl
    //----------------------------------------------------------------------------
    bool initialize(void)
    {
-      bool success = false;
+      bool success = true;
 #ifdef OPENCL
 
       std::string message("OpenCL has been enabled in ");
@@ -124,7 +124,7 @@ namespace vopencl
       success &= vcl::initialize_cells();
       success &= vcl::initialize_materials();
       success &= vcl::initialize_topology();
-      success &= vcl::initialize_stats();
+      //success &= vcl::initialize_stats();
       success &= vcl::initialize_rng();
 
 #endif // OPENCL
