@@ -15,7 +15,7 @@
 #include "cuda.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
-//#include "opencl.hpp"
+#include "vopencl.hpp"
 
 namespace gpu{
 
@@ -30,7 +30,7 @@ namespace gpu{
       #ifdef CUDA
          initialized = vcuda::initialize(gpu::cpu_stats);
       #elif OPENCL
-         initialized = opencl::initialize();
+         initialized = vopencl::initialize();
       #endif
 
       // Check for no initialization

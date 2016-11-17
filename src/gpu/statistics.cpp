@@ -13,7 +13,7 @@
 #include "gpu.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
-//#include "opencl.hpp"
+#include "vopencl.hpp"
 
 namespace gpu{
 
@@ -27,7 +27,7 @@ namespace gpu{
          #ifdef CUDA
             vcuda::stats::update();
          #elif OPENCL
-            opencl::stats::update();
+            vopencl::stats::update();
          #endif
 
          return;
@@ -47,7 +47,7 @@ namespace gpu{
          #ifdef CUDA
             vcuda::stats::get();
          #elif OPENCL
-            opencl::stats::get();
+            vopencl::stats::get();
          #endif
 
          return;
@@ -61,7 +61,7 @@ namespace gpu{
          #ifdef CUDA
             vcuda::stats::reset();
          #elif OPENCL
-            opencl::stats::reset();
+            vopencl::stats::reset();
          #endif
 
          return;

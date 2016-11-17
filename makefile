@@ -151,6 +151,7 @@ obj/qvoronoi/userprintf_rbox.o\
 # Include supplementary makefiles
 include src/gpu/makefile
 include src/cuda/makefile
+include src/opencl/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)
