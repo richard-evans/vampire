@@ -47,7 +47,7 @@ namespace vopencl
    //----------------------------------------------------------------------------
    bool initialize(void)
    {
-      bool success = true;
+      bool success = false;
 #ifdef OPENCL
 
       std::string message("OpenCL has been enabled in ");
@@ -118,6 +118,8 @@ namespace vopencl
          zlog << zTs() << message << std::endl;
          return false;
       }
+
+      success = true;
 
       success &= vcl::initialize_atoms();
       success &= vcl::initialize_fields();
