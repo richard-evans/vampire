@@ -1570,6 +1570,12 @@ int match_sim(string const word, string const value, string const unit, int cons
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
+   test="enable-fft-dipole-fields";
+   if(word==test){
+      demag::fft=true;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
    test="dipole-field-update-rate";
    if(word==test){
       int dpur=atoi(value.c_str());
@@ -2001,6 +2007,15 @@ int match_sim(string const word, string const value, string const unit, int cons
       mtrandom::integration_seed=is;
       return EXIT_SUCCESS;
    }
+
+   //--------------------------------------------------------------------
+   test="llb-stochastic-fields-off";
+   if(word==test){
+      std::cout << "" <<std::endl;
+      micromagnetic::stochastic=false;
+      return EXIT_SUCCESS;
+   }
+
    //--------------------------------------------------------------------
    test="constraint-rotation-update";
    if(word==test){

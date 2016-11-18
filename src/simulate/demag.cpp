@@ -211,8 +211,7 @@ void init(){
 					rij_yy[lc][j] = demag::prefactor*((3.0*ey*ey - 1.0)*rij3);
 					rij_yz[lc][j] = demag::prefactor*(3.0*ey*ez)*rij3;
 					rij_zz[lc][j] = demag::prefactor*((3.0*ez*ez - 1.0)*rij3);
-		//			std::cout << lc << '\t' << rij_xx[lc][j] << '\t' << rij_xy[lc][j] << '\t' << rij_xz[lc][j] << '\t' << rij_yy[lc][j] << '\t' <<rij_yz[lc][j] << "\t" << rij_zz[lc][j] <<std::endl;
- 				}
+				}
 			}
 		}
 
@@ -580,7 +579,7 @@ void fft_update()
 		std::cout << 'h' <<std::endl;
 
 
-/*
+
       // performs the converlusion between Nk and Mk
    for (int i=0 ; i<2*num_macro_cells_x ; i++){
       for (int j=0 ; j<2*num_macro_cells_y ; j++){
@@ -602,18 +601,18 @@ void fft_update()
            Hz(i,j,k)[1] += (Nzx(i,j,k)[1]*Mx(i,j,k)[0] + Nzy(i,j,k)[1]*My(i,j,k)[0] + Nzz(i,j,k)[1]*Mz(i,j,k)[0]);
           }
       }
-   }*/
+   }
 
    // performs the backward transform to give the dipole field, Hx, Hy, Hz
-//   fftw_plan HxP,HyP,HzP;
+   fftw_plan HxP,HyP,HzP;
 
-//   HxP = fftw_plan_dft_3d(2*num_macro_cells_x,2*num_macro_cells_y,2*num_macro_cells_z,Hx.ptr(),Hx.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
-//   fftw_execute(HxP);
-//   HyP = fftw_plan_dft_3d(2*num_macro_cells_x,2*num_macro_cells_y,2*num_macro_cells_z,Hy.ptr(),Hy.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
-//   fftw_execute(HyP);
-//   HzP = fftw_plan_dft_3d(2*num_macro_cells_x,2*num_macro_cells_y,2*num_macro_cells_z,Hz.ptr(),Hz.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
-//   fftw_execute(HzP);
-/*
+   HxP = fftw_plan_dft_3d(2*num_macro_cells_x,2*num_macro_cells_y,2*num_macro_cells_z,Hx.ptr(),Hx.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+   fftw_execute(HxP);
+   HyP = fftw_plan_dft_3d(2*num_macro_cells_x,2*num_macro_cells_y,2*num_macro_cells_z,Hy.ptr(),Hy.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+   fftw_execute(HyP);
+   HzP = fftw_plan_dft_3d(2*num_macro_cells_x,2*num_macro_cells_y,2*num_macro_cells_z,Hz.ptr(),Hz.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+   fftw_execute(HzP);
+
 double pi = 3.14;
 
    for (int i=0 ; i<2*num_macro_cells_x ; i++){
@@ -638,7 +637,7 @@ double pi = 3.14;
 				cell++;
 			}
 		}
-	}*/
+	}
 }
 
 /// @brief Wrapper Function to update demag fields

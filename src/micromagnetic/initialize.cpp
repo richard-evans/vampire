@@ -77,8 +77,6 @@ namespace micromagnetic{
                                           neighbour_list_start_index,  neighbour_list_end_index, type_array, material, unit_cell_size_x,
                                           volume_array, x_coord_array, y_coord_array, z_coord_array, num_atoms_in_unit_cell);
 
-
-
       //resizes the arrays to store the magnetisation
       mm::ext_field.resize(3,0.0);
 
@@ -109,6 +107,7 @@ namespace micromagnetic{
       mean_M = 0;
       counter = 0;
 
+      mm::file.open ("LLB_cell_mag");
 
 
 

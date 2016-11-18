@@ -28,7 +28,8 @@
 #include "internal.hpp"
 #include <vector>
 #include "material.hpp"
-
+#include <iostream>
+#include <fstream>
 
 namespace micromagnetic{
 
@@ -88,7 +89,7 @@ namespace micromagnetic{
       std::vector<double> calculate_tc(int num_atoms, int num_cells, std::vector<int> cell_array, std::vector<int> neighbour_list_array, std::vector<int> neighbour_list_start_index,  std::vector<int> neighbour_list_end_index, const std::vector<int> type_array, std::vector <mp::materials_t> material);
       void step(int num_cells, double temperature, std::vector<double> x_array,std::vector<double> y_array,std::vector<double> z_array, std::vector<double> ext_field, double dt,std::vector<double>& new_x_array,std::vector<double>& new_y_array,std::vector<double>& new_z_array);
 
-
+      extern std::ofstream file;
 
 
    } // end of internal namespace

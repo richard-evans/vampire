@@ -82,7 +82,7 @@ namespace micromagnetic{
             alpha_para = mm::alpha[cell]*(2.0/3.0)*reduced_temperature;
             alpha_perp = alpha_para;
          }
-         //   std::cout << temperature << '\t' << mm::chi_perp[cell] << '\t' << mm::chi_para[cell] << alpha_para << '\t' << alpha_perp << "\t" << m_e <<std::endl;
+      //      std::cout << temperature << '\t' << alpha_para << '\t' << alpha_perp << "\t" << m_e <<std::endl;
          m_e_squared = m_e*m_e;
 
 
@@ -102,9 +102,9 @@ namespace micromagnetic{
             int j2 = cell*num_cells;
             //loops over all other cells to sum the interaction
             double mi = pow(m_e_squared,0.5);
-
             for(int j = mm::macro_neighbour_list_start_index[cell];j<mm::macro_neighbour_list_end_index[cell] +1;j++){
                // calculate reduced exchange constant factor
+
                const int cellj = mm::macro_neighbour_list_array[j];
                const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
                const double A = mm::A[cellj]*pow(mj,1.66);
@@ -159,6 +159,7 @@ namespace micromagnetic{
                   new_x_array[cell] = xyz[0];
                   new_y_array[cell] = xyz[1];
                   new_z_array[cell] = xyz[2];
+
          }
 
       }

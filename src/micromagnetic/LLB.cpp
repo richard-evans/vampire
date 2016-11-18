@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <fstream>
 
+
 namespace mm = micromagnetic::internal;
 
 
@@ -112,30 +113,34 @@ int LLB_serial_heun( int num_steps,
 
 
    //calcualtes the average magnetisation of the system per step.
+
+   for (int cell = 0; cell < num_cells; cell ++)
+   {
+         if (mm::ms[cell] > 1e-100){
+         cells::x_mag_array[cell] = mm::x_array[cell]*mm::ms[cell];
+         cells::y_mag_array[cell] = mm::y_array[cell]*mm::ms[cell];
+         cells::z_mag_array[cell] = mm::z_array[cell]*mm::ms[cell];
+      }
+   }
+
    double x_mag = 0;
    double y_mag = 0;
    double z_mag = 0;
    double total = 0;
 
-   for (int cell = 0; cell < num_cells; cell ++)
-   {
-         cells::x_mag_array[cell] = mm::x_array[cell]*mm::ms[cell];
-         cells::y_mag_array[cell] = mm::y_array[cell]*mm::ms[cell];
-         cells::z_mag_array[cell] = mm::z_array[cell]*mm::ms[cell];
-         x_mag = x_mag + cells::x_mag_array[cell];
-         y_mag = y_mag + cells::y_mag_array[cell];
-         z_mag = z_mag + cells::z_mag_array[cell];
-         total = total + mm::ms[cell];
-
+   for (int cell = 0; cell < cells::num_cells; cell ++){
+      x_mag = x_mag + cells::x_mag_array[cell];
+      y_mag = y_mag + cells::y_mag_array[cell];
+      z_mag = z_mag + cells::z_mag_array[cell];
+      total = total + mm::ms[cell];
    }
+   x_mag = x_mag/total;
+   y_mag = y_mag/total;
+   z_mag = z_mag/total;
+
+   mm::file << sim::time << '\t' << temperature << '\t' << x_mag << '\t' << y_mag << '\t' << z_mag << "\t" << sqrt((x_mag*x_mag) + (y_mag*y_mag) + (z_mag*z_mag)) << std::endl;
 
 
-
-
-//std::cout << sim::time << '\t' << temperature << '\t' << x_mag/total << '\t' << y_mag/total << '\t' << z_mag/total <<std::endl;
-
-
-/*
    if (sim::time > 1000){
       for (int cell = 0; cell < num_cells; cell ++)
       {
@@ -155,5 +160,5 @@ int LLB_serial_heun( int num_steps,
          micromagnetic::counter++;
       }
       }
-   }*/
+   }
 }

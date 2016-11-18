@@ -83,7 +83,7 @@ namespace micromagnetic{
       std::vector<double> macro_neighbour_list_start_index;
       std::vector<double> macro_neighbour_list_end_index;
       std::vector<double> macro_neighbour_list_array;
-
+      std::ofstream file;
 
 
    } // end of internal namespace
