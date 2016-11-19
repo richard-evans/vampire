@@ -10,10 +10,8 @@
 #define VOPENCL_H_
 
 // C++ standard library headers
-#include <string>
 
 // Vampire headers
-#include "vopencl.hpp"
 
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for vopencl module

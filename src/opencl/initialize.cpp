@@ -40,6 +40,12 @@
 namespace vcl = ::vopencl::internal;
 #endif
 
+static void handle_error(cl::Error &error)
+{
+   std::cout << "Exception caught: "<< error.what() << '(' << error.err() << ')' << std::endl;
+   zlog << zTs() << "Exception caught: " << error.what() << '(' << error.err() << ')' << std::endl;
+}
+
 namespace vopencl
 {
    //----------------------------------------------------------------------------
@@ -113,9 +119,7 @@ namespace vopencl
       }
       catch(cl::Error &error)
       {
-         message = "Error: Exception in initialization.";
-         std::cout << message << std::endl;
-         zlog << zTs() << message << std::endl;
+         handle_error(error);
          return false;
       }
 
@@ -181,7 +185,7 @@ namespace vopencl
          }
          catch(cl::Error &error)
          {
-            std::cout << error.what() << '(' << error.err() << ')' << std::endl;
+            handle_error(error);
             return false;
          }
 
@@ -224,7 +228,7 @@ namespace vopencl
          }
          catch(cl::Error &error)
          {
-            std::cout << error.what() << '(' << error.err() << ')' << std::endl;
+            handle_error(error);
             return false;
          }
 
@@ -276,7 +280,7 @@ namespace vopencl
          }
          catch(cl::Error &error)
          {
-            std::cout << error.what() << '(' << error.err() << ')' << std::endl;
+            handle_error(error);
             return false;
          }
          
@@ -301,7 +305,7 @@ namespace vopencl
          }
          catch(cl::Error &error)
          {
-            std::cout << error.what() << '(' << error.err() << ')' << std::endl;
+            handle_error(error);
             return false;
          }
 
@@ -332,7 +336,7 @@ namespace vopencl
          }
          catch(cl::Error &error)
          {
-            std::cout << error.what() << '(' << error.err() << ')' << std::endl;
+            handle_error(error);
             return false;
          }
 
@@ -390,7 +394,7 @@ namespace vopencl
          }
          catch(cl::Error &error)
          {
-            std::cout << error.what() << '(' << error.err() << ')' << std::endl;
+            handle_error(error);
             return false;
          }
 
@@ -419,7 +423,7 @@ namespace vopencl
          }
          catch(cl::Error &error)
          {
-            std::cout << error.what() << '(' << error.err() << ')' << std::endl;
+            handle_error(error);
             return false;
          }
 
