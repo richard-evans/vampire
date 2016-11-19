@@ -10,6 +10,7 @@ OPENCL_PR=-DOPENCL_DP
 # List module object filenames
 OPENCL_OBJECTS =\
 obj/opencl/config.o \
+obj/opencl/exchange_fields.o \
 obj/opencl/data.o \
 obj/opencl/finalize.o \
 obj/opencl/initialize.o \

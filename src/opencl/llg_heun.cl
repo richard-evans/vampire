@@ -18,7 +18,7 @@ struct heun_params_t
 
 __kernel
 void llg_heun_predictor_step(const __global int *material_id,
-                             const __global heun_params_t *hean_params,
+                             __constant heun_params_t *heun_params,
                              __global real_t *x_spin,
                              __global real_t *y_spin,
                              __global real_t *z_spin,
@@ -90,7 +90,7 @@ void llg_heun_predictor_step(const __global int *material_id,
 
 __kernel
 void llg_heun_corrector_step(const __global int *material_id,
-                             const __global heun_params_t *hean_params,
+                             __constant heun_params_t *hean_params,
                              __global real_t *x_spin,
                              __global real_t *y_spin,
                              __global real_t *z_spin,
