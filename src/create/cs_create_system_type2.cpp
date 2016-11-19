@@ -111,6 +111,9 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			}
 		}
 
+      // Check for voronoi construction and apply before csg operations
+      if(create::internal::generate_voronoi_substructure) create::internal::voronoi_substructure(catom_array);
+
 		// call fill function to fill in void
 		fill(catom_array);
 

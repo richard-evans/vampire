@@ -88,11 +88,23 @@ namespace create{
       extern double faceted_particle_110_radius; // 110 facet radius
       extern double faceted_particle_111_radius; // 111 facet radius
 
+      extern bool generate_voronoi_substructure;
+      extern double voronoi_grain_size;
+      extern double voronoi_grain_spacing;
+
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
-      extern void alloy(std::vector<cs::catom_t> & catom_array);
-      extern void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      void alloy(std::vector<cs::catom_t> & catom_array);
+      void voronoi_substructure(std::vector<cs::catom_t> & catom_array);
+      void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+
+      void voronoi_grain_rounding(std::vector <std::vector <double> > & grain_coord_array,
+                                  std::vector <std::vector <std::vector <double> > > &  grain_vertices_array);
+
+      void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_array,
+                                      std::vector <std::vector <std::vector <double> > > &  grain_vertices_array,
+                                      bool include_boundary_grains);
 
    } // end of internal namespace
 } // end of create namespace

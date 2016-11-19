@@ -71,6 +71,28 @@ namespace create{
          cs::system_creation_flags[1]=7;
          return true;
       }
+      test="voronoi-grain-substructure";
+      if(word==test){
+         create::internal::generate_voronoi_substructure = true;
+         return true;
+      }
+
+      test="voronoi-grain-size";
+      if(word==test){
+         double psize=atof(value.c_str());
+         vin::check_for_valid_value(psize, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         create::internal::voronoi_grain_size=psize;
+         return true;
+      }
+      else
+      //--------------------------------------------------------------------
+      test="voronoi-grain-spacing";
+      if(word==test){
+         double pspacing=atof(value.c_str());
+         vin::check_for_valid_value(pspacing, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         create::internal::voronoi_grain_spacing=pspacing;
+         return true;
+      }
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);

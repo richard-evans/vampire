@@ -33,6 +33,10 @@ namespace create{
          double faceted_particle_110_radius = 1.0; // 110 facet particle radius
          double faceted_particle_111_radius = 1.0; // 111 facet particle radius
 
+         bool generate_voronoi_substructure = false;
+         double voronoi_grain_size = 50.0;
+         double voronoi_grain_spacing = 10.0;
+
       } // end of internal namespace
 
 } // end of create namespace
