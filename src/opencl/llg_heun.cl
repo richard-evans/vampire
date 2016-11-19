@@ -30,8 +30,7 @@ void llg_heun_predictor_step(const __global int *material_id,
                              const __global real_t *z_ext_field,
                              __global real_t *dSx,
                              __global real_t *dSy,
-                             __global real_t *dSz,
-                             const real_t dt)
+                             __global real_t *dSz)
 {
    size_t gsz = get_global_size(0);
 
@@ -73,9 +72,9 @@ void llg_heun_predictor_step(const __global int *material_id,
       dSz[atom] = DS_z;
 
       // predicted new spin
-      real_t new_S_x = S_x + DS_x * dt;
-      real_t new_S_y = S_y + DS_y * dt;
-      real_t new_S_z = S_z + DS_z * dt;
+      real_t new_S_x = S_x + DS_x * DT;
+      real_t new_S_y = S_y + DS_y * DT;
+      real_t new_S_z = S_z + DS_z * DT;
 
       // normalization of spin
       real_t mod_s = RSQRT(
@@ -106,8 +105,7 @@ void llg_heun_corrector_step(const __global int *material_id,
                              const __global real_t *z_spin_buffer,
                              const __global real_t *dSx,
                              const __global real_t *dSy,
-                             const __global real_t *dSz,
-                             const real_t dt)
+                             const __global real_t *dSz)
 {
    size_t gsz = get_global_size(0);
 
@@ -144,9 +142,9 @@ void llg_heun_corrector_step(const __global int *material_id,
       real_t DS_prime_z = prefactor * SxH_z + lambdatpr * SxSxH_z;
 
       // Heun step, using predictor and corrector spin changes
-      real_t S_x = x_spin_buffer[atom] + 0.5 * (dSx[atom] + DS_prime_x) * dt;
-      real_t S_y = y_spin_buffer[atom] + 0.5 * (dSy[atom] + DS_prime_y) * dt;
-      real_t S_z = z_spin_buffer[atom] + 0.5 * (dSz[atom] + DS_prime_z) * dt;
+      real_t S_x = x_spin_buffer[atom] + 0.5 * (dSx[atom] + DS_prime_x) * DT;
+      real_t S_y = y_spin_buffer[atom] + 0.5 * (dSy[atom] + DS_prime_y) * DT;
+      real_t S_z = z_spin_buffer[atom] + 0.5 * (dSz[atom] + DS_prime_z) * DT;
 
       // normalization of spin
       real_t mod_s = RSQRT(

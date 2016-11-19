@@ -81,6 +81,7 @@ namespace vopencl
             // Build Kernels
             std::ostringstream opts;
             opts << "-DNUM_ATOMS=" << ::atoms::num_atoms;
+            opts << " -DDT=" << ::mp::dt;
             predictor_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_predictor_step", vcl::context, vcl::default_device, opts.str());
             corrector_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_corrector_step", vcl::context, vcl::default_device, opts.str());
 
