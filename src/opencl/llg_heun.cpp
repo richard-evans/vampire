@@ -1,4 +1,5 @@
 #include <vector>
+#include <sstream>
 
 #include "atoms.hpp"
 #include "material.hpp"
@@ -78,8 +79,10 @@ namespace vopencl
             write_q.finish();
 
             // Build Kernels
-            predictor_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_predictor_step", vcl::context, vcl::default_device);
-            corrector_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_corrector_step", vcl::context, vcl::default_device);
+            std::ostringstream opts;
+            opts << "-DNUM_ATOMS=" << ::atoms::num_atoms;
+            predictor_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_predictor_step", vcl::context, vcl::default_device, opts.str());
+            corrector_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_corrector_step", vcl::context, vcl::default_device, opts.str());
 
             vcl::llg::initialized = true;
          }

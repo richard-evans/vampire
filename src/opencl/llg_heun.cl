@@ -31,12 +31,11 @@ void llg_heun_predictor_step(const __global int *material_id,
                              __global real_t *dSx,
                              __global real_t *dSy,
                              __global real_t *dSz,
-                             const real_t dt,
-                             const size_t num_atoms)
+                             const real_t dt)
 {
    size_t gsz = get_global_size(0);
 
-   for (size_t atom = get_global_id(0); atom<num_atoms; atoms+=gsz)
+   for (size_t atom = get_global_id(0); atom<NUM_ATOMS; atoms+=gsz)
    {
       size_t mid = material_id[atom];
 
@@ -108,12 +107,11 @@ void llg_heun_corrector_step(const __global int *material_id,
                              const __global real_t *dSx,
                              const __global real_t *dSy,
                              const __global real_t *dSz,
-                             const real_t dt,
-                             const size_t num_atoms)
+                             const real_t dt)
 {
    size_t gsz = get_global_size(0);
 
-   for (size_t atom = get_global_id(0); atom<num_atoms; atom+=gsz)
+   for (size_t atom = get_global_id(0); atom<NUM_ATOMS; atom+=gsz)
    {
       size_t mid = material_id[atom];
 
