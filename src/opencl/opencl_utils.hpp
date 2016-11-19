@@ -11,11 +11,11 @@ namespace vopencl
 {
    namespace internal
    {
-      cl::Kernel build_kernel_from_file(std::string &file_name,
-                                        std::string &kernel_name,
-                                        cl::Context &context,
-                                        cl::Device &device,
-                                        std::string &opts);
+      cl::Kernel build_kernel_from_file(const std::string &file_name,
+                                        const std::string &kernel_name,
+                                        const cl::Context &context,
+                                        const cl::Device &device,
+                                        const std::string &opts="");
 
       // class used to execute kernels
       class kernel_call
