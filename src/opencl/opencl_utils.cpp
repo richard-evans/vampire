@@ -43,6 +43,7 @@ namespace vopencl
 #ifdef OPENCL_DEBUG
          vcl::OCLLOG << "Building from " << file_name;
          vcl::OCLLOG << " using kernel " << kernel_name << std::endl;
+         vcl::OCLLOG << "using options ";
          vcl::OCLLOG << program.getBuildInfo<CL_PROGRAM_BUILD_OPTIONS>(device) << std::endl;
          vcl::OCLLOG << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
 #endif

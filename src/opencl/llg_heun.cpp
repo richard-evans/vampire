@@ -79,6 +79,7 @@ namespace vopencl
 
             // Build Kernels
             predictor_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_predictor_step", vcl::context, vcl::default_device);
+            corrector_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_corrector_step", vcl::context, vcl::default_device);
 
             vcl::llg::initialized = true;
          }
