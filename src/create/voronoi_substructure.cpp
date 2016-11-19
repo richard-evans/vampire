@@ -32,18 +32,31 @@
 namespace create{
 namespace internal{
 
-//====================================================================================
-//
-//														voronoi
-//
-//				Subroutine to create granular substructure for polygranular systems
-//
-//							(c) R F L Evans 17/11/2016
-//
-//====================================================================================
-//
-//=====================================================================================
+bool in_pill(double x, double y, double z, double px, double py, double ptz, double pbz, double r);
 
+//====================================================================================
+//
+//														voronoi substructure
+//
+//    Function to generate a granular 2D substructure for a defined shape,
+//    combining a voronoi construction with a bubble-like domain
+//
+//		(c) R F L Evans 17/11/2016
+//
+//             ______      _______
+//           /       \    /       \
+//          |        |   |        |
+//          |        |   |        |
+//       ---------------------------------------
+//          |        |   |        |
+//          |        |   |        |
+//          \       /    \       /
+//           ______       _______
+//
+//
+//
+//====================================================================================
+//
 void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 
 	//---------------------------------------------------
@@ -185,17 +198,32 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
    // sort by increasing radius
    material_order.sort(compare_radius_vor);
 
-	std::cout <<"Generating Voronoi Grains";
-	zlog << zTs() << "Generating Voronoi Grains";
+	std::cout <<"Generating voronoi substructure";
+	zlog << zTs() << "Generating voronoi substructure";
 
    // arrays to store list of grain vertices
    double tmp_grain_pointx_array[max_vertices];
 	double tmp_grain_pointy_array[max_vertices];
 
+   // array to store if atoms are included in substructure (assume not)
+   std::vector<bool> insub(catom_array.size(),false);
+
+   //------------------------------------------------------------------------------
+   // Set 3D structure for grains
+   //------------------------------------------------------------------------------
+   double itop_sphere_z = cs::system_dimensions[2] - 0.5*create::internal::voronoi_grain_size;
+   double ibot_sphere_z =                          + 0.5*create::internal::voronoi_grain_size;
+   // place spheres in midd for thin systems
+   if(itop_sphere_z < 0.5*cs::system_dimensions[2]) itop_sphere_z = 0.5*cs::system_dimensions[2];
+   if(ibot_sphere_z > 0.5*cs::system_dimensions[2]) ibot_sphere_z = 0.5*cs::system_dimensions[2];
+   const double top_sphere_z = itop_sphere_z;
+   const double bot_sphere_z = ibot_sphere_z;
+   const double radius_factor = create::internal::voronoi_grain_substructure_crystallization_radius;
+   const double sphere_radius = 0.5*create::internal::voronoi_grain_size*radius_factor;
+
 	// loop over all grains with vertices
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
 		// Exclude grains with zero vertices
-
 		if((grain%(grain_coord_array.size()/10))==0){
 		  std::cout << "." << std::flush;
 		  zlog << "." << std::flush;
@@ -227,17 +255,21 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 			const double x0 = grain_coord_array[grain][0];
 			const double y0 = grain_coord_array[grain][1];
 
+         const double sphere_x = grain_coord_array[grain][0];
+         const double sphere_y = grain_coord_array[grain][1];
+
 			// loopover cells
 			for(int i=minx;i<=maxx;i++){
 				for(int j=miny;j<=maxy;j++){
 
-					// loop over atoms in cells;
+					// loop over atoms in cells and z
 					for(unsigned int id=0;id<supercell_array[i][j].size();id++){
-						int atom = supercell_array[i][j][id];
+						const int atom = supercell_array[i][j][id];
 
 						// Get atomic position
-						double x = catom_array[atom].x;
-						double y = catom_array[atom].y;
+						const double x = catom_array[atom].x;
+						const double y = catom_array[atom].y;
+						const double z = catom_array[atom].z;
 
 						if(mp::material[catom_array[atom].material].core_shell_size>0.0){
 							// Iterate over materials
@@ -248,23 +280,21 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 								double minz=mp::material[mat].min*cs::system_dimensions[2];
 								double cz=catom_array[atom].z;
 								// check for within core shell range
-								if(vmath::point_in_polygon_factor(x-x0,y-y0,factor, tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
+								if(vmath::point_in_polygon_factor(x-x0,y-y0,factor, tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices) && in_pill(x, y, z, sphere_x, sphere_y, top_sphere_z, bot_sphere_z, factor*sphere_radius)){
 									if((cz>=minz) && (cz<maxz)){
-										catom_array[atom].include=true;
+                              insub[atom] = true;
 										catom_array[atom].material=mat;
-										catom_array[atom].grain=grain;
 									}
 									// if set to clear atoms then remove atoms within radius
 									else if(cs::fill_core_shell==false){
-										catom_array[atom].include=false;
+                              insub[atom] = false;
 									}
 								}
 							}
 						}
 						// Check to see if site is within polygon
-						else if(vmath::point_in_polygon_factor(x-x0,y-y0,1.0,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
-							catom_array[atom].include=true;
-							catom_array[atom].grain=grain;
+						else if(vmath::point_in_polygon_factor(x-x0,y-y0,1.0,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)&& in_pill(x, y, z, sphere_x, sphere_y, top_sphere_z, bot_sphere_z, sphere_radius)){
+							insub[atom] = true;
 						}
 					}
 				}
@@ -275,6 +305,11 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 	std::cout << "done!" << std::endl;
 	terminaltextcolor(WHITE);
 	zlog << "done!" << std::endl;
+
+   // Now delete atoms not in substructure
+   for(unsigned int atom=0; atom < catom_array.size(); atom++){
+      if(insub[atom] == false) catom_array[atom].include=false;
+   }
 
 	// check for continuous layer
 	for(unsigned int atom=0; atom < catom_array.size(); atom++){
@@ -288,6 +323,23 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 	grains::num_grains = int(grain_coord_array.size());
 
 	return;
+}
+
+bool in_pill(double x, double y, double z, double px, double py, double ptz, double pbz, double r){
+
+   const double r2 = r*r;
+   const double dx2 = (x - px)*(x - px);
+   const double dy2 = (y - py)*(y - py);
+   const double dtz2 = (z - ptz)*(z - ptz);
+   const double dbz2 = (z - pbz)*(z - pbz);
+
+   bool in_r = dx2 + dy2 < r2;
+   if(r2 == false) return false;
+   bool in_cylinder = z < ptz && z > pbz;
+   bool in_top = dx2 + dy2 + dtz2 < r2;
+   bool in_bot = dx2 + dy2 + dbz2 < r2;
+   if(in_cylinder || in_top || in_bot) return true;
+   return false;
 }
 
 } // end of namespace internal

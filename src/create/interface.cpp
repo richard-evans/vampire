@@ -76,7 +76,13 @@ namespace create{
          create::internal::generate_voronoi_substructure = true;
          return true;
       }
-
+      test="voronoi-grain-substructure-crystallization-radius";
+      if(word==test){
+         double rsize=atof(value.c_str());
+         vin::check_for_valid_value(rsize, word, line, prefix, unit, "none", 0.5, 2.0,"input","0.1 - 2");
+         create::internal::voronoi_grain_substructure_crystallization_radius=rsize;
+         return true;
+      }
       test="voronoi-grain-size";
       if(word==test){
          double psize=atof(value.c_str());

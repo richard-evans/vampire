@@ -88,9 +88,11 @@ namespace create{
       extern double faceted_particle_110_radius; // 110 facet radius
       extern double faceted_particle_111_radius; // 111 facet radius
 
-      extern bool generate_voronoi_substructure;
       extern double voronoi_grain_size;
       extern double voronoi_grain_spacing;
+
+      extern bool generate_voronoi_substructure;
+      extern double voronoi_grain_substructure_crystallization_radius;
 
       //-----------------------------------------------------------------------------
       // Internal functions for create module

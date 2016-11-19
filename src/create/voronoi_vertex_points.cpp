@@ -148,8 +148,8 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
 
    // scale and shift to centre of system
 	for(int i=0;i<num_vertices;i++){
-		vertex_array[i][0]=(vertex_array[i][0]+0.5)*scale_factor - cs::system_dimensions[0];
-		vertex_array[i][1]=(vertex_array[i][1]+0.5)*scale_factor - cs::system_dimensions[0];
+		vertex_array[i][0]=(vertex_array[i][0]+0.5)*scale_factor; // - cs::system_dimensions[0];
+		vertex_array[i][1]=(vertex_array[i][1]+0.5)*scale_factor; // - cs::system_dimensions[0];
 	}
 
    //--------------------------------------
