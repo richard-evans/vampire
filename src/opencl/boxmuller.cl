@@ -37,7 +37,7 @@ void BoxMullerTransform(const __global uint *urands,
       real_t r = SQRT(-2*LOG(u1));
       real_t costheta = COS(TWO_PI * u2);
 
-      grands[2*id+0] = r * costheta / real_t(0xFFFFFFFF);
-      grands[2*id+1] = r * SQRT(1 - costheta*costheta) / real_t(0xFFFFFFFF);
+      grands[2*id+0] = r * costheta;
+      grands[2*id+1] = r * SQRT(1 - costheta*costheta);
    }
 }
