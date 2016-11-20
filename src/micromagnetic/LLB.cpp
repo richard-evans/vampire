@@ -7,8 +7,10 @@
 
 #include "random.hpp"
 #include "sim.hpp"
+#include "vmpi.hpp"
 #include "cells.hpp"
 #include "atoms.hpp"
+#include "vio.hpp"
 #include <cmath>
 #include <iostream>
 #include <algorithm>
@@ -56,6 +58,7 @@ int LLB_serial_heun( int num_steps,
                      std::vector <double> volume_array,
                      int N
                   ){
+
 
 
 
@@ -109,11 +112,6 @@ int LLB_serial_heun( int num_steps,
       }
    }
 
-
-
-
-   //calcualtes the average magnetisation of the system per step.
-
    for (int cell = 0; cell < num_cells; cell ++)
    {
          if (mm::ms[cell] > 1e-100){
@@ -123,24 +121,42 @@ int LLB_serial_heun( int num_steps,
       }
    }
 
-   double x_mag = 0;
-   double y_mag = 0;
-   double z_mag = 0;
-   double total = 0;
 
-   for (int cell = 0; cell < cells::num_cells; cell ++){
-      x_mag = x_mag + cells::x_mag_array[cell];
-      y_mag = y_mag + cells::y_mag_array[cell];
-      z_mag = z_mag + cells::z_mag_array[cell];
-      total = total + mm::ms[cell];
+if((sim::time +1)%vout::output_rate==0){
+
+   for (int atom = 0; atom < atoms::num_atoms; atom ++)
+   {
+      int cell = atoms::cell_array[atom];
+      atoms::x_spin_array[atom] = mm::x_array[cell];
+      atoms::y_spin_array[atom] = mm::y_array[cell];
+      atoms::z_spin_array[atom] = mm::z_array[cell];
    }
-   x_mag = x_mag/total;
-   y_mag = y_mag/total;
-   z_mag = z_mag/total;
-
-   mm::file << sim::time << '\t' << temperature << '\t' << x_mag << '\t' << y_mag << '\t' << z_mag << "\t" << sqrt((x_mag*x_mag) + (y_mag*y_mag) + (z_mag*z_mag)) << std::endl;
 
 
+   //calcualtes the average magnetisation of the system per step.
+/*
+   double m_x = 0;
+   double m_y = 0;
+   double m_z = 0;
+   double m_l = 0;
+
+   for (int cell = 0; cell < num_cells; cell++)
+   {
+      m_x = m_x + cells::x_mag_array[cell];
+      m_y = m_y + cells::y_mag_array[cell];
+      m_z = m_z + cells::z_mag_array[cell];
+      m_l = m_l + mm::ms[cell];
+   }
+
+   m_x = m_x/m_l;
+   m_y = m_y/m_l;
+   m_z = m_z/m_l;
+
+   m_l = sqrt(m_x*m_x + m_y*m_y + m_z*m_z);
+
+   std::cout << sim::time << '\t' << temperature << '\t' << m_x << '\t' << m_y << '\t' << m_z  << "\t" << m_l <<std::endl;
+*/
+}
    if (sim::time > 1000){
       for (int cell = 0; cell < num_cells; cell ++)
       {
@@ -160,5 +176,6 @@ int LLB_serial_heun( int num_steps,
          micromagnetic::counter++;
       }
       }
+
    }
 }
