@@ -94,6 +94,32 @@ namespace vopencl{
       extern cl::Buffer y_dipolar_field_array;
       extern cl::Buffer z_dipolar_field_array;
 
+      namespace stats
+      {
+         extern bool use_cpu;
+         extern long counter;
+
+         extern cl::Buffer system_mask;
+         extern cl::Buffer system_magnetization;
+         extern cl::Buffer system_mean_magnetization;
+         extern int system_mask_size;
+
+         extern cl::Buffer material_mask;
+         extern cl::Buffer material_magnetization;
+         extern cl::Buffer material_mean_magnetization;
+         extern int material_mask_size;
+
+         extern cl::Buffer height_mask;
+         extern cl::Buffer height_magnetization;
+         extern cl::Buffer height_mean_magnetization;
+         extern int height_mask_size;
+
+         extern cl::Buffer material_height_mask;
+         extern cl::Buffer material_height_magnetization;
+         extern cl::Buffer material_height_mean_magnetization;
+         extern int material_height_mask_size;
+      }
+
    } // end of internal namespace
 #endif // OPENCL
 
