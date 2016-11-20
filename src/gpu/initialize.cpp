@@ -30,7 +30,7 @@ namespace gpu{
       #ifdef CUDA
          initialized = vcuda::initialize(gpu::cpu_stats);
       #elif OPENCL
-         initialized = vopencl::initialize();
+         initialized = vopencl::initialize(gpu::cpu_stats);
       #endif
 
       // Check for no initialization

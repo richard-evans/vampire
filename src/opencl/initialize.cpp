@@ -51,7 +51,7 @@ namespace vopencl
    //----------------------------------------------------------------------------
    // Function to initialize vopencl module
    //----------------------------------------------------------------------------
-   bool initialize(void)
+   bool initialize(bool cpu_stats)
    {
       bool success = false;
 #ifdef OPENCL
@@ -65,6 +65,9 @@ namespace vopencl
 
       std::cout << message << std::endl;
       zlog << zTs() << message << std::endl;
+
+      //vcl::stats::use_cpu = cpu_stats;
+      vcl::stats::use_cpu = true;
 
       try
       {
