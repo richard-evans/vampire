@@ -35,7 +35,6 @@ namespace vopencl
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
-
       extern cl::Context context;
       extern cl::Device default_device;
       
@@ -53,6 +52,11 @@ namespace vopencl
       bool initialize_topology(void);
       bool initialize_stats(void);
       bool initialize_rng(void);
+
+      void update_spin_fields();
+      void update_external_fields();
+      void update_dipolar_fields();
+      void update_cell_magnetizations();
 
       void finalize(void);
       

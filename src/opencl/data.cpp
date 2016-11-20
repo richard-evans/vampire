@@ -46,6 +46,7 @@ namespace vopencl
       namespace rng
       {
          cl::Buffer urands;
+         cl::Buffer grands;
       }
 
       namespace atoms

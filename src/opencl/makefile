@@ -10,13 +10,17 @@ OPENCL_PR=-DOPENCL_DP
 # List module object filenames
 OPENCL_OBJECTS =\
 obj/opencl/config.o \
-obj/opencl/exchange_fields.o \
 obj/opencl/data.o \
+obj/opencl/dipole.o \
+obj/opencl/exchange_fields.o \
+obj/opencl/external_fields.o \
 obj/opencl/finalize.o \
 obj/opencl/initialize.o \
 obj/opencl/interface.o \
 obj/opencl/llg_heun.o \
 obj/opencl/opencl_utils.o \
+obj/opencl/random.o \
+obj/opencl/spin_fields.o \
 obj/opencl/statistics.o
 
 OPENCL_OBJ=obj/opencl/vampire_opencl.o

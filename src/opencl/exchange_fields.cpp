@@ -1,9 +1,11 @@
 #include <vector>
+#include <sstream>
 
 #include "atoms.hpp"
 
 #include "internal.hpp"
 #include "data.hpp"
+#include "opencl_utils.hpp"
 #include "typedefs.hpp"
 
 #ifdef OPENCL
@@ -25,6 +27,8 @@ namespace vopencl
          cl::Buffer Jyy_vals_d;
          cl::Buffer Jzz_vals_d;
 
+         cl::Kernel matmul;
+
          void initialize_exchange(void)
          {
             std::vector<vcl_real_t> Jxx_vals_h;
@@ -32,6 +36,10 @@ namespace vopencl
             std::vector<vcl_real_t> Jzz_vals_h;
 
             size_t vsize = ::atoms::neighbour_list_array.size();
+
+            std::ostringstream opts;
+            opts << "-DN=" << vsize;
+            matmul = vcl::build_kernel_from_file("csrmatmul.cl", "matmul", vcl::context, vcl::default_device, opts.str());
 
             cl::CommandQueue write_q(vcl::context, vcl::default_device);
 
@@ -43,7 +51,7 @@ namespace vopencl
                // Jxy = Jxz = Jyx = 0
             {
 
-               Jxx_vals_h.resize(vsize);
+               Jxx_vals_h.resize(vsize, 0);
 
                for (unsigned i=0; i<vsize; ++i)
                {
@@ -111,6 +119,11 @@ namespace vopencl
 
             // convert Jnn from CSR to DIA
 
+            cl::CommandQueue mm(vcl::context, vcl::default_device);
+
+            cl::NDRange global(::atoms::num_atoms);
+            cl::NDRange local(0);
+
             switch(::atoms::exchange_type)
             {
             case 0:
@@ -118,9 +131,25 @@ namespace vopencl
                // Jxx = Jyy = Jzz
                // Jxy = Jxz = Jyx = 0
 
-               // vcl::x_total_field_array = matmul(Jxx, vcl::atoms::x_spin_array)
-               // vcl::y_total_field_array = matmul(Jxx, vcl::atoms::y_spin_array)
-               // vcl::z_total_field_array = matmul(Jxx, vcl::atoms::z_spin_array)
+               // vcl::x_total_spin_field_array = matmul(Jxx, vcl::atoms::x_spin_array)
+               // vcl::y_total_spin_field_array = matmul(Jxx, vcl::atoms::y_spin_array)
+               // vcl::z_total_spin_field_array = matmul(Jxx, vcl::atoms::z_spin_array)
+               vcl::kernel_call(matmul, mm, global, local,
+                                Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours, /* CSR matrix */
+                                vcl::atoms::x_spin_array,
+                                vcl::x_total_spin_field_array);
+
+               vcl::kernel_call(matmul, mm, global, local,
+                                Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours, /* CSR matrix */
+                                vcl::atoms::y_spin_array,
+                                vcl::y_total_spin_field_array);
+
+               vcl::kernel_call(matmul, mm, global, local,
+                                Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
+                                vcl::atoms::z_spin_array,
+                                vcl::z_total_spin_field_array);
+
+               
                break;
             case 1:
                // Vector
@@ -130,11 +159,28 @@ namespace vopencl
                // vcl::x_total_field_array = matmul(Jxx, vcl::atoms::x_spin_array)
                // vcl::y_total_field_array = matmul(Jyy, vcl::atoms::y_spin_array)
                // vcl::z_total_field_array = matmul(Jzz, vcl::atoms::z_spin_array)
+
+               vcl::kernel_call(matmul, mm, global, local,
+                                Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
+                                vcl::atoms::x_spin_array,
+                                vcl::x_total_spin_field_array);
+
+               vcl::kernel_call(matmul, mm, global, local,
+                                Jyy_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
+                                vcl::atoms::y_spin_array,
+                                vcl::y_total_spin_field_array);
+
+               vcl::kernel_call(matmul, mm, global, local,
+                                Jzz_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
+                                vcl::atoms::z_spin_array,
+                                vcl::z_total_spin_field_array);
                break;
             case 2:
                // Tensor
                break;
             }
+
+            mm.finish();
          }
       }
    }

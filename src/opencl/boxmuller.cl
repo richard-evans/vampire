@@ -24,19 +24,20 @@ typedef float  real_t
 
 
 __kernel
-void BoxMullerTransform(__global real_t *rands)
+void BoxMullerTransform(const __global uint *urands,
+                        __global real_t *grands)
 {
-   size_t gsz = get_global_size(0);
+   const size_t gsz = get_global_size(0);
 
    for (unsigned id=get_global_id(0); id<N/2; id+=gsz)
    {
-      real_t u1 = urands[2*id+0];
-      real_t u2 = urands[2*id+1];
+      real_t u1 = urands[2*id+0] / real_t(0xFFFFFFFF);
+      real_t u2 = urands[2*id+1] / real_t(0xFFFFFFFF);
 
       real_t r = SQRT(-2*LOG(u1));
       real_t costheta = COS(TWO_PI * u2);
 
-      rands[2*id+0] = r * costheta;
-      rands[2*id+1] = r * SQRT(1 - costheta*costheta);
+      grands[2*id+0] = r * costheta / real_t(0xFFFFFFFF);
+      grands[2*id+1] = r * SQRT(1 - costheta*costheta) / real_t(0xFFFFFFFF);
    }
 }

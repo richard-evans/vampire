@@ -406,18 +406,21 @@ namespace vopencl
          try
          {
             cl::CommandQueue write_q = cl::CommandQueue(vcl::context, vcl::default_device);
-         
-            std::vector<uint32_t> rs(1000);
 
-            size_t r_buffer_size = rs.size() * sizeof(rs[0]);
+            // each atom needs three random numbers per Heun step
+            std::vector<uint32_t> rs(::atoms::num_atoms*3);
 
-            vcl::rng::urands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, r_buffer_size);
+            size_t u_buffer_size = rs.size() * sizeof(uint32_t);
+            size_t g_buffer_size = rs.size() * sizeof(vcl_real_t);
+
+            vcl::rng::urands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, u_buffer_size);
+            vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
 
             std::srand(1);  // constant for now to get deterministic results
             for (auto &elem : rs)
                elem = std::rand();
 
-            write_q.enqueueWriteBuffer(vcl::rng::urands, CL_TRUE, 0, r_buffer_size, &rs[0]);
+            write_q.enqueueWriteBuffer(vcl::rng::urands, CL_TRUE, 0, u_buffer_size, &rs[0]);
 
             write_q.finish();
          }

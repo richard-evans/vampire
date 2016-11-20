@@ -38,9 +38,9 @@ namespace vopencl
       {
          bool initialized = false;
 
-         cl::Buffer x_spin_array;
-         cl::Buffer y_spin_array;
-         cl::Buffer z_spin_array;
+         cl::Buffer x_spin_buffer_array;
+         cl::Buffer y_spin_buffer_array;
+         cl::Buffer z_spin_buffer_array;
          cl::Buffer dS_x_array;
          cl::Buffer dS_y_array;
          cl::Buffer dS_z_array;
@@ -54,9 +54,9 @@ namespace vopencl
             size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
             size_t num_mats = ::mp::num_materials;
 
-            vcl::llg::x_spin_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
-            vcl::llg::y_spin_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
-            vcl::llg::z_spin_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::x_spin_buffer_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::y_spin_buffer_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::z_spin_buffer_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
 
             vcl::llg::dS_x_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
             vcl::llg::dS_y_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
@@ -82,19 +82,71 @@ namespace vopencl
             std::ostringstream opts;
             opts << "-DNUM_ATOMS=" << ::atoms::num_atoms;
             opts << " -DDT=" << ::mp::dt;
-            predictor_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_predictor_step", vcl::context, vcl::default_device, opts.str());
-            corrector_step = vcl::build_kernel_from_file("llg_heun.cl", "llg_heun_corrector_step", vcl::context, vcl::default_device, opts.str());
+            predictor_step = vcl::build_kernel_from_file("llg_heun.cl",
+                                                         "llg_heun_predictor_step",
+                                                         vcl::context, vcl::default_device, opts.str());
+
+            corrector_step = vcl::build_kernel_from_file("llg_heun.cl",
+                                                         "llg_heun_corrector_step",
+                                                         vcl::context, vcl::default_device, opts.str());
 
             vcl::llg::initialized = true;
          }
 
          void step(void)
          {
+            cl::NDRange global(::atoms::num_atoms);
+            cl::NDRange local(0);
+
             size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
-            cl::CommandQueue write_q(vcl::context, vcl::default_device);
-            write_q.enqueueCopyBuffer(vcl::atoms::x_spin_array, vcl::llg::x_spin_array, 0, 0, real_buffer_size);
-            write_q.enqueueCopyBuffer(vcl::atoms::y_spin_array, vcl::llg::y_spin_array, 0, 0, real_buffer_size);
-            write_q.enqueueCopyBuffer(vcl::atoms::z_spin_array, vcl::llg::z_spin_array, 0, 0, real_buffer_size);
+            cl::CommandQueue step_q(vcl::context, vcl::default_device);
+            step_q.enqueueCopyBuffer(vcl::atoms::x_spin_array, vcl::llg::x_spin_buffer_array, 0, 0, real_buffer_size);
+            step_q.enqueueCopyBuffer(vcl::atoms::y_spin_array, vcl::llg::y_spin_buffer_array, 0, 0, real_buffer_size);
+            step_q.enqueueCopyBuffer(vcl::atoms::z_spin_array, vcl::llg::z_spin_buffer_array, 0, 0, real_buffer_size);
+
+            // update fields
+            vcl::update_spin_fields();
+            vcl::update_external_fields();
+
+            step_q.finish();
+
+            // Heun predictor step
+            vcl::kernel_call(predictor_step, step_q, global, local,
+                             vcl::atoms::type_array,
+                             vcl::llg::heun_parameters_device,
+                             vcl::atoms::x_spin_array,
+                             vcl::atoms::y_spin_array,
+                             vcl::x_total_spin_field_array,
+                             vcl::y_total_spin_field_array,
+                             vcl::z_total_spin_field_array,
+                             vcl::x_total_external_field_array,
+                             vcl::y_total_external_field_array,
+                             vcl::z_total_external_field_array,
+                             vcl::llg::dS_x_array,
+                             vcl::llg::dS_y_array,
+                             vcl::llg::dS_z_array);
+
+            // update spin fields, external fixed
+            vcl::update_spin_fields();
+
+            // Heun corrector step
+            vcl::kernel_call(corrector_step, step_q, global, local,
+                             vcl::atoms::type_array,
+                             vcl::llg::heun_parameters_device,
+                             vcl::atoms::x_spin_array,
+                             vcl::atoms::y_spin_array,
+                             vcl::x_total_spin_field_array,
+                             vcl::y_total_spin_field_array,
+                             vcl::z_total_spin_field_array,
+                             vcl::x_total_external_field_array,
+                             vcl::y_total_external_field_array,
+                             vcl::z_total_external_field_array,
+                             vcl::llg::x_spin_buffer_array,
+                             vcl::llg::y_spin_buffer_array,
+                             vcl::llg::z_spin_buffer_array,
+                             vcl::llg::dS_x_array,
+                             vcl::llg::dS_y_array,
+                             vcl::llg::dS_z_array);
          }
       }
    }
