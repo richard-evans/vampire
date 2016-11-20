@@ -8,6 +8,7 @@
 #include "data.hpp"
 #include "internal.hpp"
 #include "opencl_utils.hpp"
+#include "typedefs.hpp"
 
 #ifdef OPENCL
 
@@ -19,8 +20,10 @@ namespace vopencl
    {
       bool compiled_update_dip = false;
       bool compiled_update_atm_dip = false;
+      bool compiled_update_cell_magnetization = false;
       cl::Kernel update_dip;
       cl::Kernel update_atm_dip;
+      cl::Kernel update_cell_mag;
 
       void update_dipolar_fields()
       {
@@ -34,12 +37,12 @@ namespace vopencl
 
          ::demag::update_time = ::sim::time;
 
-         //update_cell_magnetizations();
+         update_cell_magnetizations();
 
          if (!compiled_update_dip)
          {
             std::ostringstream opts;
-            opts << "-DN=" << ::cells::num_cells;
+            opts << "-DN_CELLS=" << ::cells::num_cells;
             update_dip = vcl::build_kernel_from_file("dipole.cl",
                                                      "update_dipole_fields",
                                                      vcl::context, vcl::default_device,
@@ -50,7 +53,7 @@ namespace vopencl
          if (!compiled_update_atm_dip)
          {
             std::ostringstream opts;
-            opts << "-DN=" << ::atoms::num_atoms;
+            opts << "-DN_ATOMS=" << ::atoms::num_atoms;
             update_atm_dip = vcl::build_kernel_from_file("dipole.cl",
                                                          "update_atm_dipole_fields",
                                                          vcl::context, vcl::default_device,
@@ -87,6 +90,43 @@ namespace vopencl
                           vcl::atoms::cell_array);
 
          update_q.finish();
+      }
+
+      void update_cell_magnetizations(void)
+      {
+         cl::CommandQueue cell_q(vcl::context, vcl::default_device);
+         cl::NDRange global(::cells::num_cells);
+         cl::NDRange local(0);
+
+         size_t buff_size = ::cells::num_cells * sizeof(vcl_real_t);
+         vcl_real_t zero = 0;
+         cell_q.enqueueFillBuffer(vcl::cells::x_mag_array, &zero, sizeof(zero), buff_size);
+         cell_q.enqueueFillBuffer(vcl::cells::y_mag_array, &zero, sizeof(zero), buff_size);
+         cell_q.enqueueFillBuffer(vcl::cells::z_mag_array, &zero, sizeof(zero), buff_size);
+
+         if (!compiled_update_cell_magnetization)
+         {
+            std::ostringstream opts;
+            opts << "-DN_ATOMS=" << ::atoms::num_atoms;
+            update_cell_mag = vcl::build_kernel_from_file("dipole.cl",
+                                                          "update_cell_magnetization",
+                                                          vcl::context, vcl::default_device,
+                                                          opts.str());
+            compiled_update_cell_magnetization = true;
+         }
+         
+         cell_q.finish();
+
+         vcl::kernel_call(update_cell_mag, cell_q, global, local,
+                          vcl::atoms::x_spin_array,
+                          vcl::atoms::y_spin_array,
+                          vcl::atoms::z_spin_array,
+                          vcl::atoms::type_array,
+                          vcl::atoms::cell_array,
+                          vcl::mp::materials,
+                          vcl::cells::x_mag_array,
+                          vcl::cells::y_mag_array,
+                          vcl::cells::z_mag_array);
       }
    }
 }

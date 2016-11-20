@@ -1,3 +1,5 @@
+#include "material_type.h"
+
 #ifdef OPENCL_DP
 typedef double real_t
 #else
@@ -9,31 +11,6 @@ typedef float  real_t
 #else
 #define POW(x, y) pow(x, y)
 #endif
-
-struct material_parameters_t
-{
-   real_t alpha;
-   real_t gamma_rel;
-   real_t mu_s_si;
-   real_t i_mu_s_si;
-   real_t k_latt;
-   real_t sh2;
-   real_t sh4;
-   real_t sh6;
-   real_t ku;
-   real_t anisotropy_unit_x;
-   real_t anisotropy_unit_y;
-   real_t anisotropy_unit_z;
-   real_t applied_field_strength;
-   real_t applied_field_unit_x;
-   real_t applied_field_unit_y;
-   real_t applied_field_unit_z;
-   real_t Kc1_SI;
-   real_t temperature;
-   real_t temperature_rescaling_alpha;
-   real_t temperature_rescaling_Tc;
-   real_t H_th_sigma;
-};
 
 __kernel
 void update_external_fields(const __global int *material,

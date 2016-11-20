@@ -1,8 +1,11 @@
+#include <sstream>
+
 #include "atoms.hpp"
 
 #include "data.hpp"
 #include "internal.hpp"
 #include "opencl_include.hpp"
+#include "opencl_utils.hpp"
 #include "typedefs.hpp"
 
 #ifdef OPENCL
@@ -13,6 +16,9 @@ namespace vopencl
 {
    namespace internal
    {
+      bool compiled_update_spin_fields = false;
+      cl::Kernel update_nexch_spin_fields;
+
       void update_spin_fields()
       {
          cl::CommandQueue write_q(vcl::context, vcl::default_device);
@@ -32,6 +38,32 @@ namespace vopencl
                                    &zero,
                                    sizeof(vcl_real_t),
                                    buffer_size);
+
+         if (!compiled_update_spin_fields)
+         {
+            std::ostringstream opts;
+            opts << "-DN_ATOMS=" << ::atoms::num_atoms;
+            update_nexch_spin_fields = vcl::build_kernel_from_file("spin_fields.cl",
+                                                                   "update_nexch_spin_fields",
+                                                                   vcl::context, vcl::default_device,
+                                                                   opts.str());
+            compiled_update_spin_fields = true;
+         }
+
+         write_q.finish();
+
+         cl::NDRange global(::atoms::num_atoms);
+         cl::NDRange local(0);
+
+         vcl::kernel_call(update_nexch_spin_fields, write_q, global, local,
+                          vcl::atoms::type_array,
+                          vcl::mp::materials,
+                          vcl::atoms::x_spin_array,
+                          vcl::atoms::y_spin_array,
+                          vcl::atoms::z_spin_array,
+                          vcl::x_total_spin_field_array,
+                          vcl::y_total_spin_field_array,
+                          vcl::z_total_spin_field_array);
       }
    }
 }
