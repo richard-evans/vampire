@@ -1552,6 +1552,12 @@ int match_sim(string const word, string const value, string const unit, int cons
       }
    }
    //-------------------------------------------------------------------
+   test="enable-micromagnetic-boltzman-distribution";
+   if(word==test){
+      micromagnetic::enable_boltzman_distribution=true;
+      return EXIT_SUCCESS;
+   }
+   //-------------------------------------------------------------------
    test="enable-dipole-fields";
    if(word==test){
       sim::hamiltonian_simulation_flags[4]=1;
@@ -1583,6 +1589,7 @@ int match_sim(string const word, string const value, string const unit, int cons
       demag::update_rate=dpur;
       return EXIT_SUCCESS;
    }
+
    //-------------------------------------------------------------------
    test="enable-surface-anisotropy";
    if(word==test){

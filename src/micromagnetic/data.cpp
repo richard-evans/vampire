@@ -31,6 +31,8 @@ namespace micromagnetic{
    //boolean to determine whether the simulation wants stochastic fields
    bool stochastic = true;
 
+   bool enable_boltzman_distribution = false;
+
    std::vector < std::vector <int > > P;
    std::vector < int > P1D;
    double mean_M;
@@ -84,6 +86,7 @@ namespace micromagnetic{
       std::vector<double> macro_neighbour_list_end_index;
       std::vector<double> macro_neighbour_list_array;
       std::ofstream file;
+
 
 
    } // end of internal namespace

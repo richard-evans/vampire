@@ -437,7 +437,7 @@ int run(){
 			{
 				pfile << cells::x_coord_array[cell] << '\t' << cells::y_coord_array[cell] << '\t' << cells::z_coord_array[cell] << '\t' <<cells::x_mag_array[cell] << '\t' << cells::y_mag_array[cell] << '\t' << cells::z_mag_array[cell] << '\t' << std::endl;
 			}
-
+   	if (micromagnetic::enable_boltzman_distribution == true){
 			std::ofstream pfile2D("LLBprob");
 			for(int para=0;para<101;para++){
 				for(int perp=0;perp<101;perp++){
@@ -451,6 +451,7 @@ int run(){
 				pfile1D << (double(para))/1000.0 << "\t" << micromagnetic::P1D[para] << std::endl;
 			}
 		}
+	}
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
    //------------------------------------------------

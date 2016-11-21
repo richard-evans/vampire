@@ -157,25 +157,26 @@ if((sim::time +1)%vout::output_rate==0){
    std::cout << sim::time << '\t' << temperature << '\t' << m_x << '\t' << m_y << '\t' << m_z  << "\t" << m_l <<std::endl;
 */
 }
-   if (sim::time > 1000){
-      for (int cell = 0; cell < num_cells; cell ++)
-      {
-         if (mm::ms[cell] > 1e-100)
+   if (micromagnetic::enable_boltzman_distribution == true){
+      if (sim::time > 1000){
+         for (int cell = 0; cell < num_cells; cell ++)
          {
-         double mz=sqrt(mm::z_array[cell]*mm::z_array[cell]);
-         double mx=sqrt(mm::x_array[cell]*mm::x_array[cell] + mm::y_array[cell]*mm::y_array[cell]); //sqrt(S[cell]*S[cell]+S[1]*S[1]);
-         double mag_m =sqrt(mm::x_array[cell]*mm::x_array[cell] + mm::y_array[cell]*mm::y_array[cell]+ mm::z_array[cell]*mm::z_array[cell]);
-         int para = int(mz*100.0+0.5);
-         int perp = int(mx*100.0+0.5);
-         if (para >100) para =100;
-         if (perp >100) perp =100;
-         int para1D = int(mag_m*1000.0+0.5);
-         micromagnetic::P[para][perp]++;
-         micromagnetic::P1D[para1D]++;
-         micromagnetic::mean_M+=mag_m;
-         micromagnetic::counter++;
+            if (mm::ms[cell] > 1e-100)
+            {
+            double mz=sqrt(mm::z_array[cell]*mm::z_array[cell]);
+            double mx=sqrt(mm::x_array[cell]*mm::x_array[cell] + mm::y_array[cell]*mm::y_array[cell]); //sqrt(S[cell]*S[cell]+S[1]*S[1]);
+            double mag_m =sqrt(mm::x_array[cell]*mm::x_array[cell] + mm::y_array[cell]*mm::y_array[cell]+ mm::z_array[cell]*mm::z_array[cell]);
+            int para = int(mz*100.0+0.5);
+            int perp = int(mx*100.0+0.5);
+            if (para >100) para =100;
+            if (perp >100) perp =100;
+            int para1D = int(mag_m*1000.0+0.5);
+            micromagnetic::P[para][perp]++;
+            micromagnetic::P1D[para1D]++;
+            micromagnetic::mean_M+=mag_m;
+            micromagnetic::counter++;
+         }
+         }
       }
-      }
-
    }
 }
