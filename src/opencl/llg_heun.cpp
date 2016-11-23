@@ -38,12 +38,10 @@ namespace vopencl
       {
          bool initialized = false;
 
-         cl::Buffer x_spin_buffer_array;
-         cl::Buffer y_spin_buffer_array;
-         cl::Buffer z_spin_buffer_array;
-         cl::Buffer dS_x_array;
-         cl::Buffer dS_y_array;
-         cl::Buffer dS_z_array;
+         vcl::Buffer3D spin_buffer_array;
+
+         vcl::Buffer3D dS_array;
+
          cl::Buffer heun_parameters_device;
 
          cl::Kernel predictor_step;
@@ -54,13 +52,9 @@ namespace vopencl
             size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
             size_t num_mats = ::mp::num_materials;
 
-            vcl::llg::x_spin_buffer_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
-            vcl::llg::y_spin_buffer_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
-            vcl::llg::z_spin_buffer_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::spin_buffer_array = vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
 
-            vcl::llg::dS_x_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
-            vcl::llg::dS_y_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
-            vcl::llg::dS_z_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::dS_array = vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
 
             vcl::llg::heun_parameters_device = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, num_mats*sizeof(heun_parameter_t));
 
@@ -100,9 +94,7 @@ namespace vopencl
 
             size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
             cl::CommandQueue step_q(vcl::context, vcl::default_device);
-            step_q.enqueueCopyBuffer(vcl::atoms::x_spin_array, vcl::llg::x_spin_buffer_array, 0, 0, real_buffer_size);
-            step_q.enqueueCopyBuffer(vcl::atoms::y_spin_array, vcl::llg::y_spin_buffer_array, 0, 0, real_buffer_size);
-            step_q.enqueueCopyBuffer(vcl::atoms::z_spin_array, vcl::llg::z_spin_buffer_array, 0, 0, real_buffer_size);
+            vcl::atoms::spin_array.copy_to_dev(step_q, vcl::llg::spin_buffer_array, real_buffer_size);
 
             // update fields
             vcl::update_spin_fields();
@@ -114,17 +106,20 @@ namespace vopencl
             vcl::kernel_call(predictor_step, step_q, global, local,
                              vcl::atoms::type_array,
                              vcl::llg::heun_parameters_device,
-                             vcl::atoms::x_spin_array,
-                             vcl::atoms::y_spin_array,
-                             vcl::x_total_spin_field_array,
-                             vcl::y_total_spin_field_array,
-                             vcl::z_total_spin_field_array,
-                             vcl::x_total_external_field_array,
-                             vcl::y_total_external_field_array,
-                             vcl::z_total_external_field_array,
-                             vcl::llg::dS_x_array,
-                             vcl::llg::dS_y_array,
-                             vcl::llg::dS_z_array);
+                             vcl::atoms::spin_array.x(),
+                             vcl::atoms::spin_array.y(),
+                             vcl::atoms::spin_array.z(),
+                             vcl::total_spin_field_array.x(),
+                             vcl::total_spin_field_array.y(),
+                             vcl::total_spin_field_array.z(),
+                             vcl::total_external_field_array.x(),
+                             vcl::total_external_field_array.y(),
+                             vcl::total_external_field_array.z(),
+                             vcl::llg::dS_array.x(),
+                             vcl::llg::dS_array.y(),
+                             vcl::llg::dS_array.z());
+
+            step_q.finish();
 
             // update spin fields, external fixed
             vcl::update_spin_fields();
@@ -133,20 +128,23 @@ namespace vopencl
             vcl::kernel_call(corrector_step, step_q, global, local,
                              vcl::atoms::type_array,
                              vcl::llg::heun_parameters_device,
-                             vcl::atoms::x_spin_array,
-                             vcl::atoms::y_spin_array,
-                             vcl::x_total_spin_field_array,
-                             vcl::y_total_spin_field_array,
-                             vcl::z_total_spin_field_array,
-                             vcl::x_total_external_field_array,
-                             vcl::y_total_external_field_array,
-                             vcl::z_total_external_field_array,
-                             vcl::llg::x_spin_buffer_array,
-                             vcl::llg::y_spin_buffer_array,
-                             vcl::llg::z_spin_buffer_array,
-                             vcl::llg::dS_x_array,
-                             vcl::llg::dS_y_array,
-                             vcl::llg::dS_z_array);
+                             vcl::atoms::spin_array.x(),
+                             vcl::atoms::spin_array.y(),
+                             vcl::atoms::spin_array.z(),
+                             vcl::total_spin_field_array.x(),
+                             vcl::total_spin_field_array.y(),
+                             vcl::total_spin_field_array.z(),
+                             vcl::total_external_field_array.x(),
+                             vcl::total_external_field_array.y(),
+                             vcl::total_external_field_array.z(),
+                             vcl::llg::spin_buffer_array.x(),
+                             vcl::llg::spin_buffer_array.y(),
+                             vcl::llg::spin_buffer_array.z(),
+                             vcl::llg::dS_array.x(),
+                             vcl::llg::dS_array.y(),
+                             vcl::llg::dS_array.z());
+
+            step_q.finish();
          }
       }
    }

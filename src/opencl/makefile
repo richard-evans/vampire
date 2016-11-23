@@ -34,3 +34,6 @@ $(OPENCL_OBJECTS): obj/%.o: src/%.cpp
 gcc-opencl: GCC_CFLAGS+=-DOPENCL -std=c++11
 gcc-opencl: $(OBJECTS) $(OPENCL_OBJ)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
+
+gcc-opencl-native: GCC_CFLAGS+=-DOPENCL_USE_NATIVE_FUNCTIONS
+gcc-opencl-native: gcc-opencl

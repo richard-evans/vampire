@@ -68,25 +68,27 @@ namespace vopencl
 
          // update cell dipolar fields
          vcl::kernel_call(update_dip, update_q, global, local,
-                          vcl::cells::x_mag_array,
-                          vcl::cells::y_mag_array,
-                          vcl::cells::z_mag_array,
-                          vcl::cells::x_coord_array,
-                          vcl::cells::y_coord_array,
-                          vcl::cells::z_coord_array,
+                          vcl::cells::mag_array.x(),
+                          vcl::cells::mag_array.y(),
+                          vcl::cells::mag_array.z(),
+                          vcl::cells::coord_array.x(),
+                          vcl::cells::coord_array.y(),
+                          vcl::cells::coord_array.z(),
                           vcl::cells::volume_array,
-                          vcl::cells::x_field_array,
-                          vcl::cells::y_field_array,
-                          vcl::cells::z_field_array);
+                          vcl::cells::field_array.x(),
+                          vcl::cells::field_array.y(),
+                          vcl::cells::field_array.z());
+
+         update_q.finish();
 
          // update atomistic dipolar fields
          vcl::kernel_call(update_atm_dip, update_q, global, local,
-                          vcl::cells::x_field_array,
-                          vcl::cells::y_field_array,
-                          vcl::cells::z_field_array,
-                          vcl::x_dipolar_field_array,
-                          vcl::y_dipolar_field_array,
-                          vcl::z_dipolar_field_array,
+                          vcl::cells::field_array.x(),
+                          vcl::cells::field_array.y(),
+                          vcl::cells::field_array.z(),
+                          vcl::dipolar_field_array.x(),
+                          vcl::dipolar_field_array.y(),
+                          vcl::dipolar_field_array.z(),
                           vcl::atoms::cell_array);
 
          update_q.finish();
@@ -100,9 +102,9 @@ namespace vopencl
 
          size_t buff_size = ::cells::num_cells * sizeof(vcl_real_t);
          vcl_real_t zero = 0;
-         cell_q.enqueueFillBuffer(vcl::cells::x_mag_array, &zero, sizeof(zero), buff_size);
-         cell_q.enqueueFillBuffer(vcl::cells::y_mag_array, &zero, sizeof(zero), buff_size);
-         cell_q.enqueueFillBuffer(vcl::cells::z_mag_array, &zero, sizeof(zero), buff_size);
+         cell_q.enqueueFillBuffer(vcl::cells::mag_array.x(), &zero, sizeof(zero), buff_size);
+         cell_q.enqueueFillBuffer(vcl::cells::mag_array.y(), &zero, sizeof(zero), buff_size);
+         cell_q.enqueueFillBuffer(vcl::cells::mag_array.z(), &zero, sizeof(zero), buff_size);
 
          if (!compiled_update_cell_magnetization)
          {
@@ -118,15 +120,15 @@ namespace vopencl
          cell_q.finish();
 
          vcl::kernel_call(update_cell_mag, cell_q, global, local,
-                          vcl::atoms::x_spin_array,
-                          vcl::atoms::y_spin_array,
-                          vcl::atoms::z_spin_array,
+                          vcl::atoms::spin_array.x(),
+                          vcl::atoms::spin_array.y(),
+                          vcl::atoms::spin_array.z(),
                           vcl::atoms::type_array,
                           vcl::atoms::cell_array,
                           vcl::mp::materials,
-                          vcl::cells::x_mag_array,
-                          vcl::cells::y_mag_array,
-                          vcl::cells::z_mag_array);
+                          vcl::cells::mag_array.x(),
+                          vcl::cells::mag_array.y(),
+                          vcl::cells::mag_array.z());
       }
    }
 }

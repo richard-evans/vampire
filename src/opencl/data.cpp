@@ -13,13 +13,18 @@
 #endif
 
 // Vampire headers
-#include "opencl_include.hpp"
 #include "vopencl.hpp"
 
 // vopencl module headers
-#include "internal.hpp"
 #include "data.hpp"
+#include "internal.hpp"
+#include "opencl_include.hpp"
 #include "statistics.hpp"
+#include "typedefs.hpp"
+
+#ifdef OPENCL
+
+namespace vcl = ::vopencl::internal;
 
 namespace vopencl
 {
@@ -32,8 +37,6 @@ namespace vopencl
    // Shared variables inside vopencl module
    //------------------------------------------------------------------------
 
-
-#ifdef OPENCL
    namespace internal
    {
       cl::Device default_device;
@@ -51,13 +54,9 @@ namespace vopencl
 
       namespace atoms
       {
-         cl::Buffer x_spin_array;
-         cl::Buffer y_spin_array;
-         cl::Buffer z_spin_array;
+         vcl::Buffer3D spin_array;
 
-         cl::Buffer x_coord_array;
-         cl::Buffer y_coord_array;
-         cl::Buffer z_coord_array;
+         vcl::Buffer3D coord_array;
 
          cl::Buffer type_array;
 
@@ -71,17 +70,11 @@ namespace vopencl
 
       namespace cells
       {
-         cl::Buffer x_coord_array;
-         cl::Buffer y_coord_array;
-         cl::Buffer z_coord_array;
+         vcl::Buffer3D coord_array;
 
-         cl::Buffer x_mag_array;
-         cl::Buffer y_mag_array;
-         cl::Buffer z_mag_array;
+         vcl::Buffer3D mag_array;
 
-         cl::Buffer x_field_array;
-         cl::Buffer y_field_array;
-         cl::Buffer z_field_array;
+         vcl::Buffer3D field_array;
 
          cl::Buffer volume_array;
 
@@ -93,17 +86,11 @@ namespace vopencl
          cl::Buffer materials;
       }
 
-      cl::Buffer x_total_spin_field_array;
-      cl::Buffer y_total_spin_field_array;
-      cl::Buffer z_total_spin_field_array;
+      vcl::Buffer3D total_spin_field_array;
 
-      cl::Buffer x_total_external_field_array;
-      cl::Buffer y_total_external_field_array;
-      cl::Buffer z_total_external_field_array;
+      vcl::Buffer3D total_external_field_array;
 
-      cl::Buffer x_dipolar_field_array;
-      cl::Buffer y_dipolar_field_array;
-      cl::Buffer z_dipolar_field_array;
+      vcl::Buffer3D dipolar_field_array;
 
       namespace stats
       {
@@ -130,9 +117,7 @@ namespace vopencl
          cl::Buffer material_height_mean_magnetization;
          int material_height_mask_size(0);
       }
-
    } // end of internal namespace
-#endif // OPENCL
-
 } // end of vopencl namespace
 
+#endif // OPENCL

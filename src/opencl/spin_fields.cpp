@@ -26,15 +26,15 @@ namespace vopencl
 
          // Zero the field buffers
          vcl_real_t zero = 0.0;
-         write_q.enqueueFillBuffer(vcl::x_total_spin_field_array,
+         write_q.enqueueFillBuffer(vcl::total_spin_field_array.x(),
                                    &zero,
                                    sizeof(vcl_real_t),
                                    buffer_size);
-         write_q.enqueueFillBuffer(vcl::y_total_spin_field_array,
+         write_q.enqueueFillBuffer(vcl::total_spin_field_array.y(),
                                    &zero,
                                    sizeof(vcl_real_t),
                                    buffer_size);
-         write_q.enqueueFillBuffer(vcl::z_total_spin_field_array,
+         write_q.enqueueFillBuffer(vcl::total_spin_field_array.z(),
                                    &zero,
                                    sizeof(vcl_real_t),
                                    buffer_size);
@@ -58,12 +58,12 @@ namespace vopencl
          vcl::kernel_call(update_nexch_spin_fields, write_q, global, local,
                           vcl::atoms::type_array,
                           vcl::mp::materials,
-                          vcl::atoms::x_spin_array,
-                          vcl::atoms::y_spin_array,
-                          vcl::atoms::z_spin_array,
-                          vcl::x_total_spin_field_array,
-                          vcl::y_total_spin_field_array,
-                          vcl::z_total_spin_field_array);
+                          vcl::atoms::spin_array.x(),
+                          vcl::atoms::spin_array.y(),
+                          vcl::atoms::spin_array.z(),
+                          vcl::total_spin_field_array.x(),
+                          vcl::total_spin_field_array.y(),
+                          vcl::total_spin_field_array.z());
       }
    }
 }

@@ -12,13 +12,15 @@
 // C++ standard library headers
 
 // Vampire headers
-#include "opencl_include.hpp"
 #include "vopencl.hpp"
 
 // vopencl module headers
 #include "internal.hpp"
+#include "opencl_include.hpp"
+#include "typedefs.hpp"
 
-namespace vopencl{
+namespace vopencl
+{
 
    //------------------------------------------------------------------------------
    // Externally visible variables
@@ -40,13 +42,9 @@ namespace vopencl{
 
       namespace atoms
       {
-         extern cl::Buffer x_spin_array;
-         extern cl::Buffer y_spin_array;
-         extern cl::Buffer z_spin_array;
+         extern Buffer3D spin_array;
 
-         extern cl::Buffer x_coord_array;
-         extern cl::Buffer y_coord_array;
-         extern cl::Buffer z_coord_array;
+         extern Buffer3D coord_array;
 
          extern cl::Buffer type_array;
 
@@ -60,17 +58,11 @@ namespace vopencl{
 
       namespace cells
       {
-         extern cl::Buffer x_coord_array;
-         extern cl::Buffer y_coord_array;
-         extern cl::Buffer z_coord_array;
+         extern Buffer3D coord_array;
 
-         extern cl::Buffer x_mag_array;
-         extern cl::Buffer y_mag_array;
-         extern cl::Buffer z_mag_array;
+         extern Buffer3D mag_array;
 
-         extern cl::Buffer x_field_array;
-         extern cl::Buffer y_field_array;
-         extern cl::Buffer z_field_array;
+         extern Buffer3D field_array;
 
          extern cl::Buffer volume_array;
 
@@ -82,17 +74,11 @@ namespace vopencl{
          extern cl::Buffer materials;
       }
 
-      extern cl::Buffer x_total_spin_field_array;
-      extern cl::Buffer y_total_spin_field_array;
-      extern cl::Buffer z_total_spin_field_array;
+      extern Buffer3D total_spin_field_array;
 
-      extern cl::Buffer x_total_external_field_array;
-      extern cl::Buffer y_total_external_field_array;
-      extern cl::Buffer z_total_external_field_array;
+      extern Buffer3D total_external_field_array;
 
-      extern cl::Buffer x_dipolar_field_array;
-      extern cl::Buffer y_dipolar_field_array;
-      extern cl::Buffer z_dipolar_field_array;
+      extern Buffer3D dipolar_field_array;
 
       namespace stats
       {

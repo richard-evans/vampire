@@ -26,6 +26,18 @@ namespace vopencl
 
          Buffer3D(void) : buf(3) {}
 
+         // initialize without writing, but with size
+         // e.g. for use when generating buffers on device
+         Buffer3D(cl::Context &c,
+                  cl_mem_flags fs,
+                  size_t size)
+            : buf(3)
+         {
+            buf[0] = cl::Buffer(c, fs, size);
+            buf[1] = cl::Buffer(c, fs, size);
+            buf[2] = cl::Buffer(c, fs, size);
+         }
+            
          // initialize with 3 vectors to write data to device
          template <typename T>
          Buffer3D(cl::Context &c,
@@ -45,16 +57,26 @@ namespace vopencl
             q.enqueueWriteBuffer(buf[2], CL_FALSE, 0, sizeof(T)*zs.size(), &zs[0]);
          }
 
-         // reads data from device, assumes vectors already have enough capacity
+         // reads data from device, assumes host vectors already have enough capacity
          template <typename T>
-         void read(cl::CommandQueue &q,
-                   std::vector<T> &xs,
-                   std::vector<T> &ys,
-                   std::vector<T> &zs)
+         void copy_to_host(cl::CommandQueue &q,
+                               std::vector<T> &xs,
+                               std::vector<T> &ys,
+                               std::vector<T> &zs)
          {
             q.enqueueReadBuffer(buf[0], CL_FALSE, 0, sizeof(T)*xs.size(), &xs[0]);
             q.enqueueReadBuffer(buf[1], CL_FALSE, 0, sizeof(T)*ys.size(), &ys[0]);
             q.enqueueReadBuffer(buf[2], CL_FALSE, 0, sizeof(T)*zs.size(), &zs[0]);
+         }
+
+         // copies buffers to dst buffers on device
+         void copy_to_dev(cl::CommandQueue &q,
+                          Buffer3D &dst,
+                          size_t amount_to_copy)
+         {
+            q.enqueueCopyBuffer(buf[0], dst.x(), 0, 0, amount_to_copy);
+            q.enqueueCopyBuffer(buf[1], dst.y(), 0, 0, amount_to_copy);
+            q.enqueueCopyBuffer(buf[2], dst.z(), 0, 0, amount_to_copy);
          }
 
          // access each buffer, e.g. for passing to kernel

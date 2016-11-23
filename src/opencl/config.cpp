@@ -16,12 +16,12 @@ namespace vopencl
    {
       void synchronise(void)
       {
-         size_t buff_size = ::atoms::num_atoms * sizeof(vcl::vcl_real_t);
          cl::CommandQueue sync_q(vcl::context, vcl::default_device);
 
-         sync_q.enqueueReadBuffer(vcl::atoms::x_spin_array, CL_FALSE, 0, buff_size, &::atoms::x_spin_array[0]);
-         sync_q.enqueueReadBuffer(vcl::atoms::y_spin_array, CL_FALSE, 0, buff_size, &::atoms::y_spin_array[0]);
-         sync_q.enqueueReadBuffer(vcl::atoms::z_spin_array, CL_FALSE, 0, buff_size, &::atoms::z_spin_array[0]);
+         vcl::atoms::spin_array.copy_to_host(sync_q,
+                                             ::atoms::x_spin_array,
+                                             ::atoms::y_spin_array,
+                                             ::atoms::z_spin_array);
 
          sync_q.finish();
       }
