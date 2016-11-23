@@ -47,6 +47,7 @@ namespace vcuda{
       void __finalize ()
       {
 
+         std::cout << "CUDA time taken \t" << cuda_timer.seconds_elapsed() << std::endl;
          // De-allocate the exchange fields
          cu::exchange::finalise_exchange();
 

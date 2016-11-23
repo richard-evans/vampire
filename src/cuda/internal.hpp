@@ -28,11 +28,15 @@
 #include "../../hdr/material.hpp"
 #include "../../hdr/sim.hpp"
 
+#include "cuda_timer.h"
+
 namespace vcuda{
 
 #ifdef CUDA
 
    namespace internal{
+
+      extern timer cuda_timer;
 
       /*
        * Thread launch parameters

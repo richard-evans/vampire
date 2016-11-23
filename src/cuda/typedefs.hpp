@@ -24,6 +24,7 @@
 #include <cusp/copy.h>
 #include <cusp/csr_matrix.h>
 #include <cusp/dia_matrix.h>
+#include <cusp/ell_matrix.h>
 #include <cusp/multiply.h>
 
 // Vampire headers
@@ -45,6 +46,7 @@ namespace internal{
    typedef cusp::array1d<cu_real_t, cusp::device_memory> cu_real_array_t;
    typedef cusp::array1d<int, cusp::device_memory> cu_index_array_t;
    typedef cusp::dia_matrix<int, cu_real_t, cusp::device_memory> cu_exch_mat_t;
+   //typedef cusp::ell_matrix<int, cu_real_t, cusp::device_memory> cu_exch_mat_t;
 
    // struct for material parameters
    struct material_parameters_t {

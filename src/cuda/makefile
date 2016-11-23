@@ -26,7 +26,7 @@ CUDA_OBJECTS= \
 # The device linked object for CUDA
 CUDA_DLINK= obj/cuda/vampire_cuda.o
 
-CUDA_CFLAGS= -O3 --profile -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA -rdc=true -arch=sm_20
+CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA -rdc=true -arch=sm_20
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
 	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS)
@@ -48,3 +48,7 @@ gcc-cuda: $(OBJECTS) $(CUDA_OBJECTS)
 # CUDA debug target
 gcc-cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG
 gcc-cuda-debug: gcc-cuda
+
+# CUDA debug target
+gcc-cuda-profile: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG --profile
+gcc-cuda-profile: gcc-cuda

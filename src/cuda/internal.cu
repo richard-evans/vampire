@@ -17,9 +17,9 @@ namespace vcuda
    namespace internal
    {
 
-      int block_size(256UL);
-      int grid_size(32UL);
-
+      int block_size = 128;
+      int grid_size = 32;
+      timer cuda_timer;
    }
 
 #endif
