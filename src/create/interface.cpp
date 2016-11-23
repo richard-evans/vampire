@@ -31,6 +31,19 @@ namespace create{
       //----------------------------------
       // Now test for all valid options
       //----------------------------------
+      std::string test="conical-particle";
+      if(word==test){
+         cs::system_creation_flags[1]=8;
+         return true;
+		}
+      //// check for truncation factor
+      //test="cone-height-factor";
+      //if(word == test){
+      //   double chf=atof(value.c_str());
+      //   vin::check_for_valid_value(chf, word, line, prefix, unit, "none", 1.0, 2.0,"input","1.0 - 2.0");
+      //   create::internal::cone_height_factor=chf;
+      //   return true;
+		//}
 
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){

@@ -759,6 +759,7 @@ int match(string const key, string const word, string const value, string const 
    else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
 	//===================================================================
