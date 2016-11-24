@@ -36,24 +36,27 @@ namespace create{
          //
          // (c) Andrea Meo and Richard F L Evans 2016. All rights reserved.
          //
-         // (x-h)^2 + (y-k)^2
-         // ------------------ = (z-l-aL)^2
-         //      (r/h)^2
+         // (x-h)^2  +  (y-k)^2    (2*L-z-l)^2
+         // --------  --------- = -----------  (z-l-aL)^2
+         //  (r)^2      (r)^2       (2*L)^2
          //
          // Evaluation of the above for particle coordinates h,k,l
          // and atomic positions x,y,z will include all atoms within
          // cone with vertex L, radius r
          //
          //----------------------------------------------------------------------
+         double PI=3.14159265358979323846264338327;
 
 			//-----------------------------------------
 			// Set particle radius
 			//-----------------------------------------
 			double particle_radius_squared = (cs::particle_scale*0.5)*(cs::particle_scale*0.5);
-
+         double alpha  = 90.0 - create::internal::cone_angle;
+         double L_cone = (cs::particle_scale*0.5)*tan(alpha*PI/180.);
          // Use shape modifiers to generate ellipsoid
          const double inv_r_sq = 1.0/(particle_radius_squared);
-         const double inv_c_sq = 1.0/(cs::system_dimensions[2]*cs::system_dimensions[2]*4.0);
+         //const double inv_c_sq = 1.0/(cs::system_dimensions[2]*cs::system_dimensions[2]*2.0*2.0);
+         const double inv_c_sq = 1.0/(L_cone*L_cone);
 
 			//-----------------------------------------------
 			// Loop over all atoms and mark atoms in sphere
@@ -85,9 +88,10 @@ namespace create{
 						const double my_radius_sq = my_radius*my_radius;
 						double maxz=mp::material[mat].max*cs::system_dimensions[2];
 						double minz=mp::material[mat].min*cs::system_dimensions[2];
-						//double max_range = my_radius*my_radius*particle_radius_squared; //*create::internal::cone_height_factor*maxz;
+						//double max_range = my_radius*my_radius*particle_radius_squared;
 						// check for within core shell range
-						if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (2.0*cs::system_dimensions[2]-cz)*(2.0*cs::system_dimensions[2]-cz)*inv_c_sq*my_radius_sq){
+				      //if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (2.0*cs::system_dimensions[2]-(cz))*(2.0*cs::system_dimensions[2]-(cz))*inv_c_sq*my_radius_sq){
+				      if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (L_cone-(cz))*(L_cone-(cz))*inv_c_sq*my_radius_sq){
 							if((cz>=minz) && (cz<maxz)){
 							   catom_array[atom].include=true;
 							   catom_array[atom].material=mat;
@@ -100,7 +104,8 @@ namespace create{
 						}
 					}
 				}
-				else if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (2.0*cs::system_dimensions[2]-cz)*(2.0*cs::system_dimensions[2]-cz)*inv_c_sq){
+				//else if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (2.0*cs::system_dimensions[2]-(cz))*(2.0*cs::system_dimensions[2]-(cz))*inv_c_sq){
+				else if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (L_cone-(cz))*(L_cone-(cz))*inv_c_sq){
 					catom_array[atom].include=true;
 					catom_array[atom].grain=grain;
 				}

@@ -84,7 +84,7 @@ namespace create{
       //-----------------------------------------------------------------------------
       extern std::vector<create::internal::mp_t> mp; // array of material properties
       extern MTRand grnd; // general random number generator for create functions
-      extern double cone_height_factor; // factor to truncate cone
+      extern double cone_angle; // angle of cone to truncate cylinder
 
       //-----------------------------------------------------------------------------
       // Internal functions for create module
