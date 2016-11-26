@@ -50,7 +50,7 @@
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "create.hpp"
-#include "demag.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
@@ -59,6 +59,7 @@
 #include "errors.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "stats.hpp"
 #include "units.hpp"
 #include "vio.hpp"
@@ -763,7 +764,9 @@ int match(string const key, string const word, string const value, string const 
    if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-
+   else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 	//===================================================================
 	// Test for create variables
 	//===================================================================
@@ -1383,15 +1386,6 @@ int match_dimension(string const word, string const value, string const unit, in
       cs::particle_array_offset_y=paoy;
       return EXIT_SUCCESS;
    }
-   else
-   //--------------------------------------------------------------------
-   test="macro-cell-size";
-   if(word==test){
-      double cs=atof(value.c_str());
-      check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
-      cells::size=cs;
-      return EXIT_SUCCESS;
-   }
    //--------------------------------------------------------------------
    else{
 	  terminaltextcolor(RED);
@@ -1560,32 +1554,11 @@ int match_sim(string const word, string const value, string const unit, int cons
       }
    }
    //-------------------------------------------------------------------
-   test="enable-dipole-fields";
-   if(word==test){
-      sim::hamiltonian_simulation_flags[4]=1;
-      return EXIT_SUCCESS;
-   }
-   //-------------------------------------------------------------------
    test="enable-fmr-field";
    if(word==test){
       sim::hamiltonian_simulation_flags[5]=1;
       return EXIT_SUCCESS;
    }
-   //-------------------------------------------------------------------
-   test="enable-fast-dipole-fields";
-   if(word==test){
-      demag::fast=true;
-      return EXIT_SUCCESS;
-   }
-   //-------------------------------------------------------------------
-   test="dipole-field-update-rate";
-   if(word==test){
-      int dpur=int(atof(value.c_str()));
-      check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-      demag::update_rate=dpur;
-      return EXIT_SUCCESS;
-   }
-   //-------------------------------------------------------------------
    test="enable-surface-anisotropy";
    if(word==test){
       sim::surface_anisotropy=true;
@@ -2207,6 +2180,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 
    return EXIT_SUCCESS;
 }
+
 int match_config(string const word, string const value, string const unit, int const line){
 
    std::string prefix="config:";
@@ -2844,7 +2818,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		line.erase(remove(line.begin(), line.end(), '\"'), line.end());
 
 		// remove carriage returns for dos formatted files
-                line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+      line.erase(remove(line.begin(), line.end(), '\r'), line.end());
 
 		// strip key,word,unit,value
 		std::string key="";
@@ -2994,9 +2968,16 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
+
 		  int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
+
+        // if no match then return error
 			if(matchcheck==EXIT_FAILURE){
-				err::vexit();
+            terminaltextcolor(RED);
+            std::cerr << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
+            zlog << zTs() << "Error - Unknown control statement \'material[" << super_index << "]:" << word << "\' on line " << line_counter << " of material file" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
 			}
 		}
 	}
@@ -3071,7 +3052,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
       test="atomic-spin-moment";
       if(word==test){
          double mu_s=atof(value.c_str());
-         check_for_valid_value(mu_s, word, line, prefix, unit, "moment", 0.1*9.24e-24, 1e8*9.24e-24,"material","0.1 - 1e8 mu_B");
+         check_for_valid_value(mu_s, word, line, prefix, unit, "moment", 0.01*9.24e-24, 1e8*9.24e-24,"material","0.01 - 1e8 mu_B");
          read_material[super_index].moment_flag=true;
          read_material[super_index].mu_s_SI=mu_s;
          return EXIT_SUCCESS;
@@ -3864,31 +3845,73 @@ int read_mat_file(std::string const matfile, int const LineNumber){
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
+
+      //--------------------------------------------------------------------
+      //test="non-magnetic";
+      ///*
+      //  logical non-magnetic [false]
+      //     This flag causes the material to be identified as non magnetic,
+      //     with all atoms of this type REMOVED from the simulation.
+	   //The atomic positions of non-magnetic atoms are saved separately
+	   //with the usual atomic spin configuration for post processing.
+	   //The default value is false for all materials. Valid values are
+	   //true, false or (blank) [same as true].
+      //*/
+      //if(word==test){
+      //   // Test for sane input
+      //   bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
+      //   // set flag
+      //   read_material[super_index].non_magnetic = sanitised_bool;
+      //   return EXIT_SUCCESS;
+      //}
       //--------------------------------------------------------------------
       test="non-magnetic";
       /*
-        logical non-magnetic [false]
-           This flag causes the material to be identified as non magnetic,
-           with all atoms removed of this type removed from the simulation.
+        integer non-magnetic [0]
+	   The default value is 0 for all materials. Valid values are
+	   remove, (blank) [same as remove] and keep.
+           Value = keep causes the material to be identified as non magnetic
+           with all atoms of this type KEPT in the simulation.
+           Value = remove/blank causes the material to be identified as non magnetic
+           with all atoms of this type REMOVED from the simulation.
 	   The atomic positions of non-magnetic atoms are saved separately
 	   with the usual atomic spin configuration for post processing.
-	   The default value is false for all materials. Valid values are
-	   true, false or (blank) [same as true].
       */
       if(word==test){
-         // Test for sane input
-         bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
-         // set flag
-         read_material[super_index].non_magnetic = sanitised_bool;
-         return EXIT_SUCCESS;
+         std::string test2="keep";
+         std::string test1="remove";
+         std::string test0="";
+         if(value==test2){
+            // set flag
+            read_material[super_index].non_magnetic = 2;
+            return EXIT_SUCCESS;
+         }
+         else if(value==test1){
+            // set flag
+            read_material[super_index].non_magnetic = 1;
+            return EXIT_SUCCESS;
+         }
+         else if(value==test0){
+            // set flag
+            read_material[super_index].non_magnetic = 1;
+            return EXIT_SUCCESS;
+         }
+         else{
+				terminaltextcolor(RED);
+				std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " = " << value <<" is not a valid option: blank, remove, keep." << std::endl;
+				terminaltextcolor(WHITE);
+				err::vexit();
+         }
       }
+      //--------------------------------------------------------------------
 
       //-------------------------------------------------------------------
    	// Call module input parameters
       //-------------------------------------------------------------------
       else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
       else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
-
+      else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+      else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------

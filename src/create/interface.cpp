@@ -71,6 +71,20 @@ namespace create{
          cs::system_creation_flags[1]=7;
          return true;
       }
+      std::string test="cone";
+      if(word==test){
+         cs::system_creation_flags[1]=8;
+         return true;
+		}
+      // check for truncation factor
+      test="cone-angle";
+      if(word == test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.1,44.9 ,"input","0.1 - 44.9");
+         create::internal::cone_angle=angle;
+         return true;
+		}
+
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);

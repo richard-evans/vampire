@@ -52,11 +52,12 @@
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
-#include "demag.hpp"
+#include "dipole.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
@@ -284,17 +285,41 @@ int create(){
 	} // stop if for staged generation here
 	#endif
 
-	// Set grain and cell variables for simulation
-	grains::set_properties();
-	cells::initialise();
-	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
-
    // Determine number of local atoms
    #ifdef MPICF
       int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    #else
       int num_local_atoms = atoms::num_atoms;
    #endif
+
+	// Set grain and cell variables for simulation
+	grains::set_properties();
+   cells::initialize(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  cs::unit_cell.dimensions[0],
+                  cs::unit_cell.dimensions[1],
+                  cs::unit_cell.dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  atoms::cell_array,
+                  atoms::num_atoms
+      );
+
+   //----------------------------------------
+   // Initialise spin torque data
+   //----------------------------------------
+   st::initialise(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  num_local_atoms);
+
    //----------------------------------------
    // Initialise local temperature data
    //----------------------------------------
@@ -316,11 +341,13 @@ int create(){
 					   sim::Tmin,
 					   sim::Tmax);
 
+
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
 		//vmpi::crystal_xyz(catom_array);
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   //std::cout << "my_num_atoms == " << my_num_atoms << std::endl;
 	int total_num_atoms=0;
 	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
 	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
