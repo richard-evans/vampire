@@ -32,12 +32,13 @@
 //
 //====================================================================================================
 #include <vector>
+#include <cstdint>
 
 namespace demag{
 
 	extern bool fast;
 	extern uint64_t update_rate;
-	
+
 	extern void init();
 	extern void update();
 

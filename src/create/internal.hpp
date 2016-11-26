@@ -85,10 +85,17 @@ namespace create{
       extern std::vector<create::internal::mp_t> mp; // array of material properties
       extern MTRand grnd; // general random number generator for create functions
 
+      extern double faceted_particle_100_radius; // 100 facet radius
+      extern double faceted_particle_110_radius; // 110 facet radius
+      extern double faceted_particle_111_radius; // 111 facet radius
+      extern double cone_angle; // angle of cone to truncate cylinder
+
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
       extern void alloy(std::vector<cs::catom_t> & catom_array);
+      extern void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void cone(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
 
    } // end of internal namespace
 } // end of create namespace

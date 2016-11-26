@@ -1,15 +1,13 @@
 #--------------------------------------------------------------
-#                 Makefile for create module
+#          Makefile for cells module
 #--------------------------------------------------------------
 
 # List module object filenames
-create_objects=\
-alloy.o \
+cells_objects =\
 data.o \
-faceted.o \
 initialize.o \
-cone.o \
-interface.o
+interface.o \
+mag.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/create/,$(create_objects))
+OBJECTS+=$(addprefix obj/cells/,$(cells_objects))

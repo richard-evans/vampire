@@ -31,6 +31,59 @@ namespace create{
       //----------------------------------
       // Now test for all valid options
       //----------------------------------
+      std::string test="faceted-particle";
+      if(word==test){
+         // check for blank value
+         test="";
+         if(value == test){
+            cs::system_creation_flags[1]=7;
+            return true;
+         }
+         // otherwise require 3 numbers for 100,110 and 111 facet radii
+         std::vector<double> u(3);
+         u=vin::DoublesFromString(value);
+         vin::check_for_valid_vector(u, word, line, prefix, "input");
+         // check for sensible values
+         if(u.at(0) < 1.0 || u.at(0) > 1000.0){
+      	   terminaltextcolor(RED);
+            std::cerr << "Error: 100 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: 100 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
+            err::vexit();
+         }
+         if(u.at(1) < 1.0 || u.at(1) > 1000.0){
+      	   terminaltextcolor(RED);
+            std::cerr << "Error: 110 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: 110 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
+            err::vexit();
+         }
+         if(u.at(2) < 1.0 || u.at(2) > 1000.0){
+      	   terminaltextcolor(RED);
+            std::cerr << "Error: 111 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: 111 particle facet radius for input variable " << prefix << word << " on line " << line << " of input file must be between 1 and 1000." << std::endl;
+            err::vexit();
+         }
+         create::internal::faceted_particle_100_radius = u.at(0);
+         create::internal::faceted_particle_110_radius = u.at(1);
+         create::internal::faceted_particle_111_radius = u.at(2);
+         cs::system_creation_flags[1]=7;
+         return true;
+      }
+      test="cone";
+      if(word==test){
+         cs::system_creation_flags[1]=8;
+         return true;
+		}
+      // check for truncation factor
+      test="cone-angle";
+      if(word == test){
+         double angle=atof(value.c_str());
+         vin::check_for_valid_value(angle, word, line, prefix, unit, "none", 0.1,44.9 ,"input","0.1 - 44.9");
+         create::internal::cone_angle=angle;
+         return true;
+		}
 
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){

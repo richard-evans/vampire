@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ namespace atoms{
 	//--------------------------
 	// Array Variables
 	//--------------------------
-	
+
 	std::vector <double> x_coord_array(0);
 	std::vector <double> y_coord_array(0);
 	std::vector <double> z_coord_array(0);
@@ -64,14 +64,14 @@ namespace atoms{
 	std::vector <double> x_total_external_field_array(0);	/// Total external fields
 	std::vector <double> y_total_external_field_array(0);	/// Total external fields
 	std::vector <double> z_total_external_field_array(0);	/// Total external fields
-	std::vector <double> x_dipolar_field_array(0);			/// Dipolar fields
-	std::vector <double> y_dipolar_field_array(0);			/// Dipolar fields
-	std::vector <double> z_dipolar_field_array(0);			/// Dipolar fields
-	
+//	std::vector <double> x_dipolar_field_array(0);			/// Dipolar fields
+//	std::vector <double> y_dipolar_field_array(0);			/// Dipolar fields
+//	std::vector <double> z_dipolar_field_array(0);			/// Dipolar fields
+
 	std::vector <zval_t> i_exchange_list(0);
 	std::vector <zvec_t> v_exchange_list(0);
 	std::vector <zten_t> t_exchange_list(0);
-	
+
 	// surface anisotropy
 	std::vector<bool> surface_array(0);
 	std::vector<int> nearest_neighbour_list(0);

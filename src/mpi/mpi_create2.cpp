@@ -314,7 +314,15 @@ void atom_needed_by_remote_cpu(int atom, // atom number
    const double max_x = minimax[3];
    const double max_y = minimax[4];
    const double max_z = minimax[5];
-
+/*
+   std::cout << "cpu = " << cpu_rank << "\t";
+	std::cout << "min_x = "  << min_x << "\t";
+	std::cout << "min_y = "  << min_y << "\t";
+	std::cout << "min_z = "  << min_z << "\t";
+	std::cout << "max_x = "  << max_x << "\t";
+	std::cout << "max_y = "  << max_y << "\t";
+	std::cout << "max_z = "  << max_z << std::endl;
+*/
    // temporary virtual particle
    virtual_particle_t temp_vp;
 

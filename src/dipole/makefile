@@ -1,15 +1,15 @@
 #--------------------------------------------------------------
-#                 Makefile for create module
+#          Makefile for dipole module
 #--------------------------------------------------------------
 
 # List module object filenames
-create_objects=\
-alloy.o \
+dipole_objects =\
+mpi.o \
 data.o \
-faceted.o \
 initialize.o \
-cone.o \
-interface.o
+interface.o \
+update.o \
+field.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/create/,$(create_objects))
+OBJECTS+=$(addprefix obj/dipole/,$(dipole_objects))

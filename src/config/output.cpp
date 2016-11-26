@@ -440,14 +440,14 @@ namespace vout{
     #ifdef MPICF
     // Reduce demagnetisation fields to processor 0
     if(vmpi::my_rank==0){
-        MPI_Reduce(MPI_IN_PLACE, &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-        MPI_Reduce(MPI_IN_PLACE, &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-        MPI_Reduce(MPI_IN_PLACE, &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &cells::field_array_x[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &cells::field_array_y[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &cells::field_array_z[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
     }
     else{
-        MPI_Reduce(&cells::x_field_array[0], &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&cells::y_field_array[0], &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&cells::z_field_array[0], &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&cells::field_array_x[0], &cells::field_array_x[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&cells::field_array_y[0], &cells::field_array_y[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&cells::field_array_z[0], &cells::field_array_z[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
     }
     #endif
 
@@ -480,8 +480,8 @@ namespace vout{
 
         // Root process now outputs the cell magnetisations
         for(int cell=0; cell < cells::num_cells; cell++){
-            cfg_file_ofstr << cells::x_mag_array[cell] << "\t" << cells::y_mag_array[cell] << "\t" << cells::z_mag_array[cell]<< "\t";
-            cfg_file_ofstr << cells::x_field_array[cell] << "\t" << cells::y_field_array[cell] << "\t" << cells::z_field_array[cell] << std::endl;
+            cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell]<< "\t";
+            cfg_file_ofstr << cells::field_array_x[cell] << "\t" << cells::field_array_y[cell] << "\t" << cells::field_array_z[cell] << std::endl;
         }
 
         cfg_file_ofstr.close();
@@ -570,7 +570,7 @@ namespace vout{
         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 
         for(int cell=0; cell<cells::num_cells; cell++){
-            cfg_file_ofstr << cells::x_coord_array[cell] << "\t" << cells::y_coord_array[cell] << "\t" << cells::z_coord_array[cell] << std::endl;
+            cfg_file_ofstr << cells::cell_coords_array_x[cell] << "\t" << cells::cell_coords_array_y[cell] << "\t" << cells::cell_coords_array_z[cell] << std::endl;
         }
 
         cfg_file_ofstr.close();

@@ -17,6 +17,7 @@
 // Headers
 #include "vio.hpp"
 #include "sim.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "material.hpp"
 #include "grains.hpp"
@@ -28,6 +29,7 @@
 #include "voronoi.hpp"
 #include "ltmp.hpp"
 #include "random.hpp"
+#include "spintorque.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -63,7 +65,12 @@ namespace vin{
         // Call module input parameters
         //-------------------------------------------------------------------
         if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -683,15 +690,6 @@ namespace vin{
             cs::particle_array_offset_y=paoy;
             return EXIT_SUCCESS;
         }
-        else
-        //--------------------------------------------------------------------
-        test="macro-cell-size";
-        if(word==test){
-            double cs=atof(value.c_str());
-            check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
-            cells::size=cs;
-            return EXIT_SUCCESS;
-        }
         //--------------------------------------------------------------------
         else{
         terminaltextcolor(RED);
@@ -864,20 +862,6 @@ namespace vin{
         test="enable-fmr-field";
         if(word==test){
             sim::hamiltonian_simulation_flags[5]=1;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="enable-fast-dipole-fields";
-        if(word==test){
-            demag::fast=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="dipole-field-update-rate";
-        if(word==test){
-            int dpur=atoi(value.c_str());
-            check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-            demag::update_rate=dpur;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
@@ -3171,8 +3155,10 @@ namespace vin{
             //-------------------------------------------------------------------
             // Call module input parameters
             //-------------------------------------------------------------------
-            else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+            else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
             // keyword not found
