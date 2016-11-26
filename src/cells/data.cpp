@@ -31,11 +31,13 @@ namespace cells{
    int num_atoms_in_unit_cell=0;
    int num_cells; /// number of macro-cells
    int num_local_cells=0; /// number of macro-cells
-   double macro_cell_size = 10.0; /// lateral size of local macro-cells (A)
+   double macro_cell_size = 10.0; /// macro-cells size (A)
 
    std::vector <int> local_cell_array;
    std::vector<int> num_atoms_in_cell; /// number of atoms in each cell
-   std::vector < std::vector <int> > index_atoms_array;
+   std::vector<int> num_atoms_in_cell_global; /// global number of atoms in each cell
+   std::vector < std::vector <int> > index_atoms_array; /// array to store list of atoms associated with cells in 2D structure
+   std::vector<int> index_atoms_array1D; /// array to store list of atoms associated with cells in 1D structure
 
    std::vector<double> volume_array;
    std::vector<double> cell_coords_array_x; /// arrays to store cells positions
@@ -44,13 +46,16 @@ namespace cells{
    std::vector < std::vector <double> > atom_in_cell_coords_array_x;
    std::vector < std::vector <double> > atom_in_cell_coords_array_y;
    std::vector < std::vector <double> > atom_in_cell_coords_array_z;
-   std::vector<int> atom_cell_array;
+   std::vector<int> cell_id_array;        /// array to store index of local cells
+   std::vector<int> atom_cell_id_array;   /// array to store index of cells associated with each atom
    std::vector<double> mag_array_x; /// arrays to store cells magnetisation
    std::vector<double> mag_array_y;
    std::vector<double> mag_array_z;
    std::vector<double> field_array_x; /// arrays to store cells field
    std::vector<double> field_array_y;
    std::vector<double> field_array_z;
+
+   std::vector<double> pos_and_mom_array; /// arrays to store cells positions
 
    //---------------------------------------------------------------------------
    // Function to calculate magnetisation in cells

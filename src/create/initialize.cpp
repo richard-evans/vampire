@@ -19,7 +19,7 @@ namespace create{
    //-------------------------------------------------------------------------------
    // Function to initialize create module
    //-------------------------------------------------------------------------------
-   void initialize(int num_materials){
+   void initialize(){
 
       return;
    }

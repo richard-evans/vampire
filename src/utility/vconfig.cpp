@@ -235,12 +235,6 @@ void config(){
       // check calling of routine if error checking is activated
       if(err::check==true){std::cout << "vout::atoms has been called" << std::endl;}
 
-      #ifdef MPICF
-         const int num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-      #else
-         const int num_atoms = atoms::num_atoms;
-      #endif
-
       // Set local output filename
       std::stringstream file_sstr;
       file_sstr << "atoms-";
@@ -294,7 +288,7 @@ void config(){
 
       // Everyone now outputs their atom list
       cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
-      for(int i=0; i<vout::local_output_atom_list.size(); i++){
+      for(unsigned int i=0; i<vout::local_output_atom_list.size(); i++){
          const int atom = vout::local_output_atom_list[i];
          cfg_file_ofstr << atoms::x_spin_array[atom] << "\t" << atoms::y_spin_array[atom] << "\t" << atoms::z_spin_array[atom] << std::endl;
       }
@@ -431,7 +425,7 @@ void config(){
 
       // Everyone now outputs their atom list
       cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
-      for(int i=0; i<vout::local_output_atom_list.size(); i++){
+      for(unsigned int i=0; i<vout::local_output_atom_list.size(); i++){
          const int atom = vout::local_output_atom_list[i];
          cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" <<
          atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
@@ -492,17 +486,12 @@ void cells(){
    const char* cfg_filec = cfg_file.c_str();
 
    #ifdef MPICF
-   // Reduce demagnetisation fields to processor 0
-   if(vmpi::my_rank==0){
-      MPI_Reduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-      MPI_Reduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-   }
-   else{
-      MPI_Reduce(&dipole::cells_field_array_x[0], &dipole::cells_field_array_x[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-      MPI_Reduce(&dipole::cells_field_array_y[0], &dipole::cells_field_array_y[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-      MPI_Reduce(&dipole::cells_field_array_z[0], &dipole::cells_field_array_z[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-   }
+      // if flag to print cells field is active, all cpus send cells field to root proc
+      dipole::send_cells_field(cells::cell_id_array,
+                             dipole::cells_field_array_x,
+                             dipole::cells_field_array_y,
+                             dipole::cells_field_array_z,
+                             cells::num_local_cells);
    #endif
 
    // Output masterfile header on root process
@@ -523,7 +512,7 @@ void cells(){
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
       cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-      cfg_file_ofstr << "# Number of spins: "<< cells::num_local_cells << std::endl;
+      cfg_file_ofstr << "# Number of spins: "<< cells::num_cells << std::endl;
       cfg_file_ofstr << "# System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
       cfg_file_ofstr << "# Coordinates-file: cells-coord.cfg"<< std::endl;
       cfg_file_ofstr << "# Time: " << double(sim::time)*mp::dt_SI << std::endl;
@@ -616,7 +605,7 @@ void cells_coords(){
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
       cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
       cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-      cfg_file_ofstr << "# Number of cells: "<< cells::num_local_cells << std::endl;
+      cfg_file_ofstr << "# Number of cells: "<< cells::num_cells << std::endl;
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
       cfg_file_ofstr << "#" << std::endl;
       cfg_file_ofstr << "#" << std::endl;
@@ -627,7 +616,7 @@ void cells_coords(){
 
       for(int cell=0; cell<cells::num_cells; cell++){
          if(cells::num_atoms_in_cell[cell]>0){
-            cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::cell_coords_array_x[cell] << "\t" << cells::cell_coords_array_y[cell] << "\t" << cells::cell_coords_array_z[cell] << std::endl;
+            cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::pos_and_mom_array[4*cell+0] << "\t" << cells::pos_and_mom_array[4*cell+1] << "\t" << cells::pos_and_mom_array[4*cell+2] <<  std::endl;
          }
       }
 

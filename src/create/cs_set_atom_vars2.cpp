@@ -342,14 +342,11 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
       // set all interactions for atom as non-nearest neighbour by default
       nearest_neighbour_interactions_list[atom].resize(cneighbourlist[atom].size(),false);
 
-      // counter for number of nearest neighbour interactions
-      int num_nn=0;
-
       // loop over all interactions for atom
       for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
 
          // get interaction type (same as unit cell interaction id)
-         int id = cneighbourlist[atom][nn].i;
+         unsigned int id = cneighbourlist[atom][nn].i;
 
          // Ensure valid interaction id
          if(id>nn_interaction.size()){
@@ -368,8 +365,8 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
    //----------------------------------------------------------------------------------------
 
    // Track total number of surface atoms and total nearest neighbour interactions
-   int num_surface_atoms=0;
-   int total_num_surface_nn=0;
+   unsigned int num_surface_atoms=0;
+   unsigned int total_num_surface_nn=0;
 
    // Resize surface atoms mask and initialise to false
    atoms::surface_array.resize(atoms::num_atoms, false);
@@ -381,7 +378,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
       if(catom_array[atom].mpi_type!=2){
 
          // Initialise counter for number of nearest neighbour interactions
-         int nnn_int=0;
+         unsigned int nnn_int=0;
 
          // Loop over all interactions to determine number of nearest neighbour interactions
          for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){

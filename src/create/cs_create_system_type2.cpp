@@ -210,6 +210,12 @@ int particle(std::vector<cs::catom_t> & catom_array){
 		case 6: // Teardrop
 			tear_drop(particle_origin,catom_array,0);
 			break;
+      case 7: // Faceted particle
+   		create::internal::faceted(particle_origin,catom_array,0);
+   		break;
+		case 8: // Cone
+			create::internal::cone(particle_origin,catom_array,0);
+			break;
 		default:
 			std::cout << "Unknown particle type requested for single particle system" << std::endl;
 			err::vexit();
@@ -284,6 +290,12 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 					case 6: // Teardrop
 						tear_drop(particle_origin,catom_array,particle_number);
 						break;
+               case 7: // Faceted particle
+                  create::internal::faceted(particle_origin,catom_array,particle_number);
+                  break;
+		         case 8: // Cone
+			         create::internal::cone(particle_origin,catom_array,0);
+			         break;
 					default:
 						std::cout << "Unknown particle type requested for single particle system" << std::endl;
 						err::vexit();
@@ -504,7 +516,7 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
    const int num_atoms=catom_array.size();
    int num_included=0;
    for(int a=0;a<num_atoms;a++){
-      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == false){
+      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic != 1){
          num_included++;
       }
    }
@@ -520,12 +532,12 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
       // loop over all existing atoms
       for(int a=0;a<num_atoms;a++){
          // if atom is to be included and is non-magnetic copy to new array
-         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic == false ){
+         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic != 1 ){
             catom_array[atom]=tmp_catom_array[a];
             atom++;
          }
          // if atom is part of a non-magnetic material then save to nm array
-         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == true){
+         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == 1){
             cs::nm_atom_t tmp;
          	tmp.x = catom_array[a].x;
          	tmp.y = catom_array[a].y;
@@ -702,7 +714,7 @@ void roughness(std::vector<cs::catom_t> & catom_array){
 	// Initialise random number generator
 	rgrnd.seed(cs::interfacial_roughness_random_seed);
 
-	for(int p=0; p < seed_density ; p++){
+	for(unsigned int p=0; p < seed_density ; p++){
 		// Generate random point coordinates
 		double x=rgrnd()*cs::system_dimensions[0];
 		double y=rgrnd()*cs::system_dimensions[1];
@@ -740,7 +752,7 @@ void roughness(std::vector<cs::catom_t> & catom_array){
 			const double y = double(iy)*resolution;
 
 			// Loop over all seed points
-			for(int p=0; p < seed_density ; p++){
+			for(unsigned int p=0; p < seed_density ; p++){
 				double rx=x-seed_points.at(p).x;
 				double ry=y-seed_points.at(p).y;
 

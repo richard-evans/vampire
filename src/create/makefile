@@ -6,7 +6,9 @@
 create_objects=\
 alloy.o \
 data.o \
+faceted.o \
 initialize.o \
+cone.o \
 interface.o
 
 # Append module objects to global tree

@@ -6,14 +6,14 @@
 
 
 
-export OMPI_CXX=g++
+export OMPI_CXX=g++ -std=c++11
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -DCOMP='"GNU C++ Compiler"'
+GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
@@ -38,6 +38,9 @@ PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
 IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi
+
 # Performance Flags
 ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
 ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
@@ -59,9 +62,6 @@ NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
-
-#obj/data/cells.o \
-obj/simulate/demag.o \
 
 # Objects
 OBJECTS= \
@@ -98,6 +98,7 @@ obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/partial_hysteresis.o \
 obj/program/static_hysteresis.o \
+obj/program/setting.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
 obj/program/localised_temperature_pulse.o \
@@ -170,6 +171,7 @@ ICCDB_OBJECTS=$(OBJECTS:.o=_idb.o)
 GCCDB_OBJECTS=$(OBJECTS:.o=_gdb.o)
 PCCDB_OBJECTS=$(OBJECTS:.o=_pdb.o)
 IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb.o)
+LLVMDB_OBJECTS=$(OBJECTS:.o=_llvmdb.o)
 
 MPI_OBJECTS=$(OBJECTS:.o=_mpi.o)
 MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_mpi.o)
@@ -216,6 +218,12 @@ serial-debug: $(GCCDB_OBJECTS)
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
+
+serial-llvm-debug: $(LLVMDB_OBJECTS)
+	$(LLVM) $(LLVM_DBLFLAGS) $(LIBS) $(LLVMDB_OBJECTS) -o $(EXECUTABLE)
+
+$(LLVMDB_OBJECTS): obj/%_llvmdb.o: src/%.cpp
+	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $<
 
 intel-debug: $(ICCDB_OBJECTS)
 	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)
@@ -264,7 +272,7 @@ $(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
 
 parallel-debug: $(MPI_GCCDB_OBJECTS)
-	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE).p
+	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE).p-debug
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<

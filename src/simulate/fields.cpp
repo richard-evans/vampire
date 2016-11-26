@@ -172,9 +172,9 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 	switch(atoms::exchange_type){
 		case 0: // isotropic
 			for(int atom=start_index;atom<end_index;atom++){
-				register double Hx=0.0;
-				register double Hy=0.0;
-				register double Hz=0.0;
+				double Hx=0.0;
+				double Hy=0.0;
+				double Hz=0.0;
 				const int start=atoms::neighbour_list_start_index[atom];
 				const int end=atoms::neighbour_list_end_index[atom]+1;
 				for(int nn=start;nn<end;nn++){
@@ -191,9 +191,9 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 			break;
 		case 1: // vector
 			for(int atom=start_index;atom<end_index;atom++){
-				register double Hx=0.0;
-				register double Hy=0.0;
-				register double Hz=0.0;
+				double Hx=0.0;
+				double Hy=0.0;
+				double Hz=0.0;
 				const int start=atoms::neighbour_list_start_index[atom];
 				const int end=atoms::neighbour_list_end_index[atom]+1;
 				for(int nn=start;nn<end;nn++){
@@ -214,25 +214,25 @@ int calculate_exchange_fields(const int start_index,const int end_index){
 			break;
 		case 2: // tensor
 			for(int atom=start_index;atom<end_index;atom++){
-				register double Hx=0.0;
-				register double Hy=0.0;
-				register double Hz=0.0;
+				double Hx=0.0;
+				double Hy=0.0;
+				double Hz=0.0;
 				const int start=atoms::neighbour_list_start_index[atom];
 				const int end=atoms::neighbour_list_end_index[atom]+1;
 				for(int nn=start;nn<end;nn++){
 					const int natom = atoms::neighbour_list_array[nn];
 					const int iid = atoms::neighbour_interaction_type_array[nn]; // interaction id
-					const double Jij[3][3]={atoms::t_exchange_list[iid].Jij[0][0],
-													atoms::t_exchange_list[iid].Jij[0][1],
-													atoms::t_exchange_list[iid].Jij[0][2],
+					const double Jij[3][3]={{atoms::t_exchange_list[iid].Jij[0][0],
+													 atoms::t_exchange_list[iid].Jij[0][1],
+													 atoms::t_exchange_list[iid].Jij[0][2]},
 
-													atoms::t_exchange_list[iid].Jij[1][0],
-													atoms::t_exchange_list[iid].Jij[1][1],
-													atoms::t_exchange_list[iid].Jij[1][2],
+													{atoms::t_exchange_list[iid].Jij[1][0],
+													 atoms::t_exchange_list[iid].Jij[1][1],
+													 atoms::t_exchange_list[iid].Jij[1][2]},
 
-													atoms::t_exchange_list[iid].Jij[2][0],
-													atoms::t_exchange_list[iid].Jij[2][1],
-													atoms::t_exchange_list[iid].Jij[2][2]};
+													{atoms::t_exchange_list[iid].Jij[2][0],
+													 atoms::t_exchange_list[iid].Jij[2][1],
+													 atoms::t_exchange_list[iid].Jij[2][2]}};
 
 					const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
 
@@ -272,17 +272,17 @@ int calculate_anisotropy_fields(const int start_index,const int end_index){
 			for(int atom=start_index;atom<end_index;atom++){
 				const int imaterial=atoms::type_array[atom];
 
-				const double K[3][3]={2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
-												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
-												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][2],
+				const double K[3][3]={{2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
+											  2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
+											  2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[0][2]},
 
-												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
-												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
-												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][2],
+											 {2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
+											  2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
+											  2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[1][2]},
 
-												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
-												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
-												2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]};
+										    {2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
+											  2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
+											  2.0*mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]}};
 
 				const double S[3]={atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
 
@@ -609,7 +609,7 @@ int calculate_applied_fields(const int start_index,const int end_index){
 		Hlocal.reserve(3*mp::material.size());
 
 		// Loop over all materials
-		for(int mat=0;mat<mp::material.size();mat++){
+		for(unsigned int mat=0;mat<mp::material.size();mat++){
 			Hlocal.push_back(mp::material[mat].applied_field_strength*mp::material[mat].applied_field_unit_vector[0]);
 			Hlocal.push_back(mp::material[mat].applied_field_strength*mp::material[mat].applied_field_unit_vector[1]);
 			Hlocal.push_back(mp::material[mat].applied_field_strength*mp::material[mat].applied_field_unit_vector[2]);
@@ -672,7 +672,7 @@ int calculate_thermal_fields(const int start_index,const int end_index){
    sigma_prefactor.reserve(mp::material.size());
 
    // Calculate material temperature (with optional rescaling)
-   for(int mat=0;mat<mp::material.size();mat++){
+   for(unsigned int mat=0;mat<mp::material.size();mat++){
       double temperature = sim::temperature;
       // Check for localised temperature
       if(sim::local_temperature) temperature = mp::material[mat].temperature;
@@ -716,13 +716,13 @@ int calculate_dipolar_fields(const int start_index,const int end_index){
 
 	// Add dipolar fields
 	if(dipole::activated){
-      for(int atom=start_index;atom<end_index;atom++){
-   		atoms::x_total_external_field_array[atom] += dipole::atom_dipolar_field_array_x[atom];
-   		atoms::y_total_external_field_array[atom] += dipole::atom_dipolar_field_array_y[atom];
-   		atoms::z_total_external_field_array[atom] += dipole::atom_dipolar_field_array_z[atom];
-   		/*std::cout << atoms::x_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_x[atom] << "\t";
-   		std::cout << atoms::y_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_y[atom] << "\t";
-   		std::cout << atoms::z_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_z[atom] << std::endl;*/
+	   for(int atom=start_index;atom<end_index;atom++){
+		   atoms::x_total_external_field_array[atom] += dipole::atom_dipolar_field_array_x[atom];
+			atoms::y_total_external_field_array[atom] += dipole::atom_dipolar_field_array_y[atom];
+			atoms::z_total_external_field_array[atom] += dipole::atom_dipolar_field_array_z[atom];
+			/*std::cout << atoms::x_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_x[atom] << "\t";
+			std::cout << atoms::y_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_y[atom] << "\t";
+			std::cout << atoms::z_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_z[atom] << std::endl;*/
       }
 	}
 
@@ -825,7 +825,7 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 		H_fmr_local.reserve(3*mp::material.size());
 
 		// Loop over all materials
-		for(int mat=0;mat<mp::material.size();mat++){
+		for(unsigned int mat=0;mat<mp::material.size();mat++){
 			const double Hsinwt_local=mp::material[mat].fmr_field_strength*sin(2.0*M_PI*real_time*mp::material[mat].fmr_field_frequency);
 
 			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[0]);

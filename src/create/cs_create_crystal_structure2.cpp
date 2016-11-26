@@ -89,8 +89,8 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 	int atom=0;
 
    // find maximum height lh_category
-   int maxlh=0;
-   for(int uca=0;uca<unit_cell.atom.size();uca++) if(unit_cell.atom[uca].hc > maxlh) maxlh = unit_cell.atom[uca].hc;
+   unsigned int maxlh=0;
+   for(unsigned int uca=0;uca<unit_cell.atom.size();uca++) if(unit_cell.atom[uca].hc > maxlh) maxlh = unit_cell.atom[uca].hc;
    maxlh+=1;
 
    const double cff = 1.e-9; // Small numerical correction for atoms exactly on the borderline between processors
@@ -102,7 +102,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 
 				// need to change this to accept non-orthogonal lattices
 				// Loop over atoms in unit cell
-				for(int uca=0;uca<unit_cell.atom.size();uca++){
+				for(unsigned int uca=0;uca<unit_cell.atom.size();uca++){
 					double cx = (double(x)+unit_cell.atom[uca].x)*unit_cell.dimensions[0]+cff;
 					double cy = (double(y)+unit_cell.atom[uca].y)*unit_cell.dimensions[1]+cff;
 					double cz = (double(z)+unit_cell.atom[uca].z)*unit_cell.dimensions[2]+cff;
@@ -239,11 +239,11 @@ void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename)
    std::vector<int> asym_interaction_list(0);
 
    // loop over all interactions
-   for(int i=0; i<unit_cell.interaction.size(); ++i){
+   for(unsigned int i=0; i<unit_cell.interaction.size(); ++i){
 
       // calculate reciprocal interaction
-      int ia = unit_cell.interaction[i].j;
-      int ja = unit_cell.interaction[i].i;
+      unsigned int ia = unit_cell.interaction[i].j;
+      unsigned int ja = unit_cell.interaction[i].i;
       int dx = -unit_cell.interaction[i].dx;
       int dy = -unit_cell.interaction[i].dy;
       int dz = -unit_cell.interaction[i].dz;
@@ -252,7 +252,7 @@ void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename)
       bool match=false;
 
       // loop over all interactions for reciprocal interactions i -> j -> i
-      for(int j=0; j<unit_cell.interaction.size(); ++j){
+      for(unsigned int j=0; j<unit_cell.interaction.size(); ++j){
          if(unit_cell.interaction[j].i==ia && unit_cell.interaction[j].j==ja && unit_cell.interaction[j].dx==dx && unit_cell.interaction[j].dy==dy && unit_cell.interaction[j].dz==dz){
             match=true;
             break;
@@ -271,7 +271,7 @@ void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename)
       std::cerr << "Error! Exchange interaction list in unit cell file " << filename << " contains the following assymetric interactions:" << std::endl;
       terminaltextcolor(WHITE);
       zlog << zTs() << "Error! Exchange interaction list in unit cell file " << filename << " contains the following assymetric interactions:" << std::endl;
-      for(int i=0; i < asym_interaction_list.size(); ++i){
+      for(unsigned int i=0; i < asym_interaction_list.size(); ++i){
          int id=asym_interaction_list[i];
          terminaltextcolor(RED);
          std::cerr << id << "\t" << unit_cell.interaction[id].i << "\t" << unit_cell.interaction[id].j << "\t" << unit_cell.interaction[id].dx << "\t" << unit_cell.interaction[id].dy << "\t" << unit_cell.interaction[id].dz << std::endl;
@@ -332,7 +332,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 
 		bool has_hash=false;
 		// Determine if line is a comment line
-		for(int i=0;i<line.length();i++){
+		for(unsigned int i=0;i<line.length();i++){
 			char c=line.at(i);
 
 			if(c== *hash){
@@ -378,7 +378,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					terminaltextcolor(WHITE);
 				}
 				// loop over all atoms and read into class
-				for (int i=0; i<unit_cell.atom.size(); i++){
+				for (unsigned int i=0; i<unit_cell.atom.size(); i++){
 					line_counter++;
 					// declare safe temporaries for atom input
 					int id=i;
@@ -463,8 +463,8 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					//inputfile >> id >> iatom >> jatom >> dx >> dy >> dz;
 					line_counter++;
 					// check for sane input
-					if(iatom>=0 && iatom < unit_cell.atom.size()) unit_cell.interaction[i].i=iatom;
-					else if(iatom>=0 && iatom >= unit_cell.atom.size()){
+					if(iatom>=0 && iatom < int(unit_cell.atom.size())) unit_cell.interaction[i].i=iatom;
+					else if(iatom>=0 && iatom >= int(unit_cell.atom.size())){
 						terminaltextcolor(RED);
 						std::cerr << std::endl << "Error! iatom number "<< iatom <<" for interaction id " << id << " on line " << line_counter
 							  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"
@@ -484,7 +484,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					       << " of unit cell input file " << filename.c_str() << ". Possibly too many interactions defined. Exiting" << std::endl;
 					  err::vexit();
 					}
-					if(iatom>=0 && jatom < unit_cell.atom.size()) unit_cell.interaction[i].j=jatom;
+					if(iatom>=0 && jatom < int(unit_cell.atom.size())) unit_cell.interaction[i].j=jatom;
 					else{
 						terminaltextcolor(RED);
 						std::cerr << std::endl << "Error! jatom number "<< jatom <<" for interaction id " << id << " on line " << line_counter

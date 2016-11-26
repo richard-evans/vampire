@@ -30,6 +30,55 @@ namespace dipole{
 
    extern int update_rate; /// timesteps between updates
    extern void calculate_field();
+   extern int send_recv_cells_data(std::vector<int>& proc_cell_index_array1D,
+                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                                 std::vector< std::vector <int> >& cells_index_atoms_array,
+                                 std::vector<double>& cells_pos_and_mom_array,
+                                 std::vector<int>& cells_num_atoms_in_cell,
+                                 std::vector<int>& cells_cell_id_array,
+                                 std::vector<int>& cells_local_cell_array,
+                                 int cells_num_local_cells,
+                                 int cells_num_cells
+                                 );
+
+   extern int send_recv_atoms_data(std::vector<int>& proc_cell_index_array2D,
+                                 std::vector<int>& cell_id_array,
+                                 std::vector<int>& cells_local_cell_array,
+                                 std::vector<double>& atom_pos_x,
+                                 std::vector<double>& atom_pos_y,
+                                 std::vector<double>& atom_pos_z,
+                                 std::vector<int>& atom_type_array,
+                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                                 std::vector< std::vector <int> >& cells_index_atoms_array,
+                                 std::vector<double>& cells_pos_and_mom_array,
+                                 std::vector<int>& cells_num_atoms_in_cell,
+                                 int cells_num_local_cells,
+                                 int cells_num_cells,
+                                 double cells_macro_cell_size
+                                 );
+
+   extern int sort_data(std::vector<int>& proc_cell_index_array1D,
+                        std::vector<int>& cells_cell_id_array,
+                        std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                        std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                        std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                        std::vector< std::vector <int> >& cells_index_atoms_array,
+                        std::vector<double>& cells_pos_and_mom_array,
+                        std::vector<int>& cells_num_atoms_in_cell,
+                        int cells_num_local_cells,
+                        int cells_num_cells
+				  		   );
+
+   extern int send_cells_field(std::vector<int>& cells_cell_id_array,
+                              std::vector<double>& dipole_cells_field_array_x,
+                              std::vector<double>& dipole_cells_field_array_y,
+                              std::vector<double>& dipole_cells_field_array_z,
+                              int cells_num_local_cells
+                  );
 
    namespace internal{
 
@@ -64,13 +113,16 @@ namespace dipole{
 
       extern int num_atoms;
       extern std::vector < int > atom_type_array;
-      extern std::vector < int > atom_cell_array;
+      extern std::vector < int > atom_cell_id_array;
 
       extern int cells_num_cells;
       extern int cells_num_local_cells;
       extern std::vector <int>  cells_local_cell_array;
       extern std::vector <int>  cells_num_atoms_in_cell;
       extern std::vector < double > cells_volume_array;
+
+      extern std::vector<double> cells_pos_and_mom_array;
+      extern std::vector < int > proc_cell_index_array1D;
 
       //-------------------------------------------------------------------------
       // Internal function declarations

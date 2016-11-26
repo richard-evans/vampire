@@ -175,7 +175,6 @@ void init(){
 					const double rx = cells::cell_coords_array_x[j]-cells::cell_coords_array_x[i]; // Angstroms
 					const double ry = cells::cell_coords_array_y[j]-cells::cell_coords_array_y[i];
 					const double rz = cells::cell_coords_array_z[j]-cells::cell_coords_array_z[i];
-
 					const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);
 
 					const double ex = rx*rij;
@@ -433,9 +432,6 @@ void update(){
 		//if updated record last time at update
 		demag::update_time=sim::time;
 
-		// update cell magnetisations
-//		cells::mag();
-
 		// recalculate demag fields
 		if(demag::fast==true) fast_update();
 		else std_update();
@@ -463,4 +459,3 @@ void update(){
 }
 
 } // end of namespace demag
-

@@ -178,17 +178,17 @@ double spin_exchange_energy_tensor(const int atom, const double Sx, const double
 	for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
 
 		const int natom = atoms::neighbour_list_array[nn];
-		const double Jij[3][3]={atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][0],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][1],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][2],
+		const double Jij[3][3]={{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][0],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][1],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][2]},
 
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][0],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][1],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][2],
+										{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][0],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][1],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][2]},
 
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][0],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][1],
-										atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2]};
+										{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][0],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][1],
+										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2]}};
 
 		const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
 
@@ -238,17 +238,17 @@ double spin_scalar_anisotropy_energy(const int imaterial, const double Sz){
 //                ( ezex ezey ezez ) ( Sz )
 //
 double spin_tensor_anisotropy_energy(const int imaterial, const double Sx, const double Sy, const double Sz){
-	const double K[3][3]={mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[0][2],
+	const double K[3][3]={{mp::MaterialTensorAnisotropyArray[imaterial].K[0][0],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[0][1],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[0][2]},
 
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[1][2],
+								 {mp::MaterialTensorAnisotropyArray[imaterial].K[1][0],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[1][1],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[1][2]},
 
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
-								 mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]};
+								 {mp::MaterialTensorAnisotropyArray[imaterial].K[2][0],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[2][1],
+								  mp::MaterialTensorAnisotropyArray[imaterial].K[2][2]}};
 
 	return (K[0][0]*Sx*Sx + K[0][1]*Sx*Sy +K[0][2]*Sx*Sz) +
 			 (K[1][0]*Sx*Sy + K[1][1]*Sy*Sy +K[1][2]*Sy*Sz) +
@@ -524,8 +524,7 @@ double spin_surface_anisotropy_energy(const int atom, const int imaterial, const
 ///=====================================================================================
 ///
 double spin_magnetostatic_energy(const int atom, const double Sx, const double Sy, const double Sz){
-
-	return -1.0*(dipole::atom_dipolar_field_array_x[atom]*Sx+dipole::atom_dipolar_field_array_y[atom]*Sy+dipole::atom_dipolar_field_array_z[atom]*Sz);
+   return -1.0*(dipole::atom_dipolar_field_array_x[atom]*Sx+dipole::atom_dipolar_field_array_y[atom]*Sy+dipole::atom_dipolar_field_array_z[atom]*Sz);
 }
 
 /// @brief Calculates the total energy for a single spin.

@@ -52,7 +52,6 @@
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
-//#include "demag.hpp"
 #include "dipole.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
@@ -135,10 +134,6 @@ int create(){
 	//=============================================================
 	//      System creation variables
 	//=============================================================
-
-	int num_atoms=0;							///> num_atoms for generation routines
-	//int supercell_dim[3];				///> integer dimesions of system supercells
-	//double supercell_size[3];				///> real supercell size (Angstroms)
 
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array;

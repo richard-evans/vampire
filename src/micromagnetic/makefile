@@ -1,15 +1,12 @@
 #--------------------------------------------------------------
-#          Makefile for dipole module
+#          Makefile for micromagnetic module
 #--------------------------------------------------------------
 
 # List module object filenames
-dipole_objects =\
-mpi.o \
+micromagnetic_objects =\
 data.o \
 initialize.o \
-interface.o \
-update.o \
-field.o
+interface.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/dipole/,$(dipole_objects))
+OBJECTS+=$(addprefix obj/micromagnetic/,$(micromagnetic_objects))

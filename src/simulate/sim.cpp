@@ -289,16 +289,18 @@ int run(){
                      cells::macro_cell_size,
                      cells::local_cell_array,
                      cells::num_atoms_in_cell,
+                     cells::num_atoms_in_cell_global, // <----
                      cells::index_atoms_array,
                      cells::volume_array,
-                     cells::cell_coords_array_x,
-                     cells::cell_coords_array_y,
-                     cells::cell_coords_array_z,
+                     cells::pos_and_mom_array,
                      cells::atom_in_cell_coords_array_x,
                      cells::atom_in_cell_coords_array_y,
                      cells::atom_in_cell_coords_array_z,
                      atoms::type_array,
-                     cells::atom_cell_array,
+                     cells::atom_cell_id_array,
+                     atoms::x_coord_array,
+                     atoms::y_coord_array,
+                     atoms::z_coord_array,
                      atoms::num_atoms
    );
 
@@ -442,6 +444,14 @@ int run(){
 			}
 			program::boltzmann_dist();
 			break;
+
+	    case 51:
+		  	if(vmpi::my_rank==0){
+		       std::cout << "Setting..." << std::endl;
+		       zlog << "Setting..." << std::endl;
+	     	}
+		  	program::setting_process();
+		    break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
