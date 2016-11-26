@@ -71,7 +71,7 @@ namespace create{
          cs::system_creation_flags[1]=7;
          return true;
       }
-      std::string test="cone";
+      test="cone";
       if(word==test){
          cs::system_creation_flags[1]=8;
          return true;

@@ -81,8 +81,6 @@ namespace cells{
       unsigned int dy =  static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cells::macro_cell_size));
       unsigned int dz =  static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cells::macro_cell_size));
 
-      std::cout << "\n macro cell size = " << double( cells::macro_cell_size ) << "\n" << std::flush;
-
       cells::num_cells = dx*dy*dz;
       cells::internal::cell_position_array.resize(3*cells::num_cells);
 

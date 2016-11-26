@@ -25,7 +25,7 @@ namespace create{
       };
 
       /// comparison function for reverse order sorting
-      bool compare_radius(core_radius_t first,core_radius_t second){
+      static bool compare_radius(core_radius_t first,core_radius_t second){
          if(first.radius<second.radius) return false;
          else return true;
       }
