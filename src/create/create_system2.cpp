@@ -52,7 +52,6 @@
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
-//#include "demag.hpp"
 #include "dipole.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"

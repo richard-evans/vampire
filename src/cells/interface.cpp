@@ -27,24 +27,24 @@ namespace cells{
    //---------------------------------------------------------------------------
    // Function to process input file parameters for cells module
    //---------------------------------------------------------------------------
-   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line){
-  // int match_dimension(std::string const word,sttd::string const value,std::string const unit, int const line){
+   bool match_input_parameter(string const key, string const word, string const value, string const unit, int const line){
+  // int match_dimension(std::string const word,std::string const value,std::string const unit, int const line){
 
       // Check for valid key, if no match return false
       std::string prefix="cells";
       if(key!=prefix) return false;
 
-/*      //----------------------------------
+      //----------------------------------
       // Now test for all valid options
       //----------------------------------
       std::string test="macro-cell-size";
       if(word==test){
          double csize=atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(csize, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         vin::check_for_valid_value(csize, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
          cells::macro_cell_size = csize;
          return true;
-      } */
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found

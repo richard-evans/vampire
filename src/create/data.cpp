@@ -29,6 +29,8 @@ namespace create{
          std::vector<create::internal::mp_t> mp; // array of material properties
          MTRand grnd; // general random number generator for create functions
 
+         double cone_angle = 10.0; // factor to truncate cone
+
       } // end of internal namespace
 
 } // end of create namespace

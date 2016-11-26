@@ -31,7 +31,9 @@ namespace cells{
 
    extern std::vector <int> local_cell_array;
    extern std::vector <int> num_atoms_in_cell; /// number of atoms in each cell
+   extern std::vector <int> num_atoms_in_cell_global; /// global number of atoms in each cell
    extern std::vector < std::vector <int> > index_atoms_array;
+   extern std::vector<int> index_atoms_array1D;
 
    extern std::vector<double> volume_array;
    extern std::vector<double> cell_coords_array_x; /// arrays to store cells positions
@@ -41,13 +43,16 @@ namespace cells{
    extern std::vector < std::vector <double> > atom_in_cell_coords_array_y;
    extern std::vector < std::vector <double> > atom_in_cell_coords_array_z;
 
-   extern std::vector<int> atom_cell_array;
+   extern std::vector<int> cell_id_array;
+   extern std::vector<int> atom_cell_id_array;
    extern std::vector<double> mag_array_x; /// arrays to store cells magnetisation
    extern std::vector<double> mag_array_y;
    extern std::vector<double> mag_array_z;
    extern std::vector<double> field_array_x; /// arrays to store cells field
    extern std::vector<double> field_array_y;
    extern std::vector<double> field_array_z;
+
+   extern std::vector<double> pos_and_mom_array;
 
    //---------------------------------------------------------------------------
    // Function to calculate magnetisation in cells
@@ -67,7 +72,7 @@ namespace cells{
                    const std::vector<double>& atom_coords_y,
                    const std::vector<double>& atom_coords_z,
                    const std::vector<int>& atom_type_array,
-                   const std::vector<int>& atom_cell_array,
+                   const std::vector<int>& atom_cell_id_array,
                    const int num_atoms
    );
 

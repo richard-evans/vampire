@@ -4,6 +4,7 @@
 
 # List module object filenames
 dipole_objects =\
+mpi.o \
 data.o \
 initialize.o \
 interface.o \

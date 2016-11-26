@@ -84,11 +84,13 @@ namespace create{
       //-----------------------------------------------------------------------------
       extern std::vector<create::internal::mp_t> mp; // array of material properties
       extern MTRand grnd; // general random number generator for create functions
+      extern double cone_angle; // angle of cone to truncate cylinder
 
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
       extern void alloy(std::vector<cs::catom_t> & catom_array);
+      extern void cone(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
 
    } // end of internal namespace
 } // end of create namespace
