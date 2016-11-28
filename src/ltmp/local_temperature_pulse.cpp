@@ -22,23 +22,30 @@ namespace ltmp{
 
       //-----------------------------------------------------------------------------
       // Function to calculate the local temperature using the two temperature model
+      //
+      // Pump assumes uniform heating and penetration depth of 10 nm
+      // (see main program in src/program/temperature_pulse.cpp for more info)
       //-----------------------------------------------------------------------------
-      void calculate_local_temperature(const double time_from_start){
+      void calculate_local_temperature_pulse(const double time_from_start){
 
-         const double reduced_time =  (time_from_start-2.*ltmp::internal::pump_time)/(ltmp::internal::pump_time);
-         const double prefactor = 4.0*log(2.0); // normalise to unit width
-         const double pump=ltmp::internal::pump_power*exp(-reduced_time*reduced_time*prefactor);
+         const double i_pump_time = 1.0/ltmp::internal::pump_time;
+         const double reduced_time = (time_from_start - 2.0*ltmp::internal::pump_time)*i_pump_time;
+         const double four_ln_2 = 2.77258872224; // 4 ln 2
+         // 2/(delta sqrt(pi/ln 2))*0.1, delta = 10 nm, J/m^2 -> mJ/cm^2 (factor 0.1)
+         const double two_delta_sqrt_pi_ln_2 = 9394372.787;
+         const double pump=ltmp::internal::pump_power*two_delta_sqrt_pi_ln_2*
+   								exp(-four_ln_2*reduced_time*reduced_time)*i_pump_time;
 
          const double G  = ltmp::internal::TTG;
          const double Ce = ltmp::internal::TTCe;
          const double Cl = ltmp::internal::TTCl;
          const double dt = ltmp::internal::dt;
 
-         // Parallisation 
+         // Parallisation
          // if vertical only
          // loop over internal cells
          // broadcast result
-         // else 
+         // else
          // loop over 1/n cells
          // calculate dTe dTp from Te, Tp
          //#ifdef MPICF
@@ -49,7 +56,7 @@ namespace ltmp{
          const double dTdiff_prefactor = ltmp::internal::thermal_conductivity/(ltmp::internal::micro_cell_size*ltmp::internal::micro_cell_size*1.e-20);
 
          // Determine change in Te and Tp
-         for(int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
+         for(unsigned int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
 
             const double Te = root_temperature_array[2*cell+0]*root_temperature_array[2*cell+0];
             const double Tp = root_temperature_array[2*cell+1]*root_temperature_array[2*cell+1];
@@ -68,7 +75,7 @@ namespace ltmp{
          } // end of cell loop
 
          // Calculate new electron and lattice temperatures
-         for(int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
+         for(unsigned int cell=0; cell<ltmp::internal::attenuation_array.size(); ++cell){
 
             const double Te = root_temperature_array[2*cell+0]*root_temperature_array[2*cell+0] + delta_temperature_array[2*cell+0];
             const double Tp = root_temperature_array[2*cell+1]*root_temperature_array[2*cell+1] + delta_temperature_array[2*cell+1];

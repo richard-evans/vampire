@@ -98,7 +98,7 @@ int main(int argc, char* argv[]){
       std::cout << std::endl;
       std::cout << "  Contributors: Weijia Fan, Phanwadee Chureemart, Joe Barker, " << std::endl;
       std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell," << std::endl;
-      std::cout << "                Wu Hong-Ye" << std::endl;
+      std::cout << "                Wu Hong-Ye, Rory Pond" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
       std::cout << "                Compiled with:  " << COMP << std::endl;

@@ -81,4 +81,9 @@ namespace atoms{
 	std::vector<double> eijy(0);
 	std::vector<double> eijz(0);
 
+	// Local anisotropy directions for each atom
+	std::vector<double> uniaxial_anisotropy_vector_x(0);
+	std::vector<double> uniaxial_anisotropy_vector_y(0);
+	std::vector<double> uniaxial_anisotropy_vector_z(0);
+
 }

@@ -37,7 +37,8 @@
   #include <unistd.h>
 #endif
 
-#include <vmpi.hpp>
+#include "vmpi.hpp"
+#include "material.hpp"
 
 #ifdef MPICF
 struct null_streambuf
@@ -85,7 +86,14 @@ namespace vin{
 
    extern void check_for_valid_unit_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
 
-   extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
+   extern void check_for_valid_three_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
+
+   extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
+                                      double range_min, double range_max, std::string input_file_type, std::string range_text);
+
+   extern std::vector<double> DoublesFromString(std::string value);
+
+   extern std::vector<mp::materials_t> read_material;
 
 }
 
@@ -108,6 +116,11 @@ namespace vout{
 
 	extern double atoms_output_min[3];
 	extern double atoms_output_max[3];
+
+	extern double field_output_min_1;
+	extern double field_output_max_1;
+	extern double field_output_min_2;
+	extern double field_output_max_2;
 
 	extern bool output_cells_config;
 	extern int output_cells_config_rate;

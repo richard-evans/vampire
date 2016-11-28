@@ -97,6 +97,22 @@ namespace ltmp{
             ltmp::internal::enabled = true;
             return true;
          }
+         test="lateral-gradient";
+         if(value==test){
+            ltmp::internal::lateral_discretisation = true;
+            ltmp::internal::vertical_discretisation = false;
+            ltmp::internal::enabled = true;
+            ltmp::internal::gradient = true;
+            return true;
+         }
+         test="vertical-gradient";
+         if(value==test){
+            ltmp::internal::lateral_discretisation = false;
+            ltmp::internal::vertical_discretisation = true;
+            ltmp::internal::enabled = true;
+            ltmp::internal::gradient = true;
+            return true;
+         }
          else{
             terminaltextcolor(RED);
             std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
@@ -148,12 +164,8 @@ namespace ltmp{
          return true;
       }
       //--------------------------------------------------------------------
-      else{
-         terminaltextcolor(RED);
-         std::cerr << "Error - Unknown control statement \'"<< prefix << ":" << word << "\' on line " << line << " of input file" << std::endl;
-         terminaltextcolor(WHITE);
-         err::vexit();
-      }
+      // keyword not found
+      //--------------------------------------------------------------------
       return false;
    }
 } // end of namespace ltmp
