@@ -152,10 +152,12 @@ obj/qvoronoi/userprintf_rbox.o\
 # Include supplementary makefiles
 include src/create/makefile
 include src/gpu/makefile
-include src/cuda/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
 include src/unitcell/makefile
+
+# Cuda must be last for some odd reason
+include src/cuda/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)
