@@ -29,7 +29,7 @@ CUDA_PR= -DCUDA_DP
 #CUDA_PR= -DCUDA_SP
 #CUDA_PR= -DCUDA_MP
 
-CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA -arch=sm_20 --use_fast_math -ftz=true
+CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA -arch=sm_20 --use_fast_math -ftz=true -std=c++11
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
 	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS) $(CUDA_PR)

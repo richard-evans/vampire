@@ -1,7 +1,7 @@
 #include "exchange_fields.hpp"
 
 #include "atoms.hpp"
-
+#include "vio.hpp"
 #include "cuda_utils.hpp"
 #include "internal.hpp"
 #include "data.hpp"
