@@ -90,9 +90,11 @@ materials_t::materials_t ():
 		geometry_coords[i][1]=0.0;
 	}
 	// array variables
-	for(int i=0;i<mp::max_materials;i++){
-		Jij_matrix_SI[i]=0.0;
-		Jij_matrix[i]=0.0;
+   Jij_matrix_SI.resize(mp::max_materials);
+   Jij_matrix.resize(mp::max_materials);
+   for(int i=0; i<mp::max_materials; i++){
+      Jij_matrix_SI[i].resize(3,0.0);
+      Jij_matrix[i].resize(3,0.0);
 		intermixing[i]=0.0;
 		alloy[i]=0.0;
 	}
@@ -121,8 +123,7 @@ int materials_t::print(){
 	std::cout << "----------------------------------------------------------------" << std::endl;
 	std::cout << "alpha          = " << alpha << std::endl;
 	for(int j=0;j<num_materials;j++){
-		//std::cout << " Jij_matrix_SI = " << material[i].Jij_matrix_SI[j] << "\t" << j << std::endl;
-		std::cout << " Jij_matrix_SI[" << j << "] = " << Jij_matrix_SI[j] << std::endl;
+      std::cout << " Jij_matrix_SI[" << j << "] = " << Jij_matrix_SI[j][0] << std::endl;
 	}
 	std::cout << "mu_s_SI        = " << mu_s_SI << std::endl;
 	std::cout << "Ku1_SI          = " << Ku1_SI << std::endl;
