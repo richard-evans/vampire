@@ -125,7 +125,7 @@ namespace sim{
 	double cooling_time=100.0e-12; ///seconds
 	int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
 	pump_functions_t pump_function=two_temperature;
-	double pump_power=4.e21;
+	double pump_power=20.0; // mJ/cm^2;
 	double pump_time=50.0e-15;
 	double double_pump_power=20.0; // mJ/cm^2;
 	double double_pump_Tmax=500.0;
