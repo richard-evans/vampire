@@ -25,11 +25,11 @@ CUDA_OBJECTS= \
 CUDA_DLINK= obj/cuda/vampire_cuda.o
 
 # set precision for cuda calculation
-#CUDA_PR= -DCUDA_DP
-CUDA_PR= -DCUDA_SP
+CUDA_PR= -DCUDA_DP
+#CUDA_PR= -DCUDA_SP
 #CUDA_PR= -DCUDA_MP
 
-CUDA_CFLAGS= -I./hdr -DCUDA -O3 -rdc=true -arch=sm_20 --use_fast_math -ftz=true
+CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA -arch=sm_20 --use_fast_math -ftz=true
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
 	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS) $(CUDA_PR)
@@ -51,3 +51,7 @@ gcc-cuda: $(OBJECTS) $(CUDA_OBJECTS)
 # CUDA debug target
 gcc-cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG
 gcc-cuda-debug: gcc-cuda
+
+# CUDA debug target
+gcc-cuda-profile: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG --profile
+gcc-cuda-profile: gcc-cuda

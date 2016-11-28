@@ -230,8 +230,8 @@ namespace vcuda{
                size_t mid = material_id[atom];
 
                // prestore prefactors into registers
-               cu_real_t prefactor = heun_parameters[mid].prefactor;
-               cu_real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
+               const cu_real_t prefactor = heun_parameters[mid].prefactor;
+               const cu_real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
                // load spin direction to registers for later multiple reuse
                cu_real_t sx = x_spin[atom];
