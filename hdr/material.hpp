@@ -165,7 +165,7 @@ using std::string;
 		double fmr_field_strength; // Tesla
 		double fmr_field_frequency; // Hz
 		std::vector<double> fmr_field_unit_vector; /// unit vector for material uniaxial anisotropy
-		bool fill; /// flag to determine of material fills voided space
+		bool fill; /// flag to determine if material fills voided space
       double temperature_rescaling_alpha; // temperature rescaling exponent
       double temperature_rescaling_Tc; // temperaure rescaling Tc
       bool non_magnetic;

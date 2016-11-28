@@ -65,6 +65,8 @@ namespace create{
          std::string save_file_name;
          host_alloy_d_t host_alloy_distribution; // enum specifying type of alloy distribution
          std::vector<slave_material_t> slave_material; // array of slave alloys for host
+         bool sub_fill; // flag to determine if material fills voided space in substructure
+         double voronoi_grain_substructure_nucleation_height; // value determines start point of nucleated grains
          // constructor
          mp_t ():
          	alloy_master(false),
@@ -72,7 +74,9 @@ namespace create{
             host_alloy_scale (50.0),
             save_host_alloy_profile(false),
             save_file_name(""),
-            host_alloy_distribution(internal::homogeneous)
+            host_alloy_distribution(internal::homogeneous),
+            sub_fill(false),
+            voronoi_grain_substructure_nucleation_height(0.0)
             {
                // resize array of slave materials
                slave_material.resize(mp::max_materials);

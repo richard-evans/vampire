@@ -79,7 +79,7 @@ namespace create{
       test="voronoi-grain-substructure-crystallization-radius";
       if(word==test){
          double rsize=atof(value.c_str());
-         vin::check_for_valid_value(rsize, word, line, prefix, unit, "none", 0.5, 2.0,"input","0.1 - 2");
+         vin::check_for_valid_value(rsize, word, line, prefix, unit, "none", 0.01, 2.0,"input","0.01 - 2");
          create::internal::voronoi_grain_substructure_crystallization_radius=rsize;
          return true;
       }
@@ -95,7 +95,7 @@ namespace create{
       test="voronoi-grain-spacing";
       if(word==test){
          double pspacing=atof(value.c_str());
-         vin::check_for_valid_value(pspacing, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
+         vin::check_for_valid_value(pspacing, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
          create::internal::voronoi_grain_spacing=pspacing;
          return true;
       }
@@ -284,6 +284,27 @@ namespace create{
          double v=atof(value.c_str());
          vin::check_for_valid_value(v, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
          create::internal::mp[super_index].slave_material[sub_index].variance = v;
+         return true;
+      }
+      test="fill-substructure-space";
+      if(word==test){
+         // Test for sane input
+         bool sanitised_bool = vin::check_for_valid_bool(value, word, line, prefix,"material");
+         // set flag
+         create::internal::mp[super_index].sub_fill = sanitised_bool;
+         return true;
+      }
+      /*
+         Float to set the reduced starting height (as a fraction of the total system height) for
+         the voronoi grain substructure. At this height the voronoi grain size is the standard size.
+         Away from the nulceation height the voronoi grain size is reduced according to
+         size = (1-x/max)**radius.
+      */
+      test="voronoi-grain-substructure-nucleation-height";
+      if(word==test){
+         double nh=atof(value.c_str());
+         vin::check_for_valid_value(nh, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         create::internal::mp[super_index].voronoi_grain_substructure_nucleation_height = nh;
          return true;
       }
 

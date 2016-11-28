@@ -208,18 +208,12 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
    // array to store if atoms are included in substructure (assume not)
    std::vector<bool> insub(catom_array.size(),false);
 
+   const double ssz = cs::system_dimensions[2];
+
    //------------------------------------------------------------------------------
    // Set 3D structure for grains
    //------------------------------------------------------------------------------
-   double itop_sphere_z = cs::system_dimensions[2] - 0.5*create::internal::voronoi_grain_size;
-   double ibot_sphere_z =                          + 0.5*create::internal::voronoi_grain_size;
-   // place spheres in midd for thin systems
-   if(itop_sphere_z < 0.5*cs::system_dimensions[2]) itop_sphere_z = 0.5*cs::system_dimensions[2];
-   if(ibot_sphere_z > 0.5*cs::system_dimensions[2]) ibot_sphere_z = 0.5*cs::system_dimensions[2];
-   const double top_sphere_z = itop_sphere_z;
-   const double bot_sphere_z = ibot_sphere_z;
-   const double radius_factor = create::internal::voronoi_grain_substructure_crystallization_radius;
-   const double sphere_radius = 0.5*create::internal::voronoi_grain_size*radius_factor;
+   const double sphere_radius = create::internal::voronoi_grain_substructure_crystallization_radius; //*create::internal::voronoi_grain_size*radius_factor;
 
 	// loop over all grains with vertices
 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
@@ -263,48 +257,99 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 				for(int j=miny;j<=maxy;j++){
 
 					// loop over atoms in cells and z
-					for(unsigned int id=0;id<supercell_array[i][j].size();id++){
-						const int atom = supercell_array[i][j][id];
+               for(unsigned int id=0;id<supercell_array[i][j].size();id++){
+                  const int atom = supercell_array[i][j][id];
 
-						// Get atomic position
-						const double x = catom_array[atom].x;
-						const double y = catom_array[atom].y;
-						const double z = catom_array[atom].z;
+                  // Get atomic position
+                  const double x = catom_array[atom].x;
+                  const double y = catom_array[atom].y;
+                  const double z = catom_array[atom].z;
+                  const double frh = z/ssz;
+                  const double nucleation_height = create::internal::mp[catom_array[atom].material].voronoi_grain_substructure_nucleation_height;
 
-						if(mp::material[catom_array[atom].material].core_shell_size>0.0){
-							// Iterate over materials
-							for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
-								int mat = (it)->mat;
-								double factor = mp::material[mat].core_shell_size;
-								double maxz=mp::material[mat].max*cs::system_dimensions[2];
-								double minz=mp::material[mat].min*cs::system_dimensions[2];
-								double cz=catom_array[atom].z;
-								// check for within core shell range
-								if(vmath::point_in_polygon_factor(x-x0,y-y0,factor, tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices) && in_pill(x, y, z, sphere_x, sphere_y, top_sphere_z, bot_sphere_z, factor*sphere_radius)){
-									if((cz>=minz) && (cz<maxz)){
-                              insub[atom] = true;
-										catom_array[atom].material=mat;
-									}
-									// if set to clear atoms then remove atoms within radius
-									else if(cs::fill_core_shell==false){
-                              insub[atom] = false;
-									}
-								}
-							}
-						}
-						// Check to see if site is within polygon
-						else if(vmath::point_in_polygon_factor(x-x0,y-y0,1.0,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)&& in_pill(x, y, z, sphere_x, sphere_y, top_sphere_z, bot_sphere_z, sphere_radius)){
-							insub[atom] = true;
-						}
+                  // Remove core-shell code in structure for now. This means that core shell
+                  // structures can still be applied to the superstructure, eg a dot or particle
+                  /*if(mp::material[catom_array[atom].material].core_shell_size>0.0){
+                     // Iterate over materials
+                     for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
+                        int mat = (it)->mat;
+                        double factor = mp::material[mat].core_shell_size;
+                        double maxz=mp::material[mat].max*cs::system_dimensions[2];
+                        double minz=mp::material[mat].min*cs::system_dimensions[2];
+                        double cz=catom_array[atom].z;
+                        // calculate reduced ranges for materials with small offset to prevent dangling atoms
+                        double rminz = mp::material[mat].min-0.01;
+                        double rmaxz = mp::material[mat].max+0.01;
+                        double factor_radius = 0.0;
+                        if(frh > nucleation_height){
+                           // multiply by small factor to ensure grains touch at boundary for zero spacing
+                           factor_radius = 1.04*pow(1.0+((nucleation_height-frh)/(rmaxz-nucleation_height)),sphere_radius);
+                        }
+                        else{
+                           factor_radius = 1.04*pow((1.0-(frh-nucleation_height)/(rminz-nucleation_height)),sphere_radius);
+                        }
+                        // check for within core shell range
+                        if(vmath::point_in_polygon_factor(x-x0,y-y0,factor*factor_radius, tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)){ //}; // && in_pill(x, y, z, sphere_x, sphere_y, top_sphere_z, bot_sphere_z, factor*sphere_radius)){
+                        if((cz>=minz) && (cz<maxz)){
+                           insub[atom] = true;
+                           catom_array[atom].material=mat;
+                        }
+                        // if set to clear atoms then remove atoms within radius
+                        else if(cs::fill_core_shell==false){
+                           insub[atom] = false;
+                        }
+                     }
+                  }
+                  }*/
+                  // Check to see if site is within polygon
+                  //else{
+                  int mat = catom_array[atom].material;
+                  double maxz=mp::material[mat].max*cs::system_dimensions[2];
+                  double minz=mp::material[mat].min*cs::system_dimensions[2];
+                  // calculate reduced ranges for materials with small offset to prevent dangling atoms
+                  double rminz = mp::material[mat].min-0.01;
+                  double rmaxz = mp::material[mat].max+0.01;
+                  double factor_radius = 0.0;
+                  if(frh > nucleation_height){
+                     // multiply by small factor to ensure grains touch at boundary for zero spacing
+                     factor_radius = 1.04*pow(1.0+((nucleation_height-frh)/(rmaxz-nucleation_height)),sphere_radius);
+                  }
+                  else{
+                     factor_radius = 1.04*pow((1.0-(frh-nucleation_height)/(rminz-nucleation_height)),sphere_radius);
+                  }
+                  if(vmath::point_in_polygon_factor(x-x0,y-y0,1.0*factor_radius,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)){
+                     insub[atom] = true;
+                  }
+                  //}
 					}
 				}
 			}
 		}
 	}
+
 	terminaltextcolor(GREEN);
 	std::cout << "done!" << std::endl;
 	terminaltextcolor(WHITE);
 	zlog << "done!" << std::endl;
+
+   // Now fill in with fill materials
+   for(int mat=0;mat<mp::num_materials;mat++){
+      if(create::internal::mp[mat].sub_fill){
+         double min = mp::material[mat].min*cs::system_dimensions[2];
+         double max = mp::material[mat].max*cs::system_dimensions[2];
+
+         // loop over all atoms selecting only deselected atoms within min/max
+         for(unsigned int atom=0;atom<catom_array.size();atom++){
+            if( (catom_array[atom].z < max) && (catom_array[atom].z >= min) && (catom_array[atom].include==true && insub[atom] == false)){
+               // set atom to fill material
+               catom_array[atom].material=mat;
+               // re-include atom
+               insub[atom] = true;
+            }
+         }
+      }
+   }
+
 
    // Now delete atoms not in substructure
    for(unsigned int atom=0; atom < catom_array.size(); atom++){
@@ -318,9 +363,6 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 	    catom_array[atom].grain=int(grain_coord_array.size()-1);
 	  }
 	}
-
-	// set number of grains
-	grains::num_grains = int(grain_coord_array.size());
 
 	return;
 }
