@@ -91,7 +91,7 @@ namespace vcuda
                   3*::atoms::neighbour_list_array.size()
                   );
 
-            std::cerr << "Attempting to fill matrix." << std::endl;
+            //std::cerr << "Attempting to fill matrix." << std::endl;
 
             const int Natoms = ::atoms::num_atoms;
             const int Nnbrs = row_indices.size();
@@ -111,17 +111,17 @@ namespace vcuda
                J_matrix_h.values[i+2*Nnbrs] = - ::atoms::i_exchange_list[iid].Jij;
             }
 
-            std::cerr << "Attempting matrix conversion now." << std::endl;
+            zlog << zTs() << "Attempting matrix conversion from CSR to DIA now." << std::endl;
 
             cusp::convert( J_matrix_h, J_matrix_d);
 
-            std::cerr << "Conversion complete." << std::endl;
+            zlog << zTs() << "Matrix conversion complete." << std::endl;
 
             const size_t occupied_diagonals = count_diagonals(J_xx_matrix_h.num_rows, J_xx_matrix_h.num_rows, row_indices, J_xx_matrix_h.column_indices);
             const float size       = float(occupied_diagonals) * float(J_xx_matrix_h.num_rows);
             const float fill_ratio = size / std::max(1.0f, float(J_xx_matrix_h.num_entries));
 
-            std::cerr << "Matrix:\nDiagonals = " << occupied_diagonals << "\nsize = " << size << "\nfill ratio = "<< fill_ratio << std::endl;
+            zlog << zTs() << "Cuda Matrix:\nDiagonals = " << occupied_diagonals << "\nsize = " << size << "\nfill ratio = "<< fill_ratio << std::endl;
 
 
 
@@ -172,12 +172,14 @@ namespace vcuda
                   break;
 
                case 2: // Tensor
+                  std::cerr << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
+                  zlog << zTs() << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
                   break;
             }
 
             exchange_initialised = true;
 
-            std::cout << "Made matrix" << std::endl;
+            //std::cout << "Made matrix" << std::endl;
             check_device_memory(__FILE__,__LINE__);
             check_cuda_errors(__FILE__,__LINE__);
             return EXIT_SUCCESS;
@@ -281,4 +283,3 @@ namespace vcuda
    } // end namespace internal
 
 } // end namespace vcuda
-

@@ -85,16 +85,19 @@ namespace vcuda{
 
       size_t _grid_size = ( (::atoms::num_atoms/2) / cu::block_size) + 1;
 
-      std::cerr << "Natoms = " << ::atoms::num_atoms << "\n";
-      std::cerr << "Block size = " << cu::block_size << "\n";
-      std::cerr << "grid1 = " << _grid_size << "\n";
-      std::cerr << "grid2 = " << cu::grid_size << "\n";
+      //std::cerr << "Natoms = " << ::atoms::num_atoms << "\n";
+      //std::cerr << "Block size = " << cu::block_size << "\n";
+      //std::cerr << "grid1 = " << _grid_size << "\n";
+      //std::cerr << "grid2 = " << cu::grid_size << "\n";
 
-      if (_grid_size < cu::grid_size)
-         cu::grid_size = _grid_size;
+      // I dont think this does anything
+      //if (_grid_size < cu::grid_size)
+      //   cu::grid_size = _grid_size;
 
       cu::grid_size = _grid_size;
-      std::cerr << "grid2 = " << cu::grid_size << std::endl;
+      //std::cerr << "grid2 = " << cu::grid_size << std::endl;
+
+      zlog << zTs() << "Using cuda version with block size " << cu::block_size << " and grid size " << cu::grid_size << std::endl;
 
       success = success && cu::__initialize_atoms ();
       success = success && cu::__initialize_fields ();

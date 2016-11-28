@@ -70,9 +70,6 @@ int main(int argc, char* argv[]){
       }
    }
 
-   stopwatch_t stopwatch;
-   stopwatch.start();
-
    // For parallel execution intialise MPI
    #ifdef MPICF
       vmpi::initialise();
@@ -142,6 +139,10 @@ int main(int argc, char* argv[]){
    // Create system
    cs::create();
 
+   // Set timer for runtime
+   stopwatch_t stopwatch;
+   stopwatch.start();
+
    // Simulate system
    sim::run();
 
@@ -156,7 +157,8 @@ int main(int argc, char* argv[]){
       #endif
    #endif
 
-         std::cout << "runtime[s]: " << stopwatch.elapsed_seconds() << std::endl;
+   std::cout << "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+   zlog << zTs() << "Simjulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
 
    zlog << zTs() << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(GREEN);
