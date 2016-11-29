@@ -80,6 +80,15 @@ namespace gpu{
          }
       }
       //--------------------------------------------------------------------
+      test="device";
+      if(word==test){
+         int dev=atoi(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_int(dev, word, line, prefix, unit, "none", 0, 16,"input","0-16");
+         gpu::device = dev;
+         return true;
+      }
+      //--------------------------------------------------------------------
       else{
          terminaltextcolor(RED);
          std::cerr << "Error - Unknown control statement \'"<< prefix << ":" << word << "\' on line " << line << " of input file" << std::endl;

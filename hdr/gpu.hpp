@@ -17,6 +17,7 @@ namespace gpu{
    //-----------------------------------------------------------------------------
    extern bool acceleration; // flag to enable gpu_acceleration
    extern bool cpu_stats; // flag to calculate stats using cpu
+   extern int device; // int specifying gpu device to use for simulation
 
    //-----------------------------------------------------------------------------
    // Functions for GPU acceleration

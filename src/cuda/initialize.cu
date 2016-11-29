@@ -77,6 +77,30 @@ namespace vcuda{
          ::err::vexit();
       }
 
+      // Set cuda device if specified by user
+      if(gpu::device != -1 && gpu::device < n_devices){
+         zlog << zTs() << "Setting CUDA device to " << gpu::device << std::endl;
+         cudaError_t error = cudaSetDevice(gpu::device);
+         if( error == cudaErrorSetOnActiveProcess )
+         {
+            std::cerr     << "Error: CUDA is unable to set active process to device " << gpu::device << std::endl;
+            zlog << zTs() << "Error: CUDA is unable to set active process to device " << gpu::device << std::endl;
+            ::err::vexit();
+         }
+         else if ( error == cudaErrorInvalidDevice )
+         {
+            std::cerr     << "Error: CUDA is requesting device " << gpu::device << " which is an invalid device." << std::endl;
+            zlog << zTs() << "Error: CUDA is requesting device " << gpu::device << " which is an invalid device." << std::endl;
+            ::err::vexit();
+         }
+         else if ( error != cudaSuccess)
+         {
+            std::cerr     << "Error: CUDA unable to set device to " << gpu::device << std::endl;
+            zlog << zTs() << "Error: CUDA unable to set device to " << gpu::device << std::endl;
+            ::err::vexit();
+         }
+      }
+
       bool success = true;
 
       /*

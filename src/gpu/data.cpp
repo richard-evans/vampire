@@ -28,6 +28,7 @@ namespace gpu{
    #endif
 
    bool cpu_stats = false; // flag to calculate stats using cpu
+   int device = -1; // device id
 
    //-----------------------------------------------------------------------------
    // Shared data structures for statistics calculation
