@@ -106,9 +106,25 @@ namespace vcuda
                J_matrix_h.column_indices[i+2*Nnbrs] = column_indices[i]+2*Natoms;
 
                int iid = ::atoms::neighbour_interaction_type_array[i];
-               J_matrix_h.values[i] = - ::atoms::i_exchange_list[iid].Jij;
-               J_matrix_h.values[i+Nnbrs] = - ::atoms::i_exchange_list[iid].Jij;
-               J_matrix_h.values[i+2*Nnbrs] = - ::atoms::i_exchange_list[iid].Jij;
+               switch( ::atoms::exchange_type)
+               {
+                  case 0: // Isotropic
+                     J_matrix_h.values[i]         = - ::atoms::i_exchange_list[iid].Jij;
+                     J_matrix_h.values[i+Nnbrs]   = - ::atoms::i_exchange_list[iid].Jij;
+                     J_matrix_h.values[i+2*Nnbrs] = - ::atoms::i_exchange_list[iid].Jij;
+                     break;
+
+                  case 1: // Vectorial
+                     J_matrix_h.values[i]         = - ::atoms::v_exchange_list[iid].Jij[0];
+                     J_matrix_h.values[i+Nnbrs]   = - ::atoms::v_exchange_list[iid].Jij[1];
+                     J_matrix_h.values[i+2*Nnbrs] = - ::atoms::v_exchange_list[iid].Jij[2];
+                     break;
+
+                  case 2: // Tensor
+                     std::cerr << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
+                     zlog << zTs() << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
+                     break;
+               }
             }
 
             zlog << zTs() << "Attempting matrix conversion from CSR to DIA now." << std::endl;
