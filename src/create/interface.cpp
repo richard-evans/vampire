@@ -272,7 +272,30 @@ namespace create{
          create::internal::mp[super_index].slave_material[sub_index].variance = v;
          return true;
       }
-
+      //--------------------------------------------------------------------
+      test="oxygen"; // determines if material is oxygen
+      if(word==test){
+         bool sanitised_bool = vin::check_for_valid_bool(value, word, line, prefix,"material");
+         create::internal::mp[super_index].oxygen = sanitised_bool;
+         create::internal::calculate_oxygen_termination = true; // turn on oxygen termination calculation
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="oxygen-terminated"; // determines if material must have bulk oxygen coordination
+      if(word==test){
+         bool sanitised_bool = vin::check_for_valid_bool(value, word, line, prefix,"material");
+         create::internal::mp[super_index].oxygen_terminated = sanitised_bool;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="oxygen-coordination-range"; // material specific oxygen coordination range
+      if(word==test){
+         // check for type of host alloy
+         double ocr=atof(value.c_str());
+         vin::check_for_valid_value(ocr, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+         create::internal::mp[super_index].oxygen_coordination_range = ocr;
+         return true;
+      }
       //--------------------------------------------------------------------
       // keyword not found
       //--------------------------------------------------------------------

@@ -34,6 +34,8 @@ namespace create{
          double faceted_particle_111_radius = 1.0; // 111 facet particle radius
          double cone_angle = 10.0; // factor to truncate cone
 
+         bool calculate_oxygen_termination = false; // determines whether oxygen termination should be calculated
+
       } // end of internal namespace
 
 } // end of create namespace

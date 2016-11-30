@@ -30,6 +30,9 @@
 #include "vmath.hpp"
 #include "vmpi.hpp"
 
+// Internal create header
+#include "internal.hpp"
+
 // Standard Libraries
 #include <cmath>
 #include <cstdlib>
@@ -205,7 +208,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		}
 
 		// Delete unneeded atoms
-		clear_atoms(catom_array);
+		create::internal::clear_atoms(catom_array);
 	}
 
 	// Check to see if any atoms have been generated

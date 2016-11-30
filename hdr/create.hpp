@@ -452,7 +452,6 @@ int truncated_octahedron(double[], std::vector<cs::catom_t> &,const int);
 int tear_drop(double[], std::vector<cs::catom_t> &,const int);
 
 int sort_atoms_by_grain(std::vector<cs::catom_t> &);
-void clear_atoms(std::vector<cs::catom_t> &);
 
 void roughness(std::vector<cs::catom_t> &);
 void generate_multilayers(std::vector<cs::catom_t> & catom_array);

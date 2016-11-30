@@ -63,6 +63,9 @@ namespace create{
          double host_alloy_scale;
          bool save_host_alloy_profile;
          std::string save_file_name;
+         bool oxygen;
+         bool oxygen_terminated;
+         double oxygen_coordination_range;
          host_alloy_d_t host_alloy_distribution; // enum specifying type of alloy distribution
          std::vector<slave_material_t> slave_material; // array of slave alloys for host
          // constructor
@@ -72,6 +75,9 @@ namespace create{
             host_alloy_scale (50.0),
             save_host_alloy_profile(false),
             save_file_name(""),
+            oxygen(false),
+            oxygen_terminated(false),
+            oxygen_coordination_range(1.0), // Unit cells
             host_alloy_distribution(internal::homogeneous)
             {
                // resize array of slave materials
@@ -90,12 +96,16 @@ namespace create{
       extern double faceted_particle_111_radius; // 111 facet radius
       extern double cone_angle; // angle of cone to truncate cylinder
 
+      extern bool calculate_oxygen_termination; // determines whether oxygen termination should be calculated
+
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
       extern void alloy(std::vector<cs::catom_t> & catom_array);
       extern void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void clear_atoms(std::vector<cs::catom_t> &);
       extern void cone(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void oxygen(std::vector<cs::catom_t> & catom_array);
 
    } // end of internal namespace
 } // end of create namespace
