@@ -589,6 +589,7 @@ namespace vcuda{
          std::vector<double> saturations;
 
          ::stats::system_magnetization.get_mask(mask, saturations);
+
          cu::stats::system_mask_size = saturations.size();
          cu::stats::system_mask.resize(mask.size());
          thrust::copy (

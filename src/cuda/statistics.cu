@@ -149,7 +149,17 @@ namespace vcuda{
    {
       namespace stats
       {
+          typedef thrust::tuple<double, double> double2;
 
+          // This functor implements the dot product between 3d vectors
+          struct D2Product : public thrust::unary_function<double2, double>
+          {
+              __host__ __device__
+                  double operator()(const double2& a) const
+                  {
+                      return thrust::get<0>(a) * thrust::get<1>(a);
+                  }
+          };
 
          void __update_stat (
                const cu_index_array_t & mask,
@@ -160,6 +170,38 @@ namespace vcuda{
          {
 
             if (mask_size < 1) return; // Nothing to do
+            else if ( mask_size == 1)
+            {
+                typedef cu_real_array_t::iterator real_it;
+                typedef thrust::tuple< real_it, real_it> real_it_tuple;
+                typedef thrust::zip_iterator<real_it_tuple> real2_it;
+
+                real2_it begin = thrust::make_zip_iterator( make_tuple( cu::atoms::x_spin_array.begin(), cu::atoms::spin_norm_array.begin() ) );
+                real2_it end = thrust::make_zip_iterator( make_tuple( cu::atoms::x_spin_array.end(), cu::atoms::spin_norm_array.end() ) );
+                stat[0] = thrust::transform_reduce( begin, end, D2Product(), 0.0, thrust::plus<float>()  );
+
+                begin = thrust::make_zip_iterator( make_tuple( cu::atoms::y_spin_array.begin(), cu::atoms::spin_norm_array.begin() ) );
+                end = thrust::make_zip_iterator( make_tuple( cu::atoms::y_spin_array.end(), cu::atoms::spin_norm_array.end() ) );
+                stat[1] = thrust::transform_reduce( begin, end, D2Product(), 0.0, thrust::plus<float>()  );
+
+                begin = thrust::make_zip_iterator( make_tuple( cu::atoms::z_spin_array.begin(), cu::atoms::spin_norm_array.begin() ) );
+                end = thrust::make_zip_iterator( make_tuple( cu::atoms::z_spin_array.end(), cu::atoms::spin_norm_array.end() ) );
+                stat[2] = thrust::transform_reduce( begin, end, D2Product(), 0.0, thrust::plus<float>()  );
+
+                double ms = thrust::reduce( cu::atoms::spin_norm_array.begin(), cu::atoms::spin_norm_array.end() );
+                double m = sqrt( stat[0]*stat[0] + stat[1]*stat[1] + stat[2]*stat[2]);
+                stat[0] /= m;
+                stat[1] /= m;
+                stat[2] /= m;
+                stat[3] = m / ms;
+
+                mean_stat[0] += stat[0];
+                mean_stat[1] += stat[1];
+                mean_stat[2] += stat[2];
+                mean_stat[3] += stat[3];
+
+                return;
+            }
 
             // Clean up the stat buffer
             thrust::fill(
@@ -449,11 +491,11 @@ namespace vcuda{
                   hist[4 * i + 0] = mx * imm;
                   hist[4 * i + 1] = my * imm;
                   hist[4 * i + 2] = mz * imm;
-                  hist[4 * i + 3] = imm * ms;
+                  hist[4 * i + 3] = ms / imm;
                   accum[4 * i + 0] += mx * imm;
                   accum[4 * i + 1] += my * imm;
                   accum[4 * i + 2] += mz * imm;
-                  accum[4 * i + 3] += imm * ms;
+                  accum[4 * i + 3] += ms / imm;
                } else {
                   // Just wipe the histogram
                   // FIXME Even this could be removed
