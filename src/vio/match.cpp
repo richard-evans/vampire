@@ -3136,22 +3136,46 @@ namespace vin{
             //--------------------------------------------------------------------
             test="non-magnetic";
             /*
-            logical non-magnetic [false]
-                This flag causes the material to be identified as non magnetic,
-                with all atoms removed of this type removed from the simulation.
+            integer non-magnetic [0]
+            The default value is 0 for all materials. Valid values are
+            remove, (blank) [same as remove] and keep.
+            Value = keep causes the material to be identified as non magnetic
+            with all atoms of this type KEPT in the simulation.
+            Value = 1 remove/blank causes the material to be identified as non magnetic
+            with all atoms of this type REMOVED from the simulation.
             The atomic positions of non-magnetic atoms are saved separately
             with the usual atomic spin configuration for post processing.
             The default value is false for all materials. Valid values are
             true, false or (blank) [same as true].
             */
             if(word==test){
-                // Test for sane input
-                bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
-                // set flag
-                read_material[super_index].non_magnetic = sanitised_bool;
-                return EXIT_SUCCESS;
+               test="keep";
+               // keep all atoms in simulation (for efficient parallelization)
+               if(value==test){
+                  // set flag
+                  read_material[super_index].non_magnetic = 2;
+                  return EXIT_SUCCESS;
+               }
+               // delete all atoms in simulation (default)
+               test="remove";
+               if(value==test){
+                  // set flag
+                  read_material[super_index].non_magnetic = 1;
+                  return EXIT_SUCCESS;
+               }
+               test="";
+               if(value==test){
+                  // set flag
+                  read_material[super_index].non_magnetic = 1;
+                  return EXIT_SUCCESS;
+               }
+               else{
+                  terminaltextcolor(RED);
+                  std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " = " << value <<" is not a valid option: remove, keep." << std::endl;
+                  terminaltextcolor(WHITE);
+                  err::vexit();
+               }
             }
-
             //-------------------------------------------------------------------
             // Call module input parameters
             //-------------------------------------------------------------------

@@ -536,7 +536,7 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
             catom_array[atom]=tmp_catom_array[a];
             atom++;
          }
-         // if atom is part of a non-magnetic material then save to nm array
+         // if atom is part of a non-magnetic material to be removed then save to nm array
          else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == 1){
             cs::nm_atom_t tmp;
          	tmp.x = catom_array[a].x;
