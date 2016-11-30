@@ -2700,6 +2700,7 @@ namespace vin{
                 double css=atof(value.c_str());
                 check_for_valid_value(css, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
                 read_material[super_index].core_shell_size=css;
+                cs::core_shell_particles = true;
                 return EXIT_SUCCESS;
             }
             //-------------------------------------------------------------------

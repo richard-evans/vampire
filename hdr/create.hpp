@@ -85,6 +85,7 @@ namespace cs{
 	extern int system_creation_flags[10];
 	extern std::string unit_cell_file;
 	extern bool fill_core_shell;
+   extern bool core_shell_particles;
 
 	// Variables for interfacial roughness control
 	extern bool interfacial_roughness;
