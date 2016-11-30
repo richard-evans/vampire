@@ -15,6 +15,7 @@
 #include "atoms.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
+#include "gpu.hpp"
 #include "random.hpp"
 #include "stats.hpp"
 #include "vio.hpp"

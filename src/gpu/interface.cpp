@@ -84,7 +84,7 @@ namespace gpu{
       if(word==test){
          int dev=atoi(value.c_str());
          // Test for valid range
-         vin::check_for_valid_int(dev, word, line, prefix, unit, "none", 0, 16,"input","0-16");
+         vin::check_for_valid_int(dev, word, line, prefix, 0, 16,"input","0-16");
          gpu::device = dev;
          return true;
       }
