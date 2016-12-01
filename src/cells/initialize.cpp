@@ -246,8 +246,8 @@ namespace cells{
       #ifdef MPICF
          MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      cells::num_atoms_in_cell_global.resize(cells::num_cells);
-      cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
+         cells::num_atoms_in_cell_global.resize(cells::num_cells);
+         cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
 		#endif
 
 
@@ -266,28 +266,27 @@ namespace cells{
          }
       }
 
-
-     cells::atom_in_cell_coords_array_x.resize(cells::num_cells,std::vector<double>(num_local_atoms));
-     cells::atom_in_cell_coords_array_y.resize(cells::num_cells,std::vector<double>(num_local_atoms));
-     cells::atom_in_cell_coords_array_z.resize(cells::num_cells,std::vector<double>(num_local_atoms));
-
-     cells::index_atoms_array.resize(cells::num_cells,std::vector<int>(num_local_atoms));
-     //cells::index_atoms_array1D.reserve(num_local_atoms);
-     cells::index_atoms_array1D.resize(num_local_atoms);
+      // Resize 2D arrays to store cell - atom informations
+      cells::atom_in_cell_coords_array_x.resize(cells::num_cells);
+      cells::atom_in_cell_coords_array_y.resize(cells::num_cells);
+      cells::atom_in_cell_coords_array_z.resize(cells::num_cells);
+      cells::index_atoms_array.resize(cells::num_cells);
+      // Initialise arrays to zero
+      for(int atom=0;atom<num_local_atoms;atom++){
+         int local_cell=cells::atom_cell_id_array[atom];
+         cells::atom_in_cell_coords_array_x[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+         cells::atom_in_cell_coords_array_y[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+         cells::atom_in_cell_coords_array_z[local_cell].resize(cells::num_atoms_in_cell[local_cell],0.0);
+         cells::index_atoms_array[local_cell].resize(cells::num_atoms_in_cell[local_cell],0);
+      }
+      // Resize 1D array to store atom-cell informations
+      cells::index_atoms_array1D.resize(num_local_atoms);
 
       //Set number of atoms in cell to zero
       for(int cell=0;cell<cells::num_cells;cell++){
          cells::num_atoms_in_cell[cell]=0;
       }
 
-      for(int i=0;i<cells::num_cells;i++){
-         for(int j=0;j<num_local_atoms;j++){
-            cells::atom_in_cell_coords_array_x[i][j]=0.0;
-            cells::atom_in_cell_coords_array_y[i][j]=0.0;
-            cells::atom_in_cell_coords_array_z[i][j]=0.0;
-            cells::index_atoms_array[i][j]=0;
-         }
-      }
 
       // Now re-update num_atoms in cell for local atoms only
       for(int atom=0;atom<num_local_atoms;atom++){
@@ -295,7 +294,6 @@ namespace cells{
          int type = cells::internal::atom_type_array[atom];
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
-         //if(mus/(9.274e-24) > 0.5){
          if(mp::material[type].non_magnetic==0){
             cells::atom_in_cell_coords_array_x[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_x[atom];
             cells::atom_in_cell_coords_array_y[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_y[atom];
@@ -305,7 +303,6 @@ namespace cells{
          }
       }
 
-      //std::cout << "\n\nI'm in here Cells Module\n\n" << std::flush;
       // Reorganise array that associate cell with atoms in 1D structure
       // so to pass it easy in parallel
       int counter_id_at=0;
@@ -320,7 +317,6 @@ namespace cells{
       //std::cout << "cells::cell_id_array.size() = " << cells::cell_id_array.size() << "\n" << std::flush;
       //std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
 
-
       // Calculate number of local cells
       for(int cell=0;cell<cells::num_cells;cell++){
          if(cells::num_atoms_in_cell[cell]!=0){
@@ -332,7 +328,6 @@ namespace cells{
       }
 
       //std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
-
 
       zlog << zTs() << "Number of local macrocells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
 
