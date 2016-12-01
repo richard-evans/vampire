@@ -46,6 +46,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 
 namespace vmath{
 
@@ -523,6 +524,14 @@ double interpolate_c(double xi,double yi,double xj,double yj){
 
    return yi - m*xi;
 
+}
+
+double minimum3(double first, double second, double third){
+   double minimum=(std::numeric_limits<double>::max());
+   if(first < minimum) minimum = first; // probably always true
+   if(second < minimum) minimum = second;
+   if(third < minimum) minimum = third;
+   return minimum;
 }
 
 } // end of namespcae vmath

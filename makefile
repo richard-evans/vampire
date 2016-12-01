@@ -174,6 +174,7 @@ include src/dipole/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
+include src/unitcell/makefile
 include src/vio/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
