@@ -88,9 +88,11 @@ namespace create{
       //-----------------------------------------------------------------------------
       extern std::vector<create::internal::mp_t> mp; // array of material properties
       extern MTRand grnd; // general random number generator for create functions
+
       extern double faceted_particle_100_radius; // 100 facet radius
       extern double faceted_particle_110_radius; // 110 facet radius
       extern double faceted_particle_111_radius; // 111 facet radius
+      extern double cone_angle; // angle of cone to truncate cylinder
 
       extern double voronoi_grain_size;
       extern double voronoi_grain_spacing;
@@ -101,9 +103,10 @@ namespace create{
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
-      void alloy(std::vector<cs::catom_t> & catom_array);
-      void voronoi_substructure(std::vector<cs::catom_t> & catom_array);
-      void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void alloy(std::vector<cs::catom_t> & catom_array);
+      extern void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void cone(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void voronoi_substructure(std::vector<cs::catom_t> & catom_array);
 
       void voronoi_grain_rounding(std::vector <std::vector <double> > & grain_coord_array,
                                   std::vector <std::vector <std::vector <double> > > &  grain_vertices_array);

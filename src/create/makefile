@@ -5,6 +5,7 @@
 # List module object filenames
 create_objects=\
 alloy.o \
+cone.o \
 data.o \
 faceted.o \
 initialize.o \

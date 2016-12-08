@@ -37,7 +37,7 @@
 
 namespace vmpi{
 	int mpi_mode=0;
-	int ppn=1;						///< Processors per node
+   unsigned int ppn=1;  ///< Processors per node
 	int my_rank=0;
 	int num_processors=1;
 	int num_core_atoms;
@@ -87,122 +87,6 @@ namespace vmpi{
 
 
 	namespace vmpi{
-
-	int geometric_decomposition(int num_cpus, double system_dimensions[3]){
-
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "vmpi::geometric_decomposition has been called" << std::endl;}
-
-	// set local variables
-	int x=num_cpus;
-	int nx,ny,nz;	/// Number of cpus in x,y,z
-	std::vector<int> factor_array; /// to store the factors of each given n_cpu
-	factor_array.reserve(50);
-	int counter_factor=0; /// to count the number of factors
-	int n1=1; /// store n solutions temporary
-	int n2=1;
-	int n3=1;
-	double lx = system_dimensions[0];
-	double ly = system_dimensions[1];
-	double lz = system_dimensions[2];
-
-	double surface_volumn=0.0;
-	double compare_sv=10000000.0; /// set a very large number for comparing each surface_volumn to find the minimum
-
-	// Check for zero cpu's
-	if(num_cpus==0){
-		terminaltextcolor(RED);
-		std::cerr << "Error - zero cpu's for mpi decomposition, check initialisation of mpi variables" << std::endl;
-		terminaltextcolor(WHITE);
-		err::vexit();
-	}
-
-	//---------------------------------------------------
-	// Determine number of cpu's in x,y,z
-	//---------------------------------------------------
-
-	// find all the factors of given n_cpu
-	for (int i=1;i<x+1;i++){
-		if ((x%i)==0){
-		  factor_array.push_back(i);
-			//cout << i << "\t"<< counter_factor << "\t" << factor_array[counter_factor] << endl;
-			counter_factor++;
-		}
-	}
-
-	// set the remaining elements of the array as 1 if there are no other factors
-	for (int i=counter_factor+1;i<factor_array.size();i++){
-		factor_array[i]=1;
-	}
-
-	//cout << counter_factor << endl;
-	// Check for prime number of CPUs for n > 10
-	if (counter_factor==2 && num_cpus>10) {
-		std::cerr << num_cpus << "\t" << "cpus cannot be decomposed efficiently, exiting" << std::endl;
-		err::vexit();
-	}
-	else {
-		for (int i=0;i<counter_factor;i++){
-			for (int j=0;j<counter_factor;j++){
-				for (int k=0;k<counter_factor;k++){
-					n1=factor_array[i];
-					n2=factor_array[j];
-					n3=factor_array[k];
-					if (n1*n2*n3==x){
-						surface_volumn = 2.0*(double(n1)/lx+double(n2)/ly+double(n3)/lz);
-						if (surface_volumn < compare_sv) {
-							compare_sv=surface_volumn;
-							nx=n1;
-							ny=n2;
-							nz=n3;
-						}
-					}
-				}
-			}
-		}
-		if(vmpi::my_rank==0){
-			std::cout << "System decomposed into" << "\t" << nx << " x " << ny << " x "<< nz << " CPUs for parallel execution" << std::endl;
-		}
-	}
-	//---------------------------------------------------
-	// Calculate local mpi_dimensions assuming box
-	//---------------------------------------------------
-
-	int my_rank = vmpi::my_rank;
-	double x1,x2,y1,y2,z1,z2; // start and end of each sub-cube
-
-	double dx=lx/double(nx);
-	double dy=ly/double(ny);
-	double dz=lz/double(nz);
-
-	// calculate each rank on x, y, z directions respectively
-	int my_rank_x= int(my_rank%((nx)*(ny))/(ny));
-	int my_rank_y=(my_rank%((nx)*(ny)))%(ny);
-	int my_rank_z= int(my_rank/((nx)*(ny)));
-
-	//cout <<my_rank_x << "\t" << my_rank_y << "\t" << my_rank_z << endl;
-
-	// x1, x2 stand for start_position and end_position on x axis respectively. Similar as y1,y2,z1,z2.
-	x1=double(my_rank_x)*dx;
-	x2=double(x1)+dx;
-	y1=double(my_rank_y)*dy;
-	y2=double(y1)+dy;
-	z1=double(my_rank_z)*dz;
-	z2=double(z1)+dz;
-
-	//std::cout << my_rank << "\t" << x1 << "\t" << x2 << "\t" << y1 << "\t" << y2 << "\t" << z1 << "\t" << z2 << std::endl;
-
-	// set namespaced variables
-	vmpi::min_dimensions[0]=x1;
-	vmpi::min_dimensions[1]=y1;
-	vmpi::min_dimensions[2]=z1;
-	vmpi::max_dimensions[0]=x2;
-	vmpi::max_dimensions[1]=y2;
-	vmpi::max_dimensions[2]=z2;
-
-	return EXIT_SUCCESS;
-
-}
 
 	int crystal_xyz(std::vector<cs::catom_t> & catom_array){
 	//====================================================================================
@@ -430,7 +314,15 @@ void atom_needed_by_remote_cpu(int atom, // atom number
    const double max_x = minimax[3];
    const double max_y = minimax[4];
    const double max_z = minimax[5];
-
+/*
+   std::cout << "cpu = " << cpu_rank << "\t";
+	std::cout << "min_x = "  << min_x << "\t";
+	std::cout << "min_y = "  << min_y << "\t";
+	std::cout << "min_z = "  << min_z << "\t";
+	std::cout << "max_x = "  << max_x << "\t";
+	std::cout << "max_y = "  << max_y << "\t";
+	std::cout << "max_z = "  << max_z << std::endl;
+*/
    // temporary virtual particle
    virtual_particle_t temp_vp;
 

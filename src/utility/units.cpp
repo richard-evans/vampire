@@ -48,6 +48,7 @@
 #include "vio.hpp"
 
 #include <iostream>
+#include <cmath>
 #include <cstdlib>
 
 /// @namespace units
@@ -58,9 +59,9 @@
 ///
 namespace units {
 
-	const int max_units=43;
+	const int max_units=44;
 
-	const double pi=3.14;
+	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
 	bool initialised=false;
 	// Generic unit names and conversion factors
@@ -145,6 +146,8 @@ int init(){
 		unit[40]="fs";			conversion[40]=1.0E-15;				type[40]="time"; // femtoseconds
 		unit[41]="as";			conversion[41]=1.0E-18;				type[41]="time"; // attoseconds
 		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
+      // New
+      unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
 
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag

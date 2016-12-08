@@ -32,6 +32,7 @@ namespace create{
          double faceted_particle_100_radius = 1.0; // 100 facet particle radius
          double faceted_particle_110_radius = 1.0; // 110 facet particle radius
          double faceted_particle_111_radius = 1.0; // 111 facet particle radius
+         double cone_angle = 10.0; // factor to truncate cone
 
          double voronoi_grain_size = 50.0;
          double voronoi_grain_spacing = 10.0;

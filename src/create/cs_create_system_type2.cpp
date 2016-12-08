@@ -42,6 +42,7 @@
 #include "grains.hpp"
 #include "material.hpp"
 #include "random.hpp"
+#include "unitcell.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 
@@ -180,6 +181,37 @@ int particle(std::vector<cs::catom_t> & catom_array){
 	particle_origin[1] = cs::system_dimensions[1]*0.5;
 	particle_origin[2] = cs::system_dimensions[2]*0.5;
 
+   double max_range_sq = 1e123;
+   unsigned int nearest;
+   const double prx = particle_origin[0];
+   const double pry = particle_origin[1];
+   const double prz = particle_origin[2];
+
+   // loop over all atoms to find closest atom (serial only)
+   #ifdef MPICF
+   #else
+ 	for(int atom=0;atom<catom_array.size();atom++){
+      double dx = catom_array[atom].x-particle_origin[0];
+      double dy = catom_array[atom].y-particle_origin[1];
+      double dz = catom_array[atom].z-particle_origin[2];
+      double r = dx*dx + dy*dy + dz*dz;
+      if(r < max_range_sq){
+         max_range_sq = r;
+         nearest = atom;
+      }
+   }
+   #endif
+
+   //reduce max range
+
+   // find cpu which has nearest atom
+
+   // broadcast position to all cpus.
+
+   particle_origin[0] = catom_array[nearest].x;
+   particle_origin[1] = catom_array[nearest].y;
+   particle_origin[2] = catom_array[nearest].z;
+
 	// check for move in particle origin and that unit cell size < 0.5 system size
 	if(cs::particle_creation_parity==1 &&
 		(2.0*unit_cell.dimensions[0]<cs::system_dimensions[0]) &&
@@ -216,6 +248,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
       case 7: // Faceted particle
    		create::internal::faceted(particle_origin,catom_array,0);
    		break;
+		case 8: // Cone
+			create::internal::cone(particle_origin,catom_array,0);
+			break;
 		default:
 			std::cout << "Unknown particle type requested for single particle system" << std::endl;
 			err::vexit();
@@ -256,7 +291,7 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 			// Determine particle origin
 			particle_origin[0] = double(x_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_x;
 			particle_origin[1] = double(y_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_y;
-			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
+			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
 
 			if(cs::particle_creation_parity==1){
 				particle_origin[0]+=unit_cell.dimensions[0]*0.5;
@@ -293,6 +328,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
                case 7: // Faceted particle
                   create::internal::faceted(particle_origin,catom_array,particle_number);
                   break;
+		         case 8: // Cone
+			         create::internal::cone(particle_origin,catom_array,0);
+			         break;
 					default:
 						std::cout << "Unknown particle type requested for single particle system" << std::endl;
 						err::vexit();
@@ -513,7 +551,7 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
    const int num_atoms=catom_array.size();
    int num_included=0;
    for(int a=0;a<num_atoms;a++){
-      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == false){
+      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic != 1){
          num_included++;
       }
    }
@@ -529,12 +567,12 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
       // loop over all existing atoms
       for(int a=0;a<num_atoms;a++){
          // if atom is to be included and is non-magnetic copy to new array
-         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic == false ){
+         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic != 1 ){
             catom_array[atom]=tmp_catom_array[a];
             atom++;
          }
-         // if atom is part of a non-magnetic material then save to nm array
-         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == true){
+         // if atom is part of a non-magnetic material to be removed then save to nm array
+         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == 1){
             cs::nm_atom_t tmp;
          	tmp.x = catom_array[a].x;
          	tmp.y = catom_array[a].y;

@@ -129,8 +129,8 @@ using std::string;
 		double Ks;
 
 		double gamma_rel;
-		double Jij_matrix_SI[max_materials];
-
+		std::vector<std::vector<double> >Jij_matrix_SI;
+		std::vector<std::vector<double> >Jij_matrix;
 		double initial_spin[3];
 		bool random_spins;
 
@@ -154,7 +154,6 @@ using std::string;
 
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
-		double Jij_matrix[max_materials];
 		double H_th_sigma;
 		bool constrained; /// specifies primary or alternate integrator
 
@@ -168,7 +167,7 @@ using std::string;
 		bool fill; /// flag to determine if material fills voided space
       double temperature_rescaling_alpha; // temperature rescaling exponent
       double temperature_rescaling_Tc; // temperaure rescaling Tc
-      bool non_magnetic;
+      int non_magnetic;
 		bool random_anisotropy; // flag to control random anisotropy by material
 		bool random_grain_anisotropy; // flag to control random anisotropy by grain
       lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
@@ -187,7 +186,7 @@ using std::string;
 	extern double gamma_SI;
 
 	// Unrolled material parameters for speed
-	extern std::vector <double> MaterialMuSSIArray;
+	extern std::vector <double> mu_s_array;
 	extern std::vector <zkval_t> MaterialScalarAnisotropyArray;
 	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
    extern std::vector <double> material_second_order_anisotropy_constant_array;

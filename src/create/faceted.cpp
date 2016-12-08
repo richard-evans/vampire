@@ -71,7 +71,7 @@ void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, co
 		double ry = fabs(catom_array[atom].y-particle_origin[1]);
 		double rz = fabs(catom_array[atom].z-particle_origin[2]);
 
-		if(mp::material[catom_array[atom].material].core_shell_size>0.0){
+		if(cs::core_shell_particles){
          // Iterate over materials
          for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
             int mat = (it)->mat;
@@ -102,6 +102,7 @@ void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, co
 		}
 		else
       {
+
          // Calculate facet radii
          bool in100 = (rx <= fr100*rsize*sfx) && (ry <= fr100*rsize*sfy) && (rz <= fr100*rsize*sfz);
          bool in110 = (rx <= fr110*rsize*root2 + fr110*rsize*(sfx-1.0) + fr110*rsize*(sfy-1.0) - ry) &&
