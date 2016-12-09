@@ -23,6 +23,7 @@
 // Vampire headers
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "LLG.hpp"
 #include "material.hpp"
@@ -438,17 +439,12 @@ namespace vout{
     const char* cfg_filec = cfg_file.c_str();
 
     #ifdef MPICF
-    // Reduce demagnetisation fields to processor 0
-    if(vmpi::my_rank==0){
-        MPI_Reduce(MPI_IN_PLACE, &cells::field_array_x[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-        MPI_Reduce(MPI_IN_PLACE, &cells::field_array_y[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-        MPI_Reduce(MPI_IN_PLACE, &cells::field_array_z[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-    }
-    else{
-        MPI_Reduce(&cells::field_array_x[0], &cells::field_array_x[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&cells::field_array_y[0], &cells::field_array_y[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&cells::field_array_z[0], &cells::field_array_z[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-    }
+    // if flag to print cells field is active, all cpus send cells field to root proc
+    dipole::send_cells_field(cells::cell_id_array,
+                           dipole::cells_field_array_x,
+                           dipole::cells_field_array_y,
+                           dipole::cells_field_array_z,
+                           cells::num_local_cells);
     #endif
 
     // Output masterfile header on root process
@@ -478,11 +474,13 @@ namespace vout{
         cfg_file_ofstr << "# Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 
-        // Root process now outputs the cell magnetisations
-        for(int cell=0; cell < cells::num_cells; cell++){
-            cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell]<< "\t";
-            cfg_file_ofstr << cells::field_array_x[cell] << "\t" << cells::field_array_y[cell] << "\t" << cells::field_array_z[cell] << std::endl;
-        }
+         // Root process now outputs the cell magnetisations
+         for(int cell=0; cell < cells::num_cells; cell++){
+            if(cells::num_atoms_in_cell[cell]>0){
+               cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell]<< "\t";
+               cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << std::endl;
+            }
+         }
 
         cfg_file_ofstr.close();
 
@@ -569,10 +567,11 @@ namespace vout{
         cfg_file_ofstr << "#" << std::endl;
         cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 
-        for(int cell=0; cell<cells::num_cells; cell++){
-            cfg_file_ofstr << cells::cell_coords_array_x[cell] << "\t" << cells::cell_coords_array_y[cell] << "\t" << cells::cell_coords_array_z[cell] << std::endl;
-        }
-
+			for(int cell=0; cell<cells::num_cells; cell++){
+         	if(cells::num_atoms_in_cell[cell]>0){
+            	cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::pos_and_mom_array[4*cell+0] << "\t" << cells::pos_and_mom_array[4*cell+1] << "\t" << cells::pos_and_mom_array[4*cell+2] <<  std::endl;
+         	}
+      	}
         cfg_file_ofstr.close();
     }
 
