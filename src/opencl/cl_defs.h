@@ -13,11 +13,12 @@ typedef double real_t;
 typedef ulong  uint_t;
 
 // double precision (64-bit) function
+#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable
 #define ATOMIC_CMPXCHG(a,b,c) atom_cmpxchg(a,b,c)
 
 #else
 
-// single precision (32-bit) real and unsigned interge types
+// single precision (32-bit) real and unsigned integer types
 typedef float real_t;
 typedef uint  uint_t;
 
