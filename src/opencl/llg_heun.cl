@@ -1,14 +1,4 @@
-#ifdef OPENCL_DP
-typedef double real_t
-#else
-typedef float  real_t
-#endif
-
-#ifdef OPENCL_USE_NATIVE_FUNCTIONS
-#define RSQRT(x) native_rsqrt(x)
-#else
-#define RSQRT(x) rsqrt(x)
-#endif
+#include "cl_defs.h"
 
 struct heun_params_t
 {

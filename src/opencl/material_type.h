@@ -1,11 +1,7 @@
 #ifndef VOPENCL_MATERIAL_TYPE_H_
 #define VOPENCL_MATERIAL_TYPE_H_
 
-#ifdef OPENCL_DP
-typedef double real_t
-#else
-typedef float  real_t
-#endif
+#include "cl_defs.h"
 
 struct material_parameters_t
 {

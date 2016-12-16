@@ -1,18 +1,4 @@
-#ifdef OPENCL_DP
-typedef double real_t;
-typedef ulong  uint_t;
-#else
-typedef float  real_t;
-typedef uint   uint_t;
-#endif
-
-#ifdef OPENCL_USE_NATIVE_FUNCTIONS
-#define RSQRT(x) native_rsqrt(x)
-#else
-#define RSQRT(c) rsqrt(x)
-#endif
-
-#define PI 3.14159265358979323846
+#include "cl_defs.h"
 
 __kernel
 void update_dipole_fields(const __global real_t *x_mag,
@@ -97,21 +83,16 @@ void atomic_add_global(volatile __global real_t *source, const real_t operand)
 {
    union
    {
-      uint_t intVal;
-      real_t floatVal;
-   } newVal;
-   union
-   {
-      uint_t intVal;
-      real_t floatVal;
-   } prevVal;
+       uint_t i;
+       real_t f;
+   } newVal, prevVal;
 
    do
    {
-      prevVal.floatVal = *source;
-      newVal.floatVal = prevVal.floatVal + operand;
+      prevVal.f = *source;
+      newVal.f = prevVal.f + operand;
    }
-   while (atomic_cmpxchg((volatile __global uint *)source, prevVal.intVal, newVal.intVal) != prevVal.intVal);
+   while (ATOMIC_CMPXCHG((volatile __global uint *)source, prevVal.i, newVal.i) != prevVal.i);
 }
 
 __kernel

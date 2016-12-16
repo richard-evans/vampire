@@ -1,10 +1,5 @@
+#include "cl_defs.h"
 #include "material_type.h"
-
-#ifdef OPENCL_DP
-typedef double real_t
-#else
-typedef float  real_t
-#endif
 
 __kernel
 void update_nexch_spin_fields(const __global int *material,

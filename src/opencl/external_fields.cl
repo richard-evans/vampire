@@ -1,16 +1,5 @@
+#include "cl_defs.h"
 #include "material_type.h"
-
-#ifdef OPENCL_DP
-typedef double real_t
-#else
-typedef float  real_t
-#endif
-
-#ifdef OPENCL_USE_NATIVE_FUNCTIONS
-#define POW(x, y) native_powr(x, y)
-#else
-#define POW(x, y) pow(x, y)
-#endif
 
 __kernel
 void update_external_fields(const __global int *material,

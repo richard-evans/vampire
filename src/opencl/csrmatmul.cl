@@ -1,8 +1,4 @@
-#ifdef OPENCL_DP
-typedef double real_t
-#else
-typedef float  real_t
-#endif
+#include "cl_defs.h"
 
 __kernel
 void matmul(const __global real_t *Mvals,
