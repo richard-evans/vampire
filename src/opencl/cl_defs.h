@@ -14,7 +14,9 @@ typedef ulong  uint_t;
 
 // double precision (64-bit) function
 #define ATOMIC_CMPXCHG(a,b,c) atom_cmpxchg(a,b,c)
+
 #else
+
 // single precision (32-bit) real and unsigned interge types
 typedef float real_t;
 typedef uint  uint_t;
@@ -23,6 +25,7 @@ typedef uint  uint_t;
 #define ATOMIC_CMPXCHG(a,b,c) atomic_cmpxchg(a,b,c)
 
 #endif // OPENCL_DP
+
 
 
 // native functions may be significantly faster
