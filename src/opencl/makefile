@@ -16,7 +16,6 @@ obj/opencl/exchange_fields.o \
 obj/opencl/external_fields.o \
 obj/opencl/finalize.o \
 obj/opencl/initialize.o \
-obj/opencl/interface.o \
 obj/opencl/llg_heun.o \
 obj/opencl/opencl_utils.o \
 obj/opencl/random.o \
