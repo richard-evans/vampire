@@ -1,7 +1,10 @@
 #include "opencl_include.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <string>
+
+#include "errors.hpp"
 
 #include "internal.hpp"
 
@@ -20,6 +23,8 @@ namespace vopencl
                                         const cl::Device  &device,
                                         const std::string &opts="")
       {
+         std::cerr << "Building kernel " << kernel_name << " from file " << file_name << std::endl;
+
          std::ifstream source_file(file_name);
          std::string source_code(std::istreambuf_iterator<char>(source_file),
                                 (std::istreambuf_iterator<char>()));
@@ -38,7 +43,7 @@ namespace vopencl
          prg_opts.append(" -DOPENCL_USE_NATIVE_FUNCTIONS");
 #endif
 
-         program.build({device}, prg_opts.c_str());
+         cl_int err = program.build({device}, prg_opts.c_str());
 
 #ifdef OPENCL_DEBUG
          vcl::OCLLOG << "Building from " << file_name;
@@ -48,7 +53,15 @@ namespace vopencl
          vcl::OCLLOG << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
 #endif
 
+         if (err != CL_SUCCESS)
+         {
+            std::cerr << "Error building kernel " << kernel_name << " in file " << file_name << std::endl;
+            std::cerr << "cl::Program::build() returned " << err << std::endl;
+            ::err::vexit();
+         }
+
          cl::Kernel ret(program, kernel_name.c_str());
+
          return ret;
       }
    }

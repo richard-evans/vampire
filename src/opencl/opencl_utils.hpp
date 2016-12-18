@@ -2,10 +2,36 @@
 #define VOPENCL_OPENCL_UTILS_HPP_
 
 #include <fstream>
+#include <iostream>
 #include <string>
 
-#include "opencl_include.hpp"
+#include "errors.hpp"
+
 #include "internal.hpp"
+#include "opencl_include.hpp"
+
+#define UNUSED(x) (void)(x)
+
+static void pass_args(cl::Kernel &k, unsigned i)
+{
+   UNUSED(k);
+   UNUSED(i);
+}
+
+template <typename Car, typename... Cdr>
+static void pass_args(cl::Kernel &k, unsigned i, Car car, Cdr... cdr)
+{
+   cl_int err;
+   if ((err = k.setArg(i++, car)) == CL_SUCCESS)
+      pass_args(k, i, cdr...);
+   else
+   {
+      std::cerr << "Error setting kernel argument " << (i-1);
+      std::cerr << " in kernel " << k.getInfo<CL_KERNEL_FUNCTION_NAME>() << std::endl;
+      std::cerr << "error code " << err << std::endl;
+      ::err::vexit();
+   }
+}
 
 namespace vopencl
 {
@@ -17,35 +43,16 @@ namespace vopencl
                                         const cl::Device &device,
                                         const std::string &opts="");
 
-      // class used to execute kernels
-      class kernel_call
+      template <typename... Ts>
+      static void kernel_call(cl::Kernel &k,
+                              cl::CommandQueue &q,
+                              cl::NDRange gbl,
+                              cl::NDRange lcl,
+                              Ts... Args)
       {
-         cl::Kernel clk;
-         unsigned i;
-
-         void pass_args(void){}
-
-         template <typename Car, typename... Cdr>
-         void pass_args(Car car, Cdr... cdr)
-         {
-            clk.setArg(i++, car);
-            this->pass_args(cdr...);
-         }
-
-      public:
-
-         template <typename... Ts>
-         kernel_call(const cl::Kernel &k,
-                     const cl::CommandQueue &q,
-                     const cl::NDRange gbl,
-                     const cl::NDRange lcl,
-                     Ts... Args) :
-            clk(k), i(0)
-         {
-            this->pass_args(Args...);
-            q.enqueueNDRangeKernel(clk, cl::NullRange, gbl, lcl);
-         }
-      };
+         pass_args(k, 0, Args...);
+         q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
+      }
    }
 }
 

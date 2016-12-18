@@ -54,7 +54,6 @@ namespace vopencl
                           Hx, Hy, Hz);
 
          update_dipolar_fields();
-                          
       }
    }
 }
