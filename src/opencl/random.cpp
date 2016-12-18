@@ -29,7 +29,7 @@ namespace vopencl
             {
                std::ostringstream opts;
                opts << "-DN" << ::atoms::num_atoms*3;
-               cmwc = vcl::build_kernel_from_file("cmwc.cl", "cmwc",
+               cmwc = vcl::build_kernel_from_file("cl/cmwc.cl", "cmwc",
                                                   vcl::context, vcl::default_device,
                                                   opts.str());
                compiled_cmwc = true;
@@ -49,7 +49,7 @@ namespace vopencl
             {
                std::ostringstream opts;
                opts << "-DN" << ::atoms::num_atoms*3;
-               bm = vcl::build_kernel_from_file("boxmuller.cl", "BoxMullerTransform",
+               bm = vcl::build_kernel_from_file("cl/boxmuller.cl", "BoxMullerTransform",
                                                 vcl::context, vcl::default_device,
                                                 opts.str());
                compiled_bm = true;

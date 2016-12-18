@@ -23,7 +23,7 @@ namespace vopencl
       {
          if (!compiled_update_external_fields)
          {
-            update_ext = vcl::build_kernel_from_file("external_fields.cl",
+            update_ext = vcl::build_kernel_from_file("cl/external_fields.cl",
                                                      "update_external_fields",
                                                      vcl::context, vcl::default_device);
             compiled_update_external_fields = true;
