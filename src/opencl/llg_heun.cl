@@ -1,10 +1,10 @@
 #include "cl_defs.h"
 
-struct heun_params_t
+typedef struct
 {
    real_t prefactor;
    real_t lambda_times_prefactor;
-};
+} heun_params_t;
 
 __kernel
 void llg_heun_predictor_step(const __global int *material_id,
