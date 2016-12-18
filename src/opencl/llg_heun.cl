@@ -8,7 +8,7 @@ struct heun_params_t
 
 __kernel
 void llg_heun_predictor_step(const __global int *material_id,
-                             __constant heun_params_t *heun_params,
+                             __constant heun_params_t *heun_parameters,
                              __global real_t *x_spin,
                              __global real_t *y_spin,
                              __global real_t *z_spin,
@@ -22,14 +22,14 @@ void llg_heun_predictor_step(const __global int *material_id,
                              __global real_t *dSy,
                              __global real_t *dSz)
 {
-   size_t gsz = get_global_size(0);
+   const size_t gsz = get_global_size(0);
 
-   for (size_t atom = get_global_id(0); atom<NUM_ATOMS; atoms+=gsz)
+   for (size_t atom = get_global_id(0); atom<NUM_ATOMS; atom+=gsz)
    {
       size_t mid = material_id[atom];
 
       real_t prefactor = heun_parameters[mid].prefactor;
-      real_t lambdatpr = heun_parameters[mid].lambda_time_prefactor;
+      real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
       // initial spins
       real_t S_x = x_spin[atom];
@@ -80,7 +80,7 @@ void llg_heun_predictor_step(const __global int *material_id,
 
 __kernel
 void llg_heun_corrector_step(const __global int *material_id,
-                             __constant heun_params_t *hean_params,
+                             __constant heun_params_t *hean_parameters,
                              __global real_t *x_spin,
                              __global real_t *y_spin,
                              __global real_t *z_spin,
