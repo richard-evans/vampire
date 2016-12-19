@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "atoms.hpp"
 #include "sim.hpp"
 
@@ -23,9 +25,11 @@ namespace vopencl
       {
          if (!compiled_update_external_fields)
          {
-            update_ext = vcl::build_kernel_from_file("cl/external_fields.cl",
+            std::ostringstream opts;
+            opts << "-DNUM_ATOMS=" << ::atoms::num_atoms;
+            update_ext = vcl::build_kernel_from_file("src/opencl/cl/external_fields.cl",
                                                      "update_external_fields",
-                                                     vcl::context, vcl::default_device);
+                                                     vcl::context, vcl::default_device, opts.str());
             compiled_update_external_fields = true;
          }
 

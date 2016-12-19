@@ -58,10 +58,14 @@ namespace vopencl
 
       std::string message("OpenCL has been enabled in ");
 #ifdef OPENCL_DP
-      message.append("double precision mode");
+      message.append("double precision mode.");
 #else
-      message.append("single precision mode");
+      message.append("single precision mode.");
 #endif // OPENCL_DP
+
+#ifdef OPENCL_USE_NATIVE_FUNCTIONS
+      message.append(" Native functions will be used.");
+#endif
 
       std::cout << message << std::endl;
       zlog << zTs() << message << std::endl;
@@ -98,6 +102,7 @@ namespace vopencl
             for (unsigned j=0; j<tmp_devices.size(); ++j)
             {
                vcl::OCLLOG << "Found device " << tmp_devices[j].getInfo<CL_DEVICE_NAME>() << std::endl;
+               vcl::OCLLOG << "with version " << tmp_devices[j].getInfo<CL_DEVICE_VERSION>() << std::endl;
             }
 #endif // OPENCL_DEBUG
          }

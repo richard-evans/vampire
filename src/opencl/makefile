@@ -28,14 +28,14 @@ $(OPENCL_OBJ): $(OPENCL_OBJECTS)
 	$(LD) -r $^ -o $@
 
 $(OPENCL_OBJECTS): obj/%.o: src/%.cpp
-	$(GCC) $< -c -g -o $@ $(GCC_CFLAGS) $(OPENCL_PR) $(OPENCL_LIBS) -DOPENCL_DEBUG -Wall -Wextra -pedantic
+	$(GCC) $< -c -g -o $@ $(GCC_CFLAGS) $(OPENCL_PR) $(OPENCL_LIBS) -DOPENCL_DEBUG -Wall -Wextra -std=c++11 -pedantic
 
-gcc-opencl: GCC_CFLAGS+=-DOPENCL -std=c++11
+gcc-opencl: GCC_CFLAGS+=-DOPENCL
 gcc-opencl: OPENCL_PR+=-DOPENCL_DP
 gcc-opencl: $(OBJECTS) $(OPENCL_OBJ)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
 
-gcc-opencl-sp: GCC_CFLAGS+=-DOPENCL -std=c++11
+gcc-opencl-sp: GCC_CFLAGS+=-DOPENCL
 gcc-opencl-sp: OPENCL_PR+=-DOPENCL_SP
 gcc-opencl-sp: $(OBJECTS) $(OPENCL_OBJ)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)

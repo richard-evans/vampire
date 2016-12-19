@@ -39,7 +39,7 @@ namespace vopencl
 
             std::ostringstream opts;
             opts << "-DN=" << vsize;
-            matmul = vcl::build_kernel_from_file("cl/csrmatmul.cl", "matmul",
+            matmul = vcl::build_kernel_from_file("src/opencl/cl/csrmatmul.cl", "matmul",
                                                  vcl::context, vcl::default_device, opts.str());
 
             cl::CommandQueue write_q(vcl::context, vcl::default_device);

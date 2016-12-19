@@ -13,8 +13,8 @@ void BoxMullerTransform(const __global uint *urands,
 
    for (unsigned id=get_global_id(0); id<N/2; id+=gsz)
    {
-      real_t u1 = urands[2*id+0] / real_t(0xFFFFFFFF);
-      real_t u2 = urands[2*id+1] / real_t(0xFFFFFFFF);
+      real_t u1 = urands[2*id+0] / (real_t)0xFFFFFFFF;
+      real_t u2 = urands[2*id+1] / (real_t)0xFFFFFFFF;
 
       real_t r = SQRT(-2*LOG(u1));
       real_t costheta = COS(2 * PI * u2);

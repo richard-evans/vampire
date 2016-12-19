@@ -23,14 +23,15 @@ namespace vopencl
                                         const cl::Device  &device,
                                         const std::string &opts="")
       {
-         std::cerr << "Building kernel " << kernel_name << " from file " << file_name << std::endl;
-
          std::ifstream source_file(file_name);
+         if (!source_file)
+         {
+            std::cerr << "File " << file_name << " not found!" << std::endl;
+         }
          std::string source_code(std::istreambuf_iterator<char>(source_file),
                                 (std::istreambuf_iterator<char>()));
          cl::Program::Sources source(1, std::make_pair(source_code.c_str(),
                                                        source_code.length()+1));
-
 
          cl::Program program = cl::Program(context, source);
 
@@ -42,6 +43,8 @@ namespace vopencl
 #ifdef OPENCL_USE_NATIVE_FUNCTIONS
          prg_opts.append(" -DOPENCL_USE_NATIVE_FUNCTIONS");
 #endif
+
+         prg_opts.append(" -Isrc/opencl/cl");
 
          cl_int err = program.build({device}, prg_opts.c_str());
 

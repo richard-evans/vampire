@@ -3,7 +3,7 @@
 
 __kernel
 void update_external_fields(const __global int *material,
-                            const __global material_params_t material_params,
+                            const __global material_parameters_t *material_params,
                             const __global real_t *x_dip_field,
                             const __global real_t *y_dip_field,
                             const __global real_t *z_dip_field,
@@ -11,24 +11,24 @@ void update_external_fields(const __global int *material,
                             __global real_t *y_ext_field,
                             __global real_t *z_ext_field,
                             const __global real_t *gaussian_rand,
-                            __constant real_t global_temperature,
-                            __constant real_t Hx_app,
-                            __constant real_t Hy_app,
-                            __constant real_t Hz_app)
+                            const real_t global_temperature,
+                            const real_t Hx_app,
+                            const real_t Hy_app,
+                            const real_t Hz_app)
 {
    size_t gsz = get_global_size(0);
 
-   for (int i=get_global_id(0); i<N_ATOMS; ++i)
+   for (int i=get_global_id(0); i<NUM_ATOMS; ++i)
    {
       int mid = material[i];
 
-      material_params_t mat material_params[mid];
+      material_parameters_t mat = material_params[mid];
 
       real_t field_x = 0;
       real_t field_y = 0;
       real_t field_z = 0;
 
-      real_t temp = global_termperature;
+      real_t temp = global_temperature;
       real_t alpha = mat.temperature_rescaling_alpha;
       real_t sigma = mat.H_th_sigma;
       real_t tc = mat.temperature_rescaling_Tc;

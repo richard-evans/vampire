@@ -42,8 +42,8 @@ namespace vopencl
          if (!compiled_update_spin_fields)
          {
             std::ostringstream opts;
-            opts << "-DN_ATOMS=" << ::atoms::num_atoms;
-            update_nexch_spin_fields = vcl::build_kernel_from_file("cl/spin_fields.cl",
+            opts << "-DNUM_ATOMS=" << ::atoms::num_atoms;
+            update_nexch_spin_fields = vcl::build_kernel_from_file("src/opencl/cl/spin_fields.cl",
                                                                    "update_nexch_spin_fields",
                                                                    vcl::context, vcl::default_device,
                                                                    opts.str());

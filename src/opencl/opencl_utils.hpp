@@ -12,6 +12,23 @@
 
 #define UNUSED(x) (void)(x)
 
+static std::string get_error(cl_int err)
+{
+   switch (err)
+   {
+   case CL_INVALID_VALUE:
+      return "CL_INVALID_VALUE";
+   case CL_INVALID_KERNEL:
+      return "CL_INVALID_KERNEL";
+   case CL_OUT_OF_RESOURCES:
+      return "CL_OUT_OF_RESOURCES";
+   case CL_OUT_OF_HOST_MEMORY:
+      return "CL_OUT_OF_HOST_MEMORY";
+   default:
+      return "unknown error code";
+   }
+}
+
 // functions to pass given arguments to kernel k which recursively sets argument i
 // the following function is needed for when all the arguments have been set
 static void pass_args(cl::Kernel &k, unsigned i)
@@ -25,13 +42,13 @@ template <typename Car, typename... Cdr>
 static void pass_args(cl::Kernel &k, unsigned i, Car car, Cdr... cdr)
 {
    cl_int err;
-   if ((err = k.setArg(i++, car)) == CL_SUCCESS)
-      pass_args(k, i, cdr...);
+   if ((err = k.setArg(i, car)) == CL_SUCCESS)
+      pass_args(k, i+1, cdr...);
    else
    {
       std::cerr << "Error setting kernel argument " << (i-1);
       std::cerr << " in kernel " << k.getInfo<CL_KERNEL_FUNCTION_NAME>() << std::endl;
-      std::cerr << "error code " << err << std::endl;
+      std::cerr << "error code " << get_error(err) << std::endl;
       ::err::vexit();
    }
 }

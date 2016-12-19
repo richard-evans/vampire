@@ -11,9 +11,9 @@ void update_nexch_spin_fields(const __global int *material,
                               __global real_t *y_sp_field,
                               __global real_t *z_sp_field)
 {
-   size_t gsz = get_global_size(0);
+   const size_t gsz = get_global_size(0);
 
-   for (uint i=get_global_id(0); i<N_ATOMS; i+=gsz)
+   for (uint i=get_global_id(0); i<NUM_ATOMS; i+=gsz)
    {
       int mid = material[i];
 
@@ -27,22 +27,22 @@ void update_nexch_spin_fields(const __global int *material,
       real_t sy = y_spin[i];
       real_t sz = z_spin[i];
 
-      real_t ku = material.ku;
+      real_t ku = mat.ku;
       field_z = - 2 * ku * sz;
 
-      real_t ex = material.anisotropy_unit_x;
-      real_t ey = material.anisotropy_unit_y;
-      real_t ez = material.anisotropy_unit_z;
+      real_t ex = mat.anisotropy_unit_x;
+      real_t ey = mat.anisotropy_unit_y;
+      real_t ez = mat.anisotropy_unit_z;
 
       real_t sdote  = sx*ex + sy*ey + sz*ez;
       real_t sdote3 = sdote * sdote * sdote;
       real_t sdote5 = sdote3 * sdote * sdote;
 
-      real_t scale = real_t(2) / 3;
+      real_t scale = 2.0 / 3.0;
 
-      real_t k2 = material.sh2;
-      real_t k4 = material.sh4;
-      real_t k6 = material.sh6;
+      real_t k2 = mat.sh2;
+      real_t k4 = mat.sh4;
+      real_t k6 = mat.sh6;
 
       real_t ek2 = k2 * 3 * sdote;
       real_t ek4 = k4 * 0.125 * (140 * sdote3 - 60 * sdote);
