@@ -5,7 +5,7 @@
 LD=ld
 
 OPENCL_LIBS=-lOpenCL
-OPENCL_PR=-DOPENCL_DP
+OPENCL_PR=
 
 # List module object filenames
 OPENCL_OBJECTS =\
@@ -31,8 +31,17 @@ $(OPENCL_OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) $< -c -g -o $@ $(GCC_CFLAGS) $(OPENCL_PR) $(OPENCL_LIBS) -DOPENCL_DEBUG -Wall -Wextra -pedantic
 
 gcc-opencl: GCC_CFLAGS+=-DOPENCL -std=c++11
+gcc-opencl: OPENCL_PR+=-DOPENCL_DP
 gcc-opencl: $(OBJECTS) $(OPENCL_OBJ)
+	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
+
+gcc-opencl-sp: GCC_CFLAGS+=-DOPENCL -std=c++11
+gcc-opencl-sp: OPENCL_PR+=-DOPENCL_SP
+gcc-opencl-sp: $(OBJECTS) $(OPENCL_OBJ)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
 
 gcc-opencl-native: GCC_CFLAGS+=-DOPENCL_USE_NATIVE_FUNCTIONS
 gcc-opencl-native: gcc-opencl
+
+gcc-opencl-native-sp: GCC_CFLAGS+=-DOPENCL_USE_NATIVE_FUNCTIONS
+gcc-opencl-native-sp: gcc-opencl-sp

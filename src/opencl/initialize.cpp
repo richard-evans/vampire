@@ -335,13 +335,13 @@ namespace vopencl
             cl::CommandQueue write_q = cl::CommandQueue(vcl::context, vcl::default_device);
 
             std::vector<cl_int> mask;
-            std::vector<vcl_real_t> saturations;
+            std::vector<double> saturations;
 
             // system magnetization
             ::stats::system_magnetization.get_mask(mask, saturations);
             vcl::stats::system_mask_size = saturations.size();
             size_t sys_mask_buffer_size = mask.size() * sizeof(mask[0]);
-            size_t sys_sats_buffer_size = 4 * saturations.size() * sizeof(saturations[0]);
+            size_t sys_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
             if (sys_mask_buffer_size != 0)
             {
                vcl::stats::system_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, sys_mask_buffer_size);
@@ -357,7 +357,7 @@ namespace vopencl
             ::stats::material_magnetization.get_mask(mask, saturations);
             vcl::stats::material_mask_size = saturations.size();
             size_t mat_mask_buffer_size = mask.size() * sizeof(mask[0]);
-            size_t mat_sats_buffer_size = 4 * saturations.size() * sizeof(saturations[0]);
+            size_t mat_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
             if (mat_mask_buffer_size != 0)
             {
                vcl::stats::material_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_mask_buffer_size);
@@ -373,7 +373,7 @@ namespace vopencl
             ::stats::height_magnetization.get_mask(mask, saturations);
             vcl::stats::height_mask_size = saturations.size();
             size_t height_mask_buffer_size = mask.size() * sizeof(mask[0]);
-            size_t height_sats_buffer_size = 4 * saturations.size() * sizeof(saturations[0]);
+            size_t height_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
             if (height_mask_buffer_size != 0)
             {
                vcl::stats::height_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, height_mask_buffer_size);
@@ -389,7 +389,7 @@ namespace vopencl
             ::stats::material_height_magnetization.get_mask(mask, saturations);
             vcl::stats::material_height_mask_size = saturations.size();
             size_t mat_h_mask_buffer_size = mask.size() * sizeof(mask[0]);
-            size_t mat_h_sats_buffer_size = 4 * saturations.size() * sizeof(saturations[0]);
+            size_t mat_h_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
             if (mat_h_mask_buffer_size != 0)
             {
                vcl::stats::material_height_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_h_mask_buffer_size);
