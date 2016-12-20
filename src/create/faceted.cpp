@@ -31,7 +31,7 @@ bool compare_radius(core_radius_t first,core_radius_t second){
    else return true;
 }
 
-void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain){
 	//====================================================================================
 	//
 	//	Function to cut a wulff particle shape

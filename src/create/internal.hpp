@@ -94,8 +94,8 @@ namespace create{
       // Internal functions for create module
       //-----------------------------------------------------------------------------
       extern void alloy(std::vector<cs::catom_t> & catom_array);
-      extern void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
-      extern void cone(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
 
    } // end of internal namespace
 } // end of create namespace

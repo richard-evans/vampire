@@ -63,6 +63,7 @@ namespace cs{
    void fill(std::vector<cs::catom_t> &);
    void roughness(std::vector<cs::catom_t> &);
    void calculate_atomic_composition(std::vector<cs::catom_t> &);
+   void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array);
 
 //======================================================================
 //                         create_system_type
@@ -168,46 +169,13 @@ int particle(std::vector<cs::catom_t> & catom_array){
 	// Set particle origin to atom at centre of lattice
 	//---------------------------------------------------
 
-	double particle_origin[3];
-	// find centre unit cell -- unsafe for large unit cells
-	//particle_origin[0] = double(vmath::iround(cs::system_dimensions[0]/(2.0*unit_cell.dimensions[0])))*unit_cell.dimensions[0];
-	//particle_origin[1] = double(vmath::iround(cs::system_dimensions[1]/(2.0*unit_cell.dimensions[1])))*unit_cell.dimensions[1];
-	//particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
+	std::vector<double> particle_origin(3,0.0);
 
 	particle_origin[0] = cs::system_dimensions[0]*0.5;
 	particle_origin[1] = cs::system_dimensions[1]*0.5;
 	particle_origin[2] = cs::system_dimensions[2]*0.5;
 
-   double max_range_sq = 1e123;
-   unsigned int nearest;
-   const double prx = particle_origin[0];
-   const double pry = particle_origin[1];
-   const double prz = particle_origin[2];
-
-   // loop over all atoms to find closest atom (serial only)
-   #ifdef MPICF
-   #else
- 	for(int atom=0;atom<catom_array.size();atom++){
-      double dx = catom_array[atom].x-particle_origin[0];
-      double dy = catom_array[atom].y-particle_origin[1];
-      double dz = catom_array[atom].z-particle_origin[2];
-      double r = dx*dx + dy*dy + dz*dz;
-      if(r < max_range_sq){
-         max_range_sq = r;
-         nearest = atom;
-      }
-   }
-   #endif
-
-   //reduce max range
-
-   // find cpu which has nearest atom
-
-   // broadcast position to all cpus.
-
-   particle_origin[0] = catom_array[nearest].x;
-   particle_origin[1] = catom_array[nearest].y;
-   particle_origin[2] = catom_array[nearest].z;
+   centre_particle_on_atom(particle_origin, catom_array);
 
 	// check for move in particle origin and that unit cell size < 0.5 system size
 	if(cs::particle_creation_parity==1 &&
@@ -280,15 +248,17 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 	// Loop to generate cubic lattice points
 	int particle_number=0;
 
+	std::vector<double> particle_origin(3,0.0);
+
 	for (int x_particle=0;x_particle < num_x_particle;x_particle++){
 		for (int y_particle=0;y_particle < num_y_particle;y_particle++){
-
-			double particle_origin[3];
 
 			// Determine particle origin
 			particle_origin[0] = double(x_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_x;
 			particle_origin[1] = double(y_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_y;
 			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
+
+         centre_particle_on_atom(particle_origin, catom_array);
 
 			if(cs::particle_creation_parity==1){
 				particle_origin[0]+=unit_cell.dimensions[0]*0.5;
@@ -975,6 +945,76 @@ void fill(std::vector<cs::catom_t> & catom_array){
          }
       }
    }
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to alter particle origin to be centred on an atom
+//------------------------------------------------------------------------------------------------------
+void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array){
+
+   vmpi::barrier();
+
+   // set initial max range
+   double max_range_sq = 1e123;
+   unsigned int nearest; // nearest atom to initial particle origin
+
+   // copy to temporary for speed
+   const double prx = particle_origin[0];
+   const double pry = particle_origin[1];
+   const double prz = particle_origin[2];
+
+   // loop over all atoms to find closest atom
+   for(int atom=0;atom<catom_array.size();atom++){
+      double dx = catom_array[atom].x-particle_origin[0];
+      double dy = catom_array[atom].y-particle_origin[1];
+      double dz = catom_array[atom].z-particle_origin[2];
+      double r = dx*dx + dy*dy + dz*dz;
+      if(r < max_range_sq){
+         max_range_sq = r;
+         nearest = atom;
+      }
+   }
+
+   // set particle origin to nearest atom
+   particle_origin[0] = catom_array[nearest].x;
+   particle_origin[1] = catom_array[nearest].y;
+   particle_origin[2] = catom_array[nearest].z;
+
+   //-----------------------------------------------------
+   // For parallel reduce on all CPUs
+   //-----------------------------------------------------
+   #ifdef MPICF
+      std::vector<double> ranges;
+
+      // set up array to get ranges from all CPUs on rank 0
+      if(vmpi::my_rank==0) ranges.resize(vmpi::num_processors, 1.e123);
+
+      // gather max ranges from all cpus on root
+      MPI_Gather(&max_range_sq, 1, MPI_DOUBLE, &ranges[0], vmpi::num_processors, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+      double min_range = 1.e123;
+      unsigned int rank_of_min_range=0;
+
+      // loop over all ranges and determine minimum and cpu location
+      for(int i=0; i<ranges.size(); i++){
+         if(ranges[i] < min_range){
+            min_range = ranges[i];
+            rank_of_min_range = i;
+         }
+      }
+
+      // broadcast id of nearest to all cpus
+      MPI_Bcast(&rank_of_min_range, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+
+      // broadcast position to all cpus
+      MPI_Bcast(&particle_origin[0], 3, MPI_DOUBLE, rank_of_min_range, MPI_COMM_WORLD);
+
+      vmpi::barrier();
+
+   #endif
 
    return;
 
