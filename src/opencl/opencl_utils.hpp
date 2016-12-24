@@ -77,7 +77,13 @@ namespace vopencl
                               Ts... Args)           /* kernel arguments */
       {
          pass_args(k, 0, Args...);
-         q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
+         auto err = q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
+         if (err != CL_SUCCESS)
+         {
+            std::cerr << "Error enqueuing kernel " << k.getInfo<CL_KERNEL_FUNCTION_NAME>() << std::endl;
+            std::cerr << "Error code " << err << std::endl;
+            ::err::vexit();
+         }
       }
    }
 }

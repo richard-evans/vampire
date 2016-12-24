@@ -64,10 +64,9 @@ namespace vopencl
          cl::CommandQueue update_q(vcl::context, vcl::default_device);
 
          cl::NDRange global(::atoms::num_atoms);
-         cl::NDRange local(0);
 
          // update cell dipolar fields
-         vcl::kernel_call(update_dip, update_q, global, local,
+         vcl::kernel_call(update_dip, update_q, global, vcl::local,
                           vcl::cells::mag_array.x(),
                           vcl::cells::mag_array.y(),
                           vcl::cells::mag_array.z(),
@@ -82,7 +81,7 @@ namespace vopencl
          update_q.finish();
 
          // update atomistic dipolar fields
-         vcl::kernel_call(update_atm_dip, update_q, global, local,
+         vcl::kernel_call(update_atm_dip, update_q, global, vcl::local,
                           vcl::cells::field_array.x(),
                           vcl::cells::field_array.y(),
                           vcl::cells::field_array.z(),
@@ -98,7 +97,6 @@ namespace vopencl
       {
          cl::CommandQueue cell_q(vcl::context, vcl::default_device);
          cl::NDRange global(::cells::num_cells);
-         cl::NDRange local(0);
 
          size_t buff_size = ::cells::num_cells * sizeof(vcl_real_t);
          vcl_real_t zero = 0;
@@ -119,7 +117,7 @@ namespace vopencl
          
          cell_q.finish();
 
-         vcl::kernel_call(update_cell_mag, cell_q, global, local,
+         vcl::kernel_call(update_cell_mag, cell_q, global, vcl::local,
                           vcl::atoms::spin_array.x(),
                           vcl::atoms::spin_array.y(),
                           vcl::atoms::spin_array.z(),

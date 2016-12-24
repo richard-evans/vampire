@@ -36,7 +36,6 @@ namespace vopencl
          cl::CommandQueue update_q(vcl::context, vcl::default_device);
 
          cl::NDRange global(::atoms::num_atoms);
-         cl::NDRange local(0);
 
          vcl::rng::update_grands();
 
@@ -44,7 +43,7 @@ namespace vopencl
          vcl_real_t Hy = sim::H_vec[1] * sim::H_applied;
          vcl_real_t Hz = sim::H_vec[2] * sim::H_applied;
 
-         vcl::kernel_call(update_ext, update_q, global, local,
+         vcl::kernel_call(update_ext, update_q, global, vcl::local,
                           vcl::atoms::type_array,
                           vcl::mp::materials,
                           vcl::dipolar_field_array.x(),

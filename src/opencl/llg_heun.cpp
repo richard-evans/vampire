@@ -90,7 +90,6 @@ namespace vopencl
          void step(void)
          {
             cl::NDRange global(::atoms::num_atoms);
-            cl::NDRange local(0);
 
             size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
             cl::CommandQueue step_q(vcl::context, vcl::default_device);
@@ -103,7 +102,7 @@ namespace vopencl
             step_q.finish();
 
             // Heun predictor step
-            vcl::kernel_call(predictor_step, step_q, global, local,
+            vcl::kernel_call(predictor_step, step_q, global, vcl::local,
                              vcl::atoms::type_array,
                              vcl::llg::heun_parameters_device,
                              vcl::atoms::spin_array.x(),
@@ -125,7 +124,7 @@ namespace vopencl
             vcl::update_spin_fields();
 
             // Heun corrector step
-            vcl::kernel_call(corrector_step, step_q, global, local,
+            vcl::kernel_call(corrector_step, step_q, global, vcl::local,
                              vcl::atoms::type_array,
                              vcl::llg::heun_parameters_device,
                              vcl::atoms::spin_array.x(),

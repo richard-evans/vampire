@@ -18,7 +18,6 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
-#include <cstdint>
 
 // Vampire headers
 #include "vopencl.hpp"
@@ -161,23 +160,25 @@ namespace vopencl
             size_t  int_buffer_size = ::atoms::num_atoms * sizeof(cl_int);
 
             // Allocate and initialize device memory for atomic spins
-            vcl::atoms::spin_array = vcl::Buffer3D(vcl::context, write_q, CL_MEM_READ_WRITE,
+            vcl::atoms::spin_array = vcl::Buffer3D(vcl::context, write_q,
+                                                   vcl::read_write,
                                                    ::atoms::x_spin_array,
                                                    ::atoms::y_spin_array,
                                                    ::atoms::z_spin_array);
 
             // Allocate and initialize device memory for atomic coordinates
-            vcl::atoms::coord_array = vcl::Buffer3D(vcl::context, write_q, CL_MEM_READ_WRITE,
+            vcl::atoms::coord_array = vcl::Buffer3D(vcl::context, write_q,
+                                                    vcl::read_write,
                                                     ::atoms::x_coord_array,
                                                     ::atoms::y_coord_array,
                                                     ::atoms::z_coord_array);
 
             // Allocate and initialize device memory for atomic information
-            vcl::atoms::type_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, int_buffer_size);
+            vcl::atoms::type_array = cl::Buffer(vcl::context, vcl::read_only, int_buffer_size);
             write_q.enqueueWriteBuffer(vcl::atoms::type_array, CL_FALSE, 0, int_buffer_size, &::atoms::type_array[0]);
 
             // Allocate and initialize cell information
-            vcl::atoms::cell_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, int_buffer_size);
+            vcl::atoms::cell_array = cl::Buffer(vcl::context, vcl::read_only, int_buffer_size);
             write_q.enqueueWriteBuffer(vcl::atoms::cell_array, CL_FALSE, 0, int_buffer_size, &::atoms::cell_array[0]);
 
             // Allocate and initialize unrolled spin norm array
@@ -259,11 +260,11 @@ namespace vopencl
                                                     ::cells::z_field_array);
 
             // Allocate device memory and initialize voulme array
-            vcl::cells::volume_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, real_buffer_size);
+            vcl::cells::volume_array = cl::Buffer(vcl::context, vcl::read_only, real_buffer_size);
             write_q.enqueueWriteBuffer(vcl::cells::volume_array, CL_FALSE, 0, real_buffer_size, &::cells::volume_array[0]);
 
             // Allocate device memory and initialize number of atoms for each cell
-            vcl::cells::num_atoms = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, int_buffer_size);
+            vcl::cells::num_atoms = cl::Buffer(vcl::context, vcl::read_only, int_buffer_size);
             write_q.enqueueWriteBuffer(vcl::cells::num_atoms, CL_FALSE, 0, int_buffer_size, &::cells::num_atoms_in_cell[0]);
 
             write_q.finish();
@@ -287,7 +288,7 @@ namespace vopencl
             size_t mat_buffer_size = ::mp::num_materials * sizeof(::mp::material[0]);
 
             // Allocate device memory and initialize materials array
-            vcl::mp::materials = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, mat_buffer_size);
+            vcl::mp::materials = cl::Buffer(vcl::context, vcl::read_only, mat_buffer_size);
             write_q.enqueueWriteBuffer(vcl::mp::materials, CL_FALSE, 0, mat_buffer_size, &::mp::material[0]);
 
 
@@ -316,10 +317,10 @@ namespace vopencl
                limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
 
             // Allocate device memory and initialize limits array
-            vcl::atoms::limits = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, limits_buffer_size);
+            vcl::atoms::limits = cl::Buffer(vcl::context, vcl::read_only, limits_buffer_size);
             write_q.enqueueWriteBuffer(vcl::atoms::limits, CL_FALSE, 0, limits_buffer_size, &limits_h[0]);
 
-            vcl::atoms::neighbours = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, neighbours_buffer_size);
+            vcl::atoms::neighbours = cl::Buffer(vcl::context, vcl::read_only, neighbours_buffer_size);
             write_q.enqueueWriteBuffer(vcl::atoms::neighbours, CL_FALSE, 0, neighbours_buffer_size, &::atoms::neighbour_list_array[0]);
 
             write_q.finish();
@@ -349,13 +350,13 @@ namespace vopencl
             size_t sys_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
             if (sys_mask_buffer_size != 0)
             {
-               vcl::stats::system_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, sys_mask_buffer_size);
+               vcl::stats::system_mask = cl::Buffer(vcl::context, vcl::read_write, sys_mask_buffer_size);
                write_q.enqueueWriteBuffer(vcl::stats::system_mask, CL_FALSE, 0, sys_mask_buffer_size, &mask[0]);
             }
             if (sys_sats_buffer_size != 0)
             {
-               vcl::stats::system_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, sys_sats_buffer_size);
-               vcl::stats::system_mean_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, sys_sats_buffer_size);
+               vcl::stats::system_magnetization = cl::Buffer(vcl::context, vcl::read_write, sys_sats_buffer_size);
+               vcl::stats::system_mean_magnetization = cl::Buffer(vcl::context, vcl::read_write, sys_sats_buffer_size);
             }
 
             // material magnetization
@@ -365,13 +366,13 @@ namespace vopencl
             size_t mat_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
             if (mat_mask_buffer_size != 0)
             {
-               vcl::stats::material_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_mask_buffer_size);
+               vcl::stats::material_mask = cl::Buffer(vcl::context, vcl::read_write, mat_mask_buffer_size);
                write_q.enqueueWriteBuffer(vcl::stats::material_mask, CL_FALSE, 0, mat_mask_buffer_size, &mask[0]);
             }
             if (mat_sats_buffer_size != 0)
             {
-               vcl::stats::material_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_sats_buffer_size);
-               vcl::stats::material_mean_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_sats_buffer_size);
+               vcl::stats::material_magnetization = cl::Buffer(vcl::context, vcl::read_write, mat_sats_buffer_size);
+               vcl::stats::material_mean_magnetization = cl::Buffer(vcl::context, vcl::read_write, mat_sats_buffer_size);
             }
 
             // height magnetization
@@ -381,13 +382,13 @@ namespace vopencl
             size_t height_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
             if (height_mask_buffer_size != 0)
             {
-               vcl::stats::height_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, height_mask_buffer_size);
+               vcl::stats::height_mask = cl::Buffer(vcl::context, vcl::read_write, height_mask_buffer_size);
                write_q.enqueueWriteBuffer(vcl::stats::height_mask, CL_FALSE, 0, height_mask_buffer_size, &mask[0]);
             }
             if (height_sats_buffer_size != 0)
             {
-               vcl::stats::height_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, height_sats_buffer_size);
-               vcl::stats::height_mean_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, height_sats_buffer_size);
+               vcl::stats::height_magnetization = cl::Buffer(vcl::context, vcl::read_write, height_sats_buffer_size);
+               vcl::stats::height_mean_magnetization = cl::Buffer(vcl::context, vcl::read_write, height_sats_buffer_size);
             }
 
             // material height magnetization
@@ -397,13 +398,13 @@ namespace vopencl
             size_t mat_h_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
             if (mat_h_mask_buffer_size != 0)
             {
-               vcl::stats::material_height_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_h_mask_buffer_size);
+               vcl::stats::material_height_mask = cl::Buffer(vcl::context, vcl::read_write, mat_h_mask_buffer_size);
                write_q.enqueueWriteBuffer(vcl::stats::material_height_mask, CL_FALSE, 0, mat_h_mask_buffer_size, &mask[0]);
             }
             if (mat_h_sats_buffer_size != 0)
             {
-               vcl::stats::material_height_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_h_sats_buffer_size);
-               vcl::stats::material_height_mean_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_h_sats_buffer_size);
+               vcl::stats::material_height_magnetization = cl::Buffer(vcl::context, vcl::read_write, mat_h_sats_buffer_size);
+               vcl::stats::material_height_mean_magnetization = cl::Buffer(vcl::context, vcl::read_write, mat_h_sats_buffer_size);
             }
          }
          catch(cl::Error &error)
@@ -422,13 +423,13 @@ namespace vopencl
             cl::CommandQueue write_q = cl::CommandQueue(vcl::context, vcl::default_device);
 
             // each atom needs three random numbers per Heun step
-            std::vector<uint32_t> rs(::atoms::num_atoms*3);
+            std::vector<cl_uint> rs(::atoms::num_atoms*3);
 
-            size_t u_buffer_size = rs.size() * sizeof(uint32_t);
+            size_t u_buffer_size = rs.size() * sizeof(cl_uint);
             size_t g_buffer_size = rs.size() * sizeof(vcl_real_t);
 
-            vcl::rng::urands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, u_buffer_size);
-            vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
+            vcl::rng::urands = cl::Buffer(vcl::context, vcl::read_write, u_buffer_size);
+            vcl::rng::grands = cl::Buffer(vcl::context, vcl::read_write, g_buffer_size);
 
             std::srand(1);  // constant for now to get deterministic results
             for (auto &elem : rs)

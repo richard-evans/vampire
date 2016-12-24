@@ -1,5 +1,5 @@
 #include <sstream>
-
+#include <iostream>
 #include "atoms.hpp"
 
 #include "data.hpp"
@@ -33,14 +33,19 @@ namespace vopencl
                                                   vcl::context, vcl::default_device,
                                                   opts.str());
                compiled_cmwc = true;
-            }
+            }            
 
             cl::CommandQueue rands_q(vcl::context, vcl::default_device);
+            cl_uint tmp[2];
+            rands_q.enqueueReadBuffer(vcl::rng::urands, CL_TRUE, 0, sizeof(cl_uint)*2, &tmp[0]);
+            //std::cout << "urands: " <<  tmp[0] << ' ' << tmp[1] << std::endl;
+
 
             cl::NDRange global(::atoms::num_atoms*3);
-            cl::NDRange local(0);
 
-            vcl::kernel_call(cmwc, rands_q, global, local, vcl::rng::urands);
+            vcl::kernel_call(cmwc, rands_q, global, vcl::local, vcl::rng::urands);
+
+            rands_q.finish();
          }
 
          void update_grands(void)
@@ -60,11 +65,11 @@ namespace vopencl
             cl::CommandQueue rands_q(vcl::context, vcl::default_device);
 
             cl::NDRange global(::atoms::num_atoms*3);
-            cl::NDRange local(0);
 
-            vcl::kernel_call(bm, rands_q, global, local,
+            vcl::kernel_call(bm, rands_q, global, vcl::local,
                              vcl::rng::urands,
                              vcl::rng::grands);
+            rands_q.finish();
          }
       }
    }

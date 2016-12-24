@@ -53,9 +53,8 @@ namespace vopencl
          write_q.finish();
 
          cl::NDRange global(::atoms::num_atoms);
-         cl::NDRange local(0);
 
-         vcl::kernel_call(update_nexch_spin_fields, write_q, global, local,
+         vcl::kernel_call(update_nexch_spin_fields, write_q, global, vcl::local,
                           vcl::atoms::type_array,
                           vcl::mp::materials,
                           vcl::atoms::spin_array.x(),

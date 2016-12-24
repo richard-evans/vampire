@@ -123,7 +123,6 @@ namespace vopencl
             cl::CommandQueue mm(vcl::context, vcl::default_device);
 
             cl::NDRange global(::atoms::num_atoms);
-            cl::NDRange local(0);
 
             switch(::atoms::exchange_type)
             {
@@ -135,17 +134,17 @@ namespace vopencl
                // vcl::x_total_spin_field_array = matmul(Jxx, vcl::atoms::x_spin_array)
                // vcl::y_total_spin_field_array = matmul(Jxx, vcl::atoms::y_spin_array)
                // vcl::z_total_spin_field_array = matmul(Jxx, vcl::atoms::z_spin_array)
-               vcl::kernel_call(matmul, mm, global, local,
+               vcl::kernel_call(matmul, mm, global, vcl::local,
                                 Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours, /* CSR matrix */
                                 vcl::atoms::spin_array.x(),
                                 vcl::total_spin_field_array.x());
 
-               vcl::kernel_call(matmul, mm, global, local,
+               vcl::kernel_call(matmul, mm, global, vcl::local,
                                 Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours, /* CSR matrix */
                                 vcl::atoms::spin_array.y(),
                                 vcl::total_spin_field_array.y());
 
-               vcl::kernel_call(matmul, mm, global, local,
+               vcl::kernel_call(matmul, mm, global, vcl::local,
                                 Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
                                 vcl::atoms::spin_array.z(),
                                 vcl::total_spin_field_array.z());
@@ -161,17 +160,17 @@ namespace vopencl
                // vcl::y_total_field_array = matmul(Jyy, vcl::atoms::y_spin_array)
                // vcl::z_total_field_array = matmul(Jzz, vcl::atoms::z_spin_array)
 
-               vcl::kernel_call(matmul, mm, global, local,
+               vcl::kernel_call(matmul, mm, global, vcl::local,
                                 Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
                                 vcl::atoms::spin_array.x(),
                                 vcl::total_spin_field_array.x());
 
-               vcl::kernel_call(matmul, mm, global, local,
+               vcl::kernel_call(matmul, mm, global, vcl::local,
                                 Jyy_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
                                 vcl::atoms::spin_array.y(),
                                 vcl::total_spin_field_array.y());
 
-               vcl::kernel_call(matmul, mm, global, local,
+               vcl::kernel_call(matmul, mm, global, vcl::local,
                                 Jzz_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
                                 vcl::atoms::spin_array.z(),
                                 vcl::total_spin_field_array.z());
