@@ -49,8 +49,8 @@ namespace vopencl
 
          void init(void)
          {
-            size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
-            size_t num_mats = ::mp::num_materials;
+            const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
+            const size_t num_mats = ::mp::num_materials;
 
             vcl::llg::spin_buffer_array = vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
 
@@ -62,14 +62,18 @@ namespace vopencl
 
             for (unsigned i=0; i<num_mats; ++i)
             {
-               double alpha = ::mp::material[i].alpha;
-               double gamma = ::mp::material[i].gamma_rel;
+               const double alpha = ::mp::material[i].alpha;
+               const double gamma = ::mp::material[i].gamma_rel;
                heun_parameters_host[i].prefactor = -gamma / (1.0 + alpha*alpha);
                heun_parameters_host[i].lambda_times_prefactor = -gamma * alpha / (1.0 + alpha*alpha);
             }
 
-            cl::CommandQueue write_q(vcl::context, vcl::default_device);
-            write_q.enqueueWriteBuffer(vcl::llg::heun_parameters_device, CL_TRUE, 0, num_mats*sizeof(heun_parameter_t), &heun_parameters_host[0]);
+            const cl::CommandQueue write_q(vcl::context, vcl::default_device);
+            write_q.enqueueWriteBuffer(vcl::llg::heun_parameters_device,
+                                       CL_FALSE,
+                                       0,
+                                       num_mats*sizeof(heun_parameter_t),
+                                       &heun_parameters_host[0]);
             write_q.finish();
 
             // Build Kernels
@@ -89,10 +93,10 @@ namespace vopencl
 
          void step(void)
          {
-            cl::NDRange global(::atoms::num_atoms);
+            const cl::NDRange global(::atoms::num_atoms);
 
-            size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
-            cl::CommandQueue step_q(vcl::context, vcl::default_device);
+            const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
+            const cl::CommandQueue step_q(vcl::context, vcl::default_device);
             vcl::atoms::spin_array.copy_to_dev(step_q, vcl::llg::spin_buffer_array, real_buffer_size);
 
             // update fields

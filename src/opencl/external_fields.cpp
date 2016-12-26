@@ -33,15 +33,15 @@ namespace vopencl
             compiled_update_external_fields = true;
          }
 
-         cl::CommandQueue update_q(vcl::context, vcl::default_device);
+         const cl::CommandQueue update_q(vcl::context, vcl::default_device);
 
-         cl::NDRange global(::atoms::num_atoms);
+         const cl::NDRange global(::atoms::num_atoms);
 
          vcl::rng::update_grands();
 
-         vcl_real_t Hx = sim::H_vec[0] * sim::H_applied;
-         vcl_real_t Hy = sim::H_vec[1] * sim::H_applied;
-         vcl_real_t Hz = sim::H_vec[2] * sim::H_applied;
+         const vcl_real_t Hx = sim::H_vec[0] * sim::H_applied;
+         const vcl_real_t Hy = sim::H_vec[1] * sim::H_applied;
+         const vcl_real_t Hz = sim::H_vec[2] * sim::H_applied;
 
          vcl::kernel_call(update_ext, update_q, global, vcl::local,
                           vcl::atoms::type_array,

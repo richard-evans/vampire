@@ -35,13 +35,9 @@ namespace vopencl
                compiled_cmwc = true;
             }            
 
-            cl::CommandQueue rands_q(vcl::context, vcl::default_device);
-            cl_uint tmp[2];
-            rands_q.enqueueReadBuffer(vcl::rng::urands, CL_TRUE, 0, sizeof(cl_uint)*2, &tmp[0]);
-            //std::cout << "urands: " <<  tmp[0] << ' ' << tmp[1] << std::endl;
+            const cl::CommandQueue rands_q(vcl::context, vcl::default_device);
 
-
-            cl::NDRange global(::atoms::num_atoms*3);
+            const cl::NDRange global(::atoms::num_atoms*3);
 
             vcl::kernel_call(cmwc, rands_q, global, vcl::local, vcl::rng::urands);
 
@@ -54,7 +50,8 @@ namespace vopencl
             {
                std::ostringstream opts;
                opts << "-DN=" << ::atoms::num_atoms*3;
-               bm = vcl::build_kernel_from_file("src/opencl/cl/boxmuller.cl", "BoxMullerTransform",
+               bm = vcl::build_kernel_from_file("src/opencl/cl/boxmuller.cl",
+                                                "BoxMullerTransform",
                                                 vcl::context, vcl::default_device,
                                                 opts.str());
                compiled_bm = true;
@@ -62,9 +59,9 @@ namespace vopencl
 
             update_urands();
 
-            cl::CommandQueue rands_q(vcl::context, vcl::default_device);
+            const cl::CommandQueue rands_q(vcl::context, vcl::default_device);
 
-            cl::NDRange global(::atoms::num_atoms*3);
+            const cl::NDRange global(::atoms::num_atoms*3);
 
             vcl::kernel_call(bm, rands_q, global, vcl::local,
                              vcl::rng::urands,

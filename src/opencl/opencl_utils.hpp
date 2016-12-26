@@ -12,7 +12,7 @@
 
 #define UNUSED(x) (void)(x)
 
-static std::string get_error(cl_int err)
+static std::string get_error(const cl_int err)
 {
    switch (err)
    {
@@ -31,7 +31,7 @@ static std::string get_error(cl_int err)
 
 // functions to pass given arguments to kernel k which recursively sets argument i
 // the following function is needed for when all the arguments have been set
-static void pass_args(cl::Kernel &k, unsigned i)
+static void pass_args(const cl::Kernel &k, const unsigned i)
 {
    UNUSED(k);
    UNUSED(i);
@@ -39,7 +39,7 @@ static void pass_args(cl::Kernel &k, unsigned i)
 
 // function which takes an arg from args and gives it to the kernel for arg i
 template <typename Car, typename... Cdr>
-static void pass_args(cl::Kernel &k, unsigned i, Car car, Cdr... cdr)
+static void pass_args(cl::Kernel &k, const unsigned i, const Car car, const Cdr... cdr)
 {
    cl_int err;
    if ((err = k.setArg(i, car)) == CL_SUCCESS)
@@ -71,13 +71,13 @@ namespace vopencl
       // the OpenCL C++ spec for this seems pretty fluid so it's probably better not to use it
       template <typename... Ts>
       static void kernel_call(cl::Kernel &k,        /* kernel to enqueue */
-                              cl::CommandQueue &q,  /* into this queue */
-                              cl::NDRange gbl,      /* total number of work items */
-                              cl::NDRange lcl,      /* number of work items in group */
+                              const cl::CommandQueue &q,  /* into this queue */
+                              const cl::NDRange gbl,      /* total number of work items */
+                              const cl::NDRange lcl,      /* number of work items in group */
                               Ts... Args)           /* kernel arguments */
       {
          pass_args(k, 0, Args...);
-         auto err = q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
+         const auto err = q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
          if (err != CL_SUCCESS)
          {
             std::cerr << "Error enqueuing kernel " << k.getInfo<CL_KERNEL_FUNCTION_NAME>() << std::endl;

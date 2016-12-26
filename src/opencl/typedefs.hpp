@@ -28,9 +28,9 @@ namespace vopencl
 
          // initialize without writing, but with size
          // e.g. for use when generating buffers on device
-         Buffer3D(cl::Context &c,
-                  cl_mem_flags fs,
-                  size_t size)
+         Buffer3D(const cl::Context &c,
+                  const cl_mem_flags fs,
+                  const size_t size)
             : buf(3)
          {
             buf[0] = cl::Buffer(c, fs, size);
@@ -40,12 +40,12 @@ namespace vopencl
             
          // initialize with 3 vectors to write data to device
          template <typename T>
-         Buffer3D(cl::Context &c,
-                  cl::CommandQueue &q,
-                  cl_mem_flags fs,
-                  std::vector<T> &xs,
-                  std::vector<T> &ys,
-                  std::vector<T> &zs)
+         Buffer3D(const cl::Context &c,
+                  const cl::CommandQueue &q,
+                  const cl_mem_flags fs,
+                  const std::vector<T> &xs,
+                  const std::vector<T> &ys,
+                  const std::vector<T> &zs)
             : buf(3)
          {
             buf[0] = cl::Buffer(c, fs, sizeof(T)*xs.size());
@@ -59,10 +59,10 @@ namespace vopencl
 
          // reads data from device, assumes host vectors already have enough capacity
          template <typename T>
-         void copy_to_host(cl::CommandQueue &q,
-                               std::vector<T> &xs,
-                               std::vector<T> &ys,
-                               std::vector<T> &zs)
+         void copy_to_host(const cl::CommandQueue &q,
+                           std::vector<T> &xs,
+                           std::vector<T> &ys,
+                           std::vector<T> &zs) const
          {
             q.enqueueReadBuffer(buf[0], CL_FALSE, 0, sizeof(T)*xs.size(), &xs[0]);
             q.enqueueReadBuffer(buf[1], CL_FALSE, 0, sizeof(T)*ys.size(), &ys[0]);
@@ -70,9 +70,9 @@ namespace vopencl
          }
 
          // copies buffers to dst buffers on device
-         void copy_to_dev(cl::CommandQueue &q,
+         void copy_to_dev(const cl::CommandQueue &q,
                           Buffer3D &dst,
-                          size_t amount_to_copy)
+                          const size_t amount_to_copy) const
          {
             q.enqueueCopyBuffer(buf[0], dst.x(), 0, 0, amount_to_copy);
             q.enqueueCopyBuffer(buf[1], dst.y(), 0, 0, amount_to_copy);

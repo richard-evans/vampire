@@ -25,7 +25,7 @@ namespace vopencl
       cl::Kernel update_atm_dip;
       cl::Kernel update_cell_mag;
 
-      void update_dipolar_fields()
+      void update_dipolar_fields(void)
       {
          // dipole calculations enabled?
          if (::sim::hamiltonian_simulation_flags[4]!=1) return;
@@ -61,9 +61,9 @@ namespace vopencl
             compiled_update_atm_dip = true;
          }
 
-         cl::CommandQueue update_q(vcl::context, vcl::default_device);
+         const cl::CommandQueue update_q(vcl::context, vcl::default_device);
 
-         cl::NDRange global(::atoms::num_atoms);
+         const cl::NDRange global(::atoms::num_atoms);
 
          // update cell dipolar fields
          vcl::kernel_call(update_dip, update_q, global, vcl::local,
@@ -95,11 +95,11 @@ namespace vopencl
 
       void update_cell_magnetizations(void)
       {
-         cl::CommandQueue cell_q(vcl::context, vcl::default_device);
-         cl::NDRange global(::cells::num_cells);
+         const cl::CommandQueue cell_q(vcl::context, vcl::default_device);
+         const cl::NDRange global(::cells::num_cells);
 
-         size_t buff_size = ::cells::num_cells * sizeof(vcl_real_t);
-         vcl_real_t zero = 0;
+         const size_t buff_size = ::cells::num_cells * sizeof(vcl_real_t);
+         const vcl_real_t zero = 0;
          cell_q.enqueueFillBuffer(vcl::cells::mag_array.x(), &zero, sizeof(zero), buff_size);
          cell_q.enqueueFillBuffer(vcl::cells::mag_array.y(), &zero, sizeof(zero), buff_size);
          cell_q.enqueueFillBuffer(vcl::cells::mag_array.z(), &zero, sizeof(zero), buff_size);

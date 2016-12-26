@@ -19,7 +19,7 @@ namespace vopencl
       {
          if (vcl::stats::use_cpu)
          {
-            cl::CommandQueue stats_q(vcl::context, vcl::default_device);
+            const cl::CommandQueue stats_q(vcl::context, vcl::default_device);
 
             vcl::atoms::spin_array.copy_to_host(stats_q,
                                                 ::atoms::x_spin_array,

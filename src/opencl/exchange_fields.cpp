@@ -35,14 +35,14 @@ namespace vopencl
             std::vector<vcl_real_t> Jyy_vals_h;
             std::vector<vcl_real_t> Jzz_vals_h;
 
-            size_t vsize = ::atoms::neighbour_list_array.size();
+            const size_t vsize = ::atoms::neighbour_list_array.size();
 
             std::ostringstream opts;
             opts << "-DN=" << vsize;
             matmul = vcl::build_kernel_from_file("src/opencl/cl/csrmatmul.cl", "matmul",
                                                  vcl::context, vcl::default_device, opts.str());
 
-            cl::CommandQueue write_q(vcl::context, vcl::default_device);
+            const cl::CommandQueue write_q(vcl::context, vcl::default_device);
 
             switch(::atoms::exchange_type)
             {
@@ -56,8 +56,8 @@ namespace vopencl
 
                for (unsigned i=0; i<vsize; ++i)
                {
-                  int iid = ::atoms::neighbour_interaction_type_array[i];
-                  vcl_real_t Jij = ::atoms::i_exchange_list[iid].Jij;
+                  const int iid = ::atoms::neighbour_interaction_type_array[i];
+                  const vcl_real_t Jij = ::atoms::i_exchange_list[iid].Jij;
 
                   Jxx_vals_h[i] = - Jij;
                }
@@ -82,7 +82,7 @@ namespace vopencl
 
                for (unsigned i=0; i<vsize; ++i)
                {
-                  int iid = ::atoms::neighbour_interaction_type_array[i];
+                  const int iid = ::atoms::neighbour_interaction_type_array[i];
                   Jxx_vals_h[i] = - ::atoms::v_exchange_list[iid].Jij[0];
                   Jyy_vals_h[i] = - ::atoms::v_exchange_list[iid].Jij[1];
                   Jzz_vals_h[i] = - ::atoms::v_exchange_list[iid].Jij[2];
@@ -120,9 +120,9 @@ namespace vopencl
 
             // convert Jnn from CSR to DIA
 
-            cl::CommandQueue mm(vcl::context, vcl::default_device);
+            const cl::CommandQueue mm(vcl::context, vcl::default_device);
 
-            cl::NDRange global(::atoms::num_atoms);
+            const cl::NDRange global(::atoms::num_atoms);
 
             switch(::atoms::exchange_type)
             {
