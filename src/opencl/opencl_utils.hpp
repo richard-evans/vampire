@@ -76,7 +76,15 @@ namespace vopencl
                               const cl::NDRange lcl,      /* number of work items in group */
                               Ts... Args)           /* kernel arguments */
       {
-         pass_args(k, 0, Args...);
+         // only need to set arguments once per kernel
+         // assumes it's always called with the same arguments
+         static bool first_call = true;
+         if (first_call)
+         {
+            pass_args(k, 0, Args...);
+            first_call = false;
+         }
+
          const auto err = q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
          if (err != CL_SUCCESS)
          {
