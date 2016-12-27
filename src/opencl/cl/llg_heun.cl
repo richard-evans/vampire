@@ -7,20 +7,20 @@ typedef struct
 } heun_params_t;
 
 __kernel
-void llg_heun_predictor_step(const __global int *material_id,
-                             __constant heun_params_t *heun_parameters,
-                             __global real_t *x_spin,
-                             __global real_t *y_spin,
-                             __global real_t *z_spin,
-                             const __global real_t *x_sp_field,
-                             const __global real_t *y_sp_field,
-                             const __global real_t *z_sp_field,
-                             const __global real_t *x_ext_field,
-                             const __global real_t *y_ext_field,
-                             const __global real_t *z_ext_field,
-                             __global real_t *dSx,
-                             __global real_t *dSy,
-                             __global real_t *dSz)
+void llg_heun_predictor_step(const __global int *const restrict material_id,
+                             __constant heun_params_t *const restrict heun_parameters,
+                             __global real_t *const restrict x_spin,
+                             __global real_t *const restrict y_spin,
+                             __global real_t *const restrict z_spin,
+                             const __global real_t *const restrict x_sp_field,
+                             const __global real_t *const restrict y_sp_field,
+                             const __global real_t *const restrict z_sp_field,
+                             const __global real_t *const restrict x_ext_field,
+                             const __global real_t *const restrict y_ext_field,
+                             const __global real_t *const restrict z_ext_field,
+                             __global real_t *const restrict dSx,
+                             __global real_t *const restrict dSy,
+                             __global real_t *const restrict dSz)
 {
    const size_t gsz = get_global_size(0);
 
@@ -79,23 +79,23 @@ void llg_heun_predictor_step(const __global int *material_id,
 }
 
 __kernel
-void llg_heun_corrector_step(const __global int *material_id,
-                             __constant heun_params_t *heun_parameters,
-                             __global real_t *x_spin,
-                             __global real_t *y_spin,
-                             __global real_t *z_spin,
-                             const __global real_t *x_sp_field,
-                             const __global real_t *y_sp_field,
-                             const __global real_t *z_sp_field,
-                             const __global real_t *x_ext_field,
-                             const __global real_t *y_ext_field,
-                             const __global real_t *z_ext_field,
-                             const __global real_t *x_spin_buffer,
-                             const __global real_t *y_spin_buffer,
-                             const __global real_t *z_spin_buffer,
-                             const __global real_t *dSx,
-                             const __global real_t *dSy,
-                             const __global real_t *dSz)
+void llg_heun_corrector_step(const __global int *const restrict material_id,
+                             __constant heun_params_t *const restrict heun_parameters,
+                             __global real_t *const restrict x_spin,
+                             __global real_t *const restrict y_spin,
+                             __global real_t *const restrict z_spin,
+                             const __global real_t *const restrict x_sp_field,
+                             const __global real_t *const restrict y_sp_field,
+                             const __global real_t *const restrict z_sp_field,
+                             const __global real_t *const restrict x_ext_field,
+                             const __global real_t *const restrict y_ext_field,
+                             const __global real_t *const restrict z_ext_field,
+                             const __global real_t *const restrict x_spin_buffer,
+                             const __global real_t *const restrict y_spin_buffer,
+                             const __global real_t *const restrict z_spin_buffer,
+                             const __global real_t *const restrict dSx,
+                             const __global real_t *const restrict dSy,
+                             const __global real_t *const restrict dSz)
 {
    size_t gsz = get_global_size(0);
 

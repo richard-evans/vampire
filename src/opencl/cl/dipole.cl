@@ -1,16 +1,17 @@
 #include "cl_defs.h"
+#include "material_type.h"
 
 __kernel
-void update_dipole_fields(const __global real_t *x_mag,
-                          const __global real_t *y_mag,
-                          const __global real_t *z_mag,
-                          const __global real_t *x_coord,
-                          const __global real_t *y_coord,
-                          const __global real_t *z_coord,
-                          const __global real_t *volume,
-                          __global real_t *x_dip_field,
-                          __global real_t *y_dip_field,
-                          __global real_t *z_dip_field)
+void update_dipole_fields(const __global real_t *const restrict x_mag,
+                          const __global real_t *const restrict y_mag,
+                          const __global real_t *const restrict z_mag,
+                          const __global real_t *const restrict x_coord,
+                          const __global real_t *const restrict y_coord,
+                          const __global real_t *const restrict z_coord,
+                          const __global real_t *const restrict volume,
+                          __global real_t *const restrict x_dip_field,
+                          __global real_t *const restrict y_dip_field,
+                          __global real_t *const restrict z_dip_field)
 {
    size_t gsz = get_global_size(0);
 
@@ -60,13 +61,14 @@ void update_dipole_fields(const __global real_t *x_mag,
    }
 }
 
-__kernel update_atm_dipole_fields(const __global real_t *x_cell_field,
-                                  const __global real_t *y_cell_field,
-                                  const __global real_t *z_cell_field,
-                                  __global real_t *x_dip_field,
-                                  __global real_t *y_dip_field,
-                                  __global real_t *z_dip_field,
-                                  const __global int *cell)
+__kernel
+void update_atm_dipole_fields(const __global real_t *const restrict x_cell_field,
+                              const __global real_t *const restrict y_cell_field,
+                              const __global real_t *const restrict z_cell_field,
+                              __global real_t *const restrict x_dip_field,
+                              __global real_t *const restrict y_dip_field,
+                              __global real_t *const restrict z_dip_field,
+                              const __global int *const restrict cell)
 {
    size_t gsz = get_global_size(0);
 
@@ -79,7 +81,8 @@ __kernel update_atm_dipole_fields(const __global real_t *x_cell_field,
    }
 }
 
-void atomic_add_global(volatile __global real_t *source, const real_t operand)
+void atomic_add_global(volatile __global real_t *const source,
+                       const real_t operand)
 {
    union
    {
@@ -92,19 +95,19 @@ void atomic_add_global(volatile __global real_t *source, const real_t operand)
       prevVal.f = *source;
       newVal.f = prevVal.f + operand;
    }
-   while (ATOMIC_CMPXCHG((volatile __global uint *)source, prevVal.i, newVal.i) != prevVal.i);
+   while (ATOMIC_CMPXCHG((volatile __global uint *const)source, prevVal.i, newVal.i) != prevVal.i);
 }
 
 __kernel
-void update_cell_magnetization(const __global real_t *x_spin,
-                               const __global real_t *y_spin,
-                               const __global real_t *z_spin,
-                               const __global int *material,
-                               const __global int *cell,
-                               const __global material_params_t *material_params,
-                               __global real_t *x_mag,
-                               __global real_t *y_mag,
-                               __global real_t *z_mag)
+void update_cell_magnetization(const __global real_t *const restrict x_spin,
+                               const __global real_t *const restrict y_spin,
+                               const __global real_t *const restrict z_spin,
+                               const __global int *const restrict material,
+                               const __global int *const restrict cell,
+                               const __global material_parameters_t *const restrict material_params,
+                               __global real_t *const restrict x_mag,
+                               __global real_t *const restrict y_mag,
+                               __global real_t *const restrict z_mag)
 {
    size_t gsz = get_global_size(0);
 

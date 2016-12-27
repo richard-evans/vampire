@@ -43,6 +43,7 @@ namespace vopencl
          {
             std::ostringstream opts;
             opts << "-DN_CELLS=" << ::cells::num_cells;
+            opts << " -DN_ATOMS=" << ::atoms::num_atoms;
             update_dip = vcl::build_kernel_from_file("src/opencl/cl/dipole.cl",
                                                      "update_dipole_fields",
                                                      vcl::context, vcl::default_device,
@@ -53,7 +54,8 @@ namespace vopencl
          if (!compiled_update_atm_dip)
          {
             std::ostringstream opts;
-            opts << "-DN_ATOMS=" << ::atoms::num_atoms;
+            opts << "-DN_CELLS=" << ::cells::num_cells;
+            opts << " -DN_ATOMS=" << ::atoms::num_atoms;
             update_atm_dip = vcl::build_kernel_from_file("src/opencl/cl/dipole.cl",
                                                          "update_atm_dipole_fields",
                                                          vcl::context, vcl::default_device,
