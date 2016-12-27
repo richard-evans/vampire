@@ -2,14 +2,14 @@
 #include "material_type.h"
 
 __kernel
-void update_nexch_spin_fields(const __global int *material,
-                              const __global material_parameters_t *material_params,
-                              const __global real_t *x_spin,
-                              const __global real_t *y_spin,
-                              const __global real_t *z_spin,
-                              __global real_t *x_sp_field,
-                              __global real_t *y_sp_field,
-                              __global real_t *z_sp_field)
+void update_nexch_spin_fields(const __global int *const restrict material,
+                              const __global material_parameters_t *const restrict material_params,
+                              const __global real_t *const restrict x_spin,
+                              const __global real_t *const restrict y_spin,
+                              const __global real_t *const restrict z_spin,
+                              __global real_t *const restrict x_sp_field,
+                              __global real_t *const restrict y_sp_field,
+                              __global real_t *const restrict z_sp_field)
 {
    const size_t gsz = get_global_size(0);
 
