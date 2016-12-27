@@ -29,7 +29,7 @@ namespace vopencl
 
          cl::Kernel matmul;
 
-         void initialize_exchange(void)
+         void initialize_exchange(void) noexcept
          {
             std::vector<vcl_real_t> Jxx_vals_h;
             std::vector<vcl_real_t> Jyy_vals_h;
@@ -41,8 +41,6 @@ namespace vopencl
             opts << "-DN=" << vsize;
             matmul = vcl::build_kernel_from_file("src/opencl/cl/csrmatmul.cl", "matmul",
                                                  vcl::context, vcl::default_device, opts.str());
-
-            const cl::CommandQueue write_q(vcl::context, vcl::default_device);
 
             switch(::atoms::exchange_type)
             {
@@ -63,8 +61,8 @@ namespace vopencl
                }
 
                Jxx_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, vsize*sizeof(vcl_real_t));
-               write_q.enqueueWriteBuffer(Jxx_vals_d, CL_FALSE, 0, vsize*sizeof(vcl_real_t), &Jxx_vals_h[0]);
-               write_q.finish();
+               vcl::queue.enqueueWriteBuffer(Jxx_vals_d, CL_FALSE, 0, vsize*sizeof(vcl_real_t), &Jxx_vals_h[0]);
+               vcl::queue.finish();
 
                J_isot_initialized = true;
 
@@ -92,10 +90,10 @@ namespace vopencl
                Jyy_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, vsize*sizeof(vcl_real_t));
                Jzz_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, vsize*sizeof(vcl_real_t));
 
-               write_q.enqueueWriteBuffer(Jxx_vals_d, CL_FALSE, 0, vsize*sizeof(vcl_real_t), &Jxx_vals_h[0]);
-               write_q.enqueueWriteBuffer(Jyy_vals_d, CL_FALSE, 0, vsize*sizeof(vcl_real_t), &Jyy_vals_h[0]);
-               write_q.enqueueWriteBuffer(Jzz_vals_d, CL_FALSE, 0, vsize*sizeof(vcl_real_t), &Jzz_vals_h[0]);
-               write_q.finish();
+               vcl::queue.enqueueWriteBuffer(Jxx_vals_d, CL_FALSE, 0, vsize*sizeof(vcl_real_t), &Jxx_vals_h[0]);
+               vcl::queue.enqueueWriteBuffer(Jyy_vals_d, CL_FALSE, 0, vsize*sizeof(vcl_real_t), &Jyy_vals_h[0]);
+               vcl::queue.enqueueWriteBuffer(Jzz_vals_d, CL_FALSE, 0, vsize*sizeof(vcl_real_t), &Jzz_vals_h[0]);
+               vcl::queue.finish();
 
                J_vect_initialised = true;
 
@@ -110,7 +108,7 @@ namespace vopencl
             exchange_initialized = true;
          }
 
-         void calculate_exchange_fields(void)
+         void calculate_exchange_fields(void) noexcept
          {
             if(!exchange_initialized)
                initialize_exchange();
@@ -119,8 +117,6 @@ namespace vopencl
             // colidxs = vcl::atoms::neighbours
 
             // convert Jnn from CSR to DIA
-
-            const cl::CommandQueue mm(vcl::context, vcl::default_device);
 
             const cl::NDRange global(::atoms::num_atoms);
 
@@ -134,17 +130,17 @@ namespace vopencl
                // vcl::x_total_spin_field_array = matmul(Jxx, vcl::atoms::x_spin_array)
                // vcl::y_total_spin_field_array = matmul(Jxx, vcl::atoms::y_spin_array)
                // vcl::z_total_spin_field_array = matmul(Jxx, vcl::atoms::z_spin_array)
-               vcl::kernel_call(matmul, mm, global, vcl::local,
+               vcl::kernel_call(matmul, vcl::queue, global, vcl::local,
                                 Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours, /* CSR matrix */
                                 vcl::atoms::spin_array.x(),
                                 vcl::total_spin_field_array.x());
 
-               vcl::kernel_call(matmul, mm, global, vcl::local,
+               vcl::kernel_call(matmul, vcl::queue, global, vcl::local,
                                 Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours, /* CSR matrix */
                                 vcl::atoms::spin_array.y(),
                                 vcl::total_spin_field_array.y());
 
-               vcl::kernel_call(matmul, mm, global, vcl::local,
+               vcl::kernel_call(matmul, vcl::queue, global, vcl::local,
                                 Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
                                 vcl::atoms::spin_array.z(),
                                 vcl::total_spin_field_array.z());
@@ -160,17 +156,17 @@ namespace vopencl
                // vcl::y_total_field_array = matmul(Jyy, vcl::atoms::y_spin_array)
                // vcl::z_total_field_array = matmul(Jzz, vcl::atoms::z_spin_array)
 
-               vcl::kernel_call(matmul, mm, global, vcl::local,
+               vcl::kernel_call(matmul, vcl::queue, global, vcl::local,
                                 Jxx_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
                                 vcl::atoms::spin_array.x(),
                                 vcl::total_spin_field_array.x());
 
-               vcl::kernel_call(matmul, mm, global, vcl::local,
+               vcl::kernel_call(matmul, vcl::queue, global, vcl::local,
                                 Jyy_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
                                 vcl::atoms::spin_array.y(),
                                 vcl::total_spin_field_array.y());
 
-               vcl::kernel_call(matmul, mm, global, vcl::local,
+               vcl::kernel_call(matmul, vcl::queue, global, vcl::local,
                                 Jzz_vals_d, vcl::atoms::limits, vcl::atoms::neighbours,
                                 vcl::atoms::spin_array.z(),
                                 vcl::total_spin_field_array.z());
@@ -180,7 +176,7 @@ namespace vopencl
                break;
             }
 
-            mm.finish();
+            vcl::queue.finish();
          }
       }
    }

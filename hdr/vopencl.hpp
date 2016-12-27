@@ -23,20 +23,20 @@ namespace vopencl
    // Function for OpenCL acceleration
    //-----------------------------------------------------------------------------
    bool initialize(bool cpu_stats);
-   void llg_heun();
-   void stats_update();
-   void finalize();
+   void llg_heun(void);
+   void stats_update(void);
+   void finalize(void);
 
    namespace config
    {
-      void synchronise();
+      void synchronise(void);
    }
 
    namespace stats
    {
-      void update();
-      void get();
-      void reset();
+      void update(void);
+      void get(void);
+      void reset(void);
    }
 
 } // end of vopencl namespace

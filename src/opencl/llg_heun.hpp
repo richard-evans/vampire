@@ -29,8 +29,8 @@ namespace vopencl
 
          extern cl::Buffer heun_parameters_device;
 
-         void init(void);
-         void step(void);
+         void init(void) noexcept;
+         void step(void) noexcept;
       }
    }
 }

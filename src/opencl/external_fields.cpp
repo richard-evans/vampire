@@ -21,7 +21,7 @@ namespace vopencl
       bool compiled_update_external_fields = false;
       cl::Kernel update_ext;
 
-      void update_external_fields(void)
+      void update_external_fields(void) noexcept
       {
          if (!compiled_update_external_fields)
          {
@@ -33,17 +33,13 @@ namespace vopencl
             compiled_update_external_fields = true;
          }
 
-         const cl::CommandQueue update_q(vcl::context, vcl::default_device);
-
          const cl::NDRange global(::atoms::num_atoms);
-
-         vcl::rng::update_grands();
 
          const vcl_real_t Hx = sim::H_vec[0] * sim::H_applied;
          const vcl_real_t Hy = sim::H_vec[1] * sim::H_applied;
          const vcl_real_t Hz = sim::H_vec[2] * sim::H_applied;
 
-         vcl::kernel_call(update_ext, update_q, global, vcl::local,
+         vcl::kernel_call(update_ext, vcl::queue, global, vcl::local,
                           vcl::atoms::type_array,
                           vcl::mp::materials,
                           vcl::dipolar_field_array.x(),

@@ -7,7 +7,7 @@ namespace vopencl
    {
       namespace exchange
       {
-         void calculate_exchange_fields(void);
+         void calculate_exchange_fields(void) noexcept;
       }
    }
 }

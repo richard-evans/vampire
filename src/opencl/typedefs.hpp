@@ -24,13 +24,13 @@ namespace vopencl
 
       public:
 
-         Buffer3D(void) : buf(3) {}
+         Buffer3D(void) noexcept : buf(3) {}
 
          // initialize without writing, but with size
          // e.g. for use when generating buffers on device
          Buffer3D(const cl::Context &c,
                   const cl_mem_flags fs,
-                  const size_t size)
+                  const size_t size) noexcept
             : buf(3)
          {
             buf[0] = cl::Buffer(c, fs, size);
@@ -45,7 +45,7 @@ namespace vopencl
                   const cl_mem_flags fs,
                   const std::vector<T> &xs,
                   const std::vector<T> &ys,
-                  const std::vector<T> &zs)
+                  const std::vector<T> &zs) noexcept
             : buf(3)
          {
             buf[0] = cl::Buffer(c, fs, sizeof(T)*xs.size());
@@ -62,7 +62,7 @@ namespace vopencl
          void copy_to_host(const cl::CommandQueue &q,
                            std::vector<T> &xs,
                            std::vector<T> &ys,
-                           std::vector<T> &zs) const
+                           std::vector<T> &zs) const noexcept
          {
             q.enqueueReadBuffer(buf[0], CL_FALSE, 0, sizeof(T)*xs.size(), &xs[0]);
             q.enqueueReadBuffer(buf[1], CL_FALSE, 0, sizeof(T)*ys.size(), &ys[0]);
@@ -72,7 +72,7 @@ namespace vopencl
          // copies buffers to dst buffers on device
          void copy_to_dev(const cl::CommandQueue &q,
                           Buffer3D &dst,
-                          const size_t amount_to_copy) const
+                          const size_t amount_to_copy) const noexcept
          {
             q.enqueueCopyBuffer(buf[0], dst.x(), 0, 0, amount_to_copy);
             q.enqueueCopyBuffer(buf[1], dst.y(), 0, 0, amount_to_copy);
@@ -80,12 +80,12 @@ namespace vopencl
          }
 
          // access each buffer, e.g. for passing to kernel
-         cl::Buffer &x(void) { return buf[0]; }
-         cl::Buffer &y(void) { return buf[1]; }
-         cl::Buffer &z(void) { return buf[2]; }
+         cl::Buffer &x(void) noexcept { return buf[0]; }
+         cl::Buffer &y(void) noexcept { return buf[1]; }
+         cl::Buffer &z(void) noexcept { return buf[2]; }
 
          // release memory by swapping with empty vector
-         void free(void)
+         void free(void) noexcept
          {
             std::vector<cl::Buffer>().swap(buf);
          }

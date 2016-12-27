@@ -41,6 +41,7 @@ namespace vopencl
    {
       cl::Device default_device;
       cl::Context context;
+      cl::CommandQueue queue;
 
 #ifdef OPENCL_DEBUG
       std::ofstream OCLLOG("OpenCL.log");

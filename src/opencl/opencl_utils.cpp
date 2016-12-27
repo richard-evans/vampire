@@ -21,7 +21,7 @@ namespace vopencl
                                         const std::string &kernel_name,
                                         const cl::Context &context,
                                         const cl::Device  &device,
-                                        const std::string &opts="")
+                                        const std::string &opts="") noexcept
       {
          std::ifstream source_file(file_name);
          if (!source_file)
@@ -46,6 +46,7 @@ namespace vopencl
 
          prg_opts.append(" -Isrc/opencl/cl");
 
+         std::cout << prg_opts.c_str() << std::endl;
          cl_int err = program.build({device}, prg_opts.c_str());
 
 #ifdef OPENCL_DEBUG

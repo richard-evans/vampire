@@ -25,7 +25,7 @@ namespace vopencl
       cl::Kernel update_atm_dip;
       cl::Kernel update_cell_mag;
 
-      void update_dipolar_fields(void)
+      void update_dipolar_fields(void) noexcept
       {
          // dipole calculations enabled?
          if (::sim::hamiltonian_simulation_flags[4]!=1) return;
@@ -61,12 +61,10 @@ namespace vopencl
             compiled_update_atm_dip = true;
          }
 
-         const cl::CommandQueue update_q(vcl::context, vcl::default_device);
-
          const cl::NDRange global(::atoms::num_atoms);
 
          // update cell dipolar fields
-         vcl::kernel_call(update_dip, update_q, global, vcl::local,
+         vcl::kernel_call(update_dip, vcl::queue, global, vcl::local,
                           vcl::cells::mag_array.x(),
                           vcl::cells::mag_array.y(),
                           vcl::cells::mag_array.z(),
@@ -78,10 +76,10 @@ namespace vopencl
                           vcl::cells::field_array.y(),
                           vcl::cells::field_array.z());
 
-         update_q.finish();
+         vcl::queue.finish();
 
          // update atomistic dipolar fields
-         vcl::kernel_call(update_atm_dip, update_q, global, vcl::local,
+         vcl::kernel_call(update_atm_dip, vcl::queue, global, vcl::local,
                           vcl::cells::field_array.x(),
                           vcl::cells::field_array.y(),
                           vcl::cells::field_array.z(),
@@ -89,11 +87,9 @@ namespace vopencl
                           vcl::dipolar_field_array.y(),
                           vcl::dipolar_field_array.z(),
                           vcl::atoms::cell_array);
-
-         update_q.finish();
       }
 
-      void update_cell_magnetizations(void)
+      void update_cell_magnetizations(void) noexcept
       {
          const cl::CommandQueue cell_q(vcl::context, vcl::default_device);
          const cl::NDRange global(::cells::num_cells);
@@ -115,8 +111,6 @@ namespace vopencl
             compiled_update_cell_magnetization = true;
          }
          
-         cell_q.finish();
-
          vcl::kernel_call(update_cell_mag, cell_q, global, vcl::local,
                           vcl::atoms::spin_array.x(),
                           vcl::atoms::spin_array.y(),

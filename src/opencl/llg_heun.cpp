@@ -10,6 +10,7 @@
 #include "llg_heun.hpp"
 #include "opencl_include.hpp"
 #include "opencl_utils.hpp"
+#include "random.hpp"
 #include "typedefs.hpp"
 
 #ifdef OPENCL
@@ -47,7 +48,7 @@ namespace vopencl
          cl::Kernel predictor_step;
          cl::Kernel corrector_step;
 
-         void init(void)
+         void init(void) noexcept
          {
             const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
             const size_t num_mats = ::mp::num_materials;
@@ -68,13 +69,12 @@ namespace vopencl
                heun_parameters_host[i].lambda_times_prefactor = -gamma * alpha / (1.0 + alpha*alpha);
             }
 
-            const cl::CommandQueue write_q(vcl::context, vcl::default_device);
-            write_q.enqueueWriteBuffer(vcl::llg::heun_parameters_device,
+            vcl::queue.enqueueWriteBuffer(vcl::llg::heun_parameters_device,
                                        CL_FALSE,
                                        0,
                                        num_mats*sizeof(heun_parameter_t),
                                        &heun_parameters_host[0]);
-            write_q.finish();
+            vcl::queue.finish();
 
             // Build Kernels
             std::ostringstream opts;
@@ -91,22 +91,26 @@ namespace vopencl
             vcl::llg::initialized = true;
          }
 
-         void step(void)
+         void step(void) noexcept
          {
             const cl::NDRange global(::atoms::num_atoms);
 
             const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
-            const cl::CommandQueue step_q(vcl::context, vcl::default_device);
-            vcl::atoms::spin_array.copy_to_dev(step_q, vcl::llg::spin_buffer_array, real_buffer_size);
+
+            vcl::atoms::spin_array.copy_to_dev(vcl::queue, vcl::llg::spin_buffer_array, real_buffer_size);
 
             // update fields
             vcl::update_spin_fields();
+            vcl::rng::update_grands();
+
+            vcl::queue.finish();
+            
             vcl::update_external_fields();
 
-            step_q.finish();
+            vcl::queue.finish();
 
             // Heun predictor step
-            vcl::kernel_call(predictor_step, step_q, global, vcl::local,
+            vcl::kernel_call(predictor_step, vcl::queue, global, vcl::local,
                              vcl::atoms::type_array,
                              vcl::llg::heun_parameters_device,
                              vcl::atoms::spin_array.x(),
@@ -122,13 +126,13 @@ namespace vopencl
                              vcl::llg::dS_array.y(),
                              vcl::llg::dS_array.z());
 
-            step_q.finish();
+            vcl::queue.finish();
 
             // update spin fields, external fixed
             vcl::update_spin_fields();
 
             // Heun corrector step
-            vcl::kernel_call(corrector_step, step_q, global, vcl::local,
+            vcl::kernel_call(corrector_step, vcl::queue, global, vcl::local,
                              vcl::atoms::type_array,
                              vcl::llg::heun_parameters_device,
                              vcl::atoms::spin_array.x(),
@@ -147,7 +151,7 @@ namespace vopencl
                              vcl::llg::dS_array.y(),
                              vcl::llg::dS_array.z());
 
-            step_q.finish();
+            vcl::queue.finish();
          }
       }
    }

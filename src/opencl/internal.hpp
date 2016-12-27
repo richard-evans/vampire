@@ -45,6 +45,7 @@ namespace vopencl
 
       extern cl::Context context;
       extern cl::Device default_device;
+      extern cl::CommandQueue queue;
       
 #ifdef OPENCL_DEBUG
       extern std::ofstream OCLLOG;
@@ -53,20 +54,20 @@ namespace vopencl
       // Internal function declarations
       //-------------------------------------------------------------------------
 
-      bool initialize_atoms(void);
-      bool initialize_fields(void);
-      bool initialize_cells(void);
-      bool initialize_materials(void);
-      bool initialize_topology(void);
-      bool initialize_stats(void);
-      bool initialize_rng(void);
+      bool initialize_atoms(void) noexcept;
+      bool initialize_fields(void) noexcept;
+      bool initialize_cells(void) noexcept;
+      bool initialize_materials(void) noexcept;
+      bool initialize_topology(void) noexcept;
+      bool initialize_stats(void) noexcept;
+      bool initialize_rng(void) noexcept;
 
-      void update_spin_fields();
-      void update_external_fields();
-      void update_dipolar_fields();
-      void update_cell_magnetizations();
+      void update_spin_fields() noexcept;
+      void update_external_fields() noexcept;
+      void update_dipolar_fields() noexcept;
+      void update_cell_magnetizations() noexcept;
 
-      void finalize(void);
+      void finalize(void) noexcept;
       
    } // end of internal namespace
 
