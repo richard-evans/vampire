@@ -32,13 +32,13 @@ namespace vopencl
                                                   vcl::context, vcl::default_device,
                                                   opts.str());
                compiled_grng = true;
+
+               vcl::set_kernel_args(grng, vcl::rng::urands, vcl::rng::grands);
             }
 
             const cl::NDRange global(::atoms::num_atoms*3);
 
-            vcl::kernel_call(grng, vcl::queue, global, vcl::local,
-                             vcl::rng::urands,
-                             vcl::rng::grands);
+            vcl::kernel_call(grng, vcl::queue, global, vcl::local);
          }
       }
    }

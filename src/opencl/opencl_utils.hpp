@@ -67,32 +67,19 @@ namespace vopencl
                                         const cl::Device  &device,
                                         const std::string &opts="") noexcept;
 
+      template <typename... Ts>
+      static void set_kernel_args(cl::Kernel &k, Ts... Args) noexcept
+      {
+          pass_args(k, 0, Args...);
+      }
+
       // function to enqueue a kernel
       // the OpenCL C++ spec for this seems pretty fluid so it's probably better not to use it
-      template <typename... Ts>
-      static void kernel_call(cl::Kernel &k,              /* kernel to enqueue */
-                              const cl::CommandQueue &q,  /* into this queue */
-                              const cl::NDRange gbl,      /* total number of work items */
-                              const cl::NDRange lcl,      /* number of work items in group */
-                              Ts... Args) noexcept        /* kernel arguments */
-      {
-         // only need to set arguments once per kernel
-         // assumes it's always called with the same arguments
-         static bool first_call = true;
-         if (first_call)
-         {
-            pass_args(k, 0, Args...);
-            first_call = false;
-         }
+      void kernel_call(cl::Kernel &k,              /* kernel to enqueue */
+                       const cl::CommandQueue &q,  /* into this queue */
+                       const cl::NDRange gbl,      /* total number of work items */
+                       const cl::NDRange lcl) noexcept;     /* number of work items in group */
 
-         const auto err = q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
-         if (err != CL_SUCCESS)
-         {
-            std::cerr << "Error enqueuing kernel " << k.getInfo<CL_KERNEL_FUNCTION_NAME>() << std::endl;
-            std::cerr << "Error code " << err << std::endl;
-            ::err::vexit();
-         }
-      }
    }
 }
 

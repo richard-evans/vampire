@@ -16,6 +16,20 @@ namespace vopencl
 {
    namespace internal
    {
+      void kernel_call(cl::Kernel &k,              /* kernel to enqueue */
+                       const cl::CommandQueue &q,  /* into this queue */
+                       const cl::NDRange gbl,      /* total number of work items */
+                       const cl::NDRange lcl) noexcept      /* number of work items in group */
+      {
+         const auto err = q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
+         if (err != CL_SUCCESS)
+         {
+            std::cerr << "Error enqueuing kernel " << k.getInfo<CL_KERNEL_FUNCTION_NAME>() << std::endl;
+            std::cerr << "Error code " << err << std::endl;
+            ::err::vexit();
+         }
+      }
+
       // function to build OpenCL kernel from source file
       cl::Kernel build_kernel_from_file(const std::string &file_name,
                                         const std::string &kernel_name,

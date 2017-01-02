@@ -3,6 +3,7 @@
 #include "atoms.hpp"
 
 #include "data.hpp"
+#include "exchange_fields.hpp"
 #include "internal.hpp"
 #include "opencl_include.hpp"
 #include "opencl_utils.hpp"
@@ -47,19 +48,24 @@ namespace vopencl
                                                                    vcl::context, vcl::default_device,
                                                                    opts.str());
             compiled_update_spin_fields = true;
+
+            vcl::set_kernel_args(update_nexch_spin_fields,
+                                 vcl::atoms::type_array,
+                                 vcl::mp::materials,
+                                 vcl::atoms::spin_array.x(),
+                                 vcl::atoms::spin_array.y(),
+                                 vcl::atoms::spin_array.z(),
+                                 vcl::total_spin_field_array.x(),
+                                 vcl::total_spin_field_array.y(),
+                                 vcl::total_spin_field_array.z());
          }
 
          cl::NDRange global(::atoms::num_atoms);
 
-         vcl::kernel_call(update_nexch_spin_fields, vcl::queue, global, vcl::local,
-                          vcl::atoms::type_array,
-                          vcl::mp::materials,
-                          vcl::atoms::spin_array.x(),
-                          vcl::atoms::spin_array.y(),
-                          vcl::atoms::spin_array.z(),
-                          vcl::total_spin_field_array.x(),
-                          vcl::total_spin_field_array.y(),
-                          vcl::total_spin_field_array.z());
+         vcl::kernel_call(update_nexch_spin_fields, vcl::queue, global, vcl::local);
+
+
+         vcl::exchange::calculate_exchange_fields();
       }
    }
 }
