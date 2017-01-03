@@ -36,7 +36,8 @@ namespace vopencl
                vcl::set_kernel_args(grng, vcl::rng::urands, vcl::rng::grands);
             }
 
-            const cl::NDRange global(::atoms::num_atoms*3);
+            // launch N/2 work items as each gens 2 numbers
+            const cl::NDRange global((::atoms::num_atoms*3)/2);
 
             vcl::kernel_call(grng, vcl::queue, global, vcl::local);
          }
