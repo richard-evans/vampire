@@ -22,22 +22,7 @@ namespace vopencl
 
       void update_spin_fields(void) noexcept
       {
-         size_t buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
-
-         // Zero the field buffers
-         vcl_real_t zero = 0.0;
-         vcl::queue.enqueueFillBuffer(vcl::total_spin_field_array.x(),
-                                   &zero,
-                                   sizeof(vcl_real_t),
-                                   buffer_size);
-         vcl::queue.enqueueFillBuffer(vcl::total_spin_field_array.y(),
-                                   &zero,
-                                   sizeof(vcl_real_t),
-                                   buffer_size);
-         vcl::queue.enqueueFillBuffer(vcl::total_spin_field_array.z(),
-                                   &zero,
-                                   sizeof(vcl_real_t),
-                                   buffer_size);
+         vcl::total_spin_field_array.zero_buffers();
 
          if (!compiled_update_spin_fields)
          {

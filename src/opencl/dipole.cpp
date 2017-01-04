@@ -103,11 +103,7 @@ namespace vopencl
          const cl::CommandQueue cell_q(vcl::context, vcl::default_device);
          const cl::NDRange global(::cells::num_cells);
 
-         const size_t buff_size = ::cells::num_cells * sizeof(vcl_real_t);
-         const vcl_real_t zero = 0;
-         cell_q.enqueueFillBuffer(vcl::cells::mag_array.x(), &zero, sizeof(zero), buff_size);
-         cell_q.enqueueFillBuffer(vcl::cells::mag_array.y(), &zero, sizeof(zero), buff_size);
-         cell_q.enqueueFillBuffer(vcl::cells::mag_array.z(), &zero, sizeof(zero), buff_size);
+         vcl::cells::mag_array.zero_buffers();
 
          if (!compiled_update_cell_magnetization)
          {
