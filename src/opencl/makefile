@@ -4,6 +4,8 @@
 
 LD=ld
 
+OPENCL_CFLAGS=-Wall -Wextra -std=c++11 -pedantic -Wno-ignored-attributes -Wno-unused-function -DOPENCL_DEBUG
+
 OPENCL_LIBS=-lOpenCL
 OPENCL_PR=
 
@@ -28,7 +30,7 @@ $(OPENCL_OBJ): $(OPENCL_OBJECTS)
 	$(LD) -r $^ -o $@
 
 $(OPENCL_OBJECTS): obj/%.o: src/%.cpp
-	$(GCC) $< -c -g -o $@ $(GCC_CFLAGS) $(OPENCL_PR) $(OPENCL_LIBS) -DOPENCL_DEBUG -Wall -Wextra -std=c++11 -pedantic
+	$(GCC) $< -c -g -o $@ $(GCC_CFLAGS) $(OPENCL_PR) $(OPENCL_LIBS) $(OPENCL_CFLAGS)
 
 gcc-opencl: GCC_CFLAGS+=-DOPENCL
 gcc-opencl: OPENCL_PR+=-DOPENCL_DP
