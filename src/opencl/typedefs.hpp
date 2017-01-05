@@ -90,29 +90,15 @@ namespace vopencl
          {
 #ifdef CL_API_SUFFIX__VERSION_1_2
             const vcl_real_t zero = 0.0;
-            for (const &buffer : buffers)
+            for (const cl::Buffer &buffer : buffers)
                vcl::queue.enqueueFillBuffer(buffer, &zero, sizeof(zero), buffer_size);
 #else
-            static cl::Kernel  zero_kernel;
-            static bool initialised = false;
-
-            if (!initialised)
-            {
-               zero_kernel = vcl::build_kernel_from_file("src/opencl/cl/zero_kernel.cl",
-                                                      "zero_buffers",
-                                                      vcl::context,
-                                                      vcl::default_device);
-               vcl::set_kernel_args(zero_kernel,
-                                    buffers[0],
-                                    buffers[1],
-                                    buffers[2]);
-               initialised = true;
-            }
-
-            vcl::kernel_call(zero_kernel, vcl::queue, buffer_size, vcl::local);
+            const std::vector<vcl_real_t> zeros(buffer_size, 0.0);
+            for (const cl::Buffer &buffer : buffers)
+               vcl::queue.enqueueWriteBuffer(buffer, CL_FALSE, 0, sizeof(vcl_real_t)*buffer_size, &zeros[0]);
+#endif // CL_API_SUFFIX__VERSION_1_2
 
             vcl::queue.finish();
-#endif // CL_API_SUFFIX__VERSION_1_2
          }
 
          // access each buffer, e.g. for passing to kernel
