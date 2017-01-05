@@ -39,9 +39,9 @@ namespace vopencl
       {
          bool initialized = false;
 
-         vcl::Buffer3D<vcl_real_t> spin_buffer_array;
+         vcl::Buffer3D<vcl_real_t, vcl_real_vec_t> spin_buffer_array;
 
-         vcl::Buffer3D<vcl_real_t> dS_array;
+         vcl::Buffer3D<vcl_real_t, vcl_real_vec_t> dS_array;
 
          cl::Buffer heun_parameters_device;
 
@@ -53,9 +53,11 @@ namespace vopencl
             const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
             const size_t num_mats = ::mp::num_materials;
 
-            vcl::llg::spin_buffer_array = vcl::Buffer3D<vcl_real_t>(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::spin_buffer_array =
+               vcl::Buffer3D<vcl_real_t, vcl_real_vec_t>(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
 
-            vcl::llg::dS_array = vcl::Buffer3D<vcl_real_t>(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::dS_array =
+               vcl::Buffer3D<vcl_real_t, vcl_real_vec_t>(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
 
             vcl::llg::heun_parameters_device = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, num_mats*sizeof(heun_parameter_t));
 
@@ -91,37 +93,19 @@ namespace vopencl
             vcl::set_kernel_args(predictor_step,
                                  vcl::atoms::type_array,
                                  vcl::llg::heun_parameters_device,
-                                 vcl::atoms::spin_array.x(),
-                                 vcl::atoms::spin_array.y(),
-                                 vcl::atoms::spin_array.z(),
-                                 vcl::total_spin_field_array.x(),
-                                 vcl::total_spin_field_array.y(),
-                                 vcl::total_spin_field_array.z(),
-                                 vcl::total_external_field_array.x(),
-                                 vcl::total_external_field_array.y(),
-                                 vcl::total_external_field_array.z(),
-                                 vcl::llg::dS_array.x(),
-                                 vcl::llg::dS_array.y(),
-                                 vcl::llg::dS_array.z());
+                                 vcl::atoms::spin_array,
+                                 vcl::total_spin_field_array,
+                                 vcl::total_external_field_array,
+                                 vcl::llg::dS_array);
 
             vcl::set_kernel_args(corrector_step,
                                  vcl::atoms::type_array,
                                  vcl::llg::heun_parameters_device,
-                                 vcl::atoms::spin_array.x(),
-                                 vcl::atoms::spin_array.y(),
-                                 vcl::atoms::spin_array.z(),
-                                 vcl::total_spin_field_array.x(),
-                                 vcl::total_spin_field_array.y(),
-                                 vcl::total_spin_field_array.z(),
-                                 vcl::total_external_field_array.x(),
-                                 vcl::total_external_field_array.y(),
-                                 vcl::total_external_field_array.z(),
-                                 vcl::llg::spin_buffer_array.x(),
-                                 vcl::llg::spin_buffer_array.y(),
-                                 vcl::llg::spin_buffer_array.z(),
-                                 vcl::llg::dS_array.x(),
-                                 vcl::llg::dS_array.y(),
-                                 vcl::llg::dS_array.z());
+                                 vcl::atoms::spin_array,
+                                 vcl::total_spin_field_array,
+                                 vcl::total_external_field_array,
+                                 vcl::llg::spin_buffer_array,
+                                 vcl::llg::dS_array);
 
             vcl::llg::initialized = true;
          }

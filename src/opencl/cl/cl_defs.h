@@ -9,8 +9,10 @@
 #ifdef OPENCL_DP
 
 // double precision (64-bit) real and unsigned integer types
-typedef double real_t;
-typedef ulong  uint_t;
+typedef double  real_t;
+typedef double3 real_t3;
+typedef double4 real_t4;
+typedef ulong   uint_t;
 
 // double precision (64-bit) function
 //#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable
@@ -19,8 +21,10 @@ typedef ulong  uint_t;
 #else
 
 // single precision (32-bit) real and unsigned integer types
-typedef float real_t;
-typedef uint  uint_t;
+typedef float  real_t;
+typedef float3 real_t3;
+typedef float4 real_t4;
+typedef uint   uint_t;
 
 // single precision (32-bit) function
 #define ATOMIC_CMPXCHG(a,b,c) atomic_cmpxchg(a,b,c)

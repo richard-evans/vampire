@@ -4,12 +4,8 @@
 __kernel
 void update_nexch_spin_fields(const __global int *const restrict material,
                               const __global material_parameters_t *const restrict material_params,
-                              const __global real_t *const restrict x_spin,
-                              const __global real_t *const restrict y_spin,
-                              const __global real_t *const restrict z_spin,
-                              __global real_t *const restrict x_sp_field,
-                              __global real_t *const restrict y_sp_field,
-                              __global real_t *const restrict z_sp_field)
+                              const __global real_t *const restrict spin,
+                              __global real_t *const restrict sp_field)
 {
    const size_t gsz = get_global_size(0);
 
@@ -19,22 +15,16 @@ void update_nexch_spin_fields(const __global int *const restrict material,
 
       material_parameters_t mat = material_params[mid];
 
-      real_t field_x = 0;
-      real_t field_y = 0;
-      real_t field_z = 0;
+      real_t3 S = spin[i];
 
-      real_t sx = x_spin[i];
-      real_t sy = y_spin[i];
-      real_t sz = z_spin[i];
+      real_t3 field = (real_t3)(0.0, 0.0, - 2.0*mat.ku*S.z);
 
-      real_t ku = mat.ku;
-      field_z = - 2 * ku * sz;
+      real_t3 e = (real_t3)(mat.anisotropy_unit_x,
+                            mat.anisotropy_unit_y,
+                            mat.anisotropy_unit_z);
 
-      real_t ex = mat.anisotropy_unit_x;
-      real_t ey = mat.anisotropy_unit_y;
-      real_t ez = mat.anisotropy_unit_z;
-
-      real_t sdote  = sx*ex + sy*ey + sz*ez;
+      real_t3 tmp = S * e;
+      real_t sdote  = tmp.x + tmp.y + tmp.z;
       real_t sdote3 = sdote * sdote * sdote;
       real_t sdote5 = sdote3 * sdote * sdote;
 
@@ -48,12 +38,9 @@ void update_nexch_spin_fields(const __global int *const restrict material,
       real_t ek4 = k4 * 0.125 * (140 * sdote3 - 60 * sdote);
       real_t ek6 = k6 * 0.0625 * (1386*sdote5 - 1260*sdote3 + 210*sdote);
 
-      field_x += scale * ex * (ek2 + ek4 + ek6);
-      field_y += scale * ey * (ek2 + ek4 + ek6);
-      field_z += scale * ez * (ek2 + ek4 + ek6);
+      real_t ek_sum = ek2 + ek4 + ek6;
+      field += scale * e * eksum;
 
-      x_sp_field[i] = field_x;
-      y_sp_field[i] = field_y;
-      z_sp_field[i] = field_z;
+      sp_field[i] = field;
    }
 }

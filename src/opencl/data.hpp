@@ -42,9 +42,9 @@ namespace vopencl
 
       namespace atoms
       {
-         extern Buffer3D<vcl_real_t> spin_array;
+         extern Buffer3D<vcl_real_t, vcl_real_vec_t> spin_array;
 
-         extern Buffer3D<vcl_real_t> coord_array;
+         extern Buffer3D<vcl_real_t, vcl_real_vec_t> coord_array;
 
          extern cl::Buffer type_array;
 
@@ -58,11 +58,11 @@ namespace vopencl
 
       namespace cells
       {
-         extern Buffer3D<vcl_real_t> coord_array;
+         extern Buffer3D<vcl_real_t, vcl_real_vec_t> coord_array;
 
-         extern Buffer3D<vcl_real_t> mag_array;
+         extern Buffer3D<vcl_real_t, vcl_real_vec_t> mag_array;
 
-         extern Buffer3D<vcl_real_t> field_array;
+         extern Buffer3D<vcl_real_t, vcl_real_vec_t> field_array;
 
          extern cl::Buffer volume_array;
 
@@ -74,11 +74,11 @@ namespace vopencl
          extern cl::Buffer materials;
       }
 
-      extern Buffer3D<vcl_real_t> total_spin_field_array;
+      extern Buffer3D<vcl_real_t, vcl_real_vec_t> total_spin_field_array;
 
-      extern Buffer3D<vcl_real_t> total_external_field_array;
+      extern Buffer3D<vcl_real_t, vcl_real_vec_t> total_external_field_array;
 
-      extern Buffer3D<vcl_real_t> dipolar_field_array;
+      extern Buffer3D<vcl_real_t, vcl_real_vec_t> dipolar_field_array;
 
       namespace stats
       {

@@ -4,7 +4,7 @@
 
 LD=ld
 
-OPENCL_CFLAGS=-Wall -Wextra -std=c++11 -pedantic -Wno-ignored-attributes -Wno-unused-function -DOPENCL_DEBUG
+OPENCL_CFLAGS=-Wall -Wextra -std=c++11 -pedantic -Wno-ignored-attributes -Wno-unused-function -DOPENCL_DEBUG -flto
 
 OPENCL_LIBS=-lOpenCL
 OPENCL_PR=

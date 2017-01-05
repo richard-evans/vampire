@@ -22,7 +22,7 @@ namespace vopencl
 
       void update_spin_fields(void) noexcept
       {
-         vcl::total_spin_field_array.zero_buffers();
+         vcl::total_spin_field_array.zero_buffer();
 
          if (!compiled_update_spin_fields)
          {
@@ -37,12 +37,8 @@ namespace vopencl
             vcl::set_kernel_args(update_nexch_spin_fields,
                                  vcl::atoms::type_array,
                                  vcl::mp::materials,
-                                 vcl::atoms::spin_array.x(),
-                                 vcl::atoms::spin_array.y(),
-                                 vcl::atoms::spin_array.z(),
-                                 vcl::total_spin_field_array.x(),
-                                 vcl::total_spin_field_array.y(),
-                                 vcl::total_spin_field_array.z());
+                                 vcl::atoms::spin_array,
+                                 vcl::total_spin_field_array);
          }
 
          cl::NDRange global(::atoms::num_atoms);

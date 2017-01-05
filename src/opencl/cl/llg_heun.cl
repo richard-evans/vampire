@@ -6,21 +6,20 @@ typedef struct
    real_t lambda_times_prefactor;
 } heun_params_t;
 
+real_t3 cross_product(const real_t3 A, const real_t3 B)
+{
+   return (real_t3)(A.y*B.z - A.z*B.y,
+                    A.z*B.x - A.x*B.z,
+                    A.x*B.y - A.y*B.x);
+}
+
 __kernel
 void llg_heun_predictor_step(const __global int *const restrict material_id,
                              __constant heun_params_t *const restrict heun_parameters,
-                             __global real_t *const restrict x_spin,
-                             __global real_t *const restrict y_spin,
-                             __global real_t *const restrict z_spin,
-                             const __global real_t *const restrict x_sp_field,
-                             const __global real_t *const restrict y_sp_field,
-                             const __global real_t *const restrict z_sp_field,
-                             const __global real_t *const restrict x_ext_field,
-                             const __global real_t *const restrict y_ext_field,
-                             const __global real_t *const restrict z_ext_field,
-                             __global real_t *const restrict dSx,
-                             __global real_t *const restrict dSy,
-                             __global real_t *const restrict dSz)
+                             __global real_t3 *const restrict spin,
+                             const __global real_t3 *const restrict sp_field,
+                             const __global real_t3 *const restrict ext_field,
+                             __global real_t3 *const restrict dS)
 {
    const size_t gsz = get_global_size(0);
 
@@ -32,70 +31,43 @@ void llg_heun_predictor_step(const __global int *const restrict material_id,
       real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
       // initial spins
-      real_t S_x = x_spin[atom];
-      real_t S_y = y_spin[atom];
-      real_t S_z = z_spin[atom];
+      real_t3 S = spin[atom];
 
       // total field
-      real_t H_x = x_sp_field[atom] + x_ext_field[atom];
-      real_t H_y = y_sp_field[atom] + y_ext_field[atom];
-      real_t H_z = z_sp_field[atom] + z_ext_field[atom];
+      real_t3 H = sp_field[atom] + ext_field[atom];
 
       // S cross H
-      real_t SxH_x = S_y * H_z - S_z * H_y;
-      real_t SxH_y = S_z * H_x - S_x * H_z;
-      real_t SxH_z = S_x * H_y - S_y * H_x;
+      real_t3 SxH = cross_product(S, H);
 
       // S cross (S cross H)
-      real_t SxSxH_x = (S_y * SxH_z - S_z * SxH_y);
-      real_t SxSxH_y = (S_z * SxH_x - S_x * SxH_z);
-      real_t SxSxH_z = (S_x * SxH_y - S_y * SxH_x);
+      real_t3 SxSxH = cross_product(S, SxH);
 
       // prefactor * (S cross H + lambda * S cross (S cross H))
-      real_t DS_x = prefactor * SxH_x + lambdatpr * SxSxH_x;
-      real_t DS_y = prefactor * SxH_y + lambdatpr * SxSxH_y;
-      real_t DS_z = prefactor * SxH_z + lambdatpr * SxSxH_z;
+      real_t3 DS = prefactor * SxH + lambdatpr * SxSxH;
 
       // change in S from predictor step
-      dSx[atom] = DS_x;
-      dSy[atom] = DS_y;
-      dSz[atom] = DS_z;
+      dS[atom] = DS;
 
       // predicted new spin
-      real_t new_S_x = S_x + DS_x * DT;
-      real_t new_S_y = S_y + DS_y * DT;
-      real_t new_S_z = S_z + DS_z * DT;
+      real_t3 new_S = S + DS * DT;
 
       // normalization of spin
-      real_t mod_s = RSQRT(
-         new_S_x*new_S_x +
-         new_S_y*new_S_y +
-         new_S_z*new_S_z);
+      real_t mod_s = RSQRT(new_S.x*new_S.x +
+                           new_S.y*new_S.y +
+                           new_S.z*new_S.z);
 
-      x_spin[atom] = new_S_x * mod_s;
-      y_spin[atom] = new_S_y * mod_s;
-      z_spin[atom] = new_S_z * mod_s;
+      spin[atom] = new_S * mod_s;
    }
 }
 
 __kernel
 void llg_heun_corrector_step(const __global int *const restrict material_id,
                              __constant heun_params_t *const restrict heun_parameters,
-                             __global real_t *const restrict x_spin,
-                             __global real_t *const restrict y_spin,
-                             __global real_t *const restrict z_spin,
-                             const __global real_t *const restrict x_sp_field,
-                             const __global real_t *const restrict y_sp_field,
-                             const __global real_t *const restrict z_sp_field,
-                             const __global real_t *const restrict x_ext_field,
-                             const __global real_t *const restrict y_ext_field,
-                             const __global real_t *const restrict z_ext_field,
-                             const __global real_t *const restrict x_spin_buffer,
-                             const __global real_t *const restrict y_spin_buffer,
-                             const __global real_t *const restrict z_spin_buffer,
-                             const __global real_t *const restrict dSx,
-                             const __global real_t *const restrict dSy,
-                             const __global real_t *const restrict dSz)
+                             __global real_t3 *const restrict spin,
+                             const __global real_t3 *const restrict sp_field,
+                             const __global real_t3 *const restrict ext_field,
+                             const __global real_t3 *const restrict spin_buffer,
+                             const __global real_t3 *const restrict dS)
 {
    size_t gsz = get_global_size(0);
 
@@ -107,43 +79,28 @@ void llg_heun_corrector_step(const __global int *const restrict material_id,
       real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
       // spins given by predictor step
-      real_t Sx = x_spin[atom];
-      real_t Sy = y_spin[atom];
-      real_t Sz = z_spin[atom];
+      real_t3 S = spin[atom];
 
       // revised total field
-      real_t H_x = x_sp_field[atom] + x_ext_field[atom];
-      real_t H_y = y_sp_field[atom] + y_ext_field[atom];
-      real_t H_z = z_sp_field[atom] + z_ext_field[atom];
+      real_t3 H = sp_field + ext_field;
 
       // S cross H
-      real_t SxH_x = Sy * H_z - Sz * H_y;
-      real_t SxH_y = Sz * H_x - Sx * H_z;
-      real_t SxH_z = Sx * H_y - Sy * H_x;
+      real_t3 SxH = cross_product(S, H);
 
       // S cross (S cross H)
-      real_t SxSxH_x = Sy * SxH_z - Sz * SxH_y;
-      real_t SxSxH_y = Sz * SxH_x - Sx * SxH_z;
-      real_t SxSxH_z = Sx * SxH_y - Sy * SxH_x;
+      real_t3 SxSxH = cross_product(S, SxH);
 
       // new change in S
-      real_t DS_prime_x = prefactor * SxH_x + lambdatpr * SxSxH_x;
-      real_t DS_prime_y = prefactor * SxH_y + lambdatpr * SxSxH_y;
-      real_t DS_prime_z = prefactor * SxH_z + lambdatpr * SxSxH_z;
+      real_t3 dS_prime = prefactor * SxH + lambdatpr * SxSxH;
 
       // Heun step, using predictor and corrector spin changes
-      real_t S_x = x_spin_buffer[atom] + 0.5 * (dSx[atom] + DS_prime_x) * DT;
-      real_t S_y = y_spin_buffer[atom] + 0.5 * (dSy[atom] + DS_prime_y) * DT;
-      real_t S_z = z_spin_buffer[atom] + 0.5 * (dSz[atom] + DS_prime_z) * DT;
+      S = spin_buffer[atom] + 0.5 * (dS[atom] + dS_prime) * DT;
 
       // normalization of spin
-      real_t mod_s = RSQRT(
-         S_x*S_x +
-         S_y*S_y +
-         S_z*S_z);
+      real_t mod_s = RSQRT(S.x*S.x +
+                           S.y*S.y +
+                           S.z*S.z);
 
-      x_spin[atom] = S_x * mod_s;
-      y_spin[atom] = S_y * mod_s;
-      z_spin[atom] = S_z * mod_s;
+      spin[atom] = S * mod_s;
    }
 }

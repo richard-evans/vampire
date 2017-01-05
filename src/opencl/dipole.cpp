@@ -51,16 +51,10 @@ namespace vopencl
             compiled_update_dip = true;
 
             vcl::set_kernel_args(update_dip,
-                                 vcl::cells::mag_array.x(),
-                                 vcl::cells::mag_array.y(),
-                                 vcl::cells::mag_array.z(),
-                                 vcl::cells::coord_array.x(),
-                                 vcl::cells::coord_array.y(),
-                                 vcl::cells::coord_array.z(),
+                                 vcl::cells::mag_array,
+                                 vcl::cells::coord_array,
                                  vcl::cells::volume_array,
-                                 vcl::cells::field_array.x(),
-                                 vcl::cells::field_array.y(),
-                                 vcl::cells::field_array.z());
+                                 vcl::cells::field_array);
          }
 
          if (!compiled_update_atm_dip)
@@ -75,12 +69,8 @@ namespace vopencl
             compiled_update_atm_dip = true;
 
             vcl::set_kernel_args(update_atm_dip,
-                                 vcl::cells::field_array.x(),
-                                 vcl::cells::field_array.y(),
-                                 vcl::cells::field_array.z(),
-                                 vcl::dipolar_field_array.x(),
-                                 vcl::dipolar_field_array.y(),
-                                 vcl::dipolar_field_array.z(),
+                                 vcl::cells::field_array,
+                                 vcl::dipolar_field_array,
                                  vcl::atoms::cell_array);
          }
 
@@ -103,7 +93,7 @@ namespace vopencl
          const cl::CommandQueue cell_q(vcl::context, vcl::default_device);
          const cl::NDRange global(::cells::num_cells);
 
-         vcl::cells::mag_array.zero_buffers();
+         vcl::cells::mag_array.zero_buffer();
 
          if (!compiled_update_cell_magnetization)
          {
@@ -116,15 +106,11 @@ namespace vopencl
             compiled_update_cell_magnetization = true;
 
             vcl::set_kernel_args(update_cell_mag,
-                                 vcl::atoms::spin_array.x(),
-                                 vcl::atoms::spin_array.y(),
-                                 vcl::atoms::spin_array.z(),
+                                 vcl::atoms::spin_array,
                                  vcl::atoms::type_array,
                                  vcl::atoms::cell_array,
                                  vcl::mp::materials,
-                                 vcl::cells::mag_array.x(),
-                                 vcl::cells::mag_array.y(),
-                                 vcl::cells::mag_array.z());
+                                 vcl::cells::mag_array);
          }
 
          vcl::kernel_call(update_cell_mag, cell_q, global, vcl::local);
