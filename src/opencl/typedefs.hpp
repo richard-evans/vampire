@@ -22,6 +22,7 @@ namespace vopencl
 
       // Class for set of three buffers, i.e. for x,y,z arrays
       // uses non blocking reads/writes
+      template <typename T>
       class Buffer3D
       {
          std::vector<cl::Buffer> buffers;
@@ -44,7 +45,6 @@ namespace vopencl
          }
 
           // initialize with 3 vectors to write data to device
-         template <typename T>
          Buffer3D(const cl::Context &c,
                   const cl::CommandQueue &q,
                   const cl_mem_flags fs,
@@ -65,7 +65,6 @@ namespace vopencl
          }
 
          // reads data from device, assumes host vectors already have enough capacity
-         template <typename T>
          void copy_to_host(const cl::CommandQueue &q,
                            std::vector<T> &xs,
                            std::vector<T> &ys,
@@ -89,13 +88,13 @@ namespace vopencl
          void zero_buffers(void)
          {
 #ifdef CL_API_SUFFIX__VERSION_1_2
-            const vcl_real_t zero = 0.0;
+            const T zero = 0;
             for (const cl::Buffer &buffer : buffers)
-               vcl::queue.enqueueFillBuffer(buffer, &zero, sizeof(zero), buffer_size);
+               vcl::queue.enqueueFillBuffer(buffer, &zero, sizeof T, buffer_size);
 #else
-            const std::vector<vcl_real_t> zeros(buffer_size, 0.0);
+            const std::vector<T> zeros(buffer_size, 0);
             for (const cl::Buffer &buffer : buffers)
-               vcl::queue.enqueueWriteBuffer(buffer, CL_FALSE, 0, sizeof(vcl_real_t)*buffer_size, &zeros[0]);
+               vcl::queue.enqueueWriteBuffer(buffer, CL_FALSE, 0, sizeof(T) * buffer_size, &zeros[0]);
 #endif // CL_API_SUFFIX__VERSION_1_2
 
             vcl::queue.finish();

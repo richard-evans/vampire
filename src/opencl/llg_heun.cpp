@@ -39,9 +39,9 @@ namespace vopencl
       {
          bool initialized = false;
 
-         vcl::Buffer3D spin_buffer_array;
+         vcl::Buffer3D<vcl_real_t> spin_buffer_array;
 
-         vcl::Buffer3D dS_array;
+         vcl::Buffer3D<vcl_real_t> dS_array;
 
          cl::Buffer heun_parameters_device;
 
@@ -53,9 +53,9 @@ namespace vopencl
             const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
             const size_t num_mats = ::mp::num_materials;
 
-            vcl::llg::spin_buffer_array = vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::spin_buffer_array = vcl::Buffer3D<vcl_real_t>(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
 
-            vcl::llg::dS_array = vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
+            vcl::llg::dS_array = vcl::Buffer3D<vcl_real_t>(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
 
             vcl::llg::heun_parameters_device = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, num_mats*sizeof(heun_parameter_t));
 
