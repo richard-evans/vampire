@@ -37,8 +37,8 @@ namespace vopencl
             vcl::set_kernel_args(update_nexch_spin_fields,
                                  vcl::atoms::type_array,
                                  vcl::mp::materials,
-                                 vcl::atoms::spin_array,
-                                 vcl::total_spin_field_array);
+                                 vcl::atoms::spin_array.buffer(),
+                                 vcl::total_spin_field_array.buffer());
          }
 
          cl::NDRange global(::atoms::num_atoms);

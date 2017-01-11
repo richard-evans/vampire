@@ -2,17 +2,21 @@
 #include "material_type.h"
 
 __kernel
-void update_dipole_fields(const __global real_t3 *const restrict mag,
-                          const __global real_t3 *const restrict coord,
+void update_dipole_fields(const __global real_t *const restrict mag,
+                          const __global real_t *const restrict coord,
                           const __global real_t *const restrict volume,
-                          __global real_t3 *const restrict dip_field)
+                          __global real_t *const restrict dip_field)
 {
    size_t gsz = get_global_size(0);
 
    for (size_t i=get_global_id(0); i<N_CELLS; i+=gsz)
    {
-      real_t3 m = mag[i];
-      real_t3 c = coord[i];
+      const size_t xi = 3*i+0;
+      const size_t yi = 3*i+1;
+      const size_t zi = 3*i+2;
+
+      const real_t3 mi = (real_t3)(mag[x], mag[y], mag[z]);
+      const real_t3 ci = (real_t3)(coord[x], coord[y], coord[z]);
 
       real_t vol_prefac = - 4 * PI / (3 * volume[i]);
       real_t prefactor  = 1e23;
@@ -23,34 +27,45 @@ void update_dipole_fields(const __global real_t3 *const restrict mag,
       {
          if (i==j) continue;
 
-         real_t3 om = mag[i];
+         const size_t xj = 3*j+0;
+         const size_t yj = 3*j+1;
+         const size_t zj = 3*j+2;
 
-         real_t3 dX = coord[j] - x;
+         real_t3 mj = (real_t3)(mag[xj], mag[yj], mag[zj]);
+         real_t3 cj = (real_t3)(coord[xj], coord[yj], coord[zj]);
+
+         real_t3 dX = cj - ci;
 
          real_t drij  = RSQRT(dX.x*dX.x + dX.y*dX.y + dX.z*dX.z);
          real_t drij3 = drij * drij * drij;
 
-         real_t3 sdote_vec = om * dx * drij;
+         real_t3 sdote_vec = mj * dX * drij;
          real_t sdote = sdote_vec.x + sdote_vec.y + sdote_vec.z;
 
-         field += (3 * sdote * dX * drij - om) * drij3;
+         field += (3 * sdote * dX * drij - mj) * drij3;
       }
 
-      dip_field[i] = prefactor * field;
+      field *= prefactor;
+
+      dip_field[x] = field.x;
+      dip_field[y] = field.y;
+      dip_field[z] = field.z;
    }
 }
 
 __kernel
-void update_atm_dipole_fields(const __global real_t3 *const restrict cell_field,
-                              __global real_t3 *const restrict dip_field,
+void update_atm_dipole_fields(const __global real_t *const restrict cell_field,
+                              __global real_t *const restrict dip_field,
                               const __global int *const restrict cell)
 {
-   size_t gsz = get_global_size(0);
+   const size_t gsz = get_global_size(0);
 
    for (size_t i=get_global_id(0); i<N_ATOMS; i+=gsz)
    {
-      int cid = cell[i];
-      dip_filed[i] = cell_field[cid];
+      const int cid = cell[i];
+      dip_field[3*i+0] = cell_field[3*cid+0];
+      dip_field[3*i+1] = cell_field[3*cid+1];
+      dip_field[3*i+2] = cell_field[3*cid+2];
    }
 }
 
@@ -72,22 +87,26 @@ void atomic_add_global(volatile __global real_t *const source,
 }
 
 __kernel
-void update_cell_magnetization(const __global real_t3 *const restrict spin,
+void update_cell_magnetization(const __global real_t *const restrict spin,
                                const __global int *const restrict material,
                                const __global int *const restrict cell,
                                const __global material_parameters_t *const restrict material_params,
-                               __global real_t3 *const restrict mag)
+                               __global real_t *const restrict mag)
 {
    size_t gsz = get_global_size(0);
 
    for (size_t i=get_global_id(0); i<N_ATOMS; i+=gsz)
    {
-      int mid = material[i];
-      int cid = cell[i];
-      real_t mu_s = material_params[mid].mu_s_si;
+      const size_t x = 3*i+0;
+      const size_t y = 3*i+1;
+      const size_t z = 3*i+2;
 
-      atomic_add_global(&mag[cid].x, spin[i].x*mu_s);
-      atomic_add_global(&mag[cid].y, spin[i].y*mu_s);
-      atomic_add_global(&mag[cid].z, spin[i].z*mu_s);
+      const int mid = material[i];
+      const int cid = cell[i];
+      const real_t mu_s = material_params[mid].mu_s_si;
+
+      atomic_add_global(&mag[3*cid+0], spin[x]*mu_s);
+      atomic_add_global(&mag[3*cid+1], spin[y]*mu_s);
+      atomic_add_global(&mag[3*cid+2], spin[z]*mu_s);
    }
 }

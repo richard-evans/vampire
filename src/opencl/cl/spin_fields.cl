@@ -11,36 +11,42 @@ void update_nexch_spin_fields(const __global int *const restrict material,
 
    for (uint i=get_global_id(0); i<NUM_ATOMS; i+=gsz)
    {
-      int mid = material[i];
+      const size_t x = 3*i+0;
+      const size_t y = 3*i+1;
+      const size_t z = 3*i+2;
 
-      material_parameters_t mat = material_params[mid];
+      const int mid = material[i];
 
-      real_t3 S = spin[i];
+      const material_parameters_t mat = material_params[mid];
 
-      real_t3 field = (real_t3)(0.0, 0.0, - 2.0*mat.ku*S.z);
+      const real_t3 S = (real_t3)(spin[x], spin[y], spin[z]);
 
-      real_t3 e = (real_t3)(mat.anisotropy_unit_x,
-                            mat.anisotropy_unit_y,
-                            mat.anisotropy_unit_z);
+      real_t3 field = (real_t3)(0.0, 0.0, -2.0*mat.ku*S.z);
 
-      real_t3 tmp = S * e;
-      real_t sdote  = tmp.x + tmp.y + tmp.z;
-      real_t sdote3 = sdote * sdote * sdote;
-      real_t sdote5 = sdote3 * sdote * sdote;
+      const real_t3 e = (real_t3)(mat.anisotropy_unit_x,
+                                  mat.anisotropy_unit_y,
+                                  mat.anisotropy_unit_z);
 
-      real_t scale = 2.0 / 3.0;
+      const real_t3 tmp = S * e;
+      const real_t sdote  = tmp.x + tmp.y + tmp.z;
+      const real_t sdote3 = sdote * sdote * sdote;
+      const real_t sdote5 = sdote3 * sdote * sdote;
 
-      real_t k2 = mat.sh2;
-      real_t k4 = mat.sh4;
-      real_t k6 = mat.sh6;
+      const real_t scale = 2.0 / 3.0;
 
-      real_t ek2 = k2 * 3 * sdote;
-      real_t ek4 = k4 * 0.125 * (140 * sdote3 - 60 * sdote);
-      real_t ek6 = k6 * 0.0625 * (1386*sdote5 - 1260*sdote3 + 210*sdote);
+      const real_t k2 = mat.sh2;
+      const real_t k4 = mat.sh4;
+      const real_t k6 = mat.sh6;
 
-      real_t ek_sum = ek2 + ek4 + ek6;
-      field += scale * e * eksum;
+      const real_t ek2 = k2 * 3 * sdote;
+      const real_t ek4 = k4 * 0.125 * (140 * sdote3 - 60 * sdote);
+      const real_t ek6 = k6 * 0.0625 * (1386*sdote5 - 1260*sdote3 + 210*sdote);
 
-      sp_field[i] = field;
+      const real_t ek_sum = ek2 + ek4 + ek6;
+      field += scale * e * ek_sum;
+
+      sp_field[x] = field.x;
+      sp_field[y] = field.y;
+      sp_field[z] = field.z;
    }
 }

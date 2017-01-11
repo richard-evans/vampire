@@ -51,10 +51,10 @@ namespace vopencl
             compiled_update_dip = true;
 
             vcl::set_kernel_args(update_dip,
-                                 vcl::cells::mag_array,
-                                 vcl::cells::coord_array,
+                                 vcl::cells::mag_array.buffer(),
+                                 vcl::cells::coord_array.buffer(),
                                  vcl::cells::volume_array,
-                                 vcl::cells::field_array);
+                                 vcl::cells::field_array.buffer());
          }
 
          if (!compiled_update_atm_dip)
@@ -69,8 +69,8 @@ namespace vopencl
             compiled_update_atm_dip = true;
 
             vcl::set_kernel_args(update_atm_dip,
-                                 vcl::cells::field_array,
-                                 vcl::dipolar_field_array,
+                                 vcl::cells::field_array.buffer(),
+                                 vcl::dipolar_field_array.buffer(),
                                  vcl::atoms::cell_array);
          }
 
@@ -106,11 +106,11 @@ namespace vopencl
             compiled_update_cell_magnetization = true;
 
             vcl::set_kernel_args(update_cell_mag,
-                                 vcl::atoms::spin_array,
+                                 vcl::atoms::spin_array.buffer(),
                                  vcl::atoms::type_array,
                                  vcl::atoms::cell_array,
                                  vcl::mp::materials,
-                                 vcl::cells::mag_array);
+                                 vcl::cells::mag_array.buffer());
          }
 
          vcl::kernel_call(update_cell_mag, cell_q, global, vcl::local);

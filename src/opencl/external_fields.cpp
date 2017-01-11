@@ -48,8 +48,8 @@ namespace vopencl
             vcl::set_kernel_args(update_ext,
                                  vcl::atoms::type_array,
                                  vcl::mp::materials,
-                                 vcl::dipolar_field_array,
-                                 vcl::total_external_field_array,
+                                 vcl::dipolar_field_array.buffer(),
+                                 vcl::total_external_field_array.buffer(),
                                  vcl::rng::grands,
                                  sys_params);
          }

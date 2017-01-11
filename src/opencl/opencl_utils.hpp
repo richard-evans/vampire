@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "errors.hpp"
@@ -25,7 +26,10 @@ static std::string get_error(const cl_int err) noexcept
    case CL_OUT_OF_HOST_MEMORY:
       return "CL_OUT_OF_HOST_MEMORY";
    default:
-      return "unknown error code";
+      std::string ret("Unkown error code: ");
+      std::ostringstream code;
+      code << err;
+      return std::string("unknown error code ").append(code.str());
    }
 }
 
@@ -39,7 +43,7 @@ static void pass_args(const cl::Kernel &k, const unsigned i) noexcept
 
 // function which takes an arg from args and gives it to the kernel for arg i
 template <typename Car, typename... Cdr>
-static void pass_args(cl::Kernel &k, const unsigned i, const Car car, const Cdr... cdr) noexcept
+static void pass_args(cl::Kernel &k, const unsigned i, const Car &car, const Cdr &... cdr) noexcept
 {
    cl_int err;
    if ((err = k.setArg(i, car)) == CL_SUCCESS)
@@ -68,14 +72,14 @@ namespace vopencl
                                         const std::string &opts="") noexcept;
 
       template <typename... Ts>
-      static void set_kernel_args(cl::Kernel &k, Ts... Args) noexcept
+      static void set_kernel_args(cl::Kernel &k, Ts &&... Args) noexcept
       {
           pass_args(k, 0, Args...);
       }
 
       // function to enqueue a kernel
       // the OpenCL C++ spec for this seems pretty fluid so it's probably better not to use it
-      void kernel_call(cl::Kernel &k,              /* kernel to enqueue */
+      void kernel_call(const cl::Kernel &k,              /* kernel to enqueue */
                        const cl::CommandQueue &q,  /* into this queue */
                        const cl::NDRange gbl,      /* total number of work items */
                        const cl::NDRange lcl) noexcept;     /* number of work items in group */

@@ -16,10 +16,10 @@ namespace vopencl
 {
    namespace internal
    {
-      void kernel_call(cl::Kernel &k,              /* kernel to enqueue */
-                       const cl::CommandQueue &q,  /* into this queue */
-                       const cl::NDRange gbl,      /* total number of work items */
-                       const cl::NDRange lcl) noexcept      /* number of work items in group */
+      void kernel_call(const cl::Kernel &k,            /* kernel to enqueue */
+                       const cl::CommandQueue &q,      /* into this queue */
+                       const cl::NDRange gbl,          /* total number of work items */
+                       const cl::NDRange lcl) noexcept /* number of work items in group */
       {
          const auto err = q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
          if (err != CL_SUCCESS)
@@ -60,7 +60,6 @@ namespace vopencl
 
          prg_opts.append(" -Isrc/opencl/cl");
 
-         std::cout << prg_opts.c_str() << std::endl;
          cl_int err = program.build({device}, prg_opts.c_str());
 
 #ifdef OPENCL_DEBUG
