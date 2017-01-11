@@ -2,9 +2,10 @@
 #          Makefile for vopencl module
 #--------------------------------------------------------------
 
-LD=ld
-
-OPENCL_CFLAGS=-Wall -Wextra -std=c++11 -pedantic -Wno-ignored-attributes -Wno-unused-function -DOPENCL_DEBUG -flto
+OPENCL_CFLAGS=\
+-std=c++11 -pedantic \
+-Wall -Wextra -Wno-ignored-attributes -Wno-unused-function \
+-DOPENCL_DEBUG -MMD
 
 OPENCL_LIBS=-lOpenCL
 OPENCL_PR=
@@ -24,26 +25,36 @@ obj/opencl/random.o \
 obj/opencl/spin_fields.o \
 obj/opencl/statistics.o
 
+# each object depends on .cpp and .hpp
+# this will rebuild them if the .hpp changes
+# generated with -MMD cflag
+-include $(OPENCL_OBJECTS:%.o=%.d)
+
 OPENCL_OBJ=obj/opencl/vampire_opencl.o
 
-$(OPENCL_OBJ): $(OPENCL_OBJECTS)
-	$(LD) -r $^ -o $@
-
-$(OPENCL_OBJECTS): obj/%.o: src/%.cpp
-	$(GCC) $< -c -g -o $@ $(GCC_CFLAGS) $(OPENCL_PR) $(OPENCL_LIBS) $(OPENCL_CFLAGS)
-
+# double precision
 gcc-opencl: GCC_CFLAGS+=-DOPENCL
 gcc-opencl: OPENCL_PR+=-DOPENCL_DP
 gcc-opencl: $(OBJECTS) $(OPENCL_OBJ)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
 
+# single precision
 gcc-opencl-sp: GCC_CFLAGS+=-DOPENCL
 gcc-opencl-sp: OPENCL_PR+=-DOPENCL_SP
 gcc-opencl-sp: $(OBJECTS) $(OPENCL_OBJ)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
 
+# double precision with native functions
 gcc-opencl-native: GCC_CFLAGS+=-DOPENCL_USE_NATIVE_FUNCTIONS
 gcc-opencl-native: gcc-opencl
 
+# single precision with native functions
 gcc-opencl-native-sp: GCC_CFLAGS+=-DOPENCL_USE_NATIVE_FUNCTIONS
 gcc-opencl-native-sp: gcc-opencl-sp
+
+
+$(OPENCL_OBJ): $(OPENCL_OBJECTS)
+	$(LD) -r $^ -o $@
+
+obj/opencl/%.o: src/opencl/%.cpp
+	$(GCC) $< -c -g -o $@ $(GCC_CFLAGS) $(OPENCL_PR) $(OPENCL_LIBS) $(OPENCL_CFLAGS)
