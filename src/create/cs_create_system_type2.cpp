@@ -987,26 +987,33 @@ void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<c
    // For parallel reduce on all CPUs
    //-----------------------------------------------------
    #ifdef MPICF
-      std::vector<double> ranges;
 
       // set up array to get ranges from all CPUs on rank 0
-      if(vmpi::my_rank==0) ranges.resize(vmpi::num_processors, 1.e123);
+      std::vector<double> ranges;
+      if(vmpi::my_rank == 0) ranges.resize(vmpi::num_processors, 1.e123);
+      else ranges.resize(1,0.0); // one value sufficient on all other CPUs
 
-      // gather max ranges from all cpus on root
-      MPI_Gather(&max_range_sq, 1, MPI_DOUBLE, &ranges[0], vmpi::num_processors, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      // gather max ranges from all cpus on root (1 data point from each process)
+      MPI_Gather(&max_range_sq, 1, MPI_DOUBLE, &ranges[0], 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-      double min_range = 1.e123;
+      // variable to store rank of minimum range
       unsigned int rank_of_min_range=0;
 
-      // loop over all ranges and determine minimum and cpu location
-      for(int i=0; i<ranges.size(); i++){
-         if(ranges[i] < min_range){
-            min_range = ranges[i];
-            rank_of_min_range = i;
+      // work out minimum range on root
+      if(vmpi::my_rank==0){
+
+         double min_range = 1.e123;
+
+         // loop over all ranges and determine minimum and cpu location
+         for(int i=0; i<ranges.size(); i++){
+            if(ranges[i] < min_range){
+               min_range = ranges[i];
+               rank_of_min_range = i;
+            }
          }
       }
 
-      // broadcast id of nearest to all cpus
+      // broadcast id of nearest to all cpus from root
       MPI_Bcast(&rank_of_min_range, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
       // broadcast position to all cpus
