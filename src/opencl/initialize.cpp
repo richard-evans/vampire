@@ -357,7 +357,8 @@ namespace vopencl
 
          std::srand(1);  // constant for now to get deterministic results
          for (auto &elem : rs)
-            elem = rand64();
+            // must not seed xorshift with 0
+            do { elem = rand64(); } while (elem == 0);
 
          vcl::queue.enqueueWriteBuffer(vcl::rng::urands, CL_TRUE, 0, u_buffer_size, &rs[0]);
 
