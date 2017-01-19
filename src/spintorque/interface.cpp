@@ -112,7 +112,7 @@ bool match_material(string const word, string const value, string const unit, in
    //--------------------------------------------------------------------
    // keyword not found
    //--------------------------------------------------------------------
-   return EXIT_FAILURE;
+   return false;
 
 }
 
@@ -149,8 +149,8 @@ bool match_material(string const word, string const value, string const unit, in
          st::internal::TMRenable = true;
          return true;
        }
-       
-       
+
+
       //-------------------------------------------------
       test="current-density";
        if(word==test){

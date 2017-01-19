@@ -30,6 +30,7 @@
 #include "ltmp.hpp"
 #include "random.hpp"
 #include "spintorque.hpp"
+#include "unitcell.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -70,6 +71,7 @@ namespace vin{
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
         //===================================================================
         // Test for create variables
@@ -157,34 +159,6 @@ namespace vin{
                     terminaltextcolor(WHITE);
                     return EXIT_FAILURE;
                 }
-            }
-            //-------------------------------------------------------------------
-            // Get unit cell filename
-            //-------------------------------------------------------------------
-            test="unit-cell-file";
-            if(word==test){
-                std::string ucffile=value;
-                // strip quotes
-                ucffile.erase(remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
-                test="";
-                // if filename not blank set ucf file name
-                if(ucffile!=test){
-                    //std::cout << matfile << std::endl;
-                    cs::unit_cell_file=ucffile;
-                    return EXIT_SUCCESS;
-                }
-                else{
-                    terminaltextcolor(RED);
-                    std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
-                    terminaltextcolor(WHITE);
-                    return EXIT_FAILURE;
-                }
-            }
-            else{
-                terminaltextcolor(RED);
-                std::cerr << "Error - Unknown control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
-                terminaltextcolor(WHITE);
-                return EXIT_FAILURE;
             }
         }
         else
@@ -322,16 +296,6 @@ namespace vin{
         test="particle-centre-offset"; //parity
         if(word==test){
             cs::particle_creation_parity=1;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="crystal-structure";
-        if(word==test){
-            // Strip quotes
-            std::string cs=value;
-            cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
-            cs::crystal_structure=cs;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -552,46 +516,8 @@ namespace vin{
         // System dimension variables
         //-------------------------------------------------------------------
         std::string prefix="dimensions:";
-
-        std::string test="unit-cell-size";
-        if(word==test){
-            double a=atof(value.c_str());
-            check_for_valid_value(a, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-            cs::unit_cell_size[0]=a;
-            cs::unit_cell_size[1]=a;
-            cs::unit_cell_size[2]=a;
-            return EXIT_SUCCESS;
-        }
-        else
         //--------------------------------------------------------------------
-        test="unit-cell-size-x";
-        if(word==test){
-            double ax=atof(value.c_str());
-            check_for_valid_value(ax, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-            cs::unit_cell_size[0]=ax;
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="unit-cell-size-y";
-        if(word==test){
-            double ay=atof(value.c_str());
-            check_for_valid_value(ay, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-            cs::unit_cell_size[1]=ay;
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="unit-cell-size-z";
-        if(word==test){
-            double az=atof(value.c_str());
-            check_for_valid_value(az, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-            cs::unit_cell_size[2]=az;
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="system-size";
+        std::string test="system-size";
         if(word==test){
             double d=atof(value.c_str());
             check_for_valid_value(d, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
@@ -1224,7 +1150,7 @@ namespace vin{
         if(word==test){
             std::vector<double> u(3);
             u=DoublesFromString(value);
-            check_for_valid_vector(u, word, line, prefix, "input");
+            vin::check_for_valid_three_vector(u, word, line, prefix, "input");
             // Extra check for demagnetisation-factor Nx+Ny+Nz=1
             double sum=u.at(0)+u.at(1)+u.at(2);
             if(fabs(1.0-sum)>1.e-4){
@@ -2328,15 +2254,6 @@ namespace vin{
             }
             //------------------------------------------------------------
             else
-            test="exchange-matrix";
-            if(word==test){
-                double Jij=atof(value.c_str());
-                check_for_valid_value(Jij, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
-                read_material[super_index].Jij_matrix_SI[sub_index]=-Jij; // Import exchange as field, *-1
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
             test="atomic-spin-moment";
             if(word==test){
                 double mu_s=atof(value.c_str());
@@ -3184,6 +3101,7 @@ namespace vin{
             else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+            else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
             // keyword not found
@@ -3195,7 +3113,8 @@ namespace vin{
                 zlog << zTs() << "Error - Unknown control statement '" << line_string << " on line " << line << " of material file '" << filename_string << "'" << std::endl;
                 return EXIT_FAILURE;
             }
-            return EXIT_SUCCESS;
+
+            return EXIT_FAILURE;
     }
 
 }

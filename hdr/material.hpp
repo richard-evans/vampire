@@ -129,8 +129,8 @@ using std::string;
 		double Ks;
 
 		double gamma_rel;
-		double Jij_matrix_SI[max_materials];
-
+		std::vector<std::vector<double> >Jij_matrix_SI;
+		std::vector<std::vector<double> >Jij_matrix;
 		double initial_spin[3];
 		bool random_spins;
 
@@ -154,7 +154,6 @@ using std::string;
 
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
-		double Jij_matrix[max_materials];
 		double H_th_sigma;
 		bool constrained; /// specifies primary or alternate integrator
 

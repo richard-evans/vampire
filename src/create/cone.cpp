@@ -30,7 +30,7 @@ namespace create{
          else return true;
       }
 
-      void cone(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+      void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain){
          //----------------------------------------------------------------------
          // Function to cut a truncated cone
          //

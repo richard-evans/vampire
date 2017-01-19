@@ -42,7 +42,7 @@ namespace create{
          // otherwise require 3 numbers for 100,110 and 111 facet radii
          std::vector<double> u(3);
          u=vin::DoublesFromString(value);
-         vin::check_for_valid_vector(u, word, line, prefix, "input");
+         vin::check_for_valid_three_vector(u, word, line, prefix, "input");
          // check for sensible values
          if(u.at(0) < 1.0 || u.at(0) > 1000.0){
       	   terminaltextcolor(RED);
