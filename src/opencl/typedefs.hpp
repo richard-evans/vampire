@@ -2,6 +2,7 @@
 #define VOPENCL_TYPEDEFS_HPP_
 
 #include <cassert>
+#include <type_traits>
 #include <vector>
 
 #include "internal.hpp"
@@ -31,20 +32,36 @@ namespace vopencl
       class Buffer3D
       {
          std::vector<cl::Buffer> buff_container;
+
+         // number of elements in one dimension
          size_t n_elems;
+
+         size_t buffer_size;
+
+#ifdef USE_VECTOR_TYPE
+#ifdef OPENCL_DP
+         typedef cl_double3 Rv;
+#else
+         typedef cl_float3 Rv;
+#endif // OPENCL_DP
+         unsigned v = 1;
+#else
+         typedef T Rv;
+         unsigned v = 3;
+#endif // USE_VECTOR_TYPE
 
       public:
 
-         Buffer3D(void) noexcept : buff_container(0), n_elems(0) {}
+         Buffer3D(void) noexcept : buff_container(0), n_elems(0), buffer_size(0)  {}
 
          // initialize without writing, but with size
          // e.g. for use when generating buffer on device
          Buffer3D(const cl::Context &c,
                   const cl_mem_flags fs,
                   const size_t n) noexcept
-            : buff_container(1), n_elems(n)
+            : buff_container(1), n_elems(n), buffer_size(n*v*sizeof(Rv))
          {
-            buff_container[0] = cl::Buffer(c, fs, 3*n_elems * sizeof(T));
+            buff_container[0] = cl::Buffer(c, fs, v*n_elems * sizeof(Rv));
          }
 
          // initialize with 3 vectors to write data to device
@@ -60,18 +77,23 @@ namespace vopencl
             : buff_container(1)
          {
             n_elems = xs.size();
+            buffer_size = n_elems * v * sizeof(Rv);
 
-            buff_container[0] = cl::Buffer(c, fs, 3*n_elems * sizeof(T));
+            buff_container[0] = cl::Buffer(c, fs, buffer_size);
 
-            std::vector<T> buff(3*n_elems);
+            std::vector<Rv> buff(v*n_elems);
             for (size_t i=0; i<n_elems; ++i)
             {
+#ifdef USE_VECTOR_TYPE
+               buff[i] = Rv{xs[i], ys[i], zs[i]};
+#else
                buff[3*i+0] = T(xs[i]);
                buff[3*i+1] = T(ys[i]);
                buff[3*i+2] = T(zs[i]);
+#endif
             }
 
-            q.enqueueWriteBuffer(buff_container[0], CL_TRUE, 0, 3*n_elems * sizeof(T), &buff[0]);
+            q.enqueueWriteBuffer(buff_container[0], CL_TRUE, 0, buffer_size, &buff[0]);
          }
 
          // reads data from device, assumes host vectors already have enough capacity
@@ -81,16 +103,22 @@ namespace vopencl
                            std::vector<R> &ys,
                            std::vector<R> &zs) const noexcept
          {
-            std::vector<T> buff(3*n_elems);
-            q.enqueueReadBuffer(buff_container[0], CL_TRUE, 0, 3*n_elems * sizeof(T), &buff[0]);
+            std::vector<Rv> buff(v*n_elems);
+            q.enqueueReadBuffer(buff_container[0], CL_TRUE, 0, buffer_size, &buff[0]);
 
             q.finish();
 
             for (size_t i=0; i<n_elems; ++i)
             {
+#ifdef USE_VECTOR_TYPE
+               xs[i] = R(buff[i].s[0]);
+               ys[i] = R(buff[i].s[1]);
+               zs[i] = R(buff[i].s[2]);
+#else
                xs[i] = R(buff[3*i+0]);
                ys[i] = R(buff[3*i+1]);
                zs[i] = R(buff[3*i+2]);
+#endif
             }
          }
 
@@ -98,7 +126,7 @@ namespace vopencl
          void copy_to_dev(const cl::CommandQueue &q,
                           Buffer3D &dst) const noexcept
          {
-            q.enqueueCopyBuffer(buff_container[0], dst.buff_container[0], 0, 0, 3*n_elems * sizeof(T));
+            q.enqueueCopyBuffer(buff_container[0], dst.buff_container[0], 0, 0, buffer_size);
             q.finish();
          }
 
@@ -106,11 +134,11 @@ namespace vopencl
          void zero_buffer(void) noexcept
          {
 #ifdef CL_API_SUFFIX__VERSION_1_2
-            const T zero = 0.0;
-            vcl::queue.enqueueFillBuffer(buff_container[0], &zero, sizeof(T), 3*n_elems);
+            const Rv zero{0.0};
+            vcl::queue.enqueueFillBuffer(buff_container[0], &zero, sizeof(Rv), v*n_elems);
 #else
-            const std::vector<T> zeros(3*n_elems, 0.0);
-            vcl::queue.enqueueWriteBuffer(buff_container[0], CL_FALSE, 0, 3*n_elems * sizeof(T), &zeros[0]);
+            const std::vector<Rv> zeros(3*n_elems, {0.0});
+            vcl::queue.enqueueWriteBuffer(buff_container[0], CL_FALSE, 0, buffer_size, &zeros[0]);
 #endif // CL_API_SUFFIX__VERSION_1_2
 
             vcl::queue.finish();

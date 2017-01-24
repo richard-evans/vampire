@@ -1,39 +1,54 @@
 #include "cl_defs.h"
 #include "material_type.h"
 
+#ifdef USE_VECTOR_TYPE
+typedef real_t3 T;
+#else
+typedef real_t T;
+#endif
+
 __kernel
-void update_dipole_fields(const __global real_t *const restrict mag,
-                          const __global real_t *const restrict coord,
+void update_dipole_fields(const __global T *const restrict mag,
+                          const __global T *const restrict coord,
                           const __global real_t *const restrict volume,
-                          __global real_t *const restrict dip_field)
+                          __global T *const restrict dip_field)
 {
    size_t gsz = get_global_size(0);
 
    for (size_t i=get_global_id(0); i<N_CELLS; i+=gsz)
    {
+#ifdef USE_VECTOR_TYPE
+      const real_t3 mi = mag[i];
+      const real_t3 ci = coord[i];
+#else
       const size_t xi = 3*i+0;
       const size_t yi = 3*i+1;
       const size_t zi = 3*i+2;
 
       const real_t3 mi = (real_t3)(mag[x], mag[y], mag[z]);
       const real_t3 ci = (real_t3)(coord[x], coord[y], coord[z]);
+#endif
 
       real_t vol_prefac = - 4 * PI / (3 * volume[i]);
       real_t prefactor  = 1e23;
 
-      real_t3 field = vol_prefac * m;
+      real_t3 field = vol_prefac * mi;
 
       for (size_t j=0; j<N_CELLS; ++j)
       {
          if (i==j) continue;
 
+#ifdef USE_VECTOR_TYPE
+         real_t3 mj = mag[j];
+         real_t3 cj = coord[j];
+#else
          const size_t xj = 3*j+0;
          const size_t yj = 3*j+1;
          const size_t zj = 3*j+2;
 
          real_t3 mj = (real_t3)(mag[xj], mag[yj], mag[zj]);
          real_t3 cj = (real_t3)(coord[xj], coord[yj], coord[zj]);
-
+#endif
          real_t3 dX = cj - ci;
 
          real_t drij  = RSQRT(dX.x*dX.x + dX.y*dX.y + dX.z*dX.z);
@@ -47,9 +62,13 @@ void update_dipole_fields(const __global real_t *const restrict mag,
 
       field *= prefactor;
 
+#ifdef USE_VECTOR_TYPE
+      dip_field[i] = field;
+#else
       dip_field[x] = field.x;
       dip_field[y] = field.y;
       dip_field[z] = field.z;
+#endif
    }
 }
 

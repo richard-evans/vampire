@@ -51,14 +51,18 @@ namespace vopencl
 
          std::string prg_opts(opts);
 
+         prg_opts.append(" -Isrc/opencl/cl"
 #ifdef OPENCL_DP
-         prg_opts.append(" -DOPENCL_DP");
+                         " -DOPENCL_DP"
 #endif
 #ifdef OPENCL_USE_NATIVE_FUNCTIONS
-         prg_opts.append(" -DOPENCL_USE_NATIVE_FUNCTIONS");
+                         " -DOPENCL_USE_NATIVE_FUNCTIONS"
 #endif
+#ifdef USE_VECTOR_TYPE
+                         " -DUSE_VECTOR_TYPE"
+#endif
+            );
 
-         prg_opts.append(" -Isrc/opencl/cl");
 
          cl_int err = program.build({device}, prg_opts.c_str());
 

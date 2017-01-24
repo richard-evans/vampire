@@ -23,6 +23,6 @@ namespace vopencl
       vcl::total_external_field_array.free();
       vcl::dipolar_field_array.free();
 
-#endif //OPENCL      
+#endif //OPENCL
    }
 }
