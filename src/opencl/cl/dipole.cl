@@ -25,8 +25,8 @@ void update_dipole_fields(const __global T *const restrict mag,
       const size_t yi = 3*i+1;
       const size_t zi = 3*i+2;
 
-      const real_t3 mi = (real_t3)(mag[x], mag[y], mag[z]);
-      const real_t3 ci = (real_t3)(coord[x], coord[y], coord[z]);
+      const real_t3 mi = (real_t3)(mag[xi], mag[yi], mag[zi]);
+      const real_t3 ci = (real_t3)(coord[xi], coord[yi], coord[zi]);
 #endif
 
       real_t vol_prefac = - 4 * PI / (3 * volume[i]);
@@ -65,9 +65,9 @@ void update_dipole_fields(const __global T *const restrict mag,
 #ifdef USE_VECTOR_TYPE
       dip_field[i] = field;
 #else
-      dip_field[x] = field.x;
-      dip_field[y] = field.y;
-      dip_field[z] = field.z;
+      dip_field[xi] = field.x;
+      dip_field[yi] = field.y;
+      dip_field[zi] = field.z;
 #endif
    }
 }
