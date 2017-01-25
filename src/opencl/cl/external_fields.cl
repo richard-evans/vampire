@@ -7,23 +7,26 @@ typedef real_t3 T;
 typedef real_t T;
 #endif
 
-// sys_params = {Hx_app, Hy_app, Hz_app, temperature}
 __kernel
 void update_external_fields(const __global int *const restrict material,
                             const __global material_parameters_t *const restrict material_params,
                             const __global T *const restrict dip_field,
                             __global T *const restrict ext_field,
                             const __global real_t *const restrict gaussian_rand,
-                            const real_t4 sys_params)
+                            const real_t Hx,
+                            const real_t Hy,
+                            const real_t Hz,
+                            const real_t temp)
 {
    size_t gsz = get_global_size(0);
+
+   const real_t3 Happ = (real_t3)(Hx, Hy, Hz);
 
    for (int i=get_global_id(0); i<NUM_ATOMS; ++i)
    {
       const int mid = material[i];
       const material_parameters_t mat = material_params[mid];
 
-      const real_t temp = sys_params.w;
       const real_t alpha = mat.temperature_rescaling_alpha;
       const real_t sigma = mat.H_th_sigma;
       const real_t tc = mat.temperature_rescaling_Tc;
@@ -46,7 +49,7 @@ void update_external_fields(const __global int *const restrict material,
                                   mat.applied_field_unit_y,
                                   mat.applied_field_unit_z);
 
-      field += norm_h * h + sys_params.xyz;
+      field += norm_h * h + Happ;
 
 #ifdef USE_VECTOR_TYPE
       ext_field[i] = field + dip_field[i];

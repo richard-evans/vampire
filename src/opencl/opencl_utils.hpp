@@ -26,7 +26,6 @@ static std::string get_error(const cl_int err) noexcept
    case CL_OUT_OF_HOST_MEMORY:
       return "CL_OUT_OF_HOST_MEMORY";
    default:
-      std::string ret("Unkown error code: ");
       std::ostringstream code;
       code << err;
       return std::string("unknown error code ").append(code.str());

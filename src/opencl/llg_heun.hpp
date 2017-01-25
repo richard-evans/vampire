@@ -11,8 +11,8 @@ namespace vopencl
    {
       struct heun_parameter_t
       {
-         vcl_real_t prefactor;
-         vcl_real_t lambda_times_prefactor;
+         vcl::real_t prefactor;
+         vcl::real_t lambda_times_prefactor;
       };
 
       namespace llg

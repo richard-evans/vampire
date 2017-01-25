@@ -17,25 +17,10 @@ namespace vopencl
    {
       namespace rng
       {
-         bool compiled_grng = false;
-
          cl::Kernel grng;
 
          void update_grands(void)
          {
-            if (!compiled_grng)
-            {
-               std::ostringstream opts;
-               opts << "-DN=" << ::atoms::num_atoms*3;
-               grng = vcl::build_kernel_from_file("src/opencl/cl/random.cl",
-                                                  "gen_grands",
-                                                  vcl::context, vcl::default_device,
-                                                  opts.str());
-               compiled_grng = true;
-
-               vcl::set_kernel_args(grng, vcl::rng::urands, vcl::rng::grands);
-            }
-
             // launch N/2 work items as each gens 2 numbers
             const cl::NDRange global((::atoms::num_atoms*3)/2);
 

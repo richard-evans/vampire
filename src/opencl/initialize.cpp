@@ -6,27 +6,26 @@
 //------------------------------------------------------------------------------
 //
 
-#include "opencl_include.hpp"
-
 // C++ standard library headers
-
+#include <cstdlib>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <cstdlib>
 
 // Vampire headers
-#include "vopencl.hpp"
-#include "vio.hpp"
-#include "errors.hpp"
 #include "atoms.hpp"
+#include "errors.hpp"
 #include "cells.hpp"
 #include "material.hpp"
 #include "stats.hpp"
+#include "vio.hpp"
+#include "vopencl.hpp"
 
 // vopencl module headers
-#include "internal.hpp"
 #include "data.hpp"
+#include "init_kernels.hpp"
+#include "internal.hpp"
+#include "opencl_include.hpp"
 #include "opencl_utils.hpp"
 #include "statistics.hpp"
 #include "typedefs.hpp"
@@ -43,6 +42,7 @@ namespace vopencl
    bool initialize(bool cpu_stats)
    {
       bool success = false;
+
 #ifdef OPENCL
 
       std::string message("OpenCL has been enabled in ");
@@ -123,6 +123,7 @@ namespace vopencl
       success &= vcl::initialize_topology();
       success &= vcl::initialize_stats();
       success &= vcl::initialize_rng();
+      success &= vcl::initialize_kernels();
 
 #endif // OPENCL
 
@@ -137,20 +138,20 @@ namespace vopencl
       bool initialize_atoms(void) noexcept
       {
          // Allocate and initialize device memory for atomic spins
-         vcl::atoms::spin_array = vcl::Buffer3D<vcl_real_t>(vcl::context, vcl::queue,
-                                                            vcl::read_write,
-                                                            ::atoms::x_spin_array,
-                                                            ::atoms::y_spin_array,
-                                                            ::atoms::z_spin_array);
+         vcl::atoms::spin_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue,
+                                                             vcl::read_write,
+                                                             ::atoms::x_spin_array,
+                                                             ::atoms::y_spin_array,
+                                                             ::atoms::z_spin_array);
 
          // Allocate and initialize device memory for atomic coordinates
-         vcl::atoms::coord_array = vcl::Buffer3D<vcl_real_t>(vcl::context, vcl::queue,
-                                                             vcl::read_write,
-                                                             ::atoms::x_coord_array,
-                                                             ::atoms::y_coord_array,
-                                                             ::atoms::z_coord_array);
+         vcl::atoms::coord_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue,
+                                                              vcl::read_write,
+                                                              ::atoms::x_coord_array,
+                                                              ::atoms::y_coord_array,
+                                                              ::atoms::z_coord_array);
 
-         const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl_real_t);
+         const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl::real_t);
          const size_t  int_buffer_size = ::atoms::num_atoms * sizeof(cl_int);
 
          // Allocate and initialize device memory for atomic information
@@ -173,22 +174,22 @@ namespace vopencl
       bool initialize_fields(void) noexcept
       {
          // Allocate device memory and initialize total spin field arrays
-         vcl::total_spin_field_array = vcl::Buffer3D<vcl_real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
-                                                                 ::atoms::x_total_spin_field_array,
-                                                                 ::atoms::y_total_spin_field_array,
-                                                                 ::atoms::z_total_spin_field_array);
+         vcl::total_spin_field_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+                                                                  ::atoms::x_total_spin_field_array,
+                                                                  ::atoms::y_total_spin_field_array,
+                                                                  ::atoms::z_total_spin_field_array);
 
          // Allocate device memory and initialize external field arrays
-         vcl::total_external_field_array = vcl::Buffer3D<vcl_real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
-                                                                     ::atoms::x_total_external_field_array,
-                                                                     ::atoms::y_total_external_field_array,
-                                                                     ::atoms::z_total_external_field_array);
+         vcl::total_external_field_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+                                                                      ::atoms::x_total_external_field_array,
+                                                                      ::atoms::y_total_external_field_array,
+                                                                      ::atoms::z_total_external_field_array);
 
          // Allocate device memory and initialize for dipolar field
-         vcl::dipolar_field_array = vcl::Buffer3D<vcl_real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
-                                                              ::atoms::x_dipolar_field_array,
-                                                              ::atoms::y_dipolar_field_array,
-                                                              ::atoms::z_dipolar_field_array);
+         vcl::dipolar_field_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+                                                               ::atoms::x_dipolar_field_array,
+                                                               ::atoms::y_dipolar_field_array,
+                                                               ::atoms::z_dipolar_field_array);
 
          vcl::queue.finish();
 
@@ -197,26 +198,26 @@ namespace vopencl
 
       bool initialize_cells(void) noexcept
       {
-         const size_t real_buffer_size = ::cells::num_cells * sizeof(vcl_real_t);
+         const size_t real_buffer_size = ::cells::num_cells * sizeof(vcl::real_t);
          const size_t  int_buffer_size = ::cells::num_cells * sizeof(cl_int);
 
          // Allocate device memory and initialize coordinates
-         vcl::cells::coord_array = vcl::Buffer3D<vcl_real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
-                                                             ::cells::x_coord_array,
-                                                             ::cells::y_coord_array,
-                                                             ::cells::z_coord_array);
+         vcl::cells::coord_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+                                                              ::cells::x_coord_array,
+                                                              ::cells::y_coord_array,
+                                                              ::cells::z_coord_array);
 
          // Allocate device memory and initialize cell magnetization
-         vcl::cells::mag_array = vcl::Buffer3D<vcl_real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
-                                                           ::cells::x_mag_array,
-                                                           ::cells::y_mag_array,
-                                                           ::cells::z_mag_array);
+         vcl::cells::mag_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+                                                            ::cells::x_mag_array,
+                                                            ::cells::y_mag_array,
+                                                            ::cells::z_mag_array);
 
          // Allocate device memory and initialize cell fields
-         vcl::cells::field_array = vcl::Buffer3D<vcl_real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
-                                                             ::cells::x_field_array,
-                                                             ::cells::y_field_array,
-                                                             ::cells::z_field_array);
+         vcl::cells::field_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+                                                              ::cells::x_field_array,
+                                                              ::cells::y_field_array,
+                                                              ::cells::z_field_array);
 
          // Allocate device memory and initialize voulme array
          vcl::cells::volume_array = cl::Buffer(vcl::context, vcl::read_only, real_buffer_size);
@@ -275,7 +276,7 @@ namespace vopencl
          ::stats::system_magnetization.get_mask(mask, saturations);
          vcl::stats::system_mask_size = saturations.size();
          const size_t sys_mask_buffer_size = mask.size() * sizeof(mask[0]);
-         const size_t sys_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
+         const size_t sys_sats_buffer_size = 4 * saturations.size() * sizeof(vcl::real_t);
          if (sys_mask_buffer_size != 0)
          {
             vcl::stats::system_mask = cl::Buffer(vcl::context, vcl::read_write, sys_mask_buffer_size);
@@ -291,7 +292,7 @@ namespace vopencl
          ::stats::material_magnetization.get_mask(mask, saturations);
          vcl::stats::material_mask_size = saturations.size();
          const size_t mat_mask_buffer_size = mask.size() * sizeof(mask[0]);
-         const size_t mat_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
+         const size_t mat_sats_buffer_size = 4 * saturations.size() * sizeof(vcl::real_t);
          if (mat_mask_buffer_size != 0)
          {
             vcl::stats::material_mask = cl::Buffer(vcl::context, vcl::read_write, mat_mask_buffer_size);
@@ -307,7 +308,7 @@ namespace vopencl
          ::stats::height_magnetization.get_mask(mask, saturations);
          vcl::stats::height_mask_size = saturations.size();
          const size_t height_mask_buffer_size = mask.size() * sizeof(mask[0]);
-         const size_t height_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
+         const size_t height_sats_buffer_size = 4 * saturations.size() * sizeof(vcl::real_t);
          if (height_mask_buffer_size != 0)
          {
             vcl::stats::height_mask = cl::Buffer(vcl::context, vcl::read_write, height_mask_buffer_size);
@@ -323,7 +324,7 @@ namespace vopencl
          ::stats::material_height_magnetization.get_mask(mask, saturations);
          vcl::stats::material_height_mask_size = saturations.size();
          const size_t mat_h_mask_buffer_size = mask.size() * sizeof(mask[0]);
-         const size_t mat_h_sats_buffer_size = 4 * saturations.size() * sizeof(vcl_real_t);
+         const size_t mat_h_sats_buffer_size = 4 * saturations.size() * sizeof(vcl::real_t);
          if (mat_h_mask_buffer_size != 0)
          {
             vcl::stats::material_height_mask = cl::Buffer(vcl::context, vcl::read_write, mat_h_mask_buffer_size);
@@ -343,14 +344,14 @@ namespace vopencl
          cl_ulong r = std::rand();
          return r << 32 | std::rand();
       }
-      
+
       bool initialize_rng(void) noexcept
       {
          // each atom needs three random numbers per Heun step
          std::vector<cl_ulong> rs(::atoms::num_atoms*3);
 
          const size_t u_buffer_size = rs.size() * sizeof(cl_ulong);
-         const size_t g_buffer_size = rs.size() * sizeof(vcl_real_t);
+         const size_t g_buffer_size = rs.size() * sizeof(vcl::real_t);
 
          vcl::rng::urands = cl::Buffer(vcl::context, vcl::read_write, u_buffer_size);
          vcl::rng::grands = cl::Buffer(vcl::context, vcl::read_write, g_buffer_size);
