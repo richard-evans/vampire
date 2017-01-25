@@ -80,9 +80,9 @@ void calculate_exchange(const int exchange_type,
             real_t3 J = (real_t3)(Jxx[j], Jyy[j], Jzz[j]);
             sum += J * snj;
          }
-         total_spin_field[x] = sum.x;
-         total_spin_field[y] = sum.y;
-         total_spin_field[z] = sum.z;
+         total_spin_field[xi] = sum.x;
+         total_spin_field[yi] = sum.y;
+         total_spin_field[zi] = sum.z;
 #endif // USE_VECTOR_TYPE
       }
    }
