@@ -21,7 +21,7 @@ real_t3 cross_product(const real_t3 A, const real_t3 B)
 
 __kernel
 void llg_heun_predictor_step(const __global int *const restrict material_id,
-                             __constant heun_params_t *const restrict heun_parameters,
+                             const __global heun_params_t *const restrict heun_parameters,
                              __global T *const restrict spin,
                              const __global T *const restrict sp_field,
                              const __global T *const restrict ext_field,
@@ -72,7 +72,7 @@ void llg_heun_predictor_step(const __global int *const restrict material_id,
 #endif
 
       // predicted new spin
-      real_t3 new_S = S + Schange * DT;
+      real_t3 new_S = S + Schange * (real_t)DT;
 
       // normalization of spin
       const real_t rmod_s = RSQRT(new_S.x*new_S.x +
@@ -136,7 +136,7 @@ void llg_heun_corrector_step(const __global int *const restrict material_id,
       const real_t3 dS_prime = prefactor * SxH + lambdatpr * SxSxH;
 
 #ifdef USE_VECTOR_TYPE
-      S = spin_buffer[atom] + 0.5 * (dS[atom] + dS_prime) * DT;
+      S = spin_buffer[atom] + (real_t)0.5 * (dS[atom] + dS_prime) * (real_t)DT;
 #else
       // Heun step, using predictor and corrector spin changes
       S = (real_t3)(spin_buffer[x] + 0.5 * (dS[x] + dS_prime.x) * DT,

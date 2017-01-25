@@ -177,7 +177,7 @@ static void init_llg(void)
       vcl::Buffer3D<vcl::real_t>(vcl::context, CL_MEM_READ_WRITE, num_atms);
 
    vcl::llg::heun_parameters_device =
-      cl::Buffer(vcl::context, CL_MEM_READ_ONLY, num_mats);
+      cl::Buffer(vcl::context, CL_MEM_READ_ONLY, num_mats*sizeof(vcl::heun_parameter_t));
 
    std::vector<vcl::heun_parameter_t> heun_params_host(num_mats);
 
