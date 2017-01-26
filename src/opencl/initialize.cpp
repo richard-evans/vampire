@@ -129,7 +129,7 @@ namespace vopencl
          int default_nthreads = 64;
          std::cerr << "Warning: defaulting to " << default_nthreads << " threads." << std::endl;
          std::cerr << "Use gpu:num-threads=n in the input file to specify number." << std::endl;
-         vcl::global = cl::NDRange(default_threads);
+         vcl::global = cl::NDRange(default_nthreads);
       }
 
       success = true;
