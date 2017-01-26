@@ -35,7 +35,7 @@ sim:applied-field-unit-vector=1,0,0
 
 # gpu:acceleration
 # gpu:calculate-statistics-on-cpu
-gpu:num-threads=4;
+gpu:num-threads=64;
 
 #------------------------------------------
 # Program and integrator details
