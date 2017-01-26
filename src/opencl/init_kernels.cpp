@@ -153,6 +153,21 @@ static void init_exchange(void)
                         vcl::total_spin_field_array.buffer());
 }
 
+static void init_spin_fields(void)
+{
+   std::ostringstream opts;
+   opts << "-DNUM_ATOMS=" << ::atoms::num_atoms;
+   vcl::update_nexch_spin_fields = vcl::build_kernel_from_file("src/opencl/cl/spin_fields.cl",
+                                                               "update_nexch_spin_fields",
+                                                               vcl::context, vcl::default_device,
+                                                               opts.str());
+   vcl::set_kernel_args(vcl::update_nexch_spin_fields,
+                        vcl::atoms::type_array,
+                        vcl::mp::materials,
+                        vcl::atoms::spin_array.buffer(),
+                        vcl::total_spin_field_array.buffer());
+}
+
 static void init_rng(void)
 {
    std::ostringstream opts;
@@ -236,6 +251,7 @@ namespace vopencl
          init_dipole();
          init_external_fields();
          init_exchange();
+         init_spin_fields();
          init_llg();
          init_rng();
 

@@ -22,9 +22,7 @@ namespace vopencl
 
       void update_external_fields(void) noexcept
       {
-         const cl::NDRange global(::atoms::num_atoms);
-
-         vcl::kernel_call(update_ext, vcl::queue, global, vcl::local);
+         vcl::kernel_call(update_ext, vcl::queue, vcl::global, vcl::local);
 
          update_dipolar_fields();
       }

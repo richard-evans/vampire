@@ -29,6 +29,8 @@ namespace gpu{
 
    bool cpu_stats = false; // flag to calculate stats using cpu
 
+   int num_threads = 0; // number of threads to use per kernel
+
    //-----------------------------------------------------------------------------
    // Shared data structures for statistics calculation
    //-----------------------------------------------------------------------------

@@ -22,7 +22,7 @@ void update_external_fields(const __global int *const restrict material,
 
    const real_t3 Happ = (real_t3)(Hx, Hy, Hz);
 
-   for (int i=get_global_id(0); i<NUM_ATOMS; ++i)
+   for (int i=get_global_id(0); i<NUM_ATOMS; i+=gsz)
    {
       const int mid = material[i];
       const material_parameters_t mat = material_params[mid];

@@ -26,9 +26,7 @@ namespace vopencl
 
          void calculate_exchange_fields(void) noexcept
          {
-            const cl::NDRange global(::atoms::num_atoms);
-
-            vcl::kernel_call(calculate_exchange, vcl::queue, global, vcl::local);
+            vcl::kernel_call(calculate_exchange, vcl::queue, vcl::global, vcl::local);
 
             vcl::queue.finish();
          }

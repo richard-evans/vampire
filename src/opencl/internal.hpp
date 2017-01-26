@@ -36,17 +36,20 @@ namespace vopencl
       // Internal shared variables
       //-------------------------------------------------------------------------
 
+      // number of work items
+      extern cl::NDRange global;
+
       // let implementation choose work group size
       const cl::NDRange local(cl::NullRange);
 
-      const cl_mem_flags write_only = CL_MEM_WRITE_ONLY;// | CL_MEM_ALLOC_HOST_PTR;
-      const cl_mem_flags read_only  = CL_MEM_READ_ONLY; // | CL_MEM_ALLOC_HOST_PTR;
-      const cl_mem_flags read_write = CL_MEM_READ_WRITE;// | CL_MEM_ALLOC_HOST_PTR;
+      const cl_mem_flags write_only = CL_MEM_WRITE_ONLY | CL_MEM_ALLOC_HOST_PTR;
+      const cl_mem_flags read_only  = CL_MEM_READ_ONLY  | CL_MEM_ALLOC_HOST_PTR;
+      const cl_mem_flags read_write = CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR;
 
       extern cl::Context context;
       extern cl::Device default_device;
       extern cl::CommandQueue queue;
-      
+
 #ifdef OPENCL_DEBUG
       extern std::ofstream OCLLOG;
 #endif

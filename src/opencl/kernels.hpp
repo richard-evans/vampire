@@ -19,6 +19,9 @@ namespace vopencl
       // external fields
       extern cl::Kernel update_ext;
 
+      // spin fields
+      extern cl::Kernel update_nexch_spin_fields;
+
       // exchange
       namespace exchange
       {

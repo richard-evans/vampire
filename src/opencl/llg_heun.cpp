@@ -40,8 +40,6 @@ namespace vopencl
 
          void step(void) noexcept
          {
-            const cl::NDRange global(::atoms::num_atoms);
-
             vcl::atoms::spin_array.copy_to_dev(vcl::queue, vcl::llg::spin_buffer_array);
 
             // update fields
@@ -55,7 +53,7 @@ namespace vopencl
             vcl::queue.finish();
 
             // Heun predictor step
-            vcl::kernel_call(predictor_step, vcl::queue, global, vcl::local);
+            vcl::kernel_call(predictor_step, vcl::queue, vcl::global, vcl::local);
 
 
             vcl::queue.finish();
@@ -66,7 +64,7 @@ namespace vopencl
             vcl::queue.finish();
 
             // Heun corrector step
-            vcl::kernel_call(corrector_step, vcl::queue, global, vcl::local);
+            vcl::kernel_call(corrector_step, vcl::queue, vcl::global, vcl::local);
 
 
             vcl::queue.finish();

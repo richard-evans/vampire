@@ -14,8 +14,9 @@
 
 // Vampire headers
 #include "atoms.hpp"
-#include "errors.hpp"
 #include "cells.hpp"
+#include "errors.hpp"
+#include "gpu.hpp"
 #include "material.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
@@ -36,6 +37,11 @@ namespace vcl = ::vopencl::internal;
 
 namespace vopencl
 {
+   namespace internal
+   {
+      cl::NDRange global;
+   }
+
    //----------------------------------------------------------------------------
    // Function to initialize vopencl module
    //----------------------------------------------------------------------------
@@ -112,7 +118,16 @@ namespace vopencl
 
       vcl::context = cl::Context({vcl::default_device});
 
-      vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device);
+      vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device, CL_QUEUE_PROFILING_ENABLE);
+
+      if (::gpu::num_threads > 0)
+      {
+         vcl::global = cl::NDRange(::gpu::num_threads);
+      }
+      else
+      {
+         vcl::global = cl::NDRange(4);
+      }
 
       success = true;
 

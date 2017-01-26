@@ -35,20 +35,17 @@ namespace vopencl
          ::demag::update_time = ::sim::time;
 
          // update cell magnetizations
-         const cl::NDRange global_cells(::cells::num_cells);
          vcl::cells::mag_array.zero_buffer();
-         vcl::kernel_call(update_cell_mag, vcl::queue, global_cells, vcl::local);
+         vcl::kernel_call(update_cell_mag, vcl::queue, vcl::global, vcl::local);
          vcl::queue.finish();
 
-         const cl::NDRange global_atms(::atoms::num_atoms);
-
          // update cell dipolar fields
-         vcl::kernel_call(update_dip, vcl::queue, global_atms, vcl::local);
+         vcl::kernel_call(update_dip, vcl::queue, vcl::global, vcl::local);
 
          vcl::queue.finish();
 
          // update atomistic dipolar fields
-         vcl::kernel_call(update_atm_dip, vcl::queue, global_atms, vcl::local);
+         vcl::kernel_call(update_atm_dip, vcl::queue, vcl::global, vcl::local);
 
          vcl::queue.finish();
 

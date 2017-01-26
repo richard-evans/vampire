@@ -21,10 +21,7 @@ namespace vopencl
 
          void update_grands(void)
          {
-            // launch N/2 work items as each gens 2 numbers
-            const cl::NDRange global((::atoms::num_atoms*3)/2);
-
-            vcl::kernel_call(grng, vcl::queue, global, vcl::local);
+            vcl::kernel_call(grng, vcl::queue, vcl::global, vcl::local);
          }
       }
    }

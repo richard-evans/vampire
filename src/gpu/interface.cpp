@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <string>
 
 // Vampire headers
 #include "errors.hpp"
@@ -75,6 +76,20 @@ namespace gpu{
             std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
             std::cerr << "\t\"true\"" << std::endl;
             std::cerr << "\t\"false\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+
+      test="num-threads";
+      if (word==test) {
+         int val = std::stoi(value, NULL, 10);
+         if (val > 0) {
+            gpu::num_threads = val;
+            return true;
+         } else {
+            terminaltextcolor(RED);
+            std::cerr << "Error: Value for \'" << prefix << ':' << word << "\' must be a positive integer" << std::endl;
             terminaltextcolor(WHITE);
             err::vexit();
          }

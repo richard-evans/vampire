@@ -17,6 +17,7 @@ namespace gpu{
    //-----------------------------------------------------------------------------
    extern bool acceleration; // flag to enable gpu_acceleration
    extern bool cpu_stats; // flag to calculate stats using cpu
+   extern int num_threads; // number of threads to run per kernel
 
    //-----------------------------------------------------------------------------
    // Functions for GPU acceleration
