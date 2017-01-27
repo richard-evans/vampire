@@ -46,9 +46,6 @@ namespace vopencl
 
          // update atomistic dipolar fields
          vcl::kernel_call(update_atm_dip, vcl::queue, vcl::global, vcl::local);
-
-         vcl::queue.finish();
-
       }
    }
 }

@@ -13,6 +13,8 @@
 
 #define UNUSED(x) (void)(x)
 
+namespace vcl = ::vopencl::internal;
+
 static std::string get_error(const cl_int err) noexcept
 {
    switch (err)
@@ -79,9 +81,9 @@ namespace vopencl
       // function to enqueue a kernel
       // the OpenCL C++ spec for this seems pretty fluid so it's probably better not to use it
       void kernel_call(const cl::Kernel &k,              /* kernel to enqueue */
-                       const cl::CommandQueue &q,  /* into this queue */
-                       const cl::NDRange gbl,      /* total number of work items */
-                       const cl::NDRange lcl) noexcept;     /* number of work items in group */
+                       const cl::CommandQueue &q=vcl::queue,  /* into this queue */
+                       const cl::NDRange gbl=vcl::global,      /* total number of work items */
+                       const cl::NDRange lcl=vcl::local) noexcept;     /* number of work items in group */
 
    }
 }

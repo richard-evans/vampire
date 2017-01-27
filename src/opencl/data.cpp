@@ -100,6 +100,13 @@ namespace vopencl
          cl::Buffer heun_parameters_device;
       }
 
+      namespace exchange
+      {
+         cl::Buffer Jxx_vals_d;
+         cl::Buffer Jyy_vals_d;
+         cl::Buffer Jzz_vals_d;
+      }
+
       namespace stats
       {
          bool use_cpu = false;

@@ -145,7 +145,7 @@ namespace vopencl
          }
 
          // access the buffer (to pass to kernels)
-         cl::Buffer &buffer(void) { return buff_container[0]; }
+         cl::Buffer &buffer(void) noexcept { return buff_container[0]; }
 
          // release memory by swapping with empty vector
          void free(void) noexcept

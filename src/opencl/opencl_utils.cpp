@@ -17,9 +17,9 @@ namespace vopencl
    namespace internal
    {
       void kernel_call(const cl::Kernel &k,            /* kernel to enqueue */
-                       const cl::CommandQueue &q,      /* into this queue */
-                       const cl::NDRange gbl,          /* total number of work items */
-                       const cl::NDRange lcl) noexcept /* number of work items in group */
+                       const cl::CommandQueue &q=vcl::queue,      /* into this queue */
+                       const cl::NDRange gbl=vcl::global,          /* total number of work items */
+                       const cl::NDRange lcl=vcl::local) noexcept /* number of work items in group */
       {
          const auto err = q.enqueueNDRangeKernel(k, cl::NullRange, gbl, lcl);
          if (err != CL_SUCCESS)

@@ -11,7 +11,6 @@
 #include "llg_heun.hpp"
 #include "opencl_include.hpp"
 #include "opencl_utils.hpp"
-#include "random.hpp"
 #include "typedefs.hpp"
 
 #ifdef OPENCL
@@ -33,6 +32,29 @@ namespace vopencl
 {
    namespace internal
    {
+      cl::Kernel update_nexch_spin_fields;
+      cl::Kernel update_ext;
+
+      namespace rng
+      {
+         cl::Kernel grng;
+      }
+
+      namespace exchange
+      {
+         cl::Kernel calculate_exchange;
+      }
+
+      static inline void update_spin_fields(void)
+      {
+         vcl::total_spin_field_array.zero_buffer();
+         vcl::kernel_call(vcl::update_nexch_spin_fields);
+
+         vcl::queue.finish();
+
+         vcl::kernel_call(vcl::exchange::calculate_exchange);
+      }
+
       namespace llg
       {
          cl::Kernel predictor_step;
@@ -40,21 +62,25 @@ namespace vopencl
 
          void step(void) noexcept
          {
+            // make a copy of current spins for both Heun steps
             vcl::atoms::spin_array.copy_to_dev(vcl::queue, vcl::llg::spin_buffer_array);
 
             // update fields
             vcl::update_spin_fields();
-            vcl::rng::update_grands();
+
+            // update random numbers for external field
+            vcl::kernel_call(rng::grng);
 
             vcl::queue.finish();
 
-            vcl::update_external_fields();
+            // update external and dipole fields
+            vcl::kernel_call(update_ext);
+            update_dipolar_fields();
 
             vcl::queue.finish();
 
             // Heun predictor step
-            vcl::kernel_call(predictor_step, vcl::queue, vcl::global, vcl::local);
-
+            vcl::kernel_call(predictor_step);
 
             vcl::queue.finish();
 
@@ -64,8 +90,7 @@ namespace vopencl
             vcl::queue.finish();
 
             // Heun corrector step
-            vcl::kernel_call(corrector_step, vcl::queue, vcl::global, vcl::local);
-
+            vcl::kernel_call(corrector_step);
 
             vcl::queue.finish();
          }

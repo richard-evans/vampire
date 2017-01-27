@@ -5,7 +5,7 @@
 OPENCL_CFLAGS=\
 -std=c++11 -pedantic \
 -Wall -Wextra -Wno-ignored-attributes -Wno-unused-function \
--DOPENCL_DEBUG -MMD
+-MMD -DOPENCL_DEBUG -DUSE_VECTOR_TYPE
 
 OPENCL_LIBS=-lOpenCL
 OPENCL_PR=
@@ -15,14 +15,11 @@ OPENCL_OBJECTS =\
 obj/opencl/config.o \
 obj/opencl/data.o \
 obj/opencl/dipole.o \
-obj/opencl/exchange_fields.o \
-obj/opencl/external_fields.o \
 obj/opencl/finalize.o \
 obj/opencl/initialize.o \
+obj/opencl/init_kernels.o \
 obj/opencl/llg_heun.o \
 obj/opencl/opencl_utils.o \
-obj/opencl/random.o \
-obj/opencl/spin_fields.o \
 obj/opencl/statistics.o
 
 # each object depends on .cpp and .hpp
