@@ -106,8 +106,6 @@ namespace vopencl
             std::vector<Rv> buff(v*n_elems);
             q.enqueueReadBuffer(buff_container[0], CL_TRUE, 0, buffer_size, &buff[0]);
 
-            q.finish();
-
             for (size_t i=0; i<n_elems; ++i)
             {
 #ifdef USE_VECTOR_TYPE
