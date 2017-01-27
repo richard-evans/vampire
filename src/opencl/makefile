@@ -2,8 +2,10 @@
 #          Makefile for vopencl module
 #--------------------------------------------------------------
 
+# this module requires src/gpu/interface.cpp to be compiled with c++11 support
+GCC_CFLAGS+=-std=c++11 -Wpedantic
+
 OPENCL_CFLAGS=\
--std=c++11 -pedantic \
 -Wall -Wextra -Wno-ignored-attributes -Wno-unused-function \
 -MMD -DOPENCL_DEBUG -DUSE_VECTOR_TYPE
 

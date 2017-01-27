@@ -81,6 +81,8 @@ namespace gpu{
          }
       }
 
+      // std::stoi is c++11
+#if __cplusplus > 199711L
       test="num-threads";
       if (word==test) {
          int val = std::stoi(value, NULL, 10);
@@ -94,6 +96,7 @@ namespace gpu{
             err::vexit();
          }
       }
+#endif
       //--------------------------------------------------------------------
       else{
          terminaltextcolor(RED);
