@@ -70,28 +70,24 @@ namespace vopencl
 
             // update random numbers for external field
             vcl::kernel_call(rng::grng);
-
             vcl::queue.finish();
 
             // update external and dipole fields
             vcl::kernel_call(update_ext);
+            vcl::queue.finish();
             update_dipolar_fields();
-
             vcl::queue.finish();
 
             // Heun predictor step
             vcl::kernel_call(predictor_step);
-
             vcl::queue.finish();
 
             // update spin fields, external fixed
             vcl::update_spin_fields();
-
             vcl::queue.finish();
 
             // Heun corrector step
             vcl::kernel_call(corrector_step);
-
             vcl::queue.finish();
          }
       }

@@ -1,6 +1,8 @@
 #ifndef KERNELS_HPP_
 #define KERNELS_HPP_
 
+#include "opencl_include.hpp"
+
 namespace vopencl
 {
    namespace internal

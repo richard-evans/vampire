@@ -33,9 +33,9 @@ namespace vopencl
       // function to build OpenCL kernel from source file
       cl::Kernel build_kernel_from_file(const std::string &file_name,
                                         const std::string &kernel_name,
-                                        const cl::Context &context,
-                                        const cl::Device  &device,
-                                        const std::string &opts="") noexcept
+                                        const std::string &opts="",
+                                        const cl::Context &context=vcl::context,
+                                        const cl::Device  &device=vcl::default_device) noexcept
       {
          std::ifstream source_file(file_name);
          if (!source_file)
@@ -49,22 +49,7 @@ namespace vopencl
 
          cl::Program program = cl::Program(context, source);
 
-         std::string prg_opts(opts);
-
-         prg_opts.append(" -Isrc/opencl/cl"
-#ifdef OPENCL_DP
-                         " -DOPENCL_DP"
-#endif
-#ifdef OPENCL_USE_NATIVE_FUNCTIONS
-                         " -DOPENCL_USE_NATIVE_FUNCTIONS"
-#endif
-#ifdef USE_VECTOR_TYPE
-                         " -DUSE_VECTOR_TYPE"
-#endif
-            );
-
-
-         cl_int err = program.build({device}, prg_opts.c_str());
+         cl_int err = program.build({device}, opts.c_str());
 
 #ifdef OPENCL_DEBUG
          vcl::OCLLOG << "Building from " << file_name;

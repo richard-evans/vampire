@@ -30,4 +30,5 @@ MPI-compute-times
 MPI-wait-times
 tags
 .vimrc
+*.d
 #EOF

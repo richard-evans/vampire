@@ -36,7 +36,7 @@ namespace vopencl
    {
       namespace rng
       {
-         extern cl::Buffer urands;
+         extern cl::Buffer state;
          extern cl::Buffer grands;
       }
 
@@ -89,6 +89,7 @@ namespace vopencl
 
       namespace exchange
       {
+         extern cl::Buffer J_vals_d;
          extern cl::Buffer Jxx_vals_d;
          extern cl::Buffer Jyy_vals_d;
          extern cl::Buffer Jzz_vals_d;

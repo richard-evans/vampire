@@ -93,7 +93,7 @@ void llg_heun_predictor_step(const __global int *const restrict material_id,
 
 __kernel
 void llg_heun_corrector_step(const __global int *const restrict material_id,
-                             __constant heun_params_t *const restrict heun_parameters,
+                             const __global heun_params_t *const restrict heun_parameters,
                              __global T *const restrict spin,
                              const __global T *const restrict sp_field,
                              const __global T *const restrict ext_field,

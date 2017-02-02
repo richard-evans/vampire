@@ -16,9 +16,11 @@ namespace vopencl
    namespace internal
    {
 #ifdef OPENCL_DP
-      typedef cl_double real_t;
+      typedef cl_double  real_t;
+      typedef cl_double3 real_t3;
 #else
       typedef cl_float  real_t;
+      typedef cl_float3 real_t3; 
 #endif // OPENCL_DP
 
 

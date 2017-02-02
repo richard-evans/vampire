@@ -30,7 +30,7 @@ $(OPENCL_CFLAGS)
 OPENCL_DEBUG_CFLAGS= \
 -Og -g -fno-fast-math \
 -Wall -Wextra -Wpedantic -Wshadow -Wno-ignored-attributes -Wno-unused-function \
--DOPENCL_DEBUG -DENABLE_OPENCL_TESTS
+-DNDEBUG -DOPENCL_DEBUG -DENABLE_OPENCL_TESTS
 
 OPENCL_LIBS=-lOpenCL
 

@@ -5,6 +5,7 @@ namespace vopencl
 {
    namespace internal
    {
+      void build_kernels(void) noexcept;
       bool initialize_kernels(void) noexcept;
    }
 }

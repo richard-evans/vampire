@@ -8,6 +8,7 @@
 
 // C++ standard library headers
 #include <cstdlib>
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -34,6 +35,10 @@
 #include "opencl_utils.hpp"
 #include "statistics.hpp"
 #include "typedefs.hpp"
+
+#ifdef ENABLE_OPENCL_TESTS
+#include "tests/tests.hpp"
+#endif
 
 #ifdef OPENCL
 namespace vcl = ::vopencl::internal;
@@ -84,7 +89,9 @@ namespace vopencl
       if (nplatforms == 0)
       {
          message = "Error: OpenCL is enabled but no platforms are available.";
+         terminaltextcolor(RED);
          std::cout << message << std::endl;
+         terminaltextcolor(WHITE);
          zlog << zTs() << message << std::endl;
          ::err::vexit();
       }
@@ -111,7 +118,9 @@ namespace vopencl
       if (ndevices == 0)
       {
          message = "Error: OpenCL is enabled but no suitable devices can be found.";
+         terminaltextcolor(RED);
          std::cout << message << std::endl;
+         terminaltextcolor(WHITE);
          zlog << zTs() << message << std::endl;
          ::err::vexit();
       }
@@ -135,10 +144,25 @@ namespace vopencl
       else
       {
          int default_nthreads = 64;
+         terminaltextcolor(YELLOW);
          std::cerr << "Warning: defaulting to " << default_nthreads << " threads." << std::endl;
          std::cerr << "Use gpu:num-threads=n in the input file to specify number." << std::endl;
+         terminaltextcolor(WHITE);
          vcl::global = cl::NDRange(default_nthreads);
       }
+
+      // build all OpenCL kernels
+      vcl::build_kernels();
+
+#ifdef ENABLE_OPENCL_TESTS
+      if(!vcl::test::all())
+      {
+         terminaltextcolor(RED);
+         std::cerr << "At least one OpenCL test has failed. Aborting." << std::endl;
+         terminaltextcolor(WHITE);
+         ::err::vexit();
+      }
+#endif
 
       success = true;
 
@@ -147,7 +171,7 @@ namespace vopencl
       success &= vcl::initialize_cells();
       success &= vcl::initialize_materials();
       success &= vcl::initialize_topology();
-      success &= vcl::initialize_stats();
+      //success &= vcl::initialize_stats();
       success &= vcl::initialize_rng();
       success &= vcl::initialize_kernels();
 
@@ -184,20 +208,32 @@ namespace vopencl
                                                               ::atoms::y_coord_array,
                                                               ::atoms::z_coord_array);
 
-         const size_t real_buffer_size = ::atoms::num_atoms * sizeof(vcl::real_t);
-         const size_t  int_buffer_size = ::atoms::num_atoms * sizeof(cl_int);
-
          // Allocate and initialize device memory for atomic information
-         vcl::atoms::type_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, int_buffer_size);
-         vcl::queue.enqueueWriteBuffer(vcl::atoms::type_array, CL_FALSE, 0, int_buffer_size, &::atoms::type_array[0]);
+         size_t buff_size = ::atoms::type_array.size() * sizeof ::atoms::type_array[0];
+         vcl::atoms::type_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
+         vcl::queue.enqueueWriteBuffer(vcl::atoms::type_array,
+                                       CL_FALSE,
+                                       0,
+                                       buff_size,
+                                       ::atoms::type_array.data());
 
          // Allocate and initialize cell information
-         vcl::atoms::cell_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, int_buffer_size);
-         vcl::queue.enqueueWriteBuffer(vcl::atoms::cell_array, CL_FALSE, 0, int_buffer_size, &::atoms::cell_array[0]);
+         buff_size = ::atoms::cell_array.size() * sizeof ::atoms::cell_array;
+         vcl::atoms::cell_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
+         vcl::queue.enqueueWriteBuffer(vcl::atoms::cell_array,
+                                       CL_FALSE,
+                                       0,
+                                       buff_size,
+                                       ::atoms::cell_array.data());
 
          // Allocate and initialize unrolled spin norm array
-         vcl::atoms::spin_norm_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, real_buffer_size);
-         vcl::queue.enqueueWriteBuffer(vcl::atoms::spin_norm_array, CL_FALSE, 0, real_buffer_size, &::atoms::m_spin_array[0]);
+         buff_size = ::atoms::m_spin_array.size() * sizeof ::atoms::m_spin_array[0];
+         vcl::atoms::spin_norm_array = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, buff_size);
+         vcl::queue.enqueueWriteBuffer(vcl::atoms::spin_norm_array,
+                                       CL_FALSE,
+                                       0,
+                                       buff_size,
+                                       ::atoms::m_spin_array.data());
 
          return true;
       }
@@ -227,9 +263,6 @@ namespace vopencl
 
       bool initialize_cells(void) noexcept
       {
-         const size_t real_buffer_size = ::cells::num_cells * sizeof(vcl::real_t);
-         const size_t  int_buffer_size = ::cells::num_cells * sizeof(cl_int);
-
          // Allocate device memory and initialize coordinates
          vcl::cells::coord_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
                                                               ::cells::x_coord_array,
@@ -249,43 +282,65 @@ namespace vopencl
                                                               ::cells::z_field_array);
 
          // Allocate device memory and initialize voulme array
-         vcl::cells::volume_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, real_buffer_size);
-         vcl::queue.enqueueWriteBuffer(vcl::cells::volume_array, CL_FALSE, 0, real_buffer_size, &::cells::volume_array[0]);
+         size_t buff_size = ::cells::volume_array.size() * sizeof ::cells::volume_array[0];
+         vcl::cells::volume_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
+         vcl::queue.enqueueWriteBuffer(vcl::cells::volume_array,
+                                       CL_FALSE,
+                                       0,
+                                       buff_size,
+                                       ::cells::volume_array.data());
 
          // Allocate device memory and initialize number of atoms for each cell
-         vcl::cells::num_atoms = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, int_buffer_size);
-         vcl::queue.enqueueWriteBuffer(vcl::cells::num_atoms, CL_FALSE, 0, int_buffer_size, &::cells::num_atoms_in_cell[0]);
+         buff_size = ::cells::num_atoms_in_cell.size() * sizeof ::cells::num_atoms_in_cell[0];
+         vcl::cells::num_atoms = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
+         vcl::queue.enqueueWriteBuffer(vcl::cells::num_atoms,
+                                       CL_FALSE,
+                                       0,
+                                       buff_size,
+                                       ::cells::num_atoms_in_cell.data());
 
          return true;
       }
 
       bool initialize_materials(void) noexcept
       {
-         const size_t mat_buffer_size = ::mp::num_materials * sizeof(::mp::material[0]);
-
          // Allocate device memory and initialize materials array
-         vcl::mp::materials = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, mat_buffer_size);
-         vcl::queue.enqueueWriteBuffer(vcl::mp::materials, CL_FALSE, 0, mat_buffer_size, &::mp::material[0]);
+         const size_t buff_size = ::mp::num_materials * sizeof ::mp::material[0];
+         vcl::mp::materials = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
+         vcl::queue.enqueueWriteBuffer(vcl::mp::materials,
+                                       CL_FALSE,
+                                       0,
+                                       buff_size,
+                                       ::mp::material.data());
 
          return true;
       }
 
       bool initialize_topology(void) noexcept
       {
-         const size_t limits_buffer_size = (::atoms::num_atoms+1) * sizeof(cl_uint);
-         const size_t neighbours_buffer_size = ::atoms::neighbour_list_array.size() * sizeof(::atoms::neighbour_list_array[0]);
-
          std::vector<cl_uint> limits_h(::atoms::num_atoms+1);
          limits_h[0] = 0;
          for (int atom=0; atom<::atoms::num_atoms; ++atom)
+         {
             limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+         }
 
          // Allocate device memory and initialize limits array
-         vcl::atoms::limits = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, limits_buffer_size);
-         vcl::queue.enqueueWriteBuffer(vcl::atoms::limits, CL_FALSE, 0, limits_buffer_size, &limits_h[0]);
+         size_t buff_size = limits_h.size() * sizeof limits_h[0];
+         vcl::atoms::limits = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
+         vcl::queue.enqueueWriteBuffer(vcl::atoms::limits,
+                                       CL_FALSE,
+                                       0,
+                                       buff_size,
+                                       limits_h.data());
 
-         vcl::atoms::neighbours = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, neighbours_buffer_size);
-         vcl::queue.enqueueWriteBuffer(vcl::atoms::neighbours, CL_FALSE, 0, neighbours_buffer_size, &::atoms::neighbour_list_array[0]);
+         buff_size = ::atoms::neighbour_list_array.size() * sizeof ::atoms::neighbour_list_array[0];
+         vcl::atoms::neighbours = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
+         vcl::queue.enqueueWriteBuffer(vcl::atoms::neighbours,
+                                       CL_FALSE,
+                                       0,
+                                       buff_size,
+                                       ::atoms::neighbour_list_array.data());
 
          vcl::queue.finish();
          return true;
@@ -304,7 +359,7 @@ namespace vopencl
          if (sys_mask_buffer_size != 0)
          {
             vcl::stats::system_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, sys_mask_buffer_size);
-            vcl::queue.enqueueWriteBuffer(vcl::stats::system_mask, CL_FALSE, 0, sys_mask_buffer_size, &mask[0]);
+            vcl::queue.enqueueWriteBuffer(vcl::stats::system_mask, CL_FALSE, 0, sys_mask_buffer_size, mask.data());
          }
          if (sys_sats_buffer_size != 0)
          {
@@ -320,7 +375,7 @@ namespace vopencl
          if (mat_mask_buffer_size != 0)
          {
             vcl::stats::material_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_mask_buffer_size);
-            vcl::queue.enqueueWriteBuffer(vcl::stats::material_mask, CL_FALSE, 0, mat_mask_buffer_size, &mask[0]);
+            vcl::queue.enqueueWriteBuffer(vcl::stats::material_mask, CL_FALSE, 0, mat_mask_buffer_size, mask.data());
          }
          if (mat_sats_buffer_size != 0)
          {
@@ -336,7 +391,7 @@ namespace vopencl
          if (height_mask_buffer_size != 0)
          {
             vcl::stats::height_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, height_mask_buffer_size);
-            vcl::queue.enqueueWriteBuffer(vcl::stats::height_mask, CL_FALSE, 0, height_mask_buffer_size, &mask[0]);
+            vcl::queue.enqueueWriteBuffer(vcl::stats::height_mask, CL_FALSE, 0, height_mask_buffer_size, mask.data());
          }
          if (height_sats_buffer_size != 0)
          {
@@ -352,7 +407,7 @@ namespace vopencl
          if (mat_h_mask_buffer_size != 0)
          {
             vcl::stats::material_height_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_h_mask_buffer_size);
-            vcl::queue.enqueueWriteBuffer(vcl::stats::material_height_mask, CL_FALSE, 0, mat_h_mask_buffer_size, &mask[0]);
+            vcl::queue.enqueueWriteBuffer(vcl::stats::material_height_mask, CL_FALSE, 0, mat_h_mask_buffer_size, mask.data());
          }
          if (mat_h_sats_buffer_size != 0)
          {
@@ -372,21 +427,36 @@ namespace vopencl
       bool initialize_rng(void) noexcept
       {
          // each atom needs three random numbers per Heun step
-         std::vector<cl_ulong> rs(::atoms::num_atoms*3);
+         // Box Muller transform uses two uniform random numbers to
+         // generate two gaussian random numbers so an even number of
+         // random numbers need to be stored
+         size_t n_rands;
+         if (::atoms::num_atoms % 2 == 0)
+            n_rands = ::atoms::num_atoms*3;
+         else
+            n_rands = ::atoms::num_atoms*3 + 1;
+
+         std::vector<cl_ulong> rs(n_rands);
 
          const size_t u_buffer_size = rs.size() * sizeof(cl_ulong);
          const size_t g_buffer_size = rs.size() * sizeof(vcl::real_t);
 
-         vcl::rng::urands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, u_buffer_size);
+         vcl::rng::state  = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, u_buffer_size);
          vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
 
          std::srand(std::time(NULL));
-         for (auto &elem : rs)
+         for (unsigned i=0; i<rs.size(); ++i)
+         {
             // must not seed xorshift with 0
-            do { elem = rand64(); } while (elem == 0);
+            cl_ulong r;
+            do { r = rand64(); } while (r == 0);
+            assert(r != cl_ulong(0));
+            rs[i] = r;
+         }
 
-         vcl::queue.enqueueWriteBuffer(vcl::rng::urands, CL_FALSE, 0, u_buffer_size, &rs[0]);
+         vcl::queue.enqueueWriteBuffer(vcl::rng::state, CL_FALSE, 0, u_buffer_size, rs.data());
 
+         vcl::queue.finish();
          return true;
       }
    }

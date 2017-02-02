@@ -10,6 +10,7 @@
 
 // double precision (64-bit) real and unsigned integer types
 typedef double  real_t;
+typedef double2 real_t2;
 typedef double3 real_t3;
 typedef double4 real_t4;
 typedef ulong   uint_t;
@@ -22,6 +23,7 @@ typedef ulong   uint_t;
 
 // single precision (32-bit) real and unsigned integer types
 typedef float  real_t;
+typedef float2 real_t2;
 typedef float3 real_t3;
 typedef float4 real_t4;
 typedef uint   uint_t;

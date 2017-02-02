@@ -1,8 +1,6 @@
-#include <sstream>
 #include <vector>
 
 #include "atoms.hpp"
-#include "cells.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 
@@ -21,22 +19,6 @@ static void init_dipole(void)
 {
    // dipole calculations enabled?
    if (::sim::hamiltonian_simulation_flags[4]!=1) return;
-
-   std::ostringstream opts;
-   opts << "-DN_CELLS=" << ::cells::num_cells;
-   opts << " -DN_ATOMS=" << ::atoms::num_atoms;
-   vcl::update_dip = vcl::build_kernel_from_file("src/opencl/cl/dipole.cl",
-                                                 "update_dipole_fields",
-                                                 vcl::context, vcl::default_device,
-                                                 opts.str());
-   vcl::update_atm_dip = vcl::build_kernel_from_file("src/opencl/cl/dipole.cl",
-                                                     "update_atm_dipole_fields",
-                                                     vcl::context, vcl::default_device,
-                                                     opts.str());
-   vcl::update_cell_mag = vcl::build_kernel_from_file("src/opencl/cl/dipole.cl",
-                                                      "update_cell_magnetization",
-                                                      vcl::context, vcl::default_device,
-                                                      opts.str());
 
    vcl::set_kernel_args(vcl::update_dip,
                         vcl::cells::mag_array.buffer(),
@@ -59,13 +41,6 @@ static void init_dipole(void)
 
 static void init_external_fields(void)
 {
-   std::ostringstream opts;
-   opts << "-DNUM_ATOMS=" << ::atoms::num_atoms;
-   vcl::update_ext = vcl::build_kernel_from_file("src/opencl/cl/external_fields.cl",
-                                                 "update_external_fields",
-                                                 vcl::context, vcl::default_device,
-                                                 opts.str());
-
    vcl::set_kernel_args(vcl::update_ext,
                         vcl::atoms::type_array,
                         vcl::mp::materials,
@@ -82,12 +57,6 @@ static void init_exchange(void)
 {
    const size_t vsize = ::atoms::neighbour_list_array.size();
 
-   std::ostringstream opts;
-   opts << "-DN=" << ::atoms::num_atoms;
-   vcl::exchange::calculate_exchange = vcl::build_kernel_from_file("src/opencl/cl/exchange.cl",
-                                                                   "calculate_exchange",
-                                                                   vcl::context, vcl::default_device,
-                                                                   opts.str());
    switch (::atoms::exchange_type)
    {
    case 0:
@@ -95,18 +64,31 @@ static void init_exchange(void)
       // Jxx = Jyy = Jzz
       // Jxy = Jxz = Jyx = 0
    {
-      std::vector<vcl::real_t> Jxx_vals_h(vsize);
+
+#ifdef USE_VECTOR_TYPE
+      std::vector<vcl::real_t3> J_vals_h(vsize);
+#else
+      std::vector<vcl::real_t> J_vals_h(3*vsize);
+#endif
 
       for (unsigned i=0; i<vsize; ++i)
       {
          const int iid = ::atoms::neighbour_interaction_type_array[i];
          const vcl::real_t Jij = ::atoms::i_exchange_list[iid].Jij;
 
-         Jxx_vals_h[i] = -Jij;
+#ifdef USE_VECTOR_TYPE
+         J_vals_h[i] = vcl::real_t3{-Jij, -Jij, -Jij};
+#else
+         const unsigned xxi = 3*i+0;
+         const unsigned yyi = 3*i+1;
+         const unsigned zzi = 3*i+2;
+         J_vals_h[xxi] = J_vals_h[yyi] = J_vals_h[zzi] = - Jij;
+#endif
       }
 
-      vcl::exchange::Jxx_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, vsize*sizeof(vcl::real_t));
-      vcl::queue.enqueueWriteBuffer(vcl::exchange::Jxx_vals_d, CL_FALSE, 0, vsize*sizeof(vcl::real_t), &Jxx_vals_h[0]);
+      size_t buffer_size = J_vals_h.size() * sizeof(J_vals_h[0]);
+      vcl::exchange::J_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buffer_size);
+      vcl::queue.enqueueWriteBuffer(vcl::exchange::J_vals_d, CL_FALSE, 0, buffer_size, J_vals_h.data());
    }
    break;
    case 1:
@@ -114,26 +96,35 @@ static void init_exchange(void)
       // Jxx != Jyy != Jzz
       // Jxy = Hxz = Jyx = 0
    {
-      std::vector<vcl::real_t> Jxx_vals_h(vsize);
-      std::vector<vcl::real_t> Jyy_vals_h(vsize);
-      std::vector<vcl::real_t> Jzz_vals_h(vsize);
+#ifdef USE_VECTOR_TYPE
+      std::vector<vcl::real_t3> J_vals_h(vsize);
+#else
+      std::vector<vcl::real_t> J_vals_h(3*vsize);
+#endif
 
       for (unsigned i=0; i<vsize; ++i)
       {
          const int iid = ::atoms::neighbour_interaction_type_array[i];
 
-         Jxx_vals_h[i] = - ::atoms::v_exchange_list[iid].Jij[0];
-         Jyy_vals_h[i] = - ::atoms::v_exchange_list[iid].Jij[1];
-         Jzz_vals_h[i] = - ::atoms::v_exchange_list[iid].Jij[2];
+         const auto &vel = ::atoms::v_exchange_list[iid];
+
+#ifdef USE_VECTOR_TYPE
+         J_vals_h[i] = {-vel.Jij[0], -vel.Jij[1], -vel.Jij[2]};
+#else
+         const unsigned xxi = 3*i+0;
+         const unsigned yyi = 3*i+1;
+         const unsigned zzi = 3*i+2;
+
+         J_vals_h[xxi] = - vel.Jij[0];
+         J_vals_h[yyi] = - vel.Jij[1];
+         J_vals_h[zzi] = - vel.Jij[2];
+#endif
       }
 
-      vcl::exchange::Jxx_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, vsize*sizeof(vcl::real_t));
-      vcl::exchange::Jyy_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, vsize*sizeof(vcl::real_t));
-      vcl::exchange::Jzz_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, vsize*sizeof(vcl::real_t));
+      const size_t sz = J_vals_h.size() * sizeof J_vals_h[0];
+      vcl::exchange::J_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, sz);
 
-      vcl::queue.enqueueWriteBuffer(vcl::exchange::Jxx_vals_d, CL_FALSE, 0, vsize*sizeof(vcl::real_t), &Jxx_vals_h[0]);
-      vcl::queue.enqueueWriteBuffer(vcl::exchange::Jyy_vals_d, CL_FALSE, 0, vsize*sizeof(vcl::real_t), &Jyy_vals_h[0]);
-      vcl::queue.enqueueWriteBuffer(vcl::exchange::Jzz_vals_d, CL_FALSE, 0, vsize*sizeof(vcl::real_t), &Jzz_vals_h[0]);
+      vcl::queue.enqueueWriteBuffer(vcl::exchange::J_vals_d, CL_FALSE, 0, sz, J_vals_h.data());
    }
    break;
 
@@ -143,24 +134,16 @@ static void init_exchange(void)
    }
 
    vcl::set_kernel_args(vcl::exchange::calculate_exchange,
-                        ::atoms::exchange_type,
-                        vcl::exchange::Jxx_vals_d,
-                        vcl::exchange::Jyy_vals_d,
-                        vcl::exchange::Jzz_vals_d,
+                        vcl::exchange::J_vals_d,
                         vcl::atoms::limits,
                         vcl::atoms::neighbours,
                         vcl::atoms::spin_array.buffer(),
-                        vcl::total_spin_field_array.buffer());
+                        vcl::total_spin_field_array.buffer(),
+                        ::atoms::num_atoms);
 }
 
 static void init_spin_fields(void)
 {
-   std::ostringstream opts;
-   opts << "-DNUM_ATOMS=" << ::atoms::num_atoms;
-   vcl::update_nexch_spin_fields = vcl::build_kernel_from_file("src/opencl/cl/spin_fields.cl",
-                                                               "update_nexch_spin_fields",
-                                                               vcl::context, vcl::default_device,
-                                                               opts.str());
    vcl::set_kernel_args(vcl::update_nexch_spin_fields,
                         vcl::atoms::type_array,
                         vcl::mp::materials,
@@ -170,14 +153,7 @@ static void init_spin_fields(void)
 
 static void init_rng(void)
 {
-   std::ostringstream opts;
-   opts << "-DN=" << ::atoms::num_atoms*3;
-   vcl::rng::grng = vcl::build_kernel_from_file("src/opencl/cl/random.cl",
-                                                "gen_grands",
-                                                vcl::context, vcl::default_device,
-                                                opts.str());
-
-   vcl::set_kernel_args(vcl::rng::grng, vcl::rng::urands, vcl::rng::grands);
+   vcl::set_kernel_args(vcl::rng::grng, vcl::rng::state, vcl::rng::grands);
 }
 
 static void init_llg(void)
@@ -210,19 +186,6 @@ static void init_llg(void)
                                  CL_FALSE, 0,
                                  num_mats*sizeof(vcl::heun_parameter_t),
                                  &heun_params_host[0]);
-
-   std::ostringstream opts;
-   opts << "-DNUM_ATOMS=" << num_atms;
-   opts << " -DDT=" << ::mp::dt;
-
-   vcl::llg::predictor_step = vcl::build_kernel_from_file("src/opencl/cl/llg_heun.cl",
-                                                          "llg_heun_predictor_step",
-                                                          vcl::context, vcl::default_device,
-                                                          opts.str());
-   vcl::llg::corrector_step = vcl::build_kernel_from_file("src/opencl/cl/llg_heun.cl",
-                                                          "llg_heun_corrector_step",
-                                                          vcl::context, vcl::default_device,
-                                                          opts.str());
 
    vcl::set_kernel_args(vcl::llg::predictor_step,
                         vcl::atoms::type_array,

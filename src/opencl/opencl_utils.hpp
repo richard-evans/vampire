@@ -68,9 +68,9 @@ namespace vopencl
       // and "-DN=10" will replace N with 10 in the kernel code
       cl::Kernel build_kernel_from_file(const std::string &file_name,
                                         const std::string &kernel_name,
-                                        const cl::Context &context,
-                                        const cl::Device  &device,
-                                        const std::string &opts="") noexcept;
+                                        const std::string &opts,
+                                        const cl::Context &context=vcl::context,
+                                        const cl::Device  &device=vcl::default_device) noexcept;
 
       template <typename... Ts>
       static void set_kernel_args(cl::Kernel &k, Ts &&... Args) noexcept
