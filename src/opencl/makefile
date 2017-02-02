@@ -2,18 +2,41 @@
 #          Makefile for vopencl module
 #--------------------------------------------------------------
 
-# this module requires src/gpu/interface.cpp to be compiled with c++11 support
-GCC_CFLAGS+=-std=c++11 -Wpedantic
+# Compile as `make opencl(-debug)` or `OPENCL_CFLAGS="options" make opencl(-debug)`
+# where available options are:
+#
+# -DOPENCL_USE_NATIVE_FUNCTIONS:
+#      Use native device functions which may give better performance but at the cost
+#      of less accuracy.
+#
+# -UOPENCL_DP:
+#      Use single precision floating point math instead of double precision. Some
+#      devices may require this.
+#
+# -UUSE_VECTOR_TYPE:
+#      OpenCL vector types will not be used for data storage. This may (depending on implementation
+#      and hardware) decrease amount of device memory used but memory accesses may be significantly
+#      slower.
 
-OPENCL_CFLAGS=\
--Wall -Wextra -Wno-ignored-attributes -Wno-unused-function \
--MMD -DOPENCL_DEBUG -DUSE_VECTOR_TYPE
+
+# this module requires src/gpu/interface.cpp to be compiled with c++11 support
+GCC_CFLAGS+=-std=c++11 -DOPENCL
+
+OPENCL_CFLAGS:=\
+-MMD \
+-DOPENCL_DP -DUSE_VECTOR_TYPE \
+$(OPENCL_CFLAGS)
+
+OPENCL_DEBUG_CFLAGS= \
+-Og -g -fno-fast-math \
+-Wall -Wextra -Wpedantic -Wshadow -Wno-ignored-attributes -Wno-unused-function \
+-DOPENCL_DEBUG -DENABLE_OPENCL_TESTS
 
 OPENCL_LIBS=-lOpenCL
-OPENCL_PR=
 
 # List module object filenames
 OPENCL_OBJECTS =\
+obj/opencl/build_kernels.o \
 obj/opencl/config.o \
 obj/opencl/data.o \
 obj/opencl/dipole.o \
@@ -22,38 +45,20 @@ obj/opencl/initialize.o \
 obj/opencl/init_kernels.o \
 obj/opencl/llg_heun.o \
 obj/opencl/opencl_utils.o \
-obj/opencl/statistics.o
+obj/opencl/statistics.o \
+obj/opencl/tests/all.o \
+obj/opencl/tests/matmul.o
 
 # each object depends on .cpp and .hpp
 # this will rebuild them if the .hpp changes
 # generated with -MMD cflag
 -include $(OPENCL_OBJECTS:%.o=%.d)
 
-OPENCL_OBJ=obj/opencl/vampire_opencl.o
-
-# double precision
-gcc-opencl: GCC_CFLAGS+=-DOPENCL
-gcc-opencl: OPENCL_PR+=-DOPENCL_DP
-gcc-opencl: $(OBJECTS) $(OPENCL_OBJ)
+opencl: $(OBJECTS) $(OPENCL_OBJECTS)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
 
-# single precision
-gcc-opencl-sp: GCC_CFLAGS+=-DOPENCL
-gcc-opencl-sp: OPENCL_PR+=-DOPENCL_SP
-gcc-opencl-sp: $(OBJECTS) $(OPENCL_OBJ)
-	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
-
-# double precision with native functions
-gcc-opencl-native: GCC_CFLAGS+=-DOPENCL_USE_NATIVE_FUNCTIONS
-gcc-opencl-native: gcc-opencl
-
-# single precision with native functions
-gcc-opencl-native-sp: GCC_CFLAGS+=-DOPENCL_USE_NATIVE_FUNCTIONS
-gcc-opencl-native-sp: gcc-opencl-sp
-
-
-$(OPENCL_OBJ): $(OPENCL_OBJECTS)
-	$(LD) -r $^ -o $@
+opencl-debug: OPENCL_CFLAGS+=$(OPENCL_DEBUG_FLAGS)
+opencl-debug: opencl
 
 obj/opencl/%.o: src/opencl/%.cpp
-	$(GCC) $< -c -g -o $@ $(GCC_CFLAGS) $(OPENCL_PR) $(OPENCL_LIBS) $(OPENCL_CFLAGS)
+	$(GCC) $< -c -o $@ $(GCC_CFLAGS) $(OPENCL_LIBS) $(OPENCL_CFLAGS)
