@@ -36,16 +36,15 @@ namespace vopencl
 
          // update cell magnetizations
          vcl::cells::mag_array.zero_buffer();
-         vcl::kernel_call(update_cell_mag, vcl::queue, vcl::global, vcl::local);
+         vcl::kernel_call(update_cell_mag);
          vcl::queue.finish();
 
          // update cell dipolar fields
-         vcl::kernel_call(update_dip, vcl::queue, vcl::global, vcl::local);
-
+         vcl::kernel_call(update_dip);
          vcl::queue.finish();
 
          // update atomistic dipolar fields
-         vcl::kernel_call(update_atm_dip, vcl::queue, vcl::global, vcl::local);
+         vcl::kernel_call(update_atm_dip);
       }
    }
 }
