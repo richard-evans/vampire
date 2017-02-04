@@ -24,13 +24,14 @@ GCC_CFLAGS+=-std=c++11 -DOPENCL
 
 OPENCL_CFLAGS:=\
 -MMD \
--DOPENCL_DP -DUSE_VECTOR_TYPE \
+-Wno-ignored-attributes -Wno-unused-function \
+-DNDEBUG -DOPENCL_DP -DUSE_VECTOR_TYPE \
 $(OPENCL_CFLAGS)
 
-OPENCL_DEBUG_CFLAGS= \
--Og -g -fno-fast-math \
--Wall -Wextra -Wpedantic -Wshadow -Wno-ignored-attributes -Wno-unused-function \
--DNDEBUG -DOPENCL_DEBUG -DENABLE_OPENCL_TESTS
+OPENCL_DEBUG_CFLAGS:=\
+-Og -g \
+-fno-fast-math -Wall -Wextra -Wpedantic -Wshadow \
+-UNDEBUG -DOPENCL_DEBUG -DENABLE_OPENCL_TESTS
 
 OPENCL_LIBS=-lOpenCL
 
@@ -57,8 +58,10 @@ obj/opencl/tests/matmul.o
 opencl: $(OBJECTS) $(OPENCL_OBJECTS)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
 
-opencl-debug: OPENCL_CFLAGS+=$(OPENCL_DEBUG_FLAGS)
-opencl-debug: opencl
+opencl-debug:
+	OPENCL_CFLAGS+="$(OPENCL_DEBUG_CFLAGS)" $(MAKE) opencl
+
+
 
 obj/opencl/%.o: src/opencl/%.cpp
-	$(GCC) $< -c -o $@ $(GCC_CFLAGS) $(OPENCL_LIBS) $(OPENCL_CFLAGS)
+	$(GCC) $< -c -o $@ $(GCC_CFLAGS) $(OPENCL_CFLAGS)
