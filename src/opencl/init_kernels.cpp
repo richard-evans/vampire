@@ -18,25 +18,26 @@ namespace vcl = ::vopencl::internal;
 static void init_dipole(void)
 {
    // dipole calculations enabled?
-   if (::sim::hamiltonian_simulation_flags[4]!=1) return;
+   if (::sim::hamiltonian_simulation_flags[4]==1)
+   {
+      vcl::set_kernel_args(vcl::update_dip,
+                           vcl::cells::mag_array.buffer(),
+                           vcl::cells::coord_array.buffer(),
+                           vcl::cells::volume_array,
+                           vcl::cells::field_array.buffer());
 
-   vcl::set_kernel_args(vcl::update_dip,
-                        vcl::cells::mag_array.buffer(),
-                        vcl::cells::coord_array.buffer(),
-                        vcl::cells::volume_array,
-                        vcl::cells::field_array.buffer());
+      vcl::set_kernel_args(vcl::update_atm_dip,
+                           vcl::cells::field_array.buffer(),
+                           vcl::dipolar_field_array.buffer(),
+                           vcl::atoms::cell_array);
 
-   vcl::set_kernel_args(vcl::update_atm_dip,
-                        vcl::cells::field_array.buffer(),
-                        vcl::dipolar_field_array.buffer(),
-                        vcl::atoms::cell_array);
-
-   vcl::set_kernel_args(vcl::update_cell_mag,
-                        vcl::atoms::spin_array.buffer(),
-                        vcl::atoms::type_array,
-                        vcl::atoms::cell_array,
-                        vcl::mp::materials,
-                        vcl::cells::mag_array.buffer());
+      vcl::set_kernel_args(vcl::update_cell_mag,
+                           vcl::atoms::spin_array.buffer(),
+                           vcl::atoms::type_array,
+                           vcl::atoms::cell_array,
+                           vcl::mp::materials,
+                           vcl::cells::mag_array.buffer());
+   }
 }
 
 static void init_external_fields(void)

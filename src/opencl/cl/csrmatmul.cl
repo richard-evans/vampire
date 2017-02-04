@@ -18,7 +18,7 @@ void matmul(const __global T    *const restrict A,  /* matrix non-zero values  *
                   __global T    *const restrict R,  /* resultant vector */
             const uint N)                           /* length of vector */
 {
-   size_t gsz = get_global_size(0);
+   const size_t gsz = get_global_size(0);
 
    for (size_t i=get_global_id(0); i<N; i+=gsz)
    {
