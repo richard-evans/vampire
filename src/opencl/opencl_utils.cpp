@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------
+//
+// This source file is part of the VAMPIRE open source package under the
+// GNU GPL (version 2) licence (see licence file for details).
+//
+// (c) S R H Morris 2017. All rights reserved.
+//
+//-----------------------------------------------------------------------------
+
 #include "opencl_include.hpp"
 
 #include <fstream>

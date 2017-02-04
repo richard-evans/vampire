@@ -1,10 +1,11 @@
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //
-//   This file is part of the VAMPIRE open source package under the
-//   Free BSD licence (see licence file for details).
+// This source file is part of the VAMPIRE open source package under the
+// GNU GPL (version 2) licence (see licence file for details).
 //
-//------------------------------------------------------------------------------
+// (c) S R H Morris 2017. All rights reserved.
 //
+//-----------------------------------------------------------------------------
 
 #ifndef VOPENCL_DATA_HPP_
 #define VOPENCL_DATA_HPP_

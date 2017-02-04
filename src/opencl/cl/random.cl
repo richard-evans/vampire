@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------
+//
+// This source file is part of the VAMPIRE open source package under the
+// GNU GPL (version 2) licence (see licence file for details).
+//
+// (c) S R H Morris 2017. All rights reserved.
+//
+//-----------------------------------------------------------------------------
+
 // xorshift* uniform prng with Box Muller transform
 
 #include "cl_defs.h"
@@ -20,8 +29,8 @@ void gen_grands(__global ulong  *const restrict state,
 
    for (size_t id=gid; id<(3*NUM_ATOMS)/2; id+=gsz)
    {
-      ulong s0 = xorshift(state[2*id+0]);
-      ulong s1 = xorshift(state[2*id+1]);
+      const ulong s0 = xorshift(state[2*id+0]);
+      const ulong s1 = xorshift(state[2*id+1]);
 
       state[2*id+0] = s0;
       state[2*id+1] = s1;
