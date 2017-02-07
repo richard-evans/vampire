@@ -11,7 +11,7 @@
 
 #include "cl_defs.h"
 
-ulong xorshift(ulong x)
+ulong2 xorshift(ulong2 x)
 {
    x ^= x >> 12;
    x ^= x << 25;
@@ -21,32 +21,37 @@ ulong xorshift(ulong x)
 }
 
 __kernel
-void gen_grands(__global ulong  *const restrict state,
-                __global real_t *const restrict grands)
+void gen_grands(__global ulong2  *const restrict state,
+                __global real_t2 *const restrict grands)
 {
    const size_t gid = get_global_id(0);
    const size_t gsz = get_global_size(0);
 
-   for (size_t id=gid; id<(3*NUM_ATOMS)/2; id+=gsz)
+   for (size_t i=gid; i<(3*NUM_ATOMS)/2; i+=gsz)
    {
-      const ulong s0 = xorshift(state[2*id+0]);
-      const ulong s1 = xorshift(state[2*id+1]);
+      ulong2 s = xorshift(state[i]);
 
-      state[2*id+0] = s0;
-      state[2*id+1] = s1;
+      state[i] = s;
 
-      // u0, u1 are between 0 and 1
+      // u.x, u.y are between 0 and 1
       const ulong c = 0x2545F4914F6CDD1Dul;
-      const real_t u0 = (s0 * c)/(real_t)0xFFFFFFFFFFFFFFFFul;
-      const real_t u1 = (s1 * c)/(real_t)0xFFFFFFFFFFFFFFFFul;
+      s *= c;
+      const real_t2 u =
+#ifdef OPENCL_DP
+         convert_double2(s)
+#else
+         convert_float2(s)
+#endif
+         /(real_t2)0xFFFFFFFFFFFFFFFFul;
 
-      const real_t r = SQRT(-2*LOG(u0));
+      const real_t r = SQRT(-2*LOG(u.x));
 
       // TODO: look into sincos(), sinpi(), cospi()
-      const real_t costheta = COS(2*PI*u1);
-      const real_t sintheta = SIN(2*PI*u1);
+      const real_t costheta = COS(2*PI*u.y);
+      const real_t sintheta = SIN(2*PI*u.y);
 
-      grands[2*id+0] = r * costheta;
-      grands[2*id+1] = r * sintheta;
+      real_t2 g = r * (real_t2)(costheta, sintheta);
+
+      grands[i] = g;
    }
 }
