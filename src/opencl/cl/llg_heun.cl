@@ -21,13 +21,6 @@ typedef struct
    real_t lambda_times_prefactor;
 } heun_params_t;
 
-real_t3 cross_product(const real_t3 A, const real_t3 B)
-{
-   return (real_t3)(A.y*B.z - A.z*B.y,
-                    A.z*B.x - A.x*B.z,
-                    A.x*B.y - A.y*B.x);
-}
-
 __kernel
 void llg_heun_predictor_step(const __global int *const restrict material_id,
                              const __global heun_params_t *const restrict heun_parameters,
@@ -63,10 +56,10 @@ void llg_heun_predictor_step(const __global int *const restrict material_id,
       const real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
       // S cross H
-      const real_t3 SxH = cross_product(S, H);
+      const real_t3 SxH = cross(S, H);
 
       // S cross (S cross H)
-      const real_t3 SxSxH = cross_product(S, SxH);
+      const real_t3 SxSxH = cross(S, SxH);
 
       // prefactor * (S cross H + lambda * S cross (S cross H))
       const real_t3 Schange = prefactor * SxH + lambdatpr * SxSxH;
@@ -84,11 +77,7 @@ void llg_heun_predictor_step(const __global int *const restrict material_id,
       real_t3 new_S = S + Schange * (real_t)DT;
 
       // normalization of spin
-      const real_t rmod_s = RSQRT(new_S.x*new_S.x +
-                                  new_S.y*new_S.y +
-                                  new_S.z*new_S.z);
-
-      new_S *= rmod_s;
+      new_S = normalize(new_S);
 
 #ifdef USE_VECTOR_TYPE
       spin[atom] = new_S;
@@ -136,10 +125,10 @@ void llg_heun_corrector_step(const __global int *const restrict material_id,
       const real_t lambdatpr = heun_parameters[mid].lambda_times_prefactor;
 
       // S cross H
-      const real_t3 SxH = cross_product(S, H);
+      const real_t3 SxH = cross(S, H);
 
       // S cross (S cross H)
-      const real_t3 SxSxH = cross_product(S, SxH);
+      const real_t3 SxSxH = cross(S, SxH);
 
       // new change in S
       const real_t3 dS_prime = prefactor * SxH + lambdatpr * SxSxH;
@@ -154,10 +143,7 @@ void llg_heun_corrector_step(const __global int *const restrict material_id,
 #endif
 
       // normalization of spin
-      const real_t rmod_s = RSQRT(S.x*S.x +
-                                  S.y*S.y +
-                                  S.z*S.z);
-      S *= rmod_s;
+      S = normalize(S);
 
 #ifdef USE_VECTOR_TYPE
       spin[atom] = S;
