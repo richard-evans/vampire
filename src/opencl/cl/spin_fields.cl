@@ -46,8 +46,7 @@ void update_nexch_spin_fields(const __global int *const restrict material,
                                   mat.anisotropy_unit_y,
                                   mat.anisotropy_unit_z);
 
-      const real_t3 tmp = S * e;
-      const real_t sdote  = tmp.x + tmp.y + tmp.z;
+      const real_t sdote = dot(S, e);
       const real_t sdote3 = sdote * sdote * sdote;
       const real_t sdote5 = sdote3 * sdote * sdote;
 
