@@ -99,6 +99,7 @@ namespace create{
          create::internal::voronoi_grain_spacing=pspacing;
          return true;
       }
+      //--------------------------------------------------------------------
       test="cone";
       if(word==test){
          cs::system_creation_flags[1]=8;
@@ -112,7 +113,28 @@ namespace create{
          create::internal::cone_angle=angle;
          return true;
 		}
-
+      //--------------------------------------------------------------------
+      test="bubble";
+      if(word==test){
+         cs::system_creation_flags[1]=9;
+         return true;
+		}
+      //--------------------------------------------------------------------
+      test="bubble-radius";
+      if(word==test){
+         double r=atof(value.c_str());
+         vin::check_for_valid_value(r, word, line, prefix, unit, "none", 0.0,1.0 ,"input","0.0 - 1.0");
+         create::internal::bubble_radius=r;
+         return true;
+		}
+      //--------------------------------------------------------------------
+      test="bubble-nucleation-height";
+      if(word==test){
+         double nh=atof(value.c_str());
+         vin::check_for_valid_value(nh, word, line, prefix, unit, "none", 0.0,1.0 ,"input","0.0 - 1.0");
+         create::internal::bubble_nucleation_height=nh;
+         return true;
+      }
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);
