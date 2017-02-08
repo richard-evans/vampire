@@ -33,7 +33,7 @@ namespace create{
          else return true;
       }
 
-      void bubble(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+      void bubble(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain){
 
 			// Set particle radius
          const double particle_radius_squared = (cs::particle_scale*0.5)*(cs::particle_scale*0.5);

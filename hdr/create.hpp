@@ -339,7 +339,7 @@ int bulk(std::vector<cs::catom_t> &);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int cube(double[], std::vector<cs::catom_t> &,const int);
+int cube(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
 
 /// @brief This is the brief (one line only) description of the function.
 ///
@@ -362,32 +362,9 @@ int cube(double[], std::vector<cs::catom_t> &,const int);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int sphere(double[], std::vector<cs::catom_t> &,const int);
+int sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
 
-extern void ellipsoid(double[], std::vector<cs::catom_t> &,const int);
-
-/// @brief This is the brief (one line only) description of the function.
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    05/03/2010
-///
-/// @param[in] input variable
-/// @param[out] ouput variable
-/// @param[in,out] input/output variable
-/// @return variable returned from the function
-///
-/// @internal
-///	Created:		05/03/2010
-///	Revision:	  ---
-///=====================================================================================
-///
-int cylinder(double[], std::vector<cs::catom_t> &,const int);
+extern void ellipsoid(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
 
 /// @brief This is the brief (one line only) description of the function.
 ///
@@ -410,8 +387,31 @@ int cylinder(double[], std::vector<cs::catom_t> &,const int);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int truncated_octahedron(double[], std::vector<cs::catom_t> &,const int);
-int tear_drop(double[], std::vector<cs::catom_t> &,const int);
+int cylinder(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
+
+/// @brief This is the brief (one line only) description of the function.
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, rfle500@york.ac.uk
+/// @version 1.0
+/// @date    05/03/2010
+///
+/// @param[in] input variable
+/// @param[out] ouput variable
+/// @param[in,out] input/output variable
+/// @return variable returned from the function
+///
+/// @internal
+///	Created:		05/03/2010
+///	Revision:	  ---
+///=====================================================================================
+///
+int truncated_octahedron(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
+int tear_drop(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
 
 int sort_atoms_by_grain(std::vector<cs::catom_t> &);
 void clear_atoms(std::vector<cs::catom_t> &);

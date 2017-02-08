@@ -107,9 +107,9 @@ namespace create{
       // Internal functions for create module
       //-----------------------------------------------------------------------------
       extern void alloy(std::vector<cs::catom_t> & catom_array);
-      extern void bubble(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
-      extern void faceted(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
-      extern void cone(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void bubble(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void voronoi_substructure(std::vector<cs::catom_t> & catom_array);
 
       void voronoi_grain_rounding(std::vector <std::vector <double> > & grain_coord_array,
