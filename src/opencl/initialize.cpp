@@ -29,6 +29,7 @@
 #include "vopencl.hpp"
 
 // vopencl module headers
+#include "cl/material_type.h"
 #include "data.hpp"
 #include "init_kernels.hpp"
 #include "internal.hpp"
@@ -305,14 +306,42 @@ namespace vopencl
 
       bool initialize_materials(void) noexcept
       {
+         std::vector<material_parameters_t> h_materials(::mp::num_materials);
+         for (unsigned i=0; i<::mp::num_materials; ++i)
+         {
+            double mu_s_si = ::mp::material[i].mu_s_SI;
+
+            h_materials[i].alpha = ::mp::material[i].alpha;
+            h_materials[i].gamma_rel = ::mp::material[i].gamma_rel;
+            h_materials[i].mu_s_si = mu_s_si;
+            h_materials[i].i_mu_s_si = 1.0 / mu_s_si;
+            h_materials[i].k_latt = ::mp::material[i].Klatt_SI / mu_s_si;
+            h_materials[i].sh2 = ::mp::material[i].sh2 / mu_s_si;
+            h_materials[i].sh4 = ::mp::material[i].sh4 / mu_s_si;
+            h_materials[i].sh6 = ::mp::material[i].sh6 / mu_s_si;
+            h_materials[i].ku = ::mp::material[i].Ku;
+            h_materials[i].anisotropy_unit_x = ::mp::material[i].UniaxialAnisotropyUnitVector[0];
+            h_materials[i].anisotropy_unit_y = ::mp::material[i].UniaxialAnisotropyUnitVector[1];
+            h_materials[i].anisotropy_unit_z = ::mp::material[i].UniaxialAnisotropyUnitVector[2];
+            h_materials[i].applied_field_strength = ::mp::material[i].applied_field_strength;
+            h_materials[i].applied_field_unit_x = ::mp::material[i].applied_field_unit_vector[0];
+            h_materials[i].applied_field_unit_y = ::mp::material[i].applied_field_unit_vector[1];
+            h_materials[i].applied_field_unit_z = ::mp::material[i].applied_field_unit_vector[2];
+            h_materials[i].Kc1_SI = ::mp::material[i].Kc1_SI;
+            h_materials[i].temperature = ::mp::material[i].temperature;
+            h_materials[i].temperature_rescaling_alpha = ::mp::material[i].temperature_rescaling_alpha;
+            h_materials[i].temperature_rescaling_Tc = ::mp::material[i].temperature_rescaling_Tc;
+            h_materials[i].H_th_sigma = ::mp::material[i].H_th_sigma;
+         }
+
          // Allocate device memory and initialize materials array
-         const size_t buff_size = ::mp::num_materials * sizeof ::mp::material[0];
+         const size_t buff_size = ::mp::num_materials * sizeof h_materials[0];
          vcl::mp::materials = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
          vcl::queue.enqueueWriteBuffer(vcl::mp::materials,
                                        CL_FALSE,
                                        0,
                                        buff_size,
-                                       ::mp::material.data());
+                                       h_materials.data());
 
          return true;
       }

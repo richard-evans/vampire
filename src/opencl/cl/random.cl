@@ -42,7 +42,7 @@ void gen_grands(__global ulong2  *const restrict state,
 #else
          convert_float2(s)
 #endif
-         /(real_t2)0xFFFFFFFFFFFFFFFFul;
+         /0xFFFFFFFFFFFFFFFFul;
 
       const real_t r = SQRT(-2*LOG(u.x));
 

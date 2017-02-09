@@ -10,7 +10,13 @@
 #ifndef VOPENCL_MATERIAL_TYPE_H_
 #define VOPENCL_MATERIAL_TYPE_H_
 
+// this header is included in the host C++ code as well as OpenCL code
+#ifdef __cplusplus
+#include "../typedefs.hpp"
+typedef vcl::real_t real_t;
+#else
 #include "cl_defs.h"
+#endif
 
 typedef struct
 {
