@@ -40,11 +40,17 @@ parse_input()
 
 voutput = open("output")
 lines = voutput.readlines()
+max_error = 0.0
+
 for line in lines:
     if line[:1] != "#" and len(line) > 1:
         data = [float(i) for i in line.split()]
         time = data[0]
         spin = data[1:4]
         analytic_spin = S(time)
-        errors = [a-b for a,b in zip(spin, analytic_spin)]
+        errors = [abs(a-b) for a,b in zip(spin, analytic_spin)]
         print(time, errors[0], errors[1], errors[2])
+
+        max_error = max(max_error, max(errors))
+
+print("# maximum error = ", max_error)
