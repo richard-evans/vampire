@@ -220,7 +220,7 @@ namespace vopencl
                                        ::atoms::type_array.data());
 
          // Allocate and initialize cell information
-         buff_size = ::atoms::cell_array.size() * sizeof ::atoms::cell_array;
+         buff_size = ::atoms::cell_array.size() * sizeof ::atoms::cell_array[0];
          vcl::atoms::cell_array = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buff_size);
          vcl::queue.enqueueWriteBuffer(vcl::atoms::cell_array,
                                        CL_FALSE,
@@ -266,7 +266,7 @@ namespace vopencl
       bool initialize_cells(void) noexcept
       {
          // Allocate device memory and initialize coordinates
-         vcl::cells::coord_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+         vcl::cells::coord_array = vcl::Buffer3D<vcl::real_t>(vcl::context, vcl::queue, CL_MEM_READ_ONLY,
                                                               ::cells::x_coord_array,
                                                               ::cells::y_coord_array,
                                                               ::cells::z_coord_array);
@@ -372,81 +372,9 @@ namespace vopencl
                                        buff_size,
                                        ::atoms::neighbour_list_array.data());
 
-         vcl::queue.finish();
          return true;
       }
 
-      bool initialize_stats(void) noexcept
-      {
-         std::vector<cl_int> mask;
-         std::vector<double> saturations;
-
-         // system magnetization
-         ::stats::system_magnetization.get_mask(mask, saturations);
-         vcl::stats::system_mask_size = saturations.size();
-         const size_t sys_mask_buffer_size = mask.size() * sizeof(mask[0]);
-         const size_t sys_sats_buffer_size = 4 * saturations.size() * sizeof(vcl::real_t);
-         if (sys_mask_buffer_size != 0)
-         {
-            vcl::stats::system_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, sys_mask_buffer_size);
-            vcl::queue.enqueueWriteBuffer(vcl::stats::system_mask, CL_FALSE, 0, sys_mask_buffer_size, mask.data());
-         }
-         if (sys_sats_buffer_size != 0)
-         {
-            vcl::stats::system_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, sys_sats_buffer_size);
-            vcl::stats::system_mean_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, sys_sats_buffer_size);
-         }
-
-         // material magnetization
-         ::stats::material_magnetization.get_mask(mask, saturations);
-         vcl::stats::material_mask_size = saturations.size();
-         const size_t mat_mask_buffer_size = mask.size() * sizeof(mask[0]);
-         const size_t mat_sats_buffer_size = 4 * saturations.size() * sizeof(vcl::real_t);
-         if (mat_mask_buffer_size != 0)
-         {
-            vcl::stats::material_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_mask_buffer_size);
-            vcl::queue.enqueueWriteBuffer(vcl::stats::material_mask, CL_FALSE, 0, mat_mask_buffer_size, mask.data());
-         }
-         if (mat_sats_buffer_size != 0)
-         {
-            vcl::stats::material_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_sats_buffer_size);
-            vcl::stats::material_mean_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_sats_buffer_size);
-         }
-
-         // height magnetization
-         ::stats::height_magnetization.get_mask(mask, saturations);
-         vcl::stats::height_mask_size = saturations.size();
-         const size_t height_mask_buffer_size = mask.size() * sizeof(mask[0]);
-         const size_t height_sats_buffer_size = 4 * saturations.size() * sizeof(vcl::real_t);
-         if (height_mask_buffer_size != 0)
-         {
-            vcl::stats::height_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, height_mask_buffer_size);
-            vcl::queue.enqueueWriteBuffer(vcl::stats::height_mask, CL_FALSE, 0, height_mask_buffer_size, mask.data());
-         }
-         if (height_sats_buffer_size != 0)
-         {
-            vcl::stats::height_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, height_sats_buffer_size);
-            vcl::stats::height_mean_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, height_sats_buffer_size);
-         }
-
-         // material height magnetization
-         ::stats::material_height_magnetization.get_mask(mask, saturations);
-         vcl::stats::material_height_mask_size = saturations.size();
-         const size_t mat_h_mask_buffer_size = mask.size() * sizeof(mask[0]);
-         const size_t mat_h_sats_buffer_size = 4 * saturations.size() * sizeof(vcl::real_t);
-         if (mat_h_mask_buffer_size != 0)
-         {
-            vcl::stats::material_height_mask = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_h_mask_buffer_size);
-            vcl::queue.enqueueWriteBuffer(vcl::stats::material_height_mask, CL_FALSE, 0, mat_h_mask_buffer_size, mask.data());
-         }
-         if (mat_h_sats_buffer_size != 0)
-         {
-            vcl::stats::material_height_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_h_sats_buffer_size);
-            vcl::stats::material_height_mean_magnetization = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, mat_h_sats_buffer_size);
-         }
-
-         return true;
-      }
 
       static cl_ulong rand64(void) noexcept
       {
@@ -486,7 +414,6 @@ namespace vopencl
 
          vcl::queue.enqueueWriteBuffer(vcl::rng::state, CL_FALSE, 0, u_buffer_size, rs.data());
 
-         vcl::queue.finish();
          return true;
       }
    }
