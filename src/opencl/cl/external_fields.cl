@@ -18,7 +18,7 @@ typedef real_t T;
 
 __kernel
 void update_external_fields(const __global int *const restrict material,
-                            const __global material_parameters_t *const restrict material_params,
+                            const __constant material_parameters_t *const restrict material_params,
                             const __global T *const restrict dip_field,
                             __global T *const restrict ext_field,
                             const __global real_t *const restrict gaussian_rand,
