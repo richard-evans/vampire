@@ -50,11 +50,7 @@ namespace vopencl
          size_t buffer_size;
 
 #ifdef USE_VECTOR_TYPE
-#ifdef OPENCL_DP
-         typedef cl_double3 Rv;
-#else
-         typedef cl_float3 Rv;
-#endif // OPENCL_DP
+         typedef vcl::real_t3 Rv;
          unsigned v = 1;
 #else
          typedef T Rv;
@@ -63,7 +59,7 @@ namespace vopencl
 
       public:
 
-         Buffer3D(void) noexcept : buff_container(0), n_elems(0), buffer_size(0)  {}
+         Buffer3D(void) {}
 
          // initialize without writing, but with size
          // e.g. for use when generating buffer on device

@@ -25,20 +25,33 @@ mv Co.mat Co.mat.bak
 
 
 #### Test One ####
-echo -n "Testing single spin in magnetic field....."
+echo -n "Testing applied magnetic field....."
+
+dir=tests/physical/AppliedField
 
 # use single spin in magnetic field input and material files
-cp tests/physical/single_spin_input input
-cp tests/physical/single_spin_mat Co.mat
+cp $dir/input input
+cp $dir/Co.mat Co.mat
 
 ./vampire &>/dev/null
 
 # check vampire output against analytic results
-tests/physical/single_spin_errors.py > single_spin_errors.dat
-max_error=$(grep "# maximum error = " single_spin_errors.dat | awk '{print $5}')
+$dir/applied_field_errors.py > applied_field_errors.dat
+max_error=$(grep "# maximum error = " applied_field_errors.dat | awk '{print $5}')
 is_within_tolerance $max_error
 #### End Test One ####
 
+#### Test Two ####
+echo -n "Testing thermal effects............"
+
+dir=tests/physical/Thermal
+
+cp $dir/input input
+cp $dir/Co.mat Co.mat
+
+./vampire
+
+is_within_tolerance 0.01
 
 
 # restore old input and material file
