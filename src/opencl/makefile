@@ -30,7 +30,7 @@ $(OPENCL_CFLAGS)
 
 OPENCL_DEBUG_CFLAGS:=\
 -Og -g \
--fno-fast-math -Wall -Wextra -Wpedantic -Wshadow \
+-fno-fast-math -Wall -Wextra -Wpedantic \
 -UNDEBUG -DOPENCL_DEBUG -DENABLE_OPENCL_TESTS
 
 OPENCL_LIBS=-lOpenCL
@@ -59,7 +59,7 @@ opencl: $(OBJECTS) $(OPENCL_OBJECTS)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
 
 opencl-debug:
-	OPENCL_CFLAGS+="$(OPENCL_DEBUG_CFLAGS)" $(MAKE) opencl
+	OPENCL_CFLAGS+=" $(OPENCL_DEBUG_CFLAGS)" $(MAKE) opencl
 
 
 

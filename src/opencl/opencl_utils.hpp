@@ -94,6 +94,22 @@ namespace vopencl
                        const cl::NDRange gbl=vcl::global,      /* total number of work items */
                        const cl::NDRange lcl=vcl::local) noexcept;     /* number of work items in group */
 
+      // function to create a device buffer from a host vector
+      // defaults to a read/write buffer written with a non blocking write
+      template <typename T>
+      cl::Buffer create_device_buffer(const std::vector<T> &host_vector,
+				      const cl_mem_flags mem_flags=CL_MEM_READ_WRITE,
+				      const cl_bool blocking=CL_FALSE,
+				      const cl::Context &context=vcl::context,
+				      const cl::CommandQueue &queue=vcl::queue)
+      {
+	 const size_t buffer_size = host_vector.size() * sizeof(T);
+	 cl::Buffer device_buffer(context, mem_flags, buffer_size);
+	 queue.enqueueWriteBuffer(device_buffer, blocking, 0, buffer_size, host_vector.data());
+
+	 return device_buffer;
+      }
+
    }
 }
 
