@@ -211,7 +211,7 @@ namespace vopencl
 
          // Allocate and initialize device memory for atomic information
 	 vcl::atoms::type_array = vcl::create_device_buffer(::atoms::type_array, CL_MEM_READ_ONLY);
-							    
+
          // Allocate and initialize cell information
 	 vcl::atoms::cell_array = vcl::create_device_buffer(::atoms::cell_array, CL_MEM_READ_ONLY);
 
@@ -300,7 +300,7 @@ namespace vopencl
             h_materials[i].temperature = ::mp::material[i].temperature;
             h_materials[i].temperature_rescaling_alpha = ::mp::material[i].temperature_rescaling_alpha;
             h_materials[i].temperature_rescaling_Tc = ::mp::material[i].temperature_rescaling_Tc;
-	    h_materials[i].H_th_sigma = ::mp::material[i].H_th_sigma;
+            h_materials[i].H_th_sigma = ::mp::material[i].H_th_sigma;
          }
 
          // Allocate device memory and initialize materials array
