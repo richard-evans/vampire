@@ -49,7 +49,7 @@ dir=tests/physical/Thermal
 cp $dir/input input
 cp $dir/Co.mat Co.mat
 
-./vampire
+#./vampire &>/dev/null
 
 is_within_tolerance 0.01
 
