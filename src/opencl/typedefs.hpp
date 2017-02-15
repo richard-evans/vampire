@@ -83,6 +83,10 @@ namespace vopencl
                   const std::vector<R> &zs) noexcept
             : buff_container(1)
          {
+            assert(xs.data() != nullptr);
+            assert(ys.data() != nullptr);
+            assert(zs.data() != nullptr);
+
             n_elems = xs.size();
             buffer_size = n_elems * v * sizeof(Rv);
 
@@ -100,7 +104,7 @@ namespace vopencl
 #endif
             }
 
-            q.enqueueWriteBuffer(buff_container[0], CL_TRUE, 0, buffer_size, &buff[0]);
+            q.enqueueWriteBuffer(buff_container[0], CL_TRUE, 0, buffer_size, buff.data());
          }
 
          // reads data from device, assumes host vectors already have enough capacity
@@ -110,8 +114,12 @@ namespace vopencl
                            std::vector<R> &ys,
                            std::vector<R> &zs) const noexcept
          {
+            assert(xs.size() == n_elems);
+            assert(ys.size() == n_elems);
+            assert(zs.size() == n_elems);
+
             std::vector<Rv> buff(v*n_elems);
-            q.enqueueReadBuffer(buff_container[0], CL_TRUE, 0, buffer_size, &buff[0]);
+            q.enqueueReadBuffer(buff_container[0], CL_TRUE, 0, buffer_size, buff.data());
 
             for (size_t i=0; i<n_elems; ++i)
             {
@@ -143,7 +151,7 @@ namespace vopencl
             vcl::queue.enqueueFillBuffer(buff_container[0], &zero, sizeof(Rv), v*n_elems);
 #else
             const std::vector<Rv> zeros(3*n_elems, {0.0});
-            vcl::queue.enqueueWriteBuffer(buff_container[0], CL_FALSE, 0, buffer_size, &zeros[0]);
+            vcl::queue.enqueueWriteBuffer(buff_container[0], CL_FALSE, 0, buffer_size, zeros.data());
 #endif // CL_API_SUFFIX__VERSION_1_2
 
             vcl::queue.finish();

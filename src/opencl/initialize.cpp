@@ -38,10 +38,6 @@
 #include "statistics.hpp"
 #include "typedefs.hpp"
 
-#ifdef ENABLE_OPENCL_TESTS
-#include "tests/tests.hpp"
-#endif
-
 #ifdef OPENCL
 namespace vcl = ::vopencl::internal;
 #endif
@@ -156,23 +152,12 @@ namespace vopencl
       // build all OpenCL kernels
       vcl::build_kernels();
 
-#ifdef ENABLE_OPENCL_TESTS
-      if(!vcl::test::all())
-      {
-         terminaltextcolor(RED);
-         std::cerr << "At least one OpenCL test has failed. Aborting." << std::endl;
-         terminaltextcolor(WHITE);
-         ::err::vexit();
-      }
-#endif
-
       success = true;
 
       success &= vcl::initialize_atoms();
       success &= vcl::initialize_fields();
       success &= vcl::initialize_cells();
       success &= vcl::initialize_materials();
-      success &= vcl::initialize_topology();
       success &= vcl::initialize_rng();
       success &= vcl::initialize_kernels();
 
@@ -308,24 +293,6 @@ namespace vopencl
 
          return true;
       }
-
-      bool initialize_topology(void) noexcept
-      {
-         std::vector<cl_uint> limits_h(::atoms::num_atoms+1);
-         limits_h[0] = 0;
-         for (int atom=0; atom<::atoms::num_atoms; ++atom)
-         {
-            limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
-         }
-
-         // Allocate device memory and initialize limits array
-         vcl::atoms::limits = vcl::create_device_buffer(limits_h, CL_MEM_READ_ONLY);
-
-         vcl::atoms::neighbours = vcl::create_device_buffer(::atoms::neighbour_list_array, CL_MEM_READ_ONLY);
-
-         return true;
-      }
-
 
       static cl_ulong rand64(void) noexcept
       {

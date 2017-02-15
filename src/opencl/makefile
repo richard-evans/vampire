@@ -31,7 +31,7 @@ $(OPENCL_CFLAGS)
 OPENCL_DEBUG_CFLAGS:=\
 -Og -g \
 -fno-fast-math -Wall -Wextra -Wpedantic \
--UNDEBUG -DOPENCL_DEBUG -DENABLE_OPENCL_TESTS
+-UNDEBUG -DOPENCL_DEBUG
 
 OPENCL_LIBS=-lOpenCL
 
@@ -47,8 +47,6 @@ obj/opencl/init_kernels.o \
 obj/opencl/llg_heun.o \
 obj/opencl/opencl_utils.o \
 obj/opencl/statistics.o \
-obj/opencl/tests/all.o \
-obj/opencl/tests/matmul.o
 
 # each object depends on .cpp and .hpp
 # this will rebuild them if the .hpp changes

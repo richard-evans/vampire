@@ -10,6 +10,7 @@
 #ifndef VOPENCL_OPENCL_UTILS_HPP_
 #define VOPENCL_OPENCL_UTILS_HPP_
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -24,25 +25,6 @@
 
 namespace vcl = ::vopencl::internal;
 
-static std::string get_error(const cl_int err) noexcept
-{
-   switch (err)
-   {
-   case CL_INVALID_VALUE:
-      return "CL_INVALID_VALUE";
-   case CL_INVALID_KERNEL:
-      return "CL_INVALID_KERNEL";
-   case CL_OUT_OF_RESOURCES:
-      return "CL_OUT_OF_RESOURCES";
-   case CL_OUT_OF_HOST_MEMORY:
-      return "CL_OUT_OF_HOST_MEMORY";
-   default:
-      std::ostringstream code;
-      code << err;
-      return std::string("unknown error code ").append(code.str());
-   }
-}
-
 // functions to pass given arguments to kernel k which recursively sets argument i
 // the following function is needed for when all the arguments have been set
 static void pass_args(const cl::Kernel &k, const unsigned i) noexcept
@@ -55,14 +37,14 @@ static void pass_args(const cl::Kernel &k, const unsigned i) noexcept
 template <typename Car, typename... Cdr>
 static void pass_args(cl::Kernel &k, const unsigned i, const Car &car, const Cdr &... cdr) noexcept
 {
-   cl_int err;
-   if ((err = k.setArg(i, car)) == CL_SUCCESS)
+   cl_int ec;
+   if ((ec = k.setArg(i, car)) == CL_SUCCESS)
       pass_args(k, i+1, cdr...);
    else
    {
       std::cerr << "Error setting kernel argument " << (i-1);
       std::cerr << " in kernel " << k.getInfo<CL_KERNEL_FUNCTION_NAME>() << std::endl;
-      std::cerr << "error code " << get_error(err) << std::endl;
+      std::cerr << "error code " << ec << std::endl;
       ::err::vexit();
    }
 }
@@ -105,11 +87,19 @@ namespace vopencl
       {
          const size_t buffer_size = host_vector.size() * sizeof(T);
          cl::Buffer device_buffer(context, mem_flags, buffer_size);
-         queue.enqueueWriteBuffer(device_buffer, blocking, 0, buffer_size, host_vector.data());
 
+         if (buffer_size != 0)
+         {
+            cl_int ec = queue.enqueueWriteBuffer(device_buffer, blocking, 0, buffer_size, host_vector.data());
+
+            if (ec != CL_SUCCESS)
+            {
+               std::cerr << "Error in create_device_buffer, enqueueWriteBuffer returned " << ec << std::endl;
+               ::err::vexit();
+            }
+         }
          return device_buffer;
       }
-
    }
 }
 

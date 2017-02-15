@@ -67,6 +67,12 @@ static void init_exchange(void)
 {
    const size_t vsize = ::atoms::neighbour_list_array.size();
 
+#ifdef USE_VECTOR_TYPE
+   std::vector<vcl::real_t3> J_vals_h(vsize);
+#else
+   std::vector<vcl::real_t> J_vals_h(3*vsize);
+#endif
+
    switch (::atoms::exchange_type)
    {
    case 0:
@@ -74,13 +80,6 @@ static void init_exchange(void)
       // Jxx = Jyy = Jzz
       // Jxy = Jxz = Jyx = 0
    {
-
-#ifdef USE_VECTOR_TYPE
-      std::vector<vcl::real_t3> J_vals_h(vsize);
-#else
-      std::vector<vcl::real_t> J_vals_h(3*vsize);
-#endif
-
       for (unsigned i=0; i<vsize; ++i)
       {
          const int iid = ::atoms::neighbour_interaction_type_array[i];
@@ -95,10 +94,7 @@ static void init_exchange(void)
          J_vals_h[xxi] = J_vals_h[yyi] = J_vals_h[zzi] = - Jij;
 #endif
       }
-
-      size_t buffer_size = J_vals_h.size() * sizeof(J_vals_h[0]);
-      vcl::exchange::J_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, buffer_size);
-      vcl::queue.enqueueWriteBuffer(vcl::exchange::J_vals_d, CL_FALSE, 0, buffer_size, J_vals_h.data());
+      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY);
    }
    break;
    case 1:
@@ -130,11 +126,7 @@ static void init_exchange(void)
          J_vals_h[zzi] = - vel.Jij[2];
 #endif
       }
-
-      const size_t sz = J_vals_h.size() * sizeof J_vals_h[0];
-      vcl::exchange::J_vals_d = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, sz);
-
-      vcl::queue.enqueueWriteBuffer(vcl::exchange::J_vals_d, CL_FALSE, 0, sz, J_vals_h.data());
+      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY);
    }
    break;
 
@@ -142,6 +134,19 @@ static void init_exchange(void)
       // Tensor
       break;
    }
+
+   std::vector<cl_uint> limits_h(::atoms::num_atoms+1);
+   limits_h[0] = 0;
+   for (int atom=0; atom<::atoms::num_atoms; ++atom)
+   {
+      limits_h[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+   }
+
+   // Allocate device memory and initialize limits array
+   vcl::atoms::limits = vcl::create_device_buffer(limits_h, CL_MEM_READ_ONLY);
+
+   if (::atoms::num_atoms > 1)
+      vcl::atoms::neighbours = vcl::create_device_buffer(::atoms::neighbour_list_array, CL_MEM_READ_ONLY);
 
    vcl::set_kernel_args(vcl::exchange::calculate_exchange,
                         vcl::exchange::J_vals_d,
@@ -177,9 +182,6 @@ static void init_llg(void)
    vcl::llg::dS_array =
       vcl::Buffer3D<vcl::real_t>(vcl::context, CL_MEM_READ_WRITE, num_atms);
 
-   vcl::llg::heun_parameters_device =
-      cl::Buffer(vcl::context, CL_MEM_READ_ONLY, num_mats*sizeof(vcl::heun_parameter_t));
-
    std::vector<vcl::heun_parameter_t> heun_params_host(num_mats);
 
    for (unsigned i=0; i<num_mats; ++i)
@@ -192,10 +194,7 @@ static void init_llg(void)
                                                     (1.0 + alpha*alpha));
    }
 
-   vcl::queue.enqueueWriteBuffer(vcl::llg::heun_parameters_device,
-                                 CL_FALSE, 0,
-                                 num_mats*sizeof(vcl::heun_parameter_t),
-                                 &heun_params_host[0]);
+   vcl::llg::heun_parameters_device = vcl::create_device_buffer(heun_params_host, CL_MEM_READ_ONLY);
 
    vcl::set_kernel_args(vcl::llg::predictor_step,
                         vcl::atoms::type_array,
