@@ -111,28 +111,7 @@ namespace vopencl
 
       namespace stats
       {
-         bool use_cpu = false;
-         long counter(0L);
-
-         cl::Buffer system_mask;
-         cl::Buffer system_magnetization;
-         cl::Buffer system_mean_magnetization;
-         int system_mask_size(0);
-
-         cl::Buffer material_mask;
-         cl::Buffer material_magnetization;
-         cl::Buffer material_mean_magnetization;
-         int material_mask_size(0);
-
-         cl::Buffer height_mask;
-         cl::Buffer height_magnetization;
-         cl::Buffer height_mean_magnetization;
-         int height_mask_size(0);
-
-         cl::Buffer material_height_mask;
-         cl::Buffer material_height_magnetization;
-         cl::Buffer material_height_mean_magnetization;
-         int material_height_mask_size(0);
+         bool use_cpu = true;
       }
    } // end of internal namespace
 } // end of vopencl namespace
