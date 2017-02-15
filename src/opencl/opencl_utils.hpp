@@ -84,7 +84,7 @@ namespace vopencl
       template <typename... Ts>
       static void set_kernel_args(cl::Kernel &k, Ts &&... Args) noexcept
       {
-          pass_args(k, 0, Args...);
+         pass_args(k, 0, Args...);
       }
 
       // function to enqueue a kernel
@@ -98,16 +98,16 @@ namespace vopencl
       // defaults to a read/write buffer written with a non blocking write
       template <typename T>
       cl::Buffer create_device_buffer(const std::vector<T> &host_vector,
-				      const cl_mem_flags mem_flags=CL_MEM_READ_WRITE,
-				      const cl_bool blocking=CL_FALSE,
-				      const cl::Context &context=vcl::context,
-				      const cl::CommandQueue &queue=vcl::queue)
+                                      const cl_mem_flags mem_flags=CL_MEM_READ_WRITE,
+                                      const cl_bool blocking=CL_FALSE,
+                                      const cl::Context &context=vcl::context,
+                                      const cl::CommandQueue &queue=vcl::queue)
       {
-	 const size_t buffer_size = host_vector.size() * sizeof(T);
-	 cl::Buffer device_buffer(context, mem_flags, buffer_size);
-	 queue.enqueueWriteBuffer(device_buffer, blocking, 0, buffer_size, host_vector.data());
+         const size_t buffer_size = host_vector.size() * sizeof(T);
+         cl::Buffer device_buffer(context, mem_flags, buffer_size);
+         queue.enqueueWriteBuffer(device_buffer, blocking, 0, buffer_size, host_vector.data());
 
-	 return device_buffer;
+         return device_buffer;
       }
 
    }

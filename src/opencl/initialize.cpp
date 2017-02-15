@@ -210,13 +210,13 @@ namespace vopencl
                                                               ::atoms::z_coord_array);
 
          // Allocate and initialize device memory for atomic information
-	 vcl::atoms::type_array = vcl::create_device_buffer(::atoms::type_array, CL_MEM_READ_ONLY);
+         vcl::atoms::type_array = vcl::create_device_buffer(::atoms::type_array, CL_MEM_READ_ONLY);
 
          // Allocate and initialize cell information
-	 vcl::atoms::cell_array = vcl::create_device_buffer(::atoms::cell_array, CL_MEM_READ_ONLY);
+         vcl::atoms::cell_array = vcl::create_device_buffer(::atoms::cell_array, CL_MEM_READ_ONLY);
 
          // Allocate and initialize unrolled spin norm array
-	 vcl::atoms::spin_norm_array = vcl::create_device_buffer(::atoms::m_spin_array, CL_MEM_READ_WRITE);
+         vcl::atoms::spin_norm_array = vcl::create_device_buffer(::atoms::m_spin_array, CL_MEM_READ_WRITE);
 
          return true;
       }
@@ -265,10 +265,10 @@ namespace vopencl
                                                               ::cells::z_field_array);
 
          // Allocate device memory and initialize voulme array
-	 vcl::cells::volume_array = vcl::create_device_buffer(::cells::volume_array, CL_MEM_READ_ONLY);
+         vcl::cells::volume_array = vcl::create_device_buffer(::cells::volume_array, CL_MEM_READ_ONLY);
 
          // Allocate device memory and initialize number of atoms for each cell
-	 vcl::cells::num_atoms = vcl::create_device_buffer(::cells::num_atoms_in_cell, CL_MEM_READ_ONLY);
+         vcl::cells::num_atoms = vcl::create_device_buffer(::cells::num_atoms_in_cell, CL_MEM_READ_ONLY);
 
          return true;
       }
@@ -304,7 +304,7 @@ namespace vopencl
          }
 
          // Allocate device memory and initialize materials array
-	 vcl::mp::materials = vcl::create_device_buffer(h_materials, CL_MEM_READ_ONLY);
+         vcl::mp::materials = vcl::create_device_buffer(h_materials, CL_MEM_READ_ONLY);
 
          return true;
       }
@@ -319,9 +319,9 @@ namespace vopencl
          }
 
          // Allocate device memory and initialize limits array
-	 vcl::atoms::limits = vcl::create_device_buffer(limits_h, CL_MEM_READ_ONLY);
+         vcl::atoms::limits = vcl::create_device_buffer(limits_h, CL_MEM_READ_ONLY);
 
-	 vcl::atoms::neighbours = vcl::create_device_buffer(::atoms::neighbour_list_array, CL_MEM_READ_ONLY);
+         vcl::atoms::neighbours = vcl::create_device_buffer(::atoms::neighbour_list_array, CL_MEM_READ_ONLY);
 
          return true;
       }
@@ -360,7 +360,7 @@ namespace vopencl
          }
 
          vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
-	 vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE);
+         vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE);
 
          return true;
       }
