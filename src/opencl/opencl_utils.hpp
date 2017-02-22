@@ -18,6 +18,7 @@
 
 #include "errors.hpp"
 
+#include "debug.hpp"
 #include "internal.hpp"
 #include "opencl_include.hpp"
 
@@ -97,6 +98,11 @@ namespace vopencl
                std::cerr << "Error in create_device_buffer, enqueueWriteBuffer returned " << ec << std::endl;
                ::err::vexit();
             }
+
+#ifdef OPENCL_DEBUG
+	    queue.finish();
+	    vcl::debug::verify_copy(device_buffer, host_vector);
+#endif // OPENCL_DEBUG
          }
          return device_buffer;
       }
