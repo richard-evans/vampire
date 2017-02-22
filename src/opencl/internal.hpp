@@ -17,6 +17,7 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
+#include <chrono>
 #include <string>
 #include <fstream>
 
@@ -36,6 +37,12 @@ namespace vopencl
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
+
+      namespace time
+      {
+         typedef std::chrono::time_point<std::chrono::high_resolution_clock> time_t;
+         extern time_t sim_start;
+      }
 
       // number of work items
       extern cl::NDRange global;

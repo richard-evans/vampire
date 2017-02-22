@@ -8,15 +8,12 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
-
-#ifdef OPENCL_DEBUG
-#include <chrono>
-#endif // OPENCL_DEBUG
 
 // Vampire headers
 #include "atoms.hpp"
@@ -40,15 +37,23 @@
 
 #ifdef OPENCL
 namespace vcl = ::vopencl::internal;
-#endif
 
 namespace vopencl
 {
    namespace internal
    {
       cl::NDRange global;
-   }
 
+      namespace time
+      {
+         vcl::time::time_t sim_start;
+      }
+   }
+}
+#endif // OPENCL
+
+namespace vopencl
+{
    //----------------------------------------------------------------------------
    // Function to initialize vopencl module
    //----------------------------------------------------------------------------
@@ -172,11 +177,11 @@ namespace vopencl
 
       vcl::queue.finish();
 
-#ifdef OPENCL_DEBUG
       auto end = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> diff = end - start;
       std::cout << "OpenCL initialization took " << diff.count() << " seconds." << std::endl;
-#endif // OPENCL_DEBUG
+
+      vcl::time::sim_start = std::chrono::high_resolution_clock::now();
 #endif // OPENCL
 
       return success;
