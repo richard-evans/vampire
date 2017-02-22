@@ -63,9 +63,8 @@ namespace vopencl
 
 #ifdef OPENCL
 
-#ifdef OPENCL_DEBUG
+      // initialisation start time
       auto start = std::chrono::high_resolution_clock::now();
-#endif //OPENCL_DEBUG
 
       std::string message("OpenCL has been enabled in "
 #ifdef OPENCL_DP
@@ -177,10 +176,12 @@ namespace vopencl
 
       vcl::queue.finish();
 
+      // initialisation end time
       auto end = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> diff = end - start;
       std::cout << "OpenCL initialization took " << diff.count() << " seconds." << std::endl;
 
+      // simulation start time
       vcl::time::sim_start = std::chrono::high_resolution_clock::now();
 #endif // OPENCL
 
