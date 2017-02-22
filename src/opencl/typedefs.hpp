@@ -29,7 +29,7 @@ namespace vopencl
       typedef cl_double3 real_t3;
 #else
       typedef cl_float  real_t;
-      typedef cl_float3 real_t3; 
+      typedef cl_float3 real_t3;
 #endif // OPENCL_DP
 
 
@@ -84,13 +84,11 @@ namespace vopencl
             : buff_container(1)
          {
             assert(xs.data() != nullptr);
-            assert(ys.data() != nullptr);
-            assert(zs.data() != nullptr);
+            assert(xs.size() == ys.size() &&
+                   xs.size() == zs.size());
 
             n_elems = xs.size();
             buffer_size = n_elems * v * sizeof(Rv);
-
-            buff_container[0] = cl::Buffer(c, fs, buffer_size);
 
             std::vector<Rv> buff(v*n_elems);
             for (size_t i=0; i<n_elems; ++i)
@@ -101,10 +99,10 @@ namespace vopencl
                buff[3*i+0] = T(xs[i]);
                buff[3*i+1] = T(ys[i]);
                buff[3*i+2] = T(zs[i]);
-#endif
+#endif // USE_VECTOR_TYPE
             }
 
-            q.enqueueWriteBuffer(buff_container[0], CL_TRUE, 0, buffer_size, buff.data());
+            buff_container[0] = vcl::create_device_buffer(buff, fs, CL_TRUE);
          }
 
          // reads data from device, assumes host vectors already have enough capacity
@@ -131,7 +129,7 @@ namespace vopencl
                xs[i] = R(buff[3*i+0]);
                ys[i] = R(buff[3*i+1]);
                zs[i] = R(buff[3*i+2]);
-#endif
+#endif // USE_VECTOR_TYPE
             }
          }
 
