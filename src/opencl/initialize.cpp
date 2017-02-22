@@ -62,16 +62,25 @@ namespace vopencl
       auto start = std::chrono::high_resolution_clock::now();
 #endif //OPENCL_DEBUG
 
-      std::string message("OpenCL has been enabled in ");
+      std::string message("OpenCL has been enabled in "
 #ifdef OPENCL_DP
-      message.append("double precision mode.");
+                          "double precision mode."
 #else
-      message.append("single precision mode.");
+                          "single precision mode."
 #endif // OPENCL_DP
 
 #ifdef OPENCL_USE_NATIVE_FUNCTIONS
-      message.append(" Native functions will be used.");
-#endif
+                          " Native functions will be used."
+#endif // OPENCL_USE_NATIVE_FUNCTIONS
+
+#ifdef USE_VECTOR_TYPE
+                          " OpenCL vector types will be used for storage."
+#endif // USE_VECTOR_TYPE
+
+#ifdef OPENCL_DEBUG
+                          " Debugging routines have been enabled."
+#endif // OPENCL_DEBUG
+         );
 
       std::cout << message << std::endl;
       zlog << zTs() << message << std::endl;
