@@ -51,7 +51,7 @@ obj/opencl/statistics.o \
 # each object depends on .cpp and .hpp
 # this will rebuild them if the .hpp changes
 # generated with -MMD cflag
-OPENCL_DEPS=$(OPENCL_OBJECTS:%o=%.d)
+OPENCL_DEPS=$(OPENCL_OBJECTS:%.o=%.d)
 -include $(OPENCL_DEPS)
 
 # target to delete only the OpenCL module objects and dependencies

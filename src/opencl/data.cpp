@@ -11,7 +11,7 @@
 
 #ifdef OPENCL_DEBUG
 #include <fstream>
-#endif
+#endif // OPENCL_DEBUG
 
 // Vampire headers
 #include "vopencl.hpp"
@@ -46,7 +46,7 @@ namespace vopencl
 
 #ifdef OPENCL_DEBUG
       std::ofstream OCLLOG("OpenCL.log");
-#endif
+#endif // OPENCL_DEBUG
 
       namespace rng
       {
