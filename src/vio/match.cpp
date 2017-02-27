@@ -2248,7 +2248,7 @@ namespace vin{
             test="damping-constant";
             if(word==test){
                 double damping=atof(value.c_str());
-                check_for_valid_value(damping, word, line, prefix, unit, "none", 0.0, 10.0,"material","0.0 - 10.0");
+                check_for_valid_positive_value(damping, word, line, prefix, unit, "none", 0.0, 10.0,"material","0.0 - 10.0");
                 read_material[super_index].alpha=damping;
                 return EXIT_SUCCESS;
             }
@@ -2257,7 +2257,7 @@ namespace vin{
             test="atomic-spin-moment";
             if(word==test){
                 double mu_s=atof(value.c_str());
-                check_for_valid_value(mu_s, word, line, prefix, unit, "moment", 0.1*9.24e-24, 1e8*9.24e-24,"material","0.1 - 1e8 mu_B");
+                check_for_valid_positive_value(mu_s, word, line, prefix, unit, "moment", 0.1*9.24e-24, 1e8*9.24e-24,"material","0.1 - 1e8 mu_B");
                 read_material[super_index].moment_flag=true;
                 read_material[super_index].mu_s_SI=mu_s;
                 return EXIT_SUCCESS;
@@ -2437,7 +2437,7 @@ namespace vin{
             if(word==test){
                 double gr = atof(value.c_str());
                 // Test for valid range
-                check_for_valid_value(gr, word, line, prefix, unit, "none", 0.01, 100.0,"material"," 0.01 - 100.0");
+                check_for_valid_positive_value(gr, word, line, prefix, unit, "none", 0.01, 100.0,"material"," 0.01 - 100.0");
                 read_material[super_index].gamma_rel=gr;
                 return EXIT_SUCCESS;
             }
@@ -2615,7 +2615,7 @@ namespace vin{
             test="core-shell-size";
             if(word==test){
                 double css=atof(value.c_str());
-                check_for_valid_value(css, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+                check_for_valid_positive_value(css, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
                 read_material[super_index].core_shell_size=css;
                 cs::core_shell_particles = true;
                 return EXIT_SUCCESS;
@@ -2634,7 +2634,7 @@ namespace vin{
             test="density";
             if(word==test){
                 double d=atof(value.c_str());
-                check_for_valid_value(d, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+                check_for_valid_positive_value(d, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
                 read_material[super_index].density=d;
                 return EXIT_SUCCESS;
             }

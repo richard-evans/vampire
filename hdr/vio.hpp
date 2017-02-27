@@ -66,6 +66,9 @@ namespace vin{
    extern void check_for_valid_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
                                      double range_min, double range_max, std::string input_file_type, std::string range_text);
 
+   extern void check_for_valid_positive_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
+                                              double range_min, double range_max, std::string input_file_type, std::string range_text);
+
    extern void check_for_valid_int(int& value, std::string word, int line, std::string prefix, int range_min, int range_max,
                                    std::string input_file_type, std::string range_text);
 
