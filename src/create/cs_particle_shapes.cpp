@@ -78,7 +78,7 @@ int bulk(std::vector<cs::catom_t> & catom_array){
 	return EXIT_SUCCESS;
 }
 
-int cylinder(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+int cylinder(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain){
 
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
@@ -140,7 +140,7 @@ int cylinder(double particle_origin[],std::vector<cs::catom_t> & catom_array, co
 	return EXIT_SUCCESS;
 }
 
-void ellipsoid(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+void ellipsoid(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain){
    //--------------------------------------------------------------------------------------------
    //
    ///  Function to cut an ellipsoid particle shape
@@ -219,7 +219,7 @@ void ellipsoid(double particle_origin[],std::vector<cs::catom_t> & catom_array, 
    return;
 }
 
-int sphere(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+int sphere(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain){
 	//====================================================================================
 	///
 	///									cs_sphere
@@ -287,7 +287,7 @@ int sphere(double particle_origin[],std::vector<cs::catom_t> & catom_array, cons
 	return EXIT_SUCCESS;
 }
 
-int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+int truncated_octahedron(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain){
 	//====================================================================================
 	//
 	///								cs_truncated_octahedron
@@ -364,7 +364,7 @@ int truncated_octahedron(double particle_origin[],std::vector<cs::catom_t> & cat
 	return EXIT_SUCCESS;
 }
 
-int cube(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+int cube(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
@@ -423,7 +423,7 @@ int cube(double particle_origin[],std::vector<cs::catom_t> & catom_array, const 
 }
 
 // Teardrop
-int tear_drop(double particle_origin[],std::vector<cs::catom_t> & catom_array, const int grain){
+int tear_drop(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------

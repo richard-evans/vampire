@@ -43,12 +43,14 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
-#include "demag.hpp"
+#include "cells.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -125,7 +127,7 @@ namespace sim{
 	double cooling_time=100.0e-12; ///seconds
 	int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
 	pump_functions_t pump_function=two_temperature;
-	double pump_power=4.e21;
+	double pump_power=20.0; // mJ/cm^2;
 	double pump_time=50.0e-15;
 	double double_pump_power=20.0; // mJ/cm^2;
 	double double_pump_Tmax=500.0;
@@ -204,8 +206,13 @@ namespace sim{
 
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
+		dipole::calculate_field();
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
+      st::update_spin_torque_fields(atoms::x_spin_array,
+                                  atoms::y_spin_array,
+                                  atoms::z_spin_array,
+                                  atoms::type_array,
+                                  mp::mu_s_array);
 	}
 
 /// @brief Function to run one a single program
@@ -274,6 +281,28 @@ int run(){
 
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
+
+   // initialise dipole field calculation
+   dipole::initialize(cells::num_atoms_in_unit_cell,
+                     cells::num_cells,
+                     cells::num_local_cells,
+                     cells::macro_cell_size,
+                     cells::local_cell_array,
+                     cells::num_atoms_in_cell,
+                     cells::num_atoms_in_cell_global, // <----
+                     cells::index_atoms_array,
+                     cells::volume_array,
+                     cells::pos_and_mom_array,
+                     cells::atom_in_cell_coords_array_x,
+                     cells::atom_in_cell_coords_array_y,
+                     cells::atom_in_cell_coords_array_z,
+                     atoms::type_array,
+                     cells::atom_cell_id_array,
+                     atoms::x_coord_array,
+                     atoms::y_coord_array,
+                     atoms::z_coord_array,
+                     atoms::num_atoms
+   );
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
