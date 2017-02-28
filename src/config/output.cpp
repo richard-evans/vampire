@@ -23,6 +23,7 @@
 // Vampire headers
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "LLG.hpp"
 #include "material.hpp"
@@ -385,200 +386,198 @@ namespace config{
             atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
             if(sim::identify_surface_atoms==true && atoms::surface_array[atom]==true) cfg_file_ofstr << "O " << std::endl;
             else cfg_file_ofstr << mp::material[atoms::type_array[atom]].element << std::endl;
-         }
+        }
 
-         cfg_file_ofstr.close();
+        cfg_file_ofstr.close();
 
-      }
+    }
 
-      /// @brief Cell output function
-      ///
-      /// @details Outputs formatted data snapshot for visualisation
-      ///
-      ///	#------------------------------------------------------
-      ///	# Cell configuration file for vampire
-      ///	#------------------------------------------------------
-      ///	# Date: xx/xx/xxxx xx.xx.xx
-      ///	#------------------------------------------------------
-      ///	Number of cells: $n_cells
-      ///	System dimensions: $max_x $max_y $max_z
-      ///	Coordinates-file: $coord_file
-      ///	Time: $t
-      ///	Field: $H
-      ///	Temperature: $T
-      ///	Magnetisation: $mx $my $mz
-      ///	Number of Materials: $n_mat
-      ///	Material Properties 1:  $mu_s $mmx $mmy $mmz $mm
-      ///	Material Properties 2:  $mu_s $mmx $mmy $mmz ...
-      ///	#------------------------------------------------------
-      ///
-      /// @section License
-      /// Use of this code, either in source or compiled form, is subject to license from the authors.
-      /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-      ///
-      /// @section Information
-      /// @author  Richard Evans, richard.evans@york.ac.uk
-      /// @version 1.0
-      /// @date    26/04/2013
-      ///
-      /// @internal
-      ///   Created:    26/04/2013
-      ///   Revision:     ---
-      ///=====================================================================================
-      ///
-      void cells(){
+    /// @brief Cell output function
+    ///
+    /// @details Outputs formatted data snapshot for visualisation
+    ///
+    ///   #------------------------------------------------------
+    ///   # Cell configuration file for vampire
+    ///   #------------------------------------------------------
+    ///   # Date: xx/xx/xxxx xx.xx.xx
+    ///   #------------------------------------------------------
+    ///   Number of cells: $n_cells
+    ///   System dimensions: $max_x $max_y $max_z
+    ///   Coordinates-file: $coord_file
+    ///   Time: $t
+    ///   Field: $H
+    ///   Temperature: $T
+    ///   Magnetisation: $mx $my $mz
+    ///   Number of Materials: $n_mat
+    ///   Material Properties 1:  $mu_s $mmx $mmy $mmz $mm
+    ///   Material Properties 2:  $mu_s $mmx $mmy $mmz ...
+    ///   #------------------------------------------------------
+    ///
+    /// @section License
+    /// Use of this code, either in source or compiled form, is subject to license from the authors.
+    /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+    ///
+    /// @section Information
+    /// @author  Richard Evans, richard.evans@york.ac.uk
+    /// @version 1.0
+    /// @date    26/04/2013
+    ///
+    /// @internal
+    ///   Created:    26/04/2013
+    ///   Revision:     ---
+    ///=====================================================================================
+    ///
+    void cells(){
 
-         // check calling of routine if error checking is activated
-         if(err::check==true){std::cout << "config::cells has been called" << std::endl;}
+    // check calling of routine if error checking is activated
+    if(err::check==true){std::cout << "vout::cells has been called" << std::endl;}
 
-         // Set local output filename
-         std::stringstream file_sstr;
-         file_sstr << "cells-";
-         file_sstr << std::setfill('0') << std::setw(8) << sim::output_cells_file_counter;
-         file_sstr << ".cfg";
-         std::string cfg_file = file_sstr.str();
-         const char* cfg_filec = cfg_file.c_str();
+    // Set local output filename
+    std::stringstream file_sstr;
+    file_sstr << "cells-";
+    file_sstr << std::setfill('0') << std::setw(8) << sim::output_cells_file_counter;
+    file_sstr << ".cfg";
+    std::string cfg_file = file_sstr.str();
+    const char* cfg_filec = cfg_file.c_str();
 
-         #ifdef MPICF
-         // Reduce demagnetisation fields to processor 0
-         if(vmpi::my_rank==0){
-            MPI_Reduce(MPI_IN_PLACE, &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-            MPI_Reduce(MPI_IN_PLACE, &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-            MPI_Reduce(MPI_IN_PLACE, &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-         }
-         else{
-            MPI_Reduce(&cells::x_field_array[0], &cells::x_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-            MPI_Reduce(&cells::y_field_array[0], &cells::y_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-            MPI_Reduce(&cells::z_field_array[0], &cells::z_field_array[0], cells::num_cells, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-         }
-         #endif
+    #ifdef MPICF
+    // if flag to print cells field is active, all cpus send cells field to root proc
+    dipole::send_cells_field(cells::cell_id_array,
+                           dipole::cells_field_array_x,
+                           dipole::cells_field_array_y,
+                           dipole::cells_field_array_z,
+                           cells::num_local_cells);
+    #endif
 
-         // Output masterfile header on root process
-         if(vmpi::my_rank==0){
+    // Output masterfile header on root process
+    if(vmpi::my_rank==0){
 
-            zlog << zTs() << "Outputting cell configuration " << sim::output_cells_file_counter << " to disk." << std::endl;
+        zlog << zTs() << "Outputting cell configuration " << sim::output_cells_file_counter << " to disk." << std::endl;
 
-            // Declare and open output file
-            std::ofstream cfg_file_ofstr;
-            cfg_file_ofstr.open (cfg_filec);
+        // Declare and open output file
+        std::ofstream cfg_file_ofstr;
+        cfg_file_ofstr.open (cfg_filec);
 
-            // Get system date
-            time_t rawtime = time(NULL);
-            struct tm * timeinfo = localtime(&rawtime);
+        // Get system date
+        time_t rawtime = time(NULL);
+        struct tm * timeinfo = localtime(&rawtime);
 
-            cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-            cfg_file_ofstr << "# Cell configuration file for vampire"<< std::endl;
-            cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-            cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
-            cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-            cfg_file_ofstr << "# Number of spins: "<< cells::num_cells << std::endl;
-            cfg_file_ofstr << "# System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
-            cfg_file_ofstr << "# Coordinates-file: cells-coord.cfg"<< std::endl;
-            cfg_file_ofstr << "# Time: " << double(sim::time)*mp::dt_SI << std::endl;
-            cfg_file_ofstr << "# Field: " << sim::H_applied << std::endl;
-            cfg_file_ofstr << "# Temperature: "<< sim::temperature << std::endl;
-            cfg_file_ofstr << "# Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
-            cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+        cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+        cfg_file_ofstr << "# Cell configuration file for vampire"<< std::endl;
+        cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+        cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
+        cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+        cfg_file_ofstr << "# Number of spins: "<< cells::num_cells << std::endl;
+        cfg_file_ofstr << "# System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
+        cfg_file_ofstr << "# Coordinates-file: cells-coord.cfg"<< std::endl;
+        cfg_file_ofstr << "# Time: " << double(sim::time)*mp::dt_SI << std::endl;
+        cfg_file_ofstr << "# Field: " << sim::H_applied << std::endl;
+        cfg_file_ofstr << "# Temperature: "<< sim::temperature << std::endl;
+        cfg_file_ofstr << "# Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
+        cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 
-            // Root process now outputs the cell magnetisations
-            for(int cell=0; cell < cells::num_cells; cell++){
-               cfg_file_ofstr << cells::x_mag_array[cell] << "\t" << cells::y_mag_array[cell] << "\t" << cells::z_mag_array[cell]<< "\t";
-               cfg_file_ofstr << cells::x_field_array[cell] << "\t" << cells::y_field_array[cell] << "\t" << cells::z_field_array[cell] << std::endl;
+         // Root process now outputs the cell magnetisations
+         for(int cell=0; cell < cells::num_cells; cell++){
+            if(cells::num_atoms_in_cell[cell]>0){
+               cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell]<< "\t";
+               cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << std::endl;
             }
-
-            cfg_file_ofstr.close();
          }
 
-         sim::output_cells_file_counter++;
+        cfg_file_ofstr.close();
 
-         return;
+    }
 
-      }
+    sim::output_cells_file_counter++;
 
-      /// @brief Cells output function
-      ///
-      /// @details Outputs formatted data snapshot for visualisation
-      ///
-      ///	//------------------------------------------------------
-      ///	// Atomistic coordinate configuration file for vampire
-      ///	//------------------------------------------------------
-      ///	// Date: xx/xx/xxxx xx.xx.xx
-      ///	//------------------------------------------------------
-      ///	Number of cells: $n_cells
-      ///	//------------------------------------------------------
-      ///	Number of atom files: $n_files
-      ///	atoms-coords-00CPU0.cfg
-      ///	atoms-coords-00CPU1.cfg
-      ///	atoms-coords-00CPU2.cfg
-      ///	//------------------------------------------------------
-      ///	Number of local cells: $n_loc_cells
-      ///	$material $category $x $y $z $species
-      ///	$material $category $x $y $z $species
-      ///	$material $category $x ...
-      ///
-      /// @section License
-      /// Use of this code, either in source or compiled form, is subject to license from the authors.
-      /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-      ///
-      /// @section Information
-      /// @author  Richard Evans, richard.evans@york.ac.uk
-      /// @version 1.0
-      /// @date    31/05/2011
-      ///
-      /// @internal
-      ///	Created:    31/05/2011
-      ///	Revision:     ---
-      ///=====================================================================================
-      ///
-      void cells_coords(){
+    return;
 
-         // check calling of routine if error checking is activated
-         if(err::check==true){std::cout << "config::cells_coords has been called" << std::endl;}
+    }
 
-         // Set local output filename
-         std::stringstream file_sstr;
-         file_sstr << "cells-coords";
-         file_sstr << ".cfg";
-         std::string cfg_file = file_sstr.str();
-         const char* cfg_filec = cfg_file.c_str();
+    /// @brief Cells output function
+    ///
+    /// @details Outputs formatted data snapshot for visualisation
+    ///
+    ///   //------------------------------------------------------
+    ///   // Atomistic coordinate configuration file for vampire
+    ///   //------------------------------------------------------
+    ///   // Date: xx/xx/xxxx xx.xx.xx
+    ///   //------------------------------------------------------
+    ///   Number of cells: $n_cells
+    ///   //------------------------------------------------------
+    ///   Number of atom files: $n_files
+    ///   atoms-coords-00CPU0.cfg
+    ///   atoms-coords-00CPU1.cfg
+    ///   atoms-coords-00CPU2.cfg
+    ///   //------------------------------------------------------
+    ///   Number of local cells: $n_loc_cells
+    ///   $material $category $x $y $z $species
+    ///   $material $category $x $y $z $species
+    ///   $material $category $x ...
+    ///
+    /// @section License
+    /// Use of this code, either in source or compiled form, is subject to license from the authors.
+    /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
+    ///
+    /// @section Information
+    /// @author  Richard Evans, richard.evans@york.ac.uk
+    /// @version 1.0
+    /// @date    31/05/2011
+    ///
+    /// @internal
+    ///   Created:    31/05/2011
+    ///   Revision:     ---
+    ///=====================================================================================
+    ///
+    void cells_coords(){
 
-         // Output masterfile header on root process
-         if(vmpi::my_rank==0){
+    // check calling of routine if error checking is activated
+    if(err::check==true){std::cout << "vout::atoms_coords has been called" << std::endl;}
 
-            std::cout << "Outputting cell coordinates to disk." << std::endl;
-            zlog << zTs() << "Outputting cell coordinates to disk." << std::endl;
+    // Set local output filename
+    std::stringstream file_sstr;
+    file_sstr << "cells-coords";
+    file_sstr << ".cfg";
+    std::string cfg_file = file_sstr.str();
+    const char* cfg_filec = cfg_file.c_str();
 
-            // Declare and open output file
-            std::ofstream cfg_file_ofstr;
-            cfg_file_ofstr.open (cfg_filec);
+    // Output masterfile header on root process
+    if(vmpi::my_rank==0){
 
-            // Get system date
-            time_t rawtime = time(NULL);
-            struct tm * timeinfo = localtime(&rawtime);
+        std::cout << "Outputting cell coordinates to disk." << std::endl;
+        zlog << zTs() << "Outputting cell coordinates to disk." << std::endl;
 
-            cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-            cfg_file_ofstr << "# Cell coordinates configuration file for vampire"<< std::endl;
-            cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-            cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
-            cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
-            cfg_file_ofstr << "# Number of cells: "<< cells::num_cells << std::endl;
-            cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-            cfg_file_ofstr << "#" << std::endl;
-            cfg_file_ofstr << "#" << std::endl;
-            cfg_file_ofstr << "#" << std::endl;
-            cfg_file_ofstr << "#" << std::endl;
-            cfg_file_ofstr << "#" << std::endl;
-            cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+        // Declare and open output file
+        std::ofstream cfg_file_ofstr;
+        cfg_file_ofstr.open (cfg_filec);
 
-            for(int cell=0; cell<cells::num_cells; cell++){
-               cfg_file_ofstr << cells::x_coord_array[cell] << "\t" << cells::y_coord_array[cell] << "\t" << cells::z_coord_array[cell] << std::endl;
-            }
+        // Get system date
+        time_t rawtime = time(NULL);
+        struct tm * timeinfo = localtime(&rawtime);
 
-            cfg_file_ofstr.close();
-         }
+        cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+        cfg_file_ofstr << "# Cell coordinates configuration file for vampire"<< std::endl;
+        cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+        cfg_file_ofstr << "# Date: "<< asctime(timeinfo);
+        cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
+        cfg_file_ofstr << "# Number of cells: "<< cells::num_cells << std::endl;
+        cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
+        cfg_file_ofstr << "#" << std::endl;
+        cfg_file_ofstr << "#" << std::endl;
+        cfg_file_ofstr << "#" << std::endl;
+        cfg_file_ofstr << "#" << std::endl;
+        cfg_file_ofstr << "#" << std::endl;
+        cfg_file_ofstr << "#------------------------------------------------------"<< std::endl;
 
-         return;
+			for(int cell=0; cell<cells::num_cells; cell++){
+         	if(cells::num_atoms_in_cell[cell]>0){
+            	cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::pos_and_mom_array[4*cell+0] << "\t" << cells::pos_and_mom_array[4*cell+1] << "\t" << cells::pos_and_mom_array[4*cell+2] <<  std::endl;
+         	}
+      	}
+        cfg_file_ofstr.close();
+    }
 
-      }
-   }
+    return;
+
+    }
 }

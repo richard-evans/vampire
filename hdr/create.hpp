@@ -51,6 +51,9 @@
 #include <vector>
 #include <cmath>
 
+// Vampire headers
+#include "unitcell.hpp"
+
 /// @namespace
 /// @brief Contains all functions and data associated with system creation in vampire.
 ///
@@ -62,13 +65,11 @@ namespace cs{
 
 	// System Dimensions
 	extern double system_dimensions[3];
-	extern double unit_cell_size[3];
 	extern bool pbc[3];
 	extern bool SelectMaterialByZHeight;
 	extern bool SelectMaterialByGeometry;
 	extern unsigned int total_num_unit_cells[3];
 	extern unsigned int local_num_unit_cells[3];
-	extern std::string crystal_structure;
 
 	// System Parameters
 	extern int particle_creation_parity;
@@ -83,8 +84,8 @@ namespace cs{
 	// Other directives and flags
 	extern bool single_spin;
 	extern int system_creation_flags[10];
-	extern std::string unit_cell_file;
 	extern bool fill_core_shell;
+   extern bool core_shell_particles;
 
 	// Variables for interfacial roughness control
 	extern bool interfacial_roughness;
@@ -103,46 +104,7 @@ namespace cs{
    extern int num_multilayers;
    extern bool multilayer_height_category; // enable height categorization by multilayer number
 
-	class unit_cell_atom_t {
-	public:
-		double x; /// atom x-coordinate
-		double y; /// atom y-coordinate
-		double z; /// atom z-coordinate
-		unsigned int mat; /// material
-		unsigned int lc; /// lattice category
-		unsigned int hc; /// height category
-		unsigned int ni; /// number of interactions
-	};
 
-	class unit_cell_interaction_t {
-	public:
-		unsigned int i; /// atom unit cell id
-		unsigned int j; /// neighbour atom unit cell id
-		int dx; /// delta x in unit cells
-		int dy; /// delta y in unit cells
-		int dz; /// delta z in unit cells
-		double Jij[3][3]; /// Exchange tensor
-	};
-
-	class unit_cell_t {
-	public:
-
-		double dimensions[3];
-		double shape[3][3];
-
-		unsigned int lcsize; /// number of local categories
-		unsigned int hcsize; /// number of height categories
-		unsigned int interaction_range; /// maximum range in unit cells
-		unsigned int surface_threshold; /// threshold for surface atoms
-		int exchange_type; /// -1=isotropic(local material), 0=isotropic, 1=vector, or 2=tensor
-
-		// list of atoms in each unit cell
-		std::vector <unit_cell_atom_t> atom;
-
-		// list of interactions in each unit cell
-		std::vector <unit_cell_interaction_t> interaction;
-
-	};
 
 	class neighbour_t {
 	public:
@@ -156,7 +118,7 @@ namespace cs{
 
 	};
 
-	extern cs::unit_cell_t unit_cell;
+	extern uc::unit_cell_t unit_cell;
 
    // Structure for storing non-magnetic atom data
    struct nm_atom_t{
@@ -377,7 +339,7 @@ int bulk(std::vector<cs::catom_t> &);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int cube(double[], std::vector<cs::catom_t> &,const int);
+int cube(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
 
 /// @brief This is the brief (one line only) description of the function.
 ///
@@ -400,32 +362,9 @@ int cube(double[], std::vector<cs::catom_t> &,const int);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int sphere(double[], std::vector<cs::catom_t> &,const int);
+int sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
 
-extern void ellipsoid(double[], std::vector<cs::catom_t> &,const int);
-
-/// @brief This is the brief (one line only) description of the function.
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    05/03/2010
-///
-/// @param[in] input variable
-/// @param[out] ouput variable
-/// @param[in,out] input/output variable
-/// @return variable returned from the function
-///
-/// @internal
-///	Created:		05/03/2010
-///	Revision:	  ---
-///=====================================================================================
-///
-int cylinder(double[], std::vector<cs::catom_t> &,const int);
+extern void ellipsoid(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
 
 /// @brief This is the brief (one line only) description of the function.
 ///
@@ -448,17 +387,37 @@ int cylinder(double[], std::vector<cs::catom_t> &,const int);
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int truncated_octahedron(double[], std::vector<cs::catom_t> &,const int);
-int tear_drop(double[], std::vector<cs::catom_t> &,const int);
+int cylinder(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
+
+/// @brief This is the brief (one line only) description of the function.
+///
+/// @section License
+/// Use of this code, either in source or compiled form, is subject to license from the authors.
+/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
+///
+/// @section Information
+/// @author  Richard Evans, rfle500@york.ac.uk
+/// @version 1.0
+/// @date    05/03/2010
+///
+/// @param[in] input variable
+/// @param[out] ouput variable
+/// @param[in,out] input/output variable
+/// @return variable returned from the function
+///
+/// @internal
+///	Created:		05/03/2010
+///	Revision:	  ---
+///=====================================================================================
+///
+int truncated_octahedron(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
+int tear_drop(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,const int);
 
 int sort_atoms_by_grain(std::vector<cs::catom_t> &);
 void clear_atoms(std::vector<cs::catom_t> &);
 
 void roughness(std::vector<cs::catom_t> &);
 void generate_multilayers(std::vector<cs::catom_t> & catom_array);
-
-  // unit cell initialisation function
-  void unit_cell_set(cs::unit_cell_t &);
 
 }
 
@@ -469,6 +428,7 @@ namespace create{
 
 	// Functions
 	bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
 
 } // end of namespace create
 

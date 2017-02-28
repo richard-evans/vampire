@@ -52,11 +52,13 @@
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
-#include "demag.hpp"
+#include "dipole.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
+#include "unitcell.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
@@ -74,13 +76,11 @@ namespace cs{
 
 	// System Dimensions
 	double system_dimensions[3]={77.0,77.0,77.0};	/// Size of system (A)
-	double unit_cell_size[3]={3.54,3.54,3.54};		/// Unit Cell Size (A) [Will eventually be local to unit cells]
 	bool pbc[3]={false,false,false};						/// Periodic boundary conditions
 	bool SelectMaterialByZHeight=false;					/// Toggle overwriting of material id by z-height
 	bool SelectMaterialByGeometry=false;					/// Toggle override of input material type by geometry
 	unsigned int total_num_unit_cells[3]={0,0,0};	/// Unit cells for entire system (x,y,z)
 	unsigned int local_num_unit_cells[3]={0,0,0};	/// Unit cells on local processor (x,y,z)
-	std::string crystal_structure="sc";
 
 	// System Parameters
 	int particle_creation_parity=0; /// Offset of particle centre (odd/even)
@@ -95,8 +95,9 @@ namespace cs{
 	// Other directives and flags
 	bool single_spin=false;
 	int system_creation_flags[10]={0,0,0,0,0,0,0,0,0,0};
-	std::string unit_cell_file="";
+
 	bool fill_core_shell=true;
+   bool core_shell_particles = false;
 
    // Variables for multilayer system
    bool multilayers = false;
@@ -116,7 +117,7 @@ namespace cs{
 	double interfacial_roughness_seed_height_max=1.8; /// Angstroms
 
 	// unit cell container
-	cs::unit_cell_t unit_cell;
+	unitcell::unit_cell_t unit_cell;
 
   // Array for storing non-magnetic atoms
   std::vector<nm_atom_t> non_magnetic_atoms_array;
@@ -139,11 +140,7 @@ int create(){
 	std::vector<std::vector<neighbour_t> > cneighbourlist;
 
 	// initialise unit cell for system
-	unit_cell_set(cs::unit_cell);
-
-	cs::unit_cell_size[0]=unit_cell.dimensions[0];
-	cs::unit_cell_size[1]=unit_cell.dimensions[1];
-	cs::unit_cell_size[2]=unit_cell.dimensions[2];
+	uc::initialise(cs::unit_cell);
 
    // Calculate number of global and local unit cells required (rounding up)
    // Must be set before rounding up system dimensions for periodic boundary conditions
@@ -152,9 +149,9 @@ int create(){
    cs::total_num_unit_cells[2]=int(vmath::iceil(cs::system_dimensions[2]/unit_cell.dimensions[2]));
 
 	// check for pbc and if so round up system dimensions
-	if(cs::pbc[0]==true) cs::system_dimensions[0]=cs::unit_cell_size[0]*(int(vmath::iceil(cs::system_dimensions[0]/cs::unit_cell_size[0])));
-	if(cs::pbc[1]==true) cs::system_dimensions[1]=cs::unit_cell_size[1]*(int(vmath::iceil(cs::system_dimensions[1]/cs::unit_cell_size[1])));
-	if(cs::pbc[2]==true) cs::system_dimensions[2]=cs::unit_cell_size[2]*(int(vmath::iceil(cs::system_dimensions[2]/cs::unit_cell_size[2])));
+	if(cs::pbc[0]==true) cs::system_dimensions[0]=unit_cell.dimensions[0]*(int(vmath::iceil(cs::system_dimensions[0]/unit_cell.dimensions[0])));
+	if(cs::pbc[1]==true) cs::system_dimensions[1]=unit_cell.dimensions[1]*(int(vmath::iceil(cs::system_dimensions[1]/unit_cell.dimensions[1])));
+	if(cs::pbc[2]==true) cs::system_dimensions[2]=unit_cell.dimensions[2]*(int(vmath::iceil(cs::system_dimensions[2]/unit_cell.dimensions[2])));
 
 	// Set up Parallel Decomposition if required
 	#ifdef MPICF
@@ -284,17 +281,41 @@ int create(){
 	} // stop if for staged generation here
 	#endif
 
-	// Set grain and cell variables for simulation
-	grains::set_properties();
-	cells::initialise();
-	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
-
    // Determine number of local atoms
    #ifdef MPICF
       int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    #else
       int num_local_atoms = atoms::num_atoms;
    #endif
+
+	// Set grain and cell variables for simulation
+	grains::set_properties();
+   cells::initialize(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  cs::unit_cell.dimensions[0],
+                  cs::unit_cell.dimensions[1],
+                  cs::unit_cell.dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  atoms::cell_array,
+                  atoms::num_atoms
+      );
+
+   //----------------------------------------
+   // Initialise spin torque data
+   //----------------------------------------
+   st::initialise(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  num_local_atoms);
+
    //----------------------------------------
    // Initialise local temperature data
    //----------------------------------------
@@ -316,11 +337,13 @@ int create(){
 					   sim::Tmin,
 					   sim::Tmax);
 
+
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
 		//vmpi::crystal_xyz(catom_array);
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   //std::cout << "my_num_atoms == " << my_num_atoms << std::endl;
 	int total_num_atoms=0;
 	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
 	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;

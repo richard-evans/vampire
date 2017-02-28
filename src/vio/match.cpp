@@ -17,6 +17,7 @@
 // Headers
 #include "vio.hpp"
 #include "sim.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "material.hpp"
 #include "grains.hpp"
@@ -28,6 +29,8 @@
 #include "voronoi.hpp"
 #include "ltmp.hpp"
 #include "random.hpp"
+#include "spintorque.hpp"
+#include "unitcell.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -63,7 +66,13 @@ namespace vin{
         // Call module input parameters
         //-------------------------------------------------------------------
         if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -150,34 +159,6 @@ namespace vin{
                     terminaltextcolor(WHITE);
                     return EXIT_FAILURE;
                 }
-            }
-            //-------------------------------------------------------------------
-            // Get unit cell filename
-            //-------------------------------------------------------------------
-            test="unit-cell-file";
-            if(word==test){
-                std::string ucffile=value;
-                // strip quotes
-                ucffile.erase(remove(ucffile.begin(), ucffile.end(), '\"'), ucffile.end());
-                test="";
-                // if filename not blank set ucf file name
-                if(ucffile!=test){
-                    //std::cout << matfile << std::endl;
-                    cs::unit_cell_file=ucffile;
-                    return EXIT_SUCCESS;
-                }
-                else{
-                    terminaltextcolor(RED);
-                    std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
-                    terminaltextcolor(WHITE);
-                    return EXIT_FAILURE;
-                }
-            }
-            else{
-                terminaltextcolor(RED);
-                std::cerr << "Error - Unknown control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
-                terminaltextcolor(WHITE);
-                return EXIT_FAILURE;
             }
         }
         else
@@ -315,16 +296,6 @@ namespace vin{
         test="particle-centre-offset"; //parity
         if(word==test){
             cs::particle_creation_parity=1;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="crystal-structure";
-        if(word==test){
-            // Strip quotes
-            std::string cs=value;
-            cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
-            cs::crystal_structure=cs;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -545,46 +516,8 @@ namespace vin{
         // System dimension variables
         //-------------------------------------------------------------------
         std::string prefix="dimensions:";
-
-        std::string test="unit-cell-size";
-        if(word==test){
-            double a=atof(value.c_str());
-            check_for_valid_value(a, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-            cs::unit_cell_size[0]=a;
-            cs::unit_cell_size[1]=a;
-            cs::unit_cell_size[2]=a;
-            return EXIT_SUCCESS;
-        }
-        else
         //--------------------------------------------------------------------
-        test="unit-cell-size-x";
-        if(word==test){
-            double ax=atof(value.c_str());
-            check_for_valid_value(ax, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-            cs::unit_cell_size[0]=ax;
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="unit-cell-size-y";
-        if(word==test){
-            double ay=atof(value.c_str());
-            check_for_valid_value(ay, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-            cs::unit_cell_size[1]=ay;
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="unit-cell-size-z";
-        if(word==test){
-            double az=atof(value.c_str());
-            check_for_valid_value(az, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-            cs::unit_cell_size[2]=az;
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="system-size";
+        std::string test="system-size";
         if(word==test){
             double d=atof(value.c_str());
             check_for_valid_value(d, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
@@ -681,15 +614,6 @@ namespace vin{
             double paoy=atof(value.c_str());
             check_for_valid_value(paoy, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
             cs::particle_array_offset_y=paoy;
-            return EXIT_SUCCESS;
-        }
-        else
-        //--------------------------------------------------------------------
-        test="macro-cell-size";
-        if(word==test){
-            double cs=atof(value.c_str());
-            check_for_valid_value(cs, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 - 1.0 millimetre");
-            cells::size=cs;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -864,20 +788,6 @@ namespace vin{
         test="enable-fmr-field";
         if(word==test){
             sim::hamiltonian_simulation_flags[5]=1;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="enable-fast-dipole-fields";
-        if(word==test){
-            demag::fast=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="dipole-field-update-rate";
-        if(word==test){
-            int dpur=atoi(value.c_str());
-            check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-            demag::update_rate=dpur;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
@@ -1240,7 +1150,7 @@ namespace vin{
         if(word==test){
             std::vector<double> u(3);
             u=DoublesFromString(value);
-            check_for_valid_vector(u, word, line, prefix, "input");
+            vin::check_for_valid_three_vector(u, word, line, prefix, "input");
             // Extra check for demagnetisation-factor Nx+Ny+Nz=1
             double sum=u.at(0)+u.at(1)+u.at(2);
             if(fabs(1.0-sum)>1.e-4){
@@ -2210,17 +2120,8 @@ namespace vin{
             test="damping-constant";
             if(word==test){
                 double damping=atof(value.c_str());
-                check_for_valid_value(damping, word, line, prefix, unit, "none", 0.0, 10.0,"material","0.0 - 10.0");
+                check_for_valid_positive_value(damping, word, line, prefix, unit, "none", 0.0, 10.0,"material","0.0 - 10.0");
                 read_material[super_index].alpha=damping;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="exchange-matrix";
-            if(word==test){
-                double Jij=atof(value.c_str());
-                check_for_valid_value(Jij, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
-                read_material[super_index].Jij_matrix_SI[sub_index]=-Jij; // Import exchange as field, *-1
                 return EXIT_SUCCESS;
             }
             //------------------------------------------------------------
@@ -2228,7 +2129,7 @@ namespace vin{
             test="atomic-spin-moment";
             if(word==test){
                 double mu_s=atof(value.c_str());
-                check_for_valid_value(mu_s, word, line, prefix, unit, "moment", 0.1*9.24e-24, 1e8*9.24e-24,"material","0.1 - 1e8 mu_B");
+                check_for_valid_positive_value(mu_s, word, line, prefix, unit, "moment", 0.1*9.24e-24, 1e8*9.24e-24,"material","0.1 - 1e8 mu_B");
                 read_material[super_index].moment_flag=true;
                 read_material[super_index].mu_s_SI=mu_s;
                 return EXIT_SUCCESS;
@@ -2408,7 +2309,7 @@ namespace vin{
             if(word==test){
                 double gr = atof(value.c_str());
                 // Test for valid range
-                check_for_valid_value(gr, word, line, prefix, unit, "none", 0.01, 100.0,"material"," 0.01 - 100.0");
+                check_for_valid_positive_value(gr, word, line, prefix, unit, "none", 0.01, 100.0,"material"," 0.01 - 100.0");
                 read_material[super_index].gamma_rel=gr;
                 return EXIT_SUCCESS;
             }
@@ -2586,8 +2487,9 @@ namespace vin{
             test="core-shell-size";
             if(word==test){
                 double css=atof(value.c_str());
-                check_for_valid_value(css, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+                check_for_valid_positive_value(css, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
                 read_material[super_index].core_shell_size=css;
+                cs::core_shell_particles = true;
                 return EXIT_SUCCESS;
             }
             //-------------------------------------------------------------------
@@ -2604,7 +2506,7 @@ namespace vin{
             test="density";
             if(word==test){
                 double d=atof(value.c_str());
-                check_for_valid_value(d, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+                check_for_valid_positive_value(d, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
                 read_material[super_index].density=d;
                 return EXIT_SUCCESS;
             }
@@ -3024,27 +2926,54 @@ namespace vin{
             //--------------------------------------------------------------------
             test="non-magnetic";
             /*
-            logical non-magnetic [false]
-                This flag causes the material to be identified as non magnetic,
-                with all atoms removed of this type removed from the simulation.
+            integer non-magnetic [0]
+            The default value is 0 for all materials. Valid values are
+            remove, (blank) [same as remove] and keep.
+            Value = keep causes the material to be identified as non magnetic
+            with all atoms of this type KEPT in the simulation.
+            Value = 1 remove/blank causes the material to be identified as non magnetic
+            with all atoms of this type REMOVED from the simulation.
             The atomic positions of non-magnetic atoms are saved separately
             with the usual atomic spin configuration for post processing.
             The default value is false for all materials. Valid values are
             true, false or (blank) [same as true].
             */
             if(word==test){
-                // Test for sane input
-                bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
-                // set flag
-                read_material[super_index].non_magnetic = sanitised_bool;
-                return EXIT_SUCCESS;
+               test="keep";
+               // keep all atoms in simulation (for efficient parallelization)
+               if(value==test){
+                  // set flag
+                  read_material[super_index].non_magnetic = 2;
+                  return EXIT_SUCCESS;
+               }
+               // delete all atoms in simulation (default)
+               test="remove";
+               if(value==test){
+                  // set flag
+                  read_material[super_index].non_magnetic = 1;
+                  return EXIT_SUCCESS;
+               }
+               test="";
+               if(value==test){
+                  // set flag
+                  read_material[super_index].non_magnetic = 1;
+                  return EXIT_SUCCESS;
+               }
+               else{
+                  terminaltextcolor(RED);
+                  std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " = " << value <<" is not a valid option: remove, keep." << std::endl;
+                  terminaltextcolor(WHITE);
+                  err::vexit();
+               }
             }
-
             //-------------------------------------------------------------------
             // Call module input parameters
             //-------------------------------------------------------------------
-            else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+            else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+            else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
             // keyword not found
@@ -3056,7 +2985,8 @@ namespace vin{
                 zlog << zTs() << "Error - Unknown control statement '" << line_string << " on line " << line << " of material file '" << filename_string << "'" << std::endl;
                 return EXIT_FAILURE;
             }
-            return EXIT_SUCCESS;
+
+            return EXIT_FAILURE;
     }
 
 }
