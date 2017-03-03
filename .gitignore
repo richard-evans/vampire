@@ -30,4 +30,8 @@ output
 run/unit-cell-creator
 MPI-compute-times
 MPI-wait-times
+MAT.mat
+UC.ucf
+exchange-template
+unit-cell-creator
 #EOF
