@@ -38,7 +38,7 @@ void matmul(const __global T    *const restrict A,  /* matrix non-zero values  *
       {
          sum += A[j] * V[JA[j]];
       }
-      R[i] = sum;
+      R[i] += sum;
 #else
       const size_t xi = 3*i+0;
       const size_t yi = 3*i+1;
@@ -53,9 +53,9 @@ void matmul(const __global T    *const restrict A,  /* matrix non-zero values  *
          sum += A[j] * vnj;
       }
 
-      R[xi] = sum.x;
-      R[yi] = sum.y;
-      R[zi] = sum.z;
+      R[xi] += sum.x;
+      R[yi] += sum.y;
+      R[zi] += sum.z;
 #endif // USE_VECTOR_TYPE
    }
 }
