@@ -30,6 +30,7 @@ namespace config{
    int match_input_parameter(std::string const word, std::string const value, std::string const unit, int const line){
    //int match_config          (std::string const word, std::string const value, std::string const unit, int const line){
         std::string prefix="config:";
+        //if(key!=prefix) return false;
 
         // System output config variables
         std::string test="atoms";
@@ -46,6 +47,25 @@ namespace config{
             internal::output_atoms_config_rate=i;
             return EXIT_SUCCESS;
         }
+        //--------------------------------------------------------------------
+        test="output-new";
+        if(word==test){
+            internal::output_new = true;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="output-binary";
+        if(word==test){
+            internal::output_data_format = internal::binary;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="output-text";
+        if(word==test){
+            internal::output_data_format = internal::text;
+            return EXIT_SUCCESS;
+        }
+
         //--------------------------------------------------------------------
         test="atoms-minimum-x";
         if(word==test){

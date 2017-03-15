@@ -17,6 +17,8 @@
 
 // Vampire headers
 #include "config.hpp"
+#include "material.hpp"
+#include "sim.hpp"
 
 // config module headers
 #include "internal.hpp"
@@ -61,7 +63,7 @@ namespace config{
             scmf << "#--------------------------------------------"<< std::endl;
             scmf << "Format: "<< format_string << std::endl;
             scmf << "#--------------------------------------------"<< std::endl;
-            scmf << "Number of atoms: "<< config::internal::total_output_atoms << std::endl;
+            scmf << "Number of atoms: "<< config::total_output_atoms << std::endl;
             scmf << "#--------------------------------------------" << std::endl;
             scmf << "Number of materials: " << mp::num_materials << std::endl;
             for(int mat=0;mat<mp::num_materials;mat++){
@@ -97,7 +99,7 @@ namespace config{
          // determine file name
          std::stringstream filename;
          filename << "atoms-";
-         filename << std::setfill('0') << std::setw(8) << config::internal::output_file_counter;
+         filename << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
          filename << ".meta";
 
          // Get system date
@@ -121,7 +123,7 @@ namespace config{
          ofile << "Number of spin files: " << num_files << "\n"; //vmpi::num_processors-1 << "\n";
          for(int p=0;p<num_files;p++){
             std::stringstream cfg_sstr;
-            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << config::internal::output_file_counter << ".cfg";
+            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".cfg";
             ofile << cfg_sstr.str() << "\n";
          }
          ofile << "#------------------------------------------------------"<< "\n";

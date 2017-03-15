@@ -49,6 +49,16 @@ namespace vmpi{
 	extern int num_bdry_atoms;			///< Number of atoms on local CPU with external communication
 	extern int num_halo_atoms;			///< Number of atoms on remote CPUs needed for boundary atom integration
 
+	extern int num_io_processors;		///< Total number of CPUs that perform IO
+	extern int size_io_group;			///< Size of io mpi groups
+	extern int my_io_rank;				///< Local CPU IO Comm Group Rank
+	extern int my_io_group;				///< Local CPU IO Comm Group Rank
+	extern int io_processor;			///< The group rank of processor who performs IO
+#ifdef MPICF
+	extern MPI_Comm io_comm;			///< MPI Communicator for IO
+#endif
+
+
 	extern bool replicated_data_staged; ///< Flag for staged system generation
 
 	extern char hostname[20];			///< Hostname of local CPU

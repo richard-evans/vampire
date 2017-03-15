@@ -42,6 +42,10 @@ namespace config{
 
       double atoms_output_min[3]={0.0,0.0,0.0};
       double atoms_output_max[3]={1.0,1.0,1.0};
+
+      data_format output_data_format = binary;
+      bool output_new = false;
+      bool mpi_io = false;
    } // end of internal namespace
 
 } // end of config namespace
