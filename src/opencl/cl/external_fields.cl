@@ -41,10 +41,10 @@ void update_external_fields(const __global int *const restrict material,
       const real_t tc = mat.temperature_rescaling_Tc;
       const real_t norm_h = mat.applied_field_strength;
 
-      //const real_t resc_temp = (temp < tc) ? tc * POW(temp/tc, alpha) : temp;
-      const real_t resc_temp = select(temp,
-                                      tc*POW(temp/tc, alpha),
-                                      (uint_t)isless(temp, tc));
+      const real_t resc_temp = (temp < tc) ? tc * POW(temp/tc, alpha) : temp;
+      //const real_t resc_temp = select(temp,
+      //                                tc*POW(temp/tc, alpha),
+      //                                (uint_t)isless(temp, tc));
       const real_t sq_temp = sqrt(resc_temp);
 
       const size_t x = 3*i+0;
