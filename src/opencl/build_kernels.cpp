@@ -30,9 +30,8 @@ namespace vopencl
       void build_kernels(void) noexcept
       {
          std::string default_opts("-Isrc/opencl/cl "
-                                  "-cl-mad-enable "
                                   "-cl-fast-relaxed-math "
-                                  "-cl-no-signed-zeros "
+                                  "-cl-uniform-work-group-size "
 #ifdef OPENCL_DP
                                   "-DOPENCL_DP "
 #endif
