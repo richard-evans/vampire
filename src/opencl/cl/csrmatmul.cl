@@ -24,7 +24,7 @@ void matmul(const __global T    *const restrict A,  /* matrix non-zero values  *
             const __global uint *const restrict IA, /* matrix row ptr */
             const __global uint *const restrict JA, /* col idx */
             const __global T    *const restrict V,  /* vector to be multiplied */
-                  __global T    *const restrict R,  /* resultant vector */
+            __global T    *const restrict R,  /* resultant vector */
             const uint N)                           /* length of vector */
 {
    const size_t gsz = get_global_size(0);

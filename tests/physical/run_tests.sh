@@ -31,9 +31,9 @@ function is_within_tolerance {
     local readonly tolerance=$(echo $2 | sed 's/[eE]+*/\*10\^/')
 
     if (( $(echo $error '<' $tolerance | bc -l) )); then
-	echo -e "${green}passed${nc} (maximum error $1)"
+        echo -e "${green}passed${nc} (maximum error $1)"
     else
-	echo -e "${red}failed${nc} (maximum error $1)"
+        echo -e "${red}failed${nc} (maximum error $1)"
     fi
 }
 
