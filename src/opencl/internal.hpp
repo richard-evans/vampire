@@ -42,6 +42,15 @@ namespace vopencl
       {
          typedef std::chrono::time_point<std::chrono::high_resolution_clock> time_t;
          extern time_t sim_start;
+
+#ifdef OPENCL_TIME_KERNELS
+         extern double spin_fields;
+         extern double mat_mul;
+         extern double rng;
+         extern double external_fields;
+         extern double predictor_step;
+         extern double corrector_step;
+#endif // OPENCL_TIME_KERNELS
       }
 
       // number of work items

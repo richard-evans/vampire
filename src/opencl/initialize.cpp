@@ -46,7 +46,16 @@ namespace vopencl
 
       namespace time
       {
-         vcl::time::time_t sim_start;
+         time_t sim_start;
+
+#ifdef OPENCL_TIME_KERNELS
+         double spin_fields = 0.0;
+         double mat_mul = 0.0;
+         double rng = 0.0;
+         double external_fields = 0.0;
+         double predictor_step = 0.0;
+         double corrector_step = 0.0;
+#endif // OPENCL_TIME_KERNELS
       }
    }
 }

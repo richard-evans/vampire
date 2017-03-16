@@ -19,9 +19,6 @@
 #      slower.
 
 
-# this module requires src/gpu/interface.cpp to be compiled with c++11 support
-GCC_CFLAGS+=-std=c++11 -DOPENCL
-
 OPENCL_CFLAGS:=\
 -MMD \
 -Wno-ignored-attributes -Wno-unused-function \
@@ -31,7 +28,7 @@ $(OPENCL_CFLAGS)
 OPENCL_DEBUG_CFLAGS:=\
 -Og -g \
 -fno-fast-math -Wall -Wextra -Wpedantic \
--UNDEBUG -DOPENCL_DEBUG
+-UNDEBUG -DOPENCL_DEBUG -DOPENCL_TIME_KERNELS
 
 OPENCL_LIBS=-lOpenCL
 
@@ -58,6 +55,7 @@ OPENCL_DEPS=$(OPENCL_OBJECTS:%.o=%.d)
 opencl-clean:
 	rm -f $(OPENCL_OBJECTS) $(OPENCL_DEPS)
 
+opencl: GCC_CFLAGS+=-std=c++11 -DOPENCL
 opencl: $(OBJECTS) $(OPENCL_OBJECTS)
 	$(GCC) $^ $(GCC_LDFLAGS) $(LIBS) $(OPENCL_LIBS) -o $(EXECUTABLE)
 
