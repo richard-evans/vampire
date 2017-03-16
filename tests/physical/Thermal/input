@@ -18,8 +18,8 @@ material:file=Co.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature=300.0
-sim:time-steps-increment=100
+sim:temperature=1
+sim:time-steps-increment=1
 sim:total-time-steps=100000000
 sim:time-step=1.0E-16
 
@@ -32,10 +32,10 @@ sim:applied-field-unit-vector=1,0,0
 sim:program=time-series
 sim:integrator=llg-heun
 
-gpu:num-threads=64;
+gpu:num-threads=1;
 
 #------------------------------------------
 # data output
 #------------------------------------------
 output:magnetisation
-output:output-rate = 50
+output:output-rate = 1

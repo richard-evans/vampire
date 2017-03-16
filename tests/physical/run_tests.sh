@@ -120,5 +120,9 @@ do
             perform_test $2
             shift 2
             ;;
+        *)
+            echo -e "${red}Error: unknown option $key. See --help for details."
+            exit
+            ;;
     esac
 done
