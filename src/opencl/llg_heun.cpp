@@ -12,6 +12,7 @@
 
 #include "atoms.hpp"
 #include "material.hpp"
+#include "sim.hpp"
 #include "vopencl.hpp"
 
 #include "data.hpp"
@@ -21,6 +22,22 @@
 #include "opencl_include.hpp"
 #include "opencl_utils.hpp"
 #include "typedefs.hpp"
+
+#ifdef OPENCL_TIME_KERNELS
+#include <chrono>
+
+#define TIME(func, var)                                           \
+   {                                                              \
+      auto start = std::chrono::high_resolution_clock::now();     \
+      func;                                                       \
+      vcl::queue.finish();                                        \
+      auto end = std::chrono::high_resolution_clock::now();       \
+      std::chrono::duration<double> diff = end - start;           \
+      var += diff.count();                                        \
+   }
+#else
+#define TIME(func, var) func
+#endif
 
 #ifdef OPENCL
 namespace vcl = ::vopencl::internal;
@@ -56,12 +73,13 @@ namespace vopencl
 
       static inline void update_spin_fields(void)
       {
-         vcl::total_spin_field_array.zero_buffer();
-         vcl::kernel_call(vcl::update_nexch_spin_fields);
+          //vcl::total_spin_field_array.zero_buffer();
+
+         TIME(vcl::kernel_call(vcl::update_nexch_spin_fields), vcl::time::spin_fields);
 
          vcl::queue.finish();
 
-         vcl::kernel_call(vcl::exchange::calculate_exchange);
+         TIME(vcl::kernel_call(vcl::exchange::calculate_exchange), vcl::time::mat_mul);
       }
 
       namespace llg
@@ -78,17 +96,23 @@ namespace vopencl
             vcl::update_spin_fields();
 
             // update random numbers for external field
-            vcl::kernel_call(rng::grng);
+            TIME(vcl::kernel_call(rng::grng), vcl::time::rng);
             vcl::queue.finish();
 
+            // update system applied field and temperature
+            vcl::update_ext.setArg(5, vcl::real_t(sim::H_vec[0] * sim::H_applied));
+            vcl::update_ext.setArg(6, vcl::real_t(sim::H_vec[1] * sim::H_applied));
+            vcl::update_ext.setArg(7, vcl::real_t(sim::H_vec[2] * sim::H_applied));
+            vcl::update_ext.setArg(8, vcl::real_t(sim::temperature));
+
             // update external and dipole fields
-            vcl::kernel_call(update_ext);
+            TIME(vcl::kernel_call(update_ext), vcl::time::external_fields);
             vcl::queue.finish();
             update_dipolar_fields();
             vcl::queue.finish();
 
             // Heun predictor step
-            vcl::kernel_call(predictor_step);
+            TIME(vcl::kernel_call(predictor_step), vcl::time::predictor_step);
             vcl::queue.finish();
 
             // update spin fields, external fixed
@@ -96,7 +120,7 @@ namespace vopencl
             vcl::queue.finish();
 
             // Heun corrector step
-            vcl::kernel_call(corrector_step);
+            TIME(vcl::kernel_call(corrector_step), vcl::time::corrector_step);
             vcl::queue.finish();
          }
       }
