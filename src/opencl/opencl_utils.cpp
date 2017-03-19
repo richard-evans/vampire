@@ -60,7 +60,7 @@ namespace vopencl
 
          cl_int err = program.build({device}, opts.c_str());
 
-#ifdef OPENCL_DEBUG
+#ifdef OPENCL_LOG
          vcl::OCLLOG << "Building from " << file_name;
          vcl::OCLLOG << " using kernel " << kernel_name << std::endl;
          vcl::OCLLOG << "using options ";

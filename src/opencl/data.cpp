@@ -44,7 +44,7 @@ namespace vopencl
       cl::Context context;
       cl::CommandQueue queue;
 
-#ifdef OPENCL_DEBUG
+#ifdef OPENCL_LOG
       std::ofstream OCLLOG("OpenCL.log");
 #endif // OPENCL_DEBUG
 

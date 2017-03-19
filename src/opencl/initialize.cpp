@@ -125,14 +125,14 @@ namespace vopencl
          devices[i] = tmp_devices;
          ndevices += tmp_devices.size();
 
-#ifdef OPENCL_DEBUG
+#ifdef OPENCL_LOG
          vcl::OCLLOG << "Found platform " << platforms[i].getInfo<CL_PLATFORM_NAME>() << std::endl;
          for (unsigned j=0; j<tmp_devices.size(); ++j)
          {
             vcl::OCLLOG << "Found device " << tmp_devices[j].getInfo<CL_DEVICE_NAME>() << std::endl;
             vcl::OCLLOG << "with version " << tmp_devices[j].getInfo<CL_DEVICE_VERSION>() << std::endl;
          }
-#endif // OPENCL_DEBUG
+#endif // OPENCL_LOG
       }
 
       if (ndevices == 0)
@@ -145,13 +145,31 @@ namespace vopencl
          ::err::vexit();
       }
 
-      cl::Platform default_platform = platforms[0];
-      vcl::default_device = devices[0][0];
+      if (::gpu::platform_num >= nplatforms)
+      {
+         terminaltextcolor(YELLOW);
+         std::cerr << "Warning: Platform specified does not exist (" << ::gpu::platform_num << ")." << std::endl;
+         std::cerr << "Falling back to platform zero." << std::endl;
+         terminaltextcolor(WHITE);
+         ::gpu::platform_num = 0;
+      }
 
-#ifdef OPENCL_DEBUG
+      if (::gpu::device_num >= devices[::gpu::platform_num].size())
+      {
+         terminaltextcolor(YELLOW);
+         std::cerr << "Warning: Device specified does not exist (" << ::gpu::device_num << ")." << std::endl;
+         std::cerr << "Falling back to device zero." << std::endl;
+         terminaltextcolor(WHITE);
+         ::gpu::device_num = 0;
+      }
+
+      cl::Platform default_platform = platforms[::gpu::platform_num];
+      vcl::default_device = devices[::gpu::platform_num][::gpu::device_num];
+
+#ifdef OPENCL_LOG
       vcl::OCLLOG << "Using default platform " << default_platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
       vcl::OCLLOG << "Using default device " << vcl::default_device.getInfo<CL_DEVICE_NAME>() << std::endl;
-#endif // OPENCL_DEBUG
+#endif // OPENCL_LOG
 
       vcl::context = cl::Context({vcl::default_device});
 

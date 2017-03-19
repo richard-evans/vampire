@@ -63,7 +63,7 @@ namespace vopencl
       extern cl::Device default_device;
       extern cl::CommandQueue queue;
 
-#ifdef OPENCL_DEBUG
+#ifdef OPENCL_LOG
       extern std::ofstream OCLLOG;
 #endif
       //-------------------------------------------------------------------------
