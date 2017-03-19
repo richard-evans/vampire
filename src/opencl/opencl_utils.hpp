@@ -100,8 +100,8 @@ namespace vopencl
             }
 
 #ifdef OPENCL_DEBUG
-	    queue.finish();
-	    vcl::debug::verify_copy(device_buffer, host_vector);
+            queue.finish();
+            vcl::debug::verify_copy(device_buffer, host_vector);
 #endif // OPENCL_DEBUG
          }
          return device_buffer;

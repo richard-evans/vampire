@@ -107,8 +107,8 @@ void atomic_add_global(volatile __global real_t *const source,
 {
    union
    {
-       uint_t i;
-       real_t f;
+      uint_t i;
+      real_t f;
    } newVal, prevVal;
 
    do

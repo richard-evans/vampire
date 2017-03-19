@@ -52,7 +52,7 @@ namespace vopencl
             std::cerr << "File " << file_name << " not found!" << std::endl;
          }
          std::string source_code(std::istreambuf_iterator<char>(source_file),
-                                (std::istreambuf_iterator<char>()));
+                                 (std::istreambuf_iterator<char>()));
          cl::Program::Sources source(1, std::make_pair(source_code.c_str(),
                                                        source_code.length()+1));
 

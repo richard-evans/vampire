@@ -26,14 +26,14 @@
 #ifdef OPENCL_TIME_KERNELS
 #include <chrono>
 
-#define TIME(func, var)                                           \
-   {                                                              \
-      auto start = std::chrono::high_resolution_clock::now();     \
-      func;                                                       \
-      vcl::queue.finish();                                        \
-      auto end = std::chrono::high_resolution_clock::now();       \
-      std::chrono::duration<double> diff = end - start;           \
-      var += diff.count();                                        \
+#define TIME(func, var)                                         \
+   {                                                            \
+      auto start = std::chrono::high_resolution_clock::now();   \
+      func;                                                     \
+      vcl::queue.finish();                                      \
+      auto end = std::chrono::high_resolution_clock::now();     \
+      std::chrono::duration<double> diff = end - start;         \
+      var += diff.count();                                      \
    }
 #else
 #define TIME(func, var) func
@@ -73,7 +73,7 @@ namespace vopencl
 
       static inline void update_spin_fields(void)
       {
-          //vcl::total_spin_field_array.zero_buffer();
+         //vcl::total_spin_field_array.zero_buffer();
 
          TIME(vcl::kernel_call(vcl::update_nexch_spin_fields), vcl::time::spin_fields);
 
