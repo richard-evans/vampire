@@ -9,9 +9,9 @@
 
 // C++ standard library headers
 #include <chrono>
-#include <cstdlib>
-#include <ctime>
+#include <functional>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -318,12 +318,6 @@ namespace vopencl
          return true;
       }
 
-      static cl_ulong rand64(void) noexcept
-      {
-         cl_ulong r = std::rand();
-         return (r << 32) | std::rand();
-      }
-
       bool initialize_rng(void) noexcept
       {
          // each atom needs three random numbers per Heun step
@@ -332,22 +326,29 @@ namespace vopencl
          // random numbers need to be stored
          size_t n_rands;
          if (::atoms::num_atoms % 2 == 0)
+         {
             n_rands = ::atoms::num_atoms*3;
+         }
          else
+         {
             n_rands = ::atoms::num_atoms*3 + 1;
+         }
 
          std::vector<cl_ulong> rs(n_rands);
 
          const size_t g_buffer_size = rs.size() * sizeof(vcl::real_t);
 
-         std::srand(std::time(NULL));
+         std::random_device rd;
+         const std::mt19937_64 gen(rd());
+
+         // must not seed xorshift with 0
+         const std::uniform_int_distribution<cl_ulong> dist(1);
+
+         auto rand64 = std::bind(dist, gen);
+
          for (unsigned i=0; i<rs.size(); ++i)
          {
-            // must not seed xorshift with 0
-            cl_ulong r;
-            do { r = rand64(); } while (r == 0);
-            assert(r != cl_ulong(0));
-            rs[i] = r;
+            rs[i] = rand64();
          }
 
          vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
