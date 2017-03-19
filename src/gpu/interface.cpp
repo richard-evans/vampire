@@ -83,8 +83,8 @@ namespace gpu{
 
       // std::stoi is c++11
 #if __cplusplus > 199711L
-      test="num-threads";
-      if (word==test) {
+      test = "num-threads";
+      if (word == test) {
          int val = std::stoi(value, NULL, 10);
          if (val > 0) {
             gpu::num_threads = val;
@@ -96,7 +96,36 @@ namespace gpu{
             err::vexit();
          }
       }
+
+      test = "platform-num";
+      if (word == test) {
+         int val = std::stoi(value, NULL, 10);
+         if (val >= 0) {
+            gpu::platform_num = val;
+            return true;
+         } else {
+            terminaltextcolor(RED);
+            std::cerr << "Error: Value for \'" << prefix << ':' << word << "\' must be zero or a positive integer" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+
+      test = "device-num";
+      if (word == test) {
+         int val = std::stoi(value, NULL, 10);
+         if (val >= 0) {
+            gpu::device_num = val;
+            return true;
+         } else {
+            terminaltextcolor(RED);
+            std::cerr << "Error: Value for \'" << prefix << ':' << word << "\' must be zero or a positive integer" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
 #endif
+
       //--------------------------------------------------------------------
       else{
          terminaltextcolor(RED);

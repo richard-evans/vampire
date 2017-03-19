@@ -31,7 +31,6 @@ namespace vopencl
       {
          std::string default_opts("-Isrc/opencl/cl "
                                   "-cl-fast-relaxed-math "
-                                  "-cl-uniform-work-group-size "
 #ifdef OPENCL_DP
                                   "-DOPENCL_DP "
 #endif
