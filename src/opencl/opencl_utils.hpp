@@ -83,8 +83,8 @@ namespace vopencl
       cl::Buffer create_device_buffer(const std::vector<T> &host_vector,
                                       const cl_mem_flags mem_flags=CL_MEM_READ_WRITE,
                                       const cl_bool blocking=CL_FALSE,
-                                      const cl::Context &context=vcl::context,
-                                      const cl::CommandQueue &queue=vcl::queue)
+                                      const cl::CommandQueue &queue=vcl::queue,
+                                      const cl::Context &context=vcl::context)
       {
          const size_t buffer_size = host_vector.size() * sizeof(T);
          cl::Buffer device_buffer(context, mem_flags, buffer_size);

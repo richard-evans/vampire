@@ -155,7 +155,7 @@ namespace vopencl
 
       vcl::context = cl::Context({vcl::default_device});
 
-      vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device, CL_QUEUE_PROFILING_ENABLE);
+      vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
 
       if (::gpu::num_threads > 0)
       {
@@ -313,7 +313,7 @@ namespace vopencl
          }
 
          // Allocate device memory and initialize materials array
-         vcl::mp::materials = vcl::create_device_buffer(h_materials, CL_MEM_READ_ONLY);
+         vcl::mp::materials = vcl::create_device_buffer(h_materials, CL_MEM_READ_ONLY, CL_TRUE);
 
          return true;
       }
@@ -352,7 +352,7 @@ namespace vopencl
          }
 
          vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
-         vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE);
+         vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE, CL_TRUE);
 
          return true;
       }

@@ -17,6 +17,7 @@
 #include "internal.hpp"
 #include "kernels.hpp"
 #include "llg_heun.hpp"
+#include "opencl_include.hpp"
 #include "opencl_utils.hpp"
 #include "typedefs.hpp"
 
@@ -73,6 +74,8 @@ static void init_exchange(void)
    std::vector<vcl::real_t> J_vals_h(3*vsize);
 #endif
 
+   cl::CommandQueue write_q(vcl::context, vcl::default_device);
+
    switch (::atoms::exchange_type)
    {
    case 0:
@@ -94,7 +97,7 @@ static void init_exchange(void)
          J_vals_h[xxi] = J_vals_h[yyi] = J_vals_h[zzi] = - Jij;
 #endif
       }
-      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY);
+      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY, CL_FALSE, write_q);
    }
    break;
    case 1:
@@ -126,7 +129,7 @@ static void init_exchange(void)
          J_vals_h[zzi] = - vel.Jij[2];
 #endif
       }
-      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY);
+      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY, CL_FALSE, write_q);
    }
    break;
 
@@ -143,7 +146,7 @@ static void init_exchange(void)
    }
 
    // Allocate device memory and initialize limits array
-   vcl::atoms::limits = vcl::create_device_buffer(limits_h, CL_MEM_READ_ONLY);
+   vcl::atoms::limits = vcl::create_device_buffer(limits_h, CL_MEM_READ_ONLY, CL_FALSE, write_q);
 
    if (::atoms::num_atoms > 1)
       vcl::atoms::neighbours = vcl::create_device_buffer(::atoms::neighbour_list_array, CL_MEM_READ_ONLY);
@@ -155,6 +158,8 @@ static void init_exchange(void)
                         vcl::atoms::spin_array.buffer(),
                         vcl::total_spin_field_array.buffer(),
                         ::atoms::num_atoms);
+
+   write_q.finish();
 }
 
 static void init_spin_fields(void)
@@ -194,7 +199,9 @@ static void init_llg(void)
                                                     (1.0 + alpha*alpha));
    }
 
-   vcl::llg::heun_parameters_device = vcl::create_device_buffer(heun_params_host, CL_MEM_READ_ONLY);
+   cl::CommandQueue write_q(vcl::context, vcl::default_device);
+
+   vcl::llg::heun_parameters_device = vcl::create_device_buffer(heun_params_host, CL_MEM_READ_ONLY, CL_FALSE, write_q);
 
    vcl::set_kernel_args(vcl::llg::predictor_step,
                         vcl::atoms::type_array,
@@ -212,6 +219,8 @@ static void init_llg(void)
                         vcl::total_external_field_array.buffer(),
                         vcl::llg::spin_buffer_array.buffer(),
                         vcl::llg::dS_array.buffer());
+
+   write_q.finish();
 }
 
 namespace vopencl

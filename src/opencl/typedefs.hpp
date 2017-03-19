@@ -59,14 +59,16 @@ namespace vopencl
 
       public:
 
-         Buffer3D(void) {}
+         Buffer3D(void) : n_elems(0), buffer_size(0) {}
 
          // initialize without writing, but with size
          // e.g. for use when generating buffer on device
          Buffer3D(const cl::Context &c,
                   const cl_mem_flags fs,
                   const size_t n) noexcept
-            : buff_container(1), n_elems(n), buffer_size(n*v*sizeof(Rv))
+            : buff_container(1),
+              n_elems(n),
+              buffer_size(n*v*sizeof(Rv))
          {
             buff_container[0] = cl::Buffer(c, fs, v*n_elems * sizeof(Rv));
          }
@@ -83,8 +85,8 @@ namespace vopencl
                   const std::vector<R> &zs) noexcept
             : buff_container(1)
          {
-            assert(xs.data() != nullptr);
-            assert(xs.size() == ys.size() &&
+            assert(xs.data() != nullptr &&
+                   xs.size() == ys.size() &&
                    xs.size() == zs.size());
 
             n_elems = xs.size();
@@ -104,7 +106,21 @@ namespace vopencl
 
             buff_container[0] = vcl::create_device_buffer(buff, fs, CL_TRUE);
          }
+/*
+  Buffer3D<T>& operator=(const Buffer3D<T>& rhs)
+  {
+  if (this->buffer_size == 0)
+  {
+  this->buffer_size = rhs.buffer_size;
+  this->n_elems = this->buffer_size / sizeof (T);
+  }
 
+  this->buff_container[0] = cl::Buffer(rhs.buff_container[0]);
+  //const size_t smallest_size = std::min(this->buffer_size, rhs.buffer_size);
+  //vcl::queue.enqueueCopyBuffer(rhs.buff_container[0], this->buff_container[0], 0, 0, smallest_size);
+  //vcl::queue.finish();
+  }
+*/
          // reads data from device, assumes host vectors already have enough capacity
          template <typename R>
          void copy_to_host(const cl::CommandQueue &q,
@@ -112,9 +128,9 @@ namespace vopencl
                            std::vector<R> &ys,
                            std::vector<R> &zs) const noexcept
          {
-            assert(xs.size() == n_elems);
-            assert(ys.size() == n_elems);
-            assert(zs.size() == n_elems);
+            assert(xs.size() == n_elems &&
+                   ys.size() == n_elems &&
+                   zs.size() == n_elems);
 
             std::vector<Rv> buff(v*n_elems);
             q.enqueueReadBuffer(buff_container[0], CL_TRUE, 0, buffer_size, buff.data());
@@ -132,6 +148,7 @@ namespace vopencl
 #endif // USE_VECTOR_TYPE
             }
          }
+
 
          // copies buffer to dst buffer on device
          void copy_to_dev(const cl::CommandQueue &q,
