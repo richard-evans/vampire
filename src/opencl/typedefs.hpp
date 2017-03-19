@@ -39,7 +39,6 @@ namespace vopencl
       // this will allow a work item to read the x,y,z components in fewer
       // reads than if they were in different locations.
 
-      template <typename T>
       class Buffer3D
       {
          std::vector<cl::Buffer> buff_container;
@@ -50,32 +49,30 @@ namespace vopencl
          size_t buffer_size;
 
 #ifdef USE_VECTOR_TYPE
-         typedef vcl::real_t3 Rv;
-         unsigned v = 1;
+         typedef vcl::real_t3 elem_t;
+         const static unsigned n_elems_per_set = 1;
 #else
-         typedef T Rv;
-         unsigned v = 3;
+         typedef vcl::real_t elem_t;
+         const static unsigned n_elems_per_set = 3;
 #endif // USE_VECTOR_TYPE
 
       public:
 
-         Buffer3D(void) : n_elems(0), buffer_size(0) {}
+         Buffer3D(void) {}
 
          // initialize without writing, but with size
          // e.g. for use when generating buffer on device
          Buffer3D(const cl::Context &c,
                   const cl_mem_flags fs,
                   const size_t n) noexcept
-            : buff_container(1),
-              n_elems(n),
-              buffer_size(n*v*sizeof(Rv))
+            : buff_container(1), n_elems(n), buffer_size(n * n_elems_per_set * sizeof (elem_t))
          {
-            buff_container[0] = cl::Buffer(c, fs, v*n_elems * sizeof(Rv));
+            buff_container[0] = cl::Buffer(c, fs, buffer_size);
          }
 
          // initialize with 3 vectors to write data to device
-         // use template so that a Buffer3D<float> can be initialised
-         // with std::vector<double>s
+         // use template so that class can be initialised
+         // with std::vector<double> or std::vector<float>
          template <typename R>
          Buffer3D(const cl::Context &c,
                   const cl::CommandQueue &q,
@@ -85,42 +82,28 @@ namespace vopencl
                   const std::vector<R> &zs) noexcept
             : buff_container(1)
          {
-            assert(xs.data() != nullptr &&
+            assert(xs.data() != nullptr   &&
                    xs.size() == ys.size() &&
                    xs.size() == zs.size());
 
             n_elems = xs.size();
-            buffer_size = n_elems * v * sizeof(Rv);
+            buffer_size = n_elems * n_elems_per_set * sizeof(elem_t);
 
-            std::vector<Rv> buff(v*n_elems);
+            std::vector<elem_t> buff(n_elems_per_set * n_elems);
             for (size_t i=0; i<n_elems; ++i)
             {
 #ifdef USE_VECTOR_TYPE
-               buff[i] = Rv{xs[i], ys[i], zs[i]};
+               buff[i] = elem_t{xs[i], ys[i], zs[i]};
 #else
-               buff[3*i+0] = T(xs[i]);
-               buff[3*i+1] = T(ys[i]);
-               buff[3*i+2] = T(zs[i]);
+               buff[3*i+0] = vcl::real_t(xs[i]);
+               buff[3*i+1] = vcl::real_t(ys[i]);
+               buff[3*i+2] = vcl::real_t(zs[i]);
 #endif // USE_VECTOR_TYPE
             }
 
             buff_container[0] = vcl::create_device_buffer(buff, fs, CL_TRUE);
          }
-/*
-  Buffer3D<T>& operator=(const Buffer3D<T>& rhs)
-  {
-  if (this->buffer_size == 0)
-  {
-  this->buffer_size = rhs.buffer_size;
-  this->n_elems = this->buffer_size / sizeof (T);
-  }
 
-  this->buff_container[0] = cl::Buffer(rhs.buff_container[0]);
-  //const size_t smallest_size = std::min(this->buffer_size, rhs.buffer_size);
-  //vcl::queue.enqueueCopyBuffer(rhs.buff_container[0], this->buff_container[0], 0, 0, smallest_size);
-  //vcl::queue.finish();
-  }
-*/
          // reads data from device, assumes host vectors already have enough capacity
          template <typename R>
          void copy_to_host(const cl::CommandQueue &q,
@@ -132,7 +115,7 @@ namespace vopencl
                    ys.size() == n_elems &&
                    zs.size() == n_elems);
 
-            std::vector<Rv> buff(v*n_elems);
+            std::vector<elem_t> buff(n_elems_per_set * n_elems);
             q.enqueueReadBuffer(buff_container[0], CL_TRUE, 0, buffer_size, buff.data());
 
             for (size_t i=0; i<n_elems; ++i)
@@ -149,7 +132,6 @@ namespace vopencl
             }
          }
 
-
          // copies buffer to dst buffer on device
          void copy_to_dev(const cl::CommandQueue &q,
                           Buffer3D &dst) const noexcept
@@ -162,10 +144,10 @@ namespace vopencl
          void zero_buffer(void) noexcept
          {
 #ifdef CL_API_SUFFIX__VERSION_1_2
-            const Rv zero{0.0};
-            vcl::queue.enqueueFillBuffer(buff_container[0], &zero, sizeof(Rv), v*n_elems);
+            const elem_t zero{0.0};
+            vcl::queue.enqueueFillBuffer(buff_container[0], &zero, sizeof (elem_t), n_elems_per_set * n_elems);
 #else
-            const std::vector<Rv> zeros(3*n_elems, {0.0});
+            const std::vector<elem_t> zeros(3 * n_elems, {0.0});
             vcl::queue.enqueueWriteBuffer(buff_container[0], CL_FALSE, 0, buffer_size, zeros.data());
 #endif // CL_API_SUFFIX__VERSION_1_2
 

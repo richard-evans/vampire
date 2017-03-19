@@ -182,10 +182,10 @@ static void init_llg(void)
    const size_t num_atms = ::atoms::num_atoms;
 
    vcl::llg::spin_buffer_array =
-      vcl::Buffer3D<vcl::real_t>(vcl::context, CL_MEM_READ_WRITE, num_atms);
+      vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, num_atms);
 
    vcl::llg::dS_array =
-      vcl::Buffer3D<vcl::real_t>(vcl::context, CL_MEM_READ_WRITE, num_atms);
+      vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, num_atms);
 
    std::vector<vcl::heun_parameter_t> heun_params_host(num_mats);
 

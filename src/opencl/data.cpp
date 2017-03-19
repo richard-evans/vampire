@@ -46,7 +46,7 @@ namespace vopencl
 
 #ifdef OPENCL_LOG
       std::ofstream OCLLOG("OpenCL.log");
-#endif // OPENCL_DEBUG
+#endif // OPENCL_LOG
 
       namespace rng
       {
@@ -56,9 +56,9 @@ namespace vopencl
 
       namespace atoms
       {
-         vcl::Buffer3D<vcl::real_t> spin_array;
+         vcl::Buffer3D spin_array;
 
-         vcl::Buffer3D<vcl::real_t> coord_array;
+         vcl::Buffer3D coord_array;
 
          cl::Buffer type_array;
 
@@ -72,11 +72,11 @@ namespace vopencl
 
       namespace cells
       {
-         vcl::Buffer3D<vcl::real_t> coord_array;
+         vcl::Buffer3D coord_array;
 
-         vcl::Buffer3D<vcl::real_t> mag_array;
+         vcl::Buffer3D mag_array;
 
-         vcl::Buffer3D<vcl::real_t> field_array;
+         vcl::Buffer3D field_array;
 
          cl::Buffer volume_array;
 
@@ -88,16 +88,16 @@ namespace vopencl
          cl::Buffer materials;
       }
 
-      vcl::Buffer3D<vcl::real_t> total_spin_field_array;
+      vcl::Buffer3D total_spin_field_array;
 
-      vcl::Buffer3D<vcl::real_t> total_external_field_array;
+      vcl::Buffer3D total_external_field_array;
 
-      vcl::Buffer3D<vcl::real_t> dipolar_field_array;
+      vcl::Buffer3D dipolar_field_array;
 
       namespace llg
       {
-         vcl::Buffer3D<vcl::real_t> spin_buffer_array;
-         vcl::Buffer3D<vcl::real_t> dS_array;
+         vcl::Buffer3D spin_buffer_array;
+         vcl::Buffer3D dS_array;
          cl::Buffer heun_parameters_device;
       }
 
