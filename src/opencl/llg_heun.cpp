@@ -113,15 +113,24 @@ namespace vopencl
             vcl::update_ext.setArg(7, vcl::real_t(sim::H_vec[2] * sim::H_applied));
             vcl::update_ext.setArg(8, vcl::real_t(sim::temperature));
 
-            if (::gpu::platform_other != ::gpu::platform)
+            if (::gpu::platform_other != ::gpu::platform) // context to context copy
             {
-               vcl::queue_other.finish();
-
                // TODO: find a way to do this device to device
                const int n_rands = (::atoms::num_atoms%2==0) ? ::atoms::num_atoms*3 : ::atoms::num_atoms*3+1;
                std::vector<vcl::real_t> grands(n_rands);
+
+               vcl::queue_other.finish();
+
                vcl::queue_other.enqueueReadBuffer(::vcl::rng::grands, CL_TRUE, 0, n_rands * sizeof (vcl::real_t), grands.data());
                vcl::queue_other.enqueueWriteBuffer(::vcl::rng::grands_copy, CL_TRUE, 0, n_rands * sizeof (vcl::real_t), grands.data());
+            }
+            else if (::gpu::device_other != ::gpu::device) // same context, different device
+            {
+               const int n_rands = (::atoms::num_atoms%2==0) ? ::atoms::num_atoms*3 : ::atoms::num_atoms*3+1;
+
+               vcl::queue_other.finish();
+
+               vcl::queue.enqueueCopyBuffer(::vcl::rng::grands, vcl::rng::grands_copy, 0, 0, n_rands * sizeof (vcl::real_t));
             }
 
             vcl::queue.finish();

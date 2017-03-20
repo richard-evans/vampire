@@ -7,7 +7,10 @@
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
-create:single-spin
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 7.0 !nm
+dimensions:system-size-y = 7.0 !nm
+dimensions:system-size-z = 7.0 !nm
 
 #------------------------------------------
 # Material Files:
@@ -17,7 +20,7 @@ material:file=Co.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature=0.0
+sim:temperature=300.0
 sim:time-steps-increment=100
 sim:total-time-steps=10000
 sim:time-step=1.0E-16
@@ -29,9 +32,9 @@ gpu:platform=1
 gpu:device=0
 gpu:num-threads=8192
 
-gpu:platform-other=0
-gpu:device-other=0
-gpu:num-threads=32
+#gpu:platform-other=0
+#gpu:device-other=0
+#gpu:num-threads-other=32
 
 #------------------------------------------
 # Program and integrator details
