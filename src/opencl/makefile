@@ -2,21 +2,34 @@
 #          Makefile for vopencl module
 #--------------------------------------------------------------
 
-# Compile as `make opencl(-debug)` or `OPENCL_CFLAGS="options" make opencl(-debug)`
+# Compile with `make opencl(-debug)` or `OPENCL_CFLAGS="options" make opencl(-debug)`
 # where available options are:
 #
+# -DENABLE_MULTIPLE_DEVICES:
+#      Enable the ability to use two devices to execute kernels. By
+#      default only one is used. To use two devices at least one of
+#      gpu:platform-other=n or gpu:device-other=n must be specified in the
+#      input file. This will add extra overhead even if only one device is
+#      used and presently gives worse performance most of the time even on
+#      two devices.
+#
+# -DOPENCL_TIME_KERNELS:
+#      Enable timing of kernels to measure individual kernel performance. This
+#      introduces more synchronisation and therefore will result in lower
+#      performance overall.
+#
 # -DOPENCL_USE_NATIVE_FUNCTIONS:
-#      Use native device functions which may give better performance but at the cost
-#      of less accuracy.
+#      Use native device functions which may give better performance but at the
+#      cost of less accuracy.
 #
 # -UOPENCL_DP:
-#      Use single precision floating point math instead of double precision. Some
-#      devices may require this.
+#      Use single precision floating point math instead of double precision. It
+#      should give better performance and some devices may require this.
 #
 # -UUSE_VECTOR_TYPE:
-#      OpenCL vector types will not be used for data storage. This may (depending on implementation
-#      and hardware) decrease amount of device memory used but memory accesses may be significantly
-#      slower.
+#      OpenCL vector types will not be used for data storage. This may
+#      (depending on implementation and hardware) decrease amount of device
+#      memory used but memory accesses may be significantly slower.
 
 
 OPENCL_CFLAGS:=\
