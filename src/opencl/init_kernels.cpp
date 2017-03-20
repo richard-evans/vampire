@@ -156,8 +156,7 @@ static void init_exchange(void)
                         vcl::atoms::limits,
                         vcl::atoms::neighbours,
                         vcl::atoms::spin_array.buffer(),
-                        vcl::total_spin_field_array.buffer(),
-                        ::atoms::num_atoms);
+                        vcl::total_spin_field_array.buffer());
 
    write_q.finish();
 }
