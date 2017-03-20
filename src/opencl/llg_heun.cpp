@@ -97,8 +97,13 @@ namespace vopencl
          {
             // update random numbers for external field
             // this is independent of the rest, so if possible do it on a
-            // different device
+            // different device or just another queue
+#ifdef ENABLE_MULTIPLE_DEVICES
             TIME(vcl::kernel_call(rng::grng, vcl::queue_other, vcl::global_other), vcl::time::rng, vcl::queue_other);
+#else
+            const cl::CommandQueue rand_q(vcl::context, vcl::default_device);
+            TIME(vcl::kernel_call(rng::grng, rand_q), vcl::time::rng, rand_q);
+#endif // ENABLE_MULTIPLE_DEVICES
 
             // make a copy of current spins for both Heun steps
             vcl::atoms::spin_array.copy_to_dev(vcl::queue, vcl::llg::spin_buffer_array);
@@ -113,25 +118,27 @@ namespace vopencl
             vcl::update_ext.setArg(7, vcl::real_t(sim::H_vec[2] * sim::H_applied));
             vcl::update_ext.setArg(8, vcl::real_t(sim::temperature));
 
+#ifdef ENABLE_MULTIPLE_DEVICES
+            // copy random numbers to main device
             if (::gpu::platform_other != ::gpu::platform) // context to context copy
             {
                // TODO: find a way to do this device to device
-               const int n_rands = (::atoms::num_atoms%2==0) ? ::atoms::num_atoms*3 : ::atoms::num_atoms*3+1;
-               std::vector<vcl::real_t> grands(n_rands);
+               std::vector<vcl::real_t> grands(vcl::rng::n_rands);
 
                vcl::queue_other.finish();
 
-               vcl::queue_other.enqueueReadBuffer(::vcl::rng::grands, CL_TRUE, 0, n_rands * sizeof (vcl::real_t), grands.data());
-               vcl::queue_other.enqueueWriteBuffer(::vcl::rng::grands_copy, CL_TRUE, 0, n_rands * sizeof (vcl::real_t), grands.data());
+               vcl::queue_other.enqueueReadBuffer(::vcl::rng::grands, CL_TRUE, 0, vcl::rng::n_rands * sizeof (vcl::real_t), grands.data());
+               vcl::queue_other.enqueueWriteBuffer(::vcl::rng::grands_copy, CL_TRUE, 0, vcl::rng::n_rands * sizeof (vcl::real_t), grands.data());
             }
             else if (::gpu::device_other != ::gpu::device) // same context, different device
             {
-               const int n_rands = (::atoms::num_atoms%2==0) ? ::atoms::num_atoms*3 : ::atoms::num_atoms*3+1;
-
                vcl::queue_other.finish();
 
-               vcl::queue.enqueueCopyBuffer(::vcl::rng::grands, vcl::rng::grands_copy, 0, 0, n_rands * sizeof (vcl::real_t));
+               vcl::queue.enqueueCopyBuffer(::vcl::rng::grands, vcl::rng::grands_copy, 0, 0, vcl::rng::n_rands * sizeof (vcl::real_t));
             }
+#else
+            rand_q.finish();
+#endif // ENABLE_MULTIPLE_DEVICES
 
             vcl::queue.finish();
 

@@ -150,7 +150,7 @@ namespace vopencl
          ::err::vexit();
       }
 
-      //// Set up platforms ////
+      //// Set up platforms and devices ////
       if (::gpu::platform < 0) // not specified in input file
       {
          ::gpu::platform = 0;
@@ -164,20 +164,6 @@ namespace vopencl
          ::gpu::platform = 0;
       }
 
-      if (::gpu::platform_other < 0) // not specified in input file
-      {
-         ::gpu::platform_other = ::gpu::platform;
-      }
-      else if (::gpu::platform_other >= nplatforms) // specified incorrectly
-      {
-         terminaltextcolor(YELLOW);
-         std::cerr << "Warning: Platform specified does not exist (" << ::gpu::platform << "). "
-                   << "Falling back to platform " << ::gpu::platform << '.' << std::endl;
-         terminaltextcolor(WHITE);
-         ::gpu::platform_other = ::gpu::platform;
-      }
-
-      //// Set up devices ////
       if (::gpu::device < 0) // not specified in input file
       {
          // silently use default
@@ -193,12 +179,46 @@ namespace vopencl
          ::gpu::device = 0;
       }
 
+      if (::gpu::num_threads > 0)
+      {
+         vcl::global = cl::NDRange(::gpu::num_threads);
+      }
+      else
+      {
+         int default_nthreads = 8192;
+         terminaltextcolor(YELLOW);
+         std::cerr << "Warning: defaulting to " << default_nthreads << " threads on main device." << std::endl;
+         std::cerr << "Use gpu:num-threads=n in the input file to specify number." << std::endl;
+         terminaltextcolor(WHITE);
+         vcl::global = cl::NDRange(default_nthreads);
+      }
+
+      cl::Platform default_platform = platforms[::gpu::platform];
+      vcl::default_device = devices[::gpu::platform][::gpu::device];
+
+#ifndef ENABLE_MULTIPLE_DEVICES
+      vcl::context = cl::Context({vcl::default_device});
+
+      vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device,
+                                    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+#else
+      if (::gpu::platform_other < 0) // not specified in input file
+      {
+         ::gpu::platform_other = ::gpu::platform;
+      }
+      else if (::gpu::platform_other >= nplatforms) // specified incorrectly
+      {
+         terminaltextcolor(YELLOW);
+         std::cerr << "Warning: Platform specified does not exist (" << ::gpu::platform << "). "
+                   << "Falling back to platform " << ::gpu::platform << '.' << std::endl;
+         terminaltextcolor(WHITE);
+         ::gpu::platform_other = ::gpu::platform;
+      }
 
       if (::gpu::device_other < 0) // not specified in input file
       {
          // silently use only one device
          ::gpu::device_other = ::gpu::device;
-         std::cout << ::gpu::device_other << std::endl;
       }
       else if (::gpu::device_other >= devices[::gpu::platform_other].size()) // specified incorrectly
       {
@@ -210,34 +230,27 @@ namespace vopencl
          ::gpu::device_other = ::gpu::device;
       }
 
-      cl::Platform default_platform = platforms[::gpu::platform];
-      vcl::default_device = devices[::gpu::platform][::gpu::device];
+      if (::gpu::num_threads_other > 0)
+      {
+         vcl::global_other = cl::NDRange(::gpu::num_threads_other);
+      }
+      else
+      {
+         vcl::global_other = vcl::global;
+      }
 
       cl::Platform extra_platform = platforms[::gpu::platform_other];
       vcl::extra_device = devices[::gpu::platform_other][::gpu::device_other];
-
-#ifdef OPENCL_LOG
-      vcl::OCLLOG << "Using default platform " << default_platform.getInfo<CL_PLATFORM_NAME>()  << '\n';
-      vcl::OCLLOG << "Using default device "   << vcl::default_device.getInfo<CL_DEVICE_NAME>() << '\n';
-
-      if (::gpu::platform_other != ::gpu::platform ||
-          ::gpu::device_other != ::gpu::device)
-      {
-         vcl::OCLLOG << "Using extra platform " << extra_platform.getInfo<CL_PLATFORM_NAME>()  << '\n';
-         vcl::OCLLOG << "Using extra device "   << vcl::extra_device.getInfo<CL_DEVICE_NAME>() << '\n';
-      }
-
-      vcl::OCLLOG << '\n';
-#endif // OPENCL_LOG
 
       if (::gpu::platform_other == ::gpu::platform &&
           ::gpu::device_other   == ::gpu::device) // only use one device
       {
          vcl::context = cl::Context({vcl::default_device});
-         vcl::context_other = vcl::context;
 
          vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device,
-                                    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+                                       CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+
+         vcl::context_other = vcl::context;
 
          vcl::queue_other = vcl::queue;
       }
@@ -264,29 +277,24 @@ namespace vopencl
          vcl::queue_other = cl::CommandQueue(vcl::context_other, vcl::extra_device,
                                              CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
       }
+#endif // ENABLE_MULTIPLE_DEVICES
 
-      if (::gpu::num_threads > 0)
-      {
-         vcl::global = cl::NDRange(::gpu::num_threads);
-      }
-      else
-      {
-         int default_nthreads = 8192;
-         terminaltextcolor(YELLOW);
-         std::cerr << "Warning: defaulting to " << default_nthreads << " threads on main device." << std::endl;
-         std::cerr << "Use gpu:num-threads=n in the input file to specify number." << std::endl;
-         terminaltextcolor(WHITE);
-         vcl::global = cl::NDRange(default_nthreads);
-      }
 
-      if (::gpu::num_threads_other > 0)
+#ifdef OPENCL_LOG
+      vcl::OCLLOG << "Using default platform " << default_platform.getInfo<CL_PLATFORM_NAME>()  << '\n';
+      vcl::OCLLOG << "Using default device "   << vcl::default_device.getInfo<CL_DEVICE_NAME>() << '\n';
+
+#ifdef ENABLE_MULTIPLE_DEVICES
+      if (::gpu::platform_other != ::gpu::platform ||
+          ::gpu::device_other != ::gpu::device)
       {
-         vcl::global_other = cl::NDRange(::gpu::num_threads_other);
+         vcl::OCLLOG << "Using extra platform " << extra_platform.getInfo<CL_PLATFORM_NAME>()  << '\n';
+         vcl::OCLLOG << "Using extra device "   << vcl::extra_device.getInfo<CL_DEVICE_NAME>() << '\n';
       }
-      else
-      {
-         vcl::global_other = vcl::global;
-      }
+#endif // ENABLE_MULTIPLE_DEVICES
+
+      vcl::OCLLOG << '\n';
+#endif // OPENCL_LOG
 
       // build all OpenCL kernels
       vcl::build_kernels();
@@ -441,19 +449,18 @@ namespace vopencl
          // Box Muller transform uses two uniform random numbers to
          // generate two gaussian random numbers so an even number of
          // random numbers need to be stored
-         size_t n_rands;
          if (::atoms::num_atoms % 2 == 0)
          {
-            n_rands = ::atoms::num_atoms*3;
+            vcl::rng::n_rands = ::atoms::num_atoms*3;
          }
          else
          {
-            n_rands = ::atoms::num_atoms*3 + 1;
+            vcl::rng::n_rands = ::atoms::num_atoms*3 + 1;
          }
 
-         std::vector<cl_ulong> rs(n_rands);
+         std::vector<cl_ulong> rs(vcl::rng::n_rands);
 
-         const size_t g_buffer_size = rs.size() * sizeof(vcl::real_t);
+         const size_t g_buffer_size = vcl::rng::n_rands * sizeof (vcl::real_t);
 
          std::random_device rd;
          const std::mt19937_64 gen(rd());
@@ -463,11 +470,12 @@ namespace vopencl
 
          auto rand64 = std::bind(dist, gen);
 
-         for (unsigned i=0; i<rs.size(); ++i)
+         for (unsigned i=0; i<vcl::rng::n_rands; ++i)
          {
             rs[i] = rand64();
          }
 
+#ifdef ENABLE_MULTIPLE_DEVICES
          vcl::rng::grands = cl::Buffer(vcl::context_other, CL_MEM_READ_WRITE, g_buffer_size);
          vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE, CL_TRUE, vcl::queue_other, vcl::context_other);
 
@@ -476,6 +484,10 @@ namespace vopencl
             // copy of grands on main platform
             vcl::rng::grands_copy = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, g_buffer_size);
          }
+#else
+         vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
+         vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE, CL_TRUE, vcl::queue, vcl::context);
+#endif // ENABLE_MULTIPLE_DEVICES
 
          return true;
       }

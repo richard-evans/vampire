@@ -53,6 +53,7 @@ static void init_dipole(void)
 
 static void init_external_fields(void)
 {
+#ifdef ENABLE_MULTIPLE_DEVICES
    if (::gpu::platform_other == ::gpu::platform)
    {
       vcl::set_kernel_args(vcl::update_ext,
@@ -79,6 +80,18 @@ static void init_external_fields(void)
                            vcl::real_t(sim::H_vec[2] * sim::H_applied),
                            vcl::real_t(sim::temperature));
    }
+#else
+   vcl::set_kernel_args(vcl::update_ext,
+                        vcl::atoms::type_array,
+                        vcl::mp::materials,
+                        vcl::dipolar_field_array.buffer(),
+                        vcl::total_external_field_array.buffer(),
+                        vcl::rng::grands,
+                        vcl::real_t(sim::H_vec[0] * sim::H_applied),
+                        vcl::real_t(sim::H_vec[1] * sim::H_applied),
+                        vcl::real_t(sim::H_vec[2] * sim::H_applied),
+                        vcl::real_t(sim::temperature));
+#endif // ENABLE_MULTIPLE_DEVICES
 }
 
 static void init_exchange(void)

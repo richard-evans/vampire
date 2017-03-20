@@ -56,6 +56,8 @@ namespace vopencl
          cl::Buffer state;
          cl::Buffer grands;
          cl::Buffer grands_copy;
+
+         unsigned n_rands;
       }
 
       namespace atoms
