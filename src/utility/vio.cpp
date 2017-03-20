@@ -49,6 +49,7 @@
 // Headers
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "create.hpp"
 #include "demag.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
@@ -60,6 +61,7 @@
 #include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
+#include "unitcell.hpp"
 #include "units.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
@@ -78,6 +80,9 @@ std::ofstream zlog;
 std::ofstream zmag;
 std::ofstream zgrain;
 
+#ifdef WIN_COMPILE
+#include <direct.h>
+#endif
 
 void terminaltextcolor(enum textcolor color){
 #ifdef WIN_COMPILE
@@ -261,6 +266,13 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
       getcwd(directory, sizeof(directory));
    #endif
 
+   //--------------------------------------
+   // Determine strings for column headers
+   //--------------------------------------
+   // temporary code to use a variable that is not yet needed
+   int col = file_output_list[0];
+   file_output_list[0] = col;
+
    //------------------------------------
    // Output output file header
    //------------------------------------
@@ -293,8 +305,12 @@ int match_dimension(std::string const, std::string const, std::string const, int
 int match_sim(std::string const, std::string const, std::string const, int const);
 int match_vout_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
 int match_vout_grain_list(std::string const, std::string const, int const, std::vector<unsigned int> &);
-int match_material(string const, string const, string const, int const, int const, int const);
-int match_config(string const, string const, int const);
+int match_material(string const, string const, string const, int const, int const, int const, string const, string const);
+int match_config(std::string const, std::string const, std::string const, int const);
+
+// temporary array of materials for reading in material data
+//std::cout << "here" << std::endl;
+std::vector<mp::materials_t> read_material(0);
 
 // Function to extract all variables from a string and return a vector
 std::vector<double> DoublesFromString(std::string value){
@@ -522,7 +538,7 @@ void check_for_valid_unit_vector(std::vector<double>& u, /// unit vector
 /// Function to check for correct 3-component vector and ensure length of 1
 ///-------------------------------------------------------------------------
 ///
-void check_for_valid_vector(std::vector<double>& u, /// unit vector
+void check_for_valid_three_vector(std::vector<double>& u, /// unit vector
                            std::string word, /// input file keyword
                            int line, /// input file line
                            std::string prefix, /// input file prefix
@@ -564,6 +580,77 @@ void check_for_valid_vector(std::vector<double>& u, /// unit vector
    return;
 
 }
+
+///
+/// Function to check for correct vector with valid values
+///-------------------------------------------------------------------------
+///
+void check_for_valid_vector(std::vector<double>& u, /// unit vector
+                            std::string word, /// input file keyword
+                            int line, /// input file line
+                            std::string prefix, /// input file prefix
+                            std::string unit, /// unit specified in input file
+                            std::string unit_type, /// expected unit type
+                            double range_min, /// acceptable minimum value for variable
+                            double range_max, /// acceptable maximum value for variable
+                            std::string input_file_type, ///input file name
+                            std::string range_text) /// customised text
+{
+
+   //---------------------------------------------------------------------------
+   // Check for valid unit
+   //---------------------------------------------------------------------------
+
+   for(int idx=0; idx<u.size(); idx++){
+
+      double value = u.at(idx);
+
+      // Define test unit
+   	std::string test_unit_type=unit_type;
+
+   	// Define integer for unit conversion status
+   	int convert_status=0;
+
+   	// If no unit given, assume internal, otherwise convert to internal units
+   	if(unit.size() != 0) convert_status = units::convert(unit,value,test_unit_type);
+
+   	// Test for valid conversion
+   	if(convert_status==EXIT_FAILURE){
+   		terminaltextcolor(RED);
+   		std::cerr << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+   		terminaltextcolor(WHITE);
+   		zlog << zTs() << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+   		err::vexit();
+   	}
+
+   	// Test for change in unit type in case of wrong unit type
+   	if(unit_type!=test_unit_type){
+   		terminaltextcolor(RED);
+   		std::cerr << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+   		terminaltextcolor(WHITE);
+   		zlog << zTs() << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+   		err::vexit();
+   	}
+
+      // Check for valid range
+      if((fabs(value)<range_min) || (fabs(value)>range_max)){
+         terminaltextcolor(RED);
+         std::cerr << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+         terminaltextcolor(WHITE);
+   	   zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+         err::vexit();
+      }
+
+      // save value back to array
+      u.at(idx) = value;
+
+   }
+
+   // Success - input is sane!
+   return;
+
+}
+
 /// @brief Function to read in variables from a file.
 ///
 /// @section License
@@ -751,15 +838,19 @@ int match(string const key, string const word, string const value, string const 
 	std::string test;
 
    //-------------------------------------------------------------------
-   // Call module input parameters
+	// Call module input parameters
    //-------------------------------------------------------------------
    if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
    else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+	else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+   else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
 	//===================================================================
 	// Test for create variables
 	//===================================================================
-	test="create";
+	else
+   test="create";
 	if(key==test){
 		int frs=vin::match_create(word, value, unit, line);
 		return frs;
@@ -815,7 +906,7 @@ int match(string const key, string const word, string const value, string const 
 	else
 	test="config";
 	if(key==test){
-		int frs=vin::match_config(word, value, line);
+		int frs=vin::match_config(word, value, unit, line);
 		return frs;
 	}
 	//-------------------------------------------------------------------
@@ -833,27 +924,6 @@ int match(string const key, string const word, string const value, string const 
 			if(matfile!=test){
 				//std::cout << matfile << std::endl;
 			  read_mat_file(matfile,line);
-				return EXIT_SUCCESS;
-			}
-			else{
-				terminaltextcolor(RED);
-				std::cerr << "Error - empty filename in control statement \'material:" << word << "\' on line " << line << " of input file" << std::endl;
-				terminaltextcolor(WHITE);
-				return EXIT_FAILURE;
-			}
-		}
-		//-------------------------------------------------------------------
-		// Get unit cell filename
-		//-------------------------------------------------------------------
-		test="unit-cell-file";
-		if(word==test){
-			std::string matfile=value;
-			// strip quotes
-			matfile.erase(remove(matfile.begin(), matfile.end(), '\"'), matfile.end());
-			test="";
-			if(matfile!=test){
-				//std::cout << matfile << std::endl;
-				cs::unit_cell_file=matfile;
 				return EXIT_SUCCESS;
 			}
 			else{
@@ -1009,16 +1079,6 @@ int match_create(string const word, string const value, string const unit, int c
    }
    //--------------------------------------------------------------------
    else
-   test="crystal-structure";
-   if(word==test){
-      // Strip quotes
-      std::string cs=value;
-      cs.erase(remove(cs.begin(), cs.end(), '\"'), cs.end());
-      cs::crystal_structure=cs;
-      return EXIT_SUCCESS;
-   }
-   //--------------------------------------------------------------------
-   else
    test="single-spin";
    if(word==test){
       cs::single_spin=true;
@@ -1112,7 +1172,7 @@ int match_create(string const word, string const value, string const unit, int c
    //--------------------------------------------------------------------
    test="interfacial-roughness-number-of-seed-points";
    if(word==test){
-      int sc=atoi(value.c_str());
+      int sc=int(atof(value.c_str()));
       check_for_valid_int(sc, word, line, prefix, 0, 100000,"input","0 - 100,000");
       cs::interfacial_roughness_seed_count=sc;
       return EXIT_SUCCESS;
@@ -1235,46 +1295,8 @@ int match_dimension(string const word, string const value, string const unit, in
    // System dimension variables
    //-------------------------------------------------------------------
    std::string prefix="dimensions:";
-
-   std::string test="unit-cell-size";
-   if(word==test){
-      double a=atof(value.c_str());
-      check_for_valid_value(a, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-      cs::unit_cell_size[0]=a;
-      cs::unit_cell_size[1]=a;
-      cs::unit_cell_size[2]=a;
-      return EXIT_SUCCESS;
-   }
-   else
    //--------------------------------------------------------------------
-   test="unit-cell-size-x";
-   if(word==test){
-      double ax=atof(value.c_str());
-      check_for_valid_value(ax, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-      cs::unit_cell_size[0]=ax;
-      return EXIT_SUCCESS;
-   }
-   else
-   //--------------------------------------------------------------------
-   test="unit-cell-size-y";
-   if(word==test){
-      double ay=atof(value.c_str());
-      check_for_valid_value(ay, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-      cs::unit_cell_size[1]=ay;
-      return EXIT_SUCCESS;
-   }
-   else
-   //--------------------------------------------------------------------
-   test="unit-cell-size-z";
-   if(word==test){
-      double az=atof(value.c_str());
-      check_for_valid_value(az, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
-      cs::unit_cell_size[2]=az;
-      return EXIT_SUCCESS;
-   }
-   else
-   //--------------------------------------------------------------------
-   test="system-size";
+   std::string test="system-size";
    if(word==test){
       double d=atof(value.c_str());
       check_for_valid_value(d, word, line, prefix, unit, "length", 0.1, 1.0e7,"input","0.1 Angstroms - 1 millimetre");
@@ -1333,7 +1355,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-x";
    if(word==test){
       double sfx=atof(value.c_str());
-      check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfx, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_x=sfx;
       return EXIT_SUCCESS;
    }
@@ -1342,7 +1364,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-y";
    if(word==test){
       double sfy=atof(value.c_str());
-      check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfy, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_y=sfy;
       return EXIT_SUCCESS;
    }
@@ -1351,7 +1373,7 @@ int match_dimension(string const word, string const value, string const unit, in
    test="particle-shape-factor-z";
    if(word==test){
       double sfz=atof(value.c_str());
-      check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 1.0,"input","0.001 - 1.0");
+      check_for_valid_value(sfz, word, line, prefix, unit, "none", 0.001, 2.0,"input","0.001 - 2.0");
       cs::particle_shape_factor_z=sfz;
       return EXIT_SUCCESS;
    }
@@ -1516,10 +1538,20 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::program=14;
          return EXIT_SUCCESS;
       }
+      test="fmr";
+      if(value==test){
+         sim::program=15;
+         return EXIT_SUCCESS;
+      }
       test="diagnostic-boltzmann";
       if(value==test){
          sim::program=50;
          return EXIT_SUCCESS;
+      }
+      test="setting";
+      if(value==test){
+	sim::program=51;
+	return EXIT_SUCCESS;
       }
       else{
 		 terminaltextcolor(RED);
@@ -1560,7 +1592,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //-------------------------------------------------------------------
    test="dipole-field-update-rate";
    if(word==test){
-      int dpur=atoi(value.c_str());
+      int dpur=int(atof(value.c_str()));
       check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       demag::update_rate=dpur;
       return EXIT_SUCCESS;
@@ -1580,7 +1612,7 @@ int match_sim(string const word, string const value, string const unit, int cons
          sim::NativeSurfaceAnisotropyThreshold=true;
          return EXIT_SUCCESS;
       }
-      int sat=atoi(value.c_str());
+      int sat=int(atof(value.c_str()));
       // Test for valid range
       check_for_valid_int(sat, word, line, prefix, 0, 1000000000,"input","0 - 1,000,000,000");
       sim::surface_anisotropy_threshold=sat;
@@ -1606,7 +1638,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="total-time-steps";
    if(word==test){
-      int tt=atoi(value.c_str());
+      int tt=int(atof(value.c_str()));
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::total_time=tt;
       return EXIT_SUCCESS;
@@ -1614,7 +1646,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="loop-time-steps";
    if(word==test){
-      int tt=atoi(value.c_str());
+      int tt=int(atof(value.c_str()));
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::loop_time=tt;
       return EXIT_SUCCESS;
@@ -1622,8 +1654,8 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="partial-time-steps";
    if(word==test){
-      int tt=atoi(value.c_str());
-      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      int tt=int(atof(value.c_str()));
+      check_for_valid_int(tt, word, line, prefix, 1, 2000000000,"input","1 - 2,000,000,000");
       terminaltextcolor(YELLOW);
       std::cout << "Warning: Keyword \'partial-time-steps\' is deprecated and may be removed in a future release. Please use \'time-steps-increment\' instead." << std::endl;
       terminaltextcolor(WHITE);
@@ -1633,15 +1665,15 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="time-steps-increment";
    if(word==test){
-      int tt=atoi(value.c_str());
-      check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+      int tt=int(atof(value.c_str()));
+      check_for_valid_int(tt, word, line, prefix, 1, 2000000000,"input","1 - 2,000,000,000");
       sim::partial_time=tt;
       return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------
    test="equilibration-time-steps";
    if(word==test){
-      int tt=atoi(value.c_str());
+      int tt=int(atof(value.c_str()));
       check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::equilibration_time=tt;
       return EXIT_SUCCESS;
@@ -1649,7 +1681,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="simulation-cycles";
    if(word==test){
-      int r=atoi(value.c_str());
+      int r=int(atof(value.c_str()));
       check_for_valid_int(r, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
       sim::runs=r;
       return EXIT_SUCCESS;
@@ -1925,7 +1957,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    if(word==test){
       std::vector<double> u(3);
       u=DoublesFromString(value);
-      check_for_valid_vector(u, word, line, prefix, "input");
+      check_for_valid_three_vector(u, word, line, prefix, "input");
       // Extra check for demagnetisation-factor Nx+Ny+Nz=1
       double sum=u.at(0)+u.at(1)+u.at(2);
       if(fabs(1.0-sum)>1.e-4){
@@ -1939,6 +1971,8 @@ int match_sim(string const word, string const value, string const unit, int cons
       sim::demag_factor[1]=u.at(1);
       sim::demag_factor[2]=u.at(2);
       sim::ext_demag=true;
+      // force calculation of system magnetization
+      stats::calculate_system_magnetization=true;
       return EXIT_SUCCESS;
    }
    //-------------------------------------------------------------------
@@ -2120,7 +2154,7 @@ int match_sim(string const word, string const value, string const unit, int cons
    //--------------------------------------------------------------------
    test="save-checkpoint-rate";
    if(word==test){
-      int scr=atoi(value.c_str());
+      int scr=int(atof(value.c_str()));
       check_for_valid_int(scr, word, line, prefix, 1, 2000000000,"input","1 - 2,000,000,000");
       sim::save_checkpoint_rate=scr;
       return EXIT_SUCCESS;
@@ -2150,6 +2184,31 @@ int match_sim(string const word, string const value, string const unit, int cons
       }
    }
    //--------------------------------------------------------------------
+   test="fmr-field-strength";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      sim::fmr_field_strength=H;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="fmr-field-frequency";
+   if(word==test){
+      double w = atof(value.c_str());
+      check_for_valid_value(w, word, line, prefix, unit, "none", 0.0, 1.0e4,"input","0 - 10,000 GHz");
+      sim::fmr_field_frequency = w;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test="fmr-field-unit-vector";
+   if(word==test){
+      std::vector<double> u(3);
+      u=DoublesFromString(value);
+      check_for_valid_unit_vector(u, word, line, prefix, "input");
+      sim::fmr_field_unit_vector = u;
+      return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
    else{
 	  terminaltextcolor(RED);
       std::cerr << "Error - Unknown control statement \'sim:"<< word << "\' on line " << line << " of input file" << std::endl;
@@ -2160,8 +2219,7 @@ int match_sim(string const word, string const value, string const unit, int cons
 
    return EXIT_SUCCESS;
 }
-
-int match_config(string const word, string const value, int const line){
+int match_config(string const word, string const value, string const unit, int const line){
 
    std::string prefix="config:";
 
@@ -2174,8 +2232,9 @@ int match_config(string const word, string const value, int const line){
    //-----------------------------------------
    test="atoms-output-rate";
    if(word==test){
-      int i=atoi(value.c_str());
+      int i=int(atof(value.c_str()));
       check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
+//      check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
       vout::output_atoms_config_rate=i;
       return EXIT_SUCCESS;
    }
@@ -2236,7 +2295,7 @@ int match_config(string const word, string const value, int const line){
    //--------------------------------------------------------------------
    test="macro-cells-output-rate";
    if(word==test){
-      int i=atoi(value.c_str());
+      int i=int(atof(value.c_str()));
       check_for_valid_int(i, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       vout::output_cells_config_rate=i;
       return EXIT_SUCCESS;
@@ -2245,6 +2304,38 @@ int match_config(string const word, string const value, int const line){
    test="identify-surface-atoms";
    if(word==test){
       sim::identify_surface_atoms=true;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-1-minimum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_min_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-1-maximum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_max_1=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-2-minimum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_min_2=H;
+      return EXIT_SUCCESS;
+   }
+   //-----------------------------------------
+   test="field-range-2-maximum";
+   if(word==test){
+      double H=atof(value.c_str());
+      check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
+      vout::field_output_max_2=H;
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
@@ -2583,6 +2674,12 @@ int match_vout_list(string const word, string const value, int const line, std::
       output_list.push_back(46);
       return EXIT_SUCCESS;
    }
+   //--------------------------------------------------------------------
+   test="fmr-field-strength";
+   if(word==test){
+      output_list.push_back(47);
+      return EXIT_SUCCESS;
+   }
    //-------------------------------------------------------------------
    test="mpi-timings";
    if(word==test){
@@ -2599,7 +2696,7 @@ int match_vout_list(string const word, string const value, int const line, std::
    //--------------------------------------------------------------------
    test="output-rate";
    if(word==test){
-      int r=atoi(value.c_str());
+      int r=int(atof(value.c_str()));
       check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       vout::output_rate=r;
       return EXIT_SUCCESS;
@@ -2703,7 +2800,7 @@ int match_vout_grain_list(string const word, string const value, int const line,
    //-------------------------------------------------------------------
    test="output-rate";
    if(word==test){
-      int r=atoi(value.c_str());
+      int r=int(atof(value.c_str()));
       check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
       vout::output_grain_rate=r;
       return EXIT_SUCCESS;
@@ -2719,9 +2816,6 @@ int match_vout_grain_list(string const word, string const value, int const line,
    }
    return EXIT_SUCCESS;
 }
-// temporary array of materials for reading in material data
-//std::cout << "here" << std::endl;
-  std::vector<mp::materials_t> read_material(0);
 
 int read_mat_file(std::string const matfile, int const LineNumber){
 
@@ -2762,6 +2856,9 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 		// read in whole line
 		std::string line;
 		getline(inputfile,line);
+
+		// save a copy of the line before stripping characters in case of error
+		std::string original_line = line;
 
 		// Clear whitespace, quotes and tabs
 		line.erase(remove(line.begin(), line.end(), '\t'), line.end());
@@ -2919,7 +3016,7 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 			//std::cout << "\t" << "word: " << word << std::endl;
 			//std::cout << "\t" << "value:" << value << std::endl;
 			//std::cout << "\t" << "unit: " << unit << std::endl;
-			int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1);
+		  int matchcheck = vin::match_material(word, value, unit, line_counter, super_index-1, sub_index-1, original_line, matfile);
 			if(matchcheck==EXIT_FAILURE){
 				err::vexit();
 			}
@@ -2948,7 +3045,15 @@ int read_mat_file(std::string const matfile, int const LineNumber){
 ///-------------------------------------------------------------------
 /// Function to match material key words
 ///-------------------------------------------------------------------
-int match_material(string const word, string const value, string const unit, int const line, int const super_index, int const sub_index){
+  int match_material(string const word,
+		     string const value,
+		     string const unit,
+		     int const line,
+		     int const super_index,
+		     int const sub_index,
+		     std::string const line_string,
+		     std::string const filename_string)
+  {
       std::string prefix="material:";
       //------------------------------------------------------------
       std::string test="num-materials";
@@ -2975,14 +3080,14 @@ int match_material(string const word, string const value, string const unit, int
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------
-      else
+      /*else
       test="exchange-matrix";
       if(word==test){
          double Jij=atof(value.c_str());
          check_for_valid_value(Jij, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
          read_material[super_index].Jij_matrix_SI[sub_index]=-Jij; // Import exchange as field, *-1
          return EXIT_SUCCESS;
-      }
+      }*/
       //------------------------------------------------------------
       else
       test="atomic-spin-moment";
@@ -3080,20 +3185,38 @@ int match_material(string const word, string const value, string const unit, int
       else
       test="uniaxial-anisotropy-direction";
       if(word==test){
-         // temporary storage container
-         std::vector<double> u(3);
+         // set up test comparisons
+         test="random";
+         std::string test2="random-grain";
+         // test for random anisotropy directions
+         if(value==test){
+            read_material[super_index].random_anisotropy = true;
+            read_material[super_index].random_grain_anisotropy = false;
+            sim::random_anisotropy=true;
+         }
+         // test for random grain anisotropy
+         else if(value==test2){
+            read_material[super_index].random_anisotropy = false;
+            read_material[super_index].random_grain_anisotropy = true;
+            sim::random_anisotropy=true;
+            grains::random_anisotropy = true;
+         }
+         else{
+            // temporary storage container
+            std::vector<double> u(3);
 
-         // read values from string
-         u=DoublesFromString(value);
+            // read values from string
+            u=DoublesFromString(value);
 
-         // check for sane input and normalise if necessary
-         check_for_valid_unit_vector(u, word, line, prefix, "material");
+            // check for sane input and normalise if necessary
+            check_for_valid_unit_vector(u, word, line, prefix, "material");
 
-         // Copy sanitised unit vector to material
-         read_material[super_index].UniaxialAnisotropyUnitVector=u;
+            // Copy sanitised unit vector to material
+            read_material[super_index].UniaxialAnisotropyUnitVector=u;
 
-         // Enable global tensor anisotropy flag
-         sim::TensorAnisotropy=true;
+            // Enable global tensor anisotropy flag
+            sim::TensorAnisotropy=true;
+         }
          return EXIT_SUCCESS;
       }
       //------------------------------------------------------------
@@ -3302,53 +3425,6 @@ int match_material(string const word, string const value, string const unit, int
 
          return EXIT_SUCCESS;
 
-      }
-      //--------------------------------------------------------------------
-      else
-      test="alloy-host"; // determines host material
-      if(word==test){
-         read_material[super_index].alloy_master=true; // if this keyword is set, then atoms of this type will be scanned for alloy materials
-         return EXIT_SUCCESS;
-      }
-      //--------------------------------------------------------------------
-      else
-      test="alloy-class"; // determines unit cell category id for ordered alloys
-      if(word==test){
-         int ac=atoi(value.c_str());
-         // test for 'disordered'
-         std::string dis="disordered";
-         if(value==dis){
-            read_material[super_index].alloy_class=-1; // value for random alloy
-            return EXIT_SUCCESS;
-         }
-         // test for valid ordered alloy, value of -1 will be deprecated
-         if((ac<-1) || (ac > 3)){
-			terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:alloy-class is outside of valid range (0-3)" << std::endl;
-            terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-         }
-         else{
-            read_material[super_index].alloy_class=ac;
-            return EXIT_SUCCESS;
-         }
-      }
-      //--------------------------------------------------------------------
-      else
-      test="alloy-fraction"; // determines %mixing for disordered alloys
-      if(word==test){
-         double a=atof(value.c_str());
-         if((a < 0.0) || (a > 1.0)){
-			terminaltextcolor(RED);
-            std::cerr << "Error in input file - material[" << super_index+1 << "]:alloy["<< sub_index+1 << "] is outside of valid range (0.0-1.0)" << std::endl;
-            terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-         }
-         else{
-            read_material[super_index].alloy[sub_index]=a;
-            return EXIT_SUCCESS;
-         }
-         //return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
       else
@@ -3803,7 +3879,6 @@ int match_material(string const word, string const value, string const unit, int
          return EXIT_SUCCESS;
       }
       //--------------------------------------------------------------------
-      else
       test="temperature-rescaling-curie-temperature";
       if(word==test){
          double Tc=atof(value.c_str());
@@ -3811,17 +3886,43 @@ int match_material(string const word, string const value, string const unit, int
          read_material[super_index].temperature_rescaling_Tc=Tc;
          return EXIT_SUCCESS;
       }
+      //--------------------------------------------------------------------
+      test="non-magnetic";
+      /*
+        logical non-magnetic [false]
+           This flag causes the material to be identified as non magnetic,
+           with all atoms removed of this type removed from the simulation.
+	   The atomic positions of non-magnetic atoms are saved separately
+	   with the usual atomic spin configuration for post processing.
+	   The default value is false for all materials. Valid values are
+	   true, false or (blank) [same as true].
+      */
+      if(word==test){
+         // Test for sane input
+         bool sanitised_bool = check_for_valid_bool(value, word, line, prefix,"material");
+         // set flag
+         read_material[super_index].non_magnetic = sanitised_bool;
+         return EXIT_SUCCESS;
+      }
+
+      //-------------------------------------------------------------------
+   	// Call module input parameters
+      //-------------------------------------------------------------------
+      else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+      else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+      else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+
 		//--------------------------------------------------------------------
 		// keyword not found
 		//--------------------------------------------------------------------
 		else{
-			terminaltextcolor(RED);
-			std::cerr << "Error - Unknown control statement \'material[" << super_index+1 << "]:" << word << "\' on line " << line << " of material file" << std::endl;
-			terminaltextcolor(WHITE);
-			return EXIT_FAILURE;
-		}
-
-	return EXIT_SUCCESS;
+         terminaltextcolor(RED);
+         std::cerr << "Error - Unknown control statement '" << line_string << "' on line " << line << " of material file '" << filename_string << "'" << std::endl;
+         terminaltextcolor(WHITE);
+         zlog << zTs() << "Error - Unknown control statement '" << line_string << " on line " << line << " of material file '" << filename_string << "'" << std::endl;
+         return EXIT_FAILURE;
+      }
+      return EXIT_SUCCESS;
 }
 
 
@@ -4014,14 +4115,14 @@ namespace vout{
 
 	// Output Function 23
 	void material_temperature(std::ostream& stream){
-		for(int mat=0;mat<mp::material.size();mat++){
+		for(unsigned int mat=0;mat<mp::material.size();mat++){
 			stream << mp::material[mat].temperature << "\t";
 		}
 	}
 
 	// Output Function 24
 	void material_applied_field_strength(std::ostream& stream){
-		for(int mat=0;mat<mp::material.size();mat++){
+		for(unsigned int mat=0;mat<mp::material.size();mat++){
 			stream << mp::material[mat].applied_field_strength << "\t";
 		}
 	}
@@ -4030,7 +4131,7 @@ namespace vout{
 	void material_fmr_field_strength(std::ostream& stream){
 		const double real_time=sim::time*mp::dt_SI;
 
-		for(int mat=0;mat<mp::material.size();mat++){
+		for(unsigned int mat=0;mat<mp::material.size();mat++){
 			const double Hsinwt_local=mp::material[mat].fmr_field_strength*sin(2.0*M_PI*real_time*mp::material[mat].fmr_field_frequency);
 			stream << Hsinwt_local << "\t";
 		}
@@ -4141,6 +4242,11 @@ namespace vout{
    // Output Function 46
    void material_height_mvec_actual(std::ostream& stream){
       stream << stats::material_height_magnetization.output_magnetization();
+   }
+
+   // Output Function 47
+   void fmr_field_strength(std::ostream& stream){
+      stream << sim::fmr_field << "\t";
    }
 
    // Output Function 60
@@ -4335,6 +4441,9 @@ namespace vout{
             case 46:
                vout::material_height_mvec_actual(zmag);
                break;
+            case 47:
+               vout::fmr_field_strength(zmag);
+               break;
             case 60:
 					vout::MPITimings(zmag);
 					break;
@@ -4471,6 +4580,9 @@ namespace vout{
                break;
             case 42:
                vout::mean_total_so_anisotropy_energy(std::cout);
+               break;
+            case 47:
+               vout::fmr_field_strength(std::cout);
                break;
             case 60:
 					vout::MPITimings(std::cout);

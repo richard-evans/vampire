@@ -78,6 +78,12 @@ void update_external_fields (){
    // }
    // fields.close();
 
+   //std::cerr << num_atoms << "\t";
+   //std::cerr << cu::x_total_external_field_array[0] << "\t";
+   //std::cerr << cu::y_total_external_field_array[0] << "\t";
+   //std::cerr << cu::z_total_external_field_array[0] << "\t";
+
+
    return;
 
 }
@@ -108,6 +114,9 @@ __global__ void update_external_fields_kernel (
       // Load parameters to local variables from memory
       cu::material_parameters_t mat = material_params[mid];
 
+      // Load the curand state into local memory
+      curandState local_state = rand_states[tid];
+
       // initialize registers for total external field
       cu_real_t field_x = 0.0;
       cu_real_t field_y = 0.0;
@@ -126,25 +135,22 @@ __global__ void update_external_fields_kernel (
 
       #ifdef CUDA_DP
          double resc_temp = (temp < tc) ? tc * pow(temp / tc, alpha) : temp;
-         double sq_temp = sqrt(resc_temp);
+         double rsigma = sigma*sqrt(resc_temp);
       #else
          float resc_temp = (temp < tc) ? tc * __powf(temp / tc, alpha) : temp;
-         float sq_temp = sqrtf(resc_temp);
+         float rsigma = sigma*sqrtf(resc_temp);
       #endif
 
-      field_x = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
-      field_y = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
-      field_z = sigma * sq_temp * curand_normal_double (&rand_states[tid]);
+      field_x = rsigma * curand_normal_double (&local_state);
+      field_y = rsigma * curand_normal_double (&local_state);
+      field_z = rsigma * curand_normal_double (&local_state);
 
       // Local applied field
       cu_real_t norm_h = mat.applied_field_strength;
-      cu_real_t hx = mat.applied_field_unit_x;
-      cu_real_t hy = mat.applied_field_unit_y;
-      cu_real_t hz = mat.applied_field_unit_z;
 
-      field_x += norm_h * hx;
-      field_y += norm_h * hy;
-      field_z += norm_h * hz;
+      field_x += norm_h * mat.applied_field_unit_x;
+      field_y += norm_h * mat.applied_field_unit_y;
+      field_z += norm_h * mat.applied_field_unit_z;
 
       // Global applied field
       field_x += Hx_app;
@@ -167,6 +173,9 @@ __global__ void update_external_fields_kernel (
       x_ext_field[atom] = field_x;
       y_ext_field[atom] = field_y;
       z_ext_field[atom] = field_z;
+
+      // Write local curand state back to global memory
+      rand_states[tid] = local_state;
 
    }
 }

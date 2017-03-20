@@ -65,6 +65,12 @@ namespace sim{
 	uint64_t equilibration_time=0;
 	int runs=1; /// for certain repetitions in programs
 
+    //Global definition of some parameters in order to store them in chekcpoint files
+	int64_t parity=-1;
+   uint64_t output_atoms_file_counter=0;
+   uint64_t output_cells_file_counter=0;
+   uint64_t output_rate_counter=0;
+
 	bool ext_demag=false;
 
 	double Tmax=300.0;
@@ -81,6 +87,16 @@ namespace sim{
 	double applied_field_angle_phi=0.0;
 	double applied_field_angle_theta=0.0;
 	bool applied_field_set_by_angle=false;
+
+	double fmr_field_strength = 0.0; // Oscillating field strength (Tesla)
+	double fmr_field_frequency = 1.0; // Oscillating field frequency (GHz)
+	std::vector<double> fmr_field_unit_vector; // Oscillating field direction
+	double fmr_field = 0.0; // Instantaneous value of the oscillating field strength H sin(wt)
+	bool enable_fmr = false; // Flag to enable fmr field calculation
+
+	double H=Hmax; // T
+	int64_t iH=1; // uT
+   //	uint64_t iH=-1*vmath::iround(double(Hmax)*1.0E6); // uT
 
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
@@ -110,9 +126,9 @@ namespace sim{
 	double cooling_time=100.0e-12; ///seconds
 	int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
 	pump_functions_t pump_function=two_temperature;
-	double pump_power=4.e21;
+	double pump_power=20.0; // mJ/cm^2;
 	double pump_time=50.0e-15;
-	double double_pump_power=2.e21;
+	double double_pump_power=20.0; // mJ/cm^2;
 	double double_pump_Tmax=500.0;
 	double double_pump_time=50.0e-15;
 	double double_pump_delay=10.0e-12;
@@ -146,6 +162,7 @@ namespace sim{
    bool spherical_harmonics=false; // Enables calculation of higher order anistropy with spherical harmonics
 	bool CubicScalarAnisotropy=false; /// Enables scalar cubic anisotropy
    bool lattice_anisotropy_flag=false; /// Enables lattice anisotropy
+  	bool random_anisotropy = false; // Enables random anisotropy calculation
 
 	bool local_temperature=false; /// flag to enable material specific temperature
 	bool local_applied_field=false; /// flag to enable material specific applied field
@@ -217,6 +234,9 @@ int run(){
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::run has been called" << std::endl;
 
+	// Initialise simulation data structures
+	sim::initialize(mp::num_materials);
+
 	// For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
 		#ifdef MPICF
@@ -240,6 +260,9 @@ int run(){
    // Seeds with single bit differences are not ideal and may be correlated for first few values - warming up integrator
    for(int i=0; i<1000; ++i) mtrandom::grnd();
 
+   // Check for load spin configurations from checkpoint
+   if(sim::load_checkpoint_flag) load_checkpoint();
+
    // Set up statistical data sets
    #ifdef MPICF
       int num_atoms_for_statistics = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
@@ -248,8 +271,8 @@ int run(){
    #endif
    stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array);
 
-   // Check for load spin configurations from checkpoint
-   if(sim::load_checkpoint_flag) load_checkpoint();
+   // Precalculate initial statistics
+   stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
@@ -380,6 +403,14 @@ int run(){
          program::effective_damping();
          break;
 
+		case 15:
+	  		if(vmpi::my_rank==0){
+	    		std::cout << "fmr..." << std::endl;
+	    		zlog << "fmr..." << std::endl;
+	  		}
+	  		program::fmr();
+	  		break;
+
 		case 50:
 			if(vmpi::my_rank==0){
 				std::cout << "Diagnostic-Boltzmann..." << std::endl;
@@ -387,6 +418,14 @@ int run(){
 			}
 			program::boltzmann_dist();
 			break;
+
+	    case 51:
+		  	if(vmpi::my_rank==0){
+		       std::cout << "Setting..." << std::endl;
+		       zlog << "Setting..." << std::endl;
+	     	}
+		  	program::setting_process();
+		    break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
@@ -646,5 +685,3 @@ int integrate_mpi(int n_steps){
 }
 
 } // Namespace sim
-
-

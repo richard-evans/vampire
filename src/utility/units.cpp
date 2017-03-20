@@ -6,25 +6,25 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
 //
 ///
 /// @file
-/// @brief Contains the units namespace for program parameters and unit conversion. 
+/// @brief Contains the units namespace for program parameters and unit conversion.
 ///
 /// @section notes Implementation Notes
 /// None.
@@ -48,19 +48,20 @@
 #include "vio.hpp"
 
 #include <iostream>
+#include <cmath>
 #include <cstdlib>
 
 /// @namespace units
 /// @brief Contains program parameters and functions for unit conversion.
-/// 
+///
 /// @internal
 ///=====================================================================================
 ///
 namespace units {
-	
-	const int max_units=43;
 
-	const double pi=3.14;
+	const int max_units=44;
+
+	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
 	bool initialised=false;
 	// Generic unit names and conversion factors
@@ -145,14 +146,16 @@ int init(){
 		unit[40]="fs";			conversion[40]=1.0E-15;				type[40]="time"; // femtoseconds
 		unit[41]="as";			conversion[41]=1.0E-18;				type[41]="time"; // attoseconds
 		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
+      // New
+      unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
 
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag
 		units::initialised=true;
-		
+
 		return EXIT_SUCCESS;
 	}
-	
+
 /// @brief Converts external units to internal units.
 ///
 /// @details Example usage units::convert(string "nm", double& var, string& unit_type)
@@ -168,7 +171,7 @@ int init(){
 ///
 /// @param[in] input_unit name of unit to be converted
 /// @param[in] value variable to be converted
-/// @param[out] type unit type, eg length, volume 
+/// @param[out] type unit type, eg length, volume
 /// @return EXIT_SUCCESS
 ///
 /// @internal
@@ -182,7 +185,7 @@ int init(){
 		if(units::initialised==false){
 			units::init();
 		}
-		
+
 		// loop over all possible units
 		for(int i=0;i<max_units;i++){
 			if(input_unit==units::unit[i]){
@@ -214,7 +217,7 @@ int init(){
 ///
 /// @param[in] input_unit name of unit to be converted
 /// @param[in] value vector of variables to be converted
-/// @param[out] type unit type, eg length, volume 
+/// @param[out] type unit type, eg length, volume
 /// @return EXIT_SUCCESS
 ///
 /// @internal
@@ -228,7 +231,7 @@ int init(){
 		if(units::initialised==false){
 			units::init();
 		}
-		
+
 		// loop over all possible units
 		for(int i=0;i<max_units;i++){
 			if(input_unit==units::unit[i]){
@@ -249,7 +252,7 @@ int init(){
 		err::vexit();
 
 	}
-	
+
 /// @brief Reverts internal units to external units.
 ///
 /// @details Example usage @code units::revert(string "nm", double& var, string& unit_type) /@code
@@ -265,7 +268,7 @@ int init(){
 ///
 /// @param[in] output_unit name of unit to be converted
 /// @param[in] value variable to be converted
-/// @param[out] type unit type, eg length, volume 
+/// @param[out] type unit type, eg length, volume
 /// @return EXIT_SUCCESS
 ///
 /// @internal
@@ -273,13 +276,13 @@ int init(){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-	int revert(std::string output_unit, double& value, std::string& type){	
+	int revert(std::string output_unit, double& value, std::string& type){
 
 		// Populate unit array;
 		if(units::initialised==false){
 			units::init();
 		}
-		
+
 		// loop over all possible units
 		for(int i=0;i<max_units;i++){
 			if(output_unit==units::unit[i]){
@@ -297,10 +300,9 @@ int init(){
 		std::cerr << "Error during unit reversion - unit \'"<< output_unit << "\' not found" << std::endl;
 		terminaltextcolor(WHITE);
 		err::vexit();
-		
+
 		return EXIT_SUCCESS;
-		
+
 	}
 
 } // End of namespace
-

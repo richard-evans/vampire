@@ -28,10 +28,10 @@ namespace gpu{
    #endif
 
    bool cpu_stats = false; // flag to calculate stats using cpu
+   int device = -1; // device id
 
    int num_threads = 0; // number of threads to use per kernel
-   int platform_num = 0; // which platform to use for acceleration (OpenCL)
-   int device_num = 0; // which device to use for acceleration
+   int platform = 0; // which platform to use for acceleration (OpenCL)
 
    //-----------------------------------------------------------------------------
    // Shared data structures for statistics calculation

@@ -25,14 +25,19 @@ CUDA_OBJECTS= \
 CUDA_DLINK= obj/cuda/vampire_cuda.o
 
 # set precision for cuda calculation
-#CUDA_PR= -DCUDA_DP
-CUDA_PR= -DCUDA_SP
+CUDA_PR= -DCUDA_DP
+#CUDA_PR= -DCUDA_SP
 #CUDA_PR= -DCUDA_MP
 
-CUDA_CFLAGS= -I./hdr -DCUDA -O3 -rdc=true -arch=sm_20 --use_fast_math -ftz=true
+# set matrix format
+CUDA_MATRIX_TYPE = CSR
+#CUDA_MATRIX_TYPE = DIA
+#CUDA_MATRIX_TYPE = ELL
+
+CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA -arch=sm_20 --use_fast_math -ftz=true -std=c++11
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
-	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS) $(CUDA_PR)
+	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS) $(CUDA_PR) -DCUDA_MATRIX=$(CUDA_MATRIX_TYPE)
 
 # Target for device link -- not working atm
 #$(CUDA_DLINK): $(cuda_objects)
@@ -51,3 +56,7 @@ gcc-cuda: $(OBJECTS) $(CUDA_OBJECTS)
 # CUDA debug target
 gcc-cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG
 gcc-cuda-debug: gcc-cuda
+
+# CUDA debug target
+gcc-cuda-profile: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG --profile
+gcc-cuda-profile: gcc-cuda

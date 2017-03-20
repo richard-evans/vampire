@@ -15,6 +15,7 @@
 #include "atoms.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
+#include "gpu.hpp"
 #include "random.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
@@ -77,16 +78,51 @@ namespace vcuda{
          ::err::vexit();
       }
 
+      // Set cuda device if specified by user
+      if(gpu::device != -1 && gpu::device < n_devices){
+         zlog << zTs() << "Setting CUDA device to " << gpu::device << std::endl;
+         cudaError_t error = cudaSetDevice(gpu::device);
+         if( error == cudaErrorSetOnActiveProcess )
+         {
+            std::cerr     << "Error: CUDA is unable to set active process to device " << gpu::device << std::endl;
+            zlog << zTs() << "Error: CUDA is unable to set active process to device " << gpu::device << std::endl;
+            ::err::vexit();
+         }
+         else if ( error == cudaErrorInvalidDevice )
+         {
+            std::cerr     << "Error: CUDA is requesting device " << gpu::device << " which is an invalid device." << std::endl;
+            zlog << zTs() << "Error: CUDA is requesting device " << gpu::device << " which is an invalid device." << std::endl;
+            ::err::vexit();
+         }
+         else if ( error != cudaSuccess)
+         {
+            std::cerr     << "Error: CUDA unable to set device to " << gpu::device << std::endl;
+            zlog << zTs() << "Error: CUDA unable to set device to " << gpu::device << std::endl;
+            ::err::vexit();
+         }
+      }
+
       bool success = true;
 
       /*
        * Set the block_size according to the number of atoms
        */
 
-      size_t _grid_size = ::atoms::num_atoms / cu::block_size + 1UL;
+      size_t _grid_size = ( (::atoms::num_atoms/2) / cu::block_size) + 1;
 
-      if (_grid_size < cu::grid_size)
-         cu::grid_size = _grid_size;
+      //std::cerr << "Natoms = " << ::atoms::num_atoms << "\n";
+      //std::cerr << "Block size = " << cu::block_size << "\n";
+      //std::cerr << "grid1 = " << _grid_size << "\n";
+      //std::cerr << "grid2 = " << cu::grid_size << "\n";
+
+      // I dont think this does anything
+      //if (_grid_size < cu::grid_size)
+      //   cu::grid_size = _grid_size;
+
+      cu::grid_size = _grid_size;
+      //std::cerr << "grid2 = " << cu::grid_size << std::endl;
+
+      zlog << zTs() << "Using cuda version with block size " << cu::block_size << " and grid size " << cu::grid_size << std::endl;
 
       success = success && cu::__initialize_atoms ();
       success = success && cu::__initialize_fields ();

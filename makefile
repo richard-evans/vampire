@@ -6,14 +6,14 @@
 
 
 
-export OMPI_CXX=g++
+export OMPI_CXX=g++ -std=c++11
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 #export MPICH_CXX=g++
 export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -DCOMP='"GNU C++ Compiler"'
+GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
@@ -38,6 +38,9 @@ PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
 IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi
+
 # Performance Flags
 ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
 ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
@@ -47,11 +50,14 @@ ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
 LLVM_CFLAGS= -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
 LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
-GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi
+GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++0x
 GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
+
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
+NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
@@ -71,14 +77,6 @@ obj/data/category.o \
 obj/data/cells.o \
 obj/data/grains.o \
 obj/data/lattice_anisotropy.o \
-obj/ltmp/absorption_profile.o \
-obj/ltmp/data.o \
-obj/ltmp/field.o \
-obj/ltmp/initialise.o \
-obj/ltmp/interface.o \
-obj/ltmp/is_enabled.o \
-obj/ltmp/local_temperature.o \
-obj/ltmp/output.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
@@ -87,6 +85,7 @@ obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \
 obj/mpi/mpi_create2.o \
 obj/mpi/mpi_comms.o \
+obj/mpi/wrapper.o \
 obj/program/bmark.o \
 obj/program/cmc_anisotropy.o \
 obj/program/curie_temperature.o \
@@ -99,10 +98,12 @@ obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/partial_hysteresis.o \
 obj/program/static_hysteresis.o \
+obj/program/setting.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
 obj/program/localised_temperature_pulse.o \
 obj/program/effective_damping.o \
+obj/program/fmr.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -149,7 +150,13 @@ obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
+include src/create/makefile
 include src/gpu/makefile
+include src/ltmp/makefile
+include src/simulate/makefile
+include src/unitcell/makefile
+
+# Cuda must be last for some odd reason
 include src/cuda/makefile
 include src/opencl/makefile
 
@@ -160,6 +167,7 @@ ICCDB_OBJECTS=$(OBJECTS:.o=_idb.o)
 GCCDB_OBJECTS=$(OBJECTS:.o=_gdb.o)
 PCCDB_OBJECTS=$(OBJECTS:.o=_pdb.o)
 IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb.o)
+LLVMDB_OBJECTS=$(OBJECTS:.o=_llvmdb.o)
 
 MPI_OBJECTS=$(OBJECTS:.o=_mpi.o)
 MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_mpi.o)
@@ -205,6 +213,12 @@ serial-debug: $(GCCDB_OBJECTS)
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
+
+serial-llvm-debug: $(LLVMDB_OBJECTS)
+	$(LLVM) $(LLVM_DBLFLAGS) $(LIBS) $(LLVMDB_OBJECTS) -o $(EXECUTABLE)
+
+$(LLVMDB_OBJECTS): obj/%_llvmdb.o: src/%.cpp
+	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $<
 
 intel-debug: $(ICCDB_OBJECTS)
 	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)

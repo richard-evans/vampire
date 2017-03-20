@@ -145,26 +145,26 @@ namespace vopencl
          ::err::vexit();
       }
 
-      if (::gpu::platform_num >= nplatforms)
+      if (::gpu::platform >= nplatforms)
       {
          terminaltextcolor(YELLOW);
-         std::cerr << "Warning: Platform specified does not exist (" << ::gpu::platform_num << ")." << std::endl;
+         std::cerr << "Warning: Platform specified does not exist (" << ::gpu::platform << ")." << std::endl;
          std::cerr << "Falling back to platform zero." << std::endl;
          terminaltextcolor(WHITE);
-         ::gpu::platform_num = 0;
+         ::gpu::platform = 0;
       }
 
-      if (::gpu::device_num >= devices[::gpu::platform_num].size())
+      if (::gpu::device >= devices[::gpu::platform].size())
       {
          terminaltextcolor(YELLOW);
-         std::cerr << "Warning: Device specified does not exist (" << ::gpu::device_num << ")." << std::endl;
+         std::cerr << "Warning: Device specified does not exist (" << ::gpu::device << ")." << std::endl;
          std::cerr << "Falling back to device zero." << std::endl;
          terminaltextcolor(WHITE);
-         ::gpu::device_num = 0;
+         ::gpu::device = 0;
       }
 
-      cl::Platform default_platform = platforms[::gpu::platform_num];
-      vcl::default_device = devices[::gpu::platform_num][::gpu::device_num];
+      cl::Platform default_platform = platforms[::gpu::platform];
+      vcl::default_device = devices[::gpu::platform][::gpu::device];
 
 #ifdef OPENCL_LOG
       vcl::OCLLOG << "Using default platform " << default_platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
@@ -173,7 +173,9 @@ namespace vopencl
 
       vcl::context = cl::Context({vcl::default_device});
 
-      vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+      vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device,
+                                    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
+                                    CL_QUEUE_PROFILING_ENABLE);
 
       if (::gpu::num_threads > 0)
       {

@@ -43,7 +43,9 @@ void initialise(const double system_dimensions_x,
                 const double TTG,
                 const double TTCe,
                 const double TTCl,
-                const double dt
+                const double dt,
+                const double Tmin,
+                const double Tmax
                ){
 
    //-------------------------------------------------------------------------------------
@@ -69,6 +71,8 @@ void initialise(const double system_dimensions_x,
    ltmp::internal::TTCe=TTCe; // electron heat capacity (T=0)
    ltmp::internal::TTCl=TTCl; // lattice heat capcity
    ltmp::internal::dt=dt; // time step
+   ltmp::internal::minimum_temperature = Tmin; // minimum temperature for temperature gradient
+   ltmp::internal::maximum_temperature = Tmax; // maximum temperature for temperature gradient
 
    //-------------------------------------------------------------------------------------
    // Calculate number of microcells
@@ -116,7 +120,6 @@ void initialise(const double system_dimensions_x,
 
    // Set cell and stack counters
    int cell=0;
-   int stack=0;
 
    // allocate temporary array for neighbour list calculation
    std::vector<uvec> cell_list;
@@ -160,7 +163,7 @@ void initialise(const double system_dimensions_x,
    const int d[3]={ncx,ncy,ncz};
    const double cs[3] = {ltmp::internal::micro_cell_size, ltmp::internal::micro_cell_size, ltmp::internal::micro_cell_size}; // cell size
 
-   // Assign atoms to cells                                                                                                                  
+   // Assign atoms to cells
    for(int atom=0;atom<num_local_atoms;atom++){
       // temporary for atom coordinates
       double c[3];
@@ -195,7 +198,7 @@ void initialise(const double system_dimensions_x,
             terminaltextcolor(RED);
             std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
             terminaltextcolor(WHITE);
-            #endif 
+            #endif
             terminaltextcolor(RED);
             std::cerr << "\tAtom number:      " << atom << std::endl;
             std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
@@ -258,10 +261,18 @@ void initialise(const double system_dimensions_x,
       if(ltmp::internal::vertical_discretisation){
          if(profile_file) vattn = ltmp::absorption_profile.get_absorption_constant(z);
          else vattn = exp(-z/ltmp::internal::penetration_depth); // vertical attenuation
+         // Check for gradient and if so overwrite with linear profile
+         if(ltmp::internal::gradient) vattn = ltmp::internal::cell_position_array[3*cell+2]/system_dimensions_z;
       }
-      double lattn = ltmp::internal::lateral_discretisation ? exp(-r_sq*pre/(ltmp::internal::laser_spot_size*ltmp::internal::laser_spot_size)) : 1.0;
+      double lattn = 1.0;
+      if(ltmp::internal::lateral_discretisation){
+         lattn = exp(-r_sq*pre/(ltmp::internal::laser_spot_size*ltmp::internal::laser_spot_size));
+         // Check for gradient and if so overwrite with linear profile in x
+         if(ltmp::internal::gradient) lattn = ltmp::internal::cell_position_array[3*cell+0]/system_dimensions_x;
+      }
       // determine attenuation
       ltmp::internal::attenuation_array[cell] = vattn*lattn;
+
    }
 
    //-------------------------------------------------------
@@ -332,17 +343,19 @@ void initialise(const double system_dimensions_x,
       }
    }
 
-   // optionally output temperature cell data 
+   // optionally output temperature cell data
    if(ltmp::internal::output_microcell_data){
       ltmp::internal::write_microcell_data();
-      // initial output file for vertical temperature profile 
+      // initial output file for vertical temperature profile
       if(!ltmp::internal::lateral_discretisation && ltmp::internal::vertical_discretisation) ltmp::internal::open_vertical_temperature_profile_file();
+      // initial output file for lateral temperature profile
+      if(ltmp::internal::lateral_discretisation && !ltmp::internal::vertical_discretisation) ltmp::internal::open_lateral_temperature_profile_file();
    }
 
    // Set initialised flag
    ltmp::internal::initialised = true;
 
-   return; 
+   return;
 }
 
 } // end of st namespace

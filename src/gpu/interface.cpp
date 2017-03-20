@@ -81,11 +81,10 @@ namespace gpu{
          }
       }
 
-      // std::stoi is c++11
-#if __cplusplus > 199711L
       test = "num-threads";
       if (word == test) {
-         int val = std::stoi(value, NULL, 10);
+         int val = atoi(value.c_str());
+         std::cout << val << std::endl;
          if (val > 0) {
             gpu::num_threads = val;
             return true;
@@ -97,11 +96,11 @@ namespace gpu{
          }
       }
 
-      test = "platform-num";
+      test = "platform";
       if (word == test) {
-         int val = std::stoi(value, NULL, 10);
+         int val = atoi(value.c_str());
          if (val >= 0) {
-            gpu::platform_num = val;
+            gpu::platform = val;
             return true;
          } else {
             terminaltextcolor(RED);
@@ -111,21 +110,15 @@ namespace gpu{
          }
       }
 
-      test = "device-num";
-      if (word == test) {
-         int val = std::stoi(value, NULL, 10);
-         if (val >= 0) {
-            gpu::device_num = val;
-            return true;
-         } else {
-            terminaltextcolor(RED);
-            std::cerr << "Error: Value for \'" << prefix << ':' << word << "\' must be zero or a positive integer" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
-         }
+      //--------------------------------------------------------------------
+      test="device";
+      if(word==test){
+         int dev=atoi(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_int(dev, word, line, prefix, 0, 16,"input","0-16");
+         gpu::device = dev;
+         return true;
       }
-#endif
-
       //--------------------------------------------------------------------
       else{
          terminaltextcolor(RED);

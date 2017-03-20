@@ -111,6 +111,8 @@ namespace vopencl
                            std::vector<R> &ys,
                            std::vector<R> &zs) const noexcept
          {
+            if (n_elems == 0) return;
+
             assert(xs.size() == n_elems &&
                    ys.size() == n_elems &&
                    zs.size() == n_elems);

@@ -13,9 +13,9 @@ create:crystal-structure=sc
 # System Dimensions:
 #------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 7.7 !nm
-dimensions:system-size-y = 7.7 !nm
-dimensions:system-size-z = 7.7 !nm
+dimensions:system-size-x = 7.0 !nm
+dimensions:system-size-y = 7.0 !nm
+dimensions:system-size-z = 7.0 !nm
 
 #------------------------------------------
 # Material Files:
@@ -36,8 +36,8 @@ sim:applied-field-unit-vector=1,0,0
 # gpu:acceleration
 # gpu:calculate-statistics-on-cpu
 gpu:num-threads=8192
-gpu:platform-num=1
-gpu:device-num=0
+gpu:platform=1
+gpu:device=0
 
 #------------------------------------------
 # Program and integrator details
@@ -55,6 +55,6 @@ output:magnetisation-length
 output:applied-field-alignment
 output:output-rate = 50
 
-screen:time-steps
-screen:magnetisation
-screen:magnetisation-length
+#screen:time-steps
+#screen:magnetisation
+#screen:magnetisation-length

@@ -33,6 +33,8 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
+#include "stopwatch.h"
+
 int simulate_system();
 
 /// Main function for vampire
@@ -96,7 +98,7 @@ int main(int argc, char* argv[]){
       std::cout << std::endl;
       std::cout << "  Contributors: Weijia Fan, Phanwadee Chureemart, Joe Barker, " << std::endl;
       std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell," << std::endl;
-      std::cout << "                Wu Hong-Ye" << std::endl;
+      std::cout << "                Wu Hong-Ye, Rory Pond" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
       std::cout << "                Compiled with:  " << COMP << std::endl;
@@ -137,6 +139,10 @@ int main(int argc, char* argv[]){
    // Create system
    cs::create();
 
+   // Set timer for runtime
+   stopwatch_t stopwatch;
+   stopwatch.start();
+
    // Simulate system
    sim::run();
 
@@ -151,10 +157,14 @@ int main(int argc, char* argv[]){
       #endif
    #endif
 
+   std::cout << "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+   zlog << zTs() << "Simjulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+
    zlog << zTs() << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(GREEN);
    std::cout << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(WHITE);
+
 
    return EXIT_SUCCESS;
 
