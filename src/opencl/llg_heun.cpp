@@ -26,17 +26,19 @@
 #ifdef OPENCL_TIME_KERNELS
 #include <chrono>
 
-#define TIME(func, var)                                         \
+// Macro to time enqueued kernels
+// will leave redundant syncs so only use for testing
+#define TIME(func, var, q)                                      \
    {                                                            \
       auto start = std::chrono::high_resolution_clock::now();   \
       func;                                                     \
-      vcl::queue.finish();                                      \
+      q.finish();                                               \
       auto end = std::chrono::high_resolution_clock::now();     \
       std::chrono::duration<double> diff = end - start;         \
       var += diff.count();                                      \
    }
 #else
-#define TIME(func, var) func
+#define TIME(func, var, q) func
 #endif
 
 #ifdef OPENCL
@@ -71,33 +73,38 @@ namespace vopencl
          cl::Kernel calculate_exchange;
       }
 
-      static inline void update_spin_fields(void)
-      {
-         //vcl::total_spin_field_array.zero_buffer();
-
-         TIME(vcl::kernel_call(vcl::update_nexch_spin_fields), vcl::time::spin_fields);
-
-         vcl::queue.finish();
-
-         TIME(vcl::kernel_call(vcl::exchange::calculate_exchange), vcl::time::mat_mul);
-      }
-
       namespace llg
       {
          cl::Kernel predictor_step;
          cl::Kernel corrector_step;
+      }
 
+      static inline void update_spin_fields(void)
+      {
+         //vcl::total_spin_field_array.zero_buffer();
+
+         TIME(vcl::kernel_call(vcl::update_nexch_spin_fields), vcl::time::spin_fields, vcl::queue);
+
+         vcl::queue.finish();
+
+         TIME(vcl::kernel_call(vcl::exchange::calculate_exchange), vcl::time::mat_mul, vcl::queue);
+      }
+
+      namespace llg
+      {
          void step(void) noexcept
          {
+            // update random numbers for external field
+            // independent of the rest so do it in a seperate queue
+            const cl::CommandQueue rnd_q(vcl::context, vcl::default_device);
+            TIME(vcl::kernel_call(rng::grng, rnd_q), vcl::time::rng, rnd_q);
+
             // make a copy of current spins for both Heun steps
             vcl::atoms::spin_array.copy_to_dev(vcl::queue, vcl::llg::spin_buffer_array);
 
             // update fields
             vcl::update_spin_fields();
 
-            // update random numbers for external field
-            TIME(vcl::kernel_call(rng::grng), vcl::time::rng);
-            vcl::queue.finish();
 
             // update system applied field and temperature
             vcl::update_ext.setArg(5, vcl::real_t(sim::H_vec[0] * sim::H_applied));
@@ -105,14 +112,17 @@ namespace vopencl
             vcl::update_ext.setArg(7, vcl::real_t(sim::H_vec[2] * sim::H_applied));
             vcl::update_ext.setArg(8, vcl::real_t(sim::temperature));
 
+            rnd_q.finish();
+            vcl::queue.finish();
+
             // update external and dipole fields
-            TIME(vcl::kernel_call(update_ext), vcl::time::external_fields);
+            TIME(vcl::kernel_call(update_ext), vcl::time::external_fields, vcl::queue);
             vcl::queue.finish();
             update_dipolar_fields();
             vcl::queue.finish();
 
             // Heun predictor step
-            TIME(vcl::kernel_call(predictor_step), vcl::time::predictor_step);
+            TIME(vcl::kernel_call(predictor_step), vcl::time::predictor_step, vcl::queue);
             vcl::queue.finish();
 
             // update spin fields, external fixed
@@ -120,7 +130,7 @@ namespace vopencl
             vcl::queue.finish();
 
             // Heun corrector step
-            TIME(vcl::kernel_call(corrector_step), vcl::time::corrector_step);
+            TIME(vcl::kernel_call(corrector_step), vcl::time::corrector_step, vcl::queue);
             vcl::queue.finish();
          }
       }
