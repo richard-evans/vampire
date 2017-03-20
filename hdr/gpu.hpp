@@ -18,9 +18,12 @@ namespace gpu{
    extern bool acceleration; // flag to enable gpu_acceleration
    extern bool cpu_stats; // flag to calculate stats using cpu
 
-   extern int num_threads; // number of threads to run per kernel
+   extern int num_threads; // number of threads to run per kernel on main device
+   extern int num_threads_other; // as above on other device
    extern int platform; // which platform to use for acceleration (OpenCL)
+   extern int platform_other; // other platform to use for some calculations (OpenCL)
    extern int device; // int specifying gpu device to use for simulation
+   extern int device_other; // other device to use (under platform_other)
 
 
    //-----------------------------------------------------------------------------

@@ -81,7 +81,9 @@ namespace vopencl
          // gaussian prng
          vcl::rng::grng = vcl::build_kernel_from_file("src/opencl/cl/random.cl",
                                                       "gen_grands",
-                                                      default_opts);
+                                                      default_opts,
+                                                      vcl::extra_device,
+                                                      vcl::context_other);
 
          // llg heun steps
          vcl::llg::predictor_step = vcl::build_kernel_from_file("src/opencl/cl/llg_heun.cl",

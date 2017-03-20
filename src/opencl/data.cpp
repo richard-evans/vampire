@@ -41,8 +41,11 @@ namespace vopencl
    namespace internal
    {
       cl::Device default_device;
+      cl::Device extra_device;
       cl::Context context;
+      cl::Context context_other;
       cl::CommandQueue queue;
+      cl::CommandQueue queue_other;
 
 #ifdef OPENCL_LOG
       std::ofstream OCLLOG("OpenCL.log");
@@ -52,6 +55,7 @@ namespace vopencl
       {
          cl::Buffer state;
          cl::Buffer grands;
+         cl::Buffer grands_copy;
       }
 
       namespace atoms

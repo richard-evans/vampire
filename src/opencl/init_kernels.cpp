@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "atoms.hpp"
+#include "gpu.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 
@@ -52,16 +53,32 @@ static void init_dipole(void)
 
 static void init_external_fields(void)
 {
-   vcl::set_kernel_args(vcl::update_ext,
-                        vcl::atoms::type_array,
-                        vcl::mp::materials,
-                        vcl::dipolar_field_array.buffer(),
-                        vcl::total_external_field_array.buffer(),
-                        vcl::rng::grands,
-                        vcl::real_t(sim::H_vec[0] * sim::H_applied),
-                        vcl::real_t(sim::H_vec[1] * sim::H_applied),
-                        vcl::real_t(sim::H_vec[2] * sim::H_applied),
-                        vcl::real_t(sim::temperature));
+   if (::gpu::platform_other == ::gpu::platform)
+   {
+      vcl::set_kernel_args(vcl::update_ext,
+                           vcl::atoms::type_array,
+                           vcl::mp::materials,
+                           vcl::dipolar_field_array.buffer(),
+                           vcl::total_external_field_array.buffer(),
+                           vcl::rng::grands,
+                           vcl::real_t(sim::H_vec[0] * sim::H_applied),
+                           vcl::real_t(sim::H_vec[1] * sim::H_applied),
+                           vcl::real_t(sim::H_vec[2] * sim::H_applied),
+                           vcl::real_t(sim::temperature));
+   }
+   else
+   {
+      vcl::set_kernel_args(vcl::update_ext,
+                           vcl::atoms::type_array,
+                           vcl::mp::materials,
+                           vcl::dipolar_field_array.buffer(),
+                           vcl::total_external_field_array.buffer(),
+                           vcl::rng::grands_copy,
+                           vcl::real_t(sim::H_vec[0] * sim::H_applied),
+                           vcl::real_t(sim::H_vec[1] * sim::H_applied),
+                           vcl::real_t(sim::H_vec[2] * sim::H_applied),
+                           vcl::real_t(sim::temperature));
+   }
 }
 
 static void init_exchange(void)

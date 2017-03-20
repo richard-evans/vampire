@@ -39,6 +39,7 @@ namespace vopencl
       {
          extern cl::Buffer state;
          extern cl::Buffer grands;
+         extern cl::Buffer grands_copy;
       }
 
       namespace atoms

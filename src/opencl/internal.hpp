@@ -55,13 +55,17 @@ namespace vopencl
 
       // number of work items
       extern cl::NDRange global;
+      extern cl::NDRange global_other;
 
       // let implementation choose work group size
       const cl::NDRange local(cl::NullRange);
 
       extern cl::Context context;
+      extern cl::Context context_other;
       extern cl::Device default_device;
+      extern cl::Device extra_device;
       extern cl::CommandQueue queue;
+      extern cl::CommandQueue queue_other;
 
 #ifdef OPENCL_LOG
       extern std::ofstream OCLLOG;

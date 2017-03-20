@@ -43,6 +43,7 @@ namespace vopencl
    namespace internal
    {
       cl::NDRange global;
+      cl::NDRange global_other;
 
       namespace time
       {
@@ -93,6 +94,10 @@ namespace vopencl
 #ifdef OPENCL_DEBUG
                           " Debugging routines have been enabled."
 #endif // OPENCL_DEBUG
+
+#ifdef OPENCL_TIME_KERNELS
+                          " OpenCL kernels will be timed."
+#endif // OPENCL_TIME_KERNELS
          );
 
       std::cout << message << std::endl;
@@ -145,37 +150,120 @@ namespace vopencl
          ::err::vexit();
       }
 
-      if (::gpu::platform >= nplatforms)
+      //// Set up platforms ////
+      if (::gpu::platform < 0) // not specified in input file
+      {
+         ::gpu::platform = 0;
+      }
+      else if (::gpu::platform >= nplatforms) // specified incorrectly
       {
          terminaltextcolor(YELLOW);
-         std::cerr << "Warning: Platform specified does not exist (" << ::gpu::platform << ")." << std::endl;
-         std::cerr << "Falling back to platform zero." << std::endl;
+         std::cerr << "Warning: Platform specified does not exist (" << ::gpu::platform << "). "
+                   << "Falling back to platform 0." << std::endl;
          terminaltextcolor(WHITE);
          ::gpu::platform = 0;
       }
 
-      if (::gpu::device >= devices[::gpu::platform].size())
+      if (::gpu::platform_other < 0) // not specified in input file
+      {
+         ::gpu::platform_other = ::gpu::platform;
+      }
+      else if (::gpu::platform_other >= nplatforms) // specified incorrectly
       {
          terminaltextcolor(YELLOW);
-         std::cerr << "Warning: Device specified does not exist (" << ::gpu::device << ")." << std::endl;
-         std::cerr << "Falling back to device zero." << std::endl;
+         std::cerr << "Warning: Platform specified does not exist (" << ::gpu::platform << "). "
+                   << "Falling back to platform " << ::gpu::platform << '.' << std::endl;
+         terminaltextcolor(WHITE);
+         ::gpu::platform_other = ::gpu::platform;
+      }
+
+      //// Set up devices ////
+      if (::gpu::device < 0) // not specified in input file
+      {
+         // silently use default
+         ::gpu::device = 0;
+      }
+      else if (::gpu::device >= devices[::gpu::platform].size()) // specified incorrectly
+      {
+         terminaltextcolor(YELLOW);
+         std::cerr << "Warning: Device specified (" << ::gpu::device
+                   << ") does not exist on platform " << ::gpu::platform << ". "
+                   << "Falling back to device 0." << std::endl;
          terminaltextcolor(WHITE);
          ::gpu::device = 0;
+      }
+
+
+      if (::gpu::device_other < 0) // not specified in input file
+      {
+         // silently use only one device
+         ::gpu::device_other = ::gpu::device;
+         std::cout << ::gpu::device_other << std::endl;
+      }
+      else if (::gpu::device_other >= devices[::gpu::platform_other].size()) // specified incorrectly
+      {
+         terminaltextcolor(YELLOW);
+         std::cerr << "Warning: Device specified (" << ::gpu::device_other
+                   << ") does not exist on platform " << ::gpu::platform_other << ". "
+                   << "Falling back to device " << ::gpu::device << '.' << std::endl;
+         terminaltextcolor(WHITE);
+         ::gpu::device_other = ::gpu::device;
       }
 
       cl::Platform default_platform = platforms[::gpu::platform];
       vcl::default_device = devices[::gpu::platform][::gpu::device];
 
+      cl::Platform extra_platform = platforms[::gpu::platform_other];
+      vcl::extra_device = devices[::gpu::platform_other][::gpu::device_other];
+
 #ifdef OPENCL_LOG
-      vcl::OCLLOG << "Using default platform " << default_platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
-      vcl::OCLLOG << "Using default device " << vcl::default_device.getInfo<CL_DEVICE_NAME>() << std::endl;
+      vcl::OCLLOG << "Using default platform " << default_platform.getInfo<CL_PLATFORM_NAME>()  << '\n';
+      vcl::OCLLOG << "Using default device "   << vcl::default_device.getInfo<CL_DEVICE_NAME>() << '\n';
+
+      if (::gpu::platform_other != ::gpu::platform ||
+          ::gpu::device_other != ::gpu::device)
+      {
+         vcl::OCLLOG << "Using extra platform " << extra_platform.getInfo<CL_PLATFORM_NAME>()  << '\n';
+         vcl::OCLLOG << "Using extra device "   << vcl::extra_device.getInfo<CL_DEVICE_NAME>() << '\n';
+      }
+
+      vcl::OCLLOG << '\n';
 #endif // OPENCL_LOG
 
-      vcl::context = cl::Context({vcl::default_device});
+      if (::gpu::platform_other == ::gpu::platform &&
+          ::gpu::device_other   == ::gpu::device) // only use one device
+      {
+         vcl::context = cl::Context({vcl::default_device});
+         vcl::context_other = vcl::context;
 
-      vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device,
-                                    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE |
-                                    CL_QUEUE_PROFILING_ENABLE);
+         vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device,
+                                    CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+
+         vcl::queue_other = vcl::queue;
+      }
+      else if (::gpu::platform_other == ::gpu::platform) // use two devices on the same platform
+      {
+         vcl::context = cl::Context({vcl::default_device, vcl::extra_device});
+
+         vcl::context_other = vcl::context;
+
+         vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device,
+                                       CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+
+         vcl::queue_other = cl::CommandQueue(vcl::context, vcl::extra_device,
+                                             CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+      }
+      else // multiple platforms
+      {
+         vcl::context       = cl::Context({vcl::default_device});
+         vcl::context_other = cl::Context({vcl::extra_device});
+
+         vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device,
+                                       CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+
+         vcl::queue_other = cl::CommandQueue(vcl::context_other, vcl::extra_device,
+                                             CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
+      }
 
       if (::gpu::num_threads > 0)
       {
@@ -183,12 +271,21 @@ namespace vopencl
       }
       else
       {
-         int default_nthreads = 64;
+         int default_nthreads = 8192;
          terminaltextcolor(YELLOW);
-         std::cerr << "Warning: defaulting to " << default_nthreads << " threads." << std::endl;
+         std::cerr << "Warning: defaulting to " << default_nthreads << " threads on main device." << std::endl;
          std::cerr << "Use gpu:num-threads=n in the input file to specify number." << std::endl;
          terminaltextcolor(WHITE);
          vcl::global = cl::NDRange(default_nthreads);
+      }
+
+      if (::gpu::num_threads_other > 0)
+      {
+         vcl::global_other = cl::NDRange(::gpu::num_threads_other);
+      }
+      else
+      {
+         vcl::global_other = vcl::global;
       }
 
       // build all OpenCL kernels
@@ -371,8 +468,14 @@ namespace vopencl
             rs[i] = rand64();
          }
 
-         vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
-         vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE, CL_TRUE);
+         vcl::rng::grands = cl::Buffer(vcl::context_other, CL_MEM_READ_WRITE, g_buffer_size);
+         vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE, CL_TRUE, vcl::queue_other, vcl::context_other);
+
+         if (::gpu::platform_other != ::gpu::platform)
+         {
+            // copy of grands on main platform
+            vcl::rng::grands_copy = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, g_buffer_size);
+         }
 
          return true;
       }

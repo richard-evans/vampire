@@ -43,8 +43,8 @@ namespace vopencl
       cl::Kernel build_kernel_from_file(const std::string &file_name,
                                         const std::string &kernel_name,
                                         const std::string &opts="",
-                                        const cl::Context &context=vcl::context,
-                                        const cl::Device  &device=vcl::default_device) noexcept
+                                        const cl::Device  &device=vcl::default_device,
+                                        const cl::Context &context=vcl::context) noexcept
       {
          std::ifstream source_file(file_name);
          if (!source_file)

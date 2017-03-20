@@ -61,8 +61,9 @@ namespace vopencl
       cl::Kernel build_kernel_from_file(const std::string &file_name,
                                         const std::string &kernel_name,
                                         const std::string &opts,
-                                        const cl::Context &context=vcl::context,
-                                        const cl::Device  &device=vcl::default_device) noexcept;
+                                        const cl::Device  &device=vcl::default_device,
+                                        const cl::Context &context=vcl::context) noexcept;
+
 
       template <typename... Ts>
       static void set_kernel_args(cl::Kernel &k, Ts &&... Args) noexcept
