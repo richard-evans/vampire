@@ -54,7 +54,7 @@ void llg_heun_predictor_step(const __global int *const restrict material_id,
       real_t3 new_S = S + Schange * (real_t)DT;
 
       // normalization of spin
-      new_S = normalize(new_S);
+      new_S = NORM(new_S);
 
       vstore3(new_S, atom, spin);
    }
@@ -94,10 +94,10 @@ void llg_heun_corrector_step(const __global int *const restrict material_id,
       const real_t3 dS_prime = prefactor * SxH + lambdatpr * SxSxH;
 
       // Heun step, using predictor and corrector spin changes
-      S = vload3(atom, spin_buffer) + 0.5 * (vload3(atom, dS) + dS_prime) * DT;
+      S = vload3(atom, spin_buffer) + (real_t)0.5 * (vload3(atom, dS) + dS_prime) * (real_t)DT;
 
       // normalization of spin
-      S = normalize(S);
+      S = NORM(S);
 
       vstore3(S, atom, spin);
    }

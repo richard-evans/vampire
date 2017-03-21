@@ -27,6 +27,7 @@ typedef ulong   uint_t;
 // double precision (64-bit) function
 //#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable
 #define ATOMIC_CMPXCHG(a,b,c) atom_cmpxchg(a,b,c)
+#define NORM(vec) normalize(vec)
 
 #else
 
@@ -39,6 +40,7 @@ typedef uint   uint_t;
 
 // single precision (32-bit) function
 #define ATOMIC_CMPXCHG(a,b,c) atomic_cmpxchg(a,b,c)
+#define NORM(vec) fast_normalize(vec)
 
 #endif // OPENCL_DP
 
