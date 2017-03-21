@@ -10,17 +10,11 @@
 #include "cl_defs.h"
 #include "material_type.h"
 
-#ifdef USE_VECTOR_TYPE
-typedef real_t3 T;
-#else
-typedef real_t T;
-#endif
-
 __kernel
 void update_external_fields(const __global int *const restrict material,
                             const __constant material_parameters_t *const restrict material_params,
-                            const __global T *const restrict dip_field,
-                            __global T *const restrict ext_field,
+                            const __global real_t *const restrict dip_field,
+                                  __global real_t *const restrict ext_field,
                             const __global real_t *const restrict gaussian_rand,
                             const real_t Hx,
                             const real_t Hy,
@@ -47,13 +41,7 @@ void update_external_fields(const __global int *const restrict material,
       //                                (uint_t)isless(temp, tc));
       const real_t sq_temp = sqrt(resc_temp);
 
-      const size_t x = 3*i+0;
-      const size_t y = 3*i+1;
-      const size_t z = 3*i+2;
-
-      const real_t3 grands = (real_t3)(gaussian_rand[x],
-                                       gaussian_rand[y],
-                                       gaussian_rand[z]);
+      const real_t3 grands = vload3(i, gaussian_rand);
 
       real_t3 field = sigma * sq_temp * grands;
 
@@ -63,12 +51,7 @@ void update_external_fields(const __global int *const restrict material,
 
       field += norm_h * h + Happ;
 
-#ifdef USE_VECTOR_TYPE
-      ext_field[i] = field + dip_field[i];
-#else
-      ext_field[x] = field.x + dip_field[x];
-      ext_field[y] = field.y + dip_field[y];
-      ext_field[z] = field.z + dip_field[z];
-#endif
+      // ext_field[i] = field + dip_field[i]
+      vstore3(field + vload3(i, dip_field), i, ext_field);
    }
 }

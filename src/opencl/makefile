@@ -26,16 +26,12 @@
 #      Use single precision floating point math instead of double precision. It
 #      should give better performance and some devices may require this.
 #
-# -UUSE_VECTOR_TYPE:
-#      OpenCL vector types will not be used for data storage. This may
-#      (depending on implementation and hardware) decrease amount of device
-#      memory used but memory accesses may be significantly slower.
 
 
 OPENCL_CFLAGS:=\
 -MMD \
 -Wno-ignored-attributes -Wno-unused-function \
--DNDEBUG -DOPENCL_DP -DUSE_VECTOR_TYPE -DOPENCL_LOG \
+-DNDEBUG -DOPENCL_DP -DOPENCL_LOG \
 $(OPENCL_CFLAGS)
 
 OPENCL_DEBUG_CFLAGS:=\

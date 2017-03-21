@@ -87,10 +87,6 @@ namespace vopencl
                           " Native functions will be used."
 #endif // OPENCL_USE_NATIVE_FUNCTIONS
 
-#ifdef USE_VECTOR_TYPE
-                          " OpenCL vector types will be used for storage."
-#endif // USE_VECTOR_TYPE
-
 #ifdef OPENCL_DEBUG
                           " Debugging routines have been enabled."
 #endif // OPENCL_DEBUG

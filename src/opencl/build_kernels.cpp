@@ -37,9 +37,6 @@ namespace vopencl
 #ifdef OPENCL_USE_NATIVE_FUNCTIONS
                                   "-DOPENCL_USE_NATIVE_FUNCTIONS "
 #endif
-#ifdef USE_VECTOR_TYPE
-                                  "-DUSE_VECTOR_TYPE "
-#endif
             );
          std::ostringstream params;
          params << "-DNUM_ATOMS=" << ::atoms::num_atoms << ' ';
@@ -69,9 +66,11 @@ namespace vopencl
                                                        default_opts);
 
          // matrix multiplication for exchange
+         std::ostringstream exch_opts;
+         exch_opts << default_opts << "-DEXCH_TYPE=" << ::atoms::exchange_type;
          vcl::exchange::calculate_exchange = vcl::build_kernel_from_file("src/opencl/cl/csrmatmul.cl",
                                                                          "matmul",
-                                                                         default_opts);
+                                                                         exch_opts.str());
 
          // non exchange spin fields
          vcl::update_nexch_spin_fields = vcl::build_kernel_from_file("src/opencl/cl/spin_fields.cl",

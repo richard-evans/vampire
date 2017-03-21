@@ -98,11 +98,7 @@ static void init_exchange(void)
 {
    const size_t vsize = ::atoms::neighbour_list_array.size();
 
-#ifdef USE_VECTOR_TYPE
-   std::vector<vcl::real_t3> J_vals_h(vsize);
-#else
    std::vector<vcl::real_t> J_vals_h(3*vsize);
-#endif
 
    cl::CommandQueue write_q(vcl::context, vcl::default_device);
 
@@ -118,14 +114,10 @@ static void init_exchange(void)
          const int iid = ::atoms::neighbour_interaction_type_array[i];
          const vcl::real_t Jij = ::atoms::i_exchange_list[iid].Jij;
 
-#ifdef USE_VECTOR_TYPE
-         J_vals_h[i] = vcl::real_t3{-Jij, -Jij, -Jij};
-#else
          const unsigned xxi = 3*i+0;
          const unsigned yyi = 3*i+1;
          const unsigned zzi = 3*i+2;
          J_vals_h[xxi] = J_vals_h[yyi] = J_vals_h[zzi] = - Jij;
-#endif
       }
       vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY, CL_FALSE, write_q);
    }
@@ -135,11 +127,7 @@ static void init_exchange(void)
       // Jxx != Jyy != Jzz
       // Jxy = Hxz = Jyx = 0
    {
-#ifdef USE_VECTOR_TYPE
-      std::vector<vcl::real_t3> J_vals_h(vsize);
-#else
       std::vector<vcl::real_t> J_vals_h(3*vsize);
-#endif
 
       for (unsigned i=0; i<vsize; ++i)
       {
@@ -147,9 +135,6 @@ static void init_exchange(void)
 
          const auto &vel = ::atoms::v_exchange_list[iid];
 
-#ifdef USE_VECTOR_TYPE
-         J_vals_h[i] = {-vel.Jij[0], -vel.Jij[1], -vel.Jij[2]};
-#else
          const unsigned xxi = 3*i+0;
          const unsigned yyi = 3*i+1;
          const unsigned zzi = 3*i+2;
@@ -157,7 +142,6 @@ static void init_exchange(void)
          J_vals_h[xxi] = - vel.Jij[0];
          J_vals_h[yyi] = - vel.Jij[1];
          J_vals_h[zzi] = - vel.Jij[2];
-#endif
       }
       vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY, CL_FALSE, write_q);
    }
