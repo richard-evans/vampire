@@ -21,21 +21,22 @@ ulong2 xorshift(ulong2 x)
 }
 
 __kernel
-void gen_grands(__global ulong2  *const restrict state,
-                __global real_t2 *const restrict grands)
+void gen_grands(__global ulong  *const restrict state,
+                __global real_t *const restrict grands)
 {
    const size_t gid = get_global_id(0);
    const size_t gsz = get_global_size(0);
 
    for (size_t i=gid; i<(3*NUM_ATOMS)/2; i+=gsz)
    {
-      ulong2 s = xorshift(state[i]);
+      // uniform generator
+      ulong2 s = xorshift(vload2(i, state));
+      vstore2(s, i, state);
 
-      state[i] = s;
-
-      // u.x, u.y are between 0 and 1
       const ulong c = 0x2545F4914F6CDD1Dul;
       s *= c;
+
+      // u.x, u.y are uniformly distributed between 0 and 1
       const real_t2 u =
 #ifdef OPENCL_DP
          convert_double2(s)
@@ -44,14 +45,14 @@ void gen_grands(__global ulong2  *const restrict state,
 #endif
          /0xFFFFFFFFFFFFFFFFul;
 
+      // Box Muller transform for Gaussian distribution
       const real_t r = SQRT(-2*LOG(u.x));
 
-      // TODO: look into sincos(), sinpi(), cospi()
-      const real_t costheta = COS(2*PI*u.y);
-      const real_t sintheta = SIN(2*PI*u.y);
+      // thetas.x = cos(2pi*u.y)
+      // thetas.y = sin(2pi*u.y)
+      real_t2 thetas;
+      thetas.y = sincos(2*PI*u.y, (real_t*)&thetas);
 
-      real_t2 g = r * (real_t2)(costheta, sintheta);
-
-      grands[i] = g;
+      vstore2(r*thetas, i, grands);
    }
 }
