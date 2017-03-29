@@ -23,9 +23,9 @@ namespace config{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
-
+   
    namespace internal{
-
+        std::vector<int> local_output_atom_list(0);
       //------------------------------------------------------------------------
       // Shared variables inside config module
       //------------------------------------------------------------------------
@@ -43,7 +43,7 @@ namespace config{
       double atoms_output_min[3]={0.0,0.0,0.0};
       double atoms_output_max[3]={1.0,1.0,1.0};
 
-      data_format output_data_format = binary;
+      data_format output_data_format = text;
       bool output_new = false;
       bool mpi_io = false;
    } // end of internal namespace

@@ -41,7 +41,7 @@
 namespace vmpi{
 void IOCommunticator(int num_io);
 
-int num_io_processors;
+int num_io_processors=1;
 int size_io_group;
 int my_io_rank;
 int my_io_group;
@@ -80,7 +80,7 @@ int initialise(){
 	vmpi::my_rank = MPI::COMM_WORLD.Get_rank();
 	vmpi::num_processors = MPI::COMM_WORLD.Get_size();
 	MPI::Get_processor_name(vmpi::hostname, resultlen);
-	IOCommunticator(num_processors);
+	IOCommunticator(num_io_processors);
 	// Start MPI Timer
 	vmpi::start_time=MPI_Wtime();
 
@@ -244,8 +244,10 @@ void IOCommunticator(int num_io){
 
    MPI_Comm_split(MPI_COMM_WORLD, vmpi::my_io_group, vmpi::my_rank, &vmpi::io_comm);
 
-   vmpi::my_io_rank = MPI::COMM_WORLD.Get_rank();
-   vmpi::size_io_group = MPI::COMM_WORLD.Get_size();
+   MPI_Comm_rank( vmpi::io_comm, &my_io_rank );
+   MPI_Comm_size( vmpi::io_comm, &size_io_group );
+   io_processor = size_io_group - 1;
+   printf(" ---------------------- \n Mpi::rank %d, Io Group: %d, Io group size: %d Io:rank %d \n---------------------- \n", vmpi::my_rank, vmpi::my_io_group, size_io_group, vmpi::my_io_rank);
 }
 
 

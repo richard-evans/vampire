@@ -54,6 +54,12 @@ namespace config{
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
+        test="output-legacy";
+        if(word==test){
+            internal::output_new = false;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
         test="output-binary";
         if(word==test){
             internal::output_data_format = internal::binary;
@@ -65,7 +71,22 @@ namespace config{
             internal::output_data_format = internal::text;
             return EXIT_SUCCESS;
         }
-
+        //--------------------------------------------------------------------
+        test="output-mpi-io";
+        if(word==test){
+            internal::output_data_format = internal::binary;
+            internal::output_new = true;
+            internal::mpi_io = true;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="output-io-processors";
+        if(word==test){
+            int x=atoi(value.c_str());
+            vin::check_for_valid_int(x, word, line, prefix, 1, vmpi::num_processors,"input","1 - 1,000,000");
+            vmpi::num_io_processors=x;
+            return EXIT_SUCCESS;
+        }
         //--------------------------------------------------------------------
         test="atoms-minimum-x";
         if(word==test){

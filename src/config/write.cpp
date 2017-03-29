@@ -6,7 +6,7 @@
 // (c) R F L Evans 2015. All rights reserved.
 //
 //-----------------------------------------------------------------------------
-
+#include <stdio.h>
 // C++ standard library headers
 #include <iomanip>
 #include <sstream>
@@ -89,9 +89,10 @@ void copy_data_to_buffer(const std::vector<double> &x, // vector data
 // Simple wrapper function to call output function for correct format
 //----------------------------------------------------------------------------------------------------
 //
-void write_data(const std::vector<float> &buffer)
+void write_data(const std::vector<float> &buffer, bool coord)
 {
-   std::string filename = data_filename(false);
+      printf("Writing data");
+   std::string filename = data_filename(coord);
    // Output informative message to log file
    zlog << zTs() << "Outputting configuration file " << filename << " to disk ";
 
@@ -99,9 +100,11 @@ void write_data(const std::vector<float> &buffer)
    {
 
    case config::internal::binary:
+      printf("Writing binary");
       write_data_binary(filename, buffer);
       break;
    case config::internal::text:
+      printf("Writing text");
       write_data_text(filename, buffer);
       break;
    }
@@ -121,12 +124,6 @@ void write_data_text(std::string filename, const std::vector<float> &buffer)
 
    // Output informative message to log file
    //zlog << zTs() << "Outputting configuration file " << filename.str() << " to disk ";
-
-   // instantiate timer
-   vutil::vtimer_t timer;
-
-   // start timer
-   timer.start();
 
    // Declare and open output file
    std::ofstream ofile;
@@ -149,9 +146,6 @@ void write_data_text(std::string filename, const std::vector<float> &buffer)
    // close output file
    ofile.close();
 
-   // stop the timer
-   double local_time = timer.elapsed_time(); // seconds
-
    // open file at end
    std::ifstream in(filename.c_str(), std::ios::binary | std::ios::ate);
 
@@ -160,21 +154,6 @@ void write_data_text(std::string filename, const std::vector<float> &buffer)
 
    // close file
    in.close();
-
-
-#ifdef MPICF
-// aggregate bandwidth
-   MPI_Reduce
-   double total_time;
-   MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-   double total_data_size;
-   MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-   if(vmpi::my_rank==0)
-      zlog << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
-#else
-   // calculate data rate and output to log
-   zlog << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
-#endif
 
    return;
 }
@@ -185,13 +164,6 @@ void write_data_text(std::string filename, const std::vector<float> &buffer)
 //
 void write_data_binary(std::string filename, const std::vector<float> &buffer)
 {
-
-   // instantiate timer
-   vutil::vtimer_t timer;
-
-   // start timer
-   timer.start();
-
    // Declare and open output file
    std::ofstream ofile;
    ofile.open(filename.c_str(), std::ios::binary);
@@ -208,25 +180,8 @@ void write_data_binary(std::string filename, const std::vector<float> &buffer)
    // close output file
    ofile.close();
 
-   // stop the timer
-   double local_time = timer.elapsed_time(); // seconds
-
    // get file size (bytes)
    double local_data_size = double(sizeof(float) * buffer.size());
-
-#ifdef MPICF
-// aggregate bandwidth
-   MPI_Reduce
-   double total_time;
-   MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-   double total_data_size;
-   MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-   if(vmpi::my_rank==0)
-      zlog << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
-#else
-   // calculate data rate and output to log
-   zlog << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
-#endif
 
    return;
 }
@@ -236,9 +191,9 @@ std::string data_filename(bool coords){
    std::stringstream file_sstr;
 
    if (coords)
-      file_sstr << "atom-spins-";
-   else
       file_sstr << "atom-coords-";
+   else
+      file_sstr << "atom-spins-";
 
    switch (config::internal::output_data_format)
    {
@@ -251,9 +206,11 @@ std::string data_filename(bool coords){
       break;
    }
    #ifdef MPICF
-      file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
+      if (!mpi_io)
+         file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_io_group;
    #endif
-   file_sstr << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
+   if (!coords)
+      file_sstr << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
    file_sstr << ".data";
    std::string filename = file_sstr.str();
 

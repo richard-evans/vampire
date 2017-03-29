@@ -7,6 +7,8 @@ config_objects =\
 initialize.o \
 interface.o \
 output.o \
+output_legacy.o \
+config.o \
 data.o \
 write.o \
 meta.o

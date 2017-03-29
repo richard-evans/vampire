@@ -123,9 +123,23 @@ namespace config{
          ofile << "Number of spin files: " << num_files << "\n"; //vmpi::num_processors-1 << "\n";
          for(int p=0;p<num_files;p++){
             std::stringstream cfg_sstr;
-            cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".cfg";
+
+
+            cfg_sstr << "atom-spins-" ;
+            switch (config::internal::output_data_format)
+            {
+            case config::internal::binary:
+               cfg_sstr << "binary-";
+               break;
+            case config::internal::text:
+               cfg_sstr << "text-";
+               break;
+            }
+            cfg_sstr << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".cfg";
             ofile << cfg_sstr.str() << "\n";
          }
+
+
          ofile << "#------------------------------------------------------"<< "\n";
 
          return;

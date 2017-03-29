@@ -49,6 +49,8 @@ namespace internal
    extern double atoms_output_min[3];
    extern double atoms_output_max[3];
 
+   extern std::vector<int> local_output_atom_list;
+
    enum data_format
    {
       binary = 1,
@@ -71,7 +73,10 @@ namespace internal
 
    void atoms_new();
    void atoms_coords_new();
-   void write_data(const std::vector<float> &buffer);
+   void cells_new();
+   void cells_coords_new();
+
+   void write_data(const std::vector<float> &buffer, bool coord);
    void write_data_text(std::string filename, const std::vector<float> &buffer);
    void write_data_binary(std::string filename, const std::vector<float> &buffer);
    void copy_data_to_buffer(const std::vector<double> &x, // vector data
