@@ -107,9 +107,19 @@ void atoms_new()
 
    // Output Meta Data
       const std::vector<double> m_l = stats::system_magnetization.get_magnetization();
+
+      int files;
+
+      if(output_all)
+         files = vmpi::num_processors;
+
+      if(output_gather)
+         files = vmpi::num_io_processors;
+
+      if (output_mpi_io)
+         files = 1;
       
-      int files = vmpi::num_io_processors;
-      if (mpi_io)
+
       if (vmpi::my_rank == 0)
          write_meta( double(sim::time) * mp::dt_SI , // time (seconds)
                      sim::temperature, // system temperature (Kelvin)
@@ -129,7 +139,7 @@ void atoms_new()
       copy_data_to_buffer(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, local_output_atom_list, localbuffer);
 
    #ifdef MPICF
-      if (mpi_io)
+      if (output_mpi_io)
       {
             MPI_File fh;
             MPI_Status status; 
@@ -138,13 +148,30 @@ void atoms_new()
             MPI_File_open(MPI_COMM_WORLD, filename, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fh);
             MPI_File_write_ordered(fh, &localbuffer[0], local_size, MPI_FLOAT, &status);
             MPI_File_close(&fh);
-      }else
+      }else if(output_all)
       {
+         write_data(localbuffer, false);
+      }else if(output_gather)
+      {
+            
             int total_size=0;
             MPI_Reduce(&local_size, &total_size, 1, MPI_INT, MPI_SUM, vmpi::io_processor,vmpi::io_comm);
             total_buffer.resize(total_size);
             //MPI_Gather( &localbuffer[0], local_size, MPI_FLOAT, &total_buffer[0], total_size, MPI_FLOAT, vmpi::io_processor, vmpi::io_comm);
-            printf("\n \n rank %d, local size %d, total size %d\n \n ", vmpi::my_rank, local_size, total_size);
+            
+            std::vector<int> buffer_sizes(vmpi::size_io_group), buffer_offset(vmpi::size_io_group);
+            MPI_Gather( &local_size, 1, MPI_INT, &buffer_sizes[0], vmpi::size_io_group, MPI_INT, vmpi::io_processor, vmpi::io_comm);
+            int temp=0;
+            for (int i = 0; i < vmpi::size_io_group; i++)
+            {
+               buffer_offset[i]=temp;
+               temp+=buffer_sizes[i];
+               total_size += buffer_sizes[i];
+            }
+             
+            //MPI_Gather( &localbuffer[0], local_size, MPI_FLOAT, &total_buffer[0], total_size, MPI_FLOAT, vmpi::io_processor, vmpi::io_comm);
+            //MPI_Gatherv( &localbuffer[0], local_size, MPI_FLOAT, &total_buffer[0], &buffer_sizes[0], &buffer_offset[0], MPI_FLOAT, vmpi::io_processor, vmpi::io_comm);
+            
             if (vmpi::my_io_rank == vmpi::io_processor)
                write_data(total_buffer, false);
       }
@@ -165,10 +192,12 @@ void atoms_new()
    double total_data_size;
    MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
    if(vmpi::my_rank==0)
-      zlog << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
+      zlog << "Data transfer time " << total_time << std::endl;
+      zlog << "Data transfer speed " << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
 #else
    // calculate data rate and output to log
-   zlog << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
+   zlog << "Data transfer time "  << local_time << std::endl;
+   zlog << "Data transfer speed " << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
 #endif
 }
 
@@ -283,7 +312,7 @@ void atoms_coords_new()
       copy_data_to_buffer(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array, local_output_atom_list, localbuffer);
 
    #ifdef MPICF
-      if (mpi_io)
+      if (output_mpi_io)
       {
             MPI_File fh;
             MPI_Status status;
@@ -292,16 +321,36 @@ void atoms_coords_new()
             MPI_File_open(MPI_COMM_WORLD, filename, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fh);
             MPI_File_write_ordered(fh, &localbuffer[0], local_size, MPI_FLOAT, &status);
             MPI_File_close(&fh);
-      }else
+      }else if(output_all)
       {
+         write_data(localbuffer, true);
+      }else if(output_gather)
+      {
+            /*printf("test 1 rank %d", vmpi::my_rank);
             int total_size=0;
             MPI_Reduce(&local_size, &total_size, 1, MPI_INT, MPI_SUM, vmpi::io_processor,vmpi::io_comm);
             MPI_Barrier( vmpi::io_comm );
             total_buffer.resize(total_size);
-            MPI_Gather( &localbuffer[0], local_size, MPI_FLOAT, &total_buffer[0], total_size, MPI_FLOAT, vmpi::io_processor, vmpi::io_comm);
-
+            printf("The IO Processor is %d \n", vmpi::io_processor);
+            //std::vector<int> buffer_sizes(vmpi::size_io_group), buffer_offset(vmpi::size_io_group);
+            int buffer_sizes[vmpi::size_io_group];
+            int buffer_offset[vmpi::size_io_group];
+            MPI_Gather( &local_size, 1, MPI_INT, &buffer_sizes[0], vmpi::size_io_group, MPI_INT, vmpi::io_processor, MPI_COMM_WORLD);//vmpi::io_comm);
+            int temp=0;
+            for (int i = 0; i < vmpi::size_io_group; i++)
+            {
+               buffer_offset[i]=temp;
+               temp+=buffer_sizes[i];
+            }
+               printf("\n rank %d, local size %d", vmpi::my_rank, local_size);
+            if (vmpi::my_io_rank == vmpi::io_processor)
+               printf("\n local [0] = %d, local [1] = %d, local [2] = %d, local [3] = %d \n" , buffer_sizes[0], buffer_sizes[1], buffer_sizes[2], buffer_sizes[3]);
+            //MPI_Gather( &localbuffer[0], local_size, MPI_FLOAT, &total_buffer[0], total_size, MPI_FLOAT, vmpi::io_processor, vmpi::io_comm);
+            //MPI_Gatherv( &localbuffer[0], local_size, MPI_FLOAT, &total_buffer[0], &buffer_sizes[0], &buffer_offset[0], MPI_FLOAT, vmpi::io_processor, vmpi::io_comm);
+            
             if (vmpi::my_io_rank == vmpi::io_processor)
                write_data(total_buffer, true);
+            */
       }
    #else
       write_data(localbuffer, true);
@@ -321,10 +370,12 @@ void atoms_coords_new()
    double total_data_size;
    MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
    if(vmpi::my_rank==0)
-      zlog << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
+      zlog << "Data transfer time " << total_time << std::endl;
+      zlog << "Data transfer speed " << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
 #else
    // calculate data rate and output to log
-   zlog << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
+   zlog << "Data transfer time "  << local_time << std::endl;
+   zlog << "Data transfer speed " << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
 #endif
 }
 

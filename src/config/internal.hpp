@@ -57,8 +57,10 @@ namespace internal
       text = 2
    };
    extern data_format output_data_format;
-   extern bool output_new;
-   extern bool mpi_io;
+   extern bool output_lagacy;
+   extern bool output_gather;
+   extern bool output_all;
+   extern bool output_mpi_io;
    //-------------------------------------------------------------------------
    // Internal shared variables
    //-------------------------------------------------------------------------

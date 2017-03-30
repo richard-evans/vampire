@@ -206,9 +206,16 @@ std::string data_filename(bool coords){
       break;
    }
    #ifdef MPICF
-      if (!mpi_io)
+      if(output_all)
+         file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank;
+
+      if(output_gather)
          file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_io_group;
+      
+      if (output_mpi_io)
+         file_sstr << "-mpi-io-";
    #endif
+
    if (!coords)
       file_sstr << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
    file_sstr << ".data";

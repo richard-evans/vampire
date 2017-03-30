@@ -96,7 +96,7 @@ void atoms()
    // start timer
    timer.start();
 
-   if (output_new)
+   if (!output_lagacy)
    {
       atoms_new();
       return;
@@ -242,7 +242,7 @@ void atoms_coords()
    // start timer
    timer.start();
 
-   if (output_new)
+   if (!output_lagacy)
    {
       atoms_coords_new();
       return;

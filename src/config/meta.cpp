@@ -73,6 +73,26 @@ namespace config{
             scmf << "#--------------------------------------------" << std::endl;
             scmf << "Number of coord files: " << 1 << std::endl;
             scmf << "atoms-coords.cfg" << std::endl;
+            scmf << "atom-coords-";
+            switch (config::internal::output_data_format)
+            {
+            case config::internal::binary:
+               scmf << "binary-";
+               break;
+            case config::internal::text:
+               scmf << "text-";
+               break;
+            }
+            #ifdef MPICF
+            if(output_all)
+               scmf << std::setfill('0') << std::setw(5) << vmpi::my_rank;
+            if(output_gather)
+               scmf << std::setfill('0') << std::setw(5) << vmpi::my_io_group;
+            if (output_mpi_io)
+               scmf << "-mpi-io-";
+            #endif
+
+            scmf << ".data";
 
             // number of cell files + file list
 
@@ -124,10 +144,11 @@ namespace config{
          for(int p=0;p<num_files;p++){
             std::stringstream cfg_sstr;
 
+            cfg_sstr << "atom-spins-";
 
-            cfg_sstr << "atom-spins-" ;
             switch (config::internal::output_data_format)
             {
+
             case config::internal::binary:
                cfg_sstr << "binary-";
                break;
@@ -135,7 +156,19 @@ namespace config{
                cfg_sstr << "text-";
                break;
             }
-            cfg_sstr << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".cfg";
+            #ifdef MPICF
+               if(output_all)
+                  cfg_sstr << std::setfill('0') << std::setw(5) << p;
+
+               if(output_gather)
+                  cfg_sstr << std::setfill('0') << std::setw(5) << p;
+               
+               if (output_mpi_io)
+                  cfg_sstr << "-mpi-io-";
+            #endif
+
+               cfg_sstr << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".data";
+
             ofile << cfg_sstr.str() << "\n";
          }
 

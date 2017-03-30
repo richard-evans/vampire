@@ -247,7 +247,9 @@ void IOCommunticator(int num_io){
    MPI_Comm_rank( vmpi::io_comm, &my_io_rank );
    MPI_Comm_size( vmpi::io_comm, &size_io_group );
    io_processor = size_io_group - 1;
-   printf(" ---------------------- \n Mpi::rank %d, Io Group: %d, Io group size: %d Io:rank %d \n---------------------- \n", vmpi::my_rank, vmpi::my_io_group, size_io_group, vmpi::my_io_rank);
+
+   //printf(" ---------------------- \n Mpi::rank %d, Io Group: %d, Io group size: %d Io:rank %d \n---------------------- \n", vmpi::my_rank, vmpi::my_io_group, size_io_group, vmpi::my_io_rank);
+
 }
 
 

@@ -44,8 +44,10 @@ namespace config{
       double atoms_output_max[3]={1.0,1.0,1.0};
 
       data_format output_data_format = text;
-      bool output_new = false;
-      bool mpi_io = false;
+      bool output_gather = false;
+      bool output_all = false;
+      bool output_mpi_io = false;
+      bool output_lagacy =true;
    } // end of internal namespace
 
 } // end of config namespace

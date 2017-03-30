@@ -48,15 +48,16 @@ namespace config{
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
-        test="output-new";
+        test="output-gather";
         if(word==test){
-            internal::output_new = true;
+            internal::output_gather = true;
+            internal::output_lagacy = false;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="output-legacy";
         if(word==test){
-            internal::output_new = false;
+            internal::output_lagacy = true;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -75,8 +76,16 @@ namespace config{
         test="output-mpi-io";
         if(word==test){
             internal::output_data_format = internal::binary;
-            internal::output_new = true;
-            internal::mpi_io = true;
+            internal::output_lagacy = false;
+            internal::output_mpi_io = true;
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="output-all-processors";
+        if(word==test){
+            internal::output_all = true;
+            internal::output_lagacy = false;
+            vmpi::num_io_processors = vmpi::num_processors;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
