@@ -91,12 +91,12 @@ namespace vmpi{
 	extern std::vector<double> recv_spin_data_array;
 
 	#ifdef MPICF
-		extern std::vector<MPI::Request> requests;
-		extern std::vector<MPI::Status> stati;
+		extern std::vector<MPI_Request> requests;
+		extern std::vector<MPI_Status> stati;
 	#endif
 
 	//functions declarations
-	extern int initialise();
+	extern int initialise(int argc, char *argv[]);
 	extern int hosts();
 	extern int finalise();
    extern void geometric_decomposition(int, double []);

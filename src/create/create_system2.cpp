@@ -199,7 +199,7 @@ int create(){
 			}
 
 			// Wait for process who is it
-			MPI::COMM_WORLD.Barrier();
+			vmpi::barrier();
 
 		} // end of loop over processes
 	}
@@ -215,9 +215,9 @@ int create(){
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		MPI::COMM_WORLD.Barrier(); // wait for everyone
+		vmpi::barrier();// wait for everyone
 		vmpi::copy_halo_atoms(catom_array);
-		MPI::COMM_WORLD.Barrier(); // sync after halo atoms copied
+		vmpi::barrier(); // sync after halo atoms copied
 	}
 	else if(vmpi::mpi_mode==1){
 		vmpi::set_replicated_data(catom_array);
@@ -238,7 +238,7 @@ int create(){
 	} // stop if for staged generation here
 	// ** Must be done in parallel **
 		vmpi::init_mpi_comms(catom_array);
-		MPI::COMM_WORLD.Barrier();
+		vmpi::barrier();
 	#endif
 
 	// Set atom variables for simulation
@@ -264,7 +264,7 @@ int create(){
 			}
 
 			// Wait for process who is it
-			MPI::COMM_WORLD.Barrier();
+			vmpi::barrier();
 
 		} // end of loop over processes
 	}
@@ -345,7 +345,7 @@ int create(){
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    //std::cout << "my_num_atoms == " << my_num_atoms << std::endl;
 	int total_num_atoms=0;
-	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
+	MPI_Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
    zlog << zTs() << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
 	#else

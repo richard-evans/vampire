@@ -304,7 +304,7 @@ int LLG_Heun_mpi(){
 	vmpi::TotalComputeTime+=vmpi::SwapTimer(vmpi::ComputeTime, vmpi::WaitTime);
 
 	// Wait for other processors
-	MPI::COMM_WORLD.Barrier();
+	vmpi::barrier();
 
 	// Swap timers wait -> compute
 	vmpi::TotalWaitTime+=vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);

@@ -90,17 +90,20 @@ int mpi_init_halo_swap(){
 	//----------------------------------------------------------
 
 	vmpi::requests.resize(0);
+	MPI_Request req;
 
 	for (int p=0;p<vmpi::num_processors;p++){
 		if(vmpi::send_num_array[p]!=0){
 			int num_pts = 3*vmpi::send_num_array[p];
 			int si = 3*vmpi::send_start_index_array[p];
-			vmpi::requests.push_back(MPI::COMM_WORLD.Isend(&vmpi::send_spin_data_array[si],num_pts,MPI_DOUBLE,p,48));
+			vmpi::requests.push_back(req);
+			MPI_Isend(&vmpi::send_spin_data_array[si],num_pts,MPI_DOUBLE,p,48, MPI_COMM_WORLD, &vmpi::requests.back());
 		}
 		if(vmpi::recv_num_array[p]!=0){
 			int num_pts = 3*vmpi::recv_num_array[p];
 			int si = 3*vmpi::recv_start_index_array[p];
-			vmpi::requests.push_back(MPI::COMM_WORLD.Irecv(&vmpi::recv_spin_data_array[si],num_pts,MPI_DOUBLE,p,48));
+			vmpi::requests.push_back(req);
+			MPI_Irecv(&vmpi::recv_spin_data_array[si],num_pts,MPI_DOUBLE,p,48, MPI_COMM_WORLD, &vmpi::requests.back());
 		}
 	}
 
@@ -134,7 +137,7 @@ int mpi_complete_halo_swap(){
 	
 	// Wait for all comms to complete
 	vmpi::stati.resize(vmpi::requests.size());
-	MPI::Request::Waitall(vmpi::requests.size(),&vmpi::requests[0],&vmpi::stati[0]);
+	MPI_Waitall(vmpi::requests.size(),&vmpi::requests[0],&vmpi::stati[0]);
 
 	// Swap timers wait -> compute
 	vmpi::TotalWaitTime+=vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);

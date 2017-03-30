@@ -231,11 +231,10 @@ int LLG_Midpoint_mpi(){
 	}
 
 	// Wait for other processors
-	MPI::COMM_WORLD.Barrier();
+	vmpi::barrier();
 
 	return EXIT_SUCCESS;
 }
 
 } // end of namespace sim
 #endif
-

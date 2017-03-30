@@ -297,7 +297,7 @@ void atoms_coords()
       int total_atoms;
       //std::cerr << vmpi::my_rank << "\t" << local_atoms << &local_atoms << "\t" << &total_atoms << std::endl;
       //MPI::COMM_WORLD.Barrier();
-      MPI::COMM_WORLD.Allreduce(&local_atoms, &total_atoms, 1, MPI_INT, MPI_SUM);
+      MPI_Allreduce(&local_atoms, &total_atoms, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
       total_output_atoms = total_atoms;
    //std::cerr << vmpi::my_rank << "\t" << total_atoms << "\t" << &local_atoms << "\t" << &total_atoms << std::endl;
    //MPI::COMM_WORLD.Barrier();

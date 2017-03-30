@@ -132,12 +132,12 @@ int set_properties(){
 		//MPI::COMM_WORLD.Allreduce(&grains::y_coord_array[0], &grains::y_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
 		//MPI::COMM_WORLD.Allreduce(&grains::z_coord_array[0], &grains::z_coord_array[0],grains::num_grains, MPI_INT,MPI_SUM);
 		//MPI::COMM_WORLD.Allreduce(&grains::sat_mag_array[0], &grains::sat_mag_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::grain_size_array[0],grains::num_grains, MPI_INT,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::sat_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-		if(mp::num_materials>1) MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::mat_sat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
+		MPI_Allreduce(MPI_IN_PLACE, &grains::grain_size_array[0],grains::num_grains, MPI_INT,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE, &grains::x_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE, &grains::y_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE, &grains::z_coord_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE, &grains::sat_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		if(mp::num_materials>1) MPI_Allreduce(MPI_IN_PLACE, &grains::mat_sat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
 	#endif
 
 	//vinfo << "-------------------------------------------------------------------------------------------------------------------" << std::endl;
@@ -219,12 +219,12 @@ int mag(){
 
 	// Reduce grain properties on all CPUs
 	#ifdef MPICF
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM);
-		if(mp::num_materials>1) MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::x_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
-		if(mp::num_materials>1) MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::y_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
-		if(mp::num_materials>1) MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE, &grains::z_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM);
+		MPI_Allreduce(MPI_IN_PLACE, &grains::x_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE, &grains::y_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE, &grains::z_mag_array[0],grains::num_grains, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		if(mp::num_materials>1) MPI_Allreduce(MPI_IN_PLACE, &grains::x_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		if(mp::num_materials>1) MPI_Allreduce(MPI_IN_PLACE, &grains::y_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		if(mp::num_materials>1) MPI_Allreduce(MPI_IN_PLACE, &grains::z_mat_mag_array[0],grains::num_grains*mp::num_materials, MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
 	#endif
 
 	// calculate mag_m of each grain and normalised direction
