@@ -83,8 +83,8 @@ namespace demag{
 
 	bool fast=false;
 
-	uint64_t update_rate=100; /// timesteps between updates
-	uint64_t update_time=0; /// last update time
+	int update_rate=100; /// timesteps between updates
+	int update_time=-1; /// last update time
 
 	const double prefactor=1.0e+23; // 1e-7/1e30
 
@@ -172,10 +172,9 @@ void init(){
 			for(int j=0;j<cells::num_cells;j++){
 				if(i!=j){
 
-					const double rx = cells::x_coord_array[j]-cells::x_coord_array[i]; // Angstroms
-					const double ry = cells::y_coord_array[j]-cells::y_coord_array[i];
-					const double rz = cells::z_coord_array[j]-cells::z_coord_array[i];
-
+					const double rx = cells::cell_coords_array_x[j]-cells::cell_coords_array_x[i]; // Angstroms
+					const double ry = cells::cell_coords_array_y[j]-cells::cell_coords_array_y[i];
+					const double rz = cells::cell_coords_array_z[j]-cells::cell_coords_array_z[i];
 					const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);
 
 					const double ex = rx*rij;
@@ -265,27 +264,27 @@ inline void fast_update(){
       const double mu0_three_cell_volume = -4.0e23*M_PI/(3.0*cells::volume_array[i]);
 
       // Add self-demagnetisation
-		cells::x_field_array[i]=mu0_three_cell_volume*cells::x_mag_array[i];
-		cells::y_field_array[i]=mu0_three_cell_volume*cells::y_mag_array[i];
-		cells::z_field_array[i]=mu0_three_cell_volume*cells::z_mag_array[i];
+		cells::field_array_x[i]=mu0_three_cell_volume*cells::mag_array_x[i];
+		cells::field_array_y[i]=mu0_three_cell_volume*cells::mag_array_y[i];
+		cells::field_array_z[i]=mu0_three_cell_volume*cells::mag_array_z[i];
 
 		// Loop over all other cells to calculate contribution to local cell
 		for(int j=0;j<cells::num_cells;j++){
 
-			const double mx = cells::x_mag_array[j];
-			const double my = cells::y_mag_array[j];
-			const double mz = cells::z_mag_array[j];
+			const double mx = cells::mag_array_x[j];
+			const double my = cells::mag_array_y[j];
+			const double mz = cells::mag_array_z[j];
 
-			cells::x_field_array[i]+=(mx*rij_xx[lc][j] + my*rij_xy[lc][j] + mz*rij_xz[lc][j]);
-			cells::y_field_array[i]+=(mx*rij_xy[lc][j] + my*rij_yy[lc][j] + mz*rij_yz[lc][j]);
-			cells::z_field_array[i]+=(mx*rij_xz[lc][j] + my*rij_yz[lc][j] + mz*rij_zz[lc][j]);
+			cells::field_array_x[i]+=(mx*rij_xx[lc][j] + my*rij_xy[lc][j] + mz*rij_xz[lc][j]);
+			cells::field_array_y[i]+=(mx*rij_xy[lc][j] + my*rij_yy[lc][j] + mz*rij_yz[lc][j]);
+			cells::field_array_z[i]+=(mx*rij_xz[lc][j] + my*rij_yz[lc][j] + mz*rij_zz[lc][j]);
 
 		}
 
 		// Output data to vdp file
 		//vdp << i << "\t" << cells::num_atoms_in_cell[i] << "\t";
-		//vdp << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
-		//vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
+		//vdp << cells::cell_coords_array_x[i] << "\t" << cells::cell_coords_array_y[i] << "\t" << cells::cell_coords_array_z[i] << "\t";
+		//vdp << cells::field_array_x[i] << "\t" << cells::field_array_y[i] << "\t" << cells::field_array_z[i] << "\t";
 		//vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t"<< cells::z_mag_array[i] << "\t" << inv_three_cell_volume*cells::z_mag_array[i] << std::endl;
 
 	}
@@ -330,20 +329,20 @@ inline void std_update(){
       const double mu0_three_cell_volume = -4.0*M_PI/(3.0*cells::volume_array[i]);
 
       // Add self-demagnetisation
-		cells::x_field_array[i]=mu0_three_cell_volume*cells::x_mag_array[i];
-		cells::y_field_array[i]=mu0_three_cell_volume*cells::y_mag_array[i];
-		cells::z_field_array[i]=mu0_three_cell_volume*cells::z_mag_array[i];
+		cells::field_array_x[i]=mu0_three_cell_volume*cells::mag_array_x[i];
+		cells::field_array_y[i]=mu0_three_cell_volume*cells::mag_array_y[i];
+		cells::field_array_z[i]=mu0_three_cell_volume*cells::mag_array_z[i];
 
 		// Loop over all other cells to calculate contribution to local cell
 		for(int j=0;j<i;j++){
 
-			const double mx = cells::x_mag_array[j];
-			const double my = cells::y_mag_array[j];
-			const double mz = cells::z_mag_array[j];
+			const double mx = cells::mag_array_x[j];
+			const double my = cells::mag_array_y[j];
+			const double mz = cells::mag_array_z[j];
 
-			const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
-			const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
-			const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
+			const double dx = cells::cell_coords_array_x[j]-cells::cell_coords_array_x[i];
+			const double dy = cells::cell_coords_array_y[j]-cells::cell_coords_array_y[i];
+			const double dz = cells::cell_coords_array_z[j]-cells::cell_coords_array_z[i];
 
 			const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
 			const double drij3 = drij*drij*drij; // Angstroms
@@ -354,21 +353,21 @@ inline void std_update(){
 
 			const double s_dot_e = (mx * ex + my * ey + mz * ez);
 
-			cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
-			cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
-			cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
+			cells::field_array_x[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
+			cells::field_array_y[i]+=(3.0 * s_dot_e * ey - my)*drij3;
+			cells::field_array_z[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
 
 		}
 
 		for(int j=i+1;j<cells::num_cells;j++){
 
-			const double mx = cells::x_mag_array[j];
-			const double my = cells::y_mag_array[j];
-			const double mz = cells::z_mag_array[j];
+			const double mx = cells::mag_array_x[j];
+			const double my = cells::mag_array_y[j];
+			const double mz = cells::mag_array_z[j];
 
-			const double dx = cells::x_coord_array[j]-cells::x_coord_array[i];
-			const double dy = cells::y_coord_array[j]-cells::y_coord_array[i];
-			const double dz = cells::z_coord_array[j]-cells::z_coord_array[i];
+			const double dx = cells::cell_coords_array_x[j]-cells::cell_coords_array_x[i];
+			const double dy = cells::cell_coords_array_y[j]-cells::cell_coords_array_y[i];
+			const double dz = cells::cell_coords_array_z[j]-cells::cell_coords_array_z[i];
 
 			const double drij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);
 			const double drij3 = drij*drij*drij;
@@ -379,20 +378,20 @@ inline void std_update(){
 
 			const double s_dot_e = (mx * ex + my * ey + mz * ez);
 
-			cells::x_field_array[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
-			cells::y_field_array[i]+=(3.0 * s_dot_e * ey - my)*drij3;
-			cells::z_field_array[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
+			cells::field_array_x[i]+=(3.0 * s_dot_e * ex - mx)*drij3;
+			cells::field_array_y[i]+=(3.0 * s_dot_e * ey - my)*drij3;
+			cells::field_array_z[i]+=(3.0 * s_dot_e * ez - mz)*drij3;
 
 		}
 
-		cells::x_field_array[i]*=demag::prefactor;
-		cells::y_field_array[i]*=demag::prefactor;
-		cells::z_field_array[i]*=demag::prefactor;
+		cells::field_array_x[i]*=demag::prefactor;
+		cells::field_array_y[i]*=demag::prefactor;
+		cells::field_array_z[i]*=demag::prefactor;
 
 		// Output data to vdp file
 		//vdp << i << "\t" << cells::num_atoms_in_cell[i] << "\t";
-		//vdp << cells::x_coord_array[i] << "\t" << cells::y_coord_array[i] << "\t" << cells::z_coord_array[i] << "\t";
-		//vdp << cells::x_field_array[i] << "\t" << cells::y_field_array[i] << "\t" << cells::z_field_array[i] << "\t";
+		//vdp << cells::cell_coords_array_x[i] << "\t" << cells::cell_coords_array_y[i] << "\t" << cells::cell_coords_array_z[i] << "\t";
+		//vdp << cells::field_array_x[i] << "\t" << cells::field_array_y[i] << "\t" << cells::field_array_z[i] << "\t";
 		//vdp << cells::x_mag_array[i] << "\t" << cells::y_mag_array[i] << "\t"<< cells::z_mag_array[i] << "\t" << inv_three_cell_volume*demag::prefactor*cells::z_mag_array[i] << std::endl;
 
 	}
@@ -433,9 +432,6 @@ void update(){
 		//if updated record last time at update
 		demag::update_time=sim::time;
 
-		// update cell magnetisations
-		cells::mag();
-
 		// recalculate demag fields
 		if(demag::fast==true) fast_update();
 		else std_update();
@@ -452,9 +448,9 @@ void update(){
 			const int cell = atoms::cell_array[atom];
 
 			// Copy field from macrocell to atomistic spin
-			atoms::x_dipolar_field_array[atom]=cells::x_field_array[cell];
-			atoms::y_dipolar_field_array[atom]=cells::y_field_array[cell];
-			atoms::z_dipolar_field_array[atom]=cells::z_field_array[cell];
+			atoms::x_dipolar_field_array[atom]=cells::field_array_x[cell];
+			atoms::y_dipolar_field_array[atom]=cells::field_array_y[cell];
+			atoms::z_dipolar_field_array[atom]=cells::field_array_z[cell];
 		}
 
 		} // End of check for update rate

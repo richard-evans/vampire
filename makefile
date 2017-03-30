@@ -5,7 +5,8 @@
 #===================================================================
 
 # Specify compiler for MPI compilation with openmpi
-#export OMPI_CXX=g++
+export OMPI_CXX=g++ -std=c++11
+
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 # Specify compiler for MPI compilation with mpich
@@ -13,7 +14,7 @@
 #export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -DCOMP='"GNU C++ Compiler"'
+GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
@@ -82,7 +83,6 @@ obj/create/cs_voronoi2.o \
 obj/create/multilayers.o \
 obj/data/atoms.o \
 obj/data/category.o \
-obj/data/cells.o \
 obj/data/grains.o \
 obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
@@ -117,7 +117,6 @@ obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
 obj/simulate/fields.o \
-obj/simulate/demag.o \
 obj/simulate/LLB.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
@@ -127,6 +126,14 @@ obj/simulate/cmc.o \
 obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
+obj/spintorque/data.o \
+obj/spintorque/field.o \
+obj/spintorque/initialise.o \
+obj/spintorque/interface.o \
+obj/spintorque/magnetization.o \
+obj/spintorque/matrix.o \
+obj/spintorque/output.o \
+obj/spintorque/spinaccumulation.o \
 obj/statistics/data.o \
 obj/statistics/initialize.o \
 obj/statistics/magnetization.o \
@@ -162,9 +169,12 @@ obj/qvoronoi/userprintf_rbox.o\
 # Include supplementary makefiles
 include src/create/makefile
 include src/config/makefile
+include src/cells/makefile
+include src/dipole/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
+include src/unitcell/makefile
 include src/vio/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
@@ -195,7 +205,7 @@ all: $(OBJECTS) serial
 
 # Serial Targets
 serial: $(OBJECTS)
-	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE).s
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
@@ -219,7 +229,7 @@ $(IBM_OBJECTS): obj/%_ibm.o: src/%.cpp
 	$(IBM) -c -o $@ $(IBM_CFLAGS) $<
 
 serial-debug: $(GCCDB_OBJECTS)
-	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE).s-debug
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
@@ -251,7 +261,7 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE).p
 #export OMPI_CXX=icc
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
@@ -282,7 +292,7 @@ $(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
 
 parallel-debug: $(MPI_GCCDB_OBJECTS)
-	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE).p-debug
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<

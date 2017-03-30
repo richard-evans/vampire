@@ -42,6 +42,7 @@
 #include "grains.hpp"
 #include "material.hpp"
 #include "random.hpp"
+#include "unitcell.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 
@@ -62,6 +63,7 @@ namespace cs{
    void fill(std::vector<cs::catom_t> &);
    void roughness(std::vector<cs::catom_t> &);
    void calculate_atomic_composition(std::vector<cs::catom_t> &);
+   void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array);
 
 //======================================================================
 //                         create_system_type
@@ -110,6 +112,9 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			err::vexit();
 			}
 		}
+
+      // Check for voronoi construction and apply before csg operations
+      if(create::internal::generate_voronoi_substructure) create::internal::voronoi_substructure(catom_array);
 
 		// call fill function to fill in void
 		fill(catom_array);
@@ -167,15 +172,13 @@ int particle(std::vector<cs::catom_t> & catom_array){
 	// Set particle origin to atom at centre of lattice
 	//---------------------------------------------------
 
-	double particle_origin[3];
-	// find centre unit cell -- unsafe for large unit cells
-	//particle_origin[0] = double(vmath::iround(cs::system_dimensions[0]/(2.0*unit_cell.dimensions[0])))*unit_cell.dimensions[0];
-	//particle_origin[1] = double(vmath::iround(cs::system_dimensions[1]/(2.0*unit_cell.dimensions[1])))*unit_cell.dimensions[1];
-	//particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
+	std::vector<double> particle_origin(3,0.0);
 
 	particle_origin[0] = cs::system_dimensions[0]*0.5;
 	particle_origin[1] = cs::system_dimensions[1]*0.5;
 	particle_origin[2] = cs::system_dimensions[2]*0.5;
+
+   centre_particle_on_atom(particle_origin, catom_array);
 
 	// check for move in particle origin and that unit cell size < 0.5 system size
 	if(cs::particle_creation_parity==1 &&
@@ -210,6 +213,15 @@ int particle(std::vector<cs::catom_t> & catom_array){
 		case 6: // Teardrop
 			tear_drop(particle_origin,catom_array,0);
 			break;
+      case 7: // Faceted particle
+   		create::internal::faceted(particle_origin,catom_array,0);
+   		break;
+		case 8: // Cone
+			create::internal::cone(particle_origin,catom_array,0);
+			break;
+      case 9: // Bubble
+         create::internal::bubble(particle_origin,catom_array,0);
+         break;
 		default:
 			std::cout << "Unknown particle type requested for single particle system" << std::endl;
 			err::vexit();
@@ -242,15 +254,17 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 	// Loop to generate cubic lattice points
 	int particle_number=0;
 
+	std::vector<double> particle_origin(3,0.0);
+
 	for (int x_particle=0;x_particle < num_x_particle;x_particle++){
 		for (int y_particle=0;y_particle < num_y_particle;y_particle++){
-
-			double particle_origin[3];
 
 			// Determine particle origin
 			particle_origin[0] = double(x_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_x;
 			particle_origin[1] = double(y_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_y;
-			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*cs::unit_cell_size[2])))*cs::unit_cell_size[2];
+			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
+
+         centre_particle_on_atom(particle_origin, catom_array);
 
 			if(cs::particle_creation_parity==1){
 				particle_origin[0]+=unit_cell.dimensions[0]*0.5;
@@ -284,6 +298,15 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 					case 6: // Teardrop
 						tear_drop(particle_origin,catom_array,particle_number);
 						break;
+               case 7: // Faceted particle
+                  create::internal::faceted(particle_origin,catom_array,particle_number);
+                  break;
+		         case 8: // Cone
+			         create::internal::cone(particle_origin,catom_array,particle_number);
+			         break;
+               case 9: // Bubble
+                  create::internal::bubble(particle_origin,catom_array,particle_number);
+                  break;
 					default:
 						std::cout << "Unknown particle type requested for single particle system" << std::endl;
 						err::vexit();
@@ -504,7 +527,7 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
    const int num_atoms=catom_array.size();
    int num_included=0;
    for(int a=0;a<num_atoms;a++){
-      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == false){
+      if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic != 1){
          num_included++;
       }
    }
@@ -520,12 +543,12 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
       // loop over all existing atoms
       for(int a=0;a<num_atoms;a++){
          // if atom is to be included and is non-magnetic copy to new array
-         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic == false ){
+         if(catom_array[a].include==true && mp::material[catom_array[a].material].non_magnetic != 1 ){
             catom_array[atom]=tmp_catom_array[a];
             atom++;
          }
-         // if atom is part of a non-magnetic material then save to nm array
-         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == true){
+         // if atom is part of a non-magnetic material to be removed then save to nm array
+         else if(catom_array[a].include == true && mp::material[catom_array[a].material].non_magnetic == 1){
             cs::nm_atom_t tmp;
          	tmp.x = catom_array[a].x;
          	tmp.y = catom_array[a].y;
@@ -931,6 +954,83 @@ void fill(std::vector<cs::catom_t> & catom_array){
          }
       }
    }
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to alter particle origin to be centred on an atom
+//------------------------------------------------------------------------------------------------------
+void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array){
+
+   vmpi::barrier();
+
+   // set initial max range
+   double max_range_sq = 1e123;
+   unsigned int nearest; // nearest atom to initial particle origin
+
+   // copy to temporary for speed
+   const double prx = particle_origin[0];
+   const double pry = particle_origin[1];
+   const double prz = particle_origin[2];
+
+   // loop over all atoms to find closest atom
+   for(int atom=0;atom<catom_array.size();atom++){
+      double dx = catom_array[atom].x-particle_origin[0];
+      double dy = catom_array[atom].y-particle_origin[1];
+      double dz = catom_array[atom].z-particle_origin[2];
+      double r = dx*dx + dy*dy + dz*dz;
+      if(r < max_range_sq){
+         max_range_sq = r;
+         nearest = atom;
+      }
+   }
+
+   // set particle origin to nearest atom
+   particle_origin[0] = catom_array[nearest].x;
+   particle_origin[1] = catom_array[nearest].y;
+   particle_origin[2] = catom_array[nearest].z;
+
+   //-----------------------------------------------------
+   // For parallel reduce on all CPUs
+   //-----------------------------------------------------
+   #ifdef MPICF
+
+      // set up array to get ranges from all CPUs on rank 0
+      std::vector<double> ranges;
+      if(vmpi::my_rank == 0) ranges.resize(vmpi::num_processors, 1.e123);
+      else ranges.resize(1,0.0); // one value sufficient on all other CPUs
+
+      // gather max ranges from all cpus on root (1 data point from each process)
+      MPI_Gather(&max_range_sq, 1, MPI_DOUBLE, &ranges[0], 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+      // variable to store rank of minimum range
+      unsigned int rank_of_min_range=0;
+
+      // work out minimum range on root
+      if(vmpi::my_rank==0){
+
+         double min_range = 1.e123;
+
+         // loop over all ranges and determine minimum and cpu location
+         for(int i=0; i<ranges.size(); i++){
+            if(ranges[i] < min_range){
+               min_range = ranges[i];
+               rank_of_min_range = i;
+            }
+         }
+      }
+
+      // broadcast id of nearest to all cpus from root
+      MPI_Bcast(&rank_of_min_range, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+
+      // broadcast position to all cpus
+      MPI_Bcast(&particle_origin[0], 3, MPI_DOUBLE, rank_of_min_range, MPI_COMM_WORLD);
+
+      vmpi::barrier();
+
+   #endif
 
    return;
 
