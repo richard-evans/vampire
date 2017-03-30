@@ -99,9 +99,7 @@ void config()
    {
       if (sim::program != 2)
       {
-         if (output_rate_counter_coords == 0)
-            internal::atoms_coords();
-         
+         if (output_rate_counter_coords == 0) internal::atoms_coords();
          internal::atoms();
          output_rate_counter_coords++;
       }
@@ -110,16 +108,14 @@ void config()
          // output config only in range [minField_1;maxField_1] for decreasing field
          if ((sim::H_applied >= maxField_1) && (sim::H_applied <= minField_1) && (sim::parity < 0))
          {
-            if (output_rate_counter_coords == 0)
-               internal::atoms_coords();
+            if (output_rate_counter_coords == 0) internal::atoms_coords();
             internal::atoms();
             output_rate_counter_coords++;
          }
          // output config only in range [minField_2;maxField_2] for increasing field
          else if ((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2) && (sim::parity > 0))
          {
-            if (output_rate_counter_coords == 0)
-               internal::atoms_coords();
+            if (output_rate_counter_coords == 0) internal::atoms_coords();
             internal::atoms();
             output_rate_counter_coords++;
          }
@@ -132,8 +128,7 @@ void config()
       // if(!program::hysteresis())
       if (sim::program != 2)
       {
-         if (sim::output_cells_file_counter == 0)
-            internal::cells_coords();
+         if (sim::output_cells_file_counter == 0) internal::cells_coords();
          internal::cells();
       }
       else if (sim::program == 2)
@@ -141,15 +136,13 @@ void config()
          // output config only in range [minField_1;maxField_1] for decreasing field
          if ((sim::H_applied >= maxField_1) && (sim::H_applied <= minField_1) && (sim::parity < 0))
          {
-            if (sim::output_cells_file_counter == 0)
-               internal::cells_coords();
+            if (sim::output_cells_file_counter == 0) internal::cells_coords();
             internal::cells();
          }
          // output config only in range [minField_2;maxField_2] for increasing field
          else if ((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2) && (sim::parity > 0))
          {
-            if (sim::output_cells_file_counter == 0)
-               internal::cells_coords();
+            if (sim::output_cells_file_counter == 0) internal::cells_coords();
             internal::cells();
          }
       }

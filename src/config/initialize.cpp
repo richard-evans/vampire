@@ -24,10 +24,9 @@ namespace config{
    // Function to initialize config module
    //----------------------------------------------------------------------------
    void initialize(){
-      
+
       return;
 
    }
 
 } // end of config namespace*/
-

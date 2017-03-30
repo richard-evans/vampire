@@ -6,23 +6,23 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
 //
-#include "atoms.hpp"  
+#include "atoms.hpp"
 #include "grains.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -69,7 +69,7 @@ int set_properties(){
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(err::check==true){std::cout << "grains::set_properties has been called" << std::endl;}	
+	if(err::check==true){std::cout << "grains::set_properties has been called" << std::endl;}
 	#ifdef MPICF
 		const unsigned int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 	#else
@@ -87,7 +87,7 @@ int set_properties(){
 		grains::z_mag_array.resize(grains::num_grains,0.0);
 		grains::mag_m_array.resize(grains::num_grains,0.0);
 		grains::sat_mag_array.resize(grains::num_grains,0.0);
-		
+
 		if(mp::num_materials>1){
 			grains::x_mat_mag_array.resize(grains::num_grains*mp::num_materials,0.0);
 			grains::y_mat_mag_array.resize(grains::num_grains*mp::num_materials,0.0);
@@ -142,7 +142,7 @@ int set_properties(){
 
 	//vinfo << "-------------------------------------------------------------------------------------------------------------------" << std::endl;
 	//vinfo << "# Grain number\tnum atoms\tx\ty\tz\t" << std::endl;
-	// Calculate mean grains coordinates 
+	// Calculate mean grains coordinates
 	for(int grain=0;grain<grains::num_grains;grain++){
 		// check for grains with zero atoms
 		if(grains::grain_size_array[grain]==0){
@@ -206,7 +206,7 @@ int mag(){
 				grains::y_mat_mag_array[grain*mp::num_materials+mat]+=(atoms::y_spin_array[atom]*mp::material[mat].mu_s_SI);
 				grains::z_mat_mag_array[grain*mp::num_materials+mat]+=(atoms::z_spin_array[atom]*mp::material[mat].mu_s_SI);
 			}
-			
+
 		}
 		else{
 			terminaltextcolor(RED);
@@ -260,7 +260,7 @@ int mag(){
 			}
 		}
 	}
-	
+
 	return EXIT_SUCCESS;
 
 }

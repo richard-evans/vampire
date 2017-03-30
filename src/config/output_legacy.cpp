@@ -120,7 +120,7 @@ void atoms()
    if (vmpi::my_rank != 0)
    {
       file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
-   }   
+   }
    file_sstr << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
    file_sstr << ".cfg";
    std::string cfg_file = file_sstr.str();
@@ -186,7 +186,7 @@ void atoms()
    double local_data_size = double(sizeof(float) * local_output_atom_list.size());
 #ifdef MPICF
 // aggregate bandwidth
-   
+
    double total_time;
    MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
    double total_data_size;
@@ -366,7 +366,7 @@ void atoms_coords()
    double local_data_size = double(sizeof(float) * local_output_atom_list.size());
 #ifdef MPICF
 // aggregate bandwidth
-   
+
    double total_time;
    MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
    double total_data_size;

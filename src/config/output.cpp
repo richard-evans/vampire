@@ -106,40 +106,39 @@ void atoms_new()
    }
 
    // Output Meta Data
-      const std::vector<double> m_l = stats::system_magnetization.get_magnetization();
-      
-      int files = vmpi::num_io_processors;
-      if (mpi_io)
-      if (vmpi::my_rank == 0)
-         write_meta( double(sim::time) * mp::dt_SI , // time (seconds)
-                     sim::temperature, // system temperature (Kelvin)
-                     sim::H_vec[0], // applied field components (Tesla)
-                     sim::H_vec[1],
-                     sim::H_vec[2],
-                     m_l[0], // magnetization components (normalized)
-                     m_l[0],
-                     m_l[0],
-                     files); // number of files
+   const std::vector<double> m_l = stats::system_magnetization.get_magnetization();
 
-      //Output spindata
-      int local_size = local_output_atom_list.size() * 3;
-      localbuffer.clear();
-      total_buffer.clear();
-      localbuffer.resize(local_size);
-      copy_data_to_buffer(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, local_output_atom_list, localbuffer);
+   int files = vmpi::num_io_processors;
+   if (mpi_io)
+   if (vmpi::my_rank == 0)
+      write_meta( double(sim::time) * mp::dt_SI , // time (seconds)
+                  sim::temperature, // system temperature (Kelvin)
+                  sim::H_vec[0], // applied field components (Tesla)
+                  sim::H_vec[1],
+                  sim::H_vec[2],
+                  m_l[0], // magnetization components (normalized)
+                  m_l[0],
+                  m_l[0],
+                  files); // number of files
+
+   //Output spindata
+   int local_size = local_output_atom_list.size() * 3;
+   localbuffer.clear();
+   total_buffer.clear();
+   localbuffer.resize(local_size);
+   copy_data_to_buffer(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, local_output_atom_list, localbuffer);
 
    #ifdef MPICF
-      if (mpi_io)
-      {
+      if (mpi_io){
             MPI_File fh;
-            MPI_Status status; 
+            MPI_Status status;
             std::string filestring = data_filename(false);
             char *filename = (char*)filestring.c_str();
             MPI_File_open(MPI_COMM_WORLD, filename, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fh);
             MPI_File_write_ordered(fh, &localbuffer[0], local_size, MPI_FLOAT, &status);
             MPI_File_close(&fh);
-      }else
-      {
+      }
+      else{
             int total_size=0;
             MPI_Reduce(&local_size, &total_size, 1, MPI_INT, MPI_SUM, vmpi::io_processor,vmpi::io_comm);
             total_buffer.resize(total_size);
@@ -152,24 +151,23 @@ void atoms_new()
       write_data(localbuffer, false);
    #endif
 
-      // stop the timer
+   // stop the timer
    double local_time = timer.elapsed_time(); // seconds
 
-      // get file size (bytes)
+   // get file size (bytes)
    double local_data_size = double(sizeof(float) * local_size);
-#ifdef MPICF
-// aggregate bandwidth
-   
-   double total_time;
-   MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-   double total_data_size;
-   MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-   if(vmpi::my_rank==0)
-      zlog << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
-#else
-   // calculate data rate and output to log
-   zlog << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
-#endif
+
+   #ifdef MPICF
+      // aggregate bandwidth
+      double total_time;
+      MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+      double total_data_size;
+      MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      if(vmpi::my_rank==0) zlog << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
+   #else
+      // calculate data rate and output to log
+      zlog << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
+   #endif
 }
 
 /// @brief Atomistic output function
@@ -315,7 +313,7 @@ void atoms_coords_new()
    double local_data_size = double(sizeof(float) * local_size);
 #ifdef MPICF
 // aggregate bandwidth
-   
+
    double total_time;
    MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
    double total_data_size;
@@ -406,7 +404,7 @@ void cells_new()
 ///
 void cells_coords_new()
 {
-      
+
 }
 }
 }

@@ -67,7 +67,7 @@ namespace config{
             scmf << "#--------------------------------------------" << std::endl;
             scmf << "Number of materials: " << mp::num_materials << std::endl;
             for(int mat=0;mat<mp::num_materials;mat++){
-               scmf << mat << "\t" << mp::material[mat].mu_s_SI/9.274e-24 << "\t" << mp::material[mat].element << "\t" << 
+               scmf << mat << "\t" << mp::material[mat].mu_s_SI/9.274e-24 << "\t" << mp::material[mat].element << "\t" <<
                mp::material[mat].name << std::endl;
             }
             scmf << "#--------------------------------------------" << std::endl;
@@ -138,7 +138,6 @@ namespace config{
             cfg_sstr << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".cfg";
             ofile << cfg_sstr.str() << "\n";
          }
-
 
          ofile << "#------------------------------------------------------"<< "\n";
 

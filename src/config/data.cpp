@@ -23,9 +23,8 @@ namespace config{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
-   
+
    namespace internal{
-        std::vector<int> local_output_atom_list(0);
       //------------------------------------------------------------------------
       // Shared variables inside config module
       //------------------------------------------------------------------------
@@ -46,7 +45,9 @@ namespace config{
       data_format output_data_format = text;
       bool output_new = false;
       bool mpi_io = false;
+
+      std::vector<int> local_output_atom_list(0);
+
    } // end of internal namespace
 
 } // end of config namespace
-

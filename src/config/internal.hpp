@@ -86,14 +86,14 @@ namespace internal
                            std::vector<float> &buffer);
    void write_coordinate_meta();
    void write_meta(const double simulation_time, // time (seconds)
-                  const double temperature,     // system temperature (Kelvin)
-                  const double applied_field_x, // applied field components (Tesla)
-                  const double applied_field_y,
-                  const double applied_field_z,
-                  const double magnetization_x, // magnetization components (normalized)
-                  const double magnetization_y,
-                  const double magnetization_z,
-                  const int num_files);
+                   const double temperature,     // system temperature (Kelvin)
+                   const double applied_field_x, // applied field components (Tesla)
+                   const double applied_field_y,
+                   const double applied_field_z,
+                   const double magnetization_x, // magnetization components (normalized)
+                   const double magnetization_y,
+                   const double magnetization_z,
+                   const int num_files);
    std::string data_filename(bool coords);
 
 } // end of internal namespace
