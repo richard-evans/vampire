@@ -83,9 +83,9 @@ namespace vopencl
                           "single precision mode."
 #endif // OPENCL_DP
  
-#ifdef USE_VECTOR_TYPE
+#ifdef OPENCL_USE_VECTOR_TYPE
                           " OpenCL vector types will be used for storage."
-#endif // USE_VECTOR_TYPE
+#endif // OPENCL_USE_VECTOR_TYPE
 
 #ifdef OPENCL_USE_NATIVE_FUNCTIONS
                           " Native functions will be used."
@@ -106,7 +106,7 @@ namespace vopencl
       //vcl::stats::use_cpu = cpu_stats;
       vcl::stats::use_cpu = true;
 
-      // find OpenCL platforms and devices
+      // find OpenCL platforms
       std::vector<cl::Platform> platforms;
       cl::Platform::get(&platforms);
       unsigned nplatforms = platforms.size();
@@ -121,6 +121,7 @@ namespace vopencl
          ::err::vexit();
       }
 
+      // find available devices for each platform
       std::vector<std::vector<cl::Device>> devices(nplatforms);
       unsigned ndevices = 0;
       for (unsigned i=0; i<nplatforms; ++i)
@@ -153,6 +154,7 @@ namespace vopencl
       //// Set up platforms and devices ////
       if (::gpu::platform < 0) // not specified in input file
       {
+         // use first platform found
          ::gpu::platform = 0;
       }
       else if (::gpu::platform >= nplatforms) // specified incorrectly
@@ -193,17 +195,25 @@ namespace vopencl
          vcl::global = cl::NDRange(default_nthreads);
       }
 
+      // platform and device to use for the majority of kernels
       cl::Platform default_platform = platforms[::gpu::platform];
       vcl::default_device = devices[::gpu::platform][::gpu::device];
 
 #ifndef ENABLE_MULTIPLE_DEVICES
+      // if not using multiple devices for kernels
+      // i.e. just a host CPU and a device, which may be the same CPU
+
       vcl::context = cl::Context({vcl::default_device});
 
       vcl::queue = cl::CommandQueue(vcl::context, vcl::default_device,
                                     CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE);
 #else
+      // using multiple OpenCL devices
+
+      // which platform to use for extra device
       if (::gpu::platform_other < 0) // not specified in input file
       {
+         // use the platform already being used
          ::gpu::platform_other = ::gpu::platform;
       }
       else if (::gpu::platform_other >= nplatforms) // specified incorrectly
@@ -215,9 +225,11 @@ namespace vopencl
          ::gpu::platform_other = ::gpu::platform;
       }
 
+      // which device to use
       if (::gpu::device_other < 0) // not specified in input file
       {
          // silently use only one device
+         // the same as if ENABLE_MULTIPLE_DEVICES wasn't defined
          ::gpu::device_other = ::gpu::device;
       }
       else if (::gpu::device_other >= devices[::gpu::platform_other].size()) // specified incorrectly
