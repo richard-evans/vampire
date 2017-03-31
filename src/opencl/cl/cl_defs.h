@@ -15,6 +15,8 @@
 
 #define PI 3.14159265358979323846
 
+
+//// floating point precision
 #ifdef OPENCL_DP
 
 // double precision (64-bit) real and unsigned integer types
@@ -25,11 +27,10 @@ typedef double4 real_t4;
 typedef ulong   uint_t;
 
 // double precision (64-bit) function
-//#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable
 #define ATOMIC_CMPXCHG(a,b,c) atom_cmpxchg(a,b,c)
 #define NORM(vec) normalize(vec)
 
-#else
+#else // use single precision
 
 // single precision (32-bit) real and unsigned integer types
 typedef float  real_t;
@@ -45,15 +46,22 @@ typedef uint   uint_t;
 #endif // OPENCL_DP
 
 
+//// data storage type
 #ifdef OPENCL_USE_VECTOR_TYPE
 
+// type used to access certain data
 typedef real_t3 vec_t;
+
+// each element of the array is real_t3 so can access as normal
 #define VEC_LOAD(array, idx) array[idx]
 #define VEC_STORE(array, idx, value) array[idx] = value
 
 #else
 
+// arrays stored in x,y,z,x,y,z format using ordinary floats/doubles
 typedef real_t vec_t;
+
+// use intrinsic functions to access each set of elements
 #define VEC_LOAD(array, idx) vload3(idx, array)
 #define VEC_STORE(array, idx, value) vstore3(value, idx, array)
 
