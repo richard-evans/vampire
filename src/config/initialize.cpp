@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) rory.pond 2016. All rights reserved.
+//   (c) Rory Pond and Richard F L Evans 2016. All rights reserved.
 //
-//   Email: rory.pond@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //

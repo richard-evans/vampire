@@ -3,7 +3,9 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2015. All rights reserved.
+//   (c) Rory Pond and Richard F L Evans 2016. All rights reserved.
+//
+//   Email: richard.evans@york.ac.uk
 //
 //-----------------------------------------------------------------------------
 #include <stdio.h>

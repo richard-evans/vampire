@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) rory.pond 2016. All rights reserved.
+//   (c) Andrea Meo, Rory Pond and Richard F L Evans 2016. All rights reserved.
 //
-//   Email: rory.pond@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -38,25 +38,10 @@
 
 namespace config
 {
-int output_rate_counter_coords = 0;
-int total_output_atoms = 0;
 
-/// @brief Config master output function
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.0
-/// @date    31/05/2011
-///
-/// @internal
-///	Created:		31/05/2011
-///	Revision:	---
-///=====================================================================================
-///
+//------------------------------------------------------------------------------
+// Function to output atomic and cell coordinates to disk
+//------------------------------------------------------------------------------
 void config()
 {
 
@@ -99,25 +84,25 @@ void config()
    {
       if (sim::program != 2)
       {
-         if (output_rate_counter_coords == 0) internal::atoms_coords();
+         if (config::internal::output_rate_counter_coords == 0) internal::atoms_coords();
          internal::atoms();
-         output_rate_counter_coords++;
+         config::internal::output_rate_counter_coords++;
       }
       else if (sim::program == 2)
       {
          // output config only in range [minField_1;maxField_1] for decreasing field
          if ((sim::H_applied >= maxField_1) && (sim::H_applied <= minField_1) && (sim::parity < 0))
          {
-            if (output_rate_counter_coords == 0) internal::atoms_coords();
+            if (config::internal::output_rate_counter_coords == 0) internal::atoms_coords();
             internal::atoms();
-            output_rate_counter_coords++;
+            config::internal::output_rate_counter_coords++;
          }
          // output config only in range [minField_2;maxField_2] for increasing field
          else if ((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2) && (sim::parity > 0))
          {
-            if (output_rate_counter_coords == 0) internal::atoms_coords();
+            if (config::internal::output_rate_counter_coords == 0) internal::atoms_coords();
             internal::atoms();
-            output_rate_counter_coords++;
+            config::internal::output_rate_counter_coords++;
          }
       }
    }

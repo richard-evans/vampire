@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) rory.pond 2016. All rights reserved.
+//   (c) Rory Pond and Richard F L Evans 2016. All rights reserved.
 //
-//   Email: rory.pond@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -88,14 +88,15 @@ namespace internal
 ///   Revision:   ---
 ///=====================================================================================
 ///
-void atoms()
-{
-         // instantiate timer
+void atoms(){
+
+   // instantiate timer
    vutil::vtimer_t timer;
 
    // start timer
    timer.start();
 
+   // Check for new output format
    if (output_new)
    {
       atoms_new();
@@ -145,7 +146,7 @@ void atoms()
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
       cfg_file_ofstr << "# Date: " << asctime(timeinfo);
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-      cfg_file_ofstr << "Number of spins: " << total_output_atoms << std::endl;
+      cfg_file_ofstr << "Number of spins: " << config::internal::total_output_atoms << std::endl;
       cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
       cfg_file_ofstr << "Coordinates-file: atoms-coord.cfg" << std::endl;
       cfg_file_ofstr << "Time: " << double(sim::time) * mp::dt_SI << std::endl;
@@ -298,11 +299,11 @@ void atoms_coords()
       //std::cerr << vmpi::my_rank << "\t" << local_atoms << &local_atoms << "\t" << &total_atoms << std::endl;
       //MPI::COMM_WORLD.Barrier();
       MPI_Allreduce(&local_atoms, &total_atoms, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-      total_output_atoms = total_atoms;
+      config::internal::total_output_atoms = total_atoms;
    //std::cerr << vmpi::my_rank << "\t" << total_atoms << "\t" << &local_atoms << "\t" << &total_atoms << std::endl;
    //MPI::COMM_WORLD.Barrier();
    #else
-      total_output_atoms = local_output_atom_list.size();
+      config::internal::total_output_atoms = local_output_atom_list.size();
    #endif
 
    // Set local output filename
@@ -333,7 +334,7 @@ void atoms_coords()
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
       cfg_file_ofstr << "# Date: " << asctime(timeinfo);
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-      cfg_file_ofstr << "Number of atoms: " << total_output_atoms << std::endl;
+      cfg_file_ofstr << "Number of atoms: " << config::internal::total_output_atoms << std::endl;
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
       cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors - 1 << std::endl;
       for (int p = 1; p < vmpi::num_processors; p++)

@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) rory.pond 2016. All rights reserved.
+//   (c) Rory Pond and Richard F L Evans 2016. All rights reserved.
 //
-//   Email: rory.pond@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -30,6 +30,9 @@ namespace config{
       //------------------------------------------------------------------------
       bool output_atoms_config=false;
       int output_atoms_config_rate=1000;
+
+      int output_rate_counter_coords = 0;
+      int total_output_atoms = 0;
 
       bool output_cells_config=false;
       int output_cells_config_rate=1000;

@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) rory.pond 2016. All rights reserved.
+//   (c) Rory Pond and Richard F L Evans 2016. All rights reserved.
 //
-//   Email: rory.pond@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -263,11 +263,11 @@ void atoms_coords_new()
       //std::cerr << vmpi::my_rank << "\t" << local_atoms << &local_atoms << "\t" << &total_atoms << std::endl;
       //MPI::COMM_WORLD.Barrier();
       MPI_Allreduce(&local_atoms, &total_atoms, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-      total_output_atoms = total_atoms;
+      config::internal::total_output_atoms = total_atoms;
    //std::cerr << vmpi::my_rank << "\t" << total_atoms << "\t" << &local_atoms << "\t" << &total_atoms << std::endl;
    //MPI::COMM_WORLD.Barrier();
    #else
-      total_output_atoms = local_output_atom_list.size();
+      config::internal::total_output_atoms = local_output_atom_list.size();
    #endif
 
    // Output Meta Data
