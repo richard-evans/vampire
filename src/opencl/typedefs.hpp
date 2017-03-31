@@ -101,7 +101,7 @@ namespace vopencl
 #endif // OPENCL_USE_VECTOR_TYPE
             }
 
-            buff_container[0] = vcl::create_device_buffer(buff, fs, CL_TRUE);
+            buff_container[0] = vcl::create_device_buffer(buff, fs, CL_TRUE, q, c);
          }
 
          // reads data from device, assumes host vectors already have enough capacity

@@ -350,19 +350,22 @@ namespace vopencl
 
          // Allocate and initialize device memory for atomic coordinates
          vcl::atoms::coord_array = vcl::Buffer3D(vcl::context, vcl::queue,
-                                                 CL_MEM_READ_WRITE,
+                                                 CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
                                                  ::atoms::x_coord_array,
                                                  ::atoms::y_coord_array,
                                                  ::atoms::z_coord_array);
 
          // Allocate and initialize device memory for atomic information
-         vcl::atoms::type_array = vcl::create_device_buffer(::atoms::type_array, CL_MEM_READ_ONLY);
+         vcl::atoms::type_array = vcl::create_device_buffer(::atoms::type_array,
+                                                            CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY);
 
          // Allocate and initialize cell information
-         vcl::atoms::cell_array = vcl::create_device_buffer(::atoms::cell_array, CL_MEM_READ_ONLY);
+         vcl::atoms::cell_array = vcl::create_device_buffer(::atoms::cell_array,
+                                                            CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY);
 
          // Allocate and initialize unrolled spin norm array
-         vcl::atoms::spin_norm_array = vcl::create_device_buffer(::atoms::m_spin_array, CL_MEM_READ_WRITE);
+         vcl::atoms::spin_norm_array = vcl::create_device_buffer(::atoms::m_spin_array,
+                                                                 CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY);
 
          return true;
       }
@@ -370,19 +373,22 @@ namespace vopencl
       bool initialize_fields(void) noexcept
       {
          // Allocate device memory and initialize total spin field arrays
-         vcl::total_spin_field_array = vcl::Buffer3D(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+         vcl::total_spin_field_array = vcl::Buffer3D(vcl::context, vcl::queue,
+                                                     CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
                                                      ::atoms::x_total_spin_field_array,
                                                      ::atoms::y_total_spin_field_array,
                                                      ::atoms::z_total_spin_field_array);
 
          // Allocate device memory and initialize external field arrays
-         vcl::total_external_field_array = vcl::Buffer3D(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+         vcl::total_external_field_array = vcl::Buffer3D(vcl::context, vcl::queue,
+                                                         CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
                                                          ::atoms::x_total_external_field_array,
                                                          ::atoms::y_total_external_field_array,
                                                          ::atoms::z_total_external_field_array);
 
          // Allocate device memory and initialize for dipolar field
-         vcl::dipolar_field_array = vcl::Buffer3D(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+         vcl::dipolar_field_array = vcl::Buffer3D(vcl::context, vcl::queue,
+                                                  CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
                                                   ::atoms::x_dipolar_field_array,
                                                   ::atoms::y_dipolar_field_array,
                                                   ::atoms::z_dipolar_field_array);
@@ -393,28 +399,33 @@ namespace vopencl
       bool initialize_cells(void) noexcept
       {
          // Allocate device memory and initialize coordinates
-         vcl::cells::coord_array = vcl::Buffer3D(vcl::context, vcl::queue, CL_MEM_READ_ONLY,
+         vcl::cells::coord_array = vcl::Buffer3D(vcl::context, vcl::queue,
+                                                 CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY,
                                                  ::cells::x_coord_array,
                                                  ::cells::y_coord_array,
                                                  ::cells::z_coord_array);
 
          // Allocate device memory and initialize cell magnetization
-         vcl::cells::mag_array = vcl::Buffer3D(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+         vcl::cells::mag_array = vcl::Buffer3D(vcl::context, vcl::queue,
+                                               CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
                                                ::cells::x_mag_array,
                                                ::cells::y_mag_array,
                                                ::cells::z_mag_array);
 
          // Allocate device memory and initialize cell fields
-         vcl::cells::field_array = vcl::Buffer3D(vcl::context, vcl::queue, CL_MEM_READ_WRITE,
+         vcl::cells::field_array = vcl::Buffer3D(vcl::context, vcl::queue,
+                                                 CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
                                                  ::cells::x_field_array,
                                                  ::cells::y_field_array,
                                                  ::cells::z_field_array);
 
          // Allocate device memory and initialize voulme array
-         vcl::cells::volume_array = vcl::create_device_buffer(::cells::volume_array, CL_MEM_READ_ONLY);
+         vcl::cells::volume_array = vcl::create_device_buffer(::cells::volume_array,
+                                                              CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY);
 
          // Allocate device memory and initialize number of atoms for each cell
-         vcl::cells::num_atoms = vcl::create_device_buffer(::cells::num_atoms_in_cell, CL_MEM_READ_ONLY);
+         vcl::cells::num_atoms = vcl::create_device_buffer(::cells::num_atoms_in_cell,
+                                                           CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY);
 
          return true;
       }
@@ -450,7 +461,9 @@ namespace vopencl
          }
 
          // Allocate device memory and initialize materials array
-         vcl::mp::materials = vcl::create_device_buffer(h_materials, CL_MEM_READ_ONLY, CL_TRUE);
+         vcl::mp::materials = vcl::create_device_buffer(h_materials,
+                                                        CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY,
+                                                        CL_TRUE);
 
          return true;
       }
@@ -488,17 +501,41 @@ namespace vopencl
          }
 
 #ifdef ENABLE_MULTIPLE_DEVICES
-         vcl::rng::grands = cl::Buffer(vcl::context_other, CL_MEM_READ_WRITE, g_buffer_size);
-         vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE, CL_TRUE, vcl::queue_other, vcl::context_other);
+         vcl::rng::state = vcl::create_device_buffer(rs,
+                                                     CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
+                                                     CL_TRUE,
+                                                     vcl::queue_other,
+                                                     vcl::context_other);
 
          if (::gpu::platform_other != ::gpu::platform)
          {
+            // need to read grands on the host
+            vcl::rng::grands = cl::Buffer(vcl::context_other,
+                                          CL_MEM_READ_WRITE | CL_MEM_HOST_READ_ONLY,
+                                          g_buffer_size);
+
             // copy of grands on main platform
-            vcl::rng::grands_copy = cl::Buffer(vcl::context, CL_MEM_READ_ONLY, g_buffer_size);
+            vcl::rng::grands_copy = cl::Buffer(vcl::context,
+                                               CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY,
+                                               g_buffer_size);
          }
+         else
+         {
+            vcl::rng::grands = cl::Buffer(vcl::context_other,
+                                          CL_MEM_READ_WRITE,
+                                          g_buffer_size);
+         }
+                                          
 #else
-         vcl::rng::grands = cl::Buffer(vcl::context, CL_MEM_READ_WRITE, g_buffer_size);
-         vcl::rng::state = vcl::create_device_buffer(rs, CL_MEM_READ_WRITE, CL_TRUE, vcl::queue, vcl::context);
+         vcl::rng::grands = cl::Buffer(vcl::context,
+                                       CL_MEM_READ_WRITE | CL_MEM_HOST_NO_ACCESS,
+                                       g_buffer_size);
+
+         vcl::rng::state = vcl::create_device_buffer(rs,
+                                                     CL_MEM_READ_WRITE | CL_MEM_HOST_WRITE_ONLY,
+                                                     CL_TRUE,
+                                                     vcl::queue,
+                                                     vcl::context);
 #endif // ENABLE_MULTIPLE_DEVICES
 
          return true;

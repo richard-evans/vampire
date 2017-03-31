@@ -127,7 +127,10 @@ static void init_exchange(void)
          J_vals_h[xxi] = J_vals_h[yyi] = J_vals_h[zzi] = - Jij;
 #endif // OPENCL_USE_VECTOR_TYPE
       }
-      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY, CL_FALSE, write_q);
+      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h,
+                                                          CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY,
+                                                          CL_FALSE,
+                                                          write_q);
    }
    break;
    case 1:
@@ -135,12 +138,6 @@ static void init_exchange(void)
       // Jxx != Jyy != Jzz
       // Jxy = Hxz = Jyx = 0
    {
-#ifdef OPENCL_USE_VECTOR_TYPE
-      std::vector<vcl::real_t3> J_vals_h(vsize);
-#else
-      std::vector<vcl::real_t> J_vals_h(3*vsize);
-#endif // OPENCL_USE_VECTOR_TYPE
-
       for (unsigned i=0; i<vsize; ++i)
       {
          const int iid = ::atoms::neighbour_interaction_type_array[i];
@@ -159,7 +156,10 @@ static void init_exchange(void)
          J_vals_h[zzi] = - vel.Jij[2];
 #endif // OPENCL_USE_VECTOR_TYPE
       }
-      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h, CL_MEM_READ_ONLY, CL_FALSE, write_q);
+      vcl::exchange::J_vals_d = vcl::create_device_buffer(J_vals_h,
+                                                          CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY,
+                                                          CL_FALSE,
+                                                          write_q);
    }
    break;
 
@@ -176,10 +176,14 @@ static void init_exchange(void)
    }
 
    // Allocate device memory and initialize limits array
-   vcl::atoms::limits = vcl::create_device_buffer(limits_h, CL_MEM_READ_ONLY, CL_FALSE, write_q);
+   vcl::atoms::limits = vcl::create_device_buffer(limits_h,
+                                                  CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY,
+                                                  CL_FALSE,
+                                                  write_q);
 
    if (::atoms::num_atoms > 1)
-      vcl::atoms::neighbours = vcl::create_device_buffer(::atoms::neighbour_list_array, CL_MEM_READ_ONLY);
+      vcl::atoms::neighbours = vcl::create_device_buffer(::atoms::neighbour_list_array,
+                                                         CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY);
 
    vcl::set_kernel_args(vcl::exchange::calculate_exchange,
                         vcl::exchange::J_vals_d,
@@ -188,6 +192,7 @@ static void init_exchange(void)
                         vcl::atoms::spin_array.buffer(),
                         vcl::total_spin_field_array.buffer());
 
+   // write must finish before J_vals_h goes out of scope
    write_q.finish();
 }
 
@@ -210,11 +215,13 @@ static void init_llg(void)
    const size_t num_mats = ::mp::num_materials;
    const size_t num_atms = ::atoms::num_atoms;
 
-   vcl::llg::spin_buffer_array =
-      vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, num_atms);
+   vcl::llg::spin_buffer_array = vcl::Buffer3D(vcl::context,
+                                               CL_MEM_READ_WRITE | CL_MEM_HOST_NO_ACCESS,
+                                               num_atms);
 
-   vcl::llg::dS_array =
-      vcl::Buffer3D(vcl::context, CL_MEM_READ_WRITE, num_atms);
+   vcl::llg::dS_array = vcl::Buffer3D(vcl::context,
+                                      CL_MEM_READ_WRITE | CL_MEM_HOST_NO_ACCESS,
+                                      num_atms);
 
    std::vector<vcl::heun_parameter_t> heun_params_host(num_mats);
 
@@ -230,7 +237,10 @@ static void init_llg(void)
 
    cl::CommandQueue write_q(vcl::context, vcl::default_device);
 
-   vcl::llg::heun_parameters_device = vcl::create_device_buffer(heun_params_host, CL_MEM_READ_ONLY, CL_FALSE, write_q);
+   vcl::llg::heun_parameters_device = vcl::create_device_buffer(heun_params_host,
+                                                                CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY,
+                                                                CL_FALSE,
+                                                                write_q);
 
    vcl::set_kernel_args(vcl::llg::predictor_step,
                         vcl::atoms::type_array,
@@ -249,6 +259,7 @@ static void init_llg(void)
                         vcl::llg::spin_buffer_array.buffer(),
                         vcl::llg::dS_array.buffer());
 
+   // write must finish before heun_params_host goes out of scope
    write_q.finish();
 }
 
