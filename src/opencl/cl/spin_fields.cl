@@ -49,6 +49,6 @@ void update_nexch_spin_fields(const __global int *const restrict material,
       const real_t ek_sum = ek2 + ek4 + ek6;
       field += scale * e * ek_sum;
 
-      VEC_STORE(sp_field, i, field);
+      VEC_INCR(sp_field, i, field);
    }
 }

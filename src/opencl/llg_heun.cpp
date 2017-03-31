@@ -82,13 +82,11 @@ namespace vopencl
 
       static inline void update_spin_fields(void)
       {
-         //vcl::total_spin_field_array.zero_buffer();
-
-         TIME(vcl::kernel_call(vcl::update_nexch_spin_fields), vcl::time::spin_fields, vcl::queue);
+         TIME(vcl::kernel_call(vcl::exchange::calculate_exchange), vcl::time::mat_mul, vcl::queue);
 
          vcl::queue.finish();
 
-         TIME(vcl::kernel_call(vcl::exchange::calculate_exchange), vcl::time::mat_mul, vcl::queue);
+         TIME(vcl::kernel_call(vcl::update_nexch_spin_fields), vcl::time::spin_fields, vcl::queue);
       }
 
       namespace llg

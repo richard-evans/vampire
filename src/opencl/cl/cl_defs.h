@@ -55,6 +55,7 @@ typedef real_t3 vec_t;
 // each element of the array is real_t3 so can access as normal
 #define VEC_LOAD(array, idx) array[idx]
 #define VEC_STORE(array, idx, value) array[idx] = value
+#define VEC_INCR(array, idx, value) array[idx] += value
 
 #else
 
@@ -64,6 +65,7 @@ typedef real_t vec_t;
 // use intrinsic functions to access each set of elements
 #define VEC_LOAD(array, idx) vload3(idx, array)
 #define VEC_STORE(array, idx, value) vstore3(value, idx, array)
+#define VEC_INCR(array, idx, value) vstore3(vload3(idx, array)+value, idx, array)
 
 #endif // OPENCL_USE_VECTOR_TYPE
 
