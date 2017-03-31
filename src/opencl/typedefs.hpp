@@ -48,8 +48,13 @@ namespace vopencl
 
          size_t buffer_size;
 
+#ifdef OPENCL_USE_VECTOR_TYPE
+         typedef vcl::real_t3 elem_t;
+         const static unsigned n_elems_per_set = 1;
+#else
          typedef vcl::real_t elem_t;
          const static unsigned n_elems_per_set = 3;
+#endif
 
       public:
 
@@ -87,9 +92,13 @@ namespace vopencl
             std::vector<elem_t> buff(n_elems_per_set * n_elems);
             for (size_t i=0; i<n_elems; ++i)
             {
+#ifdef OPENCL_USE_VECTOR_TYPE
+               buff[i] = elem_t{xs[i], ys[i], zs[i]};
+#else
                buff[3*i+0] = vcl::real_t(xs[i]);
                buff[3*i+1] = vcl::real_t(ys[i]);
                buff[3*i+2] = vcl::real_t(zs[i]);
+#endif // OPENCL_USE_VECTOR_TYPE
             }
 
             buff_container[0] = vcl::create_device_buffer(buff, fs, CL_TRUE);
@@ -113,9 +122,15 @@ namespace vopencl
 
             for (size_t i=0; i<n_elems; ++i)
             {
+#ifdef OPENCL_USE_VECTOR_TYPE
+               xs[i] = R(buff[i].s[0]);
+               ys[i] = R(buff[i].s[1]);
+               zs[i] = R(buff[i].s[2]);
+#else
                xs[i] = R(buff[3*i+0]);
                ys[i] = R(buff[3*i+1]);
                zs[i] = R(buff[3*i+2]);
+#endif // OPENCL_USE_VECTOR_TYPE
             }
          }
 

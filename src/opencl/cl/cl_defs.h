@@ -45,6 +45,20 @@ typedef uint   uint_t;
 #endif // OPENCL_DP
 
 
+#ifdef OPENCL_USE_VECTOR_TYPE
+
+typedef real_t3 vec_t;
+#define VEC_LOAD(array, idx) array[idx]
+#define VEC_STORE(array, idx, value) array[idx] = value
+
+#else
+
+typedef real_t vec_t;
+#define VEC_LOAD(array, idx) vload3(idx, array)
+#define VEC_STORE(array, idx, value) vstore3(value, idx, array)
+
+#endif // OPENCL_USE_VECTOR_TYPE
+
 
 // native functions may be significantly faster
 // but may be less accurate

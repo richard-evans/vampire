@@ -22,6 +22,11 @@
 #      Use native device functions which may give better performance but at the
 #      cost of less accuracy.
 #
+# -DOPENCL_USE_VECTOR_TYPE:
+#      OpenCL 3-component vector types will be used for data storage. This may
+#      (depending on implementation and hardware) increase amount of device
+#      memory used but memory accesses may be significantly faster.
+#
 # -UOPENCL_DP:
 #      Use single precision floating point math instead of double precision. It
 #      should give better performance and some devices may require this.

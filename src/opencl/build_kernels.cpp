@@ -37,6 +37,9 @@ namespace vopencl
 #ifdef OPENCL_USE_NATIVE_FUNCTIONS
                                   "-DOPENCL_USE_NATIVE_FUNCTIONS "
 #endif
+#ifdef OPENCL_USE_VECTOR_TYPE
+                                  "-DOPENCL_USE_VECTOR_TYPE "
+#endif
             );
          std::ostringstream params;
          params << "-DNUM_ATOMS=" << ::atoms::num_atoms << ' ';

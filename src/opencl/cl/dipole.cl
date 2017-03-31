@@ -11,17 +11,17 @@
 #include "material_type.h"
 
 __kernel
-void update_dipole_fields(const __global real_t *const restrict mag,
-                          const __global real_t *const restrict coord,
+void update_dipole_fields(const __global vec_t  *const restrict mag,
+                          const __global vec_t  *const restrict coord,
                           const __global real_t *const restrict volume,
-                                __global real_t *const restrict dip_field)
+                                __global vec_t  *const restrict dip_field)
 {
    const size_t gsz = get_global_size(0);
 
    for (size_t i=get_global_id(0); i<N_CELLS; i+=gsz)
    {
-      const real_t3 mi = vload3(i, mag);
-      const real_t3 ci = vload3(i, coord);
+      const real_t3 mi = VEC_LOAD(mag, i);
+      const real_t3 ci = VEC_LOAD(coord, i);
 
       const real_t vol_prefac = - 4 * PI / (3 * volume[i]);
       const real_t prefactor  = 1e23;
@@ -32,8 +32,8 @@ void update_dipole_fields(const __global real_t *const restrict mag,
       {
          if (i==j) continue;
 
-         const real_t3 mj = vload3(j, mag);
-         const real_t3 cj = vload3(j, coord);
+         const real_t3 mj = VEC_LOAD(mag, j);
+         const real_t3 cj = VEC_LOAD(coord, j);
 
          const real_t3 dX = cj - ci;
 
@@ -48,22 +48,21 @@ void update_dipole_fields(const __global real_t *const restrict mag,
 
       field *= prefactor;
 
-      vstore3(field, i, dip_field);
+      VEC_STORE(dip_field, i, field);
    }
 }
 
 __kernel
-void update_atm_dipole_fields(const __global real_t *const restrict cell_field,
-                                    __global real_t *const restrict dip_field,
-                              const __global int *const restrict cell)
+void update_atm_dipole_fields(const __global vec_t *const restrict cell_field,
+                                    __global vec_t *const restrict dip_field,
+                              const __global int   *const restrict cell)
 {
    const size_t gsz = get_global_size(0);
 
    for (size_t i=get_global_id(0); i<N_ATOMS; i+=gsz)
    {
       const int cid = cell[i];
-
-      vstore3(vload3(cid, cell_field), i, dip_field);
+      VEC_STORE(dip_field, i, VEC_LOAD(cell_field, cid));
    }
 }
 
@@ -85,11 +84,11 @@ void atomic_add_global(volatile __global real_t *const source,
 }
 
 __kernel
-void update_cell_magnetization(const __global real_t *const restrict spin,
-                               const __global int    *const restrict material,
-                               const __global int    *const restrict cell,
+void update_cell_magnetization(const __global vec_t *const restrict spin,
+                               const __global int   *const restrict material,
+                               const __global int   *const restrict cell,
                                const __global material_parameters_t *const restrict material_params,
-                                     __global real_t *const restrict mag)
+                                     __global vec_t *const restrict mag)
 {
    const size_t gsz = get_global_size(0);
 
@@ -99,6 +98,11 @@ void update_cell_magnetization(const __global real_t *const restrict spin,
       const int cid = cell[i];
       const real_t mu_s = material_params[mid].mu_s_si;
 
+#ifdef OPENCL_USE_VECTOR_TYPE
+      atomic_add_global(&mag[cid].x, spin[i].x*mu_s);
+      atomic_add_global(&mag[cid].y, spin[i].y*mu_s);
+      atomic_add_global(&mag[cid].z, spin[i].z*mu_s);
+#else
       const size_t x = 3*i+0;
       const size_t y = 3*i+1;
       const size_t z = 3*i+2;
@@ -106,5 +110,6 @@ void update_cell_magnetization(const __global real_t *const restrict spin,
       atomic_add_global(&mag[3*cid+0], spin[x]*mu_s);
       atomic_add_global(&mag[3*cid+1], spin[y]*mu_s);
       atomic_add_global(&mag[3*cid+2], spin[z]*mu_s);
+#endif
    }
 }

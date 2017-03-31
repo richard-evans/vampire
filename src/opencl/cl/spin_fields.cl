@@ -13,14 +13,14 @@
 __kernel
 void update_nexch_spin_fields(const __global int *const restrict material,
                               const __global material_parameters_t *const restrict material_params,
-                              const __global real_t *const restrict spin,
-                                    __global real_t *const restrict sp_field)
+                              const __global vec_t *const restrict spin,
+                                    __global vec_t *const restrict sp_field)
 {
    const size_t gsz = get_global_size(0);
 
    for (uint i=get_global_id(0); i<NUM_ATOMS; i+=gsz)
    {
-      const real_t3 S = vload3(i, spin);
+      const real_t3 S = VEC_LOAD(spin, i);
 
       const int mid = material[i];
 
@@ -49,6 +49,6 @@ void update_nexch_spin_fields(const __global int *const restrict material,
       const real_t ek_sum = ek2 + ek4 + ek6;
       field += scale * e * ek_sum;
 
-      vstore3(field, i, sp_field);
+      VEC_STORE(sp_field, i, field);
    }
 }

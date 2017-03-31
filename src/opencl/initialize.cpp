@@ -82,6 +82,10 @@ namespace vopencl
 #else
                           "single precision mode."
 #endif // OPENCL_DP
+ 
+#ifdef USE_VECTOR_TYPE
+                          " OpenCL vector types will be used for storage."
+#endif // USE_VECTOR_TYPE
 
 #ifdef OPENCL_USE_NATIVE_FUNCTIONS
                           " Native functions will be used."

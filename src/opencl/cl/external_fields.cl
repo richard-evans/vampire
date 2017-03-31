@@ -11,10 +11,10 @@
 #include "material_type.h"
 
 __kernel
-void update_external_fields(const __global int *const restrict material,
+void update_external_fields(const __global int    *const restrict material,
                             const __constant material_parameters_t *const restrict material_params,
-                            const __global real_t *const restrict dip_field,
-                                  __global real_t *const restrict ext_field,
+                            const __global vec_t  *const restrict dip_field,
+                                  __global vec_t  *const restrict ext_field,
                             const __global real_t *const restrict gaussian_rand,
                             const real_t Hx,
                             const real_t Hy,
@@ -52,6 +52,6 @@ void update_external_fields(const __global int *const restrict material,
       field += norm_h * h + Happ;
 
       // ext_field[i] = field + dip_field[i]
-      vstore3(field + vload3(i, dip_field), i, ext_field);
+      VEC_STORE(ext_field, i, field + VEC_LOAD(dip_field, i));
    }
 }
