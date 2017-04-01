@@ -21,8 +21,8 @@ ulong2 xorshift(ulong2 x)
 }
 
 __kernel
-void gen_grands(__global ulong  *const restrict state,
-                __global real_t *const restrict grands)
+void gen_grands(__global ulong2  *const restrict state,
+                __global real_t2 *const restrict grands)
 {
    const size_t gid = get_global_id(0);
    const size_t gsz = get_global_size(0);
@@ -30,8 +30,8 @@ void gen_grands(__global ulong  *const restrict state,
    for (size_t i=gid; i<(3*NUM_ATOMS)/2; i+=gsz)
    {
       // uniform generator
-      ulong2 s = xorshift(vload2(i, state));
-      vstore2(s, i, state);
+      ulong2 s = xorshift(state[i]);
+      state[i] = s;
 
       const ulong c = 0x2545F4914F6CDD1Dul;
       s *= c;
@@ -53,6 +53,6 @@ void gen_grands(__global ulong  *const restrict state,
       real_t2 thetas;
       thetas.y = sincos(2*PI*u.y, (real_t*)&thetas);
 
-      vstore2(r*thetas, i, grands);
+      grands[i] = r * thetas;
    }
 }
