@@ -26,8 +26,7 @@ namespace config{
    //-----------------------------------------------------------------------------
    // Function to initialise config module
    //-----------------------------------------------------------------------------
-   void initialize();
-   void config();
+   void output();
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for config module

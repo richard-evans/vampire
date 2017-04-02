@@ -528,7 +528,8 @@ namespace vout{
 		}
 		}
 
-		config::config();
+		// Output configuration files to disk
+		config::output();
 
 		// optionally save checkpoint file
 		if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();

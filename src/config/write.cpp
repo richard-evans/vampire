@@ -22,7 +22,7 @@
 
 // config headers
 #include "internal.hpp"
-// Rory these functions need fixing
+
 namespace config
 {
 namespace internal
@@ -63,87 +63,65 @@ namespace internal
 // be outputted as a sparse list (each mask id lists an array index of data to be output. The float buffer
 // stores the final complete data to be output to disk and must be 3*mask.size().
 //
-void copy_data_to_buffer(const std::vector<double> &x, // vector data
-                         const std::vector<double> &y,
-                         const std::vector<double> &z,
-                         const std::vector<int> &mask,
-                         std::vector<float> &buffer)
-{
 
-   // copy total number of output data to const for compiler
-   const int data_size = mask.size();
-
-   // loop over all atoms to be output
-   for (int id = 0; id < data_size; ++id)
-   {
-      // determine next datum to be output
-      const int index = mask[id];
-      // copy and cast data to be output to main output buffer
-      buffer[3 * id + 0] = float(x[index]);
-      buffer[3 * id + 1] = float(y[index]);
-      buffer[3 * id + 2] = float(z[index]);
-   }
-
-   return;
-}
 
 //----------------------------------------------------------------------------------------------------
 // Simple wrapper function to call output function for correct format
 //----------------------------------------------------------------------------------------------------
 //
-void write_data(const std::vector<float> &buffer, bool coord)
-{
-      printf("Writing data");
-   std::string filename = data_filename(coord);
-   // Output informative message to log file
-   zlog << zTs() << "Outputting configuration file " << filename << " to disk ";
+double write_data(std::string filename, const std::vector<double> &buffer){
 
-   switch (config::internal::output_data_format)
-   {
+   double bandwidth = 0.0;
 
-   case config::internal::binary:
-      printf("Writing binary");
-      write_data_binary(filename, buffer);
-      break;
-   case config::internal::text:
-      printf("Writing text");
-      write_data_text(filename, buffer);
-      break;
+   switch (config::internal::format){
+
+      case config::internal::binary:
+         bandwidth = write_data_binary(filename, buffer);
+         break;
+
+      case config::internal::text:
+         bandwidth = write_data_text(filename, buffer);
+         break;
+
    }
 
-   // increment file counter
-   sim::output_atoms_file_counter++;
+   return bandwidth;
 
-   return;
 }
 
 //----------------------------------------------------------------------------------------------------
 // Function to output spin data formatted as text
 //----------------------------------------------------------------------------------------------------
 //
-void write_data_text(std::string filename, const std::vector<float> &buffer)
-{
-
-   // Output informative message to log file
-   //zlog << zTs() << "Outputting configuration file " << filename.str() << " to disk ";
+double write_data_text(std::string filename, const std::vector<double> &buffer){
 
    // Declare and open output file
    std::ofstream ofile;
    ofile.open(filename.c_str());
 
    // determine number of data to output
-   const int buffer_size = buffer.size() / 3;
+   const uint64_t data_size = buffer.size() / 3;
 
    // output number of data
-   ofile << buffer_size << "\n";
+   ofile << data_size << "\n";
+
+   // instantiate timer
+   vutil::vtimer_t timer;
+
+   // start timer
+   timer.start();
 
    // output buffer to disk
-   for (int index = 0; index < buffer_size; ++index)
-   {
+   for(unsigned int index = 0; index < data_size; ++index){
+
       ofile << buffer[3 * index + 0] << "\t"
             << buffer[3 * index + 1] << "\t"
             << buffer[3 * index + 2] << "\n";
+
    }
+
+   // end timer
+   timer.stop();
 
    // close output file
    ofile.close();
@@ -157,67 +135,48 @@ void write_data_text(std::string filename, const std::vector<float> &buffer)
    // close file
    in.close();
 
-   return;
+   // return bandwidth
+   return config::internal::io_data_size / timer.elapsed_time();
+
 }
 
 //----------------------------------------------------------------------------------------------------
 // Function to output spin data in binary format
 //----------------------------------------------------------------------------------------------------
 //
-void write_data_binary(std::string filename, const std::vector<float> &buffer)
+double write_data_binary(std::string filename, const std::vector<double> &buffer)
 {
    // Declare and open output file
    std::ofstream ofile;
    ofile.open(filename.c_str(), std::ios::binary);
 
    // determine number of data to output
-   const int buffer_size = buffer.size() / 3;
+   const uint64_t data_size = buffer.size() / 3;
+
+   // instantiate timer
+   vutil::vtimer_t timer;
 
    // output number of data
-   ofile.write(reinterpret_cast<const char *>(&buffer_size), sizeof(unsigned int));
+   ofile.write(reinterpret_cast<const char *>(&data_size), sizeof(uint64_t));
+
+   // start timer
+   timer.start();
 
    // output buffer to disk
-   ofile.write(reinterpret_cast<const char *>(&buffer[0]), sizeof(float) * buffer.size());
+   ofile.write(reinterpret_cast<const char *>(&buffer[0]), sizeof(double) * buffer.size());
+
+   // end timer
+   timer.stop();
 
    // close output file
    ofile.close();
 
-   // get file size (bytes)
-   double local_data_size = double(sizeof(float) * buffer.size());
+   // return bandwidth
+   return config::internal::io_data_size / timer.elapsed_time();
 
-   return;
 }
 
-std::string data_filename(bool coords){
-   // Set local output filename
-   std::stringstream file_sstr;
 
-   if (coords)
-      file_sstr << "atom-coords-";
-   else
-      file_sstr << "atom-spins-";
-
-   switch (config::internal::output_data_format)
-   {
-
-   case config::internal::binary:
-      file_sstr << "binary-";
-      break;
-   case config::internal::text:
-      file_sstr << "text-";
-      break;
-   }
-   #ifdef MPICF
-      if (!mpi_io)
-         file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_io_group;
-   #endif
-   if (!coords)
-      file_sstr << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
-   file_sstr << ".data";
-   std::string filename = file_sstr.str();
-
-   return filename;
-}
 
 } // end of namespace internal
 } // end of namespace config

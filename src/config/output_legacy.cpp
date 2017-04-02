@@ -88,7 +88,7 @@ namespace internal
 ///   Revision:   ---
 ///=====================================================================================
 ///
-void atoms(){
+void legacy_atoms(){
 
    // instantiate timer
    vutil::vtimer_t timer;
@@ -96,12 +96,6 @@ void atoms(){
    // start timer
    timer.start();
 
-   // Check for new output format
-   if (output_new)
-   {
-      atoms_new();
-      return;
-   }
    // check calling of routine if error checking is activated
    if (err::check == true)
    {
@@ -243,12 +237,6 @@ void atoms_coords()
    // start timer
    timer.start();
 
-   if (output_new)
-   {
-      atoms_coords_new();
-      return;
-   }
-
    // check calling of routine if error checking is activated
    if (err::check == true)
    {
@@ -372,11 +360,8 @@ void atoms_coords()
    MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
    double total_data_size;
    MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-   if(vmpi::my_rank==0)
-      zlog << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
 #else
    // calculate data rate and output to log
-   zlog << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
 #endif
 }
 

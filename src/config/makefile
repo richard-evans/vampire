@@ -4,14 +4,15 @@
 
 # List module object filenames
 config_objects =\
-initialize.o \
-interface.o \
-output.o \
-output_legacy.o \
+atoms_spins.o \
+buffer.o \
 config.o \
 data.o \
-write.o \
-meta.o
+initialize.o \
+interface.o \
+meta.o \
+output_legacy.o \
+write.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/config/,$(config_objects))

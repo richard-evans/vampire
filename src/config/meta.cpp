@@ -126,7 +126,7 @@ namespace config{
 
 
             cfg_sstr << "atom-spins-" ;
-            switch (config::internal::output_data_format)
+            switch (config::internal::format)
             {
             case config::internal::binary:
                cfg_sstr << "binary-";

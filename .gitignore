@@ -12,11 +12,14 @@
 *.DS_Store
 # Other sundry files
 *.png
-*.cfg
 *.inc
 *old.cpp
 *old.hpp
 *.bkp
+# Data file formats in vampire
+*.cfg
+*.data
+*.meta
 info
 vampire*
 cfg2povray

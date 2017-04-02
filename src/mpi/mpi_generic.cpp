@@ -39,14 +39,6 @@
 
 #ifdef MPICF
 namespace vmpi{
-void IOCommunicator(int num_io);
-
-int num_io_processors=1;
-int size_io_group;
-int my_io_rank;
-int my_io_group;
-int io_processor;
-MPI_Comm io_comm;
 
 int initialise(int argc, char *argv[]){
 	//====================================================================================
@@ -81,7 +73,7 @@ int initialise(int argc, char *argv[]){
 	MPI_Comm_size(MPI_COMM_WORLD, &vmpi::num_processors);
 
 	MPI_Get_processor_name(vmpi::hostname, &resultlen);
-	IOCommunicator(num_io_processors);
+	//IOCommunicator(num_io_processors);
 	// Start MPI Timer
 	vmpi::start_time=MPI_Wtime();
 
@@ -239,17 +231,6 @@ double SwapTimer(double OldTimer, double& NewTimer){
 
 }
 
-void IOCommunicator(int num_io){
-   vmpi::num_io_processors = num_io;
-   vmpi::my_io_group = vmpi::my_rank / ( 1 + (vmpi::num_processors - 1)/vmpi::num_io_processors);
-
-   MPI_Comm_split(MPI_COMM_WORLD, vmpi::my_io_group, vmpi::my_rank, &vmpi::io_comm);
-
-   MPI_Comm_rank( vmpi::io_comm, &my_io_rank );
-   MPI_Comm_size( vmpi::io_comm, &size_io_group );
-   io_processor = size_io_group - 1;
-   printf(" ---------------------- \n Mpi::rank %d, Io Group: %d, Io group size: %d Io:rank %d \n---------------------- \n", vmpi::my_rank, vmpi::my_io_group, size_io_group, vmpi::my_io_rank);
-}
 
 
 } // end of namespace vmpi
