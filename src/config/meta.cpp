@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Rory Pond and Richard F L Evans 2016. All rights reserved.
+//   (c) Rory Pond and Richard F L Evans 2017. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -31,55 +31,60 @@ namespace config{
       //---------------------------------------------------------------------
       void write_coordinate_meta(){
 
-         #ifdef MPICF
+         std::ofstream scmf; // spin coordinate meta file
+         scmf.open("atoms-coords.meta");
 
-         #else
-            std::ofstream scmf; // spin coordinate meta file
-            scmf.open("atoms-coords.meta");
+         // determine file format
+         std::string format_string;
 
-            // determine file format
-            std::string format_string;
+         switch(config::internal::format){
 
-            switch(config::internal::output_data_format){
+            case config::internal::binary:
+               format_string = "binary";
+               break;
 
-               case config::internal::binary:
-                  format_string = "binary";
-                  break;
+            case config::internal::text:
+               format_string = "text";
+               break;
 
-               case config::internal::text:
-                  format_string = "text";
-                  break;
+         }
 
+         // Get system date
+         time_t rawtime = time(NULL);
+         struct tm * timeinfo = localtime(&rawtime);
+
+         scmf << "#----------------------------------------------------------"<< std::endl;
+         scmf << "# Atomistic coordinates configuration file for vampire V5+"<< std::endl;
+         scmf << "#----------------------------------------------------------"<< std::endl;
+         scmf << "# Date: "<< asctime(timeinfo);
+         scmf << "#--------------------------------------------"<< std::endl;
+         scmf << "Format: "<< format_string << std::endl;
+         scmf << "#--------------------------------------------"<< std::endl;
+         scmf << "Number of atoms: "<< config::internal::total_output_atoms << std::endl;
+         scmf << "#--------------------------------------------" << std::endl;
+         scmf << "Number of materials: " << mp::num_materials << std::endl;
+         for(int mat=0;mat<mp::num_materials;mat++){
+            scmf << mat << "\t" << mp::material[mat].mu_s_SI/9.274e-24 << "\t" << mp::material[mat].element << "\t" <<
+            mp::material[mat].name << std::endl;
+         }
+         scmf << "#--------------------------------------------" << std::endl;
+         scmf << "Number of coord files: " << config::internal::num_io_groups << std::endl;
+
+         // set simple file name for single file output
+         if(config::internal::num_io_groups == 1) scmf << "atoms-coords.data" << std::endl;
+         // otherwise set indexed files
+         else{
+            for(int fid = 0; fid < config::internal::num_io_groups; fid++){
+               scmf << "atoms-coords-" << std::setfill('0') << std::setw(5) << fid << ".data" << "\n";
             }
+            // flush data to disk
+            scmf << std::flush;
+         }
 
-            // Get system date
-            time_t rawtime = time(NULL);
-            struct tm * timeinfo = localtime(&rawtime);
+         // number of cell files + file list
 
-            scmf << "#----------------------------------------------------------"<< std::endl;
-            scmf << "# Atomistic coordinates configuration file for vampire V5+"<< std::endl;
-            scmf << "#----------------------------------------------------------"<< std::endl;
-            scmf << "# Date: "<< asctime(timeinfo);
-            scmf << "#--------------------------------------------"<< std::endl;
-            scmf << "Format: "<< format_string << std::endl;
-            scmf << "#--------------------------------------------"<< std::endl;
-            scmf << "Number of atoms: "<< config::total_output_atoms << std::endl;
-            scmf << "#--------------------------------------------" << std::endl;
-            scmf << "Number of materials: " << mp::num_materials << std::endl;
-            for(int mat=0;mat<mp::num_materials;mat++){
-               scmf << mat << "\t" << mp::material[mat].mu_s_SI/9.274e-24 << "\t" << mp::material[mat].element << "\t" <<
-               mp::material[mat].name << std::endl;
-            }
-            scmf << "#--------------------------------------------" << std::endl;
-            scmf << "Number of coord files: " << 1 << std::endl;
-            scmf << "atoms-coords.cfg" << std::endl;
-
-            // number of cell files + file list
-
-            // close file
-            scmf.close();
-
-         #endif
+         // close file
+         scmf.close();
 
       }
 
@@ -93,12 +98,11 @@ namespace config{
                       const double applied_field_z,
                       const double magnetization_x, // magnetization components (normalized)
                       const double magnetization_y,
-                      const double magnetization_z,
-                      const int    num_files){
+                      const double magnetization_z){
 
          // determine file name
          std::stringstream filename;
-         filename << "atoms-";
+         filename << "spins-";
          filename << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
          filename << ".meta";
 
@@ -120,23 +124,17 @@ namespace config{
          ofile << "Temperature: "<< temperature << "\n";
          ofile << "Magnetisation: " << magnetization_x << "\t" << magnetization_y << "\t" << magnetization_z << "\n";
          ofile << "#------------------------------------------------------" << "\n";
-         ofile << "Number of spin files: " << num_files << "\n"; //vmpi::num_processors-1 << "\n";
-         for(int p=0;p<num_files;p++){
-            std::stringstream cfg_sstr;
+         ofile << "Number of spin files: " << config::internal::num_io_groups << "\n"; //vmpi::num_processors-1 << "\n";
 
-
-            cfg_sstr << "atom-spins-" ;
-            switch (config::internal::format)
-            {
-            case config::internal::binary:
-               cfg_sstr << "binary-";
-               break;
-            case config::internal::text:
-               cfg_sstr << "text-";
-               break;
+         // set simple file name for single file output
+         if(config::internal::num_io_groups == 1) ofile << "spins-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".data" << std::endl;
+         // otherwise set indexed files
+         else{
+            for(int fid = 0; fid < config::internal::num_io_groups; fid++){
+               ofile << "spins-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << "-" << std::setfill('0') << std::setw(5) << fid << ".data" << "\n";
             }
-            cfg_sstr << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".cfg";
-            ofile << cfg_sstr.str() << "\n";
+            // flush data to disk
+            ofile << std::flush;
          }
 
          ofile << "#------------------------------------------------------"<< "\n";

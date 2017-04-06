@@ -122,8 +122,8 @@ namespace internal
                    const double applied_field_z,
                    const double magnetization_x, // magnetization components (normalized)
                    const double magnetization_y,
-                   const double magnetization_z,
-                   const int num_files);
+                   const double magnetization_z);
+
    std::string data_filename(bool coords);
 
 } // end of internal namespace

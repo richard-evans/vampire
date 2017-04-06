@@ -45,11 +45,9 @@ void atoms(){
    const std::vector<double> magnetisation = stats::system_magnetization.get_magnetization();
    // calculate real time
    const double real_time = double(sim::time) * mp::dt_SI;
-   // set number of files
-   const int files = config::internal::num_io_groups;
 
    if(config::internal::mode != legacy && vmpi::my_rank == 0){
-      write_meta(real_time, sim::temperature, sim::H_vec[0], sim::H_vec[1], sim::H_vec[2], magnetisation[0], magnetisation[1], magnetisation[2], files);
+      write_meta(real_time, sim::temperature, sim::H_vec[0], sim::H_vec[1], sim::H_vec[2], magnetisation[0], magnetisation[1], magnetisation[2]);
    }
 
    //------------------------------------------
@@ -61,9 +59,16 @@ void atoms(){
 
    // Determine output filename
    std::stringstream file_sstr;
-   file_sstr << "atoms-spins-" << std::setfill('0') << std::setw(5) << config::internal::io_group_id;
-   file_sstr << "-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter;
-   file_sstr << ".data";
+
+   // set simple file name for single file output
+   if(config::internal::num_io_groups == 1) file_sstr << "spins-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << ".data";
+   // otherwise set indexed files
+   else{
+      file_sstr << "spins-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << "-" <<
+                               std::setfill('0') << std::setw(6) << config::internal::io_group_id << ".data";
+   }
+
+   // convert stringstream to string
    std::string filename = file_sstr.str();
 
    // Output informative message to log file on root process

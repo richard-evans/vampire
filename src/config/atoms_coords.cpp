@@ -72,10 +72,16 @@ void atoms_coords()
 
       // Determine output filename
       std::stringstream file_sstr;
-      file_sstr << "atoms-coords-" << std::setfill('0') << std::setw(5) << config::internal::io_group_id << ".data";
+
+      // set simple file name for single file output
+      if(config::internal::num_io_groups == 1) file_sstr << "atoms-coords.data";
+      // otherwise set indexed files
+      else file_sstr << "atoms-coords-" << std::setfill('0') << std::setw(6) << config::internal::io_group_id << ".data";
+
+      // convert string stream to string
       std::string filename = file_sstr.str();
 
-      // Calcaulte number of bytes to be written to disk
+      // Calculate number of bytes to be written to disk
       const double spin_data_size = double(config::internal::total_output_atoms) * 1.0e-9 * (3.0*double(sizeof(double)) );
       const double coord_data_size = double(config::internal::total_output_atoms) * 1.0e-9 * (3.0*double(sizeof(double) + 2.0*double(sizeof(int)) ) );
 
@@ -161,7 +167,7 @@ void atoms_coords()
       #endif
 
       // Output bandwidth to log file
-      zlog << coord_data_size/io_time << " GB/s" << std::endl;
+      zlog << coord_data_size/io_time << " GB/s in " << io_time << " s" << std::endl;
 
       return;
 
