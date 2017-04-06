@@ -88,13 +88,10 @@ namespace internal
 ///   Revision:   ---
 ///=====================================================================================
 ///
-void legacy_atoms(){
+double legacy_atoms(){
 
    // instantiate timer
    vutil::vtimer_t timer;
-
-   // start timer
-   timer.start();
 
    // check calling of routine if error checking is activated
    if (err::check == true)
@@ -120,9 +117,6 @@ void legacy_atoms(){
    file_sstr << ".cfg";
    std::string cfg_file = file_sstr.str();
    const char *cfg_filec = cfg_file.c_str();
-
-   // Output informative message to log file
-   zlog << zTs() << "Outputting configuration file " << cfg_file << " to disk" << std::endl;
 
    // Declare and open output file
    std::ofstream cfg_file_ofstr;
@@ -163,6 +157,9 @@ void legacy_atoms(){
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
    }
 
+   // start timer
+   timer.start();
+
    // Everyone now outputs their atom list
    cfg_file_ofstr << local_output_atom_list.size() << std::endl;
    for (int i = 0; i < local_output_atom_list.size(); i++)
@@ -170,28 +167,25 @@ void legacy_atoms(){
       const int atom = local_output_atom_list[i];
       cfg_file_ofstr << atoms::x_spin_array[atom] << "\t" << atoms::y_spin_array[atom] << "\t" << atoms::z_spin_array[atom] << std::endl;
    }
+
+   // stop timer
+   timer.stop();
+
+   // close output file
    cfg_file_ofstr.close();
 
-   sim::output_atoms_file_counter++;
+   double io_time = timer.elapsed_time(); // seconds
 
-            // stop the timer
-   double local_time = timer.elapsed_time(); // seconds
+   #ifdef MPICF
+      // find maximum time for i/o
+      double max_io_time = 0.0;
+      // calculate actual bandwidth on root process
+      MPI_Reduce(&io_time, &max_io_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+      io_time = max_io_time;
+   #endif
 
-      // get file size (bytes)
-   double local_data_size = double(sizeof(float) * local_output_atom_list.size());
-#ifdef MPICF
-// aggregate bandwidth
+   return io_time;
 
-   double total_time;
-   MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-   double total_data_size;
-   MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-   if(vmpi::my_rank==0)
-      zlog << 1.0e-6 * total_data_size / total_time << " MB/s" << std::endl;
-#else
-   // calculate data rate and output to log
-   zlog << 1.0e-6 * local_data_size / local_time << " MB/s" << std::endl;
-#endif
 }
 
 /// @brief Atomistic output function
@@ -229,70 +223,17 @@ void legacy_atoms(){
 ///   Revision:   ---
 ///=====================================================================================
 ///
-void legacy_atoms_coords()
+double legacy_atoms_coords()
 {
-         // instantiate timer
-   vutil::vtimer_t timer;
 
-   // start timer
-   timer.start();
+   // instantiate timer
+   vutil::vtimer_t timer;
 
    // check calling of routine if error checking is activated
    if (err::check == true)
    {
       std::cout << "config::atoms_coords has been called" << std::endl;
    }
-
-   #ifdef MPICF
-      const int num_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
-   #else
-      const int num_atoms = atoms::num_atoms;
-   #endif
-
-   // resize atom list to zero
-   local_output_atom_list.resize(0);
-
-   // get output bounds
-   double minB[3] = {atoms_output_min[0] * cs::system_dimensions[0],
-                     atoms_output_min[1] * cs::system_dimensions[1],
-                     atoms_output_min[2] * cs::system_dimensions[2]};
-
-   double maxB[3] = {atoms_output_max[0] * cs::system_dimensions[0],
-                     atoms_output_max[1] * cs::system_dimensions[1],
-                     atoms_output_max[2] * cs::system_dimensions[2]};
-
-   // loop over all local atoms and record output list
-   for (int atom = 0; atom < num_atoms; atom++)
-   {
-
-      const double cc[3] = {atoms::x_coord_array[atom], atoms::y_coord_array[atom], atoms::z_coord_array[atom]};
-
-      // check atom within output bounds
-      if ((cc[0] >= minB[0]) && (cc[0] <= maxB[0]))
-      {
-         if ((cc[1] >= minB[1]) && (cc[1] <= maxB[1]))
-         {
-            if ((cc[2] >= minB[2]) && (cc[2] <= maxB[2]))
-            {
-               local_output_atom_list.push_back(atom);
-            }
-         }
-      }
-   }
-
-   // calculate total atoms to output
-   #ifdef MPICF
-      int local_atoms = local_output_atom_list.size();
-      int total_atoms;
-      //std::cerr << vmpi::my_rank << "\t" << local_atoms << &local_atoms << "\t" << &total_atoms << std::endl;
-      //MPI::COMM_WORLD.Barrier();
-      MPI_Allreduce(&local_atoms, &total_atoms, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-      config::internal::total_output_atoms = total_atoms;
-   //std::cerr << vmpi::my_rank << "\t" << total_atoms << "\t" << &local_atoms << "\t" << &total_atoms << std::endl;
-   //MPI::COMM_WORLD.Barrier();
-   #else
-      config::internal::total_output_atoms = local_output_atom_list.size();
-   #endif
 
    // Set local output filename
    std::stringstream file_sstr;
@@ -309,6 +250,9 @@ void legacy_atoms_coords()
    // Declare and open output file
    std::ofstream cfg_file_ofstr;
    cfg_file_ofstr.open(cfg_filec);
+
+   // start timer
+   timer.start();
 
    // Output masterfile header on root process
    if (vmpi::my_rank == 0)
@@ -346,23 +290,23 @@ void legacy_atoms_coords()
          cfg_file_ofstr << mp::material[atoms::type_array[atom]].element << std::endl;
    }
 
+   // stop the timer
+   timer.stop();
+
    cfg_file_ofstr.close();
 
-            // stop the timer
-   double local_time = timer.elapsed_time(); // seconds
+   double io_time = timer.elapsed_time(); // seconds
 
-      // get file size (bytes)
-   double local_data_size = double(sizeof(float) * local_output_atom_list.size());
-#ifdef MPICF
-// aggregate bandwidth
+   #ifdef MPICF
+      // find maximum time for i/o
+      double max_io_time = 0.0;
+      // calculate actual bandwidth on root process
+      MPI_Reduce(&io_time, &max_io_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+      io_time = max_io_time;
+   #endif
 
-   double total_time;
-   MPI_Reduce(&local_time, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-   double total_data_size;
-   MPI_Reduce(&local_data_size, &total_data_size, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-#else
-   // calculate data rate and output to log
-#endif
+   return io_time;
+
 }
 
 
@@ -402,7 +346,7 @@ void legacy_atoms_coords()
 ///   Revision:     ---
 ///=====================================================================================
 ///
-void cells()
+void legacy_cells()
 {
 
    // check calling of routine if error checking is activated
@@ -509,7 +453,7 @@ void cells()
 ///   Revision:     ---
 ///=====================================================================================
 ///
-void cells_coords()
+void legacy_cells_coords()
 {
 
    // check calling of routine if error checking is activated

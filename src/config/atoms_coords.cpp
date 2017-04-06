@@ -105,6 +105,7 @@ void atoms_coords()
 
          // legacy
          case config::internal::legacy:
+            io_time = config::internal::legacy_atoms_coords();
             break;
 
          case config::internal::mpi_io:{
@@ -161,7 +162,7 @@ void atoms_coords()
          // Serial mode output (ignores most io directives)
          //-----------------------------------------------------
          // check for legacy output
-         if(config::internal::mode == config::internal::legacy) config::internal::legacy_atoms_coords();
+         if(config::internal::mode == config::internal::legacy) io_time = config::internal::legacy_atoms_coords();
          // otherwise use new one by default
          else io_time = write_coord_data(filename, config::internal::local_buffer, atom_type_buffer, atom_category_buffer);
       #endif

@@ -30,7 +30,7 @@ namespace config{
       void initialize(){
 
          // Output informative message to log
-         zlog << zTs() << "Initialising configuration output" << std::endl;
+         zlog << zTs() << "Initialising configuration output..." << std::flush;
 
          // Calculate total number of atoms for output
          #ifdef MPICF
@@ -83,8 +83,8 @@ namespace config{
          // calculate total size of spin data in GB
          config::internal::io_data_size = 3.e-9 * double(sizeof(double)) * double(config::internal::total_output_atoms);
 
-         // Resize local buffer if needed
-         if(config::internal::mode != legacy) config::internal::local_buffer.resize(3 * local_output_atom_list.size());
+         // Resize local buffer
+         config::internal::local_buffer.resize(3 * local_output_atom_list.size());
 
          // set number of io_processors to num processors for for file per process mode
          #ifdef MPICF
@@ -149,6 +149,9 @@ namespace config{
 
          // set initialised flag
          config::internal::initialised = true;
+
+         // Output informative message to log
+         zlog << " done!" << std::endl;
 
          return;
 

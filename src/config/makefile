@@ -12,7 +12,7 @@ data.o \
 initialize.o \
 interface.o \
 meta.o \
-output_legacy.o \
+legacy.o \
 write_coords.o \
 write.o
 

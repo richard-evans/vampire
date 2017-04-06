@@ -105,8 +105,8 @@ void output(){ // should include variables for data to be outputted, eg spins, c
       // for all programs except hysteresis
       if (sim::program != 2)
       {
-         if (sim::output_cells_file_counter == 0) config::internal::cells_coords();
-         config::internal::cells();
+         if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+         config::internal::legacy_cells();
       }
       // for hysteresis program
       else if (sim::program == 2)
@@ -114,14 +114,14 @@ void output(){ // should include variables for data to be outputted, eg spins, c
          // output config only in range [minField_1;maxField_1] for decreasing field
          if ((sim::H_applied >= maxField_1) && (sim::H_applied <= minField_1) && (sim::parity < 0))
          {
-            if (sim::output_cells_file_counter == 0) config::internal::cells_coords();
-            config::internal::cells();
+            if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+            config::internal::legacy_cells();
          }
          // output config only in range [minField_2;maxField_2] for increasing field
          else if ((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2) && (sim::parity > 0))
          {
-            if (sim::output_cells_file_counter == 0) config::internal::cells_coords();
-            config::internal::cells();
+            if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+            config::internal::legacy_cells();
          }
       }
    }
