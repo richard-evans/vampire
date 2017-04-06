@@ -107,7 +107,14 @@ namespace config{
       test="output-nodes";
       if(word==test){
          int x=atoi(value.c_str());
-         vin::check_for_valid_int(x, word, line, prefix, 1, vmpi::num_processors,"input","1 - number of cores");
+         vin::check_for_valid_int(x, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
+         if(x > vmpi::num_processors){
+            zlog << zTs() << "Warning: Number of parallel output nodes set to " << x << " which is greater than the number of processors (" <<
+            vmpi::num_processors << ") used in this simulation. Setting output-nodes to " << vmpi::num_processors << "." << std::endl;
+            std::cout << "Warning: Number of parallel output nodes set to " << x << " which is greater than the number of processors (" <<
+            vmpi::num_processors << ") used in this simulation. Setting output-nodes to " << vmpi::num_processors << "." << std::endl;
+            x = vmpi::num_processors;
+         }
          config::internal::num_io_groups = x;
          return EXIT_SUCCESS;
       }
