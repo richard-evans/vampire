@@ -74,7 +74,8 @@ void atoms(){
    // Output informative message to log file on root process
    zlog << zTs() << "Outputting configuration file " << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << " to disk ";
 
-   double bandwidth = 0.0;
+   // Variable for calculating output bandwidth
+   double io_time = 1.0e-12;
 
    //-----------------------------------------------------
    // Parallel mode output
@@ -106,25 +107,23 @@ void atoms(){
          // Close file
          MPI_File_close(&fh);
          timer.stop(); // Stop timer
-         bandwidth = config::internal::io_data_size / timer.elapsed_time();
+         io_time = config::internal::io_data_size / timer.elapsed_time();
          break;
       }
 
       case config::internal::fpprocess:
-         bandwidth = write_data(filename, config::internal::local_buffer);
+         io_time = write_data(filename, config::internal::local_buffer);
          break;
 
       case config::internal::fpnode:
          // Gather data from all processors in io group
          MPI_Gatherv(&local_buffer[0], local_buffer.size(), MPI_DOUBLE, &collated_buffer[0], &io_group_recv_counts[0], &io_group_displacements[0], MPI_DOUBLE, io_group_master_id, io_comm);
          // output data on master io processes
-         if(config::internal::io_group_master) bandwidth = write_data(filename, config::internal::collated_buffer);
-         // correct calculation for bandwidth (default calculation assumes all atoms are output to disk on each process)
-         double total_bandwidth = 0.0;
-         if(!io_group_master) bandwidth = 1e6; // set unachievable bandwidth for all processes not outputting data
+         if(config::internal::io_group_master) io_time = write_data(filename, config::internal::collated_buffer);
+         double max_io_time = 0.0;
          // calculate actual bandwidth on root process
-         MPI_Reduce(&bandwidth, &total_bandwidth, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-         bandwidth = total_bandwidth / double(num_io_groups);
+         MPI_Reduce(&io_time, &max_io_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+         io_time = max_io_time;
          break;
 
    }
@@ -136,11 +135,11 @@ void atoms(){
       // check for legacy output
       if(config::internal::mode == config::internal::legacy) config::internal::legacy_atoms();
       // otherwise use new one by default
-      else bandwidth = write_data(filename, config::internal::local_buffer);
+      else io_time = write_data(filename, config::internal::local_buffer);
    #endif
 
    // Output bandwidth to log file
-   zlog << bandwidth << " GB/s" << std::endl;
+   zlog << config::internal::io_data_size/io_time << " GB/s in " << io_time << "s " << std::endl;
 
    // increment file counter
    sim::output_atoms_file_counter++;

@@ -71,21 +71,21 @@ namespace internal
 //
 double write_data(std::string filename, const std::vector<double> &buffer){
 
-   double bandwidth = 0.0;
+   double io_time = 0.0;
 
    switch (config::internal::format){
 
       case config::internal::binary:
-         bandwidth = write_data_binary(filename, buffer);
+         io_time = write_data_binary(filename, buffer);
          break;
 
       case config::internal::text:
-         bandwidth = write_data_text(filename, buffer);
+         io_time = write_data_text(filename, buffer);
          break;
 
    }
 
-   return bandwidth;
+   return io_time;
 
 }
 
@@ -136,7 +136,7 @@ double write_data_text(std::string filename, const std::vector<double> &buffer){
    in.close();
 
    // return bandwidth
-   return config::internal::io_data_size / timer.elapsed_time();
+   return timer.elapsed_time();
 
 }
 
@@ -172,7 +172,7 @@ double write_data_binary(std::string filename, const std::vector<double> &buffer
    ofile.close();
 
    // return bandwidth
-   return config::internal::io_data_size / timer.elapsed_time();
+   return timer.elapsed_time();
 
 }
 

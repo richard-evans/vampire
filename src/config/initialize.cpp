@@ -81,7 +81,7 @@ namespace config{
          #endif
 
          // calculate total size of spin data in GB
-         config::internal::io_data_size = 1.e-9 * double(sizeof(double)) * double(config::internal::total_output_atoms);
+         config::internal::io_data_size = 3.e-9 * double(sizeof(double)) * double(config::internal::total_output_atoms);
 
          // Resize local buffer if needed
          if(config::internal::mode != legacy) config::internal::local_buffer.resize(3 * local_output_atom_list.size());
