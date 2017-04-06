@@ -3,32 +3,22 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Rory Pond and Richard F L Evans 2016. All rights reserved.
+//   (c) Rory Pond and Richard F L Evans 2017. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
 
-//#include <stdio.h>
-
 // C++ standard library headers
-//#include <cmath>
-//#include <cstdlib>
-//#include <ctime>
 #include <iomanip>
-//#include <iostream>
-//#include <fstream>
 #include <sstream>
-//#include <string>
+
 
 // Vampire headers
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "config.hpp"
-//#include "dipole.hpp"
-//#include "errors.hpp"
-//#include "LLG.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
@@ -153,7 +143,6 @@ void atoms(){
    return;
 
 }
-
 
 } // end of internal namespace
 } // end of config namespace
