@@ -98,15 +98,14 @@ namespace internal
 
    void atoms();
    void atoms_coords();
+   void legacy_atoms();
+   void legacy_atoms_coords();
    void cells();
    void cells_coords();
 
-   void atoms_new();
-   void atoms_coords_new();
-   void cells_new();
-   void cells_coords_new();
-
    double write_data(std::string, const std::vector<double> &buffer);
+   double write_coord_data(std::string filename, const std::vector<double>& buffer, const std::vector<int>& type_buffer, const std::vector<int>& category_buffer);
+
    double write_data_text(std::string filename, const std::vector<double> &buffer);
    double write_data_binary(std::string filename, const std::vector<double> &buffer);
    void copy_data_to_buffer(const std::vector<double> &x, // vector data

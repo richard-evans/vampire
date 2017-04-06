@@ -229,7 +229,7 @@ void legacy_atoms(){
 ///   Revision:   ---
 ///=====================================================================================
 ///
-void atoms_coords()
+void legacy_atoms_coords()
 {
          // instantiate timer
    vutil::vtimer_t timer;

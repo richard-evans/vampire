@@ -4,6 +4,7 @@
 
 # List module object filenames
 config_objects =\
+atoms_coords.o \
 atoms_spins.o \
 buffer.o \
 config.o \
@@ -12,6 +13,7 @@ initialize.o \
 interface.o \
 meta.o \
 output_legacy.o \
+write_coords.o \
 write.o
 
 # Append module objects to global tree
