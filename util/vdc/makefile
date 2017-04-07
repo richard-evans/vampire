@@ -22,7 +22,8 @@ obj/data.o \
 obj/main.o \
 obj/povray.o \
 obj/read.o \
-obj/spins.o
+obj/spins.o \
+obj/xyz.o
 
 EXECUTABLE=vdc
 

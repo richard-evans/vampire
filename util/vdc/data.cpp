@@ -19,6 +19,7 @@ namespace vdc{
 
    // program option flags
    bool verbose = true; // flag to specify verbosity of output to user
+   bool xyz = true; // flag to specify crystal.xyz file output
 
    format_t format;
 
@@ -29,7 +30,10 @@ namespace vdc{
    std::vector<double> coordinates(0);
    std::vector<int> category(0);
    std::vector<int> type(0);
-   
+
    std::vector<double> spins(0);
+
+   // array to store subsidiary data file names
+   std::vector <std::string> coord_filenames(0);
 
 } // end of namespace vdc

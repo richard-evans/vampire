@@ -23,7 +23,8 @@
 namespace vdc{
 
 // forward function declarations
-void read_coord_metadata(std::vector <std::string>& filenames);
+void read_coord_metadata();
+void read_coord_data();
 
 //------------------------------------------------------------------------------
 // Wrapper function to read coordinate metafile to initialise data structures
@@ -31,70 +32,14 @@ void read_coord_metadata(std::vector <std::string>& filenames);
 //------------------------------------------------------------------------------
 void process_coordinates(){
 
-   // array to store subsidiary data file names
-   std::vector <std::string> filenames(0);
-
    // read meta data
-   vdc::read_coord_metadata(filenames);
+   vdc::read_coord_metadata();
 
-   // load coordinates into buffers
-
-   vdc::coordinates.resize(3*vdc::num_atoms);
-   vdc::category.resize(vdc::num_atoms);
-   vdc::type.resize(vdc::num_atoms);
-
-   // index counter
-   uint64_t atom_id = 0;
-
-   // loop over all files
-   for(unsigned int f = 0; f < filenames.size(); f++){
-
-      switch (vdc::format){
-
-         case vdc::binary:
-            break;
-
-         case vdc::text:{
-            // open file
-            std::ifstream ifile;
-            ifile.open(filenames[f].c_str()); // check for errors
-            // check for open file
-            if(!ifile.is_open()){
-               std::cerr << "Error! Coordinate data file \"" << filenames[f] << "\" cannot be opened. Exiting" << std::endl;
-               exit(1);
-            }
-
-            uint64_t num_atoms_in_file = 0;
-            std::string line;
-            getline(ifile, line);
-            {
-               std::istringstream ss(line);
-               ss >> num_atoms_in_file; // interpret as uint64_t
-            }
-            double x,y,z;
-            int type_id, category_id;
-            // loop over all atoms in file and load as x,y,z sets
-            for(uint64_t idx = 0; idx < num_atoms_in_file; idx++){
-               getline(ifile, line);
-               std::istringstream ss(line);
-               ss >> type_id >> category_id >> x >> y >> z;
-               vdc::type[atom_id] = type_id;
-               vdc::category[atom_id] = category_id;
-               vdc::coordinates[3*atom_id + 0] = x;
-               vdc::coordinates[3*atom_id + 1] = y;
-               vdc::coordinates[3*atom_id + 2] = z;
-               // increment atom counter
-               atom_id += 1;
-            }
-            ifile.close();
-            break;
-         }
-
-      }
-
-   }
+   // read coordinate data
+   vdc::read_coord_data();
 
    // output xyz file
+   if(vdc::xyz) output_xyz_file();
    std::ofstream ofile;
    ofile.open("crystal.xyz");
    ofile << vdc::num_atoms << "\n\n";
@@ -134,7 +79,7 @@ void process_coordinates(){
 //
 //
 //------------------------------------------------------------------------------
-void read_coord_metadata(std::vector <std::string>& filenames){
+void read_coord_metadata(){
 
    if(vdc::verbose) std::cout << "Reading meta-data" << std::endl;
 
@@ -228,9 +173,99 @@ void read_coord_metadata(std::vector <std::string>& filenames){
       line.erase(remove(line.begin(), line.end(), '\t'), line.end());
       line.erase(remove(line.begin(), line.end(), ' '), line.end());
       line.erase(remove(line.begin(), line.end(), '\r'), line.end());
-      filenames.push_back(line);
+      vdc::coord_filenames.push_back(line);
       if(vdc::verbose) std::cout << "      " << line << std::endl;
    }
+
+   return;
+
+}
+
+//------------------------------------------------------------------------------
+// Function to read in coordinate data from subsidiary files
+//------------------------------------------------------------------------------
+void read_coord_data(){
+
+   if(vdc::verbose) std::cout << "Reading coordinate data... " << std::flush;
+
+   // resize arrays
+   vdc::coordinates.resize(3*vdc::num_atoms);
+   vdc::category.resize(vdc::num_atoms);
+   vdc::type.resize(vdc::num_atoms);
+
+   // index counter
+   uint64_t atom_id = 0;
+
+   // loop over all files
+   for(unsigned int f = 0; f < vdc::coord_filenames.size(); f++){
+
+      switch (vdc::format){
+
+         case vdc::binary:{
+            uint64_t num_atoms_in_file = 0;
+            // open file in binary mode
+            std::ifstream ifile;
+            ifile.open(coord_filenames[f].c_str(), std::ios::binary); // check for errors
+            // check for open file
+            if(!ifile.is_open()){
+               std::cerr << "Error! Coordinate data file \"" << coord_filenames[f] << "\" cannot be opened. Exiting" << std::endl;
+               exit(1);
+            }
+            // read number of atoms
+            ifile.read( (char*)&num_atoms_in_file,sizeof(uint64_t) );
+            // read type array
+            ifile.read((char*)&vdc::type[atom_id], sizeof(int)*num_atoms_in_file);
+            // read category array
+            ifile.read((char*)&vdc::category[atom_id], sizeof(int)*num_atoms_in_file);
+            ifile.read((char*)&vdc::coordinates[atom_id], sizeof(double)*num_atoms_in_file*3);
+            // increment counter
+            atom_id += num_atoms_in_file;
+            ifile.close();
+            break;
+         }
+
+         case vdc::text:{
+            // open file
+            std::ifstream ifile;
+            ifile.open(coord_filenames[f].c_str()); // check for errors
+            // check for open file
+            if(!ifile.is_open()){
+               std::cerr << "Error! Coordinate data file \"" << coord_filenames[f] << "\" cannot be opened. Exiting" << std::endl;
+               exit(1);
+            }
+
+            uint64_t num_atoms_in_file = 0;
+            std::string line;
+            getline(ifile, line);
+            {
+               std::istringstream ss(line);
+               ss >> num_atoms_in_file; // interpret as uint64_t
+            }
+            double x,y,z;
+            int type_id, category_id;
+            // loop over all atoms in file and load as x,y,z sets
+            for(uint64_t idx = 0; idx < num_atoms_in_file; idx++){
+               getline(ifile, line);
+               std::istringstream ss(line);
+               ss >> type_id >> category_id >> x >> y >> z;
+               vdc::type[atom_id] = type_id;
+               vdc::category[atom_id] = category_id;
+               vdc::coordinates[3*atom_id + 0] = x;
+               vdc::coordinates[3*atom_id + 1] = y;
+               vdc::coordinates[3*atom_id + 2] = z;
+               // increment atom counter
+               atom_id += 1;
+            }
+            ifile.close();
+            break;
+         }
+
+      }
+
+   }
+
+   // output informative message to user
+   if(vdc::verbose) std::cout << "done!" << std::endl;
 
    return;
 

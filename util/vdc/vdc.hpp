@@ -21,6 +21,7 @@ namespace vdc{
 
    // program option flags
    extern bool verbose;
+   extern bool xyz;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -44,8 +45,12 @@ namespace vdc{
 
    extern std::vector<double> spins;
 
+   // array to store subsidiary data file names
+   extern std::vector <std::string> coord_filenames;
+
    // Functions
    void process_coordinates();
+   void output_xyz_file();
 
 }
 
