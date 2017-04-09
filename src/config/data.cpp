@@ -75,6 +75,8 @@ namespace config{
       std::vector<int> io_group_displacements(0); // offsets in obuf to receive from each process in io group
 
       #ifdef MPICF
+         MPI_Offset linear_offset; // offset for mpi-io collective routines for integer data (bytes)
+         MPI_Offset buffer_offset; // offset for mpi-io collective routines for 3 vector double data (bytes)
          MPI_Comm io_comm; // MPI IO communicator specifying a group of processors who output as a group
       #endif
 

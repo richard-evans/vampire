@@ -27,6 +27,11 @@ namespace config
 {
 namespace internal
 {
+
+// Forward function declarations
+double write_data_text(std::string filename, const std::vector<double> &buffer);
+double write_data_binary(std::string filename, const std::vector<double> &buffer);
+
 //--------------------------------------------------------------------------------------------------------
 //  Function to copy and cast masked 3-vector data array to output buffer (serial and parallel versions)
 //

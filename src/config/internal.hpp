@@ -84,6 +84,8 @@ namespace internal
    extern std::vector<int> io_group_displacements; // offsets in obuf to receive from each process in io group
 
    #ifdef MPICF
+      extern MPI_Offset linear_offset; // offset for mpi-io collective routines for integer data (bytes)
+      extern MPI_Offset buffer_offset; // offset for mpi-io collective routines for 3 vector double data (bytes)
       extern MPI_Comm io_comm; // MPI IO communicator specifying a group of processors who output as a group
    #endif
 

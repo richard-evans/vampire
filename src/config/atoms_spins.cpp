@@ -100,15 +100,23 @@ void atoms(){
          MPI_File_open(MPI_COMM_WORLD, cfilename, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fh);
          // write number of atoms on root process
          if(vmpi::my_rank == 0) MPI_File_write(fh, &total_output_atoms, 1, MPI_UINT64_T, &status);
-         // Wait for Everyone
-         vmpi::barrier();
+
+         // Calculate local byte offset since MPI-IO is simple and doesn't update the file handle pointer after I/O
+         MPI_Offset data_offset = config::internal::buffer_offset + sizeof(uint64_t);
+
          timer.start(); // start timer
+
          // Write data to disk
-         MPI_File_write_ordered(fh, &config::internal::local_buffer[0], config::internal::local_buffer.size(), MPI_DOUBLE, &status);
+         MPI_File_write_at_all(fh, data_offset, &config::internal::local_buffer[0], config::internal::local_buffer.size(), MPI_DOUBLE, &status);
+         //MPI_File_write_ordered(fh, &config::internal::local_buffer[0], config::internal::local_buffer.size(), MPI_DOUBLE, &status);
+
+         timer.stop(); // Stop timer
+
          // Close file
          MPI_File_close(&fh);
-         timer.stop(); // Stop timer
-         io_time = config::internal::io_data_size / timer.elapsed_time();
+
+         // Calculate elapsed time
+         io_time = timer.elapsed_time();
          break;
       }
 

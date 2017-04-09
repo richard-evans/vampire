@@ -95,6 +95,34 @@ namespace config{
          #endif
 
          //------------------------------------------------------
+         // For mpi-io output calculate data offsets
+         //------------------------------------------------------
+         #ifdef MPICF
+            if(config::internal::mode == mpi_io){
+
+               // array containing number of atoms per processor
+               std::vector<uint64_t> atoms_per_processor(vmpi::num_processors, 0);
+
+               // store number of local atoms in correct bin
+               atoms_per_processor[vmpi::my_rank] = local_output_atom_list.size();
+
+               // reduce on all processors
+               MPI_Allreduce(MPI_IN_PLACE,&atoms_per_processor[0],vmpi::num_processors, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+
+               // calculate linear integer and 3 vector buffer offsets for my_rank
+               uint64_t rank_offset = 0;
+               for(unsigned int p=0; p < vmpi::my_rank; p++){
+                  rank_offset += atoms_per_processor[p];
+               }
+
+               // set MPI offset (in bytes)
+               config::internal::linear_offset = rank_offset * sizeof(int);
+               config::internal::buffer_offset = rank_offset * 3 * sizeof(double);
+
+            }
+         #endif
+
+         //------------------------------------------------------
          // For file per node output split MPI communicator
          //------------------------------------------------------
          #ifdef MPICF
