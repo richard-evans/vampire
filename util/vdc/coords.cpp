@@ -40,17 +40,6 @@ void process_coordinates(){
 
    // output xyz file
    if(vdc::xyz) output_xyz_file();
-   std::ofstream ofile;
-   ofile.open("crystal.xyz");
-   ofile << vdc::num_atoms << "\n\n";
-
-   for(uint64_t atom = 0; atom < vdc::num_atoms; atom++){
-      int type_id = vdc::type[atom];
-      ofile << materials[type_id].element << "\t" << vdc::coordinates[3*atom + 0] << "\t" << vdc::coordinates[3*atom + 1] << "\t" << vdc::coordinates[3*atom + 2] << "\n";
-   }
-
-   ofile << std::flush;
-   ofile.close();
 
    return;
 
@@ -111,9 +100,15 @@ void read_coord_metadata(){
    if(vdc::verbose) std::cout << "   Data format: " << data_format_str << std::endl;
 
    std::string test = "text";
-   if(data_format_str == test) vdc::format = vdc::text;
+   if(data_format_str == test){
+     vdc::format = vdc::text;
+     if(vdc::verbose) std::cout << "   Setting data format to text mode" << std::endl;
+   }
    test = "binary";
-   if(data_format_str == test) vdc::format = vdc::binary;
+   if(data_format_str == test){
+     vdc::format = vdc::binary;
+     if(vdc::verbose) std::cout << "   Setting data format to binary mode" << std::endl;
+   }
    /*else{
       std::cerr << "Unknown data format \"" << data_format_str << "\". Exiting" << std::endl;
       exit(1);
@@ -213,6 +208,7 @@ void read_coord_data(){
             }
             // read number of atoms
             ifile.read( (char*)&num_atoms_in_file,sizeof(uint64_t) );
+	    std::cout << num_atoms_in_file << std::endl;
             // read type array
             ifile.read((char*)&vdc::type[atom_id], sizeof(int)*num_atoms_in_file);
             // read category array
@@ -221,6 +217,16 @@ void read_coord_data(){
             // increment counter
             atom_id += num_atoms_in_file;
             ifile.close();
+
+	    std::ofstream ofile;
+	    ofile.open("coords.txt");
+	    ofile << num_atoms_in_file << std::endl;
+	    for(int i=0; i< vdc::type.size(); i++){
+	      ofile << i << "\t" << vdc::type[i] << "\t" << vdc::category[i] << "\t" << vdc::coordinates[3*i+0] << "\t" << vdc::coordinates[3*i+1]<< "\t"<<vdc::coordinates[3*i+2] << std::endl; 
+	    }
+
+	    ofile.close();
+
             break;
          }
 
@@ -266,6 +272,46 @@ void read_coord_data(){
 
    // output informative message to user
    if(vdc::verbose) std::cout << "done!" << std::endl;
+
+   //---------------------------------------------------------------
+   // calculate system extent and centre
+   //---------------------------------------------------------------
+   double min[3] = {1e20, 1e20, 1e20};
+   double max[3] = {0.0, 0.0, 0.0};
+   double ave[3] = {0.0, 0.0, 0.0};
+
+   for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+
+      // temporary variables
+      double x = vdc::coordinates[3*atom + 0];
+      double y = vdc::coordinates[3*atom + 1];
+      double z = vdc::coordinates[3*atom + 2];
+
+      // add coordinates to running total
+      ave[0] += x;
+      ave[1] += y;
+      ave[2] += z;
+
+      // calculate min and max
+      if(x > max[0]) max[0] = x;
+      if(y > max[1]) max[1] = y;
+      if(z > max[2]) max[2] = z;
+
+      if(x < min[0]) min[0] = x;
+      if(y < min[1]) min[1] = y;
+      if(z < min[2]) min[2] = z;
+
+   }
+
+   // save system dimensions
+   vdc::system_size[0] = max[0] - min[0];
+   vdc::system_size[1] = max[1] - min[1];
+   vdc::system_size[2] = max[2] - min[2];
+
+   // save system centre
+   vdc::system_centre[0] = ave[0]/double(vdc::num_atoms);
+   vdc::system_centre[1] = ave[1]/double(vdc::num_atoms);
+   vdc::system_centre[2] = ave[2]/double(vdc::num_atoms);
 
    return;
 

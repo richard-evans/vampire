@@ -31,7 +31,7 @@ int main(int argc, char* argv[]){
    vdc::process_coordinates();
 
    // process spin files
-
+   vdc::process_spins();
 
    return 0;
 

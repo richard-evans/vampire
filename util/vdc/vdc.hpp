@@ -22,6 +22,7 @@ namespace vdc{
    // program option flags
    extern bool verbose;
    extern bool xyz;
+   extern bool povray;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -37,6 +38,12 @@ namespace vdc{
 
    extern uint64_t num_atoms;
 
+   extern unsigned int start_file_id;
+   extern unsigned int final_file_id;
+
+   extern double system_size[3];
+   extern double system_centre[3];
+
    extern std::vector<material_t> materials;
 
    extern std::vector<double> coordinates;
@@ -47,11 +54,15 @@ namespace vdc{
 
    // array to store subsidiary data file names
    extern std::vector <std::string> coord_filenames;
+   extern std::vector <std::string> spin_filenames;
 
    // Functions
    void process_coordinates();
-   void output_xyz_file();
+   void process_spins();
 
+   void output_xyz_file();
+   void output_inc_file(unsigned int spin_file_id);
+   void output_povray_file();
 }
 
 #endif //VDC_H_
