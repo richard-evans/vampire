@@ -24,12 +24,20 @@ namespace dipole{
    int update_rate=100; /// timesteps between updates
    bool activated=false;
 
+   // define arrays for B-field
    std::vector < double > cells_field_array_x;
    std::vector < double > cells_field_array_y;
    std::vector < double > cells_field_array_z;
    std::vector < double > atom_dipolar_field_array_x;
    std::vector < double > atom_dipolar_field_array_y;
    std::vector < double > atom_dipolar_field_array_z;
+   // define arrays for mu_0*Hdemag - field
+   std::vector < double > cells_mu0Hd_field_array_x;
+   std::vector < double > cells_mu0Hd_field_array_y;
+   std::vector < double > cells_mu0Hd_field_array_z;
+   std::vector < double > atom_mu0demag_field_array_x;
+   std::vector < double > atom_mu0demag_field_array_y;
+   std::vector < double > atom_mu0demag_field_array_z;
 
    double cutoff = 12.0; //12.0; /// cutoff distance between cells over which bare macro cell model can be applied
 

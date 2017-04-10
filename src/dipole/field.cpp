@@ -32,7 +32,7 @@
 namespace dipole{
 
    //-----------------------------------------------------------------------------
-   // Function for updating local temperature fields
+   // Function for updating atomic B-field and Hd-field
    //-----------------------------------------------------------------------------
 
 
@@ -52,12 +52,10 @@ namespace dipole{
 
 			   // update cell magnetisations
 			   cells::mag();
-            //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n >>>> PROBLEMS!!!!!! just after cells::mag()<<<< \n");
 
 			   // recalculate dipole fields
             dipole::internal::update_field();
-            //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n **** PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");
 
 			   // For MPI version, only add local atoms
@@ -69,16 +67,20 @@ namespace dipole{
             //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n num_local_atoms = %d on my_rank = %d\n",num_local_atoms,vmpi::my_rank);
 
-			   // Update Atomistic Dipolar Field Array
+			   // Update Atomistic Dipolar Field and Demag Field Array
 			   for(int atom=0;atom<num_local_atoms;atom++){
 				   const int cell = dipole::internal::atom_cell_id_array[atom];
                int type = dipole::internal::atom_type_array[atom];
                //fprintf(stderr,"\tcell = %d x = %f y = %f z = %f mus = %e on my_rank = %d\n",cell,cells::pos_and_mom_array[4*cell+0],cells::pos_and_mom_array[4*cell+1],cells::pos_and_mom_array[4*cell+2],cells::pos_and_mom_array[4*cell+3],vmpi::my_rank);
    	         if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==0){
-				      // Copy field from macrocell to atomistic spin
+				      // Copy B-field from macrocell to atomistic spin
 				      dipole::atom_dipolar_field_array_x[atom]=dipole::cells_field_array_x[cell];
 				      dipole::atom_dipolar_field_array_y[atom]=dipole::cells_field_array_y[cell];
 				      dipole::atom_dipolar_field_array_z[atom]=dipole::cells_field_array_z[cell];
+                  // Unroll Hdemag field
+				      dipole::atom_mu0demag_field_array_x[atom]=dipole::cells_mu0Hd_field_array_x[cell];
+				      dipole::atom_mu0demag_field_array_y[atom]=dipole::cells_mu0Hd_field_array_y[cell];
+				      dipole::atom_mu0demag_field_array_z[atom]=dipole::cells_mu0Hd_field_array_z[cell];
                   //fprintf(stderr,"\t atom = %d\tatom_field_x = %f\tatom_field_y = %f\tatom_field_z = %f\ton rank %d\n",atom,dipole::atom_dipolar_field_array_x[atom],dipole::atom_dipolar_field_array_y[atom],dipole::atom_dipolar_field_array_z[atom],vmpi::my_rank);
    	         }
 			   }

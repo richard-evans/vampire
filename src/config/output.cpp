@@ -444,6 +444,10 @@ namespace vout{
                            dipole::cells_field_array_x,
                            dipole::cells_field_array_y,
                            dipole::cells_field_array_z,
+                           dipole::cells_mu0Hd_field_array_x,
+                           dipole::cells_mu0Hd_field_array_y,
+                           dipole::cells_mu0Hd_field_array_z,
+                           cells::volume_array,
                            cells::num_local_cells);
     #endif
 
@@ -477,8 +481,9 @@ namespace vout{
          // Root process now outputs the cell magnetisations
          for(int cell=0; cell < cells::num_cells; cell++){
             if(cells::num_atoms_in_cell[cell]>0){
-               cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell]<< "\t";
-               cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << std::endl;
+               cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell]<< "\t";                                                 // Cells Magnetisation
+               cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << "\t";                     // B-field [Tesla]
+               cfg_file_ofstr << dipole::cells_mu0Hd_field_array_x[cell] << "\t" << dipole::cells_mu0Hd_field_array_y[cell] << "\t" << dipole::cells_mu0Hd_field_array_z[cell] << std::endl;   // mu_0*Hd-field [Tesla]
             }
          }
 

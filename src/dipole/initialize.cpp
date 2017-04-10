@@ -26,6 +26,8 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
+#include "sim.hpp"
+
 #include <time.h>
 #include <fenv.h>
 #include <signal.h>
@@ -121,16 +123,9 @@ namespace dipole{
 
 
       #ifdef MPICF
-         /*------------------------------------------------------*/
-         /*        parallel section                              */
-         /*------------------------------------------------------*/
-         //std::cout << "\n\nI'm in here Dipole Module\n\n" << std::flush;
-         //for(int lc=0; lc<dipole::internal::cells_num_cells; lc++){
-         //   fprintf(stderr,"\t *#*#*#* lc = %d  num_atoms_in_cell[%d] = %d num_atoms_in_cell_global[%d] = %d on rank=%d\t*#*#*#\n",lc,lc,dipole::internal::cells_num_atoms_in_cell[lc],lc,cells_num_atoms_in_cell_global[lc],vmpi::my_rank);
-         //}
-         //fprintf(stderr,"\n\n");
-         //MPI::COMM_WORLD.Barrier();
-
+         //------------------------------------------------------
+         //        parallel section
+         //------------------------------------------------------
          std::vector<double> atom_pos_x(num_local_atoms,0.0);
          std::vector<double> atom_pos_y(num_local_atoms,0.0);
          std::vector<double> atom_pos_z(num_local_atoms,0.0);
@@ -139,20 +134,17 @@ namespace dipole{
             atom_pos_y[atom]=atom_coords_y[atom];
             atom_pos_z[atom]=atom_coords_z[atom];
          }
-         //MPI::COMM_WORLD.Barrier();
 
          for(int lc=0; lc<dipole::internal::cells_num_cells; lc++){
-            //fprintf(stderr,"\t *#*#*#* lc = %d  num_atoms_in_cell[%d] = %d *#*#*#\n",lc,lc,dipole::internal::cells_num_atoms_in_cell[lc]);
             // resize arrays
             cells_atom_in_cell_coords_array_x[lc].resize(dipole::internal::cells_num_atoms_in_cell[lc]);
             cells_atom_in_cell_coords_array_y[lc].resize(dipole::internal::cells_num_atoms_in_cell[lc]);
             cells_atom_in_cell_coords_array_z[lc].resize(dipole::internal::cells_num_atoms_in_cell[lc]);
             cells_index_atoms_array[lc].resize(dipole::internal::cells_num_atoms_in_cell[lc]);
-            //fprintf(stderr,"cells_index_atoms_array[%d].size() = %lu cells_index_atoms_array[%d].size() = %lu on my_rank = %d\n",lc,cells_index_atoms_array[lc].size(),lc,cells_atom_in_cell_coords_array_x[lc].size(),vmpi::my_rank);
          }
 
-         //MPI::COMM_WORLD.Barrier();
-         // Call paralelisation function
+         // Call parallelisation function
+         // Exchange cells data
          dipole::send_recv_cells_data(dipole::internal::proc_cell_index_array1D,
                                     cells_atom_in_cell_coords_array_x,
                                     cells_atom_in_cell_coords_array_y,
@@ -166,25 +158,7 @@ namespace dipole{
                                     dipole::internal::cells_num_cells
                                     );
 
-         //MPI::COMM_WORLD.Barrier();
-         //fprintf(stderr,"\n\n >>>>> End of send/recv session for cells ---> cells_num_cells = %d, cells_num_local_cells = %d on rank = %d<<<<<<\n\n",dipole::internal::cells_num_cells,dipole::internal::cells_num_local_cells,vmpi::my_rank);
-
-         //int size = cells::cell_id_array.size();
-         //for(int i=0; i<dipole::internal::cells_num_local_cells; i++){
-         //   //int lc = cells::cell_id_array[i];
-         //   int lc = dipole::internal::cells_local_cell_array[i];
-         //   ////////fprintf(stderr,"size = %d, cells::cell_id_array[%d] = %d, x = %f y = %f z = %f mu = %e on cpu = %d proc_cell_index_array[%d] = %d\n",size,i,cells::cell_id_array[i],cells::pos_and_mom_array[4*lc+0],cells::pos_and_mom_array[4*lc+1],cells::pos_and_mom_array[4*lc+2],cells::pos_and_mom_array[4*lc+3],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
-         //   fprintf(stderr,"size = %d, cells_local_cell_array[%d] = %d, x = %f y = %f z = %f mu = %e on cpu = %d proc_cell_index_array[%d] = %d\n",size,i,dipole::internal::cells_local_cell_array[i],cells::pos_and_mom_array[4*lc+0],cells::pos_and_mom_array[4*lc+1],cells::pos_and_mom_array[4*lc+2],cells::pos_and_mom_array[4*lc+3],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
-         //}
-         //for(int lc=0; lc<ceil(dipole::internal::cells_pos_and_mom_array.size()/4.); lc++){
-         //   if(dipole::internal::cells_num_atoms_in_cell[lc]>0 || lc>=dipole::internal::cells_num_cells){
-         //      fprintf(stderr,"cell=%d, num_atoms_in_cell=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,dipole::internal::cells_num_atoms_in_cell[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
-         //   }
-         //}
-
-         //MPI::COMM_WORLD.Barrier();
-         //fprintf(stderr,"\n\n >>>>> Beginning of send/recv session for atoms ---> cells_num_cells = %d, cells_num_local_cells = %d cells_pos_and_mom_array.size() = %lu on rank = %d<<<<<<\n\n",dipole::internal::cells_num_cells,dipole::internal::cells_num_local_cells,dipole::internal::cells_pos_and_mom_array.size(),vmpi::my_rank);
-
+         // Exchange atoms data
          dipole::send_recv_atoms_data(dipole::internal::proc_cell_index_array1D,
                                     cells::cell_id_array,
                                     dipole::internal::cells_local_cell_array,
@@ -203,26 +177,7 @@ namespace dipole{
                                     cells_macro_cell_size
                                     );
 
-         //MPI::COMM_WORLD.Barrier();
-         //fprintf(stderr,"\n\n >>>>> End of send/recv session for atoms ---> cells_num_cells = %d, cells_num_local_cells = %d cells_pos_and_mom_array.size() = %lu on rank = %d<<<<<<\n\n",dipole::internal::cells_num_cells,dipole::internal::cells_num_local_cells,dipole::internal::cells_pos_and_mom_array.size(),vmpi::my_rank);
-         //MPI::COMM_WORLD.Barrier();
-         //for(int lc=0; lc<ceil(dipole::internal::cells_pos_and_mom_array.size()/4.); lc++){
-         //   if( (dipole::internal::cells_num_atoms_in_cell[lc]>0 && lc<dipole::internal::cells_num_cells) || (lc>=dipole::internal::cells_num_cells)){
-         //      fprintf(stderr,"cell=%d, num_atoms_in_cell=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,dipole::internal::cells_num_atoms_in_cell[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
-         //   }
-         //}
-         //MPI::COMM_WORLD.Barrier();
-
-         //fprintf(stderr,"\n\n >>>>> BEFORE sort_data() func <<<<<<<\n");
-         //for(unsigned int i=0;i<cells_index_atoms_array.size();i++){
-         //   if(dipole::internal::cells_num_atoms_in_cell[i]>0){
-         //      for(int j=0;j<dipole::internal::cells_num_atoms_in_cell[i];j++){
-         //         fprintf(stderr," index_atoms_array[%d][%d] = %d atom_in_cell_coords_array_x[%d][%d] = %f atom_in_cell_coords_array_y[%d][%d] = %f atom_in_cell_coords_array_z[%d][%d] = %f on rank = %d\n",i,j,cells::index_atoms_array[i][j],i,j,cells_atom_in_cell_coords_array_x[i][j],i,j,cells_atom_in_cell_coords_array_y[i][j],i,j,cells_atom_in_cell_coords_array_z[i][j],vmpi::my_rank);
-         //      }
-         //   }
-         //}
-         //MPI::COMM_WORLD.Barrier();
-
+         // Reorder data structure
       	sort_data(dipole::internal::proc_cell_index_array1D,
                   cells::cell_id_array,
                   cells_atom_in_cell_coords_array_x,
@@ -234,60 +189,22 @@ namespace dipole{
                   dipole::internal::cells_num_local_cells,
                   dipole::internal::cells_num_cells
                   );
-         //MPI::COMM_WORLD.Barrier();
 
-		   //fprintf(stderr,"\n\n =======> after call of sort_data() func ---> cells_num_cells = %d, cells_num_local_cells = %d cells_pos_and_mom_array.size() = %lu on rank = %d <===========\n\n",dipole::internal::cells_num_cells,dipole::internal::cells_num_local_cells,dipole::internal::cells_pos_and_mom_array.size(),vmpi::my_rank);
-
-         //MPI::COMM_WORLD.Barrier();
-         //for(int lc=0; lc<ceil(dipole::internal::cells_pos_and_mom_array.size()/4.); lc++){
-         //   if( (dipole::internal::cells_num_atoms_in_cell[lc]>0 && lc<dipole::internal::cells_num_cells) || (lc>=dipole::internal::cells_num_cells)){
-         //      fprintf(stderr,"cell=%d, num_atoms_in_cell=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,dipole::internal::cells_num_atoms_in_cell[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
+         //// Safety check: print cells infos
+         //for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
+         //   if(cells_num_atoms_in_cell_global[i]>0 && dipole::internal::cells_num_atoms_in_cell[i]==0){
+         //      dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
+         //      //fprintf(stderr,"  >>> cell=%d, cells_num_atoms_in_cell_global=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,cells_num_atoms_in_cell_global[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
          //   }
          //}
-         //MPI::COMM_WORLD.Barrier();
 
-         //fprintf(stderr,"\n\n new cells_num_cells = %d cell_id_array.size()=%lu on my_rank = %d\n\n",cells_num_cells,cells::cell_id_array.size(),vmpi::my_rank);
-         //fprintf(stderr,"\n\n >>> dipole::internal::cells_num_atoms_in_cell.size()=%lu \t cells_num_atoms_in_cell_global.size()=%lu ceil(dipole::internal::cells_pos_and_mom_array.size()/4.)=%f on rank=%d <<<< \n\n",dipole::internal::cells_num_atoms_in_cell.size(),cells_num_atoms_in_cell_global.size(),ceil(dipole::internal::cells_pos_and_mom_array.size()/4.),vmpi::my_rank);
-         //fprintf(stderr,"\n\n");
-         for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
-            if(cells_num_atoms_in_cell_global[i]>0 && dipole::internal::cells_num_atoms_in_cell[i]==0){
-               dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
-               //fprintf(stderr,"  >>> cell=%d, cells_num_atoms_in_cell_global=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,cells_num_atoms_in_cell_global[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
-            }
-         }
+         // Clear memory
          cells_num_atoms_in_cell_global.clear();
-         //fprintf(stderr,"\n\n After updating num_cells \n\n");
-
          // Clear atom_pos_x,y,z
          atom_pos_x.clear();
          atom_pos_y.clear();
          atom_pos_z.clear();
       #endif
-
-      //fprintf(stderr,"\n\n");
-      //fprintf(stderr,"\n !!!! PROBLEMS!!! \n");
-		//MPI::COMM_WORLD.Barrier();
-      //for(int i=0; i<dipole::internal::cells_num_cells; i++){
-      //   //fprintf(stderr,"\n\n  >>>> Print volume array after paralle section <<<<<<\n   !!!!!!cells_volume_array[%d] = %f cells_num_atoms_in_cell[%d] = %d on rank = %d\n",i,dipole::internal::cells_volume_array[i],i,dipole::internal::cells_num_atoms_in_cell[i],vmpi::my_rank);
-      //}
-
-      //fprintf(stderr,"\n !!!! PROBLEMS!!!  just after updating dipoolenum_local_cells\n");
-      //for(int i=0;i<dipole::internal::cells_num_cells;i++){
-      //   if(dipole::internal::cells_num_atoms_in_cell[i]>0){
-      //      for(int j=0;j<dipole::internal::cells_num_atoms_in_cell[i];j++){
-      //         fprintf(stderr," index_atoms_array[%d][%d] = %d atom_in_cell_coords_array_x[%d][%d] = %f atom_in_cell_coords_array_y[%d][%d] = %f atom_in_cell_coords_array_z[%d][%d] = %f on rank = %d\n",i,j,cells::index_atoms_array[i][j],i,j,cells_atom_in_cell_coords_array_x[i][j],i,j,cells_atom_in_cell_coords_array_y[i][j],i,j,cells_atom_in_cell_coords_array_z[i][j],vmpi::my_rank);
-      //      }
-      //   }
-      //}
-      //MPI::COMM_WORLD.Barrier();
-      //fprintf(stderr,"\n !!!! PROBLEMS!!! just before printing atom_in_cell_coords_array_x,y,z arrays\n");
-      //for(int lc=0; lc<ceil(dipole::internal::cells_pos_and_mom_array.size()/4.); lc++){
-      //   if( (dipole::internal::cells_num_atoms_in_cell[lc]>0 && lc<dipole::internal::cells_num_cells) || (lc>=dipole::internal::cells_num_cells)){
-      //      fprintf(stderr,"cell=%d, num_atoms_in_cell=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,dipole::internal::cells_num_atoms_in_cell[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
-      //   }
-      //}
-      //MPI::COMM_WORLD.Barrier();
-      //std::cout << std::endl << std::flush;
 
       // allocate arrays to store data [nloccell x ncells]
       for(int lc=0;lc<dipole::internal::cells_num_local_cells; lc++){
@@ -327,11 +244,14 @@ namespace dipole{
 
          dipole::internal::rij_intra_zz.push_back(std::vector<double>());
          dipole::internal::rij_intra_zz[lc].resize(dipole::internal::cells_num_cells,0.0);
-
+         // resize B-field cells array
          dipole::cells_field_array_x.resize(dipole::internal::cells_num_cells,0.0);
          dipole::cells_field_array_y.resize(dipole::internal::cells_num_cells,0.0);
          dipole::cells_field_array_z.resize(dipole::internal::cells_num_cells,0.0);
-
+         // resize mu_0*Hd-field cells array
+         dipole::cells_mu0Hd_field_array_x.resize(dipole::internal::cells_num_cells,0.0);
+         dipole::cells_mu0Hd_field_array_y.resize(dipole::internal::cells_num_cells,0.0);
+         dipole::cells_mu0Hd_field_array_z.resize(dipole::internal::cells_num_cells,0.0);
       }
 
       // calculate matrix prefactors
@@ -341,22 +261,28 @@ namespace dipole{
       std::cout<< "Number of local cells= "<<dipole::internal::cells_num_local_cells << std::endl;
       std::cout<< "Number of  cells= "<<dipole::internal::cells_num_cells << std::endl;
 
+      //==========================================================
+      //----------------------------------------------------------
+      // Calculation of dipolar tensor
+      //----------------------------------------------------------
+      //==========================================================
+
       // loop over local cells
       for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
          // reference global cell ID
          //int i = dipole::internal::cells_local_cell_array[lc];
          int i = cells::cell_id_array[lc];
-         //fprintf(stderr,"lc = %d, i = %d, x = %f y = %f z = %f M = %e proc_cell_index_array1D[i] = %d on rank = %d\n",lc,i,dipole::internal::cells_pos_and_mom_array[4*i+0],dipole::internal::cells_pos_and_mom_array[4*i+1],dipole::internal::cells_pos_and_mom_array[4*i+2],dipole::internal::cells_pos_and_mom_array[4*i+3], dipole::internal::proc_cell_index_array1D[i],vmpi::my_rank);
-
          if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
          	// Loop over all other cells to calculate contribution to local cell
             for(int j=0;j<dipole::internal::cells_num_cells;j++){
 
+               /*==========================================================*/
+               /* Calculation of intra part of dipolar tensor              */
+               /*==========================================================*/
              	if(i!=j && dipole::internal::cells_num_atoms_in_cell[j]>0){
-                  //fprintf(stderr," >> inter >> i = %d, x = %f y = %f z = %f\tj = %d, x = %f y = %f z = %f proc_cell_index_array1D[j] = %d on rank = %d\n",i,dipole::internal::cells_pos_and_mom_array[4*i+0],dipole::internal::cells_pos_and_mom_array[4*i+1],dipole::internal::cells_pos_and_mom_array[4*i+2],j,dipole::internal::cells_pos_and_mom_array[4*j+0],dipole::internal::cells_pos_and_mom_array[4*j+1],dipole::internal::cells_pos_and_mom_array[4*j+2], dipole::internal::proc_cell_index_array1D[j],vmpi::my_rank);
-
+                  // create temporary variable to store components of tensor
                  	double tmp_rij_inter_xx = 0.0;
                  	double tmp_rij_inter_xy = 0.0;
                  	double tmp_rij_inter_xz = 0.0;
@@ -364,22 +290,16 @@ namespace dipole{
                  	double tmp_rij_inter_yy = 0.0;
                  	double tmp_rij_inter_yz = 0.0;
                  	double tmp_rij_inter_zz = 0.0;
-
-                 	/*double rx = cells_cell_coords_array_x[j] - cells_cell_coords_array_x[i]; // Angstroms
-                 	double ry = cells_cell_coords_array_y[j] - cells_cell_coords_array_y[i];
-                 	double rz = cells_cell_coords_array_z[j] - cells_cell_coords_array_z[i];*/
-
+                  // Calculate distance vectors between cells
                   double rx = dipole::internal::cells_pos_and_mom_array[4*j+0] - dipole::internal::cells_pos_and_mom_array[4*i+0];
                   double ry = dipole::internal::cells_pos_and_mom_array[4*j+1] - dipole::internal::cells_pos_and_mom_array[4*i+1];
                   double rz = dipole::internal::cells_pos_and_mom_array[4*j+2] - dipole::internal::cells_pos_and_mom_array[4*i+2];
 
                  	double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
                  	double rij_1 = 1.0/rij;
-                  //fprintf(stderr," >> i %d j %d rij/mc_size = %f on rank %d\n",i,j,(rij_1)/cells_macro_cell_size,vmpi::my_rank);
 
                   // If distance between macro-cells > cutoff nm => continuum approach
                   if( (rij_1)/cells_macro_cell_size > dipole::cutoff){
-                     //fprintf(stderr,"\n >> inter >> i = %d, x = %f y = %f z = %f\tj = %d, x = %f y = %f z = %f proc_cell_index_array1D[j] = %d rij/mc_size = %f on rank = %d\n",i,dipole::internal::cells_pos_and_mom_array[4*i+0],dipole::internal::cells_pos_and_mom_array[4*i+1],dipole::internal::cells_pos_and_mom_array[4*i+2],j,dipole::internal::cells_pos_and_mom_array[4*j+0],dipole::internal::cells_pos_and_mom_array[4*j+1],dipole::internal::cells_pos_and_mom_array[4*j+2], dipole::internal::proc_cell_index_array1D[j],(rij_1)/cells_macro_cell_size,vmpi::my_rank);
 
                   	double ex = rx*rij;
                   	double ey = ry*rij;
@@ -394,7 +314,6 @@ namespace dipole{
                   	dipole::internal::rij_inter_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
                   	dipole::internal::rij_inter_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
                   	dipole::internal::rij_inter_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
-                     //fprintf(stderr,"lc = %d j = %d rij3=%f\n ex=%f\tey=%f\tez=%f\n\trij_inter_xx = %f\trij_inter_xy = %f\trij_inter_xz = %f\n\trij_inter_yx = %f\trij_inter_yy = %f\trij_inter_yz = %f\n\trij_inter_zx = %f\trij_inter_zy = %f\trij_inter_zz = %f\n on rank = %d\n",lc,j,rij3,ex,ey,ez,internal::rij_inter_xx[lc][j],internal::rij_inter_xy[lc][j],internal::rij_inter_xz[lc][j],internal::rij_inter_xy[lc][j],internal::rij_inter_yy[lc][j],internal::rij_inter_yz[lc][j],internal::rij_inter_xz[lc][j],internal::rij_inter_yz[lc][j],internal::rij_inter_zz[lc][j],vmpi::my_rank);
                   }
                   else if( (1.0/rij)/cells_macro_cell_size <= dipole::cutoff){
                      for(int pi=0; pi<dipole::internal::cells_num_atoms_in_cell[i]; pi++){
@@ -411,16 +330,12 @@ namespace dipole{
                               fprintf(stderr,">>>>> (Inter)  Warning: atoms are overlapping in cells i=%d\tand j=%d\ton rank=%d\t<<<<<\n",i,j,vmpi::my_rank);
                               std::cout << ">>>>> (Inter) Warning: atoms are overlapping in cells i,j " << i << "\t" << j <<"<<<<<" << std::endl;
                               std::cout << "Cell and atomic coordinates used for calculation of Dipolar matrix" << std::endl;
-                              /*std::cout << " xj= "  << cells_cell_coords_array_x[j]  << " yj= "  << cells_cell_coords_array_y[j]  << " zj= "  << cells_cell_coords_array_z[j] << std::endl;
-                              std::cout << " xi= "  << cells_cell_coords_array_x[i]  << " yi= "  << cells_cell_coords_array_y[i]  << " zi= "  << cells_cell_coords_array_z[i] << std::endl;*/
                               std::cout << " xj= "  << dipole::internal::cells_pos_and_mom_array[4*j+0]  << " yj= "  << dipole::internal::cells_pos_and_mom_array[4*j+1]  << " zj= "  << dipole::internal::cells_pos_and_mom_array[4*j+2] << std::endl;
                               std::cout << " xi= "  << dipole::internal::cells_pos_and_mom_array[4*i+0]  << " yi= "  << dipole::internal::cells_pos_and_mom_array[4*i+1]  << " zi= "  << dipole::internal::cells_pos_and_mom_array[4*i+2] << std::endl;
-//                            std::cout << " rx_cell= "  << rx_cell << " ry_cell= " << ry_cell << " rz_cell= " << rz_cell << std::endl;
                               std::cout << " pi= "<<pi << " xpi= " << cells_atom_in_cell_coords_array_x[i][pi] << " ypi= " << cells_atom_in_cell_coords_array_y[i][pi] << " zpi= " << cells_atom_in_cell_coords_array_z[i][pi] << std::endl;
                               std::cout << " qj= "<<qj << " xqj= " << cells_atom_in_cell_coords_array_x[j][qj] << " yqj= " << cells_atom_in_cell_coords_array_y[j][qj] << " zqj= " << cells_atom_in_cell_coords_array_z[j][qj] << std::endl;
                               std::cout << " rx= "  << rx << " ry= " << ry << " rz= " << rz << std::endl;
                               std::cout << " rij= " << 1.0/rij << " = " << (1.0/rij)/((cells_macro_cell_size*sqrt(3)+0.01)) << " macro-cells" << std::endl;
-                              //return;
                               break;
                            }
 
@@ -437,7 +352,6 @@ namespace dipole{
                            tmp_rij_inter_yy += ((3.0*ey*ey - 1.0)*rij3);
                            tmp_rij_inter_yz += ((3.0*ey*ez      )*rij3);
                            tmp_rij_inter_zz += ((3.0*ez*ez - 1.0)*rij3);
-                           //fprintf(stderr,"i=%d %f %f %f,j=%d %f %f %f, rank=%d\n\t%f\t%f\t%f\n\t%f\t%f\t%f\n\t%f\t%f\t%f\n",i,cells_atom_in_cell_coords_array_x[i][pi],cells_atom_in_cell_coords_array_y[i][pi],cells_atom_in_cell_coords_array_z[i][pi],j,cells_atom_in_cell_coords_array_x[j][qj],cells_atom_in_cell_coords_array_y[j][qj],cells_atom_in_cell_coords_array_z[j][qj],vmpi::my_rank,tmp_rij_inter_xx,tmp_rij_inter_xy,tmp_rij_inter_xz,tmp_rij_inter_xy,tmp_rij_inter_yy,tmp_rij_inter_yz,tmp_rij_inter_yz,tmp_rij_inter_zz,tmp_rij_inter_xz);
                         }
                      }
 
@@ -457,24 +371,13 @@ namespace dipole{
                      dipole::internal::rij_inter_yz[lc][j] = dipole::internal::rij_inter_yz[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                      dipole::internal::rij_inter_zz[lc][j] = dipole::internal::rij_inter_zz[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                   }  // End of Inter part calculated atomicstically
-                  //fprintf(stderr,"lc = %d j = %d\n\trij_inter_xx = %f\trij_inter_xy = %f\trij_inter_xz = %f\n\trij_inter_yx = %f\trij_inter_yy = %f\trij_inter_yz = %f\n\trij_inter_zx = %f\trij_inter_zy = %f\trij_inter_zz = %f\n on rank = %d\n",lc,j,internal::rij_inter_xx[lc][j],internal::rij_inter_xy[lc][j],internal::rij_inter_xz[lc][j],internal::rij_inter_xy[lc][j],internal::rij_inter_yy[lc][j],internal::rij_inter_yz[lc][j],internal::rij_inter_xz[lc][j],internal::rij_inter_yz[lc][j],internal::rij_inter_zz[lc][j],vmpi::my_rank);
                } // End of Inter part
 
-               // Calculation of INTRA TERM of Dipolar interaction
-               //#ifdef MPICF
-               //// if the cell is not splitted on more cpus
-               ////else if( ((i==j && proc_cell_index_array1D[i]==proc_cell_index_array1D[j]) && dipole::internal::cells_num_atoms_in_cell[j]>0) ){
-             	//else if( ( (i==j && dipole::internal::proc_cell_index_array1D[i]==dipole::internal::proc_cell_index_array1D[j]) ||
-               //      (dipole::internal::proc_cell_index_array1D[i]!=dipole::internal::proc_cell_index_array1D[j] &&
-               //            ((dipole::internal::cells_pos_and_mom_array[4*i+0]==dipole::internal::cells_pos_and_mom_array[4*j+0]) &&
-               //             (dipole::internal::cells_pos_and_mom_array[4*i+1]==dipole::internal::cells_pos_and_mom_array[4*j+1]) &&
-               //             (dipole::internal::cells_pos_and_mom_array[4*i+2]==dipole::internal::cells_pos_and_mom_array[4*j+2]) )
-               //      ) ) && dipole::internal::cells_num_atoms_in_cell[j]>0){
-               //#else
+               /*==========================================================*/
+               /* Calculation of intra part of dipolar tensor              */
+               /*==========================================================*/
                else if( i==j && dipole::internal::cells_num_atoms_in_cell[j]>0){
-               //#endif
-                  //fprintf(stderr," >> intra >> j = %d, x = %f y = %f z = %f M = %e proc_cell_index_array1D[j] = %d on rank = %d\n",j,dipole::internal::cells_pos_and_mom_array[4*j+0],dipole::internal::cells_pos_and_mom_array[4*j+1],dipole::internal::cells_pos_and_mom_array[4*j+2],dipole::internal::cells_pos_and_mom_array[4*j+3],dipole::internal::proc_cell_index_array1D[j],vmpi::my_rank);
-
+                  // initialise temp vectors
                   double tmp_rij_intra_xx = 0.0;
                   double tmp_rij_intra_xy = 0.0;
                   double tmp_rij_intra_xz = 0.0;
@@ -485,16 +388,7 @@ namespace dipole{
 
                	for(int pi=0; pi<dipole::internal::cells_num_atoms_in_cell[i]; pi++){
                  		for(int qj=0; qj<dipole::internal::cells_num_atoms_in_cell[i]; qj++){
-                        //#ifdef MPICF
-                        //if( (dipole::internal::proc_cell_index_array1D[i]==dipole::internal::proc_cell_index_array1D[j] && pi!=qj) ||
-                        //    (dipole::internal::proc_cell_index_array1D[i]!=dipole::internal::proc_cell_index_array1D[j]) ){
-                        //#else
                   		if( pi!=qj ){
-                        //#endif
-
-                   			//double rx = cells_atom_in_cell_coords_array_x[i][qj] - cells_atom_in_cell_coords_array_x[i][pi];
-                   			//double ry = cells_atom_in_cell_coords_array_y[i][qj] - cells_atom_in_cell_coords_array_y[i][pi];
-                   			//double rz = cells_atom_in_cell_coords_array_z[i][qj] - cells_atom_in_cell_coords_array_z[i][pi];
 
                    			double rx = cells_atom_in_cell_coords_array_x[j][qj] - cells_atom_in_cell_coords_array_x[i][pi];
                    			double ry = cells_atom_in_cell_coords_array_y[j][qj] - cells_atom_in_cell_coords_array_y[i][pi];
@@ -508,13 +402,10 @@ namespace dipole{
                      			std::cout << "Cell and atomic coordinates used for calculation of Dipolar matrix" << std::endl;
                      			std::cout << " qj= "<<qj << " xqj= " << cells_atom_in_cell_coords_array_x[j][qj] << " yqj= " << cells_atom_in_cell_coords_array_y[j][qj] << " zqj= " << cells_atom_in_cell_coords_array_z[j][qj] << std::endl;
                      			std::cout << " pi= "<<pi << " xpi= " << cells_atom_in_cell_coords_array_x[i][pi] << " ypi= " << cells_atom_in_cell_coords_array_y[i][pi] << " zpi= " << cells_atom_in_cell_coords_array_z[i][pi] << std::endl;
-                              /*std::cout << " xj= "  << cells_cell_coords_array_x[j]  << " yj= "  << cells_cell_coords_array_y[j]  << " zj= "  << cells_cell_coords_array_z[j] << std::endl;
-                              std::cout << " xi= "  << cells_cell_coords_array_x[i]  << " yi= "  << cells_cell_coords_array_y[i]  << " zi= "  << cells_cell_coords_array_z[i] << std::endl;*/
                               std::cout << " xj= "  << dipole::internal::cells_pos_and_mom_array[4*j+0]  << " yj= "  << dipole::internal::cells_pos_and_mom_array[4*j+1]  << " zj= "  << dipole::internal::cells_pos_and_mom_array[4*j+2] << std::endl;
                               std::cout << " xi= "  << dipole::internal::cells_pos_and_mom_array[4*i+0]  << " yi= "  << dipole::internal::cells_pos_and_mom_array[4*i+1]  << " zi= "  << dipole::internal::cells_pos_and_mom_array[4*i+2] << std::endl;
                      			std::cout << " rx= "  << rx << " ry= " << ry << " rz= " << rz << std::endl;
                      			std::cout << " rij= " << 1.0/rij << " = " << (1.0/rij)/((cells_macro_cell_size*sqrt(3)+0.01)) << " macro-cells" << std::endl;
-                     			//return;
                               break;
                    			}
 
@@ -551,94 +442,11 @@ namespace dipole{
                 	dipole::internal::rij_intra_yy[lc][i] = dipole::internal::rij_intra_yy[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                 	dipole::internal::rij_intra_yz[lc][i] = dipole::internal::rij_intra_yz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                 	dipole::internal::rij_intra_zz[lc][i] = dipole::internal::rij_intra_zz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
-               }
-               //fprintf(stderr,"lc = %d j = %d i = %d\n\trij_intra_xx = %f\trij_intra_xy = %f\trij_intra_xz = %f\n\trij_intra_yx = %f\trij_intra_yy = %f\trij_intra_yz = %f\n\trij_intra_zx = %f\trij_intra_zy = %f\trij_intra_zz = %f\n on rank = %d\n",lc,j,i,internal::rij_intra_xx[lc][i],internal::rij_intra_xy[lc][i],internal::rij_intra_xz[lc][i],internal::rij_intra_xy[lc][i],internal::rij_intra_yy[lc][i],internal::rij_intra_yz[lc][i],internal::rij_intra_xz[lc][i],internal::rij_intra_yz[lc][i],internal::rij_intra_zz[lc][i],vmpi::my_rank);
+               } // End of Intra part
             }
 			}
 		}
 
-      //MPI::COMM_WORLD.Barrier();
-      //fprintf(stderr,"\n\n >>> printing inter part of dipolar matrix <<<< \n\n");
-      //MPI::COMM_WORLD.Barrier();
-      //// print to check dipolar martrix inter term
-      //for(unsigned int i=0; i<dipole::internal::rij_inter_xx.size(); i++){
-      //   if(dipole::internal::cells_num_atoms_in_cell[cells::cell_id_array[i]]>0){
-      //      for(unsigned int j=0; j<dipole::internal::rij_inter_xx[i].size(); j++){
-      //         if(dipole::internal::cells_num_atoms_in_cell[j]>0){
-      //            fprintf(stderr,"i = %d j = %d\n\trij_inter_xx = %f\trij_inter_xy = %f\trij_inter_xz = %f\n\trij_inter_yx = %f\trij_inter_yy = %f\trij_inter_yz = %f\n\trij_inter_zx = %f\trij_inter_zy = %f\trij_inter_zz = %f\n on rank = %d\n",i,j,internal::rij_inter_xx[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_yy[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_zz[i][j],vmpi::my_rank);
-      //         }
-      //      }
-      //   }
-      //}
-      //MPI::COMM_WORLD.Barrier();
-      //fprintf(stderr,"\n\n >>> printing intra part of dipolar matrix <<<< \n\n");
-      //MPI::COMM_WORLD.Barrier();
-      //// print to check dipolar matrix intra term
-      //for(unsigned int i=0; i<dipole::internal::rij_intra_xx.size(); i++){
-      //   for(unsigned int j=0; j<dipole::internal::rij_intra_xx[i].size(); j++){
-      //      fprintf(stderr,"i = %d j = %d\n\trij_intra_xx = %f\trij_intra_xy = %f\trij_intra_xz = %f\n\trij_intra_yx = %f\trij_intra_yy = %f\trij_intra_yz = %f\n\trij_intra_zx = %f\trij_intra_zy = %f\trij_intra_zz = %f\n on rank = %d\n",i,j,internal::rij_intra_xx[i][j],internal::rij_intra_xy[i][j],internal::rij_intra_xz[i][j],internal::rij_intra_xy[i][j],internal::rij_intra_yy[i][j],internal::rij_intra_yz[i][j],internal::rij_intra_xz[i][j],internal::rij_intra_yz[i][j],internal::rij_intra_zz[i][j],vmpi::my_rank);
-      //   }
-      //}
-      //MPI::COMM_WORLD.Barrier();
-
-	   ////------- CPUs OUTPUT Dij on different fiels ------------//
-      //// Set local output filename
-      //std::stringstream file_sstr;
-      //file_sstr << "Dij-";
-      //file_sstr << vmpi::my_rank;
-      //// Set CPUID on non-root process
-      ////if(vmpi::my_rank!=0){
-      //   //file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
-      ////}
-      ////file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
-      ////file_sstr << ".cfg";
-      //std::string cfg_file = file_sstr.str();
-      //const char* cfg_filec = cfg_file.c_str();
-
-      //// Output informative message to log file
-      //zlog << zTs() << "Outputting dipole matrix file " << cfg_file << " to disk" << std::endl;
-
-      //// Declare and open output file
-      //std::ofstream cfg_file_ofstr;
-      //cfg_file_ofstr.open (cfg_filec);
-
-      //// Every cpus print to check dipolar martrix inter term
-      //for(int i=0; i<dipole::internal::cells_num_local_cells; i++){
-      //   int lc = cells::cell_id_array[i];
-      //   if(dipole::internal::cells_num_atoms_in_cell[cells::cell_id_array[i]]>0){
-      //      for(unsigned int j=0; j<dipole::internal::rij_inter_xx[i].size(); j++){
-      //         if(dipole::internal::cells_num_atoms_in_cell[j]>0){
-      //            //fprintf(cfg_file_ofstr,"i = %d j = %d\n\trij_inter_xx = %f\trij_inter_xy = %f\trij_inter_xz = %f\n\trij_inter_yx = %f\trij_inter_yy = %f\trij_inter_yz = %f\n\trij_inter_zx = %f\trij_inter_zy = %f\trij_inter_zz = %f\n on rank = %d\n",i,j,internal::rij_inter_xx[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_xy[i][j],internal::rij_inter_yy[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_xz[i][j],internal::rij_inter_yz[i][j],internal::rij_inter_zz[i][j],vmpi::my_rank);
-      //            cfg_file_ofstr << "i = " << i << "\tlc = " << lc << "\t";
-      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+0] << "\t";
-      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+1] << "\t";
-      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*lc+2] << "\t";
-      //            cfg_file_ofstr << " j = " << j << "\t";
-      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+0] << "\t";
-      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+1] << "\t";
-      //            cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+2] << "\t";
-      //            cfg_file_ofstr << "\n";
-      //            cfg_file_ofstr << "rij_intra_xx = " << dipole::internal::rij_intra_xx[i][j] << "\trij_intra_xy = " << dipole::internal::rij_intra_xy[i][j] << "\trij_intra_xz = " << dipole::internal::rij_intra_xz[i][j] << "\n";
-      //            cfg_file_ofstr << "rij_intra_yx = " << dipole::internal::rij_intra_xy[i][j] << "\trij_intra_yy = " << dipole::internal::rij_intra_yy[i][j] << "\trij_intra_yz = " << dipole::internal::rij_intra_yz[i][j] << "\n";
-      //            cfg_file_ofstr << "rij_intra_zx = " << dipole::internal::rij_intra_xz[i][j] << "\trij_intra_zy = " << dipole::internal::rij_intra_yz[i][j] << "\trij_intra_zz = " << dipole::internal::rij_intra_zz[i][j] << "\n";
-      //            cfg_file_ofstr << "\n";
-      //            cfg_file_ofstr << "rij_inter_xx = " << dipole::internal::rij_inter_xx[i][j] << "\trij_inter_xy = " << dipole::internal::rij_inter_xy[i][j] << "\trij_inter_xz = " << dipole::internal::rij_inter_xz[i][j] << "\n";
-      //            cfg_file_ofstr << "rij_inter_yx = " << dipole::internal::rij_inter_xy[i][j] << "\trij_inter_yy = " << dipole::internal::rij_inter_yy[i][j] << "\trij_inter_yz = " << dipole::internal::rij_inter_yz[i][j] << "\n";
-      //            cfg_file_ofstr << "rij_inter_zx = " << dipole::internal::rij_inter_xz[i][j] << "\trij_inter_zy = " << dipole::internal::rij_inter_yz[i][j] << "\trij_inter_zz = " << dipole::internal::rij_inter_zz[i][j] << "\n";
-      //            cfg_file_ofstr << "\n";
-      //         }
-      //      }
-      //   }
-      //}
-
-      //cfg_file_ofstr.close();
-	   ////--------------------------------------------------/
-
-
-
-      //dipole::internal::cells_pos_and_mom_array = cells_pos_and_mom_array;
-      //dipole::internal::cells_num_atoms_in_cell = cells_num_atoms_in_cell;
-      //dipole::internal::cells_num_cells = cells_num_cells;
       cells::num_cells = dipole::internal::cells_num_cells;
       cells::num_atoms_in_cell = dipole::internal::cells_num_atoms_in_cell;
 
@@ -661,7 +469,6 @@ namespace dipole{
          t1 = time (NULL);
       #endif
 
-      //fprintf(stderr,"\n >>>>> PROBLEMS!!! \n");
       // now calculate fields
       dipole::calculate_field();
 
@@ -675,8 +482,163 @@ namespace dipole{
 
       zlog << zTs() << "Time required for dipole update: " << t2-t1 << "s." << std::endl;
 
+	   //-------------------------------------------------------//
+	   //------- CPUs OUTPUT Dij on different fiels ------------//
+	   //-------------------------------------------------------//
+      // Set local output filename
+      std::stringstream file_sstr;
+      file_sstr << "Dij-";
+      file_sstr << vmpi::my_rank;
+      // Set CPUID on non-root process
+      //if(vmpi::my_rank!=0){
+         //file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
+      //}
+      //file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
+      //file_sstr << ".cfg";
+      std::string cfg_file = file_sstr.str();
+      const char* cfg_filec = cfg_file.c_str();
+
+      // Output informative message to log file
+      zlog << zTs() << "Outputting dipole matrix file " << cfg_file << " to disk" << std::endl;
+
+      // Declare and open output file
+      std::ofstream cfg_file_ofstr;
+      cfg_file_ofstr.open (cfg_filec);
+
+      // Output Demag tensor only if first step of simulation since depending only on shape
+      if(sim::time == 0){
+
+         int num_atoms_magnetic = 0.0;   // Initialise tot num of magnetic atoms
+         // Calculate number of magnetic atoms
+         for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
+            int i = cells::cell_id_array[lc];
+            num_atoms_magnetic += dipole::internal::cells_num_atoms_in_cell[i];
+         }
+         //#ifdef MPICF
+         //   MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+         //#endif
+
+         // Define and initialise Demag factor N tensor components
+         double Nxx = 0.0;
+         double Nxy = 0.0;
+         double Nxz = 0.0;
+         double Nyy = 0.0;
+         double Nyz = 0.0;
+         double Nzz = 0.0;
+
+         // Every cpus print to check dipolar martrix inter term
+         for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
+            int i = cells::cell_id_array[lc];
+            if(dipole::internal::cells_num_atoms_in_cell[i]>0){
+
+               for(unsigned int j=0; j<dipole::internal::rij_inter_xx[lc].size(); j++){
+                  if(dipole::internal::cells_num_atoms_in_cell[j]>0){
+
+                    /* // Define prefactor for Hdemag and calculate self term
+                     // Add self-demagnetisation as 1/3V
+                     const double self_demag = 1.0/(3.0*dipole::internal::cells_volume_array[j]);
+	                  const double hdx = self_demag*(cells::mag_array_x[j]/9.27400915e-24);
+	                  const double hdy = self_demag*(cells::mag_array_y[j]/9.27400915e-24);
+	                  const double hdz = self_demag*(cells::mag_array_z[j]/9.27400915e-24);
+                     // normalise mag arrays
+	                  const double mx = cells::mag_array_x[j]/9.27400915e-24;
+	                  const double my = cells::mag_array_y[j]/9.27400915e-24;
+	                  const double mz = cells::mag_array_z[j]/9.27400915e-24;
+
+                     const double Mx = cells::mag_array_x[j]/(dipole::internal::cells_volume_array[j])*1.0e30;
+                     const double My = cells::mag_array_y[j]/(dipole::internal::cells_volume_array[j])*1.0e30;
+                     const double Mz = cells::mag_array_z[j]/(dipole::internal::cells_volume_array[j])*1.0e30;
+                     const double Mtot = std::sqrt(Mx*Mx + My*My + Mz*Mz);
+                     const double magtot = std::sqrt(cells::mag_array_x[j]*cells::mag_array_x[j]+cells::mag_array_y[j]*cells::mag_array_y[j]+cells::mag_array_z[j]*cells::mag_array_z[j]);
+	                  const double hd = self_demag*(magtot/9.27400915e-24); */
+
+                     // To obtain dipolar matrix free of units, multiply tensor by "factor"
+                     const double Vatomic = dipole::internal::cells_volume_array[j]*double(cells_num_atoms_in_unit_cell)/double(dipole::internal::cells_num_atoms_in_cell[j]);
+                     const double factor = Vatomic*double(dipole::internal::cells_num_atoms_in_cell[j]) * double(dipole::internal::cells_num_atoms_in_cell[i]);
+                     // Sum over dipolar tensor to obtain total tensor
+                     Nxx += factor*(dipole::internal::rij_intra_xx[lc][j]+dipole::internal::rij_inter_xx[lc][j]);
+                     Nxy += factor*(dipole::internal::rij_intra_xy[lc][j]+dipole::internal::rij_inter_xy[lc][j]);
+                     Nxz += factor*(dipole::internal::rij_intra_xz[lc][j]+dipole::internal::rij_inter_xz[lc][j]);
+                     Nyy += factor*(dipole::internal::rij_intra_yy[lc][j]+dipole::internal::rij_inter_yy[lc][j]);
+                     Nyz += factor*(dipole::internal::rij_intra_yz[lc][j]+dipole::internal::rij_inter_yz[lc][j]);
+                     Nzz += factor*(dipole::internal::rij_intra_zz[lc][j]+dipole::internal::rij_inter_zz[lc][j]);
+
+                     /*cfg_file_ofstr << "i = " << i << "\tlc = " << lc << "\t";
+                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*i+0] << "\t";
+                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*i+1] << "\t";
+                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*i+2] << "\t";
+                     cfg_file_ofstr << " j = " << j << "\t";
+                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+0] << "\t";
+                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+1] << "\t";
+                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+2] << "\t";
+                     cfg_file_ofstr << "\n";
+                     // Define total dipolar tensor = intra + inter tensors, in order to obtain demagnetisation tensor
+	 	  				   // Print Demag factor tensor
+	 	  				   cfg_file_ofstr << "rij_intra_xx = " << -1.0*((dipole::internal::rij_intra_xx[lc][j]+dipole::internal::rij_inter_xx[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)-hd )* 9.27400915e6/Mtot << "\trij_intra_xy = " << -1.0*((dipole::internal::rij_intra_xy[lc][j]+dipole::internal::rij_inter_xy[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\trij_intra_xz = " << -1.0*((dipole::internal::rij_intra_xz[lc][j]+dipole::internal::rij_inter_xz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\n";
+	 	  				   cfg_file_ofstr << "rij_intra_yx = " << -1.0*((dipole::internal::rij_intra_xy[lc][j]+dipole::internal::rij_inter_xy[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\trij_intra_yy = " << -1.0*((dipole::internal::rij_intra_yy[lc][j]+dipole::internal::rij_inter_yy[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)-hd )* 9.27400915e6/Mtot << "\trij_intra_yz = " << -1.0*((dipole::internal::rij_intra_yz[lc][j]+dipole::internal::rij_inter_yz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\n";
+	 	  				   cfg_file_ofstr << "rij_intra_zx = " << -1.0*((dipole::internal::rij_intra_xz[lc][j]+dipole::internal::rij_inter_xz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\trij_intra_zy = " << -1.0*((dipole::internal::rij_intra_yz[lc][j]+dipole::internal::rij_inter_yz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\trij_intra_zz = " << -1.0*((dipole::internal::rij_intra_zz[lc][j]+dipole::internal::rij_inter_zz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)-hd )* 9.27400915e6/Mtot << "\n";
+
+                     cfg_file_ofstr << "\nfactor = "<<factor << std::endl;
+                     cfg_file_ofstr << "rij_intra_xx = " << factor*dipole::internal::rij_intra_xx[lc][j] << "\trij_intra_xy = " << factor*dipole::internal::rij_intra_xy[lc][j] << "\trij_intra_xz = " << factor*dipole::internal::rij_intra_xz[lc][j] << "\n";
+                     cfg_file_ofstr << "rij_intra_yx = " << factor*dipole::internal::rij_intra_xy[lc][j] << "\trij_intra_yy = " << factor*dipole::internal::rij_intra_yy[lc][j] << "\trij_intra_yz = " << factor*dipole::internal::rij_intra_yz[lc][j] << "\n";
+                     cfg_file_ofstr << "rij_intra_zx = " << factor*dipole::internal::rij_intra_xz[lc][j] << "\trij_intra_zy = " << factor*dipole::internal::rij_intra_yz[lc][j] << "\trij_intra_zz = " << factor*dipole::internal::rij_intra_zz[lc][j] << "\n";
+
+                     cfg_file_ofstr << "\n";
+                     cfg_file_ofstr << "rij_inter_xx = " << factor*dipole::internal::rij_inter_xx[lc][j] << "\trij_inter_xy = " << factor*dipole::internal::rij_inter_xy[lc][j] << "\trij_inter_xz = " << factor*dipole::internal::rij_inter_xz[lc][j] << "\n";
+                     cfg_file_ofstr << "rij_inter_yx = " << factor*dipole::internal::rij_inter_xy[lc][j] << "\trij_inter_yy = " << factor*dipole::internal::rij_inter_yy[lc][j] << "\trij_inter_yz = " << factor*dipole::internal::rij_inter_yz[lc][j] << "\n";
+                     cfg_file_ofstr << "rij_inter_zx = " << factor*dipole::internal::rij_inter_xz[lc][j] << "\trij_inter_zy = " << factor*dipole::internal::rij_inter_yz[lc][j] << "\trij_inter_zz = " << factor*dipole::internal::rij_inter_zz[lc][j] << "\n";
+                     cfg_file_ofstr << "=====================================================\n";
+                     cfg_file_ofstr << "================DEMAG FACTOR TENSOR ====================\n";
+                     cfg_file_ofstr << "Nxx = " << Nxx        << "\tNxy = " << Nxy        << "\tNxz = " << Nxz        << "\n";
+                     cfg_file_ofstr << "Nyx = " << Nxy        << "\tNyy = " << Nyy        << "\tNyz = " << Nyz        << "\n";
+                     cfg_file_ofstr << "Nzx = " << Nxz        << "\tNzy = " << Nyz        << "\tNzz = " << Nzz        << "\n";
+                     cfg_file_ofstr << "========================================================\n"; */
+
+                  }
+               }
+            }
+         }
+
+         // Reduce values of num of magnetic atoms and demag factors on all procs
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &Nxx, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &Nxy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &Nxz, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &Nyy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &Nyz, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &Nzz, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         #endif
+
+         // Write demag factor to file for each proc
+         cfg_file_ofstr << "num_atoms_magnetic = " << num_atoms_magnetic << " sim::time = " << sim::time << std::endl;
+         cfg_file_ofstr << "================DEMAG FACTOR TENSOR ====================\n";
+         cfg_file_ofstr << "Nxx\t\tNxy\t\tNxz\t\tNyx\t\tNyy\tNyz\t\tNzx\t\tNzy\t\tNzz\n";
+         cfg_file_ofstr << Nxx << "\t" << Nxy << "\t" << Nxz << "\t";
+         cfg_file_ofstr << Nxy << "\t" << Nyy << "\t" << Nyz << "\t";
+         cfg_file_ofstr << Nxz << "\t" << Nyz << "\t" << Nzz << "\n";
+         cfg_file_ofstr << "========================================================\n";
+
+         // Compute demag factor tensor from dipolar matrix adding self term
+         Nxx = ((Nxx /num_atoms_magnetic)-4.0*M_PI/3.0)/(-4.0*M_PI);
+         Nxy =  (Nxy /num_atoms_magnetic              )/(-4.0*M_PI);
+         Nxz =  (Nxz /num_atoms_magnetic              )/(-4.0*M_PI);
+         Nyy = ((Nyy /num_atoms_magnetic)-4.0*M_PI/3.0)/(-4.0*M_PI);
+         Nyz =  (Nyz /num_atoms_magnetic              )/(-4.0*M_PI);
+         Nzz = ((Nzz /num_atoms_magnetic)-4.0*M_PI/3.0)/(-4.0*M_PI);
+
+         // Write demag factor to log file zlog << zTs() <<
+         zlog << zTs() << "Demagnetisation tensor in format Nxx\t\tNxy\t\tNxz\t\tNyx\t\tNyy\tNyz\t\tNzx\t\tNzy\t\tNzz :\n";
+         zlog << zTs() << Nxx << "\t" << Nxy << "\t" << Nxz << "\t";
+         zlog <<          Nxy << "\t" << Nyy << "\t" << Nyz << "\t";
+         zlog <<          Nxz << "\t" << Nyz << "\t" << Nzz << "\n";
+
+      } // close if loop for sim::time == 0
+      cfg_file_ofstr.close();
+	   //--------------------------------------------------/
+      // End of outptu dipolar tensor
+	   //--------------------------------------------------/
+
     	return;
-
     }
-
 } // end of dipole namespace

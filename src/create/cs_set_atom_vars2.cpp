@@ -92,6 +92,10 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	dipole::atom_dipolar_field_array_x.resize(atoms::num_atoms,0.0);
 	dipole::atom_dipolar_field_array_y.resize(atoms::num_atoms,0.0);
 	dipole::atom_dipolar_field_array_z.resize(atoms::num_atoms,0.0);
+   // Resize to zero atoms_mu0demag_field-x,y,z
+	dipole::atom_mu0demag_field_array_x.resize(atoms::num_atoms,0.0);
+	dipole::atom_mu0demag_field_array_y.resize(atoms::num_atoms,0.0);
+	dipole::atom_mu0demag_field_array_z.resize(atoms::num_atoms,0.0);
 
 
    // Set custom RNG for spin initialisation

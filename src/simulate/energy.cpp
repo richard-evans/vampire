@@ -524,7 +524,8 @@ double spin_surface_anisotropy_energy(const int atom, const int imaterial, const
 ///=====================================================================================
 ///
 double spin_magnetostatic_energy(const int atom, const double Sx, const double Sy, const double Sz){
-   return -1.0*(dipole::atom_dipolar_field_array_x[atom]*Sx+dipole::atom_dipolar_field_array_y[atom]*Sy+dipole::atom_dipolar_field_array_z[atom]*Sz);
+   //return -1.0*(dipole::atom_dipolar_field_array_x[atom]*Sx+dipole::atom_dipolar_field_array_y[atom]*Sy+dipole::atom_dipolar_field_array_z[atom]*Sz);
+   return -1.0*(dipole::atom_mu0demag_field_array_x[atom]*Sx+dipole::atom_mu0demag_field_array_y[atom]*Sy+dipole::atom_mu0demag_field_array_z[atom]*Sz);
 }
 
 /// @brief Calculates the total energy for a single spin.
