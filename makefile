@@ -55,8 +55,8 @@ ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
 LLVM_CFLAGS= -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
 LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
-GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi
-GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
+GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++0x
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -std=c++0x
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
@@ -197,6 +197,7 @@ MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 MPI_CRAYDB_OBJECTS=$(OBJECTS:.o=_craydb_mpi.o)
+MPI_ARCHER_OBJECTS=$(OBJECTS:.o=_archer_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 EXECUTABLE=vampire
@@ -275,6 +276,11 @@ parallel-cray: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(EXECUTABLE)
 $(MPI_CRAY_OBJECTS): obj/%_cray_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(CRAY_CFLAGS) $<
+
+parallel-archer: $(MPI_ARCHER_OBJECTS)
+	CC -DMPICF $(GCC_LDFLAGS) $(LIBS) $(MPI_ARCHER_OBJECTS) -o $(EXECUTABLE)
+$(MPI_ARCHER_OBJECTS): obj/%_archer_mpi.o: src/%.cpp
+	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $<
 
 parallel-llvm: $(MPI_LLVM_OBJECTS)
 	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(EXECUTABLE)
