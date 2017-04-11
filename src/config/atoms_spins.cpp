@@ -38,6 +38,12 @@ namespace internal{
 //------------------------------------------------------------------------------
 void atoms(){
 
+   // instantiate timer for total output time including overheads
+   vutil::vtimer_t total_timer;
+
+   // start timer
+   total_timer.start();
+
    //------------------------------------------
    // Output Meta Data
    //------------------------------------------
@@ -147,8 +153,11 @@ void atoms(){
       else io_time = write_data(filename, config::internal::local_buffer);
    #endif
 
+   // stop total timer
+   total_timer.stop();
+
    // Output bandwidth to log file
-   zlog << config::internal::io_data_size/io_time << " GB/s in " << io_time << "s " << std::endl;
+   zlog << config::internal::io_data_size/io_time << " GB/s in " << io_time << "s [ " << total_timer.elapsed_time() << " ]" << std::endl;
 
    // increment file counter
    sim::output_atoms_file_counter++;
