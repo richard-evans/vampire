@@ -553,7 +553,7 @@ namespace dipole{
 	                  const double hd = self_demag*(magtot/9.27400915e-24); */
 
                      // To obtain dipolar matrix free of units, multiply tensor by "factor"
-                     const double Vatomic = dipole::internal::cells_volume_array[j]*double(cells_num_atoms_in_unit_cell)/double(dipole::internal::cells_num_atoms_in_cell[j]);
+                     const double Vatomic = dipole::internal::cells_volume_array[j]/double(dipole::internal::cells_num_atoms_in_cell[j]);
                      const double factor = Vatomic*double(dipole::internal::cells_num_atoms_in_cell[j]) * double(dipole::internal::cells_num_atoms_in_cell[i]);
                      // Sum over dipolar tensor to obtain total tensor
                      Nxx += factor*(dipole::internal::rij_intra_xx[lc][j]+dipole::internal::rij_inter_xx[lc][j]);
