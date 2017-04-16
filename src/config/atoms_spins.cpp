@@ -157,7 +157,7 @@ void atoms(){
    total_timer.stop();
 
    // Output bandwidth to log file
-   zlog << config::internal::io_data_size/io_time << " GB/s in " << io_time << "s [ " << total_timer.elapsed_time() << " ]" << std::endl;
+   zlog << config::internal::io_data_size/io_time << " GB/s in " << io_time << " s [ " << total_timer.elapsed_time() << " s]" << std::endl;
 
    // increment file counter
    sim::output_atoms_file_counter++;
