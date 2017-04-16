@@ -78,7 +78,7 @@ void atoms(){
    std::string filename = file_sstr.str();
 
    // Output informative message to log file on root process
-   zlog << zTs() << "Outputting configuration file " << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << " to disk ";
+   zlog << zTs() << "Outputting configuration file " << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << " to disk " << std::flush;
 
    // Variable for calculating output bandwidth
    double io_time = 1.0e-12;

@@ -14,7 +14,7 @@
 
 namespace stats{
 
-   bool calculate_system_magnetization          = false;
+   bool calculate_system_magnetization          = true;
    bool calculate_material_magnetization        = false;
    bool calculate_height_magnetization          = false;
    bool calculate_material_height_magnetization = false;
