@@ -56,6 +56,11 @@ namespace sim{
       extern std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques
       extern std::vector<double> slonczewski_spin_polarization_unit_vector; // spin polarization direction
 
+      extern int num_monte_carlo_preconditioning_steps;
+
+      // internal function declarations
+      extern void monte_carlo_preconditioning();
+
    } // end of internal namespace
 } // end of sim namespace
 

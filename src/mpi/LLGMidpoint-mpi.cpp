@@ -37,8 +37,6 @@
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
 int set_LLG();
-int mpi_init_halo_swap();
-int mpi_complete_halo_swap();
 
 namespace sim{
 
@@ -59,7 +57,7 @@ int LLG_Midpoint_mpi(){
 	const int post_comm_ei = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 
 	// Initiate halo swap
-	mpi_init_halo_swap();
+	vmpi::mpi_init_halo_swap();
 
 	// Store initial spin positions (all)
 	for(int atom=pre_comm_si;atom<post_comm_ei;atom++){
@@ -105,7 +103,7 @@ int LLG_Midpoint_mpi(){
 
 
 	// Complete halo swap
-	mpi_complete_halo_swap();
+	vmpi::mpi_complete_halo_swap();
 
 	// Calculate fields (boundary)
 	calculate_spin_fields(post_comm_si,post_comm_ei);
@@ -150,7 +148,7 @@ int LLG_Midpoint_mpi(){
 	}
 
 	// Initiate second halo swap
-	mpi_init_halo_swap();
+	vmpi::mpi_init_halo_swap();
 
 	// Recalculate spin dependent fields (core)
 	calculate_spin_fields(pre_comm_si,pre_comm_ei);
@@ -187,7 +185,7 @@ int LLG_Midpoint_mpi(){
 	}
 
 	// Complete second halo swap
-	mpi_complete_halo_swap();
+	vmpi::mpi_complete_halo_swap();
 
 	// Recalculate spin dependent fields (boundary)
 	calculate_spin_fields(post_comm_si,post_comm_ei);

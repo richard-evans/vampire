@@ -35,8 +35,6 @@
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
 int set_LLG();
-int mpi_init_halo_swap();
-int mpi_complete_halo_swap();
 
 namespace sim{
 
@@ -72,7 +70,7 @@ int LLG_Heun_mpi(){
 		//----------------------------------------
 		// Initiate halo swap
 		//----------------------------------------
-		mpi_init_halo_swap();
+		vmpi::mpi_init_halo_swap();
 
 		//----------------------------------------
 		// Store initial spin positions (all)
@@ -138,7 +136,7 @@ int LLG_Heun_mpi(){
 		//----------------------------------------
 		// Complete halo swap
 		//----------------------------------------
-		mpi_complete_halo_swap();
+		vmpi::mpi_complete_halo_swap();
 
 		//----------------------------------------
 		// Calculate fields (boundary)
@@ -203,7 +201,7 @@ int LLG_Heun_mpi(){
 		//------------------------------------------
 		// Initiate second halo swap
 		//------------------------------------------
-		mpi_init_halo_swap();
+		vmpi::mpi_init_halo_swap();
 
 		//------------------------------------------
 		// Recalculate spin dependent fields (core)
@@ -241,7 +239,7 @@ int LLG_Heun_mpi(){
 		//------------------------------------------
 		// Complete second halo swap
 		//------------------------------------------
-		mpi_complete_halo_swap();
+		vmpi::mpi_complete_halo_swap();
 
 		//------------------------------------------
 		// Recalculate spin dependent fields (boundary)

@@ -35,14 +35,14 @@
 //		Locally allocated variables:
 //
 //=====================================================================================
-#ifdef MPICF
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "vmpi.hpp"
 #include <iostream>
 
+namespace vmpi{
 
-int mpi_init_halo_swap(){
+void mpi_init_halo_swap(){
 	//====================================================================================
 	//
 	///												mpi_init_halo_swap
@@ -58,7 +58,7 @@ int mpi_init_halo_swap(){
 	//====================================================================================
 
 	//using namespace mpi_comms;
-
+#ifdef MPICF
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
@@ -107,15 +107,16 @@ int mpi_init_halo_swap(){
 		}
 	}
 
+   #endif
 	//----------------------------------------------------------
 	// Return
 	//----------------------------------------------------------
 
-	return 0;
+	return;
 
 }
 
-int mpi_complete_halo_swap(){
+void mpi_complete_halo_swap(){
 	//====================================================================================
 	///
 	///												mpi_complete_halo_swap
@@ -125,6 +126,8 @@ int mpi_complete_halo_swap(){
 	///										Version 1.0 R Evans 16/09/2009
 	//
 	//====================================================================================
+
+   #ifdef MPICF
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){
@@ -153,7 +156,10 @@ int mpi_complete_halo_swap(){
 		//std::cout << atoms::z_spin_array[vmpi::recv_atom_translation_array[i]] << std::endl;
 	}
 
-	return 0;
+   #endif
+
+	return;
 
 }
-#endif
+
+} // end of namespace vmpi

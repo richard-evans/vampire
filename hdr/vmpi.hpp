@@ -107,6 +107,10 @@ namespace vmpi{
 	extern int init_mpi_comms(std::vector<cs::catom_t> & catom_array);
 	extern double SwapTimer(double, double&);
 
+   // functions for sending/receiving halo data
+   extern void mpi_init_halo_swap();
+   extern void mpi_complete_halo_swap();
+
 	// wrapper functions avoiding MPI library
 	extern void barrier();
 

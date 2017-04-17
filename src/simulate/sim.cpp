@@ -40,6 +40,9 @@
 ///=====================================================================================
 ///
 
+// Standard Libraries
+#include <iostream>
+
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
@@ -55,8 +58,8 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
-// Standard Libraries
-#include <iostream>
+// sim module headers
+#include "internal.hpp"
 
 namespace sim{
 	std::ofstream mag_file;
@@ -287,6 +290,9 @@ int run(){
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
+
+   // Precondition spins at equilibration temperature if specified
+   sim::internal::monte_carlo_preconditioning();
 
    // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
