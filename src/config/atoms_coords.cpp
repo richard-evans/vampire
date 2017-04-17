@@ -188,6 +188,8 @@ void atoms_coords()
    //---------------------------------------------------------------------------
    void collate_int_data(std::vector<int>& source, std::vector<int>& collated){
 
+      #ifdef MPICF
+
       std::vector<int> recv_counts;
       std::vector<int> displacements;
 
@@ -221,6 +223,8 @@ void atoms_coords()
 
       // Now collect data on master io process
       MPI_Gatherv(&source[0], source.size(), MPI_INT, &collated[0], &recv_counts[0], &displacements[0], MPI_INT, io_group_master_id, io_comm);
+
+      #endif
 
       return;
 
