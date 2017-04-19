@@ -30,20 +30,11 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	std::cout << "Reading in unit cell data..." << std::flush;
 	zlog << zTs() << "Reading in unit cell data..." << std::endl;
 
-	// ifstream declaration
-	std::ifstream inputfile;
+	// stringstream stream declaration
+	std::stringstream inputfile;
 
-	// Open file read only
-	inputfile.open(filename.c_str());
-
-	// Check for opening
-	if(!inputfile.is_open()){
-		terminaltextcolor(RED);
-		std::cerr << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
-		terminaltextcolor(WHITE);
-		zlog << zTs() << "Error! - cannot open unit cell input file: " << filename.c_str() << " Exiting" << std::endl;
-		err::vexit();
-	}
+   // fill input file stream with contents of file opened on master process
+   inputfile.str( vin::get_string(filename.c_str(), "input", -1) );
 
 	// keep record of current line
 	unsigned int line_counter=0;

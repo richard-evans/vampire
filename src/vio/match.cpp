@@ -58,7 +58,6 @@ namespace vin{
     ///=====================================================================================
     ///
     int match(string const key, string const word, string const value, string const unit, int const line){
-        //int match(string const key, string const word, string const value, string const unit, int const line, std::ifstream& inputfile){
 
         std::string test;
 
@@ -1869,12 +1868,11 @@ namespace vin{
         }
         return EXIT_SUCCESS;
     }
-    
 
     // temporary array of materials for reading in material data
     std::vector<mp::materials_t> read_material(0);
 
-    int read_mat_file(std::string const matfile, int const LineNumber){
+    int read_mat_file(std::string const matfile, int const line_number){
 
 
         // resize temporary materials array for storage of variables
@@ -1886,7 +1884,7 @@ namespace vin{
 
         // Open file read only
         std::stringstream inputfile;
-        inputfile.str (GetString(matfile.c_str()));
+        inputfile.str( vin::get_string(matfile.c_str(), "material", line_number) );
         //-------------------------------------------------------
         // Material 0
         //-------------------------------------------------------
@@ -2369,14 +2367,11 @@ namespace vin{
             else
             test="geometry-file";
             if(word==test){
-                // Open geometry file
-                std::ifstream gfile(value.c_str());
-                if(!gfile.is_open()){
-                terminaltextcolor(RED);
-                    std::cerr << "Error - geometry file " << value.c_str() << " not found, exiting!" << std::endl;
-                    terminaltextcolor(WHITE);
-                return EXIT_FAILURE;
-                }
+
+               // Open geometry file
+               std::stringstream gfile;
+          		gfile.str( vin::get_string(value.c_str(), "material", line) );
+
                 gfile >> read_material[super_index].geometry;
                 if((read_material[super_index].geometry<3) || (read_material[super_index].geometry>100)){
                     terminaltextcolor(RED);
@@ -2419,13 +2414,9 @@ namespace vin{
             test="lattice-anisotropy-file";
             if(word==test){
 
-                // Open file and check for success
-                std::ifstream latt_file(value.c_str());
-                if(!latt_file.is_open()){
-                    std::cerr << "Error: lattice file " << value.c_str() << " specified on line " << line << " of material file not found. Exiting." << std::endl;
-                    zlog << zTs() << "Error: lattice file " << value.c_str() << " specified on line " << line << " of material file not found. Exiting." << std::endl;
-                    return EXIT_FAILURE;
-                }
+                // Open lattice file
+                std::stringstream latt_file;
+          		 latt_file.str( vin::get_string(value.c_str(), "material", line) );
 
                 // specify number of points to be read
                 int num_pts=0;

@@ -131,15 +131,6 @@ double write_data_text(std::string filename, const std::vector<double> &buffer){
    // close output file
    ofile.close();
 
-   // open file at end
-   std::ifstream in(filename.c_str(), std::ios::binary | std::ios::ate);
-
-   // get file size (bytes)
-   double local_data_size = double(in.tellg());
-
-   // close file
-   in.close();
-
    // return bandwidth
    return timer.elapsed_time();
 

@@ -45,9 +45,8 @@ namespace vin{
    int match_config(std::string const, std::string const, std::string const, int const);
 
    //----------------------------------------------------------------------------------
-   //Funciton protypes for functions inside: read.cpp
+   //Function protypes for functions inside: read.cpp
    //----------------------------------------------------------------------------------
-   std::string GetString(std::string const filename);
    int read(std::string const filename);
    int read_mat_file(std::string const, int const);
 

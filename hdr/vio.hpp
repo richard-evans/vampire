@@ -86,6 +86,9 @@ namespace vin{
 
    extern std::vector<double> DoublesFromString(std::string value);
 
+   // function to read file on master process and return a std::string of its contents
+   extern std::string get_string(std::string const filename, std::string source_file_name, int line);
+
    extern std::vector<mp::materials_t> read_material;
 
 }
