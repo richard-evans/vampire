@@ -145,7 +145,8 @@ namespace vmpi{
 		}
 	}
 	else{
-		MPI_Send(&num_atoms,1,MPI_INT,0,34, MPI_COMM_WORLD);
+      int nat = num_atoms; // local non-const variable for fossilised MPI libraries
+      MPI_Send(&nat,1,MPI_INT,0,34, MPI_COMM_WORLD);
 	}
 
 	//--------------------------------------------------------------------------

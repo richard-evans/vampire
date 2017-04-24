@@ -207,7 +207,7 @@ void atoms_coords()
       }
 
       // get local data size (int required for MPI Gatherv call)
-      const int num_data = source.size();
+      int num_data = source.size();
 
       // gather number of data to be received from each processor in io group
       MPI_Gather(&num_data, 1, MPI_INT, &recv_counts[0], 1, MPI_INT, io_group_master_id, io_comm);

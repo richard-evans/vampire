@@ -158,7 +158,7 @@ namespace config{
                if(io_group_master) io_group_displacements.resize(io_group_size,0);
 
                // get local data size
-               const int num_data = local_buffer.size();
+               int num_data = local_buffer.size();
 
                // gather number of data to be received from each processor in io group
                MPI_Gather(&num_data, 1, MPI_INT, &io_group_recv_counts[0], 1, MPI_INT, io_group_master_id, io_comm);
