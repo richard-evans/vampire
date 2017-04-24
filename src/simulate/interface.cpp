@@ -42,7 +42,7 @@ namespace sim{
          sim::internal::slonczewski_spin_polarization_unit_vector = u;
          return true;
       }
-      test="monte-carlo-preconditioning-steps";
+      test="preconditioning-steps";
       if(word==test){
          int n = atoi(value.c_str());
          // Test for valid range

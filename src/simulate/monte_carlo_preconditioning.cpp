@@ -19,6 +19,7 @@
 #include "sim.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "vutil.hpp"
 
 // sim module headers
 #include "internal.hpp"
@@ -41,12 +42,18 @@ void monte_carlo_preconditioning(){
    //if no steps specified, then do nothing
    if(sim::internal::num_monte_carlo_preconditioning_steps == 0) return;
 
+   // instantiate timer
+   vutil::vtimer_t timer;
+
+   // start timer
+   timer.start();
+
    // set preconditioning temperature to equilibration temperature
    sim::temperature = sim::Teq;
 
    // print informative messages to screen and log
-   std::cout << "Preconditioning spin configuration with Monte Carlo at T = " << sim::temperature << " K" << std::flush;
-   zlog << zTs() << "Preconditioning spin configuration with Monte Carlo at T = " << sim::temperature << " K ..." << std::endl;
+   std::cout << "Preconditioning spin configuration at T = " << sim::temperature << " K" << std::flush;
+   zlog << zTs() << "Preconditioning spin configuration at T = " << sim::temperature << " K ..." << std::endl;
 
    // calculate number of steps to calculate
    // Note: In parallel this includes boundary spin leading to
@@ -147,9 +154,13 @@ void monte_carlo_preconditioning(){
 
    } // end of preconditioning steps loop
 
+   // start timer
+   timer.stop();
+
    // print informative messages to screen and log
    std::cout << "Done!" << std::endl;
-   zlog << "Preconditioning completed!" << std::endl;
+   std::cout << "Preconditioning time for " << sim::internal::num_monte_carlo_preconditioning_steps << " steps: " << timer.elapsed_time() << " s" << std::endl;
+   zlog << "Preconditioning completed in " << timer.elapsed_time() << " s" << std::endl;
 
    return;
 

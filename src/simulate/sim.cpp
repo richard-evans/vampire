@@ -291,9 +291,6 @@ int run(){
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
-   // Precondition spins at equilibration temperature if specified
-   sim::internal::monte_carlo_preconditioning();
-
    // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
 		#ifdef MPICF
@@ -301,6 +298,13 @@ int run(){
 			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
 			vmpi::start_time=MPI_Wtime(); // reset timer
 		#endif
+   }
+
+   // Precondition spins at equilibration temperature
+   sim::internal::monte_carlo_preconditioning();
+
+   // For MPI version, calculate initialisation time
+   if(vmpi::my_rank==0){
 		std::cout << "Starting Simulation with Program ";
 		zlog << zTs() << "Starting Simulation with Program ";
 	}
