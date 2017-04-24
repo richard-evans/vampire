@@ -169,17 +169,19 @@ namespace vout{
 		}
 		#endif
 
-		// check for open ofstream
-		if(!zmag.is_open()){
-			// check for checkpoint continue and append data
-			if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
-			// otherwise overwrite file
-			else{
-				zmag.open("output",std::ofstream::trunc);
-				// write file header information
-				if(vmpi::my_rank==0) write_output_file_header(zmag, file_output_list);
-			}
-		}
+      // check for open ofstream on root process only
+      if(vmpi::my_rank == 0){
+         if(!zmag.is_open()){
+            // check for checkpoint continue and append data
+            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
+            // otherwise overwrite file
+            else{
+               zmag.open("output",std::ofstream::trunc);
+               // write file header information
+               write_output_file_header(zmag, file_output_list);
+            }
+         }
+      }
 
 		// Only output 1/output_rate time steps
 		if(sim::time%vout::output_rate==0){
