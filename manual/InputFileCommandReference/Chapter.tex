@@ -291,10 +291,12 @@ $ is the demagnetisation factor of the macroscopic sample. The components of the
 {\zicf sim:constraint-angle-phi-increment}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-increment}\\
 
 {\zicf sim:monte-carlo-algorithm}\addcontentsline{toc}{subsection}{sim:monte-carlo-algorithm}
-      spin-flip
-      uniform
-      angle
-      hinzke-nowak\\
+\begin{itemize}
+  \item[] spin-flip
+  \item[] uniform
+  \item[] angle
+  \item[] hinzke-nowak
+\end{itemize}\\
 
 {\zicf sim:checkpoint flag [default false]}\addcontentsline{toc}{subsection}{sim:checkpoint}
     Enables checkpointing of spin configuration at end of simulation
@@ -304,6 +306,16 @@ sim:save-checkpoint-rate=1
 sim:load-checkpoint=restart
 sim:load-checkpoint=continue\\
 
+{\zicf sim:preconditioning-steps
+    integer [default 0]}\addcontentsline{toc}{subsection}{sim:preconditioning-steps}
+    defines a number of preconditioning steps to thermalise the spins at
+    sim:equilibration-temperature prior to the main simulation starting. The
+    preconditioner uses a Monte Carlo algorithm to develop a Boltzmann spin
+    distribution prior to the main program starting. The method works in serial
+    and parallel mode and is especially efficient for materials with low Gilbert
+    damping. The preconditioning steps are applied after loading a checkpoint,
+    allowing you to take a low temperature starting state and thermally
+    equilibrate it.\\
 
 \section*{Data output}
 \addcontentsline{toc}{section}{Data output}
