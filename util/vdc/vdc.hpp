@@ -23,6 +23,7 @@ namespace vdc{
    extern bool verbose;
    extern bool xyz;
    extern bool povray;
+   extern bool cells;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -52,6 +53,11 @@ namespace vdc{
 
    extern std::vector<double> spins;
 
+   extern unsigned int total_cells;
+   extern std::vector<int> atom_cell_id;
+   extern std::vector<double> cell_coords;
+   extern std::vector< std::vector< std::vector <double> > > cell_magnetization;
+
    // array to store subsidiary data file names
    extern std::vector <std::string> coord_filenames;
    extern std::vector <std::string> spin_filenames;
@@ -63,6 +69,10 @@ namespace vdc{
    void output_xyz_file();
    void output_inc_file(unsigned int spin_file_id);
    void output_povray_file();
+
+   void initialise_cells();
+   void output_cell_file(unsigned int spin_file_id);
+
 }
 
 #endif //VDC_H_

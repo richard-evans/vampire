@@ -30,6 +30,8 @@ int main(int argc, char* argv[]){
    // process coordinates
    vdc::process_coordinates();
 
+   vdc::initialise_cells();
+
    // process spin files
    vdc::process_spins();
 

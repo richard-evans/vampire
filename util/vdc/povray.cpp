@@ -31,15 +31,15 @@ namespace vdc{
 //------------------------------------------------------------------------------
 void output_inc_file(unsigned int spin_file_id){
 
-   // output informative message to user
-   std::cout << "Writing file " << std::flush;
-
    // Open Povray Include File
 	std::stringstream incpov_file_sstr;
 	incpov_file_sstr << "spins-";
 	incpov_file_sstr << std::setfill('0') << std::setw(8) << spin_file_id;
 	incpov_file_sstr << ".inc";
 	std::string incpov_file = incpov_file_sstr.str();
+
+   // output informative message to user
+   std::cout << "Writing provray file " << incpov_file << "..." << std::flush;
 
    // temporary variables defining spin colours
    double red=0.0, green=0.0, blue=1.0;

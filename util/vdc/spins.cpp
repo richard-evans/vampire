@@ -36,6 +36,8 @@ void process_spins(){
    int min_file_id = 0;
    int max_file_id = 99999999;
 
+   vdc::initialise_cells();
+
    unsigned int last_file_id = max_file_id;
 
    // loop over all spin files
@@ -52,6 +54,8 @@ void process_spins(){
 
       // output povray file
       if(vdc::povray) output_inc_file(file_id);
+
+      vdc::output_cell_file(file_id);
 
       last_file_id = file_id;
 
