@@ -67,6 +67,7 @@ namespace internal
    extern std::vector<uint64_t> local_output_atom_list; // list of atom numbers to output to disk
 
    extern uint64_t total_output_atoms; // total number of atoms to be outputted (all processors)
+   extern uint64_t total_output_cells; // total number of cells to be outputted
 
    // Data buffers for parallel i/o
    extern std::vector<double> local_buffer;

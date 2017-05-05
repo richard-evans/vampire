@@ -58,6 +58,7 @@ namespace config{
       std::vector<uint64_t> local_output_atom_list(0); // list of atom numbers to output to disk
 
       uint64_t total_output_atoms = 0; // total number of atoms to be outputted (all processors)
+      uint64_t total_output_cells = 0; // total number of cells to be outputted
 
       // Data buffers for parallel i/o
       std::vector<double> local_buffer(0);

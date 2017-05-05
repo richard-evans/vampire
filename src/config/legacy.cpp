@@ -349,11 +349,8 @@ double legacy_atoms_coords()
 void legacy_cells()
 {
 
-   // check calling of routine if error checking is activated
-   if (err::check == true)
-   {
-      std::cout << "vout::cells has been called" << std::endl;
-   }
+   // instantiate timer
+   vutil::vtimer_t timer;
 
    // Set local output filename
    std::stringstream file_sstr;
@@ -372,11 +369,14 @@ void legacy_cells()
                               cells::num_local_cells);
    #endif
 
+   // start timer
+   timer.start();
+
    // Output masterfile header on root process
    if (vmpi::my_rank == 0)
    {
 
-      zlog << zTs() << "Outputting cell configuration " << sim::output_cells_file_counter << " to disk." << std::endl;
+      zlog << zTs() << "Outputting cell configuration " << sim::output_cells_file_counter << " to disk" << std::flush;
 
       // Declare and open output file
       std::ofstream cfg_file_ofstr;
@@ -406,12 +406,22 @@ void legacy_cells()
          if (cells::num_atoms_in_cell[cell] > 0)
          {
             cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell] << "\t";
-            cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << std::endl;
+            if(dipole::activated) cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << "\n";
+            else cfg_file_ofstr << "\n";
          }
       }
 
       cfg_file_ofstr.close();
    }
+
+   // stop the timer
+   timer.stop();
+
+   double data_size = double(config::internal::total_output_cells) * 3.0 * sizeof(double);
+   if(dipole::activated) data_size = data_size * 2.0;
+   const double io_time = timer.elapsed_time();
+
+   zlog << " of size " << data_size*1.0e-6 << " MB [ " << data_size*1.0e-9/timer.elapsed_time() << " GB/s in " << io_time << " s ]" << std::endl;
 
    sim::output_cells_file_counter++;
 
@@ -456,11 +466,8 @@ void legacy_cells()
 void legacy_cells_coords()
 {
 
-   // check calling of routine if error checking is activated
-   if (err::check == true)
-   {
-      std::cout << "vout::atoms_coords has been called" << std::endl;
-   }
+   // instantiate timer
+   vutil::vtimer_t timer;
 
    // Set local output filename
    std::stringstream file_sstr;
@@ -469,12 +476,14 @@ void legacy_cells_coords()
    std::string cfg_file = file_sstr.str();
    const char *cfg_filec = cfg_file.c_str();
 
+   // start timer
+   timer.start();
+
    // Output masterfile header on root process
    if (vmpi::my_rank == 0)
    {
 
-      std::cout << "Outputting cell coordinates to disk." << std::endl;
-      zlog << zTs() << "Outputting cell coordinates to disk." << std::endl;
+      zlog << zTs() << "Outputting cell coordinates to disk" << std::flush;
 
       // Declare and open output file
       std::ofstream cfg_file_ofstr;
@@ -498,15 +507,26 @@ void legacy_cells_coords()
       cfg_file_ofstr << "#" << std::endl;
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
 
+      config::internal::total_output_cells = 0;
+
       for (int cell = 0; cell < cells::num_cells; cell++)
       {
          if (cells::num_atoms_in_cell[cell] > 0)
          {
             cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::pos_and_mom_array[4 * cell + 0] << "\t" << cells::pos_and_mom_array[4 * cell + 1] << "\t" << cells::pos_and_mom_array[4 * cell + 2] << std::endl;
+            config::internal::total_output_cells++;
          }
       }
       cfg_file_ofstr.close();
    }
+
+   // stop the timer
+   timer.stop();
+
+   const double data_size = double(config::internal::total_output_cells) * 2.0 * sizeof(int) * 3.0 * sizeof(double);
+   const double io_time = timer.elapsed_time();
+
+   zlog << " of size " << data_size*1.0e-6 << " MB [ " << data_size*1.0e-9/timer.elapsed_time() << " GB/s in " << io_time << " s ]" << std::endl;
 
    return;
 }
