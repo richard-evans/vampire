@@ -50,12 +50,15 @@ void output_inc_file(unsigned int spin_file_id){
 
    for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
 
-      // calculate rgb components
-      //vdc::rgb(red, green, blue);
+      // get z-magnetization for colour constrast
+      const double sz = spins[3*atom+2];
+
+      // calculate rgb components based on z magnetization
+      vdc::rgb(sz, red, green, blue);
 
       std::stringstream line;
       line << "spinm"<< type[atom] << "(" <<
-              coordinates[3*atom+0] << "," << coordinates[3*atom+1] << "," << coordinates[3*atom+2] << "," <<
+              coordinates[3*atom+0]-vdc::system_centre[0] << "," << coordinates[3*atom+1]-vdc::system_centre[1] << "," << coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
               spins[3*atom+0] << "," << spins[3*atom+1] << "," << spins[3*atom+2] << "," <<
               red << "," << green << "," << blue << ")\n";
 
@@ -107,7 +110,7 @@ void output_povray_file(){
 	pfile << "#declare CX=" << size*vec[0]*6.0 << ";" << std::endl;
 	pfile << "#declare CY=" << size*vec[1]*6.0 << ";" << std::endl;
 	pfile << "#declare CZ=" << size*vec[2]*6.0 << ";" << std::endl;
-	pfile << "#declare ref=0.5;" << std::endl;
+	pfile << "#declare ref=0.05;" << std::endl;
 	pfile << "global_settings { assumed_gamma 2.0 }" << std::endl;
 	pfile << "background { color Gray30 }" << std::endl;
 
@@ -161,7 +164,7 @@ void output_povray_file(){
    pifile << "Width = 800" << std::endl;
    pifile << "Height = 600" << std::endl;
    pifile << "Antialias = On" << std::endl;
-   pifile << "Antialias_Threshold = 0.03" << std::endl;
+   pifile << "Antialias_Threshold = 0.3" << std::endl;
    pifile << "Output_File_Type = N" << std::endl;
    pifile << "Initial_Frame = " << vdc::start_file_id << std::endl;
    pifile << "Final_Frame = " << vdc::final_file_id << std::endl;

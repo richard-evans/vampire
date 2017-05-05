@@ -77,6 +77,8 @@ namespace vdc{
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);
 
+   void rgb( const double& ireal, double &red, double &green, double &blue);
+
 }
 
 #endif //VDC_H_

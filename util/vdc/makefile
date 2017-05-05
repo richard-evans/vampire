@@ -16,6 +16,7 @@ GCC_CFLAGS=-O3 -std=c++0x
 # Objects
 OBJECTS= \
 obj/cells.o \
+obj/colour.o \
 obj/coords.o \
 obj/data.o \
 obj/main.o \
