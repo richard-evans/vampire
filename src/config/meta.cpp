@@ -75,7 +75,7 @@ namespace config{
          // otherwise set indexed files
          else{
             for(int fid = 0; fid < config::internal::num_io_groups; fid++){
-               scmf << "atoms-coords-" << std::setfill('0') << std::setw(5) << fid << ".data" << "\n";
+               scmf << "atoms-coords-" << std::setfill('0') << std::setw(6) << fid << ".data" << "\n";
             }
             // flush data to disk
             scmf << std::flush;
@@ -131,7 +131,7 @@ namespace config{
          // otherwise set indexed files
          else{
             for(int fid = 0; fid < config::internal::num_io_groups; fid++){
-               ofile << "spins-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << "-" << std::setfill('0') << std::setw(5) << fid << ".data" << "\n";
+               ofile << "spins-" << std::setfill('0') << std::setw(8) << sim::output_atoms_file_counter << "-" << std::setfill('0') << std::setw(6) << fid << ".data" << "\n";
             }
             // flush data to disk
             ofile << std::flush;
