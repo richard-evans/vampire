@@ -1,37 +1,73 @@
-# Git Ignore file
-# Ignore object file
+#----------------------------------------------
+# Git Ignore file for vampire source code
+#----------------------------------------------
+
+#----------------------------------------------
+# Ignore object files
+#----------------------------------------------
 *.o
-#Ignore temporary editor files
+
+#----------------------------------------------
+# Ignore temporary editor files
+#----------------------------------------------
 *~
 *.swp
-#Ignore error files
-*.err
-#Povray files
-*.pov
-# Mac files
-*.DS_Store
-# Other sundry files
+
+#----------------------------------------------
+# Povray files
+#----------------------------------------------
 *.png
+*.pov
 *.inc
-*old.cpp
-*old.hpp
+
+#----------------------------------------------
+# OSX/macOS files
+#----------------------------------------------
+*.DS_Store
+
+#----------------------------------------------
+# Other sundry files
+#----------------------------------------------
+#*old.cpp
+#*old.hpp
 *.bkp
+*.json
+
+#----------------------------------------------
+# Manual files to be ignored
+#----------------------------------------------
+vampire_manual.pdf
+vampire_manual.out
+vampire_manual.synctex.gz
+
+
+
+#----------------------------------------------
 # Data file formats in vampire
+#----------------------------------------------
 *.cfg
 *.data
 *.meta
-info
-vampire*
-cfg2povray
-cfg2rasmol
 crystal.xyz
 log
 grain
-log.*
-info
 output
-run/unit-cell-creator
 MPI-compute-times
 MPI-wait-times
-*.json
+
+#----------------------------------------------
+# Executables
+#----------------------------------------------
+vampire-serial
+vampire-parallel
+vdc.x
+
+#----------------------------------------------
+# Obsolete
+#----------------------------------------------
+cfg2povray
+cfg2rasmol
+log.*
+run/unit-cell-creator
+
 #EOF
