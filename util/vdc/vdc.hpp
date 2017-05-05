@@ -54,6 +54,10 @@ namespace vdc{
    extern std::vector<double> spins;
 
    extern unsigned int total_cells;
+   extern unsigned int nx_cells;
+   extern unsigned int ny_cells;
+   extern unsigned int nz_cells;
+
    extern std::vector<int> atom_cell_id;
    extern std::vector<double> cell_coords;
    extern std::vector< std::vector< std::vector <double> > > cell_magnetization;

@@ -11,6 +11,9 @@
 //
 
 // C++ standard library headers
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -204,28 +207,19 @@ void read_coord_data(){
             // check for open file
             if(!ifile.is_open()){
                std::cerr << "Error! Coordinate data file \"" << coord_filenames[f] << "\" cannot be opened. Exiting" << std::endl;
+               std::cerr << "Error code: " << std::strerror(errno) << std::endl;
                exit(1);
             }
             // read number of atoms
             ifile.read( (char*)&num_atoms_in_file,sizeof(uint64_t) );
-	    std::cout << num_atoms_in_file << std::endl;
             // read type array
             ifile.read((char*)&vdc::type[atom_id], sizeof(int)*num_atoms_in_file);
             // read category array
             ifile.read((char*)&vdc::category[atom_id], sizeof(int)*num_atoms_in_file);
-            ifile.read((char*)&vdc::coordinates[atom_id], sizeof(double)*num_atoms_in_file*3);
+            ifile.read((char*)&vdc::coordinates[3*atom_id], sizeof(double)*num_atoms_in_file*3);
             // increment counter
             atom_id += num_atoms_in_file;
             ifile.close();
-
-	    std::ofstream ofile;
-	    ofile.open("coords.txt");
-	    ofile << num_atoms_in_file << std::endl;
-	    for(int i=0; i< vdc::type.size(); i++){
-	      ofile << i << "\t" << vdc::type[i] << "\t" << vdc::category[i] << "\t" << vdc::coordinates[3*i+0] << "\t" << vdc::coordinates[3*i+1]<< "\t"<<vdc::coordinates[3*i+2] << std::endl; 
-	    }
-
-	    ofile.close();
 
             break;
          }

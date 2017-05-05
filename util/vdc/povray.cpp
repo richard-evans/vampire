@@ -39,7 +39,7 @@ void output_inc_file(unsigned int spin_file_id){
 	std::string incpov_file = incpov_file_sstr.str();
 
    // output informative message to user
-   std::cout << "Writing provray file " << incpov_file << "..." << std::flush;
+   std::cout << "   Writing povray file " << incpov_file << "..." << std::flush;
 
    // temporary variables defining spin colours
    double red=0.0, green=0.0, blue=1.0;
@@ -115,8 +115,8 @@ void output_povray_file(){
 	pfile << "Set_Camera_Sky(<0,0,1>)" << std::endl;
 	pfile << "light_source { <2*CX, 2*CY, 2*CZ> color White}" << std::endl;
 
-   pfile << "#declare Initial_Frame = " << vdc::start_file_id << std::endl;
-   pfile << "#declare Final_Frame = " << vdc::final_file_id << std::endl;
+   pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
+   pfile << "#declare Final_Frame = " << vdc::final_file_id << ";" << std::endl;
 
    // Output material specific macros
 	for(int imat=0; imat < vdc::materials.size(); imat++){

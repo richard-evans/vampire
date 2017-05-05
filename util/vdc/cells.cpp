@@ -56,6 +56,11 @@ namespace vdc{
       unsigned int ny = ceil( (atoms_max[1] - atoms_min[1])/cell_size );
       unsigned int nz = ceil( (atoms_max[2] - atoms_min[2])/cell_size );
 
+      // save in vdc namespace for calculating newlines for gnuplot compatible 3d data
+      vdc::nx_cells = nx;
+      vdc::ny_cells = ny;
+      vdc::nz_cells = nz;
+
       unsigned int num_cells[3] = { nx, ny, nz };
 
       // allocate storage for cell coordinates and cell magnetization
@@ -98,7 +103,7 @@ namespace vdc{
          }
       }
 
-      // Allocate storare for cell id for each atom
+      // Allocate storage for cell id for each atom
       vdc::atom_cell_id.resize(vdc::num_atoms,0);
 
       // Determine number of cells in x,y,z
@@ -108,16 +113,16 @@ namespace vdc{
       for(int atom = 0; atom < vdc::num_atoms; atom++ ){
 
          // temporary for atom coordinates
-         double c[3] = { vdc::coordinates[3*atom+0],
-                         vdc::coordinates[3*atom+1],
-                         vdc::coordinates[3*atom+2] };
+         double c[3] = { vdc::coordinates[3*atom+0] - atoms_min[0],
+                         vdc::coordinates[3*atom+1] - atoms_min[1],
+                         vdc::coordinates[3*atom+2] - atoms_min[2] };
 
          // Determine supercell coordinates for atom (rounding down)
          int scc[3] = { int( c[0] / cell_size ),
                         int( c[1] / cell_size ),
                         int( c[2] / cell_size ) };
 
-         // If no error for range then assign atom to cell
+         // Assign atom to cell
          vdc::atom_cell_id[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
 
 
@@ -130,10 +135,19 @@ namespace vdc{
    void output_cell_file(unsigned int spin_file_id){
 
       // output informative message to user
-      if(vdc::verbose) std::cout << "Calculating cell magnetization " << vdc::cell_magnetization.size() << std::endl;
+      if(vdc::verbose) std::cout << "   Calculating cell magnetization for " << vdc::cell_magnetization.size() << " cells" << std::endl;
 
       // total number of materials + 1
       const unsigned int tmid = 1+vdc::materials.size();
+
+      // initialise magnetization to zero
+      for(int cell = 0; cell < vdc::total_cells; cell++){
+         for(int m = 0; m < tmid; m++){
+            for(int e = 0; e < 4; e++){
+               vdc::cell_magnetization[cell][m][e] = 0.0;
+            }
+         }
+      }
 
       // calculate cell magnetizations in 1D
       for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
@@ -168,16 +182,20 @@ namespace vdc{
             const double mz = vdc::cell_magnetization[cell][m][2];
             const double mm = vdc::cell_magnetization[cell][m][3];
 
-            const double inorm = 1.0/sqrt(mx*mx + my*my + mz*mz);
+            const double norm = sqrt(mx*mx + my*my + mz*mz);
+            const double inorm = 1.0/norm;
 
-            vdc::cell_magnetization[cell][m][0] = vdc::cell_magnetization[cell][m][0]*inorm;
-            vdc::cell_magnetization[cell][m][1] = vdc::cell_magnetization[cell][m][1]*inorm;
-            vdc::cell_magnetization[cell][m][2] = vdc::cell_magnetization[cell][m][2]*inorm;
-            if(m == tmid -1) vdc::cell_magnetization[cell][m][3] = 1.0/inorm; // mu_B
-            else vdc::cell_magnetization[cell][m][3] = vdc::cell_magnetization[cell][m][3]*inorm; // m/m_s
+            vdc::cell_magnetization[cell][m][0] = mx*inorm;
+            vdc::cell_magnetization[cell][m][1] = my*inorm;
+            vdc::cell_magnetization[cell][m][2] = mz*inorm;
+
+            // set magnetization of final cell to actual magnetization in mu_B
+            if(m == tmid -1) vdc::cell_magnetization[cell][m][3] = norm; // mu_B
+            // Otherwise normalise for material magnetization
+            else vdc::cell_magnetization[cell][m][3] = norm/mm; // m/m_s
 
          }
-      }
+	 }
 
       // output cells to disk
       std::ofstream ofile;
@@ -190,7 +208,7 @@ namespace vdc{
       std::string cell_file_name = cell_file_sstr.str();
 
       // output informative message to user
-      std::cout << "Writing cell file " << cell_file_name << "..." << std::flush;
+      std::cout << "   Writing cell file " << cell_file_name << "..." << std::flush;
 
       ofile.open(cell_file_name.c_str());
 
@@ -200,6 +218,12 @@ namespace vdc{
             ofile << vdc::cell_magnetization[cell][m][0] << "\t" << vdc::cell_magnetization[cell][m][1] << "\t" << vdc::cell_magnetization[cell][m][2] << "\t" << vdc::cell_magnetization[cell][m][3] << "\t";
          }
          ofile << "\n";
+
+         // output new lines after each row of x,y,z for gnuplot compatible data (to be fixed)
+         //bool nlx = ( (cell+1) % vdc::nx_cell == 0);
+         //bool nlx = ( (cell+1) % vdc::ny_cell == 0);
+         //bool nlx = ( (cell+1) % vdc::nz_cell == 0);
+         //if((cell+1)%1000 == 0 ) ofile << "\n"; // gnuplot format
       }
 
       ofile.close();

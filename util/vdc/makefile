@@ -11,12 +11,11 @@ GCC=g++
 LIBS=-lstdc++
 
 # Flags
-GCC_CFLAGS=-O3 -std=c++11
+GCC_CFLAGS=-O3 -std=c++0x
 
 # Objects
 OBJECTS= \
 obj/cells.o \
-obj/command.o \
 obj/coords.o \
 obj/data.o \
 obj/main.o \

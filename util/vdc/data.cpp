@@ -21,7 +21,7 @@ namespace vdc{
    bool verbose = true; // flag to specify verbosity of output to user
    bool xyz = true; // flag to specify crystal.xyz file output
    bool povray = true; // flag to specify povray file output
-   bool cells = true;
+   bool cells = false; // flag to specify cells output
 
    format_t format;
 
@@ -44,6 +44,10 @@ namespace vdc{
 
    // cell data
    unsigned int total_cells = 0;
+   unsigned int nx_cells = 1;
+   unsigned int ny_cells = 1;
+   unsigned int nz_cells = 1;
+
    std::vector<int> atom_cell_id;
    std::vector<double> cell_coords;
    std::vector< std::vector< std::vector <double> > > cell_magnetization;

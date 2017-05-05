@@ -11,6 +11,7 @@
 //
 
 // C++ standard library headers
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -36,7 +37,7 @@ void process_spins(){
    int min_file_id = 0;
    int max_file_id = 99999999;
 
-   vdc::initialise_cells();
+   if(vdc::cells) vdc::initialise_cells();
 
    unsigned int last_file_id = max_file_id;
 
@@ -55,7 +56,7 @@ void process_spins(){
       // output povray file
       if(vdc::povray) output_inc_file(file_id);
 
-      vdc::output_cell_file(file_id);
+      if(vdc::cells) vdc::output_cell_file(file_id);
 
       last_file_id = file_id;
 
@@ -100,16 +101,19 @@ bool read_spin_metadata(unsigned int file_id){
    filename << std::setfill('0') << std::setw(8) << file_id;
    filename << ".meta";
 
-   if(vdc::verbose) std::cout << "Reading spin meta-data file " << filename.str() << std::endl;
-
    // open spins metadata file
    std::ifstream smfile;
    smfile.open(filename.str());
 
-   // check for open file
+   // check for open file, if not open then end program, end of snapshots
    if(!smfile.is_open()){
       return false;
    }
+
+   // Metafile found - inform the user and process data
+   if(vdc::verbose) std::cout << "--------------------------------------------------------------------" << std::endl;
+   std::cout << "Processing snapshot " << std::setfill('0') << std::setw(8) << file_id << std::endl;
+   if(vdc::verbose) std::cout << "   Reading spin meta-data file " << filename.str() << std::endl;
 
    std::string line; // line string variable
 
@@ -121,7 +125,7 @@ bool read_spin_metadata(unsigned int file_id){
    line.erase (line.begin(), line.begin()+22);
    unsigned int num_spin_files=atoi(line.c_str());
 
-   if(vdc::verbose) std::cout << "   Number of files: " << num_spin_files << std::endl;
+   if(vdc::verbose) std::cout << "   Number of data files: " << num_spin_files << std::endl;
 
    vdc::spin_filenames.resize(0);
 
@@ -143,7 +147,7 @@ bool read_spin_metadata(unsigned int file_id){
 //------------------------------------------------------------------------------
 void read_spin_data(unsigned int file_id){
 
-   if(vdc::verbose) std::cout << "Reading spin data... " << std::flush;
+   if(vdc::verbose) std::cout << "   Reading spin data... " << std::flush;
 
    // resize arrays
    if(vdc::spins.size() != 3*vdc::num_atoms) vdc::spins.resize(3*vdc::num_atoms);
@@ -163,13 +167,13 @@ void read_spin_data(unsigned int file_id){
             ifile.open(spin_filenames[f].c_str(), std::ios::binary); // check for errors
             // check for open file
             if(!ifile.is_open()){
-               std::cerr << "Error! Spin data file \"" << spin_filenames[f] << "\" cannot be opened. Exiting" << std::endl;
+               std::cerr << std::endl << "   Error! Spin data file \"" << spin_filenames[f] << "\" cannot be opened. Exiting" << std::endl;
                exit(1);
             }
             // read number of atoms
             ifile.read( (char*)&num_atoms_in_file,sizeof(uint64_t) );
             // read spin data
-            ifile.read((char*)&vdc::spins[atom_id], sizeof(double)*num_atoms_in_file*3);
+            ifile.read((char*)&vdc::spins[atom_id*3], sizeof(double)*num_atoms_in_file*3);
             // increment counter
             atom_id += num_atoms_in_file;
             ifile.close();
@@ -182,7 +186,7 @@ void read_spin_data(unsigned int file_id){
             ifile.open(spin_filenames[f].c_str()); // check for errors
             // check for open file
             if(!ifile.is_open()){
-               std::cerr << "Error! Spin data file \"" << spin_filenames[f] << "\" cannot be opened. Exiting" << std::endl;
+               std::cerr << std::endl << "   Error! Spin data file \"" << spin_filenames[f] << "\" cannot be opened. Exiting" << std::endl;
                exit(1);
             }
 
