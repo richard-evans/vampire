@@ -200,9 +200,10 @@ MPI_CRAYDB_OBJECTS=$(OBJECTS:.o=_craydb_mpi.o)
 MPI_ARCHER_OBJECTS=$(OBJECTS:.o=_archer_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
-EXECUTABLE=vampire
+EXECUTABLE=vampire-serial
+PEXECUTABLE=vampire-parallel
 
-all: $(OBJECTS) serial
+all: $(OBJECTS) serial parallel vdc
 
 # Serial Targets
 serial: $(OBJECTS)
@@ -262,60 +263,60 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE).p
+	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(PEXECUTABLE).p
 #export OMPI_CXX=icc
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
 
 parallel-intel: $(MPI_ICC_OBJECTS)
-	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<intel: $(MPI_ICC_OBJECTS)
 
 parallel-cray: $(MPI_CRAY_OBJECTS)
-	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_CRAY_OBJECTS): obj/%_cray_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(CRAY_CFLAGS) $<
 
 parallel-archer: $(MPI_ARCHER_OBJECTS)
-	CC -DMPICF $(GCC_LDFLAGS) $(LIBS) $(MPI_ARCHER_OBJECTS) -o $(EXECUTABLE)
+	CC -DMPICF $(GCC_LDFLAGS) $(LIBS) $(MPI_ARCHER_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_ARCHER_OBJECTS): obj/%_archer_mpi.o: src/%.cpp
 	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $<
 
 parallel-llvm: $(MPI_LLVM_OBJECTS)
-	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_LLVM_OBJECTS): obj/%_llvm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(LLVM_CFLAGS) $<
 
 parallel-pathscale: $(MPI_PCC_OBJECTS)
-	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_PCC_OBJECTS): obj/%_p_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_CFLAGS) $<
 
 parallel-ibm: $(MPI_IBM_OBJECTS)
-	$(MPICC) $(IBM_LDFLAGS) $(MPI_IBM_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(IBM_LDFLAGS) $(MPI_IBM_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
 
 parallel-debug: $(MPI_GCCDB_OBJECTS)
-	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE).p-debug
+	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(PEXECUTABLE).p-debug
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<
 
 parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
-	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(PEXECUTABLE)
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
 parallel-cray-debug: $(MPI_CRAY_OBJECTS)
-	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_CRAYDB_OBJECTS): obj/%_craydb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(CCC_CFLAGS) $<
 
 parallel-pathscale-debug: $(MPI_PCCDB_OBJECTS)
-	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(PEXECUTABLE)
 
 $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
@@ -344,3 +345,23 @@ tidy:
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
+
+vdc:
+	$(MAKE) -B -C util/vdc/
+
+install:
+	echo "Preparing installation package"
+	rm -rf vampire.pkg
+	mkdir vampire.pkg
+	mkdir vampire.pkg/bin
+	cp vampire-* vampire.pkg/bin/
+	cp util/vdc/vdc vampire.pkg/bin/
+	mkdir vampire.pkg/examples
+	cp input vampire.pkg/examples/
+	cp Co.mat vampire.pkg/examples/
+	sudo mv -f vampire.pkg /opt/vampire
+	sudo echo "/opt/vampire/bin" > /etc/paths.d/vampire_path
+
+uninstall:
+	rm -rf /opt/vampire
+	rm -f /etc/paths.d/vampire_path

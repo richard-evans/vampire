@@ -32,6 +32,7 @@
 #*old.hpp
 *.bkp
 *.json
+vampire.pkg # installation package
 
 #----------------------------------------------
 # Manual files to be ignored
@@ -39,8 +40,6 @@
 vampire_manual.pdf
 vampire_manual.out
 vampire_manual.synctex.gz
-
-
 
 #----------------------------------------------
 # Data file formats in vampire
