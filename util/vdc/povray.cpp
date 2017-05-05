@@ -97,6 +97,7 @@ void output_povray_file(){
    pfile << "//-------------------------------------------------------------------------" << std::endl;
    pfile << "// Povray file generated using vampire" << std::endl;
    pfile << "//-------------------------------------------------------------------------" << std::endl;
+   pfile << "#version 3.5;" << std::endl;
 	pfile << "#include \"colors.inc\"" << std::endl;
 	pfile << "#include \"metals.inc\""	<< std::endl;
 	pfile << "#include \"screen.inc\""	<< std::endl;
@@ -149,6 +150,23 @@ void output_povray_file(){
 
    // close output file
 	pfile.close();
+
+   //---------------------------------------------------------------------------
+   // output povray ini file for rendering all files by default
+   //---------------------------------------------------------------------------
+   std::ofstream pifile;
+	pifile.open("spins.ini");
+
+   pifile << "Input_File_Name = \"spins.pov\"" << std::endl;
+   pifile << "Width = 800" << std::endl;
+   pifile << "Height = 600" << std::endl;
+   pifile << "Antialias = On" << std::endl;
+   pifile << "Antialias_Threshold = 0.03" << std::endl;
+   pifile << "Output_File_Type = N" << std::endl;
+   pifile << "Initial_Frame = " << vdc::start_file_id << std::endl;
+   pifile << "Final_Frame = " << vdc::final_file_id << std::endl;
+
+   pifile.close();
 
    return;
 
