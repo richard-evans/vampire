@@ -1483,6 +1483,14 @@ namespace vin{
         }
         else
         //--------------------------------------------------------------------
+        test="mean-magnetisation";
+        if(word==test){
+            stats::calculate_system_magnetization=true;
+            output_list.push_back(48);
+            return EXIT_SUCCESS;
+        }
+        else
+        //--------------------------------------------------------------------
         test="material-magnetisation";
         if(word==test){
             stats::calculate_material_magnetization=true;
@@ -1495,6 +1503,14 @@ namespace vin{
         if(word==test){
             stats::calculate_material_magnetization=true;
             output_list.push_back(9);
+            return EXIT_SUCCESS;
+        }
+        else
+        //--------------------------------------------------------------------
+        test="material-mean-magnetisation";
+        if(word==test){
+            stats::calculate_material_magnetization=true;
+            output_list.push_back(49);
             return EXIT_SUCCESS;
         }
         else

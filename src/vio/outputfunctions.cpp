@@ -314,6 +314,16 @@ namespace vout{
 		stream << sim::fmr_field << "\t";
 	}
 
+   // Output Function 48
+	void mean_mvec(std::ostream& stream){
+		stream << stats::system_magnetization.output_normalized_mean_magnetization();
+	}
+
+   // Output Function 49
+	void mat_mean_mvec(std::ostream& stream){
+		stream << stats::material_magnetization.output_normalized_mean_magnetization();
+	}
+
 	// Output Function 60
 	void MPITimings(std::ostream& stream){
 

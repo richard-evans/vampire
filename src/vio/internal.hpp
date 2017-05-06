@@ -104,6 +104,9 @@ namespace vout{
    void height_mvec_actual(std::ostream& stream);
    void material_height_mvec_actual(std::ostream& stream);
    void fmr_field_strength(std::ostream& stream);
+	void mean_mvec(std::ostream& stream);
+	void mat_mean_mvec(std::ostream& stream);
+
    void MPITimings(std::ostream& stream);
 
    //-------------------------------------------------------------------------

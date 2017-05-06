@@ -325,6 +325,12 @@ namespace vout{
 					case 47:
 						vout::fmr_field_strength(zmag);
 						break;
+               case 48:
+						vout::mean_mvec(zmag);
+						break;
+               case 49:
+						vout::mat_mean_mvec(zmag);
+						break;
 					case 60:
 						vout::MPITimings(zmag);
 						break;
@@ -464,6 +470,12 @@ namespace vout{
 						break;
 					case 47:
 						vout::fmr_field_strength(std::cout);
+						break;
+               case 48:
+						vout::mean_mvec(std::cout);
+						break;
+               case 49:
+						vout::mat_mean_mvec(std::cout);
 						break;
 					case 60:
 						vout::MPITimings(std::cout);
