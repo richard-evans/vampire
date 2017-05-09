@@ -19,6 +19,7 @@ namespace stats{
    bool calculate_height_magnetization          = false;
    bool calculate_material_height_magnetization = false;
    bool calculate_system_susceptibility         = false;
+   bool calculate_material_susceptibility         = false;
 
    magnetization_statistic_t system_magnetization;
    magnetization_statistic_t material_magnetization;
@@ -26,6 +27,7 @@ namespace stats{
    magnetization_statistic_t material_height_magnetization;
 
    susceptibility_statistic_t system_susceptibility;
+   susceptibility_statistic_t material_susceptibility;
 
    //-----------------------------------------------------------------------------
    // Shared variables used for statistics calculation

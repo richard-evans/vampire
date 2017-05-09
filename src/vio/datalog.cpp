@@ -331,6 +331,9 @@ namespace vout{
                case 49:
 						vout::mat_mean_mvec(zmag);
 						break;
+               case 50:
+						vout::mean_material_susceptibility(zmag);
+						break;
 					case 60:
 						vout::MPITimings(zmag);
 						break;
@@ -476,6 +479,9 @@ namespace vout{
 						break;
                case 49:
 						vout::mat_mean_mvec(std::cout);
+						break;
+               case 50:
+						vout::mean_material_susceptibility(std::cout);
 						break;
 					case 60:
 						vout::MPITimings(std::cout);

@@ -385,6 +385,11 @@ Computing the torque on each material is particularly useful for determining equ
 \end{equation*}
 where $\alpha = x,y,z,m$ giving the directional components of the magnetization in $x$, $y$ and $z$ respectively as well as the longitudinal susceptibility $\chi_m$. The data is output in four columns $\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$. The susceptibility is useful for identifying the critical temperature for a system as well as atomistic parametrization of the micromagnetic  Landau-Lifshitz-Bloch (LLB) equation.\\
 
+{\zicf output:material-mean-susceptibility}\addcontentsline{toc}{subsection}{output:mean-material-susceptibility} outputs
+the components of the magnetic susceptibility $\chi$ for each defined material in the system. The data is output in sets of
+four columns $\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$ for each material. In multi-sublattice systems the susceptibility of
+each sublattice can be different.\\
+
 {\zicf output:electron-temperature}\addcontentsline{toc}{subsection}{output:electron-temperature} outputs the instantaneous electron temperature as calculated from the two temperature model.\\
 
 {\zicf output:phonon-temperature}\addcontentsline{toc}{subsection}{output:phonon-temperature} outputs the instantaneous phonon (lattice) temperature as calculated from the two temperature model.\\

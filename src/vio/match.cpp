@@ -1578,6 +1578,15 @@ namespace vin{
             output_list.push_back(21);
             return EXIT_SUCCESS;
         }
+        //--------------------------------------------------------------------
+        test="material-mean-susceptibility";
+        if(word==test){
+            // Set flags for calculations of susceptibility and magnetization
+            stats::calculate_material_susceptibility=true;
+            stats::calculate_material_magnetization=true;
+            output_list.push_back(50);
+            return EXIT_SUCCESS;
+        }
         //-------------------------------------------------------------------
         test="electron-temperature"; // identical to temperature
         if(word==test){

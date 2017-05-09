@@ -49,7 +49,7 @@ void susceptibility_statistic_t::initialize(stats::magnetization_statistic_t& ma
    mean_susceptibility_squared.resize(4*num_elements,0.0);
    mean_absolute_susceptibility.resize(4*num_elements,0.0);
    mean_absolute_susceptibility_squared.resize(4*num_elements,0.0);
-   
+
    // copy saturation data
    saturation = mag_stat.saturation;
 
@@ -88,17 +88,17 @@ void susceptibility_statistic_t::calculate(const std::vector<double>& magnetizat
       mean_susceptibility[4*id + 1]+=my*mm;
       mean_susceptibility[4*id + 2]+=mz*mm;
       mean_susceptibility[4*id + 3]+=mm;
-      
+
       mean_susceptibility_squared[4*id + 0]+=mx*mx*mm*mm;
       mean_susceptibility_squared[4*id + 1]+=my*my*mm*mm;
       mean_susceptibility_squared[4*id + 2]+=mz*mz*mm*mm;
       mean_susceptibility_squared[4*id + 3]+=mm*mm;
-      
+
       mean_absolute_susceptibility[4*id + 0]+=fabs(mx*mm);
       mean_absolute_susceptibility[4*id + 1]+=fabs(my*mm);
       mean_absolute_susceptibility[4*id + 2]+=fabs(mz*mm);
       mean_absolute_susceptibility[4*id + 3]+=mm;
-      
+
       mean_absolute_susceptibility_squared[4*id + 0]+=fabs(mx*mx*mm*mm);
       mean_absolute_susceptibility_squared[4*id + 1]+=fabs(my*my*mm*mm);
       mean_absolute_susceptibility_squared[4*id + 2]+=fabs(mz*mz*mm*mm);

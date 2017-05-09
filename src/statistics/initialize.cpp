@@ -77,6 +77,7 @@ namespace stats{
 
       // system susceptibility
       if(stats::calculate_system_susceptibility) stats::system_susceptibility.initialize(stats::system_magnetization);
+      if(stats::calculate_material_susceptibility) stats::material_susceptibility.initialize(stats::system_magnetization);
 
       return;
    }

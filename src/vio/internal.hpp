@@ -106,6 +106,7 @@ namespace vout{
    void fmr_field_strength(std::ostream& stream);
 	void mean_mvec(std::ostream& stream);
 	void mat_mean_mvec(std::ostream& stream);
+   void mean_material_susceptibility(std::ostream& stream);
 
    void MPITimings(std::ostream& stream);
 
