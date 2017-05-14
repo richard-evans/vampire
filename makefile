@@ -73,13 +73,6 @@ CRAY_LDFLAGS= -I./hdr -I./src/qvoronoi
 
 # Objects
 OBJECTS= \
-obj/create/create_system2.o \
-obj/create/cs_create_crystal_structure2.o \
-obj/create/cs_create_system_type2.o \
-obj/create/cs_create_neighbour_list2.o \
-obj/create/cs_particle_shapes.o \
-obj/create/cs_set_atom_vars2.o \
-obj/create/cs_voronoi2.o \
 obj/data/atoms.o \
 obj/data/category.o \
 obj/data/grains.o \

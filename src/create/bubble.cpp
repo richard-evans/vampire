@@ -22,17 +22,6 @@
 namespace create{
    namespace internal{
 
-      struct core_radius_t{
-         int mat;
-         double radius;
-      };
-
-      /// comparison function for reverse order sorting
-      static bool compare_radius(core_radius_t first,core_radius_t second){
-         if(first.radius<second.radius) return false;
-         else return true;
-      }
-
       void bubble(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain){
 
 			// Set particle radius

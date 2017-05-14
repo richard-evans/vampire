@@ -34,6 +34,11 @@ namespace create{
       enum host_alloy_d_t { homogeneous, random, granular };
       enum slave_alloy_d_t { native, reciprocal, uniform };
 
+      struct core_radius_t{
+         int mat;
+         double radius;
+      };
+
       // simple class for slave material properties
       class slave_material_t{
 
@@ -119,16 +124,26 @@ namespace create{
       extern void layers(std::vector<cs::catom_t> & catom_array);
       extern void roughness(std::vector<cs::catom_t> & catom_array);
       extern void bubble(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
-      extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void bulk(std::vector<cs::catom_t> & catom_array);
       extern void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void cube(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void cylinder(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void ellipsoid(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void teardrop(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void truncated_octahedron(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+
       extern void voronoi_substructure(std::vector<cs::catom_t> & catom_array);
 
       void voronoi_grain_rounding(std::vector <std::vector <double> > & grain_coord_array,
                                   std::vector <std::vector <std::vector <double> > > &  grain_vertices_array);
 
       void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_array,
-                                      std::vector <std::vector <std::vector <double> > > &  grain_vertices_array,
-                                      bool include_boundary_grains);
+                                  std::vector <std::vector <std::vector <double> > > &  grain_vertices_array,
+                                  bool include_boundary_grains);
+
+      extern bool compare_radius(core_radius_t first,core_radius_t second);
 
    } // end of internal namespace
 } // end of create namespace

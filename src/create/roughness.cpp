@@ -155,10 +155,12 @@ void roughness(std::vector<cs::catom_t> & catom_array){
 			//if(cs::interfacial_roughness_local_height_field==true){
 			//double local_height = height_field.at(mat).at(hx).at(hy);
 			//}
+         const int atom_uc_cat = catom_array[atom].uc_category;
+         const int mat_uc_cat = create::internal::mp[mat].unit_cell_category;
 
 			// Include atoms if within material height
 			const double cz=catom_array[atom].z;
-			if((cz>=min+local_height) && (cz<max+local_height) && (fill==false)){
+			if((cz>=min+local_height) && (cz<max+local_height) && (fill==false)  && (atom_uc_cat == mat_uc_cat) ){
 				catom_array[atom].material=mat;
 				catom_array[atom].include=true;
 			}
@@ -166,6 +168,7 @@ void roughness(std::vector<cs::catom_t> & catom_array){
 	}
 
 	return;
+
 }
 
 } // end of internal namespace

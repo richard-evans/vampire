@@ -196,7 +196,7 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
       material_order.push_back(tmp);
    }
    // sort by increasing radius
-   material_order.sort(compare_radius_vor);
+   material_order.sort(compare_radius);
 
 	std::cout <<"Generating voronoi substructure";
 	zlog << zTs() << "Generating voronoi substructure";

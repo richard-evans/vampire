@@ -20,17 +20,6 @@
 namespace create{
 namespace internal{
 
-struct core_radius_t{
-   int mat;
-   double radius;
-};
-
-/// comparison function for reverse order sorting
-bool compare_radius(core_radius_t first,core_radius_t second){
-   if(first.radius<second.radius) return false;
-   else return true;
-}
-
 void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain){
 	//====================================================================================
 	//
@@ -88,7 +77,9 @@ void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & ca
                double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
                double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
                double cz=catom_array[atom].z;
-					if((cz>=minz) && (cz<maxz)){
+               const int atom_uc_cat = catom_array[atom].uc_category;
+               const int mat_uc_cat = create::internal::mp[mat].unit_cell_category;
+					if((cz>=minz) && (cz<maxz) && (atom_uc_cat == mat_uc_cat) ){
 						catom_array[atom].include=true;
 						catom_array[atom].material=mat;
 						catom_array[atom].grain=grain;

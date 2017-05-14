@@ -193,25 +193,25 @@ int particle(std::vector<cs::catom_t> & catom_array){
 	// Use particle type flags to determine which particle shape to cut
 	switch(cs::system_creation_flags[1]){
 		case 0: // Bulk
-			bulk(catom_array);
+			create::internal::bulk(catom_array);
 			break;
 		case 1: // Cube
-			cube(particle_origin,catom_array,0);
+			create::internal::cube(particle_origin,catom_array,0);
 			break;
 		case 2: // Cylinder
-			cylinder(particle_origin,catom_array,0);
+			create::internal::cylinder(particle_origin,catom_array,0);
 			break;
       case 3: // Ellipsoid
-         ellipsoid(particle_origin,catom_array,0);
+         create::internal::ellipsoid(particle_origin,catom_array,0);
          break;
 		case 4: // Sphere
-			sphere(particle_origin,catom_array,0);
+			create::internal::sphere(particle_origin,catom_array,0);
 			break;
 		case 5: // Truncated Octahedron
-			truncated_octahedron(particle_origin,catom_array,0);
+			create::internal::truncated_octahedron(particle_origin,catom_array,0);
 			break;
 		case 6: // Teardrop
-			tear_drop(particle_origin,catom_array,0);
+			create::internal::teardrop(particle_origin,catom_array,0);
 			break;
       case 7: // Faceted particle
    		create::internal::faceted(particle_origin,catom_array,0);
@@ -278,25 +278,25 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 				// Use particle type flags to determine which particle shape to cut
 				switch(cs::system_creation_flags[1]){
 					case 0: // Bulk
-						bulk(catom_array);
+						create::internal::bulk(catom_array);
 						break;
 					case 1: // Cube
-						cube(particle_origin,catom_array,particle_number);
+						create::internal::cube(particle_origin,catom_array,particle_number);
 						break;
 					case 2: // Cylinder
-						cylinder(particle_origin,catom_array,particle_number);
+						create::internal::cylinder(particle_origin,catom_array,particle_number);
 						break;
                case 3: // Ellipsoid
-                  ellipsoid(particle_origin,catom_array,particle_number);
+                  create::internal::ellipsoid(particle_origin,catom_array,particle_number);
                   break;
 					case 4: // Sphere
-						sphere(particle_origin,catom_array,particle_number);
+						create::internal::sphere(particle_origin,catom_array,particle_number);
 						break;
 					case 5: // Truncated Octahedron
-						truncated_octahedron(particle_origin,catom_array,particle_number);
+						create::internal::truncated_octahedron(particle_origin,catom_array,particle_number);
 						break;
 					case 6: // Teardrop
-						tear_drop(particle_origin,catom_array,particle_number);
+						create::internal::teardrop(particle_origin,catom_array,particle_number);
 						break;
                case 7: // Faceted particle
                   create::internal::faceted(particle_origin,catom_array,particle_number);

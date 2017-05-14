@@ -49,12 +49,6 @@ namespace create_voronoi{
 
 }
 
-/// comparison function for reverse order sorting
-bool compare_radius_vor(core_radius_t first,core_radius_t second){
-   if(first.radius<second.radius) return false;
-   else return true;
-}
-
 namespace cs{
 
 int voronoi_film(std::vector<cs::catom_t> & catom_array){
@@ -214,15 +208,15 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	}
 
 	// Determine order for core-shell grains
-   std::list<core_radius_t> material_order(0);
+   std::list<create::internal::core_radius_t> material_order(0);
    for(int mat=0;mat<mp::num_materials;mat++){
-      core_radius_t tmp;
+      create::internal::core_radius_t tmp;
       tmp.mat=mat;
       tmp.radius=mp::material[mat].core_shell_size;
       material_order.push_back(tmp);
    }
    // sort by increasing radius
-   material_order.sort(compare_radius_vor);
+   material_order.sort(create::internal::compare_radius);
 
 	std::cout <<"Generating Voronoi Grains";
 	zlog << zTs() << "Generating Voronoi Grains";
@@ -280,15 +274,17 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 						if(mp::material[catom_array[atom].material].core_shell_size>0.0){
 							// Iterate over materials
-							for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
+							for(std::list<create::internal::core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
 								int mat = (it)->mat;
 								double factor = mp::material[mat].core_shell_size;
 								double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
 								double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
 								double cz=catom_array[atom].z;
+                        const int atom_uc_cat = catom_array[atom].uc_category;
+                        const int mat_uc_cat = create::internal::mp[mat].unit_cell_category;
 								// check for within core shell range
 								if(vmath::point_in_polygon_factor(x-x0,y-y0,factor, tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){
-									if((cz>=minz) && (cz<maxz)){
+									if((cz>=minz) && (cz<maxz) && (atom_uc_cat == mat_uc_cat) ){
 										catom_array[atom].include=true;
 										catom_array[atom].material=mat;
 										catom_array[atom].grain=grain;
@@ -305,31 +301,6 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].include=true;
 							catom_array[atom].grain=grain;
 						}
-						// Check for continuous media
-						/*else if(mp::material[catom_array[atom].material].continuous==true){
-							const int geo=mp::material[catom_array[atom].material].geometry;
-
-							if(geo==0){
-								catom_array[atom].include=true;
-							}
-							else{
-								double x = catom_array[atom].x;
-								double y = catom_array[atom].y;
-								double px[50];
-								double py[50];
-								// Initialise polygon points
-								for(int p=0;p<geo;p++){
-									px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
-									py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
-								}
-								if(vmath::point_in_polygon(x,y,px,py,geo)==true){
-									catom_array[atom].include=true;
-									catom_array[atom].grain=grain;
-								}
-							}
-							//catom_array[atom].include=true;
-							catom_array[atom].grain=grain;
-							}*/
 					}
 				}
 			}
