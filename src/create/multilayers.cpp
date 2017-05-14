@@ -13,6 +13,9 @@
 #include "create.hpp"
 #include "material.hpp"
 
+// Internal create header
+#include "internal.hpp"
+
 namespace cs{
 
    //--------------------------------------------------------------------------
@@ -44,8 +47,8 @@ namespace cs{
       std::vector<bool> mat_fill(mp::num_materials);
 
       for(int mat=0;mat<mp::num_materials;mat++){
-         mat_min[mat]=mp::material[mat].min;
-         mat_max[mat]=mp::material[mat].max;
+         mat_min[mat]=create::internal::mp[mat].min;
+         mat_max[mat]=create::internal::mp[mat].max;
          // alloys generally are not defined by height, and so have max = 0.0
          if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
          mat_fill[mat]=mp::material[mat].fill;

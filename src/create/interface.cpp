@@ -135,6 +135,17 @@ namespace create{
          create::internal::bubble_nucleation_height=nh;
          return true;
       }
+      //--------------------------------------------------------------------
+      test="select-material-by-height";
+      if(word==test){
+          create::internal::select_material_by_z_height = true; // default
+          // also check for value
+          std::string VFalse="false";
+          if(value==VFalse){
+             create::internal::select_material_by_z_height = false; // default
+          }
+          return EXIT_SUCCESS;
+      }
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);
@@ -159,7 +170,11 @@ namespace create{
       std::string prefix="material:";
 
       // Check for empty material parameter array and resize
-      if(create::internal::mp.size() == 0) create::internal::mp.resize(mp::max_materials);
+      if(create::internal::mp.size() == 0){
+         create::internal::mp.resize(mp::max_materials);
+         // initialise unit cell/material associations
+         for(int i = 0; i < mp::max_materials; i++) create::internal::mp[i].unit_cell_category = i;
+      }
 
       //------------------------------------------------------------
       std::string test="alloy-host"; // determines host material
@@ -343,7 +358,35 @@ namespace create{
          create::internal::mp[super_index].voronoi_grain_substructure_nucleation_height = nh;
          return true;
       }
-
+      /*
+         integer to associate the material to a particular material within the unit cell.
+         Default is material id but can be overidden with this parameter.
+      */
+      test="unit-cell-category";
+      if(word==test){
+         int uccat=atoi(value.c_str());
+         vin::check_for_valid_int(uccat, word, line, prefix, 0, mp::max_materials,"material"," 0 - 100");
+         create::internal::mp[super_index].unit_cell_category = uccat;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="minimum-height";
+      if(word==test){
+          double min=atof(value.c_str());
+          vin::check_for_valid_value(min, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+          create::internal::select_material_by_z_height = true; // default
+          create::internal::mp[super_index].min=min;
+          return true;
+      }
+      //--------------------------------------------------------------------
+      test="maximum-height";
+      if(word==test){
+          double max=atof(value.c_str());
+          vin::check_for_valid_value(max, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
+          create::internal::select_material_by_z_height = true; // default
+          create::internal::mp[super_index].max=max;
+          return true;
+      }
       //--------------------------------------------------------------------
       // keyword not found
       //--------------------------------------------------------------------

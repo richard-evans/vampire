@@ -52,6 +52,7 @@
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "create.hpp"
 #include "dipole.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
@@ -62,7 +63,7 @@
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
-#include "create.hpp"
+
 
 
 
@@ -77,7 +78,7 @@ namespace cs{
 	// System Dimensions
 	double system_dimensions[3]={77.0,77.0,77.0};	/// Size of system (A)
 	bool pbc[3]={false,false,false};						/// Periodic boundary conditions
-	bool SelectMaterialByZHeight=false;					/// Toggle overwriting of material id by z-height
+
 	bool SelectMaterialByGeometry=false;					/// Toggle override of input material type by geometry
 	unsigned int total_num_unit_cells[3]={0,0,0};	/// Unit cells for entire system (x,y,z)
 	unsigned int local_num_unit_cells[3]={0,0,0};	/// Unit cells on local processor (x,y,z)
@@ -134,6 +135,9 @@ int create(){
 	//=============================================================
 	//      System creation variables
 	//=============================================================
+
+   // initialise create module parameters
+   create::initialize();
 
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array;

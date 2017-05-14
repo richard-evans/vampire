@@ -11,6 +11,9 @@ data.o \
 faceted.o \
 initialize.o \
 interface.o \
+layers.o \
+multilayers.o \
+roughness.o \
 voronoi_grain_rounding.o \
 voronoi_substructure.o \
 voronoi_vertex_points.o

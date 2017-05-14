@@ -283,8 +283,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
 								int mat = (it)->mat;
 								double factor = mp::material[mat].core_shell_size;
-								double maxz=mp::material[mat].max*cs::system_dimensions[2];
-								double minz=mp::material[mat].min*cs::system_dimensions[2];
+								double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+								double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
 								double cz=catom_array[atom].z;
 								// check for within core shell range
 								if(vmath::point_in_polygon_factor(x-x0,y-y0,factor, tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)==true){

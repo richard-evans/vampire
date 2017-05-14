@@ -67,6 +67,10 @@ namespace create{
          std::vector<slave_material_t> slave_material; // array of slave alloys for host
          bool sub_fill; // flag to determine if material fills voided space in substructure
          double voronoi_grain_substructure_nucleation_height; // value determines start point of nucleated grains
+         int unit_cell_category; // association of material to unit cell id
+         double min; // minimum material height
+         double max; // maximum material height
+
          // constructor
          mp_t ():
          	alloy_master(false),
@@ -76,7 +80,10 @@ namespace create{
             save_file_name(""),
             host_alloy_distribution(internal::homogeneous),
             sub_fill(false),
-            voronoi_grain_substructure_nucleation_height(0.0)
+            voronoi_grain_substructure_nucleation_height(0.0),
+            unit_cell_category(0),
+            min(0.0),
+            max(1.0)
             {
                // resize array of slave materials
                slave_material.resize(mp::max_materials);
@@ -103,10 +110,14 @@ namespace create{
       extern bool generate_voronoi_substructure;
       extern double voronoi_grain_substructure_crystallization_radius;
 
+      extern bool select_material_by_z_height;
+
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
       extern void alloy(std::vector<cs::catom_t> & catom_array);
+      extern void layers(std::vector<cs::catom_t> & catom_array);
+      extern void roughness(std::vector<cs::catom_t> & catom_array);
       extern void bubble(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);

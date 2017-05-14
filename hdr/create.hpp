@@ -66,7 +66,6 @@ namespace cs{
 	// System Dimensions
 	extern double system_dimensions[3];
 	extern bool pbc[3];
-	extern bool SelectMaterialByZHeight;
 	extern bool SelectMaterialByGeometry;
 	extern unsigned int total_num_unit_cells[3];
 	extern unsigned int local_num_unit_cells[3];
@@ -416,7 +415,6 @@ int tear_drop(std::vector<double>& particle_origin, std::vector<cs::catom_t> &,c
 int sort_atoms_by_grain(std::vector<cs::catom_t> &);
 void clear_atoms(std::vector<cs::catom_t> &);
 
-void roughness(std::vector<cs::catom_t> &);
 void generate_multilayers(std::vector<cs::catom_t> & catom_array);
 
 }
@@ -427,8 +425,10 @@ void generate_multilayers(std::vector<cs::catom_t> & catom_array);
 namespace create{
 
 	// Functions
+   void initialize();
 	bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
 
 } // end of namespace create
 

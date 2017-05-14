@@ -85,8 +85,8 @@ void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & ca
             bool in111 = rx + ry + rz < 1.5*my_rsize*fr111 + fr111*my_rsize*((sfx-1.0) + (sfy-1.0) + (sfz-1.0));
 
             if(in100 && in110 && in111){
-               double maxz=mp::material[mat].max*cs::system_dimensions[2];
-               double minz=mp::material[mat].min*cs::system_dimensions[2];
+               double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+               double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
                double cz=catom_array[atom].z;
 					if((cz>=minz) && (cz<maxz)){
 						catom_array[atom].include=true;

@@ -50,6 +50,9 @@
 #include <string>
 #include <iostream>
 
+// Internal create header
+#include "internal.hpp"
+
 struct core_radius_t{
    int mat;
    double radius;
@@ -115,8 +118,8 @@ int cylinder(std::vector<double>& particle_origin,std::vector<cs::catom_t> & cat
             int mat = (it)->mat;
 				double my_radius = mp::material[mat].core_shell_size;
 				double max_range = my_radius*my_radius*particle_radius_squared;
-				double maxz=mp::material[mat].max*cs::system_dimensions[2];
-				double minz=mp::material[mat].min*cs::system_dimensions[2];
+				double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+				double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
 				double cz=catom_array[atom].z;
 				// check for within core shell range
 				if(range_squared<=max_range){
@@ -194,8 +197,8 @@ void ellipsoid(std::vector<double>& particle_origin,std::vector<cs::catom_t> & c
          for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
             int mat = (it)->mat;
             const double my_radius_sq = mp::material[mat].core_shell_size*mp::material[mat].core_shell_size;
-            double maxz=mp::material[mat].max*cs::system_dimensions[2];
-            double minz=mp::material[mat].min*cs::system_dimensions[2];
+            double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+            double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
             double cz=catom_array[atom].z;
             // check for within core shell range
             if(range_x_sq*inv_rx_sq + range_y_sq*inv_ry_sq +range_z_sq*inv_rz_sq<=my_radius_sq){
@@ -262,8 +265,8 @@ int sphere(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom
             int mat = (it)->mat;
 				double my_radius = mp::material[mat].core_shell_size;
 				double max_range = my_radius*my_radius*particle_radius_squared;
-				double maxz=mp::material[mat].max*cs::system_dimensions[2];
-				double minz=mp::material[mat].min*cs::system_dimensions[2];
+				double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+				double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
 				double cz=catom_array[atom].z;
 				// check for within core shell range
 				if(range_squared<=max_range){
@@ -338,8 +341,8 @@ int truncated_octahedron(std::vector<double>& particle_origin,std::vector<cs::ca
 				double my_radius = mp::material[mat].core_shell_size;
 				double my_to_height = my_radius*to_height;
 				double my_to_length = my_radius*to_length;
-				double maxz=mp::material[mat].max*cs::system_dimensions[2];
-				double minz=mp::material[mat].min*cs::system_dimensions[2];
+				double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+				double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
 				double cz=catom_array[atom].z;
 				// check for within core shell range
 				if((range<=my_to_length) && (x_vector[0] <= my_to_height*sfx) && (x_vector[1] <= my_to_height*sfy) && (x_vector[2] <= my_to_height*sfz)){
@@ -396,8 +399,8 @@ int cube(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_a
             int mat = (it)->mat;
 				double my_length = mp::material[mat].core_shell_size;
 				double max_length = my_length*side_length;
-				double maxz=mp::material[mat].max*cs::system_dimensions[2];
-				double minz=mp::material[mat].min*cs::system_dimensions[2];
+				double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+				double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
 				double cz=catom_array[atom].z;
 				// check for within core shell range
 				if((dx<=max_length) && (dy<=max_length)){

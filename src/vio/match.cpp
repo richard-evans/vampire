@@ -327,18 +327,6 @@ namespace vin{
         }
         //--------------------------------------------------------------------
         else
-        test="select-material-by-height";
-        if(word==test){
-            cs::SelectMaterialByZHeight=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::SelectMaterialByZHeight=false;
-            }
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
         test="select-material-by-geometry";
         if(word==test){
             cs::SelectMaterialByGeometry=true; // default
@@ -2478,27 +2466,6 @@ namespace vin{
                 return EXIT_SUCCESS;
 
             }
-            //--------------------------------------------------------------------
-            else
-            test="minimum-height";
-            if(word==test){
-                double min=atof(value.c_str());
-                check_for_valid_value(min, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-                cs::SelectMaterialByZHeight=true;
-                read_material[super_index].min=min;
-                return EXIT_SUCCESS;
-            }
-            //--------------------------------------------------------------------
-            else
-            test="maximum-height";
-            if(word==test){
-                double max=atof(value.c_str());
-                check_for_valid_value(max, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-                cs::SelectMaterialByZHeight=true;
-                read_material[super_index].max=max;
-                return EXIT_SUCCESS;
-            }
-            else
             //--------------------------------------------------------------------
             test="core-shell-size";
             if(word==test){
