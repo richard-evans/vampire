@@ -172,8 +172,8 @@ namespace create{
       // Check for empty material parameter array and resize
       if(create::internal::mp.size() == 0){
          create::internal::mp.resize(mp::max_materials);
-         // initialise unit cell/material associations
-         for(int i = 0; i < mp::max_materials; i++) create::internal::mp[i].unit_cell_category = i;
+         // initialise unit cell/material associations. Value should be zero for unit cells with 1 material so that by default CSG operations are applied to those atoms
+         for(int i = 0; i < mp::max_materials; i++) create::internal::mp[i].unit_cell_category = 0;
       }
 
       //------------------------------------------------------------
@@ -360,13 +360,13 @@ namespace create{
       }
       /*
          integer to associate the material to a particular material within the unit cell.
-         Default is material id but can be overidden with this parameter.
+         Default is 0 but can be overidden with this parameter.
       */
       test="unit-cell-category";
       if(word==test){
          int uccat=atoi(value.c_str());
-         vin::check_for_valid_int(uccat, word, line, prefix, 0, mp::max_materials,"material"," 0 - 100");
-         create::internal::mp[super_index].unit_cell_category = uccat;
+         vin::check_for_valid_int(uccat, word, line, prefix, 0, mp::max_materials,"material"," 1 - 100");
+         create::internal::mp[super_index].unit_cell_category = uccat - 1; // subtract 1 corresponding to internal material numbers
          return true;
       }
       //--------------------------------------------------------------------
