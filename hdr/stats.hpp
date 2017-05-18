@@ -104,6 +104,8 @@ namespace stats
          std::string output_normalized_mean_magnetization();
          std::string output_normalized_mean_magnetization_length();
          std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec);
+			std::string output_mean_magnetization_length();
+			std::string output_mean_magnetization();
 
       private:
          bool initialized;

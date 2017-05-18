@@ -107,6 +107,8 @@ namespace vout{
 	void mean_mvec(std::ostream& stream);
 	void mat_mean_mvec(std::ostream& stream);
    void mean_material_susceptibility(std::ostream& stream);
+   void mean_height_magnetisation_length(std::ostream& stream);
+   void mean_height_magnetisation(std::ostream& stream);
 
    void MPITimings(std::ostream& stream);
 

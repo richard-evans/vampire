@@ -334,6 +334,12 @@ namespace vout{
                case 50:
 						vout::mean_material_susceptibility(zmag);
 						break;
+					case 51:
+						vout::mean_height_magnetisation_length(zmag);
+						break;
+					case 52:
+						vout::mean_height_magnetisation(zmag);
+						break;
 					case 60:
 						vout::MPITimings(zmag);
 						break;

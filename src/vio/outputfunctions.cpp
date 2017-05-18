@@ -329,6 +329,16 @@ namespace vout{
 		stream << stats::material_susceptibility.output_mean_susceptibility(sim::temperature);
 	}
 
+	// Output Function 51
+   void mean_height_magnetisation_length(std::ostream& stream){
+		stream << stats::height_magnetization.output_mean_magnetization_length();
+	}
+
+	// Output Function 51
+   void mean_height_magnetisation(std::ostream& stream){
+		stream << stats::height_magnetization.output_mean_magnetization();
+	}
+
 	// Output Function 60
 	void MPITimings(std::ostream& stream){
 

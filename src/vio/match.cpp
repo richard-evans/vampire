@@ -1758,6 +1758,20 @@ namespace vin{
             output_list.push_back(47);
             return EXIT_SUCCESS;
         }
+        //--------------------------------------------------------------------
+        test="mean-height-magnetisation-length";
+        if(word==test){
+            stats::calculate_height_magnetization=true;
+            output_list.push_back(51);
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="mean-height-magnetisation";
+        if(word==test){
+            stats::calculate_height_magnetization=true;
+            output_list.push_back(52);
+            return EXIT_SUCCESS;
+        }
         //-------------------------------------------------------------------
         test="mpi-timings";
         if(word==test){
