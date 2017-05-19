@@ -1,0 +1,163 @@
+\chapter{Installation}\label{chap:installation}
+
+This chapter covers the requirements, installation and support for \vampire on different platforms. 
+
+\section*{System Requirements}
+\addcontentsline{toc}{section}{System Requirements}
+\vampire is designed to be generally portable and compilable on Linux, Unix, Mac OSX and Windows with a range of different compilers. By design the software has a very minimal dependence on external libraries to aid compilation on the widest possible range of platforms without needing to first install and configure a large number of other packages. \vampire is designed to be maximally efficient on high performance computing clusters and scalable to thousands of processors, and as such is the recommended platform if you have access to appropriate resources. 
+
+\subsection*{Hardware Requirements}
+\vampire has been successfully tested on a wide variety of x86 and power PC processors. Memory requirements are generally relatively modest for most systems, though larger simulations will require significantly more memory. \vampire is generally computationally limited, and so the faster the clock speed and number of processor cores the better.
+
+\section*{Binary installation}
+\addcontentsline{toc}{section}{Binary installation}
+Compiled binaries of the latest release version are available to download from:\\
+
+\begin{minipage}[c]{\textwidth}
+\centering
+http://vampire.york.ac.uk/download/
+\end{minipage}\\
+
+\noindent for Linux, Mac$^{\mathrm{TM}}$ OS X and Windows$^{\mathrm{TM}}$ platforms. For the Linux and Mac OS X releases, a simple installation script \textit{install.sh} installs the binary in \textit{/opt/vampire/} and appends the directory to your environment path. The Windows binary is redistributable, and must simply be in the same directory as the input file, however, before running the code you need to install the Microsoft Visual C++ 2008 Redistributable (see the next chapter on running \vampire). From version 4.0 onwards a copy of qvoronoi is integrated into \vampire for generating granular structures. 
+
+\section*{Compiling from source}
+\addcontentsline{toc}{section}{Compiling from source}
+The best way to get the vampire source code is using git, a distributed version control program which enables changes in the code to be tracked. Git is readily available on linux (\textit{git-core} package on ubuntu) and Mac (via MacPorts). To get vampire from the Github repository checkout your own copy of the repository using:\\
+
+\begin{minipage}[c]{\textwidth}
+\centering
+git clone git://github.com/richard-evans/vampire.git
+\end{minipage}\\
+
+This way, updates to the code can be easily merged with the downloaded version. Compiling is generally as easy as running \textit{make} in Unix platforms.
+
+\subsection*{Compiling on Linux}
+\addcontentsline{toc}{subsection}{Compiling on Linux}
+In order to compile in linux, a working set of development tools are needed, which on ubuntu includes the packages \textit{build-essential} and \textit{g++}. 
+\vampire should compile without issue following a simple \textit{make} command in the source directory.
+
+For the parallel version, a working installation of openmpi is recommended, which must usually include a version of the development tools (\textit{openmpi-bin} and \textit{openmpi-dev} packages on ubuntu). Compilation is usually straightforward using \textit{make parallel}.
+
+\subsection*{Compiling on Mac OSX}
+\addcontentsline{toc}{subsection}{Compiling on Mac OSX} With OS X, compilation from source requires a working installation of Xcode, available for free from the Mac App Store. In addition command line tools must also be installed. A working installation of MacPorts is recommended to provide access to a wide range of open source libraries and tools such as openmpi, rasmol and povray. For the serial version, compilation is the same as for linux, following a simple \textit{make} command in the source directory.
+
+Similarly for the parallel version, openmpi needs to be installed via MacPorts, and compilation is usually straightforward using \textit{make parallel}.
+
+\subsection*{Compiling on Windows}
+\addcontentsline{toc}{subsection}{Compiling on Windows}
+In order to compile the code on Windows systems you will need to have Microsoft Visual Studio 2010 or later and open the file  Vampire.vcxproj with it. The project has two versions: Debug and Release, where you can choose the current one in the drop-down menu on the top toolbar. The first is for debugging the code and the executable which is created will not be a stand-alone executable. The Release version is for creating a stand-alone executables for the serial version. Click Build>Project to compile the code.
+
+Finally, you can compile a 64-bit version if you choose from the drop down menu in the top toolbar in MS Visual Studio. (It writes ``Win32'' so when you click it the x64 option will appear).
+
+%\subsection*{Compiling for Bluegene Systems}
+%\addcontentsline{toc}{subsection}{Compiling for Bluegene Systems}
+
+%------------------------------------------------------------------------
+%
+%
+%          RUNNING THE CODE
+%
+%
+%------------------------------------------------------------------------
+\chapter{Running the code}
+To run the code in all version, you first need to specify an input file and material file, which must reside in the same directory where you run the code. Example files are available in the source code distribution, or from the Download section of the website (http://vampire.york.ac.uk/download/index.html).
+
+\section*{Linux Debian/Ubuntu and Mac OS X}
+\addcontentsline{toc}{section}{Running on Linux and Mac OS X}
+In the directory including the input and material files, typing \textit{./vampire} will run the code in serial mode. For the parallel mode with openmpi, \textit{mpirun -np 2 vampire} will run the code in parallel mode, on 2 CPUs. Increasing the \textit{-np} argument will run on more cores.
+
+\section*{Windows}
+\addcontentsline{toc}{section}{Running on Windows}
+In order to run any Windows version of \vampire, you need to have ``Microsoft Visual C++ 2008 Redistributable'' library or newer installed on your PC. Usually this is installed by default, but if the executable fails to run then download and install it from here:\\
+
+\begin{minipage}[c]{\textwidth}
+\centering
+http://www.microsoft.com/en-gb/download/details.aspx?id=29
+\end{minipage}\\
+
+\subsection*{Serial version}
+\addcontentsline{toc}{subsection}{Serial version}
+The serial version can be run by double clicking the executable file, where the executable, input and material files are in the same directory. You may also want to run the code using the command line in case there are error messages. In this case you should change to the directory containing the input files and executables using the usual cd commands. \vampire can then be run by simply typing `vampire'. 
+
+\subsection*{Parallel version using MPICH2 (1 PC)}
+\addcontentsline{toc}{subsection}{Parallel version (1 PC)}
+The parallel version of \vampire requires a working installation of MPICH2 which must be installed as follows.
+
+\subsubsection{Set up MPICH2}
+\begin{itemize}
+\item Download and install MPICH2 from:\\
+http://www.mpich.org/static/tarballs/1.4.1p1/mpich2-1.4.1p1-win-ia32.msi
+\item Put its bin directory to the path. This is how to do that:
+  \begin{itemize}
+	\item Right Click ``My Computer'' and then Properties.
+	\item Click on left the ``Advanced system settings''
+	\item On the ``Advanced'' tab click the Environment Variables at the bottom
+	\item In the ``System Variables'' list at the bottom scroll down to find the ``Path'' variable.   Select it and click ``Edit''.
+	\item Go to the end of ``Variable value:'' and write ``;Mpich2path/bin'' where Mpich2path is the  path where you install your Mpich2. The ``;'' put it if does not exist before. So e.g. what I have in my pc is ``C:\textbackslash Program Files (x86)\textbackslash MPICH2\textbackslash bin''.
+  \end{itemize}
+\item Open a Command Prompt and write:\\
+  
+  \begin{minipage}[c]{9cm}
+	smpd  -install\\
+	mpiexec -remove\\
+	mpiexec -register   ,where give as username the exact username for login in the windows  and password your exact password for login windows.\\
+	smpd -install\\
+	\end{minipage}\\
+\end{itemize}
+
+\subsubsection{Run the code}
+To run the parallel version it is necessary to launch the code with the \textit{mpiexec} command. To do this, first open the MSDOS prompt. Navigate to the directory containing the binary and execute the following command:\\
+
+\begin{minipage}[c]{\textwidth}
+\centering
+\textit{mpiexec -n number\_of\_processors Vampire-Parallel.exe}
+\end{minipage}\\
+
+replacing number\_of\_processors with the number of processors/cores you want to use in this system (e.g.: \textit{mpiexec -n 4 Vampire-Parallel.exe} for a quad core machine).
+
+\subsection*{Parallel version using MPICH2 (2+ PCs)}
+\addcontentsline{toc}{subsection}{Parallel version (2+ PCs)}
+For multiple PCs in addition to a working MPICH2 implementation, you must also setup the PCs shared folder and firewall as detailed below. 
+
+\subsubsection{Configure MPICH2 for multiple PCs}
+\begin{itemize}
+\item For every PC install MPICH2 as detailed in the last section.
+\item Only for the running PC: Right click the folder where Vampire-Parallel.exe. is and click ``Properties'', go to ``Sharing Tab'' and click ``Share''. Then, if your name is there OK else choose your name from dropdown menu and click ``Add'' . In  the permission level choose to be Read/write next to your name. 
+\item Every PC: Put the files C:\textbackslash Program Files (x86)\textbackslash MPICH2\textbackslash bin\textbackslash smpd.exe ,  C:\textbackslash Program Files (x86)\textbackslash MPICH2\textbackslash bin\textbackslash mpiexec.exe and Vampire-Parallel.exe in the exception list of Windows Firewall(maybe there already in this list):
+\begin{itemize}
+\item Bring up the windows firewall from the control panel
+\item Click on ``Allow a program or feature through Windows Firewall'', click ``Change settings'' and click ``Allow another program'' and Browse. Go to find these files in their directories, and the Vampire-Parallel.exe go in the Network, then to the running PC and then to the folder.
+\end{itemize}
+\item (Optional) Only for the running PC: In order to make the log files to join and the program finish as expected you must do that: Run regedit and find the key HKEY\_CURRENT\_USER\textbackslash Software\textbackslash Microsoft\textbackslash Command Processor and click add DWORD with the name DisableUNCCheck and give it value 1 (will appear o 0 x 1 (Hex)).
+\end{itemize}
+\subsubsection{Run the code}
+To run \vampire on multiple machine execute the following command:\\
+
+\begin{minipage}[c]{\textwidth}
+\centering
+\textit{mpiexec -hosts number\_of\_hosts PC1 np1 PC2 np2\\
+-dir \textbackslash\textbackslash PC1\textbackslash Vampire\textbackslash
+\textbackslash\textbackslash PC1\textbackslash Vampire\textbackslash Vampire-Parallel.exe}
+\end{minipage}\\
+
+\begin{table}[!h]
+\begin{center}
+\lightfont
+\begin{tabular}{p{4.5cm} p{4.5cm}}
+\hline
+\textit{number\_of\_hosts}        & number of PCs you want to use\\
+\textit{PC1}                    & name of the 1$^{\mathrm{st}}$ PC\\
+\textit{np1}                    & number of cores to use in PC1\\
+\textit{PC2}                    & name of the 2$^{\mathrm{nd}}$ PC\\
+\textit{np2}                    & number of cores to use in PC2\\
+\textit{\textbackslash\textbackslash PC1\textbackslash Vampire\textbackslash} & shared directory where all the PCs can find the executable and input files\\
+\textit{\textbackslash\textbackslash PC1\textbackslash Vampire\textbackslash Vampire-Parallel.exe} & the executable location\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+%\section*{Support}
+%\addcontentsline{toc}{section}{Support}
+%As \textit{free} software, there are no guarantees of support for \vampire
+

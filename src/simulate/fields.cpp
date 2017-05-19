@@ -35,10 +35,12 @@
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
-#include "demag.hpp"
+//#include "demag.hpp"
+#include "dipole.hpp"
 #include "ltmp.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
 
@@ -97,11 +99,12 @@ int calculate_spin_fields(const int start_index,const int end_index){
    if(sim::random_anisotropy && sim::spherical_harmonics) calculate_random_spherical_harmonic_fields(start_index,end_index);
    if(sim::lattice_anisotropy_flag) calculate_lattice_anisotropy_fields(start_index,end_index);
    if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
-   //if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
-   if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
-   // Spin Dependent Extra Fields
-   //if(sim::hamiltonian_simulation_flags[4]==1) calculate_??_fields();
-   if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
+
+	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
+	if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
+	// Spin Dependent Extra Fields
+	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
+
 	calculate_full_spin_fields(start_index,end_index);
 
 	return 0;
@@ -146,11 +149,14 @@ int calculate_external_fields(const int start_index,const int end_index){
 
 	}
 
+   // Get updated spin torque fields
+   st::get_spin_torque_fields(atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array, start_index, end_index);
+
 	// FMR Fields only for fmr program
 	if(sim::enable_fmr) calculate_fmr_fields(start_index,end_index);
 
 	// Dipolar Fields
-	if(sim::hamiltonian_simulation_flags[4]==1) calculate_dipolar_fields(start_index,end_index);
+	calculate_dipolar_fields(start_index,end_index);
 
 	return 0;
 }
@@ -702,22 +708,27 @@ int calculate_thermal_fields(const int start_index,const int end_index){
 }
 
 int calculate_dipolar_fields(const int start_index,const int end_index){
-   ///======================================================
-   /// 		Subroutine to calculate dipolar fields
-   ///
-   ///			Version 1.0 R Evans 02/11/2009
-   ///======================================================
 
-   //----------------------------------------------------------
-   // check calling of routine if error checking is activated
-   //----------------------------------------------------------
+	///======================================================
+	/// 		Subroutine to calculate dipolar fields
+	///
+	///			Version 1.0 R Evans 02/11/2009
+	///======================================================
+	//----------------------------------------------------------
+	// check calling of routine if error checking is activated
+	//----------------------------------------------------------
    if(err::check==true){std::cout << "calculate_dipolar_fields has been called" << std::endl;}
 
    // Add dipolar fields
-   for(int atom=start_index;atom<end_index;atom++){
-      atoms::x_total_external_field_array[atom] += atoms::x_dipolar_field_array[atom];
-      atoms::y_total_external_field_array[atom] += atoms::y_dipolar_field_array[atom];
-      atoms::z_total_external_field_array[atom] += atoms::z_dipolar_field_array[atom];
+   if(dipole::activated){
+      for(int atom=start_index;atom<end_index;atom++){
+         atoms::x_total_external_field_array[atom] += dipole::atom_dipolar_field_array_x[atom];
+         atoms::y_total_external_field_array[atom] += dipole::atom_dipolar_field_array_y[atom];
+         atoms::z_total_external_field_array[atom] += dipole::atom_dipolar_field_array_z[atom];
+         /*std::cout << atoms::x_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_x[atom] << "\t";
+         std::cout << atoms::y_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_y[atom] << "\t";
+         std::cout << atoms::z_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_z[atom] << std::endl;*/
+      }
    }
 
    return 0;

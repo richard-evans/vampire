@@ -340,4 +340,44 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
 
 }
 
+//------------------------------------------------------------------------------------------------------
+// Function to output actual magnetisation values as string (in Bohr magnetons)
+//------------------------------------------------------------------------------------------------------
+std::string magnetization_statistic_t::output_mean_magnetization_length(){
+
+   // result string stream
+   std::ostringstream result;
+
+   // inverse number of data samples
+   const double ic = 1.0/mean_counter;
+
+   // loop over all magnetization values
+   for(int mask_id=0; mask_id<mask_size; ++mask_id){
+      result << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic << "\t";
+   }
+
+   return result.str();
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to output normalised mean magnetisation values as string
+//------------------------------------------------------------------------------------------------------
+std::string magnetization_statistic_t::output_mean_magnetization(){
+
+   // result string stream
+   std::ostringstream result;
+
+   // inverse number of data samples
+   const double ic = 1.0/mean_counter;
+
+   // loop over all magnetization values
+   for(int mask_id=0; mask_id<mask_size; ++mask_id){
+      result << mean_magnetization[4*mask_id + 0]*ic << "\t" << mean_magnetization[4*mask_id + 1]*ic << "\t" << mean_magnetization[4*mask_id + 2]*ic << "\t" << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic << "\t";
+   }
+
+   return result.str();
+
+}
+
 } // end of namespace stats

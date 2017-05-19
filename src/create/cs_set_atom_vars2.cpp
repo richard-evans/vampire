@@ -32,6 +32,7 @@
 #include <iostream>
 #include <vector>
 
+#include "dipole.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "create.hpp"
@@ -84,9 +85,14 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);
 	atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);
-	atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);
-	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);
-	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);
+//	atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);
+//	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);
+//	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);
+   // Resize to zero atoms_dipolar_field-x,y,z
+	dipole::atom_dipolar_field_array_x.resize(atoms::num_atoms,0.0);
+	dipole::atom_dipolar_field_array_y.resize(atoms::num_atoms,0.0);
+	dipole::atom_dipolar_field_array_z.resize(atoms::num_atoms,0.0);
+
 
    // Set custom RNG for spin initialisation
    MTRand random_spin_rng;

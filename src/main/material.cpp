@@ -52,8 +52,6 @@ materials_t::materials_t ():
 	Ks(0.0),
 	gamma_rel(1.0),
 	random_spins(false),
-	min(0.0),
-	max(1.0),
 	geometry(0),
 	core_shell_size(1.0),
 	interface_roughness(0.0),
@@ -78,7 +76,7 @@ materials_t::materials_t ():
    fill(false),
    temperature_rescaling_alpha(1.0),
 	temperature_rescaling_Tc(0.0),
-	non_magnetic(false),
+	non_magnetic(0),
 	random_anisotropy(false),
 	random_grain_anisotropy(false)
 	{

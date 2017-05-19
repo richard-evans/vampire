@@ -25,7 +25,7 @@
 
 // Headers
 #include "errors.hpp"
-#include "demag.hpp"
+#include "dipole.hpp"
 #include "voronoi.hpp"
 #include "material.hpp"
 #include "sim.hpp"
@@ -68,7 +68,7 @@ namespace mp{
 	double half_dt;
 
 	// Unrolled material parameters for speed
-	std::vector <double> MaterialMuSSIArray(0);
+	std::vector <double> mu_s_array;
 	std::vector <zkval_t> MaterialScalarAnisotropyArray(0);
 	std::vector <zkten_t> MaterialTensorAnisotropyArray(0);
    std::vector <double> material_second_order_anisotropy_constant_array(0);
@@ -163,7 +163,6 @@ int default_system(){
 	sim::hamiltonian_simulation_flags[1] = 1;	/// Anisotropy
 	sim::hamiltonian_simulation_flags[2] = 1;	/// Applied
 	sim::hamiltonian_simulation_flags[3] = 1;	/// Thermal
-	sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
 
 	//Integration parameters
 	dt_SI = 1.0e-15;	// seconds
@@ -217,7 +216,6 @@ int single_spin_system(){
 
 	// Turn off multi-spin Flags
 	sim::hamiltonian_simulation_flags[0] = 0;	/// Exchange
-	sim::hamiltonian_simulation_flags[4] = 0;	/// Dipolar
 
 	// MPI Mode (Homogeneous execution)
 	//vmpi::mpi_mode=0;
@@ -582,30 +580,9 @@ int set_derived_parameters(){
 			MaterialCubicAnisotropyArray.resize(mp::num_materials);
 			for(int mat=0;mat<mp::num_materials; mat++) MaterialCubicAnisotropyArray.at(mat)=mp::material[mat].Kc;
 		}
-
-		// Loop over materials to check for invalid input and warn appropriately
-		for(int mat=0;mat<mp::num_materials;mat++){
-			const double lmin=material[mat].min;
-			const double lmax=material[mat].max;
-			for(int nmat=0;nmat<mp::num_materials;nmat++){
-				if(nmat!=mat){
-					double min=material[nmat].min;
-					double max=material[nmat].max;
-					if(((lmin>min) && (lmin<max)) || ((lmax>min) && (lmax<max))){
-						terminaltextcolor(RED);
-						std::cerr << "Warning: Overlapping material heights found. Check log for details." << std::endl;
-						terminaltextcolor(WHITE);
-						zlog << zTs() << "Warning: material " << mat+1 << " overlaps material " << nmat+1 << "." << std::endl;
-						zlog << zTs() << "If you have defined geometry then this may be OK, or possibly you meant to specify alloy keyword instead." << std::endl;
-						zlog << zTs() << "----------------------------------------------------" << std::endl;
-						zlog << zTs() << "  Material "<< mat+1 << ":minimum-height = " << lmin << std::endl;
-						zlog << zTs() << "  Material "<< mat+1 << ":maximum-height = " << lmax << std::endl;
-						zlog << zTs() << "  Material "<< nmat+1 << ":minimum-height = " << min << std::endl;
-						zlog << zTs() << "  Material "<< nmat+1 << ":maximum-height = " << max << std::endl;
-					}
-				}
-			}
-		}
+      // Unroll material spin moment values for speed
+      mp::mu_s_array.resize(mp::num_materials);
+      for(int mat=0;mat<mp::num_materials; mat++) mu_s_array.at(mat)=mp::material[mat].mu_s_SI/9.27400915e-24; // normalise to mu_B
 
 	return EXIT_SUCCESS;
 }

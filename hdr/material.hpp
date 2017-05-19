@@ -136,8 +136,6 @@ namespace mp
 		double initial_spin[3];
 		bool random_spins;
 
-		double min;
-		double max;
 		int geometry; ///< 0 (geometry disabled, 1+ geometry enabled with 1+ points
 		double geometry_coords[100][2];
 		double core_shell_size;
@@ -166,10 +164,10 @@ namespace mp
 		double fmr_field_strength; // Tesla
 		double fmr_field_frequency; // Hz
 		std::vector<double> fmr_field_unit_vector; /// unit vector for material uniaxial anisotropy
-		bool fill; /// flag to determine of material fills voided space
+		bool fill; /// flag to determine if material fills voided space
       double temperature_rescaling_alpha; // temperature rescaling exponent
       double temperature_rescaling_Tc; // temperaure rescaling Tc
-      bool non_magnetic;
+      int non_magnetic;
 		bool random_anisotropy; // flag to control random anisotropy by material
 		bool random_grain_anisotropy; // flag to control random anisotropy by grain
       lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
@@ -188,7 +186,7 @@ namespace mp
 	extern double gamma_SI;
 
 	// Unrolled material parameters for speed
-	extern std::vector <double> MaterialMuSSIArray;
+	extern std::vector <double> mu_s_array;
 	extern std::vector <zkval_t> MaterialScalarAnisotropyArray;
 	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
    extern std::vector <double> material_second_order_anisotropy_constant_array;

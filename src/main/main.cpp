@@ -72,7 +72,7 @@ int main(int argc, char* argv[]){
 
    // For parallel execution intialise MPI
    #ifdef MPICF
-      vmpi::initialise();
+      vmpi::initialise(argc, argv);
    #endif
 
    // Initialise log file
@@ -96,9 +96,10 @@ int main(int argc, char* argv[]){
       std::cout << std::endl;
       std::cout << "  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>" << std::endl;
       std::cout << std::endl;
-      std::cout << "  Contributors: Weijia Fan, Phanwadee Chureemart, Joe Barker, " << std::endl;
+      std::cout << "  Contributors: Weijia Fan, Phanwadee Chureemart, Andrea Meo, " << std::endl;
+      std::cout << "                Rory Pond, Sarah Jenkins, Joe Barker, " << std::endl;
       std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell," << std::endl;
-      std::cout << "                Wu Hong-Ye, Rory Pond" << std::endl;
+      std::cout << "                Wu Hong-Ye" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
       std::cout << "                Compiled with:  " << COMP << std::endl;
@@ -149,12 +150,6 @@ int main(int argc, char* argv[]){
    // Finalise MPI
    #ifdef MPICF
       vmpi::finalise();
-      // concatenate log, sort, and append departure message.
-      #ifdef WIN_COMPILE
-         if(vmpi::num_processors!=1 && vmpi::my_rank==0) system("type log.* 2>NUL | sort > log");
-      #else
-         if(vmpi::num_processors!=1 && vmpi::my_rank==0) system("ls log.* | xargs cat | sort -n > log");
-      #endif
    #endif
 
    std::cout << "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;

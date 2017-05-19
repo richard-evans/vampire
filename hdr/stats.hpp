@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ namespace stats
    //-------------------------------------------------
 
    // Control functions
-   void initialize(const int num_atoms, const int num_materials, const std::vector<double>& magnetic_moment_array, 
+   void initialize(const int num_atoms, const int num_materials, const std::vector<double>& magnetic_moment_array,
                    const std::vector<int>& material_type_array, const std::vector<int>& height_category_array);
    void update(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
    void reset();
@@ -79,6 +79,7 @@ namespace stats
    extern bool calculate_height_magnetization;
    extern bool calculate_material_height_magnetization;
    extern bool calculate_system_susceptibility;
+   extern bool calculate_material_susceptibility;
 
    class susceptibility_statistic_t;
 
@@ -105,6 +106,8 @@ namespace stats
          std::string output_normalized_mean_magnetization();
          std::string output_normalized_mean_magnetization_length();
          std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec);
+			std::string output_mean_magnetization_length();
+			std::string output_mean_magnetization();
 
       private:
          bool initialized;
@@ -151,7 +154,7 @@ namespace stats
    extern magnetization_statistic_t material_height_magnetization;
 
    extern susceptibility_statistic_t system_susceptibility;
-   //extern susceptibility_statistic_t material_susceptibility;
+   extern susceptibility_statistic_t material_susceptibility;
 
 }
 
