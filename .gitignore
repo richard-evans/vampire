@@ -34,4 +34,5 @@ MAT.mat
 UC.ucf
 exchange-template
 unit-cell-creator
+*.gcno #profiling extensions
 #EOF
