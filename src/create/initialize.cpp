@@ -22,6 +22,11 @@ namespace create{
    //-------------------------------------------------------------------------------
    void initialize(){
 
+      // If create material parameters uninitialised then initialise with default parameters
+      if(create::internal::mp.size() == 0){
+         create::internal::mp.resize(mp::num_materials);
+      }
+
       // Loop over materials to check for invalid input and warn appropriately
 		for(int mat=0;mat<mp::num_materials;mat++){
 			const double lmin=create::internal::mp[mat].min;
