@@ -214,8 +214,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization(){
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -233,8 +237,12 @@ std::string magnetization_statistic_t::output_magnetization(){
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -252,8 +260,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization_length(){
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -271,8 +283,12 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization(){
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
@@ -293,8 +309,12 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization_leng
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
@@ -315,8 +335,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // check vector has correct size
    if(vec.size()!=3){
@@ -348,6 +372,12 @@ std::string magnetization_statistic_t::output_mean_magnetization_length(){
    // result string stream
    std::ostringstream result;
 
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
+
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
 
@@ -367,6 +397,12 @@ std::string magnetization_statistic_t::output_mean_magnetization(){
 
    // result string stream
    std::ostringstream result;
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // inverse number of data samples
    const double ic = 1.0/mean_counter;

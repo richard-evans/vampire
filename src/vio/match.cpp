@@ -73,6 +73,7 @@ namespace vin{
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
         //===================================================================
         // Test for create variables

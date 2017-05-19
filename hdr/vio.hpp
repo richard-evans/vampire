@@ -95,6 +95,7 @@ namespace vin{
 
 namespace vout{
 
+   extern bool custom_precision; // enable user selectable precision for data output
    extern unsigned int precision; // variable to control output precision (digits)
    extern bool fixed; // fixed precision output
 
@@ -126,5 +127,10 @@ namespace vout{
 // Checkpoint load/save functions
 void load_checkpoint();
 void save_checkpoint();
+
+namespace vio{
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
+}
 
 #endif /*VIO_H_*/

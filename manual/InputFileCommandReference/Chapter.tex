@@ -438,6 +438,14 @@ each sublattice can be different.\\
 
 {\zicf output:output-rate = integer [default 1]}\addcontentsline{toc}{subsection}{output:output-rate} controls the number of data points written to the output file or printed to screen. By default \vampire calculates statistics once every sim:time-steps-increment number of time steps. Usually you want to output the updated statistic (e.g. magnetization) every time, which is the default behaviour. However, sometimes you may want to plot the time evolution of an average, where you want to collect statistics much more frequently than you output to the output file, which is controlled by this keyword. For example, if output:output-rate = 10 and sim:time-steps-increment = 10 then statistics (and average values) will be updated once every 10 time steps, and the new statistics will be written to the output file every 100 time steps.\\
 
+{\zicf output:precision = integer [default 6]}\addcontentsline{toc}{subsection}{output:precision} controls
+the number of digits to be used for data written to the output file or printed to screen. The default value
+is 6 digits of precision. \\
+
+{\zicf output:fixed-width = flag [default false]}\addcontentsline{toc}{subsection}{output:fixed-width} controls
+the formatting to be used for data written to the output file or printed to screen. The default is false which
+ignores trailing zeros in the output.\\
+
 \section*{Configuration output}
 \addcontentsline{toc}{section}{Configuration output}
 These options enable the output of spin configuration snapshots during the
