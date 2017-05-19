@@ -394,7 +394,7 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_isotropic(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    else if(atoms::exchange_type==1){ // Anisotropic
       double energy=0.0;
@@ -405,7 +405,7 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_vector(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    else if(atoms::exchange_type==2){ // Tensor
       double energy=0.0;
@@ -416,7 +416,7 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_tensor(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    //------------------------------
    // Calculate anisotropy energy
