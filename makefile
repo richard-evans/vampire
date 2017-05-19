@@ -34,8 +34,8 @@ CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
-GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++98 -Wno-long-long -I./hdr -I./src/qvoronoi
-GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr -I./src/qvoronoi
+GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi
+GCC_DBLFLAGS= -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi
 
 PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
 PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
