@@ -53,8 +53,8 @@ namespace cells{
       for(int i=0;i<num_local_atoms;++i) {
          int cell = cells::atom_cell_id_array[i];
          int type = cells::internal::atom_type_array[i];
-         // Consider only cells with n_atoms != 0
-         if(cells::num_atoms_in_cell[cell]>0){
+         //// Consider only cells with n_atoms != 0
+         //if(cells::num_atoms_in_cell[cell]>0){
             const double mus = mp::material[type].mu_s_SI;
             // Consider only magnetic elements
             if(mp::material[type].non_magnetic==0){
@@ -62,7 +62,7 @@ namespace cells{
                cells::mag_array_y[cell] += atoms::y_spin_array[i]*mus;
                cells::mag_array_z[cell] += atoms::z_spin_array[i]*mus;
             }
-         }
+         //}
       }
 
       #ifdef MPICF
