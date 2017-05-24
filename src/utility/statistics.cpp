@@ -166,7 +166,7 @@ int mag_m(){
 
       // Calculate global moment for all CPUs
       #ifdef MPICF
-         MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::max_moment,1,MPI_DOUBLE,MPI_SUM);
+         MPI_Allreduce(MPI_IN_PLACE,&stats::max_moment,1,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
       #endif
 
       // Resize arrays
@@ -295,7 +295,7 @@ double max_torque(){
 
    // find max torque on all nodes
    #ifdef MPICF
-      MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&max_torque,1,MPI_DOUBLE,MPI_MAX);
+      MPI_Allreduce(MPI_IN_PLACE,&max_torque,1,MPI_DOUBLE,MPI_MAX, MPI_COMM_WORLD);
    #endif
 
   return max_torque;
@@ -342,10 +342,10 @@ void system_torque(){
 
 	// reduce torque on all nodes
 	#ifdef MPICF
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&torque[0],3,MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_x_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_y_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_z_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
+		MPI_Allreduce(MPI_IN_PLACE,&torque[0],3,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_x_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_y_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_z_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
 	#endif
 
 	// Set stats values
@@ -394,7 +394,7 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_isotropic(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    else if(atoms::exchange_type==1){ // Anisotropic
       double energy=0.0;
@@ -405,7 +405,7 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_vector(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    else if(atoms::exchange_type==2){ // Tensor
       double energy=0.0;
@@ -416,7 +416,7 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_tensor(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    //------------------------------
    // Calculate anisotropy energy

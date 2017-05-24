@@ -19,17 +19,6 @@
 namespace create{
    namespace internal{
 
-      struct core_radius_t{
-         int mat;
-         double radius;
-      };
-
-      /// comparison function for reverse order sorting
-      static bool compare_radius(core_radius_t first,core_radius_t second){
-         if(first.radius<second.radius) return false;
-         else return true;
-      }
-
       void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain){
          //----------------------------------------------------------------------
          // Function to cut a truncated cone
@@ -86,13 +75,15 @@ namespace create{
                   int mat = (it)->mat;
 						double my_radius = mp::material[mat].core_shell_size;
 						const double my_radius_sq = my_radius*my_radius;
-						double maxz=mp::material[mat].max*cs::system_dimensions[2];
-						double minz=mp::material[mat].min*cs::system_dimensions[2];
+						double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+						double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
+                  const int atom_uc_cat = catom_array[atom].uc_category;
+                  const int mat_uc_cat = create::internal::mp[mat].unit_cell_category;
 						//double max_range = my_radius*my_radius*particle_radius_squared;
 						// check for within core shell range
 				      //if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (2.0*cs::system_dimensions[2]-(cz))*(2.0*cs::system_dimensions[2]-(cz))*inv_c_sq*my_radius_sq){
 				      if(range_x_sq*inv_r_sq + range_y_sq*inv_r_sq <= (L_cone-(cz))*(L_cone-(cz))*inv_c_sq*my_radius_sq){
-							if((cz>=minz) && (cz<maxz)){
+							if((cz>=minz) && (cz<maxz) && (atom_uc_cat == mat_uc_cat) ){
 							   catom_array[atom].include=true;
 							   catom_array[atom].material=mat;
 							   catom_array[atom].grain=grain;

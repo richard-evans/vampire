@@ -11,6 +11,7 @@
 
 // Vampire headers
 #include "stats.hpp"
+#include "vio.hpp"
 #include "vmpi.hpp"
 
 namespace stats{
@@ -20,6 +21,8 @@ namespace stats{
                    const std::vector<double>& magnetic_moment_array,
                    const std::vector<int>& material_type_array,
                    const std::vector<int>& height_category_array){
+
+      zlog << zTs() << "Initialising statistics module" << std::endl;
 
       //--------------------------------------------------------------
       // Set up statistics masks for different data sets
@@ -74,6 +77,7 @@ namespace stats{
 
       // system susceptibility
       if(stats::calculate_system_susceptibility) stats::system_susceptibility.initialize(stats::system_magnetization);
+      if(stats::calculate_material_susceptibility) stats::material_susceptibility.initialize(stats::material_magnetization);
 
       return;
    }

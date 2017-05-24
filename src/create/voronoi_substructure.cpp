@@ -196,7 +196,7 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
       material_order.push_back(tmp);
    }
    // sort by increasing radius
-   material_order.sort(compare_radius_vor);
+   material_order.sort(compare_radius);
 
 	std::cout <<"Generating voronoi substructure";
 	zlog << zTs() << "Generating voronoi substructure";
@@ -274,12 +274,12 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
                      for(std::list<core_radius_t>::iterator it = material_order.begin(); it !=  material_order.end(); it++){
                         int mat = (it)->mat;
                         double factor = mp::material[mat].core_shell_size;
-                        double maxz=mp::material[mat].max*cs::system_dimensions[2];
-                        double minz=mp::material[mat].min*cs::system_dimensions[2];
+                        double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+                        double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
                         double cz=catom_array[atom].z;
                         // calculate reduced ranges for materials with small offset to prevent dangling atoms
-                        double rminz = mp::material[mat].min-0.01;
-                        double rmaxz = mp::material[mat].max+0.01;
+                        double rminz = create::internal::mp[mat].min-0.01;
+                        double rmaxz = create::internal::mp[mat].max+0.01;
                         double factor_radius = 0.0;
                         if(frh > nucleation_height){
                            // multiply by small factor to ensure grains touch at boundary for zero spacing
@@ -304,11 +304,11 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
                   // Check to see if site is within polygon
                   //else{
                   int mat = catom_array[atom].material;
-                  double maxz=mp::material[mat].max*cs::system_dimensions[2];
-                  double minz=mp::material[mat].min*cs::system_dimensions[2];
+                  double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
+                  double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
                   // calculate reduced ranges for materials with small offset to prevent dangling atoms
-                  double rminz = mp::material[mat].min-0.01;
-                  double rmaxz = mp::material[mat].max+0.01;
+                  double rminz = create::internal::mp[mat].min-0.01;
+                  double rmaxz = create::internal::mp[mat].max+0.01;
                   double factor_radius = 0.0;
                   if(frh > nucleation_height){
                      // multiply by small factor to ensure grains touch at boundary for zero spacing
@@ -335,8 +335,8 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
    // Now fill in with fill materials
    for(int mat=0;mat<mp::num_materials;mat++){
       if(create::internal::mp[mat].sub_fill){
-         double min = mp::material[mat].min*cs::system_dimensions[2];
-         double max = mp::material[mat].max*cs::system_dimensions[2];
+         double min = create::internal::mp[mat].min*cs::system_dimensions[2];
+         double max = create::internal::mp[mat].max*cs::system_dimensions[2];
 
          // loop over all atoms selecting only deselected atoms within min/max
          for(unsigned int atom=0;atom<catom_array.size();atom++){

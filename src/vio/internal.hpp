@@ -45,9 +45,8 @@ namespace vin{
    int match_config(std::string const, std::string const, std::string const, int const);
 
    //----------------------------------------------------------------------------------
-   //Funciton protypes for functions inside: read.cpp
+   //Function protypes for functions inside: read.cpp
    //----------------------------------------------------------------------------------
-   std::string GetString(std::string const filename);
    int read(std::string const filename);
    int read_mat_file(std::string const, int const);
 
@@ -105,6 +104,12 @@ namespace vout{
    void height_mvec_actual(std::ostream& stream);
    void material_height_mvec_actual(std::ostream& stream);
    void fmr_field_strength(std::ostream& stream);
+	void mean_mvec(std::ostream& stream);
+	void mat_mean_mvec(std::ostream& stream);
+   void mean_material_susceptibility(std::ostream& stream);
+   void mean_height_magnetisation_length(std::ostream& stream);
+   void mean_height_magnetisation(std::ostream& stream);
+
    void MPITimings(std::ostream& stream);
 
    //-------------------------------------------------------------------------

@@ -52,6 +52,7 @@
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "create.hpp"
 #include "dipole.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
@@ -62,7 +63,7 @@
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
-#include "create.hpp"
+
 
 
 
@@ -77,7 +78,7 @@ namespace cs{
 	// System Dimensions
 	double system_dimensions[3]={77.0,77.0,77.0};	/// Size of system (A)
 	bool pbc[3]={false,false,false};						/// Periodic boundary conditions
-	bool SelectMaterialByZHeight=false;					/// Toggle overwriting of material id by z-height
+
 	bool SelectMaterialByGeometry=false;					/// Toggle override of input material type by geometry
 	unsigned int total_num_unit_cells[3]={0,0,0};	/// Unit cells for entire system (x,y,z)
 	unsigned int local_num_unit_cells[3]={0,0,0};	/// Unit cells on local processor (x,y,z)
@@ -134,6 +135,9 @@ int create(){
 	//=============================================================
 	//      System creation variables
 	//=============================================================
+
+   // initialise create module parameters
+   create::initialize();
 
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array;
@@ -199,7 +203,7 @@ int create(){
 			}
 
 			// Wait for process who is it
-			MPI::COMM_WORLD.Barrier();
+			vmpi::barrier();
 
 		} // end of loop over processes
 	}
@@ -215,9 +219,9 @@ int create(){
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		MPI::COMM_WORLD.Barrier(); // wait for everyone
+		vmpi::barrier();// wait for everyone
 		vmpi::copy_halo_atoms(catom_array);
-		MPI::COMM_WORLD.Barrier(); // sync after halo atoms copied
+		vmpi::barrier(); // sync after halo atoms copied
 	}
 	else if(vmpi::mpi_mode==1){
 		vmpi::set_replicated_data(catom_array);
@@ -238,7 +242,7 @@ int create(){
 	} // stop if for staged generation here
 	// ** Must be done in parallel **
 		vmpi::init_mpi_comms(catom_array);
-		MPI::COMM_WORLD.Barrier();
+		vmpi::barrier();
 	#endif
 
 	// Set atom variables for simulation
@@ -264,7 +268,7 @@ int create(){
 			}
 
 			// Wait for process who is it
-			MPI::COMM_WORLD.Barrier();
+			vmpi::barrier();
 
 		} // end of loop over processes
 	}
@@ -345,7 +349,7 @@ int create(){
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    //std::cout << "my_num_atoms == " << my_num_atoms << std::endl;
 	int total_num_atoms=0;
-	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
+	MPI_Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
    zlog << zTs() << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
 	#else

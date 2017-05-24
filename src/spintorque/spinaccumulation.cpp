@@ -55,39 +55,41 @@ namespace st{
 
          // set local constants
          double je = st::internal::je; // current (C/s)
-  
-     //---------------------------------------------------------------------------------------------------     
+
+     //---------------------------------------------------------------------------------------------------
           //set parameters for TMR calculation
           if(st::internal::TMRenable == true){
  	    int FL = mp::num_materials-1;
 	    double dot = st::internal::magx_mat[0]*st::internal::magx_mat[FL]+
 	                 st::internal::magy_mat[0]*st::internal::magy_mat[FL]+
 	                 st::internal::magz_mat[0]*st::internal::magz_mat[FL];
-			 
-	   double MgO_thickness = (mp::material[2].min - mp::material[1].max)*cs::system_dimensions[2]*1.0e-10;
-	    
-	    //calculate the relative angle of two FMs	
+
+      // RE - this code is not general! Needs to be fixed. Placeholder added in the meantime
+	   //double MgO_thickness = (mp::material[2].min - mp::material[1].max)*cs::system_dimensions[2]*1.0e-10;
+      double MgO_thickness = 0.1*cs::system_dimensions[2]*1.0e-10;
+
+	    //calculate the relative angle of two FMs
 	    st::internal::rel_angle = acos(dot);
 	    double plus_cos = 1.0+cos(st::internal::rel_angle);
 	    double minus_cos = 1.0-cos(st::internal::rel_angle);
 	    double exp_t = exp(-MgO_thickness/0.25e-9);
-	    
+
 	    double jtunnel = st::internal::je*0.5*(plus_cos+0.5*minus_cos)*exp_t;
-	    
+
 	    //set the current je and spin poralisation parameters
 	    je = jtunnel;
 	    st::internal::default_properties.beta_cond = st::internal::mp[0].beta_cond*0.5*(plus_cos+0.5*minus_cos)*exp_t;
        	    st::internal::default_properties.beta_diff = st::internal::mp[0].beta_diff*0.5*(plus_cos+0.5*minus_cos)*exp_t;
-	    
-	    
+
+
 	 // Calculate spin torque parameters
         for(int cell=0; cell<st::internal::beta_cond.size(); ++cell){
-          
+
 	    // check for zero atoms in cell
-	    if(st::internal::cell_natom[cell] <= 0.0001){    
+	    if(st::internal::cell_natom[cell] <= 0.0001){
 		st::internal::beta_cond[cell]   = st::internal::default_properties.beta_cond;
 		st::internal::beta_diff[cell]   = st::internal::default_properties.beta_diff;
-	      
+
 		const double hbar = 1.05457162e-34;
 		const double B  = st::internal::beta_cond[cell];
 		const double Bp = st::internal::beta_diff[cell];
@@ -106,18 +108,18 @@ namespace st{
 
 		st::internal::a[cell] =  real(inv_lplus);
 		st::internal::b[cell] = -imag(inv_lplus);
-		
-	
+
+
 	     }
         }
-	    
+
 	   st::internal::output_base_microcell_data();
-    
+
  	 }
-                
-   //---------------------------------------------------------------------------------------------------     
-         
-         
+
+   //---------------------------------------------------------------------------------------------------
+
+
          const double i_muB = 1.0/9.274e-24; // J/T
          const double i_e = 1.0/1.60217662e-19; // electronic charge (Coulombs)
          const double microcell_volume = (st::internal::micro_cell_size *

@@ -34,12 +34,4 @@ namespace create_voronoi{
 	extern double area_cutoff;
 }
 
-struct core_radius_t{
-   int mat;
-   double radius;
-};
-
-/// comparison function for reverse order sorting
-extern bool compare_radius_vor(core_radius_t first,core_radius_t second);
-
 #endif //CREATE_VORONOI_H_

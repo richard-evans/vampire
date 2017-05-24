@@ -169,17 +169,19 @@ namespace vout{
 		}
 		#endif
 
-		// check for open ofstream
-		if(!zmag.is_open()){
-			// check for checkpoint continue and append data
-			if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
-			// otherwise overwrite file
-			else{
-				zmag.open("output",std::ofstream::trunc);
-				// write file header information
-				if(vmpi::my_rank==0) write_output_file_header(zmag, file_output_list);
-			}
-		}
+      // check for open ofstream on root process only
+      if(vmpi::my_rank == 0){
+         if(!zmag.is_open()){
+            // check for checkpoint continue and append data
+            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
+            // otherwise overwrite file
+            else{
+               zmag.open("output",std::ofstream::trunc);
+               // write file header information
+               write_output_file_header(zmag, file_output_list);
+            }
+         }
+      }
 
 		// Only output 1/output_rate time steps
 		if(sim::time%vout::output_rate==0){
@@ -323,6 +325,21 @@ namespace vout{
 					case 47:
 						vout::fmr_field_strength(zmag);
 						break;
+               case 48:
+						vout::mean_mvec(zmag);
+						break;
+               case 49:
+						vout::mat_mean_mvec(zmag);
+						break;
+               case 50:
+						vout::mean_material_susceptibility(zmag);
+						break;
+					case 51:
+						vout::mean_height_magnetisation_length(zmag);
+						break;
+					case 52:
+						vout::mean_height_magnetisation(zmag);
+						break;
 					case 60:
 						vout::MPITimings(zmag);
 						break;
@@ -463,6 +480,15 @@ namespace vout{
 					case 47:
 						vout::fmr_field_strength(std::cout);
 						break;
+               case 48:
+						vout::mean_mvec(std::cout);
+						break;
+               case 49:
+						vout::mat_mean_mvec(std::cout);
+						break;
+               case 50:
+						vout::mean_material_susceptibility(std::cout);
+						break;
 					case 60:
 						vout::MPITimings(std::cout);
 						break;
@@ -528,7 +554,8 @@ namespace vout{
 		}
 		}
 
-		vout::config();
+		// Output configuration files to disk
+		config::output();
 
 		// optionally save checkpoint file
 		if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();

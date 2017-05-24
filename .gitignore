@@ -1,38 +1,82 @@
-# Git Ignore file
-# Ignore object file
+#----------------------------------------------
+# Git Ignore file for vampire source code
+#----------------------------------------------
+
+#----------------------------------------------
+# Ignore object files
+#----------------------------------------------
 *.o
-#Ignore temporary editor files
+
+#----------------------------------------------
+# Ignore temporary editor files
+#----------------------------------------------
 *~
 *.swp
-#Ignore error files
-*.err
-#Povray files
-*.pov
-# Mac files
-*.DS_Store
-# Other sundry files
+
+#----------------------------------------------
+# Povray files
+#----------------------------------------------
 *.png
-*.cfg
+*.pov
 *.inc
+*.ini
+
+#----------------------------------------------
+# OSX/macOS files
+#----------------------------------------------
+*.DS_Store
+
+#----------------------------------------------
+# Other sundry files
+#----------------------------------------------
 *old.cpp
 *old.hpp
 *.bkp
-info
-vampire*
-cfg2povray
-cfg2rasmol
+*.json
+vampire.pkg # installation package
+
+#----------------------------------------------
+# Profiling and debugging extensions
+#----------------------------------------------
+*.gcno
+
+#----------------------------------------------
+# Manual files to be ignored
+#----------------------------------------------
+vampire_manual.pdf
+vampire_manual.out
+vampire_manual.synctex.gz
+
+#----------------------------------------------
+# Data file formats in vampire
+#----------------------------------------------
+*.cfg
+*.data
+*.meta
 crystal.xyz
 log
 grain
-log.*
-info
 output
-run/unit-cell-creator
 MPI-compute-times
 MPI-wait-times
 MAT.mat
 UC.ucf
 exchange-template
-unit-cell-creator
-*.gcno
+
+#----------------------------------------------
+# Executables
+#----------------------------------------------
+vampire-serial
+vampire-parallel
+vdc.x
+vampire*
+
+#----------------------------------------------
+# Obsolete
+#----------------------------------------------
+cfg2povray
+cfg2rasmol
+log.*
+run/unit-cell-creator
+
 #EOF

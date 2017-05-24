@@ -39,6 +39,9 @@
 #include <sstream>
 #include <vector>
 
+// Internal create header
+#include "internal.hpp"
+
 namespace cs{
 
 int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
@@ -93,7 +96,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
    for(unsigned int uca=0;uca<unit_cell.atom.size();uca++) if(unit_cell.atom[uca].hc > maxlh) maxlh = unit_cell.atom[uca].hc;
    maxlh+=1;
 
-   const double cff = 1.e-9; // Small numerical correction for atoms exactly on the borderline between processors
+   const double cff = 1.e-99; // Small numerical correction for atoms exactly on the borderline between processors
 
 	// Duplicate unit cell
 	for(int z=min_bounds[2];z<max_bounds[2];z++){
@@ -122,7 +125,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].material=unit_cell.atom[uca].mat;
 							catom_array[atom].uc_id=uca;
 							catom_array[atom].lh_category=unit_cell.atom[uca].hc+z*maxlh;
-							catom_array[atom].uc_category=unit_cell.atom[uca].lc;
+							catom_array[atom].uc_category=unit_cell.atom[uca].mat; // determine initial material (uc_category) for unit cell
 							catom_array[atom].scx=x;
 							catom_array[atom].scy=y;
 							catom_array[atom].scz=z;
@@ -140,7 +143,7 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 							catom_array[atom].material=unit_cell.atom[uca].mat;
 							catom_array[atom].uc_id=uca;
 							catom_array[atom].lh_category=unit_cell.atom[uca].hc+z*maxlh;
-							catom_array[atom].uc_category=unit_cell.atom[uca].lc;
+							catom_array[atom].uc_category=unit_cell.atom[uca].mat; // determine initial material (uc_category) for unit cell
 							catom_array[atom].scx=x;
 							catom_array[atom].scy=y;
 							catom_array[atom].scz=z;
@@ -165,48 +168,8 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 		tmp_catom_array.resize(0);
 	}
 
-
-	// If z-height material selection is enabled then do so
-	if(cs::SelectMaterialByZHeight==true){
-
-		// Check for interfacial roughness and call custom material assignment routine
-		if(cs::interfacial_roughness==true) cs::roughness(catom_array);
-
-      // Check for multilayer system and if required generate multilayers
-      else if(cs::multilayers) cs::generate_multilayers(catom_array);
-
-		// Otherwise perform normal assignement of materials
-		else{
-
-			// determine z-bounds for materials
-			std::vector<double> mat_min(mp::num_materials);
-			std::vector<double> mat_max(mp::num_materials);
-         std::vector<bool> mat_fill(mp::num_materials);
-
-         // Unroll min, max and fill for performance
-			for(int mat=0;mat<mp::num_materials;mat++){
-				mat_min[mat]=mp::material[mat].min*cs::system_dimensions[2];
-				mat_max[mat]=mp::material[mat].max*cs::system_dimensions[2];
-				// alloys generally are not defined by height, and so have max = 0.0
-				if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
-            mat_fill[mat]=mp::material[mat].fill;
-			}
-
-			// Assign materials to generated atoms
-			for(unsigned int atom=0;atom<catom_array.size();atom++){
-				for(int mat=0;mat<mp::num_materials;mat++){
-					const double cz=catom_array[atom].z;
-					if((cz>=mat_min[mat]) && (cz<mat_max[mat]) && (mat_fill[mat]==false)){
-						catom_array[atom].material=mat;
-						catom_array[atom].include=true;
-					}
-				}
-			}
-		}
-
-		// Delete unneeded atoms
-		clear_atoms(catom_array);
-	}
+   // assign materials by layer
+   create::internal::layers(catom_array);
 
 	// Check to see if any atoms have been generated
 	if(atom==0){

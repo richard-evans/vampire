@@ -14,6 +14,7 @@ sc.o \
 bcc.o \
 fcc.o \
 hcp.o \
+rocksalt.o \
 verify.o
 
 # Append module objects to global tree

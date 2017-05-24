@@ -66,6 +66,9 @@ namespace vin{
    extern void check_for_valid_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
                                      double range_min, double range_max, std::string input_file_type, std::string range_text);
 
+   extern void check_for_valid_positive_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
+                                              double range_min, double range_max, std::string input_file_type, std::string range_text);
+
    extern void check_for_valid_int(int& value, std::string word, int line, std::string prefix, int range_min, int range_max,
                                    std::string input_file_type, std::string range_text);
 
@@ -83,6 +86,9 @@ namespace vin{
 
    extern std::vector<double> DoublesFromString(std::string value);
 
+   // function to read file on master process and return a std::string of its contents
+   extern std::string get_string(std::string const filename, std::string source_file_name, int line);
+
    extern std::vector<mp::materials_t> read_material;
 
 }
@@ -97,9 +103,6 @@ namespace vout{
    extern int output_rate;
 
    extern bool gnuplot_array_format;
-
-	extern bool output_grains_config;
-	extern int output_config_grain_rate;
 
 	//extern bool output_povray;
 	//extern int output_povray_rate;

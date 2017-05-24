@@ -70,7 +70,7 @@ int main(int argc, char* argv[]){
 
    // For parallel execution intialise MPI
    #ifdef MPICF
-      vmpi::initialise();
+      vmpi::initialise(argc, argv);
    #endif
 
    // Initialise log file

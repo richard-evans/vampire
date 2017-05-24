@@ -40,6 +40,9 @@
 ///=====================================================================================
 ///
 
+// Standard Libraries
+#include <iostream>
+
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
@@ -56,8 +59,8 @@
 #include "vmpi.hpp"
 #include "vutil.hpp"
 
-// Standard Libraries
-#include <iostream>
+// sim module headers
+#include "internal.hpp"
 
 namespace sim{
 	std::ofstream mag_file;
@@ -245,25 +248,6 @@ int run(){
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
 
-	// For MPI version, calculate initialisation time
-	if(vmpi::my_rank==0){
-		#ifdef MPICF
-			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
-			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
-			vmpi::start_time=MPI_Wtime(); // reset timer
-		#endif
-		std::cout << "Starting Simulation with Program ";
-		zlog << zTs() << "Starting Simulation with Program ";
-	}
-
-	// Now set initial compute time
-	#ifdef MPICF
-	vmpi::ComputeTime=MPI_Wtime();
-	vmpi::WaitTime=MPI_Wtime();
-	vmpi::TotalComputeTime=0.0;
-	vmpi::TotalWaitTime=0.0;
-	#endif
-
 	// Initialise random number generator
 	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
 
@@ -308,6 +292,32 @@ int run(){
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
+
+   // For MPI version, calculate initialisation time
+	if(vmpi::my_rank==0){
+		#ifdef MPICF
+			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
+			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
+			vmpi::start_time=MPI_Wtime(); // reset timer
+		#endif
+   }
+
+   // Precondition spins at equilibration temperature
+   sim::internal::monte_carlo_preconditioning();
+
+   // For MPI version, calculate initialisation time
+   if(vmpi::my_rank==0){
+		std::cout << "Starting Simulation with Program ";
+		zlog << zTs() << "Starting Simulation with Program ";
+	}
+
+	// Now set initial compute time
+	#ifdef MPICF
+	vmpi::ComputeTime=MPI_Wtime();
+	vmpi::WaitTime=MPI_Wtime();
+	vmpi::TotalComputeTime=0.0;
+	vmpi::TotalWaitTime=0.0;
+	#endif
 
 	// Select program to run
 	switch(sim::program){

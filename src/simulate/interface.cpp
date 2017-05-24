@@ -42,6 +42,14 @@ namespace sim{
          sim::internal::slonczewski_spin_polarization_unit_vector = u;
          return true;
       }
+      test="preconditioning-steps";
+      if(word==test){
+         int n = atoi(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_int(n, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
+         sim::internal::num_monte_carlo_preconditioning_steps = n;
+         return true;
+      }
       //--------------------------------------------------------------------
       // input parameter not found here
       return false;

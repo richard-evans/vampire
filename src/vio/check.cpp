@@ -23,7 +23,7 @@
 
 namespace vin{
 
-    ///
+    ///-----------------------------------------------------------------------
     /// Function to check for correct unit type and valid variable range
     ///-----------------------------------------------------------------------
     ///
@@ -80,6 +80,38 @@ namespace vin{
 
     }
 
+   ///-----------------------------------------------------------------------
+   /// Function to check for correct unit type and valid variable range
+   ///-----------------------------------------------------------------------
+   ///
+   void check_for_valid_positive_value(double& value, /// value of variable as in input file
+                                     std::string word, /// input file keyword
+                                     int line, /// input file line
+                                     std::string prefix, /// input file prefix
+                                     std::string unit, /// unit specified in input file
+                                     std::string unit_type, /// expected unit type
+                                     double range_min, /// acceptable minimum value for variable
+                                     double range_max, /// acceptable maximum value for variable
+                                     std::string input_file_type, ///input file name
+                                     std::string range_text) /// customised text
+   {
+
+      // check for correct conversion and absolute value
+      check_for_valid_value(value, word, line, prefix, unit, unit_type, range_min, range_max, input_file_type, range_text);
+
+      // check for positive value
+      if(value < 0.0){
+          terminaltextcolor(RED);
+          std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be a positive constant " << range_text << "." << std::endl;
+          terminaltextcolor(WHITE);
+          zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be a positive constant " << range_text << "." << std::endl;
+          err::vexit();
+      }
+
+      // Success - input is sane!
+      return;
+
+   }
     ///
     /// Function to check for valid int variable range
     ///-----------------------------------------------------------------------

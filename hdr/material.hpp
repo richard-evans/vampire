@@ -134,8 +134,6 @@ using std::string;
 		double initial_spin[3];
 		bool random_spins;
 
-		double min;
-		double max;
 		int geometry; ///< 0 (geometry disabled, 1+ geometry enabled with 1+ points
 		double geometry_coords[100][2];
 		double core_shell_size;

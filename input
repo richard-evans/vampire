@@ -45,5 +45,7 @@ output:magnetisation
 output:magnetisation-length
 output:output-rate = 1000
 
+config:atoms
+
 screen:time-steps
 screen:magnetisation-length
