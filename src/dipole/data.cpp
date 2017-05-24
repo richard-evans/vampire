@@ -39,7 +39,9 @@ namespace dipole{
    std::vector < double > atom_mu0demag_field_array_y;
    std::vector < double > atom_mu0demag_field_array_z;
 
-   double cutoff = 12.0; //12.0; /// cutoff distance between cells over which bare macro cell model can be applied
+   double cutoff = 2.0;  /// cutoff distance between cells over which bare macro cell model can be applied
+                         /// N.B.: after 12 cells inter-intra method is equivalent to bare macrocell method.
+                         /// Although, 2 cells is enough because there are other error sources limiting the accuracy.
 
    //uint64_t sim_time;
 
