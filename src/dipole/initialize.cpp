@@ -190,14 +190,6 @@ namespace dipole{
                   dipole::internal::cells_num_cells
                   );
 
-         //// Safety check: print cells infos
-         //for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
-         //   if(cells_num_atoms_in_cell_global[i]>0 && dipole::internal::cells_num_atoms_in_cell[i]==0){
-         //      dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
-         //      //fprintf(stderr,"  >>> cell=%d, cells_num_atoms_in_cell_global=%d, x = %f y = %f z = %f on my_rank=%d proc_cell_index_array[%d]=%d\n",lc,cells_num_atoms_in_cell_global[lc],dipole::internal::cells_pos_and_mom_array[4*lc+0],dipole::internal::cells_pos_and_mom_array[4*lc+1],dipole::internal::cells_pos_and_mom_array[4*lc+2],vmpi::my_rank,lc,dipole::internal::proc_cell_index_array1D[lc]);
-         //   }
-         //}
-
          // Clear memory
          cells_num_atoms_in_cell_global.clear();
          // Clear atom_pos_x,y,z
@@ -298,15 +290,15 @@ namespace dipole{
                  	double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
                  	double rij_1 = 1.0/rij;
 
-                  // If distance between macro-cells > cutoff nm => continuum approach
+                  // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
                   if( (rij_1)/cells_macro_cell_size > dipole::cutoff){
-
+                     // define unitarian distance vectors
                   	double ex = rx*rij;
                   	double ey = ry*rij;
                   	double ez = rz*rij;
 
                   	double rij3 = (rij*rij*rij); // Angstroms
-
+                     // calculate dipolar matrix for 6 entries because of symmetry
                   	dipole::internal::rij_inter_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
                   	dipole::internal::rij_inter_xy[lc][j] = ( 3.0*ex*ey      )*rij3 ;
                   	dipole::internal::rij_inter_xz[lc][j] = ( 3.0*ex*ez      )*rij3 ;
@@ -315,6 +307,7 @@ namespace dipole{
                   	dipole::internal::rij_inter_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
                   	dipole::internal::rij_inter_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
                   }
+                  // If distance between macro-cells < cutoff ==> apply inter-intra method
                   else if( (1.0/rij)/cells_macro_cell_size <= dipole::cutoff){
                      for(int pi=0; pi<dipole::internal::cells_num_atoms_in_cell[i]; pi++){
                         for(int qj=0; qj<dipole::internal::cells_num_atoms_in_cell[j]; qj++){
@@ -325,7 +318,7 @@ namespace dipole{
 
                            rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);  //Reciprocal of the distance
                            rij_1 = 1.0/rij;
-
+                           // Check if there are not prolems with distances, otherwise print out error message
                            if( rij_1==0.0 ) {
                               fprintf(stderr,">>>>> (Inter)  Warning: atoms are overlapping in cells i=%d\tand j=%d\ton rank=%d\t<<<<<\n",i,j,vmpi::my_rank);
                               std::cout << ">>>>> (Inter) Warning: atoms are overlapping in cells i,j " << i << "\t" << j <<"<<<<<" << std::endl;
@@ -362,7 +355,7 @@ namespace dipole{
                      dipole::internal::rij_inter_yy[lc][j] =  (tmp_rij_inter_yy);
                      dipole::internal::rij_inter_yz[lc][j] =  (tmp_rij_inter_yz);
                      dipole::internal::rij_inter_zz[lc][j] =  (tmp_rij_inter_zz);
-
+                     // Normalisation by the number of atoms in the cell. This is required for the correct evaluation of the field in the update.cpp routine
                      dipole::internal::rij_inter_xx[lc][j] = dipole::internal::rij_inter_xx[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                      dipole::internal::rij_inter_xy[lc][j] = dipole::internal::rij_inter_xy[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                      dipole::internal::rij_inter_xz[lc][j] = dipole::internal::rij_inter_xz[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
@@ -485,25 +478,9 @@ namespace dipole{
 	   //-------------------------------------------------------//
 	   //------- CPUs OUTPUT Dij on different fiels ------------//
 	   //-------------------------------------------------------//
-      // Set local output filename
-      std::stringstream file_sstr;
-      file_sstr << "Dij-";
-      file_sstr << vmpi::my_rank;
-      // Set CPUID on non-root process
-      //if(vmpi::my_rank!=0){
-         //file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
-      //}
-      //file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter;
-      //file_sstr << ".cfg";
-      std::string cfg_file = file_sstr.str();
-      const char* cfg_filec = cfg_file.c_str();
 
       // Output informative message to log file
-      zlog << zTs() << "Outputting dipole matrix file " << cfg_file << " to disk" << std::endl;
-
-      // Declare and open output file
-      std::ofstream cfg_file_ofstr;
-      cfg_file_ofstr.open (cfg_filec);
+      zlog << zTs() << "Outputting dipole matrix " << std::endl;
 
       // Output Demag tensor only if first step of simulation since depending only on shape
       if(sim::time == 0){
@@ -514,9 +491,6 @@ namespace dipole{
             int i = cells::cell_id_array[lc];
             num_atoms_magnetic += dipole::internal::cells_num_atoms_in_cell[i];
          }
-         //#ifdef MPICF
-         //   MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-         //#endif
 
          // Define and initialise Demag factor N tensor components
          double Nxx = 0.0;
@@ -534,24 +508,6 @@ namespace dipole{
                for(unsigned int j=0; j<dipole::internal::rij_inter_xx[lc].size(); j++){
                   if(dipole::internal::cells_num_atoms_in_cell[j]>0){
 
-                    /* // Define prefactor for Hdemag and calculate self term
-                     // Add self-demagnetisation as 1/3V
-                     const double self_demag = 1.0/(3.0*dipole::internal::cells_volume_array[j]);
-	                  const double hdx = self_demag*(cells::mag_array_x[j]/9.27400915e-24);
-	                  const double hdy = self_demag*(cells::mag_array_y[j]/9.27400915e-24);
-	                  const double hdz = self_demag*(cells::mag_array_z[j]/9.27400915e-24);
-                     // normalise mag arrays
-	                  const double mx = cells::mag_array_x[j]/9.27400915e-24;
-	                  const double my = cells::mag_array_y[j]/9.27400915e-24;
-	                  const double mz = cells::mag_array_z[j]/9.27400915e-24;
-
-                     const double Mx = cells::mag_array_x[j]/(dipole::internal::cells_volume_array[j])*1.0e30;
-                     const double My = cells::mag_array_y[j]/(dipole::internal::cells_volume_array[j])*1.0e30;
-                     const double Mz = cells::mag_array_z[j]/(dipole::internal::cells_volume_array[j])*1.0e30;
-                     const double Mtot = std::sqrt(Mx*Mx + My*My + Mz*Mz);
-                     const double magtot = std::sqrt(cells::mag_array_x[j]*cells::mag_array_x[j]+cells::mag_array_y[j]*cells::mag_array_y[j]+cells::mag_array_z[j]*cells::mag_array_z[j]);
-	                  const double hd = self_demag*(magtot/9.27400915e-24); */
-
                      // To obtain dipolar matrix free of units, multiply tensor by "factor"
                      const double Vatomic = dipole::internal::cells_volume_array[j]/double(dipole::internal::cells_num_atoms_in_cell[j]);
                      const double factor = Vatomic*double(dipole::internal::cells_num_atoms_in_cell[j]) * double(dipole::internal::cells_num_atoms_in_cell[i]);
@@ -562,38 +518,6 @@ namespace dipole{
                      Nyy += factor*(dipole::internal::rij_intra_yy[lc][j]+dipole::internal::rij_inter_yy[lc][j]);
                      Nyz += factor*(dipole::internal::rij_intra_yz[lc][j]+dipole::internal::rij_inter_yz[lc][j]);
                      Nzz += factor*(dipole::internal::rij_intra_zz[lc][j]+dipole::internal::rij_inter_zz[lc][j]);
-
-                     /*cfg_file_ofstr << "i = " << i << "\tlc = " << lc << "\t";
-                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*i+0] << "\t";
-                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*i+1] << "\t";
-                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*i+2] << "\t";
-                     cfg_file_ofstr << " j = " << j << "\t";
-                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+0] << "\t";
-                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+1] << "\t";
-                     cfg_file_ofstr << dipole::internal::cells_pos_and_mom_array[4*j+2] << "\t";
-                     cfg_file_ofstr << "\n";
-                     // Define total dipolar tensor = intra + inter tensors, in order to obtain demagnetisation tensor
-	 	  				   // Print Demag factor tensor
-	 	  				   cfg_file_ofstr << "rij_intra_xx = " << -1.0*((dipole::internal::rij_intra_xx[lc][j]+dipole::internal::rij_inter_xx[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)-hd )* 9.27400915e6/Mtot << "\trij_intra_xy = " << -1.0*((dipole::internal::rij_intra_xy[lc][j]+dipole::internal::rij_inter_xy[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\trij_intra_xz = " << -1.0*((dipole::internal::rij_intra_xz[lc][j]+dipole::internal::rij_inter_xz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\n";
-	 	  				   cfg_file_ofstr << "rij_intra_yx = " << -1.0*((dipole::internal::rij_intra_xy[lc][j]+dipole::internal::rij_inter_xy[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\trij_intra_yy = " << -1.0*((dipole::internal::rij_intra_yy[lc][j]+dipole::internal::rij_inter_yy[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)-hd )* 9.27400915e6/Mtot << "\trij_intra_yz = " << -1.0*((dipole::internal::rij_intra_yz[lc][j]+dipole::internal::rij_inter_yz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\n";
-	 	  				   cfg_file_ofstr << "rij_intra_zx = " << -1.0*((dipole::internal::rij_intra_xz[lc][j]+dipole::internal::rij_inter_xz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\trij_intra_zy = " << -1.0*((dipole::internal::rij_intra_yz[lc][j]+dipole::internal::rij_inter_yz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)    )* 9.27400915e6/Mtot << "\trij_intra_zz = " << -1.0*((dipole::internal::rij_intra_zz[lc][j]+dipole::internal::rij_inter_zz[lc][j])*magtot/(4.0*M_PI*9.27400915e-24)-hd )* 9.27400915e6/Mtot << "\n";
-
-                     cfg_file_ofstr << "\nfactor = "<<factor << std::endl;
-                     cfg_file_ofstr << "rij_intra_xx = " << factor*dipole::internal::rij_intra_xx[lc][j] << "\trij_intra_xy = " << factor*dipole::internal::rij_intra_xy[lc][j] << "\trij_intra_xz = " << factor*dipole::internal::rij_intra_xz[lc][j] << "\n";
-                     cfg_file_ofstr << "rij_intra_yx = " << factor*dipole::internal::rij_intra_xy[lc][j] << "\trij_intra_yy = " << factor*dipole::internal::rij_intra_yy[lc][j] << "\trij_intra_yz = " << factor*dipole::internal::rij_intra_yz[lc][j] << "\n";
-                     cfg_file_ofstr << "rij_intra_zx = " << factor*dipole::internal::rij_intra_xz[lc][j] << "\trij_intra_zy = " << factor*dipole::internal::rij_intra_yz[lc][j] << "\trij_intra_zz = " << factor*dipole::internal::rij_intra_zz[lc][j] << "\n";
-
-                     cfg_file_ofstr << "\n";
-                     cfg_file_ofstr << "rij_inter_xx = " << factor*dipole::internal::rij_inter_xx[lc][j] << "\trij_inter_xy = " << factor*dipole::internal::rij_inter_xy[lc][j] << "\trij_inter_xz = " << factor*dipole::internal::rij_inter_xz[lc][j] << "\n";
-                     cfg_file_ofstr << "rij_inter_yx = " << factor*dipole::internal::rij_inter_xy[lc][j] << "\trij_inter_yy = " << factor*dipole::internal::rij_inter_yy[lc][j] << "\trij_inter_yz = " << factor*dipole::internal::rij_inter_yz[lc][j] << "\n";
-                     cfg_file_ofstr << "rij_inter_zx = " << factor*dipole::internal::rij_inter_xz[lc][j] << "\trij_inter_zy = " << factor*dipole::internal::rij_inter_yz[lc][j] << "\trij_inter_zz = " << factor*dipole::internal::rij_inter_zz[lc][j] << "\n";
-                     cfg_file_ofstr << "=====================================================\n";
-                     cfg_file_ofstr << "================DEMAG FACTOR TENSOR ====================\n";
-                     cfg_file_ofstr << "Nxx = " << Nxx        << "\tNxy = " << Nxy        << "\tNxz = " << Nxz        << "\n";
-                     cfg_file_ofstr << "Nyx = " << Nxy        << "\tNyy = " << Nyy        << "\tNyz = " << Nyz        << "\n";
-                     cfg_file_ofstr << "Nzx = " << Nxz        << "\tNzy = " << Nyz        << "\tNzz = " << Nzz        << "\n";
-                     cfg_file_ofstr << "========================================================\n"; */
-
                   }
                }
             }
@@ -610,15 +534,6 @@ namespace dipole{
             MPI_Allreduce(MPI_IN_PLACE, &Nzz, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
 
-         // Write demag factor to file for each proc
-         cfg_file_ofstr << "num_atoms_magnetic = " << num_atoms_magnetic << " sim::time = " << sim::time << std::endl;
-         cfg_file_ofstr << "================DEMAG FACTOR TENSOR ====================\n";
-         cfg_file_ofstr << "Nxx\t\tNxy\t\tNxz\t\tNyx\t\tNyy\tNyz\t\tNzx\t\tNzy\t\tNzz\n";
-         cfg_file_ofstr << Nxx << "\t" << Nxy << "\t" << Nxz << "\t";
-         cfg_file_ofstr << Nxy << "\t" << Nyy << "\t" << Nyz << "\t";
-         cfg_file_ofstr << Nxz << "\t" << Nyz << "\t" << Nzz << "\n";
-         cfg_file_ofstr << "========================================================\n";
-
          // Compute demag factor tensor from dipolar matrix adding self term
          Nxx = ((Nxx /num_atoms_magnetic)-4.0*M_PI/3.0)/(-4.0*M_PI);
          Nxy =  (Nxy /num_atoms_magnetic              )/(-4.0*M_PI);
@@ -634,7 +549,6 @@ namespace dipole{
          zlog <<          Nxz << "\t" << Nyz << "\t" << Nzz << "\n";
 
       } // close if loop for sim::time == 0
-      cfg_file_ofstr.close();
 	   //--------------------------------------------------/
       // End of outptu dipolar tensor
 	   //--------------------------------------------------/
