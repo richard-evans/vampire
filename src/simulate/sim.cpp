@@ -210,8 +210,22 @@ namespace sim{
 
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
+
+      // instantiate timer
+      vutil::vtimer_t timer;
+      // start timer
+      timer.start();
+
       // Update dipole
 		dipole::calculate_field();
+
+      // end timer
+      timer.stop();
+      // return bandwidth
+      double update_time = timer.elapsed_time();
+      // write update time in log file
+		zlog << zTs() << "Time required for dipole update: " << timer.elapsed_time() << "s" << std::endl;
+
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
       st::update_spin_torque_fields(atoms::x_spin_array,
                                   atoms::y_spin_array,
