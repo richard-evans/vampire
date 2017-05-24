@@ -1,0 +1,66 @@
+\chapter{Background theory}\label{chap:theory}
+While the underlying theory behind the atomistic spin model is well known in the scientific literature, in the following a very brief overview of the fundamental theory is presented for the benefit of those who do not wish to study the methods in great detail. If more information is required then a comprehensive review of the methods implemented in \vampire is available from the project website.
+
+\section*{Atomistic Spin Models}
+\addcontentsline{toc}{section}{Atomistic Spin Models}
+Atomistic spin models form the natural limit of two distinct approaches, namely micromagnetics and \textit{ab-initio} models of the electronic structure. In micromagnetics a material is discretized into small domains where the magnetization is assumed to be fully ordered within. If the micromagnetic cell size is reduced to less than 1 nm, then the magnetization is no longer a true continuum, but a discrete entity considering localized moments on individual atoms. Similarly, when the electronic properties of the system are considered, the quantum mechanical properties can be mapped onto atomic cores in a manner similar to molecular dynamics, where the effective properties can often be treated in a classical approximation.
+
+The advantage of the atomistic model over micromagnetics is that it naturally deals with atomic ordering and variation of local properties seen in real materials, such as interfaces, defects, roughness etc. The discrete formulation also allows the simulation of high temperatures above and beyond the Curie temperature, where the usual continuum micromagnetic approach breaks down. Such effects or often central to current problems in magnetism such as materials for spin electronics, heat assisted magnetic recording or ultrafast laser processes. Similarly for \textit{ab-initio} calculations, mapping onto an effective spin model allows apply the full quantum mechanical deal of the properties to much larger systems and the consideration of dynamic effects on much longer timescales.
+
+\section*{The Spin Hamiltonian}
+\addcontentsline{toc}{section}{The spin Hamiltonian}
+The basis of the atomistic spin model is the spin Hamiltonian, which describes the fundamental spin-dependent interactions at the atomic level (neglecting the effects of potential and kinetic energy and electron correlations). The spin Hamiltonian is typically defined as 
+\begin{equation*}
+\mathscr{H} = - \sum_{i,j} \Jij \sms_i \cdot \sms_j - \kuu \sum_{i} S_z^2 - \smmu \sum_i \Happ \cdot \sms_i
+\end{equation*}
+describing exchange, uniaxial anisotropy and applied field contributions respectively. Important parameters are the Heisenberg exchange \Jij, the anisotropy constant $\kuu$ and the atomic spin moment, \smmu. $\sms_i$ is a \textit{unit} vector which describes the orientation of the local spin moment. In most magnetic materials the exchange interactions are the dominant contribution, usually by two orders of magnitude, and gives rise to the atomic ordering of the spin directions. For ferromagnetic materials (parallel alignment of spins) $\Jij > 0$, while for anti-ferromagnetic materials (antiparallel alignment of spins), $\Jij < 0$. 
+
+While the exchange interaction determines the ordering of the spins, it is usually isotropic, and so there is no preferential orientation of all the spins in the system. Most magnetic materials are anisotropic, that is the spins have a preferred orientation in space, which arises at the atomic level due to the local crystal environment, hence its full name of \textit{magnetocrystalline anisotropy}. In the model this is most commonly uniaxial anisotropy, where the spins prefer to lie along a single preferred axis, known as the easy axis. The strength of the anisotropy is determined by the anisotropy constant, in our case \kuu, where positive value prefer alignment along the $z$-axis, while negative values prefer alignment around the $x-y$ plane. 
+
+The last term describes the coupling of the spin system to an externally applied field, \Happ, or Zeeman field. The applied field is used to reverse the orientation of the spins, and can be used in the simulation to calculate hysteresis loops, for example.
+
+ \section*{Spin Dynamics}
+\addcontentsline{toc}{section}{Spin Dynamics}
+The spin Hamiltonian describes the energetics of the system, but says nothing about the dynamic behaviour. For that the Landau-Lifshitz-Gilbert (LLG) equation is used to describe the dynamics of atomic spins. The LLG is given by
+\begin{equation}\label{eqn:LLG}
+\frac{\partial \sms_i }{\partial t} =
+-\frac{\gamma}{(1+\lambda^{2})}[\sms_i \times
+\smH^i_{\mathrm{eff}} + \lambda \sms_i \times
+(\sms_i \times \smH^i_{\mathrm{eff}})]
+\end{equation}
+where $\sms_i$ is a unit vector representing the direction of the magnetic spin moment of site $i$, $\gamma$ is the gyromagnetic ratio and $\smH^i_{\mathrm{eff}}$ is the net magnetic field on each spin. The atomistic LLG equation describes the interaction of an atomic spin moment $i$ with an effective magnetic field, which is obtained from the negative first derivative of the complete spin Hamiltonian, such that:
+\begin{equation}\label{eqn:Heff}
+  \smH^i_{\mathrm{eff}} = -\frac{1}{\smmu}\frac{\partial \mathscr{H}}{\partial \sms_i}
+\end{equation}
+where $\smmu$ is the local spin moment. The inclusion of the spin moment within the effective field is significant, in that the field is then expressed in units of Tesla, given a Hamiltonian in Joules. The LLG is integrated numerically using the Heun numerical scheme, which allows the time evolution of the spin system to be simulated.
+
+%\section*{Langevin Dynamics}
+%\addcontentsline{toc}{section}{Langevin Dynamics}
+
+%\section*{Monte Carlo Methods}
+%\addcontentsline{toc}{section}{Monte Carlo Methods}
+%Dynamic simulations are 
+
+\section*{Citations}
+\addcontentsline{toc}{section}{Citations}
+If you use \vampire for your research, please cite the following article:\\
+
+\noindent \textit{\small Atomistic spin model simulations of magnetic nanomaterials}\\
+\vspace{-0.4cm}\\
+\noindent {\small R. F. L. Evans, W. J. Fan, P. Chureemart, T. A. Ostler, M. O. A. Ellis and R. W. Chantrell}\\
+{\small J. Phys.: Condens. Matter 26, 103202 (2014)}\\
+
+\noindent If you use the constrained Monte Carlo method, in addition please cite:\\
+
+\noindent \textit{\small Constrained Monte Carlo method and calculation of the temperature dependence of magnetic anisotropy}\\
+\vspace{-0.4cm}\\
+\noindent {\small P. Asselin, R. F. L. Evans, J. Barker, R. W. Chantrell, R. Yanes, O. Chubykalo-Fesenko, D. Hinzke and U. Nowak}\\
+{\small Phys. Rev. B. \textbf{82}, 054415 (2010)}\\
+
+\noindent If you use the temperature rescaling method please cite:\\
+
+\noindent \textit{\small Quantitative simulation of temperature-dependent magnetization dynamics and equilibrium properties of elemental ferromagnets}\\
+\vspace{-0.4cm}\\
+\noindent {\small R. F. L. Evans, U. Atxitia, and R. W. Chantrell}\\
+{\small Phys. Rev. B \textbf{91}, 144425 (2015)}
+

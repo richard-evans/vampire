@@ -28,9 +28,25 @@ namespace vio{
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line){
 
       // Check for valid key, if no match return false
-      std::string prefix="vio";
+      std::string prefix="output";
       if(key!=prefix) return false;
 
+      //-------------------------------------------------------------------
+      std::string test="precision";
+      if(word==test){
+         int p=atoi(value.c_str());
+         vin::check_for_valid_int(p, word, line, prefix, 4, 16,"input","4 - 16");
+         vout::custom_precision = true; // enable user definable precision for output
+         vout::precision = p;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="fixed-width";
+      if(word==test){
+         vout::custom_precision = true; // enable user definable precision for output
+         vout::fixed = true; // enable fixed width output
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -54,4 +70,3 @@ namespace vio{
    }
 
 } // end of vio namespace
-

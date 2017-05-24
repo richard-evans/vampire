@@ -27,6 +27,10 @@ std::ofstream zgrain;
 
 namespace vout{
 
+   bool custom_precision = false; // enable user selectable precision for data output
+   unsigned int precision = 6; // variable to control output precision (digits)
+   bool fixed = false; // fixed precision output
+
 	// Namespace variable declarations
 	std::vector<unsigned int> file_output_list(0);
 	std::vector<unsigned int> screen_output_list(0);

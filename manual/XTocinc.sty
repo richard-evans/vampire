@@ -1,0 +1,26 @@
+% -------------------------------------------------------------------
+% Include Table of Contents in the Table of Contents
+% Change spacing
+% Modified by Alex, October 1994
+% Bug Fix: TOC Page number when TOC spans over one page (November, 1999)
+\newlength{\tclineskip}
+\setlength{\tclineskip}{\baselineskip}
+\def\@addcontentsline#1#2#3{\if@filesw \begingroup
+\let\label\@gobble \let\index\@gobble \let\glossary\@gobble
+\def\protect##1{\string\string\string##1\string\space
+   \space}\@temptokena{\thepage}%
+\edef\@tempa{\immediate\write
+\@auxout{\string\@writefile{#1}{\protect
+     \contentsline{#2}{#3}{\the\@temptokena}}}}\@tempa
+   \if@nobreak \ifvmode\nobreak\fi\fi\endgroup\fi}
+\def\tableofcontents{\@restonecolfalse\if@twocolumn\@restonecoltrue\onecolumn
+ \fi\chapter*{Table of Contents\@mkboth{CONTENTS}{CONTENTS}}
+  \newlength{\@defbaselineskip}
+  \setlength{\@defbaselineskip}{\baselineskip}
+  \setlength{\baselineskip}{\tclineskip}
+  \addcontentsline{toc}{chapter}{Table of Contents}
+  \@starttoc{toc}
+  \setlength{\baselineskip}{\@defbaselineskip}
+  \if@restonecol\twocolumn\fi
+  \relax}
+% -------------------------------------------------------------------

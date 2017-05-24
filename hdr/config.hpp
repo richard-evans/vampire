@@ -18,23 +18,6 @@
 
 // Vampire headers
 
-namespace vout{
-	extern void config();
-
-	extern double field_output_min_1;
-	extern double field_output_max_1;
-	extern double field_output_min_2;
-	extern double field_output_max_2;
-
-	extern bool output_cells_config;
-	extern int output_cells_config_rate;
-
-	extern bool output_atoms_config;
-	extern int output_atoms_config_rate;
-
-	extern double atoms_output_min[3];
-	extern double atoms_output_max[3];
-}
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for config module
 //--------------------------------------------------------------------------------
@@ -43,7 +26,7 @@ namespace config{
    //-----------------------------------------------------------------------------
    // Function to initialise config module
    //-----------------------------------------------------------------------------
-   void initialize();
+   void output();
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for config module
@@ -53,7 +36,7 @@ namespace config{
    //---------------------------------------------------------------------------
    // Function to process material parameters
    //---------------------------------------------------------------------------
-   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+   int match_input_parameter(std::string const word, std::string const value, std::string const unit, int const line);
 
 } // end of config namespace
 

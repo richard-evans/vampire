@@ -1,0 +1,223 @@
+\documentclass[a5paper,8pt]{report}
+%\documentclass[]{report}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+%\usepackage{sfmath}
+%\usepackage{fancyhdr}
+\usepackage{xtocinc}
+\usepackage{euscript}
+\usepackage{upgreek}
+\usepackage{color}
+\usepackage{setspace}
+\usepackage{subfigure}
+\usepackage{rotating}
+\usepackage{afterpage}
+\usepackage[format=plain,labelfont=bf,up,small,textfont=up]{caption}
+\usepackage{extsizes}
+
+% Font definitions
+\usepackage{xcolor}
+%\usepackage{fontspec,lipsum}
+\usepackage{titlesec}
+\usepackage{mathspec}
+%\usepackage{xunicode}
+%\usepackage{xltxtra}
+\usepackage{xspace}
+
+\defaultfontfeatures{Ligatures=TeX}
+% Set sans serif font to Calibri
+%%\setsansfont{Helvetica Neue Light}
+% Set serifed font to Cambria
+%%\setmainfont{Helvetica Neue Light}
+%%\setmathsfont(Digits,Latin,Greek){Helvetica Neue Light}
+%%\setmathrm[Numbers=Lining,Scale=MatchLowercase]{Helvetica}
+
+%\setsansfont{Gill Sans Light}
+%\setmainfont{Gill Sans Light}
+%%\fontsize{4}{10}\selectfont
+% Define light and dark Microsoft blue colours
+%%\definecolor{MSBlue}{rgb}{.204,.353,.541}
+%%\definecolor{MSLightBlue}{rgb}{.31,.506,.741}
+\definecolor{ZSGrey}{rgb}{.41,.41,.41}
+% Define a new fontfamily for the subsubsection font
+% Don't use \fontspec directly to change the font
+%\newfontfamily\subsubsectionfont[Color=MSLightBlue]{Times New Roman}
+%\newfontfamily\frontpagefont[Scale=1.8,BoldFont={* Semibold}]{Helvetica Neue Light}
+%\addfontfeature{LetterSpace=2.0}
+\newfontfamily\frontpagefont[Scale=1.8,LetterSpace=8.0]{Helvetica Neue UltraLight}
+%\newfontfamily\chapterfont[BoldFont={* Semibold}]{Helvetica Neue Light}
+%%\newfontfamily\chapterfont[]{Helvetica Neue Light}
+%%\newfontfamily\sectionfont[Color=ZSGrey]{Helvetica Neue Light}
+%%\newfontfamily\subsectionfont{Helvetica Neue Light}
+
+\setmainfont{Helvetica Light}
+\setmathsfont(Digits,Latin,Greek){Helvetica Light}
+\defaultfontfeatures{Ligatures=TeX}
+\setmathrm[Numbers=Lining,Scale=MatchLowercase]{Helvetica}
+
+\fontsize{4}{8}\selectfont
+
+% Define fonts
+\newfontfamily\chapterfont[]{Helvetica Light}
+\newfontfamily\titlefont[Scale=1.5]{Helvetica Bold}
+\newfontfamily\normalfont{Helvetica}
+\newfontfamily\lightfont{Helvetica Light}
+\newfontfamily\sectionfont[Scale=1.1,Color=ZSGrey]{Helvetica}
+\newfontfamily\subsectionfont[Scale=1.0]{Helvetica}
+\newfontfamily\subsubsectionfont[]{Helvetica Oblique}
+\newfontfamily\digitfont[]{Helvetica}
+
+% Set formats for each heading level
+%\titleformat*{\chapter}{\Large\bfseries\sectionfont}
+\titleformat{\chapter}[display]
+{\chapterfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}\titleformat*{\section}{\sectionfont}
+\titleformat*{\subsection}{\small\bfseries\subsectionfont}
+\titleformat*{\subsubsection}{\small\subsubsectionfont}
+\newcommand{\zicf}{\noindent\bfseries\subsectionfont\small}
+
+% this alters "before" spacing (the second length argument) to 0
+\titlespacing*{\chapter}{0pt}{0pt}{40pt}
+\titlespacing*{\section}{0pt}{20pt}{2pt}
+\titlespacing*{\subsection}{0pt}{10pt}{0pt}
+
+%\usepackage{cmbright}
+%\usepackage[T1]{fontenc}
+%\usepackage[helvet]{sfmath}
+
+%\usepackage{xltxtra}
+%\setmainfont[Mapping=tex-text]{Helvetica Neue Light}
+%\usepackage{mathpazo} %Palatino font
+%\usepackage{sidecap}
+\usepackage{listings} %source code package
+%\usepackage{thumbpdf}
+%\usepackage[bookmarks=true,backref,pdfauthor={R F L Evans},pdftitle={Thesis},hidelinks]{hyperref}
+\usepackage[unicode,pdfencoding=auto]{hyperref}
+
+%\pagestyle{fancy}
+
+\lstset{language=C++,
+           commentstyle=\textcolor[rgb]{0.00,0.66,0.33},
+           keywordstyle=\textcolor[rgb]{0.00,0.00,1.00},
+           basicstyle=\footnotesize\ttfamily,
+           frame=lines,
+           framexleftmargin=5mm,
+           numbers=left,
+           numberstyle=\footnotesize,
+           stepnumber=1,
+           numbersep=3pt}
+
+
+
+
+%print settings
+%\oddsidemargin = 1.46cm \evensidemargin = 0.0cm \textwidth = 15cm
+% online settings
+\oddsidemargin = 0.0cm \evensidemargin = 0.0cm \textwidth = 10.5cm
+\topmargin = -1.0cm \headheight = 0.0cm \textheight = 16cm
+\normalfont
+
+\onehalfspacing
+%\doublespacing
+
+% Figure Placement parameters
+\newcommand{\blankpage}{
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+}
+% Alter some LaTeX defaults for better treatment of figures:
+    % See p.105 of "TeX Unbound" for suggested values.
+    % See pp. 199-200 of Lamport's "LaTeX" book for details.
+    %   General parameters, for ALL pages:
+    \renewcommand{\topfraction}{0.9}    % max fraction of floats at top
+    \renewcommand{\bottomfraction}{0.8} % max fraction of floats at bottom
+    %   Parameters for TEXT pages (not float pages):
+    \setcounter{topnumber}{2}
+    \setcounter{bottomnumber}{2}
+    \setcounter{totalnumber}{4}     % 2 may work better
+    \setcounter{dbltopnumber}{2}    % for 2-column pages
+    \renewcommand{\dbltopfraction}{0.9} % fit big float above 2-col. text
+    \renewcommand{\textfraction}{0.07}  % allow minimal text w. figs
+    %   Parameters for FLOAT pages (not text pages):
+    \renewcommand{\floatpagefraction}{0.7}  % require fuller float pages
+    % N.B.: floatpagefraction MUST be less than topfraction !!
+    \renewcommand{\dblfloatpagefraction}{0.7}
+    % require fuller float pages
+
+%----------------------------------------------------------
+\usepackage{titlesec}
+\usepackage{mathrsfs}
+
+% Set TOC depth
+\setcounter{tocdepth}{2}
+
+\newcommand{\hsp}{\hspace{20pt}}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp}{0pt}{\Huge\bfseries}
+
+\hyphenpenalty=5000 \tolerance=1000
+
+%-----------------------------------------------------
+% Spin model parameters
+%-----------------------------------------------------
+\newcommand{\sms}{\mathbf{S}\xspace}
+\newcommand{\smmu}{\ensuremath{\mu_\mathrm{S}}\xspace}
+\newcommand{\Jij}{\ensuremath{J_{ij}}\xspace}
+\newcommand{\kuu}{\ensuremath{k_{2}}\xspace}
+\newcommand{\kuuuu}{\ensuremath{k_{4}}\xspace}
+\newcommand{\kc}{\ensuremath{k_{\mathrm{c}}}\xspace}
+\newcommand{\ksurf}{\ensuremath{k_{\mathrm{s}}}\xspace}
+\newcommand{\Happ}{\ensuremath{\mathbf{H}_{\mathrm{app}}}\xspace}
+\newcommand{\smH}{\ensuremath{\mathbf{H}\xspace}}
+
+\newcommand{\ei}{\ensuremath{\mathbf{e}_i}\xspace}
+\newcommand{\rij}{\ensuremath{\mathbf{r}_{ij}}\xspace}
+
+\newcommand{\kB}{\ensuremath{k_\mathrm{B}}\xspace}
+\newcommand{\Tc}{\ensuremath{T_{\mathrm{C}}}\xspace}
+\newcommand{\Ms}{\ensuremath{M_\mathrm{S}}\xspace}
+\newcommand{\muB}{\ensuremath{\mu_\mathrm{B}}\xspace}
+
+\newcommand{\vampire}{{\small VAMPIRE}\xspace}
+
+\newcommand{\uvec}[1]{\ensuremath{\boldsymbol{\hat{\textbf{#1}}}}}
+
+\begin{document}
+\input{Title/title.tex}
+\tableofcontents
+
+%\listoffigures
+
+%\listoftables
+\input{Preface/preface.tex}
+\input{1-BackgroundTheory/Chapter.tex}
+\input{2-Installation/Chapter.tex}
+\input{3-GettingStarted/Chapter.tex}
+%\input{5-Visualization/Chapter.tex}
+%4 Materials
+%5 Structures
+%6 Simulations
+%7 Utilities
+%8 Generating Images
+%9 Program Performance
+%Units
+\input{InputFileCommandReference/Chapter.tex}
+\input{MaterialFileCommandReference/Chapter.tex}
+%Glossary
+%\input{Conclusions/Conclusions.tex}
+%\input{Papers/Papers.tex}
+%\input{Appendix/appendix.tex}
+
+\newpage
+
+\renewcommand{\leftmark}{References}
+\renewcommand{\rightmark}{References}
+
+%\bibliographystyle{plain}
+\bibliographystyle{unsrt}
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliography{xbib}
+
+
+\end{document}

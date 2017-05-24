@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -40,7 +40,7 @@
 #ifdef MPICF
 namespace vmpi{
 
-int initialise(){
+int initialise(int argc, char *argv[]){
 	//====================================================================================
 	//
 	///												initialise_mpi
@@ -51,7 +51,7 @@ int initialise(){
 	//
 	//====================================================================================
 	//
-	//		Locally allocated variables: 	
+	//		Locally allocated variables:
 	//
 	//====================================================================================
 	// C++ MPI Binding Reference:
@@ -66,17 +66,18 @@ int initialise(){
 	int resultlen;
 
 	// Initialise MPI
-	MPI::Init();
+	MPI_Init(&argc, &argv);
 
 	// Get number of processors and rank
-	vmpi::my_rank = MPI::COMM_WORLD.Get_rank();
-	vmpi::num_processors = MPI::COMM_WORLD.Get_size();
-	MPI::Get_processor_name(vmpi::hostname, resultlen);
+ 	MPI_Comm_rank(MPI_COMM_WORLD, &vmpi::my_rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &vmpi::num_processors);
 
+	MPI_Get_processor_name(vmpi::hostname, &resultlen);
+	//IOCommunicator(num_io_processors);
 	// Start MPI Timer
 	vmpi::start_time=MPI_Wtime();
 
-	return EXIT_SUCCESS;	
+	return EXIT_SUCCESS;
 }
 
 int hosts(){
@@ -109,7 +110,7 @@ int hosts(){
 	// Wait for all processors
 			//MPI::COMM_WORLD.Barrier();
 
-	return EXIT_SUCCESS;	
+	return EXIT_SUCCESS;
 }
 
 int finalise(){
@@ -127,31 +128,31 @@ int finalise(){
 	if(err::check==true){std::cout << "finalise_mpi has been called" << std::endl;}
 
 	// Wait for all processors
-   MPI::COMM_WORLD.Barrier();
+   MPI_Barrier(MPI_COMM_WORLD);
 
-	
+
 	// Output MPI Timings to disk
 	// Get sizes of arrays
 	//std::vector<int> sizes(vmpi::num_processors);
 	//int MPITimingDataSize = ComputeTimeArray.size();
-	
+
 	// MPI_Gather (&sendbuf,sendcnt,sendtype,&recvbuf, recvcount,recvtype,root,comm)
-	//MPI_Gather(&MPITimingDataSize,1,MPI_INT,&sizes[0],1,MPI_INT,0,MPI_COMM_WORLD); 
+	//MPI_Gather(&MPITimingDataSize,1,MPI_INT,&sizes[0],1,MPI_INT,0,MPI_COMM_WORLD);
 	//for(int p=0; p<vmpi::num_processors;p++){
 	//	std::cout << "node01:" << p << " " << sizes.at(p) << std::endl;
 	//}
-	
+
 	// Gather timings
 	if(DetailedMPITiming){
 		std::vector<double> AllTimes(0);
 		if(my_rank==0) AllTimes.resize(num_processors*WaitTimeArray.size());
-		
-		MPI_Gather(&WaitTimeArray[0],WaitTimeArray.size(),MPI_DOUBLE,&AllTimes[0],WaitTimeArray.size(),MPI_DOUBLE,0,MPI_COMM_WORLD); 
+
+		MPI_Gather(&WaitTimeArray[0],WaitTimeArray.size(),MPI_DOUBLE,&AllTimes[0],WaitTimeArray.size(),MPI_DOUBLE,0,MPI_COMM_WORLD);
 
 		if(my_rank==0){
 			std::ofstream WaitTimesOFS;
 			WaitTimesOFS.open("MPI-wait-times");
-		
+
 			// Column Row format
 			for(int idx=0;idx<WaitTimeArray.size();idx++){
 				WaitTimesOFS << idx << "\t";
@@ -162,13 +163,13 @@ int finalise(){
 			}
 			WaitTimesOFS.close();
 		}
-		
-		MPI_Gather(&ComputeTimeArray[0],ComputeTimeArray.size(),MPI_DOUBLE,&AllTimes[0],ComputeTimeArray.size(),MPI_DOUBLE,0,MPI_COMM_WORLD); 
+
+		MPI_Gather(&ComputeTimeArray[0],ComputeTimeArray.size(),MPI_DOUBLE,&AllTimes[0],ComputeTimeArray.size(),MPI_DOUBLE,0,MPI_COMM_WORLD);
 
 		if(my_rank==0){
 			std::ofstream ComputeTimesOFS;
 			ComputeTimesOFS.open("MPI-compute-times");
-		
+
 			// Column Row format
 			for(int idx=0;idx<ComputeTimeArray.size();idx++){
 				ComputeTimesOFS << idx << "\t";
@@ -180,7 +181,7 @@ int finalise(){
 			ComputeTimesOFS.close();
 		}
 	}
-	
+
 	// Stop MPI Timer and output to screen
 	vmpi::end_time=MPI_Wtime();
 	if(vmpi::my_rank==0){
@@ -188,31 +189,31 @@ int finalise(){
 	}
 
 	// Finalise MPI
-	MPI::Finalize();
+	MPI_Finalize();
 
-	return EXIT_SUCCESS;	
+	return EXIT_SUCCESS;
 }
 //-------------------------------------------------------------
 // Function to swap timer and return time between calls
 //
-// Objective is to time spent waiting and computing. Since 
-// wait time is encapslated by MPIWait and MPIBarrier 
+// Objective is to time spent waiting and computing. Since
+// wait time is encapslated by MPIWait and MPIBarrier
 // everything else is defined as compute time.
 //
 // Example:
-// 
-// Start with compute_time=time and do some calculations. 
+//
+// Start with compute_time=time and do some calculations.
 // When we get to first MPIWait call we now stop the compute
 // timer and start the wait timer, so call the swap function.
 //
 // total_compute_time += SwapTimer(compute_time, wait_time);
 //
-// This sets the wait time to time and returns the compute time. 
+// This sets the wait time to time and returns the compute time.
 // Now call to wait returns, so swap timers back again:
-// 
+//
 // total_wait_time += SwapTimer(wait_time, compute_time);
-// 
-// This returns total time since wait called and resets 
+//
+// This returns total time since wait called and resets
 // compute time until next call.
 //
 // (c) Richard F. L. Evans 2012
@@ -221,15 +222,16 @@ double SwapTimer(double OldTimer, double& NewTimer){
 
 	// get current time
 	double time = MPI_Wtime();
-	
+
 	// set start time for NewTimer
 	NewTimer=time;
-	
+
 	// Calculate time elapsed since last call for OldTimer
 	return time-OldTimer;
-	
+
 }
 
-} // end of namespace vmpi
-#endif 
 
+
+} // end of namespace vmpi
+#endif

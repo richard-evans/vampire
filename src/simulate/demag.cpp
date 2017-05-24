@@ -67,6 +67,7 @@
 ///
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "gpu.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 #include "demag.hpp"
@@ -208,21 +209,21 @@ void init(){
 	// timing function
    #ifdef MPICF
       double t1 = MPI_Wtime();
-   #else
+#else
       time_t t1;
       t1 = time (NULL);
-   #endif
+#endif
 
-	// now calculate fields
-	demag::update();
+      // now calculate fields
+      demag::update();
 
-	// timing function
-   #ifdef MPICF
+      // timing function
+#ifdef MPICF
       double t2 = MPI_Wtime();
-   #else
+#else
       time_t t2;
       t2 = time (NULL);
-   #endif
+#endif
 
    zlog << zTs() << "Time required for demag update: " << t2-t1 << "s." << std::endl;
 

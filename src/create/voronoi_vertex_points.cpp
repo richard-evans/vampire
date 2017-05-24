@@ -46,8 +46,8 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
 	std::stringstream grain_file_sstr;
 	std::stringstream voronoi_file_sstr;
 
-	grain_file_sstr << "grains." << vmpi::my_rank << ".tmp";
-	voronoi_file_sstr << "voronoi." << vmpi::my_rank << ".tmp";
+	grain_file_sstr << "vor_grains.tmp";
+	voronoi_file_sstr << "voronoi.tmp";
 
 	string grain_file = grain_file_sstr.str();
 	string voronoi_file = voronoi_file_sstr.str();
@@ -81,53 +81,63 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
 		}
 	}
 
-	//--------------------------------------------------------------
-	// Output grain coordindates and Scale to be unit length (0:1)
-	//--------------------------------------------------------------
+	//-----------------------------------------------------------------------------
+	// Output grain coordindates and Scale to be unit length (0:1) on root process
+	//-----------------------------------------------------------------------------
 
-	std::ofstream grain_coord_file;
-  	grain_coord_file.open (grain_filec);
+   bool root = false; // flag to indentify root process
+   if(vmpi::my_rank == 0) root = true; // change flag to true on root process
 
-	grain_coord_file << "#============================================" << std::endl;
-	grain_coord_file << "# Grain Coordinate file for input into qhull" << std::endl;
-	grain_coord_file << "#============================================" << std::endl;
-	grain_coord_file << "# Grain Scaling Factor" << std::endl;
-	grain_coord_file << "#\t" << scale_factor << std::endl;
-	grain_coord_file << 2 << std::endl;
-	grain_coord_file << "# Number of Grains" << std::endl;
-	grain_coord_file << num_grains << std::endl;
-	grain_coord_file << "# Grains Coordinates" << std::endl;
+   if(root){
 
-	for(int i=0;i<num_grains;i++){
-		grain_coord_file << grain_coord_array[i][0]/scale_factor-0.5 << "\t";
- 		grain_coord_file << grain_coord_array[i][1]/scale_factor-0.5 << std::endl;
-	}
+   	std::ofstream grain_coord_file;
+     	grain_coord_file.open (grain_filec);
 
-	grain_coord_file.close();
+   	grain_coord_file << "#============================================" << std::endl;
+   	grain_coord_file << "# Grain Coordinate file for input into qhull" << std::endl;
+   	grain_coord_file << "#============================================" << std::endl;
+   	grain_coord_file << "# Grain Scaling Factor" << std::endl;
+   	grain_coord_file << "#\t" << scale_factor << std::endl;
+   	grain_coord_file << 2 << std::endl;
+   	grain_coord_file << "# Number of Grains" << std::endl;
+   	grain_coord_file << num_grains << std::endl;
+   	grain_coord_file << "# Grains Coordinates" << std::endl;
+
+   	for(int i=0;i<num_grains;i++){
+   		grain_coord_file << grain_coord_array[i][0]/scale_factor-0.5 << "\t";
+    		grain_coord_file << grain_coord_array[i][1]/scale_factor-0.5 << std::endl;
+   	}
+
+   	grain_coord_file.close();
+
+      //--------------------------------------------------------
+      // Use voronoi library creating an import and export temporary files
+      //--------------------------------------------------------
+      FILE *inputqv, *outputqv;
+      int qargc=3;
+      const char *qargv[3]={"qvoronoi", "-o", "-Fv"};
+      inputqv=fopen(grain_file.c_str(),"r");
+      outputqv=fopen(voronoi_file.c_str(),"w");
+      qvoronoi(qargc, const_cast<char**>(qargv), inputqv, outputqv);
+      fclose(outputqv);
+      fclose(inputqv);
+
+   }
 
    //--------------------------------------------------------
-   // Use voronoi library creating an import and export temporary files
-   //--------------------------------------------------------
-   FILE *inputqv, *outputqv;
-   int qargc=3;
-   const char *qargv[3]={"qvoronoi", "-o", "-Fv"};
-   inputqv=fopen(grain_file.c_str(),"r");
-   outputqv=fopen(voronoi_file.c_str(),"w");
-   qvoronoi(qargc, const_cast<char**>(qargv), inputqv, outputqv);
-   fclose(outputqv);
-   fclose(inputqv);
-
-   //--------------------------------------------------------
-   // Read in number of Voronoi vertices
+   // Process Voronoi vertices from file
    //--------------------------------------------------------
 
 	int dimensions,num_vertices,num_points,one;
 
-	std::ifstream vertices_file;
-  	vertices_file.open (voronoi_filec);
+   // stringstream stream declaration
+   std::stringstream vertices_file;
+
+   // fill input file stream with contents of file opened on master process
+   vertices_file.str( vin::get_string(voronoi_filec, "input", -1) );
+
 	vertices_file >> dimensions;
 	vertices_file >> num_vertices >> num_points >> one;
-
 
 	//----------------------------------------------------------
 	// Allocate vertex_array
@@ -199,12 +209,11 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
          grain_vertices_array[i].resize(0);
       }
    }
-   vertices_file.close();
 
    //-------------------------------------------------------------------
    // Remove Temporary voronoi files
    //-------------------------------------------------------------------
-   {
+   if(root){
       std::stringstream rmfsstr;
       #ifdef WIN_COMPILE
          //rmfsstr << "del /f " << grain_file;
@@ -216,11 +225,11 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
       int sysstat=system(rmfcstr);
       if(sysstat!=0) {
 		  terminaltextcolor(RED);
-		  std::cerr << "Error removing temporary grain files" << std::endl;
+		  std::cerr << "Error removing temporary grain file" << std::endl;
 		  terminaltextcolor(WHITE);
-	  }
+	   }
    }
-   {
+   if(root){
       std::stringstream rmfsstr;
       #ifdef WIN_COMPILE
          rmfsstr << "del /f " << voronoi_file;
@@ -232,9 +241,9 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
       int sysstat=system(rmfcstr);
       if(sysstat!=0) {
 		  terminaltextcolor(RED);
-		  std::cerr << "Error removing temporary voronoi files" << std::endl;
+		  std::cerr << "Error removing temporary voronoi file" << std::endl;
 		  terminaltextcolor(WHITE);
-	  }
+	   }
    }
 
    // Recalculate grain coordinates as average of vertices

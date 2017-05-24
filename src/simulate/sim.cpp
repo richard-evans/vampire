@@ -40,6 +40,9 @@
 ///=====================================================================================
 ///
 
+// Standard Libraries
+#include <iostream>
+
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
@@ -55,8 +58,8 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 
-// Standard Libraries
-#include <iostream>
+// sim module headers
+#include "internal.hpp"
 
 namespace sim{
 	std::ofstream mag_file;
@@ -66,6 +69,7 @@ namespace sim{
 	int partial_time=1000;
 	uint64_t equilibration_time=0;
 	int runs=1; /// for certain repetitions in programs
+
     //Global definition of some parameters in order to store them in chekcpoint files
 	int64_t parity=-1;
    uint64_t output_atoms_file_counter=0;
@@ -97,7 +101,7 @@ namespace sim{
 
 	double H=Hmax; // T
 	int64_t iH=1; // uT
-//	uint64_t iH=-1*vmath::iround(double(Hmax)*1.0E6); // uT
+   //	uint64_t iH=-1*vmath::iround(double(Hmax)*1.0E6); // uT
 
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
@@ -243,25 +247,6 @@ int run(){
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
 
-	// For MPI version, calculate initialisation time
-	if(vmpi::my_rank==0){
-		#ifdef MPICF
-			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
-			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
-			vmpi::start_time=MPI_Wtime(); // reset timer
-		#endif
-		std::cout << "Starting Simulation with Program ";
-		zlog << zTs() << "Starting Simulation with Program ";
-	}
-
-	// Now set initial compute time
-	#ifdef MPICF
-	vmpi::ComputeTime=MPI_Wtime();
-	vmpi::WaitTime=MPI_Wtime();
-	vmpi::TotalComputeTime=0.0;
-	vmpi::TotalWaitTime=0.0;
-	#endif
-
 	// Initialise random number generator
 	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
 
@@ -306,6 +291,32 @@ int run(){
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
+
+   // For MPI version, calculate initialisation time
+	if(vmpi::my_rank==0){
+		#ifdef MPICF
+			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
+			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
+			vmpi::start_time=MPI_Wtime(); // reset timer
+		#endif
+   }
+
+   // Precondition spins at equilibration temperature
+   sim::internal::monte_carlo_preconditioning();
+
+   // For MPI version, calculate initialisation time
+   if(vmpi::my_rank==0){
+		std::cout << "Starting Simulation with Program ";
+		zlog << zTs() << "Starting Simulation with Program ";
+	}
+
+	// Now set initial compute time
+	#ifdef MPICF
+	vmpi::ComputeTime=MPI_Wtime();
+	vmpi::WaitTime=MPI_Wtime();
+	vmpi::TotalComputeTime=0.0;
+	vmpi::TotalWaitTime=0.0;
+	#endif
 
 	// Select program to run
 	switch(sim::program){
@@ -489,7 +500,7 @@ int run(){
 	//program::LLB_Boltzmann();
 
    // De-initialize GPU
-   gpu::finalize();
+   if(gpu::acceleration) gpu::finalize();
 
    // optionally save checkpoint file
    if(sim::save_checkpoint_flag && !sim::save_checkpoint_continuous_flag) save_checkpoint();

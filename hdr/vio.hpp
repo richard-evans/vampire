@@ -86,11 +86,18 @@ namespace vin{
 
    extern std::vector<double> DoublesFromString(std::string value);
 
+   // function to read file on master process and return a std::string of its contents
+   extern std::string get_string(std::string const filename, std::string source_file_name, int line);
+
    extern std::vector<mp::materials_t> read_material;
 
 }
 
 namespace vout{
+
+   extern bool custom_precision; // enable user selectable precision for data output
+   extern unsigned int precision; // variable to control output precision (digits)
+   extern bool fixed; // fixed precision output
 
 	extern std::vector<unsigned int> file_output_list;
 	extern std::vector<unsigned int> screen_output_list;
@@ -100,9 +107,6 @@ namespace vout{
    extern int output_rate;
 
    extern bool gnuplot_array_format;
-
-	extern bool output_grains_config;
-	extern int output_config_grain_rate;
 
 	//extern bool output_povray;
 	//extern int output_povray_rate;
@@ -123,5 +127,10 @@ namespace vout{
 // Checkpoint load/save functions
 void load_checkpoint();
 void save_checkpoint();
+
+namespace vio{
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
+}
 
 #endif /*VIO_H_*/

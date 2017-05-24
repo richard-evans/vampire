@@ -20,6 +20,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "material.hpp"
+#include "gpu.hpp"
 #include "grains.hpp"
 #include "stats.hpp"
 #include "units.hpp"
@@ -58,7 +59,6 @@ namespace vin{
     ///=====================================================================================
     ///
     int match(string const key, string const word, string const value, string const unit, int const line){
-        //int match(string const key, string const word, string const value, string const unit, int const line, std::ifstream& inputfile){
 
         std::string test;
 
@@ -69,9 +69,11 @@ namespace vin{
         else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
         //===================================================================
         // Test for create variables
@@ -133,7 +135,7 @@ namespace vin{
         else
         test="config";
         if(key==test){
-            int frs=vin::match_config(word, value, unit, line);
+            int frs=config::match_input_parameter(word, value, unit, line);
             return frs;
         }
         //-------------------------------------------------------------------
@@ -324,18 +326,6 @@ namespace vin{
         test="periodic-boundaries-z";
         if(word==test){
             cs::pbc[2]=true;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="select-material-by-height";
-        if(word==test){
-            cs::SelectMaterialByZHeight=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::SelectMaterialByZHeight=false;
-            }
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -1413,134 +1403,6 @@ namespace vin{
         return EXIT_SUCCESS;
     }
 
-    int match_config(string const word, string const value, string const unit, int const line){
-
-        std::string prefix="config:";
-
-        // System output config variables
-        std::string test="atoms";
-        if(word==test){
-            vout::output_atoms_config=true;
-            return EXIT_SUCCESS;
-        }
-        //-----------------------------------------
-        test="atoms-output-rate";
-        if(word==test){
-            int i=atoi(value.c_str());
-            check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
-        //  check_for_valid_int(i, word, line, prefix, 1, 1000000,"input","1 - 1,000,000");
-            vout::output_atoms_config_rate=i;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="atoms-minimum-x";
-        if(word==test){
-            double x=atof(value.c_str());
-            check_for_valid_value(x, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
-            vout::atoms_output_min[0]=x;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="atoms-minimum-y";
-        if(word==test){
-            double y=atof(value.c_str());
-            check_for_valid_value(y, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
-            vout::atoms_output_min[1]=y;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="atoms-minimum-z";
-        if(word==test){
-            double z=atof(value.c_str());
-            check_for_valid_value(z, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
-            vout::atoms_output_min[2]=z;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="atoms-maximum-x";
-        if(word==test){
-            double x=atof(value.c_str());
-            check_for_valid_value(x, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
-            vout::atoms_output_max[0]=x;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="atoms-maximum-y";
-        if(word==test){
-            double y=atof(value.c_str());
-            check_for_valid_value(y, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
-            vout::atoms_output_max[1]=y;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="atoms-maximum-z";
-        if(word==test){
-            double z=atof(value.c_str());
-            check_for_valid_value(z, word, line, prefix, "", "none", 0.0, 1.0,"input","0.0 - 1.0");
-            vout::atoms_output_max[2]=z;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="macro-cells";
-        if(word==test){
-            vout::output_cells_config=true;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="macro-cells-output-rate";
-        if(word==test){
-            int i=atoi(value.c_str());
-            check_for_valid_int(i, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-            vout::output_cells_config_rate=i;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="identify-surface-atoms";
-        if(word==test){
-            sim::identify_surface_atoms=true;
-            return EXIT_SUCCESS;
-        }
-        //-----------------------------------------
-        test="field-range-1-minimum";
-        if(word==test){
-            double H=atof(value.c_str());
-            check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
-            vout::field_output_min_1=H;
-            return EXIT_SUCCESS;
-        }
-        //-----------------------------------------
-        test="field-range-1-maximum";
-        if(word==test){
-            double H=atof(value.c_str());
-            check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
-            vout::field_output_max_1=H;
-            return EXIT_SUCCESS;
-        }
-        //-----------------------------------------
-        test="field-range-2-minimum";
-        if(word==test){
-            double H=atof(value.c_str());
-            check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
-            vout::field_output_min_2=H;
-            return EXIT_SUCCESS;
-        }
-        //-----------------------------------------
-        test="field-range-2-maximum";
-        if(word==test){
-            double H=atof(value.c_str());
-            check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
-            vout::field_output_max_2=H;
-            return EXIT_SUCCESS;
-        }
-        //-----------------------------------------
-        else{
-        terminaltextcolor(RED);
-            std::cerr << "Error - Unknown control statement \'config:"<< word << "\' on line " << line << " of input file" << std::endl;
-        terminaltextcolor(WHITE);
-            return EXIT_FAILURE;
-        }
-    }
-
     int match_vout_list(string const word, string const value, int const line, std::vector<unsigned int> & output_list){
 
         std::string prefix="output:";
@@ -1612,6 +1474,14 @@ namespace vin{
         }
         else
         //--------------------------------------------------------------------
+        test="mean-magnetisation";
+        if(word==test){
+            stats::calculate_system_magnetization=true;
+            output_list.push_back(48);
+            return EXIT_SUCCESS;
+        }
+        else
+        //--------------------------------------------------------------------
         test="material-magnetisation";
         if(word==test){
             stats::calculate_material_magnetization=true;
@@ -1624,6 +1494,14 @@ namespace vin{
         if(word==test){
             stats::calculate_material_magnetization=true;
             output_list.push_back(9);
+            return EXIT_SUCCESS;
+        }
+        else
+        //--------------------------------------------------------------------
+        test="material-mean-magnetisation";
+        if(word==test){
+            stats::calculate_material_magnetization=true;
+            output_list.push_back(49);
             return EXIT_SUCCESS;
         }
         else
@@ -1689,6 +1567,15 @@ namespace vin{
             stats::calculate_system_susceptibility=true;
             stats::calculate_system_magnetization=true;
             output_list.push_back(21);
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-susceptibility";
+        if(word==test){
+            // Set flags for calculations of susceptibility and magnetization
+            stats::calculate_material_susceptibility=true;
+            stats::calculate_material_magnetization=true;
+            output_list.push_back(50);
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
@@ -1874,6 +1761,20 @@ namespace vin{
             output_list.push_back(47);
             return EXIT_SUCCESS;
         }
+        //--------------------------------------------------------------------
+        test="mean-height-magnetisation-length";
+        if(word==test){
+            stats::calculate_height_magnetization=true;
+            output_list.push_back(51);
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="mean-height-magnetisation";
+        if(word==test){
+            stats::calculate_height_magnetization=true;
+            output_list.push_back(52);
+            return EXIT_SUCCESS;
+        }
         //-------------------------------------------------------------------
         test="mpi-timings";
         if(word==test){
@@ -1998,11 +1899,10 @@ namespace vin{
         return EXIT_SUCCESS;
     }
 
-
     // temporary array of materials for reading in material data
     std::vector<mp::materials_t> read_material(0);
 
-    int read_mat_file(std::string const matfile, int const LineNumber){
+    int read_mat_file(std::string const matfile, int const line_number){
 
 
         // resize temporary materials array for storage of variables
@@ -2014,7 +1914,7 @@ namespace vin{
 
         // Open file read only
         std::stringstream inputfile;
-        inputfile.str (GetString(matfile.c_str()));
+        inputfile.str( vin::get_string(matfile.c_str(), "material", line_number) );
         //-------------------------------------------------------
         // Material 0
         //-------------------------------------------------------
@@ -2497,14 +2397,11 @@ namespace vin{
             else
             test="geometry-file";
             if(word==test){
-                // Open geometry file
-                std::ifstream gfile(value.c_str());
-                if(!gfile.is_open()){
-                terminaltextcolor(RED);
-                    std::cerr << "Error - geometry file " << value.c_str() << " not found, exiting!" << std::endl;
-                    terminaltextcolor(WHITE);
-                return EXIT_FAILURE;
-                }
+
+               // Open geometry file
+               std::stringstream gfile;
+          		gfile.str( vin::get_string(value.c_str(), "material", line) );
+
                 gfile >> read_material[super_index].geometry;
                 if((read_material[super_index].geometry<3) || (read_material[super_index].geometry>100)){
                     terminaltextcolor(RED);
@@ -2547,13 +2444,9 @@ namespace vin{
             test="lattice-anisotropy-file";
             if(word==test){
 
-                // Open file and check for success
-                std::ifstream latt_file(value.c_str());
-                if(!latt_file.is_open()){
-                    std::cerr << "Error: lattice file " << value.c_str() << " specified on line " << line << " of material file not found. Exiting." << std::endl;
-                    zlog << zTs() << "Error: lattice file " << value.c_str() << " specified on line " << line << " of material file not found. Exiting." << std::endl;
-                    return EXIT_FAILURE;
-                }
+                // Open lattice file
+                std::stringstream latt_file;
+          		 latt_file.str( vin::get_string(value.c_str(), "material", line) );
 
                 // specify number of points to be read
                 int num_pts=0;
@@ -2590,27 +2483,6 @@ namespace vin{
                 return EXIT_SUCCESS;
 
             }
-            //--------------------------------------------------------------------
-            else
-            test="minimum-height";
-            if(word==test){
-                double min=atof(value.c_str());
-                check_for_valid_value(min, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-                cs::SelectMaterialByZHeight=true;
-                read_material[super_index].min=min;
-                return EXIT_SUCCESS;
-            }
-            //--------------------------------------------------------------------
-            else
-            test="maximum-height";
-            if(word==test){
-                double max=atof(value.c_str());
-                check_for_valid_value(max, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-                cs::SelectMaterialByZHeight=true;
-                read_material[super_index].max=max;
-                return EXIT_SUCCESS;
-            }
-            else
             //--------------------------------------------------------------------
             test="core-shell-size";
             if(word==test){

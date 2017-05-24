@@ -33,6 +33,8 @@
 #include "vmpi.hpp"
 #include "vio.hpp"
 
+#include "stopwatch.h"
+
 int simulate_system();
 
 /// Main function for vampire
@@ -70,7 +72,7 @@ int main(int argc, char* argv[]){
 
    // For parallel execution intialise MPI
    #ifdef MPICF
-      vmpi::initialise();
+      vmpi::initialise(argc, argv);
    #endif
 
    // Initialise log file
@@ -138,6 +140,10 @@ int main(int argc, char* argv[]){
    // Create system
    cs::create();
 
+   // Set timer for runtime
+   stopwatch_t stopwatch;
+   stopwatch.start();
+
    // Simulate system
    sim::run();
 
@@ -146,10 +152,14 @@ int main(int argc, char* argv[]){
       vmpi::finalise();
    #endif
 
+   std::cout << "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+   zlog << zTs() << "Simjulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+
    zlog << zTs() << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(GREEN);
    std::cout << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(WHITE);
+
 
    return EXIT_SUCCESS;
 
