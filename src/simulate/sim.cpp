@@ -54,6 +54,7 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "vutil.hpp"
 
 // Standard Libraries
 #include <iostream>
@@ -206,24 +207,8 @@ namespace sim{
 
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-      // timing function for dipole update
-      #ifdef MPICF
-			double t1 = MPI_Wtime();
-      #else
-         time_t t1;
-         t1 = time (NULL);
-      #endif
       // Update dipole
 		dipole::calculate_field();
-      #ifdef MPICF
-         double t2 = MPI_Wtime();
-      #else
-         time_t t2;
-         t2 = time (NULL);
-      #endif
-      // Print dipole update time in log file
-      zlog << zTs() << "Time required for dipole update: " << t2-t1 << "s." << std::endl;
-
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
       st::update_spin_torque_fields(atoms::x_spin_array,
                                   atoms::y_spin_array,
