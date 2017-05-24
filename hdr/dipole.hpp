@@ -107,10 +107,6 @@ namespace dipole{
                         std::vector<double>& dipole_cells_field_array_x,      // B-field
                         std::vector<double>& dipole_cells_field_array_y,
                         std::vector<double>& dipole_cells_field_array_z,
-                        std::vector<double>& dipole_cells_mu0Hd_field_array_x, // mu_0*Hd-field
-                        std::vector<double>& dipole_cells_mu0Hd_field_array_y,
-                        std::vector<double>& dipole_cells_mu0Hd_field_array_z,
-                        std::vector<double>& cells_volume_array,
                         int cells_num_local_cells
                );
 

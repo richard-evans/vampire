@@ -494,10 +494,6 @@ namespace dipole{
                            std::vector<double>& dipole_cells_field_array_x, //B-field
                            std::vector<double>& dipole_cells_field_array_y,
                            std::vector<double>& dipole_cells_field_array_z,
-                           std::vector<double>& dipole_cells_mu0Hd_field_array_x, // mu_0*Hd-field
-                           std::vector<double>& dipole_cells_mu0Hd_field_array_y,
-                           std::vector<double>& dipole_cells_mu0Hd_field_array_z,
-                           std::vector<double>& cells_volume_array,
                            int cells_num_local_cells
                   ){
 
@@ -505,7 +501,6 @@ namespace dipole{
          int num_send_cells = cells_num_local_cells;                          // number of objects to send
          std::vector<int> mpi_send_cells_id(num_send_cells,0);                // cells id to be sent
          std::vector<double> mpi_send_cells_field(3*num_send_cells,0.0);      // B-field array to be sent
-         std::vector<double> mpi_send_cells_mu0Hd_field(3*num_send_cells,0.0);// mu_0*Hd-field array to be sent
 
          // loop over local cells to save data to send
          for(int i=0; i<num_send_cells; i++){
@@ -514,17 +509,12 @@ namespace dipole{
             mpi_send_cells_field[3*i+0] = dipole_cells_field_array_x[mpi_send_cells_id[i]];
             mpi_send_cells_field[3*i+1] = dipole_cells_field_array_y[mpi_send_cells_id[i]];
             mpi_send_cells_field[3*i+2] = dipole_cells_field_array_z[mpi_send_cells_id[i]];
-            //store Hd-field
-            mpi_send_cells_mu0Hd_field[3*i+0] = dipole_cells_mu0Hd_field_array_x[mpi_send_cells_id[i]];
-            mpi_send_cells_mu0Hd_field[3*i+1] = dipole_cells_mu0Hd_field_array_y[mpi_send_cells_id[i]];
-            mpi_send_cells_mu0Hd_field[3*i+2] = dipole_cells_mu0Hd_field_array_z[mpi_send_cells_id[i]];
          }
 
          // send cells id, B-field, Hd-field
          MPI_Send(&num_send_cells, 1, MPI_INT, 0, 114, MPI_COMM_WORLD);
          MPI_Send(&mpi_send_cells_id[0], num_send_cells, MPI_INT, 0, 115, MPI_COMM_WORLD);
          MPI_Send(&mpi_send_cells_field[0], 3*num_send_cells, MPI_DOUBLE, 0, 116, MPI_COMM_WORLD);
-         MPI_Send(&mpi_send_cells_mu0Hd_field[0], 3*num_send_cells, MPI_DOUBLE, 0, 116, MPI_COMM_WORLD);
 
          // loop over CPUs
          for(int cpu=0; cpu<vmpi::num_processors; cpu++){
@@ -537,11 +527,9 @@ namespace dipole{
                // Allocate arrays for field
                std::vector<int> mpi_recv_cells_id(num_recv_cells,0);
                std::vector<double> mpi_recv_cells_field(3*num_recv_cells,0.0);
-               std::vector<double> mpi_recv_cells_mu0Hd_field(3*num_recv_cells,0.0);
                // Receive arrays
                MPI_Recv(&mpi_recv_cells_id[0], num_recv_cells, MPI_INT, cpu, 115, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                MPI_Recv(&mpi_recv_cells_field[0], 3*num_recv_cells, MPI_DOUBLE, cpu, 116, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_cells_mu0Hd_field[0], 3*num_recv_cells, MPI_DOUBLE, cpu, 116, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
                // Save received data
                for(int i=0; i<num_recv_cells; i++){
@@ -550,10 +538,6 @@ namespace dipole{
                   dipole_cells_field_array_x[lc] = mpi_recv_cells_field[3*i+0];
                   dipole_cells_field_array_y[lc] = mpi_recv_cells_field[3*i+1];
                   dipole_cells_field_array_z[lc] = mpi_recv_cells_field[3*i+2];
-                  // save mu_0*Hd-field
-                  dipole_cells_mu0Hd_field_array_x[lc] = mpi_recv_cells_mu0Hd_field[3*i+0];
-                  dipole_cells_mu0Hd_field_array_y[lc] = mpi_recv_cells_mu0Hd_field[3*i+1];
-                  dipole_cells_mu0Hd_field_array_z[lc] = mpi_recv_cells_mu0Hd_field[3*i+2];
                } // end saving data
             } // end if I am root proc
          } // end loop over cpus
@@ -561,7 +545,6 @@ namespace dipole{
          // Clear arrays used only for sending data
          mpi_send_cells_id.clear();
          mpi_send_cells_field.clear();
-         mpi_send_cells_mu0Hd_field.clear();
 
          return EXIT_SUCCESS;
       }
