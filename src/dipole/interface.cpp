@@ -48,7 +48,7 @@ namespace dipole{
       test="cutoff-radius";
       if(word==test){
          double dpur=atof(value.c_str());
-         vin::check_for_valid_value(dpur, word, line, prefix, unit, "",  0.0, 1.0e6,"input","0.0 - 1,000,000.0");
+         vin::check_for_valid_value(dpur, word, line, prefix, unit, "",  1.0, 1.0e6,"input","0.0 - 1,000,000.0");
          dipole::cutoff=dpur;
          return true;
       }
