@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland 2016. All rights reserved.
+//   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
 //
 //   Email: sw766@york.ac.uk
 //
@@ -20,14 +20,21 @@
 
 namespace anisotropy{
 
-   //----------------------------------------------------------------------------
-   // Function to initialize anisotropy module
-   //----------------------------------------------------------------------------
-   void initialize(){
+    //----------------------------------------------------------------------------
+    // Function to initialize anisotropy module
+    //----------------------------------------------------------------------------
+    void initialise (
+            const int num_atoms,
+            const std::vector<int>& atom_type_array,
+            const std::vector<double>& atom_coords_x,
+            const std::vector<double>& atom_coords_y,
+            const std::vector<double>& atom_coords_z)
+    {}
 
-      return;
 
-   }
+    return;
+
+}
 
 } // end of anisotropy namespace
 
