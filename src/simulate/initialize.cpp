@@ -34,4 +34,4 @@ namespace sim{
       return;
    }
 
-} // end of namespace gpu
+} // end of namespace sim

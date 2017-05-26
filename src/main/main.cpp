@@ -153,7 +153,7 @@ int main(int argc, char* argv[]){
    #endif
 
    std::cout << "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
-   zlog << zTs() << "Simjulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+   zlog << zTs() << "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
 
    zlog << zTs() << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(GREEN);
