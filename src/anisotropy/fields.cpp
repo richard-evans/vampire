@@ -21,9 +21,9 @@
 namespace anisotropy{
 
     //----------------------------------------------------------------------------
-    // Function to initialize anisotropy module
+    // Function to calculate uniaxial fields
     //----------------------------------------------------------------------------
-    void initialise (
+    void calculate_uniaxial_fields (
             const int num_atoms,                        // atoms in system
             const std::vector<int>& atom_type_array,
             const std::vector<double>& atom_coords_x,
@@ -33,10 +33,8 @@ namespace anisotropy{
 	if (anisotropy::uniaxial) calculate_uniaxial_fields(num_atoms);
     }
 
-
     return;
 
 }
 
 } // end of anisotropy namespace
-

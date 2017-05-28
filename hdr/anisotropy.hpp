@@ -24,20 +24,22 @@
 //--------------------------------------------------------------------------------
 namespace anisotropy{
 
-   //-----------------------------------------------------------------------------
-   // Function to initialise anisotropy module
-   //-----------------------------------------------------------------------------
-   void initialize();
+    extern bool uniaxial;
 
-   //---------------------------------------------------------------------------
-   // Function to process input file parameters for anisotropy module
-   //---------------------------------------------------------------------------
-   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+    //-----------------------------------------------------------------------------
+    // Function to initialise anisotropy module
+    //-----------------------------------------------------------------------------
+    void initialize();
 
-   //---------------------------------------------------------------------------
-   // Function to process material parameters
-   //---------------------------------------------------------------------------
-   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+    //---------------------------------------------------------------------------
+    // Function to process input file parameters for anisotropy module
+    //---------------------------------------------------------------------------
+    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
+    //---------------------------------------------------------------------------
+    // Function to process material parameters
+    //---------------------------------------------------------------------------
+    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
 } // end of anisotropy namespace
 

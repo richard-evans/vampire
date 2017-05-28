@@ -24,7 +24,13 @@ namespace anisotropy{
    // Externally visible variables
    //------------------------------------------------------------------------------
 
+<<<<<<< Updated upstream
    namespace internal{
+=======
+    bool uniaxial = False;
+
+    namespace internal{
+>>>>>>> Stashed changes
 
       //------------------------------------------------------------------------
       // Shared variables inside anisotropy module
