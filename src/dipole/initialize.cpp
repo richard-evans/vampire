@@ -190,6 +190,13 @@ namespace dipole{
                   dipole::internal::cells_num_cells
                   );
 
+         // After transferring the data across cores, assign value dipole::internal::cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
+         for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
+            if(cells_num_atoms_in_cell_global[i]>0 && dipole::internal::cells_num_atoms_in_cell[i]==0){
+               dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
+            }
+         }
+
          // Clear memory
          cells_num_atoms_in_cell_global.clear();
          // Clear atom_pos_x,y,z
