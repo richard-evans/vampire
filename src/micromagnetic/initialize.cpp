@@ -80,27 +80,21 @@ namespace micromagnetic{
 
 
    //These functions vectors with the parameters calcualted from the function
-   mm::ms =          mm::calculate_ms(num_local_cells,num_atoms,num_cells, cell_array, type_array,material,local_cell_array);
-   mm::alpha =       mm::calculate_alpha(num_local_cells,num_atoms, num_cells, cell_array, type_array, material,local_cell_array);
-   mm::Tc =          mm::calculate_tc(num_local_cells, local_cell_array,num_atoms, num_cells, cell_array,neighbour_list_array,
-                                       neighbour_list_start_index, neighbour_list_end_index, type_array, material);
-   mm::ku =          mm::calculate_ku(num_atoms, num_cells, cell_array, type_array, material);
-   mm::gamma =       mm::calculate_gamma(num_atoms, num_cells, cell_array,type_array,material);
-   mm::one_o_chi_para =    mm::calculate_chi_para(num_local_cells, local_cell_array,num_cells, Temperature);
-   mm::one_o_chi_perp =    mm::calculate_chi_perp(num_local_cells, local_cell_array,num_cells, Temperature);
-   mm::A =           mm::calculate_a(num_atoms, num_cells, num_local_cells,cell_array, neighbour_list_array, neighbour_list_start_index,
-                                    neighbour_list_end_index, type_array,  material, volume_array, x_coord_array,
-                                    y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
-
-//for (int lc = 0; lc < num_local_cells; lc++)
-//{
- // int cell = local_cell_array[lc];
-//std::cout << cell << '\t' <<mm::ms[cell] << '\t' << mm::alpha[cell]<< '\t' << mm::gamma[cell] <<'\t' << mm::A[cell] << "\t" << mm::chi_para[cell] << '\t' << mm::chi_perp[cell] << "\t" << mm::Tc[cell] << "\t" << mm::ku[cell] << std::endl;
-//}
+   mm::ms =                   mm::calculate_ms(num_local_cells,num_atoms,num_cells, cell_array, type_array,material,local_cell_array);
+   mm::alpha =                mm::calculate_alpha(num_local_cells,num_atoms, num_cells, cell_array, type_array, material,local_cell_array);
+   mm::Tc =                   mm::calculate_tc(num_local_cells, local_cell_array,num_atoms, num_cells, cell_array,neighbour_list_array,
+                                             neighbour_list_start_index, neighbour_list_end_index, type_array, material);
+   mm::ku =                   mm::calculate_ku(num_atoms, num_cells, cell_array, type_array, material);
+   mm::gamma =                mm::calculate_gamma(num_atoms, num_cells, cell_array,type_array,material);
+   mm::one_o_chi_para =       mm::calculate_chi_para(num_local_cells, local_cell_array,num_cells, Temperature);
+   mm::one_o_chi_perp =       mm::calculate_chi_perp(num_local_cells, local_cell_array,num_cells, Temperature);
+   mm::A =                    mm::calculate_a(num_atoms, num_cells, num_local_cells,cell_array, neighbour_list_array, neighbour_list_start_index,
+                                             neighbour_list_end_index, type_array,  material, volume_array, x_coord_array,
+                                             y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
 
 
 
-//if multiscale simulation
+//if multiscale simulation work out which cells/atoms are micromagnetic/atomistic
 if (discretisation_type == 2){
 
    std::cout<< "multiscale" <<std::endl;
@@ -138,6 +132,7 @@ if (discretisation_type == 2){
   }
 
 }
+//if micromagnetic simulation all cells are micromagnetic and no atoms are micromagnetic
 else {
    for (int lc = 0; lc < num_local_cells; lc++){
        int cell = local_cell_array[lc];

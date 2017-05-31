@@ -42,6 +42,8 @@
 #include "spintorque.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
+#include "cells.hpp"
+#include "micromagnetic.hpp"
 
 // sim module header
 #include "internal.hpp"
