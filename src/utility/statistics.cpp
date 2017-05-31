@@ -58,10 +58,6 @@
 #include <cmath>
 #include <iostream>
 
-//Function prototypes
-int calculate_spin_fields(const int,const int);
-int calculate_external_fields(const int,const int);
-
 /// @namespace stats
 /// @brief Variables and functions for calculation of system statistics.
 ///
@@ -270,8 +266,8 @@ double max_torque(){
 	// Recalculate net fields
 	//------------------------------------------------
 
-	calculate_spin_fields(0,num_atoms);
-	calculate_external_fields(0,num_atoms);
+	sim::calculate_spin_fields(0,num_atoms);
+	sim::calculate_external_fields(0,num_atoms);
 
 	for(int atom=0;atom<num_atoms;atom++){
 
@@ -316,8 +312,8 @@ void system_torque(){
 	double torque[3]={0.0,0.0,0.0};
 
 	// calculate net fields
-	calculate_spin_fields(0,atoms::num_atoms);
-	calculate_external_fields(0,atoms::num_atoms);
+	sim::calculate_spin_fields(0,atoms::num_atoms);
+	sim::calculate_external_fields(0,atoms::num_atoms);
 
 	for(int atom=0;atom<stats::num_atoms;atom++){
 

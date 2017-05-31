@@ -23,6 +23,7 @@
 #include "vmpi.hpp"
 #include "cells.hpp"
 #include "errors.hpp"
+#include "sim.hpp"
 
 // dipole module headers
 #include "internal.hpp"
@@ -102,6 +103,8 @@ namespace dipole{
          	dipole::cells_field_array_x[i] = dipole::cells_field_array_x[i] * 9.27400915e-01;
          	dipole::cells_field_array_y[i] = dipole::cells_field_array_y[i] * 9.27400915e-01;
          	dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.27400915e-01;
+				//if (i ==0) std::cout << "cell field" << '\t' << sim::temperature << '\t'<< dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] << '\t' << std::endl;
+
             //fprintf(stderr," >> sum of dipolar field*mub on cell:\n >> i=%d magx=%f magy=%f magz=%f fieldx=%f fieldy=%f fieldz=%f rank=%d\n",i,cells::mag_array_x[i],cells::mag_array_y[i],cells::mag_array_z[i],dipole::cells_field_array_x[i],dipole::cells_field_array_y[i],dipole::cells_field_array_z[i],vmpi::my_rank);
      		}
     	}

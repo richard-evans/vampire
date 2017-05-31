@@ -190,9 +190,9 @@ namespace cells{
 
       cells::pos_and_mom_array.resize(4*cells::num_cells,0.0);
 
-      /*cells::cell_coords_array_x.resize(cells::num_cells,0.0);
+      cells::cell_coords_array_x.resize(cells::num_cells,0.0);
       cells::cell_coords_array_y.resize(cells::num_cells,0.0);
-      cells::cell_coords_array_z.resize(cells::num_cells,0.0);*/
+      cells::cell_coords_array_z.resize(cells::num_cells,0.0);
 
       cells::mag_array_x.resize(cells::num_cells,0.0);
       cells::mag_array_y.resize(cells::num_cells,0.0);
@@ -218,10 +218,10 @@ namespace cells{
          // Consider only magnetic elements
          //if(mus/(9.274e-24) > 0.5){
          if(mp::material[type].non_magnetic==0){
-            /*cells::cell_coords_array_x[local_cell]+=atom_coords_x[atom]*mus;
+            cells::cell_coords_array_x[local_cell]+=atom_coords_x[atom]*mus;
             cells::cell_coords_array_y[local_cell]+=atom_coords_y[atom]*mus;
             cells::cell_coords_array_z[local_cell]+=atom_coords_z[atom]*mus;
-            cells::internal::total_moment_array[local_cell]+=mus;*/
+            cells::internal::total_moment_array[local_cell]+=mus;
 
             cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+1] += atom_coords_y[atom]*mus;
@@ -320,15 +320,15 @@ namespace cells{
       // Calculate number of local cells
       for(int cell=0;cell<cells::num_cells;cell++){
          if(cells::num_atoms_in_cell[cell]!=0){
-            //std::cout << cells::num_atoms_in_cell[cell] << " in " << cell << std::endl;
+      //      std::cout << cells::num_atoms_in_cell[cell] << " in " << cell << std::endl;
             cells::local_cell_array.push_back(cell);
             cells::num_local_cells++;
             //cells::volume_array[cell] = double(cells::num_atoms_in_cell[cell])*atomic_volume;
          }
       }
 
-      //std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
-
+    //  std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
+      std::cout  << "Number of local macrocells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
       zlog << zTs() << "Number of local macrocells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
 
       // Set initialised flag

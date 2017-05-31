@@ -24,6 +24,9 @@ namespace dipole{
    int update_rate=100; /// timesteps between updates
    bool activated=false;
 
+   bool fft = false;
+
+
    std::vector < double > cells_field_array_x;
    std::vector < double > cells_field_array_y;
    std::vector < double > cells_field_array_z;
@@ -41,6 +44,7 @@ namespace dipole{
       // Shared variables inside dipole module
       //------------------------------------------------------------------------
       bool initialised=false;
+
 
       int update_time=-1; /// last update time
 
@@ -62,6 +66,36 @@ namespace dipole{
       std::vector <std::vector < double > > rij_intra_yz;
       std::vector <std::vector < double > > rij_intra_zz;
 
+      Array3D<fftw_complex> Nxx0; //3D Array for dipolar field
+	   Array3D<fftw_complex> Nxy0;
+	   Array3D<fftw_complex> Nxz0;
+
+		Array3D<fftw_complex> Nyx0; //3D Array for dipolar field
+		Array3D<fftw_complex> Nyy0;
+		Array3D<fftw_complex> Nyz0;
+
+		Array3D<fftw_complex> Nzx0; //3D Array for dipolar field
+		Array3D<fftw_complex> Nzy0;
+		Array3D<fftw_complex> Nzz0;
+
+      Array3D<fftw_complex> Nxx; //3D Array for dipolar field
+	   Array3D<fftw_complex> Nxy;
+	   Array3D<fftw_complex> Nxz;
+
+		Array3D<fftw_complex> Nyx; //3D Array for dipolar field
+		Array3D<fftw_complex> Nyy;
+		Array3D<fftw_complex> Nyz;
+
+		Array3D<fftw_complex> Nzx; //3D Array for dipolar field
+		Array3D<fftw_complex> Nzy;
+		Array3D<fftw_complex> Nzz;
+
+      int num_macro_cells_x;
+      int num_macro_cells_y;
+      int num_macro_cells_z;
+      int eight_num_cells;
+
+
       int num_atoms;
       std::vector < int > atom_type_array;
       std::vector < int > atom_cell_id_array;
@@ -78,6 +112,7 @@ namespace dipole{
       // Shared functions inside dipole module
       //------------------------------------------------------------------------
       void update_field();
+      void update_field_fft();
 
    } // end of internal namespace
 

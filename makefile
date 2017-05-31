@@ -27,7 +27,7 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=
+LIBS=-lstdc++ -lm -lfftw3
 #-lstdc++
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
@@ -165,7 +165,6 @@ obj/qvoronoi/userprintf_rbox.o\
 
 #obj/utility/vio.o \
 
-
 # Include supplementary makefiles
 include src/create/makefile
 include src/config/makefile
@@ -176,6 +175,7 @@ include src/ltmp/makefile
 include src/simulate/makefile
 include src/unitcell/makefile
 include src/vio/makefile
+include src/micromagnetic/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)

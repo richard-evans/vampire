@@ -20,6 +20,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "material.hpp"
+#include "micromagnetic.hpp"
 #include "grains.hpp"
 #include "stats.hpp"
 #include "units.hpp"
@@ -71,7 +72,7 @@ namespace vin{
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-
+        else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -2990,7 +2991,7 @@ namespace vin{
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
-
+            else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             //--------------------------------------------------------------------
             // keyword not found
             //--------------------------------------------------------------------

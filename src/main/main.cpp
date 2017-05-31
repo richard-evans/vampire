@@ -25,6 +25,9 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+// C++ standard library headers
+#include <iomanip>
+
 
 #include "create.hpp"
 #include "errors.hpp"
@@ -32,6 +35,8 @@
 #include "sim.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
+#include "vutil.hpp"
+
 
 int simulate_system();
 
@@ -118,6 +123,7 @@ int main(int argc, char* argv[]){
       time_t rawtime = time(NULL);
       struct tm * timeinfo = localtime(&rawtime);
       std::cout<<asctime(timeinfo);
+
    }
 
 
@@ -131,6 +137,11 @@ int main(int argc, char* argv[]){
          vout::nullify(std::cout);
       }
    #endif
+
+   vutil::vtimer_t timer;
+
+   // start timer
+   timer.start();
 
    // Initialise system
    mp::initialise(infile);
@@ -151,6 +162,13 @@ int main(int argc, char* argv[]){
    std::cout << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(WHITE);
 
+   // end timer
+   timer.stop();
+
+std::cout << "a" <<std::endl;
+    // return elapsed time for io
+    std::cout << "simulation time" << '\t' << timer.elapsed_time() <<std::endl;
+zlog << zTs() << "simulation time" << '\t' << timer.elapsed_time() <<std::endl;
    return EXIT_SUCCESS;
 
 }

@@ -6,6 +6,7 @@
 dipole_objects =\
 mpi.o \
 data.o \
+fft_update.o \
 initialize.o \
 interface.o \
 update.o \

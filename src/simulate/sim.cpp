@@ -50,6 +50,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
+#include "micromagnetic.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -291,7 +292,30 @@ int run(){
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
-   // For MPI version, calculate initialisation time
+	 //initialize the micromagnetic calculation
+	 if (micromagnetic::discretisation_type > 0) micromagnetic::initialize(cells::num_local_cells,
+		 																																					cells::num_cells,
+		 																																					stats::num_atoms,
+		 																																					mp::num_materials,
+																																							cells::atom_cell_id_array,
+																																							atoms::neighbour_list_array,
+																																							atoms::neighbour_list_start_index,
+																																							atoms::neighbour_list_end_index,
+																																							atoms::type_array,
+																																							mp::material,
+																																							atoms::x_coord_array,
+																																							atoms::y_coord_array,
+																																							atoms::z_coord_array,
+																																							cells::volume_array,
+																																							sim::temperature,
+																																							cells::num_atoms_in_unit_cell,
+																																							cs::system_dimensions[0],
+																																							cs::system_dimensions[1],
+																																							cs::system_dimensions[2],
+																																							cells::local_cell_array);
+
+
+	 // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
 		#ifdef MPICF
 			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
@@ -572,6 +596,132 @@ void integrate_serial(int n_steps){
    // Check for calling of function
    if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
 
+
+// if simulation is microamgnetic
+if (micromagnetic::discretisation_type ==1) {
+	// Case statement to call integrator
+	switch(micromagnetic::integrator){
+
+		 case 0: // LLG Heun
+				for(int ti=0;ti<n_steps;ti++){
+
+					if (micromagnetic::number_of_micromagnetic_cells > 0)	micromagnetic::LLG(cells::local_cell_array,
+																																										n_steps,
+																																										cells::num_cells,
+																																										cells::num_local_cells,
+																																										sim::temperature,
+																																										cells::mag_array_x,
+																																										cells::mag_array_y,
+																																										cells::mag_array_z,
+																																										sim::H_vec[0],
+																																										sim::H_vec[1],
+																																										sim::H_vec[2],
+																																										sim::H_applied,
+																																										mp::dt,
+																																										cells::volume_array);
+					 increment_time();
+				}
+				break;
+
+	 	case 1: // Montecarlo
+	 		for(int ti=0;ti<n_steps;ti++){
+				if (micromagnetic::number_of_micromagnetic_cells > 0)	micromagnetic::LLB(cells::local_cell_array,
+																																									n_steps,
+																																									cells::num_cells,
+																																									cells::num_local_cells,
+																																									sim::temperature,
+																																									cells::mag_array_x,
+																																									cells::mag_array_y,
+																																									cells::mag_array_z,
+																																									sim::H_vec[0],
+																																									sim::H_vec[1],
+																																									sim::H_vec[2],
+																																									sim::H_applied,
+																																									mp::dt,
+																																									cells::volume_array);
+				increment_time();
+	 		}
+	 		break;
+
+		default:{
+			std::cerr << "Unknown micromagnetic integrator type "<< micromagnetic::integrator << " requested, exiting" << std::endl;
+	    err::vexit();
+			}
+		}
+}
+//
+// // if simulation is multiscale
+else if (micromagnetic::discretisation_type ==2) {
+
+	// Case statement to call integrator
+	switch(micromagnetic::integrator){
+
+		 	case 0: // LLG Heun
+				for(int ti=0;ti<n_steps;ti++){
+					//std::cout << sim::time << '\t' << micromagnetic::num_atomic_steps_mm << "\t" << mp::dt << "\t" << mp::dt*micromagnetic::num_atomic_steps_mm << std::endl;
+					if (micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
+
+					if (micromagnetic::number_of_micromagnetic_cells > 0 && sim::time % micromagnetic::num_atomic_steps_mm == 0)	micromagnetic::LLG(cells::local_cell_array,
+																																																																					n_steps,
+																																																																					cells::num_cells,
+																																																																					cells::num_local_cells,
+																																																																					sim::temperature,
+																																																																					cells::mag_array_x,
+																																																																					cells::mag_array_y,
+																																																																					cells::mag_array_z,
+																																																																					sim::H_vec[0],
+																																																																					sim::H_vec[1],
+																																																																					sim::H_vec[2],
+																																																																					sim::H_applied,
+																																																																					mp::dt*micromagnetic::num_atomic_steps_mm,
+																																																																					cells::volume_array);
+					increment_time();
+
+				}
+				break;
+
+	 		case 1: // Montecarlo
+	 			for(int ti=0;ti<n_steps;ti++){
+					//std::cout << sim::time << '\t' << micromagnetic::num_atomic_steps_mm << "\t" << mp::dt << "\t" << mp::dt*micromagnetic::num_atomic_steps_mm << std::endl;
+					if (micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
+
+					if (micromagnetic::number_of_micromagnetic_cells > 0 && sim::time % micromagnetic::num_atomic_steps_mm == 0)	micromagnetic::LLB(cells::local_cell_array,
+																																																																					n_steps,
+																																																																					cells::num_cells,
+																																																																					cells::num_local_cells,
+																																																																					sim::temperature,
+																																																																					cells::mag_array_x,
+																																																																					cells::mag_array_y,
+																																																																					cells::mag_array_z,
+																																																																					sim::H_vec[0],
+																																																																					sim::H_vec[1],
+																																																																					sim::H_vec[2],
+																																																																					sim::H_applied,
+																																																																					mp::dt*micromagnetic::num_atomic_steps_mm,
+																																																																					cells::volume_array);
+					increment_time();
+					increment_time();
+	 			}
+	 			break;
+
+			default:{
+				std::cerr << "Unknown micromagnetic integrator type "<< micromagnetic::integrator << " requested, exiting" << std::endl;
+				err::vexit();
+				}
+
+ 		}
+
+		std::ofstream pfile;
+			pfile.open("cell_config2");
+
+			for (int lc = 0; lc < cells::num_local_cells; lc++){
+				int cell = cells::local_cell_array[lc];
+				//pfile2 << cell << '\t' << cells::cell_coords_array_x[cell] << '\t' << cells::cell_coords_array_y[cell] << '\t' << cells::cell_coords_array_z[cell] << '\t' <<cells::mag_array_x[cell] <<
+				pfile << cells::cell_coords_array_x[cell] << '\t' << cells::cell_coords_array_y[cell] << '\t' << cells::cell_coords_array_z[cell] << '\t' <<cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] << '\t' << std::endl;
+			}
+	}
+//else simulation is atomistic
+else{
    // Case statement to call integrator
    switch(sim::integrator){
 
@@ -623,7 +773,7 @@ void integrate_serial(int n_steps){
          err::vexit();
 		}
 	}
-
+}
    return;
 }
 

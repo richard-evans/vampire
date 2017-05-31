@@ -71,7 +71,10 @@ void calculate_surface_anisotropy_fields(const int,const int);
 void calculate_lagrange_fields(const int,const int);
 void calculate_full_spin_fields(const int start_index,const int end_index);
 
-int calculate_spin_fields(const int start_index,const int end_index){
+
+namespace sim{
+
+void calculate_spin_fields(const int start_index,const int end_index){
 	///======================================================
 	/// 		Subroutine to calculate spin dependent fields
 	///
@@ -104,10 +107,9 @@ int calculate_spin_fields(const int start_index,const int end_index){
 
 	calculate_full_spin_fields(start_index,end_index);
 
-	return 0;
 }
 
-int calculate_external_fields(const int start_index,const int end_index){
+void calculate_external_fields(const int start_index,const int end_index){
 	///======================================================
 	/// 		Subroutine to calculate external fields
 	///
@@ -155,7 +157,7 @@ int calculate_external_fields(const int start_index,const int end_index){
 	// Dipolar Fields
 	calculate_dipolar_fields(start_index,end_index);
 
-	return 0;
+}
 }
 
 int calculate_exchange_fields(const int start_index,const int end_index){

@@ -96,6 +96,7 @@ using std::string;
 	// Material Container
 	//----------------------------------
 
+
 	const int max_materials=100;
 	extern int num_materials;
 
@@ -104,6 +105,10 @@ using std::string;
 		// input parameters
 		string name;
 		string element;
+
+
+		bool micromagnetic_enabled;
+
 
 		double alpha;
 		double mu_s_SI;

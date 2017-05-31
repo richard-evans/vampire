@@ -37,6 +37,14 @@ namespace dipole{
          dipole::activated=true;
          return true;
       }
+
+      test="solver-fft";
+      if(word==test){
+         // enable dipole calculation
+         dipole::fft=true;
+         return true;
+      }
+
       test="field-update-rate";
       if(word==test){
          int dpur=atoi(value.c_str());

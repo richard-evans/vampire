@@ -81,7 +81,7 @@
 
 namespace demag{
 
-	bool fast=false;
+	bool fast=true;
 
 	int update_rate=100; /// timesteps between updates
 	int update_time=-1; /// last update time

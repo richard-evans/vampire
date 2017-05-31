@@ -25,10 +25,13 @@
 
 // dipole module headers
 #include "internal.hpp"
+#include "array3d.h"
 
 namespace dipole{
 
    extern int update_rate; /// timesteps between updates
+
+
    extern void calculate_field();
    extern int send_recv_cells_data(std::vector<int>& proc_cell_index_array1D,
                                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
@@ -91,6 +94,7 @@ namespace dipole{
       //-------------------------------------------------------------------------
       extern bool initialised;
 
+
       extern int update_time; /// last update time
 
       extern const double prefactor; // 1e-7/1e30
@@ -111,6 +115,35 @@ namespace dipole{
       extern std::vector <std::vector < double > > rij_intra_yz;
       extern std::vector <std::vector < double > > rij_intra_zz;
 
+      extern Array3D<fftw_complex> Nxx0; //3D Array for dipolar field
+	   extern Array3D<fftw_complex> Nxy0;
+	   extern Array3D<fftw_complex> Nxz0;
+
+		extern Array3D<fftw_complex> Nyx0; //3D Array for dipolar field
+		extern Array3D<fftw_complex> Nyy0;
+		extern Array3D<fftw_complex> Nyz0;
+
+		extern Array3D<fftw_complex> Nzx0; //3D Array for dipolar field
+		extern Array3D<fftw_complex> Nzy0;
+		extern Array3D<fftw_complex> Nzz0;
+
+      extern Array3D<fftw_complex> Nxx; //3D Array for dipolar field
+      extern Array3D<fftw_complex> Nxy;
+      extern Array3D<fftw_complex> Nxz;
+
+      extern Array3D<fftw_complex> Nyx; //3D Array for dipolar field
+      extern Array3D<fftw_complex> Nyy;
+      extern Array3D<fftw_complex> Nyz;
+
+      extern Array3D<fftw_complex> Nzx; //3D Array for dipolar field
+      extern Array3D<fftw_complex> Nzy;
+      extern Array3D<fftw_complex> Nzz;
+
+      extern int num_macro_cells_x;
+      extern int num_macro_cells_y;
+      extern int num_macro_cells_z;
+      extern int eight_num_cells;
+
       extern int num_atoms;
       extern std::vector < int > atom_type_array;
       extern std::vector < int > atom_cell_id_array;
@@ -129,7 +162,7 @@ namespace dipole{
       //-------------------------------------------------------------------------
       //void write_macrocell_data();
       extern void update_field();
-
+      extern void update_field_fft();
    } // end of internal namespace
 
 } // end of dipole namespace

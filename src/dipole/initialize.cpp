@@ -33,6 +33,8 @@
 // dipole module headers
 #include "internal.hpp"
 
+namespace dp = dipole::internal;
+
 namespace dipole{
 
    //----------------------------------------------------------------------------
@@ -288,8 +290,139 @@ namespace dipole{
       //}
       //MPI::COMM_WORLD.Barrier();
       //std::cout << std::endl << std::flush;
+      dipole::cells_field_array_x.resize(dipole::internal::cells_num_cells,0.0);
+      dipole::cells_field_array_y.resize(dipole::internal::cells_num_cells,0.0);
+      dipole::cells_field_array_z.resize(dipole::internal::cells_num_cells,0.0);
 
       // allocate arrays to store data [nloccell x ncells]
+      if(dipole::fft==true) {
+
+         // calculate matrix prefactors
+         zlog << zTs() << "Precalculating rij matrix for dipole calculation... " << std::endl;
+
+
+         std::cout<< "FFT method" << std::endl;
+         // determine number of cells in each direction (with small shift to prevent the fence post problem)
+         dp::num_macro_cells_x = static_cast<unsigned int>(ceil((cs::system_dimensions[0]+0.01)/cells::macro_cell_size));
+         dp::num_macro_cells_y = static_cast<unsigned int>(ceil((cs::system_dimensions[1]+0.01)/cells::macro_cell_size));
+         dp::num_macro_cells_z = static_cast<unsigned int>(ceil((cs::system_dimensions[2]+0.01)/cells::macro_cell_size));
+
+         dp::eight_num_cells = 8*dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z;
+      //   std::cout << "a" <<std::endl;
+
+         dp::Nxx0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nxy0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nxz0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+
+         dp::Nyx0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nyy0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nyz0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+
+         dp::Nzx0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nzy0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nzz0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+
+
+         dp::Nxx.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nxy.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nxz.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+
+         dp::Nyx.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nyy.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nyz.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+
+         dp::Nzx.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nzy.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+         dp::Nzz.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+
+      //   std::cout << "b" <<std::endl;
+
+
+
+      double ii,jj,kk;
+         for(int i=0;i<dp::num_macro_cells_x*2;i++){
+            if (i >= dp::num_macro_cells_x) ii = i - 2*dp::num_macro_cells_x;
+            else ii = i;
+            for(int j=0;j<dp::num_macro_cells_y*2;j++){
+               if (j >= dp::num_macro_cells_y) jj = j - 2*dp::num_macro_cells_y;
+               else jj = j;
+               for(int k=0;k<dp::num_macro_cells_z*2;k++){
+                  if (k>= dp::num_macro_cells_z) kk = k - 2*dp::num_macro_cells_z;
+                  else kk = k;
+                  if((ii!=jj) && (jj != kk)){
+
+                     const double rx = ii*cells::macro_cell_size; // Angstroms
+                     const double ry = jj*cells::macro_cell_size;
+                     const double rz = kk*cells::macro_cell_size;
+                  //   std::cout << "r" << rx << '\t' << ry << '\t' << rz << "\t" << cells::macro_cell_size << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
+                     const double rij = 1.0/pow(rx*rx+ry*ry+rz*rz,0.5);
+
+                     const double ex = rx*rij;
+                     const double ey = ry*rij;
+                     const double ez = rz*rij;
+
+                     const double rij3 = rij*rij*rij; // Angstroms
+                  //   std::cout << "r" << rx << '\t' << ry << '\t' << rz << "\t" << cells::macro_cell_size << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
+
+                        //	 std::cout <<"r" << rx << '\t' << ry << '\t' << rz << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez << prefactor << std::endl;
+
+                     dp::Nxx0(i,j,k)[0] = (3.0*ex*ex - 1.0)*rij3;
+                     dp::Nxy0(i,j,k)[0] = (3.0*ex*ey      )*rij3;
+                     dp::Nxz0(i,j,k)[0] = (3.0*ex*ez      )*rij3;
+
+                     dp::Nyx0(i,j,k)[0] = (3.0*ey*ex - 1.0)*rij3;
+                     dp::Nyy0(i,j,k)[0] = (3.0*ey*ey      )*rij3;
+                     dp::Nyz0(i,j,k)[0] = (3.0*ey*ez      )*rij3;
+
+                     dp::Nzx0(i,j,k)[0] = (3.0*ez*ex - 1.0)*rij3;
+                     dp::Nzy0(i,j,k)[0] = (3.0*ez*ey      )*rij3;
+                     dp::Nzz0(i,j,k)[0] = (3.0*ez*ez      )*rij3;
+
+            //         		 		std::cout << 	i << '\t' << j << "\t" << k << '\t' << dp::Nxx0(i,j,k)[0] << '\t' << dp::Nxy0(i,j,k)[0] << '\t' << dp::Nxz0(i,j,k)[0] << '\t' << dp::Nyy(i,j,k)[0] << '\t' << dp::Nyz0(i,j,k)[0] << '\t' << dp::Nzz0(i,j,k)[0] <<std::endl;
+                  }
+               }
+            }
+         }
+      //   std::cin.get();
+
+
+         // fft calculations
+         fftw_plan NxxP,NxyP,NxzP,NyxP,NyyP,NyzP,NzxP,NzyP,NzzP;
+
+
+         //deterines the forward transform for the N arrays
+         NxxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nxx0.ptr(),dp::Nxx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+      fftw_execute(NxxP);
+         NyxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nyx0.ptr(),dp::Nyx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NyxP);
+         NzxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nzx0.ptr(),dp::Nzx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NzxP);
+  //	std::cout << 'r' <<std::endl;
+         NxyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nxy0.ptr(),dp::Nxy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NxyP);
+         NyyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nyy0.ptr(),dp::Nyy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NyyP);
+         NzyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nzy0.ptr(),dp::Nzy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NzyP);
+  //	std::cout << 'f' <<std::endl;
+         NxzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nxz0.ptr(),dp::Nxz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NxzP);
+         NyzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nyz0.ptr(),dp::Nyz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NyzP);
+         NzzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nzz0.ptr(),dp::Nzz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NzzP);
+      //   std::cout << "d" <<std::endl;
+
+
+      }
+
+
+
+
+
+
+
+   else{
       for(int lc=0;lc<dipole::internal::cells_num_local_cells; lc++){
 
          dipole::internal::rij_inter_xx.push_back(std::vector<double>());
@@ -328,9 +461,6 @@ namespace dipole{
          dipole::internal::rij_intra_zz.push_back(std::vector<double>());
          dipole::internal::rij_intra_zz[lc].resize(dipole::internal::cells_num_cells,0.0);
 
-         dipole::cells_field_array_x.resize(dipole::internal::cells_num_cells,0.0);
-         dipole::cells_field_array_y.resize(dipole::internal::cells_num_cells,0.0);
-         dipole::cells_field_array_z.resize(dipole::internal::cells_num_cells,0.0);
 
       }
 
@@ -556,6 +686,7 @@ namespace dipole{
             }
 			}
 		}
+   }
 
       //MPI::COMM_WORLD.Barrier();
       //fprintf(stderr,"\n\n >>> printing inter part of dipolar matrix <<<< \n\n");
