@@ -24,19 +24,16 @@ namespace anisotropy{
     // Function to initialize anisotropy module
     //----------------------------------------------------------------------------
     void initialise (
-            const int num_atoms,                        // atoms in system
+            const int num_atoms,
             const std::vector<int>& atom_type_array,
+            const std::vector<double> mp::MaterialScalarAnisotropyArray,
             const std::vector<double>& atom_coords_x,
             const std::vector<double>& atom_coords_y,
             const std::vector<double>& atom_coords_z)
     {
-	if (anisotropy::uniaxial) calculate_uniaxial_fields(num_atoms);
+        if (anisotropy::uniaxial) calculate_uniaxial_fields(num_atoms);
+
+        return;
     }
 
-
-    return;
-
-}
-
 } // end of anisotropy namespace
-
