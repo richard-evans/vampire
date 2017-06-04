@@ -50,40 +50,22 @@ namespace dipole{
 			   //if updated record last time at update
 			   dipole::internal::update_time=sim::time;
 
-            #ifdef MPICF
-               double t1 = MPI_Wtime();
-            #else
-               time_t t1;
-               t1 = time (NULL);
-            #endif
-
+            // instantiate timer of cells::mag() function
+            vutil::vtimer_t timer;
+            // start timer
+            timer.start();
 			   // update cell magnetisations
 			   cells::mag();
+            // end timer
+            timer.stop();
+            // return bandwidth
+            double update_time = timer.elapsed_time();
 
-            #ifdef MPICF
-               double t2 = MPI_Wtime();
-            #else
-               time_t t2;
-               t2 = time (NULL);
-            #endif
-            zlog << zTs() << "Calculation cells magnetisation complete. Time taken: " << t2-t1 << "s."<< std::endl;
-
-            #ifdef MPICF
-               t1 = MPI_Wtime();
-            #else
-               t1;
-               t1 = time (NULL);
-            #endif
+            zlog << zTs() << "Calculation cells magnetisation complete. Time taken: " << update_time << "s."<< std::endl;
 
 			   // recalculate dipole fields
             dipole::internal::update_field();
 
-            #ifdef MPICF
-               t2 = MPI_Wtime();
-            #else
-               t2;
-               t2 = time (NULL);
-            #endif
             zlog << zTs() << "Time required for REAL dipole update: " << t2-t1 << "s."<< std::endl;
 
 			   // For MPI version, only add local atoms
