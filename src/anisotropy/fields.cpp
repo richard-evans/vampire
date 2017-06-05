@@ -21,20 +21,35 @@
 namespace anisotropy
 {
     //----------------------------------------------------------------------------
-    // Function to calculate uniaxial fields
+    // function to calculate anisotropy fields
     //----------------------------------------------------------------------------
-    void calculate_anisotropy_fields (
-        const int num_atoms,                        // atoms in system
+    void calculate_anisotropy_fields(
+        const int num_atoms,
         const std::vector<int>& atom_type_array,
+        const std::vector<double>& materialscalaranisotropyarray,
         const std::vector<double>& atom_coords_x,
         const std::vector<double>& atom_coords_y,
-        const std::vector<double>& atom_coords_z)
+        const std::vector<double>& atom_coords_z,
+        const std::vector<double>& spin_array_x,
+        const std::vector<double>& spin_array_y,
+        const std::vector<double>& spin_array_z)
         {
-            if (anisotropy::uniaxial) calculate_uniaxial_fields(num_atoms);
+            if (anisotropy::internal::uniaxial) calculate_uniaxial_fields(num_atoms);
+            // if (anisotropy::internal::2ndorder) calculate_2ndorder_fields(num_atoms);
+        }
+
+        double calculate_uniaxial_fields(num_atoms)
+        {
+            for (int atom=0; atom<num_atoms; ++atom)
+            {
+                int mat = atoms_type_array[atom];
+                double uniaxial_field = 2.0 * materialscalaranisotropyarray[mat]
+                                            * spin_array_z[atom];
+
+                anisotropy::internal::field_array[atom] += uniaxial_field;
+            }
         }
 
         return;
 
-    }
-
-} // end of anisotropy namespace
+    } // end of anisotropy namespace

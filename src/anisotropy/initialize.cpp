@@ -21,7 +21,7 @@
 namespace anisotropy{
 
     //----------------------------------------------------------------------------
-    // Function to initialize anisotropy module
+    // function to initialize anisotropy module
     //----------------------------------------------------------------------------
     void initialise (
         const int num_atoms,
@@ -29,25 +29,31 @@ namespace anisotropy{
         const std::vector<double>& materialscalaranisotropyarray,
         const std::vector<double>& atom_coords_x,
         const std::vector<double>& atom_coords_y,
-        const std::vector<double>& atom_coords_z)
+        const std::vector<double>& atom_coords_z,
+        const std::vector<double>& spin_array_x,
+        const std::vector<double>& spin_array_y,
+        const std::vector<double>& spin_array_z)
         {
-            anisotropy::internal::num_atoms = num_atoms;
-            anisotropy::internal::atom_type_array = atom_type_array;
-            anisotropy::internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
-
-            /* Check if anisotropy calculation enabled. If not, do nothing */
-
+            /* check if anisotropy calculation enabled. If not, do nothing */
             if (!anisotropy::internal::enabled) return;
 
-            // output informative message
+            /* output informative message */
             zlog << zTs() << "Initialising data structures for anisotropy calculation." << std::endl;
 
-            // check for prior initialisation
+            /* check for prior initialisation */
             if (anisotropy::internal::initialised)
             {
                zlog << zTs() << "Warning: Anisotropy calculation already initialised. Continuing." << std::endl;
                return;
             }
+
+            anisotropy::internal::num_atoms = num_atoms;
+            anisotropy::internal::atom_type_array = atom_type_array;
+            anisotropy::internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
+
+            anisotropy::internal::spin_array_x = spin_array_x;
+            anisotropy::internal::spin_array_y = spin_array_y;
+            anisotropy::internal::spin_array_z = spin_array_z;
 
             return;
         }
