@@ -18,23 +18,23 @@
 // anisotropy module headers
 #include "internal.hpp"
 
-namespace anisotropy{
-
+namespace anisotropy
+{
     //----------------------------------------------------------------------------
     // Function to calculate uniaxial fields
     //----------------------------------------------------------------------------
-    void calculate_uniaxial_fields (
-            const int num_atoms,                        // atoms in system
-            const std::vector<int>& atom_type_array,
-            const std::vector<double>& atom_coords_x,
-            const std::vector<double>& atom_coords_y,
-            const std::vector<double>& atom_coords_z)
-    {
-	if (anisotropy::uniaxial) calculate_uniaxial_fields(num_atoms);
+    void calculate_anisotropy_fields (
+        const int num_atoms,                        // atoms in system
+        const std::vector<int>& atom_type_array,
+        const std::vector<double>& atom_coords_x,
+        const std::vector<double>& atom_coords_y,
+        const std::vector<double>& atom_coords_z)
+        {
+            if (anisotropy::uniaxial) calculate_uniaxial_fields(num_atoms);
+        }
+
+        return;
+
     }
-
-    return;
-
-}
 
 } // end of anisotropy namespace

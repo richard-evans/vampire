@@ -24,16 +24,32 @@ namespace anisotropy{
     // Function to initialize anisotropy module
     //----------------------------------------------------------------------------
     void initialise (
-            const int num_atoms,
-            const std::vector<int>& atom_type_array,
-            const std::vector<double> mp::MaterialScalarAnisotropyArray,
-            const std::vector<double>& atom_coords_x,
-            const std::vector<double>& atom_coords_y,
-            const std::vector<double>& atom_coords_z)
-    {
-        if (anisotropy::uniaxial) calculate_uniaxial_fields(num_atoms);
+        const int num_atoms,
+        const std::vector<int>& atom_type_array,
+        const std::vector<double>& materialscalaranisotropyarray,
+        const std::vector<double>& atom_coords_x,
+        const std::vector<double>& atom_coords_y,
+        const std::vector<double>& atom_coords_z)
+        {
+            anisotropy::internal::num_atoms = num_atoms;
+            anisotropy::internal::atom_type_array = atom_type_array;
+            anisotropy::internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
 
-        return;
-    }
+            /* Check if anisotropy calculation enabled. If not, do nothing */
 
-} // end of anisotropy namespace
+            if (!anisotropy::internal::enabled) return;
+
+            // output informative message
+            zlog << zTs() << "Initialising data structures for anisotropy calculation." << std::endl;
+
+            // check for prior initialisation
+            if (anisotropy::internal::initialised)
+            {
+               zlog << zTs() << "Warning: Anisotropy calculation already initialised. Continuing." << std::endl;
+               return;
+            }
+
+            return;
+        }
+
+    } // end of anisotropy namespace

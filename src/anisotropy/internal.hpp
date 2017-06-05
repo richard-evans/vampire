@@ -29,13 +29,13 @@
 
 namespace anisotropy{
 
-
-
     namespace internal{
 
         //-------------------------------------------------------------------------
         // Internal data type definitions
         //-------------------------------------------------------------------------
+        extern bool enabled; // enable anisotropy calculation
+        extern bool initialised; // check module has been initialised
 
         //-------------------------------------------------------------------------
         // Internal shared variables
