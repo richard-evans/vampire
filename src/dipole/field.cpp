@@ -23,6 +23,7 @@
 #include "cells.hpp"
 #include "vio.hpp"
 #include "errors.hpp"
+#include "vutil.hpp"
 
 // dipole module headers
 #include "internal.hpp"
@@ -65,8 +66,6 @@ namespace dipole{
 
 			   // recalculate dipole fields
             dipole::internal::update_field();
-
-            zlog << zTs() << "Time required for REAL dipole update: " << t2-t1 << "s."<< std::endl;
 
 			   // For MPI version, only add local atoms
 			   #ifdef MPICF
