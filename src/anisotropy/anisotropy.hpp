@@ -20,14 +20,23 @@
 #include "anisotropy.hpp"
 
 //--------------------------------------------------------------------------------
-// Namespace for variables and functions for anisotropy module
+// namespace for variables and functions for anisotropy module
 //--------------------------------------------------------------------------------
 namespace anisotropy{
 
    //-----------------------------------------------------------------------------
-   // Function to initialise anisotropy module
+   // function to initialise anisotropy module
    //-----------------------------------------------------------------------------
-   void initialize();
+   void initialise(
+       const int num_atoms,
+       const std::vector<int>& atom_type_array,
+       const std::vector<zkval_t>& materialscalaranisotropyarray,
+       const std::vector<double>& atom_coords_x,
+       const std::vector<double>& atom_coords_y,
+       const std::vector<double>& atom_coords_z,
+       const std::vector<double>& spin_array_x,
+       const std::vector<double>& spin_array_y,
+       const std::vector<double>& spin_array_z);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for anisotropy module

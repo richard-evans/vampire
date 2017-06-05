@@ -26,7 +26,7 @@ namespace anisotropy{
     void initialise (
         const int num_atoms,
         const std::vector<int>& atom_type_array,
-        const std::vector<double>& materialscalaranisotropyarray,
+        const std::vector<zkval_t>& materialscalaranisotropyarray,
         const std::vector<double>& atom_coords_x,
         const std::vector<double>& atom_coords_y,
         const std::vector<double>& atom_coords_z,

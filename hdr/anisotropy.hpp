@@ -18,6 +18,7 @@
 
 // Vampire headers
 #include "anisotropy.hpp"
+#include "material.hpp"
 
 //--------------------------------------------------------------------------------
 // namespace for variables and functions for anisotropy module
@@ -29,10 +30,10 @@ namespace anisotropy{
     //-----------------------------------------------------------------------------
     // function to initialise anisotropy module
     //-----------------------------------------------------------------------------
-    void initialise(
+    extern void initialise(
         const int num_atoms,
         const std::vector<int>& atom_type_array,
-        const std::vector<double>& materialscalaranisotropyarray,
+        const std::vector<zkval_t>& materialscalaranisotropyarray,
         const std::vector<double>& atom_coords_x,
         const std::vector<double>& atom_coords_y,
         const std::vector<double>& atom_coords_z,

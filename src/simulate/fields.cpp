@@ -93,7 +93,16 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	if(sim::hamiltonian_simulation_flags[0]==1) calculate_exchange_fields(start_index,end_index);
 
 	// Anisotropy Fields
-	anisotropy::initialise();
+	anisotropy::initialise(
+		atoms::num_atoms,
+		atoms::type_array,
+		mp::MaterialScalarAnisotropyArray,
+		atoms::x_coord_array,
+		atoms::y_coord_array,
+		atoms::z_coord_array,
+		atoms::x_spin_array,
+		atoms::y_spin_array,
+		atoms::z_spin_array);
 
 	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
    if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
