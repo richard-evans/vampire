@@ -33,6 +33,7 @@
 //==============================================================================
 
 #include "atoms.hpp"
+#include "anisotropy.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 //#include "demag.hpp"
@@ -92,6 +93,8 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	if(sim::hamiltonian_simulation_flags[0]==1) calculate_exchange_fields(start_index,end_index);
 
 	// Anisotropy Fields
+	anisotropy::initialise();
+
 	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
    if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
    if(sim::sixth_order_uniaxial_anisotropy) calculate_sixth_order_uniaxial_anisotropy_fields(start_index,end_index);
