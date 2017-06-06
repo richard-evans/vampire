@@ -20,15 +20,15 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
+#include <vector>
 
 // Vampire headers
+#include "material.hpp"
 #include "anisotropy.hpp"
 
 // anisotropy module headers
-#include "internal.hpp"
 
 namespace anisotropy{
-
     namespace internal{
 
         //-------------------------------------------------------------------------
@@ -42,6 +42,16 @@ namespace anisotropy{
         //-------------------------------------------------------------------------
         // Internal shared variables
         //-------------------------------------------------------------------------
+
+        extern int num_atoms;
+        extern std::vector<int> atom_type_array;
+        extern std::vector<zkval_t> materialscalaranisotropyarray;
+
+        extern std::vector<double> spin_array_x;
+        extern std::vector<double> spin_array_y;
+        extern std::vector<double> spin_array_z;
+
+        extern std::vector<double> field_array;
 
         //-------------------------------------------------------------------------
         // Internal function declarations

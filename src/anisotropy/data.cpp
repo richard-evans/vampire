@@ -24,13 +24,19 @@ namespace anisotropy{
     // Externally visible variables
     //------------------------------------------------------------------------------
 
+    bool enabled = false;
+
     namespace internal{
 
         //------------------------------------------------------------------------
         // Shared variables inside anisotropy module
         //------------------------------------------------------------------------
 
-        bool uniaxial = False;
+        bool initialised = false;
+
+        bool uniaxial = false;
+
+        std::vector<double> field_array;
 
     } // end of internal namespace
 

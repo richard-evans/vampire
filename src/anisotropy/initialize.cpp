@@ -11,9 +11,12 @@
 //
 
 // C++ standard library headers
+#include <vector>
 
 // Vampire headers
 #include "anisotropy.hpp"
+#include "errors.hpp"
+#include "vio.hpp"
 
 // anisotropy module headers
 #include "internal.hpp"
@@ -54,6 +57,8 @@ namespace anisotropy{
             anisotropy::internal::spin_array_x = spin_array_x;
             anisotropy::internal::spin_array_y = spin_array_y;
             anisotropy::internal::spin_array_z = spin_array_z;
+
+            anisotropy::internal::field_array.resize(num_atoms);
 
             return;
         }

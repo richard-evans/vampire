@@ -14,10 +14,11 @@
 #define ANISOTROPY_H_
 
 // C++ standard library headers
-#include <string>
+//#include <vector>
+//#include <string>
 
 // Vampire headers
-#include "anisotropy.hpp"
+//#include "anisotropy.hpp"
 #include "material.hpp"
 
 //--------------------------------------------------------------------------------
@@ -25,13 +26,10 @@
 //--------------------------------------------------------------------------------
 namespace anisotropy{
 
-    extern bool uniaxial;
-
     //-----------------------------------------------------------------------------
     // function to initialise anisotropy module
     //-----------------------------------------------------------------------------
-    extern void initialise(
-        const int num_atoms,
+    void initialise(const int num_atoms,
         const std::vector<int>& atom_type_array,
         const std::vector<zkval_t>& materialscalaranisotropyarray,
         const std::vector<double>& atom_coords_x,
