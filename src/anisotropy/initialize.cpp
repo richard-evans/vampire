@@ -28,17 +28,17 @@ namespace anisotropy{
     //----------------------------------------------------------------------------
     void initialise (
         const int num_atoms,
-        const std::vector<int>& atom_type_array,
-        const std::vector<zkval_t>& materialscalaranisotropyarray,
-        const std::vector<double>& atom_coords_x,
-        const std::vector<double>& atom_coords_y,
-        const std::vector<double>& atom_coords_z,
-        const std::vector<double>& spin_array_x,
-        const std::vector<double>& spin_array_y,
-        const std::vector<double>& spin_array_z)
+        std::vector<int>& atom_type_array,
+        std::vector<zkval_t>& materialscalaranisotropyarray,
+        std::vector<double>& atom_coords_x,
+        std::vector<double>& atom_coords_y,
+        std::vector<double>& atom_coords_z,
+        std::vector<double>& spin_array_x,
+        std::vector<double>& spin_array_y,
+        std::vector<double>& spin_array_z)
         {
             /* check if anisotropy calculation enabled. If not, do nothing */
-            if (!anisotropy::internal::enabled) return;
+            if (!anisotropy::enabled) return;
 
             /* output informative message */
             zlog << zTs() << "Initialising data structures for anisotropy calculation." << std::endl;
@@ -50,17 +50,17 @@ namespace anisotropy{
                return;
             }
 
-            anisotropy::internal::num_atoms = num_atoms;
-            anisotropy::internal::atom_type_array = atom_type_array;
-            anisotropy::internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
+            internal::num_atoms = num_atoms;
+            // anisotropy::internal::atom_type_array = atom_type_array;
+            // anisotropy::internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
 
-            anisotropy::internal::spin_array_x = spin_array_x;
-            anisotropy::internal::spin_array_y = spin_array_y;
-            anisotropy::internal::spin_array_z = spin_array_z;
+            // anisotropy::internal::spin_array_x = spin_array_x;
+            // anisotropy::internal::spin_array_y = spin_array_y;
+            // anisotropy::internal::spin_array_z = spin_array_z;
 
-            anisotropy::internal::field_array.resize(num_atoms);
+            // anisotropy::internal::field_array.resize(num_atoms);
 
-            return;
+            // anisotropy::calculate_anisotropy_fields(num_atoms);
         }
 
     } // end of anisotropy namespace

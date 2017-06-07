@@ -24,20 +24,21 @@
 //--------------------------------------------------------------------------------
 // namespace for variables and functions for anisotropy module
 //--------------------------------------------------------------------------------
-namespace anisotropy{
-
+namespace anisotropy
+{
     //-----------------------------------------------------------------------------
     // function to initialise anisotropy module
     //-----------------------------------------------------------------------------
-    void initialise(const int num_atoms,
-        const std::vector<int>& atom_type_array,
-        const std::vector<zkval_t>& materialscalaranisotropyarray,
-        const std::vector<double>& atom_coords_x,
-        const std::vector<double>& atom_coords_y,
-        const std::vector<double>& atom_coords_z,
-        const std::vector<double>& spin_array_x,
-        const std::vector<double>& spin_array_y,
-        const std::vector<double>& spin_array_z);
+    void initialise(
+        const int num_atoms,
+        std::vector<int>& atom_type_array,
+        std::vector<zkval_t>& materialscalaranisotropyarray,
+        std::vector<double>& atom_coords_x,
+        std::vector<double>& atom_coords_y,
+        std::vector<double>& atom_coords_z,
+        std::vector<double>& spin_array_x,
+        std::vector<double>& spin_array_y,
+        std::vector<double>& spin_array_z);
 
     //---------------------------------------------------------------------------
     // Function to process input file parameters for anisotropy module
