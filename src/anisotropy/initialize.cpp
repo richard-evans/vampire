@@ -38,29 +38,29 @@ namespace anisotropy{
         std::vector<double>& spin_array_z)
         {
             /* check if anisotropy calculation enabled. If not, do nothing */
-            if (!anisotropy::enabled) return;
+            if (!enabled) return;
 
             /* output informative message */
             zlog << zTs() << "Initialising data structures for anisotropy calculation." << std::endl;
 
             /* check for prior initialisation */
-            if (anisotropy::internal::initialised)
+            if (internal::initialised)
             {
                zlog << zTs() << "Warning: Anisotropy calculation already initialised. Continuing." << std::endl;
                return;
             }
 
             internal::num_atoms = num_atoms;
-            // anisotropy::internal::atom_type_array = atom_type_array;
-            // anisotropy::internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
+            internal::atom_type_array = atom_type_array;
+            internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
 
-            // anisotropy::internal::spin_array_x = spin_array_x;
-            // anisotropy::internal::spin_array_y = spin_array_y;
-            // anisotropy::internal::spin_array_z = spin_array_z;
+            internal::spin_array_x = spin_array_x;
+            internal::spin_array_y = spin_array_y;
+            internal::spin_array_z = spin_array_z;
 
-            // anisotropy::internal::field_array.resize(num_atoms);
+            internal::field_array.resize(num_atoms);
 
-            // anisotropy::calculate_anisotropy_fields(num_atoms);
+            calculate_anisotropy_fields(num_atoms);
         }
 
     } // end of anisotropy namespace

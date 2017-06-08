@@ -38,6 +38,14 @@ namespace anisotropy{
 
         std::vector<double> field_array;
 
+        int num_atoms;
+        std::vector<int> atom_type_array;
+        std::vector<zkval_t> materialscalaranisotropyarray;
+
+        std::vector<double> spin_array_x;
+        std::vector<double> spin_array_y;
+        std::vector<double> spin_array_z;
+        
     } // end of internal namespace
 
 } // end of anisotropy namespace
