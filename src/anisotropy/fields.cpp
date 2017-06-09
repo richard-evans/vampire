@@ -18,18 +18,20 @@
 // anisotropy module headers
 #include "internal.hpp"
 
-void calculate_uniaxial_fields(int num_atoms);
+double calculate_uniaxial_fields(const int num_atoms);
 
-namespace anisotropy
-{
+namespace anisotropy {
+
         //----------------------------------------------------------------------------
         // function to calculate anisotropy fields
         //----------------------------------------------------------------------------
-        void calculate_anisotropy_fields(const int num_atoms)
+        int internally_calculate_anisotropy_fields(int num_atoms)
         {
-            if (anisotropy::internal::uniaxial)
-                calculate_uniaxial_fields(num_atoms);
+//            if (anisotropy::internal::uniaxial) calculate_uniaxial_fields(num_atoms);
+
             // if (anisotropy::internal::2ndorder) calculate_2ndorder_fields(num_atoms);
+
+            return EXIT_SUCCESS;
         }
 
         double calculate_uniaxial_fields(int num_atoms)
@@ -43,6 +45,8 @@ namespace anisotropy
 
                 anisotropy::internal::field_array[atom] += uniaxial_field;
             }
+
+            return 0.0;
         }
 
 } // end of anisotropy namespace

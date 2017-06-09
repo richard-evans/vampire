@@ -33,7 +33,7 @@ namespace anisotropy{
 
     extern bool enabled; // enable anisotropy calculation
 
-    extern void calculate_anisotropy_fields(const int num_atoms);
+    extern int internally_calculate_anisotropy_fields(const int num_atoms);
 
     namespace internal{
 
@@ -59,7 +59,7 @@ namespace anisotropy{
         extern std::vector<double> field_array;
 
         //-------------------------------------------------------------------------
-        // Internal function declarations
+        // internal function declarations
         //-------------------------------------------------------------------------
 
     } // end of internal namespace

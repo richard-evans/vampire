@@ -60,7 +60,11 @@ namespace anisotropy{
 
             internal::field_array.resize(num_atoms);
 
-            calculate_anisotropy_fields(num_atoms);
+            internally_calculate_anisotropy_fields(num_atoms);
+
+            internal::initialised = true;
+
+            return;
         }
 
     } // end of anisotropy namespace
