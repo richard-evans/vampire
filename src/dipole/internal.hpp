@@ -28,7 +28,6 @@
 
 namespace dipole{
 
-   extern int update_rate; /// timesteps between updates
    extern void calculate_field();
    extern int send_recv_cells_data(std::vector<int>& proc_cell_index_array1D,
                                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
