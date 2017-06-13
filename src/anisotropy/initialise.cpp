@@ -15,6 +15,7 @@
 
 // Vampire headers
 #include "anisotropy.hpp"
+#include "atoms.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
 
@@ -50,21 +51,22 @@ namespace anisotropy{
                return;
             }
 
-            internal::num_atoms = num_atoms;
+            /* internalise variables */
             internal::atom_type_array = atom_type_array;
             internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
 
-            internal::spin_array_x = spin_array_x;
-            internal::spin_array_y = spin_array_y;
-            internal::spin_array_z = spin_array_z;
+            internal::field_array.resize(atoms::num_atoms);
 
-            internal::field_array.resize(num_atoms);
+            /*
+             * initialise tensors
+             */
 
-            internally_calculate_anisotropy_fields(num_atoms);
+             /* resize tensors */
+             internal::second_order_tensor.resize(9);
 
-            internal::initialised = true;
+             internal::initialised = true;
 
-            return;
-        }
+             return;
+         }
 
-    } // end of anisotropy namespace
+     } // end of anisotropy namespace

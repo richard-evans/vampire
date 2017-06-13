@@ -25,7 +25,7 @@ namespace anisotropy {
         //----------------------------------------------------------------------------
         // function to calculate anisotropy fields
         //----------------------------------------------------------------------------
-        int internally_calculate_anisotropy_fields(int num_atoms)
+        int calculate_fields()
         {
 //            if (anisotropy::internal::uniaxial) calculate_uniaxial_fields(num_atoms);
 

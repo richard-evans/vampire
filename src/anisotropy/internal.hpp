@@ -33,8 +33,6 @@ namespace anisotropy{
 
     extern bool enabled; // enable anisotropy calculation
 
-    extern int internally_calculate_anisotropy_fields(const int num_atoms);
-
     namespace internal{
 
         //-------------------------------------------------------------------------
@@ -43,6 +41,8 @@ namespace anisotropy{
         extern bool initialised; // check module has been initialised
 
         extern bool uniaxial;
+
+        extern int calculate_fields();
 
         //-------------------------------------------------------------------------
         // Internal shared variables
@@ -57,6 +57,10 @@ namespace anisotropy{
         extern std::vector<double> spin_array_z;
 
         extern std::vector<double> field_array;
+
+        extern std::vector<std::vector<double> > second_order_tensor;
+        extern std::vector<std::vector<double> > fourth_order_tensor;
+        extern std::vector<std::vector<double> > sixth_order_tensor;
 
         //-------------------------------------------------------------------------
         // internal function declarations

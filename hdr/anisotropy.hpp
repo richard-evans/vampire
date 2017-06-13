@@ -40,6 +40,8 @@ namespace anisotropy
         std::vector<double>& spin_array_y,
         std::vector<double>& spin_array_z);
 
+    int calculate_fields();
+
     //---------------------------------------------------------------------------
     // Function to process input file parameters for anisotropy module
     //---------------------------------------------------------------------------

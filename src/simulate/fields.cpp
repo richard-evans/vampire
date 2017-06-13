@@ -104,6 +104,8 @@ int calculate_spin_fields(const int start_index,const int end_index){
 		atoms::y_spin_array,
 		atoms::z_spin_array);
 
+	anisotropy::calculate_fields();
+
 	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
    if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
    if(sim::sixth_order_uniaxial_anisotropy) calculate_sixth_order_uniaxial_anisotropy_fields(start_index,end_index);
