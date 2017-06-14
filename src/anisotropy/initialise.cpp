@@ -61,11 +61,31 @@ namespace anisotropy{
 
             if (uniaxial)
             {
-
-
                 /* resize tensors */
                 internal::second_order_tensor.resize(9);
 
+                /* initialise all elements to zero */
+                for (int i = 0; i < internal::second_order_tensor.size(); ++i)
+                    internal::second_order_tensor.at(i) = 0;
+
+                for (int mat = 0; mat < mp::num_materials; mat++)
+                {
+                    double ex = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
+                    double ey = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
+                    double ez = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
+
+                    internal::second_order_tensor.at(0) += mp::material.at(mat).Ku * ex * ex;
+                    internal::second_order_tensor.at(1) += mp::material.at(mat).Ku * ex * ey;
+                    internal::second_order_tensor.at(2) += mp::material.at(mat).Ku * ex * ez;
+
+                    internal::second_order_tensor.at(3) += mp::material.at(mat).Ku * ey * ex;
+                    internal::second_order_tensor.at(4) += mp::material.at(mat).Ku * ey * ey;
+                    internal::second_order_tensor.at(5) += mp::material.at(mat).Ku * ey * ez;
+
+                    internal::second_order_tensor.at(6) += mp::material.at(mat).Ku * ez * ex;
+                    internal::second_order_tensor.at(7) += mp::material.at(mat).Ku * ez * ey;
+                    internal::second_order_tensor.at(8) += mp::material.at(mat).Ku * ez * ez;
+                }
             }
 
             internal::initialised = true;

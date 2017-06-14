@@ -24,7 +24,7 @@ namespace anisotropy{
     // Externally visible variables
     //------------------------------------------------------------------------------
 
-    bool enabled = false;
+    bool uniaxial = false;
 
     namespace internal{
 
@@ -33,8 +33,6 @@ namespace anisotropy{
         //------------------------------------------------------------------------
 
         bool initialised = false;
-
-        bool uniaxial = false;
 
         std::vector<double> field_array;
 
@@ -46,9 +44,9 @@ namespace anisotropy{
         std::vector<double> spin_array_y;
         std::vector<double> spin_array_z;
 
-        std::vector<std::vector<double> > second_order_tensor;
-        std::vector<std::vector<double> > fourth_order_tensor;
-        std::vector<std::vector<double> > sixth_order_tensor;
+        std::vector<double> second_order_tensor;
+        std::vector<double> fourth_order_tensor;
+        std::vector<double> sixth_order_tensor;
 
     } // end of internal namespace
 
