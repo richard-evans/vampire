@@ -31,7 +31,7 @@
 
 namespace anisotropy{
 
-    extern bool enabled; // enable anisotropy calculation
+    extern bool uniaxial; // enable anisotropy calculation
 
     namespace internal{
 
@@ -39,8 +39,6 @@ namespace anisotropy{
         // internal data type definitions
         //-------------------------------------------------------------------------
         extern bool initialised; // check module has been initialised
-
-        extern bool uniaxial;
 
         extern int calculate_fields();
 

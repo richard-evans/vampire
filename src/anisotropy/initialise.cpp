@@ -18,6 +18,7 @@
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
+#include "material.hpp"
 
 // anisotropy module headers
 #include "internal.hpp"
@@ -38,9 +39,6 @@ namespace anisotropy{
         std::vector<double>& spin_array_y,
         std::vector<double>& spin_array_z)
         {
-            /* check if anisotropy calculation enabled. If not, do nothing */
-            if (!enabled) return;
-
             /* output informative message */
             zlog << zTs() << "Initialising data structures for anisotropy calculation." << std::endl;
 
@@ -61,12 +59,18 @@ namespace anisotropy{
              * initialise tensors
              */
 
-             /* resize tensors */
-             internal::second_order_tensor.resize(9);
+            if (uniaxial)
+            {
 
-             internal::initialised = true;
 
-             return;
-         }
+                /* resize tensors */
+                internal::second_order_tensor.resize(9);
 
-     } // end of anisotropy namespace
+            }
+
+            internal::initialised = true;
+
+            return;
+        }
+
+    } // end of anisotropy namespace
