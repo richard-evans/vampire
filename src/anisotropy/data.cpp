@@ -25,6 +25,7 @@ namespace anisotropy{
     //------------------------------------------------------------------------------
 
     bool uniaxial = false;
+    bool neel = false;
 
     namespace internal{
 

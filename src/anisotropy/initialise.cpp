@@ -59,15 +59,15 @@ namespace anisotropy{
              * initialise tensors
              */
 
+            /* resize tensors */
+            internal::second_order_tensor.resize(9);
+
+            /* initialise all elements to zero */
+            for (int i = 0; i < internal::second_order_tensor.size(); ++i)
+                internal::second_order_tensor.at(i) = 0;
+
             if (uniaxial)
             {
-                /* resize tensors */
-                internal::second_order_tensor.resize(9);
-
-                /* initialise all elements to zero */
-                for (int i = 0; i < internal::second_order_tensor.size(); ++i)
-                    internal::second_order_tensor.at(i) = 0;
-
                 for (int mat = 0; mat < mp::num_materials; mat++)
                 {
                     double ex = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
@@ -88,9 +88,41 @@ namespace anisotropy{
                 }
             }
 
-            internal::initialised = true;
+    if (neel)
+    {
+        for (int atom = 0; atom < atoms::num_atoms; atom++)
+        {
+            int mat = atoms::type_array.at(atom);
+            int start = atoms::nearest_neighbour_list_si.at(atom);
+            int end = atoms::nearest_neighbour_list_ei.at(atom);
 
-            return;
+			double Ks = 0.5 * 2.0 * mp::material.at(mat).Ks; // note factor two from differentiation
+
+            for (int n = start; n < end; n++)
+            {
+                double eijx = atoms::eijx.at(n);
+                double eijy = atoms::eijy.at(n);
+                double eijz = atoms::eijz.at(n);
+
+                internal::second_order_tensor.at(0) += eijx * eijx * Ks;
+                internal::second_order_tensor.at(1) += eijx * eijy * Ks;
+                internal::second_order_tensor.at(2) += eijx * eijz * Ks;
+
+                internal::second_order_tensor.at(3) += eijy * eijx * Ks;
+                internal::second_order_tensor.at(4) += eijy * eijy * Ks;
+                internal::second_order_tensor.at(5) += eijy * eijz * Ks;
+
+                internal::second_order_tensor.at(6) += eijz * eijx * Ks;
+                internal::second_order_tensor.at(7) += eijz * eijy * Ks;
+                internal::second_order_tensor.at(8) += eijz * eijz * Ks;
+            }
+
         }
+    }
 
-    } // end of anisotropy namespace
+    internal::initialised = true;
+
+    return;
+}
+
+} // end of anisotropy namespace

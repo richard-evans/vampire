@@ -31,7 +31,8 @@
 
 namespace anisotropy{
 
-    extern bool uniaxial; // enable anisotropy calculation
+    extern bool uniaxial; // uniaxial calculation flag
+    extern bool neel;     // neel calculation flag
 
     namespace internal{
 
