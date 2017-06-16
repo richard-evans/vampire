@@ -41,6 +41,7 @@ vampire.pkg # installation package
 vampire_manual.pdf
 vampire_manual.out
 vampire_manual.synctex.gz
+.texpadtmp
 
 #----------------------------------------------
 # Data file formats in vampire
