@@ -146,6 +146,7 @@ namespace sim{
 	extern bool local_fmr_field; /// flag to enable material specific fmr field
 
    // Checkpoint flags and variables
+   extern bool checkpoint_loaded_flag;  // Flag to determine if it is first step after loading checkpoint (true).
    extern bool load_checkpoint_flag; // Load spin configurations
    extern bool load_checkpoint_continue_flag; // Continue simulation from checkpoint time
    extern bool save_checkpoint_flag; // Save checkpoint

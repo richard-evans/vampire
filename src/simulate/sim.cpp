@@ -174,6 +174,7 @@ namespace sim{
 	bool local_fmr_field=false; /// flag to enable material specific fmr field
 
    // Checkpoint flags and variables
+   bool checkpoint_loaded_flag=false;  // Flag to determine if it is first step after loading checkpoint (true).
    bool load_checkpoint_flag=false; // Load spin configurations
    bool load_checkpoint_continue_flag=true; // Continue simulation from checkpoint time
    bool save_checkpoint_flag=false; // Save checkpoint
@@ -207,6 +208,9 @@ namespace sim{
 ///=====================================================================================
 ///
 	void increment_time(){
+
+      // set flag checkpoint_loaded_flag to false since first step of simulations was performed
+      sim::checkpoint_loaded_flag=false;
 
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
