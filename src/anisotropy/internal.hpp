@@ -57,9 +57,9 @@ namespace anisotropy{
 
         extern std::vector<double> field_array;
 
-        extern std::vector<double> second_order_tensor;
-        extern std::vector<double> fourth_order_tensor;
-        extern std::vector<double> sixth_order_tensor;
+        extern std::vector<std::vector<double> > second_order_tensor;
+        extern std::vector<std::vector<double> > fourth_order_tensor;
+        extern std::vector<std::vector<double> > sixth_order_tensor;
 
         //-------------------------------------------------------------------------
         // internal function declarations

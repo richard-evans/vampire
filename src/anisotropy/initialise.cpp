@@ -60,69 +60,74 @@ namespace anisotropy{
              */
 
             /* resize tensors */
-            internal::second_order_tensor.resize(9);
+            internal::second_order_tensor.resize(atoms::num_atoms);
+            for (int i=0; i<atoms::num_atoms; i++)
+                internal::second_order_tensor.at(i).resize(9);
 
             /* initialise all elements to zero */
-            for (int i = 0; i < internal::second_order_tensor.size(); ++i)
-                internal::second_order_tensor.at(i) = 0;
+            for (int i=0; i<atoms::num_atoms; i++)
+                for (int j=0; j<9; j++)
+                    internal::second_order_tensor.at(i).at(j) = 0;
 
             if (uniaxial)
             {
-                for (int mat = 0; mat < mp::num_materials; mat++)
+                for (int atom=0; atom<atoms::num_atoms; atom++)
                 {
+                    int mat = atoms::type_array.at(atom);
+
                     double ex = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
                     double ey = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
                     double ez = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
 
-                    internal::second_order_tensor.at(0) += mp::material.at(mat).Ku * ex * ex;
-                    internal::second_order_tensor.at(1) += mp::material.at(mat).Ku * ex * ey;
-                    internal::second_order_tensor.at(2) += mp::material.at(mat).Ku * ex * ez;
+                    internal::second_order_tensor.at(atom).at(0) += mp::material.at(mat).Ku * ex * ex;
+                    internal::second_order_tensor.at(atom).at(1) += mp::material.at(mat).Ku * ex * ey;
+                    internal::second_order_tensor.at(atom).at(2) += mp::material.at(mat).Ku * ex * ez;
 
-                    internal::second_order_tensor.at(3) += mp::material.at(mat).Ku * ey * ex;
-                    internal::second_order_tensor.at(4) += mp::material.at(mat).Ku * ey * ey;
-                    internal::second_order_tensor.at(5) += mp::material.at(mat).Ku * ey * ez;
+                    internal::second_order_tensor.at(atom).at(3) += mp::material.at(mat).Ku * ey * ex;
+                    internal::second_order_tensor.at(atom).at(4) += mp::material.at(mat).Ku * ey * ey;
+                    internal::second_order_tensor.at(atom).at(5) += mp::material.at(mat).Ku * ey * ez;
 
-                    internal::second_order_tensor.at(6) += mp::material.at(mat).Ku * ez * ex;
-                    internal::second_order_tensor.at(7) += mp::material.at(mat).Ku * ez * ey;
-                    internal::second_order_tensor.at(8) += mp::material.at(mat).Ku * ez * ez;
+                    internal::second_order_tensor.at(atom).at(6) += mp::material.at(mat).Ku * ez * ex;
+                    internal::second_order_tensor.at(atom).at(7) += mp::material.at(mat).Ku * ez * ey;
+                    internal::second_order_tensor.at(atom).at(8) += mp::material.at(mat).Ku * ez * ez;
                 }
             }
 
-    if (neel)
-    {
-        for (int atom = 0; atom < atoms::num_atoms; atom++)
-        {
-            int mat = atoms::type_array.at(atom);
-            int start = atoms::nearest_neighbour_list_si.at(atom);
-            int end = atoms::nearest_neighbour_list_ei.at(atom);
-
-			double Ks = 0.5 * 2.0 * mp::material.at(mat).Ks; // note factor two from differentiation
-
-            for (int n = start; n < end; n++)
+            if (neel)
             {
-                double eijx = atoms::eijx.at(n);
-                double eijy = atoms::eijy.at(n);
-                double eijz = atoms::eijz.at(n);
+                for (int atom = 0; atom < atoms::num_atoms; atom++)
+                {
+                    int mat = atoms::type_array.at(atom);
+                    int start = atoms::nearest_neighbour_list_si.at(atom);
+                    int end = atoms::nearest_neighbour_list_ei.at(atom);
 
-                internal::second_order_tensor.at(0) += eijx * eijx * Ks;
-                internal::second_order_tensor.at(1) += eijx * eijy * Ks;
-                internal::second_order_tensor.at(2) += eijx * eijz * Ks;
+                    double Ks = 0.5 * 2.0 * mp::material.at(mat).Ks; // note factor two from differentiation
 
-                internal::second_order_tensor.at(3) += eijy * eijx * Ks;
-                internal::second_order_tensor.at(4) += eijy * eijy * Ks;
-                internal::second_order_tensor.at(5) += eijy * eijz * Ks;
+                    for (int n = start; n < end; n++)
+                    {
+                        double eijx = atoms::eijx.at(n);
+                        double eijy = atoms::eijy.at(n);
+                        double eijz = atoms::eijz.at(n);
 
-                internal::second_order_tensor.at(6) += eijz * eijx * Ks;
-                internal::second_order_tensor.at(7) += eijz * eijy * Ks;
-                internal::second_order_tensor.at(8) += eijz * eijz * Ks;
+                        internal::second_order_tensor.at(atom).at(0) += eijx * eijx * Ks;
+                        internal::second_order_tensor.at(atom).at(1) += eijx * eijy * Ks;
+                        internal::second_order_tensor.at(atom).at(2) += eijx * eijz * Ks;
+
+                        internal::second_order_tensor.at(atom).at(3) += eijy * eijx * Ks;
+                        internal::second_order_tensor.at(atom).at(4) += eijy * eijy * Ks;
+                        internal::second_order_tensor.at(atom).at(5) += eijy * eijz * Ks;
+
+                        internal::second_order_tensor.at(atom).at(6) += eijz * eijx * Ks;
+                        internal::second_order_tensor.at(atom).at(7) += eijz * eijy * Ks;
+                        internal::second_order_tensor.at(atom).at(8) += eijz * eijz * Ks;
+                    }
+
+                }
             }
 
+            internal::initialised = true;
+
+            return;
         }
-    }
 
-    internal::initialised = true;
-
-    return;
-}
-
-} // end of anisotropy namespace
+    } // end of anisotropy namespace
