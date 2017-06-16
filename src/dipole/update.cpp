@@ -58,7 +58,7 @@ namespace dipole{
             dipole::cells_field_array_x[i]=self_demag*(cells::mag_array_x[i]/9.27400915e-24);
             dipole::cells_field_array_y[i]=self_demag*(cells::mag_array_y[i]/9.27400915e-24);
             dipole::cells_field_array_z[i]=self_demag*(cells::mag_array_z[i]/9.27400915e-24);
-            // Add self demag to Hdemag
+            // Add self demag to Hdemag --> To get only dipole-dipole contribution comment this and initialise to zero
             dipole::cells_mu0Hd_field_array_x[i]=-0.5*self_demag*(cells::mag_array_x[i]/9.27400915e-24);//*1.0e-30
             dipole::cells_mu0Hd_field_array_y[i]=-0.5*self_demag*(cells::mag_array_y[i]/9.27400915e-24);//*1.0e-30
             dipole::cells_mu0Hd_field_array_z[i]=-0.5*self_demag*(cells::mag_array_z[i]/9.27400915e-24);//*1.0e-30
