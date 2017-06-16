@@ -36,6 +36,8 @@ void save_checkpoint(){
    int64_t output_atoms_file_counter64 = int64_t(sim::output_atoms_file_counter);
    int64_t output_cells_file_counter64 = int64_t(sim::output_cells_file_counter);
    int64_t output_rate_counter64 = int64_t(sim::output_rate_counter);
+   double constr_theta = sim::constraint_theta;
+   double constr_phi   = sim::constraint_phi;
 
    // determine checkpoint file name
    std::stringstream chkfilenamess;
@@ -59,6 +61,7 @@ void save_checkpoint(){
    std::vector<uint32_t> mt_state(624); // 624 is hard coded in mt implementation. uint64 assumes same size as unsigned long
    int32_t mt_p=0; // position in rng state
    mt_p=mtrandom::grnd.get_state(mt_state);
+   std::cout << "random generator state = " << mt_p << std::endl;
 
    // write checkpoint variables to file
    chkfile.write(reinterpret_cast<const char*>(&natoms64),sizeof(uint64_t));
@@ -67,6 +70,8 @@ void save_checkpoint(){
    chkfile.write(reinterpret_cast<const char*>(&parity64),sizeof(int64_t));
    chkfile.write(reinterpret_cast<const char*>(&iH64),sizeof(int64_t));
    chkfile.write(reinterpret_cast<const char*>(&temp),sizeof(double));
+   chkfile.write(reinterpret_cast<const char*>(&constr_theta),sizeof(double));
+   chkfile.write(reinterpret_cast<const char*>(&constr_phi),sizeof(double));
    chkfile.write(reinterpret_cast<const char*>(&output_atoms_file_counter64),sizeof(int64_t));
    chkfile.write(reinterpret_cast<const char*>(&output_cells_file_counter64),sizeof(int64_t));
    chkfile.write(reinterpret_cast<const char*>(&output_rate_counter64),sizeof(int64_t));
@@ -103,6 +108,8 @@ void load_checkpoint(){
    int64_t output_atoms_file_counter64;
    int64_t output_cells_file_counter64;
    int64_t output_rate_counter64;
+   double constr_theta;
+   double constr_phi;
 
    // variables for loading state of random number generator
    std::vector<uint32_t> mt_state(624); // 624 is hard coded in mt implementation. uint64 assumes same size as unsigned long
@@ -128,6 +135,9 @@ void load_checkpoint(){
       err::vexit();
    }
 
+   // Set flag to true do determine that this is the beginning of the simulation
+   sim::checkpoint_loaded_flag=true;
+
    // read checkpoint variables from file
    chkfile.read((char*)&natoms64,sizeof(uint64_t));
    chkfile.read((char*)&time64,sizeof(int64_t));
@@ -135,12 +145,15 @@ void load_checkpoint(){
    chkfile.read((char*)&parity64,sizeof(int64_t));
    chkfile.read((char*)&iH64,sizeof(int64_t));
    chkfile.read((char*)&temp,sizeof(double));
+   chkfile.read((char*)&constr_theta,sizeof(double));
+   chkfile.read((char*)&constr_phi,sizeof(double));
    chkfile.read((char*)&output_atoms_file_counter64,sizeof(int64_t));
    chkfile.read((char*)&output_cells_file_counter64,sizeof(int64_t));
    chkfile.read((char*)&output_rate_counter64,sizeof(int64_t));
    chkfile.read((char*)&mt_p,sizeof(int32_t));
    chkfile.read((char*)&mt_state[0],sizeof(uint32_t)*mt_state.size());
 
+   std::cout << "random generator state loaded = " << mt_p << std::endl;
    // if continuing set state of rng
    if(sim::load_checkpoint_continue_flag) mtrandom::grnd.set_state(mt_state, mt_p);
 
@@ -152,7 +165,7 @@ void load_checkpoint(){
       zlog << zTs() << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting." << std::endl;
    }
 
-   // Load saved time if simulation continuing
+   // Load saved parameters if simulation continuing
    if(sim::load_checkpoint_continue_flag){
       sim::parity = parity64;
       sim::iH = iH64;
@@ -162,6 +175,8 @@ void load_checkpoint(){
       sim::output_atoms_file_counter = output_atoms_file_counter64;
       sim::output_cells_file_counter = output_cells_file_counter64;
       sim::output_rate_counter = output_rate_counter64;
+      sim::constraint_theta = constr_theta;
+      sim::constraint_phi = constr_phi;
    }
 
    // Load spin positions
