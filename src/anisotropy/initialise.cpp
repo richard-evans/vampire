@@ -61,35 +61,46 @@ namespace anisotropy{
 
             /* resize tensors */
             internal::second_order_tensor.resize(atoms::num_atoms);
-            for (int i=0; i<atoms::num_atoms; i++)
-                internal::second_order_tensor.at(i).resize(9);
+            for (int atom = 0; atom < atoms::num_atoms; ++atom)
+            {
+                internal::second_order_tensor.at(atom).resize(3);
+                for (int i = 0; i < 3; ++i)
+                    internal::second_order_tensor.at(atom).at(i).resize(3);
+            }
+
+            internal::third_order_tensor.resize(atoms::num_atoms);
+            for (int atom = 0; atom < atoms::num_atoms; ++atom)
+            {
+                internal::third_order_tensor.at(atom).resize(3);
+                for (int i = 0; i < 3; ++i)
+                {
+                    internal::third_order_tensor.at(atom).at(i).resize(3);
+                    for (int j = 0; j < 3; ++j)
+                        internal::third_order_tensor.at(atom).at(i).at(j).resize(3);
+                }
+            }
 
             /* initialise all elements to zero */
-            for (int i=0; i<atoms::num_atoms; i++)
-                for (int j=0; j<9; j++)
-                    internal::second_order_tensor.at(i).at(j) = 0;
+            for (int atom = 0; atom < atoms::num_atoms; ++atom)
+            for (int i = 0; i<3; ++i)
+            for (int j=0; j<3; j++)
+                internal::second_order_tensor.at(atom).at(i).at(j) = 0;
 
-            if (uniaxial)
+            if (uniaxial_first_order)
             {
-                for (int atom=0; atom<atoms::num_atoms; atom++)
+                for (int atom=0; atom<atoms::num_atoms; ++atom)
                 {
                     int mat = atoms::type_array.at(atom);
+                    double Ku = mp::material.at(mat).Ku;
 
-                    double ex = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
-                    double ey = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
-                    double ez = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
+                    double e[3];
+                    e[0] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
+                    e[1] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
+                    e[2] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
 
-                    internal::second_order_tensor.at(atom).at(0) += mp::material.at(mat).Ku * ex * ex;
-                    internal::second_order_tensor.at(atom).at(1) += mp::material.at(mat).Ku * ex * ey;
-                    internal::second_order_tensor.at(atom).at(2) += mp::material.at(mat).Ku * ex * ez;
-
-                    internal::second_order_tensor.at(atom).at(3) += mp::material.at(mat).Ku * ey * ex;
-                    internal::second_order_tensor.at(atom).at(4) += mp::material.at(mat).Ku * ey * ey;
-                    internal::second_order_tensor.at(atom).at(5) += mp::material.at(mat).Ku * ey * ez;
-
-                    internal::second_order_tensor.at(atom).at(6) += mp::material.at(mat).Ku * ez * ex;
-                    internal::second_order_tensor.at(atom).at(7) += mp::material.at(mat).Ku * ez * ey;
-                    internal::second_order_tensor.at(atom).at(8) += mp::material.at(mat).Ku * ez * ez;
+                    for (int i = 0; i < 3; ++i)
+                    for (int j = 0; j < 3; ++j)
+                        internal::second_order_tensor.at(atom).at(i).at(j) += e[i] * e[j] * Ku;
                 }
             }
 
@@ -101,27 +112,42 @@ namespace anisotropy{
                     int start = atoms::nearest_neighbour_list_si.at(atom);
                     int end = atoms::nearest_neighbour_list_ei.at(atom);
 
-                    double Ks = 0.5 * 2.0 * mp::material.at(mat).Ks; // note factor two from differentiation
+                    // surface constant: note factor 2 from differentiation
+                    double Ks = 0.5 * 2.0 * mp::material.at(mat).Ks;
 
-                    for (int n = start; n < end; n++)
+                    for (int n = start; n < end; ++n)
                     {
-                        double eijx = atoms::eijx.at(n);
-                        double eijy = atoms::eijy.at(n);
-                        double eijz = atoms::eijz.at(n);
+                        double eij[3];
+                        eij[0] = atoms::eijx.at(n);
+                        eij[1] = atoms::eijy.at(n);
+                        eij[2] = atoms::eijz.at(n);
 
-                        internal::second_order_tensor.at(atom).at(0) += eijx * eijx * Ks;
-                        internal::second_order_tensor.at(atom).at(1) += eijx * eijy * Ks;
-                        internal::second_order_tensor.at(atom).at(2) += eijx * eijz * Ks;
-
-                        internal::second_order_tensor.at(atom).at(3) += eijy * eijx * Ks;
-                        internal::second_order_tensor.at(atom).at(4) += eijy * eijy * Ks;
-                        internal::second_order_tensor.at(atom).at(5) += eijy * eijz * Ks;
-
-                        internal::second_order_tensor.at(atom).at(6) += eijz * eijx * Ks;
-                        internal::second_order_tensor.at(atom).at(7) += eijz * eijy * Ks;
-                        internal::second_order_tensor.at(atom).at(8) += eijz * eijz * Ks;
+                        for (int i = 0; i < 3; ++i)
+                        for (int j = 0; j < 3; ++j)
+                            internal::second_order_tensor.at(atom).at(i).at(j)
+                                += eij[i] * eij[j] * Ks;
                     }
 
+                }
+            }
+
+            if (uniaxial_second_order)
+            {
+                for (int atom = 0; atom < atoms::num_atoms; atom ++)
+                {
+                    int mat = atoms::type_array.at(atom);
+                    double Ku2 = 4.0*mp::material_second_order_anisotropy_constant_array.at(mat);
+
+                    double e[3];
+                    e[0] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
+                    e[1] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
+                    e[2] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
+
+                    for (int i = 0; i < 3; ++i)
+                    for (int j = 0; j < 3; ++j)
+                    for (int k = 0; k < 3; ++k)
+                        internal::third_order_tensor.at(atom).at(i).at(j).at(k)
+                            += e[i] * e[j] * e[k] * Ku2;
                 }
             }
 

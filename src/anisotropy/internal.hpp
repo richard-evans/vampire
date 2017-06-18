@@ -31,8 +31,10 @@
 
 namespace anisotropy{
 
-    extern bool uniaxial; // uniaxial calculation flag
+    extern bool uniaxial_first_order; // uniaxial calculation flag
     extern bool neel;     // neel calculation flag
+
+    extern bool uniaxial_second_order;
 
     namespace internal{
 
@@ -57,9 +59,9 @@ namespace anisotropy{
 
         extern std::vector<double> field_array;
 
-        extern std::vector<std::vector<double> > second_order_tensor;
-        extern std::vector<std::vector<double> > fourth_order_tensor;
-        extern std::vector<std::vector<double> > sixth_order_tensor;
+        extern std::vector<std::vector<std::vector<double> > > second_order_tensor;
+        extern std::vector<std::vector<std::vector<std::vector<double> > > > third_order_tensor;
+        extern std::vector<std::vector<std::vector<std::vector<std::vector<double> > > > > fourth_order_tensor;
 
         //-------------------------------------------------------------------------
         // internal function declarations
