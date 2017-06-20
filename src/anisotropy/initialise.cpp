@@ -59,32 +59,33 @@ namespace anisotropy{
              * initialise tensors
              */
 
-            /* resize tensors */
+            /* resize tensors and initialise to zero */
             internal::second_order_tensor.resize(atoms::num_atoms);
-            for (int atom = 0; atom < atoms::num_atoms; ++atom)
-            {
-                internal::second_order_tensor.at(atom).resize(3);
-                for (int i = 0; i < 3; ++i)
-                    internal::second_order_tensor.at(atom).at(i).resize(3);
-            }
-
             internal::third_order_tensor.resize(atoms::num_atoms);
             for (int atom = 0; atom < atoms::num_atoms; ++atom)
             {
+                internal::second_order_tensor.at(atom).resize(3);
                 internal::third_order_tensor.at(atom).resize(3);
+
                 for (int i = 0; i < 3; ++i)
                 {
+                    internal::second_order_tensor.at(atom).at(i).resize(3);
                     internal::third_order_tensor.at(atom).at(i).resize(3);
+
                     for (int j = 0; j < 3; ++j)
+                    {
+                        internal::second_order_tensor.at(atom).at(i).at(j) = 0;
                         internal::third_order_tensor.at(atom).at(i).at(j).resize(3);
+
+                        for (int k = 0; k < 3; ++k)
+                            internal::third_order_tensor.at(atom).at(i).at(j).at(k) = 0;
+                    }
                 }
             }
 
-            /* initialise all elements to zero */
-            for (int atom = 0; atom < atoms::num_atoms; ++atom)
-            for (int i = 0; i<3; ++i)
-            for (int j=0; j<3; j++)
-                internal::second_order_tensor.at(atom).at(i).at(j) = 0;
+            /*
+             * populate second order tensor
+             */
 
             if (uniaxial_first_order)
             {
@@ -130,6 +131,10 @@ namespace anisotropy{
 
                 }
             }
+
+            /*
+             * populate third order tensor
+             */
 
             if (uniaxial_second_order)
             {
