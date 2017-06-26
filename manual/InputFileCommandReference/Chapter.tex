@@ -313,7 +313,7 @@ $ is the demagnetisation factor of the macroscopic sample. The components of the
   \item[] uniform
   \item[] angle
   \item[] hinzke-nowak
-\end{itemize}\\
+\end{itemize}
 
 {\zicf sim:checkpoint flag [default false]}\addcontentsline{toc}{subsection}{sim:checkpoint}
     Enables checkpointing of spin configuration at end of simulation
@@ -336,31 +336,61 @@ sim:load-checkpoint=continue\\
 
 \section*{Data output}
 \addcontentsline{toc}{section}{Data output}
-The following commands control what data is output to the \textit{output} file. The order in which they appear is the order in which they appear in the \textit{output} file. Most options output a single column of data, but some output multiple columns, particularly vector data or parameters related to materials, where one column per material is output.\\
+The following commands control what data is output to the \textit{output} file.
+The order in which they appear is the order in which they appear in the \textit{output} file.
+Most options output a single column of data, but some output multiple columns, particularly
+vector data or parameters related to materials, where one column per material is output.\\
 
-{\zicf output:time-steps}\addcontentsline{toc}{subsection}{output:time-steps} outputs the number of time steps (or Monte Carlo steps) completed during the simulation so far.\\
+{\zicf output:time-steps}\addcontentsline{toc}{subsection}{output:time-steps} outputs
+the number of time steps (or Monte Carlo steps) completed during the simulation so far.\\
 
-{\zicf output:real-time}\addcontentsline{toc}{subsection}{output:real-time} outputs the simulation time in seconds. The real time is given by the number of time steps multiplied by sim:time-step (default value is $1.0 \times 10^{-15}$ s. The real time has no meaning for Monte Carlo simulations.\\
+{\zicf output:real-time}\addcontentsline{toc}{subsection}{output:real-time} outputs
+the simulation time in seconds. The real time is given by the number of time steps
+multiplied by sim:time-step (default value is $1.0 \times 10^{-15}$ s. The real
+time has no meaning for Monte Carlo simulations.\\
 
 {\zicf output:temperature}\addcontentsline{toc}{subsection}{output:temperature} outputs the instantaneous system temperature in Kelvin.\\
 
-{\zicf output:applied-field-strength}\addcontentsline{toc}{subsection}{output:applied-field-strength} outputs the strength of the applied field in Tesla. For hysteresis simulations the sign of the applied field strength changes along a fixed axis and is represented in the output by a similar change in sign.\\
+{\zicf output:applied-field-strength}\addcontentsline{toc}{subsection}{output:applied-field-strength}
+outputs the strength of the applied field in Tesla. For hysteresis simulations the sign of the applied
+field strength changes along a fixed axis and is represented in the output by a similar change in sign.\\
 
-{\zicf output:applied-field-unit-vector}\addcontentsline{toc}{subsection}{output:applied-field-unit-vector} outputs a unit vector in three columns $\hat{h_x}$, $\hat{h_y}$, $\hat{h_z}$ indicating the direction of the external applied field.\\
+{\zicf output:applied-field-unit-vector}\addcontentsline{toc}{subsection}{output:applied-field-unit-vector}
+outputs a unit vector in three columns $\hat{h_x}$, $\hat{h_y}$, $\hat{h_z}$ indicating
+the direction of the external applied field.\\
 
-{\zicf output:applied-field-alignment}\addcontentsline{toc}{subsection}{output:applied-field-alignment} outputs the dot product of the net magnetization direction of the system with the external applied field direction $\hat{\mathbf{m}} \cdot \hat{\mathbf{H}}$.\\
+{\zicf output:applied-field-alignment}\addcontentsline{toc}{subsection}{output:applied-field-alignment}
+outputs the dot product of the net magnetization direction of the system with the external applied field
+direction $\hat{\mathbf{m}} \cdot \hat{\mathbf{H}}$.\\
 
-{\zicf output:material-applied-field-alignment}\addcontentsline{toc}{subsection}{output:material-applied-field-alignment} outputs the dot product of the net magnetization direction of each material defined in the \textit{material} file with the external applied field direction $\left[\hat{\mathbf{m}}_1 \cdot \hat{\mathbf{H}}\right]$, $\left[\hat{\mathbf{m}}_2 \cdot \hat{\mathbf{H}}\right]$...$\left[\hat{\mathbf{m}}_n \cdot \hat{\mathbf{H}}\right]$.\\
+{\zicf output:material-applied-field-alignment}\addcontentsline{toc}{subsection}{output:material-applied-field-alignment}
+outputs the dot product of the net magnetization direction of each material defined in the \textit{material} file with
+the external applied field direction $\left[\hat{\mathbf{m}}_1 \cdot \hat{\mathbf{H}}\right]$, $\left[\hat{\mathbf{m}}_2
+\cdot \hat{\mathbf{H}}\right]$...$\left[\hat{\mathbf{m}}_n \cdot \hat{\mathbf{H}}\right]$.\\
 
-{\zicf output:magnetisation}\addcontentsline{toc}{subsection}{output:magnetisation} outputs the instantaneous magnetization of the system. The data is output in four columns $\hat{m_x}$, $\hat{m_y}$, $\hat{m_z}$, $|m|$ giving the unit vector direction of the magnetization and normalized length of the magnetization respectively. The normalized length of the magnetization $|m| = |\sum_i \mu_i S_i| / \sum \mu_i$ is given by the sum of all moments in the system assuming ferromagnetic alignment of all spins. Note that the localized spin moments $\mu_i$ are taken into account in the summation.\\
+{\zicf output:magnetisation}\addcontentsline{toc}{subsection}{output:magnetisation} outputs the
+instantaneous magnetization of the system. The data is output in four columns $\hat{m_x}$,
+$\hat{m_y}$, $\hat{m_z}$, $|m|$ giving the unit vector direction of the magnetization and
+normalized length of the magnetization respectively. The normalized length of the magnetization
+ $|m| = |\sum_i \mu_i S_i| / \sum \mu_i$ is given by the sum of all moments in the system
+ assuming ferromagnetic alignment of all spins. Note that the localized spin moments $\mu_i$
+ are taken into account in the summation.\\
 
-{\zicf output:magnetisation-length}\addcontentsline{toc}{subsection}{output:magnetisation-length} outputs the instantaneous normalized magnetization length $|m| = |\sum_i \mu_i S_i| / \sum \mu_i$, where the saturation value is defined by ferromagnetic alignment of all spins in the system. Note that the localized spin moments $\mu_i$ are taken into account in the summation.\\
+{\zicf output:magnetisation-length}\addcontentsline{toc}{subsection}{output:magnetisation-length}
+outputs the instantaneous normalized magnetization length $|m| = |\sum_i \mu_i S_i| / \sum \mu_i$,
+where the saturation value is defined by ferromagnetic alignment of all spins in the system. Note
+that the localized spin moments $\mu_i$ are taken into account in the summation.\\
 
-{\zicf output:mean-magnetisation-length}\addcontentsline{toc}{subsection}{output:mean-magnetisation-length} outputs the time-averaged normalized magnetization length $\langle|m|\rangle$.\\
+{\zicf output:mean-magnetisation-length}\addcontentsline{toc}{subsection}{output:mean-magnetisation-length}
+outputs the time-averaged normalized magnetization length $\langle|m|\rangle$.\\
 
-{\zicf output:mean-magnetisation}\addcontentsline{toc}{subsection}{output:mean-magnetisation} outputs the time-averaged normalized magnetization vector $\langle|\mathbf{m}|\rangle$.\\
+{\zicf output:mean-magnetisation}\addcontentsline{toc}{subsection}{output:mean-magnetisation}
+outputs the time-averaged normalized magnetization vector $\langle|\mathbf{m}|\rangle$.\\
 
-{\zicf output:material-magnetisation}\addcontentsline{toc}{subsection}{output:material-magnetisation} outputs the instantaneous normalized magnetization for each material in the simulation. The data is output in blocks of four columns, with one block per material defined in the \textit{material} file, e.g.
+{\zicf output:material-magnetisation}\addcontentsline{toc}{subsection}{output:material-magnetisation}
+outputs the instantaneous normalized magnetization for each material in the simulation.
+The data is output in blocks of four columns, with one block per material defined in
+the \textit{material} file, e.g.
 
 \begin{center}
 $\left[ \hat{m_1^x} \textrm{,} \hat{m_1^y} \textrm{,} \hat{m_1^z} \textrm{,} |m_1| \right]$,
@@ -368,25 +398,47 @@ $\left[ \hat{m_2^x} \textrm{,} \hat{m_2^y} \textrm{,} \hat{m_2^z} \textrm{,} |m_
 $\left[ \hat{m_n^x} \textrm{,} \hat{m_n^y} \textrm{,} \hat{m_n^z} \textrm{,} |m_n| \right]$
 \end{center}
 
-Note that obtaining the actual macroscopic magnetization length from this data is not trivial, since it is necessary to know how many atoms of each material are in the system. This information is contained within the log file (giving the fraction of atoms which make up each material). However it is usual to also output the total normalized magnetization of the system to give the relative ordering of the entire system.\\
+Note that obtaining the actual macroscopic magnetization length from this data is not trivial,
+ since it is necessary to know how many atoms of each material are in the system. This
+ information is contained within the log file (giving the fraction of atoms which make up
+ each material). However it is usual to also output the total normalized magnetization of
+ the system to give the relative ordering of the entire system.\\
 
-{\zicf output:material-mean-magnetisation-length}\addcontentsline{toc}{subsection}{output:material-mean-magnetisation-length} outputs the time-averaged normalized magnetization length for each material, e.g. $\langle|m_1|\rangle$, $\langle|m_2|\rangle$...$\langle|m_n|\rangle$.\\
+{\zicf output:material-mean-magnetisation-length}\addcontentsline{toc}{subsection}{output:material-mean-magnetisation-length}
+outputs the time-averaged normalized magnetization length for each material, e.g. $\langle|m_1|\rangle$, $\langle|m_2|\rangle$...$\langle|m_n|\rangle$.\\
 
-{\zicf output:material-mean-magnetisation}\addcontentsline{toc}{subsection}{output:material-mean-magnetisation} outputs the time-averaged normalized magnetization length for each material, e.g. $\langle|\mathbf{m}_1|\rangle$, $\langle|\mathbf{m}_2|\rangle$...$\langle|\mathbf{m}_n|\rangle$.\\
+{\zicf output:material-mean-magnetisation}\addcontentsline{toc}{subsection}{output:material-mean-magnetisation}
+outputs the time-averaged normalized magnetization length for each material, e.g. $\langle|\mathbf{m}_1|\rangle$,
+$\langle|\mathbf{m}_2|\rangle$...$\langle|\mathbf{m}_n|\rangle$.\\
 
-{\zicf output:total-torque}\addcontentsline{toc}{subsection}{output:total-torque} outputs the instantaneous components of the torque on the system $\tau = \sum_i \mu_i \mathbf{S}_i \times \mathbf{H}_i$ in three columns $\tau_x$, $\tau_y$, $\tau_z$ (units of Joules). In equilibrium the total torque will be close to zero, but is useful for testing convergence to an equilibrium state for zero temperature simulations.\\
+{\zicf output:total-torque}\addcontentsline{toc}{subsection}{output:total-torque}
+outputs the instantaneous components of the torque on the system $\tau = \sum_i
+\mu_i \mathbf{S}_i \times \mathbf{H}_i$ in three columns $\tau_x$, $\tau_y$,
+$\tau_z$ (units of Joules). In equilibrium the total torque will be close to zero,
+but is useful for testing convergence to an equilibrium state for zero temperature simulations.\\
 
-{\zicf output:mean-total-torque}\addcontentsline{toc}{subsection}{output:mean-total-torque} outputs the time average of components of the torque on the system $\langle\tau\rangle = \langle\sum_i \mu_i \mathbf{S}_i \times \mathbf{H}_i \rangle$ in three columns $\langle\tau_x \rangle$, $\langle\tau_y \rangle$, $\langle\tau_z \rangle$. In equilibrium the total torque will be close to zero, but the average torque is useful for extracting effective anisotropies or exchange using constrained Monte Carlo simulations.\\
+{\zicf output:mean-total-torque}\addcontentsline{toc}{subsection}{output:mean-total-torque}
+outputs the time average of components of the torque on the system $\langle\tau\rangle =
+\langle\sum_i \mu_i \mathbf{S}_i \times \mathbf{H}_i \rangle$ in three columns $\langle\tau_x
+\rangle$, $\langle\tau_y \rangle$, $\langle\tau_z \rangle$. In equilibrium the total torque
+will be close to zero, but the average torque is useful for extracting effective anisotropies
+or exchange using constrained Monte Carlo simulations.\\
 
-{\zicf output:constraint-phi}\addcontentsline{toc}{subsection}{output:constraint-phi} outputs the current angle of constraint from the $z$-axis for constrained simulations using either the Lagrangian Multiplier Method (LMM) or Constrained Monte Carlo (CMC) integration methods.\\
+{\zicf output:constraint-phi}\addcontentsline{toc}{subsection}{output:constraint-phi} outputs
+the current angle of constraint from the $z$-axis for constrained simulations using either the
+Lagrangian Multiplier Method (LMM) or Constrained Monte Carlo (CMC) integration methods.\\
 
-{\zicf output:constraint-theta}\addcontentsline{toc}{subsection}{output:constraint-theta} outputs the current angle of constraint from the $x$-axis for constrained simulations using either the Lagrangian Multiplier Method (LMM) or Constrained Monte Carlo (CMC) integration methods.\\
+{\zicf output:constraint-theta}\addcontentsline{toc}{subsection}{output:constraint-theta}
+outputs the current angle of constraint from the $x$-axis for constrained simulations using
+either the Lagrangian Multiplier Method (LMM) or Constrained Monte Carlo (CMC) integration methods.\\
 
 %{\zicf output:material-constraint-phi}\addcontentsline{toc}{subsection}{output:material-constraint-phi}\\
 
 %{\zicf output:material-constraint-theta}\addcontentsline{toc}{subsection}{output:material-constraint-theta}\\
 
-{\zicf output:material-mean-torque}\addcontentsline{toc}{subsection}{output:material-mean-torque} outputs the time average of components of the torque on the each material system $\langle\tau\rangle$ in blocks of three columns, with one block for each material defined in the \textit{material} file e.g.
+{\zicf output:material-mean-torque}\addcontentsline{toc}{subsection}{output:material-mean-torque}
+outputs the time average of components of the torque on the each material system $\langle\tau\rangle$
+in blocks of three columns, with one block for each material defined in the \textit{material} file e.g.
 
 \begin{center}
 $\left[ \langle\tau_1^x \rangle \right.$, $\langle\tau_1^y \rangle$, $\left. \langle\tau_1^z \rangle \right]$,
@@ -394,13 +446,22 @@ $\left[ \langle\tau_2^x \rangle \right.$, $\langle\tau_2^y \rangle$, $\left. \la
 $\left[ \langle\tau_n^x \rangle \right.$, $\langle\tau_n^y \rangle$, $\left. \langle\tau_n^z \rangle \right]$
 \end{center}
 
-Computing the torque on each material is particularly useful for determining equilibrium properties of multi-component systems with constrained Monte Carlo simulations. In certain cases the components of a system (different materials) can exert equal and opposite torques on each other, giving a total system torque of zero. The decomposition of the torques for each material allows the determination of internal torques in the system.\\
+Computing the torque on each material is particularly useful for determining equilibrium
+properties of multi-component systems with constrained Monte Carlo simulations. In certain
+cases the components of a system (different materials) can exert equal and opposite torques
+on each other, giving a total system torque of zero. The decomposition of the torques for
+each material allows the determination of internal torques in the system.\\
 
-{\zicf output:mean-susceptibility}\addcontentsline{toc}{subsection}{output:mean-susceptibility} outputs the components of the magnetic susceptibility $\chi$. The magnetic susceptibility is defined by
+{\zicf output:mean-susceptibility}\addcontentsline{toc}{subsection}{output:mean-susceptibility}
+outputs the components of the magnetic susceptibility $\chi$. The magnetic susceptibility is defined by
 \begin{equation*}
 \chi_{\alpha} = \frac{\sum_i \mu_i}{k_{\mathrm{B}}T}\left(\langle m_{\alpha}^2\rangle - \langle m_{\alpha}\rangle^2 \right)
 \end{equation*}
-where $\alpha = x,y,z,m$ giving the directional components of the magnetization in $x$, $y$ and $z$ respectively as well as the longitudinal susceptibility $\chi_m$. The data is output in four columns $\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$. The susceptibility is useful for identifying the critical temperature for a system as well as atomistic parametrization of the micromagnetic  Landau-Lifshitz-Bloch (LLB) equation.\\
+where $\alpha = x,y,z,m$ giving the directional components of the magnetization in $x$, $y$ and $z$
+respectively as well as the longitudinal susceptibility $\chi_m$. The data is output in four columns
+$\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$. The susceptibility is useful for identifying the critical
+temperature for a system as well as atomistic parametrization of the micromagnetic
+Landau-Lifshitz-Bloch (LLB) equation.\\
 
 {\zicf output:material-mean-susceptibility}\addcontentsline{toc}{subsection}{output:mean-material-susceptibility} outputs
 the components of the magnetic susceptibility $\chi$ for each defined material in the system. The data is output in sets of
@@ -453,7 +514,15 @@ each sublattice can be different.\\
 
 {\zicf output:gnuplot-array-format}\addcontentsline{toc}{subsection}{output:gnuplot-array-format}\\
 
-{\zicf output:output-rate = integer [default 1]}\addcontentsline{toc}{subsection}{output:output-rate} controls the number of data points written to the output file or printed to screen. By default \vampire calculates statistics once every sim:time-steps-increment number of time steps. Usually you want to output the updated statistic (e.g. magnetization) every time, which is the default behaviour. However, sometimes you may want to plot the time evolution of an average, where you want to collect statistics much more frequently than you output to the output file, which is controlled by this keyword. For example, if output:output-rate = 10 and sim:time-steps-increment = 10 then statistics (and average values) will be updated once every 10 time steps, and the new statistics will be written to the output file every 100 time steps.\\
+{\zicf output:output-rate = integer [default 1]}\addcontentsline{toc}{subsection}{output:output-rate}
+controls the number of data points written to the output file or printed to screen. By default \vampire
+calculates statistics once every sim:time-steps-increment number of time steps. Usually you want to
+output the updated statistic (e.g. magnetization) every time, which is the default behaviour. However,
+sometimes you may want to plot the time evolution of an average, where you want to collect statistics
+much more frequently than you output to the output file, which is controlled by this keyword. For
+example, if output:output-rate = 10 and sim:time-steps-increment = 10 then statistics (and average
+values) will be updated once every 10 time steps, and the new statistics will be written to the output
+file every 100 time steps.\\
 
 \section*{Configuration output}
 \addcontentsline{toc}{section}{Configuration output}
