@@ -43,9 +43,9 @@ namespace dipole{
       enum solver_t{
          macrocell    = 0, // original bare macrocell method (cheap but inaccurate)
          tensor       = 1, // new macrocell with tensor including local corrections
-         multipole    = 2, // bare macrocell but with multipole expansion
-         hierarchical = 3, // new macrocell with tensor including local corrections and nearfield multipole
-         exact        = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)
+         //multipole    = 2, // bare macrocell but with multipole expansion
+         //hierarchical = 3, // new macrocell with tensor including local corrections and nearfield multipole
+         //exact        = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)
       };
 
       extern solver_t solver;
@@ -110,6 +110,8 @@ namespace dipole{
                                     const std::vector<double>& atom_coords_y,
                                     const std::vector<double>& atom_coords_z,
                                     const int num_atoms);
+
+      void initialize_macrocell_solver();
 
       //-----------------------------------------------------------------------------
       // Function to send receive cells data to other cpus

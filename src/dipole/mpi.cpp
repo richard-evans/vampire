@@ -489,6 +489,11 @@ namespace internal{
          return EXIT_SUCCESS;
       }
 
+#endif
+
+   } // end of namespace internal
+
+   #ifdef MPICF
       /*--------------------------------------------------------*/
       /*Function to send cells field to be output in cfg file   */
       /*--------------------------------------------------------*/
@@ -553,7 +558,5 @@ namespace internal{
 
 
    #endif
-
-} // end of namespace internal
 
 } // end namespace dipole

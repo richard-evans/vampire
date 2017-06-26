@@ -11,24 +11,13 @@
 // C++ standard library headers
 #include <cmath>
 #include <cstdlib>
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
 
 // Vampire headers
 #include "cells.hpp"
 #include "dipole.hpp"
-#include "errors.hpp"
-#include "material.hpp"
-#include "sim.hpp"
 #include "vio.hpp"
-#include "vmpi.hpp"
 #include "vutil.hpp"
-
-#include <fenv.h>
-#include <signal.h>
 
 // dipole module headers
 #include "internal.hpp"
@@ -99,56 +88,44 @@ namespace dipole{
 		// Starting calculation of dipolar field
 		//-------------------------------------------------------------------------------------
 
-      // instantiate timer
-      vutil::vtimer_t timer;
-
-      // start timer
-      timer.start();
-
       // Check memory requirements and print to screen
       zlog << zTs() << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
       std::cout << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 
-      // For MPI version, only add local atoms
-      #ifdef MPICF
-       int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-      #else
-       int num_local_atoms = num_atoms;
-      #endif
-
-
       zlog << zTs() << "Number of local cells for dipole calculation = " << dipole::internal::cells_num_local_cells << std::endl;
       zlog << zTs() << "Number of total cells for dipole calculation = " << dipole::internal::cells_num_cells << std::endl;
 
-      // calculate matrix prefactors
-      zlog << zTs() << "Precalculating rij matrix for dipole calculation... " << std::endl;
-      std::cout     << "Precalculating rij matrix for dipole calculation"     << std::flush;
-
-      //==========================================================
       //----------------------------------------------------------
       // Calculation of dipolar tensor
       //----------------------------------------------------------
-      //==========================================================
+      switch (dipole::internal::solver){
 
-      dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, cells_num_cells, cells_num_local_cells, cells_macro_cell_size, cells_local_cell_array,
-                                                 cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, cells_volume_array, cells_pos_and_mom_array,
-                                                 cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
-                                                 atom_type_array, atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, num_atoms);
+         case dipole::internal::macrocell:
+            dipole::internal::initialize_macrocell_solver();
+            break;
 
+         case dipole::internal::tensor:
+            dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, cells_num_cells, cells_num_local_cells, cells_macro_cell_size, cells_local_cell_array,
+                                                       cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, cells_volume_array, cells_pos_and_mom_array,
+                                                       cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
+                                                       atom_type_array, atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, num_atoms);
+            break;
+
+      }
+
+      // Andrea - not sure what these are in aid of - generally a bad idea to change these!
       cells::num_cells = dipole::internal::cells_num_cells;
       cells::num_atoms_in_cell = dipole::internal::cells_num_atoms_in_cell;
 
-      // hold parallel calculation until all processors have completed the dipole calculation
-      vmpi::barrier();
-
-      // stop timer
-      timer.stop();
-
-      std::cout << "Done! [ " << timer.elapsed_time() << " s ]" << std::endl;
-      zlog << zTs() << "Precalculation of rij matrix for dipole calculation complete. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
-
       // Set initialised flag
       dipole::internal::initialised=true;
+
+      //------------------------------------------------------------------------
+      // Precalculate dipole field and time for performance
+      //------------------------------------------------------------------------
+
+      // instantiate timer
+      vutil::vtimer_t timer;
 
       // start timer
       timer.start();
@@ -172,7 +149,7 @@ namespace dipole{
       zlog << zTs() << "Outputting dipole matrix " << std::endl;
 
       // Output Demag tensor only if first step of simulation since depending only on shape
-      if(sim::time == 0){
+      //if(sim::time == 0){ // not needed since this is the initialise function...
 
          int num_atoms_magnetic = 0.0;   // Initialise tot num of magnetic atoms
          // Calculate number of magnetic atoms
@@ -189,7 +166,7 @@ namespace dipole{
          double Nyz = 0.0;
          double Nzz = 0.0;
 
-         // Every cpus print to check dipolar martrix inter term
+         // Every cpus print to check dipolar matrix inter term
          for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
             int i = cells::cell_id_array[lc];
             if(dipole::internal::cells_num_atoms_in_cell[i]>0){
@@ -237,7 +214,7 @@ namespace dipole{
          zlog <<          Nxy << "\t" << Nyy << "\t" << Nyz << "\t";
          zlog <<          Nxz << "\t" << Nyz << "\t" << Nzz << "\n";
 
-      } // close if loop for sim::time == 0
+      //} // close if loop for sim::time == 0
 	   //--------------------------------------------------/
       // End of outptu dipolar tensor
 	   //--------------------------------------------------/

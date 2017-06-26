@@ -20,6 +20,8 @@
 // Vampire headers
 #include "cells.hpp" // needed for cells::cell_id_array but to be removed
 #include "dipole.hpp"
+#include "vio.hpp"
+#include "vutil.hpp"
 
 // dipole module headers
 #include "internal.hpp"
@@ -59,6 +61,8 @@ namespace dipole{
          // Collate atom coordinates for local cells
          //------------------------------------------------------
          #ifdef MPICF
+
+            const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
 
             std::vector<double> atom_pos_x(num_local_atoms,0.0);
             std::vector<double> atom_pos_y(num_local_atoms,0.0);
@@ -138,6 +142,16 @@ namespace dipole{
             atom_pos_z.clear();
 
          #endif
+
+         // calculate matrix prefactors
+         zlog << zTs() << "Precalculating rij matrix for dipole calculation using tensor solver... " << std::endl;
+         std::cout     << "Precalculating rij matrix for dipole calculation using tensor solver"     << std::flush;
+
+         // instantiate timer
+         vutil::vtimer_t timer;
+
+         // start timer
+         timer.start();
 
          // loop over local cells
          for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
@@ -370,6 +384,15 @@ namespace dipole{
                }
    			}
    		}
+
+         // hold parallel calculation until all processors have completed the dipole calculation
+         vmpi::barrier();
+
+         // stop timer
+         timer.stop();
+
+         std::cout << "done! [ " << timer.elapsed_time() << " s ]" << std::endl;
+         zlog << zTs() << "Precalculation of rij matrix for dipole calculation complete. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
          return;
 

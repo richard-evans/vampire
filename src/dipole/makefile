@@ -8,6 +8,7 @@ data.o \
 field.o \
 initialize.o \
 interface.o \
+macrocell.o \
 memory.o \
 mpi.o \
 tensor.o \
