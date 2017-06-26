@@ -113,9 +113,26 @@ The commands here determine the dimensions of the generated system.\\
 
 {\zicf dimensions:double macro-cell-size}\addcontentsline{toc}{subsection}{dimensions:macro-cell-size} determines the macro cell size for calculation of the demagnetizing field and output of the magnetic configuration. Finer discretisation lead to more accurate results at the cost of significantly longer run times. The cell size should always be less than the system size, as highly asymmetric cells will leads to significant errors in the demagnetisation field calculation.
 
+\section*{Dipole field calculation}
+\addcontentsline{toc}{section}{Dipole field calculation}
+The following commands control the calculation of the dipole-dipole field. By
+default the dipole fields are disabled for performance reasons, but for large
+systems (> 10 nm) the interactions can become important. The \vampire code
+implements several different solvers balancing accuracy and performance. The
+default in V5+ is the tensor method, which approximates the dipole dipole
+interactions at the macrocell level but calculating a dipole-dipole tensor which
+is exact if the magnetic moments in each cell are aligned.\\
+
+{\zicf dipole:solver = exclusive string [default tensor]}\addcontentsline{toc}{subsection}{dipole:solver}
+Declares the solver to be used for the dipole calculation. Available options are:
+\begin{itemize}
+  \item[] macrocell
+  \item[] tensor
+\end{itemize}
+
 \section*{Simulation Control}
 \addcontentsline{toc}{section}{Simulation Control}
-The following commands control the simulation, including the program, maximum temperatures, applied filed strength etc.\\
+The following commands control the simulation, including the program, maximum temperatures, applied field strength etc.\\
 
 {\zicf sim:integrator = exclusive string [default llg-heun]}\addcontentsline{toc}{subsection}{sim:integrator} Declares the integrator to be used for the simulation. Available options are:
 \begin{itemize}
