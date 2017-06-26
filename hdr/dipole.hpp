@@ -47,7 +47,7 @@ namespace dipole{
    //-----------------------------------------------------------------------------
    // Function to unroll cells dipolar field into atomic field
    //-----------------------------------------------------------------------------
-   void calculate_field();
+   void calculate_field(const uint64_t sim_time);
 
    //--------------------------------------------------------
    // Function to send cells field to be output in cfg file

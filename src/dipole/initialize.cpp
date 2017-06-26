@@ -130,8 +130,8 @@ namespace dipole{
       // start timer
       timer.start();
 
-      // now calculate fields
-      dipole::calculate_field();
+      // now calculate fields at zero time
+      dipole::calculate_field(0);
 
       // hold parallel calculation until all processors have completed the update
       vmpi::barrier();
@@ -209,7 +209,7 @@ namespace dipole{
          Nzz = ((Nzz /num_atoms_magnetic)-4.0*M_PI/3.0)/(-4.0*M_PI);
 
          // Write demag factor to log file zlog << zTs() <<
-         zlog << zTs() << "Demagnetisation tensor in format Nxx\t\tNxy\t\tNxz\t\tNyx\t\tNyy\tNyz\t\tNzx\t\tNzy\t\tNzz :\n";
+         zlog << zTs() << "Demagnetisation tensor in format Nxx   Nxy   Nxz   Nyx   Nyy   Nyz   Nzx   Nzy   Nzz :\n";
          zlog << zTs() << Nxx << "\t" << Nxy << "\t" << Nxz << "\t";
          zlog <<          Nxy << "\t" << Nyy << "\t" << Nyz << "\t";
          zlog <<          Nxz << "\t" << Nyz << "\t" << Nzz << "\n";

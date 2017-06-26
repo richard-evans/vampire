@@ -28,7 +28,6 @@
 // dipole module headers
 #include "internal.hpp"
 #include "material.hpp"
-#include "sim.hpp"
 
 namespace dipole{
 
@@ -37,32 +36,32 @@ namespace dipole{
    //-----------------------------------------------------------------------------
 
 
-	void calculate_field(){
+	void calculate_field(const uint64_t sim_time){
 
       // return if dipole field not enabled
       if(!dipole::activated) return;
 
 		// prevent double calculation for split integration (MPI)
-		if(dipole::internal::update_time!=sim::time){
+		if(dipole::internal::update_time != sim_time){
 
 			// Check if update required
-		   if(sim::time%dipole::update_rate==0){
+		   if(sim_time%dipole::update_rate==0){
 
 			   //if updated record last time at update
-			   dipole::internal::update_time=sim::time;
+			   dipole::internal::update_time = sim_time;
 
             // instantiate timer of cells::mag() function
-            vutil::vtimer_t timer;
+            //vutil::vtimer_t timer;
             // start timer
-            timer.start();
+            //timer.start();
 			   // update cell magnetisations
 			   cells::mag();
             // end timer
-            timer.stop();
+            //timer.stop();
             // return bandwidth
-            double update_time = timer.elapsed_time();
+            //double update_time = timer.elapsed_time();
 
-            zlog << zTs() << "Calculation cells magnetisation complete. Time taken: " << update_time << "s."<< std::endl;
+            //zlog << zTs() << "Calculation cells magnetisation complete. Time taken: " << update_time << "s."<< std::endl;
 
 			   // recalculate dipole fields
             dipole::internal::update_field();
