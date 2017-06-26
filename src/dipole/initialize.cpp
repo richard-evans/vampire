@@ -280,6 +280,7 @@ namespace dipole{
                /* Calculation of intra part of dipolar tensor              */
                /*==========================================================*/
              	if(i!=j && dipole::internal::cells_num_atoms_in_cell[j]>0){
+
                   // create temporary variable to store components of tensor
                  	double tmp_rij_inter_xx = 0.0;
                  	double tmp_rij_inter_xy = 0.0;
@@ -288,6 +289,7 @@ namespace dipole{
                  	double tmp_rij_inter_yy = 0.0;
                  	double tmp_rij_inter_yz = 0.0;
                  	double tmp_rij_inter_zz = 0.0;
+
                   // Calculate distance vectors between cells
                   double rx = dipole::internal::cells_pos_and_mom_array[4*j+0] - dipole::internal::cells_pos_and_mom_array[4*i+0];
                   double ry = dipole::internal::cells_pos_and_mom_array[4*j+1] - dipole::internal::cells_pos_and_mom_array[4*i+1];
@@ -299,11 +301,12 @@ namespace dipole{
                   // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
                   if( (rij_1)/cells_macro_cell_size > dipole::cutoff){
                      // define unitarian distance vectors
-                  	double ex = rx*rij;
-                  	double ey = ry*rij;
-                  	double ez = rz*rij;
+                  	const double ex = rx*rij;
+                  	const double ey = ry*rij;
+                  	const double ez = rz*rij;
 
-                  	double rij3 = (rij*rij*rij); // Angstroms
+                  	const double rij3 = (rij*rij*rij); // Angstroms
+
                      // calculate dipolar matrix for 6 entries because of symmetry
                   	dipole::internal::rij_inter_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
                   	dipole::internal::rij_inter_xy[lc][j] = ( 3.0*ex*ey      )*rij3 ;
@@ -312,19 +315,29 @@ namespace dipole{
                   	dipole::internal::rij_inter_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
                   	dipole::internal::rij_inter_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
                   	dipole::internal::rij_inter_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
+
                   }
+                  //--------------------------------------------------------------------------
                   // If distance between macro-cells < cutoff ==> apply inter-intra method
+                  //--------------------------------------------------------------------------
                   else if( (1.0/rij)/cells_macro_cell_size <= dipole::cutoff){
+
                      for(int pi=0; pi<dipole::internal::cells_num_atoms_in_cell[i]; pi++){
+
+                        const double cix = cells_atom_in_cell_coords_array_x[i][pi];
+                        const double ciy = cells_atom_in_cell_coords_array_y[i][pi];
+                        const double ciz = cells_atom_in_cell_coords_array_z[i][pi];
+
                         for(int qj=0; qj<dipole::internal::cells_num_atoms_in_cell[j]; qj++){
 
-                           rx = cells_atom_in_cell_coords_array_x[j][qj] - cells_atom_in_cell_coords_array_x[i][pi];
-                           ry = cells_atom_in_cell_coords_array_y[j][qj] - cells_atom_in_cell_coords_array_y[i][pi];
-                           rz = cells_atom_in_cell_coords_array_z[j][qj] - cells_atom_in_cell_coords_array_z[i][pi];
+                           const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix;
+                           const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy;
+                           const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz;
 
                            rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);  //Reciprocal of the distance
-                           rij_1 = 1.0/rij;
-                           // Check if there are not prolems with distances, otherwise print out error message
+
+                           /*rij_1 = 1.0/rij;
+                           // Check if there are not problems with distances, otherwise print out error message
                            if( rij_1==0.0 ) {
                               fprintf(stderr,">>>>> (Inter)  Warning: atoms are overlapping in cells i=%d\tand j=%d\ton rank=%d\t<<<<<\n",i,j,vmpi::my_rank);
                               std::cout << ">>>>> (Inter) Warning: atoms are overlapping in cells i,j " << i << "\t" << j <<"<<<<<" << std::endl;
@@ -336,13 +349,13 @@ namespace dipole{
                               std::cout << " rx= "  << rx << " ry= " << ry << " rz= " << rz << std::endl;
                               std::cout << " rij= " << 1.0/rij << " = " << (1.0/rij)/((cells_macro_cell_size*sqrt(3)+0.01)) << " macro-cells" << std::endl;
                               break;
-                           }
+                           }*/
 
                            const double ex = rx*rij;
                            const double ey = ry*rij;
                            const double ez = rz*rij;
 
-                           double rij3 = (rij*rij*rij); // Angstroms
+                           const double rij3 = (rij*rij*rij); // Angstroms
 
                            tmp_rij_inter_xx += ((3.0*ex*ex - 1.0)*rij3);
                            tmp_rij_inter_xy += ((3.0*ex*ey      )*rij3);
@@ -351,6 +364,7 @@ namespace dipole{
                            tmp_rij_inter_yy += ((3.0*ey*ey - 1.0)*rij3);
                            tmp_rij_inter_yz += ((3.0*ey*ez      )*rij3);
                            tmp_rij_inter_zz += ((3.0*ez*ez - 1.0)*rij3);
+
                         }
                      }
 
@@ -361,6 +375,7 @@ namespace dipole{
                      dipole::internal::rij_inter_yy[lc][j] =  (tmp_rij_inter_yy);
                      dipole::internal::rij_inter_yz[lc][j] =  (tmp_rij_inter_yz);
                      dipole::internal::rij_inter_zz[lc][j] =  (tmp_rij_inter_zz);
+
                      // Normalisation by the number of atoms in the cell. This is required for the correct evaluation of the field in the update.cpp routine
                      dipole::internal::rij_inter_xx[lc][j] = dipole::internal::rij_inter_xx[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                      dipole::internal::rij_inter_xy[lc][j] = dipole::internal::rij_inter_xy[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
@@ -369,6 +384,7 @@ namespace dipole{
                      dipole::internal::rij_inter_yy[lc][j] = dipole::internal::rij_inter_yy[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                      dipole::internal::rij_inter_yz[lc][j] = dipole::internal::rij_inter_yz[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                      dipole::internal::rij_inter_zz[lc][j] = dipole::internal::rij_inter_zz[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+
                   }  // End of Inter part calculated atomicstically
                } // End of Inter part
 
@@ -376,6 +392,7 @@ namespace dipole{
                /* Calculation of intra part of dipolar tensor              */
                /*==========================================================*/
                else if( i==j && dipole::internal::cells_num_atoms_in_cell[j]>0){
+
                   // initialise temp vectors
                   double tmp_rij_intra_xx = 0.0;
                   double tmp_rij_intra_xy = 0.0;
@@ -385,44 +402,73 @@ namespace dipole{
                   double tmp_rij_intra_yz = 0.0;
                   double tmp_rij_intra_zz = 0.0;
 
-               	for(int pi=0; pi<dipole::internal::cells_num_atoms_in_cell[i]; pi++){
-                 		for(int qj=0; qj<dipole::internal::cells_num_atoms_in_cell[i]; qj++){
-                  		if( pi!=qj ){
+                  const int mmax = dipole::internal::cells_num_atoms_in_cell[i];
 
-                   			double rx = cells_atom_in_cell_coords_array_x[j][qj] - cells_atom_in_cell_coords_array_x[i][pi];
-                   			double ry = cells_atom_in_cell_coords_array_y[j][qj] - cells_atom_in_cell_coords_array_y[i][pi];
-                   			double rz = cells_atom_in_cell_coords_array_z[j][qj] - cells_atom_in_cell_coords_array_z[i][pi];
+               	for(int pi=0; pi<mmax; pi++){
 
-                   			const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
+                     const double cix = cells_atom_in_cell_coords_array_x[i][pi];
+                     const double ciy = cells_atom_in_cell_coords_array_y[i][pi];
+                     const double ciz = cells_atom_in_cell_coords_array_z[i][pi];
 
-                   			if( 1.0/rij==0.0 ){
-                              fprintf(stderr,">>>>> (Intra)  Warning: atoms are overlapping in cells i=%d\tand j=%d\ton rank=%d\t<<<<<\n",i,j,vmpi::my_rank);
-                     			std::cout << ">>>>> (Intra)  Warning: atoms are overlapping in cells i=\t" << i << "\t and j=\t" << j <<"\t<<<<<" << std::endl;
-                     			std::cout << "Cell and atomic coordinates used for calculation of Dipolar matrix" << std::endl;
-                     			std::cout << " qj= "<<qj << " xqj= " << cells_atom_in_cell_coords_array_x[j][qj] << " yqj= " << cells_atom_in_cell_coords_array_y[j][qj] << " zqj= " << cells_atom_in_cell_coords_array_z[j][qj] << std::endl;
-                     			std::cout << " pi= "<<pi << " xpi= " << cells_atom_in_cell_coords_array_x[i][pi] << " ypi= " << cells_atom_in_cell_coords_array_y[i][pi] << " zpi= " << cells_atom_in_cell_coords_array_z[i][pi] << std::endl;
-                              std::cout << " xj= "  << dipole::internal::cells_pos_and_mom_array[4*j+0]  << " yj= "  << dipole::internal::cells_pos_and_mom_array[4*j+1]  << " zj= "  << dipole::internal::cells_pos_and_mom_array[4*j+2] << std::endl;
-                              std::cout << " xi= "  << dipole::internal::cells_pos_and_mom_array[4*i+0]  << " yi= "  << dipole::internal::cells_pos_and_mom_array[4*i+1]  << " zi= "  << dipole::internal::cells_pos_and_mom_array[4*i+2] << std::endl;
-                     			std::cout << " rx= "  << rx << " ry= " << ry << " rz= " << rz << std::endl;
-                     			std::cout << " rij= " << 1.0/rij << " = " << (1.0/rij)/((cells_macro_cell_size*sqrt(3)+0.01)) << " macro-cells" << std::endl;
-                              break;
-                   			}
+                     // use double loops to avoid if pi != qj statement
+                     for(int qj=0; qj<pi; qj++){
 
-			                  const double ex = rx*rij;
-                   			const double ey = ry*rij;
-                   			const double ez = rz*rij;
+                        const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix; //cells_atom_in_cell_coords_array_x[i][pi];
+                        const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy; //cells_atom_in_cell_coords_array_y[i][pi];
+                        const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz; //cells_atom_in_cell_coords_array_z[i][pi];
 
-                   			const double rij3 = (rij*rij*rij); // Angstroms
+                        const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
 
-                   			tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
-                   			tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);
-                   			tmp_rij_intra_xz += ((3.0*ex*ez      )*rij3);
+                        /*if( 1.0/rij==0.0 ){
+                           fprintf(stderr,">>>>> (Intra)  Warning: atoms are overlapping in cells i=%d\tand j=%d\ton rank=%d\t<<<<<\n",i,j,vmpi::my_rank);
+                           std::cout << ">>>>> (Intra)  Warning: atoms are overlapping in cells i=\t" << i << "\t and j=\t" << j <<"\t<<<<<" << std::endl;
+                           std::cout << "Cell and atomic coordinates used for calculation of Dipolar matrix" << std::endl;
+                           std::cout << " qj= "<<qj << " xqj= " << cells_atom_in_cell_coords_array_x[j][qj] << " yqj= " << cells_atom_in_cell_coords_array_y[j][qj] << " zqj= " << cells_atom_in_cell_coords_array_z[j][qj] << std::endl;
+                           std::cout << " pi= "<<pi << " xpi= " << cells_atom_in_cell_coords_array_x[i][pi] << " ypi= " << cells_atom_in_cell_coords_array_y[i][pi] << " zpi= " << cells_atom_in_cell_coords_array_z[i][pi] << std::endl;
+                           std::cout << " xj= "  << dipole::internal::cells_pos_and_mom_array[4*j+0]  << " yj= "  << dipole::internal::cells_pos_and_mom_array[4*j+1]  << " zj= "  << dipole::internal::cells_pos_and_mom_array[4*j+2] << std::endl;
+                           std::cout << " xi= "  << dipole::internal::cells_pos_and_mom_array[4*i+0]  << " yi= "  << dipole::internal::cells_pos_and_mom_array[4*i+1]  << " zi= "  << dipole::internal::cells_pos_and_mom_array[4*i+2] << std::endl;
+                           std::cout << " rx= "  << rx << " ry= " << ry << " rz= " << rz << std::endl;
+                           std::cout << " rij= " << 1.0/rij << " = " << (1.0/rij)/((cells_macro_cell_size*sqrt(3)+0.01)) << " macro-cells" << std::endl;
+                           break;
+                        }*/
 
-                   			tmp_rij_intra_yy += ((3.0*ey*ey - 1.0)*rij3);
-                   			tmp_rij_intra_yz += ((3.0*ey*ez      )*rij3);
-                   			tmp_rij_intra_zz += ((3.0*ez*ez - 1.0)*rij3);
+                        const double ex = rx*rij;
+                        const double ey = ry*rij;
+                        const double ez = rz*rij;
 
-                 			}
+                        const double rij3 = (rij*rij*rij); // Angstroms
+
+                        tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
+                        tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);
+                        tmp_rij_intra_xz += ((3.0*ex*ez      )*rij3);
+
+                        tmp_rij_intra_yy += ((3.0*ey*ey - 1.0)*rij3);
+                        tmp_rij_intra_yz += ((3.0*ey*ez      )*rij3);
+                        tmp_rij_intra_zz += ((3.0*ez*ez - 1.0)*rij3);
+
+                     }
+                     for(int qj=pi+1; qj<mmax; qj++){
+
+                        const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix; //cells_atom_in_cell_coords_array_x[i][pi];
+                        const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy; //cells_atom_in_cell_coords_array_y[i][pi];
+                        const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz; //cells_atom_in_cell_coords_array_z[i][pi];
+
+                        const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
+
+                        const double ex = rx*rij;
+                        const double ey = ry*rij;
+                        const double ez = rz*rij;
+
+                        const double rij3 = (rij*rij*rij); // Angstroms
+
+                        tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
+                        tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);
+                        tmp_rij_intra_xz += ((3.0*ex*ez      )*rij3);
+
+                        tmp_rij_intra_yy += ((3.0*ey*ey - 1.0)*rij3);
+                        tmp_rij_intra_yz += ((3.0*ey*ez      )*rij3);
+                        tmp_rij_intra_zz += ((3.0*ez*ez - 1.0)*rij3);
+
                  		}
                 	}
 
@@ -441,6 +487,7 @@ namespace dipole{
                 	dipole::internal::rij_intra_yy[lc][i] = dipole::internal::rij_intra_yy[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                 	dipole::internal::rij_intra_yz[lc][i] = dipole::internal::rij_intra_yz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                 	dipole::internal::rij_intra_zz[lc][i] = dipole::internal::rij_intra_zz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+
                } // End of Intra part
             }
 			}
