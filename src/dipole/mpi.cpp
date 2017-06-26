@@ -34,6 +34,8 @@ namespace dipole{
    // Function to parallelise dipolar field calculation
    //-----------------------------------------------------------------------------
 
+namespace internal{
+
    #ifdef MPICF
       /*------------------------------------------------*/
       /*Function to send and receive data between cells */
@@ -551,5 +553,7 @@ namespace dipole{
 
 
    #endif
+
+} // end of namespace internal
 
 } // end namespace dipole
