@@ -11,24 +11,22 @@
 // C++ standard library headers
 #include <cmath>
 #include <cstdlib>
-#include <iostream>
-#include <vector>
-#include <string>
-
 #include <fstream>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 // Vampire headers
 #include "cells.hpp"
 #include "dipole.hpp"
-#include "material.hpp"
 #include "errors.hpp"
+#include "material.hpp"
+#include "sim.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "vutil.hpp"
 
-#include "sim.hpp"
-
-#include <time.h>
 #include <fenv.h>
 #include <signal.h>
 
@@ -102,13 +100,11 @@ namespace dipole{
 		// Starting calculation of dipolar field
 		//-------------------------------------------------------------------------------------
 
-      // timing function
-      #ifdef MPICF
-       double t1 = MPI_Wtime();
-      #else
-       time_t t1;
-       t1 = time (NULL);
-      #endif
+      // instantiate timer
+      vutil::vtimer_t timer;
+
+      // start timer
+      timer.start();
 
        // Check memory requirements and print to screen
        zlog << zTs() << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
@@ -253,12 +249,12 @@ namespace dipole{
          dipole::cells_mu0Hd_field_array_z.resize(dipole::internal::cells_num_cells,0.0);
       }
 
+      zlog << zTs() << "Number of local cells for dipole calculation = " << dipole::internal::cells_num_local_cells << std::endl;
+      zlog << zTs() << "Number of total cells for dipole calculation = " << dipole::internal::cells_num_cells << std::endl;
+
       // calculate matrix prefactors
       zlog << zTs() << "Precalculating rij matrix for dipole calculation... " << std::endl;
-
-
-      std::cout<< "Number of local cells= "<<dipole::internal::cells_num_local_cells << std::endl;
-      std::cout<< "Number of  cells= "<<dipole::internal::cells_num_cells << std::endl;
+      std::cout     << "Precalculating rij matrix for dipole calculation"     << std::flush;
 
       //==========================================================
       //----------------------------------------------------------
@@ -268,6 +264,9 @@ namespace dipole{
 
       // loop over local cells
       for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
+
+         // print out progress to screen
+         if(lc % (dipole::internal::cells_num_local_cells/10) == 0) std::cout << "." << std::flush;
 
          // reference global cell ID
          //int i = dipole::internal::cells_local_cell_array[lc];
@@ -450,37 +449,31 @@ namespace dipole{
       cells::num_cells = dipole::internal::cells_num_cells;
       cells::num_atoms_in_cell = dipole::internal::cells_num_atoms_in_cell;
 
-      #ifdef MPICF
-         double t2 = MPI_Wtime();
-      #else
-         time_t t2;
-         t2 = time (NULL);
-      #endif
-      zlog << zTs() << "Precalculation of rij matrix for dipole calculation complete. Time taken: " << t2-t1 << "s."<< std::endl;
+      // hold parallel calculation until all processors have completed the dipole calculation
+      vmpi::barrier();
+
+      // stop timer
+      timer.stop();
+
+      std::cout << "Done! [ " << timer.elapsed_time() << " s ]" << std::endl;
+      zlog << zTs() << "Precalculation of rij matrix for dipole calculation complete. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
       // Set initialised flag
       dipole::internal::initialised=true;
 
-      // timing function
-      #ifdef MPICF
-			t1 = MPI_Wtime();
-      #else
-         //time_t t1;
-         t1 = time (NULL);
-      #endif
+      // start timer
+      timer.start();
 
       // now calculate fields
       dipole::calculate_field();
 
-      // timing function
-      #ifdef MPICF
-         t2 = MPI_Wtime();
-      #else
-         //time_t t2;
-         t2 = time (NULL);
-      #endif
+      // hold parallel calculation until all processors have completed the update
+      vmpi::barrier();
 
-      zlog << zTs() << "Time required for dipole update: " << t2-t1 << "s." << std::endl;
+      // stop timer
+      timer.stop();
+
+      zlog << zTs() << "Time required for dipole update: " << timer.elapsed_time() << " s." << std::endl;
 
 	   //-------------------------------------------------------//
 	   //------- CPUs OUTPUT Dij on different fiels ------------//
