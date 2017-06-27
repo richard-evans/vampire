@@ -40,7 +40,9 @@ The following commands control generation of the simulated system, including dim
 
 {\zicf create:particle-centre-offset}\addcontentsline{toc}{subsection}{create:particle-parity} shifts the origin of a particle to the centre of the nearest unit cell.\\ \par
 
-{\zicf create:crystal-structure = string [sc,fcc,bcc; default sc]}\addcontentsline{toc}{subsection}{create:crystal-structure} Defines the default crystal lattice to be generated.\\ \par
+{\zicf create:crystal-structure = string [sc,fcc,bcc,hcp,rocksalt; default sc]}
+\addcontentsline{toc}{subsection}{create:crystal-structure} Defines the default
+crystal lattice to be generated.\\ \par
 
 {\zicf create:single-spin flag}\addcontentsline{toc}{subsection}{create:single-spin} Overrides all create options and generates a single isolated spin.\\ \par
 
@@ -75,6 +77,32 @@ The following commands control generation of the simulated system, including dim
 {\zicf create:interfacial-roughness-maximum-height}\addcontentsline{toc}{subsection}{create:interfacial-roughness-maximum-height}\\ \par
 
 {\zicf create:interfacial-roughness-height-field-resolution}\addcontentsline{toc}{subsection}{create:interfacial-roughness-height-field-resolution}\\ \par
+
+{\zicf create:alloy-random-seed integer [default 683614233]}
+\addcontentsline{toc}{subsection}{create:alloy-random-seed}
+Sets the random seed for the psuedo random number generator for generating random
+alloys. Simulations use a predictable sequence of psuedo random numbers to give
+repeatable results for the same simulation. The seed determines the actual
+sequence of numbers and is used to generate a different alloy distribution.
+Note that different numbers of cores will change the structure that is generated.\\
+
+{\zicf create:grain-random-seed integer [default 683614233]}
+\addcontentsline{toc}{subsection}{create:grain-random-seed}
+Sets the random seed for the psuedo random number generator for generating random
+grain structures. \\
+
+{\zicf create:dilution-random-seed integer [default 683614233]}
+\addcontentsline{toc}{subsection}{create:dilution-random-seed}
+Sets the random seed for the psuedo random number generator for diluting the
+atoms, leading to a different realization of a dilute material. Note that
+different numbers of cores will change the structure that is generated.\\
+
+{\zicf create:intermixing-random-seed integer [default 683614233]}
+\addcontentsline{toc}{subsection}{create:intermixing-random-seed}
+Sets the random seed for the psuedo random number generator for calculating
+intermixing of materials. A different seed will lead to a different realization
+of a dilute material. Note that different numbers of cores will change the
+structure that is generated.\\
 
 \section*{System dimensions}
 \addcontentsline{toc}{section}{System dimensions}

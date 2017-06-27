@@ -162,6 +162,22 @@ namespace create{
          create::internal::grain_seed = grs;
          return true;
       }
+      //--------------------------------------------------------------------
+      test="dilution-random-seed";
+      if(word==test){
+         int drs=atoi(value.c_str());
+         vin::check_for_valid_int(drs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::dilute_seed = drs;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="intermixing-random-seed";
+      if(word==test){
+         int mrs=atoi(value.c_str());
+         vin::check_for_valid_int(mrs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::mixing_seed = mrs;
+         return true;
+      }
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);
