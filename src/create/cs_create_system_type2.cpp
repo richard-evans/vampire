@@ -606,7 +606,7 @@ void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
 	for(unsigned int atom=0;atom<catom_array.size();atom++) MaterialNumbers.at(catom_array[atom].material)++;
 
 	// Output composition to log file
-	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
+	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat+1 << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
 
 	return;
 
