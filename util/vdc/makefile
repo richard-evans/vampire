@@ -20,6 +20,7 @@ obj/colour.o \
 obj/coords.o \
 obj/data.o \
 obj/main.o \
+obj/non_magnetic.o \
 obj/povray.o \
 obj/spins.o \
 obj/xyz.o

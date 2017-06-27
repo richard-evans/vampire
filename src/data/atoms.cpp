@@ -33,14 +33,15 @@ namespace atoms{
 	//--------------------------
 	// Single Variables
 	//--------------------------
-	int num_atoms;			/// Number of atoms in simulation
-	int num_neighbours;	   	/// Maximum number of neighbours for Hamiltonian/Lattice
-	int total_num_neighbours;
-	int exchange_type;
+   int num_atoms = 0;			/// Number of atoms in simulation
+   int num_neighbours = 0;	   	/// Maximum number of neighbours for Hamiltonian/Lattice
+   int total_num_neighbours = 0;
+   int exchange_type = 0;
+   uint64_t num_non_magnetic_atoms = 0; // Number of non-magnetic atoms not to be simulated
+
 	//--------------------------
 	// Array Variables
 	//--------------------------
-
 	std::vector <double> x_coord_array(0);
 	std::vector <double> y_coord_array(0);
 	std::vector <double> z_coord_array(0);

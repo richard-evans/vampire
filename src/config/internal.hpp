@@ -101,6 +101,8 @@ namespace internal
 
    void atoms();
    void atoms_coords();
+   void atoms_non_magnetic();
+
    double legacy_atoms();
    double legacy_atoms_coords();
    void legacy_cells();
@@ -116,6 +118,7 @@ namespace internal
                             std::vector<double> &buffer);
 
    void write_coordinate_meta();
+   void write_non_magnetic_meta(const uint64_t num_data);
    void write_meta(const double simulation_time, // time (seconds)
                    const double temperature,     // system temperature (Kelvin)
                    const double applied_field_x, // applied field components (Tesla)

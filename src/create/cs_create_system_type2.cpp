@@ -554,7 +554,7 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
          	tmp.y = catom_array[a].y;
          	tmp.z = catom_array[a].z;
          	tmp.mat = catom_array[a].material;
-         	tmp.element = mp::material[catom_array[a].material].element;
+            tmp.cat = catom_array[atom].lh_category;
          	// save atom to non-magnet array
          	cs::non_magnetic_atoms_array.push_back(tmp);
          }

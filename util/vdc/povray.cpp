@@ -66,6 +66,19 @@ void output_inc_file(unsigned int spin_file_id){
 
    }
 
+   // write non-magnetic atoms to inc file
+   for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+
+      std::stringstream line;
+      line << "spinm"<< nm_type[atom] << "(" <<
+              nm_coordinates[3*atom+0]-vdc::system_centre[0] << "," << nm_coordinates[3*atom+1]-vdc::system_centre[1] << "," << nm_coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
+              0.0 << "," << 0.0 << "," << 0.0 << "," << // no spin
+              0.3 << "," << 0.3 << "," << 0.3 << ")\n"; // grey colour by default
+
+      incfile << line.str();
+
+   }
+
    incfile << std::flush;
    incfile.close();
 
@@ -122,31 +135,55 @@ void output_povray_file(){
    pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
    pfile << "#declare Final_Frame = " << vdc::final_file_id << ";" << std::endl;
 
+   // Determine non-magnetic materials looping over all non-magnetic atoms
+   std::vector<bool> is_nm_mat(vdc::materials.size(),false);
+   for(uint64_t atom = 0; atom < vdc::num_nm_atoms; atom++){
+      const int mat = vdc::nm_type[atom];
+      is_nm_mat[mat] = true;
+   }
+
    // Output material specific macros
 	for(int imat=0; imat < vdc::materials.size(); imat++){
-		pfile << "#declare sscale"<< imat << "=2.0;" << std::endl;
-		pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
-		pfile << "#declare cscale"<< imat << "=3.54;" << std::endl;
-		pfile << "#declare cones"<< imat << "=0;" << std::endl;
-		pfile << "#declare arrows"<< imat << "=1;" << std::endl;
-		pfile << "#declare spheres"<< imat << "=1;" << std::endl;
-		pfile << "#declare cubes" << imat << "=0;" << std::endl;
-		pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
-		pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
-		pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz, cr,cg,cb)" << std::endl;
-		pfile << "union{" << std::endl;
-		pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
-		pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
-		pfile << "#if(cones"<< imat << ") cone {<cx+0.5*sx*sscale" << imat << ",cy+0.5*sy*sscale"<< imat << ",cz+0.5*sz*sscale"<< imat << ">,0.0 <cx-0.5*sx*sscale"<< imat << ",cy-0.5*sy*sscale"<< imat << ",cz-0.5*sz*sscale"<< imat << ">,sscale" << imat << "*0.5} #end" << std::endl;
-		pfile << "#if(arrows" << imat << ") cylinder {<cx+sx*0.5*sscale"<< imat <<",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<
-					">,<cx-sx*0.5*sscale"<< imat <<",cy-sy*0.5*sscale"<< imat <<",cz-sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.12}";
-		pfile << "cone {<cx+sx*0.5*1.6*sscale"<< imat <<",cy+sy*0.5*1.6*sscale"<< imat <<",cz+sz*0.5*1.6*sscale"<< imat <<">,sscale"<< imat <<"*0.0 <cx+sx*0.5*sscale"<< imat <<
-					",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.2} #end" << std::endl;
-		pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
-		pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
-		pfile << "}" << std::endl;
-		pfile << "#end" << std::endl;
-
+      if(is_nm_mat[imat] == false){
+   		pfile << "#declare sscale"<< imat << "=2.0;" << std::endl;
+   		pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
+   		pfile << "#declare cscale"<< imat << "=3.54;" << std::endl;
+   		pfile << "#declare cones"<< imat << "=0;" << std::endl;
+   		pfile << "#declare arrows"<< imat << "=1;" << std::endl;
+   		pfile << "#declare spheres"<< imat << "=1;" << std::endl;
+   		pfile << "#declare cubes" << imat << "=0;" << std::endl;
+   		pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
+   		pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+   		pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz, cr,cg,cb)" << std::endl;
+   		pfile << "union{" << std::endl;
+   		pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
+   		pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
+   		pfile << "#if(cones"<< imat << ") cone {<cx+0.5*sx*sscale" << imat << ",cy+0.5*sy*sscale"<< imat << ",cz+0.5*sz*sscale"<< imat << ">,0.0 <cx-0.5*sx*sscale"<< imat << ",cy-0.5*sy*sscale"<< imat << ",cz-0.5*sz*sscale"<< imat << ">,sscale" << imat << "*0.5} #end" << std::endl;
+   		pfile << "#if(arrows" << imat << ") cylinder {<cx+sx*0.5*sscale"<< imat <<",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<
+   					">,<cx-sx*0.5*sscale"<< imat <<",cy-sy*0.5*sscale"<< imat <<",cz-sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.12}";
+   		pfile << "cone {<cx+sx*0.5*1.6*sscale"<< imat <<",cy+sy*0.5*1.6*sscale"<< imat <<",cz+sz*0.5*1.6*sscale"<< imat <<">,sscale"<< imat <<"*0.0 <cx+sx*0.5*sscale"<< imat <<
+   					",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.2} #end" << std::endl;
+   		pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
+   		pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
+   		pfile << "}" << std::endl;
+   		pfile << "#end" << std::endl;
+      }
+      else{
+         pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
+         pfile << "#declare cscale"<< imat << "=0.1;" << std::endl;
+         pfile << "#declare spheres"<< imat << "=1;" << std::endl;
+         pfile << "#declare cubes" << imat << "=1;" << std::endl;
+         pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
+         pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+         pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz,cr,cg,cb)" << std::endl;
+         pfile << "union{" << std::endl;
+         pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
+         pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
+         pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
+         pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
+         pfile << "}" << std::endl;
+         pfile << "#end" << std::endl;
+      }
 	}
    // frame specific povray output
 	pfile << "#include concat(\"spins-\", str(frame_number, -8, 0) \".inc\")" << std::endl;

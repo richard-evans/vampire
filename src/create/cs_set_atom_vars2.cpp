@@ -57,27 +57,28 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		std::cout << "cs::set_atom_vars has been called " << vmpi::my_rank << std::endl;
 	}
 
-	//-------------------------------------------------
 	// Set number of atoms
-	//-------------------------------------------------
+	atoms::num_atoms = catom_array.size(); // core and boundary spins in mpi mode
 
-	atoms::num_atoms = catom_array.size();
 	zlog << zTs() << "Number of atoms generated on rank " << vmpi::my_rank << ": " << atoms::num_atoms-vmpi::num_halo_atoms << std::endl;
 	zlog << zTs() << "Memory required for copying to performance array on rank " << vmpi::my_rank << ": " << 19.0*double(atoms::num_atoms)*8.0/1.0e6 << " MB RAM"<< std::endl;
 
-	atoms::x_coord_array.resize(atoms::num_atoms,0);
-	atoms::y_coord_array.resize(atoms::num_atoms,0);
-	atoms::z_coord_array.resize(atoms::num_atoms,0);
+   // Save number of non-magnetic atoms
+   atoms::num_non_magnetic_atoms = cs::non_magnetic_atoms_array.size();
+
+   atoms::x_coord_array.resize(atoms::num_atoms,0.0);
+   atoms::y_coord_array.resize(atoms::num_atoms,0.0);
+   atoms::z_coord_array.resize(atoms::num_atoms,0.0);
 
 	atoms::x_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::y_spin_array.resize(atoms::num_atoms,0.0);
 	atoms::z_spin_array.resize(atoms::num_atoms,1.0);
    atoms::m_spin_array.resize(atoms::num_atoms,0.0);
 
-	atoms::type_array.resize(atoms::num_atoms,0);
-	atoms::category_array.resize(atoms::num_atoms,0);
-	atoms::grain_array.resize(atoms::num_atoms,0);
-	atoms::cell_array.resize(atoms::num_atoms,0);
+   atoms::type_array.resize(     atoms::num_atoms,0);
+   atoms::category_array.resize( atoms::num_atoms,0);
+   atoms::grain_array.resize(    atoms::num_atoms,0);
+   atoms::cell_array.resize(     atoms::num_atoms,0);
 
 	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);

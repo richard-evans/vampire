@@ -13,6 +13,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "atoms.hpp"
 #include "config.hpp"
 #include "sim.hpp"
 
@@ -73,7 +74,10 @@ void output(){ // should include variables for data to be outputted, eg spins, c
       // for all programs except hysteresis
       if (sim::program != 2)
       {
-         if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
+         if (config::internal::output_rate_counter_coords == 0){
+             config::internal::atoms_coords();
+             if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+          }
          config::internal::atoms();
          config::internal::output_rate_counter_coords++;
       }
@@ -83,14 +87,20 @@ void output(){ // should include variables for data to be outputted, eg spins, c
          // output config only in range [minField_1;maxField_1] for decreasing field
          if ((sim::H_applied >= maxField_1) && (sim::H_applied <= minField_1) && (sim::parity < 0))
          {
-            if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
+            if (config::internal::output_rate_counter_coords == 0){
+                config::internal::atoms_coords();
+                if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+             }
             config::internal::atoms();
             config::internal::output_rate_counter_coords++;
          }
          // output config only in range [minField_2;maxField_2] for increasing field
          else if ((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2) && (sim::parity > 0))
          {
-            if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
+            if (config::internal::output_rate_counter_coords == 0){
+                config::internal::atoms_coords();
+                if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+             }
             config::internal::atoms();
             config::internal::output_rate_counter_coords++;
          }
