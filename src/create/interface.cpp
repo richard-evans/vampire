@@ -144,7 +144,23 @@ namespace create{
           if(value==VFalse){
              create::internal::select_material_by_z_height = false; // default
           }
-          return EXIT_SUCCESS;
+          return true;
+      }
+      //--------------------------------------------------------------------
+      test="alloy-random-seed";
+      if(word==test){
+         int ars=atoi(value.c_str());
+         vin::check_for_valid_int(ars, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::alloy_seed = ars;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="grain-random-seed";
+      if(word==test){
+         int grs=atoi(value.c_str());
+         vin::check_for_valid_int(grs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::grain_seed = grs;
+         return true;
       }
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){

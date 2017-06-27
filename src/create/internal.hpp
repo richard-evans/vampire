@@ -101,6 +101,9 @@ namespace create{
       extern std::vector<create::internal::mp_t> mp; // array of material properties
       extern MTRand grnd; // general random number generator for create functions
 
+      extern int alloy_seed; // random seed to control alloying of atoms
+      extern int grain_seed; // random seed to control grain structure generation
+
       extern double faceted_particle_100_radius; // 100 facet radius
       extern double faceted_particle_110_radius; // 110 facet radius
       extern double faceted_particle_111_radius; // 111 facet radius
