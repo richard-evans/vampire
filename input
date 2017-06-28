@@ -1,51 +1,37 @@
 #------------------------------------------
-# Sample vampire input file to perform
-# benchmark calculation for v4.0
-#
-#------------------------------------------
-
-#------------------------------------------
-# Creation attributes:
-#------------------------------------------
-create:crystal-structure=sc
-
-#------------------------------------------
 # System Dimensions:
 #------------------------------------------
-dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 7.7 !nm
-dimensions:system-size-y = 7.7 !nm
-dimensions:system-size-z = 7.7 !nm
+dimensions:system-size-x = 8 !nm
+dimensions:system-size-y = 8 !nm
+dimensions:system-size-z = 7.8 !nm
 
 #------------------------------------------
 # Material Files:
 #------------------------------------------
-material:file=Co.mat
+material:file=IrMn.mat
+material:unit-cell-file= "Vinput.txt"
+
+sim:enable-surface-anisotropy
+sim:surface-anisotropy-threshold=20
+
+sim:save-checkpoint=continuous
 
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature=300.0
-sim:time-steps-increment=10
-sim:total-time-steps=10000
-sim:time-step=1.0E-15
 
-#------------------------------------------
-# Program and integrator details
-#------------------------------------------
-sim:program=benchmark
-sim:integrator=llg-heun
+sim:program=setting
+sim:applied-field-strength = 10
+sim:applied-field-unit-vector= 1,0,0
+
 
 #------------------------------------------
 # data output
 #------------------------------------------
 output:real-time
+output:applied-field-strength
 output:temperature
-output:magnetisation
-output:magnetisation-length
-output:output-rate = 1000
+output:material-magnetisation
 
 config:atoms
-
-screen:time-steps
-screen:magnetisation-length
+config:atoms-output-rate = 10

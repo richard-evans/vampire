@@ -747,6 +747,11 @@ namespace vin{
                 sim::program=50;
                 return EXIT_SUCCESS;
             }
+            test="setting";
+            if(value==test){
+                sim::program=51;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
