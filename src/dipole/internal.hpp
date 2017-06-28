@@ -28,57 +28,6 @@
 
 namespace dipole{
 
-   extern void calculate_field();
-   extern int send_recv_cells_data(std::vector<int>& proc_cell_index_array1D,
-                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                                 std::vector< std::vector <int> >& cells_index_atoms_array,
-                                 std::vector<double>& cells_pos_and_mom_array,
-                                 std::vector<int>& cells_num_atoms_in_cell,
-                                 std::vector<int>& cells_cell_id_array,
-                                 std::vector<int>& cells_local_cell_array,
-                                 int cells_num_local_cells,
-                                 int cells_num_cells
-                                 );
-
-   extern int send_recv_atoms_data(std::vector<int>& proc_cell_index_array2D,
-                                 std::vector<int>& cell_id_array,
-                                 std::vector<int>& cells_local_cell_array,
-                                 std::vector<double>& atom_pos_x,
-                                 std::vector<double>& atom_pos_y,
-                                 std::vector<double>& atom_pos_z,
-                                 std::vector<int>& atom_type_array,
-                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                                 std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                                 std::vector< std::vector <int> >& cells_index_atoms_array,
-                                 std::vector<double>& cells_pos_and_mom_array,
-                                 std::vector<int>& cells_num_atoms_in_cell,
-                                 int cells_num_local_cells,
-                                 int cells_num_cells,
-                                 double cells_macro_cell_size
-                                 );
-
-   extern int sort_data(std::vector<int>& proc_cell_index_array1D,
-                        std::vector<int>& cells_cell_id_array,
-                        std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                        std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                        std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                        std::vector< std::vector <int> >& cells_index_atoms_array,
-                        std::vector<double>& cells_pos_and_mom_array,
-                        std::vector<int>& cells_num_atoms_in_cell,
-                        int cells_num_local_cells,
-                        int cells_num_cells
-				  		   );
-
-   extern int send_cells_field(std::vector<int>& cells_cell_id_array,
-                              std::vector<double>& dipole_cells_field_array_x,
-                              std::vector<double>& dipole_cells_field_array_y,
-                              std::vector<double>& dipole_cells_field_array_z,
-                              int cells_num_local_cells
-                  );
-
    namespace internal{
 
       //-------------------------------------------------------------------------
@@ -89,6 +38,17 @@ namespace dipole{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern bool initialised;
+
+      // enumerated list of different dipole solvers
+      enum solver_t{
+         macrocell    = 0, // original bare macrocell method (cheap but inaccurate)
+         tensor       = 1, // new macrocell with tensor including local corrections
+         //multipole    = 2, // bare macrocell but with multipole expansion
+         //hierarchical = 3, // new macrocell with tensor including local corrections and nearfield multipole
+         //exact        = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)
+      };
+
+      extern solver_t solver;
 
       extern int update_time; /// last update time
 
@@ -128,6 +88,79 @@ namespace dipole{
       //-------------------------------------------------------------------------
       //void write_macrocell_data();
       extern void update_field();
+
+      void allocate_memory(const int cells_num_local_cells, const int cells_num_cells);
+
+      void initialize_tensor_solver(const int cells_num_atoms_in_unit_cell,
+                                    int cells_num_cells, /// number of macrocells
+                                    int cells_num_local_cells, /// number of local macrocells
+                                    const double cells_macro_cell_size,
+                                    std::vector <int>& cells_local_cell_array,
+                                    std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
+                                    std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
+                                    std::vector < std::vector <int> >& cells_index_atoms_array,
+                                    const std::vector<double>& cells_volume_array,
+                                    std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
+                                    std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                                    std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                                    std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                                    const std::vector<int>& atom_type_array,
+                                    const std::vector<int>& atom_cell_id_array,
+                                    const std::vector<double>& atom_coords_x, //atomic coordinates
+                                    const std::vector<double>& atom_coords_y,
+                                    const std::vector<double>& atom_coords_z,
+                                    const int num_atoms);
+
+      void initialize_macrocell_solver();
+
+      //-----------------------------------------------------------------------------
+      // Function to send receive cells data to other cpus
+      //-----------------------------------------------------------------------------
+      int send_recv_cells_data(std::vector<int>& proc_cell_index_array1D,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                               std::vector< std::vector <int> >& cells_index_atoms_array,
+                               std::vector<double>& cells_pos_and_mom_array,
+                               std::vector<int>& cells_num_atoms_in_cell,
+                               std::vector<int>& cells_cell_id_array,
+                               std::vector<int>& cells_local_cell_array,
+                               int cells_num_local_cells,
+                               int cells_num_cells);
+
+      //-----------------------------------------------------------------------------
+      // Function to send receive atoms data to other cpus
+      //-----------------------------------------------------------------------------
+      int send_recv_atoms_data(std::vector<int>& proc_cell_index_array2D,
+                               std::vector<int>& cell_id_array,
+                               std::vector<int>& cells_local_cell_array,
+                               std::vector<double>& atom_pos_x,
+                               std::vector<double>& atom_pos_y,
+                               std::vector<double>& atom_pos_z,
+                               std::vector<int>& atom_type_array,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                               std::vector< std::vector <int> >& cells_index_atoms_array,
+                               std::vector<double>& cells_pos_and_mom_array,
+                               std::vector<int>& cells_num_atoms_in_cell,
+                               int cells_num_local_cells,
+                               int cells_num_cells,
+                               double cells_macro_cell_size);
+
+      //----------------------------------------------------------------
+      //Function to sort cells/atoms data after sharing
+      //----------------------------------------------------------------
+      int sort_data(std::vector<int>& proc_cell_index_array1D,
+                  std::vector<int>& cells_cell_id_array,
+                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                  std::vector< std::vector <int> >& cells_index_atoms_array,
+                  std::vector<double>& cells_pos_and_mom_array,
+                  std::vector<int>& cells_num_atoms_in_cell,
+                  int cells_num_local_cells,
+                  int cells_num_cells);
 
    } // end of internal namespace
 

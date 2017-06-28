@@ -43,8 +43,6 @@ namespace dipole{
                          /// N.B.: after 12 cells inter-intra method is equivalent to bare macrocell method.
                          /// Although, 2 cells is enough because there are other error sources limiting the accuracy.
 
-   //uint64_t sim_time;
-
    namespace internal{
 
       //------------------------------------------------------------------------
@@ -53,6 +51,9 @@ namespace dipole{
       bool initialised=false;
 
       int update_time=-1; /// last update time
+
+      // solver to be used for dipole method
+      dipole::internal::solver_t solver = dipole::internal::tensor; // default is tensor method
 
       const double prefactor=1.0e+23; // 1e-7/1e30
 
