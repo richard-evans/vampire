@@ -147,6 +147,7 @@ obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
+include src/anisotropy/makefile
 include src/create/makefile
 include src/gpu/makefile
 include src/ltmp/makefile

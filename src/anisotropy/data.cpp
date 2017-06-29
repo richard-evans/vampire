@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard Evans and Sam Westmoreland 2016. All rights reserved.
+//   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
 //
-//   Email: richard.evans@york.ac.uk
+//   Email: sw766@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -30,7 +30,27 @@ namespace anisotropy{
       // Shared variables inside anisotropy module
       //------------------------------------------------------------------------
 
+      bool initialised = false;
+
+      bool uniaxial_first_order = false;
+      bool neel = false;
+
+      bool uniaxial_second_order = false;
+
+      std::vector<double> field_array;
+
+      int num_atoms;
+      std::vector<int> atom_type_array;
+      std::vector<zkval_t> materialscalaranisotropyarray;
+
+      std::vector<double> spin_array_x;
+      std::vector<double> spin_array_y;
+      std::vector<double> spin_array_z;
+
+      std::vector<std::vector<std::vector<double> > > second_order_tensor;
+      std::vector<std::vector<std::vector<std::vector<double> > > > third_order_tensor;
+      std::vector<std::vector<std::vector<std::vector<std::vector<double> > > > > fourth_order_tensor;
+
    } // end of internal namespace
 
 } // end of anisotropy namespace
-
