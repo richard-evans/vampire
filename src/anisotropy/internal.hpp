@@ -31,10 +31,11 @@
 
 namespace anisotropy{
 
-    extern bool uniaxial_first_order; // uniaxial calculation flag
-    extern bool neel;     // neel calculation flag
-
-    extern bool uniaxial_second_order;
+    //-------------------------------------------------------------------------
+    // function declarations
+    //-------------------------------------------------------------------------
+    extern int calculate_fields();
+    extern double second_order_tensor_anisotropy();
 
     namespace internal{
 
@@ -43,7 +44,13 @@ namespace anisotropy{
         //-------------------------------------------------------------------------
         extern bool initialised; // check module has been initialised
 
-        extern int calculate_fields();
+        /* anisotropy type flags */
+        extern bool uniaxial_first_order;
+        extern bool neel;
+
+        extern bool uniaxial_second_order;
+
+        extern double calculate_uniaxial_first_order_fields();
 
         //-------------------------------------------------------------------------
         // Internal shared variables

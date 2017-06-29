@@ -50,14 +50,15 @@ namespace anisotropy{
             }
 
             /* internalise variables */
+            internal::num_atoms = num_atoms;
             internal::atom_type_array = atom_type_array;
             internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
 
             internal::field_array.resize(atoms::num_atoms);
 
             /*
-             * initialise tensors
-             */
+            * initialise tensors
+            */
 
             /* resize tensors and initialise to zero */
             internal::second_order_tensor.resize(atoms::num_atoms);
@@ -84,10 +85,10 @@ namespace anisotropy{
             }
 
             /*
-             * populate second order tensor
-             */
+            * populate second order tensor
+            */
 
-            if (uniaxial_first_order)
+            if (internal::uniaxial_first_order)
             {
                 for (int atom=0; atom<atoms::num_atoms; ++atom)
                 {
@@ -105,7 +106,7 @@ namespace anisotropy{
                 }
             }
 
-            if (neel)
+            if (internal::neel)
             {
                 for (int atom = 0; atom < atoms::num_atoms; atom++)
                 {
@@ -136,7 +137,7 @@ namespace anisotropy{
              * populate third order tensor
              */
 
-            if (uniaxial_second_order)
+            if (internal::uniaxial_second_order)
             {
                 for (int atom = 0; atom < atoms::num_atoms; atom ++)
                 {

@@ -24,11 +24,6 @@ namespace anisotropy{
     // Externally visible variables
     //------------------------------------------------------------------------------
 
-    bool uniaxial_first_order = false;
-    bool neel = false;
-
-    bool uniaxial_second_order = false;
-
     namespace internal{
 
         //------------------------------------------------------------------------
@@ -36,6 +31,11 @@ namespace anisotropy{
         //------------------------------------------------------------------------
 
         bool initialised = false;
+
+        bool uniaxial_first_order = false;
+        bool neel = false;
+
+        bool uniaxial_second_order = false;
 
         std::vector<double> field_array;
 
