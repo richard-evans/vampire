@@ -34,8 +34,10 @@ namespace anisotropy{
     //-------------------------------------------------------------------------
     // function declarations
     //-------------------------------------------------------------------------
-    extern int calculate_fields();
+    extern int calculate_energies();
     extern double second_order_tensor_anisotropy();
+    extern double third_order_tensor_anisotropy();
+    extern double fourth_order_tensor_anisotropy();
 
     namespace internal{
 
@@ -49,8 +51,6 @@ namespace anisotropy{
         extern bool neel;
 
         extern bool uniaxial_second_order;
-
-        extern double calculate_uniaxial_first_order_fields();
 
         //-------------------------------------------------------------------------
         // Internal shared variables

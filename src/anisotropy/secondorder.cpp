@@ -20,18 +20,6 @@
 #include "internal.hpp"
 
 namespace anisotropy {
-    //----------------------------------------------------------------------------
-    // function to calculate anisotropy fields
-    //----------------------------------------------------------------------------
-
-    int calculate_fields()
-    {
-        second_order_tensor_anisotropy();
-
-        // if (anisotropy::internal::2ndorder) calculate_2ndorder_fields(num_atoms);
-
-        return EXIT_SUCCESS;
-    }
 
     double second_order_tensor_anisotropy()
     {
