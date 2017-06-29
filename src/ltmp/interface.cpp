@@ -128,14 +128,9 @@ namespace ltmp{
       if(word==test){
          // Open absorption profile file
          // Absorption (implicitly vs cell height)
-         std::ifstream afile(value.c_str());
-         if(!afile.is_open()){
-         terminaltextcolor(RED);
-            std::cerr << "Error - absorption profile file " << value.c_str() << " not found. Exiting." << std::endl;
-            zlog << zTs() << "Error - absorption profile file " << value.c_str() << " not found. Exiting." << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
-         }
+         std::stringstream afile;
+         afile.str( vin::get_string(value.c_str(), "input", line) );
+
          std::string linestr; // String to hold line of text
          double z=0.0; // height value
          double ab=0.0; // absorption

@@ -166,7 +166,7 @@ int mag_m(){
 
       // Calculate global moment for all CPUs
       #ifdef MPICF
-         MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::max_moment,1,MPI_DOUBLE,MPI_SUM);
+         MPI_Allreduce(MPI_IN_PLACE,&stats::max_moment,1,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
       #endif
 
       // Resize arrays
@@ -295,7 +295,7 @@ double max_torque(){
 
    // find max torque on all nodes
    #ifdef MPICF
-      MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&max_torque,1,MPI_DOUBLE,MPI_MAX);
+      MPI_Allreduce(MPI_IN_PLACE,&max_torque,1,MPI_DOUBLE,MPI_MAX, MPI_COMM_WORLD);
    #endif
 
   return max_torque;
@@ -342,10 +342,10 @@ void system_torque(){
 
 	// reduce torque on all nodes
 	#ifdef MPICF
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&torque[0],3,MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_x_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_y_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
-		MPI::COMM_WORLD.Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_z_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM);
+		MPI_Allreduce(MPI_IN_PLACE,&torque[0],3,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_x_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_y_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(MPI_IN_PLACE,&stats::sublattice_mean_torque_z_array[0],mp::num_materials,MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
 	#endif
 
 	// Set stats values
@@ -386,7 +386,7 @@ void system_energy(){
    // Calculate exchange energy
    //------------------------------
    if(atoms::exchange_type==0){ // Isotropic
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          double Sx=atoms::x_spin_array[atom];
          double Sy=atoms::y_spin_array[atom];
@@ -394,10 +394,10 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_isotropic(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    else if(atoms::exchange_type==1){ // Anisotropic
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          double Sx=atoms::x_spin_array[atom];
          double Sy=atoms::y_spin_array[atom];
@@ -405,10 +405,10 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_vector(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    else if(atoms::exchange_type==2){ // Tensor
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          double Sx=atoms::x_spin_array[atom];
          double Sy=atoms::y_spin_array[atom];
@@ -416,13 +416,13 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_exchange_energy_tensor(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_exchange_energy=energy;
+      stats::total_exchange_energy = 0.5*energy;
    }
    //------------------------------
    // Calculate anisotropy energy
    //------------------------------
    if(sim::AnisotropyType==0){ // Isotropic
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          const double Sz=atoms::z_spin_array[atom];
          const int imaterial=atoms::type_array[atom];
@@ -431,7 +431,7 @@ void system_energy(){
       stats::total_anisotropy_energy=energy;
    }
    else if(sim::AnisotropyType==1){ // Tensor
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          const double Sx=atoms::x_spin_array[atom];
          const double Sy=atoms::y_spin_array[atom];
@@ -445,7 +445,7 @@ void system_energy(){
    // Calculate other energy
    //------------------------------
    if(sim::CubicScalarAnisotropy==true){
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          const double Sx=atoms::x_spin_array[atom];
          const double Sy=atoms::y_spin_array[atom];
@@ -456,7 +456,7 @@ void system_energy(){
       stats::total_cubic_anisotropy_energy=energy;
    }
    if(sim::second_order_uniaxial_anisotropy){
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          const double Sx=atoms::x_spin_array[atom];
          const double Sy=atoms::y_spin_array[atom];
@@ -467,7 +467,7 @@ void system_energy(){
       stats::total_so_anisotropy_energy=energy;
    }
    if(sim::lattice_anisotropy_flag){
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          const double Sx=atoms::x_spin_array[atom];
          const double Sy=atoms::y_spin_array[atom];
@@ -478,7 +478,7 @@ void system_energy(){
       stats::total_lattice_anisotropy_energy=energy;
    }
    if(sim::surface_anisotropy==true){
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          const double Sx=atoms::x_spin_array[atom];
          const double Sy=atoms::y_spin_array[atom];
@@ -489,7 +489,7 @@ void system_energy(){
       stats::total_surface_anisotropy_energy=energy;
    }
    {
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          const double Sx=atoms::x_spin_array[atom];
          const double Sy=atoms::y_spin_array[atom];
@@ -500,7 +500,7 @@ void system_energy(){
       stats::total_applied_field_energy=energy;
    }
    {
-      double register energy=0.0;
+      double energy=0.0;
       for(int atom=0; atom<stats::num_atoms; atom++){
          const double Sx=atoms::x_spin_array[atom];
          const double Sy=atoms::y_spin_array[atom];

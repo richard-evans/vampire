@@ -113,7 +113,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 	vmpi::barrier();
 
 	// re-seed random number generator on each CPU
-	create::internal::grnd.seed(683614233+vmpi::my_rank);
+	create::internal::grnd.seed(create::internal::alloy_seed+vmpi::my_rank);
 
 	// determine local probability
    for(unsigned int atom=0;atom<catom_array.size();atom++){
@@ -197,7 +197,7 @@ std::vector < seed_point_t > generate_random_seed_points(double size_x, double s
 	const int num_points = int(25.0*size_x*size_y/(scale*scale));
 
 	// re-seed generator on all processors
-	create::internal::grnd.seed(1527349271);
+	create::internal::grnd.seed(create::internal::grain_seed);
 
 	for(int i=0; i<num_points; i++){
 
@@ -211,7 +211,7 @@ std::vector < seed_point_t > generate_random_seed_points(double size_x, double s
 		bool touching=false;
 
 		// loop over all previous grains and check if point is not touching other grains
-		for(int g=0;g<seeds.size(); g++){
+		for(unsigned int g=0;g<seeds.size(); g++){
 			double dx = grain.x-seeds[g].x;
 			double dy = grain.y-seeds[g].y;
 			double rij = sqrt(dx*dx + dy*dy);
@@ -257,7 +257,7 @@ std::vector < std::vector <float> > generate_host_alloy_distribution(std::vector
 
          double density = 0.0;
 			// loop over all seed points and calculate cumulative density
-			for(int g=0;g<seeds.size(); g++){
+			for(unsigned int g=0;g<seeds.size(); g++){
             double gx = seeds[g].x;
             double gy = seeds[g].y;
             double gr = seeds[g].r;

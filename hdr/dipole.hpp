@@ -1,0 +1,98 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Andrea Meo and Richard F L Evans 2016. All rights reserved.
+//
+//------------------------------------------------------------------------------
+//
+
+#ifndef DIPOLE_H_
+#define DIPOLE_H_
+
+// C++ standard library headers
+#include <string>
+#include <vector>
+
+// Vampire headers
+#include "dipole.hpp"
+
+//--------------------------------------------------------------------------------
+// Namespace for variables and functions for dipole module
+//--------------------------------------------------------------------------------
+namespace dipole{
+
+   //------------------------------------------------------------------------------
+   // Externally visible variables
+   //------------------------------------------------------------------------------
+   extern int update_rate; /// timesteps between updates
+   extern bool activated;
+   extern std::vector<double> cells_field_array_x;             /// arrays to store cells B-field
+   extern std::vector<double> cells_field_array_y;
+   extern std::vector<double> cells_field_array_z;
+   extern std::vector<double> atom_dipolar_field_array_x;   /// arrays to store atoms B-field
+   extern std::vector<double> atom_dipolar_field_array_y;
+   extern std::vector<double> atom_dipolar_field_array_z;
+
+   extern std::vector<double> cells_mu0Hd_field_array_x;             /// arrays to store cells mu_0*Hdemag-field
+   extern std::vector<double> cells_mu0Hd_field_array_y;
+   extern std::vector<double> cells_mu0Hd_field_array_z;
+   extern std::vector<double> atom_mu0demag_field_array_x;        /// arrays to store atoms mu_0*Hdemag-field
+   extern std::vector<double> atom_mu0demag_field_array_y;
+   extern std::vector<double> atom_mu0demag_field_array_z;
+
+   extern double cutoff;
+
+   //-----------------------------------------------------------------------------
+   // Function to unroll cells dipolar field into atomic field
+   //-----------------------------------------------------------------------------
+   void calculate_field(const uint64_t sim_time);
+
+   //--------------------------------------------------------
+   // Function to send cells field to be output in cfg file
+   //--------------------------------------------------------
+   int send_cells_field(std::vector<int>& cells_cell_id_array,
+                        std::vector<double>& dipole_cells_field_array_x,      // B-field
+                        std::vector<double>& dipole_cells_field_array_y,
+                        std::vector<double>& dipole_cells_field_array_z,
+                        int cells_num_local_cells
+               );
+
+   //-----------------------------------------------------------------------------
+   // Function to initialise dipole module
+   //-----------------------------------------------------------------------------
+   void initialize(const int cells_num_atoms_in_unit_cell,
+                   int cells_num_cells, /// number of macrocells
+                   int cells_num_local_cells, /// number of local macrocells
+                   const double cells_macro_cell_size,
+                   std::vector <int>& cells_local_cell_array,
+                   std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
+                   std::vector <int>& cells_num_atoms_in_cell_global, ///global  number of atoms in each cell
+                   std::vector < std::vector <int> >& cells_index_atoms_array,
+                   const std::vector<double>& cells_volume_array,
+                   std::vector<double>& cells_pos_and_mom_array,  // array to store positions and moment of cells
+                   std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                   std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                   std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                   const std::vector<int>& atom_type_array,
+                   const std::vector<int>& atom_cell_id_array,
+                   const std::vector<double>& atom_coords_x,
+                   const std::vector<double>& atom_coords_y,
+                   const std::vector<double>& atom_coords_z,
+                   const int num_atoms
+   );
+
+   //---------------------------------------------------------------------------
+   // Function to process input file parameters for dipole module
+   //---------------------------------------------------------------------------
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
+   //---------------------------------------------------------------------------
+   // Function to process material parameters
+   //---------------------------------------------------------------------------
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+
+} // end of dipole namespace
+
+#endif //DIPOLE_H_

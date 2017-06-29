@@ -37,17 +37,8 @@
   #include <unistd.h>
 #endif
 
-#include <vmpi.hpp>
-
-#ifdef MPICF
-struct null_streambuf
-: public std::streambuf
-{
-  void overflow(char c)
-  {
-  }
-};
-#endif
+#include "vmpi.hpp"
+#include "material.hpp"
 
 // Global Output Streams
 extern std::ofstream zinfo;
@@ -75,6 +66,9 @@ namespace vin{
    extern void check_for_valid_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
                                      double range_min, double range_max, std::string input_file_type, std::string range_text);
 
+   extern void check_for_valid_positive_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
+                                              double range_min, double range_max, std::string input_file_type, std::string range_text);
+
    extern void check_for_valid_int(int& value, std::string word, int line, std::string prefix, int range_min, int range_max,
                                    std::string input_file_type, std::string range_text);
 
@@ -85,9 +79,18 @@ namespace vin{
 
    extern void check_for_valid_unit_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
 
-   extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
+   extern void check_for_valid_three_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
+
+   extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
+                                      double range_min, double range_max, std::string input_file_type, std::string range_text);
 
    extern std::vector<double> DoublesFromString(std::string value);
+
+   // function to read file on master process and return a std::string of its contents
+   extern std::string get_string(std::string const filename, std::string source_file_name, int line);
+
+   extern std::vector<mp::materials_t> read_material;
+
 }
 
 namespace vout{
@@ -101,23 +104,6 @@ namespace vout{
 
    extern bool gnuplot_array_format;
 
-	extern bool output_atoms_config;
-	extern int output_atoms_config_rate;
-
-	extern double atoms_output_min[3];
-	extern double atoms_output_max[3];
-
-	extern double field_output_min_1;
-	extern double field_output_max_1;
-	extern double field_output_min_2;
-	extern double field_output_max_2;
-
-	extern bool output_cells_config;
-	extern int output_cells_config_rate;
-
-	extern bool output_grains_config;
-	extern int output_config_grain_rate;
-
 	//extern bool output_povray;
 	//extern int output_povray_rate;
 
@@ -125,7 +111,6 @@ namespace vout{
 	//extern int output_povray_cells_rate;
 
 	extern void data();
-	extern void config();
 	extern void zLogTsInit(std::string);
 
 	//extern int pov_file();

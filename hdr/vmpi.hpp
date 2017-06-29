@@ -44,10 +44,20 @@ namespace vmpi{
 	extern int my_rank; 					///< Local CPU ID
 	extern int num_processors;			///< Total number of CPUs
 	extern int mpi_mode; 				///< MPI Simulation Mode (0 = Geometric Decomposition, 1 = Replicated Data, 2 = Statistical Parallelism)
-	extern int ppn;						///< Processors per node
+   extern unsigned int ppn;			///< Processors per node
 	extern int num_core_atoms;			///< Number of atoms on local CPU with no external communication
 	extern int num_bdry_atoms;			///< Number of atoms on local CPU with external communication
 	extern int num_halo_atoms;			///< Number of atoms on remote CPUs needed for boundary atom integration
+
+	extern int num_io_processors;		///< Total number of CPUs that perform IO
+	extern int size_io_group;			///< Size of io mpi groups
+	extern int my_io_rank;				///< Local CPU IO Comm Group Rank
+	extern int my_io_group;				///< Local CPU IO Comm Group Rank
+	extern int io_processor;			///< The group rank of processor who performs IO
+#ifdef MPICF
+	extern MPI_Comm io_comm;			///< MPI Communicator for IO
+#endif
+
 
 	extern bool replicated_data_staged; ///< Flag for staged system generation
 
@@ -81,21 +91,25 @@ namespace vmpi{
 	extern std::vector<double> recv_spin_data_array;
 
 	#ifdef MPICF
-		extern std::vector<MPI::Request> requests;
-		extern std::vector<MPI::Status> stati;
+		extern std::vector<MPI_Request> requests;
+		extern std::vector<MPI_Status> stati;
 	#endif
 
 	//functions declarations
-	extern int initialise();
+	extern int initialise(int argc, char *argv[]);
 	extern int hosts();
 	extern int finalise();
-	extern int geometric_decomposition(int, double []);
+   extern void geometric_decomposition(int, double []);
 	extern int crystal_xyz(std::vector<cs::catom_t> &);
 	extern int copy_halo_atoms(std::vector<cs::catom_t> &);
 	extern int set_replicated_data(std::vector<cs::catom_t> &);
 	extern int identify_boundary_atoms(std::vector<cs::catom_t> &, std::vector<std::vector <cs::neighbour_t> > &);
 	extern int init_mpi_comms(std::vector<cs::catom_t> & catom_array);
 	extern double SwapTimer(double, double&);
+
+   // functions for sending/receiving halo data
+   extern void mpi_init_halo_swap();
+   extern void mpi_complete_halo_swap();
 
 	// wrapper functions avoiding MPI library
 	extern void barrier();

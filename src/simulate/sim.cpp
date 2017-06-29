@@ -40,21 +40,27 @@
 ///=====================================================================================
 ///
 
+// Standard Libraries
+#include <iostream>
+
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
-#include "demag.hpp"
+#include "cells.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "vutil.hpp"
 
-// Standard Libraries
-#include <iostream>
+// sim module headers
+#include "internal.hpp"
 
 namespace sim{
 	std::ofstream mag_file;
@@ -125,7 +131,7 @@ namespace sim{
 	double cooling_time=100.0e-12; ///seconds
 	int cooling_function_flag=0; /// 0 = exp, 1 = gaussian
 	pump_functions_t pump_function=two_temperature;
-	double pump_power=4.e21;
+	double pump_power=20.0; // mJ/cm^2;
 	double pump_time=50.0e-15;
 	double double_pump_power=20.0; // mJ/cm^2;
 	double double_pump_Tmax=500.0;
@@ -204,8 +210,16 @@ namespace sim{
 
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-		if(sim::hamiltonian_simulation_flags[4]==1) demag::update();
+
+      // Update dipole fields
+		dipole::calculate_field(sim::time);
+
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
+      st::update_spin_torque_fields(atoms::x_spin_array,
+                                  atoms::y_spin_array,
+                                  atoms::z_spin_array,
+                                  atoms::type_array,
+                                  mp::mu_s_array);
 	}
 
 /// @brief Function to run one a single program
@@ -236,25 +250,6 @@ int run(){
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
 
-	// For MPI version, calculate initialisation time
-	if(vmpi::my_rank==0){
-		#ifdef MPICF
-			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
-			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
-			vmpi::start_time=MPI_Wtime(); // reset timer
-		#endif
-		std::cout << "Starting Simulation with Program ";
-		zlog << zTs() << "Starting Simulation with Program ";
-	}
-
-	// Now set initial compute time
-	#ifdef MPICF
-	vmpi::ComputeTime=MPI_Wtime();
-	vmpi::WaitTime=MPI_Wtime();
-	vmpi::TotalComputeTime=0.0;
-	vmpi::TotalWaitTime=0.0;
-	#endif
-
 	// Initialise random number generator
 	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
 
@@ -275,8 +270,56 @@ int run(){
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
 
+   // initialise dipole field calculation
+   dipole::initialize(cells::num_atoms_in_unit_cell,
+                     cells::num_cells,
+                     cells::num_local_cells,
+                     cells::macro_cell_size,
+                     cells::local_cell_array,
+                     cells::num_atoms_in_cell,
+                     cells::num_atoms_in_cell_global, // <----
+                     cells::index_atoms_array,
+                     cells::volume_array,
+                     cells::pos_and_mom_array,
+                     cells::atom_in_cell_coords_array_x,
+                     cells::atom_in_cell_coords_array_y,
+                     cells::atom_in_cell_coords_array_z,
+                     atoms::type_array,
+                     cells::atom_cell_id_array,
+                     atoms::x_coord_array,
+                     atoms::y_coord_array,
+                     atoms::z_coord_array,
+                     atoms::num_atoms
+   );
+
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
+
+   // For MPI version, calculate initialisation time
+	if(vmpi::my_rank==0){
+		#ifdef MPICF
+			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
+			zlog << zTs() << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
+			vmpi::start_time=MPI_Wtime(); // reset timer
+		#endif
+   }
+
+   // Precondition spins at equilibration temperature
+   sim::internal::monte_carlo_preconditioning();
+
+   // For MPI version, calculate initialisation time
+   if(vmpi::my_rank==0){
+		std::cout << "Starting Simulation with Program ";
+		zlog << zTs() << "Starting Simulation with Program ";
+	}
+
+	// Now set initial compute time
+	#ifdef MPICF
+	vmpi::ComputeTime=MPI_Wtime();
+	vmpi::WaitTime=MPI_Wtime();
+	vmpi::TotalComputeTime=0.0;
+	vmpi::TotalWaitTime=0.0;
+	#endif
 
 	// Select program to run
 	switch(sim::program){
@@ -415,6 +458,14 @@ int run(){
 			}
 			program::boltzmann_dist();
 			break;
+
+	    case 51:
+		  	if(vmpi::my_rank==0){
+		       std::cout << "Setting..." << std::endl;
+		       zlog << "Setting..." << std::endl;
+	     	}
+		  	program::setting_process();
+		    break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;

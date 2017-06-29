@@ -33,6 +33,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
+#include "stdlib.h"
+#include <algorithm> 
 
 // Forward declaration of functions
 void process_command_line(int argc, char* argv[], std::string& namespace_name, std::string& author, std::string& email);

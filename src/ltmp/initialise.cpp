@@ -120,7 +120,6 @@ void initialise(const double system_dimensions_x,
 
    // Set cell and stack counters
    int cell=0;
-   int stack=0;
 
    // allocate temporary array for neighbour list calculation
    std::vector<uvec> cell_list;

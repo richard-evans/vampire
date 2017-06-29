@@ -4,39 +4,47 @@
 #
 #===================================================================
 
+# Specify compiler for MPI compilation with openmpi
+export OMPI_CXX=g++ -std=c++0x
 
-
-export OMPI_CXX=g++
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
+# Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
-export MPICH_CXX=bgxlc++
+#export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -DCOMP='"GNU C++ Compiler"'
+GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
 
+CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
+CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
+
 export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=-lstdc++
+LIBS=
+#-lstdc++
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
-GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++98 -Wno-long-long -I./hdr -I./src/qvoronoi
-GCC_DBLFLAGS= -lstdc++ -fbounds-check -I./hdr -I./src/qvoronoi
+GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi
+GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi
 
 PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
 PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
 
 IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
+
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi
 
 # Performance Flags
 ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
@@ -47,37 +55,32 @@ ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
 LLVM_CFLAGS= -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
 LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
-GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi
-GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
+GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++0x
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -std=c++0x
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA  --ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
+NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA
+--ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
 NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 
+CRAY_CFLAGS= -O3 -hfp3 -I./hdr -I./src/qvoronoi
+CRAY_LDFLAGS= -I./hdr -I./src/qvoronoi
 
 # Objects
 OBJECTS= \
-obj/create/create_system2.o \
-obj/create/cs_create_crystal_structure2.o \
-obj/create/cs_create_system_type2.o \
-obj/create/cs_create_neighbour_list2.o \
-obj/create/cs_particle_shapes.o \
-obj/create/cs_set_atom_vars2.o \
-obj/create/cs_voronoi2.o \
-obj/create/multilayers.o \
 obj/data/atoms.o \
 obj/data/category.o \
-obj/data/cells.o \
 obj/data/grains.o \
 obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
+obj/mpi/decomposition.o \
 obj/mpi/LLGHeun-mpi.o \
 obj/mpi/LLGMidpoint-mpi.o \
 obj/mpi/mpi_generic.o \
@@ -96,6 +99,7 @@ obj/program/lagrange.o \
 obj/program/LLB_Boltzmann.o \
 obj/program/partial_hysteresis.o \
 obj/program/static_hysteresis.o \
+obj/program/setting.o \
 obj/program/time_series.o \
 obj/program/temperature_pulse.o \
 obj/program/localised_temperature_pulse.o \
@@ -105,7 +109,6 @@ obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
 obj/simulate/fields.o \
-obj/simulate/demag.o \
 obj/simulate/LLB.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
@@ -115,6 +118,14 @@ obj/simulate/cmc.o \
 obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
+obj/spintorque/data.o \
+obj/spintorque/field.o \
+obj/spintorque/initialise.o \
+obj/spintorque/interface.o \
+obj/spintorque/magnetization.o \
+obj/spintorque/matrix.o \
+obj/spintorque/output.o \
+obj/spintorque/spinaccumulation.o \
 obj/statistics/data.o \
 obj/statistics/initialize.o \
 obj/statistics/magnetization.o \
@@ -124,8 +135,6 @@ obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
 obj/utility/units.o \
-obj/utility/vconfig.o \
-obj/utility/vio.o \
 obj/utility/vmath.o\
 obj/qvoronoi/geom.o\
 obj/qvoronoi/geom2.o\
@@ -146,12 +155,20 @@ obj/qvoronoi/usermem.o\
 obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
+#obj/utility/vio.o \
+
+
 # Include supplementary makefiles
 include src/anisotropy/makefile
 include src/create/makefile
+include src/config/makefile
+include src/cells/makefile
+include src/dipole/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
+include src/unitcell/makefile
+include src/vio/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)
@@ -160,21 +177,26 @@ ICCDB_OBJECTS=$(OBJECTS:.o=_idb.o)
 GCCDB_OBJECTS=$(OBJECTS:.o=_gdb.o)
 PCCDB_OBJECTS=$(OBJECTS:.o=_pdb.o)
 IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb.o)
+LLVMDB_OBJECTS=$(OBJECTS:.o=_llvmdb.o)
 
 MPI_OBJECTS=$(OBJECTS:.o=_mpi.o)
 MPI_ICC_OBJECTS=$(OBJECTS:.o=_i_mpi.o)
 MPI_LLVM_OBJECTS=$(OBJECTS:.o=_llvm_mpi.o)
 MPI_PCC_OBJECTS=$(OBJECTS:.o=_p_mpi.o)
 MPI_IBM_OBJECTS=$(OBJECTS:.o=_ibm_mpi.o)
+MPI_CRAY_OBJECTS=$(OBJECTS:.o=_cray_mpi.o)
 MPI_ICCDB_OBJECTS=$(OBJECTS:.o=_idb_mpi.o)
 MPI_GCCDB_OBJECTS=$(OBJECTS:.o=_gdb_mpi.o)
 MPI_PCCDB_OBJECTS=$(OBJECTS:.o=_pdb_mpi.o)
 MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
+MPI_CRAYDB_OBJECTS=$(OBJECTS:.o=_craydb_mpi.o)
+MPI_ARCHER_OBJECTS=$(OBJECTS:.o=_archer_mpi.o)
 
 CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
-EXECUTABLE=vampire
+EXECUTABLE=vampire-serial
+PEXECUTABLE=vampire-parallel
 
-all: $(OBJECTS) serial
+all: $(OBJECTS) serial parallel vdc
 
 # Serial Targets
 serial: $(OBJECTS)
@@ -202,10 +224,16 @@ $(IBM_OBJECTS): obj/%_ibm.o: src/%.cpp
 	$(IBM) -c -o $@ $(IBM_CFLAGS) $<
 
 serial-debug: $(GCCDB_OBJECTS)
-	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)-debug
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
+
+serial-llvm-debug: $(LLVMDB_OBJECTS)
+	$(LLVM) $(LLVM_DBLFLAGS) $(LIBS) $(LLVMDB_OBJECTS) -o $(EXECUTABLE)
+
+$(LLVMDB_OBJECTS): obj/%_llvmdb.o: src/%.cpp
+	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $<
 
 intel-debug: $(ICCDB_OBJECTS)
 	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)
@@ -228,45 +256,60 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(PEXECUTABLE)
 #export OMPI_CXX=icc
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
 
 parallel-intel: $(MPI_ICC_OBJECTS)
-	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<
+	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<intel: $(MPI_ICC_OBJECTS)
+
+parallel-cray: $(MPI_CRAY_OBJECTS)
+	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(PEXECUTABLE)
+$(MPI_CRAY_OBJECTS): obj/%_cray_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(CRAY_CFLAGS) $<
+
+parallel-archer: $(MPI_ARCHER_OBJECTS)
+	CC -DMPICF $(GCC_LDFLAGS) $(LIBS) $(MPI_ARCHER_OBJECTS) -o $(PEXECUTABLE)
+$(MPI_ARCHER_OBJECTS): obj/%_archer_mpi.o: src/%.cpp
+	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $<
 
 parallel-llvm: $(MPI_LLVM_OBJECTS)
-	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_LLVM_OBJECTS): obj/%_llvm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(LLVM_CFLAGS) $<
 
 parallel-pathscale: $(MPI_PCC_OBJECTS)
-	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_PCC_OBJECTS): obj/%_p_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_CFLAGS) $<
 
 parallel-ibm: $(MPI_IBM_OBJECTS)
-	$(MPICC) $(IBM_LDFLAGS) $(MPI_IBM_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(IBM_LDFLAGS) $(MPI_IBM_OBJECTS) -o $(PEXECUTABLE)
 $(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
 
 parallel-debug: $(MPI_GCCDB_OBJECTS)
-	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(PEXECUTABLE)-debug
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<
 
 parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
-	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(PEXECUTABLE)
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
 
+parallel-cray-debug: $(MPI_CRAY_OBJECTS)
+	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(PEXECUTABLE)
+$(MPI_CRAYDB_OBJECTS): obj/%_craydb_mpi.o: src/%.cpp
+	$(MPICC) -c -o $@ $(CCC_CFLAGS) $<
+
 parallel-pathscale-debug: $(MPI_PCCDB_OBJECTS)
-	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(EXECUTABLE)
+	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(PEXECUTABLE)
 
 $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
@@ -295,3 +338,23 @@ tidy:
 	@rm -f hdr/*~
 	@rm -f src/*~
 	@rm -f src/*/*~
+
+vdc:
+	$(MAKE) -B -C util/vdc/
+
+install:
+	echo "Preparing installation package"
+	rm -rf vampire.pkg
+	mkdir vampire.pkg
+	mkdir vampire.pkg/bin
+	cp vampire-* vampire.pkg/bin/
+	cp util/vdc/vdc vampire.pkg/bin/
+	mkdir vampire.pkg/examples
+	cp input vampire.pkg/examples/
+	cp Co.mat vampire.pkg/examples/
+	sudo mv -f vampire.pkg /opt/vampire
+	sudo echo "/opt/vampire/bin" > /etc/paths.d/vampire_path
+
+uninstall:
+	rm -rf /opt/vampire
+	rm -f /etc/paths.d/vampire_path

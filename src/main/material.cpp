@@ -52,8 +52,6 @@ materials_t::materials_t ():
 	Ks(0.0),
 	gamma_rel(1.0),
 	random_spins(false),
-	min(0.0),
-	max(1.0),
 	geometry(0),
 	core_shell_size(1.0),
 	interface_roughness(0.0),
@@ -78,7 +76,7 @@ materials_t::materials_t ():
    fill(false),
    temperature_rescaling_alpha(1.0),
 	temperature_rescaling_Tc(0.0),
-	non_magnetic(false),
+	non_magnetic(0),
 	random_anisotropy(false),
 	random_grain_anisotropy(false)
 	{
@@ -90,9 +88,11 @@ materials_t::materials_t ():
 		geometry_coords[i][1]=0.0;
 	}
 	// array variables
-	for(int i=0;i<mp::max_materials;i++){
-		Jij_matrix_SI[i]=0.0;
-		Jij_matrix[i]=0.0;
+   Jij_matrix_SI.resize(mp::max_materials);
+   Jij_matrix.resize(mp::max_materials);
+   for(int i=0; i<mp::max_materials; i++){
+      Jij_matrix_SI[i].resize(3,0.0);
+      Jij_matrix[i].resize(3,0.0);
 		intermixing[i]=0.0;
 		alloy[i]=0.0;
 	}
@@ -121,8 +121,7 @@ int materials_t::print(){
 	std::cout << "----------------------------------------------------------------" << std::endl;
 	std::cout << "alpha          = " << alpha << std::endl;
 	for(int j=0;j<num_materials;j++){
-		//std::cout << " Jij_matrix_SI = " << material[i].Jij_matrix_SI[j] << "\t" << j << std::endl;
-		std::cout << " Jij_matrix_SI[" << j << "] = " << Jij_matrix_SI[j] << std::endl;
+      std::cout << " Jij_matrix_SI[" << j << "] = " << Jij_matrix_SI[j][0] << std::endl;
 	}
 	std::cout << "mu_s_SI        = " << mu_s_SI << std::endl;
 	std::cout << "Ku1_SI          = " << Ku1_SI << std::endl;
