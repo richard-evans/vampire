@@ -159,6 +159,7 @@ obj/qvoronoi/userprintf_rbox.o\
 
 
 # Include supplementary makefiles
+include src/anisotropy/makefile
 include src/create/makefile
 include src/config/makefile
 include src/cells/makefile
