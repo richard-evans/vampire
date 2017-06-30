@@ -44,6 +44,7 @@
 #include <iostream>
 
 // Vampire Header files
+#include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "program.hpp"
 #include "cells.hpp"
@@ -151,23 +152,7 @@ namespace sim{
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; /// 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC
 	int program=0;
-	int AnisotropyType=2; /// Controls scalar (0) or tensor(1) anisotropy (off(2))
 
-	bool surface_anisotropy=false; /// flag to enable surface anisotropy
-	bool identify_surface_atoms=false; /// flag to idenify surface atoms in config coordinate file
-	unsigned int surface_anisotropy_threshold=123456789; /// global threshold for surface atoms
-	bool NativeSurfaceAnisotropyThreshold=false; /// enables site-dependent surface threshold
-   double nearest_neighbour_distance=1.e9; /// Control surface anisotropy nearest neighbour distance
-
-	// Anisotropy control booleans
-	bool UniaxialScalarAnisotropy=false; /// Enables scalar uniaxial anisotropy
-	bool TensorAnisotropy=false; /// Overrides scalar uniaxial anisotropy
-	bool second_order_uniaxial_anisotropy=false; /// Enables second order uniaxial anisotropy
-   bool sixth_order_uniaxial_anisotropy=false; /// Enables sixth order uniaxial anisotropy
-   bool spherical_harmonics=false; // Enables calculation of higher order anistropy with spherical harmonics
-	bool CubicScalarAnisotropy=false; /// Enables scalar cubic anisotropy
-   bool lattice_anisotropy_flag=false; /// Enables lattice anisotropy
-  	bool random_anisotropy = false; // Enables random anisotropy calculation
 
 	bool local_temperature=false; /// flag to enable material specific temperature
 	bool local_applied_field=false; /// flag to enable material specific applied field
@@ -249,6 +234,8 @@ int run(){
 
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
+
+   anisotropy::initialize(atoms::num_atoms, atoms::type_array, mp::mu_s_array);
 
 	// Initialise random number generator
 	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);

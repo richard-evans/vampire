@@ -30,26 +30,27 @@ namespace anisotropy{
       // Shared variables inside anisotropy module
       //------------------------------------------------------------------------
 
-      bool initialised = false;
+      std::vector<internal::mp_t> mp; // array of material properties
 
-      bool uniaxial_first_order = false;
-      bool neel = false;
+      bool initialised = false; // variable to determine if module has been initialised
 
-      bool uniaxial_second_order = false;
+      bool enable_second_order_tensor = false; // Flag to enable calculation of second order tensor anisotropy
+      bool enable_fourth_order_tensor = false; // Flag to enable calculation of second order tensor anisotropy
+      bool enable_sixth_order_tensor  = false; // Flag to enable calculation of second order tensor anisotropy
 
-      std::vector<double> field_array;
+      bool enable_neel_anisotropy     = false; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
+      bool enable_lattice_anisotropy  = false; // Flag to turn on lattice anisotropy calculation
+      bool enable_random_anisotropy   = false; // Flag to enable random anisitropy initialisation
 
-      int num_atoms;
-      std::vector<int> atom_type_array;
-      std::vector<zkval_t> materialscalaranisotropyarray;
+      // arrays for storing 1D collapsed tensors
+      std::vector<double> second_order_tensor(0);
+      std::vector<double> fourth_order_tensor(0);
+      std::vector<double> sixth_order_tensor(0);
 
-      std::vector<double> spin_array_x;
-      std::vector<double> spin_array_y;
-      std::vector<double> spin_array_z;
-
-      std::vector<std::vector<std::vector<double> > > second_order_tensor;
-      std::vector<std::vector<std::vector<std::vector<double> > > > third_order_tensor;
-      std::vector<std::vector<std::vector<std::vector<std::vector<double> > > > > fourth_order_tensor;
+   	//bool identify_surface_atoms = false; // flag to identify surface atoms in config coordinate file
+      bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
+   	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
+      double nearest_neighbour_distance      = 1.e9; // Control surface anisotropy nearest neighbour distance
 
    } // end of internal namespace
 

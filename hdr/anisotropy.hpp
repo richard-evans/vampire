@@ -27,31 +27,29 @@
 namespace anisotropy
 {
    //-----------------------------------------------------------------------------
-   // function to initialise anisotropy module
+   // function to initialize anisotropy module
    //-----------------------------------------------------------------------------
-   void initialise(
-      const int num_atoms,
-      std::vector<int>& atom_type_array,
-      std::vector<zkval_t>& materialscalaranisotropyarray,
-      std::vector<double>& atom_coords_x,
-      std::vector<double>& atom_coords_y,
-      std::vector<double>& atom_coords_z,
-      std::vector<double>& spin_array_x,
-      std::vector<double>& spin_array_y,
-      std::vector<double>& spin_array_z);
+   void initialize(const unsigned int num_atoms,
+                   std::vector<int>& atom_type_array,
+                   std::vector<double>& mu_s_array);
 
-      int calculate_fields();
+   void field(std::vector<double>& spin_array_x,
+              std::vector<double>& spin_array_y,
+              std::vector<double>& spin_array_z,
+              std::vector<double>& field_array_x,
+              std::vector<double>& field_array_y,
+              std::vector<double>& field_array_z);
 
-      //---------------------------------------------------------------------------
-      // Function to process input file parameters for anisotropy module
-      //---------------------------------------------------------------------------
-      bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+   //---------------------------------------------------------------------------
+   // Function to process input file parameters for anisotropy module
+   //---------------------------------------------------------------------------
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
 
-      //---------------------------------------------------------------------------
-      // Function to process material parameters
-      //---------------------------------------------------------------------------
-      bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+   //---------------------------------------------------------------------------
+   // Function to process material parameters
+   //---------------------------------------------------------------------------
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index, const int max_materials);
 
-   } // end of anisotropy namespace
+} // end of anisotropy namespace
 
-   #endif //ANISOTROPY_H_
+#endif //ANISOTROPY_H_

@@ -60,34 +60,6 @@ class zkten_t{
 	};
 };
 
-//--------------------------------------------------------------------
-// Class to contain parameters for lattice anisotropy calculation.
-//
-// Tabulated values are read from a file and added point-wise to
-// the class. During variable initialisation interpolating functions
-// are determined to calculate k(T)
-//
-class lattice_anis_t{
-
-   private:
-
-      unsigned int Tmax; // maximum array value in tabulated function
-      double k_Tmax; // value of anisotropy at k_Tmax (used for all T > Tmax)
-
-      std::vector<unsigned int> T; // input temperature points
-      std::vector<double> k; // input lattice anisotropy points
-      std::vector<double> m; // calculated m value
-      std::vector<double> c; // calculated c value
-
-   public:
-
-      void add_point(double, double);
-      void set_interpolation_table();
-      double get_lattice_anisotropy_constant(double);
-      void output_interpolated_function(int);
-
-};
-
 namespace mp
 {
 using std::string;
@@ -108,25 +80,6 @@ using std::string;
 		double alpha;
 		double mu_s_SI;
 		double magnetisation;
-		double Ku1_SI; /// SI uniaxial anisotropy constant
-		double Ku2_SI;
-      double Ku3_SI;
-      double Klatt_SI;
-		std::vector<double> KuVec_SI; /// SI anisotropy tensor
-		double Ku; /// normalised uniaxial anisotropy constant
-      double Ku2; /// normalised uniaxial anisotropy constant
-      double Ku3; /// normalised uniaxial anisotropy constant
-      double sh2; // second order spherical harmonic anisotropy constant
-      double sh4; // fourth order spherical harmonic anisotropy constant
-      double sh6; // sixth order spherical harmonic anisotropy constant
-      double Klatt; /// normalised lattice anisotropy
-      std::vector<double> KuVec; /// normalised anisotropy tensor
-		std::vector<double> UniaxialAnisotropyUnitVector; /// unit vector for material uniaxial anisotropy
-		double Kc1_SI;
-		double Kc2_SI;
-		double Kc;
-		double Ks_SI;
-		double Ks;
 
 		double gamma_rel;
 		std::vector<std::vector<double> >Jij_matrix_SI;
@@ -148,7 +101,6 @@ using std::string;
 
 		bool continuous;	///< Specifies if a material is continuous (overrides granularity in the layer)
 		bool moment_flag;	///< Specifies whether moment is set explicitly or from magnetisation
-		bool anis_flag;	///< Specifies whether anisotropy is set explicitly or as energy density
 
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
@@ -166,9 +118,6 @@ using std::string;
       double temperature_rescaling_alpha; // temperature rescaling exponent
       double temperature_rescaling_Tc; // temperaure rescaling Tc
       int non_magnetic;
-		bool random_anisotropy; // flag to control random anisotropy by material
-		bool random_grain_anisotropy; // flag to control random anisotropy by grain
-      lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
 
 		materials_t();
 		int print();

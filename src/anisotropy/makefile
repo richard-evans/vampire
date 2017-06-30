@@ -7,8 +7,8 @@ anisotropy_objects =\
 data.o \
 initialize.o \
 interface.o \
-secondorder.o \
-energy.o
+lattice_anisotropy.o \
+uniaxial_second_order.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/anisotropy/,$(anisotropy_objects))

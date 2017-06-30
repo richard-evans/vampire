@@ -215,7 +215,7 @@ bool match_material(string const word, string const value, string const unit, in
       test="initial-mag-direction";
       if(word==test){
       std::vector<double> u(3);
-      u=vin::DoublesFromString(value);
+      u=vin::doubles_from_string(value);
       vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
       st::internal::initial_m[0]=u.at(0);
       st::internal::initial_m[1]=u.at(1);
