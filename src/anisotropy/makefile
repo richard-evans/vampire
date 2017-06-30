@@ -5,6 +5,7 @@
 # List module object filenames
 anisotropy_objects =\
 data.o \
+fields.o \
 initialize.o \
 interface.o \
 lattice_anisotropy.o \

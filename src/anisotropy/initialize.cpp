@@ -15,10 +15,10 @@
 
 // Vampire headers
 #include "anisotropy.hpp"
-#include "atoms.hpp"
+//#include "atoms.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
-#include "material.hpp"
+//#include "material.hpp"
 
 // anisotropy module headers
 #include "internal.hpp"
@@ -28,138 +28,43 @@ namespace anisotropy{
    //----------------------------------------------------------------------------
    // function to initialize anisotropy module
    //----------------------------------------------------------------------------
-   void initialize (
-      const int num_atoms,
-      std::vector<int>& atom_type_array,
-      std::vector<zkval_t>& materialscalaranisotropyarray,
-      std::vector<double>& atom_coords_x,
-      std::vector<double>& atom_coords_y,
-      std::vector<double>& atom_coords_z,
-      std::vector<double>& spin_array_x,
-      std::vector<double>& spin_array_y,
-      std::vector<double>& spin_array_z)
-      {
-         /* output informative message */
-         zlog << zTs() << "Initialising data structures for anisotropy calculation." << std::endl;
+   void initialize (const unsigned int   num_atoms, // number of atoms
+                    std::vector<int>&    atom_material_array, // atoms::atom_type_array
+                    std::vector<double>& mu_s_array // array of magnetic moments
+                   ){
 
-         /* check for prior initialisation */
-         if (internal::initialised)
-         {
-            zlog << zTs() << "Warning: Anisotropy calculation already initialised. Continuing." << std::endl;
-            return;
-         }
+      /* output informative message */
+      zlog << zTs() << "Initialising data structures for anisotropy calculation." << std::endl;
 
-         /* internalise variables */
-         internal::num_atoms = num_atoms;
-         internal::atom_type_array = atom_type_array;
-         internal::materialscalaranisotropyarray = materialscalaranisotropyarray;
-
-         internal::field_array.resize(atoms::num_atoms);
-
-         /*
-         * initialise tensors
-         */
-
-         /* resize tensors and initialise to zero */
-         internal::second_order_tensor.resize(atoms::num_atoms);
-         internal::third_order_tensor.resize(atoms::num_atoms);
-         for (int atom = 0; atom < atoms::num_atoms; ++atom)
-         {
-            internal::second_order_tensor.at(atom).resize(3);
-            internal::third_order_tensor.at(atom).resize(3);
-
-            for (int i = 0; i < 3; ++i)
-            {
-               internal::second_order_tensor.at(atom).at(i).resize(3);
-               internal::third_order_tensor.at(atom).at(i).resize(3);
-
-               for (int j = 0; j < 3; ++j)
-               {
-                  internal::second_order_tensor.at(atom).at(i).at(j) = 0;
-                  internal::third_order_tensor.at(atom).at(i).at(j).resize(3);
-
-                  for (int k = 0; k < 3; ++k)
-                  internal::third_order_tensor.at(atom).at(i).at(j).at(k) = 0;
-               }
-            }
-         }
-
-         /*
-         * populate second order tensor
-         */
-
-         if (internal::uniaxial_first_order)
-         {
-            for (int atom=0; atom<atoms::num_atoms; ++atom)
-            {
-               int mat = atoms::type_array.at(atom);
-               double Ku = mp::material.at(mat).Ku;
-
-               double e[3];
-               e[0] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
-               e[1] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
-               e[2] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
-
-               for (int i = 0; i < 3; ++i)
-               for (int j = 0; j < 3; ++j)
-               internal::second_order_tensor.at(atom).at(i).at(j) += e[i] * e[j] * Ku;
-            }
-         }
-
-         if (internal::neel)
-         {
-            for (int atom = 0; atom < atoms::num_atoms; atom++)
-            {
-               int mat = atoms::type_array.at(atom);
-               int start = atoms::nearest_neighbour_list_si.at(atom);
-               int end = atoms::nearest_neighbour_list_ei.at(atom);
-
-               // surface constant: note factor 2 from differentiation
-               double Ks = 0.5 * 2.0 * mp::material.at(mat).Ks;
-
-               for (int n = start; n < end; ++n)
-               {
-                  double eij[3];
-                  eij[0] = atoms::eijx.at(n);
-                  eij[1] = atoms::eijy.at(n);
-                  eij[2] = atoms::eijz.at(n);
-
-                  for (int i = 0; i < 3; ++i)
-                  for (int j = 0; j < 3; ++j)
-                  internal::second_order_tensor.at(atom).at(i).at(j)
-                  += eij[i] * eij[j] * Ks;
-               }
-
-            }
-         }
-
-         /*
-         * populate third order tensor
-         */
-
-         if (internal::uniaxial_second_order)
-         {
-            for (int atom = 0; atom < atoms::num_atoms; atom ++)
-            {
-               int mat = atoms::type_array.at(atom);
-               double Ku2 = 4.0*mp::material_second_order_anisotropy_constant_array.at(mat);
-
-               double e[3];
-               e[0] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(0);
-               e[1] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(1);
-               e[2] = mp::material.at(mat).UniaxialAnisotropyUnitVector.at(2);
-
-               for (int i = 0; i < 3; ++i)
-               for (int j = 0; j < 3; ++j)
-               for (int k = 0; k < 3; ++k)
-               internal::third_order_tensor.at(atom).at(i).at(j).at(k)
-               += e[i] * e[j] * e[k] * Ku2;
-            }
-         }
-
-         internal::initialised = true;
-
+      /* check for prior initialisation */
+      if (internal::initialised){
+         zlog << zTs() << "Warning: Anisotropy calculation already initialised. Continuing." << std::endl;
          return;
       }
 
-   } // end of anisotropy namespace
+      // Initialise tensor variables for each atom
+      if(internal::enable_second_order_tensor) internal::second_order_tensor.resize( 9 * num_atoms, 0.0 );
+      if(internal::enable_fourth_order_tensor) internal::fourth_order_tensor.resize( 9 * num_atoms, 0.0 );
+      if(internal::enable_sixth_order_tensor)  internal::sixth_order_tensor.resize ( 9 * num_atoms, 0.0 );
+
+      // Unroll inverse mu_S array for materials to convert Joules to Tesla
+      const double mu_B = 9.27400915e-24; // Bohr magneton
+      std::vector <double> inverse_mu_s(mu_s_array.size()); // array storing inverse spin moment in J/T
+      for(int m = 0; m < mu_s_array.size(); m++) inverse_mu_s[m] = 1.0 / ( mu_s_array[m] * mu_B );
+
+      //---------------------------------------------------------------------
+      // Populate second order tensor
+      //---------------------------------------------------------------------
+      if (internal::enable_second_order_tensor){
+
+         // Add uniaxial second order anisotropy (Ku1)
+         internal::uniaxial_second_order(num_atoms, atom_material_array, inverse_mu_s);
+
+      }
+
+      internal::initialised = true;
+
+      return;
+   }
+
+} // end of anisotropy namespace

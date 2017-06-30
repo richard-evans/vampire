@@ -31,6 +31,7 @@
 //									Version 1.0 R Evans 20/10/2008
 //
 //====================================================================================================
+#include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -55,19 +56,11 @@
 //========================
 
 int calculate_exchange_fields(const int,const int);
-int calculate_anisotropy_fields(const int,const int);
-void calculate_second_order_uniaxial_anisotropy_fields(const int,const int);
-void calculate_sixth_order_uniaxial_anisotropy_fields(const int,const int);
-void calculate_spherical_harmonic_fields(const int,const int);
-void calculate_random_spherical_harmonic_fields(const int,const int);
-void calculate_lattice_anisotropy_fields(const int, const int);
-int calculate_cubic_anisotropy_fields(const int,const int);
 int calculate_applied_fields(const int,const int);
 int calculate_thermal_fields(const int,const int);
 int calculate_dipolar_fields(const int,const int);
 void calculate_hamr_fields(const int,const int);
 void calculate_fmr_fields(const int,const int);
-void calculate_surface_anisotropy_fields(const int,const int);
 void calculate_lagrange_fields(const int,const int);
 void calculate_full_spin_fields(const int start_index,const int end_index);
 
@@ -89,16 +82,11 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	// Exchange Fields
 	if(sim::hamiltonian_simulation_flags[0]==1) calculate_exchange_fields(start_index,end_index);
 
-	// Anisotropy Fields
-	if(sim::UniaxialScalarAnisotropy || sim::TensorAnisotropy) calculate_anisotropy_fields(start_index,end_index);
-   if(sim::second_order_uniaxial_anisotropy) calculate_second_order_uniaxial_anisotropy_fields(start_index,end_index);
-   if(sim::sixth_order_uniaxial_anisotropy) calculate_sixth_order_uniaxial_anisotropy_fields(start_index,end_index);
-   if(sim::spherical_harmonics && sim::random_anisotropy==false) calculate_spherical_harmonic_fields(start_index,end_index);
-   if(sim::random_anisotropy && sim::spherical_harmonics) calculate_random_spherical_harmonic_fields(start_index,end_index);
-   if(sim::lattice_anisotropy_flag) calculate_lattice_anisotropy_fields(start_index,end_index);
-   if(sim::CubicScalarAnisotropy) calculate_cubic_anisotropy_fields(start_index,end_index);
-	//if(sim::hamiltonian_simulation_flags[1]==3) calculate_local_anis_fields();
-	if(sim::surface_anisotropy==true) calculate_surface_anisotropy_fields(start_index,end_index);
+   // calculate anistropy fields
+   anisotropy::fields(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+                      atoms::x_total_spin_field_array, atoms::y_total_spin_field_array, atoms::z_total_spin_field_array,
+                      start_index, end_index);
+
 	// Spin Dependent Extra Fields
 	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
 

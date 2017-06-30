@@ -33,12 +33,14 @@ namespace anisotropy
                    std::vector<int>& atom_type_array,
                    std::vector<double>& mu_s_array);
 
-   void field(std::vector<double>& spin_array_x,
-              std::vector<double>& spin_array_y,
-              std::vector<double>& spin_array_z,
-              std::vector<double>& field_array_x,
-              std::vector<double>& field_array_y,
-              std::vector<double>& field_array_z);
+   void fields(std::vector<double>& spin_array_x,
+               std::vector<double>& spin_array_y,
+               std::vector<double>& spin_array_z,
+               std::vector<double>& field_array_x,
+               std::vector<double>& field_array_y,
+               std::vector<double>& field_array_z,
+               const int start_index,
+               const int end_index);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for anisotropy module
