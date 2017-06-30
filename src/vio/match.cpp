@@ -1124,7 +1124,7 @@ namespace vin{
         test="applied-field-unit-vector";
         if(word==test){
             std::vector<double> u(3);
-            u=DoublesFromString(value);
+            u=doubles_from_string(value);
             check_for_valid_unit_vector(u, word, line, prefix, "input");
             sim::H_vec[0]=u.at(0);
             sim::H_vec[1]=u.at(1);
@@ -1136,7 +1136,7 @@ namespace vin{
         test="demagnetisation-factor";
         if(word==test){
             std::vector<double> u(3);
-            u=DoublesFromString(value);
+            u=doubles_from_string(value);
             vin::check_for_valid_three_vector(u, word, line, prefix, "input");
             // Extra check for demagnetisation-factor Nx+Ny+Nz=1
             double sum=u.at(0)+u.at(1)+u.at(2);
@@ -1383,7 +1383,7 @@ namespace vin{
         test="fmr-field-unit-vector";
         if(word==test){
             std::vector<double> u(3);
-            u=DoublesFromString(value);
+            u=doubles_from_string(value);
             check_for_valid_unit_vector(u, word, line, prefix, "input");
             sim::fmr_field_unit_vector = u;
             return EXIT_SUCCESS;
@@ -2267,7 +2267,7 @@ namespace vin{
                     std::vector<double> u(3);
 
                     // read values from string
-                    u=DoublesFromString(value);
+                    u=doubles_from_string(value);
 
                     // check for sane input and normalise if necessary
                     check_for_valid_unit_vector(u, word, line, prefix, "material");
@@ -2352,7 +2352,7 @@ namespace vin{
                     std::vector<double> u(3);
 
                     // read values from string
-                    u=DoublesFromString(value);
+                    u=doubles_from_string(value);
 
                     // check for sane input and normalise if necessary
                     check_for_valid_unit_vector(u, word, line, prefix, "material");
@@ -2775,7 +2775,7 @@ namespace vin{
                 std::vector<double> u(3);
 
                 // read values from string
-                u=DoublesFromString(value);
+                u=doubles_from_string(value);
 
                 // check size
                 if(u.size()!=3){
@@ -2868,7 +2868,7 @@ namespace vin{
                 std::vector<double> u(3);
 
                 // read values from string
-                u=DoublesFromString(value);
+                u=doubles_from_string(value);
 
                 // check size
                 if(u.size()!=3){

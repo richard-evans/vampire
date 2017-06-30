@@ -23,7 +23,7 @@
 
 namespace vin{
 	// Function to extract all variables from a string and return a vector
-	std::vector<double> DoublesFromString(std::string value){
+	std::vector<double> doubles_from_string(std::string value){
 
 		// array for storing variables
 		std::vector<double> array(0);

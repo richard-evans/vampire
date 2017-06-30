@@ -35,7 +35,7 @@ namespace sim{
       std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);
-         u=vin::DoublesFromString(value);
+         u=vin::doubles_from_string(value);
          // Test for valid range
          vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
          // save sanitized unit vector

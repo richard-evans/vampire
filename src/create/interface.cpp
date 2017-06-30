@@ -41,7 +41,7 @@ namespace create{
          }
          // otherwise require 3 numbers for 100,110 and 111 facet radii
          std::vector<double> u(3);
-         u=vin::DoublesFromString(value);
+         u=vin::doubles_from_string(value);
          vin::check_for_valid_three_vector(u, word, line, prefix, "input");
          // check for sensible values
          if(u.at(0) < 1.0 || u.at(0) > 1000.0){
@@ -181,7 +181,7 @@ namespace create{
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);
-         u=vin::DoublesFromString(value);
+         u=vin::doubles_from_string(value);
          // Test for valid range
          vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
          // save sanitized unit vector

@@ -175,7 +175,7 @@ namespace unitcell{
       std::string test="exchange-matrix";
       if(word==test){
          // extract comma separated values from string
-         std::vector<double> Jij = vin::DoublesFromString(value);
+         std::vector<double> Jij = vin::doubles_from_string(value);
          if(Jij.size() == 1){
             vin::check_for_valid_value(Jij[0], word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
             // set all components in case vectorial form is needed later
