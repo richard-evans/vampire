@@ -63,6 +63,7 @@ namespace anisotropy{
 
          const unsigned int index = 9*atom; // get atom index in tensor array
 
+         // Second order
          double hx = 2.0 * ( internal::second_order_tensor[index + 0] * sx +
                              internal::second_order_tensor[index + 1] * sy +
                              internal::second_order_tensor[index + 2] * sz );
@@ -74,6 +75,19 @@ namespace anisotropy{
          double hz = 2.0 * ( internal::second_order_tensor[index + 6] * sx +
                              internal::second_order_tensor[index + 7] * sy +
                              internal::second_order_tensor[index + 8] * sz );
+
+         // Fourth order
+         hx += 4.0 * ( sx * internal::fourth_order_tensor[index + 0] * sx * sx +
+                       sx * internal::fourth_order_tensor[index + 1] * sy * sy +
+                       sx * internal::fourth_order_tensor[index + 2] * sz * sz);
+
+         hy += 4.0 * ( sy * internal::fourth_order_tensor[index + 3] * sx * sx +
+                       sy * internal::fourth_order_tensor[index + 4] * sy * sy +
+                       sy * internal::fourth_order_tensor[index + 5] * sz * sz);
+
+         hz += 4.0 * ( sz * internal::fourth_order_tensor[index + 6] * sx * sx +
+                       sz * internal::fourth_order_tensor[index + 7] * sy * sy +
+                       sz * internal::fourth_order_tensor[index + 8] * sz * sz);
 
          // store net field
          field_array_x[atom] += hx;
