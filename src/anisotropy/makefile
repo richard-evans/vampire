@@ -5,6 +5,7 @@
 # List module object filenames
 anisotropy_objects =\
 data.o \
+energy.o \
 fields.o \
 initialize.o \
 interface.o \

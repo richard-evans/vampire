@@ -79,6 +79,34 @@ namespace anisotropy{
 
       }
 
+      //------------------------------------------------------
+      ///  Function to calculate lattice anisotropy energy
+      //
+      ///  (c) R F L Evans 2013
+      //
+      ///  Assume temperature dependent anisotropy constant:
+      ///
+      ///                   tanh((T-Ti)/Tw) - fmin
+      ///  kappa = Klatt * ------------------------
+      //                        fmax-fmin
+      //
+      ///  E = kappa * S_z^2
+      //
+      //------------------------------------------------------
+      double spin_lattice_anisotropy_energy(const int imaterial, const double sx, const double sy, const double sz, const double temperature){
+
+         // get lattice anisotropy constant at temperature
+         const double klatt = internal::mp[imaterial].k_lattice * internal::mp[imaterial].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
+
+         // calculate s . e
+         const double sdote = ( sx * internal::elattice_array[imaterial].x +
+                                sy * internal::elattice_array[imaterial].y +
+                                sz * internal::elattice_array[imaterial].z);
+
+         return klatt * ( sdote * sdote );
+
+      }
+
    } // end of internal namespace
 
 } // end of anisotropy namespace

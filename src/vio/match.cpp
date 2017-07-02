@@ -1613,34 +1613,6 @@ namespace vin{
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
-        test="cubic-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(31);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="mean-cubic-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(32);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="surface-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(33);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="mean-surface-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(34);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
         test="exchange-energy";
         if(word==test){
             output_list.push_back(35);
@@ -1679,20 +1651,6 @@ namespace vin{
         test="mean-magnetostatic-energy";
         if(word==test){
             output_list.push_back(40);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="second-order-uniaxial-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(41);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="mean-second-order-uniaxial-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(42);
             stats::calculate_energy=true;
             return EXIT_SUCCESS;
         }
@@ -2560,7 +2518,7 @@ namespace vin{
                 u.at(1)/=ULength;
                 u.at(2)/=ULength;
 
-                // Copy anisotropy direction to material
+                // Copy applied field direction to material
                 read_material[super_index].applied_field_unit_vector=u;
 
                 // set local applied field flag
@@ -2653,7 +2611,7 @@ namespace vin{
                 u.at(1)/=ULength;
                 u.at(2)/=ULength;
 
-                // Copy anisotropy direction to material
+                // Copy field direction to material
                 read_material[super_index].fmr_field_unit_vector=u;
 
                 // set local applied field flag

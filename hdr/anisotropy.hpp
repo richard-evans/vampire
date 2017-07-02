@@ -44,6 +44,8 @@ namespace anisotropy
                const int end_index,
                const double temperature);
 
+   double single_spin_energy(const int atom, const int imaterial, const double sx, const double sy, const double sz, const double temperature);
+
    //---------------------------------------------------------------------------
    // Function to process input file parameters for anisotropy module
    //---------------------------------------------------------------------------

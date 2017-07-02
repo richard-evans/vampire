@@ -52,6 +52,7 @@
 #include <iostream>
 
 // Vampire Header files
+#include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
@@ -303,19 +304,10 @@ double calculate_spin_energy(const int atom, const int AtomExchangeType){
 		case 2: energy+=spin_exchange_energy_tensor(atom, Sx, Sy, Sz); break;
 		default: zlog << zTs() << "Error. atoms::exchange_type has value " << AtomExchangeType << " which is outside of valid range 0-2. Exiting." << std::endl; err::vexit();
 	}
-	switch(sim::AnisotropyType){
-		case 0: energy+=spin_scalar_anisotropy_energy(imaterial, Sz); break;
-		case 1: energy+=spin_tensor_anisotropy_energy(imaterial, Sx, Sy, Sz); break;
-		case 2: ; break; // skip
-		default: zlog << zTs() << "Error. sim::AnisotropyType has value " << sim::AnisotropyType << " which is outside of valid range 0-1. Exiting." << std::endl; err::vexit();
-	}
-	if(second_order_uniaxial_anisotropy) energy+=spin_second_order_uniaxial_anisotropy_energy(imaterial, Sx, Sy, Sz);
-   if(sixth_order_uniaxial_anisotropy) energy+=spin_sixth_order_uniaxial_anisotropy_energy(imaterial, Sx, Sy, Sz);
-	if(sim::CubicScalarAnisotropy==true) energy+=spin_cubic_anisotropy_energy(imaterial, Sx, Sy, Sz);
-   if(sim::lattice_anisotropy_flag) energy+=spin_lattice_anisotropy_energy(imaterial, Sx, Sy, Sz);
-	if(sim::surface_anisotropy==true) energy+=spin_surface_anisotropy_energy(atom, imaterial, Sx, Sy, Sz);
-   if(sim::spherical_harmonics && sim::random_anisotropy==false) energy += spin_spherical_harmonic_aniostropy_energy(imaterial, Sx, Sy, Sz);
-	if(sim::spherical_harmonics && sim::random_anisotropy) energy += spin_spherical_harmonic_random_aniostropy_energy(atom, imaterial, Sx, Sy, Sz);
+
+   // calculate anisotropy energy for atom
+   energy += anisotropy::single_spin_energy(atom, imaterial, Sx, Sy, Sz, sim::temperature);
+
 	energy+=spin_applied_field_energy(Sx, Sy, Sz);
 	energy+=spin_magnetostatic_energy(atom, Sx, Sy, Sz);
 

@@ -189,6 +189,8 @@ namespace anisotropy{
                                                const int end_index,
                                                const double temperature);
 
+      double spin_lattice_anisotropy_energy(const int imaterial, const double sx, const double sy, const double sz, const double temperature);
+
    } // end of internal namespace
 
    //-------------------------------------------------------------------------
