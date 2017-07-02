@@ -246,13 +246,20 @@ int run(){
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();
 
-   // Set up statistical data sets
-   #ifdef MPICF
-      int num_atoms_for_statistics = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-   #else
-      int num_atoms_for_statistics = atoms::num_atoms;
-   #endif
-   stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array);
+   {
+      // Set up statistical data sets
+      #ifdef MPICF
+         int num_atoms_for_statistics = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      #else
+         int num_atoms_for_statistics = atoms::num_atoms;
+      #endif
+      // unroll list of non-magnetic materials
+      std::vector<bool> non_magnetic_materials_array(mp::num_materials, false);
+      for(int m = 0; m < mp::num_materials; m++){
+         if( mp::material[m].non_magnetic == 2 ) non_magnetic_materials_array[m] = true;
+      }
+      stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array, non_magnetic_materials_array);
+   }
 
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);

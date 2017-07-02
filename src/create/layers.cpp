@@ -35,7 +35,7 @@ void layers(std::vector<cs::catom_t> & catom_array){
       // Check for multilayer system and if required generate multilayers
       else if(cs::multilayers) cs::generate_multilayers(catom_array);
 
-		// Otherwise perform normal assignement of materials
+		// Otherwise perform normal assignment of materials
 		else{
 
 			// determine z-bounds for materials
