@@ -141,6 +141,22 @@ The commands here determine the dimensions of the generated system.\\
 
 {\zicf dimensions:double macro-cell-size}\addcontentsline{toc}{subsection}{dimensions:macro-cell-size} determines the macro cell size for calculation of the demagnetizing field and output of the magnetic configuration. Finer discretisation lead to more accurate results at the cost of significantly longer run times. The cell size should always be less than the system size, as highly asymmetric cells will leads to significant errors in the demagnetisation field calculation.
 
+\section*{Anisotropy calculation}
+\addcontentsline{toc}{section}{Anisotropy calculation}
+The following commands control the calculation of the magnetic anisotropy energy for the system.
+{\zicf anisotropy:surface-anisotropy-threshold}\addcontentsline{toc}
+{subsection}{anisotropy:surface-anisotropy-threshold}
+  integer default [native]
+  Determines minimal number of neighbours to classify as surface atom. The
+  default value is the number of neighbours specified by the crystal or unit cell
+  file. You can set this as a lower threshold. \\
+
+{\zicf anisotropy:surface-anisotropy-nearest-neighbour-range}\addcontentsline{toc}
+{subsection}{anisotropy:surface-anisotropy-nearest-neighbour-range}
+  float default [$\infty$]
+  Sets the interaction range for the nearest neighbour list used for the surface
+  anisotropy calculation.\\
+
 \section*{Dipole field calculation}
 \addcontentsline{toc}{section}{Dipole field calculation}
 The following commands control the calculation of the dipole-dipole field. By
@@ -210,16 +226,6 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 {\zicf sim:dipole-field-update-rate}\addcontentsline{toc}{subsection}{sim:dipole-field-update-rate}
    Integer default 1000
    Number of timesteps between recalculation of the demag field. Default value is suitable for slow calculations, fast dynamics will generally require much faster update rates.\\
-
-{\zicf  sim:enable-surface-anisotropy}\addcontentsline{toc}{subsection}{sim:enable-surface-anisotropy}\\
-
-{\zicf sim:surface-anisotropy-threshold}\addcontentsline{toc}{subsection}{sim:surface-anisotropy-threshold}
-  Int default [native]
-  Determines minimal number of neighbours to classify as surface atom.\\
-
-{\zicf sim:surface-anisotropy-nearest-neighbour-range}\addcontentsline{toc}{subsection}{sim:surface-anisotropy-nearest-neighbour-range}
-  float default [$\infty$]
-  Sets the interaction range for the nearest neighbour list used for the surface anisotropy calculation.\\
 
 {\zicf sim:time-step}\addcontentsline{toc}{subsection}{sim:time-step}\\
 
