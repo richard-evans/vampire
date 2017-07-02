@@ -163,6 +163,8 @@ namespace anisotropy{
       extern void uniaxial_second_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
       extern void uniaxial_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
 
+      extern void cubic_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
+
    } // end of internal namespace
 
    //-------------------------------------------------------------------------

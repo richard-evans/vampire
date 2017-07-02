@@ -94,7 +94,7 @@ namespace anisotropy{
                                   internal::mp[mat].ku_vector[1],
                                   internal::mp[mat].ku_vector[2] };
 
-            // Loop over tensor components and store anisotropy values in Tesla
+            // Loop over tensor components and store anisotropy values in Tesla (-dE/dS)
             for (int i = 0; i < 3; ++i){
                for (int j = 0; j < 3; ++j){
                   internal::second_order_tensor[ index(atom, i, j) ] += ku2 * e[i] * e[j] * i_mu_s;

@@ -62,6 +62,19 @@ namespace anisotropy{
 
       }
 
+      //---------------------------------------------------------------------
+      // Populate fourth order tensor
+      //---------------------------------------------------------------------
+      if (internal::enable_fourth_order_tensor){
+
+         // Add uniaxial fourth order anisotropy (Ku2)
+         internal::uniaxial_fourth_order(num_atoms, atom_material_array, inverse_mu_s);
+
+         // Add cubic fourth order anisotropy (Kc1)
+         internal::cubic_fourth_order(num_atoms, atom_material_array, inverse_mu_s);
+
+      }
+
       internal::initialised = true;
 
       return;
