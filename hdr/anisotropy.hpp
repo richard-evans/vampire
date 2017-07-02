@@ -33,6 +33,9 @@ namespace anisotropy
                    std::vector<int>& atom_type_array,
                    std::vector<double>& mu_s_array);
 
+   //-----------------------------------------------------------------------------
+   // function to calculate anisotropy fields
+   //-----------------------------------------------------------------------------
    void fields(std::vector<double>& spin_array_x,
                std::vector<double>& spin_array_y,
                std::vector<double>& spin_array_z,
@@ -44,7 +47,15 @@ namespace anisotropy
                const int end_index,
                const double temperature);
 
+   //-----------------------------------------------------------------------------
+   // function to calculate anisotropy energy for a single spin
+   //-----------------------------------------------------------------------------
    double single_spin_energy(const int atom, const int imaterial, const double sx, const double sy, const double sz, const double temperature);
+
+   //-----------------------------------------------------------------------------
+   // function to get second order anisotropy constant
+   //-----------------------------------------------------------------------------
+   double get_anisotropy_constant(const int material);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for anisotropy module

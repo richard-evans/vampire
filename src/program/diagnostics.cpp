@@ -48,6 +48,7 @@
 #include <iostream>
 
 // Vampire Header files
+#include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "material.hpp"
@@ -144,16 +145,16 @@ void boltzmann_dist(){
 	double maxp=0.0;
 	double maxP=0.0;
 	for(int b=0;b<181;b++){
-		double energy = mp::material[0].Ku1_SI;
+		double energy = anisotropy::get_anisotropy_constant(0); // get anisotropy constant for material 0
 		double P = sin(double (b)*M_PI/180)*exp((energy*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0))/(sim::temperature*1.3806503e-23));
 		if((bin[b])>maxp) maxp=bin[b];
 		if(P>maxP) maxP=P;
 	}
 
 	// Output data
-	zmag << "# " << mp::material[0].Ku1_SI/(sim::temperature*1.3806503e-23) << std::endl;
+	zmag << "# " << anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23) << std::endl;
 	for(int b=0;b<181;b++){
-		double energy = mp::material[0].Ku1_SI;
+      double energy = anisotropy::get_anisotropy_constant(0); // get anisotropy constant for material 0
 		double P = sin(double (b)*M_PI/180)*exp((energy*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0))/(sim::temperature*1.3806503e-23));
 		zmag << b << "\t" << (bin[b]+bin[180-b])/(2.0*maxp) << "\t" << P/maxP << std::endl;
 	}

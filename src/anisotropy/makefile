@@ -7,6 +7,7 @@ anisotropy_objects =\
 data.o \
 energy.o \
 fields.o \
+get_anisotropy.o \
 initialize.o \
 interface.o \
 lattice.o \

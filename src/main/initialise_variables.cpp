@@ -176,7 +176,6 @@ int default_system(){
 	material[0].alpha=0.1;
 	material[0].Jij_matrix_SI[0][0]=-11.2e-21;
 	material[0].mu_s_SI=1.5*9.27400915e-24;
-	material[0].Ku1_SI=-4.644e-24;
 	material[0].gamma_rel=1.0;
 	material[0].element="Ag ";
 
