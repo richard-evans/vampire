@@ -83,9 +83,9 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	if(sim::hamiltonian_simulation_flags[0]==1) calculate_exchange_fields(start_index,end_index);
 
    // calculate anistropy fields
-   anisotropy::fields(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+   anisotropy::fields(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::type_array,
                       atoms::x_total_spin_field_array, atoms::y_total_spin_field_array, atoms::z_total_spin_field_array,
-                      start_index, end_index);
+                      start_index, end_index, sim::temperature);
 
 	// Spin Dependent Extra Fields
 	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);

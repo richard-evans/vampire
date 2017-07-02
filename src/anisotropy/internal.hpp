@@ -65,6 +65,15 @@ namespace anisotropy{
 
       };
 
+      //---------------------------------
+      // struct for storing unit vectors
+      //---------------------------------
+      struct evec_t{
+         double x;
+         double y;
+         double z;
+      };
+
       //-----------------------------------------------------------------------------
       // materials class for storing anisotropy material parameters
       //-----------------------------------------------------------------------------
@@ -157,13 +166,28 @@ namespace anisotropy{
       extern unsigned int neel_anisotropy_threshold; // global threshold for surface atoms
       extern double nearest_neighbour_distance; // Control surface anisotropy nearest neighbour distance
 
+      // arrays for storing unrolled parameters for lattice anisotropy
+      extern std::vector<double> klattice_array; // anisoptropy constant
+      extern std::vector<evec_t> elattice_array; // easy axis
+
       //-------------------------------------------------------------------------
       // internal function declarations
       //-------------------------------------------------------------------------
-      extern void uniaxial_second_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
-      extern void uniaxial_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
+      void uniaxial_second_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
+      void uniaxial_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
 
-      extern void cubic_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
+      void cubic_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
+
+      void calculate_lattice_anisotropy_fields(std::vector<double>& spin_array_x,
+                                               std::vector<double>& spin_array_y,
+                                               std::vector<double>& spin_array_z,
+                                               std::vector<int>&    type_array,
+                                               std::vector<double>& field_array_x,
+                                               std::vector<double>& field_array_y,
+                                               std::vector<double>& field_array_z,
+                                               const int start_index,
+                                               const int end_index,
+                                               const double temperature);
 
    } // end of internal namespace
 

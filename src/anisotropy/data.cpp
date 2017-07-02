@@ -52,6 +52,10 @@ namespace anisotropy{
    	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
       double nearest_neighbour_distance      = 1.e9; // Control surface anisotropy nearest neighbour distance
 
+      // arrays for storing unrolled parameters for lattice anisotropy
+      std::vector<double> klattice_array(0); // anisoptropy constant
+      std::vector<evec_t> elattice_array(0); // easy axis
+
    } // end of internal namespace
 
 } // end of anisotropy namespace

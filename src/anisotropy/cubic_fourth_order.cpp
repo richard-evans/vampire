@@ -5,7 +5,7 @@
 //
 //   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
 //
-//   Email: sw766@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //

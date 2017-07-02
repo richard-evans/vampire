@@ -8,7 +8,7 @@ data.o \
 fields.o \
 initialize.o \
 interface.o \
-lattice_anisotropy.o \
+lattice.o \
 uniaxial_second_order.o \
 uniaxial_fourth_order.o \
 cubic_fourth_order.o

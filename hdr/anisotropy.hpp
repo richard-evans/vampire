@@ -36,11 +36,13 @@ namespace anisotropy
    void fields(std::vector<double>& spin_array_x,
                std::vector<double>& spin_array_y,
                std::vector<double>& spin_array_z,
+               std::vector<int>&    type_array,
                std::vector<double>& field_array_x,
                std::vector<double>& field_array_y,
                std::vector<double>& field_array_z,
                const int start_index,
-               const int end_index);
+               const int end_index,
+               const double temperature);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for anisotropy module

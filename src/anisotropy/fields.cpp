@@ -48,11 +48,13 @@ namespace anisotropy{
    void fields(std::vector<double>& spin_array_x,
                std::vector<double>& spin_array_y,
                std::vector<double>& spin_array_z,
+               std::vector<int>&    type_array,
                std::vector<double>& field_array_x,
                std::vector<double>& field_array_y,
                std::vector<double>& field_array_z,
                const int start_index,
-               const int end_index){
+               const int end_index,
+               const double temperature){
 
       // Loop over all atoms between start and end index
       for(int atom = start_index; atom<end_index; atom++){
@@ -94,6 +96,13 @@ namespace anisotropy{
          field_array_y[atom] += hy;
          field_array_z[atom] += hz;
 
+      }
+
+      // optionally calclulate lattice anisotropy fields
+      if(internal::enable_lattice_anisotropy){
+         internal::calculate_lattice_anisotropy_fields(spin_array_x,  spin_array_y,  spin_array_z, type_array,
+                                                       field_array_x, field_array_y, field_array_z,
+                                                       start_index, end_index, temperature);
       }
 
       return;

@@ -10,20 +10,78 @@
 //------------------------------------------------------------------------------
 //
 
-// System headers
-//---------------------------
+// C++ standard library headers
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <string>
 
-// vampire headers
+// Vampire headers
+#include "anisotropy.hpp"
 #include "errors.hpp"
-#include "material.hpp"
-#include "vio.hpp"
 #include "vmath.hpp"
+#include "vio.hpp"
 
 // anisotropy module headers
 #include "internal.hpp"
+
+namespace anisotropy{
+
+   //------------------------------------------------------------------------------
+   // Externally visible variables
+   //------------------------------------------------------------------------------
+
+   namespace internal{
+
+      //------------------------------------------------------
+      ///  Function to calculate lattice anisotropy fields
+      //------------------------------------------------------
+      void calculate_lattice_anisotropy_fields(std::vector<double>& spin_array_x,
+                                               std::vector<double>& spin_array_y,
+                                               std::vector<double>& spin_array_z,
+                                               std::vector<int>&    type_array,
+                                               std::vector<double>& field_array_x,
+                                               std::vector<double>& field_array_y,
+                                               std::vector<double>& field_array_z,
+                                               const int start_index,
+                                               const int end_index,
+                                               const double temperature){
+
+         // Precalculate material lattice anisotropy constants from current temperature
+         for(int imat=0; imat<mp::num_materials; imat++){
+            internal::klattice_array[imat] = -2.0 * internal::mp[imat].k_lattice * internal::mp[imat].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
+         }
+
+         // Now calculate fields
+         for(int atom = start_index; atom < end_index; atom++){
+
+            // get material for atom
+            const int imaterial = type_array[atom];
+
+            // get spin directions
+            const double sx = spin_array_x[atom];
+            const double sy = spin_array_y[atom];
+            const double sz = spin_array_z[atom];
+
+            // calculate s . e
+            const double sdote = ( sx * internal::elattice_array[imaterial].x +
+                                   sy * internal::elattice_array[imaterial].y +
+                                   sz * internal::elattice_array[imaterial].z);
+
+            // add lattice anisotropy field to total
+            field_array_x[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].x * sdote;
+            field_array_y[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].y * sdote;
+            field_array_z[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].z * sdote;
+
+         }
+
+         return;
+
+      }
+
+   } // end of internal namespace
+
+} // end of anisotropy namespace
 
 //--------------------------------------------------
 // class functions for lattice anisotropy

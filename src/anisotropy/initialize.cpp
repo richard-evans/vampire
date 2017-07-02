@@ -75,6 +75,49 @@ namespace anisotropy{
 
       }
 
+      //---------------------------------------------------------------------
+      // Populate sixth order tensor
+      //---------------------------------------------------------------------
+      if (internal::enable_sixth_order_tensor){
+
+         // Add uniaxial sixth order anisotropy (Ku3)
+         //internal::uniaxial_sixth_order(num_atoms, atom_material_array, inverse_mu_s);
+
+         // Add cubic sixth order anisotropy (Kc2)
+         //internal::cubic_sixth_order(num_atoms, atom_material_array, inverse_mu_s);
+
+      }
+
+      //---------------------------------------------------------------------
+      // initialise lattice anisotropy for each material
+      //---------------------------------------------------------------------
+      if(internal::enable_lattice_anisotropy){
+
+         // get number of materials for simulation
+         const unsigned int num_materials = mu_s_array.size();
+
+         // arrays for storing unrolled parameters for lattice anisotropy
+         internal::klattice_array.resize(num_materials); // anisoptropy constant
+         internal::elattice_array.resize(num_materials); // easy axis
+
+         // loop over all materials and set up lattice anisotropy constants
+         for(int m = 0; m < num_materials; m++){
+
+            // set up interpolation between temperature points
+            internal::mp[m].lattice_anisotropy.set_interpolation_table();
+
+            // unroll easy axes for lattice anisotropy calculation
+            internal::elattice_array[m].x = internal::mp[m].ku_vector[0];
+            internal::elattice_array[m].y = internal::mp[m].ku_vector[1];
+            internal::elattice_array[m].z = internal::mp[m].ku_vector[2];
+
+            // output interpolated data to file
+            //internal::mp[m].lattice_anisotropy.output_interpolated_function(mat);
+
+         }
+
+      }
+
       internal::initialised = true;
 
       return;
