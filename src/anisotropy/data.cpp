@@ -47,7 +47,6 @@ namespace anisotropy{
       std::vector<double> fourth_order_tensor(0);
       std::vector<double> sixth_order_tensor(0);
 
-   	//bool identify_surface_atoms = false; // flag to identify surface atoms in config coordinate file
       bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
    	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
       double nearest_neighbour_distance      = 1.e9; // Control surface anisotropy nearest neighbour distance

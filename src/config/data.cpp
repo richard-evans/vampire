@@ -44,6 +44,8 @@ namespace config{
 
       int output_rate_counter_coords = 0;
 
+      bool identify_surface_atoms = false; // flag to identify surface atoms in config coordinate file
+
       // Field ranges for hysteresis ouput
       double field_output_min_1 = -10000.0;
       double field_output_max_1 = -0.0;

@@ -18,8 +18,8 @@
 //#include <string>
 
 // Vampire headers
-//#include "anisotropy.hpp"
-#include "material.hpp"
+#include "anisotropy.hpp"
+#include "create.hpp"
 
 //--------------------------------------------------------------------------------
 // namespace for variables and functions for anisotropy module
@@ -56,6 +56,11 @@ namespace anisotropy
    // function to get second order anisotropy constant
    //-----------------------------------------------------------------------------
    double get_anisotropy_constant(const int material);
+
+   //-----------------------------------------------------------------------------
+   // function to identify surface atoms
+   //-----------------------------------------------------------------------------
+   void identify_surface_atoms(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <cs::neighbour_t> > & cneighbourlist);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for anisotropy module

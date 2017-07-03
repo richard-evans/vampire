@@ -8,6 +8,7 @@ data.o \
 energy.o \
 fields.o \
 get_anisotropy.o \
+identify_surface_atoms.o \
 initialize.o \
 interface.o \
 lattice.o \

@@ -122,18 +122,7 @@ namespace atoms
 	extern std::vector <zvec_t> v_exchange_list;
 	extern std::vector <zten_t> t_exchange_list;
 
-	// surface anisotropy
-	extern std::vector<bool> surface_array;
-	extern std::vector<int> nearest_neighbour_list;
-	extern std::vector<int> nearest_neighbour_list_si;
-	extern std::vector<int> nearest_neighbour_list_ei;
-	extern std::vector<double> eijx;
-	extern std::vector<double> eijy;
-	extern std::vector<double> eijz;
-
-	extern std::vector<double> uniaxial_anisotropy_vector_x; // local anisotropy unit vector
-	extern std::vector<double> uniaxial_anisotropy_vector_y;
-	extern std::vector<double> uniaxial_anisotropy_vector_z;
+   extern std::vector <bool> surface_array; // flag to identify atom as surface
 
 }
 
