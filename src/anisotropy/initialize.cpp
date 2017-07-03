@@ -42,10 +42,10 @@ namespace anisotropy{
          return;
       }
 
-      // Initialise tensor variables for each atom
-      if(internal::enable_second_order_tensor) internal::second_order_tensor.resize( 9 * num_atoms, 0.0 );
-      if(internal::enable_fourth_order_tensor) internal::fourth_order_tensor.resize( 9 * num_atoms, 0.0 );
-      if(internal::enable_sixth_order_tensor)  internal::sixth_order_tensor.resize ( 9 * num_atoms, 0.0 );
+      // Initialise tensors for each atom
+      internal::second_order_tensor.resize( 9 * num_atoms, 0.0 );
+      internal::fourth_order_tensor.resize( 9 * num_atoms, 0.0 );
+      internal::sixth_order_tensor.resize ( 9 * num_atoms, 0.0 );
 
       // Unroll inverse mu_S array for materials to convert Joules to Tesla
       const double mu_B = 9.27400915e-24; // Bohr magneton
@@ -59,6 +59,8 @@ namespace anisotropy{
 
          // Add uniaxial second order anisotropy (Ku1)
          internal::uniaxial_second_order(num_atoms, atom_material_array, inverse_mu_s);
+
+         internal::neel_anisotropy(num_atoms);
 
       }
 

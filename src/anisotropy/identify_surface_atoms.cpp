@@ -168,6 +168,13 @@ namespace anisotropy{
       // Output statistics to log file
       zlog << zTs() << num_surface_atoms << " surface atoms found." << std::endl;
 
+      //----------------------------------------------------------------
+      // If neel surface anisotropy is enabled, calculate necessary data
+      //----------------------------------------------------------------
+      if(internal::enable_neel_anisotropy){
+         internal::initialise_neel_anisotropy_tensor(nearest_neighbour_interactions_list, cneighbourlist);
+      }
+
       return;
 
    }

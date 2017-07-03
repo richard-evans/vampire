@@ -140,6 +140,7 @@ namespace anisotropy{
          double kij = atof(value.c_str());
          vin::check_for_valid_value(kij, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
          internal::mp[super_index].kij[sub_index] = kij;
+         internal::enable_second_order_tensor = true; // Switch on second order tensor calculation for all spins
          internal::enable_neel_anisotropy = true;
          return true;
       }
@@ -150,6 +151,7 @@ namespace anisotropy{
          // Test for valid range
          vin::check_for_valid_value(kl, word, line, prefix, unit, "energy", -1.0e-17, 1.0e17,"material","-1e17 - 1e17 J/atom");
          internal::mp[super_index].k_lattice = kl;
+         internal::enable_second_order_tensor = true; // Switch on second order tensor calculation for all spins
          internal::enable_lattice_anisotropy = true;
          return true;
       }

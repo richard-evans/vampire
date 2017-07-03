@@ -161,6 +161,7 @@ namespace anisotropy{
       extern std::vector<double> second_order_tensor;
       extern std::vector<double> fourth_order_tensor;
       extern std::vector<double> sixth_order_tensor;
+      extern std::vector<double> neel_tensor;
 
       extern bool native_neel_anisotropy_threshold; // enables site-dependent surface threshold
       extern unsigned int neel_anisotropy_threshold; // global threshold for surface atoms
@@ -175,6 +176,7 @@ namespace anisotropy{
       //-------------------------------------------------------------------------
       void uniaxial_second_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
       void uniaxial_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
+      void neel_anisotropy(const unsigned int num_atoms);
 
       void cubic_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
 
@@ -190,6 +192,9 @@ namespace anisotropy{
                                                const double temperature);
 
       double spin_lattice_anisotropy_energy(const int imaterial, const double sx, const double sy, const double sz, const double temperature);
+
+      void initialise_neel_anisotropy_tensor(std::vector <std::vector <bool> >& nearest_neighbour_interactions_list,
+                                             std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
 
    } // end of internal namespace
 

@@ -46,6 +46,7 @@ namespace anisotropy{
       std::vector<double> second_order_tensor(0);
       std::vector<double> fourth_order_tensor(0);
       std::vector<double> sixth_order_tensor(0);
+      std::vector<double> neel_tensor(0);
 
       bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
    	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
