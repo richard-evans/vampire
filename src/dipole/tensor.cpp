@@ -157,7 +157,7 @@ namespace dipole{
          for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
             // print out progress to screen
-            if(lc % (dipole::internal::cells_num_local_cells/10) == 0) std::cout << "." << std::flush;
+            if(fmod(ceil(lc),ceil(dipole::internal::cells_num_local_cells)/10.0) == 0) std::cout << "." << std::flush;
 
             // reference global cell ID
             //int i = dipole::internal::cells_local_cell_array[lc];
