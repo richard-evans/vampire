@@ -8,6 +8,8 @@ data.o \
 field.o \
 initialize.o \
 interface.o \
+inter.o \
+intra.o \
 macrocell.o \
 memory.o \
 mpi.o \

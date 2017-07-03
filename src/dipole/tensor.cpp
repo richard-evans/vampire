@@ -168,10 +168,12 @@ namespace dipole{
                for(int j=0;j<dipole::internal::cells_num_cells;j++){
 
                   /*==========================================================*/
-                  /* Calculation of intra part of dipolar tensor              */
+                  /* Calculation of inter part of dipolar tensor              */
                   /*==========================================================*/
                 	if(i!=j && dipole::internal::cells_num_atoms_in_cell[j]>0){
-
+                     // calculate inter term of dipolar tensor
+                     compute_inter_tensor(cells_macro_cell_size,i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
+/*
                      // create temporary variable to store components of tensor
                     	double tmp_rij_inter_xx = 0.0;
                     	double tmp_rij_inter_xy = 0.0;
@@ -228,20 +230,6 @@ namespace dipole{
 
                               rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);  //Reciprocal of the distance
 
-                              /*rij_1 = 1.0/rij;
-                              // Check if there are not problems with distances, otherwise print out error message
-                              if( rij_1==0.0 ) {
-                                 fprintf(stderr,">>>>> (Inter)  Warning: atoms are overlapping in cells i=%d\tand j=%d\ton rank=%d\t<<<<<\n",i,j,vmpi::my_rank);
-                                 std::cout << ">>>>> (Inter) Warning: atoms are overlapping in cells i,j " << i << "\t" << j <<"<<<<<" << std::endl;
-                                 std::cout << "Cell and atomic coordinates used for calculation of Dipolar matrix" << std::endl;
-                                 std::cout << " xj= "  << dipole::internal::cells_pos_and_mom_array[4*j+0]  << " yj= "  << dipole::internal::cells_pos_and_mom_array[4*j+1]  << " zj= "  << dipole::internal::cells_pos_and_mom_array[4*j+2] << std::endl;
-                                 std::cout << " xi= "  << dipole::internal::cells_pos_and_mom_array[4*i+0]  << " yi= "  << dipole::internal::cells_pos_and_mom_array[4*i+1]  << " zi= "  << dipole::internal::cells_pos_and_mom_array[4*i+2] << std::endl;
-                                 std::cout << " pi= "<<pi << " xpi= " << cells_atom_in_cell_coords_array_x[i][pi] << " ypi= " << cells_atom_in_cell_coords_array_y[i][pi] << " zpi= " << cells_atom_in_cell_coords_array_z[i][pi] << std::endl;
-                                 std::cout << " qj= "<<qj << " xqj= " << cells_atom_in_cell_coords_array_x[j][qj] << " yqj= " << cells_atom_in_cell_coords_array_y[j][qj] << " zqj= " << cells_atom_in_cell_coords_array_z[j][qj] << std::endl;
-                                 std::cout << " rx= "  << rx << " ry= " << ry << " rz= " << rz << std::endl;
-                                 std::cout << " rij= " << 1.0/rij << " = " << (1.0/rij)/((cells_macro_cell_size*sqrt(3)+0.01)) << " macro-cells" << std::endl;
-                                 break;
-                              }*/
 
                               const double ex = rx*rij;
                               const double ey = ry*rij;
@@ -277,14 +265,17 @@ namespace dipole{
                         dipole::internal::rij_inter_yz[lc][j] = dipole::internal::rij_inter_yz[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
                         dipole::internal::rij_inter_zz[lc][j] = dipole::internal::rij_inter_zz[lc][j]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
 
-                     }  // End of Inter part calculated atomicstically
+                     }  // End of Inter part calculated atomicstically */
+
                   } // End of Inter part
 
                   /*==========================================================*/
                   /* Calculation of intra part of dipolar tensor              */
                   /*==========================================================*/
                   else if( i==j && dipole::internal::cells_num_atoms_in_cell[j]>0){
-
+                     //Compute inter component of dipolar tensor
+                     compute_intra_tensor(i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
+                     /*
                      // initialise temp vectors
                      double tmp_rij_intra_xx = 0.0;
                      double tmp_rij_intra_xy = 0.0;
@@ -310,19 +301,6 @@ namespace dipole{
                            const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz; //cells_atom_in_cell_coords_array_z[i][pi];
 
                            const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
-
-                           /*if( 1.0/rij==0.0 ){
-                              fprintf(stderr,">>>>> (Intra)  Warning: atoms are overlapping in cells i=%d\tand j=%d\ton rank=%d\t<<<<<\n",i,j,vmpi::my_rank);
-                              std::cout << ">>>>> (Intra)  Warning: atoms are overlapping in cells i=\t" << i << "\t and j=\t" << j <<"\t<<<<<" << std::endl;
-                              std::cout << "Cell and atomic coordinates used for calculation of Dipolar matrix" << std::endl;
-                              std::cout << " qj= "<<qj << " xqj= " << cells_atom_in_cell_coords_array_x[j][qj] << " yqj= " << cells_atom_in_cell_coords_array_y[j][qj] << " zqj= " << cells_atom_in_cell_coords_array_z[j][qj] << std::endl;
-                              std::cout << " pi= "<<pi << " xpi= " << cells_atom_in_cell_coords_array_x[i][pi] << " ypi= " << cells_atom_in_cell_coords_array_y[i][pi] << " zpi= " << cells_atom_in_cell_coords_array_z[i][pi] << std::endl;
-                              std::cout << " xj= "  << dipole::internal::cells_pos_and_mom_array[4*j+0]  << " yj= "  << dipole::internal::cells_pos_and_mom_array[4*j+1]  << " zj= "  << dipole::internal::cells_pos_and_mom_array[4*j+2] << std::endl;
-                              std::cout << " xi= "  << dipole::internal::cells_pos_and_mom_array[4*i+0]  << " yi= "  << dipole::internal::cells_pos_and_mom_array[4*i+1]  << " zi= "  << dipole::internal::cells_pos_and_mom_array[4*i+2] << std::endl;
-                              std::cout << " rx= "  << rx << " ry= " << ry << " rz= " << rz << std::endl;
-                              std::cout << " rij= " << 1.0/rij << " = " << (1.0/rij)/((cells_macro_cell_size*sqrt(3)+0.01)) << " macro-cells" << std::endl;
-                              break;
-                           }*/
 
                            const double ex = rx*rij;
                            const double ey = ry*rij;
@@ -364,21 +342,21 @@ namespace dipole{
                     		}
                    	}
 
-                   	dipole::internal::rij_intra_xx[lc][i] =  (tmp_rij_intra_xx);
-                   	dipole::internal::rij_intra_xy[lc][i] =  (tmp_rij_intra_xy);
-                   	dipole::internal::rij_intra_xz[lc][i] =  (tmp_rij_intra_xz);
+                   	dipole::internal::rij_inter_xx[lc][i] =  (tmp_rij_intra_xx);
+                   	dipole::internal::rij_inter_xy[lc][i] =  (tmp_rij_intra_xy);
+                   	dipole::internal::rij_inter_xz[lc][i] =  (tmp_rij_intra_xz);
 
-                   	dipole::internal::rij_intra_yy[lc][i] =  (tmp_rij_intra_yy);
-                   	dipole::internal::rij_intra_yz[lc][i] =  (tmp_rij_intra_yz);
-                   	dipole::internal::rij_intra_zz[lc][i] =  (tmp_rij_intra_zz);
+                   	dipole::internal::rij_inter_yy[lc][i] =  (tmp_rij_intra_yy);
+                   	dipole::internal::rij_inter_yz[lc][i] =  (tmp_rij_intra_yz);
+                   	dipole::internal::rij_inter_zz[lc][i] =  (tmp_rij_intra_zz);
 
-                   	dipole::internal::rij_intra_xx[lc][i] = dipole::internal::rij_intra_xx[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
-                   	dipole::internal::rij_intra_xy[lc][i] = dipole::internal::rij_intra_xy[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
-                   	dipole::internal::rij_intra_xz[lc][i] = dipole::internal::rij_intra_xz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+                   	dipole::internal::rij_inter_xx[lc][i] = dipole::internal::rij_inter_xx[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+                   	dipole::internal::rij_inter_xy[lc][i] = dipole::internal::rij_inter_xy[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+                   	dipole::internal::rij_inter_xz[lc][i] = dipole::internal::rij_inter_xz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
 
-                   	dipole::internal::rij_intra_yy[lc][i] = dipole::internal::rij_intra_yy[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
-                   	dipole::internal::rij_intra_yz[lc][i] = dipole::internal::rij_intra_yz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
-                   	dipole::internal::rij_intra_zz[lc][i] = dipole::internal::rij_intra_zz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+                   	dipole::internal::rij_inter_yy[lc][i] = dipole::internal::rij_inter_yy[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+                   	dipole::internal::rij_inter_yz[lc][i] = dipole::internal::rij_inter_yz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+                   	dipole::internal::rij_inter_zz[lc][i] = dipole::internal::rij_inter_zz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));  */
 
                   } // End of Intra part
                }

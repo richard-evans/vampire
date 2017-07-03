@@ -57,21 +57,13 @@ namespace dipole{
 
       const double prefactor=1.0e+23; // 1e-7/1e30
 
-      std::vector <std::vector < double > > rij_inter_xx;
-      std::vector <std::vector < double > > rij_inter_xy;
-      std::vector <std::vector < double > > rij_inter_xz;
+      std::vector <std::vector < double > > rij_tensor_xx;
+      std::vector <std::vector < double > > rij_tensor_xy;
+      std::vector <std::vector < double > > rij_tensor_xz;
 
-      std::vector <std::vector < double > > rij_inter_yy;
-      std::vector <std::vector < double > > rij_inter_yz;
-      std::vector <std::vector < double > > rij_inter_zz;
-
-      std::vector <std::vector < double > > rij_intra_xx;
-      std::vector <std::vector < double > > rij_intra_xy;
-      std::vector <std::vector < double > > rij_intra_xz;
-
-      std::vector <std::vector < double > > rij_intra_yy;
-      std::vector <std::vector < double > > rij_intra_yz;
-      std::vector <std::vector < double > > rij_intra_zz;
+      std::vector <std::vector < double > > rij_tensor_yy;
+      std::vector <std::vector < double > > rij_tensor_yz;
+      std::vector <std::vector < double > > rij_tensor_zz;
 
       int num_atoms;
       std::vector < int > atom_type_array;

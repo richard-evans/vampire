@@ -91,13 +91,13 @@ namespace dipole{
                   	const double rij3 = (rij*rij*rij); // Angstroms
 
                      // calculate dipolar matrix for 6 entries because of symmetry
-                  	dipole::internal::rij_inter_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
-                  	dipole::internal::rij_inter_xy[lc][j] = ( 3.0*ex*ey      )*rij3 ;
-                  	dipole::internal::rij_inter_xz[lc][j] = ( 3.0*ex*ez      )*rij3 ;
+                  	dipole::internal::rij_tensor_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
+                  	dipole::internal::rij_tensor_xy[lc][j] = ( 3.0*ex*ey      )*rij3 ;
+                  	dipole::internal::rij_tensor_xz[lc][j] = ( 3.0*ex*ez      )*rij3 ;
 
-                  	dipole::internal::rij_inter_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
-                  	dipole::internal::rij_inter_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
-                  	dipole::internal::rij_inter_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
+                  	dipole::internal::rij_tensor_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
+                  	dipole::internal::rij_tensor_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
+                  	dipole::internal::rij_tensor_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
 
                      }
 
@@ -109,13 +109,13 @@ namespace dipole{
 
                      const double third = 1.0/3.0;
 
-                   	dipole::internal::rij_intra_xx[lc][i] = third;
-                   	dipole::internal::rij_intra_xy[lc][i] = 0.0;
-                   	dipole::internal::rij_intra_xz[lc][i] = 0.0;
+                   	dipole::internal::rij_tensor_xx[lc][i] = third;
+                   	dipole::internal::rij_tensor_xy[lc][i] = 0.0;
+                   	dipole::internal::rij_tensor_xz[lc][i] = 0.0;
 
-                   	dipole::internal::rij_intra_yy[lc][i] = third;
-                   	dipole::internal::rij_intra_yz[lc][i] = 0.0;
-                   	dipole::internal::rij_intra_zz[lc][i] = third;
+                   	dipole::internal::rij_tensor_yy[lc][i] = third;
+                   	dipole::internal::rij_tensor_yz[lc][i] = 0.0;
+                   	dipole::internal::rij_tensor_zz[lc][i] = third;
 
                   } // End of Intra part
                }
