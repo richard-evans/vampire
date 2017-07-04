@@ -61,7 +61,7 @@ void save_checkpoint(){
    std::vector<uint32_t> mt_state(624); // 624 is hard coded in mt implementation. uint64 assumes same size as unsigned long
    int32_t mt_p=0; // position in rng state
    mt_p=mtrandom::grnd.get_state(mt_state);
-   std::cout << "random generator state = " << mt_p << std::endl;
+   //std::cout << "random generator state = " << mt_p << std::endl;
 
    // write checkpoint variables to file
    chkfile.write(reinterpret_cast<const char*>(&natoms64),sizeof(uint64_t));
@@ -153,7 +153,7 @@ void load_checkpoint(){
    chkfile.read((char*)&mt_p,sizeof(int32_t));
    chkfile.read((char*)&mt_state[0],sizeof(uint32_t)*mt_state.size());
 
-   std::cout << "random generator state loaded = " << mt_p << std::endl;
+   //std::cout << "random generator state loaded = " << mt_p << std::endl;
    // if continuing set state of rng
    if(sim::load_checkpoint_continue_flag) mtrandom::grnd.set_state(mt_state, mt_p);
 
