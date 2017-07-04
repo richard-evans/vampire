@@ -67,6 +67,9 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       void neel_anisotropy(const unsigned int num_atoms){
 
+         // if surface anisotropy is not used, then do nothing
+         if(!internal::enable_neel_anisotropy) return;
+
          //----------------------------------------------------------------------------------
          // Loop over all atoms and add neel tensor
          //----------------------------------------------------------------------------------
@@ -83,7 +86,7 @@ namespace anisotropy{
                //std::cout << "[  " << internal::second_order_tensor[index(atom, i, 0)] << "  " <<
                //                      internal::second_order_tensor[index(atom, i, 1)] << "  " <<
                //                      internal::second_order_tensor[index(atom, i, 2)] << "  " << "]" << std::endl;
-               
+
             }
 
          }
