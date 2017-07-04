@@ -72,24 +72,13 @@ namespace dipole{
          		   const double my = cells::mag_array_y[j]/9.27400915e-24;
          		   const double mz = cells::mag_array_z[j]/9.27400915e-24;
 
-         		   //if( i!=j ){
-             		   dipole::cells_field_array_x[i]+=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
-             		   dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
-             		   dipole::cells_field_array_z[i]+=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
-                     // Demag field
-                     dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
-                     dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
-                     dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
-         		   //}
-         		   /*else{
-             		   dipole::cells_field_array_x[i]+=(mx*internal::rij_intra_xx[lc][i] + my*internal::rij_intra_xy[lc][i] + mz*internal::rij_intra_xz[lc][i]);
-             		   dipole::cells_field_array_y[i]+=(mx*internal::rij_intra_xy[lc][i] + my*internal::rij_intra_yy[lc][i] + mz*internal::rij_intra_yz[lc][i]);
-             		   dipole::cells_field_array_z[i]+=(mx*internal::rij_intra_xz[lc][i] + my*internal::rij_intra_yz[lc][i] + mz*internal::rij_intra_zz[lc][i]);
-                     // Demag field
-                     dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_intra_xx[lc][i] + my*internal::rij_intra_xy[lc][i] + mz*internal::rij_intra_xz[lc][i]);
-                     dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_intra_xy[lc][i] + my*internal::rij_intra_yy[lc][i] + mz*internal::rij_intra_yz[lc][i]);
-                     dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_intra_xz[lc][i] + my*internal::rij_intra_yz[lc][i] + mz*internal::rij_intra_zz[lc][i]);
-         		   }*/
+             		dipole::cells_field_array_x[i]+=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
+             		dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
+             		dipole::cells_field_array_z[i]+=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
+                  // Demag field
+                  dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
+                  dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
+                  dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
          	   }
             }
             // Multiply the cells B-field by mu_B * mu_0/(4*pi) /1e-30  <-- (9.27400915e-24 * 1e-7 / 1e30)
