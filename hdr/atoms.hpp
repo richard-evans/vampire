@@ -73,6 +73,37 @@ class zten_t{
 	};
 };
 
+// unit vector type
+class uvec_t{
+   public:
+      double x; // x hat
+      double y; // y hat
+      double z; // z hat
+      double r; // length of vector
+
+      // unit dot product
+      double dot(uvec_t a, uvec_t b){
+         return (a.x * b.x + a.y * b.y + a.z * b.z);
+      }
+
+      // dot product including length
+      double rdot(uvec_t a, uvec_t b){
+         return (a.r * b.r * (a.x * b.x + a.y * b.y + a.z * b.z));
+      }
+
+      // unit cross product
+      uvec_t cross(uvec_t a, uvec_t b){
+         uvec_t tmp;
+         tmp.x = a.y * b.z - a.z * b.y;
+         tmp.y = a.z * b.x - a.x * b.z;
+         tmp.z = a.x * b.y - a.y * b.x;
+         tmp.r = a.r * b.r;
+
+         return tmp;
+      }
+
+};
+
 //======================================================================
 //                       Global Atomistic Variables
 //======================================================================
@@ -123,6 +154,8 @@ namespace atoms
 	extern std::vector <zten_t> t_exchange_list;
 
    extern std::vector <bool> surface_array; // flag to identify atom as surface
+
+   extern std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
 
 }
 

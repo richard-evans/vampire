@@ -17,6 +17,7 @@
 #include <string>
 
 // Vampire headers
+#include "create.hpp"
 #include "exchange.hpp"
 
 //--------------------------------------------------------------------------------
@@ -27,7 +28,7 @@ namespace exchange{
    //-----------------------------------------------------------------------------
    // Function to initialise exchange module
    //-----------------------------------------------------------------------------
-   void initialize();
+   void initialize(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for exchange module

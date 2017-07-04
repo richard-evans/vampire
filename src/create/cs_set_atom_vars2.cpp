@@ -33,11 +33,12 @@
 #include <vector>
 
 #include "anisotropy.hpp"
-#include "dipole.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
 #include "create.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
+#include "exchange.hpp"
 #include "grains.hpp"
 #include "material.hpp"
 #include "random.hpp"
@@ -141,8 +142,6 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
    //---------------------------------------------------------------------------
    anisotropy::identify_surface_atoms(catom_array, cneighbourlist);
 
-
-
 	//===========================================================
 	// Create 1-D neighbourlist
 	//===========================================================
@@ -150,162 +149,10 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 	zlog << zTs() << "Memory required for creation of 1D neighbour list on rank " << vmpi::my_rank << ": ";
 	zlog << (2.0*double(atoms::num_atoms)+2.0*double(atoms::total_num_neighbours))*8.0/1.0e6 << " MB RAM"<< std::endl;
 
+   //-------------------------------------------------
+	//	Initialise exchange calculation
 	//-------------------------------------------------
-	//	Calculate total number of neighbours
-	//-------------------------------------------------
-	int counter = 0;
-
-	for(int atom=0;atom<atoms::num_atoms;atom++){
-		counter+=cneighbourlist[atom].size();
-	}
-
-	atoms::total_num_neighbours = counter;
-
-	atoms::neighbour_list_array.resize(atoms::total_num_neighbours,0);
-	atoms::neighbour_interaction_type_array.resize(atoms::total_num_neighbours,0);
-	atoms::neighbour_list_start_index.resize(atoms::num_atoms,0);
-	atoms::neighbour_list_end_index.resize(atoms::num_atoms,0);
-
-	//	Populate 1D neighbourlist and index arrays
-	counter = 0;
-	for(int atom=0;atom<atoms::num_atoms;atom++){
-		//std::cout << atom << ": ";
-		// Set start index
-		atoms::neighbour_list_start_index[atom]=counter;
-		for(unsigned int nn=0;nn<cneighbourlist[atom].size();nn++){
-			atoms::neighbour_list_array[counter] = cneighbourlist[atom][nn].nn;
-			if(cneighbourlist[atom][nn].nn > atoms::num_atoms){
-				terminaltextcolor(RED);
-				std::cerr << "Fatal Error - neighbour " << cneighbourlist[atom][nn].nn <<" is out of valid range 0-"
-				<< atoms::num_atoms << " on rank " << vmpi::my_rank << std::endl;
-				std::cerr << "Atom " << atom << " of MPI type " << catom_array[atom].mpi_type << std::endl;
-				terminaltextcolor(WHITE);
-				err::vexit();
-			}
-
-			atoms::neighbour_interaction_type_array[counter] = cneighbourlist[atom][nn].i;
-			//std::cout << cneighbourlist[atom][nn] << " ";
-			counter++;
-		}
-		//std::cout << std::endl;
-		// Set end index
-		atoms::neighbour_list_end_index[atom]=counter-1;
-	}
-
-	// condense interaction list
-	atoms::exchange_type=unit_cell.exchange_type;
-
-	// temporary class variables
-	zval_t tmp_zval;
-	zvec_t tmp_zvec;
-	zten_t tmp_zten;
-
-	switch(atoms::exchange_type){
-		case -1:
-			// unroll material calculations
-			std::cout << "Using generic form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
-			atoms::i_exchange_list.reserve(atoms::neighbour_list_array.size());
-			// loop over all interactions
-			for(int atom=0;atom<atoms::num_atoms;atom++){
-				const int imaterial=atoms::type_array[atom];
-				for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
-					const int natom = atoms::neighbour_list_array[nn];
-					const int jmaterial=atoms::type_array[natom];
-					atoms::i_exchange_list.push_back(tmp_zval);
-               // get unit cell interaction id
-               int i = atoms::neighbour_interaction_type_array[nn];
-               atoms::i_exchange_list[nn].Jij=unit_cell.interaction[i].Jij[0][0]*mp::material[imaterial].Jij_matrix[jmaterial][0];
-					// reset interation id to neighbour number - causes segfault if nn out of range
-					atoms::neighbour_interaction_type_array[nn]=nn;
-				}
-			}
-			// now set exchange type to normal isotropic case
-			atoms::exchange_type=0;
-			break;
-		case 0:
-			std::cout << "Using isotropic form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
-			// unroll isotopic interactions
-			atoms::i_exchange_list.reserve(unit_cell.interaction.size());
-			for(unsigned int i=0;i<unit_cell.interaction.size();i++){
-				int iatom = unit_cell.interaction[i].i;
-				int imat = unit_cell.atom[iatom].mat;
-				atoms::i_exchange_list.push_back(tmp_zval);
-				atoms::i_exchange_list[i].Jij=-unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
-			}
-			break;
-		case 1:
-			std::cout << "Using vectorial form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
-			// unroll isotopic interactions
-			atoms::v_exchange_list.reserve(unit_cell.interaction.size());
-			for(unsigned int i=0;i<unit_cell.interaction.size();i++){
-				int iatom = unit_cell.interaction[i].i;
-				int imat = unit_cell.atom[iatom].mat;
-				atoms::v_exchange_list.push_back(tmp_zvec);
-				atoms::v_exchange_list[i].Jij[0]=-unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
-				atoms::v_exchange_list[i].Jij[1]=-unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
-				atoms::v_exchange_list[i].Jij[2]=-unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
-			}
-			break;
-		case 2:
-			std::cout << "Using tensorial form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-			zlog << zTs() << "Unrolled exchange template requires " << 9.0*double(unit_cell.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
-			// unroll isotopic interactions
-			atoms::t_exchange_list.reserve(unit_cell.interaction.size());
-			for(unsigned int i=0;i<unit_cell.interaction.size();i++){
-				int iatom = unit_cell.interaction[i].i;
-				int imat = unit_cell.atom[iatom].mat;
-				atoms::t_exchange_list.push_back(tmp_zten);
-
-				atoms::t_exchange_list[i].Jij[0][0]=-unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[0][1]=-unit_cell.interaction[i].Jij[0][1]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[0][2]=-unit_cell.interaction[i].Jij[0][2]/mp::material[imat].mu_s_SI;
-
-				atoms::t_exchange_list[i].Jij[1][0]=-unit_cell.interaction[i].Jij[1][0]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[1][1]=-unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[1][2]=-unit_cell.interaction[i].Jij[1][2]/mp::material[imat].mu_s_SI;
-
-				atoms::t_exchange_list[i].Jij[2][0]=-unit_cell.interaction[i].Jij[2][0]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[2][1]=-unit_cell.interaction[i].Jij[2][1]/mp::material[imat].mu_s_SI;
-				atoms::t_exchange_list[i].Jij[2][2]=-unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
-			}
-			break;
-
-      case 3: // normalised vectorial exchange
-   			// unroll material calculations
-   			std::cout << "Using vectorial form of exchange interaction with " << unit_cell.interaction.size() << " total interactions." << std::endl;
-   			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
-   			atoms::v_exchange_list.reserve(atoms::neighbour_list_array.size());
-   			// loop over all interactions
-   			for(int atom=0;atom<atoms::num_atoms;atom++){
-   				const int imaterial=atoms::type_array[atom];
-   				for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
-   					const int natom = atoms::neighbour_list_array[nn];
-   					const int jmaterial=atoms::type_array[natom];
-   					atoms::v_exchange_list.push_back(tmp_zvec);
-                  // get unit cell interaction id
-                  int i = atoms::neighbour_interaction_type_array[nn];
-                  atoms::v_exchange_list[nn].Jij[0]=unit_cell.interaction[i].Jij[0][0]*mp::material[imaterial].Jij_matrix[jmaterial][0];
-                  atoms::v_exchange_list[nn].Jij[1]=unit_cell.interaction[i].Jij[1][1]*mp::material[imaterial].Jij_matrix[jmaterial][1];
-                  atoms::v_exchange_list[nn].Jij[2]=unit_cell.interaction[i].Jij[2][2]*mp::material[imaterial].Jij_matrix[jmaterial][2];
-   					// reset interation id to neighbour number - causes segfault if nn out of range
-   					atoms::neighbour_interaction_type_array[nn]=nn;
-   				}
-   			}
-   			// now set exchange type to normal vectorial case
-   			atoms::exchange_type=1;
-   			break;
-		default:
-			terminaltextcolor(RED);
-			std::cerr << "Error! - Unknown unit cell exchange type " << atoms::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;
-			terminaltextcolor(WHITE);
-			err::vexit();
-			break;
-	}
-
-
+   exchange::initialize(cneighbourlist);
 
    // now remove unit cell interactions data
    unit_cell.interaction.resize(0);

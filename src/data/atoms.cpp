@@ -75,4 +75,6 @@ namespace atoms{
 
    std::vector <bool> surface_array(0); // flag to identify atom as surface
 
+   std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
+
 }

@@ -42,6 +42,7 @@ namespace exchange{
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
+      void unroll_exchange_interactions();
 
    } // end of internal namespace
 

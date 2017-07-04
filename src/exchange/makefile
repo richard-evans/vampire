@@ -6,7 +6,8 @@
 exchange_objects =\
 data.o \
 initialize.o \
-interface.o
+interface.o \
+unroll.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/exchange/,$(exchange_objects))

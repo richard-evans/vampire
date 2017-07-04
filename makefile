@@ -163,6 +163,7 @@ include src/create/makefile
 include src/config/makefile
 include src/cells/makefile
 include src/dipole/makefile
+include src/exchange/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile
