@@ -38,7 +38,7 @@ namespace exchange{
    //---------------------------------------------------------------------------
    // Function to process material parameters
    //---------------------------------------------------------------------------
-   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index, const int max_materials = 100);
 
 } // end of exchange namespace
 

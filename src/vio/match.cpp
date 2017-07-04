@@ -20,6 +20,7 @@
 #include "sim.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
+#include "exchange.hpp"
 #include "material.hpp"
 #include "grains.hpp"
 #include "stats.hpp"
@@ -70,6 +71,7 @@ namespace vin{
         else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -2686,6 +2688,7 @@ namespace vin{
             else if(anisotropy::match_material_parameter(word, value, unit, line, super_index, sub_index, mp::max_materials)) return EXIT_SUCCESS;
             else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(exchange::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;

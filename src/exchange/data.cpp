@@ -29,6 +29,11 @@ namespace exchange{
       //------------------------------------------------------------------------
       // Shared variables inside exchange module
       //------------------------------------------------------------------------
+      std::vector<internal::mp_t> mp; // array of material properties
+
+      bool enable_dmi = false; // flag to enable dmi calculation
+
+      double dmi_cutoff_range = 2.6; // cutoff range for DMI calculation (Ångstroms)
 
    } // end of internal namespace
 

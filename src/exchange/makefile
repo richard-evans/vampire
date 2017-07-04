@@ -5,6 +5,7 @@
 # List module object filenames
 exchange_objects =\
 data.o \
+dmi.o \
 initialize.o \
 interface.o \
 unroll.o

@@ -28,6 +28,8 @@ namespace exchange{
    //----------------------------------------------------------------------------
    void initialize(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist){
 
+      zlog << zTs() << "Initialising data structures for exchange calculation." << std::endl;
+
       //-------------------------------------------------
    	//	Calculate total number of neighbours
    	//-------------------------------------------------
@@ -90,7 +92,8 @@ namespace exchange{
       // Unroll exchange interactions
       exchange::internal::unroll_exchange_interactions();
 
-      // Calculate dmi
+      // Calculate Dzyaloshinskii-Moriya interactions (must be done after exchange unrolling)
+      exchange::internal::calculate_dmi(cneighbourlist);
 
       return;
 

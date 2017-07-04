@@ -34,14 +34,41 @@ namespace exchange{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
+      //-----------------------------------------------------------------------------
+      // materials class for storing exchange material parameters
+      //-----------------------------------------------------------------------------
+      class mp_t{
+
+         private:
+
+         public:
+
+            // variables
+            std::vector<double> dmi; // Dzyaloshinskii-Moriya interaction constant
+
+            // constructor
+            mp_t (const unsigned int max_materials = 100)
+            {
+               // resize arrays to correct size
+               dmi.resize(max_materials, 0.0); // initialise pair anisotropy constants to zero
+
+            }; // end of constructor
+
+      }; // end of exchange::internal::mp class
 
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
+      extern std::vector<internal::mp_t> mp; // array of material properties
+
+      extern bool enable_dmi; // flag to enable dmi calculation
+
+      extern double dmi_cutoff_range; // cutoff range for DMI calculation (Ångstroms)
 
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
+      void calculate_dmi(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
       void unroll_exchange_interactions();
 
    } // end of internal namespace
