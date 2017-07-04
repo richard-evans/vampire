@@ -113,10 +113,6 @@ namespace dipole{
 
       }
 
-      // Andrea - not sure what these are in aid of - generally a bad idea to change these!
-      cells::num_cells = dipole::internal::cells_num_cells;
-      cells::num_atoms_in_cell = dipole::internal::cells_num_atoms_in_cell;
-
       // Set initialised flag
       dipole::internal::initialised=true;
 
