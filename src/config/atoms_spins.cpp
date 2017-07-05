@@ -53,7 +53,7 @@ void atoms(){
    const double real_time = double(sim::time) * mp::dt_SI;
 
    if(config::internal::mode != legacy && vmpi::my_rank == 0){
-      write_meta(real_time, sim::temperature, sim::H_vec[0], sim::H_vec[1], sim::H_vec[2], magnetisation[0], magnetisation[1], magnetisation[2]);
+      write_meta(real_time, sim::temperature, sim::H_vec[0], sim::H_vec[1], sim::H_vec[2], sim::H_applied, magnetisation[0], magnetisation[1], magnetisation[2]);
    }
 
    //------------------------------------------

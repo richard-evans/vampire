@@ -96,6 +96,7 @@ namespace config{
                       const double applied_field_x, // applied field components (Tesla)
                       const double applied_field_y,
                       const double applied_field_z,
+                      const double applied_field_mag,
                       const double magnetization_x, // magnetization components (normalized)
                       const double magnetization_y,
                       const double magnetization_z){
@@ -120,7 +121,7 @@ namespace config{
          ofile << "# Date: "<< asctime(timeinfo);
          ofile << "#------------------------------------------------------"<< "\n";
          ofile << "Time: " << simulation_time << "\n";
-         ofile << "Field: " << applied_field_x << "\t" << applied_field_y << "\t" << applied_field_z << "\n";
+         ofile << "Field: " << applied_field_x*applied_field_mag << "\t" << applied_field_y*applied_field_mag << "\t" << applied_field_z*applied_field_mag << "\n";
          ofile << "Temperature: "<< temperature << "\n";
          ofile << "Magnetisation: " << magnetization_x << "\t" << magnetization_y << "\t" << magnetization_z << "\n";
          ofile << "#------------------------------------------------------" << "\n";
