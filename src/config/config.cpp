@@ -111,14 +111,14 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    //------------------------------------------------------
    if ((config::internal::output_cells_config == true) && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
    {
-      // for all programs except hysteresis
-      if (sim::program != 2)
+      // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
+      if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
       {
          if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
          config::internal::legacy_cells();
       }
-      // for hysteresis program
-      else if (sim::program == 2)
+      // for hysteresis programs
+      else if ((sim::program == 2) || (sim::program ==3) || (sim::program ==12))
       {
          // output config only in range [minField_1;maxField_1] for decreasing field
          if (sim::parity < 0)
