@@ -37,8 +37,10 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    // Calculate field ranges for output in limited applied ranges during hysteresis
    //------------------------------------------------------------------------------------------
 
+   // Max and Min field values for descending branch
    double minField_1;
    double maxField_1;
+   // Max and Min field values for ascending branch
    double minField_2;
    double maxField_2;
 
@@ -70,15 +72,16 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    //------------------------------------------------------
    if ((config::internal::output_atoms_config == true) && (sim::output_rate_counter % config::internal::output_atoms_config_rate == 0))
    {
-      // for all programs except hysteresis
-      if (sim::program != 2)
+      // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
+      if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
       {
+         //Always output coordinates the first time (re-)started, otherwise the spins coordinates won't be printed
          if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
-         config::internal::atoms();
-         config::internal::output_rate_counter_coords++;
+         config::internal::atoms(); // call function to output spins coords
+         config::internal::output_rate_counter_coords++; //update the counter
       }
-      // for hysteresis program
-      else if (sim::program == 2)
+      // for hysteresis programs
+      else if ((sim::program == 2) || (sim::program ==3) || (sim::program ==12))
       {
          // output config only in range [minField_1;maxField_1] for descending branch
          if (sim::parity < 0)
