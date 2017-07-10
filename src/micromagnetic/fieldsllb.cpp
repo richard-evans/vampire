@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include <vector>
 #include "errors.hpp"
+#include "cells.hpp"
 #include "vio.hpp"
+#include "environment.hpp"
 namespace micromagnetic
 {
 
@@ -24,26 +26,16 @@ namespace micromagnetic
                                                std::vector<double> y_array,
                                                std::vector<double> z_array){
 
-
+                                                // std::cout <<'a' << std::endl;
       std::vector<double> spin_field(3,0.0);
-		//std::cout << "f2" <<std::endl;
-      //chi is usually used as 2/chi
+
+      //chi is usually used as 1/2*chi
       const double one_o_2_chi_para = (one_o_chi_para[cell]/2.0);
-      //std::cout << "f2" <<std::endl;
 
-
-      //the temperature is usually used as a reduced temperature.
+      //the temperature is usually used as a reduced temperature or Tc/(Tc-T).
       const double reduced_temperature = temperature/Tc[cell];
       const double Tc_o_Tc_m_T = Tc[cell]/(temperature - Tc[cell]);
-      //std::cout << "f2" <<std::endl;
 
-      //std::cout << "temp" << '\t' << temperature << std::endl;
-      //std::cout << "Tc" << '\t' << Tc[cell] << std::endl;
-      //std::cout << "Rt" << '\t' << reduced_temperature << std::endl;
-      //std::cout << "alpha_para" << '\t' << alpha_para[cell] << std::endl;
-      //std::cout << "alpha_perp" << '\t' << alpha_perp[cell] << std::endl;
-      //std::cout << "me" << '\t' << m_e[cell] << std::endl;
-      //calculates me and alpha depending on the temperature.
       if (temperature<=Tc[cell]){
          m_e[cell] = pow((Tc[cell]-temperature)/(Tc[cell]),0.365);
          alpha_para[cell] = (2.0/3.0)*alpha[cell]*reduced_temperature;
@@ -54,7 +46,7 @@ namespace micromagnetic
          alpha_para[cell] = alpha[cell]*(2.0/3.0)*reduced_temperature;
          alpha_perp[cell] = alpha_para[cell];
       }
-		//std::cout << "f3" <<std::endl;
+
       const double m_e_squared = m_e[cell]*m_e[cell];
       const double m_squared = m[1]*m[1]+m[2]*m[2]+m[0]*m[0];
 
@@ -62,13 +54,14 @@ namespace micromagnetic
       double pf = 0;
       if(temperature<=Tc[cell]) pf = one_o_2_chi_para*(1.0 - m_squared/m_e_squared);
       else pf = -2.0*one_o_2_chi_para*(1.0 + Tc_o_Tc_m_T*3.0*m_squared/5.0);
-		//std::cout << "f4" <<std::endl;
+
 
       //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
       double exchange_field[3]={0.0,0.0,0.0};
       //is T < TC the exchange field = 0
       int cellj;
       double mj;
+
 
       if (num_cells > 1){
        int j2 = cell*num_cells;
@@ -83,12 +76,19 @@ namespace micromagnetic
           exchange_field[2] -= Ac*(z_array[cellj] - z_array[cell]);
         }
       }
-		//std::cout << "f5" <<std::endl;
-      //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] = pf*m[0] - one_o_chi_perp[cell]*m[0] + ext_field[0] + cells::field_array_x[cell]*cells::num_atoms_in_cell[cell] + exchange_field[0];
-      spin_field[1] = pf*m[1] - one_o_chi_perp[cell]*m[1] + ext_field[1] + cells::field_array_y[cell]*cells::num_atoms_in_cell[cell] + exchange_field[1];
-      spin_field[2] = pf*m[2]                       + ext_field[2] + cells::field_array_z[cell]*cells::num_atoms_in_cell[cell] + exchange_field[2];
 
+      //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
+      spin_field[0] = pf*m[0] - one_o_chi_perp[cell]*m[0] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0];
+      spin_field[1] = pf*m[1] - one_o_chi_perp[cell]*m[1] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1];
+      spin_field[2] = pf*m[2]                             + ext_field[2] + cells::field_array_z[cell] + exchange_field[2];
+
+     if (environment::enabled){
+       spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
+       spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
+       spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+      // std::cout << cell << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << "\t" << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2] << std::endl;
+     }
+    //  std::cout << spin_field[0] << '\t' << environment::environment_field_x[cell] <<std::endl;
       return spin_field;
      }
    }

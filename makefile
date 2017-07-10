@@ -176,6 +176,7 @@ include src/simulate/makefile
 include src/unitcell/makefile
 include src/vio/makefile
 include src/micromagnetic/makefile
+include src/environment/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)

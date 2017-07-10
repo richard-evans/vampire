@@ -55,10 +55,7 @@ namespace micromagnetic{
           }
       }
       test="atomistic-steps-per-micromagnetic-step";
-            std::cout << word << "\t" << test << std::endl;
-
       if(word==test){
-        std::cout << "a" <<std::endl;
         double dt=atof(value.c_str());
         //vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
         micromagnetic::num_atomic_steps_mm =dt;

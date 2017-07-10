@@ -21,6 +21,7 @@
 #include "errors.hpp"
 #include "material.hpp"
 #include "micromagnetic.hpp"
+#include "environment.hpp"
 #include "grains.hpp"
 #include "stats.hpp"
 #include "units.hpp"
@@ -73,6 +74,7 @@ namespace vin{
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -758,6 +760,11 @@ namespace vin{
             test="diagnostic-boltzmann";
             if(value==test){
                 sim::program=50;
+                return EXIT_SUCCESS;
+            }
+            test="setting";
+            if(value==test){
+                sim::program=51;
                 return EXIT_SUCCESS;
             }
             else{
@@ -2992,6 +2999,7 @@ namespace vin{
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(environment::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             //--------------------------------------------------------------------
             // keyword not found
             //--------------------------------------------------------------------

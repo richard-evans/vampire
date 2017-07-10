@@ -93,6 +93,9 @@ namespace micromagnetic{
                                              y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
 
 
+for (int cell = 0; cell < num_cells; cell++){
+  std::cout << cells::cell_coords_array_x[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << std::endl;
+}
 
 //if multiscale simulation work out which cells/atoms are micromagnetic/atomistic
 if (discretisation_type == 2){

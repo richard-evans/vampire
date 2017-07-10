@@ -80,17 +80,22 @@ namespace dipole{
    	Mz2.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
 
 
-         Mx.IFill(0.0);
-         My.IFill(0.0);
-         Mz.IFill(0.0);
+		Mx.IFill(0.0);
+		My.IFill(0.0);
+		Mz.IFill(0.0);
 
-   		Mx2.IFill(0.0);
-         My2.IFill(0.0);
-         Mz2.IFill(0.0);
+		Mx2.IFill(0.0);
+		My2.IFill(0.0);
+		Mz2.IFill(0.0);
 
-   		Hx2.IFill(0.0);
-         Hy2.IFill(0.0);
-         Hz2.IFill(0.0);
+		Hx.IFill(0.0);
+		Hy.IFill(0.0);
+		Hz.IFill(0.0);
+
+		Hx2.IFill(0.0);
+		Hy2.IFill(0.0);
+		Hz2.IFill(0.0);
+		
    	//		std::cout << "a" <<std::endl;
    		int cell = 0;
    		for (int i=0 ; i<dp::num_macro_cells_x; i++){
@@ -100,8 +105,10 @@ namespace dipole{
    					Mx(i,j,k)[0] = cells::mag_array_x[cell]/9.27400915e-24;
    					My(i,j,k)[0] = cells::mag_array_y[cell]/9.27400915e-24;
    					Mz(i,j,k)[0] = cells::mag_array_z[cell]/9.27400915e-24;
-               //   if (cell == 0) std::cout << Mx(i,j,k)[0]  << "\t" <<   My(i,j,k)[0]  << "\t" <<   Mz(i,j,k)[0]  << "\t" <<  std::endl;
- 					   cell ++;
+                  //if (cell == 0) std::cout << "A" << Mx(i,j,k)[0]  << "\t" <<   My(i,j,k)[0]  << "\t" <<   Mz(i,j,k)[0]  << "\t" <<  std::endl;
+
+					//	std::cout << cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] << '\t' << Mx(i,j,k)[0] << '\t' << My(i,j,k)[0] << '\t' << Mz(i,j,k)[0] <<std::endl;
+					   cell ++;
 
    				}
    			 }
@@ -129,11 +136,11 @@ cell = 0;
       for (int i=0 ; i<2*dp::num_macro_cells_x ; i++){
          for (int j=0 ; j<2*dp::num_macro_cells_y ; j++){
              for (int k=0 ; k<2*dp::num_macro_cells_z ; k++){
-         //       if (cell == 0) std::cout << "Nx" << Nxx(i,j,k)[0]  << "\t" <<   Nxy(i,j,k)[0]  << "\t" <<   Nxz(i,j,k)[0]  << "\t" << Nxx(i,j,k)[1]  << "\t" <<   Nxy(i,j,k)[1]  << "\t" <<   Nxz(i,j,k)[1]  << "\t" <<  std::endl;
-         //       if (cell == 0) std::cout << "Ny" << Nyx(i,j,k)[0]  << "\t" <<   Nyy(i,j,k)[0]  << "\t" <<   Nyz(i,j,k)[0]  << "\t" << Nyx(i,j,k)[1]  << "\t" <<   Nyy(i,j,k)[1]  << "\t" <<   Nyz(i,j,k)[1]  << "\t" <<  std::endl;
-         //       if (cell == 0) std::cout << "Nz" << Nzx(i,j,k)[0]  << "\t" <<   Nzy(i,j,k)[0]  << "\t" <<   Nzz(i,j,k)[0]  << "\t" << Nzx(i,j,k)[1]  << "\t" <<   Nzy(i,j,k)[1]  << "\t" <<   Nzz(i,j,k)[1]  << "\t" <<  std::endl;
+               if (cell == 0) std::cout << "Nx" << Nxx(i,j,k)[0]  << "\t" <<   Nxy(i,j,k)[0]  << "\t" <<   Nxz(i,j,k)[0]  << "\t" << Nxx(i,j,k)[1]  << "\t" <<   Nxy(i,j,k)[1]  << "\t" <<   Nxz(i,j,k)[1]  << "\t" <<  std::endl;
+               if (cell == 0) std::cout << "Ny" << Nyx(i,j,k)[0]  << "\t" <<   Nyy(i,j,k)[0]  << "\t" <<   Nyz(i,j,k)[0]  << "\t" << Nyx(i,j,k)[1]  << "\t" <<   Nyy(i,j,k)[1]  << "\t" <<   Nyz(i,j,k)[1]  << "\t" <<  std::endl;
+               if (cell == 0) std::cout << "Nz" << Nzx(i,j,k)[0]  << "\t" <<   Nzy(i,j,k)[0]  << "\t" <<   Nzz(i,j,k)[0]  << "\t" << Nzx(i,j,k)[1]  << "\t" <<   Nzy(i,j,k)[1]  << "\t" <<   Nzz(i,j,k)[1]  << "\t" <<  std::endl;
 
-            //    if (cell == 0) std::cout << "M" << Mx2(i,j,k)[0]  << "\t" <<   My2(i,j,k)[0]  << "\t" <<   Mz2(i,j,k)[0]  << "\t" << Mx2(i,j,k)[1]  << "\t" <<   My2(i,j,k)[1]  << "\t" <<   Mz2(i,j,k)[1]  << "\t" <<  std::endl;
+               if (cell == 0) std::cout << "M" << Mx2(i,j,k)[0]  << "\t" <<   My2(i,j,k)[0]  << "\t" <<   Mz2(i,j,k)[0]  << "\t" << Mx2(i,j,k)[1]  << "\t" <<   My2(i,j,k)[1]  << "\t" <<   Mz2(i,j,k)[1]  << "\t" <<  std::endl;
 
               Hx(i,j,k)[0] = Nxx(i,j,k)[0]*Mx2(i,j,k)[0] + Nxy(i,j,k)[0]*My2(i,j,k)[0] + Nxz(i,j,k)[0]*Mz2(i,j,k)[0]; //summing the real part
               Hx(i,j,k)[0] -= (Nxx(i,j,k)[1]*Mx2(i,j,k)[1] + Nxy(i,j,k)[1]*My2(i,j,k)[1] + Nxz(i,j,k)[1]*Mz2(i,j,k)[1]);

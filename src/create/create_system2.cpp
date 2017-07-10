@@ -290,6 +290,7 @@ int create(){
 
 	// Set grain and cell variables for simulation
 	grains::set_properties();
+	std::cout << "yay" <<std::endl;
    cells::initialize(cs::system_dimensions[0],
                   cs::system_dimensions[1],
                   cs::system_dimensions[2],

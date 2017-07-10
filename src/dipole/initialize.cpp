@@ -337,7 +337,25 @@ namespace dipole{
 
       //   std::cout << "b" <<std::endl;
 
+      dp::Nxx.IFill(0.0);
+      dp::Nxy.IFill(0.0);
+      dp::Nxz.IFill(0.0);
+      dp::Nyx.IFill(0.0);
+      dp::Nyy.IFill(0.0);
+      dp::Nyz.IFill(0.0);
+      dp::Nzx.IFill(0.0);
+      dp::Nzy.IFill(0.0);
+      dp::Nzz.IFill(0.0);
 
+      dp::Nxx0.IFill(0.0);
+      dp::Nxy0.IFill(0.0);
+      dp::Nxz0.IFill(0.0);
+      dp::Nyx0.IFill(0.0);
+      dp::Nyy0.IFill(0.0);
+      dp::Nyz0.IFill(0.0);
+      dp::Nzx0.IFill(0.0);
+      dp::Nzy0.IFill(0.0);
+      dp::Nzz0.IFill(0.0);
 
       double ii,jj,kk;
          for(int i=0;i<dp::num_macro_cells_x*2;i++){
@@ -362,7 +380,7 @@ namespace dipole{
                      const double ez = rz*rij;
 
                      const double rij3 = rij*rij*rij; // Angstroms
-                  //   std::cout << "r" << rx << '\t' << ry << '\t' << rz << "\t" << cells::macro_cell_size << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
+                  //   std::cout << "DPr" << rx << '\t' << ry << '\t' << rz << "\t" << cells::macro_cell_size << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
 
                         //	 std::cout <<"r" << rx << '\t' << ry << '\t' << rz << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez << prefactor << std::endl;
 
@@ -378,19 +396,32 @@ namespace dipole{
                      dp::Nzy0(i,j,k)[0] = (3.0*ez*ey      )*rij3;
                      dp::Nzz0(i,j,k)[0] = (3.0*ez*ez      )*rij3;
 
-            //         		 		std::cout << 	i << '\t' << j << "\t" << k << '\t' << dp::Nxx0(i,j,k)[0] << '\t' << dp::Nxy0(i,j,k)[0] << '\t' << dp::Nxz0(i,j,k)[0] << '\t' << dp::Nyy(i,j,k)[0] << '\t' << dp::Nyz0(i,j,k)[0] << '\t' << dp::Nzz0(i,j,k)[0] <<std::endl;
+
+                     dp::Nxx(i,j,k)[0] = 0.0;
+                     dp::Nxy(i,j,k)[0] = 0.0;
+                     dp::Nxz(i,j,k)[0] = 0.0;
+
+                     dp::Nyx(i,j,k)[0] = 0.0;
+                     dp::Nyy(i,j,k)[0] = 0.0;
+                     dp::Nyz(i,j,k)[0] = 0.0;
+
+                     dp::Nzx(i,j,k)[0] = 0.0;
+                     dp::Nzy(i,j,k)[0] = 0.0;
+                     dp::Nzz(i,j,k)[0] = 0.0;
+            //         std::cout << 	"DP" << i << '\t' << j << "\t" << k << '\t' << dp::Nxx0(i,j,k)[0] << '\t' << dp::Nxy0(i,j,k)[0] << '\t' << dp::Nxz0(i,j,k)[0] << '\t' << dp::Nyy(i,j,k)[0] << '\t' << dp::Nyz0(i,j,k)[0] << '\t' << dp::Nzz0(i,j,k)[0] <<std::endl;
                   }
                }
             }
          }
       //   std::cin.get();
-
+   //   std::cout << "ENV" <<std::endl;
+   //   std::cin.get();
 
          // fft calculations
          fftw_plan NxxP,NxyP,NxzP,NyxP,NyyP,NyzP,NzxP,NzyP,NzzP;
 
 
-         //deterines the forward transform for the N arrays
+          //deterines the forward transform for the N arrays
          NxxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nxx0.ptr(),dp::Nxx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
       fftw_execute(NxxP);
          NyxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nyx0.ptr(),dp::Nyx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
@@ -412,7 +443,13 @@ namespace dipole{
          NzzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nzz0.ptr(),dp::Nzz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzzP);
       //   std::cout << "d" <<std::endl;
-
+      // std::cout << "INIT DP" <<std::endl;
+      // int i = 0;
+      // int j = 0;
+      // int k = 0;
+      // std::cout << dp::Nxx0(i,j,k)[0] << '\t' << dp::Nxy0(i,j,k)[0] << '\t' << dp::Nxz0(i,j,k)[0] << '\t' << dp::Nyy0(i,j,k)[0] << '\t' << dp::Nyz0(i,j,k)[0] << '\t' << dp::Nzz0(i,j,k)[0] <<std::endl;
+      // std::cout << dp::Nxx(i,j,k)[0] << '\t' << dp::Nxy(i,j,k)[0] << '\t' << dp::Nxz(i,j,k)[0] << '\t' << dp::Nyy(i,j,k)[0] << '\t' << dp::Nyz(i,j,k)[0] << '\t' << dp::Nzz(i,j,k)[0] <<std::endl;
+      // std::cin.get();
 
       }
 

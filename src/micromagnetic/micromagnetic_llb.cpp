@@ -99,9 +99,9 @@ namespace micromagnetic{
   }
 
 int LLB( std::vector <int> local_cell_array,
-										 int num_steps,
+							int num_steps,
                      int num_cells,
-										 int num_local_cells,
+							int num_local_cells,
                      double temperature,
                      std::vector<double>& x_mag_array,
                      std::vector<double>& y_mag_array,
@@ -179,7 +179,9 @@ int LLB( std::vector <int> local_cell_array,
 		m[0] = x_array[cell];
 		m[1] = y_array[cell];
 		m[2] = z_array[cell];
+
 		spin_field = mm::calculate_llb_fields(m, temperature, num_cells, cell, x_array,y_array,z_array);
+		//if (cell == 0 ) std::cout << m[0] << "\t" << spin_field[0] <<std::endl;
 		//calculates the stochatic parallel and perpendicular terms
 		////std::cout << dt << "\t" << temperature << '\t' << kB << '\t' << mm::alpha_para[cell] << '\t' << mm::alpha_perp[cell] << '\t' << mm::ms[cell] << '\t' << sigma_para << '\t' << sigma_perp << std::endl;
 		double sigma_para = sqrt(2*kB*temperature*mm::alpha_para[cell]/(mm::ms[cell]*dt)); //why 1e-27
@@ -194,7 +196,8 @@ int LLB( std::vector <int> local_cell_array,
 
 		double xyz[3] = {0.0,0.0,0.0};
 		//calculates the LLB equation
-		xyz[0]=  - (m[1]*H[2]-m[2]*H[1])
+	//if (cell==0)	std:: cout << m[0] << '\t' << m[1] << '\t' << m[2] << "\t" << H[0] << '\t' << H[1] << '\t' << H[2] << "\t" << m[1]*H[2] << '\t'  << m[2]*H[1] << std::endl;
+ 		xyz[0]=  - (m[1]*H[2]-m[2]*H[1])
 						 + mm::alpha_para[cell]*m[0]*SdotH*one_o_m_squared
 						 - mm::alpha_perp[cell]*(m[1]*(m[0]*H[1]-m[1]*H[0])-m[2]*(m[2]*H[0]-m[0]*H[2]))*one_o_m_squared
 						 + GW1x[cell]*sigma_para
@@ -215,7 +218,7 @@ int LLB( std::vector <int> local_cell_array,
 		x_euler_array[cell] = xyz[0];
 		y_euler_array[cell] = xyz[1];
 		z_euler_array[cell] = xyz[2];
-
+		//if(cell == 0) std::cout << (m[1]*H[2]-m[2]*H[1]) << '\t' <<mm::alpha_para[cell]*m[0]*SdotH*one_o_m_squared <<"\t" << mm::alpha_perp[cell]*(m[1]*(m[0]*H[1]-m[1]*H[0])-m[2]*(m[2]*H[0]-m[0]*H[2]))*one_o_m_squared << "\t" << x_euler_array[cell] << std::endl;
 	}
 
 	//these new x postiion are stored in an array (store)
@@ -285,10 +288,11 @@ int LLB( std::vector <int> local_cell_array,
 	//calcualtes the final position as x = xinital + 1/2(euler+heun)*dt
 	for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
 		int cell = list_of_micromagnetic_cells[lc];
+
 		 x_array[cell] = x_initial_spin_array[cell] + 0.5*dt*(x_euler_array[cell] + x_heun_array[cell]);
 		 y_array[cell] = y_initial_spin_array[cell] + 0.5*dt*(y_euler_array[cell] + y_heun_array[cell]);
 		 z_array[cell] = z_initial_spin_array[cell] + 0.5*dt*(z_euler_array[cell] + z_heun_array[cell]);
-
+//if (cell == 0) std::cout << x_array[cell] << '\t' << dt << "\t" <<x_initial_spin_array[cell]  << '\t' << x_euler_array[cell] << '\t' << x_heun_array[cell] <<std::endl;
 		cells::mag_array_x[cell] = x_array[cell]*mm::ms[cell];
 		cells::mag_array_y[cell] = y_array[cell]*mm::ms[cell];
 		cells::mag_array_z[cell] = z_array[cell]*mm::ms[cell];

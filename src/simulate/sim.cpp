@@ -46,6 +46,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "program.hpp"
+#include "environment.hpp"
 #include "cells.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
@@ -292,6 +293,8 @@ int run(){
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
+	 if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
+
 	 //initialize the micromagnetic calculation
 	 if (micromagnetic::discretisation_type > 0) micromagnetic::initialize(cells::num_local_cells,
 		 																																					cells::num_cells,
@@ -313,6 +316,7 @@ int run(){
 																																							cs::system_dimensions[1],
 																																							cs::system_dimensions[2],
 																																							cells::local_cell_array);
+
 
 
 	 // For MPI version, calculate initialisation time
@@ -604,6 +608,14 @@ if (micromagnetic::discretisation_type ==1) {
 
 		 case 0: // LLG Heun
 				for(int ti=0;ti<n_steps;ti++){
+			//		std::cout << "A" << sim::time << std::endl;
+					if (environment::enabled) environment::LLB(sim::temperature,
+																											sim::H_applied,
+																											sim::H_vec[0],
+																											sim::H_vec[1],
+																											sim::H_vec[2],
+																											mp::dt);
+
 
 					if (micromagnetic::number_of_micromagnetic_cells > 0)	micromagnetic::LLG(cells::local_cell_array,
 																																										n_steps,
@@ -619,12 +631,21 @@ if (micromagnetic::discretisation_type ==1) {
 																																										sim::H_applied,
 																																										mp::dt,
 																																										cells::volume_array);
+
 					 increment_time();
 				}
 				break;
 
 	 	case 1: // Montecarlo
 	 		for(int ti=0;ti<n_steps;ti++){
+	//								std::cout << "A" << sim::time << std::endl;
+				if (environment::enabled) environment::LLB(sim::temperature,
+																										sim::H_applied,
+																										sim::H_vec[0],
+																										sim::H_vec[1],
+																										sim::H_vec[2],
+																										mp::dt);
+			//		std::cout << "B" << ti << std::endl;
 				if (micromagnetic::number_of_micromagnetic_cells > 0)	micromagnetic::LLB(cells::local_cell_array,
 																																									n_steps,
 																																									cells::num_cells,
@@ -639,6 +660,7 @@ if (micromagnetic::discretisation_type ==1) {
 																																									sim::H_applied,
 																																									mp::dt,
 																																									cells::volume_array);
+																																											//			std::cout << "C" << ti << std::endl;
 				increment_time();
 	 		}
 	 		break;
@@ -658,9 +680,16 @@ else if (micromagnetic::discretisation_type ==2) {
 
 		 	case 0: // LLG Heun
 				for(int ti=0;ti<n_steps;ti++){
+					if (environment::enabled) environment::LLB(sim::temperature,
+																											sim::H_applied,
+																											sim::H_vec[0],
+																											sim::H_vec[1],
+																											sim::H_vec[2],
+																											mp::dt);
+										std::cout << "A" << ti << std::endl;
 					//std::cout << sim::time << '\t' << micromagnetic::num_atomic_steps_mm << "\t" << mp::dt << "\t" << mp::dt*micromagnetic::num_atomic_steps_mm << std::endl;
 					if (micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
-
+					std::cout << "B" << ti << std::endl;
 					if (micromagnetic::number_of_micromagnetic_cells > 0 && sim::time % micromagnetic::num_atomic_steps_mm == 0)	micromagnetic::LLG(cells::local_cell_array,
 																																																																					n_steps,
 																																																																					cells::num_cells,
@@ -676,14 +705,23 @@ else if (micromagnetic::discretisation_type ==2) {
 																																																																					mp::dt*micromagnetic::num_atomic_steps_mm,
 																																																																					cells::volume_array);
 					increment_time();
+										std::cout << "C" << ti << std::endl;
 
 				}
 				break;
 
 	 		case 1: // Montecarlo
 	 			for(int ti=0;ti<n_steps;ti++){
+					if (environment::enabled) environment::LLB(sim::temperature,
+																											sim::H_applied,
+																											sim::H_vec[0],
+																											sim::H_vec[1],
+																											sim::H_vec[2],
+																											mp::dt);
+					std::cout << "A" << ti << std::endl;
 					//std::cout << sim::time << '\t' << micromagnetic::num_atomic_steps_mm << "\t" << mp::dt << "\t" << mp::dt*micromagnetic::num_atomic_steps_mm << std::endl;
 					if (micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
+					std::cout <<"B" <<  ti << std::endl;
 
 					if (micromagnetic::number_of_micromagnetic_cells > 0 && sim::time % micromagnetic::num_atomic_steps_mm == 0)	micromagnetic::LLB(cells::local_cell_array,
 																																																																					n_steps,
@@ -699,7 +737,7 @@ else if (micromagnetic::discretisation_type ==2) {
 																																																																					sim::H_applied,
 																																																																					mp::dt*micromagnetic::num_atomic_steps_mm,
 																																																																					cells::volume_array);
-					increment_time();
+					std::cout << "C" << ti << std::endl;
 					increment_time();
 	 			}
 	 			break;
