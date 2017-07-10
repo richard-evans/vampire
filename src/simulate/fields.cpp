@@ -35,7 +35,7 @@
 #include "atoms.hpp"
 #include "material.hpp"
 #include "errors.hpp"
-//#include "demag.hpp"
+#include "exchange.hpp"
 #include "dipole.hpp"
 #include "ltmp.hpp"
 #include "random.hpp"
@@ -79,10 +79,29 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	fill (atoms::y_total_spin_field_array.begin()+start_index,atoms::y_total_spin_field_array.begin()+end_index,0.0);
 	fill (atoms::z_total_spin_field_array.begin()+start_index,atoms::z_total_spin_field_array.begin()+end_index,0.0);
 
-	// Exchange Fields
-	if(sim::hamiltonian_simulation_flags[0]==1) calculate_exchange_fields(start_index,end_index);
+   //-----------------------------------------
+	// Calculate exchange Fields
+   //-----------------------------------------
+   exchange::fields(start_index, // first atom for exchange interactions to be calculated
+                    end_index, // last +1 atom to be calculated
+                    atoms::neighbour_list_start_index,
+                    atoms::neighbour_list_end_index,
+                    atoms::type_array, // type for atom
+                    atoms::neighbour_list_array, // list of interactions between atoms
+                    atoms::neighbour_interaction_type_array, // list of interaction type for each pair of atoms with value given in exchange list
+                    atoms::i_exchange_list, // list of isotropic exchange constants
+                    atoms::v_exchange_list, // list of vectorial exchange constants
+                    atoms::t_exchange_list, // list of tensorial exchange constants
+                    atoms::x_spin_array,
+                    atoms::y_spin_array,
+                    atoms::z_spin_array,
+                    atoms::x_total_spin_field_array,
+                    atoms::y_total_spin_field_array,
+                    atoms::z_total_spin_field_array);
 
+   //-----------------------------------------
    // calculate anistropy fields
+   //-----------------------------------------
    anisotropy::fields(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::type_array,
                       atoms::x_total_spin_field_array, atoms::y_total_spin_field_array, atoms::z_total_spin_field_array,
                       start_index, end_index, sim::temperature);
@@ -145,100 +164,6 @@ int calculate_external_fields(const int start_index,const int end_index){
 
 	return 0;
 }
-
-int calculate_exchange_fields(const int start_index,const int end_index){
-	///======================================================
-	/// 		Subroutine to calculate exchange fields
-	///
-	///			Version 2.0 Richard Evans 08/09/2011
-	///======================================================
-
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "calculate_exchange_fields has been called" << std::endl;}
-
-	// Use appropriate function for exchange calculation
-	switch(atoms::exchange_type){
-		case 0: // isotropic
-			for(int atom=start_index;atom<end_index;atom++){
-				double Hx=0.0;
-				double Hy=0.0;
-				double Hz=0.0;
-				const int start=atoms::neighbour_list_start_index[atom];
-				const int end=atoms::neighbour_list_end_index[atom]+1;
-				for(int nn=start;nn<end;nn++){
-					const int natom = atoms::neighbour_list_array[nn];
-					const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
-					Hx -= Jij*atoms::x_spin_array[natom];
-					Hy -= Jij*atoms::y_spin_array[natom];
-					Hz -= Jij*atoms::z_spin_array[natom];
-				}
-				atoms::x_total_spin_field_array[atom] += Hx;
-				atoms::y_total_spin_field_array[atom] += Hy;
-				atoms::z_total_spin_field_array[atom] += Hz;
-			}
-			break;
-		case 1: // vector
-			for(int atom=start_index;atom<end_index;atom++){
-				double Hx=0.0;
-				double Hy=0.0;
-				double Hz=0.0;
-				const int start=atoms::neighbour_list_start_index[atom];
-				const int end=atoms::neighbour_list_end_index[atom]+1;
-				for(int nn=start;nn<end;nn++){
-					const int natom = atoms::neighbour_list_array[nn];
-					const int iid = atoms::neighbour_interaction_type_array[nn]; // interaction id
-					const double Jij[3]={atoms::v_exchange_list[iid].Jij[0],
-												atoms::v_exchange_list[iid].Jij[1],
-												atoms::v_exchange_list[iid].Jij[2]};
-
-					Hx -= Jij[0]*atoms::x_spin_array[natom];
-					Hy -= Jij[1]*atoms::y_spin_array[natom];
-					Hz -= Jij[2]*atoms::z_spin_array[natom];
-				}
-				atoms::x_total_spin_field_array[atom] += Hx;
-				atoms::y_total_spin_field_array[atom] += Hy;
-				atoms::z_total_spin_field_array[atom] += Hz;
-			}
-			break;
-		case 2: // tensor
-			for(int atom=start_index;atom<end_index;atom++){
-				double Hx=0.0;
-				double Hy=0.0;
-				double Hz=0.0;
-				const int start=atoms::neighbour_list_start_index[atom];
-				const int end=atoms::neighbour_list_end_index[atom]+1;
-				for(int nn=start;nn<end;nn++){
-					const int natom = atoms::neighbour_list_array[nn];
-					const int iid = atoms::neighbour_interaction_type_array[nn]; // interaction id
-					const double Jij[3][3]={{atoms::t_exchange_list[iid].Jij[0][0],
-													 atoms::t_exchange_list[iid].Jij[0][1],
-													 atoms::t_exchange_list[iid].Jij[0][2]},
-
-													{atoms::t_exchange_list[iid].Jij[1][0],
-													 atoms::t_exchange_list[iid].Jij[1][1],
-													 atoms::t_exchange_list[iid].Jij[1][2]},
-
-													{atoms::t_exchange_list[iid].Jij[2][0],
-													 atoms::t_exchange_list[iid].Jij[2][1],
-													 atoms::t_exchange_list[iid].Jij[2][2]}};
-
-					const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
-
-					Hx -= (Jij[0][0]*S[0] + Jij[0][1]*S[1] +Jij[0][2]*S[2]);
-					Hy -= (Jij[1][0]*S[0] + Jij[1][1]*S[1] +Jij[1][2]*S[2]);
-					Hz -= (Jij[2][0]*S[0] + Jij[2][1]*S[1] +Jij[2][2]*S[2]);
-				}
-				atoms::x_total_spin_field_array[atom] += Hx;
-				atoms::y_total_spin_field_array[atom] += Hy;
-				atoms::z_total_spin_field_array[atom] += Hz;
-			}
-			break;
-		}
-
-		return EXIT_SUCCESS;
-	}
-
-
 
 int calculate_applied_fields(const int start_index,const int end_index){
 	///==========================================================================

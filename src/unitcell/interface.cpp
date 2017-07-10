@@ -179,16 +179,16 @@ namespace unitcell{
          if(Jij.size() == 1){
             vin::check_for_valid_value(Jij[0], word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
             // set all components in case vectorial form is needed later
-            vin::read_material[super_index].Jij_matrix_SI[sub_index][0]=-Jij[0]; // Import exchange as field, *-1
-            vin::read_material[super_index].Jij_matrix_SI[sub_index][1]=-Jij[0];
-            vin::read_material[super_index].Jij_matrix_SI[sub_index][2]=-Jij[0];
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][0] = Jij[0]; // Import exchange as field
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][1] = Jij[0];
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][2] = Jij[0];
             return true;
          }
          else if(Jij.size() == 3){
             vin::check_for_valid_vector(Jij, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
-            vin::read_material[super_index].Jij_matrix_SI[sub_index][0]=-Jij[0]; // Import exchange as field, *-1
-            vin::read_material[super_index].Jij_matrix_SI[sub_index][1]=-Jij[1];
-            vin::read_material[super_index].Jij_matrix_SI[sub_index][2]=-Jij[2];
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][0] = Jij[0]; // Import exchange as field
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][1] = Jij[1];
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][2] = Jij[2];
             // set vectorial anisotropy
             uc::internal::exchange_type = uc::internal::vectorial;
             return true;

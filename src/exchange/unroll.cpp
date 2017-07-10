@@ -62,7 +62,7 @@ namespace exchange{
    				int iatom = cs::unit_cell.interaction[i].i;
    				int imat = cs::unit_cell.atom[iatom].mat;
    				atoms::i_exchange_list.push_back(tmp_zval);
-   				atoms::i_exchange_list[i].Jij=-cs::unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
+   				atoms::i_exchange_list[i].Jij = cs::unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
    			}
    			break;
 
@@ -75,9 +75,9 @@ namespace exchange{
    				int iatom = cs::unit_cell.interaction[i].i;
    				int imat = cs::unit_cell.atom[iatom].mat;
    				atoms::v_exchange_list.push_back(tmp_zvec);
-   				atoms::v_exchange_list[i].Jij[0]=-cs::unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
-   				atoms::v_exchange_list[i].Jij[1]=-cs::unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
-   				atoms::v_exchange_list[i].Jij[2]=-cs::unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
+   				atoms::v_exchange_list[i].Jij[0] = cs::unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
+   				atoms::v_exchange_list[i].Jij[1] = cs::unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
+   				atoms::v_exchange_list[i].Jij[2] = cs::unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
    			}
    			break;
 
@@ -91,17 +91,17 @@ namespace exchange{
    				int imat = cs::unit_cell.atom[iatom].mat;
    				atoms::t_exchange_list.push_back(tmp_zten);
 
-   				atoms::t_exchange_list[i].Jij[0][0]=-cs::unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
-   				atoms::t_exchange_list[i].Jij[0][1]=-cs::unit_cell.interaction[i].Jij[0][1]/mp::material[imat].mu_s_SI;
-   				atoms::t_exchange_list[i].Jij[0][2]=-cs::unit_cell.interaction[i].Jij[0][2]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[0][0] = cs::unit_cell.interaction[i].Jij[0][0]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[0][1] = cs::unit_cell.interaction[i].Jij[0][1]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[0][2] = cs::unit_cell.interaction[i].Jij[0][2]/mp::material[imat].mu_s_SI;
 
-   				atoms::t_exchange_list[i].Jij[1][0]=-cs::unit_cell.interaction[i].Jij[1][0]/mp::material[imat].mu_s_SI;
-   				atoms::t_exchange_list[i].Jij[1][1]=-cs::unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
-   				atoms::t_exchange_list[i].Jij[1][2]=-cs::unit_cell.interaction[i].Jij[1][2]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[1][0] = cs::unit_cell.interaction[i].Jij[1][0]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[1][1] = cs::unit_cell.interaction[i].Jij[1][1]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[1][2] = cs::unit_cell.interaction[i].Jij[1][2]/mp::material[imat].mu_s_SI;
 
-   				atoms::t_exchange_list[i].Jij[2][0]=-cs::unit_cell.interaction[i].Jij[2][0]/mp::material[imat].mu_s_SI;
-   				atoms::t_exchange_list[i].Jij[2][1]=-cs::unit_cell.interaction[i].Jij[2][1]/mp::material[imat].mu_s_SI;
-   				atoms::t_exchange_list[i].Jij[2][2]=-cs::unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[2][0] = cs::unit_cell.interaction[i].Jij[2][0]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[2][1] = cs::unit_cell.interaction[i].Jij[2][1]/mp::material[imat].mu_s_SI;
+   				atoms::t_exchange_list[i].Jij[2][2] = cs::unit_cell.interaction[i].Jij[2][2]/mp::material[imat].mu_s_SI;
    			}
    			break;
 

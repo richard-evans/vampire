@@ -6,6 +6,7 @@
 exchange_objects =\
 data.o \
 dmi.o \
+fields.o \
 initialize.o \
 interface.o \
 set_exchange_type.o \

@@ -35,6 +35,26 @@ namespace exchange{
    //-----------------------------------------------------------------------------
    unsigned int set_exchange_type(std::string exchange_type_string);
 
+   //-----------------------------------------------------------------------------
+   // Function to calculate exchange fields for spins between start and end index
+   //-----------------------------------------------------------------------------
+   void fields(const int start_index, // first atom for exchange interactions to be calculated
+               const int end_index, // last +1 atom to be calculated
+               const std::vector<int>& neighbour_list_start_index,
+               const std::vector<int>& neighbour_list_end_index,
+               const std::vector<int>& type_array, // type for atom
+               const std::vector<int>& neighbour_list_array, // list of interactions between atoms
+               const std::vector<int>& neighbour_interaction_type_array, // list of interaction type for each pair of atoms with value given in exchange list
+               const std::vector <zval_t>& i_exchange_list, // list of isotropic exchange constants
+               const std::vector <zvec_t>& v_exchange_list, // list of vectorial exchange constants
+               const std::vector <zten_t>& t_exchange_list, // list of tensorial exchange constants
+               const std::vector<double>& spin_array_x, // spin vectors for atoms
+               const std::vector<double>& spin_array_y,
+               const std::vector<double>& spin_array_z,
+               std::vector<double>& field_array_x, // field vectors for atoms
+               std::vector<double>& field_array_y,
+               std::vector<double>& field_array_z);
+
    //---------------------------------------------------------------------------
    // Function to process input file parameters for exchange module
    //---------------------------------------------------------------------------
