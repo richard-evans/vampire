@@ -8,6 +8,8 @@ data.o \
 dmi.o \
 initialize.o \
 interface.o \
+set_exchange_type.o \
+unroll_normalised.o \
 unroll.o
 
 # Append module objects to global tree

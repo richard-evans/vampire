@@ -35,6 +35,10 @@ namespace exchange{
 
       double dmi_cutoff_range = 2.6; // cutoff range for DMI calculation (Ångstroms)
 
+      exchange_t exchange_type = isotropic; // exchange type to use in simulation
+
+      bool use_material_exchange_constants = true; // flag to enable material exchange parameters
+
    } // end of internal namespace
 
 } // end of exchange namespace

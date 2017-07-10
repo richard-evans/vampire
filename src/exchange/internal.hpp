@@ -65,11 +65,23 @@ namespace exchange{
 
       extern double dmi_cutoff_range; // cutoff range for DMI calculation (Ångstroms)
 
+      // Enumerated list of available exchange types
+      enum exchange_t { isotropic = 0, // isotropic exchange interactions
+                        vectorial, // vector exchange Jxx, Jyy, Jzz
+                        tensorial, // tensor exchange Jxx, Jxy ... Jzz
+                        //biquadratic
+      };
+
+      extern exchange_t exchange_type;
+
+      extern bool use_material_exchange_constants; // flag to enable material exchange parameters
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
       void calculate_dmi(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
       void unroll_exchange_interactions();
+      void unroll_normalised_exchange_interactions();
 
    } // end of internal namespace
 

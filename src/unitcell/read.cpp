@@ -15,6 +15,7 @@
 
 // Vampire headers
 #include "errors.hpp"
+#include "exchange.hpp"
 #include "material.hpp"
 #include "unitcell.hpp"
 #include "vio.hpp"
@@ -159,9 +160,15 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					//std::cout << i << "\t" << id << "\t" << cx << "\t" << cy << "\t" << cz << "\t" << mat_id << "\t" << lcat_id << "\t" << hcat_id << std::endl;
 				}
 				break;
-			case 5:
-				iss >> num_interactions >> exc_type;
-				//std::cout << num_interactions << "\t" << exc_type << std::endl;
+			case 5:{
+				iss >> num_interactions;
+            std::string exchange_type_string;
+            iss >> exchange_type_string;
+				// std::cout << num_interactions << "\t" << exchange_type_string << std::endl;
+
+            // process exchange string to set exchange type and normalisation
+            const int num_exchange_values = exchange::set_exchange_type(exchange_type_string);
+
 				if(num_interactions>=0) unit_cell.interaction.resize(num_interactions);
 				else {
 					terminaltextcolor(RED);
@@ -169,8 +176,6 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					<< " of unit cell input file " << filename.c_str() << " is less than 0. Exiting" << std::endl; err::vexit();
 				    terminaltextcolor(WHITE);
 				}
-				// if exchange type omitted, then assume isotropic values from material file
-				//if(exc_type==-1) unit_cell.exchange_type=0;
 				// loop over all interactions and read into class
 				for (int i=0; i<num_interactions; i++){
 					//std::cout << "setting up interaction "<< i+1<< " of " << num_interactions << " interactions" << std::endl;
@@ -230,36 +235,40 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 
 					int iatom_mat = unit_cell.atom[iatom].mat;
 					int jatom_mat = unit_cell.atom[jatom].mat;
-					switch(exc_type){
+					switch(num_exchange_values){
 						//case -1: // assume isotropic
 						//	unit_cell.interaction[i].Jij[0][0]=mp::material[iatom_mat].Jij_matrix[jatom_mat][0]; // only works if read after mat file
 						//	break;
-						case 0:
-							int_iss >> unit_cell.interaction[i].Jij[0][0];
-							//std::cout << i << "\t" << unit_cell.interaction[i].Jij[0][0] << std::endl;
-							break;
 						case 1:
+							int_iss >> unit_cell.interaction[i].Jij[0][0];
+							// save interactions into diagonal components of the exchange tensor
+							unit_cell.interaction[i].Jij[1][1] = unit_cell.interaction[i].Jij[0][0];
+							unit_cell.interaction[i].Jij[2][2] = unit_cell.interaction[i].Jij[0][0];
+							break;
+						case 3:
 							int_iss >> unit_cell.interaction[i].Jij[0][0] >> unit_cell.interaction[i].Jij[1][1] >> unit_cell.interaction[i].Jij[2][2];
 							break;
-						case 2:
+						case 9:
 							int_iss >> unit_cell.interaction[i].Jij[0][0] >> unit_cell.interaction[i].Jij[0][1] >> unit_cell.interaction[i].Jij[0][2];
 							int_iss >> unit_cell.interaction[i].Jij[1][0] >> unit_cell.interaction[i].Jij[1][1] >> unit_cell.interaction[i].Jij[1][2];
 							int_iss >> unit_cell.interaction[i].Jij[2][0] >> unit_cell.interaction[i].Jij[2][1] >> unit_cell.interaction[i].Jij[2][2];
 							break;
 						default:
 							terminaltextcolor(RED);
-							std::cerr << "Error! Requested exchange type " << exc_type << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 0-2. Exiting" << std::endl; err::vexit();
+							std::cerr << "Programmer Error! Requested number of exchange values " << num_exchange_values << " on line " << line_counter
+					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1,3 or 9. Exiting" << std::endl;
 							terminaltextcolor(WHITE);
+                     err::vexit();
 					}
 					// increment number of interactions for atom i
 					unit_cell.atom[iatom].ni++;
 				}
 				// set interaction range
-				unit_cell.interaction_range=interaction_range;
+				unit_cell.interaction_range = interaction_range;
 				// set exchange type
-				unit_cell.exchange_type=exc_type;
+				unit_cell.exchange_type = exc_type;
 				break;
+         }
 			default:
 				terminaltextcolor(RED);
 				std::cerr << "Error! Unknown line type on line " << line_counter
