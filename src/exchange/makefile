@@ -6,6 +6,7 @@
 exchange_objects =\
 data.o \
 dmi.o \
+energy.o \
 fields.o \
 initialize.o \
 interface.o \

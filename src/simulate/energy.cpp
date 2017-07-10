@@ -54,6 +54,7 @@
 // Vampire Header files
 #include "anisotropy.hpp"
 #include "atoms.hpp"
+#include "exchange.hpp"
 #include "material.hpp"
 #include "errors.hpp"
 //#include "demag.hpp"
@@ -64,144 +65,6 @@
 #include "vmpi.hpp"
 
 namespace sim{
-
-/// @brief Calculates the exchange energy for a single spin (isotropic).
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    07/02/2011
-///
-/// @param[in] int atom number
-/// @param[in] imaterial material of local atom
-/// @param[in] Sx x-spin of local atom
-/// @param[in] Sy y-spin of local atom
-/// @param[in] Sz z-spin of local atom
-/// @return exchange energy
-///
-/// @internal
-///	Created:		07/02/2011
-///	Revision:	  ---
-///=====================================================================================
-///
-double spin_exchange_energy_isotropic(const int atom, const double Sx, const double Sy, const double Sz){
-
-	// energy
-	double energy=0.0;
-
-	// Loop over neighbouring spins to calculate exchange
-	for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
-
-		const int natom = atoms::neighbour_list_array[nn];
-		const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
-
-		energy+=Jij*(atoms::x_spin_array[natom]*Sx + atoms::y_spin_array[natom]*Sy + atoms::z_spin_array[natom]*Sz);
-	}
-
-	return energy;
-
-}
-
-/// @brief Calculates the exchange energy for a single spin (vector).
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    07/02/2011
-///
-/// @param[in] atom atom number
-/// @param[in] Sx x-spin of local atom
-/// @param[in] Sy y-spin of local atom
-/// @param[in] Sz z-spin of local atom
-/// @return exchange energy
-///
-/// @internal
-///	Created:		07/02/2011
-///	Revision:	  ---
-///=====================================================================================
-///
-double spin_exchange_energy_vector(const int atom, const double Sx, const double Sy, const double Sz){
-
-	// energy
-	double energy=0.0;
-
-	// Loop over neighbouring spins to calculate exchange
-	for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
-
-		const int natom = atoms::neighbour_list_array[nn];
-		const double Jij[3]={atoms::v_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0],
-									atoms::v_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1],
-									atoms::v_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2]};
-
-		energy+=(Jij[0]*atoms::x_spin_array[natom]*Sx + Jij[1]*atoms::y_spin_array[natom]*Sy + Jij[2]*atoms::z_spin_array[natom]*Sz);
-	}
-
-	return energy;
-
-}
-
-/// @brief Calculates the exchange energy for a single spin (tensor).
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    07/02/2011
-///
-/// @param[in] atom atom number
-/// @param[in] Sx x-spin of local atom
-/// @param[in] Sy y-spin of local atom
-/// @param[in] Sz z-spin of local atom
-/// @return exchange energy
-///
-/// @internal
-///	Created:		27/07/2012
-///	Revision:	  ---
-///=====================================================================================
-///
-double spin_exchange_energy_tensor(const int atom, const double Sx, const double Sy, const double Sz){
-
-	// energy
-	double energy=0.0;
-
-	// Loop over neighbouring spins to calculate exchange
-	for(int nn=atoms::neighbour_list_start_index[atom];nn<=atoms::neighbour_list_end_index[atom];nn++){
-
-		const int natom = atoms::neighbour_list_array[nn];
-		const double Jij[3][3]={{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][0],
-										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][1],
-										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[0][2]},
-
-										{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][0],
-										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][1],
-										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[1][2]},
-
-										{atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][0],
-										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][1],
-										 atoms::t_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij[2][2]}};
-
-		const double S[3]={atoms::x_spin_array[natom],atoms::y_spin_array[natom],atoms::z_spin_array[natom]};
-
-		energy+=(Jij[0][0]*S[0]*Sx + Jij[0][1]*S[1]*Sx +Jij[0][2]*S[2]*Sx +
-					Jij[1][0]*S[0]*Sy + Jij[1][1]*S[1]*Sy +Jij[1][2]*S[2]*Sy +
-					Jij[2][0]*S[0]*Sz + Jij[2][1]*S[1]*Sz +Jij[2][2]*S[2]*Sz);
-
-	}
-
-	return energy;
-
-}
 
 
 
@@ -281,7 +144,7 @@ double spin_magnetostatic_energy(const int atom, const double Sx, const double S
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-double calculate_spin_energy(const int atom, const int AtomExchangeType){
+double calculate_spin_energy(const int atom){
 
 	// check calling of routine if error checking is activated
 	if(err::check==true) std::cout << "calculate_spin_energy has been called" << std::endl;
@@ -298,12 +161,7 @@ double calculate_spin_energy(const int atom, const int AtomExchangeType){
 	double energy=0.0;
 
 	// Calculate total spin energy
-	switch(AtomExchangeType){
-		case 0: energy+=spin_exchange_energy_isotropic(atom, Sx, Sy, Sz); break;
-		case 1: energy+=spin_exchange_energy_vector(atom, Sx, Sy, Sz); break;
-		case 2: energy+=spin_exchange_energy_tensor(atom, Sx, Sy, Sz); break;
-		default: zlog << zTs() << "Error. atoms::exchange_type has value " << AtomExchangeType << " which is outside of valid range 0-2. Exiting." << std::endl; err::vexit();
-	}
+   energy += exchange::single_spin_energy(atom, Sx, Sy, Sz);
 
    // calculate anisotropy energy for atom
    energy += anisotropy::single_spin_energy(atom, imaterial, Sx, Sy, Sz, sim::temperature);

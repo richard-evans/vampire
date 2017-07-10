@@ -31,12 +31,10 @@ namespace exchange{
    //----------------------------------------------------------------------------
    void unroll_exchange_interactions(){
 
-   	// condense interaction list
-   	atoms::exchange_type=cs::unit_cell.exchange_type;
-
       // if dmi is enabled then set exchange type to force normalised tensor form of exchange
       if(internal::enable_dmi){
-         atoms::exchange_type = 4;
+         internal::exchange_type = internal::tensorial;
+         internal::use_material_exchange_constants = true;
       }
 
       // if normalised exchange is to be used (taking values from exchange matrix
@@ -107,7 +105,7 @@ namespace exchange{
 
    		default:
    			terminaltextcolor(RED);
-   			std::cerr << "Error! - Unknown unit cell exchange type " << atoms::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;
+   			std::cerr << "Error! - Unknown unit cell exchange type " << internal::exchange_type << "; unable to unroll exchenge template. Exiting" << std::endl;
    			terminaltextcolor(WHITE);
    			err::vexit();
    			break;

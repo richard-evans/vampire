@@ -20,6 +20,51 @@
 #include "create.hpp"
 #include "exchange.hpp"
 
+class zval_t{
+	public:
+	double Jij;
+
+	// constructor
+	zval_t():
+		Jij(0.0)
+	{
+	};
+};
+
+class zvec_t{
+	public:
+	double Jij[3];
+
+	// constructor
+	zvec_t()
+	{
+		Jij[0] = 0.0;
+		Jij[1] = 0.0;
+		Jij[2] = 0.0;
+	};
+};
+
+class zten_t{
+	public:
+	double Jij[3][3];
+
+	// constructor
+	zten_t()
+	{
+		Jij[0][0] = 0.0;
+		Jij[0][1] = 0.0;
+		Jij[0][2] = 0.0;
+
+		Jij[1][0] = 0.0;
+		Jij[1][1] = 0.0;
+		Jij[1][2] = 0.0;
+
+		Jij[2][0] = 0.0;
+		Jij[2][1] = 0.0;
+		Jij[2][2] = 0.0;
+	};
+};
+
 //--------------------------------------------------------------------------------
 // Namespace for variables and functions for exchange module
 //--------------------------------------------------------------------------------
@@ -34,6 +79,11 @@ namespace exchange{
    // Function to set exchange type isotropic, vectorial or tensorial
    //-----------------------------------------------------------------------------
    unsigned int set_exchange_type(std::string exchange_type_string);
+
+   //---------------------------------------------------------------------------
+   // Calculate  exchange energy for single spin selecting the correct type
+   //---------------------------------------------------------------------------
+   double single_spin_energy(const int atom, const double sx, const double sy, const double sz);
 
    //-----------------------------------------------------------------------------
    // Function to calculate exchange fields for spins between start and end index

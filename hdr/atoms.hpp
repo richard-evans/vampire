@@ -28,50 +28,7 @@
 #include <string>
 #include <vector>
 
-class zval_t{
-	public:
-	double Jij;
-
-	// constructor
-	zval_t():
-		Jij(0.0)
-	{
-	};
-};
-
-class zvec_t{
-	public:
-	double Jij[3];
-
-	// constructor
-	zvec_t()
-	{
-		Jij[0]=0.0;
-		Jij[1]=0.0;
-		Jij[2]=0.0;
-	};
-};
-
-class zten_t{
-	public:
-	double Jij[3][3];
-
-	// constructor
-	zten_t()
-	{
-		Jij[0][0]=0.0;
-		Jij[0][1]=0.0;
-		Jij[0][2]=0.0;
-
-		Jij[1][0]=0.0;
-		Jij[1][1]=0.0;
-		Jij[1][2]=0.0;
-
-		Jij[2][0]=0.0;
-		Jij[2][1]=0.0;
-		Jij[2][2]=0.0;
-	};
-};
+#include "exchange.hpp"
 
 // unit vector type
 class uvec_t{
@@ -115,7 +72,6 @@ namespace atoms
 	extern int num_atoms;			/// Number of atoms in simulation
 	extern int num_neighbours;	   	/// Maximum number of neighbours for Hamiltonian/Lattice
 	extern int total_num_neighbours;/// Total number of neighbours for system
-	extern int exchange_type;
    extern uint64_t num_non_magnetic_atoms; // Number of non-magnetic atoms not to be simulated
 
 	//--------------------------
