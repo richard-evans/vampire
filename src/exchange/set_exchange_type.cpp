@@ -132,8 +132,8 @@ namespace exchange{
       }
 
       terminaltextcolor(RED);
-         zlog << zTs() << "Error: Unkown exchange type \"" << exchange_type_string << "\" in unit cell file. Exiting!";
-         std::cerr     << "Error: Unkown exchange type \"" << exchange_type_string << "\" in unit cell file. Exiting!";
+         zlog << zTs() << "\nError: Unkown exchange type \"" << exchange_type_string << "\" in unit cell file. Exiting!" << std::endl;
+         std::cerr     << "\nError: Unkown exchange type \"" << exchange_type_string << "\" in unit cell file. Exiting!" << std::endl;
       terminaltextcolor(WHITE);
 
       // exit program
