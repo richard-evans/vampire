@@ -64,8 +64,8 @@ namespace exchange{
       //------------------------------------------------------------
       // Check for material properties
       //------------------------------------------------------------
-      std::string test="dmi-constant"; // short form
-      std::string test2="dzyaloshinskii-moriya-interaction-constant"; // long form
+      std::string test = "dmi-constant"; // short form
+      std::string test2 = "dzyaloshinskii-moriya-interaction-constant"; // long form
       if( (word == test) || (word == test2) ){
          double dmi = atof(value.c_str());
          vin::check_for_valid_value(dmi, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
@@ -73,6 +73,37 @@ namespace exchange{
          internal::enable_dmi = true; // Switch on dmi calculation and fully unrolled tensorial anisotropy
          return true;
       }
+      test = "exchange-matrix";
+      if(word==test){
+         // extract comma separated values from string
+         std::vector<double> Jij = vin::doubles_from_string(value);
+         if(Jij.size() == 1){
+            vin::check_for_valid_value(Jij[0], word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
+            // set all components in case vectorial form is needed later
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][0] = Jij[0]; // Import exchange as field
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][1] = Jij[0];
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][2] = Jij[0];
+            return true;
+         }
+         else if(Jij.size() == 3){
+            vin::check_for_valid_vector(Jij, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e18");
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][0] = Jij[0]; // Import exchange as field
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][1] = Jij[1];
+            vin::read_material[super_index].Jij_matrix_SI[sub_index][2] = Jij[2];
+            // set vectorial anisotropy
+            internal::exchange_type = internal::vectorial;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error in input file - material[" << super_index << "]:exchange_matrix[" << sub_index << "] must have one or three values." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error in input file - material[" << super_index << "]:exchange_matrix[" << sub_index << "] must have one or three values." << std::endl;
+            err::vexit();
+            return false;
+         }
+      }
+
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

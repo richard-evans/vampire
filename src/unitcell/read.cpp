@@ -40,6 +40,9 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 	// keep record of current line
 	unsigned int line_counter=0;
 	unsigned int line_id=0;
+
+   std::string exchange_type_string; // string defining exchange type
+
 	// Loop over all lines
 	while (! inputfile.eof() ){
 		line_counter++;
@@ -72,9 +75,8 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		std::istringstream iss(line,std::istringstream::in);
 
 		// defaults for interaction list
-		int exc_type=-1; // assume isotropic
-		int num_interactions=0; // assume no interactions
-		int interaction_range=1; // assume +-1 unit cell as default
+		int num_interactions = 0; // assume no interactions
+		int interaction_range = 1; // assume +-1 unit cell as default
 
 		// non-comment line found - check for line number
 		switch(line_id){
@@ -154,16 +156,16 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 									 << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl;
 						terminaltextcolor(WHITE);
 						zlog << zTs() << "Error! Requested material id " << mat_id << " for atom number " << id <<  " on line " << line_counter
-                            << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl; err::vexit();}
+                       << " of unit cell input file " << filename.c_str() << " is greater than the number of materials ( " << mp::num_materials << " ) specified in the material file. Exiting" << std::endl;
+                  err::vexit();
+               }
 					unit_cell.atom[i].lc=lcat_id;
 					unit_cell.atom[i].hc=hcat_id;
 					//std::cout << i << "\t" << id << "\t" << cx << "\t" << cy << "\t" << cz << "\t" << mat_id << "\t" << lcat_id << "\t" << hcat_id << std::endl;
 				}
 				break;
 			case 5:{
-				iss >> num_interactions;
-            std::string exchange_type_string;
-            iss >> exchange_type_string;
+				iss >> num_interactions >> exchange_type_string;
 				// std::cout << num_interactions << "\t" << exchange_type_string << std::endl;
 
             // process exchange string to set exchange type and normalisation
@@ -265,9 +267,9 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				}
 				// set interaction range
 				unit_cell.interaction_range = interaction_range;
-				// set exchange type
-				unit_cell.exchange_type = exc_type;
+
 				break;
+
          }
 			default:
 				terminaltextcolor(RED);
@@ -285,7 +287,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
    zlog << "Done!" << std::endl;
 	zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
 	zlog << zTs() << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
-	zlog << zTs() << "\t" << "Exchange type: " <<  unit_cell.exchange_type << std::endl;
+	zlog << zTs() << "\t" << "Exchange type: " << exchange_type_string << std::endl;
 	zlog << zTs() << "\t" << "Calculated interaction range: " << unit_cell.interaction_range << " Unit Cells" << std::endl;
 
 	return;
