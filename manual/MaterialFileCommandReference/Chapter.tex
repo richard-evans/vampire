@@ -49,12 +49,12 @@ easy axis direction.\\
 
 {\zicf material:second-order-uniaxial-anisotropy-constant = float [default 0.0 J/atom]}
 \addcontentsline{toc}{subsection}{material:second-order-uniaxial-anisotropy-constant}
-Has the same meaning and preferred form for material:uniaxial-anisotropy-constant.
+Has the same meaning and is the preferred form for material:uniaxial-anisotropy-constant.\\
 
 {\zicf material:fourth-order-uniaxial-anisotropy-constant = float [default 0.0 J/atom]}
 \addcontentsline{toc}{subsection}{material:fourth-order-uniaxial-anisotropy-constant}
 implements fourth order uniaxial anisotropy as implemented with spherical
-harmonics.
+harmonics.\\
 
 {\zicf material:cubic-anisotropy-constant = float [default 0.0 J/atom]}
 \addcontentsline{toc}{subsection}{material:cubic-anisotropy-constant}
@@ -100,10 +100,10 @@ voronoi structure or particle array) can be specified using\\
 which allocates each atom in the material a random anisotropy vector in three
 dimensions, giving all atoms of the material in each grain a different
 anisotropy vector. Both random anisotropies are compatible with higher order
-uniaxial anisotropy but not lattice anisotropy or cubic anisotropy.
+uniaxial anisotropy but not lattice anisotropy or cubic anisotropy.\\
 
 %{\zicf material:uniaxial-anisotropy-tensor float tensor [default 0]}
-\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-tensor}
+%\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-tensor}
 
 %A tensor describing the single ion second order anisotropy. The anisotropy energy is defined as
 %[ Sx Sy Sz ] [ kxx kxy kxz ]
@@ -117,11 +117,11 @@ The anisotropy is given by a summation over nearest neighbour atoms given by
 E_i = +\frac{1}{2} \sum_j^{\mathrm{nn}} \ksurf (\sms \cdot \rij )^2
 \end{equation*}
 where \ksurf is the surface anisotropy constant between atoms $i$ and $j$ and
-\rij is a unit vector between sites $i$ and $j$.
+\rij is a unit vector between sites $i$ and $j$.\\
 
 {\zicf neel-anisotropy-constant[index] = float [default 0.0 J]}
 \addcontentsline{toc}{subsection}{material:neel-anisotropy-constant}
-Has the same meaning and preferred form for material:surface-anisotropy-constant.
+Has the same meaning and is the preferred form for material:surface-anisotropy-constant.\\
 
 {\zicf lattice-anisotropy-constant = float [default 0.0 J/atom]}
 \addcontentsline{toc}{subsection}{material:lattice-anisotropy-constant}
