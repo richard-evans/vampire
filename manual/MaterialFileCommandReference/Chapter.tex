@@ -15,7 +15,7 @@ defines an identifying name for the material with a maximum length of xx charact
 
 {\zicf material:damping-constant = float [0.0-10.0; default 1.0]}\addcontentsline{toc}{subsection}{material:damping-constant} defines the phenomenological relaxation rate (damping) in dynamic simulations using the LLG equation. For equilibrium properties the damping should be set to 1 (critical damping), while for realistic dynamics the damping should be representative of the material. Typical values range from 0.005 to 0.1 for most materials.\\
 
-{\zicf material:exchange-matrix[index] = float [default $12 \times 10^{-21}$ J/link]}\addcontentsline{toc}{subsection}{material:exchange-matrix} Defines the pairwise exchange energy between atoms of type index and neighbour-index. The pair wise exchange energy is independent of the coordination number, and so the total exchange integral will depend on the number of nearest neighbours for the crystal lattice. The exchange energy must be defined between all material pairs in the simulation, with positive values representing ferromagnetic coupling, and negative values representing anti ferromagnetic coupling. For a ferromagnet with nearest neighbour exchange, the pairwise exchange energy can be found from the Curie temperature by the meanfield expression:
+{\zicf material:exchange-matrix[index] = float [default 0.0 J/link]}\addcontentsline{toc}{subsection}{material:exchange-matrix} Defines the pairwise exchange energy between atoms of type index and neighbour-index. The pair wise exchange energy is independent of the coordination number, and so the total exchange integral will depend on the number of nearest neighbours for the crystal lattice. The exchange energy must be defined between all material pairs in the simulation, with positive values representing ferromagnetic coupling, and negative values representing anti ferromagnetic coupling. For a ferromagnet with nearest neighbour exchange, the pairwise exchange energy can be found from the Curie temperature by the meanfield expression:
 \begin{equation*}
 \Jij = \frac{3\kB\Tc}{\epsilon z}
 \end{equation*}
@@ -32,50 +32,120 @@ Defines the local effective spin moment for each atomic site. Atomic moments can
 \end{equation*}
 where $a$ is the lattice constant, $n$ is the number of atoms per unit cell, and \Ms is the saturation magnetisation in units of J/T/m$^3$ (A/m). Note that unlike micromagnetic simulations, atomistic simulations always use zero-K values of the spin moments, since thermal fluctuations of the magnetisation are provided by the model. Small values ($<1 \muB$) will typically lead to integration problems for the LLG unless sub-femtosecond time steps are used.\\
 
-{\zicf material:uniaxial-anisotropy-constant = float [default 0.0 J/atom]}\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-constant}
-  Defines the local second order single-ion magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
+%--------------------------------
+% Magnetic anisotropy parameters
+%--------------------------------
+{\zicf material:uniaxial-anisotropy-constant = float [default 0.0 J/atom]}
+\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-constant}
+  Defines the local second order single-ion magnetocrystalline anisotropy
+  constant at each atomic site. The anisotropy energy is given by the expression
 \begin{equation*}
 E_i = -\kuu (\sms_i \cdot \ei)^2
 \end{equation*}
-Where $\sms_i$ is the local spin direction and \ei is the easy axis unit vector. Positive values of \kuu give a preferred easy axis orientation, and negative values give a preferred easy plane orientation of the spin.\\
+where $\sms_i$ is the local spin direction and \ei is the easy axis unit vector.
+Positive values of \kuu give a preferred easy axis orientation, and negative v
+alues give a preferred easy plane orientation of the spin perpendicular to the
+easy axis direction.\\
 
-{\zicf material:second-uniaxial-anisotropy-constant = float [default 0.0 J/atom]}\addcontentsline{toc}{subsection}{material:second-uniaxial-anisotropy-constant}
-  Defines the local fourth order single-ion magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
+{\zicf material:second-order-uniaxial-anisotropy-constant = float [default 0.0 J/atom]}
+\addcontentsline{toc}{subsection}{material:second-order-uniaxial-anisotropy-constant}
+Has the same meaning and is the preferred form for material:uniaxial-anisotropy-constant.\\
 
-\begin{equation*}
-E_i = -\kuuuu (\sms_i \cdot \ei)^4
-\end{equation*}
-Where $\sms_i$ is the local spin direction and \ei is the easy axis unit vector. Positive values of \kuuuu give a preferred easy axis orientation, and negative values give a preferred easy plane orientation of the spin.\\
+{\zicf material:fourth-order-uniaxial-anisotropy-constant = float [default 0.0 J/atom]}
+\addcontentsline{toc}{subsection}{material:fourth-order-uniaxial-anisotropy-constant}
+implements fourth order uniaxial anisotropy as implemented with spherical
+harmonics.\\
 
-  %lattice-anisotropy-constant
-  %lattice-anisotropy-inflection-temperature
-  %lattice-anisotropy-unity-temperature
-  %lattice-anisotropy-temperature-width
-
-{\zicf material:cubic-anisotropy-constant = float [default 0.0 J/atom]}\addcontentsline{toc}{subsection}{material:cubic-anisotropy-constant}
-  Defines the local cubic magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
+{\zicf material:cubic-anisotropy-constant = float [default 0.0 J/atom]}
+\addcontentsline{toc}{subsection}{material:cubic-anisotropy-constant}
+Defines the local cubic magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
 \begin{equation*}
 E_i = -\frac{\kc}{2} (S_x^4 + S_y^4 + S_z^4)
 \end{equation*}
-where $S_{x,y,z}$ are the components of the local spin direction and \kc is the cubic anisotropy constant. Positive values of \kc give a preferred easy axis orientation along the [001] directions, medium-hard along the [110] directions and hard along the [111] directions. Negative values give a preferred easy direction along the [111] directions, medium ahead along the [110] directions and hard along the [100] directions. \\
+where $S_{x,y,z}$ are the components of the local spin direction and \kc is
+the cubic anisotropy constant. Positive values of \kc give a preferred easy
+axis orientation along the [001] directions, medium-hard along the [110]
+directions and hard along the [111] directions. Negative values give a preferred
+easy direction along the [111] directions, medium ahead along the [110]
+directions and hard along the [100] directions. \\
 
-{\zicf material:uniaxial-anisotropy-direction = float vector [default (001)]}\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-direction} A unit vector \ei describing the magnetic easy axis direction for uniaxial anisotropy. The vector is entered in comma delimited form - For example:\\
+{\zicf material:fourth-order-cubic-anisotropy-constant = float [default 0.0 J/atom]}
+\addcontentsline{toc}{subsection}{material:fourth-order-cubic-anisotropy-constant}
+Has the same meaning and preferred form for material:cubic-anisotropy-constant.
+
+{\zicf material:uniaxial-anisotropy-direction = float vector [default (0,0,1)]}
+\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-direction}
+A unit vector \ei describing the magnetic easy axis direction for uniaxial
+anisotropy. The vector is entered in comma delimited form - For example:\\
 
 \textit{material[1]:uniaxial-anisotropy-direction = 0,0,1}\\
 
-\noindent The unit vector is self normalising and so the direction can be expressed in standard form (with length $r =  1$) or in terms of crystallographic directions, e.g. [111].\\
+\noindent The unit vector is self normalising and so the direction can be
+expressed in standard form (with length $r =  1$) or in terms of
+crystallographic directions, e.g. [111].\\
 
-%{\zicf material:uniaxial-anisotropy-tensor float tensor [default 0]}\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-tensor}
+Random anisotropy can be specified using\\
+
+\textit{material[1]:uniaxial-anisotropy-direction = random}\\
+
+which allocates each atom in the material a random anisotropy vector in three
+dimensions. This may applicable to truly amorphous Rare earth alloys where no
+local anisotropy direction is preferred.\\
+
+Random anisotropy for each grain in the simulation (specified by generating a
+voronoi structure or particle array) can be specified using\\
+
+\textit{material[1]:uniaxial-anisotropy-direction = random-grain}\\
+
+which allocates each atom in the material a random anisotropy vector in three
+dimensions, giving all atoms of the material in each grain a different
+anisotropy vector. Both random anisotropies are compatible with higher order
+uniaxial anisotropy but not lattice anisotropy or cubic anisotropy.\\
+
+%{\zicf material:uniaxial-anisotropy-tensor float tensor [default 0]}
+%\addcontentsline{toc}{subsection}{material:uniaxial-anisotropy-tensor}
 
 %A tensor describing the single ion second order anisotropy. The anisotropy energy is defined as
 %[ Sx Sy Sz ] [ kxx kxy kxz ]
 %Setting the anisotropy tensor will overwrite the single ion anisotropy and
 
-{\zicf material:surface-anisotropy-constant = float default 0.0 (J/atom)}\addcontentsline{toc}{subsection}{material:surface-anisotropy-constant} Describes the surface anisotropy constant in the N\'eel pair anisotropy model. The anisotropy is given by a summation over nearest neighbour atoms given by
+{\zicf material:surface-anisotropy-constant = float default 0.0 (J/atom)}
+\addcontentsline{toc}{subsection}{material:surface-anisotropy-constant}
+Describes the surface anisotropy constant in the N\'eel pair anisotropy model.
+The anisotropy is given by a summation over nearest neighbour atoms given by
 \begin{equation*}
-E_i = -\frac{\ksurf}{2} \sum_j^{\mathrm{nn}} (\sms \cdot \rij )^2
+E_i = +\frac{1}{2} \sum_j^{\mathrm{nn}} \ksurf (\sms \cdot \rij )^2
 \end{equation*}
-where \ksurf is the surface anisotropy constant and \rij is a unit vector between sites $i$ and $j$. Defining this material parameter for any material enables calculation of the surface anisotropy during the simulation at some performance cost, so only define this if actually required in the simulation. \\
+where \ksurf is the surface anisotropy constant between atoms $i$ and $j$ and
+\rij is a unit vector between sites $i$ and $j$.\\
+
+{\zicf neel-anisotropy-constant[index] = float [default 0.0 J]}
+\addcontentsline{toc}{subsection}{material:neel-anisotropy-constant}
+Has the same meaning and is the preferred form for material:surface-anisotropy-constant.\\
+
+{\zicf lattice-anisotropy-constant = float [default 0.0 J/atom]}
+\addcontentsline{toc}{subsection}{material:lattice-anisotropy-constant}
+Defines anisotropy arising from temperature dependent lattice expansion
+such as in RETM alloys. The temperature dependence of the lattice anisotropy is
+defined with a user defined function specified in the parameter
+\textit{lattice-anisotropy-file}.\\
+
+{\zicf lattice-anisotropy-file = string}
+\addcontentsline{toc}{subsection}{material:lattice-anisotropy-file}
+Defines a file containing the temperature dependence of anisotropy arising from
+lattice expansion. The first line of the file specifies the number of points,
+followed by a list of pairs indicating the temperature (in $K$) and normalised
+lattice anisotropy, typically of order 1 at $T = 0 K$. The specified points are
+linearly interpolated by the code and so excessively high resolution is not
+required for high accuracy, and 1 K resolution is typically sufficient for most
+problems.\\
+
+%To be implemented
+%sixth-order-uniaxial-anisotropy-constant
+%sixth-order-cubic-anisotropy-constant
+%cubic-anisotropy-direction
+%uniaxial-anisotropy-tensor
+%cubic-anisotropy-tensor %To be implemented
 
 {\zicf material:relative-gamma float [default 1]}\addcontentsline{toc}{subsection}{material:relative-gamma} defines the gyromagnetic ratio
 of the material relative to that of the electron $\gamma_{\mathrm{e}} = 1.76$ T$^{-1}$s$^{-1}$. Valid values are in the range 0.01 - 100.0. For most materials $\gamma_{\mathrm{r}} = 1$.\\

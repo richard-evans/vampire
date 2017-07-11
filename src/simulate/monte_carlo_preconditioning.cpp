@@ -64,9 +64,6 @@ void monte_carlo_preconditioning(){
 	std::valarray<double> old_spin(3);
 	std::valarray<double> new_spin(3);
 
-   // constant identifying isotropic, vectorial or tensorial exchange
-	const int atom_exchange_type = atoms::exchange_type;
-
    // Material dependent temperature rescaling unrolled for speed
    std::vector<double> rescaled_material_kBTBohr(mp::num_materials);
    std::vector<double> moment_array(mp::num_materials); // mu_s/mu_B
@@ -116,7 +113,7 @@ void monte_carlo_preconditioning(){
          //std::cout << "here" << std::endl;
 
    		// Calculate current energy
-   		double old_energy = sim::calculate_spin_energy(atom, atom_exchange_type);
+   		double old_energy = sim::calculate_spin_energy(atom);
 
    		// Copy new spin position
    		atoms::x_spin_array[atom] = new_spin[0];
@@ -127,7 +124,7 @@ void monte_carlo_preconditioning(){
 
 
    		// Calculate new energy
-   		const double new_energy = sim::calculate_spin_energy(atom, atom_exchange_type);
+   		const double new_energy = sim::calculate_spin_energy(atom);
 
    		// Calculate difference in Joules/mu_B
    		const double DE = (new_energy - old_energy) * moment_array[imaterial];

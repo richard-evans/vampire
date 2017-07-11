@@ -53,6 +53,8 @@ namespace internal
 
    extern int output_rate_counter_coords;
 
+   extern bool identify_surface_atoms; // flag to identify surface atoms in config coordinate file
+
    // Field ranges for hysteresis ouput
    extern double field_output_min_1;
    extern double field_output_max_1;

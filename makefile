@@ -76,7 +76,6 @@ OBJECTS= \
 obj/data/atoms.o \
 obj/data/category.o \
 obj/data/grains.o \
-obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
@@ -159,10 +158,12 @@ obj/qvoronoi/userprintf_rbox.o\
 
 
 # Include supplementary makefiles
+include src/anisotropy/makefile
 include src/create/makefile
 include src/config/makefile
 include src/cells/makefile
 include src/dipole/makefile
+include src/exchange/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/simulate/makefile

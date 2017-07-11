@@ -1,0 +1,46 @@
+\chapter{Unit Cell Files}\label{chap:unitcellfiles}
+\vampire provides a selection of built-in unit cell crystal structures which can be specified with the 
+create:crystal-structure keyword. However, there are many more crystal structures and magnetic materials 
+than the code could possibly support, and so an advanced mode is available where the user can specify 
+any atomic structure and exchange interactions which are then imported into the code and can be used to generate large systems and/or cut into the standard geometric shapes. It is also possible to simulate complex non-periodic structures such as nanoparticles obtained from molecular dynamics simulations with the same approach. The unit cell file is specified in the main input file using the keyword:
+\begin{verbatim}
+material:unit-cell-file = file.ucf
+\end{verbatim}
+where ``file.ucf'' is the filename. 
+
+\section*{The unit cell file format}
+\addcontentsline{toc}{section}{The unit cell file format}
+The unit cell file is split into two main parts. The first part specifies the unit cell shape, the atoms in the unit cell, and their material associations and catagorization for statistics purposes. The second part specifies all atomic exchange interactions within and between neighbouring unit cells. The general plain text format is as follows:
+
+\begin{verbatim}
+1 # Unit cell size:2 ucx ucy ucz3 # Unit cell lattice vectors:4 ucvxx ucvxy ucvxz5 ucvyx ucvyy ucvyz6 ucvzx ucvzy ucvzz7 # Atoms8 num_atoms_in_unit_cell number_of_materials9 atom_id cx cy cz [mat_id cat_id hcat_id]10 ...11    ...12 # Interactions13 num_interactions [exchange_type] 
+14 IID i j dx dy dz | Jij                    | Jx Jy Jz                    | Jxx Jxy Jxz Jyx Jyy Jyz Jzx Jzy Jzz
+\end{verbatim}
+In general this format now allows the specification of any system we want, but clearly complex multi- layered systems require large file sizes. Working through line by line:\\
+
+\begin{tabular}{ l p{8cm} }
+$1$    & “\#” defines a comment line which is ignored by the parser – so these lines are optional.\\
+$2$    & ucx, ucy and ucz are the unit cell size in angstroms.\\
+$4-6$  & These lines define the shape of the unit cell to be replicated, for cubic cells this is the unit matrix. Note that at present only orthogonal lattice vectors are supported by the code.\\$8$    & Define the number of atoms and number of materials in the unit cell. Materials allow grouping of atoms by material, and have the same parameters (ie moment, damping, etc). Material specification affects the way statistics are collected and displayed, and also allows the simple creation of ordered alloys. The list of atoms must immediately follow this line.\\$9-10$ & These lines define the atoms in each unit cell and their parameters:\\
+$.$	 & atom\_id    Number identifier of atom in unit cell, starts at 0.\\
+$.$	 & cx,cy,cz   unit cell coordinates as a fraction of unit cell size\\
+$.$	 & mat\_id  material id of the atom, integer starting at 0\\$.$	 & cat\_id  category id of the atom, used for calculating properties not categorised by material, eg height or sublattice. Integer starting at 1.\\$.$	 & hcat\_id Height category id used for calculating properties as a function of height\\$12$   & Defines the total number of interactions for the unit cell and the expected type of exchange(isotropic, vectorial, tensorial, normalized-isotropic, normalized-vectorial, normalized-tensorial). No lines are allowed between this line and the list of interactions.\\
+$13$   & These lines list all the interactions.\\$.$	   & IID Interaction ID – only used for accounting purposes, starts at 0.\\$.$	   & i Atom number of atom in local unit cell\\$.$    & j Atom number of atom in local/remote unit cell\\$.$    & dxuc,dyuc,dzuc relative integer coordinates of unit cell for atom j\\$.$    & Jij, Jxx... Exchange values specified in Joules. \\
+\end{tabular}
+
+\section*{Example: Simple Cubic System}
+\addcontentsline{toc}{section}{Example: Simple Cubic System}
+As an example, here is a complete sample file for a simple cubic system with a single material.
+\begin{verbatim}
+1 # Unit cell size:2 3.54 3.54 3.543 # Unit cell vectors:4 1.0 0.0 0.05 0.0 1.0 0.06 0.0 0.0 1.07 # Atoms num_atoms num_materials; id cx cy cz mat cat hcat8 1 19 00.00.00.000010 # Interactions n exctype; id i j dx dy dz Jij11 6 isotropic12 013 114 215 316 417 5
+\end{verbatim}Here only easy axis anisotropy and isotropic exchange are defined. Since there is only a single atom in the unit cell, all i-j pairs are 0-0, but over the neighbouring unit cells ±1 in all directions. This generallyleads to a large number of interactions for increasing numbers of atoms in the unit cell, and in future I will write a program to generate some different lattices and interaction lists.
+ 
+
+
+
+
+
+
+
+
+%

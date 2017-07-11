@@ -36,7 +36,6 @@ namespace atoms{
    int num_atoms = 0;			/// Number of atoms in simulation
    int num_neighbours = 0;	   	/// Maximum number of neighbours for Hamiltonian/Lattice
    int total_num_neighbours = 0;
-   int exchange_type = 0;
    uint64_t num_non_magnetic_atoms = 0; // Number of non-magnetic atoms not to be simulated
 
 	//--------------------------
@@ -73,18 +72,8 @@ namespace atoms{
 	std::vector <zvec_t> v_exchange_list(0);
 	std::vector <zten_t> t_exchange_list(0);
 
-	// surface anisotropy
-	std::vector<bool> surface_array(0);
-	std::vector<int> nearest_neighbour_list(0);
-	std::vector<int> nearest_neighbour_list_si(0);
-	std::vector<int> nearest_neighbour_list_ei(0);
-	std::vector<double> eijx(0);
-	std::vector<double> eijy(0);
-	std::vector<double> eijz(0);
+   std::vector <bool> surface_array(0); // flag to identify atom as surface
 
-	// Local anisotropy directions for each atom
-	std::vector<double> uniaxial_anisotropy_vector_x(0);
-	std::vector<double> uniaxial_anisotropy_vector_y(0);
-	std::vector<double> uniaxial_anisotropy_vector_z(0);
+   std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
 
 }
