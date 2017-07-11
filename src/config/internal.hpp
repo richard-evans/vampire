@@ -124,6 +124,7 @@ namespace internal
                    const double applied_field_x, // applied field components (Tesla)
                    const double applied_field_y,
                    const double applied_field_z,
+                   const double applied_field_mag,
                    const double magnetization_x, // magnetization components (normalized)
                    const double magnetization_y,
                    const double magnetization_z);

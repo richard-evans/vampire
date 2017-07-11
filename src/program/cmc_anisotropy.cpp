@@ -94,13 +94,21 @@ void cmc_anisotropy(){
 	}
 
 	// set minimum rotational angle
-	sim::constraint_theta=sim::constraint_theta_min;
+   // if checkpoint is loaded, then update minimum values of temperature and constrained angles
+	if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::checkpoint_loaded_flag){
+      zlog << zTs() << "Constrained angles theta loaded from checkpoint " << sim::constraint_theta <<  std::endl;
+   }
+   else sim::constraint_theta=sim::constraint_theta_min;
 
 	// perform rotational angle sweep
 	while(sim::constraint_theta<=sim::constraint_theta_max){
 
 		// set minimum azimuthal angle
-		sim::constraint_phi=sim::constraint_phi_min;
+      // if checkpoint is loaded, then update minimum values of temperature and constrained angles
+	   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::checkpoint_loaded_flag){
+         zlog << zTs() << "Constrained angle phi loaded from checkpoint: " << sim::constraint_phi << std::endl;
+      }
+		else sim::constraint_phi=sim::constraint_phi_min;
 
 		// perform azimuthal angle sweep
 		while(sim::constraint_phi<=sim::constraint_phi_max){
@@ -109,12 +117,24 @@ void cmc_anisotropy(){
 			sim::CMCinit();
 
 			// Set starting temperature
-			sim::temperature=sim::Tmin;
+         // if checkpoint is loaded, then update minimum values of temperature and constrained angles
+	      if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::checkpoint_loaded_flag==true){
+            zlog << zTs() << "Constrained temperature loaded from checkpoint: " << sim::temperature << "K and flag = " << sim::checkpoint_loaded_flag <<std::endl;
+            //sim::temperature += sim::delta_temperature;
+         }
+			else sim::temperature=sim::Tmin - sim::delta_temperature;
 
 			// Perform Temperature Loop
-			while(sim::temperature<=sim::Tmax){
+			//while(sim::temperature<=sim::Tmax){
+			while(sim::temperature<sim::Tmax){
+
+				// Increment temperature
+				sim::temperature+=sim::delta_temperature;
 
 				// Equilibrate system
+		      /*// Equilibrate system only if not checkpoint
+	         if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag && sim::checkpoint_loaded_flag){}
+				else sim::integrate(sim::equilibration_time); */
 				sim::integrate(sim::equilibration_time);
 
 				// Reset mean magnetisation counters
@@ -134,11 +154,9 @@ void cmc_anisotropy(){
 
 				}
 
+            //std::cout << std::endl << "T= "<<sim::temperature << "\tphi = " << sim::constraint_phi << "\ttheta = " << sim::constraint_theta << std::endl << std::endl;
 				// Output data
 				vout::data();
-
-				// Increment temperature
-				sim::temperature+=sim::delta_temperature;
 
 			} // End of temperature loop
 

@@ -58,7 +58,7 @@ namespace dipole{
             dipole::cells_field_array_x[i]=self_demag*(cells::mag_array_x[i]/9.27400915e-24);
             dipole::cells_field_array_y[i]=self_demag*(cells::mag_array_y[i]/9.27400915e-24);
             dipole::cells_field_array_z[i]=self_demag*(cells::mag_array_z[i]/9.27400915e-24);
-            // Add self demag to Hdemag
+            // Add self demag to Hdemag --> To get only dipole-dipole contribution comment this and initialise to zero
             dipole::cells_mu0Hd_field_array_x[i]=-0.5*self_demag*(cells::mag_array_x[i]/9.27400915e-24);//*1.0e-30
             dipole::cells_mu0Hd_field_array_y[i]=-0.5*self_demag*(cells::mag_array_y[i]/9.27400915e-24);//*1.0e-30
             dipole::cells_mu0Hd_field_array_z[i]=-0.5*self_demag*(cells::mag_array_z[i]/9.27400915e-24);//*1.0e-30
@@ -72,24 +72,13 @@ namespace dipole{
          		   const double my = cells::mag_array_y[j]/9.27400915e-24;
          		   const double mz = cells::mag_array_z[j]/9.27400915e-24;
 
-         		   if( i!=j ){
-             		   dipole::cells_field_array_x[i]+=(mx*internal::rij_inter_xx[lc][j] + my*internal::rij_inter_xy[lc][j] + mz*internal::rij_inter_xz[lc][j]);
-             		   dipole::cells_field_array_y[i]+=(mx*internal::rij_inter_xy[lc][j] + my*internal::rij_inter_yy[lc][j] + mz*internal::rij_inter_yz[lc][j]);
-             		   dipole::cells_field_array_z[i]+=(mx*internal::rij_inter_xz[lc][j] + my*internal::rij_inter_yz[lc][j] + mz*internal::rij_inter_zz[lc][j]);
-                     // Demag field
-                     dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_inter_xx[lc][j] + my*internal::rij_inter_xy[lc][j] + mz*internal::rij_inter_xz[lc][j]);
-                     dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_inter_xy[lc][j] + my*internal::rij_inter_yy[lc][j] + mz*internal::rij_inter_yz[lc][j]);
-                     dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_inter_xz[lc][j] + my*internal::rij_inter_yz[lc][j] + mz*internal::rij_inter_zz[lc][j]);
-         		   }
-         		   else{
-             		   dipole::cells_field_array_x[i]+=(mx*internal::rij_intra_xx[lc][i] + my*internal::rij_intra_xy[lc][i] + mz*internal::rij_intra_xz[lc][i]);
-             		   dipole::cells_field_array_y[i]+=(mx*internal::rij_intra_xy[lc][i] + my*internal::rij_intra_yy[lc][i] + mz*internal::rij_intra_yz[lc][i]);
-             		   dipole::cells_field_array_z[i]+=(mx*internal::rij_intra_xz[lc][i] + my*internal::rij_intra_yz[lc][i] + mz*internal::rij_intra_zz[lc][i]);
-                     // Demag field
-                     dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_intra_xx[lc][i] + my*internal::rij_intra_xy[lc][i] + mz*internal::rij_intra_xz[lc][i]);
-                     dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_intra_xy[lc][i] + my*internal::rij_intra_yy[lc][i] + mz*internal::rij_intra_yz[lc][i]);
-                     dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_intra_xz[lc][i] + my*internal::rij_intra_yz[lc][i] + mz*internal::rij_intra_zz[lc][i]);
-         		   }
+             		dipole::cells_field_array_x[i]+=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
+             		dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
+             		dipole::cells_field_array_z[i]+=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
+                  // Demag field
+                  dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
+                  dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
+                  dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
          	   }
             }
             // Multiply the cells B-field by mu_B * mu_0/(4*pi) /1e-30  <-- (9.27400915e-24 * 1e-7 / 1e30)

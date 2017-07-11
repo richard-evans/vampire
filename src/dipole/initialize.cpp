@@ -113,10 +113,6 @@ namespace dipole{
 
       }
 
-      // Andrea - not sure what these are in aid of - generally a bad idea to change these!
-      cells::num_cells = dipole::internal::cells_num_cells;
-      cells::num_atoms_in_cell = dipole::internal::cells_num_atoms_in_cell;
-
       // Set initialised flag
       dipole::internal::initialised=true;
 
@@ -171,19 +167,19 @@ namespace dipole{
             int i = cells::cell_id_array[lc];
             if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
-               for(unsigned int j=0; j<dipole::internal::rij_inter_xx[lc].size(); j++){
+               for(unsigned int j=0; j<dipole::internal::rij_tensor_xx[lc].size(); j++){
                   if(dipole::internal::cells_num_atoms_in_cell[j]>0){
 
                      // To obtain dipolar matrix free of units, multiply tensor by "factor"
                      const double Vatomic = dipole::internal::cells_volume_array[j]/double(dipole::internal::cells_num_atoms_in_cell[j]);
                      const double factor = Vatomic*double(dipole::internal::cells_num_atoms_in_cell[j]) * double(dipole::internal::cells_num_atoms_in_cell[i]);
                      // Sum over dipolar tensor to obtain total tensor
-                     Nxx += factor*(dipole::internal::rij_intra_xx[lc][j]+dipole::internal::rij_inter_xx[lc][j]);
-                     Nxy += factor*(dipole::internal::rij_intra_xy[lc][j]+dipole::internal::rij_inter_xy[lc][j]);
-                     Nxz += factor*(dipole::internal::rij_intra_xz[lc][j]+dipole::internal::rij_inter_xz[lc][j]);
-                     Nyy += factor*(dipole::internal::rij_intra_yy[lc][j]+dipole::internal::rij_inter_yy[lc][j]);
-                     Nyz += factor*(dipole::internal::rij_intra_yz[lc][j]+dipole::internal::rij_inter_yz[lc][j]);
-                     Nzz += factor*(dipole::internal::rij_intra_zz[lc][j]+dipole::internal::rij_inter_zz[lc][j]);
+                     Nxx += factor*(dipole::internal::rij_tensor_xx[lc][j]);
+                     Nxy += factor*(dipole::internal::rij_tensor_xy[lc][j]);
+                     Nxz += factor*(dipole::internal::rij_tensor_xz[lc][j]);
+                     Nyy += factor*(dipole::internal::rij_tensor_yy[lc][j]);
+                     Nyz += factor*(dipole::internal::rij_tensor_yz[lc][j]);
+                     Nzz += factor*(dipole::internal::rij_tensor_zz[lc][j]);
                   }
                }
             }

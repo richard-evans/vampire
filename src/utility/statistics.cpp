@@ -508,7 +508,7 @@ void system_energy(){
          const int imaterial=atoms::type_array[atom];
          energy+=sim::spin_magnetostatic_energy(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
       }
-      stats::total_magnetostatic_energy=energy;
+      stats::total_magnetostatic_energy=0.5*energy;
    }
 
    // Calculate total energy

@@ -94,18 +94,24 @@ int curie_temperature(){
 	if(err::check==true){std::cout << "program::curie_temperature has been called" << std::endl;}
 
 	// Set starting temperature
-    // Initialise sim::temperature
-	if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
-		sim::temperature+=sim::delta_temperature;
-    }
-    else sim::temperature=sim::Tmin;
+   // Initialise sim::temperature
+   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
+      sim::temperature+=sim::delta_temperature;
+   }
+   else sim::temperature=sim::Tmin - sim::delta_temperature;
 
 	// Perform Temperature Loop
-	while(sim::temperature<=sim::Tmax){
+	//while(sim::temperature<=sim::Tmax){
+	while(sim::temperature<sim::Tmax){
 
-		// Equilibrate system only if not checkpoint
+      // Increment temperature
+		sim::temperature+=sim::delta_temperature;
+
+		// Equilibrate system
+      /*//only if not checkpoint
 	   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
-		else sim::integrate(sim::equilibration_time);
+		else sim::integrate(sim::equilibration_time); */
+		sim::integrate(sim::equilibration_time);
 
 		// Reset mean magnetisation counters
 		stats::mag_m_reset();
@@ -126,9 +132,6 @@ int curie_temperature(){
 
 		// Output data
 		vout::data();
-
-		// Increment temperature
-		sim::temperature+=sim::delta_temperature;
 
 	} // End of temperature loop
 

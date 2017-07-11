@@ -54,21 +54,13 @@ namespace dipole{
 
       extern const double prefactor; // 1e-7/1e30
 
-      extern std::vector <std::vector < double > > rij_inter_xx;
-      extern std::vector <std::vector < double > > rij_inter_xy;
-      extern std::vector <std::vector < double > > rij_inter_xz;
+      extern std::vector <std::vector < double > > rij_tensor_xx;
+      extern std::vector <std::vector < double > > rij_tensor_xy;
+      extern std::vector <std::vector < double > > rij_tensor_xz;
 
-      extern std::vector <std::vector < double > > rij_inter_yy;
-      extern std::vector <std::vector < double > > rij_inter_yz;
-      extern std::vector <std::vector < double > > rij_inter_zz;
-
-      extern std::vector <std::vector < double > > rij_intra_xx;
-      extern std::vector <std::vector < double > > rij_intra_xy;
-      extern std::vector <std::vector < double > > rij_intra_xz;
-
-      extern std::vector <std::vector < double > > rij_intra_yy;
-      extern std::vector <std::vector < double > > rij_intra_yz;
-      extern std::vector <std::vector < double > > rij_intra_zz;
+      extern std::vector <std::vector < double > > rij_tensor_yy;
+      extern std::vector <std::vector < double > > rij_tensor_yz;
+      extern std::vector <std::vector < double > > rij_tensor_zz;
 
       extern int num_atoms;
       extern std::vector < int > atom_type_array;
@@ -110,6 +102,24 @@ namespace dipole{
                                     const std::vector<double>& atom_coords_y,
                                     const std::vector<double>& atom_coords_z,
                                     const int num_atoms);
+
+      void compute_inter_tensor(const double cells_macro_cell_size,
+                                const int i,
+                                const int j,
+                                const int lc,
+                                std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
+                                //std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
+                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z);
+
+      void compute_intra_tensor(const int i,
+                                const int j,
+                                const int lc,
+                                std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
+                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z);
 
       void initialize_macrocell_solver();
 
