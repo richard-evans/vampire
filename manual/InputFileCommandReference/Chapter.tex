@@ -40,7 +40,9 @@ The following commands control generation of the simulated system, including dim
 
 {\zicf create:particle-centre-offset}\addcontentsline{toc}{subsection}{create:particle-parity} shifts the origin of a particle to the centre of the nearest unit cell.\\ \par
 
-{\zicf create:crystal-structure = string [sc,fcc,bcc; default sc]}\addcontentsline{toc}{subsection}{create:crystal-structure} Defines the default crystal lattice to be generated.\\ \par
+{\zicf create:crystal-structure = string [sc,fcc,bcc,hcp,rocksalt; default sc]}
+\addcontentsline{toc}{subsection}{create:crystal-structure} Defines the default
+crystal lattice to be generated.\\ \par
 
 {\zicf create:single-spin flag}\addcontentsline{toc}{subsection}{create:single-spin} Overrides all create options and generates a single isolated spin.\\ \par
 
@@ -75,6 +77,32 @@ The following commands control generation of the simulated system, including dim
 {\zicf create:interfacial-roughness-maximum-height}\addcontentsline{toc}{subsection}{create:interfacial-roughness-maximum-height}\\ \par
 
 {\zicf create:interfacial-roughness-height-field-resolution}\addcontentsline{toc}{subsection}{create:interfacial-roughness-height-field-resolution}\\ \par
+
+{\zicf create:alloy-random-seed integer [default 683614233]}
+\addcontentsline{toc}{subsection}{create:alloy-random-seed}
+Sets the random seed for the psuedo random number generator for generating random
+alloys. Simulations use a predictable sequence of psuedo random numbers to give
+repeatable results for the same simulation. The seed determines the actual
+sequence of numbers and is used to generate a different alloy distribution.
+Note that different numbers of cores will change the structure that is generated.\\
+
+{\zicf create:grain-random-seed integer [default 683614233]}
+\addcontentsline{toc}{subsection}{create:grain-random-seed}
+Sets the random seed for the psuedo random number generator for generating random
+grain structures. \\
+
+{\zicf create:dilution-random-seed integer [default 683614233]}
+\addcontentsline{toc}{subsection}{create:dilution-random-seed}
+Sets the random seed for the psuedo random number generator for diluting the
+atoms, leading to a different realization of a dilute material. Note that
+different numbers of cores will change the structure that is generated.\\
+
+{\zicf create:intermixing-random-seed integer [default 683614233]}
+\addcontentsline{toc}{subsection}{create:intermixing-random-seed}
+Sets the random seed for the psuedo random number generator for calculating
+intermixing of materials. A different seed will lead to a different realization
+of a dilute material. Note that different numbers of cores will change the
+structure that is generated.\\
 
 \section*{System dimensions}
 \addcontentsline{toc}{section}{System dimensions}
@@ -112,6 +140,22 @@ The commands here determine the dimensions of the generated system.\\
 {\zicf dimensions:particle-array-offset-y}\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y}\\
 
 {\zicf dimensions:double macro-cell-size}\addcontentsline{toc}{subsection}{dimensions:macro-cell-size} determines the macro cell size for calculation of the demagnetizing field and output of the magnetic configuration. Finer discretisation lead to more accurate results at the cost of significantly longer run times. The cell size should always be less than the system size, as highly asymmetric cells will leads to significant errors in the demagnetisation field calculation.
+
+\section*{Anisotropy calculation}
+\addcontentsline{toc}{section}{Anisotropy calculation}
+The following commands control the calculation of the magnetic anisotropy energy for the system.
+{\zicf anisotropy:surface-anisotropy-threshold}\addcontentsline{toc}
+{subsection}{anisotropy:surface-anisotropy-threshold}
+  integer default [native]
+  Determines minimal number of neighbours to classify as surface atom. The
+  default value is the number of neighbours specified by the crystal or unit cell
+  file. You can set this as a lower threshold. \\
+
+{\zicf anisotropy:surface-anisotropy-nearest-neighbour-range}\addcontentsline{toc}
+{subsection}{anisotropy:surface-anisotropy-nearest-neighbour-range}
+  float default [$\infty$]
+  Sets the interaction range for the nearest neighbour list used for the surface
+  anisotropy calculation.\\
 
 \section*{Dipole field calculation}
 \addcontentsline{toc}{section}{Dipole field calculation}
@@ -182,16 +226,6 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 {\zicf sim:dipole-field-update-rate}\addcontentsline{toc}{subsection}{sim:dipole-field-update-rate}
    Integer default 1000
    Number of timesteps between recalculation of the demag field. Default value is suitable for slow calculations, fast dynamics will generally require much faster update rates.\\
-
-{\zicf  sim:enable-surface-anisotropy}\addcontentsline{toc}{subsection}{sim:enable-surface-anisotropy}\\
-
-{\zicf sim:surface-anisotropy-threshold}\addcontentsline{toc}{subsection}{sim:surface-anisotropy-threshold}
-  Int default [native]
-  Determines minimal number of neighbours to classify as surface atom.\\
-
-{\zicf sim:surface-anisotropy-nearest-neighbour-range}\addcontentsline{toc}{subsection}{sim:surface-anisotropy-nearest-neighbour-range}
-  float default [$\infty$]
-  Sets the interaction range for the nearest neighbour list used for the surface anisotropy calculation.\\
 
 {\zicf sim:time-step}\addcontentsline{toc}{subsection}{sim:time-step}\\
 
@@ -486,14 +520,6 @@ each sublattice can be different.\\
 
 {\zicf output:mean-anisotropy-energy}\addcontentsline{toc}{subsection}{output:mean-anisotropy-energy}\\
 
-{\zicf output:cubic-anisotropy-energy}\addcontentsline{toc}{subsection}{output:cubic-anisotropy-energy}\\
-
-{\zicf output:mean-cubic-anisotropy-energy}\addcontentsline{toc}{subsection}{output:mean-cubic-anisotropy-energy}\\
-
-{\zicf output:surface-anisotropy-energy}\addcontentsline{toc}{subsection}{output:surface-anisotropy-energy}\\
-
-{\zicf output:mean-surface-anisotropy-energy}\addcontentsline{toc}{subsection}{output:mean-surface-anisotropy-energy}\\
-
 {\zicf output:exchange-energy}\addcontentsline{toc}{subsection}{output:exchange-energy}\\
 
 {\zicf output:mean-exchange-energy}\addcontentsline{toc}{subsection}{output:mean-exchange-energy}\\
@@ -505,10 +531,6 @@ each sublattice can be different.\\
 {\zicf output:magnetostatic-energy}\addcontentsline{toc}{subsection}{output:magnetostatic-energy}\\
 
 {\zicf output:mean-magnetostatic-energy}\addcontentsline{toc}{subsection}{output:mean-magnetostatic-energy}\\
-
-{\zicf output:second-order-uniaxial-anisotropy-energy}\addcontentsline{toc}{subsection}{output:second-order-uniaxial-anisotropy-energy}\\
-
-{\zicf output:mean-second-order-uniaxial-anisotropy-energy}\addcontentsline{toc}{subsection}{output:mean-second-order-uniaxial-anisotropy-energy}\\
 
 {\zicf output:mpi-timings}\addcontentsline{toc}{subsection}{output:mpi-timings}\\
 

@@ -121,24 +121,6 @@ namespace sim{
 
 	extern int integrator;
 	extern int program;
-	extern int AnisotropyType;
-
-	extern bool surface_anisotropy;
-	extern bool identify_surface_atoms;
-	extern unsigned int surface_anisotropy_threshold;
-	extern bool NativeSurfaceAnisotropyThreshold;
-   extern double nearest_neighbour_distance;
-
-	// Anisotropy control booleans
-	extern bool UniaxialScalarAnisotropy; /// Enables scalar uniaxial anisotropy
-	extern bool TensorAnisotropy; /// Overrides vector uniaxial anisotropy (even slower)
-	extern bool second_order_uniaxial_anisotropy; /// Enables second order uniaxial anisotropy
-   extern bool sixth_order_uniaxial_anisotropy; // Enables sixth order uniaxial anisotropy
-   extern bool spherical_harmonics; // Enables calculation of higher order anistropy with spherical harmonics
-	extern bool CubicScalarAnisotropy; // Enables scalar cubic anisotropy
-	extern bool EnableUniaxialAnisotropyUnitVector; /// enables anisotropy tensor if any material has non z-axis K
-   extern bool lattice_anisotropy_flag; /// Enables lattice anisotropy
-   extern bool random_anisotropy; // Enables random anisotropy calculation
 
    // Local system variables
 	extern bool local_temperature; /// flag to enable material specific temperature
@@ -188,20 +170,9 @@ namespace sim{
 	extern void CMCMCinit();
 
 	// Field and energy functions
-	extern double calculate_spin_energy(const int, const int);
-   extern double spin_exchange_energy_isotropic(const int, const double, const double , const double );
-   extern double spin_exchange_energy_vector(const int, const double, const double, const double);
-   extern double spin_exchange_energy_tensor(const int, const double, const double, const double);
-   extern double spin_scalar_anisotropy_energy(const int, const double);
-   extern double spin_second_order_uniaxial_anisotropy_energy(const int, const double, const double, const double);
-   extern double spin_sixth_order_uniaxial_anisotropy_energy(const int, const double, const double, const double);
-   extern double spin_lattice_anisotropy_energy(const int, const double, const double, const double);
-   extern double spin_cubic_anisotropy_energy(const int, const double, const double, const double);
-   extern double spin_tensor_anisotropy_energy(const int, const double, const double, const double);
-   extern double spin_surface_anisotropy_energy(const int, const int, const double, const double, const double);
+	extern double calculate_spin_energy(const int atom);
    extern double spin_applied_field_energy(const double, const double, const double);
    extern double spin_magnetostatic_energy(const int, const double, const double, const double);
-   extern double lattice_anisotropy_function(const double, const int);
 
    // LaGrange multiplier variables
    extern double lagrange_lambda_x;

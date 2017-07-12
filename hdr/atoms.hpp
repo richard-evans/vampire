@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -28,49 +28,37 @@
 #include <string>
 #include <vector>
 
-class zval_t{
-	public:
-	double Jij;
-	
-	// constructor
-	zval_t():
-		Jij(0.0)
-	{
-	};
-};
+#include "exchange.hpp"
 
-class zvec_t{
-	public:
-	double Jij[3];
-	
-	// constructor
-	zvec_t()
-	{
-		Jij[0]=0.0;
-		Jij[1]=0.0;
-		Jij[2]=0.0;
-	};
-};
+// unit vector type
+class uvec_t{
+   public:
+      double x; // x hat
+      double y; // y hat
+      double z; // z hat
+      double r; // length of vector
 
-class zten_t{
-	public:
-	double Jij[3][3];
-	
-	// constructor
-	zten_t()
-	{
-		Jij[0][0]=0.0;
-		Jij[0][1]=0.0;
-		Jij[0][2]=0.0;
+      // unit dot product
+      double dot(uvec_t a, uvec_t b){
+         return (a.x * b.x + a.y * b.y + a.z * b.z);
+      }
 
-		Jij[1][0]=0.0;
-		Jij[1][1]=0.0;
-		Jij[1][2]=0.0;
+      // dot product including length
+      double rdot(uvec_t a, uvec_t b){
+         return (a.r * b.r * (a.x * b.x + a.y * b.y + a.z * b.z));
+      }
 
-		Jij[2][0]=0.0;
-		Jij[2][1]=0.0;
-		Jij[2][2]=0.0;
-	};
+      // unit cross product
+      uvec_t cross(uvec_t a, uvec_t b){
+         uvec_t tmp;
+         tmp.x = a.y * b.z - a.z * b.y;
+         tmp.y = a.z * b.x - a.x * b.z;
+         tmp.z = a.x * b.y - a.y * b.x;
+         tmp.r = a.r * b.r;
+
+         return tmp;
+      }
+
 };
 
 //======================================================================
@@ -84,7 +72,8 @@ namespace atoms
 	extern int num_atoms;			/// Number of atoms in simulation
 	extern int num_neighbours;	   	/// Maximum number of neighbours for Hamiltonian/Lattice
 	extern int total_num_neighbours;/// Total number of neighbours for system
-	extern int exchange_type;
+   extern uint64_t num_non_magnetic_atoms; // Number of non-magnetic atoms not to be simulated
+
 	//--------------------------
 	// Array Variables
 	//--------------------------
@@ -115,23 +104,14 @@ namespace atoms
 	extern std::vector <double> x_dipolar_field_array;			/// Dipolar fields
 	extern std::vector <double> y_dipolar_field_array;			/// Dipolar fields
 	extern std::vector <double> z_dipolar_field_array;			/// Dipolar fields
-	
+
 	extern std::vector <zval_t> i_exchange_list;
 	extern std::vector <zvec_t> v_exchange_list;
 	extern std::vector <zten_t> t_exchange_list;
-	
-	// surface anisotropy
-	extern std::vector<bool> surface_array;
-	extern std::vector<int> nearest_neighbour_list;
-	extern std::vector<int> nearest_neighbour_list_si;
-	extern std::vector<int> nearest_neighbour_list_ei;
-	extern std::vector<double> eijx;
-	extern std::vector<double> eijy;
-	extern std::vector<double> eijz;
 
-	extern std::vector<double> uniaxial_anisotropy_vector_x; // local anisotropy unit vector
-	extern std::vector<double> uniaxial_anisotropy_vector_y;
-	extern std::vector<double> uniaxial_anisotropy_vector_z;
+   extern std::vector <bool> surface_array; // flag to identify atom as surface
+
+   extern std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
 
 }
 

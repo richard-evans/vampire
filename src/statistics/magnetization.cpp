@@ -50,12 +50,12 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
 
    // save mask to internal storage
    num_atoms = in_mask.size();
-   mask_size = in_mask_size;
-   mean_counter=0.0;
+   mask_size = in_mask_size - 1; // last element contains magnetization for non-magnetic atoms
+   mean_counter = 0.0;
    mask=in_mask; // copy contents of vector
-   magnetization.resize(4*mask_size,0.0);
-   mean_magnetization.resize(4*mask_size,0.0);
-   saturation.resize(mask_size,0.0);
+   magnetization.resize(4 * in_mask_size, 0.0);
+   mean_magnetization.resize(4 * in_mask_size, 0.0);
+   saturation.resize(in_mask_size, 0.0);
 
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom<num_atoms; ++atom){

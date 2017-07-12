@@ -554,7 +554,7 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
          	tmp.y = catom_array[a].y;
          	tmp.z = catom_array[a].z;
          	tmp.mat = catom_array[a].material;
-         	tmp.element = mp::material[catom_array[a].material].element;
+            tmp.cat = catom_array[atom].lh_category;
          	// save atom to non-magnet array
          	cs::non_magnetic_atoms_array.push_back(tmp);
          }
@@ -606,7 +606,7 @@ void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
 	for(unsigned int atom=0;atom<catom_array.size();atom++) MaterialNumbers.at(catom_array[atom].material)++;
 
 	// Output composition to log file
-	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
+	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat+1 << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
 
 	return;
 
@@ -615,6 +615,9 @@ void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
 int intermixing(std::vector<cs::catom_t> & catom_array){
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::intermixing has been called" << std::endl;}
+
+   // re-seed random number generator on each CPU with a different number
+	create::internal::grnd.seed(create::internal::mixing_seed + vmpi::my_rank);
 
 	// loop over all atoms
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
@@ -632,20 +635,20 @@ int intermixing(std::vector<cs::catom_t> & catom_array){
 				double mean = (min+max)/2.0;
 				if(z<=min){
 					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-					if(mtrandom::grnd() < probability) final_material=mat;
+					if(create::internal::grnd() < probability) final_material=mat;
 				}
 				else if(z>min && z<=mean){
 					double probability=0.5+0.5*tanh((z-min)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-					if(mtrandom::grnd() < probability) final_material=mat;
+					if(create::internal::grnd() < probability) final_material=mat;
 				}
 				else if(z>mean && z<=max){
 					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
-					if(mtrandom::grnd() < probability) final_material=mat;
+					if(create::internal::grnd() < probability) final_material=mat;
 				}
 				else if(z>max){
 					double probability=0.5-0.5*tanh((z-max)/(mp::material[current_material].intermixing[mat]*cs::system_dimensions[2]));
 					//std::cout << current_material << "\t" << mat << "\t" << atom << "\t" << z << "\t" << max << "\t" << probability << std::endl;
-					if(mtrandom::grnd() < probability) final_material=mat;
+					if(create::internal::grnd() < probability) final_material=mat;
 				}
 			}
 		}
@@ -658,19 +661,22 @@ int intermixing(std::vector<cs::catom_t> & catom_array){
 }
 
 void dilute (std::vector<cs::catom_t> & catom_array){
-    // check calling of routine if error checking is activated
-    if(err::check==true){std::cout << "cs::dilute has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "cs::dilute has been called" << std::endl;}
 
-    // loop over all atoms
-    for(unsigned int atom=0;atom<catom_array.size();atom++){
+   // re-seed random number generator on each CPU with a different number
+   create::internal::grnd.seed(create::internal::dilute_seed + vmpi::my_rank);
+
+   // loop over all atoms
+   for(unsigned int atom=0;atom<catom_array.size();atom++){
       // if atom material is alloy master
       int local_material=catom_array[atom].material;
       double probability = mp::material[local_material].density;
-      if(mtrandom::grnd() > probability) catom_array[atom].include=false;
-    }
+      if(create::internal::grnd() > probability) catom_array[atom].include=false;
+   }
 
-    return;
-  }
+   return;
+}
 
 void geometry (std::vector<cs::catom_t> & catom_array){
 	// check calling of routine if error checking is activated

@@ -1,38 +1,115 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard Evans 2017. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
-//  (at your option) any later version.
+//------------------------------------------------------------------------------
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-// System headers
-//---------------------------
+
+// C++ standard library headers
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <string>
 
-// vampire headers
+// Vampire headers
+#include "anisotropy.hpp"
 #include "errors.hpp"
-#include "material.hpp"
-#include "vio.hpp"
 #include "vmath.hpp"
+#include "vio.hpp"
+
+// anisotropy module headers
+#include "internal.hpp"
+
+namespace anisotropy{
+
+   //------------------------------------------------------------------------------
+   // Externally visible variables
+   //------------------------------------------------------------------------------
+
+   namespace internal{
+
+      //------------------------------------------------------
+      ///  Function to calculate lattice anisotropy fields
+      //------------------------------------------------------
+      void calculate_lattice_anisotropy_fields(std::vector<double>& spin_array_x,
+                                               std::vector<double>& spin_array_y,
+                                               std::vector<double>& spin_array_z,
+                                               std::vector<int>&    type_array,
+                                               std::vector<double>& field_array_x,
+                                               std::vector<double>& field_array_y,
+                                               std::vector<double>& field_array_z,
+                                               const int start_index,
+                                               const int end_index,
+                                               const double temperature){
+
+         // Precalculate material lattice anisotropy constants from current temperature
+         for(int imat=0; imat<mp::num_materials; imat++){
+            internal::klattice_array[imat] = -2.0 * internal::mp[imat].k_lattice * internal::mp[imat].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
+         }
+
+         // Now calculate fields
+         for(int atom = start_index; atom < end_index; atom++){
+
+            // get material for atom
+            const int imaterial = type_array[atom];
+
+            // get spin directions
+            const double sx = spin_array_x[atom];
+            const double sy = spin_array_y[atom];
+            const double sz = spin_array_z[atom];
+
+            // calculate s . e
+            const double sdote = ( sx * internal::elattice_array[imaterial].x +
+                                   sy * internal::elattice_array[imaterial].y +
+                                   sz * internal::elattice_array[imaterial].z);
+
+            // add lattice anisotropy field to total
+            field_array_x[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].x * sdote;
+            field_array_y[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].y * sdote;
+            field_array_z[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].z * sdote;
+
+         }
+
+         return;
+
+      }
+
+      //------------------------------------------------------
+      ///  Function to calculate lattice anisotropy energy
+      //
+      ///  (c) R F L Evans 2013
+      //
+      ///  Assume temperature dependent anisotropy constant:
+      ///
+      ///                   tanh((T-Ti)/Tw) - fmin
+      ///  kappa = Klatt * ------------------------
+      //                        fmax-fmin
+      //
+      ///  E = kappa * S_z^2
+      //
+      //------------------------------------------------------
+      double spin_lattice_anisotropy_energy(const int imaterial, const double sx, const double sy, const double sz, const double temperature){
+
+         // get lattice anisotropy constant at temperature
+         const double klatt = internal::mp[imaterial].k_lattice * internal::mp[imaterial].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
+
+         // calculate s . e
+         const double sdote = ( sx * internal::elattice_array[imaterial].x +
+                                sy * internal::elattice_array[imaterial].y +
+                                sz * internal::elattice_array[imaterial].z);
+
+         return klatt * ( sdote * sdote );
+
+      }
+
+   } // end of internal namespace
+
+} // end of anisotropy namespace
 
 //--------------------------------------------------
 // class functions for lattice anisotropy
@@ -41,7 +118,7 @@
 //--------------------------------------------------
 // Add point to list of input points
 //
-void lattice_anis_t::add_point(double temperature, double anisotropy){
+void anisotropy::internal::lattice_anis_t::add_point(double temperature, double anisotropy){
 
    // check for valid temperature value
    if( temperature < 0.0 && temperature > 10000.0 ){
@@ -61,7 +138,7 @@ void lattice_anis_t::add_point(double temperature, double anisotropy){
 // Creates a lookup table of interpolated functions
 // to calculate lattice anisotropy
 //
-void lattice_anis_t::set_interpolation_table(){
+void anisotropy::internal::lattice_anis_t::set_interpolation_table(){
 
    // Output informative message to log
    zlog << zTs() << "Determining interpolation variables for tabulated lattice anisotropy." << std::endl;
@@ -168,7 +245,7 @@ void lattice_anis_t::set_interpolation_table(){
 // Creates a lookup table of interpolated functions
 // to calculate lattice anisotropy
 //
-double lattice_anis_t::get_lattice_anisotropy_constant(double temperature){
+double anisotropy::internal::lattice_anis_t::get_lattice_anisotropy_constant(double temperature){
 
    // convert temperature to index
    const unsigned int Ti = int(temperature);
@@ -184,7 +261,7 @@ double lattice_anis_t::get_lattice_anisotropy_constant(double temperature){
 //-------------------------------------------------------
 // Prints interpolated values of input function to file
 //
-void lattice_anis_t::output_interpolated_function(int i){
+void anisotropy::internal::lattice_anis_t::output_interpolated_function(int i){
 
    const unsigned int ten_Tmax = 10*Tmax;
 

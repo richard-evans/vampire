@@ -183,7 +183,7 @@ namespace config{
       //-------------------------------------------------------------------
       test="identify-surface-atoms";
       if(word==test){
-         sim::identify_surface_atoms=true;
+         config::internal::identify_surface_atoms = true;
          return EXIT_SUCCESS;
       }
       //-----------------------------------------

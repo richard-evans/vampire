@@ -13,6 +13,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "atoms.hpp"
 #include "config.hpp"
 #include "sim.hpp"
 
@@ -75,10 +76,15 @@ void output(){ // should include variables for data to be outputted, eg spins, c
       // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
       if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
       {
+
          //Always output coordinates the first time (re-)started, otherwise the spins coordinates won't be printed
-         if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
+         if (config::internal::output_rate_counter_coords == 0){
+             config::internal::atoms_coords();
+             if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+          }
          config::internal::atoms(); // call function to output spins coords
          config::internal::output_rate_counter_coords++; //update the counter
+
       }
       // for hysteresis programs
       else if ((sim::program == 2) || (sim::program ==3) || (sim::program ==12))
@@ -86,9 +92,11 @@ void output(){ // should include variables for data to be outputted, eg spins, c
          // output config only in range [minField_1;maxField_1] for descending branch
          if (sim::parity < 0)
          {
-            if((sim::H_applied >= minField_1) && (sim::H_applied <= maxField_1))
-            {
-               if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
+            if((sim::H_applied >= minField_1) && (sim::H_applied <= maxField_1)){
+               if(config::internal::output_rate_counter_coords == 0){
+                  config::internal::atoms_coords();
+                  if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+               }
                config::internal::atoms();
                config::internal::output_rate_counter_coords++;
             }
@@ -96,9 +104,11 @@ void output(){ // should include variables for data to be outputted, eg spins, c
          // output config only in range [minField_2;maxField_2] for ascending branch
          else if (sim::parity > 0)
          {
-            if((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2))
-            {
-               if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
+            if((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2)){
+               if (config::internal::output_rate_counter_coords == 0){
+                  config::internal::atoms_coords();
+                  if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+               }
                config::internal::atoms();
                config::internal::output_rate_counter_coords++;
             }

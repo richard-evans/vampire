@@ -41,7 +41,7 @@ namespace create{
          }
          // otherwise require 3 numbers for 100,110 and 111 facet radii
          std::vector<double> u(3);
-         u=vin::DoublesFromString(value);
+         u=vin::doubles_from_string(value);
          vin::check_for_valid_three_vector(u, word, line, prefix, "input");
          // check for sensible values
          if(u.at(0) < 1.0 || u.at(0) > 1000.0){
@@ -144,12 +144,44 @@ namespace create{
           if(value==VFalse){
              create::internal::select_material_by_z_height = false; // default
           }
-          return EXIT_SUCCESS;
+          return true;
+      }
+      //--------------------------------------------------------------------
+      test="alloy-random-seed";
+      if(word==test){
+         int ars=atoi(value.c_str());
+         vin::check_for_valid_int(ars, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::alloy_seed = ars;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="grain-random-seed";
+      if(word==test){
+         int grs=atoi(value.c_str());
+         vin::check_for_valid_int(grs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::grain_seed = grs;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="dilution-random-seed";
+      if(word==test){
+         int drs=atoi(value.c_str());
+         vin::check_for_valid_int(drs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::dilute_seed = drs;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="intermixing-random-seed";
+      if(word==test){
+         int mrs=atoi(value.c_str());
+         vin::check_for_valid_int(mrs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::mixing_seed = mrs;
+         return true;
       }
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);
-         u=vin::DoublesFromString(value);
+         u=vin::doubles_from_string(value);
          // Test for valid range
          vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
          // save sanitized unit vector

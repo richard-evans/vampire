@@ -42,6 +42,12 @@ namespace vdc{
    std::vector<double> coordinates(0);
    std::vector<double> spins(0);
 
+   // non-magnetic atom data
+   uint64_t num_nm_atoms = 0;
+   std::vector<int> nm_category(0);
+   std::vector<int> nm_type(0);
+   std::vector<double> nm_coordinates(0);
+
    // cell data
    unsigned int total_cells = 0;
    unsigned int nx_cells = 1;
@@ -55,5 +61,6 @@ namespace vdc{
    // array to store subsidiary data file names
    std::vector <std::string> coord_filenames(0);
    std::vector <std::string> spin_filenames(0);
+   std::vector <std::string> nm_filenames(0);
 
 } // end of namespace vdc
