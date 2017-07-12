@@ -449,6 +449,14 @@ int run(){
 	  		program::fmr();
 	  		break;
 
+		case 16:
+	  		if(vmpi::my_rank==0){
+	    		std::cout << "localised-field-cool..." << std::endl;
+	    		zlog << "localised-field-cool..." << std::endl;
+	  		}
+	  		program::local_field_cool();
+	  		break;
+
 		case 50:
 			if(vmpi::my_rank==0){
 				std::cout << "Diagnostic-Boltzmann..." << std::endl;

@@ -696,6 +696,11 @@ namespace vin{
                 sim::program=5;
                 return EXIT_SUCCESS;
             }
+            test="localised-field-cool";
+            if(value==test){
+                sim::program=16;
+                return EXIT_SUCCESS;
+            }
             test="laser-pulse";
             if(value==test){
                 sim::program=6;
@@ -765,12 +770,13 @@ namespace vin{
                 std::cerr << "\t\"static-hysteresis-loop\"" << std::endl;
                 std::cerr << "\t\"curie-temperature\"" << std::endl;
                 std::cerr << "\t\"field-cool\"" << std::endl;
+                std::cerr << "\t\"localised-field-cool\"" << std::endl;
                 std::cerr << "\t\"laser-pulse\"" << std::endl;
                 std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
                 std::cerr << "\t\"hybrid-cmc\"" << std::endl;
                 std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
                 std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
-                terminaltextcolor(WHITE);
+            terminaltextcolor(WHITE);
             err::vexit();
             }
         }
@@ -2419,6 +2425,24 @@ namespace vin{
                     terminaltextcolor(WHITE);
                     err::vexit();
                 }
+            }
+            //--------------------------------------------------------------------
+            test="maximum-temperature";
+            if(word==test){
+               double T=atof(value.c_str());
+               check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+               read_material[super_index].maximum_temperature = T;
+               sim::local_temperature=true; // set local temperature flag
+               return EXIT_SUCCESS;
+            }
+            //--------------------------------------------------------------------
+            test="minimum-temperature";
+            if(word==test){
+               double T=atof(value.c_str());
+               check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+               read_material[super_index].minimum_temperature = T;
+               sim::local_temperature=true; // set local temperature flag
+               return EXIT_SUCCESS;
             }
             //--------------------------------------------------------------------
             test="use-phonon-temperature";
