@@ -387,15 +387,20 @@ int ConstrainedMonteCarlo(){
 	M_other[2] = 0.0;
 
 	for(int atom=0;atom<atoms::num_atoms;atom++){
-		M_other[0] = M_other[0] + atoms::x_spin_array[atom]; //multiplied by polar_vector below
-		M_other[1] = M_other[1] + atoms::y_spin_array[atom];
-		M_other[2] = M_other[2] + atoms::z_spin_array[atom];
+		const double mu = atoms::m_spin_array[atom];
+		M_other[0] = M_other[0] + atoms::x_spin_array[atom] * mu; //multiplied by polar_vector below
+		M_other[1] = M_other[1] + atoms::y_spin_array[atom] * mu;
+		M_other[2] = M_other[2] + atoms::z_spin_array[atom] * mu;
 	}
 
 	for (int mcs=0;mcs<atoms::num_atoms;mcs++){
 		// Randomly select spin number 1
 		atom_number1 = int(mtrandom::grnd()*atoms::num_atoms);
 		imat1=atoms::type_array[atom_number1];
+
+		// get spin moment for atom 1
+		const double mu1 = atoms::m_spin_array[atom_number1];
+
       sim::mc_delta_angle=sigma_array[imat1];
 
 		// Save initial Spin 1
@@ -438,6 +443,9 @@ int ConstrainedMonteCarlo(){
 		// Randomly select spin number 2 (i/=j)
 		atom_number2 = int(mtrandom::grnd()*atoms::num_atoms);
 		imat2=atoms::type_array[atom_number2];
+      // get spin moment for atom 2
+      const double mu2 = atoms::m_spin_array[atom_number2];
+
 		// Save initial Spin 2
 		spin2_initial[0] = atoms::x_spin_array[atom_number2];
 		spin2_initial[1] = atoms::y_spin_array[atom_number2];
@@ -449,8 +457,9 @@ int ConstrainedMonteCarlo(){
 		spin2_init_mvd[2]=ppolar_matrix[2][0]*spin2_initial[0]+ppolar_matrix[2][1]*spin2_initial[1]+ppolar_matrix[2][2]*spin2_initial[2];
 
 		// Calculate new spin based on constraint Mx=My=0
-		spin2_fin_mvd[0] = spin1_init_mvd[0]+spin2_init_mvd[0]-spin1_fin_mvd[0];
-		spin2_fin_mvd[1] = spin1_init_mvd[1]+spin2_init_mvd[1]-spin1_fin_mvd[1];
+		const double mom_ratio = (mu1/mu2);
+		spin2_fin_mvd[0] = mom_ratio*(spin1_init_mvd[0]-spin1_fin_mvd[0]) + spin2_init_mvd[0];
+		spin2_fin_mvd[1] = mom_ratio*(spin1_init_mvd[1]-spin1_fin_mvd[1]) + spin2_init_mvd[1];
 
 		if(((spin2_fin_mvd[0]*spin2_fin_mvd[0]+spin2_fin_mvd[1]*spin2_fin_mvd[1])<1.0) && (atom_number1 != atom_number2)){
 
@@ -485,9 +494,9 @@ int ConstrainedMonteCarlo(){
 			// Compute Mz_other, Mz, Mz'
 			Mz_old = M_other[0]*ppolar_vector[0] + M_other[1]*ppolar_vector[1] + M_other[2]*ppolar_vector[2];
 
-			Mz_new = (M_other[0] + spin1_final[0] + spin2_final[0]- spin1_initial[0] - spin2_initial[0])*ppolar_vector[0] +
-						(M_other[1] + spin1_final[1] + spin2_final[1]- spin1_initial[1] - spin2_initial[1])*ppolar_vector[1] +
-						(M_other[2] + spin1_final[2] + spin2_final[2]- spin1_initial[2] - spin2_initial[2])*ppolar_vector[2];
+			Mz_new = (M_other[0] + mu1*spin1_final[0] + mu2*spin2_final[0]- mu1*spin1_initial[0] - mu2*spin2_initial[0])*ppolar_vector[0] +
+						(M_other[1] + mu1*spin1_final[1] + mu2*spin2_final[1]- mu1*spin1_initial[1] - mu2*spin2_initial[1])*ppolar_vector[1] +
+						(M_other[2] + mu1*spin1_final[2] + mu2*spin2_final[2]- mu1*spin1_initial[2] - mu2*spin2_initial[2])*ppolar_vector[2];
 
 			// Check for lower energy state and accept unconditionally
 			//if((delta_energy21<0.0) && (Mz_new>0.0)) continue;
@@ -497,9 +506,9 @@ int ConstrainedMonteCarlo(){
 				// If move is favorable then accept
 				probability = exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
 				if((probability>=mtrandom::grnd()) && (Mz_new>0.0) ){
-					M_other[0] = M_other[0] + spin1_final[0] + spin2_final[0] - spin1_initial[0] - spin2_initial[0];
-					M_other[1] = M_other[1] + spin1_final[1] + spin2_final[1] - spin1_initial[1] - spin2_initial[1];
-					M_other[2] = M_other[2] + spin1_final[2] + spin2_final[2] - spin1_initial[2] - spin2_initial[2];
+					M_other[0] = M_other[0] + mu1*spin1_final[0] + mu2*spin2_final[0] - mu1*spin1_initial[0] - mu2*spin2_initial[0];
+					M_other[1] = M_other[1] + mu1*spin1_final[1] + mu2*spin2_final[1] - mu1*spin1_initial[1] - mu2*spin2_initial[1];
+					M_other[2] = M_other[2] + mu1*spin1_final[2] + mu2*spin2_final[2] - mu1*spin1_initial[2] - mu2*spin2_initial[2];
 					cmc::mc_success += 1.0;
 				}
 				//if both p1 and p2 not allowed then
