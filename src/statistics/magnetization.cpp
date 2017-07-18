@@ -69,7 +69,7 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
    #endif
 
    // determine mask id's with no atoms
-   std::vector<int> num_atoms_in_mask(mask_size,0);
+   std::vector<int> num_atoms_in_mask(in_mask_size,0);
    for(unsigned int atom=0; atom<in_mask.size(); ++atom){
       int mask_id = in_mask[atom];
       // add atoms to mask
