@@ -401,7 +401,7 @@ void system_energy(){
          double sy=atoms::y_spin_array[atom];
          double sz=atoms::z_spin_array[atom];
          const int imaterial=atoms::type_array[atom];
-         energy +=  anisotropy::single_spin_energy(atom, imaterial, sx, sy, sz, temperature);
+         energy +=  anisotropy::single_spin_energy(atom, imaterial, sx, sy, sz, temperature) * mp::material[imaterial].mu_s_SI;
       }
       stats::total_anisotropy_energy += energy;
    }
@@ -413,7 +413,7 @@ void system_energy(){
          const double Sy=atoms::y_spin_array[atom];
          const double Sz=atoms::z_spin_array[atom];
          const int imaterial=atoms::type_array[atom];
-         energy+=sim::spin_applied_field_energy(Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+         energy+=sim::spin_applied_field_energy(Sx, Sy, Sz) * mp::material[imaterial].mu_s_SI;
       }
       stats::total_applied_field_energy=energy;
    }
@@ -424,7 +424,7 @@ void system_energy(){
          const double Sy=atoms::y_spin_array[atom];
          const double Sz=atoms::z_spin_array[atom];
          const int imaterial=atoms::type_array[atom];
-         energy+=sim::spin_magnetostatic_energy(atom, Sx, Sy, Sz)*mp::material[imaterial].mu_s_SI;
+         energy+=sim::spin_magnetostatic_energy(atom, Sx, Sy, Sz) * mp::material[imaterial].mu_s_SI;
       }
       stats::total_magnetostatic_energy=0.5*energy;
    }
