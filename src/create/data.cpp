@@ -47,6 +47,7 @@ namespace create{
 
          bool generate_voronoi_substructure = false;
          double voronoi_grain_substructure_crystallization_radius = 1.2;
+         double voronoi_grain_substructure_overlap_factor = 1.0;
 
          bool select_material_by_z_height = false;	// Toggle overwriting of material id by z-height
 

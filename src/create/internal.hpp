@@ -119,6 +119,7 @@ namespace create{
 
       extern bool generate_voronoi_substructure;
       extern double voronoi_grain_substructure_crystallization_radius;
+      extern double voronoi_grain_substructure_overlap_factor;
 
       extern bool select_material_by_z_height;
 

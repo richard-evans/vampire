@@ -76,6 +76,7 @@ namespace create{
          create::internal::generate_voronoi_substructure = true;
          return true;
       }
+      //--------------------------------------------------------------------
       test="voronoi-grain-substructure-crystallization-radius";
       if(word==test){
          double rsize=atof(value.c_str());
@@ -83,6 +84,15 @@ namespace create{
          create::internal::voronoi_grain_substructure_crystallization_radius=rsize;
          return true;
       }
+      //--------------------------------------------------------------------
+      test="voronoi-grain-substructure-overlap-factor";
+      if(word==test){
+         double ol=atof(value.c_str());
+         vin::check_for_valid_value(ol, word, line, prefix, unit, "none", 0.1, 3.0,"input","0.1 - 3");
+         create::internal::voronoi_grain_substructure_overlap_factor = ol;
+         return true;
+      }
+      //--------------------------------------------------------------------
       test="voronoi-grain-size";
       if(word==test){
          double psize=atof(value.c_str());
