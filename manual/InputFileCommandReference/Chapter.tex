@@ -157,6 +157,14 @@ The following commands control the calculation of the magnetic anisotropy energy
   Sets the interaction range for the nearest neighbour list used for the surface
   anisotropy calculation.\\
 
+{\zicf anisotropy:enable-bulk-neel-anisotropy}\addcontentsline{toc}
+{subsection}{anisotropy:enable-bulk-neel-anisotropy}
+  bool default false
+  Enables calculation of the N\'eel pair anisotropy in the bulk, irrespective of
+  the number of neighbours, enabling the effect of localised spin-orbit
+  interactions. Internally this sets a large threshold, and so specifying
+  anisotropy:surface-anisotropy-threshold will override this flag.\\
+
 \section*{Dipole field calculation}
 \addcontentsline{toc}{section}{Dipole field calculation}
 The following commands control the calculation of the dipole-dipole field. By
