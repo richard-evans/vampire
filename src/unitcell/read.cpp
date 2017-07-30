@@ -28,14 +28,17 @@ namespace internal{
 
 void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 
-	std::cout << "Reading in unit cell data..." << std::flush;
-	zlog << zTs() << "Reading in unit cell data..." << std::endl;
+	std::cout << "Reading in unit cell data from disk..." << std::flush;
+	zlog << zTs() << "Reading in unit cell data from disk..." << std::endl;
 
 	// stringstream stream declaration
 	std::stringstream inputfile;
 
    // fill input file stream with contents of file opened on master process
    inputfile.str( vin::get_string(filename.c_str(), "input", -1) );
+
+   std::cout << "done!\nProcessing unit cell data..." << std::flush;
+   zlog << zTs() << "Reading data completed. Processing unit cell data..." << std::endl;
 
 	// keep record of current line
 	unsigned int line_counter=0;
@@ -104,9 +107,16 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1-1,000,000. Exiting" << std::endl; err::vexit();
 					terminaltextcolor(WHITE);
 				}
-				// loop over all atoms and read into class
-				for (unsigned int i=0; i<unit_cell.atom.size(); i++){
+
+            std::cout << "\nProcessing data for " << unit_cell.atom.size() << " atoms..." << std::flush;
+            zlog << zTs() << "\t" << "Processing data for " << unit_cell.atom.size() << " unit cell atoms..." << std::endl;
+
+
+            // loop over all atoms and read into class
+            for(unsigned int i = 0; i < unit_cell.atom.size(); i++){
+
 					line_counter++;
+
 					// declare safe temporaries for atom input
 					int id=i;
 					double cx=2.0, cy=2.0,cz=2.0; // coordinates - default will give an error
@@ -166,7 +176,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				break;
 			case 5:{
 				iss >> num_interactions >> exchange_type_string;
-				// std::cout << num_interactions << "\t" << exchange_type_string << std::endl;
+				//std::cout << num_interactions << "\t" << exchange_type_string << std::endl;
 
             // process exchange string to set exchange type and normalisation
             const int num_exchange_values = exchange::set_exchange_type(exchange_type_string);
@@ -178,8 +188,17 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					<< " of unit cell input file " << filename.c_str() << " is less than 0. Exiting" << std::endl; err::vexit();
 				    terminaltextcolor(WHITE);
 				}
+
+            std::cout << "done!\nProcessing data from " << num_interactions << " interactions..." << std::flush;
+            zlog << zTs() << "\t" << "Processing unit cell atoms completed" << std::endl;
+            zlog << zTs() << "\t" << "Processing data from " << num_interactions << " unit cell interactions..." << std::endl;
+
 				// loop over all interactions and read into class
 				for (int i=0; i<num_interactions; i++){
+
+               // Output progress counter to screen for large interaction counts
+               if( (i % (num_interactions/10)) == 0 && num_interactions > 10000) std::cout << "." << std::flush;
+
 					//std::cout << "setting up interaction "<< i+1<< " of " << num_interactions << " interactions" << std::endl;
 					// declare safe temporaries for interaction input
 					int id=i;
@@ -280,11 +299,15 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		line_id++;
 	} // end of while loop
 
+   std::cout << "done!\nVerifying exchange interactions..." << std::flush;
+   zlog << zTs() << "\t" << "Processing unit cell interactions completed" << std::endl;
+   zlog << zTs() << "\t" << "Verifying unit cell exchange interactions..." << std::endl;
+
    // Verify exchange interactions are symmetric (required for MPI parallelization)
    uc::internal::verify_exchange_interactions(unit_cell, filename);
 
-   std::cout << "Done!" << std::endl;
-   zlog << "Done!" << std::endl;
+   std::cout << "done!" << std::endl;
+   zlog << zTs() << "Verifying unit cell exchange interactions completed" << std::endl;
 	zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
 	zlog << zTs() << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
 	zlog << zTs() << "\t" << "Exchange type: " << exchange_type_string << std::endl;
