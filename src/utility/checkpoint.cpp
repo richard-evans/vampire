@@ -163,6 +163,7 @@ void load_checkpoint(){
       std::cerr << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting." << std::endl;
       terminaltextcolor(WHITE);
       zlog << zTs() << "Error: Mismatch between number of atoms in checkpoint file (" << natoms64 << ") and number of generated atoms (" << atoms::num_atoms-vmpi::num_halo_atoms << "). Exiting." << std::endl;
+      err::vexit();
    }
 
    // Load saved parameters if simulation continuing

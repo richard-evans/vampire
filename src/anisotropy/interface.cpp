@@ -58,7 +58,13 @@ namespace anisotropy{
           internal::nearest_neighbour_distance = r;
           return true;
       }
-
+      //-------------------------------------------------------------------
+      test="enable-bulk-neel-anisotropy";
+      if(word==test){
+          // Enable large threshold to force calculation of Neel anisotropy for all atoms
+          internal::neel_anisotropy_threshold = 1000000000;
+          return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
