@@ -250,7 +250,7 @@ void CMCinit(){
 	cmc::polar_rot_matrix(sim::constraint_phi,sim::constraint_theta, cmc::polar_matrix, cmc::polar_matrix_tp, cmc::polar_vector);
 
 	// Check for rotational update
-	if(sim::constraint_rotation==false || (sim::constraint_theta_changed==false && sim::constraint_phi_changed==false)){
+	if((sim::constraint_rotation==false || (sim::constraint_theta_changed==false && sim::constraint_phi_changed==false)) && sim::checkpoint_loaded_flag==false){
 
 		// Output message showing constraint direction re-initialisation
 		zlog << zTs() << "Initialising spins to new constraint direction (phi, theta) " <<  sim::constraint_phi << " , " << sim::constraint_theta << std::endl;
@@ -266,6 +266,10 @@ void CMCinit(){
 			atoms::z_spin_array[atom]=sz;
 		}
 	}
+   // If the simulation is restarted from within the temperature loop, then the spin configurations must not be reinitialised
+   else if(sim::checkpoint_loaded_flag==true){
+      zlog << zTs() << "Not re-initialising spins to constraint directions since still in temperature loop" << std::endl;
+   }
 	else{
 
 		// Output message showing constraint direction re-initialisation
