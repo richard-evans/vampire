@@ -20,6 +20,7 @@
 #include "material.hpp"
 #include "cells.hpp"
 #include "atoms.hpp"
+#include "vmpi.hpp"
 
 
 #include <iostream>
@@ -55,6 +56,7 @@ namespace micromagnetic{
                    std::vector<int> local_cell_array){
 
 
+
    //resizes the vectors used to store the cell parameters
    mm::A.resize(num_cells*num_cells,0.0);
    mm::alpha.resize(num_cells,0.0);
@@ -64,19 +66,13 @@ namespace micromagnetic{
    mm::ku.resize(num_cells,0.0);
    mm::ms.resize(num_cells,0.0);
    mm::Tc.resize(num_cells,0.0);
-
    mm::alpha_para.resize(num_cells,0.0);
    mm::alpha_perp.resize(num_cells,0.0);
-
    mm::m_e.resize(num_cells,0.0);
-
    mm::macro_neighbour_list_start_index.resize(num_cells,0.0);
    mm::macro_neighbour_list_end_index.resize(num_cells,0.0);
-
    micromagnetic::cell_discretisation_micromagnetic.resize(num_cells,true);
-
    mm::ext_field.resize(3,0.0);
-
 
 
    //These functions vectors with the parameters calcualted from the function
@@ -85,7 +81,7 @@ namespace micromagnetic{
    mm::Tc =                   mm::calculate_tc(num_local_cells, local_cell_array,num_atoms, num_cells, cell_array,neighbour_list_array,
                                              neighbour_list_start_index, neighbour_list_end_index, type_array, material);
    mm::ku =                   mm::calculate_ku(num_atoms, num_cells, cell_array, type_array, material);
-   mm::gamma =                mm::calculate_gamma(num_atoms, num_cells, cell_array,type_array,material);
+   mm::gamma =                mm::calculate_gamma(num_atoms, num_cells, cell_array,type_array,material,num_local_cells,local_cell_array);
    mm::one_o_chi_para =       mm::calculate_chi_para(num_local_cells, local_cell_array,num_cells, Temperature);
    mm::one_o_chi_perp =       mm::calculate_chi_perp(num_local_cells, local_cell_array,num_cells, Temperature);
    mm::A =                    mm::calculate_a(num_atoms, num_cells, num_local_cells,cell_array, neighbour_list_array, neighbour_list_start_index,
@@ -93,39 +89,33 @@ namespace micromagnetic{
                                              y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
 
 
-for (int cell = 0; cell < num_cells; cell++){
-  std::cout << cells::cell_coords_array_x[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << std::endl;
-}
-
 //if multiscale simulation work out which cells/atoms are micromagnetic/atomistic
 if (discretisation_type == 2){
-
-   std::cout<< "multiscale" <<std::endl;
+  //loops over all atoms and if any atom in the cell is atomistic the whole cell becomes atomistic else the cell is micromagnetic.
    for (int atom =0; atom < num_atoms; atom++){
       int cell = cell_array[atom];
       int mat  = type_array[atom];
       micromagnetic::cell_discretisation_micromagnetic[cell] = mp::material[mat].micromagnetic_enabled;
+      //unless the cell contains AFM atoms, then it is always atomsitic
       if (mm::Tc[cell] < 0) micromagnetic::cell_discretisation_micromagnetic[cell] = 0;
    }
 
-   for (int lc = 0; lc < num_local_cells; lc++){
-      int cell = local_cell_array[lc];
-   }
+   //loops over all atoms saves each atom at micromagnetic or atomistic depending on whether the cell is microamgnetic or atomistic
    for (int atom =0; atom < num_atoms; atom++){
       int cell = cell_array[atom];
       int mat  = type_array[atom];
-  //if (micromagnetic::cell_discretisation_micromagnetic[cell] ==0 && mm::ms[cell] )  std::cout << "cells" << '\t' << atom << '\t' << cell <<'\t' <<micromagnetic::cell_discretisation_micromagnetic[cell] <<std::endl;
+    //id atomistic add to numner of atomisic atoms
       if (micromagnetic::cell_discretisation_micromagnetic[cell] == 0) {
          list_of_atomistic_atoms.push_back(atom);
          number_of_atomistic_atoms++;
       }
+      //if micromagnetic add to the numebr of microamgnetic cells.
       else {
         list_of_none_atomistic_atoms.push_back(atom);
         number_of_none_atomistic_atoms++;
       }
    }
-   std::cout <<"atoms" << number_of_atomistic_atoms << '\t' << atoms::num_atoms <<std::endl;
-
+   //if simualtion is micromagetic all cells are made micromagnetic cells
   for (int lc = 0; lc < num_local_cells; lc++){
       int cell = local_cell_array[lc];
     if (micromagnetic::cell_discretisation_micromagnetic[cell] == 1 && mm::ms[cell] > 1e-30) {
@@ -135,7 +125,7 @@ if (discretisation_type == 2){
   }
 
 }
-//if micromagnetic simulation all cells are micromagnetic and no atoms are micromagnetic
+//if micromagnetic simulation all cells are micromagnetic and all atoms are micromagnetic
 else {
    for (int lc = 0; lc < num_local_cells; lc++){
        int cell = local_cell_array[lc];
@@ -151,7 +141,10 @@ else {
 
   }
 
-     std::cout << "cells" << number_of_micromagnetic_cells<< '\t' << number_of_atomistic_atoms <<std::endl;
+    //for field calcualtions you need to access the atoms in numerically consecutive lists.
+    //therefore you need to create lists of consecutive lists
+    //loops over all atoms if atom is not one minus the previous atom then create a new list.
+
      if (number_of_atomistic_atoms > 0){
      int end = list_of_atomistic_atoms[0];
      int begin = list_of_atomistic_atoms[0];
@@ -166,10 +159,19 @@ else {
          begin = atom + 1;
        }
     }}
+//     if (vmpi::my_rank ==0){
+//     for (int cell = 0; cell < num_cells; cell++){
+//       std::cerr << vmpi::my_rank << '\t' << cells::cell_coords_array_z[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << "\t" << mm::Tc[cell] << "\t" <<micromagnetic::cell_discretisation_micromagnetic[cell] <<std::endl;
+//     }
+// }
+
 
      int num_calculations = mm::fields_neighbouring_atoms_begin.size();
-     std::cout << num_calculations <<std::endl;
 
+
+     //boltzman stuff
+        P.resize(101);
+        for (int i = 0; i < 101; i++) P[i].resize(101,0.0);
 
 
 

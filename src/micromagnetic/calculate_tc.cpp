@@ -49,14 +49,11 @@ namespace micromagnetic {
               for(int nn=start;nn<end;nn++){
 			       const int natom = atoms::neighbour_list_array[nn];
               const int nmat   = type_array[atom];
-            //    std::cout << nn << '\t' << atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij*mp::material[mat].mu_s_SI <<std::endl;
                 const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij*mp::material[mat].mu_s_SI;
-                //std::cout << atom << '\t' << natom << '\t' << mat << "\t" << Jij << "\t" << mat << '\t' << atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij << '\t' << mp::material[mat].mu_s_SI << std::endl;
                 J[cell] = J[cell] +  Jij;
               }
             }
 
-                    // std::cin.get();
             break;
 		      case 1: // vector
             terminaltextcolor(RED);
@@ -77,9 +74,10 @@ namespace micromagnetic {
           for (int i = 0; i < num_local_cells; i++){
             int cell = local_cell_array[i];
             Tc[cell] = -J[cell]*e/(3*kB*N[cell]);
-        //    if (ms[cell] > 0)std::cout << J[cell] << '\t' << Tc[cell] << '\t' << N[cell] <<std::endl;
-            //if (Tc[cell] < 0) Tc[cell] = -Tc[cell];
          }
+         #ifdef MPICF
+           MPI_Allreduce(MPI_IN_PLACE, &Tc[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         #endif
 
          return Tc;             //returns a 1D array containing the curiue temepratures
       }

@@ -57,8 +57,14 @@ namespace micromagnetic{
       test="atomistic-steps-per-micromagnetic-step";
       if(word==test){
         double dt=atof(value.c_str());
-        //vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
+        vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1, 100000,"input","1 step - 100000 steps");
         micromagnetic::num_atomic_steps_mm =dt;
+        return true;
+      }
+
+      test="output-boltzman";
+      if(word==test){
+        boltzman =true;
         return true;
       }
 

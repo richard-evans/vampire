@@ -66,35 +66,55 @@ namespace dipole{
       std::vector <std::vector < double > > rij_intra_yz;
       std::vector <std::vector < double > > rij_intra_zz;
 
-      Array3D<fftw_complex> Nxx0; //3D Array for dipolar field
-	   Array3D<fftw_complex> Nxy0;
-	   Array3D<fftw_complex> Nxz0;
+      //only initialise if FFT has been enabled in makefile
+      #ifdef FFT
+      fftw_complex *N2xx0; //3D Array for dipolar field
+      fftw_complex *N2xy0;
+      fftw_complex *N2xz0;
 
-		Array3D<fftw_complex> Nyx0; //3D Array for dipolar field
-		Array3D<fftw_complex> Nyy0;
-		Array3D<fftw_complex> Nyz0;
+      fftw_complex *N2yx0; //3D Array for dipolar field
+      fftw_complex *N2yy0;
+      fftw_complex *N2yz0;
 
-		Array3D<fftw_complex> Nzx0; //3D Array for dipolar field
-		Array3D<fftw_complex> Nzy0;
-		Array3D<fftw_complex> Nzz0;
+      fftw_complex *N2zx0; //3D Array for dipolar field
+      fftw_complex *N2zy0;
+      fftw_complex *N2zz0;
 
-      Array3D<fftw_complex> Nxx; //3D Array for dipolar field
-	   Array3D<fftw_complex> Nxy;
-	   Array3D<fftw_complex> Nxz;
+      fftw_complex *N2xx; //3D Array for dipolar field
+      fftw_complex *N2xy;
+      fftw_complex *N2xz;
 
-		Array3D<fftw_complex> Nyx; //3D Array for dipolar field
-		Array3D<fftw_complex> Nyy;
-		Array3D<fftw_complex> Nyz;
+      fftw_complex *N2yx; //3D Array for dipolar field
+      fftw_complex *N2yy;
+      fftw_complex *N2yz;
 
-		Array3D<fftw_complex> Nzx; //3D Array for dipolar field
-		Array3D<fftw_complex> Nzy;
-		Array3D<fftw_complex> Nzz;
+      fftw_complex *N2zx; //3D Array for dipolar field
+      fftw_complex *N2zy;
+      fftw_complex *N2zz;
 
+
+      fftw_complex *Mx_in; //3D Array for dipolar field
+      fftw_complex *My_in;
+      fftw_complex *Mz_in;
+
+      fftw_complex *Hx_in; //3D Array for dipolar field
+      fftw_complex *Hy_in;
+      fftw_complex *Hz_in;
+
+      fftw_complex *Mx_out; //3D Array for dipolar field
+      fftw_complex *My_out;
+      fftw_complex *Mz_out;
+
+      fftw_complex *Hx_out; //3D Array for dipolar field
+      fftw_complex *Hy_out;
+      fftw_complex *Hz_out;
+
+      //stores number of macrocells in x,y,z
       int num_macro_cells_x;
       int num_macro_cells_y;
       int num_macro_cells_z;
       int eight_num_cells;
-
+      #endif
 
       int num_atoms;
       std::vector < int > atom_type_array;

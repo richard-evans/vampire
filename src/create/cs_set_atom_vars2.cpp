@@ -130,7 +130,6 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 		atoms::z_spin_array[atom]=sz*modS;
       atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
 	}
-
 	//===========================================================
 	// Create 1-D neighbourlist
 	//===========================================================

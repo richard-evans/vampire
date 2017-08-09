@@ -44,10 +44,10 @@ namespace micromagnetic{
   int atomistic_LLGinit(){
 
   	// check calling of routine if error checking is activated
-  	if(err::check==true){std::cout << "sim::LLG_init has been called" << std::endl;}
+  	if(err::check==true){std::cout << "micromagnetic::atomistic_LLG_init has been called" << std::endl;}
 
   	using namespace atomistic_LLG_arrays;
-		//std::cout << "called" <<std::endl;
+		//resize LLG arrays
   	x_spin_storage_array.resize(atoms::num_atoms,0.0);
   	y_spin_storage_array.resize(atoms::num_atoms,0.0);
   	z_spin_storage_array.resize(atoms::num_atoms,0.0);
@@ -80,11 +80,13 @@ namespace micromagnetic{
 
   	// Check for initialisation of LLG integration arrays
   	if(LLG_set== false) atomistic_LLGinit();
+
   	// Local variables for system integration
   	const int num_atoms=atoms::num_atoms;
   	double xyz[3];		// Local Delta Spin Components
   	double S_new[3];	// New Local Spin Moment
   	double mod_S;		// magnitude of spin moment
+
   	// Store initial spin positions
     for(int atom_list=0;atom_list<number_of_atomistic_atoms;atom_list++){
   		int atom = list_of_atomistic_atoms[atom_list];
@@ -92,26 +94,32 @@ namespace micromagnetic{
   		y_initial_spin_array[atom] = atoms::y_spin_array[atom];
   		z_initial_spin_array[atom] = atoms::z_spin_array[atom];
   	}
-		//std::cout << 'a' << std::endl;
+
+		//loops over sections of atoms which are numerically adjacent ie. 4,5,6,7,8,9 then 12,13,14,15
+		//num calcualtions is the number of sections of adjacent atoms.
 		int num_calculations = mm::fields_neighbouring_atoms_begin.size();
 
+		//caclualtes the spin fields and external fields for each section.
 		for (int i = 0; i < num_calculations; i ++){
-			int begin = mm::fields_neighbouring_atoms_begin[i];
+			int begin = mm::fields_neighbouring_atoms_begin[i];		//the start and end atom index for each section.
 			int end = mm::fields_neighbouring_atoms_end[i];
-			sim::calculate_spin_fields(begin,end);
-	    sim::calculate_external_fields(begin,end);
+			sim::calculate_spin_fields(begin,end);								//calls the function from the usual atomsitic vampire
+	    sim::calculate_external_fields(begin,end);						//external fields on each atom from the atomistic vampire.
 		}
-		//std::cout << 'b' << std::endl;
 
 
+		//Calculate Euler gradients
 		for(int atom_list=0;atom_list<number_of_atomistic_atoms;atom_list++){
+			//calcualtes the atom if from the atom list
   		int atom = list_of_atomistic_atoms[atom_list];
-
+			//sets the material for each atom
 			const int imaterial=atoms::type_array[atom];
+
+			//alpha is used as 1/(1+a^2) and a/(1+a^2) so these are stored as variables.
 			const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq; // material specific alpha and gamma
 			const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
 
-			// Store local spin in Sand local field in H
+			// Store local spin in S and local field in H
 			const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
 			const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom],
 										atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom],
@@ -134,7 +142,6 @@ namespace micromagnetic{
 
 			// Normalise Spin Length
 			mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
-
 			S_new[0]=S_new[0]*mod_S;
 			S_new[1]=S_new[1]*mod_S;
 			S_new[2]=S_new[2]*mod_S;
@@ -144,21 +151,21 @@ namespace micromagnetic{
 			y_spin_storage_array[atom]=S_new[1];
 			z_spin_storage_array[atom]=S_new[2];
 		}
-		//std::cout << 'c' << std::endl;
 
 
+		//recalcualtes the spin fields for each section as before
 		for (int i = 0; i < num_calculations; i ++){
 			int begin = mm::fields_neighbouring_atoms_begin[i];
 			int end = mm::fields_neighbouring_atoms_end[i];
 			sim::calculate_spin_fields(begin,end);
 		}
-		//std::cout << 'd' << std::endl;
+
 
 		// Calculate Heun Gradients
 		for(int atom_list=0;atom_list<number_of_atomistic_atoms;atom_list++){
   		int atom = list_of_atomistic_atoms[atom_list];
 
-
+			//calcualtes the material and 1/(1+a^2) and a/(1+a^2)
 			const int imaterial=atoms::type_array[atom];;
 			const double one_oneplusalpha_sq = mp::material[imaterial].one_oneplusalpha_sq;
 			const double alpha_oneplusalpha_sq = mp::material[imaterial].alpha_oneplusalpha_sq;
@@ -179,10 +186,10 @@ namespace micromagnetic{
 			y_heun_array[atom]=xyz[1];
 			z_heun_array[atom]=xyz[2];
 		}
-		//std::cout << 'e' << std::endl;
 
 
-		// Calculate Heun Step
+		//calcualtes the new spin arrays from the euler and heun Gradients
+		//S = S_initial + 1/2dt ( euler + heun)
 		for(int atom_list=0;atom_list<number_of_atomistic_atoms;atom_list++){
   		int atom = list_of_atomistic_atoms[atom_list];
 			S_new[0]=x_initial_spin_array[atom]+mp::half_dt*(x_euler_array[atom]+x_heun_array[atom]);
@@ -201,8 +208,6 @@ namespace micromagnetic{
 			atoms::y_spin_array[atom]=S_new[1];
 			atoms::z_spin_array[atom]=S_new[2];
 		}
-		//std::cout << 'f' << std::endl;
-
 
 		return EXIT_SUCCESS;
 	}

@@ -25,8 +25,9 @@
 
 // dipole module headers
 #include "internal.hpp"
-#include "array3d.h"
-
+#ifdef FFT
+#include <fftw3.h>
+#endif
 namespace dipole{
 
    extern int update_rate; /// timesteps between updates
@@ -114,36 +115,54 @@ namespace dipole{
       extern std::vector <std::vector < double > > rij_intra_yy;
       extern std::vector <std::vector < double > > rij_intra_yz;
       extern std::vector <std::vector < double > > rij_intra_zz;
+      #ifdef FFT
+      extern fftw_complex *N2xx0; //3D Array for dipolar field
+      extern fftw_complex *N2xy0;
+      extern fftw_complex *N2xz0;
 
-      extern Array3D<fftw_complex> Nxx0; //3D Array for dipolar field
-	   extern Array3D<fftw_complex> Nxy0;
-	   extern Array3D<fftw_complex> Nxz0;
+      extern fftw_complex *N2yx0; //3D Array for dipolar field
+      extern fftw_complex *N2yy0;
+      extern fftw_complex *N2yz0;
 
-		extern Array3D<fftw_complex> Nyx0; //3D Array for dipolar field
-		extern Array3D<fftw_complex> Nyy0;
-		extern Array3D<fftw_complex> Nyz0;
+      extern fftw_complex *N2zx0; //3D Array for dipolar field
+      extern fftw_complex *N2zy0;
+      extern fftw_complex *N2zz0;
 
-		extern Array3D<fftw_complex> Nzx0; //3D Array for dipolar field
-		extern Array3D<fftw_complex> Nzy0;
-		extern Array3D<fftw_complex> Nzz0;
+      extern fftw_complex *N2xx; //3D Array for dipolar field
+      extern fftw_complex *N2xy;
+      extern fftw_complex *N2xz;
 
-      extern Array3D<fftw_complex> Nxx; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nxy;
-      extern Array3D<fftw_complex> Nxz;
+      extern fftw_complex *N2yx; //3D Array for dipolar field
+      extern fftw_complex *N2yy;
+      extern fftw_complex *N2yz;
 
-      extern Array3D<fftw_complex> Nyx; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nyy;
-      extern Array3D<fftw_complex> Nyz;
+      extern fftw_complex *N2zx; //3D Array for dipolar field
+      extern fftw_complex *N2zy;
+      extern fftw_complex *N2zz;
 
-      extern Array3D<fftw_complex> Nzx; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nzy;
-      extern Array3D<fftw_complex> Nzz;
+
+      extern fftw_complex *Mx_in; //3D Array for dipolar field
+      extern fftw_complex *My_in;
+      extern fftw_complex *Mz_in;
+
+      extern fftw_complex *Hx_in; //3D Array for dipolar field
+      extern fftw_complex *Hy_in;
+      extern fftw_complex *Hz_in;
+
+      extern fftw_complex *Mx_out; //3D Array for dipolar field
+      extern fftw_complex *My_out;
+      extern fftw_complex *Mz_out;
+
+      extern fftw_complex *Hx_out; //3D Array for dipolar field
+      extern fftw_complex *Hy_out;
+      extern fftw_complex *Hz_out;
+
 
       extern int num_macro_cells_x;
       extern int num_macro_cells_y;
       extern int num_macro_cells_z;
       extern int eight_num_cells;
-
+      #endif
       extern int num_atoms;
       extern std::vector < int > atom_type_array;
       extern std::vector < int > atom_cell_id_array;

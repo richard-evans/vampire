@@ -82,9 +82,9 @@ void setting_process(){
             }
 
         }
-		//	#ifdef MPICF
-    //      MPI::COMM_WORLD.Allreduce(&Local_Sub[0], &Total_Sub[0],grains::num_grains*4, MPI_INT, MPI_SUM);
-    //    #endif
+			#ifdef MPICF
+         MPI::COMM_WORLD.Allreduce(&Local_Sub[0], &Total_Sub[0],grains::num_grains*4, MPI_INT, MPI_SUM);
+       #endif
 
 
        int l =0;
@@ -107,7 +107,7 @@ void setting_process(){
 
        for (int i = 0; i < grains::num_grains*4; i= i +4){
            if (Total_Sub[i] != 0){
-               cerr <<"number in each sublattice for grain" << j << ";" <<  Total_Sub[i] << "\t" << Total_Sub[i +1] << "\t" << Total_Sub[i+2] << "\t" << Total_Sub[i+3] << "\t" << std::endl;
+               cout <<"number in each sublattice for grain" << j << ";" <<  Total_Sub[i] << "\t" << Total_Sub[i +1] << "\t" << Total_Sub[i+2] << "\t" << Total_Sub[i+3] << "\t" << std::endl;
                zlog << zTs() <<"number in each sublattice for grain" << j << ";" <<  Total_Sub[i] << "\t" << Total_Sub[i +1] << "\t" << Total_Sub[i+2] << "\t" << Total_Sub[i+3] << "\t" << std::endl;
                j++;
            }

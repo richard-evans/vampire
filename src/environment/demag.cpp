@@ -6,224 +6,241 @@
 #include "sim.hpp"
 #include <math.h>
 #include "cells.hpp"
-#include "array3d.h"
+#ifdef FFT
+#include <fftw3.h>
+#endif
 namespace environment{
 
-     namespace internal{
+  namespace internal{
 
-       int initialise_demag_fields(){
+    int initialise_demag_fields(){
 
-       eight_num_cells = 8*num_cells_x*num_cells_y*num_cells_z;
-       eightPI_three_cell_volume = 8.0*M_PI/(3.0*cell_volume);
+    //only complie this section of FFT is enabled else don't
+    #ifdef FFT
+    //save eight times number cells and 8 pi/3V to use later.
+    eight_num_cells = 8*num_cells_x*num_cells_y*num_cells_z;
+    eightPI_three_cell_volume = 8.0*M_PI/(3.0*cell_volume);
 
-       Nxx0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nxy0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nxz0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
+    //Resize arrays for fft
+    N2xx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2xy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2xz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2yx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2yy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2yz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2zx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2zy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2zz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
 
-       Nyx0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nyy0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nyz0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
+    N2xx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2xy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2xz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2yx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2yy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2yz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2zx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2zy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    N2zz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
 
-       Nzx0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nzy0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nzz0.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
+    Mx_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    My_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    Mz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
 
-       Nxx.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nxy.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nxz.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
+    Mx_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    My_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    Mz_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
 
-       Nyx.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nyy.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nyz.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
+    Hx_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    Hy_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    Hz_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
 
-       Nzx.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nzy.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-       Nzz.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
+    Hx_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    Hy_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
+    Hz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
 
+    //initialises all the demag tensor components to 0
+    for(unsigned int i = 0 ; i < num_cells_x ; i++){
+      for(unsigned int j = 0 ; j < num_cells_y; j++){
+         for(unsigned int k = 0 ; k < num_cells_z ; k++){
+            int id = (i*num_cells_x+j)*num_cells_y+k;
 
-       Nxx.IFill(0.0);
-       Nxy.IFill(0.0);
-       Nxz.IFill(0.0);
-       Nyx.IFill(0.0);
-       Nyy.IFill(0.0);
-       Nyz.IFill(0.0);
-       Nzx.IFill(0.0);
-       Nzy.IFill(0.0);
-       Nzz.IFill(0.0);
+              N2xx0[id][0]=0;
+              N2xx0[id][1]=0;
+              N2xx[id][0] =0;
+              N2xx[id][1] =0;
+              N2xy0[id][0]=0;
+              N2xy0[id][1]=0;
+              N2xy[id][0] =0;
+              N2xy[id][1] =0;
+              N2xz0[id][0]=0;
+              N2xz0[id][1]=0;
 
-       Nxx0.IFill(0.0);
-       Nxy0.IFill(0.0);
-       Nxz0.IFill(0.0);
-       Nyx0.IFill(0.0);
-       Nyy0.IFill(0.0);
-       Nyz0.IFill(0.0);
-       Nzx0.IFill(0.0);
-       Nzy0.IFill(0.0);
-       Nzz0.IFill(0.0);
+              N2yx0[id][0]=0;
+              N2yx0[id][1]=0;
+              N2yx[id][0] =0;
+              N2yx[id][1] =0;
+              N2yy0[id][0]=0;
+              N2yy0[id][1]=0;
+              N2yy[id][0] =0;
+              N2yy[id][1] =0;
+              N2yz0[id][0]=0;
+              N2yz0[id][1]=0;
 
-      double ii,jj,kk;
-         for(int i=0;i<num_cells_x*2;i++){
-            if (i >= num_cells_x) ii = i - 2*num_cells_x;
-            else ii = i;
-            for(int j=0;j<num_cells_y*2;j++){
-               if (j >= num_cells_y) jj = j - 2*num_cells_y;
-               else jj = j;
-               for(int k=0;k<num_cells_z*2;k++){
-                  if (k>= num_cells_z) kk = k - 2*num_cells_z;
-                  else kk = k;
-                  if((ii!=jj) && (jj != kk)){
-
-                     const double rx = ii*cell_size[0]; // Angstroms
-                     const double ry = jj*cell_size[1];
-                     const double rz = kk*cell_size[2];
-                  //   std::cout << "r" << rx << '\t' << ry << '\t' << rz << "\t" << cells::macro_cell_size << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
-                     const double rij = 1.0/pow(rx*rx+ry*ry+rz*rz,0.5);
-
-                     const double ex = rx*rij;
-                     const double ey = ry*rij;
-                     const double ez = rz*rij;
-
-                     const double rij3 = rij*rij*rij; // Angstroms
-                  // std::cout << "r" << rx << '\t' << ry << '\t' << rz << "\t" << cell_size[0] << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
-
-                     Nxx0(i,j,k)[0] = (3.0*ex*ex - 1.0)*rij3;
-                     Nxy0(i,j,k)[0] = (3.0*ex*ey      )*rij3;
-                     Nxz0(i,j,k)[0] = (3.0*ex*ez      )*rij3;
-
-                     Nyx0(i,j,k)[0] = (3.0*ey*ex - 1.0)*rij3;
-                     Nyy0(i,j,k)[0] = (3.0*ey*ey      )*rij3;
-                     Nyz0(i,j,k)[0] = (3.0*ey*ez      )*rij3;
-
-                     Nzx0(i,j,k)[0] = (3.0*ez*ex - 1.0)*rij3;
-                     Nzy0(i,j,k)[0] = (3.0*ez*ey      )*rij3;
-                     Nzz0(i,j,k)[0] = (3.0*ez*ez      )*rij3;
-
-
-            //   std::cout << 	i << '\t' << j << "\t" << k << '\t' << Nxx0(i,j,k)[0] << '\t' << Nxy0(i,j,k)[0] << '\t' << Nxz0(i,j,k)[0] << '\t' << Nyy(i,j,k)[0] << '\t' << Nyz0(i,j,k)[0] << '\t' << Nzz0(i,j,k)[0] <<std::endl;
-
-                  }
-               }
-            }
+              N2zx0[id][0]=0;
+              N2zx0[id][1]=0;
+              N2zx[id][0] =0;
+              N2zx[id][1] =0;
+              N2zy0[id][0]=0;
+              N2zy0[id][1]=0;
+              N2zy[id][0] =0;
+              N2zy[id][1] =0;
+              N2zz0[id][0]=0;
+              N2zz0[id][1]=0;
          }
+      }
+    }
+
+    //initalises all the non-zero demag tensor components as with the normal demag field calcualtion
+    double ii,jj,kk;
+     for(int i=0;i<num_cells_x*2;i++){
+        if (i >= num_cells_x) ii = i - 2*num_cells_x;
+        else ii = i;
+        for(int j=0;j<num_cells_y*2;j++){
+           if (j >= num_cells_y) jj = j - 2*num_cells_y;
+           else jj = j;
+           for(int k=0;k<num_cells_z*2;k++){
+              if (k>= num_cells_z) kk = k - 2*num_cells_z;
+              else kk = k;
+              if((ii!=jj) && (jj != kk)){
+
+                 const double rx = ii*cell_size[0]; // Angstroms
+                 const double ry = jj*cell_size[1];
+                 const double rz = kk*cell_size[2];
+
+                 const double rij = 1.0/pow(rx*rx+ry*ry+rz*rz,0.5);
+
+                 const double ex = rx*rij;
+                 const double ey = ry*rij;
+                 const double ez = rz*rij;
+
+                 const double rij3 = rij*rij*rij; // Angstroms
+
+                 int id = (i*num_cells_x+j)*num_cells_y+k;
+                 N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
+                 N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
+                 N2xy0[id][0] = (3.0*ex*ey      )*rij3;
+                 N2xz0[id][0] = (3.0*ex*ez      )*rij3;
+
+                 N2yx0[id][0] = (3.0*ey*ex - 1.0)*rij3;
+                 N2yy0[id][0] = (3.0*ey*ey      )*rij3;
+                 N2yz0[id][0] = (3.0*ey*ez      )*rij3;
+
+                 N2zx0[id][0] = (3.0*ez*ex - 1.0)*rij3;
+                 N2zy0[id][0] = (3.0*ez*ey      )*rij3;
+                 N2zz0[id][0] = (3.0*ez*ez      )*rij3;
+
+              }
+           }
+        }
+     }
 
 
 
          // fft calculations
          fftw_plan NxxP,NxyP,NxzP,NyxP,NyyP,NyzP,NzxP,NzyP,NzzP;
-         int i = 3;
-         int j = 2;
-         int k = 3;
-          std::cout << "INIT ENV" <<std::endl;
-          std::cout << Nxx0(i,j,k)[0] << '\t' << Nxy0(i,j,k)[0] << '\t' << Nxz0(i,j,k)[0] << '\t' << Nyy0(i,j,k)[0] << '\t' << Nyz0(i,j,k)[0] << '\t' << Nzz0(i,j,k)[0] <<std::endl;
-          std::cout << Nxx(i,j,k)[0] << '\t' << Nxy(i,j,k)[0] << '\t' << Nxz(i,j,k)[0] << '\t' << Nyy(i,j,k)[0] << '\t' << Nyz(i,j,k)[0] << '\t' << Nzz(i,j,k)[0] <<std::endl;
-          std::cout << num_cells_x << '\t' << num_cells_y << '\t' << num_cells_z << std::endl;
-          std::cout << *Nxx0.ptr() <<std::endl;
-         //deterines the forward transform for the N arrays
-         NxxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nxx0.ptr(),Nxx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+
+         //deterines the forward transform for the demag field arrays from N2xx0 to N2xx arrays
+         NxxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2xx0,N2xx,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NxxP);
-         NyxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nyx0.ptr(),Nyx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NyxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2yx0,N2yx,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyxP);
-         NzxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nzx0.ptr(),Nzx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NzxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2zx0,N2zx,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzxP);
-         NxyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nxy0.ptr(),Nxy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NxyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2xy0,N2xy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NxyP);
-         NyyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nyy0.ptr(),Nyy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NyyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2yy0,N2yy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyyP);
-         NzyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nzy0.ptr(),Nzy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NzyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2zy0,N2zy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzyP);
-         NxzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nxz0.ptr(),Nxz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NxzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2xz0,N2xz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NxzP);
-         NyzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nyz0.ptr(),Nyz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NyzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2yz0,N2yz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyzP);
-         NzzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Nzz0.ptr(),Nzz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NzzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2zz0,N2zz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzzP);
 
-          std::cout << "INIT ENV" <<std::endl;
-          std::cout << Nxx0.getarrayelement(i,j,k) << Nxx0(i,j,k)[0] << '\t' << Nxy0(i,j,k)[0] << '\t' << Nxz0(i,j,k)[0] << '\t' << Nyy0(i,j,k)[0] << '\t' << Nyz0(i,j,k)[0] << '\t' << Nzz0(i,j,k)[0] <<std::endl;
-          std::cout << Nxx(i,j,k)[0] << '\t' << Nxy(i,j,k)[0] << '\t' << Nxz(i,j,k)[0] << '\t' << Nyy(i,j,k)[0] << '\t' << Nyz(i,j,k)[0] << '\t' << Nzz(i,j,k)[0] <<std::endl;
-          std::cin.get();
+
          return 0;
 
        }
 
         int calculate_demag_fields(){
 
+          //initalise all components of M and H arrays to 0
+         for(unsigned int i = 0 ; i < num_cells_x ; i++){
+             for(unsigned int j = 0 ; j < num_cells_y; j++){
+                for(unsigned int k = 0 ; k < num_cells_z ; k++){
 
-         Array3D<fftw_complex> Mx; //3D Array for magneetisation
-         Array3D<fftw_complex> My;
-         Array3D<fftw_complex> Mz;
-
-         Array3D<fftw_complex> Hx; //3D Array for dipolar field
-         Array3D<fftw_complex> Hy;
-         Array3D<fftw_complex> Hz;
-
-         Array3D<fftw_complex> Mx2; //3D Array for magneetisation
-         Array3D<fftw_complex> My2;
-         Array3D<fftw_complex> Mz2;
-
-         Array3D<fftw_complex> Hx2; //3D Array for dipolar field
-         Array3D<fftw_complex> Hy2;
-         Array3D<fftw_complex> Hz2;
-
-         Hx.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-         Hy.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-         Hz.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-
-         Mx.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-         My.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-         Mz.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-
-         Hx2.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-         Hy2.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-         Hz2.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-
-         Mx2.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-         My2.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
-         Mz2.resize(2*num_cells_x,2*num_cells_y,2*num_cells_z);
+                     int id = (i*num_cells_x+j)*num_cells_y+k;
+                     Mx_in[id][0]=0;
+                     Mx_in[id][1]=0;
+                     My_in[id][0]=0;
+                     My_in[id][1]=0;
+                     Mz_in[id][0]=0;
+                     Mz_in[id][1]=0;
 
 
-         Mx.IFill(0.0);
-         My.IFill(0.0);
-         Mz.IFill(0.0);
-
-         Mx2.IFill(0.0);
-         My2.IFill(0.0);
-         Mz2.IFill(0.0);
-
-         Hx.IFill(0.0);
-         Hy.IFill(0.0);
-         Hz.IFill(0.0);
-
-         Hx2.IFill(0.0);
-         Hy2.IFill(0.0);
-         Hz2.IFill(0.0);
+                     Mx_out[id][0]=0;
+                     Mx_out[id][1]=0;
+                     My_out[id][0]=0;
+                     My_out[id][1]=0;
+                     Mz_out[id][0]=0;
+                     Mz_out[id][1]=0;
 
 
+                     Hx_in[id][0]=0;
+                     Hx_in[id][1]=0;
+                     Hy_in[id][0]=0;
+                     Hy_in[id][1]=0;
+                     Hz_in[id][0]=0;
+                     Hz_in[id][1]=0;
+
+
+                     Hx_out[id][0]=0;
+                     Hx_out[id][1]=0;
+                     Hy_out[id][0]=0;
+                     Hy_out[id][1]=0;
+                     Hz_out[id][0]=0;
+                     Hz_out[id][1]=0;
+
+                }
+             }
+        }
+
+        //initialised the in components for the FT to the magnetisation of each cell
          int cell = 0;
          for (int i=0 ; i<num_cells_x; i++){
          	for (int j=0 ; j<num_cells_y; j++){
          		for (int k=0 ; k<num_cells_z; k++){
-
-         			Mx(i,j,k)[0] = x_mag_array[cell]/9.27400915e-24;
-         			My(i,j,k)[0] = y_mag_array[cell]/9.27400915e-24;
-         			Mz(i,j,k)[0] = z_mag_array[cell]/9.27400915e-24;
-               //   std::cout << x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' << Mx(i,j,k)[0] << '\t' << My(i,j,k)[0] << '\t' << Mz(i,j,k)[0] <<std::endl;
-            	   cell ++;
+              int id = (i*num_cells_x+j)*num_cells_y+k;
+         			Mx_in[id][0] = x_mag_array[cell]/9.27400915e-24;
+         			My_in[id][0] = y_mag_array[cell]/9.27400915e-24;
+         			Mz_in[id][0] = z_mag_array[cell]/9.27400915e-24;
+              cell ++;
 
          		}
          	 }
          }
-
+         //FT for magnetisation
          fftw_plan MxP,MyP,MzP;
 
-         //std::cout << 'g' <<std::endl;
-         MxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mx.ptr(),Mx2.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         MxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mx_in,Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MxP);
-         MyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,My.ptr(),My2.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         MyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,My_in,My_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MyP);
-         MzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mz.ptr(),Mz2.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         MzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mz_in,Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MzP);
-         //std::cout << 'h' <<std::endl;
+
 
          cell = 0;
 
@@ -231,50 +248,42 @@ namespace environment{
          for (int i=0 ; i<2*num_cells_x ; i++){
            for (int j=0 ; j<2*num_cells_y ; j++){
                for (int k=0 ; k<2*num_cells_z ; k++){
-                        //  if (cell == 0) std::cout << "ANx" << Nxx(i,j,k)[0]  << "\t" <<   Nxy(i,j,k)[0]  << "\t" <<   Nxz(i,j,k)[0]  << "\t" << Nxx(i,j,k)[1]  << "\t" <<   Nxy(i,j,k)[1]  << "\t" <<   Nxz(i,j,k)[1]  << "\t" <<  std::endl;
-                        //        if (cell == 0) std::cout << "ANy" << Nyx(i,j,k)[0]  << "\t" <<   Nyy(i,j,k)[0]  << "\t" <<   Nyz(i,j,k)[0]  << "\t" << Nyx(i,j,k)[1]  << "\t" <<   Nyy(i,j,k)[1]  << "\t" <<   Nyz(i,j,k)[1]  << "\t" <<  std::endl;
-                        //        if (cell == 0) std::cout << "ANz" << Nzx(i,j,k)[0]  << "\t" <<   Nzy(i,j,k)[0]  << "\t" <<   Nzz(i,j,k)[0]  << "\t" << Nzx(i,j,k)[1]  << "\t" <<   Nzy(i,j,k)[1]  << "\t" <<   Nzz(i,j,k)[1]  << "\t" <<  std::endl;
-                         //
-                        //        if (cell == 0) std::cout << "AM" << Mx2(i,j,k)[0]  << "\t" <<   My2(i,j,k)[0]  << "\t" <<   Mz2(i,j,k)[0]  << "\t" << Mx2(i,j,k)[1]  << "\t" <<   My2(i,j,k)[1]  << "\t" <<   Mz2(i,j,k)[1]  << "\t" <<  std::endl;
 
+                  int id = (i*num_cells_x+j)*num_cells_y+k;
+                  Hx_in[id][0] = N2xx[id][0]*Mx_out[id][0] + N2xy[id][0]*My_out[id][0] + N2xz[id][0]*Mz_out[id][0]; //summing the real part
+                  Hx_in[id][0] -= (N2xx[id][1]*Mx_out[id][1] + N2xy[id][1]*My_out[id][1] + N2xz[id][1]*Mz_out[id][1]);
 
-                  Hx(i,j,k)[0] = Nxx(i,j,k)[0]*Mx2(i,j,k)[0] + Nxy(i,j,k)[0]*My2(i,j,k)[0] + Nxz(i,j,k)[0]*Mz2(i,j,k)[0]; //summing the real part
-                  Hx(i,j,k)[0] -= (Nxx(i,j,k)[1]*Mx2(i,j,k)[1] + Nxy(i,j,k)[1]*My2(i,j,k)[1] + Nxz(i,j,k)[1]*Mz2(i,j,k)[1]);
+                  Hx_in[id][1] = N2xx[id][0]*Mx_out[id][1] + N2xy[id][0]*My_out[id][1] + N2xz[id][0]*Mz_out[id][1];
+                  Hx_in[id][1] += (N2xx[id][1]*Mx_out[id][0] + N2xy[id][1]*My_out[id][0] + N2xz[id][1]*Mz_out[id][0]);
 
-                  Hx(i,j,k)[1] = Nxx(i,j,k)[0]*Mx2(i,j,k)[1] + Nxy(i,j,k)[0]*My2(i,j,k)[1] + Nxz(i,j,k)[0]*Mz2(i,j,k)[1];
-                  Hx(i,j,k)[1] += (Nxx(i,j,k)[1]*Mx2(i,j,k)[0] + Nxy(i,j,k)[1]*My2(i,j,k)[0] + Nxz(i,j,k)[1]*Mz2(i,j,k)[0]);
+                  Hy_in[id][0] = N2yx[id][0]*Mx_out[id][0] + N2yy[id][0]*My_out[id][0] + N2yz[id][0]*Mz_out[id][0];
+                  Hy_in[id][0] -= (N2yx[id][1]*Mx_out[id][1] + N2yy[id][1]*My_out[id][1] + N2yz[id][1]*Mz_out[id][1]);
 
-                  Hy(i,j,k)[0] = Nyx(i,j,k)[0]*Mx2(i,j,k)[0] + Nyy(i,j,k)[0]*My2(i,j,k)[0] + Nyz(i,j,k)[0]*Mz2(i,j,k)[0];
-                  Hy(i,j,k)[0] -= (Nyx(i,j,k)[1]*Mx2(i,j,k)[1] + Nyy(i,j,k)[1]*My2(i,j,k)[1] + Nyz(i,j,k)[1]*Mz2(i,j,k)[1]);
+                  Hy_in[id][1] = N2yx[id][0]*Mx_out[id][1] + N2yy[id][0]*My_out[id][1] + N2yz[id][0]*Mz_out[id][1];
+                  Hy_in[id][1] += (N2yx[id][1]*Mx_out[id][0] + N2yy[id][1]*My_out[id][0] + N2yz[id][1]*Mz_out[id][0]);
 
-                  Hy(i,j,k)[1] = Nyx(i,j,k)[0]*Mx2(i,j,k)[1] + Nyy(i,j,k)[0]*My2(i,j,k)[1] + Nyz(i,j,k)[0]*Mz2(i,j,k)[1];
-                  Hy(i,j,k)[1] += (Nyx(i,j,k)[1]*Mx2(i,j,k)[0] + Nyy(i,j,k)[1]*My2(i,j,k)[0] + Nyz(i,j,k)[1]*Mz2(i,j,k)[0]);
+                  Hz_in[id][0] = N2zx[id][0]*Mx_out[id][0] + N2zy[id][0]*My_out[id][0] + N2zz[id][0]*Mz_out[id][0]; //summing the real part
+                  Hz_in[id][0] -= (N2zx[id][1]*Mx_out[id][1] + N2zy[id][1]*My_out[id][1] + N2zz[id][1]*Mz_out[id][1]);
 
-                  Hz(i,j,k)[0] = Nzx(i,j,k)[0]*Mx2(i,j,k)[0] + Nzy(i,j,k)[0]*My2(i,j,k)[0] + Nzz(i,j,k)[0]*Mz2(i,j,k)[0]; //summing the real part
-                  Hz(i,j,k)[0] -= (Nzx(i,j,k)[1]*Mx2(i,j,k)[1] + Nzy(i,j,k)[1]*My2(i,j,k)[1] + Nzz(i,j,k)[1]*Mz2(i,j,k)[1]);
-
-                  Hz(i,j,k)[1] = Nzx(i,j,k)[0]*Mx2(i,j,k)[1] + Nzy(i,j,k)[0]*My2(i,j,k)[1] + Nzz(i,j,k)[0]*Mz2(i,j,k)[1];
-                  Hz(i,j,k)[1] += (Nzx(i,j,k)[1]*Mx2(i,j,k)[0] + Nzy(i,j,k)[1]*My2(i,j,k)[0] + Nzz(i,j,k)[1]*Mz2(i,j,k)[0]);
+                  Hz_in[id][1] = N2zx[id][0]*Mx_out[id][1] + N2zy[id][0]*My_out[id][1] + N2zz[id][0]*Mz_out[id][1];
+                  Hz_in[id][1] += (N2zx[id][1]*Mx_out[id][0] + N2zy[id][1]*My_out[id][0] + N2zz[id][1]*Mz_out[id][0]);
                   cell++;
                }
            }
          }
-         //std::cin.get();
+
         // performs the backward transform to give the dipole field, Hx, Hy, Hz
         fftw_plan HxP,HyP,HzP;
 
-        HxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hx.ptr(),Hx2.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+        HxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hx_in,Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
         fftw_execute(HxP);
-        HyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hy.ptr(),Hy2.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+        HyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hy_in,Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
         fftw_execute(HyP);
-        HzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hz.ptr(),Hz2.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+        HzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hz_in,Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
         fftw_execute(HzP);
 
 
 	      for (int i = 0; i< num_cells; i++){
-
-     //         	const double self_demag = demag::prefactor*eightPI_three_cell_volume;
-
 
            // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
            dipole_field_x[i]=eightPI_three_cell_volume*(x_mag_array[i]/9.27400915e-24);
@@ -282,39 +291,32 @@ namespace environment{
            dipole_field_z[i]=eightPI_three_cell_volume*(z_mag_array[i]/9.27400915e-24);
 
         }
-
+          //sums the dipole field N.m + self demag/eightnumcells
         	cell = 0;
         	for (int i=0 ; i<num_cells_x ; i++){
         		for (int j=0 ; j<num_cells_y ; j++){
         			for (int k=0 ; k<num_cells_z ; k++){
-        			  dipole_field_x[cell] += Hx2(i,j,k)[0]/eight_num_cells;
-        			  dipole_field_y[cell] += Hy2(i,j,k)[0]/eight_num_cells;
-        			  dipole_field_z[cell] += Hz2(i,j,k)[0]/eight_num_cells;
-                 dipole_field_x[cell] *= 9.27400915e-01;
-                 dipole_field_y[cell] *= 9.27400915e-01;
-                 dipole_field_z[cell] *= 9.27400915e-01;
-                // std::cout << "SELF" << eightPI_three_cell_volume*(x_mag_array[i]/9.27400915e-24) << '\t' << eightPI_three_cell_volume*(y_mag_array[i]/9.27400915e-24) << '\t' << eightPI_three_cell_volume*(z_mag_array[i]/9.27400915e-24) <<std::endl;
-               //  std::cout << "OTHER" << Hx2(i,j,k)[0]/eight_num_cells << '\t' << Hy2(i,j,k)[0]/eight_num_cells << '\t' << Hz2(i,j,k)[0]/eight_num_cells <<std::endl;
+                int id = (i*num_cells_x+j)*num_cells_y+k;
+        			  dipole_field_x[cell] += Hx_out[id][0]/eight_num_cells;
+        			  dipole_field_y[cell] += Hy_out[id][0]/eight_num_cells;
+        			  dipole_field_z[cell] += Hz_out[id][0]/eight_num_cells;
+                dipole_field_x[cell] *= 9.27400915e-01;
+                dipole_field_y[cell] *= 9.27400915e-01;
+                dipole_field_z[cell] *= 9.27400915e-01;
                	cell++;
         			}
         		}
         	}
-         for (int cell = 0; cell < cells::num_cells; cell++){
 
+          //saves the dipole field for each cell to the environment cell for use in the environment module
+         for (int cell = 0; cell < cells::num_cells; cell++){
             int env_cell = list_env_cell_atomistic_cell[cell];
             environment_field_x[cell] = dipole_field_x[env_cell];
             environment_field_y[cell] = dipole_field_y[env_cell];
             environment_field_z[cell] = dipole_field_z[env_cell];
-         //	std::cout << environment_field_x[cell] << "\t" << environment_field_z[cell] <<std::endl;
          }
-   //      std::cin.get();
-        	Hx.clear();
-        	Hy.clear();
-        	Hz.clear();
-        	Mx.clear();
-        	My.clear();
-        	Mz.clear();
-
+         //enf the FFT only compilation
+         #endif
          return 0;
 
         }

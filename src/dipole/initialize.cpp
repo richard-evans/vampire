@@ -293,7 +293,7 @@ namespace dipole{
       dipole::cells_field_array_x.resize(dipole::internal::cells_num_cells,0.0);
       dipole::cells_field_array_y.resize(dipole::internal::cells_num_cells,0.0);
       dipole::cells_field_array_z.resize(dipole::internal::cells_num_cells,0.0);
-
+      #ifdef FFT
       // allocate arrays to store data [nloccell x ncells]
       if(dipole::fft==true) {
 
@@ -310,52 +310,86 @@ namespace dipole{
          dp::eight_num_cells = 8*dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z;
       //   std::cout << "a" <<std::endl;
 
-         dp::Nxx0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nxy0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nxz0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+      dp::N2xx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2xy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2xz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2yx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2yy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2yz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2zx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2zy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2zz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-         dp::Nyx0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nyy0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nyz0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+      dp::N2xx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2xy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2xz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2yx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2yy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2yz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2zx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2zy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::N2zz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-         dp::Nzx0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nzy0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nzz0.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+      dp::Mx_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::My_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::Mz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
+      dp::Mx_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::My_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::Mz_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-         dp::Nxx.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nxy.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nxz.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+      dp::Hx_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::Hy_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::Hz_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-         dp::Nyx.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nyy.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nyz.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-
-         dp::Nzx.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nzy.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-         dp::Nzz.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+      dp::Hx_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::Hy_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+      dp::Hz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
       //   std::cout << "b" <<std::endl;
 
-      dp::Nxx.IFill(0.0);
-      dp::Nxy.IFill(0.0);
-      dp::Nxz.IFill(0.0);
-      dp::Nyx.IFill(0.0);
-      dp::Nyy.IFill(0.0);
-      dp::Nyz.IFill(0.0);
-      dp::Nzx.IFill(0.0);
-      dp::Nzy.IFill(0.0);
-      dp::Nzz.IFill(0.0);
+      for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++)
+      {
+          for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++)
+          {
+            for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++)
+            {
+                int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
+                  dp::N2xx0[id][0]=0;
+                  dp::N2xx0[id][1]=0;
+                  dp::N2xx[id][0] =0;
+                  dp::N2xx[id][1] =0;
+                  dp::N2xy0[id][0]=0;
+                  dp::N2xy0[id][1]=0;
+                  dp::N2xy[id][0] =0;
+                  dp::N2xy[id][1] =0;
+                  dp::N2xz0[id][0]=0;
+                  dp::N2xz0[id][1]=0;
 
-      dp::Nxx0.IFill(0.0);
-      dp::Nxy0.IFill(0.0);
-      dp::Nxz0.IFill(0.0);
-      dp::Nyx0.IFill(0.0);
-      dp::Nyy0.IFill(0.0);
-      dp::Nyz0.IFill(0.0);
-      dp::Nzx0.IFill(0.0);
-      dp::Nzy0.IFill(0.0);
-      dp::Nzz0.IFill(0.0);
+                  dp::N2yx0[id][0]=0;
+                  dp::N2yx0[id][1]=0;
+                  dp::N2yx[id][0] =0;
+                  dp::N2yx[id][1] =0;
+                  dp::N2yy0[id][0]=0;
+                  dp::N2yy0[id][1]=0;
+                  dp::N2yy[id][0] =0;
+                  dp::N2yy[id][1] =0;
+                  dp::N2yz0[id][0]=0;
+                  dp::N2yz0[id][1]=0;
+
+                  dp::N2zx0[id][0]=0;
+                  dp::N2zx0[id][1]=0;
+                  dp::N2zx[id][0] =0;
+                  dp::N2zx[id][1] =0;
+                  dp::N2zy0[id][0]=0;
+                  dp::N2zy0[id][1]=0;
+                  dp::N2zy[id][0] =0;
+                  dp::N2zy[id][1] =0;
+                  dp::N2zz0[id][0]=0;
+                  dp::N2zz0[id][1]=0;
+            }
+          }
+      }
 
       double ii,jj,kk;
          for(int i=0;i<dp::num_macro_cells_x*2;i++){
@@ -380,76 +414,53 @@ namespace dipole{
                      const double ez = rz*rij;
 
                      const double rij3 = rij*rij*rij; // Angstroms
-                  //   std::cout << "DPr" << rx << '\t' << ry << '\t' << rz << "\t" << cells::macro_cell_size << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
+                  // std::cout << "r" << rx << '\t' << ry << '\t' << rz << "\t" << cell_size[0] << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
+                     int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
+                     dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
+                     dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
+                     dp::N2xy0[id][0] = (3.0*ex*ey      )*rij3;
+                     dp::N2xz0[id][0] = (3.0*ex*ez      )*rij3;
 
-                        //	 std::cout <<"r" << rx << '\t' << ry << '\t' << rz << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez << prefactor << std::endl;
+                     dp::N2yx0[id][0] = (3.0*ey*ex - 1.0)*rij3;
+                     dp::N2yy0[id][0] = (3.0*ey*ey      )*rij3;
+                     dp::N2yz0[id][0] = (3.0*ey*ez      )*rij3;
 
-                     dp::Nxx0(i,j,k)[0] = (3.0*ex*ex - 1.0)*rij3;
-                     dp::Nxy0(i,j,k)[0] = (3.0*ex*ey      )*rij3;
-                     dp::Nxz0(i,j,k)[0] = (3.0*ex*ez      )*rij3;
-
-                     dp::Nyx0(i,j,k)[0] = (3.0*ey*ex - 1.0)*rij3;
-                     dp::Nyy0(i,j,k)[0] = (3.0*ey*ey      )*rij3;
-                     dp::Nyz0(i,j,k)[0] = (3.0*ey*ez      )*rij3;
-
-                     dp::Nzx0(i,j,k)[0] = (3.0*ez*ex - 1.0)*rij3;
-                     dp::Nzy0(i,j,k)[0] = (3.0*ez*ey      )*rij3;
-                     dp::Nzz0(i,j,k)[0] = (3.0*ez*ez      )*rij3;
+                     dp::N2zx0[id][0] = (3.0*ez*ex - 1.0)*rij3;
+                     dp::N2zy0[id][0] = (3.0*ez*ey      )*rij3;
+                     dp::N2zz0[id][0] = (3.0*ez*ez      )*rij3;
 
 
-                     dp::Nxx(i,j,k)[0] = 0.0;
-                     dp::Nxy(i,j,k)[0] = 0.0;
-                     dp::Nxz(i,j,k)[0] = 0.0;
+            //   std::cout << 	i << '\t' << j << "\t" << k << '\t' << Nxx0[id][0] << '\t' << Nxy0[id][0] << '\t' << Nxz0[id][0] << '\t' << Nyy[id][0] << '\t' << Nyz0[id][0] << '\t' << Nzz0[id][0] <<std::endl;
 
-                     dp::Nyx(i,j,k)[0] = 0.0;
-                     dp::Nyy(i,j,k)[0] = 0.0;
-                     dp::Nyz(i,j,k)[0] = 0.0;
-
-                     dp::Nzx(i,j,k)[0] = 0.0;
-                     dp::Nzy(i,j,k)[0] = 0.0;
-                     dp::Nzz(i,j,k)[0] = 0.0;
-            //         std::cout << 	"DP" << i << '\t' << j << "\t" << k << '\t' << dp::Nxx0(i,j,k)[0] << '\t' << dp::Nxy0(i,j,k)[0] << '\t' << dp::Nxz0(i,j,k)[0] << '\t' << dp::Nyy(i,j,k)[0] << '\t' << dp::Nyz0(i,j,k)[0] << '\t' << dp::Nzz0(i,j,k)[0] <<std::endl;
                   }
                }
             }
          }
-      //   std::cin.get();
-   //   std::cout << "ENV" <<std::endl;
-   //   std::cin.get();
+
 
          // fft calculations
          fftw_plan NxxP,NxyP,NxzP,NyxP,NyyP,NyzP,NzxP,NzyP,NzzP;
 
 
           //deterines the forward transform for the N arrays
-         NxxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nxx0.ptr(),dp::Nxx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
-      fftw_execute(NxxP);
-         NyxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nyx0.ptr(),dp::Nyx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NxxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2xx0,dp::N2xx,FFTW_FORWARD,FFTW_ESTIMATE);
+         fftw_execute(NxxP);
+         NyxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2yx0,dp::N2yx,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyxP);
-         NzxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nzx0.ptr(),dp::Nzx.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NzxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2zx0,dp::N2zx,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzxP);
-  //	std::cout << 'r' <<std::endl;
-         NxyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nxy0.ptr(),dp::Nxy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NxyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2xy0,dp::N2xy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NxyP);
-         NyyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nyy0.ptr(),dp::Nyy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NyyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2yy0,dp::N2yy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyyP);
-         NzyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nzy0.ptr(),dp::Nzy.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NzyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2zy0,dp::N2zy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzyP);
-  //	std::cout << 'f' <<std::endl;
-         NxzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nxz0.ptr(),dp::Nxz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NxzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2xz0,dp::N2xz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NxzP);
-         NyzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nyz0.ptr(),dp::Nyz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NyzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2yz0,dp::N2yz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyzP);
-         NzzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Nzz0.ptr(),dp::Nzz.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         NzzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2zz0,dp::N2zz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzzP);
-      //   std::cout << "d" <<std::endl;
-      // std::cout << "INIT DP" <<std::endl;
-      // int i = 0;
-      // int j = 0;
-      // int k = 0;
-      // std::cout << dp::Nxx0(i,j,k)[0] << '\t' << dp::Nxy0(i,j,k)[0] << '\t' << dp::Nxz0(i,j,k)[0] << '\t' << dp::Nyy0(i,j,k)[0] << '\t' << dp::Nyz0(i,j,k)[0] << '\t' << dp::Nzz0(i,j,k)[0] <<std::endl;
-      // std::cout << dp::Nxx(i,j,k)[0] << '\t' << dp::Nxy(i,j,k)[0] << '\t' << dp::Nxz(i,j,k)[0] << '\t' << dp::Nyy(i,j,k)[0] << '\t' << dp::Nyz(i,j,k)[0] << '\t' << dp::Nzz(i,j,k)[0] <<std::endl;
-      // std::cin.get();
 
       }
 
@@ -460,6 +471,7 @@ namespace dipole{
 
 
    else{
+     #endif
       for(int lc=0;lc<dipole::internal::cells_num_local_cells; lc++){
 
          dipole::internal::rij_inter_xx.push_back(std::vector<double>());
@@ -723,8 +735,9 @@ namespace dipole{
             }
 			}
 		}
+    #ifdef FFT
    }
-
+#endif
       //MPI::COMM_WORLD.Barrier();
       //fprintf(stderr,"\n\n >>> printing inter part of dipolar matrix <<<< \n\n");
       //MPI::COMM_WORLD.Barrier();

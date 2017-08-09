@@ -24,6 +24,10 @@ namespace micromagnetic{
            int mat = type_array[atom];
             ku[cell] = ku[cell] +  mp::material[mat].Ku1_SI;
          }
+
+         #ifdef MPICF
+           MPI_Allreduce(MPI_IN_PLACE, &ku[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         #endif
          return ku;               //returns a
       }
    } //closes the internal namspace

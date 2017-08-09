@@ -29,18 +29,21 @@ namespace environment{
          double a4 =-4e-23;
          double a5 =-6.5076312364e-32;
 
-         double chi = 0.0;        //1D vector the store the parallel susceptability for each cell
+         //cosntant to store the susepbability of the system
+         double chi = 0.0;
 
          double PI= 3.14159;
 
-
+        //calcualtes the susceptability for temerpature < Tc
         if(T<Tc) chi =(a0/660.*Tc)/(4.*PI)/(Tc-T)+a1*pow((Tc-T),1.)+ a2*pow((Tc-T),3.)+a3*pow((Tc-T),4.)+ a4*pow((Tc-T),6.)+ a5*pow((Tc-T),9.);
+        //calcualtes the susceptability for temperature greater than TC.
         else chi = (1.1*1.4/660.*Tc)/(4*PI)/(T-Tc);
 
         //conversion from CGS to SI plus a small factor to stop the sum being less than 0
         chi = 1.0/(chi*9.54393845712027+0.308e-14 + 0.03);
 
-         return chi;            //returns the 1D vector for the susceptability,
+        //returns the system suseptability
+        return chi;
       }
    } //closes the internal namspace
 }  //closes the micromagnetic namespace

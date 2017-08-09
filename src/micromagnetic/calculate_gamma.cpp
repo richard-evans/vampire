@@ -17,7 +17,9 @@ namespace micromagnetic{
                                           int num_cells,
                                           std::vector<int> cell_array,                  //1D array storing which cell each atom is in
                                           const std::vector<int> type_array,            //1D array storing which material each atom is
-                                          std::vector <mp::materials_t> material){      //class of material parameters for the atoms
+                                          std::vector <mp::materials_t> material,
+                                          int num_local_cells,
+                                          std::vector<int>local_cell_array){      //class of material parameters for the atoms
 
 
          std::vector<double>  gamma(num_cells,0.0);     //1D vector storing the value of gamma for each cell
@@ -31,9 +33,13 @@ namespace micromagnetic{
             N[cell_array[atom]]++;
          }
          //calculates gamma/N
-         for (int cell = 0; cell < num_cells; cell++){
+         for (int i = 0; i < num_local_cells; i++){
+           int cell = local_cell_array[i];
             gamma[cell] = gamma[cell]/N[cell];
          }
+         #ifdef MPICF
+           MPI_Allreduce(MPI_IN_PLACE, &gamma[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         #endif
          return gamma;                     //returns a 1D array of values of gamma for each cell
       }
    } //closes the internal namspace

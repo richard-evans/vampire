@@ -57,8 +57,10 @@ namespace dipole{
 
 			   // recalculate dipole fields
             if (dipole::fft == false)  dipole::internal::update_field();
+						#ifdef FFT
 				else dipole::internal::update_field_fft();
-            //MPI::COMM_WORLD.Barrier();
+				#endif
+					  //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n **** PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");
 
 			   // For MPI version, only add local atoms

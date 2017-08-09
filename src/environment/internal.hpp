@@ -23,8 +23,9 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
-#include "array3d.h"
-
+#ifdef FFT
+#include <fftw3.h>
+#endif
 
 // Vampire headers
 #include "environment.hpp"
@@ -51,33 +52,33 @@ namespace environment{
       extern std::vector < double > dipole_field_y;
       extern std::vector < double > dipole_field_z;
 
+      //3d vector to store the shift in atomistic position from 0,0,0 with respect to the environment module
       extern std::vector < double > shift;
+
 
       extern double eightPI_three_cell_volume;
       extern double cell_volume;
 
+      //if initial spins are random
       extern bool random_spins;
 
+      //stores cell properties
       extern int num_cells;
       extern double A;
       extern double exchange_constant;
       extern double ku;
       extern double Tc;
       extern double Ms;
-
       extern double m_e;
-
       extern double gamma;
       extern double alpha;
-
       extern int num_env_cells;
-
       extern double one_o_chi_para;
       extern double one_o_chi_perp;
-
       extern double alpha_para;
       extern double alpha_perp;
 
+      //array to store mag
       extern std::vector < double > x_mag_array;
       extern std::vector < double > y_mag_array;
       extern std::vector < double > z_mag_array;
@@ -87,37 +88,55 @@ namespace environment{
       extern std::vector<double> cell_coords_array_y;
       extern std::vector<double> cell_coords_array_z;
 
+      //stores nearest neighbours
       extern std::vector<double> neighbour_list_start_index;
       extern std::vector<double> neighbour_list_end_index;
       extern std::vector<double> neighbour_list_array;
 
       extern ofstream o_file;
+      #ifdef FFT
+      extern fftw_complex *Mx_in; //3D Array for m_in
+      extern fftw_complex *My_in;
+      extern fftw_complex *Mz_in;
+
+      extern fftw_complex *Hx_in; //3D Array for Hin
+      extern fftw_complex *Hy_in;
+      extern fftw_complex *Hz_in;
+
+      extern fftw_complex *Mx_out; //3D Array for mout
+      extern fftw_complex *My_out;
+      extern fftw_complex *Mz_out;
+
+      extern fftw_complex *Hx_out; //3D Array for Hout
+      extern fftw_complex *Hy_out;
+      extern fftw_complex *Hz_out;
 
 
-      extern Array3D<fftw_complex> Nxx0; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nxy0;
-      extern Array3D<fftw_complex> Nxz0;
+      extern fftw_complex *N2xx0; //3D Array for dipolar field
+      extern fftw_complex *N2xy0;
+      extern fftw_complex *N2xz0;
 
-      extern Array3D<fftw_complex> Nyx0; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nyy0;
-      extern Array3D<fftw_complex> Nyz0;
+      extern fftw_complex *N2yx0; //3D Array for dipolar field
+      extern fftw_complex *N2yy0;
+      extern fftw_complex *N2yz0;
 
-      extern Array3D<fftw_complex> Nzx0; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nzy0;
-      extern Array3D<fftw_complex> Nzz0;
+      extern fftw_complex *N2zx0; //3D Array for dipolar field
+      extern fftw_complex *N2zy0;
+      extern fftw_complex *N2zz0;
 
-      extern Array3D<fftw_complex> Nxx; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nxy;
-      extern Array3D<fftw_complex> Nxz;
+      extern fftw_complex *N2xx; //3D Array for dipolar field
+      extern fftw_complex *N2xy;
+      extern fftw_complex *N2xz;
 
-      extern Array3D<fftw_complex> Nyx; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nyy;
-      extern Array3D<fftw_complex> Nyz;
+      extern fftw_complex *N2yx; //3D Array for dipolar field
+      extern fftw_complex *N2yy;
+      extern fftw_complex *N2yz;
 
-      extern Array3D<fftw_complex> Nzx; //3D Array for dipolar field
-      extern Array3D<fftw_complex> Nzy;
-      extern Array3D<fftw_complex> Nzz;
+      extern fftw_complex *N2zx; //3D Array for dipolar field
+      extern fftw_complex *N2zy;
+      extern fftw_complex *N2zz;
 
+      #endif
       extern int num_cells_x;
       extern int num_cells_y;
       extern int num_cells_z;

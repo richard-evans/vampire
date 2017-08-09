@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=44;
+	const int max_units=46;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -97,58 +97,61 @@ int init(){
 		using units::unit;
 		using units::conversion;
 		// Distances
-		unit[0]="";				conversion[0]=1.0; 			type[0]="none";		// Default (No conversion)
-		unit[1]="A";			conversion[1]=1.0; 			type[1]="length";		// Angstrom (Internal)
-		unit[2]="m";			conversion[2]=1.0E10; 		type[2]="length";		// Metres
-		unit[3]="cm";			conversion[3]=1.0E8; 		type[3]="length";		// Centimetres
-		unit[4]="mm";			conversion[4]=1.0E7;	 		type[4]="length";		// Millimetres
-		unit[5]="um";			conversion[5]=1.0E4; 		type[5]="length";		// Micrometres
-		unit[6]="nm";			conversion[6]=1.0E1; 		type[6]="length";		// Nanometres
-		unit[7]="pm";			conversion[7]=1.0E-3;	 	type[7]="length";		// Picometres
-		unit[8]="in";			conversion[8]=2.54E8; 		type[8]="length";		// Imperial Inches
-		unit[9]="feet";		conversion[9]=3.12E9; 		type[9]="length";		// Imperial Feet
+		unit[0]="";					conversion[0]=1.0; 							type[0]="none";				// Default (No conversion)
+		unit[1]="A";				conversion[1]=1.0; 							type[1]="length";			// Angstrom (Internal)
+		unit[2]="m";				conversion[2]=1.0E10; 					type[2]="length";			// Metres
+		unit[3]="cm";				conversion[3]=1.0E8; 						type[3]="length";			// Centimetres
+		unit[4]="mm";				conversion[4]=1.0E7;	 					type[4]="length";			// Millimetres
+		unit[5]="um";				conversion[5]=1.0E4; 						type[5]="length";			// Micrometres
+		unit[6]="nm";				conversion[6]=1.0E1; 						type[6]="length";			// Nanometres
+		unit[7]="pm";				conversion[7]=1.0E-3;	 					type[7]="length";			// Picometres
+		unit[8]="in";				conversion[8]=2.54E8; 					type[8]="length";			// Imperial Inches
+		unit[9]="feet";			conversion[9]=3.12E9; 					type[9]="length";			// Imperial Feet
 		// Energies
-		unit[10]="J";			conversion[10]=1.0; 					type[10]="energy";		// Joules
-		unit[11]="eV";			conversion[11]=1.602176487e-19; 	type[11]="energy";		// Electron Volts
-		unit[12]="meV";		conversion[12]=1.602176487e-22; 	type[12]="energy";		// Millielectron Volts
-		unit[13]="erg";		conversion[13]=1E-7; 				type[13]="energy";		// Ergs
-		unit[14]="Ryd";		conversion[14]=2.17987208E-18;	type[14]="energy";		// Rydbergs
+		unit[10]="J";				conversion[10]=1.0; 						type[10]="energy";		// Joules
+		unit[11]="eV";			conversion[11]=1.602176487e-19; type[11]="energy";		// Electron Volts
+		unit[12]="meV";			conversion[12]=1.602176487e-22; type[12]="energy";		// Millielectron Volts
+		unit[13]="erg";			conversion[13]=1E-7; 						type[13]="energy";		// Ergs
+		unit[14]="Ryd";			conversion[14]=2.17987208E-18;	type[14]="energy";		// Rydbergs
 		unit[15]="mRyd";		conversion[15]=2.17987208E-21; 	type[15]="energy";		// MilliRydbergs
 		unit[16]="Ht";			conversion[16]=4.35974417E-18;	type[16]="energy";		// Hartrees
 		// Spin moment
-		unit[17]="J/T";		conversion[17]=1.0; 					type[17]="moment";		// Joules/Tesla
-		unit[18]="Amm";		conversion[18]=1.0; 					type[18]="moment";		// Amps metres squared
-		unit[19]="erg/G";		conversion[19]=1.0E-3; 				type[19]="moment";		// Erg/Gauss
-		unit[20]="abAcmcm";	conversion[20]=1.0E-3; 				type[20]="moment";		// Abampere centimetre squared
-		unit[21]="muB";		conversion[21]=9.27400915e-24; 	type[21]="moment";		// Bohr Magnetons
+		unit[17]="J/T";			conversion[17]=1.0; 						type[17]="moment";		// Joules/Tesla
+		unit[18]="Amm";			conversion[18]=1.0; 						type[18]="moment";		// Amps metres squared
+		unit[19]="erg/G";		conversion[19]=1.0E-3; 					type[19]="moment";		// Erg/Gauss
+		unit[20]="abAcmcm";	conversion[20]=1.0E-3; 					type[20]="moment";		// Abampere centimetre squared
+		unit[21]="muB";			conversion[21]=9.27400915e-24; 	type[21]="moment";		// Bohr Magnetons
 		unit[22]="eV/T";		conversion[22]=1.602176487e-19;	type[22]="moment";		// Electron volts/Tesla
-		unit[23]="erg/Oe";	conversion[23]=1.0E-3; 				type[23]="moment";		// Erg/Oersted
+		unit[23]="erg/Oe";	conversion[23]=1.0E-3; 					type[23]="moment";		// Erg/Oersted
 		// Magnetisation
-		unit[24]="A/m";		conversion[24]=2.17987208E-18;	type[24]="magnetisation";	// Amps/metre
+		unit[24]="A/m";			conversion[24]=2.17987208E-18;	type[24]="magnetisation";	// Amps/metre
 		unit[25]="emu/cc";	conversion[25]=2.17987208E-21; 	type[25]="magnetisation";	// emu/cubic cm
-		unit[26]="J/T/AAA";	conversion[26]=1.0;					type[26]="magnetisation";	// Joule/Tesla/Angstrom cubed
+		unit[26]="J/T/AAA";	conversion[26]=1.0;							type[26]="magnetisation";	// Joule/Tesla/Angstrom cubed
 		// Anisotropy
-		unit[27]="J/atom";	conversion[27]=1.0; 					type[27]="anisotropy";		// Joules/Atom
-		unit[28]="J/mmm";		conversion[28]=1.0E-30; 			type[28]="anisotropy";		// Joules/metres cubed
-		unit[29]="erg/cc";	conversion[29]=1.0E-31; 			type[29]="anisotropy";		// Erg/cc
+		unit[27]="J/atom";	conversion[27]=1.0; 						type[27]="anisotropy";		// Joules/Atom
+		unit[28]="J/mmm";		conversion[28]=1.0E-30; 				type[28]="anisotropy";		// Joules/metres cubed
+		unit[29]="erg/cc";	conversion[29]=1.0E-31; 				type[29]="anisotropy";		// Erg/cc
 		// Field
-		unit[30]="T";			conversion[30]=1.0; 					type[30]="field";		// Tesla
-		unit[31]="mT";			conversion[31]=1.0E-3;		 		type[31]="field";		// milliTesla
-		unit[32]="uT";			conversion[32]=1.0E-6;		 		type[32]="field";		// microTesla
-		unit[33]="Oe";			conversion[33]=1.0E-4;				type[33]="field";		// Oersted
-		unit[34]="kOe";		conversion[34]=1.0E-1; 				type[34]="field";		// kilo Oersted
+		unit[30]="T";				conversion[30]=1.0; 						type[30]="field";		// Tesla
+		unit[31]="mT";			conversion[31]=1.0E-3;		 			type[31]="field";		// milliTesla
+		unit[32]="uT";			conversion[32]=1.0E-6;		 			type[32]="field";		// microTesla
+		unit[33]="Oe";			conversion[33]=1.0E-4;					type[33]="field";		// Oersted
+		unit[34]="kOe";			conversion[34]=1.0E-1; 					type[34]="field";		// kilo Oersted
 		// Time
-		unit[35]="s";			conversion[35]=1.0;					type[35]="time"; // seconds
-		unit[36]="ms";			conversion[36]=1.0E-3;				type[36]="time"; // milliseconds
-		unit[37]="us";			conversion[37]=1.0E-6;				type[37]="time"; // microseconds
-		unit[38]="ns";			conversion[38]=1.0E-9;				type[38]="time"; // nanoseconds
-		unit[39]="ps";			conversion[39]=1.0E-12;				type[39]="time"; // picoseconds
-		unit[40]="fs";			conversion[40]=1.0E-15;				type[40]="time"; // femtoseconds
-		unit[41]="as";			conversion[41]=1.0E-18;				type[41]="time"; // attoseconds
-		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
+		unit[35]="s";				conversion[35]=1.0;							type[35]="time"; // seconds
+		unit[36]="ms";			conversion[36]=1.0E-3;					type[36]="time"; // milliseconds
+		unit[37]="us";			conversion[37]=1.0E-6;					type[37]="time"; // microseconds
+		unit[38]="ns";			conversion[38]=1.0E-9;					type[38]="time"; // nanoseconds
+		unit[39]="ps";			conversion[39]=1.0E-12;					type[39]="time"; // picoseconds
+		unit[40]="fs";			conversion[40]=1.0E-15;					type[40]="time"; // femtoseconds
+		unit[41]="as";			conversion[41]=1.0E-18;					type[41]="time"; // attoseconds
+		unit[42]="zs";			conversion[42]=1.0E-21;					type[42]="time"; // zeptoseconds
       // New
-      unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
+    unit[43]="zJ";			conversion[43]=1.0E-21; 				type[43]="energy";		// zeptoJoules
 
+		//exchange
+		unit[44]="J/m";		conversion[44]=1.0E-10; 				type[44]="exchange";		// Joules/metres squared
+    unit[45]="erg/cm";	conversion[45]=1.0E-15; 				type[45]="exchange";		// erg/cm squared
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag
 		units::initialised=true;
@@ -237,6 +240,7 @@ int init(){
 			if(input_unit==units::unit[i]){
 				// Convert unit
 				for(unsigned int idx=0; idx < value.size(); idx++) value.at(idx)*=conversion[i];
+				std::cout << conversion[i] <<std::endl;
 				// Set unit type
 				type=units::type[i];
 

@@ -41,7 +41,11 @@ namespace dipole{
       test="solver-fft";
       if(word==test){
          // enable dipole calculation
+         #ifdef FFT
          dipole::fft=true;
+         #else
+         std::cout << "FFTW not enabled in makefile - running normal demag calcualtion" <<std::endl;
+         #endif
          return true;
       }
 

@@ -54,6 +54,9 @@ namespace micromagnetic{
 
 
          }
+         #ifdef MPICF
+           MPI_Allreduce(MPI_IN_PLACE, &chi[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         #endif
          return chi;            //returns the 1D vector containing the perpencicular susceptability for each cell,
       }
    } //closes the internal namspace

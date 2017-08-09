@@ -4,6 +4,7 @@
 // micromagnetic module headers
 #include "internal.hpp"
 #include "sim.hpp"
+
 #include <math.h>
 namespace environment{
 
@@ -16,6 +17,7 @@ namespace environment{
      	 double mz = 0;
      	 double ml = 0;
 
+       //calcualtes the mean mx,my,mz,ml for all cells.
        for (int cell = 0; cell < num_cells; cell++){
 
    			   mx =  mx + x_mag_array[cell];
@@ -30,16 +32,18 @@ namespace environment{
    		my = my/magm;
    		mz = mz/magm;
 
+      //outputs to the file environment_output
    		o_file <<sim::time << '\t' << sim::temperature << "\t" << mx << '\t' << my<< '\t' << mz << '\t' <<  magm/msat << std::endl;
-         std::cout <<sim::time << '\t' << sim::temperature << "\t" << mx << '\t' << my<< '\t' << mz << '\t' <<  magm/msat << std::endl;
 
-         // std::ofstream pfile;
-  	// 		pfile.open("env_cell_config");
-         //
-  	// 		for (int cell = 0; cell < num_cells; cell++){
-  	// 			//pfile2 << cell << '\t' << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<mag_array_x[cell] <<
-  	// 			pfile << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' << std::endl;
-  	// 		}
+      //   std::cout <<sim::time << '\t' << sim::temperature << "\t" << mx << '\t' << my<< '\t' << mz << '\t' <<  magm/msat << std::endl;
+
+          // std::ofstream pfile;
+    			// pfile.open("env_cell_config");
+          //
+    			// for (int cell = 0; cell < num_cells; cell++){
+          //
+    			// 	pfile << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' << std::endl;
+    			// }
 
 
        return 0;

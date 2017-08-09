@@ -39,6 +39,9 @@ namespace micromagnetic{
            int cell = local_cell_array[i];
             alpha[cell] = alpha[cell]/N[cell];
          }
+         #ifdef MPICF
+           MPI_Allreduce(MPI_IN_PLACE, &alpha[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         #endif
          return alpha;          //return an array of damping constants for each cell
       }
    } //closes the internal namspace

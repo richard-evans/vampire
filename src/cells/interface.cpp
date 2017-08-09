@@ -41,8 +41,8 @@ namespace cells{
       if(word==test){
          double csize=atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(csize, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
-         cells::macro_cell_size = csize;
+         vin::check_for_valid_value(csize, word, line, prefix, unit, "length", 10, 1.0e5,"input","10 Angstroms - 0.01 millimetre");
+         cells::macro_cell_size = csize + 0.01;
          return true;
       }
 

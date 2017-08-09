@@ -25,26 +25,53 @@
 namespace micromagnetic{
 
     //bool to decide whether the simulation is micromagnetic or atomsitic
+    // 0 - atomistic
+    // 1 - micromagnetic
+    // 2 - multiscale
    extern int discretisation_type;
 
+   //initialises the lists of atomstic/micromagnetic atoms for multiscale simulations
    extern std::vector < double > list_of_atomistic_atoms;
    extern std::vector < double > list_of_none_atomistic_atoms;
    extern std::vector < double > list_of_micromagnetic_cells;
 
+   //variables to store the numbers of atomistic/ microamgnetic atoms for multiscale simulations
    extern int number_of_atomistic_atoms;
    extern int number_of_none_atomistic_atoms;
    extern int number_of_micromagnetic_cells;
 
+
+   //vector to store whether cells are micromagnetic or atomistic
    extern std::vector < bool > cell_discretisation_micromagnetic;
 
+   //set the integrator for microamgnetic simulations
+   //0 - LLG
+   //1 - LLB
    extern int integrator;
 
+   //number of micromagnetic steps per atomistic step
    extern int num_atomic_steps_mm;
 
+   //bool to enable the output of a boltzman distribution
+   extern bool boltzman;
+
+   //varibles for the Boltzman distribution
+   extern double mean_M;
+   extern double counter;
+   extern std::vector < std::vector < double > > P;
+   extern std::vector < double > P1D;
+
+   //--------------------------------------------------------------------
+   //     Function declorations
+   //--------------------------------------------------------------------
+
+   //atomsitic LLG
    int atomistic_LLG_Heun();
 
+   //function to initialise the atomistic LLG
    int atomistic_LLGinit();
 
+   //micromagnetic LLB
    int LLB( std::vector <int> local_cell_array,
             int num_steps,
             int num_cells,
@@ -60,6 +87,7 @@ namespace micromagnetic{
             double dt,
             std::vector <double> volume_array);
 
+    //micromagnetic LLG
     int LLG( std::vector <int> local_cell_array,
              int num_steps,
              int num_cells,

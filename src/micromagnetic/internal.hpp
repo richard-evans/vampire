@@ -24,6 +24,7 @@
 // Vampire headers
 #include "micromagnetic.hpp"
 #include "material.hpp"
+#include "vmpi.hpp"
 
 // micromagnetic module headers
 #include "internal.hpp"
@@ -35,6 +36,11 @@ namespace micromagnetic{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
+
+    extern int my_num_micromagnetic_cells;
+   	 extern int my_start_index; // first cell to intergrate on local (my) cpu
+   	 extern int my_end_index;  // last cell +1 to intergrate on local (my) cpu
+
 
       //-------------------------------------------------------------------------
       // Internal shared variables
@@ -96,7 +102,7 @@ namespace micromagnetic{
       std::vector<double> calculate_chi_perp(int num_local_cells,std::vector<int>local_cell_array,int num_cells, double T);
 
       std::vector<double> calculate_gamma(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array,
-                                          std::vector <mp::materials_t> material);
+                                          std::vector <mp::materials_t> material, int num_local_cells,  std::vector<int>local_cell_array);
 
       std::vector<double> calculate_ku(const int num_atoms, const int num_cells, const std::vector<int> cell_array,  const std::vector<int> type_array,
                                         std::vector <mp::materials_t> material);

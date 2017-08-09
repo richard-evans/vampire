@@ -38,6 +38,7 @@ namespace dipole{
    // Function for updating local temperature fields
    //-----------------------------------------------------------------------------
 
+#ifdef FFT
 
 	void dipole::internal::update_field_fft(){
 
@@ -47,64 +48,56 @@ namespace dipole{
    		terminaltextcolor(WHITE);
    	}
 
-      Array3D<fftw_complex> Mx; //3D Array for magneetisation
-      Array3D<fftw_complex> My;
-      Array3D<fftw_complex> Mz;
 
-      Array3D<fftw_complex> Hx; //3D Array for dipolar field
-      Array3D<fftw_complex> Hy;
-      Array3D<fftw_complex> Hz;
-
-   	Array3D<fftw_complex> Mx2; //3D Array for magneetisation
-      Array3D<fftw_complex> My2;
-      Array3D<fftw_complex> Mz2;
-
-      Array3D<fftw_complex> Hx2; //3D Array for dipolar field
-      Array3D<fftw_complex> Hy2;
-      Array3D<fftw_complex> Hz2;
-
-   	Hx.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-      Hy.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-      Hz.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-
-      Mx.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-      My.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-      Mz.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-
-   	Hx2.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-   	Hy2.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-   	Hz2.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-
-   	Mx2.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-   	My2.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
-   	Mz2.resize(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z);
+		for (int i=0 ; i<dp::num_macro_cells_x ; i++){
+         for (int j=0 ; j<dp::num_macro_cells_y ; j++){
+             for (int k=0 ; k<dp::num_macro_cells_z ; k++){
+						int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
+						Mx_in[id][0]=0;
+						Mx_in[id][1]=0;
+						My_in[id][0]=0;
+						My_in[id][1]=0;
+						Mz_in[id][0]=0;
+						Mz_in[id][1]=0;
 
 
-		Mx.IFill(0.0);
-		My.IFill(0.0);
-		Mz.IFill(0.0);
+						Mx_out[id][0]=0;
+						Mx_out[id][1]=0;
+						My_out[id][0]=0;
+						My_out[id][1]=0;
+						Mz_out[id][0]=0;
+						Mz_out[id][1]=0;
 
-		Mx2.IFill(0.0);
-		My2.IFill(0.0);
-		Mz2.IFill(0.0);
 
-		Hx.IFill(0.0);
-		Hy.IFill(0.0);
-		Hz.IFill(0.0);
+						Hx_in[id][0]=0;
+						Hx_in[id][1]=0;
+						Hy_in[id][0]=0;
+						Hy_in[id][1]=0;
+						Hz_in[id][0]=0;
+						Hz_in[id][1]=0;
 
-		Hx2.IFill(0.0);
-		Hy2.IFill(0.0);
-		Hz2.IFill(0.0);
-		
+
+						Hx_out[id][0]=0;
+						Hx_out[id][1]=0;
+						Hy_out[id][0]=0;
+						Hy_out[id][1]=0;
+						Hz_out[id][0]=0;
+						Hz_out[id][1]=0;
+
+				 }
+			 }
+		}
+
+
    	//		std::cout << "a" <<std::endl;
    		int cell = 0;
    		for (int i=0 ; i<dp::num_macro_cells_x; i++){
    			for (int j=0 ; j<dp::num_macro_cells_y; j++){
    				for (int k=0 ; k<dp::num_macro_cells_z; k++){
-
-   					Mx(i,j,k)[0] = cells::mag_array_x[cell]/9.27400915e-24;
-   					My(i,j,k)[0] = cells::mag_array_y[cell]/9.27400915e-24;
-   					Mz(i,j,k)[0] = cells::mag_array_z[cell]/9.27400915e-24;
+						int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
+   					Mx_in[id][0] = cells::mag_array_x[cell]/9.27400915e-24;
+   					My_in[id][0] = cells::mag_array_y[cell]/9.27400915e-24;
+   					Mz_in[id][0] = cells::mag_array_z[cell]/9.27400915e-24;
                   //if (cell == 0) std::cout << "A" << Mx(i,j,k)[0]  << "\t" <<   My(i,j,k)[0]  << "\t" <<   Mz(i,j,k)[0]  << "\t" <<  std::endl;
 
 					//	std::cout << cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] << '\t' << Mx(i,j,k)[0] << '\t' << My(i,j,k)[0] << '\t' << Mz(i,j,k)[0] <<std::endl;
@@ -115,19 +108,14 @@ namespace dipole{
    		}
 
 
-
-         Hx.IFill(0.0);
-         Hy.IFill(0.0);
-         Hz.IFill(0.0);
-
    	   fftw_plan MxP,MyP,MzP;
 
    		//std::cout << 'g' <<std::endl;
-         MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,Mx.ptr(),Mx2.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mx_in,dp::Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MxP);
-         MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,My.ptr(),My2.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::My_in,dp::My_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MyP);
-         MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,Mz.ptr(),Mz2.ptr(),FFTW_FORWARD,FFTW_ESTIMATE);
+         MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mz_in,dp::Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MzP);
    		//std::cout << 'h' <<std::endl;
 
@@ -136,35 +124,27 @@ cell = 0;
       for (int i=0 ; i<2*dp::num_macro_cells_x ; i++){
          for (int j=0 ; j<2*dp::num_macro_cells_y ; j++){
              for (int k=0 ; k<2*dp::num_macro_cells_z ; k++){
-               if (cell == 0) std::cout << "Nx" << Nxx(i,j,k)[0]  << "\t" <<   Nxy(i,j,k)[0]  << "\t" <<   Nxz(i,j,k)[0]  << "\t" << Nxx(i,j,k)[1]  << "\t" <<   Nxy(i,j,k)[1]  << "\t" <<   Nxz(i,j,k)[1]  << "\t" <<  std::endl;
-               if (cell == 0) std::cout << "Ny" << Nyx(i,j,k)[0]  << "\t" <<   Nyy(i,j,k)[0]  << "\t" <<   Nyz(i,j,k)[0]  << "\t" << Nyx(i,j,k)[1]  << "\t" <<   Nyy(i,j,k)[1]  << "\t" <<   Nyz(i,j,k)[1]  << "\t" <<  std::endl;
-               if (cell == 0) std::cout << "Nz" << Nzx(i,j,k)[0]  << "\t" <<   Nzy(i,j,k)[0]  << "\t" <<   Nzz(i,j,k)[0]  << "\t" << Nzx(i,j,k)[1]  << "\t" <<   Nzy(i,j,k)[1]  << "\t" <<   Nzz(i,j,k)[1]  << "\t" <<  std::endl;
 
-               if (cell == 0) std::cout << "M" << Mx2(i,j,k)[0]  << "\t" <<   My2(i,j,k)[0]  << "\t" <<   Mz2(i,j,k)[0]  << "\t" << Mx2(i,j,k)[1]  << "\t" <<   My2(i,j,k)[1]  << "\t" <<   Mz2(i,j,k)[1]  << "\t" <<  std::endl;
+					 int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
+					 Hx_in[id][0] = dp::N2xx[id][0]*dp::Mx_out[id][0] + dp::N2xy[id][0]*dp::My_out[id][0] + dp::N2xz[id][0]*dp::Mz_out[id][0]; //summing the real part
+					 Hx_in[id][0] -= (dp::N2xx[id][1]*dp::Mx_out[id][1] + dp::N2xy[id][1]*dp::My_out[id][1] + dp::N2xz[id][1]*dp::Mz_out[id][1]);
 
-              Hx(i,j,k)[0] = Nxx(i,j,k)[0]*Mx2(i,j,k)[0] + Nxy(i,j,k)[0]*My2(i,j,k)[0] + Nxz(i,j,k)[0]*Mz2(i,j,k)[0]; //summing the real part
-              Hx(i,j,k)[0] -= (Nxx(i,j,k)[1]*Mx2(i,j,k)[1] + Nxy(i,j,k)[1]*My2(i,j,k)[1] + Nxz(i,j,k)[1]*Mz2(i,j,k)[1]);
+					 Hx_in[id][1] = dp::N2xx[id][0]*dp::Mx_out[id][1] + dp::N2xy[id][0]*dp::My_out[id][1] + dp::N2xz[id][0]*dp::Mz_out[id][1];
+					 Hx_in[id][1] += (dp::N2xx[id][1]*dp::Mx_out[id][0] + dp::N2xy[id][1]*dp::My_out[id][0] + dp::N2xz[id][1]*dp::Mz_out[id][0]);
 
-   					 Hx(i,j,k)[1] = Nxx(i,j,k)[0]*Mx2(i,j,k)[1] + Nxy(i,j,k)[0]*My2(i,j,k)[1] + Nxz(i,j,k)[0]*Mz2(i,j,k)[1];
-              Hx(i,j,k)[1] += (Nxx(i,j,k)[1]*Mx2(i,j,k)[0] + Nxy(i,j,k)[1]*My2(i,j,k)[0] + Nxz(i,j,k)[1]*Mz2(i,j,k)[0]);
+					 Hy_in[id][0] = dp::N2yx[id][0]*dp::Mx_out[id][0] + dp::N2yy[id][0]*dp::My_out[id][0] + dp::N2yz[id][0]*dp::Mz_out[id][0];
+					 Hy_in[id][0] -= (dp::N2yx[id][1]*dp::Mx_out[id][1] + dp::N2yy[id][1]*dp::My_out[id][1] + dp::N2yz[id][1]*dp::Mz_out[id][1]);
 
-              Hy(i,j,k)[0] = Nyx(i,j,k)[0]*Mx2(i,j,k)[0] + Nyy(i,j,k)[0]*My2(i,j,k)[0] + Nyz(i,j,k)[0]*Mz2(i,j,k)[0];
-              Hy(i,j,k)[0] -= (Nyx(i,j,k)[1]*Mx2(i,j,k)[1] + Nyy(i,j,k)[1]*My2(i,j,k)[1] + Nyz(i,j,k)[1]*Mz2(i,j,k)[1]);
+					 Hy_in[id][1] = dp::N2yx[id][0]*dp::Mx_out[id][1] + dp::N2yy[id][0]*dp::My_out[id][1] + dp::N2yz[id][0]*dp::Mz_out[id][1];
+					 Hy_in[id][1] += (dp::N2yx[id][1]*dp::Mx_out[id][0] + dp::N2yy[id][1]*dp::My_out[id][0] + dp::N2yz[id][1]*dp::Mz_out[id][0]);
 
-   					 Hy(i,j,k)[1] = Nyx(i,j,k)[0]*Mx2(i,j,k)[1] + Nyy(i,j,k)[0]*My2(i,j,k)[1] + Nyz(i,j,k)[0]*Mz2(i,j,k)[1];
-              Hy(i,j,k)[1] += (Nyx(i,j,k)[1]*Mx2(i,j,k)[0] + Nyy(i,j,k)[1]*My2(i,j,k)[0] + Nyz(i,j,k)[1]*Mz2(i,j,k)[0]);
+					 Hz_in[id][0] = dp::N2zx[id][0]*dp::Mx_out[id][0] + dp::N2zy[id][0]*dp::My_out[id][0] + dp::N2zz[id][0]*dp::Mz_out[id][0]; //summing the real part
+					 Hz_in[id][0] -= (dp::N2zx[id][1]*dp::Mx_out[id][1] + dp::N2zy[id][1]*dp::My_out[id][1] + dp::N2zz[id][1]*dp::Mz_out[id][1]);
 
-              Hz(i,j,k)[0] = Nzx(i,j,k)[0]*Mx2(i,j,k)[0] + Nzy(i,j,k)[0]*My2(i,j,k)[0] + Nzz(i,j,k)[0]*Mz2(i,j,k)[0]; //summing the real part
-              Hz(i,j,k)[0] -= (Nzx(i,j,k)[1]*Mx2(i,j,k)[1] + Nzy(i,j,k)[1]*My2(i,j,k)[1] + Nzz(i,j,k)[1]*Mz2(i,j,k)[1]);
+					 Hz_in[id][1] = dp::N2zx[id][0]*dp::Mx_out[id][1] + dp::N2zy[id][0]*dp::My_out[id][1] + dp::N2zz[id][0]*dp::Mz_out[id][1];
+					 Hz_in[id][1] += (dp::N2zx[id][1]*dp::Mx_out[id][0] + dp::N2zy[id][1]*dp::My_out[id][0] + dp::N2zz[id][1]*dp::Mz_out[id][0]);
+					 cell++;
 
-   					 Hz(i,j,k)[1] = Nzx(i,j,k)[0]*Mx2(i,j,k)[1] + Nzy(i,j,k)[0]*My2(i,j,k)[1] + Nzz(i,j,k)[0]*Mz2(i,j,k)[1];
-              Hz(i,j,k)[1] += (Nzx(i,j,k)[1]*Mx2(i,j,k)[0] + Nzy(i,j,k)[1]*My2(i,j,k)[0] + Nzz(i,j,k)[1]*Mz2(i,j,k)[0]);
-   			//		 		 		std::cout << 	i << '\t' << j << "\t" << k << '\t' << Nxx(i,j,k)[0] << '\t' << Nxy(i,j,k)[0] << '\t' << Nxz(i,j,k)[0] << '\t' << Nyy(i,j,k)[0] << '\t' << Nyz(i,j,k)[0] << '\t' << Nzz(i,j,k)[0] <<std::endl;
-    				//	 std::cout  << i << '\t' << j << '\t' << k << '\t' << Mx(i,j,k)[0] << '\t' << Mx(i,j,k)[1]<< "\t" << My(i,j,k)[0] << '\t' << My(i,j,k)[1]<< "\t" << Mz(i,j,k)[0] << '\t' << Mz(i,j,k)[1] << '\t' <<  Hx(i,j,k)[0] << '\t' << Hx(i,j,k)[1] << '\t' << Hy(i,j,k)[0] << '\t' << Hy(i,j,k)[1] << '\t'  << Hz(i,j,k)[0] << '\t' << Hz(i,j,k)[1] << '\t' << std::endl;
-
-            //   if (cell == 0) std::cout << "H" << Hx(i,j,k)[0]  << "\t" <<   Hy(i,j,k)[0]  << "\t" <<   Hz(i,j,k)[0]  << "\t" << Hx(i,j,k)[1]  << "\t" <<   Hy(i,j,k)[1]  << "\t" <<   Hz(i,j,k)[1]  << "\t" <<  std::endl;
-
-               cell++;
              }
          }
       }
@@ -174,11 +154,11 @@ cell = 0;
       // performs the backward transform to give the dipole field, Hx, Hy, Hz
       fftw_plan HxP,HyP,HzP;
 
-      HxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,Hx.ptr(),Hx2.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+      HxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hx_in,dp::Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
       fftw_execute(HxP);
-      HyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,Hy.ptr(),Hy2.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+      HyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hy_in,dp::Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
       fftw_execute(HyP);
-      HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,Hz.ptr(),Hz2.ptr(),FFTW_BACKWARD,FFTW_ESTIMATE);
+      HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hz_in,dp::Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
       fftw_execute(HzP);
 
 
@@ -209,9 +189,10 @@ cell = 0;
    		for (int j=0 ; j<dp::num_macro_cells_y ; j++){
    			for (int k=0 ; k<dp::num_macro_cells_z ; k++){
    			//	if (cell ==0 && sim::time % 1000 == 0) std::cout << "cell field" << '\t' << sim::temperature << '\t'<< Hx(i,j,k)[0]/eight_num_cells << '\t' << Hy(i,j,k)[0]/eight_num_cells << '\t' << Hz(i,j,k)[0]/eight_num_cells << '\t' << std::endl;
-   				dipole::cells_field_array_x[cell] += Hx2(i,j,k)[0]/dp::eight_num_cells;
-   				dipole::cells_field_array_y[cell] += Hy2(i,j,k)[0]/dp::eight_num_cells;
-   				dipole::cells_field_array_z[cell] += Hz2(i,j,k)[0]/dp::eight_num_cells;
+				int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
+					dipole::cells_field_array_x[cell] += Hx_out[id][0]/dp::eight_num_cells;
+   				dipole::cells_field_array_y[cell] += Hy_out[id][0]/dp::eight_num_cells;
+   				dipole::cells_field_array_z[cell] += Hz_out[id][0]/dp::eight_num_cells;
                dipole::cells_field_array_x[cell] *= 9.27400915e-01;
                dipole::cells_field_array_y[cell] *= 9.27400915e-01;
                dipole::cells_field_array_z[cell] *= 9.27400915e-01;
@@ -223,13 +204,7 @@ cell = 0;
    			}
    		}
    	}
-   	Hx.clear();
-   	Hy.clear();
-   	Hz.clear();
-   	Mx.clear();
-   	My.clear();
-   	Mz.clear();
-   //std::cout << cells::x_field_array[cell] << '\t' << cells::y_field_array[cell] << '\t' << cells::z_field_array[cell] <<std::endl;
 
    }
+#endif
 }

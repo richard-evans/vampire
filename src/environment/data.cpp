@@ -18,7 +18,9 @@
 
 // environment module headers
 #include "internal.hpp"
-
+#ifdef FFT
+#include <fftw3.h>
+#endif
 namespace environment{
 
    //------------------------------------------------------------------------------
@@ -34,6 +36,8 @@ namespace environment{
 
    int demag_update_rate = 1000;
    bool enabled = false;
+
+   int num_atomic_steps_env= 1;
 
    namespace internal{
 
@@ -74,7 +78,7 @@ namespace environment{
       double alpha_para;
       double alpha_perp;
 
-      std::vector < double > x_mag_array;
+      std::vector < double > x_mag_array;//arrays to store the cell magnetidsation
       std::vector < double > y_mag_array;
       std::vector < double > z_mag_array;
 
@@ -82,37 +86,56 @@ namespace environment{
       std::vector<double> cell_coords_array_y;
       std::vector<double> cell_coords_array_z;
 
-      std::vector<double> neighbour_list_start_index;
+      std::vector<double> neighbour_list_start_index;   //arrays to store the neighbour lists
       std::vector<double> neighbour_list_end_index;
       std::vector<double> neighbour_list_array;
 
       ofstream o_file;
 
+      //if FFT is enabled at compilation
+      #ifdef FFT
+      fftw_complex *N2xx0; //3D Array for dipolar field
+      fftw_complex *N2xy0;
+      fftw_complex *N2xz0;
 
-      Array3D<fftw_complex> Nxx0; //3D Array for dipolar field
-      Array3D<fftw_complex> Nxy0;
-      Array3D<fftw_complex> Nxz0;
+      fftw_complex *N2yx0; //3D Array for dipolar field
+      fftw_complex *N2yy0;
+      fftw_complex *N2yz0;
 
-      Array3D<fftw_complex> Nyx0; //3D Array for dipolar field
-      Array3D<fftw_complex> Nyy0;
-      Array3D<fftw_complex> Nyz0;
+      fftw_complex *N2zx0; //3D Array for dipolar field
+      fftw_complex *N2zy0;
+      fftw_complex *N2zz0;
 
-      Array3D<fftw_complex> Nzx0; //3D Array for dipolar field
-      Array3D<fftw_complex> Nzy0;
-      Array3D<fftw_complex> Nzz0;
+      fftw_complex *N2xx; //3D Array for dipolar field
+      fftw_complex *N2xy;
+      fftw_complex *N2xz;
 
-      Array3D<fftw_complex> Nxx; //3D Array for dipolar field
-      Array3D<fftw_complex> Nxy;
-      Array3D<fftw_complex> Nxz;
+      fftw_complex *N2yx; //3D Array for dipolar field
+      fftw_complex *N2yy;
+      fftw_complex *N2yz;
 
-      Array3D<fftw_complex> Nyx; //3D Array for dipolar field
-      Array3D<fftw_complex> Nyy;
-      Array3D<fftw_complex> Nyz;
+      fftw_complex *N2zx; //3D Array for dipolar field
+      fftw_complex *N2zy;
+      fftw_complex *N2zz;
 
-      Array3D<fftw_complex> Nzx; //3D Array for dipolar field
-      Array3D<fftw_complex> Nzy;
-      Array3D<fftw_complex> Nzz;
+      fftw_complex *Mx_in; //3D Array for magnetisation into FT
+      fftw_complex *My_in;
+      fftw_complex *Mz_in;
 
+      fftw_complex *Hx_in; //3D Array for field into FT
+      fftw_complex *Hy_in;
+      fftw_complex *Hz_in;
+
+      fftw_complex *Mx_out; //3D Array for magnetisation storage out for FT
+      fftw_complex *My_out;
+      fftw_complex *Mz_out;
+
+      fftw_complex *Hx_out; //3D Array for field out of FT
+      fftw_complex *Hy_out;
+      fftw_complex *Hz_out;
+      #endif
+
+      //ints to store the numbers of cells
       int num_cells_x;
       int num_cells_y;
       int num_cells_z;

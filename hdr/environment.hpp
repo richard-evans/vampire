@@ -25,25 +25,34 @@
 //--------------------------------------------------------------------------------
 namespace environment{
 
-
+    //bool to enable/disable the calcualtion of the environment module
      extern bool enabled;
+
+     //sets the update rate for the demag fields for the environment module
      extern int demag_update_rate;
+
+     //initialises the environment field - accesible outside the module.
      extern std::vector < double > environment_field_x;
      extern std::vector < double > environment_field_y;
      extern std::vector < double > environment_field_z;
 
-
+     //initialises the field from the atomic caluclation to the environment.
      extern std::vector < double > atomic_field_x;
      extern std::vector < double > atomic_field_y;
      extern std::vector < double > atomic_field_z;
 
+     //environment timesteps per atomistic timestep
+     extern int num_atomic_steps_env;
 
+     //initialises LLB
      int LLB(double temperature,
              double Hx,
              double Hy,
              double Hz,
              double H,
              double dt);
+
+
    //-----------------------------------------------------------------------------
    // Function to initialise environment module
    //-----------------------------------------------------------------------------
