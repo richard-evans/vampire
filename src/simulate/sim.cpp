@@ -241,11 +241,23 @@ int run(){
 
    anisotropy::initialize(atoms::num_atoms, atoms::type_array, mp::mu_s_array);
 
-	// Initialise random number generator
-	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
+   //-------------------------------------------------------------
+	// Initialise random number generator for parallel processes
+   // In parallel offset seeds by NP to avoid correlation between
+   // consecutive seeds defined by the user
+   //-------------------------------------------------------------
+   // start with long seed to account for high core counts
+   uint64_t long_seed = mtrandom::integration_seed + vmpi::my_rank * vmpi::num_processors;
+
+   // truncate seed to 32 bit integer with wrap around
+   uint32_t short_seed = long_seed;
+
+   // now seed generator
+	mtrandom::grnd.seed(short_seed);
 
    // Seeds with single bit differences are not ideal and may be correlated for first few values - warming up integrator
    for(int i=0; i<1000; ++i) mtrandom::grnd();
+   //-------------------------------------------------------------
 
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();

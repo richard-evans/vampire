@@ -102,7 +102,9 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
 
    // Set custom RNG for spin initialisation
    MTRand random_spin_rng;
-   random_spin_rng.seed(123456+vmpi::my_rank);
+   uint64_t long_seed = 123456 + vmpi::my_rank * vmpi::num_processors;
+   uint32_t short_seed = long_seed;   // truncate seed to 32 bit integer with wrap around
+   random_spin_rng.seed(short_seed);
 
 	for(int atom=0;atom<atoms::num_atoms;atom++){
 

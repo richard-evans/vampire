@@ -617,7 +617,9 @@ int intermixing(std::vector<cs::catom_t> & catom_array){
 	if(err::check==true){std::cout << "cs::intermixing has been called" << std::endl;}
 
    // re-seed random number generator on each CPU with a different number
-	create::internal::grnd.seed(create::internal::mixing_seed + vmpi::my_rank);
+   uint64_t long_seed = create::internal::mixing_seed + vmpi::my_rank * vmpi::num_processors;
+   uint32_t short_seed = long_seed;   // truncate seed to 32 bit integer with wrap around
+	create::internal::grnd.seed(short_seed);
 
 	// loop over all atoms
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
@@ -665,7 +667,9 @@ void dilute (std::vector<cs::catom_t> & catom_array){
    if(err::check==true){std::cout << "cs::dilute has been called" << std::endl;}
 
    // re-seed random number generator on each CPU with a different number
-   create::internal::grnd.seed(create::internal::dilute_seed + vmpi::my_rank);
+   uint64_t long_seed = create::internal::dilute_seed + vmpi::my_rank * vmpi::num_processors;
+   uint32_t short_seed = long_seed;   // truncate seed to 32 bit integer with wrap around
+   create::internal::grnd.seed(short_seed);
 
    // loop over all atoms
    for(unsigned int atom=0;atom<catom_array.size();atom++){
