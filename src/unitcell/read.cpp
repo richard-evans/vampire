@@ -197,7 +197,7 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				for (int i=0; i<num_interactions; i++){
 
                // Output progress counter to screen for large interaction counts
-               if( (i % (num_interactions/10)) == 0 && num_interactions > 10000) std::cout << "." << std::flush;
+               if( (i % (num_interactions/10 + 1)) == 0 && num_interactions > 10000) std::cout << "." << std::flush;
 
 					//std::cout << "setting up interaction "<< i+1<< " of " << num_interactions << " interactions" << std::endl;
 					// declare safe temporaries for interaction input

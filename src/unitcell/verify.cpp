@@ -47,7 +47,7 @@ void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename)
    for(unsigned int i = first; i < last; ++i){
 
       // Output progress indicator to screen for large interaction counts
-      if( (i % (my_num_interactions/10)) == 0 && unit_cell.interaction.size() > 10000) std::cout << "." << std::flush;
+      if( (i % (my_num_interactions/10 + 1)) == 0 && unit_cell.interaction.size() > 10000) std::cout << "." << std::flush;
 
       // calculate reciprocal interaction
       unsigned int ia = unit_cell.interaction[i].j;
