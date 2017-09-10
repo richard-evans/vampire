@@ -79,13 +79,6 @@ obj/data/grains.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
-obj/mpi/decomposition.o \
-obj/mpi/LLGHeun-mpi.o \
-obj/mpi/LLGMidpoint-mpi.o \
-obj/mpi/mpi_generic.o \
-obj/mpi/mpi_create2.o \
-obj/mpi/mpi_comms.o \
-obj/mpi/wrapper.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -148,6 +141,7 @@ include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
+include src/mpi/makefile
 include src/program/makefile
 include src/simulate/makefile
 include src/unitcell/makefile

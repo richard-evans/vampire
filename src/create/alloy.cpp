@@ -113,9 +113,7 @@ void alloy(std::vector<cs::catom_t> & catom_array){
 	vmpi::barrier();
 
 	// re-seed random number generator on each CPU
-   uint64_t long_seed = create::internal::alloy_seed + vmpi::my_rank * vmpi::num_processors;
-   uint32_t short_seed = long_seed;   // truncate seed to 32 bit integer with wrap around
-	create::internal::grnd.seed(short_seed);
+	create::internal::grnd.seed(vmpi::parallel_rng_seed(create::internal::alloy_seed));
 
 	// determine local probability
    for(unsigned int atom=0;atom<catom_array.size();atom++){

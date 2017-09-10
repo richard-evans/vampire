@@ -114,6 +114,9 @@ namespace vmpi{
 	// wrapper functions avoiding MPI library
 	extern void barrier();
 
+   // function to seed random numbers in parallel
+   uint32_t parallel_rng_seed(int seed);
+
 }
 
 #endif /*VMPI_H_*/
