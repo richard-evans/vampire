@@ -98,7 +98,7 @@ void output_povray_file(){
 	pfile.open("spins.pov");
 
    // Calculate location of camera
-   double dim[3] = {vdc::system_size[0], vdc::system_size[1], vdc::system_size[2]};
+   double dim[3] = {vdc::system_size[0]+0.001, vdc::system_size[1]+0.001, vdc::system_size[2]+0.001};
    double vec[3];
 
 	double size = sqrt(dim[0]*dim[0] + dim[1]*dim[1] + dim[2]*dim[2]);
