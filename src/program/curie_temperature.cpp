@@ -88,6 +88,7 @@ namespace program{
 ///	Revision:	09/03/2011
 ///=====================================================================================
 ///
+
 int curie_temperature(){
 
 	// check calling of routine if error checking is activated
@@ -98,19 +99,12 @@ int curie_temperature(){
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
       sim::temperature+=sim::delta_temperature;
    }
-   else sim::temperature=sim::Tmin - sim::delta_temperature;
+   else sim::temperature=sim::Tmin;
 
 	// Perform Temperature Loop
-	//while(sim::temperature<=sim::Tmax){
-	while(sim::temperature<sim::Tmax){
-
-      // Increment temperature
-		sim::temperature+=sim::delta_temperature;
+	while(sim::temperature<=sim::Tmax){
 
 		// Equilibrate system
-      /*//only if not checkpoint
-	   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
-		else sim::integrate(sim::equilibration_time); */
 		sim::integrate(sim::equilibration_time);
 
 		// Reset mean magnetisation counters
@@ -132,6 +126,9 @@ int curie_temperature(){
 
 		// Output data
 		vout::data();
+
+		// Increment temperature
+		sim::temperature+=sim::delta_temperature;
 
 	} // End of temperature loop
 
