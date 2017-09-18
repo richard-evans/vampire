@@ -1,3 +1,14 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//
+//   Email: sj681@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 // Vampire headers
 #include "environment.hpp"
 
@@ -8,18 +19,14 @@ namespace environment{
 
    namespace internal{
 
-
-     //calcuaktes the temperature dependant parallel component of the susceptability from the analytical equation
+      //calculates the temperature dependant parallel component of the susceptability from the analytical equation
 
       double calculate_chi_para(double T){
 
          // -----------------------------------------------------------------------------------
-
          //        chi_para = a0/4pi . Tc/(Tc-T) + sum_i ai (Tc -T)^i          if T < TC
          //        chi_para = b0 +1/4pi . Tc/(T-TC)                            if T > TC
-
          // -----------------------------------------------------------------------------------
-
 
          //Fit Parameter
          double a0 = 0.8;
@@ -34,16 +41,16 @@ namespace environment{
 
          double PI= 3.14159;
 
-        //calcualtes the susceptability for temerpature < Tc
-        if(T<Tc) chi =(a0/660.*Tc)/(4.*PI)/(Tc-T)+a1*pow((Tc-T),1.)+ a2*pow((Tc-T),3.)+a3*pow((Tc-T),4.)+ a4*pow((Tc-T),6.)+ a5*pow((Tc-T),9.);
-        //calcualtes the susceptability for temperature greater than TC.
-        else chi = (1.1*1.4/660.*Tc)/(4*PI)/(T-Tc);
+         //calcualtes the susceptability for temerpature < Tc
+         if(T<Tc) chi =(a0/660.*Tc)/(4.*PI)/(Tc-T)+a1*pow((Tc-T),1.)+ a2*pow((Tc-T),3.)+a3*pow((Tc-T),4.)+ a4*pow((Tc-T),6.)+ a5*pow((Tc-T),9.);
+         //calcualtes the susceptability for temperature greater than TC.
+         else chi = (1.1*1.4/660.*Tc)/(4*PI)/(T-Tc);
 
-        //conversion from CGS to SI plus a small factor to stop the sum being less than 0
-        chi = 1.0/(chi*9.54393845712027+0.308e-14 + 0.03);
+         //conversion from CGS to SI plus a small factor to stop the sum being less than 0
+         chi = 1.0/(chi*9.54393845712027+0.308e-14 + 0.03);
 
-        //returns the system suseptability
-        return chi;
+         //returns the system suseptability
+         return chi;
       }
    } //closes the internal namspace
 }  //closes the micromagnetic namespace

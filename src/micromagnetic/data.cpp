@@ -58,18 +58,15 @@ namespace micromagnetic{
    double mean_M=0.0;
    double counter=0.0;
 
-
    namespace internal{
-
 
       //------------------------------------------------------------------------
       // Shared variables inside micromagnetic module
       //------------------------------------------------------------------------
 
       int my_num_micromagnetic_cells;
-   	 int my_start_index; // first cell to intergrate on local (my) cpu
-   	 int my_end_index;  // last cell +1 to intergrate on local (my) cpu
-
+      int my_start_index; // first cell to intergrate on local (my) cpu
+      int my_end_index;  // last cell +1 to intergrate on local (my) cpu
 
       //stores the micromagnetic properties of the macrocells
       std::vector<double> A;
@@ -87,7 +84,6 @@ namespace micromagnetic{
       //stores the external fields (x,y,z)
       std::vector<double> ext_field;
 
-
       //start and end index arrays for the neighbouring atoms for field calcualtions.
       std::vector<double> fields_neighbouring_atoms_begin;
       std::vector<double> fields_neighbouring_atoms_end;
@@ -96,7 +92,6 @@ namespace micromagnetic{
       std::vector<double> macro_neighbour_list_start_index;
       std::vector<double> macro_neighbour_list_end_index;
       std::vector<double> macro_neighbour_list_array;
-
 
    } // end of internal namespace
 

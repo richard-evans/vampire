@@ -32,42 +32,40 @@ namespace micromagnetic{
       std::string prefix="micromagnetic";
       if(key!=prefix) return false;
 
-
       std::string test="integrator";
       if(word==test){
-          test="llg";
-          if(value==test){
-              micromagnetic::integrator=0;
-              return true;
-          }
-          test="llb";
-          if(value==test){
-              micromagnetic::integrator=1;
-              return true;
-          }
-          else{
-          terminaltextcolor(RED);
-              std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-              std::cerr << "\t\"llg\"" << std::endl;
-              std::cerr << "\t\"llb\"" << std::endl;
-          terminaltextcolor(WHITE);
-              err::vexit();
-          }
+         test="llg";
+         if(value==test){
+            micromagnetic::integrator=0;
+            return true;
+         }
+         test="llb";
+         if(value==test){
+            micromagnetic::integrator=1;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"llg\"" << std::endl;
+            std::cerr << "\t\"llb\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
       }
       test="atomistic-steps-per-micromagnetic-step";
       if(word==test){
-        double dt=atof(value.c_str());
-        vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1, 100000,"input","1 step - 100000 steps");
-        micromagnetic::num_atomic_steps_mm =dt;
-        return true;
+         double dt=atof(value.c_str());
+         vin::check_for_valid_value(dt, word, line, prefix, unit, "time", 1, 100000,"input","1 step - 100000 steps");
+         micromagnetic::num_atomic_steps_mm =dt;
+         return true;
       }
 
       test="output-boltzman";
       if(word==test){
-        boltzman =true;
-        return true;
+         boltzman =true;
+         return true;
       }
-
 
       test="discretisation"; // whether the material is micromagnetic or atomistic
       if(word==test){
@@ -104,9 +102,6 @@ namespace micromagnetic{
          return true;
       }
 
-
-
-
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -122,18 +117,14 @@ namespace micromagnetic{
       // add prefix string
       std::string prefix="material:";
 
-
       //--------------------------------------------------------------------
       std::string test="micromagnetic-discretisation-enabled";
-            std::cout << word << "\t" << test << std::endl;
       if(word==test){
-        std::cout << "a" << std::endl;
          double K=atof(value.c_str());
          vin::read_material[super_index].micromagnetic_enabled=true;
-          std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
-            return true;
+         std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
+         return true;
       }
-
 
       //--------------------------------------------------------------------
       // Keyword not found

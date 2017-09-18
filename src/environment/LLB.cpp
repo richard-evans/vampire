@@ -1,3 +1,14 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//
+//   Email: sj681@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 
 // Vampire headers
 #include "environment.hpp"
@@ -19,292 +30,289 @@
 
 namespace env = environment::internal;
 
-
-
-
 namespace LLB_arrays{
 
-	// Local arrays for LLG integration
-	std::vector <double> x_euler_array;
-	std::vector <double> y_euler_array;
-	std::vector <double> z_euler_array;
+   // Local arrays for LLG integration
+   std::vector <double> x_euler_array;
+   std::vector <double> y_euler_array;
+   std::vector <double> z_euler_array;
 
-	std::vector <double> x_array;
-	std::vector <double> y_array;
-	std::vector <double> z_array;
+   std::vector <double> x_array;
+   std::vector <double> y_array;
+   std::vector <double> z_array;
 
-	std::vector <double> x_heun_array;
-	std::vector <double> y_heun_array;
-	std::vector <double> z_heun_array;
+   std::vector <double> x_heun_array;
+   std::vector <double> y_heun_array;
+   std::vector <double> z_heun_array;
 
-	std::vector <double> x_spin_storage_array;
-	std::vector <double> y_spin_storage_array;
-	std::vector <double> z_spin_storage_array;
+   std::vector <double> x_spin_storage_array;
+   std::vector <double> y_spin_storage_array;
+   std::vector <double> z_spin_storage_array;
 
-	std::vector <double> x_initial_spin_array;
-	std::vector <double> y_initial_spin_array;
-	std::vector <double> z_initial_spin_array;
+   std::vector <double> x_initial_spin_array;
+   std::vector <double> y_initial_spin_array;
+   std::vector <double> z_initial_spin_array;
 
-	//stores the gaussian width components of the random thermal fields
-	std::vector <double> GW1x;
-	std::vector <double> GW1y;
-	std::vector <double> GW1z;
-	std::vector <double> GW2x;
-	std::vector <double> GW2y;
-	std::vector <double> GW2z;
+   //stores the gaussian width components of the random thermal fields
+   std::vector <double> GW1x;
+   std::vector <double> GW1y;
+   std::vector <double> GW1z;
+   std::vector <double> GW2x;
+   std::vector <double> GW2y;
+   std::vector <double> GW2z;
 
 
-	bool LLG_set=false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
+   bool LLG_set=false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 
 }
 
 
 namespace environment{
 
-  int LLB_init(int num_cells){
+   int LLB_init(int num_cells){
 
-  using namespace LLB_arrays;
+      using namespace LLB_arrays;
 
-//resize arrays
-	x_spin_storage_array.resize(num_cells,0.0);
-  y_spin_storage_array.resize(num_cells,0.0);
-  z_spin_storage_array.resize(num_cells,0.0);
+      //resize arrays
+      x_spin_storage_array.resize(num_cells,0.0);
+      y_spin_storage_array.resize(num_cells,0.0);
+      z_spin_storage_array.resize(num_cells,0.0);
 
-	x_array.resize(num_cells,0.0);
-	y_array.resize(num_cells,0.0);
-	z_array.resize(num_cells,0.0);
+      x_array.resize(num_cells,0.0);
+      y_array.resize(num_cells,0.0);
+      z_array.resize(num_cells,0.0);
 
-  x_initial_spin_array.resize(num_cells,0.0);
-  y_initial_spin_array.resize(num_cells,0.0);
-  z_initial_spin_array.resize(num_cells,0.0);
+      x_initial_spin_array.resize(num_cells,0.0);
+      y_initial_spin_array.resize(num_cells,0.0);
+      z_initial_spin_array.resize(num_cells,0.0);
 
-  x_euler_array.resize(num_cells,0.0);
-  y_euler_array.resize(num_cells,0.0);
-  z_euler_array.resize(num_cells,0.0);
+      x_euler_array.resize(num_cells,0.0);
+      y_euler_array.resize(num_cells,0.0);
+      z_euler_array.resize(num_cells,0.0);
 
-  x_heun_array.resize(num_cells,0.0);
-  y_heun_array.resize(num_cells,0.0);
-  z_heun_array.resize(num_cells,0.0);
+      x_heun_array.resize(num_cells,0.0);
+      y_heun_array.resize(num_cells,0.0);
+      z_heun_array.resize(num_cells,0.0);
 
-	GW1x.resize(num_cells,0.0);
-	GW1y.resize(num_cells,0.0);
-	GW1z.resize(num_cells,0.0);
-	GW2x.resize(num_cells,0.0);
-	GW2y.resize(num_cells,0.0);
-	GW2z.resize(num_cells,0.0);
-
-
-  LLG_set=true;
-
-  return EXIT_SUCCESS;
-}
-
-int LLB(double temperature,
-	     double H,
-        double Hx,
-        double Hy,
-        double Hz,
-        double dt){
+      GW1x.resize(num_cells,0.0);
+      GW1y.resize(num_cells,0.0);
+      GW1z.resize(num_cells,0.0);
+      GW2x.resize(num_cells,0.0);
+      GW2y.resize(num_cells,0.0);
+      GW2z.resize(num_cells,0.0);
 
 
-  using namespace LLB_arrays;
-	//updating the cell magnetisation (in parallel)
-	if (micromagnetic::discretisation_type == 0) cells::mag();
+      LLG_set=true;
 
-  int num_cells = env::num_cells;
+      return EXIT_SUCCESS;
+   }
 
-	// set up tranges for different processors
-	int num_env_cells = env::num_env_cells;
-	int my_num_env_cells = num_env_cells/vmpi::num_processors;
-	int my_env_start_index = my_num_env_cells*vmpi::my_rank; // first cell to intergrate on local (my) cpu
-	int my_env_end_index = my_num_env_cells*(vmpi::my_rank+1);  // last cell +1 to intergrate on local (my) cpu
-	if (vmpi::my_rank == vmpi::num_processors - 1 ) my_env_end_index = num_env_cells;
-
-
-	// Check for initialisation of LLG integration arrays
-	if(LLG_set== false) environment::LLB_init(num_cells);
-	// Local variables for system integration
-	const double iMs = 1.0/env::Ms;
-
-	//sets to 0 for the parallel processing
-	for (int cell = 0; cell < num_cells; cell++){
-		x_spin_storage_array[cell] = 0.0;
-		y_spin_storage_array[cell] = 0.0;
-		z_spin_storage_array[cell] = 0.0;
-	}
-	//save this new m as the initial value, so it can be saved and used in the final equation.
-	for (int i = my_env_start_index; i < my_env_end_index; i++){
-		int cell = env::none_atomistic_cells[i];
-		x_array[cell] = env::x_mag_array[cell]*iMs;
-		y_array[cell] = env::y_mag_array[cell]*iMs;
-		z_array[cell] = env::z_mag_array[cell]*iMs;
-		x_initial_spin_array[cell] = x_array[cell];
-		y_initial_spin_array[cell] = y_array[cell];
-		z_initial_spin_array[cell] = z_array[cell];
-	}
+   int LLB(double temperature,
+      double H,
+      double Hx,
+      double Hy,
+      double Hz,
+      double dt){
 
 
-	const double kB = 1.3806503e-23;
-	std::vector<double> m(3,0.0);
-	std::vector<double> spin_field(3,0.0);
+         using namespace LLB_arrays;
+         //updating the cell magnetisation (in parallel)
+         if (micromagnetic::discretisation_type == 0) cells::mag();
 
-  env::ext_field[0] = H*Hx;
-  env::ext_field[1] = H*Hy;
-	env::ext_field[2] = H*Hz;
+         int num_cells = env::num_cells;
 
-  //calculte chi as a function of temperature
-	env::one_o_chi_para =  env::calculate_chi_para(temperature);
-	env::one_o_chi_perp =  env::calculate_chi_perp(temperature);
-
-	//fill the noise terms
-	for (int i = my_env_start_index; i < my_env_end_index; i++){
-		int cell = env::none_atomistic_cells[i];
-		GW1x[cell] = mtrandom::gaussian();
-		GW1y[cell] = mtrandom::gaussian();
-		GW1z[cell] = mtrandom::gaussian();
-		GW2x[cell] = mtrandom::gaussian();
-		GW2y[cell] = mtrandom::gaussian();
-		GW2z[cell] = mtrandom::gaussian();
-	}
-	//iff FFt is enabled calcualte the demag fields.
-	#ifdef FFT
-		if (sim::time %demag_update_rate == 0) env::calculate_demag_fields();
-	#endif
-
-	for (int i = my_env_start_index; i < my_env_end_index; i++){
-		int cell = env::none_atomistic_cells[i];
-    m[0] = x_array[cell];
-		m[1] = y_array[cell];
-		m[2] = z_array[cell];
-
-		//calcualte the LLB fields
-    spin_field = env::calculate_llb_fields(m, temperature, cell, x_array,y_array,z_array);
-
-		//calcualte the noise terms
-    double sigma_para = sqrt(2*kB*temperature*env::alpha_para/(env::Ms*dt));
-    double sigma_perp = sqrt(2*kB*temperature*(env::alpha_perp-env::alpha_para)/(dt*env::Ms*env::alpha_perp*env::alpha_perp));
-    const double H[3] = {spin_field[0], spin_field[1], spin_field[2]};
-
-    //saves the noise terms to an array for easy access
-    const double GW2t[3] = {GW2x[cell],GW2y[cell],GW2z[cell]};
-    const double one_o_m_squared = 1.0/(m[0]*m[0]+m[1]*m[1]+m[2]*m[2]);
-    const double SdotH = m[0]*H[0] + m[1]*H[1] + m[2]*H[2];
-    double xyz[3] = {0.0,0.0,0.0};
-		//calculates the LLB equation
-		xyz[0]=  - (m[1]*H[2]-m[2]*H[1])
-						 + env::alpha_para*m[0]*SdotH*one_o_m_squared
-						 - env::alpha_perp*(m[1]*(m[0]*H[1]-m[1]*H[0])-m[2]*(m[2]*H[0]-m[0]*H[2]))*one_o_m_squared
-						 + GW1x[cell]*sigma_para
-						 - env::alpha_perp*(m[1]*(m[0]*GW2t[1]-m[1]*GW2t[0])-m[2]*(m[2]*GW2t[0]-m[0]*GW2t[2]))*one_o_m_squared*sigma_perp;
-
-		xyz[1]=  - (m[2]*H[0]-m[0]*H[2])
-						 + env::alpha_para*m[1]*SdotH*one_o_m_squared
-						 - env::alpha_perp*(m[2]*(m[1]*H[2]-m[2]*H[1])-m[0]*(m[0]*H[1]-m[1]*H[0]))*one_o_m_squared
-						 + GW1y[cell]*sigma_para
-						 - env::alpha_perp*(m[2]*(m[1]*GW2t[2]-m[2]*GW2t[1])-m[0]*(m[0]*GW2t[1]-m[1]*GW2t[0]))*one_o_m_squared*sigma_perp;
-
-		xyz[2]=	 - (m[0]*H[1]-m[1]*H[0])
-						 + env::alpha_para*m[2]*SdotH*one_o_m_squared
-						 - env::alpha_perp*(m[0]*(m[2]*H[0]-m[0]*H[2])-m[1]*(m[1]*H[2]-m[2]*H[1]))*one_o_m_squared
-						 + GW1z[cell]*sigma_para
-						 - env::alpha_perp*(m[0]*(m[2]*GW2t[0]-m[0]*GW2t[2])-m[1]*(m[1]*GW2t[2]-m[2]*GW2t[1]))*one_o_m_squared*sigma_perp;
-
-		x_euler_array[cell] = xyz[0];
-		y_euler_array[cell] = xyz[1];
-		z_euler_array[cell] = xyz[2];
-
-	}
-	//save the euler step to a spin storage array
-	for (int i = my_env_start_index; i < my_env_end_index; i++){
-		int cell = env::none_atomistic_cells[i];
-    x_spin_storage_array[cell] = x_array[cell] + x_euler_array[cell]*dt;
-    y_spin_storage_array[cell] = y_array[cell] + y_euler_array[cell]*dt;
-    z_spin_storage_array[cell] = z_array[cell] + z_euler_array[cell]*dt;
-  }
+         // set up tranges for different processors
+         int num_env_cells = env::num_env_cells;
+         int my_num_env_cells = num_env_cells/vmpi::num_processors;
+         int my_env_start_index = my_num_env_cells*vmpi::my_rank; // first cell to intergrate on local (my) cpu
+         int my_env_end_index = my_num_env_cells*(vmpi::my_rank+1);  // last cell +1 to intergrate on local (my) cpu
+         if (vmpi::my_rank == vmpi::num_processors - 1 ) my_env_end_index = num_env_cells;
 
 
-  #ifdef MPICF
-  	MPI_Allreduce(MPI_IN_PLACE, &x_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-  	MPI_Allreduce(MPI_IN_PLACE, &y_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-		MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-  #endif
+         // Check for initialisation of LLG integration arrays
+         if(LLG_set== false) environment::LLB_init(num_cells);
+         // Local variables for system integration
+         const double iMs = 1.0/env::Ms;
 
-	//
-  for (int i = my_env_start_index; i < my_env_end_index; i++){
-	  int cell = env::none_atomistic_cells[i];
-    m[0] = x_spin_storage_array[cell];
-		m[1] = y_spin_storage_array[cell];
-		m[2] = z_spin_storage_array[cell];
-		//calcualte spin fields
-    spin_field = env::calculate_llb_fields(m, temperature, cell, x_spin_storage_array, y_spin_storage_array, z_spin_storage_array);
-
-    double sigma_para = sqrt(2.0*kB*temperature*env::alpha_para/(env::Ms*dt)); //why 1e-27
-    double sigma_perp = sqrt(2.0*kB*temperature*(env::alpha_perp-env::alpha_para)/(dt*env::Ms*env::alpha_perp*env::alpha_perp));
-    const double H[3] = {spin_field[0], spin_field[1], spin_field[2]};
-
-    //saves the noise terms to an array
-    const double GW2t[3] = {GW2x[cell],GW2y[cell],GW2z[cell]};
-    const double one_o_m_squared = 1.0/(m[0]*m[0]+m[1]*m[1]+m[2]*m[2]);
-    const double SdotH = m[0]*H[0] + m[1]*H[1] + m[2]*H[2];
-    double xyz[3] = {0.0,0.0,0.0};
-		//calculates the LLB equation
-		xyz[0]=  - (m[1]*H[2]-m[2]*H[1])
-						 + env::alpha_para*m[0]*SdotH*one_o_m_squared
-						 - env::alpha_perp*(m[1]*(m[0]*H[1]-m[1]*H[0])-m[2]*(m[2]*H[0]-m[0]*H[2]))*one_o_m_squared
-						 + GW1x[cell]*sigma_para
-						 - env::alpha_perp*(m[1]*(m[0]*GW2t[1]-m[1]*GW2t[0])-m[2]*(m[2]*GW2t[0]-m[0]*GW2t[2]))*one_o_m_squared*sigma_perp;
-
-		xyz[1]=  - (m[2]*H[0]-m[0]*H[2])
-						 + env::alpha_para*m[1]*SdotH*one_o_m_squared
-						 - env::alpha_perp*(m[2]*(m[1]*H[2]-m[2]*H[1])-m[0]*(m[0]*H[1]-m[1]*H[0]))*one_o_m_squared
-						 + GW1y[cell]*sigma_para
-						 - env::alpha_perp*(m[2]*(m[1]*GW2t[2]-m[2]*GW2t[1])-m[0]*(m[0]*GW2t[1]-m[1]*GW2t[0]))*one_o_m_squared*sigma_perp;
-
-		xyz[2]=	 - (m[0]*H[1]-m[1]*H[0])
-						 + env::alpha_para*m[2]*SdotH*one_o_m_squared
-						 - env::alpha_perp*(m[0]*(m[2]*H[0]-m[0]*H[2])-m[1]*(m[1]*H[2]-m[2]*H[1]))*one_o_m_squared
-						 + GW1z[cell]*sigma_para
-						 - env::alpha_perp*(m[0]*(m[2]*GW2t[0]-m[0]*GW2t[2])-m[1]*(m[1]*GW2t[2]-m[2]*GW2t[1]))*one_o_m_squared*sigma_perp;
-
-		//heun delta = xyz
-		x_heun_array[cell] = xyz[0];
-		y_heun_array[cell] = xyz[1];
-		z_heun_array[cell] = xyz[2];
-
-	}
-
-	for (int cell = 0; cell < num_cells; cell++){
-		env::x_mag_array[cell] = 0.0;
-		env::y_mag_array[cell] = 0.0;
-		env::z_mag_array[cell] = 0.0;
-	}
+         //sets to 0 for the parallel processing
+         for (int cell = 0; cell < num_cells; cell++){
+            x_spin_storage_array[cell] = 0.0;
+            y_spin_storage_array[cell] = 0.0;
+            z_spin_storage_array[cell] = 0.0;
+         }
+         //save this new m as the initial value, so it can be saved and used in the final equation.
+         for (int i = my_env_start_index; i < my_env_end_index; i++){
+            int cell = env::none_atomistic_cells[i];
+            x_array[cell] = env::x_mag_array[cell]*iMs;
+            y_array[cell] = env::y_mag_array[cell]*iMs;
+            z_array[cell] = env::z_mag_array[cell]*iMs;
+            x_initial_spin_array[cell] = x_array[cell];
+            y_initial_spin_array[cell] = y_array[cell];
+            z_initial_spin_array[cell] = z_array[cell];
+         }
 
 
-	//calcualtes the new magnetisations from the heun and euler deltas
-	for (int i = my_env_start_index; i < my_env_end_index; i++){
-		int cell = env::none_atomistic_cells[i];
-    	x_array[cell] = x_initial_spin_array[cell] + 0.5*dt*(x_euler_array[cell] + x_heun_array[cell]);
-    	y_array[cell] = y_initial_spin_array[cell] + 0.5*dt*(y_euler_array[cell] + y_heun_array[cell]);
-    	z_array[cell] = z_initial_spin_array[cell] + 0.5*dt*(z_euler_array[cell] + z_heun_array[cell]);
+         const double kB = 1.3806503e-23;
+         std::vector<double> m(3,0.0);
+         std::vector<double> spin_field(3,0.0);
 
-    	env::x_mag_array[cell] = x_array[cell]*env::Ms;
-    	env::y_mag_array[cell] = y_array[cell]*env::Ms;
-    	env::z_mag_array[cell] = z_array[cell]*env::Ms;
-  }
+         env::ext_field[0] = H*Hx;
+         env::ext_field[1] = H*Hy;
+         env::ext_field[2] = H*Hz;
 
-  #ifdef MPICF
-  	MPI_Allreduce(MPI_IN_PLACE, &env::x_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-  	MPI_Allreduce(MPI_IN_PLACE, &env::y_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-		MPI_Allreduce(MPI_IN_PLACE, &env::z_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-  #endif
+         //calculte chi as a function of temperature
+         env::one_o_chi_para =  env::calculate_chi_para(temperature);
+         env::one_o_chi_perp =  env::calculate_chi_perp(temperature);
 
-//outputs magnetisation
-if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) 	int a = env::output();
+         //fill the noise terms
+         for (int i = my_env_start_index; i < my_env_end_index; i++){
+            int cell = env::none_atomistic_cells[i];
+            GW1x[cell] = mtrandom::gaussian();
+            GW1y[cell] = mtrandom::gaussian();
+            GW1z[cell] = mtrandom::gaussian();
+            GW2x[cell] = mtrandom::gaussian();
+            GW2y[cell] = mtrandom::gaussian();
+            GW2z[cell] = mtrandom::gaussian();
+         }
+         //iff FFt is enabled calcualte the demag fields.
+         #ifdef FFT
+         if (sim::time %demag_update_rate == 0) env::calculate_demag_fields();
+         #endif
+
+         for (int i = my_env_start_index; i < my_env_end_index; i++){
+            int cell = env::none_atomistic_cells[i];
+            m[0] = x_array[cell];
+            m[1] = y_array[cell];
+            m[2] = z_array[cell];
+
+            //calcualte the LLB fields
+            spin_field = env::calculate_llb_fields(m, temperature, cell, x_array,y_array,z_array);
+
+            //calcualte the noise terms
+            double sigma_para = sqrt(2*kB*temperature*env::alpha_para/(env::Ms*dt));
+            double sigma_perp = sqrt(2*kB*temperature*(env::alpha_perp-env::alpha_para)/(dt*env::Ms*env::alpha_perp*env::alpha_perp));
+            const double H[3] = {spin_field[0], spin_field[1], spin_field[2]};
+
+            //saves the noise terms to an array for easy access
+            const double GW2t[3] = {GW2x[cell],GW2y[cell],GW2z[cell]};
+            const double one_o_m_squared = 1.0/(m[0]*m[0]+m[1]*m[1]+m[2]*m[2]);
+            const double SdotH = m[0]*H[0] + m[1]*H[1] + m[2]*H[2];
+            double xyz[3] = {0.0,0.0,0.0};
+            //calculates the LLB equation
+            xyz[0]=  - (m[1]*H[2]-m[2]*H[1])
+            + env::alpha_para*m[0]*SdotH*one_o_m_squared
+            - env::alpha_perp*(m[1]*(m[0]*H[1]-m[1]*H[0])-m[2]*(m[2]*H[0]-m[0]*H[2]))*one_o_m_squared
+            + GW1x[cell]*sigma_para
+            - env::alpha_perp*(m[1]*(m[0]*GW2t[1]-m[1]*GW2t[0])-m[2]*(m[2]*GW2t[0]-m[0]*GW2t[2]))*one_o_m_squared*sigma_perp;
+
+            xyz[1]=  - (m[2]*H[0]-m[0]*H[2])
+            + env::alpha_para*m[1]*SdotH*one_o_m_squared
+            - env::alpha_perp*(m[2]*(m[1]*H[2]-m[2]*H[1])-m[0]*(m[0]*H[1]-m[1]*H[0]))*one_o_m_squared
+            + GW1y[cell]*sigma_para
+            - env::alpha_perp*(m[2]*(m[1]*GW2t[2]-m[2]*GW2t[1])-m[0]*(m[0]*GW2t[1]-m[1]*GW2t[0]))*one_o_m_squared*sigma_perp;
+
+            xyz[2]=	 - (m[0]*H[1]-m[1]*H[0])
+            + env::alpha_para*m[2]*SdotH*one_o_m_squared
+            - env::alpha_perp*(m[0]*(m[2]*H[0]-m[0]*H[2])-m[1]*(m[1]*H[2]-m[2]*H[1]))*one_o_m_squared
+            + GW1z[cell]*sigma_para
+            - env::alpha_perp*(m[0]*(m[2]*GW2t[0]-m[0]*GW2t[2])-m[1]*(m[1]*GW2t[2]-m[2]*GW2t[1]))*one_o_m_squared*sigma_perp;
+
+            x_euler_array[cell] = xyz[0];
+            y_euler_array[cell] = xyz[1];
+            z_euler_array[cell] = xyz[2];
+
+         }
+         //save the euler step to a spin storage array
+         for (int i = my_env_start_index; i < my_env_end_index; i++){
+            int cell = env::none_atomistic_cells[i];
+            x_spin_storage_array[cell] = x_array[cell] + x_euler_array[cell]*dt;
+            y_spin_storage_array[cell] = y_array[cell] + y_euler_array[cell]*dt;
+            z_spin_storage_array[cell] = z_array[cell] + z_euler_array[cell]*dt;
+         }
 
 
-	return 0;
+         #ifdef MPICF
+         MPI_Allreduce(MPI_IN_PLACE, &x_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &y_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         #endif
 
-}
+         //
+         for (int i = my_env_start_index; i < my_env_end_index; i++){
+            int cell = env::none_atomistic_cells[i];
+            m[0] = x_spin_storage_array[cell];
+            m[1] = y_spin_storage_array[cell];
+            m[2] = z_spin_storage_array[cell];
+            //calcualte spin fields
+            spin_field = env::calculate_llb_fields(m, temperature, cell, x_spin_storage_array, y_spin_storage_array, z_spin_storage_array);
+
+            double sigma_para = sqrt(2.0*kB*temperature*env::alpha_para/(env::Ms*dt)); //why 1e-27
+            double sigma_perp = sqrt(2.0*kB*temperature*(env::alpha_perp-env::alpha_para)/(dt*env::Ms*env::alpha_perp*env::alpha_perp));
+            const double H[3] = {spin_field[0], spin_field[1], spin_field[2]};
+
+            //saves the noise terms to an array
+            const double GW2t[3] = {GW2x[cell],GW2y[cell],GW2z[cell]};
+            const double one_o_m_squared = 1.0/(m[0]*m[0]+m[1]*m[1]+m[2]*m[2]);
+            const double SdotH = m[0]*H[0] + m[1]*H[1] + m[2]*H[2];
+            double xyz[3] = {0.0,0.0,0.0};
+            //calculates the LLB equation
+            xyz[0]=  - (m[1]*H[2]-m[2]*H[1])
+            + env::alpha_para*m[0]*SdotH*one_o_m_squared
+            - env::alpha_perp*(m[1]*(m[0]*H[1]-m[1]*H[0])-m[2]*(m[2]*H[0]-m[0]*H[2]))*one_o_m_squared
+            + GW1x[cell]*sigma_para
+            - env::alpha_perp*(m[1]*(m[0]*GW2t[1]-m[1]*GW2t[0])-m[2]*(m[2]*GW2t[0]-m[0]*GW2t[2]))*one_o_m_squared*sigma_perp;
+
+            xyz[1]=  - (m[2]*H[0]-m[0]*H[2])
+            + env::alpha_para*m[1]*SdotH*one_o_m_squared
+            - env::alpha_perp*(m[2]*(m[1]*H[2]-m[2]*H[1])-m[0]*(m[0]*H[1]-m[1]*H[0]))*one_o_m_squared
+            + GW1y[cell]*sigma_para
+            - env::alpha_perp*(m[2]*(m[1]*GW2t[2]-m[2]*GW2t[1])-m[0]*(m[0]*GW2t[1]-m[1]*GW2t[0]))*one_o_m_squared*sigma_perp;
+
+            xyz[2]=	 - (m[0]*H[1]-m[1]*H[0])
+            + env::alpha_para*m[2]*SdotH*one_o_m_squared
+            - env::alpha_perp*(m[0]*(m[2]*H[0]-m[0]*H[2])-m[1]*(m[1]*H[2]-m[2]*H[1]))*one_o_m_squared
+            + GW1z[cell]*sigma_para
+            - env::alpha_perp*(m[0]*(m[2]*GW2t[0]-m[0]*GW2t[2])-m[1]*(m[1]*GW2t[2]-m[2]*GW2t[1]))*one_o_m_squared*sigma_perp;
+
+            //heun delta = xyz
+            x_heun_array[cell] = xyz[0];
+            y_heun_array[cell] = xyz[1];
+            z_heun_array[cell] = xyz[2];
+
+         }
+
+         for (int cell = 0; cell < num_cells; cell++){
+            env::x_mag_array[cell] = 0.0;
+            env::y_mag_array[cell] = 0.0;
+            env::z_mag_array[cell] = 0.0;
+         }
 
 
-}
+         //calcualtes the new magnetisations from the heun and euler deltas
+         for (int i = my_env_start_index; i < my_env_end_index; i++){
+            int cell = env::none_atomistic_cells[i];
+            x_array[cell] = x_initial_spin_array[cell] + 0.5*dt*(x_euler_array[cell] + x_heun_array[cell]);
+            y_array[cell] = y_initial_spin_array[cell] + 0.5*dt*(y_euler_array[cell] + y_heun_array[cell]);
+            z_array[cell] = z_initial_spin_array[cell] + 0.5*dt*(z_euler_array[cell] + z_heun_array[cell]);
+
+            env::x_mag_array[cell] = x_array[cell]*env::Ms;
+            env::y_mag_array[cell] = y_array[cell]*env::Ms;
+            env::z_mag_array[cell] = z_array[cell]*env::Ms;
+         }
+
+         #ifdef MPICF
+         MPI_Allreduce(MPI_IN_PLACE, &env::x_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &env::y_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &env::z_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         #endif
+
+         //outputs magnetisation
+         if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) 	int a = env::output();
+
+
+         return 0;
+
+      }
+
+
+   }

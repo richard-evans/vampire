@@ -1,3 +1,14 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//
+//   Email: sj681@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 
 // Vampire headers
 #include "micromagnetic.hpp"
@@ -11,7 +22,6 @@
 namespace micromagnetic {
 
    namespace internal {
-
 
       //calculates the curie temperature of each cell
       std::vector<double> calculate_tc(int num_local_cells,
@@ -37,8 +47,8 @@ namespace micromagnetic {
 
          //------------------------------------------------------------------------
 
-
          switch(atoms::exchange_type){
+
        		case 0: // isotropic
             for (int atom = 0; atom <num_atoms; atom++){
               const int cell  = cell_array[atom];
@@ -55,6 +65,7 @@ namespace micromagnetic {
             }
 
             break;
+
 		      case 1: // vector
             terminaltextcolor(RED);
             std::cerr << "Error! Vectoral exchange calculation not yet implemented in micromagnetic mode" << std::endl;
@@ -62,21 +73,22 @@ namespace micromagnetic {
             zlog << zTs() << "Error! Vectoral exchange calculation not yet implemented in micromagnetic mode" << std::endl;
             err::vexit();
             break;
-		     case 2: // tensor
+
+            case 2: // tensor
             terminaltextcolor(RED);
             std::cerr << "Error! Tensor exchange calculation not yet implemented in micromagnetic mode" << std::endl;
             terminaltextcolor(WHITE);
             zlog << zTs() << "Error! Tensor exchange calculation not yet implemented in micromagnetic mode" << std::endl;
             err::vexit();
             break;
-        }
+         }
 
-          for (int i = 0; i < num_local_cells; i++){
+         for (int i = 0; i < num_local_cells; i++){
             int cell = local_cell_array[i];
             Tc[cell] = -J[cell]*e/(3*kB*N[cell]);
          }
          #ifdef MPICF
-           MPI_Allreduce(MPI_IN_PLACE, &Tc[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &Tc[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
          #endif
 
          return Tc;             //returns a 1D array containing the curiue temepratures

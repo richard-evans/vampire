@@ -37,17 +37,15 @@ namespace micromagnetic{
       // Internal data type definitions
       //-------------------------------------------------------------------------
 
-    extern int my_num_micromagnetic_cells;
-   	 extern int my_start_index; // first cell to intergrate on local (my) cpu
-   	 extern int my_end_index;  // last cell +1 to intergrate on local (my) cpu
-
+      extern int my_num_micromagnetic_cells;
+      extern int my_start_index; // first cell to intergrate on local (my) cpu
+      extern int my_end_index;  // last cell +1 to intergrate on local (my) cpu
 
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
 
       //vectors to store the cell parameters
-
       extern std::vector<double> m_e;
       extern std::vector<double> alpha_perp;
       extern std::vector<double> alpha_para;
@@ -63,36 +61,34 @@ namespace micromagnetic{
       //stores the external fields (x,y,z)
       extern std::vector<double> ext_field;
 
-
       //stores the neighbour list for calculating A
       extern std::vector<double> macro_neighbour_list_start_index;
       extern std::vector<double> macro_neighbour_list_end_index;
       extern std::vector<double> macro_neighbour_list_array;
 
-
       extern std::vector<double> fields_neighbouring_atoms_begin;
       extern std::vector<double> fields_neighbouring_atoms_end;
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
 
-
       //functions to calculate the cell parameters
       std::vector<double> calculate_a(int num_atoms,
-                                        int num_cells,
-                                        int num_local_cells,
-                                        std::vector<int> cell_array,                      //1D array storing which cell each atom is in
-                                        std::vector<int> neighbour_list_array,            //1D vector listing the nearest neighbours of each atom
-                                        std::vector<int> neighbour_list_start_index,      //1D vector storing the start index for each atom in the neighbour_list_array
-                                        std::vector<int> neighbour_list_end_index,        //1D vector storing the end index for each atom in the neighbour_list_array
-                                        const std::vector<int> type_array,                //1D array storing which material each cell is
-                                        std::vector <mp::materials_t> material,           //class of material parameters for the atoms
-                                        std::vector <double> volume_array,                 //1D array storing the volume of each cell
-                                        std::vector <double> x_coord_array,
-                                        std::vector <double> y_coord_array,
-                                        std::vector <double> z_coord_array,
-                                        double num_atoms_in_unit_cell,
-                                        std::vector <int> local_cell_array);
+                                      int num_cells,
+                                      int num_local_cells,
+                                      std::vector<int> cell_array,                      //1D array storing which cell each atom is in
+                                      std::vector<int> neighbour_list_array,            //1D vector listing the nearest neighbours of each atom
+                                      std::vector<int> neighbour_list_start_index,      //1D vector storing the start index for each atom in the neighbour_list_array
+                                      std::vector<int> neighbour_list_end_index,        //1D vector storing the end index for each atom in the neighbour_list_array
+                                      const std::vector<int> type_array,                //1D array storing which material each cell is
+                                      std::vector <mp::materials_t> material,           //class of material parameters for the atoms
+                                      std::vector <double> volume_array,                 //1D array storing the volume of each cell
+                                      std::vector <double> x_coord_array,
+                                      std::vector <double> y_coord_array,
+                                      std::vector <double> z_coord_array,
+                                      double num_atoms_in_unit_cell,
+                                      std::vector <int> local_cell_array);
 
       std::vector<double> calculate_alpha(int num_local_cells,int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array,
                                           std::vector <mp::materials_t> material,std::vector <int >local_cell_array);

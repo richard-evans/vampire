@@ -162,14 +162,14 @@ namespace environment{
 
 
       std::vector<double> calculate_llb_fields(std::vector <double > m,
-                                                double temperature,
-                                                int cell,
-                                                std::vector<double> x_array,
-                                                std::vector<double> y_array,
-                                                std::vector<double> z_array);
+         double temperature,
+         int cell,
+         std::vector<double> x_array,
+         std::vector<double> y_array,
+         std::vector<double> z_array);
 
-   } // end of internal namespace
+      } // end of internal namespace
 
-} // end of environment namespace
+   } // end of environment namespace
 
-#endif //ENVIRONMENT_INTERNAL_H_
+   #endif //ENVIRONMENT_INTERNAL_H_

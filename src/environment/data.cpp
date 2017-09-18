@@ -142,12 +142,10 @@ namespace environment{
 
       int eight_num_cells;
 
-
       std::vector < int > none_atomistic_cells;
       std::vector < int > atomistic_cells;
       std::vector < int > list_env_cell_atomistic_cell;
       std::vector < int > env_cell_is_in_atomistic_region;
-
 
    } // end of internal namespace
 

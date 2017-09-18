@@ -1,3 +1,14 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//
+//   Email: sj681@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 
 // Vampire headers
 #include "micromagnetic.hpp"
@@ -27,18 +38,18 @@ namespace micromagnetic{
 
          //gamma = 1/N sum_(i = N) gamma
          for (int atom = 0; atom <num_atoms; atom++){
-           int cell = cell_array[atom];
-           int mat = type_array[atom];
+            int cell = cell_array[atom];
+            int mat = type_array[atom];
             gamma[cell] = gamma[cell] + mp::material[mat].gamma_rel;
             N[cell_array[atom]]++;
          }
          //calculates gamma/N
          for (int i = 0; i < num_local_cells; i++){
-           int cell = local_cell_array[i];
+            int cell = local_cell_array[i];
             gamma[cell] = gamma[cell]/N[cell];
          }
          #ifdef MPICF
-           MPI_Allreduce(MPI_IN_PLACE, &gamma[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &gamma[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
          #endif
          return gamma;                     //returns a 1D array of values of gamma for each cell
       }

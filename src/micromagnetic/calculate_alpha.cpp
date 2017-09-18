@@ -1,3 +1,14 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//
+//   Email: sj681@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 
 // Vampire headers
 #include "micromagnetic.hpp"
@@ -22,27 +33,27 @@ namespace micromagnetic{
                                           std::vector <mp::materials_t> material,
                                           std::vector<int> local_cell_array){     //class of material parameters for the atoms
 
-
          std::vector<double>  alpha(num_cells,0.0);                                    //vectors to store alpha
          std::vector<double>  N(num_cells,0.0);                                        //vector stores the number of atoms per micromagnetic cell
 
          //sums over all atoms to calulcate the sum of alpha and number of atoms for each cell
          for (int atom = 0; atom <num_atoms; atom++){
-           int cell = cell_array[atom];
-           int mat = type_array[atom];
-           alpha[cell] = alpha[cell] + mp::material[mat].alpha;
-           N[cell]++;
+            int cell = cell_array[atom];
+            int mat = type_array[atom];
+            alpha[cell] = alpha[cell] + mp::material[mat].alpha;
+            N[cell]++;
          }
 
          //calculates the average alpha per cell
          for (int i = 0; i < num_local_cells; i++){
-           int cell = local_cell_array[i];
+            int cell = local_cell_array[i];
             alpha[cell] = alpha[cell]/N[cell];
          }
          #ifdef MPICF
-           MPI_Allreduce(MPI_IN_PLACE, &alpha[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &alpha[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
          #endif
          return alpha;          //return an array of damping constants for each cell
       }
+
    } //closes the internal namspace
 }  //closes the micromagnetic namespace

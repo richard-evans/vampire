@@ -1,3 +1,14 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//
+//   Email: sj681@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 // Vampire headers
 #include "micromagnetic.hpp"
 
@@ -20,13 +31,13 @@ namespace micromagnetic{
          std::vector<double> ku(num_cells,0.0);
          //sums over all atoms to add the ku per cell
          for (int atom = 0; atom < num_atoms; atom++){
-           int cell = cell_array[atom];
-           int mat = type_array[atom];
+            int cell = cell_array[atom];
+            int mat = type_array[atom];
             ku[cell] = ku[cell] +  mp::material[mat].Ku1_SI;
          }
 
          #ifdef MPICF
-           MPI_Allreduce(MPI_IN_PLACE, &ku[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &ku[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
          #endif
          return ku;               //returns a
       }

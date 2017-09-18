@@ -165,10 +165,10 @@ int main(int argc, char* argv[]){
    // end timer
    timer.stop();
 
-std::cout << "a" <<std::endl;
-    // return elapsed time for io
-    std::cout << "simulation time" << '\t' << timer.elapsed_time() <<std::endl;
-zlog << zTs() << "simulation time" << '\t' << timer.elapsed_time() <<std::endl;
+   // return elapsed time for io
+   std::cout << "simulation time" << '\t' << timer.elapsed_time() <<std::endl;
+   zlog << zTs() << "simulation time" << '\t' << timer.elapsed_time() <<std::endl;
+
    return EXIT_SUCCESS;
 
 }
