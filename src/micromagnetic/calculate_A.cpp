@@ -70,8 +70,10 @@ namespace micromagnetic{
             //calculates the atomic volume  = volume of one cell/number of atoms in a unitcell = atomic volume
             const double atomic_volume = cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[2]/num_atoms_in_unit_cell;
 
+            int exchange_type = 0;
+
             //what is the exchange type?
-            switch(atoms::exchange_type){
+            switch(exchange_type){
 
                case 0: // isotropic
 

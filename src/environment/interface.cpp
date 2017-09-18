@@ -168,7 +168,7 @@ namespace environment{
             // temporary storage container
             std::vector<double> u(3);
             // read values from string
-            u=vin::DoublesFromString(value);
+            u=vin::doubles_from_string(value);
             vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "none", 0,1,"input","0- 1");
             vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "none", 0,1,"input","0- 1");
             vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "none", 0,1,"input","0- 1");
@@ -191,7 +191,7 @@ namespace environment{
          std::vector<double> u(3);
 
          // read values from string
-         u=vin::DoublesFromString(value);
+         u=vin::doubles_from_string(value);
          vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "length", 0,100000,"input","0- 100,000");
          vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "length", 0,100000,"input","0- 100,000");
          vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "length", 0,100000,"input","0- 100,000");

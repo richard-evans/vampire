@@ -47,7 +47,9 @@ namespace micromagnetic {
 
          //------------------------------------------------------------------------
 
-         switch(atoms::exchange_type){
+         int exchange_type = 0; //temporary stand-in for exchange type
+
+         switch(exchange_type){
 
        		case 0: // isotropic
             for (int atom = 0; atom <num_atoms; atom++){
