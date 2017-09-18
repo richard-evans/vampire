@@ -1,21 +1,18 @@
 #--------------------------------------------------------------
-#          Makefile for dipole module
+#          Makefile for environment module
 #--------------------------------------------------------------
 
 # List module object filenames
-dipole_objects =\
+environment_objects =\
 data.o \
-field.o \
-fft_update.o \
 initialize.o \
 interface.o \
-inter.o \
-intra.o \
-macrocell.o \
-memory.o \
-mpi.o \
-tensor.o \
-update.o
+calculate_chi_perp.o \
+calculate_chi_para.o \
+LLB.o \
+fieldsLLB.o \
+output.o \
+demag.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/dipole/,$(dipole_objects))
+OBJECTS+=$(addprefix obj/environment/,$(environment_objects))

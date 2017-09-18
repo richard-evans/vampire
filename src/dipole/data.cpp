@@ -23,6 +23,7 @@ namespace dipole{
    //------------------------------------------------------------------------------
    int update_rate=100; /// timesteps between updates
    bool activated=false;
+   bool fft = false;
 
    // define arrays for B-field
    std::vector < double > cells_field_array_x;
@@ -50,6 +51,7 @@ namespace dipole{
       //------------------------------------------------------------------------
       bool initialised=false;
 
+
       int update_time=-1; /// last update time
 
       // solver to be used for dipole method
@@ -64,6 +66,56 @@ namespace dipole{
       std::vector <std::vector < double > > rij_tensor_yy;
       std::vector <std::vector < double > > rij_tensor_yz;
       std::vector <std::vector < double > > rij_tensor_zz;
+
+      //only initialise if FFT has been enabled in makefile
+      #ifdef FFT
+      fftw_complex *N2xx0; //3D Array for dipolar field
+      fftw_complex *N2xy0;
+      fftw_complex *N2xz0;
+
+      fftw_complex *N2yx0; //3D Array for dipolar field
+      fftw_complex *N2yy0;
+      fftw_complex *N2yz0;
+
+      fftw_complex *N2zx0; //3D Array for dipolar field
+      fftw_complex *N2zy0;
+      fftw_complex *N2zz0;
+
+      fftw_complex *N2xx; //3D Array for dipolar field
+      fftw_complex *N2xy;
+      fftw_complex *N2xz;
+
+      fftw_complex *N2yx; //3D Array for dipolar field
+      fftw_complex *N2yy;
+      fftw_complex *N2yz;
+
+      fftw_complex *N2zx; //3D Array for dipolar field
+      fftw_complex *N2zy;
+      fftw_complex *N2zz;
+
+
+      fftw_complex *Mx_in; //3D Array for dipolar field
+      fftw_complex *My_in;
+      fftw_complex *Mz_in;
+
+      fftw_complex *Hx_in; //3D Array for dipolar field
+      fftw_complex *Hy_in;
+      fftw_complex *Hz_in;
+
+      fftw_complex *Mx_out; //3D Array for dipolar field
+      fftw_complex *My_out;
+      fftw_complex *Mz_out;
+
+      fftw_complex *Hx_out; //3D Array for dipolar field
+      fftw_complex *Hy_out;
+      fftw_complex *Hz_out;
+
+      //stores number of macrocells in x,y,z
+      int num_macro_cells_x;
+      int num_macro_cells_y;
+      int num_macro_cells_z;
+      int eight_num_cells;
+      #endif
 
       int num_atoms;
       std::vector < int > atom_type_array;
@@ -81,6 +133,7 @@ namespace dipole{
       // Shared functions inside dipole module
       //------------------------------------------------------------------------
       void update_field();
+      void update_field_fft();
 
    } // end of internal namespace
 

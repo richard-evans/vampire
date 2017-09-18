@@ -36,6 +36,7 @@
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
+
 	extern std::ofstream mag_file;
 	extern uint64_t time;
 	extern uint64_t total_time;
@@ -168,6 +169,9 @@ namespace sim{
 	extern void CMCinit();
 	extern int LLGinit();
 	extern void CMCMCinit();
+
+	void calculate_spin_fields(const int start_index,const int end_index);
+	void calculate_external_fields(const int start_index,const int end_index);
 
 	// Field and energy functions
 	extern double calculate_spin_energy(const int atom);

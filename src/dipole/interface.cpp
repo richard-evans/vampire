@@ -57,6 +57,17 @@ namespace dipole{
          }
       }
       //-------------------------------------------------------------------
+      test="solver-fft";
+      if(word==test){
+         // enable dipole calculation
+         #ifdef FFT
+            dipole::fft=true;
+         #else
+            std::cout << "FFTW not enabled in makefile - running normal demag calculation" <<std::endl;
+         #endif
+         return true;
+      }
+      //-------------------------------------------------------------------
       test="field-update-rate";
       if(word==test){
          int dpur=atoi(value.c_str());

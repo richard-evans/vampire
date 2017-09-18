@@ -176,6 +176,10 @@ namespace cells{
       // Resize new cell arrays
       cells::pos_and_mom_array.resize(4*cells::num_cells,0.0);
 
+      cells::cell_coords_array_x.resize(cells::num_cells,0.0);
+      cells::cell_coords_array_y.resize(cells::num_cells,0.0);
+      cells::cell_coords_array_z.resize(cells::num_cells,0.0);
+
       cells::mag_array_x.resize(cells::num_cells,0.0);
       cells::mag_array_y.resize(cells::num_cells,0.0);
       cells::mag_array_z.resize(cells::num_cells,0.0);
@@ -198,6 +202,13 @@ namespace cells{
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
          if(mp::material[type].non_magnetic==0){
+
+            // which one are we keeping here - re?
+            cells::cell_coords_array_x[local_cell]+=atom_coords_x[atom]*mus;
+            cells::cell_coords_array_y[local_cell]+=atom_coords_y[atom]*mus;
+            cells::cell_coords_array_z[local_cell]+=atom_coords_z[atom]*mus;
+            cells::internal::total_moment_array[local_cell]+=mus;
+
             cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+1] += atom_coords_y[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+2] += atom_coords_z[atom]*mus;

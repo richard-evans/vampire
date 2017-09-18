@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=44;
+	const int max_units=46;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -149,6 +149,9 @@ int init(){
       // New
       unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
 
+		//exchange
+		unit[44]="J/m";		conversion[44]=1.0E-10; 				type[44]="exchange";		// Joules/metres squared
+    unit[45]="erg/cm";	conversion[45]=1.0E-15; 				type[45]="exchange";		// erg/cm squared
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag
 		units::initialised=true;

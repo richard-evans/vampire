@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -30,13 +30,15 @@
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
+#include "cells.hpp"
+#include "micromagnetic.hpp"
 
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
 
 namespace program{
-	
+
 	double chi_perpendicular(double x, double TC){
   //Fit Parameter
 	double a0 = 0.00211549427182711;
@@ -50,11 +52,11 @@ namespace program{
 	double a8 = 1.53787854178089;
 	double a9 = -0.627128148404525;
 
-	double chi_CGS = 0.0;    
+	double chi_CGS = 0.0;
 	//double chi_SI  = 0.0;
 	double chi     = 0.0;
 	double PI= 3.14159;
- 
+
   if(x<(1.065*TC)) chi_CGS = a0+ a1*pow(pow(((1.068*TC-x)/(1.068*TC)),0.5),2.)+ a2*pow((((1.068*TC)-x)/(1.068*TC)),2.)+ a3*pow((((1.068*TC)-x)/(1.068*TC)),3.)+ a4*pow((((1.068*TC)-x)/(1.068*TC)),4.) + a5*pow((((1.068*TC)-x)/(1.068*TC)),5.) + a6*pow((((1.068*TC)-x)/(1.068*TC)),6.) + a7*pow((((1.068*TC)-x)/(1.068*TC)),7.)+ a8*pow((((1.068*TC)-x)/(1.068*TC)),8.) + a9*pow((((1.068*TC)-x)/(1.068*TC)),9.);
   else chi_CGS = (0.8*1.4/660.*TC)/(4*PI)/(x-TC);
 
@@ -62,7 +64,7 @@ namespace program{
   //chi = chi_SI*4*A_FePt*A_FePt*A_FePt/MU_S_FePt/MU_0;
   chi = chi_CGS*9.54393845712027; // (Tesla)
 
-  return(chi); // [T]      
+  return(chi); // [T]
 }
 double chi_parallel(double x, double TC){
   //Fit Parameter
@@ -72,8 +74,8 @@ double chi_parallel(double x, double TC){
   double a3 =-1.3e-17;
   double a4 =-4e-23;
   double a5 =-6.5076312364e-32;
-  
-  double chi_CGS = 0.0; 
+
+  double chi_CGS = 0.0;
   //double chi_SI  = 0.0;
   double chi = 0.0;
   double PI= 3.14159;
@@ -85,7 +87,7 @@ double chi_parallel(double x, double TC){
   //chi = chi_SI*4*A_FePt*A_FePt*A_FePt/MU_S_FePt/MU_0;
   chi = chi_CGS*9.54393845712027+0.308e-14; // (Tesla)
 
-  return(chi); // [T]   
+  return(chi); // [T]
 }
 
 int LLB_Boltzmann(){
@@ -99,12 +101,12 @@ int LLB_Boltzmann(){
 			atoms::y_spin_array[atom]=0.0;
 			atoms::z_spin_array[atom]=1.0;
 	}
-	
+
 	for(int T=300;T<310;T+=10){
 		sim::temperature=double(T);
 		double mean_M=0.0;
 		double counter=0.0;
-		
+
 		double P[101][101];
 		double P1D[1001];
 		for(int para=0;para<101;para++){
@@ -118,7 +120,21 @@ int LLB_Boltzmann(){
 		// Simulate system
 		for(sim::time=0;sim::time<10000000;sim::time+=1){
 			// Calculate LLG
-			sim::LLB(1);
+			if (micromagnetic::discretisation_type != 1)  sim::LLB(1);
+			else micromagnetic::LLG(cells::local_cell_array,
+															1,
+															cells::num_cells,
+															cells::num_local_cells,
+															sim::temperature,
+															cells::mag_array_x,
+															cells::mag_array_y,
+															cells::mag_array_z,
+															sim::H_vec[0],
+															sim::H_vec[1],
+															sim::H_vec[2],
+															sim::H_applied,
+															mp::dt,
+															cells::volume_array);
 			  if(sim::time%100000==0){
 				  std::cout << sim::time << std::endl;
 			  }
@@ -185,5 +201,3 @@ int LLB_Boltzmann(){
 
 
 }//end of namespace program
-
-

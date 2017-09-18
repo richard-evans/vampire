@@ -77,6 +77,8 @@ using std::string;
 		string name;
 		string element;
 
+		bool micromagnetic_enabled;
+
 		double alpha;
 		double mu_s_SI;
 		double magnetisation;

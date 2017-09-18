@@ -47,10 +47,12 @@
 #include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "program.hpp"
+#include "environment.hpp"
 #include "cells.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
+#include "micromagnetic.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -62,6 +64,8 @@
 
 // sim module headers
 #include "internal.hpp"
+
+void multiscale_simulation_steps(int n_steps);
 
 namespace sim{
 	std::ofstream mag_file;
@@ -284,13 +288,39 @@ int run(){
                      atoms::x_coord_array,
                      atoms::y_coord_array,
                      atoms::z_coord_array,
-                     atoms::num_atoms
-   );
+                     atoms::num_atoms);
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
-   // For MPI version, calculate initialisation time
+	 if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
+
+	 //initialize the micromagnetic calculation
+	// if (micromagnetic::discretisation_type > 0)
+	micromagnetic::initialize(cells::num_local_cells,
+		 																																					cells::num_cells,
+		 																																					stats::num_atoms,
+		 																																					mp::num_materials,
+																																							cells::atom_cell_id_array,
+																																							atoms::neighbour_list_array,
+																																							atoms::neighbour_list_start_index,
+																																							atoms::neighbour_list_end_index,
+																																							atoms::type_array,
+																																							mp::material,
+																																							atoms::x_coord_array,
+																																							atoms::y_coord_array,
+																																							atoms::z_coord_array,
+																																							cells::volume_array,
+																																							sim::temperature,
+																																							cells::num_atoms_in_unit_cell,
+																																							cs::system_dimensions[0],
+																																							cs::system_dimensions[1],
+																																							cs::system_dimensions[2],
+																																							cells::local_cell_array);
+
+
+
+	 // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
 		#ifdef MPICF
 			std::cout << "Time for initialisation: " << MPI_Wtime()-vmpi::start_time << std::endl;
@@ -579,6 +609,12 @@ void integrate_serial(int n_steps){
    // Check for calling of function
    if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
 
+   // if simulation is micromagnetic
+   if (micromagnetic::discretisation_type >0 ) multiscale_simulation_steps(n_steps);
+
+   //else simulation is atomistic
+   else{
+
    // Case statement to call integrator
    switch(sim::integrator){
 
@@ -588,6 +624,10 @@ void integrate_serial(int n_steps){
             if(gpu::acceleration) gpu::llg_heun();
             // Otherwise use CPU version
             else sim::LLG_Heun();
+
+				if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0){
+               environment::LLB(sim::temperature, sim::H_applied,sim::H_vec[0],sim::H_vec[1],sim::H_vec[2],mp::dt);
+            }
             // Increment time
             increment_time();
          }
@@ -630,6 +670,7 @@ void integrate_serial(int n_steps){
          err::vexit();
 		}
 	}
+}
 
    return;
 }
@@ -661,7 +702,11 @@ int integrate_mpi(int n_steps){
 
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate_mpi has been called" << std::endl;
+		//multiscale simulation
+	  if (micromagnetic::discretisation_type >0 ) multiscale_simulation_steps(n_steps);
 
+	//else simulation is atomistic
+	else{
 	// Case statement to call integrator
 	switch(sim::integrator){
 		case 0: // LLG Heun
@@ -671,7 +716,14 @@ int integrate_mpi(int n_steps){
 				#ifdef CUDA
 					//sim::LLG_Heun_cuda_mpi();
 				#else
-					sim::LLG_Heun_mpi();
+				//	sim::LLG_Heun_mpi();
+				//calcualte the field from the environment
+					if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
+																																																						sim::H_applied,
+																																																						sim::H_vec[0],
+																																																						sim::H_vec[1],
+																																																						sim::H_vec[2],
+																																																						mp::dt);
 				#endif
 			#endif
 				// increment time
@@ -723,8 +775,69 @@ int integrate_mpi(int n_steps){
 			exit (EXIT_FAILURE);
 			}
 	}
-
+	}
 	return EXIT_SUCCESS;
 }
 
 } // Namespace sim
+
+void multiscale_simulation_steps(int n_steps){
+
+   for(int ti=0;ti<n_steps;ti++){
+      //calcaulte the field from the environment
+      if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
+         sim::H_applied,
+         sim::H_vec[0],
+         sim::H_vec[1],
+         sim::H_vec[2],
+         mp::dt);
+
+         //if  there are micromagnetic cells run a micromagnetic step
+         if (micromagnetic::number_of_micromagnetic_cells > 0 &&  (sim::time)% micromagnetic::num_atomic_steps_mm == 0) {
+
+            //if LLb run an LLG steps
+            if (micromagnetic::integrator == 0) micromagnetic::LLG(cells::local_cell_array,
+               n_steps,
+               cells::num_cells,
+               cells::num_local_cells,
+               sim::temperature,
+               cells::mag_array_x,
+               cells::mag_array_y,
+               cells::mag_array_z,
+               sim::H_vec[0],
+               sim::H_vec[1],
+               sim::H_vec[2],
+               sim::H_applied,
+               mp::dt,
+               cells::volume_array);
+               //if LLB run an LLb step
+               else micromagnetic::LLB(cells::local_cell_array,
+                  n_steps,
+                  cells::num_cells,
+                  cells::num_local_cells,
+                  sim::temperature,
+                  cells::mag_array_x,
+                  cells::mag_array_y,
+                  cells::mag_array_z,
+                  sim::H_vec[0],
+                  sim::H_vec[1],
+                  sim::H_vec[2],
+                  sim::H_applied,
+                  mp::dt,
+                  cells::volume_array);
+               }
+               //run an atomistic step if there are atomistic atoms
+               if (micromagnetic::discretisation_type == 0  && micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
+
+               //incremenet time
+               sim::increment_time();
+            }
+            std::ofstream pfile;
+            pfile.open("cell_config2");
+
+            for (int lc = 0; lc < cells::num_local_cells; lc++){
+               int cell = cells::local_cell_array[lc];
+               //pfile2 << cell << '\t' << cells::cell_coords_array_x[cell] << '\t' << cells::cell_coords_array_y[cell] << '\t' << cells::cell_coords_array_z[cell] << '\t' <<cells::mag_array_x[cell] <<
+               pfile << cells::cell_coords_array_x[cell] << '\t' << cells::cell_coords_array_y[cell] << '\t' << cells::cell_coords_array_z[cell] << '\t' <<cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] << '\t' << std::endl;
+            }
+         }

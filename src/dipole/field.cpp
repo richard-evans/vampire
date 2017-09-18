@@ -64,7 +64,13 @@ namespace dipole{
             //zlog << zTs() << "Calculation cells magnetisation complete. Time taken: " << update_time << "s."<< std::endl;
 
 			   // recalculate dipole fields
-            dipole::internal::update_field();
+            if (dipole::fft == false)  dipole::internal::update_field();
+				#ifdef FFT
+               else dipole::internal::update_field_fft();
+				#endif
+					  //MPI::COMM_WORLD.Barrier();
+            //fprintf(stderr,"\n **** PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");
+
 
 			   // For MPI version, only add local atoms
 			   #ifdef MPICF

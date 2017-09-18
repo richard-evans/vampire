@@ -13,6 +13,21 @@ export OMPI_CXX=g++ -std=c++0x
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
 # Compilers
+
+
+
+ifdef FFT
+ICC=icc -DCOMP='"Intel C++ Compiler"' -DFFT
+GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' -DFFT
+LLVM=g++ -DCOMP='"LLVM C++ Compiler"' -DFFT
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DFFT
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DFFT
+MPICC=mpicxx -DMPICF -DFFT
+
+LIBS=-lstdc++ -lm -lfftw3
+
+endif
+ifndef FFT
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
@@ -20,6 +35,10 @@ PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
 
+LIBS=-lstdc++ -lm
+
+endif
+# LIBS
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
 
@@ -27,10 +46,12 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=
-#-lstdc++
+
+
+
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 # Debug Flags
+
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
@@ -131,7 +152,6 @@ obj/qvoronoi/userprintf_rbox.o\
 
 #obj/utility/vio.o \
 
-
 # Include supplementary makefiles
 include src/anisotropy/makefile
 include src/create/makefile
@@ -146,6 +166,8 @@ include src/program/makefile
 include src/simulate/makefile
 include src/unitcell/makefile
 include src/vio/makefile
+include src/micromagnetic/makefile
+include src/environment/makefile
 
 ICC_OBJECTS=$(OBJECTS:.o=_i.o)
 LLVM_OBJECTS=$(OBJECTS:.o=_llvm.o)

@@ -28,6 +28,8 @@ namespace dipole{
    //------------------------------------------------------------------------------
    extern int update_rate; /// timesteps between updates
    extern bool activated;
+   extern bool fft;
+
    extern std::vector<double> cells_field_array_x;             /// arrays to store cells B-field
    extern std::vector<double> cells_field_array_y;
    extern std::vector<double> cells_field_array_z;

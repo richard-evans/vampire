@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sarah Jenkins and Richard F L Evans 2016. All rights reserved.
+//   (c) Sarah Jenkins 2017. All rights reserved.
 //
 //   Email: sj681@york.ac.uk
 //
@@ -31,7 +31,10 @@ namespace program{
    //---------------------------------------------------------------------------------------------------------------------
    // Setting algorithm for exchange bias in IrMn3
    //---------------------------------------------------------------------------------------------------------------------
+
    void setting_process(){
+      //Error Checking.
+      if(err::check==true) std::cout << "program::setting has been called" << std::endl;
 
       //Arrays to determine the 8 possible ground state spin orientations configurations
       double Configurations[8][3] = {
@@ -57,83 +60,75 @@ namespace program{
       };
 
       std::vector< std::vector <int> > No_in_Sublattice;
-
       // Number sublattices in each grain
       No_in_Sublattice.resize(4);
-
       // resize array for correct number of atoms in each grain
-      //    std::cout << grains::num_grains <<std::endl;
       for(int i = 0; i < 4; i++) No_in_Sublattice[i].resize(grains::num_grains,0.0);
-
+      std::vector <int> Total_Sub (grains::num_grains*4,0);
       std::vector <int> Local_Sub (grains::num_grains*4,0);
       std::vector <int> Chosen_array(grains::num_grains,0);
       std::vector <int> Largest_Sublattice(grains::num_grains,0);
       std::vector <int> Max_atoms(grains::num_grains,0);
 
       #ifdef MPICF
-         stats::num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      stats::num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
       #else
-         stats::num_atoms = atoms::num_atoms;
+      stats::num_atoms = atoms::num_atoms;
       #endif
-
-      std::cerr << "A" << stats::num_atoms << "\t" << grains::num_grains << std::endl;
 
       //Calculates how many atoms are in the top layer of each sublattice in each grain.
       for (int atom = 0; atom < stats::num_atoms; atom++){
 
          for (int neighbour = atoms::neighbour_list_start_index[atom]; neighbour < atoms::neighbour_list_end_index[atom]; neighbour ++){
-            // explain what if statement is testing - yes Sarah...
-            //std::cout << atom << "\t" << neighbour <<atoms::type_array[atom] << '\t' << atoms::type_array[atoms::neighbour_list_array[neighbour]] << std::endl;
+            // explain what if statement is testing
             if ((atoms::type_array[atom] >3) && (atoms::type_array[atoms::neighbour_list_array[neighbour]] < 4)){
-               //         std::cerr << atoms::grain_array[atom] << "\t"<< atoms::type_array[atoms::neighbour_list_array[neighbour]] << "\t" << atoms::type_array[atom] <<endl;
+               //        std::cerr << atoms::grain_array[atom] << "\t"<< atoms::type_array[atoms::neighbour_list_array[neighbour]] << "\t" << atoms::type_array[atom] <<endl;
                No_in_Sublattice[atoms::type_array[atoms::neighbour_list_array[neighbour]]][atoms::grain_array[atom]]++;
-               // cerr << No_in_Sublattice[atoms::type_array[atoms::neighbour_list_array[neighbour]]][atoms::grain_array[atom]]<<endl;
+               //    cerr << No_in_Sublattice[atoms::type_array[atoms::neighbour_list_array[neighbour]]][atoms::grain_array[atom]]<<endl;
             }
          }
       }
+
 
       int k = 0;
       for (int j = 0; j < grains::num_grains; j ++){
          for (int i = 0; i < 4; i ++){
             Local_Sub[k] = No_in_Sublattice[i][j];
             k++;
-
          }
 
       }
-      std::cerr << "before" << Local_Sub[0] << '\t' << Local_Sub[1] << '\t' << Local_Sub[2] << '\t' << Local_Sub[3] << std::endl;
-
       #ifdef MPICF
-         MPI_Allreduce(MPI_IN_PLACE, &Local_Sub[0],grains::num_grains*4,MPI_INT,MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(&Local_Sub[0], &Total_Sub[0],grains::num_grains*4, MPI_INT, MPI_SUM,MPI_COMM_WORLD);
       #endif
 
-      std::cerr<< "after" << Local_Sub[0] << '\t' << Local_Sub[1] << '\t' << Local_Sub[2] << '\t' << Local_Sub[3] << std::endl;
 
       int l =0;
+
 
       //calculates which sublattice contains the most atoms for each grain.
       for (int j = 0; j < grains::num_grains; j++){
 
          for( int i = 0; i <4; i ++){
-            //       std::cout << Local_Sub[l] << "\t" << Local_Sub[l] << std::endl;
-            if ((Local_Sub[l] > Max_atoms[j]) & (Local_Sub[l] != 0)){
+            if ((Total_Sub[l] > Max_atoms[j]) & (Total_Sub[l] != 0)){
                Largest_Sublattice[j] = i;
-               Max_atoms[j] =Local_Sub[l];
+               Max_atoms[j] =Total_Sub[l];
             }
             l++;
          }
-         if (Local_Sub[l-1] !=0 ) cerr << Largest_Sublattice[j] <<endl;
+         if (Total_Sub[l-1] !=0 ) cerr << Largest_Sublattice[j] <<endl;
       }
       int j = 0;
 
 
       for (int i = 0; i < grains::num_grains*4; i= i +4){
-         if (Local_Sub[i] != 0){
-            cerr <<"number in each sublattice for grain" << j << ";" <<  Local_Sub[i] << "\t" << Local_Sub[i +1] << "\t" << Local_Sub[i+2] << "\t" << Local_Sub[i+3] << "\t" << std::endl;
-            zlog << zTs() <<"number in each sublattice for grain" << j << ";" <<  Local_Sub[i] << "\t" << Local_Sub[i +1] << "\t" << Local_Sub[i+2] << "\t" << Local_Sub[i+3] << "\t" << std::endl;
+         if (Total_Sub[i] != 0){
+            cout <<"number in each sublattice for grain" << j << ";" <<  Total_Sub[i] << "\t" << Total_Sub[i +1] << "\t" << Total_Sub[i+2] << "\t" << Total_Sub[i+3] << "\t" << std::endl;
+            zlog << zTs() <<"number in each sublattice for grain" << j << ";" <<  Total_Sub[i] << "\t" << Total_Sub[i +1] << "\t" << Total_Sub[i+2] << "\t" << Total_Sub[i+3] << "\t" << std::endl;
             j++;
          }
       }
+
 
       double result,angle;
       double min_angle = 1000;
@@ -149,24 +144,19 @@ namespace program{
             min_angle = angle;
          }
       }
-      // std::cout << Direction_Closest_to_Field <<std::endl;
 
       //Sets the sublattice with the largest number of atoms along the direction nearest the field
       //This minimises S.H
       for (int j = 0; j < grains::num_grains; j ++){
          for (int i = 0; i <8; i ++){
             if (Possible_Arrays[i][Largest_Sublattice[j]] == Direction_Closest_to_Field){
-               //   std::cout << i <<std::endl;
                Chosen_array[j] = i;
                break;
             }
          }
       }
-      
       int Array;
-      std::cout << "a" <<std::endl;
-      for (int i = 0; i <stats::num_atoms; i++){
-         //	std::cout << atoms::type_array[i] << "\t" << atoms::z_spin_array[i] <<std::endl;
+      for (int i = 0; i < vmpi::num_core_atoms + vmpi::num_bdry_atoms; i++){
          if(atoms::type_array[i] > 3){
             atoms::x_spin_array[i] = sim::H_vec[0];
             atoms::y_spin_array[i] = sim::H_vec[1];
