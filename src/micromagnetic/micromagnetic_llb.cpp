@@ -90,6 +90,7 @@ namespace micromagnetic{
 
    using namespace micromagnetic_arrays;
 
+
    x_spin_storage_array.resize(num_cells,0.0);
    y_spin_storage_array.resize(num_cells,0.0);
    z_spin_storage_array.resize(num_cells,0.0);
@@ -139,6 +140,8 @@ int LLB( std::vector <int> local_cell_array,
          double dt,
          std::vector <double> volume_array){
 
+
+
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "micromagnetic::LLG_Heun has been called" << std::endl;}
 
@@ -164,7 +167,11 @@ int LLB( std::vector <int> local_cell_array,
       x_spin_storage_array[cell] = 0.0;
       y_spin_storage_array[cell] = 0.0;
       z_spin_storage_array[cell] = 0.0;
+
    }
+
+
+
 
    //save this new m as the initial value, so it can be saved and used in the final equation.
    for (int lc = my_start_index; lc < my_end_index; lc++){
@@ -174,6 +181,7 @@ int LLB( std::vector <int> local_cell_array,
       y_initial_spin_array[cell] = y_array[cell];
       z_initial_spin_array[cell] = z_array[cell];
    }
+
 
    const double kB = 1.3806503e-23;
    //arrays to store the magnetisation and the field
@@ -186,9 +194,13 @@ int LLB( std::vector <int> local_cell_array,
    mm::ext_field[1] = H*Hy;
    mm::ext_field[2] = H*Hz;
 
+
+
+
    //calculte chi(T).
    mm::one_o_chi_para =  mm::calculate_chi_para(num_local_cells,local_cell_array, num_cells, temperature);
    mm::one_o_chi_perp =  mm::calculate_chi_perp(num_local_cells,local_cell_array, num_cells, temperature);
+
 
    //6 arrays of gaussian random numbers to store the stochastic noise terms for x,y,z parallel and perperdicular
    //fill the noise terms
@@ -202,13 +214,16 @@ int LLB( std::vector <int> local_cell_array,
       GW2z[cell] = mtrandom::gaussian();
    }
 
+
    //calcualte the euler gradient
    for (int lc = my_start_index; lc < my_end_index; lc++){
       int cell = list_of_micromagnetic_cells[lc];
+
       //save to m for easy access
       m[0] = x_array[cell];
       m[1] = y_array[cell];
       m[2] = z_array[cell];
+
       //calculate spin fields
       spin_field = mm::calculate_llb_fields(m, temperature, num_cells, cell, x_array,y_array,z_array);
 
@@ -217,10 +232,12 @@ int LLB( std::vector <int> local_cell_array,
       double sigma_perp = sqrt(2*kB*temperature*(mm::alpha_perp[cell]-mm::alpha_para[cell])/(dt*mm::ms[cell]*mm::alpha_perp[cell]*mm::alpha_perp[cell]));
       const double H[3] = {spin_field[0], spin_field[1], spin_field[2]};
 
+
       //saves the noise terms to an array
       const double GW2t[3] = {GW2x[cell],GW2y[cell],GW2z[cell]};
       const double one_o_m_squared = 1.0/(m[0]*m[0]+m[1]*m[1]+m[2]*m[2]);
       const double SdotH = m[0]*H[0] + m[1]*H[1] + m[2]*H[2];
+
 
 
       double xyz[3] = {0.0,0.0,0.0};
@@ -243,10 +260,14 @@ int LLB( std::vector <int> local_cell_array,
                + GW1z[cell]*sigma_para
                - mm::alpha_perp[cell]*(m[0]*(m[2]*GW2t[0]-m[0]*GW2t[2])-m[1]*(m[1]*GW2t[2]-m[2]*GW2t[1]))*one_o_m_squared*sigma_perp;
 
+
       x_euler_array[cell] = xyz[0];
       y_euler_array[cell] = xyz[1];
       z_euler_array[cell] = xyz[2];
+
+
    }
+
 
    //these new x postiion are stored in an array (store)
    //x = x+step*dt
@@ -256,11 +277,14 @@ int LLB( std::vector <int> local_cell_array,
       y_spin_storage_array[cell] = y_array[cell] + y_euler_array[cell]*dt;
       z_spin_storage_array[cell] = z_array[cell] + z_euler_array[cell]*dt;
    }
+
+
    #ifdef MPICF
    	MPI_Allreduce(MPI_IN_PLACE, &x_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
    	MPI_Allreduce(MPI_IN_PLACE, &y_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
    	MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
    #endif
+
 
    //calcaultes the heun gradient
    for (int lc = my_start_index; lc < my_end_index; lc++){
@@ -310,6 +334,7 @@ int LLB( std::vector <int> local_cell_array,
 
    }
 
+
    //all 0 for parallel simualtions for reduce
    for (int cell = 0; cell < num_cells; cell++){
    	cells::mag_array_x[cell] = 0.0;
@@ -320,9 +345,11 @@ int LLB( std::vector <int> local_cell_array,
    	z_array[cell] = 0.0;
    }
 
+
    //update spin arrays
    for (int lc = my_start_index; lc < my_end_index; lc++){
    	int cell = list_of_micromagnetic_cells[lc];
+
    	 //m = initial + 1/2 dt (euler + heun)
    	 x_array[cell] = x_initial_spin_array[cell] + 0.5*dt*(x_euler_array[cell] + x_heun_array[cell]);
    	 y_array[cell] = y_initial_spin_array[cell] + 0.5*dt*(y_euler_array[cell] + y_heun_array[cell]);
@@ -332,8 +359,8 @@ int LLB( std::vector <int> local_cell_array,
    	cells::mag_array_x[cell] = x_array[cell]*mm::ms[cell];
    	cells::mag_array_y[cell] = y_array[cell]*mm::ms[cell];
    	cells::mag_array_z[cell] = z_array[cell]*mm::ms[cell];
-
    }
+
 
    //reduce to all processors
    #ifdef MPICF
@@ -342,8 +369,9 @@ int LLB( std::vector <int> local_cell_array,
    	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
    	MPI_Allreduce(MPI_IN_PLACE, &x_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
    	MPI_Allreduce(MPI_IN_PLACE, &y_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-   	MPI_Allreduce(MPI_IN_PLACE, &z_array[0],    num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+   	MPI_Allreduce(MPI_IN_PLACE, &z_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
    #endif
+
 
    //update atom positions
    if (discretisation_type  == 2 || sim::time%vout::output_rate -1){
@@ -355,6 +383,7 @@ int LLB( std::vector <int> local_cell_array,
          atoms::z_spin_array[atom] = z_array[cell];
       }
     }
+
 
 	return 0;
 

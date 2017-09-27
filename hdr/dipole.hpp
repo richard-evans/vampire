@@ -67,7 +67,9 @@ namespace dipole{
    void initialize(const int cells_num_atoms_in_unit_cell,
                    int cells_num_cells, /// number of macrocells
                    int cells_num_local_cells, /// number of local macrocells
-                   const double cells_macro_cell_size,
+                   const double cells_macro_cell_size_x,
+                   const double cells_macro_cell_size_y,
+                   const double cells_macro_cell_size_z,
                    std::vector <int>& cells_local_cell_array,
                    std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                    std::vector <int>& cells_num_atoms_in_cell_global, ///global  number of atoms in each cell

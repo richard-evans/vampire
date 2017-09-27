@@ -38,6 +38,8 @@ namespace micromagnetic{
    int number_of_none_atomistic_atoms = 0;
    int number_of_micromagnetic_cells = 0;
 
+
+
    //is the discretisation of each cell microamgnetic or atomistic
    std::vector < bool > cell_discretisation_micromagnetic;
 
@@ -57,6 +59,8 @@ namespace micromagnetic{
 
    double mean_M=0.0;
    double counter=0.0;
+
+
 
    namespace internal{
 
@@ -81,6 +85,12 @@ namespace micromagnetic{
       std::vector<double> alpha_para;
       std::vector<double> alpha_perp;
 
+      bool mm_correction;
+
+      std::vector <double> pinning_field_x;
+      std::vector <double> pinning_field_y;
+      std::vector <double> pinning_field_z;
+
       //stores the external fields (x,y,z)
       std::vector<double> ext_field;
 
@@ -92,6 +102,7 @@ namespace micromagnetic{
       std::vector<double> macro_neighbour_list_start_index;
       std::vector<double> macro_neighbour_list_end_index;
       std::vector<double> macro_neighbour_list_array;
+
 
    } // end of internal namespace
 

@@ -30,7 +30,9 @@ namespace dipole{
    void initialize(const int cells_num_atoms_in_unit_cell,
                   int cells_num_cells, /// number of macrocells
                   int cells_num_local_cells, /// number of local macrocells
-                  const double cells_macro_cell_size,
+                  const double cells_macro_cell_size_x,
+                  const double cells_macro_cell_size_y,
+                  const double cells_macro_cell_size_z,
                   std::vector <int>& cells_local_cell_array,
                   std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                   std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
@@ -105,11 +107,13 @@ namespace dipole{
             break;
 
          case dipole::internal::tensor:
-            dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, cells_num_cells, cells_num_local_cells, cells_macro_cell_size, cells_local_cell_array,
+            dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, cells_num_cells, cells_num_local_cells, cells_macro_cell_size_x,cells_macro_cell_size_y,cells_macro_cell_size_z, cells_local_cell_array,
                                                        cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, cells_volume_array, cells_pos_and_mom_array,
                                                        cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
                                                        atom_type_array, atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, num_atoms);
             break;
+         case dipole::internal::fft:
+            dipole::internal::initialize_fft_solver();
 
       }
 

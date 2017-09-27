@@ -140,6 +140,7 @@ namespace environment{
             y_spin_storage_array[cell] = 0.0;
             z_spin_storage_array[cell] = 0.0;
          }
+
          //save this new m as the initial value, so it can be saved and used in the final equation.
          for (int i = my_env_start_index; i < my_env_end_index; i++){
             int cell = env::none_atomistic_cells[i];
@@ -174,18 +175,25 @@ namespace environment{
             GW2y[cell] = mtrandom::gaussian();
             GW2z[cell] = mtrandom::gaussian();
          }
-         //iff FFt is enabled calcualte the demag fields.
+         //iff FFt is enabled calculate the demag fields.
          #ifdef FFT
          if (sim::time %demag_update_rate == 0) env::calculate_demag_fields();
          #endif
+         //std::vector < double > mm_env_exchange(num_cells,0.0);
+         //std::vector < double > env_mm_exchange(mm::num_cells,0.0);
 
+         for (int i = 0; i < environment::num_interactions; i ++ ){
+            int mm_cell = environment::list_of_mm_cells_with_neighbours[i];
+            int env_cell = environment::list_of_env_cells_with_neighbours[i];
+            double overlap = list_of_overlap_area[i];
+
+         }
          for (int i = my_env_start_index; i < my_env_end_index; i++){
             int cell = env::none_atomistic_cells[i];
             m[0] = x_array[cell];
             m[1] = y_array[cell];
             m[2] = z_array[cell];
 
-            //calcualte the LLB fields
             spin_field = env::calculate_llb_fields(m, temperature, cell, x_array,y_array,z_array);
 
             //calcualte the noise terms

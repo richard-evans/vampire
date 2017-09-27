@@ -45,6 +45,7 @@ namespace dipole{
       enum solver_t{
          macrocell    = 0, // original bare macrocell method (cheap but inaccurate)
          tensor       = 1, // new macrocell with tensor including local corrections
+         fft          = 5,
          //multipole    = 2, // bare macrocell but with multipole expansion
          //hierarchical = 3, // new macrocell with tensor including local corrections and nearfield multipole
          //exact        = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)
@@ -129,12 +130,16 @@ namespace dipole{
       //void write_macrocell_data();
       extern void update_field();
 
+      extern void update_field_fft();
+
       void allocate_memory(const int cells_num_local_cells, const int cells_num_cells);
 
       void initialize_tensor_solver(const int cells_num_atoms_in_unit_cell,
                                     int cells_num_cells, /// number of macrocells
                                     int cells_num_local_cells, /// number of local macrocells
-                                    const double cells_macro_cell_size,
+                                    const double cells_macro_cell_size_x,
+                                    const double cells_macro_cell_size_y,
+                                    const double cells_macro_cell_size_z,
                                     std::vector <int>& cells_local_cell_array,
                                     std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                                     std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
@@ -151,7 +156,9 @@ namespace dipole{
                                     const std::vector<double>& atom_coords_z,
                                     const int num_atoms);
 
-      void compute_inter_tensor(const double cells_macro_cell_size,
+      void compute_inter_tensor(const double cells_macro_cell_size_x,
+                                const double cells_macro_cell_size_y,
+                                const double cells_macro_cell_size_z,
                                 const int i,
                                 const int j,
                                 const int lc,
@@ -170,6 +177,8 @@ namespace dipole{
                                 std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z);
 
       void initialize_macrocell_solver();
+
+      void initialize_fft_solver();
 
       //-----------------------------------------------------------------------------
       // Function to send receive cells data to other cpus
@@ -204,7 +213,7 @@ namespace dipole{
                                std::vector<int>& cells_num_atoms_in_cell,
                                int cells_num_local_cells,
                                int cells_num_cells,
-                               double cells_macro_cell_size);
+                               double cells_macro_cell_size_x,double cells_macro_cell_size_y,double cells_macro_cell_size_z);
 
       //----------------------------------------------------------------
       //Function to sort cells/atoms data after sharing
@@ -220,7 +229,7 @@ namespace dipole{
                   int cells_num_local_cells,
                   int cells_num_cells);
 
-      extern void update_field_fft();
+   //   extern void update_field_fft();
 
    } // end of internal namespace
 

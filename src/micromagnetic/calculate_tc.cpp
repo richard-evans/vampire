@@ -87,7 +87,7 @@ namespace micromagnetic {
 
          for (int i = 0; i < num_local_cells; i++){
             int cell = local_cell_array[i];
-            Tc[cell] = -J[cell]*e/(3*kB*N[cell]);
+            Tc[cell] = J[cell]*e/(3*kB*N[cell]);
          }
          #ifdef MPICF
             MPI_Allreduce(MPI_IN_PLACE, &Tc[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);

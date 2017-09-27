@@ -17,6 +17,8 @@
 #include "micromagnetic.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
+#include "units.hpp"
+#include "errors.hpp"
 
 // micromagnetic module headers
 #include "internal.hpp"
@@ -102,6 +104,12 @@ namespace micromagnetic{
          return true;
       }
 
+      test="pinning-field-correction";
+      if(word==test){
+         micromagnetic::internal::mm_correction = true;
+         return true;
+      }
+
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -122,9 +130,37 @@ namespace micromagnetic{
       if(word==test){
          double K=atof(value.c_str());
          vin::read_material[super_index].micromagnetic_enabled=true;
-         std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
+         //std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
          return true;
       }
+
+
+      test="pinning-field-strength";
+      if(word==test){
+         double K=atof(value.c_str());
+         vin::read_material[super_index].pinning_field_strength = K;
+         //std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
+         return true;
+      }
+
+      test="pinning-field-unit-vector";
+      if(word==test){
+         // temporary storage container
+         std::vector<double> u(3);
+
+         // read values from string
+         u=vin::doubles_from_string(value);
+         vin::check_for_valid_unit_vector(u, word, line, prefix,"length");
+         // Copy sanitised unit vector to material
+         vin::read_material[super_index].pinning_field_unit_vector[0] =u.at(0);
+         vin::read_material[super_index].pinning_field_unit_vector[1] =u.at(1);
+         vin::read_material[super_index].pinning_field_unit_vector[2] =u.at(2);
+         //mp::pinning_field[super_index][1]=u.at(1);
+         //mp::pinning_field[super_index][2]=u.at(2);
+         return true;
+      }
+
+
 
       //--------------------------------------------------------------------
       // Keyword not found

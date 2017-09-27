@@ -71,6 +71,11 @@ namespace micromagnetic{
       mm::macro_neighbour_list_end_index.resize(num_cells,0.0);
       micromagnetic::cell_discretisation_micromagnetic.resize(num_cells,true);
       mm::ext_field.resize(3,0.0);
+      mm::pinning_field_x.resize(num_cells,0.0);
+      mm::pinning_field_y.resize(num_cells,0.0);
+      mm::pinning_field_z.resize(num_cells,0.0);
+
+
 
       // These functions vectors with the parameters calcualted from the function
       mm::ms =                   mm::calculate_ms(num_local_cells,num_atoms,num_cells, cell_array, type_array,material,local_cell_array);
@@ -83,7 +88,19 @@ namespace micromagnetic{
       mm::one_o_chi_perp =       mm::calculate_chi_perp(num_local_cells, local_cell_array,num_cells, Temperature);
       mm::A =                    mm::calculate_a(num_atoms, num_cells, num_local_cells,cell_array, neighbour_list_array, neighbour_list_start_index,
                                                  neighbour_list_end_index, type_array,  material, volume_array, x_coord_array,
+
+
                                                  y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
+
+      if (discretisation_type == 1){
+         for (int lc = 0; lc < num_local_cells; lc++){
+            int cell = local_cell_array[lc];
+            if (mm::Tc[cell] < 0) {
+               discretisation_type = 2;
+
+            }
+         }
+      }
 
       //if multiscale simulation work out which cells/atoms are micromagnetic/atomistic
       if (discretisation_type == 2){
@@ -94,6 +111,7 @@ namespace micromagnetic{
             micromagnetic::cell_discretisation_micromagnetic[cell] = mp::material[mat].micromagnetic_enabled;
             //unless the cell contains AFM atoms, then it is always atomsitic
             if (mm::Tc[cell] < 0) micromagnetic::cell_discretisation_micromagnetic[cell] = 0;
+
          }
 
          //loops over all atoms saves each atom at micromagnetic or atomistic depending on whether the cell is microamgnetic or atomistic
@@ -160,18 +178,49 @@ namespace micromagnetic{
          }
       }
 
-//     if (vmpi::my_rank ==0){
-//     for (int cell = 0; cell < num_cells; cell++){
-//       std::cerr << vmpi::my_rank << '\t' << cells::cell_coords_array_z[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << "\t" << mm::Tc[cell] << "\t" <<micromagnetic::cell_discretisation_micromagnetic[cell] <<std::endl;
-//     }
-// }
+     for (int cell = 0; cell < num_cells; cell++){
+       std::cerr << '\t' << cells::cell_coords_array_z[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << "\t" << mm::Tc[cell] << "\t" <<micromagnetic::cell_discretisation_micromagnetic[cell] <<std::endl;
+     }
 
+     std::vector < double > temp(num_cells,0);
 
      int num_calculations = mm::fields_neighbouring_atoms_begin.size();
+
+     for (int atom = 0; atom < num_atoms; atom ++){
+        int mat = type_array[atom];
+        int cell = cell_array[atom];
+        mm::pinning_field_x[cell] += mp::material[mat].pinning_field_unit_vector[0];
+        mm::pinning_field_y[cell] += mp::material[mat].pinning_field_unit_vector[1];
+        mm::pinning_field_z[cell] += mp::material[mat].pinning_field_unit_vector[2];
+        temp[cell]++;
+     }
+
+
+     for (int cell = 0; cell < num_cells; cell++ ){
+        if (temp[cell] > 0 ){
+        mm::pinning_field_x[cell] = mm::pinning_field_x[cell]/temp[cell];
+        mm::pinning_field_y[cell] = mm::pinning_field_y[cell]/temp[cell];
+        mm::pinning_field_z[cell] = mm::pinning_field_z[cell]/temp[cell];
+     }
+        std::cout << cell << '\t' << mm::pinning_field_x[cell] <<'\t' << mm::pinning_field_y[cell] <<'\t' << mm::pinning_field_z[cell] <<std::endl;
+     }
+     std::cout << mm::mm_correction <<std::endl;
+     if (mm::mm_correction == true){
+        for (int cell = 0; cell < num_cells; cell++ ){
+         //  mm::pinning_field_x[cell] = 2*mm::pinning_field_x[cell]/cells::macro_cell_size[0];
+          // mm::pinning_field_y[cell] = 2*mm::pinning_field_y[cell]/cells::macro_cell_size[1];
+           //mm::pinning_field_z[cell] = 2*mm::pinning_field_z[cell]/cells::macro_cell_size[2];
+                   std::cout << cell << '\t' << mm::pinning_field_x[cell] <<'\t' << mm::pinning_field_y[cell] <<'\t' << mm::pinning_field_z[cell] <<std::endl;
+        }
+     }
+
 
      //boltzman stuff
      P.resize(101);
      for (int i = 0; i < 101; i++) P[i].resize(101,0.0);
+
+
+
 
      return;
 

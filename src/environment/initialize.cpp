@@ -25,10 +25,13 @@
 #include <iostream>
 #include <math.h>
 
+
+
 using namespace std;
 
 namespace env = environment::internal;
 
+void neighbours(int env, int mm, double overlap);
 
 namespace environment{
 
@@ -69,7 +72,9 @@ namespace environment{
          env::cell_volume = env::cell_size[0]*env::cell_size[1]*env::cell_size[2];
 
          //convert Ms from input to Ms = ms.V and Ku = ku.V
+
          env::Ms = env::Ms*env::cell_volume;
+
          env::ku = -env::ku*env::cell_volume;
 
          //resize arrays
@@ -95,13 +100,21 @@ namespace environment{
          environment_field_y.resize(cells::num_cells,0.0);
          environment_field_z.resize(cells::num_cells,0.0);
 
-         //stores the max and min coordinates of all cells
+         //stores the max and min coordinates of all env cells
          std::vector <double > x_max(env::num_cells,0.0);
          std::vector <double > y_max(env::num_cells,0.0);
          std::vector <double > z_max(env::num_cells,0.0);
          std::vector <double > x_min(env::num_cells,0.0);
          std::vector <double > y_min(env::num_cells,0.0);
          std::vector <double > z_min(env::num_cells,0.0);
+
+         //stores the max and min coordinates of all env cells
+         std::vector <double > x_m_max(env::num_cells,0.0);
+         std::vector <double > y_m_max(env::num_cells,0.0);
+         std::vector <double > z_m_max(env::num_cells,0.0);
+         std::vector <double > x_m_min(env::num_cells,0.0);
+         std::vector <double > y_m_min(env::num_cells,0.0);
+         std::vector <double > z_m_min(env::num_cells,0.0);
 
          //calculates the mininum and maximum positions of each cell for calcualtions of which cell the atomistic atoms are in later
          int cell = 0;
@@ -125,13 +138,24 @@ namespace environment{
                }
             }
          }
+
          //loops over all atomistic cells to determine if the atomsitic simulation lies within an environment cell
          for (int cell = 0 ; cell < cells::num_cells; cell++){
             //calcaultes the x,y,z position for each atomsitic cell
             double x = cells::cell_coords_array_x[cell]/cells::internal::total_moment_array[cell] + env::shift[0];
             double y = cells::cell_coords_array_y[cell]/cells::internal::total_moment_array[cell] + env::shift[1];
             double z = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell] + env::shift[2];
-            //loops over all environment cells to xetermine which cell this atomistic cell lies within
+
+            x_m_max[cell] = x + cells::macro_cell_size[0]/2.0;
+            x_m_min[cell] = x - cells::macro_cell_size[0]/2.0;
+            y_m_max[cell] = y + cells::macro_cell_size[1]/2.0;
+            y_m_min[cell] = y - cells::macro_cell_size[1]/2.0;
+            z_m_max[cell] = z + cells::macro_cell_size[2]/2.0;
+            z_m_min[cell] = z - cells::macro_cell_size[2]/2.0;
+
+
+
+            //loops over all environment cells to determine which cell this atomistic cell lies within
             for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
                //if atom is within environment
                if (x < x_max[env_cell] && x > x_min[env_cell] && y < y_max[env_cell] && y > y_min[env_cell] && z < z_max[env_cell] && z > z_min[env_cell]){
@@ -147,6 +171,31 @@ namespace environment{
                }
             }
          }
+
+
+         for (int mm_cell = 0 ; mm_cell < cells::num_cells; mm_cell++){
+            for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
+               std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;
+               if (abs(x_m_max[mm_cell] - x_max[env_cell]) < 2){
+                  neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
+                  std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;
+               }
+            //   if (abs(x_m_min[mm_cell] - x_min[env_cell]) < cells::macro_cell_size[0]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
+            //   if (abs(x_m_min[mm_cell] - x_max[env_cell]) < cells::macro_cell_size[0]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
+            //   if (abs(x_m_max[mm_cell] - x_min[env_cell]) < cells::macro_cell_size[0]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
+
+            //   if (abs(y_m_max[mm_cell] - y_max[env_cell]) < cells::macro_cell_size[1]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[1]);
+               // if (abs(y_m_min[mm_cell] - y_min[env_cell]) < cells::macro_cell_size[1]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[1]);
+               // if (abs(y_m_min[mm_cell] - y_max[env_cell]) < cells::macro_cell_size[1]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[1]);
+               // if (abs(y_m_max[mm_cell] - y_min[env_cell]) < cells::macro_cell_size[1]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[1]);
+               //
+               // if (abs(z_m_max[mm_cell] - z_max[env_cell]) < cells::macro_cell_size[2]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[2]);
+               // if (abs(z_m_min[mm_cell] - z_min[env_cell]) < cells::macro_cell_size[2]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[2]);
+               // if (abs(z_m_min[mm_cell] - z_max[env_cell]) < cells::macro_cell_size[2]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[2]);
+               // if (abs(z_m_max[mm_cell] - z_min[env_cell]) < cells::macro_cell_size[2]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[2]);
+            }
+         }
+
          //adds all cells whichc are not within the atomistic section to the the none atomsitic cells list or the atomistic cells list
          for (int cell = 0; cell < env::num_cells; cell++){
             if (env::env_cell_is_in_atomistic_region[cell] == 0.0){
@@ -240,6 +289,9 @@ namespace environment{
             }
          }
 
+
+
+
          //initalise the demag fields
          int a = env::initialise_demag_fields();
 
@@ -254,9 +306,28 @@ namespace environment{
             }
          }
 
+         for (int i = 0; i < environment::num_interactions; i ++ ){
+            int mm_cell = environment::list_of_mm_cells_with_neighbours[i];
+            int env_cell = environment::list_of_env_cells_with_neighbours[i];
+            double overlap = list_of_overlap_area[i];
+            double x = cells::cell_coords_array_x[mm_cell]/cells::internal::total_moment_array[mm_cell] + env::shift[0];
+            double y = cells::cell_coords_array_y[mm_cell]/cells::internal::total_moment_array[mm_cell] + env::shift[1];
+            double z = cells::cell_coords_array_z[mm_cell]/cells::internal::total_moment_array[mm_cell] + env::shift[2];
+            double pos_x = env::cell_coords_array_x[env_cell];
+            double pos_y = env::cell_coords_array_y[env_cell];
+            double pos_z = env::cell_coords_array_z[env_cell];
+            std::cout << "A" << pos_x << '\t' << pos_y << '\t' << pos_z << '\t' <<x << '\t' << y << '\t' << z << '\t' << mm_cell << '\t' << env_cell << '\t' << overlap << std::endl;
+         }
 
          return;
 
       }
 
    } // end of environment namespace
+
+void neighbours(int env, int mm, double overlap){
+   environment::list_of_mm_cells_with_neighbours.push_back(mm);
+   environment::list_of_env_cells_with_neighbours.push_back(env);
+   environment::list_of_overlap_area.push_back(overlap);
+   environment::num_interactions++;
+   }

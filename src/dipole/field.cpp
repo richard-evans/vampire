@@ -71,7 +71,6 @@ namespace dipole{
 					  //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n **** PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");
 
-
 			   // For MPI version, only add local atoms
 			   #ifdef MPICF
 				   const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;

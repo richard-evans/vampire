@@ -50,6 +50,12 @@ namespace create{
 				}
 			}
 		}
+      for (int mat = 0; mat < mp::num_materials; mat++){
+         mp::material[mat].pinning_field_unit_vector[0] *= mp::material[mat].pinning_field_strength;
+         mp::material[mat].pinning_field_unit_vector[1] *= mp::material[mat].pinning_field_strength;
+         mp::material[mat].pinning_field_unit_vector[2] *= mp::material[mat].pinning_field_strength;
+         std::cout << mp::material[mat].pinning_field_unit_vector[0] <<std::endl;
+      }
 
       return;
    }

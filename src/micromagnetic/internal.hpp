@@ -40,7 +40,7 @@ namespace micromagnetic{
       extern int my_num_micromagnetic_cells;
       extern int my_start_index; // first cell to intergrate on local (my) cpu
       extern int my_end_index;  // last cell +1 to intergrate on local (my) cpu
-
+      extern bool mm_correction;
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
@@ -57,6 +57,10 @@ namespace micromagnetic{
       extern std::vector<double> ku;
       extern std::vector<double> ms;
       extern std::vector<double> Tc;
+
+      extern std::vector <double> pinning_field_x;
+      extern std::vector <double> pinning_field_y;
+      extern std::vector <double> pinning_field_z;
 
       //stores the external fields (x,y,z)
       extern std::vector<double> ext_field;
@@ -124,6 +128,7 @@ namespace micromagnetic{
                                                 std::vector<double> x_array,
                                                 std::vector<double> y_array,
                                                 std::vector<double> z_array);
+
 
 
    } // end of internal namespace

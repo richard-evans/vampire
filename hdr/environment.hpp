@@ -70,6 +70,11 @@ namespace environment{
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
+   extern std::vector < int > list_of_mm_cells_with_neighbours;
+   extern std::vector < int > list_of_env_cells_with_neighbours;
+   extern std::vector < double > list_of_overlap_area;
+   extern int num_interactions;
+
 } // end of environment namespace
 
 #endif //ENVIRONMENT_H_

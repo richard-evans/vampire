@@ -39,6 +39,13 @@ namespace environment{
 
    int num_atomic_steps_env= 1;
 
+   std::vector < int > list_of_mm_cells_with_neighbours;
+   std::vector < int > list_of_env_cells_with_neighbours;
+   std::vector < double > list_of_overlap_area;
+
+   int num_interactions = 0;
+
+
    namespace internal{
 
       //------------------------------------------------------------------------

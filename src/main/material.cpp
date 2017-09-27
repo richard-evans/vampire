@@ -86,6 +86,8 @@ materials_t::materials_t ():
 	applied_field_unit_vector.at(1)=0.0;
 	applied_field_unit_vector.at(2)=1.0;
 
+	pinning_field_unit_vector.resize(3,0.0);
+
 	// FMR field direction default initialisation
 	fmr_field_unit_vector.at(0)=0.0;
 	fmr_field_unit_vector.at(1)=0.0;

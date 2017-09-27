@@ -147,7 +147,7 @@ namespace micromagnetic{
                   int cellj = local_cell_array[j];
                   if (a2d[celli][cellj] != 0){
                      macro_neighbour_list_array.push_back(j);                                        //if the interaction is non zero add the cell to the neighbourlist
-                     a[array_index] = (a2d[celli][cellj]*cell_size)/(2*ms[celli]*atomic_volume);                 //calcualtes the exchange interaction for the cells.
+                     a[array_index] = -(a2d[celli][cellj]*cell_size)/(2*ms[celli]*atomic_volume);                 //calcualtes the exchange interaction for the cells.
                      macro_neighbour_list_end_index[celli] = array_index;                                //the end index is updated for each cell so is given the value for the last cell.
                      array_index ++;
                   }

@@ -40,7 +40,9 @@ namespace dipole{
       void initialize_tensor_solver(const int cells_num_atoms_in_unit_cell,
                                     int cells_num_cells, /// number of macrocells
                                     int cells_num_local_cells, /// number of local macrocells
-                                    const double cells_macro_cell_size,
+                                    const double cells_macro_cell_size_x,
+                                    const double cells_macro_cell_size_y,
+                                    const double cells_macro_cell_size_z,
                                     std::vector <int>& cells_local_cell_array,
                                     std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                                     std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
@@ -112,7 +114,7 @@ namespace dipole{
                                                    dipole::internal::cells_num_atoms_in_cell,
                                                    dipole::internal::cells_num_local_cells,
                                                    dipole::internal::cells_num_cells,
-                                                   cells_macro_cell_size);
+                                                   cells_macro_cell_size_x,cells_macro_cell_size_y,cells_macro_cell_size_z );
 
             // Reorder data structure
             dipole::internal::sort_data(dipole::internal::proc_cell_index_array1D,
@@ -173,7 +175,7 @@ namespace dipole{
                 	if(i!=j && dipole::internal::cells_num_atoms_in_cell[j]>0){
 
                      // calculate inter term of dipolar tensor
-                     compute_inter_tensor(cells_macro_cell_size,i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
+                     compute_inter_tensor(cells_macro_cell_size_x,cells_macro_cell_size_y,cells_macro_cell_size_z, i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
 
                   } // End of Inter part
 

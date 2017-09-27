@@ -167,7 +167,9 @@ namespace internal{
                               std::vector<int>& cells_num_atoms_in_cell,
                               int cells_num_local_cells,
                               int cells_num_cells,
-                              double cells_macro_cell_size
+                              double cells_macro_cell_size_x,
+                              double cells_macro_cell_size_y,
+                              double cells_macro_cell_size_z
                               ){
 
          // temporary variables to send and receive data
@@ -213,7 +215,7 @@ namespace internal{
                                                	(cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2])*(cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2]));
                         //distance between cells
                         double rij = 1.0/rij_1;
-                        if((rij/cells_macro_cell_size <= dipole::cutoff) || ((cells_pos_and_mom_array[4*lc+0]==cells_pos_and_mom_array[4*i+0]) && (cells_pos_and_mom_array[4*lc+1]==cells_pos_and_mom_array[4*i+1]) && (cells_pos_and_mom_array[4*lc+2]==cells_pos_and_mom_array[4*i+2]) ) ){
+                        if((rij/cells_macro_cell_size_x <= dipole::cutoff) || ((cells_pos_and_mom_array[4*lc+0]==cells_pos_and_mom_array[4*i+0]) && (cells_pos_and_mom_array[4*lc+1]==cells_pos_and_mom_array[4*i+1]) && (cells_pos_and_mom_array[4*lc+2]==cells_pos_and_mom_array[4*i+2]) ) ){
                            if(bool_array[i]!=0){
                               list_cpu_to_send_to.push_back(cpu_recv);
                               list_cells_to_send.push_back(i);

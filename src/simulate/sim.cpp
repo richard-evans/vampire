@@ -273,7 +273,9 @@ int run(){
    dipole::initialize(cells::num_atoms_in_unit_cell,
                      cells::num_cells,
                      cells::num_local_cells,
-                     cells::macro_cell_size,
+                     cells::macro_cell_size[0],
+							cells::macro_cell_size[1],
+							cells::macro_cell_size[2],
                      cells::local_cell_array,
                      cells::num_atoms_in_cell,
                      cells::num_atoms_in_cell_global, // <----
@@ -714,9 +716,9 @@ int integrate_mpi(int n_steps){
 			#ifdef MPICF
 				// Select CUDA version if supported
 				#ifdef CUDA
-					//sim::LLG_Heun_cuda_mpi();
+					sim::LLG_Heun_cuda_mpi();
 				#else
-				//	sim::LLG_Heun_mpi();
+					sim::LLG_Heun_mpi();
 				//calcualte the field from the environment
 					if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
 																																																						sim::H_applied,
@@ -795,6 +797,7 @@ void multiscale_simulation_steps(int n_steps){
          //if  there are micromagnetic cells run a micromagnetic step
          if (micromagnetic::number_of_micromagnetic_cells > 0 &&  (sim::time)% micromagnetic::num_atomic_steps_mm == 0) {
 
+
             //if LLb run an LLG steps
             if (micromagnetic::integrator == 0) micromagnetic::LLG(cells::local_cell_array,
                n_steps,
@@ -810,7 +813,7 @@ void multiscale_simulation_steps(int n_steps){
                sim::H_applied,
                mp::dt,
                cells::volume_array);
-               //if LLB run an LLb step
+               //if LLB run an LLB step
                else micromagnetic::LLB(cells::local_cell_array,
                   n_steps,
                   cells::num_cells,
@@ -827,7 +830,7 @@ void multiscale_simulation_steps(int n_steps){
                   cells::volume_array);
                }
                //run an atomistic step if there are atomistic atoms
-               if (micromagnetic::discretisation_type == 0  && micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
+               if (micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
 
                //incremenet time
                sim::increment_time();

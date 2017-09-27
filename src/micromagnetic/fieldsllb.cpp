@@ -42,6 +42,7 @@ namespace micromagnetic{
       //chi is usually used as 1/2*chi
       const double one_o_2_chi_para = (one_o_chi_para[cell]/2.0);
 
+
       //the temperature is usually used as a reduced temperature or Tc/(Tc-T).
       const double reduced_temperature = temperature/Tc[cell];
       const double Tc_o_Tc_m_T = Tc[cell]/(temperature - Tc[cell]);
@@ -69,6 +70,7 @@ namespace micromagnetic{
 
       //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
       //array to store the exchanege field
+
       double exchange_field[3]={0.0,0.0,0.0};
       if (num_cells > 1){
          int j2 = cell*num_cells;
@@ -88,18 +90,22 @@ namespace micromagnetic{
          }
       }
 
+
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] = pf*m[0] - one_o_chi_perp[cell]*m[0] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0];
-      spin_field[1] = pf*m[1] - one_o_chi_perp[cell]*m[1] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1];
-      spin_field[2] = pf*m[2]                             + ext_field[2] + cells::field_array_z[cell] + exchange_field[2];
+      spin_field[0] = pf*m[0] - one_o_chi_perp[cell]*m[0] + ext_field[0] + exchange_field[0];// +pinning_field_x[cell];// + cells::field_array_x[cell];
+      spin_field[1] = pf*m[1] - one_o_chi_perp[cell]*m[1] + ext_field[1] + exchange_field[1];// + pinning_field_y[cell];// + cells::field_array_y[cell];
+      spin_field[2] = pf*m[2]                             + ext_field[2] + exchange_field[2];// + pinning_field_z[cell];// + cells::field_array_z[cell];
+
       //if environment is enabled add the environment field.
 
-      if (environment::enabled){
-         spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
-         spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
-         spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
-      }
 
+      // if (environment::enabled){
+      //    spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
+      //    spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
+      //    spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+      // }
+
+      //std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
       return spin_field;
    }
 

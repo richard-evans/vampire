@@ -31,7 +31,7 @@ namespace cells{
    int num_atoms_in_unit_cell=0;
    int num_cells; /// number of macro-cells
    int num_local_cells=0; /// number of macro-cells
-   double macro_cell_size = 10.0; /// macro-cells size (A)
+   std::vector < double > macro_cell_size(3,10.0); /// macro-cells size (A)
 
    std::vector <int> local_cell_array;
    std::vector<int> num_atoms_in_cell; /// number of atoms in each cell

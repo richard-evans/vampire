@@ -16,7 +16,7 @@ export OMPI_CXX=g++ -std=c++0x
 
 
 
-ifdef FFT
+#ifdef FFT
 ICC=icc -DCOMP='"Intel C++ Compiler"' -DFFT
 GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' -DFFT
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"' -DFFT
@@ -26,18 +26,18 @@ MPICC=mpicxx -DMPICF -DFFT
 
 LIBS=-lstdc++ -lm -lfftw3
 
-endif
-ifndef FFT
-ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
-LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-MPICC=mpicxx -DMPICF
+#endif
+#ifndef FFT
+#ICC=icc -DCOMP='"Intel C++ Compiler"'
+#GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
+#LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
+#PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
+#IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+#MPICC=mpicxx -DMPICF
 
-LIBS=-lstdc++ -lm
+#LIBS=-lstdc++ -lm
 
-endif
+#endif
 # LIBS
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
