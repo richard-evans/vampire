@@ -155,7 +155,7 @@ namespace environment{
          }
 
 
-         std::cin.get();
+
          // fft calculations
          fftw_plan NxxP,NxyP,NxzP,NyxP,NyyP,NyzP,NzxP,NzyP,NzzP;
 
@@ -180,13 +180,14 @@ namespace environment{
          fftw_execute(NzzP);
 
 
-
+         #endif
          return 0;
 
       }
 
       int calculate_demag_fields(){
 
+         #ifdef FFT
          //initalise all components of M and H arrays to 0
          for(unsigned int i = 0 ; i < num_cells_x ; i++){
             for(unsigned int j = 0 ; j < num_cells_y; j++){
@@ -242,7 +243,7 @@ namespace environment{
                }
             }
          }
-      //   std::cin.get();
+
          //FT for magnetisation
          fftw_plan MxP,MyP,MzP;
 
