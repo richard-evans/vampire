@@ -49,6 +49,7 @@
 #include "program.hpp"
 #include "environment.hpp"
 #include "cells.hpp"
+#include "../cells/internal.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
@@ -841,6 +842,6 @@ void multiscale_simulation_steps(int n_steps){
             for (int lc = 0; lc < cells::num_local_cells; lc++){
                int cell = cells::local_cell_array[lc];
                //pfile2 << cell << '\t' << cells::cell_coords_array_x[cell] << '\t' << cells::cell_coords_array_y[cell] << '\t' << cells::cell_coords_array_z[cell] << '\t' <<cells::mag_array_x[cell] <<
-               pfile << cells::cell_coords_array_x[cell] << '\t' << cells::cell_coords_array_y[cell] << '\t' << cells::cell_coords_array_z[cell] << '\t' <<cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] << '\t' << std::endl;
+               pfile << cells::cell_coords_array_x[cell]/cells::internal::total_moment_array[cell] << "\t"<< cells::cell_coords_array_y[cell]/cells::internal::total_moment_array[cell] << "\t"<< cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell] <<  '\t' << cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] << '\t' << std::endl;
             }
          }

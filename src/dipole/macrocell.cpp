@@ -47,9 +47,9 @@ namespace dipole{
 
          // loop over local cells
          for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
-
+         //   std::cout << lc << std::endl;
             // print out progress to screen
-            if(lc % (dipole::internal::cells_num_local_cells/10) == 0) std::cout << "." << std::flush;
+            //if(lc % (dipole::internal::cells_num_local_cells/10) == 0) std::cout << "." << std::flush;
 
             // reference global cell ID
             //int i = dipole::internal::cells_local_cell_array[lc];
@@ -89,6 +89,7 @@ namespace dipole{
                   	const double ez = rz*rij;
 
                   	const double rij3 = (rij*rij*rij); // Angstroms
+         //      std::cout <<"r " <<"\t" << rx << '\t' << ry << '\t' << rz << '\t' << rij << '\t' << ex << '\t' << ey << '\t' << ez << "\t" << rij3 << std::endl;
 
                      // calculate dipolar matrix for 6 entries because of symmetry
                   	dipole::internal::rij_tensor_xx[lc][j] = ((3.0*ex*ex - 1.0)*rij3);
@@ -118,6 +119,8 @@ namespace dipole{
                    	dipole::internal::rij_tensor_zz[lc][i] = third;
 
                   } // End of Intra part
+                  // std::cout  << "tensor " << dipole::internal::rij_tensor_xx[lc][j] << '\t' << dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<dipole::internal::rij_tensor_xz[lc][j] << '\t' << dipole::internal::rij_tensor_yy[lc][j] << '\t' << dipole::internal::rij_tensor_yz[lc][j]<< '\t' <<dipole::internal::rij_tensor_zz[lc][j] <<std::endl;
+
                }
    			}
    		}
@@ -127,7 +130,7 @@ namespace dipole{
 
          // stop timer
          timer.stop();
-
+      //std::cout << "end" <<std::endl;
          std::cout << "done! [ " << timer.elapsed_time() << " s ]" << std::endl;
          zlog << zTs() << "Precalculation of rij matrix for dipole calculation complete. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 

@@ -19,6 +19,7 @@
 #include "internal.hpp"
 #include "material.hpp"
 #include "cells.hpp"
+#include "../cells/internal.hpp"
 #include "atoms.hpp"
 #include "vmpi.hpp"
 
@@ -108,6 +109,7 @@ namespace micromagnetic{
          for (int atom =0; atom < num_atoms; atom++){
             int cell = cell_array[atom];
             int mat  = type_array[atom];
+            std::cout << cell << '\t' << mat << std::endl;
             micromagnetic::cell_discretisation_micromagnetic[cell] = mp::material[mat].micromagnetic_enabled;
             //unless the cell contains AFM atoms, then it is always atomsitic
             if (mm::Tc[cell] < 0) micromagnetic::cell_discretisation_micromagnetic[cell] = 0;
@@ -179,7 +181,7 @@ namespace micromagnetic{
       }
 
      for (int cell = 0; cell < num_cells; cell++){
-       std::cerr << '\t' << cells::cell_coords_array_z[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << "\t" << mm::Tc[cell] << "\t" <<micromagnetic::cell_discretisation_micromagnetic[cell] <<std::endl;
+       std::cerr << '\t' << cells::cell_coords_array_z[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << "\t" << mm::Tc[cell] << "\t" <<micromagnetic::cell_discretisation_micromagnetic[cell] << "\t" << mm::alpha[cell] << '\t' << mm::gamma[cell] << std::endl;
      }
 
      std::vector < double > temp(num_cells,0);
@@ -189,28 +191,34 @@ namespace micromagnetic{
      for (int atom = 0; atom < num_atoms; atom ++){
         int mat = type_array[atom];
         int cell = cell_array[atom];
-        mm::pinning_field_x[cell] += mp::material[mat].pinning_field_unit_vector[0];
-        mm::pinning_field_y[cell] += mp::material[mat].pinning_field_unit_vector[1];
-        mm::pinning_field_z[cell] += mp::material[mat].pinning_field_unit_vector[2];
-        temp[cell]++;
+       // mm::pinning_field_x[cell] += mp::material[mat].pinning_field_unit_vector[0];
+       // mm::pinning_field_y[cell] += mp::material[mat].pinning_field_unit_vector[1];
+       // mm::pinning_field_z[cell] += mp::material[mat].pinning_field_unit_vector[2];
+       // temp[cell]++;
      }
 
 
      for (int cell = 0; cell < num_cells; cell++ ){
-        if (temp[cell] > 0 ){
-        mm::pinning_field_x[cell] = mm::pinning_field_x[cell]/temp[cell];
-        mm::pinning_field_y[cell] = mm::pinning_field_y[cell]/temp[cell];
-        mm::pinning_field_z[cell] = mm::pinning_field_z[cell]/temp[cell];
+        double zi = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell];
+        if (zi < 50){
+           mm::pinning_field_x[cell] = 0;
+            mm::pinning_field_y[cell] = 0.1;
+            mm::pinning_field_z[cell] = 0;
+        }
+      //  if (temp[cell] > 0 ){
+      //  mm::pinning_field_x[cell] = mm::pinning_field_x[cell]/temp[cell];
+      //  mm::pinning_field_y[cell] = mm::pinning_field_y[cell]/temp[cell];
+       // mm::pinning_field_z[cell] = mm::pinning_field_z[cell]/temp[cell];
+    // }
+      //  std::cout << cell << '\t' << mm::pinning_field_x[cell] <<'\t' << mm::pinning_field_y[cell] <<'\t' << mm::pinning_field_z[cell] <<std::endl;
      }
-        std::cout << cell << '\t' << mm::pinning_field_x[cell] <<'\t' << mm::pinning_field_y[cell] <<'\t' << mm::pinning_field_z[cell] <<std::endl;
-     }
-     std::cout << mm::mm_correction <<std::endl;
+   //  std::cout << mm::mm_correction <<std::endl;
      if (mm::mm_correction == true){
         for (int cell = 0; cell < num_cells; cell++ ){
          //  mm::pinning_field_x[cell] = 2*mm::pinning_field_x[cell]/cells::macro_cell_size[0];
           // mm::pinning_field_y[cell] = 2*mm::pinning_field_y[cell]/cells::macro_cell_size[1];
            //mm::pinning_field_z[cell] = 2*mm::pinning_field_z[cell]/cells::macro_cell_size[2];
-                   std::cout << cell << '\t' << mm::pinning_field_x[cell] <<'\t' << mm::pinning_field_y[cell] <<'\t' << mm::pinning_field_z[cell] <<std::endl;
+         //          std::cout << cell << '\t' << mm::pinning_field_x[cell] <<'\t' << mm::pinning_field_y[cell] <<'\t' << mm::pinning_field_z[cell] <<std::endl;
         }
      }
 

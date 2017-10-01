@@ -111,10 +111,10 @@ namespace dipole{
       fftw_complex *Hz_out;
 
       //stores number of macrocells in x,y,z
-      int num_macro_cells_x;
-      int num_macro_cells_y;
-      int num_macro_cells_z;
-      int eight_num_cells;
+      unsigned int num_macro_cells_x;
+      unsigned int num_macro_cells_y;
+      unsigned int num_macro_cells_z;
+      unsigned int eight_num_cells;
       #endif
 
       int num_atoms;

@@ -106,10 +106,10 @@ namespace dipole{
       extern fftw_complex *Hy_out;
       extern fftw_complex *Hz_out;
 
-      extern int num_macro_cells_x;
-      extern int num_macro_cells_y;
-      extern int num_macro_cells_z;
-      extern int eight_num_cells;
+      extern unsigned int num_macro_cells_x;
+      extern unsigned int num_macro_cells_y;
+      extern unsigned int num_macro_cells_z;
+      extern unsigned int eight_num_cells;
       #endif
       extern int num_atoms;
       extern std::vector < int > atom_type_array;

@@ -151,7 +151,7 @@ int LLB( std::vector <int> local_cell_array,
 	if(LLG_set== false) micromagnetic::micromagnetic_init(num_cells, x_mag_array, y_mag_array, z_mag_array);
 
    // Local variables for system integration
-
+//	std::cout << x_array[0] << '\t' << y_array[0] << '\t' << z_array[0]<<std::endl;
    // set up ranges for different processors
    int my_num_micromagnetic_cells = number_of_micromagnetic_cells/vmpi::num_processors;
    int my_start_index = my_num_micromagnetic_cells*vmpi::my_rank; // first cell to intergrate on local (my) cpu
@@ -374,7 +374,7 @@ int LLB( std::vector <int> local_cell_array,
 
 
    //update atom positions
-   if (discretisation_type  == 2 || sim::time%vout::output_rate -1){
+   if (discretisation_type == 2 || sim::time%vout::output_rate -1){
       for(int atom_list=0;atom_list<number_of_none_atomistic_atoms;atom_list++){
          int atom = list_of_none_atomistic_atoms[atom_list];
          int cell = cells::atom_cell_id_array[atom];

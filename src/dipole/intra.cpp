@@ -75,8 +75,9 @@ namespace dipole{
                  const double ex = rx*rij;
                  const double ey = ry*rij;
                  const double ez = rz*rij;
-
+               //  std::cout <<"tensor" <<"\t" << rx << '\t' << ry << '\t' << rz << '\t' << rij << '\t' << ex << '\t' << ey << '\t' << ez << "\t" << rij3 << std::endl;
                  const double rij3 = (rij*rij*rij); // Angstroms
+                 //std::cout <<"tensor" <<"\t" << rx << '\t' << ry << '\t' << rz << '\t' << rij << '\t' << ex << '\t' << ey << '\t' << ez << "\t" << rij3 << std::endl;
 
                  tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
                  tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);
@@ -127,6 +128,7 @@ namespace dipole{
          dipole::internal::rij_tensor_yy[lc][i] = dipole::internal::rij_tensor_yy[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
          dipole::internal::rij_tensor_yz[lc][i] = dipole::internal::rij_tensor_yz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
          dipole::internal::rij_tensor_zz[lc][i] = dipole::internal::rij_tensor_zz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
+         std::cout  << "tensor " << dipole::internal::rij_tensor_xx[lc][i] << '\t' << dipole::internal::rij_tensor_xy[lc][i]<< '\t' <<dipole::internal::rij_tensor_xz[lc][i] << '\t' << dipole::internal::rij_tensor_yy[lc][i] << '\t' << dipole::internal::rij_tensor_yz[lc][i]<< '\t' <<dipole::internal::rij_tensor_zz[lc][i] <<std::endl;
 
       }  // End of funtion calculating Intra component of dipole tensor
 

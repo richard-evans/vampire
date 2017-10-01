@@ -82,6 +82,7 @@ namespace micromagnetic{
                   //saves the cell the atom is in and the material
                   const int cell  = cell_array[atom];
                   const int mat   = type_array[atom];
+               //   std::cout << cell << '\t' << mat << std::endl;
                   //the nearest neighbours are stored in an array - for each atom the start and end index for the array are found,
                   const int start = atoms::neighbour_list_start_index[atom];
                   const int end   = atoms::neighbour_list_end_index[atom] + 1;
@@ -97,6 +98,8 @@ namespace micromagnetic{
                         const double dy = y_coord_array[atom] - y_coord_array[natom];
                         const double dz = z_coord_array[atom] - z_coord_array[natom];
                         const double d2 = dx*dx + dy*dy + dz*dz;
+                     //   std::cout << d2 <<std::endl;
+                     //   std::cin.get();
                         //Jij is stored as Jij/mu_s so to get Jij we have to multiply by mu_s
                         //Jij = sum(Jij*distance)
                         const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij*mp::material[mat].mu_s_SI;
@@ -146,9 +149,10 @@ namespace micromagnetic{
                for (int j =0; j <num_local_cells; j++){
                   int cellj = local_cell_array[j];
                   if (a2d[celli][cellj] != 0){
-                     macro_neighbour_list_array.push_back(j);                                        //if the interaction is non zero add the cell to the neighbourlist
+                     macro_neighbour_list_array.push_back(cellj);                                        //if the interaction is non zero add the cell to the neighbourlist
                      a[array_index] = -(a2d[celli][cellj]*cell_size)/(2*ms[celli]*atomic_volume);                 //calcualtes the exchange interaction for the cells.
-                     macro_neighbour_list_end_index[celli] = array_index;                                //the end index is updated for each cell so is given the value for the last cell.
+                     macro_neighbour_list_end_index[celli] = array_index;
+                  //   std::cout << celli << '\t' << cellj << '\t' <<   a[array_index] <<std::endl;                           //the end index is updated for each cell so is given the value for the last cell.
                      array_index ++;
                   }
                }

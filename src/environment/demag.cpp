@@ -321,7 +321,7 @@ namespace environment{
                }
             }
          }
-      //   std::cin.get();
+
          //saves the dipole field for each cell to the environment cell for use in the environment module
          for (int cell = 0; cell < cells::num_cells; cell++){
             int env_cell = list_env_cell_atomistic_cell[cell];
@@ -329,7 +329,7 @@ namespace environment{
             environment_field_x[cell] = dipole_field_x[env_cell];
             environment_field_y[cell] = dipole_field_y[env_cell];
             environment_field_z[cell] = dipole_field_z[env_cell];
-         //               std::cout << cell << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' << environment_field_z[cell] <<std::endl;
+
          }
    //      //end the FFT only compilation
          #endif

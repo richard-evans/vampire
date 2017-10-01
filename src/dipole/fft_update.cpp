@@ -55,9 +55,10 @@ namespace dipole{
       dp::num_macro_cells_y = static_cast<unsigned int>(ceil((cs::system_dimensions[1]+0.01)/cells::macro_cell_size[1]));
       dp::num_macro_cells_z = static_cast<unsigned int>(ceil((cs::system_dimensions[2]+0.01)/cells::macro_cell_size[2]));
 
+      //calcualtes 8 times number of cells
       dp::eight_num_cells = 8*dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z;
 
-
+      //initialises complex arrays to store the demag field array (in - N2xx0 and out N2xx etc.)
       dp::N2xx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
       dp::N2xy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
       dp::N2xz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
@@ -94,13 +95,13 @@ namespace dipole{
       dp::Hy_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
       dp::Hz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-      //   std::cout << "b" <<std::endl;
 
-      for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++)
+      //initialises all in components of the demag tensor to 0
+      for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++)
       {
-          for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++)
+          for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++)
           {
-            for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++)
+            for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++)
             {
                 int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
                   dp::N2xx0[id][0]=0;
@@ -139,6 +140,7 @@ namespace dipole{
           }
       }
 
+      //calculates the demag tensor
       double ii,jj,kk;
          for(int i=0;i<dp::num_macro_cells_x*2;i++){
             if (i >= dp::num_macro_cells_x) ii = i - 2*dp::num_macro_cells_x;
@@ -154,7 +156,7 @@ namespace dipole{
                      const double rx = ii*cells::macro_cell_size[0]; // Angstroms
                      const double ry = jj*cells::macro_cell_size[1];
                      const double rz = kk*cells::macro_cell_size[2];
-                  //   std::cout << "r" << rx << '\t' << ry << '\t' << rz << "\t" << cells::macro_cell_size << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
+;
                      const double rij = 1.0/pow(rx*rx+ry*ry+rz*rz,0.5);
 
                      const double ex = rx*rij;
@@ -162,23 +164,20 @@ namespace dipole{
                      const double ez = rz*rij;
 
                      const double rij3 = rij*rij*rij; // Angstroms
-                  // std::cout << "r" << rx << '\t' << ry << '\t' << rz << "\t" << cell_size[0] << '\t' << rij << '\t' << rij3 << '\t' << ex << '\t' << ey << '\t' << ez <<std::endl;
+
                      int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
-                     dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
+
                      dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
                      dp::N2xy0[id][0] = (3.0*ex*ey      )*rij3;
                      dp::N2xz0[id][0] = (3.0*ex*ez      )*rij3;
 
-                     dp::N2yx0[id][0] = (3.0*ey*ex - 1.0)*rij3;
-                     dp::N2yy0[id][0] = (3.0*ey*ey      )*rij3;
+                     dp::N2yx0[id][0] = (3.0*ey*ex      )*rij3;
+                     dp::N2yy0[id][0] = (3.0*ey*ey - 1.0)*rij3;
                      dp::N2yz0[id][0] = (3.0*ey*ez      )*rij3;
 
-                     dp::N2zx0[id][0] = (3.0*ez*ex - 1.0)*rij3;
+                     dp::N2zx0[id][0] = (3.0*ez*ex      )*rij3;
                      dp::N2zy0[id][0] = (3.0*ez*ey      )*rij3;
-                     dp::N2zz0[id][0] = (3.0*ez*ez      )*rij3;
-
-
-            //   std::cout << 	i << '\t' << j << "\t" << k << '\t' << Nxx0[id][0] << '\t' << Nxy0[id][0] << '\t' << Nxz0[id][0] << '\t' << Nyy[id][0] << '\t' << Nyz0[id][0] << '\t' << Nzz0[id][0] <<std::endl;
+                     dp::N2zz0[id][0] = (3.0*ez*ez - 1.0)*rij3;
 
                   }
                }
@@ -210,6 +209,17 @@ namespace dipole{
          NzzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2zz0,dp::N2zz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzzP);
 
+         // fftw_destroy_plan(NxxP);
+         // fftw_destroy_plan(NxyP);
+         // fftw_destroy_plan(NxyP);
+         // fftw_destroy_plan(NyxP);
+         // fftw_destroy_plan(NyxP);
+         // fftw_destroy_plan(NyxP);
+         // fftw_destroy_plan(NzxP);
+         // fftw_destroy_plan(NzyP);
+         // fftw_destroy_plan(NzzP);
+
+         std::cerr << "demag::fft_update has been initalised " <<std::endl;
       }
      #endif
    }
@@ -223,10 +233,10 @@ namespace dipole{
          terminaltextcolor(WHITE);
       }
 
-
-      for (int i=0 ; i<dp::num_macro_cells_x ; i++){
-         for (int j=0 ; j<dp::num_macro_cells_y ; j++){
-            for (int k=0 ; k<dp::num_macro_cells_z ; k++){
+      //initalises all the M in and out and H in and out components to 0
+      for (int i=0 ; i<2*dp::num_macro_cells_x ; i++){
+         for (int j=0 ; j<2*dp::num_macro_cells_y ; j++){
+            for (int k=0 ; k<2*dp::num_macro_cells_z ; k++){
                int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
                Mx_in[id][0]=0;
                Mx_in[id][1]=0;
@@ -263,6 +273,7 @@ namespace dipole{
          }
       }
 
+      //sets magnetisation inside the system to 0
       int cell = 0;
       for (int i=0 ; i<dp::num_macro_cells_x; i++){
          for (int j=0 ; j<dp::num_macro_cells_y; j++){
@@ -271,9 +282,7 @@ namespace dipole{
                Mx_in[id][0] = cells::mag_array_x[cell]/9.27400915e-24;
                My_in[id][0] = cells::mag_array_y[cell]/9.27400915e-24;
                Mz_in[id][0] = cells::mag_array_z[cell]/9.27400915e-24;
-               //if (cell == 0) std::cout << "A" << Mx(i,j,k)[0]  << "\t" <<   My(i,j,k)[0]  << "\t" <<   Mz(i,j,k)[0]  << "\t" <<  std::endl;
 
-               //	std::cout << cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] << '\t' << Mx(i,j,k)[0] << '\t' << My(i,j,k)[0] << '\t' << Mz(i,j,k)[0] <<std::endl;
                cell ++;
 
             }
@@ -282,17 +291,21 @@ namespace dipole{
 
       fftw_plan MxP,MyP,MzP;
 
-      //std::cout << 'g' <<std::endl;
+      //fourier transform
       MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mx_in,dp::Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
       fftw_execute(MxP);
       MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::My_in,dp::My_out,FFTW_FORWARD,FFTW_ESTIMATE);
       fftw_execute(MyP);
       MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mz_in,dp::Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
       fftw_execute(MzP);
-      //std::cout << 'h' <<std::endl;
+
+      // fftw_destroy_plan(MxP);
+      // fftw_destroy_plan(MyP);
+      // fftw_destroy_plan(MzP);
+
 
       cell = 0;
-      // performs the converlusion between Nk and Mk
+      // performs the converlusion between N and M
       for (int i=0 ; i<2*dp::num_macro_cells_x ; i++){
          for (int j=0 ; j<2*dp::num_macro_cells_y ; j++){
             for (int k=0 ; k<2*dp::num_macro_cells_z ; k++){
@@ -331,20 +344,18 @@ namespace dipole{
       HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hz_in,dp::Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
       fftw_execute(HzP);
 
+      // fftw_destroy_plan(HxP);
+      // fftw_destroy_plan(HyP);
+      // fftw_destroy_plan(HzP);
 
       for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
-         //int i = dipole::internal::cells_local_cell_array[lc];
          int i = cells::cell_id_array[lc];
-         //std::cout << std::endl << "dipole::internal::cells_local_cell_array[lc] = " << i << std::endl;
-         //fprintf(stderr,"lc = %d, i = %d, x = %f y = %f z = %f M = %e on rank = %d\n",lc,i,dipole::internal::cells_pos_and_mom_array[4*i+0],dipole::internal::cells_pos_and_mom_array[4*i+1],dipole::internal::cells_pos_and_mom_array[4*i+2],dipole::internal::cells_pos_and_mom_array[4*i+3],vmpi::my_rank);
-
          if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
             const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
-            //         	const double self_demag = demag::prefactor*eightPI_three_cell_volume;
+            //const double self_demag = demag::prefactor*eightPI_three_cell_volume;
             double self_demag = eightPI_three_cell_volume;
-            //fprintf(stderr,"  $$$$$$$$$ dipole::internal::cells_volume_array[%d] = %f self_demag = %e on rank = %d\n",i,dipole::internal::cells_volume_array[i],self_demag,vmpi::my_rank);
 
             // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
             dipole::cells_field_array_x[i]=self_demag*(cells::mag_array_x[i]/9.27400915e-24);
@@ -358,7 +369,7 @@ namespace dipole{
       for (int i=0 ; i<dp::num_macro_cells_x ; i++){
          for (int j=0 ; j<dp::num_macro_cells_y ; j++){
             for (int k=0 ; k<dp::num_macro_cells_z ; k++){
-               //	if (cell ==0 && sim::time % 1000 == 0) std::cout << "cell field" << '\t' << sim::temperature << '\t'<< Hx(i,j,k)[0]/eight_num_cells << '\t' << Hy(i,j,k)[0]/eight_num_cells << '\t' << Hz(i,j,k)[0]/eight_num_cells << '\t' << std::endl;
+
                int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
                dipole::cells_field_array_x[cell] += Hx_out[id][0]/dp::eight_num_cells;
                dipole::cells_field_array_y[cell] += Hy_out[id][0]/dp::eight_num_cells;
@@ -366,14 +377,23 @@ namespace dipole{
                dipole::cells_field_array_x[cell] *= 9.27400915e-01;
                dipole::cells_field_array_y[cell] *= 9.27400915e-01;
                dipole::cells_field_array_z[cell] *= 9.27400915e-01;
-               //   if (cell ==0) std::cout << "cell field" << '\t' << sim::temperature << '\t'<< dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell] << '\t' << std::endl;
-
-               //	if (cell == 0)	std::cout << "fft" <<   '\t' << cell << '\t' << cells::num_cells << '\t' << dipole::cells_field_array_x[cell] <<  '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell] << std::endl;
-
                cell++;
             }
          }
       }
+
+      // fftw_free(Mx_out);
+      // fftw_free(My_out);
+      // fftw_free(Mz_out);
+      // fftw_free(Hx_out);
+      // fftw_free(Hy_out);
+   	// fftw_free(Hz_out);
+      // fftw_free(Mx_in);
+      // fftw_free(My_in);
+      // fftw_free(Mz_in);
+      // fftw_free(Hx_in);
+      // fftw_free(Hy_in);
+      // fftw_free(Hz_in);
 
 
    #endif

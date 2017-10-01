@@ -13,6 +13,7 @@
 // Vampire headers
 #include "micromagnetic.hpp"
 #include "cells.hpp"
+#include "../cells/internal.hpp"
 #include "internal.hpp"
 
 // micromagnetic module headers
@@ -77,21 +78,32 @@ namespace micromagnetic{
             // calculate reduced exchange constant factor
             const int cellj = macro_neighbour_list_array[j];
             const double mj = m_e[cellj];
-            const double Ac = A[cellj]*pow(mj,1.66);
+            double Ac = A[j]*pow(mj,1.66);
+            double zj = cells::cell_coords_array_z[cellj]/cells::internal::total_moment_array[cellj];
+            double zi = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell];
+            //std::cout << cell << '\t' << cellj << '\t' << zi << '\t' << zj << std::endl;
+            if (zj < 36 && zi > 40) {Ac = -0.02*Ac;}// std::cout << "neg" << std::endl;}
+            if (zi < 36 && zj > 40) {Ac = -0.02*Ac;}// std::cout << "neg" << std::endl;}
             exchange_field[0] -= Ac*(x_array[cellj]*m_e[cellj] - x_array[cell]*m_e[cell]);
             exchange_field[1] -= Ac*(y_array[cellj]*m_e[cellj] - y_array[cell]*m_e[cell]);
             exchange_field[2] -= Ac*(z_array[cellj]*m_e[cellj] - z_array[cell]*m_e[cell]);
+
+
+
          }
+
       }
+
 
       //calcualtes thesigma values
       double sigma_para = sqrt(2*kB*temperature*alpha_para[cell]/(ms[cell]*mp::dt));
       double sigma_perp = sqrt(2*kB*temperature*(alpha_perp[cell]-alpha_para[cell])/(mp::dt*ms[cell]*alpha_perp[cell]*alpha_perp[cell]));
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] = one_o_chi_perp[cell]*m[0]*m_e[cell] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0] + sigma_para*mtrandom::gaussian();
-      spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian();
-      spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian();
+      spin_field[0] = one_o_chi_perp[cell]*m[0]*m_e[cell] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];;
+      spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];;
+      spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];;
+
 
       return spin_field;
 

@@ -14,7 +14,7 @@
 #include "micromagnetic.hpp"
 #include "cells.hpp"
 #include "internal.hpp"
-
+#include "../cells/internal.hpp"
 // micromagnetic module headers
 #include <stdlib.h>
 #include <vector>
@@ -73,7 +73,6 @@ namespace micromagnetic{
 
       double exchange_field[3]={0.0,0.0,0.0};
       if (num_cells > 1){
-         int j2 = cell*num_cells;
 
          //loops over all other cells with interactions to this cell
          const int start = macro_neighbour_list_start_index[cell];
@@ -83,18 +82,31 @@ namespace micromagnetic{
             // calculate reduced exchange constant factor
             const int cellj = macro_neighbour_list_array[j];
             const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
-            const double Ac = A[cellj]*pow(mj,1.66);
+            double Ac = A[j]*pow(mj,1.66);
+            //std::cout << cell << '\t' << cellj << '\t' << mj << '\t' << A[j] <<std::endl;
+            double zj = cells::cell_coords_array_z[cellj]/cells::internal::total_moment_array[cellj];
+            double zi = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell];
+            //std::cout << cell << '\t' << cellj << '\t' << zi << '\t' << zj << std::endl;
+            if (zj < 31 && zi > 50) {Ac = -0.1*Ac;}// std::cout << "neg" << std::endl;}
+            if (zi < 31 && zj > 50) {Ac = -0.1*Ac;}// std::cout << "neg" << std::endl;}
+
+      //if (zj < 140 && zi > 150)   std::cout << cell << '\t' << cellj << '\t' << Ac << '\t' << x_array[cellj] - x_array[cell] << "\t" << exchange_field[0] <<"\t" << exchange_field[1] <<"\t" << exchange_field[2] << std::endl;
+      //else std::cout << "A" << cell << '\t' << cellj << '\t' << Ac << '\t' << x_array[cellj] - x_array[cell] << "\t" << exchange_field[0] <<"\t" << exchange_field[1] <<"\t" << exchange_field[2] << std::endl;
             exchange_field[0] -= Ac*(x_array[cellj] - x_array[cell]);
             exchange_field[1] -= Ac*(y_array[cellj] - y_array[cell]);
             exchange_field[2] -= Ac*(z_array[cellj] - z_array[cell]);
+
+
          }
       }
+   //   std::cin.get();
 
+//if (exchange_field[0] != exchange_field[0]) std::cin.get();
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] = pf*m[0] - one_o_chi_perp[cell]*m[0] + ext_field[0] + exchange_field[0];// +pinning_field_x[cell];// + cells::field_array_x[cell];
-      spin_field[1] = pf*m[1] - one_o_chi_perp[cell]*m[1] + ext_field[1] + exchange_field[1];// + pinning_field_y[cell];// + cells::field_array_y[cell];
-      spin_field[2] = pf*m[2]                             + ext_field[2] + exchange_field[2];// + pinning_field_z[cell];// + cells::field_array_z[cell];
+      spin_field[0] = pf*m[0] + exchange_field[0] + pinning_field_x[cell] + ext_field[0] ;//- one_o_chi_perp[cell]*m[0] + ext_field[0] + exchange_field[0];// + pinning_field_x[cell];// + cells::field_array_x[cell];
+      spin_field[1] = pf*m[1] + exchange_field[1] + pinning_field_y[cell] + ext_field[1] ;//- one_o_chi_perp[cell]*m[1] + ext_field[1] + exchange_field[1];// + pinning_field_y[cell];// + cells::field_array_y[cell];
+      spin_field[2] = pf*m[2] + exchange_field[2] + pinning_field_z[cell] + ext_field[2] ;//                          + ext_field[2] + exchange_field[2];// + pinning_field_z[cell];// + cells::field_array_z[cell];
 
       //if environment is enabled add the environment field.
 

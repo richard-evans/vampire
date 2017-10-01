@@ -175,10 +175,10 @@ namespace environment{
 
          for (int mm_cell = 0 ; mm_cell < cells::num_cells; mm_cell++){
             for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
-               std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;
+            //   std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;
                if (abs(x_m_max[mm_cell] - x_max[env_cell]) < 2){
                   neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
-                  std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;
+            //      std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;
                }
             //   if (abs(x_m_min[mm_cell] - x_min[env_cell]) < cells::macro_cell_size[0]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
             //   if (abs(x_m_min[mm_cell] - x_max[env_cell]) < cells::macro_cell_size[0]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
