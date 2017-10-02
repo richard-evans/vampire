@@ -836,12 +836,5 @@ void multiscale_simulation_steps(int n_steps){
                //incremenet time
                sim::increment_time();
             }
-            std::ofstream pfile;
-            pfile.open("cell_config2");
 
-            for (int lc = 0; lc < cells::num_local_cells; lc++){
-               int cell = cells::local_cell_array[lc];
-               //pfile2 << cell << '\t' << cells::cell_coords_array_x[cell] << '\t' << cells::cell_coords_array_y[cell] << '\t' << cells::cell_coords_array_z[cell] << '\t' <<cells::mag_array_x[cell] <<
-               pfile << cells::cell_coords_array_x[cell]/cells::internal::total_moment_array[cell] << "\t"<< cells::cell_coords_array_y[cell]/cells::internal::total_moment_array[cell] << "\t"<< cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell] <<  '\t' << cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] << '\t' << std::endl;
-            }
          }

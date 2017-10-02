@@ -181,6 +181,11 @@ namespace dipole{
       void initialize_fft_solver();
 
       //-----------------------------------------------------------------------------
+      // Function to finalize FFT solver and release memory
+      //-----------------------------------------------------------------------------
+      void finalize_fft_solver();
+
+      //-----------------------------------------------------------------------------
       // Function to send receive cells data to other cpus
       //-----------------------------------------------------------------------------
       int send_recv_cells_data(std::vector<int>& proc_cell_index_array1D,

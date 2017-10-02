@@ -30,6 +30,7 @@
 
 
 #include "create.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "material.hpp"
 #include "sim.hpp"
@@ -151,6 +152,9 @@ int main(int argc, char* argv[]){
 
    // Simulate system
    sim::run();
+
+   // finalise dipole module
+   dipole::finalize();
 
    // Finalise MPI
    #ifdef MPICF
