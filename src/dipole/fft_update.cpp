@@ -170,46 +170,7 @@ void initialize_fft_solver(){
       // Calculate the dipole tensor between cells (assumes translational invariance for FFT)
       //--------------------------------------------------------------------------------------
       double ii,jj,kk;
-<<<<<<< HEAD
-         for(int i=0;i<dp::num_macro_cells_x*2;i++){
-            if (i >= dp::num_macro_cells_x) ii = i - 2*dp::num_macro_cells_x;
-            else ii = i;
-            for(int j=0;j<dp::num_macro_cells_y*2;j++){
-               if (j >= dp::num_macro_cells_y) jj = j - 2*dp::num_macro_cells_y;
-               else jj = j;
-               for(int k=0;k<dp::num_macro_cells_z*2;k++){
-                  if (k>= dp::num_macro_cells_z) kk = k - 2*dp::num_macro_cells_z;
-                  else kk = k;
-                  if((ii!=jj) && (jj != kk)){
 
-                     const double rx = ii*cells::macro_cell_size[0]; // Angstroms
-                     const double ry = jj*cells::macro_cell_size[1];
-                     const double rz = kk*cells::macro_cell_size[2];
-;
-                     const double rij = 1.0/pow(rx*rx+ry*ry+rz*rz,0.5);
-
-                     const double ex = rx*rij;
-                     const double ey = ry*rij;
-                     const double ez = rz*rij;
-
-                     const double rij3 = rij*rij*rij; // Angstroms
-
-                     //int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
-                     int id = (i*2*dp::num_macro_cells_y+j)*2*dp::num_macro_cells_z+k;
-                     dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
-                     dp::N2xy0[id][0] = (3.0*ex*ey      )*rij3;
-                     dp::N2xz0[id][0] = (3.0*ex*ez      )*rij3;
-
-                     dp::N2yx0[id][0] = (3.0*ey*ex      )*rij3;
-                     dp::N2yy0[id][0] = (3.0*ey*ey - 1.0)*rij3;
-                     dp::N2yz0[id][0] = (3.0*ey*ez      )*rij3;
-
-                     dp::N2zx0[id][0] = (3.0*ez*ex      )*rij3;
-                     dp::N2zy0[id][0] = (3.0*ez*ey      )*rij3;
-                     dp::N2zz0[id][0] = (3.0*ez*ez - 1.0)*rij3;
-
-                  }
-=======
       // perform a triple loop over all macrocells in x,y,z
       for(int i = 0; i < dp::num_macro_cells_x*2; i++){
 
@@ -264,7 +225,6 @@ void initialize_fft_solver(){
                   dp::N2zy0[id][0] = (3.0*ez*ey      )*irij3;
                   dp::N2zz0[id][0] = (3.0*ez*ez - 1.0)*irij3;
 
->>>>>>> richard/environment
                }
             }
          }
@@ -322,53 +282,12 @@ void initialize_fft_solver(){
 
       zlog << zTs() << "dipole field calulation with FFT has been initalised " << std::endl;
 
-<<<<<<< HEAD
-         // fft calculations
-         fftw_plan NxxP,NxyP,NxzP,NyxP,NyyP,NyzP,NzxP,NzyP,NzzP;
-
-
-          //deterines the forward transform for the N arrays
-         NxxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2xx0,dp::N2xx,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NxxP);
-         NyxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2yx0,dp::N2yx,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NyxP);
-         NzxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2zx0,dp::N2zx,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NzxP);
-         NxyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2xy0,dp::N2xy,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NxyP);
-         NyyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2yy0,dp::N2yy,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NyyP);
-         NzyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2zy0,dp::N2zy,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NzyP);
-         NxzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2xz0,dp::N2xz,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NxzP);
-         NyzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2yz0,dp::N2yz,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NyzP);
-         NzzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::N2zz0,dp::N2zz,FFTW_FORWARD,FFTW_ESTIMATE);
-         fftw_execute(NzzP);
-
-         // fftw_destroy_plan(NxxP);
-         // fftw_destroy_plan(NxyP);
-         // fftw_destroy_plan(NxzP);
-         // fftw_destroy_plan(NyxP);
-         // fftw_destroy_plan(NyyP);
-         // fftw_destroy_plan(NyzP);
-         // fftw_destroy_plan(NzxP);
-         // fftw_destroy_plan(NzyP);
-         // fftw_destroy_plan(NzzP);
-
-         std::cerr << "demag::fft_update has been initalised " <<std::endl;
-      }
-     #endif
-=======
->>>>>>> richard/environment
-   }
-   #endif
 
    //--------------------------------------------------------------------------------------
    // Calulate FFT of dipole tensor FFT(N) -> result N2xx etc
    //--------------------------------------------------------------------------------------
-
+   }
+        #endif
    return;
 
 }
@@ -476,19 +395,13 @@ void update_field_fft(){
    // Perform the convolution between N and M [ FFT(N) . FFT(M) ]
    //---------------------------------------------------------------------------
 
-<<<<<<< HEAD
-               int id = (i*2*dp::num_macro_cells_y+j)*2*dp::num_macro_cells_z+k;
-               Hx_in[id][0] = dp::N2xx[id][0]*dp::Mx_out[id][0] + dp::N2xy[id][0]*dp::My_out[id][0] + dp::N2xz[id][0]*dp::Mz_out[id][0]; //summing the real part
-               Hx_in[id][0] -= (dp::N2xx[id][1]*dp::Mx_out[id][1] + dp::N2xy[id][1]*dp::My_out[id][1] + dp::N2xz[id][1]*dp::Mz_out[id][1]);
-=======
    // loop over all cells in x,y,z
    for (int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
       for (int j = 0 ; j < 2*dp::num_macro_cells_y ; j++){
          for (int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
->>>>>>> richard/environment
 
             // calculate array index
-            int id = (i*2*dp::num_macro_cells_y + j)*2*dp::num_macro_cells_z + k;
+            int id = ((i*2*dp::num_macro_cells_y + j)*2*dp::num_macro_cells_z) + k;
 
             Hx_in[id][0]  =  dp::N2xx[id][0] * dp::Mx_out[id][0] + dp::N2xy[id][0] * dp::My_out[id][0] + dp::N2xz[id][0] * dp::Mz_out[id][0]; //summing the real part
             Hx_in[id][0] -= (dp::N2xx[id][1] * dp::Mx_out[id][1] + dp::N2xy[id][1] * dp::My_out[id][1] + dp::N2xz[id][1] * dp::Mz_out[id][1]);
@@ -593,7 +506,7 @@ void update_field_fft(){
 // Function to finalize FFT solver and release memory
 //-----------------------------------------------------------------------------
 void finalize_fft_solver(){
-
+#ifdef FFT
    // Print informative message to log file and screen
    std::cout << "Deallocating memory for FFT dipole calculation" << std::endl;
    zlog << zTs() << "Deallocating memory for FFT dipole calculation" << std::endl;
@@ -631,6 +544,8 @@ void finalize_fft_solver(){
    fftw_free(dp::N2zy0);
    fftw_free(dp::N2zz0);
 
+#endif
+std::cout << "A" <<std::endl;
    return;
 
 }
