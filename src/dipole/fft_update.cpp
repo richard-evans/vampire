@@ -165,8 +165,8 @@ namespace dipole{
 
                      const double rij3 = rij*rij*rij; // Angstroms
 
-                     int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
-
+                     //int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
+                     int id = (i*2*dp::num_macro_cells_y+j)*2*dp::num_macro_cells_z+k;
                      dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
                      dp::N2xy0[id][0] = (3.0*ex*ey      )*rij3;
                      dp::N2xz0[id][0] = (3.0*ex*ez      )*rij3;
@@ -211,10 +211,10 @@ namespace dipole{
 
          // fftw_destroy_plan(NxxP);
          // fftw_destroy_plan(NxyP);
-         // fftw_destroy_plan(NxyP);
+         // fftw_destroy_plan(NxzP);
          // fftw_destroy_plan(NyxP);
-         // fftw_destroy_plan(NyxP);
-         // fftw_destroy_plan(NyxP);
+         // fftw_destroy_plan(NyyP);
+         // fftw_destroy_plan(NyzP);
          // fftw_destroy_plan(NzxP);
          // fftw_destroy_plan(NzyP);
          // fftw_destroy_plan(NzzP);
@@ -310,7 +310,7 @@ namespace dipole{
          for (int j=0 ; j<2*dp::num_macro_cells_y ; j++){
             for (int k=0 ; k<2*dp::num_macro_cells_z ; k++){
 
-               int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
+               int id = (i*2*dp::num_macro_cells_y+j)*2*dp::num_macro_cells_z+k;
                Hx_in[id][0] = dp::N2xx[id][0]*dp::Mx_out[id][0] + dp::N2xy[id][0]*dp::My_out[id][0] + dp::N2xz[id][0]*dp::Mz_out[id][0]; //summing the real part
                Hx_in[id][0] -= (dp::N2xx[id][1]*dp::Mx_out[id][1] + dp::N2xy[id][1]*dp::My_out[id][1] + dp::N2xz[id][1]*dp::Mz_out[id][1]);
 

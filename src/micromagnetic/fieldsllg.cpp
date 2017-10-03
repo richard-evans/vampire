@@ -21,6 +21,7 @@
 #include <vector>
 #include "errors.hpp"
 #include "vio.hpp"
+#include "sim.hpp"
 #include "random.hpp"
 
 namespace micromagnetic{
@@ -82,8 +83,17 @@ namespace micromagnetic{
             double zj = cells::cell_coords_array_z[cellj]/cells::internal::total_moment_array[cellj];
             double zi = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell];
             //std::cout << cell << '\t' << cellj << '\t' << zi << '\t' << zj << std::endl;
-            if (zj < 36 && zi > 40) {Ac = -0.02*Ac;}// std::cout << "neg" << std::endl;}
-            if (zi < 36 && zj > 40) {Ac = -0.02*Ac;}// std::cout << "neg" << std::endl;}
+            int mat  = cell_material_array[cell];
+            int matj =cell_material_array[cellj];
+            if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
+               if (mat != matj){
+                  //Ac = (1.0/(m_e_squared))*pow(mj,1.66)*vin::read_material[mat].SAF[matj]*(2.0/mm::Ms[cell]*cells::macro_cell_size[0]*cells::macro_cell_size[1]);
+                  Ac = (1.0/(m_e_squared))*pow(mj,1.66)*(2.0/(ms[cell]*cells::macro_cell_size[0]*cells::macro_cell_size[1]));
+                  Ac = mp::material[mat].SAF[matj]*Ac;//*cells::macro_cell_size[0]*cells::macro_cell_size[1];
+            //      std::cout <<zi << '\t' << zj <<  "\t" <<"neg" <<std::endl;
+               }
+            }
+         //   std::cout <<zi << '\t' << zj << "\t" <<  Ac<<std::endl;
             exchange_field[0] -= Ac*(x_array[cellj]*m_e[cellj] - x_array[cell]*m_e[cell]);
             exchange_field[1] -= Ac*(y_array[cellj]*m_e[cellj] - y_array[cell]*m_e[cell]);
             exchange_field[2] -= Ac*(z_array[cellj]*m_e[cellj] - z_array[cell]*m_e[cell]);
@@ -100,11 +110,12 @@ namespace micromagnetic{
       double sigma_perp = sqrt(2*kB*temperature*(alpha_perp[cell]-alpha_para[cell])/(mp::dt*ms[cell]*alpha_perp[cell]*alpha_perp[cell]));
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] = one_o_chi_perp[cell]*m[0]*m_e[cell] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];;
-      spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];;
-      spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];;
+      spin_field[0] = one_o_chi_perp[cell]*m[0]*m_e[cell] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell] + sim::track_field_x[cell];
+      spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell] + sim::track_field_y[cell];
+      spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell] + sim::track_field_z[cell];
 
-
+      if (spin_field[0] != spin_field[0]) std::cin.get();
+      //std::cout << ms[cell] << '\t' <<spin_field[0] << '\t' << sim::track_field_y[cell] <<std::endl;
       return spin_field;
 
    }

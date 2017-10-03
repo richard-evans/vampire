@@ -39,7 +39,6 @@ namespace micromagnetic{
    int number_of_micromagnetic_cells = 0;
 
 
-
    //is the discretisation of each cell microamgnetic or atomistic
    std::vector < bool > cell_discretisation_micromagnetic;
 
@@ -85,8 +84,10 @@ namespace micromagnetic{
       std::vector<double> alpha_para;
       std::vector<double> alpha_perp;
 
-      bool mm_correction;
+      std::vector <double> cell_material_array;
 
+      bool mm_correction;
+      double pinning_field_height;
       std::vector <double> pinning_field_x;
       std::vector <double> pinning_field_y;
       std::vector <double> pinning_field_z;

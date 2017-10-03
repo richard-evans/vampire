@@ -74,7 +74,6 @@ namespace environment{
          //convert Ms from input to Ms = ms.V and Ku = ku.V
 
          env::Ms = env::Ms*env::cell_volume;
-
          env::ku = -env::ku*env::cell_volume;
 
          //resize arrays
