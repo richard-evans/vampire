@@ -6,6 +6,7 @@
 dipole_objects =\
 data.o \
 field.o \
+finalize.o \
 fft_update.o \
 initialize.o \
 interface.o \

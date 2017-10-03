@@ -17,6 +17,7 @@ export OMPI_CXX=g++ -std=c++0x
 
 
 #ifdef FFT
+<<<<<<< HEAD
 ICC=icc -DCOMP='"Intel C++ Compiler"' -DFFT
 GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' -DFFT
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"' -DFFT
@@ -34,6 +35,25 @@ LIBS=-lstdc++ -lm -lfftw3
 #PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 #IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 #MPICC=mpicxx -DMPICF
+=======
+#ICC=icc -DCOMP='"Intel C++ Compiler"' -DFFT
+#GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' -DFFT
+LLVM=g++ -DCOMP='"LLVM C++ Compiler"' -DFFT
+#PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DFFT
+#IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DFFT
+#MPICC=mpicxx -DMPICF -DFFT
+
+LIBS=-lstdc++ -lm -lfftw3 -L/opt/local/lib/
+
+#endif
+#ifndef FFT
+ICC=icc -DCOMP='"Intel C++ Compiler"'
+GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
+#LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+MPICC=mpicxx -DMPICF
+>>>>>>> richard/environment
 
 #LIBS=-lstdc++ -lm
 
@@ -46,7 +66,7 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-
+INC=-I/opt/local/include/
 
 
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
@@ -214,7 +234,7 @@ serial-llvm: $(LLVM_OBJECTS)
 	$(LLVM) $(LLVM_LDFLAGS) $(LIBS) $(LLVM_OBJECTS) -o $(EXECUTABLE)
 
 $(LLVM_OBJECTS): obj/%_llvm.o: src/%.cpp
-	$(LLVM) -c -o $@ $(LLVM_CFLAGS) $<
+	$(LLVM) -c -o $@ $(INC) $(LLVM_CFLAGS) $<
 
 serial-ibm: $(IBM_OBJECTS)
 	$(IBM) $(IBM_LDFLAGS) $(IBM_OBJECTS) -o $(EXECUTABLE)
