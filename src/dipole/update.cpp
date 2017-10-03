@@ -59,9 +59,9 @@ namespace dipole{
             double self_demag = eightPI_three_cell_volume;
 
             // Normalise cell magnetisation by the Bohr magneton
-            double mx_i = cells::mag_array_x[i]*imuB;
-            double my_i = cells::mag_array_y[i]*imuB;
-            double mz_i = cells::mag_array_z[i]*imuB;
+            const double mx_i = cells::mag_array_x[i]*imuB;
+            const double my_i = cells::mag_array_y[i]*imuB;
+            const double mz_i = cells::mag_array_z[i]*imuB;
 
             // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
             dipole::cells_field_array_x[i]=self_demag * mx_i;
