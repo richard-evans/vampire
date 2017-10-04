@@ -44,6 +44,9 @@ namespace dipole{
 			terminaltextcolor(WHITE);
 		}
 
+      // Define constant imuB = 1/muB to normalise to unitarian values the cell magnetisation
+      const double imuB = 1.0/9.27400915e-24;
+
 		// loop over local cells
     	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
@@ -51,26 +54,32 @@ namespace dipole{
 
         	if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
+            // Self demagnetisation factor multiplying m(i)
             const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
             double self_demag = eightPI_three_cell_volume;
 
-            // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V and normalise cells magnetisation by Bohr magneton
-            dipole::cells_field_array_x[i]=self_demag*(cells::mag_array_x[i]/9.27400915e-24);
-            dipole::cells_field_array_y[i]=self_demag*(cells::mag_array_y[i]/9.27400915e-24);
-            dipole::cells_field_array_z[i]=self_demag*(cells::mag_array_z[i]/9.27400915e-24);
+            // Normalise cell magnetisation by the Bohr magneton
+            const double mx_i = cells::mag_array_x[i]*imuB;
+            const double my_i = cells::mag_array_y[i]*imuB;
+            const double mz_i = cells::mag_array_z[i]*imuB;
+
+            // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
+            dipole::cells_field_array_x[i]=self_demag * mx_i;
+            dipole::cells_field_array_y[i]=self_demag * my_i;
+            dipole::cells_field_array_z[i]=self_demag * mz_i;
             // Add self demag to Hdemag --> To get only dipole-dipole contribution comment this and initialise to zero
-            dipole::cells_mu0Hd_field_array_x[i]=-0.5*self_demag*(cells::mag_array_x[i]/9.27400915e-24);//*1.0e-30
-            dipole::cells_mu0Hd_field_array_y[i]=-0.5*self_demag*(cells::mag_array_y[i]/9.27400915e-24);//*1.0e-30
-            dipole::cells_mu0Hd_field_array_z[i]=-0.5*self_demag*(cells::mag_array_z[i]/9.27400915e-24);//*1.0e-30
+            dipole::cells_mu0Hd_field_array_x[i]=-0.5*self_demag * mx_i;
+            dipole::cells_mu0Hd_field_array_y[i]=-0.5*self_demag * my_i;
+            dipole::cells_mu0Hd_field_array_z[i]=-0.5*self_demag * mz_i;
 
             // Loop over all other cells to calculate contribution to local cell
             for(int j=0;j<dipole::internal::cells_num_cells;j++){
          	   if(dipole::internal::cells_num_atoms_in_cell[j]>0){
 
                   // Normalise the cell magnetisation by the Bohr magneton
-         		   const double mx = cells::mag_array_x[j]/9.27400915e-24;
-         		   const double my = cells::mag_array_y[j]/9.27400915e-24;
-         		   const double mz = cells::mag_array_z[j]/9.27400915e-24;
+         		   const double mx = cells::mag_array_x[j]*imuB;
+         		   const double my = cells::mag_array_y[j]*imuB;
+         		   const double mz = cells::mag_array_z[j]*imuB;
 
 //std::cout << "Multi" <<'\t' << mx << '\t' << internal::rij_tensor_xx[lc][j]  << '\t' << my << '\t' << internal::rij_tensor_xy[lc][j] <<'\t' << mz << '\t' << internal::rij_tensor_xz[lc][j] << std::endl;
              		dipole::cells_field_array_x[i]+=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
@@ -93,6 +102,7 @@ namespace dipole{
             dipole::cells_mu0Hd_field_array_x[i] = dipole::cells_mu0Hd_field_array_x[i] * 9.27400915e-01;
             dipole::cells_mu0Hd_field_array_y[i] = dipole::cells_mu0Hd_field_array_y[i] * 9.27400915e-01;
             dipole::cells_mu0Hd_field_array_z[i] = dipole::cells_mu0Hd_field_array_z[i] * 9.27400915e-01;
+
      		}
     	}
 	} // end of dipole::internal::update_field() function
