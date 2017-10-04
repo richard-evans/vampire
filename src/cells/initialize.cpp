@@ -203,12 +203,6 @@ namespace cells{
          // Consider only magnetic elements
          if(mp::material[type].non_magnetic==0){
 
-            // which one are we keeping here - re?
-            cells::cell_coords_array_x[local_cell]+=atom_coords_x[atom]*mus;
-            cells::cell_coords_array_y[local_cell]+=atom_coords_y[atom]*mus;
-            cells::cell_coords_array_z[local_cell]+=atom_coords_z[atom]*mus;
-            cells::internal::total_moment_array[local_cell]+=mus;
-
             cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+1] += atom_coords_y[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+2] += atom_coords_z[atom]*mus;

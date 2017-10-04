@@ -76,9 +76,9 @@ namespace dipole{
 
             for (int lc = 0; lc < cells::num_local_cells; lc++){
                int cell = cells::local_cell_array[lc];
-               pfile << cell << '\t' << cells::cell_coords_array_x[cell] << '\t' <<
-                                         cells::cell_coords_array_y[cell] << '\t' <<
-                                         cells::cell_coords_array_z[cell] << '\t' <<
+               pfile << cell << '\t' << cells::pos_and_mom_array[4*cell+0] << '\t' <<
+                                         cells::pos_and_mom_array[4*cell+1] << '\t' <<
+                                         cells::pos_and_mom_array[4*cell+2] << '\t' <<
                                          cells::mag_array_x[cell] << '\t' <<
                                          cells::mag_array_y[cell] << '\t' <<
                                          cells::mag_array_z[cell] << '\t' <<
