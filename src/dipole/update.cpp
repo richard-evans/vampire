@@ -45,7 +45,7 @@ namespace dipole{
 		}
 
       // Define constant imuB = 1/muB to normalise to unitarian values the cell magnetisation
-      const double imuB = 1.0/9.274009994e-24;
+      const double imuB = 1.0/9.27400915e-24;
 
 		// loop over local cells
     	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
@@ -92,14 +92,14 @@ namespace dipole{
             }
             // Multiply the cells B-field by mu_B * mu_0/(4*pi) /1e-30  <-- (9.27400915e-24 * 1e-7 / 1e30)
             // where the last term accounts for the fact that the volume was calculated in Angstrom
-            dipole::cells_field_array_x[i] = dipole::cells_field_array_x[i] * 9.274009994e-01;
-            dipole::cells_field_array_y[i] = dipole::cells_field_array_y[i] * 9.274009994e-01;
-            dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.274009994e-01;
+            dipole::cells_field_array_x[i] = dipole::cells_field_array_x[i] * 9.27400915e-01;
+            dipole::cells_field_array_y[i] = dipole::cells_field_array_y[i] * 9.27400915e-01;
+            dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.27400915e-01;
             // Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
             // of magnetisation and volume in angstrom
-            dipole::cells_mu0Hd_field_array_x[i] = dipole::cells_mu0Hd_field_array_x[i] * 9.274009994e-01;
-            dipole::cells_mu0Hd_field_array_y[i] = dipole::cells_mu0Hd_field_array_y[i] * 9.274009994e-01;
-            dipole::cells_mu0Hd_field_array_z[i] = dipole::cells_mu0Hd_field_array_z[i] * 9.274009994e-01;
+            dipole::cells_mu0Hd_field_array_x[i] = dipole::cells_mu0Hd_field_array_x[i] * 9.27400915e-01;
+            dipole::cells_mu0Hd_field_array_y[i] = dipole::cells_mu0Hd_field_array_y[i] * 9.27400915e-01;
+            dipole::cells_mu0Hd_field_array_z[i] = dipole::cells_mu0Hd_field_array_z[i] * 9.27400915e-01;
      		}
     	}
 	} // end of dipole::internal::update_field() function
