@@ -195,7 +195,7 @@ namespace environment{
             }
          }
 
-         //adds all cells whichc are not within the atomistic section to the the none atomsitic cells list or the atomistic cells list
+         //adds all cells which are not within the atomistic section to the the none atomsitic cells list or the atomistic cells list
          for (int cell = 0; cell < env::num_cells; cell++){
             if (env::env_cell_is_in_atomistic_region[cell] == 0.0){
                env::none_atomistic_cells.push_back(cell);
@@ -315,7 +315,7 @@ namespace environment{
             double pos_x = env::cell_coords_array_x[env_cell];
             double pos_y = env::cell_coords_array_y[env_cell];
             double pos_z = env::cell_coords_array_z[env_cell];
-            std::cout << "A" << pos_x << '\t' << pos_y << '\t' << pos_z << '\t' <<x << '\t' << y << '\t' << z << '\t' << mm_cell << '\t' << env_cell << '\t' << overlap << std::endl;
+      //      std::cout << "A" << pos_x << '\t' << pos_y << '\t' << pos_z << '\t' <<x << '\t' << y << '\t' << z << '\t' << mm_cell << '\t' << env_cell << '\t' << overlap << std::endl;
          }
 
          return;

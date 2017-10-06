@@ -88,15 +88,17 @@ namespace micromagnetic{
             int matj =cell_material_array[cellj];
             if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
                if (mat != matj){
-                  //Ac = (1.0/(m_e_squared))*pow(mj,1.66)*vin::read_material[mat].SAF[matj]*(2.0/mm::Ms[cell]*cells::macro_cell_size[0]*cells::macro_cell_size[1]);
-                  Ac = (1.0/(m_e_squared))*pow(mj,1.66)*(2.0/(ms[cell]*cells::macro_cell_size[0]*cells::macro_cell_size[1]));
-                  Ac = mp::material[mat].SAF[matj]*Ac;//*cells::macro_cell_size[0]*cells::macro_cell_size[1];
-            //      std::cout << zi << '\t' << zj <<  "\t" <<"neg" <<std::endl;
+                  double Area = cells::macro_cell_size[0]*cells::macro_cell_size[1];
+                 Ac = -pow(mj,1.66)*Area*mp::material[mat].SAF[matj]/ms[cell];
+                 if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
+
+//                  std::cout << Ac << '\t' << ms[cell] << '\t' << mp::material[mat].SAF[matj] << '\t' << A[j] << "\t" << cells::macro_cell_size[0] << std::endl;
+
                }
             }
 
 
-         //   std::cout <<zi << '\t' << zj << "\t" <<  Ac<<std::endl;
+
             exchange_field[0] -= Ac*(x_array[cellj]*m_e[cellj] - x_array[cell]*m_e[cell]);
             exchange_field[1] -= Ac*(y_array[cellj]*m_e[cellj] - y_array[cell]*m_e[cell]);
             exchange_field[2] -= Ac*(z_array[cellj]*m_e[cellj] - z_array[cell]*m_e[cell]);

@@ -153,7 +153,7 @@ int init(){
 		unit[44]="J/m";		conversion[44]=1.0E-10; 			type[44]="exchange";		// Joules/metres squared
     	unit[45]="erg/cm";	conversion[45]=1.0E-15; 			type[45]="exchange";		// erg/cm squared
 
-	 	unit[46]="mJ/cm2";	conversion[46]=1.0e-3/1.0e16; 	type[46]="mm_energy";		// mJ/cm2 squared to J/A2
+	 	unit[46]="erg/cm2";	conversion[46]=1.0e-23; 	type[46]="mm_energy";		// erg/cm2 squared to J/A2
 
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag

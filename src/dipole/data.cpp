@@ -24,7 +24,6 @@ namespace dipole{
    int update_rate=100; /// timesteps between updates
    bool activated=false;
    bool fft = false;
-
    // define arrays for B-field
    std::vector < double > cells_field_array_x;
    std::vector < double > cells_field_array_y;
@@ -51,6 +50,8 @@ namespace dipole{
       //------------------------------------------------------------------------
       bool initialised=false;
 
+      fftw_plan MxP,MyP,MzP;
+      fftw_plan HxP,HyP,HzP;
 
       int update_time=-1; /// last update time
 

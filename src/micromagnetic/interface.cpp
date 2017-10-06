@@ -145,8 +145,8 @@ namespace micromagnetic{
       test="pinning-field-strength";
       if(word==test){
          double K=atof(value.c_str());
+         vin::check_for_valid_value(K, word, line, prefix, unit, "mm_energy", 1e-28, 10*1.0e-10,"material"," 0.000000 - 1");
          vin::read_material[super_index].pinning_field_strength = K;
-         //std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
          return true;
       }
 
@@ -168,7 +168,7 @@ namespace micromagnetic{
       test="SAF-exchange-coupling"; // new and preferred form
       if( (word == test)){
          double J = atof(value.c_str());
-         vin::check_for_valid_value(J, word, line, prefix, unit, "mm_energy", 0.0001*1.0e-3/1.0e16, 10*1.0e-3/1.0e16,"material"," 0.00001 - 10");
+         vin::check_for_valid_value(J, word, line, prefix, unit, "mm_energy", 0.0000000000000001*1.0e-3/1.0e16, 10*1.0e-3/1.0e16,"material"," 0.000000 - 1");
          vin::read_material[super_index].SAF[sub_index] = J;
          vin::read_material[super_index].enable_SAF = true;
          vin::read_material[sub_index].enable_SAF = true;

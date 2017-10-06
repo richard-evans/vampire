@@ -281,6 +281,18 @@ void initialize_fft_solver(){
       fftw_destroy_plan(NzyP);
       fftw_destroy_plan(NzzP);
 
+      dp::MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mx_in,dp::Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
+
+      dp::MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::My_in,dp::My_out,FFTW_FORWARD,FFTW_ESTIMATE);
+
+      dp::MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mz_in,dp::Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
+
+      dp::HxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hx_in,dp::Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+
+      dp::HyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hy_in,dp::Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+
+      dp::HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hz_in,dp::Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+
       zlog << zTs() << "dipole field calulation with FFT has been initalised " << std::endl;
 
 
@@ -394,22 +406,16 @@ void update_field_fft(){
       }
    }*/
 
-   fftw_plan MxP,MyP,MzP;
 
    //---------------------------------------------------------------------------
    // Calculate Fourier Transform of the magnetization FFT(M)
    //---------------------------------------------------------------------------
 
-   MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mx_in,dp::Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
+
    fftw_execute(MxP);
-   MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::My_in,dp::My_out,FFTW_FORWARD,FFTW_ESTIMATE);
    fftw_execute(MyP);
-   MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mz_in,dp::Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
    fftw_execute(MzP);
 
-   fftw_destroy_plan(MxP);
-   fftw_destroy_plan(MyP);
-   fftw_destroy_plan(MzP);
 
    //---------------------------------------------------------------------------
    // Perform the convolution between N and M [ FFT(N) . FFT(M) ]
@@ -449,18 +455,10 @@ void update_field_fft(){
    // Perform the backward transform to give the dipole field, H = iFFT( FFT(N).FFT(M) )
    //------------------------------------------------------------------------------------
 
-   fftw_plan HxP,HyP,HzP;
 
-   HxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hx_in,dp::Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
    fftw_execute(HxP);
-   HyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hy_in,dp::Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
    fftw_execute(HyP);
-   HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hz_in,dp::Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
    fftw_execute(HzP);
-
-   fftw_destroy_plan(HxP);
-   fftw_destroy_plan(HyP);
-   fftw_destroy_plan(HzP);
 
    //-------------------------------------------------------------------------------------
    // loop over all local cells to initialise field with self term
@@ -591,6 +589,14 @@ void finalize_fft_solver(){
    fftw_free(dp::N2zx0);
    fftw_free(dp::N2zy0);
    fftw_free(dp::N2zz0);
+
+   fftw_destroy_plan(dp::MxP);
+   fftw_destroy_plan(dp::MyP);
+   fftw_destroy_plan(dp::MzP);
+
+   fftw_destroy_plan(dp::HxP);
+   fftw_destroy_plan(dp::HyP);
+   fftw_destroy_plan(dp::HzP);
 
 #endif
    return;
