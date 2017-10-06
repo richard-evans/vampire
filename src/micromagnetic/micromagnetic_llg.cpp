@@ -112,7 +112,6 @@ namespace micromagnetic{
       // check calling of routine if error checking is activated
       if(err::check==true){std::cout << "micromagnetic::LLG_Heun has been called" << std::endl;}
 
-      std::cout << 'a' <<std::endl;
       using namespace micromagnetic_arrays_llg;
 
       // Check for initialisation of LLG integration arrays
@@ -263,7 +262,6 @@ namespace micromagnetic{
             atoms::m_spin_array[atom] = mm::m_e[cell];
          }
       }
-      std::cout << 'b' <<std::endl;
 
       // if(sim::time>10000){
       // 	for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){

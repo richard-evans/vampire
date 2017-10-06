@@ -72,7 +72,7 @@ namespace micromagnetic{
       double exchange_field[3]={0.0,0.0,0.0};
       //is T < TC the exchange field = 0
       if (num_cells > 1){
-        std::cout << 'a' <<std::endl;
+
 
          const int start = macro_neighbour_list_start_index[cell];
          const int end = macro_neighbour_list_end_index[cell] +1;
@@ -94,7 +94,7 @@ namespace micromagnetic{
             //      std::cout << zi << '\t' << zj <<  "\t" <<"neg" <<std::endl;
                }
             }
-            std::cout << 'b' <<std::endl;
+
 
          //   std::cout <<zi << '\t' << zj << "\t" <<  Ac<<std::endl;
             exchange_field[0] -= Ac*(x_array[cellj]*m_e[cellj] - x_array[cell]*m_e[cell]);

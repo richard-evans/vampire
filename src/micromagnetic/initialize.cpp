@@ -217,9 +217,9 @@ namespace micromagnetic{
    //  std::cout << mm::mm_correction <<std::endl;
      if (mm::mm_correction == true){
         for (int cell = 0; cell < num_cells; cell++ ){
-         //  mm::pinning_field_x[cell] = 2*mm::pinning_field_x[cell]/cells::macro_cell_size[0];
-          // mm::pinning_field_y[cell] = 2*mm::pinning_field_y[cell]/cells::macro_cell_size[1];
-           //mm::pinning_field_z[cell] = 2*mm::pinning_field_z[cell]/cells::macro_cell_size[2];
+           mm::pinning_field_x[cell] = 2*mm::pinning_field_x[cell]/cells::macro_cell_size[0];
+           mm::pinning_field_y[cell] = 2*mm::pinning_field_y[cell]/cells::macro_cell_size[1];
+           mm::pinning_field_z[cell] = 2*mm::pinning_field_z[cell]/cells::macro_cell_size[2];
          //          std::cout << cell << '\t' << mm::pinning_field_x[cell] <<'\t' << mm::pinning_field_y[cell] <<'\t' << mm::pinning_field_z[cell] <<std::endl;
         }
      }
