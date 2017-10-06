@@ -76,9 +76,10 @@ void initialize_fft_solver(){
       zlog << zTs() << "Precalculating rij matrix for dipole calculation... " << std::endl;
 
       // determine number of cells in each direction (with small shift to prevent the fence post problem)
-      dp::num_macro_cells_x = static_cast<unsigned int>(ceil((cs::system_dimensions[0]+0.01)/cells::macro_cell_size[0]));
-      dp::num_macro_cells_y = static_cast<unsigned int>(ceil((cs::system_dimensions[1]+0.01)/cells::macro_cell_size[1]));
-      dp::num_macro_cells_z = static_cast<unsigned int>(ceil((cs::system_dimensions[2]+0.01)/cells::macro_cell_size[2]));
+      dp::num_macro_cells_x = cells::num_macro_cells_fft[0];
+      dp::num_macro_cells_y = cells::num_macro_cells_fft[1];
+      dp::num_macro_cells_z = cells::num_macro_cells_fft[2];
+
 
       //calcualtes 8 times number of cells
       dp::eight_num_cells = 8*dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z;
@@ -191,7 +192,7 @@ void initialize_fft_solver(){
                else kk = k;
 
                // check that i != j != k to avoid NaN in sqrt()
-               if( (ii != jj) && (jj != kk) ){
+               if( (ii != 0 ) && (jj != 0) && (kk != 0)){
 
                   // calculate position vector to neighbouring cells
                   const double rx = double(ii) * cells::macro_cell_size[0]; // Angstroms
@@ -299,8 +300,6 @@ void update_field_fft(){
 
 #ifdef FFT
 
-   std::cerr << "doing fft update" << std::endl;
-
    //---------------------------------------------------------------
    // Initalise all the magnetization and field components to zero
    //---------------------------------------------------------------
@@ -346,10 +345,31 @@ void update_field_fft(){
       }
    }
 
+   // inverse Bohr magneton to convert cell magnetization to J/T
+   const double imuB = 1.0/9.27400915e-24;
+
    //-----------------------------------------------
    // Set the magnetization inside the system
    //-----------------------------------------------
 
+   for(int lc = 0; lc < cells::num_local_cells; lc++){
+
+    // get cell index
+     int cell = cells::cell_id_array[lc];
+
+     //save the cell_id for use in the fft
+     int id = cells::fft_cell_id_array[cell];
+
+     Mx_in[id][0] = cells::mag_array_x[cell] * imuB;
+     My_in[id][0] = cells::mag_array_y[cell] * imuB;
+     Mz_in[id][0] = cells::mag_array_z[cell] * imuB;
+
+   }
+
+
+
+
+/*
    // temporary counter for cell number
    int cell = 0;
 
@@ -372,7 +392,7 @@ void update_field_fft(){
 
          }
       }
-   }
+   }*/
 
    fftw_plan MxP,MyP,MzP;
 
@@ -469,6 +489,35 @@ void update_field_fft(){
    // Add calculated field to field array
    //-------------------------------------------------------------------------------------
 
+   // inverse Bohr magneton to convert cell magnetization to J/T
+   //const double imuB = 1.0/9.27400915e-24;
+
+   //-----------------------------------------------
+   // Set the magnetization inside the system
+   //-----------------------------------------------
+   //std::ofstream ofield("fields");
+
+   for(int lc = 0; lc < cells::num_local_cells; lc++){
+
+    // get cell index
+     int cell = cells::cell_id_array[lc];
+
+     //save the cell_id for use in the fft
+     int id = cells::fft_cell_id_array[cell];
+
+     dipole::cells_field_array_x[cell] += Hx_out[id][0]/dp::eight_num_cells;
+     dipole::cells_field_array_y[cell] += Hy_out[id][0]/dp::eight_num_cells;
+     dipole::cells_field_array_z[cell] += Hz_out[id][0]/dp::eight_num_cells;
+
+     dipole::cells_field_array_x[cell] *= 9.27400915e-01;
+     dipole::cells_field_array_y[cell] *= 9.27400915e-01;
+     dipole::cells_field_array_z[cell] *= 9.27400915e-01;
+
+//     ofield <<cell << '\t' << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' <<   dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell] <<std::endl;
+   }
+
+
+/*
    // reset cell index counter
    cell = 0;
 
@@ -493,11 +542,10 @@ void update_field_fft(){
 
          }
       }
-   }
+   }*/
 
 #endif
 
-   std::cerr << "done" << std::endl;
 
    return;
 }
@@ -545,7 +593,6 @@ void finalize_fft_solver(){
    fftw_free(dp::N2zz0);
 
 #endif
-std::cout << "A" <<std::endl;
    return;
 
 }

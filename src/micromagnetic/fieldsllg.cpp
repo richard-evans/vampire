@@ -72,6 +72,7 @@ namespace micromagnetic{
       double exchange_field[3]={0.0,0.0,0.0};
       //is T < TC the exchange field = 0
       if (num_cells > 1){
+        std::cout << 'a' <<std::endl;
 
          const int start = macro_neighbour_list_start_index[cell];
          const int end = macro_neighbour_list_end_index[cell] +1;
@@ -90,9 +91,11 @@ namespace micromagnetic{
                   //Ac = (1.0/(m_e_squared))*pow(mj,1.66)*vin::read_material[mat].SAF[matj]*(2.0/mm::Ms[cell]*cells::macro_cell_size[0]*cells::macro_cell_size[1]);
                   Ac = (1.0/(m_e_squared))*pow(mj,1.66)*(2.0/(ms[cell]*cells::macro_cell_size[0]*cells::macro_cell_size[1]));
                   Ac = mp::material[mat].SAF[matj]*Ac;//*cells::macro_cell_size[0]*cells::macro_cell_size[1];
-            //      std::cout <<zi << '\t' << zj <<  "\t" <<"neg" <<std::endl;
+            //      std::cout << zi << '\t' << zj <<  "\t" <<"neg" <<std::endl;
                }
             }
+            std::cout << 'b' <<std::endl;
+
          //   std::cout <<zi << '\t' << zj << "\t" <<  Ac<<std::endl;
             exchange_field[0] -= Ac*(x_array[cellj]*m_e[cellj] - x_array[cell]*m_e[cell]);
             exchange_field[1] -= Ac*(y_array[cellj]*m_e[cellj] - y_array[cell]*m_e[cell]);
@@ -110,9 +113,9 @@ namespace micromagnetic{
       double sigma_perp = sqrt(2*kB*temperature*(alpha_perp[cell]-alpha_para[cell])/(mp::dt*ms[cell]*alpha_perp[cell]*alpha_perp[cell]));
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] = one_o_chi_perp[cell]*m[0]*m_e[cell] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell] + sim::track_field_x[cell];
-      spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell] + sim::track_field_y[cell];
-      spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell] + sim::track_field_z[cell];
+      spin_field[0] = one_o_chi_perp[cell]*m[0]*m_e[cell] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];// + sim::track_field_x[cell];
+      spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];// + sim::track_field_y[cell];
+      spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];// + sim::track_field_z[cell];
 
       if (spin_field[0] != spin_field[0]) std::cin.get();
       //std::cout << ms[cell] << '\t' <<spin_field[0] << '\t' << sim::track_field_y[cell] <<std::endl;

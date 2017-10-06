@@ -28,6 +28,7 @@ namespace cells{
    extern int num_cells; /// number of macro-cells
    extern int num_local_cells; /// number of macro-cells
    extern std::vector < double > macro_cell_size; /// lateral size of local macro-cells (A)
+   extern std::vector < double > num_macro_cells_fft; /// lateral size of local macro-cells (A)
 
    extern std::vector <int> local_cell_array;
    extern std::vector <int> num_atoms_in_cell; /// number of atoms in each cell
@@ -53,6 +54,8 @@ namespace cells{
    extern std::vector<double> field_array_z;
 
    extern std::vector<double> pos_and_mom_array;
+   extern std::vector<double> fft_cell_id_array;
+
 
    //---------------------------------------------------------------------------
    // Function to calculate magnetisation in cells

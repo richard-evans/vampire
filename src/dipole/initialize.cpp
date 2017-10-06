@@ -157,7 +157,7 @@ namespace dipole{
             int i = cells::cell_id_array[lc];
             num_atoms_magnetic += dipole::internal::cells_num_atoms_in_cell[i];
          }
-
+   
          // Define and initialise Demag factor N tensor components
          double Nxx = 0.0;
          double Nxy = 0.0;
