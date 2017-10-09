@@ -40,6 +40,8 @@ namespace dipole{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern bool initialised;
+      extern fftw_plan MxP,MyP,MzP;
+      extern fftw_plan HxP,HyP,HzP;
 
       // enumerated list of different dipole solvers
       enum solver_t{

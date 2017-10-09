@@ -117,6 +117,10 @@ namespace sim{
 	extern double TTTe; /// electron temperature
 	extern double TTTp; /// phonon temperature
 
+	extern std::vector < double > track_field_x;
+	extern std::vector < double > track_field_y;
+	extern std::vector < double > track_field_z;
+
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 

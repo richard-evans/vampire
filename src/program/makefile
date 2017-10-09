@@ -19,6 +19,7 @@ partial_hysteresis.o \
 static_hysteresis.o \
 setting.o \
 time_series.o \
+disk_tracks.o \
 temperature_pulse.o \
 localised_temperature_pulse.o \
 effective_damping.o \

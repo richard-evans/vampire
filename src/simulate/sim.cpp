@@ -150,6 +150,8 @@ namespace sim{
 	double TTTe = 0.0; /// electron temperature
 	double TTTp = 0.0; /// phonon temperature
 
+
+
    double mc_delta_angle=0.1; /// Tuned angle for Monte Carlo trial move
    mc_algorithms mc_algorithm=hinzke_nowak;
 
@@ -502,6 +504,14 @@ int run(){
 	     	}
 		  	program::setting_process();
 		    break;
+
+		 case 52:
+			if(vmpi::my_rank==0){
+				 std::cout << "Tracks..." << std::endl;
+				 zlog << "Tracks..." << std::endl;
+			}
+			program::tracks();
+			 break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;

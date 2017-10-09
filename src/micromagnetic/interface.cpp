@@ -109,6 +109,13 @@ namespace micromagnetic{
          micromagnetic::internal::mm_correction = true;
          return true;
       }
+      test="pinning-field-height";
+      if(word==test){
+         double h=atof(value.c_str());
+         vin::check_for_valid_value(h, word, line, prefix, unit, "length", 1, 100000000,"input","1 A - 100000 A");
+         micromagnetic::internal::pinning_field_height =h;
+         return true;
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found
@@ -138,8 +145,8 @@ namespace micromagnetic{
       test="pinning-field-strength";
       if(word==test){
          double K=atof(value.c_str());
+         vin::check_for_valid_value(K, word, line, prefix, unit, "mm_energy", 1e-28, 10*1.0e-10,"material"," 0.000000 - 1");
          vin::read_material[super_index].pinning_field_strength = K;
-         //std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
          return true;
       }
 
@@ -155,8 +162,16 @@ namespace micromagnetic{
          vin::read_material[super_index].pinning_field_unit_vector[0] =u.at(0);
          vin::read_material[super_index].pinning_field_unit_vector[1] =u.at(1);
          vin::read_material[super_index].pinning_field_unit_vector[2] =u.at(2);
-         //mp::pinning_field[super_index][1]=u.at(1);
-         //mp::pinning_field[super_index][2]=u.at(2);
+         return true;
+      }
+
+      test="SAF-exchange-coupling"; // new and preferred form
+      if( (word == test)){
+         double J = atof(value.c_str());
+         vin::check_for_valid_value(J, word, line, prefix, unit, "mm_energy", 0.0000000000000001*1.0e-3/1.0e16, 10*1.0e-3/1.0e16,"material"," 0.000000 - 1");
+         vin::read_material[super_index].SAF[sub_index] = J;
+         vin::read_material[super_index].enable_SAF = true;
+         vin::read_material[sub_index].enable_SAF = true;
          return true;
       }
 

@@ -19,8 +19,13 @@ namespace sim{
 
    //----------------------------------------------------------------------------
    // Shared variables used with main vampire code
-   //---------------------------------------------------------------------------
+   //--------------------------------------------------------------------------
 
+
+   std::vector < double > track_field_x;
+   std::vector < double > track_field_y;
+   std::vector < double > track_field_z;
+   
    namespace internal{
 
       //----------------------------------------------------------------------------
@@ -32,6 +37,7 @@ namespace sim{
       std::vector<double> slonczewski_spin_polarization_unit_vector(3,0.0); // spin polarization direction
 
       int num_monte_carlo_preconditioning_steps = 0;
+
 
    } // end of internal namespace
 

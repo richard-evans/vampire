@@ -87,6 +87,8 @@ using std::string;
 		std::vector<std::vector<double> >Jij_matrix_SI;
 		std::vector<std::vector<double> >Jij_matrix;
 
+		std::vector<double> SAF;
+		bool enable_SAF;
 		std::vector < double > pinning_field_unit_vector;
 		double pinning_field_strength;
 

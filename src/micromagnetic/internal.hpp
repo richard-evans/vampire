@@ -62,6 +62,10 @@ namespace micromagnetic{
       extern std::vector <double> pinning_field_y;
       extern std::vector <double> pinning_field_z;
 
+      extern std::vector <double> cell_material_array;
+
+      extern double pinning_field_height;
+
       //stores the external fields (x,y,z)
       extern std::vector<double> ext_field;
 

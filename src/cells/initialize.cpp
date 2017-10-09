@@ -122,14 +122,13 @@ namespace cells{
       // Determine number of cells in x,y,z
       const int d[3]={ncx,ncy,ncz};
       const double cs[3] = {cells::macro_cell_size[0], cells::macro_cell_size[1], cells::macro_cell_size[2]}; // cell size
-
+      std::vector < double > cell_lattice(3*cells::num_cells,0.0);
      // For MPI version, only add local atoms
       #ifdef MPICF
          int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
       #else
          int num_local_atoms = num_atoms;
       #endif
-
       // Assign atoms to cells
       for(int atom=0;atom<num_local_atoms;atom++){
          // temporary for atom coordinates
@@ -167,6 +166,16 @@ namespace cells{
          }
          // If no error for range then assign atom to cell
          cells::atom_cell_id_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
+         if (scc[0] > num_macro_cells_fft[0]) num_macro_cells_fft[0] = scc[0];
+         if (scc[1] > num_macro_cells_fft[1]) num_macro_cells_fft[1] = scc[1];
+         if (scc[2] > num_macro_cells_fft[2]) num_macro_cells_fft[2] = scc[2];
+
+
+      //   std::cout << "supercell" << '\t' << cells::atom_cell_id_array[atom] << '\t' << scc[0] << '\t' << scc[1] << '\t' << scc[2] << std::endl;
+         cell_lattice[3*cells::atom_cell_id_array[atom]+0] = scc[0];
+         cell_lattice[3*cells::atom_cell_id_array[atom]+1] = scc[1];
+         cell_lattice[3*cells::atom_cell_id_array[atom]+2] = scc[2];
+
       }
 
       //-------------------------------------------------------------------------------------
@@ -192,8 +201,13 @@ namespace cells{
       cells::num_atoms_in_cell_global.resize(0);
       cells::volume_array.resize(cells::num_cells,0.0);
 
+      cells::fft_cell_id_array.resize(cells::num_cells,0.0);
+
       cells::internal::total_moment_array.resize(cells::num_cells,0.0);
 
+      std::vector < double > x_coord_array(cells::num_cells,0.0);
+      std::vector < double > y_coord_array(cells::num_cells,0.0);
+      std::vector < double > z_coord_array(cells::num_cells,0.0);
       // Now add atoms to each cell as magnetic 'centre of mass'
       for(int atom=0;atom<num_local_atoms;atom++){
          int local_cell=cells::atom_cell_id_array[atom];
@@ -217,6 +231,10 @@ namespace cells{
          if(cells::num_atoms_in_cell[local_cell]>0){
             // add index of cell only if there are atoms inside
             cells::cell_id_array.push_back(local_cell);
+            x_coord_array[local_cell] = x_coord_array[local_cell]/cells::num_atoms_in_cell[local_cell];
+            y_coord_array[local_cell] = y_coord_array[local_cell]/cells::num_atoms_in_cell[local_cell];
+            z_coord_array[local_cell] = z_coord_array[local_cell]/cells::num_atoms_in_cell[local_cell];
+
          }
       }
 
@@ -306,6 +324,21 @@ namespace cells{
 
       // Precalculate cell magnetisation
       cells::mag();
+
+      for(int lc = 0; lc < cells::num_local_cells; lc++){
+
+       // get cell index
+        int i = cells::cell_id_array[lc];
+
+        //save x,y,z lattice coordiantes for use in the fft
+        int x = cell_lattice[3*i+0];
+        int y = cell_lattice[3*i+1];
+        int z = cell_lattice[3*i+2];
+
+        //save the cell_id for use in the fft
+        fft_cell_id_array[i] = (x*2*(num_macro_cells_fft[2]+1) + y)*2*(num_macro_cells_fft[1] +1) + z;
+//        std::cout <<i << '\t' << fft_cell_id_array[i] << '\t' << x << '\t' << y << '\t' << z << '\t' << "\t" << fft_maxx_lattice+1 << '\t' << fft_maxy_lattice+1 << '\t' << fft_maxz_lattice+1 << std::endl;
+      }
 
       return;
    }

@@ -141,13 +141,13 @@ namespace environment{
                      N2xy0[id][0] = (3.0*ex*ey      )*rij3;
                      N2xz0[id][0] = (3.0*ex*ez      )*rij3;
 
-                     N2yx0[id][0] = (3.0*ey*ex - 1.0)*rij3;
-                     N2yy0[id][0] = (3.0*ey*ey      )*rij3;
+                     N2yx0[id][0] = (3.0*ey*ex      )*rij3;
+                     N2yy0[id][0] = (3.0*ey*ey - 1.0)*rij3;
                      N2yz0[id][0] = (3.0*ey*ez      )*rij3;
 
-                     N2zx0[id][0] = (3.0*ez*ex - 1.0)*rij3;
+                     N2zx0[id][0] = (3.0*ez*ex      )*rij3;
                      N2zy0[id][0] = (3.0*ez*ey      )*rij3;
-                     N2zz0[id][0] = (3.0*ez*ez      )*rij3;
+                     N2zz0[id][0] = (3.0*ez*ez - 1.0)*rij3;
 
                   }
                }
