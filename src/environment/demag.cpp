@@ -26,6 +26,8 @@ namespace environment{
 
       int initialise_demag_fields(){
 
+         std::cout << "Initialising dipole fields in environment module..." << std::endl;
+
          //only complie this section of FFT is enabled else don't
          #ifdef FFT
          //save eight times number cells and 8 pi/3V to use later.

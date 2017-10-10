@@ -41,6 +41,9 @@ namespace environment{
    void initialize(   double system_dimensions_x,
       double system_dimensions_y,
       double system_dimensions_z){
+
+         std::cout << "Initialising environment module" << std::endl;
+
          //-------------------------------------------------------------------------------------
          // Calculate number of microcells
          //-------------------------------------------------------------------------------------
@@ -70,6 +73,8 @@ namespace environment{
          //total number of cells and cell volume
          env::num_cells = env::num_cells_x*env::num_cells_y*env::num_cells_z;
          env::cell_volume = env::cell_size[0]*env::cell_size[1]*env::cell_size[2];
+
+         std::cout << "Number of environment cells: " << env::num_cells << std::endl;
 
          //convert Ms from input to Ms = ms.V and Ku = ku.V
 
@@ -115,7 +120,7 @@ namespace environment{
          std::vector <double > y_m_min(cells::num_cells,0.0);
          std::vector <double > z_m_min(cells::num_cells,0.0);
 
-         //calculates the mininum and maximum positions of each cell for calcualtions of which cell the atomistic atoms are in later
+         //calculates the minimum and maximum positions of each cell for calcualtions of which cell the atomistic atoms are in later
          int cell = 0;
          for (int x = 0; x < env::num_cells_x; x++){
             double pos_x = env::cell_size[0]*x + env::cell_size[0]/2.0;
@@ -138,9 +143,11 @@ namespace environment{
             }
          }
 
+         std::cout << "Identifying environment cells which are atomistic" << std::endl;
+
          //loops over all atomistic cells to determine if the atomsitic simulation lies within an environment cell
          for (int cell = 0 ; cell < cells::num_cells; cell++){
-            //calcaultes the x,y,z position for each atomsitic cell
+            //calculates the x,y,z position for each atomistic cell
             double x = cells::cell_coords_array_x[cell]/cells::internal::total_moment_array[cell] + env::shift[0];
             double y = cells::cell_coords_array_y[cell]/cells::internal::total_moment_array[cell] + env::shift[1];
             double z = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell] + env::shift[2];
@@ -197,15 +204,21 @@ namespace environment{
 
          //adds all cells which are not within the atomistic section to the the none atomsitic cells list or the atomistic cells list
          for (int cell = 0; cell < env::num_cells; cell++){
-            if (env::env_cell_is_in_atomistic_region[cell] == 0){
+
+            // calculate if cell is part of shield structure
+            const bool included = internal::in_shield(env::cell_coords_array_x[cell], env::cell_coords_array_y[cell], env::cell_coords_array_z[cell]);
+
+            // check environment cell is in shields and not atomistic
+            if (env::env_cell_is_in_atomistic_region[cell] == 0 && included){
                env::none_atomistic_cells.push_back(cell);
                env::num_env_cells ++;
-
             }
-            else {
+            // if it is atomistic then add it to list of atomistic cells
+            else if(env::env_cell_is_in_atomistic_region[cell] == 1){
                env::atomistic_cells.push_back(cell);
-
             }
+            // otherwise don't add it to anything
+
          }
 
 
@@ -213,6 +226,9 @@ namespace environment{
          //if cells are neighbours add them to the neighbour list array_index
          //each cell has a start and end index index. the neighbours for each cell are within these index
 
+         std::cout << "Calculating neighbour list for environment cells" << std::endl;
+         // This is massively inefficient for large numbers of cells
+         // better to store x,y,z cell associations and calculate neighbours directly - RE
          int array_index = 0;
          for (int celli = 0; celli < env::num_cells; celli ++){
             double xi = env::cell_coords_array_x[celli];
@@ -229,7 +245,7 @@ namespace environment{
                double dy = sqrt((yi - yj)*(yi - yj));
                double dz = sqrt((zi - zj)*(zi - zj));
 
-               //calcualtes how many sides of the cude are touching neaarest neighbours have 1.
+               //calcualtes how many sides of the cube are touching neaarest neighbours have 1.
                if (dx == env::cell_size[0] && dy ==0 && dz == 0) a++;
                if (dy == env::cell_size[1] && dz ==0 && dx == 0) a++;
                if (dz == env::cell_size[2] && dy ==0 && dx == 0) a++;
@@ -305,7 +321,7 @@ namespace environment{
             }
          }
 
-         for (int i = 0; i < environment::num_interactions; i ++ ){
+         /*for (int i = 0; i < environment::num_interactions; i ++ ){
             int mm_cell = environment::list_of_mm_cells_with_neighbours[i];
             int env_cell = environment::list_of_env_cells_with_neighbours[i];
             double overlap = list_of_overlap_area[i];
@@ -316,7 +332,7 @@ namespace environment{
             double pos_y = env::cell_coords_array_y[env_cell];
             double pos_z = env::cell_coords_array_z[env_cell];
       //      std::cout << "A" << pos_x << '\t' << pos_y << '\t' << pos_z << '\t' <<x << '\t' << y << '\t' << z << '\t' << mm_cell << '\t' << env_cell << '\t' << overlap << std::endl;
-         }
+   }*/
 
          return;
 

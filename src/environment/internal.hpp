@@ -160,6 +160,7 @@ namespace environment{
       int calculate_demag_fields();
       int output();
 
+      bool in_shield(double x, double y, double z);
 
       std::vector<double> calculate_llb_fields(std::vector <double > m,
          double temperature,

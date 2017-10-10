@@ -230,6 +230,7 @@ namespace environment{
             z_euler_array[cell] = xyz[2];
 
          }
+
          //save the euler step to a spin storage array
          for (int i = my_env_start_index; i < my_env_end_index; i++){
             int cell = env::none_atomistic_cells[i];
@@ -248,9 +249,11 @@ namespace environment{
          //
          for (int i = my_env_start_index; i < my_env_end_index; i++){
             int cell = env::none_atomistic_cells[i];
+
             m[0] = x_spin_storage_array[cell];
             m[1] = y_spin_storage_array[cell];
             m[2] = z_spin_storage_array[cell];
+
             //calcualte spin fields
             spin_field = env::calculate_llb_fields(m, temperature, cell, x_spin_storage_array, y_spin_storage_array, z_spin_storage_array);
 
@@ -299,6 +302,7 @@ namespace environment{
          //calcualtes the new magnetisations from the heun and euler deltas
          for (int i = my_env_start_index; i < my_env_end_index; i++){
             int cell = env::none_atomistic_cells[i];
+
             x_array[cell] = x_initial_spin_array[cell] + 0.5*dt*(x_euler_array[cell] + x_heun_array[cell]);
             y_array[cell] = y_initial_spin_array[cell] + 0.5*dt*(y_euler_array[cell] + y_heun_array[cell]);
             z_array[cell] = z_initial_spin_array[cell] + 0.5*dt*(z_euler_array[cell] + z_heun_array[cell]);
@@ -306,6 +310,7 @@ namespace environment{
             env::x_mag_array[cell] = x_array[cell]*env::Ms;
             env::y_mag_array[cell] = y_array[cell]*env::Ms;
             env::z_mag_array[cell] = z_array[cell]*env::Ms;
+
          }
 
          #ifdef MPICF
