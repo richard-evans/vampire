@@ -334,6 +334,12 @@ int run(){
 		#endif
    }
 
+   // Instantiate timer
+   vutil::vtimer_t timer;
+
+   // start timer
+   timer.start();
+
    // Precondition spins at equilibration temperature
    sim::internal::monte_carlo_preconditioning();
 
@@ -519,6 +525,13 @@ int run(){
 			exit (EXIT_FAILURE);
 			}
 	}
+
+   // end timer
+   timer.stop();
+
+   // return elapsed time for io
+   std::cout << "Simulation time" << '\t' << timer.elapsed_time() <<std::endl;
+   zlog << zTs() << "Simulation time" << '\t' << timer.elapsed_time() <<std::endl;
 
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
