@@ -162,14 +162,14 @@ namespace environment{
 
       bool in_shield(double x, double y, double z);
 
-      std::vector<double> calculate_llb_fields(std::vector <double > m,
-         double temperature,
-         int cell,
-         std::vector<double> x_array,
-         std::vector<double> y_array,
-         std::vector<double> z_array);
+      std::vector<double> calculate_llb_fields(std::vector <double>& m,
+                                               double temperature,
+                                               int cell,
+                                               std::vector<double>& x_array,
+                                               std::vector<double>& y_array,
+                                               std::vector<double>& z_array);
 
-         std::vector<double> calculate_field_env(int celli, int cellj);
+      std::vector<double> calculate_field_env(int celli, int cellj);
       std::vector<double> calculate_field_mm(int celli, int cellj);
 
       } // end of internal namespace

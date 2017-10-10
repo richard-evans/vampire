@@ -26,13 +26,12 @@ namespace environment
    namespace internal
    {
 
-      std::vector<double> calculate_llb_fields(std::vector <double > m,
+      std::vector<double> calculate_llb_fields(std::vector <double>& m,
          double t,
          int cell,
-         std::vector<double> x_array,
-         std::vector<double> y_array,
-         std::vector<double> z_array){
-
+         std::vector<double>& x_array,
+         std::vector<double>& y_array,
+         std::vector<double>& z_array){
 
             double temperature;
             //vector to store fields
@@ -95,7 +94,7 @@ namespace environment
 
                }
             }
-            
+
             //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
             spin_field[0] = pf*m[0]+ exchange_field[0] - one_o_chi_perp*m[0] + ext_field[0];// + dipole_field_x[cell];
             spin_field[1] = pf*m[1]+ exchange_field[1] - one_o_chi_perp*m[1] + ext_field[1];// + dipole_field_y[cell];
