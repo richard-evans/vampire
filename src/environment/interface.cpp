@@ -103,7 +103,8 @@ namespace environment{
       test="exchange-constant";
       if(word==test){
          double exc=atof(value.c_str());
-         vin::check_for_valid_positive_value(exc, word, line, prefix, unit, "exchange", 0,2e-15 ,"input","0 - 2e-15");
+         // allowable values 0 - 1e-9 J/m == 1e-19 J/Angstrom
+         vin::check_for_valid_positive_value(exc, word, line, prefix, unit, "exchange", 0, 1e-19 ,"input","0 - 1e-19");
          env::A =-exc;
 
          return true;

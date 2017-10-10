@@ -185,9 +185,9 @@ namespace micromagnetic{
          }
       }
 
-     for (int cell = 0; cell < num_cells; cell++){
+     /*for (int cell = 0; cell < num_cells; cell++){
        std::cerr << '\t' << cells::cell_coords_array_z[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << "\t" << mm::Tc[cell] << "\t" <<micromagnetic::cell_discretisation_micromagnetic[cell] << "\t" << mm::alpha[cell] << '\t' << mm::gamma[cell] << std::endl;
-     }
+    }*/
 
      std::vector < double > temp(num_cells,0);
 

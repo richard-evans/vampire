@@ -92,8 +92,8 @@ namespace environment{
          env::neighbour_list_start_index.resize(env::num_cells,0.0);
          env::neighbour_list_end_index.resize(env::num_cells,0.0);
 
-         env::list_env_cell_atomistic_cell.resize(cells::num_cells,0.0);
-         env::env_cell_is_in_atomistic_region.resize(env::num_cells,0.0);
+         env::list_env_cell_atomistic_cell.resize(cells::num_cells,0);
+         env::env_cell_is_in_atomistic_region.resize(env::num_cells,0);
 
          environment_field_x.resize(cells::num_cells,0.0);
          environment_field_y.resize(cells::num_cells,0.0);
@@ -107,13 +107,13 @@ namespace environment{
          std::vector <double > y_min(env::num_cells,0.0);
          std::vector <double > z_min(env::num_cells,0.0);
 
-         //stores the max and min coordinates of all env cells
-         std::vector <double > x_m_max(env::num_cells,0.0);
-         std::vector <double > y_m_max(env::num_cells,0.0);
-         std::vector <double > z_m_max(env::num_cells,0.0);
-         std::vector <double > x_m_min(env::num_cells,0.0);
-         std::vector <double > y_m_min(env::num_cells,0.0);
-         std::vector <double > z_m_min(env::num_cells,0.0);
+         //stores the max and min coordinates of all cells::cells
+         std::vector <double > x_m_max(cells::num_cells,0.0);
+         std::vector <double > y_m_max(cells::num_cells,0.0);
+         std::vector <double > z_m_max(cells::num_cells,0.0);
+         std::vector <double > x_m_min(cells::num_cells,0.0);
+         std::vector <double > y_m_min(cells::num_cells,0.0);
+         std::vector <double > z_m_min(cells::num_cells,0.0);
 
          //calculates the mininum and maximum positions of each cell for calcualtions of which cell the atomistic atoms are in later
          int cell = 0;
@@ -162,7 +162,7 @@ namespace environment{
                   //adds the cell to the list of atomistic cells
                   env::list_env_cell_atomistic_cell[cell] = env_cell;
                   //this cell is an atomistic cell.
-                  env::env_cell_is_in_atomistic_region[env_cell] = 1.0;
+                  env::env_cell_is_in_atomistic_region[env_cell] = 1;
                   env::x_mag_array[env_cell] += cells::mag_array_x[cell];
                   env::y_mag_array[env_cell] += cells::mag_array_y[cell];
                   env::z_mag_array[env_cell] += cells::mag_array_z[cell];
@@ -197,7 +197,7 @@ namespace environment{
 
          //adds all cells which are not within the atomistic section to the the none atomsitic cells list or the atomistic cells list
          for (int cell = 0; cell < env::num_cells; cell++){
-            if (env::env_cell_is_in_atomistic_region[cell] == 0.0){
+            if (env::env_cell_is_in_atomistic_region[cell] == 0){
                env::none_atomistic_cells.push_back(cell);
                env::num_env_cells ++;
 
