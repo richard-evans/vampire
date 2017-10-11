@@ -46,7 +46,7 @@ namespace environment{
 
          //outputs to the file environment_output
          o_file <<sim::time << '\t' << sim::temperature << "\t" << mx << '\t' << my<< '\t' << mz << '\t' <<  magm/msat << std::endl;
-
+      // std::cout << sim::time << '\t' << sim::temperature << "\t" << mx << '\t' << my<< '\t' << mz << '\t' <<  magm/msat << std::endl;
          // std::ofstream pfile;
          // pfile.open("env_cell_config");
          //

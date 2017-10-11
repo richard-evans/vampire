@@ -75,6 +75,8 @@ namespace create{
          int unit_cell_category; // association of material to unit cell id
          double min; // minimum material height
          double max; // maximum material height
+         double max_width = 1.0;
+         double min_width = 0.0;
 
          // constructor
          mp_t ():

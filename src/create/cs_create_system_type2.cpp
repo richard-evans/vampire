@@ -520,6 +520,23 @@ int pop_template_2D(int** template_array_2D,int cs_num_atoms,int** cs_coord_arra
 
 void clear_atoms(std::vector<cs::catom_t> & catom_array){
 
+   for(unsigned int atom=0;atom<catom_array.size();atom++){
+     double x = catom_array[atom].x;
+     double y = catom_array[atom].y;
+     double z = catom_array[atom].z;
+
+     double mat =catom_array[atom].material;
+
+        //  std::cout << x << '\t' << z << '\t' << mat <<std::endl;
+     double min = create::internal::mp[mat].min_width*system_dimensions[1];
+     double max = create::internal::mp[mat].max_width*system_dimensions[1];
+  //         std::cout << mat << '\t' <<min << '\t' << max << std::endl;
+     if (y < min || y > max  ){
+  //     std::cout << mat << '\t' << y << std::endl;
+       catom_array[atom].include = false;
+     }
+   }
+
    // check calling of routine if error checking is activated
    if(err::check==true){std::cout << "cs::clear_atoms has been called" << std::endl;}
 

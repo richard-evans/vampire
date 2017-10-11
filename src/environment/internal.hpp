@@ -58,7 +58,8 @@ namespace environment{
 
       extern double eightPI_three_cell_volume;
       extern double cell_volume;
-
+      extern double env_field;
+      extern std::vector < double > env_field_uv;
       //if initial spins are random
       extern bool random_spins;
 

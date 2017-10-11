@@ -51,12 +51,14 @@ namespace environment{
       if(word==test){
          double y=atof(value.c_str());
          vin::check_for_valid_value(y, word, line, prefix, unit, "length", 10, 1.0e8,"input","10 Angstroms - 10 millimetre");
+                  env::dim[1] =y;
          return true;
       }
       test="system-size-z";
       if(word==test){
          double z=atof(value.c_str());
          vin::check_for_valid_value(z, word, line, prefix, unit, "length", 10, 1.0e8,"input","10 Angstroms - 10 millimetre");
+                  env::dim[2] =z;
          return true;
       }
       test="system-size";
@@ -151,6 +153,29 @@ namespace environment{
          env::alpha =a;
          return true;
       }
+      test="applied-environment-field-strength";
+      if(word==test){
+         double a=atof(value.c_str());
+         vin::check_for_valid_positive_value(a, word, line, prefix, unit, "none", 0,1,"input","0- 1");
+         env::env_field =a;
+         return true;
+      }
+
+      test="applied-environment-field-unit-vector";
+      if(word==test){
+         // temporary storage container
+         std::vector<double> u(3);
+
+         // read values from string
+         u=vin::doubles_from_string(value);
+         vin::check_for_valid_unit_vector(u, word, line, prefix,"length");
+         // Copy sanitised unit vector to material
+         env::env_field_uv[0] =u.at(0);
+         env::env_field_uv[1] =u.at(1);
+         env::env_field_uv[2] =u.at(2);
+         return true;
+      }
+
       test="gyromagnetic-ratio";
       if(word==test){
          double g=atof(value.c_str());

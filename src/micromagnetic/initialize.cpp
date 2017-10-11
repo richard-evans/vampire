@@ -59,6 +59,7 @@ namespace micromagnetic{
 
       //resizes the vectors used to store the cell parameters
 
+      std::cout << "MM" << num_cells<<std::endl;
       mm::A.resize(num_cells*num_cells,0.0);
       mm::alpha.resize(num_cells,0.0);
       mm::one_o_chi_perp.resize(num_cells,0.0);
@@ -206,29 +207,30 @@ namespace micromagnetic{
 
      for (int cell = 0; cell < num_cells; cell++ ){
 
-        double zi = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell];
+        double zi = cells::pos_and_mom_array[4*cell+2];
          int mat = mm::cell_material_array[cell];
+        // if ( mp::material[mat].pinning_field_unit_vector[1] != 0) std::cout << mat << "\t" << mp::material[mat].pinning_field_unit_vector[1] << '\t' << mm::pinning_field_height << "\t" << zi << std::endl;
          if (zi < mm::pinning_field_height && mp::material[mat].pinning_field_unit_vector[0]+ mp::material[mat].pinning_field_unit_vector[1] + mp::material[mat].pinning_field_unit_vector[2]!= 0.0){
            double Area = cells::macro_cell_size[0]*cells::macro_cell_size[1];
 
             mm::pinning_field_x[cell] = Area*mp::material[mat].pinning_field_unit_vector[0]/mm::ms[cell];
             mm::pinning_field_y[cell] = Area*mp::material[mat].pinning_field_unit_vector[1]/mm::ms[cell];
             mm::pinning_field_z[cell] = Area*mp::material[mat].pinning_field_unit_vector[2]/mm::ms[cell];
-        //    std::cout << mp::material[mat].pinning_field_unit_vector[1] << "\t" << Area << '\t'  << mm::ms[cell] <<  '\t' <<mm::pinning_field_x[cell] << '\t' << mm::pinning_field_y[cell] << '\t' << mm::pinning_field_z[cell] <<std::endl;
+          //  std::cout << mp::material[mat].pinning_field_unit_vector[1] << "\t" << Area << '\t'  << mm::ms[cell] <<  '\t' <<mm::pinning_field_x[cell] << '\t' << mm::pinning_field_y[cell] << '\t' << mm::pinning_field_z[cell] <<std::endl;
         }
      }
 
 
 
    //  std::cout << mm::mm_correction <<std::endl;
-     if (mm::mm_correction == true){
-        for (int cell = 0; cell < num_cells; cell++ ){
-           mm::pinning_field_x[cell] = 2*mm::pinning_field_x[cell]/cells::macro_cell_size[2];
-           mm::pinning_field_y[cell] = 2*mm::pinning_field_y[cell]/cells::macro_cell_size[2];
-           mm::pinning_field_z[cell] = 2*mm::pinning_field_z[cell]/cells::macro_cell_size[2];
+  //   if (mm::mm_correction == true){
+  //      for (int cell = 0; cell < num_cells; cell++ ){
+  //         mm::pinning_field_x[cell] = 2*mm::pinning_field_x[cell]/cells::macro_cell_size[2];
+  //         mm::pinning_field_y[cell] = 2*mm::pinning_field_y[cell]/cells::macro_cell_size[2];
+  //         mm::pinning_field_z[cell] = 2*mm::pinning_field_z[cell]/cells::macro_cell_size[2];
 //           std::cout << cell << '\t' << mm::pinning_field_x[cell] <<'\t' << mm::pinning_field_y[cell] <<'\t' << mm::pinning_field_z[cell] <<std::endl;
-        }
-     }
+    //    }
+  //}
 
      //boltzman stuff
      P.resize(101);

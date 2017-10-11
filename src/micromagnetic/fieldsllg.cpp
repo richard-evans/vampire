@@ -22,6 +22,7 @@
 #include "errors.hpp"
 #include "vio.hpp"
 #include "sim.hpp"
+#include "environment.hpp"
 #include "random.hpp"
 
 namespace micromagnetic{
@@ -81,8 +82,6 @@ namespace micromagnetic{
             const int cellj = macro_neighbour_list_array[j];
             const double mj = m_e[cellj];
             double Ac = A[j]*pow(mj,1.66);
-            double zj = cells::cell_coords_array_z[cellj]/cells::internal::total_moment_array[cellj];
-            double zi = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell];
             //std::cout << cell << '\t' << cellj << '\t' << zi << '\t' << zj << std::endl;
             int mat  = cell_material_array[cell];
             int matj =cell_material_array[cellj];
@@ -118,6 +117,14 @@ namespace micromagnetic{
       spin_field[0] = one_o_chi_perp[cell]*m[0]*m_e[cell] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];// + sim::track_field_x[cell];
       spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];// + sim::track_field_y[cell];
       spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];// + sim::track_field_z[cell];
+    //  std::cout << cell << "\t" << pinning_field_y[cell] << std::endl;
+      if (environment::enabled){
+      //  std::cout << cell << "\t" << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell] << '\t' << environment::environment_field_z[cell] << std::endl;
+         spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
+         spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
+         spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+      }
+
 
       if (spin_field[0] != spin_field[0]) std::cin.get();
       //std::cout << ms[cell] << '\t' <<spin_field[0] << '\t' << sim::track_field_y[cell] <<std::endl;

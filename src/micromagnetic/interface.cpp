@@ -149,7 +149,6 @@ namespace micromagnetic{
          vin::read_material[super_index].pinning_field_strength = K;
          return true;
       }
-
       test="pinning-field-unit-vector";
       if(word==test){
          // temporary storage container

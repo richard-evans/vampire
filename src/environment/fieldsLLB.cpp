@@ -95,12 +95,15 @@ namespace environment
 
                }
             }
-            
-            //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-            spin_field[0] = pf*m[0]+ exchange_field[0] - one_o_chi_perp*m[0] + ext_field[0];// + dipole_field_x[cell];
-            spin_field[1] = pf*m[1]+ exchange_field[1] - one_o_chi_perp*m[1] + ext_field[1];// + dipole_field_y[cell];
-            spin_field[2] = pf*m[2]+ exchange_field[2]                       + ext_field[2];// + dipole_field_z[cell];
 
+            //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
+            spin_field[0] = pf*m[0]+ exchange_field[0] - one_o_chi_perp*m[0] + ext_field[0] + dipole_field_x[cell] + env_field_uv[0];
+            spin_field[1] = pf*m[1]+ exchange_field[1] - one_o_chi_perp*m[1] + ext_field[1] + dipole_field_y[cell] + env_field_uv[1];
+            spin_field[2] = pf*m[2]+ exchange_field[2]                       + ext_field[2] + dipole_field_z[cell] + env_field_uv[2];
+          //    std::cout << "x" << '\t' << pf  << '\t' << m[0] << '\t' << exchange_field[0] << "\t" << dipole_field_x[cell] << "\t" << spin_field[0] <<std::endl;
+          //    std::cout << "y" << '\t' << pf  << '\t' << m[1] << '\t' << exchange_field[1] << "\t" << dipole_field_y[cell] << "\t" << spin_field[1] <<std::endl;
+          //    std::cout << "z" << '\t' << pf  << '\t' << m[2] << '\t' << exchange_field[2] << "\t" << dipole_field_z[cell] << "\t" << spin_field[2] <<std::endl;
+              if (spin_field[0] != spin_field[0] )std::cin.get();
             return spin_field;
 
          }

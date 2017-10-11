@@ -298,8 +298,6 @@ int run(){
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
-	 if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
-
 	 //initialize the micromagnetic calculation
 	// if (micromagnetic::discretisation_type > 0)
 	micromagnetic::initialize(cells::num_local_cells,
@@ -325,6 +323,8 @@ int run(){
 
 
 
+	 if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
+	 
 	 // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
 		#ifdef MPICF

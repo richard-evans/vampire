@@ -69,6 +69,10 @@ namespace environment{
 
       bool random_spins = true;
 
+      double env_field = 0.0;
+
+      std::vector < double > env_field_uv(3,0.0);
+
       double one_o_chi_para;
       double one_o_chi_perp;
 

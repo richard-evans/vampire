@@ -69,11 +69,14 @@ namespace environment{
          Hy_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
          Hz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
 
+
+
          //initialises all the demag tensor components to 0
-         for(unsigned int i = 0 ; i < num_cells_x ; i++){
-            for(unsigned int j = 0 ; j < num_cells_y; j++){
-               for(unsigned int k = 0 ; k < num_cells_z ; k++){
-                  int id = (i*num_cells_x+j)*num_cells_y+k;
+         for(unsigned int i = 0 ; i < 2*num_cells_x ; i++){
+            for(unsigned int j = 0 ; j < 2*num_cells_y; j++){
+               for(unsigned int k = 0 ; k < 2*num_cells_z ; k++){
+                 int id = (2*i*num_cells_y+j)*2*num_cells_z+k;
+
 
                   N2xx0[id][0]=0;
                   N2xx0[id][1]=0;
@@ -111,6 +114,7 @@ namespace environment{
             }
          }
 
+
          //initalises all the non-zero demag tensor components as with the normal demag field calcualtion
          double ii,jj,kk;
          for(int i=0;i<num_cells_x*2;i++){
@@ -135,8 +139,8 @@ namespace environment{
                      const double ez = rz*rij;
 
                      const double rij3 = rij*rij*rij; // Angstroms
+                     int id = (2*i*num_cells_y+j)*2*num_cells_z+k;
 
-                     int id = (i*num_cells_x+j)*num_cells_y+k;
                      N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
                      N2xy0[id][0] = (3.0*ex*ey      )*rij3;
                      N2xz0[id][0] = (3.0*ex*ez      )*rij3;
@@ -153,6 +157,7 @@ namespace environment{
                }
             }
          }
+
 
 
 
@@ -180,6 +185,7 @@ namespace environment{
          fftw_execute(NzzP);
 
 
+
          #endif
          return 0;
 
@@ -193,7 +199,8 @@ namespace environment{
             for(unsigned int j = 0 ; j < num_cells_y; j++){
                for(unsigned int k = 0 ; k < num_cells_z ; k++){
 
-                  int id = (i*num_cells_x+j)*num_cells_y+k;
+                 int id = (2*i*num_cells_y+j)*2*num_cells_z+k;
+
                   Mx_in[id][0]=0;
                   Mx_in[id][1]=0;
                   My_in[id][0]=0;
@@ -262,7 +269,7 @@ namespace environment{
             for (int j=0 ; j<2*num_cells_y ; j++){
                for (int k=0 ; k<2*num_cells_z ; k++){
 
-                  int id = (i*num_cells_x+j)*num_cells_y+k;
+                  int id = (2*i*num_cells_y+j)*2*num_cells_z+k;
                   Hx_in[id][0] = N2xx[id][0]*Mx_out[id][0] + N2xy[id][0]*My_out[id][0] + N2xz[id][0]*Mz_out[id][0]; //summing the real part
                   Hx_in[id][0] -= (N2xx[id][1]*Mx_out[id][1] + N2xy[id][1]*My_out[id][1] + N2xz[id][1]*Mz_out[id][1]);
 
@@ -299,9 +306,9 @@ namespace environment{
          for (int i = 0; i< num_cells; i++){
 
             // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
-            dipole_field_x[i]=0.0;//eightPI_three_cell_volume*(x_mag_array[i]/9.27400915e-24);
-            dipole_field_y[i]=0.0;//eightPI_three_cell_volume*(y_mag_array[i]/9.27400915e-24);
-            dipole_field_z[i]=0.0;//eightPI_three_cell_volume*(z_mag_array[i]/9.27400915e-24);
+            dipole_field_x[i]=eightPI_three_cell_volume*(x_mag_array[i]/9.27400915e-24);
+            dipole_field_y[i]=eightPI_three_cell_volume*(y_mag_array[i]/9.27400915e-24);
+            dipole_field_z[i]=eightPI_three_cell_volume*(z_mag_array[i]/9.27400915e-24);
 
          }
          //sums the dipole field N.m + self demag/eightnumcells
@@ -311,12 +318,12 @@ namespace environment{
                for (int k=0 ; k<num_cells_z ; k++){
                   int id = (i*num_cells_x+j)*num_cells_y+k;
                //   std:: cout << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << Hx_out[id][0] << '\t' << Hy_out[id][0] << '\t' << Hz_out[id][0] << std::endl;
-               //    dipole_field_x[cell] += Hx_out[id][0]/eight_num_cells;
-               //   dipole_field_y[cell] += Hy_out[id][0]/eight_num_cells;
-               //   dipole_field_z[cell] += Hz_out[id][0]/eight_num_cells;
-               //   dipole_field_x[cell] *= 9.27400915e-01;
-               //   dipole_field_y[cell] *= 9.27400915e-01;
-               //   dipole_field_z[cell] *= 9.27400915e-01;
+                  dipole_field_x[cell] += Hx_out[id][0]/eight_num_cells;
+                 dipole_field_y[cell] += Hy_out[id][0]/eight_num_cells;
+                 dipole_field_z[cell] += Hz_out[id][0]/eight_num_cells;
+                 dipole_field_x[cell] *= 9.27400915e-01;
+                 dipole_field_y[cell] *= 9.27400915e-01;
+                 dipole_field_z[cell] *= 9.27400915e-01;
                   cell++;
                }
             }

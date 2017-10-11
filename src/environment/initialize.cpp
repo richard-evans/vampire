@@ -16,6 +16,9 @@
 #include "environment.hpp"
 #include "random.hpp"
 #include "../cells/internal.hpp"
+#include "../micromagnetic/internal.hpp"
+#include "micromagnetic.hpp"
+
 // environment module headers
 #include "internal.hpp"
 #include "sim.hpp"
@@ -48,6 +51,11 @@ namespace environment{
          //  double size_x = system_dimensions_x + env::shift[0];
          //  double size_y = system_dimensions_y + env::shift[1];
          //  double size_z = system_dimensions_z + env::shift[2];
+
+
+         env::env_field_uv[0] = env::env_field_uv[0]*env::env_field;
+         env::env_field_uv[1] = env::env_field_uv[1]*env::env_field;
+         env::env_field_uv[2] = env::env_field_uv[2]*env::env_field;
 
          double dx,dy,dz;
          // if (env::dim[0] + 0.01 < size_x) dx = size_x + 0.01;
@@ -139,25 +147,29 @@ namespace environment{
          }
 
          //loops over all atomistic cells to determine if the atomsitic simulation lies within an environment cell
-         for (int cell = 0 ; cell < cells::num_cells; cell++){
+         for(int lc=0; lc<cells::num_local_cells; lc++){
+            int cell = cells::cell_id_array[lc];
+          //  std::cout << "env" << cells::num_local_cells <<std::endl;
             //calcaultes the x,y,z position for each atomsitic cell
-            double x = cells::cell_coords_array_x[cell]/cells::internal::total_moment_array[cell] + env::shift[0];
-            double y = cells::cell_coords_array_y[cell]/cells::internal::total_moment_array[cell] + env::shift[1];
-            double z = cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell] + env::shift[2];
+            double x = cells::pos_and_mom_array[4*cell + 0] + env::shift[0];//cells::pos_and_mom_array[4*cell + 3] + env::shift[0];
+            double y = cells::pos_and_mom_array[4*cell + 1] + env::shift[1];//cells::pos_and_mom_array[4*cell + 3] + env::shift[0];
+            double z = cells::pos_and_mom_array[4*cell + 2] + env::shift[2];//cells::pos_and_mom_array[4*cell + 3] + env::shift[0];
 
-            x_m_max[cell] = x + cells::macro_cell_size[0]/2.0;
-            x_m_min[cell] = x - cells::macro_cell_size[0]/2.0;
-            y_m_max[cell] = y + cells::macro_cell_size[1]/2.0;
-            y_m_min[cell] = y - cells::macro_cell_size[1]/2.0;
-            z_m_max[cell] = z + cells::macro_cell_size[2]/2.0;
-            z_m_min[cell] = z - cells::macro_cell_size[2]/2.0;
-
-
+          //  std::cout << z << "\t" << env::shift[2] <<std::endl;
+            // x_m_max[cell] = x + cells::macro_cell_size[0]/2.0;
+            // x_m_min[cell] = x - cells::macro_cell_size[0]/2.0;
+            // y_m_max[cell] = y + cells::macro_cell_size[1]/2.0;
+            // y_m_min[cell] = y - cells::macro_cell_size[1]/2.0;
+            // z_m_max[cell] = z + cells::macro_cell_size[2]/2.0;
+            // z_m_min[cell] = z - cells::macro_cell_size[2]/2.0;
 
             //loops over all environment cells to determine which cell this atomistic cell lies within
             for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
+            //  std::cout
                //if atom is within environment
+              // std::cout << z_max[env_cell] << '\t' << z_min[env_cell] << '\t' << z << std::endl;
                if (x < x_max[env_cell] && x > x_min[env_cell] && y < y_max[env_cell] && y > y_min[env_cell] && z < z_max[env_cell] && z > z_min[env_cell]){
+              //   std::cout <<"A" <<  micromagnetic::internal::cell_material_array[cell] <<std::endl;
                   //then the magnetisation of the enciroment cell is a sum of all atomistic atoms in that cell
                   //adds the cell to the list of atomistic cells
                   env::list_env_cell_atomistic_cell[cell] = env_cell;
@@ -172,13 +184,13 @@ namespace environment{
          }
 
 
-         for (int mm_cell = 0 ; mm_cell < cells::num_cells; mm_cell++){
-            for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
+      //   for (int mm_cell = 0 ; mm_cell < cells::num_cells; mm_cell++){
+      //      for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
             //   std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;
-               if (abs(x_m_max[mm_cell] - x_max[env_cell]) < 2){
-                  neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
+          //     if (abs(x_m_max[mm_cell] - x_max[env_cell]) < 2){
+              //    neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
             //      std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;
-               }
+          //     }
             //   if (abs(x_m_min[mm_cell] - x_min[env_cell]) < cells::macro_cell_size[0]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
             //   if (abs(x_m_min[mm_cell] - x_max[env_cell]) < cells::macro_cell_size[0]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
             //   if (abs(x_m_max[mm_cell] - x_min[env_cell]) < cells::macro_cell_size[0]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[0]);
@@ -192,8 +204,8 @@ namespace environment{
                // if (abs(z_m_min[mm_cell] - z_min[env_cell]) < cells::macro_cell_size[2]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[2]);
                // if (abs(z_m_min[mm_cell] - z_max[env_cell]) < cells::macro_cell_size[2]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[2]);
                // if (abs(z_m_max[mm_cell] - z_min[env_cell]) < cells::macro_cell_size[2]/100.0) neighbours(env_cell,mm_cell,cells::macro_cell_size[2]);
-            }
-         }
+      //      }
+    //     }
 
          //adds all cells which are not within the atomistic section to the the none atomsitic cells list or the atomistic cells list
          for (int cell = 0; cell < env::num_cells; cell++){
@@ -207,6 +219,7 @@ namespace environment{
 
             }
          }
+
 
 
          //calcualtes the neighbour lists for each cell.
@@ -241,6 +254,7 @@ namespace environment{
                }
             }
          }
+
 
          //calcualtes me
          double m_e = pow((env::Tc-sim::temperature)/(env::Tc),0.365);
@@ -290,9 +304,9 @@ namespace environment{
 
 
 
-
          //initalise the demag fields
          int a = env::initialise_demag_fields();
+
 
          //output the cell positions and initial magnetisations to a file.
          if (vmpi::my_rank == 0){

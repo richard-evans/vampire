@@ -185,9 +185,9 @@ namespace cells{
       // Resize new cell arrays
       cells::pos_and_mom_array.resize(4*cells::num_cells,0.0);
 
-      cells::cell_coords_array_x.resize(cells::num_cells,0.0);
-      cells::cell_coords_array_y.resize(cells::num_cells,0.0);
-      cells::cell_coords_array_z.resize(cells::num_cells,0.0);
+    //  cells::cell_coords_array_x.resize(cells::num_cells,0.0);
+    //  cells::cell_coords_array_y.resize(cells::num_cells,0.0);
+    //  cells::cell_coords_array_z.resize(cells::num_cells,0.0);
 
       cells::mag_array_x.resize(cells::num_cells,0.0);
       cells::mag_array_y.resize(cells::num_cells,0.0);
