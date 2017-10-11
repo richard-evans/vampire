@@ -26,13 +26,12 @@ namespace environment
    namespace internal
    {
 
-      std::vector<double> calculate_llb_fields(std::vector <double > m,
+      std::vector<double> calculate_llb_fields(std::vector <double>& m,
          double t,
          int cell,
-         std::vector<double> x_array,
-         std::vector<double> y_array,
-         std::vector<double> z_array){
-
+         std::vector<double>& x_array,
+         std::vector<double>& y_array,
+         std::vector<double>& z_array){
 
             double temperature;
             //vector to store fields
@@ -69,11 +68,14 @@ namespace environment
 
             //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
             double exchange_field[3]={0.0,0.0,0.0};
+            const double Ar = A*2.0/(Ms);
             //saves the x,y,z prefactors for the exchange constant
-            const double Acx = A*2/(Ms)*cell_size[2]*cell_size[1];
-            const double Acy = A*2/(Ms)*cell_size[2]*cell_size[0];
-            const double Acz = A*2/(Ms)*cell_size[0]*cell_size[1];
-
+            //const double Acx = A*2/(Ms)*cell_size[2]*cell_size[1];
+            //const double Acy = A*2/(Ms)*cell_size[2]*cell_size[0];
+            //const double Acz = A*2/(Ms)*cell_size[0]*cell_size[1];
+            const double Acx = Ar*cell_size[2]*cell_size[1];
+            const double Acy = Ar*cell_size[2]*cell_size[0];
+            const double Acz = Ar*cell_size[0]*cell_size[1];
 
             if (num_cells > 1){
                const int start = neighbour_list_start_index[cell];
@@ -85,9 +87,10 @@ namespace environment
                   //calculate |mj|
                   const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
                   //calcaultes the temperature dependant terms
-                  const double ECx = pow(mj,1.66)*Acx;
-                  const double ECy = pow(mj,1.66)*Acy;
-                  const double ECz = pow(mj,1.66)*Acz;
+                  const double AT = pow(mj,1.66);
+                  const double ECx = AT*Acx;
+                  const double ECy = AT*Acy;
+                  const double ECz = AT*Acz;
                   //calcualtes the exchange field from i to j
                   exchange_field[0] -= ECx*(x_array[cellj] - x_array[cell]);
                   exchange_field[1] -= ECy*(y_array[cellj] - y_array[cell]);
@@ -95,6 +98,7 @@ namespace environment
 
                }
             }
+
 
             //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
             spin_field[0] = pf*m[0]+ exchange_field[0] - one_o_chi_perp*m[0] + ext_field[0] + dipole_field_x[cell] + env_field_uv[0];

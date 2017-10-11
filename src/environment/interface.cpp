@@ -116,14 +116,12 @@ namespace environment{
       if(word==test){
          double k=atof(value.c_str());
          vin::check_for_valid_value(k, word, line, prefix, unit, "anisotropy", 0,1e-15 ,"input","0 - 1e-18");
-         std::cout << k <<std::endl;
          env::ku =k;
          return true;
       }
       test="Ms";
       if(word==test){
          double A=atof(value.c_str());
-         std::cout << A << std::endl;
          vin::check_for_valid_positive_value(A, word, line, prefix, unit, "magnetisation", 1e-35,1e-15 ,"input","1e-32 - 1e-18");
          env::Ms =A;
          return true;

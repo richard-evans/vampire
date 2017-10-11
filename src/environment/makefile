@@ -12,6 +12,7 @@ calculate_chi_para.o \
 LLB.o \
 fieldsLLB.o \
 output.o \
+shields.o \
 demag.o
 
 # Append module objects to global tree

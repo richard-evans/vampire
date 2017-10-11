@@ -139,11 +139,6 @@ int main(int argc, char* argv[]){
       }
    #endif
 
-   vutil::vtimer_t timer;
-
-   // start timer
-   timer.start();
-
    // Initialise system
    mp::initialise(infile);
 
@@ -165,13 +160,6 @@ int main(int argc, char* argv[]){
    terminaltextcolor(GREEN);
    std::cout << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(WHITE);
-
-   // end timer
-   timer.stop();
-
-   // return elapsed time for io
-   std::cout << "simulation time" << '\t' << timer.elapsed_time() <<std::endl;
-   zlog << zTs() << "simulation time" << '\t' << timer.elapsed_time() <<std::endl;
 
    return EXIT_SUCCESS;
 
