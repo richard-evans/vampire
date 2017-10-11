@@ -126,7 +126,7 @@ namespace micromagnetic{
       }
 
 
-      if (spin_field[0] != spin_field[0]) std::cin.get();
+    //  if (spin_field[0] != spin_field[0]) std::cin.get();
       //std::cout << ms[cell] << '\t' <<spin_field[0] << '\t' << sim::track_field_y[cell] <<std::endl;
       return spin_field;
 
