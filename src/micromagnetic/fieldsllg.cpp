@@ -124,6 +124,12 @@ namespace micromagnetic{
          spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
          spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
       }
+      if (sim::track_field_x.size() != 0 ){
+        spin_field[0] = spin_field[0] + sim::track_field_x[cell];
+        spin_field[1] = spin_field[1] + sim::track_field_y[cell];
+        spin_field[2] = spin_field[2] + sim::track_field_z[cell];
+
+      }
 
 
     //  if (spin_field[0] != spin_field[0]) std::cin.get();
