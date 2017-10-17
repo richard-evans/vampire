@@ -262,6 +262,7 @@ namespace micromagnetic{
             atoms::m_spin_array[atom] = mm::m_e[cell];
          }
       }
+      if (internal::enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1)  mm::calculate_resistance();
 
       // if(sim::time>10000){
       // 	for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){

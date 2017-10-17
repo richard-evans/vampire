@@ -38,7 +38,6 @@ namespace micromagnetic{
    int number_of_none_atomistic_atoms = 0;
    int number_of_micromagnetic_cells = 0;
 
-
    //is the discretisation of each cell microamgnetic or atomistic
    std::vector < bool > cell_discretisation_micromagnetic;
 
@@ -71,6 +70,10 @@ namespace micromagnetic{
       int my_start_index; // first cell to intergrate on local (my) cpu
       int my_end_index;  // last cell +1 to intergrate on local (my) cpu
 
+      bool enable_resistance;
+      int resistance_layer_1 = 0;
+      int resistance_layer_2 = 0;
+      
       //stores the micromagnetic properties of the macrocells
       std::vector<double> A;
       std::vector<double> alpha;

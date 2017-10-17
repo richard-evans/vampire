@@ -45,6 +45,10 @@ namespace micromagnetic{
       // Internal shared variables
       //-------------------------------------------------------------------------
 
+      extern bool enable_resistance;
+      extern int resistance_layer_1;
+      extern int resistance_layer_2;
+
       //vectors to store the cell parameters
       extern std::vector<double> m_e;
       extern std::vector<double> alpha_perp;
@@ -80,6 +84,9 @@ namespace micromagnetic{
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
+
+      
+      double calculate_resistance();
 
       //functions to calculate the cell parameters
       std::vector<double> calculate_a(int num_atoms,

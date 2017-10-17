@@ -79,12 +79,16 @@ namespace program{
       //Calculates how many atoms are in the top layer of each sublattice in each grain.
       for (int atom = 0; atom < stats::num_atoms; atom++){
 
-         for (int neighbour = atoms::neighbour_list_start_index[atom]; neighbour < atoms::neighbour_list_end_index[atom]; neighbour ++){
+        int start = atoms::neighbour_list_start_index[atom];
+        int end =  atoms::neighbour_list_end_index[atom] +1;
+        int mat_i = atoms::type_array[atom];
+        int grain = atoms::grain_array[atom];
+
+         for (int neighbour = start; neighbour < end; neighbour ++){
             // explain what if statement is testing
-            if ((atoms::type_array[atom] >3) && (atoms::type_array[atoms::neighbour_list_array[neighbour]] < 4)){
-               //        std::cerr << atoms::grain_array[atom] << "\t"<< atoms::type_array[atoms::neighbour_list_array[neighbour]] << "\t" << atoms::type_array[atom] <<endl;
-               No_in_Sublattice[atoms::type_array[atoms::neighbour_list_array[neighbour]]][atoms::grain_array[atom]]++;
-               //    cerr << No_in_Sublattice[atoms::type_array[atoms::neighbour_list_array[neighbour]]][atoms::grain_array[atom]]<<endl;
+            int mat_j = atoms::type_array[atoms::neighbour_list_array[neighbour]];
+            if ((mat_i >3) && (mat_j < 4)){
+              No_in_Sublattice[mat_j][grain]++;
             }
          }
       }
@@ -96,8 +100,8 @@ namespace program{
             Local_Sub[k] = No_in_Sublattice[i][j];
             k++;
          }
-
       }
+
       #ifdef MPICF
          MPI_Allreduce(&Local_Sub[0], &Total_Sub[0],grains::num_grains*4, MPI_INT, MPI_SUM,MPI_COMM_WORLD);
       #endif
@@ -156,7 +160,7 @@ namespace program{
          }
       }
       int Array;
-      for (int i = 0; i < vmpi::num_core_atoms + vmpi::num_bdry_atoms; i++){
+      for (int i = 0; i < stats::num_atoms; i++){
          if(atoms::type_array[i] > 3){
             atoms::x_spin_array[i] = sim::H_vec[0];
             atoms::y_spin_array[i] = sim::H_vec[1];

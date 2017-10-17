@@ -19,6 +19,7 @@ atomistic_llg_heun.o \
 micromagnetic_llb.o \
 micromagnetic_llg.o \
 fieldsllb.o \
+resistance.o \
 fieldsllg.o
 
 # Append module objects to global tree

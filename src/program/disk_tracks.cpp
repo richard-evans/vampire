@@ -77,8 +77,8 @@ namespace program{
 ///
 namespace track_parameters{
 
-   int num_bits_per_track = 4;
-   int num_tracks = 1;
+   int num_bits_per_track = 3;
+   int num_tracks = 3;
    double fly_height = 100;
 
    double bit_size = 1000;
@@ -89,12 +89,12 @@ namespace track_parameters{
    double zb = bit_size/2.0;
 
    double cross_track_velocity = 0.0;
-   double down_track_velocity = 0.01;
+   double down_track_velocity = 0.0;
 
    double initial_x_position = 0;
-   double initial_z_position = -2000;
+   double initial_z_position = 0;
 
-   double Ms = 1;
+   double Ms = 0.1;
    int num_bits = (num_bits_per_track +1)*(num_tracks +1);
    std::vector < double > x_track_array(num_bits,0.0);
    std::vector < double > z_track_array(num_bits,0.0);
@@ -213,8 +213,8 @@ void calculate_field(int cell,int step){
 void tracks(){
 
   using namespace track_parameters;
-
-
+  int a = 0;
+int i = 0;
 	// check calling of routine if error checking is activated
 	if(err::check==true) std::cout << "program::tracks has been called" << std::endl;
 
@@ -238,6 +238,9 @@ void tracks(){
 
   while(sim::time<sim::equilibration_time+sim::total_time){
 
+    if (a == 0) Ms = Ms - 0.01;
+    if (a == 1) Ms = Ms + 0.01;
+
 
           for (int lc = 0; lc < cells::num_local_cells; lc++){
              int cell = cells::cell_id_array[lc];
@@ -254,9 +257,12 @@ void tracks(){
     // Output data
     vout::data();
 
-       double down_track_position = initial_z_position + down_track_velocity*sim::time;
-    std::cout  << sim::time << "\t" <<down_track_position <<   "\t" << sim::track_field_x[0]  << '\t' << sim::track_field_y[0]  << '\t' << sim::track_field_z[0]  << std::endl;
+    double cross_track_position = initial_x_position + cross_track_velocity*sim::time;
+    double down_track_position = initial_z_position + down_track_velocity*sim::time;
+    std::cout  << a << '\t' << Ms << '\t' << sim::time << "\t" <<down_track_position << "\t" << cross_track_position<<  "\t" << sim::track_field_x[0]  << '\t' << sim::track_field_y[0]  << '\t' << sim::track_field_z[0]  << std::endl;
+  if (i == 20) a = 1;
 
+i++;
 	}
 
 }
