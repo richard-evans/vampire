@@ -28,6 +28,9 @@ namespace vout{
 	void time(std::ostream& stream){
 		stream << sim::time << "\t";
 	}
+	void MRresistance(std::ostream& stream){
+		stream << micromagnetic::MR_resistance << "\t";
+	}
 
 	// Output Function 1
 	void real_time(std::ostream& stream){

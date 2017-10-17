@@ -40,6 +40,7 @@ namespace micromagnetic{
    extern int number_of_none_atomistic_atoms;
    extern int number_of_micromagnetic_cells;
 
+   extern double MR_resistance;
 
    //vector to store whether cells are micromagnetic or atomistic
    extern std::vector < bool > cell_discretisation_micromagnetic;
@@ -126,6 +127,7 @@ namespace micromagnetic{
                     double system_dimensions_y,
                     double system_dimensions_z,
                     std::vector<int> local_cell_array);
+
 
 
    //---------------------------------------------------------------------------

@@ -28,6 +28,8 @@ namespace micromagnetic{
    //boolean to determine whether the simulation is micromagnetic
    int discretisation_type = 0;
 
+   double MR_resistance = 0.0;
+
    //lsits to store atomistic/microamgnetic cells/atoms
    std::vector < double > list_of_atomistic_atoms;
    std::vector < double > list_of_none_atomistic_atoms;
@@ -73,7 +75,7 @@ namespace micromagnetic{
       bool enable_resistance;
       int resistance_layer_1 = 0;
       int resistance_layer_2 = 0;
-      
+
       //stores the micromagnetic properties of the macrocells
       std::vector<double> A;
       std::vector<double> alpha;

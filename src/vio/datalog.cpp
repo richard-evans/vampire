@@ -343,6 +343,9 @@ namespace vout{
 					case 60:
 						vout::MPITimings(zmag);
 						break;
+					case 61:
+						vout::MRresistance(zmag);
+						break;
 				}
 			}
 			// Carriage return

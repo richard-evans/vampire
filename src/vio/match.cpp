@@ -1744,6 +1744,12 @@ namespace vin{
             vout::output_rate=r;
             return EXIT_SUCCESS;
         }
+        test="magneto-resistance";
+        if(word==test){
+            micromagnetic::enable_resistance = true;
+            output_list.push_back(61);
+            return EXIT_SUCCESS;
+        }
 
         //--------------------------------------------------------------------
         // keyword not found
