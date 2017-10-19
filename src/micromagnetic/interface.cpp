@@ -179,7 +179,7 @@ namespace micromagnetic{
       if( (word == test)){
         internal::resistance_layer_1 = sub_index;
         internal::resistance_layer_2 = super_index;
-        internal::enable_resistance = true;
+        enable_resistance = true;
          return true;
       }
 

@@ -30,6 +30,7 @@ namespace micromagnetic{
 
    double MR_resistance = 0.0;
 
+   bool enable_resistance = false;
    //lsits to store atomistic/microamgnetic cells/atoms
    std::vector < double > list_of_atomistic_atoms;
    std::vector < double > list_of_none_atomistic_atoms;
@@ -72,7 +73,7 @@ namespace micromagnetic{
       int my_start_index; // first cell to intergrate on local (my) cpu
       int my_end_index;  // last cell +1 to intergrate on local (my) cpu
 
-      bool enable_resistance;
+
       int resistance_layer_1 = 0;
       int resistance_layer_2 = 0;
 

@@ -194,6 +194,13 @@ namespace sim{
    // Monte Carlo statistics counters
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;
+	 extern double track_Ms;
+
+	 extern double cross_track_velocity;
+	 extern double down_track_velocity;
+
+	 extern double initial_down_track_position;
+	 extern double initial_cross_track_position;
 
 }
 

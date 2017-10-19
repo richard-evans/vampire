@@ -19,6 +19,7 @@
 #include "material.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
+#include "micromagnetic.hpp"
 
 // vio module headers
 #include "internal.hpp"

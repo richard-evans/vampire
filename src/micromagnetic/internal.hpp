@@ -45,7 +45,7 @@ namespace micromagnetic{
       // Internal shared variables
       //-------------------------------------------------------------------------
 
-      extern bool enable_resistance;
+
       extern int resistance_layer_1;
       extern int resistance_layer_2;
 
@@ -85,7 +85,7 @@ namespace micromagnetic{
       // Internal function declarations
       //-------------------------------------------------------------------------
 
-      
+
       double calculate_resistance();
 
       //functions to calculate the cell parameters

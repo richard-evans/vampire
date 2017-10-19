@@ -25,7 +25,15 @@ namespace sim{
    std::vector < double > track_field_x;
    std::vector < double > track_field_y;
    std::vector < double > track_field_z;
-   
+
+   double track_Ms;
+   double cross_track_velocity = 0.0;
+   double down_track_velocity = 0.0;
+
+   double initial_down_track_position = 0.0;
+   double initial_cross_track_position = 0.0;
+
+
    namespace internal{
 
       //----------------------------------------------------------------------------

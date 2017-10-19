@@ -123,7 +123,9 @@ namespace micromagnetic{
          spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
          spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
          spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+
       }
+  //  if (cell == 0)  std::cout << "fields = " <<spin_field[0] << '\t' <<spin_field[1] << '\t' <<spin_field[2] << '\t' << sim::track_field_x[cell] << "\t" << sim::track_field_y[cell] << '\t' <<sim::track_field_z[cell] <<std::endl;
       if (sim::track_field_x.size() != 0 ){
         spin_field[0] = spin_field[0] + sim::track_field_x[cell];
         spin_field[1] = spin_field[1] + sim::track_field_y[cell];

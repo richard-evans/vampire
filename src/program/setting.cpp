@@ -89,6 +89,7 @@ namespace program{
             int mat_j = atoms::type_array[atoms::neighbour_list_array[neighbour]];
             if ((mat_i >3) && (mat_j < 4)){
               No_in_Sublattice[mat_j][grain]++;
+
             }
          }
       }
@@ -97,14 +98,19 @@ namespace program{
       int k = 0;
       for (int j = 0; j < grains::num_grains; j ++){
          for (int i = 0; i < 4; i ++){
-            Local_Sub[k] = No_in_Sublattice[i][j];
+            Total_Sub[k] = No_in_Sublattice[i][j];
+
+
             k++;
+
          }
       }
 
       #ifdef MPICF
-         MPI_Allreduce(&Local_Sub[0], &Total_Sub[0],grains::num_grains*4, MPI_INT, MPI_SUM,MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &Total_Sub[0],grains::num_grains*4, MPI_INT, MPI_SUM,MPI_COMM_WORLD);
       #endif
+
+
 
 
       int l =0;
@@ -120,17 +126,18 @@ namespace program{
             }
             l++;
          }
-         if (Total_Sub[l-1] !=0 ) cerr << Largest_Sublattice[j] <<endl;
+         //if (Total_Sub[l-1] !=0 )
+         cerr << Largest_Sublattice[j] <<endl;
       }
       int j = 0;
 
 
       for (int i = 0; i < grains::num_grains*4; i= i +4){
-         if (Total_Sub[i] != 0){
+        // if (Total_Sub[i] != 0){
             cout <<"number in each sublattice for grain" << j << ";" <<  Total_Sub[i] << "\t" << Total_Sub[i +1] << "\t" << Total_Sub[i+2] << "\t" << Total_Sub[i+3] << "\t" << std::endl;
             zlog << zTs() <<"number in each sublattice for grain" << j << ";" <<  Total_Sub[i] << "\t" << Total_Sub[i +1] << "\t" << Total_Sub[i+2] << "\t" << Total_Sub[i+3] << "\t" << std::endl;
             j++;
-         }
+      //   }
       }
 
 
@@ -159,6 +166,7 @@ namespace program{
             }
          }
       }
+
       int Array;
       for (int i = 0; i < stats::num_atoms; i++){
          if(atoms::type_array[i] > 3){

@@ -30,6 +30,7 @@ namespace micromagnetic{
     // 2 - multiscale
    extern int discretisation_type;
 
+   extern bool enable_resistance;
    //initialises the lists of atomstic/micromagnetic atoms for multiscale simulations
    extern std::vector < double > list_of_atomistic_atoms;
    extern std::vector < double > list_of_none_atomistic_atoms;

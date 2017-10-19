@@ -56,6 +56,7 @@
 #include "vmath.hpp"
 #include "vmpi.hpp"
 #include "cells.hpp"
+#include <fstream>
 
 namespace program{
 
@@ -77,9 +78,9 @@ namespace program{
 ///
 namespace track_parameters{
 
-   int num_bits_per_track = 3;
-   int num_tracks = 3;
-   double fly_height = 100;
+   int num_bits_per_track = 1;
+   int num_tracks = 1;
+   double fly_height = 1000;
 
    double bit_size = 1000;
    double bit_width = 600;
@@ -88,13 +89,8 @@ namespace track_parameters{
    double yb = bit_width/2.0;
    double zb = bit_size/2.0;
 
-   double cross_track_velocity = 0.0;
-   double down_track_velocity = 0.0;
 
-   double initial_x_position = 0;
-   double initial_z_position = 0;
-
-   double Ms = 0.1;
+   double Ms;
    int num_bits = (num_bits_per_track +1)*(num_tracks +1);
    std::vector < double > x_track_array(num_bits,0.0);
    std::vector < double > z_track_array(num_bits,0.0);
@@ -112,13 +108,13 @@ void create_tracks(){
 
    int bit = 0;
    int M = 1.0;
-   for (double x = -(num_tracks/2.0)*bit_size; x < (num_tracks/2.0)*bit_size + bit_size; x = x + bit_size){
-      for (double z = -(num_bits_per_track/2.0)*bit_size; z < (num_bits_per_track/2.0)*bit_size + bit_size; z = z + bit_size){
+   for (double x = -(num_tracks*xb); x < (num_tracks*xb) + bit_size; x = x + bit_size){
+      for (double z = -(num_bits_per_track*yb); z < (num_bits_per_track/2.0)*bit_size + bit_size; z = z + bit_size){
          x_track_array[bit] = x;
          z_track_array[bit] = z;
          bit_magnetisation[bit] = M;
          bit++;
-         M = M*-1;
+         M = M;
       }
       M = M*-1;
    }
@@ -133,9 +129,8 @@ void calculate_field(int cell,int step){
    using namespace track_parameters;
 
 
-
-   double down_track_position = initial_z_position + down_track_velocity*step;
-   double cross_track_position = initial_x_position + cross_track_velocity*step;
+   double down_track_position = sim::initial_down_track_position + sim::down_track_velocity*step;
+   double cross_track_position = sim::initial_cross_track_position + sim::cross_track_velocity*step;
 
 
    sim::track_field_x[cell] = 0.0;
@@ -205,6 +200,10 @@ void calculate_field(int cell,int step){
       sim::track_field_y[cell] += prefactor*H[1];
       sim::track_field_z[cell] += prefactor*H[2];
 
+      sim::track_field_x[cell] *= -1.0/(4.0*3.14);
+      sim::track_field_y[cell] *= -1.0/(4.0*3.14);
+      sim::track_field_z[cell] *= -1.0/(4.0*3.14);
+
   //    if (cell == 0 ) std::cout  << sim::time << "\t" <<down_track_position <<   "\t" << sim::track_field_x[cell]  << '\t' << sim::track_field_y[cell]  << '\t' << sim::track_field_z[cell]  << std::endl;
    }
 
@@ -212,9 +211,15 @@ void calculate_field(int cell,int step){
 
 void tracks(){
 
+  std::ofstream myfile;
+  myfile.open("field.txt");
+
   using namespace track_parameters;
-  int a = 0;
-int i = 0;
+  //int a = 0;
+  //int i = 0;
+  Ms =sim::track_Ms;
+  std::cout << "MS =" << Ms << "\t" << sim::track_Ms << "\t" << sim::cross_track_velocity << '\t' << sim::down_track_velocity << std::endl;
+
 	// check calling of routine if error checking is activated
 	if(err::check==true) std::cout << "program::tracks has been called" << std::endl;
 
@@ -238,15 +243,12 @@ int i = 0;
 
   while(sim::time<sim::equilibration_time+sim::total_time){
 
-    if (a == 0) Ms = Ms - 0.01;
-    if (a == 1) Ms = Ms + 0.01;
 
 
-          for (int lc = 0; lc < cells::num_local_cells; lc++){
-             int cell = cells::cell_id_array[lc];
-            // std::cout << cell << std::endl;
-             calculate_field(cell, sim::time);
-          }
+    for (int lc = 0; lc < cells::num_local_cells; lc++){
+       int cell = cells::cell_id_array[lc];
+       calculate_field(cell, sim::time);
+    }
 
     // Integrate system
     sim::integrate(sim::partial_time);
@@ -257,12 +259,10 @@ int i = 0;
     // Output data
     vout::data();
 
-    double cross_track_position = initial_x_position + cross_track_velocity*sim::time;
-    double down_track_position = initial_z_position + down_track_velocity*sim::time;
-    std::cout  << a << '\t' << Ms << '\t' << sim::time << "\t" <<down_track_position << "\t" << cross_track_position<<  "\t" << sim::track_field_x[0]  << '\t' << sim::track_field_y[0]  << '\t' << sim::track_field_z[0]  << std::endl;
-  if (i == 20) a = 1;
+    double cross_track_position = sim::initial_cross_track_position + sim::cross_track_velocity*sim::time;
+    double down_track_position = sim::initial_down_track_position + sim::down_track_velocity*sim::time;
+    myfile << Ms << '\t' << sim::time << "\t" <<down_track_position << "\t" << cross_track_position<<  "\t" << sim::track_field_x[0]  << '\t' << sim::track_field_y[0]  << '\t' << sim::track_field_z[0]  << std::endl;
 
-i++;
 	}
 
 }
