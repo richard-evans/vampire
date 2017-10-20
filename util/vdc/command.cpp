@@ -13,6 +13,8 @@
 // C++ standard library headers
 #include <iostream>
 #include <sstream>
+#include <cmath>
+#include <vector>
 
 // program header
 #include "vdc.hpp"
@@ -33,10 +35,11 @@ namespace vdc{
 //    --objects = spins, cones, spheres, cubes
 //    --slice = x,x,y,y,z,z
 //    --multiscale = gradient, material, region
-      std::string vector_z = "(0,0,1)"
-      std::string vector_x = "(1,0,0)"
+      std::string string_z = "(0.0,0.0,1.0)"
+      std::string string_x = "(1.0,0.0,0.0)"
 
-      double x1,y1,z1,x2,y2,z2;
+      std::vector<double> vector_z = {0.0,0.0,1.0};
+      std::vector<double> vector_x = {1.0,0.0,0.0};
 
       for (int arg = 1; arg < argc; arg++){
 
@@ -59,28 +62,35 @@ namespace vdc{
             }
 
             // work through vector and extract values
-            extract(vector_z,x1,y1,z1);
+            extract(string_z,vector_z);
          }
 
       }
 
    }
 
-   void extract( std::string vect, double& x, double& y, double& z );
+   void extract( std::string string_z, std::vector<double> vector_z ){
+      int marker = 0; //position in the vector string
 
       // check for opening brackets
-      if ( vect[0] == ( "(" || "{" ) ) {
-         int i = 1;
+      if ( string_z[marker] == ( "(" || "{" ) ) {
+         //-----------------------------------------------
+         // move to next character
+         marker++;
 
-         std::string tmp_string;
-         // read x-value
-         while ( vect[i] != "," ) {
-            tmp_string.resize( tmp_string.size() +1 );
-            tmp_string[i-1] = vect[i];
-         }
+         // read coordinates
+         read_vector( vect, x, marker );
+         read_vector( vect, y, marker );
+         read_vector( vect, z, marker );
 
-         // convert from string to double
-         x = std::stod(tmp_string)
+         // normalise (x,y,z)
+         double length;
+         length = std:sqrt( x*x + y*y + z*z );
+         x = x/length;
+         y = y/length;
+         z = z/length;
+
+
       }
       else {
          terminaltextcolor(RED);
@@ -89,7 +99,28 @@ namespace vdc{
          terminaltextcolor(WHITE);
          return EXIT_FAILURE;
       }
+   }
 
-      
+   void read_vector( std::string vect, double& coordinate, int& marker ){
+      std::string tmp_string;
+      int i = 0;
+
+      // read coordinate-value
+      while ( vect[marker] != "," ) {
+         tmp_string.resize( tmp_string.size() +1 );
+         tmp_string[i] = vect[marker];
+         marker++;
+         i++;
+      }
+
+      // move marker off comma
+      marker++;
+
+      // convert from string to double
+      coordinate = std::stod(tmp_string)
+   }
+
+
+
 
 } // end of namespace vdc
