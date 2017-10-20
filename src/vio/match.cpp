@@ -1204,7 +1204,7 @@ namespace vin{
         test="track-Ms";
         if(word==test){
           double m=atof(value.c_str());
-          check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+          check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 100");
           sim::track_Ms = m;
           return EXIT_SUCCESS;
         }

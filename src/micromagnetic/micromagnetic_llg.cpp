@@ -109,6 +109,7 @@ namespace micromagnetic{
       std::vector <double> volume_array
    ){
 
+//std::cout << "a" <<std::endl;
       // check calling of routine if error checking is activated
       if(err::check==true){std::cout << "micromagnetic::LLG_Heun has been called" << std::endl;}
 
@@ -263,7 +264,7 @@ namespace micromagnetic{
          }
       }
 
-      
+
       if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1)  micromagnetic::MR_resistance = mm::calculate_resistance();
 
       // if(sim::time>10000){

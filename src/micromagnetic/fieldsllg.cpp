@@ -74,7 +74,7 @@ namespace micromagnetic{
       //is T < TC the exchange field = 0
       if (num_cells > 1){
 
-
+//std::cout << "A1" <<std::endl;
          const int start = macro_neighbour_list_start_index[cell];
          const int end = macro_neighbour_list_end_index[cell] +1;
          for(int j = start;j< end;j++){
@@ -85,18 +85,20 @@ namespace micromagnetic{
             //std::cout << cell << '\t' << cellj << '\t' << zi << '\t' << zj << std::endl;
             int mat  = cell_material_array[cell];
             int matj =cell_material_array[cellj];
-            if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
-               if (mat != matj){
-                  double Area = cells::macro_cell_size[0]*cells::macro_cell_size[1];
-                 Ac = -pow(mj,1.66)*Area*mp::material[mat].SAF[matj]/ms[cell];
-                 if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
+           if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
+              if (mat != matj){
+              //  std::cout << mat << '\t' << matj << std::endl;
+                 double Area = cells::macro_cell_size[0]*cells::macro_cell_size[1];
+                Ac = -pow(mj,1.66)*Area*mp::material[mat].SAF[matj]/ms[cell];
+                if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
 
-//                  std::cout << Ac << '\t' << ms[cell] << '\t' << mp::material[mat].SAF[matj] << '\t' << A[j] << "\t" << cells::macro_cell_size[0] << std::endl;
+        //         std::cout << Ac << '\t' << ms[cell] << '\t' << mp::material[mat].SAF[matj] << '\t' << A[j] << "\t" << cells::macro_cell_size[0] << std::endl;
 
-               }
-            }
+              }
+           }
 
-
+      //std::cout <<"exc = " <<  exchange_field[0]<< "\t" << exchange_field[1] << '\t' <<exchange_field[2]<<std::endl;
+        //    std::cin.get();
 
             exchange_field[0] -= Ac*(x_array[cellj]*m_e[cellj] - x_array[cell]*m_e[cell]);
             exchange_field[1] -= Ac*(y_array[cellj]*m_e[cellj] - y_array[cell]*m_e[cell]);
@@ -117,15 +119,15 @@ namespace micromagnetic{
       spin_field[0] = one_o_chi_perp[cell]*m[0]*m_e[cell] + ext_field[0] + cells::field_array_x[cell] + exchange_field[0] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];// + sim::track_field_x[cell];
       spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];// + sim::track_field_y[cell];
       spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];// + sim::track_field_z[cell];
-    //  std::cout << cell << "\t" << pinning_field_y[cell] << std::endl;
+
       if (environment::enabled){
-      //  std::cout << cell << "\t" << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell] << '\t' << environment::environment_field_z[cell] << std::endl;
+
          spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
          spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
          spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
 
       }
-  //  if (cell == 0)  std::cout << "fields = " <<spin_field[0] << '\t' <<spin_field[1] << '\t' <<spin_field[2] << '\t' << sim::track_field_x[cell] << "\t" << sim::track_field_y[cell] << '\t' <<sim::track_field_z[cell] <<std::endl;
+
       if (sim::track_field_x.size() != 0 ){
         spin_field[0] = spin_field[0] + sim::track_field_x[cell];
         spin_field[1] = spin_field[1] + sim::track_field_y[cell];
@@ -134,8 +136,10 @@ namespace micromagnetic{
       }
 
 
+   //   if (cell == 5)   std::cout << "fields = " <<spin_field[0] << '\t' <<spin_field[1] << '\t' <<spin_field[2] << '\t' <<"exc = " <<  exchange_field[0]<< "\t" << exchange_field[1] << '\t' <<exchange_field[2]<<'\t' << "pin = " <<  pinning_field_x[cell] << "\t" << pinning_field_y[cell] << '\t' <<pinning_field_z[cell]<<'\t' << "track = " <<  sim::track_field_x[cell] << "\t" << sim::track_field_y[cell] << '\t' <<sim::track_field_z[cell] <<std::endl;
+
+
     //  if (spin_field[0] != spin_field[0]) std::cin.get();
-      //std::cout << ms[cell] << '\t' <<spin_field[0] << '\t' << sim::track_field_y[cell] <<std::endl;
       return spin_field;
 
    }

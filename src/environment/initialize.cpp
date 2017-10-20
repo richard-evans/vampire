@@ -154,7 +154,10 @@ namespace environment{
          std::cout << "Identifying environment cells which are atomistic" << std::endl;
 
          //loops over all atomistic cells to determine if the atomsitic simulation lies within an environment cell
-
+         std::vector<bool> in_env(cells::num_local_cells,false);
+         for(int lc=0; lc<cells::num_local_cells; lc++){
+            in_env[cell] = false;
+         }
          for(int lc=0; lc<cells::num_local_cells; lc++){
             int cell = cells::cell_id_array[lc];
           //  std::cout << "env" << cells::num_local_cells <<std::endl;
@@ -174,14 +177,15 @@ namespace environment{
 
             //loops over all environment cells to determine which cell this atomistic cell lies within
             for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
-            //  std::cout
+
                //if atom is within environment
-              // std::cout << z_max[env_cell] << '\t' << z_min[env_cell] << '\t' << z << std::endl;
+
                if (x < x_max[env_cell] && x > x_min[env_cell] && y < y_max[env_cell] && y > y_min[env_cell] && z < z_max[env_cell] && z > z_min[env_cell]){
-              //   std::cout <<"A" <<  micromagnetic::internal::cell_material_array[cell] <<std::endl;
+
                   //then the magnetisation of the enciroment cell is a sum of all atomistic atoms in that cell
                   //adds the cell to the list of atomistic cells
                   env::list_env_cell_atomistic_cell[cell] = env_cell;
+                  in_env[cell] = true;
                   //this cell is an atomistic cell.
                   env::env_cell_is_in_atomistic_region[env_cell] = 1;
                   env::x_mag_array[env_cell] += cells::mag_array_x[cell];
@@ -190,9 +194,17 @@ namespace environment{
 
                }
             }
+
          }
 
+         for(int lc=0; lc<cells::num_local_cells; lc++){
+            int cell = cells::cell_id_array[lc];
+         //   std::cout << cell << '\t' << cells::pos_and_mom_array[4*cell + 2] << '\t' << in_env[cell] <<std::endl;
+            if (in_env[cell] == true) env::list_of_mm_cells_in_env.push_back(cell);
 
+         }
+
+      //   std::cout << env::list_of_mm_cells_in_env.size() <<std::endl;
       //   for (int mm_cell = 0 ; mm_cell < cells::num_cells; mm_cell++){
       //      for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
             //   std::cout << x_m_max[mm_cell] << '\t' << x_max[env_cell] << '\t' << abs(x_m_max[mm_cell] - x_max[env_cell]) <<std::endl;

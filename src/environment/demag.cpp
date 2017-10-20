@@ -332,7 +332,8 @@ namespace environment{
          }
 
          //saves the dipole field for each cell to the environment cell for use in the environment module
-         for (int cell = 0; cell < cells::num_cells; cell++){
+         for (int l = 0; l < list_env_cell_atomistic_cell.size(); l++){
+            int cell = list_env_cell_atomistic_cell[l];
             int env_cell = list_env_cell_atomistic_cell[cell];
          //   std::cout << cell << '\t' << env_cell <<std::endl;
             environment_field_x[cell] = dipole_field_x[env_cell];

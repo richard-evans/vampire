@@ -60,195 +60,196 @@
 
 namespace program{
 
-/// @brief Function to calculate magnetisation over a time series
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.0
-/// @date    30/03/2011
-///
-/// @internal
-///	Created:		30/03/2011
-///	Revision:	--
-///=====================================================================================
-///
+//------------------------------------------------------------------------------
+// Namespace defining dimensions and parameters for tracks
+//------------------------------------------------------------------------------
+
 namespace track_parameters{
 
+   // specify number of bits and tracks
    int num_bits_per_track = 1;
    int num_tracks = 1;
-   double fly_height = 1000;
 
-   double bit_size = 1000;
-   double bit_width = 600;
+   // distance of tracks from read head
+   double fly_height = 0.0; // Angstroms
 
-   double xb = bit_size/2.0;
-   double yb = bit_width/2.0;
-   double zb = bit_size/2.0;
+   double bit_size = 1000.0; // size of bits in x-direction (cross track)
+   double bit_width = 10000.0; // size of bits in z-direction (down track)
+   double bit_depth = 600.0; // depth of bits along y-direction
 
+   double Ms = 0.1;// mu0 Ms in Tesla
 
-   double Ms;
-   int num_bits = (num_bits_per_track +1)*(num_tracks +1);
-   std::vector < double > x_track_array(num_bits,0.0);
-   std::vector < double > z_track_array(num_bits,0.0);
-   std::vector < double > bit_magnetisation(num_bits,0.0);
+   int num_bits; // total number of bits
 
-   double y_track = -fly_height - bit_width/2.0;
+   std::vector < double > x_track_array; // stores coordinates of bits
+   std::vector < double > z_track_array; // stores coordinates of bits
+   std::vector < double > bit_magnetisation; // stores magnetization of bits
+   //double y_track = -bit_depth*0.5;
+}
 
+// typesafe sign function
+template <typename T> int sign(T val) {
+    return (T(0) < val) - (val < T(0));
 }
 
 
+//------------------------------------------------------------------------------
+// Function to create tracks
+//------------------------------------------------------------------------------
 
 void create_tracks(){
+   int M = 1;
 
-   using namespace track_parameters;
+
+   // temporary constants defining half sizes of bits
+   const double xb = track_parameters::bit_size*0.5;
+   const double yb = track_parameters::bit_depth*0.5;
+   const double zb = track_parameters::bit_width*0.5;
 
    int bit = 0;
-   int M = 1.0;
-   for (double x = -(num_tracks*xb); x < (num_tracks*xb) + bit_size; x = x + bit_size){
-      for (double z = -(num_bits_per_track*yb); z < (num_bits_per_track/2.0)*bit_size + bit_size; z = z + bit_size){
-         x_track_array[bit] = x;
-         z_track_array[bit] = z;
-         bit_magnetisation[bit] = M;
-         bit++;
-         M = M;
-      }
-      M = M*-1;
-   }
 
+   const int start_x = -(track_parameters::num_tracks*xb) + xb;
+   const int end_x = (track_parameters::num_tracks*xb) + xb;
+   const int bs = track_parameters::bit_size;
+   const int bw = track_parameters::bit_width;
+   const int start_z = -(track_parameters::num_bits_per_track*zb) + zb;
+   const int end_z = (track_parameters::num_bits_per_track*zb) + zb;
+
+    for (int x = start_x; x < end_x; x = x + bs){
+       for (double z = -start_z; z < end_z; z = z + bw){
+          track_parameters::x_track_array[bit] = x;
+          track_parameters::z_track_array[bit] = z;
+   //
+          track_parameters::bit_magnetisation[bit] = M;
+          bit++;
+          std::cout << bit << "\t" << track_parameters::num_bits<<std::endl;
+   //    //   M = M*-1;
+       }
+     //  M = M*-1;
+    }
 }
 
 
-
-void calculate_field(int cell,int step){
-
-
-   using namespace track_parameters;
-
+std::vector <double > calculate_field(double cx, double cy, double cz, int step){
 
    double down_track_position = sim::initial_down_track_position + sim::down_track_velocity*step;
    double cross_track_position = sim::initial_cross_track_position + sim::cross_track_velocity*step;
 
+   double prefactor = track_parameters::Ms/(4.0*M_PI);
 
-   sim::track_field_x[cell] = 0.0;
-   sim::track_field_y[cell] = 0.0;
-   sim::track_field_z[cell] = 0.0;
+   //cell position in Angstrom
+   double x_cell = cross_track_position + cx;
+   double y_cell = cy;
+   double z_cell = down_track_position  + cz;
 
+   const double xb = track_parameters::bit_size  * 0.5;
+   const double yb = track_parameters::bit_depth * 0.5;
+   const double zb = track_parameters::bit_width * 0.5;
 
-   //cell position in A
-   double x_cell = cross_track_position + cells::pos_and_mom_array[4*cell+0];
-   double y_cell = -fly_height          - cells::pos_and_mom_array[4*cell+1];
-   double z_cell = down_track_position  + cells::pos_and_mom_array[4*cell+2];
-   //std::cout
-   //std::cout << x_cell << '\t' << y_cell << '\t' << z_cell << std::endl;
-   //loop over all bits to calcualte the field from each bit
-   for (int bit = 0; bit < num_bits; bit++){
+   const double y_track = -track_parameters::bit_depth/2.0 - track_parameters::fly_height;
 
-      std::vector <double > H(3,0.0);
+   std::vector <double > B(3,0.0);
+
+   for (int bit = 0; bit < track_parameters::num_bits; bit++){
+
       //bit positions in A
-      double x_bit = x_track_array[bit];
+      double x_bit = track_parameters::x_track_array[bit];
       double y_bit = y_track;
-      double z_bit = z_track_array[bit];
+      double z_bit = track_parameters::z_track_array[bit];
 
       //pcalcualtes the prefactor (M/4pi)
-      double prefactor = Ms*bit_magnetisation[bit]/(4.0*3.14);
-      //std::cout <<prefactor <<std::endl;
-      //calcualtes the vector in A from the cell to the bits
+
+      //calculates the vector in A from the cell to the bits
       double x = x_cell - x_bit;
       double y = y_cell - y_bit;
       double z = z_cell - z_bit;
 
 
-      for (int k =1; k < 3; k ++){
-         int k1 = pow((-1),k);
+      double Bx = 0.0;
+      double By = 0.0;
+      double Bz = 0.0;
 
-         for (int l =1; l < 3; l ++){
-            int l1 = pow((-1),l);
+      for(int k=1; k<4; k++){
 
-            for (int m =1; m < 3; m ++){
-               int m1 = pow((-1),m);
-               int klm1 = pow((-1),l+k+m);
+          // predefine power as fixed for loop iteration
+          const double m1k = pow(-1,k);
+
+          for(int l=1; l<4; l++){
+
+             // predefine power as fixed for loop iteration
+             const double m1l = pow(-1,l);
+
+             for(int m=1; m<4; m++){
+
+                const double m1m = pow(-1,m);
+                const double m1klm = pow(-1,k+l+m);
+
+                const double xp = x + xb*m1k;
+                const double yp = y + yb*m1l;
+                const double zp = z + zb*m1m;
+
+                const double r = sqrt( xp*xp + yp*yp + zp*zp );
+
+                const double xabs = fabs(xp);
+                const double yabs = fabs(yp);
+
+                Bx += m1klm * log(zp+r);
+                By += m1klm * log(xp+r);
+                Bz += m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+
+             }
+          }
+      }
 
 
-               double y_l1yb = y+l1*yb;
-               double x_k1xb = x+k1*xb;
-               double z_m1zb = z+m1*zb;
-
-               if (x_k1xb ==0) x_k1xb = 0.001;
-               if (y_l1yb ==0) y_l1yb = 0.001;
-               if (z_m1zb ==0) z_m1zb = 0.001;
-
-               double mod = sqrt(y_l1yb*y_l1yb + x_k1xb*x_k1xb);
-               double frac = y_l1yb*x_k1xb/mod;
-               double sq = x_k1xb*x_k1xb + y_l1yb*y_l1yb + z_m1zb*z_m1zb;
-
-               H[0] += klm1*log(z_m1zb + sqrt(sq));
-               H[1] += klm1*frac*atan((x_k1xb*z_m1zb)/(y_l1yb*sqrt(sq)));
-               H[2] += klm1*log(x_k1xb + sqrt(sq));
-
-            //   if (cell == 0 ) std::cout << "A" << cell << '\t' << sim::time <<  "\t" << x << '\t' << y << '\t' << z << "\t" << sim::track_field_y[cell]  << std::endl;
-
-            }
-         }
-      }//std::cin.get();
-
-
-      sim::track_field_x[cell] += prefactor*H[0];
-      sim::track_field_y[cell] += prefactor*H[1];
-      sim::track_field_z[cell] += prefactor*H[2];
-
-      sim::track_field_x[cell] *= -1.0/(4.0*3.14);
-      sim::track_field_y[cell] *= -1.0/(4.0*3.14);
-      sim::track_field_z[cell] *= -1.0/(4.0*3.14);
-
-  //    if (cell == 0 ) std::cout  << sim::time << "\t" <<down_track_position <<   "\t" << sim::track_field_x[cell]  << '\t' << sim::track_field_y[cell]  << '\t' << sim::track_field_z[cell]  << std::endl;
+      B[0] = Bx*prefactor;
+      B[1] = By*prefactor;
+      B[2] = Bz*prefactor;
    }
+
+   return B;
 
 }
 
 void tracks(){
 
-  std::ofstream myfile;
-  myfile.open("field.txt");
 
-  using namespace track_parameters;
-  //int a = 0;
-  //int i = 0;
-  Ms =sim::track_Ms;
-  std::cout << "MS =" << Ms << "\t" << sim::track_Ms << "\t" << sim::cross_track_velocity << '\t' << sim::down_track_velocity << std::endl;
+     sim::track_field_x.resize(cells::num_cells,0.0);
+     sim::track_field_y.resize(cells::num_cells,0.0);
+     sim::track_field_z.resize(cells::num_cells,0.0);
 
-	// check calling of routine if error checking is activated
-	if(err::check==true) std::cout << "program::tracks has been called" << std::endl;
+   //   for (int cell = 0; cell <cells::num_cells; cell++ ){
+   //      sim::track_field_x[cell] = 0.0;
+   //      sim::track_field_y[cell] = 0.0;
+   //      sim::track_field_z[cell] = 0.0;
+   //   }
 
-	double temp=sim::temperature;
+   // define total number of bits
+   track_parameters::num_bits = (track_parameters::num_bits_per_track)*(track_parameters::num_tracks);
 
-   sim::track_field_x.resize(cells::num_cells);
-   sim::track_field_y.resize(cells::num_cells);
-   sim::track_field_z.resize(cells::num_cells);
-
-
-
-
+   track_parameters::x_track_array.resize(track_parameters::num_bits,0.0);
+   track_parameters::z_track_array.resize(track_parameters::num_bits,0.0);
+   track_parameters::bit_magnetisation.resize(track_parameters::num_bits,0.0);
 
    create_tracks();
 
 
-
-
-	sim::temperature=temp;
-
+std::vector <double > B(3,0.0);
 
   while(sim::time<sim::equilibration_time+sim::total_time){
 
+     for (int lc = 0; lc < cells::num_local_cells; lc++){
+        int cell = cells::cell_id_array[lc];
 
+          const double cx = cells::pos_and_mom_array[4*cell+0];
+          const double cy = cells::pos_and_mom_array[4*cell+1];
+          const double cz = cells::pos_and_mom_array[4*cell+2];
+          B = calculate_field(cx, cy, cz, sim::time);
+          sim::track_field_x[cell] = B[0];
+          sim::track_field_y[cell] = B[1];
+          sim::track_field_z[cell] = B[2];
+       }
 
-    for (int lc = 0; lc < cells::num_local_cells; lc++){
-       int cell = cells::cell_id_array[lc];
-       calculate_field(cell, sim::time);
-    }
 
     // Integrate system
     sim::integrate(sim::partial_time);
@@ -259,12 +260,7 @@ void tracks(){
     // Output data
     vout::data();
 
-    double cross_track_position = sim::initial_cross_track_position + sim::cross_track_velocity*sim::time;
-    double down_track_position = sim::initial_down_track_position + sim::down_track_velocity*sim::time;
-    myfile << Ms << '\t' << sim::time << "\t" <<down_track_position << "\t" << cross_track_position<<  "\t" << sim::track_field_x[0]  << '\t' << sim::track_field_y[0]  << '\t' << sim::track_field_z[0]  << std::endl;
-
 	}
 
 }
-
 }//end of namespace program
