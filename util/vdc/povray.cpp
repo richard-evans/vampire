@@ -52,9 +52,11 @@ void output_inc_file(unsigned int spin_file_id){
 
       // get z-magnetization for colour constrast
       const double sz = spins[3*atom+2];
+		const double sy = spins[3*atom+1];
+		const double sx = spins[3*atom+0];
 
       // calculate rgb components based on z magnetization
-      vdc::rgb(sz, red, green, blue);
+      vdc::rgb(sx, sy, sz, red, green, blue);
 
       std::stringstream line;
       line << "spinm"<< type[atom] << "(" <<
