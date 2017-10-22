@@ -88,14 +88,8 @@ namespace vdc{
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);
 
-   void colourwheel( std::vector<std::vector<double>>& colourmap );
    void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
-   double scale( double scale_min, double scale_max, double start_min, double start_max, double x );
-   void rgb2hsl( double& red, double& green, double& blue, double& hue, double& light, double& saturation );
-   void hsl2rgb( double& red, double& green, double& blue, double& hue, double& light, double& saturation );
-   void interpolate(double xy_angle, double& red, double& green, double& blue );
-   void rgb2hsi( double& red, double& green, double& blue, double& h2, double& intensity, double& saturation );
-   void hsi2rgb( double& red, double& green, double& blue, double& hue, double& intensity, double& saturation );
+
 }
 
 #endif //VDC_H_

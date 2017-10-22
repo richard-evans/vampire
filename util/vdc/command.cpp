@@ -70,6 +70,25 @@ void command( int argc, char* argv[] ){
          // work through vector and extract values
          extract(string_z,vector_z);
       }
+      else if (sw == "--vector-x"){
+
+         // check number of args not exceeded
+         if (arg+1 < argc){
+            arg++;
+            vector_z = string(argv[arg]);
+         }
+         else {
+            terminaltextcolor(RED);
+            std::cerr << "Error - expected 3 comma separated variables in brackets."
+                      << "\n" << "Check for spaces in command-line arguments"
+                      << std:endl;
+            terminaltextcolor(WHITE);
+            return EXIT_FAILURE;
+         }
+
+         // work through vector and extract values
+         extract(string_z,vector_x);
+      }
 
    }
 
