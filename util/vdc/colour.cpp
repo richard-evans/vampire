@@ -42,15 +42,15 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    double sx2, sy2, sz2; //spin coordinates after change of axes
    std::vector<double> vector_y = {0.0,0.0,0.0};
 
-   // calculate y-axis (z cross x) 
-   vector_y[0] = vector_z[1]*vector_x[2] - vector_x[1]*vector_z[2];
-   vector_y[1] = vector_x[0]*vector_z[2] - vector_z[0]*vector_x[2];
-   vector_y[2] = vector_z[0]*vector_x[1] - vector_x[0]*vector_z[1];
+   // calculate y-axis (z cross x)
+   vector_y[0] = vdc::vector_z[1]*vdc::vector_x[2] - vdc::vector_x[1]*vdc::vector_z[2];
+   vector_y[1] = vdc::vector_x[0]*vdc::vector_z[2] - vdc::vector_z[0]*vdc::vector_x[2];
+   vector_y[2] = vdc::vector_z[0]*vdc::vector_x[1] - vdc::vector_x[0]*vdc::vector_z[1];
 
    // perform change of coordinates
-   sx2 = vector_x[0]*sx + vector_x[1]*sy + vector_x[2]*sz;
+   sx2 = vdc::vector_x[0]*sx + vdc::vector_x[1]*sy + vdc::vector_x[2]*sz;
    sy2 = vector_y[0]*sx + vector_y[1]*sy + vector_y[2]*sz;
-   sz2 = vector_z[0]*sx + vector_z[1]*sy + vector_z[2]*sz;
+   sz2 = vdc::vector_z[0]*sx + vdc::vector_z[1]*sy + vdc::vector_z[2]*sz;
 
    // in x,y plane, angle = the spin direction
    xy_angle = std::atan2(sy2,sx2);

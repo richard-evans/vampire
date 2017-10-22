@@ -22,7 +22,7 @@
 namespace vdc{
 
 // forward function declarations
-void extract( std::string string_z, std::vector<double> vector_z );
+void extract( std::string arg_string, std::vector<double> arg_vector );
 
 //------------------------------------------------------------------------------
 // Command line parsing function
@@ -70,7 +70,7 @@ void command( int argc, char* argv[] ){
          }
 
          // work through vector and extract values
-         extract(temp_str,vector_z);
+         extract(temp_str,vdc::vector_z);
 
          // confirm initialisation of z-axis
          z_initialised = true;
@@ -92,7 +92,7 @@ void command( int argc, char* argv[] ){
          }
 
          // work through vector and extract values
-         extract(temp_str,vector_x);
+         extract(temp_str,vdc::vector_x);
 
          // confirm initialisation of x-axis
          x_initialised = true;
@@ -104,7 +104,7 @@ void command( int argc, char* argv[] ){
    if ( z_initialised && !x_initialised ){
 
       // find a line on the plane going through origin with normal vector_z
-      vector_x = {1.0, 0.0, -1.0*vector_z[0]/vector_z[2]};
+      vdc::vector_x = {1.0, 0.0, -1.0*vdc::vector_z[0]/vdc::vector_z[2]};
    }
    else if ( !z_initialised && x_initialised ){
 
@@ -120,7 +120,7 @@ void command( int argc, char* argv[] ){
 
       // check if input axes are orthogonal
       double zdotx;
-      zdotx = vector_z[0]*vector_x[0] + vector_z[1]*vector_x[1] + vector_z[2]*vector_x[2];
+      zdotx = vdc::vector_z[0]*vdc::vector_x[0] + vdc::vector_z[1]*vdc::vector_x[1] + vdc::vector_z[2]*vdc::vector_x[2];
 
       if ( (zdotx > 0.000001) || (zdotx < -0.000001) ){
          terminaltextcolor(RED);
@@ -137,11 +137,11 @@ void command( int argc, char* argv[] ){
 // Extracts 3D vector coordinates from string: {x,y,z} or (x,y,z)
 // where x,y and z are doubles
 //------------------------------------------------------------------------------
-void extract( std::string string_z, std::vector<double> vector_z ){
+void extract( std::string arg_string, std::vector<double> arg_vector ){
    int marker = 0; // position in the vector string
 
    // check for opening brackets
-   if ( string_z[marker] != ( "(" || "{" ) ){
+   if ( arg_string[marker] != ( "(" || "{" ) ){
       terminaltextcolor(RED);
       std::cerr << "Error - brackets required around 3 comma separated values"
                 << std::endl;
@@ -158,29 +158,29 @@ void extract( std::string string_z, std::vector<double> vector_z ){
 
       // read coordinate-value
       int j = 0;
-      while ( string_z[marker] != "," ){
+      while ( arg_string[marker] != "," ){
          tmp_string.resize( tmp_string.size() +1 );
-         tmp_string[j] = string_z[marker];
+         tmp_string[j] = arg_string[marker];
 
          // move through number
          marker++;
          j++;
       }
 
-      vector_z[i] = std::stod(tmp_string);
+      arg_vector[i] = std::stod(tmp_string);
 
       // skip comma, check for closing brackets
-      if ( string_z[marker] == "," ){
+      if ( arg_string[marker] == "," ){
          marker++;
       }
-      else if ( (string_z[marker] != ( ")" || "}" )) && ( i == 2 ){
+      else if ( (arg_string[marker] != ( ")" || "}" )) && ( i == 2 ){
          terminaltextcolor(RED);
          std::cerr << "Error - brackets required around 3 comma separated values"
                    << std::endl;
          terminaltextcolor(WHITE);
          return EXIT_FAILURE;
       }
-      else if ( (string_z[marker] == ( ")" || "}" )) && ( i != 2 ){
+      else if ( (arg_string[marker] == ( ")" || "}" )) && ( i != 2 ){
          terminaltextcolor(RED)
          std::cerr << "Error - three coordinates required"
                    << std::endl;
@@ -190,12 +190,12 @@ void extract( std::string string_z, std::vector<double> vector_z ){
 
    }
 
-   // normalise vector_z
+   // normalise arg_vector
    double length;
-   length = std:sqrt( vector_z[0]*vector_z[0] + vector_z[1]*vector_z[1] + vector_z[2]*vector_z[2] );
-   vector_z[0] = vector_z[0]/length;
-   vector_z[1] = vector_z[1]/length;
-   vector_z[2] = vector_z[2]/length;
+   length = std:sqrt( arg_vector[0]*arg_vector[0] + arg_vector[1]*arg_vector[1] + arg_vector[2]*arg_vector[2] );
+   arg_vector[0] = arg_vector[0]/length;
+   arg_vector[1] = arg_vector[1]/length;
+   arg_vector[2] = arg_vector[2]/length;
 
 }
 

@@ -55,7 +55,7 @@ namespace vdc{
 
    // axis vectors for povray colouring
    extern std::vector<double> vector_z;
-   extern std::vector<double> vector_X;
+   extern std::vector<double> vector_x;
 
    // non-magnetic atom data
    extern uint64_t num_nm_atoms;
