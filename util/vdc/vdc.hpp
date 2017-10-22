@@ -53,6 +53,10 @@ namespace vdc{
    extern std::vector<double> coordinates;
    extern std::vector<double> spins;
 
+   // axis vectors for povray colouring
+   extern std::vector<double> vector_z;
+   extern std::vector<double> vector_X;
+
    // non-magnetic atom data
    extern uint64_t num_nm_atoms;
    extern std::vector<int> nm_category;

@@ -42,6 +42,10 @@ namespace vdc{
    std::vector<double> coordinates(0);
    std::vector<double> spins(0);
 
+   // axis vectors for povray colouring
+   std::vector<double> vector_z = {0.0,0.0,1.0};
+   std::vector<double> vector_x = {1.0,0.0,0.0};
+
    // non-magnetic atom data
    uint64_t num_nm_atoms = 0;
    std::vector<int> nm_category(0);

@@ -39,9 +39,21 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
 
    // variables
    double xy_angle, z_angle, hue, light, saturation;
+   double sx2, sy2, sz2; //spin coordinates after change of axes
+   std::vector<double> vector_y = {0.0,0.0,0.0};
+
+   // calculate y-axis (z cross x) 
+   vector_y[0] = vector_z[1]*vector_x[2] - vector_x[1]*vector_z[2];
+   vector_y[1] = vector_x[0]*vector_z[2] - vector_z[0]*vector_x[2];
+   vector_y[2] = vector_z[0]*vector_x[1] - vector_x[0]*vector_z[1];
+
+   // perform change of coordinates
+   sx2 = vector_x[0]*sx + vector_x[1]*sy + vector_x[2]*sz;
+   sy2 = vector_y[0]*sx + vector_y[1]*sy + vector_y[2]*sz;
+   sz2 = vector_z[0]*sx + vector_z[1]*sy + vector_z[2]*sz;
 
    // in x,y plane, angle = the spin direction
-   xy_angle = std::atan2(sy,sx);
+   xy_angle = std::atan2(sy2,sx2);
    xy_angle = std::fmod(xy_angle + 2*pi, 2*pi);  // range [0-2pi]
 
    // to apply colourmap, need value between 0-255
@@ -61,7 +73,7 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
 
    // adjust lightness to reflect z-axis orientation
    // find angle w.r.t. z-axis [value -pi/2 to pi/2]
-   z_angle = std::atan(sz/std::sqrt(sx*sx + sy*sy));
+   z_angle = std::atan(sz2/std::sqrt(sx2*sx2 + sy2*sy2));
    if ( z_angle >= 0.0 ){
       light = light + (1.0 - light)*(2.0*z_angle/pi);
    }

@@ -41,11 +41,13 @@ void command( int argc, char* argv[] ){
 //    --objects = spins, cones, spheres, cubes
 //    --slice = x,x,y,y,z,z
 //    --multiscale = gradient, material, region
-   std::string string_z = "(0.0,0.0,1.0)"
-   std::string string_x = "(1.0,0.0,0.0)"
 
-   std::vector<double> vector_z = {0.0,0.0,1.0};
-   std::vector<double> vector_x = {1.0,0.0,0.0};
+   // check for axis initialisations
+   bool x_initialised = false;
+   bool z_initialised = false;
+
+   // temporary string for storing command line argument
+   std::string temp_str;
 
    for (int arg = 1; arg < argc; arg++){
 
@@ -56,7 +58,7 @@ void command( int argc, char* argv[] ){
          // check number of args not exceeded
          if (arg+1 < argc){
             arg++;
-            vector_z = string(argv[arg]);
+            temp_str = string(argv[arg]);
          }
          else {
             terminaltextcolor(RED);
@@ -68,26 +70,63 @@ void command( int argc, char* argv[] ){
          }
 
          // work through vector and extract values
-         extract(string_z,vector_z);
+         extract(temp_str,vector_z);
+
+         // confirm initialisation of z-axis
+         z_initialised = true;
       }
       else if (sw == "--vector-x"){
 
          // check number of args not exceeded
          if (arg+1 < argc){
             arg++;
-            vector_z = string(argv[arg]);
+            temp_str = string(argv[arg]);
          }
          else {
             terminaltextcolor(RED);
             std::cerr << "Error - expected 3 comma separated variables in brackets."
                       << "\n" << "Check for spaces in command-line arguments"
-                      << std:endl;
+                      << std::endl;
             terminaltextcolor(WHITE);
             return EXIT_FAILURE;
          }
 
          // work through vector and extract values
-         extract(string_z,vector_x);
+         extract(temp_str,vector_x);
+
+         // confirm initialisation of x-axis
+         x_initialised = true;
+      }
+
+   }
+
+   // check for valid axis initialisations
+   if ( z_initialised && !x_initialised ){
+
+      // find a line on the plane going through origin with normal vector_z
+      vector_x = {1.0, 0.0, -1.0*vector_z[0]/vector_z[2]};
+   }
+   else if ( !z_initialised && x_initialised ){
+
+      // x-axis cannot be initialised alone
+      terminaltextcolor(RED);
+      std::cerr << "Error - x-axis cannot be initialised alone."
+                << "\n" << "To use 1D colour scheme, initialise z-axis instead"
+                << std::endl;
+      terminaltextcolor(WHITE);
+      return EXIT_FAILURE;
+   }
+   else if ( z_initialised && x_initialised ){
+
+      // check if input axes are orthogonal
+      double zdotx;
+      zdotx = vector_z[0]*vector_x[0] + vector_z[1]*vector_x[1] + vector_z[2]*vector_x[2];
+
+      if ( (zdotx > 0.000001) || (zdotx < -0.000001) ){
+         terminaltextcolor(RED);
+         std::cerr << "Error - input axes are not orthogonal." << std::endl;
+         terminaltextcolor(WHITE);
+         return EXIT_FAILURE;
       }
 
    }
