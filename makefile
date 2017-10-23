@@ -56,14 +56,11 @@ LLVM_CFLAGS= -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
 LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
 GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++0x
-GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -std=c++0x
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa
 
-NVCC_FLAGS=-I/usr/local/cuda/include -I./hdr -I./src/qvoronoi --compiler-bindir=/usr/bin/g++-4.2 --compiler-options=-O3,-DCUDA
---ptxas-options=-v --maxrregcount=32 -arch=sm_13 -O3
-NVCC=nvcc -DCOMP='"GNU C++ Compiler"'
 
 IBM_CFLAGS=-O5 -qarch=450 -qtune=450 -I./hdr -I./src/qvoronoi
 IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
@@ -195,7 +192,6 @@ MPI_IBMDB_OBJECTS=$(OBJECTS:.o=_ibmdb_mpi.o)
 MPI_CRAYDB_OBJECTS=$(OBJECTS:.o=_craydb_mpi.o)
 MPI_ARCHER_OBJECTS=$(OBJECTS:.o=_archer_mpi.o)
 
-CUDA_OBJECTS=$(OBJECTS:.o=_cuda.o)
 CLEXECUTABLE=vampire-opencl
 CUDAEXECUTABLE=vampire-cuda
 EXECUTABLE=vampire-serial

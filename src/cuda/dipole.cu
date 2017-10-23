@@ -17,6 +17,7 @@
 #include "cuda_utils.hpp"
 #include "exchange_fields.hpp"
 #include "data.hpp"
+#include "dipole.hpp"
 #include "internal.hpp"
 
 // Conditional compilation of all cuda code
@@ -38,13 +39,13 @@ void update_dipolar_fields ()
    if(sim::hamiltonian_simulation_flags[4]!=1) return;
 
    // check for previous demag update at same time (avoids recalculation in Heun scheme)
-   if (::sim::time == ::demag::update_time) return;
+   if (::sim::time == ::dipole::update_time) return;
 
    // if remainder of time/rate != 0 return
-   if (::sim::time % ::demag::update_rate != 0) return;
+   if (::sim::time % ::dipole::update_rate != 0) return;
 
    // save last time of demag update
-   ::demag::update_time = ::sim::time;
+   ::dipole::update_time = ::sim::time;
 
    update_cell_magnetizations ();
 

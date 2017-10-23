@@ -15,6 +15,7 @@
 #include "atoms.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
+#include "dipole.hpp"
 #include "gpu.hpp"
 #include "random.hpp"
 #include "stats.hpp"
@@ -313,23 +314,9 @@ namespace vcuda{
          cu::y_dipolar_field_array.resize(::atoms::num_atoms);
          cu::z_dipolar_field_array.resize(::atoms::num_atoms);
 
-         thrust::copy(
-               ::atoms::x_dipolar_field_array.begin(),
-               ::atoms::x_dipolar_field_array.end(),
-               cu::x_dipolar_field_array.begin()
-               );
-
-         thrust::copy(
-               ::atoms::y_dipolar_field_array.begin(),
-               ::atoms::y_dipolar_field_array.end(),
-               cu::y_dipolar_field_array.begin()
-               );
-
-         thrust::copy(
-               ::atoms::z_dipolar_field_array.begin(),
-               ::atoms::z_dipolar_field_array.end(),
-               cu::z_dipolar_field_array.begin()
-               );
+         thrust::copy(::dipole::atom_dipolar_field_array_x.begin(),::dipole::atom_dipolar_field_array_x.end(), cu::x_dipolar_field_array.begin());
+         thrust::copy(::dipole::atom_dipolar_field_array_y.begin(),::dipole::atom_dipolar_field_array_y.end(), cu::y_dipolar_field_array.begin());
+         thrust::copy(::dipole::atom_dipolar_field_array_z.begin(),::dipole::atom_dipolar_field_array_z.end(), cu::z_dipolar_field_array.begin());
 
          return true;
       }
@@ -344,75 +331,45 @@ namespace vcuda{
          cu::cells::y_coord_array.resize(::cells::num_cells);
          cu::cells::z_coord_array.resize(::cells::num_cells);
 
-         thrust::copy(
-               ::cells::x_coord_array.begin(),
-               ::cells::x_coord_array.end(),
-               cu::cells::x_coord_array.begin()
-               );
+         // unroll 4N array to N
+         std::vector<double> pos(::cells::num_cells,0.0);
+         for(int cell = 0; cell < pos.size(); cell++) pos[cell] = ::cells::pos_and_mom_array[4*cell+0]; // x
 
-         thrust::copy(
-               ::cells::y_coord_array.begin(),
-               ::cells::y_coord_array.end(),
-               cu::cells::y_coord_array.begin()
-               );
+         thrust::copy(pos.begin(), pos.end(), cu::cells::x_coord_array.begin());
 
-         thrust::copy(
-               ::cells::z_coord_array.begin(),
-               ::cells::z_coord_array.end(),
-               cu::cells::z_coord_array.begin()
-               );
+         // unroll 4N array to N
+         for(int cell = 0; cell < pos.size(); cell++) pos[cell] = ::cells::pos_and_mom_array[4*cell+1]; // y
 
-         /*
-          * Allocate memory and initialize cell magnetization
-          */
+         thrust::copy(pos.begin(), pos.end(), cu::cells::y_coord_array.begin());
+
+         // unroll 4N array to N
+         for(int cell = 0; cell < pos.size(); cell++) pos[cell] = ::cells::pos_and_mom_array[4*cell+2]; // z
+
+         thrust::copy(pos.begin(), pos.end(), cu::cells::z_coord_array.begin());
+
+         //-----------------------------------------------------
+         // Allocate memory and initialize cell magnetization
+         //-----------------------------------------------------
 
          cu::cells::x_mag_array.resize(::cells::num_cells);
          cu::cells::y_mag_array.resize(::cells::num_cells);
          cu::cells::z_mag_array.resize(::cells::num_cells);
 
-         thrust::copy(
-               ::cells::x_mag_array.begin(),
-               ::cells::x_mag_array.end(),
-               cu::cells::x_mag_array.begin()
-               );
+         thrust::copy(::cells::mag_array_x.begin(), ::cells::mag_array_x.end(), cu::cells::x_mag_array.begin());
+         thrust::copy(::cells::mag_array_y.begin(), ::cells::mag_array_y.end(), cu::cells::y_mag_array.begin());
+         thrust::copy(::cells::mag_array_z.begin(), ::cells::mag_array_z.end(), cu::cells::z_mag_array.begin());
 
-         thrust::copy(
-               ::cells::y_mag_array.begin(),
-               ::cells::y_mag_array.end(),
-               cu::cells::y_mag_array.begin()
-               );
-
-         thrust::copy(
-               ::cells::z_mag_array.begin(),
-               ::cells::z_mag_array.end(),
-               cu::cells::z_mag_array.begin()
-               );
-
-         /*
-          * Allocate memory and initialize cell fields
-          */
+         //----------------------------------------------
+         // Allocate memory and initialize cell fields
+         //----------------------------------------------
 
          cu::cells::x_field_array.resize(::cells::num_cells);
          cu::cells::y_field_array.resize(::cells::num_cells);
          cu::cells::z_field_array.resize(::cells::num_cells);
 
-         thrust::copy(
-               ::cells::x_field_array.begin(),
-               ::cells::x_field_array.end(),
-               cu::cells::x_field_array.begin()
-               );
-
-         thrust::copy(
-               ::cells::y_field_array.begin(),
-               ::cells::y_field_array.end(),
-               cu::cells::y_field_array.begin()
-               );
-
-         thrust::copy(
-               ::cells::z_field_array.begin(),
-               ::cells::z_field_array.end(),
-               cu::cells::z_field_array.begin()
-               );
+         thrust::copy(::cells::field_array_x.begin(), ::cells::field_array_x.end(), cu::cells::x_field_array.begin());
+         thrust::copy(::cells::field_array_y.begin(), ::cells::field_array_y.end(), cu::cells::y_field_array.begin());
+         thrust::copy(::cells::field_array_z.begin(), ::cells::field_array_z.end(), cu::cells::z_field_array.begin());
 
          /*
           * Copy volume and number of atoms for each cell
