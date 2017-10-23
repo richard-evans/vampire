@@ -50,7 +50,7 @@ namespace micromagnetic{
          mod_i =sqrt(sqrt(x_i*x_i+y_i*y_i)*sqrt(x_i*x_i+y_i*y_i) +z_i*z_i);
 
          for(int j = start;j< end;j++){
-
+    
           const int cellj = macro_neighbour_list_array[j];
           int mat  = cell_material_array[cell];
           int matj =cell_material_array[cellj];

@@ -92,19 +92,12 @@ namespace micromagnetic{
                 Ac = -pow(mj,1.66)*Area*mp::material[mat].SAF[matj]/ms[cell];
                 if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
 
-        //         std::cout << Ac << '\t' << ms[cell] << '\t' << mp::material[mat].SAF[matj] << '\t' << A[j] << "\t" << cells::macro_cell_size[0] << std::endl;
-
               }
            }
-
-      //std::cout <<"exc = " <<  exchange_field[0]<< "\t" << exchange_field[1] << '\t' <<exchange_field[2]<<std::endl;
-        //    std::cin.get();
 
             exchange_field[0] -= Ac*(x_array[cellj]*m_e[cellj] - x_array[cell]*m_e[cell]);
             exchange_field[1] -= Ac*(y_array[cellj]*m_e[cellj] - y_array[cell]*m_e[cell]);
             exchange_field[2] -= Ac*(z_array[cellj]*m_e[cellj] - z_array[cell]*m_e[cell]);
-
-
 
          }
 
@@ -136,7 +129,8 @@ namespace micromagnetic{
       }
 
 
-   //   if (cell == 5)   std::cout << "fields = " <<spin_field[0] << '\t' <<spin_field[1] << '\t' <<spin_field[2] << '\t' <<"exc = " <<  exchange_field[0]<< "\t" << exchange_field[1] << '\t' <<exchange_field[2]<<'\t' << "pin = " <<  pinning_field_x[cell] << "\t" << pinning_field_y[cell] << '\t' <<pinning_field_z[cell]<<'\t' << "track = " <<  sim::track_field_x[cell] << "\t" << sim::track_field_y[cell] << '\t' <<sim::track_field_z[cell] <<std::endl;
+    // if (cell == 5)
+//      std::cout <<cell <<  "fields = " <<spin_field[0] << '\t' <<spin_field[1] << '\t' <<spin_field[2] << '\t' <<"exc = " <<  exchange_field[0]<< "\t" << exchange_field[1] << '\t' <<exchange_field[2]<<'\t' << "pin = " <<  pinning_field_x[cell] << "\t" << pinning_field_y[cell] << '\t' <<pinning_field_z[cell]<<'\t' << "env = " <<  environment::environment_field_x[cell] << "\t" << environment::environment_field_y[cell] << '\t' <<environment::environment_field_z[cell]<<std::endl;
 
 
     //  if (spin_field[0] != spin_field[0]) std::cin.get();
