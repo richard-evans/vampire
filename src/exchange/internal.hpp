@@ -67,8 +67,8 @@ namespace exchange{
 
       // Enumerated list of available exchange types
       enum exchange_t { isotropic = 0, // isotropic exchange interactions
-                        vectorial, // vector exchange Jxx, Jyy, Jzz
-                        tensorial, // tensor exchange Jxx, Jxy ... Jzz
+                        vectorial = 1, // vector exchange Jxx, Jyy, Jzz
+                        tensorial = 2, // tensor exchange Jxx, Jxy ... Jzz
                         //biquadratic
       };
 
