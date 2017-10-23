@@ -78,6 +78,7 @@ namespace vdc{
    extern std::vector <std::string> nm_filenames;
 
    // Functions
+   void command( int argc, char* argv[], int& exit_status );
    void process_coordinates();
    void process_spins();
 

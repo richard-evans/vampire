@@ -298,32 +298,24 @@ void interpolate(double xy_angle, double& red, double& green, double& blue ){
    // values between which we interpolate
    xmin = int(std::floor(xy_angle));
    xmax = int(std::ceil(xy_angle));
-   std::cout << "START" << "\n" << "angle = "<< xy_angle << "\n" <<  "xmin = " << xmin << "\t" << "xmax = " << xmax << std::endl;
-
    // initialise colourwheel
    colourwheel( colourmap );
 
    // find colorval associated with min and max
    ymin = colourmap[xmin];
    ymax = colourmap[xmax];
-   std::cout << "ymin = " << ymin[0] << "\t" << "ymax = " << ymax[0] << std::endl;
 
    // work out gradients and intersects
    for ( int i=0; i < 3; i++){
       m[i] = (ymax[i] - ymin[i])/(xmax - xmin);
       c[i] = ymin[i] - m[i]*xmin;
    }
-   std::cout << "m = " << m[0] << "\t" << "c = " << c[0] << std::endl;
-
    // input angle into y=mx+c
    red   = m[0]*xy_angle + c[0];
    green = m[1]*xy_angle + c[1];
    blue  = m[2]*xy_angle + c[2];
 
-   std::cout << "red = " << red << std::endl;
-
    return;
-
 }
 
 //------------------------------------------------------------------------------
