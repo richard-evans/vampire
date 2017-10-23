@@ -22,6 +22,8 @@ namespace dipole{
    // Externally visible variables
    //------------------------------------------------------------------------------
    int update_rate=100; /// timesteps between updates
+   int update_time=-1; /// last update time
+
    bool activated=false;
 
    std::vector < double > cells_field_array_x;
@@ -41,8 +43,6 @@ namespace dipole{
       // Shared variables inside dipole module
       //------------------------------------------------------------------------
       bool initialised=false;
-
-      int update_time=-1; /// last update time
 
       const double prefactor=1.0e+23; // 1e-7/1e30
 

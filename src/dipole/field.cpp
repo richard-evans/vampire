@@ -42,13 +42,13 @@ namespace dipole{
       if(!dipole::activated) return;
 
 		// prevent double calculation for split integration (MPI)
-		if(dipole::internal::update_time!=sim::time){
+		if(dipole::update_time!=sim::time){
 
 			// Check if update required
 		   if(sim::time%dipole::update_rate==0){
 
 			   //if updated record last time at update
-			   dipole::internal::update_time=sim::time;
+			   dipole::update_time=sim::time;
 
 			   // update cell magnetisations
 			   cells::mag();
