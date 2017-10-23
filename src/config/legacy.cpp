@@ -284,7 +284,7 @@ double legacy_atoms_coords()
    {
       const int atom = local_output_atom_list[i];
       cfg_file_ofstr << atoms::type_array[atom] << "\t" << atoms::category_array[atom] << "\t" << atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
-      if (sim::identify_surface_atoms == true && atoms::surface_array[atom] == true)
+      if (config::internal::identify_surface_atoms == true && atoms::surface_array[atom] == true)
          cfg_file_ofstr << "O " << std::endl;
       else
          cfg_file_ofstr << mp::material[atoms::type_array[atom]].element << std::endl;

@@ -31,11 +31,16 @@
 #----------------------------------------------
 # Other sundry files
 #----------------------------------------------
-#*old.cpp
-#*old.hpp
+*old.cpp
+*old.hpp
 *.bkp
 *.json
 vampire.pkg # installation package
+
+#----------------------------------------------
+# Profiling and debugging extensions
+#----------------------------------------------
+*.gcno
 
 #----------------------------------------------
 # Manual files to be ignored
@@ -43,6 +48,7 @@ vampire.pkg # installation package
 vampire_manual.pdf
 vampire_manual.out
 vampire_manual.synctex.gz
+.texpadtmp
 
 #----------------------------------------------
 # Data file formats in vampire
@@ -59,6 +65,9 @@ MPI-wait-times
 tags
 .vimrc
 *.d
+MAT.mat
+UC.ucf
+exchange-template
 
 #----------------------------------------------
 # Executables
@@ -66,6 +75,7 @@ tags
 vampire-serial
 vampire-parallel
 vdc.x
+vampire*
 
 #----------------------------------------------
 # Obsolete

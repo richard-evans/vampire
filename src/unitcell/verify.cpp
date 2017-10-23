@@ -16,6 +16,7 @@
 #include "errors.hpp"
 #include "unitcell.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 
 // unitcell module headers
 #include "internal.hpp"
@@ -36,8 +37,17 @@ void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename)
    // list of assymetric interactions
    std::vector<int> asym_interaction_list(0);
 
-   // loop over all interactions
-   for(unsigned int i=0; i<unit_cell.interaction.size(); ++i){
+   // Parallelise in case of large interaction sizes
+   int my_num_interactions = unit_cell.interaction.size()/vmpi::num_processors;
+   int first = vmpi::my_rank * my_num_interactions;
+   int last = first + my_num_interactions;
+   if(vmpi::my_rank == vmpi::num_processors-1) last = unit_cell.interaction.size(); // add last points to last processor
+
+   // loop over all interactions to find matching reciprocal interaction
+   for(unsigned int i = first; i < last; ++i){
+
+      // Output progress indicator to screen for large interaction counts
+      if( (i % (my_num_interactions/10 + 1)) == 0 && unit_cell.interaction.size() > 10000) std::cout << "." << std::flush;
 
       // calculate reciprocal interaction
       unsigned int ia = unit_cell.interaction[i].j;
@@ -63,7 +73,10 @@ void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename)
       }
    }
 
-   // Output error message and list of interactions if found
+   // Make all processors wait here
+   vmpi::barrier();
+
+   // Output error message and list of interactions if found on any processor
    if(asym_interaction_list.size()>0){
       terminaltextcolor(RED);
       std::cerr << "Error! Exchange interaction list in unit cell file " << filename << " contains the following assymetric interactions:" << std::endl;

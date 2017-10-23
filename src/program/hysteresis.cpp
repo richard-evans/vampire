@@ -91,8 +91,13 @@ int hysteresis(){
 	int iH_old;
 	int start_time;
 
-	// Equilibrate system in saturation field
-	sim::H_applied=sim::Heq;
+	// Equilibrate system in saturation field, i.e. the largest between equilibration and maximum field set by the user
+   if(sim::Heq >= sim::Hmax){
+	   sim::H_applied=sim::Heq;
+   }
+   else{
+   	sim::H_applied=sim::Hmax;
+   }
 
 	// Initialise sim::integrate only if it not a checkpoint
 	if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
@@ -110,11 +115,12 @@ int hysteresis(){
 
 	// Perform Field Loop -parity
 	while(iparity<2){
-
-		if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
-
+      // If checkpoint is loaded with continue flag, then set up correctly max,min field values
+		if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag)
+      {
          //necessary to upload value of iH_old when loading the checkpoint !!!
 		   iH_old=int(sim::iH);
+         //Setup min and max fields and increment (uT)
 			if(parity_old<0){
 				if(iparity<0) miHmax=iH_old;
 				else if(iparity>0 && iH_old<=0) miHmax=iH_old; //miHmax=(iHmax-iHinc);
@@ -146,7 +152,7 @@ int hysteresis(){
 				// Calculate mag_m, mag
 				stats::mag_m();
 
-			}
+			} // End of integration loop
 
 			// Increment of iH
 			Hfield+=iHinc;
@@ -165,6 +171,6 @@ int hysteresis(){
 
 	return EXIT_SUCCESS;
 
-}
+} // End of hysteresis program
 
 }//end of namespace program

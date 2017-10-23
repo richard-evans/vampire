@@ -44,6 +44,7 @@
 #include <iostream>
 
 // Vampire Header files
+#include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "program.hpp"
 #include "cells.hpp"
@@ -57,6 +58,7 @@
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "vutil.hpp"
 
 // sim module headers
 #include "internal.hpp"
@@ -151,29 +153,14 @@ namespace sim{
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; /// 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC
 	int program=0;
-	int AnisotropyType=2; /// Controls scalar (0) or tensor(1) anisotropy (off(2))
 
-	bool surface_anisotropy=false; /// flag to enable surface anisotropy
-	bool identify_surface_atoms=false; /// flag to idenify surface atoms in config coordinate file
-	unsigned int surface_anisotropy_threshold=123456789; /// global threshold for surface atoms
-	bool NativeSurfaceAnisotropyThreshold=false; /// enables site-dependent surface threshold
-   double nearest_neighbour_distance=1.e9; /// Control surface anisotropy nearest neighbour distance
-
-	// Anisotropy control booleans
-	bool UniaxialScalarAnisotropy=false; /// Enables scalar uniaxial anisotropy
-	bool TensorAnisotropy=false; /// Overrides scalar uniaxial anisotropy
-	bool second_order_uniaxial_anisotropy=false; /// Enables second order uniaxial anisotropy
-   bool sixth_order_uniaxial_anisotropy=false; /// Enables sixth order uniaxial anisotropy
-   bool spherical_harmonics=false; // Enables calculation of higher order anistropy with spherical harmonics
-	bool CubicScalarAnisotropy=false; /// Enables scalar cubic anisotropy
-   bool lattice_anisotropy_flag=false; /// Enables lattice anisotropy
-  	bool random_anisotropy = false; // Enables random anisotropy calculation
 
 	bool local_temperature=false; /// flag to enable material specific temperature
 	bool local_applied_field=false; /// flag to enable material specific applied field
 	bool local_fmr_field=false; /// flag to enable material specific fmr field
 
    // Checkpoint flags and variables
+   bool checkpoint_loaded_flag=false;  // Flag to determine if it is first step after loading checkpoint (true).
    bool load_checkpoint_flag=false; // Load spin configurations
    bool load_checkpoint_continue_flag=true; // Continue simulation from checkpoint time
    bool save_checkpoint_flag=false; // Save checkpoint
@@ -208,9 +195,15 @@ namespace sim{
 ///
 	void increment_time(){
 
+      // set flag checkpoint_loaded_flag to false since first step of simulations was performed
+      sim::checkpoint_loaded_flag=false;
+
 		sim::time++;
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-		dipole::calculate_field();
+
+      // Update dipole fields
+		dipole::calculate_field(sim::time);
+
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
       st::update_spin_torque_fields(atoms::x_spin_array,
                                   atoms::y_spin_array,
@@ -247,22 +240,28 @@ int run(){
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
 
-	// Initialise random number generator
-	mtrandom::grnd.seed(mtrandom::integration_seed+vmpi::my_rank);
+   anisotropy::initialize(atoms::num_atoms, atoms::type_array, mp::mu_s_array);
 
-   // Seeds with single bit differences are not ideal and may be correlated for first few values - warming up integrator
-   for(int i=0; i<1000; ++i) mtrandom::grnd();
+   // now seed generator
+	mtrandom::grnd.seed(vmpi::parallel_rng_seed(mtrandom::integration_seed));
 
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();
 
-   // Set up statistical data sets
-   #ifdef MPICF
-      int num_atoms_for_statistics = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-   #else
-      int num_atoms_for_statistics = atoms::num_atoms;
-   #endif
-   stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array);
+   {
+      // Set up statistical data sets
+      #ifdef MPICF
+         int num_atoms_for_statistics = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      #else
+         int num_atoms_for_statistics = atoms::num_atoms;
+      #endif
+      // unroll list of non-magnetic materials
+      std::vector<bool> non_magnetic_materials_array(mp::num_materials, false);
+      for(int m = 0; m < mp::num_materials; m++){
+         if( mp::material[m].non_magnetic == 2 ) non_magnetic_materials_array[m] = true;
+      }
+      stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array, non_magnetic_materials_array);
+   }
 
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
@@ -446,6 +445,14 @@ int run(){
 	    		zlog << "fmr..." << std::endl;
 	  		}
 	  		program::fmr();
+	  		break;
+
+		case 16:
+	  		if(vmpi::my_rank==0){
+	    		std::cout << "localised-field-cool..." << std::endl;
+	    		zlog << "localised-field-cool..." << std::endl;
+	  		}
+	  		program::local_field_cool();
 	  		break;
 
 		case 50:

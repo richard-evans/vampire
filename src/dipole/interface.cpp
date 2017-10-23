@@ -33,15 +33,43 @@ namespace dipole{
       //-------------------------------------------------------------------
       std::string test="solver";
       if(word==test){
-         // enable dipole calculation
-         dipole::activated=true;
-         return true;
+         test="macrocell";
+         if(value == test){
+            dipole::internal::solver = dipole::internal::macrocell;
+            // enable dipole calculation
+            dipole::activated=true;
+            return true;
+         }
+         test="tensor";
+         if(value == test){
+            dipole::internal::solver = dipole::internal::tensor;
+            // enable dipole calculation
+            dipole::activated=true;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"macrocell\"" << std::endl;
+            std::cerr << "\t\"tensor\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
       }
+      //-------------------------------------------------------------------
       test="field-update-rate";
       if(word==test){
          int dpur=atoi(value.c_str());
          vin::check_for_valid_int(dpur, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
          dipole::update_rate=dpur;
+         return true;
+      }
+      //-------------------------------------------------------------------
+      test="cutoff-radius";
+      if(word==test){
+         double dpur=atof(value.c_str());
+         vin::check_for_valid_value(dpur, word, line, prefix, unit, "",  1.0, 1.0e6,"input","1.0 - 1,000,000.0");
+         dipole::cutoff=dpur;
          return true;
       }
       //--------------------------------------------------------------------

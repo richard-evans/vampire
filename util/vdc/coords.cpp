@@ -41,6 +41,10 @@ void process_coordinates(){
    // read coordinate data
    vdc::read_coord_data();
 
+   // load non-magnetic data files
+   read_nm_metadata();
+   read_nm_data();
+
    // output xyz file
    if(vdc::xyz) output_xyz_file();
 

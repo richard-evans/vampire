@@ -175,17 +175,6 @@ void calculate_interactions(unit_cell_t& unit_cell){
       err::vexit();
    }
 
-   // Determine exchange type
-   if(uc::internal::exchange_type == isotropic) unit_cell.exchange_type=-1;
-   else if(uc::internal::exchange_type == vectorial) unit_cell.exchange_type=3;
-   else{
-      terminaltextcolor(RED);
-      std::cerr << "Programmer error! Exchange type " << uc::internal::exchange_type << " is not a recognised value!" << std::endl;
-      terminaltextcolor(WHITE);
-      zlog << zTs() << "Programmer error! Exchange type " << uc::internal::exchange_type << " is not a recognised value!" << std::endl;
-      err::vexit();
-   }
-
    return;
 
 }

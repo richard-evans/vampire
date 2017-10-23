@@ -125,7 +125,7 @@ namespace cs{
       double y;
       double z;
       int mat;
-      std::string element;
+      int cat;
    };
 
   // Array for storing non-magnetic atoms

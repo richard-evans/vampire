@@ -37,8 +37,9 @@ void output_xyz_file(){
    ofile.open("crystal.xyz");
 
    // output number of atoms
-   ofile << vdc::num_atoms << "\n\n";
+   ofile << vdc::num_atoms + vdc::num_nm_atoms << "\n\n";
 
+   // write magnetic atoms
    for(uint64_t atom = 0; atom < vdc::num_atoms; atom++){
 
       // get atom type
@@ -48,6 +49,19 @@ void output_xyz_file(){
                vdc::coordinates[3*atom + 0] << "\t" <<
                vdc::coordinates[3*atom + 1] << "\t" <<
                vdc::coordinates[3*atom + 2] << "\n";
+
+   }
+
+   // write non-magnetic atoms
+   for(uint64_t atom = 0; atom < vdc::num_nm_atoms; atom++){
+
+      // get atom type
+      int type_id = vdc::nm_type[atom];
+
+      ofile << materials[type_id].element << "\t" <<
+               vdc::nm_coordinates[3*atom + 0] << "\t" <<
+               vdc::nm_coordinates[3*atom + 1] << "\t" <<
+               vdc::nm_coordinates[3*atom + 2] << "\n";
 
    }
 

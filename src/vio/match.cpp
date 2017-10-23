@@ -15,10 +15,12 @@
 
 // Vampire headers
 // Headers
+#include "anisotropy.hpp"
 #include "vio.hpp"
 #include "sim.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
+#include "exchange.hpp"
 #include "material.hpp"
 #include "gpu.hpp"
 #include "grains.hpp"
@@ -66,10 +68,12 @@ namespace vin{
         // Call module input parameters
         //-------------------------------------------------------------------
         if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(anisotropy::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -695,6 +699,11 @@ namespace vin{
                 sim::program=5;
                 return EXIT_SUCCESS;
             }
+            test="localised-field-cool";
+            if(value==test){
+                sim::program=16;
+                return EXIT_SUCCESS;
+            }
             test="laser-pulse";
             if(value==test){
                 sim::program=6;
@@ -750,6 +759,11 @@ namespace vin{
                 sim::program=50;
                 return EXIT_SUCCESS;
             }
+            test="setting";
+            if(value==test){
+                sim::program=51;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
@@ -759,12 +773,13 @@ namespace vin{
                 std::cerr << "\t\"static-hysteresis-loop\"" << std::endl;
                 std::cerr << "\t\"curie-temperature\"" << std::endl;
                 std::cerr << "\t\"field-cool\"" << std::endl;
+                std::cerr << "\t\"localised-field-cool\"" << std::endl;
                 std::cerr << "\t\"laser-pulse\"" << std::endl;
                 std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
                 std::cerr << "\t\"hybrid-cmc\"" << std::endl;
                 std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
                 std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
-                terminaltextcolor(WHITE);
+            terminaltextcolor(WHITE);
             err::vexit();
             }
         }
@@ -778,36 +793,6 @@ namespace vin{
         test="enable-fmr-field";
         if(word==test){
             sim::hamiltonian_simulation_flags[5]=1;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="enable-surface-anisotropy";
-        if(word==test){
-            sim::surface_anisotropy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="surface-anisotropy-threshold";
-        if(word==test){
-            // test for native keyword
-            test="native";
-            if(value==test){
-                sim::NativeSurfaceAnisotropyThreshold=true;
-                return EXIT_SUCCESS;
-            }
-            int sat=atoi(value.c_str());
-            // Test for valid range
-            check_for_valid_int(sat, word, line, prefix, 0, 1000000000,"input","0 - 1,000,000,000");
-            sim::surface_anisotropy_threshold=sat;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="surface-anisotropy-nearest-neighbour-range";
-        if(word==test){
-            // Test for valid range
-            double r=atof(value.c_str());
-            check_for_valid_value(r, word, line, prefix, unit, "length", 0.0, 1.0e9,"input","0.0 - 1,000,000,000");
-            sim::nearest_neighbour_distance=r;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
@@ -1127,7 +1112,7 @@ namespace vin{
         test="applied-field-unit-vector";
         if(word==test){
             std::vector<double> u(3);
-            u=DoublesFromString(value);
+            u=doubles_from_string(value);
             check_for_valid_unit_vector(u, word, line, prefix, "input");
             sim::H_vec[0]=u.at(0);
             sim::H_vec[1]=u.at(1);
@@ -1139,7 +1124,7 @@ namespace vin{
         test="demagnetisation-factor";
         if(word==test){
             std::vector<double> u(3);
-            u=DoublesFromString(value);
+            u=doubles_from_string(value);
             vin::check_for_valid_three_vector(u, word, line, prefix, "input");
             // Extra check for demagnetisation-factor Nx+Ny+Nz=1
             double sum=u.at(0)+u.at(1)+u.at(2);
@@ -1386,7 +1371,7 @@ namespace vin{
         test="fmr-field-unit-vector";
         if(word==test){
             std::vector<double> u(3);
-            u=DoublesFromString(value);
+            u=doubles_from_string(value);
             check_for_valid_unit_vector(u, word, line, prefix, "input");
             sim::fmr_field_unit_vector = u;
             return EXIT_SUCCESS;
@@ -1644,34 +1629,6 @@ namespace vin{
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
-        test="cubic-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(31);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="mean-cubic-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(32);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="surface-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(33);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="mean-surface-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(34);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
         test="exchange-energy";
         if(word==test){
             output_list.push_back(35);
@@ -1710,20 +1667,6 @@ namespace vin{
         test="mean-magnetostatic-energy";
         if(word==test){
             output_list.push_back(40);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="second-order-uniaxial-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(41);
-            stats::calculate_energy=true;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
-        test="mean-second-order-uniaxial-anisotropy-energy";
-        if(word==test){
-            output_list.push_back(42);
             stats::calculate_energy=true;
             return EXIT_SUCCESS;
         }
@@ -2164,175 +2107,6 @@ namespace vin{
             }
             //------------------------------------------------------------
             else
-            test="uniaxial-anisotropy-constant";
-            if(word==test){
-                double K=atof(value.c_str());
-                check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
-                read_material[super_index].Ku1_SI=-K; // Import anisotropy as field, *-1
-                // enable global anisotropy flag
-                sim::UniaxialScalarAnisotropy=true;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="second-uniaxial-anisotropy-constant";
-            if(word==test){
-                double K=atof(value.c_str());
-                check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
-                read_material[super_index].Ku2_SI=-K; // Import anisotropy as field, *-1
-                sim::second_order_uniaxial_anisotropy=true;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="third-uniaxial-anisotropy-constant";
-            if(word==test){
-                double K=atof(value.c_str());
-                check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
-                read_material[super_index].Ku3_SI=-K; // Import anisotropy as field, *-1
-                sim::sixth_order_uniaxial_anisotropy=true;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="second-order-harmonic-anisotropy-constant";
-            if(word==test){
-                double K=atof(value.c_str());
-                check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
-                read_material[super_index].sh2=K;
-                sim::spherical_harmonics=true;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="fourth-order-harmonic-anisotropy-constant";
-            if(word==test){
-                double K=atof(value.c_str());
-                check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
-                read_material[super_index].sh4=K;
-                sim::spherical_harmonics=true;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="sixth-order-harmonic-anisotropy-constant";
-            if(word==test){
-                double K=atof(value.c_str());
-                check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
-                read_material[super_index].sh6=K;
-                sim::spherical_harmonics=true;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="lattice-anisotropy-constant";
-            if(word==test){
-                double Klatt=atof(value.c_str());
-                // Test for valid range
-                check_for_valid_value(Klatt, word, line, prefix, unit, "energy", -1.0e-18, 1.0e18,"material","-1e18 - 1e18");
-                read_material[super_index].Klatt_SI=-Klatt; // Import anisotropy as field, *-1
-                sim::lattice_anisotropy_flag=true;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="cubic-anisotropy-constant";
-            if(word==test){
-                double K=atof(value.c_str());
-                // Test for valid range
-                check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
-                read_material[super_index].Kc1_SI=-K; // Import anisotropy as field, *-1
-                sim::CubicScalarAnisotropy=true;
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="uniaxial-anisotropy-direction";
-            if(word==test){
-                // set up test comparisons
-                test="random";
-                std::string test2="random-grain";
-                // test for random anisotropy directions
-                if(value==test){
-                    read_material[super_index].random_anisotropy = true;
-                    read_material[super_index].random_grain_anisotropy = false;
-                    sim::random_anisotropy=true;
-                }
-                // test for random grain anisotropy
-                else if(value==test2){
-                    read_material[super_index].random_anisotropy = false;
-                    read_material[super_index].random_grain_anisotropy = true;
-                    sim::random_anisotropy=true;
-                    grains::random_anisotropy = true;
-                }
-                else{
-                    // temporary storage container
-                    std::vector<double> u(3);
-
-                    // read values from string
-                    u=DoublesFromString(value);
-
-                    // check for sane input and normalise if necessary
-                    check_for_valid_unit_vector(u, word, line, prefix, "material");
-
-                    // Copy sanitised unit vector to material
-                    read_material[super_index].UniaxialAnisotropyUnitVector=u;
-
-                    // Enable global tensor anisotropy flag
-                    sim::TensorAnisotropy=true;
-                }
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
-            test="uniaxial-anisotropy-tensor";
-            if(word==test){
-                std::vector<double> K;
-                // read values from string
-                K=DoublesFromString(value);
-                // check size
-                if(K.size()!=9){
-                terminaltextcolor(RED);
-                    std::cerr << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
-                    terminaltextcolor(WHITE);
-                zlog << zTs() << "Error in input file - material[" << super_index << "]:uniaxial-anisotropy-tensor must have nine values." << std::endl;
-                    return EXIT_FAILURE;
-                }
-
-                string unit_type="energy";
-                // if no unit given, assume internal
-                if(unit.size() != 0){
-                    units::convert(unit,K,unit_type);
-                    //read_material[super_index].anis_flag=false;
-                    //std::cout << "setting flag to false" << std::endl;
-                }
-                string str="energy";
-                if(unit_type==str){
-                    // Copy anisotropy vector to material
-                    read_material[super_index].KuVec_SI=K;
-                    sim::TensorAnisotropy=true;
-                    return EXIT_SUCCESS;
-                }
-                else{
-                terminaltextcolor(RED);
-                    std::cerr << "Error - unit type \'" << unit_type << "\' is invalid for parameter \'dimensions:" << word << "\'"<< std::endl;
-                    terminaltextcolor(WHITE);
-                err::vexit();
-                }
-            }
-            //------------------------------------------------------------
-            else
-            test="surface-anisotropy-constant";
-            if(word==test){
-                double K=atof(value.c_str());
-                // Test for valid range
-                check_for_valid_value(K, word, line, prefix, unit, "energy", -1e-18, 1e-18,"material"," < +/- 1.0e-18 J/atom");
-                read_material[super_index].Ks_SI=-K;// Import anisotropy as field, *-1
-                sim::surface_anisotropy=true; // enable surface anisotropy
-                return EXIT_SUCCESS;
-            }
-            //------------------------------------------------------------
-            else
             test="relative-gamma";
             if(word==test){
                 double gr = atof(value.c_str());
@@ -2355,7 +2129,7 @@ namespace vin{
                     std::vector<double> u(3);
 
                     // read values from string
-                    u=DoublesFromString(value);
+                    u=doubles_from_string(value);
 
                     // check for sane input and normalise if necessary
                     check_for_valid_unit_vector(u, word, line, prefix, "material");
@@ -2438,50 +2212,6 @@ namespace vin{
                 //	read_material[super_index].min=min;
                     return EXIT_SUCCESS;
                 //}
-            }
-            //--------------------------------------------------------------------
-            else
-            test="lattice-anisotropy-file";
-            if(word==test){
-
-                // Open lattice file
-                std::stringstream latt_file;
-          		 latt_file.str( vin::get_string(value.c_str(), "material", line) );
-
-                // specify number of points to be read
-                int num_pts=0;
-
-                // Read in number of temperature points
-                latt_file >> num_pts;
-
-                // Check for valid number of points
-                if(num_pts<=1){
-                    std::cerr << "Error in lattice-anisotropy-file " << value.c_str() << " on line " << line << " of material file. The first number must be an integer greater than 1. Exiting." << std::endl;
-                    zlog << zTs() << "Error in lattice-anisotropy-file " << value.c_str() << " on line " << line << " of material file. The first number must be an integer greater than 1. Exiting." << std::endl;
-                    return EXIT_FAILURE;
-                }
-
-                // Loop over all lines in file
-                for(int c=0;c<num_pts;c++){
-
-                    // temporary variables
-                    double T;
-                    double k;
-
-                    // Read in points and add them to material
-                    latt_file >> T >> k;
-
-                    // Check for premature end of file
-                    if(latt_file.eof()){
-                        std::cerr << "Error in lattice anisotropy-file " << value.c_str() << " on line " << line << " of material file. End of file reached before reading all values. Exiting" << std::endl;
-                        zlog << zTs() << "Error in lattice anisotropy-file " << value.c_str() << " on line " << line << " of material file. End of file reached before reading all values. Exiting" << std::endl;
-                        return EXIT_FAILURE;
-                    }
-                    read_material[super_index].lattice_anisotropy.add_point(T,k);
-                }
-
-                return EXIT_SUCCESS;
-
             }
             //--------------------------------------------------------------------
             test="core-shell-size";
@@ -2700,6 +2430,24 @@ namespace vin{
                 }
             }
             //--------------------------------------------------------------------
+            test="maximum-temperature";
+            if(word==test){
+               double T=atof(value.c_str());
+               check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+               read_material[super_index].maximum_temperature = T;
+               sim::local_temperature=true; // set local temperature flag
+               return EXIT_SUCCESS;
+            }
+            //--------------------------------------------------------------------
+            test="minimum-temperature";
+            if(word==test){
+               double T=atof(value.c_str());
+               check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+               read_material[super_index].minimum_temperature = T;
+               sim::local_temperature=true; // set local temperature flag
+               return EXIT_SUCCESS;
+            }
+            //--------------------------------------------------------------------
             test="use-phonon-temperature";
             /*
             logical use-phonon-temperature
@@ -2778,7 +2526,7 @@ namespace vin{
                 std::vector<double> u(3);
 
                 // read values from string
-                u=DoublesFromString(value);
+                u=doubles_from_string(value);
 
                 // check size
                 if(u.size()!=3){
@@ -2804,7 +2552,7 @@ namespace vin{
                 u.at(1)/=ULength;
                 u.at(2)/=ULength;
 
-                // Copy anisotropy direction to material
+                // Copy applied field direction to material
                 read_material[super_index].applied_field_unit_vector=u;
 
                 // set local applied field flag
@@ -2871,7 +2619,7 @@ namespace vin{
                 std::vector<double> u(3);
 
                 // read values from string
-                u=DoublesFromString(value);
+                u=doubles_from_string(value);
 
                 // check size
                 if(u.size()!=3){
@@ -2897,7 +2645,7 @@ namespace vin{
                 u.at(1)/=ULength;
                 u.at(2)/=ULength;
 
-                // Copy anisotropy direction to material
+                // Copy field direction to material
                 read_material[super_index].fmr_field_unit_vector=u;
 
                 // set local applied field flag
@@ -2969,8 +2717,10 @@ namespace vin{
             //-------------------------------------------------------------------
             // Call module input parameters
             //-------------------------------------------------------------------
+            else if(anisotropy::match_material_parameter(word, value, unit, line, super_index, sub_index, mp::max_materials)) return EXIT_SUCCESS;
             else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(exchange::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;

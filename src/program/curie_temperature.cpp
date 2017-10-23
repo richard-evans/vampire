@@ -88,24 +88,24 @@ namespace program{
 ///	Revision:	09/03/2011
 ///=====================================================================================
 ///
+
 int curie_temperature(){
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "program::curie_temperature has been called" << std::endl;}
 
 	// Set starting temperature
-    // Initialise sim::temperature
-	if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
-		sim::temperature+=sim::delta_temperature;
-    }
-    else sim::temperature=sim::Tmin;
+   // Initialise sim::temperature
+   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){
+      sim::temperature+=sim::delta_temperature;
+   }
+   else sim::temperature=sim::Tmin;
 
 	// Perform Temperature Loop
 	while(sim::temperature<=sim::Tmax){
 
-		// Equilibrate system only if not checkpoint
-	   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
-		else sim::integrate(sim::equilibration_time);
+		// Equilibrate system
+		sim::integrate(sim::equilibration_time);
 
 		// Reset mean magnetisation counters
 		stats::mag_m_reset();

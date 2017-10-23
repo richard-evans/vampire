@@ -84,7 +84,7 @@ namespace vin{
    extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
                                       double range_min, double range_max, std::string input_file_type, std::string range_text);
 
-   extern std::vector<double> DoublesFromString(std::string value);
+   extern std::vector<double> doubles_from_string(std::string value);
 
    // function to read file on master process and return a std::string of its contents
    extern std::string get_string(std::string const filename, std::string source_file_name, int line);

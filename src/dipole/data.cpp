@@ -26,16 +26,24 @@ namespace dipole{
 
    bool activated=false;
 
+   // define arrays for B-field
    std::vector < double > cells_field_array_x;
    std::vector < double > cells_field_array_y;
    std::vector < double > cells_field_array_z;
    std::vector < double > atom_dipolar_field_array_x;
    std::vector < double > atom_dipolar_field_array_y;
    std::vector < double > atom_dipolar_field_array_z;
+   // define arrays for mu_0*Hdemag - field
+   std::vector < double > cells_mu0Hd_field_array_x;
+   std::vector < double > cells_mu0Hd_field_array_y;
+   std::vector < double > cells_mu0Hd_field_array_z;
+   std::vector < double > atom_mu0demag_field_array_x;
+   std::vector < double > atom_mu0demag_field_array_y;
+   std::vector < double > atom_mu0demag_field_array_z;
 
-   double cutoff = 12.0; //12.0; /// cutoff distance between cells over which bare macro cell model can be applied
-
-   //uint64_t sim_time;
+   double cutoff = 2.0;  /// cutoff distance between cells over which bare macro cell model can be applied
+                         /// N.B.: after 12 cells inter-intra method is equivalent to bare macrocell method.
+                         /// Although, 2 cells is enough because there are other error sources limiting the accuracy.
 
    namespace internal{
 
@@ -44,23 +52,20 @@ namespace dipole{
       //------------------------------------------------------------------------
       bool initialised=false;
 
+      int update_time=-1; /// last update time
+
+      // solver to be used for dipole method
+      dipole::internal::solver_t solver = dipole::internal::tensor; // default is tensor method
+
       const double prefactor=1.0e+23; // 1e-7/1e30
 
-      std::vector <std::vector < double > > rij_inter_xx;
-      std::vector <std::vector < double > > rij_inter_xy;
-      std::vector <std::vector < double > > rij_inter_xz;
+      std::vector <std::vector < double > > rij_tensor_xx;
+      std::vector <std::vector < double > > rij_tensor_xy;
+      std::vector <std::vector < double > > rij_tensor_xz;
 
-      std::vector <std::vector < double > > rij_inter_yy;
-      std::vector <std::vector < double > > rij_inter_yz;
-      std::vector <std::vector < double > > rij_inter_zz;
-
-      std::vector <std::vector < double > > rij_intra_xx;
-      std::vector <std::vector < double > > rij_intra_xy;
-      std::vector <std::vector < double > > rij_intra_xz;
-
-      std::vector <std::vector < double > > rij_intra_yy;
-      std::vector <std::vector < double > > rij_intra_yz;
-      std::vector <std::vector < double > > rij_intra_zz;
+      std::vector <std::vector < double > > rij_tensor_yy;
+      std::vector <std::vector < double > > rij_tensor_yz;
+      std::vector <std::vector < double > > rij_tensor_zz;
 
       int num_atoms;
       std::vector < int > atom_type_array;

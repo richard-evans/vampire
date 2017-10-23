@@ -183,11 +183,11 @@ namespace config{
       //-------------------------------------------------------------------
       test="identify-surface-atoms";
       if(word==test){
-         sim::identify_surface_atoms=true;
+         config::internal::identify_surface_atoms = true;
          return EXIT_SUCCESS;
       }
       //-----------------------------------------
-      test="field-range-1-minimum";
+      test="field-range-descending-minimum";
       if(word==test){
          double H=atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
@@ -195,7 +195,7 @@ namespace config{
          return EXIT_SUCCESS;
       }
       //-----------------------------------------
-      test="field-range-1-maximum";
+      test="field-range-descending-maximum";
       if(word==test){
          double H=atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
@@ -203,7 +203,7 @@ namespace config{
          return EXIT_SUCCESS;
       }
       //-----------------------------------------
-      test="field-range-2-minimum";
+      test="field-range-ascending-minimum";
       if(word==test){
          double H=atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");
@@ -211,7 +211,7 @@ namespace config{
          return EXIT_SUCCESS;
       }
       //-----------------------------------------
-      test="field-range-2-maximum";
+      test="field-range-ascending-maximum";
       if(word==test){
          double H=atof(value.c_str());
          vin::check_for_valid_value(H, word, line, prefix, unit, "field", -1.e4, 1.0e4,"input","+/- 10,000 T");

@@ -250,7 +250,7 @@ void CMCinit(){
 	cmc::polar_rot_matrix(sim::constraint_phi,sim::constraint_theta, cmc::polar_matrix, cmc::polar_matrix_tp, cmc::polar_vector);
 
 	// Check for rotational update
-	if(sim::constraint_rotation==false || (sim::constraint_theta_changed==false && sim::constraint_phi_changed==false)){
+	if((sim::constraint_rotation==false || (sim::constraint_theta_changed==false && sim::constraint_phi_changed==false)) && sim::checkpoint_loaded_flag==false){
 
 		// Output message showing constraint direction re-initialisation
 		zlog << zTs() << "Initialising spins to new constraint direction (phi, theta) " <<  sim::constraint_phi << " , " << sim::constraint_theta << std::endl;
@@ -266,6 +266,10 @@ void CMCinit(){
 			atoms::z_spin_array[atom]=sz;
 		}
 	}
+   // If the simulation is restarted from within the temperature loop, then the spin configurations must not be reinitialised
+   else if(sim::checkpoint_loaded_flag==true){
+      zlog << zTs() << "Not re-initialising spins to constraint directions since still in temperature loop" << std::endl;
+   }
 	else{
 
 		// Output message showing constraint direction re-initialisation
@@ -371,8 +375,6 @@ int ConstrainedMonteCarlo(){
 	double ppolar_matrix[3][3];
 	double ppolar_matrix_tp[3][3];
 
-	const int AtomExchangeType=atoms::exchange_type;
-
 	for (int i=0;i<3;i++){
 		ppolar_vector[i]=cmc::polar_vector[0][i];
 		for (int j=0;j<3;j++){
@@ -389,15 +391,20 @@ int ConstrainedMonteCarlo(){
 	M_other[2] = 0.0;
 
 	for(int atom=0;atom<atoms::num_atoms;atom++){
-		M_other[0] = M_other[0] + atoms::x_spin_array[atom]; //multiplied by polar_vector below
-		M_other[1] = M_other[1] + atoms::y_spin_array[atom];
-		M_other[2] = M_other[2] + atoms::z_spin_array[atom];
+		const double mu = atoms::m_spin_array[atom];
+		M_other[0] = M_other[0] + atoms::x_spin_array[atom] * mu; //multiplied by polar_vector below
+		M_other[1] = M_other[1] + atoms::y_spin_array[atom] * mu;
+		M_other[2] = M_other[2] + atoms::z_spin_array[atom] * mu;
 	}
 
 	for (int mcs=0;mcs<atoms::num_atoms;mcs++){
 		// Randomly select spin number 1
 		atom_number1 = int(mtrandom::grnd()*atoms::num_atoms);
 		imat1=atoms::type_array[atom_number1];
+
+		// get spin moment for atom 1
+		const double mu1 = atoms::m_spin_array[atom_number1];
+
       sim::mc_delta_angle=sigma_array[imat1];
 
 		// Save initial Spin 1
@@ -422,7 +429,7 @@ int ConstrainedMonteCarlo(){
 		//call calc_one_spin_energy(delta_energy1,spin1_final,atom_number1)
 
 		// Calculate current energy
-		Eold = sim::calculate_spin_energy(atom_number1, AtomExchangeType);
+		Eold = sim::calculate_spin_energy(atom_number1);
 
 		// Copy new spin position (provisionally accept move)
 		atoms::x_spin_array[atom_number1] = spin1_final[0];
@@ -430,7 +437,7 @@ int ConstrainedMonteCarlo(){
 		atoms::z_spin_array[atom_number1] = spin1_final[2];
 
 		// Calculate new energy
-		Enew = sim::calculate_spin_energy(atom_number1, AtomExchangeType);
+		Enew = sim::calculate_spin_energy(atom_number1);
 
 		// Calculate difference in Joules/mu_B
 		delta_energy1 = (Enew-Eold)*mp::material[imat1].mu_s_SI*1.07828231e23; //1/9.27400915e-24
@@ -440,6 +447,9 @@ int ConstrainedMonteCarlo(){
 		// Randomly select spin number 2 (i/=j)
 		atom_number2 = int(mtrandom::grnd()*atoms::num_atoms);
 		imat2=atoms::type_array[atom_number2];
+      // get spin moment for atom 2
+      const double mu2 = atoms::m_spin_array[atom_number2];
+
 		// Save initial Spin 2
 		spin2_initial[0] = atoms::x_spin_array[atom_number2];
 		spin2_initial[1] = atoms::y_spin_array[atom_number2];
@@ -451,8 +461,9 @@ int ConstrainedMonteCarlo(){
 		spin2_init_mvd[2]=ppolar_matrix[2][0]*spin2_initial[0]+ppolar_matrix[2][1]*spin2_initial[1]+ppolar_matrix[2][2]*spin2_initial[2];
 
 		// Calculate new spin based on constraint Mx=My=0
-		spin2_fin_mvd[0] = spin1_init_mvd[0]+spin2_init_mvd[0]-spin1_fin_mvd[0];
-		spin2_fin_mvd[1] = spin1_init_mvd[1]+spin2_init_mvd[1]-spin1_fin_mvd[1];
+		const double mom_ratio = (mu1/mu2);
+		spin2_fin_mvd[0] = mom_ratio*(spin1_init_mvd[0]-spin1_fin_mvd[0]) + spin2_init_mvd[0];
+		spin2_fin_mvd[1] = mom_ratio*(spin1_init_mvd[1]-spin1_fin_mvd[1]) + spin2_init_mvd[1];
 
 		if(((spin2_fin_mvd[0]*spin2_fin_mvd[0]+spin2_fin_mvd[1]*spin2_fin_mvd[1])<1.0) && (atom_number1 != atom_number2)){
 
@@ -468,7 +479,7 @@ int ConstrainedMonteCarlo(){
 
 			//Calculate Energy Difference 2
 			// Calculate current energy
-			Eold = sim::calculate_spin_energy(atom_number2, AtomExchangeType);
+			Eold = sim::calculate_spin_energy(atom_number2);
 
 			// Copy new spin position (provisionally accept move)
 			atoms::x_spin_array[atom_number2] = spin2_final[0];
@@ -476,7 +487,7 @@ int ConstrainedMonteCarlo(){
 			atoms::z_spin_array[atom_number2] = spin2_final[2];
 
 			// Calculate new energy
-			Enew = sim::calculate_spin_energy(atom_number2, AtomExchangeType);
+			Enew = sim::calculate_spin_energy(atom_number2);
 
 			// Calculate difference in Joules/mu_B
 			delta_energy2 = (Enew-Eold)*mp::material[imat2].mu_s_SI*1.07828231e23; //1/9.27400915e-24
@@ -487,9 +498,9 @@ int ConstrainedMonteCarlo(){
 			// Compute Mz_other, Mz, Mz'
 			Mz_old = M_other[0]*ppolar_vector[0] + M_other[1]*ppolar_vector[1] + M_other[2]*ppolar_vector[2];
 
-			Mz_new = (M_other[0] + spin1_final[0] + spin2_final[0]- spin1_initial[0] - spin2_initial[0])*ppolar_vector[0] +
-						(M_other[1] + spin1_final[1] + spin2_final[1]- spin1_initial[1] - spin2_initial[1])*ppolar_vector[1] +
-						(M_other[2] + spin1_final[2] + spin2_final[2]- spin1_initial[2] - spin2_initial[2])*ppolar_vector[2];
+			Mz_new = (M_other[0] + mu1*spin1_final[0] + mu2*spin2_final[0]- mu1*spin1_initial[0] - mu2*spin2_initial[0])*ppolar_vector[0] +
+						(M_other[1] + mu1*spin1_final[1] + mu2*spin2_final[1]- mu1*spin1_initial[1] - mu2*spin2_initial[1])*ppolar_vector[1] +
+						(M_other[2] + mu1*spin1_final[2] + mu2*spin2_final[2]- mu1*spin1_initial[2] - mu2*spin2_initial[2])*ppolar_vector[2];
 
 			// Check for lower energy state and accept unconditionally
 			//if((delta_energy21<0.0) && (Mz_new>0.0)) continue;
@@ -499,9 +510,9 @@ int ConstrainedMonteCarlo(){
 				// If move is favorable then accept
 				probability = exp(-delta_energy21)*((Mz_new/Mz_old)*(Mz_new/Mz_old))*std::fabs(spin2_init_mvd[2]/spin2_fin_mvd[2]);
 				if((probability>=mtrandom::grnd()) && (Mz_new>0.0) ){
-					M_other[0] = M_other[0] + spin1_final[0] + spin2_final[0] - spin1_initial[0] - spin2_initial[0];
-					M_other[1] = M_other[1] + spin1_final[1] + spin2_final[1] - spin1_initial[1] - spin2_initial[1];
-					M_other[2] = M_other[2] + spin1_final[2] + spin2_final[2] - spin1_initial[2] - spin2_initial[2];
+					M_other[0] = M_other[0] + mu1*spin1_final[0] + mu2*spin2_final[0] - mu1*spin1_initial[0] - mu2*spin2_initial[0];
+					M_other[1] = M_other[1] + mu1*spin1_final[1] + mu2*spin2_final[1] - mu1*spin1_initial[1] - mu2*spin2_initial[1];
+					M_other[2] = M_other[2] + mu1*spin1_final[2] + mu2*spin2_final[2] - mu1*spin1_initial[2] - mu2*spin2_initial[2];
 					cmc::mc_success += 1.0;
 				}
 				//if both p1 and p2 not allowed then

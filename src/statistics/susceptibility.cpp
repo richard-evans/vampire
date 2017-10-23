@@ -152,7 +152,7 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
    const double imean_counter_sq = 1.0/(mean_counter*mean_counter);
 
    // loop over all elements
-   for(int id=0; id< num_elements; ++id){
+   for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
 
       const double prefactor = itemp*saturation[id]; // in mu_B
       const double sus_x = prefactor*(mean_susceptibility_squared[4*id + 0]*imean_counter-mean_susceptibility[4*id + 0]*mean_susceptibility[4*id + 0]*imean_counter_sq);

@@ -5,6 +5,7 @@
 # List module object filenames
 config_objects =\
 atoms_coords.o \
+atoms_non_magnetic.o \
 atoms_spins.o \
 buffer.o \
 config.o \

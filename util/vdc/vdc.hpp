@@ -47,11 +47,17 @@ namespace vdc{
 
    extern std::vector<material_t> materials;
 
-   extern std::vector<double> coordinates;
    extern std::vector<int> category;
    extern std::vector<int> type;
 
+   extern std::vector<double> coordinates;
    extern std::vector<double> spins;
+
+   // non-magnetic atom data
+   extern uint64_t num_nm_atoms;
+   extern std::vector<int> nm_category;
+   extern std::vector<int> nm_type;
+   extern std::vector<double> nm_coordinates;
 
    extern unsigned int total_cells;
    extern unsigned int nx_cells;
@@ -65,10 +71,15 @@ namespace vdc{
    // array to store subsidiary data file names
    extern std::vector <std::string> coord_filenames;
    extern std::vector <std::string> spin_filenames;
+   extern std::vector <std::string> nm_filenames;
 
    // Functions
    void process_coordinates();
    void process_spins();
+
+   // forward function declarations
+   void read_nm_metadata();
+   void read_nm_data();
 
    void output_xyz_file();
    void output_inc_file(unsigned int spin_file_id);

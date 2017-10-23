@@ -53,6 +53,8 @@ namespace internal
 
    extern int output_rate_counter_coords;
 
+   extern bool identify_surface_atoms; // flag to identify surface atoms in config coordinate file
+
    // Field ranges for hysteresis ouput
    extern double field_output_min_1;
    extern double field_output_max_1;
@@ -101,6 +103,8 @@ namespace internal
 
    void atoms();
    void atoms_coords();
+   void atoms_non_magnetic();
+
    double legacy_atoms();
    double legacy_atoms_coords();
    void legacy_cells();
@@ -116,11 +120,13 @@ namespace internal
                             std::vector<double> &buffer);
 
    void write_coordinate_meta();
+   void write_non_magnetic_meta(const uint64_t num_data);
    void write_meta(const double simulation_time, // time (seconds)
                    const double temperature,     // system temperature (Kelvin)
                    const double applied_field_x, // applied field components (Tesla)
                    const double applied_field_y,
                    const double applied_field_z,
+                   const double applied_field_mag,
                    const double magnetization_x, // magnetization components (normalized)
                    const double magnetization_y,
                    const double magnetization_z);

@@ -34,8 +34,8 @@ CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
-GCC_DBCFLAGS= -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi
-GCC_DBLFLAGS= -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi
+GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi
+GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi
 
 PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
 PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
@@ -73,35 +73,9 @@ OBJECTS= \
 obj/data/atoms.o \
 obj/data/category.o \
 obj/data/grains.o \
-obj/data/lattice_anisotropy.o \
 obj/main/initialise_variables.o \
 obj/main/main.o \
 obj/main/material.o \
-obj/mpi/decomposition.o \
-obj/mpi/LLGHeun-mpi.o \
-obj/mpi/LLGMidpoint-mpi.o \
-obj/mpi/mpi_generic.o \
-obj/mpi/mpi_create2.o \
-obj/mpi/mpi_comms.o \
-obj/mpi/wrapper.o \
-obj/program/bmark.o \
-obj/program/cmc_anisotropy.o \
-obj/program/curie_temperature.o \
-obj/program/diagnostics.o \
-obj/program/field_cool.o \
-obj/program/hamr.o \
-obj/program/hybrid_cmc.o \
-obj/program/hysteresis.o \
-obj/program/lagrange.o \
-obj/program/LLB_Boltzmann.o \
-obj/program/partial_hysteresis.o \
-obj/program/static_hysteresis.o \
-obj/program/setting.o \
-obj/program/time_series.o \
-obj/program/temperature_pulse.o \
-obj/program/localised_temperature_pulse.o \
-obj/program/effective_damping.o \
-obj/program/fmr.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -156,12 +130,16 @@ obj/qvoronoi/userprintf_rbox.o\
 
 
 # Include supplementary makefiles
+include src/anisotropy/makefile
 include src/create/makefile
 include src/config/makefile
 include src/cells/makefile
 include src/dipole/makefile
+include src/exchange/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
+include src/mpi/makefile
+include src/program/makefile
 include src/simulate/makefile
 include src/unitcell/makefile
 include src/vio/makefile

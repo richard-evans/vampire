@@ -102,10 +102,6 @@ namespace cells{
       int cell=0;
       //int stack=0;
 
-      // allocate temporary array for neighbour list calculation
-      //std::vector<uvec> cell_list;
-      //cell_list.reserve(dx*dy*dz);
-
       // Allocate space for 3D supercell array (ST coordinate system)
       std::vector<std::vector<std::vector<int> > > supercell_array;
       supercell_array.resize(ncx);
@@ -117,8 +113,6 @@ namespace cells{
             for(int k=0; k<ncz; ++k){
                // associate cell with position i,j,k
                supercell_array[i][j][k]=cell;
-               //std::cout << cell << "\t" << i << "\t" << j << "\t" << k << std::endl;
-               //std::cout << std::flush;
                // increment cell number
                cell++;
             }
@@ -173,14 +167,7 @@ namespace cells{
          }
          // If no error for range then assign atom to cell
          cells::atom_cell_id_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
-
-         //std::cout << "atom_cell_id_array " << cells::atom_cell_id_array[atom] << " atom " << atom << "\t" << scc[0] << "\t" << scc[1] << "\t" << scc[2] << std::endl;
-         //std::cout << std::flush;
-         //fprintf(stderr,"atom_cell_id_array %d atom %d\t%d\t%d\t%d on rank %d\n",cells::atom_cell_id_array[atom],atom,scc[0],scc[1],scc[2],vmpi::my_rank);
-         //std::cerr << std::flush;
-
       }
-      //MPI::COMM_WORLD.Barrier();
 
       //-------------------------------------------------------------------------------------
       // Determine number of microcells computed locally
@@ -202,7 +189,6 @@ namespace cells{
       cells::volume_array.resize(cells::num_cells,0.0);
 
       cells::internal::total_moment_array.resize(cells::num_cells,0.0);
-      //cells::cell_id_array.resize(cells::num_cells);
 
       // Now add atoms to each cell as magnetic 'centre of mass'
       for(int atom=0;atom<num_local_atoms;atom++){
@@ -211,7 +197,6 @@ namespace cells{
          int type = atoms::type_array[atom];
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
-         //if(mus/(9.274e-24) > 0.5){
          if(mp::material[type].non_magnetic==0){
 
             cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
@@ -222,8 +207,6 @@ namespace cells{
             cells::num_atoms_in_cell[local_cell]++;
          }
       }
-
-      //fprintf(stderr,"\n\n  >>>> before adjusting coord of cells on rank %d <<<< \n\n",vmpi::my_rank);
 
       // Save local cells index
       for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
@@ -240,7 +223,6 @@ namespace cells{
          cells::num_atoms_in_cell_global.resize(cells::num_cells);
          cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
 		#endif
-
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
       const double atomic_volume = unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/cells::num_atoms_in_unit_cell;
@@ -278,7 +260,6 @@ namespace cells{
          cells::num_atoms_in_cell[cell]=0;
       }
 
-
       // Now re-update num_atoms in cell for local atoms only
       for(int atom=0;atom<num_local_atoms;atom++){
          int local_cell=cells::atom_cell_id_array[atom];
@@ -305,20 +286,14 @@ namespace cells{
             counter_id_at++;
          }
       }
-      //std::cout << "cells::cell_id_array.size() = " << cells::cell_id_array.size() << "\n" << std::flush;
-      //std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
 
       // Calculate number of local cells
       for(int cell=0;cell<cells::num_cells;cell++){
          if(cells::num_atoms_in_cell[cell]!=0){
-            //std::cout << cells::num_atoms_in_cell[cell] << " in " << cell << std::endl;
             cells::local_cell_array.push_back(cell);
             cells::num_local_cells++;
-            //cells::volume_array[cell] = double(cells::num_atoms_in_cell[cell])*atomic_volume;
          }
       }
-
-      //std::cout << "\n--->cells::index_atoms_array1D.size() = " << cells::index_atoms_array1D.size() << "\n\n" << std::flush;
 
       zlog << zTs() << "Number of local macrocells on rank " << vmpi::my_rank << ": " << cells::num_local_cells << std::endl;
 
@@ -329,7 +304,6 @@ namespace cells{
       cells::mag();
 
       return;
-
    }
 
 } // end of cells namespace

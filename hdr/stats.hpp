@@ -68,8 +68,12 @@ namespace stats
    //-------------------------------------------------
 
    // Control functions
-   void initialize(const int num_atoms, const int num_materials, const std::vector<double>& magnetic_moment_array,
-                   const std::vector<int>& material_type_array, const std::vector<int>& height_category_array);
+   void initialize(const int num_atoms, const int num_materials,
+                   const std::vector<double>& magnetic_moment_array,
+                   const std::vector<int>& material_type_array,
+                   const std::vector<int>& height_category_array,
+                   const std::vector<bool>& non_magnetic_materials_array);
+
    void update(const std::vector<double>& sx, const std::vector<double>& sy, const std::vector<double>& sz, const std::vector<double>& mm);
    void reset();
 

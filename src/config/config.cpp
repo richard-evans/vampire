@@ -13,6 +13,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "atoms.hpp"
 #include "config.hpp"
 #include "gpu.hpp"
 #include "sim.hpp"
@@ -38,13 +39,15 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    // Calculate field ranges for output in limited applied ranges during hysteresis
    //------------------------------------------------------------------------------------------
 
+   // Max and Min field values for descending branch
    double minField_1;
    double maxField_1;
+   // Max and Min field values for ascending branch
    double minField_2;
    double maxField_2;
 
-   // check that minField_1>maxField_1
-   if (config::internal::field_output_min_1 >= config::internal::field_output_max_1)
+   // check that minField_1<maxField_1
+   if (config::internal::field_output_min_1 < config::internal::field_output_max_1)
    {
       minField_1 = config::internal::field_output_min_1;
       maxField_1 = config::internal::field_output_max_1;
@@ -75,29 +78,45 @@ void output(){ // should include variables for data to be outputted, eg spins, c
       // If using GPU acceleration then synchonise spins from device
       gpu::config::synchronise();
 
-      // for all programs except hysteresis
-      if (sim::program != 2)
+      // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
+      if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
       {
-         if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
-         config::internal::atoms();
-         config::internal::output_rate_counter_coords++;
+
+         //Always output coordinates the first time (re-)started, otherwise the spins coordinates won't be printed
+         if (config::internal::output_rate_counter_coords == 0){
+             config::internal::atoms_coords();
+             if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+          }
+         config::internal::atoms(); // call function to output spins coords
+         config::internal::output_rate_counter_coords++; //update the counter
+
       }
-      // for hysteresis program
-      else if (sim::program == 2)
+      // for hysteresis programs
+      else if ((sim::program == 2) || (sim::program ==3) || (sim::program ==12))
       {
-         // output config only in range [minField_1;maxField_1] for decreasing field
-         if ((sim::H_applied >= maxField_1) && (sim::H_applied <= minField_1) && (sim::parity < 0))
+         // output config only in range [minField_1;maxField_1] for descending branch
+         if (sim::parity < 0)
          {
-            if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
-            config::internal::atoms();
-            config::internal::output_rate_counter_coords++;
+            if((sim::H_applied >= minField_1) && (sim::H_applied <= maxField_1)){
+               if(config::internal::output_rate_counter_coords == 0){
+                  config::internal::atoms_coords();
+                  if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+               }
+               config::internal::atoms();
+               config::internal::output_rate_counter_coords++;
+            }
          }
-         // output config only in range [minField_2;maxField_2] for increasing field
-         else if ((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2) && (sim::parity > 0))
+         // output config only in range [minField_2;maxField_2] for ascending branch
+         else if (sim::parity > 0)
          {
-            if (config::internal::output_rate_counter_coords == 0) config::internal::atoms_coords();
-            config::internal::atoms();
-            config::internal::output_rate_counter_coords++;
+            if((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2)){
+               if (config::internal::output_rate_counter_coords == 0){
+                  config::internal::atoms_coords();
+                  if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+               }
+               config::internal::atoms();
+               config::internal::output_rate_counter_coords++;
+            }
          }
       }
    }
@@ -107,26 +126,32 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    //------------------------------------------------------
    if ((config::internal::output_cells_config == true) && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
    {
-      // for all programs except hysteresis
-      if (sim::program != 2)
+      // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
+      if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
       {
          if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
          config::internal::legacy_cells();
       }
-      // for hysteresis program
-      else if (sim::program == 2)
+      // for hysteresis programs
+      else if ((sim::program == 2) || (sim::program ==3) || (sim::program ==12))
       {
          // output config only in range [minField_1;maxField_1] for decreasing field
-         if ((sim::H_applied >= maxField_1) && (sim::H_applied <= minField_1) && (sim::parity < 0))
+         if (sim::parity < 0)
          {
-            if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
-            config::internal::legacy_cells();
+            if((sim::H_applied >= minField_1) && (sim::H_applied <= maxField_1))
+            {
+               if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+               config::internal::legacy_cells();
+            }
          }
          // output config only in range [minField_2;maxField_2] for increasing field
-         else if ((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2) && (sim::parity > 0))
+         else if (sim::parity > 0)
          {
-            if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
-            config::internal::legacy_cells();
+            if((sim::H_applied >= minField_2) && (sim::H_applied <= maxField_2))
+            {
+               if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
+               config::internal::legacy_cells();
+            }
          }
       }
    }

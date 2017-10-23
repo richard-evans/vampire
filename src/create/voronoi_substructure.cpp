@@ -252,6 +252,9 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
          const double sphere_x = grain_coord_array[grain][0];
          const double sphere_y = grain_coord_array[grain][1];
 
+			// copy overlap of substructure grains to a local constant
+			const double overlap = create::internal::voronoi_grain_substructure_overlap_factor;
+
 			// loopover cells
 			for(int i=minx;i<=maxx;i++){
 				for(int j=miny;j<=maxy;j++){
@@ -317,7 +320,7 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
                   else{
                      factor_radius = 1.04*pow((1.0-(frh-nucleation_height)/(rminz-nucleation_height)),sphere_radius);
                   }
-                  if(vmath::point_in_polygon_factor(x-x0,y-y0,1.0*factor_radius,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)){
+                  if(vmath::point_in_polygon_factor(x-x0,y-y0,overlap*factor_radius,tmp_grain_pointx_array,tmp_grain_pointy_array,num_vertices)){
                      insub[atom] = true;
                   }
                   //}
