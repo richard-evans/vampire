@@ -72,7 +72,6 @@ namespace internal{
       cu_real_t sh2;
       cu_real_t sh4;
       cu_real_t sh6;
-      cu_real_t ku;
       cu_real_t anisotropy_unit_x;
       cu_real_t anisotropy_unit_y;
       cu_real_t anisotropy_unit_z;
@@ -80,7 +79,7 @@ namespace internal{
       cu_real_t applied_field_unit_x;
       cu_real_t applied_field_unit_y;
       cu_real_t applied_field_unit_z;
-      cu_real_t Kc1_SI;
+      cu_real_t kc4;
       cu_real_t temperature;
       cu_real_t temperature_rescaling_alpha;
       cu_real_t temperature_rescaling_Tc;

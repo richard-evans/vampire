@@ -1,6 +1,7 @@
 #include "exchange_fields.hpp"
 
 #include "atoms.hpp"
+#include "exchange.hpp"
 #include "vio.hpp"
 #include "cuda_utils.hpp"
 #include "internal.hpp"
@@ -106,6 +107,10 @@ namespace vcuda
 
             const int Natoms = ::atoms::num_atoms;
             const int Nnbrs = row_indices.size();
+
+            // get exchange type
+            const unsigned int exchange_type = ::exchange::get_exchange_type();
+
             for( int i = 0; i < Nnbrs; i++)
             {
                J_matrix_h.row_indices[i] = row_indices[i];
@@ -117,7 +122,8 @@ namespace vcuda
                J_matrix_h.column_indices[i+2*Nnbrs] = column_indices[i]+2*Natoms;
 
                int iid = ::atoms::neighbour_interaction_type_array[i];
-               switch( ::atoms::exchange_type)
+
+               switch(exchange_type)
                {
                   case 0: // Isotropic
                      J_matrix_h.values[i]         = - ::atoms::i_exchange_list[iid].Jij;
@@ -155,7 +161,7 @@ namespace vcuda
 
             zlog << zTs() << "Cuda Matrix: Diagonals = " << occupied_diagonals << ", size = " << size << ", fill ratio = "<< fill_ratio << std::endl;
 
-            switch( ::atoms::exchange_type)
+            switch(exchange_type)
             {
                case 0: // Isotropic
 
@@ -244,7 +250,11 @@ namespace vcuda
             thrust::copy( field3N.begin() + 2*::atoms::num_atoms, field3N.end(), cu::z_total_spin_field_array.begin() );
 
               */
-            switch( ::atoms::exchange_type)
+
+            // get exchange type
+            const unsigned int exchange_type = ::exchange::get_exchange_type();
+
+            switch(exchange_type)
             {
                case 0: // Isotropic
 

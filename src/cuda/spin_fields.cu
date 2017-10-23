@@ -77,9 +77,7 @@ __global__ void update_non_exchange_spin_fields_kernel (
 {
    for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
          i < n_atoms;
-         i += blockDim.x * gridDim.x)
-   {
-
+         i += blockDim.x * gridDim.x){
 
       int mid = material[i];
       // Load parameters from memory
@@ -93,12 +91,6 @@ __global__ void update_non_exchange_spin_fields_kernel (
       cu_real_t sx = x_spin[i];
       cu_real_t sy = y_spin[i];
       cu_real_t sz = z_spin[i];
-
-      /*
-       * Scalar anisotropy
-       */
-      cu_real_t ku = material.ku;
-      field_z -= 2.0 * ku * sz;
 
       cu_real_t ex = material.anisotropy_unit_x;
       cu_real_t ey = material.anisotropy_unit_y;
@@ -120,8 +112,7 @@ __global__ void update_non_exchange_spin_fields_kernel (
 
       cu_real_t ek2 = k2 * 3.0 * sdote;
       cu_real_t ek4 = k4 * 0.125 * (140.0 * sdote3 - 60.0 *sdote);
-      cu_real_t ek6 = k6 * 0.0625 * (
-            1386.0 * sdote5 - 1260.0 * sdote3 + 210.0 * sdote);
+      cu_real_t ek6 = k6 * 0.0625 * (1386.0 * sdote5 - 1260.0 * sdote3 + 210.0 * sdote);
 
       field_x += scale * ex * (ek2 + ek4 + ek6);
       field_y += scale * ey * (ek2 + ek4 + ek6);
@@ -159,6 +150,7 @@ __global__ void update_non_exchange_spin_fields_kernel (
       x_sp_field[i] += field_x;
       y_sp_field[i] += field_y;
       z_sp_field[i] += field_z;
+
    }
 }
 

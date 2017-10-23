@@ -12,6 +12,7 @@
 #include <vector>
 
 // Vampire headers
+#include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
@@ -406,49 +407,38 @@ namespace vcuda{
          {
             double mu_s_SI = ::mp::material[i].mu_s_SI;
 
-            _materials[i].alpha =
-               ::mp::material[i].alpha;
-            _materials[i].gamma_rel =
-               ::mp::material[i].gamma_rel;
-            _materials[i].mu_s_si =
-               mu_s_SI;
-            _materials[i].i_mu_s_si =
-               1.0 / mu_s_SI;
-            _materials[i].k_latt =
-               ::mp::material[i].Klatt_SI / mu_s_SI;
-            _materials[i].sh2 =
-               ::mp::material[i].sh2 / mu_s_SI;
-            _materials[i].sh4 =
-               ::mp::material[i].sh4 / mu_s_SI;
-            _materials[i].sh6 =
-               ::mp::material[i].sh6 / mu_s_SI;
-            _materials[i].ku =
-               ::mp::material[i].Ku;
-            _materials[i].anisotropy_unit_x =
-               ::mp::material[i].UniaxialAnisotropyUnitVector[0];
-            _materials[i].anisotropy_unit_y =
-               ::mp::material[i].UniaxialAnisotropyUnitVector[1];
-            _materials[i].anisotropy_unit_z =
-               ::mp::material[i].UniaxialAnisotropyUnitVector[2];
-            _materials[i].applied_field_strength =
-               ::mp::material[i].applied_field_strength;
-            _materials[i].applied_field_unit_x =
-               ::mp::material[i].applied_field_unit_vector[0];
-            _materials[i].applied_field_unit_y =
-               ::mp::material[i].applied_field_unit_vector[1];
-            _materials[i].applied_field_unit_z =
-               ::mp::material[i].applied_field_unit_vector[2];
-            _materials[i].Kc1_SI =
-               ::mp::material[i].Kc1_SI;
-            _materials[i].temperature =
-               ::mp::material[i].temperature;
-            _materials[i].temperature_rescaling_alpha =
-               ::mp::material[i].temperature_rescaling_alpha;
-            _materials[i].temperature_rescaling_Tc =
-               ::mp::material[i].temperature_rescaling_Tc;
-            _materials[i].H_th_sigma =
-               ::mp::material[i].H_th_sigma;
+            double ku2 = ::anisotropy::get_ku2(i); // second order uniaxial anisotropy constant (Ku1)
+            double ku4 = ::anisotropy::get_ku4(i); // fourth order uniaxial anisotropy constant (Ku2)
+            double ku6 = ::anisotropy::get_ku6(i); // sixth order uniaxial anisotropy constant  (Ku3)
+            double kc4 = ::anisotropy::get_kc4(i); // fourth order cubic anisotropy constant (Kc1)
+            //double kc6 = ::anisotropy::get_kc6(i); // sixth order cubic anisotropy constant (Kc2)
+
+            std::vector<double> ku_vector = ::anisotropy::get_ku_vector(i); // unit vector defining axis for uniaxial anisotropy
+
+            _materials[i].alpha     = ::mp::material[i].alpha;
+            _materials[i].gamma_rel = ::mp::material[i].gamma_rel;
+            _materials[i].mu_s_si   = mu_s_SI;
+            _materials[i].i_mu_s_si = 1.0 / mu_s_SI;
+            _materials[i].k_latt = 0.0; //::mp::material[i].Klatt_SI / mu_s_SI;
+            _materials[i].sh2 = ku2;// / mu_s_SI;
+            _materials[i].sh4 = ku4;
+            _materials[i].sh6 = ku6;
+            _materials[i].anisotropy_unit_x = ku_vector[0];
+            _materials[i].anisotropy_unit_y = ku_vector[1];
+            _materials[i].anisotropy_unit_z = ku_vector[2];
+            _materials[i].applied_field_strength = ::mp::material[i].applied_field_strength;
+            _materials[i].applied_field_unit_x   = ::mp::material[i].applied_field_unit_vector[0];
+            _materials[i].applied_field_unit_y   = ::mp::material[i].applied_field_unit_vector[1];
+            _materials[i].applied_field_unit_z   = ::mp::material[i].applied_field_unit_vector[2];
+            _materials[i].kc4 = kc4;
+            _materials[i].temperature = ::mp::material[i].temperature;
+            _materials[i].temperature_rescaling_alpha = ::mp::material[i].temperature_rescaling_alpha;
+            _materials[i].temperature_rescaling_Tc    = ::mp::material[i].temperature_rescaling_Tc;
+            _materials[i].H_th_sigma = ::mp::material[i].H_th_sigma;
+
          }
+
+         //std::vector<double> ks_tensor = ::anisotropy::get_ku_vector(i);
 
          /*
           * Allocate memory and send information about the materials
