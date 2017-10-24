@@ -126,15 +126,15 @@ namespace vcuda
                switch(exchange_type)
                {
                   case 0: // Isotropic
-                     J_matrix_h.values[i]         = - ::atoms::i_exchange_list[iid].Jij;
-                     J_matrix_h.values[i+Nnbrs]   = - ::atoms::i_exchange_list[iid].Jij;
-                     J_matrix_h.values[i+2*Nnbrs] = - ::atoms::i_exchange_list[iid].Jij;
+                     J_matrix_h.values[i]         = ::atoms::i_exchange_list[iid].Jij;
+                     J_matrix_h.values[i+Nnbrs]   = ::atoms::i_exchange_list[iid].Jij;
+                     J_matrix_h.values[i+2*Nnbrs] = ::atoms::i_exchange_list[iid].Jij;
                      break;
 
                   case 1: // Vectorial
-                     J_matrix_h.values[i]         = - ::atoms::v_exchange_list[iid].Jij[0];
-                     J_matrix_h.values[i+Nnbrs]   = - ::atoms::v_exchange_list[iid].Jij[1];
-                     J_matrix_h.values[i+2*Nnbrs] = - ::atoms::v_exchange_list[iid].Jij[2];
+                     J_matrix_h.values[i]         = ::atoms::v_exchange_list[iid].Jij[0];
+                     J_matrix_h.values[i+Nnbrs]   = ::atoms::v_exchange_list[iid].Jij[1];
+                     J_matrix_h.values[i+2*Nnbrs] = ::atoms::v_exchange_list[iid].Jij[2];
                      break;
 
                   case 2: // Tensor
@@ -172,7 +172,7 @@ namespace vcuda
 
                   for (int i = 0; i < ::atoms::neighbour_list_array.size(); i++) {
                      int iid = ::atoms::neighbour_interaction_type_array[i];
-                     J_xx_matrix_h.values[i] = - ::atoms::i_exchange_list[iid].Jij;
+                     J_xx_matrix_h.values[i] = ::atoms::i_exchange_list[iid].Jij;
                   }
 
 
@@ -194,9 +194,9 @@ namespace vcuda
                   for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)
                   {
                      int iid = ::atoms::neighbour_interaction_type_array[i];
-                     J_xx_matrix_h.values[i] = - ::atoms::v_exchange_list[iid].Jij[0];
-                     J_yy_matrix_h.values[i] = - ::atoms::v_exchange_list[iid].Jij[1];
-                     J_zz_matrix_h.values[i] = - ::atoms::v_exchange_list[iid].Jij[2];
+                     J_xx_matrix_h.values[i] = ::atoms::v_exchange_list[iid].Jij[0];
+                     J_yy_matrix_h.values[i] = ::atoms::v_exchange_list[iid].Jij[1];
+                     J_zz_matrix_h.values[i] = ::atoms::v_exchange_list[iid].Jij[2];
                   }
 
                   cusp::convert(J_xx_matrix_h, J_xx_mat_d);
