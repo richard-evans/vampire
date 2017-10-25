@@ -47,18 +47,19 @@ bool in_shield(double x, double y, double z){
    const double zr = z; // reduced height
 
    // Bottom shield
-   if(zr < 300.0 && zr > 0.0) return true;
+   //if(zr < 300.0 && zr > 0.0) return true;
 
    // Top shield (++z) 31-51 nm
-   if(zr > 520.0 && zr < 720.0) return true;
+//   if(zr > 520.0 && zr < 720.0) return true;
 
    // Top shield (+z) 52-72 nm
-   if(z > 740.0 && z < 940.0) return true;
+//   if(z > 740.0 && z < 940.0) return true;
 
    // side shields
-   if(in_x(xr, zr)) return true;
+//   if(in_x(xr, zr))
+return true;
 
-   return false;
+   //return false;
 
 }
 

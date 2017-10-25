@@ -71,10 +71,10 @@ namespace track_parameters{
    int num_tracks = 1;
 
    // distance of tracks from read head
-   double fly_height = 0.0; // Angstroms
+   double fly_height = 200.0; // Angstroms
 
    double bit_size = 1000.0; // size of bits in x-direction (cross track)
-   double bit_width = 10000.0; // size of bits in z-direction (down track)
+   double bit_width = 1000.0; // size of bits in z-direction (down track)
    double bit_depth = 600.0; // depth of bits along y-direction
 
    double Ms = 0.1;// mu0 Ms in Tesla
@@ -122,7 +122,7 @@ void create_tracks(){
    //
           track_parameters::bit_magnetisation[bit] = M;
           bit++;
-          std::cout << bit << "\t" << track_parameters::num_bits<<std::endl;
+   //       std::cout << bit << "\t" << track_parameters::num_bits<<std::endl;
    //    //   M = M*-1;
        }
      //  M = M*-1;
@@ -142,6 +142,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
    double y_cell = cy;
    double z_cell = down_track_position  + cz;
 
+//   std::cout << x_cell << '\t' << y_cell << '\t' << z_cell << std::endl;
    const double xb = track_parameters::bit_size  * 0.5;
    const double yb = track_parameters::bit_depth * 0.5;
    const double zb = track_parameters::bit_width * 0.5;
@@ -156,7 +157,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
       double x_bit = track_parameters::x_track_array[bit];
       double y_bit = y_track;
       double z_bit = track_parameters::z_track_array[bit];
-
+//   std::cout << x_bit << '\t' << y_bit << '\t' << z_bit << std::endl;
       //pcalcualtes the prefactor (M/4pi)
 
       //calculates the vector in A from the cell to the bits
@@ -164,6 +165,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
       double y = y_cell - y_bit;
       double z = z_cell - z_bit;
 
+//   std::cout << x << '\t' << y << '\t' << z<< std::endl;
 
       double Bx = 0.0;
       double By = 0.0;
@@ -185,17 +187,21 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
                 const double m1klm = pow(-1,k+l+m);
 
                 const double xp = x + xb*m1k;
-                const double yp = y + yb*m1l;
-                const double zp = z + zb*m1m;
+               const double yp = y + yb*m1l;
+               const double zp = z + zb*m1m;
 
-                const double r = sqrt( xp*xp + yp*yp + zp*zp );
-
+                //if (xp ==0) xp = 0.001;
+                //if (yp ==0) yp = 0.001;
+                //if (zp ==0) zp = 0.001;
                 const double xabs = fabs(xp);
                 const double yabs = fabs(yp);
 
-                Bx += m1klm * log(zp+r);
-                By += m1klm * log(xp+r);
-                Bz += m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                double r = sqrt(xp*xp + yp*yp + zp*zp);
+
+                Bx += m1klm* log(zp + r);
+                By += m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                Bz += m1klm* log(xp + r);
+
 
              }
           }
@@ -234,22 +240,32 @@ void tracks(){
    create_tracks();
 
 
-std::vector <double > B(3,0.0);
 
   while(sim::time<sim::equilibration_time+sim::total_time){
 
-     for (int lc = 0; lc < cells::num_local_cells; lc++){
-        int cell = cells::cell_id_array[lc];
+   std::ofstream ofile;
+   ofile.open("trackfield.txt");
 
-          const double cx = cells::pos_and_mom_array[4*cell+0];
-          const double cy = cells::pos_and_mom_array[4*cell+1];
-          const double cz = cells::pos_and_mom_array[4*cell+2];
-          B = calculate_field(cx, cy, cz, sim::time);
-          sim::track_field_x[cell] = B[0];
-          sim::track_field_y[cell] = B[1];
-          sim::track_field_z[cell] = B[2];
-       }
+   std::ofstream pfile;
+   pfile.open("magnet.txt");
 
+   std::vector <double > B(3,0.0);
+
+   for (int lc = 0; lc < cells::num_local_cells; lc++){
+     int cell = cells::cell_id_array[lc];
+
+        const double cx = cells::pos_and_mom_array[4*cell+0];
+        const double cy = cells::pos_and_mom_array[4*cell+1];
+        const double cz = cells::pos_and_mom_array[4*cell+2];
+
+            B = calculate_field(cx,cy,cz,0);
+             sim::track_field_x[cell] = B[0];
+             sim::track_field_y[cell] = B[1];
+             sim::track_field_z[cell] = B[2];
+            ofile << cx << "\t" << cy << "\t" << cz << "\t" <<
+                  B[0] << "\t" << B[1] << "\t" << B[2] << std::endl;
+
+         }
 
     // Integrate system
     sim::integrate(sim::partial_time);

@@ -236,23 +236,25 @@ namespace environment{
                }
             }
          }
-
+         std::ofstream pfile;
+         pfile.open("m.txt");
          //initialised the in components for the FT to the magnetisation of each cell
          int cell = 0;
          for (int i=0 ; i<num_cells_x; i++){
             for (int j=0 ; j<num_cells_y; j++){
                for (int k=0 ; k<num_cells_z; k++){
-                  int id = (i*num_cells_x+j)*num_cells_y+k;
+                  int id = (2*i*num_cells_y+j)*2*num_cells_z+k;
+
                //   std::cout << x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << std::endl;
                   Mx_in[id][0] = x_mag_array[cell]/9.27400915e-24;
                   My_in[id][0] = y_mag_array[cell]/9.27400915e-24;
                   Mz_in[id][0] = z_mag_array[cell]/9.27400915e-24;
-            //      std::cout << Mx_in[id][0] << '\t' << My_in[id][0] << '\t' << Mz_in[id][0] << std::endl;
+                  pfile <<cell << '\t' << i << '\t' << j << '\t' << k << "\t" <<  x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' <<z_mag_array[cell] << std::endl;
                   cell++;
                }
             }
          }
-
+//         std::cout <<
          //FT for magnetisation
          fftw_plan MxP,MyP,MzP;
 
@@ -311,31 +313,35 @@ namespace environment{
             dipole_field_x[i]=eightPI_three_cell_volume*(x_mag_array[i]/9.27400915e-24);
             dipole_field_y[i]=eightPI_three_cell_volume*(y_mag_array[i]/9.27400915e-24);
             dipole_field_z[i]=eightPI_three_cell_volume*(z_mag_array[i]/9.27400915e-24);
-
          }
+         
+         std::ofstream ofile;
+         ofile.open("field.txt");
+
          //sums the dipole field N.m + self demag/eightnumcells
          cell = 0;
          for (int i=0 ; i<num_cells_x ; i++){
             for (int j=0 ; j<num_cells_y ; j++){
                for (int k=0 ; k<num_cells_z ; k++){
-                  int id = (i*num_cells_x+j)*num_cells_y+k;
+                  int id = (2*i*num_cells_y+j)*2*num_cells_z+k;
                //   std:: cout << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << Hx_out[id][0] << '\t' << Hy_out[id][0] << '\t' << Hz_out[id][0] << std::endl;
-                  dipole_field_x[cell] += Hx_out[id][0]/eight_num_cells;
+                 dipole_field_x[cell] += Hx_out[id][0]/eight_num_cells;
                  dipole_field_y[cell] += Hy_out[id][0]/eight_num_cells;
                  dipole_field_z[cell] += Hz_out[id][0]/eight_num_cells;
                  dipole_field_x[cell] *= 9.27400915e-01;
                  dipole_field_y[cell] *= 9.27400915e-01;
                  dipole_field_z[cell] *= 9.27400915e-01;
+                 ofile << i << '\t' << j << '\t' << k << '\t' << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << std::endl;
                   cell++;
                }
             }
          }
 
          //saves the dipole field for each cell to the environment cell for use in the environment module
-         for (int l = 0; l < list_env_cell_atomistic_cell.size(); l++){
-            int cell = list_env_cell_atomistic_cell[l];
+         for(int lc=0; lc<cells::num_local_cells; lc++){
+            int cell = cells::cell_id_array[lc];
             int env_cell = list_env_cell_atomistic_cell[cell];
-         //   std::cout << cell << '\t' << env_cell <<std::endl;
+            //std::cout << cell << '\t' << env_cell <<std::endl;
             environment_field_x[cell] = dipole_field_x[env_cell];
             environment_field_y[cell] = dipole_field_y[env_cell];
             environment_field_z[cell] = dipole_field_z[env_cell];
