@@ -22,12 +22,13 @@
 namespace vdc{
 
 // forward function declarations
-void extract( std::string arg_string, std::vector<double> arg_vector, int& exit_status );
+int extract( std::string arg_string, std::vector<double>& arg_vector );
+void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x );
 
 //------------------------------------------------------------------------------
 // Command line parsing function
 //------------------------------------------------------------------------------
-void command( int argc, char* argv[], int& exit_status ){
+int command( int argc, char* argv[] ){
 // Command line options for utility to be implemented:
 //    --xyz - generate xyz file
 //    --povray - generate povray files
@@ -58,7 +59,7 @@ void command( int argc, char* argv[], int& exit_status ){
          // check number of args not exceeded
          if (arg+1 < argc){
             arg++;
-            temp_str = std::string(argv[arg]);
+            temp_str = argv[arg];
          }
          else {
             ////terminaltextcolor(RED);
@@ -66,17 +67,14 @@ void command( int argc, char* argv[], int& exit_status ){
                       << "\n" << "Check for spaces in command-line arguments"
                       << std::endl;
             ////terminaltextcolor(WHITE);
-            exit_status = EXIT_FAILURE;
+            return EXIT_FAILURE;
          }
 
          // work through vector and extract values
-         extract(temp_str, vdc::vector_z, exit_status);
+         extract(temp_str, vdc::vector_z );
 
          // confirm initialisation of z-axis
          z_initialised = true;
-
-         std::cout << "vector_z = " << vector_z[0] << "\t" << vector_z[1] << "\t" << vector_z[2] << std::endl;
-         std::cout << "Bye" << std::endl;
       }
       else if (sw == "--vector-x"){
 
@@ -91,11 +89,11 @@ void command( int argc, char* argv[], int& exit_status ){
                       << "\n" << "Check for spaces in command-line arguments"
                       << std::endl;
             ////terminaltextcolor(WHITE);
-            exit_status = EXIT_FAILURE;
+            return EXIT_FAILURE;
          }
 
          // work through vector and extract values
-         extract(temp_str, vdc::vector_x, exit_status);
+         extract(temp_str, vdc::vector_x );
 
          // confirm initialisation of x-axis
          x_initialised = true;
@@ -105,7 +103,7 @@ void command( int argc, char* argv[], int& exit_status ){
          std::cerr << "Error - unknown command line parameter \'" << sw << "\'"
                    << std::endl;
          ////terminaltextcolor(WHITE);
-         exit_status = EXIT_FAILURE;
+         return EXIT_FAILURE;
       }
    }
 
@@ -113,18 +111,20 @@ void command( int argc, char* argv[], int& exit_status ){
    if ( z_initialised && !x_initialised ){
 
       // check for a z-axis with vector_z[2] = 0
-      if ( (-0.000001 < vector_z[2]) && (vector_z[2] < 0.000001) ){
+      if ( (-0.000001 < vdc::vector_z[2]) && (vdc::vector_z[2] < 0.000001) ){
          // x-axis will lie along {0,0,1}
          vdc::vector_x = {0.0, 0.0, 1.0};
+
+         // find vector_y
+         init_vector_y( vdc::vector_z, vdc::vector_x );
       }
       else {
          // find x-axis which lies on plane with normal vector_z
          vdc::vector_x = {1.0, 0.0, -1.0*vdc::vector_z[0]/vdc::vector_z[2]};
+
+         // find vector_y
+         init_vector_y( vdc::vector_z, vdc::vector_x );
       }
-
-
-      // find a line on the plane going through origin with normal vector_z
-      vdc::vector_x = {1.0, 0.0, -1.0*vdc::vector_z[0]/vdc::vector_z[2]};
    }
    else if ( !z_initialised && x_initialised ){
 
@@ -134,7 +134,7 @@ void command( int argc, char* argv[], int& exit_status ){
                 << "\n" << "To use 1D colour scheme, initialise z-axis instead"
                 << std::endl;
       ////terminaltextcolor(WHITE);
-      exit_status = EXIT_FAILURE;
+      return EXIT_FAILURE;
    }
    else if ( z_initialised && x_initialised ){
 
@@ -146,11 +146,11 @@ void command( int argc, char* argv[], int& exit_status ){
          ////terminaltextcolor(RED);
          std::cerr << "Error - input axes are not orthogonal." << std::endl;
          ////terminaltextcolor(WHITE);
-         exit_status = EXIT_FAILURE;
+         return EXIT_FAILURE;
       }
 
    }
-   return;
+   return EXIT_SUCCESS;
 
 }
 
@@ -158,7 +158,7 @@ void command( int argc, char* argv[], int& exit_status ){
 // Extracts 3D vector coordinates from string: {x,y,z} or (x,y,z)
 // where x,y and z are doubles
 //------------------------------------------------------------------------------
-void extract( std::string arg_string, std::vector<double> arg_vector, int& exit_status ){
+int extract( std::string arg_string, std::vector<double>& arg_vector ){
    int marker = 0; // position in the vector string
 
    // check for opening brackets
@@ -167,7 +167,7 @@ void extract( std::string arg_string, std::vector<double> arg_vector, int& exit_
       std::cerr << "Error - brackets required around 3 comma separated values"
                 << std::endl;
       ////terminaltextcolor(WHITE);
-      exit_status = EXIT_FAILURE;
+      return EXIT_FAILURE;
    }
 
    // move to next character
@@ -179,9 +179,9 @@ void extract( std::string arg_string, std::vector<double> arg_vector, int& exit_
 
       // read coordinate-value
       int j = 0;
-      while ( arg_string[marker] != ',' ){
-         tmp_string.resize( tmp_string.size() +1 );
-         tmp_string[j] = arg_string[marker];
+
+      while ( (arg_string[marker] != ',') && (arg_string[marker] != '}') && (arg_string[marker] != ')') ){
+         tmp_string.push_back(arg_string[marker]);
 
          // move through number
          marker++;
@@ -199,14 +199,14 @@ void extract( std::string arg_string, std::vector<double> arg_vector, int& exit_
          std::cerr << "Error - brackets required around 3 comma separated values"
                    << std::endl;
          ////terminaltextcolor(WHITE);
-         exit_status = EXIT_FAILURE;
+         return EXIT_FAILURE;
       }
       else if ( ((arg_string[marker] == ')') || (arg_string[marker] == '}')) && ( i != 2 ) ){
          ////terminaltextcolor(RED)
          std::cerr << "Error - three coordinates required"
                    << std::endl;
          ////terminaltextcolor(WHITE);
-         exit_status = EXIT_FAILURE;
+         return EXIT_FAILURE;
       }
 
    }
@@ -218,7 +218,18 @@ void extract( std::string arg_string, std::vector<double> arg_vector, int& exit_
    arg_vector[1] = arg_vector[1]/length;
    arg_vector[2] = arg_vector[2]/length;
 
-   return;
+   return EXIT_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+// Perform cross product of input vectors vector_x and vector_z to get vector_y
+//------------------------------------------------------------------------------
+void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x ){
+
+   vdc::vector_y[0] = vdc::vector_z[1]*vdc::vector_x[2] - vdc::vector_x[1]*vdc::vector_z[2];
+   vdc::vector_y[1] = vdc::vector_x[0]*vdc::vector_z[2] - vdc::vector_z[0]*vdc::vector_x[2];
+   vdc::vector_y[2] = vdc::vector_z[0]*vdc::vector_x[1] - vdc::vector_x[0]*vdc::vector_z[1];
+
 }
 
 } // end of namespace vdc

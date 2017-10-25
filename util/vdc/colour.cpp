@@ -40,16 +40,10 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    // variables
    double xy_angle, z_angle, hue, light, saturation;
    double sx2, sy2, sz2; //spin coordinates after change of axes
-   std::vector<double> vector_y = {0.0,0.0,0.0};
-
-   // calculate y-axis (z cross x)
-   vector_y[0] = vdc::vector_z[1]*vdc::vector_x[2] - vdc::vector_x[1]*vdc::vector_z[2];
-   vector_y[1] = vdc::vector_x[0]*vdc::vector_z[2] - vdc::vector_z[0]*vdc::vector_x[2];
-   vector_y[2] = vdc::vector_z[0]*vdc::vector_x[1] - vdc::vector_x[0]*vdc::vector_z[1];
 
    // perform change of coordinates
    sx2 = vdc::vector_x[0]*sx + vdc::vector_x[1]*sy + vdc::vector_x[2]*sz;
-   sy2 = vector_y[0]*sx + vector_y[1]*sy + vector_y[2]*sz;
+   sy2 = vdc::vector_y[0]*sx + vdc::vector_y[1]*sy + vdc::vector_y[2]*sz;
    sz2 = vdc::vector_z[0]*sx + vdc::vector_z[1]*sy + vdc::vector_z[2]*sz;
 
    // in x,y plane, angle = the spin direction
@@ -67,22 +61,22 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    saturation = 0.0;
    light = 0.0;
 
-   // we have resolved xy plane colours. to adjust bightness (x-axis) we
-   // convert to HSL
-   rgb2hsi(red, green, blue, hue, light, saturation);
-
-   // adjust lightness to reflect z-axis orientation
-   // find angle w.r.t. z-axis [value -pi/2 to pi/2]
-   z_angle = std::atan(sz2/std::sqrt(sx2*sx2 + sy2*sy2));
-   if ( z_angle >= 0.0 ){
-      light = light + (1.0 - light)*(2.0*z_angle/pi);
-   }
-   else {
-      light = light + light*(2.0*z_angle/pi);
-   }
-
-   // convert back to rgb to get final colour
-   hsi2rgb(red, green, blue, hue, light, saturation);
+   // // we have resolved xy plane colours. to adjust bightness (x-axis) we
+   // // convert to HSL
+   // rgb2hsl(red, green, blue, hue, light, saturation);
+   //
+   // // adjust lightness to reflect z-axis orientation
+   // // find angle w.r.t. z-axis [value -pi/2 to pi/2]
+   // z_angle = std::atan(sz2/std::sqrt(sx2*sx2 + sy2*sy2));
+   // if ( z_angle >= 0.0 ){
+   //    light = light + (1.0 - light)*(2.0*z_angle/pi);
+   // }
+   // else {
+   //    light = light + light*(2.0*z_angle/pi);
+   // }
+   //
+   // // convert back to rgb to get final colour
+   // hsl2rgb(red, green, blue, hue, light, saturation);
 
    return;
 }

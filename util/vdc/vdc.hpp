@@ -55,6 +55,7 @@ namespace vdc{
 
    // axis vectors for povray colouring
    extern std::vector<double> vector_z;
+   extern std::vector<double> vector_y;
    extern std::vector<double> vector_x;
 
    // non-magnetic atom data
@@ -78,7 +79,7 @@ namespace vdc{
    extern std::vector <std::string> nm_filenames;
 
    // Functions
-   void command( int argc, char* argv[], int& exit_status );
+   int command( int argc, char* argv[]);
    void process_coordinates();
    void process_spins();
 
