@@ -27,7 +27,7 @@ namespace gpu{
       bool acceleration = false; // flag to enable gpu_acceleration
    #endif
 
-   bool cpu_stats = false; // flag to calculate stats using cpu
+   bool cpu_stats = true; // flag to calculate stats using cpu
    int device = -1; // device id
    int device_other = -1; // other device to use
 
