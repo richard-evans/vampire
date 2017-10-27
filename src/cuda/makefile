@@ -21,6 +21,13 @@ CUDA_OBJECTS= \
 	     obj/cuda/spin_fields.o \
 	     obj/cuda/statistics.o
 
+CUDA_ARCH= -gencode arch=compute_30,code=sm_30 \
+-gencode arch=compute_35,code=sm_35 \
+-gencode arch=compute_50,code=sm_50 \
+-gencode arch=compute_50,code=compute_50 \
+-gencode arch=compute_61,code=sm_61 \
+-gencode arch=compute_61,code=compute_61
+
 # The device linked object for CUDA
 CUDA_DLINK= obj/cuda/vampire_cuda.o
 
@@ -34,14 +41,10 @@ CUDA_MATRIX_TYPE = CSR
 #CUDA_MATRIX_TYPE = DIA
 #CUDA_MATRIX_TYPE = ELL
 
-CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA --gpu-architecture=compute_30 --gpu-code=compute_30,sm_30 --use_fast_math -ftz=true -std=c++11
+CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++11
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
 	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS) $(CUDA_PR) -DCUDA_MATRIX=$(CUDA_MATRIX_TYPE)
-
-# Target for device link -- not working atm
-#$(CUDA_DLINK): $(cuda_objects)
-#	nvcc -arch=sm_30 -dlink $(cuda_objects) -o $@
 
 # Target to link the CUDA enabled vampire
 ifeq ($(shell uname -s), Darwin)
