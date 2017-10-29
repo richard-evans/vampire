@@ -403,7 +403,7 @@ void legacy_cells()
       // Root process now outputs the cell magnetisations
       for (int cell = 0; cell < cells::num_cells; cell++)
       {
-         if (cells::num_atoms_in_cell[cell] > 0)
+         if (dipole::dipole_cells_num_atoms_in_cell[cell] > 0)
          {
             cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell] << "\t";
             if(dipole::activated) cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << "\n";
@@ -511,9 +511,9 @@ void legacy_cells_coords()
 
       for (int cell = 0; cell < cells::num_cells; cell++)
       {
-         if (cells::num_atoms_in_cell[cell] > 0)
+         if (dipole::dipole_cells_num_atoms_in_cell[cell] > 0)
          {
-            cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell[cell] << "\t" << cells::pos_and_mom_array[4 * cell + 0] << "\t" << cells::pos_and_mom_array[4 * cell + 1] << "\t" << cells::pos_and_mom_array[4 * cell + 2] << std::endl;
+            cfg_file_ofstr << cell << "\t" << dipole::dipole_cells_num_atoms_in_cell[cell] << "\t" << cells::pos_and_mom_array[4 * cell + 0] << "\t" << cells::pos_and_mom_array[4 * cell + 1] << "\t" << cells::pos_and_mom_array[4 * cell + 2] << std::endl;
             config::internal::total_output_cells++;
          }
       }

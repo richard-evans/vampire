@@ -64,13 +64,13 @@ namespace dipole{
             const double mz_i = cells::mag_array_z[i]*imuB;
 
             // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
-            dipole::cells_field_array_x[i]=self_demag * mx_i;
-            dipole::cells_field_array_y[i]=self_demag * my_i;
-            dipole::cells_field_array_z[i]=self_demag * mz_i;
+            dipole::cells_field_array_x[i] = self_demag * mx_i*0.0; //*0.0
+            dipole::cells_field_array_y[i] = self_demag * my_i*0.0; //*0.0
+            dipole::cells_field_array_z[i] = self_demag * mz_i*0.0; //*0.0
             // Add self demag to Hdemag --> To get only dipole-dipole contribution comment this and initialise to zero
-            dipole::cells_mu0Hd_field_array_x[i]=-0.5*self_demag * mx_i;
-            dipole::cells_mu0Hd_field_array_y[i]=-0.5*self_demag * my_i;
-            dipole::cells_mu0Hd_field_array_z[i]=-0.5*self_demag * mz_i;
+            dipole::cells_mu0Hd_field_array_x[i] = -0.5*self_demag * mx_i;
+            dipole::cells_mu0Hd_field_array_y[i] = -0.5*self_demag * my_i;
+            dipole::cells_mu0Hd_field_array_z[i] = -0.5*self_demag * mz_i;
 
             // Loop over all other cells to calculate contribution to local cell
             for(int j=0;j<dipole::internal::cells_num_cells;j++){

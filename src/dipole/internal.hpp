@@ -91,17 +91,17 @@ namespace dipole{
                                     std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                                     std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
                                     std::vector < std::vector <int> >& cells_index_atoms_array,
-                                    const std::vector<double>& cells_volume_array,
+                                    std::vector<double>& cells_volume_array,
                                     std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
                                     std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
                                     std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
                                     std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                                    const std::vector<int>& atom_type_array,
-                                    const std::vector<int>& atom_cell_id_array,
-                                    const std::vector<double>& atom_coords_x, //atomic coordinates
-                                    const std::vector<double>& atom_coords_y,
-                                    const std::vector<double>& atom_coords_z,
-                                    const int num_atoms);
+                                    std::vector<int>& atom_type_array,
+                                    std::vector<int>& atom_cell_id_array,
+                                    std::vector<double>& atom_coords_x, //atomic coordinates
+                                    std::vector<double>& atom_coords_y,
+                                    std::vector<double>& atom_coords_z,
+                                    int num_atoms);
 
       void compute_inter_tensor(const double cells_macro_cell_size,
                                 const int i,
@@ -121,7 +121,25 @@ namespace dipole{
                                 std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
                                 std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z);
 
-      void initialize_macrocell_solver();
+      void initialize_macrocell_solver(const int cells_num_atoms_in_unit_cell,
+                                       int cells_num_cells, /// number of macrocells
+                                       int cells_num_local_cells, /// number of local macrocells
+                                       const double cells_macro_cell_size,
+                                       std::vector <int>& cells_local_cell_array,
+                                       std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
+                                       std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
+                                       std::vector < std::vector <int> >& cells_index_atoms_array,
+                                       std::vector<double>& cells_volume_array,
+                                       std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
+                                       std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                                       std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                                       std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                                       std::vector<int>& atom_type_array,
+                                       std::vector<int>& atom_cell_id_array,
+                                       std::vector<double>& atom_coords_x, //atomic coordinates
+                                       std::vector<double>& atom_coords_y,
+                                       std::vector<double>& atom_coords_z,
+                                       int num_atoms);
 
       //-----------------------------------------------------------------------------
       // Function to send receive cells data to other cpus
@@ -171,6 +189,13 @@ namespace dipole{
                   std::vector<int>& cells_num_atoms_in_cell,
                   int cells_num_local_cells,
                   int cells_num_cells);
+
+      /*--------------------------------------------------------*/
+      /*Function to send cells field to be output in cfg file   */
+      /*--------------------------------------------------------*/
+      int send_cells_demag_factor(std::vector<int>& cells_cell_id_array,
+                                 std::vector<double>& N_tensor_array,
+                                 int cells_num_local_cells);
 
    } // end of internal namespace
 
