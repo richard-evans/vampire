@@ -45,6 +45,7 @@ namespace cells{
                    const std::vector<double>& atom_coords_z,
                    const std::vector<int>& atom_type_array,
                    const std::vector<int>& atom_cell_id_array,
+                   const int num_total_atoms_for_dipole,
                    const int num_atoms
    ){
 
@@ -191,6 +192,7 @@ namespace cells{
       cells::internal::total_moment_array.resize(cells::num_cells,0.0);
 
       // Now add atoms to each cell as magnetic 'centre of mass'
+      int num_atoms_magnetic = 0;  /// number of magnetic atoms
       for(int atom=0;atom<num_local_atoms;atom++){
          int local_cell=cells::atom_cell_id_array[atom];
          //int type = cells::internal::atom_type_array[atom];
@@ -204,6 +206,7 @@ namespace cells{
             cells::pos_and_mom_array[4*local_cell+3] += mus;
 
             cells::num_atoms_in_cell[local_cell]++;
+            num_atoms_magnetic++;
          }
       }
 
@@ -221,10 +224,13 @@ namespace cells{
          MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          cells::num_atoms_in_cell_global.resize(cells::num_cells);
          cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
+         MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 		#endif
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
-      const double atomic_volume = unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/cells::num_atoms_in_unit_cell;
+      // Atomic volume is corrected by a factor which makes it a magnetic atomic volume
+      const double factor_for_volume = double(num_total_atoms_for_dipole)/double(num_atoms_magnetic);
+      const double atomic_volume = factor_for_volume * unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/cells::num_atoms_in_unit_cell;
 
       // Now find mean coordinates via magnetic 'centre of mass'
       for(int local_cell=0;local_cell<cells::num_cells;local_cell++){

@@ -73,6 +73,7 @@ namespace cells{
                    const std::vector<double>& atom_coords_z,
                    const std::vector<int>& atom_type_array,
                    const std::vector<int>& atom_cell_id_array,
+                   const int num_total_atoms_for_dipole,
                    const int num_atoms
    );
 
