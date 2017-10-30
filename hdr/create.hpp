@@ -103,8 +103,6 @@ namespace cs{
    extern int num_multilayers;
    extern bool multilayer_height_category; // enable height categorization by multilayer number
 
-
-
 	class neighbour_t {
 	public:
 
@@ -305,6 +303,9 @@ void generate_multilayers(std::vector<cs::catom_t> & catom_array);
 // new create module functions
 //------------------------------------------------------------------------------
 namespace create{
+
+	// Variable for total number of atoms that are not filler
+	extern int num_total_atoms_non_filler;
 
 	// Functions
    void initialize();

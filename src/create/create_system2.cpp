@@ -305,6 +305,7 @@ int create(){
                   atoms::z_coord_array,
                   atoms::type_array,
                   atoms::cell_array,
+						create::num_total_atoms_non_filler,
                   atoms::num_atoms
       );
 
