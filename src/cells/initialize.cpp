@@ -131,6 +131,20 @@ namespace cells{
          int num_local_atoms = num_atoms;
       #endif
 
+      // Determine number of total atoms
+      #ifdef MPICF
+         int num_total_atoms=0;
+         int total_non_mag_removed_atoms=0;
+         MPI_Reduce(&num_local_atoms,&num_total_atoms, 1,MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+         MPI_Reduce(&create::num_total_atoms_non_filler,&total_non_mag_removed_atoms, 1, MPI_INT, MPI_SUM, 0,MPI_COMM_WORLD);
+         int total_atoms_non_filler = num_total_atoms + total_non_mag_removed_atoms;
+         MPI_Bcast(&total_atoms_non_filler,1,MPI_INT,0,MPI_COMM_WORLD);
+      #else
+         int total_atoms_non_filler = atoms::num_atoms+create::num_total_atoms_non_filler;
+      #endif
+      // std::cout << "\nTotal number of atoms generated including non-magnetic atoms after Allreduce operation (all CPUs): " << total_atoms_non_filler << std::endl;
+
+
       // Assign atoms to cells
       for(int atom=0;atom<num_local_atoms;atom++){
          // temporary for atom coordinates
@@ -229,8 +243,11 @@ namespace cells{
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
       // Atomic volume is corrected by a factor which makes it a magnetic atomic volume
-      const double factor_for_volume = double(num_total_atoms_for_dipole)/double(num_atoms_magnetic);
-      const double atomic_volume = factor_for_volume * unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/cells::num_atoms_in_unit_cell;
+      const double factor_for_volume = double(total_atoms_non_filler)/double(num_atoms_magnetic);
+      const double atomic_volume =  factor_for_volume * unit_cell_size_x*unit_cell_size_y*unit_cell_size_z/double(cells::num_atoms_in_unit_cell);
+      // std::cout << "\n\tnum_total_atoms_for_dipole\t" << total_atoms_non_filler << std::endl;
+      // std::cout << "\n\tnum_atoms_magnetic\t" << num_atoms_magnetic << std::endl;
+      // std::cout << "\n\tfactor_for_volume\t" << factor_for_volume << std::endl;
 
       // Now find mean coordinates via magnetic 'centre of mass'
       for(int local_cell=0;local_cell<cells::num_cells;local_cell++){
