@@ -39,6 +39,11 @@ namespace montecarlo{
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
+   //---------------------------------------------------------------------------
+   // Function to perform one monte carlo step
+   //---------------------------------------------------------------------------
+   int mc_step();
+
 } // end of montecarlo namespace
 
 #endif //MONTECARLO_H_

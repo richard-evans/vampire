@@ -33,4 +33,3 @@ namespace montecarlo{
    } // end of internal namespace
 
 } // end of montecarlo namespace
-

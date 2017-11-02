@@ -86,7 +86,6 @@ obj/simulate/fields.o \
 obj/simulate/LLB.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
-obj/simulate/mc.o \
 obj/simulate/mc_moves.o \
 obj/simulate/cmc.o \
 obj/simulate/cmc_mc.o \
@@ -141,6 +140,7 @@ include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
+include src/montecarlo/makefile
 include src/mpi/makefile
 include src/program/makefile
 include src/simulate/makefile

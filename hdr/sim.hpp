@@ -159,7 +159,6 @@ namespace sim{
 	extern int LLG_Midpoint();
 	extern int LLG_Midpoint_mpi();
 	extern int LLG_Midpoint_cuda();
-	extern int MonteCarlo();
 	extern int ConstrainedMonteCarlo();
 	extern int ConstrainedMonteCarloMonteCarlo();
 	extern void mc_move(const std::valarray<double>&, std::valarray<double>&);

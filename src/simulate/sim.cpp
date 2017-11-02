@@ -52,6 +52,7 @@
 #include "errors.hpp"
 #include "gpu.hpp"
 #include "material.hpp"
+#include "montecarlo.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
@@ -595,7 +596,7 @@ void integrate_serial(int n_steps){
 
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
-				sim::MonteCarlo();
+				montecarlo::mc_step();
 				// increment time
 				increment_time();
 			}
