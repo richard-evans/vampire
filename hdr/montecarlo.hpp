@@ -40,9 +40,24 @@ namespace montecarlo{
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
    //---------------------------------------------------------------------------
-   // Function to perform one monte carlo step
+   // Function to perform one monte carlo, constrained monte carlo, or hybrid
+   // cmc-mc step, respectively
    //---------------------------------------------------------------------------
    int mc_step();
+   int cmc_step();
+   int cmc_mc_step();
+
+   //---------------------------------------------------------------------------
+   // Provide access to CMCinit and CMCMCinit for cmc_anisotropy and
+   // hybrid_cmc programs respectively
+   //---------------------------------------------------------------------------
+   void CMCinit();
+   void CMCMCinit();
+
+   //---------------------------------------------------------------------------
+   // Function to perform monte carlo preconditioning
+   //---------------------------------------------------------------------------
+   void monte_carlo_preconditioning();
 
 } // end of montecarlo namespace
 

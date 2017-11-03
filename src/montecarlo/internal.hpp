@@ -42,6 +42,7 @@ namespace montecarlo{
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
+      void mc_move(const std::valarray<double>&, std::valarray<double>&);
 
    } // end of internal namespace
 

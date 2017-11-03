@@ -47,7 +47,7 @@ namespace sim{
          int n = atoi(value.c_str());
          // Test for valid range
          vin::check_for_valid_int(n, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
-         sim::internal::num_monte_carlo_preconditioning_steps = n;
+         sim::num_monte_carlo_preconditioning_steps = n;
          return true;
       }
       //--------------------------------------------------------------------

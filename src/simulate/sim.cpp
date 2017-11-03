@@ -301,7 +301,7 @@ int run(){
    }
 
    // Precondition spins at equilibration temperature
-   sim::internal::monte_carlo_preconditioning();
+   montecarlo::monte_carlo_preconditioning();
 
    // For MPI version, calculate initialisation time
    if(vmpi::my_rank==0){
@@ -612,7 +612,7 @@ void integrate_serial(int n_steps){
 
 		case 3: // Constrained Monte Carlo
 			for(int ti=0;ti<n_steps;ti++){
-				sim::ConstrainedMonteCarlo();
+				montecarlo::cmc_step();
 				// increment time
 				increment_time();
 			}
@@ -620,7 +620,7 @@ void integrate_serial(int n_steps){
 
 		case 4: // Hybrid Constrained Monte Carlo
 			for(int ti=0;ti<n_steps;ti++){
-				sim::ConstrainedMonteCarloMonteCarlo();
+				montecarlo::cmc_mc_step();
 				// increment time
 				increment_time();
 			}

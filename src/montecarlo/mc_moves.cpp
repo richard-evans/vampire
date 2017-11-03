@@ -38,7 +38,12 @@
 #include "random.hpp"
 #include "sim.hpp"
 
-namespace sim{
+// Internal header file
+#include "internal.hpp"
+
+namespace montecarlo{
+
+namespace internal{
 
 // Function declarations
 void mc_gaussian(const std::valarray<double>&, std::valarray<double>&);
@@ -155,4 +160,6 @@ void mc_hinzke_nowak(const std::valarray<double>& old_spin, std::valarray<double
       return;
 }
 
-}
+} //end of namespace internal
+
+} //end of namespace montecarlo

@@ -94,7 +94,8 @@ namespace sim{
 	// Monte Carlo variables
 	extern double mc_delta_angle; /// Tuned angle for Monte Carlo trial move
 	enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak};
-   extern mc_algorithms mc_algorithm; /// Selected algorith for Monte Carlo simulations
+   extern mc_algorithms mc_algorithm; /// Selected algorithm for Monte Carlo simulations
+   extern int num_monte_carlo_preconditioning_steps;
 
 	extern double head_position[2];
 	extern double head_speed;
@@ -159,9 +160,7 @@ namespace sim{
 	extern int LLG_Midpoint();
 	extern int LLG_Midpoint_mpi();
 	extern int LLG_Midpoint_cuda();
-	extern int ConstrainedMonteCarlo();
-	extern int ConstrainedMonteCarloMonteCarlo();
-	extern void mc_move(const std::valarray<double>&, std::valarray<double>&);
+
 
 	// Integrator initialisers
 	extern void CMCinit();

@@ -16,13 +16,12 @@
 #include "internal.hpp"
 
 namespace sim{
-
    //----------------------------------------------------------------------------
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
+   extern int num_monte_carlo_preconditioning_steps(0);
 
    namespace internal{
-
       //----------------------------------------------------------------------------
       // Shared variables used within sim module
       //---------------------------------------------------------------------------
@@ -31,7 +30,6 @@ namespace sim{
       std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques
       std::vector<double> slonczewski_spin_polarization_unit_vector(3,0.0); // spin polarization direction
 
-      int num_monte_carlo_preconditioning_steps = 0;
 
    } // end of internal namespace
 

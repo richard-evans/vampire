@@ -86,9 +86,6 @@ obj/simulate/fields.o \
 obj/simulate/LLB.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
-obj/simulate/mc_moves.o \
-obj/simulate/cmc.o \
-obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/spintorque/data.o \
