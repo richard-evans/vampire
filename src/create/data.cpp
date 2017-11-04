@@ -20,6 +20,7 @@ namespace create{
    //----------------------------------------------------------------------------
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
+   int num_total_atoms_non_filler = 0;
 
       namespace internal{
 

@@ -489,6 +489,105 @@ namespace internal{
          return EXIT_SUCCESS;
       }
 
+      /*--------------------------------------------------------*/
+      /*Function to send cells demag factor to be computed      */
+      /*--------------------------------------------------------*/
+      int send_cells_demag_factor(std::vector<int>& cells_cell_id_array,
+                                 std::vector<double>& N_tensor_array,
+                                 int cells_num_local_cells
+                                 ){
+
+         // allocate memory to send data
+         int num_send_cells = cells_num_local_cells;                          // number of objects to send
+         std::vector<int> mpi_send_cells_id(num_send_cells,0);                // cells id to be sent
+         std::vector<double> mpi_send_cells_demag_factor(6*num_send_cells,0.0);      // demag-factor and self term array to be sent
+
+         // loop over local cells to save data to send
+         for(int i=0; i<num_send_cells; i++){
+            mpi_send_cells_id[i] = cells_cell_id_array[i];
+            //store demag factor
+            mpi_send_cells_demag_factor[6*i+0] = N_tensor_array[6*mpi_send_cells_id[i]+0];
+            mpi_send_cells_demag_factor[6*i+1] = N_tensor_array[6*mpi_send_cells_id[i]+1];
+            mpi_send_cells_demag_factor[6*i+2] = N_tensor_array[6*mpi_send_cells_id[i]+2];
+            mpi_send_cells_demag_factor[6*i+3] = N_tensor_array[6*mpi_send_cells_id[i]+3];
+            mpi_send_cells_demag_factor[6*i+4] = N_tensor_array[6*mpi_send_cells_id[i]+4];
+            mpi_send_cells_demag_factor[6*i+5] = N_tensor_array[6*mpi_send_cells_id[i]+5];
+         }
+
+         // // Uncomment in case you want to check exchange of data between cores
+         // std::cerr << "/* Data allocated on rank */" << vmpi::my_rank << '\t';
+
+         // send cells id, demag factors and self term
+         MPI_Send(&num_send_cells, 1, MPI_INT, 0, 120, MPI_COMM_WORLD);
+         MPI_Send(&mpi_send_cells_id[0], num_send_cells, MPI_INT, 0, 121, MPI_COMM_WORLD);
+         MPI_Send(&mpi_send_cells_demag_factor[0], 6*num_send_cells, MPI_DOUBLE, 0, 122, MPI_COMM_WORLD);
+
+         // loop over CPUs
+         for(int cpu=0; cpu<vmpi::num_processors; cpu++){
+            // if I am root proc, then I receive cells demag factors
+            if(vmpi::my_rank == 0){
+               // allocate int to receive num of cells to be received
+               int num_recv_cells;
+               // Receive num_recv_cells
+               MPI_Recv(&num_recv_cells, 1, MPI_INT, cpu, 120, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               // Allocate arrays for demag factor
+               std::vector<int> mpi_recv_cells_id(num_recv_cells,0);
+               std::vector<double> mpi_recv_cells_demag_factor(6*num_recv_cells,0.0);
+               // Receive arrays
+               MPI_Recv(&mpi_recv_cells_id[0], num_recv_cells, MPI_INT, cpu, 121, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               MPI_Recv(&mpi_recv_cells_demag_factor[0], 6*num_recv_cells, MPI_DOUBLE, cpu, 122, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+               // Save received data
+               for(int i=0; i<num_recv_cells; i++){
+                  int lc = mpi_recv_cells_id[i];
+                  // save demag factor
+                  N_tensor_array[6*lc+0] = mpi_recv_cells_demag_factor[6*i+0];
+                  N_tensor_array[6*lc+1] = mpi_recv_cells_demag_factor[6*i+1];
+                  N_tensor_array[6*lc+2] = mpi_recv_cells_demag_factor[6*i+2];
+                  N_tensor_array[6*lc+3] = mpi_recv_cells_demag_factor[6*i+3];
+                  N_tensor_array[6*lc+4] = mpi_recv_cells_demag_factor[6*i+4];
+                  N_tensor_array[6*lc+5] = mpi_recv_cells_demag_factor[6*i+5];
+               } // end saving data
+
+               // // Uncomment in case you want to check exchange of data between cores
+               // std::cerr << "/* \tData received on rank */" << vmpi::my_rank << '\t';
+
+            } // end if I am root proc
+         } // end loop over cpus
+
+         // // Uncomment in case you want to check exchange of data between cores
+         // int counter_total_cells_non_zero = 0;
+         // if(vmpi::my_rank==0){
+         //    std::cout << "I am rank 0 and I will print the tensor for each cell\n" << std::endl;
+         //    // Print tensor
+         //    for (int i = 0; i < cells::num_cells; i++)
+         //    {
+         //       if (dipole::internal::cells_num_atoms_in_cell[i] > 0)
+         //       {
+         //          std::cout << "\t*----------------------------------*" << std::endl;
+         //          std::cout << "\tCell = " << i << "\tNat_cell_i = " << dipole::internal::cells_num_atoms_in_cell[i]  << "\n";
+         //          std::cout << "\t" << N_tensor_array[6*i+0] << "\t" << N_tensor_array[6*i+1] << "\t" << N_tensor_array[6*i+2] << "\n";
+         //          std::cout << "\t" << N_tensor_array[6*i+1] << "\t" << N_tensor_array[6*i+3] << "\t" << N_tensor_array[6*i+4] << "\n";
+         //          std::cout << "\t" << N_tensor_array[6*i+2] << "\t" << N_tensor_array[6*i+4] << "\t" << N_tensor_array[6*i+5] << "\n";
+         //          std::cout << "\t*----------------------------------*" << std::endl;
+         //          std::cout << std::endl;
+         //
+         //          // increment counter for number of cells
+         //          counter_total_cells_non_zero ++;
+         //       }
+         //    }
+         // }
+
+         // // Uncomment in case you want to check exchange of data between cores
+         // std::cout << "Number of cells non zero on rank 0 = " << counter_total_cells_non_zero << std::endl;
+
+         // Clear arrays used only for sending data
+         mpi_send_cells_id.clear();
+         mpi_send_cells_demag_factor.clear();
+
+         return EXIT_SUCCESS;
+      }
+
 #endif
 
    } // end of namespace internal

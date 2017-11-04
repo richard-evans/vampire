@@ -45,17 +45,17 @@ namespace dipole{
                                     std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                                     std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell
                                     std::vector < std::vector <int> >& cells_index_atoms_array,
-                                    const std::vector<double>& cells_volume_array,
+                                    std::vector<double>& cells_volume_array,
                                     std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
                                     std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
                                     std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
                                     std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                                    const std::vector<int>& atom_type_array,
-                                    const std::vector<int>& atom_cell_id_array,
-                                    const std::vector<double>& atom_coords_x, //atomic coordinates
-                                    const std::vector<double>& atom_coords_y,
-                                    const std::vector<double>& atom_coords_z,
-                                    const int num_atoms){
+                                    std::vector<int>& atom_type_array,
+                                    std::vector<int>& atom_cell_id_array,
+                                    std::vector<double>& atom_coords_x, //atomic coordinates
+                                    std::vector<double>& atom_coords_y,
+                                    std::vector<double>& atom_coords_z,
+                                    int num_atoms){
 
          //------------------------------------------------------
          // Collate atom coordinates for local cells
@@ -74,12 +74,12 @@ namespace dipole{
                atom_pos_z[atom]=atom_coords_z[atom];
             }
 
-            for(int lc=0; lc<dipole::internal::cells_num_cells; lc++){
+            for(int lc=0; lc<cells_num_cells; lc++){
                // resize arrays
-               cells_atom_in_cell_coords_array_x[lc].resize(dipole::internal::cells_num_atoms_in_cell[lc]);
-               cells_atom_in_cell_coords_array_y[lc].resize(dipole::internal::cells_num_atoms_in_cell[lc]);
-               cells_atom_in_cell_coords_array_z[lc].resize(dipole::internal::cells_num_atoms_in_cell[lc]);
-               cells_index_atoms_array[lc].resize(dipole::internal::cells_num_atoms_in_cell[lc]);
+               cells_atom_in_cell_coords_array_x[lc].resize(cells_num_atoms_in_cell[lc]);
+               cells_atom_in_cell_coords_array_y[lc].resize(cells_num_atoms_in_cell[lc]);
+               cells_atom_in_cell_coords_array_z[lc].resize(cells_num_atoms_in_cell[lc]);
+               cells_index_atoms_array[lc].resize(cells_num_atoms_in_cell[lc]);
             }
 
             // Call parallelisation function
@@ -89,29 +89,29 @@ namespace dipole{
                                                    cells_atom_in_cell_coords_array_y,
                                                    cells_atom_in_cell_coords_array_z,
                                                    cells_index_atoms_array,
-                                                   dipole::internal::cells_pos_and_mom_array,
-                                                   dipole::internal::cells_num_atoms_in_cell,
+                                                   cells_pos_and_mom_array,
+                                                   cells_num_atoms_in_cell,
                                                    cells::cell_id_array,
-                                                   dipole::internal::cells_local_cell_array,
-                                                   dipole::internal::cells_num_local_cells,
-                                                   dipole::internal::cells_num_cells);
+                                                   cells_local_cell_array,
+                                                   cells_num_local_cells,
+                                                   cells_num_cells);
 
             // Exchange atoms data
             dipole::internal::send_recv_atoms_data(dipole::internal::proc_cell_index_array1D,
                                                    cells::cell_id_array,
-                                                   dipole::internal::cells_local_cell_array,
+                                                   cells_local_cell_array,
                                                    atom_pos_x,
                                                    atom_pos_y,
                                                    atom_pos_z,
-                                                   dipole::internal::atom_type_array, // atomic moments (from dipole;:internal::atom_type_array)
+                                                   atom_type_array, // atomic moments (from dipole;:internal::atom_type_array)
                                                    cells_atom_in_cell_coords_array_x,
                                                    cells_atom_in_cell_coords_array_y,
                                                    cells_atom_in_cell_coords_array_z,
                                                    cells_index_atoms_array,
-                                                   dipole::internal::cells_pos_and_mom_array,
-                                                   dipole::internal::cells_num_atoms_in_cell,
-                                                   dipole::internal::cells_num_local_cells,
-                                                   dipole::internal::cells_num_cells,
+                                                   cells_pos_and_mom_array,
+                                                   cells_num_atoms_in_cell,
+                                                   cells_num_local_cells,
+                                                   cells_num_cells,
                                                    cells_macro_cell_size);
 
             // Reorder data structure
@@ -121,15 +121,15 @@ namespace dipole{
                                         cells_atom_in_cell_coords_array_y,
                                         cells_atom_in_cell_coords_array_z,
                                         cells_index_atoms_array,
-                                        dipole::internal::cells_pos_and_mom_array,
-                                        dipole::internal::cells_num_atoms_in_cell,
-                                        dipole::internal::cells_num_local_cells,
-                                        dipole::internal::cells_num_cells);
+                                        cells_pos_and_mom_array,
+                                        cells_num_atoms_in_cell,
+                                        cells_num_local_cells,
+                                        cells_num_cells);
 
-            // After transferring the data across cores, assign value dipole::internal::cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
+            // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
             for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
-               if(cells_num_atoms_in_cell_global[i]>0 && dipole::internal::cells_num_atoms_in_cell[i]==0){
-                  dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
+               if(cells_num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
+                  cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
                }
             }
 
@@ -143,6 +143,9 @@ namespace dipole{
 
          #endif
 
+         // Assign updated value of cells_num_atoms_in_cell to dipole::dipole_cells_num_atoms_in_cell. It is needed to print the config file. The actual value cells::num_atoms_in_cell is not changed instead
+         dipole::dipole_cells_num_atoms_in_cell=cells_num_atoms_in_cell;
+
          // calculate matrix prefactors
          zlog << zTs() << "Precalculating rij matrix for dipole calculation using tensor solver... " << std::endl;
          std::cout     << "Precalculating rij matrix for dipole calculation using tensor solver"     << std::flush;
@@ -154,23 +157,23 @@ namespace dipole{
          timer.start();
 
          // loop over local cells
-         for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
+         for(int lc=0;lc<cells_num_local_cells;lc++){
 
             // print out progress to screen
-            if(fmod(ceil(lc),ceil(dipole::internal::cells_num_local_cells)/10.0) == 0) std::cout << "." << std::flush;
+            if(fmod(ceil(lc),ceil(cells_num_local_cells)/10.0) == 0) std::cout << "." << std::flush;
 
             // reference global cell ID
-            //int i = dipole::internal::cells_local_cell_array[lc];
+            //int i = cells_local_cell_array[lc];
             int i = cells::cell_id_array[lc];
-            if(dipole::internal::cells_num_atoms_in_cell[i]>0){
+            if(cells_num_atoms_in_cell[i]>0){
 
             	// Loop over all other cells to calculate contribution to local cell
-               for(int j=0;j<dipole::internal::cells_num_cells;j++){
+               for(int j=0;j<cells_num_cells;j++){
 
                   /*==========================================================*/
                   /* Calculation of inter part of dipolar tensor              */
                   /*==========================================================*/
-                	if(i!=j && dipole::internal::cells_num_atoms_in_cell[j]>0){
+                	if(i!=j && cells_num_atoms_in_cell[j]>0){
 
                      // calculate inter term of dipolar tensor
                      compute_inter_tensor(cells_macro_cell_size,i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
@@ -180,7 +183,7 @@ namespace dipole{
                   /*==========================================================*/
                   /* Calculation of intra part of dipolar tensor              */
                   /*==========================================================*/
-                  else if( i==j && dipole::internal::cells_num_atoms_in_cell[j]>0){
+                  else if( i==j && cells_num_atoms_in_cell[j]>0){
 
                      //Compute inter component of dipolar tensor
                      compute_intra_tensor(i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
