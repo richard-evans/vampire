@@ -56,6 +56,7 @@
 #include "sim.hpp"
 #include "spintorque.hpp"
 #include "stats.hpp"
+#include "stopwatch.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 #include "vutil.hpp"
@@ -300,6 +301,10 @@ int run(){
 		#endif
    }
 
+   // Set timer for runtime
+   stopwatch_t stopwatch;
+   stopwatch.start();
+
    // Precondition spins at equilibration temperature
    sim::internal::monte_carlo_preconditioning();
 
@@ -477,6 +482,9 @@ int run(){
 			exit (EXIT_FAILURE);
 			}
 	}
+
+   std::cout <<     "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+   zlog << zTs() << "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
 
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
