@@ -29,9 +29,9 @@ namespace anisotropy{
    namespace internal{
 
       //---------------------------------------------------------------------------------
-      // Function to add fourth order cubic anisotropy
+      // Function to add sixth order cubic anisotropy
       //---------------------------------------------------------------------------------
-      void cubic_fourth_order_fields(std::vector<double>& spin_array_x,
+      void cubic_sixth_order_fields( std::vector<double>& spin_array_x,
                                      std::vector<double>& spin_array_y,
                                      std::vector<double>& spin_array_z,
                                      std::vector<int>&    atom_material_array,
@@ -42,10 +42,10 @@ namespace anisotropy{
                                      const int end_index){
 
          // if not enabled then do nothing
-         if(!internal::enable_cubic_fourth_order) return;
+         if(!internal::enable_cubic_sixth_order) return;
 
-         // scale factor from derivative of E = +1/2 (sx^4 + sy^4 + sz^4)
-         const double scale = -0.5*4.0;
+         // scale factor from derivative of E = (sx^2 sy^2 sz^2)
+         const double scale = -2.0;
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -58,14 +58,19 @@ namespace anisotropy{
             const double sz = spin_array_z[atom];
 
             // get reduced anisotropy constant ku/mu_s
-            const double kc4 = internal::kc4[mat];
+            const double kc6 = internal::kc6[mat];
+
+            // calculate intermediate expansions
+            const double sx2 = sx*sx;
+            const double sy2 = sy*sy;
+            const double sz2 = sz*sz;
 
             // calculate field (double negative from scale factor and negative derivative)
-            const double k4 = scale*kc4;
+            const double k6 = scale*kc6;
 
-            field_array_x[atom] += sx*sx*sx*k4;
-            field_array_y[atom] += sy*sy*sy*k4;
-            field_array_z[atom] += sz*sz*sz*k4;
+            field_array_x[atom] += sx*sy2*sz2*k6;
+            field_array_y[atom] += sy*sz2*sx2*k6;
+            field_array_z[atom] += sz*sx2*sy2*k6;
 
          }
 
@@ -75,22 +80,18 @@ namespace anisotropy{
 
       //---------------------------------------------------------------------------------
       // Function to add fourth order cubic anisotropy
-      // E = +1/2 k4 (sx^4 + sy^4 + sz^4)
+      // E = + k6 (sx^2 sy^2 sz^2)
       //---------------------------------------------------------------------------------
-      double cubic_fourth_order_energy(const int atom,
-                                       const int mat,
-                                       const double sx,
-                                       const double sy,
-                                       const double sz){
+      double cubic_sixth_order_energy(const int atom,
+                                      const int mat,
+                                      const double sx,
+                                      const double sy,
+                                      const double sz){
 
          // get reduced anisotropy constant ku/mu_s (Tesla)
-         const double kc4 = internal::kc4[mat];
+         const double kc6 = internal::kc6[mat];
 
-         const double sx4 = sx*sx*sx*sx;
-         const double sy4 = sy*sy*sy*sy;
-         const double sz4 = sz*sz*sz*sz;
-
-         return -0.5*kc4*(sx4 + sy4 + sz4);
+         return kc6*sx*sx*sy*sy*sz*sz;
 
       }
 

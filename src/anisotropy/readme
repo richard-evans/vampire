@@ -4,19 +4,16 @@
 
 This module implements various forms of magnetic anisotropy within the
 VAMPIRE code, including uniaxial, cubic, surface and temperature dependent
-lattice anisotropy. For high performance all anisotropies are rolled into three
-tensors, of order 2, 4 and 6 representing the different orders of magnetic
-anisotropy. A tensor of each order is stored for each individual atom which
-greatly simplifies the code structure and calculation to a simple
-vector-matrix-vector multiplication such as
+lattice anisotropy. For high performance the Neel anisotropy is rolled into
+a tensor for weach atom. The calculation is then a simple vector-matrix-vector
+multiplication:
 
-( Sx Sy Sz ) ( Txx Txy Txz ) ( Sx )
-             ( Tyx Tyy Tyz ) ( Sy )
-             ( Tzx Tzy Tzz ) ( Sz )
+E = ( Sx Sy Sz ) ( Txx Txy Txz ) ( Sx )
+                 ( Tyx Tyy Tyz ) ( Sy )
+                 ( Tzx Tzy Tzz ) ( Sz )
 
-for a second order anisotropy. The tensor form is computed once at the beginning
- of the simulation and incorporates the correct components for different
- materials and symmetries.
+The tensor form is computed once at the beginning of the simulation and
+incorporates the correct components for different materials and symmetries.
 
 Uniaxial anisotropy is implemented with spherical harmonics with even LeGrandre
 polynomials. Cubic anisotropy is implemented as directional cosines. Surface

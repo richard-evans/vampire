@@ -27,7 +27,7 @@ namespace anisotropy{
    namespace internal{
 
       //---------------------------------------------------------------------------------
-      // Function to add second order uniaxial anisotropy along vector e
+      // Function to add Neel pair anisotropy
       //
       // Example 1:
       //                               o -- ø -- o
@@ -65,112 +65,80 @@ namespace anisotropy{
       //                       = Sx 2 Sx + Sy Sy
       //
       //---------------------------------------------------------------------------------
-      void neel_anisotropy(const unsigned int num_atoms){
+      void neel_fields(std::vector<double>& spin_array_x,
+                       std::vector<double>& spin_array_y,
+                       std::vector<double>& spin_array_z,
+                       std::vector<int>&    atom_material_array,
+                       std::vector<double>& field_array_x,
+                       std::vector<double>& field_array_y,
+                       std::vector<double>& field_array_z,
+                       const int start_index,
+                       const int end_index){
 
          // if surface anisotropy is not used, then do nothing
          if(!internal::enable_neel_anisotropy) return;
 
-         //----------------------------------------------------------------------------------
-         // Loop over all atoms and add neel tensor
-         //----------------------------------------------------------------------------------
-         for (int atom=0; atom < num_atoms; ++atom){
+         // loop over all atoms
+         for(int atom = start_index; atom<end_index; atom++){
 
-            //std::cout << atom << std::endl;
+            const double sx = spin_array_x[atom]; // store spin direction in temporary variables
+            const double sy = spin_array_y[atom];
+            const double sz = spin_array_z[atom];
 
-            for (int i = 0; i < 3; ++i){
-               for (int j = 0; j < 3; ++j){
-                  internal::second_order_tensor[ index(atom, i, j) ] += internal::neel_tensor[ index(atom, i, j) ];
-               }
+            const int index = 9*atom; // get atom index in tensor array
 
-               // print tensor
-               //std::cout << "[  " << internal::second_order_tensor[index(atom, i, 0)] << "  " <<
-               //                      internal::second_order_tensor[index(atom, i, 1)] << "  " <<
-               //                      internal::second_order_tensor[index(atom, i, 2)] << "  " << "]" << std::endl;
+            // Second order
+            double hx = 2.0 * ( internal::neel_tensor[index + 0] * sx +
+                                internal::neel_tensor[index + 1] * sy +
+                                internal::neel_tensor[index + 2] * sz );
 
-            }
+            double hy = 2.0 * ( internal::neel_tensor[index + 3] * sx +
+                                internal::neel_tensor[index + 4] * sy +
+                                internal::neel_tensor[index + 5] * sz );
+
+            double hz = 2.0 * ( internal::neel_tensor[index + 6] * sx +
+                                internal::neel_tensor[index + 7] * sy +
+                                internal::neel_tensor[index + 8] * sz );
+
+            //store net field
+            field_array_x[atom] += hx;
+            field_array_y[atom] += hy;
+            field_array_z[atom] += hz;
 
          }
-
-         // delete memory of neel tensor
-         std::vector<double> blank(0);
-         internal::neel_tensor.swap(blank);
 
          return;
 
       }
 
+      //---------------------------------------------------------------------------------
+      // Function to add neel anisotropy energy
+      //---------------------------------------------------------------------------------
+      double neel_energy(const int atom,
+                         const int mat,
+                         const double sx,
+                         const double sy,
+                         const double sz){
 
+         // get index for tensor
+         const unsigned int index = 9*atom;
 
+         double energy = 0.0;
 
-/*      void calculate_surface_anisotropy_fields(const int start_index,const int end_index){
-      	///======================================================
-      	/// 		Subroutine to calculate surface anisotropy fields
-      	///
-      	///			Version 1.0 Richard Evans 13/09/2011
-      	///======================================================
+         energy =  (sx * internal::neel_tensor[index + 0] * sx
+                  + sx * internal::neel_tensor[index + 1] * sy
+                  + sx * internal::neel_tensor[index + 2] * sz
+                  + sy * internal::neel_tensor[index + 3] * sx
+                  + sy * internal::neel_tensor[index + 4] * sy
+                  + sy * internal::neel_tensor[index + 5] * sz
+                  + sz * internal::neel_tensor[index + 6] * sx
+                  + sz * internal::neel_tensor[index + 7] * sy
+                  + sz * internal::neel_tensor[index + 8] * sz);
 
-      	// check calling of routine if error checking is activated
-      	if(err::check==true){std::cout << "calculate_surface_anisotropy_fields has been called" << std::endl;}
+         // return energy after multiplying by -1
+         return -1.0*energy;
 
-      	for(int atom=start_index;atom<end_index;atom++){
-      		// only calculate for surface atoms
-      		if(atoms::surface_array[atom]==true){
-      			const int imaterial=atoms::type_array[atom];
-      			const double Ks=0.5*2.0*mp::material[imaterial].Ks; // note factor two here from differentiation
-      			const double S[3]={atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
-
-      			for(int nn=atoms::nearest_neighbour_list_si[atom];nn<atoms::nearest_neighbour_list_ei[atom];nn++){
-      				const double si_dot_eij=(S[0]*atoms::eijx[nn]+S[1]*atoms::eijy[nn]+S[2]*atoms::eijz[nn]);
-      				atoms::x_total_spin_field_array[atom]-=Ks*si_dot_eij*atoms::eijx[nn];
-      				atoms::y_total_spin_field_array[atom]-=Ks*si_dot_eij*atoms::eijy[nn];
-      				atoms::z_total_spin_field_array[atom]-=Ks*si_dot_eij*atoms::eijz[nn];
-      			}
-      		}
-      	}
-
-      	return;
       }
-
-
-
-      /// @brief Calculates the surface anisotropy energy for a single spin.
-      ///
-      /// @section License
-      /// Use of this code, either in source or compiled form, is subject to license from the authors.
-      /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-      ///
-      /// @section Information
-      /// @author  Richard Evans, rfle500@york.ac.uk
-      /// @version 1.0
-      /// @date    07/02/2011
-      ///
-      /// @param[in] atom atom number
-      /// @param[in] imaterial material of local atom
-      /// @param[in] Sx x-spin of local atom
-      /// @param[in] Sy y-spin of local atom
-      /// @param[in] Sz z-spin of local atom
-      /// @return exchange energy
-      ///
-      /// @internal
-      ///	Created:		13/09/2011
-      ///	Revision:	  ---
-      ///=====================================================================================
-      ///
-      double spin_surface_anisotropy_energy(const int atom, const int imaterial, const double Sx, const double Sy, const double Sz){
-
-      	double energy=0.0;
-
-      	if(atoms::surface_array[atom]==true && sim::surface_anisotropy==true){
-      		const double Ks=mp::material[imaterial].Ks*0.5;
-      		for(int nn=atoms::nearest_neighbour_list_si[atom];nn<atoms::nearest_neighbour_list_ei[atom];nn++){
-      			const double si_dot_eij=(Sx*atoms::eijx[nn]+Sy*atoms::eijy[nn]+Sz*atoms::eijz[nn]);
-      			energy+=Ks*si_dot_eij*si_dot_eij;
-      		}
-      	}
-
-      	return energy;
-      }
-*/
 
    } // end of internal namespace
 

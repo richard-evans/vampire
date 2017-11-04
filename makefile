@@ -14,7 +14,7 @@ export OMPI_CXX=g++ -std=c++0x
 #export MPICH_CXX=bgxlc++
 # Compilers
 ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
+GCC=g++-mp-6 -std=c++0x -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
