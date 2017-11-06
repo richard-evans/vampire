@@ -20,6 +20,7 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
+#include <valarray>
 
 // Vampire headers
 #include "montecarlo.hpp"
