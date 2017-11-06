@@ -65,6 +65,8 @@
 // Internal header files
 #include "internal.hpp"
 
+namespace montecarlo{
+
 /// local cmc namespace
 namespace cmc{
 
@@ -235,7 +237,6 @@ void rotate_spins_around_x_axis(double ddx){
 
 } // end of cmc namespace
 
-namespace montecarlo{
 ///
 /// @brief        Initialise Constrained Monte Carlo module
 ///
@@ -546,4 +547,4 @@ int cmc_step(){
 	return EXIT_SUCCESS;
 }
 
-} // End of namespace sim
+} // End of namespace montecarlo

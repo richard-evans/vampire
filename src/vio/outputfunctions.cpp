@@ -17,6 +17,7 @@
 #include "vio.hpp"
 #include "grains.hpp"
 #include "material.hpp"
+#include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
 
@@ -148,14 +149,14 @@ namespace vout{
 	// Output Function 18
 	void material_constraint_phi(std::ostream& stream){
 		for(int mat=0;mat<mp::num_materials;mat++){
-			stream << cmc::cmc_mat[mat].constraint_phi << "\t";
+			stream << montecarlo::cmc::cmc_mat[mat].constraint_phi << "\t";
 		}
 	}
 
 	// Output Function 19
 	void material_constraint_theta(std::ostream& stream){
 		for(int mat=0;mat<mp::num_materials;mat++){
-			stream << cmc::cmc_mat[mat].constraint_theta << "\t";
+			stream << montecarlo::cmc::cmc_mat[mat].constraint_theta << "\t";
 		}
 	}
 

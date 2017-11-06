@@ -99,28 +99,28 @@ void hybrid_cmc(){
 	}
 
 	// resize cmc array to include correct number of materials
-	cmc::cmc_mat.resize(mp::num_materials);
+	montecarlo::cmc::cmc_mat.resize(mp::num_materials);
 
 	// loop over all materials
 	for (int mat=0;mat<mp::num_materials;mat++){
 
 	// Set active material (used for calculating rotational update of spin directions)
-	cmc::active_material=mat;
+	montecarlo::cmc::active_material=mat;
 
 	// Output informative message to log file
 	zlog << zTs() << "Starting Hybrid CMC loop for material " << mat << std::endl;
 
 	// set minimum rotational angle
-	cmc::cmc_mat[mat].constraint_theta=cmc::cmc_mat[mat].constraint_theta_min;
+	montecarlo::cmc::cmc_mat[mat].constraint_theta=montecarlo::cmc::cmc_mat[mat].constraint_theta_min;
 
 	// perform rotational angle sweep
-	while(cmc::cmc_mat[mat].constraint_theta<=cmc::cmc_mat[mat].constraint_theta_max){
+	while(montecarlo::cmc::cmc_mat[mat].constraint_theta<=montecarlo::cmc::cmc_mat[mat].constraint_theta_max){
 
 		// set minimum azimuthal angle
-		cmc::cmc_mat[mat].constraint_phi=cmc::cmc_mat[mat].constraint_phi_min;
+		montecarlo::cmc::cmc_mat[mat].constraint_phi=montecarlo::cmc::cmc_mat[mat].constraint_phi_min;
 
 		// perform azimuthal angle sweep
-		while(cmc::cmc_mat[mat].constraint_phi<=cmc::cmc_mat[mat].constraint_phi_max){
+		while(montecarlo::cmc::cmc_mat[mat].constraint_phi<=montecarlo::cmc::cmc_mat[mat].constraint_phi_max){
 
 			// Re-initialise spin moments for CMC
 			montecarlo::CMCMCinit();
@@ -160,15 +160,15 @@ void hybrid_cmc(){
 			} // End of temperature loop
 
 			// Increment azimuthal angle
-			if(cmc::cmc_mat[mat].constraint_phi+cmc::cmc_mat[mat].constraint_phi_delta>cmc::cmc_mat[mat].constraint_phi_max) break;
-			cmc::cmc_mat[mat].constraint_phi+=cmc::cmc_mat[mat].constraint_phi_delta;
+			if(montecarlo::cmc::cmc_mat[mat].constraint_phi+montecarlo::cmc::cmc_mat[mat].constraint_phi_delta>montecarlo::cmc::cmc_mat[mat].constraint_phi_max) break;
+			montecarlo::cmc::cmc_mat[mat].constraint_phi+=montecarlo::cmc::cmc_mat[mat].constraint_phi_delta;
 			sim::constraint_phi_changed=true;
 		} // End of azimuthal angle sweep
 		if(vout::gnuplot_array_format) zmag << std::endl;
 
 		// Increment rotational angle
-		if(cmc::cmc_mat[mat].constraint_theta+cmc::cmc_mat[mat].constraint_theta_delta>cmc::cmc_mat[mat].constraint_theta_max) break;
-		cmc::cmc_mat[mat].constraint_theta+=cmc::cmc_mat[mat].constraint_theta_delta;
+		if(montecarlo::cmc::cmc_mat[mat].constraint_theta+montecarlo::cmc::cmc_mat[mat].constraint_theta_delta>montecarlo::cmc::cmc_mat[mat].constraint_theta_max) break;
+		montecarlo::cmc::cmc_mat[mat].constraint_theta+=montecarlo::cmc::cmc_mat[mat].constraint_theta_delta;
 		sim::constraint_theta_changed=true;
 	} // End of rotational angle sweep
 
@@ -216,28 +216,28 @@ void reverse_hybrid_cmc(){
    }
 
    // resize cmc array to include correct number of materials
-   cmc::cmc_mat.resize(mp::num_materials);
+   montecarlo::cmc::cmc_mat.resize(mp::num_materials);
 
    // loop over all materials
    for (int mat=0;mat<mp::num_materials;mat++){
 
    // Set active material (used for calculating rotational update of spin directions)
-   cmc::active_material=mat;
+   montecarlo::cmc::active_material=mat;
 
    // Output informative message to log file
    zlog << zTs() << "Starting Hybrid CMC loop for material " << mat << std::endl;
 
    // set minimum azimuthal angle
-   cmc::cmc_mat[mat].constraint_phi=cmc::cmc_mat[mat].constraint_phi_min;
+   montecarlo::cmc::cmc_mat[mat].constraint_phi=montecarlo::cmc::cmc_mat[mat].constraint_phi_min;
 
    // perform azimuthal angle sweep
-   while(cmc::cmc_mat[mat].constraint_phi<=cmc::cmc_mat[mat].constraint_phi_max){
+   while(montecarlo::cmc::cmc_mat[mat].constraint_phi<=montecarlo::cmc::cmc_mat[mat].constraint_phi_max){
 
       // set minimum rotational angle
-      cmc::cmc_mat[mat].constraint_theta=cmc::cmc_mat[mat].constraint_theta_min;
+      montecarlo::cmc::cmc_mat[mat].constraint_theta=montecarlo::cmc::cmc_mat[mat].constraint_theta_min;
 
       // perform rotational angle sweep
-      while(cmc::cmc_mat[mat].constraint_theta<=cmc::cmc_mat[mat].constraint_theta_max){
+      while(montecarlo::cmc::cmc_mat[mat].constraint_theta<=montecarlo::cmc::cmc_mat[mat].constraint_theta_max){
 
          // Re-initialise spin moments for CMC
          montecarlo::CMCMCinit();
@@ -277,15 +277,15 @@ void reverse_hybrid_cmc(){
          } // End of temperature loop
 
          // Increment rotational angle
-         if(cmc::cmc_mat[mat].constraint_theta+cmc::cmc_mat[mat].constraint_theta_delta>cmc::cmc_mat[mat].constraint_theta_max) break;
-         cmc::cmc_mat[mat].constraint_theta+=cmc::cmc_mat[mat].constraint_theta_delta;
+         if(montecarlo::cmc::cmc_mat[mat].constraint_theta+montecarlo::cmc::cmc_mat[mat].constraint_theta_delta>montecarlo::cmc::cmc_mat[mat].constraint_theta_max) break;
+         montecarlo::cmc::cmc_mat[mat].constraint_theta+=montecarlo::cmc::cmc_mat[mat].constraint_theta_delta;
          sim::constraint_theta_changed=true;
       } // End of rotational angle sweep
       if(vout::gnuplot_array_format) zmag << std::endl;
 
       // Increment azimuthal angle
-      if(cmc::cmc_mat[mat].constraint_phi+cmc::cmc_mat[mat].constraint_phi_delta>cmc::cmc_mat[mat].constraint_phi_max) break;
-      cmc::cmc_mat[mat].constraint_phi+=cmc::cmc_mat[mat].constraint_phi_delta;
+      if(montecarlo::cmc::cmc_mat[mat].constraint_phi+montecarlo::cmc::cmc_mat[mat].constraint_phi_delta>montecarlo::cmc::cmc_mat[mat].constraint_phi_max) break;
+      montecarlo::cmc::cmc_mat[mat].constraint_phi+=montecarlo::cmc::cmc_mat[mat].constraint_phi_delta;
       sim::constraint_phi_changed=true;
    } // End of azimuthal angle sweep
 

@@ -30,6 +30,7 @@
 #include "cells.hpp"
 #include "voronoi.hpp"
 #include "ltmp.hpp"
+#include "montecarlo.hpp"
 #include "random.hpp"
 #include "spintorque.hpp"
 #include "unitcell.hpp"
@@ -1847,7 +1848,7 @@ namespace vin{
 
         // resize temporary materials array for storage of variables
         read_material.resize(mp::max_materials);
-        cmc::cmc_mat.resize(mp::max_materials);
+        montecarlo::cmc::cmc_mat.resize(mp::max_materials);
 
             // Print informative message to zlog file
         zlog << zTs() << "Opening material file \"" << matfile << "\"." << std::endl;
@@ -2286,7 +2287,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2302,7 +2303,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_min=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_min=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2318,7 +2319,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_max=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_max=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2334,7 +2335,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_delta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_delta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2350,7 +2351,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_min=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_min=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2366,7 +2367,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2382,7 +2383,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_max=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_max=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2398,7 +2399,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_delta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_delta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{

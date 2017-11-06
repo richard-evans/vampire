@@ -493,15 +493,15 @@ int run(){
    }
    if(sim::integrator==3 || sim::integrator==4){
       std::cout << "Constrained Monte Carlo statistics:" << std::endl;
-      std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
-      std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0    << "% Accepted" << std::endl;
-      std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
-      std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+      std::cout << "\tTotal moves: " << montecarlo::cmc::mc_total << std::endl;
+      std::cout << "\t" << (montecarlo::cmc::mc_success/montecarlo::cmc::mc_total)*100.0    << "% Accepted" << std::endl;
+      std::cout << "\t" << (montecarlo::cmc::energy_reject/montecarlo::cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+      std::cout << "\t" << (montecarlo::cmc::sphere_reject/montecarlo::cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
       zlog << zTs() << "Constrained Monte Carlo statistics:" << std::endl;
-      zlog << zTs() << "\tTotal moves: " << cmc::mc_total << std::endl;
-      zlog << zTs() << "\t" << (cmc::mc_success/cmc::mc_total)*100.0    << "% Accepted" << std::endl;
-      zlog << zTs() << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
-      zlog << zTs() << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+      zlog << zTs() << "\tTotal moves: " << montecarlo::cmc::mc_total << std::endl;
+      zlog << zTs() << "\t" << (montecarlo::cmc::mc_success/montecarlo::cmc::mc_total)*100.0    << "% Accepted" << std::endl;
+      zlog << zTs() << "\t" << (montecarlo::cmc::energy_reject/montecarlo::cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+      zlog << zTs() << "\t" << (montecarlo::cmc::sphere_reject/montecarlo::cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
    }
 
 	//program::LLB_Boltzmann();

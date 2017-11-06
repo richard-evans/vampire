@@ -52,6 +52,7 @@
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "material.hpp"
+#include "montecarlo.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "vmath.hpp"
@@ -60,6 +61,7 @@
 //Internal header file
 #include "internal.hpp"
 
+namespace montecarlo{
 /// local cmc namespace
 namespace cmc{
 
@@ -234,7 +236,7 @@ void rotate_material_spins_around_x_axis(double ddx, int material){
 
 } // end of cmc namespace
 
-namespace montecarlo{
+
 ///
 /// @brief        Initialise Constrained Monte Carlo module
 ///
@@ -578,4 +580,4 @@ int cmc_mc_step(){
 	return EXIT_SUCCESS;
 }
 
-} // End of namespace sim
+} // End of namespace montecarlo
