@@ -59,6 +59,11 @@ namespace montecarlo{
    //---------------------------------------------------------------------------
    void monte_carlo_preconditioning();
 
+   //---------------------------------------------------------------------------
+   // CMC namespace; must be given external access to be initialised by
+   // match.cpp and, and data can be accessed by sim.cpp and outputfunctions.cpp
+   //---------------------------------------------------------------------------
+
    namespace cmc{
 
    	class cmc_material_t {
@@ -112,7 +117,7 @@ namespace montecarlo{
    	extern double mc_total;
    	extern double sphere_reject;
    	extern double energy_reject;
-   }
+   } //end of cmc namespace
 
 } // end of montecarlo namespace
 
