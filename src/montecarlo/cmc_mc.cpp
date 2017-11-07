@@ -1,47 +1,14 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard Evans 2017. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
+//------------------------------------------------------------------------------
 //
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-///
-///	@file  cmc.cpp
-///  	@brief  Constrained Monte Carlo / Monte Carlo hybrid integrator
-///
-/// Additional to CMC, this version combines constrained and free integrators
-/// for different materials
-///
-///	@author Richard Evans, richard.evans@york.ac.uk
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-///
-///  @internal
-///    Created  02/11/2011
-///   Revision  1.0
-///  Copyright  Copyright (c) 2011, Richard Evans
-///
-///=====================================================================================
-///
 
 // Standard Libraries
 #include <cmath>
@@ -69,9 +36,9 @@ namespace cmc{
 	std::vector<cmc_material_t> cmc_mat;
 	int active_material=0;
 
-///
-/// @brief Sets up matrices for performing CMC in an arbitrary space
-///
+//------------------------------------------------------------------------------
+// Sets up matrices for performing CMC in an arbitrary space
+//------------------------------------------------------------------------------
 void mat_polar_rot_matrix()
 {
 
@@ -236,15 +203,10 @@ void rotate_material_spins_around_x_axis(double ddx, int material){
 
 } // end of cmc namespace
 
-
-///
-/// @brief        Initialise Constrained Monte Carlo module
-///
-/// Creates the rotation matices for the given angle and computes the
-/// Boltzmann factor for the given temperature.
-///
-/// @return       void
-///
+//------------------------------------------------------------------------------
+// Creates the rotation matices for the given angle and computes the
+// Boltzmann factor for the given temperature.
+//------------------------------------------------------------------------------
 void CMCMCinit(){
 
 	// Check for calling of function
@@ -323,15 +285,11 @@ void CMCMCinit(){
 	return;
 }
 
-///
-/// @brief      Runs the Constrained Monte Carlo algorithm
-///
-/// Chooses nspins random spin pairs from the spin system and attempts a
-/// Constrained Monte Carlo move on each pair, accepting for either lower
-/// energy or with a Boltzmann thermal weighting.
-///
-/// @return     void
-///
+//------------------------------------------------------------------------------
+// Chooses nspins random spin pairs from the spin system and attempts a
+// Constrained Monte Carlo move on each pair, accepting for either lower
+// energy or with a Boltzmann thermal weighting.
+//------------------------------------------------------------------------------
 int cmc_mc_step(){
 
 	// Check for calling of function

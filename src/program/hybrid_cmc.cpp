@@ -108,7 +108,7 @@ void hybrid_cmc(){
 	montecarlo::cmc::active_material=mat;
 
 	// Output informative message to log file
-	zlog << zTs() << "Starting Hybrid CMC loop for material " << mat << std::endl;
+   zlog << zTs() << "Starting Hybrid CMC loop for material " << mat << std::endl;
 
 	// set minimum rotational angle
 	montecarlo::cmc::cmc_mat[mat].constraint_theta=montecarlo::cmc::cmc_mat[mat].constraint_theta_min;
