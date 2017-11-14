@@ -39,7 +39,9 @@ namespace montecarlo{
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
-
+      std::vector<std::vector<int> > c_octants(8); //Core atoms of each octant
+      std::vector<std::vector<int> > b_octants(8); //Boundary atoms of each octant
+      bool mc_parallel_initialized = false;
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------

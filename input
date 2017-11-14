@@ -25,9 +25,7 @@ material:file=Co.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:minimum-temperature=100.0
-sim:maximum-temperature=110.0
-sim:temperature-increment=1.0
+sim:temperature=300.0
 sim:time-steps-increment=10
 sim:total-time-steps=10000
 sim:time-step=1.0E-15
@@ -35,8 +33,8 @@ sim:time-step=1.0E-15
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
-sim:program=curie-temperature
-sim:integrator=monte-carlo
+sim:program=benchmark
+sim:integrator=llg-heun
 
 #------------------------------------------
 # data output
@@ -46,8 +44,6 @@ output:temperature
 output:magnetisation
 output:magnetisation-length
 output:output-rate = 1000
-
-config:atoms
 
 screen:time-steps
 screen:magnetisation-length
