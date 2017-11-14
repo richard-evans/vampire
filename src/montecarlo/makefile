@@ -11,7 +11,8 @@ mc.o \
 mc_moves.o \
 cmc.o \
 cmc_mc.o \
-monte_carlo_preconditioning.o
+monte_carlo_preconditioning.o \
+mc-mpi.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/montecarlo/,$(montecarlo_objects))

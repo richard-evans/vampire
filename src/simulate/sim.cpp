@@ -682,10 +682,9 @@ int integrate_mpi(int n_steps){
 
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
-				terminaltextcolor(RED);
-				std::cerr << "Error - Monte Carlo Integrator unavailable for parallel execution" << std::endl;
-				terminaltextcolor(WHITE);
-				err::vexit();
+				#ifdef MPICF
+               montecarlo::mc_step_parallel();
+            #endif
 				// increment time
 				increment_time();
 			}

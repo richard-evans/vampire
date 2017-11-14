@@ -15,6 +15,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
 
 // Vampire headers
 #include "montecarlo.hpp"
@@ -46,6 +47,7 @@ namespace montecarlo{
    int mc_step();
    int cmc_step();
    int cmc_mc_step();
+   int mc_step_parallel();
 
    //---------------------------------------------------------------------------
    // Provide access to CMCinit and CMCMCinit for cmc_anisotropy and

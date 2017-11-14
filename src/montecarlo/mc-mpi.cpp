@@ -23,6 +23,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "vmpi.hpp"
 
 // Internal header
 #include "internal.hpp"
@@ -42,8 +43,10 @@ void mc_parallel_init(){
    std::vector<double> &x = atoms::x_coord_array;
    std::vector<double> &y = atoms::y_coord_array;
    std::vector<double> &z = atoms::z_coord_array;
-   double &max_dim = cs::system_dimensions;
+   double *max_dim = cs::system_dimensions;
 
+   std::vector<std::vector<int> > c_octants(8); //Core atoms of each octant
+   std::vector<std::vector<int> > b_octants(8); //Boundary atoms of each octant
    int octant_num = 0; //Count which octant loop is in
 
    //Determines which atoms are in which octant and pushes the index of those
@@ -120,7 +123,7 @@ int mc_step_parallel(){
 	// loop over all octants
    for(int octant = 0; octant < 7; octant++) {
       int nmoves = internal::c_octants[octant].size();
-      if (nmoves == 0) {continue}; //i.e. if no atoms in octant, skip octant
+      if (nmoves == 0) {continue;} //i.e. if no atoms in octant, skip octant
 
       vmpi::mpi_init_halo_swap();
       //loop over core atoms in current octant to begin single monte carlo step

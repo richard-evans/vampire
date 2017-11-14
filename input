@@ -25,7 +25,8 @@ material:file=Co.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature=300.0
+sim:minimum-temperature=300.0
+sim:maximum-temperature=310.0
 sim:time-steps-increment=10
 sim:total-time-steps=10000
 sim:time-step=1.0E-15
@@ -33,8 +34,8 @@ sim:time-step=1.0E-15
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
-sim:program=benchmark
-sim:integrator=llg-heun
+sim:program=curie-temperature
+sim:integrator=monte-carlo
 
 #------------------------------------------
 # data output
