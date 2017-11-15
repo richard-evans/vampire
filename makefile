@@ -174,10 +174,10 @@ all: $(OBJECTS) serial parallel vdc
 
 # Serial Targets
 serial: $(OBJECTS)
-	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
-	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
+	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
 
 serial-intel: $(ICC_OBJECTS)
 	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)
@@ -230,10 +230,10 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(PEXECUTABLE)
+	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(PEXECUTABLE)
 #export OMPI_CXX=icc
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
+	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<
 
 parallel-intel: $(MPI_ICC_OBJECTS)
 	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)

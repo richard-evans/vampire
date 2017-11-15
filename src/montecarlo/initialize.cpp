@@ -25,9 +25,13 @@ namespace montecarlo{
    //----------------------------------------------------------------------------
    void initialize(){
 
+      internal::mc_parallel_initialized = false;
+      internal::c_octants.resize(8);
+      internal::b_octants.resize(8);
+
+
       return;
 
    }
 
 } // end of montecarlo namespace
-

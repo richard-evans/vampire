@@ -9,7 +9,7 @@
 //
 //------------------------------------------------------------------------------
 //
-
+#ifdef MPICF
 // Standard Libraries
 #include <cmath>
 #include <cstdlib>
@@ -45,12 +45,11 @@ void mc_parallel_init(){
    std::vector<double> &z = atoms::z_coord_array;
    double *max_dim = cs::system_dimensions;
 
-   std::vector<std::vector<int> > c_octants(8); //Core atoms of each octant
-   std::vector<std::vector<int> > b_octants(8); //Boundary atoms of each octant
    int octant_num = 0; //Count which octant loop is in
 
-   //Determines which atoms are in which octant and pushes the index of those
-   //atoms into the appropriate octant arrays for core region
+   //Determines which core atoms are in which octant and pushes the index of those
+   //atoms into the appropriate octant arrays.
+
    for(int zoct=0; zoct<2; zoct++){for(int yoct=0; yoct<2; yoct++){for(int xoct=0; xoct<2; xoct++){
       for (int i=0; i<catoms; i++){
          if (   x[i] > max_dim[0]/2.0*xoct && x[i] > max_dim[0]/2.0 + max_dim[0]/2.0*xoct
@@ -64,7 +63,7 @@ void mc_parallel_init(){
    }}}
 
    octant_num = 0;
-   //Same as above, but for boundary atoms
+   //Sort boundary atoms into appropriate octant arrays.
    for(int zoct=0; zoct<2; zoct++){for(int yoct=0; yoct<2; yoct++){for(int xoct=0; xoct<2; xoct++){
       for (int i=catoms; i<batoms; i++){
          if (   x[i] > max_dim[0]/2.0*xoct && x[i] > max_dim[0]/2.0 + max_dim[0]/2.0*xoct
@@ -76,6 +75,8 @@ void mc_parallel_init(){
       }
       octant_num++;
    }}}
+
+   mc_parallel_initialized = true;
 }
 
 } //end of namespace internal
@@ -91,10 +92,6 @@ int mc_step_parallel(){
    if(internal::mc_parallel_initialized == false) {
       internal::mc_parallel_init();
    }
-
-	// calculate number of steps to calculate
-	int ncoremoves = vmpi::num_core_atoms;
-   int nbdrymoves = vmpi::num_bdry_atoms;
 
 	// Declare arrays for spin states
 	std::valarray<double> Sold(3);
@@ -121,9 +118,8 @@ int mc_step_parallel(){
    double statistics_reject = 0.0;
 
 	// loop over all octants
-   for(int octant = 0; octant < 7; octant++) {
+   for(int octant = 0; octant < 8; octant++) {
       int nmoves = internal::c_octants[octant].size();
-      if (nmoves == 0) {continue;} //i.e. if no atoms in octant, skip octant
 
       vmpi::mpi_init_halo_swap();
       //loop over core atoms in current octant to begin single monte carlo step
@@ -181,6 +177,8 @@ int mc_step_parallel(){
    	}
 
       vmpi::mpi_complete_halo_swap();
+
+      nmoves = internal::b_octants[octant].size();
 
       //Loop over all atoms in boundary region to complete monte carlo step
       for(int i=0; i<nmoves; i++){
@@ -256,3 +254,4 @@ int mc_step_parallel(){
 }
 
 } // End of namespace montecarlo
+#endif

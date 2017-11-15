@@ -681,6 +681,7 @@ int integrate_mpi(int n_steps){
 			break;
 
 		case 1: // Montecarlo
+         montecarlo::initialize();
 			for(int ti=0;ti<n_steps;ti++){
 				#ifdef MPICF
                montecarlo::mc_step_parallel();

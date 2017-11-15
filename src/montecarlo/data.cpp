@@ -28,6 +28,10 @@ namespace montecarlo{
       //------------------------------------------------------------------------
       // Shared variables inside montecarlo module
       //------------------------------------------------------------------------
+      std::vector<std::vector<int> > c_octants; //Core atoms of each octant
+      std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
+      bool mc_parallel_initialized;
+
 
    } // end of internal namespace
 
