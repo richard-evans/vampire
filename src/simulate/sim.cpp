@@ -240,6 +240,8 @@ int run(){
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
 
+   montecarlo::initialize();
+
    anisotropy::initialize(atoms::num_atoms, atoms::type_array, mp::mu_s_array);
 
    // now seed generator
@@ -681,7 +683,6 @@ int integrate_mpi(int n_steps){
 			break;
 
 		case 1: // Montecarlo
-         montecarlo::initialize();
 			for(int ti=0;ti<n_steps;ti++){
 				#ifdef MPICF
                montecarlo::mc_step_parallel();

@@ -49,33 +49,39 @@ void mc_parallel_init(){
 
    //Determines which core atoms are in which octant and pushes the index of those
    //atoms into the appropriate octant arrays.
-
-   for(int zoct=0; zoct<2; zoct++){for(int yoct=0; yoct<2; yoct++){for(int xoct=0; xoct<2; xoct++){
-      for (int i=0; i<catoms; i++){
-         if (   x[i] > max_dim[0]/2.0*xoct && x[i] > max_dim[0]/2.0 + max_dim[0]/2.0*xoct
-             && y[i] > max_dim[1]/2.0*yoct && y[i] > max_dim[1]/2.0 + max_dim[1]/2.0*yoct
-             && z[i] > max_dim[2]/2.0*zoct && z[i] > max_dim[2]/2.0 + max_dim[2]/2.0*zoct)
-         {
-            c_octants[octant_num].push_back(i);
+   for(int zoct=0; zoct<2; zoct++){
+      for(int yoct=0; yoct<2; yoct++){
+         for(int xoct=0; xoct<2; xoct++){
+            for (int i=0; i<catoms; i++){
+               if (   x[i] > max_dim[0]/2.0*xoct && x[i] < max_dim[0]/2.0 + max_dim[0]/2.0*xoct
+                   && y[i] > max_dim[1]/2.0*yoct && y[i] < max_dim[1]/2.0 + max_dim[1]/2.0*yoct
+                   && z[i] > max_dim[2]/2.0*zoct && z[i] < max_dim[2]/2.0 + max_dim[2]/2.0*zoct)
+               {
+                  c_octants[octant_num].push_back(i);
+               }
+            }
+            octant_num++;
          }
       }
-      octant_num++;
-   }}}
+   }
 
    octant_num = 0;
    //Sort boundary atoms into appropriate octant arrays.
-   for(int zoct=0; zoct<2; zoct++){for(int yoct=0; yoct<2; yoct++){for(int xoct=0; xoct<2; xoct++){
-      for (int i=catoms; i<batoms; i++){
-         if (   x[i] > max_dim[0]/2.0*xoct && x[i] > max_dim[0]/2.0 + max_dim[0]/2.0*xoct
-             && y[i] > max_dim[1]/2.0*yoct && y[i] > max_dim[1]/2.0 + max_dim[1]/2.0*yoct
-             && z[i] > max_dim[2]/2.0*zoct && z[i] > max_dim[2]/2.0 + max_dim[2]/2.0*zoct)
-         {
-            b_octants[octant_num].push_back(i);
+   for(int zoct=0; zoct<2; zoct++){
+      for(int yoct=0; yoct<2; yoct++){
+         for(int xoct=0; xoct<2; xoct++){
+            for (int i=catoms; i<catoms+batoms; i++){
+               if (   x[i] > max_dim[0]/2.0*xoct && x[i] < max_dim[0]/2.0 + max_dim[0]/2.0*xoct
+                   && y[i] > max_dim[1]/2.0*yoct && y[i] < max_dim[1]/2.0 + max_dim[1]/2.0*yoct
+                   && z[i] > max_dim[2]/2.0*zoct && z[i] < max_dim[2]/2.0 + max_dim[2]/2.0*zoct)
+               {
+                  b_octants[octant_num].push_back(i);
+               }
+            }
+            octant_num++;
          }
       }
-      octant_num++;
-   }}}
-
+   }
    mc_parallel_initialized = true;
 }
 
@@ -120,7 +126,6 @@ int mc_step_parallel(){
 	// loop over all octants
    for(int octant = 0; octant < 8; octant++) {
       int nmoves = internal::c_octants[octant].size();
-
       vmpi::mpi_init_halo_swap();
       //loop over core atoms in current octant to begin single monte carlo step
    	for(int i=0; i<nmoves; i++){
