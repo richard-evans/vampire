@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard Evans 2017. All rights reserved.
+//   (c) Richard Evans and Adam Laverack 2017. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -43,7 +43,12 @@ void mc_parallel_init(){
    std::vector<double> &x = atoms::x_coord_array;
    std::vector<double> &y = atoms::y_coord_array;
    std::vector<double> &z = atoms::z_coord_array;
-   double *max_dim = cs::system_dimensions;
+
+   double *min_dim = vmpi::min_dimensions;
+   double *max_dim = vmpi::max_dimensions;
+   double widthx = max_dim[0] - min_dim[0];
+   double widthy = max_dim[1] - min_dim[1];
+   double widthz = max_dim[2] - min_dim[2];
 
    int octant_num = 0; //Count which octant loop is in
 
@@ -53,9 +58,9 @@ void mc_parallel_init(){
       for(int yoct=0; yoct<2; yoct++){
          for(int xoct=0; xoct<2; xoct++){
             for (int i=0; i<catoms; i++){
-               if (   x[i] > max_dim[0]/2.0*xoct && x[i] < max_dim[0]/2.0 + max_dim[0]/2.0*xoct
-                   && y[i] > max_dim[1]/2.0*yoct && y[i] < max_dim[1]/2.0 + max_dim[1]/2.0*yoct
-                   && z[i] > max_dim[2]/2.0*zoct && z[i] < max_dim[2]/2.0 + max_dim[2]/2.0*zoct)
+               if (   x[i] > min_dim[0] + widthx/2.0*xoct && x[i] < widthx/2.0 + widthx/2.0*xoct
+                   && y[i] > min_dim[1] + widthy/2.0*yoct && y[i] < widthy/2.0 + widthy/2.0*yoct
+                   && z[i] > min_dim[2] + widthz/2.0*zoct && z[i] < widthz/2.0 + widthz/2.0*zoct)
                {
                   c_octants[octant_num].push_back(i);
                }
@@ -71,9 +76,9 @@ void mc_parallel_init(){
       for(int yoct=0; yoct<2; yoct++){
          for(int xoct=0; xoct<2; xoct++){
             for (int i=catoms; i<catoms+batoms; i++){
-               if (   x[i] > max_dim[0]/2.0*xoct && x[i] < max_dim[0]/2.0 + max_dim[0]/2.0*xoct
-                   && y[i] > max_dim[1]/2.0*yoct && y[i] < max_dim[1]/2.0 + max_dim[1]/2.0*yoct
-                   && z[i] > max_dim[2]/2.0*zoct && z[i] < max_dim[2]/2.0 + max_dim[2]/2.0*zoct)
+               if (   x[i] > min_dim[0] + widthx/2.0*xoct && x[i] < widthx/2.0 + widthx/2.0*xoct
+                   && y[i] > min_dim[1] + widthy/2.0*yoct && y[i] < widthy/2.0 + widthy/2.0*yoct
+                   && z[i] > min_dim[2] + widthz/2.0*zoct && z[i] < widthz/2.0 + widthz/2.0*zoct)
                {
                   b_octants[octant_num].push_back(i);
                }
