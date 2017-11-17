@@ -37,7 +37,7 @@ namespace internal{
 // checkerboard MC algorithm
 //------------------------------------------------------------------------------
 void mc_parallel_init(){
-   //Convenient shorthands
+   // Convenient shorthands
    int &catoms = vmpi::num_core_atoms;
    int &batoms = vmpi::num_bdry_atoms;
    std::vector<double> &x = atoms::x_coord_array;
@@ -52,12 +52,14 @@ void mc_parallel_init(){
 
    int octant_num = 0; //Count which octant loop is in
 
-   //Determines which core atoms are in which octant and pushes the index of those
-   //atoms into the appropriate octant arrays.
+   // Determines which core atoms are in which octant and pushes the index of those
+   // atoms into the appropriate octant arrays.
    for(int zoct=0; zoct<2; zoct++){
       for(int yoct=0; yoct<2; yoct++){
          for(int xoct=0; xoct<2; xoct++){
+            // Loop through all core atoms
             for (int i=0; i<catoms; i++){
+               // Check if current atom is in desired octant
                if (   x[i] > min_dim[0] + widthx/2.0*xoct && x[i] < widthx/2.0 + widthx/2.0*xoct
                    && y[i] > min_dim[1] + widthy/2.0*yoct && y[i] < widthy/2.0 + widthy/2.0*yoct
                    && z[i] > min_dim[2] + widthz/2.0*zoct && z[i] < widthz/2.0 + widthz/2.0*zoct)
@@ -75,7 +77,9 @@ void mc_parallel_init(){
    for(int zoct=0; zoct<2; zoct++){
       for(int yoct=0; yoct<2; yoct++){
          for(int xoct=0; xoct<2; xoct++){
+            // Loop through all boundary atoms
             for (int i=catoms; i<catoms+batoms; i++){
+               // Check if current atom is in desired octant
                if (   x[i] > min_dim[0] + widthx/2.0*xoct && x[i] < widthx/2.0 + widthx/2.0*xoct
                    && y[i] > min_dim[1] + widthy/2.0*yoct && y[i] < widthy/2.0 + widthy/2.0*yoct
                    && z[i] > min_dim[2] + widthz/2.0*zoct && z[i] < widthz/2.0 + widthz/2.0*zoct)
