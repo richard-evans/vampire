@@ -173,6 +173,12 @@ int MonteCarlo(){
    sim::mc_statistics_moves += statistics_moves;
    sim::mc_statistics_reject += statistics_reject;
 
+	double last_rejection_rate = statistics_reject / statistics_moves;
+   double factor = 0.5 / last_rejection_rate;
+   sim::mc_adaptive_sigma *= factor;
+	if (sim::mc_adaptive_sigma > 60.0)
+		sim::mc_adaptive_sigma = 60.0;
+
 	return EXIT_SUCCESS;
 }
 

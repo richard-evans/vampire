@@ -175,6 +175,8 @@ namespace sim{
    // Monte Carlo statistics counters
    double mc_statistics_moves = 0.0;
    double mc_statistics_reject = 0.0;
+	// The angle of the adaptive cone
+	double mc_adaptive_sigma = 60.0;
 
 /// @brief Function to increment time counter and associted variables
 ///

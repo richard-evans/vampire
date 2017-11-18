@@ -186,6 +186,7 @@ namespace sim{
    // Monte Carlo statistics counters
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;
+   extern double mc_adaptive_sigma;
 
 }
 

@@ -33,6 +33,7 @@
 //-------------------------------------------------------------------
 // standard library header files
 #include <valarray>
+#include <iostream>
 
 // vampire header files
 #include "random.hpp"
@@ -44,7 +45,7 @@ namespace sim{
 void mc_gaussian(const std::valarray<double>&, std::valarray<double>&);
 void mc_spin_flip(const std::valarray<double>&, std::valarray<double>&);
 void mc_uniform(std::valarray<double>&);
-void mc_angle(const std::valarray<double>&, std::valarray<double>&);
+void mc_angle(const std::valarray<double>&, std::valarray<double>&, double angle);
 void mc_hinzke_nowak(const std::valarray<double>&, std::valarray<double>&);
 void mc_adaptive(const std::valarray<double>&, std::valarray<double>&);
 
@@ -69,7 +70,7 @@ void mc_move(const std::valarray<double>& old_spin, std::valarray<double>& new_s
          mc_uniform(new_spin);
          break;
       case angle:
-         mc_angle(old_spin, new_spin);
+         mc_angle(old_spin, new_spin, sim::mc_delta_angle);
          break;
       case hinzke_nowak:
          mc_hinzke_nowak(old_spin, new_spin);
@@ -86,11 +87,11 @@ void mc_move(const std::valarray<double>& old_spin, std::valarray<double>& new_s
 
 /// Angle move
 /// Move spin within cone near old position
-void mc_angle(const std::valarray<double>& old_spin, std::valarray<double>& new_spin){
+void mc_angle(const std::valarray<double>& old_spin, std::valarray<double>& new_spin, double angle){
 
-   new_spin[0]=old_spin[0]+mtrandom::gaussian()*sim::mc_delta_angle;
-   new_spin[1]=old_spin[1]+mtrandom::gaussian()*sim::mc_delta_angle;
-   new_spin[2]=old_spin[2]+mtrandom::gaussian()*sim::mc_delta_angle;
+   new_spin[0]=old_spin[0]+mtrandom::gaussian()*angle;
+   new_spin[1]=old_spin[1]+mtrandom::gaussian()*angle;
+   new_spin[2]=old_spin[2]+mtrandom::gaussian()*angle;
 
    // Calculate new spin length
    const double r = 1.0/sqrt (new_spin[0]*new_spin[0]+new_spin[1]*new_spin[1]+new_spin[2]*new_spin[2]);
@@ -150,10 +151,10 @@ void mc_hinzke_nowak(const std::valarray<double>& old_spin, std::valarray<double
             mc_uniform(new_spin);
             break;
          case 2:
-            mc_angle(old_spin, new_spin);
+            mc_angle(old_spin, new_spin, sim::mc_delta_angle);
             break;
          default:
-            mc_angle(old_spin, new_spin);
+            mc_angle(old_spin, new_spin, sim::mc_delta_angle);
             break;
       }
       return;
@@ -167,7 +168,8 @@ void mc_hinzke_nowak(const std::valarray<double>& old_spin, std::valarray<double
 /// RFL. Evans
 /// D. Sabogal-Suarez
 void mc_adaptive(const std::valarray<double>& old_spin, std::valarray<double>& new_spin){
-   std::exit(EXIT_FAILURE);
+   // Here we have sim::mc_adaptive_sigma, at least from the monte carlo algorithm
+   mc_angle(old_spin, new_spin, sim::mc_adaptive_sigma);
    return;
 }
 
