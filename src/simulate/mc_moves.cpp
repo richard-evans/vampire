@@ -46,6 +46,7 @@ void mc_spin_flip(const std::valarray<double>&, std::valarray<double>&);
 void mc_uniform(std::valarray<double>&);
 void mc_angle(const std::valarray<double>&, std::valarray<double>&);
 void mc_hinzke_nowak(const std::valarray<double>&, std::valarray<double>&);
+void mc_adaptive(const std::valarray<double>&, std::valarray<double>&);
 
 ///--------------------------------------------------------
 ///
@@ -72,6 +73,9 @@ void mc_move(const std::valarray<double>& old_spin, std::valarray<double>& new_s
          break;
       case hinzke_nowak:
          mc_hinzke_nowak(old_spin, new_spin);
+         break;
+      case adaptive:
+         mc_adaptive(old_spin, new_spin);
          break;
       default:
          mc_hinzke_nowak(old_spin, new_spin);
@@ -153,6 +157,18 @@ void mc_hinzke_nowak(const std::valarray<double>& old_spin, std::valarray<double
             break;
       }
       return;
+}
+
+/// Generates a new spin from a cone around the old spin, the cone width is
+/// derived from the acceptance rate of the previous monte carlo step.
+///
+/// Adaptive algorithm implemented
+/// JD. Alzate-Cardona
+/// RFL. Evans
+/// D. Sabogal-Suarez
+void mc_adaptive(const std::valarray<double>& old_spin, std::valarray<double>& new_spin){
+   std::exit(EXIT_FAILURE);
+   return;
 }
 
 }

@@ -1284,6 +1284,11 @@ namespace vin{
                 sim::mc_algorithm=hinzke_nowak;
                 return EXIT_SUCCESS;
             }
+            test="adaptive";
+            if(value==test){
+                sim::mc_algorithm=adaptive;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;

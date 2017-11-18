@@ -93,7 +93,7 @@ namespace sim{
 
 	// Monte Carlo variables
 	extern double mc_delta_angle; /// Tuned angle for Monte Carlo trial move
-	enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak};
+	enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak, adaptive};
    extern mc_algorithms mc_algorithm; /// Selected algorith for Monte Carlo simulations
 
 	extern double head_position[2];
