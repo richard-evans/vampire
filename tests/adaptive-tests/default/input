@@ -1,0 +1,16 @@
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+material:file=material.mat
+
+sim:integrator = monte-carlo
+sim:program = curie-temperature
+
+sim:equilibration-time-steps = 1000
+sim:loop-time-steps = 1000
+sim:time-steps-increment = 1
+
+output:temperature
+output:mean-magnetisation-length
+screen:temperature
+screen:mean-magnetisation-length
