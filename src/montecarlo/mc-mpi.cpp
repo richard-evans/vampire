@@ -36,16 +36,12 @@ namespace internal{
 // Initialise octant arrays to store which atom is in which octant for the
 // checkerboard MC algorithm
 //------------------------------------------------------------------------------
-void mc_parallel_init(){
+void mc_parallel_init(std::vector<double> x, std::vector<double> y, std::vector<double> z,
+                      double *min_dim, double *max_dim){
    // Convenient shorthands
-   int &catoms = vmpi::num_core_atoms;
-   int &batoms = vmpi::num_bdry_atoms;
-   std::vector<double> &x = atoms::x_coord_array;
-   std::vector<double> &y = atoms::y_coord_array;
-   std::vector<double> &z = atoms::z_coord_array;
+   int catoms = vmpi::num_core_atoms;
+   int batoms = vmpi::num_bdry_atoms;
 
-   double *min_dim = vmpi::min_dimensions;
-   double *max_dim = vmpi::max_dimensions;
    double widthx = max_dim[0] - min_dim[0];
    double widthy = max_dim[1] - min_dim[1];
    double widthz = max_dim[2] - min_dim[2];
@@ -102,10 +98,11 @@ void mc_parallel_init(){
 int mc_step_parallel(){
 
 	// Check for calling of function
-	if(err::check==true) std::cout << "montecarlo::mc_step has been called" << std::endl;
+	if(err::check==true) std::cout << "montecarlo::mc_step_parallel has been called" << std::endl;
 
    if(internal::mc_parallel_initialized == false) {
-      internal::mc_parallel_init();
+      internal::mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+                                 vmpi::min_dimensions, vmpi::max_dimensions);
    }
 
 	// Declare arrays for spin states
