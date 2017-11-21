@@ -74,6 +74,10 @@ namespace environment{
 
       std::vector < double > env_field_uv(3,0.0);
 
+      //FT for magnetisation
+      fftw_plan MxP,MyP,MzP;
+      fftw_plan HxP,HyP,HzP;
+
       double one_o_chi_para;
       double one_o_chi_perp;
 

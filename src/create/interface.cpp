@@ -435,7 +435,6 @@ namespace create{
       if(word==test){
           double min=atof(value.c_str());
           vin::check_for_valid_value(min, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-          create::internal::select_material_by_z_height = true; // default
           create::internal::mp[super_index].min_width=min;
           return true;
       }
@@ -444,7 +443,6 @@ namespace create{
       if(word==test){
           double max=atof(value.c_str());
           vin::check_for_valid_value(max, word, line, prefix, unit, "none", 0.0, 1.0,"material"," 0.0 - 1.0");
-          create::internal::select_material_by_z_height = true; // default
           create::internal::mp[super_index].max_width=max;
           return true;
       }

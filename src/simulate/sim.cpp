@@ -809,14 +809,21 @@ int integrate_mpi(int n_steps){
 
 void multiscale_simulation_steps(int n_steps){
 
+	if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
+	   sim::H_applied,
+	   sim::H_vec[0],
+	   sim::H_vec[1],
+	   sim::H_vec[2],
+	   mp::dt);
+
    for(int ti=0;ti<n_steps;ti++){
       //calcaulte the field from the environment
-      if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
-         sim::H_applied,
-         sim::H_vec[0],
-         sim::H_vec[1],
-         sim::H_vec[2],
-         mp::dt);
+      // if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
+      //    sim::H_applied,
+      //    sim::H_vec[0],
+      //    sim::H_vec[1],
+      //    sim::H_vec[2],
+      //    mp::dt);
 
          //if  there are micromagnetic cells run a micromagnetic step
          if (micromagnetic::number_of_micromagnetic_cells > 0 &&  (sim::time)% micromagnetic::num_atomic_steps_mm == 0) {

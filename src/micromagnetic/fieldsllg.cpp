@@ -33,9 +33,9 @@ namespace micromagnetic{
                                                double temperature,
                                                int num_cells,
                                                int cell,
-                                               std::vector<double> x_array,
-                                               std::vector<double> y_array,
-                                               std::vector<double> z_array){
+                                               std::vector<double>& x_array,
+                                               std::vector<double>& y_array,
+                                               std::vector<double>& z_array){
 
 
       std::vector<double> spin_field(3,0.0);
@@ -128,7 +128,16 @@ namespace micromagnetic{
 //std::cout << m[0] << '\t' << m[1] << '\t' << m[2] <<std::endl;
 
     // if (cell == 5)
-      //std::cout <<cell <<  "fields = " <<spin_field[0] << '\t' <<spin_field[1] << '\t' <<spin_field[2] << '\t' <<"track = " <<  sim::track_field_x[cell]<< "\t" << sim::track_field_y[cell] << '\t' <<sim::track_field_z[cell]<<'\t' << "pin = " <<  pinning_field_x[cell] << "\t" << pinning_field_y[cell] << '\t' <<pinning_field_z[cell]<<'\t' << "env = " <<  environment::environment_field_x[cell] << "\t" << environment::environment_field_y[cell] << '\t' <<environment::environment_field_z[cell]<<std::endl;
+   //    std::cout <<cell
+   //    //"fields = "
+   //     <<"\t" <<spin_field[0] << '\t' <<spin_field[1] << '\t' <<spin_field[2] << '\t'
+   // //<< "coords" << "\t"
+   //  <<  cells::pos_and_mom_array[4*cell+0] << '\t' <<  cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t'
+   //    //<<"track = "
+   //     <<  sim::track_field_x[cell]<< "\t" << sim::track_field_y[cell] << '\t' <<sim::track_field_z[cell]<<'\t'
+   // //   << "pin = " <<  pinning_field_x[cell] << "\t" << pinning_field_y[cell] << '\t' <<pinning_field_z[cell]<<'\t'
+   //     //<<"env = " <<  "\t"
+   //     <<environment::environment_field_x[cell] << "\t" << environment::environment_field_y[cell] << '\t' <<environment::environment_field_z[cell]<<std::endl;
 
 
     //  if (spin_field[0] != spin_field[0]) std::cin.get();

@@ -31,9 +31,9 @@ namespace micromagnetic{
                                                double temperature,
                                                int num_cells,
                                                int cell,
-                                               std::vector<double> x_array,
-                                               std::vector<double> y_array,
-                                               std::vector<double> z_array){
+                                               std::vector<double>& x_array,
+                                               std::vector<double>& y_array,
+                                               std::vector<double>& z_array){
 
 
       //array to save the field to for each cell

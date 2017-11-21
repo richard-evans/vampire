@@ -70,11 +70,16 @@ namespace program{
       std::vector <int> Largest_Sublattice(grains::num_grains,0);
       std::vector <int> Max_atoms(grains::num_grains,0);
 
+
       #ifdef MPICF
       stats::num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
       #else
       stats::num_atoms = atoms::num_atoms;
       #endif
+
+      std::vector <bool> atom_included(stats::num_atoms,false);
+
+  //    std::cout << stats::num_atoms <<std::endl;
 
       //Calculates how many atoms are in the top layer of each sublattice in each grain.
       for (int atom = 0; atom < stats::num_atoms; atom++){
@@ -83,17 +88,28 @@ namespace program{
         int end =  atoms::neighbour_list_end_index[atom] +1;
         int mat_i = atoms::type_array[atom];
         int grain = atoms::grain_array[atom];
+        atom_included[atom] =false;
+        if (mat_i < 4){
+    //      std::cout << "A" <<atom << '\t' << atoms::x_coord_array[atom] << '\t' << atoms::y_coord_array[atom] << '\t' << atoms::z_coord_array[atom] << '\t' << atom_included[atom] << "\t" <<  atoms::type_array[atom] <<std::endl;
 
-         for (int neighbour = start; neighbour < end; neighbour ++){
+          for (int neighbour = start; neighbour < end; neighbour ++){
+            if (atom_included[atom] == false){
             // explain what if statement is testing
-            int mat_j = atoms::type_array[atoms::neighbour_list_array[neighbour]];
-            if ((mat_i >3) && (mat_j < 4)){
-              No_in_Sublattice[mat_j][grain]++;
 
+            int mat_j = atoms::type_array[atoms::neighbour_list_array[neighbour]];
+            std::cout << mat_j <<std::endl;
+            if (mat_j == 4 || mat_j == 5){
+        //      std:: cout << atom << '\t' << mat_j << std::endl;
+              No_in_Sublattice[mat_i][grain]++;
+              atom_included[atom] = true;
+            }
             }
          }
+       }
       }
-
+    //  for (int atom = 0; atom < stats::num_atoms; atom++){
+  //      std::cout << atom << '\t' << atoms::x_coord_array[atom] << '\t' << atoms::y_coord_array[atom] << '\t' << atoms::z_coord_array[atom] << '\t' << atom_included[atom] << "\t" <<  atoms::type_array[atom] <<std::endl;
+//      }
 
       int k = 0;
       for (int j = 0; j < grains::num_grains; j ++){

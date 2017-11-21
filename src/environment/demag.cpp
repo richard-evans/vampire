@@ -186,7 +186,27 @@ namespace environment{
          NzzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2zz0,N2zz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzzP);
 
+         // free memory from FFTW plans
+         fftw_destroy_plan(NxxP);
+         fftw_destroy_plan(NxyP);
+         fftw_destroy_plan(NxzP);
+         fftw_destroy_plan(NyxP);
+         fftw_destroy_plan(NyyP);
+         fftw_destroy_plan(NyzP);
+         fftw_destroy_plan(NzxP);
+         fftw_destroy_plan(NzyP);
+         fftw_destroy_plan(NzzP);
 
+
+         MxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mx_in,Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
+         MyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,My_in,My_out,FFTW_FORWARD,FFTW_ESTIMATE);
+         MzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mz_in,Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
+
+         HxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hx_in,Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+         HyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hy_in,Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+         HzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hz_in,Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+
+         std::cout << "End of dipole fields initialisation..." << std::endl;
 
          #endif
          return 0;
@@ -254,15 +274,9 @@ namespace environment{
                }
             }
          }
-//         std::cout <<
-         //FT for magnetisation
-         fftw_plan MxP,MyP,MzP;
 
-         MxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mx_in,Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MxP);
-         MyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,My_in,My_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MyP);
-         MzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mz_in,Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(MzP);
 
 
@@ -295,16 +309,11 @@ namespace environment{
                }
             }
          }
-
-         // performs the backward transform to give the dipole field, Hx, Hy, Hz
-         fftw_plan HxP,HyP,HzP;
-
-         HxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hx_in,Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
          fftw_execute(HxP);
-         HyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hy_in,Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
          fftw_execute(HyP);
-         HzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hz_in,Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
          fftw_execute(HzP);
+
+
 
 
          for (int i = 0; i< num_cells; i++){
@@ -314,7 +323,7 @@ namespace environment{
             dipole_field_y[i]=eightPI_three_cell_volume*(y_mag_array[i]/9.27400915e-24);
             dipole_field_z[i]=eightPI_three_cell_volume*(z_mag_array[i]/9.27400915e-24);
          }
-         
+
          std::ofstream ofile;
          ofile.open("field.txt");
 
@@ -331,7 +340,7 @@ namespace environment{
                  dipole_field_x[cell] *= 9.27400915e-01;
                  dipole_field_y[cell] *= 9.27400915e-01;
                  dipole_field_z[cell] *= 9.27400915e-01;
-                 ofile << i << '\t' << j << '\t' << k << '\t' << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << std::endl;
+               //  ofile << i << '\t' << j << '\t' << k << '\t' << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << std::endl;
                   cell++;
                }
             }
@@ -345,6 +354,7 @@ namespace environment{
             environment_field_x[cell] = dipole_field_x[env_cell];
             environment_field_y[cell] = dipole_field_y[env_cell];
             environment_field_z[cell] = dipole_field_z[env_cell];
+            ofile << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
 
          }
    //      //end the FFT only compilation

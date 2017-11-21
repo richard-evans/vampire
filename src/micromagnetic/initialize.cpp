@@ -98,7 +98,8 @@ namespace micromagnetic{
                                                  y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
 
 
-
+// for (int cell = 0; cell < num_cells; cell++)
+// std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << mm::ms[cell] <<std::endl;
 
       if (discretisation_type == 1){
          for (int lc = 0; lc < num_local_cells; lc++){

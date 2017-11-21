@@ -52,18 +52,18 @@ namespace environment{
          o_file <<sim::time << '\t' << sim::temperature << "\t" << mx << '\t' << my<< '\t' << mz << '\t' <<  magm/msat << std::endl;
 
 
-         std::stringstream filename_sstr;
-         filename_sstr << "env_cell_config" << sim::time << ".txt";
-         std::ofstream pfile;
-         pfile.open(filename_sstr.str());
-
+         // std::stringstream filename_sstr;
+         // filename_sstr << "env_cell_config" << sim::time << ".txt";
+         // std::ofstream pfile;
+         // pfile.open(filename_sstr.str());
          //
-         for (int i = 0; i < env::num_env_cells; i++){
-            int cell = env::none_atomistic_cells[i];
-         //for(int cell = 0; cell < num_cells; cell++){
-         //
-         	pfile << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' <<std::endl;
-         }
+         // //
+         // for (int i = 0; i < env::num_env_cells; i++){
+         //    int cell = env::none_atomistic_cells[i];
+         // //for(int cell = 0; cell < num_cells; cell++){
+         // //
+         // 	pfile << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' <<std::endl;
+         // }
 
          return 0;
       }
