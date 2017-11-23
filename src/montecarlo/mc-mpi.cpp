@@ -36,8 +36,8 @@ namespace internal{
 // Initialise octant arrays to store which atom is in which octant for the
 // checkerboard MC algorithm
 //------------------------------------------------------------------------------
-void mc_parallel_init(std::vector<double> x, std::vector<double> y, std::vector<double> z,
-                      double *min_dim, double *max_dim){
+void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
+                      double min_dim[3], double max_dim[3]){
    // Convenient shorthands
    int catoms = vmpi::num_core_atoms;
    int batoms = vmpi::num_bdry_atoms;
@@ -56,9 +56,9 @@ void mc_parallel_init(std::vector<double> x, std::vector<double> y, std::vector<
             // Loop through all core atoms
             for (int i=0; i<catoms; i++){
                // Check if current atom is in desired octant
-               if (   x[i] > min_dim[0] + widthx/2.0*xoct && x[i] < widthx/2.0 + widthx/2.0*xoct
-                   && y[i] > min_dim[1] + widthy/2.0*yoct && y[i] < widthy/2.0 + widthy/2.0*yoct
-                   && z[i] > min_dim[2] + widthz/2.0*zoct && z[i] < widthz/2.0 + widthz/2.0*zoct)
+               if (   x[i] > min_dim[0] + widthx*xoct*0.5 && x[i] < widthx*0.5 + widthx*xoct*0.5
+                   && y[i] > min_dim[1] + widthy*yoct*0.5 && y[i] < widthy*0.5 + widthy*yoct*0.5
+                   && z[i] > min_dim[2] + widthz*zoct*0.5 && z[i] < widthz*0.5 + widthz*zoct*0.5)
                {
                   c_octants[octant_num].push_back(i);
                }
@@ -76,9 +76,9 @@ void mc_parallel_init(std::vector<double> x, std::vector<double> y, std::vector<
             // Loop through all boundary atoms
             for (int i=catoms; i<catoms+batoms; i++){
                // Check if current atom is in desired octant
-               if (   x[i] > min_dim[0] + widthx/2.0*xoct && x[i] < widthx/2.0 + widthx/2.0*xoct
-                   && y[i] > min_dim[1] + widthy/2.0*yoct && y[i] < widthy/2.0 + widthy/2.0*yoct
-                   && z[i] > min_dim[2] + widthz/2.0*zoct && z[i] < widthz/2.0 + widthz/2.0*zoct)
+               if (   x[i] > min_dim[0] + widthx*xoct*0.5 && x[i] < widthx*0.5 + widthx*xoct*0.5
+                   && y[i] > min_dim[1] + widthy*yoct*0.5 && y[i] < widthy*0.5 + widthy*yoct*0.5
+                   && z[i] > min_dim[2] + widthz*zoct*0.5 && z[i] < widthz*0.5 + widthz*zoct*0.5)
                {
                   b_octants[octant_num].push_back(i);
                }
@@ -245,6 +245,30 @@ int mc_step_parallel(){
    		}
    	}
 
+
+      double mag_local[3] = {0.0};
+      double mag_global[3] = {0.0};
+      double mag_length_global = 0.0;
+      int sys_size = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
+      for (int i = 0; i < sys_size; i++) {
+         mag_local[0] += atoms::x_spin_array[i];
+         mag_local[1] += atoms::y_spin_array[i];
+         mag_local[2] += atoms::z_spin_array[i];
+      }
+
+      mag_local[0] /= double(sys_size);
+      mag_local[1] /= double(sys_size);
+      mag_local[2] /= double(sys_size);
+
+      MPI_Allreduce(&mag_local, &mag_global, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+      mag_length_global = sqrt(pow(mag_local[0], 2) + pow(mag_local[1], 2) + pow(mag_local[2], 2));
+
+      mag_length_global /= vmpi::num_processors;
+
+      //std::cout << mag_length_global << "\n";
+
+
       // Swap timers compute -> wait
       vmpi::TotalComputeTime+=vmpi::SwapTimer(vmpi::ComputeTime, vmpi::WaitTime);
 
@@ -258,8 +282,6 @@ int mc_step_parallel(){
    // Save statistics to sim namespace variable
    sim::mc_statistics_moves += statistics_moves;
    sim::mc_statistics_reject += statistics_reject;
-
-
 
 	return EXIT_SUCCESS;
 }
