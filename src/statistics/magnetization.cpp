@@ -146,8 +146,6 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
    for(int idx=0; idx<msize; ++idx) mean_magnetization[idx]+=magnetization[idx];
    mean_counter+=1.0;
 
-   std::cout << magnetization[3] << "\n";
-
    return;
 
 }
