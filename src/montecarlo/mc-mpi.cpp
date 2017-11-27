@@ -132,8 +132,6 @@ int mc_step_parallel(){
 	// loop over all octants
    for(int octant = 0; octant < 8; octant++) {
 
-      //std::cerr << vmpi::my_rank << "\t" << octant << "\t" << internal::b_octants[octant].size() << "\n";
-
       int nmoves = internal::c_octants[octant].size();
       vmpi::mpi_init_halo_swap();
       //loop over core atoms in current octant to begin single monte carlo step
@@ -258,9 +256,14 @@ int mc_step_parallel(){
       vmpi::TotalWaitTime+=vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
    }
 
+   //Collect statistics from all processors
+   double global_statistics_moves = 0.0;
+   double global_statistics_reject = 0.0;
+   MPI_Allreduce(&statistics_moves, &global_statistics_moves, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&statistics_reject, &global_statistics_reject, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    // Save statistics to sim namespace variable
-   sim::mc_statistics_moves += statistics_moves;
-   sim::mc_statistics_reject += statistics_reject;
+   sim::mc_statistics_moves += global_statistics_moves;
+   sim::mc_statistics_reject += global_statistics_reject;
 
 	return EXIT_SUCCESS;
 }
