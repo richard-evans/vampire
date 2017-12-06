@@ -16,7 +16,6 @@
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
-#include <fstream>
 
 // program header
 #include "vdc.hpp"
@@ -61,22 +60,22 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    saturation = 0.0;
    light = 0.0;
 
-   // // we have resolved xy plane colours. to adjust bightness (x-axis) we
-   // // convert to HSL
-   // rgb2hsl(red, green, blue, hue, light, saturation);
-   //
-   // // adjust lightness to reflect z-axis orientation
-   // // find angle w.r.t. z-axis [value -pi/2 to pi/2]
-   // z_angle = std::atan(sz2/std::sqrt(sx2*sx2 + sy2*sy2));
-   // if ( z_angle >= 0.0 ){
-   //    light = light + (1.0 - light)*(2.0*z_angle/pi);
-   // }
-   // else {
-   //    light = light + light*(2.0*z_angle/pi);
-   // }
-   //
-   // // convert back to rgb to get final colour
-   // hsl2rgb(red, green, blue, hue, light, saturation);
+   // we have resolved xy plane colours. to adjust bightness (x-axis) we
+   // convert to HSL
+   rgb2hsl(red, green, blue, hue, light, saturation);
+
+   // adjust lightness to reflect z-axis orientation
+   // find angle w.r.t. z-axis [value -pi/2 to pi/2]
+   z_angle = std::atan(sz2/std::sqrt(sx2*sx2 + sy2*sy2));
+   if ( z_angle >= 0.0 ){
+      light = light + (1.0 - light)*(2.0*z_angle/pi);
+   }
+   else {
+      light = light + light*(2.0*z_angle/pi);
+   }
+
+   // convert back to rgb to get final colour
+   hsl2rgb(red, green, blue, hue, light, saturation);
 
    return;
 }
@@ -108,7 +107,7 @@ void rgb2hsl( double& red, double& green, double& blue, double& hue, double& lig
       hue = 0.0;
    }
    else if ( (maximum <= (red + 0.000001)) && (maximum >=  (red - 0.000001)) ){
-      hue = std::fmod( (green - blue)/chroma, 6.0 );
+      hue = std::fmod(std::fmod( (green - blue)/chroma, 6.0 ) + 6.0, 6.0);
    }
    else if ( (maximum <= (green + 0.000001)) && (maximum >=  (green - 0.000001)) ){
       hue = (blue - red)/chroma + 2.0;
@@ -122,7 +121,7 @@ void rgb2hsl( double& red, double& green, double& blue, double& hue, double& lig
    light = 0.5*(maximum + minimum);
 
    // saturation
-   if ( (chroma <= 1.000001) && (chroma >= (1.0 - 0.000001)) ){
+   if ( (light <= 1.000001) && (light >= (1.0 - 0.000001)) ){
       saturation = 0.0;
    }
    else {
