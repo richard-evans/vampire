@@ -97,23 +97,19 @@ void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vecto
    //------------------------------------------------------------------------------
 int mc_step_parallel(){
 
-	// Check for calling of function
-	if(err::check==true) std::cout << "montecarlo::mc_step_parallel has been called" << std::endl;
+   // Check for calling of function
+   if(err::check==true) std::cout << "montecarlo::mc_step_parallel has been called" << std::endl;
 
    if(internal::mc_parallel_initialized == false) {
       internal::mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
                                  vmpi::min_dimensions, vmpi::max_dimensions);
    }
 
-	// Declare arrays for spin states
-	std::valarray<double> Sold(3);
-	std::valarray<double> Snew(3);
-
-	// Temporaries
-	int atom=0;
-	double Eold=0.0;
-	double Enew=0.0;
-	double DE=0.0;
+   // Temporaries
+   int atom=0;
+   double Eold=0.0;
+   double Enew=0.0;
+   double DE=0.0;
 
    // Material dependent temperature rescaling
    std::vector<double> rescaled_material_kBTBohr(mp::num_materials);
@@ -135,58 +131,58 @@ int mc_step_parallel(){
       int nmoves = internal::c_octants[octant].size();
       vmpi::mpi_init_halo_swap();
       //loop over core atoms in current octant to begin single monte carlo step
-   	for(int i=0; i<nmoves; i++){
+      for(int i=0; i<nmoves; i++){
 
          // add one to number of moves counter
          statistics_moves+=1.0;
 
-   		// pick atom
-   		atom = internal::c_octants[octant][int(nmoves*mtrandom::grnd())];
+      	// pick atom
+      	atom = internal::c_octants[octant][int(nmoves*mtrandom::grnd())];
 
-   		// get material id
-   		const int imaterial=atoms::type_array[atom];
+      	// get material id
+      	const int imaterial=atoms::type_array[atom];
 
          // Calculate range for move
          sim::mc_delta_angle=sigma_array[imaterial];
 
-   		// Save old spin position
-   		Sold[0] = atoms::x_spin_array[atom];
-   		Sold[1] = atoms::y_spin_array[atom];
-   		Sold[2] = atoms::z_spin_array[atom];
+      	// Save old spin position
+      	internal::Sold[0] = atoms::x_spin_array[atom];
+      	internal::Sold[1] = atoms::y_spin_array[atom];
+      	internal::Sold[2] = atoms::z_spin_array[atom];
 
          // Make Monte Carlo move
-         internal::mc_move(Sold, Snew);
+         internal::mc_move(internal::Sold, internal::Snew);
 
-   		// Calculate current energy
-   		Eold = sim::calculate_spin_energy(atom);
+      	// Calculate current energy
+      	Eold = sim::calculate_spin_energy(atom);
 
-   		// Copy new spin position
-   		atoms::x_spin_array[atom] = Snew[0];
-   		atoms::y_spin_array[atom] = Snew[1];
-   		atoms::z_spin_array[atom] = Snew[2];
+      	// Copy new spin position
+      	atoms::x_spin_array[atom] = internal::Snew[0];
+      	atoms::y_spin_array[atom] = internal::Snew[1];
+      	atoms::z_spin_array[atom] = internal::Snew[2];
 
-   		// Calculate new energy
-   		Enew = sim::calculate_spin_energy(atom);
+      	// Calculate new energy
+      	Enew = sim::calculate_spin_energy(atom);
 
-   		// Calculate difference in Joules/mu_B
-   		DE = (Enew-Eold)*mp::material[imaterial].mu_s_SI*1.07828231e23; //1/9.27400915e-24
+      	// Calculate difference in Joules/mu_B
+      	DE = (Enew-Eold)*mp::material[imaterial].mu_s_SI*1.07828231e23; //1/9.27400915e-24
 
-   		// Check for lower energy state and accept unconditionally
-   		if(DE<0) continue;
-   		// Otherwise evaluate probability for move
-   		else{
-   			if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
-   			// If rejected reset spin coordinates and continue
-   			else{
-   				atoms::x_spin_array[atom] = Sold[0];
-   				atoms::y_spin_array[atom] = Sold[1];
-   				atoms::z_spin_array[atom] = Sold[2];
+      	// Check for lower energy state and accept unconditionally
+      	if(DE<0) continue;
+      	// Otherwise evaluate probability for move
+      	else{
+      		if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
+      		// If rejected reset spin coordinates and continue
+      		else{
+      			atoms::x_spin_array[atom] = internal::Sold[0];
+      			atoms::y_spin_array[atom] = internal::Sold[1];
+      			atoms::z_spin_array[atom] = internal::Sold[2];
                // add one to rejection counter
                statistics_reject += 1.0;
-   				continue;
-   			}
-   		}
-   	}
+      			continue;
+      		}
+      	}
+      }
 
       vmpi::mpi_complete_halo_swap();
 
@@ -208,20 +204,20 @@ int mc_step_parallel(){
          sim::mc_delta_angle=sigma_array[imaterial];
 
    		// Save old spin position
-   		Sold[0] = atoms::x_spin_array[atom];
-   		Sold[1] = atoms::y_spin_array[atom];
-   		Sold[2] = atoms::z_spin_array[atom];
+   		internal::Sold[0] = atoms::x_spin_array[atom];
+   		internal::Sold[1] = atoms::y_spin_array[atom];
+   		internal::Sold[2] = atoms::z_spin_array[atom];
 
          // Make Monte Carlo move
-         internal::mc_move(Sold, Snew);
+         internal::mc_move(internal::Sold, internal::Snew);
 
    		// Calculate current energy
    		Eold = sim::calculate_spin_energy(atom);
 
    		// Copy new spin position
-   		atoms::x_spin_array[atom] = Snew[0];
-   		atoms::y_spin_array[atom] = Snew[1];
-   		atoms::z_spin_array[atom] = Snew[2];
+   		atoms::x_spin_array[atom] = internal::Snew[0];
+   		atoms::y_spin_array[atom] = internal::Snew[1];
+   		atoms::z_spin_array[atom] = internal::Snew[2];
 
    		// Calculate new energy
    		Enew = sim::calculate_spin_energy(atom);
@@ -236,9 +232,9 @@ int mc_step_parallel(){
    			if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
    			// If rejected reset spin coordinates and continue
    			else{
-   				atoms::x_spin_array[atom] = Sold[0];
-   				atoms::y_spin_array[atom] = Sold[1];
-   				atoms::z_spin_array[atom] = Sold[2];
+   				atoms::x_spin_array[atom] = internal::Sold[0];
+   				atoms::y_spin_array[atom] = internal::Sold[1];
+   				atoms::z_spin_array[atom] = internal::Sold[2];
                // add one to rejection counter
                statistics_reject += 1.0;
    				continue;

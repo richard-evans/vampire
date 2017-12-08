@@ -148,20 +148,19 @@ void rotate_spins_around_z_axis(double ddz){
 
 	// loop over all spins and rotate by theta around z
 	for(int atom =0;atom<atoms::num_atoms;atom++){
-			std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
 
 			// Load spin coordinates
-			Sold[0]=atoms::x_spin_array[atom];
-			Sold[1]=atoms::y_spin_array[atom];
-			Sold[2]=atoms::z_spin_array[atom];
+			internal::Sold[0]=atoms::x_spin_array[atom];
+			internal::Sold[1]=atoms::y_spin_array[atom];
+			internal::Sold[2]=atoms::z_spin_array[atom];
 
 			// Calculate new spin positions
-			Snew = vmath::matmul(Sold,z_rotation_matrix);
+			internal::Snew = vmath::matmul(internal::Sold,z_rotation_matrix);
 
 			// Set new spin positions
-			atoms::x_spin_array[atom]=Snew[0];
-			atoms::y_spin_array[atom]=Snew[1];
-			atoms::z_spin_array[atom]=Snew[2];
+			atoms::x_spin_array[atom]=internal::Snew[0];
+			atoms::y_spin_array[atom]=internal::Snew[1];
+			atoms::z_spin_array[atom]=internal::Snew[2];
 		}
 
 	return;
@@ -179,20 +178,19 @@ void rotate_spins_around_x_axis(double ddx){
 
 	// loop over all spins and rotate by phi around x
 	for(int atom =0;atom<atoms::num_atoms;atom++){
-		std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
 
 		// Load spin coordinates
-		Sold[0]=atoms::x_spin_array[atom];
-		Sold[1]=atoms::y_spin_array[atom];
-		Sold[2]=atoms::z_spin_array[atom];
+		internal::Sold[0]=atoms::x_spin_array[atom];
+		internal::Sold[1]=atoms::y_spin_array[atom];
+		internal::Sold[2]=atoms::z_spin_array[atom];
 
 		// Calculate new spin positions
-		Snew = vmath::matmul(Sold,x_rotation_matrix);
+		internal::Snew = vmath::matmul(internal::Sold,x_rotation_matrix);
 
 		// Set new spin positions
-		atoms::x_spin_array[atom]=Snew[0];
-		atoms::y_spin_array[atom]=Snew[1];
-		atoms::z_spin_array[atom]=Snew[2];
+		atoms::x_spin_array[atom]=internal::Snew[0];
+		atoms::y_spin_array[atom]=internal::Snew[1];
+		atoms::z_spin_array[atom]=internal::Snew[2];
 	}
 
 	return;
@@ -301,8 +299,8 @@ int cmc_step(){
 	double Eold;
 	double Enew;
 
-	std::valarray<double> spin1_initial(3);
-	std::valarray<double> spin1_final(3);
+	std::vector<double> spin1_initial(3);
+	std::vector<double> spin1_final(3);
 	double spin2_initial[3];
 	double spin2_final[3];
 

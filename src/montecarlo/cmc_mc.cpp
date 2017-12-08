@@ -149,20 +149,19 @@ void rotate_material_spins_around_z_axis(double ddz, int material){
 	for(int atom =0;atom<atoms::num_atoms;atom++){
 		int mat=atoms::type_array[atom];
 		if(mat==material){
-			std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
 
 			// Load spin coordinates
-			Sold[0]=atoms::x_spin_array[atom];
-			Sold[1]=atoms::y_spin_array[atom];
-			Sold[2]=atoms::z_spin_array[atom];
+			internal::Sold[0]=atoms::x_spin_array[atom];
+			internal::Sold[1]=atoms::y_spin_array[atom];
+			internal::Sold[2]=atoms::z_spin_array[atom];
 
 			// Calculate new spin positions
-			Snew = vmath::matmul(Sold,z_rotation_matrix);
+			internal::Snew = vmath::matmul(internal::Sold,z_rotation_matrix);
 
 			// Set new spin positions
-			atoms::x_spin_array[atom]=Snew[0];
-			atoms::y_spin_array[atom]=Snew[1];
-			atoms::z_spin_array[atom]=Snew[2];
+			atoms::x_spin_array[atom]=internal::Snew[0];
+			atoms::y_spin_array[atom]=internal::Snew[1];
+			atoms::z_spin_array[atom]=internal::Snew[2];
 		}
 	}
 
@@ -181,20 +180,19 @@ void rotate_material_spins_around_x_axis(double ddx, int material){
 	for(int atom =0;atom<atoms::num_atoms;atom++){
 		int mat=atoms::type_array[atom];
 		if(mat==material){
-			std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
 
 			// Load spin coordinates
-			Sold[0]=atoms::x_spin_array[atom];
-			Sold[1]=atoms::y_spin_array[atom];
-			Sold[2]=atoms::z_spin_array[atom];
+			internal::Sold[0]=atoms::x_spin_array[atom];
+			internal::Sold[1]=atoms::y_spin_array[atom];
+			internal::Sold[2]=atoms::z_spin_array[atom];
 
 			// Calculate new spin positions
-			Snew = vmath::matmul(Sold,x_rotation_matrix);
+			internal::Snew = vmath::matmul(internal::Sold,x_rotation_matrix);
 
 			// Set new spin positions
-			atoms::x_spin_array[atom]=Snew[0];
-			atoms::y_spin_array[atom]=Snew[1];
-			atoms::z_spin_array[atom]=Snew[2];
+			atoms::x_spin_array[atom]=internal::Snew[0];
+			atoms::y_spin_array[atom]=internal::Snew[1];
+			atoms::z_spin_array[atom]=internal::Snew[2];
 		}
 	}
 
@@ -310,8 +308,8 @@ int cmc_mc_step(){
 	double Eold;
 	double Enew;
 
-   std::valarray<double> spin1_initial(3);
-	std::valarray<double> spin1_final(3);
+   std::vector<double> spin1_initial(3);
+	std::vector<double> spin1_final(3);
 	double spin2_initial[3];
 	double spin2_final[3];
 

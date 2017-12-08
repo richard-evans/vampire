@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
-#include <valarray>
+#include <vector>
 
 // Vampire headers
 #include "montecarlo.hpp"
@@ -39,13 +39,18 @@ namespace montecarlo{
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
+      //MC Variables
+      extern std::vector<double> Sold;
+      extern std::vector<double> Snew;
+
+      //MC-MPI variables
       extern std::vector<std::vector<int> > c_octants; //Core atoms of each octant
       extern std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
       extern bool mc_parallel_initialized;
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
-      void mc_move(const std::valarray<double>&, std::valarray<double>&);
+      void mc_move(const std::vector<double>&, std::vector<double>&);
 
    } // end of internal namespace
 

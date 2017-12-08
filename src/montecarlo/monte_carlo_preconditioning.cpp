@@ -58,10 +58,6 @@ void monte_carlo_preconditioning(){
    // spurious edge dynamics
 	const int num_moves = atoms::num_atoms;
 
-	// Declare arrays for spin states
-	std::valarray<double> old_spin(3);
-	std::valarray<double> new_spin(3);
-
    // Material dependent temperature rescaling unrolled for speed
    std::vector<double> rescaled_material_kBTBohr(mp::num_materials);
    std::vector<double> moment_array(mp::num_materials); // mu_s/mu_B
@@ -99,14 +95,14 @@ void monte_carlo_preconditioning(){
          //std::cout << "here-1 " << sim::mc_delta_angle << std::endl;
 
    		// Save old spin position
-   		old_spin[0] = atoms::x_spin_array[atom];
-   		old_spin[1] = atoms::y_spin_array[atom];
-   		old_spin[2] = atoms::z_spin_array[atom];
+   		internal::Sold[0] = atoms::x_spin_array[atom];
+   		internal::Sold[1] = atoms::y_spin_array[atom];
+   		internal::Sold[2] = atoms::z_spin_array[atom];
 
          //std::cout << "here0" << std::endl;
 
          // Make Monte Carlo move
-         montecarlo::internal::mc_move(old_spin, new_spin);
+         montecarlo::internal::mc_move(internal::Sold, internal::Snew);
 
          //std::cout << "here" << std::endl;
 
@@ -114,9 +110,9 @@ void monte_carlo_preconditioning(){
    		double old_energy = sim::calculate_spin_energy(atom);
 
    		// Copy new spin position
-   		atoms::x_spin_array[atom] = new_spin[0];
-   		atoms::y_spin_array[atom] = new_spin[1];
-   		atoms::z_spin_array[atom] = new_spin[2];
+   		atoms::x_spin_array[atom] = internal::Snew[0];
+   		atoms::y_spin_array[atom] = internal::Snew[1];
+   		atoms::z_spin_array[atom] = internal::Snew[2];
 
          //std::cout << "here2" << std::endl;
 
@@ -134,9 +130,9 @@ void monte_carlo_preconditioning(){
    			if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
    			// If rejected reset spin coordinates and continue
    			else{
-   				atoms::x_spin_array[atom] = old_spin[0];
-   				atoms::y_spin_array[atom] = old_spin[1];
-   				atoms::z_spin_array[atom] = old_spin[2];
+   				atoms::x_spin_array[atom] = internal::Sold[0];
+   				atoms::y_spin_array[atom] = internal::Sold[1];
+   				atoms::z_spin_array[atom] = internal::Sold[2];
    				continue;
    			}
    		}

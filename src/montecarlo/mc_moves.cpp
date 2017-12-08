@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 //
 // standard library header files
-#include <valarray>
+#include <vector>
 
 // vampire header files
 #include "random.hpp"
@@ -24,18 +24,18 @@ namespace montecarlo{
 namespace internal{
 
 // Function declarations
-void mc_gaussian(const std::valarray<double>&, std::valarray<double>&);
-void mc_spin_flip(const std::valarray<double>&, std::valarray<double>&);
-void mc_uniform(std::valarray<double>&);
-void mc_angle(const std::valarray<double>&, std::valarray<double>&);
-void mc_hinzke_nowak(const std::valarray<double>&, std::valarray<double>&);
+void mc_gaussian(const std::vector<double>&, std::vector<double>&);
+void mc_spin_flip(const std::vector<double>&, std::vector<double>&);
+void mc_uniform(std::vector<double>&);
+void mc_angle(const std::vector<double>&, std::vector<double>&);
+void mc_hinzke_nowak(const std::vector<double>&, std::vector<double>&);
 
 ///--------------------------------------------------------
 ///
 ///  Master function to call desired Monte Carlo move
 ///
 ///--------------------------------------------------------
-void mc_move(const std::valarray<double>& old_spin, std::valarray<double>& new_spin){
+void mc_move(const std::vector<double>& old_spin, std::vector<double>& new_spin){
 
    // Reference enum list for readability
    using namespace sim;
@@ -65,7 +65,7 @@ void mc_move(const std::valarray<double>& old_spin, std::valarray<double>& new_s
 
 /// Angle move
 /// Move spin within cone near old position
-void mc_angle(const std::valarray<double>& old_spin, std::valarray<double>& new_spin){
+void mc_angle(const std::vector<double>& old_spin, std::vector<double>& new_spin){
 
    new_spin[0]=old_spin[0]+mtrandom::gaussian()*sim::mc_delta_angle;
    new_spin[1]=old_spin[1]+mtrandom::gaussian()*sim::mc_delta_angle;
@@ -75,7 +75,9 @@ void mc_angle(const std::valarray<double>& old_spin, std::valarray<double>& new_
    const double r = 1.0/sqrt (new_spin[0]*new_spin[0]+new_spin[1]*new_spin[1]+new_spin[2]*new_spin[2]);
 
    // Apply normalisation
-   new_spin*=r;
+   for (int i=0; i < new_spin.size(); i++) {
+      new_spin[i]*=r;
+   }
 
    return;
 
@@ -83,7 +85,7 @@ void mc_angle(const std::valarray<double>& old_spin, std::valarray<double>& new_
 
 /// Spin flip move
 /// Reverse spin direction
-void mc_spin_flip(const std::valarray<double>& old_spin, std::valarray<double>& new_spin){
+void mc_spin_flip(const std::vector<double>& old_spin, std::vector<double>& new_spin){
 
    new_spin[0]=-old_spin[0];
    new_spin[1]=-old_spin[1];
@@ -95,7 +97,7 @@ void mc_spin_flip(const std::valarray<double>& old_spin, std::valarray<double>& 
 
 /// Random move
 /// Place spin randomly on unit sphere
-void mc_uniform(std::valarray<double>& new_spin){
+void mc_uniform(std::vector<double>& new_spin){
 
    new_spin[0]=mtrandom::gaussian();
    new_spin[1]=mtrandom::gaussian();
@@ -105,7 +107,9 @@ void mc_uniform(std::valarray<double>& new_spin){
    const double r = 1.0/sqrt (new_spin[0]*new_spin[0]+new_spin[1]*new_spin[1]+new_spin[2]*new_spin[2]);
 
    // Apply normalisation
-   new_spin*=r;
+   for (int i=0; i < new_spin.size(); i++) {
+      new_spin[i]*=r;
+   }
 
    return;
 
@@ -116,7 +120,7 @@ void mc_uniform(std::valarray<double>& new_spin){
 /// D. Hinzke, U. Nowak, Computer Physics Communications 121–122 (1999) 334–337
 /// "Monte Carlo simulation of magnetization switching in a Heisenberg model for small ferromagnetic particles"
 ///
-void mc_hinzke_nowak(const std::valarray<double>& old_spin, std::valarray<double>& new_spin){
+void mc_hinzke_nowak(const std::vector<double>& old_spin, std::vector<double>& new_spin){
 
    // Select random move type
    const int pick_move=int(3.0*mtrandom::grnd());
