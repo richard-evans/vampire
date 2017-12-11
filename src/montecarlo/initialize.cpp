@@ -13,6 +13,7 @@
 // C++ standard library headers
 
 // Vampire headers
+#include "material.hpp"
 #include "montecarlo.hpp"
 
 // montecarlo module headers
@@ -24,8 +25,18 @@ namespace montecarlo{
    // Function to initialize montecarlo module
    //----------------------------------------------------------------------------
    void initialize(){
+      internal::num_materials = mp::num_materials;
+      internal::temperature_rescaling_alpha.resize(mp::num_materials);
+      internal::temperature_rescaling_Tc.resize(mp::num_materials);
+      internal::mu_s_SI.resize(mp::num_materials);
+      for(int i=0; i < mp::num_materials; i++) {
+         internal::temperature_rescaling_alpha[i] = mp::material[i].temperature_rescaling_alpha;
+         internal::temperature_rescaling_Tc[i] = mp::material[i].temperature_rescaling_Tc;
+         internal::mu_s_SI[i] = mp::material[i].mu_s_SI;
+      }
 
-      internal::mc_parallel_initialized = false;
+
+      mc_parallel_initialized = false;
       internal::c_octants.resize(8);
       internal::b_octants.resize(8);
 

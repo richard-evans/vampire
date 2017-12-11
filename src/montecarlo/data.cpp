@@ -25,18 +25,26 @@ namespace montecarlo{
    // Externally visible variables
    //------------------------------------------------------------------------------
 
+   bool mc_parallel_initialized;
+
    namespace internal{
       //------------------------------------------------------------------------
       // Shared variables inside montecarlo module
       //------------------------------------------------------------------------
+      //Materials Variables
+      int num_materials;
+      std::vector<double> temperature_rescaling_alpha;
+      std::vector<double> temperature_rescaling_Tc;
+      std::vector<double> mu_s_SI;
+
       //MC Variables
+      double mc_delta_angle;
       std::vector<double> Sold(3);
    	std::vector<double> Snew(3);
 
       //MC-MPI variables
       std::vector<std::vector<int> > c_octants; //Core atoms of each octant
       std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
-      bool mc_parallel_initialized;
 
 
    } // end of internal namespace

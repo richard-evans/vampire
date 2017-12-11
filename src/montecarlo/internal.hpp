@@ -39,14 +39,20 @@ namespace montecarlo{
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
+      //Materials Variables
+      extern int num_materials;
+      extern std::vector<double> temperature_rescaling_alpha;
+      extern std::vector<double> temperature_rescaling_Tc;
+      extern std::vector<double> mu_s_SI;
+
       //MC Variables
+      extern double mc_delta_angle;
       extern std::vector<double> Sold;
       extern std::vector<double> Snew;
 
       //MC-MPI variables
       extern std::vector<std::vector<int> > c_octants; //Core atoms of each octant
       extern std::vector<std::vector<int> > b_octants; //Boundary atoms of each octant
-      extern bool mc_parallel_initialized;
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------

@@ -598,7 +598,7 @@ void integrate_serial(int n_steps){
 
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
-				montecarlo::mc_step();
+				montecarlo::mc_step(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::num_atoms, atoms::type_array);
 				// increment time
 				increment_time();
 			}
@@ -685,7 +685,12 @@ int integrate_mpi(int n_steps){
 		case 1: // Montecarlo
 			for(int ti=0;ti<n_steps;ti++){
 				#ifdef MPICF
-               montecarlo::mc_step_parallel();
+               if(montecarlo::mc_parallel_initialized == false) {
+                  montecarlo::mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+                                               vmpi::min_dimensions, vmpi::max_dimensions);
+               }
+               montecarlo::mc_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+                                            atoms::type_array);
             #endif
 				// increment time
 				increment_time();
