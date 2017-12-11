@@ -25,6 +25,7 @@ namespace montecarlo{
    // Function to initialize montecarlo module
    //----------------------------------------------------------------------------
    void initialize(){
+      //Copy materials data into internal namespace
       internal::num_materials = mp::num_materials;
       internal::temperature_rescaling_alpha.resize(mp::num_materials);
       internal::temperature_rescaling_Tc.resize(mp::num_materials);
@@ -35,7 +36,7 @@ namespace montecarlo{
          internal::mu_s_SI[i] = mp::material[i].mu_s_SI;
       }
 
-
+      //Initialize parallel mc variables
       mc_parallel_initialized = false;
       internal::c_octants.resize(8);
       internal::b_octants.resize(8);

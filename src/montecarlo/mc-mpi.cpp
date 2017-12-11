@@ -111,8 +111,12 @@ int mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_s
    for(int octant = 0; octant < 8; octant++) {
 
       int nmoves = internal::c_octants[octant].size();
+      //Initialise non-blocking send
       vmpi::mpi_init_halo_swap();
-      //loop over core atoms in current octant to begin single monte carlo step
+
+      //
+      //Integrate core region
+      //
       for(int i=0; i<nmoves; i++){
 
          // add one to number of moves counter
@@ -166,11 +170,13 @@ int mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_s
       	}
       }
 
+      //Finish non-blocking data send/receive
       vmpi::mpi_complete_halo_swap();
 
+      //
+      //Begin integrating boundary region
+      //
       nmoves = internal::b_octants[octant].size();
-
-      //Loop over all atoms in boundary region to complete monte carlo step
       for(int i=0; i<nmoves; i++){
 
          // add one to number of moves counter
@@ -243,7 +249,7 @@ int mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_s
    sim::mc_statistics_moves += global_statistics_moves;
    sim::mc_statistics_reject += global_statistics_reject;
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 } // End of namespace montecarlo

@@ -93,9 +93,9 @@ int mc_step(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array
       if(DE<0) continue;
       // Otherwise evaluate probability for move
       else{
-			if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
+          if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
 	      // If rejected reset spin coordinates and continue
-	        else{
+            else{
              x_spin_array[atom] = internal::Sold[0];
              y_spin_array[atom] = internal::Sold[1];
              z_spin_array[atom] = internal::Sold[2];
