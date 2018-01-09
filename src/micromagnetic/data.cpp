@@ -36,6 +36,7 @@ namespace micromagnetic{
    std::vector < double > list_of_none_atomistic_atoms;
    std::vector < double > list_of_micromagnetic_cells;
 
+
    //sets initial values to 0
    int number_of_atomistic_atoms = 0;
    int number_of_none_atomistic_atoms = 0;
@@ -76,6 +77,8 @@ namespace micromagnetic{
 
       int resistance_layer_1 = 0;
       int resistance_layer_2 = 0;
+
+      std::vector <double> fmr_H(3,0.0);
 
       //stores the micromagnetic properties of the macrocells
       std::vector<double> A;

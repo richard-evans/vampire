@@ -113,6 +113,12 @@ namespace micromagnetic{
       spin_field[1] = one_o_chi_perp[cell]*m[1]*m_e[cell] + ext_field[1] + cells::field_array_y[cell] + exchange_field[1] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];// + sim::track_field_y[cell];
       spin_field[2] =                                     + ext_field[2] + cells::field_array_z[cell] + exchange_field[2] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];// + sim::track_field_z[cell];
 
+      if (sim::enable_fmr){
+         spin_field[0] = spin_field[0] + fmr_H[0];
+         spin_field[1] = spin_field[1] + fmr_H[1];
+         spin_field[2] = spin_field[2] + fmr_H[2];
+
+      }
       if (environment::enabled){
          spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
          spin_field[1] = spin_field[1] + environment::environment_field_y[cell];

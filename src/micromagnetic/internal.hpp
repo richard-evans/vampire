@@ -62,6 +62,9 @@ namespace micromagnetic{
       extern std::vector<double> ms;
       extern std::vector<double> Tc;
 
+
+      extern std::vector <double> fmr_H;
+
       extern std::vector <double> pinning_field_x;
       extern std::vector <double> pinning_field_y;
       extern std::vector <double> pinning_field_z;

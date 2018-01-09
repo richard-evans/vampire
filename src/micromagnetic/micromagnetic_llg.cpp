@@ -130,6 +130,17 @@ namespace micromagnetic{
       mm::ext_field[1] = H*Hy;
       mm::ext_field[2] = H*Hz;
 
+      const double real_time = sim::time*mp::dt_SI;
+   	const double omega = sim::fmr_field_frequency*1.e9; // Hz
+   	const double Hfmrx = sim::fmr_field_unit_vector[0];
+   	const double Hfmry = sim::fmr_field_unit_vector[1];
+   	const double Hfmrz = sim::fmr_field_unit_vector[2];
+   	const double Hsinwt = sim::fmr_field_strength * sin(2.0 * M_PI * omega * real_time);
+   	mm::fmr_H[0] = Hfmrx * Hsinwt;
+   	mm::fmr_H[1] = Hfmry * Hsinwt;
+   	mm::fmr_H[2] = Hfmrz * Hsinwt;
+
+
       //save this new m as the initial value, so it can be saved and used in the final equation.
       //normalises the x,y,z magnetisatyions to have a lenfth of 1
       for (int lc = 0; lc < num_local_cells; lc++){
