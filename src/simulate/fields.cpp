@@ -22,13 +22,13 @@
 //
 // ----------------------------------------------------------------------------
 //
-//====================================================================================================
+//=============================================================================
 //
-//       				                    	Fields
+//                                     Fields
 //
-//  			 		Subroutines to calculate fields for the hamiltonian
+//              Subroutines to calculate fields for the hamiltonian
 //
-//									Version 1.0 R Evans 20/10/2008
+//                         Version 1.0 R Evans 20/10/2008
 //
 //====================================================================================================
 #include "anisotropy.hpp"
@@ -65,6 +65,7 @@ void calculate_lagrange_fields(const int,const int);
 void calculate_full_spin_fields(const int start_index,const int end_index);
 
 int calculate_spin_fields(const int start_index,const int end_index){
+
 	///======================================================
 	/// 		Subroutine to calculate spin dependent fields
 	///
@@ -137,7 +138,7 @@ int calculate_external_fields(const int start_index,const int end_index){
 
       // Local thermal Fields
       ltmp::get_localised_thermal_fields(atoms::x_total_external_field_array,atoms::y_total_external_field_array,
-                                         atoms::z_total_external_field_array, start_index, end_index);
+            atoms::z_total_external_field_array, start_index, end_index);
 
       // Applied Fields
       if(sim::hamiltonian_simulation_flags[2]==1) calculate_applied_fields(start_index,end_index);
@@ -237,17 +238,18 @@ int calculate_applied_fields(const int start_index,const int end_index){
 	}
 
 	return 0;
+
 }
 
 int calculate_thermal_fields(const int start_index,const int end_index){
-	///======================================================
-	/// 		Subroutine to calculate thermal fields
-	///
+   ///======================================================
+   /// 		Subroutine to calculate thermal fields
+   ///
    ///      Version 1.2 R Evans 12/08/2014
-	///======================================================
+   ///======================================================
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "calculate_thermal_fields has been called" << std::endl;}
+   // check calling of routine if error checking is activated
+   if(err::check==true){std::cout << "calculate_thermal_fields has been called" << std::endl;}
 
    // unroll sigma for speed
    std::vector<double> sigma_prefactor(0);
@@ -267,48 +269,48 @@ int calculate_thermal_fields(const int start_index,const int end_index){
       sigma_prefactor.push_back(sqrt_T*mp::material[mat].H_th_sigma);
    }
 
- 	generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-	generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-	generate (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::x_total_external_field_array.begin()+start_index,atoms::x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::y_total_external_field_array.begin()+start_index,atoms::y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+   generate (atoms::z_total_external_field_array.begin()+start_index,atoms::z_total_external_field_array.begin()+end_index, mtrandom::gaussian);
 
-	for(int atom=start_index;atom<end_index;atom++){
+   for(int atom=start_index;atom<end_index;atom++){
 
-		const int imaterial=atoms::type_array[atom];
+      const int imaterial=atoms::type_array[atom];
       const double H_th_sigma = sigma_prefactor[imaterial];
 
-		atoms::x_total_external_field_array[atom] *= H_th_sigma;
+      atoms::x_total_external_field_array[atom] *= H_th_sigma;
 		atoms::y_total_external_field_array[atom] *= H_th_sigma;
 		atoms::z_total_external_field_array[atom] *= H_th_sigma;
 	}
 
-	return EXIT_SUCCESS;
+   return EXIT_SUCCESS;
 }
 
 int calculate_dipolar_fields(const int start_index,const int end_index){
+
 	///======================================================
 	/// 		Subroutine to calculate dipolar fields
 	///
 	///			Version 1.0 R Evans 02/11/2009
 	///======================================================
-
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
-	if(err::check==true){std::cout << "calculate_dipolar_fields has been called" << std::endl;}
+   if(err::check==true){std::cout << "calculate_dipolar_fields has been called" << std::endl;}
 
-	// Add dipolar fields
-	if(dipole::activated){
-	   for(int atom=start_index;atom<end_index;atom++){
-		   atoms::x_total_external_field_array[atom] += dipole::atom_dipolar_field_array_x[atom];
-			atoms::y_total_external_field_array[atom] += dipole::atom_dipolar_field_array_y[atom];
-			atoms::z_total_external_field_array[atom] += dipole::atom_dipolar_field_array_z[atom];
-			/*std::cout << atoms::x_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_x[atom] << "\t";
-			std::cout << atoms::y_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_y[atom] << "\t";
-			std::cout << atoms::z_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_z[atom] << std::endl;*/
+   // Add dipolar fields
+   if(dipole::activated){
+      for(int atom=start_index;atom<end_index;atom++){
+         atoms::x_total_external_field_array[atom] += dipole::atom_dipolar_field_array_x[atom];
+         atoms::y_total_external_field_array[atom] += dipole::atom_dipolar_field_array_y[atom];
+         atoms::z_total_external_field_array[atom] += dipole::atom_dipolar_field_array_z[atom];
+         /*std::cout << atoms::x_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_x[atom] << "\t";
+         std::cout << atoms::y_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_y[atom] << "\t";
+         std::cout << atoms::z_total_external_field_array[atom] << "\t" <<  dipole::atom_dipolar_field_array_z[atom] << std::endl;*/
       }
-	}
+   }
 
-	return 0;
+   return 0;
 }
 
 void calculate_hamr_fields(const int start_index,const int end_index){
@@ -433,6 +435,7 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 	}
 
 	return;
+
 }
 
 ///------------------------------------------------------

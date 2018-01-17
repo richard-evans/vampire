@@ -40,9 +40,6 @@ namespace cells{
    std::vector<int> index_atoms_array1D; /// array to store list of atoms associated with cells in 1D structure
 
    std::vector<double> volume_array;
-   std::vector<double> cell_coords_array_x; /// arrays to store cells positions
-   std::vector<double> cell_coords_array_y;
-   std::vector<double> cell_coords_array_z;
    std::vector < std::vector <double> > atom_in_cell_coords_array_x;
    std::vector < std::vector <double> > atom_in_cell_coords_array_y;
    std::vector < std::vector <double> > atom_in_cell_coords_array_z;

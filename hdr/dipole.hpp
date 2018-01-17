@@ -26,12 +26,15 @@ namespace dipole{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
-   extern int update_rate; /// timesteps between updates
    extern bool activated;
-   extern std::vector<double> cells_field_array_x;             /// arrays to store cells B-field
+
+   extern int update_rate; /// timesteps between updates
+   extern int update_time; /// last update time
+
+   extern std::vector<double> cells_field_array_x; /// arrays to store cells field
    extern std::vector<double> cells_field_array_y;
    extern std::vector<double> cells_field_array_z;
-   extern std::vector<double> atom_dipolar_field_array_x;   /// arrays to store atoms B-field
+   extern std::vector<double> atom_dipolar_field_array_x;
    extern std::vector<double> atom_dipolar_field_array_y;
    extern std::vector<double> atom_dipolar_field_array_z;
 

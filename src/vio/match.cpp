@@ -22,6 +22,7 @@
 #include "errors.hpp"
 #include "exchange.hpp"
 #include "material.hpp"
+#include "gpu.hpp"
 #include "grains.hpp"
 #include "stats.hpp"
 #include "units.hpp"
@@ -71,10 +72,12 @@ namespace vin{
         else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
         //===================================================================
         // Test for create variables

@@ -30,23 +30,35 @@ namespace anisotropy{
       // Shared variables inside anisotropy module
       //------------------------------------------------------------------------
 
-      std::vector<internal::mp_t> mp; // array of material properties
+      std::vector<internal::mp_t> mp(0); // array of material properties
 
       bool initialised = false; // variable to determine if module has been initialised
-
-      bool enable_second_order_tensor = false; // Flag to enable calculation of second order tensor anisotropy
-      bool enable_fourth_order_tensor = false; // Flag to enable calculation of second order tensor anisotropy
-      bool enable_sixth_order_tensor  = false; // Flag to enable calculation of second order tensor anisotropy
 
       bool enable_neel_anisotropy     = false; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
       bool enable_lattice_anisotropy  = false; // Flag to turn on lattice anisotropy calculation
       bool enable_random_anisotropy   = false; // Flag to enable random anisitropy initialisation
 
-      // arrays for storing 1D collapsed tensors
-      std::vector<double> second_order_tensor(0);
-      std::vector<double> fourth_order_tensor(0);
-      std::vector<double> sixth_order_tensor(0);
+      bool enable_uniaxial_second_order = false; // Flag to enable calculation of second order anisotropy
+      bool enable_uniaxial_fourth_order = false; // Flag to enable calculation of fourth order anisotropy
+      bool enable_uniaxial_sixth_order  = false; // Flag to enable calculation of sixth order anisotropy
+
+      bool enable_cubic_fourth_order    = false; // Flag to enable calculation of fourth order cubic anisotropy
+      bool enable_cubic_sixth_order     = false; // Flag to enable calculation of sixth order cubic  anisotropy
+
+      // array for storing 1D second order collapsed tensor for Neel anisotropy
       std::vector<double> neel_tensor(0);
+
+      // arrays for storing unrolled anisotropy constants in Tesla
+      std::vector<double> ku2(0);
+      std::vector<double> ku4(0);
+      std::vector<double> ku6(0);
+      std::vector<double> kc4(0);
+      std::vector<double> kc6(0);
+
+      // unrolled arrays for storing easy axes for each material
+      std::vector<evec_t> ku_vector(0); // 001 easy axis direction
+      std::vector<evec_t> kc_vector(0); // 001 vector for cubic anisotropy
+      //std::vector<evec_t> kc_vector_b(0); // 100 vector for cubic anisotropy
 
       bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
    	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
@@ -54,7 +66,6 @@ namespace anisotropy{
 
       // arrays for storing unrolled parameters for lattice anisotropy
       std::vector<double> klattice_array(0); // anisoptropy constant
-      std::vector<evec_t> elattice_array(0); // easy axis
 
    } // end of internal namespace
 

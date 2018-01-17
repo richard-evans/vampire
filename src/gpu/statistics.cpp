@@ -13,22 +13,60 @@
 #include "gpu.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
-//#include "opencl.hpp"
+#include "vopencl.hpp"
 
 namespace gpu{
 
-   //-------------------------------------------------------------------------------
-   // Function to call correct statistics update function
-   //-------------------------------------------------------------------------------
-   void stats_update(){
+   namespace stats{
 
-      #ifdef CUDA
-         cuda::stats_update();
-      #elseif OPENCL
-         opencl::stats_update();
-      #endif
+      //-------------------------------------------------------------------------------
+      // Function to call correct statistics update function on device
+      //-------------------------------------------------------------------------------
+      void update(){
 
-      return;
-   }
+         #ifdef CUDA
+            vcuda::stats::update();
+         #elif OPENCL
+            vopencl::stats::update();
+         #endif
+
+         return;
+      }
+
+      //-------------------------------------------------------------------------------
+      // Function to get statistics module data from device for output
+      //
+      // Remember to use the set_magnetization in the magnetization_statistic_t instances
+      //
+      // There is a performance penalty for rapid updates of statistics for output
+      // to disk.
+      //
+      //-------------------------------------------------------------------------------
+      void get(){
+
+         #ifdef CUDA
+            vcuda::stats::get();
+         #elif OPENCL
+            vopencl::stats::get();
+         #endif
+
+         return;
+      }
+
+      //-------------------------------------------------------------------------------
+      // Function to reset statistics counters on device
+      //-------------------------------------------------------------------------------
+      void reset(){
+
+         #ifdef CUDA
+            vcuda::stats::reset();
+         #elif OPENCL
+            vopencl::stats::reset();
+         #endif
+
+         return;
+      }
+
+   } // end of stats namespace
 
 } // end of namespace gpu

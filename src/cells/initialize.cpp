@@ -214,6 +214,7 @@ namespace cells{
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
          if(mp::material[type].non_magnetic==0){
+
             cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+1] += atom_coords_y[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+2] += atom_coords_z[atom]*mus;

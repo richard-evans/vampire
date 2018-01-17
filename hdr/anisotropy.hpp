@@ -53,9 +53,15 @@ namespace anisotropy
    double single_spin_energy(const int atom, const int imaterial, const double sx, const double sy, const double sz, const double temperature);
 
    //-----------------------------------------------------------------------------
-   // function to get second order anisotropy constant
+   // functions to get anisotropy constants
    //-----------------------------------------------------------------------------
    double get_anisotropy_constant(const int material);
+   double get_ku2(const int material);
+   double get_ku4(const int material);
+   double get_ku6(const int material);
+   double get_kc4(const int material);
+   double get_kc6(const int material);
+   std::vector<double> get_ku_vector(const int material);
 
    //-----------------------------------------------------------------------------
    // function to identify surface atoms

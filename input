@@ -7,11 +7,6 @@
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
-create:crystal-structure=sc
-
-#------------------------------------------
-# System Dimensions:
-#------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
 dimensions:system-size-x = 7.7 !nm
 dimensions:system-size-y = 7.7 !nm
@@ -26,7 +21,7 @@ material:file=Co.mat
 # Simulation attributes:
 #------------------------------------------
 sim:temperature=300.0
-sim:time-steps-increment=10
+sim:time-steps-increment=1000
 sim:total-time-steps=10000
 sim:time-step=1.0E-15
 
@@ -40,12 +35,7 @@ sim:integrator=llg-heun
 # data output
 #------------------------------------------
 output:real-time
-output:temperature
 output:magnetisation
-output:magnetisation-length
-output:output-rate = 1000
-
-config:atoms
 
 screen:time-steps
 screen:magnetisation-length

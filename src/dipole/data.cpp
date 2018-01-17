@@ -22,6 +22,8 @@ namespace dipole{
    // Externally visible variables
    //------------------------------------------------------------------------------
    int update_rate=100; /// timesteps between updates
+   int update_time=-1; /// last update time
+
    bool activated=false;
 
    // define arrays for B-field

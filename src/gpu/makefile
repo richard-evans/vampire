@@ -4,9 +4,11 @@
 
 # List module object filenames
 gpu_objects=\
+config.o \
 data.o \
 finalize.o \
 initialize.o \
+interface.o \
 llg_heun.o \
 statistics.o
 

@@ -1,0 +1,41 @@
+#------------------------------------------
+# Sample vampire input file to perform
+# benchmark calculation for v4.0
+#
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:single-spin
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:temperature=0.0
+sim:time-steps-increment=100
+sim:total-time-steps=10000
+sim:time-step=1.0E-16
+
+sim:applied-field-strength=10.0 !T
+sim:applied-field-unit-vector=0,0,1
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program=time-series
+sim:integrator=llg-heun
+
+gpu:num-threads=64
+
+#------------------------------------------
+# data output
+#------------------------------------------
+output:real-time
+output:magnetisation
+output:output-rate = 50

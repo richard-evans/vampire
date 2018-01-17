@@ -15,6 +15,7 @@
 // Vampire headers
 #include "atoms.hpp"
 #include "config.hpp"
+#include "gpu.hpp"
 #include "sim.hpp"
 
 // config module headers
@@ -73,6 +74,10 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    //------------------------------------------------------
    if ((config::internal::output_atoms_config == true) && (sim::output_rate_counter % config::internal::output_atoms_config_rate == 0))
    {
+
+      // If using GPU acceleration then synchonise spins from device
+      gpu::config::synchronise();
+
       // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
       if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
       {

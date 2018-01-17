@@ -151,6 +151,7 @@ int main(int argc, char* argv[]){
    std::cout << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(WHITE);
 
+
    return EXIT_SUCCESS;
 
 }

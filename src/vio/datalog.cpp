@@ -12,13 +12,14 @@
 
 // C++ standard library headers
 #include <sstream>
+
 // Vampire headers
-// Headers
-#include "vio.hpp"
 #include "config.hpp"
-#include "sim.hpp"
-#include "grains.hpp"
 #include "errors.hpp"
+#include "gpu.hpp"
+#include "grains.hpp"
+#include "sim.hpp"
+#include "vio.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -188,6 +189,10 @@ namespace vout{
 
 		// Output data to output
 		if(vmpi::my_rank==0){
+
+         // For gpu acceleration get statistics from device
+         if(gpu::acceleration) gpu::stats::get();
+
 			for(unsigned int item=0;item<file_output_list.size();item++){
 				switch(file_output_list[item]){
 					case 0:
@@ -354,6 +359,9 @@ namespace vout{
 		// Output data to cout
 		if(vmpi::my_rank==0){
 			if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
+
+            // For gpu acceleration get statistics from device (repeated here so additional performance cost for doing this)
+            if(gpu::acceleration) gpu::stats::get();
 
 				for(unsigned int item=0;item<screen_output_list.size();item++){
 				switch(screen_output_list[item]){

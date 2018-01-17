@@ -56,6 +56,7 @@
 #include "sim.hpp"
 #include "spintorque.hpp"
 #include "stats.hpp"
+#include "stopwatch.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 #include "vutil.hpp"
@@ -71,6 +72,7 @@ namespace sim{
 	int partial_time=1000;
 	uint64_t equilibration_time=0;
 	int runs=1; /// for certain repetitions in programs
+
     //Global definition of some parameters in order to store them in chekcpoint files
 	int64_t parity=-1;
    uint64_t output_atoms_file_counter=0;
@@ -102,7 +104,7 @@ namespace sim{
 
 	double H=Hmax; // T
 	int64_t iH=1; // uT
-//	uint64_t iH=-1*vmath::iround(double(Hmax)*1.0E6); // uT
+   //	uint64_t iH=-1*vmath::iround(double(Hmax)*1.0E6); // uT
 
 	double demag_factor[3]={0.0,0.0,0.0};
 	double head_position[2]={0.0,cs::system_dimensions[1]*0.5}; // A
@@ -299,6 +301,10 @@ int run(){
 		#endif
    }
 
+   // Set timer for runtime
+   stopwatch_t stopwatch;
+   stopwatch.start();
+
    // Precondition spins at equilibration temperature
    sim::internal::monte_carlo_preconditioning();
 
@@ -477,6 +483,9 @@ int run(){
 			}
 	}
 
+   std::cout <<     "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+   zlog << zTs() << "Simulation run time [s]: " << stopwatch.elapsed_seconds() << std::endl;
+
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
    //------------------------------------------------
@@ -506,7 +515,7 @@ int run(){
 	//program::LLB_Boltzmann();
 
    // De-initialize GPU
-   gpu::finalize();
+   if(gpu::acceleration) gpu::finalize();
 
    // optionally save checkpoint file
    if(sim::save_checkpoint_flag && !sim::save_checkpoint_continuous_flag) save_checkpoint();
