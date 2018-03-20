@@ -44,8 +44,8 @@ namespace anisotropy{
          // if not enabled then do nothing
          if(!internal::enable_cubic_fourth_order) return;
 
-         // scale factor from derivative of E = +1/2 (sx^4 + sy^4 + sz^4)
-         const double scale = -0.5*4.0;
+         // scale factor from derivative of E = -1/2 (sx^4 + sy^4 + sz^4)
+         const double scale = 0.5*4.0;
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -75,7 +75,7 @@ namespace anisotropy{
 
       //---------------------------------------------------------------------------------
       // Function to add fourth order cubic anisotropy
-      // E = +1/2 k4 (sx^4 + sy^4 + sz^4)
+      // E = -1/2 k4 (sx^4 + sy^4 + sz^4)
       //---------------------------------------------------------------------------------
       double cubic_fourth_order_energy(const int atom,
                                        const int mat,

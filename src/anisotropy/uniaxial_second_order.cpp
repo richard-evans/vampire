@@ -62,7 +62,9 @@ namespace anisotropy{
          if(!internal::enable_uniaxial_second_order) return;
 
          // rescaling prefactor
-         const double scale = 2.0; // 3*2/3 = 2 Factor to rescale anisotropies to usual scale
+         // E = 2/3 * - ku2 (1/2)  * (3sz^2 - 1) == -ku2 sz^2 + const
+         // H = -dE/dS = +2ku2 sz
+         const double scale = 2.0; // 2*2/3 = 2 Factor to rescale anisotropies to usual scale
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
