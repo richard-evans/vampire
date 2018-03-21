@@ -66,11 +66,7 @@
 
 namespace sim{
 	std::ofstream mag_file;
-	uint64_t time=0;
-	uint64_t total_time=10000;
-	uint64_t loop_time=10000;
-	int partial_time=1000;
-	uint64_t equilibration_time=0;
+
 	int runs=1; /// for certain repetitions in programs
 
     //Global definition of some parameters in order to store them in chekcpoint files
@@ -168,9 +164,9 @@ namespace sim{
    bool save_checkpoint_continuous_flag=false; // save checkpoints during simulations
    int save_checkpoint_rate=1; // Default increment between checkpoints
 
-	// Local function declarations
-   void integrate_serial(int);
-	int integrate_mpi(int);
+   // Local function declarations
+   void integrate_serial(uint64_t);
+   int integrate_mpi(uint64_t);
 
    // Monte Carlo statistics counters
    double mc_statistics_moves = 0.0;
@@ -546,7 +542,7 @@ int run(){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int integrate(int n_steps){
+int integrate(uint64_t n_steps){
 
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate has been called" << std::endl;
@@ -583,7 +579,7 @@ int integrate(int n_steps){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-void integrate_serial(int n_steps){
+void integrate_serial(uint64_t n_steps){
 
    // Check for calling of function
    if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
@@ -592,7 +588,7 @@ void integrate_serial(int n_steps){
    switch(sim::integrator){
 
       case 0: // LLG Heun
-         for(int ti=0;ti<n_steps;ti++){
+         for(uint64_t ti=0;ti<n_steps;ti++){
             // Optionally select GPU accelerated version
             if(gpu::acceleration) gpu::llg_heun();
             // Otherwise use CPU version
@@ -603,7 +599,7 @@ void integrate_serial(int n_steps){
          break;
 
 		case 1: // Montecarlo
-			for(int ti=0;ti<n_steps;ti++){
+			for(uint64_t ti=0;ti<n_steps;ti++){
 				sim::MonteCarlo();
 				// increment time
 				increment_time();
@@ -611,7 +607,7 @@ void integrate_serial(int n_steps){
 			break;
 
       case 2: // LLG Midpoint
-         for(int ti=0;ti<n_steps;ti++){
+         for(uint64_t ti=0;ti<n_steps;ti++){
             sim::LLG_Midpoint();
             // increment time
             increment_time();
@@ -619,7 +615,7 @@ void integrate_serial(int n_steps){
          break;
 
 		case 3: // Constrained Monte Carlo
-			for(int ti=0;ti<n_steps;ti++){
+			for(uint64_t ti=0;ti<n_steps;ti++){
 				sim::ConstrainedMonteCarlo();
 				// increment time
 				increment_time();
@@ -627,7 +623,7 @@ void integrate_serial(int n_steps){
 			break;
 
 		case 4: // Hybrid Constrained Monte Carlo
-			for(int ti=0;ti<n_steps;ti++){
+			for(uint64_t ti=0;ti<n_steps;ti++){
 				sim::ConstrainedMonteCarloMonteCarlo();
 				// increment time
 				increment_time();
@@ -674,7 +670,7 @@ int integrate_mpi(int n_steps){
 	// Case statement to call integrator
 	switch(sim::integrator){
 		case 0: // LLG Heun
-			for(int ti=0;ti<n_steps;ti++){
+			for(uint64_t ti=0;ti<n_steps;ti++){
 			#ifdef MPICF
 				// Select CUDA version if supported
 				#ifdef CUDA
@@ -689,7 +685,7 @@ int integrate_mpi(int n_steps){
 			break;
 
 		case 1: // Montecarlo
-			for(int ti=0;ti<n_steps;ti++){
+			for(uint64_t ti=0;ti<n_steps;ti++){
 				terminaltextcolor(RED);
 				std::cerr << "Error - Monte Carlo Integrator unavailable for parallel execution" << std::endl;
 				terminaltextcolor(WHITE);
@@ -700,7 +696,7 @@ int integrate_mpi(int n_steps){
 			break;
 
 		case 2: // LLG Midpoint
-			for(int ti=0;ti<n_steps;ti++){
+			for(uint64_t ti=0;ti<n_steps;ti++){
 			#ifdef MPICF
 			// Select CUDA version if supported
 				#ifdef CUDA
@@ -715,7 +711,7 @@ int integrate_mpi(int n_steps){
 			break;
 
 		case 3: // Constrained Monte Carlo
-			for(int ti=0;ti<n_steps;ti++){
+			for(uint64_t ti=0;ti<n_steps;ti++){
 				terminaltextcolor(RED);
 				std::cerr << "Error - Constrained Monte Carlo Integrator unavailable for parallel execution" << std::endl;
 				terminaltextcolor(WHITE);

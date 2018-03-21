@@ -14,7 +14,8 @@ interface.o \
 match.o \
 nullify.o \
 outputfunctions.o \
-read.o
+read.o \
+string_to_x.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/vio/,$(vio_objects))
