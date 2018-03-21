@@ -71,16 +71,6 @@ namespace exchange{
             // save interaction type to 1D array
    			atoms::neighbour_interaction_type_array[counter] = cneighbourlist[atom][nn].i;
 
-            // save eij vector i->j to 1D list
-            //const double eij[3] = { cneighbourlist[i][kn].vx, cneighbourlist[i][kn].vy, cneighbourlist[i][kn].vz };
-            //const double mod = sqrt(eij[0]*eij[0] + eij[1]*eij[1] + eij[2]*eij[2]);
-            //const double imod = 1.0/mod;
-
-            //atoms::neighbour_eij_array[counter].x = eij[0] * imod; // x hat
-            //atoms::neighbour_eij_array[counter].y = eij[1] * imod; // y hat
-            //atoms::neighbour_eij_array[counter].z = eij[2] * imod; // z hat
-            //atoms::neighbour_eij_array[counter].r = mod; // length of vector
-
    			//std::cout << cneighbourlist[atom][nn] << " ";
    			counter++;
    		}
@@ -91,6 +81,9 @@ namespace exchange{
 
       // Unroll exchange interactions
       exchange::internal::unroll_exchange_interactions();
+
+      // initialise biquadratic_exchange
+      exchange::internal::initialize_biquadratic_exchange();
 
       // Calculate Dzyaloshinskii-Moriya interactions (must be done after exchange unrolling)
       exchange::internal::calculate_dmi(cneighbourlist);

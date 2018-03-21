@@ -41,129 +41,27 @@ namespace exchange{
                std::vector<double>& field_array_y,
                std::vector<double>& field_array_z){
 
-   	// Use appropriate function for exchange calculation
-   	switch(internal::exchange_type){
 
-   		case internal::isotropic:
+   	// Calculate standard (bilinear) exchange fields
+      exchange::internal::exchange_fields(start_index, end_index,
+                                neighbour_list_start_index, neighbour_list_end_index,
+                                type_array, neighbour_list_array, neighbour_interaction_type_array,
+                                i_exchange_list, v_exchange_list, t_exchange_list,
+                                spin_array_x, spin_array_y, spin_array_z,
+                                field_array_x, field_array_y, field_array_z);
 
-            // loop over all atoms
-   			for(int atom = start_index; atom < end_index; ++atom){
+      // calculate biquadratic exchange field
+      if(exchange::internal::enable_bqe){
+         exchange::internal::biquadratic_exchange_fields(start_index, end_index,
+                                                         neighbour_list_start_index, neighbour_list_end_index,
+                                                         type_array, neighbour_list_array, neighbour_interaction_type_array,
+                                                         internal::bq_i_exchange_list, internal::bq_v_exchange_list, internal::bq_t_exchange_list,
+                                                         spin_array_x, spin_array_y, spin_array_z,
+                                                         field_array_x, field_array_y, field_array_z);
+      }
 
-               // temporary variables (registers) to calculate intermediate sum
-   				double hx = 0.0;
-   				double hy = 0.0;
-   				double hz = 0.0;
+   	return;
 
-               // temporray constants for loop start and end indices
-   				const int start = neighbour_list_start_index[atom];
-   				const int end   = neighbour_list_end_index[atom]+1;
-
-               // loop over all neighbours
-   				for(int nn = start; nn < end; ++nn){
-
-   					const int natom = neighbour_list_array[nn]; // get neighbouring atom number
-   					const double Jij = i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij; // get exchange constant between atoms
-
-   					hx += Jij * spin_array_x[natom]; // add exchange fields
-   					hy += Jij * spin_array_y[natom];
-   					hz += Jij * spin_array_z[natom];
-
-   				}
-
-   				field_array_x[atom] += hx; // save total field to field array
-   				field_array_y[atom] += hy;
-   				field_array_z[atom] += hz;
-
-   			}
-   			break;
-
-   		case internal::vectorial: // vector
-
-            // loop over all atoms
-            for(int atom = start_index; atom < end_index; ++atom){
-
-               // temporary variables (registers) to calculate intermediate sum
-               double hx = 0.0;
-               double hy = 0.0;
-               double hz = 0.0;
-
-               // temporray constants for loop start and end indices
-               const int start = neighbour_list_start_index[atom];
-               const int end   = neighbour_list_end_index[atom]+1;
-
-               // loop over all neighbours
-               for(int nn = start; nn < end; ++nn){
-
-                  const int natom = neighbour_list_array[nn]; // get neighbouring atom number
-                  const int iid = neighbour_interaction_type_array[nn]; // interaction id
-
-   					const double Jij[3]={v_exchange_list[iid].Jij[0],
-   												v_exchange_list[iid].Jij[1],
-   												v_exchange_list[iid].Jij[2]};
-
-                  hx += Jij[0] * spin_array_x[natom]; // add exchange fields
-   					hy += Jij[1] * spin_array_y[natom];
-   					hz += Jij[2] * spin_array_z[natom];
-
-   				}
-
-               field_array_x[atom] += hx; // save total field to field array
-   				field_array_y[atom] += hy;
-   				field_array_z[atom] += hz;
-
-   			}
-   			break;
-
-   		case internal::tensorial: // tensor
-
-            // loop over all atoms
-            for(int atom = start_index; atom < end_index; ++atom){
-
-               // temporary variables (registers) to calculate intermediate sum
-               double hx = 0.0;
-               double hy = 0.0;
-               double hz = 0.0;
-
-               // temporray constants for loop start and end indices
-               const int start = neighbour_list_start_index[atom];
-               const int end   = neighbour_list_end_index[atom]+1;
-
-               // loop over all neighbours
-               for(int nn = start; nn < end; ++nn){
-
-                  const int natom = neighbour_list_array[nn]; // get neighbouring atom number
-                  const int iid = neighbour_interaction_type_array[nn]; // interaction id
-
-   					const double Jij[3][3]={ {t_exchange_list[iid].Jij[0][0],
-   													  t_exchange_list[iid].Jij[0][1],
-   												     t_exchange_list[iid].Jij[0][2]},
-
-   													 {t_exchange_list[iid].Jij[1][0],
-   													  t_exchange_list[iid].Jij[1][1],
-   													  t_exchange_list[iid].Jij[1][2]},
-
-   													 {t_exchange_list[iid].Jij[2][0],
-   													  t_exchange_list[iid].Jij[2][1],
-   													  t_exchange_list[iid].Jij[2][2]} };
-
-   					const double S[3]={spin_array_x[natom], spin_array_y[natom], spin_array_z[natom]};
-
-   					hx += ( Jij[0][0] * S[0] + Jij[0][1] * S[1] + Jij[0][2] * S[2]);
-   					hy += ( Jij[1][0] * S[0] + Jij[1][1] * S[1] + Jij[1][2] * S[2]);
-   					hz += ( Jij[2][0] * S[0] + Jij[2][1] * S[1] + Jij[2][2] * S[2]);
-   				}
-
-               field_array_x[atom] += hx; // save total field to field array
-   				field_array_y[atom] += hy;
-   				field_array_z[atom] += hz;
-
-   			}
-   			break;
-
-   		}
-
-   		return;
-
-   	}
+   }
 
 } // end of exchange namespace

@@ -103,7 +103,14 @@ namespace exchange{
             return false;
          }
       }
-
+      test = "biquadratic-exchange";
+      if( word == test ){
+         double bqe = atof(value.c_str());
+         vin::check_for_valid_value(bqe, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
+         internal::mp[super_index].bqe[sub_index] = bqe;
+         internal::enable_bqe = true; // Switch on biquadratic exchange
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
