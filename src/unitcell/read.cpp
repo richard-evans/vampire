@@ -290,6 +290,12 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				break;
 
          }
+         case 6:{
+            // read biquadratic exchange interactions
+            unitcell::internal::read_biquadratic_interactions(unit_cell, inputfile, iss, filename, line_counter, interaction_range);
+            break;
+         }
+
 			default:
 				terminaltextcolor(RED);
 				std::cerr << "Error! Unknown line type on line " << line_counter

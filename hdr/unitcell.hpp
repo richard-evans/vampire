@@ -35,6 +35,7 @@ namespace unitcell{
 		unsigned int lc; /// lattice category
 		unsigned int hc; /// height category
 		unsigned int ni; /// number of interactions
+      unsigned int nbqi; /// number of interactions
 	};
 
    // Unit cell interaction class definition
@@ -67,6 +68,9 @@ namespace unitcell{
 
 		// list of interactions in each unit cell
 		std::vector <unitcell::interaction_t> interaction;
+
+      // list of biquadratic interactions in each unit cell
+		std::vector <unitcell::interaction_t> biquadratic_interaction;
 
 	};
 

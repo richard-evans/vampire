@@ -104,6 +104,12 @@ void normalise_exponential_exchange(unitcell::unit_cell_t& unit_cell){
       unit_cell.interaction[i].Jij[0][0] *= inv_norm_factor;
       unit_cell.interaction[i].Jij[1][1] *= inv_norm_factor;
       unit_cell.interaction[i].Jij[2][2] *= inv_norm_factor;
+
+      // normalise biquadratic exchange interactions
+      unit_cell.biquadratic_interaction[i].Jij[0][0] *= inv_norm_factor;
+      unit_cell.biquadratic_interaction[i].Jij[1][1] *= inv_norm_factor;
+      unit_cell.biquadratic_interaction[i].Jij[2][2] *= inv_norm_factor;
+
    }
 
    double nsum = 0.0;

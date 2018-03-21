@@ -138,6 +138,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
                unit_cell.interaction.push_back(tmp);
 
+               // save same interactions for biquadratic exchange
+               unit_cell.biquadratic_interaction.push_back(tmp);
+
             }
          }
       }

@@ -76,9 +76,10 @@ namespace exchange{
    void initialize(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
 
    //-----------------------------------------------------------------------------
-   // Function to set exchange type isotropic, vectorial or tensorial
+   // Functions to set exchange type isotropic, vectorial or tensorial
    //-----------------------------------------------------------------------------
    unsigned int set_exchange_type(std::string exchange_type_string);
+   unsigned int set_biquadratic_exchange_type(std::string exchange_type_string);
 
    //-----------------------------------------------------------------------------
    // Function to get exchange type isotropic (0), vectorial(1) or tensorial(2)

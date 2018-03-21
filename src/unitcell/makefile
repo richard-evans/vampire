@@ -10,6 +10,7 @@ initialize.o \
 interactions.o \
 interface.o \
 read.o \
+read_biquadratic.o \
 sc.o \
 bcc.o \
 fcc.o \
