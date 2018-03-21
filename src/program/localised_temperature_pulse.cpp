@@ -41,7 +41,7 @@ namespace program{
    while(sim::time<sim::equilibration_time){
 
       // loop over partial_time to update temperature every time
-      for(int tt=0; tt < sim::partial_time; tt++){
+      for(uint64_t tt=0; tt < sim::partial_time; tt++){
 
          // Calculate temperature
          ltmp::update_localised_temperature(-1.e-7);
@@ -58,13 +58,13 @@ namespace program{
    }
 
    // record starting time after equilibration
-   int start_time=sim::time;
+   uint64_t start_time = sim::time;
 
    // Simulate temperature pulse
-   while(sim::time<sim::total_time+start_time){
+   while(sim::time < sim::total_time+start_time){
 
       // loop over partial_time to update temperature every time
-      for(int tt=0; tt < sim::partial_time; tt++){
+      for(uint64_t tt=0; tt < sim::partial_time; tt++){
 
          // Calculate time from pulse
          double time_from_start=mp::dt_SI*double(sim::time-start_time);
