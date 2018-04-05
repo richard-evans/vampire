@@ -175,125 +175,18 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 				}
 				break;
 			case 5:{
-				iss >> num_interactions >> exchange_type_string;
-				//std::cout << num_interactions << "\t" << exchange_type_string << std::endl;
 
-            // process exchange string to set exchange type and normalisation
-            const int num_exchange_values = exchange::set_exchange_type(exchange_type_string);
-
-				if(num_interactions>=0) unit_cell.interaction.resize(num_interactions);
-				else {
-					terminaltextcolor(RED);
-					std::cerr << "Error! Requested number of interactions " << num_interactions << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is less than 0. Exiting" << std::endl; err::vexit();
-				    terminaltextcolor(WHITE);
-				}
-
-            std::cout << "done!\nProcessing data from " << num_interactions << " interactions..." << std::flush;
-            zlog << zTs() << "\t" << "Processing unit cell atoms completed" << std::endl;
-            zlog << zTs() << "\t" << "Processing data from " << num_interactions << " unit cell interactions..." << std::endl;
-
-				// loop over all interactions and read into class
-				for (int i=0; i<num_interactions; i++){
-
-               // Output progress counter to screen for large interaction counts
-               if( (i % (num_interactions/10 + 1)) == 0 && num_interactions > 10000) std::cout << "." << std::flush;
-
-					//std::cout << "setting up interaction "<< i+1<< " of " << num_interactions << " interactions" << std::endl;
-					// declare safe temporaries for interaction input
-					int id=i;
-					int iatom=-1,jatom=-1; // atom pairs
-					int dx=0, dy=0,dz=0; // relative unit cell coordinates
-					// get line
-					std::string int_line;
-					getline(inputfile,int_line);
-					//std::cout << int_line.c_str() << std::endl;
-					std::istringstream int_iss(int_line,std::istringstream::in);
-					int_iss >> id >> iatom >> jatom >> dx >> dy >> dz;
-					//inputfile >> id >> iatom >> jatom >> dx >> dy >> dz;
-					line_counter++;
-					// check for sane input
-					if(iatom>=0 && iatom < int(unit_cell.atom.size())) unit_cell.interaction[i].i=iatom;
-					else if(iatom>=0 && iatom >= int(unit_cell.atom.size())){
-						terminaltextcolor(RED);
-						std::cerr << std::endl << "Error! iatom number "<< iatom <<" for interaction id " << id << " on line " << line_counter
-							  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"
-							  << unit_cell.atom.size()-1 << ". Exiting" << std::endl;
-						terminaltextcolor(WHITE);
-						zlog << zTs() << "Error! iatom number "<< iatom <<" for interaction id " << id << " on line " << line_counter
-						     << " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"<< unit_cell.atom.size()-1
-						     << ". Exiting" << std::endl;
-						err::vexit();
-					}
-					else{
-					  terminaltextcolor(RED);
-					  std::cerr << std::endl << "Error! No valid interaction for interaction id " << id << " on line " << line_counter
-						    << " of unit cell input file " << filename.c_str() << ". Possibly too many interactions defined. Exiting" << std::endl;
-					  terminaltextcolor(WHITE);
-					  zlog << zTs() << "Error! No valid interaction for interaction id " << id << " on line " << line_counter
-					       << " of unit cell input file " << filename.c_str() << ". Possibly too many interactions defined. Exiting" << std::endl;
-					  err::vexit();
-					}
-					if(iatom>=0 && jatom < int(unit_cell.atom.size())) unit_cell.interaction[i].j=jatom;
-					else{
-						terminaltextcolor(RED);
-						std::cerr << std::endl << "Error! jatom number "<< jatom <<" for interaction id " << id << " on line " << line_counter
-							  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"
-							  << unit_cell.atom.size()-1 << ". Exiting" << std::endl;
-						terminaltextcolor(WHITE);
-						zlog << zTs() << "Error! jatom number "<< jatom <<" for interaction id " << id << " on line " << line_counter
-							  << " of unit cell input file " << filename.c_str() << " is outside of valid range 0-"
-							  << unit_cell.atom.size()-1 << ". Exiting" << std::endl;
-						err::vexit();
-						}
-					unit_cell.interaction[i].dx=dx;
-					unit_cell.interaction[i].dy=dy;
-					unit_cell.interaction[i].dz=dz;
-					// check for long range interactions
-					if(abs(dx)>interaction_range) interaction_range=abs(dx);
-					if(abs(dy)>interaction_range) interaction_range=abs(dy);
-					if(abs(dz)>interaction_range) interaction_range=abs(dz);
-
-					int iatom_mat = unit_cell.atom[iatom].mat;
-					int jatom_mat = unit_cell.atom[jatom].mat;
-					switch(num_exchange_values){
-						//case -1: // assume isotropic
-						//	unit_cell.interaction[i].Jij[0][0]=mp::material[iatom_mat].Jij_matrix[jatom_mat][0]; // only works if read after mat file
-						//	break;
-						case 1:
-							int_iss >> unit_cell.interaction[i].Jij[0][0];
-							// save interactions into diagonal components of the exchange tensor
-							unit_cell.interaction[i].Jij[1][1] = unit_cell.interaction[i].Jij[0][0];
-							unit_cell.interaction[i].Jij[2][2] = unit_cell.interaction[i].Jij[0][0];
-							break;
-						case 3:
-							int_iss >> unit_cell.interaction[i].Jij[0][0] >> unit_cell.interaction[i].Jij[1][1] >> unit_cell.interaction[i].Jij[2][2];
-							break;
-						case 9:
-							int_iss >> unit_cell.interaction[i].Jij[0][0] >> unit_cell.interaction[i].Jij[0][1] >> unit_cell.interaction[i].Jij[0][2];
-							int_iss >> unit_cell.interaction[i].Jij[1][0] >> unit_cell.interaction[i].Jij[1][1] >> unit_cell.interaction[i].Jij[1][2];
-							int_iss >> unit_cell.interaction[i].Jij[2][0] >> unit_cell.interaction[i].Jij[2][1] >> unit_cell.interaction[i].Jij[2][2];
-							break;
-						default:
-							terminaltextcolor(RED);
-							std::cerr << "Programmer Error! Requested number of exchange values " << num_exchange_values << " on line " << line_counter
-					<< " of unit cell input file " << filename.c_str() << " is outside of valid range 1,3 or 9. Exiting" << std::endl;
-							terminaltextcolor(WHITE);
-                     err::vexit();
-					}
-					// increment number of interactions for atom i
-					unit_cell.atom[iatom].ni++;
-				}
-				// set interaction range
-				unit_cell.interaction_range = interaction_range;
-
+            // read (bilinear) exchange interactions
+            unit_cell.bilinear.read_interactions(num_uc_atoms, inputfile, iss, filename, line_counter, interaction_range);
 				break;
 
          }
          case 6:{
+
             // read biquadratic exchange interactions
-            unitcell::internal::read_biquadratic_interactions(unit_cell, inputfile, iss, filename, line_counter, interaction_range);
+            unit_cell.biquadratic.read_interactions(num_uc_atoms, inputfile, iss, filename, line_counter, interaction_range);
             break;
+
          }
 
 			default:
@@ -310,12 +203,14 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
    zlog << zTs() << "\t" << "Verifying unit cell exchange interactions..." << std::endl;
 
    // Verify exchange interactions are symmetric (required for MPI parallelization)
-   uc::internal::verify_exchange_interactions(unit_cell, filename);
+   unit_cell.bilinear.verify(filename);
+   unit_cell.biquadratic.verify(filename);
 
    std::cout << "done!" << std::endl;
    zlog << zTs() << "Verifying unit cell exchange interactions completed" << std::endl;
 	zlog << zTs() << "\t" << "Number of atoms read-in: " << unit_cell.atom.size() << std::endl;
-	zlog << zTs() << "\t" << "Number of interactions read-in: " << unit_cell.interaction.size() << std::endl;
+	zlog << zTs() << "\t" << "Number of bilinear interactions read-in: " << unit_cell.bilinear.interaction.size() << std::endl;
+   zlog << zTs() << "\t" << "Number of biquadratic interactions read-in: " << unit_cell.biquadratic.interaction.size() << std::endl;
 	zlog << zTs() << "\t" << "Exchange type: " << exchange_type_string << std::endl;
 	zlog << zTs() << "\t" << "Calculated interaction range: " << unit_cell.interaction_range << " Unit Cells" << std::endl;
 

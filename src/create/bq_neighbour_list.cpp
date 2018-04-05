@@ -1,0 +1,327 @@
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Richard F L Evans 2018. All rights reserved.
+//
+//   Email: richard.evans@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
+
+// C++ standard library headers
+#include <cmath>
+#include <iostream>
+#include <limits>
+
+// Vampire headers
+#include "create.hpp"
+#include "errors.hpp"
+#include "vio.hpp"
+#include "vmath.hpp"
+#include "vmpi.hpp"
+
+// Standard Libraries
+#ifdef WIN_COMPILE
+#define NOMINMAX
+#undef max
+#undef min
+#endif
+
+namespace cs{
+
+//------------------------------------------------------------------------------
+// Append biquadratic interactions to neighbour list
+//------------------------------------------------------------------------------
+int bq_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbour_t> > & cneighbourlist){
+
+	// put number of atoms into temporary variable
+	const int num_atoms = catom_array.size();
+
+	// estimate number of interactions per atom
+	const int max_nn=int(1.1*(double(unit_cell.biquadratic_interaction.size())/double(unit_cell.atom.size())));
+
+   // Calculate system dimensions and number of supercells
+   int max_val=(std::numeric_limits<int>::max());
+   int min[3]={max_val,max_val,max_val}; // lowest cell id
+   int max[3]={0,0,0}; // highest cell id
+
+	for(int atom=0;atom<num_atoms;atom++){
+		int c[3]={catom_array[atom].scx,catom_array[atom].scy,catom_array[atom].scz};
+		for(int i=0;i<3;i++){
+			if(c[i]<min[i]){
+				min[i]=c[i];
+			}
+			if(c[i]>max[i]){
+				max[i]=c[i];
+			}
+		}
+	}
+
+	// calculate offset and cell maximum in whole unit cells
+	const int offset[3] = {min[0], min[1], min[2]};
+	const int max_cell[3] = {max[0],max[1],max[2]};
+
+	// calculate number of cells needed = max-min+1 ( if max_cell = 25, then 0-25 = 26
+	const unsigned int d[3]={static_cast<unsigned int>(max_cell[0]-offset[0]+1),
+                            static_cast<unsigned int>(max_cell[1]-offset[1]+1),
+                            static_cast<unsigned int>(max_cell[2]-offset[2]+1)};
+
+	// Declare array for create space for 3D supercell array
+	std::vector<std::vector<std::vector<std::vector<int> > > > supercell_array;
+
+	zlog << zTs() << "Memory required for biquadratic neighbourlist calculation:" << 8.0*double(d[0])*double(d[1])*double(d[2])*double(unit_cell.atom.size())/1.0e6 << " MB" << std::endl;
+   zlog << zTs() << "Allocating memory for supercell array in biquadratic neighbourlist calculation..."<< std::endl;
+	supercell_array.resize(d[0]);
+	for(unsigned int i=0; i<d[0] ; i++){
+		supercell_array[i].resize(d[1]);
+		for(unsigned int j=0; j<d[1] ; j++){
+			supercell_array[i][j].resize(d[2]);
+			for(unsigned int k=0; k<d[2] ; k++){
+				supercell_array[i][j][k].resize(unit_cell.atom.size(),-1);
+			}
+		}
+	}
+   zlog << zTs() << "\tDone"<< std::endl;
+
+	// declare cell array to loop over
+	const unsigned int num_cells=d[0]*d[1]*d[2];
+	std::vector< std::vector <int> > cell_coord_array;
+	cell_coord_array.reserve(num_cells);
+	for(unsigned int i=0;i<num_cells;i++){
+		cell_coord_array.push_back(std::vector<int>());
+		cell_coord_array[i].resize(3);
+	}
+
+	// Initialise cell_array
+	unsigned int cell=0;
+	for(unsigned int x=0;x<d[0];x++){
+		for(unsigned int y=0;y<d[1];y++){
+			for(unsigned int z=0;z<d[2];z++){
+				//save cell coordinates
+				cell_coord_array[cell][0]=x;
+				cell_coord_array[cell][1]=y;
+				cell_coord_array[cell][2]=z;
+				cell++;
+			}
+		}
+	}
+   zlog << zTs() << "Populating supercell array for biquadratic neighbourlist calculation..."<< std::endl;
+	// Populate supercell array with atom numbers
+	for(int atom=0;atom<num_atoms;atom++){
+		unsigned int scc[3]={static_cast<unsigned int>(catom_array[atom].scx-offset[0]),
+                           static_cast<unsigned int>(catom_array[atom].scy-offset[1]),
+                           static_cast<unsigned int>(catom_array[atom].scz-offset[2])};
+
+		double c[3]={catom_array[atom].x,catom_array[atom].y,catom_array[atom].z};
+		//std::cout << atom << "\t" << c[0] << "\t" << c[1] <<"\t" << c[2] << std::endl;
+		for(int i=0;i<3;i++){
+			//scc[i]=int(c[i]/cs::unit_cell_size[i])-offset[i]; // Always round down for supercell coordinates
+			// Always check cell in range
+         if(scc[i]>= d[i]){
+			//if(scc[i]<0 || scc[i]>= d[i]){ // Chexk for scc < 0 not required since d and scc are unsigned
+				//std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
+				#ifdef MPICF
+				terminaltextcolor(RED);
+				std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
+				terminaltextcolor(WHITE);
+				#endif
+				terminaltextcolor(RED);
+				std::cerr << "\tAtom number:      " << atom << std::endl;
+				std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
+				std::cerr << "\tmin coordinates:  " << min[0] << "\t" << min[1] << "\t" << min[2] << "\t" << std::endl;
+				std::cerr << "\tmax coordinates:  " << max[0] << "\t" << max[1] << "\t" << max[2] << "\t" << std::endl;
+				std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
+				std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
+				std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
+				std::cerr << "\tCell offest (dp): " << offset[0]*unit_cell.dimensions[0] << "\t" << offset[1]*unit_cell.dimensions[1] << "\t" << offset[2]*unit_cell.dimensions[2] << std::endl;
+				terminaltextcolor(WHITE);
+				err::vexit();
+			}
+		}
+		// Check for atoms greater than max_atoms_per_supercell
+		if(catom_array[atom].uc_id<unit_cell.atom.size()){
+			// Add atom to supercell
+			supercell_array[scc[0]][scc[1]][scc[2]][catom_array[atom].uc_id]=atom;
+		}
+		else{
+			terminaltextcolor(RED);
+			std::cerr << "Error, number of atoms per supercell exceeded" << std::endl;
+			std::cerr << "\tAtom number:      " << atom << std::endl;
+			std::cerr << "\tAtom coordinates: " << c[0] << "\t" << c[1] << "\t" << c[2] << "\t" << std::endl;
+			std::cerr << "\tCell coordinates: " << scc[0] << "\t" << scc[1] << "\t" << scc[2] << "\t" << std::endl;
+			std::cerr << "\tCell maxima:      " << d[0] << "\t" << d[1] << "\t" << d[2] << std::endl;
+			std::cerr << "\tCell offset:      " << offset[0] << "\t" << offset[1] << "\t" << offset[2] << std::endl;
+			std::cerr << "\tAtoms in Current Cell:" << std::endl;
+			for(unsigned int ix=0;ix<supercell_array[scc[0]][scc[1]][scc[2]].size();ix++){
+				const int ixatom=supercell_array[scc[0]][scc[1]][scc[2]][ix];
+				std::cerr << "\t\t [id x y z] "<< ix << "\t" << ixatom << "\t" << catom_array[ixatom].x << "\t" << catom_array[ixatom].y << "\t" << catom_array[ixatom].z << std::endl;
+			}
+			terminaltextcolor(WHITE);
+			err::vexit();
+		}
+	}
+
+   zlog << zTs() << "\tDone"<< std::endl;
+
+   // Get unit cell size
+   const double ucdx=cs::unit_cell.dimensions[0];
+   const double ucdy=cs::unit_cell.dimensions[1];
+   const double ucdz=cs::unit_cell.dimensions[2];
+
+	// Generate neighbour list
+	std::cout <<"Generating biquadratic neighbour list"<< std::flush;
+   zlog << zTs() << "Additional memory required for biquadratic neighbour list:" << 8.0*double(num_cells)*double(cs::unit_cell.biquadratic_interaction.size())/1.0e6 << " MB" << std::endl;
+   zlog << zTs() << "Generating biquadratic neighbour list..."<< std::endl;
+	neighbour_t tmp_nt;
+	// Loop over all cells
+	for(unsigned int cell=0;cell<num_cells;cell++){
+		if(cell%(num_cells/10+1)==0){
+			std::cout << "." << std::flush;
+		}
+		//std::cout << "cell: " << cell << ":>" << std::flush; // << std::endl;
+		int scc[3]={cell_coord_array[cell][0],cell_coord_array[cell][1],cell_coord_array[cell][2]};
+		// Loop over all interactions
+		for(unsigned int i=0;i<cs::unit_cell.biquadratic_interaction.size();i++){
+
+			const int atom=cs::unit_cell.biquadratic_interaction[i].i;
+			const int natom=cs::unit_cell.biquadratic_interaction[i].j;
+
+			int nx=cs::unit_cell.biquadratic_interaction[i].dx+scc[0];
+			int ny=cs::unit_cell.biquadratic_interaction[i].dy+scc[1];
+			int nz=cs::unit_cell.biquadratic_interaction[i].dz+scc[2];
+
+         // vector from i->j
+         double vx=0.0;
+         double vy=0.0;
+         double vz=0.0;
+
+         #ifdef MPICF
+           // Parallel periodic boundaries are handled explicitly elsewhere
+         #else
+         // Wrap around for periodic boundaries
+         // Consider virtual atom position for position vector
+         if(cs::pbc[0]==true){
+            if(nx>=int(d[0])){
+               nx=nx-d[0];
+               vx=vx+d[0]*ucdx;
+            }
+            else if(nx<0){
+               nx=nx+d[0];
+               vx=vx-d[0]*ucdx;
+            }
+         }
+         if(cs::pbc[1]==true){
+            if(ny>=int(d[1])){
+               ny=ny-d[1];
+               vy=vy+d[1]*ucdy;
+            }
+            else if(ny<0){
+               ny=ny+d[1];
+               vy=vy-d[1]*ucdy;
+            }
+         }
+         if(cs::pbc[2]==true){
+            if(nz>=int(d[2])){
+               nz=nz-d[2];
+               vz=vz+d[2]*ucdz;
+            }
+            else if(nz<0){
+               nz=nz+d[2];
+               vz=vz-d[2]*ucdz;
+            }
+         }
+         #endif
+         // check for out-of-bounds access
+         if((nx>=0 && static_cast<unsigned int>(nx)<d[0]) &&
+            (ny>=0 && static_cast<unsigned int>(ny)<d[1]) &&
+            (nz>=0 && static_cast<unsigned int>(nz)<d[2])){
+            // check for missing atoms
+            if((supercell_array[scc[0]][scc[1]][scc[2]][atom]!=-1) && (supercell_array[nx][ny][nz][natom]!=-1)){
+
+               // need actual atom numbers...
+               int atomi = supercell_array[scc[0]][scc[1]][scc[2]][atom];
+               int atomj = supercell_array[nx][ny][nz][natom];
+
+               //std::cout << "int_id: " << i << "\tatom i: " << atomi << "\tatom j: " << atomj << "\tuc_i: " << atom << "\tuc_j: " << natom << std::endl;
+
+               double ix=catom_array[atomi].x; // Already in A
+               double iy=catom_array[atomi].y;
+               double iz=catom_array[atomi].z;
+               double jx=catom_array[atomj].x;
+               double jy=catom_array[atomj].y;
+               double jz=catom_array[atomj].z;
+
+               //std::cout << "\tpi:    " << ix << "\t" << iy << "\t" << iz << std::endl;
+               //std::cout << "\tpj:    " << jx << "\t" << jy << "\t" << jz << std::endl;
+               //std::cout << "\tv_uc:  " << vx << "\t" << vy << "\t" << vz << std::endl;
+
+               vx+=jx-ix;
+               vy+=jy-iy;
+               vz+=jz-iz;
+
+               //std::cout << "\tv:     " << jx-ix << "\t" << jy-iy << "\t" << jz-iz << std::endl;
+               //std::cout << "\tv_eff: " << vx << "\t" << vy << "\t" << vz << std::endl;
+
+               // get current index
+               int index=cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].size();
+
+               // push back array of class
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]].push_back(tmp_nt);
+
+               // now save atom id and interaction type
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].nn=supercell_array[nx][ny][nz][natom];
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].i=i;
+
+               // Add position vector from i-> j
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].vx=vx;
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].vy=vy;
+               cneighbourlist[supercell_array[scc[0]][scc[1]][scc[2]][atom]][index].vz=vz;
+
+            }
+			}
+		}
+	}
+	if(vmpi::my_rank == 0){
+		terminaltextcolor(GREEN);
+		std::cout << "done!" << std::endl;
+		terminaltextcolor(WHITE);
+	}
+   zlog << zTs() << "\tDone"<< std::endl;
+
+	// Deallocate supercell array
+   zlog << zTs() << "Deallocating supercell array for biquadratic neighbour list calculation" << std::endl;
+	for(unsigned int i=0; i<d[0] ; i++){
+		for(unsigned int j=0; j<d[1] ;j++){
+			for(unsigned int k=0; k<d[2] ;k++){
+				supercell_array[i][j][k].resize(0);
+				}
+				supercell_array[i][j].resize(0);
+			}
+			supercell_array[i].resize(0);
+		}
+	supercell_array.resize(0);
+
+   zlog << zTs() << "\tDone" << std::endl;
+
+	// Print neighbour list
+	//for(int atom=0;atom<catom_array.size();atom++){
+	//	std::cout << atom << "\t";
+	//	for(int nn=0;nn<cneighbourlist[atom].size();nn++){
+	//		std::cout << cneighbourlist[atom][nn].nn << "\t";
+	//	}
+	//	std::cout << std::endl;
+	//}
+
+	// Mark surface atoms
+	//for(int atom=0;atom<num_atoms;atom++){
+	//	if(int(cneighbourlist[atom].size())!=mp::material[catom_array[atom].material].hamiltonian_num_neighbours){
+	//		catom_array[atom].material=2;
+	//	}
+	//}
+
+	return EXIT_SUCCESS;
+}
+
+} // End of namespace cs

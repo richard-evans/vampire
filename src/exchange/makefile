@@ -4,6 +4,7 @@
 
 # List module object filenames
 exchange_objects =\
+biquadratic_energy.o \
 biquadratic_fields.o \
 data.o \
 dmi.o \

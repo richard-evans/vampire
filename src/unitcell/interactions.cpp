@@ -136,10 +136,10 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.Jij[2][1] = 0.0; // zy
                tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq); // zz
 
-               unit_cell.interaction.push_back(tmp);
+               unit_cell.bilinear.interaction.push_back(tmp);
 
                // save same interactions for biquadratic exchange
-               unit_cell.biquadratic_interaction.push_back(tmp);
+               unit_cell.biquadratic.interaction.push_back(tmp);
 
             }
          }
@@ -148,15 +148,16 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
    // Set calculated interactions range
    int interaction_range=0;
-   for(int i=0; i<unit_cell.interaction.size(); i++){
-      if(abs(unit_cell.interaction[i].dx)>interaction_range) interaction_range=abs(unit_cell.interaction[i].dx);
-      if(abs(unit_cell.interaction[i].dy)>interaction_range) interaction_range=abs(unit_cell.interaction[i].dy);
-      if(abs(unit_cell.interaction[i].dz)>interaction_range) interaction_range=abs(unit_cell.interaction[i].dz);
+   for(int i=0; i<unit_cell.bilinear.interaction.size(); i++){
+      if(abs(unit_cell.bilinear.interaction[i].dx)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dx);
+      if(abs(unit_cell.bilinear.interaction[i].dy)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dy);
+      if(abs(unit_cell.bilinear.interaction[i].dz)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dz);
    }
    unit_cell.interaction_range = interaction_range;
 
    // Normalise exchange interactions
-   uc::internal::normalise_exchange(unit_cell);
+   unit_cell.bilinear.normalise_exchange();
+   unit_cell.biquadratic.normalise_exchange();
 
    // Output interactions to screen
    /*for(int i=0; i<unit_cell.interaction.size(); i++){
@@ -170,7 +171,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
    }*/
 
    // Check for interactions
-   if(unit_cell.interaction.size()==0){
+   if(unit_cell.bilinear.interaction.size()==0){
       terminaltextcolor(RED);
       std::cerr << "Error! No interactions generated for " << uc::internal::crystal_structure << " crystal structure. Try increasing the interaction range. Aborting." << std::endl;
       terminaltextcolor(WHITE);

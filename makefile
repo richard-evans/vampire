@@ -139,6 +139,7 @@ include src/exchange/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/mpi/makefile
+include src/neighbours/makefile
 include src/program/makefile
 include src/simulate/makefile
 include src/unitcell/makefile

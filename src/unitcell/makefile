@@ -9,8 +9,10 @@ exchange.o \
 initialize.o \
 interactions.o \
 interface.o \
+normalise.o \
 read.o \
-read_biquadratic.o \
+read_interactions.o \
+set_exchange_type.o \
 sc.o \
 bcc.o \
 fcc.o \

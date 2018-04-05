@@ -34,7 +34,7 @@ namespace internal{
    // Function to calculate surface anisotropy tensor
    //---------------------------------------------------------------------------
    void initialise_neel_anisotropy_tensor(std::vector <std::vector <bool> >& nearest_neighbour_interactions_list,
-                                          std::vector<std::vector <cs::neighbour_t> >& cneighbourlist){
+                                          std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist){
 
       // Print informative message to log file
       zlog << zTs() << "Using Néel pair anisotropy for atoms with < threshold number of neighbours." << std::endl;

@@ -69,8 +69,6 @@ namespace unitcell{
                                          int& interaction_range);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
       double exchange(double range_sq, double nn_cutoff_sq);
-      void normalise_exchange(unitcell::unit_cell_t& unit_cell);
-
 
    } // end of internal namespace
 

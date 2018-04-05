@@ -44,7 +44,7 @@ namespace exchange{
    	switch(internal::exchange_type){
    		case internal::isotropic:
    			// unroll material calculations
-   			std::cout << "Using generic/normalised form of exchange interaction with " << cs::unit_cell.interaction.size() << " total interactions." << std::endl;
+   			std::cout << "Using generic/normalised form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
    			atoms::i_exchange_list.reserve(atoms::neighbour_list_array.size());
    			// loop over all interactions
@@ -56,7 +56,7 @@ namespace exchange{
    					atoms::i_exchange_list.push_back(tmp_zval);
                   // get unit cell interaction id
                   int i = atoms::neighbour_interaction_type_array[nn];
-                  atoms::i_exchange_list[nn].Jij = cs::unit_cell.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0];
+                  atoms::i_exchange_list[nn].Jij = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0];
    					// reset interation id to neighbour number - causes segfault if nn out of range
    					atoms::neighbour_interaction_type_array[nn] = nn;
    				}
@@ -65,7 +65,7 @@ namespace exchange{
 
          case internal::vectorial: // normalised vectorial exchange
       			// unroll material calculations
-      			std::cout << "Using normalised vectorial form of exchange interaction with " << cs::unit_cell.interaction.size() << " total interactions." << std::endl;
+      			std::cout << "Using normalised vectorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
       			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
       			atoms::v_exchange_list.reserve(atoms::neighbour_list_array.size());
       			// loop over all interactions
@@ -77,9 +77,9 @@ namespace exchange{
       					atoms::v_exchange_list.push_back(tmp_zvec);
                      // get unit cell interaction id
                      int i = atoms::neighbour_interaction_type_array[nn];
-                     atoms::v_exchange_list[nn].Jij[0] = cs::unit_cell.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0];
-                     atoms::v_exchange_list[nn].Jij[1] = cs::unit_cell.interaction[i].Jij[1][1] * mp::material[imaterial].Jij_matrix[jmaterial][1];
-                     atoms::v_exchange_list[nn].Jij[2] = cs::unit_cell.interaction[i].Jij[2][2] * mp::material[imaterial].Jij_matrix[jmaterial][2];
+                     atoms::v_exchange_list[nn].Jij[0] = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0];
+                     atoms::v_exchange_list[nn].Jij[1] = cs::unit_cell.bilinear.interaction[i].Jij[1][1] * mp::material[imaterial].Jij_matrix[jmaterial][1];
+                     atoms::v_exchange_list[nn].Jij[2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * mp::material[imaterial].Jij_matrix[jmaterial][2];
       					// reset interation id to neighbour number - causes segfault if nn out of range
       					atoms::neighbour_interaction_type_array[nn] = nn;
       				}
@@ -88,7 +88,7 @@ namespace exchange{
 
          case internal::tensorial: // normalised tensorial exchange
          {
-   			std::cout << "Using normalised tensorial form of exchange interaction with " << cs::unit_cell.interaction.size() << " total interactions." << std::endl;
+   			std::cout << "Using normalised tensorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled exchange template requires " << 9.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
    			// unroll isotopic interactions
    			atoms::t_exchange_list.reserve(atoms::neighbour_list_array.size());
@@ -107,17 +107,17 @@ namespace exchange{
                   int i = atoms::neighbour_interaction_type_array[nn];
 
                   // future development may allow for generic inclusion of DMI parameter from exchange tensor, but not currently enabled
-                  atoms::t_exchange_list[nn].Jij[0][0] = cs::unit_cell.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0];
-                  atoms::t_exchange_list[nn].Jij[0][1] = cs::unit_cell.interaction[i].Jij[0][1] * 0.0; //mp::material[imaterial].Dij[jmaterial];
-                  atoms::t_exchange_list[nn].Jij[0][2] = cs::unit_cell.interaction[i].Jij[0][2] * 0.0; //mp::material[imaterial].Dij[jmaterial];
+                  atoms::t_exchange_list[nn].Jij[0][0] = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0];
+                  atoms::t_exchange_list[nn].Jij[0][1] = cs::unit_cell.bilinear.interaction[i].Jij[0][1] * 0.0; //mp::material[imaterial].Dij[jmaterial];
+                  atoms::t_exchange_list[nn].Jij[0][2] = cs::unit_cell.bilinear.interaction[i].Jij[0][2] * 0.0; //mp::material[imaterial].Dij[jmaterial];
 
-                  atoms::t_exchange_list[nn].Jij[1][0] = cs::unit_cell.interaction[i].Jij[1][0] * 0.0; //mp::material[imaterial].Dij[jmaterial];
-                  atoms::t_exchange_list[nn].Jij[1][1] = cs::unit_cell.interaction[i].Jij[1][1] * mp::material[imaterial].Jij_matrix[jmaterial][1];
-                  atoms::t_exchange_list[nn].Jij[1][2] = cs::unit_cell.interaction[i].Jij[1][2] * 0.0; //mp::material[imaterial].Dij[jmaterial];
+                  atoms::t_exchange_list[nn].Jij[1][0] = cs::unit_cell.bilinear.interaction[i].Jij[1][0] * 0.0; //mp::material[imaterial].Dij[jmaterial];
+                  atoms::t_exchange_list[nn].Jij[1][1] = cs::unit_cell.bilinear.interaction[i].Jij[1][1] * mp::material[imaterial].Jij_matrix[jmaterial][1];
+                  atoms::t_exchange_list[nn].Jij[1][2] = cs::unit_cell.bilinear.interaction[i].Jij[1][2] * 0.0; //mp::material[imaterial].Dij[jmaterial];
 
-                  atoms::t_exchange_list[nn].Jij[2][0] = cs::unit_cell.interaction[i].Jij[2][0] * 0.0; //mp::material[imaterial].Dij[jmaterial];
-                  atoms::t_exchange_list[nn].Jij[2][1] = cs::unit_cell.interaction[i].Jij[2][1] * 0.0; //mp::material[imaterial].Dij[jmaterial];
-                  atoms::t_exchange_list[nn].Jij[2][2] = cs::unit_cell.interaction[i].Jij[2][2] * mp::material[imaterial].Jij_matrix[jmaterial][2];
+                  atoms::t_exchange_list[nn].Jij[2][0] = cs::unit_cell.bilinear.interaction[i].Jij[2][0] * 0.0; //mp::material[imaterial].Dij[jmaterial];
+                  atoms::t_exchange_list[nn].Jij[2][1] = cs::unit_cell.bilinear.interaction[i].Jij[2][1] * 0.0; //mp::material[imaterial].Dij[jmaterial];
+                  atoms::t_exchange_list[nn].Jij[2][2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * mp::material[imaterial].Jij_matrix[jmaterial][2];
 
                   // reset interation id to neighbour number - causes segfault if nn out of range
                   atoms::neighbour_interaction_type_array[nn] = nn;

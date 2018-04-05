@@ -85,11 +85,11 @@ namespace internal{
             const double sjy = spin_array_y[natom];
             const double sjz = spin_array_z[natom];
 
-            const double si_dot_sj = sxi*sxj + syi*syj + szi*szj;
+            const double si_dot_sj = six*sjx + siy*sjy + siz*sjz;
 
-				hx += Jbq * sxj*si_dot_sj; // add exchange fields
-				hy += Jbq * syj*si_dot_sj;
-				hz += Jbq * szj*si_dot_sj;
+				hx += Jbq * sjx*si_dot_sj; // add exchange fields
+				hy += Jbq * sjy*si_dot_sj;
+				hz += Jbq * sjz*si_dot_sj;
 
 			}
 

@@ -1,49 +1,15 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard F L Evans 2018. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
+//------------------------------------------------------------------------------
 //
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-/// @file
-/// @brief Contains master function for system creation and cs namespace.
-///
-/// @details This is the detailed description of the funtion of this file
-///
-/// @section notes Implementation Notes
-/// Creation routines are re-written for double precision corrdinates, neighbourlists and
-/// mpi decomposition.
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section info File Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    25/02/2010
-/// @internal
-///	Created:		25/02/2010
-///	Revision:	  ---
-///=====================================================================================
-///
+
 // Standard Headers
 #include <iostream>
 #include <fstream>
@@ -57,6 +23,7 @@
 #include "grains.hpp"
 #include "ltmp.hpp"
 #include "material.hpp"
+#include "neighbours.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
 #include "unitcell.hpp"
@@ -64,15 +31,9 @@
 #include "vmath.hpp"
 #include "vmpi.hpp"
 
+// Internal create header
+#include "internal.hpp"
 
-
-
-/// @namespace ns
-/// @brief Create System Namespace - includes variables and functions for system creation.
-///
-/// @internal
-///=====================================================================================
-///
 namespace cs{
 
 	// System Dimensions
@@ -141,10 +102,15 @@ int create(){
 
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array;
-	std::vector<std::vector<neighbour_t> > cneighbourlist;
 
 	// initialise unit cell for system
 	uc::initialise(cs::unit_cell);
+
+   // Instantiate some constants for improved readability
+   const double ucx = unit_cell.dimensions[0];
+   const double ucy = unit_cell.dimensions[1];
+   const double ucz = unit_cell.dimensions[2];
+   const unsigned int na = unit_cell.atom.size();
 
    // Calculate number of global and local unit cells required (rounding up)
    // Must be set before rounding up system dimensions for periodic boundary conditions
@@ -162,54 +128,6 @@ int create(){
 		if(vmpi::mpi_mode==0) vmpi::geometric_decomposition(vmpi::num_processors,cs::system_dimensions);
 	#endif
 
-	//      Initialise variables for system creation
-	if(cs::system_creation_flags[0]==1){
-		// read_coord_file();
-	}
-
-	#ifdef MPICF
-	// check for staged replicated data generation
-	if(vmpi::replicated_data_staged==true && vmpi::mpi_mode==1){
-
-		// copy ppn to constant temporary
-		const int ppn=vmpi::ppn;
-
-		for(int n=0;n<ppn;n++){
-			bool i_am_it=false;
-			if(vmpi::my_rank%ppn==n) i_am_it=true;
-
-			// Only generate system if I am it
-			if(i_am_it){
-
-				zlog << zTs() << "Generating staged system on rank " << vmpi::my_rank << "..." << std::endl;
-				//std::cerr << zTs() << "Generating staged system on rank " << vmpi::my_rank << "..." << std::endl;
-
-				// Create block of crystal of desired size
-				cs::create_crystal_structure(catom_array);
-
-				// Cut system to the correct type, species etc
-				cs::create_system_type(catom_array);
-
-				vmpi::set_replicated_data(catom_array);
-
-				// Create Neighbour list for system
-				cs::create_neighbourlist(catom_array,cneighbourlist);
-
-				// Identify needed atoms and destroy the rest
-				vmpi::identify_boundary_atoms(catom_array,cneighbourlist);
-
-				zlog << zTs() << "Staged system generation on rank " << vmpi::my_rank << " completed." << std::endl;
-				//std::cerr << zTs() << "Staged system generation on rank " << vmpi::my_rank << " completed." << std::endl;
-			}
-
-			// Wait for process who is it
-			vmpi::barrier();
-
-		} // end of loop over processes
-	}
-	else{
-	#endif
-
 	// Create block of crystal of desired size
 	cs::create_crystal_structure(catom_array);
 
@@ -219,71 +137,42 @@ int create(){
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		vmpi::barrier();// wait for everyone
-		vmpi::copy_halo_atoms(catom_array);
-		vmpi::barrier(); // sync after halo atoms copied
-	}
-	else if(vmpi::mpi_mode==1){
-		vmpi::set_replicated_data(catom_array);
-	}
-	#else
-		//cs::copy_periodic_boundaries(catom_array);
+		create::internal::copy_halo_atoms(catom_array);
+   }
 	#endif
 
-	// Create Neighbour list for system
-	cs::create_neighbourlist(catom_array,cneighbourlist);
+   //---------------------------------------------
+	// Create Neighbour lists for system
+   //---------------------------------------------
+   neighbours::list_t bilinear; // bilinear exchange list
+   neighbours::list_t biquadratic; // biquadratic exchange list
+
+   // generate bilinear exchange list
+   bilinear.generate(catom_array, cs::unit_cell.bilinear, na, ucx, ucy, ucz);
+
+   // optionally create a biquadratic neighbour list
+   if(exchange::biquadratic){
+      biquadratic.generate(catom_array, cs::unit_cell.biquadratic, na, ucx, ucy, ucz);
+   }
 
 	#ifdef MPICF
-		vmpi::identify_boundary_atoms(catom_array,cneighbourlist);
+		create::internal::identify_mpi_boundary_atoms(catom_array,bilinear);
+      if(exchange::biquadratic) create::internal::identify_mpi_boundary_atoms(catom_array,biquadratic);
+      // Sort Arrays by MPI Type
+      create::internal::sort_atoms_by_mpi_type(catom_array, bilinear, biquadratic);
 	#endif
 
-
 	#ifdef MPICF
-	} // stop if for staged generation here
-	// ** Must be done in parallel **
-		vmpi::init_mpi_comms(catom_array);
+      // ** Must be done in parallel **
+		create::internal::init_mpi_comms(catom_array);
 		vmpi::barrier();
-	#endif
-
-	// Set atom variables for simulation
-	#ifdef MPICF
-	// check for staged replicated data generation
-	if(vmpi::replicated_data_staged==true && vmpi::mpi_mode==1){
-
-		// copy ppn to constant temporary
-		const int ppn=vmpi::ppn;
-
-		for(int n=0;n<ppn;n++){
-			bool i_am_it=false;
-			if(vmpi::my_rank%ppn==n) i_am_it=true;
-
-			// Only generate system if I am it
-			if(i_am_it){
-
-				zlog << zTs() << "Copying system data to optimised data structures on rank " << vmpi::my_rank << "..." << std::endl;
-				//std::cerr << zTs() << "Copying system data to optimised data structures on rank " << vmpi::my_rank << "..." << std::endl;
-				cs::set_atom_vars(catom_array,cneighbourlist);
-				zlog << zTs() << "Copying on rank " << vmpi::my_rank << " completed." << std::endl;
-				//std::cerr << zTs() << "Copying on rank " << vmpi::my_rank << " completed." << std::endl;
-			}
-
-			// Wait for process who is it
-			vmpi::barrier();
-
-		} // end of loop over processes
-	}
-	else{
 	#endif
 
 	// Print informative message
 	std::cout << "Copying system data to optimised data structures." << std::endl;
 	zlog << zTs() << "Copying system data to optimised data structures." << std::endl;
 
-	cs::set_atom_vars(catom_array,cneighbourlist);
-
-	#ifdef MPICF
-	} // stop if for staged generation here
-	#endif
+	create::internal::set_atom_vars(catom_array, bilinear, biquadratic);
 
    // Determine number of local atoms
    #ifdef MPICF
@@ -362,4 +251,4 @@ int create(){
 	return EXIT_SUCCESS;
 }
 
-}
+} // end of create namespace

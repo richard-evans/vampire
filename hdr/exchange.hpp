@@ -70,10 +70,13 @@ class zten_t{
 //--------------------------------------------------------------------------------
 namespace exchange{
 
+   extern bool biquadratic; // flag to enable biquadratic exchange calculation
+
    //-----------------------------------------------------------------------------
    // Function to initialise exchange module
    //-----------------------------------------------------------------------------
-   void initialize(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
+   void initialize(std::vector<std::vector <neighbours::neighbour_t> >& bilinear,
+                   std::vector<std::vector <neighbours::neighbour_t> >& biquadratic);
 
    //-----------------------------------------------------------------------------
    // Functions to set exchange type isotropic, vectorial or tensorial
@@ -90,6 +93,7 @@ namespace exchange{
    // Calculate  exchange energy for single spin selecting the correct type
    //---------------------------------------------------------------------------
    double single_spin_energy(const int atom, const double sx, const double sy, const double sz);
+   double single_spin_biquadratic_energy(const int atom, const double sx, const double sy, const double sz);
 
    //-----------------------------------------------------------------------------
    // Function to calculate exchange fields for spins between start and end index

@@ -51,10 +51,10 @@ namespace exchange{
                                 field_array_x, field_array_y, field_array_z);
 
       // calculate biquadratic exchange field
-      if(exchange::internal::enable_bqe){
+      if(exchange::biquadratic){
          exchange::internal::biquadratic_exchange_fields(start_index, end_index,
-                                                         neighbour_list_start_index, neighbour_list_end_index,
-                                                         type_array, neighbour_list_array, neighbour_interaction_type_array,
+                                                         exchange::internal::biquadratic_neighbour_list_start_index, exchange::internal::biquadratic_neighbour_list_end_index,
+                                                         type_array, exchange::internal::biquadratic_neighbour_list_array, exchange::internal::biquadratic_neighbour_interaction_type_array,
                                                          internal::bq_i_exchange_list, internal::bq_v_exchange_list, internal::bq_t_exchange_list,
                                                          spin_array_x, spin_array_y, spin_array_z,
                                                          field_array_x, field_array_y, field_array_z);

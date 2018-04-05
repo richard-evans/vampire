@@ -25,52 +25,98 @@
 //--------------------------------------------------------------------------------
 namespace unitcell{
 
+   //---------------------------------------------------------------------------
    // Unit cell atom class definition
+   //---------------------------------------------------------------------------
    class atom_t {
 	public:
-		double x; /// atom x-coordinate
-		double y; /// atom y-coordinate
-		double z; /// atom z-coordinate
-		unsigned int mat; /// material
-		unsigned int lc; /// lattice category
-		unsigned int hc; /// height category
-		unsigned int ni; /// number of interactions
-      unsigned int nbqi; /// number of interactions
+      double x; /// atom x-coordinate
+      double y; /// atom y-coordinate
+      double z; /// atom z-coordinate
+      unsigned int mat; /// material
+      unsigned int lc; /// lattice category
+      unsigned int hc; /// height category
+      unsigned int ni; /// number of interactions
 	};
 
+   //---------------------------------------------------------------------------
    // Unit cell interaction class definition
+   //---------------------------------------------------------------------------
 	class interaction_t {
 	public:
-		unsigned int i; /// atom unit cell id
-		unsigned int j; /// neighbour atom unit cell id
-		int dx; /// delta x in unit cells
-		int dy; /// delta y in unit cells
-		int dz; /// delta z in unit cells
+      unsigned int i; /// atom unit cell id
+      unsigned int j; /// neighbour atom unit cell id
+      int dx; /// delta x in unit cells
+      int dy; /// delta y in unit cells
+      int dz; /// delta z in unit cells
       double rij; // interaction range (unit cells)
-		double Jij[3][3]; /// Exchange tensor
+      double Jij[3][3]; /// Exchange tensor
 	};
 
+   //---------------------------------------------------------------------------
+   // Enumerated list of available exchange types
+   //---------------------------------------------------------------------------
+   enum exchange_t { isotropic = 0, // isotropic exchange interactions
+                     vectorial = 1, // vector exchange Jxx, Jyy, Jzz
+                     tensorial = 2, // tensor exchange Jxx, Jxy ... Jzz
+   };
+
+   //---------------------------------------------------------------------------
+   // Unit cell exchange template class definition
+   //---------------------------------------------------------------------------
+   class exchange_template_t {
+   public:
+
+      exchange_t exchange_type; // exchange type to use in simulation
+      bool use_material_exchange_constants; // flag to enable material exchange parameters
+
+      // list of interactions in each unit cell
+      std::vector <unitcell::interaction_t> interaction;
+
+      // list of number of interactions from template for each atom in unit cell
+      std::vector <int> ni;
+
+      void read_interactions(
+         const int num_atoms, // num atoms in unit cell
+         std::stringstream& ucf_file,
+         std::istringstream& ucf_ss,
+         std::string& filename,
+         unsigned int& line_counter,
+         int& interaction_range);
+
+      // function to set exchange type
+      unsigned int set_exchange_type(std::string exchange_type_string);
+
+      // function to verify exchange interactions are reciprocal
+      void verify(std::string filename);
+
+      // normalisation function to achieve same exchange sum as nn approximation
+      void normalise_exchange();
+      void normalise_exponential_exchange();
+
+   };
+
+   //---------------------------------------------------------------------------
    // Unit cell class definition
+   //---------------------------------------------------------------------------
 	class unit_cell_t {
 	public:
 
 		double dimensions[3];
 		double shape[3][3];
       double cutoff_radius; // nearest neighbours
+      unsigned int interaction_range; /// maximum range in unit cells
 
 		unsigned int lcsize; /// number of local categories
 		unsigned int hcsize; /// number of height categories
-		unsigned int interaction_range; /// maximum range in unit cells
 		unsigned int surface_threshold; /// threshold for surface atoms
 
 		// list of atoms in each unit cell
 		std::vector <unitcell::atom_t> atom;
 
-		// list of interactions in each unit cell
-		std::vector <unitcell::interaction_t> interaction;
-
-      // list of biquadratic interactions in each unit cell
-		std::vector <unitcell::interaction_t> biquadratic_interaction;
+      unitcell::exchange_template_t bilinear;
+      unitcell::exchange_template_t biquadratic;
+      //exchange_template_t fourspin_interaction; // tbc
 
 	};
 

@@ -63,7 +63,6 @@ namespace exchange{
       //-------------------------------------------------------------------------
       extern std::vector<internal::mp_t> mp; // array of material properties
 
-      extern bool enable_bqe; // flag to enable biquadratic exchange calculation
       extern bool enable_dmi; // flag to enable dmi calculation
 
       extern double dmi_cutoff_range; // cutoff range for DMI calculation (Ångstroms)
@@ -126,6 +125,11 @@ namespace exchange{
       	};
       };
 
+      extern std::vector <int> biquadratic_neighbour_list_array; // 1D list of biquadratic neighbours
+      extern std::vector <int> biquadratic_neighbour_interaction_type_array; // 1D list of biquadratic exchange interaction types
+      extern std::vector <int> biquadratic_neighbour_list_start_index; // list of first biquadratic neighbour for atom i
+      extern std::vector <int> biquadratic_neighbour_list_end_index;   // list of last biquadratic neighbour for atom i
+
       extern std::vector <exchange::internal::value_t > bq_i_exchange_list; // list of isotropic biquadratic exchange constants
       extern std::vector <exchange::internal::vector_t> bq_v_exchange_list; // list of vectorial biquadratic exchange constants
       extern std::vector <exchange::internal::tensor_t> bq_t_exchange_list; // list of tensorial biquadratic exchange constants
@@ -133,7 +137,7 @@ namespace exchange{
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
-      void calculate_dmi(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
+      void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
       void unroll_exchange_interactions();
       void unroll_normalised_exchange_interactions();
       void unroll_normalised_biquadratic_exchange_interactions();

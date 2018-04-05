@@ -43,7 +43,7 @@ namespace internal{
    // within their respective cutoff ranges for i-k and j-k interactions.
    //
    //------------------------------------------------------------------------------
-   void calculate_dmi(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist){
+   void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist){
 
       // if dmi is not needed then do nothing
       if(!internal::enable_dmi) return;
