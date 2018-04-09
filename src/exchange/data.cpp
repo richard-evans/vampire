@@ -39,6 +39,8 @@ namespace exchange{
       exchange_t exchange_type = isotropic; // exchange type to use in simulation
       exchange_t biquadratic_exchange_type = isotropic; // biquadratic exchange type to use in simulation
 
+      exchange_t minimum_needed_exchange_type = isotropic; // minimum support required for bilinear exchange type (for vectorial constants and DMI)
+
       bool use_material_exchange_constants = true; // flag to enable material exchange parameters
       bool use_material_biquadratic_exchange_constants = true; // flag to enable material biquadratic exchange parameters
 

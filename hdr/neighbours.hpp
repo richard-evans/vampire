@@ -18,6 +18,7 @@
 
 // Vampire headers
 #include "create_atoms_class.hpp"
+#include "exchange_types.hpp" // needed for exchange interaction type definition
 #include "neighbours.hpp"
 #include "unitcell.hpp"
 

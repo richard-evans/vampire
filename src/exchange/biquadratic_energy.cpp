@@ -68,7 +68,7 @@ namespace exchange{
       // select calculation based on exchange type
       switch(internal::biquadratic_exchange_type){
 
-   		case internal::isotropic:
+   		case exchange::isotropic:
             return spin_biquadratic_exchange_energy_isotropic(atom, sx, sy, sz);
             break;
 

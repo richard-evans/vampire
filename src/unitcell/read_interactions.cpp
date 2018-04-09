@@ -40,7 +40,7 @@ namespace unitcell{
       ucf_ss >> num_interactions >> exchange_type_string;
 
       // process exchange string to set exchange type and normalisation
-      const int num_exchange_values = set_exchange_type(exchange_type_string);
+      const int num_exchange_values = unitcell::exchange_template_t::set_exchange_type(exchange_type_string);
 
       if(num_interactions>=0) interaction.resize(num_interactions);
       else {

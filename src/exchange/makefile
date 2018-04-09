@@ -15,8 +15,6 @@ get_exchange_type.o \
 initialize.o \
 initialize_biquadratic.o \
 interface.o \
-set_biquadratic_exchange_type.o \
-set_exchange_type.o \
 unroll_normalised.o \
 unroll_normalised_biquadratic.o \
 unroll.o

@@ -31,6 +31,15 @@ namespace exchange{
 
       zlog << zTs() << "Initialising data structures for exchange calculation." << std::endl;
 
+      // save type of interaction template and if material file constants are used
+      exchange::internal::exchange_type = cs::unit_cell.bilinear.exchange_type;
+      exchange::internal::use_material_exchange_constants = cs::unit_cell.bilinear.use_material_exchange_constants;
+
+      // check that minimum required exchange type is enabled
+      if(exchange::internal::exchange_type == exchange::isotropic &&  exchange::internal::minimum_needed_exchange_type == exchange::vectorial){
+         exchange::internal::exchange_type = exchange::vectorial;
+      }
+
       //-------------------------------------------------
    	//	Calculate total number of neighbours
    	//-------------------------------------------------
@@ -88,6 +97,10 @@ namespace exchange{
          for(uint64_t atom = 0; atom < atoms::num_atoms; atom++){
       		counter += biquadratic[atom].size();
       	}
+
+         // save type of interaction template and if material file constants are used
+         exchange::internal::biquadratic_exchange_type = cs::unit_cell.biquadratic.exchange_type;
+         exchange::internal::use_material_biquadratic_exchange_constants = cs::unit_cell.biquadratic.use_material_exchange_constants;
 
       	exchange::internal::biquadratic_neighbour_list_array.resize(counter,0);
       	exchange::internal::biquadratic_neighbour_interaction_type_array.resize(counter,0);

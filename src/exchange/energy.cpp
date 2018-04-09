@@ -119,17 +119,17 @@ namespace exchange{
       // select calculation based on exchange type
       switch(internal::exchange_type){
 
-   		case internal::isotropic:
+   		case exchange::isotropic:
             return spin_exchange_energy_isotropic(atom, sx, sy, sz);
             break;
 
 
-         case internal::vectorial:
+         case exchange::vectorial:
             return spin_exchange_energy_vectorial(atom, sx, sy, sz);
             break;
 
 
-         case internal::tensorial:
+         case exchange::tensorial:
             return spin_exchange_energy_tensorial(atom, sx, sy, sz);
             break;
 

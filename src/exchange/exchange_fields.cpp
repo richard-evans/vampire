@@ -46,7 +46,7 @@ namespace internal{
    	// Use appropriate function for exchange calculation
    	switch(internal::exchange_type){
 
-   		case internal::isotropic:
+   		case exchange::isotropic:
 
             // loop over all atoms
    			for(int atom = start_index; atom < end_index; ++atom){
@@ -79,7 +79,7 @@ namespace internal{
    			}
    			break;
 
-   		case internal::vectorial: // vector
+   		case exchange::vectorial: // vector
 
             // loop over all atoms
             for(int atom = start_index; atom < end_index; ++atom){
@@ -116,7 +116,7 @@ namespace internal{
    			}
    			break;
 
-   		case internal::tensorial: // tensor
+   		case exchange::tensorial: // tensor
 
             // loop over all atoms
             for(int atom = start_index; atom < end_index; ++atom){

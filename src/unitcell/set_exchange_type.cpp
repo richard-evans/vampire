@@ -44,7 +44,7 @@ namespace unitcell{
       if(isotropic_str == exchange_type_string){
 
          // set exchange type
-         exchange_type = isotropic;
+         exchange_type = exchange::isotropic;
 
          // unset normalization flag
          use_material_exchange_constants = false;
@@ -60,7 +60,7 @@ namespace unitcell{
       if(vectorial_str == exchange_type_string){
 
          // set exchange type
-         exchange_type = vectorial;
+         exchange_type = exchange::vectorial;
 
          // unset normalization flag
          use_material_exchange_constants = false;
@@ -76,7 +76,7 @@ namespace unitcell{
       if(tensorial_str == exchange_type_string){
 
          // set exchange type
-         exchange_type = tensorial;
+         exchange_type = exchange::tensorial;
 
          // unset normalization flag
          use_material_exchange_constants = false;
@@ -92,7 +92,7 @@ namespace unitcell{
       if(norm_isotropic_str == exchange_type_string){
 
          // set exchange type
-         exchange_type = isotropic;
+         exchange_type = exchange::isotropic;
 
          // unset normalization flag
          use_material_exchange_constants = true;
@@ -108,7 +108,7 @@ namespace unitcell{
       if(norm_vectorial_str == exchange_type_string){
 
          // set exchange type
-         exchange_type = vectorial;
+         exchange_type = exchange::vectorial;
 
          // unset normalization flag
          use_material_exchange_constants = true;
@@ -124,7 +124,7 @@ namespace unitcell{
       if(norm_tensorial_str == exchange_type_string){
 
          // set exchange type
-         exchange_type = tensorial;
+         exchange_type = exchange::tensorial;
 
          // unset normalization flag
          use_material_exchange_constants = true;

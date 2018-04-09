@@ -44,7 +44,7 @@ namespace internal{
 
    	switch(internal::biquadratic_exchange_type){
 
-   		case internal::isotropic:
+   		case exchange::isotropic:
             std::cout << "Initialising biquadratic exchange interactions." << std::endl;
             zlog << zTs() << "Initialising biquadratic exchange interactions." << std::endl;
             zlog << zTs() << "Unrolled biquadratic exchange template requires "
@@ -65,7 +65,7 @@ namespace internal{
    			}
    			break;
 
-   		case internal::vectorial:
+   		case exchange::vectorial:
    			std::cout << "Using vectorial form of biquadratic exchange interaction with " << cs::unit_cell.biquadratic.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled biquadratic exchange template requires " << 3.0*double(cs::unit_cell.biquadratic.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
 
@@ -85,7 +85,7 @@ namespace internal{
    			}
    			break;
 
-   		case internal::tensorial:
+   		case exchange::tensorial:
 
    			std::cout << "Using tensorial form of biquadratic exchange interaction with " << cs::unit_cell.biquadratic.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled biquadratic exchange template requires " << 9.0*double(cs::unit_cell.biquadratic.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;

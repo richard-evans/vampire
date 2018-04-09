@@ -18,6 +18,7 @@
 #include <vector>
 
 // Vampire headers
+#include "exchange_types.hpp" // needed for exchange interaction type definition
 #include "unitcell.hpp"
 
 //--------------------------------------------------------------------------------
@@ -54,20 +55,12 @@ namespace unitcell{
 	};
 
    //---------------------------------------------------------------------------
-   // Enumerated list of available exchange types
-   //---------------------------------------------------------------------------
-   enum exchange_t { isotropic = 0, // isotropic exchange interactions
-                     vectorial = 1, // vector exchange Jxx, Jyy, Jzz
-                     tensorial = 2, // tensor exchange Jxx, Jxy ... Jzz
-   };
-
-   //---------------------------------------------------------------------------
    // Unit cell exchange template class definition
    //---------------------------------------------------------------------------
    class exchange_template_t {
    public:
 
-      exchange_t exchange_type; // exchange type to use in simulation
+      exchange::exchange_t exchange_type; // exchange type to use in simulation
       bool use_material_exchange_constants; // flag to enable material exchange parameters
 
       // list of interactions in each unit cell
@@ -75,6 +68,15 @@ namespace unitcell{
 
       // list of number of interactions from template for each atom in unit cell
       std::vector <int> ni;
+
+      // Class constructor with rational defaults
+      exchange_template_t():
+         exchange_type(exchange::isotropic),
+         use_material_exchange_constants(true)
+      {
+         // Do nothing
+         return;
+      };
 
       void read_interactions(
          const int num_atoms, // num atoms in unit cell

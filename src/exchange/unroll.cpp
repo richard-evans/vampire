@@ -33,7 +33,7 @@ namespace exchange{
 
       // if dmi is enabled then set exchange type to force normalised tensor form of exchange
       if(internal::enable_dmi){
-         internal::exchange_type = internal::tensorial;
+         internal::exchange_type = exchange::tensorial;
          internal::use_material_exchange_constants = true;
       }
 
@@ -51,7 +51,7 @@ namespace exchange{
 
    	switch(internal::exchange_type){
 
-   		case internal::isotropic:
+   		case exchange::isotropic:
    			std::cout << "Using isotropic form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(cs::unit_cell.bilinear.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
    			// unroll isotopic interactions
@@ -64,7 +64,7 @@ namespace exchange{
    			}
    			break;
 
-   		case internal::vectorial:
+   		case exchange::vectorial:
    			std::cout << "Using vectorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(cs::unit_cell.bilinear.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
    			// unroll isotopic interactions
@@ -79,7 +79,7 @@ namespace exchange{
    			}
    			break;
 
-   		case internal::tensorial:
+   		case exchange::tensorial:
    			std::cout << "Using tensorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled exchange template requires " << 9.0*double(cs::unit_cell.bilinear.interaction.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
    			// unroll isotopic interactions

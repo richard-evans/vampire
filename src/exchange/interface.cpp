@@ -91,7 +91,7 @@ namespace exchange{
             vin::read_material[super_index].Jij_matrix_SI[sub_index][1] = Jij[1];
             vin::read_material[super_index].Jij_matrix_SI[sub_index][2] = Jij[2];
             // set vectorial anisotropy
-            internal::exchange_type = internal::vectorial;
+            internal::minimum_needed_exchange_type = exchange::vectorial;
             return true;
          }
          else{

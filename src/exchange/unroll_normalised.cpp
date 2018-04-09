@@ -41,8 +41,8 @@ namespace exchange{
    	zvec_t tmp_zvec;
    	zten_t tmp_zten;
 
-   	switch(internal::exchange_type){
-   		case internal::isotropic:
+   	switch(exchange::internal::exchange_type){
+   		case exchange::isotropic:
    			// unroll material calculations
    			std::cout << "Using generic/normalised form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
@@ -63,7 +63,7 @@ namespace exchange{
    			}
    			break;
 
-         case internal::vectorial: // normalised vectorial exchange
+         case exchange::vectorial: // normalised vectorial exchange
       			// unroll material calculations
       			std::cout << "Using normalised vectorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
       			zlog << zTs() << "Unrolled exchange template requires " << 3.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
@@ -86,7 +86,7 @@ namespace exchange{
       			}
       			break;
 
-         case internal::tensorial: // normalised tensorial exchange
+         case exchange::tensorial: // normalised tensorial exchange
          {
    			std::cout << "Using normalised tensorial form of exchange interaction with " << cs::unit_cell.bilinear.interaction.size() << " total interactions." << std::endl;
    			zlog << zTs() << "Unrolled exchange template requires " << 9.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;

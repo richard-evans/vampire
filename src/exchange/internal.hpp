@@ -67,14 +67,10 @@ namespace exchange{
 
       extern double dmi_cutoff_range; // cutoff range for DMI calculation (Ångstroms)
 
-      // Enumerated list of available exchange types
-      enum exchange_t { isotropic = 0, // isotropic exchange interactions
-                        vectorial = 1, // vector exchange Jxx, Jyy, Jzz
-                        tensorial = 2, // tensor exchange Jxx, Jxy ... Jzz
-      };
-
       extern exchange_t exchange_type; // exchange type to use in simulation
       extern exchange_t biquadratic_exchange_type; // biquadratic exchange type to use in simulation
+
+      extern exchange_t minimum_needed_exchange_type; // minimum support required for bilinear exchange type (for vectorial constants and DMI)
 
       extern bool use_material_exchange_constants; // flag to enable material exchange parameters
       extern bool use_material_biquadratic_exchange_constants; // flag to enable material exchange parameters
