@@ -101,6 +101,7 @@ namespace vout{
    extern bool gnuplot_array_format;
 	
 	extern bool output_atoms_config;
+	extern bool output_atoms_config_vtk;
 	extern int output_atoms_config_rate;
 	
 	extern double atoms_output_min[3];
