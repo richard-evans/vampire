@@ -2169,6 +2169,12 @@ int match_config(string const word, string const value, int const line){
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
+   std::string test = "vtk";
+   if (word == test) {
+	   vout::output_atoms_config_vtk = true;
+	   return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
    test="atoms-output-rate";
    if(word==test){
       int i=atoi(value.c_str());
@@ -2601,13 +2607,6 @@ int match_vout_list(string const word, string const value, int const line, std::
       vout::output_rate=r;
       return EXIT_SUCCESS;
    }
-   //--------------------------------------------------------------------
-   test = "vtk";
-   if (word == test){
-	   output_list.push_back(61);
-	   return EXIT_SUCCESS;
-   }
-   //--------------------------------------------------------------------
 
    //--------------------------------------------------------------------
    // keyword not found
@@ -4140,6 +4139,10 @@ namespace vout{
 		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
 		stream << "\t" << vmpi::MaximumComputeTime << "\t" << vmpi::MaximumWaitTime << "\t";
 	}
+	// Output Function 61
+	void vtk_magnetization(std::ostream& stream) {
+		// Fill in later
+	}
 	
 	// Data output wrapper function
 	void data(){
@@ -4188,144 +4191,147 @@ namespace vout{
 
 		// Output data to output
       if(vmpi::my_rank==0){
-		for(unsigned int item=0;item<file_output_list.size();item++){
-			switch(file_output_list[item]){
-				case 0:
-					vout::time(zmag);
-					break;
-				case 1:
-					vout::real_time(zmag);
-					break;
-				case 2:
-					vout::temperature(zmag);
-					break;
-				case 3:
-					vout::Happ(zmag);
-					break;
-				case 4:
-					vout::Hvec(zmag);
-					break;
-				case 5:
-					vout::mvec(zmag);
-					break;
-				case 6:
-					vout::magm(zmag);
-					break;
-				case 7:
-					vout::mean_magm(zmag);
-					break;
-				case 8:
-					vout::mat_mvec(zmag);
-					break;
-				case 9:
-					vout::mat_mean_magm(zmag);
-					break;
-				case 12:
-					vout::mdoth(zmag);
-					break;
-				case 14:
-					vout::systorque(zmag);
-					break;
-				case 15:
-					vout::mean_systorque(zmag);
-					break;
-				case 16:
-					vout::constraint_phi(zmag);
-					break;
-				case 17:
-					vout::constraint_theta(zmag);
-					break;
-				case 18:
-					vout::material_constraint_phi(zmag);
-					break;
-				case 19:
-					vout::material_constraint_theta(zmag);
-					break;
-				case 20:
-					vout::material_mean_systorque(zmag);
-					break;
-				case 21:
-					vout::mean_system_susceptibility(zmag);
-					break;
-				case 22:
-					vout::phonon_temperature(zmag);
-					break;
-				case 23:
-					vout::material_temperature(zmag);
-					break;
-				case 24:
-					vout::material_applied_field_strength(zmag);
-					break;
-				case 25:
-					vout::material_fmr_field_strength(zmag);
-					break;
-				case 26:
-					vout::mat_mdoth(zmag);
-					break;
-            case 27:
-               vout::total_energy(zmag);
-               break;
-            case 28:
-               vout::mean_total_energy(zmag);
-               break;
-            case 29:
-               vout::total_anisotropy_energy(zmag);
-               break;
-            case 30:
-               vout::mean_total_anisotropy_energy(zmag);
-               break;
-            case 31:
-               vout::total_cubic_anisotropy_energy(zmag);
-               break;
-            case 32:
-               vout::mean_total_cubic_anisotropy_energy(zmag);
-               break;
-            case 33:
-               vout::total_surface_anisotropy_energy(zmag);
-               break;
-            case 34:
-               vout::mean_total_surface_anisotropy_energy(zmag);
-               break;
-            case 35:
-               vout::total_exchange_energy(zmag);
-               break;
-            case 36:
-               vout::mean_total_exchange_energy(zmag);
-               break;
-            case 37:
-               vout::total_applied_field_energy(zmag);
-               break;
-            case 38:
-               vout::mean_total_applied_field_energy(zmag);
-               break;
-            case 39:
-               vout::total_magnetostatic_energy(zmag);
-               break;
-            case 40:
-               vout::mean_total_magnetostatic_energy(zmag);
-               break;
-            case 41:
-               vout::total_so_anisotropy_energy(zmag);
-               break;
-            case 42:
-               vout::mean_total_so_anisotropy_energy(zmag);
-               break;
-            case 43:
-               vout::height_mvec(zmag);
-               break;
-            case 44:
-               vout::material_height_mvec(zmag);
-               break;
-            case 45:
-               vout::height_mvec_actual(zmag);
-               break;
-            case 46:
-               vout::material_height_mvec_actual(zmag);
-               break;
-            case 60:
-					vout::MPITimings(zmag);
-					break;
-			}
+		  for (unsigned int item = 0; item < file_output_list.size(); item++) {
+			  switch (file_output_list[item]) {
+			  case 0:
+				  vout::time(zmag);
+				  break;
+			  case 1:
+				  vout::real_time(zmag);
+				  break;
+			  case 2:
+				  vout::temperature(zmag);
+				  break;
+			  case 3:
+				  vout::Happ(zmag);
+				  break;
+			  case 4:
+				  vout::Hvec(zmag);
+				  break;
+			  case 5:
+				  vout::mvec(zmag);
+				  break;
+			  case 6:
+				  vout::magm(zmag);
+				  break;
+			  case 7:
+				  vout::mean_magm(zmag);
+				  break;
+			  case 8:
+				  vout::mat_mvec(zmag);
+				  break;
+			  case 9:
+				  vout::mat_mean_magm(zmag);
+				  break;
+			  case 12:
+				  vout::mdoth(zmag);
+				  break;
+			  case 14:
+				  vout::systorque(zmag);
+				  break;
+			  case 15:
+				  vout::mean_systorque(zmag);
+				  break;
+			  case 16:
+				  vout::constraint_phi(zmag);
+				  break;
+			  case 17:
+				  vout::constraint_theta(zmag);
+				  break;
+			  case 18:
+				  vout::material_constraint_phi(zmag);
+				  break;
+			  case 19:
+				  vout::material_constraint_theta(zmag);
+				  break;
+			  case 20:
+				  vout::material_mean_systorque(zmag);
+				  break;
+			  case 21:
+				  vout::mean_system_susceptibility(zmag);
+				  break;
+			  case 22:
+				  vout::phonon_temperature(zmag);
+				  break;
+			  case 23:
+				  vout::material_temperature(zmag);
+				  break;
+			  case 24:
+				  vout::material_applied_field_strength(zmag);
+				  break;
+			  case 25:
+				  vout::material_fmr_field_strength(zmag);
+				  break;
+			  case 26:
+				  vout::mat_mdoth(zmag);
+				  break;
+			  case 27:
+				  vout::total_energy(zmag);
+				  break;
+			  case 28:
+				  vout::mean_total_energy(zmag);
+				  break;
+			  case 29:
+				  vout::total_anisotropy_energy(zmag);
+				  break;
+			  case 30:
+				  vout::mean_total_anisotropy_energy(zmag);
+				  break;
+			  case 31:
+				  vout::total_cubic_anisotropy_energy(zmag);
+				  break;
+			  case 32:
+				  vout::mean_total_cubic_anisotropy_energy(zmag);
+				  break;
+			  case 33:
+				  vout::total_surface_anisotropy_energy(zmag);
+				  break;
+			  case 34:
+				  vout::mean_total_surface_anisotropy_energy(zmag);
+				  break;
+			  case 35:
+				  vout::total_exchange_energy(zmag);
+				  break;
+			  case 36:
+				  vout::mean_total_exchange_energy(zmag);
+				  break;
+			  case 37:
+				  vout::total_applied_field_energy(zmag);
+				  break;
+			  case 38:
+				  vout::mean_total_applied_field_energy(zmag);
+				  break;
+			  case 39:
+				  vout::total_magnetostatic_energy(zmag);
+				  break;
+			  case 40:
+				  vout::mean_total_magnetostatic_energy(zmag);
+				  break;
+			  case 41:
+				  vout::total_so_anisotropy_energy(zmag);
+				  break;
+			  case 42:
+				  vout::mean_total_so_anisotropy_energy(zmag);
+				  break;
+			  case 43:
+				  vout::height_mvec(zmag);
+				  break;
+			  case 44:
+				  vout::material_height_mvec(zmag);
+				  break;
+			  case 45:
+				  vout::height_mvec_actual(zmag);
+				  break;
+			  case 46:
+				  vout::material_height_mvec_actual(zmag);
+				  break;
+			  case 60:
+				  vout::MPITimings(zmag);
+				  break;
+			  case 61:
+				  vout::vtk_magnetization(zmag);
+				break;
+			  }
 		}
 		// Carriage return
 		if(file_output_list.size()>0) zmag << std::endl;
