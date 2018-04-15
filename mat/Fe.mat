@@ -1,0 +1,20 @@
+#===================================================
+# Vampire material file for Fe
+#===================================================
+#
+# P. D. Murray 2018-04-14
+#
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=1
+#---------------------------------------------------
+# Material 0 Iron Generic
+#---------------------------------------------------
+material[0]:material-name="Fe"
+material[0]:damping-constant=0.1
+material[0]:atomic-spin-moment=1.92 !muB
+material[0]:uniaxial-anisotropy-constant=-8.07246e-24
+material[0]:material-element=Fe
+material[0]:initial-spin-direction=0,0,1
+material[0]:exchange-matrix[0]=12e-21
