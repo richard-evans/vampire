@@ -1,0 +1,49 @@
+#------------------------------------------
+# Sample vampire input file to perform
+# benchmark calculation for v4.0
+#
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:crystal-structure=sc
+
+#------------------------------------------
+# System Dimensions:
+#------------------------------------------
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 10 !nm
+dimensions:system-size-y = 10 !nm
+dimensions:system-size-z = 10 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Fe.mat
+
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:temperature=300.0
+sim:time-steps-increment=10
+sim:total-time-steps=10000
+sim:time-step=1.0E-15
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program=benchmark
+sim:integrator=llg-heun
+
+#------------------------------------------
+# data output
+#------------------------------------------
+output:real-time
+output:temperature
+output:magnetisation
+output:magnetisation-length
+output:output-rate = 1000
+
+screen:time-steps
+screen:magnetisation-length
