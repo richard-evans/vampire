@@ -2601,6 +2601,13 @@ int match_vout_list(string const word, string const value, int const line, std::
       vout::output_rate=r;
       return EXIT_SUCCESS;
    }
+   //--------------------------------------------------------------------
+   test = "vtk";
+   if (word == test){
+	   output_list.push_back(61);
+	   return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
 
    //--------------------------------------------------------------------
    // keyword not found
