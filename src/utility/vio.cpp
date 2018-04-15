@@ -4139,10 +4139,6 @@ namespace vout{
 		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
 		stream << "\t" << vmpi::MaximumComputeTime << "\t" << vmpi::MaximumWaitTime << "\t";
 	}
-	// Output Function 61
-	void vtk_magnetization(std::ostream& stream) {
-		// Fill in later
-	}
 	
 	// Data output wrapper function
 	void data(){
@@ -4328,9 +4324,6 @@ namespace vout{
 			  case 60:
 				  vout::MPITimings(zmag);
 				  break;
-			  case 61:
-				  vout::vtk_magnetization(zmag);
-				break;
 			  }
 		}
 		// Carriage return
