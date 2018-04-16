@@ -200,6 +200,8 @@
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);WIN_COMPILE;M_PI=3.145926;_CRT_SECURE_NO_WARNINGS;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\src\qvoronoi;.\hdr;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
