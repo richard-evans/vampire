@@ -2169,9 +2169,17 @@ int match_config(string const word, string const value, int const line){
       return EXIT_SUCCESS;
    }
    //-----------------------------------------
-   std::string test = "vtk";
+   test = "vtk";
    if (word == test) {
 	   vout::output_atoms_config_vtk = true;
+	   return EXIT_SUCCESS;
+   }
+   //--------------------------------------------------------------------
+   test = "vtk-output-rate";
+   if (word == test) {
+	   int i=atoi(value.c_str());
+	   check_for_valid_int(i, word, line, prefix, 1, 1000000, "input", "1 - 1,000,000");
+	   vout::output_atoms_vtk_rate = i;
 	   return EXIT_SUCCESS;
    }
    //--------------------------------------------------------------------

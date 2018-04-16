@@ -103,6 +103,7 @@ namespace vout{
 	extern bool output_atoms_config;
 	extern bool output_atoms_config_vtk;
 	extern int output_atoms_config_rate;
+	extern int output_atoms_vtk_rate;
 	
 	extern double atoms_output_min[3];
 	extern double atoms_output_max[3];
