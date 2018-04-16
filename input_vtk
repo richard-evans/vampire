@@ -14,10 +14,10 @@ create:ellipsoid
 # System Dimensions:
 #------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
-# dimensions:system-size-x = 5 !nm
-# dimensions:system-size-y = 5 !nm
-# dimensions:system-size-z = 5 !nm
-dimensions:particle-size= 5 !nm
+dimensions:system-size-x = 25 !nm
+dimensions:system-size-y = 25 !nm
+dimensions:system-size-z = 25 !nm
+dimensions:particle-size= 25 !nm
 dimensions:particle-shape-factor-x = 1
 dimensions:particle-shape-factor-y = 0.8
 dimensions:particle-shape-factor-z = 0.2
@@ -54,9 +54,11 @@ sim:applied-field-strength-increment=0.1 !T
 # data output
 #------------------------------------------
 output:real-time
-#output:temperature
-config:atoms
-config:atoms-output-rate=1
+# output:temperature
+config:vtk
+config:vtk-output-rate=1
+# config:atoms-output-rate-vtk=1
+# config:atoms-output-rate=1
 
 output:applied-field-strength
 output:applied-field-unit-vector
