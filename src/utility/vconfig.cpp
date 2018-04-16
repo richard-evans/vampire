@@ -67,7 +67,9 @@ namespace vout{
    bool output_atoms_config=false;
    bool output_atoms_config_vtk = false;
    int output_atoms_config_rate=1000;
+   int output_atoms_vtk_rate = 1000;
    int output_atoms_file_counter=0;
+   int output_atoms_vtk_file_counter=0;
    int output_rate_counter=0;
 
    double atoms_output_min[3]={0.0,0.0,0.0};
@@ -85,6 +87,11 @@ namespace vout{
 
    // function headers
    void atoms();
+   void atoms_vtk();
+   void calculate_total_atoms();
+   void write_atom_coordinates(std::ofstream&);
+   void write_atom_spins(std::ofstream&);
+   void write_atom_materials(std::ofstream&);
    void atoms_coords();
    void cells();
    void cells_coords();
@@ -123,7 +130,7 @@ void config(){
    }
 
    // atomic spins output - vtk file format
-   if ((vout::output_atoms_config_vtk == true) && (vout::output_rate_counter%output_cells_config_rate == 0)) {
+   if ((vout::output_atoms_config_vtk == true) && (vout::output_rate_counter%output_atoms_vtk_rate == 0)) {
 	   vout::atoms_vtk();
    }
 
@@ -283,12 +290,12 @@ void config(){
 /// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
 ///
 /// @section Information
-/// @author  Richard Evans, richard.evans@york.ac.uk
+/// @author  Peyton Murray
 /// @version 1.0
-/// @date    30/05/2011
+/// @date    2018-04-15
 ///
 /// @internal
-///	Created:		30/05/2011
+///	Created:		2018-04-15
 ///	Revision:	  ---
 ///=====================================================================================
 ///
@@ -303,6 +310,9 @@ void config(){
 	   const int num_atoms = atoms::num_atoms;
 	   #endif
 
+	   // Calculate the total number of local atoms. Needed for output, particularly for MPI.
+	   calculate_total_atoms();
+
 	   // Set local output filename
 	   std::stringstream file_sstr;
 	   file_sstr << "spins-";
@@ -310,7 +320,7 @@ void config(){
 	   if (vmpi::my_rank != 0) {
 		   file_sstr << std::setfill('0') << std::setw(5) << vmpi::my_rank << "-";
 	   }
-	   file_sstr << std::setfill('0') << std::setw(8) << output_atoms_file_counter << ".vtk";
+	   file_sstr << std::setfill('0') << std::setw(8) << output_atoms_vtk_file_counter << ".vtk";
 
 	   std::string cfg_file = file_sstr.str();
 
@@ -323,50 +333,131 @@ void config(){
 
 	   // Output masterfile header on root process
 	   if (vmpi::my_rank == 0) {
-		   // Get system date
-		   time_t rawtime = time(NULL);
-		   struct tm * timeinfo = localtime(&rawtime);
+		   cfg_file_ofstr << "# vtk DataFile Version 3.1\n";
+		   cfg_file_ofstr << "Written by Vampire Atomistic Simulator.\n";
+		   cfg_file_ofstr << "ASCII\n";
+		   cfg_file_ofstr << "DATASET POLYDATA\n";
+		   cfg_file_ofstr << "POINTS " << num_atoms << " double\n";
 
-		   cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-		   cfg_file_ofstr << "# Atomistic spin configuration file for vampire" << std::endl;
-		   cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-		   cfg_file_ofstr << "# Date: " << asctime(timeinfo);
-		   cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-		   cfg_file_ofstr << "Number of spins: " << vout::total_output_atoms << std::endl;
-		   cfg_file_ofstr << "System dimensions:" << cs::system_dimensions[0] << "\t" << cs::system_dimensions[1] << "\t" << cs::system_dimensions[2] << std::endl;
-		   cfg_file_ofstr << "Coordinates-file: atoms-coord.cfg" << std::endl;
-		   cfg_file_ofstr << "Time: " << double(sim::time)*mp::dt_SI << std::endl;
-		   cfg_file_ofstr << "Field: " << sim::H_applied << std::endl;
-		   cfg_file_ofstr << "Temperature: " << sim::temperature << std::endl;
-		   cfg_file_ofstr << "Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
-		   cfg_file_ofstr << "Number of Materials: " << mp::num_materials << std::endl;
-		   for (int mat = 0; mat<mp::num_materials; mat++) {
-			   cfg_file_ofstr << mp::material[mat].mu_s_SI << std::endl;
-		   }
-		   cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-		   cfg_file_ofstr << "Number of spin files: " << vmpi::num_processors - 1 << std::endl;
-		   for (int p = 1; p<vmpi::num_processors; p++) {
-			   std::stringstream cfg_sstr;
-			   cfg_sstr << "atoms-" << std::setfill('0') << std::setw(5) << p << "-" << std::setfill('0') << std::setw(8) << output_atoms_file_counter << ".cfg";
-			   cfg_file_ofstr << cfg_sstr.str() << std::endl;
-		   }
-		   cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
+		   // Write atom coordinates to top of file
+		   write_atom_coordinates(cfg_file_ofstr);
+		   cfg_file_ofstr << "POINT_DATA " << num_atoms << "\n";
+		   cfg_file_ofstr << "VECTORS spin double\n";
 	   }
 
-	   // Everyone now outputs their atom list
-	   cfg_file_ofstr << vout::local_output_atom_list.size() << std::endl;
-	   for (int i = 0; i<vout::local_output_atom_list.size(); i++) {
-		   const int atom = vout::local_output_atom_list[i];
-		   cfg_file_ofstr << atoms::x_spin_array[atom] << "\t" << atoms::y_spin_array[atom] << "\t" << atoms::z_spin_array[atom] << std::endl;
-	   }
+	   // Write atom spins to data part of vtk file
+	   write_atom_spins(cfg_file_ofstr);
+
+	   // Write atom type to data part of vtk file
+	   //cfg_file_ofstr << "SCALARS ELEMENT char\n";
+	   //cfg_file_ofstr << "LOOKUP_TABLE default\n";
+	   //write_atom_materials(cfg_file_ofstr);
 
 	   cfg_file_ofstr.close();
+	   output_atoms_vtk_file_counter++;
+	   return;
+   }
 
-	   output_atoms_file_counter++;
+   void calculate_total_atoms() {
+	   #ifdef MPICF
+	   const int num_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
+	   #else
+	   const int num_atoms = atoms::num_atoms;
+	   #endif
 
+	   // resize atom list to zero
+	   local_output_atom_list.resize(0);
 
+	   // get output bounds
+	   double minB[3] = { vout::atoms_output_min[0] * cs::system_dimensions[0],
+		   vout::atoms_output_min[1] * cs::system_dimensions[1],
+		   vout::atoms_output_min[2] * cs::system_dimensions[2] };
 
+	   double maxB[3] = { vout::atoms_output_max[0] * cs::system_dimensions[0],
+		   vout::atoms_output_max[1] * cs::system_dimensions[1],
+		   vout::atoms_output_max[2] * cs::system_dimensions[2] };
 
+	   // loop over all local atoms and record output list
+	   for (int atom = 0; atom < num_atoms; atom++) {
+
+		   const double cc[3] = { atoms::x_coord_array[atom],atoms::y_coord_array[atom],atoms::z_coord_array[atom] };
+		   // check atom within output bounds
+		   if ((cc[0] >= minB[0]) && (cc[0] <= maxB[0])) {
+			   if ((cc[1] >= minB[1]) && (cc[1] <= maxB[1])) {
+				   if ((cc[2] >= minB[2]) && (cc[2] <= maxB[2])) {
+					   local_output_atom_list.push_back(atom);
+				   }
+			   }
+		   }
+	   }
+
+	   // calculate total atoms to output
+	   #ifdef MPICF
+	   int local_atoms = local_output_atom_list.size();
+	   int total_atoms;
+	   //std::cerr << vmpi::my_rank << "\t" << local_atoms << &local_atoms << "\t" << &total_atoms << std::endl;
+	   //MPI::COMM_WORLD.Barrier();
+	   MPI::COMM_WORLD.Allreduce(&local_atoms, &total_atoms, 1, MPI_INT, MPI_SUM);
+	   vout::total_output_atoms = total_atoms;
+	   //std::cerr << vmpi::my_rank << "\t" << total_atoms << "\t" << &local_atoms << "\t" << &total_atoms << std::endl;
+	   //MPI::COMM_WORLD.Barrier();
+	   #else
+	   vout::total_output_atoms = local_output_atom_list.size();
+	   #endif
+	   return;
+   }
+
+   void write_atom_coordinates(std::ofstream& filestream) {
+
+	   if (err::check == true) std::cout << "vout::write_atom_coordinates_vtk has been called" << std::endl;
+
+	   if (filestream.is_open()) {
+		   int atom;
+		   char atom_location[100];
+		   // Everyone now outputs their atom list
+		   for (int i = 0; i < vout::local_output_atom_list.size(); i++) {
+			   atom = vout::local_output_atom_list[i];
+			   std::sprintf(atom_location, "%+6.6E %+6.6E %+6.6E\n", atoms::x_coord_array[atom], atoms::y_coord_array[atom], atoms::z_coord_array[atom]);
+			   filestream << atom_location;
+		   }
+
+		   return;
+	   }
+	   else throw std::runtime_error("vout::write_atom_coordinates_vtk was called, but input filestream was not open.");
+   }
+
+   void write_atom_spins(std::ofstream& filestream) {
+
+	   if (err::check == true) std::cout << "vout::write_atom_spins has been called" << std::endl;
+
+	   if (filestream.is_open()) {
+		   int atom;
+		   char atom_spin[100];
+		   for (int i = 0; i < vout::local_output_atom_list.size(); i++) {
+			   atom = vout::local_output_atom_list[i];
+			   std::sprintf(atom_spin, "%+6.6E %+6.6E %+6.6E\n", atoms::x_spin_array[atom], atoms::y_spin_array[atom], atoms::z_spin_array[atom]);
+			   filestream << atom_spin;
+		   }
+		   return;
+	   }
+	   else throw std::runtime_error("vout::write_atom_spins was called, but input filestream was not open.");
+   }
+
+   void write_atom_materials(std::ofstream& filestream) {
+
+	   if (err::check == true) std::cout << "vout::write_atom_materials has been called" << std::endl;
+
+	   if (filestream.is_open()) {
+		   int atom;
+		   char atom_material[100];
+		   for (int i = 0; i < vout::local_output_atom_list.size(); i++) {
+			   atom = vout::local_output_atom_list[i];
+			   std::sprintf(atom_material, "%s\n", mp::material[atoms::type_array[atom]].element.c_str());
+			   filestream << atom_material;
+		   }
+		   return;
+	   }
+	   else throw std::runtime_error("vout::write_atom_materials was called, but input filestream was not open.");
    }
 
 /// @brief Atomistic output function
