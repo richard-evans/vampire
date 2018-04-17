@@ -88,7 +88,7 @@ namespace vout{
    // function headers
    void atoms();
    void atoms_vtk();
-   void calculate_total_atoms();
+   void build_local_atom_list();
    void write_atom_coordinates(std::ofstream&);
    void write_atom_spins(std::ofstream&);
    void write_atom_materials(std::ofstream&);
@@ -258,45 +258,7 @@ void config(){
 
 /// @brief VTK Atomistic output function
 ///
-/// @details Outputs vtk-formatted data snapshot for visualisation  
-///
-///	#------------------------------------------------------
-///	# VTK Atomistic spin configuration file for vampire
-///	#------------------------------------------------------
-///	# Date: xx/xx/xxxx xx.xx.xx
-///	#------------------------------------------------------
-///	Number of spins: $n_spins
-///	System dimensions: $max_x $max_y $max_z
-///	Coordinates-file: $coord_file
-///	Time: $t
-///	Field: $H
-///	Temperature: $T
-///	Magnetisation: $mx $my $mz
-///	Number of Materials: $n_mat
-///	Material Properties 1:	$mu_s	$mmx $mmy $mmz $mm
-///	Material Properties 2:	$mu_s	$mmx $mmy $mmz ...
-///	#------------------------------------------------------
-///	Number of spin files: $n_files
-///	atoms-000ID000-00CPU0.cfg
-///	atoms-000ID000-00CPU1.cfg
-///	atoms-000ID000-00CPU2.cfg
-///	#------------------------------------------------------
-///	Number of local spins: $n_loc_spins
-///	$sx $sy $sz
-///	$sx $sy ...
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-///
-/// @section Information
-/// @author  Peyton Murray
-/// @version 1.0
-/// @date    2018-04-15
-///
-/// @internal
-///	Created:		2018-04-15
-///	Revision:	  ---
+/// @details Outputs vtk-formatted data snapshot for visualisation. See www.vtk.org for more info. 
 ///=====================================================================================
 ///
    void atoms_vtk() {
@@ -311,7 +273,7 @@ void config(){
 	   #endif
 
 	   // Calculate the total number of local atoms. Needed for output, particularly for MPI.
-	   calculate_total_atoms();
+	   build_local_atom_list();
 
 	   // Set local output filename
 	   std::stringstream file_sstr;
@@ -348,17 +310,19 @@ void config(){
 	   // Write atom spins to data part of vtk file
 	   write_atom_spins(cfg_file_ofstr);
 
-	   // Write atom type to data part of vtk file
-	   //cfg_file_ofstr << "SCALARS ELEMENT char\n";
-	   //cfg_file_ofstr << "LOOKUP_TABLE default\n";
-	   //write_atom_materials(cfg_file_ofstr);
-
 	   cfg_file_ofstr.close();
 	   output_atoms_vtk_file_counter++;
 	   return;
    }
 
-   void calculate_total_atoms() {
+
+   /// @brief Builds the local atom list
+   ///
+   /// @details Updates vout::total_output_atoms and vout::local_output_atom_list
+   /// with the local atoms.
+   ///=====================================================================================
+   ///
+   void build_local_atom_list() {
 	   #ifdef MPICF
 	   const int num_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
 	   #else
@@ -407,6 +371,15 @@ void config(){
 	   return;
    }
 
+   /// @brief Write atom coordinates to an output filestream.
+   ///
+   /// @details Outputs atomic coordinates, one on each line.:
+   /// x1 y1 z1
+   /// x2 y2 z2
+   /// x3 y3 z3
+   ///   ...
+   ///=====================================================================================
+   ///
    void write_atom_coordinates(std::ofstream& filestream) {
 
 	   if (err::check == true) std::cout << "vout::write_atom_coordinates_vtk has been called" << std::endl;
@@ -426,6 +399,15 @@ void config(){
 	   else throw std::runtime_error("vout::write_atom_coordinates_vtk was called, but input filestream was not open.");
    }
 
+   /// @brief Write atom spins to an output filestream
+   ///
+   /// @details Outputs atomic spins, one on each line.:
+   /// s1x s1y s1z
+   /// s2x s2y s2z
+   /// s3x s3y s3z
+   ///   ... 
+   ///=====================================================================================
+   ///
    void write_atom_spins(std::ofstream& filestream) {
 
 	   if (err::check == true) std::cout << "vout::write_atom_spins has been called" << std::endl;
@@ -443,6 +425,15 @@ void config(){
 	   else throw std::runtime_error("vout::write_atom_spins was called, but input filestream was not open.");
    }
 
+   /// @brief Write atom material to an output filestream
+   ///
+   /// @details Outputs atomic material, one on each line.:
+   /// a1
+   /// a2
+   /// a3
+   ///   ... 
+   ///=====================================================================================
+   ///
    void write_atom_materials(std::ofstream& filestream) {
 
 	   if (err::check == true) std::cout << "vout::write_atom_materials has been called" << std::endl;
