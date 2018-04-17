@@ -8,19 +8,17 @@
 # Creation attributes:
 #------------------------------------------
 create:crystal-structure=bcc
-create:ellipsoid
+# create:ellipsoid
+create:cylinder
 
 #------------------------------------------
 # System Dimensions:
 #------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 25 !nm
-dimensions:system-size-y = 25 !nm
-dimensions:system-size-z = 25 !nm
-dimensions:particle-size= 25 !nm
-dimensions:particle-shape-factor-x = 1
-dimensions:particle-shape-factor-y = 0.8
-dimensions:particle-shape-factor-z = 0.2
+dimensions:system-size-x = 10 !nm
+dimensions:system-size-y = 10 !nm
+dimensions:system-size-z = 1 !nm
+dimensions:particle-size= 10 !nm
 
 #------------------------------------------
 # Material Files:
@@ -43,7 +41,7 @@ sim:time-steps-increment=10000
 sim:equilibration-time-steps=10000
 
 sim:time-step=1e-16
-sim:temperature=300.0
+sim:temperature=0.0
 sim:applied-field-unit-vector= 1,0,0
 sim:maximum-applied-field-strength=3.0 !T
 sim:minimum-applied-field-strength=-3.0 !T
