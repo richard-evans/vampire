@@ -69,8 +69,11 @@ void fmr(){
 	// disable fmr fields for equilibration
 	sim::enable_fmr = false;
 
-	// Set equilibration temperature and field
-	sim::temperature=sim::Teq;
+   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
+   else{
+	   // Set equilibration temperature and field
+	   sim::temperature=sim::Teq;
+   }
 
 	// Equilibrate system
 	while(sim::time<sim::equilibration_time){
@@ -84,10 +87,13 @@ void fmr(){
 		vout::data();
 	}
 
-	sim::temperature=temp;
+   if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
+   else{
+	   sim::temperature=temp;
 
-   // Reset mean magnetisation counters
-   stats::mag_m_reset();
+      // Reset mean magnetisation counters
+      stats::mag_m_reset();
+   }
 
 	// enable fmr fields
 	sim::enable_fmr = true;
