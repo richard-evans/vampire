@@ -26,11 +26,8 @@ namespace montecarlo{
 //------------------------------------------------------------------------------
 // Integrates a Monte Carlo step
 //------------------------------------------------------------------------------
-int mc_step(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array,
-            std::vector<double> &z_spin_array, int num_atoms, std::vector<int> &type_array){
 
    // calculate number of steps to calculate
-   int nmoves = num_atoms;
 
    // Temporaries
    int atom=0;
@@ -47,10 +44,17 @@ int mc_step(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array
       double rescaled_temperature = sim::temperature < Tc ? Tc*pow(sim::temperature/Tc,alpha) : sim::temperature;
       rescaled_material_kBTBohr[m] = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
       sigma_array[m] = rescaled_temperature < 1.0 ? 0.02 : pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
+void mc_step(std::vector<double> &x_spin_array,
+             std::vector<double> &y_spin_array,
+             std::vector<double> &z_spin_array,
+             int num_atoms,
+             std::vector<int> &type_array){
+      return;
    }
 
    double statistics_moves = 0.0;
    double statistics_reject = 0.0;
+      const int nmoves = num_atoms;
 
 	// loop over natoms to form a single Monte Carlo step
    for(int i=0;i<nmoves; i++){
@@ -110,7 +114,6 @@ int mc_step(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array
    sim::mc_statistics_moves += statistics_moves;
    sim::mc_statistics_reject += statistics_reject;
 
-   return EXIT_SUCCESS;
 }
 
 } // End of namespace montecarlo

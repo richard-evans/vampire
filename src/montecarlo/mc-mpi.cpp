@@ -85,7 +85,10 @@ void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vecto
    //------------------------------------------------------------------------------
    // Integrates a Monte Carlo step in parallel
    //------------------------------------------------------------------------------
-int mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, std::vector<int> &type_array){
+void mc_step_parallel(std::vector<double> &x_spin_array,
+                      std::vector<double> &y_spin_array,
+                      std::vector<double> &z_spin_array,
+                      std::vector<int> &type_array){
 
    // Temporaries
    int atom=0;
@@ -237,7 +240,8 @@ int mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_s
       vmpi::barrier();
 
       // Swap timers wait -> compute
-      vmpi::TotalWaitTime+=vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
+      vmpi::TotalWaitTime += vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
+
    }
 
    //Collect statistics from all processors
@@ -245,11 +249,13 @@ int mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_s
    double global_statistics_reject = 0.0;
    MPI_Allreduce(&statistics_moves, &global_statistics_moves, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    MPI_Allreduce(&statistics_reject, &global_statistics_reject, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
    // Save statistics to sim namespace variable
    sim::mc_statistics_moves += global_statistics_moves;
    sim::mc_statistics_reject += global_statistics_reject;
 
-   return EXIT_SUCCESS;
+   return;
+
 }
 
 } // End of namespace montecarlo

@@ -19,7 +19,7 @@ namespace sim{
    //----------------------------------------------------------------------------
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
-   extern int num_monte_carlo_preconditioning_steps(0);
+   int num_monte_carlo_preconditioning_steps(0);
 
    namespace internal{
       //----------------------------------------------------------------------------

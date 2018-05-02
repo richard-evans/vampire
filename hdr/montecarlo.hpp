@@ -44,10 +44,10 @@ namespace montecarlo{
    // Function to perform one monte carlo, constrained monte carlo, or hybrid
    // cmc-mc step, respectively
    //---------------------------------------------------------------------------
-   int mc_step(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, int num_atoms, std::vector<int> &type_array);
+   void mc_step(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, int num_atoms, std::vector<int> &type_array);
    int cmc_step();
    int cmc_mc_step();
-   int mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, std::vector<int> &type_array);
+   void mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, std::vector<int> &type_array);
 
    //---------------------------------------------------------------------------
    // Provide access to CMCinit and CMCMCinit for cmc_anisotropy and
@@ -57,6 +57,7 @@ namespace montecarlo{
    void CMCMCinit();
    void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
                          double min_dim[3], double max_dim[3]);
+
    extern bool mc_parallel_initialized;
 
    //---------------------------------------------------------------------------
@@ -92,23 +93,24 @@ namespace montecarlo{
    		// vector magnetisation
    		double M_other[3];
 
-   	cmc_material_t():
-   		constraint_phi(0.0),
-   		constraint_phi_min(0.0),
-   		constraint_phi_max(0.0),
-   		constraint_phi_delta(5.0),
-   		constraint_theta(0.0),
-   		constraint_theta_min(0.0),
-   		constraint_theta_max(0.0),
-   		constraint_theta_delta(5.0)
+      	cmc_material_t():
+      		constraint_phi(0.0),
+      		constraint_phi_min(0.0),
+      		constraint_phi_max(0.0),
+      		constraint_phi_delta(5.0),
+      		constraint_theta(0.0),
+      		constraint_theta_min(0.0),
+      		constraint_theta_max(0.0),
+      		constraint_theta_delta(5.0)
 
-   	{
+      	{
 
-   	//for(int i=0;i<100;i++){
-   	//	geometry_coords[i][0]=0.0;
-   	//	geometry_coords[i][1]=0.0;
-   	//}
-   }
+      	//for(int i=0;i<100;i++){
+      	//	geometry_coords[i][0]=0.0;
+      	//	geometry_coords[i][1]=0.0;
+      	//}
+      }
+
    	};
 
    	extern std::vector<cmc_material_t> cmc_mat;
@@ -122,6 +124,7 @@ namespace montecarlo{
    	extern double mc_total;
    	extern double sphere_reject;
    	extern double energy_reject;
+
    } //end of cmc namespace
 
 } // end of montecarlo namespace
