@@ -26,94 +26,95 @@ namespace montecarlo{
 //------------------------------------------------------------------------------
 // Integrates a Monte Carlo step
 //------------------------------------------------------------------------------
-
-   // calculate number of steps to calculate
-
-   // Temporaries
-   int atom=0;
-   double Eold=0.0;
-   double Enew=0.0;
-   double DE=0.0;
-
-   // Material dependent temperature rescaling
-   std::vector<double> rescaled_material_kBTBohr(internal::num_materials);
-   std::vector<double> sigma_array(internal::num_materials); // range for tuned gaussian random move
-   for(int m=0; m<internal::num_materials; ++m){
-      double alpha = internal::temperature_rescaling_alpha[m];
-      double Tc = internal::temperature_rescaling_Tc[m];
-      double rescaled_temperature = sim::temperature < Tc ? Tc*pow(sim::temperature/Tc,alpha) : sim::temperature;
-      rescaled_material_kBTBohr[m] = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
-      sigma_array[m] = rescaled_temperature < 1.0 ? 0.02 : pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
 void mc_step(std::vector<double> &x_spin_array,
              std::vector<double> &y_spin_array,
              std::vector<double> &z_spin_array,
              int num_atoms,
              std::vector<int> &type_array){
-      return;
-   }
 
-   double statistics_moves = 0.0;
-   double statistics_reject = 0.0;
+      // calculate number of steps to calculate
       const int nmoves = num_atoms;
 
-	// loop over natoms to form a single Monte Carlo step
-   for(int i=0;i<nmoves; i++){
+      // Temporaries
+      int atom=0;
+      double Eold=0.0;
+      double Enew=0.0;
+      double DE=0.0;
 
-      // add one to number of moves counter
-      statistics_moves+=1.0;
+      // Material dependent temperature rescaling
+      std::vector<double> rescaled_material_kBTBohr(internal::num_materials);
+      std::vector<double> sigma_array(internal::num_materials); // range for tuned gaussian random move
+      for(int m=0; m<internal::num_materials; ++m){
+         double alpha = internal::temperature_rescaling_alpha[m];
+         double Tc = internal::temperature_rescaling_Tc[m];
+         double rescaled_temperature = sim::temperature < Tc ? Tc*pow(sim::temperature/Tc,alpha) : sim::temperature;
+         rescaled_material_kBTBohr[m] = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
+         sigma_array[m] = rescaled_temperature < 1.0 ? 0.02 : pow(1.0/rescaled_material_kBTBohr[m],0.2)*0.08;
+      }
 
-      // pick atom
-      atom = int(nmoves*mtrandom::grnd());
+      double statistics_moves = 0.0;
+      double statistics_reject = 0.0;
 
-      // get material id
-      const int imaterial=type_array[atom];
+      // loop over natoms to form a single Monte Carlo step
+      for(int i=0;i<nmoves; i++){
 
-      // Calculate range for move
-      internal::mc_delta_angle=sigma_array[imaterial];
+         // add one to number of moves counter
+         statistics_moves+=1.0;
 
-      // Save old spin position
-      internal::Sold[0] = x_spin_array[atom];
-      internal::Sold[1] = y_spin_array[atom];
-      internal::Sold[2] = z_spin_array[atom];
+         // pick atom
+         atom = int(nmoves*mtrandom::grnd());
 
-      // Make Monte Carlo move
-      internal::mc_move(internal::Sold, internal::Snew);
+         // get material id
+         const int imaterial=type_array[atom];
 
-      // Calculate current energy
-      Eold = sim::calculate_spin_energy(atom);
+         // Calculate range for move
+         internal::mc_delta_angle=sigma_array[imaterial];
 
-      // Copy new spin position
-      x_spin_array[atom] = internal::Snew[0];
-      y_spin_array[atom] = internal::Snew[1];
-      z_spin_array[atom] = internal::Snew[2];
+         // Save old spin position
+         internal::Sold[0] = x_spin_array[atom];
+         internal::Sold[1] = y_spin_array[atom];
+         internal::Sold[2] = z_spin_array[atom];
 
-      // Calculate new energy
-      Enew = sim::calculate_spin_energy(atom);
+         // Make Monte Carlo move
+         internal::mc_move(internal::Sold, internal::Snew);
 
-      // Calculate difference in Joules/mu_B
-      DE = (Enew-Eold)*internal::mu_s_SI[imaterial]*1.07828231e23; //1/9.27400915e-24
+         // Calculate current energy
+         Eold = sim::calculate_spin_energy(atom);
 
-      // Check for lower energy state and accept unconditionally
-      if(DE<0) continue;
-      // Otherwise evaluate probability for move
-      else{
-          if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
-	      // If rejected reset spin coordinates and continue
+         // Copy new spin position
+         x_spin_array[atom] = internal::Snew[0];
+         y_spin_array[atom] = internal::Snew[1];
+         z_spin_array[atom] = internal::Snew[2];
+
+         // Calculate new energy
+         Enew = sim::calculate_spin_energy(atom);
+
+         // Calculate difference in Joules/mu_B
+         DE = (Enew-Eold)*internal::mu_s_SI[imaterial]*1.07828231e23; //1/9.27400915e-24
+
+         // Check for lower energy state and accept unconditionally
+         if(DE<0) continue;
+         // Otherwise evaluate probability for move
+         else{
+            if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
+            // If rejected reset spin coordinates and continue
             else{
-             x_spin_array[atom] = internal::Sold[0];
-             y_spin_array[atom] = internal::Sold[1];
-             z_spin_array[atom] = internal::Sold[2];
-             // add one to rejection counter
-             statistics_reject += 1.0;
-             continue;
-          }
-       }
-    }
+               x_spin_array[atom] = internal::Sold[0];
+               y_spin_array[atom] = internal::Sold[1];
+               z_spin_array[atom] = internal::Sold[2];
+               // add one to rejection counter
+               statistics_reject += 1.0;
+               continue;
+            }
+         }
+      }
 
-   // Save statistics to sim namespace variable
-   sim::mc_statistics_moves += statistics_moves;
-   sim::mc_statistics_reject += statistics_reject;
+      // Save statistics to sim namespace variable
+      sim::mc_statistics_moves += statistics_moves;
+      sim::mc_statistics_reject += statistics_reject;
 
-}
+      return;
+      
+   }
 
-} // End of namespace montecarlo
+   } // End of namespace montecarlo
