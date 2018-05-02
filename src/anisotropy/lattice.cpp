@@ -36,16 +36,19 @@ namespace anisotropy{
       //------------------------------------------------------
       ///  Function to calculate lattice anisotropy fields
       //------------------------------------------------------
-      void calculate_lattice_anisotropy_fields(std::vector<double>& spin_array_x,
-                                               std::vector<double>& spin_array_y,
-                                               std::vector<double>& spin_array_z,
-                                               std::vector<int>&    type_array,
-                                               std::vector<double>& field_array_x,
-                                               std::vector<double>& field_array_y,
-                                               std::vector<double>& field_array_z,
-                                               const int start_index,
-                                               const int end_index,
-                                               const double temperature){
+      void lattice_fields(std::vector<double>& spin_array_x,
+                          std::vector<double>& spin_array_y,
+                          std::vector<double>& spin_array_z,
+                          std::vector<int>&    type_array,
+                          std::vector<double>& field_array_x,
+                          std::vector<double>& field_array_y,
+                          std::vector<double>& field_array_z,
+                          const int start_index,
+                          const int end_index,
+                          const double temperature){
+
+         // if lattice anisotropy is not used, then do nothing
+         if(!internal::enable_lattice_anisotropy) return;
 
          // Precalculate material lattice anisotropy constants from current temperature
          for(int imat=0; imat<mp::num_materials; imat++){
@@ -56,22 +59,25 @@ namespace anisotropy{
          for(int atom = start_index; atom < end_index; atom++){
 
             // get material for atom
-            const int imaterial = type_array[atom];
+            const int mat = type_array[atom];
 
             // get spin directions
             const double sx = spin_array_x[atom];
             const double sy = spin_array_y[atom];
             const double sz = spin_array_z[atom];
 
-            // calculate s . e
-            const double sdote = ( sx * internal::elattice_array[imaterial].x +
-                                   sy * internal::elattice_array[imaterial].y +
-                                   sz * internal::elattice_array[imaterial].z);
+            const double ex = internal::ku_vector[mat].x;
+            const double ey = internal::ku_vector[mat].y;
+            const double ez = internal::ku_vector[mat].z;
+
+            const double sdote = (sx*ex + sy*ey + sz*ez);
+
+            const double kl = internal::klattice_array[mat];
 
             // add lattice anisotropy field to total
-            field_array_x[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].x * sdote;
-            field_array_y[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].y * sdote;
-            field_array_z[atom] += internal::klattice_array[imaterial] * internal::elattice_array[imaterial].z * sdote;
+            field_array_x[atom] += kl * ex * sdote;
+            field_array_y[atom] += kl * ey * sdote;
+            field_array_z[atom] += kl * ez * sdote;
 
          }
 
@@ -93,15 +99,17 @@ namespace anisotropy{
       ///  E = kappa * S_z^2
       //
       //------------------------------------------------------
-      double spin_lattice_anisotropy_energy(const int imaterial, const double sx, const double sy, const double sz, const double temperature){
+      double lattice_energy(const int atom, const int mat, const double sx, const double sy, const double sz, const double temperature){
 
          // get lattice anisotropy constant at temperature
-         const double klatt = internal::mp[imaterial].k_lattice * internal::mp[imaterial].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
+         const double klatt = internal::mp[mat].k_lattice * internal::mp[mat].lattice_anisotropy.get_lattice_anisotropy_constant(temperature);
 
          // calculate s . e
-         const double sdote = ( sx * internal::elattice_array[imaterial].x +
-                                sy * internal::elattice_array[imaterial].y +
-                                sz * internal::elattice_array[imaterial].z);
+         const double ex = internal::ku_vector[mat].x;
+         const double ey = internal::ku_vector[mat].y;
+         const double ez = internal::ku_vector[mat].z;
+
+         const double sdote = (sx*ex + sy*ey + sz*ez);
 
          return klatt * ( sdote * sdote );
 

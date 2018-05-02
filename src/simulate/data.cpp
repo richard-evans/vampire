@@ -19,7 +19,14 @@ namespace sim{
    //----------------------------------------------------------------------------
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
+
    int num_monte_carlo_preconditioning_steps(0);
+
+   uint64_t time         = 0; // time step counter
+   uint64_t total_time   = 10000; // total time steps (non-loop code)
+   uint64_t loop_time    = 10000; // loop time steps (hysteresis/temperature loops)
+   uint64_t partial_time = 1000; // same as time-step-increment
+   uint64_t equilibration_time = 0; // equilibration time steps
 
    namespace internal{
       //----------------------------------------------------------------------------

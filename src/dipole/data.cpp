@@ -22,6 +22,8 @@ namespace dipole{
    // Externally visible variables
    //------------------------------------------------------------------------------
    int update_rate=100; /// timesteps between updates
+   int update_time=-1; /// last update time
+
    bool activated=false;
 
    // define arrays for B-field
@@ -38,6 +40,8 @@ namespace dipole{
    std::vector < double > atom_mu0demag_field_array_x;
    std::vector < double > atom_mu0demag_field_array_y;
    std::vector < double > atom_mu0demag_field_array_z;
+
+   std::vector <int> dipole_cells_num_atoms_in_cell;
 
    double cutoff = 2.0;  /// cutoff distance between cells over which bare macro cell model can be applied
                          /// N.B.: after 12 cells inter-intra method is equivalent to bare macrocell method.

@@ -22,6 +22,7 @@
 #include "errors.hpp"
 #include "exchange.hpp"
 #include "material.hpp"
+#include "gpu.hpp"
 #include "grains.hpp"
 #include "stats.hpp"
 #include "units.hpp"
@@ -72,10 +73,12 @@ namespace vin{
         else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(create::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
         //===================================================================
         // Test for create variables
@@ -793,62 +796,11 @@ namespace vin{
             sim::hamiltonian_simulation_flags[5]=1;
             return EXIT_SUCCESS;
         }
-        //-------------------------------------------------------------------
-        test="time-step";
-        if(word==test){
-            double dt=atof(value.c_str());
-            check_for_valid_value(dt, word, line, prefix, unit, "time", 1.0e-20, 1.0e-6,"input","0.01 attosecond - 1 picosecond");
-            mp::dt_SI=dt;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="total-time-steps";
-        if(word==test){
-            int tt=atoi(value.c_str());
-            check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-            sim::total_time=tt;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="loop-time-steps";
-        if(word==test){
-            int tt=atoi(value.c_str());
-            check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-            sim::loop_time=tt;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="partial-time-steps";
-        if(word==test){
-            int tt=atoi(value.c_str());
-            check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-            terminaltextcolor(YELLOW);
-            std::cout << "Warning: Keyword \'partial-time-steps\' is deprecated and may be removed in a future release. Please use \'time-steps-increment\' instead." << std::endl;
-            terminaltextcolor(WHITE);
-        sim::partial_time=tt;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="time-steps-increment";
-        if(word==test){
-            int tt=atoi(value.c_str());
-            check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-            sim::partial_time=tt;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="equilibration-time-steps";
-        if(word==test){
-            int tt=atoi(value.c_str());
-            check_for_valid_int(tt, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-            sim::equilibration_time=tt;
-            return EXIT_SUCCESS;
-        }
         //--------------------------------------------------------------------
         test="simulation-cycles";
         if(word==test){
             int r=atoi(value.c_str());
-            check_for_valid_int(r, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+            check_for_valid_int(r, word, line, prefix, 0, 2000000000,"input","1 - 2,000,000,000");
             sim::runs=r;
             return EXIT_SUCCESS;
         }
@@ -888,7 +840,7 @@ namespace vin{
         test="temperature-increment";
         if(word==test){
             double T=atof(value.c_str());
-            check_for_valid_value(T, word, line, prefix, unit, "none", 0.0, 1.0e6,"input","0.0 - 1,000,000 K");
+            check_for_valid_value(T, word, line, prefix, unit, "none", 1.0e-10, 1.0e6,"input","1.0e-10 - 1,000,000 K");
             sim::delta_temperature=T;
             return EXIT_SUCCESS;
         }

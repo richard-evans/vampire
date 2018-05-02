@@ -51,13 +51,13 @@ void local_field_cool(){
 			vout::data();
 		}
 
-		int start_time=sim::time;
+		uint64_t start_time = sim::time;
 
 		// Perform Field Cooling
 		while(sim::time<sim::total_time+start_time){
 
          // loop over partial time
-         for(int tt=0; tt < sim::partial_time; tt++){
+         for(uint64_t tt=0; tt < sim::partial_time; tt++){
 
             // Calculate normalised temperature using desired cooling function
             double time_from_start=mp::dt_SI*double(sim::time-start_time);

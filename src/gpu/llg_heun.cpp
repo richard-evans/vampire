@@ -13,7 +13,7 @@
 #include "gpu.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
-//#include "opencl.hpp"
+#include "vopencl.hpp"
 
 namespace gpu{
 
@@ -23,9 +23,9 @@ namespace gpu{
    void llg_heun(){
 
       #ifdef CUDA
-         cuda::llg_heun();
-      #elseif OPENCL
-         opencl::llg_heun();
+         vcuda::llg_heun();
+      #elif OPENCL
+         vopencl::llg_heun();
       #endif
 
       return;

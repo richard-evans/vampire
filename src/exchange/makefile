@@ -8,6 +8,7 @@ data.o \
 dmi.o \
 energy.o \
 fields.o \
+get_exchange_type.o \
 initialize.o \
 interface.o \
 set_exchange_type.o \

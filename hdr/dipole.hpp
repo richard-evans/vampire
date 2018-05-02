@@ -26,12 +26,15 @@ namespace dipole{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
-   extern int update_rate; /// timesteps between updates
    extern bool activated;
-   extern std::vector<double> cells_field_array_x;             /// arrays to store cells B-field
+
+   extern int update_rate; /// timesteps between updates
+   extern int update_time; /// last update time
+
+   extern std::vector<double> cells_field_array_x; /// arrays to store cells field
    extern std::vector<double> cells_field_array_y;
    extern std::vector<double> cells_field_array_z;
-   extern std::vector<double> atom_dipolar_field_array_x;   /// arrays to store atoms B-field
+   extern std::vector<double> atom_dipolar_field_array_x;
    extern std::vector<double> atom_dipolar_field_array_y;
    extern std::vector<double> atom_dipolar_field_array_z;
 
@@ -41,6 +44,8 @@ namespace dipole{
    extern std::vector<double> atom_mu0demag_field_array_x;        /// arrays to store atoms mu_0*Hdemag-field
    extern std::vector<double> atom_mu0demag_field_array_y;
    extern std::vector<double> atom_mu0demag_field_array_z;
+
+   extern std::vector <int> dipole_cells_num_atoms_in_cell;             /// Array to store number of atoms in cells that will be needed to print the cell config file
 
    extern double cutoff;
 
@@ -70,17 +75,17 @@ namespace dipole{
                    std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                    std::vector <int>& cells_num_atoms_in_cell_global, ///global  number of atoms in each cell
                    std::vector < std::vector <int> >& cells_index_atoms_array,
-                   const std::vector<double>& cells_volume_array,
+                   std::vector<double>& cells_volume_array,
                    std::vector<double>& cells_pos_and_mom_array,  // array to store positions and moment of cells
                    std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
                    std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
                    std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                   const std::vector<int>& atom_type_array,
-                   const std::vector<int>& atom_cell_id_array,
-                   const std::vector<double>& atom_coords_x,
-                   const std::vector<double>& atom_coords_y,
-                   const std::vector<double>& atom_coords_z,
-                   const int num_atoms
+                   std::vector<int>& atom_type_array,
+                   std::vector<int>& atom_cell_id_array,
+                   std::vector<double>& atom_coords_x,
+                   std::vector<double>& atom_coords_y,
+                   std::vector<double>& atom_coords_z,
+                   int num_atoms
    );
 
    //---------------------------------------------------------------------------

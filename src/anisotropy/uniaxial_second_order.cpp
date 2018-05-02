@@ -29,81 +29,94 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       // Function to add second order uniaxial anisotropy along vector e
       //
-      // Example 1: e == [0,0,1] || z
+      //  Higher order anisotropies generally need to be described using spherical harmonics. The usual form (a
+      //  series in S leads to cross pollution of terms, giving strange temperature dependencies.
       //
-      //       Energy (scalar) = - ku Sz * Sz
+      //  The harmonics are described with Legendre polynomials with even order, which for 2nd, 4th and 6th are:
+      //  ( http://en.wikipedia.org/wiki/Legendre_polynomials )
       //
-      //       Tensor T[ij] = e[i] e[j] = [  0   0   0  ]
-      //                                  [  0   0   0  ]
-      //                                  [  0   0   1  ]
+      //  k2(sz) = - (1/2)  * (3sz^2 - 1)
+      //  k4(sz) = - (1/8)  * (35sz^4 - 30sz^2 + 3)
+      //  k6(sz) = - (1/16) * (231sz^6 - 315*sz^4 + 105sz^2 - 5)
       //
-      //       Energy (tensor) = S . T . S
+      //  The harmonics feature an arbritrary +2/3 factor compared with the usual form, and so in VAMPIRE these are
+      //  renormalised to maintain consistency for the 2nd order terms.
       //
-      //                       = [ Sx Sy Sz ] [  0   0   0  ] [ Sx ]
-      //                                      [  0   0   0  ] [ Sy ]
-      //                                      [  0   0   1  ] [ Sz ]
+      //  The field induced by the harmonics is given by the first derivative w.r.t. sz. This can be projected onto
+      //  any arbritrary direction ex,ey,ez allowing higher order anisotropy terms along any direction. This
+      //  direction is shared with the other uniaxial anisotropy coefficients since they should not be used
+      //  simultaneously.
       //
-      //                       = Sx Txx Sx + Sx Txy Sy + Sx Txz Sz +
-      //                         Sy Tyx Sx + Sy Tyy Sy + Sy Tyz Sz +
-      //                         Sz Tzx Sx + Sz Tzy Sy + Sz Tzz Sz
-      //
-      //                       = Sz Tzz Sz
-      //
-      // Example 2: e == [0.707,0.707,0] || xy
-      //
-      //       Energy (scalar) = - ku (Sx ex + Sy ey + Sz ez)**2
-      //                       = Sx ex Sx ex + 2 Sx Sy ex ey + Sy ey Sy ey
-      //                       = 0.5 Sx Sx + Sx Sy + 0.5 Sy Sy
-      //
-      //       Tensor T[ij] = e[i] e[j] = [  0.5   0.5   0  ]
-      //                                  [  0.5   0.5   0  ]
-      //                                  [   0     0    0  ]
-      //
-      //       Energy (tensor) = S . T . S
-      //
-      //                       = [ Sx Sy Sz ] [  0.5   0.5   0  ] [ Sx ]
-      //                                      [  0.5   0.5   0  ] [ Sy ]
-      //                                      [   0     0    0  ] [ Sz ]
-      //
-      //                       = Sx Txx Sx + Sx Txy Sy + Sx Txz Sz +
-      //                         Sy Tyx Sx + Sy Tyy Sy + Sy Tyz Sz +
-      //                         Sz Tzx Sx + Sz Tzy Sy + Sz Tzz Sz
-      //
-      //                       = Sx Txx Sx + Sx Txy Sy +
-      //                         Sy Tyx Sx + Sy Tyy Sy
-      //
-      //                       = 0.5 Sx Sx + 0.5 Sx Sy + 0.5 Sy Sx + 0.5 Sy Sy
-      //
-      //                       Q.E.D
-      //
-      //---------------------------------------------------------------------------------
-      void uniaxial_second_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s){
+      //--------------------------------------------------------------------------------------------------------------
+      void uniaxial_second_order_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index){
 
-         //----------------------------------------------------------------------------------
-         // Loop over all atoms and calculate second order tensor components
-         //----------------------------------------------------------------------------------
-         for (int atom=0; atom < num_atoms; ++atom){
+         // if not enabled then do nothing
+         if(!internal::enable_uniaxial_second_order) return;
+
+         // rescaling prefactor
+         // E = 2/3 * - ku2 (1/2)  * (3sz^2 - 1) == -ku2 sz^2 + const
+         // H = -dE/dS = +2ku2 sz
+         const double scale = 2.0; // 2*2/3 = 2 Factor to rescale anisotropies to usual scale
+
+         // Loop over all atoms between start and end index
+         for(int atom = start_index; atom < end_index; atom++){
 
             // get atom material
-            const unsigned int mat = atom_material_array[atom];
+            const int mat = atom_material_array[atom];
 
-            const double i_mu_s = inverse_mu_s[mat];
-            const double ku2 = internal::mp[mat].ku2;
+            const double sx = spin_array_x[atom]; // store spin direction in temporary variables
+            const double sy = spin_array_y[atom];
+            const double sz = spin_array_z[atom];
 
-            const double e[3] = { internal::mp[mat].ku_vector[0],
-                                  internal::mp[mat].ku_vector[1],
-                                  internal::mp[mat].ku_vector[2] };
+            const double ex = internal::ku_vector[mat].x;
+            const double ey = internal::ku_vector[mat].y;
+            const double ez = internal::ku_vector[mat].z;
 
-            // Loop over tensor components and store anisotropy values in Tesla (-dE/dS)
-            for (int i = 0; i < 3; ++i){
-               for (int j = 0; j < 3; ++j){
-                  internal::second_order_tensor[ index(atom, i, j) ] += ku2 * e[i] * e[j] * i_mu_s;
-               }
-            }
+            // get reduced anisotropy constant ku/mu_s
+            const double ku2 = internal::ku2[mat];
+
+            const double sdote = (sx*ex + sy*ey + sz*ez);
+
+            const double k2 = scale*ku2*sdote;
+
+            field_array_x[atom] += ex*k2;
+            field_array_y[atom] += ey*k2;
+            field_array_z[atom] += ez*k2;
 
          }
 
          return;
+
+      }
+
+      //---------------------------------------------------------------------------------
+      // Function to add second order uniaxial anisotropy
+      // E = 2/3 * - ku2 (1/2)  * (3sz^2 - 1) == -ku2 sz^2 + const
+      //---------------------------------------------------------------------------------
+      double uniaxial_second_order_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz){
+
+         // get reduced anisotropy constant ku/mu_s (Tesla)
+         const double ku2 = internal::ku2[mat];
+
+         const double ex = internal::ku_vector[mat].x;
+         const double ey = internal::ku_vector[mat].y;
+         const double ez = internal::ku_vector[mat].z;
+
+         const double sdote = (sx*ex + sy*ey + sz*ez);
+
+         return -ku2*(sdote*sdote);
 
       }
 

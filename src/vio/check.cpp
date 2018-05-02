@@ -168,6 +168,33 @@ namespace vin{
 
     }
 
+    //-----------------------------------------------------------------------
+    // Overloaded function to check for valid uint64_t variable range
+    //-----------------------------------------------------------------------
+    void check_for_valid_int(uint64_t& value,             // value of variable as in input file
+                             std::string word,            // input file keyword
+                             int line,                    // input file line
+                             std::string prefix,          // input file prefix
+                             uint64_t range_min,          // acceptable minimum value for variable
+                             uint64_t range_max,          // acceptable maximum value for variable
+                             std::string input_file_type, // input file name
+                             std::string range_text)      // customised text
+    {
+
+        // Check for valid range
+        if( (value < range_min) || (value > range_max) ){
+           terminaltextcolor(RED);
+           std::cerr << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+           terminaltextcolor(WHITE);
+           zlog << zTs() << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+           err::vexit();
+        }
+
+        // Success - input is sane!
+        return;
+
+    }
+
     ///-----------------------------------------------------------------------
     /// Function to check for valid boolean
     ///

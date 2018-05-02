@@ -122,14 +122,14 @@ namespace anisotropy{
                // set default uniaxial and cubic directions
                ku_vector.resize(3); // resize to three elements
 
-               ku_vector[0] = 0.0; // set direction alon [0,0,1]
+               ku_vector[0] = 0.0; // set direction along [0,0,1]
                ku_vector[1] = 0.0;
                ku_vector[2] = 1.0;
 
                // set default uniaxial and cubic directions
                kc_vector.resize(3); // resize to three elements
 
-               kc_vector[0] = 0.0; // set direction alon [0,0,1]
+               kc_vector[0] = 0.0; // set direction along [0,0,1]
                kc_vector[1] = 0.0;
                kc_vector[2] = 1.0;
 
@@ -149,19 +149,31 @@ namespace anisotropy{
 
       extern bool initialised; // check module has been initialised
 
-      extern bool enable_second_order_tensor; // Flag to enable calculation of second order tensor anisotropy
-      extern bool enable_fourth_order_tensor; // Flag to enable calculation of second order tensor anisotropy
-      extern bool enable_sixth_order_tensor; // Flag to enable calculation of second order tensor anisotropy
+      extern bool enable_uniaxial_second_order; // Flag to enable calculation of second order uniaxial anisotropy
+      extern bool enable_uniaxial_fourth_order; // Flag to enable calculation of fourth order uniaxial anisotropy
+      extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
+
+      extern bool enable_cubic_fourth_order;    // Flag to enable calculation of fourth order cubic anisotropy
+      extern bool enable_cubic_sixth_order;     // Flag to enable calculation of sixth order cubic  anisotropy
 
       extern bool enable_neel_anisotropy; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
       extern bool enable_lattice_anisotropy; // Flag to turn on lattice anisotropy calculation
       extern bool enable_random_anisotropy; // Flag to enable random anisitropy initialisation
 
-      // arrays for storing 1D collapsed tensors
-      extern std::vector<double> second_order_tensor;
-      extern std::vector<double> fourth_order_tensor;
-      extern std::vector<double> sixth_order_tensor;
+      // arrays for storing 1D collapsed Neel tensor
       extern std::vector<double> neel_tensor;
+
+      // arrays for storing unrolled anisotropy constants in Tesla
+      extern std::vector<double> ku2;
+      extern std::vector<double> ku4;
+      extern std::vector<double> ku6;
+      extern std::vector<double> kc4;
+      extern std::vector<double> kc6;
+
+      // unrolled arrays for storing easy axes for each material
+      extern std::vector<evec_t> ku_vector; // 001 easy axis direction
+      extern std::vector<evec_t> kc_vector; // 001 vector for cubic anisotropy
+      //extern std::vector<evec_t> kc_vector_b(0); // 100 vector for cubic anisotropy
 
       extern bool native_neel_anisotropy_threshold; // enables site-dependent surface threshold
       extern unsigned int neel_anisotropy_threshold; // global threshold for surface atoms
@@ -169,29 +181,118 @@ namespace anisotropy{
 
       // arrays for storing unrolled parameters for lattice anisotropy
       extern std::vector<double> klattice_array; // anisoptropy constant
-      extern std::vector<evec_t> elattice_array; // easy axis
 
       //-------------------------------------------------------------------------
       // internal function declarations
       //-------------------------------------------------------------------------
-      void uniaxial_second_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
-      void uniaxial_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
-      void neel_anisotropy(const unsigned int num_atoms);
+      void uniaxial_second_order_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
 
-      void cubic_fourth_order(const unsigned int num_atoms, std::vector<int>& atom_material_array, std::vector<double>& inverse_mu_s);
+      void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
 
-      void calculate_lattice_anisotropy_fields(std::vector<double>& spin_array_x,
-                                               std::vector<double>& spin_array_y,
-                                               std::vector<double>& spin_array_z,
-                                               std::vector<int>&    type_array,
-                                               std::vector<double>& field_array_x,
-                                               std::vector<double>& field_array_y,
-                                               std::vector<double>& field_array_z,
-                                               const int start_index,
-                                               const int end_index,
-                                               const double temperature);
+      void uniaxial_sixth_order_fields( std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
 
-      double spin_lattice_anisotropy_energy(const int imaterial, const double sx, const double sy, const double sz, const double temperature);
+      void cubic_fourth_order_fields(std::vector<double>& spin_array_x,
+                                     std::vector<double>& spin_array_y,
+                                     std::vector<double>& spin_array_z,
+                                     std::vector<int>&    atom_material_array,
+                                     std::vector<double>& field_array_x,
+                                     std::vector<double>& field_array_y,
+                                     std::vector<double>& field_array_z,
+                                     const int start_index,
+                                     const int end_index);
+
+      void cubic_sixth_order_fields( std::vector<double>& spin_array_x,
+                                     std::vector<double>& spin_array_y,
+                                     std::vector<double>& spin_array_z,
+                                     std::vector<int>&    atom_material_array,
+                                     std::vector<double>& field_array_x,
+                                     std::vector<double>& field_array_y,
+                                     std::vector<double>& field_array_z,
+                                     const int start_index,
+                                     const int end_index);
+
+      void neel_fields( std::vector<double>& spin_array_x,
+                        std::vector<double>& spin_array_y,
+                        std::vector<double>& spin_array_z,
+                        std::vector<int>&    atom_material_array,
+                        std::vector<double>& field_array_x,
+                        std::vector<double>& field_array_y,
+                        std::vector<double>& field_array_z,
+                        const int start_index,
+                        const int end_index);
+
+      void lattice_fields(std::vector<double>& spin_array_x,
+                          std::vector<double>& spin_array_y,
+                          std::vector<double>& spin_array_z,
+                          std::vector<int>&    type_array,
+                          std::vector<double>& field_array_x,
+                          std::vector<double>& field_array_y,
+                          std::vector<double>& field_array_z,
+                          const int start_index,
+                          const int end_index,
+                          const double temperature);
+
+      double uniaxial_second_order_energy( const int atom,
+                                           const int mat,
+                                           const double sx,
+                                           const double sy,
+                                           const double sz);
+
+      double uniaxial_fourth_order_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double uniaxial_sixth_order_energy( const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double cubic_fourth_order_energy(const int atom,
+                                       const int mat,
+                                       const double sx,
+                                       const double sy,
+                                       const double sz);
+
+      double cubic_sixth_order_energy( const int atom,
+                                       const int mat,
+                                       const double sx,
+                                       const double sy,
+                                       const double sz);
+
+      double neel_energy( const int atom,
+                          const int mat,
+                          const double sx,
+                          const double sy,
+                          const double sz);
+
+      double lattice_energy(const int atom, const int mat, const double sx, const double sy, const double sz, const double temperature);
 
       void initialise_neel_anisotropy_tensor(std::vector <std::vector <bool> >& nearest_neighbour_interactions_list,
                                              std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
@@ -201,11 +302,6 @@ namespace anisotropy{
    //-------------------------------------------------------------------------
    // function declarations
    //-------------------------------------------------------------------------
-
-   //extern int calculate_energies();
-   //extern double second_order_tensor_anisotropy();
-   //extern double third_order_tensor_anisotropy();
-   //extern double fourth_order_tensor_anisotropy();
 
    //-------------------------------------------------------------------------
    // simple inline function to convert atom,i,j into 1D tensor coordinates

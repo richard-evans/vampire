@@ -183,10 +183,10 @@ int finalise(){
 	}
 
 	// Stop MPI Timer and output to screen
-	vmpi::end_time=MPI_Wtime();
-	if(vmpi::my_rank==0){
-		std::cout << "MPI Simulation Time: " << vmpi::end_time-vmpi::start_time << std::endl;
-	}
+	//vmpi::end_time=MPI_Wtime();
+	//if(vmpi::my_rank==0){
+	//	std::cout << "MPI Simulation Time: " << vmpi::end_time-vmpi::start_time << std::endl;
+	//}
 
 	// Finalise MPI
 	MPI_Finalize();

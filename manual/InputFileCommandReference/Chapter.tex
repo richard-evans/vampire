@@ -554,6 +554,14 @@ example, if output:output-rate = 10 and sim:time-steps-increment = 10 then stati
 values) will be updated once every 10 time steps, and the new statistics will be written to the output
 file every 100 time steps.\\
 
+{\zicf output:precision = integer [default 6]}\addcontentsline{toc}{subsection}{output:precision} controls
+the number of digits to be used for data written to the output file or printed to screen. The default value
+is 6 digits of precision. \\
+
+{\zicf output:fixed-width = flag [default false]}\addcontentsline{toc}{subsection}{output:fixed-width} controls
+the formatting to be used for data written to the output file or printed to screen. The default is false which
+ignores trailing zeros in the output.\\
+
 \section*{Configuration output}
 \addcontentsline{toc}{section}{Configuration output}
 These options enable the output of spin configuration snapshots during the
@@ -665,3 +673,13 @@ scale simulations (on a single physical node) the default value of 1 is fine.
 For larger scale simulations more output nodes are beneficial to achieve maximum
 performance, with one output node per physical node being a sensible choice, but
 this can be specified up to the maximum number of processes in the simulation.\\
+
+
+%OpenCL and cuda acceleration \\
+%gpu:platform=1
+%gpu:device=0
+%gpu:num-threads=8192
+
+%#gpu:platform-other=0
+%#gpu:device-other=0
+%#gpu:num-threads-other=32

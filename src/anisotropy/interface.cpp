@@ -94,7 +94,7 @@ namespace anisotropy{
          double ku2 = atof(value.c_str());
          vin::check_for_valid_value(ku2, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].ku2 = ku2;
-         internal::enable_second_order_tensor = true; // Switch on second order tensor calculation for all spins
+         internal::enable_uniaxial_second_order = true; // Switch on second order tensor calculation for all spins
          return true;
       }
       //------------------------------------------------------------
@@ -103,8 +103,7 @@ namespace anisotropy{
          double ku4 = atof(value.c_str());
          vin::check_for_valid_value(ku4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].ku4 = ku4;
-         internal::enable_second_order_tensor = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
-         internal::enable_fourth_order_tensor = true; // Switch on fourth order tensor calculation for all spins
+         internal::enable_uniaxial_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
          return true;
       }
       //------------------------------------------------------------
@@ -113,9 +112,7 @@ namespace anisotropy{
          double ku6 = atof(value.c_str());
          vin::check_for_valid_value(ku6, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].ku6 = ku6;
-         internal::enable_second_order_tensor = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
-         internal::enable_fourth_order_tensor = true; // Switch on fourth order tensor calculation for all spins (from spherical harmonics)
-         internal::enable_sixth_order_tensor = true; // Switch on sixth order tensor calculation for all spins
+         internal::enable_uniaxial_sixth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
          return true;
       }
       //------------------------------------------------------------
@@ -126,7 +123,7 @@ namespace anisotropy{
          // Test for valid range
          vin::check_for_valid_value(kc4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].kc4 = kc4;
-         internal::enable_fourth_order_tensor = true; // Switch on fourth order tensor calculation for all spins
+         internal::enable_cubic_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
          return true;
       }
       //------------------------------------------------------------
@@ -136,7 +133,7 @@ namespace anisotropy{
          // Test for valid range
          vin::check_for_valid_value(kc6, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].kc6 = kc6;
-         internal::enable_sixth_order_tensor = true; // Switch on sixth order tensor calculation for all spins
+         internal::enable_cubic_sixth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
          return true;
       }
       //------------------------------------------------------------
@@ -146,7 +143,6 @@ namespace anisotropy{
          double kij = atof(value.c_str());
          vin::check_for_valid_value(kij, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
          internal::mp[super_index].kij[sub_index] = kij;
-         internal::enable_second_order_tensor = true; // Switch on second order tensor calculation for all spins
          internal::enable_neel_anisotropy = true;
          return true;
       }
@@ -157,7 +153,6 @@ namespace anisotropy{
          // Test for valid range
          vin::check_for_valid_value(kl, word, line, prefix, unit, "energy", -1.0e-17, 1.0e17,"material","-1e17 - 1e17 J/atom");
          internal::mp[super_index].k_lattice = kl;
-         internal::enable_second_order_tensor = true; // Switch on second order tensor calculation for all spins
          internal::enable_lattice_anisotropy = true;
          return true;
       }
@@ -249,7 +244,7 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
-      test="uniaxial-anisotropy-tensor";
+      /*test="uniaxial-anisotropy-tensor";
       if(word==test){
          std::vector<double> t;
          // read values from string
@@ -280,9 +275,9 @@ namespace anisotropy{
             terminaltextcolor(WHITE);
             err::vexit();
          }
-      }
+      }*/
       //------------------------------------------------------------
-      test="cubic-anisotropy-tensor";
+      /*test="cubic-anisotropy-tensor";
       if(word==test){
          std::vector<double> t;
          // read values from string
@@ -313,7 +308,7 @@ namespace anisotropy{
             terminaltextcolor(WHITE);
             err::vexit();
          }
-      }
+      }*/
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

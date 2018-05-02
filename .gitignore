@@ -12,6 +12,8 @@
 #----------------------------------------------
 *~
 *.swp
+*.swo
+
 
 #----------------------------------------------
 # Povray files
@@ -60,6 +62,9 @@ grain
 output
 MPI-compute-times
 MPI-wait-times
+tags
+.vimrc
+*.d
 MAT.mat
 UC.ucf
 exchange-template

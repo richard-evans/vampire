@@ -80,6 +80,11 @@ namespace exchange{
    //-----------------------------------------------------------------------------
    unsigned int set_exchange_type(std::string exchange_type_string);
 
+   //-----------------------------------------------------------------------------
+   // Function to get exchange type isotropic (0), vectorial(1) or tensorial(2)
+   //-----------------------------------------------------------------------------
+   unsigned int get_exchange_type();
+
    //---------------------------------------------------------------------------
    // Calculate  exchange energy for single spin selecting the correct type
    //---------------------------------------------------------------------------

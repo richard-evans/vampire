@@ -75,6 +75,9 @@ namespace vin{
    extern void check_for_valid_int(  unsigned int& value, std::string word, int line, std::string prefix, unsigned int range_min,
                               unsigned int range_max, std::string input_file_type, std::string range_text);
 
+   extern void check_for_valid_int(  uint64_t& value, std::string word, int line, std::string prefix,
+                                     uint64_t range_min, uint64_t range_max, std::string input_file_type, std::string range_text);
+
    extern bool check_for_valid_bool( std::string value, std::string word, int line, std::string prefix, std::string input_file_type);
 
    extern void check_for_valid_unit_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string input_file_type);
@@ -89,11 +92,17 @@ namespace vin{
    // function to read file on master process and return a std::string of its contents
    extern std::string get_string(std::string const filename, std::string source_file_name, int line);
 
+   uint64_t str_to_uint64(std::string input_str);
+
    extern std::vector<mp::materials_t> read_material;
 
 }
 
 namespace vout{
+
+   extern bool custom_precision; // enable user selectable precision for data output
+   extern unsigned int precision; // variable to control output precision (digits)
+   extern bool fixed; // fixed precision output
 
 	extern std::vector<unsigned int> file_output_list;
 	extern std::vector<unsigned int> screen_output_list;
@@ -123,5 +132,10 @@ namespace vout{
 // Checkpoint load/save functions
 void load_checkpoint();
 void save_checkpoint();
+
+namespace vio{
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
+}
 
 #endif /*VIO_H_*/

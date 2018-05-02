@@ -532,6 +532,14 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
       }
    }
 
+   // Get total number of atoms contributing to the body volume, i.e. all the atoms generated within the body shape
+   create::num_total_atoms_non_filler = 0;
+   for(int a=0;a<num_atoms;a++){
+      if(catom_array[a].include == true && mp::material[catom_array[a].material].fill == false && mp::material[catom_array[a].material].non_magnetic == 1){
+         create::num_total_atoms_non_filler++;
+      }
+   }
+
    // check if there are unneeded atoms
    if(num_atoms!=num_included){
       // create temporary copy for atoms

@@ -40,7 +40,7 @@ namespace sim{
 	extern uint64_t time;
 	extern uint64_t total_time;
 	extern uint64_t loop_time;
-	extern int partial_time;
+	extern uint64_t partial_time;
 	extern uint64_t equilibration_time;
 	extern int runs;
 	extern int64_t parity;
@@ -146,7 +146,7 @@ namespace sim{
 	// Wrapper Functions
 	extern int run();
 	extern int initialise();
-	extern int integrate(int);
+	extern int integrate(uint64_t);
 
 	// Legacy integrators
 	extern int LLB(int);

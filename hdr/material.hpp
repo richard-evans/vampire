@@ -21,13 +21,14 @@
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
-//
+
+#ifndef MATERIAL_HPP_
+#define MATERIAL_HPP_
+
 #include <iostream>
 #include <string>
 #include <vector>
 
-#ifndef MATERIAL_H_
-#define MATERIAL_H_
 class zkval_t{
 	public:
 	double K;
@@ -62,7 +63,8 @@ class zkten_t{
 
 namespace mp
 {
-using std::string;
+
+   using std::string;
 
 	//----------------------------------
 	// Material Container
@@ -141,8 +143,7 @@ using std::string;
    extern std::vector <double> material_second_order_anisotropy_constant_array;
    extern std::vector <double> material_sixth_order_anisotropy_constant_array;
    extern std::vector <double> material_spherical_harmonic_constants_array;
-	extern std::vector <double> MaterialCubicAnisotropyArray;
-
+   extern std::vector <double> MaterialCubicAnisotropyArray;
 
 	// Functions
 	extern int initialise(std::string);
@@ -151,10 +152,9 @@ using std::string;
 	extern int single_spin_system();
 	extern int set_derived_parameters();
 
-
 }
 
 /// Alias deprecated material_parameters to mp namespace
 namespace material_parameters=mp;
 
-#endif // MATERIAL_H_
+#endif // MATERIAL_HPP_

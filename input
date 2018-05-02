@@ -7,11 +7,6 @@
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
-create:crystal-structure=sc
-
-#------------------------------------------
-# System Dimensions:
-#------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
 dimensions:system-size-x = 7.7 !nm
 dimensions:system-size-y = 7.7 !nm
@@ -43,9 +38,8 @@ sim:integrator=monte-carlo
 # data output
 #------------------------------------------
 output:real-time
-output:temperature
 output:magnetisation
-output:magnetisation-length
+output:mean-magnetisation-length
 output:output-rate = 1000
 
 screen:temperature

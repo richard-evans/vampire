@@ -138,6 +138,12 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
    // result string stream
    std::ostringstream result;
 
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
+
    // determine inverse temperature mu_B/(kB T) (flushing to zero for very low temperatures)
    const double itemp = temperature < 1.e-300 ? 0.0 : 9.274e-24/(1.3806503e-23*temperature);
 
