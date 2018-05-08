@@ -43,10 +43,6 @@ int command( int argc, char* argv[] ){
 //    --slice = x,x,y,y,z,z
 //    --multiscale = gradient, material, region
 
-   // check for axis initialisations
-   bool x_initialised = false;
-   bool z_initialised = false;
-
    // temporary string for storing command line argument
    std::string temp_str;
 
@@ -74,7 +70,7 @@ int command( int argc, char* argv[] ){
          extract(temp_str, vdc::vector_z );
 
          // confirm initialisation of z-axis
-         z_initialised = true;
+         z_vector = true;
       }
       else if (sw == "--vector-x"){
 
@@ -96,7 +92,40 @@ int command( int argc, char* argv[] ){
          extract(temp_str, vdc::vector_x );
 
          // confirm initialisation of x-axis
-         x_initialised = true;
+         x_vector = true;
+      }
+      else if (sw == "--colourmap"){
+
+         // check number of args not exceeded
+         if (arg+1 < argc){
+            arg++;
+            temp_str = std::string(argv[arg]);
+         }
+         else {
+            ////terminaltextcolor(RED);
+            std::cerr << "Error - expected colourmap keyword."
+                      << std::endl;
+            ////terminaltextcolor(WHITE);
+            return EXIT_FAILURE
+         }
+
+         if ( temp_str == "C2" ){
+            colour_keyword == temp_str;
+         }
+         else if (temp_str == "BWR" ){
+            colour_keyword == temp_str;
+         }
+         else if (temp_str == "Rainbow" ){
+            colour_keyword == temp_str;
+         }
+         else {
+            ////terminaltextcolor(RED);
+            std::cerr << "Error - Colourmap keyword does not match."
+                      << std::endl;
+            return EXIT_FAILURE
+            ////terminaltextcolor(WHITE);
+         }
+
       }
       else {
          ////terminaltextcolor(RED);
@@ -108,9 +137,10 @@ int command( int argc, char* argv[] ){
    }
 
    // check for valid axis initialisations
-   if ( z_initialised && !x_initialised ){
+   if ( z_vector && !x_vector ){
 
       // check for a z-axis with vector_z[2] = 0
+      // (Hence z_vector lies in xy-plane)
       if ( (-0.000001 < vdc::vector_z[2]) && (vdc::vector_z[2] < 0.000001) ){
          // x-axis will lie along {0,0,1}
          vdc::vector_x = {0.0, 0.0, 1.0};
@@ -120,13 +150,14 @@ int command( int argc, char* argv[] ){
       }
       else {
          // find x-axis which lies on plane with normal vector_z
+         // (there must exist a vector with coor {1,0,x} normal to z_vector )
          vdc::vector_x = {1.0, 0.0, -1.0*vdc::vector_z[0]/vdc::vector_z[2]};
 
          // find vector_y
          init_vector_y( vdc::vector_z, vdc::vector_x );
       }
    }
-   else if ( !z_initialised && x_initialised ){
+   else if ( !z_vector && x_vector ){
 
       // x-axis cannot be initialised alone
       ////terminaltextcolor(RED);
@@ -136,7 +167,7 @@ int command( int argc, char* argv[] ){
       ////terminaltextcolor(WHITE);
       return EXIT_FAILURE;
    }
-   else if ( z_initialised && x_initialised ){
+   else if ( z_vector && x_vector ){
 
       // check if input axes are orthogonal
       double zdotx;
