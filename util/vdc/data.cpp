@@ -22,6 +22,8 @@ namespace vdc{
    bool xyz = true; // flag to specify crystal.xyz file output
    bool povray = true; // flag to specify povray file output
    bool cells = false; // flag to specify cells output
+   bool x_vector = false; // flag to specify direction of povray colouring
+   bool z_vector = false; // flag to specify plane for povray colouring
 
    format_t format;
 

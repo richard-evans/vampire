@@ -24,6 +24,11 @@ namespace vdc{
    extern bool xyz;
    extern bool povray;
    extern bool cells;
+   extern bool x_vector;
+   extern bool z_vector;
+
+   // keyword variables
+   extern std::string colour_keyword
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -95,6 +100,8 @@ namespace vdc{
    void output_cell_file(unsigned int spin_file_id);
 
    void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
+
+   void colourwheel ( std::vector<std::vector<double>>& colourmap, std::string keyword );
 
 }
 
