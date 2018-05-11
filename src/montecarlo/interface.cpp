@@ -33,6 +33,47 @@ namespace montecarlo{
       if(key!=prefix) return false;
 
       //--------------------------------------------------------------------
+      std::string test="algorithm";
+      if( word == test ){
+         test = "adaptive";
+         if(value == test){
+            montecarlo::internal::algorithm = montecarlo::internal::adaptive;
+            return true;
+         }
+         test = "spin-flip";
+         if( value == test ){
+            montecarlo::internal::algorithm = montecarlo::internal::spin_flip;
+            return true;
+         }
+         test = "uniform";
+         if( value == test ){
+            montecarlo::internal::algorithm = montecarlo::internal::uniform;
+            return true;
+         }
+         test = "angle";
+         if( value == test ){
+            montecarlo::internal::algorithm = montecarlo::internal::angle;
+            return true;
+         }
+         test = "hinzke-nowak";
+         if( value == test ){
+            montecarlo::internal::algorithm = montecarlo::internal::hinzke_nowak;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - value for \'montecarlo:" << word << "\' must be one of:" << std::endl;
+            std::cerr << "\t\"adaptive\"" << std::endl;
+            std::cerr << "\t\"spin-flip\"" << std::endl;
+            std::cerr << "\t\"uniform\"" << std::endl;
+            std::cerr << "\t\"angle\"" << std::endl;
+            std::cerr << "\t\"hinzke-nowak\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+         }
+      }
+
+      //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
       return false;
@@ -55,4 +96,3 @@ namespace montecarlo{
    }
 
 } // end of montecarlo namespace
-

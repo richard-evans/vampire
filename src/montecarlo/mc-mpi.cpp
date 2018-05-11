@@ -132,7 +132,7 @@ void mc_step_parallel(std::vector<double> &x_spin_array,
       	const int imaterial=type_array[atom];
 
          // Calculate range for move
-         internal::mc_delta_angle=sigma_array[imaterial];
+         internal::delta_angle=sigma_array[imaterial];
 
       	// Save old spin position
       	internal::Sold[0] = x_spin_array[atom];
@@ -192,7 +192,7 @@ void mc_step_parallel(std::vector<double> &x_spin_array,
    		const int imaterial=type_array[atom];
 
          // Calculate range for move
-         internal::mc_delta_angle=sigma_array[imaterial];
+         internal::delta_angle=sigma_array[imaterial];
 
    		// Save old spin position
    		internal::Sold[0] = x_spin_array[atom];
@@ -249,6 +249,15 @@ void mc_step_parallel(std::vector<double> &x_spin_array,
    double global_statistics_reject = 0.0;
    MPI_Allreduce(&statistics_moves, &global_statistics_moves, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    MPI_Allreduce(&statistics_reject, &global_statistics_reject, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+   // calculate new adaptive step sigma angle (on per-processor basis using local, not global stats)
+   if(montecarlo::internal::algorithm == montecarlo::internal::adaptive){
+      const double last_rejection_rate = statistics_reject / statistics_moves;
+      const double factor = 0.5 / last_rejection_rate;
+      montecarlo::internal::adaptive_sigma *= factor;
+      // check for excessive range (too small angle takes too long to grow, too large does not improve performance) and truncate
+      if (montecarlo::internal::adaptive_sigma > 60.0 || montecarlo::internal::adaptive_sigma < 1e-5) montecarlo::internal::adaptive_sigma = 60.0;
+   }
 
    // Save statistics to sim namespace variable
    sim::mc_statistics_moves += global_statistics_moves;

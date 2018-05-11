@@ -75,6 +75,7 @@ namespace vin{
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(montecarlo::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -1208,42 +1209,6 @@ namespace vin{
             check_for_valid_value(angle, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
             sim::constraint_phi_delta=angle;
             return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="monte-carlo-algorithm";
-        if(word==test){
-            // include namesapce here to access enum values
-            using namespace sim;
-            test="spin-flip";
-            if(value==test){
-                sim::mc_algorithm=spin_flip;
-                return EXIT_SUCCESS;
-            }
-            test="uniform";
-            if(value==test){
-                sim::mc_algorithm=uniform;
-                return EXIT_SUCCESS;
-            }
-            test="angle";
-            if(value==test){
-                sim::mc_algorithm=angle;
-                return EXIT_SUCCESS;
-            }
-            test="hinzke-nowak";
-            if(value==test){
-                sim::mc_algorithm=hinzke_nowak;
-                return EXIT_SUCCESS;
-            }
-            else{
-            terminaltextcolor(RED);
-                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-                std::cerr << "\t\"spin-flip\"" << std::endl;
-                std::cerr << "\t\"uniform\"" << std::endl;
-                std::cerr << "\t\"angle\"" << std::endl;
-                std::cerr << "\t\"hinzke-nowak\"" << std::endl;
-            terminaltextcolor(WHITE);
-                err::vexit();
-            }
         }
         //-------------------------------------------------------------------
         test="save-checkpoint";

@@ -90,7 +90,7 @@ void monte_carlo_preconditioning(){
          //std::cout << "here-2 " << imaterial << std::endl;
 
          // Calculate range for move
-         sim::mc_delta_angle = sigma_array[imaterial];
+         internal::delta_angle = sigma_array[imaterial];
 
          //std::cout << "here-1 " << sim::mc_delta_angle << std::endl;
 

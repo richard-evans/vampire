@@ -31,14 +31,19 @@ namespace montecarlo{
       //------------------------------------------------------------------------
       // Shared variables inside montecarlo module
       //------------------------------------------------------------------------
-      //Materials Variables
+
+      // Monte Carlo update algorithm
+      algorithm_t algorithm = adaptive;
+
+      // Materials variables
       int num_materials;
       std::vector<double> temperature_rescaling_alpha;
       std::vector<double> temperature_rescaling_Tc;
       std::vector<double> mu_s_SI;
 
-      //MC Variables
-      double mc_delta_angle;
+      // MC Variables
+      double delta_angle = 0.1;     // Tuned angle for Monte Carlo trial move
+      double adaptive_sigma = 60.0; // sigma trial width for adaptive move
       std::vector<double> Sold(3);
    	std::vector<double> Snew(3);
 

@@ -352,7 +352,7 @@ int cmc_mc_step(){
 		// Randomly select spin number 1
 		atom_number1 = int(mtrandom::grnd()*atoms::num_atoms);
 		imat1=atoms::type_array[atom_number1];
-      sim::mc_delta_angle=sigma_array[imat1];
+      internal::delta_angle=sigma_array[imat1];
 
 		// check for constrained or unconstrained
 		if(mp::material[imat1].constrained==false){

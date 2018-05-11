@@ -27,8 +27,9 @@ namespace internal{
 void mc_gaussian(const std::vector<double>&, std::vector<double>&);
 void mc_spin_flip(const std::vector<double>&, std::vector<double>&);
 void mc_uniform(std::vector<double>&);
-void mc_angle(const std::vector<double>&, std::vector<double>&);
+void mc_angle(const std::vector<double>&, std::vector<double>&, const double angle);
 void mc_hinzke_nowak(const std::vector<double>&, std::vector<double>&);
+void mc_adaptive(const std::vector<double>&, std::vector<double>&);
 
 ///--------------------------------------------------------
 ///
@@ -38,12 +39,14 @@ void mc_hinzke_nowak(const std::vector<double>&, std::vector<double>&);
 void mc_move(const std::vector<double>& old_spin, std::vector<double>& new_spin){
 
    // Reference enum list for readability
-   using namespace sim;
-   //enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak};
+   using namespace montecarlo::internal;
 
    // Select algorithm using case statement
-   switch(sim::mc_algorithm){
+   switch(algorithm){
 
+      case adaptive:
+         mc_adaptive(old_spin, new_spin);
+         break;
       case spin_flip:
          mc_spin_flip(old_spin, new_spin);
          break;
@@ -51,13 +54,13 @@ void mc_move(const std::vector<double>& old_spin, std::vector<double>& new_spin)
          mc_uniform(new_spin);
          break;
       case angle:
-         mc_angle(old_spin, new_spin);
+         mc_angle(old_spin, new_spin, montecarlo::internal::delta_angle);
          break;
       case hinzke_nowak:
          mc_hinzke_nowak(old_spin, new_spin);
          break;
       default:
-         mc_hinzke_nowak(old_spin, new_spin);
+         mc_adaptive(old_spin, new_spin);
          break;
    }
    return;
@@ -65,19 +68,19 @@ void mc_move(const std::vector<double>& old_spin, std::vector<double>& new_spin)
 
 /// Angle move
 /// Move spin within cone near old position
-void mc_angle(const std::vector<double>& old_spin, std::vector<double>& new_spin){
+void mc_angle(const std::vector<double>& old_spin, std::vector<double>& new_spin, const double angle){
 
-   new_spin[0]=old_spin[0]+mtrandom::gaussian()*internal::mc_delta_angle;
-   new_spin[1]=old_spin[1]+mtrandom::gaussian()*internal::mc_delta_angle;
-   new_spin[2]=old_spin[2]+mtrandom::gaussian()*internal::mc_delta_angle;
+   new_spin[0] = old_spin[0] + mtrandom::gaussian() * angle;
+   new_spin[1] = old_spin[1] + mtrandom::gaussian() * angle;
+   new_spin[2] = old_spin[2] + mtrandom::gaussian() * angle;
 
    // Calculate new spin length
    const double r = 1.0/sqrt (new_spin[0]*new_spin[0]+new_spin[1]*new_spin[1]+new_spin[2]*new_spin[2]);
 
    // Apply normalisation
-   for (int i=0; i < new_spin.size(); i++) {
-      new_spin[i]*=r;
-   }
+   new_spin[0] *= r;
+   new_spin[1] *= r;
+   new_spin[2] *= r;
 
    return;
 
@@ -133,13 +136,29 @@ void mc_hinzke_nowak(const std::vector<double>& old_spin, std::vector<double>& n
             mc_uniform(new_spin);
             break;
          case 2:
-            mc_angle(old_spin, new_spin);
+            mc_angle(old_spin, new_spin, montecarlo::internal::delta_angle);
             break;
          default:
-            mc_angle(old_spin, new_spin);
+            mc_angle(old_spin, new_spin, montecarlo::internal::delta_angle);
             break;
       }
       return;
+}
+
+//-----------------------------------------------------------------------------------------
+/// Generates a new spin from a cone around the old spin, the cone width is
+/// derived from the acceptance rate of the previous monte carlo step.
+///
+/// Adaptive algorithm implemented
+/// JD. Alzate-Cardona
+/// RFL. Evans
+/// D. Sabogal-Suarez
+// Implementation by Oscar David Arbeláez E., JD. Alzate-Cardona and R F L Evans 2018
+//-----------------------------------------------------------------------------------------
+void mc_adaptive(const std::vector<double>& old_spin, std::vector<double>& new_spin){
+   // Here we have adaptive_sigma, at least from the monte carlo algorithm
+   mc_angle(old_spin, new_spin, montecarlo::internal::adaptive_sigma);
+   return;
 }
 
 } //end of namespace internal

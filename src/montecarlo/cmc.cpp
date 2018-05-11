@@ -361,7 +361,7 @@ int cmc_step(){
 		// get spin moment for atom 1
 		const double mu1 = atoms::m_spin_array[atom_number1];
 
-      sim::mc_delta_angle=sigma_array[imat1];
+      internal::delta_angle=sigma_array[imat1];
 
 		// Save initial Spin 1
 		spin1_initial[0] = atoms::x_spin_array[atom_number1];

@@ -68,7 +68,7 @@ void mc_step(std::vector<double> &x_spin_array,
          const int imaterial=type_array[atom];
 
          // Calculate range for move
-         internal::mc_delta_angle=sigma_array[imaterial];
+         internal::delta_angle=sigma_array[imaterial];
 
          // Save old spin position
          internal::Sold[0] = x_spin_array[atom];
@@ -109,12 +109,21 @@ void mc_step(std::vector<double> &x_spin_array,
          }
       }
 
+      // calculate new adaptive step sigma angle
+      if(montecarlo::internal::algorithm == montecarlo::internal::adaptive){
+         const double last_rejection_rate = statistics_reject / statistics_moves;
+         const double factor = 0.5 / last_rejection_rate;
+         montecarlo::internal::adaptive_sigma *= factor;
+         // check for excessive range (too small angle takes too long to grow, too large does not improve performance) and truncate
+      	if (montecarlo::internal::adaptive_sigma > 60.0 || montecarlo::internal::adaptive_sigma < 1e-5) montecarlo::internal::adaptive_sigma = 60.0;
+      }
+
       // Save statistics to sim namespace variable
       sim::mc_statistics_moves += statistics_moves;
       sim::mc_statistics_reject += statistics_reject;
 
       return;
-      
+
    }
 
    } // End of namespace montecarlo

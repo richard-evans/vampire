@@ -144,9 +144,6 @@ namespace sim{
 	double TTTe = 0.0; /// electron temperature
 	double TTTp = 0.0; /// phonon temperature
 
-   double mc_delta_angle=0.1; /// Tuned angle for Monte Carlo trial move
-   mc_algorithms mc_algorithm=hinzke_nowak;
-
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
 	int integrator=0; /// 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC

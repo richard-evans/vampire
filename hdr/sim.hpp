@@ -92,9 +92,6 @@ namespace sim{
 	extern double constraint_theta_delta; /// loop angle delta [degrees]
 
 	// Monte Carlo variables
-	extern double mc_delta_angle; /// Tuned angle for Monte Carlo trial move
-	enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak};
-   extern mc_algorithms mc_algorithm; /// Selected algorithm for Monte Carlo simulations
    extern int num_monte_carlo_preconditioning_steps;
 
 	extern double head_position[2];

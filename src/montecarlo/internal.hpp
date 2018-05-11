@@ -39,6 +39,10 @@ namespace montecarlo{
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
+      enum algorithm_t { adaptive, spin_flip, uniform, angle, hinzke_nowak };
+
+      extern algorithm_t algorithm; // Selected algorithm for Monte Carlo simulations
+
       //Materials Variables
       extern int num_materials;
       extern std::vector<double> temperature_rescaling_alpha;
@@ -46,7 +50,9 @@ namespace montecarlo{
       extern std::vector<double> mu_s_SI;
 
       //MC Variables
-      extern double mc_delta_angle;
+      extern double delta_angle;    // Tuned angle for Monte Carlo trial move
+      extern double adaptive_sigma; // sigma trial width for adaptive move
+
       extern std::vector<double> Sold;
       extern std::vector<double> Snew;
 
