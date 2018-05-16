@@ -1,37 +1,20 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard Evans 2018. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
+//------------------------------------------------------------------------------
 //
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-//====================================================================
-//                           set_atom_vars
-//   Subroutine to copy newly created system variables to
-//   atom variables for use in integration subroutines
-//
-//====================================================================
 
+// C++ standard library headers
 #include <iostream>
 #include <vector>
 
+// VAMPIRE headers
 #include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
@@ -41,18 +24,20 @@
 #include "exchange.hpp"
 #include "grains.hpp"
 #include "material.hpp"
+#include "neighbours.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
 
+namespace create{
+namespace internal{
 
-//using namespace atom_variables;
-//using namespace material_parameters;
-
-namespace cs{
-int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbour_t> > & cneighbourlist){
+//------------------------------------------------------------------------------
+void set_atom_vars(std::vector<cs::catom_t> & catom_array,
+                   neighbours::list_t& bilinear,
+                   neighbours::list_t& biquadratic){
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){
@@ -140,7 +125,7 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
    //---------------------------------------------------------------------------
    // Identify surface atoms and initialise anisotropy data
    //---------------------------------------------------------------------------
-   anisotropy::identify_surface_atoms(catom_array, cneighbourlist);
+   anisotropy::identify_surface_atoms(catom_array, bilinear.list);
 
 	//===========================================================
 	// Create 1-D neighbourlist
@@ -152,26 +137,20 @@ int set_atom_vars(std::vector<cs::catom_t> & catom_array, std::vector<std::vecto
    //-------------------------------------------------
 	//	Initialise exchange calculation
 	//-------------------------------------------------
-   exchange::initialize(cneighbourlist);
-
-   // now remove unit cell interactions data
-   unit_cell.interaction.resize(0);
+   exchange::initialize(bilinear.list, biquadratic.list);
 
    // Save number of atoms in unit cell first
-   cells::num_atoms_in_unit_cell=unit_cell.atom.size();
-   //std::cout << "\t\t" << unit_cell.atom.size() << "\t" << cells::num_atoms_in_unit_cell << std::endl;
-   unit_cell.atom.resize(0);
+   cells::num_atoms_in_unit_cell = cs::unit_cell.atom.size();
 
    // Now nuke generation vectors to free memory NOW
    std::vector<cs::catom_t> zerov;
-   std::vector<std::vector <neighbour_t> > zerovv;
+   std::vector<std::vector <neighbours::neighbour_t> > zerovv;
    catom_array.swap(zerov);
-   cneighbourlist.swap(zerovv);
+   bilinear.list.swap(zerovv);
 
-
-
-   return EXIT_SUCCESS;
+   return;
 
 }
 
-} // End of cs namespace
+} // End of internal namespace
+} // End of create namespace
