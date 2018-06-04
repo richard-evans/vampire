@@ -504,8 +504,8 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 
 		// temporary constant for spin components
 		const double sx = atoms::x_spin_array[atom];
-		const double sy = atoms::x_spin_array[atom];
-		const double sz = atoms::x_spin_array[atom];
+		const double sy = atoms::y_spin_array[atom];
+		const double sz = atoms::z_spin_array[atom];
 
 		// get material parameter
 		const int material=atoms::type_array[atom];

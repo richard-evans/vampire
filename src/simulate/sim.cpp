@@ -662,7 +662,7 @@ void integrate_serial(uint64_t n_steps){
 ///	Revision:	  ---
 ///=====================================================================================
 ///
-int integrate_mpi(int n_steps){
+int integrate_mpi(uint64_t n_steps){
 
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate_mpi has been called" << std::endl;
