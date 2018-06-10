@@ -261,7 +261,7 @@ int run(){
    }
 
    // Precalculate initial statistics
-   stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
+   stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
 
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,

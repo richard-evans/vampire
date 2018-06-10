@@ -26,13 +26,19 @@ namespace stats{
    void update(const std::vector<double>& sx, // spin unit vector
                const std::vector<double>& sy,
                const std::vector<double>& sz,
-               const std::vector<double>& mm){
+               const std::vector<double>& mm,
+               const std::vector<int>& mat,
+               const double temperature
+            ){
 
       // Check for GPU acceleration and update statistics on device
       if(gpu::acceleration){
          gpu::stats::update();
       }
       else{
+         // update energy statistics
+         if(stats::calculate_system_energy)                 stats::system_energy.calculate(sx, sy, sz, mm, mat, temperature);
+
          // update magnetization statistics
          if(stats::calculate_system_magnetization)          stats::system_magnetization.calculate_magnetization(sx,sy,sz,mm);
          if(stats::calculate_material_magnetization)        stats::material_magnetization.calculate_magnetization(sx,sy,sz,mm);
@@ -59,6 +65,9 @@ namespace stats{
          gpu::stats::reset();
       }
       else{
+         // reset energy statistics
+         if(stats::calculate_system_energy)                 stats::system_energy.reset_averages();
+
          // reset magnetization statistics
          if(stats::calculate_system_magnetization)          stats::system_magnetization.reset_magnetization_averages();
          if(stats::calculate_material_magnetization)        stats::material_magnetization.reset_magnetization_averages();

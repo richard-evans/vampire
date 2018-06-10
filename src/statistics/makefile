@@ -1,21 +1,15 @@
 #--------------------------------------------------------------
-#          Makefile for dipole module
+#                 Makefile for statistics module
 #--------------------------------------------------------------
 
 # List module object filenames
-dipole_objects =\
+statistics_objects=\
 data.o \
 energy.o \
-field.o \
 initialize.o \
-interface.o \
-inter.o \
-intra.o \
-macrocell.o \
-memory.o \
-mpi.o \
-tensor.o \
-update.o
+magnetization.o \
+statistics.o \
+susceptibility.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/dipole/,$(dipole_objects))
+OBJECTS+=$(addprefix obj/statistics/,$(statistics_objects))

@@ -1519,70 +1519,70 @@ namespace vin{
         test="total-energy";
         if(word==test){
             output_list.push_back(27);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-total-energy";
         if(word==test){
             output_list.push_back(28);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="anisotropy-energy";
         if(word==test){
             output_list.push_back(29);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-anisotropy-energy";
         if(word==test){
             output_list.push_back(30);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="exchange-energy";
         if(word==test){
             output_list.push_back(35);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-exchange-energy";
         if(word==test){
             output_list.push_back(36);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="applied-field-energy";
         if(word==test){
             output_list.push_back(37);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-applied-field-energy";
         if(word==test){
             output_list.push_back(38);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="magnetostatic-energy";
         if(word==test){
             output_list.push_back(39);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-magnetostatic-energy";
         if(word==test){
             output_list.push_back(40);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------

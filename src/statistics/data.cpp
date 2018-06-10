@@ -14,12 +14,18 @@
 
 namespace stats{
 
+   bool calculate_system_energy                 = false;
    bool calculate_system_magnetization          = true;
    bool calculate_material_magnetization        = false;
    bool calculate_height_magnetization          = false;
    bool calculate_material_height_magnetization = false;
    bool calculate_system_susceptibility         = false;
-   bool calculate_material_susceptibility         = false;
+   bool calculate_material_susceptibility       = false;
+
+   energy_statistic_t system_energy;
+   energy_statistic_t material_energy;
+
+   //torque_statistic_t system_torque;
 
    magnetization_statistic_t system_magnetization;
    magnetization_statistic_t material_magnetization;

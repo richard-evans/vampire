@@ -54,6 +54,11 @@ namespace dipole{
    //-----------------------------------------------------------------------------
    void calculate_field(const uint64_t sim_time);
 
+   //------------------------------------------------------------------------------
+   // Function to calculate energy of spin in dipole (magnetostatic) field
+   //------------------------------------------------------------------------------
+   double spin_magnetostatic_energy(const int atom, const double sx, const double sy, const double sz);
+
    //--------------------------------------------------------
    // Function to send cells field to be output in cfg file
    //--------------------------------------------------------

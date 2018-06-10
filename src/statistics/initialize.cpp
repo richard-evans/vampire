@@ -33,6 +33,17 @@ namespace stats{
       // define vector mask
       std::vector<int> mask(stats::num_atoms,0);
 
+      // system energy
+      if(stats::calculate_system_energy){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
+            // all other atoms are included
+            else mask[atom] = 0;
+         }
+         stats::system_energy.set_mask(1+1,mask);
+      }
+
       // system magnetization
       if(stats::calculate_system_magnetization){
          for(int atom=0; atom < stats::num_atoms; ++atom){
