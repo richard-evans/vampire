@@ -106,23 +106,23 @@ int command( int argc, char* argv[] ){
             std::cerr << "Error - expected colourmap keyword."
                       << std::endl;
             ////terminaltextcolor(WHITE);
-            return EXIT_FAILURE
+            return EXIT_FAILURE;
          }
 
          if ( temp_str == "C2" ){
-            colour_keyword == temp_str;
+            vdc::colour_keyword = temp_str;
          }
          else if (temp_str == "BWR" ){
-            colour_keyword == temp_str;
+            vdc::colour_keyword = temp_str;
          }
          else if (temp_str == "Rainbow" ){
-            colour_keyword == temp_str;
+            vdc::colour_keyword = temp_str;
          }
          else {
             ////terminaltextcolor(RED);
             std::cerr << "Error - Colourmap keyword does not match."
                       << std::endl;
-            return EXIT_FAILURE
+            return EXIT_FAILURE;
             ////terminaltextcolor(WHITE);
          }
 
@@ -187,7 +187,7 @@ int command( int argc, char* argv[] ){
 
 //------------------------------------------------------------------------------
 // Extracts 3D vector coordinates from string: {x,y,z} or (x,y,z)
-// where x,y and z are doubles
+// where x,y and z are type double
 //------------------------------------------------------------------------------
 int extract( std::string arg_string, std::vector<double>& arg_vector ){
    int marker = 0; // position in the vector string
@@ -261,6 +261,7 @@ void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x ){
    vdc::vector_y[1] = vdc::vector_x[0]*vdc::vector_z[2] - vdc::vector_z[0]*vdc::vector_x[2];
    vdc::vector_y[2] = vdc::vector_z[0]*vdc::vector_x[1] - vdc::vector_x[0]*vdc::vector_z[1];
 
+   return;
 }
 
 } // end of namespace vdc

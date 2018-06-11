@@ -25,6 +25,9 @@ namespace vdc{
    bool x_vector = false; // flag to specify direction of povray colouring
    bool z_vector = false; // flag to specify plane for povray colouring
 
+   // keyword variables
+   std::string colour_keyword = "C2";
+
    format_t format;
 
    uint64_t num_atoms = 0;

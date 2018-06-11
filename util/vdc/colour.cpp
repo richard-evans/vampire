@@ -30,8 +30,8 @@ void hsl2rgb( double& red, double& green, double& blue, double& hue, double& lig
 void hsi2rgb( double& red, double& green, double& blue, double& hue, double& intensity, double& saturation );
 void interpolate(double xy_angle, double& red, double& green, double& blue );
 
-void rgb( const double& sx, const double& sy, const double& sz, double& red, double& green, double& blue){
 
+void rgb( const double& sx, const double& sy, const double& sz, double& red, double& green, double& blue){
    // parameters
    const double pi  = 3.14159265358979323846;
 
@@ -291,7 +291,7 @@ void hsi2rgb( double& red, double& green, double& blue, double& hue, double& int
 // Find point between integer colorvals using y=mx+c
 // x-values [0-255], y-values rgb [0-1]
 //------------------------------------------------------------------------------
-void interpolate( double xy_angle, double& red, double& green, double& blue, std::string keyword ){
+void interpolate( double xy_angle, double& red, double& green, double& blue ){
 
    std::vector<std::vector<double>> colourmap(256, std::vector<double>(3));
    std::vector<double> m(3), c(3), ymin(3), ymax(3);

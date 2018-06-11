@@ -28,7 +28,7 @@ namespace vdc{
    extern bool z_vector;
 
    // keyword variables
-   extern std::string colour_keyword
+   extern std::string colour_keyword;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -101,7 +101,7 @@ namespace vdc{
 
    void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
 
-   void colourwheel ( std::vector<std::vector<double>>& colourmap, std::string keyword );
+   int colourwheel ( std::vector<std::vector<double>>& colourmap );
 
 }
 

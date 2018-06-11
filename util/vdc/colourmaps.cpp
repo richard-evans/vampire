@@ -18,11 +18,11 @@
 
 namespace vdc{
 
-void colourwheel( std::vector<std::vector<double>>& colourmap ){
+int colourwheel( std::vector<std::vector<double>>& colourmap ){
 
    // colour_keyword is an external global variable
 
-   if ( colour_keyword == "C2" ){
+   if ( vdc::colour_keyword == "C2" ){
       // Good cyclic map with four distinct colours allowing
       // four orientations or phase angles to be visualised.
       // cyclic_mygbm_30-95_c78_n256
@@ -283,7 +283,7 @@ void colourwheel( std::vector<std::vector<double>>& colourmap ){
       colourmap[254] = {0.923611,0.316999,0.957797};
       colourmap[255] = {0.930949,0.324889,0.953227};
    }
-   else if ( colour_keyword == "BWR" ){
+   else if ( vdc::colour_keyword == "BWR" ){
       // Standard blue-white-red diverging colour map with
       // end colours matched for lightness and chroma.
       // diverging_bwr_40-95_c42_n256
@@ -544,7 +544,7 @@ void colourwheel( std::vector<std::vector<double>>& colourmap ){
       colourmap[254] = {0.755534,0.036080,0.029827};
       colourmap[255] = {0.752427,0.008418,0.021805};
    }
-   else if ( colour_keyword == "Rainbow" ){
+   else if ( vdc::colour_keyword == "Rainbow" ){
       // Rainbow map that can also be used as a diverging map
       // with yellow as the reference centre colour.
       // diverging-rainbow_bgymr_45-85_c67_n256
@@ -808,9 +808,9 @@ void colourwheel( std::vector<std::vector<double>>& colourmap ){
    else {
       std::cerr << "Error - Colourmap keyword does not match."
                 << std::endl;
-      std::exit()
+      return EXIT_FAILURE;
    }
-   return;
+   return EXIT_SUCCESS;
 
 }
 
