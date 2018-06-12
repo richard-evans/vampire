@@ -248,7 +248,7 @@ void read_coord_data(){
             double x,y,z;
             int type_id, category_id;
             // loop over all atoms in file and load as x,y,z sets
-            for(uint64_t idx = 0; idx < num_atoms_in_file; idx++){
+            for(uint64_t idx = 0; idx < num_atoms_in_file; idx++){              
                getline(ifile, line);
                std::istringstream ss(line);
                ss >> type_id >> category_id >> x >> y >> z;

@@ -11,7 +11,7 @@ GCC=g++
 LIBS=-lstdc++
 
 # Flags
-GCC_CFLAGS=-O3 -std=c++0x
+GCC_CFLAGS=-O3 -std=c++0x -g
 
 # Objects
 OBJECTS= \
