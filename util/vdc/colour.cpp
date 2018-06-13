@@ -39,26 +39,22 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    double xy_angle, z_angle, hue, light, saturation;
    double sx2, sy2, sz2; // spin coordinates after change of axes
    double sx1, sy1, sz1; ///
-   sx1 = 0.0; ///
-   sy1 = 0.0; ///
-   sz1 = 0.5; ///
+
    // perform change of coordinates
    sx2 = vdc::vector_x[0]*sx + vdc::vector_x[1]*sy + vdc::vector_x[2]*sz;
    sy2 = vdc::vector_y[0]*sx + vdc::vector_y[1]*sy + vdc::vector_y[2]*sz;
    sz2 = vdc::vector_z[0]*sx + vdc::vector_z[1]*sy + vdc::vector_z[2]*sz;
-   //std::cout << "sx2 = " << sx2 << "\tsy2 = " << sy2 << "\tsz2 = " << sz2 << std::endl;
+
    // in x,y plane, angle = the spin direction
    xy_angle = std::atan2(sy2,sx2);
-   //std::cout << "xy_angle = " << xy_angle << std::endl;
    xy_angle = std::fmod(xy_angle + 2*pi, 2*pi);  // range [0-2pi]
-   //std::cout << "xy_angle = " << xy_angle << std::endl;
 
    // to apply colourmap, need value between 0-255
    xy_angle = scale(0.0, 255.0, 0.0, 2.0*pi, xy_angle);
-   //std::cout << "xy_angle = " << xy_angle << std::endl;
+
    // find rgb values
    interpolate( xy_angle, red, green, blue );
-   //std::cout << "red = " << red << std::endl << "green = " << green << std::endl << "blue = " << blue << std::endl;
+
    // temp values for hue, saturation and light
    hue = 0.0;
    saturation = 0.0;
@@ -67,7 +63,7 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    // we have resolved xy plane colours. to adjust bightness (x-axis) we
    // convert to HSL
    rgb2hsl(red, green, blue, hue, light, saturation);
-   //std::cout << "hue = " << hue << std::endl << "light = " << light << std::endl << "sat = " << saturation << std::endl;
+
    // adjust lightness to reflect z-axis orientation
    // find angle w.r.t. z-axis [value -pi/2 to pi/2]
    z_angle = std::atan(sz2/std::sqrt(sx2*sx2 + sy2*sy2));
@@ -77,8 +73,7 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    else {
       light = light + light*(2.0*z_angle/pi);
    }
-   //std::cout << "z_angle = " << z_angle << std::endl;
-   //std::cout << "hue = " << hue << std::endl << "light = " << light << std::endl << "sat = " << saturation << std::endl;
+
    // convert back to rgb to get final colour
    hsl2rgb(red, green, blue, hue, light, saturation);
 
@@ -306,16 +301,14 @@ void interpolate( double xy_angle, double& red, double& green, double& blue ){
    // values between which we interpolate
    xmin = int(std::floor(xy_angle));
    xmax = int(std::ceil(xy_angle));
-   //std::cout << "xmin = " << xmin << std::endl;
-   //std::cout << "xmax = " << xmax << std::endl;
+
    // initialise colourwheel
    vdc::colourwheel( colourmap );
 
    // find colorval associated with min and max
    ymin = colourmap[xmin];
    ymax = colourmap[xmax];
-   //std::cout << "ymin = " << ymin[0] << " " << ymin[1] << " " << ymin[2] << std::endl;
-   //std::cout << "ymax = " << ymax[0] << " " << ymin[1] << " " << ymin[2] << std::endl;
+
    // if different: work out gradients and intersects
    if ( ymin == ymax ) {
       red   = ymin[0];
@@ -327,8 +320,7 @@ void interpolate( double xy_angle, double& red, double& green, double& blue ){
          m[i] = (ymax[i] - ymin[i])/(xmax - xmin);
          c[i] = ymin[i] - m[i]*xmin;
       }
-      //std::cout << "m = " << m[0] << " " << m[1] << " " << m[2] << std::endl;
-      //std::cout << "c = " << c[0] << " " << c[1] << " " << c[2] << std::endl;
+
       // input angle into y=mx+c
       red   = m[0]*xy_angle + c[0];
       green = m[1]*xy_angle + c[1];

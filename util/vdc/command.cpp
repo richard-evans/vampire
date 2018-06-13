@@ -23,6 +23,7 @@ namespace vdc{
 
 // forward function declarations
 int extract( std::string arg_string, std::vector<double>& arg_vector );
+int check_arg( int arg, int argc, char* argv[], std::string temp_str, std::string error_output );
 void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x );
 
 //------------------------------------------------------------------------------
@@ -53,18 +54,7 @@ int command( int argc, char* argv[] ){
       if (sw == "--vector-z"){
 
          // check number of args not exceeded
-         if (arg+1 < argc){
-            arg++;
-            temp_str = argv[arg];
-         }
-         else {
-            ////terminaltextcolor(RED);
-            std::cerr << "Error - expected 3 comma separated variables in brackets."
-                      << "\n" << "Check for spaces in command-line arguments"
-                      << std::endl;
-            ////terminaltextcolor(WHITE);
-            return EXIT_FAILURE;
-         }
+         check_arg(arg, argc, argv[], temp_str, "Error - expected 3 comma separated variables in brackets." );
 
          // work through vector and extract values
          extract(temp_str, vdc::vector_z );
@@ -75,18 +65,7 @@ int command( int argc, char* argv[] ){
       else if (sw == "--vector-x"){
 
          // check number of args not exceeded
-         if (arg+1 < argc){
-            arg++;
-            temp_str = std::string(argv[arg]);
-         }
-         else {
-            ////terminaltextcolor(RED);
-            std::cerr << "Error - expected 3 comma separated variables in brackets."
-                      << "\n" << "Check for spaces in command-line arguments"
-                      << std::endl;
-            ////terminaltextcolor(WHITE);
-            return EXIT_FAILURE;
-         }
+         check_arg(arg, argc, argv[], temp_str, "Error - expected 3 comma separated variables in brackets." );
 
          // work through vector and extract values
          extract(temp_str, vdc::vector_x );
@@ -97,17 +76,7 @@ int command( int argc, char* argv[] ){
       else if (sw == "--colourmap"){
 
          // check number of args not exceeded
-         if (arg+1 < argc){
-            arg++;
-            temp_str = std::string(argv[arg]);
-         }
-         else {
-            ////terminaltextcolor(RED);
-            std::cerr << "Error - expected colourmap keyword."
-                      << std::endl;
-            ////terminaltextcolor(WHITE);
-            return EXIT_FAILURE;
-         }
+         check_arg(arg, argc, argv[], temp_str, "Error - expected colourmap keyword." );
 
          if ( temp_str == "C2" ){
             vdc::colour_keyword = temp_str;
@@ -262,6 +231,24 @@ void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x ){
    vdc::vector_y[2] = vdc::vector_z[0]*vdc::vector_x[1] - vdc::vector_x[0]*vdc::vector_z[1];
 
    return;
+}
+
+
+//------------------------------------------------------------------------------
+// Check number of command line args not exceeded
+//------------------------------------------------------------------------------
+int check_arg( int arg, int argc, char* argv[], std::string temp_str, std::string error_output ){
+
+   if (arg+1 < argc){
+      arg++;
+      temp_str = argv[arg];
+   }
+   else {
+      std::cerr << error_output << std::endl;
+
+      return EXIT_FAILURE;
+   }
+
 }
 
 } // end of namespace vdc
