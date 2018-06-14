@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <vector>
+#include <fstream>
 
 // program headers
 #include "vdc.hpp"
@@ -804,6 +805,20 @@ int colourwheel( std::vector<std::vector<double>>& colourmap ){
       colourmap[253] = {0.850828,0.038404,0.048987};
       colourmap[254] = {0.846867,0.028128,0.024389};
       colourmap[255] = {0.842871,0.018301,0.001517};
+   }
+   else if ( vdc::colour_keyword == "custom" ){
+      // open custom colourmap file
+      std::fstream myfile(vdc::custom_colourmap_file, std::ios_base::in);
+
+      // read colours
+      double a, b, c;
+
+      for (int i = 0; i < 256; i++) {
+         myfile >> a >> b >> c;
+         colourmap[i] = {a, b, c};
+      }
+
+      myfile.close();
    }
    else {
       std::cerr << "Error - Colourmap keyword does not match."

@@ -23,7 +23,7 @@ namespace vdc{
 
 // forward function declarations
 int extract( std::string arg_string, std::vector<double>& arg_vector );
-int check_arg( int arg, int argc, char* argv[], std::string temp_str, std::string error_output );
+int check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output );
 void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x );
 
 //------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ int command( int argc, char* argv[] ){
       if (sw == "--vector-z"){
 
          // check number of args not exceeded
-         check_arg(arg, argc, argv[], temp_str, "Error - expected 3 comma separated variables in brackets." );
+         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables in brackets." );
 
          // work through vector and extract values
          extract(temp_str, vdc::vector_z );
@@ -65,7 +65,7 @@ int command( int argc, char* argv[] ){
       else if (sw == "--vector-x"){
 
          // check number of args not exceeded
-         check_arg(arg, argc, argv[], temp_str, "Error - expected 3 comma separated variables in brackets." );
+         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables in brackets." );
 
          // work through vector and extract values
          extract(temp_str, vdc::vector_x );
@@ -76,7 +76,7 @@ int command( int argc, char* argv[] ){
       else if (sw == "--colourmap"){
 
          // check number of args not exceeded
-         check_arg(arg, argc, argv[], temp_str, "Error - expected colourmap keyword." );
+         check_arg(arg, argc, argv, temp_str, "Error - expected colourmap keyword." );
 
          if ( temp_str == "C2" ){
             vdc::colour_keyword = temp_str;
@@ -94,6 +94,20 @@ int command( int argc, char* argv[] ){
             return EXIT_FAILURE;
             ////terminaltextcolor(WHITE);
          }
+
+      }
+      else if ( sw == "--2D" ){
+
+         vdc::z_axis_colour = false;
+
+      }
+      else if ( sw == "--custom_colourmap" ){
+
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - expected custom colourmap name.");
+
+         // set custom map file name
+         vdc::custom_colourmap_file = temp_str;
 
       }
       else {
@@ -237,7 +251,7 @@ void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x ){
 //------------------------------------------------------------------------------
 // Check number of command line args not exceeded
 //------------------------------------------------------------------------------
-int check_arg( int arg, int argc, char* argv[], std::string temp_str, std::string error_output ){
+int check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output ){
 
    if (arg+1 < argc){
       arg++;
@@ -248,6 +262,8 @@ int check_arg( int arg, int argc, char* argv[], std::string temp_str, std::strin
 
       return EXIT_FAILURE;
    }
+
+   return EXIT_SUCCESS;
 
 }
 

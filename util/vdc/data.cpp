@@ -27,6 +27,8 @@ namespace vdc{
 
    // keyword variables
    std::string colour_keyword = "C2";
+   std::string custom_colourmap_file;
+   bool z_axis_colour = true;
 
    format_t format;
 

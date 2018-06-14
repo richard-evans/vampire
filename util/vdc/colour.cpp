@@ -55,27 +55,31 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    // find rgb values
    interpolate( xy_angle, red, green, blue );
 
-   // temp values for hue, saturation and light
-   hue = 0.0;
-   saturation = 0.0;
-   light = 0.0;
+   if ( vdc::z_axis_colour == true ){
 
-   // we have resolved xy plane colours. to adjust bightness (x-axis) we
-   // convert to HSL
-   rgb2hsl(red, green, blue, hue, light, saturation);
+      // temp values for hue, saturation and light
+      hue = 0.0;
+      saturation = 0.0;
+      light = 0.0;
 
-   // adjust lightness to reflect z-axis orientation
-   // find angle w.r.t. z-axis [value -pi/2 to pi/2]
-   z_angle = std::atan(sz2/std::sqrt(sx2*sx2 + sy2*sy2));
-   if ( z_angle >= 0.0 ){
-      light = light + (1.0 - light)*(2.0*z_angle/pi);
+      // we have resolved xy plane colours. to adjust bightness (x-axis) we
+      // convert to HSL
+      rgb2hsl(red, green, blue, hue, light, saturation);
+
+      // adjust lightness to reflect z-axis orientation
+      // find angle w.r.t. z-axis [value -pi/2 to pi/2]
+      z_angle = std::atan(sz2/std::sqrt(sx2*sx2 + sy2*sy2));
+      if ( z_angle >= 0.0 ){
+         light = light + (1.0 - light)*(2.0*z_angle/pi);
+      }
+      else {
+         light = light + light*(2.0*z_angle/pi);
+      }
+
+      // convert back to rgb to get final colour
+      hsl2rgb(red, green, blue, hue, light, saturation);
+
    }
-   else {
-      light = light + light*(2.0*z_angle/pi);
-   }
-
-   // convert back to rgb to get final colour
-   hsl2rgb(red, green, blue, hue, light, saturation);
 
    if ( red < 0.0 || red > 1.0 ){
       std::cout << "Error red = " << red << std::endl;
