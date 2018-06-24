@@ -342,8 +342,28 @@ namespace vout{
 
 	// Output Function 60
 	void MPITimings(std::ostream& stream){
-
 		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
 		stream << "\t" << vmpi::MaximumComputeTime << "\t" << vmpi::MaximumWaitTime << "\t";
 	}
+
+   // Output Function 61
+   void mean_system_specific_heat(std::ostream& stream){
+      stream << stats::system_specific_heat.output_mean_specific_heat(sim::temperature);
+   }
+
+   // Output Function 62
+   void mean_material_specific_heat(std::ostream& stream){
+      stream << stats::material_specific_heat.output_mean_specific_heat(sim::temperature);
+   }
+
+   // Output Function 63
+   void material_total_energy(std::ostream& stream){
+      stream << stats::material_energy.output_energy(stats::total);
+   }
+
+   // Output Function 64
+   void material_mean_total_energy(std::ostream& stream){
+      stream << stats::material_energy.output_mean_energy(stats::total);
+   }
+
 }

@@ -348,6 +348,18 @@ namespace vout{
 					case 60:
 						vout::MPITimings(zmag);
 						break;
+					case 61:
+						vout::mean_system_specific_heat(zmag);
+						break;
+					case 62:
+						vout::mean_material_specific_heat(zmag);
+						break;
+               case 63:
+                  vout::material_total_energy(zmag);
+                  break;
+               case 64:
+                  vout::material_mean_total_energy(zmag);
+                  break;
 				}
 			}
 			// Carriage return
@@ -500,6 +512,18 @@ namespace vout{
 					case 60:
 						vout::MPITimings(std::cout);
 						break;
+					case 61:
+						vout::mean_system_specific_heat(std::cout);
+						break;
+					case 62:
+						vout::mean_material_specific_heat(std::cout);
+						break;
+               case 63:
+                  vout::material_total_energy(std::cout);
+                  break;
+               case 64:
+                  vout::material_mean_total_energy(std::cout);
+                  break;
 				}
 			}
 

@@ -69,22 +69,26 @@ namespace stats
 
    // Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
    extern bool calculate_system_energy;
+   extern bool calculate_material_energy;
    extern bool calculate_system_magnetization;
    extern bool calculate_material_magnetization;
    extern bool calculate_height_magnetization;
    extern bool calculate_material_height_magnetization;
+   extern bool calculate_system_specific_heat;
+   extern bool calculate_material_specific_heat;
    extern bool calculate_system_susceptibility;
    extern bool calculate_material_susceptibility;
 
    // forward declaration of friend classes
    class susceptibility_statistic_t;
+   class specific_heat_statistic_t;
 
    //----------------------------------
    // Energy class definition
    //----------------------------------
    class energy_statistic_t{
 
-      //friend class specific_heat_statistic_t;
+      friend class specific_heat_statistic_t;
 
    public:
       energy_statistic_t ();
@@ -176,6 +180,29 @@ namespace stats
 
    };
 
+	//----------------------------------
+   // Specific Heat Class definition
+   //----------------------------------
+   class specific_heat_statistic_t{
+
+      public:
+         specific_heat_statistic_t ();
+         void initialize(energy_statistic_t& energy_statistic);
+         void calculate(const std::vector<double>& energy);
+         void reset_averages();
+         std::string output_mean_specific_heat(const double temperature);
+
+
+      private:
+         bool initialized;
+         int num_elements;
+         double mean_counter;
+         std::vector<double> mean_specific_heat;
+         std::vector<double> mean_specific_heat_squared;
+         std::vector<double> normalisation;
+
+   };
+
    //----------------------------------
    // Susceptibility Class definition
    //----------------------------------
@@ -209,6 +236,9 @@ namespace stats
    extern magnetization_statistic_t material_magnetization;
    extern magnetization_statistic_t height_magnetization;
    extern magnetization_statistic_t material_height_magnetization;
+
+   extern specific_heat_statistic_t system_specific_heat;
+   extern specific_heat_statistic_t material_specific_heat;
 
    extern susceptibility_statistic_t system_susceptibility;
    extern susceptibility_statistic_t material_susceptibility;

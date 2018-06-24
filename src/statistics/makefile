@@ -7,7 +7,9 @@ statistics_objects=\
 data.o \
 energy.o \
 initialize.o \
+interface.o \
 magnetization.o \
+specific_heat.o \
 statistics.o \
 susceptibility.o
 

@@ -267,7 +267,7 @@ const std::vector<double>& energy_statistic_t::get_total_energy(){
 }
 
 //------------------------------------------------------------------------------------------------------
-// Function to get const reference for total energy data
+// Function to get const reference for total energy data (in Tesla)
 //------------------------------------------------------------------------------------------------------
 const std::vector<double>& energy_statistic_t::get_exchange_energy(){
 

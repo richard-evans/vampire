@@ -15,10 +15,13 @@
 namespace stats{
 
    bool calculate_system_energy                 = false;
+   bool calculate_material_energy               = false;
    bool calculate_system_magnetization          = true;
    bool calculate_material_magnetization        = false;
    bool calculate_height_magnetization          = false;
    bool calculate_material_height_magnetization = false;
+   bool calculate_system_specific_heat          = false;
+   bool calculate_material_specific_heat        = false;
    bool calculate_system_susceptibility         = false;
    bool calculate_material_susceptibility       = false;
 
@@ -31,6 +34,9 @@ namespace stats{
    magnetization_statistic_t material_magnetization;
    magnetization_statistic_t height_magnetization;
    magnetization_statistic_t material_height_magnetization;
+
+   specific_heat_statistic_t system_specific_heat;
+   specific_heat_statistic_t material_specific_heat;
 
    susceptibility_statistic_t system_susceptibility;
    susceptibility_statistic_t material_susceptibility;

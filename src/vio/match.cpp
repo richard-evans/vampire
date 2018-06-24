@@ -1640,6 +1640,36 @@ namespace vin{
             output_list.push_back(60);
             return EXIT_SUCCESS;
         }
+        //-------------------------------------------------------------------
+        test="mean-specific-heat";
+        if(word==test){
+           stats::calculate_system_energy = true;
+           stats::calculate_system_specific_heat = true;
+           output_list.push_back(61);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-specific-heat";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           stats::calculate_material_specific_heat = true;
+           output_list.push_back(62);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-total-energy";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           output_list.push_back(63);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-total-energy";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           output_list.push_back(64);
+           return EXIT_SUCCESS;
+        }
         //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){

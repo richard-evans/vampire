@@ -111,6 +111,10 @@ namespace vout{
    void mean_height_magnetisation(std::ostream& stream);
 
    void MPITimings(std::ostream& stream);
+   void mean_system_specific_heat(std::ostream& stream);
+   void mean_material_specific_heat(std::ostream& stream);
+   void material_total_energy(std::ostream& stream);
+   void material_mean_total_energy(std::ostream& stream);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp

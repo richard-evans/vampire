@@ -44,6 +44,17 @@ namespace stats{
          stats::system_energy.set_mask(1+1,mask);
       }
 
+      // material energy
+      if(stats::calculate_material_energy){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_materials;
+            // other atoms assigned to material level masks
+            else mask[atom] = material_type_array[atom];
+         }
+         stats::material_energy.set_mask(num_materials+1,mask);
+      }
+
       // system magnetization
       if(stats::calculate_system_magnetization){
          for(int atom=0; atom < stats::num_atoms; ++atom){
@@ -110,10 +121,15 @@ namespace stats{
          stats::material_height_magnetization.set_mask(num_materials*(max_height+1)+1,mask,magnetic_moment_array);
       }
 
+      // system specific heat
+      if(stats::calculate_system_specific_heat)   stats::system_specific_heat.initialize(stats::system_energy);
+      if(stats::calculate_material_specific_heat) stats::material_specific_heat.initialize(stats::material_energy);
+
       // system susceptibility
       if(stats::calculate_system_susceptibility) stats::system_susceptibility.initialize(stats::system_magnetization);
       if(stats::calculate_material_susceptibility) stats::material_susceptibility.initialize(stats::material_magnetization);
 
       return;
+
    }
 } // end of namespace stats
