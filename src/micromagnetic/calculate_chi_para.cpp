@@ -27,7 +27,7 @@ namespace micromagnetic{
 
       std::vector<double> calculate_chi_para(int num_local_cells,
                                              std::vector<int>local_cell_array,
-                                             int num_cells,
+                                              int num_cells,
                                              double T){        //temperature
 
          // -----------------------------------------------------------------------------------

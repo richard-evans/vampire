@@ -21,6 +21,7 @@
 #include "dipole.hpp"
 #include "vmpi.hpp"
 #include "cells.hpp"
+
 #include "vio.hpp"
 #include "errors.hpp"
 #include "vutil.hpp"
@@ -71,28 +72,7 @@ namespace dipole{
 					  //MPI::COMM_WORLD.Barrier();
             //fprintf(stderr,"\n **** PROBLEMS!!!!!! just after dipole::internal::update_field()<<<< \n");
 
-            std::ofstream pfile;
-            pfile.open("cell_config2");
 
-            for (int lc = 0; lc < cells::num_local_cells; lc++){
-               int cell = cells::local_cell_array[lc];
-               pfile << cell << '\t' << cells::pos_and_mom_array[4*cell+0] << '\t' <<
-                                         cells::pos_and_mom_array[4*cell+1] << '\t' <<
-                                         cells::pos_and_mom_array[4*cell+2] << '\t' <<
-                                         cells::mag_array_x[cell] << '\t' <<
-                                         cells::mag_array_y[cell] << '\t' <<
-                                         cells::mag_array_z[cell] << '\t' <<
-                                         dipole::cells_field_array_x[cell] << '\t' <<
-                                         dipole::cells_field_array_y[cell] << '\t' <<
-                                         dipole::cells_field_array_z[cell] << '\t' << std::endl;
-
-               /*pfile << cells::cell_coords_array_x[cell]/cells::internal::total_moment_array[cell] << "\t"<<
-                        cells::cell_coords_array_y[cell]/cells::internal::total_moment_array[cell] << "\t"<<
-                        cells::cell_coords_array_z[cell]/cells::internal::total_moment_array[cell] <<  '\t' <<
-                        cells::mag_array_x[cell] << '\t' <<
-                        cells::mag_array_y[cell] << '\t' <<
-                        cells::mag_array_z[cell] << '\t' << std::endl;*/
-            }
 			   // For MPI version, only add local atoms
 			   #ifdef MPICF
 				   const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;

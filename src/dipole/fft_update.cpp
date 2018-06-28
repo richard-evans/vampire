@@ -71,7 +71,8 @@ void initialize_fft_solver(){
    #ifdef FFT
    // allocate arrays to store data [nloccell x ncells]
    if(dipole::fft==true) {
-
+   //   std::cout << "fft" << std::endl;
+      //std::cin.get();
       // calculate matrix prefactors
       zlog << zTs() << "Precalculating rij matrix for dipole calculation... " << std::endl;
 

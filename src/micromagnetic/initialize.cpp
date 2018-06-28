@@ -59,7 +59,7 @@ namespace micromagnetic{
 
       //resizes the vectors used to store the cell parameters
 
-      std::cout << "MM" << num_cells<<std::endl;
+   //   std::cout << "MM" << num_cells<<std::endl;
       mm::A.resize(num_cells*num_cells,0.0);
       mm::alpha.resize(num_cells,0.0);
       mm::one_o_chi_perp.resize(num_cells,0.0);
@@ -213,7 +213,7 @@ namespace micromagnetic{
         // if ( mp::material[mat].pinning_field_unit_vector[1] != 0) std::cout << mat << "\t" << mp::material[mat].pinning_field_unit_vector[1] << '\t' << mm::pinning_field_height << "\t" << zi << std::endl;
          if (zi < mm::pinning_field_height && mp::material[mat].pinning_field_unit_vector[0]+ mp::material[mat].pinning_field_unit_vector[1] + mp::material[mat].pinning_field_unit_vector[2]!= 0.0){
            double Area = cells::macro_cell_size[0]*cells::macro_cell_size[1];
-
+         //  std::cout << cell << '\t' << mat << '\t' <<  mp::material[mat].pinning_field_unit_vector[0] << '\t' <<  mp::material[mat].pinning_field_unit_vector[1] <<std::endl;
             mm::pinning_field_x[cell] = Area*mp::material[mat].pinning_field_unit_vector[0]/mm::ms[cell];
             mm::pinning_field_y[cell] = Area*mp::material[mat].pinning_field_unit_vector[1]/mm::ms[cell];
             mm::pinning_field_z[cell] = Area*mp::material[mat].pinning_field_unit_vector[2]/mm::ms[cell];
@@ -238,7 +238,7 @@ namespace micromagnetic{
      for (int i = 0; i < 101; i++) P[i].resize(101,0.0);
 
 
-
+   //  std::cout << "initialize complete" << "\t" << mm::gamma[0] << '\t' << mm::alpha[0] << std::endl;
 
      return;
 

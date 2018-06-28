@@ -141,7 +141,7 @@ namespace micromagnetic{
             // multiplys A by cell size/2Ms*V_Atomic to ad din the terms of H_Ex
             //removes all the zero interactions by using neighbourlists.
             //The neighbourlists store every interaction as a list. The section of list relevent to each cell is pointed out using the start index and end index.
-
+            if (num_cells > 1){
             for (int celli =0; celli < num_cells; celli++){
                double cell_size = pow(volume_array[celli],1./3.);                                        //calcualte the size of each cell
                macro_neighbour_list_start_index[celli] = array_index;                                    //saves the start index for each cell to an array for easy access later
@@ -159,6 +159,7 @@ namespace micromagnetic{
 
 
             }
+         }
             //   #ifdef MPICF
             //     MPI_Allreduce(MPI_IN_PLACE, &a[0],     array_index,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
             //   #endif

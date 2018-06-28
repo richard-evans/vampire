@@ -128,7 +128,7 @@ namespace dipole{
          dipole::internal::rij_tensor_yy[lc][i] = dipole::internal::rij_tensor_yy[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
          dipole::internal::rij_tensor_yz[lc][i] = dipole::internal::rij_tensor_yz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
          dipole::internal::rij_tensor_zz[lc][i] = dipole::internal::rij_tensor_zz[lc][i]/(double(dipole::internal::cells_num_atoms_in_cell[i]) * double(dipole::internal::cells_num_atoms_in_cell[j]));
-         std::cout  << "tensor " << dipole::internal::rij_tensor_xx[lc][i] << '\t' << dipole::internal::rij_tensor_xy[lc][i]<< '\t' <<dipole::internal::rij_tensor_xz[lc][i] << '\t' << dipole::internal::rij_tensor_yy[lc][i] << '\t' << dipole::internal::rij_tensor_yz[lc][i]<< '\t' <<dipole::internal::rij_tensor_zz[lc][i] <<std::endl;
+         //std::cout  << "tensor " << dipole::internal::rij_tensor_xx[lc][i] << '\t' << dipole::internal::rij_tensor_xy[lc][i]<< '\t' <<dipole::internal::rij_tensor_xz[lc][i] << '\t' << dipole::internal::rij_tensor_yy[lc][i] << '\t' << dipole::internal::rij_tensor_yz[lc][i]<< '\t' <<dipole::internal::rij_tensor_zz[lc][i] <<std::endl;
 
       }  // End of funtion calculating Intra component of dipole tensor
 

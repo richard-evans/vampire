@@ -208,7 +208,7 @@ int LLG_Heun(){
 		S_new[0]=S[0]+xyz[0]*mp::dt;
 		S_new[1]=S[1]+xyz[1]*mp::dt;
 		S_new[2]=S[2]+xyz[2]*mp::dt;
-
+	//std::cout << mp::dt << '\t' << mp::dt_SI <<std::endl;
 		// Normalise Spin Length
 		mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
 

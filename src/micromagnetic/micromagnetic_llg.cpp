@@ -130,15 +130,15 @@ namespace micromagnetic{
       mm::ext_field[1] = H*Hy;
       mm::ext_field[2] = H*Hz;
 
-      const double real_time = sim::time*mp::dt_SI;
-   	const double omega = sim::fmr_field_frequency*1.e9; // Hz
-   	const double Hfmrx = sim::fmr_field_unit_vector[0];
-   	const double Hfmry = sim::fmr_field_unit_vector[1];
-   	const double Hfmrz = sim::fmr_field_unit_vector[2];
-   	const double Hsinwt = sim::fmr_field_strength * sin(2.0 * M_PI * omega * real_time);
-   	mm::fmr_H[0] = Hfmrx * Hsinwt;
-   	mm::fmr_H[1] = Hfmry * Hsinwt;
-   	mm::fmr_H[2] = Hfmrz * Hsinwt;
+      // const double real_time = sim::time*mp::dt_SI;
+   	// const double omega = sim::fmr_field_frequency*1.e9; // Hz
+   	// const double Hfmrx = sim::fmr_field_unit_vector[0];
+   	// const double Hfmry = sim::fmr_field_unit_vector[1];
+   	// const double Hfmrz = sim::fmr_field_unit_vector[2];
+   	// const double Hsinwt = sim::fmr_field_strength * sin(2.0 * M_PI * omega * real_time);
+   	// mm::fmr_H[0] = Hfmrx * Hsinwt;
+   	// mm::fmr_H[1] = Hfmry * Hsinwt;
+   	// mm::fmr_H[2] = Hfmrz * Hsinwt;
 
 
       //save this new m as the initial value, so it can be saved and used in the final equation.
@@ -227,7 +227,7 @@ namespace micromagnetic{
          const double H[3] = {-spin_field[0], -spin_field[1], -spin_field[2]};
 
          //calcualtes 1/(1+a^2) and a/(1+a^2) for llg
-         const double one_oneplusalpha_sq = 1/(1+mm::alpha[cell]*mm::alpha[cell]); // material specific alpha and gamma
+         const double one_oneplusalpha_sq = 1.0/(1.0+mm::alpha[cell]*mm::alpha[cell]); // material specific alpha and gamma
          const double alpha_oneplusalpha_sq = mm::alpha[cell]/(1+mm::alpha[cell]*mm::alpha[cell]);
 
          //saves delta to xyz
@@ -246,7 +246,7 @@ namespace micromagnetic{
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
          int cell = list_of_micromagnetic_cells[lc];
 
-         S_new[0]= x_initial_spin_array[cell]+(dt/2)*(x_euler_array[cell]+x_heun_array[cell]);
+         S_new[0]= x_initial_spin_array[cell]+(dt/2.0)*(x_euler_array[cell]+x_heun_array[cell]);
          S_new[1]= y_initial_spin_array[cell]+(dt/2)*(y_euler_array[cell]+y_heun_array[cell]);
          S_new[2]= z_initial_spin_array[cell]+(dt/2)*(z_euler_array[cell]+z_heun_array[cell]);
 
@@ -275,6 +275,23 @@ namespace micromagnetic{
          }
       }
 
+      std::ofstream pfile;
+      pfile.open("cell_config3");
+       if(sim::time>10000){
+      for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
+
+         int cell = list_of_micromagnetic_cells[lc];
+
+         pfile << cell << '\t' << internal::cell_material_array[cell] << '\t'<< cells::pos_and_mom_array[4*cell+0] << '\t' <<
+                                   cells::pos_and_mom_array[4*cell+1] << '\t' <<
+                                   cells::pos_and_mom_array[4*cell+2] << '\t' <<
+                                   cells::mag_array_x[cell] << '\t' <<
+                                   cells::mag_array_y[cell] << '\t' <<
+                                   cells::mag_array_z[cell] << '\t' << std::endl;
+
+      }
+      std::cin.get();
+   }
 
       if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1)  micromagnetic::MR_resistance = mm::calculate_resistance();
 

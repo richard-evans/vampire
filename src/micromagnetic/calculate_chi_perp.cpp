@@ -61,6 +61,7 @@ namespace micromagnetic{
             chi[cell] = chi[cell]/chi_0;
             //returns the anisotropy constant
             chi[cell] = -ku[cell]/ms[cell]*chi[cell];
+            //std::cout << ku[cell] << std::endl;
          }
          #ifdef MPICF
             MPI_Allreduce(MPI_IN_PLACE, &chi[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);

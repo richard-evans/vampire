@@ -68,8 +68,8 @@ namespace program{
 namespace track_parameters{
 
    // specify number of bits and tracks
-   int num_bits_per_track = 1;
-   int num_tracks = 3;
+   int num_bits_per_track = 3;
+   int num_tracks = 1;
 
    // distance of tracks from read head
    double fly_height = 100.0; // Angstroms
@@ -119,18 +119,19 @@ void create_tracks(){
    std::cout << start_x << '\t' << end_x << '\t' << start_z << '\t' << end_z << std::endl;
     for (int x = start_x; x < end_x; x = x + bs){
        for (double z = start_z; z < end_z; z = z + bw){
-          std::cout << z << "\t" << end_z << '\t' << bw <<  std::endl;
+          std::cout << z << "\t" << x << '\t' << bw <<  std::endl;
           track_parameters::x_track_array[bit] = x;
           track_parameters::z_track_array[bit] = z;
-   //
           track_parameters::bit_magnetisation[bit] = M;
           std::cout << bit << '\t' <<  track_parameters::bit_magnetisation[bit] <<std::endl;
           bit++;
-   //       std::cout << bit << "\t" << track_parameters::num_bits<<std::endl;
+
       M = M*-1;
        }
        M = M*-1;
     }
+
+    std::cin.get();
 }
 
 
@@ -146,7 +147,6 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
    double y_cell = cy;
    double z_cell = down_track_position  + cz;
 
-   //std::cout << x_cell << '\t' << y_cell << '\t' << z_cell << std::endl;
    const double xb = track_parameters::bit_size  * 0.5;
    const double yb = track_parameters::bit_depth * 0.5;
    const double zb = track_parameters::bit_width * 0.5;
@@ -161,15 +161,15 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
       double x_bit = track_parameters::x_track_array[bit];
       double y_bit = y_track;
       double z_bit = track_parameters::z_track_array[bit];
-//   std::cout << x_bit << '\t' << y_bit << '\t' << z_bit << std::endl;
-      //pcalcualtes the prefactor (M/4pi)
+
 
       //calculates the vector in A from the cell to the bits
-      double x = x_cell - x_bit;
-      double y = y_cell - y_bit;
-      double z = z_cell - z_bit;
-   // std::cout << x << '\t' << y << '\t' << z<< std::endl;
+      double x = sqrt((x_cell - x_bit)*(x_cell - x_bit));
+      double y = sqrt((y_cell - y_bit)*(y_cell - y_bit));
+      double z = sqrt((z_cell - z_bit)*(z_cell - z_bit));
 
+
+      std::cout << "distance" << "\t" << z << "\t" << track_parameters::bit_magnetisation[bit] <<std::endl;
       double Bx = 0.0;
       double By = 0.0;
       double Bz = 0.0;
@@ -198,20 +198,22 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
 
                 double r = sqrt(xp*xp + yp*yp + zp*zp);
 
-                Bx += track_parameters::bit_magnetisation[bit]*m1klm* log(zp + r);
-                By += track_parameters::bit_magnetisation[bit]*m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
-                Bz += track_parameters::bit_magnetisation[bit]*m1klm* log(xp + r);
+                Bx = Bx + track_parameters::bit_magnetisation[bit]*m1klm* log(zp + r);
+                By = By + track_parameters::bit_magnetisation[bit]*m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                Bz = Bz + track_parameters::bit_magnetisation[bit]*m1klm* log(xp + r);
 
 
              }
           }
       }
-
-
+   std::cout <<"field1:\t" <<  Bx << '\t' <<  By <<std::endl;
+   std::cout << "\t" << std::endl;
       B[0] = Bx*prefactor;
       B[1] = By*prefactor;
       B[2] = Bz*prefactor;
+
    }
+   std::cout <<"\t\t\t\t\tfield:\t" <<  B[0] << '\t' <<  B[1] << '\t' << B[2] <<std::endl;
 
    return B;
 
@@ -253,17 +255,17 @@ void tracks(){
          }
 
 
-while(sim::time<100000){
-
-         // Integrate system
-         sim::integrate(sim::partial_time);
-
-    // Calculate magnetisation statistics
-    stats::mag_m();
-
-    // Output data
-    vout::data();
-}
+// while(sim::time<100000){
+//
+//          // Integrate system
+//          sim::integrate(sim::partial_time);
+//
+//     // Calculate magnetisation statistics
+//     stats::mag_m();
+//
+//     // Output data
+//     vout::data();
+// }
 
 
 
@@ -287,7 +289,9 @@ while(sim::time <sim::equilibration_time+sim::total_time){
              sim::track_field_x[cell] = B[0];
              sim::track_field_y[cell] = B[1];
              sim::track_field_z[cell] = B[2];
+
              ofile << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+         //    std::cout  << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
 
          }
 
