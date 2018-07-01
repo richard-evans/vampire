@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 // C++ standard library headers
+#include <iomanip>
 
 // Vampire headers
 #include "vmpi.hpp"
@@ -82,7 +83,7 @@ namespace vmpi{
          node_dimensions = decompose(my_node_id, num_nodes, system_dimensions, "System", "nodes");
 
          /*if(node_rank == 0){
-            std::cerr << vmpi::my_rank << " " << my_node << " " << num_nodes << " " << num_processors_on_my_node << " " << 
+            std::cerr << vmpi::my_rank << " " << my_node << " " << num_nodes << " " << num_processors_on_my_node << " " <<
             node_dimensions.minx << " " << node_dimensions.miny << " " << node_dimensions.minz << " " <<
             node_dimensions.maxx << " " << node_dimensions.maxy << " " << node_dimensions.maxz << "nd" << std::endl;
          }*/
@@ -103,6 +104,75 @@ namespace vmpi{
       //std::cerr << vmpi::my_rank << " " << my_node << " "
       //          << vmpi::min_dimensions[0] << " " << vmpi::min_dimensions[1] << " " << vmpi::min_dimensions[2] << " "
       //          << vmpi::max_dimensions[0] << " " << vmpi::max_dimensions[1] << " " << vmpi::max_dimensions[2] << std::endl;
+
+      //------------------------------------------------------------------------
+      // Homogenise minima and maxima to be the same on all processors
+      //------------------------------------------------------------------------
+      // This fixes a persistent bug where the maximum on one processor can be
+      // greater than the minimum on another processor due to rounding errors
+      //------------------------------------------------------------------------
+
+      // store vectors for easy transportation
+      std::vector<double> md(6,0.0);
+
+      md[0] = vmpi::min_dimensions[0];
+      md[1] = vmpi::min_dimensions[1];
+      md[2] = vmpi::min_dimensions[2];
+      md[3] = vmpi::max_dimensions[0];
+      md[4] = vmpi::max_dimensions[1];
+      md[5] = vmpi::max_dimensions[2];
+
+      // collate dimensions on root process
+      std::vector<double> mdg;
+      if(vmpi::my_rank==0) mdg.resize(6*vmpi::num_processors,0.0);
+
+      // gather values from all other processes
+      MPI_Gather(&md[0], 6, MPI_DOUBLE, &mdg[0], 6, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+      //------------------------------------------------------------------------
+      // homogenise (N_proc **2 operation, my take a while for > 1000 CPUs...)
+      //------------------------------------------------------------------------
+      if(vmpi::my_rank==0){
+
+         for(int i = 0; i< mdg.size(); i++){
+
+            const double value = mdg[i];
+
+            for(int j = 0; j< mdg.size(); j++){
+
+               // calculate absolute numerical diff in value
+               const double diff = fabs(mdg[j] - value);
+
+               // if difference is within tolerance, then homogenise
+               if(diff < 1.0e-7) mdg[j] = value;
+
+            }
+
+         }
+
+      }
+
+      // output homogenised values to file with very high precision
+      /*
+      if(vmpi::my_rank==0){
+         std::ofstream ofile("mma.txt");
+         for(int i=0; i< vmpi::num_processors; i++){
+            ofile << i << "\t";
+            for(int j=0; j<6; j++) ofile << std::setw(52) << std::setprecision(50) << mdg[6*i+j] << "\t";
+            ofile << "\n";
+         }
+         ofile.close();
+      }*/
+
+      // now scatter so everyone has the same data
+      MPI_Scatter(&mdg[0], 6, MPI_DOUBLE, &md[0], 6, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+      vmpi::min_dimensions[0] = md[0];
+      vmpi::min_dimensions[1] = md[1];
+      vmpi::min_dimensions[2] = md[2];
+      vmpi::max_dimensions[0] = md[3];
+      vmpi::max_dimensions[1] = md[4];
+      vmpi::max_dimensions[2] = md[5];
 
       return;
 
@@ -178,8 +248,8 @@ namespace vmpi{
       // Calculate local mpi_dimensions assuming box
       //---------------------------------------------------
       const int my_rank = id;
-      const double dx=lx/double(nx); 
-      const double dy=ly/double(ny); 
+      const double dx=lx/double(nx);
+      const double dy=ly/double(ny);
       const double dz=lz/double(nz);
 
       // calculate each rank on x, y, z directions respectively
@@ -199,7 +269,7 @@ namespace vmpi{
       block_dimensions.maxz = double(my_rank_z)*dz + dz + dimensions.minz;
 
       //std::cerr << vmpi::my_rank << "\t" << id << "\t" << nx << "\t" << ny << "\t" << nz << "\trrrrr" << std::endl;
-      
+
       return block_dimensions;
 
    }

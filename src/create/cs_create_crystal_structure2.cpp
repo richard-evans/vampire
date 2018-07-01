@@ -96,8 +96,6 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
    for(unsigned int uca=0;uca<unit_cell.atom.size();uca++) if(unit_cell.atom[uca].hc > maxlh) maxlh = unit_cell.atom[uca].hc;
    maxlh+=1;
 
-   const double cff = 1.e-99; // Small numerical correction for atoms exactly on the borderline between processors
-
 	// Duplicate unit cell
 	for(int z=min_bounds[2];z<max_bounds[2];z++){
 		for(int y=min_bounds[1];y<max_bounds[1];y++){
@@ -106,9 +104,9 @@ int create_crystal_structure(std::vector<cs::catom_t> & catom_array){
 				// need to change this to accept non-orthogonal lattices
 				// Loop over atoms in unit cell
 				for(unsigned int uca=0;uca<unit_cell.atom.size();uca++){
-					double cx = (double(x)+unit_cell.atom[uca].x)*unit_cell.dimensions[0]+cff;
-					double cy = (double(y)+unit_cell.atom[uca].y)*unit_cell.dimensions[1]+cff;
-					double cz = (double(z)+unit_cell.atom[uca].z)*unit_cell.dimensions[2]+cff;
+					double cx = (double(x)+unit_cell.atom[uca].x)*unit_cell.dimensions[0];
+					double cy = (double(y)+unit_cell.atom[uca].y)*unit_cell.dimensions[1];
+					double cz = (double(z)+unit_cell.atom[uca].z)*unit_cell.dimensions[2];
 					#ifdef MPICF
 						if(vmpi::mpi_mode==0){
 							// only generate atoms within allowed dimensions
