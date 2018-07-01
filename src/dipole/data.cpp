@@ -33,6 +33,7 @@ namespace dipole{
    std::vector < double > atom_dipolar_field_array_x;
    std::vector < double > atom_dipolar_field_array_y;
    std::vector < double > atom_dipolar_field_array_z;
+
    // define arrays for mu_0*Hdemag - field
    std::vector < double > cells_mu0Hd_field_array_x;
    std::vector < double > cells_mu0Hd_field_array_y;
@@ -81,6 +82,7 @@ namespace dipole{
 
       std::vector<double> cells_pos_and_mom_array;
       std::vector < int > proc_cell_index_array1D;
+
       //------------------------------------------------------------------------
       // Shared functions inside dipole module
       //------------------------------------------------------------------------

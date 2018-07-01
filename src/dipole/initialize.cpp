@@ -91,7 +91,7 @@ namespace dipole{
 
       // Check memory requirements and print to screen
       zlog << zTs() << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-      std::cout << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+      std::cout     << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 
       zlog << zTs() << "Number of local cells for dipole calculation = " << dipole::internal::cells_num_local_cells << std::endl;
       zlog << zTs() << "Number of total cells for dipole calculation = " << dipole::internal::cells_num_cells << std::endl;
@@ -141,9 +141,12 @@ namespace dipole{
 
       zlog << zTs() << "Time required for dipole update: " << timer.elapsed_time() << " s." << std::endl;
 
-	   //-------------------------------------------------------//
-	   //------- CPUs OUTPUT Dij on different fiels ------------//
-	   //-------------------------------------------------------//
+      //--------------------------------------------------------------------------------------------------
+      // Calculate gloabl demagnetizing factor from dipole tensors
+      //--------------------------------------------------------------------------------------------------
+      //
+      //
+      //--------------------------------------------------------------------------------------------------
 
       // Output informative message to log file
       zlog << zTs() << "Outputting dipole matrix " << std::endl;
@@ -154,15 +157,20 @@ namespace dipole{
 
       // Every cpus print to check dipolar matrix inter term
       for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
+
+         // get id of cell
          int i = cells::cell_id_array[lc];
+
+         // if local cell contains atoms
          if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
+            // loop over all neighbours for cell
             for(unsigned int j=0; j<dipole::internal::rij_tensor_xx[lc].size(); j++){
                if(dipole::internal::cells_num_atoms_in_cell[j]>0){
 
                   // To obtain dipolar matrix free of units, multiply tensor by "factor"
                   //const double Vatomic = dipole::internal::cells_volume_array[j]/double(dipole::internal::cells_num_atoms_in_cell[j]);
-                  const double factor = double(dipole::internal::cells_num_atoms_in_cell[j]) * double(dipole::internal::cells_num_atoms_in_cell[i]); 
+                  const double factor = double(dipole::internal::cells_num_atoms_in_cell[j]) * double(dipole::internal::cells_num_atoms_in_cell[i]);
 
                   N_tensor_array[6*i+0] +=  factor*(dipole::internal::rij_tensor_xx[lc][j]);
                   N_tensor_array[6*i+1] +=  factor*(dipole::internal::rij_tensor_xy[lc][j]);
@@ -170,6 +178,7 @@ namespace dipole{
                   N_tensor_array[6*i+3] +=  factor*(dipole::internal::rij_tensor_yy[lc][j]);
                   N_tensor_array[6*i+4] +=  factor*(dipole::internal::rij_tensor_yz[lc][j]);
                   N_tensor_array[6*i+5] +=  factor*(dipole::internal::rij_tensor_zz[lc][j]);
+
                }
             }
          }
@@ -189,6 +198,8 @@ namespace dipole{
                                                    N_tensor_array,
                                                    cells::num_local_cells
          );
+         // Could potentially replace dipole::internal::send_cells_demag_factor() with MPI_Reduce and MPI_MAX op, but depends on implementation.
+         // Leaving as-is for now
       #endif
 
       // Compute demag factor only on root process
