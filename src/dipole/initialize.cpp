@@ -93,6 +93,9 @@ namespace dipole{
       zlog << zTs() << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
       std::cout     << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 
+      zlog << zTs() << "Total memory for dipole calculation (all CPUs): " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+      std::cout << "Total memory for dipole calculation (all CPUs): " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+
       zlog << zTs() << "Number of local cells for dipole calculation = " << dipole::internal::cells_num_local_cells << std::endl;
       zlog << zTs() << "Number of total cells for dipole calculation = " << dipole::internal::cells_num_cells << std::endl;
 
