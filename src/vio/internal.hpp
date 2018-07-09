@@ -87,18 +87,18 @@ namespace vout{
    void mean_total_energy(std::ostream& stream);
    void total_anisotropy_energy(std::ostream& stream);
    void mean_total_anisotropy_energy(std::ostream& stream);
-   void total_cubic_anisotropy_energy(std::ostream& stream);
-   void mean_total_cubic_anisotropy_energy(std::ostream& stream);
-   void total_surface_anisotropy_energy(std::ostream& stream);
-   void mean_total_surface_anisotropy_energy(std::ostream& stream);
+   //void total_cubic_anisotropy_energy(std::ostream& stream);
+   //void mean_total_cubic_anisotropy_energy(std::ostream& stream);
+   //void total_surface_anisotropy_energy(std::ostream& stream);
+   //void mean_total_surface_anisotropy_energy(std::ostream& stream);
    void total_exchange_energy(std::ostream& stream);
    void mean_total_exchange_energy(std::ostream& stream);
    void total_applied_field_energy(std::ostream& stream);
    void mean_total_applied_field_energy(std::ostream& stream);
    void total_magnetostatic_energy(std::ostream& stream);
    void mean_total_magnetostatic_energy(std::ostream& stream);
-   void total_so_anisotropy_energy(std::ostream& stream);
-   void mean_total_so_anisotropy_energy(std::ostream& stream);
+   //void total_so_anisotropy_energy(std::ostream& stream);
+   //void mean_total_so_anisotropy_energy(std::ostream& stream);
    void height_mvec(std::ostream& stream);
    void material_height_mvec(std::ostream& stream);
    void height_mvec_actual(std::ostream& stream);
@@ -111,6 +111,10 @@ namespace vout{
    void mean_height_magnetisation(std::ostream& stream);
 
    void MPITimings(std::ostream& stream);
+   void mean_system_specific_heat(std::ostream& stream);
+   void mean_material_specific_heat(std::ostream& stream);
+   void material_total_energy(std::ostream& stream);
+   void material_mean_total_energy(std::ostream& stream);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp

@@ -280,16 +280,16 @@ namespace vout{
 						vout::mean_total_anisotropy_energy(zmag);
 						break;
 					case 31:
-						vout::total_cubic_anisotropy_energy(zmag);
+						//vout::total_cubic_anisotropy_energy(zmag);
 						break;
 					case 32:
-						vout::mean_total_cubic_anisotropy_energy(zmag);
+						//vout::mean_total_cubic_anisotropy_energy(zmag);
 						break;
 					case 33:
-						vout::total_surface_anisotropy_energy(zmag);
+						//vout::total_surface_anisotropy_energy(zmag);
 						break;
 					case 34:
-						vout::mean_total_surface_anisotropy_energy(zmag);
+						//vout::mean_total_surface_anisotropy_energy(zmag);
 						break;
 					case 35:
 						vout::total_exchange_energy(zmag);
@@ -310,10 +310,10 @@ namespace vout{
 						vout::mean_total_magnetostatic_energy(zmag);
 						break;
 					case 41:
-						vout::total_so_anisotropy_energy(zmag);
+						//vout::total_so_anisotropy_energy(zmag);
 						break;
 					case 42:
-						vout::mean_total_so_anisotropy_energy(zmag);
+						//vout::mean_total_so_anisotropy_energy(zmag);
 						break;
 					case 43:
 						vout::height_mvec(zmag);
@@ -348,6 +348,18 @@ namespace vout{
 					case 60:
 						vout::MPITimings(zmag);
 						break;
+					case 61:
+						vout::mean_system_specific_heat(zmag);
+						break;
+					case 62:
+						vout::mean_material_specific_heat(zmag);
+						break;
+               case 63:
+                  vout::material_total_energy(zmag);
+                  break;
+               case 64:
+                  vout::material_mean_total_energy(zmag);
+                  break;
 				}
 			}
 			// Carriage return
@@ -450,16 +462,16 @@ namespace vout{
 						vout::mean_total_anisotropy_energy(std::cout);
 						break;
 					case 31:
-						vout::total_cubic_anisotropy_energy(std::cout);
+						//vout::total_cubic_anisotropy_energy(std::cout);
 						break;
 					case 32:
-						vout::mean_total_cubic_anisotropy_energy(std::cout);
+						//vout::mean_total_cubic_anisotropy_energy(std::cout);
 						break;
 					case 33:
-						vout::total_surface_anisotropy_energy(std::cout);
+						//vout::total_surface_anisotropy_energy(std::cout);
 						break;
 					case 34:
-						vout::mean_total_surface_anisotropy_energy(std::cout);
+						//vout::mean_total_surface_anisotropy_energy(std::cout);
 						break;
 					case 35:
 						vout::total_exchange_energy(std::cout);
@@ -480,10 +492,10 @@ namespace vout{
 						vout::mean_total_magnetostatic_energy(std::cout);
 						break;
 					case 41:
-						vout::total_so_anisotropy_energy(std::cout);
+						//vout::total_so_anisotropy_energy(std::cout);
 						break;
 					case 42:
-						vout::mean_total_so_anisotropy_energy(std::cout);
+						//vout::mean_total_so_anisotropy_energy(std::cout);
 						break;
 					case 47:
 						vout::fmr_field_strength(std::cout);
@@ -500,6 +512,18 @@ namespace vout{
 					case 60:
 						vout::MPITimings(std::cout);
 						break;
+					case 61:
+						vout::mean_system_specific_heat(std::cout);
+						break;
+					case 62:
+						vout::mean_material_specific_heat(std::cout);
+						break;
+               case 63:
+                  vout::material_total_energy(std::cout);
+                  break;
+               case 64:
+                  vout::material_mean_total_energy(std::cout);
+                  break;
 				}
 			}
 

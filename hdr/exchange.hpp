@@ -19,6 +19,7 @@
 // Vampire headers
 #include "create.hpp"
 #include "exchange.hpp"
+#include "exchange_types.hpp"
 
 class zval_t{
 	public:
@@ -70,15 +71,19 @@ class zten_t{
 //--------------------------------------------------------------------------------
 namespace exchange{
 
+   extern bool biquadratic; // flag to enable biquadratic exchange calculation
+
    //-----------------------------------------------------------------------------
    // Function to initialise exchange module
    //-----------------------------------------------------------------------------
-   void initialize(std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
+   void initialize(std::vector<std::vector <neighbours::neighbour_t> >& bilinear,
+                   std::vector<std::vector <neighbours::neighbour_t> >& biquadratic);
 
    //-----------------------------------------------------------------------------
-   // Function to set exchange type isotropic, vectorial or tensorial
+   // Functions to set exchange type isotropic, vectorial or tensorial
    //-----------------------------------------------------------------------------
    unsigned int set_exchange_type(std::string exchange_type_string);
+   unsigned int set_biquadratic_exchange_type(std::string exchange_type_string);
 
    //-----------------------------------------------------------------------------
    // Function to get exchange type isotropic (0), vectorial(1) or tensorial(2)
@@ -89,6 +94,7 @@ namespace exchange{
    // Calculate  exchange energy for single spin selecting the correct type
    //---------------------------------------------------------------------------
    double single_spin_energy(const int atom, const double sx, const double sy, const double sz);
+   double single_spin_biquadratic_energy(const int atom, const double sx, const double sy, const double sz);
 
    //-----------------------------------------------------------------------------
    // Function to calculate exchange fields for spins between start and end index

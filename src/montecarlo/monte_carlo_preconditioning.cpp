@@ -21,12 +21,10 @@
 #include "vmpi.hpp"
 #include "vutil.hpp"
 
-// sim module headers
+// Include internal header
 #include "internal.hpp"
 
-namespace sim{
-
-namespace internal{
+namespace montecarlo{
 
 //------------------------------------------------------------------------------
 // Function to perform simple Monte Carlo solver as a preconditioner to
@@ -40,7 +38,7 @@ namespace internal{
 void monte_carlo_preconditioning(){
 
    //if no steps specified, then do nothing
-   if(sim::internal::num_monte_carlo_preconditioning_steps == 0) return;
+   if(sim::num_monte_carlo_preconditioning_steps == 0) return;
 
    // instantiate timer
    vutil::vtimer_t timer;
@@ -60,10 +58,6 @@ void monte_carlo_preconditioning(){
    // spurious edge dynamics
 	const int num_moves = atoms::num_atoms;
 
-	// Declare arrays for spin states
-	std::valarray<double> old_spin(3);
-	std::valarray<double> new_spin(3);
-
    // Material dependent temperature rescaling unrolled for speed
    std::vector<double> rescaled_material_kBTBohr(mp::num_materials);
    std::vector<double> moment_array(mp::num_materials); // mu_s/mu_B
@@ -77,10 +71,10 @@ void monte_carlo_preconditioning(){
       moment_array[m] = mp::material[m].mu_s_SI/9.27400915e-24;
    }
 
-	for(int s = 0; s < sim::internal::num_monte_carlo_preconditioning_steps; s++){
+	for(int s = 0; s < sim::num_monte_carlo_preconditioning_steps; s++){
 
       //std::cout << s << std::endl;
-      if( (s % (sim::internal::num_monte_carlo_preconditioning_steps/10)) == 0) std::cout << "." << std::flush;
+      if( (s % (sim::num_monte_carlo_preconditioning_steps/10)) == 0) std::cout << "." << std::flush;
 
       // loop over natoms to form a single Monte Carlo step
       for(int i = 0; i < num_moves; i++){
@@ -96,19 +90,19 @@ void monte_carlo_preconditioning(){
          //std::cout << "here-2 " << imaterial << std::endl;
 
          // Calculate range for move
-         sim::mc_delta_angle = sigma_array[imaterial];
+         internal::delta_angle = sigma_array[imaterial];
 
          //std::cout << "here-1 " << sim::mc_delta_angle << std::endl;
 
    		// Save old spin position
-   		old_spin[0] = atoms::x_spin_array[atom];
-   		old_spin[1] = atoms::y_spin_array[atom];
-   		old_spin[2] = atoms::z_spin_array[atom];
+   		internal::Sold[0] = atoms::x_spin_array[atom];
+   		internal::Sold[1] = atoms::y_spin_array[atom];
+   		internal::Sold[2] = atoms::z_spin_array[atom];
 
          //std::cout << "here0" << std::endl;
 
          // Make Monte Carlo move
-         sim::mc_move(old_spin, new_spin);
+         montecarlo::internal::mc_move(internal::Sold, internal::Snew);
 
          //std::cout << "here" << std::endl;
 
@@ -116,9 +110,9 @@ void monte_carlo_preconditioning(){
    		double old_energy = sim::calculate_spin_energy(atom);
 
    		// Copy new spin position
-   		atoms::x_spin_array[atom] = new_spin[0];
-   		atoms::y_spin_array[atom] = new_spin[1];
-   		atoms::z_spin_array[atom] = new_spin[2];
+   		atoms::x_spin_array[atom] = internal::Snew[0];
+   		atoms::y_spin_array[atom] = internal::Snew[1];
+   		atoms::z_spin_array[atom] = internal::Snew[2];
 
          //std::cout << "here2" << std::endl;
 
@@ -136,9 +130,9 @@ void monte_carlo_preconditioning(){
    			if(exp(-DE*rescaled_material_kBTBohr[imaterial]) >= mtrandom::grnd()) continue;
    			// If rejected reset spin coordinates and continue
    			else{
-   				atoms::x_spin_array[atom] = old_spin[0];
-   				atoms::y_spin_array[atom] = old_spin[1];
-   				atoms::z_spin_array[atom] = old_spin[2];
+   				atoms::x_spin_array[atom] = internal::Sold[0];
+   				atoms::y_spin_array[atom] = internal::Sold[1];
+   				atoms::z_spin_array[atom] = internal::Sold[2];
    				continue;
    			}
    		}
@@ -156,13 +150,11 @@ void monte_carlo_preconditioning(){
 
    // print informative messages to screen and log
    std::cout << "Done!" << std::endl;
-   std::cout << "Preconditioning time for " << sim::internal::num_monte_carlo_preconditioning_steps << " steps: " << timer.elapsed_time() << " s" << std::endl;
+   std::cout << "Preconditioning time for " << sim::num_monte_carlo_preconditioning_steps << " steps: " << timer.elapsed_time() << " s" << std::endl;
    zlog << "Preconditioning completed in " << timer.elapsed_time() << " s" << std::endl;
 
    return;
 
 }
 
-} // end of namespace internal
-
-} // end of namespace sim
+} // end of namespace montecarlo

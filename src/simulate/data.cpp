@@ -16,10 +16,12 @@
 #include "internal.hpp"
 
 namespace sim{
-
    //----------------------------------------------------------------------------
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
+
+   int num_monte_carlo_preconditioning_steps(0);
+
    uint64_t time         = 0; // time step counter
    uint64_t total_time   = 10000; // total time steps (non-loop code)
    uint64_t loop_time    = 10000; // loop time steps (hysteresis/temperature loops)
@@ -27,7 +29,6 @@ namespace sim{
    uint64_t equilibration_time = 0; // equilibration time steps
 
    namespace internal{
-
       //----------------------------------------------------------------------------
       // Shared variables used within sim module
       //---------------------------------------------------------------------------
@@ -36,7 +37,6 @@ namespace sim{
       std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques
       std::vector<double> slonczewski_spin_polarization_unit_vector(3,0.0); // spin polarization direction
 
-      int num_monte_carlo_preconditioning_steps = 0;
 
    } // end of internal namespace
 

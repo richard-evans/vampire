@@ -126,6 +126,9 @@ namespace create{
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
+      void set_atom_vars(std::vector<cs::catom_t> &, neighbours::list_t& bilinear, neighbours::list_t& biquadratic);
+
+
       extern void alloy(std::vector<cs::catom_t> & catom_array);
       extern void layers(std::vector<cs::catom_t> & catom_array);
       extern void roughness(std::vector<cs::catom_t> & catom_array);
@@ -150,6 +153,12 @@ namespace create{
                                   bool include_boundary_grains);
 
       extern bool compare_radius(core_radius_t first,core_radius_t second);
+
+      // MPI functions
+      extern void copy_halo_atoms(std::vector<cs::catom_t> & catom_array);
+      extern void identify_mpi_boundary_atoms(std::vector<cs::catom_t> & catom_array, neighbours::list_t & cneighbourlist);
+      extern void sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array, neighbours::list_t& bilinear, neighbours::list_t& biquadratic);
+      extern void init_mpi_comms(std::vector<cs::catom_t> & catom_array);
 
    } // end of internal namespace
 } // end of create namespace

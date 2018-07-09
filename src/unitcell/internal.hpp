@@ -20,6 +20,7 @@
 //---------------------------------------------------------------------
 
 // C++ standard library headers
+#include <sstream>
 
 // Vampire headers
 #include "unitcell.hpp"
@@ -60,10 +61,14 @@ namespace unitcell{
       void build_rock_salt(unitcell::unit_cell_t& unit_cell);
       void calculate_interactions(unit_cell_t& unit_cell);
       void read_unit_cell(unit_cell_t & unit_cell, std::string filename);
+      void read_biquadratic_interactions(unit_cell_t & unit_cell,
+                                         std::stringstream& ucf,
+                                         std::istringstream& ucf_ss,
+                                         std::string& filename,
+                                         unsigned int& line_counter,
+                                         int& interaction_range);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
       double exchange(double range_sq, double nn_cutoff_sq);
-      void normalise_exchange(unitcell::unit_cell_t& unit_cell);
-
 
    } // end of internal namespace
 

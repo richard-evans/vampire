@@ -31,6 +31,7 @@
 #include "cells.hpp"
 #include "voronoi.hpp"
 #include "ltmp.hpp"
+#include "montecarlo.hpp"
 #include "random.hpp"
 #include "spintorque.hpp"
 #include "unitcell.hpp"
@@ -74,6 +75,7 @@ namespace vin{
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(montecarlo::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -1208,42 +1210,6 @@ namespace vin{
             sim::constraint_phi_delta=angle;
             return EXIT_SUCCESS;
         }
-        //--------------------------------------------------------------------
-        test="monte-carlo-algorithm";
-        if(word==test){
-            // include namesapce here to access enum values
-            using namespace sim;
-            test="spin-flip";
-            if(value==test){
-                sim::mc_algorithm=spin_flip;
-                return EXIT_SUCCESS;
-            }
-            test="uniform";
-            if(value==test){
-                sim::mc_algorithm=uniform;
-                return EXIT_SUCCESS;
-            }
-            test="angle";
-            if(value==test){
-                sim::mc_algorithm=angle;
-                return EXIT_SUCCESS;
-            }
-            test="hinzke-nowak";
-            if(value==test){
-                sim::mc_algorithm=hinzke_nowak;
-                return EXIT_SUCCESS;
-            }
-            else{
-            terminaltextcolor(RED);
-                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-                std::cerr << "\t\"spin-flip\"" << std::endl;
-                std::cerr << "\t\"uniform\"" << std::endl;
-                std::cerr << "\t\"angle\"" << std::endl;
-                std::cerr << "\t\"hinzke-nowak\"" << std::endl;
-            terminaltextcolor(WHITE);
-                err::vexit();
-            }
-        }
         //-------------------------------------------------------------------
         test="save-checkpoint";
         if(word==test){
@@ -1553,70 +1519,70 @@ namespace vin{
         test="total-energy";
         if(word==test){
             output_list.push_back(27);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-total-energy";
         if(word==test){
             output_list.push_back(28);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="anisotropy-energy";
         if(word==test){
             output_list.push_back(29);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-anisotropy-energy";
         if(word==test){
             output_list.push_back(30);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="exchange-energy";
         if(word==test){
             output_list.push_back(35);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-exchange-energy";
         if(word==test){
             output_list.push_back(36);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="applied-field-energy";
         if(word==test){
             output_list.push_back(37);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-applied-field-energy";
         if(word==test){
             output_list.push_back(38);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="magnetostatic-energy";
         if(word==test){
             output_list.push_back(39);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-magnetostatic-energy";
         if(word==test){
             output_list.push_back(40);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -1673,6 +1639,36 @@ namespace vin{
             vmpi::DetailedMPITiming=true;
             output_list.push_back(60);
             return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
+        test="mean-specific-heat";
+        if(word==test){
+           stats::calculate_system_energy = true;
+           stats::calculate_system_specific_heat = true;
+           output_list.push_back(61);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-specific-heat";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           stats::calculate_material_specific_heat = true;
+           output_list.push_back(62);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-total-energy";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           output_list.push_back(63);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-total-energy";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           output_list.push_back(64);
+           return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="gnuplot-array-format";
@@ -1799,7 +1795,7 @@ namespace vin{
 
         // resize temporary materials array for storage of variables
         read_material.resize(mp::max_materials);
-        cmc::cmc_mat.resize(mp::max_materials);
+        montecarlo::cmc::cmc_mat.resize(mp::max_materials);
 
             // Print informative message to zlog file
         zlog << zTs() << "Opening material file \"" << matfile << "\"." << std::endl;
@@ -2238,7 +2234,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2254,7 +2250,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_min=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_min=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2270,7 +2266,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_max=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_max=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2286,7 +2282,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_delta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_delta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2302,7 +2298,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_min=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_min=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2318,7 +2314,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2334,7 +2330,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_max=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_max=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2350,7 +2346,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_delta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_delta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{

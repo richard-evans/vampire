@@ -52,6 +52,7 @@
 #include "errors.hpp"
 #include "gpu.hpp"
 #include "material.hpp"
+#include "montecarlo.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
@@ -142,9 +143,6 @@ namespace sim{
 	double TTG = 6.6E17 ;///electron coupling constant
 	double TTTe = 0.0; /// electron temperature
 	double TTTp = 0.0; /// phonon temperature
-
-   double mc_delta_angle=0.1; /// Tuned angle for Monte Carlo trial move
-   mc_algorithms mc_algorithm=hinzke_nowak;
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
@@ -237,6 +235,8 @@ int run(){
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
 
+   montecarlo::initialize();
+
    anisotropy::initialize(atoms::num_atoms, atoms::type_array, mp::mu_s_array);
 
    // now seed generator
@@ -261,7 +261,7 @@ int run(){
    }
 
    // Precalculate initial statistics
-   stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array);
+   stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
 
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,
@@ -302,7 +302,7 @@ int run(){
    stopwatch.start();
 
    // Precondition spins at equilibration temperature
-   sim::internal::monte_carlo_preconditioning();
+   montecarlo::monte_carlo_preconditioning();
 
    // For MPI version, calculate initialisation time
    if(vmpi::my_rank==0){
@@ -497,15 +497,15 @@ int run(){
    }
    if(sim::integrator==3 || sim::integrator==4){
       std::cout << "Constrained Monte Carlo statistics:" << std::endl;
-      std::cout << "\tTotal moves: " << cmc::mc_total << std::endl;
-      std::cout << "\t" << (cmc::mc_success/cmc::mc_total)*100.0    << "% Accepted" << std::endl;
-      std::cout << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
-      std::cout << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+      std::cout << "\tTotal moves: " << montecarlo::cmc::mc_total << std::endl;
+      std::cout << "\t" << (montecarlo::cmc::mc_success/montecarlo::cmc::mc_total)*100.0    << "% Accepted" << std::endl;
+      std::cout << "\t" << (montecarlo::cmc::energy_reject/montecarlo::cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+      std::cout << "\t" << (montecarlo::cmc::sphere_reject/montecarlo::cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
       zlog << zTs() << "Constrained Monte Carlo statistics:" << std::endl;
-      zlog << zTs() << "\tTotal moves: " << cmc::mc_total << std::endl;
-      zlog << zTs() << "\t" << (cmc::mc_success/cmc::mc_total)*100.0    << "% Accepted" << std::endl;
-      zlog << zTs() << "\t" << (cmc::energy_reject/cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
-      zlog << zTs() << "\t" << (cmc::sphere_reject/cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
+      zlog << zTs() << "\tTotal moves: " << montecarlo::cmc::mc_total << std::endl;
+      zlog << zTs() << "\t" << (montecarlo::cmc::mc_success/montecarlo::cmc::mc_total)*100.0    << "% Accepted" << std::endl;
+      zlog << zTs() << "\t" << (montecarlo::cmc::energy_reject/montecarlo::cmc::mc_total)*100.0 << "% Rejected (Energy)" << std::endl;
+      zlog << zTs() << "\t" << (montecarlo::cmc::sphere_reject/montecarlo::cmc::mc_total)*100.0 << "% Rejected (Sphere)" << std::endl;
    }
 
 	//program::LLB_Boltzmann();
@@ -600,7 +600,7 @@ void integrate_serial(uint64_t n_steps){
 
 		case 1: // Montecarlo
 			for(uint64_t ti=0;ti<n_steps;ti++){
-				sim::MonteCarlo();
+				montecarlo::mc_step(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::num_atoms, atoms::type_array);
 				// increment time
 				increment_time();
 			}
@@ -616,7 +616,7 @@ void integrate_serial(uint64_t n_steps){
 
 		case 3: // Constrained Monte Carlo
 			for(uint64_t ti=0;ti<n_steps;ti++){
-				sim::ConstrainedMonteCarlo();
+				montecarlo::cmc_step();
 				// increment time
 				increment_time();
 			}
@@ -624,7 +624,7 @@ void integrate_serial(uint64_t n_steps){
 
 		case 4: // Hybrid Constrained Monte Carlo
 			for(uint64_t ti=0;ti<n_steps;ti++){
-				sim::ConstrainedMonteCarloMonteCarlo();
+				montecarlo::cmc_mc_step();
 				// increment time
 				increment_time();
 			}
@@ -685,11 +685,17 @@ int integrate_mpi(uint64_t n_steps){
 			break;
 
 		case 1: // Montecarlo
+
 			for(uint64_t ti=0;ti<n_steps;ti++){
-				terminaltextcolor(RED);
-				std::cerr << "Error - Monte Carlo Integrator unavailable for parallel execution" << std::endl;
-				terminaltextcolor(WHITE);
-				err::vexit();
+				#ifdef MPICF
+               if(montecarlo::mc_parallel_initialized == false) {
+                  montecarlo::mc_parallel_init(atoms::x_coord_array, atoms::y_coord_array, atoms::z_coord_array,
+                                               vmpi::min_dimensions, vmpi::max_dimensions);
+               }
+               montecarlo::mc_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array,
+                                            atoms::type_array);
+            #endif
+
 				// increment time
 				increment_time();
 			}
