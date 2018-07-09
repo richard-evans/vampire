@@ -254,8 +254,8 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 					if(abs(dy)>interaction_range) interaction_range=abs(dy);
 					if(abs(dz)>interaction_range) interaction_range=abs(dz);
 
-					int iatom_mat = unit_cell.atom[iatom].mat;
-					int jatom_mat = unit_cell.atom[jatom].mat;
+					// int iatom_mat = unit_cell.atom[iatom].mat; // unused and unloved variables
+					// int jatom_mat = unit_cell.atom[jatom].mat;
 					switch(num_exchange_values){
 						//case -1: // assume isotropic
 						//	unit_cell.interaction[i].Jij[0][0]=mp::material[iatom_mat].Jij_matrix[jatom_mat][0]; // only works if read after mat file

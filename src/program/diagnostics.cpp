@@ -124,9 +124,6 @@ namespace program{
       // array for binning spin angle
       std::vector<double> bin(181,0.0);
 
-      // Set starting temperature
-      sim::temperature=sim::temperature;
-
       // Equilibrate system
       sim::integrate(sim::equilibration_time);
 

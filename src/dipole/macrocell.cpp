@@ -175,13 +175,13 @@ namespace dipole{
                 	if(i!=j && cells_num_atoms_in_cell[j]>0){
 
                      // create temporary variable to store components of tensor
-                    	double tmp_rij_inter_xx = 0.0;
-                    	double tmp_rij_inter_xy = 0.0;
-                    	double tmp_rij_inter_xz = 0.0;
+                    	//double tmp_rij_inter_xx = 0.0; // unloved and unused variables
+                    	//double tmp_rij_inter_xy = 0.0;
+                    	//double tmp_rij_inter_xz = 0.0;
 
-                    	double tmp_rij_inter_yy = 0.0;
-                    	double tmp_rij_inter_yz = 0.0;
-                    	double tmp_rij_inter_zz = 0.0;
+                    	//double tmp_rij_inter_yy = 0.0;
+                    	//double tmp_rij_inter_yz = 0.0;
+                    	//double tmp_rij_inter_zz = 0.0;
 
                      // Calculate distance vectors between cells
                      double rx = cells_pos_and_mom_array[4*j+0] - cells_pos_and_mom_array[4*i+0];
@@ -189,7 +189,7 @@ namespace dipole{
                      double rz = cells_pos_and_mom_array[4*j+2] - cells_pos_and_mom_array[4*i+2];
 
                     	double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
-                    	double rij_1 = 1.0/rij;
+                    	// double rij_1 = 1.0/rij; unused variable
 
                      // define unitarian distance vectors
                   	const double ex = rx*rij;
@@ -215,15 +215,13 @@ namespace dipole{
                   // ** Need to fix this !!!! ** //
                   else if( i==j && dipole::internal::cells_num_atoms_in_cell[j]>0){
 
-                     const double third = 1.0/3.0;
-
-                   	dipole::internal::rij_tensor_xx[lc][i] = 0.0; //third;
+                   	dipole::internal::rij_tensor_xx[lc][i] = 0.0;
                    	dipole::internal::rij_tensor_xy[lc][i] = 0.0;
                    	dipole::internal::rij_tensor_xz[lc][i] = 0.0;
 
-                   	dipole::internal::rij_tensor_yy[lc][i] = 0.0; //third;
+                   	dipole::internal::rij_tensor_yy[lc][i] = 0.0;
                    	dipole::internal::rij_tensor_yz[lc][i] = 0.0;
-                   	dipole::internal::rij_tensor_zz[lc][i] = 0.0; //third;
+                   	dipole::internal::rij_tensor_zz[lc][i] = 0.0;
 
                   } // End of Intra part
                }

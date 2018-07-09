@@ -163,7 +163,6 @@ namespace program{
          }
       }
       
-      int Array;
       std::cout << "a" <<std::endl;
       for (int i = 0; i <stats::num_atoms; i++){
          //	std::cout << atoms::type_array[i] << "\t" << atoms::z_spin_array[i] <<std::endl;

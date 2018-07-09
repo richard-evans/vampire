@@ -99,11 +99,11 @@ double legacy_atoms(){
       std::cout << "config::atoms has been called" << std::endl;
    }
 
-   #ifdef MPICF
+   /* #ifdef MPICF
       const int num_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
    #else
       const int num_atoms = atoms::num_atoms;
-   #endif
+   #endif */ //unused variable
 
    // Set local output filename
    std::stringstream file_sstr;

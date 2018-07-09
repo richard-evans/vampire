@@ -278,7 +278,7 @@ namespace dipole{
                      }
                      // Send num_of_atoms to be received and allocate memory in arrays
                      // my_rank send data to other cpus
-                     int cpu_send = vmpi::my_rank;
+                     // int cpu_send = vmpi::my_rank; // unused variable
                      int cpu_recv = cpu;
                      MPI_Send(&num_send_cells,           1,                MPI_INT,    cpu_recv, 111, MPI_COMM_WORLD);
                      MPI_Send(&num_send_atoms,           1,                MPI_INT,    cpu_recv, 103, MPI_COMM_WORLD);
@@ -299,7 +299,7 @@ namespace dipole{
             else{
                //fprintf(stderr," >>> rank %d is receiving data from proc %d <<<<< \n",vmpi::my_rank,proc);
                int cpu_send = proc;
-               int cpu_recv = vmpi::my_rank;
+               // int cpu_recv = vmpi::my_rank; // unused variable
                // my_rank receives number of objects that hav been sent from other cpus
                MPI_Recv(&num_recv_cells, 1, MPI_INT, cpu_send, 111, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                MPI_Recv(&num_recv_atoms, 1, MPI_INT, cpu_send, 103, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
