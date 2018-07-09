@@ -112,6 +112,7 @@ namespace vmpi{
       // greater than the minimum on another processor due to rounding errors
       //------------------------------------------------------------------------
 
+      #ifdef MPICF // MPI-only region
       // store vectors for easy transportation
       std::vector<double> md(6,0.0);
 
@@ -173,6 +174,8 @@ namespace vmpi{
       vmpi::max_dimensions[0] = md[3];
       vmpi::max_dimensions[1] = md[4];
       vmpi::max_dimensions[2] = md[5];
+
+      #endif // End of MPI region
 
       return;
 
