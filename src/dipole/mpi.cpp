@@ -34,24 +34,24 @@ namespace dipole{
    // Function to parallelise dipolar field calculation
    //-----------------------------------------------------------------------------
 
-namespace internal{
+   namespace internal{
 
-   #ifdef MPICF
+      #ifdef MPICF
       /*------------------------------------------------*/
       /*Function to send and receive data between cells */
       /*------------------------------------------------*/
       int send_recv_cells_data(std::vector<int>& proc_cell_index_array1D,
-                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                              std::vector< std::vector <int> >& cells_index_atoms_array,
-                              std::vector<double>& cells_pos_and_mom_array,
-                              std::vector<int>& cells_num_atoms_in_cell,
-                              std::vector<int>& cells_cell_id_array,
-                              std::vector<int>& cells_local_cell_array,
-                              int cells_num_local_cells,
-                              int cells_num_cells
-                              ){
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                               std::vector< std::vector <int> >& cells_index_atoms_array,
+                               std::vector<double>& cells_pos_and_mom_array,
+                               std::vector<int>& cells_num_atoms_in_cell,
+                               std::vector<int>& cells_cell_id_array,
+                               std::vector<int>& cells_local_cell_array,
+                               int cells_num_local_cells,
+                               int cells_num_cells
+      ){
          // temporary variables to send and receive data
          int num_send_cells;
          std::vector<int> mpi_send_cells_num_atoms_in_cell;
@@ -153,22 +153,22 @@ namespace internal{
       /*Function to send and receive data atoms between cpus */
       /*------------------------------------------------*/
       int send_recv_atoms_data(std::vector<int>& proc_cell_index_array1D,
-                              std::vector<int>& cells_cell_id_array,
-                              std::vector<int>& cells_local_cell_array,
-                              std::vector<double>& atom_pos_x,
-                              std::vector<double>& atom_pos_y,
-                              std::vector<double>& atom_pos_z,
-                              std::vector<int>& atom_type_array, // atomic moments (from dipole;:internal::atom_type_array)
-                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                              std::vector< std::vector <int> >& cells_index_atoms_array,
-                              std::vector<double>& cells_pos_and_mom_array,
-                              std::vector<int>& cells_num_atoms_in_cell,
-                              int cells_num_local_cells,
-                              int cells_num_cells,
-                              double cells_macro_cell_size
-                              ){
+                               std::vector<int>& cells_cell_id_array,
+                               std::vector<int>& cells_local_cell_array,
+                               std::vector<double>& atom_pos_x,
+                               std::vector<double>& atom_pos_y,
+                               std::vector<double>& atom_pos_z,
+                               std::vector<int>& atom_type_array, // atomic moments (from dipole;:internal::atom_type_array)
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                               std::vector< std::vector <int> >& cells_index_atoms_array,
+                               std::vector<double>& cells_pos_and_mom_array,
+                               std::vector<int>& cells_num_atoms_in_cell,
+                               int cells_num_local_cells,
+                               int cells_num_cells,
+                               double cells_macro_cell_size
+      ){
 
          // temporary variables to send and receive data
          std::vector<int> list_cpu_to_send_to;
@@ -209,8 +209,8 @@ namespace internal{
                      if(cells_num_atoms_in_cell[i]>0){
                         //reciprocal of distance between cells
                         double rij_1 = 1.0/sqrt((cells_pos_and_mom_array[4*lc+0]-cells_pos_and_mom_array[4*i+0])*(cells_pos_and_mom_array[4*lc+0]-cells_pos_and_mom_array[4*i+0]) +
-                                               	(cells_pos_and_mom_array[4*lc+1]-cells_pos_and_mom_array[4*i+1])*(cells_pos_and_mom_array[4*lc+1]-cells_pos_and_mom_array[4*i+1]) +
-                                               	(cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2])*(cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2]));
+                                                (cells_pos_and_mom_array[4*lc+1]-cells_pos_and_mom_array[4*i+1])*(cells_pos_and_mom_array[4*lc+1]-cells_pos_and_mom_array[4*i+1]) +
+                                                (cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2])*(cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2]));
                         //distance between cells
                         double rij = 1.0/rij_1;
                         if((rij/cells_macro_cell_size <= dipole::cutoff) || ((cells_pos_and_mom_array[4*lc+0]==cells_pos_and_mom_array[4*i+0]) && (cells_pos_and_mom_array[4*lc+1]==cells_pos_and_mom_array[4*i+1]) && (cells_pos_and_mom_array[4*lc+2]==cells_pos_and_mom_array[4*i+2]) ) ){
@@ -227,6 +227,8 @@ namespace internal{
                }
             }
          }
+
+         // Calculate total storage
 
          for(int proc=0; proc<vmpi::num_processors; proc++){
             if(vmpi::my_rank == proc){
@@ -335,8 +337,8 @@ namespace internal{
                      int size = cells_index_atoms_array[cell].size();
                      old_size_array[lc]=size;
                      if((mpi_recv_cells_pos_mom[4*lc+0]==cells_pos_and_mom_array[4*cell+0]) &&
-                        (mpi_recv_cells_pos_mom[4*lc+1]==cells_pos_and_mom_array[4*cell+1]) &&
-                        (mpi_recv_cells_pos_mom[4*lc+2]==cells_pos_and_mom_array[4*cell+2]) && bool_array[lc]!=0){
+                     (mpi_recv_cells_pos_mom[4*lc+1]==cells_pos_and_mom_array[4*cell+1]) &&
+                     (mpi_recv_cells_pos_mom[4*lc+2]==cells_pos_and_mom_array[4*cell+2]) && bool_array[lc]!=0){
 
                         recv_cell_id[lc] = cell;
 
@@ -344,8 +346,8 @@ namespace internal{
                         bool_array[lc]=0;
                      }
                      else if((mpi_recv_cells_pos_mom[4*lc+0]==cells_pos_and_mom_array[4*cell+0]) &&
-                             (mpi_recv_cells_pos_mom[4*lc+1]==cells_pos_and_mom_array[4*cell+1]) &&
-                             (mpi_recv_cells_pos_mom[4*lc+2]==cells_pos_and_mom_array[4*cell+2]) && bool_array[lc]==0){
+                     (mpi_recv_cells_pos_mom[4*lc+1]==cells_pos_and_mom_array[4*cell+1]) &&
+                     (mpi_recv_cells_pos_mom[4*lc+2]==cells_pos_and_mom_array[4*cell+2]) && bool_array[lc]==0){
                         cells_num_atoms_in_cell[cell]=0;
                      }
                   }
@@ -376,6 +378,36 @@ namespace internal{
             } //end else statement
          }
 
+         const double is = sizeof(int);
+         const double ds = sizeof(double);
+
+         double mem_tot =  double(list_cpu_to_send_to.size())*is +
+                           double(list_cells_to_send.size())*is +
+                           double(list_cells_to_recv.size())*is +
+                           double(mpi_send_atoms_cell.size())*is +
+                           double(mpi_send_num_atoms_in_cell.size())*is +
+                           double(mpi_send_atoms_id.size())*is +
+                           double(mpi_send_atoms_pos_x.size())*ds +
+                           double(mpi_send_atoms_pos_y.size())*ds +
+                           double(mpi_send_atoms_pos_z.size())*ds +
+                           double(mpi_send_atoms_mom.size())*ds +
+                           double(mpi_send_cells_pos_mom.size())*ds +
+                           double(mpi_recv_atoms_cell.size())*is +
+                           double(mpi_recv_num_atoms_in_cell.size())*is +
+                           double(mpi_recv_atoms_id.size())*is +
+                           double(mpi_recv_atoms_pos_x.size())*ds +
+                           double(mpi_recv_atoms_pos_y.size())*ds +
+                           double(mpi_recv_atoms_pos_z.size())*ds +
+                           double(mpi_recv_atoms_mom.size())*ds +
+                           double(mpi_recv_cells_pos_mom.size())*ds;
+
+         double global_tot = 0.0;
+
+         MPI_Reduce(&mem_tot, &global_tot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+         std::cout << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB" << std::endl;
+         zlog << zTs() << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB"<< std::endl;
+
          // Free memory
          list_cpu_to_send_to.clear();
          list_cells_to_send.clear();
@@ -404,16 +436,16 @@ namespace internal{
       /*Function to sort cells/atoms data after sharing */
       /*------------------------------------------------*/
       int sort_data(std::vector<int>& proc_cell_index_array1D,
-                  std::vector<int>& cells_cell_id_array,
-                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                  std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                  std::vector< std::vector <int> >& cells_index_atoms_array,
-                  std::vector<double>& cells_pos_and_mom_array,
-                  std::vector<int>& cells_num_atoms_in_cell,
-                  int cells_num_local_cells,
-                  int cells_num_cells
-                  ){
+                    std::vector<int>& cells_cell_id_array,
+                    std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                    std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                    std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                    std::vector< std::vector <int> >& cells_index_atoms_array,
+                    std::vector<double>& cells_pos_and_mom_array,
+                    std::vector<int>& cells_num_atoms_in_cell,
+                    int cells_num_local_cells,
+                    int cells_num_cells
+      ){
 
          std::vector<int> same_cells;
          int counter = 0;
@@ -492,15 +524,15 @@ namespace internal{
       /*--------------------------------------------------------*/
       /*Function to send cells demag factor to be computed      */
       /*--------------------------------------------------------*/
-      int send_cells_demag_factor(std::vector<int>& cells_cell_id_array,
-                                 std::vector<double>& N_tensor_array,
-                                 int cells_num_local_cells
-                                 ){
+      int send_cells_demag_factor(std::vector<int>& cells_cell_id_array, // 1D array of cell id's to be sent to root process
+                                  std::vector<double>& N_tensor_array,   // 6N tensor of local tensor components
+                                  int cells_num_local_cells              // number of local cells on processor
+      ){
 
          // allocate memory to send data
-         int num_send_cells = cells_num_local_cells;                          // number of objects to send
-         std::vector<int> mpi_send_cells_id(num_send_cells,0);                // cells id to be sent
-         std::vector<double> mpi_send_cells_demag_factor(6*num_send_cells,0.0);      // demag-factor and self term array to be sent
+         const int num_send_cells = cells_num_local_cells;                        // number of objects to send
+         std::vector<int> mpi_send_cells_id(num_send_cells,0);                    // array storing cell ids to be sent
+         std::vector<double> mpi_send_cells_demag_factor(6*num_send_cells,0.0);   // array strong demag factor and self term array to be sent
 
          // loop over local cells to save data to send
          for(int i=0; i<num_send_cells; i++){
@@ -517,10 +549,21 @@ namespace internal{
          // // Uncomment in case you want to check exchange of data between cores
          // std::cerr << "/* Data allocated on rank */" << vmpi::my_rank << '\t';
 
-         // send cells id, demag factors and self term
-         MPI_Send(&num_send_cells, 1, MPI_INT, 0, 120, MPI_COMM_WORLD);
-         MPI_Send(&mpi_send_cells_id[0], num_send_cells, MPI_INT, 0, 121, MPI_COMM_WORLD);
-         MPI_Send(&mpi_send_cells_demag_factor[0], 6*num_send_cells, MPI_DOUBLE, 0, 122, MPI_COMM_WORLD);
+         // arrays of MPI requests
+         std::vector<MPI_Request> requests(0);
+
+         MPI_Request req; // temporary variable for push_back operations
+         MPI_Status status; // temporary variable for stati
+
+         //------------------------------------------------------------
+         // send cells id, demag factors and self term from all CPUs
+         //------------------------------------------------------------
+         requests.push_back(req);
+         MPI_Isend(&num_send_cells, 1, MPI_INT, 0, 120, MPI_COMM_WORLD, &requests.back());
+         requests.push_back(req);
+         MPI_Isend(&mpi_send_cells_id[0], num_send_cells, MPI_INT, 0, 121, MPI_COMM_WORLD, &requests.back());
+         requests.push_back(req);
+         MPI_Isend(&mpi_send_cells_demag_factor[0], 6*num_send_cells, MPI_DOUBLE, 0, 122, MPI_COMM_WORLD, &requests.back());
 
          // loop over CPUs
          for(int cpu=0; cpu<vmpi::num_processors; cpu++){
@@ -529,17 +572,26 @@ namespace internal{
                // allocate int to receive num of cells to be received
                int num_recv_cells;
                // Receive num_recv_cells
-               MPI_Recv(&num_recv_cells, 1, MPI_INT, cpu, 120, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               requests.push_back(req);
+               MPI_Irecv(&num_recv_cells, 1, MPI_INT, cpu, 120, MPI_COMM_WORLD, &requests.back());
+               MPI_Wait(&requests.back(), &status); // wait for number of cells to receive
                // Allocate arrays for demag factor
                std::vector<int> mpi_recv_cells_id(num_recv_cells,0);
                std::vector<double> mpi_recv_cells_demag_factor(6*num_recv_cells,0.0);
                // Receive arrays
-               MPI_Recv(&mpi_recv_cells_id[0], num_recv_cells, MPI_INT, cpu, 121, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_cells_demag_factor[0], 6*num_recv_cells, MPI_DOUBLE, cpu, 122, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+               requests.push_back(req);
+               MPI_Irecv(&mpi_recv_cells_id[0], num_recv_cells, MPI_INT, cpu, 121, MPI_COMM_WORLD, &requests.back());
+               MPI_Wait(&requests.back(), &status); // wait for data to be received
+               requests.push_back(req);
+               MPI_Irecv(&mpi_recv_cells_demag_factor[0], 6*num_recv_cells, MPI_DOUBLE, cpu, 122, MPI_COMM_WORLD, &requests.back());
+               MPI_Wait(&requests.back(), &status); // wait for data to be received
 
-               // Save received data
+               // Save received data (only once for each cell, duplicates are discarded by being overwritten)
                for(int i=0; i<num_recv_cells; i++){
+
+                  // get cell id to save demag tensor into
                   int lc = mpi_recv_cells_id[i];
+
                   // save demag factor
                   N_tensor_array[6*lc+0] = mpi_recv_cells_demag_factor[6*i+0];
                   N_tensor_array[6*lc+1] = mpi_recv_cells_demag_factor[6*i+1];
@@ -581,6 +633,9 @@ namespace internal{
          // // Uncomment in case you want to check exchange of data between cores
          // std::cout << "Number of cells non zero on rank 0 = " << counter_total_cells_non_zero << std::endl;
 
+         // wait for all processors (and root) at this point
+         vmpi::barrier();
+
          // Clear arrays used only for sending data
          mpi_send_cells_id.clear();
          mpi_send_cells_demag_factor.clear();
@@ -588,72 +643,90 @@ namespace internal{
          return EXIT_SUCCESS;
       }
 
-#endif
+      #endif
 
    } // end of namespace internal
 
    #ifdef MPICF
-      /*--------------------------------------------------------*/
-      /*Function to send cells field to be output in cfg file   */
-      /*--------------------------------------------------------*/
-      int send_cells_field(std::vector<int>& cells_cell_id_array,
-                           std::vector<double>& dipole_cells_field_array_x, //B-field
-                           std::vector<double>& dipole_cells_field_array_y,
-                           std::vector<double>& dipole_cells_field_array_z,
-                           int cells_num_local_cells
-                  ){
+   /*--------------------------------------------------------*/
+   /*Function to send cells field to be output in cfg file   */
+   /*--------------------------------------------------------*/
+   int send_cells_field(std::vector<int>& cells_cell_id_array,
+                        std::vector<double>& dipole_cells_field_array_x, //B-field
+                        std::vector<double>& dipole_cells_field_array_y,
+                        std::vector<double>& dipole_cells_field_array_z,
+                        int cells_num_local_cells
+   ){
 
-         // allocate memory to send data
-         int num_send_cells = cells_num_local_cells;                          // number of objects to send
-         std::vector<int> mpi_send_cells_id(num_send_cells,0);                // cells id to be sent
-         std::vector<double> mpi_send_cells_field(3*num_send_cells,0.0);      // B-field array to be sent
+      // allocate memory to send data
+      int num_send_cells = cells_num_local_cells;                          // number of objects to send
+      std::vector<int> mpi_send_cells_id(num_send_cells,0);                // cells id to be sent
+      std::vector<double> mpi_send_cells_field(3*num_send_cells,0.0);      // B-field array to be sent
 
-         // loop over local cells to save data to send
-         for(int i=0; i<num_send_cells; i++){
-            mpi_send_cells_id[i] = cells_cell_id_array[i];
-            //store B-field
-            mpi_send_cells_field[3*i+0] = dipole_cells_field_array_x[mpi_send_cells_id[i]];
-            mpi_send_cells_field[3*i+1] = dipole_cells_field_array_y[mpi_send_cells_id[i]];
-            mpi_send_cells_field[3*i+2] = dipole_cells_field_array_z[mpi_send_cells_id[i]];
-         }
-
-         // send cells id, B-field, Hd-field
-         MPI_Send(&num_send_cells, 1, MPI_INT, 0, 114, MPI_COMM_WORLD);
-         MPI_Send(&mpi_send_cells_id[0], num_send_cells, MPI_INT, 0, 115, MPI_COMM_WORLD);
-         MPI_Send(&mpi_send_cells_field[0], 3*num_send_cells, MPI_DOUBLE, 0, 116, MPI_COMM_WORLD);
-
-         // loop over CPUs
-         for(int cpu=0; cpu<vmpi::num_processors; cpu++){
-            // if I am root proc, then I receive cells dipolar field
-            if(vmpi::my_rank == 0){
-               // allocate int to receive num of cells to be received
-               int num_recv_cells;
-               // Receive num_recv_cells
-               MPI_Recv(&num_recv_cells, 1, MPI_INT, cpu, 114, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               // Allocate arrays for field
-               std::vector<int> mpi_recv_cells_id(num_recv_cells,0);
-               std::vector<double> mpi_recv_cells_field(3*num_recv_cells,0.0);
-               // Receive arrays
-               MPI_Recv(&mpi_recv_cells_id[0], num_recv_cells, MPI_INT, cpu, 115, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_cells_field[0], 3*num_recv_cells, MPI_DOUBLE, cpu, 116, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-               // Save received data
-               for(int i=0; i<num_recv_cells; i++){
-                  int lc = mpi_recv_cells_id[i];
-                  // save B-field
-                  dipole_cells_field_array_x[lc] = mpi_recv_cells_field[3*i+0];
-                  dipole_cells_field_array_y[lc] = mpi_recv_cells_field[3*i+1];
-                  dipole_cells_field_array_z[lc] = mpi_recv_cells_field[3*i+2];
-               } // end saving data
-            } // end if I am root proc
-         } // end loop over cpus
-
-         // Clear arrays used only for sending data
-         mpi_send_cells_id.clear();
-         mpi_send_cells_field.clear();
-
-         return EXIT_SUCCESS;
+      // loop over local cells to save data to send
+      for(int i=0; i<num_send_cells; i++){
+         mpi_send_cells_id[i] = cells_cell_id_array[i];
+         //store B-field
+         mpi_send_cells_field[3*i+0] = dipole_cells_field_array_x[mpi_send_cells_id[i]];
+         mpi_send_cells_field[3*i+1] = dipole_cells_field_array_y[mpi_send_cells_id[i]];
+         mpi_send_cells_field[3*i+2] = dipole_cells_field_array_z[mpi_send_cells_id[i]];
       }
+
+      // array of MPI requests
+      std::vector<MPI_Request> requests(0);
+
+      MPI_Request req; // temporary variable for push_back operations
+      MPI_Status status; // temporary variable for stati
+
+      // send cells id, B-field, Hd-field
+      requests.push_back(req);
+      MPI_Isend(&num_send_cells, 1, MPI_INT, 0, 114, MPI_COMM_WORLD, &requests.back());
+      requests.push_back(req);
+      MPI_Isend(&mpi_send_cells_id[0], num_send_cells, MPI_INT, 0, 115, MPI_COMM_WORLD, &requests.back());
+      requests.push_back(req);
+      MPI_Isend(&mpi_send_cells_field[0], 3*num_send_cells, MPI_DOUBLE, 0, 116, MPI_COMM_WORLD, &requests.back());
+
+      // loop over CPUs
+      for(int cpu=0; cpu<vmpi::num_processors; cpu++){
+         // if I am root proc, then I receive cells dipolar field
+         if(vmpi::my_rank == 0){
+            // allocate int to receive num of cells to be received
+            int num_recv_cells;
+            // Receive num_recv_cells
+            requests.push_back(req);
+            MPI_Irecv(&num_recv_cells, 1, MPI_INT, cpu, 114, MPI_COMM_WORLD, &requests.back());
+            MPI_Wait(&requests.back(), &status); // wait for number of data to be received
+            // Allocate arrays for field
+            std::vector<int> mpi_recv_cells_id(num_recv_cells,0);
+            std::vector<double> mpi_recv_cells_field(3*num_recv_cells,0.0);
+            // Receive arrays
+            requests.push_back(req);
+            MPI_Irecv(&mpi_recv_cells_id[0], num_recv_cells, MPI_INT, cpu, 115, MPI_COMM_WORLD, &requests.back());
+            MPI_Wait(&requests.back(), &status); // wait for data to be received
+            requests.push_back(req);
+            MPI_Irecv(&mpi_recv_cells_field[0], 3*num_recv_cells, MPI_DOUBLE, cpu, 116, MPI_COMM_WORLD, &requests.back());
+            MPI_Wait(&requests.back(), &status); // wait for data to be received
+            // Save received data
+            for(int i=0; i<num_recv_cells; i++){
+               int lc = mpi_recv_cells_id[i];
+               // save B-field
+               dipole_cells_field_array_x[lc] = mpi_recv_cells_field[3*i+0];
+               dipole_cells_field_array_y[lc] = mpi_recv_cells_field[3*i+1];
+               dipole_cells_field_array_z[lc] = mpi_recv_cells_field[3*i+2];
+
+            } // end saving data
+         } // end if I am root proc
+      } // end loop over cpus
+
+      // wait for all processes here before de-allocating memory
+      vmpi::barrier();
+
+      // Clear arrays used only for sending data
+      mpi_send_cells_id.clear();
+      mpi_send_cells_field.clear();
+
+      return EXIT_SUCCESS;
+   }
 
 
    #endif

@@ -50,6 +50,7 @@ namespace stats
 	extern std::vector <double> sublattice_mean_torque_y_array;
 	extern std::vector <double> sublattice_mean_torque_z_array;
 
+	extern double energy_data_counter;
 	extern double torque_data_counter;
 
    extern bool calculate_energy;
