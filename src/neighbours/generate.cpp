@@ -358,7 +358,7 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
                //std::cout << "\tv_eff: " << vx << "\t" << vy << "\t" << vz << std::endl;
 
                // get current index
-               int index = list[supercell_array[scc[0]][scc[1]][scc[2]][atom]].size();
+               // int index = list[supercell_array[scc[0]][scc[1]][scc[2]][atom]].size(); // unused variable
 
                // set neighbour data
                tmp_nt.nn = supercell_array[nx][ny][nz][natom]; // atom ID of neighbour

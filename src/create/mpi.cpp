@@ -254,7 +254,6 @@ namespace create{
          std::vector<MPI_Request> requests(0);
          std::vector<MPI_Status> stati(0);
          MPI_Request req;
-         MPI_Status stat;
 
          // Send/receive number of boundary/halo atoms
          for(int cpu=0;cpu<vmpi::num_processors;cpu++){

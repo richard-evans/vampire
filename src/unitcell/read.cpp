@@ -78,7 +78,6 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 		std::istringstream iss(line,std::istringstream::in);
 
 		// defaults for interaction list
-		int num_interactions = 0; // assume no interactions
 		int interaction_range = 1; // assume +-1 unit cell as default
 
 		// non-comment line found - check for line number
