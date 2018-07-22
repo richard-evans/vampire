@@ -157,7 +157,7 @@ void monte_carlo_preconditioning(){
    // print informative messages to screen and log
    std::cout << "Done!" << std::endl;
    std::cout << "Preconditioning time for " << sim::internal::num_monte_carlo_preconditioning_steps << " steps: " << timer.elapsed_time() << " s" << std::endl;
-   zlog << "Preconditioning completed in " << timer.elapsed_time() << " s" << std::endl;
+   zlog << zTs() << "Preconditioning completed in " << timer.elapsed_time() << " s" << std::endl;
 
    return;
 
