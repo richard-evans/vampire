@@ -349,6 +349,9 @@ double legacy_atoms_coords()
 void legacy_cells()
 {
 
+   // wait for all processes
+   vmpi::barrier();
+
    // instantiate timer
    vutil::vtimer_t timer;
 
@@ -362,11 +365,11 @@ void legacy_cells()
 
    #ifdef MPICF
       // if flag to print cells field is active, all cpus send cells field to root proc
-      dipole::send_cells_field(cells::cell_id_array,
-                              dipole::cells_field_array_x,
-                              dipole::cells_field_array_y,
-                              dipole::cells_field_array_z,
-                              cells::num_local_cells);
+      if(dipole::activated) dipole::send_cells_field(cells::cell_id_array,
+                                                     dipole::cells_field_array_x,
+                                                     dipole::cells_field_array_y,
+                                                     dipole::cells_field_array_z,
+                                                     cells::num_local_cells);
    #endif
 
    // start timer
@@ -401,14 +404,13 @@ void legacy_cells()
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
 
       // Root process now outputs the cell magnetisations
-      for (int cell = 0; cell < cells::num_cells; cell++)
-      {
-         if (dipole::dipole_cells_num_atoms_in_cell[cell] > 0)
-         {
+      for (int cell = 0; cell < cells::num_cells; cell++){
+         if (cells::num_atoms_in_cell_global[cell] > 0){
             cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell] << "\t";
             if(dipole::activated) cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << "\n";
             else cfg_file_ofstr << "\n";
          }
+
       }
 
       cfg_file_ofstr.close();
@@ -424,6 +426,9 @@ void legacy_cells()
    zlog << " of size " << data_size*1.0e-6 << " MB [ " << data_size*1.0e-9/timer.elapsed_time() << " GB/s in " << io_time << " s ]" << std::endl;
 
    sim::output_cells_file_counter++;
+
+   // wait for all processes
+   vmpi::barrier();
 
    return;
 }
@@ -465,6 +470,9 @@ void legacy_cells()
 ///
 void legacy_cells_coords()
 {
+
+   // wait for all processes
+   vmpi::barrier();
 
    // instantiate timer
    vutil::vtimer_t timer;
@@ -509,11 +517,9 @@ void legacy_cells_coords()
 
       config::internal::total_output_cells = 0;
 
-      for (int cell = 0; cell < cells::num_cells; cell++)
-      {
-         if (dipole::dipole_cells_num_atoms_in_cell[cell] > 0)
-         {
-            cfg_file_ofstr << cell << "\t" << dipole::dipole_cells_num_atoms_in_cell[cell] << "\t" << cells::pos_and_mom_array[4 * cell + 0] << "\t" << cells::pos_and_mom_array[4 * cell + 1] << "\t" << cells::pos_and_mom_array[4 * cell + 2] << std::endl;
+      for (int cell = 0; cell < cells::num_cells; cell++){
+         if (cells::num_atoms_in_cell_global[cell] > 0){
+            cfg_file_ofstr << cell << "\t" << cells::num_atoms_in_cell_global[cell] << "\t" << cells::pos_and_mom_array[4 * cell + 0] << "\t" << cells::pos_and_mom_array[4 * cell + 1] << "\t" << cells::pos_and_mom_array[4 * cell + 2] << std::endl;
             config::internal::total_output_cells++;
          }
       }
@@ -527,6 +533,9 @@ void legacy_cells_coords()
    const double io_time = timer.elapsed_time();
 
    zlog << " of size " << data_size*1.0e-6 << " MB [ " << data_size*1.0e-9/timer.elapsed_time() << " GB/s in " << io_time << " s ]" << std::endl;
+
+   // wait for all processes
+   vmpi::barrier();
 
    return;
 }
