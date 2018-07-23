@@ -8,7 +8,8 @@ command.o \
 githash.o \
 initialise_variables.o \
 main.o \
-material.o
+material.o \
+version.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/main/,$(main_objects))

@@ -31,12 +31,10 @@ namespace internal{
    // Internal shared variables
    //-------------------------------------------------------------------------
    extern std::string input_file_name;
-   extern std::string vampire_version;
 
    //-------------------------------------------------------------------------
    // Internal function declarations
    //-------------------------------------------------------------------------
-   std::string githash(); // return code version
    void command_line_args(int argc, char* argv[]); // process command line arguments
 
 
