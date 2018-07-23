@@ -28,6 +28,7 @@
 
 #include "create.hpp"
 #include "errors.hpp"
+#include "info.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "vmpi.hpp"
@@ -39,7 +40,6 @@
 namespace vmain{
    namespace internal{
       std::string input_file_name = "input"; // default input file name
-      std::string vampire_version = "5.0.0"; // vampire code version
    }
 }
 
@@ -71,9 +71,9 @@ int main(int argc, char* argv[]){
       std::cout << "                                         | |               " << std::endl;
       std::cout << "                                         |_|               " << std::endl;
       std::cout << std::endl;
-      std::cout << "                      Version " << vmain::internal::vampire_version << " " << __DATE__ << " " << __TIME__ << std::endl;
+      std::cout << "                      Version " << vinfo::version() << " " << __DATE__ << " " << __TIME__ << std::endl;
       std::cout << std::endl;
-      std::cout << "             Git commit: " << vmain::internal::githash() << std::endl;
+      std::cout << "             Git commit: " << vinfo::githash() << std::endl;
       std::cout << std::endl;
       std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
       std::cout << std::endl;

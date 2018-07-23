@@ -16,6 +16,7 @@
 // Vampire headers
 #include "config.hpp"
 #include "errors.hpp"
+#include "info.hpp"
 #include "gpu.hpp"
 #include "grains.hpp"
 #include "sim.hpp"
@@ -73,6 +74,8 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 	ofile << "# " << "  time       : " << oftime << "    process id : " << vout::zLogPid << std::endl;
 	ofile << "# " << "  hostname   : " << vout::zLogHostName << std::endl;
 	ofile << "# " << "  path       : " << directory << std::endl;
+   ofile << "# " << "  version    : " << vinfo::version() << std::endl;
+   ofile << "# " << "  githash    : " << vinfo::githash() << std::endl;
 	ofile << "#----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
 	//ofile << "# time" << "\t" << "temperature" << "\t" <<  "|m|" << "\t" << "..." << std::endl; // to be concluded...
 
@@ -136,6 +139,25 @@ namespace vout{
 		zLogInitialised=true;
 
 		zlog << zTs() << "Logfile opened" << std::endl;
+
+      //------------------------------------
+   	// Determine current directory
+   	//------------------------------------
+   	char directory [256];
+
+   	#ifdef WIN_COMPILE
+   		_getcwd(directory, sizeof(directory));
+   	#else
+   		getcwd(directory, sizeof(directory));
+   	#endif
+
+      // write system and version information
+      zlog << zTs() << "Executable : " << vout::zLogProgramName << std::endl;
+      zlog << zTs() << "Host name  : " << vout::zLogHostName << ":" << std::endl;
+      zlog << zTs() << "Directory  : " << directory << std::endl;
+      zlog << zTs() << "Process ID : " << vout::zLogPid << std::endl;
+      zlog << zTs() << "Version    : " << vinfo::version() << std::endl;
+      zlog << zTs() << "Githash    : " << vinfo::githash() << std::endl;
 
 		return;
 	}
@@ -631,9 +653,11 @@ std::string zTs(){
 
 		timeinfo = localtime ( &seconds );
 		// Format time string
-		strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
+		//strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
+      strftime (logtime,80,"%d-%m-%Y [%X] ",timeinfo);
 
-		Ts << logtime << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
+		Ts << logtime;
+      // << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
 
 		return Ts.str();
 

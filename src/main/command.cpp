@@ -15,6 +15,7 @@
 
 // Vampire headers
 #include "errors.hpp"
+#include "info.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
 
@@ -39,8 +40,8 @@ void command_line_args(int argc, char* argv[]){
       //-----------------------------
       if( sw == "--version" || sw == "-v"){
          if(vmpi::my_rank == 0){
-            std::cout << "vampire version " << vmain::internal::vampire_version << std::endl;
-            std::cout << "Githash " << vmain::internal::githash() << std::endl;
+            std::cout << "vampire version " << vinfo::version() << std::endl;
+            std::cout << "Githash " << vinfo::githash() << std::endl;
             std::cout << "\nThis is free software; see the source for licence information." << std::endl;
          }
          #ifdef MPICF
