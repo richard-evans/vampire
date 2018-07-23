@@ -496,40 +496,57 @@ namespace create{
    ///
    void identify_mpi_boundary_atoms(std::vector<cs::catom_t>& catom_array, neighbours::list_t& cneighbourlist){
 
-         // check calling of routine if error checking is activated
-         if(err::check==true){std::cout << "vmpi::identify_boundary_atoms has been called" << std::endl;}
-
          // Find and mark boundary and unneeded halo atoms
-         for(unsigned int atom=0;atom<catom_array.size();atom++){
-            const int my_mpi_type=catom_array[atom].mpi_type;
-            bool boundary=false;
-            bool non_interacting_halo=true;
-            for(unsigned int nn=0;nn<cneighbourlist.list[atom].size();nn++){
-               int nn_mpi_type = catom_array[cneighbourlist.list[atom][nn].nn].mpi_type;
+         for( unsigned int atom = 0; atom < catom_array.size(); atom++ ){
+
+            // define mpi type of local atom
+            const int my_mpi_type = catom_array[atom].mpi_type;
+
+            // loop over all neighbours for atom
+            for( unsigned int nn = 0; nn < cneighbourlist.list[atom].size(); nn++ ){
+
+               // identify neighbour atom
+               const uint64_t natom = cneighbourlist.list[atom][nn].nn;
+
+               // define nearest neighbour MPI type
+               int nn_mpi_type = catom_array[natom].mpi_type;
+
                // Test for interaction with halo
-               if((my_mpi_type==0) && (nn_mpi_type == 2)){
-                  boundary=true;
+               if( (my_mpi_type == 0 || my_mpi_type == 1) && (nn_mpi_type == 2) ){
+                  // a core atom interacting with the halo -> boundary
+                  catom_array[atom].boundary = true;
+                  // identify halo atom as interacting
+                  catom_array[natom].non_interacting_halo = false;
                }
-               // Test for halo interacting with non-halo
-               if((my_mpi_type==2) && ((nn_mpi_type == 0) || (nn_mpi_type == 1))){
-                  non_interacting_halo=false;
-                  //std::cout << "Found interacting halo,     atom: " << atom << "\t MPI_t: " << my_mpi_type << " Neighbour: " << cneighbourlist[atom][nn].nn << "\t MPI_t: " <<  nn_mpi_type << " Flag: " << non_interacting_halo << std::endl;
-
-               }
-               //else 	std::cout << "Found non-interacting halo, atom: " << atom << "\t MPI_t: " << my_mpi_type << " Neighbour: " << cneighbourlist[atom][nn].nn << "\t MPI_t: " <<  nn_mpi_type << " Flag: " << non_interacting_halo << std::endl;
 
             }
+
             // Mark atoms appropriately
-            if((my_mpi_type==2) && (non_interacting_halo==true)){
-               catom_array[atom].mpi_type=3;
-            }
-            if(boundary==true){
+            if( catom_array[atom].boundary == true ){
                catom_array[atom].mpi_type=1;
             }
+
          }
 
-         // Sort Arrays by MPI Type
-         //sort_atoms_by_mpi_type(catom_array,cneighbourlist);
+         return;
+      }
+
+
+      //----------------------------------------------------------------------------------
+      // Simple function to identify non-interacting halo atoms for deletion
+      //----------------------------------------------------------------------------------
+      void mark_non_interacting_halo(std::vector<cs::catom_t>& catom_array){
+
+         // Find and mark boundary and unneeded halo atoms
+         for( unsigned int atom = 0; atom < catom_array.size(); atom++ ){
+
+            // define mpi type of local atom
+            const int my_mpi_type = catom_array[atom].mpi_type;
+
+            if( ( my_mpi_type == 2 ) && ( catom_array[atom].non_interacting_halo == true ) ){
+               catom_array[atom].mpi_type = 3;
+            }
+         }
 
          return;
       }

@@ -46,6 +46,9 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 
    std::string exchange_type_string; // string defining exchange type
 
+   // defaults for interaction list
+   int interaction_range = 1; // assume +-1 unit cell as default
+
 	// Loop over all lines
 	while (! inputfile.eof() ){
 		line_counter++;
@@ -76,9 +79,6 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
 
 		// convert line to string stream
 		std::istringstream iss(line,std::istringstream::in);
-
-		// defaults for interaction list
-		int interaction_range = 1; // assume +-1 unit cell as default
 
 		// non-comment line found - check for line number
 		switch(line_id){
@@ -204,6 +204,9 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
    // Verify exchange interactions are symmetric (required for MPI parallelization)
    unit_cell.bilinear.verify(filename);
    unit_cell.biquadratic.verify(filename);
+
+   // set interaction range if larger than existing range
+   if(interaction_range > unit_cell.interaction_range) unit_cell.interaction_range = interaction_range;
 
    std::cout << "done!" << std::endl;
    zlog << zTs() << "Verifying unit cell exchange interactions completed" << std::endl;

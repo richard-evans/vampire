@@ -31,6 +31,30 @@ namespace exchange{
 
       zlog << zTs() << "Initialising data structures for exchange calculation." << std::endl;
 
+      //-----------------------------------------------------------------------------
+      // Optionally output exchange template and halo
+      //-----------------------------------------------------------------------------
+
+      //std::cout << "Num atoms: " << atoms::num_atoms << std::endl;
+      //std::cout << "Num core atoms: " << vmpi::num_core_atoms << std::endl;
+      //std::cout << "Num boundary atoms: " << vmpi::num_bdry_atoms << std::endl;
+      //std::cout << "Num halo atoms: " << vmpi::num_halo_atoms << std::endl;
+
+      //std::ofstream ofile("mpi_crystal_after.xyz");
+
+      //ofile << atoms::num_atoms << "\n\n";
+      //for(uint64_t atom=0; atom < atoms::num_atoms; atom++){
+      //   std::string ele = "Ag";
+      //   if(atom < vmpi::num_core_atoms) ele = "Ag";
+      //   else if(atom < vmpi::num_core_atoms+vmpi::num_bdry_atoms) ele = "Fe";
+      //   else if(atom < vmpi::num_core_atoms + vmpi::num_bdry_atoms + vmpi::num_halo_atoms) ele = "Li";
+      //   ofile << ele << "\t" << atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << std::endl;
+      //}
+
+      //ofile.close();
+
+      //-----------------------------------------------------------------------------
+
       // save type of interaction template and if material file constants are used
       exchange::internal::exchange_type = cs::unit_cell.bilinear.exchange_type;
       exchange::internal::use_material_exchange_constants = cs::unit_cell.bilinear.use_material_exchange_constants;
@@ -69,10 +93,13 @@ namespace exchange{
             // save atom number to 1D interaction list
    			atoms::neighbour_list_array[counter] = bilinear[atom][nn].nn;
 
-   			if(bilinear[atom][nn].nn > atoms::num_atoms){
+   			if(bilinear[atom][nn].nn >= atoms::num_atoms){
    				terminaltextcolor(RED);
-   				std::cerr << "Fatal Error - neighbour " << bilinear[atom][nn].nn <<" is out of valid range 0-"
-   				<< atoms::num_atoms << " on rank " << vmpi::my_rank << std::endl;
+   				std::cerr << "Fatal Error - neighbour atom " << bilinear[atom][nn].nn <<" is out of valid range 0-"
+   				<< atoms::num_atoms-1 << " on rank " << vmpi::my_rank << std::endl;
+               std::cerr << "\tAtom number      : " << atom << std::endl;
+               std::cerr << "\tNeighbour number : " << nn << std::endl;
+               std::cerr << "\tNeighbour atom   : " << atoms::neighbour_list_array[counter] << std::endl;
    				//std::cerr << "Atom " << atom << " of MPI type " << catom_array[atom].mpi_type << std::endl;
    				terminaltextcolor(WHITE);
    				err::vexit();
@@ -93,6 +120,8 @@ namespace exchange{
       // Biquadratic exchange list - should probably be classified at some point
       //------------------------------------------------------------------------
       if(exchange::biquadratic){
+
+         // determine total number of biquadratic exchange interactions
          counter = 0;
          for(uint64_t atom = 0; atom < atoms::num_atoms; atom++){
       		counter += biquadratic[atom].size();
@@ -119,7 +148,7 @@ namespace exchange{
                // save atom number to 1D interaction list
       			exchange::internal::biquadratic_neighbour_list_array[counter] = biquadratic[atom][nn].nn;
 
-      			if(biquadratic[atom][nn].nn > atoms::num_atoms){
+      			if(biquadratic[atom][nn].nn >= atoms::num_atoms){
       				terminaltextcolor(RED);
       				std::cerr << "Fatal Error - biquadratic neighbour " << biquadratic[atom][nn].nn <<" is out of valid range 0-"
       				<< atoms::num_atoms << " on rank " << vmpi::my_rank << std::endl;

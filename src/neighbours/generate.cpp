@@ -61,7 +61,7 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
 	list.reserve(num_atoms);
 
 	// estimate number of interactions per atom
-	const uint64_t max_nn = uint64_t( 1.1*( double(exchange.interaction.size()) / double(num_atoms_in_unit_cell) ) );
+	const int64_t max_nn = int64_t( 1.1*( double(exchange.interaction.size()) / double(num_atoms_in_unit_cell) ) );
 
 	// Reserve space for each atom in neighbour list according to material type
 	for(int atom=0; atom < num_atoms; atom++){
@@ -70,16 +70,16 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
 	}
 
    // Calculate system dimensions and number of supercells
-   const uint64_t max_val=1000000000000000;
-   uint64_t min[3]={max_val,max_val,max_val}; // lowest cell id
-   uint64_t max[3]={0,0,0}; // highest cell id
+   const int64_t max_val=1000000000000;
+   int64_t min[3] = {max_val,max_val,max_val}; // lowest cell id
+   int64_t max[3] = {0,0,0}; // highest cell id
 
    // find supercell range of atoms on this CPU
 	for(int atom = 0; atom < num_atoms; atom++){
 
-		uint64_t c[3]={ atom_array[atom].scx,
-                      atom_array[atom].scy,
-                      atom_array[atom].scz};
+		int64_t c[3] = { atom_array[atom].scx,
+                       atom_array[atom].scy,
+                       atom_array[atom].scz};
 
       // loop over i,j,k
 		for(int i = 0; i < 3; i++){
@@ -102,14 +102,14 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
    }
 
 	// calculate offset and cell maximum in whole unit cells
-	const uint64_t offset[3]   = {min[0], min[1], min[2]};
-	const uint64_t max_cell[3] = {max[0], max[1], max[2]};
+	const int64_t offset[3]   = {min[0], min[1], min[2]};
+	const int64_t max_cell[3] = {max[0], max[1], max[2]};
 
 	// calculate number of cells needed = max-min+1
    // ( if max_cell = 25, then 0 to 25 = 26 cells)
-	const uint64_t d[3]={ ( max_cell[0] - offset[0] + 1 ),
-                         ( max_cell[1] - offset[1] + 1 ),
-                         ( max_cell[2] - offset[2] + 1 )};
+	const int64_t d[3] = { ( max_cell[0] - offset[0] + 1 ),
+                          ( max_cell[1] - offset[1] + 1 ),
+                          ( max_cell[2] - offset[2] + 1 )};
 
 	// Declare temporary array for 3D supercell array
 	std::vector<std::vector<std::vector<std::vector<int> > > > supercell_array;
@@ -148,10 +148,10 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
    zlog << zTs() << "\tAllocating memory done"<< std::endl;
 
 	// declare 1D cell array to loop over
-	const uint64_t num_cells = d[0]*d[1]*d[2];
+	const int64_t num_cells = d[0]*d[1]*d[2];
 	std::vector< std::vector <int> > cell_coord_array;
 	cell_coord_array.reserve(num_cells);
-	for(uint64_t i=0; i < num_cells; i++){
+	for(int64_t i=0; i < num_cells; i++){
 		cell_coord_array.push_back(std::vector<int>());
 		cell_coord_array[i].resize(3);
 	}
@@ -174,12 +174,12 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
    zlog << zTs() << "Populating supercell array for neighbourlist calculation..."<< std::endl;
 
 	// Populate supercell array with atom numbers
-	for(int atom=0;atom<num_atoms;atom++){
+	for(int atom=0; atom < num_atoms; atom++){
 
       // get supercell coordinates
-		uint64_t scc[3]={ atom_array[atom].scx - offset[0],
-                        atom_array[atom].scy - offset[1],
-                        atom_array[atom].scz - offset[2]};
+      int64_t scc[3]={ atom_array[atom].scx - offset[0],
+                       atom_array[atom].scy - offset[1],
+                       atom_array[atom].scz - offset[2] };
 
       // get atom real position coordinates
 		double c[3]={atom_array[atom].x, atom_array[atom].y, atom_array[atom].z};
@@ -187,8 +187,10 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
       // check that atom is within valid range of supercell coordinates
 		for(int i=0;i<3;i++){
 			// Always check cell in range
-         if(scc[i]>= d[i]){
-				//std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
+         if( scc[i] >= d[i] ){
+            terminaltextcolor(RED);
+				std::cerr << "Error - atom out of supercell range in neighbourlist calculation!" << std::endl;
+            terminaltextcolor(WHITE);
 				#ifdef MPICF
 				terminaltextcolor(RED);
 				std::cerr << "\tCPU Rank: " << vmpi::my_rank << std::endl;
@@ -326,9 +328,9 @@ void list_t::generate( std::vector<cs::catom_t>& atom_array,    // array of atom
          }
          #endif
          // check for out-of-bounds access
-         if((nx>=0 && static_cast<uint64_t>(nx)<d[0]) &&
-            (ny>=0 && static_cast<uint64_t>(ny)<d[1]) &&
-            (nz>=0 && static_cast<uint64_t>(nz)<d[2])){
+         if( (nx >= 0 && static_cast<int64_t>(nx) < d[0] ) &&
+             (ny >= 0 && static_cast<int64_t>(ny) < d[1] ) &&
+             (nz >= 0 && static_cast<int64_t>(nz) < d[2] ) ){
             // check for missing atoms
             if((supercell_array[scc[0]][scc[1]][scc[2]][atom]!=-1) && (supercell_array[nx][ny][nz][natom]!=-1)){
 

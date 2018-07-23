@@ -30,12 +30,14 @@ public:
 
    // Global atomic coordinates
    uint64_t uc_id;        // atom number of host unit cell
-   uint64_t scx;                   // supecell x coordinate of atom |
-   uint64_t scy;                   // supecell y coordinate of atom |
-   uint64_t scz;                   // supecell z coordinate of atom /
+   int64_t scx;                   // supercell x coordinate of atom |
+   int64_t scy;                   // supercell y coordinate of atom |
+   int64_t scz;                   // supercell z coordinate of atom /
 
    // Flags
    bool include; // boolean to incude atom in structure (or not)
+   bool boundary; // boolean to determine if atom interacts with MPI halo
+   bool non_interacting_halo; // boolean to determine if atom is non-interacting halo
 
    // Integers
    int material;              // atom material belongs to
@@ -62,6 +64,8 @@ public:
       scy(0),
       scz(0),
       include(false),
+      boundary(false),
+      non_interacting_halo(true),
       material(0),
       uc_category(0),
       lh_category(0),

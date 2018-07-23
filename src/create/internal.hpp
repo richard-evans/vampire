@@ -157,6 +157,7 @@ namespace create{
       // MPI functions
       extern void copy_halo_atoms(std::vector<cs::catom_t> & catom_array);
       extern void identify_mpi_boundary_atoms(std::vector<cs::catom_t> & catom_array, neighbours::list_t & cneighbourlist);
+      extern void mark_non_interacting_halo(std::vector<cs::catom_t>& catom_array);
       extern void sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array, neighbours::list_t& bilinear, neighbours::list_t& biquadratic);
       extern void init_mpi_comms(std::vector<cs::catom_t> & catom_array);
 

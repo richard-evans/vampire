@@ -80,7 +80,7 @@ namespace exchange{
                      atoms::v_exchange_list[nn].Jij[0] = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0];
                      atoms::v_exchange_list[nn].Jij[1] = cs::unit_cell.bilinear.interaction[i].Jij[1][1] * mp::material[imaterial].Jij_matrix[jmaterial][1];
                      atoms::v_exchange_list[nn].Jij[2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * mp::material[imaterial].Jij_matrix[jmaterial][2];
-      					// reset interation id to neighbour number - causes segfault if nn out of range
+      					// reset interaction id to neighbour number - causes segfault if nn out of range
       					atoms::neighbour_interaction_type_array[nn] = nn;
       				}
       			}

@@ -112,6 +112,7 @@ namespace unitcell{
          interaction[i].dx=dx;
          interaction[i].dy=dy;
          interaction[i].dz=dz;
+
          // check for long range interactions
          if(abs(dx)>interaction_range) interaction_range=abs(dx);
          if(abs(dy)>interaction_range) interaction_range=abs(dy);
@@ -146,9 +147,6 @@ namespace unitcell{
          ni[iatom]++;
 
       }
-
-      // set interaction range if larger than existing range
-      //if(interaction_range > unit_cell.interaction_range) unit_cell.interaction_range = interaction_range;
 
       return;
 

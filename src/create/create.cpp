@@ -158,6 +158,7 @@ int create(){
 	#ifdef MPICF
 		create::internal::identify_mpi_boundary_atoms(catom_array,bilinear);
       if(exchange::biquadratic) create::internal::identify_mpi_boundary_atoms(catom_array,biquadratic);
+      create::internal::mark_non_interacting_halo(catom_array);
       // Sort Arrays by MPI Type
       create::internal::sort_atoms_by_mpi_type(catom_array, bilinear, biquadratic);
 	#endif
