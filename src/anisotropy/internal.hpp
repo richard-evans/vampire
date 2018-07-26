@@ -175,9 +175,11 @@ namespace anisotropy{
       extern std::vector<evec_t> kc_vector; // 001 vector for cubic anisotropy
       //extern std::vector<evec_t> kc_vector_b(0); // 100 vector for cubic anisotropy
 
-      extern bool native_neel_anisotropy_threshold; // enables site-dependent surface threshold
+      extern bool native_neel_anisotropy_threshold;  // enables site-dependent surface threshold
       extern unsigned int neel_anisotropy_threshold; // global threshold for surface atoms
-      extern double nearest_neighbour_distance; // Control surface anisotropy nearest neighbour distance
+      extern double nearest_neighbour_distance;      // Control surface anisotropy nearest neighbour distance
+      extern bool neel_range_dependent;              // Enable range dependent Neel anisotropy Lij = L0 exp(-r/r0)
+      extern double neel_exponential_range;          // r0 value for range dependence of Neel anisotropy
 
       // arrays for storing unrolled parameters for lattice anisotropy
       extern std::vector<double> klattice_array; // anisoptropy constant

@@ -165,6 +165,21 @@ The following commands control the calculation of the magnetic anisotropy energy
   interactions. Internally this sets a large threshold, and so specifying
   anisotropy:surface-anisotropy-threshold will override this flag.\\
 
+{\zicf anisotropy:neel-anisotropy-exponential-factor}\addcontentsline{toc}
+{subsection}{anisotropy:neel-anisotropy-exponential-factor}
+  float default [$2.5$]
+  Enables an exponentially range dependent N\'eel pair anisotropy so that
+  lattice distortions and strains change the magnetoelastic compling strength.
+  In the usual form the method only takes into account the symmetry ($L_{ij}(r)
+  = const$). The value should be set to the typical lattice parameter otherwise
+  the total anisotropy will be significantly higher or lower than expected. The
+  functional form of the range dependence is
+  \begin{equation}
+     L_{ij}(r_{ij}) = L_0 \exp\left(-\frac{r_{ij} - r_0}{r_{0}}\right)
+  \end{equation}
+  where $r_{ij}$ is the pair separation, $r_0$ is the exponential factor and $L_0$
+  is the usual N\'eel anisotropy constant.\\
+
 \section*{Dipole field calculation}
 \addcontentsline{toc}{section}{Dipole field calculation}
 The following commands control the calculation of the dipole-dipole field. By

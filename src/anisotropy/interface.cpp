@@ -65,6 +65,17 @@ namespace anisotropy{
           internal::neel_anisotropy_threshold = 1000000000;
           return true;
       }
+      //-------------------------------------------------------------------
+      test="neel-anisotropy-exponential-factor";
+      if(word==test){
+          // Enable range dependent Neel anisotropy Lij(r) = exp(-(r-r0)/r0)
+          // r should be approximately nearest neighbour range ~ 2.5 angstroms
+          double r = atof(value.c_str());
+          vin::check_for_valid_value(r, word, line, prefix, unit, "length", 0.0001, 1000.0,"input","0.0001 - 1,000");
+          internal::neel_exponential_range = r;
+          internal::neel_range_dependent = true;
+          return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

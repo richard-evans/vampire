@@ -29,7 +29,7 @@
 namespace anisotropy{
 
    //---------------------------------------------------------------------------
-   // Function to calculate surface anisotropy tensor
+   // Function to identify less than fully coordinated atoms
    //---------------------------------------------------------------------------
    void identify_surface_atoms(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbours::neighbour_t> > & cneighbourlist){
 
