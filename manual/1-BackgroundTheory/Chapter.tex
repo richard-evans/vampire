@@ -3,7 +3,7 @@ While the underlying theory behind the atomistic spin model is well known in the
 
 \section*{Atomistic Spin Models}
 \addcontentsline{toc}{section}{Atomistic Spin Models}
-Atomistic spin models form the natural limit of two distinct approaches, namely micromagnetics and \textit{ab-initio} models of the electronic structure. In micromagnetics a material is discretized into small domains where the magnetization is assumed to be fully ordered within. If the micromagnetic cell size is reduced to less than 1 nm, then the magnetization is no longer a true continuum, but a discrete entity considering localized moments on individual atoms. Similarly, when the electronic properties of the system are considered, the quantum mechanical properties can be mapped onto atomic cores in a manner similar to molecular dynamics, where the effective properties can often be treated in a classical approximation.
+Atomistic spin models form the natural limit of two distinct approaches, namely micromagnetics and \textit{ab-initio} models of the electronic structure. In micromagnetics a material is discretized into small domains where the magnetization is assumed to be fully ordered within it. If the micromagnetic cell size is reduced to less than 1 nm, then the magnetization is no longer a true continuum, but a discrete entity considering localized moments on individual atoms. Similarly, when the electronic properties of the system are considered, the quantum mechanical properties can be mapped onto atomic cores in a manner similar to molecular dynamics, where the effective properties can often be treated with a classical approximation.
 
 The advantage of the atomistic model over micromagnetics is that it naturally deals with atomic ordering and variation of local properties seen in real materials, such as interfaces, defects, roughness etc. The discrete formulation also allows the simulation of high temperatures above and beyond the Curie temperature, where the usual continuum micromagnetic approach breaks down. Such effects or often central to current problems in magnetism such as materials for spin electronics, heat assisted magnetic recording or ultrafast laser processes. Similarly for \textit{ab-initio} calculations, mapping onto an effective spin model allows apply the full quantum mechanical deal of the properties to much larger systems and the consideration of dynamic effects on much longer timescales.
 
@@ -11,7 +11,7 @@ The advantage of the atomistic model over micromagnetics is that it naturally de
 \addcontentsline{toc}{section}{The spin Hamiltonian}
 The basis of the atomistic spin model is the spin Hamiltonian, which describes the fundamental spin-dependent interactions at the atomic level (neglecting the effects of potential and kinetic energy and electron correlations). The spin Hamiltonian is typically defined as 
 \begin{equation*}
-\mathscr{H} = - \sum_{i,j} \Jij \sms_i \cdot \sms_j - \kuu \sum_{i} S_z^2 - \smmu \sum_i \Happ \cdot \sms_i
+\mathscr{H} = - \sum_{i<j} \Jij \sms_i \cdot \sms_j - \kuu \sum_{i} S_z^2 - \smmu \sum_i \Happ \cdot \sms_i
 \end{equation*}
 describing exchange, uniaxial anisotropy and applied field contributions respectively. Important parameters are the Heisenberg exchange \Jij, the anisotropy constant $\kuu$ and the atomic spin moment, \smmu. $\sms_i$ is a \textit{unit} vector which describes the orientation of the local spin moment. In most magnetic materials the exchange interactions are the dominant contribution, usually by two orders of magnitude, and gives rise to the atomic ordering of the spin directions. For ferromagnetic materials (parallel alignment of spins) $\Jij > 0$, while for anti-ferromagnetic materials (antiparallel alignment of spins), $\Jij < 0$. 
 
@@ -19,7 +19,7 @@ While the exchange interaction determines the ordering of the spins, it is usual
 
 The last term describes the coupling of the spin system to an externally applied field, \Happ, or Zeeman field. The applied field is used to reverse the orientation of the spins, and can be used in the simulation to calculate hysteresis loops, for example.
 
- \section*{Spin Dynamics}
+\section*{Spin Dynamics}
 \addcontentsline{toc}{section}{Spin Dynamics}
 The spin Hamiltonian describes the energetics of the system, but says nothing about the dynamic behaviour. For that the Landau-Lifshitz-Gilbert (LLG) equation is used to describe the dynamics of atomic spins. The LLG is given by
 \begin{equation}\label{eqn:LLG}
@@ -43,13 +43,21 @@ where $\smmu$ is the local spin moment. The inclusion of the spin moment within 
 
 \section*{Citations}
 \addcontentsline{toc}{section}{Citations}
-If you use \vampire for your research, please cite the following article:\\
-
+If you use \vampire for your research, it is helpful to acknowledge the authors of the code by citing relevant papers and include a statement in the paper such as the following:\\
+\vspace{0.4cm}
+\indent \textit{The simulations in this work made use of the \vampire software package [1]}\\
+\vspace{0.2cm}
+and add a footnote reading:\\
+\vspace{0.2cm}
+\indent \textit{[1] \vampire software package version 5.0 available from http://vampire.york.ac.uk}\\
+\vspace{0.4cm}
+\noindent If you use the code, please cite the following article:\\
 \noindent \textit{\small Atomistic spin model simulations of magnetic nanomaterials}\\
 \vspace{-0.4cm}\\
 \noindent {\small R. F. L. Evans, W. J. Fan, P. Chureemart, T. A. Ostler, M. O. A. Ellis and R. W. Chantrell}\\
 {\small J. Phys.: Condens. Matter 26, 103202 (2014)}\\
 
+\clearpage
 \noindent If you use the constrained Monte Carlo method, in addition please cite:\\
 
 \noindent \textit{\small Constrained Monte Carlo method and calculation of the temperature dependence of magnetic anisotropy}\\
