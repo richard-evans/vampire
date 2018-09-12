@@ -165,8 +165,8 @@ The following commands control the calculation of the magnetic anisotropy energy
   interactions. Internally this sets a large threshold, and so specifying
   anisotropy:surface-anisotropy-threshold will override this flag.\\
 
-{\zicf anisotropy:neel-anisotropy-exponential-factor}\addcontentsline{toc}
-{subsection}{anisotropy:neel-anisotropy-exponential-factor}
+{\zicf anisotropy:neel-anisotropy-exponential-range}\addcontentsline{toc}
+{subsection}{anisotropy:neel-anisotropy-exponential-range}
   float default [$2.5$]
   Enables an exponentially range dependent N\'eel pair anisotropy so that
   lattice distortions and strains change the magnetoelastic compling strength.
@@ -175,10 +175,21 @@ The following commands control the calculation of the magnetic anisotropy energy
   the total anisotropy will be significantly higher or lower than expected. The
   functional form of the range dependence is
   \begin{equation}
-     L_{ij}(r_{ij}) = L_0 \exp\left(-\frac{r_{ij} - r_0}{r_{0}}\right)
+     L_{ij}(r_{ij}) = L_0 \exp\left(-F\frac{r_{ij} - r_0}{r_{0}}\right)
   \end{equation}
-  where $r_{ij}$ is the pair separation, $r_0$ is the exponential factor and $L_0$
-  is the usual N\'eel anisotropy constant.\\
+  where $r_{ij}$ is the pair separation, $r_0$ is the exponential range,
+  $F$ is the exponential factor and $L_0$ is the usual N\'eel anisotropy constant.
+  The functional form assures that at the first neighbour distance the value of
+  the N\'eel anisotropy constant is the same as would be without the range-
+  dependent form.\\
+
+{\zicf anisotropy:neel-anisotropy-exponential-factor}\addcontentsline{toc}
+{subsection}{anisotropy:neel-anisotropy-exponential-factor}
+   float default [$5.52$]
+   Enables an exponentially range dependent N\'eel pair anisotropy so that
+   lattice distortions and strains change the magnetoelastic compling strength.
+   In the usual form the method only takes into account the symmetry ($L_{ij}(r)
+   = const$). The prefactor controls the falloff with increasing range/\\
 
 \section*{Dipole field calculation}
 \addcontentsline{toc}{section}{Dipole field calculation}

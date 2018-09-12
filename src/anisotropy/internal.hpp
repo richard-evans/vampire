@@ -178,8 +178,9 @@ namespace anisotropy{
       extern bool native_neel_anisotropy_threshold;  // enables site-dependent surface threshold
       extern unsigned int neel_anisotropy_threshold; // global threshold for surface atoms
       extern double nearest_neighbour_distance;      // Control surface anisotropy nearest neighbour distance
-      extern bool neel_range_dependent;              // Enable range dependent Neel anisotropy Lij = L0 exp(-r/r0)
+      extern bool neel_range_dependent;              // Enable range dependent Neel anisotropy Lij = L0 exp(-F(r-r0)/r0)
       extern double neel_exponential_range;          // r0 value for range dependence of Neel anisotropy
+      extern double neel_exponential_factor;         // F value for range dependence of Neel anisotropy
 
       // arrays for storing unrolled parameters for lattice anisotropy
       extern std::vector<double> klattice_array; // anisoptropy constant

@@ -68,7 +68,18 @@ namespace anisotropy{
       //-------------------------------------------------------------------
       test="neel-anisotropy-exponential-factor";
       if(word==test){
-          // Enable range dependent Neel anisotropy Lij(r) = exp(-(r-r0)/r0)
+          // Enable range dependent Neel anisotropy Lij(r) = exp(-F(r-r0)/r0)
+          // F should be steepness of function indicating rate of decay with r
+          double F = atof(value.c_str());
+          vin::check_for_valid_value(F, word, line, prefix, unit, "none", 0.01, 100.0,"input","0.01 - 100");
+          internal::neel_exponential_factor = F;
+          internal::neel_range_dependent = true;
+          return true;
+      }
+      //-------------------------------------------------------------------
+      test="neel-anisotropy-exponential-range";
+      if(word==test){
+          // Enable range dependent Neel anisotropy Lij(r) = exp(-F(r-r0)/r0)
           // r should be approximately nearest neighbour range ~ 2.5 angstroms
           double r = atof(value.c_str());
           vin::check_for_valid_value(r, word, line, prefix, unit, "length", 0.0001, 1000.0,"input","0.0001 - 1,000");

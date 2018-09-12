@@ -91,7 +91,7 @@ namespace internal{
                   // Adjust kij by exponential factor if needed
                   if(internal::neel_range_dependent){
                      // Normalised exponential e(r0) = 1.0
-                     kij = kij*exp(-(rij-neel_exponential_range)/neel_exponential_range);
+                     kij = kij*exp(-neel_exponential_factor*( rij - neel_exponential_range )/neel_exponential_range);
                   };
 
                   // loop over tensor components and sum total including local anisotropy constant
