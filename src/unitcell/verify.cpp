@@ -33,6 +33,9 @@ namespace unitcell{
 //-------------------------------------------------------------------
 void unitcell::exchange_template_t::verify(std::string filename){
 
+   // ignore any cases with more than 100,000 interactions
+   if(interaction.size() > 100000) return;
+
    // list of assymetric interactions
    std::vector<int> asym_interaction_list(0);
 
