@@ -112,21 +112,23 @@ namespace vin{
 
 			// get size of string
 			int linelength = line.length();
+                        // remove everything after comment character
                         line =line.substr(0,line.find('#')) ;
 			// set character triggers
                         char delim[] = ":=!";
-			//const char* arrow=">";	// List identifier
-
+                        // convert to c-string style, for tokenisation
                         char *cstr = new char[line.length() + 1];
                         strcpy(cstr, line.c_str());
+                        // tokenise the string, using delimiters from above
                         char *token = strtok(cstr,delim);
                         for (int count = 0; count < 4 && token !=NULL; count++){
-                            if (count==0){key=token;}
-                            else if(count==1){word=token;}
+                            if (count==0){key=token;}       // Format is always the same
+                            else if(count==1){word=token;}  // but breaks if not EOL found
                             else if(count==2){value=token;}
                             else if(count==3){unit=token;}
                             token = strtok(NULL,delim);
                             };
+                        // tidy up
                         delete [] cstr;
                         delete token;
 			string empty="";
