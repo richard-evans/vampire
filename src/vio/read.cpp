@@ -13,7 +13,9 @@
 // C++ standard library headers
 #include <algorithm>
 #include <sstream>
-
+#include <cstring>
+#include <string>
+#include <iostream>
 // Vampire headers
 #include "vio.hpp"
 #include "errors.hpp"
@@ -87,6 +89,8 @@ namespace vin{
 
 		int line_counter=0;
 		// Loop over all lines and pass keyword to matching function
+                char com = '#';
+                char delim[] = ":=!";
 		while (! inputfile.eof() ){
 			line_counter++;
 			// read in whole line
@@ -108,84 +112,23 @@ namespace vin{
 
 			// get size of string
 			int linelength = line.length();
-			int last=0;
-
+                        line =line.substr(0,line.find('#')) ;
 			// set character triggers
-			const char* colon=":";	// Word identifier
-			const char* eq="=";		// Value identifier
-			const char* exc="!";		// Unit identifier
-			const char* hash="#";	// Comment identifier
+                        char delim[] = ":=!";
 			//const char* arrow=">";	// List identifier
 
-			// Determine key by looping over characters in line
-			for(int i=0;i<linelength;i++){
-				char c=line.at(i);
-				last=i;
-
-				// if character is not ":" or "=" or "!" or "#" interpret as key
-				if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
-					key.push_back(c);
-				}
-				else break;
-			}
-			const int end_key=last;
-
-			// Determine the rest
-			for(int i=end_key;i<linelength;i++){
-
-				char c=line.at(i);
-				//last=i;
-					// period found - interpret as word
-					if(c== *colon){
-						for(int j=i+1;j<linelength;j++){
-							// if character is not special add to value
-							char c=line.at(j);
-							if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
-								word.push_back(c);
-							}
-							// if character is special then go back to main loop
-							else{
-								i=j-1;
-								break;
-							}
-						}
-					}
-					// equals found - interpret as value
-					else if(c== *eq){
-						for(int j=i+1;j<linelength;j++){
-							// if character is not special add to value
-							char c=line.at(j);
-							if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
-								value.push_back(c);
-							}
-							// if character is special then go back to main loop
-							else{
-								i=j-1;
-								break;
-							}
-						}
-					}
-					// exclaimation mark found - interpret as unit
-					else if(c== *exc){
-						for(int j=i+1;j<linelength;j++){
-							// if character is not special add to value
-							char c=line.at(j);
-							if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
-								unit.push_back(c);
-							}
-							// if character is special then go back to main loop
-							else{
-								i=j-1;
-								break;
-							}
-						}
-					}
-					// hash found - interpret as comment
-					else if(c== *hash){
-						break;
-					}
-					//break;
-			}
+                        char *cstr = new char[line.length() + 1];
+                        strcpy(cstr, line.c_str());
+                        char *token = strtok(cstr,delim);
+                        for (int count = 0; count < 4 && token !=NULL; count++){
+                            if (count==0){key=token;}
+                            else if(count==1){word=token;}
+                            else if(count==2){value=token;}
+                            else if(count==3){unit=token;}
+                            token = strtok(NULL,delim);
+                            };
+                        delete [] cstr;
+                        delete token;
 			string empty="";
 			if(key!=empty){
 			//std::cout << "\t" << "key:  " << key << std::endl;
