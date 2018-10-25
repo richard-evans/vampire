@@ -91,6 +91,7 @@ namespace vin{
 		// Loop over all lines and pass keyword to matching function
                 char com = '#';
                 char delim[] = ":=!";
+                char cstr[512];
 		while (! inputfile.eof() ){
 			line_counter++;
 			// read in whole line
@@ -103,6 +104,7 @@ namespace vin{
 
 			// clear carriage return for dos formatted files
 			line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+                        
 
 			// strip key,word,unit,value
 			std::string key="";
@@ -112,30 +114,30 @@ namespace vin{
 
 			// get size of string
 			int linelength = line.length();
+                        // max size of char array cstr is 512, error if greater than this. // Strictly, could do after stripping comments. 
+                        if {linelength > 510){std::cout << "Input line: " << line_counter << " is too long."<<std::endl;};
 
                         // remove everything after comment character
-                        line =line.substr(0,line.find('#')) ;
-
-			// set character triggers
-                        char delim[] = ":=!";
+                        line = line.substr(0,line.find('#')) ;
 
                         // convert to c-string style, for tokenisation
-                        char *cstr = new char[line.length() + 1];
+                        //char *cstr = new char[line.length() + 1]; // Don't use new pointers. 
+
                         strcpy(cstr, line.c_str());
 
                         // tokenise the string, using delimiters from above
-                        char *token = strtok(cstr,delim);
+                        char *token = strtok(cstr,delim);  // If this is still too much pointing, 
+                                                           // an alternative would be to use strcspn 
+                                                           //or std::string find and stripping the beginning based on this. 
                         for (int count = 0; count < 4 && token !=NULL; count++){
                             if (count==0){key=token;}       // Format is always the same
-                            else if(count==1){word=token;}  // but breaks if not EOL found
+                            else if(count==1){word=token;}  // but breaks if EOL found
                             else if(count==2){value=token;}
                             else if(count==3){unit=token;}
                             token = strtok(NULL,delim);
                             };
 
                         // tidy up
-                        delete [] cstr;
-                        delete token;
 			string empty="";
 			if(key!=empty){
 			//std::cout << "\t" << "key:  " << key << std::endl;
