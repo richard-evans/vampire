@@ -115,7 +115,7 @@ namespace vin{
 			// get size of string
 			int linelength = line.length();
                         // max size of char array cstr is 512, error if greater than this. // Strictly, could do after stripping comments. 
-                        if {linelength > 510){std::cout << "Input line: " << line_counter << " is too long."<<std::endl;};
+                        if (linelength > 510){std::cout << "Input line: " << line_counter << " is too long."<<std::endl;};
 
                         // remove everything after comment character
                         line = line.substr(0,line.find('#')) ;
