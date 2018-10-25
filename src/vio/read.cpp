@@ -112,13 +112,17 @@ namespace vin{
 
 			// get size of string
 			int linelength = line.length();
+
                         // remove everything after comment character
                         line =line.substr(0,line.find('#')) ;
+
 			// set character triggers
                         char delim[] = ":=!";
+
                         // convert to c-string style, for tokenisation
                         char *cstr = new char[line.length() + 1];
                         strcpy(cstr, line.c_str());
+
                         // tokenise the string, using delimiters from above
                         char *token = strtok(cstr,delim);
                         for (int count = 0; count < 4 && token !=NULL; count++){
@@ -128,6 +132,7 @@ namespace vin{
                             else if(count==3){unit=token;}
                             token = strtok(NULL,delim);
                             };
+
                         // tidy up
                         delete [] cstr;
                         delete token;
