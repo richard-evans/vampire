@@ -249,8 +249,8 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
 			const double x0 = grain_coord_array[grain][0];
 			const double y0 = grain_coord_array[grain][1];
 
-         const double sphere_x = grain_coord_array[grain][0];
-         const double sphere_y = grain_coord_array[grain][1];
+         // const double sphere_x = grain_coord_array[grain][0]; // unused variable
+         // const double sphere_y = grain_coord_array[grain][1]; // unused variable
 
 			// copy overlap of substructure grains to a local constant
 			const double overlap = create::internal::voronoi_grain_substructure_overlap_factor;
@@ -307,8 +307,8 @@ void voronoi_substructure(std::vector<cs::catom_t> & catom_array){
                   // Check to see if site is within polygon
                   //else{
                   int mat = catom_array[atom].material;
-                  double maxz=create::internal::mp[mat].max*cs::system_dimensions[2];
-                  double minz=create::internal::mp[mat].min*cs::system_dimensions[2];
+                  //double maxz=create::internal::mp[mat].max*cs::system_dimensions[2]; // unused variable
+                  //double minz=create::internal::mp[mat].min*cs::system_dimensions[2]; // unused variable
                   // calculate reduced ranges for materials with small offset to prevent dangling atoms
                   double rminz = create::internal::mp[mat].min-0.01;
                   double rmaxz = create::internal::mp[mat].max+0.01;
@@ -378,7 +378,8 @@ bool in_pill(double x, double y, double z, double px, double py, double ptz, dou
    const double dtz2 = (z - ptz)*(z - ptz);
    const double dbz2 = (z - pbz)*(z - pbz);
 
-   bool in_r = dx2 + dy2 < r2;
+   //bool in_r = dx2 + dy2 < r2; // unused variable
+
    if(r2 == false) return false;
    bool in_cylinder = z < ptz && z > pbz;
    bool in_top = dx2 + dy2 + dtz2 < r2;

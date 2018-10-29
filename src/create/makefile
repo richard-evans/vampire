@@ -4,10 +4,9 @@
 
 # List module object filenames
 create_objects=\
-create_system2.o \
+create.o \
 cs_create_crystal_structure2.o \
 cs_create_system_type2.o \
-cs_create_neighbour_list2.o \
 cs_set_atom_vars2.o \
 alloy.o \
 bubble.o \
@@ -23,6 +22,7 @@ initialize.o \
 interface.o \
 layers.o \
 multilayers.o \
+mpi.o \
 roughness.o \
 sphere.o \
 teardrop.o \

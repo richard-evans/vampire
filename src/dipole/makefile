@@ -5,6 +5,7 @@
 # List module object filenames
 dipole_objects =\
 data.o \
+energy.o \
 field.o \
 initialize.o \
 interface.o \

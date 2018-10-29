@@ -34,7 +34,7 @@ namespace internal{
    // Function to calculate surface anisotropy tensor
    //---------------------------------------------------------------------------
    void initialise_neel_anisotropy_tensor(std::vector <std::vector <bool> >& nearest_neighbour_interactions_list,
-                                          std::vector<std::vector <cs::neighbour_t> >& cneighbourlist){
+                                          std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist){
 
       // Print informative message to log file
       zlog << zTs() << "Using Néel pair anisotropy for atoms with < threshold number of neighbours." << std::endl;
@@ -47,6 +47,7 @@ namespace internal{
 
       //	Populate surface atom and 1D nearest neighbour list and index arrays
       for(int atom=0;atom<atoms::num_atoms;atom++){
+
 
          // Only calculate parameters for atoms with less than full nn coordination
          if(atoms::surface_array[atom]){
@@ -76,16 +77,22 @@ namespace internal{
                   double eij[3]={cneighbourlist[atom][nn].vx, cneighbourlist[atom][nn].vy, cneighbourlist[atom][nn].vz};
 
                   // normalise to unit vector
-                  const double invrij=1.0/sqrt(eij[0]*eij[0]+eij[1]*eij[1]+eij[2]*eij[2]);
+                  const double rij = sqrt(eij[0]*eij[0]+eij[1]*eij[1]+eij[2]*eij[2]);
+                  const double invrij = 1.0/rij;
 
                   // normalise components to unit vector
                   eij[0] = eij[0] * invrij;
                   eij[1] = eij[1] * invrij;
                   eij[2] = eij[2] * invrij;
 
-                  // get pair anisotropy constant between atom i and j
-                  const double kij = anisotropy::internal::mp[imat].kij[jmat]*i_mu_s;
+                  // get pair anisotropy constant between atom i and j in Tesla
+                  double kij = anisotropy::internal::mp[imat].kij[jmat]*i_mu_s;
 
+                  // Adjust kij by exponential factor if needed
+                  if(internal::neel_range_dependent){
+                     // Normalised exponential e(r0) = 1.0
+                     kij = kij*exp(-neel_exponential_factor*( rij - neel_exponential_range )/neel_exponential_range);
+                  };
 
                   // loop over tensor components and sum total including local anisotropy constant
                   // note inclusion of factor - 2 . 1/2 = -1 in tensor field compared to energy due to derivative
@@ -122,6 +129,23 @@ namespace internal{
          }
          //std::cout << std::endl;
       } // end of atom loop
+
+      //---------------------------------------------------------------------------------
+      // Output Neel tensors to file
+      //---------------------------------------------------------------------------------
+
+      /*std::ofstream ofile("Neel_tensor.txt");
+
+      for(int atom=0; atom < atoms::num_atoms; atom++){
+         // only output tensors for surface atoms
+         if(atoms::surface_array[atom]){
+            ofile << atom << "\t" << atoms::x_coord_array[atom] << "\t" << atoms::y_coord_array[atom] << "\t" << atoms::z_coord_array[atom] << "\t";
+            for(int i=0; i<9; i++) ofile << anisotropy::internal::neel_tensor[ 9 * atom + i ] << "\t";
+            ofile << std::endl;
+         }
+      }
+
+      ofile.close();*/
 
    } // end of surface anisotropy initialisation
 

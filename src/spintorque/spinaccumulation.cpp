@@ -331,16 +331,16 @@ namespace st{
 
                const st::internal::three_vector_t pm_basis = gaussian_elimination(M, V);
 
-               const double pm_b1 = pm_basis.x;
+               //const double pm_b1 = pm_basis.x; // unused variable
                const double pm_b2 = pm_basis.y;
                const double pm_b3 = pm_basis.z;
 
                // Calculate the spin torque coefficients describing ast and nast
-
                const double prefac_sc = microcell_volume * st::internal::sd_exchange[cell] * i_e * i_muB;
                const double plus_perp =  (pm_b2*pm_b2 + pm_b3*pm_b3);
-               const double minus_perp = (pm_b2*pm_b2 - pm_b3*pm_b3);
-	       double aj; // the ST parameter describing Slonczewski torque
+               // const double minus_perp = (pm_b2*pm_b2 - pm_b3*pm_b3); // unused variable
+
+	            double aj; // the ST parameter describing Slonczewski torque
                double bj; // the ST parameter describing field-like torque
 
 

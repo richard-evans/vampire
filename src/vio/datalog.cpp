@@ -16,6 +16,7 @@
 // Vampire headers
 #include "config.hpp"
 #include "errors.hpp"
+#include "info.hpp"
 #include "gpu.hpp"
 #include "grains.hpp"
 #include "sim.hpp"
@@ -73,6 +74,8 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 	ofile << "# " << "  time       : " << oftime << "    process id : " << vout::zLogPid << std::endl;
 	ofile << "# " << "  hostname   : " << vout::zLogHostName << std::endl;
 	ofile << "# " << "  path       : " << directory << std::endl;
+   ofile << "# " << "  version    : " << vinfo::version() << std::endl;
+   ofile << "# " << "  githash    : " << vinfo::githash() << std::endl;
 	ofile << "#----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
 	//ofile << "# time" << "\t" << "temperature" << "\t" <<  "|m|" << "\t" << "..." << std::endl; // to be concluded...
 
@@ -136,6 +139,25 @@ namespace vout{
 		zLogInitialised=true;
 
 		zlog << zTs() << "Logfile opened" << std::endl;
+
+      //------------------------------------
+   	// Determine current directory
+   	//------------------------------------
+   	char directory [256];
+
+   	#ifdef WIN_COMPILE
+   		_getcwd(directory, sizeof(directory));
+   	#else
+   		getcwd(directory, sizeof(directory));
+   	#endif
+
+      // write system and version information
+      zlog << zTs() << "Executable : " << vout::zLogProgramName << std::endl;
+      zlog << zTs() << "Host name  : " << vout::zLogHostName << ":" << std::endl;
+      zlog << zTs() << "Directory  : " << directory << std::endl;
+      zlog << zTs() << "Process ID : " << vout::zLogPid << std::endl;
+      zlog << zTs() << "Version    : " << vinfo::version() << std::endl;
+      zlog << zTs() << "Githash    : " << vinfo::githash() << std::endl;
 
 		return;
 	}
@@ -280,16 +302,16 @@ namespace vout{
 						vout::mean_total_anisotropy_energy(zmag);
 						break;
 					case 31:
-						vout::total_cubic_anisotropy_energy(zmag);
+						//vout::total_cubic_anisotropy_energy(zmag);
 						break;
 					case 32:
-						vout::mean_total_cubic_anisotropy_energy(zmag);
+						//vout::mean_total_cubic_anisotropy_energy(zmag);
 						break;
 					case 33:
-						vout::total_surface_anisotropy_energy(zmag);
+						//vout::total_surface_anisotropy_energy(zmag);
 						break;
 					case 34:
-						vout::mean_total_surface_anisotropy_energy(zmag);
+						//vout::mean_total_surface_anisotropy_energy(zmag);
 						break;
 					case 35:
 						vout::total_exchange_energy(zmag);
@@ -310,10 +332,10 @@ namespace vout{
 						vout::mean_total_magnetostatic_energy(zmag);
 						break;
 					case 41:
-						vout::total_so_anisotropy_energy(zmag);
+						//vout::total_so_anisotropy_energy(zmag);
 						break;
 					case 42:
-						vout::mean_total_so_anisotropy_energy(zmag);
+						//vout::mean_total_so_anisotropy_energy(zmag);
 						break;
 					case 43:
 						vout::height_mvec(zmag);
@@ -348,6 +370,18 @@ namespace vout{
 					case 60:
 						vout::MPITimings(zmag);
 						break;
+					case 61:
+						vout::mean_system_specific_heat(zmag);
+						break;
+					case 62:
+						vout::mean_material_specific_heat(zmag);
+						break;
+               case 63:
+                  vout::material_total_energy(zmag);
+                  break;
+               case 64:
+                  vout::material_mean_total_energy(zmag);
+                  break;
 				}
 			}
 			// Carriage return
@@ -450,16 +484,16 @@ namespace vout{
 						vout::mean_total_anisotropy_energy(std::cout);
 						break;
 					case 31:
-						vout::total_cubic_anisotropy_energy(std::cout);
+						//vout::total_cubic_anisotropy_energy(std::cout);
 						break;
 					case 32:
-						vout::mean_total_cubic_anisotropy_energy(std::cout);
+						//vout::mean_total_cubic_anisotropy_energy(std::cout);
 						break;
 					case 33:
-						vout::total_surface_anisotropy_energy(std::cout);
+						//vout::total_surface_anisotropy_energy(std::cout);
 						break;
 					case 34:
-						vout::mean_total_surface_anisotropy_energy(std::cout);
+						//vout::mean_total_surface_anisotropy_energy(std::cout);
 						break;
 					case 35:
 						vout::total_exchange_energy(std::cout);
@@ -480,10 +514,10 @@ namespace vout{
 						vout::mean_total_magnetostatic_energy(std::cout);
 						break;
 					case 41:
-						vout::total_so_anisotropy_energy(std::cout);
+						//vout::total_so_anisotropy_energy(std::cout);
 						break;
 					case 42:
-						vout::mean_total_so_anisotropy_energy(std::cout);
+						//vout::mean_total_so_anisotropy_energy(std::cout);
 						break;
 					case 47:
 						vout::fmr_field_strength(std::cout);
@@ -500,6 +534,18 @@ namespace vout{
 					case 60:
 						vout::MPITimings(std::cout);
 						break;
+					case 61:
+						vout::mean_system_specific_heat(std::cout);
+						break;
+					case 62:
+						vout::mean_material_specific_heat(std::cout);
+						break;
+               case 63:
+                  vout::material_total_energy(std::cout);
+                  break;
+               case 64:
+                  vout::material_mean_total_energy(std::cout);
+                  break;
 				}
 			}
 
@@ -607,9 +653,11 @@ std::string zTs(){
 
 		timeinfo = localtime ( &seconds );
 		// Format time string
-		strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
+		//strftime (logtime,80,"%Y-%m-%d %X ",timeinfo);
+      strftime (logtime,80,"%d-%m-%Y [%X] ",timeinfo);
 
-		Ts << logtime << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
+		Ts << logtime;
+      // << vout::zLogProgramName << " [" << vout::zLogHostName << ":" << vout::zLogPid << ":"<< vmpi::my_rank << "] ";
 
 		return Ts.str();
 

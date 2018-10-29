@@ -165,6 +165,32 @@ The following commands control the calculation of the magnetic anisotropy energy
   interactions. Internally this sets a large threshold, and so specifying
   anisotropy:surface-anisotropy-threshold will override this flag.\\
 
+{\zicf anisotropy:neel-anisotropy-exponential-range}\addcontentsline{toc}
+{subsection}{anisotropy:neel-anisotropy-exponential-range}
+  float default [$2.5$]
+  Enables an exponentially range dependent N\'eel pair anisotropy so that
+  lattice distortions and strains change the magnetoelastic compling strength.
+  In the usual form the method only takes into account the symmetry ($L_{ij}(r)
+  = const$). The value should be set to the typical lattice parameter otherwise
+  the total anisotropy will be significantly higher or lower than expected. The
+  functional form of the range dependence is
+  \begin{equation}
+     L_{ij}(r_{ij}) = L_0 \exp\left(-F\frac{r_{ij} - r_0}{r_{0}}\right)
+  \end{equation}
+  where $r_{ij}$ is the pair separation, $r_0$ is the exponential range,
+  $F$ is the exponential factor and $L_0$ is the usual N\'eel anisotropy constant.
+  The functional form assures that at the first neighbour distance the value of
+  the N\'eel anisotropy constant is the same as would be without the range-
+  dependent form.\\
+
+{\zicf anisotropy:neel-anisotropy-exponential-factor}\addcontentsline{toc}
+{subsection}{anisotropy:neel-anisotropy-exponential-factor}
+   float default [$5.52$]
+   Enables an exponentially range dependent N\'eel pair anisotropy so that
+   lattice distortions and strains change the magnetoelastic compling strength.
+   In the usual form the method only takes into account the symmetry ($L_{ij}(r)
+   = const$). The prefactor controls the falloff with increasing range/\\
+
 \section*{Dipole field calculation}
 \addcontentsline{toc}{section}{Dipole field calculation}
 The following commands control the calculation of the dipole-dipole field. By
@@ -349,21 +375,27 @@ $ is the demagnetisation factor of the macroscopic sample. The components of the
 
 {\zicf sim:constraint-angle-phi-increment}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-increment}\\
 
-{\zicf sim:monte-carlo-algorithm}\addcontentsline{toc}{subsection}{sim:monte-carlo-algorithm}
+{\zicf sim:monte-carlo-algorithm}\addcontentsline{toc}{subsection}{sim:monte-carlo-algorithm} selects the trial move algorithm for use with the Monte Carlo solver. The following options are available:
 \begin{itemize}
+  \item[] adaptive (default)
   \item[] spin-flip
   \item[] uniform
   \item[] angle
   \item[] hinzke-nowak
 \end{itemize}
+The adaptive move performs a gaussian move with a tuned trial width to attempt to maintain a 50\% acceptance probability, and is the most efficient method in most cases. A spin flip flips the direction of the spin 180$^{\circ}$ and can be used to perform Ising-type simulations for a uniform starting configuration. Uniform moves a spin to a random location on the unit sphere. Angle performs a gaussian move with a parametric estimate of the optimal width. Hinzke-Nowak performs a random combination of spin-flip, uniform and angle type-moves.\\
 
 {\zicf sim:checkpoint flag [default false]}\addcontentsline{toc}{subsection}{sim:checkpoint}
-    Enables checkpointing of spin configuration at end of simulation
-sim:save-checkpoint=end
-sim:save-checkpoint=continuous
-sim:save-checkpoint-rate=1
-sim:load-checkpoint=restart
-sim:load-checkpoint=continue\\
+    Enables checkpointing of spin configuration at end of the simulation. The options are:
+
+\begin{itemize}
+  \item[] sim:save-checkpoint=end
+  \item[] sim:save-checkpoint=continuous
+  \item[] sim:save-checkpoint-rate=1
+  \item[] sim:load-checkpoint=restart
+  \item[] sim:load-checkpoint=continue
+\end{itemize}
+.\\
 
 {\zicf sim:preconditioning-steps
     integer [default 0]}\addcontentsline{toc}{subsection}{sim:preconditioning-steps}
@@ -501,8 +533,8 @@ outputs the components of the magnetic susceptibility $\chi$. The magnetic susce
 \end{equation*}
 where $\alpha = x,y,z,m$ giving the directional components of the magnetization in $x$, $y$ and $z$
 respectively as well as the longitudinal susceptibility $\chi_m$. The data is output in four columns
-$\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$. The susceptibility is useful for identifying the critical
-temperature for a system as well as atomistic parametrization of the micromagnetic
+$\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$ in units of Tesla$^{-1}$. The susceptibility is useful for identifying the critical
+temperature for a system as well as atomistic parameterisation of the micromagnetic
 Landau-Lifshitz-Bloch (LLB) equation.\\
 
 {\zicf output:material-mean-susceptibility}\addcontentsline{toc}{subsection}{output:mean-material-susceptibility} outputs
@@ -539,6 +571,26 @@ each sublattice can be different.\\
 {\zicf output:magnetostatic-energy}\addcontentsline{toc}{subsection}{output:magnetostatic-energy}\\
 
 {\zicf output:mean-magnetostatic-energy}\addcontentsline{toc}{subsection}{output:mean-magnetostatic-energy}\\
+
+{\zicf output:material-total-energy}\addcontentsline{toc}{subsection}{output:material-total-energy} outputs
+the total energy of each material in the system.\\
+
+{\zicf output:material-mean-total-energy}\addcontentsline{toc}{subsection}{output:material-mean-total-energy} outputs
+the mean total energy of each material in the system.\\
+
+{\zicf output:mean-specific-heat}\addcontentsline{toc}{subsection}{output:mean-specific-heat} outputs the mean
+total specific heat $C_{\mathrm{v}}$ defined by:
+\begin{equation*}
+C_{\mathrm{v}} = \frac{\left(\langle U^2 \rangle - \langle U \rangle^2 \right)}{k_{\mathrm{B}} T^2}
+\end{equation*}
+where $U$ is the internal (total) energy, $T$ is the system temperature and $k_{\mathrm{B}}$ is the Boltzmann
+constant. The outputted value has units of $k_{\mathrm{B}}$ per spin. For classical magnets the specific heat
+tends to a non-zero constant approaching zero temperature. When using spin temperature rescaling the specific
+heat tends to zero as expected for a quantum system.\\
+
+{\zicf output:material-mean-specific-heat}\addcontentsline{toc}{subsection}{output:material-mean-specific-heat} outputs the
+mean specific heat for each defined material in the system in units of $k_{\mathrm{B}}$ per spin. The data is formatted as
+one column per material.\\
 
 {\zicf output:mpi-timings}\addcontentsline{toc}{subsection}{output:mpi-timings}\\
 

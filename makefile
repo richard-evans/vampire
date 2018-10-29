@@ -52,7 +52,7 @@ ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-LLVM_CFLAGS= -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
+LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi
 LLVM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi
 
 GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi -std=c++0x
@@ -68,14 +68,18 @@ IBM_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi -O5 -qarch=450 -qtune=450
 CRAY_CFLAGS= -O3 -hfp3 -I./hdr -I./src/qvoronoi
 CRAY_LDFLAGS= -I./hdr -I./src/qvoronoi
 
+
+# Save git commit in simple function
+GHASH:=$(shell git rev-parse HEAD)
+# special options for certain files
+
+OPTIONS=
+
 # Objects
 OBJECTS= \
 obj/data/atoms.o \
 obj/data/category.o \
 obj/data/grains.o \
-obj/main/initialise_variables.o \
-obj/main/main.o \
-obj/main/material.o \
 obj/random/mtrand.o \
 obj/random/random.o \
 obj/simulate/energy.o \
@@ -83,10 +87,6 @@ obj/simulate/fields.o \
 obj/simulate/LLB.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
-obj/simulate/mc.o \
-obj/simulate/mc_moves.o \
-obj/simulate/cmc.o \
-obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/spintorque/data.o \
@@ -97,11 +97,6 @@ obj/spintorque/magnetization.o \
 obj/spintorque/matrix.o \
 obj/spintorque/output.o \
 obj/spintorque/spinaccumulation.o \
-obj/statistics/data.o \
-obj/statistics/initialize.o \
-obj/statistics/magnetization.o \
-obj/statistics/statistics.o \
-obj/statistics/susceptibility.o \
 obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
@@ -126,21 +121,23 @@ obj/qvoronoi/usermem.o\
 obj/qvoronoi/userprintf.o\
 obj/qvoronoi/userprintf_rbox.o\
 
-#obj/utility/vio.o \
-
-
 # Include supplementary makefiles
 include src/anisotropy/makefile
+include src/cells/makefile
 include src/create/makefile
 include src/config/makefile
-include src/cells/makefile
+include src/constants/makefile
 include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
+include src/main/makefile
+include src/montecarlo/makefile
 include src/mpi/makefile
+include src/neighbours/makefile
 include src/program/makefile
 include src/simulate/makefile
+include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
 
@@ -186,49 +183,49 @@ serial: $(OBJECTS)
 	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
-	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
+	$(GCC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
 serial-intel: $(ICC_OBJECTS)
 	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
-	$(ICC) -c -o $@ $(ICC_CFLAGS) $<
+	$(ICC) -c -o $@ $(ICC_CFLAGS) $(OPTIONS) $<
 
 serial-llvm: $(LLVM_OBJECTS)
 	$(LLVM) $(LLVM_LDFLAGS) $(LIBS) $(LLVM_OBJECTS) -o $(EXECUTABLE)
 
 $(LLVM_OBJECTS): obj/%_llvm.o: src/%.cpp
-	$(LLVM) -c -o $@ $(LLVM_CFLAGS) $<
+	$(LLVM) -c -o $@ $(LLVM_CFLAGS) $(OPTIONS) $<
 
 serial-ibm: $(IBM_OBJECTS)
 	$(IBM) $(IBM_LDFLAGS) $(IBM_OBJECTS) -o $(EXECUTABLE)
 
 $(IBM_OBJECTS): obj/%_ibm.o: src/%.cpp
-	$(IBM) -c -o $@ $(IBM_CFLAGS) $<
+	$(IBM) -c -o $@ $(IBM_CFLAGS) $(OPTIONS) $<
 
 serial-debug: $(GCCDB_OBJECTS)
 	$(GCC) $(GCC_DBLFLAGS) $(LIBS) $(GCCDB_OBJECTS) -o $(EXECUTABLE)-debug
 
 $(GCCDB_OBJECTS): obj/%_gdb.o: src/%.cpp
-	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $<
+	$(GCC) -c -o $@ $(GCC_DBCFLAGS) $(OPTIONS) $<
 
 serial-llvm-debug: $(LLVMDB_OBJECTS)
 	$(LLVM) $(LLVM_DBLFLAGS) $(LIBS) $(LLVMDB_OBJECTS) -o $(EXECUTABLE)
 
 $(LLVMDB_OBJECTS): obj/%_llvmdb.o: src/%.cpp
-	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $<
+	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $(OPTIONS) $<
 
 intel-debug: $(ICCDB_OBJECTS)
 	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(ICCDB_OBJECTS): obj/%_idb.o: src/%.cpp
-	$(ICC) -c -o $@ $(ICC_DBCFLAGS) $<
+	$(ICC) -c -o $@ $(ICC_DBCFLAGS) $(OPTIONS) $<
 
 pathscale-debug: $(ICCDB_OBJECTS)
 	$(PCC) $(PCC_DBLFLAGS) $(LIBS) $(PCCDB_OBJECTS) -o $(EXECUTABLE)
 
 $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
-	$(PCC) -c -o $@ $(PCC_DBCFLAGS) $<
+	$(PCC) -c -o $@ $(PCC_DBCFLAGS) $(OPTIONS) $<
 
 #ibm-debug: $(ICCDB_OBJECTS)
 #        $(PCC) $(PCC_DBLFLAGS) $(PCCDB_OBJECTS) -o $(EXECUTABLE)
@@ -240,62 +237,69 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 
 parallel: $(MPI_OBJECTS)
 	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(PEXECUTABLE)
-#export OMPI_CXX=icc
+
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
+	$(MPICC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
 parallel-intel: $(MPI_ICC_OBJECTS)
 	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)
+
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<intel: $(MPI_ICC_OBJECTS)
 
 parallel-cray: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(PEXECUTABLE)
+
 $(MPI_CRAY_OBJECTS): obj/%_cray_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(CRAY_CFLAGS) $<
 
 parallel-archer: $(MPI_ARCHER_OBJECTS)
 	CC -DMPICF $(GCC_LDFLAGS) $(LIBS) $(MPI_ARCHER_OBJECTS) -o $(PEXECUTABLE)
+
 $(MPI_ARCHER_OBJECTS): obj/%_archer_mpi.o: src/%.cpp
 	CC -DMPICF -c -o $@ $(GCC_CFLAGS) $<
 
 parallel-llvm: $(MPI_LLVM_OBJECTS)
 	$(MPICC) $(LLVM_LDFLAGS) $(LIBS) $(MPI_LLVM_OBJECTS) -o $(PEXECUTABLE)
+
 $(MPI_LLVM_OBJECTS): obj/%_llvm_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(LLVM_CFLAGS) $<
+	$(MPICC) -c -o $@ $(LLVM_CFLAGS) $(OPTIONS) $<
 
 parallel-pathscale: $(MPI_PCC_OBJECTS)
 	$(MPICC) $(PCC_LDFLAGS) $(LIBS) $(MPI_PCC_OBJECTS) -o $(PEXECUTABLE)
+
 $(MPI_PCC_OBJECTS): obj/%_p_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(PCC_CFLAGS) $<
+	$(MPICC) -c -o $@ $(PCC_CFLAGS) $(OPTIONS) $<
 
 parallel-ibm: $(MPI_IBM_OBJECTS)
 	$(MPICC) $(IBM_LDFLAGS) $(MPI_IBM_OBJECTS) -o $(PEXECUTABLE)
+
 $(MPI_IBM_OBJECTS): obj/%_ibm_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(IBM_CFLAGS) $<
+	$(MPICC) -c -o $@ $(IBM_CFLAGS) $(OPTIONS) $<
 
 parallel-debug: $(MPI_GCCDB_OBJECTS)
 	$(MPICC) $(GCC_DBLFLAGS) $(LIBS) $(MPI_GCCDB_OBJECTS) -o $(PEXECUTABLE)-debug
 
 $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $<
+	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $(OPTIONS) $<
 
 parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
 	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(PEXECUTABLE)
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $<
+	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $(OPTIONS) $<
 
 parallel-cray-debug: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(PEXECUTABLE)
+
 $(MPI_CRAYDB_OBJECTS): obj/%_craydb_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(CCC_CFLAGS) $<
+	$(MPICC) -c -o $@ $(CCC_CFLAGS) $(OPTIONS) $<
 
 parallel-pathscale-debug: $(MPI_PCCDB_OBJECTS)
 	$(MPICC) $(PCC_DBLFLAGS) $(LIBS) $(MPI_PCCDB_OBJECTS) -o $(PEXECUTABLE)
 
 $(MPI_PCCDB_OBJECTS): obj/%_pdb_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $<
+	$(MPICC) -c -o $@ $(PCC_DBCFLAGS) $(OPTIONS) $<
 
 clean:
 	@rm -f obj/*.o

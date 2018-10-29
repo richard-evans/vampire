@@ -24,9 +24,6 @@ namespace create{
 
       void bubble(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain){
 
-			// Set particle radius
-         const double particle_radius_squared = (cs::particle_scale*0.5)*(cs::particle_scale*0.5);
-
          // Set bubble nucleation height and radius
          const double nucleation_height = create::internal::bubble_nucleation_height;
          const double bubble_radius = create::internal::bubble_radius;

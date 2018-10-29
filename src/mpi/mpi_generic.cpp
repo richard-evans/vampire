@@ -72,6 +72,9 @@ int initialise(int argc, char *argv[]){
  	MPI_Comm_rank(MPI_COMM_WORLD, &vmpi::my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &vmpi::num_processors);
 
+   // set master flag on master (root) process
+   if(vmpi::my_rank == 0) vmpi::master = true;
+
 	MPI_Get_processor_name(vmpi::hostname, &resultlen);
 	//IOCommunicator(num_io_processors);
 	// Start MPI Timer

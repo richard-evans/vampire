@@ -1,51 +1,14 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard Evans 2017. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
+//------------------------------------------------------------------------------
 //
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-///
-///	@file  cmc.cpp
-///  	@brief  Constrained Monte Carlo integrator
-///
-/// Constrained Monte Carlo is implemented which allows the direction of
-/// total magnetisation to be constrained. This is completed by making
-/// Monte Carlo moves on a pair of spins simultaneously in the system and
-/// forcing this to be conservative of the magnetisation direction.
-///
-///	@author  Joe Barker (jb544), jb544@york.ac.uk
-///	@author Richard Evans, richard.evans@york.ac.uk
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, Joe Barker 2009-2011. All Rights Reserved.
-///
-///  @internal
-///    Created  08/06/2009
-///   Revision  1.1
-///   Modified from original Fortran
-///  Copyright  Copyright (c) 2011, Richard Evans
-///
-///=====================================================================================
-///
 
 // Standard Libraries
 #include <cmath>
@@ -61,6 +24,11 @@
 #include "sim.hpp"
 #include "vmath.hpp"
 #include "vio.hpp"
+
+// Internal header files
+#include "internal.hpp"
+
+namespace montecarlo{
 
 /// local cmc namespace
 namespace cmc{
@@ -180,20 +148,19 @@ void rotate_spins_around_z_axis(double ddz){
 
 	// loop over all spins and rotate by theta around z
 	for(int atom =0;atom<atoms::num_atoms;atom++){
-			std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
 
 			// Load spin coordinates
-			Sold[0]=atoms::x_spin_array[atom];
-			Sold[1]=atoms::y_spin_array[atom];
-			Sold[2]=atoms::z_spin_array[atom];
+			internal::Sold[0]=atoms::x_spin_array[atom];
+			internal::Sold[1]=atoms::y_spin_array[atom];
+			internal::Sold[2]=atoms::z_spin_array[atom];
 
 			// Calculate new spin positions
-			Snew = vmath::matmul(Sold,z_rotation_matrix);
+			internal::Snew = vmath::matmul(internal::Sold,z_rotation_matrix);
 
 			// Set new spin positions
-			atoms::x_spin_array[atom]=Snew[0];
-			atoms::y_spin_array[atom]=Snew[1];
-			atoms::z_spin_array[atom]=Snew[2];
+			atoms::x_spin_array[atom]=internal::Snew[0];
+			atoms::y_spin_array[atom]=internal::Snew[1];
+			atoms::z_spin_array[atom]=internal::Snew[2];
 		}
 
 	return;
@@ -211,20 +178,19 @@ void rotate_spins_around_x_axis(double ddx){
 
 	// loop over all spins and rotate by phi around x
 	for(int atom =0;atom<atoms::num_atoms;atom++){
-		std::vector<double> Sold(3), Snew(3); // Vectors to hold spins
 
 		// Load spin coordinates
-		Sold[0]=atoms::x_spin_array[atom];
-		Sold[1]=atoms::y_spin_array[atom];
-		Sold[2]=atoms::z_spin_array[atom];
+		internal::Sold[0]=atoms::x_spin_array[atom];
+		internal::Sold[1]=atoms::y_spin_array[atom];
+		internal::Sold[2]=atoms::z_spin_array[atom];
 
 		// Calculate new spin positions
-		Snew = vmath::matmul(Sold,x_rotation_matrix);
+		internal::Snew = vmath::matmul(internal::Sold,x_rotation_matrix);
 
 		// Set new spin positions
-		atoms::x_spin_array[atom]=Snew[0];
-		atoms::y_spin_array[atom]=Snew[1];
-		atoms::z_spin_array[atom]=Snew[2];
+		atoms::x_spin_array[atom]=internal::Snew[0];
+		atoms::y_spin_array[atom]=internal::Snew[1];
+		atoms::z_spin_array[atom]=internal::Snew[2];
 	}
 
 	return;
@@ -232,19 +198,14 @@ void rotate_spins_around_x_axis(double ddx){
 
 } // end of cmc namespace
 
-namespace sim{
-///
-/// @brief        Initialise Constrained Monte Carlo module
-///
-/// Creates the rotation matices for the given angle and computes the
-/// Boltzmann factor for the given temperature.
-///
-/// @return       void
-///
+//------------------------------------------------------------------------------
+// Creates the rotation matices for the given angle and computes the
+// Boltzmann factor for the given temperature.
+//------------------------------------------------------------------------------
 void CMCinit(){
 
 	// Check for calling of function
-	if(err::check==true) std::cout << "sim::CMCinit has been called" << std::endl;
+	if(err::check==true) std::cout << "montecarlo::CMCinit has been called" << std::endl;
 
 	// Create rotational matrices for cmc
 	cmc::polar_rot_matrix(sim::constraint_phi,sim::constraint_theta, cmc::polar_matrix, cmc::polar_matrix_tp, cmc::polar_vector);
@@ -313,20 +274,15 @@ void CMCinit(){
 	return;
 }
 
-
-///
-/// @brief      Runs the Constrained Monte Carlo algorithm
-///
-/// Chooses nspins random spin pairs from the spin system and attempts a
-/// Constrained Monte Carlo move on each pair, accepting for either lower
-/// energy or with a Boltzmann thermal weighting.
-///
-/// @return     void
-///
-int ConstrainedMonteCarlo(){
+//------------------------------------------------------------------------------
+// Chooses nspins random spin pairs from the spin system and attempts a
+// Constrained Monte Carlo move on each pair, accepting for either lower
+// energy or with a Boltzmann thermal weighting.
+//------------------------------------------------------------------------------
+int cmc_step(){
 
 	// Check for calling of function
-	if(err::check==true) std::cout << "sim::ConstrainedMonteCarlo has been called" << std::endl;
+	if(err::check==true) std::cout << "montecarlo::ConstrainedMonteCarlo has been called" << std::endl;
 
 	// check for cmc initialisation
 	if(cmc::is_initialised==false) CMCinit();
@@ -343,8 +299,8 @@ int ConstrainedMonteCarlo(){
 	double Eold;
 	double Enew;
 
-	std::valarray<double> spin1_initial(3);
-	std::valarray<double> spin1_final(3);
+	std::vector<double> spin1_initial(3);
+	std::vector<double> spin1_final(3);
 	double spin2_initial[3];
 	double spin2_final[3];
 
@@ -405,7 +361,7 @@ int ConstrainedMonteCarlo(){
 		// get spin moment for atom 1
 		const double mu1 = atoms::m_spin_array[atom_number1];
 
-      sim::mc_delta_angle=sigma_array[imat1];
+      internal::delta_angle=sigma_array[imat1];
 
 		// Save initial Spin 1
 		spin1_initial[0] = atoms::x_spin_array[atom_number1];
@@ -418,7 +374,7 @@ int ConstrainedMonteCarlo(){
 		spin1_init_mvd[2]=ppolar_matrix[2][0]*spin1_initial[0]+ppolar_matrix[2][1]*spin1_initial[1]+ppolar_matrix[2][2]*spin1_initial[2];
 
       // Make Monte Carlo move
-      sim::mc_move(spin1_initial,spin1_final);
+      montecarlo::internal::mc_move(spin1_initial,spin1_final);
 
 		//spin1_fin_mvd = matmul(polar_matrix, spin1_final)
 		spin1_fin_mvd[0]=ppolar_matrix[0][0]*spin1_final[0]+ppolar_matrix[0][1]*spin1_final[1]+ppolar_matrix[0][2]*spin1_final[2];
@@ -543,4 +499,4 @@ int ConstrainedMonteCarlo(){
 	return EXIT_SUCCESS;
 }
 
-} // End of namespace sim
+} // End of namespace montecarlo

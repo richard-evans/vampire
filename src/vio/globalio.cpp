@@ -32,4 +32,4 @@ void terminaltextcolor(enum textcolor color){
 	std::cout << "\033["<<fincolor.str()<<"m";
 	std::cerr << "\033["<<fincolor.str()<<"m";
 #endif
-};
+}

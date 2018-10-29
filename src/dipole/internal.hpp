@@ -42,7 +42,7 @@ namespace dipole{
       // enumerated list of different dipole solvers
       enum solver_t{
          macrocell    = 0, // original bare macrocell method (cheap but inaccurate)
-         tensor       = 1, // new macrocell with tensor including local corrections
+         tensor       = 1 // new macrocell with tensor including local corrections
          //multipole    = 2, // bare macrocell but with multipole expansion
          //hierarchical = 3, // new macrocell with tensor including local corrections and nearfield multipole
          //exact        = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)

@@ -17,6 +17,7 @@
 #include "vio.hpp"
 #include "grains.hpp"
 #include "material.hpp"
+#include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
 
@@ -148,14 +149,14 @@ namespace vout{
 	// Output Function 18
 	void material_constraint_phi(std::ostream& stream){
 		for(int mat=0;mat<mp::num_materials;mat++){
-			stream << cmc::cmc_mat[mat].constraint_phi << "\t";
+			stream << montecarlo::cmc::cmc_mat[mat].constraint_phi << "\t";
 		}
 	}
 
 	// Output Function 19
 	void material_constraint_theta(std::ostream& stream){
 		for(int mat=0;mat<mp::num_materials;mat++){
-			stream << cmc::cmc_mat[mat].constraint_theta << "\t";
+			stream << montecarlo::cmc::cmc_mat[mat].constraint_theta << "\t";
 		}
 	}
 
@@ -211,26 +212,26 @@ namespace vout{
 
 	// Output Function 27
 	void total_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::all, stats::total);
+      stream << stats::system_energy.output_energy(stats::total);
 	}
 
 	// Output Function 28
 	void mean_total_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::all, stats::mean);
+      stream << stats::system_energy.output_mean_energy(stats::total);
 	}
 
 	// Output Function 29
 	void total_anisotropy_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::anisotropy, stats::total);
+      stream << stats::system_energy.output_energy(stats::anisotropy);
 	}
 
 	// Output Function 30
 	void mean_total_anisotropy_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::anisotropy, stats::mean);
+      stream << stats::system_energy.output_mean_energy(stats::anisotropy);
 	}
 
 	// Output Function 31
-	void total_cubic_anisotropy_energy(std::ostream& stream){
+	/*void total_cubic_anisotropy_energy(std::ostream& stream){
 		stats::output_energy(stream, stats::cubic_anisotropy, stats::total);
 	}
 
@@ -247,47 +248,47 @@ namespace vout{
 	// Output Function 34
 	void mean_total_surface_anisotropy_energy(std::ostream& stream){
 		stats::output_energy(stream, stats::surface_anisotropy, stats::mean);
-	}
+	}*/
 
 	// Output Function 35
 	void total_exchange_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::exchange, stats::total);
+      stream << stats::system_energy.output_energy(stats::exchange);
 	}
 
 	// Output Function 36
 	void mean_total_exchange_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::exchange, stats::mean);
+      stream << stats::system_energy.output_mean_energy(stats::exchange);
 	}
 
 	// Output Function 37
 	void total_applied_field_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::applied_field, stats::total);
+      stream << stats::system_energy.output_energy(stats::applied_field);
 	}
 
 	// Output Function 38
 	void mean_total_applied_field_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::applied_field, stats::mean);
+      stream << stats::system_energy.output_mean_energy(stats::applied_field);
 	}
 
 	// Output Function 39
 	void total_magnetostatic_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::magnetostatic, stats::total);
+      stream << stats::system_energy.output_energy(stats::magnetostatic);
 	}
 
 	// Output Function 40
 	void mean_total_magnetostatic_energy(std::ostream& stream){
-		stats::output_energy(stream, stats::magnetostatic, stats::mean);
+      stream << stats::system_energy.output_mean_energy(stats::magnetostatic);
 	}
 
 	// Output Function 41
-	void total_so_anisotropy_energy(std::ostream& stream){
+	/*void total_so_anisotropy_energy(std::ostream& stream){
 		stats::output_energy(stream, stats::second_order_anisotropy, stats::total);
 	}
 
 	// Output Function 42
 	void mean_total_so_anisotropy_energy(std::ostream& stream){
 		stats::output_energy(stream, stats::second_order_anisotropy, stats::mean);
-	}
+	}*/
 
 	// Output Function 43
 	void height_mvec(std::ostream& stream){
@@ -341,8 +342,28 @@ namespace vout{
 
 	// Output Function 60
 	void MPITimings(std::ostream& stream){
-
 		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
 		stream << "\t" << vmpi::MaximumComputeTime << "\t" << vmpi::MaximumWaitTime << "\t";
 	}
+
+   // Output Function 61
+   void mean_system_specific_heat(std::ostream& stream){
+      stream << stats::system_specific_heat.output_mean_specific_heat(sim::temperature);
+   }
+
+   // Output Function 62
+   void mean_material_specific_heat(std::ostream& stream){
+      stream << stats::material_specific_heat.output_mean_specific_heat(sim::temperature);
+   }
+
+   // Output Function 63
+   void material_total_energy(std::ostream& stream){
+      stream << stats::material_energy.output_energy(stats::total);
+   }
+
+   // Output Function 64
+   void material_mean_total_energy(std::ostream& stream){
+      stream << stats::material_energy.output_mean_energy(stats::total);
+   }
+
 }

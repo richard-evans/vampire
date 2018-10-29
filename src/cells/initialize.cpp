@@ -240,7 +240,10 @@ namespace cells{
          cells::num_atoms_in_cell_global.resize(cells::num_cells);
          cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
          MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-		#endif
+      #else
+         // copy num_atoms_in_cell to global version
+         cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
+      #endif
 
       // Used to calculate magnetisation in each cell. Poor approximation when unit cell size ~ system size.
       // Atomic volume is corrected by a factor which makes it a magnetic atomic volume
@@ -287,7 +290,7 @@ namespace cells{
       for(int atom=0;atom<num_local_atoms;atom++){
          int local_cell=cells::atom_cell_id_array[atom];
          int type = cells::internal::atom_type_array[atom];
-         const double mus = mp::material[type].mu_s_SI;
+         // const double mus = mp::material[type].mu_s_SI; unused variable
          // Consider only magnetic elements
          if(mp::material[type].non_magnetic==0){
             cells::atom_in_cell_coords_array_x[local_cell][cells::num_atoms_in_cell[local_cell]]=atom_coords_x[atom];

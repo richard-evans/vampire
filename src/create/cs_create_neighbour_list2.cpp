@@ -221,10 +221,14 @@ int create_neighbourlist(std::vector<cs::catom_t> & catom_array, std::vector<std
 
    zlog << zTs() << "\tDone"<< std::endl;
 
-   // Get unit cell size
-   const double ucdx=cs::unit_cell.dimensions[0];
-   const double ucdy=cs::unit_cell.dimensions[1];
-   const double ucdz=cs::unit_cell.dimensions[2];
+   #ifdef MPICF
+     // Parallel periodic boundaries are handled explicitly elsewhere
+   #else
+      // Get unit cell size
+      const double ucdx=cs::unit_cell.dimensions[0];
+      const double ucdy=cs::unit_cell.dimensions[1];
+      const double ucdz=cs::unit_cell.dimensions[2];
+   #endif
 
 	// Generate neighbour list
 	std::cout <<"Generating neighbour list"<< std::flush;

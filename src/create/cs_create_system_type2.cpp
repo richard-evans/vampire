@@ -843,9 +843,9 @@ void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<c
 
    // loop over all atoms to find closest atom
    for(int atom=0;atom<catom_array.size();atom++){
-      double dx = catom_array[atom].x-particle_origin[0];
-      double dy = catom_array[atom].y-particle_origin[1];
-      double dz = catom_array[atom].z-particle_origin[2];
+      double dx = catom_array[atom].x - prx;
+      double dy = catom_array[atom].y - pry;
+      double dz = catom_array[atom].z - prz;
       double r = dx*dx + dy*dy + dz*dz;
       if(r < max_range_sq){
          max_range_sq = r;

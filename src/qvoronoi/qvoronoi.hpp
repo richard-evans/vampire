@@ -6,6 +6,6 @@
 #define QVORONOI
 #include <stdio.h>
 
-void qvoronoi(int , char *[], FILE* , FILE* ); 
+void qvoronoi(int , char *[], FILE* , FILE* );
 
 #endif

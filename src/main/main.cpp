@@ -28,10 +28,20 @@
 
 #include "create.hpp"
 #include "errors.hpp"
+#include "info.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
+
+#include "internal.hpp"
+
+// main namespace
+namespace vmain{
+   namespace internal{
+      std::string input_file_name = "input"; // default input file name
+   }
+}
 
 int simulate_system();
 
@@ -39,39 +49,13 @@ int simulate_system();
 /// Prints out program header and calls main program routines
 int main(int argc, char* argv[]){
 
-   //=============================================================
-   // Check for valid command-line arguments
-   //=============================================================
-   std::string infile="input";
-
-   for(int arg = 1; arg < argc; arg++){
-      std::string sw=argv[arg];
-      // input file
-      if(sw=="-f"){
-         // check number of args not exceeded
-         if(arg+1 < argc){
-            arg++;
-            infile=string(argv[arg]);
-         }
-         else{
-      	    terminaltextcolor(RED);
-            std::cerr << "Error - no file specified for \'-f\' command line option" << std::endl;
-            terminaltextcolor(WHITE);
-            return EXIT_FAILURE;
-         }
-      }
-      else{
-         terminaltextcolor(RED);
-         std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
-         terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
-   }
-
    // For parallel execution intialise MPI
    #ifdef MPICF
       vmpi::initialise(argc, argv);
    #endif
+
+   // Check for valid command-line arguments
+   vmain::internal::command_line_args(argc, argv);
 
    // Initialise log file
    vout::zLogTsInit(std::string(argv[0]));
@@ -87,17 +71,19 @@ int main(int argc, char* argv[]){
       std::cout << "                                         | |               " << std::endl;
       std::cout << "                                         |_|               " << std::endl;
       std::cout << std::endl;
-      std::cout << "                      Version 4.0.0 " << __DATE__ << " " << __TIME__ << std::endl;
+      std::cout << "                      Version " << vinfo::version() << " " << __DATE__ << " " << __TIME__ << std::endl;
       std::cout << std::endl;
-
+      std::cout << "             Git commit: " << vinfo::githash() << std::endl;
+      std::cout << std::endl;
       std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
       std::cout << std::endl;
       std::cout << "  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>" << std::endl;
       std::cout << std::endl;
-      std::cout << "  Contributors: Weijia Fan, Phanwadee Chureemart, Andrea Meo, " << std::endl;
-      std::cout << "                Rory Pond, Sarah Jenkins, Joe Barker, " << std::endl;
+      std::cout << "  Contributors: Andrea Meo, Rory Pond, Weijia Fan," << std::endl;
+      std::cout << "                Phanwadee Chureemart, Sarah Jenkins, Joe Barker, " << std::endl;
       std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell," << std::endl;
-      std::cout << "                Wu Hong-Ye" << std::endl;
+      std::cout << "                Wu Hong-Ye, Matthew Ellis, Razvan Ababei, " << std::endl;
+      std::cout << "                Sam Westmoreland, Oscar Arbelaez, Sam Morris" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
       std::cout << "                Compiled with:  " << COMP << std::endl;
@@ -133,7 +119,7 @@ int main(int argc, char* argv[]){
    #endif
 
    // Initialise system
-   mp::initialise(infile);
+   mp::initialise(vmain::internal::input_file_name);
 
    // Create system
    cs::create();

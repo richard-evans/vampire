@@ -15,21 +15,21 @@ dimensions:system-size-z = 7.7 !nm
 #------------------------------------------
 # Material Files:
 #------------------------------------------
-material:file=Co.mat
+material:file = Co.mat
 
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature=300.0
-sim:time-steps-increment=1000
-sim:total-time-steps=10000
-sim:time-step=1.0E-15
+sim:temperature = 300.0
+sim:time-steps-increment = 1000
+sim:total-time-steps = 10000
+sim:time-step = 1 !fs
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
-sim:program=benchmark
-sim:integrator=llg-heun
+sim:program = benchmark
+sim:integrator = llg-heun
 
 #------------------------------------------
 # data output
