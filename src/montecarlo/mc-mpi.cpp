@@ -15,6 +15,7 @@
 #include <vector>
 
 // Vampire Header files
+#include "errors.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "vmpi.hpp"
@@ -28,8 +29,12 @@ namespace montecarlo{
 // Initialise octant arrays to store which atom is in which octant for the
 // checkerboard MC algorithm
 //------------------------------------------------------------------------------
-void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
-                      double min_dim[3], double max_dim[3]){
+void mc_parallel_init(std::vector<double> &x, // atomic coordinates
+                      std::vector<double> &y,
+                      std::vector<double> &z,
+                      double min_dim[3], // minimum dimensions on local processor
+                      double max_dim[3]){ // maximum dimensions on local processor
+
    // Convenient shorthands
    int catoms = vmpi::num_core_atoms;
    int batoms = vmpi::num_bdry_atoms;
@@ -48,9 +53,9 @@ void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vecto
             // Loop through all core atoms
             for (int i=0; i<catoms; i++){
                // Check if current atom is in desired octant
-               if (   x[i] > min_dim[0] + widthx*xoct*0.5 && x[i] < min_dim[0] + widthx*0.5 + widthx*xoct*0.5
-                   && y[i] > min_dim[1] + widthy*yoct*0.5 && y[i] < min_dim[1] + widthy*0.5 + widthy*yoct*0.5
-                   && z[i] > min_dim[2] + widthz*zoct*0.5 && z[i] < min_dim[2] + widthz*0.5 + widthz*zoct*0.5)
+               if (   x[i] >= min_dim[0] + widthx*xoct*0.5 && x[i] < min_dim[0] + widthx*0.5 + widthx*xoct*0.5
+                   && y[i] >= min_dim[1] + widthy*yoct*0.5 && y[i] < min_dim[1] + widthy*0.5 + widthy*yoct*0.5
+                   && z[i] >= min_dim[2] + widthz*zoct*0.5 && z[i] < min_dim[2] + widthz*0.5 + widthz*zoct*0.5)
                {
                   internal::c_octants[octant_num].push_back(i);
                }
@@ -68,9 +73,9 @@ void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vecto
             // Loop through all boundary atoms
             for (int i=catoms; i<catoms+batoms; i++){
                // Check if current atom is in desired octant
-               if (   x[i] > min_dim[0] + widthx*xoct*0.5 && x[i] < min_dim[0] + widthx*0.5 + widthx*xoct*0.5
-                   && y[i] > min_dim[1] + widthy*yoct*0.5 && y[i] < min_dim[1] + widthy*0.5 + widthy*yoct*0.5
-                   && z[i] > min_dim[2] + widthz*zoct*0.5 && z[i] < min_dim[2] + widthz*0.5 + widthz*zoct*0.5)
+               if (   x[i] >= min_dim[0] + widthx*xoct*0.5 && x[i] < min_dim[0] + widthx*0.5 + widthx*xoct*0.5
+                   && y[i] >= min_dim[1] + widthy*yoct*0.5 && y[i] < min_dim[1] + widthy*0.5 + widthy*yoct*0.5
+                   && z[i] >= min_dim[2] + widthz*zoct*0.5 && z[i] < min_dim[2] + widthz*0.5 + widthz*zoct*0.5)
                {
                   internal::b_octants[octant_num].push_back(i);
                }
@@ -79,12 +84,33 @@ void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vecto
          }
       }
    }
+
+   //--------------------------------------------------------------------
+   // check that all atoms have been allocated an octant
+   //--------------------------------------------------------------------
+   // core atoms
+   int num_atoms_in_octants = 0;
+   for(int i=0; i< 8; i++) num_atoms_in_octants += internal::c_octants[i].size();
+   if(num_atoms_in_octants != catoms){
+      std::cerr << "Programmer error: missing atoms in core octants in parallel monte carlo initialisation" << std::endl;
+      err::vexit();
+   }
+   // boundary atoms
+   num_atoms_in_octants = 0;
+   for(int i=0; i< 8; i++) num_atoms_in_octants += internal::b_octants[i].size();
+   if(num_atoms_in_octants != batoms){
+      std::cerr << "Programmer error: missing atoms in boundary octants in parallel monte carlo initialisation" << std::endl;
+      err::vexit();
+   }
+
+   // set flag to indicate that parallel MC has been initialised
    mc_parallel_initialized = true;
+
 }
 
-   //------------------------------------------------------------------------------
-   // Integrates a Monte Carlo step in parallel
-   //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Integrates a Monte Carlo step in parallel
+//------------------------------------------------------------------------------
 void mc_step_parallel(std::vector<double> &x_spin_array,
                       std::vector<double> &y_spin_array,
                       std::vector<double> &z_spin_array,
@@ -117,15 +143,15 @@ void mc_step_parallel(std::vector<double> &x_spin_array,
       //Initialise non-blocking send
       vmpi::mpi_init_halo_swap();
 
-      //
-      //Integrate core region
-      //
+      //---------------------------------
+      // Integrate core region
+      //---------------------------------
       for(int i=0; i<nmoves; i++){
 
          // add one to number of moves counter
          statistics_moves+=1.0;
 
-      	// pick atom
+      	// pick random atom in octant
       	atom = internal::c_octants[octant][int(nmoves*mtrandom::grnd())];
 
       	// get material id
@@ -173,7 +199,7 @@ void mc_step_parallel(std::vector<double> &x_spin_array,
       	}
       }
 
-      //Finish non-blocking data send/receive
+      // Finish non-blocking data send/receive
       vmpi::mpi_complete_halo_swap();
 
       //
@@ -242,7 +268,7 @@ void mc_step_parallel(std::vector<double> &x_spin_array,
       // Swap timers wait -> compute
       vmpi::TotalWaitTime += vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
 
-   }
+   } // end of octant loop
 
    //Collect statistics from all processors
    double global_statistics_moves = 0.0;
