@@ -107,10 +107,15 @@ namespace dipole{
       switch (dipole::internal::solver){
 
          case dipole::internal::macrocell:
-            dipole::internal::initialize_macrocell_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
-                                                       dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, dipole::internal::cells_pos_and_mom_array,
-                                                       cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
-                                                       dipole::internal::atom_type_array, dipole::internal::atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
+            dipole::internal::initialize_macrocell_solver(cells_num_atoms_in_unit_cell,
+                                                          dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells,
+                                                          cells_macro_cell_size_x,
+                                                          cells_macro_cell_size_y,
+                                                          cells_macro_cell_size_z,
+                                                          dipole::internal::cells_local_cell_array,
+                                                          dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, dipole::internal::cells_pos_and_mom_array,
+                                                          cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
+                                                          dipole::internal::atom_type_array, dipole::internal::atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
             break;
 
          case dipole::internal::tensor:

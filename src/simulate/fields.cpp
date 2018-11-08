@@ -66,15 +66,9 @@ void calculate_fmr_fields(const int,const int);
 void calculate_lagrange_fields(const int,const int);
 void calculate_full_spin_fields(const int start_index,const int end_index);
 
-<<<<<<< HEAD
-int calculate_spin_fields(const int start_index,const int end_index){
-
-=======
-
 namespace sim{
 
 void calculate_spin_fields(const int start_index,const int end_index){
->>>>>>> environment
 	///======================================================
 	/// 		Subroutine to calculate spin dependent fields
 	///
@@ -172,7 +166,8 @@ void calculate_external_fields(const int start_index,const int end_index){
 	calculate_dipolar_fields(start_index,end_index);
 
 }
-}
+
+} // end of namespace sim
 
 int calculate_applied_fields(const int start_index,const int end_index){
 	///==========================================================================

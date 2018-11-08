@@ -34,9 +34,9 @@ using namespace std;
 
 namespace env = environment::internal;
 
-void neighbours(int env, int mm, double overlap);
-
 namespace environment{
+
+   void neighbours(int env, int mm, double overlap);
 
    //----------------------------------------------------------------------------
    // Function to initialize environment module
@@ -333,11 +333,11 @@ namespace environment{
 
       }
 
-   } // end of environment namespace
+      void neighbours(int env, int mm, double overlap){
+         environment::list_of_mm_cells_with_neighbours.push_back(mm);
+         environment::list_of_env_cells_with_neighbours.push_back(env);
+         environment::list_of_overlap_area.push_back(overlap);
+         environment::num_interactions++;
+      }
 
-void neighbours(int env, int mm, double overlap){
-   environment::list_of_mm_cells_with_neighbours.push_back(mm);
-   environment::list_of_env_cells_with_neighbours.push_back(env);
-   environment::list_of_overlap_area.push_back(overlap);
-   environment::num_interactions++;
-   }
+   } // end of environment namespace

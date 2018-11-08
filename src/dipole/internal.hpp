@@ -40,14 +40,17 @@ namespace dipole{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern bool initialised;
+
+      #ifdef FFT
       extern fftw_plan MxP,MyP,MzP;
       extern fftw_plan HxP,HyP,HzP;
+      #endif
 
       // enumerated list of different dipole solvers
       enum solver_t{
          macrocell    = 0, // original bare macrocell method (cheap but inaccurate)
          tensor       = 1, // new macrocell with tensor including local corrections
-         fft          = 5, // fft method with charge sheets
+         fft          = 5 // fft method with charge sheets
          //multipole    = 2, // bare macrocell but with multipole expansion
          //hierarchical = 3, // new macrocell with tensor including local corrections and nearfield multipole
          //exact        = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)
@@ -181,7 +184,9 @@ namespace dipole{
       void initialize_macrocell_solver(const int cells_num_atoms_in_unit_cell,
                                        int cells_num_cells, /// number of macrocells
                                        int cells_num_local_cells, /// number of local macrocells
-                                       const double cells_macro_cell_size,
+                                       const double cells_macro_cell_size_x,
+                                       const double cells_macro_cell_size_y,
+                                       const double cells_macro_cell_size_z,
                                        std::vector <int>& cells_local_cell_array,
                                        std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                                        std::vector <int>& cells_num_atoms_in_cell_global, /// number of atoms in each cell

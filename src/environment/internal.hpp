@@ -86,10 +86,11 @@ namespace environment{
       extern std::vector < double > z_mag_array;
 
       //FT for magnetisation
+      #ifdef FFT
       extern fftw_plan MxP,MyP,MzP;
       // performs the backward transform to give the dipole field, Hx, Hy, Hz
       extern fftw_plan HxP,HyP,HzP;
-
+      #endif
 //      extern fft_cell_id_array;
 
       extern std::vector<double> cell_coords_array_x; /// arrays to store cells positions
