@@ -122,7 +122,6 @@ namespace micromagnetic{
       mm::one_o_chi_para =  mm::calculate_chi_para(num_local_cells,local_cell_array, num_cells, temperature);
       mm::one_o_chi_perp =  mm::calculate_chi_perp(num_local_cells,local_cell_array, num_cells, temperature);
 
-
       //The external fields equal the length of the field times the applied field vector.
       //This is saved to an array.
       mm::ext_field[0] = H*Hx;
@@ -141,7 +140,7 @@ namespace micromagnetic{
 
 
       //save this new m as the initial value, so it can be saved and used in the final equation.
-      //normalises the x,y,z magnetisatyions to have a lenfth of 1
+      //normalises the x,y,z magnetisations to have a length of 1
       for (int lc = 0; lc < num_local_cells; lc++){
          int cell = local_cell_array[lc];
          x_array[cell] = x_mag_array[cell];

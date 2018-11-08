@@ -110,7 +110,9 @@ namespace dipole{
                                                    cells_num_atoms_in_cell,
                                                    cells_num_local_cells,
                                                    cells_num_cells,
-                                                   cells_macro_cell_size);
+                                                   cells_macro_cell_size_x,
+                                                   cells_macro_cell_size_y,
+                                                   cells_macro_cell_size_z);
 
             // Reorder data structure
             dipole::internal::sort_data(dipole::internal::proc_cell_index_array1D,

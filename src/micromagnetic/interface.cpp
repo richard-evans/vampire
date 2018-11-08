@@ -73,19 +73,22 @@ namespace micromagnetic{
       if(word==test){
 
          // check for type of discretisation
-         test="micromagnetic";
-         if(value==test){
-            discretisation_type = 1;
-            return true;
-         }
          test="atomistic"; // runs simualtion as normal (atomistics)
          if(value==test){
             discretisation_type = 0;
+            micromagnetic::enabled = false;
+            return true;
+         }
+         test="micromagnetic";
+         if(value==test){
+            discretisation_type = 1;
+            micromagnetic::enabled = true;
             return true;
          }
          test="multiscale"; // at the moment just runs a normal atomsitic simulation
          if(value==test){
             discretisation_type = 2;
+            micromagnetic::enabled = true;
             return true;
          }
          // otherwise throw an error

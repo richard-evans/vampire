@@ -18,6 +18,7 @@ calculate_tc.o \
 atomistic_llg_heun.o \
 micromagnetic_llb.o \
 micromagnetic_llg.o \
+multiscale.o \
 fieldsllb.o \
 resistance.o \
 fieldsllg.o

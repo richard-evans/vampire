@@ -56,10 +56,12 @@ namespace micromagnetic{
                    double system_dimensions_z,
                    std::vector<int> local_cell_array){
 
+      //--------------------------------------------------------------------
+      // If micromagnetics not enabled, do nothing
+      //--------------------------------------------------------------------
+      if(micromagnetic::enabled == false ) return;
 
       //resizes the vectors used to store the cell parameters
-
-   //   std::cout << "MM" << num_cells<<std::endl;
       mm::A.resize(num_cells*num_cells,0.0);
       mm::alpha.resize(num_cells,0.0);
       mm::one_o_chi_perp.resize(num_cells,0.0);

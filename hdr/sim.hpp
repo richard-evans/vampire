@@ -148,6 +148,7 @@ namespace sim{
 	// Wrapper Functions
 	extern int run();
 	extern int initialise();
+   extern void increment_time();
 	extern int integrate(uint64_t);
 
 	// Legacy integrators

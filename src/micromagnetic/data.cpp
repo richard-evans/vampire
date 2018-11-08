@@ -24,6 +24,7 @@ namespace micromagnetic{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
+   extern bool enabled = false; // Flag to determine if micromagnetic simulation is enabled
 
    //boolean to determine whether the simulation is micromagnetic
    int discretisation_type = 0;

@@ -68,8 +68,6 @@
 // sim module headers
 #include "internal.hpp"
 
-void multiscale_simulation_steps(int n_steps);
-
 namespace sim{
 	std::ofstream mag_file;
 
@@ -624,7 +622,7 @@ void integrate_serial(uint64_t n_steps){
    if(err::check==true) std::cout << "sim::integrate_serial has been called" << std::endl;
 
    // if simulation is micromagnetic
-   if (micromagnetic::discretisation_type >0 ) multiscale_simulation_steps(n_steps);
+   if (micromagnetic::enabled) micromagnetic::multiscale_simulation_steps(n_steps);
 
    //else simulation is atomistic
    else{
@@ -638,7 +636,7 @@ void integrate_serial(uint64_t n_steps){
             if(gpu::acceleration) gpu::llg_heun();
             // Otherwise use CPU version
             else sim::LLG_Heun();
-
+            // Integrate environment here (needs to be refactored into env module)
 				if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0){
                environment::LLB(sim::temperature, sim::H_applied,sim::H_vec[0],sim::H_vec[1],sim::H_vec[2],mp::dt);
             }
@@ -716,8 +714,9 @@ int integrate_mpi(uint64_t n_steps){
 
 	// Check for calling of function
 	if(err::check==true) std::cout << "sim::integrate_mpi has been called" << std::endl;
-		//multiscale simulation
-	  if (micromagnetic::discretisation_type >0 ) multiscale_simulation_steps(n_steps);
+
+	//multiscale simulation
+	if (micromagnetic::discretisation_type >0 ) micromagnetic::multiscale_simulation_steps(n_steps);
 
 	//else simulation is atomistic
 	else{
@@ -731,8 +730,8 @@ int integrate_mpi(uint64_t n_steps){
 					sim::LLG_Heun_cuda_mpi();
 				#else
 					sim::LLG_Heun_mpi();
-				//calcualte the field from the environment
-					if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0){
+               //calcualte the field from the environment
+					if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0)
                    environment::LLB(sim::temperature, sim::H_applied,
                    sim::H_vec[0], sim::H_vec[1],sim::H_vec[2], mp::dt);
 				#endif
@@ -797,65 +796,3 @@ int integrate_mpi(uint64_t n_steps){
 }
 
 } // Namespace sim
-
-void multiscale_simulation_steps(int n_steps){
-
-	if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
-	   sim::H_applied,
-	   sim::H_vec[0],
-	   sim::H_vec[1],
-	   sim::H_vec[2],
-	   mp::dt);
-
-   for(int ti=0;ti<n_steps;ti++){
-      //calcaulte the field from the environment
-      // if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
-      //    sim::H_applied,
-      //    sim::H_vec[0],
-      //    sim::H_vec[1],
-      //    sim::H_vec[2],
-      //    mp::dt);
-
-         //if  there are micromagnetic cells run a micromagnetic step
-         if (micromagnetic::number_of_micromagnetic_cells > 0 &&  (sim::time)% micromagnetic::num_atomic_steps_mm == 0) {
-
-
-            //if LLb run an LLG steps
-            if (micromagnetic::integrator == 0) micromagnetic::LLG(cells::local_cell_array,
-               n_steps,
-               cells::num_cells,
-               cells::num_local_cells,
-               sim::temperature,
-               cells::mag_array_x,
-               cells::mag_array_y,
-               cells::mag_array_z,
-               sim::H_vec[0],
-               sim::H_vec[1],
-               sim::H_vec[2],
-               sim::H_applied,
-               mp::dt,
-               cells::volume_array);
-               //if LLB run an LLB step
-               else micromagnetic::LLB(cells::local_cell_array,
-                  n_steps,
-                  cells::num_cells,
-                  cells::num_local_cells,
-                  sim::temperature,
-                  cells::mag_array_x,
-                  cells::mag_array_y,
-                  cells::mag_array_z,
-                  sim::H_vec[0],
-                  sim::H_vec[1],
-                  sim::H_vec[2],
-                  sim::H_applied,
-                  mp::dt,
-                  cells::volume_array);
-               }
-               //run an atomistic step if there are atomistic atoms
-               if (micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
-
-               //incremenet time
-               sim::increment_time();
-            }
-
-         }

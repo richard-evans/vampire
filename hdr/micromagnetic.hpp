@@ -24,6 +24,8 @@
 //--------------------------------------------------------------------------------
 namespace micromagnetic{
 
+   extern bool enabled; // Flag to determine if micromagnetic simulation is enabled
+
     //bool to decide whether the simulation is micromagnetic or atomsitic
     // 0 - atomistic
     // 1 - micromagnetic
@@ -66,6 +68,9 @@ namespace micromagnetic{
    //--------------------------------------------------------------------
    //     Function declorations
    //--------------------------------------------------------------------
+
+   // multiscale and micromagnetic integration steps
+   void multiscale_simulation_steps(const uint64_t n_steps);
 
    //atomsitic LLG
    int atomistic_LLG_Heun();
