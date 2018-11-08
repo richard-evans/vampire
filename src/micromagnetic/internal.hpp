@@ -135,7 +135,7 @@ namespace micromagnetic{
                                                 std::vector<double>& y_array,
                                                 std::vector<double>& z_array);
 
-      std::vector<double> calculate_llg_fields(std::vector <double > m,
+      std::vector<double> calculate_llg_fields(std::vector <double>& m,
                                                 double temperature,
                                                 int num_cells,
                                                 int cell,

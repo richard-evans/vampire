@@ -63,7 +63,7 @@ namespace micromagnetic{
    int micromagnetic_init_llg(int num_cells){
 
       // check calling of routine if error checking is activated
-      if(err::check==true) std::cout << "LLB_init has been called" << std::endl;
+      if(err::check==true) std::cout << "LLG_init has been called" << std::endl;
 
       using namespace micromagnetic_arrays_llg;
 
@@ -109,7 +109,6 @@ namespace micromagnetic{
       std::vector <double> volume_array
    ){
 
-//std::cout << "a" <<std::endl;
       // check calling of routine if error checking is activated
       if(err::check==true){std::cout << "micromagnetic::LLG_Heun has been called" << std::endl;}
 
@@ -157,22 +156,28 @@ namespace micromagnetic{
          z_initial_spin_array[cell] = z_array[cell];
       }
 
-
-      std::vector<double> m(3,0.0);
       std::vector<double> spin_field(3,0.0);
+      std::vector<double> m(3,0.0);
 
       //calcualtes the euler gradient
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
+
+         // get cell ID
          int cell = list_of_micromagnetic_cells[lc];
+
+         // load magnetization into temporary variable
          m[0] = x_array[cell];
          m[1] = y_array[cell];
          m[2] = z_array[cell];
 
-         //calcualtes spin fields
+         // calculates spin fields
          spin_field = mm::calculate_llg_fields(m, temperature, num_cells, cell, x_array,y_array,z_array);
+
          //calcualtes 1/(1+a^2) and a/(1+a^2) for llg
-         const double one_oneplusalpha_sq = 1/(1+mm::alpha[cell]*mm::alpha[cell]); // material specific alpha and gamma
-         const double alpha_oneplusalpha_sq = mm::alpha[cell]/(1+mm::alpha[cell]*mm::alpha[cell]);
+         const double alpha = mm::alpha[cell];
+         const double ialpha2 = 1.0/(1.0+alpha*alpha);
+         const double one_oneplusalpha_sq = ialpha2; // material specific alpha and gamma
+         const double alpha_oneplusalpha_sq = alpha*ialpha2;
 
          const double S[3] = {m[0],m[1],m[2]};
          const double H[3] = {-spin_field[0], -spin_field[1], -spin_field[2]};
@@ -213,9 +218,10 @@ namespace micromagnetic{
 
       }
 
-      //heun step
+      // heun step
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
          int cell = list_of_micromagnetic_cells[lc];
+
          m[0] = x_spin_storage_array[cell];
          m[1] = y_spin_storage_array[cell];
          m[2] = z_spin_storage_array[cell];
@@ -275,7 +281,7 @@ namespace micromagnetic{
          }
       }
 
-      std::ofstream pfile;
+      /*std::ofstream pfile;
       pfile.open("cell_config3");
        if(sim::time>10000){
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
@@ -291,7 +297,7 @@ namespace micromagnetic{
 
       }
       std::cin.get();
-   }
+   }*/
 
       if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1)  micromagnetic::MR_resistance = mm::calculate_resistance();
 

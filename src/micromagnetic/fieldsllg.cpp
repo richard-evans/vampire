@@ -11,26 +11,23 @@
 //
 
 // Vampire headers
-#include "micromagnetic.hpp"
 #include "cells.hpp"
-#include "../cells/internal.hpp"
-#include "internal.hpp"
-
-// micromagnetic module headers
-#include <stdlib.h>
-#include <vector>
+#include "dipole.hpp"
 #include "errors.hpp"
-#include "vio.hpp"
-#include "sim.hpp"
 #include "environment.hpp"
 #include "random.hpp"
-#include "dipole.hpp"
+#include "sim.hpp"
+#include "vio.hpp"
+
+// micromagnetic module headers
+#include "micromagnetic.hpp"
+#include "internal.hpp"
 
 namespace micromagnetic{
 
    namespace internal{
 
-      std::vector<double> calculate_llg_fields(std::vector <double > m,
+      std::vector<double> calculate_llg_fields(std::vector <double>& m,
                                                double temperature,
                                                int num_cells,
                                                int cell,
@@ -106,35 +103,40 @@ namespace micromagnetic{
          }
 
       }
-//std::cin.get();
 
       //calcualtes thesigma values
       double sigma_para = sqrt(2*kB*temperature*alpha_para[cell]/(ms[cell]*mp::dt));
       double sigma_perp = sqrt(2*kB*temperature*(alpha_perp[cell]-alpha_para[cell])/(mp::dt*ms[cell]*alpha_perp[cell]*alpha_perp[cell]));
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] =ext_field[0] + exchange_field[0] + one_o_chi_perp[cell]*m[0]*m_e[cell]  + dipole::cells_field_array_x[cell] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];// + sim::track_field_x[cell];
-      spin_field[1] =ext_field[1] + exchange_field[1] + one_o_chi_perp[cell]*m[1]*m_e[cell]  + dipole::cells_field_array_y[cell] + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];// + sim::track_field_y[cell];
-      spin_field[2] =ext_field[2] + exchange_field[2]                                        + dipole::cells_field_array_z[cell] + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];// + sim::track_field_z[cell];
+      spin_field[0] = ext_field[0] + exchange_field[0] + one_o_chi_perp[cell]*m[0]*m_e[cell] + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];// + sim::track_field_x[cell];
+      spin_field[1] =ext_field[1] + exchange_field[1] + one_o_chi_perp[cell]*m[1]*m_e[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];// + sim::track_field_y[cell];
+      spin_field[2] =ext_field[2] + exchange_field[2]                                        + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];// + sim::track_field_z[cell];
 
+      // Add dipole field if enabled
+      if (dipole::activated){
+         spin_field[0] += dipole::cells_field_array_x[cell];
+         spin_field[1] += dipole::cells_field_array_x[cell];
+         spin_field[2] += dipole::cells_field_array_x[cell];
+      }
 
-      // if (sim::enable_fmr){
-      //    spin_field[0] = spin_field[0] + fmr_H[0];
-      //    spin_field[1] = spin_field[1] + fmr_H[1];
-      //    spin_field[2] = spin_field[2] + fmr_H[2];
-      //
-      // }
-      // if (environment::enabled){
-      //    spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
-      //    spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
-      //    spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
-      // }
-      //
-      // if (sim::track_field_x.size() != 0 ){
-      //   spin_field[0] = spin_field[0] + sim::track_field_x[cell];
-      //   spin_field[1] = spin_field[1] + sim::track_field_y[cell];
-      //   spin_field[2] = spin_field[2] + sim::track_field_z[cell];
-      // }
+      if (sim::enable_fmr){
+         spin_field[0] = spin_field[0] + fmr_H[0];
+         spin_field[1] = spin_field[1] + fmr_H[1];
+         spin_field[2] = spin_field[2] + fmr_H[2];
+      }
+
+      if (environment::enabled){
+         spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
+         spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
+         spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+      }
+
+      if (sim::track_field_x.size() != 0 ){
+        spin_field[0] = spin_field[0] + sim::track_field_x[cell];
+        spin_field[1] = spin_field[1] + sim::track_field_y[cell];
+        spin_field[2] = spin_field[2] + sim::track_field_z[cell];
+      }
 
 
 

@@ -372,7 +372,6 @@ int LLB( std::vector <int> local_cell_array,
    	MPI_Allreduce(MPI_IN_PLACE, &z_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
    #endif
 
-
    //update atom positions
    if (discretisation_type == 2 || sim::time%vout::output_rate -1){
       for(int atom_list=0;atom_list<number_of_none_atomistic_atoms;atom_list++){
@@ -382,8 +381,7 @@ int LLB( std::vector <int> local_cell_array,
          atoms::y_spin_array[atom] = y_array[cell];
          atoms::z_spin_array[atom] = z_array[cell];
       }
-    }
-
+   }
 
 	return 0;
 
