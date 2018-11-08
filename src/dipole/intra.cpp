@@ -75,8 +75,9 @@ namespace dipole{
                  const double ex = rx*rij;
                  const double ey = ry*rij;
                  const double ez = rz*rij;
-
+               //  std::cout <<"tensor" <<"\t" << rx << '\t' << ry << '\t' << rz << '\t' << rij << '\t' << ex << '\t' << ey << '\t' << ez << "\t" << rij3 << std::endl;
                  const double rij3 = (rij*rij*rij); // Angstroms
+                 //std::cout <<"tensor" <<"\t" << rx << '\t' << ry << '\t' << rz << '\t' << rij << '\t' << ex << '\t' << ey << '\t' << ez << "\t" << rij3 << std::endl;
 
                  tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
                  tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);

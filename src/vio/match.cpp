@@ -23,6 +23,8 @@
 #include "exchange.hpp"
 #include "material.hpp"
 #include "gpu.hpp"
+#include "micromagnetic.hpp"
+#include "environment.hpp"
 #include "grains.hpp"
 #include "stats.hpp"
 #include "units.hpp"
@@ -79,8 +81,9 @@ namespace vin{
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -766,6 +769,11 @@ namespace vin{
                 sim::program=51;
                 return EXIT_SUCCESS;
             }
+            test="disk-tracks";
+            if(value==test){
+                sim::program=52;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
@@ -1145,6 +1153,47 @@ namespace vin{
         if(word==test){
             sim::constraint_rotation=true;
             return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="track-Ms";
+        if(word==test){
+          double m=atof(value.c_str());
+          check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 100");
+          sim::track_Ms = m;
+          return EXIT_SUCCESS;
+        }
+
+        //--------------------------------------------------------------------
+        test="cross-track-velocity";
+        if(word==test){
+          double m=atof(value.c_str());
+          check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+          sim::cross_track_velocity = m;
+          return EXIT_SUCCESS;
+        }
+
+        //--------------------------------------------------------------------
+        test="down-track-velocity";
+        if(word==test){
+          double m=atof(value.c_str());
+          check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+          sim::down_track_velocity = m;
+          return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="initial-cross-track-position";
+        if(word==test){
+          double m=atof(value.c_str());
+          check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
+          sim::initial_cross_track_position = m;
+          return EXIT_SUCCESS;
+        }
+        test="initial-down-track-position";
+        if(word==test){
+          double m=atof(value.c_str());
+          check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
+          sim::initial_down_track_position = m;
+          return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="constraint-angle-theta";
@@ -1682,6 +1731,12 @@ namespace vin{
             int r=atoi(value.c_str());
             check_for_valid_int(r, word, line, prefix, 0, 1000000,"input","0 - 1,000,000");
             vout::output_rate=r;
+            return EXIT_SUCCESS;
+        }
+        test="magneto-resistance";
+        if(word==test){
+            micromagnetic::enable_resistance = true;
+            output_list.push_back(61);
             return EXIT_SUCCESS;
         }
 
@@ -2669,7 +2724,8 @@ namespace vin{
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
-
+            else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(environment::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             //--------------------------------------------------------------------
             // keyword not found
             //--------------------------------------------------------------------

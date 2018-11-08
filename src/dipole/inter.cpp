@@ -37,7 +37,9 @@ namespace dipole{
       // explictly from the atomistic coordinates. Longer range tensors assume
       // the dipole-dipole form.
       //------------------------------------------------------------------------
-      void compute_inter_tensor(const double cells_macro_cell_size,
+      void compute_inter_tensor(const double cells_macro_cell_size_x,
+                                const double cells_macro_cell_size_y,
+                                const double cells_macro_cell_size_z,
                                 const int i,
                                 const int j,
                                 const int lc,
@@ -65,7 +67,7 @@ namespace dipole{
          double rij_1 = 1.0/rij;
 
          // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
-         if( (rij_1)/cells_macro_cell_size > dipole::cutoff){
+         if( (rij_1)/cells_macro_cell_size_x > dipole::cutoff){
             // define unitarian distance vectors
 	         const double ex = rx*rij;
 	         const double ey = ry*rij;
@@ -87,7 +89,7 @@ namespace dipole{
          //--------------------------------------------------------------------------
          // If distance between macro-cells < cutoff ==> apply inter-intra method
          //--------------------------------------------------------------------------
-         else if( (1.0/rij)/cells_macro_cell_size <= dipole::cutoff){
+         else if( (1.0/rij)/cells_macro_cell_size_x <= dipole::cutoff){
 
             for(int pi=0; pi<cells_num_atoms_in_cell[i]; pi++){
 

@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=44;
+	const int max_units=47;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -124,8 +124,8 @@ int init(){
 		unit[22]="eV/T";		conversion[22]=1.602176487e-19;	type[22]="moment";		// Electron volts/Tesla
 		unit[23]="erg/Oe";	conversion[23]=1.0E-3; 				type[23]="moment";		// Erg/Oersted
 		// Magnetisation
-		unit[24]="A/m";		conversion[24]=2.17987208E-18;	type[24]="magnetisation";	// Amps/metre
-		unit[25]="emu/cc";	conversion[25]=2.17987208E-21; 	type[25]="magnetisation";	// emu/cubic cm
+		unit[24]="A/m";		conversion[24]=1.0E-30;	         type[24]="magnetisation";	// Amps/metre
+		unit[25]="emu/cc";	conversion[25]=1.0E-27; 	      type[25]="magnetisation";	// emu/cubic cm
 		unit[26]="J/T/AAA";	conversion[26]=1.0;					type[26]="magnetisation";	// Joule/Tesla/Angstrom cubed
 		// Anisotropy
 		unit[27]="J/atom";	conversion[27]=1.0; 					type[27]="anisotropy";		// Joules/Atom
@@ -148,6 +148,12 @@ int init(){
 		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
       // New
       unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
+
+		// exchange (Internal unit J/Angstrom)
+		unit[44]="J/m";		conversion[44]=1.0E-10; 			type[44]="exchange";		// Joules/metres squared
+    	unit[45]="erg/cm";	conversion[45]=1.0E-15; 			type[45]="exchange";		// erg/cm squared
+
+	 	unit[46]="erg/cm2";	conversion[46]=1.0e-23; 	type[46]="mm_energy";		// erg/cm2 squared to J/A2
 
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag

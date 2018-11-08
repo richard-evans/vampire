@@ -47,14 +47,34 @@ namespace dipole{
             dipole::activated=true;
             return true;
          }
+         test="fft";
+         if(value == test){
+            dipole::internal::solver = dipole::internal::fft;
+            // enable dipole calculation
+            dipole::activated=true;
+            dipole::fft=true;
+            return true;
+         }
          else{
             terminaltextcolor(RED);
             std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
             std::cerr << "\t\"macrocell\"" << std::endl;
             std::cerr << "\t\"tensor\"" << std::endl;
+            std::cerr << "\t\"fft\"" << std::endl;
             terminaltextcolor(WHITE);
             err::vexit();
          }
+      }
+      //-------------------------------------------------------------------
+      test="solver-fft";
+      if(word==test){
+         // enable dipole calculation
+         #ifdef FFT
+            dipole::fft=true;
+         #else
+            std::cout << "FFTW not enabled in makefile - running normal demag calculation" <<std::endl;
+         #endif
+         return true;
       }
       //-------------------------------------------------------------------
       test="field-update-rate";

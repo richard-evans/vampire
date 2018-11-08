@@ -75,6 +75,8 @@ namespace create{
          int unit_cell_category; // association of material to unit cell id
          double min; // minimum material height
          double max; // maximum material height
+         double max_width;
+         double min_width;
 
          // constructor
          mp_t ():
@@ -88,7 +90,9 @@ namespace create{
             voronoi_grain_substructure_nucleation_height(0.0),
             unit_cell_category(0),
             min(0.0),
-            max(1.0)
+            max(1.0),
+            min_width(0.0),
+            max_width(1.0)
             {
                // resize array of slave materials
                slave_material.resize(mp::max_materials);

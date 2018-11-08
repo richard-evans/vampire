@@ -153,22 +153,24 @@ namespace dipole{
       /*Function to send and receive data atoms between cpus */
       /*------------------------------------------------*/
       int send_recv_atoms_data(std::vector<int>& proc_cell_index_array1D,
-                               std::vector<int>& cells_cell_id_array,
-                               std::vector<int>& cells_local_cell_array,
-                               std::vector<double>& atom_pos_x,
-                               std::vector<double>& atom_pos_y,
-                               std::vector<double>& atom_pos_z,
-                               std::vector<int>& atom_type_array, // atomic moments (from dipole;:internal::atom_type_array)
-                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                               std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                               std::vector< std::vector <int> >& cells_index_atoms_array,
-                               std::vector<double>& cells_pos_and_mom_array,
-                               std::vector<int>& cells_num_atoms_in_cell,
-                               int cells_num_local_cells,
-                               int cells_num_cells,
-                               double cells_macro_cell_size
-      ){
+                              std::vector<int>& cells_cell_id_array,
+                              std::vector<int>& cells_local_cell_array,
+                              std::vector<double>& atom_pos_x,
+                              std::vector<double>& atom_pos_y,
+                              std::vector<double>& atom_pos_z,
+                              std::vector<int>& atom_type_array, // atomic moments (from dipole;:internal::atom_type_array)
+                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_x,
+                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_y,
+                              std::vector< std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                              std::vector< std::vector <int> >& cells_index_atoms_array,
+                              std::vector<double>& cells_pos_and_mom_array,
+                              std::vector<int>& cells_num_atoms_in_cell,
+                              int cells_num_local_cells,
+                              int cells_num_cells,
+                              double cells_macro_cell_size_x,
+                              double cells_macro_cell_size_y,
+                              double cells_macro_cell_size_z
+                              ){
 
          // temporary variables to send and receive data
          std::vector<int> list_cpu_to_send_to;
@@ -213,7 +215,7 @@ namespace dipole{
                                                 (cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2])*(cells_pos_and_mom_array[4*lc+2]-cells_pos_and_mom_array[4*i+2]));
                         //distance between cells
                         double rij = 1.0/rij_1;
-                        if((rij/cells_macro_cell_size <= dipole::cutoff) || ((cells_pos_and_mom_array[4*lc+0]==cells_pos_and_mom_array[4*i+0]) && (cells_pos_and_mom_array[4*lc+1]==cells_pos_and_mom_array[4*i+1]) && (cells_pos_and_mom_array[4*lc+2]==cells_pos_and_mom_array[4*i+2]) ) ){
+                        if((rij/cells_macro_cell_size_x <= dipole::cutoff) || ((cells_pos_and_mom_array[4*lc+0]==cells_pos_and_mom_array[4*i+0]) && (cells_pos_and_mom_array[4*lc+1]==cells_pos_and_mom_array[4*i+1]) && (cells_pos_and_mom_array[4*lc+2]==cells_pos_and_mom_array[4*i+2]) ) ){
                            if(bool_array[i]!=0){
                               list_cpu_to_send_to.push_back(cpu_recv);
                               list_cells_to_send.push_back(i);

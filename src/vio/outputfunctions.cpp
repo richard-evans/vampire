@@ -20,6 +20,7 @@
 #include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
+#include "micromagnetic.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -364,6 +365,11 @@ namespace vout{
    // Output Function 64
    void material_mean_total_energy(std::ostream& stream){
       stream << stats::material_energy.output_mean_energy(stats::total);
+   }
+
+   // Output Function 65
+   void MRresistance(std::ostream& stream){
+      stream << micromagnetic::MR_resistance << "\t";
    }
 
 }

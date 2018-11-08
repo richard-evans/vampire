@@ -42,9 +42,36 @@ namespace cells{
          double csize=atof(value.c_str());
          // Test for valid range
          vin::check_for_valid_value(csize, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
-         cells::macro_cell_size = csize;
+         cells::macro_cell_size[0] = csize;
+         cells::macro_cell_size[1] = csize;
+         cells::macro_cell_size[2] = csize;
          return true;
       }
+      test="macro-cell-size-x";
+      if(word==test){
+         double csize=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(csize, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
+         cells::macro_cell_size[0] = csize;
+         return true;
+      }
+      test="macro-cell-size-y";
+      if(word==test){
+         double csize=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(csize, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
+         cells::macro_cell_size[1] = csize;
+         return true;
+      }
+      test="macro-cell-size-z";
+      if(word==test){
+         double csize=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(csize, word, line, prefix, unit, "length", 0.0, 1.0e7,"input","0.0 Angstroms - 1 millimetre");
+         cells::macro_cell_size[2] = csize;
+         return true;
+      }
+
 
       //--------------------------------------------------------------------
       // Keyword not found
@@ -69,4 +96,3 @@ namespace cells{
    }
 
 } // end of cells namespace
-

@@ -12,7 +12,10 @@ export OMPI_CXX=g++ -std=c++0x
 # Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
-# Compilers
+
+#-----------------------------------------------------------------------
+# Compiler sets
+#-----------------------------------------------------------------------
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
@@ -20,17 +23,39 @@ PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
 
+#-----------------------------------------------------------------------
+# Compiler options including FFT linking (needed for FFT dipole field)
+#-----------------------------------------------------------------------
+#ICC=icc -DCOMP='"Intel C++ Compiler"' -DFFT
+#GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' -DFFT
+#LLVM=g++ -DCOMP='"LLVM C++ Compiler"' -DFFT
+#PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DFFT
+#IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DFFT
+#MPICC=mpicxx -DMPICF -DFFT
+
+#----------------------------------
+# standard library options
+#----------------------------------
+LIBS=-lstdc++ -lm
+INC=
+#--------------------------------------------------------------------
+# standard library options + fftw
+# need to add correct path to fftw library for linking to work
+#--------------------------------------------------------------------
+#LIBS=-lstdc++ -lm -lfftw3 -L/opt/local/lib/
+#INC=-I/opt/local/include/
+
+# LIBS
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
 
 export LANG=C
 export LC_ALL=C
 
-# LIBS
-LIBS=
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 
 # Debug Flags
+
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
@@ -140,6 +165,8 @@ include src/simulate/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
+include src/micromagnetic/makefile
+include src/environment/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile
@@ -195,7 +222,7 @@ serial-llvm: $(LLVM_OBJECTS)
 	$(LLVM) $(LLVM_LDFLAGS) $(LIBS) $(LLVM_OBJECTS) -o $(EXECUTABLE)
 
 $(LLVM_OBJECTS): obj/%_llvm.o: src/%.cpp
-	$(LLVM) -c -o $@ $(LLVM_CFLAGS) $(OPTIONS) $<
+	$(LLVM) -c -o $@ $(LLVM_CFLAGS) $(INC) $(OPTIONS) $<
 
 serial-ibm: $(IBM_OBJECTS)
 	$(IBM) $(IBM_LDFLAGS) $(IBM_OBJECTS) -o $(EXECUTABLE)

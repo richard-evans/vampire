@@ -36,6 +36,7 @@
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
+
 	extern std::ofstream mag_file;
 	extern uint64_t time;
 	extern uint64_t total_time;
@@ -114,6 +115,10 @@ namespace sim{
 	extern double TTTe; /// electron temperature
 	extern double TTTp; /// phonon temperature
 
+	extern std::vector < double > track_field_x;
+	extern std::vector < double > track_field_y;
+	extern std::vector < double > track_field_z;
+
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 
@@ -162,6 +167,9 @@ namespace sim{
 	// Integrator initialisers
 	extern int LLGinit();
 
+	void calculate_spin_fields(const int start_index,const int end_index);
+	void calculate_external_fields(const int start_index,const int end_index);
+
 	// Field and energy functions
 	extern double calculate_spin_energy(const int atom);
    extern double spin_applied_field_energy(const double, const double, const double);
@@ -179,6 +187,13 @@ namespace sim{
    // Monte Carlo statistics counters
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;
+	 extern double track_Ms;
+
+	 extern double cross_track_velocity;
+	 extern double down_track_velocity;
+
+	 extern double initial_down_track_position;
+	 extern double initial_cross_track_position;
 
 }
 

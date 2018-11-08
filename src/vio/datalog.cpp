@@ -382,6 +382,9 @@ namespace vout{
                case 64:
                   vout::material_mean_total_energy(zmag);
                   break;
+               case 65:
+						vout::MRresistance(zmag);
+						break;
 				}
 			}
 			// Carriage return

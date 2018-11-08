@@ -43,6 +43,8 @@
 #include "spintorque.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
+#include "cells.hpp"
+#include "micromagnetic.hpp"
 
 // sim module header
 #include "internal.hpp"
@@ -64,8 +66,15 @@ void calculate_fmr_fields(const int,const int);
 void calculate_lagrange_fields(const int,const int);
 void calculate_full_spin_fields(const int start_index,const int end_index);
 
+<<<<<<< HEAD
 int calculate_spin_fields(const int start_index,const int end_index){
 
+=======
+
+namespace sim{
+
+void calculate_spin_fields(const int start_index,const int end_index){
+>>>>>>> environment
 	///======================================================
 	/// 		Subroutine to calculate spin dependent fields
 	///
@@ -112,10 +121,9 @@ int calculate_spin_fields(const int start_index,const int end_index){
 
 	calculate_full_spin_fields(start_index,end_index);
 
-	return 0;
 }
 
-int calculate_external_fields(const int start_index,const int end_index){
+void calculate_external_fields(const int start_index,const int end_index){
 	///======================================================
 	/// 		Subroutine to calculate external fields
 	///
@@ -163,7 +171,7 @@ int calculate_external_fields(const int start_index,const int end_index){
 	// Dipolar Fields
 	calculate_dipolar_fields(start_index,end_index);
 
-	return 0;
+}
 }
 
 int calculate_applied_fields(const int start_index,const int end_index){

@@ -27,11 +27,12 @@ namespace dipole{
    // Externally visible variables
    //------------------------------------------------------------------------------
    extern bool activated;
-
    extern int update_rate; /// timesteps between updates
    extern int update_time; /// last update time
 
    extern std::vector<double> cells_field_array_x; /// arrays to store cells field
+   extern bool fft;
+
    extern std::vector<double> cells_field_array_y;
    extern std::vector<double> cells_field_array_z;
    extern std::vector<double> atom_dipolar_field_array_x;
@@ -75,7 +76,9 @@ namespace dipole{
    void initialize(const int cells_num_atoms_in_unit_cell,
                    int cells_num_cells, /// number of macrocells
                    int cells_num_local_cells, /// number of local macrocells
-                   const double cells_macro_cell_size,
+                   const double cells_macro_cell_size_x,
+                   const double cells_macro_cell_size_y,
+                   const double cells_macro_cell_size_z,
                    std::vector <int>& cells_local_cell_array,
                    std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
                    std::vector <int>& cells_num_atoms_in_cell_global, ///global  number of atoms in each cell
@@ -92,6 +95,11 @@ namespace dipole{
                    std::vector<double>& atom_coords_z,
                    int num_atoms
    );
+
+   //-----------------------------------------------------------------------------
+   // Function to finalize dipole module
+   //-----------------------------------------------------------------------------
+   void finalize();
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for dipole module

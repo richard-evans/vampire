@@ -81,6 +81,7 @@ namespace dipole{
          		   const double my = cells::mag_array_y[j]*imuB;
          		   const double mz = cells::mag_array_z[j]*imuB;
 
+//std::cout << "Multi" <<'\t' << mx << '\t' << internal::rij_tensor_xx[lc][j]  << '\t' << my << '\t' << internal::rij_tensor_xy[lc][j] <<'\t' << mz << '\t' << internal::rij_tensor_xz[lc][j] << std::endl;
              		dipole::cells_field_array_x[i]+=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
              		dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
              		dipole::cells_field_array_z[i]+=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
@@ -100,6 +101,7 @@ namespace dipole{
             dipole::cells_mu0Hd_field_array_x[i] = dipole::cells_mu0Hd_field_array_x[i] * 9.27400915e-01;
             dipole::cells_mu0Hd_field_array_y[i] = dipole::cells_mu0Hd_field_array_y[i] * 9.27400915e-01;
             dipole::cells_mu0Hd_field_array_z[i] = dipole::cells_mu0Hd_field_array_z[i] * 9.27400915e-01;
+            
      		}
     	}
 	} // end of dipole::internal::update_field() function

@@ -7,6 +7,8 @@ dipole_objects =\
 data.o \
 energy.o \
 field.o \
+finalize.o \
+fft_update.o \
 initialize.o \
 interface.o \
 inter.o \

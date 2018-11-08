@@ -57,6 +57,7 @@ namespace vout{
    // Funciton protypes for functions inside: outputfunctions.cpp
    //-------------------------------------------------------------------------
    void time(std::ostream& stream);
+   void MRresistance(std::ostream& stream);
    void real_time(std::ostream& stream);
    void temperature(std::ostream& stream);
    void Happ(std::ostream& stream);

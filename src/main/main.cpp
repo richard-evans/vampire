@@ -25,14 +25,20 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+// C++ standard library headers
+#include <iomanip>
+
 
 #include "create.hpp"
+#include "dipole.hpp"
 #include "errors.hpp"
 #include "info.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
+#include "vutil.hpp"
+
 
 #include "internal.hpp"
 
@@ -104,6 +110,7 @@ int main(int argc, char* argv[]){
       time_t rawtime = time(NULL);
       struct tm * timeinfo = localtime(&rawtime);
       std::cout<<asctime(timeinfo);
+
    }
 
 
@@ -126,6 +133,9 @@ int main(int argc, char* argv[]){
 
    // Simulate system
    sim::run();
+
+   // finalise dipole module
+   dipole::finalize();
 
    // Finalise MPI
    #ifdef MPICF
