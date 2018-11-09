@@ -24,6 +24,8 @@ namespace micromagnetic{
       // -----------------------------------------------------------------------------------
       // calculates the temperature dependant parallel component of the susceptability from the analytical equation
       // -----------------------------------------------------------------------------------
+      // parallelisation note - all cell properties are synchronised, so no explicit reduction needed
+      // -----------------------------------------------------------------------------------
 
       std::vector<double> calculate_chi_para(int num_local_cells,
                                              std::vector<int>local_cell_array,
@@ -62,9 +64,6 @@ namespace micromagnetic{
                std::cin.get();
             }
          }
-         #ifdef MPICF
-            MPI_Allreduce(MPI_IN_PLACE, &chi[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         #endif
 
          return chi;            //returns the 1D vector for the susceptability,
       }

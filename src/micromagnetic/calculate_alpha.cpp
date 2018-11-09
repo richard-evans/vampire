@@ -44,14 +44,18 @@ namespace micromagnetic{
             N[cell]++;
          }
 
-         //calculates the average alpha per cell
+         // Reduce sum of Jij and N on all processors
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &alpha[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &N[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         #endif
+
+         // calculates the average alpha per cell
          for (int i = 0; i < num_local_cells; i++){
             int cell = local_cell_array[i];
             alpha[cell] = alpha[cell]/N[cell];
          }
-         #ifdef MPICF
-            MPI_Allreduce(MPI_IN_PLACE, &alpha[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         #endif
+
          return alpha;          //return an array of damping constants for each cell
       }
 

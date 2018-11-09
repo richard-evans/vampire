@@ -85,13 +85,17 @@ namespace micromagnetic {
             break;
          }
 
+         // Reduce sum of Jij and N on all processors
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &J[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &N[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         #endif
+
+         // Calculate average Tc for all local cells
          for (int i = 0; i < num_local_cells; i++){
             int cell = local_cell_array[i];
             Tc[cell] = J[cell]*e/(3*kB*N[cell]);
          }
-         #ifdef MPICF
-            MPI_Allreduce(MPI_IN_PLACE, &Tc[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         #endif
 
          return Tc;             //returns a 1D array containing the curiue temepratures
       }

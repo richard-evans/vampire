@@ -268,6 +268,15 @@ int LLB( std::vector <int> local_cell_array,
 
    }
 
+   // For parallel version set arrays to large negative number every time
+   // to allow parallel reduction to work
+   #ifdef MPICF
+      for(int cell=0; cell< x_spin_storage_array.size(); cell++){
+         x_spin_storage_array[cell] = -10.0;
+         y_spin_storage_array[cell] = -10.0;
+         z_spin_storage_array[cell] = -10.0;
+      }
+   #endif
 
    //these new x postiion are stored in an array (store)
    //x = x+step*dt
@@ -278,13 +287,12 @@ int LLB( std::vector <int> local_cell_array,
       z_spin_storage_array[cell] = z_array[cell] + z_euler_array[cell]*dt;
    }
 
-
+   // Reduce cell magnetizations on all processors to enable correct exchange field calculations
    #ifdef MPICF
-   	MPI_Allreduce(MPI_IN_PLACE, &x_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-   	MPI_Allreduce(MPI_IN_PLACE, &y_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-   	MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &x_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &y_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
    #endif
-
 
    //calcaultes the heun gradient
    for (int lc = my_start_index; lc < my_end_index; lc++){
@@ -334,17 +342,18 @@ int LLB( std::vector <int> local_cell_array,
 
    }
 
-
-   //all 0 for parallel simualtions for reduce
-   for (int cell = 0; cell < num_cells; cell++){
-   	cells::mag_array_x[cell] = 0.0;
-   	cells::mag_array_y[cell] = 0.0;
-   	cells::mag_array_z[cell] = 0.0;
-   	x_array[cell] = 0.0;
-   	y_array[cell] = 0.0;
-   	z_array[cell] = 0.0;
-   }
-
+   // For parallel version set arrays to large negative number every time
+   // to allow parallel reduction to work
+   #ifdef MPICF
+      for(int cell=0; cell< x_array.size(); cell++){
+         x_array[cell] = -10.0;
+         y_array[cell] = -10.0;
+         z_array[cell] = -10.0;
+         cells::mag_array_x[cell] = -10.0;
+         cells::mag_array_y[cell] = -10.0;
+         cells::mag_array_z[cell] = -10.0;
+      }
+   #endif
 
    //update spin arrays
    for (int lc = my_start_index; lc < my_end_index; lc++){
@@ -362,17 +371,17 @@ int LLB( std::vector <int> local_cell_array,
    }
 
 
-   //reduce to all processors
+   // Reduce unit vectors and moments to all processors
    #ifdef MPICF
-   	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-   	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-   	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-   	MPI_Allreduce(MPI_IN_PLACE, &x_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-   	MPI_Allreduce(MPI_IN_PLACE, &y_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-   	MPI_Allreduce(MPI_IN_PLACE, &z_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &x_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &y_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &z_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
    #endif
 
-   //update atom positions
+   //update atom positions (what happens for multiscale - are mm cells not updated?)
    if (discretisation_type == 2 || sim::time%vout::output_rate -1){
       for(int atom_list=0;atom_list<number_of_none_atomistic_atoms;atom_list++){
          int atom = list_of_none_atomistic_atoms[atom_list];

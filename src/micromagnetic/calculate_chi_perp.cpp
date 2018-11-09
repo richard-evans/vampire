@@ -19,8 +19,12 @@
 
 namespace micromagnetic{
 
-   namespace internal{
-     //calculates the temperature dependant perpendicular component of the susceptability from the analytical equation
+namespace internal{
+      // -----------------------------------------------------------------------------------
+      //calculates the temperature dependant perpendicular component of the susceptability from the analytical equation
+      // -----------------------------------------------------------------------------------
+      // parallelisation note - all cell properties are synchronised, so no explicit reduction needed
+      // -----------------------------------------------------------------------------------
 
       std::vector<double> calculate_chi_perp(int num_local_cells,
                                               std::vector<int>local_cell_array,int num_cells, double T){
@@ -63,9 +67,7 @@ namespace micromagnetic{
             chi[cell] = -ku[cell]/ms[cell]*chi[cell];
             //std::cout << ku[cell] << std::endl;
          }
-         #ifdef MPICF
-            MPI_Allreduce(MPI_IN_PLACE, &chi[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         #endif
+
          return chi;            //returns the 1D vector containing the perpencicular susceptability for each cell,
       }
    } //closes the internal namspace

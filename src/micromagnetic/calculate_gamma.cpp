@@ -43,15 +43,21 @@ namespace micromagnetic{
             gamma[cell] = gamma[cell] + mp::material[mat].gamma_rel;
             N[cell_array[atom]]++;
          }
+
+         // Reduce sum of Jij and N on all processors
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &gamma[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &N[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         #endif
+
          //calculates gamma/N
          for (int i = 0; i < num_local_cells; i++){
             int cell = local_cell_array[i];
             gamma[cell] = gamma[cell]/N[cell];
          }
-         #ifdef MPICF
-            MPI_Allreduce(MPI_IN_PLACE, &gamma[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         #endif
+
          return gamma;                     //returns a 1D array of values of gamma for each cell
+
       }
    } //closes the internal namspace
 }  //closes the micromagnetic namespace

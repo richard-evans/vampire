@@ -296,7 +296,7 @@ int run(){
 	// if (micromagnetic::discretisation_type > 0)
 	micromagnetic::initialize( cells::num_local_cells,
                               cells::num_cells,
-                              stats::num_atoms,
+                              stats::num_atoms, // use stats::num_atoms which includes core+boundary atoms in parallel
                               mp::num_materials,
                               cells::atom_cell_id_array,
                               atoms::neighbour_list_array,

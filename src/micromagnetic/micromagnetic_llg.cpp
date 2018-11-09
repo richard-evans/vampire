@@ -196,6 +196,16 @@ namespace micromagnetic{
       double S_new[3] = {0.0,0.0,0.0};
       double mod_S;
 
+      // For parallel version set arrays to large negative number every time
+      // to allow parallel reduction to work
+      #ifdef MPICF
+         for(int cell=0; cell< x_spin_storage_array.size(); cell++){
+            x_spin_storage_array[cell] = -10.0;
+            y_spin_storage_array[cell] = -10.0;
+            z_spin_storage_array[cell] = -10.0;
+         }
+      #endif
+
       //saves the new S array from euler step and normalises
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
          int cell = list_of_micromagnetic_cells[lc];
@@ -216,6 +226,13 @@ namespace micromagnetic{
          z_spin_storage_array[cell] = S_new[2];
 
       }
+
+      // Reduce cell magnetizations on all processors to enable correct exchange field calculations
+      #ifdef MPICF
+      	MPI_Allreduce(MPI_IN_PLACE, &x_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      	MPI_Allreduce(MPI_IN_PLACE, &y_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      	MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      #endif
 
       // heun step
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
@@ -247,7 +264,20 @@ namespace micromagnetic{
          z_heun_array[cell] = xyz[2];
       }
 
-      //calculates new spin arrays from heun and euler steps
+      // For parallel version set arrays to large negative number every time
+      // to allow parallel reduction to work
+      #ifdef MPICF
+         for(int cell=0; cell< x_array.size(); cell++){
+            x_array[cell] = -10.0;
+            y_array[cell] = -10.0;
+            z_array[cell] = -10.0;
+            cells::mag_array_x[cell] = -10.0;
+            cells::mag_array_y[cell] = -10.0;
+            cells::mag_array_z[cell] = -10.0;
+         }
+      #endif
+
+      // calculates new spin arrays from heun and euler steps
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
          int cell = list_of_micromagnetic_cells[lc];
 
@@ -267,6 +297,16 @@ namespace micromagnetic{
          cells::mag_array_z[cell] = z_array[cell]*mm::ms[cell];
 
       }
+
+      // Reduce unit vectors and moments to all processors
+      #ifdef MPICF
+      	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      	MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      	MPI_Allreduce(MPI_IN_PLACE, &x_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      	MPI_Allreduce(MPI_IN_PLACE, &y_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      	MPI_Allreduce(MPI_IN_PLACE, &z_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      #endif
 
       //updates atom magnetisations
       if (discretisation_type  == 2 || sim::time%vout::output_rate -1){
