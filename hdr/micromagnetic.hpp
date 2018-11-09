@@ -26,11 +26,9 @@ namespace micromagnetic{
 
    extern bool enabled; // Flag to determine if micromagnetic simulation is enabled
 
-    //bool to decide whether the simulation is micromagnetic or atomsitic
-    // 0 - atomistic
-    // 1 - micromagnetic
-    // 2 - multiscale
-   extern int discretisation_type;
+   // enumerated list to decide whether the simulation is micromagnetic or atomsitic
+   enum discretisation_t { atomistic = 0, micromagnetics = 1, multiscale = 2 };
+   extern discretisation_t discretisation_type;
 
    extern bool enable_resistance;
    //initialises the lists of atomstic/micromagnetic atoms for multiscale simulations

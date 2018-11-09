@@ -74,8 +74,8 @@ namespace micromagnetic{
 
 
          const int start = macro_neighbour_list_start_index[cell];
-         const int end = macro_neighbour_list_end_index[cell] +1;
-         for(int j = start;j< end;j++){
+         const int end = macro_neighbour_list_end_index[cell];
+         for(int j = start;j<end;j++){
             // calculate reduced exchange constant factor
             const int cellj = macro_neighbour_list_array[j];
             const double mj = m_e[cellj];

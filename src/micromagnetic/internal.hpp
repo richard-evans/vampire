@@ -36,16 +36,14 @@ namespace micromagnetic{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
-
       extern int my_num_micromagnetic_cells;
       extern int my_start_index; // first cell to intergrate on local (my) cpu
       extern int my_end_index;  // last cell +1 to intergrate on local (my) cpu
       extern bool mm_correction;
+
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
-
-
       extern int resistance_layer_1;
       extern int resistance_layer_2;
 
