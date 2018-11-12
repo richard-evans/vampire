@@ -278,10 +278,15 @@ namespace micromagnetic{
       //--------------------------------------------
       // print informative message to users
       //--------------------------------------------
+      int total_micromagnetic_cells = number_of_micromagnetic_cells;
+      #ifdef MPICF
+         MPI_Allreduce(&number_of_micromagnetic_cells, &total_micromagnetic_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+      #endif
+
       std::cout << "Micromagnetic initialisation complete" << std::endl;
       zlog << zTs() << "Micromagnetic initialisation complete" << std::endl;
-      std::cout << "Number of micromagnetic cells: " << number_of_micromagnetic_cells << std::endl;
-      zlog << zTs() << "Number of micromagnetic cells: " << number_of_micromagnetic_cells << std::endl;
+      std::cout << "Number of micromagnetic cells (all CPUs): " << total_micromagnetic_cells << std::endl;
+      zlog << zTs() << "Number of micromagnetic cells: " << total_micromagnetic_cells << std::endl;
 
       return;
 
