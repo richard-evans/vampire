@@ -373,6 +373,23 @@ int LLB( std::vector <int> local_cell_array,
 
    // Reduce unit vectors and moments to all processors
    #ifdef MPICF
+      // before reduction, need to zero all non-magnetic (empty) cells
+      // note: this requires that atomistic simulations are done last in multiscale simulation
+      for(int cid=0; cid < list_of_empty_micromagnetic_cells.size(); cid++){
+
+         // get cell ID
+         const int cell = list_of_empty_micromagnetic_cells[cid];
+
+         // set all components to zero
+         cells::mag_array_x[cell] = 0.0;
+         cells::mag_array_y[cell] = 0.0;
+         cells::mag_array_z[cell] = 0.0;
+
+         x_array[cell] = 0.0;
+         y_array[cell] = 0.0;
+         z_array[cell] = 0.0;
+
+      }
       MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);

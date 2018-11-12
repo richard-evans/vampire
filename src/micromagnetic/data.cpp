@@ -24,7 +24,7 @@ namespace micromagnetic{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
-   extern bool enabled = false; // Flag to determine if micromagnetic simulation is enabled
+   bool enabled = false; // Flag to determine if micromagnetic simulation is enabled
 
    //boolean to determine whether the simulation is micromagnetic
    discretisation_t discretisation_type = atomistic;
@@ -32,11 +32,11 @@ namespace micromagnetic{
    double MR_resistance = 0.0;
 
    bool enable_resistance = false;
-   //lsits to store atomistic/microamgnetic cells/atoms
-   std::vector < double > list_of_atomistic_atoms;
-   std::vector < double > list_of_none_atomistic_atoms;
-   std::vector < double > list_of_micromagnetic_cells;
-
+   //lists to store atomistic/microamgnetic cells/atoms
+   std::vector <int> list_of_atomistic_atoms(0);
+   std::vector <int> list_of_none_atomistic_atoms(0);
+   std::vector <int> list_of_micromagnetic_cells(0);
+   std::vector <int> list_of_empty_micromagnetic_cells(0);
 
    //sets initial values to 0
    int number_of_atomistic_atoms = 0;

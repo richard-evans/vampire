@@ -140,13 +140,17 @@ namespace micromagnetic{
             }
          }
 
-         // if simualtion is micromagetic all cells are made micromagnetic cells
+         // if simulation is micromagetic all cells are made micromagnetic cells
          for (int lc = 0; lc < num_local_cells; lc++){
             int cell = local_cell_array[lc];
             // Check that cell is micromagnetic, has a reasonable moment and reasonable Curie temperature
             if (micromagnetic::cell_discretisation_micromagnetic[cell] == 1 && mm::ms[cell] > 1e-30 && mm::Tc[cell] > 0.1) {
                list_of_micromagnetic_cells.push_back(cell);
-               number_of_micromagnetic_cells ++;
+               number_of_micromagnetic_cells++;
+            }
+            // Otherwise list cells as non-magnetic (empty)
+            else{
+               list_of_empty_micromagnetic_cells.push_back(cell);
             }
          }
 
@@ -172,6 +176,10 @@ namespace micromagnetic{
                // update number of cells
                number_of_micromagnetic_cells ++;
 
+            }
+            // Otherwise list cells as non-magnetic (empty)
+            else{
+               list_of_empty_micromagnetic_cells.push_back(cell);
             }
 
          }

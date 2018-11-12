@@ -32,9 +32,10 @@ namespace micromagnetic{
 
    extern bool enable_resistance;
    //initialises the lists of atomstic/micromagnetic atoms for multiscale simulations
-   extern std::vector < double > list_of_atomistic_atoms;
-   extern std::vector < double > list_of_none_atomistic_atoms;
-   extern std::vector < double > list_of_micromagnetic_cells;
+   extern std::vector <int> list_of_atomistic_atoms;
+   extern std::vector <int> list_of_none_atomistic_atoms;
+   extern std::vector <int> list_of_micromagnetic_cells;
+   extern std::vector <int> list_of_empty_micromagnetic_cells;
 
    //variables to store the numbers of atomistic/ microamgnetic atoms for multiscale simulations
    extern int number_of_atomistic_atoms;
