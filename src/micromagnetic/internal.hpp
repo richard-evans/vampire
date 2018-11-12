@@ -69,6 +69,11 @@ namespace micromagnetic{
 
       extern std::vector <double> cell_material_array;
 
+      // Thermal field array
+      extern std::vector<double> thermal_field_array_x;
+      extern std::vector<double> thermal_field_array_y;
+      extern std::vector<double> thermal_field_array_z;
+
       extern double pinning_field_height;
 
       //stores the external fields (x,y,z)
@@ -141,6 +146,7 @@ namespace micromagnetic{
                                                 std::vector<double>& y_array,
                                                 std::vector<double>& z_array);
 
+      void calculate_llg_thermal_fields(double temperature);
 
 
    } // end of internal namespace

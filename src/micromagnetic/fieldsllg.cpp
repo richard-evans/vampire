@@ -104,15 +104,11 @@ std::vector<double> calculate_llg_fields(std::vector <double>& m,
 
    }
 
-   // calculate sigma value (added fixed alpha and m_e in denominator?)
-   const double sigma = sqrt( twokB * temperature * alpha[cell] / ( mp::dt * ms[cell] * mi ) );
-
    const double anis_field[3]    = {one_o_chi_perp[cell]*mix, one_o_chi_perp[cell]*miy, 0.0};
-   const double thermal_field[3] = {sigma * mtrandom::gaussian(), sigma * mtrandom::gaussian(), sigma * mtrandom::gaussian()};
 
-   spin_field[0] = ext_field[0] + exchange_field[0] + anis_field[0] + thermal_field[0] + pinning_field_x[cell];
-   spin_field[1] = ext_field[1] + exchange_field[1] + anis_field[1] + thermal_field[1] + pinning_field_y[cell];
-   spin_field[2] = ext_field[2] + exchange_field[2] + anis_field[2] + thermal_field[2] + pinning_field_z[cell];
+   spin_field[0] = ext_field[0] + exchange_field[0] + anis_field[0] + thermal_field_array_x[cell] + pinning_field_x[cell];
+   spin_field[1] = ext_field[1] + exchange_field[1] + anis_field[1] + thermal_field_array_y[cell] + pinning_field_y[cell];
+   spin_field[2] = ext_field[2] + exchange_field[2] + anis_field[2] + thermal_field_array_z[cell] + pinning_field_z[cell];
 
    // Add dipole field if enabled
    if (dipole::activated){
@@ -143,6 +139,30 @@ std::vector<double> calculate_llg_fields(std::vector <double>& m,
    }
 
    return spin_field;
+
+}
+
+//------------------------------------------------------------------------------
+// Function to calculate thermal field for LLG micromagnetics
+//------------------------------------------------------------------------------
+void calculate_llg_thermal_fields(double temperature){
+
+   // loop over all cells and calculate thermal fields
+   for (int lc = 0; lc < cells::num_local_cells; lc++){
+
+      // get cell ID
+      const int cell = cells::local_cell_array[lc];
+
+      // calculate sigma value (added fixed alpha and m_e in denominator?)
+      const double sigma = sqrt( twokB * temperature * alpha[cell] / ( mp::dt * ms[cell] * m_e[cell] ) );
+
+      thermal_field_array_x[cell] = sigma * mtrandom::gaussian();
+      thermal_field_array_y[cell] = sigma * mtrandom::gaussian();
+      thermal_field_array_z[cell] = sigma * mtrandom::gaussian();
+
+   }
+
+   return;
 
 }
 

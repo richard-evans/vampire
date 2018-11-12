@@ -28,6 +28,10 @@
 #include <algorithm>
 #include <fstream>
 
+// file scope variables (for performance)
+std::vector<double> spin_field(3,0.0);
+std::vector<double> m(3,0.0);
+
 namespace mm = micromagnetic::internal;
 
 namespace micromagnetic_arrays_llg{
@@ -60,7 +64,7 @@ namespace micromagnetic_arrays_llg{
 
 namespace micromagnetic{
 
-   int micromagnetic_init_llg(int num_cells){
+   int micromagnetic_init_llg(const int num_cells){
 
       // check calling of routine if error checking is activated
       if(err::check==true) std::cout << "LLG_init has been called" << std::endl;
@@ -92,42 +96,41 @@ namespace micromagnetic{
       return EXIT_SUCCESS;
    }
 
-
-   int LLG( std::vector <int> local_cell_array,
-      int num_steps,
-      int num_cells,
-      int num_local_cells,
-      double temperature,
+   //---------------------------------------------------------------------------
+   // Function to calculate single LLG timestep for micromagnetic cells
+   //---------------------------------------------------------------------------
+   int LLG( const std::vector<int>& local_cell_array,
+      const int num_steps,
+      const int num_cells,
+      const int num_local_cells,
+      const double temperature,
       std::vector<double>& x_mag_array,
       std::vector<double>& y_mag_array,
       std::vector<double>& z_mag_array,
-      double Hx,
-      double Hy,
-      double Hz,
-      double H,
-      double dt,
-      std::vector <double> volume_array
+      const double Hx,
+      const double Hy,
+      const double Hz,
+      const double H,
+      const double dt,
+      const std::vector<double>& volume_array
    ){
-
-      // check calling of routine if error checking is activated
-      if(err::check==true){std::cout << "micromagnetic::LLG_Heun has been called" << std::endl;}
 
       using namespace micromagnetic_arrays_llg;
 
       // Check for initialisation of LLG integration arrays
       if(LLG_set== false) micromagnetic::micromagnetic_init_llg(num_cells);
-      // Local variables for system integration
 
       //calculte chi(T).
       mm::one_o_chi_para =  mm::calculate_chi_para(num_local_cells,local_cell_array, num_cells, temperature);
       mm::one_o_chi_perp =  mm::calculate_chi_perp(num_local_cells,local_cell_array, num_cells, temperature);
 
       //The external fields equal the length of the field times the applied field vector.
-      //This is saved to an array.
       mm::ext_field[0] = H*Hx;
       mm::ext_field[1] = H*Hy;
       mm::ext_field[2] = H*Hz;
 
+      // local constants
+      const double halfdt = 0.5*mp::dt;
       // const double real_time = sim::time*mp::dt_SI;
    	// const double omega = sim::fmr_field_frequency*1.e9; // Hz
    	// const double Hfmrx = sim::fmr_field_unit_vector[0];
@@ -143,22 +146,30 @@ namespace micromagnetic{
       //normalises the x,y,z magnetisations to have a length of 1
       for (int lc = 0; lc < num_local_cells; lc++){
          int cell = local_cell_array[lc];
-         x_array[cell] = x_mag_array[cell];
-         y_array[cell] = y_mag_array[cell];
-         z_array[cell] = z_mag_array[cell];
-         double m_squared = sqrt(x_array[cell]*x_array[cell] + y_array[cell]*y_array[cell] + z_array[cell]*z_array[cell]);
-         x_array[cell] = x_array[cell]/m_squared;
-         y_array[cell] = y_array[cell]/m_squared;
-         z_array[cell] = z_array[cell]/m_squared;
-         x_initial_spin_array[cell] = x_array[cell];
-         y_initial_spin_array[cell] = y_array[cell];
-         z_initial_spin_array[cell] = z_array[cell];
+         double x = x_mag_array[cell];
+         double y = y_mag_array[cell];
+         double z = z_mag_array[cell];
+         const double im_squared = 1.0/sqrt(x*x + y*y +z*z);
+         x = x*im_squared;
+         y = y*im_squared;
+         z = z*im_squared;
+
+         x_array[cell] = x;
+         y_array[cell] = y;
+         z_array[cell] = z;
+
+         x_initial_spin_array[cell] = x;
+         y_initial_spin_array[cell] = y;
+         z_initial_spin_array[cell] = z;
+
       }
 
-      std::vector<double> spin_field(3,0.0);
-      std::vector<double> m(3,0.0);
+      // precalculate thermal fields for both steps of the integration
+      internal::calculate_llg_thermal_fields(temperature);
 
-      //calcualtes the euler gradient
+      //------------------------------------------------------------------------
+      // calculates the euler gradient
+      //------------------------------------------------------------------------
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
 
          // get cell ID
@@ -175,13 +186,15 @@ namespace micromagnetic{
          //calcualtes 1/(1+a^2) and a/(1+a^2) for llg
          const double alpha = mm::alpha[cell];
          const double ialpha2 = 1.0/(1.0+alpha*alpha);
-         const double one_oneplusalpha_sq = ialpha2; // material specific alpha and gamma
-         const double alpha_oneplusalpha_sq = alpha*ialpha2;
+         const double one_oneplusalpha_sq = -ialpha2; // material specific alpha and gamma
+         const double alpha_oneplusalpha_sq = -alpha*ialpha2;
 
          const double S[3] = {m[0],m[1],m[2]};
-         const double H[3] = {-spin_field[0], -spin_field[1], -spin_field[2]};
-         //calcautes the delta S stores in x,y,z
-         double xyz[3] = {0.0,0.0,0.0};
+         const double H[3] = {spin_field[0], spin_field[1], spin_field[2]};
+
+         // calculates the delta S stores in x,y,z
+         double xyz[3];
+
          xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
          xyz[1]=(one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
          xyz[2]=(one_oneplusalpha_sq)*(S[0]*H[1]-S[1]*H[0]) + (alpha_oneplusalpha_sq)*(S[0]*(S[2]*H[0]-S[0]*H[2])-S[1]*(S[1]*H[2]-S[2]*H[1]));
@@ -217,9 +230,9 @@ namespace micromagnetic{
          // Normalise Spin Length
          mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
 
-         S_new[0]=S_new[0]*mod_S;
-         S_new[1]=S_new[1]*mod_S;
-         S_new[2]=S_new[2]*mod_S;
+         S_new[0] = S_new[0] * mod_S;
+         S_new[1] = S_new[1] * mod_S;
+         S_new[2] = S_new[2] * mod_S;
 
          x_spin_storage_array[cell] = S_new[0];
          y_spin_storage_array[cell] = S_new[1];
@@ -234,7 +247,9 @@ namespace micromagnetic{
       	MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
       #endif
 
+      //------------------------------------------------------------------------
       // heun step
+      //------------------------------------------------------------------------
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
          int cell = list_of_micromagnetic_cells[lc];
 
@@ -246,11 +261,13 @@ namespace micromagnetic{
 
          //save magnetisation and field to arrays for easy access.
          const double S[3] = {m[0],m[1],m[2]};
-         const double H[3] = {-spin_field[0], -spin_field[1], -spin_field[2]};
+         const double H[3] = {spin_field[0], spin_field[1], spin_field[2]};
 
-         //calcualtes 1/(1+a^2) and a/(1+a^2) for llg
-         const double one_oneplusalpha_sq = 1.0/(1.0+mm::alpha[cell]*mm::alpha[cell]); // material specific alpha and gamma
-         const double alpha_oneplusalpha_sq = mm::alpha[cell]/(1+mm::alpha[cell]*mm::alpha[cell]);
+         //calculates 1/(1+a^2) and a/(1+a^2) for llg
+         const double alpha = mm::alpha[cell];
+         const double ialpha2 = 1.0/(1.0+alpha*alpha);
+         const double one_oneplusalpha_sq = -ialpha2; // material specific alpha and gamma
+         const double alpha_oneplusalpha_sq = -alpha*ialpha2;
 
          //saves delta to xyz
          double xyz[3] = {0.0,0.0,0.0};
@@ -262,6 +279,7 @@ namespace micromagnetic{
          x_heun_array[cell] = xyz[0];
          y_heun_array[cell] = xyz[1];
          z_heun_array[cell] = xyz[2];
+
       }
 
       // For parallel version set arrays to large negative number every time
@@ -281,20 +299,24 @@ namespace micromagnetic{
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
          int cell = list_of_micromagnetic_cells[lc];
 
-         S_new[0]= x_initial_spin_array[cell]+(dt/2.0)*(x_euler_array[cell]+x_heun_array[cell]);
-         S_new[1]= y_initial_spin_array[cell]+(dt/2)*(y_euler_array[cell]+y_heun_array[cell]);
-         S_new[2]= z_initial_spin_array[cell]+(dt/2)*(z_euler_array[cell]+z_heun_array[cell]);
+         S_new[0] = x_initial_spin_array[cell] + halfdt * ( x_euler_array[cell] + x_heun_array[cell] );
+         S_new[1] = y_initial_spin_array[cell] + halfdt * ( y_euler_array[cell] + y_heun_array[cell] );
+         S_new[2] = z_initial_spin_array[cell] + halfdt * ( z_euler_array[cell] + z_heun_array[cell] );
 
          // Normalise Spin Length
          mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
 
-         x_array[cell]=S_new[0]*mod_S;
-         y_array[cell]=S_new[1]*mod_S;
-         z_array[cell]=S_new[2]*mod_S;
+         x_array[cell] = S_new[0]*mod_S;
+         y_array[cell] = S_new[1]*mod_S;
+         z_array[cell] = S_new[2]*mod_S;
 
-         cells::mag_array_x[cell] = x_array[cell]*mm::ms[cell];
-         cells::mag_array_y[cell] = y_array[cell]*mm::ms[cell];
-         cells::mag_array_z[cell] = z_array[cell]*mm::ms[cell];
+         // cast ms as temporary constant
+         const double ms = mm::ms[cell];
+
+         // save back actual moments to cell arrays (J/T)
+         cells::mag_array_x[cell] = x_array[cell]*ms;
+         cells::mag_array_y[cell] = y_array[cell]*ms;
+         cells::mag_array_z[cell] = z_array[cell]*ms;
 
       }
 

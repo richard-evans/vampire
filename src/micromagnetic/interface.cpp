@@ -138,7 +138,6 @@ namespace micromagnetic{
       //--------------------------------------------------------------------
       std::string test="micromagnetic-discretisation-enabled";
       if(word==test){
-         double K=atof(value.c_str());
          vin::read_material[super_index].micromagnetic_enabled=true;
          //std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
          return true;

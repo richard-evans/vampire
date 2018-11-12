@@ -96,6 +96,11 @@ namespace micromagnetic{
 
       std::vector <double> cell_material_array;
 
+      // Thermal field array
+      std::vector<double> thermal_field_array_x(0);
+      std::vector<double> thermal_field_array_y(0);
+      std::vector<double> thermal_field_array_z(0);
+
       bool mm_correction;
       double pinning_field_height;
       std::vector <double> pinning_field_x;

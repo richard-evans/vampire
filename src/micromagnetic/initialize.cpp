@@ -71,7 +71,7 @@ namespace micromagnetic{
       mm::Tc.resize(num_cells,0.0);
       mm::alpha_para.resize(num_cells,0.0);
       mm::alpha_perp.resize(num_cells,0.0);
-      mm::m_e.resize(num_cells,0.0);
+      mm::m_e.resize(num_cells,1.0); // initialise as fully magnetizated
       mm::macro_neighbour_list_start_index.resize(num_cells,0.0);
       mm::macro_neighbour_list_end_index.resize(num_cells,0.0);
       micromagnetic::cell_discretisation_micromagnetic.resize(num_cells,true);
@@ -80,6 +80,10 @@ namespace micromagnetic{
       mm::pinning_field_y.resize(num_cells,0.0);
       mm::pinning_field_z.resize(num_cells,0.0);
       mm::cell_material_array.resize(num_cells,0.0);
+
+      mm::thermal_field_array_x.resize(num_cells,0.0);
+      mm::thermal_field_array_y.resize(num_cells,0.0);
+      mm::thermal_field_array_z.resize(num_cells,0.0);
 
       // These functions vectors with the parameters calcualted from the function
       mm::ms =                   mm::calculate_ms(num_local_cells,num_atoms,num_cells, cell_array, type_array,material,local_cell_array);

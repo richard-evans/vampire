@@ -93,21 +93,21 @@ namespace micromagnetic{
             double dt,
             std::vector <double> volume_array);
 
-    //micromagnetic LLG
-    int LLG( std::vector <int> local_cell_array,
-             int num_steps,
-             int num_cells,
-             int num_local_cells,
-             double temperature,
-             std::vector<double>& x_mag_array,
-             std::vector<double>& y_mag_array,
-             std::vector<double>& z_mag_array,
-             double Hx,
-             double Hy,
-             double Hz,
-             double H,
-             double dt,
-             std::vector <double> volume_array);
+   //micromagnetic LLG
+   int LLG( const std::vector<int>& local_cell_array,
+      const int num_steps,
+      const int num_cells,
+      const int num_local_cells,
+      const double temperature,
+      std::vector<double>& x_mag_array,
+      std::vector<double>& y_mag_array,
+      std::vector<double>& z_mag_array,
+      const double Hx,
+      const double Hy,
+      const double Hz,
+      const double H,
+      const double dt,
+      const std::vector<double>& volume_array);
 
    //-----------------------------------------------------------------------------
    // Function to initialise micromagnetic module
