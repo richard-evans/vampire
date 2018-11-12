@@ -58,6 +58,8 @@ namespace micromagnetic{
       //--------------------------------------------------------------------
       if(micromagnetic::enabled == false ) return;
 
+      zlog << zTs() << "Initialising micromagnetic calculation..." << std::endl;
+
       //resizes the vectors used to store the cell parameters
       mm::A.resize(num_cells*num_cells,0.0);
       mm::alpha.resize(num_cells,0.0);
@@ -265,14 +267,19 @@ namespace micromagnetic{
     //    }
   //}
 
-     //boltzman stuff
-     P.resize(101);
-     for (int i = 0; i < 101; i++) P[i].resize(101,0.0);
+      //boltzman stuff
+      P.resize(101);
+      for (int i = 0; i < 101; i++) P[i].resize(101,0.0);
 
+      //--------------------------------------------
+      // print informative message to users
+      //--------------------------------------------
+      std::cout << "Micromagnetic initialisation complete" << std::endl;
+      zlog << zTs() << "Micromagnetic initialisation complete" << std::endl;
+      std::cout << "Number of micromagnetic cells: " << number_of_micromagnetic_cells << std::endl;
+      zlog << zTs() << "Number of micromagnetic cells: " << number_of_micromagnetic_cells << std::endl;
 
-   //  std::cout << "initialize complete" << "\t" << mm::gamma[0] << '\t' << mm::alpha[0] << std::endl;
-
-     return;
+      return;
 
    }
 
