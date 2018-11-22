@@ -12,6 +12,7 @@
 #ifdef MPICF
 // Standard Libraries
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 // Vampire Header files
