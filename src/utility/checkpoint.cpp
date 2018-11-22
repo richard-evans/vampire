@@ -90,8 +90,8 @@ void save_checkpoint(){
    // close checkpoint file
    chkfile.close();
 
-   // log writing checkpoint file
-   zlog << zTs() << "Checkpoint file written to disk." << std::endl;
+   // log writing checkpoint file (only for non-continuous checkpoint files)
+   if(!sim::save_checkpoint_continuous_flag) zlog << zTs() << "Checkpoint file written to disk." << std::endl;
 
    return;
 

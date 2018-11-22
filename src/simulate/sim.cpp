@@ -245,6 +245,9 @@ int run(){
    // Check for load spin configurations from checkpoint
    if(sim::load_checkpoint_flag) load_checkpoint();
 
+	// For continuous checkpoints inform user about I/O
+	if(sim::save_checkpoint_continuous_flag) zlog << zTs() << "Continuously writing checkpoints to disk throughout simulation." << std::endl;
+
    {
       // Set up statistical data sets
       #ifdef MPICF
