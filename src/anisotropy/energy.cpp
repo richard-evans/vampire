@@ -34,15 +34,16 @@ namespace anisotropy{
       double energy = 0.0;
 
       // if not enabled then do nothing
-      if(internal::enable_uniaxial_second_order) energy += internal::uniaxial_second_order_energy(atom, mat, sx, sy, sz);
-      if(internal::enable_uniaxial_fourth_order) energy += internal::uniaxial_fourth_order_energy(atom, mat, sx, sy, sz);
-      if(internal::enable_uniaxial_sixth_order)  energy += internal::uniaxial_sixth_order_energy (atom, mat, sx, sy, sz);
+      if(internal::enable_uniaxial_second_order)         energy += internal::uniaxial_second_order_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_uniaxial_fourth_order)         energy += internal::uniaxial_fourth_order_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_uniaxial_sixth_order)          energy += internal::uniaxial_sixth_order_energy (atom, mat, sx, sy, sz);
 
-      if(internal::enable_cubic_fourth_order)    energy += internal::cubic_fourth_order_energy(atom, mat, sx, sy, sz);
-      if(internal::enable_cubic_sixth_order)     energy += internal::cubic_sixth_order_energy (atom, mat, sx, sy, sz);
+      if(internal::enable_cubic_fourth_order)            energy += internal::cubic_fourth_order_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_cubic_fourth_order_rotation)   energy += internal::cubic_fourth_order_rotation_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_cubic_sixth_order)             energy += internal::cubic_sixth_order_energy (atom, mat, sx, sy, sz);
 
-      if(internal::enable_neel_anisotropy)       energy += internal::neel_energy(atom, mat, sx, sy, sz);
-      if(internal::enable_lattice_anisotropy)    energy += internal::lattice_energy(atom, mat, sx, sy, sz, temperature);
+      if(internal::enable_neel_anisotropy)               energy += internal::neel_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_lattice_anisotropy)            energy += internal::lattice_energy(atom, mat, sx, sy, sz, temperature);
 
       return energy;
 
