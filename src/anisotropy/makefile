@@ -5,6 +5,7 @@
 # List module object filenames
 anisotropy_objects =\
 cubic_fourth_order.o \
+cubic_fourth_order_rotation.o \
 cubic_sixth_order.o \
 data.o \
 energy.o \
