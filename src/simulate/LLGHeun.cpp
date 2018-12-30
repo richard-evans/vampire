@@ -168,17 +168,13 @@ int LLG_Heun(){
 	if(LLG_set==false) sim::LLGinit();
 
 	// Local variables for system integration
-	const int num_atoms=atoms::num_atoms;
-	double xyz[3];		// Local Delta Spin Components
-	double S_new[3];	// New Local Spin Moment
-	double mod_S;		// magnitude of spin moment
+	const int num_atoms = atoms::num_atoms;
 
 	// Store initial spin positions
-	for(int atom=0;atom<num_atoms;atom++){
-		x_initial_spin_array[atom] = atoms::x_spin_array[atom];
-		y_initial_spin_array[atom] = atoms::y_spin_array[atom];
-		z_initial_spin_array[atom] = atoms::z_spin_array[atom];
-	}
+   for(int atom = 0; atom < num_atoms; ++atom) x_initial_spin_array[atom] = atoms::x_spin_array[atom];
+   for(int atom = 0; atom < num_atoms; ++atom) y_initial_spin_array[atom] = atoms::y_spin_array[atom];
+   for(int atom = 0; atom < num_atoms; ++atom) z_initial_spin_array[atom] = atoms::z_spin_array[atom];
+
 
 	// Calculate fields
 	calculate_spin_fields(0,num_atoms);
@@ -198,39 +194,32 @@ int LLG_Heun(){
 									atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]};
 
 		// Calculate Delta S
-		xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
-		xyz[1]=(one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
-		xyz[2]=(one_oneplusalpha_sq)*(S[0]*H[1]-S[1]*H[0]) + (alpha_oneplusalpha_sq)*(S[0]*(S[2]*H[0]-S[0]*H[2])-S[1]*(S[1]*H[2]-S[2]*H[1]));
+		x_euler_array[atom]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
+		y_euler_array[atom]=(one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
+		z_euler_array[atom]=(one_oneplusalpha_sq)*(S[0]*H[1]-S[1]*H[0]) + (alpha_oneplusalpha_sq)*(S[0]*(S[2]*H[0]-S[0]*H[2])-S[1]*(S[1]*H[2]-S[2]*H[1]));
 
-		// Store dS in euler array
-		x_euler_array[atom]=xyz[0];
-		y_euler_array[atom]=xyz[1];
-		z_euler_array[atom]=xyz[2];
+   }
 
-		// Calculate Euler Step
-		S_new[0]=S[0]+xyz[0]*mp::dt;
-		S_new[1]=S[1]+xyz[1]*mp::dt;
-		S_new[2]=S[2]+xyz[2]*mp::dt;
+   // cast namespaced variable to local constant
+   const double mpdt = mp::dt;
 
-		// Normalise Spin Length
-		mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
+   // Calculate Euler Step
+   for(int atom = 0; atom < num_atoms; ++atom) x_spin_storage_array[atom] = x_initial_spin_array[atom] + x_euler_array[atom]*mpdt;
+   for(int atom = 0; atom < num_atoms; ++atom) y_spin_storage_array[atom] = y_initial_spin_array[atom] + y_euler_array[atom]*mpdt;
+   for(int atom = 0; atom < num_atoms; ++atom) z_spin_storage_array[atom] = z_initial_spin_array[atom] + z_euler_array[atom]*mpdt;
 
-		S_new[0]=S_new[0]*mod_S;
-		S_new[1]=S_new[1]*mod_S;
-		S_new[2]=S_new[2]*mod_S;
+   // calculate normalised spin length (holding in heun array_x for vectorizability)
+   for(int atom = 0; atom < num_atoms; ++atom){
+      const double x = x_spin_storage_array[atom];
+      const double y = y_spin_storage_array[atom];
+      const double z = z_spin_storage_array[atom];
+      x_heun_array[atom] = 1.0/sqrt(x*x + y*y + z*z);
+   }
 
-		//Writing of Spin Values to Storage Array
-		x_spin_storage_array[atom]=S_new[0];
-		y_spin_storage_array[atom]=S_new[1];
-		z_spin_storage_array[atom]=S_new[2];
- 	}
-
-	// Copy new spins to spin array
-	for(int atom=0;atom<num_atoms;atom++){
-		atoms::x_spin_array[atom]=x_spin_storage_array[atom];
-		atoms::y_spin_array[atom]=y_spin_storage_array[atom];
-		atoms::z_spin_array[atom]=z_spin_storage_array[atom];
-	}
+   // normalise spin length
+   for(int atom = 0; atom < num_atoms; ++atom) atoms::x_spin_array[atom] = x_spin_storage_array[atom] * x_heun_array[atom];
+   for(int atom = 0; atom < num_atoms; ++atom) atoms::y_spin_array[atom] = y_spin_storage_array[atom] * x_heun_array[atom];
+   for(int atom = 0; atom < num_atoms; ++atom) atoms::z_spin_array[atom] = z_spin_storage_array[atom] * x_heun_array[atom];
 
 	// Recalculate spin dependent fields
 	calculate_spin_fields(0,num_atoms);
@@ -248,37 +237,34 @@ int LLG_Heun(){
 									atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom],
 									atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]};
 
-		// Calculate Delta S
-		xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
-		xyz[1]=(one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
-		xyz[2]=(one_oneplusalpha_sq)*(S[0]*H[1]-S[1]*H[0]) + (alpha_oneplusalpha_sq)*(S[0]*(S[2]*H[0]-S[0]*H[2])-S[1]*(S[1]*H[2]-S[2]*H[1]));
+		// Calculate Delta S and store dS in heun array
+		x_heun_array[atom]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
+		y_heun_array[atom]=(one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
+		z_heun_array[atom]=(one_oneplusalpha_sq)*(S[0]*H[1]-S[1]*H[0]) + (alpha_oneplusalpha_sq)*(S[0]*(S[2]*H[0]-S[0]*H[2])-S[1]*(S[1]*H[2]-S[2]*H[1]));
 
-		// Store dS in heun array
-		x_heun_array[atom]=xyz[0];
-		y_heun_array[atom]=xyz[1];
-		z_heun_array[atom]=xyz[2];
 	}
 
 	// Calculate Heun Step
-	for(int atom=0;atom<num_atoms;atom++){
-		S_new[0]=x_initial_spin_array[atom]+mp::half_dt*(x_euler_array[atom]+x_heun_array[atom]);
-		S_new[1]=y_initial_spin_array[atom]+mp::half_dt*(y_euler_array[atom]+y_heun_array[atom]);
-		S_new[2]=z_initial_spin_array[atom]+mp::half_dt*(z_euler_array[atom]+z_heun_array[atom]);
+   const double halfdt = mp::half_dt;
+	for(int atom=0;atom<num_atoms;atom++) x_spin_storage_array[atom] = x_initial_spin_array[atom] + halfdt* (x_euler_array[atom]+x_heun_array[atom]);
+   for(int atom=0;atom<num_atoms;atom++) y_spin_storage_array[atom] = y_initial_spin_array[atom] + halfdt* (y_euler_array[atom]+y_heun_array[atom]);
+   for(int atom=0;atom<num_atoms;atom++) z_spin_storage_array[atom] = z_initial_spin_array[atom] + halfdt* (z_euler_array[atom]+z_heun_array[atom]);
 
-		// Normalise Spin Length
-		mod_S = 1.0/sqrt(S_new[0]*S_new[0] + S_new[1]*S_new[1] + S_new[2]*S_new[2]);
+   // calculate normalised spin length (holding in heun array_x for vectorizability)
+   for(int atom = 0; atom < num_atoms; ++atom){
+      const double x = x_spin_storage_array[atom];
+      const double y = y_spin_storage_array[atom];
+      const double z = z_spin_storage_array[atom];
+      x_heun_array[atom] = 1.0/sqrt(x*x + y*y + z*z);
+   }
 
-		S_new[0]=S_new[0]*mod_S;
-		S_new[1]=S_new[1]*mod_S;
-		S_new[2]=S_new[2]*mod_S;
-
-		// Copy new spins to spin array
-		atoms::x_spin_array[atom]=S_new[0];
-		atoms::y_spin_array[atom]=S_new[1];
-		atoms::z_spin_array[atom]=S_new[2];
-	}
+   // normalise spin length
+   for(int atom = 0; atom < num_atoms; ++atom) atoms::x_spin_array[atom] = x_spin_storage_array[atom] * x_heun_array[atom];
+   for(int atom = 0; atom < num_atoms; ++atom) atoms::y_spin_array[atom] = y_spin_storage_array[atom] * x_heun_array[atom];
+   for(int atom = 0; atom < num_atoms; ++atom) atoms::z_spin_array[atom] = z_spin_storage_array[atom] * x_heun_array[atom];
 
 	return EXIT_SUCCESS;
+
 }
 
 /// @brief LLG Heun Integrator (CUDA)
