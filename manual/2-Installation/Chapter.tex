@@ -15,7 +15,7 @@ Compiled binaries of the latest release version are available to download from:\
 
 \begin{minipage}[c]{\textwidth}
 \centering
-http://vampire.york.ac.uk/download/
+https://vampire.york.ac.uk/download/
 \end{minipage}\\
 
 \noindent for Linux and Mac$^{\mathrm{TM}}$ OS X platforms. For the Linux and Mac OS X releases, a simple installation script \textit{install.sh} installs the binary in \textit{/opt/vampire/} and appends the directory to your environment path. On Windows the recommended method is to use the \textit{Linux subsystem for windows} developer feature which adds a linux subsystem that is capable of running the standard linux binary. A copy of qvoronoi is integrated into \vampire for generating granular structures. 
@@ -53,11 +53,11 @@ The recommended way to use vampire on Windows is to install Linux subsystem for 
 
 \subsection*{Compiling for ARCHER/Cray systems}
 \addcontentsline{toc}{subsection}{Compiling for ARCHER}
-ARCHER is the UK national supercomputer and includes custom compilers developed by Cray Inc. However, performance is generally better for the gnu compiler collection and so there is an optimized makefile option for compilation on the ARCHER and similar Cray XC30 systems. To compile, you need to swap the environment to the GNU compiler suite using \textit{Enswap Gnu}. You can then compile with \textit{make ARCHER} which will compile a parallel binary.
+ARCHER is the UK national supercomputer and includes custom compilers developed by Cray Inc. However, performance is generally better for the gnu compiler collection and so there is an optimized makefile option for compilation on the ARCHER and similar Cray XC30 systems. To compile, you need to swap the environment to the GNU compiler suite using \textit{module swap PrgEnv-cray PrgEnv-gnu}. You can then compile with \textit{make parallel-archer} which will compile a parallel binary.
 
-\subsection*{Compiling for GPU acceleration with CUDA}
+\subsection*{Compiling for GPU acceleration with CUDA (beta)}
 \addcontentsline{toc}{subsection}{Compiling for GPU}
-The latest release includes a CUDA implementation for GPU accelerated atomistic spin dynamics. To compile the CUDA version of the code, you need to install the CUDA drivers and runtime. Once installed, compilation should be straightforward using \textit{make cuda}. By default, the binary includes device code for a wide range of architectures. Depending on your device/card, you may need to modify the device code generation option in the makefile.
+The latest release includes a CUDA implementation for GPU accelerated atomistic spin dynamics. To compile the CUDA version of the code, you need to install the CUDA drivers and runtime. Once installed, compilation should be straightforward using \textit{make gcc-cuda}. By default, the binary includes device code for a wide range of architectures. Depending on your device/card, you may need to modify the device code generation option in the makefile.
 
 %------------------------------------------------------------------------
 %
