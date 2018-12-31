@@ -29,13 +29,14 @@
 
 \definecolor{ZSGrey}{rgb}{.41,.41,.41}
 
-\newfontfamily\frontpagefont[Scale=2.8,LetterSpace=8.0]{Open Sans Light}
+\newfontfamily\frontpagefont[Scale=2.8,LetterSpace=8.0]{Open Sans}
 
 \setmainfont{Open Sans}
-\setmathsfont(Digits,Latin,Greek){Times New Roman}
+%\setmathsfont(Digits,Latin,Greek){Times}
+\setmathsfont{Times}
 
 \defaultfontfeatures{Ligatures=TeX}
-\setmathrm[Numbers=Lining,Scale=MatchLowercase]{Open Sans}
+%\setmathrm[Numbers=Lining,Scale=MatchLowercase]{Open Sans}
 
 \fontsize{4}{8}\selectfont
 
@@ -48,14 +49,14 @@
 \newfontfamily\subsectionfont[Scale=1.0]{Open Sans}
 \newfontfamily\subsubsectionfont[]{Open Sans Italic}
 \newfontfamily\digitfont[]{Open Sans}
-
+\newfontfamily\commandfont[Scale=1.0]{Open Sans Bold}
 % Set formats for each heading level
 %\titleformat*{\chapter}{\Large\bfseries\sectionfont}
 \titleformat{\chapter}[display]
 {\chapterfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}\titleformat*{\section}{\sectionfont}
 \titleformat*{\subsection}{\small\bfseries\subsectionfont}
 \titleformat*{\subsubsection}{\small\subsubsectionfont}
-\newcommand{\zicf}{\noindent\bfseries\subsectionfont\small}
+\newcommand{\zicf}{\noindent\commandfont}
 
 % this alters "before" spacing (the second length argument) to 0
 \titlespacing*{\chapter}{0pt}{0pt}{40pt}

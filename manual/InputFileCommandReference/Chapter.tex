@@ -46,27 +46,27 @@ crystal lattice to be generated.\\ \par
 
 {\zicf create:single-spin flag}\addcontentsline{toc}{subsection}{create:single-spin} Overrides all create options and generates a single isolated spin.\\ \par
 
-{\zicf create:periodic-boundaries-x flag}\addcontentsline{toc}{subsection}{create:periodic-boundaries-x} creates periodic boundaries along the $x$-direction. Parallel version is implemented but untested - use with caution.\\ \par
+{\zicf create:periodic-boundaries-x flag}\addcontentsline{toc}{subsection}{create:periodic-boundaries-x} creates periodic boundaries along the $x$-direction.\\ \par
 
-{\zicf create:periodic-boundaries-y flag}\addcontentsline{toc}{subsection}{create:periodic-boundaries-y} creates periodic boundaries along the $y$-direction. Parallel version is implemented but untested - use with caution.\\ \par
+{\zicf create:periodic-boundaries-y flag}\addcontentsline{toc}{subsection}{create:periodic-boundaries-y} creates periodic boundaries along the $y$-direction.\\ \par
 
-{\zicf create:periodic-boundaries-z flag}\addcontentsline{toc}{subsection}{create:periodic-boundaries-z} creates periodic boundaries along the $z$-direction. Parallel version is implemented but untested - use with caution.\\ \par
+{\zicf create:periodic-boundaries-z flag}\addcontentsline{toc}{subsection}{create:periodic-boundaries-z} creates periodic boundaries along the $z$-direction.\\ \par
 
-{\zicf create:select-material-by-height}\addcontentsline{toc}{subsection}{create:select-material-by-height}\\ \par
+{\zicf create:select-material-by-height}\addcontentsline{toc}{subsection}{create:select-material-by-height} specifies that materials are preferentially assigned by their height specification.\\ \par
 
-{\zicf create:select-material-by-geometry}\addcontentsline{toc}{subsection}{create:select-material-by-geometry}\\ \par
+{\zicf create:select-material-by-geometry}\addcontentsline{toc}{subsection}{create:select-material-by-geometry} specifies that materials are preferentially assigned by their geometric specification (eg in core-shell systems).\\ \par
 
 {\zicf create:fill-core-shell-particles}\addcontentsline{toc}{subsection}{create:fill-core-shell-particles}\\ \par
 
-{\zicf create:interfacial-roughness}\addcontentsline{toc}{subsection}{create:interfacial-roughness}\\ \par
+{\zicf create:interfacial-roughness}\addcontentsline{toc}{subsection}{create:interfacial-roughness} specifies that a global roughness is applied to the material height specification (eg from a non-flat substrate).\\ \par
 
-{\zicf create:material-interfacial-roughness}\addcontentsline{toc}{subsection}{create:material-interfacial-roughness}\\ \par
+{\zicf create:material-interfacial-roughness}\addcontentsline{toc}{subsection}{create:material-interfacial-roughness} specifies that a material-specific roughness is applied to the material height specification (eg from differences in local deposition rate).\\ \par
 
-{\zicf create:interfacial-roughness-random-seed}\addcontentsline{toc}{subsection}{create:interfacial-roughness-random-seed}\\ \par
+{\zicf create:interfacial-roughness-random-seed}\addcontentsline{toc}{subsection}{create:interfacial-roughness-random-seed} specifies the random seed for generating the roughness pattern, where different numbers generate different random patterns. Number should ideally be large and around 2,000,000,000.\\ \par
 
-{\zicf create:interfacial-roughness-number-of-seed-points}\addcontentsline{toc}{subsection}{create:interfacial-roughness-number-of-seed-points}\\ \par
+{\zicf create:interfacial-roughness-number-of-seed-points}\addcontentsline{toc}{subsection}{create:interfacial-roughness-number-of-seed-points} determines the undulation for the roughness, where more points gives a larger undulation.\\ \par
 
-{\zicf create:interfacial-roughness-type}\addcontentsline{toc}{subsection}{create:interfacial-roughness-type}\\ \par
+{\zicf create:interfacial-roughness-type}\addcontentsline{toc}{subsection}{create:interfacial-roughness-type} determines whether the roughness is applied as peaks or troughs in the material-specific material heights. Valid options are "peaks" or "troughs".\\ \par
 
 {\zicf create:interfacial-roughness-seed-radius}\addcontentsline{toc}{subsection}{create:interfacial-roughness-seed-radius}\\ \par
 
@@ -108,7 +108,7 @@ structure that is generated.\\
 \addcontentsline{toc}{section}{System dimensions}
 The commands here determine the dimensions of the generated system.\\
 
-{\zicf dimensions:unit-cell-size = float [0.1+ \AA, default 3.54 \AA]}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size} Defines the size of the unit cell.\\ \par
+{\zicf dimensions:unit-cell-size = float [0.1 \AA - 10 $\mu$ m, default 3.54 \AA]}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size} Defines the size of the unit cell.\\ \par
 
 {\zicf dimensions:unit-cell-size-x}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-x} Defines the size of the unit cell if asymmetric.\\ \par
 
@@ -129,17 +129,17 @@ The commands here determine the dimensions of the generated system.\\
 {\zicf dimensions:particle-spacing}\addcontentsline{toc}{subsection}{dimensions:particle-spacing} Defines the spacing between particles in particle arrays or voronoi media.\\ \par
 
 
-{\zicf dimensions:particle-shape-factor-x = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $x$ direction. This property scales the as a fraction of the particle-size along the $x$-direction.\\
+{\zicf dimensions:particle-shape-factor-x = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-x} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $x$ direction. This property scales the as a fraction of the particle-size along the $x$-direction.\\
 
-{\zicf dimensions:particle-shape-factor-y = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-y}\\
+{\zicf dimensions:particle-shape-factor-y = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-y} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $y$ direction. This property scales the as a fraction of the particle-size along the $y$-direction.\\
 
-{\zicf dimensions:particle-shape-factor-z = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z}\\
+{\zicf dimensions:particle-shape-factor-z = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $z$ direction. This property scales the as a fraction of the particle-size along the $z$-direction.\\
 
 {\zicf dimensions:particle-array-offset-x [0-10$^4$ \AA]}\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-x} Translates the 2-D particle array the chosen distance along the x-direction.\\
 
-{\zicf dimensions:particle-array-offset-y}\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y}\\
+{\zicf dimensions:particle-array-offset-y}\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y}  Translates the 2-D particle array the chosen distance along the y-direction.\\
 
-{\zicf dimensions:double macro-cell-size}\addcontentsline{toc}{subsection}{dimensions:macro-cell-size} determines the macro cell size for calculation of the demagnetizing field and output of the magnetic configuration. Finer discretisation lead to more accurate results at the cost of significantly longer run times. The cell size should always be less than the system size, as highly asymmetric cells will leads to significant errors in the demagnetisation field calculation.
+{\zicf dimensions:double macro-cell-size}\addcontentsline{toc}{subsection}{dimensions:macro-cell-size} determines the macro cell size for calculation of the demagnetizing field and output of the magnetic configuration. Finer discretisation leads to more accurate results at the cost of significantly longer run times. The cell size should always be less than the system size, as highly asymmetric cells will leads to significant errors in the demagnetisation field calculation.
 
 \section*{Anisotropy calculation}
 \addcontentsline{toc}{section}{Anisotropy calculation}
@@ -195,19 +195,19 @@ The following commands control the simulation, including the program, maximum te
   \item[] hybrid-constrained-monte-carlo
 \end{itemize}
 
-{\zicf sim:program = exclusive bool}\addcontentsline{toc}{subsection}{sim:program} defines the simulation program to be used.\\
+{\zicf sim:program = exclusive string}\addcontentsline{toc}{subsection}{sim:program} defines the simulation program to be used.\\
 
 {\zicf sim:program = benchmark}\addcontentsline{toc}{subsubsection}{benchmark} program which integrates the system for 10,000 time steps and exits. Used primarily for quick performance comparisons for different system architectures, processors and during code performance optimisation.\\
 
 {\zicf sim:program = time-series}\addcontentsline{toc}{subsubsection}{time-series} program to perform a single time series typically used for switching calculations, ferromagnetic resonance or to find equilibrium magnetic configurations. The system is usually simulated with constant temperature and applied field. The system is first equilibrated for \textit{sim:equilibration-time-steps} time steps and is then integrated for \textit{sim:time-steps} time steps.\\
 
-{\zicf sim:program = hysteresis-loop}\addcontentsline{toc}{subsubsection}{hysteresis-loop} program to simulate a dynamic hysteresis loop in user defined field range and precision. The system temperature is fixed and defined by \textit{sim:temperature}. The system is first equilibrated for \textit{sim:equilibration time-steps} time steps at \textit{sim:maximum-applied-field-strength} applied field. For normal loops \textit{sim:maximum-applied-field-strength} should be a saturating field. After equilibration the system is integrated for \textit{sim:loop-time-steps} at each field point. The field increments from +\textit{sim:maximum-applied-field-strength} to =\textit{sim:maximum-applied-field-strength} in steps of \textit{sim:applied-field-increment}, and data is output after each field step.\\
+{\zicf sim:program = hysteresis-loop}\addcontentsline{toc}{subsubsection}{hysteresis-loop} program to simulate a dynamic hysteresis loop in user defined field range and precision. The system temperature is fixed and defined by \textit{sim:temperature}. The system is first equilibrated for \textit{sim:equilibration time-steps} time steps at \textit{sim:maximum-applied-field-strength} applied field. For normal loops \textit{sim:maximum-applied-field-strength} should be a saturating field. After equilibration the system is integrated for \textit{sim:loop-time-steps} at each field point. The field increments from +\textit{sim:maximum-applied-field-strength} to =\textit{sim:maximum-applied -field-strength} in steps of \textit{sim:applied-field-increment}, and data is output after each field step.\\
 
 {\zicf sim:program = static-hysteresis-loop}\addcontentsline{toc}{subsubsection}{static-hysteresis-loop} program to perform a hysteresis loop in the same way as a normal hysteresis loop, but instead of a dynamic loop the equilibrium condition is found by minimisation of the torque on the system. For static loops the temperature must be zero otherwise the torque is always finite. At each field increment the system is integrated until either the maximum torque for any one spin is less than the tolerance value ($10^{-6}$ T), or if \textit{sim:loop-time-steps} is reached. Generally static loops are computationally efficient, and so \textit{sim:loop-time-steps} can be large, as many integration steps are only required during switching, i.e. near the coercivity.\\
 
-{\zicf sim:program = curie-temperature}\addcontentsline{toc}{subsubsection}{curie-temperature} Simulates a temperature loop to determine the Curie temperature of the system. The temperature of the system is increased stepwise, starting at \textit{sim:minimum} temperature and ending at \textit{sim:maximum-temperature} in steps of \textit{sim:temperature-increment}. At each temperature the system is first equilibrated for \textit{sim:equilibration-steps} time steps and then a statistical average is taken over \textit{sim:loop-time-steps}. In general the Monte Carlo integrator is the optimal method for determining the Curie temperature, and typically a few thousand steps is sufficient to equilibrate the system. To determine the Curie temperature it is best to plot the mean magnetization length at each temperature, which can be specified using the \textit{output:mean-magnetisation-length} keyword. Typically the temperature dependent magnetization cen be fitted using the function
+{\zicf sim:program = curie-temperature}\addcontentsline{toc}{subsubsection}{curie-temperature} Simulates a temperature loop to determine the Curie temperature of the system. The temperature of the system is increased stepwise, starting at \textit{sim:minimum} temperature and ending at \textit{sim:maximum- temperature} in steps of \textit{sim:temperature-increment}. At each temperature the system is first equilibrated for \textit{sim:equilibration-steps} time steps and then a statistical average is taken over \textit{sim:loop-time-steps}. In general the Monte Carlo integrator is the optimal method for determining the Curie temperature, and typically a few thousand steps is sufficient to equilibrate the system. To determine the Curie temperature it is best to plot the mean magnetization length at each temperature, which can be specified using the \textit{output:mean-magnetisation-length} keyword. Typically the temperature dependent magnetization can be fitted using the function
 \begin{equation}
-m(T) = <\sqrt{\sum_i \sms}> \left(1 - \frac{T}{T_{\mathrm{C}}} \right)^{\beta}
+m(T) = \langle{\sqrt{\sum_i \sms}}\rangle = \left(1 - \frac{T}{T_{\mathrm{C}}} \right)^{\beta}
 \end{equation}
 where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\beta \sim 0.34$ is the critical exponent.\\
 
@@ -318,10 +318,10 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 where $\mathbf{M}$ is the magnetisation of the sample and $\mathbf{N}_{\mathrm{d}}
 $ is the demagnetisation factor of the macroscopic sample. The components of the demagnetisation factor must sum to 1. In general the demagnetisation factor should be used without the dipolar field, as this results in counting the demagnetising effects twice. However, the possibility of using both is not prevented by the code.\\
 
-{\zicf sim:mpi-mode}\addcontentsline{toc}{subsection}{sim:mpi-mode}
-    geometric-decomposition
-    replicated-data
-    replicated-data-staged\\
+%{\zicf sim:mpi-mode}\addcontentsline{toc}{subsection}{sim:mpi-mode}
+%    geometric-decomposition
+%    replicated-data
+%    replicated-data-staged\\
 
 %{\zicf  sim:mpi-ppn ()}\addcontentsline{toc}{subsection}{sim:mpi-ppn}\\
 
