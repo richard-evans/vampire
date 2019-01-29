@@ -153,6 +153,7 @@ namespace create{
                                   bool include_boundary_grains);
 
       extern bool compare_radius(core_radius_t first,core_radius_t second);
+      extern void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array);
 
       // MPI functions
       extern void copy_halo_atoms(std::vector<cs::catom_t> & catom_array);

@@ -62,7 +62,6 @@ namespace cs{
    void geometry(std::vector<cs::catom_t> &);
    void fill(std::vector<cs::catom_t> &);
    void roughness(std::vector<cs::catom_t> &);
-   void calculate_atomic_composition(std::vector<cs::catom_t> &);
    void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array);
 
 //======================================================================
@@ -139,7 +138,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		clear_atoms(catom_array);
 
 		// Calculate final atomic composition
-		calculate_atomic_composition(catom_array);
+		create::internal::calculate_atomic_composition(catom_array);
 
 		// Check for zero atoms generated
 		if(catom_array.size()==0){
@@ -603,21 +602,6 @@ int sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array){
 	copy(catom_list.begin(), catom_list.end(), catom_array.begin());
 
 	return EXIT_SUCCESS;
-}
-
-void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
-
-	zlog<< zTs() << "Determining atomic composition" << std::endl;
-
-	// Determine number of atoms of each class and output to log
-	std::vector<unsigned int> MaterialNumbers(mp::num_materials,0);
-	for(unsigned int atom=0;atom<catom_array.size();atom++) MaterialNumbers.at(catom_array[atom].material)++;
-
-	// Output composition to log file
-	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat+1 << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
-
-	return;
-
 }
 
 int intermixing(std::vector<cs::catom_t> & catom_array){
