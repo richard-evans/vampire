@@ -205,6 +205,12 @@ void read_unit_cell(unit_cell_t & unit_cell, std::string filename){
    unit_cell.bilinear.verify(filename);
    unit_cell.biquadratic.verify(filename);
 
+   // If biquadratic interactins are included, then set flag to enable them
+   if(unit_cell.biquadratic.interaction.size()>0){
+      zlog << zTs() << "Enabling biquadratic interactions from unit cell file" << std::endl;
+      exchange::biquadratic = true;
+   }
+
    // set interaction range if larger than existing range
    if(interaction_range > unit_cell.interaction_range) unit_cell.interaction_range = interaction_range;
 
