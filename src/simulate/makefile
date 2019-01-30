@@ -5,7 +5,6 @@
 # List module object filenames
 sim_objects=\
 data.o \
-lsf_heun.o \
 initialize.o \
 interface.o
 
