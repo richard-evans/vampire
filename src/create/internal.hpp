@@ -137,6 +137,7 @@ namespace create{
       extern void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void cube(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void cylinder(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void ellipse(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain);
       extern void ellipsoid(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);

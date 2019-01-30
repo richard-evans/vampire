@@ -221,6 +221,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
       case 9: // Bubble
          create::internal::bubble(particle_origin,catom_array,0);
          break;
+      case 10: // Ellipse
+         create::internal::ellipse(particle_origin,catom_array,0);
+         break;
 		default:
 			std::cout << "Unknown particle type requested for single particle system" << std::endl;
 			err::vexit();
@@ -305,6 +308,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 			         break;
                case 9: // Bubble
                   create::internal::bubble(particle_origin,catom_array,particle_number);
+                  break;
+               case 10: // Ellipse
+                  create::internal::ellipse(particle_origin,catom_array,0);
                   break;
 					default:
 						std::cout << "Unknown particle type requested for single particle system" << std::endl;
