@@ -197,7 +197,7 @@ namespace sim{
 		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
 
       // Update dipole fields
-		dipole::calculate_field(sim::time);
+		dipole::calculate_field(sim::time, atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array);
 
 		if(sim::lagrange_multiplier) update_lagrange_lambda();
       st::update_spin_torque_fields(atoms::x_spin_array,
@@ -285,6 +285,10 @@ int run(){
                      atoms::x_coord_array,
                      atoms::y_coord_array,
                      atoms::z_coord_array,
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     atoms::m_spin_array,
                      atoms::num_atoms
    );
 
