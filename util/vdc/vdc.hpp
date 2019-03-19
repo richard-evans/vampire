@@ -25,6 +25,13 @@ namespace vdc{
    extern bool povray;
    extern bool cells;
    extern bool vtk;
+   extern bool x_vector;
+   extern bool z_vector;
+
+   // keyword variables
+   extern std::string colour_keyword;
+   extern std::string custom_colourmap_file;
+   extern bool z_axis_colour;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -54,6 +61,11 @@ namespace vdc{
    extern std::vector<double> coordinates;
    extern std::vector<double> spins;
 
+   // axis vectors for povray colouring
+   extern std::vector<double> vector_z;
+   extern std::vector<double> vector_y;
+   extern std::vector<double> vector_x;
+
    // non-magnetic atom data
    extern uint64_t num_nm_atoms;
    extern std::vector<int> nm_category;
@@ -75,6 +87,7 @@ namespace vdc{
    extern std::vector <std::string> nm_filenames;
 
    // Functions
+   int command( int argc, char* argv[]);
    void process_coordinates();
    void process_spins();
 
@@ -90,7 +103,9 @@ namespace vdc{
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);
 
-   void rgb( const double& ireal, double &red, double &green, double &blue);
+   void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
+
+   int colourwheel ( std::vector<std::vector<double>>& colourmap );
 
 }
 

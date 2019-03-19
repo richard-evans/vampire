@@ -23,6 +23,13 @@ namespace vdc{
    bool povray = true; // flag to specify povray file output
    bool cells = false; // flag to specify cells output
    bool vtk = true;
+   bool x_vector = false; // flag to specify direction of povray colouring
+   bool z_vector = false; // flag to specify plane for povray colouring
+
+   // keyword variables
+   std::string colour_keyword = "C2";
+   std::string custom_colourmap_file;
+   bool z_axis_colour = true;
 
    format_t format;
 
@@ -42,6 +49,11 @@ namespace vdc{
 
    std::vector<double> coordinates(0);
    std::vector<double> spins(0);
+
+   // axis vectors for povray colouring
+   std::vector<double> vector_z = {0.0,0.0,1.0};
+   std::vector<double> vector_y = {0.0,1.0,0.0};
+   std::vector<double> vector_x = {1.0,0.0,0.0};
 
    // non-magnetic atom data
    uint64_t num_nm_atoms = 0;

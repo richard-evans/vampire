@@ -69,11 +69,13 @@ void output_inc_file(unsigned int spin_file_id){
       #pragma omp for
       for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
 
-         // get z-magnetization for colour contrast
+         // get magnetization for colour contrast
+         const double sx = spins[3*atom+0];
+         const double sy = spins[3*atom+1];
          const double sz = spins[3*atom+2];
 
-         // calculate rgb components based on z magnetization
-         vdc::rgb(sz, red, green, blue);
+         // calculate rgb components based on magnetization
+         vdc::rgb(sx, sy, sz, red, green, blue);
 
          // format text for povray file
          otext << "spinm"<< type[atom] << "(" <<

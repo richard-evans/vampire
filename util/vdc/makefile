@@ -18,6 +18,8 @@ GCC_CFLAGS=-O3 -std=c++0x
 OBJECTS= \
 obj/cells.o \
 obj/colour.o \
+obj/colourmaps.o \
+obj/command.o \
 obj/coords.o \
 obj/data.o \
 obj/main.o \

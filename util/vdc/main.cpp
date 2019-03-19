@@ -19,7 +19,10 @@
 int main(int argc, char* argv[]){
 
    // process command line arguments
-   //command(argc, argv);
+   int matchcheck = vdc::command(argc, argv);
+   if (matchcheck == EXIT_FAILURE){
+      return EXIT_FAILURE;
+   }
 
    if(vdc::verbose){
       std::cout << "|------------------------------------------------------------|" << std::endl;
@@ -33,6 +36,6 @@ int main(int argc, char* argv[]){
    // process spin files
    vdc::process_spins();
 
-   return 0;
+   return EXIT_SUCCESS;
 
 }
