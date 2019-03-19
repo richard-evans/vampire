@@ -12,6 +12,7 @@ LIBS=-lstdc++
 
 # Flags
 GCC_CFLAGS=-O3 -std=c++0x
+#GCC_CFLAGS=-O3 -std=c++0x -fopenmp
 
 # Objects
 OBJECTS= \
@@ -31,7 +32,7 @@ all: $(OBJECTS) gcc
 
 # Serial Targets
 gcc: $(OBJECTS)
-	$(GCC) $(OBJECTS) $(LIBS) -o $(EXECUTABLE)
+	$(GCC) $(OBJECTS) $(GCC_CFLAGS) $(LIBS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: ./%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<

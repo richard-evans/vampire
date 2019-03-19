@@ -22,6 +22,13 @@
 // program header
 #include "vdc.hpp"
 
+// openmp header
+#ifdef _OPENMP
+   #include <omp.h>
+#else
+   #define omp_get_thread_num() 0
+#endif
+
 namespace vdc{
 
 // forward function declarations
@@ -48,37 +55,71 @@ void output_inc_file(unsigned int spin_file_id){
    std::ofstream incfile;
    incfile.open(incpov_file.c_str());
 
-   for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+   //---------------------------------------------------------------------------
+   // parallelise stream formatting for better performance
+   // step 1: parallel formatted output to stringstream in memory
+   // step 2: binary write of formatted text to output file (awesomely fast!)
+   //---------------------------------------------------------------------------
+   #pragma omp parallel
+   {
 
-      // get z-magnetization for colour constrast
-      const double sz = spins[3*atom+2];
+      std::stringstream otext;
 
-      // calculate rgb components based on z magnetization
-      vdc::rgb(sz, red, green, blue);
+      // write to output text stream in parallel
+      #pragma omp for
+      for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
 
-      std::stringstream line;
-      line << "spinm"<< type[atom] << "(" <<
-              coordinates[3*atom+0]-vdc::system_centre[0] << "," << coordinates[3*atom+1]-vdc::system_centre[1] << "," << coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
-              spins[3*atom+0] << "," << spins[3*atom+1] << "," << spins[3*atom+2] << "," <<
-              red << "," << green << "," << blue << ")\n";
+         // get z-magnetization for colour contrast
+         const double sz = spins[3*atom+2];
 
-      incfile << line.str();
+         // calculate rgb components based on z magnetization
+         vdc::rgb(sz, red, green, blue);
 
-   }
+         // format text for povray file
+         otext << "spinm"<< type[atom] << "(" <<
+                  coordinates[3*atom+0]-vdc::system_centre[0] << "," << coordinates[3*atom+1]-vdc::system_centre[1] << "," << coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
+                  spins[3*atom+0] << "," << spins[3*atom+1] << "," << spins[3*atom+2] << "," <<
+                  red << "," << green << "," << blue << ")\n";
 
+      } // end of parallel for
+
+      // force each thread to write to file in order
+      #pragma omp critical
+      incfile << otext.str();
+
+   } // end of parallel region
+
+   //---------------------------------------------------------------------------
    // write non-magnetic atoms to inc file
-   for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+   //---------------------------------------------------------------------------
+   // parallelise stream formatting for better performance
+   //---------------------------------------------------------------------------
+   #pragma omp parallel
+   {
 
-      std::stringstream line;
-      line << "spinm"<< nm_type[atom] << "(" <<
-              nm_coordinates[3*atom+0]-vdc::system_centre[0] << "," << nm_coordinates[3*atom+1]-vdc::system_centre[1] << "," << nm_coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
-              0.0 << "," << 0.0 << "," << 0.0 << "," << // no spin
-              0.3 << "," << 0.3 << "," << 0.3 << ")\n"; // grey colour by default
+      std::stringstream otext;
 
-      incfile << line.str();
+      // write to output text stream in parallel
+      #pragma omp for
+      for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
 
-   }
+         // format text for povray file
+         otext << "spinm"<< nm_type[atom] << "(" <<
+                  nm_coordinates[3*atom+0]-vdc::system_centre[0] << "," <<
+                  nm_coordinates[3*atom+1]-vdc::system_centre[1] << "," <<
+                  nm_coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
+                  0.0 << "," << 0.0 << "," << 0.0 << "," << // no spin
+                  0.3 << "," << 0.3 << "," << 0.3 << ")\n"; // grey colour by default
 
+      } // end of parallel for
+
+      // force each thread to write to file in order
+      #pragma omp critical
+      incfile << otext.str();
+
+   } // end of parallel region
+
+   // flush data to include file and close
    incfile << std::flush;
    incfile.close();
 
