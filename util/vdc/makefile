@@ -24,6 +24,7 @@ obj/main.o \
 obj/non_magnetic.o \
 obj/povray.o \
 obj/spins.o \
+obj/vtk.o \
 obj/xyz.o
 
 EXECUTABLE=vdc

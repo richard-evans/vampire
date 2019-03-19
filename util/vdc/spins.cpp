@@ -58,6 +58,9 @@ void process_spins(){
 
       if(vdc::cells) vdc::output_cell_file(file_id);
 
+      // output vtk file
+      if(vdc::vtk) output_vtk_file(file_id);
+
       last_file_id = file_id;
 
    }

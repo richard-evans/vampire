@@ -22,6 +22,7 @@ namespace vdc{
    bool xyz = true; // flag to specify crystal.xyz file output
    bool povray = true; // flag to specify povray file output
    bool cells = false; // flag to specify cells output
+   bool vtk = true;
 
    format_t format;
 
