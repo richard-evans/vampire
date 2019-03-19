@@ -41,7 +41,7 @@ void output_vtk_file(unsigned int spin_file_id){
    vtkfile.open(vtk_file.c_str());
 
    // output informative message to user
-   std::cout << "   Writing VTK file " << vtk_file << "..." << std::flush;
+   if(vdc::verbose) std::cout << "   Writing VTK file " << vtk_file << "..." << std::flush;
 
    const double scx = vdc::system_centre[0];
    const double scy = vdc::system_centre[1];

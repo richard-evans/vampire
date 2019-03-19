@@ -46,7 +46,7 @@ void output_inc_file(unsigned int spin_file_id){
 	std::string incpov_file = incpov_file_sstr.str();
 
    // output informative message to user
-   std::cout << "   Writing povray file " << incpov_file << "..." << std::flush;
+   if(vdc::verbose) std::cout << "   Writing povray file " << incpov_file << "..." << std::flush;
 
    // temporary variables defining spin colours
    double red=0.0, green=0.0, blue=1.0;

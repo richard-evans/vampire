@@ -24,11 +24,9 @@ int main(int argc, char* argv[]){
       return EXIT_FAILURE;
    }
 
-   if(vdc::verbose){
-      std::cout << "|------------------------------------------------------------|" << std::endl;
-      std::cout << "|              Vampire Data Converter for v5+                |" << std::endl;
-      std::cout << "|------------------------------------------------------------|" << std::endl;
-   }
+   std::cout << "|------------------------------------------------------------|" << std::endl;
+   std::cout << "|              Vampire Data Converter for v5+                |" << std::endl;
+   std::cout << "|------------------------------------------------------------|" << std::endl;
 
    // process coordinates
    vdc::process_coordinates();

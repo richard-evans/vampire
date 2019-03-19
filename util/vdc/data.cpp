@@ -18,16 +18,16 @@
 namespace vdc{
 
    // program option flags
-   bool verbose = true; // flag to specify verbosity of output to user
-   bool xyz = true; // flag to specify crystal.xyz file output
-   bool povray = true; // flag to specify povray file output
-   bool cells = false; // flag to specify cells output
-   bool vtk = true;
+   bool verbose = false; // flag to specify verbosity of output to user
+   bool xyz     = false; // flag to specify crystal.xyz file output
+   bool povray  = false; // flag to specify povray file output
+   bool cells   = false; // flag to specify cells output
+   bool vtk     = false; // flag to specify vtk output
    bool x_vector = false; // flag to specify direction of povray colouring
    bool z_vector = false; // flag to specify plane for povray colouring
 
    // keyword variables
-   std::string colour_keyword = "C2";
+   std::string colour_keyword = "BWR";
    std::string custom_colourmap_file;
    bool z_axis_colour = true;
 

@@ -51,7 +51,32 @@ int command( int argc, char* argv[] ){
 
       // read prefix
       std::string sw=argv[arg];
-      if (sw == "--vector-z"){
+
+      //------------------------------------------------------------------------
+      // Check for appropriate data outputs
+      //------------------------------------------------------------------------
+      // xyz coordinate file output
+      if (sw == "--xyz"){
+         vdc::xyz = true;
+      }
+      // xyz coordinate file output
+      else if (sw == "--povray"){
+         vdc::povray = true;
+      }
+      // xyz coordinate file output
+      else if (sw == "--vtk"){
+         vdc::vtk = true;
+      }
+      //------------------------------------------------------------------------
+      // Check for verbose output
+      //------------------------------------------------------------------------
+      else if (sw == "--verbose"){
+         vdc::verbose = true;
+      }
+      //------------------------------------------------------------------------
+      // Check for colour mapping parameters
+      //------------------------------------------------------------------------
+      else if (sw == "--vector-z"){
 
          // check number of args not exceeded
          check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables in brackets." );
@@ -117,6 +142,19 @@ int command( int argc, char* argv[] ){
          ////terminaltextcolor(WHITE);
          return EXIT_FAILURE;
       }
+   }
+
+   //---------------------------------------------------------------------------
+   // Additional checks on input parameters
+   //---------------------------------------------------------------------------
+
+   // check that some kind of data output is requested
+   if( !vdc::xyz && !vdc::povray && !vdc::vtk ){
+      std::cerr << "Error! No output data formats requested. Available options are: " << std::endl;
+      std::cerr << "\t\t --xyz    Data output in .xyz format for viewing in rasmol/jmol" << std::endl;
+      std::cerr << "\t\t --povray Data output in PoVRAY format for rendering" << std::endl;
+      std::cerr << "\t\t --vtk    Data output in VTK format for viewing in Paraview" << std::endl;
+      return EXIT_FAILURE;
    }
 
    // check for valid axis initialisations
