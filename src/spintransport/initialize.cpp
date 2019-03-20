@@ -15,6 +15,7 @@
 // Vampire headers
 #include "create.hpp"
 #include "spintransport.hpp"
+#include "vio.hpp"
 
 // spintransport module headers
 #include "internal.hpp"
@@ -26,20 +27,21 @@ namespace spin_transport{
       uint64_t id; // id of cell
       std::vector<uint64_t> atom; // list of atoms in each cell
       std::vector<uint64_t> nm_atom; // list of non-magnetic atoms in each cell
-   }
+   };
 
    //----------------------------------------------------------------------------
    // Function to initialize spin transport module
    //----------------------------------------------------------------------------
-   void initialize(const double system_size_x, //maximum dimensions of system along x-direction (angstroms)
-                   const double system_size_y, //maximum dimensions of system along y-direction (angstroms)
-                   const double system_size_z, //maximum dimensions of system along z-direction (angstroms)
-                   const uint64_t num_atoms, // number of atoms
+   void initialize(const double system_size_x, // maximum dimensions of system along x-direction (angstroms)
+                   const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
+                   const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
+                   const int num_materials,    // number of materials
+                   const uint64_t num_atoms,   // number of atoms
                    const std::vector<int>& atoms_type_array, // material types of atoms
                    const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
                    const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
                    const std::vector<double>& atoms_z_coord_array, // z-coordinates of atoms
-                   const std::vector<nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
+                   const std::vector<cs::nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
    ){
 
       //-------------------------------------------------------------------------
@@ -58,7 +60,7 @@ namespace spin_transport{
       //                 |       |   |   |       |       |
       //
       //                              stacks_x
-
+      //
       //
       //
       //
@@ -67,15 +69,28 @@ namespace spin_transport{
       //
       //-------------------------------------------------------------------------
 
+      //-------------------------------------------------------------------------
+      // check that module is needed - if not do nothing
+      //-------------------------------------------------------------------------
+      if( st::internal::enabled == false ) return;
+
+      // Inform user that module is initializing
+      zlog << zTs() << "Initializing spin transport module" << std::endl;
+
+      // If st material parameters uninitialised then initialise with default parameters
+      if(spin_transport::internal::mp.size() == 0){
+         spin_transport::internal::mp.resize(num_materials);
+      }
+
       // copy cell sizes to local variable to enable arbitrary current direction
       const double cell_size[3] = { st::internal::cell_size_x,
                                     st::internal::cell_size_y,
                                     st::internal::cell_size_z };
 
       // calculate number of cells in each direction x,y,z (rounding up)
-      const int num_cells[3] = { iceil(system_size_x/cell_size[0]),
-                                 iceil(system_size_y/cell_size[1]),
-                                 iceil(system_size_z/cell_size[2]) };
+      const int num_cells[3] = { ceil(system_size_x/cell_size[0]),
+                                 ceil(system_size_y/cell_size[1]),
+                                 ceil(system_size_z/cell_size[2]) };
 
 
       int stack_x = 0; // spatial direction of stack arrays  x,y,z
@@ -83,7 +98,7 @@ namespace spin_transport{
       int stack_z = 2;
 
       // calculate stack order based on current direction (always calculated along the stack-z direction)
-      if(st::internal::current_direction == px){
+      if(st::internal::current_direction == st::internal::px){
          stack_x = 1; // y-direction
          stack_y = 2; // z-direction
          stack_z = 0; // x-direction
@@ -106,13 +121,13 @@ namespace spin_transport{
          cells3D[i].resize(num_cells[stack_y]);
 
          // loop over all y-cells in stack
-         for(unsigned int j = 0; j < cells[i].size(); j++){
+         for(unsigned int j = 0; j < cells3D[i].size(); j++){
 
             // resize cell array[i][j] to hold stack z_cells (each stack linear in memory along z (current) direction)
             cells3D[i][j].resize(num_cells[stack_z]); //
 
             // loop over all z-cells to set linear cell ID for cell arrays
-            for(unsigned int k = 0; k < cells[i][j].size(); k++){
+            for(unsigned int k = 0; k < cells3D[i][j].size(); k++){
                cells3D[i][j][k].id = cell_id;
                cell_id++; // increment cell number
             }
@@ -124,7 +139,10 @@ namespace spin_transport{
       //---------------------------------------------------------------------------------
       // Calculate atom-cell associations and cell positions
       //---------------------------------------------------------------------------------
-      //atom_in_cell[num_atoms]
+
+      // resize array to store which cell each atom is in
+      st::internal::atom_in_cell.resize(num_atoms);
+
       for(uint64_t atom = 0; atom < num_atoms; atom++){
 
          // get atomic coordinates
@@ -141,7 +159,7 @@ namespace spin_transport{
          const uint64_t k = cellID[stack_z];
 
          // associate atom with stack cell ID
-         atom_in_cell[atom] = cells3D[i][j][k].id;
+         st::internal::atom_in_cell[atom] = cells3D[i][j][k].id;
 
          // add atom to atoms in cell list
          cells3D[i][j][k].atom.push_back(atom);
@@ -188,12 +206,15 @@ namespace spin_transport{
          st::internal::stack_final_index[s] = s*num_cells_in_stack + num_cells_in_stack; // loop to less than this number
       }
 
+      // calculate total number of cells
+      st::internal::total_num_cells = num_cells[0]*num_cells[1]*num_cells[2];
+
       // resize array to store sequential list of magnetic cells to calculate the resistance over
-      st::internal::next_cell_in_stack.resize(st::internal::num_cells); // list of next cell in stack to account for tunnel barrier
+      st::internal::next_cell_in_stack.resize(st::internal::total_num_cells); // list of next cell in stack to account for tunnel barrier
 
       // resize arrays to store average resistance in each cell
-      st::internal::cell_resistance.resize(st::internal::num_cells,0.0);
-      st::internal::cell_spin_resistance.resize(st::internal::num_cells,0.0);
+      st::internal::cell_resistance.resize(st::internal::total_num_cells,0.0);
+      st::internal::cell_spin_resistance.resize(st::internal::total_num_cells,0.0);
 
       // cell size parameters for resitivity to resistance calculation
       const double iA = 1.0 / (cell_size[stack_x] * cell_size[stack_y]); // Angstroms^-2
@@ -204,7 +225,7 @@ namespace spin_transport{
          for(unsigned int j = 0; j < cells3D[i].size(); j++){
 
             // loop over all cells in stack
-            for(unsigned int k = 0; k < cells[i][j].size(); k++){
+            for(unsigned int k = 0; k < cells3D[i][j].size(); k++){
 
                // determine cell ID
                const uint64_t cell = cells3D[i][j][k].id;
@@ -227,13 +248,15 @@ namespace spin_transport{
                   // magnetic atoms
                   for(unsigned int atom = 0; atom < cells3D[i][j][k].atom.size(); atom++ ){
                      int mat = atoms_type_array[atom]; // get material type
-                     resistivity += st::internal::mp[mat]; // add resistivity to total
+                     resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
+                     spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
                   }
 
                   // non-magnetic atoms
                   for(unsigned int atom = 0; atom < cells3D[i][j][k].nm_atom.size(); atom++ ){
                      int mat = non_magnetic_atoms_array[atom].mat; // get material type
-                     resistivity += st::internal::mp[mat]; // add resistivity to total
+                     resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
+                     spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
                   }
 
                   // calculate average resistivity
@@ -251,10 +274,8 @@ namespace spin_transport{
          }
       }
 
-      st::internal::cell_magnetization.resize(st::internal::num_cells);
-      st::internal::cell_position.resize(3*st::internal::num_cells);
-
-
+      st::internal::cell_magnetization.resize(st::internal::total_num_cells);
+      st::internal::cell_position.resize(3*st::internal::total_num_cells);
 
       return;
 

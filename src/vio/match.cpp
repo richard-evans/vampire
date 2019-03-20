@@ -34,6 +34,7 @@
 #include "montecarlo.hpp"
 #include "random.hpp"
 #include "spintorque.hpp"
+#include "spintransport.hpp"
 #include "unitcell.hpp"
 
 // vio module headers
@@ -78,6 +79,7 @@ namespace vin{
         else if(montecarlo::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(spin_transport::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
@@ -2668,6 +2670,7 @@ namespace vin{
             else if(exchange::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+            else if(spin_transport::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
