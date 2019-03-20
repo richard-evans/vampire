@@ -56,7 +56,10 @@ namespace sim{
       extern std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques
       extern std::vector<double> slonczewski_spin_polarization_unit_vector; // spin polarization direction
 
-
+      //-------------------------------------------------------------------------
+      // Internal function declarations
+      //-------------------------------------------------------------------------
+      extern void initialize_modules();
 
    } // end of internal namespace
 } // end of sim namespace

@@ -5,8 +5,8 @@
 # List module object filenames
 sim_objects=\
 data.o \
-lsf_heun.o \
 initialize.o \
+initialize_modules.o \
 interface.o
 
 # Append module objects to global tree

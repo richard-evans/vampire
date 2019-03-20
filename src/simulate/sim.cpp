@@ -235,6 +235,9 @@ int run(){
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
 
+   // Initialize vampire modules
+   sim::internal::initialize_modules();
+
    montecarlo::initialize();
 
    anisotropy::initialize(atoms::num_atoms, atoms::type_array, mp::mu_s_array);
