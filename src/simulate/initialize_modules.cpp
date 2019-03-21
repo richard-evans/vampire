@@ -116,7 +116,8 @@ void initialize_modules(){
                               atoms::x_coord_array,
                               atoms::y_coord_array,
                               atoms::z_coord_array,
-						            cs::non_magnetic_atoms_array);
+                              atoms::m_spin_array,
+                              cs::non_magnetic_atoms_array);
 
    return;
 

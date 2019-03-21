@@ -53,7 +53,7 @@ namespace spin_transport{
             // constructor
             mp_t (const unsigned int max_materials = 100):
             	resistivity(1.68e-8),     // default value is for copper (Cu)
-               spin_resistivity(1.68e-8) // default value is for copper (Cu)
+               spin_resistivity(0.0)     // default value is for copper (Cu)
             {
 
             }; // end of constructor
@@ -82,20 +82,25 @@ namespace spin_transport{
       extern double environment_resistivity; // Resitivity of device environment
 
       // array of stacks (list of cells) along current direction
-      extern std::vector < std::vector <unsigned int> > stack_array;
+      //extern std::vector < std::vector <unsigned int> > stack_array;
 
       // Stack data and indices
       extern std::vector <unsigned int> stack_start_index; // start of stack in 1D list of cells
       extern std::vector <unsigned int> stack_final_index; // end of stack +1 in 1D list of cells
-      extern std::vector <unsigned int> next_cell_in_stack; // list of next cell in stack to account for tunnel barrier
+      //extern std::vector <unsigned int> next_cell_in_stack; // list of next cell in stack to account for tunnel barrier
+      extern std::vector <double> stack_resistance;        // array of stack resistances
+      extern std::vector <double> stack_current;           // array of stack currents
 
       // arrays to store average resistance and spin resistance in each cell
       extern std::vector <double> cell_resistance;
       extern std::vector <double> cell_spin_resistance;
 
       // arrays to store cell properties
-      extern std::vector <double> cell_magnetization;
-      extern std::vector <double> cell_position;
+      extern std::vector <bool> magnetic;                    // boolean array to determine if cell is magnetic or not
+      extern std::vector <double> cell_magnetization;        // 3N normalised magnetization in each cell
+      extern std::vector <double> cell_isaturation;          // inverse magnetic saturation at T=0 in each cell
+      extern std::vector <double> cell_position;             // 3N array of cell positions (origin)
+      extern std::vector <double> cell_spin_torque_fields;   // 3N array of cell spin torque fields
 
       // array to store which cell each atom is in
       extern std::vector <unsigned int> atom_in_cell;
@@ -103,6 +108,14 @@ namespace spin_transport{
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
+      void calculate_cell_magnetization(const unsigned int num_local_atoms,            // number of local atoms
+                                        const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
+                                        const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
+                                        const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
+                                        const std::vector<double>& atoms_m_spin_array  // moment of atoms
+      );
+
+      void calculate_magnetoresistance();
 
    } // end of internal namespace
 

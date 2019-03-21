@@ -27,6 +27,12 @@
 namespace spin_transport{
 
    //-----------------------------------------------------------------------------
+   // Shared variables for data output
+   //-----------------------------------------------------------------------------
+   extern double total_resistance;
+   extern double total_current;
+
+   //-----------------------------------------------------------------------------
    // Function to initialise spintransport module
    //-----------------------------------------------------------------------------
    void initialize(const double system_size_x, // maximum dimensions of system along x-direction (angstroms)
@@ -38,7 +44,21 @@ namespace spin_transport{
                    const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
                    const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
                    const std::vector<double>& atoms_z_coord_array, // z-coordinates of atoms
+                   const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
                    const std::vector<cs::nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
+   );
+
+   //-----------------------------------------------------------------------------
+   // Function to update resistance, current and spin transfer torque fields
+   //-----------------------------------------------------------------------------
+   void update(const unsigned int num_local_atoms,            // number of local atoms
+               const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
+               const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
+               const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
+               const std::vector<double>& atoms_m_spin_array, // moment of atoms
+               std::vector<double>& atoms_x_field_array,      // x-field of atoms
+               std::vector<double>& atoms_y_field_array,      // y-field of atoms
+               std::vector<double>& atoms_z_field_array       // z-field of atoms
    );
 
    //---------------------------------------------------------------------------

@@ -23,6 +23,8 @@ namespace spin_transport{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
+   double total_resistance = 0.0;
+   double total_current = 0.0;
 
    namespace internal{
 
@@ -47,20 +49,26 @@ namespace spin_transport{
       double environment_resistivity = 1.0e15; // Resitivity of device environment (assumed to be SiO2)
 
       // array of stacks (list of cells) along current direction
-      std::vector < std::vector <unsigned int> > stack_array;
+      //std::vector < std::vector <unsigned int> > stack_array;
 
       // Stack data and indices
       std::vector <unsigned int> stack_start_index; // start of stack in 1D list of cells
       std::vector <unsigned int> stack_final_index; // end of stack +1 in 1D list of cells
-      std::vector <unsigned int> next_cell_in_stack; // list of next cell in stack to account for tunnel barrier
+      std::vector <double> stack_resistance;        // array of stack resistances
+      std::vector <double> stack_current;           // array of stack currents
+
+      //std::vector <unsigned int> next_cell_in_stack; // list of next cell in stack to account for tunnel barrier
 
       // arrays to store average resistance and spin resistance in each cell
       std::vector <double> cell_resistance;
       std::vector <double> cell_spin_resistance;
 
       // arrays to store cell properties
-      std::vector <double> cell_magnetization;
-      std::vector <double> cell_position;
+      std::vector <bool> magnetic;                    // boolean array to determine if cell is magnetic or not
+      std::vector <double> cell_magnetization;        // 3N normalised magnetization in each cell
+      std::vector <double> cell_isaturation;          // inverse magnetic saturation at T=0 in each cell
+      std::vector <double> cell_position;             // 3N array of cell positions (origin)
+      std::vector <double> cell_spin_torque_fields;   // 3N array of cell spin torque fields
 
       // array to store which cell each atom is in
       std::vector <unsigned int> atom_in_cell;
