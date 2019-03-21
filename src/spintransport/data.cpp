@@ -33,6 +33,9 @@ namespace spin_transport{
       //------------------------------------------------------------------------
       bool enabled = false; // bool to enable spin transport calculation
 
+      unsigned int update_rate  = 100;  // number of timesteps between updates
+      unsigned int time_counter = 100;  // number of timesteps since last update (initially set to same as update rate to ensure calculation at start)
+
       std::vector<internal::mp_t> mp; // array of material properties
 
       // enumerated list of different current directions
@@ -47,9 +50,6 @@ namespace spin_transport{
 
       double voltage = 0.0;                    // Applied voltage perpendicular to current direction
       double environment_resistivity = 1.0e15; // Resitivity of device environment (assumed to be SiO2)
-
-      // array of stacks (list of cells) along current direction
-      //std::vector < std::vector <unsigned int> > stack_array;
 
       // Stack data and indices
       std::vector <unsigned int> stack_start_index; // start of stack in 1D list of cells

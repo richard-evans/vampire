@@ -65,6 +65,9 @@ namespace spin_transport{
       //-------------------------------------------------------------------------
       extern bool enabled; // bool to enable spin transport calculation
 
+      extern unsigned int update_rate;  // number of timesteps between updates
+      extern unsigned int time_counter; // number of timesteps since last update
+
       extern std::vector<internal::mp_t> mp; // array of material properties
 
       // enumerated list of different current directions

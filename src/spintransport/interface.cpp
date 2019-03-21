@@ -163,6 +163,17 @@ namespace spin_transport{
           internal::environment_resistivity = rho;
           return true;
       }
+      //------------------------------------------------------------------------
+      test = "update-rate";
+      if( word == test ){
+          // Set resistivity for environment (cells with no atoms)
+          uint64_t ur = vin::str_to_uint64(value);
+          vin::check_for_valid_int(ur, word, line, prefix, 1,10000000,"input","1 - 1E7 time steps");
+          st::internal::update_rate = ur;
+          // set time counter to ensure initial calculation at start
+          st::internal::time_counter = ur;
+          return true;
+      }
       // channel length
       //--------------------------------------------------------------------
       // Keyword not found

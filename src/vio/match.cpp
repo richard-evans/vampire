@@ -1673,6 +1673,19 @@ namespace vin{
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
+        test="resistance";
+        if(word==test){
+           output_list.push_back(65);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="current";
+        if(word==test){
+           output_list.push_back(66);
+           return EXIT_SUCCESS;
+        }
+        // reserve 67 for voltage
+        //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;

@@ -109,8 +109,6 @@ void calculate_magnetoresistance(){
    st::total_resistance = 1.0 / sum_inv_resistance;
    st::total_current = st::internal::voltage / st::total_resistance;
 
-   std::cout << "R: " << st::total_resistance << "\t" << "I: " << st::total_current << std::endl;
-
    return;
 
 }

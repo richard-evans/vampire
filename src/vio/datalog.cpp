@@ -382,6 +382,12 @@ namespace vout{
                case 64:
                   vout::material_mean_total_energy(zmag);
                   break;
+               case 65:
+                  vout::resistance(zmag);
+                  break;
+               case 66:
+                  vout::current(zmag);
+                  break;
 				}
 			}
 			// Carriage return
@@ -545,6 +551,12 @@ namespace vout{
                   break;
                case 64:
                   vout::material_mean_total_energy(std::cout);
+                  break;
+               case 65:
+                  vout::resistance(std::cout);
+                  break;
+               case 66:
+                  vout::current(std::cout);
                   break;
 				}
 			}

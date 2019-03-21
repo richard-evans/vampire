@@ -38,6 +38,17 @@ void update(const unsigned int num_local_atoms,            // number of local at
    //-------------------------------------------------------------------------
    if( st::internal::enabled == false ) return;
 
+   //-------------------------------------------------------------------------
+   // check that it is time to update
+   //-------------------------------------------------------------------------
+   if(st::internal::time_counter != st::internal::update_rate){
+      // if not increment counter and do nothing
+      st::internal::time_counter++;
+      return;
+   }
+   // otherwise reset counter and continue
+   else{ st::internal::time_counter = 1; }
+
    //---------------------------------------------------------------------------------------------------------
    // update cell magnetizations
    //---------------------------------------------------------------------------------------------------------

@@ -20,6 +20,7 @@
 #include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
+#include "spintransport.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -366,4 +367,15 @@ namespace vout{
       stream << stats::material_energy.output_mean_energy(stats::total);
    }
 
+   // Output Function 65
+   void resistance(std::ostream& stream){
+      stream << spin_transport::total_resistance << "\t";
+   }
+
+   // Output Function 66
+   void current(std::ostream& stream){
+      stream << spin_transport::total_current << "\t";
+   }
+
+   // Output 67 reserved for voltage
 }

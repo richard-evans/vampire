@@ -115,6 +115,8 @@ namespace vout{
    void mean_material_specific_heat(std::ostream& stream);
    void material_total_energy(std::ostream& stream);
    void material_mean_total_energy(std::ostream& stream);
+   void resistance(std::ostream& stream);
+   void current(std::ostream& stream);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp
