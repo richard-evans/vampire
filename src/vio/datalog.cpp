@@ -388,6 +388,10 @@ namespace vout{
                case 66:
                   vout::current(zmag);
                   break;
+               default:
+                  std::cerr     << "\nProgrammer error: unknown output function " << file_output_list[item] << ". Exiting" << std::endl;
+                  zlog << zTs() << "Programmer error: unknown output function " << file_output_list[item] << ". Exiting" << std::endl;
+                  err::vexit();
 				}
 			}
 			// Carriage return
@@ -558,6 +562,11 @@ namespace vout{
                case 66:
                   vout::current(std::cout);
                   break;
+               default:
+                  std::cerr     << "\nProgrammer error: unknown screen output function " << file_output_list[item] << ". Exiting" << std::endl;
+                  zlog << zTs() << "Programmer error: unknown screen output function " << file_output_list[item] << ". Exiting" << std::endl;
+                  err::vexit();
+
 				}
 			}
 
