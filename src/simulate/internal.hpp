@@ -60,6 +60,7 @@ namespace sim{
       // Internal function declarations
       //-------------------------------------------------------------------------
       extern void initialize_modules();
+      extern void increment_time();
 
    } // end of internal namespace
 } // end of sim namespace

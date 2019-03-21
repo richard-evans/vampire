@@ -5,6 +5,7 @@
 # List module object filenames
 sim_objects=\
 data.o \
+increment_time.o \
 initialize.o \
 initialize_modules.o \
 interface.o
