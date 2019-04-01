@@ -42,6 +42,7 @@ namespace spin_transport{
                    const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
                    const std::vector<double>& atoms_z_coord_array, // z-coordinates of atoms
                    const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
+                   const std::vector<bool>& is_magnetic_material, // array of size num_mat to state whether material is magnetic (true) or not (false)
                    const std::vector<cs::nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
    ){
 
@@ -219,8 +220,6 @@ namespace spin_transport{
       // calculate total number of cells
       st::internal::total_num_cells = num_cells[0]*num_cells[1]*num_cells[2];
 
-      // resize array to store sequential list of magnetic cells to calculate the resistance over
-      //st::internal::next_cell_in_stack.resize(st::internal::total_num_cells); // list of next cell in stack to account for tunnel barrier
       // resize boolean array to determine if cell is magnetic or not
       st::internal::magnetic.resize(st::internal::total_num_cells, true); // initially assume all cells magnetic
 
@@ -256,37 +255,63 @@ namespace spin_transport{
                   st::internal::magnetic[cell] = false; // set cell as non-magnetic
                }
                // otherwise add contributions from atoms to calculate average resistivity
+               // Impurities in metals have a disproportionate effect on the resistance and so we approximate the
+               // average resistance of the cell as
+               //
+               //                        R1^2 + R2^2 + ... + Rn^2
+               //               R_eff = --------------------------
+               //                          (R1 + R2 + ... Rn)
+               //
+               // so that the larger resistance values always dominate, even for small impurity amounts.
+               // Net effect is then similar for M/Ox interfaces in series, where the oxide dominates the resistance.
+
                else{
 
                   // variables to accumulate resistances for cell
                   double resistivity = 0.0;
+                  double resistivity_sq = 0.0;
                   double spin_resistivity = 0.0;
+                  double spin_resistivity_sq = 0.0;
                   double total_moment = 0.0;
+
+                  // check for cells with only non-magnetic atoms = keep
+                  bool any_magnetic_atoms = false;
 
                   // magnetic atoms
                   for(unsigned int atom = 0; atom < cells3D[i][j][k].atom.size(); atom++ ){
-                     int mat = atoms_type_array[atom]; // get material type
+                     // get atom number in total list
+                     int atomID = cells3D[i][j][k].atom[atom];
+                     // get atom material
+                     int mat = atoms_type_array[atomID]; // get material type
+                     // check that atom is magnetic
+                     if(is_magnetic_material[mat] == true) any_magnetic_atoms = true;
+                     // add resistivities
                      resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
+                     resistivity_sq += st::internal::mp[mat].resistivity * st::internal::mp[mat].resistivity; // add resistivity^2 to total
                      spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
-                     total_moment += atoms_m_spin_array[atom];
+                     spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
+                     // calculate total moment
+                     total_moment += atoms_m_spin_array[atomID];
                   }
 
-                  // non-magnetic atoms
+                  // non-magnetic (remove) atoms
                   for(unsigned int atom = 0; atom < cells3D[i][j][k].nm_atom.size(); atom++ ){
                      int mat = non_magnetic_atoms_array[atom].mat; // get material type
                      resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
+                     resistivity_sq += st::internal::mp[mat].resistivity * st::internal::mp[mat].resistivity; // add resistivity^2 to total
                      spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
+                     spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
                   }
 
-                  // check that cells contain at least one magnetic atom
-                  if(cells3D[i][j][k].atom.size() == 0){
+                  // check for empty cells or cells with only non-magnetic atoms (keep) and if so treat as non-magnetic
+                  if(cells3D[i][j][k].atom.size() == 0 || any_magnetic_atoms == false){
                       st::internal::magnetic[cell] = false; // no magnetic atoms -> non-magnetic cell
                       total_moment = 1.0; // assume 1 so inverse is still 1 (any value is fine but needs to be > 0)
-                   }
+                  }
 
                   // calculate average resistivity
-                  double mean_resistivity      = resistivity      / double( num_atoms_in_cell );
-                  double mean_spin_resistivity = spin_resistivity / double( num_atoms_in_cell );
+                  double mean_resistivity      = resistivity_sq / resistivity;
+                  double mean_spin_resistivity = spin_resistivity_sq / spin_resistivity;
 
                   // set cell resistance
                   st::internal::cell_resistance[cell]      = mean_resistivity * l * iA;
@@ -294,6 +319,11 @@ namespace spin_transport{
 
                   // set inverse total moment
                   st::internal::cell_isaturation[cell] = 1.0/total_moment; // (1/mu_B)
+
+                  // set inverse saturation of non-magnetic cells to zero
+                  if(cells3D[i][j][k].atom.size() == 0 || any_magnetic_atoms == false){
+                      st::internal::cell_isaturation[cell] = 0.0;
+                  }
 
                }
 
@@ -356,20 +386,24 @@ namespace spin_transport{
          }
       }
 
-      std::ofstream ofile("data.txt");
-      for(int i =0; i< st::internal::total_num_cells; i++){
-         ofile << st::internal::cell_position[3*i+0] << "\t" <<
-                  st::internal::cell_position[3*i+1] << "\t" <<
-                  st::internal::cell_position[3*i+2] << "\t" <<
-                  st::internal::cell_resistance[i] << std::endl;
-      }
-      ofile.close();
-
       //------------------------------------------------------------------------
       // resize cell vector data arrays (3N) and set to zero
       //------------------------------------------------------------------------
       st::internal::cell_magnetization.resize(3*st::internal::total_num_cells, 0.0);
       st::internal::cell_spin_torque_fields.resize(3*st::internal::total_num_cells, 0.0);
+
+      std::ofstream ofile("data.txt");
+      for(int i =0; i< st::internal::total_num_cells; i++){
+         ofile << st::internal::cell_position[3*i+0] << "\t" <<
+                  st::internal::cell_position[3*i+1] << "\t" <<
+                  st::internal::cell_position[3*i+2] << "\t" <<
+                  st::internal::cell_magnetization[3*i+0] << "\t" <<
+                  st::internal::cell_magnetization[3*i+1] << "\t" <<
+                  st::internal::cell_magnetization[3*i+2] << "\t" <<
+                  st::internal::cell_resistance[i] << std::endl;
+      }
+      ofile.close();
+
 
       return;
 

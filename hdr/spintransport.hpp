@@ -45,6 +45,7 @@ namespace spin_transport{
                    const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
                    const std::vector<double>& atoms_z_coord_array, // z-coordinates of atoms
                    const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
+                   const std::vector<bool>& is_magnetic_material, // array of size num_mat to state whether material is magnetic (true) or not (false)
                    const std::vector<cs::nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
    );
 
