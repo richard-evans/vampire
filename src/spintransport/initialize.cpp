@@ -36,6 +36,8 @@ namespace spin_transport{
                    const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
                    const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
                    const int num_materials,    // number of materials
+                   const std::vector<double>& slonczewski_aj, // material specific slonczewski_aj prefactor
+                   const std::vector<double>& slonczewski_bj, // material specific slonczewski_bj prefactor
                    const uint64_t num_atoms,   // number of atoms
                    const std::vector<int>& atoms_type_array, // material types of atoms
                    const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
@@ -230,9 +232,16 @@ namespace spin_transport{
       // resize array to store inverse total moment m_s (T = 0)
       st::internal::cell_isaturation.resize(st::internal::total_num_cells,1.0);
 
+      // resize arrays to store slonczewski prefactors
+      st::internal::cell_slonczewski_aj.resize(st::internal::total_num_cells,0.0);
+      st::internal::cell_slonczewski_bj.resize(st::internal::total_num_cells,0.0);
+
       // cell size parameters for resitivity to resistance calculation
       const double iA = 1.0 / (cell_size[stack_x] * cell_size[stack_y]); // Angstroms^-2
       const double l = cell_size[stack_z];
+
+      // constant prefactor for STT components
+      const double one_o_gamma_e = 1.0 / (1.76e11 * 1.602e-19);  // muB / (gamma * e) but cell saturation already specified in muB's
 
       // loop over all xy-cells (stacks)
       for(unsigned int i = 0; i < cells3D.size(); i++){
@@ -273,6 +282,8 @@ namespace spin_transport{
                   double spin_resistivity = 0.0;
                   double spin_resistivity_sq = 0.0;
                   double total_moment = 0.0;
+                  double total_aj = 0.0; // spin torque prefactor parameter
+                  double total_bj = 0.0; // spin torque prefactor parameter
 
                   // check for cells with only non-magnetic atoms = keep
                   bool any_magnetic_atoms = false;
@@ -292,6 +303,11 @@ namespace spin_transport{
                      spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
                      // calculate total moment
                      total_moment += atoms_m_spin_array[atomID];
+
+                     // calculate total prefactor parameters
+                     total_aj += slonczewski_aj[mat];
+                     total_bj += slonczewski_bj[mat];
+
                   }
 
                   // non-magnetic (remove) atoms
@@ -307,6 +323,12 @@ namespace spin_transport{
                   if(cells3D[i][j][k].atom.size() == 0 || any_magnetic_atoms == false){
                       st::internal::magnetic[cell] = false; // no magnetic atoms -> non-magnetic cell
                       total_moment = 1.0; // assume 1 so inverse is still 1 (any value is fine but needs to be > 0)
+                  }
+                  else{
+                     // calculate mean spin torque prefactor parameters for magnetic cells
+                     const double count = double(cells3D[i][j][k].atom.size()); // number of magnetic atoms in cell
+                     st::internal::cell_slonczewski_aj[cell] = total_aj * one_o_gamma_e / (count * total_moment);
+                     st::internal::cell_slonczewski_bj[cell] = total_bj * one_o_gamma_e / (count * total_moment);
                   }
 
                   // calculate average resistivity

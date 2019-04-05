@@ -104,6 +104,8 @@ namespace spin_transport{
       extern std::vector <double> cell_isaturation;          // inverse magnetic saturation at T=0 in each cell
       extern std::vector <double> cell_position;             // 3N array of cell positions (origin)
       extern std::vector <double> cell_spin_torque_fields;   // 3N array of cell spin torque fields
+      extern std::vector <double> cell_slonczewski_aj;       // cell specific prefactors for spin-torque aJ
+      extern std::vector <double> cell_slonczewski_bj;       // cell specific prefactors for spin-torque bJ
 
       // array to store which cell each atom is in
       extern std::vector <unsigned int> atom_in_cell;
@@ -119,6 +121,12 @@ namespace spin_transport{
       );
 
       void calculate_magnetoresistance();
+
+      void calculate_field(const unsigned int num_local_atoms,            // number of local atoms
+                           std::vector<double>& atoms_x_field_array,      // x-field of atoms
+                           std::vector<double>& atoms_y_field_array,      // y-field of atoms
+                           std::vector<double>& atoms_z_field_array       // z-field of atoms
+      );
 
    } // end of internal namespace
 

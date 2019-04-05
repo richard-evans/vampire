@@ -133,6 +133,9 @@ namespace sim{
    extern bool save_checkpoint_continuous_flag; // save checkpoints during simulations
    extern int save_checkpoint_rate; // Default increment between checkpoints
 
+   extern std::vector<double> slonczewski_aj; // array of adiabatic spin torques
+   extern std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques
+
 	// Initialization functions
 	extern void initialize(int num_materials);
 

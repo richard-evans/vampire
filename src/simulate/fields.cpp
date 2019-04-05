@@ -519,8 +519,8 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double stpy = slonczewski_spin_polarization_unit_vector[1];
 		const double stpz = slonczewski_spin_polarization_unit_vector[2];
 
-		const double staj = slonczewski_aj[material];
-		const double stbj = slonczewski_bj[material];
+		const double staj = sim::slonczewski_aj[material];
+		const double stbj = sim::slonczewski_bj[material];
 
 		// calculate field
 		hx += staj*(sy*stpz - sz*stpy) + stbj*stpx;

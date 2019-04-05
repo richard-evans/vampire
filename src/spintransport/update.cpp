@@ -63,6 +63,8 @@ void update(const unsigned int num_local_atoms,            // number of local at
    //---------------------------------------------------------------------------------------------------------
    // calculate STT field
    //---------------------------------------------------------------------------------------------------------
+   st::internal::calculate_field(num_local_atoms, atoms_x_field_array, atoms_y_field_array, atoms_z_field_array);
+
 
    return;
 

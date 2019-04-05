@@ -1,21 +1,52 @@
-//----------------------------------------------------------------------------------
-// Slonczewski spin torque field
-//----------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Richard F L Evans 2019. All rights reserved.
+//
+//   Email: richard.evans@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 
-// save polarization to temporary constant
-const double stpx = slonczewski_spin_polarization_unit_vector[0];
-const double stpy = slonczewski_spin_polarization_unit_vector[1];
-const double stpz = slonczewski_spin_polarization_unit_vector[2];
+// C++ standard library headers
 
-const double staj = slonczewski_aj[material];
-const double stbj = slonczewski_bj[material];
+// Vampire headers
+#include "spintransport.hpp"
 
-// calculate field
-hx += staj*(sy*stpz - sz*stpy) + stbj*stpx;
-hy += staj*(sz*stpx - sx*stpz) + stbj*stpy;
-hz += staj*(sx*stpy - sy*stpx) + stbj*stpz;
+// spintransport module headers
+#include "internal.hpp"
 
-// save field to spin field array
-atoms::x_total_spin_field_array[atom]+=hx;
-atoms::y_total_spin_field_array[atom]+=hy;
-atoms::z_total_spin_field_array[atom]+=hz;
+namespace spin_transport{
+namespace internal{
+
+   //---------------------------------------------------------------------------
+   // Function to calculate spin transfer torque field for each atom
+   //---------------------------------------------------------------------------
+   void calculate_field(const unsigned int num_local_atoms,            // number of local atoms
+                        std::vector<double>& atoms_x_field_array,      // x-field of atoms
+                        std::vector<double>& atoms_y_field_array,      // y-field of atoms
+                        std::vector<double>& atoms_z_field_array       // z-field of atoms
+      ){
+
+         //---------------------------------------------------------------------------
+         // loop over all atoms and apply cell spin torque field
+         //---------------------------------------------------------------------------
+         for(unsigned int atom = 0; atom < num_local_atoms; atom++){
+
+            // get cell id
+            const uint64_t cell = st::internal::atom_in_cell[atom];
+
+            atoms_x_field_array[atom] += st::internal::cell_spin_torque_fields[3*cell+0];
+            atoms_y_field_array[atom] += st::internal::cell_spin_torque_fields[3*cell+1];
+            atoms_z_field_array[atom] += st::internal::cell_spin_torque_fields[3*cell+2];
+
+         }
+
+      return;
+
+   }
+
+}
+}

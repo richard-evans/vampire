@@ -39,6 +39,8 @@ namespace spin_transport{
                    const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
                    const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
                    const int num_materials,    // number of materials
+                   const std::vector<double>& slonczewski_aj, // material specific slonczewski_aj prefactor
+                   const std::vector<double>& slonczewski_bj, // material specific slonczewski_bj prefactor
                    const uint64_t num_atoms,   // number of atoms
                    const std::vector<int>& atoms_type_array, // material types of atoms
                    const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms

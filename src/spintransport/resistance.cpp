@@ -65,6 +65,20 @@ void calculate_magnetoresistance(){
             // calculate resistance (need to include T dependence of Rep here)
             total_stack_resistance += Rep + 0.5*Rsp*(1.0 - mi_dot_mj);
 
+            // calculate relavtive contributions of adiabatic and non-adiabatic spin torque
+            const double staj = st::internal::cell_slonczewski_aj[cell];
+            const double stbj = st::internal::cell_slonczewski_bj[cell];
+
+            // calculate field without current based on relative magnetization orientations
+            const double hx = staj*(mjy*miz - mjz*miy) + stbj*mix;
+            const double hy = staj*(mjz*mix - mjx*miz) + stbj*miy;
+            const double hz = staj*(mjx*miy - mjy*mix) + stbj*miz;
+
+            // save field (without current factor)
+            st::internal::cell_spin_torque_fields[3*cell+0] = hx;
+            st::internal::cell_spin_torque_fields[3*cell+1] = hy;
+            st::internal::cell_spin_torque_fields[3*cell+2] = hz;
+
             // update cell resistances and magnetization
             mix = mjx;
             miy = mjy;
@@ -103,6 +117,25 @@ void calculate_magnetoresistance(){
    //-----------------------------------------------------
    for(int stack = 0; stack < st::internal::num_stacks; stack++){
       st::internal::stack_current[stack] = st::internal::voltage / st::internal::stack_resistance[stack];
+   }
+
+   //---------------------------------------------------------
+   // Compute cell spin torque fields based on stack currents
+   //---------------------------------------------------------
+   for(int stack = 0; stack < st::internal::num_stacks; stack++){
+
+      const unsigned int start = stack_start_index[stack];
+      const unsigned int end   = stack_final_index[stack];
+
+      // load stack current
+      const double je = st::internal::stack_current[stack];
+
+      // loop over all other cells in stack starting at cell start+1
+      for(unsigned int cell = start+1 ; cell < end ; cell++){
+         st::internal::cell_spin_torque_fields[3*cell+0] *= je;
+         st::internal::cell_spin_torque_fields[3*cell+1] *= je;
+         st::internal::cell_spin_torque_fields[3*cell+2] *= je;
+      }
    }
 
    // save total resistance and current

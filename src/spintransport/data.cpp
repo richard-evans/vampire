@@ -69,6 +69,8 @@ namespace spin_transport{
       std::vector <double> cell_isaturation;          // inverse magnetic saturation at T=0 in each cell
       std::vector <double> cell_position;             // 3N array of cell positions (origin)
       std::vector <double> cell_spin_torque_fields;   // 3N array of cell spin torque fields
+      std::vector<double> cell_slonczewski_aj;        // cell specific prefactors for spin-torque aJ
+      std::vector<double> cell_slonczewski_bj;        // cell specific prefactors for spin-torque bJ
 
       // array to store which cell each atom is in
       std::vector <unsigned int> atom_in_cell;

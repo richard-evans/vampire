@@ -5,6 +5,7 @@
 # List module object filenames
 spintransport_objects =\
 data.o \
+field.o \
 initialize.o \
 interface.o \
 magnetization.o \

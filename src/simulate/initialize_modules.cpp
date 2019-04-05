@@ -125,6 +125,8 @@ void initialize_modules(){
                               cs::system_dimensions[1],
                               cs::system_dimensions[2],
                               mp::num_materials,
+                              sim::slonczewski_aj,
+                              sim::slonczewski_bj,
                               atoms::num_atoms,
                               atoms::type_array,
                               atoms::x_coord_array,
