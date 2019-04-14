@@ -25,6 +25,7 @@ namespace vdc{
    extern bool povray;
    extern bool cells;
    extern bool vtk;
+   extern bool txt;
    extern bool x_vector;
    extern bool z_vector;
 
@@ -99,6 +100,7 @@ namespace vdc{
    void output_inc_file(unsigned int spin_file_id);
    void output_povray_file();
    void output_vtk_file(unsigned int spin_file_id);
+   void output_txt_file(unsigned int file_id);
 
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);

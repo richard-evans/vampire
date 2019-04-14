@@ -26,6 +26,7 @@ obj/main.o \
 obj/non_magnetic.o \
 obj/povray.o \
 obj/spins.o \
+obj/text.o \
 obj/vtk.o \
 obj/xyz.o
 

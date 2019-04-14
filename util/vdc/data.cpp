@@ -23,6 +23,7 @@ namespace vdc{
    bool povray  = false; // flag to specify povray file output
    bool cells   = false; // flag to specify cells output
    bool vtk     = false; // flag to specify vtk output
+   bool txt    = false; // flag to specify plain text output
    bool x_vector = false; // flag to specify direction of povray colouring
    bool z_vector = false; // flag to specify plane for povray colouring
 

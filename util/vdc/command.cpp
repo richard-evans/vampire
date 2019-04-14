@@ -67,6 +67,10 @@ int command( int argc, char* argv[] ){
       else if (sw == "--vtk"){
          vdc::vtk = true;
       }
+      // plain text file output
+      else if (sw == "--text"){
+         vdc::txt = true;
+      }
       //------------------------------------------------------------------------
       // Check for verbose output
       //------------------------------------------------------------------------
@@ -149,11 +153,12 @@ int command( int argc, char* argv[] ){
    //---------------------------------------------------------------------------
 
    // check that some kind of data output is requested
-   if( !vdc::xyz && !vdc::povray && !vdc::vtk ){
+   if( !vdc::xyz && !vdc::povray && !vdc::vtk && !vdc::txt ){
       std::cerr << "Error! No output data formats requested. Available options are: " << std::endl;
       std::cerr << "\t\t --xyz    Data output in .xyz format for viewing in rasmol/jmol" << std::endl;
       std::cerr << "\t\t --povray Data output in PoVRAY format for rendering" << std::endl;
       std::cerr << "\t\t --vtk    Data output in VTK format for viewing in Paraview" << std::endl;
+      std::cerr << "\t\t --text   Data output in plain text format for plotting in gnuplot/excel etc" << std::endl;
       return EXIT_FAILURE;
    }
 

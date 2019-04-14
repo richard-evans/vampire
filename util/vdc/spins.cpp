@@ -61,6 +61,9 @@ void process_spins(){
       // output vtk file
       if(vdc::vtk) output_vtk_file(file_id);
 
+      // output plain text file
+      if(vdc::txt) output_txt_file(file_id);
+
       last_file_id = file_id;
 
    }
