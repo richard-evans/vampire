@@ -54,7 +54,7 @@ gcc-cuda: CUDALIBS=-lcudart -lcusparse -lcurand
 endif
 gcc-cuda: GCC_CFLAGS += -DCUDA
 gcc-cuda: $(OBJECTS) $(CUDA_OBJECTS)
-	$(NVCC) $(CUDA_CFLAGS) $(GCC_LDFLAGS) $(LIBS) ${CUDALIBS} $(OBJECTS) $(CUDA_OBJECTS) -o $(EXECUTABLE)
+	$(NVCC) $(CUDA_CFLAGS) $(GCC_LDFLAGS) $(LIBS) ${CUDALIBS} $(OBJECTS) $(CUDA_OBJECTS) -o $(CUDAEXECUTABLE)
 
 # CUDA debug target
 gcc-cuda-debug: CUDA_CFLAGS += -DCUDA_DEBUG -DCUDA_SPIN_DEBUG
