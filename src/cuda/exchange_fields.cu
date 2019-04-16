@@ -137,39 +137,39 @@ namespace vcuda
 
                        J_matrix_h.row_indices[i]            = row_indices[i];
                        J_matrix_h.column_indices[i]         = ::atoms::neighbour_list_array[i];
-                       J_matrix_h.values[i]                 = - ::atoms::v_exchange_list[iid].Jij[0][0];
+                       J_matrix_h.values[i]                 = - ::atoms::t_exchange_list[iid].Jij[0][0];
 
                        J_matrix_h.row_indices[i+1]            = row_indices[i];
                        J_matrix_h.column_indices[i+1]         = ::atoms::neighbour_list_array[i]+Natoms;
-                       J_matrix_h.values[i+1]                 = - ::atoms::v_exchange_list[iid].Jij[0][1];
+                       J_matrix_h.values[i+1]                 = - ::atoms::t_exchange_list[iid].Jij[0][1];
 
                        J_matrix_h.row_indices[i+2]            = row_indices[i];
                        J_matrix_h.column_indices[i+2]         = ::atoms::neighbour_list_array[i]+2*Natoms;
-                       J_matrix_h.values[i+2]                 = - ::atoms::v_exchange_list[iid].Jij[0][2];
+                       J_matrix_h.values[i+2]                 = - ::atoms::t_exchange_list[iid].Jij[0][2];
 
                        J_matrix_h.row_indices[i+Nnbrs]      = row_indices[i]+Natoms;
                        J_matrix_h.column_indices[i+Nnbrs]   = ::atoms::neighbour_list_array[i];
-                       J_matrix_h.values[i+Nnbrs]           = - ::atoms::v_exchange_list[iid].Jij[1][0];
+                       J_matrix_h.values[i+Nnbrs]           = - ::atoms::t_exchange_list[iid].Jij[1][0];
 
                        J_matrix_h.row_indices[i+Nnbrs+1]      = row_indices[i]+Natoms;
                        J_matrix_h.column_indices[i+Nnbrs+1]   = ::atoms::neighbour_list_array[i] + Natoms;
-                       J_matrix_h.values[i+Nnbrs+1]           = - ::atoms::v_exchange_list[iid].Jij[1][1];
+                       J_matrix_h.values[i+Nnbrs+1]           = - ::atoms::t_exchange_list[iid].Jij[1][1];
 
                        J_matrix_h.row_indices[i+Nnbrs+2]      = row_indices[i]+Natoms;
                        J_matrix_h.column_indices[i+Nnbrs+2]   = ::atoms::neighbour_list_array[i] + 2*Natoms;
-                       J_matrix_h.values[i+Nnbrs+2]           = - ::atoms::v_exchange_list[iid].Jij[1][2];
+                       J_matrix_h.values[i+Nnbrs+2]           = - ::atoms::t_exchange_list[iid].Jij[1][2];
 
                        J_matrix_h.row_indices[i+2*Nnbrs]    = row_indices[i]+2*Natoms;
                        J_matrix_h.column_indices[i+2*Nnbrs] = ::atoms::neighbour_list_array[i];
-                       J_matrix_h.values[i+2*Nnbrs]         = - ::atoms::v_exchange_list[iid].Jij[2][0];
+                       J_matrix_h.values[i+2*Nnbrs]         = - ::atoms::t_exchange_list[iid].Jij[2][0];
 
                        J_matrix_h.row_indices[i+2*Nnbrs+1]    = row_indices[i]+2*Natoms;
                        J_matrix_h.column_indices[i+2*Nnbrs+1] = ::atoms::neighbour_list_array[i] + Natoms;
-                       J_matrix_h.values[i+2*Nnbrs+1]         = - ::atoms::v_exchange_list[iid].Jij[2][1];
+                       J_matrix_h.values[i+2*Nnbrs+1]         = - ::atoms::t_exchange_list[iid].Jij[2][1];
 
                        J_matrix_h.row_indices[i+2*Nnbrs+2]    = row_indices[i]+2*Natoms;
                        J_matrix_h.column_indices[i+2*Nnbrs+2] = ::atoms::neighbour_list_array[i] + 2*Natoms;
-                       J_matrix_h.values[i+2*Nnbrs+2]         = - ::atoms::v_exchange_list[iid].Jij[2][2];
+                       J_matrix_h.values[i+2*Nnbrs+2]         = - ::atoms::t_exchange_list[iid].Jij[2][2];
 
                        break;
                }
