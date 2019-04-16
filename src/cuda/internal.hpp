@@ -22,11 +22,11 @@
  * requesting data strcutures from the main program
  */
 
-#include "../../hdr/atoms.hpp"
-#include "../../hdr/cells.hpp"
-#include "../../hdr/demag.hpp"
-#include "../../hdr/material.hpp"
-#include "../../hdr/sim.hpp"
+#include "atoms.hpp"
+#include "cells.hpp"
+#include "demag.hpp"
+#include "material.hpp"
+#include "sim.hpp"
 
 #include "cuda_timer.h"
 

@@ -55,167 +55,144 @@ namespace vcuda
 
             check_device_memory(__FILE__,__LINE__);
 
+            const int Natoms = ::atoms::num_atoms;
+            const int Nnbrs = ::atoms::neighbour_list_array.size();
+
             spin3N.assign( 3*::atoms::num_atoms, 0);
             field3N.assign( 3*::atoms::num_atoms, 0);
 
-            cusp::csr_matrix < int, cu::cu_real_t, cusp::host_memory > J_xx_matrix_h (
-                  ::atoms::num_atoms,
-                  ::atoms::num_atoms,
-                  ::atoms::neighbour_list_array.size()
-                  );
+            cusp::array1d<int, cusp::host_memory> row_indices( Nnbrs );
+            cusp::array1d<int, cusp::host_memory> row_offsets( Natoms + 1);
+            row_offsets[0] = 0;
+            for( int atom = 0; atom < Natoms; atom++) row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+            cusp::offsets_to_indices( row_offsets, row_indices);
 
-            cusp::csr_matrix < int, cu::cu_real_t, cusp::host_memory > J_yy_matrix_h (
-                  ::atoms::num_atoms,
-                  ::atoms::num_atoms,
-                  ::atoms::neighbour_list_array.size()
-                  );
+            // Declare a local matrix on the host using coordinate format to be filled
+            cusp::coo_matrix< int, cu::cu_real_t, cusp::host_memory> J_matrix_h;
 
-            cusp::csr_matrix < int, cu::cu_real_t, cusp::host_memory > J_zz_matrix_h (
-                  ::atoms::num_atoms,
-                  ::atoms::num_atoms,
-                  ::atoms::neighbour_list_array.size()
-                  );
+            switch( ::atoms::exchange_type)
+            {
+                case 0: // Isotropic
+                    J_matrix_h.resize(
+                            3*::atoms::num_atoms,
+                            3*::atoms::num_atoms,
+                            3*::atoms::neighbour_list_array.size()
+                            );
+                    break;
 
+                case 1: // Vectorial
+                    J_matrix_h.resize(
+                            3*::atoms::num_atoms,
+                            3*::atoms::num_atoms,
+                            3*::atoms::neighbour_list_array.size()
+                            );
+                    break;
 
-            J_xx_matrix_h.row_offsets[0] = 0.0;
-            J_yy_matrix_h.row_offsets[0] = 0.0;
-            J_zz_matrix_h.row_offsets[0] = 0.0;
-
-            for (int atom = 0; atom < ::atoms::num_atoms; atom++) {
-               J_xx_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
-               J_yy_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
-               J_zz_matrix_h.row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
+                case 2: // Tensor
+                    J_matrix_h.resize(
+                            9*::atoms::num_atoms,
+                            9*::atoms::num_atoms,
+                            9*::atoms::neighbour_list_array.size()
+                            );
+                    break;
             }
 
-            for (int i = 0; i < ::atoms::neighbour_list_array.size(); i++) {
-               J_xx_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
-               J_yy_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
-               J_zz_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
-            }
 
-            cusp::array1d<int, cusp::host_memory> row_indices( J_xx_matrix_h.column_indices);
-            cusp::array1d<int, cusp::host_memory> column_indices( J_xx_matrix_h.column_indices);
-            cusp::offsets_to_indices( J_xx_matrix_h.row_offsets, row_indices);
-
-            cusp::coo_matrix< int, cu::cu_real_t, cusp::host_memory> J_matrix_h(
-                  3*::atoms::num_atoms,
-                  3*::atoms::num_atoms,
-                  3*::atoms::neighbour_list_array.size()
-                  );
-
-            //std::cerr << "Attempting to fill matrix." << std::endl;
-
-            const int Natoms = ::atoms::num_atoms;
-            const int Nnbrs = row_indices.size();
-
-            // get exchange type
-            const unsigned int exchange_type = ::exchange::get_exchange_type();
 
             for( int i = 0; i < Nnbrs; i++)
             {
-               J_matrix_h.row_indices[i] = row_indices[i];
-               J_matrix_h.row_indices[i+Nnbrs] = row_indices[i]+Natoms;
-               J_matrix_h.row_indices[i+2*Nnbrs] = row_indices[i]+2*Natoms;
 
-               J_matrix_h.column_indices[i] = column_indices[i];
-               J_matrix_h.column_indices[i+Nnbrs] = column_indices[i]+Natoms;
-               J_matrix_h.column_indices[i+2*Nnbrs] = column_indices[i]+2*Natoms;
 
                int iid = ::atoms::neighbour_interaction_type_array[i];
 
                switch(exchange_type)
                {
-                  case 0: // Isotropic
-                     J_matrix_h.values[i]         = ::atoms::i_exchange_list[iid].Jij;
-                     J_matrix_h.values[i+Nnbrs]   = ::atoms::i_exchange_list[iid].Jij;
-                     J_matrix_h.values[i+2*Nnbrs] = ::atoms::i_exchange_list[iid].Jij;
-                     break;
+                   case 0: // Isotropic
+                       J_matrix_h.row_indices[i]            = row_indices[i];
+                       J_matrix_h.column_indices[i]         = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i]                 = - ::atoms::i_exchange_list[iid].Jij;
 
-                  case 1: // Vectorial
-                     J_matrix_h.values[i]         = ::atoms::v_exchange_list[iid].Jij[0];
-                     J_matrix_h.values[i+Nnbrs]   = ::atoms::v_exchange_list[iid].Jij[1];
-                     J_matrix_h.values[i+2*Nnbrs] = ::atoms::v_exchange_list[iid].Jij[2];
-                     break;
+                       J_matrix_h.row_indices[i+Nnbrs]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs]   = ::atoms::neighbour_list_array[i] + Natoms;
+                       J_matrix_h.values[i+Nnbrs]           = - ::atoms::i_exchange_list[iid].Jij;
 
-                  case 2: // Tensor
-                     std::cerr << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
-                     zlog << zTs() << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
-                     break;
+                       J_matrix_h.row_indices[i+2*Nnbrs]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs] = ::atoms::neighbour_list_array[i] + 2*Natoms;
+                       J_matrix_h.values[i+2*Nnbrs]         = - ::atoms::i_exchange_list[iid].Jij;
+                       break;
+
+                   case 1: // Vectorial
+                       J_matrix_h.row_indices[i]            = row_indices[i];
+                       J_matrix_h.column_indices[i]         = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i]                 = - ::atoms::v_exchange_list[iid].Jij[0];
+
+                       J_matrix_h.row_indices[i+Nnbrs]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs]   = ::atoms::neighbour_list_array[i] + Natoms;
+                       J_matrix_h.values[i+Nnbrs]           = - ::atoms::v_exchange_list[iid].Jij[1];
+
+                       J_matrix_h.row_indices[i+2*Nnbrs]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs] = ::atoms::neighbour_list_array[i] + 2*Natoms;
+                       J_matrix_h.values[i+2*Nnbrs]         = - ::atoms::v_exchange_list[iid].Jij[2];
+                       break;
+
+                   case 2: // Tensor
+
+                       J_matrix_h.row_indices[i]            = row_indices[i];
+                       J_matrix_h.column_indices[i]         = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i]                 = - ::atoms::t_exchange_list[iid].Jij[0][0];
+
+                       J_matrix_h.row_indices[i+1]            = row_indices[i];
+                       J_matrix_h.column_indices[i+1]         = ::atoms::neighbour_list_array[i]+Natoms;
+                       J_matrix_h.values[i+1]                 = - ::atoms::t_exchange_list[iid].Jij[0][1];
+
+                       J_matrix_h.row_indices[i+2]            = row_indices[i];
+                       J_matrix_h.column_indices[i+2]         = ::atoms::neighbour_list_array[i]+2*Natoms;
+                       J_matrix_h.values[i+2]                 = - ::atoms::t_exchange_list[iid].Jij[0][2];
+
+                       J_matrix_h.row_indices[i+Nnbrs]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs]   = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i+Nnbrs]           = - ::atoms::t_exchange_list[iid].Jij[1][0];
+
+                       J_matrix_h.row_indices[i+Nnbrs+1]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs+1]   = ::atoms::neighbour_list_array[i] + Natoms;
+                       J_matrix_h.values[i+Nnbrs+1]           = - ::atoms::t_exchange_list[iid].Jij[1][1];
+
+                       J_matrix_h.row_indices[i+Nnbrs+2]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs+2]   = ::atoms::neighbour_list_array[i] + 2*Natoms;
+                       J_matrix_h.values[i+Nnbrs+2]           = - ::atoms::t_exchange_list[iid].Jij[1][2];
+
+                       J_matrix_h.row_indices[i+2*Nnbrs]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs] = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i+2*Nnbrs]         = - ::atoms::t_exchange_list[iid].Jij[2][0];
+
+                       J_matrix_h.row_indices[i+2*Nnbrs+1]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs+1] = ::atoms::neighbour_list_array[i] + Natoms;
+                       J_matrix_h.values[i+2*Nnbrs+1]         = - ::atoms::t_exchange_list[iid].Jij[2][1];
+
+                       J_matrix_h.row_indices[i+2*Nnbrs+2]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs+2] = ::atoms::neighbour_list_array[i] + 2*Natoms;
+                       J_matrix_h.values[i+2*Nnbrs+2]         = - ::atoms::t_exchange_list[iid].Jij[2][2];
+
+                       break;
                }
             }
+
+            // Use the sort member function to double check ordering before convert
+            J_matrix_h.sort_by_row_and_column();
 
             // Black magic to turn CUDA_MATRIX into a string
             #define STRING(s) #s
             #define VALSTRING(s) STRING(s)
 
             // Print out informative message
-            zlog << zTs() << "Attempting matrix conversion from CSR to " << VALSTRING(CUDA_MATRIX) << " and transferring to device..." << std::endl;
+            zlog << zTs() << "Attempting matrix conversion from COO to " << VALSTRING(CUDA_MATRIX) << " and transferring to device..." << std::endl;
 
             cusp::convert( J_matrix_h, J_matrix_d);
 
             zlog << zTs() << "Matrix conversion and transfer complete." << std::endl;
 
-            const size_t occupied_diagonals = count_diagonals(J_xx_matrix_h.num_rows, J_xx_matrix_h.num_rows, row_indices, J_xx_matrix_h.column_indices);
-            const float size       = float(occupied_diagonals) * float(J_xx_matrix_h.num_rows);
-            const float fill_ratio = size / std::max(1.0f, float(J_xx_matrix_h.num_entries));
-
-            zlog << zTs() << "Cuda Matrix: Diagonals = " << occupied_diagonals << ", size = " << size << ", fill ratio = "<< fill_ratio << std::endl;
-
-            switch(exchange_type)
-            {
-               case 0: // Isotropic
-
-                  //--------------------------------------------------------------
-                  // Exchange is isotropic so Jxx = Jyy = Jzz
-                  // and Jxy = Jxz = Jyx = 0
-                  //--------------------------------------------------------------
-
-                  for (int i = 0; i < ::atoms::neighbour_list_array.size(); i++) {
-                     int iid = ::atoms::neighbour_interaction_type_array[i];
-                     J_xx_matrix_h.values[i] = ::atoms::i_exchange_list[iid].Jij;
-                  }
-
-
-
-                  cusp::convert(J_xx_matrix_h, J_xx_mat_d);
-
-                  J_isot_initialised = true;
-
-                  break;
-
-               case 1: // Vector
-
-                  //--------------------------------------------------------------
-                  // Exchange is diagonal so Jxx != Jyy != Jzz
-                  // and Jxy = Jxz = Jyx = 0
-                  //--------------------------------------------------------------
-
-                  // Copy J values from vampire exchange list to values list
-                  for( int i = 0; i < ::atoms::neighbour_list_array.size(); i++)
-                  {
-                     int iid = ::atoms::neighbour_interaction_type_array[i];
-                     J_xx_matrix_h.values[i] = ::atoms::v_exchange_list[iid].Jij[0];
-                     J_yy_matrix_h.values[i] = ::atoms::v_exchange_list[iid].Jij[1];
-                     J_zz_matrix_h.values[i] = ::atoms::v_exchange_list[iid].Jij[2];
-                  }
-
-                  cusp::convert(J_xx_matrix_h, J_xx_mat_d);
-                  cusp::convert(J_yy_matrix_h, J_yy_mat_d);
-                  cusp::convert(J_zz_matrix_h, J_zz_mat_d);
-
-                  J_vect_initialised = true;
-
-                  break;
-
-               case 2: // Tensor
-                  std::cerr << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
-                  zlog << zTs() << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
-                  break;
-            }
-
             exchange_initialised = true;
 
-            //std::cout << "Made matrix" << std::endl;
             check_device_memory(__FILE__,__LINE__);
             check_cuda_errors(__FILE__,__LINE__);
             return EXIT_SUCCESS;
@@ -227,6 +204,7 @@ namespace vcuda
             spin3N.cu_real_array_t::~cu_real_array_t();
             field3N.cu_real_array_t::~cu_real_array_t();
             J_matrix_d.cu_exch_mat_t::~cu_exch_mat_t ();
+
             check_cuda_errors(__FILE__,__LINE__);
             return EXIT_SUCCESS;
          }
@@ -235,7 +213,9 @@ namespace vcuda
          {
 
             check_cuda_errors(__FILE__,__LINE__);
-              /*
+
+            if( !exchange_initialised) initialise_exchange();
+
             thrust::copy( cu::atoms::x_spin_array.begin(), cu::atoms::x_spin_array.end(), spin3N.begin());
             thrust::copy( cu::atoms::y_spin_array.begin(), cu::atoms::y_spin_array.end(), spin3N.begin() + ::atoms::num_atoms);
             thrust::copy( cu::atoms::z_spin_array.begin(), cu::atoms::z_spin_array.end(), spin3N.begin() + 2*::atoms::num_atoms);
@@ -249,71 +229,6 @@ namespace vcuda
             thrust::copy( field3N.begin() + ::atoms::num_atoms, field3N.begin() + 2*::atoms::num_atoms, cu::y_total_spin_field_array.begin() );
             thrust::copy( field3N.begin() + 2*::atoms::num_atoms, field3N.end(), cu::z_total_spin_field_array.begin() );
 
-              */
-
-            // get exchange type
-            const unsigned int exchange_type = ::exchange::get_exchange_type();
-
-            switch(exchange_type)
-            {
-               case 0: // Isotropic
-
-                  //--------------------------------------------------------------
-                  // Exchange is isotropic so Jxx = Jyy = Jzz
-                  // and Jxy = Jxz = Jyx = 0
-                  //--------------------------------------------------------------
-
-                  if( !exchange_initialised) initialise_exchange();
-
-                  // FIXME This maybe boosted
-                  // It should keep the old values stored in the spin field
-                  // Since Jxx = Jyy = Jzz only the Jxx array is used
-
-                  cusp::multiply(
-                        J_xx_mat_d,
-                        cu::atoms::x_spin_array,
-                        cu::x_total_spin_field_array
-                        );
-                  cusp::multiply(
-                        J_xx_mat_d,
-                        cu::atoms::y_spin_array,
-                        cu::y_total_spin_field_array
-                        );
-                  cusp::multiply(
-                        J_xx_mat_d,
-                        cu::atoms::z_spin_array,
-                        cu::z_total_spin_field_array
-                        );
-
-                  break;
-
-               case 1: // Vector exchange
-
-                  //--------------------------------------------------------------
-                  // Exchange is diagonal so Jxx != Jyy != Jzz
-                  // and Jxy = Jxz = Jyx = 0
-                  //--------------------------------------------------------------
-
-                  if( !exchange_initialised) initialise_exchange();
-
-                  cusp::multiply(
-                        J_xx_mat_d,
-                        cu::atoms::x_spin_array,
-                        cu::x_total_spin_field_array
-                        );
-                  cusp::multiply(
-                        J_yy_mat_d,
-                        cu::atoms::y_spin_array,
-                        cu::y_total_spin_field_array
-                        );
-                  cusp::multiply(
-                        J_zz_mat_d,
-                        cu::atoms::z_spin_array,
-                        cu::z_total_spin_field_array
-                        );
-
-                  break;
-            }
 
             check_cuda_errors(__FILE__,__LINE__);
             return EXIT_SUCCESS;

@@ -40,17 +40,6 @@ namespace vcuda{
 
       } /* atoms */
 
-      namespace exchange
-      {
-         cu_real_array_t Jxx_vals_d(0UL);
-         cu_real_array_t Jyy_vals_d(0UL);
-         cu_real_array_t Jzz_vals_d(0UL);
-
-         cu_exch_mat_t J_xx_mat_d;
-         cu_exch_mat_t J_yy_mat_d;
-         cu_exch_mat_t J_zz_mat_d;
-      }
-
       namespace cells
       {
          cu_real_array_t x_coord_array(0UL);
