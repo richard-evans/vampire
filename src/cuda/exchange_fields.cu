@@ -66,46 +66,117 @@ namespace vcuda
             for( int atom = 0; atom < Natoms; atom++) row_offsets[atom+1] = ::atoms::neighbour_list_end_index[atom]+1;
             cusp::offsets_to_indices( row_offsets, row_indices);
 
+            // Declare a local matrix on the host using coordinate format to be filled
+            cusp::coo_matrix< int, cu::cu_real_t, cusp::host_memory> J_matrix_h;
 
-            cusp::coo_matrix< int, cu::cu_real_t, cusp::host_memory> J_matrix_h(
-                  3*::atoms::num_atoms,
-                  3*::atoms::num_atoms,
-                  3*::atoms::neighbour_list_array.size()
-                  );
+            switch( ::atoms::exchange_type)
+            {
+                case 0: // Isotropic
+                    J_matrix_h.resize(
+                            3*::atoms::num_atoms,
+                            3*::atoms::num_atoms,
+                            3*::atoms::neighbour_list_array.size()
+                            );
+                    break;
+
+                case 1: // Vectorial
+                    J_matrix_h.resize(
+                            3*::atoms::num_atoms,
+                            3*::atoms::num_atoms,
+                            3*::atoms::neighbour_list_array.size()
+                            );
+                    break;
+
+                case 2: // Tensor
+                    J_matrix_h.resize(
+                            9*::atoms::num_atoms,
+                            9*::atoms::num_atoms,
+                            9*::atoms::neighbour_list_array.size()
+                            );
+                    break;
+            }
+
 
 
             for( int i = 0; i < Nnbrs; i++)
             {
-               J_matrix_h.row_indices[i] = row_indices[i];
-               J_matrix_h.row_indices[i+Nnbrs] = row_indices[i]+Natoms;
-               J_matrix_h.row_indices[i+2*Nnbrs] = row_indices[i]+2*Natoms;
-
-               J_matrix_h.column_indices[i] = ::atoms::neighbour_list_array[i];
-               J_matrix_h.column_indices[i+Nnbrs] = ::atoms::neighbour_list_array[i] + Natoms;
-               J_matrix_h.column_indices[i+2*Nnbrs] = ::atoms::neighbour_list_array[i] + 2*Natoms;
 
 
                int iid = ::atoms::neighbour_interaction_type_array[i];
                switch( ::atoms::exchange_type)
                {
-                  case 0: // Isotropic
-                     J_matrix_h.values[i]         = - ::atoms::i_exchange_list[iid].Jij;
-                     J_matrix_h.values[i+Nnbrs]   = - ::atoms::i_exchange_list[iid].Jij;
-                     J_matrix_h.values[i+2*Nnbrs] = - ::atoms::i_exchange_list[iid].Jij;
-                     break;
+                   case 0: // Isotropic
+                       J_matrix_h.row_indices[i]            = row_indices[i];
+                       J_matrix_h.column_indices[i]         = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i]                 = - ::atoms::i_exchange_list[iid].Jij;
 
-                  case 1: // Vectorial
-                     J_matrix_h.values[i]         = - ::atoms::v_exchange_list[iid].Jij[0];
-                     J_matrix_h.values[i+Nnbrs]   = - ::atoms::v_exchange_list[iid].Jij[1];
-                     J_matrix_h.values[i+2*Nnbrs] = - ::atoms::v_exchange_list[iid].Jij[2];
-                     break;
+                       J_matrix_h.row_indices[i+Nnbrs]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs]   = ::atoms::neighbour_list_array[i] + Natoms;
+                       J_matrix_h.values[i+Nnbrs]           = - ::atoms::i_exchange_list[iid].Jij;
 
-                  case 2: // Tensor
-                     std::cerr << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
-                     zlog << zTs() << "Error! Tensorial form of exchange not yet implemented in cuda version!" << std::endl;
-                     break;
+                       J_matrix_h.row_indices[i+2*Nnbrs]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs] = ::atoms::neighbour_list_array[i] + 2*Natoms;
+                       J_matrix_h.values[i+2*Nnbrs]         = - ::atoms::i_exchange_list[iid].Jij;
+                       break;
+
+                   case 1: // Vectorial
+                       J_matrix_h.row_indices[i]            = row_indices[i];
+                       J_matrix_h.column_indices[i]         = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i]                 = - ::atoms::v_exchange_list[iid].Jij[0];
+
+                       J_matrix_h.row_indices[i+Nnbrs]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs]   = ::atoms::neighbour_list_array[i] + Natoms;
+                       J_matrix_h.values[i+Nnbrs]           = - ::atoms::v_exchange_list[iid].Jij[1];
+
+                       J_matrix_h.row_indices[i+2*Nnbrs]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs] = ::atoms::neighbour_list_array[i] + 2*Natoms;
+                       J_matrix_h.values[i+2*Nnbrs]         = - ::atoms::v_exchange_list[iid].Jij[2];
+                       break;
+
+                   case 2: // Tensor
+
+                       J_matrix_h.row_indices[i]            = row_indices[i];
+                       J_matrix_h.column_indices[i]         = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i]                 = - ::atoms::v_exchange_list[iid].Jij[0][0];
+
+                       J_matrix_h.row_indices[i+1]            = row_indices[i];
+                       J_matrix_h.column_indices[i+1]         = ::atoms::neighbour_list_array[i]+Natoms;
+                       J_matrix_h.values[i+1]                 = - ::atoms::v_exchange_list[iid].Jij[0][1];
+
+                       J_matrix_h.row_indices[i+2]            = row_indices[i];
+                       J_matrix_h.column_indices[i+2]         = ::atoms::neighbour_list_array[i]+2*Natoms;
+                       J_matrix_h.values[i+2]                 = - ::atoms::v_exchange_list[iid].Jij[0][2];
+
+                       J_matrix_h.row_indices[i+Nnbrs]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs]   = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i+Nnbrs]           = - ::atoms::v_exchange_list[iid].Jij[1][0];
+
+                       J_matrix_h.row_indices[i+Nnbrs+1]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs+1]   = ::atoms::neighbour_list_array[i] + Natoms;
+                       J_matrix_h.values[i+Nnbrs+1]           = - ::atoms::v_exchange_list[iid].Jij[1][1];
+
+                       J_matrix_h.row_indices[i+Nnbrs+2]      = row_indices[i]+Natoms;
+                       J_matrix_h.column_indices[i+Nnbrs+2]   = ::atoms::neighbour_list_array[i] + 2*Natoms;
+                       J_matrix_h.values[i+Nnbrs+2]           = - ::atoms::v_exchange_list[iid].Jij[1][2];
+
+                       J_matrix_h.row_indices[i+2*Nnbrs]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs] = ::atoms::neighbour_list_array[i];
+                       J_matrix_h.values[i+2*Nnbrs]         = - ::atoms::v_exchange_list[iid].Jij[2][0];
+
+                       J_matrix_h.row_indices[i+2*Nnbrs+1]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs+1] = ::atoms::neighbour_list_array[i] + Natoms;
+                       J_matrix_h.values[i+2*Nnbrs+1]         = - ::atoms::v_exchange_list[iid].Jij[2][1];
+
+                       J_matrix_h.row_indices[i+2*Nnbrs+2]    = row_indices[i]+2*Natoms;
+                       J_matrix_h.column_indices[i+2*Nnbrs+2] = ::atoms::neighbour_list_array[i] + 2*Natoms;
+                       J_matrix_h.values[i+2*Nnbrs+2]         = - ::atoms::v_exchange_list[iid].Jij[2][2];
+
+                       break;
                }
             }
+
+            // Use the sort member function to double check ordering before convert
+            J_matrix_h.sort_by_row_and_column();
 
             // Black magic to turn CUDA_MATRIX into a string
             #define STRING(s) #s
