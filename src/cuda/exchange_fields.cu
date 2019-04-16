@@ -70,7 +70,7 @@ namespace vcuda
             // Declare a local matrix on the host using coordinate format to be filled
             cusp::coo_matrix< int, cu::cu_real_t, cusp::host_memory> J_matrix_h;
 
-            switch( ::atoms::exchange_type)
+            switch( ::exchange::get_exchange_type())
             {
                 case 0: // Isotropic
                     J_matrix_h.resize(
@@ -90,8 +90,8 @@ namespace vcuda
 
                 case 2: // Tensor
                     J_matrix_h.resize(
-                            9*::atoms::num_atoms,
-                            9*::atoms::num_atoms,
+                            3*::atoms::num_atoms,
+                            3*::atoms::num_atoms,
                             9*::atoms::neighbour_list_array.size()
                             );
                     break;
@@ -105,7 +105,7 @@ namespace vcuda
 
                int iid = ::atoms::neighbour_interaction_type_array[i];
 
-               switch(exchange_type)
+               switch( ::exchange::get_exchange_type() )
                {
                    case 0: // Isotropic
                        J_matrix_h.row_indices[i]            = row_indices[i];
@@ -220,11 +220,13 @@ namespace vcuda
             thrust::copy( cu::atoms::y_spin_array.begin(), cu::atoms::y_spin_array.end(), spin3N.begin() + ::atoms::num_atoms);
             thrust::copy( cu::atoms::z_spin_array.begin(), cu::atoms::z_spin_array.end(), spin3N.begin() + 2*::atoms::num_atoms);
 
+            check_cuda_errors(__FILE__,__LINE__);
             cusp::multiply(
                   J_matrix_d,
                   spin3N,
                   field3N);
 
+            check_cuda_errors(__FILE__,__LINE__);
             thrust::copy( field3N.begin(), field3N.begin() + ::atoms::num_atoms, cu::x_total_spin_field_array.begin() );
             thrust::copy( field3N.begin() + ::atoms::num_atoms, field3N.begin() + 2*::atoms::num_atoms, cu::y_total_spin_field_array.begin() );
             thrust::copy( field3N.begin() + 2*::atoms::num_atoms, field3N.end(), cu::z_total_spin_field_array.begin() );
