@@ -14,6 +14,7 @@
 
 // Vampire headers
 #include "spintransport.hpp"
+#include "vmpi.hpp"
 
 // spintransport module headers
 #include "internal.hpp"
@@ -38,7 +39,7 @@ void calculate_cell_magnetization(const unsigned int num_local_atoms,           
    std::fill(st::internal::cell_magnetization.begin(), st::internal::cell_magnetization.end(), 0.0);
 
    //---------------------------------------------------------------------------
-   // loop over all atoms and determine cell magnetizations
+   // loop over all atoms and determine cell magnetizations (can OpenMP)
    //---------------------------------------------------------------------------
    for(unsigned int atom = 0; atom < num_local_atoms; atom++){
 
@@ -55,24 +56,15 @@ void calculate_cell_magnetization(const unsigned int num_local_atoms,           
 
    }
 
-   //---------------------------------------------------------------------------
-   // parallel all reduce here
-   //---------------------------------------------------------------------------
 
    //---------------------------------------------------------------------------
-   // calculate reduced magnetiztion for each cell
+   // Reduce cell magnetizations on all processors
    //---------------------------------------------------------------------------
-   for(unsigned int cell = 0 ; cell < st::internal::total_num_cells ; cell++){
-
-      // get inverse saturation magnetization for cell
-      const double isat = st::internal::cell_isaturation[cell];
-
-      // normalise magnetization in each cell
-      st::internal::cell_magnetization[3*cell+0] *= isat;
-      st::internal::cell_magnetization[3*cell+1] *= isat;
-      st::internal::cell_magnetization[3*cell+2] *= isat;
-
-   }
+   #ifdef MPICF
+      // cast to int for MPI
+      int bufsize = 3*st::internal::total_num_cells;
+      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_magnetization[0], bufsize, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   #endif
 
    return;
 

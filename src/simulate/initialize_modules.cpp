@@ -127,7 +127,7 @@ void initialize_modules(){
                               mp::num_materials,
                               sim::slonczewski_aj,
                               sim::slonczewski_bj,
-                              atoms::num_atoms,
+                              num_local_atoms,
                               atoms::type_array,
                               atoms::x_coord_array,
                               atoms::y_coord_array,

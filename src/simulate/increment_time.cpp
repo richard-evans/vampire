@@ -52,9 +52,14 @@ void increment_time(){
    //---------------------------------------------------------------------
    // update spin transport solver resistance and current and STT fields
    //---------------------------------------------------------------------
-   unsigned int num_atoms = atoms::num_atoms;
+   // Determine number of local atoms
+   #ifdef MPICF
+      const unsigned int num_local_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
+   #else
+      const unsigned int num_local_atoms = atoms::num_atoms;
+   #endif
 
-   spin_transport::update(num_atoms,
+   spin_transport::update(num_local_atoms,
                           atoms::x_spin_array,
                           atoms::y_spin_array,
                           atoms::z_spin_array,

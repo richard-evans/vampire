@@ -15,6 +15,7 @@
 
 // Vampire headers
 #include "spintransport.hpp"
+#include "vmpi.hpp"
 
 // spintransport module headers
 #include "internal.hpp"
@@ -31,19 +32,30 @@ void calculate_magnetoresistance(){
    double sum_inv_resistance = 0.0;
 
    //---------------------------------------------------------------------------------------------------------
-   // loop over all stacks to calculate stack resistance
+   // Zero spin torque arrray for parallel version to allow reduction
+   //---------------------------------------------------------------------------------------------------------
+   #ifdef MPICF
+      std::fill(st::internal::cell_spin_torque_fields.begin(), st::internal::cell_spin_torque_fields.end(), 0.0);
+      //std::fill(st::internal::stack_resistance[stack].begin(), st::internal::stack_resistance[stack].end(), 0.0); // needed for data output only
+      //std::fill(st::internal::stack_current[stack].begin(),    st::internal::stack_current[stack].end(),    0.0);
+   #endif
+
+   // TODO need to parallelise stack loop
+   //---------------------------------------------------------------------------------------------------------
+   // loop over all stacks to calculate stack resistance (can OpenMP this loop)
    //---------------------------------------------------------------------------------------------------------
    for(int stack = 0; stack < st::internal::num_stacks; stack++){
 
       const unsigned int start = stack_start_index[stack];
       const unsigned int end   = stack_final_index[stack];
+      const double isat = st::internal::cell_isaturation[start]; // saturation magnetization for cell i
 
       double total_stack_resistance = 0.0;
 
-      // load first cell magnetization
-      double mix = st::internal::cell_magnetization[3*start+0];
-      double miy = st::internal::cell_magnetization[3*start+1];
-      double miz = st::internal::cell_magnetization[3*start+2];
+      // load first cell reduced magnetization
+      double mix = st::internal::cell_magnetization[3*start+0] * isat;
+      double miy = st::internal::cell_magnetization[3*start+1] * isat;
+      double miz = st::internal::cell_magnetization[3*start+2] * isat;
 
       // load first cell resistances for P and AP states
       double Rep = st::internal::cell_resistance[start];      // electron-phonon scattering resistance
@@ -55,10 +67,11 @@ void calculate_magnetoresistance(){
       for(unsigned int cell = start+1 ; cell < end ; cell++){
 
          if(st::internal::magnetic[cell]){
-            // calculate next cell magnetization
-            const double mjx = st::internal::cell_magnetization[3*cell+0];
-            const double mjy = st::internal::cell_magnetization[3*cell+1];
-            const double mjz = st::internal::cell_magnetization[3*cell+2];
+            // calculate next cell reduced magnetization
+            const double jsat = st::internal::cell_isaturation[cell];
+            const double mjx = st::internal::cell_magnetization[3*cell+0] * jsat;
+            const double mjy = st::internal::cell_magnetization[3*cell+1] * jsat;
+            const double mjz = st::internal::cell_magnetization[3*cell+2] * jsat;
 
             const double mi_dot_mj = ( mix*mjx + miy*mjy + miz*mjz );
 
@@ -103,40 +116,42 @@ void calculate_magnetoresistance(){
       //-----------------------------------------------------
       total_stack_resistance += Rep;
 
-      //-----------------------------------------------------
-      // save stack resistance to array
-      //-----------------------------------------------------
-      st::internal::stack_resistance[stack] = total_stack_resistance;
-
+      // accumulate total inverse resistance
       sum_inv_resistance += 1.0 / total_stack_resistance;
 
-   } // end of stack loop
+      //-----------------------------------------------------
+      // Compute stack current
+      //-----------------------------------------------------
+      const double je = st::internal::voltage / total_stack_resistance;
 
-   //-----------------------------------------------------
-   // Compute stack currents
-   //-----------------------------------------------------
-   for(int stack = 0; stack < st::internal::num_stacks; stack++){
-      st::internal::stack_current[stack] = st::internal::voltage / st::internal::stack_resistance[stack];
-   }
-
-   //---------------------------------------------------------
-   // Compute cell spin torque fields based on stack currents
-   //---------------------------------------------------------
-   for(int stack = 0; stack < st::internal::num_stacks; stack++){
-
-      const unsigned int start = stack_start_index[stack];
-      const unsigned int end   = stack_final_index[stack];
-
-      // load stack current
-      const double je = st::internal::stack_current[stack];
-
+      //---------------------------------------------------------
+      // Compute cell spin torque fields based on stack currents
+      //---------------------------------------------------------
       // loop over all other cells in stack starting at cell start+1
       for(unsigned int cell = start+1 ; cell < end ; cell++){
          st::internal::cell_spin_torque_fields[3*cell+0] *= je;
          st::internal::cell_spin_torque_fields[3*cell+1] *= je;
          st::internal::cell_spin_torque_fields[3*cell+2] *= je;
       }
-   }
+
+      //-----------------------------------------------------
+      // save stack resistance and current to arrays
+      //-----------------------------------------------------
+      st::internal::stack_resistance[stack] = total_stack_resistance;
+      st::internal::stack_current[stack]    = je;
+
+   } // end of stack loop
+
+   //------------------------------------------------------------------------------------------
+   // Reduce cell spin trorque fields and stack currents and resistances on all processors
+   //------------------------------------------------------------------------------------------
+   #ifdef MPICF
+      // cast to int for MPI
+      //int bufsize = 3*st::internal::total_num_cells;
+      //MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_torque_fields[0], 3*st::internal::total_num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      //MPI_Allreduce(MPI_IN_PLACE, &st::internal::stack_resistance[0],        st::internal::num_stacks,        MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      //MPI_Allreduce(MPI_IN_PLACE, &sum_inv_resistance,                       1,                               MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   #endif
 
    // save total resistance and current
    st::total_resistance = 1.0 / sum_inv_resistance;

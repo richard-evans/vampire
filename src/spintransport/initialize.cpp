@@ -16,6 +16,7 @@
 #include "create.hpp"
 #include "spintransport.hpp"
 #include "vio.hpp"
+#include "vmpi.hpp"
 
 // spintransport module headers
 #include "internal.hpp"
@@ -38,7 +39,7 @@ namespace spin_transport{
                    const int num_materials,    // number of materials
                    const std::vector<double>& slonczewski_aj, // material specific slonczewski_aj prefactor
                    const std::vector<double>& slonczewski_bj, // material specific slonczewski_bj prefactor
-                   const uint64_t num_atoms,   // number of atoms
+                   const uint64_t num_atoms,   // number of local atoms
                    const std::vector<int>& atoms_type_array, // material types of atoms
                    const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
                    const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
@@ -92,9 +93,9 @@ namespace spin_transport{
                                     st::internal::cell_size_z };
 
       // calculate number of cells in each direction x,y,z (rounding up)
-      const int num_cells[3] = { ceil(system_size_x/cell_size[0]),
-                                 ceil(system_size_y/cell_size[1]),
-                                 ceil(system_size_z/cell_size[2]) };
+      const int num_cells[3] = { static_cast<int>( ceil(system_size_x/cell_size[0]) ),
+                                 static_cast<int>( ceil(system_size_y/cell_size[1]) ),
+                                 static_cast<int>( ceil(system_size_z/cell_size[2]) ) };
 
 
       int stack_x = 0; // spatial direction of stack arrays  x,y,z
@@ -162,7 +163,9 @@ namespace spin_transport{
          const double cz = atoms_z_coord_array[atom];
 
          // calculate 3D cell ID in atoms coordinate system
-         unsigned int cellID[3] = { cx/cell_size[0], cy/cell_size[1], cz/cell_size[2]};
+         unsigned int cellID[3] = { static_cast<unsigned int>( cx / cell_size[0] ),
+                                    static_cast<unsigned int>( cy / cell_size[1] ),
+                                    static_cast<unsigned int>( cz / cell_size[2] ) };
 
          // now calculate in stack coordinate system
          const uint64_t i = cellID[stack_x];
@@ -187,7 +190,9 @@ namespace spin_transport{
          const double cz = non_magnetic_atoms_array[atom].z;
 
          // calculate 3D cell ID in atoms coordinate system
-         unsigned int cellID[3] = { cx/cell_size[0], cy/cell_size[1], cz/cell_size[2]};
+         unsigned int cellID[3] = { static_cast<unsigned int>( cx / cell_size[0] ),
+                                    static_cast<unsigned int>( cy / cell_size[1] ),
+                                    static_cast<unsigned int>( cz / cell_size[2] ) };
 
          // now calculate in stack coordinate system
          const uint64_t i = cellID[stack_x];
@@ -222,19 +227,143 @@ namespace spin_transport{
       // calculate total number of cells
       st::internal::total_num_cells = num_cells[0]*num_cells[1]*num_cells[2];
 
+
+      //---------------------------------------------------------------------------------
+      // Accumulate derived cell data
+      //---------------------------------------------------------------------------------
+
       // resize boolean array to determine if cell is magnetic or not
       st::internal::magnetic.resize(st::internal::total_num_cells, true); // initially assume all cells magnetic
 
       // resize arrays to store average resistance in each cell
-      st::internal::cell_resistance.resize(st::internal::total_num_cells,0.0);
-      st::internal::cell_spin_resistance.resize(st::internal::total_num_cells,0.0);
+      st::internal::cell_resistance.resize(st::internal::total_num_cells,0.0); // also stores accumulated resistance before averaging
+      st::internal::cell_spin_resistance.resize(st::internal::total_num_cells,0.0); // also stores accumulated spin resistance before averaging
 
       // resize array to store inverse total moment m_s (T = 0)
-      st::internal::cell_isaturation.resize(st::internal::total_num_cells,1.0);
+      st::internal::cell_isaturation.resize(st::internal::total_num_cells,1.0); // also stores accumulated moment before inversion
 
       // resize arrays to store slonczewski prefactors
-      st::internal::cell_slonczewski_aj.resize(st::internal::total_num_cells,0.0);
-      st::internal::cell_slonczewski_bj.resize(st::internal::total_num_cells,0.0);
+      st::internal::cell_slonczewski_aj.resize(st::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
+      st::internal::cell_slonczewski_bj.resize(st::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
+
+      // Temporary arrays to accumulate intermediate values
+      std::vector<uint64_t> total_num_atoms_in_cell(    st::internal::total_num_cells, 0  ); // array to store total number of magnetic and non-magnetic atoms in cell
+      std::vector<double>   total_num_magnetic_atoms(   st::internal::total_num_cells, 0  ); // array to store total number of actually magnetic atoms (ignoring nm = keep atoms) [double format for easy normalisation]
+      std::vector<double>   total_resistivity_sq(       st::internal::total_num_cells, 0.0); // array to store total resistivity^2 calculated from constituent atoms
+      std::vector<double>   total_spin_resistivity_sq(  st::internal::total_num_cells, 0.0); // array to store total spin resistivity^2 calculated from constituent atoms
+
+      // loop over all xy-cells (stacks)
+      for(unsigned int i = 0; i < cells3D.size(); i++){
+         for(unsigned int j = 0; j < cells3D[i].size(); j++){
+
+            // loop over all cells in stack
+            for(unsigned int k = 0; k < cells3D[i][j].size(); k++){
+
+               // determine cell ID
+               const uint64_t cell = cells3D[i][j][k].id;
+
+               // determine total number of local atoms
+               uint64_t num_atoms_in_cell = cells3D[i][j][k].atom.size() + cells3D[i][j][k].nm_atom.size();
+
+               // add contributions from atoms to calculate average resistivity
+               // Impurities in metals have a disproportionate effect on the resistance and so we approximate the
+               // average resistance of the cell as
+               //
+               //                        R1^2 + R2^2 + ... + Rn^2
+               //               R_eff = --------------------------
+               //                          (R1 + R2 + ... Rn)
+               //
+               // so that the larger resistance values always dominate, even for small impurity amounts.
+               // Net effect is then similar for M/Ox interfaces in series, where the oxide dominates the resistance.
+
+               // variables to accumulate resistances for cell
+               double resistivity = 0.0;
+               double resistivity_sq = 0.0;
+               double spin_resistivity = 0.0;
+               double spin_resistivity_sq = 0.0;
+               double total_moment = 0.0;
+               double total_aj = 0.0; // spin torque prefactor parameter
+               double total_bj = 0.0; // spin torque prefactor parameter
+
+               // check for cells with only non-magnetic atoms = keep
+               uint64_t num_magnetic_atoms = 0.0; // counter for number of actually magnetic atoms
+
+               // magnetic atoms
+               for(unsigned int atom = 0; atom < cells3D[i][j][k].atom.size(); atom++ ){
+                  // get atom number in total list
+                  int atomID = cells3D[i][j][k].atom[atom];
+                  // get atom material
+                  int mat = atoms_type_array[atomID]; // get material type
+
+                  // add resistivities
+                  resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
+                  resistivity_sq += st::internal::mp[mat].resistivity * st::internal::mp[mat].resistivity; // add resistivity^2 to total
+                  spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
+                  spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
+
+                  // check that atom is magnetic
+                  if(is_magnetic_material[mat] == true){
+
+                     // increment number of magnetic atoms counter
+                     num_magnetic_atoms += 1.0;
+
+                     // calculate total moment
+                     total_moment += atoms_m_spin_array[atomID];
+
+                     // calculate total prefactor parameters
+                     total_aj += slonczewski_aj[mat];
+                     total_bj += slonczewski_bj[mat];
+
+                  }
+
+               }
+
+               // non-magnetic (remove) atoms
+               for(unsigned int atom = 0; atom < cells3D[i][j][k].nm_atom.size(); atom++ ){
+                  int mat = non_magnetic_atoms_array[atom].mat; // get material type
+                  resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
+                  resistivity_sq += st::internal::mp[mat].resistivity * st::internal::mp[mat].resistivity; // add resistivity^2 to total
+                  spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
+                  spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
+               }
+
+               // save accumulated values
+               st::internal::cell_resistance[cell] = resistivity;
+               st::internal::cell_spin_resistance[cell] = spin_resistivity;
+               st::internal::cell_slonczewski_aj[cell] = total_aj;
+               st::internal::cell_slonczewski_bj[cell] = total_bj;
+               st::internal::cell_isaturation[cell] = total_moment; // (mu_B)
+
+               total_num_atoms_in_cell[cell]    = num_atoms_in_cell;    // store total number of magnetic and non-magnetic atoms in cell
+               total_num_magnetic_atoms[cell]   = num_magnetic_atoms;   // store total number of magnetic atoms in cell in double format for normalisation
+               total_resistivity_sq[cell]       = resistivity_sq;       // store total resistivity^2 calculated from constituent atoms
+               total_spin_resistivity_sq[cell]  = spin_resistivity_sq;  // store total spin resistivity^2 calculated from constituent atoms
+
+            } // end of cell loop
+         } // end of stack y loop
+      } // end of stack x loop
+
+      //-----------------------------------------------------------------------------------------------
+      // reduce on all processors to enable unique determination of empty cells and average parameters
+      //-----------------------------------------------------------------------------------------------
+      #ifdef MPICF
+         // cast to int for MPI
+         int bufsize = st::internal::total_num_cells;
+         // reduce all cell totals onto all processors
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_resistance[0],      bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_resistance[0], bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_slonczewski_aj[0],  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_slonczewski_bj[0],  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_isaturation[0],     bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &total_num_magnetic_atoms[0],           bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &total_num_atoms_in_cell[0],            bufsize, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &total_resistivity_sq[0],               bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &total_spin_resistivity_sq[0],          bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+      #endif
+
+      //-----------------------------------------------------------------------------------------------
+      // Calculate average cell parameters
+      //-----------------------------------------------------------------------------------------------
 
       // cell size parameters for resitivity to resistance calculation
       const double iA = 1.0 / (cell_size[stack_x] * cell_size[stack_y]); // Angstroms^-2
@@ -253,106 +382,53 @@ namespace spin_transport{
                // determine cell ID
                const uint64_t cell = cells3D[i][j][k].id;
 
-               // determine total number of atoms
-               uint64_t num_atoms_in_cell = cells3D[i][j][k].atom.size() + cells3D[i][j][k].nm_atom.size();
+               // determine total number of atoms on all processors
+               uint64_t num_atoms_in_cell = total_num_atoms_in_cell[cell];
 
-               // if cell is empty assume uniform padding resistance
+               // if cell is empty space assume uniform padding resistance
                if(num_atoms_in_cell == 0){
                   st::internal::cell_resistance[cell]      = st::internal::environment_resistivity * l * iA;
                   st::internal::cell_spin_resistance[cell] = st::internal::environment_resistivity * l * iA;
-                  st::internal::cell_isaturation[cell] = 1.0; // set inverse saturation to 1.0 to avoid NaN
+                  st::internal::cell_isaturation[cell] = 0.0; // set inverse saturation to 0.0
                   st::internal::magnetic[cell] = false; // set cell as non-magnetic
                }
                // otherwise add contributions from atoms to calculate average resistivity
-               // Impurities in metals have a disproportionate effect on the resistance and so we approximate the
-               // average resistance of the cell as
-               //
-               //                        R1^2 + R2^2 + ... + Rn^2
-               //               R_eff = --------------------------
-               //                          (R1 + R2 + ... Rn)
-               //
-               // so that the larger resistance values always dominate, even for small impurity amounts.
-               // Net effect is then similar for M/Ox interfaces in series, where the oxide dominates the resistance.
-
                else{
 
-                  // variables to accumulate resistances for cell
-                  double resistivity = 0.0;
-                  double resistivity_sq = 0.0;
-                  double spin_resistivity = 0.0;
-                  double spin_resistivity_sq = 0.0;
-                  double total_moment = 0.0;
-                  double total_aj = 0.0; // spin torque prefactor parameter
-                  double total_bj = 0.0; // spin torque prefactor parameter
-
-                  // check for cells with only non-magnetic atoms = keep
-                  bool any_magnetic_atoms = false;
-
-                  // magnetic atoms
-                  for(unsigned int atom = 0; atom < cells3D[i][j][k].atom.size(); atom++ ){
-                     // get atom number in total list
-                     int atomID = cells3D[i][j][k].atom[atom];
-                     // get atom material
-                     int mat = atoms_type_array[atomID]; // get material type
-                     // check that atom is magnetic
-                     if(is_magnetic_material[mat] == true) any_magnetic_atoms = true;
-                     // add resistivities
-                     resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
-                     resistivity_sq += st::internal::mp[mat].resistivity * st::internal::mp[mat].resistivity; // add resistivity^2 to total
-                     spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
-                     spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
-                     // calculate total moment
-                     total_moment += atoms_m_spin_array[atomID];
-
-                     // calculate total prefactor parameters
-                     total_aj += slonczewski_aj[mat];
-                     total_bj += slonczewski_bj[mat];
-
-                  }
-
-                  // non-magnetic (remove) atoms
-                  for(unsigned int atom = 0; atom < cells3D[i][j][k].nm_atom.size(); atom++ ){
-                     int mat = non_magnetic_atoms_array[atom].mat; // get material type
-                     resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
-                     resistivity_sq += st::internal::mp[mat].resistivity * st::internal::mp[mat].resistivity; // add resistivity^2 to total
-                     spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
-                     spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
-                  }
-
                   // check for empty cells or cells with only non-magnetic atoms (keep) and if so treat as non-magnetic
-                  if(cells3D[i][j][k].atom.size() == 0 || any_magnetic_atoms == false){
+                  if(total_num_magnetic_atoms[cell] < 0.1){
                       st::internal::magnetic[cell] = false; // no magnetic atoms -> non-magnetic cell
-                      total_moment = 1.0; // assume 1 so inverse is still 1 (any value is fine but needs to be > 0)
+                      st::internal::cell_isaturation[cell] = 1.0; // assume 1 so inverse is still 1 (any value is fine but needs to be > 0)
                   }
                   else{
                      // calculate mean spin torque prefactor parameters for magnetic cells
-                     const double count = double(cells3D[i][j][k].atom.size()); // number of magnetic atoms in cell
-                     st::internal::cell_slonczewski_aj[cell] = total_aj * one_o_gamma_e / (count * total_moment);
-                     st::internal::cell_slonczewski_bj[cell] = total_bj * one_o_gamma_e / (count * total_moment);
+                     const double count = total_num_magnetic_atoms[cell]; // number of magnetic atoms in cell
+                     const double total_moment = st::internal::cell_isaturation[cell]; // total magnetic moment
+                     st::internal::cell_slonczewski_aj[cell] = st::internal::cell_slonczewski_aj[cell] * one_o_gamma_e / (count * total_moment);
+                     st::internal::cell_slonczewski_bj[cell] = st::internal::cell_slonczewski_bj[cell] * one_o_gamma_e / (count * total_moment);
                   }
 
                   // calculate average resistivity
-                  double mean_resistivity      = resistivity_sq / resistivity;
-                  double mean_spin_resistivity = spin_resistivity_sq / spin_resistivity;
+                  double mean_resistivity      = total_resistivity_sq[cell] / st::internal::cell_resistance[cell];
+                  double mean_spin_resistivity = total_spin_resistivity_sq[cell] / st::internal::cell_spin_resistance[cell];
 
                   // set cell resistance
                   st::internal::cell_resistance[cell]      = mean_resistivity * l * iA;
                   st::internal::cell_spin_resistance[cell] = mean_spin_resistivity * l * iA;
 
                   // set inverse total moment
-                  st::internal::cell_isaturation[cell] = 1.0/total_moment; // (1/mu_B)
+                  st::internal::cell_isaturation[cell] = 1.0/st::internal::cell_isaturation[cell]; // (1/mu_B)
 
                   // set inverse saturation of non-magnetic cells to zero
-                  if(cells3D[i][j][k].atom.size() == 0 || any_magnetic_atoms == false){
+                  if(total_num_magnetic_atoms[cell] < 0.1){
                       st::internal::cell_isaturation[cell] = 0.0;
                   }
 
                }
 
-
-            }
-         }
-      }
+            } // end of cell loop
+         } // end of stack y loop
+      } // end of stack x loop
 
       //------------------------------------------------------------------------
       // Calculate cell data
@@ -393,7 +469,7 @@ namespace spin_transport{
                const uint64_t cell = cells3D[i][j][k].id;
 
                // determine cell counts in each direction
-               int xyz[3] = { i, j, k};
+               unsigned int xyz[3] = { i, j, k};
 
                // calculate cell coordinates
                const double x = double(xyz[istack[0]]) * cell_size[0];
