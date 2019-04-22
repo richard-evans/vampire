@@ -90,9 +90,11 @@ namespace spin_transport{
       // Stack data and indices
       extern std::vector <unsigned int> stack_start_index; // start of stack in 1D list of cells
       extern std::vector <unsigned int> stack_final_index; // end of stack +1 in 1D list of cells
-      //extern std::vector <unsigned int> next_cell_in_stack; // list of next cell in stack to account for tunnel barrier
       extern std::vector <double> stack_resistance;        // array of stack resistances
       extern std::vector <double> stack_current;           // array of stack currents
+
+      extern unsigned int first_stack; // first stack on local processor
+      extern unsigned int last_stack;  // last stack on local processor
 
       // arrays to store average resistance and spin resistance in each cell
       extern std::vector <double> cell_resistance;

@@ -485,6 +485,38 @@ namespace spin_transport{
       }
 
       //------------------------------------------------------------------------
+      // determine first and last stack to be computed on local processor
+      //------------------------------------------------------------------------
+      #ifdef MPICF
+         const unsigned int num_local_stacks = st::internal::num_stacks / vmpi::num_processors;
+         spin_transport::internal::first_stack = vmpi::my_rank * num_local_stacks;
+         spin_transport::internal::last_stack = (vmpi::my_rank+1) * num_local_stacks;
+         // add all surplus points to last processor
+         if( vmpi::my_rank == vmpi::num_processors - 1){
+            spin_transport::internal::last_stack = st::internal::num_stacks;
+         }
+         // check for more processors than stacks, if so allocate one stack per processor
+         if( st::internal::num_stacks < vmpi::num_processors ){
+            if( vmpi::my_rank < st::internal::num_stacks){
+               spin_transport::internal::first_stack = vmpi::my_rank;
+               spin_transport::internal::last_stack  = vmpi::my_rank + 1;
+            }
+            else{
+               spin_transport::internal::first_stack = 0;
+               spin_transport::internal::last_stack  = 0;
+            }
+         }
+         // data output on distribution of stacks to processors
+         //std::cerr << "Num stacks, start, end : " <<
+         //             spin_transport::internal::last_stack - spin_transport::internal::first_stack << "\t" <<
+         //             spin_transport::internal::first_stack << "\t" << spin_transport::internal::last_stack << std::endl;
+      #else
+         // for serial exectuation always compute all stacks
+         spin_transport::internal::first_stack = 0;
+         spin_transport::internal::last_stack  = st::internal::num_stacks;
+      #endif
+
+      //------------------------------------------------------------------------
       // resize cell vector data arrays (3N) and set to zero
       //------------------------------------------------------------------------
       st::internal::cell_magnetization.resize(3*st::internal::total_num_cells, 0.0);

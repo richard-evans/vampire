@@ -56,7 +56,6 @@ void calculate_cell_magnetization(const unsigned int num_local_atoms,           
 
    }
 
-
    //---------------------------------------------------------------------------
    // Reduce cell magnetizations on all processors
    //---------------------------------------------------------------------------

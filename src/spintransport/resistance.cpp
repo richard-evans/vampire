@@ -36,15 +36,15 @@ void calculate_magnetoresistance(){
    //---------------------------------------------------------------------------------------------------------
    #ifdef MPICF
       std::fill(st::internal::cell_spin_torque_fields.begin(), st::internal::cell_spin_torque_fields.end(), 0.0);
-      //std::fill(st::internal::stack_resistance[stack].begin(), st::internal::stack_resistance[stack].end(), 0.0); // needed for data output only
-      //std::fill(st::internal::stack_current[stack].begin(),    st::internal::stack_current[stack].end(),    0.0);
+      //std::fill(st::internal::stack_resistance.begin(), st::internal::stack_resistance.end(), 0.0); // needed for data output only
+      //std::fill(st::internal::stack_current.begin(),    st::internal::stack_current.end(),    0.0);
    #endif
 
    // TODO need to parallelise stack loop
    //---------------------------------------------------------------------------------------------------------
    // loop over all stacks to calculate stack resistance (can OpenMP this loop)
    //---------------------------------------------------------------------------------------------------------
-   for(int stack = 0; stack < st::internal::num_stacks; stack++){
+   for(int stack = st::internal::first_stack; stack < st::internal::last_stack; stack++){
 
       const unsigned int start = stack_start_index[stack];
       const unsigned int end   = stack_final_index[stack];
@@ -146,11 +146,9 @@ void calculate_magnetoresistance(){
    // Reduce cell spin trorque fields and stack currents and resistances on all processors
    //------------------------------------------------------------------------------------------
    #ifdef MPICF
-      // cast to int for MPI
-      //int bufsize = 3*st::internal::total_num_cells;
-      //MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_torque_fields[0], 3*st::internal::total_num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_torque_fields[0], 3*st::internal::total_num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       //MPI_Allreduce(MPI_IN_PLACE, &st::internal::stack_resistance[0],        st::internal::num_stacks,        MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      //MPI_Allreduce(MPI_IN_PLACE, &sum_inv_resistance,                       1,                               MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &sum_inv_resistance,                       1,                               MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    #endif
 
    // save total resistance and current

@@ -11,6 +11,8 @@
 //
 
 // C++ standard library headers
+#include <iostream>
+#include <fstream>
 
 // Vampire headers
 #include "spintransport.hpp"
@@ -65,6 +67,26 @@ void update(const unsigned int num_local_atoms,            // number of local at
    //---------------------------------------------------------------------------------------------------------
    st::internal::calculate_field(num_local_atoms, atoms_x_field_array, atoms_y_field_array, atoms_z_field_array);
 
+   //---------------------------------------------------------------------------------------------------------
+   // test output of cell-level spin transport data
+   //---------------------------------------------------------------------------------------------------------
+
+   // std::ofstream ofile("stdata.txt");
+   // for(int i =0; i< st::internal::total_num_cells; i++){
+   //    const double isat = st::internal::cell_isaturation[i];
+   //    ofile << st::internal::cell_position[3*i+0] << "\t" <<
+   //             st::internal::cell_position[3*i+1] << "\t" <<
+   //             st::internal::cell_position[3*i+2] << "\t" <<
+   //             st::internal::cell_magnetization[3*i+0] * isat << "\t" <<
+   //             st::internal::cell_magnetization[3*i+1] * isat << "\t" <<
+   //             st::internal::cell_magnetization[3*i+2] * isat << "\t" <<
+   //             st::internal::cell_spin_torque_fields[3*i+0] << "\t" <<
+   //             st::internal::cell_spin_torque_fields[3*i+1] << "\t" <<
+   //             st::internal::cell_spin_torque_fields[3*i+2] << "\t" <<
+   //             st::internal::cell_resistance[i] << "\t" <<
+   //             st::internal::cell_spin_resistance[i] << std::endl;
+   // }
+   // ofile.close();
 
    return;
 

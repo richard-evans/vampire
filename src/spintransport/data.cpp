@@ -57,7 +57,8 @@ namespace spin_transport{
       std::vector <double> stack_resistance;        // array of stack resistances
       std::vector <double> stack_current;           // array of stack currents
 
-      //std::vector <unsigned int> next_cell_in_stack; // list of next cell in stack to account for tunnel barrier
+      unsigned int first_stack = 0; // first stack on local processor
+      unsigned int last_stack = 0;  // last stack on local processor
 
       // arrays to store average resistance and spin resistance in each cell
       std::vector <double> cell_resistance;
