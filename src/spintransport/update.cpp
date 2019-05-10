@@ -29,10 +29,7 @@ void update(const unsigned int num_local_atoms,            // number of local at
             const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
             const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
             const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
-            const std::vector<double>& atoms_m_spin_array, // moment of atoms
-            std::vector<double>& atoms_x_field_array,      // x-field of atoms
-            std::vector<double>& atoms_y_field_array,      // y-field of atoms
-            std::vector<double>& atoms_z_field_array       // z-field of atoms
+            const std::vector<double>& atoms_m_spin_array  // moment of atoms
    ){
 
    //-------------------------------------------------------------------------
@@ -61,11 +58,6 @@ void update(const unsigned int num_local_atoms,            // number of local at
    // calculate magnetoresistance
    //---------------------------------------------------------------------------------------------------------
    st::internal::calculate_magnetoresistance();
-
-   //---------------------------------------------------------------------------------------------------------
-   // calculate STT field
-   //---------------------------------------------------------------------------------------------------------
-   st::internal::calculate_field(num_local_atoms, atoms_x_field_array, atoms_y_field_array, atoms_z_field_array);
 
    //---------------------------------------------------------------------------------------------------------
    // test output of cell-level spin transport data

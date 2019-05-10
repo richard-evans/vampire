@@ -63,11 +63,7 @@ void increment_time(){
                           atoms::x_spin_array,
                           atoms::y_spin_array,
                           atoms::z_spin_array,
-                          atoms::m_spin_array,
-                          atoms::x_total_external_field_array,
-                          atoms::y_total_external_field_array,
-                          atoms::z_total_external_field_array
-   );
+                          atoms::m_spin_array);
 
    return;
 

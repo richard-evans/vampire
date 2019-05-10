@@ -58,11 +58,13 @@ namespace spin_transport{
                const std::vector<double>& atoms_x_spin_array, // x-spin vector of atoms
                const std::vector<double>& atoms_y_spin_array, // y-spin vector of atoms
                const std::vector<double>& atoms_z_spin_array, // z-spin-vector of atoms
-               const std::vector<double>& atoms_m_spin_array, // moment of atoms
-               std::vector<double>& atoms_x_field_array,      // x-field of atoms
-               std::vector<double>& atoms_y_field_array,      // y-field of atoms
-               std::vector<double>& atoms_z_field_array       // z-field of atoms
-   );
+               const std::vector<double>& atoms_m_spin_array);
+
+   void calculate_field(const unsigned int start_index,            // first atom
+                        const unsigned int end_index,              // last atom
+                        std::vector<double>& atoms_x_field_array,  // x-field of atoms
+                        std::vector<double>& atoms_y_field_array,  // y-field of atoms
+                        std::vector<double>& atoms_z_field_array); // z-field of atoms
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for spintransport module

@@ -41,6 +41,7 @@
 #include "random.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
+#include "spintransport.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
 
@@ -156,6 +157,9 @@ int calculate_external_fields(const int start_index,const int end_index){
 
    // Get updated spin torque fields
    st::get_spin_torque_fields(atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array, start_index, end_index);
+
+   // Get updated spin torque fields
+   spin_transport::calculate_field(start_index, end_index, atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array);
 
 	// FMR Fields only for fmr program
 	if(sim::enable_fmr) calculate_fmr_fields(start_index,end_index);
