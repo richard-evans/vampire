@@ -39,7 +39,6 @@ namespace stats{
    specific_heat_statistic_t system_specific_heat;
    specific_heat_statistic_t material_specific_heat;
 
-   
    standard_deviation_statistic_t material_standard_deviation;
    susceptibility_statistic_t system_susceptibility;
    susceptibility_statistic_t material_susceptibility;

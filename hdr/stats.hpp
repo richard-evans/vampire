@@ -85,6 +85,7 @@ namespace stats
    class susceptibility_statistic_t;
    class specific_heat_statistic_t;
 
+   class standard_deviation_statistic_t;
    //----------------------------------
    // Energy class definition
    //----------------------------------
