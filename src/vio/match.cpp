@@ -1461,6 +1461,15 @@ namespace vin{
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
+        test="material-standard-deviation";
+        if(word==test){
+            // Set flags for calculations of standard deviation and magnetization
+            stats::calculate_material_standard_deviation=true;
+            stats::calculate_material_magnetization=true;
+            output_list.push_back(999); //AJN
+            return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
         test="mean-susceptibility";
         if(word==test){
             // Set flags for calculations of susceptibility and magnetization

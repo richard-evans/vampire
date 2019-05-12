@@ -174,6 +174,10 @@ namespace vout{
 		stream << stats::system_susceptibility.output_mean_susceptibility(sim::temperature);
 	}
 
+	// Output Function 999
+	void standard_deviation(std::ostream& stream){
+		stream << stats::material_standard_deviation.output_standard_deviation();
+	}
 	// Output Function 22
 	void phonon_temperature(std::ostream& stream){
 		stream << sim::TTTp << "\t";

@@ -246,12 +246,15 @@ namespace vout{
 					case 62:
 						vout::mean_material_specific_heat(stream);
 						break;
-               case 63:
-                  vout::material_total_energy(stream);
-                  break;
-               case 64:
-                  vout::material_mean_total_energy(stream);
-                  break;
+                    case 63:
+                       vout::material_total_energy(stream);
+                       break;
+                    case 64:
+                       vout::material_mean_total_energy(stream);
+                       break;
+                    case 999: //AJN
+						vout::standard_deviation(stream);
+						break;
 				}
 
     }
@@ -389,7 +392,6 @@ namespace vout{
 			for(unsigned int item=0;item<file_output_list.size();item++){
                 output_switch(zmag,file_output_list[item]);
                 }
-
 			// Carriage return
 			if(file_output_list.size()>0) zmag << std::endl;
 
@@ -405,8 +407,7 @@ namespace vout{
 
 				for(unsigned int item=0;item<screen_output_list.size();item++){
                     output_switch(std::cout,screen_output_list[item]);
-			}
-
+				}
 			// Carriage return
 			if(screen_output_list.size()>0) std::cout << std::endl;
 			}

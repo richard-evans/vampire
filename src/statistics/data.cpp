@@ -22,6 +22,7 @@ namespace stats{
    bool calculate_material_height_magnetization = false;
    bool calculate_system_specific_heat          = false;
    bool calculate_material_specific_heat        = false;
+   bool calculate_material_standard_deviation   = false;
    bool calculate_system_susceptibility         = false;
    bool calculate_material_susceptibility       = false;
 
@@ -38,6 +39,8 @@ namespace stats{
    specific_heat_statistic_t system_specific_heat;
    specific_heat_statistic_t material_specific_heat;
 
+   
+   standard_deviation_statistic_t material_standard_deviation;
    susceptibility_statistic_t system_susceptibility;
    susceptibility_statistic_t material_susceptibility;
 

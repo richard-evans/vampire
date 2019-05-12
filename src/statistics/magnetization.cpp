@@ -145,11 +145,11 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
                          magnetization[4*mask_id + 1]*magnetization[4*mask_id + 1] +
                          magnetization[4*mask_id + 2]*magnetization[4*mask_id + 2]);
 
-      // normalize to msat
-      magnetization[4*mask_id + 0] = magnetization[4*mask_id + 0]/magm; // unit vector
-      magnetization[4*mask_id + 1] = magnetization[4*mask_id + 1]/magm;
-      magnetization[4*mask_id + 2] = magnetization[4*mask_id + 2]/magm;
-      magnetization[4*mask_id + 3] = magm/msat; // m/m_s
+      // normalize to msat  // this is what we want std_dev of in time - AJN
+      magnetization[4*mask_id + 0] = magnetization[4*mask_id + 0]/magm; // unit vector // x - AJN
+      magnetization[4*mask_id + 1] = magnetization[4*mask_id + 1]/magm;                // y 
+      magnetization[4*mask_id + 2] = magnetization[4*mask_id + 2]/magm;                // z
+      magnetization[4*mask_id + 3] = magm/msat; // m/m_s                               // ?
    }
 
    // Zero empty mask id's
