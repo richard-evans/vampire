@@ -6,7 +6,10 @@
 // (c) R F L Evans 2014. All rights reserved.
 //
 //-----------------------------------------------------------------------------
-
+// Implementing Welford's algorithm for calculating standard deviation
+// Calculates the standard deviation in each component of the magnetisation
+// vector  - implemented by Andrew Naden 05/2019
+//-----------------------------------------------------------------------------
 // C++ standard library headers
 #include <algorithm>
 #include <cmath>
