@@ -195,16 +195,12 @@ namespace vout{
 
 	// Output Function 21
 	void mean_system_susceptibility(std::ostream& stream,bool header){
-		stream << stats::system_susceptibility.output_mean_susceptibility(sim::temperature);
+		stream << stats::system_susceptibility.output_mean_susceptibility(sim::temperature,header);
 	}
 
 	// Output Function 999
 	void standard_deviation(std::ostream& stream,bool header){
-        if(header){
-            stream << "SD_Mx" <<"\t"<< "SD_My" <<"\t"<< "SD_Mz" <<"\t"<< "SD_Ml" <<"\t";
-        }else{
-            stream << stats::material_standard_deviation.output_standard_deviation();
-        }
+        stream << stats::material_standard_deviation.output_standard_deviation(header);
 	}
 	// Output Function 22
 	void phonon_temperature(std::ostream& stream,bool header){
@@ -359,7 +355,7 @@ namespace vout{
 
    // Output Function 50
    void mean_material_susceptibility(std::ostream& stream,bool header){
-		stream << stats::material_susceptibility.output_mean_susceptibility(sim::temperature);
+		stream << stats::material_susceptibility.output_mean_susceptibility(sim::temperature,header);
 	}
 
 	// Output Function 51

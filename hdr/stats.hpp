@@ -216,7 +216,7 @@ namespace stats
          void initialize(magnetization_statistic_t& mag_stat);
          void calculate(const std::vector<double>& magnetization);
          void reset_averages();
-         std::string output_mean_susceptibility(const double temperature);
+         std::string output_mean_susceptibility(const double temperature,bool header);
          //std::string output_mean_absolute_susceptibility();
 
       private:
@@ -240,7 +240,7 @@ namespace stats
          void initialize(magnetization_statistic_t& mag_stat);
          void update(const std::vector<double>& magnetization);
          void reset_averages();
-         std::string output_standard_deviation();
+         std::string output_standard_deviation(bool header);
 
       private:
          bool initialized;

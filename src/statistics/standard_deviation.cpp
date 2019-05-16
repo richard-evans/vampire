@@ -105,7 +105,7 @@ void standard_deviation_statistic_t::reset_averages(){
 //------------------------------------------------------------------------------------------------------
 // Function to output mean standard_deviation values as string
 //------------------------------------------------------------------------------------------------------
-std::string standard_deviation_statistic_t::output_standard_deviation(){
+std::string standard_deviation_statistic_t::output_standard_deviation(bool header){
 
    // result string stream
    std::ostringstream result;
@@ -115,23 +115,27 @@ std::string standard_deviation_statistic_t::output_standard_deviation(){
       result.precision(vout::precision);
       if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
    }
+   if(!header){
+       // determine inverse mean counter and its square
+       const double imean_counter = 1.0/mean_counter;
 
-   // determine inverse mean counter and its square
-   const double imean_counter = 1.0/mean_counter;
+       // loop over all elements
+       for(int id=0; id< num_elements -1; ++id){ // ignore last element as always contains non-magnetic atoms
 
-   // loop over all elements
-   for(int id=0; id< num_elements -1; ++id){ // ignore last element as always contains non-magnetic atoms
+          const double std_x = sqrt((residual_sq[4*id + 0]*imean_counter));
+          const double std_y = sqrt(residual_sq[4*id + 1]*imean_counter);
+          const double std_z = sqrt(residual_sq[4*id + 2]*imean_counter);
+          const double std_m = sqrt(residual_sq[4*id + 3]*imean_counter);
 
-      const double std_x = sqrt((residual_sq[4*id + 0]*imean_counter));
-      const double std_y = sqrt(residual_sq[4*id + 1]*imean_counter);
-      const double std_z = sqrt(residual_sq[4*id + 2]*imean_counter);
-      const double std_m = sqrt(residual_sq[4*id + 3]*imean_counter);
+          result <<std_x << "\t" << std_y << "\t" << std_z << "\t" << std_m << "\t";
+          //result <<std_x << "\t" <<std_y  << "\t" << std_z << "\t" << mean_counter << "\t";
+          }
 
-      result <<std_x << "\t" << std_y << "\t" << std_z << "\t" << std_m << "\t";
-      //result <<std_x << "\t" <<std_y  << "\t" << std_z << "\t" << mean_counter << "\t";
-
-
-   }
+       }else{
+          for(int id=0; id< num_elements -1; ++id){ // ignore last element as always contains non-magnetic atoms
+             result <<"ID"<<id<<"_std_x" << "\t" <<"ID"<<id<<"_std_y" << "\t" <<"ID"<<id<<"_std_z" << "\t"<<"ID"<<id<<"_std_l" << "\t";
+             }
+       }
 
    return result.str();
 
