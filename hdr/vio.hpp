@@ -122,7 +122,7 @@ namespace vout{
 	extern void data();
 	extern void zLogTsInit(std::string);
     void output_switch(std::ostream&, unsigned int);
-    void write_output(std::ostream&,std::vector<unsigned int>&);
+    extern void write_out(std::ostream&,std::vector<unsigned int>&);
 	//extern int pov_file();
 
 	void redirect(std::ostream& strm, std::string filename);

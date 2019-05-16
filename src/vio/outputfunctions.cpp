@@ -26,57 +26,81 @@
 
 namespace vout{
 	// Output Function 0
-	void time(std::ostream& stream){
-		stream << sim::time << "\t";
+	void time(std::ostream& stream,bool header){
+        if(header){
+            stream<<"Time"<<"\t";
+        }else{
+		    stream << sim::time << "\t";
+        }
 	}
 
 	// Output Function 1
-	void real_time(std::ostream& stream){
-		stream << sim::time*mp::dt_SI << "\t";
+	void real_time(std::ostream& stream,bool header){
+        if(header){
+            stream<<"Real_Time"<<"\t";
+        }else{
+		    stream << sim::time*mp::dt_SI << "\t";
+        }
 	}
 
 	// Output Function 2
-	void temperature(std::ostream& stream){
-		stream << sim::temperature << "\t";
+	void temperature(std::ostream& stream,bool header){
+        if(header){
+            stream<<"Temperature"<<"\t";
+        }else{
+		    stream << sim::temperature << "\t";
+        }
 	}
 
 	// Output Function 3
-	void Happ(std::ostream& stream){
-		stream << sim::H_applied << "\t";
+	void Happ(std::ostream& stream,bool header){
+        if(header){
+            stream<<"H_Applied"<<"\t";
+        }else{
+		    stream << sim::H_applied << "\t";
+        }
 	}
 
 	// Output Function 4
-	void Hvec(std::ostream& stream){
-		stream << sim::H_vec[0] << "\t"<< sim::H_vec[1] << "\t"<< sim::H_vec[2] << "\t";
+	void Hvec(std::ostream& stream,bool header){
+        if(header){
+            stream<<"H_Vector_x"<<"\t"<<"H_Vector_y"<<"\t"<<"H_Vector_z"<<"\t";
+        }else{
+		    stream << sim::H_vec[0] << "\t"<< sim::H_vec[1] << "\t"<< sim::H_vec[2] << "\t";
+        }
 	}
 
 	// Output Function 5
-	void mvec(std::ostream& stream){
-		stream << stats::system_magnetization.output_normalized_magnetization();
+	void mvec(std::ostream& stream,bool header){
+        if(header){
+            stream<<"M_norm_x"<<"\t"<<"M_norm_y"<<"\t"<<"M_norm_z"<<"\t"<<"M_norm_l"<<"\t";
+        }else{
+		    stream << stats::system_magnetization.output_normalized_magnetization();
+        }
 	}
 
 	// Output Function 6
-	void magm(std::ostream& stream){
+	void magm(std::ostream& stream,bool header){
 		stream << stats::system_magnetization.output_normalized_magnetization_length() << "\t";
 	}
 
 	// Output Function 7
-	void mean_magm(std::ostream& stream){
+	void mean_magm(std::ostream& stream,bool header){
 		stream << stats::system_magnetization.output_normalized_mean_magnetization_length();
 	}
 
 	// Output Function 8
-	void mat_mvec(std::ostream& stream){
+	void mat_mvec(std::ostream& stream,bool header){
 		stream << stats::material_magnetization.output_normalized_magnetization();
 	}
 
 	// Output Function 9
-	void mat_mean_magm(std::ostream& stream){
+	void mat_mean_magm(std::ostream& stream,bool header){
 		stream << stats::material_magnetization.output_normalized_mean_magnetization_length();
 	}
 
 	// Output Function 10
-	void grain_mvec(std::ostream& stream){
+	void grain_mvec(std::ostream& stream,bool header){
 
 		unsigned int id=0; // grain id (excluding grains with zero atoms)
 
@@ -94,7 +118,7 @@ namespace vout{
 	}
 
 	// Output Function 11
-	void grain_magm(std::ostream& stream){
+	void grain_magm(std::ostream& stream,bool header){
 
 		unsigned int id=0; // grain id (excluding grains with zero atoms)
 
@@ -109,59 +133,59 @@ namespace vout{
 	}
 
 	// Output Function 12
-	void mdoth(std::ostream& stream){
+	void mdoth(std::ostream& stream,bool header){
 		// initialise vector of H
 		std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
 		stream << stats::system_magnetization.output_normalized_magnetization_dot_product(H);
 	}
 
 	// Output Function 13
-	void grain_mat_mvec(std::ostream& stream){
+	void grain_mat_mvec(std::ostream& stream,bool header){
 
 		grains::output_mat_mag(stream);
 
 	}
 
 	// Output Function 14
-	void systorque(std::ostream& stream){
+	void systorque(std::ostream& stream,bool header){
 		stream << stats::total_system_torque[0] << "\t";
 		stream << stats::total_system_torque[1] << "\t";
 		stream << stats::total_system_torque[2] << "\t";
 	}
 
 	// Output Function 15
-	void mean_systorque(std::ostream& stream){
+	void mean_systorque(std::ostream& stream,bool header){
 		stream << stats::total_mean_system_torque[0]/stats::torque_data_counter << "\t";
 		stream << stats::total_mean_system_torque[1]/stats::torque_data_counter << "\t";
 		stream << stats::total_mean_system_torque[2]/stats::torque_data_counter << "\t";
 	}
 
 	// Output Function 16
-	void constraint_phi(std::ostream& stream){
+	void constraint_phi(std::ostream& stream,bool header){
 		stream << sim::constraint_phi << "\t";
 	}
 
 	// Output Function 17
-	void constraint_theta(std::ostream& stream){
+	void constraint_theta(std::ostream& stream,bool header){
 		stream << sim::constraint_theta << "\t";
 	}
 
 	// Output Function 18
-	void material_constraint_phi(std::ostream& stream){
+	void material_constraint_phi(std::ostream& stream,bool header){
 		for(int mat=0;mat<mp::num_materials;mat++){
 			stream << montecarlo::cmc::cmc_mat[mat].constraint_phi << "\t";
 		}
 	}
 
 	// Output Function 19
-	void material_constraint_theta(std::ostream& stream){
+	void material_constraint_theta(std::ostream& stream,bool header){
 		for(int mat=0;mat<mp::num_materials;mat++){
 			stream << montecarlo::cmc::cmc_mat[mat].constraint_theta << "\t";
 		}
 	}
 
 	// Output Function 20
-	void material_mean_systorque(std::ostream& stream){
+	void material_mean_systorque(std::ostream& stream,bool header){
 		for(int mat=0;mat<mp::num_materials;mat++){
 			stream << stats::sublattice_mean_torque_x_array[mat]/stats::torque_data_counter << "\t";
 			stream << stats::sublattice_mean_torque_y_array[mat]/stats::torque_data_counter << "\t";
@@ -170,35 +194,39 @@ namespace vout{
 	}
 
 	// Output Function 21
-	void mean_system_susceptibility(std::ostream& stream){
+	void mean_system_susceptibility(std::ostream& stream,bool header){
 		stream << stats::system_susceptibility.output_mean_susceptibility(sim::temperature);
 	}
 
 	// Output Function 999
-	void standard_deviation(std::ostream& stream){
-		stream << stats::material_standard_deviation.output_standard_deviation();
+	void standard_deviation(std::ostream& stream,bool header){
+        if(header){
+            stream << "SD_Mx" <<"\t"<< "SD_My" <<"\t"<< "SD_Mz" <<"\t"<< "SD_Ml" <<"\t";
+        }else{
+            stream << stats::material_standard_deviation.output_standard_deviation();
+        }
 	}
 	// Output Function 22
-	void phonon_temperature(std::ostream& stream){
+	void phonon_temperature(std::ostream& stream,bool header){
 		stream << sim::TTTp << "\t";
 	}
 
 	// Output Function 23
-	void material_temperature(std::ostream& stream){
+	void material_temperature(std::ostream& stream,bool header){
 		for(int mat=0;mat<mp::material.size();mat++){
 			stream << mp::material[mat].temperature << "\t";
 		}
 	}
 
 	// Output Function 24
-	void material_applied_field_strength(std::ostream& stream){
+	void material_applied_field_strength(std::ostream& stream,bool header){
 		for(int mat=0;mat<mp::material.size();mat++){
 			stream << mp::material[mat].applied_field_strength << "\t";
 		}
 	}
 
 	// Output Function 25
-	void material_fmr_field_strength(std::ostream& stream){
+	void material_fmr_field_strength(std::ostream& stream,bool header){
 		const double real_time=sim::time*mp::dt_SI;
 
 		for(int mat=0;mat<mp::material.size();mat++){
@@ -208,165 +236,165 @@ namespace vout{
 	}
 
 	// Output Function 26
-	void mat_mdoth(std::ostream& stream){
+	void mat_mdoth(std::ostream& stream,bool header){
 		// initialise vector of H
 		std::vector<double> H(&sim::H_vec[0], &sim::H_vec[0]+3);
 		stream << stats::material_magnetization.output_normalized_magnetization_dot_product(H);
 	}
 
 	// Output Function 27
-	void total_energy(std::ostream& stream){
+	void total_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_energy(stats::total);
 	}
 
 	// Output Function 28
-	void mean_total_energy(std::ostream& stream){
+	void mean_total_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_mean_energy(stats::total);
 	}
 
 	// Output Function 29
-	void total_anisotropy_energy(std::ostream& stream){
+	void total_anisotropy_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_energy(stats::anisotropy);
 	}
 
 	// Output Function 30
-	void mean_total_anisotropy_energy(std::ostream& stream){
+	void mean_total_anisotropy_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_mean_energy(stats::anisotropy);
 	}
 
 	// Output Function 31
-	/*void total_cubic_anisotropy_energy(std::ostream& stream){
+	/*void total_cubic_anisotropy_energy(std::ostream& stream,bool header){
 		stats::output_energy(stream, stats::cubic_anisotropy, stats::total);
 	}
 
 	// Output Function 32
-	void mean_total_cubic_anisotropy_energy(std::ostream& stream){
+	void mean_total_cubic_anisotropy_energy(std::ostream& stream,bool header){
 		stats::output_energy(stream, stats::cubic_anisotropy, stats::mean);
 	}
 
 	// Output Function 33
-	void total_surface_anisotropy_energy(std::ostream& stream){
+	void total_surface_anisotropy_energy(std::ostream& stream,bool header){
 		stats::output_energy(stream, stats::surface_anisotropy, stats::total);
 	}
 
 	// Output Function 34
-	void mean_total_surface_anisotropy_energy(std::ostream& stream){
+	void mean_total_surface_anisotropy_energy(std::ostream& stream,bool header){
 		stats::output_energy(stream, stats::surface_anisotropy, stats::mean);
 	}*/
 
 	// Output Function 35
-	void total_exchange_energy(std::ostream& stream){
+	void total_exchange_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_energy(stats::exchange);
 	}
 
 	// Output Function 36
-	void mean_total_exchange_energy(std::ostream& stream){
+	void mean_total_exchange_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_mean_energy(stats::exchange);
 	}
 
 	// Output Function 37
-	void total_applied_field_energy(std::ostream& stream){
+	void total_applied_field_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_energy(stats::applied_field);
 	}
 
 	// Output Function 38
-	void mean_total_applied_field_energy(std::ostream& stream){
+	void mean_total_applied_field_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_mean_energy(stats::applied_field);
 	}
 
 	// Output Function 39
-	void total_magnetostatic_energy(std::ostream& stream){
+	void total_magnetostatic_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_energy(stats::magnetostatic);
 	}
 
 	// Output Function 40
-	void mean_total_magnetostatic_energy(std::ostream& stream){
+	void mean_total_magnetostatic_energy(std::ostream& stream,bool header){
       stream << stats::system_energy.output_mean_energy(stats::magnetostatic);
 	}
 
 	// Output Function 41
-	/*void total_so_anisotropy_energy(std::ostream& stream){
+	/*void total_so_anisotropy_energy(std::ostream& stream,bool header){
 		stats::output_energy(stream, stats::second_order_anisotropy, stats::total);
 	}
 
 	// Output Function 42
-	void mean_total_so_anisotropy_energy(std::ostream& stream){
+	void mean_total_so_anisotropy_energy(std::ostream& stream,bool header){
 		stats::output_energy(stream, stats::second_order_anisotropy, stats::mean);
 	}*/
 
 	// Output Function 43
-	void height_mvec(std::ostream& stream){
+	void height_mvec(std::ostream& stream,bool header){
 		stream << stats::height_magnetization.output_normalized_magnetization();
 	}
 
 	// Output Function 44
-	void material_height_mvec(std::ostream& stream){
+	void material_height_mvec(std::ostream& stream,bool header){
 		stream << stats::material_height_magnetization.output_normalized_magnetization();
 	}
 
 	// Output Function 45
-	void height_mvec_actual(std::ostream& stream){
+	void height_mvec_actual(std::ostream& stream,bool header){
 		stream << stats::height_magnetization.output_magnetization();
 	}
 
 	// Output Function 46
-	void material_height_mvec_actual(std::ostream& stream){
+	void material_height_mvec_actual(std::ostream& stream,bool header){
 		stream << stats::material_height_magnetization.output_magnetization();
 	}
 
 	// Output Function 47
-	void fmr_field_strength(std::ostream& stream){
+	void fmr_field_strength(std::ostream& stream,bool header){
 		stream << sim::fmr_field << "\t";
 	}
 
    // Output Function 48
-	void mean_mvec(std::ostream& stream){
+	void mean_mvec(std::ostream& stream,bool header){
 		stream << stats::system_magnetization.output_normalized_mean_magnetization();
 	}
 
    // Output Function 49
-	void mat_mean_mvec(std::ostream& stream){
+	void mat_mean_mvec(std::ostream& stream,bool header){
 		stream << stats::material_magnetization.output_normalized_mean_magnetization();
 	}
 
    // Output Function 50
-   void mean_material_susceptibility(std::ostream& stream){
+   void mean_material_susceptibility(std::ostream& stream,bool header){
 		stream << stats::material_susceptibility.output_mean_susceptibility(sim::temperature);
 	}
 
 	// Output Function 51
-   void mean_height_magnetisation_length(std::ostream& stream){
+   void mean_height_magnetisation_length(std::ostream& stream,bool header){
 		stream << stats::height_magnetization.output_mean_magnetization_length();
 	}
 
 	// Output Function 51
-   void mean_height_magnetisation(std::ostream& stream){
+   void mean_height_magnetisation(std::ostream& stream,bool header){
 		stream << stats::height_magnetization.output_mean_magnetization();
 	}
 
 	// Output Function 60
-	void MPITimings(std::ostream& stream){
+	void MPITimings(std::ostream& stream,bool header){
 		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
 		stream << "\t" << vmpi::MaximumComputeTime << "\t" << vmpi::MaximumWaitTime << "\t";
 	}
 
    // Output Function 61
-   void mean_system_specific_heat(std::ostream& stream){
+   void mean_system_specific_heat(std::ostream& stream,bool header){
       stream << stats::system_specific_heat.output_mean_specific_heat(sim::temperature);
    }
 
    // Output Function 62
-   void mean_material_specific_heat(std::ostream& stream){
+   void mean_material_specific_heat(std::ostream& stream,bool header){
       stream << stats::material_specific_heat.output_mean_specific_heat(sim::temperature);
    }
 
    // Output Function 63
-   void material_total_energy(std::ostream& stream){
+   void material_total_energy(std::ostream& stream,bool header){
       stream << stats::material_energy.output_energy(stats::total);
    }
 
    // Output Function 64
-   void material_mean_total_energy(std::ostream& stream){
+   void material_mean_total_energy(std::ostream& stream,bool header){
       stream << stats::material_energy.output_mean_energy(stats::total);
    }
 
