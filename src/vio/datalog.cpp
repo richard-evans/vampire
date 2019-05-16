@@ -258,6 +258,22 @@ namespace vout{
 				}
 
     }
+
+    void write_out(std::ostream& stream,std::vector<unsigned int>& list){
+		// Output data to output
+		if(vmpi::my_rank==0){
+
+         // For gpu acceleration get statistics from device
+         if(gpu::acceleration) gpu::stats::get();
+
+			for(unsigned int item=0;item<list.size();item++){
+                output_switch(stream,list[item]);
+                }
+			// Carriage return
+			if(list.size()>0) stream << std::endl;
+
+			} // end of code for rank 0 only
+    }
  
 	void zLogTsInit(std::string tmp){
 
@@ -380,38 +396,13 @@ namespace vout{
          }
       }
 
-		// Only output 1/output_rate time steps
+		// Only output 1/output_rate time steps// This is all serialised inside the write_output fn - AJN
 		if(sim::time%vout::output_rate==0){
-
-		// Output data to output
-		if(vmpi::my_rank==0){
-
-         // For gpu acceleration get statistics from device
-         if(gpu::acceleration) gpu::stats::get();
-
-			for(unsigned int item=0;item<file_output_list.size();item++){
-                output_switch(zmag,file_output_list[item]);
-                }
-			// Carriage return
-			if(file_output_list.size()>0) zmag << std::endl;
-
-			} // end of code for rank 0 only
+            write_out(zmag,file_output_list);
 		} // end of if statement for output rate
 
-		// Output data to cout
-		if(vmpi::my_rank==0){
-			if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
-
-            // For gpu acceleration get statistics from device (repeated here so additional performance cost for doing this)
-            if(gpu::acceleration) gpu::stats::get();
-
-				for(unsigned int item=0;item<screen_output_list.size();item++){
-                    output_switch(std::cout,screen_output_list[item]);
-				}
-			// Carriage return
-			if(screen_output_list.size()>0) std::cout << std::endl;
-			}
-
+		if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
+            write_out(std::cout,screen_output_list);
 		} // End of if statement to output data to screen
 
 		if(sim::time%vout::output_grain_rate==0){
