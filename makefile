@@ -97,12 +97,6 @@ obj/spintorque/magnetization.o \
 obj/spintorque/matrix.o \
 obj/spintorque/output.o \
 obj/spintorque/spinaccumulation.o \
-obj/statistics/data.o \
-obj/statistics/initialize.o \
-obj/statistics/magnetization.o \
-obj/statistics/statistics.o \
-obj/statistics/susceptibility.o \
-obj/statistics/standard_deviation.o \
 obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
