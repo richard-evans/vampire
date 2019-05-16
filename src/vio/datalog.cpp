@@ -84,7 +84,178 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 }
 
 namespace vout{
+    
+    void output_switch(std::ostream& stream,unsigned int idx){
+				switch(idx){
+					case 0:
+						vout::time(stream);
+						break;
+					case 1:
+						vout::real_time(stream);
+						break;
+					case 2:
+						vout::temperature(stream);
+						break;
+					case 3:
+						vout::Happ(stream);
+						break;
+					case 4:
+						vout::Hvec(stream);
+						break;
+					case 5:
+						vout::mvec(stream);
+						break;
+					case 6:
+						vout::magm(stream);
+						break;
+					case 7:
+						vout::mean_magm(stream);
+						break;
+					case 8:
+						vout::mat_mvec(stream);
+						break;
+					case 9:
+						vout::mat_mean_magm(stream);
+						break;
+					case 12:
+						vout::mdoth(stream);
+						break;
+					case 14:
+						vout::systorque(stream);
+						break;
+					case 15:
+						vout::mean_systorque(stream);
+						break;
+					case 16:
+						vout::constraint_phi(stream);
+						break;
+					case 17:
+						vout::constraint_theta(stream);
+						break;
+					case 18:
+						vout::material_constraint_phi(stream);
+						break;
+					case 19:
+						vout::material_constraint_theta(stream);
+						break;
+					case 20:
+						vout::material_mean_systorque(stream);
+						break;
+					case 21:
+						vout::mean_system_susceptibility(stream);
+						break;
+					case 22:
+						vout::phonon_temperature(stream);
+						break;
+					case 23:
+						vout::material_temperature(stream);
+						break;
+					case 24:
+						vout::material_applied_field_strength(stream);
+						break;
+					case 25:
+						vout::material_fmr_field_strength(stream);
+						break;
+					case 26:
+						vout::mat_mdoth(stream);
+						break;
+					case 27:
+						vout::total_energy(stream);
+						break;
+					case 28:
+						vout::mean_total_energy(stream);
+						break;
+					case 29:
+						vout::total_anisotropy_energy(stream);
+						break;
+					case 30:
+						vout::mean_total_anisotropy_energy(stream);
+						break;
+					case 31:
+						//vout::total_cubic_anisotropy_energy(stream);
+						break;
+					case 32:
+						//vout::mean_total_cubic_anisotropy_energy(stream);
+						break;
+					case 33:
+						//vout::total_surface_anisotropy_energy(stream);
+						break;
+					case 34:
+						//vout::mean_total_surface_anisotropy_energy(stream);
+						break;
+					case 35:
+						vout::total_exchange_energy(stream);
+						break;
+					case 36:
+						vout::mean_total_exchange_energy(stream);
+						break;
+					case 37:
+						vout::total_applied_field_energy(stream);
+						break;
+					case 38:
+						vout::mean_total_applied_field_energy(stream);
+						break;
+					case 39:
+						vout::total_magnetostatic_energy(stream);
+						break;
+					case 40:
+						vout::mean_total_magnetostatic_energy(stream);
+						break;
+					case 41:
+						//vout::total_so_anisotropy_energy(stream);
+						break;
+					case 42:
+						//vout::mean_total_so_anisotropy_energy(stream);
+						break;
+					case 43:
+						vout::height_mvec(stream);
+						break;
+					case 44:
+						vout::material_height_mvec(stream);
+						break;
+					case 45:
+						vout::height_mvec_actual(stream);
+						break;
+					case 46:
+						vout::material_height_mvec_actual(stream);
+						break;
+					case 47:
+						vout::fmr_field_strength(stream);
+						break;
+               case 48:
+						vout::mean_mvec(stream);
+						break;
+               case 49:
+						vout::mat_mean_mvec(stream);
+						break;
+               case 50:
+						vout::mean_material_susceptibility(stream);
+						break;
+					case 51:
+						vout::mean_height_magnetisation_length(stream);
+						break;
+					case 52:
+						vout::mean_height_magnetisation(stream);
+						break;
+					case 60:
+						vout::MPITimings(stream);
+						break;
+					case 61:
+						vout::mean_system_specific_heat(stream);
+						break;
+					case 62:
+						vout::mean_material_specific_heat(stream);
+						break;
+               case 63:
+                  vout::material_total_energy(stream);
+                  break;
+               case 64:
+                  vout::material_mean_total_energy(stream);
+                  break;
+				}
 
+    }
+ 
 	void zLogTsInit(std::string tmp){
 
 		// Get program name and process ID
@@ -216,174 +387,9 @@ namespace vout{
          if(gpu::acceleration) gpu::stats::get();
 
 			for(unsigned int item=0;item<file_output_list.size();item++){
-				switch(file_output_list[item]){
-					case 0:
-						vout::time(zmag);
-						break;
-					case 1:
-						vout::real_time(zmag);
-						break;
-					case 2:
-						vout::temperature(zmag);
-						break;
-					case 3:
-						vout::Happ(zmag);
-						break;
-					case 4:
-						vout::Hvec(zmag);
-						break;
-					case 5:
-						vout::mvec(zmag);
-						break;
-					case 6:
-						vout::magm(zmag);
-						break;
-					case 7:
-						vout::mean_magm(zmag);
-						break;
-					case 8:
-						vout::mat_mvec(zmag);
-						break;
-					case 9:
-						vout::mat_mean_magm(zmag);
-						break;
-					case 12:
-						vout::mdoth(zmag);
-						break;
-					case 14:
-						vout::systorque(zmag);
-						break;
-					case 15:
-						vout::mean_systorque(zmag);
-						break;
-					case 16:
-						vout::constraint_phi(zmag);
-						break;
-					case 17:
-						vout::constraint_theta(zmag);
-						break;
-					case 18:
-						vout::material_constraint_phi(zmag);
-						break;
-					case 19:
-						vout::material_constraint_theta(zmag);
-						break;
-					case 20:
-						vout::material_mean_systorque(zmag);
-						break;
-					case 21:
-						vout::mean_system_susceptibility(zmag);
-						break;
-					case 22:
-						vout::phonon_temperature(zmag);
-						break;
-					case 23:
-						vout::material_temperature(zmag);
-						break;
-					case 24:
-						vout::material_applied_field_strength(zmag);
-						break;
-					case 25:
-						vout::material_fmr_field_strength(zmag);
-						break;
-					case 26:
-						vout::mat_mdoth(zmag);
-						break;
-					case 27:
-						vout::total_energy(zmag);
-						break;
-					case 28:
-						vout::mean_total_energy(zmag);
-						break;
-					case 29:
-						vout::total_anisotropy_energy(zmag);
-						break;
-					case 30:
-						vout::mean_total_anisotropy_energy(zmag);
-						break;
-					case 31:
-						//vout::total_cubic_anisotropy_energy(zmag);
-						break;
-					case 32:
-						//vout::mean_total_cubic_anisotropy_energy(zmag);
-						break;
-					case 33:
-						//vout::total_surface_anisotropy_energy(zmag);
-						break;
-					case 34:
-						//vout::mean_total_surface_anisotropy_energy(zmag);
-						break;
-					case 35:
-						vout::total_exchange_energy(zmag);
-						break;
-					case 36:
-						vout::mean_total_exchange_energy(zmag);
-						break;
-					case 37:
-						vout::total_applied_field_energy(zmag);
-						break;
-					case 38:
-						vout::mean_total_applied_field_energy(zmag);
-						break;
-					case 39:
-						vout::total_magnetostatic_energy(zmag);
-						break;
-					case 40:
-						vout::mean_total_magnetostatic_energy(zmag);
-						break;
-					case 41:
-						//vout::total_so_anisotropy_energy(zmag);
-						break;
-					case 42:
-						//vout::mean_total_so_anisotropy_energy(zmag);
-						break;
-					case 43:
-						vout::height_mvec(zmag);
-						break;
-					case 44:
-						vout::material_height_mvec(zmag);
-						break;
-					case 45:
-						vout::height_mvec_actual(zmag);
-						break;
-					case 46:
-						vout::material_height_mvec_actual(zmag);
-						break;
-					case 47:
-						vout::fmr_field_strength(zmag);
-						break;
-               case 48:
-						vout::mean_mvec(zmag);
-						break;
-               case 49:
-						vout::mat_mean_mvec(zmag);
-						break;
-               case 50:
-						vout::mean_material_susceptibility(zmag);
-						break;
-					case 51:
-						vout::mean_height_magnetisation_length(zmag);
-						break;
-					case 52:
-						vout::mean_height_magnetisation(zmag);
-						break;
-					case 60:
-						vout::MPITimings(zmag);
-						break;
-					case 61:
-						vout::mean_system_specific_heat(zmag);
-						break;
-					case 62:
-						vout::mean_material_specific_heat(zmag);
-						break;
-               case 63:
-                  vout::material_total_energy(zmag);
-                  break;
-               case 64:
-                  vout::material_mean_total_energy(zmag);
-                  break;
-				}
-			}
+                output_switch(zmag,file_output_list[item]);
+                }
+
 			// Carriage return
 			if(file_output_list.size()>0) zmag << std::endl;
 
@@ -398,155 +404,7 @@ namespace vout{
             if(gpu::acceleration) gpu::stats::get();
 
 				for(unsigned int item=0;item<screen_output_list.size();item++){
-				switch(screen_output_list[item]){
-					case 0:
-						vout::time(std::cout);
-						break;
-					case 1:
-						vout::real_time(std::cout);
-						break;
-					case 2:
-						vout::temperature(std::cout);
-						break;
-					case 3:
-						vout::Happ(std::cout);
-						break;
-					case 4:
-						vout::Hvec(std::cout);
-						break;
-					case 5:
-						vout::mvec(std::cout);
-						break;
-					case 6:
-						vout::magm(std::cout);
-						break;
-					case 7:
-						vout::mean_magm(std::cout);
-						break;
-					case 8:
-						vout::mat_mvec(std::cout);
-						break;
-					case 9:
-						vout::mat_mean_magm(std::cout);
-						break;
-					case 12:
-						vout::mdoth(std::cout);
-						break;
-					case 14:
-						vout::systorque(std::cout);
-						break;
-					case 15:
-						vout::mean_systorque(std::cout);
-						break;
-					case 16:
-						vout::constraint_phi(std::cout);
-						break;
-					case 17:
-						vout::constraint_theta(std::cout);
-						break;
-					case 18:
-						vout::material_constraint_phi(std::cout);
-						break;
-					case 19:
-						vout::material_constraint_theta(std::cout);
-						break;
-					case 20:
-						vout::material_mean_systorque(std::cout);
-						break;
-					case 21:
-						vout::mean_system_susceptibility(std::cout);
-						break;
-					case 22:
-						vout::phonon_temperature(std::cout);
-						break;
-					case 23:
-						vout::material_temperature(std::cout);
-						break;
-					case 24:
-						vout::material_applied_field_strength(std::cout);
-						break;
-					case 25:
-						vout::material_fmr_field_strength(std::cout);
-						break;
-					case 26:
-						vout::mat_mdoth(std::cout);
-						break;
-					case 27:
-						vout::total_energy(std::cout);
-						break;
-					case 28:
-						vout::mean_total_energy(std::cout);
-						break;
-					case 29:
-						vout::total_anisotropy_energy(std::cout);
-						break;
-					case 30:
-						vout::mean_total_anisotropy_energy(std::cout);
-						break;
-					case 31:
-						//vout::total_cubic_anisotropy_energy(std::cout);
-						break;
-					case 32:
-						//vout::mean_total_cubic_anisotropy_energy(std::cout);
-						break;
-					case 33:
-						//vout::total_surface_anisotropy_energy(std::cout);
-						break;
-					case 34:
-						//vout::mean_total_surface_anisotropy_energy(std::cout);
-						break;
-					case 35:
-						vout::total_exchange_energy(std::cout);
-						break;
-					case 36:
-						vout::mean_total_exchange_energy(std::cout);
-						break;
-					case 37:
-						vout::total_applied_field_energy(std::cout);
-						break;
-					case 38:
-						vout::mean_total_applied_field_energy(std::cout);
-						break;
-					case 39:
-						vout::total_magnetostatic_energy(std::cout);
-						break;
-					case 40:
-						vout::mean_total_magnetostatic_energy(std::cout);
-						break;
-					case 41:
-						//vout::total_so_anisotropy_energy(std::cout);
-						break;
-					case 42:
-						//vout::mean_total_so_anisotropy_energy(std::cout);
-						break;
-					case 47:
-						vout::fmr_field_strength(std::cout);
-						break;
-               case 48:
-						vout::mean_mvec(std::cout);
-						break;
-               case 49:
-						vout::mat_mean_mvec(std::cout);
-						break;
-               case 50:
-						vout::mean_material_susceptibility(std::cout);
-						break;
-					case 60:
-						vout::MPITimings(std::cout);
-						break;
-					case 61:
-						vout::mean_system_specific_heat(std::cout);
-						break;
-					case 62:
-						vout::mean_material_specific_heat(std::cout);
-						break;
-               case 63:
-                  vout::material_total_energy(std::cout);
-                  break;
-               case 64:
-                  vout::material_mean_total_energy(std::cout);
-                  break;
-				}
+                    output_switch(std::cout,screen_output_list[item]);
 			}
 
 			// Carriage return
