@@ -161,14 +161,14 @@ namespace stats
          void set_magnetization(std::vector<double>& magnetization, std::vector<double>& mean_magnetization, long counter);
          void reset_magnetization_averages();
          const std::vector<double>& get_magnetization();
-         std::string output_magnetization();
-         std::string output_normalized_magnetization();
-         std::string output_normalized_magnetization_length();
-         std::string output_normalized_mean_magnetization();
-         std::string output_normalized_mean_magnetization_length();
+         std::string output_magnetization(bool header);
+         std::string output_normalized_magnetization(bool header);
+         std::string output_normalized_magnetization_length(bool header);
+         std::string output_normalized_mean_magnetization(bool header);
+         std::string output_normalized_mean_magnetization_length(bool header);
          std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec);
-         std::string output_mean_magnetization_length();
-         std::string output_mean_magnetization();
+         std::string output_mean_magnetization_length(bool header);
+         std::string output_mean_magnetization(bool header);
 
       private:
          bool initialized;

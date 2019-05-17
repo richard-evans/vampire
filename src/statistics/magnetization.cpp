@@ -210,7 +210,7 @@ void magnetization_statistic_t::reset_magnetization_averages(){
 //------------------------------------------------------------------------------------------------------
 // Function to output normalised magnetisation values as string
 //------------------------------------------------------------------------------------------------------
-std::string magnetization_statistic_t::output_normalized_magnetization(){
+std::string magnetization_statistic_t::output_normalized_magnetization(bool header){
 
    // result string stream
    std::ostringstream result;
@@ -223,7 +223,11 @@ std::string magnetization_statistic_t::output_normalized_magnetization(){
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << magnetization[4*mask_id + 0] << "\t" << magnetization[4*mask_id + 1] << "\t" << magnetization[4*mask_id + 2] << "\t" << magnetization[4*mask_id + 3] << "\t";
+        if(header){
+            result<<"ID"<<mask_id<<"M_norm_x"<<"\t"<<"ID"<<mask_id<<"M_norm_y"<<"\t"<<"ID"<<mask_id<<"M_norm_z"<<"\t"<<"ID"<<mask_id<<"M_norm_l"<<"\t";
+        }else{
+            result << magnetization[4*mask_id + 0] << "\t" << magnetization[4*mask_id + 1] << "\t" << magnetization[4*mask_id + 2] << "\t" << magnetization[4*mask_id + 3] << "\t";
+        }
    }
 
    return result.str();
@@ -233,7 +237,7 @@ std::string magnetization_statistic_t::output_normalized_magnetization(){
 //------------------------------------------------------------------------------------------------------
 // Function to output actual magnetisation values as string (in Bohr magnetons)
 //------------------------------------------------------------------------------------------------------
-std::string magnetization_statistic_t::output_magnetization(){
+std::string magnetization_statistic_t::output_magnetization(bool header){
 
    // result string stream
    std::ostringstream result;
@@ -246,7 +250,11 @@ std::string magnetization_statistic_t::output_magnetization(){
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << magnetization[4*mask_id + 0] << "\t" << magnetization[4*mask_id + 1] << "\t" << magnetization[4*mask_id + 2] << "\t" << magnetization[4*mask_id + 3]*saturation[mask_id] << "\t";
+        if(header){
+            result<<"ID"<<mask_id<<"M_x"<<"\t"<<"ID"<<mask_id<<"M_y"<<"\t"<<"ID"<<mask_id<<"M_z"<<"\t"<<"ID"<<mask_id<<"M_l"<<"\t";
+        }else{
+            result << magnetization[4*mask_id + 0] << "\t" << magnetization[4*mask_id + 1] << "\t" << magnetization[4*mask_id + 2] << "\t" << magnetization[4*mask_id + 3]*saturation[mask_id] << "\t";
+        }
    }
 
    return result.str();
@@ -256,7 +264,7 @@ std::string magnetization_statistic_t::output_magnetization(){
 //------------------------------------------------------------------------------------------------------
 // Function to output normalised mean magnetisation length values as string
 //------------------------------------------------------------------------------------------------------
-std::string magnetization_statistic_t::output_normalized_magnetization_length(){
+std::string magnetization_statistic_t::output_normalized_magnetization_length(bool header){
 
    // result string stream
    std::ostringstream result;
@@ -269,7 +277,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization_length(){
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << magnetization[4*mask_id + 3] << "\t";
+       if(header){
+           result << "ID"<<mask_id<<"M_norm_l"<<"\t";
+       }else{
+          result << magnetization[4*mask_id + 3] << "\t";
+       }
+
    }
 
    return result.str();
@@ -279,7 +292,7 @@ std::string magnetization_statistic_t::output_normalized_magnetization_length(){
 //------------------------------------------------------------------------------------------------------
 // Function to output normalised mean magnetisation values as string
 //------------------------------------------------------------------------------------------------------
-std::string magnetization_statistic_t::output_normalized_mean_magnetization(){
+std::string magnetization_statistic_t::output_normalized_mean_magnetization(bool header){
 
    // result string stream
    std::ostringstream result;
@@ -295,7 +308,11 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization(){
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << mean_magnetization[4*mask_id + 0]*ic << "\t" << mean_magnetization[4*mask_id + 1]*ic << "\t" << mean_magnetization[4*mask_id + 2]*ic << "\t" << mean_magnetization[4*mask_id + 3]*ic << "\t";
+        if(header){
+            result<<"ID"<<mask_id<<"M_norm_mean_x"<<"\t"<<"ID"<<mask_id<<"M_norm_mean_y"<<"\t"<<"ID"<<mask_id<<"M_norm_mean_z"<<"\t"<<"ID"<<mask_id<<"M_norm_mean_l"<<"\t";
+        }else{
+            result << mean_magnetization[4*mask_id + 0]*ic << "\t" << mean_magnetization[4*mask_id + 1]*ic << "\t" << mean_magnetization[4*mask_id + 2]*ic << "\t" << mean_magnetization[4*mask_id + 3]*ic << "\t";
+        }
    }
 
    return result.str();
@@ -305,7 +322,7 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization(){
 //------------------------------------------------------------------------------------------------------
 // Function to output normalised mean magnetisation length values as string
 //------------------------------------------------------------------------------------------------------
-std::string magnetization_statistic_t::output_normalized_mean_magnetization_length(){
+std::string magnetization_statistic_t::output_normalized_mean_magnetization_length(bool header){
 
    // result string stream
    std::ostringstream result;
@@ -321,7 +338,11 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization_leng
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << mean_magnetization[4*mask_id + 3]*ic << "\t";
+       if(header){
+           result << "ID"<<mask_id<<"M_norm_mean_l"<<"\t";
+       }else{
+           result << mean_magnetization[4*mask_id + 3]*ic << "\t";
+       }
    }
 
    return result.str();
@@ -367,7 +388,7 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
 //------------------------------------------------------------------------------------------------------
 // Function to output actual magnetisation values as string (in Bohr magnetons)
 //------------------------------------------------------------------------------------------------------
-std::string magnetization_statistic_t::output_mean_magnetization_length(){
+std::string magnetization_statistic_t::output_mean_magnetization_length(bool header){
 
    // result string stream
    std::ostringstream result;
@@ -383,7 +404,11 @@ std::string magnetization_statistic_t::output_mean_magnetization_length(){
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic << "\t";
+       if(header){
+           result << "ID"<<mask_id<<"M_mean_l"<<"\t";
+       }else{
+           result << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic << "\t";
+       }
    }
 
    return result.str();
@@ -393,7 +418,7 @@ std::string magnetization_statistic_t::output_mean_magnetization_length(){
 //------------------------------------------------------------------------------------------------------
 // Function to output normalised mean magnetisation values as string
 //------------------------------------------------------------------------------------------------------
-std::string magnetization_statistic_t::output_mean_magnetization(){
+std::string magnetization_statistic_t::output_mean_magnetization(bool header){
 
    // result string stream
    std::ostringstream result;
@@ -409,7 +434,11 @@ std::string magnetization_statistic_t::output_mean_magnetization(){
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
-      result << mean_magnetization[4*mask_id + 0]*ic << "\t" << mean_magnetization[4*mask_id + 1]*ic << "\t" << mean_magnetization[4*mask_id + 2]*ic << "\t" << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic << "\t";
+        if(header){
+            result<<"ID"<<mask_id<<"M_mean_x"<<"\t"<<"ID"<<mask_id<<"M_mean_y"<<"\t"<<"ID"<<mask_id<<"M_mean_z"<<"\t"<<"ID"<<mask_id<<"M_mean_l"<<"\t";
+        }else{
+            result << mean_magnetization[4*mask_id + 0]*ic << "\t" << mean_magnetization[4*mask_id + 1]*ic << "\t" << mean_magnetization[4*mask_id + 2]*ic << "\t" << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic << "\t";
+        }
    }
 
    return result.str();

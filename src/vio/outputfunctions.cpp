@@ -72,31 +72,27 @@ namespace vout{
 
 	// Output Function 5
 	void mvec(std::ostream& stream,bool header){
-        if(header){
-            stream<<"M_norm_x"<<"\t"<<"M_norm_y"<<"\t"<<"M_norm_z"<<"\t"<<"M_norm_l"<<"\t";
-        }else{
-		    stream << stats::system_magnetization.output_normalized_magnetization();
-        }
+		    stream << stats::system_magnetization.output_normalized_magnetization(header);
 	}
 
 	// Output Function 6
 	void magm(std::ostream& stream,bool header){
-		stream << stats::system_magnetization.output_normalized_magnetization_length() << "\t";
+		stream << stats::system_magnetization.output_normalized_magnetization_length(header) << "\t";
 	}
 
 	// Output Function 7
 	void mean_magm(std::ostream& stream,bool header){
-		stream << stats::system_magnetization.output_normalized_mean_magnetization_length();
+		stream << stats::system_magnetization.output_normalized_mean_magnetization_length(header);
 	}
 
 	// Output Function 8
 	void mat_mvec(std::ostream& stream,bool header){
-		stream << stats::material_magnetization.output_normalized_magnetization();
+		stream << stats::material_magnetization.output_normalized_magnetization(header);
 	}
 
 	// Output Function 9
 	void mat_mean_magm(std::ostream& stream,bool header){
-		stream << stats::material_magnetization.output_normalized_mean_magnetization_length();
+		stream << stats::material_magnetization.output_normalized_mean_magnetization_length(header);
 	}
 
 	// Output Function 10
@@ -320,22 +316,22 @@ namespace vout{
 
 	// Output Function 43
 	void height_mvec(std::ostream& stream,bool header){
-		stream << stats::height_magnetization.output_normalized_magnetization();
+		stream << stats::height_magnetization.output_normalized_magnetization(header);
 	}
 
 	// Output Function 44
 	void material_height_mvec(std::ostream& stream,bool header){
-		stream << stats::material_height_magnetization.output_normalized_magnetization();
+		stream << stats::material_height_magnetization.output_normalized_magnetization(header);
 	}
 
 	// Output Function 45
 	void height_mvec_actual(std::ostream& stream,bool header){
-		stream << stats::height_magnetization.output_magnetization();
+		stream << stats::height_magnetization.output_magnetization(header);
 	}
 
 	// Output Function 46
 	void material_height_mvec_actual(std::ostream& stream,bool header){
-		stream << stats::material_height_magnetization.output_magnetization();
+		stream << stats::material_height_magnetization.output_magnetization(header);
 	}
 
 	// Output Function 47
@@ -345,12 +341,12 @@ namespace vout{
 
    // Output Function 48
 	void mean_mvec(std::ostream& stream,bool header){
-		stream << stats::system_magnetization.output_normalized_mean_magnetization();
+		stream << stats::system_magnetization.output_normalized_mean_magnetization(header);
 	}
 
    // Output Function 49
 	void mat_mean_mvec(std::ostream& stream,bool header){
-		stream << stats::material_magnetization.output_normalized_mean_magnetization();
+		stream << stats::material_magnetization.output_normalized_mean_magnetization(header);
 	}
 
    // Output Function 50
@@ -360,12 +356,12 @@ namespace vout{
 
 	// Output Function 51
    void mean_height_magnetisation_length(std::ostream& stream,bool header){
-		stream << stats::height_magnetization.output_mean_magnetization_length();
+		stream << stats::height_magnetization.output_mean_magnetization_length(header);
 	}
 
 	// Output Function 51
    void mean_height_magnetisation(std::ostream& stream,bool header){
-		stream << stats::height_magnetization.output_mean_magnetization();
+		stream << stats::height_magnetization.output_mean_magnetization(header);
 	}
 
 	// Output Function 60
