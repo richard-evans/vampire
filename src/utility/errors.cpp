@@ -104,13 +104,13 @@ namespace err
       terminaltextcolor(RED);
       std::cout << "Fatal error: Aborting program. See log file for details." << std::endl;
       terminaltextcolor(WHITE);
-
+      #ifdef MPICH
       // Wait for everyone
       vmpi::barrier();
 
       // Now finalise MPI
-      vmpi::finalise();
-
+      int i = vmpi::finalise();
+      #endif
       // Now exit program disgracefully
       exit(EXIT_FAILURE);
    }
