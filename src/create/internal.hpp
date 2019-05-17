@@ -137,6 +137,7 @@ namespace create{
       extern void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void cube(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void cylinder(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void ellipse(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain);
       extern void ellipsoid(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
@@ -153,6 +154,7 @@ namespace create{
                                   bool include_boundary_grains);
 
       extern bool compare_radius(core_radius_t first,core_radius_t second);
+      extern void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array);
 
       // MPI functions
       extern void copy_halo_atoms(std::vector<cs::catom_t> & catom_array);

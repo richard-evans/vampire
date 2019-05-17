@@ -47,6 +47,13 @@ namespace dipole{
             dipole::activated=true;
             return true;
          }
+         test="atomistic";
+         if(value == test){
+            dipole::internal::solver = dipole::internal::atomistic;
+            // enable dipole calculation
+            dipole::activated=true;
+            return true;
+         }
          else{
             terminaltextcolor(RED);
             std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;

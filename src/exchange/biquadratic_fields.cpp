@@ -32,9 +32,9 @@ namespace internal{
    //
    // Field given by:
    //
-   //    H_bq^x = -dE/dSix = -Jbq Sxj ( Sxi * Sxj + Syi * Syj + Szi * Szj)
-   //    H_bq^y = -dE/dSiy = -Jbq Syj ( Sxi * Sxj + Syi * Syj + Szi * Szj)
-   //    H_bq^z = -dE/dSiz = -Jbq Szj ( Sxi * Sxj + Syi * Syj + Szi * Szj)
+   //    H_bq^x = -dE/dSix = -2 Jbq Sxj ( Sxi * Sxj + Syi * Syj + Szi * Szj)
+   //    H_bq^y = -dE/dSiy = -2 Jbq Syj ( Sxi * Sxj + Syi * Syj + Szi * Szj)
+   //    H_bq^z = -dE/dSiz = -2 Jbq Szj ( Sxi * Sxj + Syi * Syj + Szi * Szj)
    //
    //-----------------------------------------------------------------------------------------
    void biquadratic_exchange_fields(const int start_index, // first atom for exchange interactions to be calculated
@@ -78,7 +78,7 @@ namespace internal{
 				const int natom = neighbour_list_array[nn];
 
             // get exchange constant between atoms
-				const double Jbq = bq_i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij;
+				const double twoJbq = 2.0*bq_i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij;
 
             // load spin Sj components
             const double sjx = spin_array_x[natom];
@@ -87,9 +87,9 @@ namespace internal{
 
             const double si_dot_sj = six*sjx + siy*sjy + siz*sjz;
 
-				hx += Jbq * sjx*si_dot_sj; // add exchange fields
-				hy += Jbq * sjy*si_dot_sj;
-				hz += Jbq * sjz*si_dot_sj;
+				hx += twoJbq * sjx*si_dot_sj; // add exchange fields
+				hy += twoJbq * sjy*si_dot_sj;
+				hz += twoJbq * sjz*si_dot_sj;
 
 			}
 

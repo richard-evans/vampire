@@ -42,9 +42,10 @@ namespace dipole{
       // enumerated list of different dipole solvers
       enum solver_t{
          macrocell    = 0, // original bare macrocell method (cheap but inaccurate)
-         tensor       = 1 // new macrocell with tensor including local corrections
+         tensor       = 1, // new macrocell with tensor including local corrections
          //multipole    = 2, // bare macrocell but with multipole expansion
          //hierarchical = 3, // new macrocell with tensor including local corrections and nearfield multipole
+         atomistic = 4 // new macrocell with tensor including local corrections and nearfield multipole
          //exact        = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)
       };
 
@@ -74,6 +75,29 @@ namespace dipole{
 
       extern std::vector<double> cells_pos_and_mom_array;
       extern std::vector < int > proc_cell_index_array1D;
+
+      //------------------------------------------------------------------------
+      // data structures for atomistic solver
+      // (copy of all atom positions and spins on all processors)
+      //------------------------------------------------------------------------
+
+      extern int num_local_atoms; // number of local atoms (my processor)
+      extern int total_num_atoms; // number of total atoms (all processors)
+
+      // arrays to store atomic coordinates
+      extern std::vector <double> cx;
+      extern std::vector <double> cy;
+      extern std::vector <double> cz;
+
+      // arrays to store atomic spins
+      extern std::vector <double> sx;
+      extern std::vector <double> sy;
+      extern std::vector <double> sz;
+      extern std::vector <double> sm;
+
+      // arrays for calculating displacements for parallelisation
+      extern std::vector <int> receive_counts;
+      extern std::vector <int> receive_displacements;
 
       //-------------------------------------------------------------------------
       // Internal function declarations
@@ -140,6 +164,16 @@ namespace dipole{
                                        std::vector<double>& atom_coords_y,
                                        std::vector<double>& atom_coords_z,
                                        int num_atoms);
+
+      void initialize_atomistic_solver(int num_atoms,                      // number of atoms (only correct in serial)
+                                       std::vector<double>& x_coord_array, // atomic corrdinates (angstroms)
+                                       std::vector<double>& y_coord_array,
+                                       std::vector<double>& z_coord_array,
+                                       std::vector<double>& moments_array); // atomistic magnetic moments (bohr magnetons)
+
+      void calculate_atomistic_dipole_field(std::vector<double>& x_spin_array, // atomic spin directions
+                                            std::vector<double>& y_spin_array,
+                                            std::vector<double>& z_spin_array);
 
       //-----------------------------------------------------------------------------
       // Function to send receive cells data to other cpus

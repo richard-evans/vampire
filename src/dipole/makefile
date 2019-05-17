@@ -4,6 +4,7 @@
 
 # List module object filenames
 dipole_objects =\
+atomistic.o \
 data.o \
 energy.o \
 field.o \

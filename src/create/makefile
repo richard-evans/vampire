@@ -13,9 +13,11 @@ bubble.o \
 bulk.o \
 cone.o \
 compare_radius.o \
+composition.o \
 cube.o \
 cylinder.o \
 data.o \
+ellipse.o \
 ellipsoid.o \
 faceted.o \
 initialize.o \

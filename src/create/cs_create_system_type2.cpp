@@ -30,6 +30,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
@@ -45,6 +46,7 @@
 #include "unitcell.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
+#include "vmpi.hpp"
 
 // Internal create header
 #include "internal.hpp"
@@ -62,7 +64,6 @@ namespace cs{
    void geometry(std::vector<cs::catom_t> &);
    void fill(std::vector<cs::catom_t> &);
    void roughness(std::vector<cs::catom_t> &);
-   void calculate_atomic_composition(std::vector<cs::catom_t> &);
    void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array);
 
 //======================================================================
@@ -110,37 +111,66 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		default:{
 			std::cerr << "Unknown system type requested, exiting" << std::endl;
 			err::vexit();
-			}
 		}
+	}
 
-      // Check for voronoi construction and apply before csg operations
-      if(create::internal::generate_voronoi_substructure) create::internal::voronoi_substructure(catom_array);
+   // Check for voronoi construction and apply before csg operations
+   if(create::internal::generate_voronoi_substructure) create::internal::voronoi_substructure(catom_array);
 
-		// call fill function to fill in void
-		fill(catom_array);
+	// call fill function to fill in void
+	fill(catom_array);
 
-		// call geometry function
-		geometry(catom_array);
+	// call geometry function
+	geometry(catom_array);
 
-		// call intermixing function - must be before alloy function
-		intermixing(catom_array);
+	// call intermixing function - must be before alloy function
+	intermixing(catom_array);
 
-		// call surface roughness function
-		// Formally called here but now moved to crystal structure generation
-		//roughness(catom_array);
+	// call surface roughness function
+	// Formally called here but now moved to crystal structure generation
+	//roughness(catom_array);
 
-		// call alloy function
-		create::internal::alloy(catom_array);
+	// call alloy function
+	create::internal::alloy(catom_array);
 
-		// call dilution function
-		dilute(catom_array);
+	// call dilution function
+	dilute(catom_array);
 
-		// Delete unneeded atoms
-		clear_atoms(catom_array);
+	// Delete unneeded atoms
+	clear_atoms(catom_array);
 
-		// Calculate final atomic composition
-		calculate_atomic_composition(catom_array);
+	// Calculate final atomic composition
+	create::internal::calculate_atomic_composition(catom_array);
 
+   // For parallel check which processors have zero atoms
+   #ifdef MPICF
+      uint64_t num_atoms_check = 0;
+      // if a processor has zero atoms then flag as 1 (0 has more than zero atoms)
+      if(catom_array.size() == 0 ) num_atoms_check = 1;
+      // Check globally for no errors
+      MPI_Allreduce(MPI_IN_PLACE, &num_atoms_check, 1, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+      // If error, determine which ranks have no atoms
+      if( num_atoms_check > 0){
+         std::vector<uint64_t> no_atoms(vmpi::num_processors, 0);
+         if(catom_array.size() == 0 ) no_atoms[vmpi::my_rank] = 1;
+         MPI_Allreduce( MPI_IN_PLACE , &no_atoms[0], vmpi::num_processors, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+         // generate error message
+         std::stringstream message_stream;
+         if(vmpi::my_rank == 0){
+            message_stream << "Error! the following processes have zero atoms: ";
+            for(int p=0; p < vmpi::num_processors; p++){
+               if(no_atoms[p] == 1) message_stream << p << " ";
+            }
+            message_stream << ". All parallel processes must contain atoms - change system dimensions or add fill material!";
+         }
+         // Output error message to screen
+         terminaltextcolor(RED);
+            std::cout << "Error, no atoms generated on some processors for requested system shape - change system dimensions or add fill material!" << std::endl;
+         terminaltextcolor(WHITE);
+         // Exit without abort and nice error message
+         err::v_parallel_all_exit(message_stream.str());
+      }
+   #else
 		// Check for zero atoms generated
 		if(catom_array.size()==0){
 			terminaltextcolor(RED);
@@ -148,6 +178,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			terminaltextcolor(WHITE);
 			err::vexit();
 		}
+   #endif
 
 	return 0;
 }
@@ -221,6 +252,9 @@ int particle(std::vector<cs::catom_t> & catom_array){
 			break;
       case 9: // Bubble
          create::internal::bubble(particle_origin,catom_array,0);
+         break;
+      case 10: // Ellipse
+         create::internal::ellipse(particle_origin,catom_array,0);
          break;
 		default:
 			std::cout << "Unknown particle type requested for single particle system" << std::endl;
@@ -306,6 +340,9 @@ int particle_array(std::vector<cs::catom_t> & catom_array){
 			         break;
                case 9: // Bubble
                   create::internal::bubble(particle_origin,catom_array,particle_number);
+                  break;
+               case 10: // Ellipse
+                  create::internal::ellipse(particle_origin,catom_array,0);
                   break;
 					default:
 						std::cout << "Unknown particle type requested for single particle system" << std::endl;
@@ -603,21 +640,6 @@ int sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array){
 	copy(catom_list.begin(), catom_list.end(), catom_array.begin());
 
 	return EXIT_SUCCESS;
-}
-
-void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array){
-
-	zlog<< zTs() << "Determining atomic composition" << std::endl;
-
-	// Determine number of atoms of each class and output to log
-	std::vector<unsigned int> MaterialNumbers(mp::num_materials,0);
-	for(unsigned int atom=0;atom<catom_array.size();atom++) MaterialNumbers.at(catom_array[atom].material)++;
-
-	// Output composition to log file
-	for(int mat=0;mat<mp::num_materials;mat++) zlog << zTs() << "Material " << mat+1 << " " << mp::material[mat].name << " makes up " << double(MaterialNumbers[mat])*100.0/double(catom_array.size()) << "% of all atoms." << std::endl;
-
-	return;
-
 }
 
 int intermixing(std::vector<cs::catom_t> & catom_array){
