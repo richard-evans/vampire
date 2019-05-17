@@ -447,6 +447,12 @@ namespace create{
          return true;
 		}
       //--------------------------------------------------------------------
+      test="ellipse";
+      if(word==test){
+         cs::system_creation_flags[1] = 10;
+         return true;
+		}
+      //--------------------------------------------------------------------
       test="bubble-radius";
       if(word==test){
          double r=atof(value.c_str());

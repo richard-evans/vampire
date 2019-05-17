@@ -28,12 +28,21 @@
 #include "internal.hpp"
 #include "material.hpp"
 
+
+
 namespace dipole{
+
+   namespace internal{
+      void calculate_macrocell_dipole_field();
+   }
 
    //-----------------------------------------------------------------------------
    // Function for updating atomic B-field and Hd-field
    //-----------------------------------------------------------------------------
-	void calculate_field(const uint64_t sim_time){
+	void calculate_field(const uint64_t sim_time,
+                        std::vector<double>& x_spin_array, // atomic spin directions
+                        std::vector<double>& y_spin_array,
+                        std::vector<double>& z_spin_array){
 
       // return if dipole field not enabled
       if(!dipole::activated) return;
@@ -47,57 +56,83 @@ namespace dipole{
 			   //if updated record last time at update
 			   dipole::internal::update_time = sim_time;
 
-            // instantiate timer of cells::mag() function
-            //vutil::vtimer_t timer;
-            // start timer
-            //timer.start();
+            switch (dipole::internal::solver){
 
-			   // update cell magnetisations
-			   cells::mag();
+               case dipole::internal::macrocell:
+                  dipole::internal::calculate_macrocell_dipole_field();
+                  break;
 
-            // end timer
-            //timer.stop();
-            // return bandwidth
-            //double update_time = timer.elapsed_time();
+               case dipole::internal::tensor:
+                  dipole::internal::calculate_macrocell_dipole_field();
+                  break;
 
-            //zlog << zTs() << "Calculation cells magnetisation complete. Time taken: " << update_time << "s."<< std::endl;
+               case dipole::internal::atomistic:
+                  dipole::internal::calculate_atomistic_dipole_field(x_spin_array, y_spin_array, z_spin_array);
+                  break;
 
-			   // recalculate dipole fields
-            dipole::internal::update_field();
+            }
 
-			   // For MPI version, only add local atoms
-			   #ifdef MPICF
-				   const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-			   #else
-				   const int num_local_atoms = dipole::internal::num_atoms;
-			   #endif
-
-			   // Update Atomistic Dipolar Field and Demag Field Array
-			   for(int atom=0;atom<num_local_atoms;atom++){
-
-				   const int cell = dipole::internal::atom_cell_id_array[atom];
-
-               int type = dipole::internal::atom_type_array[atom];
-
-   	         if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==0){
-
-				      // Copy B-field from macrocell to atomistic spin
-				      dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
-				      dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
-				      dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
-
-                  // Unroll Hdemag field
-				      dipole::atom_mu0demag_field_array_x[atom] = dipole::cells_mu0Hd_field_array_x[cell];
-				      dipole::atom_mu0demag_field_array_y[atom] = dipole::cells_mu0Hd_field_array_y[cell];
-				      dipole::atom_mu0demag_field_array_z[atom] = dipole::cells_mu0Hd_field_array_z[cell];
-
-   	         }
-			   }
 		   } // End of check for update rate
 		} // end of check for update time
 
       return;
 
    }
+
+   namespace internal{
+
+      void calculate_macrocell_dipole_field(){
+         // instantiate timer of cells::mag() function
+         //vutil::vtimer_t timer;
+         // start timer
+         //timer.start();
+
+         // update cell magnetisations
+         cells::mag();
+
+         // end timer
+         //timer.stop();
+         // return bandwidth
+         //double update_time = timer.elapsed_time();
+
+         //zlog << zTs() << "Calculation cells magnetisation complete. Time taken: " << update_time << "s."<< std::endl;
+
+         // recalculate dipole fields
+         dipole::internal::update_field();
+
+         // For MPI version, only add local atoms
+         #ifdef MPICF
+            const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+         #else
+            const int num_local_atoms = dipole::internal::num_atoms;
+         #endif
+
+         // Update Atomistic Dipolar Field and Demag Field Array
+         for(int atom=0;atom<num_local_atoms;atom++){
+
+            const int cell = dipole::internal::atom_cell_id_array[atom];
+
+            int type = dipole::internal::atom_type_array[atom];
+
+            if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==0){
+
+               // Copy B-field from macrocell to atomistic spin
+               dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
+               dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
+               dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
+
+               // Unroll Hdemag field
+               dipole::atom_mu0demag_field_array_x[atom] = dipole::cells_mu0Hd_field_array_x[cell];
+               dipole::atom_mu0demag_field_array_y[atom] = dipole::cells_mu0Hd_field_array_y[cell];
+               dipole::atom_mu0demag_field_array_z[atom] = dipole::cells_mu0Hd_field_array_z[cell];
+
+            }
+         }
+
+         return;
+
+      } // end of function
+
+} // end of internal namespace
 
 } // end of dipole namespace

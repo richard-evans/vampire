@@ -266,6 +266,7 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 {\zicf sim:total-time-steps}\addcontentsline{toc}{subsection}{sim:total-time-steps}\\
 
 {\zicf sim:loop-time-steps}\addcontentsline{toc}{subsection}{sim:loop-time-steps}\\
+The number of time steps that statistics are taken over, including the \textit{mean-magnetisation} and \textit{material-standard-deviation}. This takes place after sim:equilibration time steps have passed in simulations such as \textit{program:curie-temperature}.\\
 
 {\zicf sim:time-steps-increment}\addcontentsline{toc}{subsection}{sim:time-steps-increment}\\
 
@@ -541,6 +542,19 @@ Landau-Lifshitz-Bloch (LLB) equation.\\
 the components of the magnetic susceptibility $\chi$ for each defined material in the system. The data is output in sets of
 four columns $\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$ for each material. In multi-sublattice systems the susceptibility of
 each sublattice can be different.\\
+
+{\zicf output:material-standard-deviation}\addcontentsline{toc}{subsection}{output:material-standard-deviation} outputs
+the standard deviation in the components of the instantaneous normalized magnetization for each material in the simulation.
+The data is output in blocks of four columns, with one block per material defined in
+the \textit{material} file, e.g.
+
+\begin{center}
+$\left[ \hat{\sigma_1^x} \textrm{,} \hat{\sigma_1^y} \textrm{,} \hat{\sigma_1^z} \textrm{,} \sigma_{|m_1|} \right]$,
+$\left[ \hat{\sigma_2^x} \textrm{,} \hat{\sigma_2^y} \textrm{,} \hat{\sigma_2^z} \textrm{,} \sigma_{|m_2|} \right]$ ...
+$\left[ \hat{\sigma_n^x} \textrm{,} \hat{\sigma_n^y} \textrm{,} \hat{\sigma_n^z} \textrm{,} \sigma_{|m_n|} \right]$
+\end{center}
+
+The statistic is taken over the range of values gathered during the \textit{loop-time-steps} after equilibration.\\
 
 {\zicf output:electron-temperature}\addcontentsline{toc}{subsection}{output:electron-temperature} outputs the instantaneous electron temperature as calculated from the two temperature model.\\
 
