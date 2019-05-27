@@ -95,6 +95,8 @@ namespace err
    //-----------------------------------------------------------------------------------------
    void v_parallel_all_exit(std::string message){
 
+      #ifdef MPICF
+
       // Print non-blank error message to screen and log
       std::string blank = "";
       if( message != blank ){
@@ -110,6 +112,8 @@ namespace err
 
       // Now finalise MPI
       vmpi::finalise();
+
+      #endif
 
       // Now exit program disgracefully
       exit(EXIT_FAILURE);
