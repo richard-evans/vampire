@@ -118,7 +118,7 @@ namespace sim{
       if(word==test){
          double aj=atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
+         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", -1.0e2, 1.0e2,"input","-100T - +100T");
          sim::internal::mp[super_index].slonczewski_aj.set(aj);
          return true;
       }
@@ -130,7 +130,7 @@ namespace sim{
       if(word==test){
          double bj=atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
+         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", -1.0e2, 1.0e2,"input","-100T - +100T");
          sim::internal::mp[super_index].slonczewski_bj.set(bj);
          return true;
       }
