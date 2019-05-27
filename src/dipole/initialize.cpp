@@ -43,11 +43,13 @@ namespace dipole{
                   std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
                   std::vector<int>& atom_type_array,
                   std::vector<int>& atom_cell_id_array,
-
                   std::vector<double>& atom_coords_x, //atomic coordinates
                   std::vector<double>& atom_coords_y,
                   std::vector<double>& atom_coords_z,
-
+                  std::vector<double>& x_spin_array, // atomic spin directions
+                  std::vector<double>& y_spin_array,
+                  std::vector<double>& z_spin_array,
+                  std::vector<double>& atom_moments, // atomic magnetic moments
                   int num_atoms
 				){
 
@@ -118,6 +120,10 @@ namespace dipole{
                                                        dipole::internal::atom_type_array, dipole::internal::atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
             break;
 
+         case dipole::internal::atomistic:
+            dipole::internal::initialize_atomistic_solver(num_atoms, atom_coords_x, atom_coords_y, atom_coords_z, atom_moments);
+            break;
+
       }
 
       // Set initialised flag
@@ -134,7 +140,7 @@ namespace dipole{
       timer.start();
 
       // now calculate fields at zero time
-      dipole::calculate_field(0);
+      dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array);
 
       // hold parallel calculation until all processors have completed the update
       vmpi::barrier();

@@ -251,6 +251,10 @@ int run(){
                      atoms::x_coord_array,
                      atoms::y_coord_array,
                      atoms::z_coord_array,
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     atoms::m_spin_array,
                      atoms::num_atoms
    );
 

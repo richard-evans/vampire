@@ -116,6 +116,8 @@ int hosts(){
 	return EXIT_SUCCESS;
 }
 
+#endif
+
 int finalise(){
 	//====================================================================================
 	//
@@ -126,6 +128,8 @@ int finalise(){
 	///										Version 1.0 R Evans 07/08/2009
 	//
 	//====================================================================================
+
+#ifdef MPICF
 
 	// check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "finalise_mpi has been called" << std::endl;}
@@ -194,8 +198,13 @@ int finalise(){
 	// Finalise MPI
 	MPI_Finalize();
 
+#endif
+
 	return EXIT_SUCCESS;
 }
+
+#ifdef MPICF
+
 //-------------------------------------------------------------
 // Function to swap timer and return time between calls
 //

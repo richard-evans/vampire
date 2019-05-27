@@ -90,7 +90,38 @@ namespace err
       exit(EXIT_FAILURE);
    }
 
+   //-----------------------------------------------------------------------------------------
+   // Parallel exit function calling MPI_Finalise (must be called by all processes)
+   //-----------------------------------------------------------------------------------------
+   void v_parallel_all_exit(std::string message){
+
+      #ifdef MPICF
+
+      // Print non-blank error message to screen and log
+      std::string blank = "";
+      if( message != blank ){
+         zlog << zTs() << message << std::endl;
+      }
+      zlog << zTs() << "Fatal error: Aborting program." << std::endl;
+      terminaltextcolor(RED);
+      std::cout << "Fatal error: Aborting program. See log file for details." << std::endl;
+      terminaltextcolor(WHITE);
+
+      // Wait for everyone
+      vmpi::barrier();
+
+      // Now finalise MPI
+      vmpi::finalise();
+
+      #endif
+
+      // Now exit program disgracefully
+      exit(EXIT_FAILURE);
+   }
+
+   //-----------------------------------------------------------------------------------------
    /// zexit with error message
+   //-----------------------------------------------------------------------------------------
    void zexit(std::string message){
 
       // check calling of routine if error checking is activated

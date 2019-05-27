@@ -17,6 +17,7 @@ composition.o \
 cube.o \
 cylinder.o \
 data.o \
+ellipse.o \
 ellipsoid.o \
 faceted.o \
 initialize.o \
