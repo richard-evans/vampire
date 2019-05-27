@@ -13,12 +13,13 @@ export OMPI_CXX=g++ -std=c++0x
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"'
+ICC=icc -std=c++0x -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
+MPIICC=mpiicpc -DMPICF
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
@@ -47,8 +48,8 @@ LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I.
 LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
-ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
+ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
+ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axCORE-AVX2
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
@@ -191,7 +192,7 @@ $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
 serial-intel: $(ICC_OBJECTS)
-	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)
+	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)-intel
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $(OPTIONS) $<
@@ -221,7 +222,7 @@ $(LLVMDB_OBJECTS): obj/%_llvmdb.o: src/%.cpp
 	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $(OPTIONS) $<
 
 intel-debug: $(ICCDB_OBJECTS)
-	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)
+	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)-intel-debug
 
 $(ICCDB_OBJECTS): obj/%_idb.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_DBCFLAGS) $(OPTIONS) $<
@@ -247,10 +248,10 @@ $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
 parallel-intel: $(MPI_ICC_OBJECTS)
-	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)
+	$(MPIICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)-intel
 
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<intel: $(MPI_ICC_OBJECTS)
+	$(MPIICC) -c -o $@ $(ICC_CFLAGS) $<
 
 parallel-cray: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(PEXECUTABLE)
@@ -289,10 +290,10 @@ $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $(OPTIONS) $<
 
 parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
-	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(PEXECUTABLE)
+	$(MPIICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(PEXECUTABLE)-intel-debug
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $(OPTIONS) $<
+	$(MPIICC) -c -o $@ $(ICC_DBCFLAGS) $(OPTIONS) $<
 
 parallel-cray-debug: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(PEXECUTABLE)
@@ -313,7 +314,7 @@ clean:
 purge:
 	@rm -f obj/*.o
 	@rm -f obj/*/*.o
-	@rm -f vampire
+	@rm -f vampire-*
 
 tidy:
 	@rm -f *~
