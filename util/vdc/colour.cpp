@@ -55,6 +55,9 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    // find rgb values
    interpolate( xy_angle, red, green, blue );
 
+   // by default the z-component is ignored and the system is coloured as 2D
+   // if --3D is used, colours are brighter/darker according to the z-component
+   // of the magnetisation
    if ( vdc::z_axis_colour == true ){
 
       // temp values for hue, saturation and light

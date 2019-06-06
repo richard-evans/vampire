@@ -28,9 +28,9 @@ namespace vdc{
    bool z_vector = false; // flag to specify plane for povray colouring
 
    // keyword variables
-   std::string colour_keyword = "BWR";
+   std::string colour_keyword = "CBWR";
    std::string custom_colourmap_file;
-   bool z_axis_colour = true;
+   bool z_axis_colour = false;
 
    format_t format;
 
