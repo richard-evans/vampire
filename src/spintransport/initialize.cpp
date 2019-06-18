@@ -525,18 +525,20 @@ namespace spin_transport{
       st::internal::cell_magnetization.resize(3*st::internal::total_num_cells, 0.0);
       st::internal::cell_spin_torque_fields.resize(3*st::internal::total_num_cells, 0.0);
 
-      std::ofstream ofile("data.txt");
-      for(int i =0; i< st::internal::total_num_cells; i++){
-         ofile << st::internal::cell_position[3*i+0] << "\t" <<
-                  st::internal::cell_position[3*i+1] << "\t" <<
-                  st::internal::cell_position[3*i+2] << "\t" <<
-                  st::internal::cell_magnetization[3*i+0] << "\t" <<
-                  st::internal::cell_magnetization[3*i+1] << "\t" <<
-                  st::internal::cell_magnetization[3*i+2] << "\t" <<
-                  st::internal::cell_resistance[i] << std::endl;
+      if( vmpi::my_rank == 0 ){
+         std::ofstream ofile("data.txt");
+         for(int i =0; i< st::internal::total_num_cells; i++){
+            ofile << st::internal::cell_position[3*i+0] << "\t" <<
+                     st::internal::cell_position[3*i+1] << "\t" <<
+                     st::internal::cell_position[3*i+2] << "\t" <<
+                     st::internal::cell_magnetization[3*i+0] << "\t" <<
+                     st::internal::cell_magnetization[3*i+1] << "\t" <<
+                     st::internal::cell_magnetization[3*i+2] << "\t" <<
+                     st::internal::cell_resistance[i] << "\t" <<
+                     st::internal::cell_spin_resistance[i] << std::endl;
+         }
+         ofile.close();
       }
-      ofile.close();
-
 
       return;
 
