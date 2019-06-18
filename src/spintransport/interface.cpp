@@ -215,7 +215,7 @@ namespace spin_transport{
       if( word == test ){
          // Set resistivity for atom type
          double rho = vin::str_to_double(value);
-         vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 1.0e-20, 1.0e20,"input","1E-20 - 1E20 Ohm metres");
+         vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 0.0, 1.0e20,"input","0.0 - 1E20 Ohm metres");
          st::internal::mp[super_index].spin_resistivity = rho;
          return true;
       }

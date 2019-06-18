@@ -409,8 +409,11 @@ namespace spin_transport{
                   }
 
                   // calculate average resistivity
-                  double mean_resistivity      = total_resistivity_sq[cell] / st::internal::cell_resistance[cell];
-                  double mean_spin_resistivity = total_spin_resistivity_sq[cell] / st::internal::cell_spin_resistance[cell];
+                  double mean_resistivity = 0.0; // variable to store mean resistivity in cell
+                  double mean_spin_resistivity = 0.0; // variable to store mean spin resistivity in cell
+                  // if resistance is non-zero, work out average
+                  if( st::internal::cell_resistance[cell]      > 0.0 ) mean_resistivity      = total_resistivity_sq[cell]      / st::internal::cell_resistance[cell];
+                  if( st::internal::cell_spin_resistance[cell] > 0.0 ) mean_spin_resistivity = total_spin_resistivity_sq[cell] / st::internal::cell_spin_resistance[cell];
 
                   // set cell resistance
                   st::internal::cell_resistance[cell]      = mean_resistivity * l * iA;
