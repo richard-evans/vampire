@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 
-// C++ standard library headers
+// C standard library headers
 #include <string>
 
 // Vampire headers
@@ -50,6 +50,13 @@ namespace dipole{
          test="atomistic";
          if(value == test){
             dipole::internal::solver = dipole::internal::atomistic;
+            // enable dipole calculation
+            dipole::activated=true;
+            return true;
+         }
+         test="hierarchical";
+         if(value == test){
+            dipole::internal::solver = dipole::internal::hierarchical;
             // enable dipole calculation
             dipole::activated=true;
             return true;

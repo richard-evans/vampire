@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 
-// C++ standard library headers
+// C standard library headers
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -18,10 +18,14 @@
 #include "dipole.hpp"
 #include "vio.hpp"
 #include "vutil.hpp"
+#include "hierarchical.hpp"
 
 
-// dipole module headers
-#include "internal.hpp"
+ // dipole module headers
+ #include "internal.hpp"
+#include "../hierarchical/internal.hpp"
+
+namespace ha = hierarchical::internal;
 
 namespace dipole{
 
@@ -68,8 +72,6 @@ namespace dipole{
       std::cout << "Initialising dipole field calculation" << std::endl;
 		zlog << zTs() << "Initialising dipole field calculation" << std::endl;
 
-      // allocate memory for rij matrix
-      dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
 
       //-------------------------------------------------------------------------------------
       // Set const for functions
@@ -107,6 +109,7 @@ namespace dipole{
       switch (dipole::internal::solver){
 
          case dipole::internal::macrocell:
+            dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
             dipole::internal::initialize_macrocell_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
                                                        dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, dipole::internal::cells_pos_and_mom_array,
                                                        cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
@@ -114,18 +117,22 @@ namespace dipole{
             break;
 
          case dipole::internal::tensor:
+            dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
             dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
                                                        dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, dipole::internal::cells_pos_and_mom_array,
                                                        cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
                                                        dipole::internal::atom_type_array, dipole::internal::atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
             break;
-
          case dipole::internal::atomistic:
             dipole::internal::initialize_atomistic_solver(num_atoms, atom_coords_x, atom_coords_y, atom_coords_z, atom_moments);
             break;
+         case dipole::internal::hierarchical:
+            hierarchical::initialize(cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2]);
+            //std::cout << "hier" << std::endl;
+            break;
 
       }
-
+//hierarchical::initialize(cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2]);
       // Set initialised flag
       dipole::internal::initialised=true;
 
@@ -163,42 +170,90 @@ namespace dipole{
       // Output Demag tensor only if first step of simulation since depending only on shape
       std::vector<double> N_tensor_array(6*dipole::internal::cells_num_cells,0.0);
 
+      if (dipole::internal::solver == dipole::internal::hierarchical){
+               //Every cpus print to check dipolar matrix inter term
+         for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
 
-      // Every cpus print to check dipolar matrix inter term
-      for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
 
-         // get id of cell
-         int i = cells::cell_id_array[lc];
+            // get id of cell
+            int i = cells::cell_id_array[lc];
 
-         // if local cell contains atoms
-         if(dipole::internal::cells_num_atoms_in_cell[i]>0){
+            // if local cell contains atoms
+            if(cells_num_atoms_in_cell[i]>0){
 
-            // loop over all neighbours for cell
-            for(unsigned int j=0; j<dipole::internal::rij_tensor_xx[lc].size(); j++){
-               if(dipole::internal::cells_num_atoms_in_cell[j]>0){
+               // loop over all neighbours for cell
+               const int start = ha::interaction_list_start_index[lc];
+               const int end = ha::interaction_list_end_index[lc];
+            //std::cout << lc << "\t" << i << "\t" << start << '\t' << end << "\t" << end -start << std::endl;
+            //   std::cout <<"cell\t" << cell_i <<  "\t" << lc <<  "\tdone! [ " << timer.elapsed_time() << " s ]" << std::endl;
 
-                  // To obtain dipolar matrix free of units, multiply tensor by "factor"
-                  //const double Vatomic = dipole::internal::cells_volume_array[j]/double(dipole::internal::cells_num_atoms_in_cell[j]);
-                  const double factor = double(dipole::internal::cells_num_atoms_in_cell[j]) * double(dipole::internal::cells_num_atoms_in_cell[i]);
+               for(int interaction_no = start; interaction_no<end; interaction_no++){
+                  int j = ha::interaction_list[interaction_no];
+                  //if(dipole::internal::cells_num_atoms_in_cell[j]>0){
 
-                  N_tensor_array[6*i+0] +=  factor*(dipole::internal::rij_tensor_xx[lc][j]);
-                  N_tensor_array[6*i+1] +=  factor*(dipole::internal::rij_tensor_xy[lc][j]);
-                  N_tensor_array[6*i+2] +=  factor*(dipole::internal::rij_tensor_xz[lc][j]);
-                  N_tensor_array[6*i+3] +=  factor*(dipole::internal::rij_tensor_yy[lc][j]);
-                  N_tensor_array[6*i+4] +=  factor*(dipole::internal::rij_tensor_yz[lc][j]);
-                  N_tensor_array[6*i+5] +=  factor*(dipole::internal::rij_tensor_zz[lc][j]);
+                     // To obtain dipolar matrix free of units, multiply tensor by "factor"
+                     //const double Vatomic = dipole::internal::cells_volume_array[j]/double(dipole::internal::cells_num_atoms_in_cell[j]);
+                     const double factor = double(cells_num_atoms_in_cell[j]) * double(cells_num_atoms_in_cell[i]);
+
+                     N_tensor_array[6*i+0] +=  factor*(ha::rij_tensor_xx[interaction_no]);
+                     N_tensor_array[6*i+1] +=  factor*(ha::rij_tensor_xy[interaction_no]);
+                     N_tensor_array[6*i+2] +=  factor*(ha::rij_tensor_xz[interaction_no]);
+                     N_tensor_array[6*i+3] +=  factor*(ha::rij_tensor_yy[interaction_no]);
+                     N_tensor_array[6*i+4] +=  factor*(ha::rij_tensor_yz[interaction_no]);
+                     N_tensor_array[6*i+5] +=  factor*(ha::rij_tensor_zz[interaction_no]);
 
                }
             }
+                     // Print tensor: uncomment if you want to check the tensor components
+                  //   std::cout << "*----------------------------------*" << std::endl;
+                     //std::cout << "lc = " << lc << "\ti = " << i << "\tNat_cell_i = " << cells_num_atoms_in_cell[i]  << std::endl;
+                     // std::cout << N_tensor_array[6*i+0] << "\t" << N_tensor_array[6*i+1] << "\t" << N_tensor_array[6*i+2] << "\n";
+                     // std::cout << N_tensor_array[6*i+1] << "\t" << N_tensor_array[6*i+3] << "\t" << N_tensor_array[6*i+4] << "\n";
+                     // std::cout << N_tensor_array[6*i+2] << "\t" << N_tensor_array[6*i+4] << "\t" << N_tensor_array[6*i+5] << "\n";
+                     // std::cout << "*----------------------------------*" << std::endl;
+                  //   std::cout << std::endl;
          }
-         // // Print tensor: uncomment if you want to check the tensor components
-         // std::cout << "*----------------------------------*" << std::endl;
-         // std::cout << "lc = " << lc << "\ti = " << i << "\tNat_cell_i = " << dipole::internal::cells_num_atoms_in_cell[i]  << "\tN_self_i = " << N_self_array[i] << std::endl;
-         // std::cout << N_tensor_array[6*i+0] << "\t" << N_tensor_array[6*i+1] << "\t" << N_tensor_array[6*i+2] << "\n";
-         // std::cout << N_tensor_array[6*i+1] << "\t" << N_tensor_array[6*i+3] << "\t" << N_tensor_array[6*i+4] << "\n";
-         // std::cout << N_tensor_array[6*i+2] << "\t" << N_tensor_array[6*i+4] << "\t" << N_tensor_array[6*i+5] << "\n";
-         // std::cout << "*----------------------------------*" << std::endl;
-         // std::cout << std::endl;
+
+      }
+
+      else{
+
+         // Every cpus print to check dipolar matrix inter term
+         for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
+
+            // get id of cell
+            int i = cells::cell_id_array[lc];
+
+            // if local cell contains atoms
+            if(dipole::internal::cells_num_atoms_in_cell[i]>0){
+
+               // loop over all neighbours for cell
+               for(unsigned int j=0; j<dipole::internal::rij_tensor_xx[lc].size(); j++){
+                  if(dipole::internal::cells_num_atoms_in_cell[j]>0){
+
+                     // To obtain dipolar matrix free of units, multiply tensor by "factor"
+                     //const double Vatomic = dipole::internal::cells_volume_array[j]/double(dipole::internal::cells_num_atoms_in_cell[j]);
+                     const double factor = double(dipole::internal::cells_num_atoms_in_cell[j]) * double(dipole::internal::cells_num_atoms_in_cell[i]);
+
+                     N_tensor_array[6*i+0] +=  factor*(dipole::internal::rij_tensor_xx[lc][j]);
+                     N_tensor_array[6*i+1] +=  factor*(dipole::internal::rij_tensor_xy[lc][j]);
+                     N_tensor_array[6*i+2] +=  factor*(dipole::internal::rij_tensor_xz[lc][j]);
+                     N_tensor_array[6*i+3] +=  factor*(dipole::internal::rij_tensor_yy[lc][j]);
+                     N_tensor_array[6*i+4] +=  factor*(dipole::internal::rij_tensor_yz[lc][j]);
+                     N_tensor_array[6*i+5] +=  factor*(dipole::internal::rij_tensor_zz[lc][j]);
+
+                  }
+               }
+            }
+            // // Print tensor: uncomment if you want to check the tensor components
+            // std::cout << "*----------------------------------*" << std::endl;
+            // std::cout << "lc = " << lc << "\ti = " << i << "\tNat_cell_i = " << dipole::internal::cells_num_atoms_in_cell[i]  << "\tN_self_i = " << N_self_array[i] << std::endl;
+            // std::cout << N_tensor_array[6*i0] << "\t" << N_tensor_array[6*i1] << "\t" << N_tensor_array[6*i2] << "\n";
+            // std::cout << N_tensor_array[6*i1] << "\t" << N_tensor_array[6*i3] << "\t" << N_tensor_array[6*i4] << "\n";
+            // std::cout << N_tensor_array[6*i2] << "\t" << N_tensor_array[6*i4] << "\t" << N_tensor_array[6*i5] << "\n";
+            // std::cout << "*----------------------------------*" << std::endl;
+            // std::cout << std::endl;
+         }
       }
 
       // if vampire is running in parallel, all cpus send demag field to root proc
@@ -232,11 +287,11 @@ namespace dipole{
             if (dipole::internal::cells_num_atoms_in_cell[i] > 0)
             {
                num_atoms_magnetic += dipole::internal::cells_num_atoms_in_cell[i];
-               cells_non_zero ++;
+               cells_non_zero++ ;
             }
          }
 
-      //   for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
+      //   for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc){
       //      int i = cells::cell_id_array[lc];
          for(int i=0; i<cells::num_cells; i++){
             if(dipole::internal::cells_num_atoms_in_cell[i]>0){

@@ -27,7 +27,8 @@
 // dipole module headers
 #include "internal.hpp"
 #include "material.hpp"
-
+#include "../hierarchical/internal.hpp"
+#include "hierarchical.hpp"
 
 
 namespace dipole{
@@ -68,6 +69,9 @@ namespace dipole{
 
                case dipole::internal::atomistic:
                   dipole::internal::calculate_atomistic_dipole_field(x_spin_array, y_spin_array, z_spin_array);
+                  break;
+               case dipole::internal::hierarchical:
+                  hierarchical::internal::update();
                   break;
 
             }
@@ -117,14 +121,15 @@ namespace dipole{
             if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==0){
 
                // Copy B-field from macrocell to atomistic spin
-               dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
-               dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
-               dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
+               // Copy B-field from macrocell to atomistic spin
+               dipole::atom_dipolar_field_array_x[atom] = 0.0;//dipole::cells_field_array_x[cell];
+               dipole::atom_dipolar_field_array_y[atom] = 0.0;//dipole::cells_field_array_y[cell];
+               dipole::atom_dipolar_field_array_z[atom] = 0.0;//dipole::cells_field_array_z[cell];
 
                // Unroll Hdemag field
-               dipole::atom_mu0demag_field_array_x[atom] = dipole::cells_mu0Hd_field_array_x[cell];
-               dipole::atom_mu0demag_field_array_y[atom] = dipole::cells_mu0Hd_field_array_y[cell];
-               dipole::atom_mu0demag_field_array_z[atom] = dipole::cells_mu0Hd_field_array_z[cell];
+               dipole::atom_mu0demag_field_array_x[atom] = 0.0;//dipole::cells_mu0Hd_field_array_x[cell];
+               dipole::atom_mu0demag_field_array_y[atom] = 0.0;//dipole::cells_mu0Hd_field_array_y[cell];
+               dipole::atom_mu0demag_field_array_z[atom] = 0.0;//dipole::cells_mu0Hd_field_array_z[cell];
 
             }
          }

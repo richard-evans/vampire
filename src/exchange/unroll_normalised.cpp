@@ -77,7 +77,7 @@ namespace exchange{
                   int i = atoms::neighbour_interaction_type_array[nn];
                   atoms::i_exchange_list[nn].Jij = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0]*J;
                   //if (imaterial != 4 && jmaterial != 4 && imaterial ==jmaterial)
-                  std::cout <<atoms::num_atoms << '\t' <<  atom << '\t' << natom << '\t' << dx << '\t' << dy << '\t' << dz << '\t' << d << '\t' << imaterial << '\t' << jmaterial  << '\t' << J << '\t' << atoms::i_exchange_list[nn].Jij <<std::endl;
+                  //std::cout <<atoms::num_atoms << '\t' <<  atom << '\t' << natom << '\t' << dx << '\t' << dy << '\t' << dz << '\t' << d << '\t' << imaterial << '\t' << jmaterial  << '\t' << J << '\t' << atoms::i_exchange_list[nn].Jij <<std::endl;
                   // reset interation id to neighbour number - causes segfault if nn out of range
    					atoms::neighbour_interaction_type_array[nn] = nn;
    				}

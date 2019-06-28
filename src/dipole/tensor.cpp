@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 
-// C++ standard library headers
+// C standard library headers
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -189,6 +189,13 @@ namespace dipole{
                      compute_intra_tensor(i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
 
                   } // End of Intra part
+                  if (dipole::internal::rij_tensor_xx[lc][j]*dipole::internal::rij_tensor_xx[lc][j] < 1e-15) dipole::internal::rij_tensor_xx[lc][j] =0;
+                  if (dipole::internal::rij_tensor_xy[lc][j]*dipole::internal::rij_tensor_xy[lc][j] < 1e-15) dipole::internal::rij_tensor_xy[lc][j] =0;
+                  if (dipole::internal::rij_tensor_xz[lc][j]*dipole::internal::rij_tensor_xz[lc][j] < 1e-15) dipole::internal::rij_tensor_xz[lc][j] =0;
+                  if (dipole::internal::rij_tensor_yy[lc][j]*dipole::internal::rij_tensor_yy[lc][j] < 1e-15) dipole::internal::rij_tensor_yy[lc][j] =0;
+                  if (dipole::internal::rij_tensor_yz[lc][j]*dipole::internal::rij_tensor_yz[lc][j] < 1e-15) dipole::internal::rij_tensor_yz[lc][j] =0;
+                  if (dipole::internal::rij_tensor_zz[lc][j]*dipole::internal::rij_tensor_zz[lc][j] < 1e-15) dipole::internal::rij_tensor_zz[lc][j] =0;
+
                }
    			}
    		}
