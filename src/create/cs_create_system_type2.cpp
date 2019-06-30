@@ -825,9 +825,13 @@ void fill(std::vector<cs::catom_t> & catom_array){
    // check calling of routine if error checking is activated
    if(err::check==true){std::cout << "cs::fill has been called" << std::endl;}
 
-   //loop over all potential intermixing materials
+   //loop over all potential fill materials
    for(int mat=0;mat<mp::num_materials;mat++){
+
+      // If material is fill material
       if(mp::material[mat].fill){
+
+         // Calculate min/max heights for fill material (for a partial fill)
          double min = create::internal::mp[mat].min*cs::system_dimensions[2];
          double max = create::internal::mp[mat].max*cs::system_dimensions[2];
 
@@ -840,7 +844,9 @@ void fill(std::vector<cs::catom_t> & catom_array){
                catom_array[atom].include=true;
             }
          }
+
       }
+
    }
 
    return;
