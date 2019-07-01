@@ -22,7 +22,9 @@
 
 // Vampire headers
 #include "dipole.hpp"
-
+#ifdef FFT
+#include <fftw3.h>
+#endif
 // dipole module headers
 #include "internal.hpp"
 
@@ -41,12 +43,12 @@ namespace dipole{
 
       // enumerated list of different dipole solvers
       enum solver_t{
-         macrocell    = 0, // original bare macrocell method (cheap but inaccurate)
-         tensor       = 1, // new macrocell with tensor including local corrections
+         macrocell      = 0, // original bare macrocell method (cheap but inaccurate)
+         tensor         = 1, // new macrocell with tensor including local corrections
          //multipole    = 2, // bare macrocell but with multipole expansion
-         hierarchical = 3, // new macrocell with tensor including local corrections and nearfield multipole
-         atomistic = 4 // new macrocell with tensor including local corrections and nearfield multipole
-         //exact        = 4, // atomistic dipole dipole (too slow for anything over 1000 atoms)
+         hierarchical   = 3, // new macrocell with tensor including local corrections and nearfield multipole
+         atomistic      = 4, // new macrocell with tensor including local corrections and nearfield multipole
+         fft            = 5 // atomistic dipole dipole (too slow for anything over 1000 atoms)
       };
 
       extern solver_t solver;
@@ -99,6 +101,59 @@ namespace dipole{
       extern std::vector <int> receive_counts;
       extern std::vector <int> receive_displacements;
 
+      //FFT arrays
+
+      #ifdef FFT
+         extern fftw_plan MxP,MyP,MzP;
+         extern fftw_plan HxP,HyP,HzP;
+         extern fftw_complex *N2xx0; //3D Array for dipolar field
+         extern fftw_complex *N2xy0;
+         extern fftw_complex *N2xz0;
+
+         extern fftw_complex *N2yx0; //3D Array for dipolar field
+         extern fftw_complex *N2yy0;
+         extern fftw_complex *N2yz0;
+
+         extern fftw_complex *N2zx0; //3D Array for dipolar field
+         extern fftw_complex *N2zy0;
+         extern fftw_complex *N2zz0;
+
+         extern fftw_complex *N2xx; //3D Array for dipolar field
+         extern fftw_complex *N2xy;
+         extern fftw_complex *N2xz;
+
+         extern fftw_complex *N2yx; //3D Array for dipolar field
+         extern fftw_complex *N2yy;
+         extern fftw_complex *N2yz;
+
+         extern fftw_complex *N2zx; //3D Array for dipolar field
+         extern fftw_complex *N2zy;
+         extern fftw_complex *N2zz;
+
+         extern fftw_complex *Mx_in; //3D Array for dipolar field
+         extern fftw_complex *My_in;
+         extern fftw_complex *Mz_in;
+
+         extern fftw_complex *Hx_in; //3D Array for dipolar field
+         extern fftw_complex *Hy_in;
+         extern fftw_complex *Hz_in;
+
+         extern fftw_complex *Mx_out; //3D Array for dipolar field
+         extern fftw_complex *My_out;
+         extern fftw_complex *Mz_out;
+
+         extern fftw_complex *Hx_out; //3D Array for dipolar field
+         extern fftw_complex *Hy_out;
+         extern fftw_complex *Hz_out;
+
+         extern unsigned int num_macro_cells_x;
+         extern unsigned int num_macro_cells_y;
+         extern unsigned int num_macro_cells_z;
+         extern unsigned int eight_num_cells;
+      #endif
+
+      extern void update_field_fft();
+      void initialize_fft_solver();
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------

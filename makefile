@@ -13,12 +13,14 @@ export OMPI_CXX=g++ -std=c++0x
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
-LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-MPICC=mpicxx -DMPICF
+ICC=icc -DCOMP='"Intel C++ Compiler"' -DFFT
+GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' -DFFT
+LLVM=g++ -DCOMP='"LLVM C++ Compiler"' -DFFT
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DFFT
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DFFT
+MPICC=mpicxx -DMPICF -DFFT
+
+LIBS=-lstdc++ -lm -lfftw3 -L/opt/local/lib/
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
@@ -27,7 +29,7 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=
+
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 
 # Debug Flags
@@ -130,9 +132,11 @@ include src/constants/makefile
 include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
+include src/hierarchical/makefile
 include src/ltmp/makefile
 include src/main/makefile
 include src/montecarlo/makefile
+include src/micromagnetic/makefile
 include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile

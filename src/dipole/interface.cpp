@@ -61,6 +61,13 @@ namespace dipole{
             dipole::activated=true;
             return true;
          }
+         test="fft";
+         if(value == test){
+            dipole::internal::solver = dipole::internal::fft;
+            // enable dipole calculation
+            dipole::activated=true;
+            return true;
+         }
          else{
             terminaltextcolor(RED);
             std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;

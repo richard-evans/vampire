@@ -95,7 +95,9 @@ namespace dipole{
             dipole::cells_field_array_x[i] = dipole::cells_field_array_x[i] * 9.27400915e-01;
             dipole::cells_field_array_y[i] = dipole::cells_field_array_y[i] * 9.27400915e-01;
             dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.27400915e-01;
-            // Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
+				std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] << '\t' << std::endl;
+
+				// Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
             // of magnetisation and volume in angstrom
             dipole::cells_mu0Hd_field_array_x[i] = dipole::cells_mu0Hd_field_array_x[i] * 9.27400915e-01;
             dipole::cells_mu0Hd_field_array_y[i] = dipole::cells_mu0Hd_field_array_y[i] * 9.27400915e-01;

@@ -111,7 +111,57 @@ namespace dipole{
       // Shared functions inside dipole module
       //------------------------------------------------------------------------
       void update_field();
+      #ifdef FFT
+         fftw_plan MxP,MyP,MzP;
+         fftw_plan HxP,HyP,HzP;
+         fftw_complex *N2xx0; //3D Array for dipolar field
+         fftw_complex *N2xy0;
+         fftw_complex *N2xz0;
 
+         fftw_complex *N2yx0; //3D Array for dipolar field
+         fftw_complex *N2yy0;
+         fftw_complex *N2yz0;
+
+         fftw_complex *N2zx0; //3D Array for dipolar field
+         fftw_complex *N2zy0;
+         fftw_complex *N2zz0;
+
+         fftw_complex *N2xx; //3D Array for dipolar field
+         fftw_complex *N2xy;
+         fftw_complex *N2xz;
+
+         fftw_complex *N2yx; //3D Array for dipolar field
+         fftw_complex *N2yy;
+         fftw_complex *N2yz;
+
+         fftw_complex *N2zx; //3D Array for dipolar field
+         fftw_complex *N2zy;
+         fftw_complex *N2zz;
+
+
+         fftw_complex *Mx_in; //3D Array for dipolar field
+         fftw_complex *My_in;
+         fftw_complex *Mz_in;
+
+         fftw_complex *Hx_in; //3D Array for dipolar field
+         fftw_complex *Hy_in;
+         fftw_complex *Hz_in;
+
+         fftw_complex *Mx_out; //3D Array for dipolar field
+         fftw_complex *My_out;
+         fftw_complex *Mz_out;
+
+         fftw_complex *Hx_out; //3D Array for dipolar field
+         fftw_complex *Hy_out;
+         fftw_complex *Hz_out;
+
+         //stores number of macrocells in x,y,z
+         unsigned int num_macro_cells_x;
+         unsigned int num_macro_cells_y;
+         unsigned int num_macro_cells_z;
+         unsigned int eight_num_cells;
+      #endif
+      void update_field_fft();
    } // end of internal namespace
 
 } // end of dipole namespace

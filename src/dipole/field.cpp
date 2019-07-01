@@ -73,6 +73,9 @@ namespace dipole{
                case dipole::internal::hierarchical:
                   hierarchical::internal::update();
                   break;
+               case dipole::internal::fft:
+                  dipole::internal::update_field_fft();
+                  break;
 
             }
 
