@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=44;
+	const int max_units=47;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -148,6 +148,13 @@ int init(){
 		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
       // New
       unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
+
+		// exchange (Internal unit J/Angstrom)
+		unit[44]="J/m";		conversion[44]=1.0E-10; 			type[44]="exchange";		// Joules/metres squared
+    	unit[45]="erg/cm";	conversion[45]=1.0E-15; 			type[45]="exchange";		// erg/cm squared
+	 	unit[46]="erg/cm2";	conversion[46]=1.0e-23; 			type[46]="mm_energy";		// erg/cm2 squared to J/A2
+
+      //
 
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag

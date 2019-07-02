@@ -35,7 +35,7 @@
 #include "random.hpp"
 #include "spintorque.hpp"
 #include "unitcell.hpp"
-
+#include "micromagnetic.hpp"
 // vio module headers
 #include "internal.hpp"
 
@@ -68,6 +68,7 @@ namespace vin{
         //-------------------------------------------------------------------
         // Call module input parameters
         //-------------------------------------------------------------------
+      //  std::cout << "YAY" <<std::endl;
         if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(anisotropy::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -80,6 +81,7 @@ namespace vin{
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
         //===================================================================
         // Test for create variables
@@ -1326,6 +1328,12 @@ namespace vin{
             output_list.push_back(2);
             return EXIT_SUCCESS;
         }
+        test="magneto-resistance";
+        if(word==test){
+          micromagnetic::enable_resistance = true;
+          output_list.push_back(61);
+          return EXIT_SUCCESS;
+       }
         else
         //--------------------------------------------------------------------
         test="applied-field-strength";
@@ -1766,6 +1774,12 @@ namespace vin{
             output_list.push_back(22);
             return EXIT_SUCCESS;
         }
+        test="magneto-resistance";
+        if(word==test){
+          micromagnetic::enable_resistance = true;
+          output_list.push_back(61);
+          return EXIT_SUCCESS;
+       }
         else
         //-------------------------------------------------------------------
         test="output-rate";
@@ -2631,6 +2645,7 @@ namespace vin{
             The default value is false for all materials. Valid values are
             true, false or (blank) [same as true].
             */
+
             if(word==test){
                test="keep";
                // keep all atoms in simulation (for efficient parallelization)
@@ -2662,6 +2677,7 @@ namespace vin{
             //-------------------------------------------------------------------
             // Call module input parameters
             //-------------------------------------------------------------------
+
             else if(anisotropy::match_material_parameter(word, value, unit, line, super_index, sub_index, mp::max_materials)) return EXIT_SUCCESS;
             else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
@@ -2669,6 +2685,7 @@ namespace vin{
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
             // keyword not found

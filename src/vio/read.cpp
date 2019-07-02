@@ -76,6 +76,7 @@ namespace vin{
 	///=====================================================================================
 	///
 	int read(string const filename){
+		//zlog << zTs() << "READING" << std::endl;
 		// Print informative message to zlog file
 		zlog << zTs() << "Opening main input file \"" << filename << "\"." << std::endl;
 
@@ -188,10 +189,10 @@ namespace vin{
 			}
 			string empty="";
 			if(key!=empty){
-			//std::cout << "\t" << "key:  " << key << std::endl;
-			//std::cout << "\t" << "word: " << word << std::endl;
-			//std::cout << "\t" << "value:" << value << std::endl;
-			//std::cout << "\t" << "unit: " << unit << std::endl;
+	//		std::cout << "\t" << "key:  " << key << std::endl;
+//			std::cout << "\t" << "word: " << word << std::endl;
+//			std::cout << "\t" << "value:" << value << std::endl;
+//		   std::cout << "\t" << "unit: " << unit << std::endl;
 			int matchcheck = match(key, word, value, unit, line_counter);
 			if(matchcheck==EXIT_FAILURE){
 				err::vexit();

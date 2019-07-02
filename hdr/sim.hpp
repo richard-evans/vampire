@@ -167,6 +167,9 @@ namespace sim{
    extern double spin_applied_field_energy(const double, const double, const double);
    extern double spin_magnetostatic_energy(const int, const double, const double, const double);
 
+	void calculate_spin_fields(const int start_index,const int end_index);
+	void calculate_external_fields(const int start_index,const int end_index);
+	
    // LaGrange multiplier variables
    extern double lagrange_lambda_x;
    extern double lagrange_lambda_y;
