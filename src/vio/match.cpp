@@ -38,6 +38,7 @@
 #include "micromagnetic.hpp"
 // vio module headers
 #include "internal.hpp"
+#include "../create/internal.hpp"
 
 namespace vin{
 
@@ -470,6 +471,11 @@ namespace vin{
             cs::num_multilayers = nmul;
             return EXIT_SUCCESS;
         }
+        test="grains-poission"; //parity
+        if(word==test){
+          create::internal::grain_poission=true;
+          return EXIT_SUCCESS;
+       }
         //--------------------------------------------------------------------
         test="height-categorization";
         if(word==test){
