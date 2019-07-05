@@ -50,9 +50,7 @@ int simulate_system();
 int main(int argc, char* argv[]){
 
    // For parallel execution intialise MPI
-   #ifdef MPICF
-      vmpi::initialise(argc, argv);
-   #endif
+   vmpi::initialise(argc, argv);
 
    // Check for valid command-line arguments
    vmain::internal::command_line_args(argc, argv);

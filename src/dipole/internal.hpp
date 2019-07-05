@@ -40,6 +40,7 @@ namespace dipole{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern bool initialised;
+      extern bool output_atomistic_dipole_field; // flag to toggle output of atomic resolution dipole field
 
       // enumerated list of different dipole solvers
       enum solver_t{
@@ -225,7 +226,8 @@ namespace dipole{
                                        std::vector<double>& x_coord_array, // atomic corrdinates (angstroms)
                                        std::vector<double>& y_coord_array,
                                        std::vector<double>& z_coord_array,
-                                       std::vector<double>& moments_array); // atomistic magnetic moments (bohr magnetons)
+                                       std::vector<double>& moments_array, // atomistic magnetic moments (bohr magnetons)
+                                       std::vector<int>& mat_id_array);    // atom material ID
 
       void calculate_atomistic_dipole_field(std::vector<double>& x_spin_array, // atomic spin directions
                                             std::vector<double>& y_spin_array,
@@ -286,6 +288,21 @@ namespace dipole{
       int send_cells_demag_factor(std::vector<int>& cells_cell_id_array,
                                  std::vector<double>& N_tensor_array,
                                  int cells_num_local_cells);
+
+      //-----------------------------------------------------------------
+      // Function to initialise atomic resolution output of dipole field
+      //-----------------------------------------------------------------
+      void output_atomistic_coordinates(int num_atoms,                      // number of atoms (only correct in serial)
+                                        std::vector<double>& x_coord_array, // atomic coordinates (angstroms)
+                                        std::vector<double>& y_coord_array,
+                                        std::vector<double>& z_coord_array,
+                                        std::vector<double>& moments_array);
+
+       //-----------------------------------------------------------------
+       // Function to output atomic resolution dipole field
+       //-----------------------------------------------------------------
+       void output_atomistic_dipole_fields();
+
 
    } // end of internal namespace
 

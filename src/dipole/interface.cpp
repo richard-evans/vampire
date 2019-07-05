@@ -93,6 +93,13 @@ namespace dipole{
          dipole::cutoff=dpur;
          return true;
       }
+      //-------------------------------------------------------------------
+      test="output-atomistic-dipole-field";
+      if(word==test){
+         // set flag to output atomistic dipole field
+         dipole::internal::output_atomistic_dipole_field = true;
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

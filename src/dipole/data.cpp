@@ -54,6 +54,7 @@ namespace dipole{
       // Shared variables inside dipole module
       //------------------------------------------------------------------------
       bool initialised=false;
+      bool output_atomistic_dipole_field = false; // flag to toggle output of atomic resolution dipole field
 
       int update_time=-1; /// last update time
 

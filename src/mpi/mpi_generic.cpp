@@ -37,10 +37,9 @@
 #include <iostream>
 #include <fstream>
 
-#ifdef MPICF
 namespace vmpi{
 
-int initialise(int argc, char *argv[]){
+void initialise(int argc, char *argv[]){
 	//====================================================================================
 	//
 	///												initialise_mpi
@@ -58,11 +57,7 @@ int initialise(int argc, char *argv[]){
 	// https://computing.llnl.gov/tutorials/mpi/
 	//====================================================================================
 
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){std::cout << "initialise_mpi has been called" << std::endl;}
-
+#ifdef MPICF
 	int resultlen;
 
 	// Initialise MPI
@@ -78,9 +73,17 @@ int initialise(int argc, char *argv[]){
 	MPI_Get_processor_name(vmpi::hostname, &resultlen);
 	//IOCommunicator(num_io_processors);
 	// Start MPI Timer
-	vmpi::start_time=MPI_Wtime();
+	vmpi::start_time = MPI_Wtime();
 
-	return EXIT_SUCCESS;
+#else
+
+   // set master flag on master (root) process (serial)
+   if(vmpi::my_rank == 0) vmpi::master = true;
+
+#endif
+
+	return;
+
 }
 
 int hosts(){
@@ -115,8 +118,6 @@ int hosts(){
 
 	return EXIT_SUCCESS;
 }
-
-#endif
 
 int finalise(){
 	//====================================================================================
@@ -243,7 +244,6 @@ double SwapTimer(double OldTimer, double& NewTimer){
 
 }
 
-
+#endif
 
 } // end of namespace vmpi
-#endif
