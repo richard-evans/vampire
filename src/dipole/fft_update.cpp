@@ -474,25 +474,25 @@ void update_field_fft(){
    //-------------------------------------------------------------------------------------
    // loop over all local cells to initialise field with self term
    //-------------------------------------------------------------------------------------
-   for(int lc = 0; lc < dipole::internal::cells_num_local_cells; lc++){
-
-      // get cell index
-      int i = cells::cell_id_array[lc];
-
-      // check cell contains atoms
-      if(dipole::internal::cells_num_atoms_in_cell[i]>0){
-
-         // set constant for self dipole field
-         const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
-         const double self_demag = imuB * eightPI_three_cell_volume;
+//    for(int lc = 0; lc < dipole::internal::cells_num_local_cells; lc++){
 //
-         // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
-         dipole::cells_field_array_x[i] = self_demag * cells::mag_array_x[i];
-         dipole::cells_field_array_y[i] = self_demag * cells::mag_array_y[i];
-         dipole::cells_field_array_z[i] = self_demag * cells::mag_array_z[i];
-
-      }
-   }
+//       // get cell index
+//       int i = cells::cell_id_array[lc];
+//
+//       // check cell contains atoms
+//       if(dipole::internal::cells_num_atoms_in_cell[i]>0){
+//
+//          // set constant for self dipole field
+//          const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
+//          const double self_demag = imuB * eightPI_three_cell_volume;
+// //
+//          // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
+//          dipole::cells_field_array_x[i] = self_demag * cells::mag_array_x[i];
+//          dipole::cells_field_array_y[i] = self_demag * cells::mag_array_y[i];
+//          dipole::cells_field_array_z[i] = self_demag * cells::mag_array_z[i];
+//
+//       }
+//    }
 
    //-------------------------------------------------------------------------------------
    // Add calculated field to field array

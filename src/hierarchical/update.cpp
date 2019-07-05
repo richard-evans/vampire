@@ -81,7 +81,7 @@ namespace hierarchical{
            const double mx = mag_array_x[cell_j]*imuB;
            const double my = mag_array_y[cell_j]*imuB;
            const double mz = mag_array_z[cell_j]*imuB;
-         //std::cout<< sim::time << '\t'  << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
+         //if (cell_i == 0)std::cout<< cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
            dipole::cells_field_array_x[cell_i]      +=(mx*rij_tensor_xx[j] + my*rij_tensor_xy[j] + mz*rij_tensor_xz[j]);
            dipole::cells_field_array_y[cell_i]      +=(mx*rij_tensor_xy[j] + my*rij_tensor_yy[j] + mz*rij_tensor_yz[j]);
            dipole::cells_field_array_z[cell_i]      +=(mx*rij_tensor_xz[j] + my*rij_tensor_yz[j] + mz*rij_tensor_zz[j]);
@@ -96,6 +96,8 @@ namespace hierarchical{
          dipole::cells_field_array_x[cell_i]       = dipole::cells_field_array_x[cell_i] * 9.27400915e-01;
          dipole::cells_field_array_y[cell_i]       = dipole::cells_field_array_y[cell_i] * 9.27400915e-01;
          dipole::cells_field_array_z[cell_i]       = dipole::cells_field_array_z[cell_i] * 9.27400915e-01;
+         if (cell_i == 0) std::cout << sim::time << '\t' << cell_i << '\t' << dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
+
          // Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
          // of magnetisation and volume in angstrom
          dipole::cells_mu0Hd_field_array_x[cell_i] = dipole::cells_mu0Hd_field_array_x[cell_i] * 9.27400915e-01;

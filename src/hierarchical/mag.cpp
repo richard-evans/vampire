@@ -49,7 +49,7 @@ namespace hierarchical{
     int hierarchical_mag(){
 
 
-    //cells::mag();
+    cells::mag();
 
    //std::cout <<"CELLS:\t" << num_zero_level_cells << "\t" << cells::num_cells <<std::endl;
 

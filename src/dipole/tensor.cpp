@@ -166,36 +166,40 @@ namespace dipole{
             //int i = cells_local_cell_array[lc];
             int i = cells::cell_id_array[lc];
             if(cells_num_atoms_in_cell[i]>0){
+            //std::cout << i << '\t' << "interaction" << "\t"  << cells_num_cells << "\t" << cells_num_atoms_in_cell[i] <<  std::endl;
+
 
             	// Loop over all other cells to calculate contribution to local cell
                for(int j=0;j<cells_num_cells;j++){
-
+                  //if (i == 0 ) std::cout << j << "\t" << cells_num_atoms_in_cell[j] << std::endl;
                   /*==========================================================*/
                   /* Calculation of inter part of dipolar tensor              */
                   /*==========================================================*/
-                	if(i!=j && cells_num_atoms_in_cell[j]>0){
+                  if (cells_num_atoms_in_cell[j]!=0){
+                	   if(i!=j){
 
-                     // calculate inter term of dipolar tensor
-                     compute_inter_tensor(cells_macro_cell_size,i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
+                        // calculate inter term of dipolar tensor
+                        compute_inter_tensor(cells_macro_cell_size,i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
 
-                  } // End of Inter part
+                     } // End of Inter part
 
-                  /*==========================================================*/
-                  /* Calculation of intra part of dipolar tensor              */
-                  /*==========================================================*/
-                  else if( i==j && cells_num_atoms_in_cell[j]>0){
+                     /*==========================================================*/
+                     /* Calculation of intra part of dipolar tensor              */
+                     /*==========================================================*/
+                     else if( i==j && cells_num_atoms_in_cell[j]!=0){
 
-                     //Compute inter component of dipolar tensor
-                     compute_intra_tensor(i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
-
-                  } // End of Intra part
+                        //Compute inter component of dipolar tensor
+                        compute_intra_tensor(i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
+                     }
+               // End of Intra part
                   if (dipole::internal::rij_tensor_xx[lc][j]*dipole::internal::rij_tensor_xx[lc][j] < 1e-15) dipole::internal::rij_tensor_xx[lc][j] =0;
                   if (dipole::internal::rij_tensor_xy[lc][j]*dipole::internal::rij_tensor_xy[lc][j] < 1e-15) dipole::internal::rij_tensor_xy[lc][j] =0;
                   if (dipole::internal::rij_tensor_xz[lc][j]*dipole::internal::rij_tensor_xz[lc][j] < 1e-15) dipole::internal::rij_tensor_xz[lc][j] =0;
                   if (dipole::internal::rij_tensor_yy[lc][j]*dipole::internal::rij_tensor_yy[lc][j] < 1e-15) dipole::internal::rij_tensor_yy[lc][j] =0;
                   if (dipole::internal::rij_tensor_yz[lc][j]*dipole::internal::rij_tensor_yz[lc][j] < 1e-15) dipole::internal::rij_tensor_yz[lc][j] =0;
                   if (dipole::internal::rij_tensor_zz[lc][j]*dipole::internal::rij_tensor_zz[lc][j] < 1e-15) dipole::internal::rij_tensor_zz[lc][j] =0;
-                  std::cout <<"A" << '\t' << lc << '\t' << j << '\t' <<  dipole::internal::rij_tensor_xx[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xz[lc][j]<< '\t' <<  dipole::internal::rij_tensor_yy[lc][j] << '\t' <<  dipole::internal::rij_tensor_zz[lc][j] << std::endl;
+                  //std::cout <<"A" << '\t' << i << '\t' << j << '\t' <<  dipole::internal::rij_tensor_xx[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xz[lc][j]<< '\t' <<  dipole::internal::rij_tensor_yy[lc][j] << '\t' <<  dipole::internal::rij_tensor_yz[lc][j] << '\t' <<  dipole::internal::rij_tensor_zz[lc][j] << std::endl;
+}
                }
    			}
    		}

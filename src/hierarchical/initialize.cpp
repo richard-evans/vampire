@@ -215,10 +215,10 @@ namespace hierarchical{
               //loop over all levels to calvculate the positions and sizes of the cells in the levels.
               for (int level = 0; level < ha::num_levels; level ++){
 
-                 double cell_size = pow(2,level)*cells::macro_cell_size*dipole::cutoff;
+                 double cell_size = pow(2,level)*cells::macro_cell_size;
 
-                 ha::interaction_range[level] = cell_size;
-                // std::cout << "cellsize:\t" << cell_size << std::endl;
+                 ha::interaction_range[level] = cell_size*2*dipole::cutoff;
+               //  std::cout << level << '\t' << cell_size << '\t' << ha::interaction_range[level] <<std::endl;
                  // Calculate number of microcells
                  // determine number of cells in x and y (global)
                  int ncx = static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cell_size));
@@ -330,7 +330,7 @@ namespace hierarchical{
 
 
                 ha::num_zero_level_cells = ha::cells_level_end_index[0];
-                std::cout << ha::num_zero_level_cells << std::endl;
+                //std::cout << ha::num_zero_level_cells << std::endl;
                 ha::num_atoms_in_cell.resize(ha::total_num_cells,0);
                 ha::interaction_list_start_index.resize(ha::num_zero_level_cells,false);
                 ha::interaction_list_end_index.resize(ha::num_zero_level_cells,false);
@@ -411,7 +411,7 @@ namespace hierarchical{
                           int end   = ha::cells_level_end_index[level];
                           //std::cout << "cell:\t" << cell_i << "\tlevel:\t" <<  level << "\tN:\t" << end-start << std::endl;
                           for (int cell_j = start; cell_j < end; cell_j++){
-                         //    std::cout << "cell:\t" << cell_i << "\tlevel:\t" <<  level << "\tN:\t" << cell_j << "\t"  <<  interacted[cell_j] << "\t" << ha::interaction_list_end_index[lc] << '\t' << ha::interaction_list_start_index[lc] << std::endl;
+                     //   if (cell_i == 0)     std::cout << "cell:\t" << cell_i << "\tlevel:\t" <<  level << "\tN:\t" << cell_j << "\t"  <<  interacted[cell_j] << "\t" << ha::interaction_list_end_index[lc] << '\t' << ha::interaction_list_start_index[lc] << std::endl;
 
                              if (interacted[cell_j] == false && level != 0){
 
@@ -433,6 +433,7 @@ namespace hierarchical{
 
                                   double r = sqrt(dx_2 + dy_2 + dz_2);
                                   //   std::cout << cell_i << '\t' << cell_j << "\t" << corner << '\t' << r << '\t' << interaction_range[level] <<std::endl;
+                                 //         if (cell_i == 0)      std::cout << r << '\t' <<  ha::interaction_range[level] <<std::endl;
                                   if (r > ha::interaction_range[level]) is_corner_outside_range ++;
                                }
                             //   std::cout << is_corner_outside_range <<std::endl;
@@ -444,13 +445,15 @@ namespace hierarchical{
                                   int end_cell_in_cell = ha::cells_in_cells_end_index[cell_j];
                                   ha::interaction_list.push_back(lc);
                                   ha::interaction_list_end_index[lc] = interaction_num;
+                              //            if (cell_i == 0)      std::cout << "interacted" << std::endl;
                             //      std::cout << end_cell_in_cell -start_cell_in_cell <<std::endl;
                                   for (int sub_cell = start_cell_in_cell; sub_cell < end_cell_in_cell; sub_cell ++ ){
                                      interacted[sub_cell] = true;
+                                 //         if (cell_i == 0)    std::cout << sub_cell << std::endl;
                                   }
                                }
                             }
-                            else if (level > 0){
+                            else if (level != 0){
                                int start_cell_in_cell = ha::cells_in_cells_start_index[cell_j];
                                int end_cell_in_cell = ha::cells_in_cells_end_index[cell_j];
 
@@ -461,6 +464,7 @@ namespace hierarchical{
                             else if (level == 0 && interacted[cell_j] == false){
                                ha::interaction_list.push_back(cell_j);
                                interaction_num ++;
+                     //                  if (cell_i == 0)      std::cout << "interacted" << std::endl;
                                ha::interaction_list_end_index[lc] = interaction_num;
                             }
                          }
@@ -507,19 +511,19 @@ namespace hierarchical{
                 //   start timer
                    int cell_i = cells::cell_id_array[lc];
 
-                   if (cells_num_atoms_in_cell[cell_i] > 0){
+                   if (cells_num_atoms_in_cell[cell_i] != 0){
 
                       const int start = ha::interaction_list_start_index[lc];
                       const int end = ha::interaction_list_end_index[lc];
 
-                //      std::cerr << cell_i << '\t' << "interaction" << "\t" << end - start << "\t" << cells_num_cells << std::endl;
+                  //    std::cerr << cell_i << '\t' << "interaction" << "\t" << end - start << "\t" << cells_num_cells << "\t" << cells_num_atoms_in_cell[cell_i] << std::endl;
 
                       for(int j = start;j<end;j++){
 
                          int cell_j = ha::interaction_list[j];
-
-                         if ( cells_num_atoms_in_cell[cell_j] > 0){
-
+                         //if (cell_i == 0 ) std::cout << cell_j <<  "\t" << cells_num_atoms_in_cell[cell_j] << std::endl;
+                         if ( cells_num_atoms_in_cell[cell_j] != 0){
+                           //if ( cells_num_atoms_in_cell[cell_j] == 0 && cell_i == 0) std::cout << "HHHHM" << cell_j <<  "\t" << cells_num_atoms_in_cell[cell_j] << std::endl;
                             if(cell_i!=cell_j) {
                                ha::calc_inter(cell_i,cell_j,j, cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z);
                             }
@@ -532,7 +536,7 @@ namespace hierarchical{
                             if (ha::rij_tensor_yy[j]*ha::rij_tensor_yy[j] < 1e-15) ha::rij_tensor_yy[j] =0;
                             if (ha::rij_tensor_yz[j]*ha::rij_tensor_yz[j] < 1e-15) ha::rij_tensor_yz[j] =0;
                             if (ha::rij_tensor_zz[j]*ha::rij_tensor_zz[j] < 1e-15) ha::rij_tensor_zz[j] =0;
-                            std::cout << "A" << '\t' << cell_i << '\t' << cell_j << "\t" <<  ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
+                            //std::cout << "A" << '\t' << cell_i << '\t' << cell_j << "\t" << ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
 
                            //std::cout << cells_num_atoms_in_cell[cell_i] << '\t' << cells_num_atoms_in_cell[cell_j] << '\t' <<  cell_i << '\t' << cell_j << "\t" <<  ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
                          }
