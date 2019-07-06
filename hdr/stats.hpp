@@ -145,7 +145,6 @@ namespace stats
 
    };
 
-   class standard_deviation_statistic_t;
    //----------------------------------
    // Magnetization Class definition
    //----------------------------------
