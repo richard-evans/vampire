@@ -1,0 +1,43 @@
+<!DOCTYPE html >
+<html >
+	<head>
+        <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<title>X3D Viewer</title>
+        <link rel="stylesheet" type="text/css" href="x3dom.css" />
+		<script type="text/javascript" src="x3dom.js"></script>
+	</head>
+       
+<body>
+
+   <h1>X3D File Viewer</h1>
+
+        <div id="x3d-div">
+            <input type="file" id="file-input" accept=".x3d,.vrml,.wrl"/>
+        </div>
+
+        <div>
+            Load file above. Note that local textures/resources are not supported.
+        </div>
+
+        <x3d xmlns="http://www.x3dom.org/x3dom" showStat="false" showLog="false" x="0px" y="0px" width="600px" height="600px" altImg="helloX3D-alt.png">
+          <param name="PrimitiveQuality" value="0.5" ></param>
+          <scene id="scene">
+              
+          </scene>
+        </x3d>
+        <script type="text/javascript">
+            function openFile(e){
+                var file = e.target.files[0];
+                var a = new FileReader();
+                a.onload = function(e) {
+                    var dataurl = e.target.result;
+                    document.getElementById('scene').innerHTML = '<inline url="' + dataurl + '" /> '
+                }
+                a.readAsDataURL(file);
+            }
+            document.getElementById('file-input').addEventListener('change', openFile, false);
+        </script>
+</body>
+</html>
+
