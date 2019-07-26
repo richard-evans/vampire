@@ -180,6 +180,8 @@ int create(){
       int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    #else
       int num_local_atoms = atoms::num_atoms;
+      // set number of core atoms for serial code (to allow wraper functions to work seamlessly)
+      vmpi::num_core_atoms = atoms::num_atoms;
    #endif
 
 	// Set grain and cell variables for simulation

@@ -42,6 +42,7 @@ using std::string;
 namespace vmpi{
 
    extern bool master;              // boolean variable (only true on master process)
+   extern int master_id;            // MPI process ID for master process
 	extern int my_rank; 					///< Local CPU ID
 	extern int num_processors;			///< Total number of CPUs
 	extern int mpi_mode; 				///< MPI Simulation Mode (0 = Geometric Decomposition, 1 = Replicated Data, 2 = Statistical Parallelism)
@@ -97,7 +98,7 @@ namespace vmpi{
 	#endif
 
 	//functions declarations
-	extern int initialise(int argc, char *argv[]);
+	extern void initialise(int argc, char *argv[]);
 	extern int hosts();
 	extern int finalise();
    extern void geometric_decomposition(int, double []);
@@ -109,6 +110,10 @@ namespace vmpi{
 
 	// wrapper functions avoiding MPI library
 	extern void barrier();
+   extern uint64_t reduce_sum(uint64_t local);
+   extern void collate(std::vector<double>& input, std::vector<double>& output);
+   extern void counts_and_displacements(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
+   extern void fast_collate(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
 
    // function to seed random numbers in parallel
    uint32_t parallel_rng_seed(int seed);

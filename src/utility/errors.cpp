@@ -95,6 +95,8 @@ namespace err
    //-----------------------------------------------------------------------------------------
    void v_parallel_all_exit(std::string message){
 
+      #ifdef MPICF
+
       // Print non-blank error message to screen and log
       std::string blank = "";
       if( message != blank ){
@@ -104,13 +106,14 @@ namespace err
       terminaltextcolor(RED);
       std::cout << "Fatal error: Aborting program. See log file for details." << std::endl;
       terminaltextcolor(WHITE);
-      #ifdef MPICH
+
       // Wait for everyone
       vmpi::barrier();
 
       // Now finalise MPI
-      int i = vmpi::finalise();
+      vmpi::finalise();
       #endif
+
       // Now exit program disgracefully
       exit(EXIT_FAILURE);
    }
