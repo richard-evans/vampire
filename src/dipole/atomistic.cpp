@@ -16,6 +16,7 @@
 #include "dipole.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "material.hpp"
 
 // dipole module headers
 #include "internal.hpp"
@@ -34,7 +35,8 @@ namespace dipole{
                                        std::vector<double>& x_coord_array, // atomic corrdinates (angstroms)
                                        std::vector<double>& y_coord_array,
                                        std::vector<double>& z_coord_array,
-                                       std::vector<double>& moments_array){ // atomistic magnetic moments (bohr magnetons)
+                                       std::vector<double>& moments_array, // atomistic magnetic moments (bohr magnetons)
+                                       std::vector<int>& mat_id_array){    // atom material ID
 
          // Calculate memory requirements and inform user
          const double mem = double(num_atoms) * double(vmpi::num_processors) * sizeof(double) * 7.0 / 1.0e6;
@@ -45,6 +47,13 @@ namespace dipole{
 
          // calculate number of local atoms excluding halo
          dp::num_local_atoms = vmpi::num_core_atoms + vmpi::num_bdry_atoms;
+
+         // Zero all moments for non-magnetic materials by using copy of moments array
+         std::vector<double> moments_array_copy = moments_array;
+         for (int atom = 0; atom < dp::num_local_atoms; atom++){
+            int mat = mat_id_array[atom]; // get atomic material ID
+            if(mp::material[mat].non_magnetic != 0) moments_array_copy[atom] = 0.0; // set local moment to zero
+         }
 
          // resize main displacement array
          dp::receive_displacements.resize(vmpi::num_processors,0);
@@ -77,10 +86,10 @@ namespace dipole{
          dp::sm.resize(total_num_atoms, 0.0);
 
          // Gather atomic positions on all processors
-         MPI_Allgatherv(&x_coord_array[0], num_local_atoms, MPI_DOUBLE, &dp::cx[0], &dp::receive_counts[0],  &dp::receive_displacements[0], MPI_DOUBLE, MPI_COMM_WORLD);
-         MPI_Allgatherv(&y_coord_array[0], num_local_atoms, MPI_DOUBLE, &dp::cy[0], &dp::receive_counts[0],  &dp::receive_displacements[0], MPI_DOUBLE, MPI_COMM_WORLD);
-         MPI_Allgatherv(&z_coord_array[0], num_local_atoms, MPI_DOUBLE, &dp::cz[0], &dp::receive_counts[0],  &dp::receive_displacements[0], MPI_DOUBLE, MPI_COMM_WORLD);
-         MPI_Allgatherv(&moments_array[0], num_local_atoms, MPI_DOUBLE, &dp::sm[0], &dp::receive_counts[0],  &dp::receive_displacements[0], MPI_DOUBLE, MPI_COMM_WORLD);
+         MPI_Allgatherv(&x_coord_array[0],      num_local_atoms, MPI_DOUBLE, &dp::cx[0], &dp::receive_counts[0], &dp::receive_displacements[0], MPI_DOUBLE, MPI_COMM_WORLD);
+         MPI_Allgatherv(&y_coord_array[0],      num_local_atoms, MPI_DOUBLE, &dp::cy[0], &dp::receive_counts[0], &dp::receive_displacements[0], MPI_DOUBLE, MPI_COMM_WORLD);
+         MPI_Allgatherv(&z_coord_array[0],      num_local_atoms, MPI_DOUBLE, &dp::cz[0], &dp::receive_counts[0], &dp::receive_displacements[0], MPI_DOUBLE, MPI_COMM_WORLD);
+         MPI_Allgatherv(&moments_array_copy[0], num_local_atoms, MPI_DOUBLE, &dp::sm[0], &dp::receive_counts[0], &dp::receive_displacements[0], MPI_DOUBLE, MPI_COMM_WORLD);
 
          // Resize arrays to hold all spin and moment positions
          dp::sx.resize(total_num_atoms, 0.0);
@@ -93,6 +102,13 @@ namespace dipole{
          dp::num_local_atoms = num_atoms;
          dp::total_num_atoms = num_local_atoms;
 
+         // Zero all moments for non-magnetic materials by using copy of moments array
+         std::vector<double> moments_array_copy = moments_array;
+         for (int atom = 0; atom < dp::num_local_atoms; atom++){
+            int mat = mat_id_array[atom]; // get atomic material ID
+            if(mp::material[mat].non_magnetic != 0) moments_array_copy[atom] = 0.0; // set local moment to zero
+         }
+
          // resize coordinate arrays to include all atoms
          dp::cx.resize(total_num_atoms, 0.0);
          dp::cy.resize(total_num_atoms, 0.0);
@@ -104,7 +120,7 @@ namespace dipole{
             cx[atom] = x_coord_array[atom];
             cy[atom] = y_coord_array[atom];
             cz[atom] = z_coord_array[atom];
-            sm[atom] = moments_array[atom];
+            sm[atom] = moments_array_copy[atom];
          }
 
          // Resize arrays to hold all spin and moment positions
@@ -113,6 +129,9 @@ namespace dipole{
          dp::sz.resize(total_num_atoms, 1.0);
 
       #endif
+
+      // If enabled, output calculated atomistic dipole field coordinates and moments (passing local values)
+      if(dp::output_atomistic_dipole_field) output_atomistic_coordinates(num_atoms, x_coord_array, y_coord_array, z_coord_array, moments_array_copy);
 
       // Inform user of successful initialisation
       zlog << zTs() << "Atomistic dipole field calculation initialised" << std::endl;
@@ -268,6 +287,8 @@ namespace dipole{
          dipole::atom_dipolar_field_array_z[atom_i] = prefactor * bz;
 
       }
+
+      if(dp::output_atomistic_dipole_field) output_atomistic_dipole_fields();
 
       return;
 
