@@ -51,7 +51,7 @@ namespace stats
    enum stat_t { atotal=0, mean=1};
 
    /// Statistics output functions
-   extern void output_energy(std::ostream&, enum energy_t, enum stat_t);
+   extern void output_energy(std::ostream&, enum energy_t, enum stat_t,bool header);
 
    //-------------------------------------------------
    // New statistics module functions and variables
@@ -116,8 +116,8 @@ namespace stats
 
       void update_mean_counter(long counter);
 
-      std::string output_energy(enum energy_t energy_type);
-      std::string output_mean_energy(enum energy_t energy_type);
+      std::string output_energy(enum energy_t energy_type, bool header);
+      std::string output_mean_energy(enum energy_t energy_type, bool header);
 
    private:
       bool initialized;
@@ -166,7 +166,7 @@ namespace stats
          std::string output_normalized_magnetization_length(bool header);
          std::string output_normalized_mean_magnetization(bool header);
          std::string output_normalized_mean_magnetization_length(bool header);
-         std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec);
+         std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec,bool header);
          std::string output_mean_magnetization_length(bool header);
          std::string output_mean_magnetization(bool header);
 
@@ -193,7 +193,7 @@ namespace stats
          void initialize(energy_statistic_t& energy_statistic);
          void calculate(const std::vector<double>& energy);
          void reset_averages();
-         std::string output_mean_specific_heat(const double temperature);
+         std::string output_mean_specific_heat(const double temperature,bool header);
 
 
       private:

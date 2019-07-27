@@ -352,7 +352,7 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization_leng
 //------------------------------------------------------------------------------------------------------
 // Function to output normalised mean magnetisation length values as string
 //------------------------------------------------------------------------------------------------------
-std::string magnetization_statistic_t::output_normalized_magnetization_dot_product(const std::vector<double>& vec){
+std::string magnetization_statistic_t::output_normalized_magnetization_dot_product(const std::vector<double>& vec,bool header){
 
    // result string stream
    std::ostringstream result;
@@ -374,11 +374,19 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
+       if(header){
+           result << "ID"<<mask_id<<"M_norm_dot_H_m"<<"\t"
+                  << "ID"<<mask_id<<"M_norm_dot_H_x"<<"\t"
+                  << "ID"<<mask_id<<"M_norm_dot_H_y"<<"\t"
+                  << "ID"<<mask_id<<"M_norm_dot_H_z"<<"\t";
+
+       }else{
       const double mm = magnetization[4*mask_id + 3];
       const double mhx = magnetization[4*mask_id + 0]*mm*vec[0];
       const double mhy = magnetization[4*mask_id + 1]*mm*vec[1];
       const double mhz = magnetization[4*mask_id + 2]*mm*vec[2];
       result << mhx + mhy + mhz << "\t";
+      }
    }
 
    return result.str();
