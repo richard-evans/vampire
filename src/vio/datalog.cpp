@@ -78,7 +78,9 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
    ofile << "# " << "  githash    : " << vinfo::githash() << std::endl;
 	ofile << "#----------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
 	//ofile << "# time" << "\t" << "temperature" << "\t" <<  "|m|" << "\t" << "..." << std::endl; // to be concluded...
-    vout::write_out(ofile,file_output_list);
+    if(vout::header_option){
+        vout::write_out(ofile,file_output_list);
+    }
 	return;
 
 }
@@ -260,7 +262,11 @@ namespace vout{
     }
 
     void write_out(std::ostream& stream,std::vector<unsigned int>& list){
-        static bool header =true;
+        static bool header = true;
+        // if header is false then header_option is never checked.
+        if(header && !vout::header_option){
+          header = false;
+        };
 		// Output data to output
 		if(vmpi::my_rank==0){
 

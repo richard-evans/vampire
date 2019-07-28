@@ -103,7 +103,7 @@ namespace vout{
    extern bool custom_precision; // enable user selectable precision for data output
    extern unsigned int precision; // variable to control output precision (digits)
    extern bool fixed; // fixed precision output
-
+   extern bool header_option; // column headers
 	extern std::vector<unsigned int> file_output_list;
 	extern std::vector<unsigned int> screen_output_list;
 	extern std::vector<unsigned int> grain_output_list;
