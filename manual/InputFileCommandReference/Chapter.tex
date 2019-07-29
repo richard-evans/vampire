@@ -206,6 +206,7 @@ Declares the solver to be used for the dipole calculation. Available options are
 \begin{itemize}
   \item[] macrocell
   \item[] tensor
+  \item[] atomistic
 \end{itemize}
 
 \section*{Simulation Control}
@@ -243,7 +244,7 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 {\zicf sim:program = temperature-pulse}\addcontentsline{toc}{subsubsection}{temperature-pulse}\\
 
 {\zicf sim:program = cmc-anisotropy}\addcontentsline{toc}{subsubsection}{cmc-anisotropy}\\
-
+   Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques. 
 %    Hybrid-CMC \\
 %    Reverse-Hybrid-CMC x
 %    LaGrange-Multiplier x
@@ -262,8 +263,10 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
    Number of timesteps between recalculation of the demag field. Default value is suitable for slow calculations, fast dynamics will generally require much faster update rates.\\
 
 {\zicf sim:time-step}\addcontentsline{toc}{subsection}{sim:time-step}\\
+   The timestep for the evolution of the system, determines how long a simulation will take.\\
 
 {\zicf sim:total-time-steps}\addcontentsline{toc}{subsection}{sim:total-time-steps}\\
+   The total number of time steps the program will run for.\\
 
 {\zicf sim:loop-time-steps}\addcontentsline{toc}{subsection}{sim:loop-time-steps}\\
 The number of time steps that statistics are taken over, including the \textit{mean-magnetisation} and \textit{material-standard-deviation}. This takes place after sim:equilibration time steps have passed in simulations such as \textit{program:curie-temperature}.\\
@@ -271,30 +274,39 @@ The number of time steps that statistics are taken over, including the \textit{m
 {\zicf sim:time-steps-increment}\addcontentsline{toc}{subsection}{sim:time-steps-increment}\\
 
 {\zicf sim:equilibration-time-steps}\addcontentsline{toc}{subsection}{sim:equilibration-time-steps}\\
-
+   The number of simulation time steps that the system is allowed to equilibrate for at each temperature. Statistics are not taken over this range.\\
 {\zicf sim:simulation-cycles}\addcontentsline{toc}{subsection}{sim:simulation-cycles}\\
 
 {\zicf sim:maximum-temperature}\addcontentsline{toc}{subsection}{sim:maximum-temperature}\\
+   The maximum temperature in a simulation over a temperature series, such as \textit{sim:program = curie-temperature}.\\
 
 {\zicf sim:minimum-temperature}\addcontentsline{toc}{subsection}{sim:minimum-temperature}\\
+   The minimum temperature in a simulation over a temperature series, such as \textit{sim:program = curie-temperature}.\\
 
 {\zicf sim:equilibration-temperature}\addcontentsline{toc}{subsection}{sim:equilibration-temperature}\\
-
+   The temperature at which a simulation equilibrates, for example, prior to the temperature pulse in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:temperature}\addcontentsline{toc}{subsection}{sim:temperature}\\
+   The temperature of the simulation. 
 
 {\zicf sim:temperature-increment}\addcontentsline{toc}{subsection}{sim:temperature-increment}\\
+   The temperature step size in a simulation over a temperature series, such as \textit{sim:program = curie-temperature}.\\
 
 {\zicf sim:cooling-time}\addcontentsline{toc}{subsection}{sim:cooling-time}\\
 
 {\zicf sim:laser-pulse-temporal-profile}\addcontentsline{toc}{subsection}{sim:laser-pulse-temporal-profile}
-    square
-    two-temperature
-    double-pulse-two-temperature
-    double-pulse-square\\
+   The shape of the laser temperature pulse in time, used in \textit{sim:program = temperature-pulse}.\\
+  \begin{itemize}
+    \item[] square
+    \item[] two-temperature
+    \item[] double-pulse-two-temperature
+    \item[] double-pulse-square\\
+  \end{itemize}
 
 {\zicf sim:laser-pulse-time}\addcontentsline{toc}{subsection}{sim:laser-pulse-time}\\
+   The length of the laser temperature pulse in time, used in \textit{sim:program = temperature-pulse}.\\
 
 {\zicf sim:laser-pulse-power}\addcontentsline{toc}{subsection}{sim:laser-pulse-power}\\
+   The fluence of the laser temperature pulse, used in \textit{sim:program = temperature-pulse}.\\
 
 {\zicf sim:second-laser-pulse-time}\addcontentsline{toc}{subsection}{sim:second-laser-pulse-time}\\
 
@@ -307,26 +319,29 @@ The number of time steps that statistics are taken over, including the \textit{m
 {\zicf sim:two-temperature-heat-sink-coupling}\addcontentsline{toc}{subsection}{sim:two-temperature-heat-sink-coupling}\\
 
 {\zicf sim:two-temperature-electron-heat-capacity}\addcontentsline{toc}{subsection}{sim:two-temperature-electron-heat-capacity}\\
-
+   The heat capacity of the electrons in the system, used in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:two-temperature-phonon-heat-capacity}\addcontentsline{toc}{subsection}{sim:two-temperature-phonon-heat-capacity}\\
-
+   The heat capacity of the phonons in the system, used in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:two-temperature-electron-phonon-coupling}\addcontentsline{toc}{subsection}{sim:two-temperature-electron-phonon-coupling}\\
-
+   Dictates the heat exchange coupling between the electrons and the phonons in the system, used in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:cooling-function}\addcontentsline{toc}{subsection}{sim:cooling-function}
-    exponential
-    gaussian
-    double-gaussian
-    linear\\
-
+   Dictates the shape of the cooling curve in \textit{sim:program = field-cool} simulations. Choose from:
+\begin{itemize}
+    \item[] exponential
+    \item[] gaussian
+    \item[] double-gaussian
+    \item[] linear\\
+\end{itemize}
 {\zicf sim:applied-field-strength}\addcontentsline{toc}{subsection}{sim:applied-field-strength}\\
+   The strength of the applied external field acting on the system.\\
 
 %{\zicf   minimum-applied-field-strength x
 {\zicf  sim:maximum-applied-field-strength}\addcontentsline{toc}{subsection}{sim:maximum-applied-field-strength}\\
-
+   The maximum strength of the applied external field acting on the system, in a magnetisation field series simulation such as \textit{sim:program = hysteresis-loop}. In this simulation, this maximum is the maximum magnitude, and dictates both the maximum and minimum ($\pm$) magnetisation in the target direction.\\
 {\zicf sim:equilibration-applied-field-strength}\addcontentsline{toc}{subsection}{sim:equilibration-applied-field-strength}\\
-
+   The strength of the applied external field the system equilibrates in, in a magnetisation field series simulation such as \textit{sim:program = hysteresis-loop}.\\
 {\zicf sim:applied-field-strength-increment}\addcontentsline{toc}{subsection}{sim:applied-field-strength-increment}\\
-
+   The increment in the strength of the applied external field acting on the system, in a magnetisation field series simulation such as \textit{sim:program = hysteresis-loop}.\\
 {\zicf sim:applied-field-angle-theta}\addcontentsline{toc}{subsection}{sim:applied-field-angle-theta}\\
 
 {\zicf sim:applied-field-angle-phi}\addcontentsline{toc}{subsection}{sim:applied-field-angle-phi}\\
@@ -359,23 +374,23 @@ $ is the demagnetisation factor of the macroscopic sample. The components of the
 {\zicf sim:constraint-rotation-update}\addcontentsline{toc}{subsection}{sim:constraint-rotation-update}\\
 
 {\zicf sim:constraint-angle-theta = float (default 0)}\addcontentsline{toc}{subsection}{sim:constraint-angle-theta}
-    When a constrained integrator is used in a normal program, this variable controls the angle of the magnetisation of the. Whole system from the x-axis [degrees]. In constrained simulations (such as c,c anisotropy) this has no effect.\\
+    When a constrained integrator is used in a normal program, this variable controls the angle of the magnetisation of the whole system from the x-axis [degrees]. In constrained simulations (such as cmc anisotropy) this has no effect.\\
 
 {\zicf  sim:constraint-angle-theta-minimum float (default 0)}\addcontentsline{toc}{subsection}{sim:constraint-angle-theta-minimum}\\
-
+    The minimum angle of theta that the global magnetisation is constrained to in a constrained angle series, used in \textit{sim:program = cmc-anisotropy}.\\
 {\zicf  sim:constraint-angle-theta-maximum}\addcontentsline{toc}{subsection}{sim:constraint-angle-theta-maximum}\\
-
+    The maximum angle of theta that the global magnetisation is constrained to in a constrained angle series, used in \textit{sim:program = cmc-anisotropy}.\\
 {\zicf  sim:constraint-angle-theta-increment = float 0.001-360 (default 5)}\addcontentsline{toc}{subsection}{sim:constraint-angle-theta-increment}
-    Incremental Change of angle of m from z-direction in constrained simulations. Controls the resolution of \\
+    Incremental Change of the angle of global magnetisation from z-direction in constrained simulations. Controls the resolution of the angular sweep.\\
 
 {\zicf sim:constraint-angle-phi}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi}\\
-
+    When a constrained integrator is used in a normal program, this variable controls the angle of the magnetisation of the whole system from the x-axis [degrees]. In constrained simulations (such as cmc anisotropy) this has no effect.\\
 {\zicf sim:constraint-angle-phi-minimum}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-minimum}\\
-
+    The minimum angle of phi that the global magnetisation is constrained to in a constrained angle series, used in \textit{sim:program = cmc-anisotropy}.\\
 {\zicf sim:constraint-angle-phi-maximum}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-maximum}\\
-
+    The maximum angle of phi that the global magnetisation is constrained to in a constrained angle series, used in \textit{sim:program = cmc-anisotropy}.\\
 {\zicf sim:constraint-angle-phi-increment}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-increment}\\
-
+    Incremental Change of the angle of global magnetisation from z-direction in constrained simulations. Controls the resolution of the angular sweep.\\
 {\zicf sim:monte-carlo-algorithm}\addcontentsline{toc}{subsection}{sim:monte-carlo-algorithm} selects the trial move algorithm for use with the Monte Carlo solver. The following options are available:
 \begin{itemize}
   \item[] adaptive (default)
@@ -414,7 +429,8 @@ The adaptive move performs a gaussian move with a tuned trial width to attempt t
 The following commands control what data is output to the \textit{output} file.
 The order in which they appear is the order in which they appear in the \textit{output} file.
 Most options output a single column of data, but some output multiple columns, particularly
-vector data or parameters related to materials, where one column per material is output.\\
+vector data or parameters related to materials, where one column per material is output. Note 
+that this means that for vector data, one set of columns per material is output.\\
 
 {\zicf output:time-steps}\addcontentsline{toc}{subsection}{output:time-steps} outputs
 the number of time steps (or Monte Carlo steps) completed during the simulation so far.\\
