@@ -66,6 +66,8 @@ namespace dipole{
 
          // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
          if( (rij_1)/cells_macro_cell_size > dipole::cutoff){
+            //if (i ==0)   std::cout << j << '\t'<< rij_1 << '\t' << "macrocell" <<std::endl;
+
             // define unitarian distance vectors
 	         const double ex = rx*rij;
 	         const double ey = ry*rij;
@@ -88,19 +90,20 @@ namespace dipole{
          // If distance between macro-cells < cutoff ==> apply inter-intra method
          //--------------------------------------------------------------------------
          else if( (1.0/rij)/cells_macro_cell_size <= dipole::cutoff){
-
+      //if (i ==0)   std::cout << j << '\t'<< rij_1 << '\t' << "tensor" << "\t" << cells_num_atoms_in_cell[i] << '\t' << cells_num_atoms_in_cell[j] << std::endl;
             for(int pi=0; pi<cells_num_atoms_in_cell[i]; pi++){
 
                const double cix = cells_atom_in_cell_coords_array_x[i][pi];
                const double ciy = cells_atom_in_cell_coords_array_y[i][pi];
                const double ciz = cells_atom_in_cell_coords_array_z[i][pi];
 
+
+
                for(int qj=0; qj<cells_num_atoms_in_cell[j]; qj++){
 
                   const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix;
                   const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy;
                   const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz;
-
                   rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);  //Reciprocal of the distance
 
                   const double ex = rx*rij;
@@ -127,7 +130,7 @@ namespace dipole{
             dipole::internal::rij_tensor_yy[lc][j] =  (tmp_rij_inter_yy);
             dipole::internal::rij_tensor_yz[lc][j] =  (tmp_rij_inter_yz);
             dipole::internal::rij_tensor_zz[lc][j] =  (tmp_rij_inter_zz);
-
+            //if (i == 0) std::cout << "atom" <<  '\t' << i <<'\t' << j << "\t" << dipole::internal::rij_tensor_xx[lc][j] << "\t" << dipole::internal::rij_tensor_xy[lc][j] << '\t' <<dipole::internal::rij_tensor_xz[lc][j] << std::endl;
             // // Uncomment in case you want to print the tensor components
             // std::cout << "\n############# INTER ###################\n";
             // std::cout << "lc = " << lc << "\tj = " << j << "\tNat_i\t" << cells_num_atoms_in_cell[i] << "\tNat_j\t" << cells_num_atoms_in_cell[j] << std::endl;

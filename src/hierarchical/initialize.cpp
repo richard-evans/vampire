@@ -55,15 +55,14 @@ namespace hierarchical{
       vutil::vtimer_t timer;
 
 
-      //   start timer
-      //  timer.start();
+      //  start timer
+       timer.start();
 
    //   std::cout << dipole::cutoff*cells::macro_cell_size <<std::endl;
         //caclualte the number of levels necessary for the calculation
         int largest_dimension = largest(system_dimensions_x, system_dimensions_y,system_dimensions_z);
-        ha::num_levels = ceil(std::log(2*largest_dimension/(dipole::cutoff*cells::macro_cell_size))/std::log(2.0));
+        ha::num_levels = ceil(std::log(2*largest_dimension/(dipole::cutoff*2*cells::macro_cell_size))/std::log(2.0));
 
-        //std::cout << ha::num_levels << std::endl;
 
         ha::cells_level_start_index.resize(ha::num_levels,0.0);
         ha::cells_level_end_index.resize(ha::num_levels,0.0);
@@ -93,8 +92,6 @@ namespace hierarchical{
        cells_pos_and_mom_array.resize(cells::num_cells*4);
 
 
-      //    std::cout <<cells_num_cells << '\t' << cells_num_local_cells << "\t" <<  cells_atom_in_cell_coords_array_x.size() << '\t' << cells_index_atoms_array.size() << "\t" << cells_pos_and_mom_array.size()/4. << '\t' << cells_num_atoms_in_cell.size() << "\t" << cells_local_cell_array.size() << '\t' << std::endl;
-
 
 
           for(int i=0; i<cells_num_cells; i++){
@@ -121,12 +118,12 @@ namespace hierarchical{
           for (int lc = 0; lc < cells_num_local_cells; lc ++){
              cells_local_cell_array[lc] = cells::local_cell_array[lc];
           }
-      //    timer.stop();
-      //    std::cout << "\t1 [ " << timer.elapsed_time() << " s ]" << std::endl;
-      //    zlog << zTs() <<  "\tDIPOLE UPDATE1. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
-//
+         timer.stop();
+         std::cout << "\t1 [ " << timer.elapsed_time() << " s ]" << std::endl;
+         zlog << zTs() <<  "\tDIPOLE UPDATE1. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
-      //          timer.start();
+
+                timer.start();
 
                 #ifdef MPICF
 
@@ -188,11 +185,13 @@ namespace hierarchical{
                                             cells_num_local_cells,
                                             cells_num_cells);
 
+                        //                    std::cout <<"CELLS" <<  cells::num_atoms_in_cell_global.size() <<std::endl;
 
                 //After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
                 for(unsigned int i=0; i<cells::num_atoms_in_cell_global.size(); i++){
                    if(cells::num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
                       cells_num_atoms_in_cell[i] = cells::num_atoms_in_cell_global[i];
+                     // std::cout <<"CELLS" <<  cells_atom_in_cell_coords_array_x.size() <<std::endl;
                    }
                 }
 
@@ -203,12 +202,12 @@ namespace hierarchical{
 
               #endif
 
-         //     timer.stop();
-         //     std::cout << "\t2 [ " << timer.elapsed_time() << " s ]" << std::endl;
-         //     zlog << zTs() <<  "\tDIPOLE UPDATE2. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+             timer.stop();
+             std::cout << "\t2 [ " << timer.elapsed_time() << " s ]" << std::endl;
+             zlog << zTs() <<  "\tDIPOLE UPDATE2. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
-         //    timer.start();
+            timer.start();
 
               int index = 0;
 
@@ -216,9 +215,8 @@ namespace hierarchical{
               for (int level = 0; level < ha::num_levels; level ++){
 
                  double cell_size = pow(2,level)*cells::macro_cell_size;
-
-                 ha::interaction_range[level] = cell_size*2*dipole::cutoff;
-               //  std::cout << level << '\t' << cell_size << '\t' << ha::interaction_range[level] <<std::endl;
+                 ha::interaction_range[level] = cells::macro_cell_size*level*dipole::cutoff + dipole::cutoff;
+                 if (level == ha::num_levels - 1 ) ha::interaction_range[level] = cell_size*dipole::cutoff*10000;
                  // Calculate number of microcells
                  // determine number of cells in x and y (global)
                  int ncx = static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cell_size));
@@ -226,13 +224,12 @@ namespace hierarchical{
                  int ncz = static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cell_size));
 
                  int temp_num_cells = ncx*ncy*ncz;
-
+               //  std::cout << level << temp_num_cells << '\t' << index << std::endl;
                  //set the start and end index for the level
                  ha::cells_level_start_index[level] = index;
-                 index = index + temp_num_cells;
-                 ha::cells_level_end_index[level] = index;
-                 //std::cout << "l:\t" << index << "\t ha:\t" >>
-                // std::cout << ha::cells_level_start_index[level] << '\t' << ha::cells_level_end_index[level] << '\t' << temp_num_cells << "\t" << cells_num_cells << "\t" << ncx << '\t' << ncy << '\t' << ncz << std::endl;
+                index = index + temp_num_cells;
+                ha::cells_level_end_index[level] = index;
+                // std::cout << "l:\t" << level << '\t' <<  << "\t ha:\t" >> ha::cells_level_start_index[level] << '\t' << ha::cells_level_end_index[level] << '\t' << temp_num_cells << "\t" << cells_num_cells << "\t" << ncx << '\t' << ncy << '\t' << ncz << std::endl;
                  double size_x,size_y,size_z;
                  double x,y,z;
                  for(int i=0;i<ncx;++i){
@@ -248,13 +245,24 @@ namespace hierarchical{
                          if (k < ncz -1) size_z = cell_size;
                          else            size_z = system_dimensions_z - (ncz-1)*cell_size;
                          z = k*cell_size + size_z/2.0;
-
-                         ha::cell_positions.push_back(x);
-                         ha::cell_positions.push_back(y);
-                         ha::cell_positions.push_back(z);
-                         ha::cell_dimensions.push_back(size_x);
-                         ha::cell_dimensions.push_back(size_y);
-                         ha::cell_dimensions.push_back(size_z);
+                     //    if (level == 0) {
+                            ha::cell_positions.push_back(x);
+                            ha::cell_positions.push_back(y);
+                            ha::cell_positions.push_back(z);
+                            ha::cell_dimensions.push_back(size_x);
+                            ha::cell_dimensions.push_back(size_y);
+                            ha::cell_dimensions.push_back(size_z);
+                        //    index++;
+                        //    ha::cells_level_end_index[level] = index;
+                        // }
+                        // else if (size_x != 0 && size_y != 0 && size_z != 0) {
+                        //    ha::cell_positions.push_back(x);
+                        //    ha::cell_positions.push_back(y);
+                        //    ha::cell_positions.push_back(z);
+                        //    ha::cell_dimensions.push_back(size_x);
+                        //    ha::cell_dimensions.push_back(size_y);
+                        //    ha::cell_dimensions.push_back(size_z);
+                        // }
                        }
                     }
                   }
@@ -262,22 +270,24 @@ namespace hierarchical{
                 ha::total_num_cells = index;
                 int index2 = 0;
 
-             //    std::cout << "total\t" << ha::total_num_cells <<std::endl;
-             //    std::cout << ha::cells_level_start_index[0] << '\t'  << ha::cells_level_end_index[0] << std::endl;
+
+
+         //   std::cout << "total\t" << ha::total_num_cells <<std::endl;
+            //  std::cout << ha::cells_level_start_index[0] << '\t'  << ha::cells_level_end_index[0] << std::endl;
 
                 ha::cells_in_cells_start_index.resize(ha::total_num_cells,0.0);
                 ha::cells_in_cells_end_index.resize(ha::total_num_cells,0.0);
                 ha::cell_positions_mom.resize(ha::total_num_cells*4,0.0);
-            //    std::cout << ha::total_num_cells << '\t' << cells_num_cells << std::endl;
-            //    timer.stop();
-            //    std::cout << "\t3 [ " << timer.elapsed_time() << " s ]" << std::endl;
-            ////    zlog << zTs() <<  "\tDIPOLE UPDATE3. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+            //   std::cout <<"total:\t" <<  ha::total_num_cells << '\t' << " zero:" << '\t' << cells_num_cells << std::endl;
+               timer.stop();
+               std::cout << "\t3 [ " << timer.elapsed_time() << " s ]" << std::endl;
+               zlog << zTs() <<  "\tDIPOLE UPDATE3. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
-            //    std::cout << "A" << '\t' << ha::num_levels << '\t' << ha::cells_level_end_index[0] << '\t' << ha::cells_level_start_index[0] << '\t' << ha::total_num_cells << '\t' << std::endl;
-            //   timer.start();
+            //   std::cout << "A" << '\t' << ha::num_levels << '\t' << ha::cells_level_end_index[0] << '\t' << ha::cells_level_start_index[0] << '\t' << ha::total_num_cells << '\t' << std::endl;
+              timer.start();
 
-
+              std::vector <int > cells_help(ha::total_num_cells, 0);
 
                  for (int level = 1; level < ha::num_levels; level ++){
 
@@ -289,6 +299,7 @@ namespace hierarchical{
 
                   for (int cell_l = start_level; cell_l < end_level; cell_l++){
                     ha::cells_in_cells_start_index[cell_l] = index2;
+                  //  std::cout << ha::cells_in_cells_start_index[cell_l] <<std::endl;
                     double x = ha::cell_positions[cell_l*3 + 0];
                     double y = ha::cell_positions[cell_l*3 + 1];
                     double z = ha::cell_positions[cell_l*3 + 2];
@@ -305,28 +316,39 @@ namespace hierarchical{
                     double max_z = z + size_z/2.0;
 
                      for (int cell_sl = start_sublevel; cell_sl < end_sublevel; cell_sl++){
+
                       double sc_x = ha::cell_positions[cell_sl*3 + 0];
                       double sc_y = ha::cell_positions[cell_sl*3 + 1];
                       double sc_z = ha::cell_positions[cell_sl*3 + 2];
 
-                      if ((sc_x >= min_x) && (sc_x < max_x) && (sc_y >= min_y) && (sc_y < max_y) && (sc_z >= min_z) && (sc_z < max_z)){
-
+                      if ((sc_x >= min_x) && (sc_x <= max_x) && (sc_y >= min_y) && (sc_y <= max_y) && (sc_z >= min_z) && (sc_z <= max_z)){
+                       //std::cout << "A" << index2 << '\t' << ha::cells_in_cells.size() <<std::endl;
                        ha::cells_in_cells.push_back(cell_sl);
-                   //    std::cout << cell_l << '\t' << "pushback" << "\t" << cell_sl << std::endl;
-                      ha::cells_in_cells_end_index[cell_l] = index2;
-                                  index2 = index2 +1;
+                       index2 ++;
+                       ha::cells_in_cells_end_index[cell_l] = index2;
+
+                       //cells_help[cell_sl] ++;
+                       if (level == 1 ){
+                  //     std::cout << "cell\t" << cell_l << "\t" << ha::cell_positions[cell_l*3 + 0] << "\t" << ha::cell_positions[cell_l*3 + 1] << "\t" << ha::cell_positions[cell_l*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_l*3 + 0] << "\t" <<ha::cell_dimensions[cell_l*3 + 1] <<"\t" <<ha::cell_dimensions[cell_l*3 + 2] << std::endl;
+
+
+               //           std::cout  <<"subcell" << '\t' <<  index2 << '\t' << ha::cells_in_cells_start_index[cell_l] << '\t' <<ha::cells_in_cells_end_index[cell_l] << '\t' << cell_sl <<  "\t" << ha::cell_positions[cell_sl*3 + 0] << "\t" << ha::cell_positions[cell_sl*3 + 1] << "\t" << ha::cell_positions[cell_sl*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_sl*3 + 0] << "\t" <<ha::cell_dimensions[cell_sl*3 + 1] <<"\t" <<ha::cell_dimensions[cell_sl*3 + 2] << std::endl;
+                         //std::cout << cell_l << "\t" << ha::cell_positions[cell_l*3 + 0] << "\t" << ha::cell_positions[cell_l*3 + 1] << "\t" << ha::cell_positions[cell_l*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_l*3 + 0] << "\t" <<ha::cell_dimensions[cell_l*3 + 1] <<"\t" <<ha::cell_dimensions[cell_l*3 + 2] << std::endl;
+               }
+
                       }
+
                      }
-                  //           std::cout <<level << '\t' <<  cell_l << '\t' << ha::cells_in_cells.size() << "\t" <<ha::cells_in_cells_end_index[cell_l] << '\t' <<  ha::cells_in_cells_start_index[cell_l]<< "\t" << "N_cells in cell\t" << ha::cells_in_cells_end_index[cell_l] - ha::cells_in_cells_start_index[cell_l] <<  std::endl;
                   }
                 }
 
-            //    timer.stop();
-            //    std::cout << "\t4 [ " << timer.elapsed_time() << " s ]" << std::endl;
-            //    zlog << zTs() <<  "\tDIPOLE UPDATE4. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+
+               timer.stop();
+               std::cout << "\t4 [ " << timer.elapsed_time() << " s ]" << std::endl;
+               zlog << zTs() <<  "\tDIPOLE UPDATE4. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
-            //   timer.start();
+              timer.start();
 
 
                 ha::num_zero_level_cells = ha::cells_level_end_index[0];
@@ -338,38 +360,40 @@ namespace hierarchical{
                 ha::mag_array_y.resize(ha::total_num_cells,0);
                 ha::mag_array_z.resize(ha::total_num_cells,0);
 
+               if (ha::num_zero_level_cells != cells_num_cells) std::cout << "ERROR ZERO CELLS != NUM CELLS" << std::endl;
                 int n_cells = 0;
-                //std::cout << ha::num_zero_level_cells << '\t' << cells_num_cells << '\t' << ha::cell_positions_mom.size()/4. << '\t' << cells_pos_and_mom_array.size()/4. << ha::num_atoms_in_cell.size() << '\t' << cells_num_atoms_in_cell.size() <<std::endl;
+            //    std::cout << ha::num_zero_level_cells << '\t' << cells_num_cells << '\t' << ha::cell_positions_mom.size()/4. << '\t' << cells_pos_and_mom_array.size()/4. <<"\t" <<  ha::num_atoms_in_cell.size() << '\t' << cells_num_atoms_in_cell.size() <<std::endl;
                 for (int cell = 0; cell < cells_num_cells; cell ++){
 
                    ha::cell_positions_mom[4*cell+0] = cells_pos_and_mom_array[4*cell+0];
                    ha::cell_positions_mom[4*cell+1] = cells_pos_and_mom_array[4*cell+1];
                    ha::cell_positions_mom[4*cell+2] = cells_pos_and_mom_array[4*cell+2];
                    ha::cell_positions_mom[4*cell+3] = cells_pos_and_mom_array[4*cell+3];
+               //    std::cout << ha::cell_positions_mom[4*cell+2] << '\t' << ha::cell_positions[3*cell+2] << std::endl;
                    ha::num_atoms_in_cell[cell] = cells_num_atoms_in_cell[cell];
                    //std::cout << ha::num_atoms_in_cell[cell] <<std::endl;
                    n_cells = n_cells+ ha::num_atoms_in_cell[cell];
                 }
 
-            //    timer.stop();
-            //    std::cout << "\t5 [ " << timer.elapsed_time() << " s ]" << std::endl;
-            //    zlog << zTs() <<  "\tDIPOLE UPDATE5. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+               timer.stop();
+               std::cout << "\t5 [ " << timer.elapsed_time() << " s ]" << std::endl;
+               zlog << zTs() <<  "\tDIPOLE UPDATE5. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
-               timer.start();
+              timer.start();
 
                 for (int level = 1; level < ha::num_levels; level ++ ){
                 n_cells = 0;
                   int start = ha::cells_level_start_index[level];
                   int end   = ha::cells_level_end_index[level];
-                  //std::cout << "A" << level << '\t' << start << "\t" << end <<std::endl;
+               //   std::cout << "A" << level << '\t' << start << "\t" << end <<std::endl;
                    for (int cell = start; cell < end; cell++){
-
                       int start_cell_in_cell = ha::cells_in_cells_start_index[cell];
-                      ha::cells_in_cells_end_index[cell] = ha::cells_in_cells_end_index[cell] +1;
                       int end_cell_in_cell = ha::cells_in_cells_end_index[cell];
-                      for (int cell_in_cell = start_cell_in_cell; cell_in_cell < end_cell_in_cell; cell_in_cell++){
-
+                      int N_cells = end_cell_in_cell - start_cell_in_cell;
+                      for (int interaction = start_cell_in_cell; interaction < end_cell_in_cell; interaction ++ ){
+                       int cell_in_cell = ha::cells_in_cells[interaction];
+                        // std::cout << "B" << level << '\t' << cell << '\t' << cell_in_cell << "\t" << ha::cell_positions[cell*3 + 2] <<  "\t" <<ha::cell_dimensions[cell*3 + 2] << "\t" << ha::cell_positions[cell_in_cell*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_in_cell*3 + 2] << "\t" << start_cell_in_cell << '\t' << end_cell_in_cell <<std::endl;
                          ha::cell_positions_mom[4*cell+0] += ha::cell_positions_mom[4*cell_in_cell+0];
                          ha::cell_positions_mom[4*cell+1] += ha::cell_positions_mom[4*cell_in_cell+1];
                          ha::cell_positions_mom[4*cell+2] += ha::cell_positions_mom[4*cell_in_cell+2];
@@ -377,41 +401,44 @@ namespace hierarchical{
                          ha::num_atoms_in_cell[cell] += ha::num_atoms_in_cell[cell_in_cell];
 
                       }
+                      ha::cell_positions_mom[4*cell+0] = ha::cell_positions_mom[4*cell+0]/N_cells;
+                      ha::cell_positions_mom[4*cell+1] = ha::cell_positions_mom[4*cell+1]/N_cells;
+                      ha::cell_positions_mom[4*cell+2] = ha::cell_positions_mom[4*cell+2]/N_cells;
+                      ha::cell_positions_mom[4*cell+3] = ha::cell_positions_mom[4*cell+3]/N_cells;
+                     // std::cout << ha::cell_positions_mom[4*cell+0] << '\t' << ha::cell_positions[3*cell+0] << "\t" << N_cells <<  std::endl;
+
                       n_cells = n_cells + ha::num_atoms_in_cell[cell];
                    }
                  }
 
-            //     timer.stop();
-            //     std::cout << "\t6 [ " << timer.elapsed_time() << " s ]" << std::endl;
-            //     zlog << zTs() <<  "\tDIPOLE UPDATE6. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+                timer.stop();
+                std::cout << "\t6 [ " << timer.elapsed_time() << " s ]" << std::endl;
+                zlog << zTs() <<  "\tDIPOLE UPDATE6. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
-            //   timer.start();
+              timer.start();
 
 
                  std::vector < std::vector < double> >corners;
                  corners.resize(8);
+
+
                  for (int i = 0; i < 8; ++i) corners[i].resize(3,0.0);
 
                  int interaction_num = 0;
                  for (int lc = 0; lc < cells_num_local_cells; lc ++){
-                   // if (ha::num_atoms_in_cell[cell_i] > 0){
-                   //    std::cout <<cell_i << '\t' << interaction_num << std::endl;
+
                      std::vector < bool > interacted(ha::total_num_cells,false);
                        ha::interaction_list_start_index[lc] = interaction_num;
                        int cell_i = cells::cell_id_array[lc];
                        double xi = ha::cell_positions[cell_i*3 + 0];
                        double yi = ha::cell_positions[cell_i*3 + 1];
                        double zi = ha::cell_positions[cell_i*3 + 2];
-
-
                        for (int level = ha::num_levels - 1; level > -1; level -- ){
 
                           int start = ha::cells_level_start_index[level];
                           int end   = ha::cells_level_end_index[level];
-                          //std::cout << "cell:\t" << cell_i << "\tlevel:\t" <<  level << "\tN:\t" << end-start << std::endl;
-                          for (int cell_j = start; cell_j < end; cell_j++){
-                     //   if (cell_i == 0)     std::cout << "cell:\t" << cell_i << "\tlevel:\t" <<  level << "\tN:\t" << cell_j << "\t"  <<  interacted[cell_j] << "\t" << ha::interaction_list_end_index[lc] << '\t' << ha::interaction_list_start_index[lc] << std::endl;
+                           for (int cell_j = start; cell_j < end; cell_j++){
 
                              if (interacted[cell_j] == false && level != 0){
 
@@ -432,55 +459,55 @@ namespace hierarchical{
                                   double dz_2 = (zi - corners[corner][2])*(zi-corners[corner][2]);
 
                                   double r = sqrt(dx_2 + dy_2 + dz_2);
-                                  //   std::cout << cell_i << '\t' << cell_j << "\t" << corner << '\t' << r << '\t' << interaction_range[level] <<std::endl;
-                                 //         if (cell_i == 0)      std::cout << r << '\t' <<  ha::interaction_range[level] <<std::endl;
                                   if (r > ha::interaction_range[level]) is_corner_outside_range ++;
                                }
-                            //   std::cout << is_corner_outside_range <<std::endl;
+
                                if (is_corner_outside_range == 8){
                                   interaction_num ++;
                                   ha::interaction_list_end_index[lc] = interaction_num;
                                   interacted[cell_j] = true;
                                   int start_cell_in_cell = ha::cells_in_cells_start_index[cell_j];
                                   int end_cell_in_cell = ha::cells_in_cells_end_index[cell_j];
-                                  ha::interaction_list.push_back(lc);
+                                  ha::interaction_list.push_back(cell_j);
+
+                                  //if (cell_i == 0 ha::cell_positions[cell_j*3 + 0]  == 115)  std::cout <<"interacted" << std::endl;//std::cout << cell_j <<  "\t" << ha::cell_positions[cell_j*3 + 0] << "\t" << ha::cell_positions[cell_j*3 + 1] << "\t" << ha::cell_positions[cell_j*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_j*3 + 0] << "\t" <<ha::cell_dimensions[cell_j*3 + 1] <<"\t" <<ha::cell_dimensions[cell_j*3 + 2] << std::endl;
                                   ha::interaction_list_end_index[lc] = interaction_num;
-                              //            if (cell_i == 0)      std::cout << "interacted" << std::endl;
-                            //      std::cout << end_cell_in_cell -start_cell_in_cell <<std::endl;
-                                  for (int sub_cell = start_cell_in_cell; sub_cell < end_cell_in_cell; sub_cell ++ ){
+                                 // if (cell_i == 0) std::cout << "CELL POSITION\t" << start_cell_in_cell << '\t' << end_cell_in_cell << '\t' << cell_j << '\t' << ha::cell_positions[cell_j*3 + 0] << "\t" << ha::cell_positions[cell_j*3 + 1] << "\t" << ha::cell_positions[cell_j*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_j*3 + 0] << "\t" <<ha::cell_dimensions[cell_j*3 + 1] <<"\t" <<ha::cell_dimensions[cell_j*3 + 2] << std::endl;
+                                  for (int interaction = start_cell_in_cell; interaction < end_cell_in_cell; interaction ++ ){
+                                    int sub_cell = ha::cells_in_cells[interaction];
                                      interacted[sub_cell] = true;
-                                 //         if (cell_i == 0)    std::cout << sub_cell << std::endl;
+                                 //    if (cell_i == 0)     std::cout << "SUBCELL POSITION\t" << sub_cell <<  "\t" << ha::cell_positions[sub_cell*3 + 0] << "\t" << ha::cell_positions[sub_cell*3 + 1] << "\t" << ha::cell_positions[sub_cell*3 + 2] <<  "\t" <<ha::cell_dimensions[sub_cell*3 + 0] << "\t" <<ha::cell_dimensions[sub_cell*3 + 1] <<"\t" <<ha::cell_dimensions[sub_cell*3 + 2] << std::endl;
                                   }
                                }
+                              //if (cell_i == 0)  std::cout << '\t' << std::endl;
                             }
                             else if (level != 0){
                                int start_cell_in_cell = ha::cells_in_cells_start_index[cell_j];
                                int end_cell_in_cell = ha::cells_in_cells_end_index[cell_j];
 
-                               for (int sub_cell = start_cell_in_cell; sub_cell < end_cell_in_cell; sub_cell ++ ){
+                               for (int interaction = start_cell_in_cell; interaction < end_cell_in_cell; interaction ++ ){
+                                 int sub_cell = ha::cells_in_cells[interaction];
                                   interacted[sub_cell] = true;
                                }
                             }
                             else if (level == 0 && interacted[cell_j] == false){
                                ha::interaction_list.push_back(cell_j);
                                interaction_num ++;
-                     //                  if (cell_i == 0)      std::cout << "interacted" << std::endl;
                                ha::interaction_list_end_index[lc] = interaction_num;
                             }
                          }
-                         //std::cout << "SS\t" <<  cell_i << "\t" <<  ha::interaction_list_start_index[cell_i] << '\t' << ha::interaction_list_end_index[cell_i] << '\t' << ha::interaction_list_end_index[cell_i] -ha::interaction_list_start_index[cell_i] << std::endl;
 
                       }
-                //   }
+
                 }
 
-            //    timer.stop();
-            //    std::cout << "\t7 [ " << timer.elapsed_time() << " s ]" << std::endl;
-            //    zlog << zTs() <<  "\tDIPOLE UPDATE7. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+               timer.stop();
+               std::cout << "\t7 [ " << timer.elapsed_time() << " s ]" << std::endl;
+               zlog << zTs() <<  "\tDIPOLE UPDATE7. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
-            //   timer.start();
-              // std::cout << interaction_num << "\t" << cells_num_local_cells << '\t' << cells_num_local_cells*cells_num_cells << std::endl;
+              timer.start();
+            //  std::cout << interaction_num << "\t" << cells_num_local_cells << '\t' << cells_num_local_cells*cells_num_cells << std::endl;
 
                 ha::rij_tensor_xx.resize(interaction_num,0.0);
                 ha::rij_tensor_xy.resize(interaction_num,0.0);
@@ -499,14 +526,14 @@ namespace hierarchical{
                 dipole::cells_mu0Hd_field_array_z.resize(cells_num_cells,0.0);
 
 
-            //    timer.stop();
-            //    std::cout << "\t8 [ " << timer.elapsed_time() << " s ]" << std::endl;
-            //    zlog << zTs() <<  "\tDIPOLE UPDATE8. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+               timer.stop();
+               std::cout << "\t8 [ " << timer.elapsed_time() << " s ]" << std::endl;
+               zlog << zTs() <<  "\tDIPOLE UPDATE8. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
-            //    timer.start();
+               timer.start();
 
-
+               //
                 for(int lc=0; lc<cells_num_local_cells; lc++){
                 //   start timer
                    int cell_i = cells::cell_id_array[lc];
@@ -521,9 +548,9 @@ namespace hierarchical{
                       for(int j = start;j<end;j++){
 
                          int cell_j = ha::interaction_list[j];
-                         //if (cell_i == 0 ) std::cout << cell_j <<  "\t" << cells_num_atoms_in_cell[cell_j] << std::endl;
-                         if ( cells_num_atoms_in_cell[cell_j] != 0){
-                           //if ( cells_num_atoms_in_cell[cell_j] == 0 && cell_i == 0) std::cout << "HHHHM" << cell_j <<  "\t" << cells_num_atoms_in_cell[cell_j] << std::endl;
+                        // if (cell_i == 0) std::cout << cell_j <<  "\t" << ha::cell_positions[cell_j*3 + 0] << "\t" << ha::cell_positions[cell_j*3 + 1] << "\t" << ha::cell_positions[cell_j*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_j*3 + 0] << "\t" <<ha::cell_dimensions[cell_j*3 + 1] <<"\t" <<ha::cell_dimensions[cell_j*3 + 2] << std::endl;
+                         if ( cells_num_atoms_in_cell[cell_j] != 0 && cell_j < ha::num_zero_level_cells){
+                        //   if ( cells_num_atoms_in_cell[cell_j] == 0 && cell_i == 0) std::cout << "HHHHM" << cell_j <<  "\t" << cells_num_atoms_in_cell[cell_j] << std::endl;
                             if(cell_i!=cell_j) {
                                ha::calc_inter(cell_i,cell_j,j, cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z);
                             }
@@ -536,18 +563,18 @@ namespace hierarchical{
                             if (ha::rij_tensor_yy[j]*ha::rij_tensor_yy[j] < 1e-15) ha::rij_tensor_yy[j] =0;
                             if (ha::rij_tensor_yz[j]*ha::rij_tensor_yz[j] < 1e-15) ha::rij_tensor_yz[j] =0;
                             if (ha::rij_tensor_zz[j]*ha::rij_tensor_zz[j] < 1e-15) ha::rij_tensor_zz[j] =0;
-                            //std::cout << "A" << '\t' << cell_i << '\t' << cell_j << "\t" << ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
+                           //if (cell_i == 0 ) std::cout << "A" << '\t' << cell_i << '\t' << cell_j << "\t" << ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
 
-                           //std::cout << cells_num_atoms_in_cell[cell_i] << '\t' << cells_num_atoms_in_cell[cell_j] << '\t' <<  cell_i << '\t' << cell_j << "\t" <<  ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
-                         }
+               //             //std::cout << cells_num_atoms_in_cell[cell_i] << '\t' << cells_num_atoms_in_cell[cell_j] << '\t' <<  cell_i << '\t' << cell_j << "\t" <<  ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] <<'\t' << ha::rij_tensor_zz[j] << std::endl;
+                       }
                       }
                    }
                 }
-         //       timer.stop();
-            //    std::cout << "\t9 [ " << timer.elapsed_time() << " s ]" << std::endl;
-            //    zlog << zTs() <<  "\tDIPOLE UPDATE9. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+               timer.stop();
+               std::cout << "\t9 [ " << timer.elapsed_time() << " s ]" << std::endl;
+               zlog << zTs() <<  "\tDIPOLE UPDATE9. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
-
+         //   std::cout << "A" << std::endl;
       return;
 
    }

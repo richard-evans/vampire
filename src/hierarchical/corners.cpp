@@ -51,12 +51,12 @@ namespace hierarchical{
         corners[i].resize(3,0.0);
 
       double min_x = x - cell_size_x/2.0;
-      double min_y = y - cell_size_x/2.0;
-      double min_z = z - cell_size_x/2.0;
+      double min_y = y - cell_size_y/2.0;
+      double min_z = z - cell_size_z/2.0;
 
       double max_x = x + cell_size_x/2.0;
-      double max_y = y + cell_size_x/2.0;
-      double max_z = z + cell_size_x/2.0;
+      double max_y = y + cell_size_y/2.0;
+      double max_z = z + cell_size_z/2.0;
 
       corners[0][0] = min_x;
       corners[1][0] = min_x;
