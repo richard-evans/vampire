@@ -174,22 +174,12 @@ namespace dipole{
                   /*==========================================================*/
                 	if(i!=j && cells_num_atoms_in_cell[j]>0){
 
-                     // create temporary variable to store components of tensor
-                    	//double tmp_rij_inter_xx = 0.0; // unloved and unused variables
-                    	//double tmp_rij_inter_xy = 0.0;
-                    	//double tmp_rij_inter_xz = 0.0;
-
-                    	//double tmp_rij_inter_yy = 0.0;
-                    	//double tmp_rij_inter_yz = 0.0;
-                    	//double tmp_rij_inter_zz = 0.0;
-
                      // Calculate distance vectors between cells
                      double rx = cells_pos_and_mom_array[4*j+0] - cells_pos_and_mom_array[4*i+0];
                      double ry = cells_pos_and_mom_array[4*j+1] - cells_pos_and_mom_array[4*i+1];
                      double rz = cells_pos_and_mom_array[4*j+2] - cells_pos_and_mom_array[4*i+2];
 
                     	double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
-                    	// double rij_1 = 1.0/rij; unused variable
 
                      // define unitarian distance vectors
                   	const double ex = rx*rij;
@@ -212,16 +202,90 @@ namespace dipole{
                   /*==========================================================*/
                   /* Calculation of intra part of dipolar tensor              */
                   /*==========================================================*/
-                  // ** Need to fix this !!!! ** //
+
                   else if( i==j && dipole::internal::cells_num_atoms_in_cell[j]>0){
 
-                   	dipole::internal::rij_tensor_xx[lc][i] = 0.0;
-                   	dipole::internal::rij_tensor_xy[lc][i] = 0.0;
-                   	dipole::internal::rij_tensor_xz[lc][i] = 0.0;
+                     double tmp_rij_intra_xx = 0.0;
+                     double tmp_rij_intra_xy = 0.0;
+                     double tmp_rij_intra_xz = 0.0;
 
-                   	dipole::internal::rij_tensor_yy[lc][i] = 0.0;
-                   	dipole::internal::rij_tensor_yz[lc][i] = 0.0;
-                   	dipole::internal::rij_tensor_zz[lc][i] = 0.0;
+                     double tmp_rij_intra_yy = 0.0;
+                     double tmp_rij_intra_yz = 0.0;
+                     double tmp_rij_intra_zz = 0.0;
+
+                     const int mmax = cells_num_atoms_in_cell[i];
+
+                     for(int pi=0; pi<mmax; pi++){
+
+                          const double cix = cells_atom_in_cell_coords_array_x[i][pi];
+                          const double ciy = cells_atom_in_cell_coords_array_y[i][pi];
+                          const double ciz = cells_atom_in_cell_coords_array_z[i][pi];
+
+                          // use double loops to avoid if pi != qj statement
+                          for(int qj=0; qj<pi; qj++){
+
+                             const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix; //cells_atom_in_cell_coords_array_x[i][pi];
+                             const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy; //cells_atom_in_cell_coords_array_y[i][pi];
+                             const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz; //cells_atom_in_cell_coords_array_z[i][pi];
+
+                             const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
+
+                             const double ex = rx*rij;
+                             const double ey = ry*rij;
+                             const double ez = rz*rij;
+
+                             const double rij3 = (rij*rij*rij); // Angstroms
+
+                             tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
+                             tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);
+                             tmp_rij_intra_xz += ((3.0*ex*ez      )*rij3);
+
+                             tmp_rij_intra_yy += ((3.0*ey*ey - 1.0)*rij3);
+                             tmp_rij_intra_yz += ((3.0*ey*ez      )*rij3);
+                             tmp_rij_intra_zz += ((3.0*ez*ez - 1.0)*rij3);
+
+                          }
+                          for(int qj=pi+1; qj<mmax; qj++){
+
+                             const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix; //cells_atom_in_cell_coords_array_x[i][pi];
+                             const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy; //cells_atom_in_cell_coords_array_y[i][pi];
+                             const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz; //cells_atom_in_cell_coords_array_z[i][pi];
+
+                             const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
+
+                             const double ex = rx*rij;
+                             const double ey = ry*rij;
+                             const double ez = rz*rij;
+
+                             const double rij3 = (rij*rij*rij); // Angstroms
+
+                             tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
+                             tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);
+                             tmp_rij_intra_xz += ((3.0*ex*ez      )*rij3);
+
+                             tmp_rij_intra_yy += ((3.0*ey*ey - 1.0)*rij3);
+                             tmp_rij_intra_yz += ((3.0*ey*ez      )*rij3);
+                             tmp_rij_intra_zz += ((3.0*ez*ez - 1.0)*rij3);
+
+                        }
+                     }
+
+                     dipole::internal::rij_tensor_xx[lc][i] =  (tmp_rij_intra_xx);
+                     dipole::internal::rij_tensor_xy[lc][i] =  (tmp_rij_intra_xy);
+                     dipole::internal::rij_tensor_xz[lc][i] =  (tmp_rij_intra_xz);
+
+                     dipole::internal::rij_tensor_yy[lc][i] =  (tmp_rij_intra_yy);
+                     dipole::internal::rij_tensor_yz[lc][i] =  (tmp_rij_intra_yz);
+                     dipole::internal::rij_tensor_zz[lc][i] =  (tmp_rij_intra_zz);
+
+                     dipole::internal::rij_tensor_xx[lc][i] = dipole::internal::rij_tensor_xx[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_tensor_xy[lc][i] = dipole::internal::rij_tensor_xy[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_tensor_xz[lc][i] = dipole::internal::rij_tensor_xz[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+
+                     dipole::internal::rij_tensor_yy[lc][i] = dipole::internal::rij_tensor_yy[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_tensor_yz[lc][i] = dipole::internal::rij_tensor_yz[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+                     dipole::internal::rij_tensor_zz[lc][i] = dipole::internal::rij_tensor_zz[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
+
 
                   } // End of Intra part
                }
