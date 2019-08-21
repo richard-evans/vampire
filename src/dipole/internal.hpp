@@ -51,6 +51,11 @@ namespace dipole{
          atomistic      = 4, // new macrocell with tensor including local corrections and nearfield multipole
          fft            = 5 // atomistic dipole dipole (too slow for anything over 1000 atoms)
       };
+      extern std::vector < int > cell_dx;
+      extern std::vector < int > cell_dy;
+      extern std::vector < int > cell_dz;
+
+      extern std::vector < std::vector < std::vector<int> > > idarray;
 
       extern solver_t solver;
 

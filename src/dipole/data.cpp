@@ -16,6 +16,8 @@
 // dipole module headers
 #include "internal.hpp"
 
+
+
 namespace dipole{
 
    //------------------------------------------------------------------------------
@@ -25,6 +27,8 @@ namespace dipole{
    int update_time=-1; /// last update time
 
    bool activated=false;
+
+   //std::ofstream field("dipole-field");
 
    // define arrays for B-field
    std::vector < double > cells_field_array_x;
@@ -50,6 +54,11 @@ namespace dipole{
 
    namespace internal{
 
+      std::vector < int > cell_dx;
+      std::vector < int > cell_dy;
+      std::vector < int > cell_dz;
+      std::vector < std::vector < std::vector<int> > > idarray;
+      //std::ofstream output_field;
       //------------------------------------------------------------------------
       // Shared variables inside dipole module
       //------------------------------------------------------------------------

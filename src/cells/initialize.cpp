@@ -185,14 +185,14 @@ namespace cells{
          // If no error for range then assign atom to cell
          cells::atom_cell_id_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
 
-         if (scc[0] > num_macro_cells_fft[0]) num_macro_cells_fft[0] = scc[0];
-         if (scc[1] > num_macro_cells_fft[1]) num_macro_cells_fft[1] = scc[1];
-         if (scc[2] > num_macro_cells_fft[2]) num_macro_cells_fft[2] = scc[2];
-
+      //   if (scc[0] > num_macro_cells_fft[0]) num_macro_cells_fft[0] = scc[0];
+      //   if (scc[1] > num_macro_cells_fft[1]) num_macro_cells_fft[1] = scc[1];
+      //   if (scc[2] > num_macro_cells_fft[2]) num_macro_cells_fft[2] = scc[2];
+         //std::cout << scc[0] << '\t' << scc[1] << '\t' << scc[2] << std::endl;
          //   std::cout << "supercell" << '\t' << cells::atom_cell_id_array[atom] << '\t' << scc[0] << '\t' << scc[1] << '\t' << scc[2] << std::endl;
-         cell_lattice[3*cells::atom_cell_id_array[atom]+0] = scc[0];
-         cell_lattice[3*cells::atom_cell_id_array[atom]+1] = scc[1];
-         cell_lattice[3*cells::atom_cell_id_array[atom]+2] = scc[2];
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+0] = scc[0];
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+1] = scc[1];
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+2] = scc[2];
       }
 
       //-------------------------------------------------------------------------------------
@@ -342,20 +342,20 @@ namespace cells{
       // Precalculate cell magnetisation
       cells::mag();
 
-      for(int lc = 0; lc < cells::num_local_cells; lc++){
-
-       // get cell index
-        int i = cells::cell_id_array[lc];
-
-        //save x,y,z lattice coordiantes for use in the fft
-        int x = cell_lattice[3*i+0];
-        int y = cell_lattice[3*i+1];
-        int z = cell_lattice[3*i+2];
-
-        //save the cell_id for use in the fft
-        fft_cell_id_array[i] = (x*2*(num_macro_cells_fft[2]+1) + y)*2*(num_macro_cells_fft[1] +1) + z;
-//        std::cout <<i << '\t' << fft_cell_id_array[i] << '\t' << x << '\t' << y << '\t' << z << '\t' << "\t" << fft_maxx_lattice+1 << '\t' << fft_maxy_lattice+1 << '\t' << fft_maxz_lattice+1 << std::endl;
-      }
+//       for(int lc = 0; lc < cells::num_local_cells; lc++){
+//
+//        // get cell index
+//         int i = cells::cell_id_array[lc];
+//
+//         //save x,y,z lattice coordiantes for use in the fft
+//         int x = cell_lattice[3*i+0];
+//         int y = cell_lattice[3*i+1];
+//         int z = cell_lattice[3*i+2];
+//
+//         //save the cell_id for use in the fft
+//       //  fft_cell_id_array[i] = (x*2*(num_macro_cells_fft[2]+1) + y)*2*(num_macro_cells_fft[1] +1) + z;
+// //        std::cout <<i << '\t' << fft_cell_id_array[i] << '\t' << x << '\t' << y << '\t' << z << '\t' << "\t" << fft_maxx_lattice+1 << '\t' << fft_maxy_lattice+1 << '\t' << fft_maxz_lattice+1 << std::endl;
+//       }
 
       return;
    }

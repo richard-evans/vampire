@@ -40,36 +40,38 @@ namespace dipole{
 
 namespace internal{
 
-//------------------------------------------------------------------------------
-// Calculation of the dipole field using a Fast Fourier Transform
-//------------------------------------------------------------------------------
-// The demagnetizing field of a body can be expressed as
-//
-//                                   H = - N . M
-//
-// where H is the dipole field, N is the demagnetizing tensor, and M is the
-// magnetization. Applying discrete fourier transforms (DFT) gives
-//
-//                            DFT(H) = -DFT(N) . DFT(M)
-//
-// By rearrangement we recover the demagnetizing field H:
-//
-//                          H = iDFT[ -DFT(N) . DFT(M) ]
-//
-// Where iDFT is an inverse discrtete fourier transform. If the interaction
-// tensor N can be assumed to be translationally invariant then we can
-// accelerate the calculation of the field with a Fast Fourier Transform (FFT):
-//
-//                          H = iFFT[ -FFT(N) . FFT(M) ]
-//
-// where FFT(N) is fixed and scales with n log n numercial operations where n
-// is the number of cells.
-//
-//------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-// Function to initialise dipole field calculation using FFT solver
-//-----------------------------------------------------------------------------
+   //------------------------------------------------------------------------------
+   // Calculation of the dipole field using a Fast Fourier Transform
+   //------------------------------------------------------------------------------
+   // The demagnetizing field of a body can be expressed as
+   //
+   //                                   H = - N . M
+   //
+   // where H is the dipole field, N is the demagnetizing tensor, and M is the
+   // magnetization. Applying discrete fourier transforms (DFT) gives
+   //
+   //                            DFT(H) = -DFT(N) . DFT(M)
+   //
+   // By rearrangement we recover the demagnetizing field H:
+   //
+   //                          H = iDFT[ -DFT(N) . DFT(M) ]
+   //
+   // Where iDFT is an inverse discrtete fourier transform. If the interaction
+   // tensor N can be assumed to be translationally invariant then we can
+   // accelerate the calculation of the field with a Fast Fourier Transform (FFT):
+   //
+   //                          H = iFFT[ -FFT(N) . FFT(M) ]
+   //
+   // where FFT(N) is fixed and scales with n log n numercial operations where n
+   // is the number of cells.
+   //
+   //------------------------------------------------------------------------------
+
+   //-----------------------------------------------------------------------------
+   // Function to initialise dipole field calculation using FFT solver
+   //-----------------------------------------------------------------------------
+
 void initialize_fft_solver(){
 
    #ifdef FFT
@@ -78,540 +80,439 @@ void initialize_fft_solver(){
          // calculate matrix prefactors
          zlog << zTs() << "Precalculating rij matrix for dipole calculation... " << std::endl;
 
-         // determine number of cells in each direction (with small shift to prevent the fence post problem)
-         dp::num_macro_cells_x = cells::num_macro_cells_fft[0];
-         dp::num_macro_cells_y = cells::num_macro_cells_fft[1];
-         dp::num_macro_cells_z = cells::num_macro_cells_fft[2];
+
+   // determine number of cells in x and y (global)
+   cells::num_macro_cells_fft[0] = static_cast<unsigned int>(ceil((cs::system_dimensions[0]+0.01)/cells::macro_cell_size));
+   cells::num_macro_cells_fft[1] = static_cast<unsigned int>(ceil((cs::system_dimensions[1]+0.01)/cells::macro_cell_size));
+   cells::num_macro_cells_fft[2] = static_cast<unsigned int>(ceil((cs::system_dimensions[2]+0.01)/cells::macro_cell_size));
 
 
-         dipole::cells_field_array_x.resize(cells_num_cells,0.0);
-         dipole::cells_field_array_y.resize(cells_num_cells,0.0);
-         dipole::cells_field_array_z.resize(cells_num_cells,0.0);
+   // determine number of cells in each direction (with small shift to prevent the fence post problem)
+   dp::num_macro_cells_x = cells::num_macro_cells_fft[0];
+   dp::num_macro_cells_y = cells::num_macro_cells_fft[1];
+   dp::num_macro_cells_z = cells::num_macro_cells_fft[2];
 
-         // resize mu_0*Hd-field cells array
-         dipole::cells_mu0Hd_field_array_x.resize(cells_num_cells,0.0);
-         dipole::cells_mu0Hd_field_array_y.resize(cells_num_cells,0.0);
-         dipole::cells_mu0Hd_field_array_z.resize(cells_num_cells,0.0);
 
-         //calcualtes 8 times number of cells
-         dp::eight_num_cells = 8*dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z;
+   dipole::cells_field_array_x.resize(cells_num_cells,0.0);
+   dipole::cells_field_array_y.resize(cells_num_cells,0.0);
+   dipole::cells_field_array_z.resize(cells_num_cells,0.0);
 
-         // // Alocate memory for complex arrays to store the dipole tensor, magnetization and field arrays (in - N2xx0 and out N2xx etc.)
-          dp::N2xx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2xy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2xz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2yx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2yy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2yz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2zx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2zy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2zz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+   // resize mu_0*Hd-field cells array
+   dipole::cells_mu0Hd_field_array_x.resize(cells_num_cells,0.0);
+   dipole::cells_mu0Hd_field_array_y.resize(cells_num_cells,0.0);
+   dipole::cells_mu0Hd_field_array_z.resize(cells_num_cells,0.0);
 
-         dp::N2xx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2xy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2xz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2yx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2yy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2yz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2zx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2zy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::N2zz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+   //calcualtes 8 times number of cells
+   dp::eight_num_cells = 8*dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z;
+   std::cout << dp::num_macro_cells_x << '\t' << dp::num_macro_cells_y << '\t' << dp::num_macro_cells_z << '\t' << cells_num_cells << "\t" << dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z <<std::endl;
 
-         dp::Mx_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::My_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::Mz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+   dp::N2xx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2xy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2xz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2yx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2yy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2yz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2zx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2zy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2zz =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-         dp::Mx_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::My_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::Mz_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2xx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2xy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2xz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2yx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2yy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2yz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2zx0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2zy0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::N2zz0 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-         dp::Hx_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::Hy_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::Hz_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::Mx_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::My_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::Mz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-         dp::Hx_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::Hy_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
-         dp::Hz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::Mx_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::My_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::Mz_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-         //--------------------------------------------------------------------------------------
-         // Initialise real and imaginary components of the dipole tensor to 0.0
-         //--------------------------------------------------------------------------------------
-         for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
-            for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
-               for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
+  dp::Hx_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::Hy_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::Hz_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-                  int id = (i*dp::num_macro_cells_y*2 + j)*dp::num_macro_cells_z*2+k;
+  dp::Hx_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::Hy_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
+  dp::Hz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
-                  dp::N2xx0[id][0] = 0.0;
-                  dp::N2xx0[id][1] = 0.0;
-                  dp::N2xx[id][0]  = 0.0;
-                  dp::N2xx[id][1]  = 0.0;
-                  dp::N2xy0[id][0] = 0.0;
-                  dp::N2xy0[id][1] = 0.0;
-                  dp::N2xy[id][0]  = 0.0;
-                  dp::N2xy[id][1]  = 0.0;
-                  dp::N2xz0[id][0] = 0.0;
-                  dp::N2xz0[id][1] = 0.0;
 
-                  dp::N2yx0[id][0] = 0.0;
-                  dp::N2yx0[id][1] = 0.0;
-                  dp::N2yx[id][0]  = 0.0;
-                  dp::N2yx[id][1]  = 0.0;
-                  dp::N2yy0[id][0] = 0.0;
-                  dp::N2yy0[id][1] = 0.0;
-                  dp::N2yy[id][0]  = 0.0;
-                  dp::N2yy[id][1]  = 0.0;
-                  dp::N2yz0[id][0] = 0.0;
-                  dp::N2yz0[id][1] = 0.0;
+  // std::vector < int > cell_dx(dp::eight_num_cells,0.0);
+  // std::vector < int > cell_dy(dp::eight_num_cells,0.0);
+  // std::vector < int > cell_dz(dp::eight_num_cells,0.0);
+  for(int k=0; k<2*dp::num_macro_cells_x; k++)
+  {
+    dp::idarray.push_back(std::vector<std::vector<int> >()); //initialize the first index with a 2D vector
+    for(int i=0; i<2*dp::num_macro_cells_y; i++)
+    {
+      dp::idarray[k].push_back(std::vector<int>()); //initialize the 2 index with a row of strings
+      for(int j=0; j<2*dp::num_macro_cells_z; j++)
+         dp::idarray[k][i].push_back(0.0); //fulfill the last index regularly
+    }
+  }
+  cell_dx.resize(dp::eight_num_cells,0.0);
+  cell_dy.resize(dp::eight_num_cells,0.0);
+  cell_dz.resize(dp::eight_num_cells,0.0);
 
-                  dp::N2zx0[id][0] = 0.0;
-                  dp::N2zx0[id][1] = 0.0;
-                  dp::N2zx[id][0]  = 0.0;
-                  dp::N2zx[id][1]  = 0.0;
-                  dp::N2zy0[id][0] = 0.0;
-                  dp::N2zy0[id][1] = 0.0;
-                  dp::N2zy[id][0]  = 0.0;
-                  dp::N2zy[id][1]  = 0.0;
-                  dp::N2zz0[id][0] = 0.0;
-                  dp::N2zz0[id][1] = 0.0;
+  int N = 0;
 
-               }
-            }
+ for(int i=0;i<dp::num_macro_cells_x;++i){
+     for(int j=0;j<dp::num_macro_cells_y;++j){
+        for(int k=0; k<dp::num_macro_cells_z; ++k){
+           dp::cell_dx[N] = i;
+           dp::cell_dy[N] = j;
+           dp::cell_dz[N] = k;
+           dp::idarray[i][j][k] = N;
+           N++;
+        }
+     }
+ }
+
+  for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
+     for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
+        for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
+          // std::cout << i << '\t' << j << '\t' << k <<std::endl;
+           if (i >= dp::num_macro_cells_x  || j >= dp::num_macro_cells_y || k >= dp::num_macro_cells_z  ){
+            // std::cout << "ENTER" << std::endl;
+           dp::cell_dx[N] = i;
+           dp::cell_dy[N] = j;
+           dp::cell_dz[N] = k;
+          // std::cout << i << '\t' << j << '\t' << k << std::endl;
+          dp::idarray[i][j][k] = N;
+          N++;
          }
+        }
+     }
+  }
 
-         //--------------------------------------------------------------------------------------
-         // Calculate the dipole tensor between cells (assumes translational invariance for FFT)
-         //--------------------------------------------------------------------------------------
-         double ii,jj,kk;
+  if (N != dp::eight_num_cells) std::cout << "ERROR" << "\t" << N << '\t' << dp::eight_num_cells << std::endl;
 
-         // perform a triple loop over all macrocells in x,y,z
-         for(int i = 0; i < dp::num_macro_cells_x*2; i++){
+  for (int id = 0; id < cells_num_cells; id++){
 
-            // apply periodic boundary conditions in x
-            if (i >= dp::num_macro_cells_x) ii = i - 2*dp::num_macro_cells_x;
-            else ii = i;
+     dp::N2xx0[id][0] = 0.0;
+     dp::N2xx0[id][1] = 0.0;
+     dp::N2xx[id][0]  = 0.0;
+     dp::N2xx[id][1]  = 0.0;
+     dp::N2xy0[id][0] = 0.0;
+     dp::N2xy0[id][1] = 0.0;
+     dp::N2xy[id][0]  = 0.0;
+     dp::N2xy[id][1]  = 0.0;
+     dp::N2xz0[id][0] = 0.0;
+     dp::N2xz0[id][1] = 0.0;
 
-            for(int j = 0; j < dp::num_macro_cells_y*2; j++){
+     dp::N2yx0[id][0] = 0.0;
+     dp::N2yx0[id][1] = 0.0;
+     dp::N2yx[id][0]  = 0.0;
+     dp::N2yx[id][1]  = 0.0;
+     dp::N2yy0[id][0] = 0.0;
+     dp::N2yy0[id][1] = 0.0;
+     dp::N2yy[id][0]  = 0.0;
+     dp::N2yy[id][1]  = 0.0;
+     dp::N2yz0[id][0] = 0.0;
+     dp::N2yz0[id][1] = 0.0;
 
-               // apply periodic boundary conditions in y
-               if (j >= dp::num_macro_cells_y) jj = j - 2*dp::num_macro_cells_y;
-               else jj = j;
+     dp::N2zx0[id][0] = 0.0;
+     dp::N2zx0[id][1] = 0.0;
+     dp::N2zx[id][0]  = 0.0;
+     dp::N2zx[id][1]  = 0.0;
+     dp::N2zy0[id][0] = 0.0;
+     dp::N2zy0[id][1] = 0.0;
+     dp::N2zy[id][0]  = 0.0;
+     dp::N2zy[id][1]  = 0.0;
+     dp::N2zz0[id][0] = 0.0;
+     dp::N2zz0[id][1] = 0.0;
+ }
 
-               for(int k = 0; k < dp::num_macro_cells_z*2; k++){
+  for (int id = 0; id < dp::eight_num_cells; id++){
+     int i = cell_dx[id];
+     int j = cell_dy[id];
+     int k = cell_dz[id];
 
-                  // apply periodic boundary conditions in z
-                  if (k >= dp::num_macro_cells_z) kk = k - 2*dp::num_macro_cells_z;
-                  else kk = k;
+     int ii,jj,kk;
+     if (i >= dp::num_macro_cells_x) ii = i - 2*dp::num_macro_cells_x;
+     else ii = i;
+     if (j >= dp::num_macro_cells_y) jj = j - 2*dp::num_macro_cells_y;
+     else jj = j;
+     if (k >= dp::num_macro_cells_z) kk = k - 2*dp::num_macro_cells_z;
+     else kk = k;
 
-                  // check that i != j != k to avoid NaN in sqrt()
-                  if( (ii != 0 ) && (jj != 0) && (kk != 0)){
+   //  std::cout << i << '\t' << j << '\t' << k << "\t" << ii << '\t' << jj << '\t' << kk << std::endl;
 
-                     // calculate position vector to neighbouring cells
-                     const double rx = double(ii) * cells::macro_cell_size; // Angstroms
-                     const double ry = double(jj) * cells::macro_cell_size;
-                     const double rz = double(kk) * cells::macro_cell_size;
+     if (!( ii ==0 &&  jj == 0  && kk == 0)) {
+       // std::cout << "enter" << std::endl;
+        const double rx = double(ii) * cells::macro_cell_size; // Angstroms
+        const double ry = double(jj) * cells::macro_cell_size;
+        const double rz = double(kk) * cells::macro_cell_size;
 
-                     // calculate inverse distance
-                     const double irij = 1.0/sqrt(rx*rx + ry*ry + rz*rz);
+        // calculate inverse distance
+        const double irij = 1.0/sqrt(rx*rx + ry*ry + rz*rz);
+      // if ( ii == i && jj ==j && kk==k )  std::cout << rx << '\t' << ry << '\t' << rz << '\t' << irij << std::endl;
+        // calculate unit vector to cells
+        const double ex = rx * irij;
+        const double ey = ry * irij;
+        const double ez = rz * irij;
 
-                     // calculate unit vector to cells
-                     const double ex = rx * irij;
-                     const double ey = ry * irij;
-                     const double ez = rz * irij;
+        // calculate cube of interaction range
+        const double irij3 = irij * irij * irij; // Angstroms
 
-                     // calculate cube of interaction range
-                     const double irij3 = irij * irij * irij; // Angstroms
+        dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*irij3;
+        dp::N2xy0[id][0] = (3.0*ex*ey      )*irij3;
+        dp::N2xz0[id][0] = (3.0*ex*ez      )*irij3;
 
-                     // calculate index in 1D array
-                     int id = (i*2*dp::num_macro_cells_y + j)*2*dp::num_macro_cells_z + k;
+        dp::N2yx0[id][0] = (3.0*ey*ex      )*irij3;
+        dp::N2yy0[id][0] = (3.0*ey*ey - 1.0)*irij3;
+        dp::N2yz0[id][0] = (3.0*ey*ez      )*irij3;
 
-                     // set dipole tensor components
-                     dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*irij3;
-                     dp::N2xy0[id][0] = (3.0*ex*ey      )*irij3;
-                     dp::N2xz0[id][0] = (3.0*ex*ez      )*irij3;
+        dp::N2zx0[id][0] = (3.0*ez*ex      )*irij3;
+        dp::N2zy0[id][0] = (3.0*ez*ey      )*irij3;
+        dp::N2zz0[id][0] = (3.0*ez*ez - 1.0)*irij3;
+       // std::cout << ii << '\t' << jj << '\t' << kk << "\t" << dp::N2xx0[id][0] << '\t' << dp::N2xy0[id][0] << '\t' << dp::N2xz0[id][0] << '\t' << dp::N2yy0[id][0] << '\t' << dp::N2yz0[id][0] << '\t' << dp::N2zz0[id][0] << std::endl;
+     }
+  }
 
-                     dp::N2yx0[id][0] = (3.0*ey*ex      )*irij3;
-                     dp::N2yy0[id][0] = (3.0*ey*ey - 1.0)*irij3;
-                     dp::N2yz0[id][0] = (3.0*ey*ez      )*irij3;
+  //--------------------------------------------------------------------------------------
+  // Calculate FFT of dipole tensor FFT(N) -> result N2xx etc
+  //--------------------------------------------------------------------------------------
 
-                     dp::N2zx0[id][0] = (3.0*ez*ex      )*irij3;
-                     dp::N2zy0[id][0] = (3.0*ez*ey      )*irij3;
-                     dp::N2zz0[id][0] = (3.0*ez*ez - 1.0)*irij3;
+  // Set temporary plans to calculate FFT of the dipole tensor FFT(N)
+  fftw_plan NxxP, NxyP, NxzP, NyxP, NyyP, NyzP, NzxP, NzyP, NzzP;
 
-                  }
-               }
-            }
-         }
+  // temporary constants for FFT size for readability
+  const unsigned int nx = 2*dp::num_macro_cells_x;
+  const unsigned int ny = 2*dp::num_macro_cells_y;
+  const unsigned int nz = 2*dp::num_macro_cells_z;
 
-         //--------------------------------------------------------------------------------------
-         // Calculate FFT of dipole tensor FFT(N) -> result N2xx etc
-         //--------------------------------------------------------------------------------------
+  NxxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xx0, dp::N2xx, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NxxP);
 
-         // Set temporary plans to calculate FFT of the dipole tensor FFT(N)
-         fftw_plan NxxP, NxyP, NxzP, NyxP, NyyP, NyzP, NzxP, NzyP, NzzP;
+  NyxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yx0, dp::N2yx, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NyxP);
 
-         // temporary constants for FFT size for readability
-         const unsigned int nx = 2*dp::num_macro_cells_x;
-         const unsigned int ny = 2*dp::num_macro_cells_y;
-         const unsigned int nz = 2*dp::num_macro_cells_z;
+  NzxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zx0, dp::N2zx, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NzxP);
 
-         NxxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xx0, dp::N2xx, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NxxP);
+  NxyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xy0, dp::N2xy, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NxyP);
 
-         NyxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yx0, dp::N2yx, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NyxP);
+  NyyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yy0, dp::N2yy, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NyyP);
 
-         NzxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zx0, dp::N2zx, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NzxP);
+  NzyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zy0, dp::N2zy, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NzyP);
 
-         NxyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xy0, dp::N2xy, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NxyP);
+  NxzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xz0, dp::N2xz, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NxzP);
 
-         NyyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yy0, dp::N2yy, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NyyP);
+  NyzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yz0, dp::N2yz, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NyzP);
 
-         NzyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zy0, dp::N2zy, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NzyP);
+  NzzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zz0, dp::N2zz, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(NzzP);
 
-         NxzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xz0, dp::N2xz, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NxzP);
+  // free memory from FFTW plans
+  fftw_destroy_plan(NxxP);
+  fftw_destroy_plan(NxyP);
+  fftw_destroy_plan(NxzP);
+  fftw_destroy_plan(NyxP);
+  fftw_destroy_plan(NyyP);
+  fftw_destroy_plan(NyzP);
+  fftw_destroy_plan(NzxP);
+  fftw_destroy_plan(NzyP);
+  fftw_destroy_plan(NzzP);
 
-         NyzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yz0, dp::N2yz, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NyzP);
+  dp::MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mx_in,dp::Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
 
-         NzzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zz0, dp::N2zz, FFTW_FORWARD, FFTW_ESTIMATE);
-         fftw_execute(NzzP);
+  dp::MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::My_in,dp::My_out,FFTW_FORWARD,FFTW_ESTIMATE);
 
-         // free memory from FFTW plans
-         fftw_destroy_plan(NxxP);
-         fftw_destroy_plan(NxyP);
-         fftw_destroy_plan(NxzP);
-         fftw_destroy_plan(NyxP);
-         fftw_destroy_plan(NyyP);
-         fftw_destroy_plan(NyzP);
-         fftw_destroy_plan(NzxP);
-         fftw_destroy_plan(NzyP);
-         fftw_destroy_plan(NzzP);
+  dp::MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mz_in,dp::Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
 
-         dp::MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mx_in,dp::Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
+  dp::HxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hx_in,dp::Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
 
-         dp::MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::My_in,dp::My_out,FFTW_FORWARD,FFTW_ESTIMATE);
+  dp::HyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hy_in,dp::Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
 
-         dp::MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mz_in,dp::Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
+  dp::HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hz_in,dp::Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
 
-         dp::HxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hx_in,dp::Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
-
-         dp::HyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hy_in,dp::Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
-
-         dp::HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hz_in,dp::Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
-
-         zlog << zTs() << "dipole field calulation with FFT has been initalised " << std::endl;
+  zlog << zTs() << "dipole field calulation with FFT has been initalised " << std::endl;
 
 
-      //--------------------------------------------------------------------------------------
-      // Calulate FFT of dipole tensor FFT(N) -> result N2xx etc
-      //--------------------------------------------------------------------------------------
-           #endif
+  //--------------------------------------------------------------------------------------
+  // Calulate FFT of dipole tensor FFT(N) -> result N2xx etc
+  //--------------------------------------------------------------------------------------
 
-   return;
+   #endif
 
 }
 
 void update_field_fft(){
 
 
-  //std::cout << "update" << std::endl;
-#ifdef FFT
+     //std::cout << "update" << std::endl;
+   #ifdef FFT
 
-   //---------------------------------------------------------------
-   // Initalise all the magnetization and field components to zero
-   //---------------------------------------------------------------
-   for (int i=0 ; i<2*dp::num_macro_cells_x ; i++){
-      for (int j=0 ; j<2*dp::num_macro_cells_y ; j++){
-         for (int k=0 ; k<2*dp::num_macro_cells_z ; k++){
+  for (int id = 0; id < dp::eight_num_cells; id++){
 
-            //int id = (i*dp::num_macro_cells_x+j)*dp::num_macro_cells_y+k;
-            int id = (i*2*dp::num_macro_cells_y+j)*2*dp::num_macro_cells_z+k;
-
-            Mx_in[id][0] = 0.0;
-            Mx_in[id][1] = 0.0;
-            My_in[id][0] = 0.0;
-            My_in[id][1] = 0.0;
-            Mz_in[id][0] = 0.0;
-            Mz_in[id][1] = 0.0;
+     Mx_in[id][0] = 0.0;
+     Mx_in[id][1] = 0.0;
+     My_in[id][0] = 0.0;
+     My_in[id][1] = 0.0;
+     Mz_in[id][0] = 0.0;
+     Mz_in[id][1] = 0.0;
 
 
-            Mx_out[id][0] = 0.0;
-            Mx_out[id][1] = 0.0;
-            My_out[id][0] = 0.0;
-            My_out[id][1] = 0.0;
-            Mz_out[id][0] = 0.0;
-            Mz_out[id][1] = 0.0;
+     Mx_out[id][0] = 0.0;
+     Mx_out[id][1] = 0.0;
+     My_out[id][0] = 0.0;
+     My_out[id][1] = 0.0;
+     Mz_out[id][0] = 0.0;
+     Mz_out[id][1] = 0.0;
 
 
-            Hx_in[id][0] = 0.0;
-            Hx_in[id][1] = 0.0;
-            Hy_in[id][0] = 0.0;
-            Hy_in[id][1] = 0.0;
-            Hz_in[id][0] = 0.0;
-            Hz_in[id][1] = 0.0;
+     Hx_in[id][0] = 0.0;
+     Hx_in[id][1] = 0.0;
+     Hy_in[id][0] = 0.0;
+     Hy_in[id][1] = 0.0;
+     Hz_in[id][0] = 0.0;
+     Hz_in[id][1] = 0.0;
 
 
-            Hx_out[id][0] = 0.0;
-            Hx_out[id][1] = 0.0;
-            Hy_out[id][0] = 0.0;
-            Hy_out[id][1] = 0.0;
-            Hz_out[id][0] = 0.0;
-            Hz_out[id][1] = 0.0;
+     Hx_out[id][0] = 0.0;
+     Hx_out[id][1] = 0.0;
+     Hy_out[id][0] = 0.0;
+     Hy_out[id][1] = 0.0;
+     Hz_out[id][0] = 0.0;
+     Hz_out[id][1] = 0.0;
 
-         }
-      }
-   }
+  }
 
-   // inverse Bohr magneton to convert cell magnetization to J/T
    const double imuB = 1.0/9.27400915e-24;
-
-   //-----------------------------------------------
-   // Set the magnetization inside the system
-   //-----------------------------------------------
 
    for(int lc = 0; lc < cells::num_local_cells; lc++){
-
     // get cell index
      int cell = cells::cell_id_array[lc];
+     int id = cell;
+    Mx_in[id][0] = cells::mag_array_x[cell] * imuB;
+    My_in[id][0] = cells::mag_array_y[cell] * imuB;
+    Mz_in[id][0] = cells::mag_array_z[cell] * imuB;
+  }
 
-     //save the cell_id for use in the fft
-     int id = cells::fft_cell_id_array[cell];
+    fftw_execute(MxP);
+    fftw_execute(MyP);
+    fftw_execute(MzP);
 
-     Mx_in[id][0] = cells::mag_array_x[cell] * imuB;
-     My_in[id][0] = cells::mag_array_y[cell] * imuB;
-     Mz_in[id][0] = cells::mag_array_z[cell] * imuB;
+    for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
+       for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
+          for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
+           int id = dp::idarray[i][j][k];
+           Hx_in[id][0]  =  dp::N2xx[id][0] * dp::Mx_out[id][0] + dp::N2xy[id][0] * dp::My_out[id][0] + dp::N2xz[id][0] * dp::Mz_out[id][0]; //summing the real part
+           Hx_in[id][0] -= (dp::N2xx[id][1] * dp::Mx_out[id][1] + dp::N2xy[id][1] * dp::My_out[id][1] + dp::N2xz[id][1] * dp::Mz_out[id][1]);
 
-   }
+           Hx_in[id][1]  =  dp::N2xx[id][0] * dp::Mx_out[id][1] + dp::N2xy[id][0] * dp::My_out[id][1] + dp::N2xz[id][0] * dp::Mz_out[id][1];
+           Hx_in[id][1] += (dp::N2xx[id][1] * dp::Mx_out[id][0] + dp::N2xy[id][1] * dp::My_out[id][0] + dp::N2xz[id][1] * dp::Mz_out[id][0]);
 
+           Hy_in[id][0]  =  dp::N2yx[id][0] * dp::Mx_out[id][0] + dp::N2yy[id][0] * dp::My_out[id][0] + dp::N2yz[id][0] * dp::Mz_out[id][0];
+           Hy_in[id][0] -= (dp::N2yx[id][1] * dp::Mx_out[id][1] + dp::N2yy[id][1] * dp::My_out[id][1] + dp::N2yz[id][1] * dp::Mz_out[id][1]);
 
+           Hy_in[id][1]  =  dp::N2yx[id][0] * dp::Mx_out[id][1] + dp::N2yy[id][0] * dp::My_out[id][1] + dp::N2yz[id][0] * dp::Mz_out[id][1];
+           Hy_in[id][1] += (dp::N2yx[id][1] * dp::Mx_out[id][0] + dp::N2yy[id][1] * dp::My_out[id][0] + dp::N2yz[id][1] * dp::Mz_out[id][0]);
 
+           Hz_in[id][0]  =  dp::N2zx[id][0] * dp::Mx_out[id][0] + dp::N2zy[id][0] * dp::My_out[id][0] + dp::N2zz[id][0] * dp::Mz_out[id][0]; //summing the real part
+           Hz_in[id][0] -= (dp::N2zx[id][1] * dp::Mx_out[id][1] + dp::N2zy[id][1] * dp::My_out[id][1] + dp::N2zz[id][1] * dp::Mz_out[id][1]);
 
-/*
-   // temporary counter for cell number
-   int cell = 0;
-
-   // inverse Bohr magneton to convert cell magnetization to J/T
-   const double imuB = 1.0/9.27400915e-24;
-
-   for (int i = 0; i < dp::num_macro_cells_x; i++){
-      for (int j = 0; j < dp::num_macro_cells_y; j++){
-         for (int k = 0; k < dp::num_macro_cells_z; k++){
-
-            // Calculate cell id
-            int id = (i*2*dp::num_macro_cells_y + j)*2*dp::num_macro_cells_z + k;
-
-            Mx_in[id][0] = cells::mag_array_x[cell] * imuB;
-            My_in[id][0] = cells::mag_array_y[cell] * imuB;
-            Mz_in[id][0] = cells::mag_array_z[cell] * imuB;
-
-            // increment cell counter
-            cell ++;
-
-         }
-      }
-   }*/
+           Hz_in[id][1]  =  dp::N2zx[id][0] * dp::Mx_out[id][1] + dp::N2zy[id][0] * dp::My_out[id][1] + dp::N2zz[id][0] * dp::Mz_out[id][1];
+           Hz_in[id][1] += (dp::N2zx[id][1] * dp::Mx_out[id][0] + dp::N2zy[id][1] * dp::My_out[id][0] + dp::N2zz[id][1] * dp::Mz_out[id][0]);
 
 
-   //---------------------------------------------------------------------------
-   // Calculate Fourier Transform of the magnetization FFT(M)
-   //---------------------------------------------------------------------------
-
-
-   fftw_execute(MxP);
-   fftw_execute(MyP);
-   fftw_execute(MzP);
-
-
-   //---------------------------------------------------------------------------
-   // Perform the convolution between N and M [ FFT(N) . FFT(M) ]
-   //---------------------------------------------------------------------------
-
-   // loop over all cells in x,y,z
-   for (int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
-      for (int j = 0 ; j < 2*dp::num_macro_cells_y ; j++){
-         for (int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
-
-            // calculate array index
-            int id = ((i*2*dp::num_macro_cells_y + j)*2*dp::num_macro_cells_z) + k;
-
-            Hx_in[id][0]  =  dp::N2xx[id][0] * dp::Mx_out[id][0] + dp::N2xy[id][0] * dp::My_out[id][0] + dp::N2xz[id][0] * dp::Mz_out[id][0]; //summing the real part
-            Hx_in[id][0] -= (dp::N2xx[id][1] * dp::Mx_out[id][1] + dp::N2xy[id][1] * dp::My_out[id][1] + dp::N2xz[id][1] * dp::Mz_out[id][1]);
-
-            Hx_in[id][1]  =  dp::N2xx[id][0] * dp::Mx_out[id][1] + dp::N2xy[id][0] * dp::My_out[id][1] + dp::N2xz[id][0] * dp::Mz_out[id][1];
-            Hx_in[id][1] += (dp::N2xx[id][1] * dp::Mx_out[id][0] + dp::N2xy[id][1] * dp::My_out[id][0] + dp::N2xz[id][1] * dp::Mz_out[id][0]);
-
-            Hy_in[id][0]  =  dp::N2yx[id][0] * dp::Mx_out[id][0] + dp::N2yy[id][0] * dp::My_out[id][0] + dp::N2yz[id][0] * dp::Mz_out[id][0];
-            Hy_in[id][0] -= (dp::N2yx[id][1] * dp::Mx_out[id][1] + dp::N2yy[id][1] * dp::My_out[id][1] + dp::N2yz[id][1] * dp::Mz_out[id][1]);
-
-            Hy_in[id][1]  =  dp::N2yx[id][0] * dp::Mx_out[id][1] + dp::N2yy[id][0] * dp::My_out[id][1] + dp::N2yz[id][0] * dp::Mz_out[id][1];
-            Hy_in[id][1] += (dp::N2yx[id][1] * dp::Mx_out[id][0] + dp::N2yy[id][1] * dp::My_out[id][0] + dp::N2yz[id][1] * dp::Mz_out[id][0]);
-
-            Hz_in[id][0]  =  dp::N2zx[id][0] * dp::Mx_out[id][0] + dp::N2zy[id][0] * dp::My_out[id][0] + dp::N2zz[id][0] * dp::Mz_out[id][0]; //summing the real part
-            Hz_in[id][0] -= (dp::N2zx[id][1] * dp::Mx_out[id][1] + dp::N2zy[id][1] * dp::My_out[id][1] + dp::N2zz[id][1] * dp::Mz_out[id][1]);
-
-            Hz_in[id][1]  =  dp::N2zx[id][0] * dp::Mx_out[id][1] + dp::N2zy[id][0] * dp::My_out[id][1] + dp::N2zz[id][0] * dp::Mz_out[id][1];
-            Hz_in[id][1] += (dp::N2zx[id][1] * dp::Mx_out[id][0] + dp::N2zy[id][1] * dp::My_out[id][0] + dp::N2zz[id][1] * dp::Mz_out[id][0]);
-
-         }
-      }
-   }
-
-   //------------------------------------------------------------------------------------
-   // Perform the backward transform to give the dipole field, H = iFFT( FFT(N).FFT(M) )
-   //------------------------------------------------------------------------------------
-
+        }
+     }
+  }
 
    fftw_execute(HxP);
    fftw_execute(HyP);
    fftw_execute(HzP);
 
-   //-------------------------------------------------------------------------------------
-   // loop over all local cells to initialise field with self term
-   //-------------------------------------------------------------------------------------
-//    for(int lc = 0; lc < dipole::internal::cells_num_local_cells; lc++){
-//
-//       // get cell index
-//       int i = cells::cell_id_array[lc];
-//
-//       // check cell contains atoms
-//       if(dipole::internal::cells_num_atoms_in_cell[i]>0){
-//
-//          // set constant for self dipole field
-//          const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*dipole::internal::cells_volume_array[i]);
-//          const double self_demag = imuB * eightPI_three_cell_volume;
-// //
-//          // Add self-demagnetisation as mu_0/4_PI * 8PI/3V
-//          dipole::cells_field_array_x[i] = self_demag * cells::mag_array_x[i];
-//          dipole::cells_field_array_y[i] = self_demag * cells::mag_array_y[i];
-//          dipole::cells_field_array_z[i] = self_demag * cells::mag_array_z[i];
-//
-//       }
-//    }
-
-   //-------------------------------------------------------------------------------------
-   // Add calculated field to field array
-   //-------------------------------------------------------------------------------------
-
-   // inverse Bohr magneton to convert cell magnetization to J/T
-   //const double imuB = 1.0/9.27400915e-24;
-
-   //-----------------------------------------------
-   // Set the magnetization inside the system
-   //-----------------------------------------------
-   //std::ofstream ofield("fields");
 
    for(int lc = 0; lc < cells::num_local_cells; lc++){
 
     // get cell index
      int cell = cells::cell_id_array[lc];
-
-     //save the cell_id for use in the fft
-     int id = cells::fft_cell_id_array[cell];
-
-     dipole::cells_field_array_x[cell] += Hx_out[id][0]/dp::eight_num_cells;
-     dipole::cells_field_array_y[cell] += Hy_out[id][0]/dp::eight_num_cells;
-     dipole::cells_field_array_z[cell] += Hz_out[id][0]/dp::eight_num_cells;
+     int id = cell;
+     dipole::cells_field_array_x[id] += Hx_out[cell][0]/dp::eight_num_cells;
+     dipole::cells_field_array_y[id] += Hy_out[cell][0]/dp::eight_num_cells;
+     dipole::cells_field_array_z[id] += Hz_out[cell][0]/dp::eight_num_cells;
 
      dipole::cells_field_array_x[cell] *= 9.27400915e-01;
      dipole::cells_field_array_y[cell] *= 9.27400915e-01;
      dipole::cells_field_array_z[cell] *= 9.27400915e-01;
 
-     std::cout <<cell << '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell] <<std::endl;
+    dp_fields <<cell << '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell] <<std::endl;
+    cell++;
+  }
+
+
+
+   #endif
+   return;
+}
+
+   //-----------------------------------------------------------------------------
+   // Function to finalize FFT solver and release memory
+   //-----------------------------------------------------------------------------
+   void finalize_fft_solver(){
+   #ifdef FFT
+      // // Print informative message to log file and screen
+      std::cout << "Deallocating memory for FFT dipole calculation" << std::endl;
+      zlog << zTs() << "Deallocating memory for FFT dipole calculation" << std::endl;
+      //
+      // // Free memory from FFT complex variables
+      fftw_free(dp::Mx_out);
+      fftw_free(dp::My_out);
+      fftw_free(dp::Mz_out);
+      fftw_free(dp::Hx_out);
+      fftw_free(dp::Hy_out);
+      fftw_free(dp::Hz_out);
+      fftw_free(dp::Mx_in);
+      fftw_free(dp::My_in);
+      fftw_free(dp::Mz_in);
+      fftw_free(dp::Hx_in);
+      fftw_free(dp::Hy_in);
+      fftw_free(dp::Hz_in);
+
+      fftw_free(dp::N2xx );
+      fftw_free(dp::N2xy );
+      fftw_free(dp::N2xz );
+      fftw_free(dp::N2yx );
+      fftw_free(dp::N2yy );
+      fftw_free(dp::N2yz );
+      fftw_free(dp::N2zx );
+      fftw_free(dp::N2zy );
+      fftw_free(dp::N2zz );
+      fftw_free(dp::N2xx0);
+      fftw_free(dp::N2xy0);
+      fftw_free(dp::N2xz0);
+      fftw_free(dp::N2yx0);
+      fftw_free(dp::N2yy0);
+      fftw_free(dp::N2yz0);
+      fftw_free(dp::N2zx0);
+      fftw_free(dp::N2zy0);
+      fftw_free(dp::N2zz0);
+
+      fftw_destroy_plan(dp::MxP);
+      fftw_destroy_plan(dp::MyP);
+      fftw_destroy_plan(dp::MzP);
+
+      fftw_destroy_plan(dp::HxP);
+      fftw_destroy_plan(dp::HyP);
+      fftw_destroy_plan(dp::HzP);
+
+   #endif
+      return;
+
    }
-
-
-/*
-   // reset cell index counter
-   cell = 0;
-
-   // loop over all cells in x,y and z
-   for( int i = 0 ; i < dp::num_macro_cells_x; i++){
-      for( int j = 0 ; j < dp::num_macro_cells_y; j++){
-         for( int k = 0 ; k < dp::num_macro_cells_z; k++){
-
-            // calculate cell id
-            int id = (i*2*dp::num_macro_cells_y + j)*2*dp::num_macro_cells_z + k;
-
-            dipole::cells_field_array_x[cell] += Hx_out[id][0]/dp::eight_num_cells;
-            dipole::cells_field_array_y[cell] += Hy_out[id][0]/dp::eight_num_cells;
-            dipole::cells_field_array_z[cell] += Hz_out[id][0]/dp::eight_num_cells;
-
-            dipole::cells_field_array_x[cell] *= 9.27400915e-01;
-            dipole::cells_field_array_y[cell] *= 9.27400915e-01;
-            dipole::cells_field_array_z[cell] *= 9.27400915e-01;
-
-            // increment cell counter
-            cell++;
-
-         }
-      }
-   }*/
-
-#endif
-
-
-   return;
-}
-
-//-----------------------------------------------------------------------------
-// Function to finalize FFT solver and release memory
-//-----------------------------------------------------------------------------
-void finalize_fft_solver(){
-#ifdef FFT
-   // // Print informative message to log file and screen
-   std::cout << "Deallocating memory for FFT dipole calculation" << std::endl;
-   zlog << zTs() << "Deallocating memory for FFT dipole calculation" << std::endl;
-   //
-   // // Free memory from FFT complex variables
-   fftw_free(dp::Mx_out);
-   fftw_free(dp::My_out);
-   fftw_free(dp::Mz_out);
-   fftw_free(dp::Hx_out);
-   fftw_free(dp::Hy_out);
-   fftw_free(dp::Hz_out);
-   fftw_free(dp::Mx_in);
-   fftw_free(dp::My_in);
-   fftw_free(dp::Mz_in);
-   fftw_free(dp::Hx_in);
-   fftw_free(dp::Hy_in);
-   fftw_free(dp::Hz_in);
-
-   fftw_free(dp::N2xx );
-   fftw_free(dp::N2xy );
-   fftw_free(dp::N2xz );
-   fftw_free(dp::N2yx );
-   fftw_free(dp::N2yy );
-   fftw_free(dp::N2yz );
-   fftw_free(dp::N2zx );
-   fftw_free(dp::N2zy );
-   fftw_free(dp::N2zz );
-   fftw_free(dp::N2xx0);
-   fftw_free(dp::N2xy0);
-   fftw_free(dp::N2xz0);
-   fftw_free(dp::N2yx0);
-   fftw_free(dp::N2yy0);
-   fftw_free(dp::N2yz0);
-   fftw_free(dp::N2zx0);
-   fftw_free(dp::N2zy0);
-   fftw_free(dp::N2zz0);
-
-   fftw_destroy_plan(dp::MxP);
-   fftw_destroy_plan(dp::MyP);
-   fftw_destroy_plan(dp::MzP);
-   //
-   fftw_destroy_plan(dp::HxP);
-   fftw_destroy_plan(dp::HyP);
-   fftw_destroy_plan(dp::HzP);
-
-#endif
-   return;
-
-}
-}
-}
+   }
+   }
