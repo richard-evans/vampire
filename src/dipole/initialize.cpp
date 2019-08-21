@@ -73,6 +73,8 @@ namespace dipole{
 		zlog << zTs() << "Initialising dipole field calculation" << std::endl;
 
 
+      if(vmpi::my_rank==0) dp_fields.open("dipole-field");
+
       //-------------------------------------------------------------------------------------
       // Set const for functions
       //-------------------------------------------------------------------------------------

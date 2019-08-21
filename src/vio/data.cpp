@@ -24,6 +24,7 @@ std::ofstream zinfo;
 std::ofstream zlog;
 std::ofstream zmag;
 std::ofstream zgrain;
+std::ofstream dp_fields;
 
 namespace vout{
 
