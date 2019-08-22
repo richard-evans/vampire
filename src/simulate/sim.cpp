@@ -510,6 +510,13 @@ int run(){
 	     	}
 		  	program::setting_process();
 		    break;
+		case 52:
+			 if(vmpi::my_rank==0){
+		 	 std::cout << "Tracks..." << std::endl;
+		 	zlog << "Tracks..." << std::endl;
+		}
+		program::tracks();
+	 	break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
