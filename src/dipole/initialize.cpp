@@ -91,6 +91,8 @@ namespace dipole{
 
       dipole::internal::cells_pos_and_mom_array    = cells_pos_and_mom_array;
 
+
+
 		//-------------------------------------------------------------------------------------
 		// Starting calculation of dipolar field
 		//-------------------------------------------------------------------------------------
@@ -132,14 +134,7 @@ namespace dipole{
             hierarchical::initialize(cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2]);
             break;
          case dipole::internal::fft:
-            std::cout << "fft" << std::endl;
-            // resize B-field cells array
             dipole::internal::initialize_fft_solver();
-            //dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
-            //dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
-            //                                           dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, dipole::internal::cells_pos_and_mom_array,
-            //                                           cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
-            //                                           dipole::internal::atom_type_array, dipole::internal::atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
             break;
       }
       // Set initialised flag

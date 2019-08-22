@@ -198,7 +198,7 @@ namespace dipole{
                   if (dipole::internal::rij_tensor_yy[lc][j]*dipole::internal::rij_tensor_yy[lc][j] < 1e-15) dipole::internal::rij_tensor_yy[lc][j] =0;
                   if (dipole::internal::rij_tensor_yz[lc][j]*dipole::internal::rij_tensor_yz[lc][j] < 1e-15) dipole::internal::rij_tensor_yz[lc][j] =0;
                   if (dipole::internal::rij_tensor_zz[lc][j]*dipole::internal::rij_tensor_zz[lc][j] < 1e-15) dipole::internal::rij_tensor_zz[lc][j] =0;
-               //   std::cout <<"A" << '\t' << i << '\t' << j << '\t' <<  dipole::internal::rij_tensor_xx[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xz[lc][j]<< '\t' <<  dipole::internal::rij_tensor_yy[lc][j] << '\t' <<  dipole::internal::rij_tensor_yz[lc][j] << '\t' <<  dipole::internal::rij_tensor_zz[lc][j] << std::endl;
+               if (i == 34 )   std::cout  << j << '\t' <<cells_pos_and_mom_array[j*4 + 0] << '\t' << cells_pos_and_mom_array[j*4 + 1] << '\t' << cells_pos_and_mom_array[j*4 + 2] << '\t' <<   dipole::internal::rij_tensor_xx[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xz[lc][j]<< '\t' <<  dipole::internal::rij_tensor_yy[lc][j] << '\t' <<  dipole::internal::rij_tensor_yz[lc][j] << '\t' <<  dipole::internal::rij_tensor_zz[lc][j] << std::endl;
 }
                }
    			}

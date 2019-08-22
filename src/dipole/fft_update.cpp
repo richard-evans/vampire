@@ -272,7 +272,8 @@ void initialize_fft_solver(){
         dp::N2zx0[id][0] = (3.0*ez*ex      )*irij3;
         dp::N2zy0[id][0] = (3.0*ez*ey      )*irij3;
         dp::N2zz0[id][0] = (3.0*ez*ez - 1.0)*irij3;
-       // std::cout << ii << '\t' << jj << '\t' << kk << "\t" << dp::N2xx0[id][0] << '\t' << dp::N2xy0[id][0] << '\t' << dp::N2xz0[id][0] << '\t' << dp::N2yy0[id][0] << '\t' << dp::N2yz0[id][0] << '\t' << dp::N2zz0[id][0] << std::endl;
+      //   if (dp::N2zz0[id][0] > 0)
+      std::cout << ii << '\t' << jj << '\t' << kk << "\t" << dp::N2xx0[id][0] << '\t' << dp::N2xy0[id][0] << '\t' << dp::N2xz0[id][0] << '\t' << dp::N2yy0[id][0] << '\t' << dp::N2yz0[id][0] << '\t' << dp::N2zz0[id][0] << std::endl;
      }
   }
 
@@ -284,6 +285,7 @@ void initialize_fft_solver(){
   fftw_plan NxxP, NxyP, NxzP, NyxP, NyyP, NyzP, NzxP, NzyP, NzzP;
 
   // temporary constants for FFT size for readability
+
   const unsigned int nx = 2*dp::num_macro_cells_x;
   const unsigned int ny = 2*dp::num_macro_cells_y;
   const unsigned int nz = 2*dp::num_macro_cells_z;
@@ -396,9 +398,11 @@ void update_field_fft(){
     // get cell index
      int cell = cells::cell_id_array[lc];
      int id = cell;
+   //  std::cout << id << '\t' << cells::mag_array_x[cell] * imuB << '\t' << cells::mag_array_y[cell] * imuB << '\t' << cells::mag_array_z[cell] * imuB <<std::endl;
     Mx_in[id][0] = cells::mag_array_x[cell] * imuB;
     My_in[id][0] = cells::mag_array_y[cell] * imuB;
     Mz_in[id][0] = cells::mag_array_z[cell] * imuB;
+
   }
 
     fftw_execute(MxP);
@@ -432,6 +436,7 @@ void update_field_fft(){
      }
   }
 
+
    fftw_execute(HxP);
    fftw_execute(HyP);
    fftw_execute(HzP);
@@ -452,12 +457,13 @@ void update_field_fft(){
 
     dp_fields <<cell << '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell] <<std::endl;
     cell++;
+
   }
 
-
-
    #endif
+
    return;
+
 }
 
    //-----------------------------------------------------------------------------

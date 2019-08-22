@@ -63,6 +63,7 @@ namespace dipole{
 
          double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
          double rij_1 = 1.0/rij;
+         //if (i == 0 )std::cout << rx << '\t' << ry << '\t' << rz << '\t' << rij << std::endl;
 
          // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
          if( (rij_1)/cells_macro_cell_size > dipole::cutoff){

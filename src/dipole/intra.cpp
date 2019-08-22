@@ -120,7 +120,7 @@ namespace dipole{
       	dipole::internal::rij_tensor_yz[lc][i] =  (tmp_rij_intra_yz);
          dipole::internal::rij_tensor_zz[lc][i] =  (tmp_rij_intra_zz);
 
-         // // Uncomment in case you want to check the tensor components
+         // Uncomment in case you want to check the tensor components
          // std::cout << "\n############# INTRA ###################\n";
          // std::cout << "lc = " << lc << "\tj = " << j << std::endl;
          // std::cout << tmp_rij_intra_xx << "\t" << tmp_rij_intra_xy << "\t" << tmp_rij_intra_xz << "\n";
