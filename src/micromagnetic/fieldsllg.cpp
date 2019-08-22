@@ -24,6 +24,8 @@
 #include "sim.hpp"
 #include "random.hpp"
 #include "dipole.hpp"
+#include "environment.hpp"
+
 
 namespace micromagnetic{
 
@@ -43,11 +45,11 @@ namespace micromagnetic{
       const double kB = 1.3806503e-23;
 
       //chi is usually used as 2/chi
-      const double one_o_2_chi_para = (one_o_chi_para[cell]/2.0);
+      //const double one_o_2_chi_para = (one_o_chi_para[cell]/2.0);
 
       //the temperature is usually used as a reduced temperature.
       const double reduced_temperature = temperature/Tc[cell];
-      const double Tc_o_Tc_m_T = Tc[cell]/(temperature - Tc[cell]);
+      //const double Tc_o_Tc_m_T = Tc[cell]/(temperature - Tc[cell]);
 
       //calcualted m_e and alpha temperature dependant
       if(temperature<=Tc[cell]){
@@ -62,7 +64,7 @@ namespace micromagnetic{
       }
 
       //saved me_2
-      const double m_e_squared = m_e[cell]*m_e[cell];
+      //const double m_e_squared = m_e[cell]*m_e[cell];
 
       //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
       double exchange_field[3]={0.0,0.0,0.0};
@@ -100,8 +102,8 @@ namespace micromagnetic{
            // std::cout << mat << '\t' << matj << "\t" << mp::material[mat].override_atomsitic[matj] << std::endl;
 
            if (mp::material[mat].override_atomsitic[matj] == true){
-             double Area = cells::macro_cell_size*cells::macro_cell_size;
-             double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
+             //double Area = cells::macro_cell_size*cells::macro_cell_size;
+             //double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
              //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
              Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
            }
@@ -117,7 +119,7 @@ namespace micromagnetic{
 
       //calcualtes thesigma values
       double sigma_para = sqrt(2*kB*temperature*alpha_para[cell]/(ms[cell]*mp::dt));
-      double sigma_perp = sqrt(2*kB*temperature*(alpha_perp[cell]-alpha_para[cell])/(mp::dt*ms[cell]*alpha_perp[cell]*alpha_perp[cell]));
+   //   double sigma_perp = sqrt(2*kB*temperature*(alpha_perp[cell]-alpha_para[cell])/(mp::dt*ms[cell]*alpha_perp[cell]*alpha_perp[cell]));
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
       spin_field[0] =ext_field[0] + exchange_field[0] - one_o_chi_perp[cell]*m[0]*m_e[cell]*ku_x[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];
@@ -131,17 +133,17 @@ namespace micromagnetic{
       spin_field[1] = spin_field[1] + dipole::cells_field_array_y[cell];
       spin_field[2] = spin_field[2] + dipole::cells_field_array_z[cell];
    }
-      // if (bias_magnets == true){
-      //   spin_field[0] = spin_field[0] + bias_field_x[cell];
-      //   spin_field[1] = spin_field[1] + bias_field_y[cell];
-      //   spin_field[2] = spin_field[2] + bias_field_z[cell];
-      // }
+      if (bias_magnets == true){
+        spin_field[0] = spin_field[0] + bias_field_x[cell];
+        spin_field[1] = spin_field[1] + bias_field_y[cell];
+        spin_field[2] = spin_field[2] + bias_field_z[cell];
+      }
       //
-      // if (environment::enabled){
-      //    spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
-      //    spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
-      //    spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
-      // }
+      if (environment::enabled){
+         spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
+         spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
+         spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+      }
       //
       // if (sim::track_field_x.size() != 0 ){
       //   spin_field[0] = spin_field[0] + sim::track_field_x[cell];

@@ -23,6 +23,7 @@
 #include "cells.hpp"
 #include "vio.hpp"
 #include "dipole.hpp"
+#include "environment.hpp"
 
 namespace micromagnetic{
 
@@ -130,13 +131,13 @@ namespace micromagnetic{
     spin_field[1] = spin_field[1] + dipole::cells_field_array_y[cell];
     spin_field[2] = spin_field[2] + dipole::cells_field_array_z[cell];
  }
-
-    // if (environment::enabled){
-    // // std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
-    //    spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
-    //    spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
-    //    spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
-    // }
+ //std::cout << "SP" << spin_field[0] << "\t" << spin_field[1] << '\t' << spin_field[2] << std::endl;
+    if (environment::enabled){
+    // std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
+       spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
+       spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
+       spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+    }
 
     //  if (sim::track_field_x.size() != 0 ){
     //    spin_field[0] = spin_field[0] + sim::track_field_x[cell];
@@ -145,11 +146,12 @@ namespace micromagnetic{
     // //   std::cout << pinning_field_y[cell] << '\t' << sim::track_field_x[cell] << '\t' << sim::track_field_y[cell] << "\t" <<sim::track_field_z[cell] <<std::endl;
     //  }
 
-     // if (bias_magnets == true){
-     //   spin_field[0] = spin_field[0] + bias_field_x[cell];
-     //   spin_field[1] = spin_field[1] + bias_field_y[cell];
-     //   spin_field[2] = spin_field[2] + bias_field_z[cell];
-     // }
+     if (bias_magnets == true){
+      //  std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
+       spin_field[0] = spin_field[0] + bias_field_x[cell];
+       spin_field[1] = spin_field[1] + bias_field_y[cell];
+       spin_field[2] = spin_field[2] + bias_field_z[cell];
+     }
 
       //std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
       return spin_field;

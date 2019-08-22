@@ -262,11 +262,11 @@ namespace micromagnetic{
         // P.resize(101);
         // for (int i = 0; i < 101; i++) P[i].resize(101,0.0);
         //
-        // if (mm::bias_magnets == true){
-        //
-        //   int a = mm::calculate_bias_magnets(system_dimensions_x,system_dimensions_y,system_dimensions_z);
-        //
-        // }
+        if (mm::bias_magnets == true){
+
+          int a = mm::calculate_bias_magnets(system_dimensions_x,system_dimensions_y,system_dimensions_z);
+
+        }
         std::cout << "end of micromangetic initialisation" << std::endl;
 
    return;

@@ -52,6 +52,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
+#include "environment.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
 #include "random.hpp"
@@ -320,6 +321,11 @@ int run(){
 									  cs::system_dimensions[1],
 									  cs::system_dimensions[2],
 									  cells::local_cell_array);
+
+
+	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
+
+
 
    // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
@@ -633,6 +639,9 @@ void integrate_serial(uint64_t n_steps){
             if(gpu::acceleration) gpu::llg_heun();
             // Otherwise use CPU version
             else sim::LLG_Heun();
+				if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0){
+					environment::LLB(sim::temperature, sim::H_applied,sim::H_vec[0],sim::H_vec[1],sim::H_vec[2],mp::dt);
+				}
             // Increment time
             increment_time();
          }
@@ -724,6 +733,14 @@ int integrate_mpi(uint64_t n_steps){
 					//sim::LLG_Heun_cuda_mpi();
 				#else
 					sim::LLG_Heun_mpi();
+					//calcualte the field from the environment
+					if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0)
+						environment::LLB(sim::temperature,
+												sim::H_applied,
+												sim::H_vec[0],
+												sim::H_vec[1],
+												sim::H_vec[2],
+												mp::dt);
 				#endif
 			#endif
 				// increment time
@@ -791,16 +808,18 @@ int integrate_mpi(uint64_t n_steps){
 
 void multiscale_simulation_steps(int n_steps){
 
-	// if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
-	//    sim::H_applied,
-	//    sim::H_vec[0],
-	//    sim::H_vec[1],
-	//    sim::H_vec[2],
-	//    mp::dt);
+	if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0)
+		environment::LLB(sim::temperature,
+						   	sim::H_applied,
+						   	sim::H_vec[0],
+						   	sim::H_vec[1],
+						   	sim::H_vec[2],
+						   	mp::dt);
 
    for(int ti=0;ti<n_steps;ti++){
       //calcaulte the field from the environment
-      // if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0) environment::LLB(sim::temperature,
+      // if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0)
+		//	environment::LLB(sim::temperature,
       //    sim::H_applied,
       //    sim::H_vec[0],
       //    sim::H_vec[1],

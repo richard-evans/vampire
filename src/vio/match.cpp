@@ -21,6 +21,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
+#include "environment.hpp"
 #include "material.hpp"
 #include "gpu.hpp"
 #include "grains.hpp"
@@ -83,7 +84,7 @@ namespace vin{
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-
+        else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -2692,7 +2693,8 @@ namespace vin{
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
-
+            else if(environment::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+                  
             //--------------------------------------------------------------------
             // keyword not found
             //--------------------------------------------------------------------
