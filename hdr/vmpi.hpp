@@ -111,6 +111,7 @@ namespace vmpi{
 	// wrapper functions avoiding MPI library
 	extern void barrier();
    extern uint64_t reduce_sum(uint64_t local);
+   extern uint64_t all_reduce_sum(uint64_t local);
    extern void collate(std::vector<double>& input, std::vector<double>& output);
    extern void counts_and_displacements(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
    extern void fast_collate(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);

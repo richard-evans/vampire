@@ -53,6 +53,25 @@ uint64_t reduce_sum(uint64_t local){
 
 }
 
+//------------------------------------------------------------------------------
+// Wrapper function(s) for MPI all reduce operation
+//------------------------------------------------------------------------------
+uint64_t all_reduce_sum(uint64_t local){
+
+   uint64_t global = 0;
+
+   #ifdef MPICF
+      // Perform MPI reduce for MPI code
+      MPI_Allreduce(&local, &global, 1, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+   #else
+      // set global variable equal to local for serial calls
+      global = local;
+   #endif
+
+   return global;
+
+}
+
 //--------------------------------------------------------------------------------------
 // Function to collate an array on master from distributed components on all processors
 //--------------------------------------------------------------------------------------
