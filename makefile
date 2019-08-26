@@ -144,6 +144,7 @@ include src/simulate/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
+include src/environment/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile
