@@ -7,11 +7,6 @@
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
-create:crystal-structure=sc
-
-#------------------------------------------
-# System Dimensions:
-#------------------------------------------
 dimensions:unit-cell-size = 3.54 !A
 dimensions:system-size-x = 7.7 !nm
 dimensions:system-size-y = 7.7 !nm
@@ -25,33 +20,22 @@ material:file=Co.mat
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
-sim:temperature=0.0
-sim:time-steps-increment=100
-sim:total-time-steps=1000
-sim:time-step=1.0E-16
-
-sim:applied-field-strength=0.0 !T
-sim:applied-field-unit-vector=1,0,0
-
-# gpu:acceleration
-# gpu:calculate-statistics-on-cpu
+sim:temperature=300.0
+sim:time-steps-increment=1000
+sim:total-time-steps=10000
+sim:time-step=1.0E-15
 
 #------------------------------------------
 # Program and integrator details
 #------------------------------------------
-sim:program=time-series
+sim:program=benchmark
 sim:integrator=llg-heun
 
 #------------------------------------------
 # data output
 #------------------------------------------
 output:real-time
-output:temperature
 output:magnetisation
-output:magnetisation-length
-output:applied-field-alignment
-output:output-rate = 50
 
 screen:time-steps
-screen:magnetisation
 screen:magnetisation-length

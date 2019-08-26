@@ -61,34 +61,6 @@ class zkten_t{
 	};
 };
 
-//--------------------------------------------------------------------
-// Class to contain parameters for lattice anisotropy calculation.
-//
-// Tabulated values are read from a file and added point-wise to
-// the class. During variable initialisation interpolating functions
-// are determined to calculate k(T)
-//
-class lattice_anis_t{
-
-   private:
-
-      unsigned int Tmax; // maximum array value in tabulated function
-      double k_Tmax; // value of anisotropy at k_Tmax (used for all T > Tmax)
-
-      std::vector<unsigned int> T; // input temperature points
-      std::vector<double> k; // input lattice anisotropy points
-      std::vector<double> m; // calculated m value
-      std::vector<double> c; // calculated c value
-
-   public:
-
-      void add_point(double, double);
-      void set_interpolation_table();
-      double get_lattice_anisotropy_constant(double);
-      void output_interpolated_function(int);
-
-};
-
 namespace mp
 {
 
@@ -110,25 +82,6 @@ namespace mp
 		double alpha;
 		double mu_s_SI;
 		double magnetisation;
-		double Ku1_SI; /// SI uniaxial anisotropy constant
-		double Ku2_SI;
-      double Ku3_SI;
-      double Klatt_SI;
-		std::vector<double> KuVec_SI; /// SI anisotropy tensor
-		double Ku; /// normalised uniaxial anisotropy constant
-      double Ku2; /// normalised uniaxial anisotropy constant
-      double Ku3; /// normalised uniaxial anisotropy constant
-      double sh2; // second order spherical harmonic anisotropy constant
-      double sh4; // fourth order spherical harmonic anisotropy constant
-      double sh6; // sixth order spherical harmonic anisotropy constant
-      double Klatt; /// normalised lattice anisotropy
-      std::vector<double> KuVec; /// normalised anisotropy tensor
-		std::vector<double> UniaxialAnisotropyUnitVector; /// unit vector for material uniaxial anisotropy
-		double Kc1_SI;
-		double Kc2_SI;
-		double Kc;
-		double Ks_SI;
-		double Ks;
 
 		double gamma_rel;
 		std::vector<std::vector<double> >Jij_matrix_SI;
@@ -136,8 +89,6 @@ namespace mp
 		double initial_spin[3];
 		bool random_spins;
 
-		double min;
-		double max;
 		int geometry; ///< 0 (geometry disabled, 1+ geometry enabled with 1+ points
 		double geometry_coords[100][2];
 		double core_shell_size;
@@ -152,7 +103,6 @@ namespace mp
 
 		bool continuous;	///< Specifies if a material is continuous (overrides granularity in the layer)
 		bool moment_flag;	///< Specifies whether moment is set explicitly or from magnetisation
-		bool anis_flag;	///< Specifies whether anisotropy is set explicitly or as energy density
 
 		double one_oneplusalpha_sq;
 		double alpha_oneplusalpha_sq;
@@ -160,19 +110,18 @@ namespace mp
 		bool constrained; /// specifies primary or alternate integrator
 
 		double temperature; /// Kelvin
+		double maximum_temperature; /// Kelvin
+		double minimum_temperature; /// Kelvin
 		bool couple_to_phonon_temperature; ///true/false
 		double applied_field_strength; /// Tesla
 		std::vector<double> applied_field_unit_vector; /// unit vector for material uniaxial anisotropy
 		double fmr_field_strength; // Tesla
 		double fmr_field_frequency; // Hz
 		std::vector<double> fmr_field_unit_vector; /// unit vector for material uniaxial anisotropy
-		bool fill; /// flag to determine of material fills voided space
+		bool fill; /// flag to determine if material fills voided space
       double temperature_rescaling_alpha; // temperature rescaling exponent
       double temperature_rescaling_Tc; // temperaure rescaling Tc
-      bool non_magnetic;
-		bool random_anisotropy; // flag to control random anisotropy by material
-		bool random_grain_anisotropy; // flag to control random anisotropy by grain
-      lattice_anis_t lattice_anisotropy; // class containing lattice anisotropy data
+      int non_magnetic;
 
 		materials_t();
 		int print();
@@ -188,7 +137,7 @@ namespace mp
 	extern double gamma_SI;
 
 	// Unrolled material parameters for speed
-	extern std::vector <double> MaterialMuSSIArray;
+	extern std::vector <double> mu_s_array;
 	extern std::vector <zkval_t> MaterialScalarAnisotropyArray;
 	extern std::vector <zkten_t> MaterialTensorAnisotropyArray;
    extern std::vector <double> material_second_order_anisotropy_constant_array;

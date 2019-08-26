@@ -40,16 +40,6 @@
 #include "vmpi.hpp"
 #include "material.hpp"
 
-#ifdef MPICF
-struct null_streambuf
-: public std::streambuf
-{
-  void overflow(char c)
-  {
-  }
-};
-#endif
-
 // Global Output Streams
 extern std::ofstream zinfo;
 extern std::ofstream zmag;
@@ -76,11 +66,17 @@ namespace vin{
    extern void check_for_valid_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
                                      double range_min, double range_max, std::string input_file_type, std::string range_text);
 
+   extern void check_for_valid_positive_value(double& value, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
+                                              double range_min, double range_max, std::string input_file_type, std::string range_text);
+
    extern void check_for_valid_int(int& value, std::string word, int line, std::string prefix, int range_min, int range_max,
                                    std::string input_file_type, std::string range_text);
 
    extern void check_for_valid_int(  unsigned int& value, std::string word, int line, std::string prefix, unsigned int range_min,
                               unsigned int range_max, std::string input_file_type, std::string range_text);
+
+   extern void check_for_valid_int(  uint64_t& value, std::string word, int line, std::string prefix,
+                                     uint64_t range_min, uint64_t range_max, std::string input_file_type, std::string range_text);
 
    extern bool check_for_valid_bool( std::string value, std::string word, int line, std::string prefix, std::string input_file_type);
 
@@ -91,7 +87,12 @@ namespace vin{
    extern void check_for_valid_vector(std::vector<double>& u, std::string word, int line, std::string prefix, std::string unit, std::string unit_type,
                                       double range_min, double range_max, std::string input_file_type, std::string range_text);
 
-   extern std::vector<double> DoublesFromString(std::string value);
+   extern std::vector<double> doubles_from_string(std::string value);
+
+   // function to read file on master process and return a std::string of its contents
+   extern std::string get_string(std::string const filename, std::string source_file_name, int line);
+
+   uint64_t str_to_uint64(std::string input_str);
 
    extern std::vector<mp::materials_t> read_material;
 
@@ -99,6 +100,7 @@ namespace vin{
 
 namespace vout{
 
+   extern bool custom_precision; // enable user selectable precision for data output
    extern unsigned int precision; // variable to control output precision (digits)
    extern bool fixed; // fixed precision output
 
@@ -111,23 +113,6 @@ namespace vout{
 
    extern bool gnuplot_array_format;
 
-	extern bool output_atoms_config;
-	extern int output_atoms_config_rate;
-
-	extern double atoms_output_min[3];
-	extern double atoms_output_max[3];
-
-	extern double field_output_min_1;
-	extern double field_output_max_1;
-	extern double field_output_min_2;
-	extern double field_output_max_2;
-
-	extern bool output_cells_config;
-	extern int output_cells_config_rate;
-
-	extern bool output_grains_config;
-	extern int output_config_grain_rate;
-
 	//extern bool output_povray;
 	//extern int output_povray_rate;
 
@@ -135,7 +120,6 @@ namespace vout{
 	//extern int output_povray_cells_rate;
 
 	extern void data();
-	extern void config();
 	extern void zLogTsInit(std::string);
 
 	//extern int pov_file();
@@ -148,5 +132,10 @@ namespace vout{
 // Checkpoint load/save functions
 void load_checkpoint();
 void save_checkpoint();
+
+namespace vio{
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
+}
 
 #endif /*VIO_H_*/

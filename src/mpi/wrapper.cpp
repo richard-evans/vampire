@@ -23,7 +23,7 @@ void barrier(){
 
    // Wait for all processors just in case anyone else times out
    #ifdef MPICF
-      MPI::COMM_WORLD.Barrier();
+      MPI_Barrier(MPI_COMM_WORLD);
    #endif
 
    return;

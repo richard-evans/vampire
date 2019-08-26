@@ -33,14 +33,14 @@ namespace atoms{
 	//--------------------------
 	// Single Variables
 	//--------------------------
-	int num_atoms;			/// Number of atoms in simulation
-	int num_neighbours;	   	/// Maximum number of neighbours for Hamiltonian/Lattice
-	int total_num_neighbours;
-	int exchange_type;
+   int num_atoms = 0;			/// Number of atoms in simulation
+   int num_neighbours = 0;	   	/// Maximum number of neighbours for Hamiltonian/Lattice
+   int total_num_neighbours = 0;
+   uint64_t num_non_magnetic_atoms = 0; // Number of non-magnetic atoms not to be simulated
+
 	//--------------------------
 	// Array Variables
 	//--------------------------
-
 	std::vector <double> x_coord_array(0);
 	std::vector <double> y_coord_array(0);
 	std::vector <double> z_coord_array(0);
@@ -64,26 +64,13 @@ namespace atoms{
 	std::vector <double> x_total_external_field_array(0);	/// Total external fields
 	std::vector <double> y_total_external_field_array(0);	/// Total external fields
 	std::vector <double> z_total_external_field_array(0);	/// Total external fields
-	std::vector <double> x_dipolar_field_array(0);			/// Dipolar fields
-	std::vector <double> y_dipolar_field_array(0);			/// Dipolar fields
-	std::vector <double> z_dipolar_field_array(0);			/// Dipolar fields
 
 	std::vector <zval_t> i_exchange_list(0);
 	std::vector <zvec_t> v_exchange_list(0);
 	std::vector <zten_t> t_exchange_list(0);
 
-	// surface anisotropy
-	std::vector<bool> surface_array(0);
-	std::vector<int> nearest_neighbour_list(0);
-	std::vector<int> nearest_neighbour_list_si(0);
-	std::vector<int> nearest_neighbour_list_ei(0);
-	std::vector<double> eijx(0);
-	std::vector<double> eijy(0);
-	std::vector<double> eijz(0);
+   std::vector <bool> surface_array(0); // flag to identify atom as surface
 
-	// Local anisotropy directions for each atom
-	std::vector<double> uniaxial_anisotropy_vector_x(0);
-	std::vector<double> uniaxial_anisotropy_vector_y(0);
-	std::vector<double> uniaxial_anisotropy_vector_z(0);
+   std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
 
 }

@@ -41,6 +41,7 @@ namespace unitcell{
       else if(uc::internal::crystal_structure == "bcc") uc::internal::build_body_centred_cubic(unit_cell);
       else if(uc::internal::crystal_structure == "fcc") uc::internal::build_face_centred_cubic(unit_cell);
       else if(uc::internal::crystal_structure == "hcp") uc::internal::build_hexagonal_close_packed(unit_cell);
+      else if(uc::internal::crystal_structure == "rocksalt") uc::internal::build_rock_salt(unit_cell);
       // Otherwise print an error to user
       else{
          terminaltextcolor(RED);

@@ -41,6 +41,8 @@ namespace stats{
 
          // update susceptibility statistics
          if(stats::calculate_system_susceptibility)         stats::system_susceptibility.calculate(stats::system_magnetization.get_magnetization());
+         if(stats::calculate_material_susceptibility)       stats::material_susceptibility.calculate(stats::material_magnetization.get_magnetization());
+
       }
 
       return;
@@ -65,6 +67,8 @@ namespace stats{
 
          // reset susceptibility statistics
          if(stats::calculate_system_susceptibility) stats::system_susceptibility.reset_averages();
+         if(stats::calculate_material_susceptibility) stats::material_susceptibility.reset_averages();
+
       }
 
       return;

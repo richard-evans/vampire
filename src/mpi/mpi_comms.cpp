@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -32,17 +32,17 @@
 //
 //====================================================================================
 //
-//		Locally allocated variables: 	
+//		Locally allocated variables:
 //
 //=====================================================================================
-#ifdef MPICF
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "vmpi.hpp"
 #include <iostream>
 
+namespace vmpi{
 
-int mpi_init_halo_swap(){
+void mpi_init_halo_swap(){
 	//====================================================================================
 	//
 	///												mpi_init_halo_swap
@@ -53,12 +53,12 @@ int mpi_init_halo_swap(){
 	//
 	//====================================================================================
 	//
-	//		Locally allocated variables: 	
+	//		Locally allocated variables:
 	//
 	//====================================================================================
 
 	//using namespace mpi_comms;
-
+#ifdef MPICF
 	//----------------------------------------------------------
 	// check calling of routine if error checking is activated
 	//----------------------------------------------------------
@@ -90,29 +90,33 @@ int mpi_init_halo_swap(){
 	//----------------------------------------------------------
 
 	vmpi::requests.resize(0);
+	MPI_Request req;
 
 	for (int p=0;p<vmpi::num_processors;p++){
 		if(vmpi::send_num_array[p]!=0){
 			int num_pts = 3*vmpi::send_num_array[p];
 			int si = 3*vmpi::send_start_index_array[p];
-			vmpi::requests.push_back(MPI::COMM_WORLD.Isend(&vmpi::send_spin_data_array[si],num_pts,MPI_DOUBLE,p,48));
+			vmpi::requests.push_back(req);
+			MPI_Isend(&vmpi::send_spin_data_array[si],num_pts,MPI_DOUBLE,p,48, MPI_COMM_WORLD, &vmpi::requests.back());
 		}
 		if(vmpi::recv_num_array[p]!=0){
 			int num_pts = 3*vmpi::recv_num_array[p];
 			int si = 3*vmpi::recv_start_index_array[p];
-			vmpi::requests.push_back(MPI::COMM_WORLD.Irecv(&vmpi::recv_spin_data_array[si],num_pts,MPI_DOUBLE,p,48));
+			vmpi::requests.push_back(req);
+			MPI_Irecv(&vmpi::recv_spin_data_array[si],num_pts,MPI_DOUBLE,p,48, MPI_COMM_WORLD, &vmpi::requests.back());
 		}
 	}
 
+   #endif
 	//----------------------------------------------------------
 	// Return
 	//----------------------------------------------------------
 
-	return 0;
+	return;
 
 }
 
-int mpi_complete_halo_swap(){
+void mpi_complete_halo_swap(){
 	//====================================================================================
 	///
 	///												mpi_complete_halo_swap
@@ -123,6 +127,8 @@ int mpi_complete_halo_swap(){
 	//
 	//====================================================================================
 
+   #ifdef MPICF
+
 	// check calling of routine if error checking is activated
 	if(err::check==true){
 		std::cout << "mpi_complete_halo_swap has been called" << "\t";
@@ -131,14 +137,14 @@ int mpi_complete_halo_swap(){
 
 	// Swap timers compute -> wait
 	vmpi::TotalComputeTime+=vmpi::SwapTimer(vmpi::ComputeTime, vmpi::WaitTime);
-	
+
 	// Wait for all comms to complete
 	vmpi::stati.resize(vmpi::requests.size());
-	MPI::Request::Waitall(vmpi::requests.size(),&vmpi::requests[0],&vmpi::stati[0]);
+	MPI_Waitall(vmpi::requests.size(),&vmpi::requests[0],&vmpi::stati[0]);
 
 	// Swap timers wait -> compute
 	vmpi::TotalWaitTime+=vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);
-	
+
 	// Unpack received spins
 	for(unsigned int i=0;i<vmpi::recv_atom_translation_array.size();i++){
 		atoms::x_spin_array[vmpi::recv_atom_translation_array[i]] = vmpi::recv_spin_data_array[3*i+0];
@@ -150,7 +156,10 @@ int mpi_complete_halo_swap(){
 		//std::cout << atoms::z_spin_array[vmpi::recv_atom_translation_array[i]] << std::endl;
 	}
 
-	return 0;
+   #endif
+
+	return;
 
 }
-#endif
+
+} // end of namespace vmpi

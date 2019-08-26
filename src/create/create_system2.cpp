@@ -52,16 +52,18 @@
 #include "errors.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
-#include "demag.hpp"
+#include "create.hpp"
+#include "dipole.hpp"
 #include "grains.hpp"
 #include "ltmp.hpp"
 #include "material.hpp"
 #include "sim.hpp"
+#include "spintorque.hpp"
 #include "unitcell.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
 #include "vmpi.hpp"
-#include "create.hpp"
+
 
 
 
@@ -76,7 +78,7 @@ namespace cs{
 	// System Dimensions
 	double system_dimensions[3]={77.0,77.0,77.0};	/// Size of system (A)
 	bool pbc[3]={false,false,false};						/// Periodic boundary conditions
-	bool SelectMaterialByZHeight=false;					/// Toggle overwriting of material id by z-height
+
 	bool SelectMaterialByGeometry=false;					/// Toggle override of input material type by geometry
 	unsigned int total_num_unit_cells[3]={0,0,0};	/// Unit cells for entire system (x,y,z)
 	unsigned int local_num_unit_cells[3]={0,0,0};	/// Unit cells on local processor (x,y,z)
@@ -96,6 +98,7 @@ namespace cs{
 	int system_creation_flags[10]={0,0,0,0,0,0,0,0,0,0};
 
 	bool fill_core_shell=true;
+   bool core_shell_particles = false;
 
    // Variables for multilayer system
    bool multilayers = false;
@@ -132,6 +135,9 @@ int create(){
 	//=============================================================
 	//      System creation variables
 	//=============================================================
+
+   // initialise create module parameters
+   create::initialize();
 
 	// Atom creation array
 	std::vector<cs::catom_t> catom_array;
@@ -197,7 +203,7 @@ int create(){
 			}
 
 			// Wait for process who is it
-			MPI::COMM_WORLD.Barrier();
+			vmpi::barrier();
 
 		} // end of loop over processes
 	}
@@ -213,9 +219,9 @@ int create(){
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
 	if(vmpi::mpi_mode==0){
-		MPI::COMM_WORLD.Barrier(); // wait for everyone
+		vmpi::barrier();// wait for everyone
 		vmpi::copy_halo_atoms(catom_array);
-		MPI::COMM_WORLD.Barrier(); // sync after halo atoms copied
+		vmpi::barrier(); // sync after halo atoms copied
 	}
 	else if(vmpi::mpi_mode==1){
 		vmpi::set_replicated_data(catom_array);
@@ -236,7 +242,7 @@ int create(){
 	} // stop if for staged generation here
 	// ** Must be done in parallel **
 		vmpi::init_mpi_comms(catom_array);
-		MPI::COMM_WORLD.Barrier();
+		vmpi::barrier();
 	#endif
 
 	// Set atom variables for simulation
@@ -262,7 +268,7 @@ int create(){
 			}
 
 			// Wait for process who is it
-			MPI::COMM_WORLD.Barrier();
+			vmpi::barrier();
 
 		} // end of loop over processes
 	}
@@ -279,17 +285,42 @@ int create(){
 	} // stop if for staged generation here
 	#endif
 
-	// Set grain and cell variables for simulation
-	grains::set_properties();
-	cells::initialise();
-	if(sim::hamiltonian_simulation_flags[4]==1) demag::init();
-
    // Determine number of local atoms
    #ifdef MPICF
       int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    #else
       int num_local_atoms = atoms::num_atoms;
    #endif
+
+	// Set grain and cell variables for simulation
+	grains::set_properties();
+   cells::initialize(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  cs::unit_cell.dimensions[0],
+                  cs::unit_cell.dimensions[1],
+                  cs::unit_cell.dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  atoms::cell_array,
+						create::num_total_atoms_non_filler,
+                  atoms::num_atoms
+      );
+
+   //----------------------------------------
+   // Initialise spin torque data
+   //----------------------------------------
+   st::initialise(cs::system_dimensions[0],
+                  cs::system_dimensions[1],
+                  cs::system_dimensions[2],
+                  atoms::x_coord_array,
+                  atoms::y_coord_array,
+                  atoms::z_coord_array,
+                  atoms::type_array,
+                  num_local_atoms);
+
    //----------------------------------------
    // Initialise local temperature data
    //----------------------------------------
@@ -311,13 +342,15 @@ int create(){
 					   sim::Tmin,
 					   sim::Tmax);
 
+
 	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
 		//vmpi::crystal_xyz(catom_array);
 	int my_num_atoms=vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+   //std::cout << "my_num_atoms == " << my_num_atoms << std::endl;
 	int total_num_atoms=0;
-	MPI::COMM_WORLD.Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0 );
+	MPI_Reduce(&my_num_atoms,&total_num_atoms, 1,MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 	std::cout << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
    zlog << zTs() << "Total number of atoms (all CPUs): " << total_num_atoms << std::endl;
 	#else

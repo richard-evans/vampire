@@ -13,7 +13,7 @@
 #include "gpu.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
-//#include "opencl.hpp"
+#include "vopencl.hpp"
 
 namespace gpu{
 
@@ -25,7 +25,7 @@ namespace gpu{
       #ifdef CUDA
          vcuda::finalize();
       #elif OPENCL
-         opencl::finalize();
+         vopencl::finalize();
       #endif
 
       return;

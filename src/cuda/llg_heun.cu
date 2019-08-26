@@ -36,6 +36,7 @@ namespace vcuda{
         if (!cu::llg::initialized) cu::llg::__llg_init();
         // perform a single LLG Heun step
         cu::llg::__llg_step();
+
       #endif
 
       return;

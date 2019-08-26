@@ -51,12 +51,12 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
 
    // save mask to internal storage
    num_atoms = in_mask.size();
-   mask_size = in_mask_size;
-   mean_counter=0.0;
+   mask_size = in_mask_size - 1; // last element contains magnetization for non-magnetic atoms
+   mean_counter = 0.0;
    mask=in_mask; // copy contents of vector
-   magnetization.resize(4*mask_size,0.0);
-   mean_magnetization.resize(4*mask_size,0.0);
-   saturation.resize(mask_size,0.0);
+   magnetization.resize(4 * in_mask_size, 0.0);
+   mean_magnetization.resize(4 * in_mask_size, 0.0);
+   saturation.resize(in_mask_size, 0.0);
 
    // calculate contributions of spins to each magetization category
    for(int atom=0; atom<num_atoms; ++atom){
@@ -70,7 +70,7 @@ void magnetization_statistic_t::set_mask(const int in_mask_size, std::vector<int
    #endif
 
    // determine mask id's with no atoms
-   std::vector<int> num_atoms_in_mask(mask_size,0);
+   std::vector<int> num_atoms_in_mask(in_mask_size,0);
    for(unsigned int atom=0; atom<in_mask.size(); ++atom){
       int mask_id = in_mask[atom];
       // add atoms to mask
@@ -214,8 +214,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization(){
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -233,8 +237,12 @@ std::string magnetization_statistic_t::output_magnetization(){
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -252,8 +260,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization_length(){
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
@@ -271,8 +283,12 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization(){
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
@@ -293,8 +309,12 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization_leng
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // inverse number of data samples
    const double ic = 1.0/mean_counter;
@@ -315,8 +335,12 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
 
    // result string stream
    std::ostringstream result;
-   result.precision(vout::precision);
-   if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
 
    // check vector has correct size
    if(vec.size()!=3){
@@ -334,6 +358,58 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
       const double mhy = magnetization[4*mask_id + 1]*mm*vec[1];
       const double mhz = magnetization[4*mask_id + 2]*mm*vec[2];
       result << mhx + mhy + mhz << "\t";
+   }
+
+   return result.str();
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to output actual magnetisation values as string (in Bohr magnetons)
+//------------------------------------------------------------------------------------------------------
+std::string magnetization_statistic_t::output_mean_magnetization_length(){
+
+   // result string stream
+   std::ostringstream result;
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
+
+   // inverse number of data samples
+   const double ic = 1.0/mean_counter;
+
+   // loop over all magnetization values
+   for(int mask_id=0; mask_id<mask_size; ++mask_id){
+      result << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic << "\t";
+   }
+
+   return result.str();
+
+}
+
+//------------------------------------------------------------------------------------------------------
+// Function to output normalised mean magnetisation values as string
+//------------------------------------------------------------------------------------------------------
+std::string magnetization_statistic_t::output_mean_magnetization(){
+
+   // result string stream
+   std::ostringstream result;
+
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
+
+   // inverse number of data samples
+   const double ic = 1.0/mean_counter;
+
+   // loop over all magnetization values
+   for(int mask_id=0; mask_id<mask_size; ++mask_id){
+      result << mean_magnetization[4*mask_id + 0]*ic << "\t" << mean_magnetization[4*mask_id + 1]*ic << "\t" << mean_magnetization[4*mask_id + 2]*ic << "\t" << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic << "\t";
    }
 
    return result.str();

@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -33,17 +33,17 @@ namespace mtrandom
 // Namespace mt random
 //==========================================================
 {
-	
+
 	int voronoi_seed=1951218893;
 	int integration_seed=2137082040;
-	
+
 	double x1,x2,w;
 	double number1;
 	double number2;
 	bool logic=false;
 	MTRand grnd; // single sequence of random numbers
 
-  
+
 double gaussian_old(){
 	using namespace mtrandom;
 
@@ -66,7 +66,7 @@ double gaussian_old(){
 		}
 }
 
-  // Here is a revised version which is ~ 10x faster! gaussian() above takes ~ 30% 
+  // Here is a revised version which is ~ 10x faster! gaussian() above takes ~ 30%
   //running time for LLG integration, now ~ 3%
 
 
@@ -104,10 +104,10 @@ double gaussian_old(){
 //#include <gsl/gsl_rng.h>
 
 
-/// position of right-most step 
+/// position of right-most step
 #define PARAM_R 3.44428647676
 
-/// tabulated values for the heigt of the Ziggurat levels 
+/// tabulated values for the heigt of the Ziggurat levels
 static const double ytab[128] = {
   1, 0.963598623011, 0.936280813353, 0.913041104253,
   0.892278506696, 0.873239356919, 0.855496407634, 0.838778928349,
@@ -144,7 +144,7 @@ static const double ytab[128] = {
 };
 
 /// tabulated values for 2^24 times x[i]/x[i+1],
-/// used to accept for U*x[i+1]<=x[i] without any floating point operations 
+/// used to accept for U*x[i+1]<=x[i] without any floating point operations
 static const unsigned long ktab[128] = {
   0, 12590644, 14272653, 14988939,
   15384584, 15635009, 15807561, 15933577,
@@ -180,7 +180,7 @@ static const unsigned long ktab[128] = {
   16207738, 16047994, 15704248, 15472926
 };
 
-/// tabulated values of 2^{-24}*x[i] 
+/// tabulated values of 2^{-24}*x[i]
 static const double wtab[128] = {
   1.62318314817e-08, 2.16291505214e-08, 2.54246305087e-08, 2.84579525938e-08,
   3.10340022482e-08, 3.33011726243e-08, 3.53439060345e-08, 3.72152672658e-08,
@@ -221,7 +221,7 @@ double gaussian(){
   double  x, y;
 
   while (1) {
-    U = grnd.i32();
+    U = mtrandom::grnd.i32();
     i = U & 0x0000007F;		/* 7 bit to choose the step */
     sign = U & 0x00000080;	/* 1 bit for the sign */
     j = U>>8;			/* 24 bit for the x-value */
@@ -233,10 +233,10 @@ double gaussian(){
       double  y0, y1;
       y0 = ytab[i];
       y1 = ytab[i+1];
-      y = y1+(y0-y1)*grnd();
+      y = y1+(y0-y1)*mtrandom::grnd();
     } else {
-      x = PARAM_R - log(1.0-grnd())/PARAM_R;
-      y = exp(-PARAM_R*(x-0.5*PARAM_R))*grnd();
+      x = PARAM_R - log(1.0-mtrandom::grnd())/PARAM_R;
+      y = exp(-PARAM_R*(x-0.5*PARAM_R))*mtrandom::grnd();
     }
     if (y < exp(-0.5*x*x))  break;
   }

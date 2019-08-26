@@ -13,6 +13,9 @@
 #include "create.hpp"
 #include "material.hpp"
 
+// Internal create header
+#include "internal.hpp"
+
 namespace cs{
 
    //--------------------------------------------------------------------------
@@ -44,8 +47,8 @@ namespace cs{
       std::vector<bool> mat_fill(mp::num_materials);
 
       for(int mat=0;mat<mp::num_materials;mat++){
-         mat_min[mat]=mp::material[mat].min;
-         mat_max[mat]=mp::material[mat].max;
+         mat_min[mat]=create::internal::mp[mat].min;
+         mat_max[mat]=create::internal::mp[mat].max;
          // alloys generally are not defined by height, and so have max = 0.0
          if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
          mat_fill[mat]=mp::material[mat].fill;
@@ -61,8 +64,10 @@ namespace cs{
                const double mat_min_z = (mat_min[mat] + multilayer_num)*fractional_system_height;
                const double mat_max_z = (mat_max[mat] + multilayer_num)*fractional_system_height;
                const double cz=catom_array[atom].z;
+               const int atom_uc_cat = catom_array[atom].uc_category;
+               const int mat_uc_cat = create::internal::mp[mat].unit_cell_category;
                // if in range then allocate to material
-               if((cz>=mat_min_z) && (cz<mat_max_z) && (mat_fill[mat]==false)){
+               if((cz>=mat_min_z) && (cz<mat_max_z) && (mat_fill[mat]==false) && (atom_uc_cat == mat_uc_cat) ){
                   catom_array[atom].material=mat;
                   catom_array[atom].include=true;
                   // Optionally recategorize heigh magnetization by layer in multilayer

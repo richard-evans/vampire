@@ -12,7 +12,7 @@
 // Vampire headers
 #include "gpu.hpp"
 #include "cuda.hpp"
-//#include "opencl.hpp"
+#include "vopencl.hpp"
 
 namespace gpu{
 
@@ -26,7 +26,7 @@ namespace gpu{
          #ifdef CUDA
             vcuda::config::synchronise();
          #elif OPENCL
-            opencl::config::synchronise();
+            vopencl::config::synchronise();
          #endif
 
          return;
