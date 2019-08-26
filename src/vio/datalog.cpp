@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans and Rory Pond 2016. All rights reserved.
+//   (c) Andrew Naden, Richard F L Evans and Rory Pond 2016. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk and rory.pond@york.ac.uk
 //
@@ -86,203 +86,205 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 }
 
 namespace vout{
-    
-    void output_switch(std::ostream& stream,unsigned int idx,bool header){
-				switch(idx){
-					case 0:
-						vout::time(stream,header);
-						break;
-					case 1:
-						vout::real_time(stream,header);
-						break;
-					case 2:
-						vout::temperature(stream,header);
-						break;
-					case 3:
-						vout::Happ(stream,header);
-						break;
-					case 4:
-						vout::Hvec(stream,header);
-						break;
-					case 5:
-						vout::mvec(stream,header);
-						break;
-					case 6:
-						vout::magm(stream,header);
-						break;
-					case 7:
-						vout::mean_magm(stream,header);
-						break;
-					case 8:
-						vout::mat_mvec(stream,header);
-						break;
-					case 9:
-						vout::mat_mean_magm(stream,header);
-						break;
-					case 12:
-						vout::mdoth(stream,header);
-						break;
-					case 14:
-						vout::systorque(stream,header);
-						break;
-					case 15:
-						vout::mean_systorque(stream,header);
-						break;
-					case 16:
-						vout::constraint_phi(stream,header);
-						break;
-					case 17:
-						vout::constraint_theta(stream,header);
-						break;
-					case 18:
-						vout::material_constraint_phi(stream,header);
-						break;
-					case 19:
-						vout::material_constraint_theta(stream,header);
-						break;
-					case 20:
-						vout::material_mean_systorque(stream,header);
-						break;
-					case 21:
-						vout::mean_system_susceptibility(stream,header);
-						break;
-					case 22:
-						vout::phonon_temperature(stream,header);
-						break;
-					case 23:
-						vout::material_temperature(stream,header);
-						break;
-					case 24:
-						vout::material_applied_field_strength(stream,header);
-						break;
-					case 25:
-						vout::material_fmr_field_strength(stream,header);
-						break;
-					case 26:
-						vout::mat_mdoth(stream,header);
-						break;
-					case 27:
-						vout::total_energy(stream,header);
-						break;
-					case 28:
-						vout::mean_total_energy(stream,header);
-						break;
-					case 29:
-						vout::total_anisotropy_energy(stream,header);
-						break;
-					case 30:
-						vout::mean_total_anisotropy_energy(stream,header);
-						break;
-					case 31:
-						//vout::total_cubic_anisotropy_energy(stream,header);
-						break;
-					case 32:
-						//vout::mean_total_cubic_anisotropy_energy(stream,header);
-						break;
-					case 33:
-						//vout::total_surface_anisotropy_energy(stream,header);
-						break;
-					case 34:
-						//vout::mean_total_surface_anisotropy_energy(stream,header);
-						break;
-					case 35:
-						vout::total_exchange_energy(stream,header);
-						break;
-					case 36:
-						vout::mean_total_exchange_energy(stream,header);
-						break;
-					case 37:
-						vout::total_applied_field_energy(stream,header);
-						break;
-					case 38:
-						vout::mean_total_applied_field_energy(stream,header);
-						break;
-					case 39:
-						vout::total_magnetostatic_energy(stream,header);
-						break;
-					case 40:
-						vout::mean_total_magnetostatic_energy(stream,header);
-						break;
-					case 41:
-						//vout::total_so_anisotropy_energy(stream,header);
-						break;
-					case 42:
-						//vout::mean_total_so_anisotropy_energy(stream,header);
-						break;
-					case 43:
-						vout::height_mvec(stream,header);
-						break;
-					case 44:
-						vout::material_height_mvec(stream,header);
-						break;
-					case 45:
-						vout::height_mvec_actual(stream,header);
-						break;
-					case 46:
-						vout::material_height_mvec_actual(stream,header);
-						break;
-					case 47:
-						vout::fmr_field_strength(stream,header);
-						break;
-               case 48:
-						vout::mean_mvec(stream,header);
-						break;
-               case 49:
-						vout::mat_mean_mvec(stream,header);
-						break;
-               case 50:
-						vout::mean_material_susceptibility(stream,header);
-						break;
-					case 51:
-						vout::mean_height_magnetisation_length(stream,header);
-						break;
-					case 52:
-						vout::mean_height_magnetisation(stream,header);
-						break;
-					case 60:
-						vout::MPITimings(stream,header);
-						break;
-					case 61:
-						vout::mean_system_specific_heat(stream,header);
-						break;
-					case 62:
-						vout::mean_material_specific_heat(stream,header);
-						break;
-                    case 63:
-                       vout::material_total_energy(stream,header);
-                       break;
-                    case 64:
-                       vout::material_mean_total_energy(stream,header);
-                       break;
-                    case 999: //AJN
-						vout::standard_deviation(stream,header);
-						break;
-				}
 
-    }
+   void output_switch(std::ostream& stream,unsigned int idx,bool header){
+      switch(idx){
+      	case 0:
+      		vout::time(stream,header);
+      		break;
+      	case 1:
+      		vout::real_time(stream,header);
+      		break;
+      	case 2:
+      		vout::temperature(stream,header);
+      		break;
+      	case 3:
+      		vout::Happ(stream,header);
+      		break;
+      	case 4:
+      		vout::Hvec(stream,header);
+      		break;
+      	case 5:
+      		vout::mvec(stream,header);
+      		break;
+      	case 6:
+      		vout::magm(stream,header);
+      		break;
+      	case 7:
+      		vout::mean_magm(stream,header);
+      		break;
+      	case 8:
+      		vout::mat_mvec(stream,header);
+      		break;
+      	case 9:
+      		vout::mat_mean_magm(stream,header);
+      		break;
+      	case 12:
+      		vout::mdoth(stream,header);
+      		break;
+      	case 14:
+      		vout::systorque(stream,header);
+      		break;
+      	case 15:
+      		vout::mean_systorque(stream,header);
+      		break;
+      	case 16:
+      		vout::constraint_phi(stream,header);
+      		break;
+      	case 17:
+      		vout::constraint_theta(stream,header);
+      		break;
+      	case 18:
+      		vout::material_constraint_phi(stream,header);
+      		break;
+      	case 19:
+      		vout::material_constraint_theta(stream,header);
+      		break;
+      	case 20:
+      		vout::material_mean_systorque(stream,header);
+      		break;
+      	case 21:
+      		vout::mean_system_susceptibility(stream,header);
+      		break;
+      	case 22:
+      		vout::phonon_temperature(stream,header);
+      		break;
+      	case 23:
+      		vout::material_temperature(stream,header);
+      		break;
+      	case 24:
+      		vout::material_applied_field_strength(stream,header);
+      		break;
+      	case 25:
+      		vout::material_fmr_field_strength(stream,header);
+      		break;
+      	case 26:
+      		vout::mat_mdoth(stream,header);
+      		break;
+      	case 27:
+      		vout::total_energy(stream,header);
+      		break;
+      	case 28:
+      		vout::mean_total_energy(stream,header);
+      		break;
+      	case 29:
+      		vout::total_anisotropy_energy(stream,header);
+      		break;
+      	case 30:
+      		vout::mean_total_anisotropy_energy(stream,header);
+      		break;
+      	case 31:
+      		//vout::total_cubic_anisotropy_energy(stream,header);
+      		break;
+      	case 32:
+      		//vout::mean_total_cubic_anisotropy_energy(stream,header);
+      		break;
+      	case 33:
+      		//vout::total_surface_anisotropy_energy(stream,header);
+      		break;
+      	case 34:
+      		//vout::mean_total_surface_anisotropy_energy(stream,header);
+      		break;
+      	case 35:
+      		vout::total_exchange_energy(stream,header);
+      		break;
+      	case 36:
+      		vout::mean_total_exchange_energy(stream,header);
+      		break;
+      	case 37:
+      		vout::total_applied_field_energy(stream,header);
+      		break;
+      	case 38:
+      		vout::mean_total_applied_field_energy(stream,header);
+      		break;
+      	case 39:
+      		vout::total_magnetostatic_energy(stream,header);
+      		break;
+      	case 40:
+      		vout::mean_total_magnetostatic_energy(stream,header);
+      		break;
+      	case 41:
+      		//vout::total_so_anisotropy_energy(stream,header);
+      		break;
+      	case 42:
+      		//vout::mean_total_so_anisotropy_energy(stream,header);
+      		break;
+      	case 43:
+      		vout::height_mvec(stream,header);
+      		break;
+      	case 44:
+      		vout::material_height_mvec(stream,header);
+      		break;
+      	case 45:
+      		vout::height_mvec_actual(stream,header);
+      		break;
+      	case 46:
+      		vout::material_height_mvec_actual(stream,header);
+      		break;
+      	case 47:
+      		vout::fmr_field_strength(stream,header);
+      		break;
+         case 48:
+      		vout::mean_mvec(stream,header);
+      		break;
+         case 49:
+      		vout::mat_mean_mvec(stream,header);
+      		break;
+         case 50:
+      		vout::mean_material_susceptibility(stream,header);
+      		break;
+      	case 51:
+      		vout::mean_height_magnetisation_length(stream,header);
+      		break;
+      	case 52:
+      		vout::mean_height_magnetisation(stream,header);
+      		break;
+      	case 60:
+      		vout::MPITimings(stream,header);
+      		break;
+      	case 61:
+      		vout::mean_system_specific_heat(stream,header);
+      		break;
+      	case 62:
+      		vout::mean_material_specific_heat(stream,header);
+      		break;
+              case 63:
+                 vout::material_total_energy(stream,header);
+                 break;
+              case 64:
+                 vout::material_mean_total_energy(stream,header);
+                 break;
+              case 999: //AJN
+      		vout::standard_deviation(stream,header);
+      		break;
+      }
 
-    void write_out(std::ostream& stream,std::vector<unsigned int>& list){
-        static bool header = true;
-        // if header is false then header_option is never checked.
-        if(header && !vout::header_option){
-          header = false;
-        };
-		// Output data to output
-		if(vmpi::my_rank==0){
+      return;
+
+   }
+
+   void write_out(std::ostream& stream,std::vector<unsigned int>& list){
+      static bool header = true;
+      // if header is false then header_option is never checked.
+      if(header && !vout::header_option){
+         header = false;
+      };
+      // Output data to output
+      if(vmpi::my_rank==0){
 
          // For gpu acceleration get statistics from device
          if(gpu::acceleration) gpu::stats::get();
 
-			for(unsigned int item=0;item<list.size();item++){
-                output_switch(stream,list[item],header);
-                }
-			// Carriage return
-			if(list.size()>0) stream << std::endl;
+         for(unsigned int item=0;item<list.size();item++){
+            output_switch(stream,list[item],header);
+         }
+         // Carriage return
+         if(list.size()>0) stream << std::endl;
 
-			} // end of code for rank 0 only
-            header = false;
-    }
- 
+      } // end of code for rank 0 only
+      header = false;
+   }
+
 	void zLogTsInit(std::string tmp){
 
 		// Get program name and process ID
@@ -304,9 +306,9 @@ namespace vout{
 		}
 
 		//reverse read into program name
-		linelength=tmprev.size();
-		for(int i=linelength-1;i>=0;i--){
-			char c=tmprev.at(i);
+		linelength = tmprev.size();
+		for(int i = linelength-1; i>=0; i--){
+			char c = tmprev.at(i);
 			zLogProgramName.push_back(c);
 		}
 
@@ -360,7 +362,9 @@ namespace vout{
 		return;
 	}
 
+   //-------------------------------------------
 	// Data output wrapper function
+   //-------------------------------------------
 	void data(){
 
 		// check calling of routine if error checking is activated
@@ -415,56 +419,57 @@ namespace vout{
 
 		if(sim::time%vout::output_grain_rate==0){
 
-		// calculate grain magnetisations
-		grains::mag();
+   		// calculate grain magnetisations
+   		grains::mag();
 
-		// Output data to zgrain
-		if(vmpi::my_rank==0){
+   		// Output data to zgrain
+   		if(vmpi::my_rank==0){
 
-			// check for open ofstream
-			if(vout::grain_output_list.size() > 0 && !zgrain.is_open()){
-				// check for checkpoint continue and append data
-				if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain",std::ofstream::app);
-				// otherwise overwrite file
-				else zgrain.open("grain",std::ofstream::trunc);
-			}
+   			// check for open ofstream
+   			if(vout::grain_output_list.size() > 0 && !zgrain.is_open()){
+   				// check for checkpoint continue and append data
+   				if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zgrain.open("grain",std::ofstream::app);
+   				// otherwise overwrite file
+   				else zgrain.open("grain",std::ofstream::trunc);
+   			}
 
-			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
-			switch(vout::grain_output_list[item]){
-				case 0:
-					vout::time(zgrain,false);
-					break;
-				case 1:
-					vout::real_time(zgrain,false);
-					break;
-				case 2:
-					vout::temperature(zgrain,false);
-					break;
-				case 3:
-					vout::Happ(zgrain,false);
-					break;
-				case 4:
-					vout::Hvec(zgrain,false);
-					break;
-				case 10:
-					vout::grain_mvec(zgrain,false);
-					break;
-				case 11:
-					vout::grain_magm(zgrain,false);
-					break;
-				case 13:
-					vout::grain_mat_mvec(zgrain,false);
-					break;
-				case 22:
-					vout::phonon_temperature(zgrain,false);
-					break;
-			}
-		}
+   			for(unsigned int item=0;item<vout::grain_output_list.size();item++){
+      			switch(vout::grain_output_list[item]){
+      				case 0:
+      					vout::time(zgrain,false);
+      					break;
+      				case 1:
+      					vout::real_time(zgrain,false);
+      					break;
+      				case 2:
+      					vout::temperature(zgrain,false);
+      					break;
+      				case 3:
+      					vout::Happ(zgrain,false);
+      					break;
+      				case 4:
+      					vout::Hvec(zgrain,false);
+      					break;
+      				case 10:
+      					vout::grain_mvec(zgrain,false);
+      					break;
+      				case 11:
+      					vout::grain_magm(zgrain,false);
+      					break;
+      				case 13:
+      					vout::grain_mat_mvec(zgrain,false);
+      					break;
+      				case 22:
+      					vout::phonon_temperature(zgrain,false);
+      					break;
+               }
+            }
 
-		// Carriage return
-		if(vout::grain_output_list.size()>0) zgrain << std::endl;
-		}
-		}
+            // Carriage return
+            if(vout::grain_output_list.size()>0) zgrain << std::endl;
+         }
+
+      }
 
 		// Output configuration files to disk
 		config::output();
@@ -472,8 +477,11 @@ namespace vout{
 		// optionally save checkpoint file
 		if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();
 
-	} // end of data
-}
+      return;
+
+   } // end of data()
+
+} // end of namespace vout
 
 /// @brief Function to output timestamp to stream
 ///

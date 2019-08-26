@@ -3,7 +3,7 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2014. All rights reserved.
+// (c) A J Naden and R F L Evans 2019. All rights reserved.
 //
 //-----------------------------------------------------------------------------
 // Implementing Welford's algorithm for calculating standard deviation
@@ -49,7 +49,7 @@ void standard_deviation_statistic_t::initialize(stats::magnetization_statistic_t
 
    // Now set number of standard_deviation values to match
    residual_sq.resize(4*num_elements,0.0);
-   
+
    // and set the mean at start to 0
    mean.resize(4*num_elements,0.0);
 
@@ -63,12 +63,12 @@ void standard_deviation_statistic_t::initialize(stats::magnetization_statistic_t
 
 //------------------------------------------------------------------------------------------------------
 // Function to calculate standard_deviation of the magnetisation and retain the mean value
-// Welford's algorithm gives a running total. 
+// Welford's algorithm gives a running total.
 //
 //-------------------------------------------------------------------------------------------------------
 void standard_deviation_statistic_t::update(const std::vector<double>& magnetization){
 
-   mean_counter+=1.0; // increment first, as divides by this. 
+   mean_counter+=1.0; // increment first, as divides by this.
    // loop over all elements
    for(int id=0; id< num_elements; ++id){
       // copy reduced magnetisation
