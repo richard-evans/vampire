@@ -1,46 +1,14 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Andrea Meo and Richard Evans 2019. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
+//------------------------------------------------------------------------------
 //
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
-//
-///
-/// @file
-/// @brief Contains the Hysteresis program
-///
-/// @details Performs a field loop to calculate field dependent magnetisation
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section info File Information
-/// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.1
-/// @date    21/03/2011
-/// @internal
-///	Created:		05/02/2011
-///	Revision:	21/03/2011
-///=====================================================================================
-///
 
 // Standard Libraries
 #include <cstdlib>
@@ -51,7 +19,6 @@
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
-
 
 namespace program{
 
@@ -85,8 +52,8 @@ int hysteresis(){
 	if(err::check==true){std::cout << "program::hysteresis has been called" << std::endl;}
 
 	// Setup min and max fields and increment (uT)
-	int64_t iHmax=vmath::iround(double(sim::Hmax)*1.0E6);
-	int64_t miHmax=-iHmax;
+	int64_t iHmax = vmath::iround64(double(sim::Hmax)*1.0E6);
+	int64_t miHmax = -iHmax;
 	int64_t parity_old;
 	int64_t iH_old;
 	uint64_t start_time;
@@ -104,7 +71,7 @@ int hysteresis(){
 	else sim::integrate(sim::equilibration_time);
 
    // Hinc must be positive
-	int64_t iHinc=vmath::iround(double(fabs(sim::Hinc))*1.0E6);
+	int64_t iHinc = vmath::iround64(double(fabs(sim::Hinc))*1.0E6);
 
    int64_t Hfield;
    int64_t iparity=sim::parity;
@@ -119,7 +86,7 @@ int hysteresis(){
 		if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag)
       {
          //necessary to upload value of iH_old when loading the checkpoint !!!
-		   iH_old=static_cast<int64_t>(sim::iH); //  int(sim::iH);
+		   iH_old=static_cast<int64_t>(sim::iH);
          //Setup min and max fields and increment (uT)
 			if(parity_old<0){
 				if(iparity<0) miHmax=iH_old;
