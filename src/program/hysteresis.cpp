@@ -85,11 +85,11 @@ int hysteresis(){
 	if(err::check==true){std::cout << "program::hysteresis has been called" << std::endl;}
 
 	// Setup min and max fields and increment (uT)
-	int iHmax=vmath::iround(double(sim::Hmax)*1.0E6);
-	int miHmax=-iHmax;
-	int parity_old;
-	int iH_old;
-	int start_time;
+	int64_t iHmax=vmath::iround(double(sim::Hmax)*1.0E6);
+	int64_t miHmax=-iHmax;
+	int64_t parity_old;
+	int64_t iH_old;
+	uint64_t start_time;
 
 	// Equilibrate system in saturation field, i.e. the largest between equilibration and maximum field set by the user
    if(sim::Heq >= sim::Hmax){
@@ -104,14 +104,14 @@ int hysteresis(){
 	else sim::integrate(sim::equilibration_time);
 
    // Hinc must be positive
-	int iHinc=vmath::iround(double(fabs(sim::Hinc))*1.0E6);
+	int64_t iHinc=vmath::iround(double(fabs(sim::Hinc))*1.0E6);
 
-   int Hfield;
-   int iparity=sim::parity;
+   int64_t Hfield;
+   int64_t iparity=sim::parity;
 	parity_old=iparity;
 
    // Save value of iH from previous simulation
-	if(sim::load_checkpoint_continue_flag) iH_old=int(sim::iH);
+	if(sim::load_checkpoint_continue_flag) iH_old=static_cast<int64_t>(sim::iH); //  int(sim::iH);
 
 	// Perform Field Loop -parity
 	while(iparity<2){
@@ -119,7 +119,7 @@ int hysteresis(){
 		if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag)
       {
          //necessary to upload value of iH_old when loading the checkpoint !!!
-		   iH_old=int(sim::iH);
+		   iH_old=static_cast<int64_t>(sim::iH); //  int(sim::iH);
          //Setup min and max fields and increment (uT)
 			if(parity_old<0){
 				if(iparity<0) miHmax=iH_old;
@@ -156,7 +156,7 @@ int hysteresis(){
 
 			// Increment of iH
 			Hfield+=iHinc;
-			sim::iH=int64_t(Hfield); //sim::iH+=iHinc;
+			sim::iH=Hfield; //sim::iH+=iHinc;
 
 			// Output to screen and file after each field
 			vout::data();
@@ -165,7 +165,7 @@ int hysteresis(){
 
 		// Increment of parity
       iparity+=2;
-      sim::parity=int64_t(iparity);
+      sim::parity=iparity;
 
 	} // End of parity loop
 
