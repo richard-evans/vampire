@@ -122,6 +122,8 @@ namespace vout{
    void data();
    void zLogTsInit(std::string tmp);
 
+   void MRresistance(std::ostream& stream);
+
 }
 
 #endif //VIO_INTERNAL_H_

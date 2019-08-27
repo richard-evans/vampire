@@ -20,6 +20,7 @@
 #include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
+#include "micromagnetic.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -28,6 +29,11 @@ namespace vout{
 	// Output Function 0
 	void time(std::ostream& stream){
 		stream << sim::time << "\t";
+	}
+
+	void MRresistance(std::ostream& stream){
+	//	std::cout <<  micromagnetic::MR_resistance <<std::endl;
+	stream << micromagnetic::MR_resistance << "\t";
 	}
 
 	// Output Function 1

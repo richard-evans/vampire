@@ -1451,7 +1451,7 @@ namespace vin{
         test="magneto-resistance";
         if(word==test){
           micromagnetic::enable_resistance = true;
-          output_list.push_back(61);
+          output_list.push_back(65);
           return EXIT_SUCCESS;
        }
         else
@@ -1896,8 +1896,9 @@ namespace vin{
         }
         test="magneto-resistance";
         if(word==test){
+          //std::cout << "A" <<std::endl;
           micromagnetic::enable_resistance = true;
-          output_list.push_back(61);
+          output_list.push_back(65);
           return EXIT_SUCCESS;
        }
         else

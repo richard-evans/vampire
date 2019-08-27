@@ -376,12 +376,16 @@ namespace vout{
 					case 62:
 						vout::mean_material_specific_heat(zmag);
 						break;
-               case 63:
-                  vout::material_total_energy(zmag);
-                  break;
-               case 64:
-                  vout::material_mean_total_energy(zmag);
-                  break;
+          case 63:
+            vout::material_total_energy(zmag);
+            break;
+          case 64:
+            vout::material_mean_total_energy(zmag);
+            break;
+					case 65:
+						vout::MRresistance(zmag);
+						break;
+	break;
 				}
 			}
 			// Carriage return
