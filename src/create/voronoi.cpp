@@ -32,6 +32,7 @@
 #include "vmpi.hpp"
 #include "vmath.hpp"
 #include "voronoi.hpp"
+#include <algorithm>
 
 #include <random>
 #include <cmath>
