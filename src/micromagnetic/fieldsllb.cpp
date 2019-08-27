@@ -98,14 +98,14 @@ namespace micromagnetic{
             if (cell != cellj){
             if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
               if (mat != matj){
-                 double Area = cells::macro_cell_size*cells::macro_cell_size;
+                 double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
                 Ac = -pow(mj,1.66)*Area*mp::material[mat].SAF[matj]/ms[cell];
               }
            }
 
            if (mp::material[mat].override_atomsitic[matj] == true){
-             double Area = cells::macro_cell_size*cells::macro_cell_size;
-             double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
+             double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
+             double Volume = cells::macro_cell_size_x*cells::macro_cell_size_y*cells::macro_cell_size_z;
              double Ac2 = Ac;
              Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
            }
@@ -122,6 +122,7 @@ namespace micromagnetic{
       spin_field[0] = pf*m[0] + ext_field[0]  + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0];// + dipole::cells_field_array_x[cell];
       spin_field[1] = pf*m[1] + ext_field[1]  + pinning_field_y[cell]  + exchange_field[1] - ku_y[cell]*one_o_chi_perp[cell]*m[1];// + dipole::cells_field_array_y[cell];
       spin_field[2] = pf*m[2] + ext_field[2]  + pinning_field_z[cell]  + exchange_field[2] - ku_z[cell]*one_o_chi_perp[cell]*m[2];// + dipole::cells_field_array_z[cell];
+    //  std::cout << ku_x[cell]*one_o_chi_perp[cell] << '\t' << ku_y[cell]*one_o_chi_perp[cell] << '\t' << ku_z[cell]*one_o_chi_perp[cell] << std::endl;
         //if (cell ==0)		std::cout  << "inside\t" <<   dipole::cells_field_array_x[0] << '\t' << dipole::cells_field_array_y[0] << '\t' << dipole::cells_field_array_z[0] <<std::endl;
  //       std::cin.get();
   //}

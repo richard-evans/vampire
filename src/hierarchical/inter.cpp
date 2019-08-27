@@ -63,7 +63,7 @@ namespace hierarchical{
        double rij = sqrt(rx2*rx2+ry2*ry2+rz2*rz2); //Reciprocal of the distance
        double rij_1 = 1.0/rij;
       //if (cell_i == 0) std::cout <<rij << std::endl;
-      if (rij > dipole::cutoff*cells::macro_cell_size){
+      if (rij > dipole::cutoff*internal::av_cell_size){
       //if (cell_i ==0)   std::cout << cell_j << '\t'<< rij << '\t' << "macrocell" <<std::endl;
 
                   // define unitarian distance vectors
@@ -92,7 +92,7 @@ namespace hierarchical{
          //--------------------------------------------------------------------------
          // If distance between macro-cells < cutoff ==> apply inter-intra method
          //--------------------------------------------------------------------------
-          else if(rij <= dipole::cutoff*cells::macro_cell_size){
+          else if(rij <= dipole::cutoff*internal::av_cell_size){
          //    if (cell_i ==0)   std::cout << cell_j << '\t'<< rij << '\t' << "tensor" << "\t" << ha::num_atoms_in_cell[cell_i] << '\t' << ha::num_atoms_in_cell[cell_j] << std::endl;
 
 

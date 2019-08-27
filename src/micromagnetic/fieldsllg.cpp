@@ -93,7 +93,7 @@ namespace micromagnetic{
            if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
               if (mat != matj){
 
-                 double Area = cells::macro_cell_size*cells::macro_cell_size;
+                 double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
                 Ac = -pow(mj,1.66)*Area*mp::material[mat].SAF[matj]/ms[cell];
                 //if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
 

@@ -66,7 +66,7 @@ namespace dipole{
          //if (i == 0 )std::cout << rx << '\t' << ry << '\t' << rz << '\t' << rij << std::endl;
 
          // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
-         if( (rij_1)/cells_macro_cell_size > dipole::cutoff){
+         if( (rij_1)/cells::macro_cell_size_x > dipole::cutoff){
             //if (i ==0)   std::cout << j << '\t'<< rij_1 << '\t' << "macrocell" <<std::endl;
 
             // define unitarian distance vectors
@@ -90,7 +90,7 @@ namespace dipole{
          //--------------------------------------------------------------------------
          // If distance between macro-cells < cutoff ==> apply inter-intra method
          //--------------------------------------------------------------------------
-         else if( (1.0/rij)/cells_macro_cell_size <= dipole::cutoff){
+         else if( (1.0/rij)/cells::macro_cell_size_x <= dipole::cutoff){
       //if (i ==0)   std::cout << j << '\t'<< rij_1 << '\t' << "tensor" << "\t" << cells_num_atoms_in_cell[i] << '\t' << cells_num_atoms_in_cell[j] << std::endl;
             for(int pi=0; pi<cells_num_atoms_in_cell[i]; pi++){
 

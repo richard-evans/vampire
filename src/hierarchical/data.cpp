@@ -49,7 +49,7 @@ namespace hierarchical{
       std::vector < int > proc_cell_index_array1D;
       std::vector < int > cells_num_atoms_in_cell;
 
-
+      double av_cell_size;
 
       std::vector<double> mag_array_x; /// arrays to store cells magnetisation
       std::vector<double> mag_array_y;

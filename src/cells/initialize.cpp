@@ -78,15 +78,15 @@ namespace cells{
       // Calculate number of microcells
       //-------------------------------------------------------------------------------------
       // determine number of stacks in x and y (global)
-      unsigned int dx =  static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cells::macro_cell_size));
-      unsigned int dy =  static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cells::macro_cell_size));
-      unsigned int dz =  static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cells::macro_cell_size));
+      unsigned int dx =  static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cells::macro_cell_size_x));
+      unsigned int dy =  static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cells::macro_cell_size_y));
+      unsigned int dz =  static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cells::macro_cell_size_z));
 
       cells::num_cells = dx*dy*dz;
       cells::internal::cell_position_array.resize(3*cells::num_cells);
 
       //std::cout << " variable cells::num_cells = " << cells::num_cells << std::endl;
-      zlog << zTs() << "Macrocell size = " << cells::macro_cell_size << " Angstroms" << std::endl;
+      zlog << zTs() << "Macrocell size = " << cells::macro_cell_size_x<< "," <<cells::macro_cell_size_y<< "," <<cells::macro_cell_size_z<<  " Angstroms" << std::endl;
       zlog << zTs() << "Macrocells in x,y,z: " << dx << "\t" << dy << "\t" << dz << std::endl;
       zlog << zTs() << "Total number of macrocells: " << cells::num_cells << std::endl;
       zlog << zTs() << "Memory required for macrocell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
@@ -122,7 +122,7 @@ namespace cells{
 
       // Determine number of cells in x,y,z
       const int d[3]={ncx,ncy,ncz};
-      const double cs[3] = {cells::macro_cell_size, cells::macro_cell_size, cells::macro_cell_size}; // cell size
+      const double cs[3] = {cells::macro_cell_size_x, cells::macro_cell_size_y, cells::macro_cell_size_z}; // cell size
 
       std::vector < double > cell_lattice(3*cells::num_cells,0.0);
 

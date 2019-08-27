@@ -71,7 +71,7 @@ namespace hierarchical{
       extern std::vector<double> rij_tensor_zz;
 
 
-
+      extern double av_cell_size;
 
       //-------------------------------------------------------------------------
       // Internal function declarations

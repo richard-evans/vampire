@@ -237,7 +237,7 @@ namespace micromagnetic{
             int mat = mm::cell_material_array[cell];
 
             if (mp::material[mat].pinning_field_unit_vector[0]+ mp::material[mat].pinning_field_unit_vector[1] + mp::material[mat].pinning_field_unit_vector[2]!= 0.0){
-              double Area = cells::macro_cell_size*cells::macro_cell_size;
+              double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
             //  std::cout << mp::material[mat].pinning_field_unit_vector[2] << '\t' << mm::ms[cell] << '\t' << Area << std::endl;
                mm::pinning_field_x[cell] = Area*mp::material[mat].pinning_field_unit_vector[0]/mm::ms[cell];
                mm::pinning_field_y[cell] = Area*mp::material[mat].pinning_field_unit_vector[1]/mm::ms[cell];
@@ -251,9 +251,9 @@ namespace micromagnetic{
 
        if (mm::mm_correction == true){
           for (int cell = 0; cell < num_cells; cell++ ){
-             mm::pinning_field_x[cell] = 2*mm::pinning_field_x[cell]/cells::macro_cell_size;
-             mm::pinning_field_y[cell] = 2*mm::pinning_field_y[cell]/cells::macro_cell_size;
-             mm::pinning_field_z[cell] = 2*mm::pinning_field_z[cell]/cells::macro_cell_size;
+             mm::pinning_field_x[cell] = 2*mm::pinning_field_x[cell]/cells::macro_cell_size_x;
+             mm::pinning_field_y[cell] = 2*mm::pinning_field_y[cell]/cells::macro_cell_size_y;
+             mm::pinning_field_z[cell] = 2*mm::pinning_field_z[cell]/cells::macro_cell_size_z;
 
           }
      }

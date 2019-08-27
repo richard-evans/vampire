@@ -82,9 +82,9 @@ void initialize_fft_solver(){
 
 
    // determine number of cells in x and y (global)
-   cells::num_macro_cells_fft[0] = static_cast<unsigned int>(ceil((cs::system_dimensions[0]+0.01)/cells::macro_cell_size_x));
-   cells::num_macro_cells_fft[1] = static_cast<unsigned int>(ceil((cs::system_dimensions[1]+0.01)/cells::macro_cell_size_y));
-   cells::num_macro_cells_fft[2] = static_cast<unsigned int>(ceil((cs::system_dimensions[2]+0.01)/cells::macro_cell_size_z));
+   cells::num_macro_cells_fft[0] = static_cast<unsigned int>(ceil((cs::system_dimensions[0]+0.01)/cells::macro_cell_size));
+   cells::num_macro_cells_fft[1] = static_cast<unsigned int>(ceil((cs::system_dimensions[1]+0.01)/cells::macro_cell_size));
+   cells::num_macro_cells_fft[2] = static_cast<unsigned int>(ceil((cs::system_dimensions[2]+0.01)/cells::macro_cell_size));
 
 
    // determine number of cells in each direction (with small shift to prevent the fence post problem)
@@ -162,6 +162,17 @@ void initialize_fft_solver(){
 
   int N = 0;
 
+ // for(int i=0;i<dp::num_macro_cells_x;++i){
+ //     for(int j=0;j<dp::num_macro_cells_y;++j){
+ //        for(int k=0; k<dp::num_macro_cells_z; ++k){
+ //           dp::cell_dx[N] = i;
+ //           dp::cell_dy[N] = j;
+ //           dp::cell_dz[N] = k;
+ //           dp::idarray[i][j][k] = N;
+ //           N++;
+ //        }
+ //     }
+ // }
 
   for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
      for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
@@ -182,56 +193,46 @@ void initialize_fft_solver(){
 
   if (N != dp::eight_num_cells) std::cout << "ERROR" << "\t" << N << '\t' << dp::eight_num_cells << std::endl;
 
-  for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
-     for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
-        for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
-          int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-          int id2 = dp::idarray[i][j][k];
-      //    std::cout << id << '\t' << id2 << std::endl;
-           dp::N2xx0[id][0] = 0.0;
-           dp::N2xx0[id][1] = 0.0;
-           dp::N2xx[id][0]  = 0.0;
-           dp::N2xx[id][1]  = 0.0;
-           dp::N2xy0[id][0] = 0.0;
-           dp::N2xy0[id][1] = 0.0;
-           dp::N2xy[id][0]  = 0.0;
-           dp::N2xy[id][1]  = 0.0;
-           dp::N2xz0[id][0] = 0.0;
-           dp::N2xz0[id][1] = 0.0;
+  for (int id = 0; id < cells_num_cells; id++){
 
-           dp::N2yx0[id][0] = 0.0;
-           dp::N2yx0[id][1] = 0.0;
-           dp::N2yx[id][0]  = 0.0;
-           dp::N2yx[id][1]  = 0.0;
-           dp::N2yy0[id][0] = 0.0;
-           dp::N2yy0[id][1] = 0.0;
-           dp::N2yy[id][0]  = 0.0;
-           dp::N2yy[id][1]  = 0.0;
-           dp::N2yz0[id][0] = 0.0;
-           dp::N2yz0[id][1] = 0.0;
+     dp::N2xx0[id][0] = 0.0;
+     dp::N2xx0[id][1] = 0.0;
+     dp::N2xx[id][0]  = 0.0;
+     dp::N2xx[id][1]  = 0.0;
+     dp::N2xy0[id][0] = 0.0;
+     dp::N2xy0[id][1] = 0.0;
+     dp::N2xy[id][0]  = 0.0;
+     dp::N2xy[id][1]  = 0.0;
+     dp::N2xz0[id][0] = 0.0;
+     dp::N2xz0[id][1] = 0.0;
 
-           dp::N2zx0[id][0] = 0.0;
-           dp::N2zx0[id][1] = 0.0;
-           dp::N2zx[id][0]  = 0.0;
-           dp::N2zx[id][1]  = 0.0;
-           dp::N2zy0[id][0] = 0.0;
-           dp::N2zy0[id][1] = 0.0;
-           dp::N2zy[id][0]  = 0.0;
-           dp::N2zy[id][1]  = 0.0;
-           dp::N2zz0[id][0] = 0.0;
-           dp::N2zz0[id][1] = 0.0;
-         }
-       }
-     }
+     dp::N2yx0[id][0] = 0.0;
+     dp::N2yx0[id][1] = 0.0;
+     dp::N2yx[id][0]  = 0.0;
+     dp::N2yx[id][1]  = 0.0;
+     dp::N2yy0[id][0] = 0.0;
+     dp::N2yy0[id][1] = 0.0;
+     dp::N2yy[id][0]  = 0.0;
+     dp::N2yy[id][1]  = 0.0;
+     dp::N2yz0[id][0] = 0.0;
+     dp::N2yz0[id][1] = 0.0;
 
-     for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
-        for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
-           for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
-             int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-             int id2 = dp::idarray[i][j][k];
-     // int i = cell_dx[id];
-     // int j = cell_dy[id];
-     // int k = cell_dz[id];
+     dp::N2zx0[id][0] = 0.0;
+     dp::N2zx0[id][1] = 0.0;
+     dp::N2zx[id][0]  = 0.0;
+     dp::N2zx[id][1]  = 0.0;
+     dp::N2zy0[id][0] = 0.0;
+     dp::N2zy0[id][1] = 0.0;
+     dp::N2zy[id][0]  = 0.0;
+     dp::N2zy[id][1]  = 0.0;
+     dp::N2zz0[id][0] = 0.0;
+     dp::N2zz0[id][1] = 0.0;
+ }
+
+  for (int id = 0; id < dp::eight_num_cells; id++){
+     int i = cell_dx[id];
+     int j = cell_dy[id];
+     int k = cell_dz[id];
 
      int ii,jj,kk;
      if (i >= dp::num_macro_cells_x) ii = i - 2*dp::num_macro_cells_x;
@@ -244,26 +245,10 @@ void initialize_fft_solver(){
    //  std::cout << i << '\t' << j << '\t' << k << "\t" << ii << '\t' << jj << '\t' << kk << std::endl;
 
      if (!( ii ==0 &&  jj == 0  && kk == 0)) {
-     // if ((2*dp::num_macro_cells_x%2 == 0 && i == dp::num_macro_cells_x) || (2*dp::num_macro_cells_y%2 == 0 && j == dp::num_macro_cells_y) || (2*dp::num_macro_cells_z%2 == 0 && k == dp::num_macro_cells_z)) {
-     //   dp::N2xx0[id][0] = 0.0;
-     //   dp::N2xy0[id][0] = 0.0;
-     //   dp::N2xz0[id][0] = 0.0;
-     //
-     //   dp::N2yx0[id][0] = 0.0;
-     //   dp::N2yy0[id][0] = 0.0;
-     //   dp::N2yz0[id][0] = 0.0;
-     //
-     //   dp::N2zx0[id][0] = 0.0;
-     //   dp::N2zy0[id][0] = 0.0;
-     //   dp::N2zz0[id][0] = 0.0;
-     //   continue;
-     // }
-
-
        // std::cout << "enter" << std::endl;
-        const double rx = double(ii) * cells::macro_cell_size_x; // Angstroms
-        const double ry = double(jj) * cells::macro_cell_size_y;
-        const double rz = double(kk) * cells::macro_cell_size_z;
+        const double rx = double(ii) * cells::macro_cell_size; // Angstroms
+        const double ry = double(jj) * cells::macro_cell_size;
+        const double rz = double(kk) * cells::macro_cell_size;
 
         // calculate inverse distance
         const double irij = 1.0/sqrt(rx*rx + ry*ry + rz*rz);
@@ -291,8 +276,6 @@ void initialize_fft_solver(){
       std::cout << ii << '\t' << jj << '\t' << kk << "\t" << dp::N2xx0[id][0] << '\t' << dp::N2xy0[id][0] << '\t' << dp::N2xz0[id][0] << '\t' << dp::N2yy0[id][0] << '\t' << dp::N2yz0[id][0] << '\t' << dp::N2zz0[id][0] << std::endl;
      }
   }
-}
-}
 
   //--------------------------------------------------------------------------------------
   // Calculate FFT of dipole tensor FFT(N) -> result N2xx etc
@@ -411,57 +394,47 @@ void update_field_fft(){
 
    const double imuB = 1.0/9.27400915e-24;
 
-   for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++){
-      for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++){
-         for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
-           int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;
-           int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-           int id2 = dp::idarray[i][j][k];
+   for(int lc = 0; lc < cells::num_local_cells; lc++){
     // get cell index
-     //int cell = cells::cell_id_array[lc];
-     //int id = cell;
+     int cell = cells::cell_id_array[lc];
+     int id = cell;
    //  std::cout << id << '\t' << cells::mag_array_x[cell] * imuB << '\t' << cells::mag_array_y[cell] * imuB << '\t' << cells::mag_array_z[cell] * imuB <<std::endl;
-          Mx_in[id][0] = cells::mag_array_x[cell] * imuB;
-          My_in[id][0] = cells::mag_array_y[cell] * imuB;
-          Mz_in[id][0] = cells::mag_array_z[cell] * imuB;
-          std::cout << cell << '\t' << id << '\t' << i << '\t' << j << '\t' << k << "\t" << cells::mag_array_x[cell] * imuB << "\t" << cells::mag_array_y[cell] * imuB << "\t" << cells::mag_array_z[cell] * imuB  << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] <<  std::endl;
-        }
-      }
-    }
+    Mx_in[id][0] = cells::mag_array_x[cell] * imuB;
+    My_in[id][0] = cells::mag_array_y[cell] * imuB;
+    Mz_in[id][0] = cells::mag_array_z[cell] * imuB;
 
+  }
 
     fftw_execute(MxP);
     fftw_execute(MyP);
     fftw_execute(MzP);
 
-    for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++){
-       for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++){
-          for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
+    for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
+       for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
+          for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
+           int id = dp::idarray[i][j][k];
+           Hx_in[id][0]  =  dp::N2xx[id][0] * dp::Mx_out[id][0] + dp::N2xy[id][0] * dp::My_out[id][0] + dp::N2xz[id][0] * dp::Mz_out[id][0]; //summing the real part
+           Hx_in[id][0] -= (dp::N2xx[id][1] * dp::Mx_out[id][1] + dp::N2xy[id][1] * dp::My_out[id][1] + dp::N2xz[id][1] * dp::Mz_out[id][1]);
 
-      int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;
-      int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-      int id2 = dp::idarray[i][j][k];
-      Hx_in[id][0]  =  dp::N2xx[id][0] * dp::Mx_out[id][0] + dp::N2xy[id][0] * dp::My_out[id][0] + dp::N2xz[id][0] * dp::Mz_out[id][0]; //summing the real part
-      Hx_in[id][0] -= (dp::N2xx[id][1] * dp::Mx_out[id][1] + dp::N2xy[id][1] * dp::My_out[id][1] + dp::N2xz[id][1] * dp::Mz_out[id][1]);
+           Hx_in[id][1]  =  dp::N2xx[id][0] * dp::Mx_out[id][1] + dp::N2xy[id][0] * dp::My_out[id][1] + dp::N2xz[id][0] * dp::Mz_out[id][1];
+           Hx_in[id][1] += (dp::N2xx[id][1] * dp::Mx_out[id][0] + dp::N2xy[id][1] * dp::My_out[id][0] + dp::N2xz[id][1] * dp::Mz_out[id][0]);
 
-      Hx_in[id][1]  =  dp::N2xx[id][0] * dp::Mx_out[id][1] + dp::N2xy[id][0] * dp::My_out[id][1] + dp::N2xz[id][0] * dp::Mz_out[id][1];
-      Hx_in[id][1] += (dp::N2xx[id][1] * dp::Mx_out[id][0] + dp::N2xy[id][1] * dp::My_out[id][0] + dp::N2xz[id][1] * dp::Mz_out[id][0]);
+           Hy_in[id][0]  =  dp::N2yx[id][0] * dp::Mx_out[id][0] + dp::N2yy[id][0] * dp::My_out[id][0] + dp::N2yz[id][0] * dp::Mz_out[id][0];
+           Hy_in[id][0] -= (dp::N2yx[id][1] * dp::Mx_out[id][1] + dp::N2yy[id][1] * dp::My_out[id][1] + dp::N2yz[id][1] * dp::Mz_out[id][1]);
 
-      Hy_in[id][0]  =  dp::N2yx[id][0] * dp::Mx_out[id][0] + dp::N2yy[id][0] * dp::My_out[id][0] + dp::N2yz[id][0] * dp::Mz_out[id][0];
-      Hy_in[id][0] -= (dp::N2yx[id][1] * dp::Mx_out[id][1] + dp::N2yy[id][1] * dp::My_out[id][1] + dp::N2yz[id][1] * dp::Mz_out[id][1]);
+           Hy_in[id][1]  =  dp::N2yx[id][0] * dp::Mx_out[id][1] + dp::N2yy[id][0] * dp::My_out[id][1] + dp::N2yz[id][0] * dp::Mz_out[id][1];
+           Hy_in[id][1] += (dp::N2yx[id][1] * dp::Mx_out[id][0] + dp::N2yy[id][1] * dp::My_out[id][0] + dp::N2yz[id][1] * dp::Mz_out[id][0]);
 
-      Hy_in[id][1]  =  dp::N2yx[id][0] * dp::Mx_out[id][1] + dp::N2yy[id][0] * dp::My_out[id][1] + dp::N2yz[id][0] * dp::Mz_out[id][1];
-      Hy_in[id][1] += (dp::N2yx[id][1] * dp::Mx_out[id][0] + dp::N2yy[id][1] * dp::My_out[id][0] + dp::N2yz[id][1] * dp::Mz_out[id][0]);
+           Hz_in[id][0]  =  dp::N2zx[id][0] * dp::Mx_out[id][0] + dp::N2zy[id][0] * dp::My_out[id][0] + dp::N2zz[id][0] * dp::Mz_out[id][0]; //summing the real part
+           Hz_in[id][0] -= (dp::N2zx[id][1] * dp::Mx_out[id][1] + dp::N2zy[id][1] * dp::My_out[id][1] + dp::N2zz[id][1] * dp::Mz_out[id][1]);
 
-      Hz_in[id][0]  =  dp::N2zx[id][0] * dp::Mx_out[id][0] + dp::N2zy[id][0] * dp::My_out[id][0] + dp::N2zz[id][0] * dp::Mz_out[id][0]; //summing the real part
-      Hz_in[id][0] -= (dp::N2zx[id][1] * dp::Mx_out[id][1] + dp::N2zy[id][1] * dp::My_out[id][1] + dp::N2zz[id][1] * dp::Mz_out[id][1]);
+           Hz_in[id][1]  =  dp::N2zx[id][0] * dp::Mx_out[id][1] + dp::N2zy[id][0] * dp::My_out[id][1] + dp::N2zz[id][0] * dp::Mz_out[id][1];
+           Hz_in[id][1] += (dp::N2zx[id][1] * dp::Mx_out[id][0] + dp::N2zy[id][1] * dp::My_out[id][0] + dp::N2zz[id][1] * dp::Mz_out[id][0]);
 
-      Hz_in[id][1]  =  dp::N2zx[id][0] * dp::Mx_out[id][1] + dp::N2zy[id][0] * dp::My_out[id][1] + dp::N2zz[id][0] * dp::Mz_out[id][1];
-      Hz_in[id][1] += (dp::N2zx[id][1] * dp::Mx_out[id][0] + dp::N2zy[id][1] * dp::My_out[id][0] + dp::N2zz[id][1] * dp::Mz_out[id][0]);
-      std::cout <<dp::Mx_out[id][0] << '\t' << dp::My_out[id][0] << '\t' << dp::Mz_out[id][0] <<"\t" <<   Hx_in[id][0] << '\t' <<  Hy_in[id][0] << '\t' <<  Hy_in[id][0] << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] << std::endl;
+
         }
-      }
-    }
+     }
+  }
 
 
    fftw_execute(HxP);
@@ -469,29 +442,24 @@ void update_field_fft(){
    fftw_execute(HzP);
 
 
-   for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++){
-      for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++){
-         for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
+   for(int lc = 0; lc < cells::num_local_cells; lc++){
 
-     int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;
-     int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-     int id2 = dp::idarray[i][j][k];
-     dipole::cells_field_array_x[cell] += Hx_out[id][0]/dp::eight_num_cells;
-     dipole::cells_field_array_y[cell] += Hy_out[id][0]/dp::eight_num_cells;
-     dipole::cells_field_array_z[cell] += Hz_out[id][0]/dp::eight_num_cells;
+    // get cell index
+     int cell = cells::cell_id_array[lc];
+     int id = cell;
+     dipole::cells_field_array_x[id] += Hx_out[cell][0]/dp::eight_num_cells;
+     dipole::cells_field_array_y[id] += Hy_out[cell][0]/dp::eight_num_cells;
+     dipole::cells_field_array_z[id] += Hz_out[cell][0]/dp::eight_num_cells;
 
      dipole::cells_field_array_x[cell] *= 9.27400915e-01;
      dipole::cells_field_array_y[cell] *= 9.27400915e-01;
      dipole::cells_field_array_z[cell] *= 9.27400915e-01;
 
-    dp_fields <<i << '\t' << j << '\t' << k << '\t' << cell << '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell]  << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] << std::endl;
+    dp_fields <<cell << '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell] <<std::endl;
     cell++;
 
   }
-}
 
-  }
-std::cin.get();
    #endif
 
    return;

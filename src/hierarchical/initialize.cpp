@@ -38,11 +38,29 @@ namespace ha = hierarchical::internal;
 
 int largest(int x, int y, int z){
     int largest = x;
-    if (y > largest) largest = y;
-    if (z > largest) largest = z;
+    int N = 0;
+    if (y > largest) {
+      largest = y;
+      N = 1;
+    }
+    if (z > largest) {
+      largest = z;
+      N = 2;
+    }
 
-   return largest;
+   return N;
 }
+
+int min(int x, int y, int z){
+    int min = x;
+    if (y < min)
+      min = y;
+    if (z > min)
+      min = z;
+
+   return min;
+}
+
 
 namespace hierarchical{
 
@@ -58,11 +76,19 @@ namespace hierarchical{
       //  start timer
        timer.start();
 
+       int A = ceil(std::log(2*system_dimensions_x/(dipole::cutoff*2*cells::macro_cell_size_x))/std::log(2.0));
+       int B = ceil(std::log(2*system_dimensions_y/(dipole::cutoff*2*cells::macro_cell_size_y))/std::log(2.0));
+       int C = ceil(std::log(2*system_dimensions_z/(dipole::cutoff*2*cells::macro_cell_size_z))/std::log(2.0));
    //   std::cout << dipole::cutoff*cells::macro_cell_size <<std::endl;
         //caclualte the number of levels necessary for the calculation
-        int largest_dimension = largest(system_dimensions_x, system_dimensions_y,system_dimensions_z);
-        ha::num_levels = ceil(std::log(2*largest_dimension/(dipole::cutoff*2*cells::macro_cell_size))/std::log(2.0));
-
+        int N = largest(A, B,C);
+        int cell_size = 0;
+        if (N == 0)
+          ha::num_levels = A;
+        if (N == 1)
+          ha::num_levels = B;
+        if (N == 2)
+          ha::num_levels = C;
 
         ha::cells_level_start_index.resize(ha::num_levels,0.0);
         ha::cells_level_end_index.resize(ha::num_levels,0.0);
@@ -210,41 +236,44 @@ namespace hierarchical{
             timer.start();
 
               int index = 0;
-
+              internal::av_cell_size = cells::macro_cell_size_x*cells::macro_cell_size_x + cells::macro_cell_size_y*cells::macro_cell_size_y + cells::macro_cell_size_z*cells::macro_cell_size_z;
+              internal::av_cell_size = sqrt(internal::av_cell_size);
               //loop over all levels to calvculate the positions and sizes of the cells in the levels.
               for (int level = 0; level < ha::num_levels; level ++){
 
-                 double cell_size = pow(2,level)*cells::macro_cell_size;
-                 ha::interaction_range[level] = cells::macro_cell_size*level*dipole::cutoff + dipole::cutoff;
+                 double cell_size_x = pow(2,level)*cells::macro_cell_size_x;
+                 double cell_size_y = pow(2,level)*cells::macro_cell_size_y;
+                 double cell_size_z = pow(2,level)*cells::macro_cell_size_z;
+
+                 ha::interaction_range[level] = internal::av_cell_size*level*dipole::cutoff + dipole::cutoff;
                  if (level == ha::num_levels - 1 ) ha::interaction_range[level] = cell_size*dipole::cutoff*10000;
                  // Calculate number of microcells
                  // determine number of cells in x and y (global)
-                 int ncx = static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cell_size));
-                 int ncy = static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cell_size));
-                 int ncz = static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cell_size));
+                 int ncx = static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cell_size_x));
+                 int ncy = static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cell_size_y));
+                 int ncz = static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cell_size_z));
 
                  int temp_num_cells = ncx*ncy*ncz;
-               //  std::cout << level << temp_num_cells << '\t' << index << std::endl;
                  //set the start and end index for the level
                  ha::cells_level_start_index[level] = index;
-                index = index + temp_num_cells;
-                ha::cells_level_end_index[level] = index;
-                // std::cout << "l:\t" << level << '\t' <<  << "\t ha:\t" >> ha::cells_level_start_index[level] << '\t' << ha::cells_level_end_index[level] << '\t' << temp_num_cells << "\t" << cells_num_cells << "\t" << ncx << '\t' << ncy << '\t' << ncz << std::endl;
+                 index = index + temp_num_cells;
+                 ha::cells_level_end_index[level] = index;
+                 // std::cout << "l:\t" << level << '\t' <<  << "\t ha:\t" >> ha::cells_level_start_index[level] << '\t' << ha::cells_level_end_index[level] << '\t' << temp_num_cells << "\t" << cells_num_cells << "\t" << ncx << '\t' << ncy << '\t' << ncz << std::endl;
                  double size_x,size_y,size_z;
                  double x,y,z;
                  for(int i=0;i<ncx;++i){
-                   if (i < ncx -1)  size_x = cell_size;
-                   else             size_x = system_dimensions_x - (ncx-1)*cell_size;
-                   x = i*cell_size + size_x/2.0;
+                   if (i < ncx -1)  size_x = cell_size_x;
+                   else             size_x = system_dimensions_x - (ncx-1)*cell_size_x;
+                   x = i*cell_size_x + size_x/2.0;
                     for(int j=0;j<ncy;++j){
-                      if (j < ncy -1) size_y = cell_size;
-                      else            size_y = system_dimensions_y - (ncy-1)*cell_size;
-                      y = j*cell_size + size_y/2.0;
+                      if (j < ncy -1) size_y = cell_size_y;
+                      else            size_y = system_dimensions_y - (ncy-1)*cell_size_y;
+                      y = j*cell_size_y + size_y/2.0;
                       // store cell coordinates
                        for(int k=0; k<ncz; ++k){
-                         if (k < ncz -1) size_z = cell_size;
-                         else            size_z = system_dimensions_z - (ncz-1)*cell_size;
-                         z = k*cell_size + size_z/2.0;
+                         if (k < ncz -1) size_z = cell_size_z;
+                         else            size_z = system_dimensions_z - (ncz-1)*cell_size_z;
+                         z = k*cell_size_z + size_z/2.0;
                      //    if (level == 0) {
                             ha::cell_positions.push_back(x);
                             ha::cell_positions.push_back(y);
