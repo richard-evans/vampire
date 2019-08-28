@@ -780,8 +780,15 @@ namespace vin{
                sim::program=52;
                return EXIT_SUCCESS;
             }
+            test="field-sweep";
+            if(value==test){
+                sim::program=60;
+                return EXIT_SUCCESS;
+            }
+
             else{
             terminaltextcolor(RED);
+                        std::cout << word << '\t' << test << std::endl;
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
                 std::cerr << "\t\"benchmark\"" << std::endl;
                 std::cerr << "\t\"time-series\"" << std::endl;

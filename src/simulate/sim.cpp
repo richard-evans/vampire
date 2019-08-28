@@ -518,6 +518,14 @@ int run(){
 		program::tracks();
 	 	break;
 
+		case 60:
+			 if(vmpi::my_rank==0){
+			 std::cout << "field-sweep..." << std::endl;
+			zlog << "field-sweep..." << std::endl;
+		}
+		program::field_sweep();
+		break;
+
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
