@@ -260,7 +260,7 @@ namespace micromagnetic{
                mm::pinning_field_x[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[0];
                mm::pinning_field_y[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[1];
                mm::pinning_field_z[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[2];
-               std::cout <<  mm::pinning_field_x[cell] << '\t' << mm::pinning_field_y[cell] << '\t' <<  mm::pinning_field_z[cell] << std::endl;
+            //   std::cout <<  mm::pinning_field_x[cell] << '\t' << mm::pinning_field_y[cell] << '\t' <<  mm::pinning_field_z[cell] << std::endl;
 
               // std::cout <<prefactor*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor2*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor3*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor4*mp::material[mat].pinning_field_unit_vector[2] <<  std::endl;
 //               n_cells
