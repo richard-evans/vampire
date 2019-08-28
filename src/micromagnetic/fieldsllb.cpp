@@ -99,9 +99,8 @@ namespace micromagnetic{
             if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
               if (mat != matj){
             //    std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
-                 double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
-                Ac = -pow(mj,1.66)*Area*mp::material[mat].SAF[matj]/ms[cell];
-              //  std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
+              Ac = -pow(mj,1.66)*prefactor[matj]*mp::material[mat].SAF[matj];
+                std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
 
               }
            }
@@ -112,7 +111,7 @@ namespace micromagnetic{
              double Ac2 = Ac;
              Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
            }
-        //   std::cout << mat << '\t' << matj << '\t' << -Ac <<std::endl;
+      //   std::cout << mat << '\t' << matj << '\t' << -Ac <<std::endl;
             exchange_field[0] -= Ac*(x_array[cellj] - x_array[cell]);
             exchange_field[1] -= Ac*(y_array[cellj] - y_array[cell]);
             exchange_field[2] -= Ac*(z_array[cellj] - z_array[cell]);

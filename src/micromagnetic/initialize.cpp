@@ -229,17 +229,22 @@ namespace micromagnetic{
         }
 
       //  std::vector <int> n_cells_per_mat(mp::num_materials,0);
-      std::vector <double> mat_vol(mp::num_materials,0);
-        std::vector <double> mat_ms(mp::num_materials,0);
+        mm::mat_vol.resize(mp::num_materials,0);
+        mm::mat_ms.resize(mp::num_materials,0);
+        mm::prefactor.resize(mp::num_materials,0);
         for (int cell = 0; cell < num_cells; cell++ ){
             int mat = mm::cell_material_array[cell];
           //  n_cells_per_mat[mat]++;
-            mat_vol[mat] = mat_vol[mat] + volume_array[mat];
-            mat_ms[mat] = mat_ms[mat] + mm::ms[cell];
-
+            mm::mat_vol[mat] = mm::mat_vol[mat] + volume_array[cell];
+            mm::mat_ms[mat] = mm::mat_ms[mat] + mm::ms[cell];
         }
-
-
+        for (int mat = 0; mat < mp::num_materials; mat++ ){
+          double min=create::internal::mp[mat].min;
+          double max=create::internal::mp[mat].max;
+          double t = max - min;
+          t = t*system_dimensions_z;
+          mm::prefactor[mat] = 1/(t*mm::mat_ms[mat]/mm::mat_vol[mat]);
+        }
 
         for (int cell = 0; cell < num_cells; cell++ ){
 
@@ -252,14 +257,9 @@ namespace micromagnetic{
                // mm::pinning_field_x[cell] = Area*mp::material[mat].pinning_field_unit_vector[0]/mm::ms[cell];
                // mm::pinning_field_y[cell] = Area*mp::material[mat].pinning_field_unit_vector[1]/mm::ms[cell];
                // mm::pinning_field_z[cell] = Area*mp::material[mat].pinning_field_unit_vector[2]/mm::ms[cell];
-               double min=create::internal::mp[mat].min;
-               double max=create::internal::mp[mat].max;
-               double t = max - min;
-               t = t*system_dimensions_z;
-               double prefactor = 1/(t*mat_ms[mat]/mat_vol[mat]);
-               mm::pinning_field_x[cell] = prefactor*mp::material[mat].pinning_field_unit_vector[0];
-               mm::pinning_field_y[cell] = prefactor*mp::material[mat].pinning_field_unit_vector[1];
-               mm::pinning_field_z[cell] = prefactor*mp::material[mat].pinning_field_unit_vector[2];
+               mm::pinning_field_x[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[0];
+               mm::pinning_field_y[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[1];
+               mm::pinning_field_z[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[2];
                std::cout <<  mm::pinning_field_x[cell] << '\t' << mm::pinning_field_y[cell] << '\t' <<  mm::pinning_field_z[cell] << std::endl;
 
               // std::cout <<prefactor*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor2*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor3*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor4*mp::material[mat].pinning_field_unit_vector[2] <<  std::endl;

@@ -69,7 +69,9 @@ namespace micromagnetic{
       extern std::vector<double> ku_z;
       extern std::vector<double> ms;
       extern std::vector<double> Tc;
-
+      extern std::vector <double> mat_vol;
+      extern std::vector <double> mat_ms;
+      extern std::vector <double> prefactor;
 
       extern std::vector <double> fmr_H;
 

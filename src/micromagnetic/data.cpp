@@ -101,6 +101,10 @@ namespace micromagnetic{
       std::vector<double> alpha_para;
       std::vector<double> alpha_perp;
 
+      std::vector <double> mat_vol;
+      std::vector <double> mat_ms;
+      std::vector <double> prefactor;
+
       std::vector <double> cell_material_array;
 
       bool mm_correction;
