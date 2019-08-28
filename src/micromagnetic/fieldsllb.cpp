@@ -100,7 +100,7 @@ namespace micromagnetic{
               if (mat != matj){
             //    std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
               Ac = -pow(mj,1.66)*prefactor[matj]*mp::material[mat].SAF[matj];
-                std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
+              //  std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
 
               }
            }
