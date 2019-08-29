@@ -51,6 +51,10 @@ namespace micromagnetic{
 
       extern bool bias_magnets;
 
+      extern double bias_magnets_max_height;
+      extern double bias_magnets_min_height;
+      extern int bias_magnets_gap;
+
       extern int resistance_layer_1;
       extern int resistance_layer_2;
 

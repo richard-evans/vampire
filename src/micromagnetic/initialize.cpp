@@ -244,6 +244,7 @@ namespace micromagnetic{
           double t = max - min;
           t = t*system_dimensions_z;
           mm::prefactor[mat] = 1/(t*mm::mat_ms[mat]/mm::mat_vol[mat]);
+        //  std::cout << mm::mat_vol[mat] <<std::endl;
         }
 
         for (int cell = 0; cell < num_cells; cell++ ){

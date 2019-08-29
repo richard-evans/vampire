@@ -38,16 +38,18 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
   double shield_Ms = 1;
   double x_size = 10000;
   double y_size = system_dimensions_y;
-  double z_size = system_dimensions_z;
+  double z_size = system_dimensions_z*bias_magnets_max_height - system_dimensions_z*bias_magnets_min_height;
 
   double x_pos;
   double y_pos = system_dimensions_y/2;
-  double z_pos = system_dimensions_z/2;
+  double z_pos = z_size/2.0 + system_dimensions_z*bias_magnets_min_height;
 
-  double x_pos_1 = -x_size/2;
-  double x_pos_2 =  x_size/2 +system_dimensions_x;
+  double x_pos_1 = -x_size/2 - bias_magnets_gap;
+  double x_pos_2 =  x_size/2 + system_dimensions_x + bias_magnets_gap;
 //
-//
+
+  std::cout << x_pos_1 << '\t' << x_pos_2 << '\t' << y_pos << '\t' << z_pos << std::endl;
+
    double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
   for (int lc = 0; lc < cells::num_local_cells; lc++){

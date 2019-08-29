@@ -116,6 +116,30 @@ namespace micromagnetic{
          return true;
       }
 
+      test="bias-magnets-max-height";
+      if(word==test){
+         double h = atof(value.c_str());
+         micromagnetic::internal::bias_magnets_max_height = h;
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         return true;
+      }
+
+      test="bias-magnets-min-height";
+      if(word==test){
+         double h = atof(value.c_str());
+         micromagnetic::internal::bias_magnets_min_height = h;
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         return true;
+      }
+
+      test="bias-magnets-gap";
+      if(word==test){
+         double h = atof(value.c_str());
+         vin::check_for_valid_value(h, word, line, prefix, unit, "length", 0, 100000000,"input","1 A - 100000 A");
+         micromagnetic::internal::bias_magnets_gap = h;
+         return true;
+      }
+
       test="pinning-field-height";
       if(word==test){
          double h=atof(value.c_str());

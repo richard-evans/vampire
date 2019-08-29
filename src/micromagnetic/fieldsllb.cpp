@@ -98,7 +98,7 @@ namespace micromagnetic{
             if (cell != cellj){
             if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
               if (mat != matj){
-            //    std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
+            //    std::cout << mat << '\t' << matj << "\t" << Ac << "\t" << prefactor[matj] << std::endl;
               Ac = -pow(mj,1.66)*prefactor[matj]*mp::material[mat].SAF[matj];
               //  std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
 
@@ -111,7 +111,7 @@ namespace micromagnetic{
              double Ac2 = Ac;
              Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
            }
-      //   std::cout << mat << '\t' << matj << '\t' << -Ac <<std::endl;
+      //     std::cout << mat << '\t' << matj << '\t' << -Ac << '\t' <<  pinning_field_x[cell]<< std::endl;
             exchange_field[0] -= Ac*(x_array[cellj] - x_array[cell]);
             exchange_field[1] -= Ac*(y_array[cellj] - y_array[cell]);
             exchange_field[2] -= Ac*(z_array[cellj] - z_array[cell]);
@@ -120,7 +120,8 @@ namespace micromagnetic{
       }
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-    //  std::cout << mat << '\t' << pinning_field_x[cell] << '\t' << pinning_field_y[cell] << '\t' << pinning_field_z[cell] << std::endl;
+    //  std::cout << cell << '\t' << pinning_field_x[cell] << '\t' << pinning_field_y[cell] << '\t' << pinning_field_z[cell] << std::endl;
+    //  std::cout << cell_material_array[cell]<<'\t' << pinning_field_x[cell]  + exchange_field[0] << '\t' << pinning_field_y[cell]  + exchange_field[1]<< "\t" << pinning_field_z[cell]  + exchange_field[2] << std::endl;
       spin_field[0] = pf*m[0] + ext_field[0]  + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0];// + dipole::cells_field_array_x[cell];
       spin_field[1] = pf*m[1] + ext_field[1]  + pinning_field_y[cell]  + exchange_field[1] - ku_y[cell]*one_o_chi_perp[cell]*m[1];// + dipole::cells_field_array_y[cell];
       spin_field[2] = pf*m[2] + ext_field[2]  + pinning_field_z[cell]  + exchange_field[2] - ku_z[cell]*one_o_chi_perp[cell]*m[2];// + dipole::cells_field_array_z[cell];

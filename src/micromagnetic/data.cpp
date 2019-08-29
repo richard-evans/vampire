@@ -74,6 +74,9 @@ namespace micromagnetic{
       int my_start_index; // first cell to intergrate on local (my) cpu
       int my_end_index;  // last cell +1 to intergrate on local (my) cpu
 
+      double bias_magnets_max_height = 1.0;
+      double bias_magnets_min_height= 0.0;
+      int bias_magnets_gap = 10;
 
       int resistance_layer_1 = 0;
       int resistance_layer_2 = 0;
