@@ -36,22 +36,23 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
 
 
   double shield_Ms = 1;
-  double x_size = 10000;
-  double y_size = system_dimensions_y;
+  double x_size = system_dimensions_y;
+  double y_size = 1000000;
   double z_size = system_dimensions_z*bias_magnets_max_height - system_dimensions_z*bias_magnets_min_height;
 
-  double x_pos;
-  double y_pos = system_dimensions_y/2;
+  double x_pos = system_dimensions_y/2;
+  double y_pos;
   double z_pos = z_size/2.0 + system_dimensions_z*bias_magnets_min_height;
 
-  double x_pos_1 = -x_size/2 - bias_magnets_gap;
-  double x_pos_2 =  x_size/2 + system_dimensions_x + bias_magnets_gap;
+  double y_pos_1 = - y_size/2 - bias_magnets_gap;
+  double y_pos_2 =   y_size/2 + system_dimensions_x + bias_magnets_gap;
 //
 
-  std::cout << x_pos_1 << '\t' << x_pos_2 << '\t' << y_pos << '\t' << z_pos << std::endl;
+  //std::cout << y_pos_1 << '\t' << y_pos_2 << '\t' << x_pos << '\t' << z_pos << std::endl;
 
    double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
+
   for (int lc = 0; lc < cells::num_local_cells; lc++){
 
     int cell = cells::local_cell_array[lc];
@@ -75,8 +76,8 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
 
      for (int shield = 0; shield < 2; shield++){
 
-       if (shield == 0) x_pos = x_pos_1;
-       if (shield == 1) x_pos = x_pos_2;
+       if (shield == 0) y_pos = y_pos_1;
+       if (shield == 1) y_pos = y_pos_2;
        //calculates the vector in A from the cell to the shields
        double x = sqrt((x_cell - x_pos)*(x_cell - x_pos));
        double y = sqrt((y_cell - y_pos)*(y_cell - y_pos));
@@ -86,17 +87,17 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
        double By = 0.0;
        double Bz = 0.0;
 
-       for(int k=1; k<4; k++){
+       for(int k=1; k<3; k++){
 
            // predefine power as fixed for loop iteration
            const double m1k = pow(-1,k);
 
-           for(int l=1; l<4; l++){
+           for(int l=1; l<3; l++){
 
               // predefine power as fixed for loop iteration
               const double m1l = pow(-1,l);
 
-              for(int m=1; m<4; m++){
+              for(int m=1; m<3; m++){
 
                  const double m1m = pow(-1,m);
                  const double m1klm = pow(-1,k+l+m);
@@ -119,12 +120,13 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
            }
        }
 
-       bias_field_x[cell] = bias_field_x[cell] + Bx*prefactor;
-       bias_field_y[cell] = bias_field_y[cell] + By*prefactor;
+    //   std::cout << cell << '\t' << Bx << "\t" << By << '\t' << Bz <<  '\t' << prefactor << std::endl;
+       bias_field_x[cell] = bias_field_x[cell] + By*prefactor;
+       bias_field_y[cell] = bias_field_y[cell] + Bx*prefactor;
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 
      }
-     //std::cout <<"total" << '\t' << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
+     std::cout <<"total" << '\t' << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<  "\t" << z_cell << std::endl;
 
   }
 return 0;
