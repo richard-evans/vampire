@@ -118,17 +118,17 @@ int bias_shields(){
        double By = 0.0;
        double Bz = 0.0;
 
-       for(int k=1; k<4; k++){
+       for(int k=1; k<3; k++){
 
            // predefine power as fixed for loop iteration
            const double m1k = pow(-1,k);
 
-           for(int l=1; l<4; l++){
+           for(int l=1; l<3; l++){
 
               // predefine power as fixed for loop iteration
               const double m1l = pow(-1,l);
 
-              for(int m=1; m<4; m++){
+              for(int m=1; m<3; m++){
 
                  const double m1m = pow(-1,m);
                  const double m1klm = pow(-1,k+l+m);
