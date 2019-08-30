@@ -151,7 +151,7 @@ namespace micromagnetic{
     //  }
 
      if (bias_magnets == true){
-      //  std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
+    //    std::cout << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2]<< "\t" << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
        spin_field[0] = spin_field[0] + bias_field_x[cell];
        spin_field[1] = spin_field[1] + bias_field_y[cell];
        spin_field[2] = spin_field[2] + bias_field_z[cell];
