@@ -77,7 +77,7 @@ namespace micromagnetic{
             //  std::cout << change <<std::endl;
               double R = Rmin*(change);
           //    std::cout << costheta << '\t' << change << std::endl;
-              sum_one_o_R = 1.0/R;
+              sum_one_o_R = sum_one_o_R + 1.0/R;
             //  std::cout <<"x=" << x_i << '\t' << "y=" <<  y_i << '\t' << "z=" << z_i << "\t" << "x=" << x_j << '\t'<< "y=" << y_j << '\t' << "z=" << z_j << "\t" << mod_i*mod_j << '\t' << dot_product << '\t' << costheta << '\t' << R << '\t' <<sum_one_o_R <<std::endl;
 
             }
