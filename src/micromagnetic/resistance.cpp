@@ -28,8 +28,6 @@ namespace micromagnetic{
 
      double calculate_resistance(){
 
-    //   std::cout << "r" <<resistance_layer_1 << '\t' << resistance_layer_2 <<std::endl;
-
        double x_i,y_i,z_i;
        double x_j,y_j,z_j;
        double mod_i, mod_j;
@@ -79,7 +77,7 @@ namespace micromagnetic{
           //    std::cout << costheta << '\t' << change << std::endl;
               sum_one_o_R = sum_one_o_R + 1.0/R;
             //  std::cout <<"x=" << x_i << '\t' << "y=" <<  y_i << '\t' << "z=" << z_i << "\t" << "x=" << x_j << '\t'<< "y=" << y_j << '\t' << "z=" << z_j << "\t" << mod_i*mod_j << '\t' << dot_product << '\t' << costheta << '\t' << R << '\t' <<sum_one_o_R <<std::endl;
-
+          //  std::cout << "r" <<resistance_layer_1 << '\t' << resistance_layer_2 << "\t" << cell << '\t' << std::endl;
             }
           }
         }

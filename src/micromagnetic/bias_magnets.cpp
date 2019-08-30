@@ -33,14 +33,14 @@ namespace micromagnetic{
 
 int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y,double system_dimensions_z){
 
-
+  //THIS IS CORRECT I KNOW THE X AND Y ARE MISSED UP! THIS IS BECAUE MS is assumed to be along y but i need it along x so i have switched x and y then switched them back at the end
 
   double shield_Ms = 1;
-  double x_size = system_dimensions_y;
+  double x_size =system_dimensions_y*bias_magnets_max_width - system_dimensions_y*bias_magnets_min_width;
   double y_size = 1000000;
   double z_size = system_dimensions_z*bias_magnets_max_height - system_dimensions_z*bias_magnets_min_height;
 
-  double x_pos = system_dimensions_y/2;
+  double x_pos = x_size/2 + system_dimensions_y*bias_magnets_min_width;
   double y_pos;
   double z_pos = z_size/2.0 + system_dimensions_z*bias_magnets_min_height;
 
@@ -48,7 +48,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
   double y_pos_2 =   y_size/2 + system_dimensions_x + bias_magnets_gap;
 //
 
-  //std::cout << y_pos_1 << '\t' << y_pos_2 << '\t' << x_pos << '\t' << z_pos << std::endl;
+  std::cout << y_pos_1 << '\t' << y_pos_2 << '\t' << x_pos << '\t' << z_pos << std::endl;
 
    double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.

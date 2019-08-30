@@ -434,7 +434,7 @@ int LLB( std::vector <int> local_cell_array,
     }
 	//	std::cin.get();
 	//	std::cout << enable_resistance << "\t" << std::endl;
-      if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1)  micromagnetic::MR_resistance = mm::calculate_resistance();
+      if (sim::time%100000 && enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 )  micromagnetic::MR_resistance = mm::calculate_resistance();
 		//	std::cout << micromagnetic::MR_resistance <<std::endl;
 
 	return 0;

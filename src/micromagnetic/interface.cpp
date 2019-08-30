@@ -132,6 +132,23 @@ namespace micromagnetic{
          return true;
       }
 
+      test="bias-magnets-max-width";
+      if(word==test){
+         double h = atof(value.c_str());
+         micromagnetic::internal::bias_magnets_max_width = h;
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         return true;
+      }
+
+      test="bias-magnets-min-width";
+      if(word==test){
+         double h = atof(value.c_str());
+         micromagnetic::internal::bias_magnets_min_width = h;
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         return true;
+      }
+
+
       test="bias-magnets-gap";
       if(word==test){
          double h = atof(value.c_str());

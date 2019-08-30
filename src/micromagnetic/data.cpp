@@ -76,6 +76,10 @@ namespace micromagnetic{
 
       double bias_magnets_max_height = 1.0;
       double bias_magnets_min_height= 0.0;
+
+      double bias_magnets_max_width = 1.0;
+      double bias_magnets_min_width = 0.0;
+
       int bias_magnets_gap = 10;
 
       int resistance_layer_1 = 0;
