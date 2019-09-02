@@ -43,7 +43,7 @@ namespace micromagnetic{
        double one_o_Rmin = 1.0/Rmin;
        double sum_one_o_R = 0.0;
 
-       std::cout << area << "\t" << Ra << '\t' << Rmin <<  "\t" << GMR <<std::endl;
+//       std::cout << area << "\t" << Ra << '\t' << Rmin <<  "\t" << GMR <<std::endl;
 
 
        for (int lc = 0; lc < cells::num_local_cells; lc++){
