@@ -32,12 +32,19 @@ namespace micromagnetic{
        double x_j,y_j,z_j;
        double mod_i, mod_j;
 
-       double GMR = 1.0;
+       double GMR = res_GMR;
        double GMR_o_2 = GMR/2.0;
 
-       double Rmin = 1.0;
+       double Ra = res_RA;
+       double area = overlap_area*1e-8;
+
+       //double a = system_dimensions_y*bias_magnets_max_width;
+       double Rmin = Ra/area;
        double one_o_Rmin = 1.0/Rmin;
        double sum_one_o_R = 0.0;
+
+       std::cout << area << "\t" << Ra << '\t' << Rmin <<  "\t" << GMR <<std::endl;
+
 
        for (int lc = 0; lc < cells::num_local_cells; lc++){
 

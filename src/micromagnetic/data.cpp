@@ -81,6 +81,10 @@ namespace micromagnetic{
       double bias_magnets_min_width = 0.0;
 
       int bias_magnets_gap = 10;
+      double overlap_area = 0.0;
+
+      double res_GMR = 1.0;
+      double res_RA = 0.3;
 
       int resistance_layer_1 = 0;
       int resistance_layer_2 = 0;

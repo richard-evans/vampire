@@ -41,6 +41,8 @@ namespace micromagnetic{
       extern int my_start_index; // first cell to intergrate on local (my) cpu
       extern int my_end_index;  // last cell +1 to intergrate on local (my) cpu
       extern bool mm_correction;
+      extern double res_GMR;
+      extern double res_RA;
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
@@ -57,6 +59,7 @@ namespace micromagnetic{
       extern double bias_magnets_max_width;
       extern double bias_magnets_min_width;
 
+      extern double overlap_area;
 
       extern int bias_magnets_gap;
 

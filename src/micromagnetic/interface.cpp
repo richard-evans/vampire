@@ -110,6 +110,22 @@ namespace micromagnetic{
          return true;
       }
 
+      test="resistance-GMR";
+      if(word==test){
+         double h = atof(value.c_str());
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         micromagnetic::internal::res_GMR = h;
+         return true;
+      }
+
+      test="resistance-RA";
+      if(word==test){
+         double h = atof(value.c_str());
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         micromagnetic::internal::res_RA = h;
+         return true;
+      }
+
       test="bias-magnets";
       if(word==test){
          micromagnetic::internal::bias_magnets = true;
@@ -184,7 +200,6 @@ namespace micromagnetic{
       //--------------------------------------------------------------------
       std::string test="micromagnetic-discretisation-enabled";
       if(word==test){
-         double K=atof(value.c_str());
          vin::read_material[super_index].micromagnetic_enabled=true;
          //std::cout << super_index << '\t' << vin::read_material[super_index].micromagnetic_enabled << std::endl;
          return true;

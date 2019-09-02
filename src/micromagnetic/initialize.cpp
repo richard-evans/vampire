@@ -107,17 +107,12 @@ namespace micromagnetic{
 
    std::cout << mm::ms[0] << '\t' << mm::alpha[0] << '\t' << mm::Tc[0] << '\t' << mm::ku[0] << '\t' << mm::gamma[0] << '\t' << mm::one_o_chi_para[0] << '\t' << mm::one_o_chi_perp[0] << '\t' << mm::A[0] << '\t' << std::endl;
 
-
-
     for (int cell = 0; cell < num_cells; cell++)
-
-
          if (discretisation_type == 1){
             for (int lc = 0; lc < num_local_cells; lc++){
                int cell = local_cell_array[lc];
                if (mm::Tc[cell] < 0) {
                   discretisation_type = 2;
-
                }
             }
          }
@@ -255,9 +250,6 @@ namespace micromagnetic{
             if (mp::material[mat].pinning_field_unit_vector[0]+ mp::material[mat].pinning_field_unit_vector[1] + mp::material[mat].pinning_field_unit_vector[2]!= 0.0){
               double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
             //  std::cout << mp::material[mat].pinning_field_unit_vector[0] << '\t' <<mp::material[mat].pinning_field_unit_vector[1] << '\t' << mp::material[mat].pinning_field_unit_vector[2] << '\t' << mm::ms[cell] << '\t' << Area << std::endl;
-               // mm::pinning_field_x[cell] = Area*mp::material[mat].pinning_field_unit_vector[0]/mm::ms[cell];
-               // mm::pinning_field_y[cell] = Area*mp::material[mat].pinning_field_unit_vector[1]/mm::ms[cell];
-               // mm::pinning_field_z[cell] = Area*mp::material[mat].pinning_field_unit_vector[2]/mm::ms[cell];
                mm::pinning_field_x[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[0];
                mm::pinning_field_y[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[1];
                mm::pinning_field_z[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[2];
@@ -280,11 +272,36 @@ namespace micromagnetic{
 
           }
      }
+      if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 ){
+        for (int cell = 0; cell < cells::num_cells; cell++ ){
+
+          int mat =mm::cell_material_array[cell];
+          const int start = mm::macro_neighbour_list_start_index[cell];
+          const int end = mm::macro_neighbour_list_end_index[cell] +1;
+
+          for(int j = start;j< end;j++){
+             // calculate reduced exchange constant factor
+
+             const int cellj = mm::macro_neighbour_list_array[j];
+             int matj =mm::cell_material_array[cellj];
+
+            if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2){
+
+              mm::overlap_area = mm::overlap_area + cells::macro_cell_size_x*cells::macro_cell_size_y;
+
+            }
+          }
+        }
+      }
+
+      std::cout << "OVERLAP" << "\t" << mm::overlap_area << std::endl;
+
 
         // //boltzman stuff
         // P.resize(101);
         // for (int i = 0; i < 101; i++) P[i].resize(101,0.0);
-        //
+
+
         if (mm::bias_magnets == true){
 
           int a = mm::calculate_bias_magnets(system_dimensions_x,system_dimensions_y,system_dimensions_z);

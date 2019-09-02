@@ -212,10 +212,10 @@ namespace micromagnetic{
                      int cellj = j;//local_cell_array[j];
                      if (a2d[celli][cellj] != 0 && celli != cellj){
                         macro_neighbour_list_array.push_back(cellj);                                        //if the interaction is non zero add the cell to the neighbourlist
-
+                    //    std::cout << N << '\t' << num_interactions_cell[celli][cellj] << std::endl;
                         a.push_back(-(a2d[celli][cellj]/(4*atomic_volume)));//*cell_size)/(2.0*ms[celli]*atomic_volume*num_interactions_cell[celli][cellj]));
                         //calcualtes the exchange interaction for the cells.                           //the end index is updated for each cell so is given the value for the last cell.
-                        a[array_index] = (a[array_index]*2*cell_size)/(ms[celli]*N);
+                        a[array_index] = (a[array_index]*2*cell_size)/(ms[celli]*N); //*N instead od numinteraction
                         macro_neighbour_list_end_index[celli] = array_index;
                         //the end index is updated for each cell so is given the value for the last cell.
                         array_index ++;
@@ -223,6 +223,7 @@ namespace micromagnetic{
                   }
                }
             }
+//            std::cin.get();
             return a;        //returns a 1D vector of the cellular exchange interactions,
          }
       }

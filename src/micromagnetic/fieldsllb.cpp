@@ -15,6 +15,7 @@
 #include "cells.hpp"
 #include "internal.hpp"
 #include "../cells/internal.hpp"
+#include "../simulate/internal.hpp"
 // micromagnetic module headers
 #include <stdlib.h>
 #include <vector>
@@ -23,7 +24,9 @@
 #include "cells.hpp"
 #include "vio.hpp"
 #include "dipole.hpp"
+#include "spintorque.hpp"
 #include "environment.hpp"
+
 
 namespace micromagnetic{
 
@@ -82,8 +85,8 @@ namespace micromagnetic{
       //array to store the exchanege field
       //std::cin.get();
       double exchange_field[3]={0.0,0.0,0.0};
+      int mat  = cell_material_array[cell];
       if (num_cells > 1){
-        int mat  = cell_material_array[cell];
          //loops over all other cells with interactions to this cell
          const int start = macro_neighbour_list_start_index[cell];
          const int end = macro_neighbour_list_end_index[cell] +1;
@@ -98,7 +101,7 @@ namespace micromagnetic{
             if (cell != cellj){
             if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
               if (mat != matj){
-            //    std::cout << mat << '\t' << matj << "\t" << Ac << "\t" << prefactor[matj] << std::endl;
+            //    std::cout << cell << '\t' << cellj << "\t" << Ac << std::endl;
               Ac = -pow(mj,1.66)*prefactor[matj]*mp::material[mat].SAF[matj];
               //  std::cout << mat << '\t' << matj << "\t" << Ac << std::endl;
 
@@ -111,13 +114,27 @@ namespace micromagnetic{
              double Ac2 = Ac;
              Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
            }
-      //     std::cout << mat << '\t' << matj << '\t' << -Ac << '\t' <<  pinning_field_x[cell]<< std::endl;
+        //   std::cout << cell << '\t' << cellj << '\t' << -Ac << '\t' <<  std::endl;
             exchange_field[0] -= Ac*(x_array[cellj] - x_array[cell]);
             exchange_field[1] -= Ac*(y_array[cellj] - y_array[cell]);
             exchange_field[2] -= Ac*(z_array[cellj] - z_array[cell]);
           }
          }
       }
+
+      // const double stpx = sim::internal::slonczewski_spin_polarization_unit_vector[0];
+  		// const double stpy = sim::internal::slonczewski_spin_polarization_unit_vector[1];
+  		// const double stpz = sim::internal::slonczewski_spin_polarization_unit_vector[2];
+      //
+  		// const double staj = sim::internal::slonczewski_aj[mat];
+  		// const double stbj = sim::internal::slonczewski_bj[mat];
+      //
+  		// // calculate field
+  		// double HSTTx = staj*(y_array[cell]*stpz - z_array[cell]*stpy) + stbj*stpx;
+  		// double HSTTy = staj*(z_array[cell]*stpx - x_array[cell]*stpz) + stbj*stpy;
+  		// double HSTTz = staj*(x_array[cell]*stpy - y_array[cell]*stpx) + stbj*stpz;
+      //
+      // std::cout << HSTTx << '\t' << HSTTy << '\t' << HSTTz << std::endl;
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
     //  std::cout << cell << '\t' << pinning_field_x[cell] << '\t' << pinning_field_y[cell] << '\t' << pinning_field_z[cell] << std::endl;
