@@ -113,7 +113,7 @@ namespace micromagnetic{
       test="resistance-GMR";
       if(word==test){
          double h = atof(value.c_str());
-         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 100000,"input","0 - 100000");
          micromagnetic::internal::res_GMR = h;
          return true;
       }
@@ -121,7 +121,7 @@ namespace micromagnetic{
       test="resistance-RA";
       if(word==test){
          double h = atof(value.c_str());
-         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 100000,"input","0 - 100000");
          micromagnetic::internal::res_RA = h;
          return true;
       }
