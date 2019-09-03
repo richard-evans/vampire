@@ -28,8 +28,8 @@ namespace micromagnetic{
 
      double calculate_resistance(){
 
-       double x_i,y_i,z_i;
-       double x_j,y_j,z_j;
+       double mx_i,my_i,mz_i;
+       double mx_j,my_j,mz_j;
        double mod_i, mod_j;
 
        double GMR = res_GMR;
@@ -38,14 +38,11 @@ namespace micromagnetic{
        double Ra = res_RA;
        double area = overlap_area*1e-8;
 
-       //double a = system_dimensions_y*bias_magnets_max_width;
        double Rmin = Ra/area;
        double one_o_Rmin = 1.0/Rmin;
        double sum_one_o_R = 0.0;
 
-//       std::cout << area << "\t" << Ra << '\t' << Rmin <<  "\t" << GMR <<std::endl;
-
-
+       int i = 0;
        for (int lc = 0; lc < cells::num_local_cells; lc++){
 
          int cell = cells::local_cell_array[lc];
@@ -55,11 +52,11 @@ namespace micromagnetic{
            const int start = macro_neighbour_list_start_index[cell];
            const int end = macro_neighbour_list_end_index[cell] +1;
 
-           x_i = cells::mag_array_x[cell];
-           y_i = cells::mag_array_y[cell];
-           z_i = cells::mag_array_z[cell];
+           mx_i = cells::mag_array_x[cell];
+           my_i = cells::mag_array_y[cell];
+           mz_i = cells::mag_array_z[cell];
 
-           mod_i =sqrt(sqrt(x_i*x_i+y_i*y_i)*sqrt(x_i*x_i+y_i*y_i) +z_i*z_i);
+           mod_i =sqrt(sqrt(mx_i*mx_i+my_i*my_i)*sqrt(mx_i*mx_i+my_i*my_i) +mz_i*mz_i);
 
            for(int j = start;j< end;j++){
 
@@ -69,28 +66,31 @@ namespace micromagnetic{
 
             if (mat == resistance_layer_1 && matj == resistance_layer_2){
           //    std::cout << cell << '\t' << cellj << '\t' << dot_product << '\t' << costheta << '\t' << R << '\t' <<sum_one_o_R <<std::endl;
-              x_j = cells::mag_array_x[cellj];
-              y_j = cells::mag_array_y[cellj];
-              z_j = cells::mag_array_z[cellj];
+              mx_j = cells::mag_array_x[cellj];
+              my_j = cells::mag_array_y[cellj];
+              mz_j = cells::mag_array_z[cellj];
 
-              mod_j =sqrt(sqrt(x_j*x_j+y_j*y_j)*sqrt(x_j*x_j+y_j*y_j) +z_j*z_j);
+              mod_j =sqrt(sqrt(mx_j*mx_j+my_j*my_j)*sqrt(mx_j*mx_j+my_j*my_j) +mz_j*mz_j);
 
-              double dot_product = x_i*x_j + y_i*y_j + z_i*z_j;
-
-              double costheta = dot_product/(mod_i*mod_j);
+              double dot_product = mx_i*mx_j + my_i*my_j + mz_i*mz_j;
+               double costheta = dot_product/(mod_i*mod_j);
               double change  = 1- GMR_o_2*costheta;
             //  std::cout << change <<std::endl;
               double R = Rmin*(change);
-          //    std::cout << costheta << '\t' << change << std::endl;
+            //  std::cout << i << '\t' << costheta << '\t' << change << "\t" << R<<  "\t" << 1.0/R << "\t" << sum_one_o_R << '\t' << 1.0/sum_one_o_R << std::endl;
+
               sum_one_o_R = sum_one_o_R + 1.0/R;
+              i ++ ;
+          //    std::cout << dot_product << '\t' << costheta << '\t' << change << '\t' << R << sum_one_o_R << "\t" << 1/sum_one_o_R << std::endl;
             //  std::cout <<"x=" << x_i << '\t' << "y=" <<  y_i << '\t' << "z=" << z_i << "\t" << "x=" << x_j << '\t'<< "y=" << y_j << '\t' << "z=" << z_j << "\t" << mod_i*mod_j << '\t' << dot_product << '\t' << costheta << '\t' << R << '\t' <<sum_one_o_R <<std::endl;
           //  std::cout << "r" <<resistance_layer_1 << '\t' << resistance_layer_2 << "\t" << cell << '\t' << std::endl;
             }
           }
         }
       }
+    //  std::cin.get();
     //  std::cout << 1.0/sum_one_o_R <<std::endl;
-      return 1.0/sum_one_o_R;
+      return i*1.0/sum_one_o_R;
     }
    }
  }

@@ -286,7 +286,7 @@ namespace micromagnetic{
              int matj =mm::cell_material_array[cellj];
 
             if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2){
-
+        //      std::cout << mm::resistance_layer_1 << '\t' << mm::resistance_layer_2 <<
               mm::overlap_area = mm::overlap_area + cells::macro_cell_size_x*cells::macro_cell_size_y;
 
             }
@@ -295,7 +295,7 @@ namespace micromagnetic{
       }
 
       std::cout << "OVERLAP" << "\t" << mm::overlap_area << std::endl;
-
+      mm::overlap_area = 240*200;
 
         // //boltzman stuff
         // P.resize(101);
