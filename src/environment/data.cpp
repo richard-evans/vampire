@@ -55,6 +55,10 @@ namespace environment{
       //------------------------------------------------------------------------
 
 
+      bool square_shields = true;
+      bool expoential_shields = false;
+      int gap = 200;
+
       std::vector < int > cell_dx;
       std::vector < int > cell_dy;
       std::vector < int > cell_dz;

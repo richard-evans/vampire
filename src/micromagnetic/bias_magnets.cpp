@@ -48,7 +48,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
   double y_pos_2 =   y_size/2 + system_dimensions_x + bias_magnets_gap;
 //
 
-  std::cout << y_pos_1 << '\t' << y_pos_2 << '\t' << x_pos << '\t' << z_pos << std::endl;
+//  std::cout << y_pos_1 << '\t' << y_pos_2 << '\t' << x_pos << '\t' << z_pos << std::endl;
 
    double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
@@ -126,7 +126,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 
      }
-     std::cout <<"total" << '\t' << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<  "\t" << z_cell << std::endl;
+  //   std::cout <<"total" << '\t' << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<  "\t" << z_cell << std::endl;
 
   }
 return 0;

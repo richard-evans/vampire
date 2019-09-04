@@ -44,7 +44,7 @@ namespace environment{
       extern std::vector < int > cell_dz;
 
       extern std::vector < std::vector < std::vector<int> > > idarray;
-      
+
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
@@ -64,6 +64,9 @@ namespace environment{
       //3d vector to store the shift in atomistic position from 0,0,0 with respect to the environment module
       extern std::vector < double > shift;
 
+      extern bool square_shields;
+      extern bool expoential_shields;
+      extern int gap;
 
       extern double eightPI_three_cell_volume;
       extern double cell_volume;

@@ -14,6 +14,7 @@
 
 // micromagnetic module headers
 #include "internal.hpp"
+#include "create.hpp"
 
 // C++ headers
 #include <math.h>
@@ -46,12 +47,13 @@ bool  in_x(double x, double z){
 //------------------------------------------------------------------------------
 bool in_shield(double x, double y, double z){
 
-  bool square_shields = true;
-  bool expoential_shields = false;
 
   if (square_shields){
-    int gap = 20;
-    if (y < 500 || y > 640) return true;
+  //  std::cout << dim[1] << "\t" << cs::system_dimensions[1] << '\t' << gap << std::endl;
+    int min = dim[1]/2.0 - cs::system_dimensions[1]/2.0 - gap;
+    int max = min + cs::system_dimensions[1] + 2.0*gap;
+  //  std::cout << min << '\t' << max << std::endl;
+    if (y < min || y > max) return true;
     else return false;
 
   }
@@ -82,7 +84,7 @@ bool in_shield(double x, double y, double z){
 
    return true;
   }
-   //return false;
+   else return true;
 
 
 }

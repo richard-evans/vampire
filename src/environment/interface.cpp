@@ -40,6 +40,25 @@ namespace environment{
          return true;
       }
 
+      test="square-shields";
+      if(word==test){
+         env::square_shields = true;
+         return true;
+      }
+      test="exponential-shields";
+      if(word==test){
+         env::expoential_shields = true;
+         return true;
+      }
+
+      test="shield-gap";
+      if(word==test){
+         double g=atof(value.c_str());
+         vin::check_for_valid_value(g, word, line, prefix, unit, "length", 0, 1.0e8,"input","0 Angstroms - 10 millimetre");
+         env::gap =g;
+         return true;
+      }
+
       test="system-size-x";
       if(word==test){
          double x=atof(value.c_str());
