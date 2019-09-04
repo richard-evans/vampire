@@ -46,6 +46,19 @@ bool  in_x(double x, double z){
 //------------------------------------------------------------------------------
 bool in_shield(double x, double y, double z){
 
+  bool square_shields = true;
+  bool expoential_shields = false;
+
+  if (square_shields){
+    int gap = 20;
+    if (y < 500 || y > 640) return true;
+    else return false;
+
+  }
+
+
+  else if (expoential_shields){
+
    // height of inner sensor region
    const double stack_height = 200; // Angstroms
 
@@ -63,12 +76,14 @@ bool in_shield(double x, double y, double z){
   //
   //  //Top shield (+z) 52-72 nm
   // if(z > 740.0 && z < 940.0) return true;
-  //
-  //  // side shields
-  //  if(in_x(xr, zr))
-   return true;
+  // //
+  // //  // side shields
+  // if(in_x(xr, zr))
 
+   return true;
+  }
    //return false;
+
 
 }
 

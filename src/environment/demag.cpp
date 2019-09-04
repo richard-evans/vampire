@@ -34,6 +34,8 @@ namespace environment{
          eight_num_cells = 8*num_cells_x*num_cells_y*num_cells_z;
          eightPI_three_cell_volume = 8.0*M_PI/(3.0*cell_volume);
 
+         std::cout << num_cells_x << '\t' << num_cells_y << '\t' << num_cells_z <<std::endl;
+
          //Resize arrays for fft
          N2xx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
          N2xy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
@@ -71,54 +73,10 @@ namespace environment{
          Hy_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
          Hz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * eight_num_cells);
 
-         for(int k=0; k<2*num_cells_x; k++)
-         {
-           idarray.push_back(std::vector<std::vector<int> >()); //initialize the first index with a 2D vector
-           for(int i=0; i<2*num_cells_y; i++)
-           {
-             idarray[k].push_back(std::vector<int>()); //initialize the 2 index with a row of strings
-             for(int j=0; j<2*num_cells_z; j++)
-                idarray[k][i].push_back(0.0); //fulfill the last index regularly
-           }
-         }
-         cell_dx.resize(eight_num_cells,0.0);
-         cell_dy.resize(eight_num_cells,0.0);
-         cell_dz.resize(eight_num_cells,0.0);
-
-         int N = 0;
-
-         for(int i=0;i<num_cells_x;++i){
-             for(int j=0;j<num_cells_y;++j){
-                for(int k=0; k<num_cells_z; ++k){
-                   cell_dx[N] = i;
-                   cell_dy[N] = j;
-                   cell_dz[N] = k;
-                   idarray[i][j][k] = N;
-                   N++;
-                }
-             }
-         }
-
-      for(unsigned int i = 0 ; i < 2*num_cells_x ; i++){
-         for(unsigned int j = 0 ; j < 2*num_cells_y; j++){
-            for(unsigned int k = 0 ; k < 2*num_cells_z ; k++){
-               if (i >= num_cells_x || j >= num_cells_y || k >= num_cells_z  ){
-                  cell_dx[N] = i;
-                  cell_dy[N] = j;
-                  cell_dz[N] = k;
-                 // std::cout << i << '\t' << j << '\t' << k << std::endl;
-                 idarray[i][j][k] = N;
-                 N++;
-                }
-               }
-            }
-         }
-
-           if (N !=eight_num_cells) std::cout << "ERROR" << "\t" << N << '\t' << eight_num_cells << std::endl;
 
 
          //initialises all the demag tensor components to 0
-  for (int id = 0; id < num_cells; id++){
+         for (int id = 0; id < eight_num_cells; id++){
 
 
                   N2xx0[id][0]=0;
@@ -157,74 +115,73 @@ namespace environment{
 
 
          //initalises all the non-zero demag tensor components as with the normal demag field calcualtion
-         for (int id = 0; id < eight_num_cells; id++){
-            int i = cell_dx[id];
-            int j = cell_dy[id];
-            int k = cell_dz[id];
+         for(unsigned int k = 0 ; k < 2*num_cells_z ; k++){
+            for(unsigned int j = 0 ; j < 2*num_cells_y; j++){
+               for(unsigned int i = 0 ; i < 2*num_cells_x ; i++){
+                  int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
 
-            int ii,jj,kk;
-            if (i >= num_cells_x) ii = i - 2*num_cells_x;
-            else ii = i;
-            if (j >= num_cells_y) jj = j - 2*num_cells_y;
-            else jj = j;
-            if (k >= num_cells_z) kk = k - 2*num_cells_z;
-            else kk = k;
+                  int ii,jj,kk;
+                  if (i >= num_cells_x) ii = i - 2*num_cells_x;
+                  else ii = i;
+                  if (j >= num_cells_y) jj = j - 2*num_cells_y;
+                  else jj = j;
+                  if (k >= num_cells_z) kk = k - 2*num_cells_z;
+                  else kk = k;
 
-          //  std::cout << i << '\t' << j << '\t' << k << "\t" << ii << '\t' << jj << '\t' << kk << std::endl;
+                   const double rx = ii*cell_size[0]; // Angstroms
+                   const double ry = jj*cell_size[1];
+                   const double rz = kk*cell_size[2];
 
-            if (!( ii ==0 &&  jj == 0  && kk == 0)) {
-                     const double rx = ii*cell_size[0]; // Angstroms
-                     const double ry = jj*cell_size[1];
-                     const double rz = kk*cell_size[2];
+                   const double rij = sqrt(rx*rx + ry*ry + rz*rz);
+                   if (rij > 0.1){
+                   const double irij = 1.0/rij;
 
-                     const double irij = 1.0/pow(rx*rx+ry*ry+rz*rz,0.5);
+                   const double ex = rx*irij;
+                   const double ey = ry*irij;
+                   const double ez = rz*irij;
 
-                     const double ex = rx*irij;
-                     const double ey = ry*irij;
-                     const double ez = rz*irij;
+                   const double rij3 = irij*irij*irij; // Angstroms
+                   int id = (2*i*num_cells_y+j)*2*num_cells_z+k;
 
-                     const double rij3 = irij*irij*irij; // Angstroms
-                     int id = (2*i*num_cells_y+j)*2*num_cells_z+k;
+                   N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
+                   N2xy0[id][0] = (3.0*ex*ey      )*rij3;
+                   N2xz0[id][0] = (3.0*ex*ez      )*rij3;
 
-                     N2xx0[id][0] = (3.0*ex*ex - 1.0)*rij3;
-                     N2xy0[id][0] = (3.0*ex*ey      )*rij3;
-                     N2xz0[id][0] = (3.0*ex*ez      )*rij3;
+                   N2yx0[id][0] = (3.0*ey*ex      )*rij3;
+                   N2yy0[id][0] = (3.0*ey*ey - 1.0)*rij3;
+                   N2yz0[id][0] = (3.0*ey*ez      )*rij3;
 
-                     N2yx0[id][0] = (3.0*ey*ex      )*rij3;
-                     N2yy0[id][0] = (3.0*ey*ey - 1.0)*rij3;
-                     N2yz0[id][0] = (3.0*ey*ez      )*rij3;
-
-                     N2zx0[id][0] = (3.0*ez*ex      )*rij3;
-                     N2zy0[id][0] = (3.0*ez*ey      )*rij3;
-                     N2zz0[id][0] = (3.0*ez*ez - 1.0)*rij3;
+                   N2zx0[id][0] = (3.0*ez*ex      )*rij3;
+                   N2zy0[id][0] = (3.0*ez*ey      )*rij3;
+                   N2zz0[id][0] = (3.0*ez*ez - 1.0)*rij3;
+              //     std::cout << ii << '\t' << jj << '\t' << kk << "\t" << N2xx0[id][0] << '\t' << N2xy0[id][0] << '\t' << N2xz0[id][0] << '\t' << N2yy0[id][0] << '\t' << N2yz0[id][0] << '\t' << N2zz0[id][0] << std::endl;
 
                   }
                }
-
-
-
+             }
+           }
 
          // fft calculations
          fftw_plan NxxP,NxyP,NxzP,NyxP,NyyP,NyzP,NzxP,NzyP,NzzP;
 
          //deterines the forward transform for the demag field arrays from N2xx0 to N2xx arrays
-         NxxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2xx0,N2xx,FFTW_FORWARD,FFTW_ESTIMATE);
+         NxxP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2xx0,N2xx,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NxxP);
-         NyxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2yx0,N2yx,FFTW_FORWARD,FFTW_ESTIMATE);
+         NyxP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2yx0,N2yx,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyxP);
-         NzxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2zx0,N2zx,FFTW_FORWARD,FFTW_ESTIMATE);
+         NzxP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2zx0,N2zx,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzxP);
-         NxyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2xy0,N2xy,FFTW_FORWARD,FFTW_ESTIMATE);
+         NxyP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2xy0,N2xy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NxyP);
-         NyyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2yy0,N2yy,FFTW_FORWARD,FFTW_ESTIMATE);
+         NyyP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2yy0,N2yy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyyP);
-         NzyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2zy0,N2zy,FFTW_FORWARD,FFTW_ESTIMATE);
+         NzyP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2zy0,N2zy,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzyP);
-         NxzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2xz0,N2xz,FFTW_FORWARD,FFTW_ESTIMATE);
+         NxzP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2xz0,N2xz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NxzP);
-         NyzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2yz0,N2yz,FFTW_FORWARD,FFTW_ESTIMATE);
+         NyzP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2yz0,N2yz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NyzP);
-         NzzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,N2zz0,N2zz,FFTW_FORWARD,FFTW_ESTIMATE);
+         NzzP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x, N2zz0,N2zz,FFTW_FORWARD,FFTW_ESTIMATE);
          fftw_execute(NzzP);
 
          // free memory from FFTW plans
@@ -239,13 +196,13 @@ namespace environment{
          fftw_destroy_plan(NzzP);
 
 
-         MxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mx_in,Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
-         MyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,My_in,My_out,FFTW_FORWARD,FFTW_ESTIMATE);
-         MzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Mz_in,Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
+         MxP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x,Mx_in,Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
+         MyP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x,My_in,My_out,FFTW_FORWARD,FFTW_ESTIMATE);
+         MzP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x,Mz_in,Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
 
-         HxP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hx_in,Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
-         HyP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hy_in,Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
-         HzP = fftw_plan_dft_3d(2*num_cells_x,2*num_cells_y,2*num_cells_z,Hz_in,Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+         HxP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x,Hx_in,Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+         HyP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x,Hy_in,Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+         HzP = fftw_plan_dft_3d(2*num_cells_z,2*num_cells_y,2*num_cells_x,Hz_in,Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
 
          std::cout << "End of dipole fields initialisation..." << std::endl;
 
@@ -293,21 +250,27 @@ namespace environment{
                }
 
 
-         std::ofstream pfile;
-         pfile.open("m.txt");
+        // std::ofstream pfile;
+      //   pfile.open("m.txt");
          //initialised the in components for the FT to the magnetisation of each cell
          int cell = 0;
          const double imuB = 1.0/9.27400915e-24;
 
-         for(int lc = 0; lc < cells::num_local_cells; lc++){
-          // get cell index
-           int cell = cells::cell_id_array[lc];
-           int id = cell;
-          Mx_in[id][0] = x_mag_array[cell] * imuB;
-          My_in[id][0] = y_mag_array[cell] * imuB;
-          Mz_in[id][0] = z_mag_array[cell] * imuB;
-          pfile <<id << '\t' <<   Mx_in[id][0] << "\t" << My_in[id][0] << "\t" << Mz_in[id][0] << "\t" << std::endl;
-        }
+         for(unsigned int k = 0 ; k < num_cells_z ; k++){
+            for(unsigned int j = 0 ; j < num_cells_y; j++){
+               for(unsigned int i = 0 ; i < num_cells_x ; i++){
+                  int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
+
+                  // get cell index
+                  int cell = k * num_cells_x*num_cells_y + j * num_cells_x + i;
+
+                  Mx_in[id][0] = x_mag_array[cell] * imuB;
+                  My_in[id][0] = y_mag_array[cell] * imuB;
+                  Mz_in[id][0] = z_mag_array[cell] * imuB;
+              //    pfile <<i << '\t' << j << '\t' << k << "\t"<< cell << '\t' <<   Mx_in[id][0] << "\t" << My_in[id][0] << "\t" << Mz_in[id][0] << "\t" << std::endl;
+                }
+              }
+            }
 
 
          fftw_execute(MxP);
@@ -318,11 +281,11 @@ namespace environment{
          cell = 0;
 
          // performs the converlusion between Nk and Mk
-         for (int i=0 ; i<2*num_cells_x ; i++){
-            for (int j=0 ; j<2*num_cells_y ; j++){
-               for (int k=0 ; k<2*num_cells_z ; k++){
+         for(unsigned int k = 0 ; k < 2*num_cells_z ; k++){
+            for(unsigned int j = 0 ; j < 2*num_cells_y; j++){
+               for(unsigned int i = 0 ; i < 2*num_cells_x ; i++){
+                 int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
 
-                  int id = idarray[i][j][k];
                   Hx_in[id][0] = N2xx[id][0]*Mx_out[id][0] + N2xy[id][0]*My_out[id][0] + N2xz[id][0]*Mz_out[id][0]; //summing the real part
                   Hx_in[id][0] -= (N2xx[id][1]*Mx_out[id][1] + N2xy[id][1]*My_out[id][1] + N2xz[id][1]*Mz_out[id][1]);
 
@@ -359,23 +322,28 @@ namespace environment{
          //    dipole_field_z[i]=0.0;//eightPI_three_cell_volume*(z_mag_array[i]/9.27400915e-24);
          // }
 
-         std::ofstream ofile;
-         ofile.open("field.txt");
+      //   std::ofstream ofile;
+      //   ofile.open("field.txt");
 
          //sums the dipole field N.m + self demag/eightnumcells
-         cell = 0;
-         for(int lc = 0; lc < cells::num_local_cells; lc++){
+         for(unsigned int k = 0 ; k < num_cells_z ; k++){
+            for(unsigned int j = 0 ; j < num_cells_y; j++){
+               for(unsigned int i = 0 ; i < num_cells_x ; i++){
+                  int id = k * 2*num_cells_x*2*num_cells_y + j * 2*num_cells_x + i;
 
-          // get cell index
-           int cell = cells::cell_id_array[lc];
-           int id = cell;
-         //   std:: cout << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << Hx_out[id][0] << '\t' << Hy_out[id][0] << '\t' << Hz_out[id][0] << std::endl;
-           dipole_field_x[cell] += Hx_out[id][0]*constant;
-           dipole_field_y[cell] += Hy_out[id][0]*constant;
-           dipole_field_z[cell] += Hz_out[id][0]*constant;
-         //  ofile << cell << '\t' << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << std::endl;
-         }
 
+                // get cell index
+                int cell = k * num_cells_x*num_cells_y + j * num_cells_x + i;
+
+               //   std:: cout << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << Hx_out[id][0] << '\t' << Hy_out[id][0] << '\t' << Hz_out[id][0] << std::endl;
+                 dipole_field_x[cell] = Hx_out[id][0]*constant;
+                 dipole_field_y[cell] = Hy_out[id][0]*constant;
+                 dipole_field_z[cell] = Hz_out[id][0]*constant;
+              //   ofile <<i << '\t' << j << '\t' << k << "\t" <<  cell << '\t' << dipole_field_x[cell] << '\t' << dipole_field_y[cell] << '\t' << dipole_field_z[cell] << '\t' << std::endl;
+               }
+             }
+           }
+//std::cin.get();
          //saves the dipole field for each cell to the environment cell for use in the environment module
          for(int lc=0; lc<cells::num_local_cells; lc++){
             int cell = cells::cell_id_array[lc];
@@ -385,7 +353,7 @@ namespace environment{
             environment_field_y[cell] = dipole_field_y[env_cell];// + bias_field_y[env_cell];
             environment_field_z[cell] = dipole_field_z[env_cell];// + bias_field_z[env_cell];
 
-            ofile << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
+          //  ofile << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
 
          }
    //      //end the FFT only compilation

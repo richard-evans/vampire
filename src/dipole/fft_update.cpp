@@ -104,7 +104,6 @@ void initialize_fft_solver(){
 
    //calcualtes 8 times number of cells
    dp::eight_num_cells = 8*dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z;
-   std::cout << dp::num_macro_cells_x << '\t' << dp::num_macro_cells_y << '\t' << dp::num_macro_cells_z << '\t' << cells_num_cells << "\t" << dp::num_macro_cells_x*dp::num_macro_cells_y*dp::num_macro_cells_z <<std::endl;
 
    dp::N2xx =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
   dp::N2xy =  (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
@@ -143,50 +142,11 @@ void initialize_fft_solver(){
   dp::Hz_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * dp::eight_num_cells);
 
 
-  // std::vector < int > cell_dx(dp::eight_num_cells,0.0);
-  // std::vector < int > cell_dy(dp::eight_num_cells,0.0);
-  // std::vector < int > cell_dz(dp::eight_num_cells,0.0);
-  for(int k=0; k<2*dp::num_macro_cells_x; k++)
-  {
-    dp::idarray.push_back(std::vector<std::vector<int> >()); //initialize the first index with a 2D vector
-    for(int i=0; i<2*dp::num_macro_cells_y; i++)
-    {
-      dp::idarray[k].push_back(std::vector<int>()); //initialize the 2 index with a row of strings
-      for(int j=0; j<2*dp::num_macro_cells_z; j++)
-         dp::idarray[k][i].push_back(0.0); //fulfill the last index regularly
-    }
-  }
-  cell_dx.resize(dp::eight_num_cells,0.0);
-  cell_dy.resize(dp::eight_num_cells,0.0);
-  cell_dz.resize(dp::eight_num_cells,0.0);
 
-  int N = 0;
-
-
-  for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
+  for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
      for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
-        for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
-
-        //   if (i >= dp::num_macro_cells_x  || j >= dp::num_macro_cells_y || k >= dp::num_macro_cells_z  ){
-
-           dp::cell_dx[N] = i;
-           dp::cell_dy[N] = j;
-           dp::cell_dz[N] = k;
-          // std::cout << i << '\t' << j << '\t' << k << std::endl;
-          dp::idarray[i][j][k] = N;
-          N++;
-        // }
-        }
-     }
-  }
-
-  if (N != dp::eight_num_cells) std::cout << "ERROR" << "\t" << N << '\t' << dp::eight_num_cells << std::endl;
-
-  for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
-     for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
-        for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
+        for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
           int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-          int id2 = dp::idarray[i][j][k];
       //    std::cout << id << '\t' << id2 << std::endl;
            dp::N2xx0[id][0] = 0.0;
            dp::N2xx0[id][1] = 0.0;
@@ -224,74 +184,53 @@ void initialize_fft_solver(){
        }
      }
 
-     for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
+     for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
         for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
-           for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
+           for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
              int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-             int id2 = dp::idarray[i][j][k];
-     // int i = cell_dx[id];
-     // int j = cell_dy[id];
-     // int k = cell_dz[id];
 
-     int ii,jj,kk;
-     if (i >= dp::num_macro_cells_x) ii = i - 2*dp::num_macro_cells_x;
-     else ii = i;
-     if (j >= dp::num_macro_cells_y) jj = j - 2*dp::num_macro_cells_y;
-     else jj = j;
-     if (k >= dp::num_macro_cells_z) kk = k - 2*dp::num_macro_cells_z;
-     else kk = k;
+             int ii,jj,kk;
+             if (i >= dp::num_macro_cells_x) ii = i - 2*dp::num_macro_cells_x;
+             else ii = i;
+             if (j >= dp::num_macro_cells_y) jj = j - 2*dp::num_macro_cells_y;
+             else jj = j;
+             if (k >= dp::num_macro_cells_z) kk = k - 2*dp::num_macro_cells_z;
+             else kk = k;
 
-   //  std::cout << i << '\t' << j << '\t' << k << "\t" << ii << '\t' << jj << '\t' << kk << std::endl;
+             // std::cout << "enter" << std::endl;
+            const double rx = double(ii) * cells::macro_cell_size_x; // Angstroms
+            const double ry = double(jj) * cells::macro_cell_size_y;
+            const double rz = double(kk) * cells::macro_cell_size_z;
 
-     if (!( ii ==0 &&  jj == 0  && kk == 0)) {
-     // if ((2*dp::num_macro_cells_x%2 == 0 && i == dp::num_macro_cells_x) || (2*dp::num_macro_cells_y%2 == 0 && j == dp::num_macro_cells_y) || (2*dp::num_macro_cells_z%2 == 0 && k == dp::num_macro_cells_z)) {
-     //   dp::N2xx0[id][0] = 0.0;
-     //   dp::N2xy0[id][0] = 0.0;
-     //   dp::N2xz0[id][0] = 0.0;
-     //
-     //   dp::N2yx0[id][0] = 0.0;
-     //   dp::N2yy0[id][0] = 0.0;
-     //   dp::N2yz0[id][0] = 0.0;
-     //
-     //   dp::N2zx0[id][0] = 0.0;
-     //   dp::N2zy0[id][0] = 0.0;
-     //   dp::N2zz0[id][0] = 0.0;
-     //   continue;
-     // }
+            // calculate inverse distance
+            const double rij = sqrt(rx*rx + ry*ry + rz*rz);
+            if (rij > 0.1){
+            const double irij = 1.0/rij;
+            // if ( ii == i && jj ==j && kk==k )  std::cout << rx << '\t' << ry << '\t' << rz << '\t' << irij << std::endl;
+            // calculate unit vector to cells
+            const double ex = rx * irij;
+            const double ey = ry * irij;
+            const double ez = rz * irij;
 
+          // calculate cube of interaction range
+          const double irij3 = irij * irij * irij; // Angstroms
 
-       // std::cout << "enter" << std::endl;
-        const double rx = double(ii) * cells::macro_cell_size_x; // Angstroms
-        const double ry = double(jj) * cells::macro_cell_size_y;
-        const double rz = double(kk) * cells::macro_cell_size_z;
+          dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*irij3;
+          dp::N2xy0[id][0] = (3.0*ex*ey      )*irij3;
+          dp::N2xz0[id][0] = (3.0*ex*ez      )*irij3;
 
-        // calculate inverse distance
-        const double irij = 1.0/sqrt(rx*rx + ry*ry + rz*rz);
-      // if ( ii == i && jj ==j && kk==k )  std::cout << rx << '\t' << ry << '\t' << rz << '\t' << irij << std::endl;
-        // calculate unit vector to cells
-        const double ex = rx * irij;
-        const double ey = ry * irij;
-        const double ez = rz * irij;
+          dp::N2yx0[id][0] = (3.0*ey*ex      )*irij3;
+          dp::N2yy0[id][0] = (3.0*ey*ey - 1.0)*irij3;
+          dp::N2yz0[id][0] = (3.0*ey*ez      )*irij3;
 
-        // calculate cube of interaction range
-        const double irij3 = irij * irij * irij; // Angstroms
-
-        dp::N2xx0[id][0] = (3.0*ex*ex - 1.0)*irij3;
-        dp::N2xy0[id][0] = (3.0*ex*ey      )*irij3;
-        dp::N2xz0[id][0] = (3.0*ex*ez      )*irij3;
-
-        dp::N2yx0[id][0] = (3.0*ey*ex      )*irij3;
-        dp::N2yy0[id][0] = (3.0*ey*ey - 1.0)*irij3;
-        dp::N2yz0[id][0] = (3.0*ey*ez      )*irij3;
-
-        dp::N2zx0[id][0] = (3.0*ez*ex      )*irij3;
-        dp::N2zy0[id][0] = (3.0*ez*ey      )*irij3;
-        dp::N2zz0[id][0] = (3.0*ez*ez - 1.0)*irij3;
-      //   if (dp::N2zz0[id][0] > 0)
-      std::cout << ii << '\t' << jj << '\t' << kk << "\t" << dp::N2xx0[id][0] << '\t' << dp::N2xy0[id][0] << '\t' << dp::N2xz0[id][0] << '\t' << dp::N2yy0[id][0] << '\t' << dp::N2yz0[id][0] << '\t' << dp::N2zz0[id][0] << std::endl;
-     }
+          dp::N2zx0[id][0] = (3.0*ez*ex      )*irij3;
+          dp::N2zy0[id][0] = (3.0*ez*ey      )*irij3;
+          dp::N2zz0[id][0] = (3.0*ez*ez - 1.0)*irij3;
+        //   if (dp::N2zz0[id][0] > 0)
+      //  std::cout << ii << '\t' << jj << '\t' << kk << "\t" << dp::N2xx0[id][0] << '\t' << dp::N2xy0[id][0] << '\t' << dp::N2xz0[id][0] << '\t' << dp::N2yy0[id][0] << '\t' << dp::N2yz0[id][0] << '\t' << dp::N2zz0[id][0] << std::endl;
+       }
+    }
   }
-}
 }
 
   //--------------------------------------------------------------------------------------
@@ -307,31 +246,31 @@ void initialize_fft_solver(){
   const unsigned int ny = 2*dp::num_macro_cells_y;
   const unsigned int nz = 2*dp::num_macro_cells_z;
 
-  NxxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xx0, dp::N2xx, FFTW_FORWARD, FFTW_ESTIMATE);
+  NxxP = fftw_plan_dft_3d(nz, ny, nx, dp::N2xx0, dp::N2xx, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NxxP);
 
-  NyxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yx0, dp::N2yx, FFTW_FORWARD, FFTW_ESTIMATE);
+  NyxP = fftw_plan_dft_3d(nz, ny, nx, dp::N2yx0, dp::N2yx, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NyxP);
 
-  NzxP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zx0, dp::N2zx, FFTW_FORWARD, FFTW_ESTIMATE);
+  NzxP = fftw_plan_dft_3d(nz, ny, nx, dp::N2zx0, dp::N2zx, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NzxP);
 
-  NxyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xy0, dp::N2xy, FFTW_FORWARD, FFTW_ESTIMATE);
+  NxyP = fftw_plan_dft_3d(nz, ny, nx, dp::N2xy0, dp::N2xy, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NxyP);
 
-  NyyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yy0, dp::N2yy, FFTW_FORWARD, FFTW_ESTIMATE);
+  NyyP = fftw_plan_dft_3d(nz, ny, nx, dp::N2yy0, dp::N2yy, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NyyP);
 
-  NzyP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zy0, dp::N2zy, FFTW_FORWARD, FFTW_ESTIMATE);
+  NzyP = fftw_plan_dft_3d(nz, ny, nx, dp::N2zy0, dp::N2zy, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NzyP);
 
-  NxzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2xz0, dp::N2xz, FFTW_FORWARD, FFTW_ESTIMATE);
+  NxzP = fftw_plan_dft_3d(nz, ny, nx, dp::N2xz0, dp::N2xz, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NxzP);
 
-  NyzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2yz0, dp::N2yz, FFTW_FORWARD, FFTW_ESTIMATE);
+  NyzP = fftw_plan_dft_3d(nz, ny, nx, dp::N2yz0, dp::N2yz, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NyzP);
 
-  NzzP = fftw_plan_dft_3d(nx, ny, nz, dp::N2zz0, dp::N2zz, FFTW_FORWARD, FFTW_ESTIMATE);
+  NzzP = fftw_plan_dft_3d(nz, ny, nx, dp::N2zz0, dp::N2zz, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute(NzzP);
 
   // free memory from FFTW plans
@@ -345,17 +284,17 @@ void initialize_fft_solver(){
   fftw_destroy_plan(NzyP);
   fftw_destroy_plan(NzzP);
 
-  dp::MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mx_in,dp::Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
+  dp::MxP = fftw_plan_dft_3d(2*dp::num_macro_cells_z,2*dp::num_macro_cells_y,2*dp::num_macro_cells_x,dp::Mx_in,dp::Mx_out,FFTW_FORWARD,FFTW_ESTIMATE);
 
-  dp::MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::My_in,dp::My_out,FFTW_FORWARD,FFTW_ESTIMATE);
+  dp::MyP = fftw_plan_dft_3d(2*dp::num_macro_cells_z,2*dp::num_macro_cells_y,2*dp::num_macro_cells_x,dp::My_in,dp::My_out,FFTW_FORWARD,FFTW_ESTIMATE);
 
-  dp::MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Mz_in,dp::Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
+  dp::MzP = fftw_plan_dft_3d(2*dp::num_macro_cells_z,2*dp::num_macro_cells_y,2*dp::num_macro_cells_x,dp::Mz_in,dp::Mz_out,FFTW_FORWARD,FFTW_ESTIMATE);
 
-  dp::HxP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hx_in,dp::Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+  dp::HxP = fftw_plan_dft_3d(2*dp::num_macro_cells_z,2*dp::num_macro_cells_y,2*dp::num_macro_cells_x,dp::Hx_in,dp::Hx_out,FFTW_BACKWARD,FFTW_ESTIMATE);
 
-  dp::HyP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hy_in,dp::Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+  dp::HyP = fftw_plan_dft_3d(2*dp::num_macro_cells_z,2*dp::num_macro_cells_y,2*dp::num_macro_cells_x,dp::Hy_in,dp::Hy_out,FFTW_BACKWARD,FFTW_ESTIMATE);
 
-  dp::HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_x,2*dp::num_macro_cells_y,2*dp::num_macro_cells_z,dp::Hz_in,dp::Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
+  dp::HzP = fftw_plan_dft_3d(2*dp::num_macro_cells_z,2*dp::num_macro_cells_y,2*dp::num_macro_cells_x,dp::Hz_in,dp::Hz_out,FFTW_BACKWARD,FFTW_ESTIMATE);
 
   zlog << zTs() << "dipole field calulation with FFT has been initalised " << std::endl;
 
@@ -411,12 +350,11 @@ void update_field_fft(){
 
    const double imuB = 1.0/9.27400915e-24;
 
-   for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++){
+   for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
       for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++){
-         for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
-           int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;
+         for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++){
            int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-           int id2 = dp::idarray[i][j][k];
+           int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;;
     // get cell index
      //int cell = cells::cell_id_array[lc];
      //int id = cell;
@@ -424,7 +362,7 @@ void update_field_fft(){
           Mx_in[id][0] = cells::mag_array_x[cell] * imuB;
           My_in[id][0] = cells::mag_array_y[cell] * imuB;
           Mz_in[id][0] = cells::mag_array_z[cell] * imuB;
-          std::cout << cell << '\t' << id << '\t' << i << '\t' << j << '\t' << k << "\t" << cells::mag_array_x[cell] * imuB << "\t" << cells::mag_array_y[cell] * imuB << "\t" << cells::mag_array_z[cell] * imuB  << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] <<  std::endl;
+        //  std::cout << cell << '\t' << id << '\t' << i << '\t' << j << '\t' << k << "\t" << cells::mag_array_x[cell] * imuB << "\t" << cells::mag_array_y[cell] * imuB << "\t" << cells::mag_array_z[cell] * imuB  << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] <<  std::endl;
         }
       }
     }
@@ -434,33 +372,35 @@ void update_field_fft(){
     fftw_execute(MyP);
     fftw_execute(MzP);
 
-    for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++){
-       for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++){
-          for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
+    for(unsigned int k = 0 ; k < 2*dp::num_macro_cells_z ; k++){
+       for(unsigned int j = 0 ; j < 2*dp::num_macro_cells_y; j++){
+          for(unsigned int i = 0 ; i < 2*dp::num_macro_cells_x ; i++){
+            int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
 
-      int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;
-      int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-      int id2 = dp::idarray[i][j][k];
-      Hx_in[id][0]  =  dp::N2xx[id][0] * dp::Mx_out[id][0] + dp::N2xy[id][0] * dp::My_out[id][0] + dp::N2xz[id][0] * dp::Mz_out[id][0]; //summing the real part
-      Hx_in[id][0] -= (dp::N2xx[id][1] * dp::Mx_out[id][1] + dp::N2xy[id][1] * dp::My_out[id][1] + dp::N2xz[id][1] * dp::Mz_out[id][1]);
 
-      Hx_in[id][1]  =  dp::N2xx[id][0] * dp::Mx_out[id][1] + dp::N2xy[id][0] * dp::My_out[id][1] + dp::N2xz[id][0] * dp::Mz_out[id][1];
-      Hx_in[id][1] += (dp::N2xx[id][1] * dp::Mx_out[id][0] + dp::N2xy[id][1] * dp::My_out[id][0] + dp::N2xz[id][1] * dp::Mz_out[id][0]);
+          //  int cell = id;//k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;
+            //int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
+            //int id2 = dp::idarray[i][j][k];
+            Hx_in[id][0]  =  dp::N2xx[id][0] * dp::Mx_out[id][0] + dp::N2xy[id][0] * dp::My_out[id][0] + dp::N2xz[id][0] * dp::Mz_out[id][0]; //summing the real part
+            Hx_in[id][0] -= (dp::N2xx[id][1] * dp::Mx_out[id][1] + dp::N2xy[id][1] * dp::My_out[id][1] + dp::N2xz[id][1] * dp::Mz_out[id][1]);
 
-      Hy_in[id][0]  =  dp::N2yx[id][0] * dp::Mx_out[id][0] + dp::N2yy[id][0] * dp::My_out[id][0] + dp::N2yz[id][0] * dp::Mz_out[id][0];
-      Hy_in[id][0] -= (dp::N2yx[id][1] * dp::Mx_out[id][1] + dp::N2yy[id][1] * dp::My_out[id][1] + dp::N2yz[id][1] * dp::Mz_out[id][1]);
+            Hx_in[id][1]  =  dp::N2xx[id][0] * dp::Mx_out[id][1] + dp::N2xy[id][0] * dp::My_out[id][1] + dp::N2xz[id][0] * dp::Mz_out[id][1];
+            Hx_in[id][1] += (dp::N2xx[id][1] * dp::Mx_out[id][0] + dp::N2xy[id][1] * dp::My_out[id][0] + dp::N2xz[id][1] * dp::Mz_out[id][0]);
 
-      Hy_in[id][1]  =  dp::N2yx[id][0] * dp::Mx_out[id][1] + dp::N2yy[id][0] * dp::My_out[id][1] + dp::N2yz[id][0] * dp::Mz_out[id][1];
-      Hy_in[id][1] += (dp::N2yx[id][1] * dp::Mx_out[id][0] + dp::N2yy[id][1] * dp::My_out[id][0] + dp::N2yz[id][1] * dp::Mz_out[id][0]);
+            Hy_in[id][0]  =  dp::N2yx[id][0] * dp::Mx_out[id][0] + dp::N2yy[id][0] * dp::My_out[id][0] + dp::N2yz[id][0] * dp::Mz_out[id][0];
+            Hy_in[id][0] -= (dp::N2yx[id][1] * dp::Mx_out[id][1] + dp::N2yy[id][1] * dp::My_out[id][1] + dp::N2yz[id][1] * dp::Mz_out[id][1]);
 
-      Hz_in[id][0]  =  dp::N2zx[id][0] * dp::Mx_out[id][0] + dp::N2zy[id][0] * dp::My_out[id][0] + dp::N2zz[id][0] * dp::Mz_out[id][0]; //summing the real part
-      Hz_in[id][0] -= (dp::N2zx[id][1] * dp::Mx_out[id][1] + dp::N2zy[id][1] * dp::My_out[id][1] + dp::N2zz[id][1] * dp::Mz_out[id][1]);
+            Hy_in[id][1]  =  dp::N2yx[id][0] * dp::Mx_out[id][1] + dp::N2yy[id][0] * dp::My_out[id][1] + dp::N2yz[id][0] * dp::Mz_out[id][1];
+            Hy_in[id][1] += (dp::N2yx[id][1] * dp::Mx_out[id][0] + dp::N2yy[id][1] * dp::My_out[id][0] + dp::N2yz[id][1] * dp::Mz_out[id][0]);
 
-      Hz_in[id][1]  =  dp::N2zx[id][0] * dp::Mx_out[id][1] + dp::N2zy[id][0] * dp::My_out[id][1] + dp::N2zz[id][0] * dp::Mz_out[id][1];
-      Hz_in[id][1] += (dp::N2zx[id][1] * dp::Mx_out[id][0] + dp::N2zy[id][1] * dp::My_out[id][0] + dp::N2zz[id][1] * dp::Mz_out[id][0]);
-      std::cout <<dp::Mx_out[id][0] << '\t' << dp::My_out[id][0] << '\t' << dp::Mz_out[id][0] <<"\t" <<   Hx_in[id][0] << '\t' <<  Hy_in[id][0] << '\t' <<  Hy_in[id][0] << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] << std::endl;
+            Hz_in[id][0]  =  dp::N2zx[id][0] * dp::Mx_out[id][0] + dp::N2zy[id][0] * dp::My_out[id][0] + dp::N2zz[id][0] * dp::Mz_out[id][0]; //summing the real part
+            Hz_in[id][0] -= (dp::N2zx[id][1] * dp::Mx_out[id][1] + dp::N2zy[id][1] * dp::My_out[id][1] + dp::N2zz[id][1] * dp::Mz_out[id][1]);
+
+            Hz_in[id][1]  =  dp::N2zx[id][0] * dp::Mx_out[id][1] + dp::N2zy[id][0] * dp::My_out[id][1] + dp::N2zz[id][0] * dp::Mz_out[id][1];
+            Hz_in[id][1] += (dp::N2zx[id][1] * dp::Mx_out[id][0] + dp::N2zy[id][1] * dp::My_out[id][0] + dp::N2zz[id][1] * dp::Mz_out[id][0]);
+      //      std::cout <<dp::Mx_out[id][0] << '\t' << dp::My_out[id][0] << '\t' << dp::Mz_out[id][0] <<"\t" <<   Hx_in[id][0] << '\t' <<  Hy_in[id][0] << '\t' <<  Hy_in[id][0] << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] << std::endl;
+          }
         }
-      }
     }
 
 
@@ -469,29 +409,30 @@ void update_field_fft(){
    fftw_execute(HzP);
 
 
-   for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++){
+   for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
       for(unsigned int j = 0 ; j < dp::num_macro_cells_y; j++){
-         for(unsigned int k = 0 ; k < dp::num_macro_cells_z ; k++){
-
-     int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;
-     int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
-     int id2 = dp::idarray[i][j][k];
-     dipole::cells_field_array_x[cell] += Hx_out[id][0]/dp::eight_num_cells;
-     dipole::cells_field_array_y[cell] += Hy_out[id][0]/dp::eight_num_cells;
-     dipole::cells_field_array_z[cell] += Hz_out[id][0]/dp::eight_num_cells;
+         for(unsigned int i = 0 ; i < dp::num_macro_cells_x ; i++){
+           int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
+           int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;;
+     //int cell = k * dp::num_macro_cells_x*dp::num_macro_cells_y + j * dp::num_macro_cells_x + i;
+    // int id = k * 2*dp::num_macro_cells_x*2*dp::num_macro_cells_y + j * 2*dp::num_macro_cells_x + i;
+    // int id2 = dp::idarray[i][j][k];
+     dipole::cells_field_array_x[cell] = Hx_out[id][0]/dp::eight_num_cells;
+     dipole::cells_field_array_y[cell] = Hy_out[id][0]/dp::eight_num_cells;
+     dipole::cells_field_array_z[cell] = Hz_out[id][0]/dp::eight_num_cells;
 
      dipole::cells_field_array_x[cell] *= 9.27400915e-01;
      dipole::cells_field_array_y[cell] *= 9.27400915e-01;
      dipole::cells_field_array_z[cell] *= 9.27400915e-01;
 
-    dp_fields <<i << '\t' << j << '\t' << k << '\t' << cell << '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell]  << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] << std::endl;
+    //dp_fields <<sim::time<< '\t' <<  dipole::cells_field_array_x[cell] << '\t' << dipole::cells_field_array_y[cell] << '\t' << dipole::cells_field_array_z[cell]  << "\t" << cells::pos_and_mom_array[4*cell+0] << '\t' << cells_pos_and_mom_array[4*cell+1] << '\t' << cells_pos_and_mom_array[4*cell+2] << std::endl;
     cell++;
 
   }
 }
 
   }
-std::cin.get();
+//std::cin.get();
    #endif
 
    return;

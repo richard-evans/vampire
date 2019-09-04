@@ -59,7 +59,7 @@ namespace micromagnetic{
             chi[cell] = 1.0/(chi[cell]*9.54393845712027+0.308e-14);
             if (chi[cell] < 0) {
               chi[cell] = 0.0001;
-               std::cout << "error" << '\t' << Tc[cell] << '\t' << chi[cell] <<std::endl;
+              // std::cout << "error" << '\t' << Tc[cell] << '\t' << chi[cell] <<std::endl;
                //std::cin.get();
             }
          }
