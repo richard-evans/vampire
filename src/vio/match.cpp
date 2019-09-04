@@ -1174,7 +1174,7 @@ namespace vin{
           return EXIT_SUCCESS;
      }
 
-     test="track-bit-x";
+     test="track-bit-size-x";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
@@ -1182,7 +1182,7 @@ namespace vin{
         return EXIT_SUCCESS;
      }
 
-     test="track-bit-z";
+     test="track-bit-size-z";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
@@ -1190,7 +1190,7 @@ namespace vin{
         return EXIT_SUCCESS;
      }
 
-     test="track-bit-y";
+     test="track-bit-size-y";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
