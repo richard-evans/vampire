@@ -1255,14 +1255,14 @@ namespace vin{
         return EXIT_SUCCESS;
      }
      //--------------------------------------------------------------------
-     test="initial-cross-track-position";
+     test="initial-x-position";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
         sim::initial_cross_track_position = m;
         return EXIT_SUCCESS;
      }
-     test="initial-down-track-position";
+     test="initial-z-position";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
