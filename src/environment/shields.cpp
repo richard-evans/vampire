@@ -50,8 +50,8 @@ bool in_shield(double x, double y, double z){
 
   if (square_shields){
   //  std::cout << dim[1] << "\t" << cs::system_dimensions[1] << '\t' << gap << std::endl;
-    int min = dim[1]/2.0 - cs::system_dimensions[1]/2.0 - gap;
-    int max = min + cs::system_dimensions[1] + 2.0*gap;
+    int min = dim[0]/2.0 - cs::system_dimensions[0]/2.0 - gap;
+    int max = min + cs::system_dimensions[0] + 2.0*gap;
   //  std::cout << min << '\t' << max << std::endl;
     if (y < min || y > max) return true;
     else return false;
@@ -92,16 +92,16 @@ bool in_shield(double x, double y, double z){
 int bias_shields(){
 
   double shield_Ms = 1;
-  double x_size = 1000000;
-  double y_size = dim[1];
+  double x_size = dim[1];
+  double y_size = 1000000;
   double z_size = dim[2];
 
-  double x_pos;
-  double y_pos = dim[1]/2;
-  double z_pos = dim[2]/2;
+  double x_pos = x_size/2.0;
+  double y_pos;
+  double z_pos = dim[2]/2.0;
 
-  double x_pos_1 = -x_size/2;
-  double x_pos_2 =  x_size/2 +dim[0];
+  double y_pos_1 = -y_size/2.0;
+  double y_pos_2 =  y_size/2.0 +dim[0];
 
 
    double prefactor = shield_Ms/(4.0*M_PI);
@@ -124,8 +124,8 @@ int bias_shields(){
 
      for (int shield = 0; shield < 2; shield++){
 
-       if (shield == 0) x_pos = x_pos_1;
-       if (shield == 1) x_pos = x_pos_2;
+       if (shield == 0) y_pos = y_pos_1;
+       if (shield == 1) y_pos = y_pos_2;
        //calculates the vector in A from the cell to the shields
        double x = sqrt((x_cell - x_pos)*(x_cell - x_pos));
        double y = sqrt((y_cell - y_pos)*(y_cell - y_pos));
@@ -167,15 +167,15 @@ int bias_shields(){
               }
            }
        }
-       bias_field_x[cell] = bias_field_x[cell] + Bx*prefactor;
-       bias_field_y[cell] = bias_field_y[cell] + By*prefactor;
+       bias_field_x[cell] = bias_field_x[cell] + By*prefactor;
+       bias_field_y[cell] = bias_field_y[cell] + Bx*prefactor;
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 
      }
-  //   std::cout <<"total" << '\t << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
+  //  std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
 
   }
-
+//std::cin.get();
 
 
 
