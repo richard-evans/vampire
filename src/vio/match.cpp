@@ -1238,7 +1238,7 @@ namespace vin{
 
 
      //--------------------------------------------------------------------
-     test="cross-track-velocity";
+     test="x-velocity";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
@@ -1247,7 +1247,7 @@ namespace vin{
      }
 
      //--------------------------------------------------------------------
-     test="down-track-velocity";
+     test="z-velocity";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
