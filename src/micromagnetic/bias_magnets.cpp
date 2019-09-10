@@ -126,7 +126,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 
      }
-  //   std::cout <<"total" << '\t' << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<  "\t" << z_cell << std::endl;
+     std::cout <<"total" << '\t' << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<  "\t" << z_cell << std::endl;
 
   }
 return 0;

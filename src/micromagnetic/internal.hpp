@@ -55,7 +55,7 @@ namespace micromagnetic{
 
       extern double bias_magnets_max_height;
       extern double bias_magnets_min_height;
-
+      extern double shield_Ms;
       extern double bias_magnets_max_width;
       extern double bias_magnets_min_width;
 

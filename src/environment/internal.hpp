@@ -68,6 +68,7 @@ namespace environment{
       extern bool expoential_shields;
       extern int gap;
 
+      extern bool LFA_scan;
       extern double eightPI_three_cell_volume;
       extern double cell_volume;
       extern double env_field;

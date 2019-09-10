@@ -1225,6 +1225,7 @@ namespace vin{
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 100,"input","0.0 - 100");
         sim::track_num_tracks = m;
+        std::cout << "N" << m << std::endl;
         return EXIT_SUCCESS;
      }
      test="num-bits-per-track";
@@ -1232,6 +1233,8 @@ namespace vin{
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 100.0,"input","0.0 - 100");
         sim::track_num_bits_per_track = m;
+        std::cout << "N" << m << std::endl;
+        
         return EXIT_SUCCESS;
      }
 

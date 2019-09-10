@@ -59,6 +59,12 @@ namespace environment{
          return true;
       }
 
+      test="LFA_scan";
+      if(word==test){
+         env::LFA_scan =true;
+         return true;
+      }
+
       test="system-size-x";
       if(word==test){
          double x=atof(value.c_str());

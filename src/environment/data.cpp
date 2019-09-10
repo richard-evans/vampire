@@ -66,6 +66,8 @@ namespace environment{
 
       std::vector <int> list_of_mm_cells_in_env;
 
+      bool LFA_scan;
+
       std::vector < double > dim(3,6.0);
       std::vector < double > cell_size(3,2.0);
 

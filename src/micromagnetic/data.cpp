@@ -85,7 +85,7 @@ namespace micromagnetic{
 
       double res_GMR = 1.0;
       double res_RA = 0.3;
-
+      double shield_Ms = -1;
       int resistance_layer_1 = 0;
       int resistance_layer_2 = 0;
 

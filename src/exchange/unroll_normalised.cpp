@@ -63,6 +63,7 @@ namespace exchange{
                   double d = sqrt(sqrt(dx*dx + dy*dy)*sqrt(dx*dx + dy*dy) + dz*dz);
 
                   if (IrMn[imaterial] && IrMn[jmaterial]){
+
                      //std::cout << "enter" <<std::endl;
                      if (d  > 2.6 && d < 2.7 ) J = 1.0;
                      else if (d  > 3.7 && d <3.8 ) J = -0.8;
@@ -72,7 +73,8 @@ namespace exchange{
                      if (d  > 2.6 && d < 2.7 ) J = -1.0;
                      else if (d  > 3.7 && d <3.8 ) J = 0.0;
                   }
-                  //J = -1;
+
+                //  std::cout << J << std::endl;
                   // get unit cell interaction id
                   int i = atoms::neighbour_interaction_type_array[nn];
                   atoms::i_exchange_list[nn].Jij = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * mp::material[imaterial].Jij_matrix[jmaterial][0]*J;
