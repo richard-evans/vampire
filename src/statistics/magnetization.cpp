@@ -6,6 +6,21 @@
 // (c) R F L Evans 2014. All rights reserved.
 //
 //-----------------------------------------------------------------------------
+//
+// In principle better to use kahan summation for accumulated statistics to
+// avoid accumulated errors, but up to 20% performance loss for unusual edge
+// case. Code left here for future reference
+//
+// for(int idx = 0; idx < msize; ++idx){
+//    const double sum = mean_magnetization[idx];  // load magnetization to temp
+//    const double acc = kahan_roundoff[idx];      // save accumulated error
+//    const double mag = magnetization[idx];       // load magnetisation
+//    const double err = mag - acc;                // net error
+//    const double cor = sum + y;                  // corrected sum
+//    kahan_roundoff[idx] = (corr - sum) - err;    // retain roundoff for next iteration
+//    mean_magnetization[idx] = corr;              // save final sum with correction
+// }
+//-----------------------------------------------------------------------------
 
 // C++ standard library headers
 #include <algorithm>
@@ -117,9 +132,9 @@ void magnetization_statistic_t::get_mask(std::vector<int>& out_mask, std::vector
 // Function to calculate magnetisation of spins given a mask and place result in a magnetization array
 //------------------------------------------------------------------------------------------------------
 void magnetization_statistic_t::calculate_magnetization(const std::vector<double>& sx, // spin unit vector
-                                                         const std::vector<double>& sy,
-                                                         const std::vector<double>& sz,
-                                                         const std::vector<double>& mm){
+                                                        const std::vector<double>& sy,
+                                                        const std::vector<double>& sz,
+                                                        const std::vector<double>& mm){
 
    // initialise magnetization to zero [.end() seems to be optimised away by the compiler...]
    std::fill(magnetization.begin(),magnetization.end(),0.0);
@@ -149,7 +164,7 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
       magnetization[4*mask_id + 0] = magnetization[4*mask_id + 0]/magm; // unit vector // x - AJN
       magnetization[4*mask_id + 1] = magnetization[4*mask_id + 1]/magm;                // y
       magnetization[4*mask_id + 2] = magnetization[4*mask_id + 2]/magm;                // z
-      magnetization[4*mask_id + 3] = magm/msat; // m/m_s                               // ?
+      magnetization[4*mask_id + 3] = magm/msat; // m/m_s                               // m
    }
 
    // Zero empty mask id's
@@ -157,7 +172,7 @@ void magnetization_statistic_t::calculate_magnetization(const std::vector<double
 
    // Add magnetisation to mean
    const int msize = magnetization.size();
-   for(int idx=0; idx<msize; ++idx) mean_magnetization[idx]+=magnetization[idx];
+   for(int idx=0; idx<msize; ++idx) mean_magnetization[idx] += magnetization[idx];
    mean_counter+=1.0;
 
    return;
