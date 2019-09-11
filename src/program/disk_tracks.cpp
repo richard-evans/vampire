@@ -291,6 +291,7 @@ void tracks(){
      tp::total_bit_width = tp::bit_width + tp::track_gap;
      tp::total_bit_depth = tp::bit_depth;
 
+     std:: cout << tp::bit_size << '\t' << tp::bit_width << '\t' << std::endl;
      tp::Ms = sim::track_Ms;// mu0 Ms in Tesla
 
      sim::track_field_x.resize(cells::num_cells,0.0);
@@ -417,14 +418,14 @@ void tracks(){
       sim::track_field_x[cell] = B[0];
       sim::track_field_y[cell] = B[1];
       sim::track_field_z[cell] = B[2];
-          //   ofile << cell << '\t' << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0]<< '\t' << B[1] << '\t' << B[2] <<  std::endl;
+      ofile << cell << '\t' << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0]<< '\t' << B[1] << '\t' << B[2] <<  std::endl;
          //    std::cout  << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
     }
 
          // Integrate system
   sim::integrate(sim::partial_time);
 
-  ofile << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+  //ofile << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
   step++;
 
     // Calculate magnetisation statistics
