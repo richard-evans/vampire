@@ -440,6 +440,7 @@ void tracks(){
 //
 else {
 
+
    std::ofstream ofile;
    ofile.open ("position.txt");
    int step = 0;
@@ -477,7 +478,7 @@ else {
    //  std::cout <<  tp::Ms << '\t' << max << std::endl;
    ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
 
-    tp::Ms = tp::Ms - 0.01;
+    tp::Ms = tp::Ms - sim::LFA_scan_field_step;
 
 	}
 
@@ -511,7 +512,7 @@ else {
       ///     std::cout <<  tp::Ms << '\t' << max << std::endl;
          ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
 
-     tp::Ms = tp::Ms + 0.01;
+     tp::Ms = tp::Ms + sim::LFA_scan_field_step;
 
 	}
 }

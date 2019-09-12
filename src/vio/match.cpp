@@ -1219,6 +1219,13 @@ namespace vin{
         sim::track_track_gap = m;
         return EXIT_SUCCESS;
      }
+     test="LFA-track-field-step";
+     if(word==test){
+       double m=atof(value.c_str());
+       check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 36000.0,"input","0.0 - 100");
+       sim::LFA_scan_field_step = m;
+       return EXIT_SUCCESS;
+     }
 
      test="num-tracks";
      if(word==test){
@@ -1234,7 +1241,7 @@ namespace vin{
         check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 100.0,"input","0.0 - 100");
         sim::track_num_bits_per_track = m;
         std::cout << "N" << m << std::endl;
-        
+
         return EXIT_SUCCESS;
      }
 
