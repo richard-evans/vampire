@@ -147,7 +147,7 @@ void create_tracks(){
        }
      }
    }
-   std::cout << "A" << std::endl;
+//   std::cout << "A" << std::endl;
 
    // temporary constants defining half sizes of bits
    const double xb = tp::bit_size*0.5;
@@ -177,7 +177,7 @@ void create_tracks(){
        }
   //     M = M*-1;
     }
-    std::cout << "A" << std::endl;
+   // std::cout << "A" << std::endl;
 
 
 //    std::cin.get();
@@ -373,7 +373,7 @@ void tracks(){
           tp::x_track_pos[bit] = x;
           tp::z_track_pos[bit] = z;
           tp::bit_magnetisation[bit] = bitms[bit];
-          std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs <<  "\t" <<bitms[bit] << std::endl;
+      //    std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs <<  "\t" <<bitms[bit] << std::endl;
       //    std::cout << bitms[bit] <<std::endl;
     //      std::cout << bit << '\t' <<  tp::bit_magnetisation[bit] <<std::endl;
           bit++;
@@ -446,9 +446,9 @@ else {
 
 
    double max = tp::Ms;
-   std::cout << "ENTER" << std::endl;
+   //std::cout << "ENTER" << std::endl;
 
-   std::cout << tp::Ms << '\t' << max << std::endl;
+//   std::cout << tp::Ms << '\t' << max << std::endl;
   while(tp::Ms > -max){
 
 
@@ -474,7 +474,7 @@ else {
 
     // Output data
     vout::data();
-     std::cout <<  tp::Ms << '\t' << max << std::endl;
+   //  std::cout <<  tp::Ms << '\t' << max << std::endl;
    ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
 
     tp::Ms = tp::Ms - 0.01;
@@ -508,7 +508,7 @@ else {
 
           // Output data
           vout::data();
-           std::cout <<  tp::Ms << '\t' << max << std::endl;
+      ///     std::cout <<  tp::Ms << '\t' << max << std::endl;
          ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
 
      tp::Ms = tp::Ms + 0.01;
