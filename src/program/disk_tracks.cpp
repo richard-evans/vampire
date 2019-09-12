@@ -438,79 +438,82 @@ void tracks(){
 	}
  }
 //
-// else {
-//
-//
-//   while(tp::Ms > -0.11){
-//
-//
-//
-//    for (int lc = 0; lc < cells::num_local_cells; lc++){
-//      int cell = cells::cell_id_array[lc];
-//
-//         const double cx = cells::pos_and_mom_array[4*cell+0];
-//         const double cy = cells::pos_and_mom_array[4*cell+1];
-//         const double cz = cells::pos_and_mom_array[4*cell+2];
-//
-//             B = calculate_field(cx,cy,cz,0);
-//              sim::track_field_x[cell] = B[0];
-//              sim::track_field_y[cell] = B[1];
-//              sim::track_field_z[cell] = B[2];
-//
-//          }
-//
-// for (int i = 0; i < 500; i++){
-//     // Integrate system
-//     sim::integrate(1000);
-//
-//     // Calculate magnetisation statistics
-//     stats::mag_m();
-//
-//     // Output data
-//     vout::data();
-// }
-//    //ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
-//
-//     tp::Ms = tp::Ms - 0.01;
-//
-// 	}
-//
-//
-//    while(tp::Ms < 0.11){
-//
-//
-//
-//     for (int lc = 0; lc < cells::num_local_cells; lc++){
-//       int cell = cells::cell_id_array[lc];
-//
-//          const double cx = cells::pos_and_mom_array[4*cell+0];
-//          const double cy = cells::pos_and_mom_array[4*cell+1];
-//          const double cz = cells::pos_and_mom_array[4*cell+2];
-//
-//              B = calculate_field(cx,cy,cz,0);
-//               sim::track_field_x[cell] = B[0];
-//               sim::track_field_y[cell] = B[1];
-//               sim::track_field_z[cell] = B[2];
-//
-//           }
-//
-//  for (int i = 0; i < 500; i++){
-//      // Integrate system
-//      sim::integrate(1000);
-//
-//      // Calculate magnetisation statistics
-//      stats::mag_m();
-//
-//      // Output data
-//      vout::data();
-    //}
-//
-//
-//   std::cout << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
-//
-//      tp::Ms = tp::Ms + 0.01;
-//
-// 	}
-//}
+else {
+
+   std::ofstream ofile;
+   ofile.open ("position.txt");
+   int step = 0;
+
+
+   double max = tp::Ms;
+   std::cout << "ENTER" << std::endl;
+
+   std::cout << tp::Ms << '\t' << max << std::endl;
+  while(tp::Ms > -max){
+
+
+   for (int lc = 0; lc < cells::num_local_cells; lc++){
+     int cell = cells::cell_id_array[lc];
+
+        const double cx = cells::pos_and_mom_array[4*cell+0];
+        const double cy = cells::pos_and_mom_array[4*cell+1];
+        const double cz = cells::pos_and_mom_array[4*cell+2];
+
+            B = calculate_field(cx,cy,cz,0);
+             sim::track_field_x[cell] = B[0];
+             sim::track_field_y[cell] = B[1];
+             sim::track_field_z[cell] = B[2];
+
+         }
+
+    // Integrate system
+    sim::integrate(sim::partial_time);
+
+    // Calculate magnetisation statistics
+    stats::mag_m();
+
+    // Output data
+    vout::data();
+     std::cout <<  tp::Ms << '\t' << max << std::endl;
+   ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+
+    tp::Ms = tp::Ms - 0.01;
+
+	}
+
+
+   while(tp::Ms < max){
+
+
+
+         for (int lc = 0; lc < cells::num_local_cells; lc++){
+           int cell = cells::cell_id_array[lc];
+
+              const double cx = cells::pos_and_mom_array[4*cell+0];
+              const double cy = cells::pos_and_mom_array[4*cell+1];
+              const double cz = cells::pos_and_mom_array[4*cell+2];
+
+                  B = calculate_field(cx,cy,cz,0);
+                   sim::track_field_x[cell] = B[0];
+                   sim::track_field_y[cell] = B[1];
+                   sim::track_field_z[cell] = B[2];
+
+               }
+
+          // Integrate system
+          sim::integrate(sim::partial_time);
+
+          // Calculate magnetisation statistics
+          stats::mag_m();
+
+          // Output data
+          vout::data();
+           std::cout <<  tp::Ms << '\t' << max << std::endl;
+         ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+
+     tp::Ms = tp::Ms + 0.01;
+
+	}
+}
 }
 }//end of namespace program
