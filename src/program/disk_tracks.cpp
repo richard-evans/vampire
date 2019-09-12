@@ -132,9 +132,9 @@ void create_tracks(){
      while(getline(ifile,line) ){
        std::stringstream line_stream(line);
        line_stream >> track_num >> bit_num >> M;
-       std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
+       //std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
        bitms[(track_num-1)*(tp::num_bits_per_track) + (bit_num-1)] = M*tp::Ms;
-       std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
+      // std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
      }
    }
    else {
@@ -168,7 +168,7 @@ void create_tracks(){
           tp::x_track_pos[bit] = x;
           tp::z_track_pos[bit] = z;
           tp::bit_magnetisation[bit] = bitms[bit];
-          std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs << std::endl;
+      //    std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs << std::endl;
       //    std::cout << bitms[bit] <<std::endl;
     //      std::cout << bit << '\t' <<  tp::bit_magnetisation[bit] <<std::endl;
           bit++;
@@ -291,7 +291,7 @@ void tracks(){
      tp::total_bit_width = tp::bit_width + tp::track_gap;
      tp::total_bit_depth = tp::bit_depth;
 
-     std:: cout << tp::bit_size << '\t' << tp::bit_width << '\t' << std::endl;
+   //  std:: cout << tp::bit_size << '\t' << tp::bit_width << '\t' << std::endl;
      tp::Ms = sim::track_Ms;// mu0 Ms in Tesla
 
      sim::track_field_x.resize(cells::num_cells,0.0);
@@ -333,13 +333,13 @@ void tracks(){
          err::vexit();
        }
        line_stream >> track_num >> bit_num >> M;
-       std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
+   //    std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
        if (track_num-1 > tp::num_tracks || bit_num-1  > tp::num_bits_per_track){
          std::cout << "error number of bits in file more than number of specified bits" << std::endl;
          err::vexit();
        }
        bitms[(track_num-1)*(tp::num_bits_per_track) + (bit_num-1)] = M*tp::Ms;
-       std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
+   //    std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
      }
    }
    else {
