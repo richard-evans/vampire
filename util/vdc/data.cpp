@@ -36,6 +36,8 @@ namespace vdc{
 
    uint64_t num_atoms = 0;
 
+   unsigned int vdc_start_file_id = 0;
+   unsigned int vdc_final_file_id = 99999999;
    unsigned int start_file_id = 0;
    unsigned int final_file_id = 99999999;
 

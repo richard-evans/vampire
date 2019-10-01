@@ -78,6 +78,42 @@ int command( int argc, char* argv[] ){
          vdc::verbose = true;
       }
       //------------------------------------------------------------------------
+      // Check for user specified initial frame to render
+      //------------------------------------------------------------------------
+      else if (sw == "--frame-start"){
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - expected index of intial frame to render." );
+
+         if ( stoi(temp_str) >= 0 ){
+            vdc::vdc_start_file_id = stoi(temp_str);
+         }
+         else{
+            ////terminaltextcolor(RED);
+            std::cerr << "Error - frame index cannot be negative."
+                      << std::endl;
+            return EXIT_FAILURE;
+            ////terminaltextcolor(WHITE);
+         }
+      }
+      //------------------------------------------------------------------------
+      // Check for user specified final frame to render
+      //------------------------------------------------------------------------
+      else if (sw == "--frame-final"){
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - expected index of final frame to render." );
+
+         if ( stoi(temp_str) >= 0 ){
+            vdc::vdc_final_file_id = stoi(temp_str)+1; // +1 since we want to render the last frame as well
+         }
+         else{
+            ////terminaltextcolor(RED);
+            std::cerr << "Error - frame index cannot be negative."
+                      << std::endl;
+            return EXIT_FAILURE;
+            ////terminaltextcolor(WHITE);
+         }
+      }
+      //------------------------------------------------------------------------
       // Check for colour mapping parameters
       //------------------------------------------------------------------------
       else if (sw == "--vector-z"){
