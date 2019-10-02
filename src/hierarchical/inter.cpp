@@ -96,15 +96,15 @@ namespace hierarchical{
          //    if (cell_i ==0)   std::cout << cell_j << '\t'<< rij << '\t' << "tensor" << "\t" << ha::num_atoms_in_cell[cell_i] << '\t' << ha::num_atoms_in_cell[cell_j] << std::endl;
 
 
-           if  (cell_j > ha::num_zero_level_cells) std::cout << ha::num_zero_level_cells << '\t' << cell_j << '\t' << rij <<  "\t" << dipole::cutoff*cells::macro_cell_size << std::endl;
-          //std::cout << "ATOM" << '\t' << ha::num_atoms_in_cell[cell_i] << std::endl;
-            //if (cell_j > 120) std::cout << cell_i << "\t" << cell_j << std::endl;
+//            if  (cell_j > ha::num_zero_level_cells) std::cout << ha::num_zero_level_cells << '\t' << cell_j << '\t' << rij <<  "\t" << dipole::cutoff*cells::macro_cell_size << std::endl;
+//           //std::cout << "ATOM" << '\t' << ha::num_atoms_in_cell[cell_i] << std::endl;
+//             //if (cell_j > 120) std::cout << cell_i << "\t" << cell_j << std::endl;
              for(int pi=0; pi<ha::num_atoms_in_cell[cell_i]; pi++){
-
+//
                const double cix = cells_atom_in_cell_coords_array_x[cell_i][pi];
                const double ciy = cells_atom_in_cell_coords_array_y[cell_i][pi];
                const double ciz = cells_atom_in_cell_coords_array_z[cell_i][pi];
-
+//
                  for(int qj=0; qj<ha::num_atoms_in_cell[cell_j]; qj++){
 
                   const double dx = cells_atom_in_cell_coords_array_x[cell_j][qj] - cix;
@@ -126,11 +126,11 @@ namespace hierarchical{
                   tmp_rij_inter_yy += ((3.0*ey*ey - 1.0)*rij3);
                   tmp_rij_inter_yz += ((3.0*ey*ez      )*rij3);
                   tmp_rij_inter_zz += ((3.0*ez*ez - 1.0)*rij3);
-//                   //std::cout<<pi << '\t' << qj << '\t' << ex << '\t' << ey << '\t' << ez << "\t" << tmp_rij_inter_xx <<std::endl;
-//std::cout << cell_j << '\t' << rij3 << '\t'  << ha::num_atoms_in_cell[cell_i] << '\t' << ha::num_atoms_in_cell[cell_j] << '\t' << dx << '\t' << dy << '\t' << dz << "\t" << tmp_rij_inter_xx << '\t' << tmp_rij_inter_xy << '\t' << tmp_rij_inter_xz << '\t' <<std::endl;
+ //                   //std::cout<<pi << '\t' << qj << '\t' << ex << '\t' << ey << '\t' << ez << "\t" << tmp_rij_inter_xx <<std::endl;
+ //std::cout << cell_j << '\t' << rij3 << '\t'  << ha::num_atoms_in_cell[cell_i] << '\t' << ha::num_atoms_in_cell[cell_j] << '\t' << dx << '\t' << dy << '\t' << dz << "\t" << tmp_rij_inter_xx << '\t' << tmp_rij_inter_xy << '\t' << tmp_rij_inter_xz << '\t' <<std::endl;
                  }
               }
-            //std::cout << interaction_no << '\t' << ha::rij_tensor_xx.size() <<std::endl;
+             //std::cout << interaction_no << '\t' << ha::rij_tensor_xx.size() <<std::endl;
             ha::rij_tensor_xx[interaction_no] =  (tmp_rij_inter_xx);
             ha::rij_tensor_xy[interaction_no] =  (tmp_rij_inter_xy);
             ha::rij_tensor_xz[interaction_no] =  (tmp_rij_inter_xz);
