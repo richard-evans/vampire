@@ -49,7 +49,7 @@ void susceptibility_statistic_t::initialize(stats::magnetization_statistic_t& ma
    mean_susceptibility_squared.resize(4*num_elements,0.0);
    mean_absolute_susceptibility.resize(4*num_elements,0.0);
    mean_absolute_susceptibility_squared.resize(4*num_elements,0.0);
-   
+
    // copy saturation data
    saturation = mag_stat.saturation;
 
@@ -88,17 +88,17 @@ void susceptibility_statistic_t::calculate(const std::vector<double>& magnetizat
       mean_susceptibility[4*id + 1]+=my*mm;
       mean_susceptibility[4*id + 2]+=mz*mm;
       mean_susceptibility[4*id + 3]+=mm;
-      
+
       mean_susceptibility_squared[4*id + 0]+=mx*mx*mm*mm;
       mean_susceptibility_squared[4*id + 1]+=my*my*mm*mm;
       mean_susceptibility_squared[4*id + 2]+=mz*mz*mm*mm;
       mean_susceptibility_squared[4*id + 3]+=mm*mm;
-      
+
       mean_absolute_susceptibility[4*id + 0]+=fabs(mx*mm);
       mean_absolute_susceptibility[4*id + 1]+=fabs(my*mm);
       mean_absolute_susceptibility[4*id + 2]+=fabs(mz*mm);
       mean_absolute_susceptibility[4*id + 3]+=mm;
-      
+
       mean_absolute_susceptibility_squared[4*id + 0]+=fabs(mx*mx*mm*mm);
       mean_absolute_susceptibility_squared[4*id + 1]+=fabs(my*my*mm*mm);
       mean_absolute_susceptibility_squared[4*id + 2]+=fabs(mz*mz*mm*mm);
@@ -138,6 +138,12 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
    // result string stream
    std::ostringstream result;
 
+   // set custom precision if enabled
+   if(vout::custom_precision){
+      result.precision(vout::precision);
+      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+   }
+
    // determine inverse temperature mu_B/(kB T) (flushing to zero for very low temperatures)
    const double itemp = temperature < 1.e-300 ? 0.0 : 9.274e-24/(1.3806503e-23*temperature);
 
@@ -146,7 +152,7 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
    const double imean_counter_sq = 1.0/(mean_counter*mean_counter);
 
    // loop over all elements
-   for(int id=0; id< num_elements; ++id){
+   for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
 
       const double prefactor = itemp*saturation[id]; // in mu_B
       const double sus_x = prefactor*(mean_susceptibility_squared[4*id + 0]*imean_counter-mean_susceptibility[4*id + 0]*mean_susceptibility[4*id + 0]*imean_counter_sq);

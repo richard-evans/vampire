@@ -27,7 +27,7 @@
 //
 ltmp::abs_t::abs_t():
   profile_loaded(false)
-  {};
+  {}
 
 //--------------------------------------------------
 // Function to return if profile is set
@@ -122,7 +122,7 @@ double ltmp::abs_t::get_absorption_constant(double height){
       if(height >= zmin && height <= zmax){
          // calculate interpolated value
          return height*m[i]+c[i];
-      }      
+      }
    }
 
    return 0.0;

@@ -19,7 +19,7 @@
 //                               |
 //                              _-_
 //                             /   \
-//                         __--     --__  
+//                         __--     --__
 //                     ----------------------
 //                     |  |  |  |  |  |  |  |
 //                     ----------------------
@@ -110,7 +110,9 @@ namespace ltmp{
                   const double TTG,
                   const double TTCe,
                   const double TTCl,
-                  const double dt);
+                  const double dt,
+                  const double Tmin,
+                  const double Tmax);
 
    //-----------------------------------------------------------------------------
    // Function to copy localised thermal fields to external field array

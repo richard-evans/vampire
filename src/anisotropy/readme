@@ -1,0 +1,21 @@
+//------------------------------------------------------------------------------
+//                      VAMPIRE anisotropy module
+//------------------------------------------------------------------------------
+
+This module implements various forms of magnetic anisotropy within the
+VAMPIRE code, including uniaxial, cubic, surface and temperature dependent
+lattice anisotropy. For high performance the Neel anisotropy is rolled into
+a tensor for weach atom. The calculation is then a simple vector-matrix-vector
+multiplication:
+
+E = ( Sx Sy Sz ) ( Txx Txy Txz ) ( Sx )
+                 ( Tyx Tyy Tyz ) ( Sy )
+                 ( Tzx Tzy Tzz ) ( Sz )
+
+The tensor form is computed once at the beginning of the simulation and
+incorporates the correct components for different materials and symmetries.
+
+Uniaxial anisotropy is implemented with spherical harmonics with even LeGrandre
+polynomials. Cubic anisotropy is implemented as directional cosines. Surface
+anisotropy expands the local components to an onsite anisotropy which is
+time invariant.

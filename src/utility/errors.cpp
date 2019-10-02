@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -70,13 +70,13 @@ namespace err
       terminaltextcolor(WHITE);
       zlog << zTs() << "Fatal error on rank: " << vmpi::my_rank << ": Aborting program." << std::endl;
       // concatenate log and sort
-      #ifdef WIN_COMPILE
+      /*#ifdef WIN_COMPILE
          system("type log.* 2>NUL | sort > log");
       #else
          system("ls log.* | xargs cat | sort -n > log");
-      #endif
+      #endif*/
 
-      MPI::COMM_WORLD.Abort(EXIT_FAILURE);
+      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
       // MPI program dies ungracefully here
       #endif
 
@@ -105,13 +105,7 @@ namespace err
       zlog << zTs() << "Fatal error on rank " << vmpi::my_rank << ": " << message << std::endl;
       zlog << zTs() << "Aborting program." << std::endl;
 
-      // concatenate log and sort
-      #ifdef WIN_COMPILE
-         system("type log.* 2>NUL | sort > log");
-      #else
-         system("ls log.* | xargs cat | sort -n > log");
-      #endif
-      MPI::COMM_WORLD.Abort(EXIT_FAILURE);
+      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
       // MPI program dies ungracefully here
       #else
          // Print Error message to screen and log

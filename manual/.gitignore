@@ -1,0 +1,8 @@
+*.bbl
+*.aux
+*.blg
+*.log
+*.toc
+vampire-manual.pdf
+*.bak
+*~

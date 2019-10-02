@@ -6,18 +6,18 @@
 //
 //  Email:richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify 
-//  it under the terms of the GNU General Public License as published by 
-//  the Free Software Foundation; either version 2 of the License, or 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
 //
-//  This program is distributed in the hope that it will be useful, but 
-//  WITHOUT ANY WARRANTY; without even the implied warranty of 
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //  General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License 
-//  along with this program; if not, write to the Free Software Foundation, 
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
 //  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 //
 // ----------------------------------------------------------------------------
@@ -28,10 +28,20 @@
 
 #include "create.hpp"
 #include "errors.hpp"
+#include "info.hpp"
 #include "material.hpp"
 #include "sim.hpp"
 #include "vmpi.hpp"
 #include "vio.hpp"
+
+#include "internal.hpp"
+
+// main namespace
+namespace vmain{
+   namespace internal{
+      std::string input_file_name = "input"; // default input file name
+   }
+}
 
 int simulate_system();
 
@@ -39,39 +49,13 @@ int simulate_system();
 /// Prints out program header and calls main program routines
 int main(int argc, char* argv[]){
 
-   //=============================================================
-   // Check for valid command-line arguments
-   //=============================================================
-   std::string infile="input";
-
-   for(int arg = 1; arg < argc; arg++){
-      std::string sw=argv[arg];
-      // input file
-      if(sw=="-f"){
-         // check number of args not exceeded
-         if(arg+1 < argc){
-            arg++;
-            infile=string(argv[arg]);
-         }
-         else{
-      	    terminaltextcolor(RED);
-            std::cerr << "Error - no file specified for \'-f\' command line option" << std::endl;
-            terminaltextcolor(WHITE);
-            return EXIT_FAILURE;
-         }
-      }
-      else{
-         terminaltextcolor(RED);
-         std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
-         terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
-   }
-
    // For parallel execution intialise MPI
    #ifdef MPICF
-      vmpi::initialise();
+      vmpi::initialise(argc, argv);
    #endif
+
+   // Check for valid command-line arguments
+   vmain::internal::command_line_args(argc, argv);
 
    // Initialise log file
    vout::zLogTsInit(std::string(argv[0]));
@@ -87,16 +71,19 @@ int main(int argc, char* argv[]){
       std::cout << "                                         | |               " << std::endl;
       std::cout << "                                         |_|               " << std::endl;
       std::cout << std::endl;
-      std::cout << "                      Version 4.0.0 " << __DATE__ << " " << __TIME__ << std::endl;
+      std::cout << "                      Version " << vinfo::version() << " " << __DATE__ << " " << __TIME__ << std::endl;
       std::cout << std::endl;
-
+      std::cout << "             Git commit: " << vinfo::githash() << std::endl;
+      std::cout << std::endl;
       std::cout << "  Licensed under the GNU Public License(v2). See licence file for details." << std::endl;
       std::cout << std::endl;
       std::cout << "  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>" << std::endl;
       std::cout << std::endl;
-      std::cout << "  Contributors: Weijia Fan, Phanwadee Chureemart, Joe Barker, " << std::endl;
+      std::cout << "  Contributors: Andrea Meo, Rory Pond, Weijia Fan," << std::endl;
+      std::cout << "                Phanwadee Chureemart, Sarah Jenkins, Joe Barker, " << std::endl;
       std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell," << std::endl;
-      std::cout << "                Wu Hong-Ye, Rory Pond" << std::endl;
+      std::cout << "                Wu Hong-Ye, Matthew Ellis, Razvan Ababei, " << std::endl;
+      std::cout << "                Sam Westmoreland, Oscar Arbelaez, Sam Morris" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
       std::cout << "                Compiled with:  " << COMP << std::endl;
@@ -123,7 +110,7 @@ int main(int argc, char* argv[]){
    #ifdef MPICF
       vmpi::hosts();
    #endif
-  
+
    #ifdef MPICF
       // nullify non root cout stream
       if(vmpi::my_rank!=0){
@@ -132,7 +119,7 @@ int main(int argc, char* argv[]){
    #endif
 
    // Initialise system
-   mp::initialise(infile);
+   mp::initialise(vmain::internal::input_file_name);
 
    // Create system
    cs::create();
@@ -143,12 +130,6 @@ int main(int argc, char* argv[]){
    // Finalise MPI
    #ifdef MPICF
       vmpi::finalise();
-      // concatenate log, sort, and append departure message.
-      #ifdef WIN_COMPILE
-         if(vmpi::num_processors!=1 && vmpi::my_rank==0) system("type log.* 2>NUL | sort > log");
-      #else
-         if(vmpi::num_processors!=1 && vmpi::my_rank==0) system("ls log.* | xargs cat | sort -n > log");
-      #endif
    #endif
 
    zlog << zTs() << "Simulation ended gracefully." << std::endl;
@@ -156,16 +137,17 @@ int main(int argc, char* argv[]){
    std::cout << "Simulation ended gracefully." << std::endl;
    terminaltextcolor(WHITE);
 
+
    return EXIT_SUCCESS;
 
 }
 
 /// \mainpage Vampire
-/// 
+///
 /// \section intro_sec Introduction
-/// 
-/// Vampire is an anacronym for Visual Atomistic and Micromagnetic Parallel IntegratoR Engine and 
-/// simulates the magnetic properties of materials using a classical spin model. Models can be 
+///
+/// Vampire is an anacronym for Visual Atomistic and Micromagnetic Parallel IntegratoR Engine and
+/// simulates the magnetic properties of materials using a classical spin model. Models can be
 /// defined from the atomistic scale up to micrometer scale using a variety of methods.The code is
 /// open source and has been developed by the Computational Magnetism Group at The University of
 /// York, United Kingdom.
@@ -192,7 +174,7 @@ int main(int argc, char* argv[]){
 /// \subsection features_ss5 Energy Minimisation
 /// \arg LaGrange Multiplier Energy Minimisation
 /// \subsection features_ss6 Parallel Features
-/// Vampire has been designed to run efficiently on parallel supercomputers 
+/// Vampire has been designed to run efficiently on parallel supercomputers
 /// and supports the following parallel modes:
 /// \arg Parallel Statistics
 /// \arg 2D-decomposition (Thin films)
@@ -201,11 +183,11 @@ int main(int argc, char* argv[]){
 /// \arg Output to PovRAY Format
 /// \arg Realtime OpenGL visualisation (Coming Soon!)
 /// \section install_sec Installation
-/// Vampire is distributed as both executable (serial version) and source code (serial, parallel, and CUDA versions). 
+/// Vampire is distributed as both executable (serial version) and source code (serial, parallel, and CUDA versions).
 /// Compilation has been tested on a wide range of C++ compilers, including GNU,
-/// Intel and Pathscale. 
+/// Intel and Pathscale.
 /// \subsection exec Installation for binary distribution
-/// The executables, libraries and scripts come packaged in a vampire.x.x.xxx.tar.gz file. To install the software, 
+/// The executables, libraries and scripts come packaged in a vampire.x.x.xxx.tar.gz file. To install the software,
 /// first unpack the archive with: \n
 /// \verbatim tar -xzf vampire.x.x.xxx.tar.gz \endverbatim
 /// Then change into the unpacked directory \n
@@ -214,7 +196,7 @@ int main(int argc, char* argv[]){
 /// \verbatim sudo ./install.sh \endverbatim
 ///
 /// \subsection bin Installation for source code distribution
-/// Essentially three bits of information are required to compile 
-///  
+/// Essentially three bits of information are required to compile
+///
 /// etc...
-/// 
+///
