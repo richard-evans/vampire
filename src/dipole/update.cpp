@@ -97,7 +97,7 @@ namespace dipole{
             dipole::cells_field_array_x[i] = dipole::cells_field_array_x[i] * 9.27400915e-01;
             dipole::cells_field_array_y[i] = dipole::cells_field_array_y[i] * 9.27400915e-01;
             dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.27400915e-01;
-			 //	dp_fields << sim::time << '\t' << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] << '\t' << std::endl;
+			 	dp_fields << sim::time << '\t' << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] << '\t' << std::endl;
 				//dp_fields <<sim::time << "\t" <<  dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i]  << "\t" << cells::pos_and_mom_array[4*i+0] << '\t' << cells_pos_and_mom_array[4*i+1] << '\t' << cells_pos_and_mom_array[4*i+2] << std::endl;
 
 				// Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation

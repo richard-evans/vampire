@@ -93,6 +93,10 @@ namespace dipole{
          dipole::cutoff=dpur;
          return true;
       }
+      test="atomistic-tensor-enabled";
+      if(word==test){
+         dipole::atomsitic_tensor_enabled=true;
+      }
       //-------------------------------------------------------------------
       test="output-atomistic-dipole-field";
       if(word==test){

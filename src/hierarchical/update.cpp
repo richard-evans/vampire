@@ -111,7 +111,7 @@ namespace hierarchical{
     // zlog << zTs() <<  "\tDIPOLE UPDATE. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
-   
+
 
 
 
