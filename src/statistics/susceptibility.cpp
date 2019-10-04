@@ -12,7 +12,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
-
+#include <string>
 // Vampire headers
 #include "errors.hpp"
 #include "stats.hpp"
@@ -136,13 +136,14 @@ void susceptibility_statistic_t::reset_averages(){
 std::string susceptibility_statistic_t::output_mean_susceptibility(const double temperature,bool header){
 
    // result string stream
-   std::ostringstream result;
+   std::ostringstream res;
 
    // set custom precision if enabled
    if(vout::custom_precision){
-      result.precision(vout::precision);
-      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+      res.precision(vout::precision);
+      if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
+   vout::fixed_width_output result(res,vout::fw_size); 
    if(!header){
    // determine inverse temperature mu_B/(kB T) (flushing to zero for very low temperatures)
    const double itemp = temperature < 1.e-300 ? 0.0 : 9.274e-24/(1.3806503e-23*temperature);
@@ -160,12 +161,15 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
       const double sus_z = prefactor*(mean_susceptibility_squared[4*id + 2]*imean_counter-mean_susceptibility[4*id + 2]*mean_susceptibility[4*id + 2]*imean_counter_sq);
       const double sus_m = prefactor*(mean_susceptibility_squared[4*id + 3]*imean_counter-mean_susceptibility[4*id + 3]*mean_susceptibility[4*id + 3]*imean_counter_sq);
 
-      result << sus_x << "\t" << sus_y << "\t" << sus_z << "\t" << sus_m << "\t";
+      result << sus_x << sus_y << sus_z << sus_m;
 
    }
    }else{
        for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
-          result << "ID"<<id<<"_sus_x" << "\t"<< "ID"<<id<<"_sus_y" << "\t"<< "ID"<<id<<"_sus_z" << "\t"<< "ID"<<id<<"_sus_m" << "\t";
+          result << "ID" + std::to_string(id) + "_sus_x"
+                 << "ID" + std::to_string(id) + "_sus_y"
+                 << "ID" + std::to_string(id) + "_sus_z"
+                 << "ID" + std::to_string(id) + "_sus_m";
        }
    }
    return result.str();
