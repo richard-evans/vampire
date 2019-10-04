@@ -28,6 +28,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <time.h>
 #include <sys/types.h>
 #ifdef WIN_COMPILE
@@ -39,6 +40,9 @@
 
 #include "vmpi.hpp"
 #include "material.hpp"
+#include <iostream>
+#include <iomanip>
+#include <vector>
 
 // Global Output Streams
 extern std::ofstream zinfo;
@@ -127,6 +131,53 @@ namespace vout{
 
 	void redirect(std::ostream& strm, std::string filename);
 	void nullify(std::ostream& strm);
+
+    extern int fw_size;
+    //class fixed_width_output{
+    //    private:
+    //      int width; // the width of each output
+    //      std::ostream& stream_obj; // the initial stream object
+    //    public:
+    //      fixed_width_output(std::ostream&,int);
+    //      template<typename T> // sets up a template for using the operator<<
+    //      fixed_width_output& operator<<(const T& output);
+    //      fixed_width_output& operator<<(std::ostream& (*func)(std::ostream&));
+    //      std::string str();
+    //};
+
+//class that creates an object which acts like an output
+//stream but delivers fixed width output separated by
+// tabs
+class fixed_width_output{
+  private:
+    int width; // the width of each output
+    std::ostringstream& stream_obj; // the initial stream object
+  public:
+    //constructor, calls constructors of width and stream_obj
+    //                                          :-> member initialization list
+    fixed_width_output(std::ostringstream& obj, int w): width(w),stream_obj(obj) {};
+
+    template<typename T> // sets up a template for using the operator<<
+    // defines a function which returns a pointer to the fixed... object
+    // takes one of type T as input.
+    fixed_width_output& operator<<(const T& output){ 
+      //sends the formatted output to a stream_obj
+      stream_obj <<std::left<<std::setw(width) << output <<"\t";
+      //stream_obj <<"|"<<std::left<<std::setw(width) << output;
+      //stream_obj <<std::left<<std::setw(width) << output<<"|";
+      //returns the object (dereferenced from the pointer)
+      return *this;
+    }
+    // specialises the function, for when the input is an output stream 
+    // which is being operated on, such as using <<std::endl;
+    fixed_width_output& operator<<(std::ostringstream& (*func)(std::ostringstream&)){
+        func(stream_obj);
+        return *this;
+    };
+    std::string str(){
+        return stream_obj.str();
+    };
+};
 
 }
 

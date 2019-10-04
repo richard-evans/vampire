@@ -29,6 +29,7 @@ namespace vout{
 
    bool custom_precision = false; // enable user selectable precision for data output
    unsigned int precision = 6; // variable to control output precision (digits)
+   int fw_size = 11;
    bool fixed = false; // fixed precision output
    bool header_option = false; // output column headers on output file
 

@@ -7,6 +7,7 @@ vio_objects =\
 check.o \
 data.o \
 datalog.o \
+fixed_width.o \
 get_string.o \
 globalio.o \
 initialize.o \

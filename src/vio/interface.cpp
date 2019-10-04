@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <string>
+#include<algorithm> 
 
 // Vampire headers
 #include "errors.hpp"
@@ -43,8 +44,8 @@ namespace vio{
       //-------------------------------------------------------------------
       test="fixed-width";
       if(word==test){
-         vout::custom_precision = true; // enable user definable precision for output
-         vout::fixed = true; // enable fixed width output
+         vout::fixed=true;
+         vout::fw_size = std::max(int(vout::precision+3),11); // enable fixed width output
          return true;
       }
       test="column-headers";
