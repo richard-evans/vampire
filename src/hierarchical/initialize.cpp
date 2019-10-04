@@ -247,7 +247,7 @@ namespace hierarchical{
                  double cell_size_y = pow(2,level)*cells::macro_cell_size_y;
                  double cell_size_z = pow(2,level)*cells::macro_cell_size_z;
 
-                 if (level == 0) ha::interaction_range[0] = dipole::cutoff*internal::av_cell_size*2;
+                 if (level == 0) ha::interaction_range[0] = dipole::cutoff*internal::av_cell_size*2*1.5;
 
                  else  ha::interaction_range[level] = ha::interaction_range[level - 1]*2.0;
                  std::cout << level<< '\t' << ha::interaction_range[level] << "\t" << dipole::cutoff*cells::macro_cell_size_x<< "\t" << internal::av_cell_size  <<'\t' << cells::macro_cell_size_x << "\t" << cells::macro_cell_size_y << "\t" << cells::macro_cell_size_z << "\t" <<  std::endl;
