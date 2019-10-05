@@ -45,7 +45,7 @@ namespace vio{
       test="fixed-width";
       if(word==test){
          vout::fixed=true;
-         vout::fw_size = std::max(int(vout::precision+3),vout::max_header); // enable fixed width output
+         vout::fw_size = std::max(int(vout::precision+7),vout::max_header); // enable fixed width output
          return true;
       }
       test="column-headers";
