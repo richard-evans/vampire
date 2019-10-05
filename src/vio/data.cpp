@@ -32,7 +32,7 @@ namespace vout{
    int fw_size = 11;
    bool fixed = false; // fixed precision output
    bool header_option = false; // output column headers on output file
-
+   int max_header=14;
 	// Namespace variable declarations
 	std::vector<unsigned int> file_output_list(0);
 	std::vector<unsigned int> screen_output_list(0);
