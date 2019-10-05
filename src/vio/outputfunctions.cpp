@@ -159,7 +159,6 @@ namespace vout{
       std::ostringstream res;
       if(vout::custom_precision){
          res.precision(vout::precision);
-         if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
       }
       vout::fixed_width_output result(res,vout::fw_size); 
       if(header){
@@ -179,7 +178,6 @@ namespace vout{
       std::ostringstream res;
       if(vout::custom_precision){
          res.precision(vout::precision);
-         if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
       }
       vout::fixed_width_output result(res,vout::fw_size); 
       if(header){
@@ -240,7 +238,6 @@ namespace vout{
       std::ostringstream res;
       if(vout::custom_precision){
          res.precision(vout::precision);
-         if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
       }
       vout::fixed_width_output result(res,vout::fw_size); 
       for(int mat=0;mat<mp::num_materials;mat++){
