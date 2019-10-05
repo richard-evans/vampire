@@ -29,7 +29,7 @@ namespace vout{
 	// Output Function 0
     std::string generic_output_int(std::string str,int i, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size_int); 
       if(header){
            result << str;
         }
@@ -157,6 +157,10 @@ namespace vout{
    // Output Function 14 - with Header
    void systorque(std::ostream& stream, bool header){
       std::ostringstream res;
+      if(vout::custom_precision){
+         res.precision(vout::precision);
+         if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
+      }
       vout::fixed_width_output result(res,vout::fw_size); 
       if(header){
          result << "Tot_torque_x"
@@ -173,6 +177,10 @@ namespace vout{
    // Output Function 15 - with Header
    void mean_systorque(std::ostream& stream, bool header){
       std::ostringstream res;
+      if(vout::custom_precision){
+         res.precision(vout::precision);
+         if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
+      }
       vout::fixed_width_output result(res,vout::fw_size); 
       if(header){
          result << "Mean_torque_x"
@@ -230,6 +238,10 @@ namespace vout{
    // Output Function 20
    void material_mean_systorque(std::ostream& stream, bool header){
       std::ostringstream res;
+      if(vout::custom_precision){
+         res.precision(vout::precision);
+         if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
+      }
       vout::fixed_width_output result(res,vout::fw_size); 
       for(int mat=0;mat<mp::num_materials;mat++){
          if(header){

@@ -133,6 +133,7 @@ namespace vout{
 	void nullify(std::ostream& strm);
 
     extern int fw_size;
+    extern int fw_size_int;
     extern int max_header;
     //class fixed_width_output{
     //    private:
