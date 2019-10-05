@@ -61,9 +61,13 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 	char directory [256];
 
 	#ifdef WIN_COMPILE
-		_getcwd(directory, sizeof(directory));
+		if(_getcwd(directory, sizeof(directory)) == NULL){
+            std::cerr << "Fatal getcwd error in datalog." << std::endl;
+        }
 	#else
-		getcwd(directory, sizeof(directory));
+		if(getcwd(directory, sizeof(directory)) == NULL){
+            std::cerr << "Fatal getcwd error in datalog." << std::endl;
+        }
 	#endif
 
 	//------------------------------------
@@ -346,9 +350,13 @@ namespace vout{
    	char directory [256];
 
    	#ifdef WIN_COMPILE
-   		_getcwd(directory, sizeof(directory));
+   		if(_getcwd(directory, sizeof(directory)) == NULL){
+            std::cerr << "Fatal getcwd error in datalog." << std::endl;
+        }
    	#else
-   		getcwd(directory, sizeof(directory));
+   		if(getcwd(directory, sizeof(directory)) == NULL){
+            std::cerr << "Fatal getcwd error in datalog." << std::endl;
+        }
    	#endif
 
       // write system and version information
