@@ -159,9 +159,9 @@ namespace vout{
       std::ostringstream res;
       vout::fixed_width_output result(res,vout::fw_size); 
       if(header){
-         result << "Total_torque_x"
-                << "Total_torque_y"
-                << "Total_torque_z";
+         result << "Tot_torque_x"
+                << "Tot_torque_y"
+                << "Tot_torque_z";
       }else{
          result << stats::total_system_torque[0]
                 << stats::total_system_torque[1]
@@ -233,9 +233,9 @@ namespace vout{
       vout::fixed_width_output result(res,vout::fw_size); 
       for(int mat=0;mat<mp::num_materials;mat++){
          if(header){
-            result << "ID" << mat << "_Mean_torque_x"
-                   << "ID" << mat << "_Mean_torque_y"
-                   << "ID" << mat << "_Mean_torque_z";
+            result << "ID" + std::to_string(mat) + "_Mean_tor_x"
+                   << "ID" + std::to_string(mat) + "_Mean_tor_y"
+                   << "ID" + std::to_string(mat) + "_Mean_tor_z";
          }
          else{
             result << stats::sublattice_mean_torque_x_array[mat] / stats::torque_data_counter
