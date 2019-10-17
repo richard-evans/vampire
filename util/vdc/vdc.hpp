@@ -32,7 +32,7 @@ namespace vdc{
    // keyword variables
    extern std::string colour_keyword;
    extern std::string custom_colourmap_file;
-   extern bool z_axis_colour;
+   extern bool x_axis_colour;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};

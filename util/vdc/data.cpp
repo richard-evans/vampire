@@ -30,7 +30,7 @@ namespace vdc{
    // keyword variables
    std::string colour_keyword = "CBWR";
    std::string custom_colourmap_file;
-   bool z_axis_colour = false;
+   bool x_axis_colour = false;
 
    format_t format;
 

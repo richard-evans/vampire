@@ -127,7 +127,7 @@ int command( int argc, char* argv[] ){
       }
       else if ( sw == "--3D" ){
 
-         vdc::z_axis_colour = true;
+         vdc::x_axis_colour = true;
 
       }
       else if ( sw == "--custom_colourmap" ){
