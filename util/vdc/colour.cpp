@@ -47,6 +47,7 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
 
    // in y,z plane, angle = the spin direction
    yz_angle = std::atan2(sy2,sz2);
+   if ( (sy2 == 0) && (sz2 == 0) ) yz_angle = pi/2;
    yz_angle = std::fmod(yz_angle + 2*pi, 2*pi);  // range [0-2pi]
 
    // to apply colourmap, need value between 0-255
