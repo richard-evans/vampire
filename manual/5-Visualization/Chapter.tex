@@ -6,14 +6,14 @@
 \centering
 \textit{make vdc}
 \end{minipage}\\
- 
- The \vampire data converter, or vdc, is run to produce the input files needed. By default, it provides output for both Rasmol and POV-Ray. 
+
+ The \vampire data converter, or vdc, is run to produce the input files needed. By default, it provides output for both Rasmol and POV-Ray.
 
 %opt/vampire/cfg2xx\\
 
 \section*{Getting started}
 \addcontentsline{toc}{section}{Getting started}
-To generate the positions of your atoms, multiple parameters must be set in the input file, depending on the number of cores the simulation is run on.  
+To generate the positions of your atoms, multiple parameters must be set in the input file, depending on the number of cores the simulation is run on.
 min/max\\
 
 \subsection*{input}
@@ -48,7 +48,7 @@ comment line
 \end{verbatim}
 }
 
-The element in the .xyz file does not necessarily need to be the same as the atoms used in your system. They can instead be chosen for a different colour palette depending on the users requirements.  
+The element in the .xyz file does not necessarily need to be the same as the atoms used in your system. They can instead be chosen for a different colour palette depending on the users requirements.
 
 \section*{Atomic visualization with POV-Ray}
 \addcontentsline{toc}{section}{Atomic visualization with POV-Ray}
@@ -60,7 +60,7 @@ To produce pictures of your material of punishable quality and high configurabil
 \textit{povray spins.pov}
 \end{minipage}\\
 
-In a situation where there are multiple possible snapshots of the system, this command will render all snapshots in order. To select specific snapshots or ranges, you need to add the following flags:
+Depending on the parameters included in the input file, several snapshots of the system may be produced and using the above command will render images for each snapshot. To select specific snapshots or ranges, you need to add the following flags:
 
 \begin{minipage}[c]{\textwidth}
 \centering
@@ -75,50 +75,103 @@ For example, to render frame 9 only, you could use:
 \textit{povray -W3600 -H2700 +A0.3 +KFI9 +KFF9 spins.pov}
 \end{minipage}\\
 
-Where the "-W" and "-H" flags define the width and heigh of the image (the resolution), and "+A" is used for antialiasing. \\ 
+Where the "-W" and "-H" flags define the width and heigh of the image (the resolution), and "+A" is used for antialiasing. \\
 
-\subsection{Customisation options}
-The POV-Ray output from vdc can be customised in several ways by using command line flags when running vdc. There are several choices of possible colourmap configurations, the ones provided by default are made to be perceptually uniform and in some cases take account of colourblindness.\\
+\section{Customisation options}
+The POV-Ray output from vdc can be customised in several ways by using command line flags when running vdc. There are several choices of possible colourmap configurations, the ones provided by default are made to be perceptually uniform and in some cases take account of colourblindness. Information on the colourmaps, the importance of perceptually uniform maps and how to adapt and use different maps can be found from "Peter Kovesi. Good Colour Maps: How to Design Them. arXiv:1509.03700 [cs.GR] 2015". \\
+
+\subsection{Colourmaps}
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{--colourmap [C2/BWR/Rainbow]}
+\textit{-{}-colourmap [CBWR - default/C2/BWR/Rainbow]}
 \end{minipage}\\
 
-The "C2" coloumap is cyclic and useful for 3D magnetic systems. It has four principle directions of magenta, yellow, green and blue. As it is cyclic, there will be a smooth transition between colour at all angles, irrespective of what is chosen as the $0^{\circ}$ spin direction.\\
+\begin{figure*}[!h]
+\center
+\includegraphics[width=4cm]{figures/CBWR_colourmap.png}
+%\caption{}
+\label{fig:CBWR_colourmap}
+\end{figure*}
 
-The "BWR" colourmap can be applied to 2D systems where the focus is on opposite spin directions, such as antiferromagnetic or ferrimagentic systems. It offers two colours of contrast, red and blue, which are joined by a gradual fade to white. As it is not cyclic, care must be taken at the $0^{\circ}$ spin direction as moving from it to a negative angle gives a hard border of red to blue colour. \\
+By default, a 1D colourmap is used. Aligned along the z-axis, spins in the \{0,0,1\} direction are red, while spins antiparallel to this \{0,0,-1\} are blue. Between these values, the colour transitions to white around the x-y plane. This corresponds to the "CBWR" colourmap, a cyclic blue-white-red map, which lends itself well to 1D or 2D spin sytems where there are two principle spin directions, such as antiferromagnets and ferrimagnets. Some care must be taken to align the principle spin directions with the z-axis, as this is the axis along which colour is applied. This can also be changed using the "-{}-vector-z" command line argument.   \\
 
-The "Rainbow" colourmap can be used in 3D systems where spins are aligned in many different directions such as vortex configurations. While it is still designed to be somewhat perceptually uniform, this is very difficult to do with rainbow palettes hence its use typically loses detail when compared to other maps, however it is also one of the most vibrant.
+\begin{figure*}[!h]
+\center
+\includegraphics[width=4cm]{figures/C2_colourmap.png}
+%\caption{}
+\label{fig:C2_colourmap}
+\end{figure*}
+
+The "C2" coloumap is also cyclic and useful for 3D magnetic systems such as vortex states. It has four principle directions of magenta, yellow, green and blue. As it is cyclic, there will be a smooth transition between colour at all angles, irrespective of what is chosen as the zero degree spin direction. Sytems which benefit from this colourmap may also use the "-{}-3D" command line argument which applies a darkening and britening effect along the x-axis. \\
+
+\begin{figure*}[!h]
+\center
+\includegraphics[width=7cm]{figures/BWR_colourmap.png}
+%\caption{}
+\label{fig:C2_colourmap}
+\end{figure*}
+
+The BWR colourmap is very similar in properties to the CBWR map however it is not cyclic. This mean that spins along the positive z-axis will be red with a small positive y-component and blue with a small negative y-component. There will be an immediate flip from bright red to blue as this transition occurs. This can be used to emphasise the transition between spin directions. The transition point can be changed by using the "-{}-vector-z" command line argument. \\
+
+\begin{figure*}[!h]
+\center
+\includegraphics[width=7cm]{figures/Rainbow_colourmap.png}
+%\caption{}
+\label{fig:Rainbow_colourmap}
+\end{figure*}
+
+The "Rainbow" colourmap can be used in 2D systems where spins are aligned in many different directions such as high temperature simulations. While it is still designed to be somewhat perceptually uniform, this is very difficult to do with rainbow palettes hence its use typically loses detail when compared to other maps, however it is also one of the most vibrant. \\
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{vdc spins.pov --custom-colourmap file-name}
+\textit{vdc spins.pov -{}-custom-colourmap file-name}
 \end{minipage}\\
 
-Finally, a user defined colourmap can be used. To apply a different map, a file containing 256 colours in the RBG format must be provided in the same directory that vdc is run.\\
+\subsection{Custom Colourmaps}
 
-POV-Ray images produced by vdc have a 3D brightening effect enabled by default. When spins do not lie only in the xy-plane, their colour brightness is increased or reduced depending on their magnitude in the z-axis. To disable this effect, the following flag can be used:
+A user defined colourmap can also be used. To apply a different map, a file containing 256 colours in the RBG format must be provided in the same directory that vdc is run. RGB values must be space separated, with no other information such as line numbers. The beginning of an example colourmap is shown below. Pregenerated perceptually uniform colourmaps of various forms, including those included in vampire by default, can be found in "peterkovesi.com/projects/colourmaps/index.html" under the Download secion. \\
+
+\subsection*{custom\_colourmap\_file}
+{\footnotesize
+\begin{verbatim}
+0.000000 0.000000 0.000000
+0.005561 0.005563 0.005563
+0.011212 0.011219 0.011217
+0.016877 0.016885 0.016883
+0.022438 0.022448 0.022445
+0.027998 0.028011 0.028008
+0.033540 0.033554 0.033551
+0.039316 0.039333 0.039329
+0.044700 0.044719 0.044714
+0.049695 0.049713 0.049709
+0.054322 0.054343 0.054338
+\end{verbatim}
+}
+
+\subsection{3D Systems}
+
+POV-Ray images produced by vdc can have a 3D brightening effect applied by using the "-{}-3D" command line argument. When spins do not lie only in the yz-plane, their colour brightness is increased or reduced depending on their magnitude in the x-axis.
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{vdc spins.pov --2D}
+\textit{vdc spins.pov -{}-3D}
 \end{minipage}\\
 
-When used, this effect does not have to be applied in the z, or \{0,0,1\} direction.
+\subsection{Defining axes}
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{vdc spins.pov --vector-z \textbackslash\{x,y,z\textbackslash\}}
+\textit{vdc spins.pov -{}-vector-z \textbackslash\{x,y,z\textbackslash\}}
 \end{minipage}\\
 
-To define the axis, simply use the command "--vector-z" followed by a direction vector. This does not need to be normalised, and can be used without defining the xy-plane, as explained below.\\
+To define the axis, simply use the command "-{}-vector-z" followed by a direction vector. This does not need to be normalised, and can be used without defining the xy-plane, as explained below.\\
 
-Similarly, another direction can be defined for the $0^{\circ}$ direction in the xy-plane. However, as the z-axis effect is not necessarily in the \{0,0,1\} direction, this parameter cannot be used alone and must be accompanied by the flag "--vector-z".
+Similarly, another direction can be defined for the $0^{\circ}$ direction in the xy-plane. However, as the z-axis effect is not necessarily in the \{0,0,1\} direction, this parameter cannot be used alone and must be accompanied by the flag "-{}-vector-z".
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{vdc spins.pov --vector-z \textbackslash\{x,y,z\textbackslash\} --vector-x \textbackslash\{x,y,z\textbackslash\}}
+\textit{vdc spins.pov -{}-vector-z \textbackslash\{x,y,z\textbackslash\} -{}-vector-x \textbackslash\{x,y,z\textbackslash\}}
 \end{minipage}\\
 
 \section*{Micromagnetic visualization with PovRAY}
