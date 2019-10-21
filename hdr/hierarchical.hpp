@@ -15,6 +15,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
 
 // Vampire headers
 #include "hierarchical.hpp"
