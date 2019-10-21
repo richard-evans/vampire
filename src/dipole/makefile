@@ -8,6 +8,7 @@ atomistic.o \
 data.o \
 energy.o \
 field.o \
+fft_update.o \
 initialize.o \
 interface.o \
 inter.o \

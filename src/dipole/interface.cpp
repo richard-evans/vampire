@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 //
 
-// C++ standard library headers
+// C standard library headers
 #include <string>
 
 // Vampire headers
@@ -54,6 +54,20 @@ namespace dipole{
             dipole::activated=true;
             return true;
          }
+         test="hierarchical";
+         if(value == test){
+            dipole::internal::solver = dipole::internal::hierarchical;
+            // enable dipole calculation
+            dipole::activated=true;
+            return true;
+         }
+         test="fft";
+         if(value == test){
+            dipole::internal::solver = dipole::internal::fft;
+            // enable dipole calculation
+            dipole::activated=true;
+            return true;
+         }
          else{
             terminaltextcolor(RED);
             std::cerr << "Error: Value for \'" << prefix << ":" << word << "\' must be one of:" << std::endl;
@@ -78,6 +92,10 @@ namespace dipole{
          vin::check_for_valid_value(dpur, word, line, prefix, unit, "",  1.0, 1.0e6,"input","1.0 - 1,000,000.0");
          dipole::cutoff=dpur;
          return true;
+      }
+      test="atomistic-tensor-enabled";
+      if(word==test){
+         dipole::atomsitic_tensor_enabled=true;
       }
       //-------------------------------------------------------------------
       test="output-atomistic-dipole-field";

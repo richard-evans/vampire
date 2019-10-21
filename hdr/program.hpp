@@ -48,12 +48,14 @@ namespace program
    extern void localised_temperature_pulse();
    extern void effective_damping();
    extern void fmr();
+	 extern void tracks();
+	extern void field_sweep();
 
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();
 	extern int timestep_scaling();
 	extern void boltzmann_dist();
-        extern void setting_process();
+  extern void setting_process();
 
 }
 

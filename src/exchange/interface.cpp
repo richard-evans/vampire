@@ -59,6 +59,7 @@ namespace exchange{
       // Check for empty material parameter array and resize to avoid segmentation fault
       if(internal::mp.size() == 0){
          internal::mp.resize(max_materials);
+         internal::IrMn.resize(max_materials);
       }
 
       //------------------------------------------------------------
@@ -109,6 +110,11 @@ namespace exchange{
          vin::check_for_valid_value(bqe, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
          internal::mp[super_index].bqe[sub_index] = bqe;
          exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      test = "IrMn";
+      if( word == test ){
+         internal::IrMn[super_index] = true; // Switch on biquadratic exchange
          return true;
       }
       //--------------------------------------------------------------------

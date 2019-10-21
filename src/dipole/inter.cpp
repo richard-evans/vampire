@@ -45,7 +45,8 @@ namespace dipole{
                                 //std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
                                 std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
                                 std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z){
+                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                                int id){
 
          // create temporary variable to store components of tensor
          double tmp_rij_inter_xx = 0.0;
@@ -63,9 +64,12 @@ namespace dipole{
 
          double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
          double rij_1 = 1.0/rij;
-
+         //if (i == 0 )std::cout << rx << '\t' << ry << '\t' << rz << '\t' << rij << std::endl;
          // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
-         if( (rij_1)/cells_macro_cell_size > dipole::cutoff){
+         if( (rij_1)/cells::macro_cell_size_x > dipole::cutoff){
+            //if (i ==0)   std::cout << j << '\t'<< rij_1 << '\t' << "macrocell" <<std::endl;
+
+            //std::cout << dipole::atomistic_cutoff <<std::endl;
             // define unitarian distance vectors
 	         const double ex = rx*rij;
 	         const double ey = ry*rij;
@@ -87,22 +91,56 @@ namespace dipole{
          //--------------------------------------------------------------------------
          // If distance between macro-cells < cutoff ==> apply inter-intra method
          //--------------------------------------------------------------------------
-         else if( (1.0/rij)/cells_macro_cell_size <= dipole::cutoff){
-
+          else if( rij_1/cells::macro_cell_size_x <= dipole::cutoff){
+      // //if (i ==0)   std::cout << j << '\t'<< rij_1 << '\t' << "tensor" << "\t" << cells_num_atoms_in_cell[i] << '\t' << cells_num_atoms_in_cell[j] << std::endl;
+      //
             for(int pi=0; pi<cells_num_atoms_in_cell[i]; pi++){
 
+      //          //atomistic_dd_neighbourlist_start[pi] = id;
+      //
                const double cix = cells_atom_in_cell_coords_array_x[i][pi];
                const double ciy = cells_atom_in_cell_coords_array_y[i][pi];
                const double ciz = cells_atom_in_cell_coords_array_z[i][pi];
-
+      //         int atomi_id = cells::index_atoms_array[lc][pi];
+      //          atomistic_dd_neighbourlist_start[pi] = id;
+      //
                for(int qj=0; qj<cells_num_atoms_in_cell[j]; qj++){
 
                   const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix;
                   const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy;
                   const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz;
+                 double dist = sqrt(rx*rx+ry*ry+rz*rz);
+                 rij = 1.0/dist;  //Reciprocal of the distance
 
-                  rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz);  //Reciprocal of the distance
+               //   if (dist <  dipole::atomistic_cutoff ){
+                     //add to Jij somehow :P
+                     // // get spin moment of atom j
+                     // const double ex = rx*rij;
+                     // const double ey = ry*rij;
+                     // const double ez = rz*rij;
+                     //
+                     // const double rij3 = (rij*rij*rij); // Angstroms
+                     //
+                     // double atomistic_tmp_rij_inter_xx = ((3.0*ex*ex - 1.0)*rij3);
+                     // double atomistic_tmp_rij_inter_xy = ((3.0*ex*ey      )*rij3);
+                     // double atomistic_tmp_rij_inter_xz = ((3.0*ex*ez      )*rij3);
+                     //
+                     // double atomistic_tmp_rij_inter_yy = ((3.0*ey*ey - 1.0)*rij3);
+                     // double atomistic_tmp_rij_inter_yz = ((3.0*ey*ez      )*rij3);
+                     // double atomistic_tmp_rij_inter_zz = ((3.0*ez*ez - 1.0)*rij3);
+                     //
+                     // atomistic_dd_neighbourlist.push_back(qj);
+                     //
+                     // atomistic_dd_neighbourlist_end[pi] = id;
+                     // int atomj_id = cells::index_atoms_array[j][qj];
+                     // //std::cout << pi << '\t' << qj << '\t' << atomistic_dd_neighbourlist_start[pi] << '\t' << atomistic_dd_neighbourlist_end[pi] << "\t" << id << std::endl;
+                     // id++;
+                     //add to Jij!??!?!?!?!?!?!?!?!??!?!
+                     //rij_xx[atom_i] = rij_xx[atom_i] + atomistic_tmp_rij_inter_xx
 
+
+            //      }
+      //            else{
                   const double ex = rx*rij;
                   const double ey = ry*rij;
                   const double ez = rz*rij;
@@ -116,10 +154,11 @@ namespace dipole{
                   tmp_rij_inter_yy += ((3.0*ey*ey - 1.0)*rij3);
                   tmp_rij_inter_yz += ((3.0*ey*ez      )*rij3);
                   tmp_rij_inter_zz += ((3.0*ez*ez - 1.0)*rij3);
-
+         //      }
+      //
                }
             }
-
+      //
             dipole::internal::rij_tensor_xx[lc][j] =  (tmp_rij_inter_xx);
             dipole::internal::rij_tensor_xy[lc][j] =  (tmp_rij_inter_xy);
             dipole::internal::rij_tensor_xz[lc][j] =  (tmp_rij_inter_xz);
@@ -127,17 +166,17 @@ namespace dipole{
             dipole::internal::rij_tensor_yy[lc][j] =  (tmp_rij_inter_yy);
             dipole::internal::rij_tensor_yz[lc][j] =  (tmp_rij_inter_yz);
             dipole::internal::rij_tensor_zz[lc][j] =  (tmp_rij_inter_zz);
-
-            // // Uncomment in case you want to print the tensor components
-            // std::cout << "\n############# INTER ###################\n";
-            // std::cout << "lc = " << lc << "\tj = " << j << "\tNat_i\t" << cells_num_atoms_in_cell[i] << "\tNat_j\t" << cells_num_atoms_in_cell[j] << std::endl;
-            // std::cout << tmp_rij_inter_xx << "\t" << tmp_rij_inter_xy << "\t" << tmp_rij_inter_xz << "\n";
-            // std::cout << tmp_rij_inter_xy << "\t" << tmp_rij_inter_yy << "\t" << tmp_rij_inter_yz << "\n";
-            // std::cout << tmp_rij_inter_xz << "\t" << tmp_rij_inter_yz << "\t" << tmp_rij_inter_zz << "\n";
-            // std::cout << "\n################################\n";
-            // std::cout << std::endl;
-
-            // Normalisation by the number of atoms in the cell. This is required for the correct evaluation of the field in the update.cpp routine
+            //if (i == 0) std::cout << "atom" <<  '\t' << i <<'\t' << j << "\t" << dipole::internal::rij_tensor_xx[lc][j] << "\t" << dipole::internal::rij_tensor_xy[lc][j] << '\t' <<dipole::internal::rij_tensor_xz[lc][j] << std::endl;
+      //       // // Uncomment in case you want to print the tensor components
+      //       // std::cout << "\n############# INTER ###################\n";
+      //       // std::cout << "lc = " << lc << "\tj = " << j << "\tNat_i\t" << cells_num_atoms_in_cell[i] << "\tNat_j\t" << cells_num_atoms_in_cell[j] << std::endl;
+      //       // std::cout << tmp_rij_inter_xx << "\t" << tmp_rij_inter_xy << "\t" << tmp_rij_inter_xz << "\n";
+      //       // std::cout << tmp_rij_inter_xy << "\t" << tmp_rij_inter_yy << "\t" << tmp_rij_inter_yz << "\n";
+      //       // std::cout << tmp_rij_inter_xz << "\t" << tmp_rij_inter_yz << "\t" << tmp_rij_inter_zz << "\n";
+      //       // std::cout << "\n################################\n";
+      //       // std::cout << std::endl;
+      //
+      //       // Normalisation by the number of atoms in the cell. This is required for the correct evaluation of the field in the update.cpp routine
             dipole::internal::rij_tensor_xx[lc][j] = dipole::internal::rij_tensor_xx[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
             dipole::internal::rij_tensor_xy[lc][j] = dipole::internal::rij_tensor_xy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
             dipole::internal::rij_tensor_xz[lc][j] = dipole::internal::rij_tensor_xz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
@@ -145,8 +184,8 @@ namespace dipole{
             dipole::internal::rij_tensor_yy[lc][j] = dipole::internal::rij_tensor_yy[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
             dipole::internal::rij_tensor_yz[lc][j] = dipole::internal::rij_tensor_yz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
             dipole::internal::rij_tensor_zz[lc][j] = dipole::internal::rij_tensor_zz[lc][j]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-         }  // End of Inter part calculated atomicstically
-      }  // End of funtion calculating inter component of dipole tensor
+          }  // End of Inter part calculated atomicstically
+       }  // End of funtion calculating inter component of dipole tensor
 
    } // End of namespace internal
 } // End of namespace dipole

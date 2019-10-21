@@ -56,10 +56,7 @@
 #include "errors.hpp"
 #include "LLG.hpp"
 #include "material.hpp"
-
-//Function prototypes
-int calculate_spin_fields(const int,const int);
-int calculate_external_fields(const int,const int);
+#include "sim.hpp"
 
 namespace LLG_arrays{
 

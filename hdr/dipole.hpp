@@ -38,6 +38,10 @@ namespace dipole{
    extern std::vector<double> atom_dipolar_field_array_y;
    extern std::vector<double> atom_dipolar_field_array_z;
 
+   extern std::vector<int> atomistic_dd_neighbourlist;
+   extern std::vector<int> atomistic_dd_neighbourlist_start;
+   extern std::vector<int> atomistic_dd_neighbourlist_end;
+
    extern std::vector<double> cells_mu0Hd_field_array_x;             /// arrays to store cells mu_0*Hdemag-field
    extern std::vector<double> cells_mu0Hd_field_array_y;
    extern std::vector<double> cells_mu0Hd_field_array_z;
@@ -48,6 +52,8 @@ namespace dipole{
    extern std::vector <int> dipole_cells_num_atoms_in_cell;             /// Array to store number of atoms in cells that will be needed to print the cell config file
 
    extern double cutoff;
+   extern double atomistic_cutoff;
+   extern bool atomsitic_tensor_enabled;
 
    //-----------------------------------------------------------------------------
    // Function to unroll cells dipolar field into atomic field

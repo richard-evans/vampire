@@ -75,7 +75,8 @@ namespace exchange{
 
    	atoms::total_num_neighbours = counter;
 
-   	atoms::neighbour_list_array.resize(atoms::total_num_neighbours,0);
+      atoms::neighbour_list_array.resize(atoms::total_num_neighbours,0);
+
    	atoms::neighbour_interaction_type_array.resize(atoms::total_num_neighbours,0);
       //atoms::neighbour_eij_array.resize(atoms::total_num_neighbours);
 
@@ -171,7 +172,7 @@ namespace exchange{
       }
 
       // Unroll exchange interactions
-      exchange::internal::unroll_exchange_interactions();
+      exchange::internal::unroll_exchange_interactions(bilinear);
 
       // initialise biquadratic_exchange
       exchange::internal::initialize_biquadratic_exchange();

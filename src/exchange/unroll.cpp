@@ -29,7 +29,7 @@ namespace exchange{
    //----------------------------------------------------------------------------
    // Function to unroll neighbour list into 1D
    //----------------------------------------------------------------------------
-   void unroll_exchange_interactions(){
+   void unroll_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear){
 
       // if dmi is enabled then set exchange type to force normalised tensor form of exchange
       if(internal::enable_dmi){
@@ -40,7 +40,7 @@ namespace exchange{
       // if normalised exchange is to be used (taking values from exchange matrix
       // defined in the material file), then unroll normalised interactions
       if(internal::use_material_exchange_constants){
-         unroll_normalised_exchange_interactions();
+         unroll_normalised_exchange_interactions(bilinear);
          return;
       }
 

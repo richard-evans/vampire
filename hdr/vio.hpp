@@ -45,6 +45,7 @@ extern std::ofstream zinfo;
 extern std::ofstream zmag;
 extern std::ofstream zgrain;
 extern std::ofstream zlog;
+extern std::ofstream dp_fields;
 
 enum textcolor {
    RED=31,
