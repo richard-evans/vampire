@@ -252,56 +252,32 @@ int command( int argc, char* argv[] ){
 // where x,y and z are type double
 //------------------------------------------------------------------------------
 int extract( std::string arg_string, std::vector<double>& arg_vector ){
-   int marker = 0; // position in the vector string
-
-   // check for opening brackets
-   if ( (arg_string[marker] != '(') && (arg_string[marker] != '{') ){
-      ////terminaltextcolor(RED);
-      std::cerr << "Error - brackets required around 3 comma separated values"
-                << std::endl;
-      ////terminaltextcolor(WHITE);
-      return EXIT_FAILURE;
-   }
-
-   // move to next character
-   marker++;
+   std::string tmp_string;
+   int vector_index = 0;
 
    // read coordinates
+   for ( int i = 0; i < arg_string.size(); i++){
+      if ( arg_string[i] != ','){
+         tmp_string.push_back(arg_string[i]);
+      }
+      else {
+         // check if a number has bean read (no leading comma)
+         if ( tmp_string.size() == 0 ){
+            std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
+            return EXIT_FAILURE;
+         }
+
+         // save coordinate and move onto next one
+         arg_vector[vector_index] = std::stod(tmp_string);
+         vector_index++;
+      }
+   }
+
+   // check vector has been input correctly (no missing coordinates)
    for ( int i = 0; i < 3; i++){
-      std::string tmp_string;
-
-      // read coordinate-value
-      int j = 0;
-
-      while ( (arg_string[marker] != ',') && (arg_string[marker] != '}') && (arg_string[marker] != ')') ){
-         tmp_string.push_back(arg_string[marker]);
-
-         // move through number
-         marker++;
-         j++;
+      if ( arg_vector.size() == 0){
+         std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
       }
-
-      arg_vector[i] = std::stod(tmp_string);
-
-      // skip comma, check for closing brackets
-      if ( arg_string[marker] == ',' ){
-         marker++;
-      }
-      else if ( ((arg_string[marker] != ')') && (arg_string[marker] != '}' )) && ( i == 2 ) ){
-         ////terminaltextcolor(RED);
-         std::cerr << "Error - brackets required around 3 comma separated values"
-                   << std::endl;
-         ////terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
-      else if ( ((arg_string[marker] == ')') || (arg_string[marker] == '}')) && ( i != 2 ) ){
-         ////terminaltextcolor(RED)
-         std::cerr << "Error - three coordinates required"
-                   << std::endl;
-         ////terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
-
    }
 
    // normalise arg_vector
