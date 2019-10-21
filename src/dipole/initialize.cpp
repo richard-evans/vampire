@@ -148,14 +148,15 @@ namespace dipole{
       // instantiate timer
       vutil::vtimer_t timer;
 
+      // hold parallel calculation until all processors have completed initialization
+      // to ensure an accurate reading
+      vmpi::barrier();
+
       // start timer
       timer.start();
 
       // now calculate fields at zero time
       dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array, atom_moments, magnetic);
-
-      // hold parallel calculation until all processors have completed the update
-      vmpi::barrier();
 
       // stop timer
       timer.stop();

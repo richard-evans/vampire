@@ -72,9 +72,11 @@ namespace dipole{
                case dipole::internal::atomistic:
                   dipole::internal::calculate_atomistic_dipole_field(x_spin_array, y_spin_array, z_spin_array);
                   break;
+
                case dipole::internal::hierarchical:
                   hierarchical::update(x_spin_array, y_spin_array, z_spin_array, m_spin_array, magnetic);
                   break;
+
                case dipole::internal::fft:
                   dipole::internal::update_field_fft();
                   break;
