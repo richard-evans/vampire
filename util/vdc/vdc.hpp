@@ -48,6 +48,8 @@ namespace vdc{
 
    extern uint64_t num_atoms;
 
+   extern unsigned int vdc_start_file_id;
+   extern unsigned int vdc_final_file_id;
    extern unsigned int start_file_id;
    extern unsigned int final_file_id;
 
