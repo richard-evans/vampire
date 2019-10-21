@@ -53,6 +53,22 @@ uint64_t reduce_sum(uint64_t local){
 
 }
 
+double reduce_sum(double local){
+
+   double global = 0.0;
+
+   #ifdef MPICF
+      // Perform MPI reduce for MPI code
+      MPI_Reduce(&local, &global, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+   #else
+      // set global variable equal to local for serial calls
+      global = local;
+   #endif
+
+   return global;
+
+}
+
 //------------------------------------------------------------------------------
 // Wrapper function(s) for MPI all reduce operation
 //------------------------------------------------------------------------------
@@ -69,6 +85,31 @@ uint64_t all_reduce_sum(uint64_t local){
    #endif
 
    return global;
+
+}
+
+double all_reduce_sum(double local){
+
+   double global = 0.0;
+
+   #ifdef MPICF
+      // Perform MPI reduce for MPI code
+      MPI_Allreduce(&local, &global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   #else
+      // set global variable equal to local for serial calls
+      global = local;
+   #endif
+
+   return global;
+
+}
+
+void all_reduce_sum(std::vector<double>& array){
+
+   #ifdef MPICF
+      // Perform MPI reduce for MPI code
+      MPI_Allreduce(MPI_IN_PLACE, &array[0], array.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   #endif
 
 }
 
