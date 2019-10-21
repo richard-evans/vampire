@@ -79,8 +79,12 @@ namespace hierarchical{
 
       std::vector < std::vector < double> > calculate_corners(double x, double y, double z, double cell_size_x, double cell_size_y, double cell_size_z);
 
-      int hierarchical_mag();
-      void update();
+      // function to update hierarchical cell magnetizations
+      void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, // atomic spin directions
+                                                std::vector <double>& y_spin_array,
+                                                std::vector <double>& z_spin_array,
+                                                std::vector <double>& m_spin_array, // atomic spin moment
+                                                std::vector < bool >& magnetic);    // is magnetic);
 
       void calc_intra(int cell_i, int cell_j, int interaction_no,
                       std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_x,

@@ -59,9 +59,11 @@ namespace dipole{
    // Function to unroll cells dipolar field into atomic field
    //-----------------------------------------------------------------------------
    void calculate_field(const uint64_t sim_time,
-                        std::vector<double>& x_spin_array, // atomic spin directions
-                        std::vector<double>& y_spin_array,
-                        std::vector<double>& z_spin_array);
+                        std::vector <double>& x_spin_array, // atomic spin directions
+                        std::vector <double>& y_spin_array,
+                        std::vector <double>& z_spin_array,
+                        std::vector <double>& m_spin_array, // atomic spin moment
+                        std::vector < bool >& magnetic);    // is magnetic
 
    //------------------------------------------------------------------------------
    // Function to calculate energy of spin in dipole (magnetostatic) field
@@ -103,6 +105,7 @@ namespace dipole{
                    std::vector<double>& y_spin_array,
                    std::vector<double>& z_spin_array,
                    std::vector<double>& atom_moments, // atomic magnetic moments
+                   std::vector<bool>& magnetic, // bool for magnetic atoms
                    int num_atoms
    );
 

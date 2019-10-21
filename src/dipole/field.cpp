@@ -41,9 +41,11 @@ namespace dipole{
    // Function for updating atomic B-field and Hd-field
    //-----------------------------------------------------------------------------
 	void calculate_field(const uint64_t sim_time,
-                        std::vector<double>& x_spin_array, // atomic spin directions
-                        std::vector<double>& y_spin_array,
-                        std::vector<double>& z_spin_array){
+                        std::vector <double>& x_spin_array, // atomic spin directions
+                        std::vector <double>& y_spin_array,
+                        std::vector <double>& z_spin_array,
+                        std::vector <double>& m_spin_array, // atomic spin moment
+                        std::vector < bool >& magnetic){ // is magnetic
 
       // return if dipole field not enabled
       if(!dipole::activated) return;
@@ -71,7 +73,7 @@ namespace dipole{
                   dipole::internal::calculate_atomistic_dipole_field(x_spin_array, y_spin_array, z_spin_array);
                   break;
                case dipole::internal::hierarchical:
-                  hierarchical::internal::update();
+                  hierarchical::update(x_spin_array, y_spin_array, z_spin_array, m_spin_array, magnetic);
                   break;
                case dipole::internal::fft:
                   dipole::internal::update_field_fft();

@@ -240,7 +240,7 @@ namespace hierarchical{
 
               int index = 0;
               internal::av_cell_size =  (cells::macro_cell_size_x +  cells::macro_cell_size_y +  cells::macro_cell_size_z)/3.0;
-              //loop over all levels to calvculate the positions and sizes of the cells in the levels.
+              //loop over all levels to calculate the positions and sizes of the cells in the levels.
               for (int level = 0; level < ha::num_levels; level ++){
 
                  double cell_size_x = pow(2,level)*cells::macro_cell_size_x;
@@ -323,6 +323,7 @@ namespace hierarchical{
 
               std::vector <int > cells_help(ha::total_num_cells, 0);
 
+                 // loop over all levels
                  for (int level = 1; level < ha::num_levels; level ++){
 
                   int sublevel         = level - 1;
