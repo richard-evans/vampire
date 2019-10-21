@@ -34,7 +34,7 @@ namespace vdc{
 // forward function declarations
 
 //------------------------------------------------------------------------------
-// Function to output crystal.xyz file compatible with rasmol
+// Function to output spins.pov file compatible with povray
 //------------------------------------------------------------------------------
 void output_inc_file(unsigned int spin_file_id){
 
