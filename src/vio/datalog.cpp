@@ -255,7 +255,7 @@ namespace vout{
             vout::material_mean_total_energy(stream,header);
             break;
          case 65:
-            vout::MRresistance(zmag);
+            vout::MRresistance(stream,header);
             break;
          case 999: //AJN
             vout::standard_deviation(stream,header);

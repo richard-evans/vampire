@@ -460,7 +460,7 @@ namespace vout{
    }
 
    // Output Function 65 - with Header
-   void MRresistance(std::ostream& stream){
+   void MRresistance(std::ostream& stream, bool header){
       if(header){
          stream << "MR" << "\t";
       }
