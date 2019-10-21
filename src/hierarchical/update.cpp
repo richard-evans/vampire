@@ -98,7 +98,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       dipole::cells_field_array_x[cell_i]       = dipole::cells_field_array_x[cell_i] * 9.27400915e-01;
       dipole::cells_field_array_y[cell_i]       = dipole::cells_field_array_y[cell_i] * 9.27400915e-01;
       dipole::cells_field_array_z[cell_i]       = dipole::cells_field_array_z[cell_i] * 9.27400915e-01;
-      dp_fields << sim::time << '\t' << cell_i << '\t' << dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
+      //dp_fields << sim::time << '\t' << cell_i << '\t' << dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
 
       // Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
       // of magnetisation and volume in angstrom
