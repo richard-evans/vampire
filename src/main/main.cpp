@@ -83,7 +83,8 @@ int main(int argc, char* argv[]){
       std::cout << "                Phanwadee Chureemart, Sarah Jenkins, Joe Barker, " << std::endl;
       std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell," << std::endl;
       std::cout << "                Wu Hong-Ye, Matthew Ellis, Razvan Ababei, " << std::endl;
-      std::cout << "                Sam Westmoreland, Oscar Arbelaez, Sam Morris" << std::endl;
+      std::cout << "                Sam Westmoreland, Oscar Arbelaez, Sam Morris," << std::endl;
+      std::cout << "                Daniel Meilak" << std::endl;
       std::cout << " " << std::endl;
       #ifdef COMP
       std::cout << "                Compiled with:  " << COMP << std::endl;
