@@ -144,7 +144,7 @@ void read_coord_metadata(){
    line.erase (line.begin(), line.begin()+20);
    num_materials=atoi(line.c_str());
 
-   // Tell the user about the total number of atoms if verbosity is required
+   // Tell the user about the total number of materials if verbosity is required
    if(vdc::verbose) std::cout << "   Number of materials: " << num_materials << std::endl;
 
    // now read in material data
