@@ -212,6 +212,12 @@ void read_nm_data(){
 
    }
 
+   // create vector list of non magnetic atom indices
+   vdc::nm_atoms_list.resize(vdc::num_nm_atoms);
+   for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+      vdc::nm_atoms_list[atom] = atom;
+   }
+
    // output informative message to user
    if(vdc::verbose) std::cout << "done!" << std::endl;
 

@@ -18,12 +18,12 @@
 namespace vdc{
 
    // program option flags
-   bool verbose = false; // flag to specify verbosity of output to user
-   bool xyz     = false; // flag to specify crystal.xyz file output
-   bool povray  = false; // flag to specify povray file output
-   bool cells   = false; // flag to specify cells output
-   bool vtk     = false; // flag to specify vtk output
-   bool txt    = false; // flag to specify plain text output
+   bool verbose  = false; // flag to specify verbosity of output to user
+   bool xyz      = false; // flag to specify crystal.xyz file output
+   bool povray   = false; // flag to specify povray file output
+   bool cells    = false; // flag to specify cells output
+   bool vtk      = false; // flag to specify vtk output
+   bool txt      = false; // flag to specify plain text output
    bool x_vector = false; // flag to specify direction of povray colouring
    bool z_vector = false; // flag to specify plane for povray colouring
 
@@ -56,6 +56,10 @@ namespace vdc{
 
    // slice parameters for cutting the original system
    std::vector<double> slice_parameters = {0.0,1.0,0.0,1.0,0.0,1.0};
+   std::vector<int> atoms_list(0);
+   std::vector<int> nm_atoms_list(0);
+   std::vector<int> sliced_atoms_list(0);
+   std::vector<int> sliced_nm_atoms_list(0);
 
    // axis vectors for povray colouring
    std::vector<double> vector_z = {0.0,0.0,1.0};

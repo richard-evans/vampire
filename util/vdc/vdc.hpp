@@ -59,6 +59,10 @@ namespace vdc{
 
    // slice parameters for cutting the original system
    extern std::vector<double> slice_parameters;
+   extern std::vector<int> atoms_list;
+   extern std::vector<int> nm_atoms_list;
+   extern std::vector<int> sliced_atoms_list;
+   extern std::vector<int> sliced_nm_atoms_list;
 
    extern std::vector<material_t> materials;
 
@@ -101,6 +105,7 @@ namespace vdc{
    // forward function declarations
    void read_nm_metadata();
    void read_nm_data();
+   void slice_nm_system();
 
    void output_xyz_file();
    void output_inc_file(unsigned int spin_file_id);

@@ -67,7 +67,7 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+      for( auto &atom : vdc::sliced_atoms_list ){
 
          // get magnetization for colour contrast
          const double sx = spins[3*atom+0];
@@ -103,7 +103,7 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+      for( auto &atom : vdc::sliced_nm_atoms_list ){
 
          // format text for povray file
          otext << "spinm"<< nm_type[atom] << "(" <<
@@ -180,7 +180,7 @@ void output_povray_file(){
 
    // Determine non-magnetic materials looping over all non-magnetic atoms
    std::vector<bool> is_nm_mat(vdc::materials.size(),false);
-   for(uint64_t atom = 0; atom < vdc::num_nm_atoms; atom++){
+   for( auto &atom : vdc::sliced_nm_atoms_list ){
       const int mat = vdc::nm_type[atom];
       is_nm_mat[mat] = true;
    }

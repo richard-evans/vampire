@@ -49,23 +49,23 @@ void output_vtk_file(unsigned int spin_file_id){
 
    vtkfile << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">" << std::endl;
    vtkfile << "<UnstructuredGrid>" << std::endl;
-   vtkfile << "   <Piece NumberOfPoints=\"" << vdc::num_atoms << "\" NumberOfCells=\"0\">" << std::endl;
+   vtkfile << "   <Piece NumberOfPoints=\"" << vdc::sliced_atoms_list.size() << "\" NumberOfCells=\"0\">" << std::endl;
    vtkfile << "      <Points>" << std::endl;
    vtkfile << "         <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
-   for(uint64_t atom = 0; atom < vdc::num_atoms; atom++){
+   for( auto &atom : vdc::sliced_atoms_list ){
       vtkfile << "            " << coordinates[3*atom+0]-scx << " " << coordinates[3*atom+1]-scy << " " << coordinates[3*atom+2]-scz << std::endl;
    }
    vtkfile << "         </DataArray>" << std::endl;
    vtkfile << "      </Points>" << std::endl;
    vtkfile << "      <PointData Vectors=\"vector\">" << std::endl;
    vtkfile << "         <DataArray type=\"Float32\" Name=\"spin\" NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
-   for(uint64_t atom = 0; atom < vdc::num_atoms; atom++){
+   for( auto &atom : vdc::atoms_list ){
       vtkfile << spins[3*atom+0] << " " << spins[3*atom+1] << " " << spins[3*atom+2] << " ";
    }
    vtkfile << std::endl;
    vtkfile << "         </DataArray>" << std::endl;
    vtkfile << "         <DataArray type=\"Float32\" Name=\"moment\" format=\"ascii\">" << std::endl;
-   for(uint64_t atom = 0; atom < vdc::num_atoms; atom++){
+   for( auto &atom : vdc::sliced_atoms_list ){
       // get atom type
       int type_id = vdc::type[atom];
       const double moment = materials[type_id].moment;
@@ -74,7 +74,7 @@ void output_vtk_file(unsigned int spin_file_id){
    vtkfile << std::endl;
    vtkfile << "         </DataArray>" << std::endl;
    vtkfile << "         <DataArray type=\"Int32\" Name=\"ID\" format=\"ascii\">" << std::endl;
-   for(uint64_t atom = 0; atom < vdc::num_atoms; atom++){
+   for( auto &atom : vdc::sliced_atoms_list ){
       // get atom type
       int type_id = vdc::type[atom];
       vtkfile << type_id << " ";
