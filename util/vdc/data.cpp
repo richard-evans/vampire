@@ -31,6 +31,7 @@ namespace vdc{
    std::string colour_keyword = "CBWR";
    std::string custom_colourmap_file;
    bool x_axis_colour = false;
+   std::string slice_type = "no-slice";
 
    format_t format;
 
@@ -52,6 +53,9 @@ namespace vdc{
 
    std::vector<double> coordinates(0);
    std::vector<double> spins(0);
+
+   // slice parameters for cutting the original system
+   std::vector<double> slice_parameters = {0.0,1.0,0.0,1.0,0.0,1.0};
 
    // axis vectors for povray colouring
    std::vector<double> vector_z = {0.0,0.0,1.0};

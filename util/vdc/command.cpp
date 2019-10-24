@@ -22,7 +22,8 @@
 namespace vdc{
 
 // forward function declarations
-int extract( std::string arg_string, std::vector<double>& arg_vector );
+int extract_vector( std::string arg_string, std::vector<double>& arg_vector );
+int extract_slice( std::string arg_string, std::vector<double>& arg_vector );
 int check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output );
 void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x );
 
@@ -114,15 +115,51 @@ int command( int argc, char* argv[] ){
          }
       }
       //------------------------------------------------------------------------
+      // Check for slice parameters
+      //------------------------------------------------------------------------
+      else if (sw == "--slice"){
+
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - expected 6 comma separated variables." );
+
+         // work through vector and extract values
+         extract_slice(temp_str, vdc::slice_parameters);
+
+         // set slice keyword
+         vdc::slice_type = "slice";
+      }
+      else if (sw == "--slice-void"){
+
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - expected 6 comma separated variables." );
+
+         // work through vector and extract values
+         extract_slice(temp_str, vdc::slice_parameters);
+
+         // set slice keyword
+         vdc::slice_type = "slice-void";
+      }
+      else if (sw == "--slice-sphere"){
+
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - expected a single variable." );
+
+         // set slice keyword
+         vdc::slice_type = "slice-sphere";
+
+         // set parameter
+         slice_parameters[0] = std::stod(temp_str);
+      }
+      //------------------------------------------------------------------------
       // Check for colour mapping parameters
       //------------------------------------------------------------------------
       else if (sw == "--vector-z"){
 
          // check number of args not exceeded
-         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables in brackets." );
+         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables." );
 
          // work through vector and extract values
-         extract(temp_str, vdc::vector_z );
+         extract_vector(temp_str, vdc::vector_z );
 
          // confirm initialisation of z-axis
          z_vector = true;
@@ -130,10 +167,10 @@ int command( int argc, char* argv[] ){
       else if (sw == "--vector-x"){
 
          // check number of args not exceeded
-         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables in brackets." );
+         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables." );
 
          // work through vector and extract values
-         extract(temp_str, vdc::vector_x );
+         extract_vector(temp_str, vdc::vector_x );
 
          // confirm initialisation of x-axis
          x_vector = true;
@@ -248,10 +285,10 @@ int command( int argc, char* argv[] ){
 }
 
 //------------------------------------------------------------------------------
-// Extracts 3D vector coordinates from string: {x,y,z} or (x,y,z)
+// Extracts 3D vector coordinates from string: x,y,z
 // where x,y and z are type double
 //------------------------------------------------------------------------------
-int extract( std::string arg_string, std::vector<double>& arg_vector ){
+int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
    std::string tmp_string;
    int vector_index = 0;
 
@@ -286,6 +323,48 @@ int extract( std::string arg_string, std::vector<double>& arg_vector ){
    arg_vector[0] = arg_vector[0]/length;
    arg_vector[1] = arg_vector[1]/length;
    arg_vector[2] = arg_vector[2]/length;
+
+   return EXIT_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+// Extracts fractional min max for slice of system to be shown
+// xmin,xmax,ymin,ymax,zmin,zmax all type double
+//------------------------------------------------------------------------------
+int extract_slice( std::string arg_string, std::vector<double>& arg_vector ){
+   std::string tmp_string;
+   int vector_index = 0;
+
+   // read fractional coordinates
+   for ( int i = 0; i < arg_string.size(); i++){
+      if ( arg_string[i] != ','){
+         tmp_string.push_back(arg_string[i]);
+      }
+      else {
+         // check if a number has bean read (no leading comma)
+         if ( tmp_string.size() == 0 ){
+            std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
+            return EXIT_FAILURE;
+         }
+
+         // save coordinate, verify and move onto next one
+         arg_vector[vector_index] = std::stod(tmp_string);
+
+         if ( (arg_vector[vector_index] <= -0.000001) || (arg_vector[vector_index] >= 1.000001 ) ){
+            std::cerr << "Error - fractional coordinates should be between 0-1." << std::endl;
+            return EXIT_FAILURE;
+         }
+
+         vector_index++;
+      }
+   }
+
+   // check vector has been input correctly (no missing coordinates)
+   for ( int i = 0; i < 6; i++){
+      if ( arg_vector.size() == 0){
+         std::cerr << "Error - argument should be in the format xmin,xmax,ymin,ymax,zmin,zmax with no spaces." << std::endl;
+      }
+   }
 
    return EXIT_SUCCESS;
 }

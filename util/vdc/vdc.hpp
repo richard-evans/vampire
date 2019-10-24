@@ -33,6 +33,7 @@ namespace vdc{
    extern std::string colour_keyword;
    extern std::string custom_colourmap_file;
    extern bool x_axis_colour;
+   extern std::string slice_type;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -55,6 +56,9 @@ namespace vdc{
 
    extern double system_size[3];
    extern double system_centre[3];
+
+   // slice parameters for cutting the original system
+   extern std::vector<double> slice_parameters;
 
    extern std::vector<material_t> materials;
 

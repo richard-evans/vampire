@@ -268,11 +268,8 @@ void read_coord_data(){
 
    }
 
-   // output informative message to user
-   if(vdc::verbose) std::cout << "done!" << std::endl;
-
    //---------------------------------------------------------------
-   // calculate system extent and centre
+   // calculate system extent and centre before slicing
    //---------------------------------------------------------------
    double min[3] = {1e20, 1e20, 1e20};
    double max[3] = {0.0, 0.0, 0.0};
@@ -310,6 +307,100 @@ void read_coord_data(){
    vdc::system_centre[0] = ave[0]/double(vdc::num_atoms);
    vdc::system_centre[1] = ave[1]/double(vdc::num_atoms);
    vdc::system_centre[2] = ave[2]/double(vdc::num_atoms);
+
+
+   //---------------------------------------------------------------
+   // reduce atom list to those within chosen slice_type
+   //---------------------------------------------------------------
+   std::vector<int> reduced_atoms_list;
+   double xmin, xmax;
+   double ymin, ymax;
+   double zmin, zmax;
+
+   // work out _min, _max real values from fractional
+   // coordinates in slice_parameters
+   xmin = slice_parameters[0]*(max[0]-min[0]) + min[0];
+   ymin = slice_parameters[2]*(max[1]-min[1]) + min[1];
+   zmin = slice_parameters[4]*(max[2]-min[2]) + min[2];
+
+   xmax = slice_parameters[1]*(max[0]-min[0]) + min[0];
+   ymax = slice_parameters[3]*(max[1]-min[1]) + min[1];
+   zmax = slice_parameters[5]*(max[2]-min[2]) + min[2];
+
+   switch (vdc::slice_type){
+      case "no-slice":{
+         for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+            reduced_atoms_list.push_back(atom);
+         }
+      }
+      // User defines a volume, only atoms inside are included
+      case "slice":{
+         for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+
+            x = vdc::coordinates[3*atom + 0];
+            y = vdc::coordinates[3*atom + 1];
+            z = vdc::coordinates[3*atom + 2];
+
+            // choose only atoms within boundaries
+            if ( (x >= slice_min[0]) && (x <= slice_max[0]) ){
+               if ( (y >= slice_min[1]) && (y <= slice_max[1]) ){
+                  if ( (z >= slice_min[2]) && (z <= slice_max[2]) ){
+                     reduced_atoms_list.push_back(atom);
+                  }
+               }
+            }
+         }
+      }
+
+      // User defines a volume, only atoms outside are included
+      case "slice-void":{
+         for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+
+            x = vdc::coordinates[3*atom + 0];
+            y = vdc::coordinates[3*atom + 1];
+            z = vdc::coordinates[3*atom + 2];
+
+            // choose only atoms within boundaries
+            if ( (x <= slice_min[0]) && (x >= slice_max[0]) ){
+               if ( (y <= slice_min[1]) && (y >= slice_max[1]) ){
+                  if ( (z <= slice_min[2]) && (z >= slice_max[2]) ){
+                     reduced_atoms_list.push_back(atom);
+                  }
+               }
+            }
+         }
+      }
+
+      // Sphere with the diameter of the smallest grain size
+      case "slice-sphere":{
+         // find smallest system_size
+         double radius = std::min(std::min(system_size[0],system_size[1]),system_size[2])/2.0;
+
+         // chose only atoms within sphere at the centre of the system
+         for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+
+            x = vdc::coordinates[3*atom + 0];
+            y = vdc::coordinates[3*atom + 1];
+            z = vdc::coordinates[3*atom + 2];
+
+            double temp = 0;
+
+            temp += (x - system_centre[0])*(x - system_centre[0]);
+            temp += (y - system_centre[1])*(y - system_centre[1]);
+            temp += (z - system_centre[2])*(z - system_centre[2]);
+
+            if ( temp <= (radius*radius) ){
+               reduced_atoms_list.push_back(atom);
+            }
+         }
+      }
+   }
+
+   // user reduced_atoms_list to prune vdc::coordinates
+   
+
+   // output informative message to user
+   if(vdc::verbose) std::cout << "done!" << std::endl;
 
    return;
 
