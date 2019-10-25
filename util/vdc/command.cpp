@@ -142,13 +142,13 @@ int command( int argc, char* argv[] ){
       else if (sw == "--slice-sphere"){
 
          // check number of args not exceeded
-         check_arg(arg, argc, argv, temp_str, "Error - expected a single variable." );
+         //check_arg(arg, argc, argv, temp_str, "Error - expected a single variable." );
 
          // set slice keyword
          vdc::slice_type = "slice-sphere";
 
          // set parameter
-         slice_parameters[0] = std::stod(temp_str);
+         //slice_parameters[0] = std::stod(temp_str);
       }
       //------------------------------------------------------------------------
       // Check for colour mapping parameters
@@ -295,9 +295,6 @@ int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
    // read coordinates
    for ( int i = 0; i < arg_string.size(); i++){
       if ( arg_string[i] != ','){
-         tmp_string.push_back(arg_string[i]);
-      }
-      else {
          // check if a number has bean read (no leading comma)
          if ( tmp_string.size() == 0 ){
             std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
@@ -307,6 +304,14 @@ int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
          // save coordinate and move onto next one
          arg_vector[vector_index] = std::stod(tmp_string);
          vector_index++;
+      }
+      else if ( i == (arg_string.size()-1) ){
+         // reached end of char, read final coordinate
+         tmp_string.push_back(arg_string[i]);
+         arg_vector[vector_index] = std::stod(tmp_string);
+      }
+      else{
+         tmp_string.push_back(arg_string[i]);
       }
    }
 
@@ -332,15 +337,12 @@ int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
 // xmin,xmax,ymin,ymax,zmin,zmax all type double
 //------------------------------------------------------------------------------
 int extract_slice( std::string arg_string, std::vector<double>& arg_vector ){
-   std::string tmp_string;
+   std::string tmp_string = "";
    int vector_index = 0;
 
    // read fractional coordinates
-   for ( int i = 0; i < arg_string.size(); i++){
-      if ( arg_string[i] != ','){
-         tmp_string.push_back(arg_string[i]);
-      }
-      else {
+   for (unsigned int i = 0; i < arg_string.size(); i++){
+      if ( arg_string[i] == ',' ){
          // check if a number has bean read (no leading comma)
          if ( tmp_string.size() == 0 ){
             std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
@@ -354,8 +356,22 @@ int extract_slice( std::string arg_string, std::vector<double>& arg_vector ){
             std::cerr << "Error - fractional coordinates should be between 0-1." << std::endl;
             return EXIT_FAILURE;
          }
-
+         tmp_string = "";
          vector_index++;
+      }
+      else if ( i == (arg_string.size()-1) ){
+         // reached end of character, read final number
+         tmp_string.push_back(arg_string[i]);
+         arg_vector[vector_index] = std::stod(tmp_string);
+
+         if ( (arg_vector[vector_index] <= -0.000001) || (arg_vector[vector_index] >= 1.000001 ) ){
+            std::cerr << "Error - fractional coordinates should be between 0-1." << std::endl;
+            return EXIT_FAILURE;
+         }
+      }
+      else {
+         // push back the digit
+         tmp_string.push_back(arg_string[i]);
       }
    }
 
