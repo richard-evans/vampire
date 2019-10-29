@@ -104,7 +104,7 @@ namespace vout{
    extern bool custom_precision; // enable user selectable precision for data output
    extern unsigned int precision; // variable to control output precision (digits)
    extern bool fixed; // fixed precision output
-
+   extern bool header_option; // column headers
 	extern std::vector<unsigned int> file_output_list;
 	extern std::vector<unsigned int> screen_output_list;
 	extern std::vector<unsigned int> grain_output_list;
@@ -122,7 +122,8 @@ namespace vout{
 
 	extern void data();
 	extern void zLogTsInit(std::string);
-
+    void output_switch(std::ostream&, unsigned int);
+    extern void write_out(std::ostream&,std::vector<unsigned int>&);
 	//extern int pov_file();
 
 	void redirect(std::ostream& strm, std::string filename);

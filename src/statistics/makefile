@@ -10,6 +10,7 @@ initialize.o \
 interface.o \
 magnetization.o \
 specific_heat.o \
+standard_deviation.o\
 statistics.o \
 susceptibility.o
 

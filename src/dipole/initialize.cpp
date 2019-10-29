@@ -54,6 +54,7 @@ namespace dipole{
                   std::vector<double>& y_spin_array,
                   std::vector<double>& z_spin_array,
                   std::vector<double>& atom_moments, // atomic magnetic moments
+                  std::vector<bool>& magnetic, // bool for magnetic atoms
                   int num_atoms
 				){
 
@@ -147,14 +148,15 @@ namespace dipole{
       // instantiate timer
       vutil::vtimer_t timer;
 
+      // hold parallel calculation until all processors have completed initialization
+      // to ensure an accurate reading
+      vmpi::barrier();
+
       // start timer
       timer.start();
 
       // now calculate fields at zero time
-      dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array);
-
-      // hold parallel calculation until all processors have completed the update
-      vmpi::barrier();
+      dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array, atom_moments, magnetic);
 
       // stop timer
       timer.stop();
@@ -177,18 +179,21 @@ namespace dipole{
 
       if (dipole::internal::solver == dipole::internal::hierarchical){
 
+         //---------------------------------------------------------------------
          // Check memory requirements and print to screen
-//         zlog << zTs() << "hierarchical Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-//         std::cout     << "hierarchical Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
+         //---------------------------------------------------------------------
 
-         zlog << zTs() << "hierarchical Total memory for dipole calculation (all CPUs): " << ha::interaction_list.size()*6*8.0/1.0e6 << " MB of RAM" << std::endl;
-         std::cout << "hierarchical Total memory for dipole calculation (all CPUs): " << ha::interaction_list.size()*6*8.0/1.0e6 << " MB of RAM" << std::endl;
+         const double total_memory = vmpi::reduce_sum( double(ha::interaction_list.size() ) * 6.0 * 8.0 / 1.0e6 ); // in Megabytes
 
-         zlog << zTs() << "hierarchical Number of local cells for dipole calculation = " << dipole::internal::cells_num_local_cells << std::endl;
-         zlog << zTs() << "hierarchical Number of total cells for dipole calculation = " << dipole::internal::cells_num_cells << std::endl;
+         zlog << zTs() << "Total memory for hierarchical dipole calculation (all CPUs): " << total_memory << " MB of RAM" << std::endl;
+         std::cout << "Total memory for hierarchical dipole calculation (all CPUs): " << total_memory << " MB of RAM" << std::endl;
+
+         zlog << zTs() << "Number of local cells for hierarchical dipole calculation = " << dipole::internal::cells_num_local_cells << std::endl;
+         zlog << zTs() << "Number of total cells for hierarchical dipole calculation = " << dipole::internal::cells_num_cells << std::endl;
 
                //Every cpus print to check dipolar matrix inter term
-         for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
+               // RFLE - currently commented out as caused a sagfault and not that important
+         /*for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
 
 
             // get id of cell
@@ -228,7 +233,7 @@ namespace dipole{
                     //  std::cout << N_tensor_array[6*i+2] << "\t" << N_tensor_array[6*i+4] << "\t" << N_tensor_array[6*i+5] << "\n";
                     //  std::cout << "*----------------------------------*" << std::endl;
                     // std::cout << std::endl;
-         }
+         }*/
 
       }
 

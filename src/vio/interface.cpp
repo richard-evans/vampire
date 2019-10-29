@@ -47,6 +47,11 @@ namespace vio{
          vout::fixed = true; // enable fixed width output
          return true;
       }
+      test="column-headers";
+      if(word==test){
+        vout::header_option = true;
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

@@ -127,8 +127,10 @@ double two_temperature_function(double ftime){
    const double Cl = sim::TTCl;
    const double dt = mp::dt_SI;
 
-   sim::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
-   sim::TTTp = ( G*(Te-Tp)     )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
+	// integrate two temperature model (floor in free elecron approximation (c prop to T) for low temperatures)
+	if(Te>1.0) sim::TTTe = (-G*(Te-Tp)+pump)*dt/(Ce*Te) + Te;
+	else sim::TTTe =       (-G*(Te-Tp)+pump)*dt/Ce + Te;
+	sim::TTTp =            ( G*(Te-Tp)     )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
 
    // Optionally set material specific temperatures
    if(sim::local_temperature==true){
@@ -166,8 +168,10 @@ double double_pump_two_temperature_function(double ftime){
 		const double Cl = sim::TTCl;
 		const double dt = mp::dt_SI;
 
-		sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/(Ce*Te) + Te;
-		sim::TTTp = ( G*(Te-Tp)            )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
+		// integrate two temperature model (floor in free elecron approximation (c prop to T) for low temperatures)
+		if(Te>1.0) sim::TTTe = (-G*(Te-Tp)+pump1+pump2)*dt/(Ce*Te) + Te;
+		else sim::TTTe =       (-G*(Te-Tp)+pump1+pump2)*dt/Ce + Te;
+		sim::TTTp =            ( G*(Te-Tp)            )*dt/Cl + Tp - (Tp-sim::Teq)*sim::HeatSinkCouplingConstant*dt;
 
       // Optionally set material specific temperatures
       if(sim::local_temperature==true){

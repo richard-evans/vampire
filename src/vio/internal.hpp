@@ -56,65 +56,67 @@ namespace vout{
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: outputfunctions.cpp
    //-------------------------------------------------------------------------
-   void time(std::ostream& stream);
-   void real_time(std::ostream& stream);
-   void temperature(std::ostream& stream);
-   void Happ(std::ostream& stream);
-   void Hvec(std::ostream& stream);
-   void mvec(std::ostream& stream);
-   void magm(std::ostream& stream);
-   void mean_magm(std::ostream& stream);
-   void mat_mvec(std::ostream& stream);
-   void mat_mean_magm(std::ostream& stream);
-   void grain_mvec(std::ostream& stream);
-   void grain_magm(std::ostream& stream);
-   void mdoth(std::ostream& stream);
-   void grain_mat_mvec(std::ostream& stream);
-   void systorque(std::ostream& stream);
-   void mean_systorque(std::ostream& stream);
-   void constraint_phi(std::ostream& stream);
-   void constraint_theta(std::ostream& stream);
-   void material_constraint_phi(std::ostream& stream);
-   void material_constraint_theta(std::ostream& stream);
-   void material_mean_systorque(std::ostream& stream);
-   void mean_system_susceptibility(std::ostream& stream);
-   void phonon_temperature(std::ostream& stream);
-   void material_temperature(std::ostream& stream);
-   void material_applied_field_strength(std::ostream& stream);
-   void material_fmr_field_strength(std::ostream& stream);
-   void mat_mdoth(std::ostream& stream);
-   void total_energy(std::ostream& stream);
-   void mean_total_energy(std::ostream& stream);
-   void total_anisotropy_energy(std::ostream& stream);
-   void mean_total_anisotropy_energy(std::ostream& stream);
-   //void total_cubic_anisotropy_energy(std::ostream& stream);
-   //void mean_total_cubic_anisotropy_energy(std::ostream& stream);
-   //void total_surface_anisotropy_energy(std::ostream& stream);
-   //void mean_total_surface_anisotropy_energy(std::ostream& stream);
-   void total_exchange_energy(std::ostream& stream);
-   void mean_total_exchange_energy(std::ostream& stream);
-   void total_applied_field_energy(std::ostream& stream);
-   void mean_total_applied_field_energy(std::ostream& stream);
-   void total_magnetostatic_energy(std::ostream& stream);
-   void mean_total_magnetostatic_energy(std::ostream& stream);
-   //void total_so_anisotropy_energy(std::ostream& stream);
-   //void mean_total_so_anisotropy_energy(std::ostream& stream);
-   void height_mvec(std::ostream& stream);
-   void material_height_mvec(std::ostream& stream);
-   void height_mvec_actual(std::ostream& stream);
-   void material_height_mvec_actual(std::ostream& stream);
-   void fmr_field_strength(std::ostream& stream);
-	void mean_mvec(std::ostream& stream);
-	void mat_mean_mvec(std::ostream& stream);
-   void mean_material_susceptibility(std::ostream& stream);
-   void mean_height_magnetisation_length(std::ostream& stream);
-   void mean_height_magnetisation(std::ostream& stream);
+   void time(std::ostream& stream,bool header);
+   void real_time(std::ostream& stream,bool header);
+   void temperature(std::ostream& stream,bool header);
+   void Happ(std::ostream& stream,bool header);
+   void Hvec(std::ostream& stream,bool header);
+   void mvec(std::ostream& stream,bool header);
+   void magm(std::ostream& stream,bool header);
+   void mean_magm(std::ostream& stream,bool header);
+   void mat_mvec(std::ostream& stream,bool header);
+   void mat_mean_magm(std::ostream& stream,bool header);
+   void grain_mvec(std::ostream& stream,bool header);
+   void grain_magm(std::ostream& stream,bool header);
+   void mdoth(std::ostream& stream,bool header);
+   void grain_mat_mvec(std::ostream& stream,bool header);
+   void systorque(std::ostream& stream,bool header);
+   void mean_systorque(std::ostream& stream,bool header);
+   void constraint_phi(std::ostream& stream,bool header);
+   void constraint_theta(std::ostream& stream,bool header);
+   void material_constraint_phi(std::ostream& stream,bool header);
+   void material_constraint_theta(std::ostream& stream,bool header);
+   void material_mean_systorque(std::ostream& stream,bool header);
+   void standard_deviation(std::ostream& stream,bool header);
+   void mean_system_susceptibility(std::ostream& stream,bool header);
+   void phonon_temperature(std::ostream& stream,bool header);
+   void material_temperature(std::ostream& stream,bool header);
+   void material_applied_field_strength(std::ostream& stream,bool header);
+   void material_fmr_field_strength(std::ostream& stream,bool header);
+   void mat_mdoth(std::ostream& stream,bool header);
+   void total_energy(std::ostream& stream,bool header);
+   void mean_total_energy(std::ostream& stream,bool header);
+   void total_anisotropy_energy(std::ostream& stream,bool header);
+   void mean_total_anisotropy_energy(std::ostream& stream,bool header);
+   //void total_cubic_anisotropy_energy(std::ostream& stream,bool header);
+   //void mean_total_cubic_anisotropy_energy(std::ostream& stream,bool header);
+   //void total_surface_anisotropy_energy(std::ostream& stream,bool header);
+   //void mean_total_surface_anisotropy_energy(std::ostream& stream,bool header);
+   void total_exchange_energy(std::ostream& stream,bool header);
+   void mean_total_exchange_energy(std::ostream& stream,bool header);
+   void total_applied_field_energy(std::ostream& stream,bool header);
+   void mean_total_applied_field_energy(std::ostream& stream,bool header);
+   void total_magnetostatic_energy(std::ostream& stream,bool header);
+   void mean_total_magnetostatic_energy(std::ostream& stream,bool header);
+   //void total_so_anisotropy_energy(std::ostream& stream,bool header);
+   //void mean_total_so_anisotropy_energy(std::ostream& stream,bool header);
+   void height_mvec(std::ostream& stream,bool header);
+   void material_height_mvec(std::ostream& stream,bool header);
+   void height_mvec_actual(std::ostream& stream,bool header);
+   void material_height_mvec_actual(std::ostream& stream,bool header);
+   void fmr_field_strength(std::ostream& stream,bool header);
+	void mean_mvec(std::ostream& stream,bool header);
+	void mat_mean_mvec(std::ostream& stream,bool header);
+   void mean_material_susceptibility(std::ostream& stream,bool header);
+   void mean_height_magnetisation_length(std::ostream& stream,bool header);
+   void mean_height_magnetisation(std::ostream& stream,bool header);
 
-   void MPITimings(std::ostream& stream);
-   void mean_system_specific_heat(std::ostream& stream);
-   void mean_material_specific_heat(std::ostream& stream);
-   void material_total_energy(std::ostream& stream);
-   void material_mean_total_energy(std::ostream& stream);
+   void MPITimings(std::ostream& stream,bool header);
+   void mean_system_specific_heat(std::ostream& stream,bool header);
+   void mean_material_specific_heat(std::ostream& stream,bool header);
+   void material_total_energy(std::ostream& stream,bool header);
+   void material_mean_total_energy(std::ostream& stream,bool header);
+   void MRresistance(std::ostream& stream, bool header);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp
@@ -122,7 +124,7 @@ namespace vout{
    void data();
    void zLogTsInit(std::string tmp);
 
-   void MRresistance(std::ostream& stream);
+
 
 }
 

@@ -127,9 +127,9 @@ namespace internal{
                            ejk[idx] = ejk[idx] * inv_rjk;
                         }
 
-                        // Set pair dmi constant between i=->k and j->k normalised to mu_s_i
-                        const double Dij = ( exchange::internal::mp[imat].dmi[kmat] +
-                                             exchange::internal::mp[jmat].dmi[kmat]) * i_mu_s;
+                        // Set pair dmi constant average between i=->k and j->k normalised to mu_s_i
+                        const double Dij = 0.5*( exchange::internal::mp[imat].dmi[kmat] +
+                                                 exchange::internal::mp[jmat].dmi[kmat]) * i_mu_s;
 
                         // compute direction of Dij
                         const double Dx = eik[1]*ejk[2] - eik[2]*ejk[1];
@@ -167,12 +167,12 @@ namespace internal{
                         //
                         //---------------------------------------------------------------
                         //
-                        tmp_tensor[1] += Dij * +Dz; // Jxy
-                        tmp_tensor[2] += Dij * -Dy; // Jxz
-                        tmp_tensor[3] += Dij * -Dz; // Jyx
-                        tmp_tensor[5] += Dij * +Dx; // Jyz
-                        tmp_tensor[6] += Dij * +Dy; // Jzx
-                        tmp_tensor[7] += Dij * -Dx; // Jzy
+                        tmp_tensor[1] -= Dij * +Dz; // Jxy
+                        tmp_tensor[2] -= Dij * -Dy; // Jxz
+                        tmp_tensor[3] -= Dij * -Dz; // Jyx
+                        tmp_tensor[5] -= Dij * +Dx; // Jyz
+                        tmp_tensor[6] -= Dij * +Dy; // Jzx
+                        tmp_tensor[7] -= Dij * -Dx; // Jzy
 
                         /*ofile << i << "\t" << nj << "\t" << nk << "\t|\t" << Dx << "\t" << Dy << "\t" << Dz << "\t" << Dij << "\t|\t" <<
                                  " eik: " << eik[0] << "\t" << eik[1] << "\t" << eik[2] << "\t|\t" <<

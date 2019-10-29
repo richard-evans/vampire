@@ -50,8 +50,10 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 	zlog << zTs() << "Number of atoms generated on rank " << vmpi::my_rank << ": " << atoms::num_atoms-vmpi::num_halo_atoms << std::endl;
 	zlog << zTs() << "Memory required for copying to performance array on rank " << vmpi::my_rank << ": " << 19.0*double(atoms::num_atoms)*8.0/1.0e6 << " MB RAM"<< std::endl;
 
-   // Save number of non-magnetic atoms
-   atoms::num_non_magnetic_atoms = cs::non_magnetic_atoms_array.size();
+   // Save number of non-magnetic atoms in total (all processors)
+   uint64_t total_non_magnetic_atoms = cs::non_magnetic_atoms_array.size();
+   atoms::num_non_magnetic_atoms = vmpi::all_reduce_sum(total_non_magnetic_atoms);
+
 
    atoms::x_coord_array.resize(atoms::num_atoms,0.0);
    atoms::y_coord_array.resize(atoms::num_atoms,0.0);
@@ -66,6 +68,8 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
    atoms::category_array.resize( atoms::num_atoms,0);
    atoms::grain_array.resize(    atoms::num_atoms,0);
    atoms::cell_array.resize(     atoms::num_atoms,0);
+
+   atoms::magnetic.resize(       atoms::num_atoms,0);
 
 	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
@@ -120,6 +124,11 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 		atoms::y_spin_array[atom]=sy*modS;
 		atoms::z_spin_array[atom]=sz*modS;
       atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
+
+      // generate list of magnetic atoms
+      if( mp::material[mat].non_magnetic == 0 ) atoms::magnetic[atom] = true;
+      else atoms::magnetic[atom] = false;
+
 	}
 
    //---------------------------------------------------------------------------

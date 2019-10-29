@@ -12,13 +12,17 @@ export OMPI_CXX=g++ -std=c++0x
 # Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
+
+# Include the FFTW library by uncommenting the -DFFT (off by default)
+export incFFT= #-DFFT
+
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"' -DFFT
-GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' -DFFT
-LLVM=g++ -DCOMP='"LLVM C++ Compiler"' -DFFT
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' -DFFT
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' -DFFT
-MPICC=mpicxx -DMPICF -DFFT
+ICC=icc -DCOMP='"Intel C++ Compiler"' $(incFFT)
+GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' $(incFFT)
+LLVM=g++ -DCOMP='"LLVM C++ Compiler"' $(incFFT)
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' $(incFFT)
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' $(incFFT)
+MPICC=mpicxx -DMPICF $(incFFT)
 
 LIBS=-lstdc++ -lm -lfftw3 -L/opt/local/lib/
 

@@ -411,7 +411,7 @@ void energy_statistic_t::reset_averages(){
 //------------------------------------------------------------------------------------------------------
 // Function to output normalised magnetisation values as string
 //------------------------------------------------------------------------------------------------------
-std::string energy_statistic_t::output_energy(enum energy_t energy_type){
+std::string energy_statistic_t::output_energy(enum energy_t energy_type,bool header){
 
    // result string stream
    std::ostringstream result;
@@ -424,32 +424,37 @@ std::string energy_statistic_t::output_energy(enum energy_t energy_type){
    }
 
    // could specify an output conversion unit here
-
+   // could run all of the for loops as one outside the switch. -AJN
+   if(header){
+       
+       for(int mask_id=0;mask_id<mask_size; ++mask_id) result<<"ID"<<mask_id<<"_E"<<energy_type<<"_Energy"<<"\t";
+   }else{
    // output correct energy type (in Joules)
-   switch(energy_type){
+       switch(energy_type){
 
-      case total :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<         total_energy[mask_id] * constants::muB << "\t";
-         break;
+          case total :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<         total_energy[mask_id] * constants::muB << "\t";
+             break;
 
-      case exchange :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<      exchange_energy[mask_id] * constants::muB << "\t";
-         break;
+          case exchange :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<      exchange_energy[mask_id] * constants::muB << "\t";
+             break;
 
-      case anisotropy :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<    anisotropy_energy[mask_id] * constants::muB << "\t";
-         break;
+          case anisotropy :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<    anisotropy_energy[mask_id] * constants::muB << "\t";
+             break;
 
-      case applied_field :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result << applied_field_energy[mask_id] * constants::muB << "\t";
-         break;
+          case applied_field :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result << applied_field_energy[mask_id] * constants::muB << "\t";
+             break;
 
-      case magnetostatic :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result << magnetostatic_energy[mask_id] * constants::muB << "\t";
-         break;
+          case magnetostatic :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result << magnetostatic_energy[mask_id] * constants::muB << "\t";
+             break;
 
-      default :
-         break;
+          default :
+             break;
+       }
 
    }
 
@@ -460,7 +465,7 @@ std::string energy_statistic_t::output_energy(enum energy_t energy_type){
 //------------------------------------------------------------------------------------------------------
 // Function to output normalised magnetisation values as string
 //------------------------------------------------------------------------------------------------------
-std::string energy_statistic_t::output_mean_energy(enum energy_t energy_type){
+std::string energy_statistic_t::output_mean_energy(enum energy_t energy_type,bool header){
 
    // result string stream
    std::ostringstream result;
@@ -474,33 +479,37 @@ std::string energy_statistic_t::output_mean_energy(enum energy_t energy_type){
    }
 
    // could specify an output conversion unit here
-
+   // could run all of the for loops as one outside the switch. -AJN
+   if(header){
+       for(int mask_id=0;mask_id<mask_size; ++mask_id) result<<"ID"<<mask_id<<"_E"<<energy_type<<"_Energy"<<"\t";
+   }else{
    // output correct energy type (in Joules)
-   switch(energy_type){
+       switch(energy_type){
 
-      case total :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<         mean_total_energy[mask_id] * constants::muB / mean_counter << "\t";
-         break;
+          case total :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<         mean_total_energy[mask_id] * constants::muB / mean_counter << "\t";
+             break;
 
-      case exchange :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<      mean_exchange_energy[mask_id] * constants::muB / mean_counter << "\t";
-         break;
+          case exchange :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<      mean_exchange_energy[mask_id] * constants::muB / mean_counter << "\t";
+             break;
 
-      case anisotropy :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<    mean_anisotropy_energy[mask_id] * constants::muB / mean_counter << "\t";
-         break;
+          case anisotropy :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result <<    mean_anisotropy_energy[mask_id] * constants::muB / mean_counter << "\t";
+             break;
 
-      case applied_field :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result << mean_applied_field_energy[mask_id] * constants::muB / mean_counter << "\t";
-         break;
+          case applied_field :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result << mean_applied_field_energy[mask_id] * constants::muB / mean_counter << "\t";
+             break;
 
-      case magnetostatic :
-         for(int mask_id=0; mask_id<mask_size; ++mask_id) result << mean_magnetostatic_energy[mask_id] * constants::muB / mean_counter << "\t";
-         break;
+          case magnetostatic :
+             for(int mask_id=0; mask_id<mask_size; ++mask_id) result << mean_magnetostatic_energy[mask_id] * constants::muB / mean_counter << "\t";
+             break;
 
-      default :
-         break;
+          default :
+             break;
 
+       }
    }
 
    return result.str();
