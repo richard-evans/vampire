@@ -23,7 +23,7 @@ namespace vdc{
 
 // forward function declarations
 int extract_vector( std::string arg_string, std::vector<double>& arg_vector );
-int extract_slice( std::string arg_string, std::vector<double>& arg_vector );
+int extract_slice_param( std::string arg_string, std::vector<double>& arg_vector, int number_of_param);
 int check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output );
 void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x );
 
@@ -123,7 +123,7 @@ int command( int argc, char* argv[] ){
          check_arg(arg, argc, argv, temp_str, "Error - expected 6 comma separated variables." );
 
          // work through vector and extract values
-         extract_slice(temp_str, vdc::slice_parameters);
+         extract_slice_param(temp_str, vdc::slice_parameters, 6);
 
          // set slice keyword
          vdc::slice_type = "slice";
@@ -134,7 +134,7 @@ int command( int argc, char* argv[] ){
          check_arg(arg, argc, argv, temp_str, "Error - expected 6 comma separated variables." );
 
          // work through vector and extract values
-         extract_slice(temp_str, vdc::slice_parameters);
+         extract_slice_param(temp_str, vdc::slice_parameters, 6);
 
          // set slice keyword
          vdc::slice_type = "slice-void";
@@ -142,13 +142,13 @@ int command( int argc, char* argv[] ){
       else if (sw == "--slice-sphere"){
 
          // check number of args not exceeded
-         //check_arg(arg, argc, argv, temp_str, "Error - expected a single variable." );
+         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables." );
+
+         // work through vector and extract values
+         extract_slice_param(temp_str, vdc::slice_parameters, 3);
 
          // set slice keyword
          vdc::slice_type = "slice-sphere";
-
-         // set parameter
-         //slice_parameters[0] = std::stod(temp_str);
       }
       //------------------------------------------------------------------------
       // Check for colour mapping parameters
@@ -294,7 +294,7 @@ int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
 
    // read coordinates
    for ( int i = 0; i < arg_string.size(); i++){
-      if ( arg_string[i] != ','){
+      if ( arg_string[i] == ','){
          // check if a number has bean read (no leading comma)
          if ( tmp_string.size() == 0 ){
             std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
@@ -316,10 +316,8 @@ int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
    }
 
    // check vector has been input correctly (no missing coordinates)
-   for ( int i = 0; i < 3; i++){
-      if ( arg_vector.size() == 0){
-         std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
-      }
+   if ( vector_index != 2){
+      std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
    }
 
    // normalise arg_vector
@@ -336,7 +334,7 @@ int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
 // Extracts fractional min max for slice of system to be shown
 // xmin,xmax,ymin,ymax,zmin,zmax all type double
 //------------------------------------------------------------------------------
-int extract_slice( std::string arg_string, std::vector<double>& arg_vector ){
+int extract_slice_param( std::string arg_string, std::vector<double>& arg_vector, int number_of_param){
    std::string tmp_string = "";
    int vector_index = 0;
 
@@ -376,10 +374,8 @@ int extract_slice( std::string arg_string, std::vector<double>& arg_vector ){
    }
 
    // check vector has been input correctly (no missing coordinates)
-   for ( int i = 0; i < 6; i++){
-      if ( arg_vector.size() == 0){
-         std::cerr << "Error - argument should be in the format xmin,xmax,ymin,ymax,zmin,zmax with no spaces." << std::endl;
-      }
+   if ( vector_index != (number_of_param-1)){
+      std::cerr << "Error - 6 comma separated values require for slice or slice-void, 3 for slice-sphere." << std::endl;
    }
 
    return EXIT_SUCCESS;

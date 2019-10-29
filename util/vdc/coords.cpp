@@ -28,7 +28,7 @@ namespace vdc{
 // forward function declarations
 void read_coord_metadata();
 void read_coord_data();
-void calculate_system_extent(std::vector<int>& atom_list, std::vector<int>& nm_atom_list);
+void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& non_magnetic_list);
 void slice_system();
 
 //------------------------------------------------------------------------------
@@ -291,14 +291,14 @@ void read_coord_data(){
 //------------------------------------------------------------------------------
 // calculate system extent and centre
 //------------------------------------------------------------------------------
-void calculate_system_extent(std::vector<int>& atom_list, std::vector<int>& nm_atoms_list){
+void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& non_magnetic_list){
 
    double min[3] = {1e20, 1e20, 1e20};
    double max[3] = {0.0, 0.0, 0.0};
    double ave[3] = {0.0, 0.0, 0.0};
 
    // loop through all magnetic atoms
-   for( auto &atom : atoms_list ){
+   for( auto &atom : magnetic_list ){
 
       // temporary variables
       double x = vdc::coordinates[3*atom + 0];
@@ -321,7 +321,7 @@ void calculate_system_extent(std::vector<int>& atom_list, std::vector<int>& nm_a
    }
 
    // loop through all non-magnetic atoms
-   for( auto &atom : nm_atoms_list ){
+   for( auto &atom : non_magnetic_list ){
 
       // temporary variables
       double x = vdc::nm_coordinates[3*atom + 0];
@@ -349,12 +349,26 @@ void calculate_system_extent(std::vector<int>& atom_list, std::vector<int>& nm_a
    vdc::system_size[2] = max[2] - min[2];
 
    // number of atoms
-   unsigned int n = atom_list.size() + nm_atoms_list.size();
+   unsigned int n = magnetic_list.size() + non_magnetic_list.size();
+   std::cout << magnetic_list.size() << " " << non_magnetic_list.size() << std::endl;
 
    // save system centre
    vdc::system_centre[0] = ave[0]/double(n);
    vdc::system_centre[1] = ave[1]/double(n);
    vdc::system_centre[2] = ave[2]/double(n);
+
+   // std::cout << "System Dimensions:" << std::endl;
+   // std::cout << system_size[0] << " " << system_size[1] << " " << system_size[2] << std::endl;
+   // std::cout << "System Centre:" << std::endl;
+   // std::cout << system_centre[0] << " " << system_centre[1] << " " << system_centre[2] << std::endl;
+   //
+   // std::cout << "Slice Parameter:" << std::endl;
+   // std::cout << slice_parameters[0] << " " << slice_parameters[1]
+   //           << " " << slice_parameters[2] << " " << slice_parameters[3]
+   //           << " " << slice_parameters[4] << " " << slice_parameters[5] << std::endl;
+   // std::cout << "xmin= " << xmin << "\txmax= " << xmax << std::endl;
+   // std::cout << "ymin= " << ymin << "\tymax= " << ymax << std::endl;
+   // std::cout << "zmin= " << zmin << "\tzmax= " << zmax << std::endl;
 
    return;
 }
@@ -366,29 +380,17 @@ void slice_system(){
    double xmin, xmax, x;
    double ymin, ymax, y;
    double zmin, zmax, z;
+   double tol = 0.000000001;
 
-   std::cout << "System Dimensions:" << std::endl;
-   std::cout << system_size[0] << " " << system_size[1] << " " << system_size[2] << std::endl;
-   std::cout << "System Centre:" << std::endl;
-   std::cout << system_centre[0] << " " << system_centre[1] << " " << system_centre[2] << std::endl;
+   // work out _min, _max real values from fractional coordinates in
+   // slice_parameters. Also add a tolerance for double comparisons
+   xmin = (slice_parameters[0]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0]-tol;
+   ymin = (slice_parameters[2]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1]-tol;
+   zmin = (slice_parameters[4]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]-tol;
 
-   // work out _min, _max real values from fractional
-   // coordinates in slice_parameters
-   xmin = (slice_parameters[0]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0];
-   ymin = (slice_parameters[2]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1];
-   zmin = (slice_parameters[4]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
-
-   xmax = (slice_parameters[1]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0];
-   ymax = (slice_parameters[3]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1];
-   zmax = (slice_parameters[5]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
-
-   std::cout << "Slice Parameter:" << std::endl;
-   std::cout << slice_parameters[0] << " " << slice_parameters[1]
-             << " " << slice_parameters[2] << " " << slice_parameters[3]
-             << " " << slice_parameters[4] << " " << slice_parameters[5] << std::endl;
-   std::cout << "xmin= " << xmin << "\txmax= " << xmax << std::endl;
-   std::cout << "ymin= " << ymin << "\tymax= " << ymax << std::endl;
-   std::cout << "zmin= " << zmin << "\tzmax= " << zmax << std::endl;
+   xmax = (slice_parameters[1]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0]+tol;
+   ymax = (slice_parameters[3]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1]+tol;
+   zmax = (slice_parameters[5]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]+tol;
 
    // No slice defined, all atoms are included
    if (vdc::slice_type == "no-slice"){
@@ -445,32 +447,10 @@ void slice_system(){
          z = vdc::coordinates[3*atom + 2];
 
          // choose only atoms within boundaries
-         if ( (x <= xmin) || (x >= xmax) ){
-            vdc::sliced_atoms_list.push_back(atom);
-         }
-         if ( ((y <= ymin) || (y >= ymax)) && (vdc::sliced_atoms_list.back() != atom)){
-            vdc::sliced_atoms_list.push_back(atom);
-         }
-         if ( ((z <= zmin) || (z >= zmax)) && (vdc::sliced_atoms_list.back() != atom)){
+         if (! (((x >= xmin) && (x <= xmax)) && ((y >= ymin) && (y <= ymax)) && ((z >= zmin) && (z <= zmax))) ){
             vdc::sliced_atoms_list.push_back(atom);
          }
 
-         // double start = 0;
-         // std::vector<int> temp_vector;
-         // for ( auto &atom : vdc::sliced_atoms_list ){
-         //    for (int j = start; j < atom; j++){
-         //       temp_vector.push_back(j);
-         //    }
-         //    start = atom+1;
-         // }
-         // for (unsigned int j = start; j < vdc::num_atoms; j++){
-         //    temp_vector.push_back(j);
-         // }
-         //
-         // vdc::sliced_atoms_list.resize(temp_vector.size());
-         // for ( unsigned int i = 0; i < temp_vector.size(); i++ ){
-         //    vdc::sliced_atoms_list[i] = temp_vector[i];
-         // }
       }
       for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
 
@@ -479,57 +459,24 @@ void slice_system(){
          z = vdc::nm_coordinates[3*atom + 2];
 
          // choose only atoms within boundaries
-         if ( (x <= xmin) || (x >= xmax) ){
+         if (! (((x >= xmin) && (x <= xmax)) && ((y >= ymin) && (y <= ymax)) && ((z >= zmin) && (z <= zmax))) ){
             vdc::sliced_nm_atoms_list.push_back(atom);
          }
-         if ( ((y <= ymin) || (y >= ymax)) && (vdc::sliced_atoms_list.back() != atom)){
-            vdc::sliced_nm_atoms_list.push_back(atom);
-         }
-         if ( ((z <= zmin) || (z >= zmax)) && (vdc::sliced_atoms_list.back() != atom)){
-            vdc::sliced_nm_atoms_list.push_back(atom);
-         }
-
-         // // choose only atoms within boundaries
-         // if ( (x >= xmin) && (x <= xmax) ){
-         //    if ( (y >= ymin) && (y <= ymax) ){
-         //       if ( (z >= zmin) && (z <= zmax) ){
-         //          vdc::sliced_nm_atoms_list.push_back(atom);
-         //       }
-         //    }
-         // }
-
-         // double start = 0;
-         // std::vector<int> temp_vector;
-         // for ( auto &atom : vdc::sliced_nm_atoms_list ){
-         //    for (int j = start; j < atom; j++){
-         //       temp_vector.push_back(j);
-         //    }
-         //    start = atom+1;
-         // }
-         // for (unsigned int j = start; j < vdc::num_nm_atoms; j++){
-         //    temp_vector.push_back(j);
-         // }
-         //
-         // vdc::sliced_nm_atoms_list.resize(temp_vector.size());
-         // for ( unsigned int i = 0; i < temp_vector.size(); i++ ){
-         //    vdc::sliced_nm_atoms_list[i] = temp_vector[i];
-         // }
-
-         // // choose only atoms within boundaries
-         // if ( (x <= xmin) || (x >= xmax) || (y <= ymin) || (y >= ymax) || (z <= zmin) || (z >= zmax) ){
-         //    //if ( (y <= ymin) || (y >= ymax) ){
-         //    //   if ( (z <= zmin) || (z >= zmax) ){
-         //    vdc::sliced_nm_atoms_list.push_back(atom);
-         //    //   }
-         //    //}
-         // }
       }
    }
 
-   // Sphere with the diameter of the smallest grain size
+   // Remove ellipsoid from centre of particle with diameters determined by
+   // slice_parameters
+   // Equation of ellipse in 3D
+   // (x-x1)^2/a^2 + (y-y1)^2/b^2 + (z-z1)^2/c^2 = 1
+   // (x1,y1,z1) is the centre and a,b,c are the axis radii
    else if (vdc::slice_type == "slice-sphere"){
-      // find smallest system_size
-      double radius = std::min(std::min(system_size[0],system_size[1]),system_size[2])/2.0;
+      double a, b, c;
+
+      // work out radii of the ellipse
+      a = vdc::system_size[0]*vdc::slice_parameters[0]/2.0;
+      b = vdc::system_size[1]*vdc::slice_parameters[1]/2.0;
+      c = vdc::system_size[2]*vdc::slice_parameters[2]/2.0;
 
       // chose only atoms within sphere at the centre of the system
       for (unsigned int atom = 0; atom < vdc::num_atoms; atom++){
@@ -540,11 +487,11 @@ void slice_system(){
 
          double temp = 0;
 
-         temp += (x - system_centre[0])*(x - system_centre[0]);
-         temp += (y - system_centre[1])*(y - system_centre[1]);
-         temp += (z - system_centre[2])*(z - system_centre[2]);
+         temp += (x - system_centre[0])*(x - system_centre[0])/(a*a);
+         temp += (y - system_centre[1])*(y - system_centre[1])/(b*b);
+         temp += (z - system_centre[2])*(z - system_centre[2])/(c*c);
 
-         if ( temp <= (radius*radius) ){
+         if ( temp >= 1.0 ){
             vdc::sliced_atoms_list.push_back(atom);
          }
       }
@@ -556,11 +503,11 @@ void slice_system(){
 
          double temp = 0;
 
-         temp += (x - system_centre[0])*(x - system_centre[0]);
-         temp += (y - system_centre[1])*(y - system_centre[1]);
-         temp += (z - system_centre[2])*(z - system_centre[2]);
+         temp += (x - system_centre[0])*(x - system_centre[0])/(a*a);
+         temp += (y - system_centre[1])*(y - system_centre[1])/(b*b);
+         temp += (z - system_centre[2])*(z - system_centre[2])/(c*c);
 
-         if ( temp <= (radius*radius) ){
+         if ( temp >= 1.0 ){
             vdc::sliced_nm_atoms_list.push_back(atom);
          }
       }
