@@ -39,11 +39,9 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
                                           std::vector <double>& m_spin_array, // atomic spin moment
                                           std::vector < bool >& magnetic){ // is magnetic
 
-   // initialise local cells to zero (distributed operation)
-   for(int cell_index = 0; cell_index < cells::num_local_cells; ++cell_index ) {
 
-      // get cell ID for global array
-      const int cell = cells::cell_id_array[cell_index];
+   // initialise local cells to zero
+   for(int cell = 0; cell < cells::num_cells; ++cell) {
 
       ha::mag_array_x[cell] = 0.0;
       ha::mag_array_y[cell] = 0.0;
