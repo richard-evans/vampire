@@ -560,7 +560,7 @@ namespace dipole{
          const double is = sizeof(int);
          const double ds = sizeof(double);
 
-         double mem_tot =  double(list_cpu_to_send_to.size())*is +
+         /*double mem_tot =  double(list_cpu_to_send_to.size())*is +
                            double(list_cells_to_send.size())*is +
                            double(list_cells_to_recv.size())*is +
                            double(mpi_send_atoms_cell.size())*is +
@@ -578,14 +578,12 @@ namespace dipole{
                            double(mpi_recv_atoms_pos_y.size())*ds +
                            double(mpi_recv_atoms_pos_z.size())*ds +
                            double(mpi_recv_atoms_mom.size())*ds +
-                           double(mpi_recv_cells_pos_mom.size())*ds;
+                           double(mpi_recv_cells_pos_mom.size())*ds;*/
 
-         double global_tot = 0.0;
-
-         MPI_Reduce(&mem_tot, &global_tot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-
-         std::cout << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB" << std::endl;
-         zlog << zTs() << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB"<< std::endl;
+         //double global_tot = 0.0;
+         //MPI_Reduce(&mem_tot, &global_tot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         //std::cout << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB" << std::endl;
+         //zlog << zTs() << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB"<< std::endl;
 
          // Free memory
          list_cpu_to_send_to.clear();
@@ -608,17 +606,11 @@ namespace dipole{
          mpi_recv_atoms_mom.clear();
          mpi_recv_cells_pos_mom.clear();
 
-
-
-
          // stop timer
          timer.stop();
 
-          std::cout  << "Time required for dipole initialisation: " << timer.elapsed_time() << " s." << std::endl;
-          zlog << zTs() <<"Time required for dipole initialisation: " << timer.elapsed_time() << " s." << std::endl;
-
-
          return EXIT_SUCCESS;
+
       }
 
       /*------------------------------------------------*/
