@@ -56,7 +56,7 @@ void process_coordinates(){
    // Calculate systenm dimensions after slicing
    vdc::calculate_system_extent(vdc::sliced_atoms_list,vdc::sliced_nm_atoms_list);
 
-   // output xyz file
+   // output xyz file;
    if(vdc::xyz) output_xyz_file();
 
    return;
@@ -274,7 +274,6 @@ void read_coord_data(){
             ifile.close();
             break;
          }
-
       }
 
    }
@@ -282,7 +281,7 @@ void read_coord_data(){
    // create vector list of atom indices
    vdc::atoms_list.resize(vdc::num_atoms);
    for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
-      vdc::atoms_list[atom] = atom;
+      vdc::atoms_list.push_back(atom);
    }
 
    return;
@@ -350,7 +349,6 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
 
    // number of atoms
    unsigned int n = magnetic_list.size() + non_magnetic_list.size();
-   std::cout << magnetic_list.size() << " " << non_magnetic_list.size() << std::endl;
 
    // save system centre
    vdc::system_centre[0] = ave[0]/double(n);
@@ -512,11 +510,58 @@ void slice_system(){
          }
       }
    }
+   else if (vdc::slice_type == "slice-cylinder"){
+      // only show inner cylinder of particles
+      double a,b;
+
+      // work out radii of the ellipse
+      a = vdc::system_size[0]*vdc::slice_parameters[0]/2.0;
+      b = vdc::system_size[1]*vdc::slice_parameters[1]/2.0;
+      zmin = (slice_parameters[2]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]-tol;
+      zmax = (slice_parameters[3]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]+tol;
+
+      // chose only atoms within cylinder at the centre of the system
+      for (unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+
+         x = vdc::coordinates[3*atom + 0];
+         y = vdc::coordinates[3*atom + 1];
+         z = vdc::coordinates[3*atom + 2];
+
+         double temp = 0;
+
+         temp += (x - system_centre[0])*(x - system_centre[0])/(a*a);
+         temp += (y - system_centre[1])*(y - system_centre[1])/(b*b);
+
+         if ( (temp <= 1.0) && (z >= zmin) && (z <= zmax) ){
+            vdc::sliced_atoms_list.push_back(atom);
+         }
+      }
+   }
    else {
       std::cerr << "Error - unknown slice type, probably a mistake in command.cpp"
                 << std::endl;
 
       std::exit(EXIT_FAILURE);
+   }
+
+   if ( remove_materials.size() != 0 ){
+      std::vector<int> temp_list(0), temp_nm_list(0);
+      for( auto &atom : vdc::sliced_atoms_list ){
+         for ( auto &material : remove_materials ){
+            if ( vdc::type[atom] != (material-1) ){
+               temp_list.push_back(atom);
+            }
+         }
+      }
+      for( auto &atom : vdc::sliced_nm_atoms_list ){
+         for ( auto &material : remove_materials ){
+            if ( vdc::nm_type[atom] != (material-1) ){
+               temp_nm_list.push_back(atom);
+            }
+         }
+      }
+      vdc::sliced_atoms_list.swap(temp_list);
+      vdc::sliced_nm_atoms_list.swap(temp_nm_list);
    }
 
    // output informative message to user

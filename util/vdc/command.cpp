@@ -23,9 +23,10 @@ namespace vdc{
 
 // forward function declarations
 int extract_vector( std::string arg_string, std::vector<double>& arg_vector );
+int extract_materials( std::string arg_string, std::vector<int>& arg_vector);
 int extract_slice_param( std::string arg_string, std::vector<double>& arg_vector, int number_of_param);
 int check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output );
-void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x );
+void init_vector_y();
 
 //------------------------------------------------------------------------------
 // Command line parsing function
@@ -115,6 +116,17 @@ int command( int argc, char* argv[] ){
          }
       }
       //------------------------------------------------------------------------
+      // Check for user specified materials to remove
+      //------------------------------------------------------------------------
+      else if (sw == "--remove-material"){
+
+            // check number of args not exceeded
+            check_arg(arg, argc, argv, temp_str, "Error - expected at least one variable." );
+
+            // work through vector and extract values
+            extract_materials(temp_str, vdc::remove_materials);
+      }
+      //------------------------------------------------------------------------
       // Check for slice parameters
       //------------------------------------------------------------------------
       else if (sw == "--slice"){
@@ -149,6 +161,17 @@ int command( int argc, char* argv[] ){
 
          // set slice keyword
          vdc::slice_type = "slice-sphere";
+      }
+      else if (sw == "--slice-cylinder"){
+
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - expected 4 comma separated variables." );
+
+         // work through vector and extract values
+         extract_slice_param(temp_str, vdc::slice_parameters, 4);
+
+         // set slice keyword
+         vdc::slice_type = "slice-cylinder";
       }
       //------------------------------------------------------------------------
       // Check for colour mapping parameters
@@ -245,7 +268,7 @@ int command( int argc, char* argv[] ){
          vdc::vector_x = {0.0, 0.0, 1.0};
 
          // find vector_y
-         init_vector_y( vdc::vector_z, vdc::vector_x );
+         init_vector_y();
       }
       else {
          // find x-axis which lies on plane with normal vector_z
@@ -253,7 +276,7 @@ int command( int argc, char* argv[] ){
          vdc::vector_x = {1.0, 0.0, -1.0*vdc::vector_z[0]/vdc::vector_z[2]};
 
          // find vector_y
-         init_vector_y( vdc::vector_z, vdc::vector_x );
+         init_vector_y();
       }
    }
    else if ( !z_vector && x_vector ){
@@ -293,7 +316,7 @@ int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
    int vector_index = 0;
 
    // read coordinates
-   for ( int i = 0; i < arg_string.size(); i++){
+   for (unsigned int i = 0; i < arg_string.size(); i++){
       if ( arg_string[i] == ','){
          // check if a number has bean read (no leading comma)
          if ( tmp_string.size() == 0 ){
@@ -343,7 +366,7 @@ int extract_slice_param( std::string arg_string, std::vector<double>& arg_vector
       if ( arg_string[i] == ',' ){
          // check if a number has bean read (no leading comma)
          if ( tmp_string.size() == 0 ){
-            std::cerr << "Error - vector should be in the format x,y,z with no spaces." << std::endl;
+            std::cerr << "Error - leading comma." << std::endl;
             return EXIT_FAILURE;
          }
 
@@ -380,11 +403,43 @@ int extract_slice_param( std::string arg_string, std::vector<double>& arg_vector
 
    return EXIT_SUCCESS;
 }
+//------------------------------------------------------------------------------
+// Extracts materials to be remove from the visualised system
+//------------------------------------------------------------------------------
+int extract_materials( std::string arg_string, std::vector<int>& arg_vector){
+   std::string tmp_string = "";
 
+   // read materials
+   for (unsigned int i = 0; i < arg_string.size(); i++){
+      if ( arg_string[i] == ',' ){
+         // check if a number has bean read (no leading comma)
+         if ( tmp_string.size() == 0 ){
+            std::cerr << "Error - leading comma" << std::endl;
+            return EXIT_FAILURE;
+         }
+
+         // save material and move onto next one
+         arg_vector.push_back(std::stod(tmp_string));
+         tmp_string = "";
+      }
+      else if ( i == (arg_string.size()-1) ){
+         // reached end of character, read final material
+         tmp_string.push_back(arg_string[i]);
+         arg_vector.push_back(std::stod(tmp_string));
+
+      }
+      else {
+         // push back the digit
+         tmp_string.push_back(arg_string[i]);
+      }
+   }
+
+   return EXIT_SUCCESS;
+}
 //------------------------------------------------------------------------------
 // Perform cross product of input vectors vector_x and vector_z to get vector_y
 //------------------------------------------------------------------------------
-void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x ){
+void init_vector_y(){
 
    vdc::vector_y[0] = vdc::vector_z[1]*vdc::vector_x[2] - vdc::vector_x[1]*vdc::vector_z[2];
    vdc::vector_y[1] = vdc::vector_x[0]*vdc::vector_z[2] - vdc::vector_z[0]*vdc::vector_x[2];

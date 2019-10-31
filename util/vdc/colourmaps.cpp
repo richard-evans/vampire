@@ -287,7 +287,7 @@ int colourwheel( std::vector<std::vector<double>>& colourmap ){
       // Good cyclic map with four distinct colours allowing
       // four orientations or phase angles to be visualised.
       // cyclic_mygbm_30-95_c78_n256
-      colourmap[0] = {0.937688,0.333524,0.948091};
+      colourmap[0] = {0.937688,0.333524,0.948091}; // magenta
       colourmap[1] = {0.943832,0.342828,0.942393};
       colourmap[2] = {0.949390,0.352750,0.936128};
       colourmap[3] = {0.954392,0.363232,0.929311};
@@ -351,7 +351,7 @@ int colourwheel( std::vector<std::vector<double>>& colourmap ){
       colourmap[61] = {0.962437,0.922845,0.254315};
       colourmap[62] = {0.956863,0.926719,0.238952};
       colourmap[63] = {0.950639,0.929902,0.223876};
-      colourmap[64] = {0.943771,0.932362,0.209203};
+      colourmap[64] = {0.943771,0.932362,0.209203}; // yellow
       colourmap[65] = {0.936285,0.934099,0.195058};
       colourmap[66] = {0.928203,0.935119,0.181532};
       colourmap[67] = {0.919585,0.935443,0.168836};
@@ -415,7 +415,7 @@ int colourwheel( std::vector<std::vector<double>>& colourmap ){
       colourmap[125] = {0.210918,0.694751,0.118989};
       colourmap[126] = {0.203999,0.689009,0.131291};
       colourmap[127] = {0.198943,0.683096,0.144224};
-      colourmap[128] = {0.195928,0.677034,0.157682};
+      colourmap[128] = {0.195928,0.677034,0.157682}; // green
       colourmap[129] = {0.194864,0.670809,0.171614};
       colourmap[130] = {0.195597,0.664426,0.185943};
       colourmap[131] = {0.197953,0.657910,0.200497};
@@ -479,7 +479,7 @@ int colourwheel( std::vector<std::vector<double>>& colourmap ){
       colourmap[189] = {0.155365,0.161400,0.899600};
       colourmap[190] = {0.162302,0.151032,0.906369};
       colourmap[191] = {0.170751,0.141359,0.912696};
-      colourmap[192] = {0.180618,0.132437,0.918560};
+      colourmap[192] = {0.180618,0.132437,0.918560}; // blue
       colourmap[193] = {0.191735,0.124462,0.923961};
       colourmap[194] = {0.203887,0.117652,0.928885};
       colourmap[195] = {0.216808,0.112135,0.933354};

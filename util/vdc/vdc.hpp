@@ -59,6 +59,7 @@ namespace vdc{
 
    // slice parameters for cutting the original system
    extern std::vector<double> slice_parameters;
+   extern std::vector<int> remove_materials;
    extern std::vector<int> atoms_list;
    extern std::vector<int> nm_atoms_list;
    extern std::vector<int> sliced_atoms_list;

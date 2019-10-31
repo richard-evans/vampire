@@ -71,10 +71,10 @@ namespace vdc{
 
       vdc::cell_coords.resize(3*total_cells, 0.0);
       vdc::cell_magnetization.resize(total_cells);
-      for(int i = 0; i < vdc::total_cells; i++){
+      for(unsigned int i = 0; i < vdc::total_cells; i++){
          vdc::cell_magnetization[i].resize(tmid);
          // stored as mx, my, mz, |m| sets
-         for(int j=0; j< tmid; j++) vdc::cell_magnetization[i][j].resize(4,0.0); // initialise cell magnetization to zero
+         for(unsigned int j=0; j< tmid; j++) vdc::cell_magnetization[i][j].resize(4,0.0); // initialise cell magnetization to zero
       }
 
       // allocate cell memory in 3D and store 1D cell id
@@ -82,12 +82,12 @@ namespace vdc{
       std::vector<std::vector<std::vector<int> > > supercell_array;
 
       supercell_array.resize(num_cells[0]);
-      for(int i=0;i<num_cells[0];++i){
+      for(unsigned int i=0;i<num_cells[0];++i){
          supercell_array[i].resize(num_cells[1]);
          for(int j=0;j<num_cells[1];++j){
             supercell_array[i][j].resize(num_cells[2]);
             // store cell coordinates
-            for(int k=0; k<num_cells[2]; ++k){
+            for(unsigned int k=0; k<num_cells[2]; ++k){
 
                // associate cell with position i,j,k
                supercell_array[i][j][k]=cell;
@@ -141,8 +141,8 @@ namespace vdc{
       const unsigned int tmid = 1+vdc::materials.size();
 
       // initialise magnetization to zero
-      for(int cell = 0; cell < vdc::total_cells; cell++){
-         for(int m = 0; m < tmid; m++){
+      for(unsigned int cell = 0; cell < vdc::total_cells; cell++){
+         for(unsigned int m = 0; m < tmid; m++){
             for(int e = 0; e < 4; e++){
                vdc::cell_magnetization[cell][m][e] = 0.0;
             }
@@ -175,8 +175,8 @@ namespace vdc{
       }
 
       // normalise magnetizations
-      for(int cell = 0; cell < vdc::total_cells; cell++){
-         for(int m = 0; m < tmid; m++){
+      for(unsigned int cell = 0; cell < vdc::total_cells; cell++){
+         for(unsigned int m = 0; m < tmid; m++){
             const double mx = vdc::cell_magnetization[cell][m][0];
             const double my = vdc::cell_magnetization[cell][m][1];
             const double mz = vdc::cell_magnetization[cell][m][2];
@@ -212,9 +212,9 @@ namespace vdc{
 
       ofile.open(cell_file_name.c_str());
 
-      for(int cell = 0; cell < total_cells; cell++){
+      for( unsigned int cell = 0; cell < total_cells; cell++){
          ofile << vdc::cell_coords[3*cell + 0] << "\t" << vdc::cell_coords[3*cell + 1] << "\t" << vdc::cell_coords[3*cell + 2] << "\t";
-         for(int m = 0; m < tmid; m++){
+         for( unsigned int m = 0; m < tmid; m++){
             ofile << vdc::cell_magnetization[cell][m][0] << "\t" << vdc::cell_magnetization[cell][m][1] << "\t" << vdc::cell_magnetization[cell][m][2] << "\t" << vdc::cell_magnetization[cell][m][3] << "\t";
          }
          ofile << "\n";
