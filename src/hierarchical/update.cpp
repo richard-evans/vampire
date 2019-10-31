@@ -80,9 +80,9 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       for(int j = start; j<end;j++){
         int cell_j = ha::interaction_list[j];
 
-        const double mx = ha::mag_array_x[cell_j]*imuB;
-        const double my = ha::mag_array_y[cell_j]*imuB;
-        const double mz = ha::mag_array_z[cell_j]*imuB;
+        const double mx = ha::mag_array_x[cell_j]; //*imuB;
+        const double my = ha::mag_array_y[cell_j]; //*imuB;
+        const double mz = ha::mag_array_z[cell_j]; //*imuB;
       //if (cell_i == 0)std::cout<< cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
         dipole::cells_field_array_x[cell_i]      +=(mx*ha::rij_tensor_xx[j] + my*ha::rij_tensor_xy[j] + mz*ha::rij_tensor_xz[j]);
         dipole::cells_field_array_y[cell_i]      +=(mx*ha::rij_tensor_xy[j] + my*ha::rij_tensor_yy[j] + mz*ha::rij_tensor_yz[j]);
