@@ -309,6 +309,10 @@ namespace dipole{
        //-----------------------------------------------------------------
        void output_atomistic_dipole_fields();
 
+       //-----------------------------------------------------------------
+       // Function to output solver memory information
+       //-----------------------------------------------------------------
+       void output_dipole_solver_mem_info(int num_cells, int num_local_cells);
 
    } // end of internal namespace
 

@@ -9,6 +9,7 @@ data.o \
 energy.o \
 field.o \
 fft_update.o \
+info.o \
 initialize.o \
 interface.o \
 inter.o \
