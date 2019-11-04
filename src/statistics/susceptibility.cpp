@@ -133,7 +133,7 @@ void susceptibility_statistic_t::reset_averages(){
 //------------------------------------------------------------------------------------------------------
 // Function to output mean susceptibility values as string
 //------------------------------------------------------------------------------------------------------
-std::string susceptibility_statistic_t::output_mean_susceptibility(const double temperature){
+std::string susceptibility_statistic_t::output_mean_susceptibility(const double temperature,bool header){
 
    // result string stream
    std::ostringstream result;
@@ -143,7 +143,7 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
       result.precision(vout::precision);
       if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
    }
-
+   if(!header){
    // determine inverse temperature mu_B/(kB T) (flushing to zero for very low temperatures)
    const double itemp = temperature < 1.e-300 ? 0.0 : 9.274e-24/(1.3806503e-23*temperature);
 
@@ -163,7 +163,11 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
       result << sus_x << "\t" << sus_y << "\t" << sus_z << "\t" << sus_m << "\t";
 
    }
-
+   }else{
+       for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
+          result << "ID"<<id<<"_sus_x" << "\t"<< "ID"<<id<<"_sus_y" << "\t"<< "ID"<<id<<"_sus_z" << "\t"<< "ID"<<id<<"_sus_m" << "\t";
+       }
+   }
    return result.str();
 
 }

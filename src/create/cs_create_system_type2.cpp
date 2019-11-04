@@ -30,6 +30,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
@@ -45,6 +46,7 @@
 #include "unitcell.hpp"
 #include "vio.hpp"
 #include "vmath.hpp"
+#include "vmpi.hpp"
 
 // Internal create header
 #include "internal.hpp"
@@ -109,37 +111,66 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 		default:{
 			std::cerr << "Unknown system type requested, exiting" << std::endl;
 			err::vexit();
-			}
 		}
+	}
 
-      // Check for voronoi construction and apply before csg operations
-      if(create::internal::generate_voronoi_substructure) create::internal::voronoi_substructure(catom_array);
+   // Check for voronoi construction and apply before csg operations
+   if(create::internal::generate_voronoi_substructure) create::internal::voronoi_substructure(catom_array);
 
-		// call fill function to fill in void
-		fill(catom_array);
+	// call fill function to fill in void
+	fill(catom_array);
 
-		// call geometry function
-		geometry(catom_array);
+	// call geometry function
+	geometry(catom_array);
 
-		// call intermixing function - must be before alloy function
-		intermixing(catom_array);
+	// call intermixing function - must be before alloy function
+	intermixing(catom_array);
 
-		// call surface roughness function
-		// Formally called here but now moved to crystal structure generation
-		//roughness(catom_array);
+	// call surface roughness function
+	// Formally called here but now moved to crystal structure generation
+	//roughness(catom_array);
 
-		// call alloy function
-		create::internal::alloy(catom_array);
+	// call alloy function
+	create::internal::alloy(catom_array);
 
-		// call dilution function
-		dilute(catom_array);
+	// call dilution function
+	dilute(catom_array);
 
-		// Delete unneeded atoms
-		clear_atoms(catom_array);
+	// Delete unneeded atoms
+	clear_atoms(catom_array);
 
-		// Calculate final atomic composition
-		create::internal::calculate_atomic_composition(catom_array);
+	// Calculate final atomic composition
+	create::internal::calculate_atomic_composition(catom_array);
 
+   // For parallel check which processors have zero atoms
+   #ifdef MPICF
+      uint64_t num_atoms_check = 0;
+      // if a processor has zero atoms then flag as 1 (0 has more than zero atoms)
+      if(catom_array.size() == 0 ) num_atoms_check = 1;
+      // Check globally for no errors
+      MPI_Allreduce(MPI_IN_PLACE, &num_atoms_check, 1, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+      // If error, determine which ranks have no atoms
+      if( num_atoms_check > 0){
+         std::vector<uint64_t> no_atoms(vmpi::num_processors, 0);
+         if(catom_array.size() == 0 ) no_atoms[vmpi::my_rank] = 1;
+         MPI_Allreduce( MPI_IN_PLACE , &no_atoms[0], vmpi::num_processors, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+         // generate error message
+         std::stringstream message_stream;
+         if(vmpi::my_rank == 0){
+            message_stream << "Error! the following processes have zero atoms: ";
+            for(int p=0; p < vmpi::num_processors; p++){
+               if(no_atoms[p] == 1) message_stream << p << " ";
+            }
+            message_stream << ". All parallel processes must contain atoms - change system dimensions or add fill material!";
+         }
+         // Output error message to screen
+         terminaltextcolor(RED);
+            std::cout << "Error, no atoms generated on some processors for requested system shape - change system dimensions or add fill material!" << std::endl;
+         terminaltextcolor(WHITE);
+         // Exit without abort and nice error message
+         err::v_parallel_all_exit(message_stream.str());
+      }
+   #else
 		// Check for zero atoms generated
 		if(catom_array.size()==0){
 			terminaltextcolor(RED);
@@ -147,6 +178,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 			terminaltextcolor(WHITE);
 			err::vexit();
 		}
+   #endif
 
 	return 0;
 }
@@ -793,9 +825,13 @@ void fill(std::vector<cs::catom_t> & catom_array){
    // check calling of routine if error checking is activated
    if(err::check==true){std::cout << "cs::fill has been called" << std::endl;}
 
-   //loop over all potential intermixing materials
+   //loop over all potential fill materials
    for(int mat=0;mat<mp::num_materials;mat++){
+
+      // If material is fill material
       if(mp::material[mat].fill){
+
+         // Calculate min/max heights for fill material (for a partial fill)
          double min = create::internal::mp[mat].min*cs::system_dimensions[2];
          double max = create::internal::mp[mat].max*cs::system_dimensions[2];
 
@@ -808,7 +844,9 @@ void fill(std::vector<cs::catom_t> & catom_array){
                catom_array[atom].include=true;
             }
          }
+
       }
+
    }
 
    return;
