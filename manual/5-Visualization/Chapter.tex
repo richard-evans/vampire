@@ -60,12 +60,20 @@ To produce pictures of your material of punishable quality and high configurabil
 \textit{povray spins.pov}
 \end{minipage}\\
 
-Depending on the parameters included in the input file, several snapshots of the system may be produced and using the above command will render images for each snapshot. To select specific snapshots or ranges, you need to add the following flags:
+Depending on the parameters included in the input file, several snapshots of the system may be produced and using the above command will render images for each snapshot. For large systems with many snapshots, it is possible to select a range of snapshots for vdc to process.
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{+KFF<N> (initial frame number)\\
-+KFI<N> (final frame number)}
+\textit{--frame-start [initial frame number]\\
+--frame-final [final frame number]}
+\end{minipage}\\
+
+This will produce POV-Ray input files for the chosen frames. In addition to this, when running povray it is also possible to select specific snapshots or ranges to render using the following flags:
+
+\begin{minipage}[c]{\textwidth}
+\centering
+\textit{+KFF<N> [initial frame number]\\
++KFI<N> [final frame number]}
 \end{minipage}\\
 
 For example, to render frame 9 only, you could use:
@@ -183,7 +191,7 @@ It may be beneficial to use only smaller portions of your full system when gener
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{--slice [xmin,xmax,ymin,ymax,zmin,zmax]}
+\textit{-{}-slice [xmin,xmax,ymin,ymax,zmin,zmax]}
 \end{minipage}\\
 
 The first slice type defines minimum and maximum values for each axis. Only atoms and spins inside these borders are included in the visualisation. The parameters passed to this argument are interpreted as fractional coordinates, hence a minimum of "0.0" and maximum "1.0" will include all atoms and spins. \\
@@ -194,7 +202,7 @@ By using this parameter, it is possible to halve a nanoparticle to see how spins
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{--slice-void [xmin,xmax,ymin,ymax,zmin,zmax]}
+\textit{-{}-slice-void [xmin,xmax,ymin,ymax,zmin,zmax]}
 \end{minipage}\\
 
 Similar to "--slice", this parameter will \textit{remove} all atoms and spins inside the given borders. This can be used to create cubic hollow systems where only surface atoms are shown, possibly removing a very high percantage of atoms in the system, which can greatly reduce rendering time for both POV-Ray and Rasmol. \\
@@ -203,7 +211,7 @@ Similar to "--slice", this parameter will \textit{remove} all atoms and spins in
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{--slice-sphere [xfrac,yfrac,zfrac]}
+\textit{-{}-slice-sphere [xfrac,yfrac,zfrac]}
 \end{minipage}\\
 
 The sphere slice is also used to remove the atoms and spins at the centre of a system. This particular parameter lends itself well to spherical systems as it removes a spherical section of atoms. Three parameters are required, instead of six. Each one defines a region, centred on the centre of the original system, along the respective axis, equal to a fraction of the system size along that axis. As these parameters are not necessarily equal to each other, this can be used to create an ellipse of missing atoms at the centre of the system.
@@ -212,7 +220,7 @@ The sphere slice is also used to remove the atoms and spins at the centre of a s
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{--slice-cylinder [xfrac,yfrac,zmin,zmax]}
+\textit{-{}-slice-cylinder [xfrac,yfrac,zmin,zmax]}
 \end{minipage}\\
 
 Cylindrical systems are often surrounded by non-magnetic materials for parallelisation purposes. This slice parameter can be used to remove all atoms outside a cylindracal section by defining the x- and y-fractional sizes as well as a fractional minimum and maximum along the z-axis.
