@@ -77,10 +77,10 @@ For example, to render frame 9 only, you could use:
 
 Where the "-W" and "-H" flags define the width and heigh of the image (the resolution), and "+A" is used for antialiasing. \\
 
-\section{Customisation options}
+\section*{POV-Ray customisation options}
 The POV-Ray output from vdc can be customised in several ways by using command line flags when running vdc. There are several choices of possible colourmap configurations, the ones provided by default are made to be perceptually uniform and in some cases take account of colourblindness. Information on the colourmaps, the importance of perceptually uniform maps and how to adapt and use different maps can be found from "Peter Kovesi. Good Colour Maps: How to Design Them. arXiv:1509.03700 [cs.GR] 2015". \\
 
-\subsection{Colourmaps}
+\subsection*{Colourmaps}
 
 \begin{minipage}[c]{\textwidth}
 \centering
@@ -89,16 +89,16 @@ The POV-Ray output from vdc can be customised in several ways by using command l
 
 \begin{figure*}[!h]
 \center
-\includegraphics[width=4cm]{figures/CBWR_colourmap.png}
+\includegraphics[width=4cm]{figures/CBWR_colourmap.jpg}
 %\caption{}
 \label{fig:CBWR_colourmap}
 \end{figure*}
 
-By default, a 1D colourmap is used. Aligned along the z-axis, spins in the \{0,0,1\} direction are red, while spins antiparallel to this \{0,0,-1\} are blue. Between these values, the colour transitions to white around the x-y plane. This corresponds to the "CBWR" colourmap, a cyclic blue-white-red map, which lends itself well to 1D or 2D spin sytems where there are two principle spin directions, such as antiferromagnets and ferrimagnets. Some care must be taken to align the principle spin directions with the z-axis, as this is the axis along which colour is applied. This can also be changed using the "-{}-vector-z" command line argument.   \\
+By default, a 1D colourmap is used. Aligned along the z-axis, spins in the \{0,0,1\} direction are red, while spins antiparallel to this \{0,0,-1\} are blue. Between these values, the colour transitions to white around the xy-plane. This corresponds to the "CBWR" colourmap, a cyclic blue-white-red map, which lends itself well to 1D or 2D spin sytems where there are two principle spin directions, such as antiferromagnets and ferrimagnets. Some care must be taken to align the principle spin directions with the z-axis, as this is the axis along which colour is applied. This can also be changed using the "-{}-vector-z" command line argument.   \\
 
 \begin{figure*}[!h]
 \center
-\includegraphics[width=4cm]{figures/C2_colourmap.png}
+\includegraphics[width=4cm]{figures/C2_colourmap.jpg}
 %\caption{}
 \label{fig:C2_colourmap}
 \end{figure*}
@@ -107,30 +107,32 @@ The "C2" coloumap is also cyclic and useful for 3D magnetic systems such as vort
 
 \begin{figure*}[!h]
 \center
-\includegraphics[width=7cm]{figures/BWR_colourmap.png}
+\includegraphics[width=7cm]{figures/BWR_colourmap.jpg}
 %\caption{}
-\label{fig:C2_colourmap}
+\label{fig:BWR_colourmap}
 \end{figure*}
 
-The BWR colourmap is very similar in properties to the CBWR map however it is not cyclic. This mean that spins along the positive z-axis will be red with a small positive y-component and blue with a small negative y-component. There will be an immediate flip from bright red to blue as this transition occurs. This can be used to emphasise the transition between spin directions. The transition point can be changed by using the "-{}-vector-z" command line argument. \\
+The "BWR" colourmap is very similar in properties to the CBWR map however it is not cyclic. This mean that spins along the positive z-axis will be red with a small positive y-component and blue with a small negative y-component. There will be an immediate flip from bright red to blue as this transition occurs. This can be used to emphasise the transition between spin directions. The transition point can be changed by using the "-{}-vector-z" command line argument. \\
 
 \begin{figure*}[!h]
 \center
-\includegraphics[width=7cm]{figures/Rainbow_colourmap.png}
+\includegraphics[width=7cm]{figures/Rainbow_colourmap.jpg}
 %\caption{}
 \label{fig:Rainbow_colourmap}
 \end{figure*}
 
 The "Rainbow" colourmap can be used in 2D systems where spins are aligned in many different directions such as high temperature simulations. While it is still designed to be somewhat perceptually uniform, this is very difficult to do with rainbow palettes hence its use typically loses detail when compared to other maps, however it is also one of the most vibrant. \\
 
+\subsection*{Custom Colourmaps}
+
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{vdc spins.pov -{}-custom-colourmap file-name}
+\textit{-{}-custom-colourmap [file-name]}
 \end{minipage}\\
 
-\subsection{Custom Colourmaps}
+A user defined colourmap can also be used. To apply a different map, a file containing 256 colours in the RBG format must be provided in the same directory that vdc is run. RGB values must be space separated, with no other information such as line numbers. The beginning of an example colourmap is shown below. \\
 
-A user defined colourmap can also be used. To apply a different map, a file containing 256 colours in the RBG format must be provided in the same directory that vdc is run. RGB values must be space separated, with no other information such as line numbers. The beginning of an example colourmap is shown below. Pregenerated perceptually uniform colourmaps of various forms, including those included in vampire by default, can be found in "peterkovesi.com/projects/colourmaps/index.html" under the Download secion. \\
+Pregenerated perceptually uniform colourmaps of various forms, including those included in vampire by default, can be found in "peterkovesi.com/projects/colourmaps/index.html" under the Download secion. \\
 
 \subsection*{custom\_colourmap\_file}
 {\footnotesize
@@ -149,30 +151,71 @@ A user defined colourmap can also be used. To apply a different map, a file cont
 \end{verbatim}
 }
 
-\subsection{3D Systems}
-
-POV-Ray images produced by vdc can have a 3D brightening effect applied by using the "-{}-3D" command line argument. When spins do not lie only in the yz-plane, their colour brightness is increased or reduced depending on their magnitude in the x-axis.
+\subsection*{3D Systems}
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{vdc spins.pov -{}-3D}
+\textit{-{}-3D}
 \end{minipage}\\
 
-\subsection{Defining axes}
+POV-Ray images produced by vdc can have a 3D brightening effect applied by using the "-{}-3D" command line argument. When spins do not lie only in the yz-plane, their colour brightness is increased or reduced depending on their magnitude in the x-axis. \\
+
+\subsection*{Defining axes}
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{vdc spins.pov -{}-vector-z \textbackslash\{x,y,z\textbackslash\}}
+\textit{-{}-vector-z x,y,z}
 \end{minipage}\\
 
-To define the axis, simply use the command "-{}-vector-z" followed by a direction vector. This does not need to be normalised, and can be used without defining the xy-plane, as explained below.\\
+The principle axis along which colour is applied is the z-axis. This determines where colours will occur depending on the colour map being used. By default the "CBWR" map is used; spins along the positive z-direction are red, those along the negative z-direction are blue, and spins aligned along the xy-plane are white.\\
 
-Similarly, another direction can be defined for the $0^{\circ}$ direction in the xy-plane. However, as the z-axis effect is not necessarily in the \{0,0,1\} direction, this parameter cannot be used alone and must be accompanied by the flag "-{}-vector-z".
+In many cases, the overall magnetic moment does not necessarily lie along the z-axis. To remedy this, a new "z-axis" may be defined. To redefine the z-axis, simply use the command "-{}-vector-z" followed by a direction vector. Note that this does not need to be normalised.\\
+
+For example, if the user defines "-{}-vector-z 1,1,1", spins along the \{1,1,1\} direction will be red, \{-1,-1,-1\} will be blue and those perpendicular to the given axis will be white.\\
+
+In some cases, the colourmap may not be symmetric along the default xy-plane, such as the "C2" colourmap. Here, spins along positive-y are magenta, while those antiparallel are green. This can be adjusted using a similar command line argument "-{}-vector-x", however this argument cannot be used without first defining "-{}-vector-z". \\
+
+\section*{Using Slices}
+
+It may be beneficial to use only smaller portions of your full system when generating POV-Ray or Rasmol images. This can help with large systems where rendering can become a time constraint, or systems made up of several elements which might be less relevant for the visualisation. There are several similar command line options which can be used to cut up the system in different ways:
+
+\subsection*{Slice}
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{vdc spins.pov -{}-vector-z \textbackslash\{x,y,z\textbackslash\} -{}-vector-x \textbackslash\{x,y,z\textbackslash\}}
+\textit{--slice [xmin,xmax,ymin,ymax,zmin,zmax]}
 \end{minipage}\\
+
+The first slice type defines minimum and maximum values for each axis. Only atoms and spins inside these borders are included in the visualisation. The parameters passed to this argument are interpreted as fractional coordinates, hence a minimum of "0.0" and maximum "1.0" will include all atoms and spins. \\
+
+By using this parameter, it is possible to halve a nanoparticle to see how spins at the centre of the system behave.\\
+
+\subsection*{Void slice}
+
+\begin{minipage}[c]{\textwidth}
+\centering
+\textit{--slice-void [xmin,xmax,ymin,ymax,zmin,zmax]}
+\end{minipage}\\
+
+Similar to "--slice", this parameter will \textit{remove} all atoms and spins inside the given borders. This can be used to create cubic hollow systems where only surface atoms are shown, possibly removing a very high percantage of atoms in the system, which can greatly reduce rendering time for both POV-Ray and Rasmol. \\
+
+\subsection*{Sphere slice}
+
+\begin{minipage}[c]{\textwidth}
+\centering
+\textit{--slice-sphere [xfrac,yfrac,zfrac]}
+\end{minipage}\\
+
+The sphere slice is also used to remove the atoms and spins at the centre of a system. This particular parameter lends itself well to spherical systems as it removes a spherical section of atoms. Three parameters are required, instead of six. Each one defines a region, centred on the centre of the original system, along the respective axis, equal to a fraction of the system size along that axis. As these parameters are not necessarily equal to each other, this can be used to create an ellipse of missing atoms at the centre of the system.
+
+\subsection*{Cylindrical Slice}
+
+\begin{minipage}[c]{\textwidth}
+\centering
+\textit{--slice-cylinder [xfrac,yfrac,zmin,zmax]}
+\end{minipage}\\
+
+Cylindrical systems are often surrounded by non-magnetic materials for parallelisation purposes. This slice parameter can be used to remove all atoms outside a cylindracal section by defining the x- and y-fractional sizes as well as a fractional minimum and maximum along the z-axis.
 
 \section*{Micromagnetic visualization with PovRAY}
 \addcontentsline{toc}{section}{Micromagnetic visualization with PovRAY}
