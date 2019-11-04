@@ -136,7 +136,7 @@ bool read_spin_metadata(unsigned int file_id){
 
    vdc::spin_filenames.resize(0);
 
-   for(int file = 0; file < num_spin_files; file++){
+   for(unsigned int file = 0; file < num_spin_files; file++){
       getline(smfile, line);
       line.erase(remove(line.begin(), line.end(), '\t'), line.end());
       line.erase(remove(line.begin(), line.end(), ' '), line.end());
@@ -205,7 +205,6 @@ void read_spin_data(unsigned int file_id){
                ss >> num_atoms_in_file; // interpret as uint64_t
             }
             double x,y,z;
-            int type_id, category_id;
             // loop over all atoms in file and load as x,y,z sets
             for(uint64_t idx = 0; idx < num_atoms_in_file; idx++){
                getline(ifile, line);

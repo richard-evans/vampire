@@ -38,7 +38,6 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    // variables
    double yz_angle, x_angle, hue, light, saturation;
    double sx2, sy2, sz2; // spin coordinates after change of axes
-   double sx1, sy1, sz1; ///
 
    // perform change of coordinates
    sx2 = vdc::vector_x[0]*sx + vdc::vector_x[1]*sy + vdc::vector_x[2]*sz;
@@ -155,7 +154,7 @@ void rgb2hsl( double& red, double& green, double& blue, double& hue, double& lig
 void rgb2hsi( double& red, double& green, double& blue, double& h2, double& intensity, double& saturation ){
 
    const double pi  = 3.14159265358979323846;
-   double alpha, beta, c2;
+   double alpha, beta;//, c2;
 
    // calculate hue (h2) and chroma (c2)
    alpha = 0.5*( 2.0*red - green - blue );
@@ -165,7 +164,7 @@ void rgb2hsi( double& red, double& green, double& blue, double& h2, double& inte
    h2 = std::fmod(h2 + 2*pi, 2*pi);
    h2 = h2*180.0/pi;
 
-   c2 = std::sqrt( alpha*alpha + beta*beta );
+   //c2 = std::sqrt( alpha*alpha + beta*beta );
 
    // calculate intensity
    intensity = ( red + green + blue )/3.0;

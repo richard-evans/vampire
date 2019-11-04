@@ -186,7 +186,7 @@ void output_povray_file(){
    }
 
    // Output material specific macros
-	for(int imat=0; imat < vdc::materials.size(); imat++){
+	for(unsigned int imat=0; imat < vdc::materials.size(); imat++){
       if(is_nm_mat[imat] == false){
    		pfile << "#declare sscale"<< imat << "=2.0;" << std::endl;
    		pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
