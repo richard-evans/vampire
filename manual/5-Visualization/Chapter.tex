@@ -60,20 +60,18 @@ To produce pictures of your material of punishable quality and high configurabil
 \textit{povray spins.pov}
 \end{minipage}\\
 
-Depending on the parameters included in the input file, several snapshots of the system may be produced and using the above command will render images for each snapshot. For large systems with many snapshots, it is possible to select a range of snapshots for vdc to process.
+Depending on the parameters included in the input file, several snapshots of the system may be produced and using the above command will render images for each snapshot. To reduce processing time when running vdc, it is possible to select a range of snapshots.
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{--frame-start [initial frame number]\\
---frame-final [final frame number]}
+\textit{vdc -{}-frame-start [initial frame number] -{}-frame-final [final frame number]}
 \end{minipage}\\
 
 This will produce POV-Ray input files for the chosen frames. In addition to this, when running povray it is also possible to select specific snapshots or ranges to render using the following flags:
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{+KFF<N> [initial frame number]\\
-+KFI<N> [final frame number]}
+\textit{povray +KFF[initial frame number] +KFI[final frame number]}
 \end{minipage}\\
 
 For example, to render frame 9 only, you could use:
@@ -92,7 +90,7 @@ The POV-Ray output from vdc can be customised in several ways by using command l
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-colourmap [CBWR - default/C2/BWR/Rainbow]}
+\textit{vdc -{}-colourmap [CBWR - default/C2/BWR/Rainbow]}
 \end{minipage}\\
 
 \begin{figure*}[!h]
@@ -135,7 +133,7 @@ The "Rainbow" colourmap can be used in 2D systems where spins are aligned in man
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-custom-colourmap [file-name]}
+\textit{vdc -{}-custom-colourmap [file-name]}
 \end{minipage}\\
 
 A user defined colourmap can also be used. To apply a different map, a file containing 256 colours in the RBG format must be provided in the same directory that vdc is run. RGB values must be space separated, with no other information such as line numbers. The beginning of an example colourmap is shown below. \\
@@ -163,7 +161,7 @@ Pregenerated perceptually uniform colourmaps of various forms, including those i
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-3D}
+\textit{vdc -{}-3D}
 \end{minipage}\\
 
 POV-Ray images produced by vdc can have a 3D brightening effect applied by using the "-{}-3D" command line argument. When spins do not lie only in the yz-plane, their colour brightness is increased or reduced depending on their magnitude in the x-axis. \\
@@ -172,7 +170,7 @@ POV-Ray images produced by vdc can have a 3D brightening effect applied by using
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-vector-z x,y,z}
+\textit{vdc -{}-vector-z x,y,z}
 \end{minipage}\\
 
 The principle axis along which colour is applied is the z-axis. This determines where colours will occur depending on the colour map being used. By default the "CBWR" map is used; spins along the positive z-direction are red, those along the negative z-direction are blue, and spins aligned along the xy-plane are white.\\
@@ -191,7 +189,7 @@ There are several command line options that can be used to change all visualisat
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-slice [xmin,xmax,ymin,ymax,zmin,zmax]}
+\textit{vdc -{}-slice [xmin,xmax,ymin,ymax,zmin,zmax]}
 \end{minipage}\\
 
 The first slice type defines minimum and maximum values for each axis. Only atoms and spins inside these borders are included in the visualisation. The parameters passed to this argument are interpreted as fractional coordinates, hence a minimum of "0.0" and maximum "1.0" will include all atoms and spins. \\
@@ -202,7 +200,7 @@ By using this parameter, it is possible to halve a nanoparticle to see how spins
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-slice-void [xmin,xmax,ymin,ymax,zmin,zmax]}
+\textit{vdc -{}-slice-void [xmin,xmax,ymin,ymax,zmin,zmax]}
 \end{minipage}\\
 
 Similar to "--slice", this parameter will \textit{remove} all atoms and spins inside the given borders. This can be used to create cubic hollow systems where only surface atoms are shown, possibly removing a very high percantage of atoms in the system, which can greatly reduce rendering time for both POV-Ray and Rasmol. \\
@@ -211,7 +209,7 @@ Similar to "--slice", this parameter will \textit{remove} all atoms and spins in
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-slice-sphere [xfrac,yfrac,zfrac]}
+\textit{vdc -{}-slice-sphere [xfrac,yfrac,zfrac]}
 \end{minipage}\\
 
 The sphere slice is also used to remove the atoms and spins at the centre of a system. This particular parameter lends itself well to spherical systems as it removes a spherical section of atoms. Three parameters are required, instead of six. Each one defines a region, centred on the centre of the original system, along the respective axis, equal to a fraction of the system size along that axis. As these parameters are not necessarily equal to each other, this can be used to create an ellipse of missing atoms at the centre of the system.
@@ -220,7 +218,7 @@ The sphere slice is also used to remove the atoms and spins at the centre of a s
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-slice-cylinder [xfrac,yfrac,zmin,zmax]}
+\textit{vdc -{}-slice-cylinder [xfrac,yfrac,zmin,zmax]}
 \end{minipage}\\
 
 Cylindrical systems are often surrounded by non-magnetic materials for parallelisation purposes. This slice parameter can be used to remove all atoms outside a cylindracal section by defining the x- and y-fractional sizes as well as a fractional minimum and maximum along the z-axis.
@@ -229,14 +227,14 @@ Cylindrical systems are often surrounded by non-magnetic materials for paralleli
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-remove-material [material1,material2,...]}
+\textit{vdc -{}-remove-material [material1,material2,...]}
 \end{minipage}\\
 
 In some cases whole materials are not relevant for visualisation purposes and can be altogether removed. To use this command line parameter a list of material indices need to be provided. For example, to remove materials 2 and 4:
 
 \begin{minipage}[c]{\textwidth}
 \centering
-\textit{-{}-remove-material 2,4}
+\textit{vdc -{}-remove-material 2,4}
 \end{minipage}\\
 
 \section*{Micromagnetic visualization with PovRAY}
