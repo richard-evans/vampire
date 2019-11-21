@@ -118,7 +118,7 @@ int command( int argc, char* argv[] ){
       //------------------------------------------------------------------------
       // Check for user specified materials to remove
       //------------------------------------------------------------------------
-      else if (sw == "--remove-material"){
+      else if (sw == "--remove-material" || sw == "--remove-materials"){
 
             // check number of args not exceeded
             check_arg(arg, argc, argv, temp_str, "Error - expected at least one variable." );
@@ -207,6 +207,9 @@ int command( int argc, char* argv[] ){
             vdc::colour_keyword = temp_str;
          }
          else if (temp_str == "BWR" ){
+            vdc::colour_keyword = temp_str;
+         }
+         else if (temp_str == "CBWR" ){
             vdc::colour_keyword = temp_str;
          }
          else if (temp_str == "Rainbow" ){
