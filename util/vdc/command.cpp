@@ -326,6 +326,7 @@ int extract_vector( std::string arg_string, std::vector<double>& arg_vector ){
 
          // save coordinate and move onto next one
          arg_vector[vector_index] = std::stod(tmp_string);
+         tmp_string = "";
          vector_index++;
       }
       else if ( i == (arg_string.size()-1) ){
