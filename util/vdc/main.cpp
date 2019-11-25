@@ -19,13 +19,14 @@
 int main(int argc, char* argv[]){
 
    // process command line arguments
-   //command(argc, argv);
-
-   if(vdc::verbose){
-      std::cout << "|------------------------------------------------------------|" << std::endl;
-      std::cout << "|              Vampire Data Converter for v5+                |" << std::endl;
-      std::cout << "|------------------------------------------------------------|" << std::endl;
+   int matchcheck = vdc::command(argc, argv);
+   if (matchcheck == EXIT_FAILURE){
+      return EXIT_FAILURE;
    }
+
+   std::cout << "|------------------------------------------------------------|" << std::endl;
+   std::cout << "|              Vampire Data Converter for v5+                |" << std::endl;
+   std::cout << "|------------------------------------------------------------|" << std::endl;
 
    // process coordinates
    vdc::process_coordinates();
@@ -33,6 +34,6 @@ int main(int argc, char* argv[]){
    // process spin files
    vdc::process_spins();
 
-   return 0;
+   return EXIT_SUCCESS;
 
 }

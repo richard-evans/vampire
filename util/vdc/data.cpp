@@ -18,15 +18,27 @@
 namespace vdc{
 
    // program option flags
-   bool verbose = true; // flag to specify verbosity of output to user
-   bool xyz = true; // flag to specify crystal.xyz file output
-   bool povray = true; // flag to specify povray file output
-   bool cells = false; // flag to specify cells output
+   bool verbose  = false; // flag to specify verbosity of output to user
+   bool xyz      = false; // flag to specify crystal.xyz file output
+   bool povray   = false; // flag to specify povray file output
+   bool cells    = false; // flag to specify cells output
+   bool vtk      = false; // flag to specify vtk output
+   bool txt      = false; // flag to specify plain text output
+   bool x_vector = false; // flag to specify direction of povray colouring
+   bool z_vector = false; // flag to specify plane for povray colouring
+
+   // keyword variables
+   std::string colour_keyword = "CBWR";
+   std::string custom_colourmap_file;
+   bool x_axis_colour = false;
+   std::string slice_type = "no-slice";
 
    format_t format;
 
    uint64_t num_atoms = 0;
 
+   unsigned int vdc_start_file_id = 0;
+   unsigned int vdc_final_file_id = 99999999;
    unsigned int start_file_id = 0;
    unsigned int final_file_id = 99999999;
 
@@ -41,6 +53,19 @@ namespace vdc{
 
    std::vector<double> coordinates(0);
    std::vector<double> spins(0);
+
+   // slice parameters for cutting the original system
+   std::vector<double> slice_parameters = {0.0,1.0,0.0,1.0,0.0,1.0};
+   std::vector<int> remove_materials(0);
+   std::vector<int> atoms_list(0);
+   std::vector<int> nm_atoms_list(0);
+   std::vector<int> sliced_atoms_list(0);
+   std::vector<int> sliced_nm_atoms_list(0);
+
+   // axis vectors for povray colouring
+   std::vector<double> vector_z = {0.0,0.0,1.0};
+   std::vector<double> vector_y = {0.0,1.0,0.0};
+   std::vector<double> vector_x = {1.0,0.0,0.0};
 
    // non-magnetic atom data
    uint64_t num_nm_atoms = 0;
