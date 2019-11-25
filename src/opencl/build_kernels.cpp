@@ -49,7 +49,7 @@ namespace vopencl
          default_opts.append(params.str());
 
          // dipole calculations enabled?
-         if (::sim::hamiltonian_simulation_flags[4])
+         if (::dipole::activated)
          {
             // build dipolar kernels
             vcl::update_dip =      vcl::build_kernel_from_file("src/opencl/cl/dipole.cl",
