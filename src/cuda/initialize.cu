@@ -311,14 +311,13 @@ namespace vcuda{
           * initial data for the dipolar field
           */
 
-         cu::x_dipolar_field_array.resize(::atoms::num_atoms, 0.0);
-         cu::y_dipolar_field_array.resize(::atoms::num_atoms, 0.0);
-         cu::z_dipolar_field_array.resize(::atoms::num_atoms, 0.0);
+         cu::x_dipolar_field_array.resize(::atoms::num_atoms);
+         cu::y_dipolar_field_array.resize(::atoms::num_atoms);
+         cu::z_dipolar_field_array.resize(::atoms::num_atoms);
 
-         // commented out for now as we need to port over the new dipole solvers...
-         //thrust::copy(::dipole::atom_dipolar_field_array_x.begin(),::dipole::atom_dipolar_field_array_x.end(), cu::x_dipolar_field_array.begin());
-         //thrust::copy(::dipole::atom_dipolar_field_array_y.begin(),::dipole::atom_dipolar_field_array_y.end(), cu::y_dipolar_field_array.begin());
-         //thrust::copy(::dipole::atom_dipolar_field_array_z.begin(),::dipole::atom_dipolar_field_array_z.end(), cu::z_dipolar_field_array.begin());
+         thrust::copy(::dipole::atom_dipolar_field_array_x.begin(),::dipole::atom_dipolar_field_array_x.end(), cu::x_dipolar_field_array.begin());
+         thrust::copy(::dipole::atom_dipolar_field_array_y.begin(),::dipole::atom_dipolar_field_array_y.end(), cu::y_dipolar_field_array.begin());
+         thrust::copy(::dipole::atom_dipolar_field_array_z.begin(),::dipole::atom_dipolar_field_array_z.end(), cu::z_dipolar_field_array.begin());
 
          return true;
       }

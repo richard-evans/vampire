@@ -33,6 +33,8 @@ namespace gpu{
    extern void initialize();
    extern void llg_heun();
    extern void finalize();
+   extern void transfer_spin_positions_from_gpu_to_cpu();
+   extern void transfer_dipole_fields_from_cpu_to_gpu();
 
    //-----------------------------------------------------------------------------
    // Functions for GPU configuration output
