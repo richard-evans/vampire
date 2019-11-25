@@ -1,5 +1,14 @@
 //------------------------------------------------------------------------------
 //
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
+//
+//   (c) Daniel Meilak 2019. All rights reserved.
+//
+//   Email: dm858@york.ac.uk
+//
+//------------------------------------------------------------------------------
+//
 // What follows are a group of colourmaps taken from peterkovesi.com
 // Website: http://www.peterkovesi.com/matlabfns/Colourmaps/colorcet.m
 // Reference: Kovesi, Peter. "Good colour maps: How to design them."
