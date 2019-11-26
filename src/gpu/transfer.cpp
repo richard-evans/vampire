@@ -20,6 +20,9 @@ namespace gpu{
 //------------------------------------------------------------------------------
 void transfer_spin_positions_from_gpu_to_cpu(){
 
+   // check for gpu functions and data initialised
+   if( !gpu::initialized ) return;
+
    #ifdef CUDA
       vcuda::transfer_spin_positions_from_gpu_to_cpu();
    #elif OPENCL
@@ -34,6 +37,9 @@ void transfer_spin_positions_from_gpu_to_cpu(){
 // Wrapper function to transfer dipole field data from CPU to GPU
 //------------------------------------------------------------------------------
 void transfer_dipole_fields_from_cpu_to_gpu(){
+
+   // check for gpu functions and data initialised
+   if( !gpu::initialized ) return;
 
    #ifdef CUDA
       vcuda::transfer_dipole_fields_from_cpu_to_gpu();
