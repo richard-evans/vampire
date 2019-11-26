@@ -57,6 +57,7 @@ namespace vdc{
    // slice parameters for cutting the original system
    std::vector<double> slice_parameters = {0.0,1.0,0.0,1.0,0.0,1.0};
    std::vector<int> remove_materials(0);
+   std::vector<int> afm_materials(0);
    std::vector<int> atoms_list(0);
    std::vector<int> nm_atoms_list(0);
    std::vector<int> sliced_atoms_list(0);

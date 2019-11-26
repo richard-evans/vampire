@@ -51,7 +51,7 @@ void output_inc_file(unsigned int spin_file_id){
 
    // temporary variables defining spin colours
    double red=0.0, green=0.0, blue=1.0;
-
+   
    // open incfile
    std::ofstream incfile;
    incfile.open(incpov_file.c_str());
@@ -70,12 +70,19 @@ void output_inc_file(unsigned int spin_file_id){
       #pragma omp for
       for( auto &atom : vdc::sliced_atoms_list ){
 
+         // flip antiferromagnetic spins if required
+         if (std::find(afm_materials.begin(), afm_materials.end(), vdc::type[atom]+1) != afm_materials.end() ){
+            spins[3*atom+0] = -spins[3*atom+0];
+            spins[3*atom+1] = -spins[3*atom+1];
+            spins[3*atom+2] = -spins[3*atom+2];
+         }
+
          // get magnetization for colour contrast
          const double sx = spins[3*atom+0];
          const double sy = spins[3*atom+1];
          const double sz = spins[3*atom+2];
 
-         // calculate rgb components based on magnetization
+         // calculate rgb components based on spin orientation
          vdc::rgb(sx, sy, sz, red, green, blue);
 
          // format text for povray file
