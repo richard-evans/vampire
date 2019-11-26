@@ -66,7 +66,6 @@ void output_txt_file(unsigned int spin_file_id){
       std::stringstream otext;
 
       // write to output text stream in parallel
-      #pragma omp for
       for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
 
          // format text for plain text file
@@ -92,7 +91,6 @@ void output_txt_file(unsigned int spin_file_id){
       std::stringstream otext;
 
       // write to output text stream in parallel
-      #pragma omp for
       for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
 
          // format text for text file
