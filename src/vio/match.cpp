@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <sstream>
+#include <iostream>
 
 // Vampire headers
 // Headers
@@ -948,6 +949,44 @@ namespace vin{
                 terminaltextcolor(WHITE);
                 err::vexit();
             }
+        }
+        //-------------------------------------------------------------------
+        test="load-checkpoint-if-exists";
+        if(word==test){
+          // determine checkpoint file name
+          std::stringstream chkfilenamess;
+          chkfilenamess << "vampire" << vmpi::my_rank << ".chk";
+          std::string chkfilename = chkfilenamess.str();
+
+          // open checkpoint file
+          std::ofstream chkfile(chkfilename.c_str(),std::ios::in);
+          bool exists=chkfile.good();
+          chkfile.close();
+          if(exists){
+            test="restart";
+            if(value==test){
+                sim::load_checkpoint_flag=true; // Load spin configurations
+                sim::load_checkpoint_continue_flag=false; // Restart simulation with checkpoint configuration
+                return EXIT_SUCCESS;
+            }
+            test="continue";
+            if(value==test){
+                sim::load_checkpoint_flag=true; // Load spin configurations
+                sim::load_checkpoint_continue_flag=true; // Continue simulation from saved time with checkpoint configuration
+                return EXIT_SUCCESS;
+            }
+            else{
+                terminaltextcolor(RED);
+                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+                std::cerr << "\t\"restart\"" << std::endl;
+                std::cerr << "\t\"continue\"" << std::endl;
+                terminaltextcolor(WHITE);
+                err::vexit();
+            }
+          }
+          else{
+            return EXIT_SUCCESS; // No checkpoint file
+          }
         }
         //--------------------------------------------------------------------
         test="fmr-field-strength";
