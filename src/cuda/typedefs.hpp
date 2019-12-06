@@ -21,11 +21,12 @@
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
 #include <thrust/tuple.h>
-#include <cusp/copy.h>
-#include <cusp/csr_matrix.h>
-#include <cusp/dia_matrix.h>
-#include <cusp/ell_matrix.h>
-#include <cusp/multiply.h>
+//#include <cusp/copy.h>
+//#include <cusp/csr_matrix.h>
+//#include <cusp/dia_matrix.h>
+//#include <cusp/ell_matrix.h>
+//#include <cusp/multiply.h>
+#include "cusparse.h"
 
 // Vampire headers
 #include "cuda.hpp"
@@ -48,10 +49,13 @@ namespace internal{
       typedef float cu_real_t;
    #endif
 
-   typedef cusp::array1d<cu_real_t, cusp::device_memory> cu_real_array_t;
-   typedef cusp::array1d<int, cusp::device_memory> cu_index_array_t;
+   //typedef cusp::array1d<cu_real_t, cusp::device_memory> cu_real_array_t;
+   //typedef cusp::array1d<int, cusp::device_memory> cu_index_array_t;
+   typedef thrust::device_vector<double> cu_real_array_t;
+   typedef thrust::device_vector<int>    cu_index_array_t;
 
    // Compile-time selectable matrix structure
+   /*
    #if CUDA_MATRIX == CSR
       typedef cusp::csr_matrix<int, cu_real_t, cusp::device_memory> cu_exch_mat_t;
    #elif CUDA_MATRIX == DIA
@@ -61,6 +65,8 @@ namespace internal{
    #else
       typedef cusp::csr_matrix<int, cu_real_t, cusp::device_memory> cu_exch_mat_t;
    #endif
+   */
+   typedef cusparseSpMatDescr_t cu_exch_mat_t;
 
    // struct for material parameters
    struct material_parameters_t {
