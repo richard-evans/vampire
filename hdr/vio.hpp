@@ -135,21 +135,24 @@ namespace vout{
     extern int fw_size;
     extern int fw_size_int;
     extern int max_header;
-    //class fixed_width_output{
-    //    private:
-    //      int width; // the width of each output
-    //      std::ostream& stream_obj; // the initial stream object
-    //    public:
-    //      fixed_width_output(std::ostream&,int);
-    //      template<typename T> // sets up a template for using the operator<<
-    //      fixed_width_output& operator<<(const T& output);
-    //      fixed_width_output& operator<<(std::ostream& (*func)(std::ostream&));
-    //      std::string str();
-    //};
 
 //class that creates an object which acts like an output
 //stream but delivers fixed width output separated by
-// tabs
+//tabs
+//as a result, outputs that are part of one column 
+//should be concatenated before output, so as to 
+//prevent splitting out into multiple columns. 
+//to use you should use the output stream you
+//would normally be using as an argument during construction
+//and the width of your columns.
+//     e.g.
+//     std::ostringstream res;
+//     vout::fixed_width_output result(res,vout::fw_size);
+//you can then use the <<operator to send output to this
+//stream, but formatted.
+//     e.g.
+//     result << "ID" + std::to_string(mask_id);
+
 class fixed_width_output{
   private:
     int width; // the width of each output
@@ -160,16 +163,17 @@ class fixed_width_output{
     fixed_width_output(std::ostringstream& obj, int w): width(w),stream_obj(obj) {};
 
     template<typename T> // sets up a template for using the operator<<
+
     // defines a function which returns a pointer to the fixed... object
     // takes one of type T as input.
     fixed_width_output& operator<<(const T& output){ 
       //sends the formatted output to a stream_obj
       stream_obj <<std::left<<std::setw(width) << output <<"\t";
-      //stream_obj <<"|"<<std::left<<std::setw(width) << output;
-      //stream_obj <<std::left<<std::setw(width) << output<<"|";
+
       //returns the object (dereferenced from the pointer)
       return *this;
     }
+
     // specialises the function, for when the input is an output stream 
     // which is being operated on, such as using <<std::endl;
     fixed_width_output& operator<<(std::ostringstream& (*func)(std::ostringstream&)){
