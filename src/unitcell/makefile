@@ -17,6 +17,7 @@ sc.o \
 bcc.o \
 fcc.o \
 hcp.o \
+heusler.o \
 rocksalt.o \
 verify.o
 
