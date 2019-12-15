@@ -38,6 +38,14 @@ namespace unitcell{
       unsigned int lc; /// lattice category
       unsigned int hc; /// height category
       unsigned int ni; /// number of interactions
+      bool nm; // non-magnetic atom (no interactions are calculated)
+
+      // constructor
+      atom_t():
+         nm(false)
+      {
+      };
+
 	};
 
    //---------------------------------------------------------------------------

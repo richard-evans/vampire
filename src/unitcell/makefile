@@ -19,6 +19,7 @@ fcc.o \
 hcp.o \
 heusler.o \
 rocksalt.o \
+spinel.o \
 verify.o
 
 # Append module objects to global tree
