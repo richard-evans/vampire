@@ -730,7 +730,7 @@ namespace create{
       test="unit-cell-category";
       if(word==test){
          int uccat=atoi(value.c_str());
-         vin::check_for_valid_int(uccat, word, line, prefix, 0, mp::max_materials,"material"," 1 - 100");
+         vin::check_for_valid_int(uccat, word, line, prefix, 1, mp::max_materials+1,"material"," 1 - 100");
          create::internal::mp[super_index].unit_cell_category = uccat - 1; // subtract 1 corresponding to internal material numbers
          return true;
       }
