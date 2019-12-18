@@ -42,6 +42,13 @@ namespace unitcell{
 
       // constructor
       atom_t():
+         x(0.0),
+         y(0.0),
+         z(0.0),
+         mat(0),
+         lc(0),
+         hc(0),
+         ni(0),
          nm(false)
       {
       };
