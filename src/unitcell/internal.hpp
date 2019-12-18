@@ -58,6 +58,7 @@ namespace unitcell{
       void build_body_centred_cubic(unitcell::unit_cell_t& unit_cell);
       void build_face_centred_cubic(unitcell::unit_cell_t& unit_cell);
       void build_hexagonal_close_packed(unitcell::unit_cell_t& unit_cell);
+      void build_kagome(unitcell::unit_cell_t& unit_cell);
       void build_rock_salt(unitcell::unit_cell_t& unit_cell);
       void build_heusler(unitcell::unit_cell_t& unit_cell);
       void build_spinel(unitcell::unit_cell_t& unit_cell);

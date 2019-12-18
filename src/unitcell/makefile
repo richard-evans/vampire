@@ -18,6 +18,7 @@ bcc.o \
 fcc.o \
 hcp.o \
 heusler.o \
+kagome.o \
 rocksalt.o \
 spinel.o \
 verify.o
