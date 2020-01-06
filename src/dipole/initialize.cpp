@@ -181,6 +181,8 @@ namespace dipole{
 //         zlog << zTs() << "hierarchical Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 //         std::cout     << "hierarchical Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
 
+    double mem = ha::interaction_list.size()*6*8.0/1.0e6;
+//    allreduce(mem);
          zlog << zTs() << "hierarchical Total memory for dipole calculation (all CPUs): " << ha::interaction_list.size()*6*8.0/1.0e6 << " MB of RAM" << std::endl;
          std::cout << "hierarchical Total memory for dipole calculation (all CPUs): " << ha::interaction_list.size()*6*8.0/1.0e6 << " MB of RAM" << std::endl;
 

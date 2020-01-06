@@ -218,22 +218,22 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
       double z = sqrt((z_cell - z_bit)*(z_cell - z_bit));
 
 
-      //std::cout << "distance" << "\t" << z << "\t" << tp::bit_magnetisation[bit] <<std::endl;
+    //  std::cout << "distance" << "\t" << x << "\t" << y <<  "\t'" << z << "\t" << tp::bit_magnetisation[bit] <<std::endl;
       double Bx = 0.0;
       double By = 0.0;
       double Bz = 0.0;
 
-      for(int k=1; k<4; k++){
+      for(int k=1; k<3; k++){
 
           // predefine power as fixed for loop iteration
           const double m1k = pow(-1,k);
 
-          for(int l=1; l<4; l++){
+          for(int l=1; l<3; l++){
 
              // predefine power as fixed for loop iteration
              const double m1l = pow(-1,l);
 
-             for(int m=1; m<4; m++){
+             for(int m=1; m<3; m++){
 
                 const double m1m = pow(-1,m);
                 const double m1klm = pow(-1,k+l+m);
