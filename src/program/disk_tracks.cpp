@@ -132,9 +132,9 @@ void create_tracks(){
      while(getline(ifile,line) ){
        std::stringstream line_stream(line);
        line_stream >> track_num >> bit_num >> M;
-       std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
+       //std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
        bitms[(track_num-1)*(tp::num_bits_per_track) + (bit_num-1)] = M*tp::Ms;
-       std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
+      // std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
      }
    }
    else {
@@ -147,7 +147,7 @@ void create_tracks(){
        }
      }
    }
-   std::cout << "A" << std::endl;
+//   std::cout << "A" << std::endl;
 
    // temporary constants defining half sizes of bits
    const double xb = tp::bit_size*0.5;
@@ -168,7 +168,7 @@ void create_tracks(){
           tp::x_track_pos[bit] = x;
           tp::z_track_pos[bit] = z;
           tp::bit_magnetisation[bit] = bitms[bit];
-          std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs << std::endl;
+      //    std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs << std::endl;
       //    std::cout << bitms[bit] <<std::endl;
     //      std::cout << bit << '\t' <<  tp::bit_magnetisation[bit] <<std::endl;
           bit++;
@@ -177,7 +177,7 @@ void create_tracks(){
        }
   //     M = M*-1;
     }
-    std::cout << "A" << std::endl;
+   // std::cout << "A" << std::endl;
 
 
 //    std::cin.get();
@@ -291,6 +291,7 @@ void tracks(){
      tp::total_bit_width = tp::bit_width + tp::track_gap;
      tp::total_bit_depth = tp::bit_depth;
 
+   //  std:: cout << tp::bit_size << '\t' << tp::bit_width << '\t' << std::endl;
      tp::Ms = sim::track_Ms;// mu0 Ms in Tesla
 
      sim::track_field_x.resize(cells::num_cells,0.0);
@@ -332,13 +333,13 @@ void tracks(){
          err::vexit();
        }
        line_stream >> track_num >> bit_num >> M;
-       std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
+   //    std::cout << (track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << '\t' << bitms.size() << "\t" << tp::num_bits_per_track << '\t' <<tp::num_tracks<<std::endl;
        if (track_num-1 > tp::num_tracks || bit_num-1  > tp::num_bits_per_track){
          std::cout << "error number of bits in file more than number of specified bits" << std::endl;
          err::vexit();
        }
        bitms[(track_num-1)*(tp::num_bits_per_track) + (bit_num-1)] = M*tp::Ms;
-       std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
+   //    std::cout <<(track_num-1)*(tp::num_bits_per_track) + (bit_num-1) << std::endl;
      }
    }
    else {
@@ -372,7 +373,7 @@ void tracks(){
           tp::x_track_pos[bit] = x;
           tp::z_track_pos[bit] = z;
           tp::bit_magnetisation[bit] = bitms[bit];
-          std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs <<  "\t" <<bitms[bit] << std::endl;
+      //    std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs <<  "\t" <<bitms[bit] << std::endl;
       //    std::cout << bitms[bit] <<std::endl;
     //      std::cout << bit << '\t' <<  tp::bit_magnetisation[bit] <<std::endl;
           bit++;
@@ -417,14 +418,14 @@ void tracks(){
       sim::track_field_x[cell] = B[0];
       sim::track_field_y[cell] = B[1];
       sim::track_field_z[cell] = B[2];
-          //   ofile << cell << '\t' << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0]<< '\t' << B[1] << '\t' << B[2] <<  std::endl;
+      ofile << cell << '\t' << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0]<< '\t' << B[1] << '\t' << B[2] <<  std::endl;
          //    std::cout  << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
     }
 
          // Integrate system
   sim::integrate(sim::partial_time);
 
-  ofile << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+  //ofile << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
   step++;
 
     // Calculate magnetisation statistics
@@ -437,79 +438,83 @@ void tracks(){
 	}
  }
 //
-// else {
-//
-//
-//   while(tp::Ms > -0.11){
-//
-//
-//
-//    for (int lc = 0; lc < cells::num_local_cells; lc++){
-//      int cell = cells::cell_id_array[lc];
-//
-//         const double cx = cells::pos_and_mom_array[4*cell+0];
-//         const double cy = cells::pos_and_mom_array[4*cell+1];
-//         const double cz = cells::pos_and_mom_array[4*cell+2];
-//
-//             B = calculate_field(cx,cy,cz,0);
-//              sim::track_field_x[cell] = B[0];
-//              sim::track_field_y[cell] = B[1];
-//              sim::track_field_z[cell] = B[2];
-//
-//          }
-//
-// for (int i = 0; i < 500; i++){
-//     // Integrate system
-//     sim::integrate(1000);
-//
-//     // Calculate magnetisation statistics
-//     stats::mag_m();
-//
-//     // Output data
-//     vout::data();
-// }
-//    //ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
-//
-//     tp::Ms = tp::Ms - 0.01;
-//
-// 	}
-//
-//
-//    while(tp::Ms < 0.11){
-//
-//
-//
-//     for (int lc = 0; lc < cells::num_local_cells; lc++){
-//       int cell = cells::cell_id_array[lc];
-//
-//          const double cx = cells::pos_and_mom_array[4*cell+0];
-//          const double cy = cells::pos_and_mom_array[4*cell+1];
-//          const double cz = cells::pos_and_mom_array[4*cell+2];
-//
-//              B = calculate_field(cx,cy,cz,0);
-//               sim::track_field_x[cell] = B[0];
-//               sim::track_field_y[cell] = B[1];
-//               sim::track_field_z[cell] = B[2];
-//
-//           }
-//
-//  for (int i = 0; i < 500; i++){
-//      // Integrate system
-//      sim::integrate(1000);
-//
-//      // Calculate magnetisation statistics
-//      stats::mag_m();
-//
-//      // Output data
-//      vout::data();
-    //}
-//
-//
-//   std::cout << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
-//
-//      tp::Ms = tp::Ms + 0.01;
-//
-// 	}
-//}
+else {
+
+
+   std::ofstream ofile;
+   ofile.open ("position.txt");
+   int step = 0;
+
+
+   double max = tp::Ms;
+   //std::cout << "ENTER" << std::endl;
+
+//   std::cout << tp::Ms << '\t' << max << std::endl;
+  while(tp::Ms > -max){
+
+
+   for (int lc = 0; lc < cells::num_local_cells; lc++){
+     int cell = cells::cell_id_array[lc];
+
+        const double cx = cells::pos_and_mom_array[4*cell+0];
+        const double cy = cells::pos_and_mom_array[4*cell+1];
+        const double cz = cells::pos_and_mom_array[4*cell+2];
+
+            B = calculate_field(cx,cy,cz,0);
+             sim::track_field_x[cell] = B[0];
+             sim::track_field_y[cell] = B[1];
+             sim::track_field_z[cell] = B[2];
+
+         }
+
+    // Integrate system
+    sim::integrate(sim::partial_time);
+
+    // Calculate magnetisation statistics
+    stats::mag_m();
+
+    // Output data
+    vout::data();
+   //  std::cout <<  tp::Ms << '\t' << max << std::endl;
+   ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+
+    tp::Ms = tp::Ms - sim::LFA_scan_field_step;
+
+	}
+
+
+   while(tp::Ms < max){
+
+
+
+         for (int lc = 0; lc < cells::num_local_cells; lc++){
+           int cell = cells::cell_id_array[lc];
+
+              const double cx = cells::pos_and_mom_array[4*cell+0];
+              const double cy = cells::pos_and_mom_array[4*cell+1];
+              const double cz = cells::pos_and_mom_array[4*cell+2];
+
+                  B = calculate_field(cx,cy,cz,0);
+                   sim::track_field_x[cell] = B[0];
+                   sim::track_field_y[cell] = B[1];
+                   sim::track_field_z[cell] = B[2];
+
+               }
+
+          // Integrate system
+          sim::integrate(sim::partial_time);
+
+          // Calculate magnetisation statistics
+          stats::mag_m();
+
+          // Output data
+          vout::data();
+      ///     std::cout <<  tp::Ms << '\t' << max << std::endl;
+         ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+
+     tp::Ms = tp::Ms + sim::LFA_scan_field_step;
+
+	}
+}
 }
 }//end of namespace program

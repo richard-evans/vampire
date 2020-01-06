@@ -197,7 +197,8 @@ namespace dipole{
                                 //std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
                                 std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
                                 std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z);
+                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
+                                int id );
 
       void compute_intra_tensor(const int i,
                                 const int j,

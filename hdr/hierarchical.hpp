@@ -15,6 +15,7 @@
 
 // C++ standard library headers
 #include <string>
+#include <vector>
 
 // Vampire headers
 #include "hierarchical.hpp"
@@ -38,6 +39,15 @@ namespace hierarchical{
    // Function to process material parameters
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+
+   //---------------------------------------------------------------------------
+   // Function to update hierarchical dipole fields
+   //---------------------------------------------------------------------------
+   void update(std::vector <double>& x_spin_array, // atomic spin directions
+               std::vector <double>& y_spin_array,
+               std::vector <double>& z_spin_array,
+               std::vector <double>& m_spin_array, // atomic spin moment
+               std::vector < bool >& magnetic);    // is magnetic);
 
 } // end of hierarchical namespace
 

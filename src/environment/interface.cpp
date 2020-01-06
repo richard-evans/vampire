@@ -59,7 +59,7 @@ namespace environment{
          return true;
       }
 
-      test="LFA_scan";
+      test="LFA-scan";
       if(word==test){
          env::LFA_scan =true;
          return true;

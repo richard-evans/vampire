@@ -50,6 +50,7 @@ namespace sim{
 
 	extern int track_num_bits_per_track;
 	extern int track_num_tracks;
+	extern double LFA_scan_field_step;
 
 	// distance of tracks from read head
 	extern double track_fly_height; // Angstroms
@@ -62,7 +63,7 @@ namespace sim{
 	extern std::vector < double > track_field_x;
 	extern std::vector < double > track_field_y;
 	extern std::vector < double > track_field_z;
-	
+
 	extern std::ofstream mag_file;
 	extern uint64_t time;
 	extern uint64_t total_time;

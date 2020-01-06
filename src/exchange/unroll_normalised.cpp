@@ -70,7 +70,7 @@ namespace exchange{
                   }
                   else {
                   //   std::cout << "not enter" <<std::endl;
-                     if (d  > 2.6 && d < 2.7 ) J = -1.0;
+                     if (d  > 2.6 && d < 2.7 ) J = 1.0;
                      else if (d  > 3.7 && d <3.8 ) J = 0.0;
                   }
 

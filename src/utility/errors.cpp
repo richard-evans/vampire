@@ -112,7 +112,6 @@ namespace err
 
       // Now finalise MPI
       vmpi::finalise();
-
       #endif
 
       // Now exit program disgracefully

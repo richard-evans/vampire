@@ -51,7 +51,7 @@ namespace stats
    enum stat_t { atotal=0, mean=1};
 
    /// Statistics output functions
-   extern void output_energy(std::ostream&, enum energy_t, enum stat_t);
+   extern void output_energy(std::ostream&, enum energy_t, enum stat_t,bool header);
 
    //-------------------------------------------------
    // New statistics module functions and variables
@@ -77,6 +77,7 @@ namespace stats
    extern bool calculate_material_height_magnetization;
    extern bool calculate_system_specific_heat;
    extern bool calculate_material_specific_heat;
+   extern bool calculate_material_standard_deviation;// AJN
    extern bool calculate_system_susceptibility;
    extern bool calculate_material_susceptibility;
 
@@ -84,6 +85,7 @@ namespace stats
    class susceptibility_statistic_t;
    class specific_heat_statistic_t;
 
+   class standard_deviation_statistic_t;
    //----------------------------------
    // Energy class definition
    //----------------------------------
@@ -115,8 +117,8 @@ namespace stats
 
       void update_mean_counter(long counter);
 
-      std::string output_energy(enum energy_t energy_type);
-      std::string output_mean_energy(enum energy_t energy_type);
+      std::string output_energy(enum energy_t energy_type, bool header);
+      std::string output_mean_energy(enum energy_t energy_type, bool header);
 
    private:
       bool initialized;
@@ -149,7 +151,7 @@ namespace stats
    class magnetization_statistic_t{
 
       friend class susceptibility_statistic_t;
-
+      friend class standard_deviation_statistic_t;
       public:
          magnetization_statistic_t ();
          bool is_initialized();
@@ -159,14 +161,14 @@ namespace stats
          void set_magnetization(std::vector<double>& magnetization, std::vector<double>& mean_magnetization, long counter);
          void reset_magnetization_averages();
          const std::vector<double>& get_magnetization();
-         std::string output_magnetization();
-         std::string output_normalized_magnetization();
-         std::string output_normalized_magnetization_length();
-         std::string output_normalized_mean_magnetization();
-         std::string output_normalized_mean_magnetization_length();
-         std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec);
-         std::string output_mean_magnetization_length();
-         std::string output_mean_magnetization();
+         std::string output_magnetization(bool header);
+         std::string output_normalized_magnetization(bool header);
+         std::string output_normalized_magnetization_length(bool header);
+         std::string output_normalized_mean_magnetization(bool header);
+         std::string output_normalized_mean_magnetization_length(bool header);
+         std::string output_normalized_magnetization_dot_product(const std::vector<double>& vec,bool header);
+         std::string output_mean_magnetization_length(bool header);
+         std::string output_mean_magnetization(bool header);
 
       private:
          bool initialized;
@@ -191,7 +193,7 @@ namespace stats
          void initialize(energy_statistic_t& energy_statistic);
          void calculate(const std::vector<double>& energy);
          void reset_averages();
-         std::string output_mean_specific_heat(const double temperature);
+         std::string output_mean_specific_heat(const double temperature,bool header);
 
 
       private:
@@ -214,7 +216,7 @@ namespace stats
          void initialize(magnetization_statistic_t& mag_stat);
          void calculate(const std::vector<double>& magnetization);
          void reset_averages();
-         std::string output_mean_susceptibility(const double temperature);
+         std::string output_mean_susceptibility(const double temperature,bool header);
          //std::string output_mean_absolute_susceptibility();
 
       private:
@@ -226,6 +228,29 @@ namespace stats
          std::vector<double> mean_absolute_susceptibility;
          std::vector<double> mean_absolute_susceptibility_squared;
          std::vector<double> saturation;
+
+   };
+   //----------------------------------
+   // Standard Deviation of magnetisation in time Class definition
+   //----------------------------------
+   class standard_deviation_statistic_t{ // AJN
+
+      public:
+         standard_deviation_statistic_t ();
+         void initialize(magnetization_statistic_t& mag_stat);
+         void update(const std::vector<double>& magnetization);
+         void reset_averages();
+         std::string output_standard_deviation(bool header);
+
+      private:
+         bool initialized;
+         int num_elements;//number of elements in the system
+         int idx;// index for looping through directions
+         double mean_counter;// counts time steps in loop - factor out for normal time
+         double res1; // residuals calculated at each time
+         double res2;
+         std::vector<double> residual_sq;// running squared residual for each direction
+         std::vector<double> mean; // running mean for each direction
 
    };
 
@@ -243,7 +268,7 @@ namespace stats
 
    extern susceptibility_statistic_t system_susceptibility;
    extern susceptibility_statistic_t material_susceptibility;
-
+   extern standard_deviation_statistic_t material_standard_deviation;
 }
 
 #endif /*STATS_H_*/
