@@ -51,6 +51,7 @@ namespace sim{
 	extern int track_num_bits_per_track;
 	extern int track_num_tracks;
 	extern double LFA_scan_field_step;
+	extern bool LFA;
 
 	// distance of tracks from read head
 	extern double track_fly_height; // Angstroms

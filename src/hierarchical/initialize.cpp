@@ -91,7 +91,7 @@ namespace hierarchical{
           ha::num_levels = C;
 
           if (ha::num_levels < 1) ha::num_levels = 1;
-          std::cout << "num_levels"  << ha::num_levels << "\t" << system_dimensions_x << '\t' << cells::macro_cell_size_x << "\t" << C << "\t" << N << "\t" << std::endl;
+        //  std::cout << "num_levels"  << ha::num_levels << "\t" << system_dimensions_x << '\t' << cells::macro_cell_size_x << "\t" << C << "\t" << N << "\t" << std::endl;
 
         ha::cells_level_start_index.resize(ha::num_levels,0.0);
         ha::cells_level_end_index.resize(ha::num_levels,0.0);
@@ -121,7 +121,7 @@ namespace hierarchical{
        cells_pos_and_mom_array.resize(cells::num_cells*4);
 
 
-       std::cout << cells_num_cells << std::endl;
+  //     std::cout << cells_num_cells << std::endl;
 
           for(int i=0; i<cells_num_cells; i++){
              // resize arrays
@@ -148,8 +148,8 @@ namespace hierarchical{
              cells_local_cell_array[lc] = cells::local_cell_array[lc];
           }
          timer.stop();
-         std::cout << "\t1 [ " << timer.elapsed_time() << " s ]" << std::endl;
-         zlog << zTs() <<  "\tDIPOLE UPDATE1. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+    //     std::cout << "\t1 [ " << timer.elapsed_time() << " s ]" << std::endl;
+  //       zlog << zTs() <<  "\tDIPOLE UPDATE1. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
                 timer.start();
@@ -232,8 +232,8 @@ namespace hierarchical{
               #endif
 
              timer.stop();
-             std::cout << "\t2 [ " << timer.elapsed_time() << " s ]" << std::endl;
-             zlog << zTs() <<  "\tDIPOLE UPDATE2. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+          //   std::cout << "\t2 [ " << timer.elapsed_time() << " s ]" << std::endl;
+        //     zlog << zTs() <<  "\tDIPOLE UPDATE2. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
 
 
             timer.start();
@@ -250,7 +250,7 @@ namespace hierarchical{
                  if (level == 0) ha::interaction_range[0] = dipole::cutoff*internal::av_cell_size*2*1.5;
 
                  else  ha::interaction_range[level] = ha::interaction_range[level - 1]*2.0;
-                 std::cout << level<< '\t' << ha::interaction_range[level] << "\t" << dipole::cutoff*cells::macro_cell_size_x<< "\t" << internal::av_cell_size  <<'\t' << cells::macro_cell_size_x << "\t" << cells::macro_cell_size_y << "\t" << cells::macro_cell_size_z << "\t" <<  std::endl;
+              //   std::cout << level<< '\t' << ha::interaction_range[level] << "\t" << dipole::cutoff*cells::macro_cell_size_x<< "\t" << internal::av_cell_size  <<'\t' << cells::macro_cell_size_x << "\t" << cells::macro_cell_size_y << "\t" << cells::macro_cell_size_z << "\t" <<  std::endl;
                  if (level == ha::num_levels - 1 ) ha::interaction_range[level] = internal::av_cell_size*dipole::cutoff*10000;
                  // Calculate number of microcells
                  // determine number of cells in x and y (global)
@@ -418,7 +418,7 @@ namespace hierarchical{
               timer.start();
 
                 for (int level = 1; level < ha::num_levels; level ++ ){
-                n_cells = 0;
+                  n_cells = 0;
                   int start = ha::cells_level_start_index[level];
                   int end   = ha::cells_level_end_index[level];
                //   std::cout << "A" << level << '\t' << start << "\t" << end <<std::endl;

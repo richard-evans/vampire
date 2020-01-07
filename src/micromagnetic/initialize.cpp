@@ -105,7 +105,7 @@ namespace micromagnetic{
                                               neighbour_list_end_index, type_array,  material, volume_array, x_coord_array,
                                               y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
 
-   std::cout << mm::ms[0] << '\t' << mm::alpha[0] << '\t' << mm::Tc[0] << '\t' << mm::ku[0] << '\t' << mm::gamma[0] << '\t' << mm::one_o_chi_para[0] << '\t' << mm::one_o_chi_perp[0] << '\t' << mm::A[0] << '\t' << std::endl;
+   //std::cout << mm::ms[0] << '\t' << mm::alpha[0] << '\t' << mm::Tc[0] << '\t' << mm::ku[0] << '\t' << mm::gamma[0] << '\t' << mm::one_o_chi_para[0] << '\t' << mm::one_o_chi_perp[0] << '\t' << mm::A[0] << '\t' << std::endl;
 
     for (int cell = 0; cell < num_cells; cell++)
          if (discretisation_type == 1){
@@ -294,7 +294,7 @@ namespace micromagnetic{
         }
       }
 
-      std::cout << "OVERLAP" << "\t" << mm::overlap_area << std::endl;
+      //std::cout << "OVERLAP" << "\t" << mm::overlap_area << std::endl;
       mm::overlap_area = 240*200;
 
         // //boltzman stuff

@@ -111,7 +111,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    timer.stop();
   //std::cout << "\tdone! [ " << timer.elapsed_time() << " s ]" << std::endl;
 // zlog << zTs() <<  "\tDIPOLE UPDATE. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
-std::cout << "dipole update time " << timer.elapsed_time() << " s" << std::endl;
+//std::cout << "dipole update time " << timer.elapsed_time() << " s" << std::endl;
 
 
    return;

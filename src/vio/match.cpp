@@ -872,7 +872,7 @@ namespace vin{
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
-        sim::track_bit_size = m;
+        sim::track_bit_depth = m;
         return EXIT_SUCCESS;
      }
      test="track-fly-height";
@@ -904,13 +904,17 @@ namespace vin{
        sim::LFA_scan_field_step = m;
        return EXIT_SUCCESS;
      }
+     test="LFA";
+     if(word==test){
+       sim::LFA = true;
+       return EXIT_SUCCESS;
+     }
 
      test="num-tracks";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 100,"input","0.0 - 100");
         sim::track_num_tracks = m;
-        std::cout << "N" << m << std::endl;
         return EXIT_SUCCESS;
      }
      test="num-bits-per-track";

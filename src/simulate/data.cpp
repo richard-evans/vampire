@@ -44,6 +44,7 @@ namespace sim{
    double track_fly_height = 100.0; // Angstroms
 
    double LFA_scan_field_step = 0.01;
+   bool LFA = false;
 
    bool track_ms_file = false;
 

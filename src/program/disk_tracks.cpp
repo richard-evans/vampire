@@ -200,6 +200,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
    const double yb = tp::bit_depth * 0.5;
    const double zb = tp::bit_width * 0.5;
 
+  // std::cout << tp::bit_size  << '\t' << tp::bit_depth << '\t' << tp::bit_width << std::endl;
    const double y_track = -tp::bit_depth/2.0 - tp::fly_height;
 
    std::vector <double > B(3,0.0);
@@ -218,7 +219,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
       double z = sqrt((z_cell - z_bit)*(z_cell - z_bit));
 
 
-    //  std::cout << "distance" << "\t" << x << "\t" << y <<  "\t'" << z << "\t" << tp::bit_magnetisation[bit] <<std::endl;
+//      std::cout << "distance" << "\t" << x << "\t" << y <<  "\t'" << z << "\t" << tp::bit_magnetisation[bit] <<std::endl;
       double Bx = 0.0;
       double By = 0.0;
       double Bz = 0.0;
@@ -250,7 +251,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
                 Bx = Bx + m1klm* log(zp + r);
                 By = By + m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
                 Bz = Bz + m1klm* log(xp + r);
-      //          std::cout << bit  << '\t' << Bx << '\t' << By << '\t' << Bz << std::endl;
+              //  std::cout <<"BIT\t" << xp << '\t' <<  bit  << '\t' << Bx << '\t' << By << '\t' << Bz << std::endl;
 
 
              }
@@ -281,6 +282,7 @@ void tracks(){
      tp::fly_height = sim::track_fly_height; // Angstroms
 
      tp::bit_size =  sim::track_bit_size; // size of bits in x-direction (cross track)
+    // std::cout << tp::bit_size <<std::endl;
      tp::bit_width = sim::track_bit_width; // size of bits in z-direction (down track)
      tp::bit_depth = sim::track_bit_depth; // depth of bits along y-direction
 
@@ -381,7 +383,8 @@ void tracks(){
        }
     }
 
-   if (environment::internal::LFA_scan == false){
+   if (sim::LFA == false){
+     std::cout << "NO LFAAAAAA" << std::endl;
 
    for (int lc = 0; lc < cells::num_local_cells; lc++){
     int cell = cells::cell_id_array[lc];
@@ -406,6 +409,9 @@ void tracks(){
    double cross_track_position = sim::initial_cross_track_position + sim::cross_track_velocity*step;
    double down_track_position = sim::initial_down_track_position + sim::down_track_velocity*step;
 
+   double avBx = 0;
+   double avBy = 0;
+   double avBz = 0;
 
    for (int lc = 0; lc < cells::num_local_cells; lc++){
      int cell = cells::cell_id_array[lc];
@@ -418,9 +424,16 @@ void tracks(){
       sim::track_field_x[cell] = B[0];
       sim::track_field_y[cell] = B[1];
       sim::track_field_z[cell] = B[2];
-      ofile << cell << '\t' << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0]<< '\t' << B[1] << '\t' << B[2] <<  std::endl;
-         //    std::cout  << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+      avBx = avBx + B[0];
+      avBy = avBy + B[1];
+      avBz = avBz + B[2];
+
+     //    std::cout  << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
     }
+    avBx =avBx/cells::num_local_cells;
+    avBy =avBy/cells::num_local_cells;
+    avBz =avBz/cells::num_local_cells;
+    ofile << sim::time << '\t' << down_track_position << "\t" << cross_track_position << '\t' << micromagnetic::MR_resistance << "\t" << avBx<< '\t' << avBy<< '\t' << avBz <<  std::endl;
 
          // Integrate system
   sim::integrate(sim::partial_time);
@@ -437,9 +450,9 @@ void tracks(){
 
 	}
  }
-//
-else {
 
+else {
+  //   std::cout << "LFAAAAAA" << std::endl;
 
    std::ofstream ofile;
    ofile.open ("position.txt");
