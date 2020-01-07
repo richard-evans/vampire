@@ -458,61 +458,47 @@ else {
    ofile.open ("position.txt");
    int step = 0;
 
+   std::ifstream ifile2;
+   ifile2.open("lfa-ms");
 
-   double max = tp::Ms;
-   //std::cout << "ENTER" << std::endl;
-
-//   std::cout << tp::Ms << '\t' << max << std::endl;
-  while(tp::Ms > -max){
+   double start_ms = 0;
+   double end_ms = 0;
+   double ms_step = 0;
 
 
-   for (int lc = 0; lc < cells::num_local_cells; lc++){
-     int cell = cells::cell_id_array[lc];
+   if (ifile2.good()){
+     std::cout << "Creating lfa scan from file" << std::endl;
 
-        const double cx = cells::pos_and_mom_array[4*cell+0];
-        const double cy = cells::pos_and_mom_array[4*cell+1];
-        const double cz = cells::pos_and_mom_array[4*cell+2];
+    // read number of atoms in this file
+    std::string line; // declare a string to hold line of text
+    while(getline(ifile2,line) ){
+      std::stringstream line_stream(line);
+
+      line_stream >> start_ms >> end_ms >> ms_step;
+      //std::cout << "ENTER" << std::endl;
+      tp::Ms = start_ms;
+      ms_step = sqrt(ms_step*ms_step);
+      sim::LFA_scan_field_step = ms_step;
+      std::cout << start_ms << '\t' << end_ms << "\t" << ms_step <<std::endl;
+      if (start_ms > end_ms){
+    //  std::cout << "here" <<std::endl;
+        while(tp::Ms > end_ms){
+    //  std::cout << "also here" <<std::endl;
+
+          for (int lc = 0; lc < cells::num_local_cells; lc++){
+            int cell = cells::cell_id_array[lc];
+
+            const double cx = cells::pos_and_mom_array[4*cell+0];
+            const double cy = cells::pos_and_mom_array[4*cell+1];
+            const double cz = cells::pos_and_mom_array[4*cell+2];
 
             B = calculate_field(cx,cy,cz,0);
-             sim::track_field_x[cell] = B[0];
-             sim::track_field_y[cell] = B[1];
-             sim::track_field_z[cell] = B[2];
+            sim::track_field_x[cell] = B[0];
+            sim::track_field_y[cell] = B[1];
+            sim::track_field_z[cell] = B[2];
 
-         }
-
-    // Integrate system
-    sim::integrate(sim::partial_time);
-
-    // Calculate magnetisation statistics
-    stats::mag_m();
-
-    // Output data
-    vout::data();
-   //  std::cout <<  tp::Ms << '\t' << max << std::endl;
-   ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
-
-    tp::Ms = tp::Ms - sim::LFA_scan_field_step;
-
-	}
-
-
-   while(tp::Ms < max){
-
-
-
-         for (int lc = 0; lc < cells::num_local_cells; lc++){
-           int cell = cells::cell_id_array[lc];
-
-              const double cx = cells::pos_and_mom_array[4*cell+0];
-              const double cy = cells::pos_and_mom_array[4*cell+1];
-              const double cz = cells::pos_and_mom_array[4*cell+2];
-
-                  B = calculate_field(cx,cy,cz,0);
-                   sim::track_field_x[cell] = B[0];
-                   sim::track_field_y[cell] = B[1];
-                   sim::track_field_z[cell] = B[2];
-
-               }
+          }
+          //      std::cout << "and here" <<std::endl;
 
           // Integrate system
           sim::integrate(sim::partial_time);
@@ -522,12 +508,60 @@ else {
 
           // Output data
           vout::data();
-      ///     std::cout <<  tp::Ms << '\t' << max << std::endl;
-         ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
 
-     tp::Ms = tp::Ms + sim::LFA_scan_field_step;
+          std::cout <<  tp::Ms << std::endl;
+          ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
 
-	}
-}
-}
+
+          tp::Ms = tp::Ms - sim::LFA_scan_field_step;
+
+	       }
+       }
+
+       else {
+
+
+         while(tp::Ms < end_ms){
+
+
+
+           for (int lc = 0; lc < cells::num_local_cells; lc++){
+             int cell = cells::cell_id_array[lc];
+
+             const double cx = cells::pos_and_mom_array[4*cell+0];
+             const double cy = cells::pos_and_mom_array[4*cell+1];
+             const double cz = cells::pos_and_mom_array[4*cell+2];
+
+             B = calculate_field(cx,cy,cz,0);
+             sim::track_field_x[cell] = B[0];
+             sim::track_field_y[cell] = B[1];
+             sim::track_field_z[cell] = B[2];
+
+           }
+
+          // Integrate system
+          sim::integrate(sim::partial_time);
+
+          // Calculate magnetisation statistics
+          stats::mag_m();
+
+          // Output data
+          vout::data();
+           std::cout <<  tp::Ms << std::endl;
+          ofile << sim::time << '\t' << tp::Ms << "\t" << micromagnetic::MR_resistance << "\t" << B[0] << '\t' << B[1] << '\t' << B[2] <<  std::endl;
+
+         tp::Ms = tp::Ms + sim::LFA_scan_field_step;
+
+	      }
+      }
+
+    }
+  }
+  else {
+    std::cout << "lfa-ms file missing." <<std::endl;
+    err::vexit();
+  }
+
+  }
+  }
 }//end of namespace program
