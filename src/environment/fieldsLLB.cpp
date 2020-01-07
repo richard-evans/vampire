@@ -68,14 +68,14 @@ namespace environment
 
             //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
             double exchange_field[3]={0.0,0.0,0.0};
-            const double Ar = A*2.0/(Ms);
+            const double Ar = A*2.0/(Ms[cell]);
             //saves the x,y,z prefactors for the exchange constant
             //const double Acx = A*2/(Ms)*cell_size[2]*cell_size[1];
             //const double Acy = A*2/(Ms)*cell_size[2]*cell_size[0];
             //const double Acz = A*2/(Ms)*cell_size[0]*cell_size[1];
-            const double Acx = Ar*cell_size[2]*cell_size[1];
-            const double Acy = Ar*cell_size[2]*cell_size[0];
-            const double Acz = Ar*cell_size[0]*cell_size[1];
+            const double Acx = Ar*cell_size_z[cell]*cell_size_y[cell];
+            const double Acy = Ar*cell_size_z[cell]*cell_size_x[cell];
+            const double Acz = Ar*cell_size_x[cell]*cell_size_y[cell];
 
             if (num_cells > 1){
                const int start = neighbour_list_start_index[cell];
@@ -101,9 +101,9 @@ namespace environment
 
 
             //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-            spin_field[0] = pf*m[0] + exchange_field[0] - one_o_chi_perp*m[0] + ext_field[0] + dipole_field_x[cell] + env_field_uv[0] + bias_field_x[cell];
-            spin_field[1] = pf*m[1] + exchange_field[1] - one_o_chi_perp*m[1] + ext_field[1] + dipole_field_y[cell] + env_field_uv[1] + bias_field_y[cell];
-            spin_field[2] = pf*m[2] + exchange_field[2]                       + ext_field[2] + dipole_field_z[cell] + env_field_uv[2] + bias_field_z[cell];
+            spin_field[0] = pf*m[0] + exchange_field[0] + ku[cell]/Ms[cell]*one_o_chi_perp*m[0] + ext_field[0] + dipole_field_x[cell] + env_field_uv[0] + bias_field_x[cell];
+            spin_field[1] = pf*m[1] + exchange_field[1] + ku[cell]/Ms[cell]*one_o_chi_perp*m[1] + ext_field[1] + dipole_field_y[cell] + env_field_uv[1] + bias_field_y[cell];
+            spin_field[2] = pf*m[2] + exchange_field[2]                                         + ext_field[2] + dipole_field_z[cell] + env_field_uv[2] + bias_field_z[cell];
           //    std::cout << "x" << '\t' << pf  << '\t' << m[0] << '\t' << exchange_field[0] << "\t" << dipole_field_x[cell] << "\t" << spin_field[0] <<std::endl;
           //    std::cout << "y" << '\t' << pf  << '\t' << m[1] << '\t' << exchange_field[1] << "\t" << dipole_field_y[cell] << "\t" << spin_field[1] <<std::endl;
           //    std::cout << "z" << '\t' << pf  << '\t' << m[2] << '\t' << exchange_field[2] << "\t" << dipole_field_z[cell] << "\t" << spin_field[2] <<std::endl;

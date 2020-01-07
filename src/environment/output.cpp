@@ -40,7 +40,7 @@ namespace environment{
             mx =  mx + x_mag_array[cell];
             my =  my + y_mag_array[cell];
             mz =  mz + z_mag_array[cell];
-            ml =  ml + Ms;
+            ml =  ml + Ms[cell];
          }
 
          double msat = ml;

@@ -45,47 +45,45 @@ bool  in_x(double x, double z){
 //------------------------------------------------------------------------------
 // Function to calculate basic shield geometry for reader
 //------------------------------------------------------------------------------
-bool in_shield(double x, double y, double z){
+int in_shield(double x, double y, double z){
 
 
-  if (square_shields){
+//  if (square_shields){
   //  std::cout << dim[1] << "\t" << cs::system_dimensions[1] << '\t' << gap << std::endl;
-    int min = dim[0]/2.0 - cs::system_dimensions[0]/2.0 - gap;
-    int max = min + cs::system_dimensions[0] + 2.0*gap;
-  //  std::cout << min << '\t' << max << std::endl;
-    if (y < min || y > max) return true;
-    else return false;
+  //   int min = dim[0]/2.0 - cs::system_dimensions[0]/2.0 - gap;
+  //   int max = min + cs::system_dimensions[0] + 2.0*gap;
+  // //  std::cout << min << '\t' << max << std::endl;
+  //   if (y < min || y > max) return true;
+  //   else return false;
 
-  }
-
-
-  else if (expoential_shields){
-
-   // height of inner sensor region
-   const double stack_height = 200; // Angstroms
-
-   const double xr = x;
-   const double yr = y;
-   const double zr = z; // reduced height
-
-//   Bottom shield
-  //  if(zr < 300.0 && zr > 0.0) return true;
+//   }
+//
+//
+//   else if (expoential_shields){
+//
+//    // height of inner sensor region
+//    const double stack_height = 200; // Angstroms
+//
+//    const double xr = x;
+//    const double yr = y;
+//    const double zr = z; // reduced height
+//
+// //   Bottom shield
+   if(z <= 302 && z >= -2)    return 1;
   //
-  //  if (zr < 310  && zr > 290) return true;
+  //if (zr < 310  && zr > 290) return true;
   //
   // // Top shield (++z) 31-51 nm
-  // if(zr > 520.0 && zr < 720.0) return true;
+  if(z >= 518 && z <= 722.9) return 2;
   //
   //  //Top shield (+z) 52-72 nm
-  // if(z > 740.0 && z < 940.0) return true;
+  if(z >= 759.8 && z <= 942.4) return 3;
   // //
   // //  // side shields
-  // if(in_x(xr, zr))
+  if(in_x(x, z)) return 4;
 
-   return true;
-  }
-   else return true;
-
+  //if (sqrt(x*x + y*y + z*z)  < 90) return 1;
+  else return 0;
 
 }
 

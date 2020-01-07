@@ -40,7 +40,7 @@ namespace environment{
          double a7 = 0.797453198330591;
          double a8 = 1.53787854178089;
          double a9 = -0.627128148404525;
-         double PI= 3.14159;
+         double PI = 3.14159;
          //normalisation when T=0
          double chi_0 = (a0+ a1+ a2+ a3 + a4 + a5 + a6 + a7+ a8+ a9);
          //conversion to SI
@@ -56,7 +56,6 @@ namespace environment{
          chi = chi/chi_0;
 
          //returns the anisotropy constant - the susceptability is only used for this
-         chi = -ku/Ms*chi;
 
          return chi;            //returns the 1D vector containing the perpencicular susceptability for each cell,
       }

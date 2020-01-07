@@ -69,7 +69,9 @@ namespace environment{
       bool LFA_scan;
 
       std::vector < double > dim(3,6.0);
-      std::vector < double > cell_size(3,2.0);
+      std::vector < double > cell_size_x;
+      std::vector < double > cell_size_y;
+      std::vector < double > cell_size_z;
 
       std::vector < double > initial_spin(3,0.0);
 
@@ -85,7 +87,7 @@ namespace environment{
 
       std::vector < double > shift(3,0.0);
       double eightPI_three_cell_volume;
-      double cell_volume;
+      std::vector < double > cell_volume;
 
       bool random_spins = true;
 
@@ -102,9 +104,11 @@ namespace environment{
 
       int num_cells;
       double A = -180;
-      double ku= -1e-23;
+      double ku_value = -1e-23;
+      double Ms_value = 1e-21;
+      std::vector < double > ku;// -1e-23;
       double Tc = 600;
-      double Ms = 1e-21;
+      std::vector < double > Ms;// = 1e-21;
       double gamma = 1.0;
       double alpha = 1.0;
       int num_env_cells = 0.0;
@@ -112,6 +116,7 @@ namespace environment{
       double exchange_constant;
       double alpha_para;
       double alpha_perp;
+      double cell_size = 20;
 
       std::vector < double > x_mag_array;//arrays to store the cell magnetidsation
       std::vector < double > y_mag_array;
@@ -124,6 +129,14 @@ namespace environment{
       std::vector<double> neighbour_list_start_index;   //arrays to store the neighbour lists
       std::vector<double> neighbour_list_end_index;
       std::vector<double> neighbour_list_array;
+
+      std::vector < double > rij_tensor_xx;
+      std::vector < double > rij_tensor_xy;
+      std::vector < double > rij_tensor_xz;
+
+      std::vector < double > rij_tensor_yy;
+      std::vector < double > rij_tensor_yz;
+      std::vector < double > rij_tensor_zz;
 
 //      std::ofstream o_file;
 

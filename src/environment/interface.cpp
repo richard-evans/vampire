@@ -100,30 +100,28 @@ namespace environment{
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "length", 10, 1.0e6,"input","10 Angstroms - 0.1 millimetre");
-         env::cell_size[0] =d;
-         env::cell_size[1] =d;
-         env::cell_size[2] =d;
+         env::cell_size =d;
          return true;
       }
       test="cell-size-x";
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "length", 10, 1.0e6,"input","10 Angstroms - 0.1 millimetre");
-         env::cell_size[0] =d;
+         env::cell_size =d;
          return true;
       }
       test="cell-size-y";
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "length", 10, 1.0e6,"input","10 Angstroms - 0.1 millimetre");
-         env::cell_size[1] =d;
+         env::cell_size =d;
          return true;
       }
       test="cell-size-z";
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "length", 10, 1.0e6,"input","10 Angstroms - 0.1 millimetre");
-         env::cell_size[2] =d;
+         env::cell_size =d;
          return true;
       }
 
@@ -141,14 +139,14 @@ namespace environment{
       if(word==test){
          double k=atof(value.c_str());
          vin::check_for_valid_value(k, word, line, prefix, unit, "anisotropy", 0,1e-15 ,"input","0 - 1e-18");
-         env::ku =k;
+         env::ku_value =k;
          return true;
       }
       test="Ms";
       if(word==test){
          double A=atof(value.c_str());
          vin::check_for_valid_positive_value(A, word, line, prefix, unit, "magnetisation", 1e-35,1e-15 ,"input","1e-32 - 1e-18");
-         env::Ms =A;
+         env::Ms_value =A;
          return true;
       }
       //initialuse the number of atomsitic steps per micromagnetic step

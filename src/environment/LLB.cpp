@@ -113,6 +113,7 @@ namespace environment{
       double Hy,
       double Hz,
       double dt){
+
          using namespace LLB_arrays;
                //updating the cell magnetisation (in parallel)
                if (micromagnetic::discretisation_type == 0) cells::mag();
@@ -130,7 +131,6 @@ namespace environment{
                // Check for initialisation of LLG integration arrays
                if(LLG_set== false) environment::LLB_init(num_cells);
                // Local variables for system integration
-               const double iMs = 1.0/env::Ms;
 
                //sets to 0 for the parallel processing
                for (int cell = 0; cell < num_cells; cell++){
@@ -142,9 +142,9 @@ namespace environment{
                //save this new m as the initial value, so it can be saved and used in the final equation.
                for (int i = my_env_start_index; i < my_env_end_index; i++){
                   int cell = env::none_atomistic_cells[i];
-                  x_array[cell] = env::x_mag_array[cell]*iMs;
-                  y_array[cell] = env::y_mag_array[cell]*iMs;
-                  z_array[cell] = env::z_mag_array[cell]*iMs;
+                  x_array[cell] = env::x_mag_array[cell]*1.0/env::Ms[cell];
+                  y_array[cell] = env::y_mag_array[cell]*1.0/env::Ms[cell];
+                  z_array[cell] = env::z_mag_array[cell]*1.0/env::Ms[cell];
                   x_initial_spin_array[cell] = x_array[cell];
                   y_initial_spin_array[cell] = y_array[cell];
                   z_initial_spin_array[cell] = z_array[cell];
@@ -164,6 +164,7 @@ namespace environment{
                env::one_o_chi_para =  env::calculate_chi_para(temperature);
                env::one_o_chi_perp =  env::calculate_chi_perp(temperature);
 
+
                //fill the noise terms
                for (int i = my_env_start_index; i < my_env_end_index; i++){
                   int cell = env::none_atomistic_cells[i];
@@ -175,9 +176,9 @@ namespace environment{
                   GW2z[cell] = mtrandom::gaussian();
                }
                //iff FFt is enabled calculate the demag fields.
-               #ifdef FFT
+            //   #ifdef FFT
                if (sim::time %demag_update_rate == 0) env::calculate_demag_fields();
-               #endif
+            //   #endif
                //std::vector < double > mm_env_exchange(num_cells,0.0);
                //std::vector < double > env_mm_exchange(mm::num_cells,0.0);
 

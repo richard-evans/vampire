@@ -49,7 +49,9 @@ namespace environment{
       // Internal data type definitions
       //-------------------------------------------------------------------------
       extern std::vector < double > dim;
-      extern std::vector < double > cell_size;
+      extern std::vector < double > cell_size_x;
+      extern std::vector < double > cell_size_y;
+      extern std::vector < double > cell_size_z;
       extern std::vector < double > initial_spin;
       extern std::vector < double > ext_field;
 
@@ -70,7 +72,7 @@ namespace environment{
 
       extern bool LFA_scan;
       extern double eightPI_three_cell_volume;
-      extern double cell_volume;
+      extern std::vector < double > cell_volume;
       extern double env_field;
       extern std::vector < double > env_field_uv;
       //if initial spins are random
@@ -80,9 +82,11 @@ namespace environment{
       extern int num_cells;
       extern double A;
       extern double exchange_constant;
-      extern double ku;
+      extern double ku_value;
+      extern double Ms_value;
+      extern std::vector < double > ku;// -1e-23;
+      extern std::vector < double > Ms;// = 1e-21;
       extern double Tc;
-      extern double Ms;
       extern double m_e;
       extern double gamma;
       extern double alpha;
@@ -91,6 +95,7 @@ namespace environment{
       extern double one_o_chi_perp;
       extern double alpha_para;
       extern double alpha_perp;
+      extern double cell_size;
 
       extern std::vector <int> list_of_mm_cells_in_env;
       //array to store mag
@@ -164,6 +169,14 @@ namespace environment{
 
       extern int eight_num_cells;
 
+      extern std::vector < double > rij_tensor_xx;
+      extern std::vector < double > rij_tensor_xy;
+      extern std::vector < double > rij_tensor_xz;
+
+      extern std::vector < double > rij_tensor_yy;
+      extern std::vector < double > rij_tensor_yz;
+      extern std::vector < double > rij_tensor_zz;
+
 
       extern std::vector < int > none_atomistic_cells;
       extern std::vector < int > atomistic_cells;
@@ -181,7 +194,7 @@ namespace environment{
       int calculate_demag_fields();
       int output();
 
-      bool in_shield(double x, double y, double z);
+      int in_shield(double x, double y, double z);
       int bias_shields();
 
       std::vector<double> calculate_llb_fields(std::vector <double>& m,
@@ -193,6 +206,7 @@ namespace environment{
 
       std::vector<double> calculate_field_env(int celli, int cellj);
       std::vector<double> calculate_field_mm(int celli, int cellj);
+      std::vector < std::vector < double> > calculate_corners(double x, double y, double z, double cell_size_x, double cell_size_y, double cell_size_z);
 
       } // end of internal namespace
 
