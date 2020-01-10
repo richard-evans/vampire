@@ -102,11 +102,7 @@ int micromagnetic_init(int num_cells,
                        std::vector<double>& y_mag_array,
                        std::vector<double>& z_mag_array){
 
-   // check calling of routine if error checking is activated
-   if(err::check==true) std::cout << "LLB_init has been called" << std::endl;
-
    using namespace micromagnetic_arrays;
-
 
    x_spin_storage_array.resize(num_cells,0.0);
    y_spin_storage_array.resize(num_cells,0.0);
@@ -141,6 +137,9 @@ int micromagnetic_init(int num_cells,
 
 }
 
+//------------------------------------------------------------------------------
+// Function to integrate LLB for micromagnetic cells
+//------------------------------------------------------------------------------
 int LLB( std::vector <int>& local_cell_array,
          int num_steps,
          int num_cells,
@@ -168,8 +167,8 @@ int LLB( std::vector <int>& local_cell_array,
       mm::T[cell] = temperature;
    }
 
-   //mm::output_system_parameters(cells::pos_and_mom_array, x_mag_array, y_mag_array, z_mag_array);
-   //std::cin.get();
+   // Output cell parameters for debugging
+   //mm::output_system_parameters(cells::pos_and_mom_array, x_mag_array, y_mag_array, z_mag_array); std::cin.get();
 
    // compute parallel and perpendicular susceptibilities
    mm::calculate_chi_para(number_of_micromagnetic_cells, list_of_micromagnetic_cells, mm::one_o_chi_para, mm::T, mm::Tc);
@@ -209,6 +208,8 @@ int LLB( std::vector <int>& local_cell_array,
       GW2z[cell] = mtrandom::gaussian();
    }
 
+   double xyz[3] = {0.0,0.0,0.0};
+
    //calculate the euler gradient (for cells on this processor)
    for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
       int cell = list_of_micromagnetic_cells[lc];
@@ -232,7 +233,6 @@ int LLB( std::vector <int>& local_cell_array,
       const double one_o_m_squared = 1.0/(m[0]*m[0]+m[1]*m[1]+m[2]*m[2]);
       const double SdotH = m[0]*H[0] + m[1]*H[1] + m[2]*H[2];
 
-      double xyz[3] = {0.0,0.0,0.0};
 		//calculates delta terms
       xyz[0]=  - (m[1]*H[2]-m[2]*H[1])
                + mm::alpha_para[cell]*m[0]*SdotH*one_o_m_squared
@@ -359,39 +359,8 @@ int LLB( std::vector <int>& local_cell_array,
    	cells::mag_array_z[cell] = z_array[cell]*mm::ms[cell];
    }
 
-   /*{
-   std::stringstream fname_ss;
-   fname_ss << "cells-before-" << vmpi::my_rank << ".txt";
-   std::ofstream ofile(fname_ss.str());
-
-   for(int cell=0; cell < cells::num_cells ; cell++){
-      ofile << x_array[cell] << "\t" << y_array[cell] << "\t" << z_array[cell] << "\t" <<
-               cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell] << std::endl;
-   }
-
-   ofile.close();
-}*/
-
 	// Reduce unit vectors and moments to all processors
    #ifdef MPICF
-      // before reduction, need to zero all non-magnetic (empty) cells
-      // note: this requires that atomistic simulations are done last in multiscale simulation
-      /*for(int cid=0; cid < list_of_empty_micromagnetic_cells.size(); cid++){
-
-         // get cell ID
-         const int cell = list_of_empty_micromagnetic_cells[cid];
-
-         // set all components to zero
-         cells::mag_array_x[cell] = 0.0;
-         cells::mag_array_y[cell] = 0.0;
-         cells::mag_array_z[cell] = 0.0;
-
-         x_array[cell] = 0.0;
-         y_array[cell] = 0.0;
-         z_array[cell] = 0.0;
-
-      }*/
-
       MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0], data_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0], data_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0], data_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -400,20 +369,6 @@ int LLB( std::vector <int>& local_cell_array,
       MPI_Allreduce(MPI_IN_PLACE, &z_array[0],            data_size, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
    #endif
-
-   /*{
-   std::stringstream fname_ss;
-   fname_ss << "cells-" << vmpi::my_rank << ".txt";
-   std::ofstream ofile(fname_ss.str());
-
-   for(int cell=0; cell < cells::num_cells ; cell++){
-      ofile << x_array[cell] << "\t" << y_array[cell] << "\t" << z_array[cell] << "\t" <<
-               cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell] << std::endl;
-   }
-
-   ofile.close();
-   }
-   std::cin.get();*/
 
    //update atom positions
    if (discretisation_type == 2 || sim::time%vout::output_rate -1){
@@ -425,14 +380,14 @@ int LLB( std::vector <int>& local_cell_array,
          atoms::z_spin_array[atom] = z_array[cell];
       }
     }
-	//	std::cin.get();
-	//	std::cout << enable_resistance << "\t" << std::endl;
-      if (sim::time%100000 && enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 )  micromagnetic::MR_resistance = mm::calculate_resistance();
-		//	std::cout << micromagnetic::MR_resistance <<std::endl;
+
+   if (sim::time%100000 && enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 ){
+      micromagnetic::MR_resistance = mm::calculate_resistance();
+   }
 
 	return 0;
 
 }
 
 
-}
+} // end of micromagnetic namespace
