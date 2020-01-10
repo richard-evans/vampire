@@ -150,7 +150,7 @@ void create_tracks(){
 //   std::cout << "A" << std::endl;
 
    // temporary constants defining half sizes of bits
-   const double xb = tp::bit_size*0.5;
+   const double xb = tp::bit_size *0.5;
    const double yb = tp::bit_depth*0.5;
    const double zb = tp::bit_width*0.5;
 
@@ -168,19 +168,9 @@ void create_tracks(){
           tp::x_track_pos[bit] = x;
           tp::z_track_pos[bit] = z;
           tp::bit_magnetisation[bit] = bitms[bit];
-      //    std::cout << x << '\t' << z <<  "\t" << bw << '\t' << bs << std::endl;
-      //    std::cout << bitms[bit] <<std::endl;
-    //      std::cout << bit << '\t' <<  tp::bit_magnetisation[bit] <<std::endl;
           bit++;
-
-//      M = M*-1;
        }
-  //     M = M*-1;
     }
-   // std::cout << "A" << std::endl;
-
-
-//    std::cin.get();
 }
 
 
