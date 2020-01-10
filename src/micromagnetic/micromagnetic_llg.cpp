@@ -124,11 +124,9 @@ namespace micromagnetic{
       if(LLG_set== false) micromagnetic::micromagnetic_init_llg(num_cells);
       // Local variables for system integration
 
-      //calculte chi(T).
-      mm::one_o_chi_para =  mm::calculate_chi_para(num_local_cells,local_cell_array, num_cells, temperature);
-      mm::one_o_chi_perp =  mm::calculate_chi_perp(num_local_cells,local_cell_array, num_cells, temperature);
-
-
+      // calculate chi(T).
+      mm::calculate_chi_para(number_of_micromagnetic_cells, list_of_micromagnetic_cells, mm::one_o_chi_para, mm::T, mm::Tc);
+      mm::calculate_chi_perp(number_of_micromagnetic_cells, list_of_micromagnetic_cells, mm::one_o_chi_perp, mm::T, mm::Tc);
 
       //The external fields equal the length of the field times the applied field vector.
       //This is saved to an array.
@@ -171,7 +169,7 @@ namespace micromagnetic{
 
 
 
-      //calcualtes the euler gradient
+      //calculates the euler gradient
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
          int cell = list_of_micromagnetic_cells[lc];
          m[0] = x_array[cell];
@@ -232,8 +230,6 @@ namespace micromagnetic{
          z_spin_storage_array[cell] = S_new[2];
 
       }
-   //   for (int cell = 0; cell < num_cells; cell++)
-   //   std::cout << "INITIAL" << "\t" << x_spin_storage_array[cell] << '\t' << y_spin_storage_array[cell] << '\t' << z_spin_storage_array[cell] << '\t' << std::endl;
 
       // Reduce cell magnetizations on all processors to enable correct exchange field calculations
       #ifdef MPICF
@@ -242,9 +238,6 @@ namespace micromagnetic{
          MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
       #endif
 
-
-   //   for (int cell = 0; cell < num_cells; cell++)
-         //   std::cout << "END" << "\t" << x_spin_storage_array[cell] << '\t' << y_spin_storage_array[cell] << '\t' << z_spin_storage_array[cell] << '\t' << std::endl;
       //heun step
       for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
          int cell = list_of_micromagnetic_cells[lc];

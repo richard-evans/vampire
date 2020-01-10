@@ -18,56 +18,58 @@
 #include <math.h>
 
 namespace micromagnetic{
+namespace internal{
 
-   namespace internal{
+// Fit Parameters (local scoped constants to minimize function overhead)
+const double a0 = 0.8;
+const double a1 =-2.2e-07;
+const double a2 = 1.95e-13;
+const double a3 =-1.3e-17;
+const double a4 =-4e-23;
+const double a5 =-6.5076312364e-32;
+const double i4PI = 1.0/(4.0*3.14159265359);
+const double i660 = 1.0/660.0;
 
-      // -----------------------------------------------------------------------------------
-      // calculates the temperature dependant parallel component of the susceptability from the analytical equation
-      // -----------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------
+//        chi_para = a0/4pi . Tc/(Tc-T) + sum_i ai (Tc -T)^i          if T < TC
+//        chi_para = b0 +1/4pi . Tc/(T-TC)                            if T > TC
+// -----------------------------------------------------------------------------------
+inline double chi_para_fn(const double T, const double Tc){
 
-      std::vector<double> calculate_chi_para(int num_local_cells,
-                                             std::vector<int>local_cell_array,
-                                              int num_cells,
-                                             double T){        //temperature
+   const double TcmT = Tc - T;
+   const double TcmT3 = TcmT*TcmT*TcmT;
+   const double TcmT6 = TcmT3*TcmT3;
+   const double TcmT9 = TcmT3*TcmT6;
 
-         // -----------------------------------------------------------------------------------
-         //        chi_para = a0/4pi . Tc/(Tc-T) + sum_i ai (Tc -T)^i          if T < TC
-         //        chi_para = b0 +1/4pi . Tc/(T-TC)                            if T > TC
-         // -----------------------------------------------------------------------------------
+   if(T<Tc) return 1.0 / ( 9.54393845712027*( (a0*Tc*i660*i4PI)/(TcmT) +
+                                              a1*TcmT + a2*TcmT3 +
+                                              a3*TcmT*TcmT*TcmT*TcmT +
+                                              a4*TcmT6 + a5*TcmT9 ) );
+   else return 1.0 / ( 9.54393845712027*( 1.1*1.4*Tc*i660*i4PI/(T-Tc) ) );
 
-         //Fit Parameter
-         double a0 = 0.8;
-         double a1 =-2.2e-07;
-         double a2 = 1.95e-13;
-         double a3 =-1.3e-17;
-         double a4 =-4e-23;
-         double a5 =-6.5076312364e-32;
+}
 
-         std::vector<double> chi(num_cells,0.0);        //1D vector the store the parallel susceptability for each cell
+// -----------------------------------------------------------------------------------
+// calculates the temperature dependant parallel component of the susceptability from the analytical equation
+// -----------------------------------------------------------------------------------
+void calculate_chi_para(int num_mm_cells,
+                        std::vector<int>& list_of_mm_cells,
+                        std::vector<double>& chi_para,
+                        std::vector<double>& T,
+                        std::vector<double>& Tc){
 
-         double PI= 3.14159;
-         //double factor =  0.75947907;
-         for (int i = 0; i < num_local_cells; i++){
+   // compute chi value for cells (on this processor)
+   for (int lc = 0; lc < num_mm_cells; lc++){
+      int cell = list_of_mm_cells[lc];
+      chi_para[cell] = chi_para_fn(T[cell], Tc[cell]);
+   }
 
-            int cell = local_cell_array[i];
+   #ifdef MPICF
+      //MPI_Allreduce(MPI_IN_PLACE, &chi[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+   #endif
 
-            //analytical expression for the parallel susceptability,
-            if(T<Tc[cell]) chi[cell] =(a0/660.*Tc[cell])/(4.*PI)/(Tc[cell]-T)+a1*pow((Tc[cell]-T),1.)+ a2*pow((Tc[cell]-T),3.)+a3*pow((Tc[cell]-T),4.)+ a4*pow((Tc[cell]-T),6.)+ a5*pow((Tc[cell]-T),9.);
-            else chi[cell] = (1.1*1.4/660.*Tc[cell])/(4*PI)/(T-Tc[cell]);
+   return;            //returns the 1D vector for the susceptability,
+}
 
-            //conversion from CGS to SI plus a small factor to stop the sum being less than 0
-            chi[cell] = 1.0/(chi[cell]*9.54393845712027+0.308e-14);
-            if (chi[cell] < 0) {
-              chi[cell] = 0.0001;
-              // std::cout << "error" << '\t' << Tc[cell] << '\t' << chi[cell] <<std::endl;
-               //std::cin.get();
-            }
-         }
-         #ifdef MPICF
-            MPI_Allreduce(MPI_IN_PLACE, &chi[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         #endif
-
-         return chi;            //returns the 1D vector for the susceptability,
-      }
-   } //closes the internal namspace
+} //closes the internal namspace
 }  //closes the micromagnetic namespace

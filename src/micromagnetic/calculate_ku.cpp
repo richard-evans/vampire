@@ -90,9 +90,9 @@ namespace micromagnetic{
 
 
          #ifdef MPICF
-         MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
          #endif
 
 
@@ -121,11 +121,13 @@ namespace micromagnetic{
 
 
         }
-        #ifdef MPICF
-        MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-        #endif
+
+        // why is this summed again?
+        /*#ifdef MPICF
+           MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+           MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+           MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+        #endif*/
 
 
 

@@ -56,6 +56,8 @@ namespace micromagnetic{
                    double system_dimensions_z,
                    std::vector<int> local_cell_array){
 
+   // Output informative message to user
+   std::cout << "Initialising micromagnetic module" << std::endl;
 
    int num_atoms_interactions;
    #ifdef MPICF
@@ -76,6 +78,7 @@ namespace micromagnetic{
    mm::ku_y.resize(num_cells,0.0);
    mm::ku_z.resize(num_cells,0.0);
    mm::ms.resize(num_cells,0.0);
+   mm::T.resize(num_cells,0.0);
    mm::Tc.resize(num_cells,0.0);
    mm::alpha_para.resize(num_cells,0.0);
    mm::alpha_perp.resize(num_cells,0.0);
@@ -99,8 +102,9 @@ namespace micromagnetic{
                                                neighbour_list_start_index, neighbour_list_end_index, type_array, material);
    mm::ku =                   mm::calculate_ku(num_atoms, num_cells, cell_array, type_array, material);
    mm::gamma =                mm::calculate_gamma(num_atoms, num_cells, cell_array,type_array,material,num_local_cells,local_cell_array);
-   mm::one_o_chi_para =       mm::calculate_chi_para(num_local_cells, local_cell_array,num_cells, Temperature);
-   mm::one_o_chi_perp =       mm::calculate_chi_perp(num_local_cells, local_cell_array,num_cells, Temperature);
+   //mm::one_o_chi_para =       mm::calculate_chi_para(num_local_cells, local_cell_array,num_cells, Temperature);
+   //mm::one_o_chi_perp =       mm::calculate_chi_perp(num_local_cells, local_cell_array,num_cells, Temperature);
+
    mm::A =                    mm::calculate_a(num_atoms_interactions, num_cells, num_local_cells,cell_array, neighbour_list_array, neighbour_list_start_index,
                                               neighbour_list_end_index, type_array,  material, volume_array, x_coord_array,
                                               y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
@@ -147,6 +151,7 @@ namespace micromagnetic{
             //if simualtion is micromagetic all cells are made micromagnetic cells
             for (int lc = 0; lc < num_local_cells; lc++){
                int cell = local_cell_array[lc];
+               // need to fix here tOO!!!
                if (micromagnetic::cell_discretisation_micromagnetic[cell] == 1 && mm::ms[cell] > 1e-30) {
                   list_of_micromagnetic_cells.push_back(cell);
                   number_of_micromagnetic_cells ++;
@@ -161,10 +166,45 @@ namespace micromagnetic{
 
          //if micromagnetic simulation all cells are micromagnetic and all atoms are micromagnetic
          else {
-            for (int lc = 0; lc < num_local_cells; lc++){
+
+            vmpi::barrier();
+
+            std::vector<int> list_of_magnetic_cells(0);
+
+            // determine total number of magnetic cells
+            int num_magnetic_cells = 0;
+            for(int c = 0; c < cells::num_cells; c++){
+               if(mm::ms[c] > 1e-40 && mm::Tc[c] > 0.1){
+                  list_of_magnetic_cells.push_back(c);
+                  num_magnetic_cells++;
+               }
+               else{
+                  list_of_empty_micromagnetic_cells.push_back(c);
+               }
+            }
+
+
+            // now divide cells over processors, allocating extra to the last processor
+            int num_cells_pp = num_magnetic_cells / vmpi::num_processors;
+            int my_num_cells = num_cells_pp;
+            if(vmpi::my_rank == vmpi::num_processors - 1) my_num_cells = num_magnetic_cells - (vmpi::num_processors-1)*num_cells_pp;
+
+            std::cerr << vmpi::my_rank << "\t" << cells::num_cells << "\t" << my_num_cells << "\t" << num_magnetic_cells << std::endl;
+
+            // loop over all magnetic cells, allocating cells to processors in linear fashion
+            const int start = vmpi::my_rank*num_cells_pp;
+            const int end   = vmpi::my_rank*num_cells_pp + my_num_cells;
+            for(int c = start; c < end; c++){
+               list_of_micromagnetic_cells.push_back( list_of_magnetic_cells[c] );
+               number_of_micromagnetic_cells ++;
+            }
+
+            vmpi::barrier();
+
+            /*for (int lc = 0; lc < num_local_cells; lc++){
                int cell = local_cell_array[lc];
 
-               // Check that cell is micromgantic, has a reasonable moment and reasonable Curie temperature
+               // Check that cell is micromagnetic, has a reasonable moment and reasonable Curie temperature
                if(mm::ms[cell] > 1e-40 && mm::Tc[cell] > 0.1){
 
                   // save cell in list
@@ -179,7 +219,7 @@ namespace micromagnetic{
                   list_of_empty_micromagnetic_cells.push_back(cell);
                }
 
-            }
+            }*/
 
             for (int atom =0; atom < num_atoms; atom++){
                list_of_none_atomistic_atoms.push_back(atom);
@@ -188,7 +228,7 @@ namespace micromagnetic{
 
          }
 
-         //for field calcualtions you need to access the atoms in numerically consecutive lists.
+         //for field calculations you need to access the atoms in numerically consecutive lists.
          //therefore you need to create lists of consecutive lists
          //loops over all atoms if atom is not one minus the previous atom then create a new list.
 
@@ -208,6 +248,13 @@ namespace micromagnetic{
             }
          }
 
+         //--------------------------------------------------------------------------------------------------
+         // Pre-calculate micromagnetic parameters
+         //--------------------------------------------------------------------------------------------------
+         //mm::calculate_chi_para(number_of_micromagnetic_cells, list_of_micromagnetic_cells, mm::one_o_chi_para, mm::T, mm::Tc);
+         //mm::calculate_chi_perp(number_of_micromagnetic_cells, list_of_micromagnetic_cells, mm::one_o_chi_perp, mm::T, mm::Tc);
+
+
         /*for (int cell = 0; cell < num_cells; cell++){
           std::cerr << '\t' << cells::cell_coords_array_z[cell] << '\t' <<  mm::ms[cell] << '\t' << mm::ku[cell] << '\t' << mm::A[cell] << "\t" << mm::Tc[cell] << "\t" <<micromagnetic::cell_discretisation_micromagnetic[cell] << "\t" << mm::alpha[cell] << '\t' << mm::gamma[cell] << std::endl;
        }*/
@@ -215,7 +262,7 @@ namespace micromagnetic{
         std::vector < double > temp(num_cells,0);
 
 
-        int num_calculations = mm::fields_neighbouring_atoms_begin.size();
+        //int num_calculations = mm::fields_neighbouring_atoms_begin.size();
 
         for (int atom = 0; atom < num_atoms_interactions; atom ++){
            int mat = type_array[atom];
@@ -244,11 +291,11 @@ namespace micromagnetic{
 
         for (int cell = 0; cell < num_cells; cell++ ){
 
-           double zi = cells::pos_and_mom_array[4*cell+2];
+           //double zi = cells::pos_and_mom_array[4*cell+2];
             int mat = mm::cell_material_array[cell];
 
             if (mp::material[mat].pinning_field_unit_vector[0]+ mp::material[mat].pinning_field_unit_vector[1] + mp::material[mat].pinning_field_unit_vector[2]!= 0.0){
-              double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
+              //double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
             //  std::cout << mp::material[mat].pinning_field_unit_vector[0] << '\t' <<mp::material[mat].pinning_field_unit_vector[1] << '\t' << mp::material[mat].pinning_field_unit_vector[2] << '\t' << mm::ms[cell] << '\t' << Area << std::endl;
                mm::pinning_field_x[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[0];
                mm::pinning_field_y[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[1];
@@ -302,12 +349,10 @@ namespace micromagnetic{
         // for (int i = 0; i < 101; i++) P[i].resize(101,0.0);
 
 
-        if (mm::bias_magnets == true){
-
-          int a = mm::calculate_bias_magnets(system_dimensions_x,system_dimensions_y,system_dimensions_z);
-
-        }
-        std::cout << "end of micromangetic initialisation" << std::endl;
+      if(mm::bias_magnets == true){
+         mm::calculate_bias_magnets(system_dimensions_x,system_dimensions_y,system_dimensions_z);
+      }
+      std::cout << "End of micromangetic initialisation" << std::endl;
 
    return;
 

@@ -32,9 +32,9 @@ namespace micromagnetic{
 
    extern bool enable_resistance;
    //initialises the lists of atomstic/micromagnetic atoms for multiscale simulations
-   extern std::vector < double > list_of_atomistic_atoms;
-   extern std::vector < double > list_of_none_atomistic_atoms;
-   extern std::vector < double > list_of_micromagnetic_cells;
+   extern std::vector <int> list_of_atomistic_atoms;
+   extern std::vector <int> list_of_none_atomistic_atoms;
+   extern std::vector <int> list_of_micromagnetic_cells;
    extern std::vector <int> list_of_empty_micromagnetic_cells;
    //variables to store the numbers of atomistic/ microamgnetic atoms for multiscale simulations
    extern int number_of_atomistic_atoms;
@@ -74,7 +74,7 @@ namespace micromagnetic{
    int atomistic_LLGinit();
 
    //micromagnetic LLB
-   int LLB( std::vector <int> local_cell_array,
+   int LLB( std::vector <int>& local_cell_array,
             int num_steps,
             int num_cells,
             int num_local_cells,
@@ -87,7 +87,7 @@ namespace micromagnetic{
             double Hz,
             double H,
             double dt,
-            std::vector <double> volume_array);
+            std::vector <double>& volume_array);
 
     //micromagnetic LLG
     int LLG( std::vector <int> local_cell_array,
