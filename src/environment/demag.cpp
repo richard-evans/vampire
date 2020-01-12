@@ -275,7 +275,7 @@ namespace environment{
         int interaction_no = 0;
            const double imuB = 1.0/9.27400915e-24;
 
-        std::cout << "calcualte demag env " <<std::endl;
+      //  std::cout << "calcualte demag env " <<std::endl;
 
       for(int cell_i = 0; cell_i<num_cells;cell_i++){
 
@@ -317,17 +317,17 @@ namespace environment{
         //std::cout << sim::time << '\t' << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
       }
     //  saves the dipole field for each cell to the environment cell for use in the environment module
-      for(int lc=0; lc<cells::num_local_cells; lc++){
-         int cell = cells::cell_id_array[lc];
-         int env_cell = list_env_cell_atomistic_cell[cell];
-         //std::cout << cell << '\t' << env_cell <<std::endl;
-         environment_field_x[cell] = dipole_field_x[env_cell] + bias_field_x[env_cell];
-         environment_field_y[cell] = dipole_field_y[env_cell] + bias_field_y[env_cell];
-         environment_field_z[cell] = dipole_field_z[env_cell] + bias_field_z[env_cell];
-
-        std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
-
-      }
+      // for(int lc=0; lc<cells::num_local_cells; lc++){
+      //    int cell = cells::cell_id_array[lc];
+      //    int env_cell = list_env_cell_atomistic_cell[cell];
+      //    //std::cout << cell << '\t' << env_cell <<std::endl;
+      //    environment_field_x[cell] = dipole_field_x[env_cell] + bias_field_x[env_cell];
+      //    environment_field_y[cell] = dipole_field_y[env_cell] + bias_field_y[env_cell];
+      //    environment_field_z[cell] = dipole_field_z[env_cell] + bias_field_z[env_cell];
+      //
+      // //  std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
+      //
+      // }
 
 //          #ifdef FFT
 //          //initalise all components of M and H arrays to 0

@@ -238,6 +238,7 @@ namespace vout{
       }
    }
 
+
    // Output Function 21 - with Header
    void mean_system_susceptibility(std::ostream& stream, bool header){
       stream << stats::system_susceptibility.output_mean_susceptibility(sim::temperature,header);
@@ -467,6 +468,33 @@ namespace vout{
       else{
          stream << micromagnetic::MR_resistance << "\t";
       }
+   }
+
+   void lfa_ms(std::ostream& stream,bool header){
+     if(header){
+        stream << "MS" << "\t";
+     }
+     else{
+         stream << sim::Ms << "\t";
+      }
+   }
+   void x_track_pos(std::ostream& stream,bool header){
+     if(header){
+        stream << "x-pos" << "\t";
+     }
+     else{
+              stream << sim::track_pos_x << "\t";
+            }
+
+   }
+   void z_track_pos(std::ostream& stream,bool header){
+     if(header){
+        stream << "z pos" << "\t";
+     }
+     else{
+        stream << sim::track_pos_z << "\t";
+    }
+
    }
 
 }

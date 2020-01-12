@@ -933,7 +933,7 @@ namespace vin{
      test="x-velocity";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360.0,"input","0.0 - 360.0 degrees");
         sim::cross_track_velocity = m;
         return EXIT_SUCCESS;
      }
@@ -942,7 +942,7 @@ namespace vin{
      test="z-velocity";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360.0,"input","0.0 - 360.0 degrees");
         sim::down_track_velocity = m;
         return EXIT_SUCCESS;
      }
@@ -950,14 +950,14 @@ namespace vin{
      test="initial-x-position";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
+        check_for_valid_value(m, word, line, prefix, unit, "length", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
         sim::initial_cross_track_position = m;
         return EXIT_SUCCESS;
      }
      test="initial-z-position";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
+        check_for_valid_value(m, word, line, prefix, unit, "length", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
         sim::initial_down_track_position = m;
         return EXIT_SUCCESS;
      }
@@ -1147,12 +1147,6 @@ namespace vin{
             output_list.push_back(2);
             return EXIT_SUCCESS;
         }
-        test="magneto-resistance";
-        if(word==test){
-          micromagnetic::enable_resistance = true;
-          output_list.push_back(65);
-          return EXIT_SUCCESS;
-       }
         else
         //--------------------------------------------------------------------
         test="applied-field-strength";
@@ -1504,6 +1498,28 @@ namespace vin{
         if(word==test){
            stats::calculate_material_energy = true;
            output_list.push_back(64);
+           return EXIT_SUCCESS;
+        }
+        test="magneto-resistance";
+        if(word==test){
+          micromagnetic::enable_resistance = true;
+          output_list.push_back(65);
+          return EXIT_SUCCESS;
+       }
+        //--------------------------------------------------------------------
+        test="lfa-ms";
+        if(word==test){
+           output_list.push_back(66);
+           return EXIT_SUCCESS;
+        }
+        test="track-pos-x";
+        if(word==test){
+           output_list.push_back(67);
+           return EXIT_SUCCESS;
+        }
+        test="track-pos-z";
+        if(word==test){
+           output_list.push_back(68);
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------

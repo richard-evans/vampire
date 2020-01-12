@@ -88,6 +88,9 @@ namespace vout{
    void mean_total_energy(std::ostream& stream,bool header);
    void total_anisotropy_energy(std::ostream& stream,bool header);
    void mean_total_anisotropy_energy(std::ostream& stream,bool header);
+   void lfa_ms(std::ostream& stream,bool header);
+   void x_track_pos(std::ostream& stream,bool header);
+   void z_track_pos(std::ostream& stream,bool header);
    //void total_cubic_anisotropy_energy(std::ostream& stream,bool header);
    //void mean_total_cubic_anisotropy_energy(std::ostream& stream,bool header);
    //void total_surface_anisotropy_energy(std::ostream& stream,bool header);

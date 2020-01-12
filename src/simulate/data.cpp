@@ -30,6 +30,10 @@ namespace sim{
    double track_bit_depth = 600;
    double cross_track_velocity = 0.0;
    double down_track_velocity = 0.0;
+   double track_pos_x;
+   double track_pos_z;
+   double Ms;
+
 
    double initial_down_track_position = 0.0;
    double initial_cross_track_position = 0.0;

@@ -53,6 +53,7 @@ namespace environment{
       //------------------------------------------------------------------------
       // Shared variables inside environment module
       //------------------------------------------------------------------------
+      int num_shields = 1;
 
 
       bool square_shields = true;
@@ -68,12 +69,38 @@ namespace environment{
 
       bool LFA_scan;
 
+      std::vector <string> shield_shape;
+      std::vector <double> shield_ms;
+      std::vector <double> shield_Tc;
+      std::vector< std::vector <double> > shield_A;
+      std::vector <double> shield_alpha;
+      std::vector <double> shield_gamma;
+      std::vector <double> shield_ku;
+      std::vector <double> shield_max_x;
+      std::vector <double> shield_max_y;
+      std::vector <double> shield_max_z;
+      std::vector <double> shield_min_x;
+      std::vector <double> shield_min_y;
+      std::vector <double> shield_min_z;
+      std::vector <double> shield_Hext_x;
+      std::vector <double> shield_Hext_y;
+      std::vector <double> shield_Hext_z;
+      std::vector <double> shield_max_cell_size;
+      std::vector <double> shield_min_cell_size;
+      std::vector <string> pos_or_neg;
+      std::vector <int> shield_number;
+      std::vector <int> H_strength;
+
+
+
       std::vector < double > dim(3,6.0);
       std::vector < double > cell_size_x;
       std::vector < double > cell_size_y;
       std::vector < double > cell_size_z;
 
-      std::vector < double > initial_spin(3,0.0);
+      std::vector < double > initial_spin_x;
+      std::vector < double > initial_spin_y;
+      std::vector < double > initial_spin_z;
 
       std::vector < double > ext_field(3,0.0);
 
@@ -89,7 +116,7 @@ namespace environment{
       double eightPI_three_cell_volume;
       std::vector < double > cell_volume;
 
-      bool random_spins = true;
+      std::vector < bool > random_spins;
 
       double env_field = 0.0;
 
@@ -99,15 +126,11 @@ namespace environment{
       fftw_plan MxP,MyP,MzP;
       fftw_plan HxP,HyP,HzP;
       #endif
-      double one_o_chi_para;
-      double one_o_chi_perp;
+      std::vector < double > one_o_chi_para;
+      std::vector < double > one_o_chi_perp;
 
       int num_cells;
-      double A = -180;
-      double ku_value = -1e-23;
-      double Ms_value = 1e-21;
       std::vector < double > ku;// -1e-23;
-      double Tc = 600;
       std::vector < double > Ms;// = 1e-21;
       double gamma = 1.0;
       double alpha = 1.0;

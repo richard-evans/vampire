@@ -257,6 +257,15 @@ namespace vout{
          case 65:
             vout::MRresistance(stream,header);
             break;
+				case 66:
+					 vout::lfa_ms(stream,header);
+					 break;
+				case 67:
+	          vout::x_track_pos(stream,header);
+	          break;
+				case 68:
+						vout::z_track_pos(stream,header);
+						break;
          case 999: //AJN
             vout::standard_deviation(stream,header);
             break;
