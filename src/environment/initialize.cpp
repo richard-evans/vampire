@@ -116,7 +116,7 @@ namespace environment{
        corners.resize(8);
        for (int i = 0; i < 8; ++i) corners[i].resize(3,0.0);
        std::ofstream pfile2;
-       pfile2.open("m2.txt");
+       pfile2.open("env_cell_positions");
        env::o_file.open("env_output");
 
        int n_cell = 0;
