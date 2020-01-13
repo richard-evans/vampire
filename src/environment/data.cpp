@@ -161,6 +161,8 @@ namespace environment{
       std::vector < double > rij_tensor_yz;
       std::vector < double > rij_tensor_zz;
 
+      bool env_output_info = false;
+
       std::ofstream o_file;
 
       //if FFT is enabled at compilation

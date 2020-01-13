@@ -73,6 +73,11 @@ namespace environment{
          env::LFA_scan =true;
          return true;
       }
+      test="ouput-cell-mag";
+      if(word==test){
+         env::env_output_info =true;
+         return true;
+      }
 
       test="system-size-x";
       if(word==test){

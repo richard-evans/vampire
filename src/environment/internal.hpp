@@ -121,7 +121,7 @@ namespace environment{
       extern double alpha_para;
       extern double alpha_perp;
       extern double cell_size;
-
+      extern bool env_output_info;
       extern std::vector <int> list_of_mm_cells_in_env;
       //array to store mag
       extern std::vector < double > x_mag_array;
