@@ -17,6 +17,7 @@
 #include "create.hpp"
 #include "vio.hpp"
 #include "errors.hpp"
+#include <algorithm>
 // C++ headers
 #include <math.h>
 
