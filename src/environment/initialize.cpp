@@ -117,6 +117,7 @@ namespace environment{
        for (int i = 0; i < 8; ++i) corners[i].resize(3,0.0);
        std::ofstream pfile2;
        pfile2.open("m2.txt");
+       env::o_file.open("env_output");
 
        int n_cell = 0;
        std::cout << env::num_shields <<std::endl;
