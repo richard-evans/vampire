@@ -80,6 +80,7 @@ namespace micromagnetic{
       extern std::vector<double> ku_y;
       extern std::vector<double> ku_z;
       extern std::vector<double> ms;
+      extern std::vector<double> T;
       extern std::vector<double> Tc;
       extern std::vector <double> mat_vol;
       extern std::vector <double> mat_ms;
@@ -110,7 +111,6 @@ namespace micromagnetic{
       // Internal function declarations
       //-------------------------------------------------------------------------
 
-
       double calculate_resistance();
       int calculate_bias_magnets(double sx, double sy, double sz);
       //functions to calculate the cell parameters
@@ -133,9 +133,17 @@ namespace micromagnetic{
       std::vector<double> calculate_alpha(int num_local_cells,int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array,
                                           std::vector <mp::materials_t> material,std::vector <int >local_cell_array);
 
-      std::vector<double> calculate_chi_para(int num_local_cells,std::vector<int>local_cell_array,int num_cells, double T);
+      void calculate_chi_perp(int num_mm_cells,
+                             std::vector<int>& list_of_mm_cells,
+                             std::vector<double>& chi_perp,
+                             std::vector<double>& T,
+                             std::vector<double>& Tc);
 
-      std::vector<double> calculate_chi_perp(int num_local_cells,std::vector<int>local_cell_array,int num_cells, double T);
+     void calculate_chi_para(int num_mm_cells,
+                             std::vector<int>& list_of_mm_cells,
+                             std::vector<double>& chi_para,
+                             std::vector<double>& T,
+                             std::vector<double>& Tc);
 
       std::vector<double> calculate_gamma(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array,
                                           std::vector <mp::materials_t> material, int num_local_cells,  std::vector<int>local_cell_array);
@@ -165,7 +173,10 @@ namespace micromagnetic{
                                                 std::vector<double>& y_array,
                                                 std::vector<double>& z_array);
 
-
+      void output_system_parameters(std::vector<double>& pos_and_mom_array,
+                                    std::vector<double>& x_mag_array,
+                                    std::vector<double>& y_mag_array,
+                                    std::vector<double>& z_mag_array);
 
    } // end of internal namespace
 

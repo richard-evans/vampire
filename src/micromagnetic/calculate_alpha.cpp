@@ -40,23 +40,28 @@ namespace micromagnetic{
          for (int atom = 0; atom <num_atoms; atom++){
             int cell = cell_array[atom];
             int mat = type_array[atom];
-            alpha[cell] = alpha[cell] + mp::material[mat].alpha;
-            N[cell]++;
+            alpha[cell] += mp::material[mat].alpha;
+            N[cell] += 1.0;
          }
 
-         // Reduce sum of Jij and N on all processors
+         // Reduce sum of alpha and N on all processors
          #ifdef MPICF
             MPI_Allreduce(MPI_IN_PLACE, &alpha[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-            MPI_Allreduce(MPI_IN_PLACE, &N[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(MPI_IN_PLACE, &N[0],     num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
 
          // calculates the average alpha per cell
-         for (int i = 0; i < num_local_cells; i++){
-            int cell = local_cell_array[i];
+         for (int cell = 0; cell < num_cells; cell++){
             alpha[cell] = alpha[cell]/N[cell];
          }
 
+         // reduce final alpha values on all cells
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &alpha[0], num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+         #endif
+
          return alpha;          //return an array of damping constants for each cell
+
       }
 
    } //closes the internal namspace

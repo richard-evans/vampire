@@ -195,7 +195,7 @@ namespace micromagnetic{
                for (int j = 0; j < num_cells; j++){
                   int cellj = j;
 
-                  if (int(a2d[celli][cellj]) != int(a2d[cellj][celli])) std::cout << "Error! Non symetric exchange" <<"\t"  <<  celli << '\t' << cellj << "\t"  <<  a2d[celli][cellj]<<"\t"  <<  a2d[cellj][celli] <<std::endl;
+                  if (int(a2d[celli][cellj]) != int(a2d[cellj][celli])) std::cout << "Error! Non symmetric exchange" <<"\t"  <<  celli << '\t' << cellj << "\t"  <<  a2d[celli][cellj]<<"\t"  <<  a2d[cellj][celli] <<std::endl;
                }
             }
 

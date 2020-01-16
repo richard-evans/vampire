@@ -29,24 +29,21 @@
 
 
 namespace micromagnetic{
+namespace internal{
 
-   namespace internal{
-
-      std::vector<double> calculate_llb_fields(std::vector <double > m,
-                                               double temperature,
-                                               int num_cells,
-                                               int cell,
-                                               std::vector<double>& x_array,
-                                               std::vector<double>& y_array,
-                                               std::vector<double>& z_array){
-
-
+   std::vector<double> calculate_llb_fields(std::vector <double > m,
+                                            double temperature,
+                                            int num_cells,
+                                            int cell,
+                                            std::vector<double>& x_array,
+                                            std::vector<double>& y_array,
+                                            std::vector<double>& z_array){
 
       //array to save the field to for each cell
       std::vector<double> spin_field(3,0.0);
 
       //chi is usually used as 1/2*chi
-      const double one_o_2_chi_para = (one_o_chi_para[cell]/2.0);
+      const double one_o_2_chi_para = (one_o_chi_para[cell]*0.5);
 
 
       //the temperature is usually used as a reduced temperature or Tc/(Tc-T).
@@ -109,9 +106,9 @@ namespace micromagnetic{
            }
 
            if (mp::material[mat].override_atomsitic[matj] == true){
-             double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
-             double Volume = cells::macro_cell_size_x*cells::macro_cell_size_y*cells::macro_cell_size_z;
-             double Ac2 = Ac;
+             //double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
+             //double Volume = cells::macro_cell_size_x*cells::macro_cell_size_y*cells::macro_cell_size_z;
+             //double Ac2 = Ac;
              Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
            }
         //   std::cout << cell << '\t' << cellj << '\t' << -Ac << '\t' <<  std::endl;
@@ -121,6 +118,10 @@ namespace micromagnetic{
           }
          }
       }
+
+      //exchange_field[0] = 0.0;
+      //exchange_field[1] = 0.0;
+      //exchange_field[2] = 0.0;
 
       const double stpx = sim::internal::slonczewski_spin_polarization_unit_vector[0];
   		const double stpy = sim::internal::slonczewski_spin_polarization_unit_vector[1];

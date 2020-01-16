@@ -1,4 +1,3 @@
-
 //------------------------------------------------------------------------------
 //
 //   This file is part of the VAMPIRE open source package under the
@@ -32,9 +31,9 @@ namespace micromagnetic{
 
    bool enable_resistance = false;
    //lsits to store atomistic/microamgnetic cells/atoms
-   std::vector < double > list_of_atomistic_atoms(0);
-   std::vector < double > list_of_none_atomistic_atoms(0);
-   std::vector < double > list_of_micromagnetic_cells(0);
+   std::vector <int> list_of_atomistic_atoms(0);
+   std::vector <int> list_of_none_atomistic_atoms(0);
+   std::vector <int> list_of_micromagnetic_cells(0);
    std::vector <int> list_of_empty_micromagnetic_cells(0);
 
    //sets initial values to 0
@@ -107,6 +106,7 @@ namespace micromagnetic{
       std::vector<double> ku_y;
       std::vector<double> ku_z;
       std::vector<double> ms;
+      std::vector<double> T;
       std::vector<double> Tc;
       std::vector<double> m_e;
       std::vector<double> alpha_para;
