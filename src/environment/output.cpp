@@ -69,7 +69,7 @@ namespace environment{
             int cell = env::none_atomistic_cells[i];
          //for(int cell = 0; cell < num_cells; cell++){
          //
-         	pfile << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' <<std::endl;
+         	pfile << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' << std::endl;
          }
        }
 

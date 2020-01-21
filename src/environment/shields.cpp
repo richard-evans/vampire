@@ -18,6 +18,7 @@
 #include "vio.hpp"
 #include "errors.hpp"
 #include <algorithm>
+#include <algorithm>
 // C++ headers
 #include <math.h>
 
@@ -114,10 +115,6 @@ int in_shield(double x, double y, double z,int shield){
      else if( g2 < z && env::pos_or_neg[shield] == "neg" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
          z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){ //z <= zmax && x <= xmax && x >= xmin && z >= zmin) {
-      // std::cout << "pos" <<std::endl;
-  //    std::cout << x << '\t'  << z << '\t' <<g2 << '\t' << g << '\t' <<  std::endl;
-
-      // std::cout << zmin << '\t' << zmax << "\t" << xmin << '\t' << xmax << '\t' << g2 << '\t' << g << '\t' << x << '\t'  << z << '\t' << std::endl;
        return 1;
      }
      else{
@@ -427,9 +424,11 @@ int read_in_shield_info(){
 
       }
 
+
       std::string test="shield-type";
       if(word==test){
         if (value == "cube"){
+
           env::shield_shape[super_index-1] = value;
         }
         else if (value == "exponential"){
@@ -445,6 +444,7 @@ int read_in_shield_info(){
       test="minimum-x";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_min_x[super_index-1] = g;
 
       }
@@ -452,12 +452,14 @@ int read_in_shield_info(){
       test="minimum-y";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_min_y[super_index-1] = g;
 
       }
       test="minimum-z";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_min_z[super_index-1] = g;
 
       }
@@ -465,6 +467,7 @@ int read_in_shield_info(){
       test="maximum-x";
       if(word==test){
         double g=atof(value.c_str());
+         vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_max_x[super_index-1] = g;
 
       }
@@ -472,12 +475,14 @@ int read_in_shield_info(){
       test="maximum-y";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_max_y[super_index-1] = g;
 
       }
       test="maximum-z";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_max_z[super_index-1] = g;
 
       }
@@ -485,6 +490,7 @@ int read_in_shield_info(){
       test="maximum-cell-size";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_value(g, word, 1, "environment", unit, "length", 20, 2000,"shield_geom","2 nm to 100 nm");
         env::shield_max_cell_size[super_index-1] = g;
         std::cout << "max" << "\t" << g << std::endl;
 
@@ -493,6 +499,7 @@ int read_in_shield_info(){
       test="minimum-cell-size";
       if(word==test){
         double g=atof(value.c_str());
+         vin::check_for_valid_value(g, word, 1, "environment", unit, "length", 10, 10,"shield_geom","1 nm to 10 nm");
         env::shield_min_cell_size[super_index-1] = g;
 
       }
@@ -500,6 +507,7 @@ int read_in_shield_info(){
       test="Ms";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_positive_value(g, word, 1, "environment", unit, "magnetisation", 1e-35,1e-15 ,"shield_geom","1e-32 - 1e-18");
         env::shield_ms[super_index-1] = g;
 
       }
@@ -507,18 +515,21 @@ int read_in_shield_info(){
       test="Ku";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_value(g, word, 1, "environment", unit, "anisotropy", 0,1e-15 ,"shield_geom","0 - 1e-18");
         env::shield_ku[super_index-1] = g;
       }
 
       test="Tc";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_positive_value(g, word, 1, "environment", unit, "none", 10, 30000 ,"shield_geom","0 -30000");
         env::shield_Tc[super_index-1] = g;
       }
 
       test="A";
       if(word==test){
         double g=atof(value.c_str());
+        vin::check_for_valid_positive_value(g, word, 1, "environment", unit, "exchange", 0, 1e19 ,"shield_geom","0 - 1e-19");
         env::shield_A[super_index-1][sub_index-1] = g;
         //std::cout << super_index << '\t' << sub_index << '\t' << g << std::endl;
       }

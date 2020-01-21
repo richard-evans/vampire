@@ -855,7 +855,7 @@ namespace vin{
      test="track-bit-size-x";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10000000");
         sim::track_bit_size = m;
         return EXIT_SUCCESS;
      }
@@ -863,7 +863,7 @@ namespace vin{
      test="track-bit-size-z";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10000000");
         sim::track_bit_width = m;
         return EXIT_SUCCESS;
      }
@@ -871,7 +871,7 @@ namespace vin{
      test="track-bit-size-y";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10000000");
         sim::track_bit_depth = m;
         return EXIT_SUCCESS;
      }
@@ -1522,6 +1522,11 @@ namespace vin{
            output_list.push_back(68);
            return EXIT_SUCCESS;
         }
+         test="track-field";
+         if(word==test){
+        output_list.push_back(69);
+        return EXIT_SUCCESS;
+     }
         //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){

@@ -101,9 +101,9 @@ namespace environment
 
 
             //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-            spin_field[0] = pf*m[0] + exchange_field[0] + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[0] + shield_Hext_x[0]  + env_field_uv[0] + bias_field_x[cell];//+ dipole_field_x[cell];// + env_field_uv[0] + bias_field_x[cell];
-            spin_field[1] = pf*m[1] + exchange_field[1] + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[1] + shield_Hext_y[1]  + env_field_uv[1] + bias_field_y[cell];// + dipole_field_y[cell];// + env_field_uv[1] + bias_field_y[cell];
-            spin_field[2] = pf*m[2] + exchange_field[2]                                               + shield_Hext_z[2]  + env_field_uv[2] + bias_field_z[cell];//+ dipole_field_z[cell];// + env_field_uv[2] + bias_field_z[cell];
+            spin_field[0] = pf*m[0] + exchange_field[0] + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[0] + shield_Hext_x[shield]  + env_field_uv[0];// + bias_field_x[cell]+ dipole_field_x[cell];
+            spin_field[1] = pf*m[1] + exchange_field[1] + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[1] + shield_Hext_y[shield]  + env_field_uv[1];// + bias_field_y[cell] + dipole_field_y[cell];
+            spin_field[2] = pf*m[2] + exchange_field[2]                                               + shield_Hext_z[shield]  + env_field_uv[2];// + bias_field_z[cell]+ dipole_field_z[cell];
           //    std::cout << "x" << '\t' << pf  << '\t' << m[0] << '\t' << exchange_field[0] << "\t" << dipole_field_x[cell] << "\t" << spin_field[0] <<std::endl;
           //    std::cout << "y" << '\t' << pf  << '\t' << m[1] << '\t' << exchange_field[1] << "\t" << dipole_field_y[cell] << "\t" << spin_field[1] <<std::endl;
           //    std::cout << "z" << '\t' << pf  << '\t' << m[2] << '\t' << exchange_field[2] << "\t" << dipole_field_z[cell] << "\t" << spin_field[2] <<std::endl;
