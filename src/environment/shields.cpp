@@ -205,7 +205,7 @@ int bias_shields(){
                  double r = sqrt(xp*xp + yp*yp + zp*zp);
 
                  Bx = Bx + m1klm * log(zp + r);
-                 By = By + m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                 By = By - m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
                  Bz = Bz + m1klm * log(xp + r);
 
 
