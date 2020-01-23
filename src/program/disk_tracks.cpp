@@ -123,7 +123,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
    sim::track_pos_z = sim::initial_down_track_position  + sim::down_track_velocity*step;
    sim::track_pos_x = sim::initial_cross_track_position + sim::cross_track_velocity*step;
 
-   std::cout << sim::track_pos_x << "\t" << sim::cross_track_velocity << '\t' << step << std::endl;
+   //std::cout << sim::track_pos_x << "\t" << sim::cross_track_velocity << '\t' << step << std::endl;
 
    //prefactor includes a conversion from Telsa  to A/m (dived by 4*pi*1e-7) and a divide by 4 pi from the equation in the prism paper
    //this converts the output field to Oe - oh noooo
@@ -161,7 +161,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
       double y = sqrt((y_cell - y_bit)*(y_cell - y_bit));
       double z = sqrt((z_cell - z_bit)*(z_cell - z_bit));
 
-      std::cout << x << '\t' << y << '\t' << z << std::endl;
+      //std::cout << x << '\t' << y << '\t' << z << std::endl;
 
       double Bx = 0.0;
       double By = 0.0;
@@ -205,7 +205,7 @@ std::vector <double > calculate_field(double cx, double cy, double cz, int step)
       B[0] = B[0] + Bx*prefactor*tp::bit_magnetisation[bit];
       B[1] = B[1] - By*prefactor*tp::bit_magnetisation[bit];
       B[2] = B[2] + Bz*prefactor*tp::bit_magnetisation[bit];
-      std::cout <<"field:\t" <<Bx << '\t' << By << '\t' << Bz << '\t' <<  B[0] << '\t' << B[1] << '\t' << B[2] << '\t' << prefactor << '\t' << tp::bit_magnetisation[bit]  << std::endl;
+   //   std::cout <<"field:\t" <<Bx << '\t' << By << '\t' << Bz << '\t' <<  B[0] << '\t' << B[1] << '\t' << B[2] << '\t' << prefactor << '\t' << tp::bit_magnetisation[bit]  << std::endl;
 
    }
 
@@ -323,6 +323,7 @@ void tracks(){
        }
     }
 
+    //run a scan over bits
    if (sim::LFA == false){
      std::cout << "NO LFAAAAAA" << "\t" << cells::num_local_cells <<std::endl;
 
@@ -393,6 +394,8 @@ void tracks(){
 	}
  }
 
+
+//run an LFA simulation
 else {
   //   std::cout << "LFAAAAAA" << std::endl;
 

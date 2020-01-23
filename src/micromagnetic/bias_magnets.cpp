@@ -112,7 +112,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
                  double r = sqrt(xp*xp + yp*yp + zp*zp);
 
                  Bx = Bx + m1klm * log(zp + r);
-                 By = By + m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                 By = By - m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
                  Bz = Bz + m1klm * log(xp + r);
 
 
@@ -121,7 +121,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
        }
 
     //   std::cout << cell << '\t' << Bx << "\t" << By << '\t' << Bz <<  '\t' << prefactor << std::endl;
-       bias_field_x[cell] = -bias_field_x[cell] + By*prefactor;
+       bias_field_x[cell] = bias_field_x[cell] + By*prefactor;
        bias_field_y[cell] = bias_field_y[cell] + Bx*prefactor;
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 

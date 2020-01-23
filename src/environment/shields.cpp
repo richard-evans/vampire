@@ -492,7 +492,6 @@ int read_in_shield_info(){
         double g=atof(value.c_str());
         vin::check_for_valid_value(g, word, 1, "environment", unit, "length", 20, 2000,"shield_geom","2 nm to 100 nm");
         env::shield_max_cell_size[super_index-1] = g;
-        std::cout << "max" << "\t" << g << std::endl;
 
       }
 
@@ -575,7 +574,6 @@ int read_in_shield_info(){
             env::random_spins[super_index]=false;
          }
          // return
-         return true;
       }
 
 

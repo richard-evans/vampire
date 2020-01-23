@@ -155,7 +155,7 @@ namespace internal{
  }
  //std::cout << "SP" << spin_field[0] << "\t" << spin_field[1] << '\t' << spin_field[2] << std::endl;
     if (environment::enabled){
-  // std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << std::endl;
+   std::cout << "ENV" << '\t' << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << std::endl;
        spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
        spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
        spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
@@ -169,7 +169,7 @@ namespace internal{
      }
 
      if (bias_magnets == true){
-    //    std::cout << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2]<< "\t" << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
+        std::cout << "BIAS\t" << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
        spin_field[0] = spin_field[0] + bias_field_x[cell];
        spin_field[1] = spin_field[1] + bias_field_y[cell];
        spin_field[2] = spin_field[2] + bias_field_z[cell];
