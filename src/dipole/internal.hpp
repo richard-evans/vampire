@@ -189,24 +189,24 @@ namespace dipole{
                                     std::vector<double>& atom_coords_z,
                                     int num_atoms);
 
-      void compute_inter_tensor(const double cells_macro_cell_size,
-                                const int i,
-                                const int j,
-                                const int lc,
-                                std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
-                                //std::vector<double>& cells_pos_and_mom_array, // array to store positions and moment of cells
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z,
-                                int id );
+      // new version of inter tensor method
+      void compute_inter_tensor(const int celli,                                                // global ID of cell i
+                                const int cellj,                                                // global ID of cell i
+                                const int lc,                                                   // local cell ID
+                                const double cutoff,                                            // cutoff range for dipole tensor construction (Angstroms)
+                                const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                                const std::vector<double>& cells_pos_and_mom_array,             // array of positions and cell moments
+                                const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
+                                const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                               );
 
-      void compute_intra_tensor(const int i,
-                                const int j,
-                                const int lc,
-                                std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z);
+      void compute_intra_tensor(const int celli,                                                // global ID of cell i
+                                const int cellj,                                                // global ID of cell i
+                                const int lc,                                                   // local cell ID
+                                const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                                const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
+                                const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                               );
 
       void initialize_macrocell_solver(const int cells_num_atoms_in_unit_cell,
                                        int cells_num_cells, /// number of macrocells
@@ -287,6 +287,22 @@ namespace dipole{
                   std::vector<int>& cells_num_atoms_in_cell,
                   int cells_num_local_cells,
                   int cells_num_cells);
+
+      void initialise_atomistic_cell_data(const int num_cells,
+                                          const int num_local_cells,
+                                          const double cutoff,                                         // cutoff range for dipole tensor construction (Angstroms)
+                                          const std::vector<int>& num_atoms_in_cell,                   // number of atoms in each cell (local CPU)
+                                          const std::vector<int>& list_of_local_cells,                 // numerical list of cells containing atoms on local processor
+                                          const std::vector<int>& global_atoms_in_cell_count,          // number of atoms in each cell (all CPUs)
+                                          const std::vector<double>& pos_and_mom_array,                // array of positions and cell moments
+                                          const std::vector < std::vector <int> >& index_atoms_array,  // 2D array of [cells][atomID]
+                                          const std::vector<double>& atoms_coords_x,                   // input arrays of atom coordinates
+                                          const std::vector<double>& atoms_coords_y,                   //
+                                          const std::vector<double>& atoms_coords_z,                   //
+                                          const std::vector<double>& atoms_moments,                    // input array of atom moments (Bohr magnetons)
+                                          std::vector<int>& list_of_cells_with_atoms,                  // list of cells to access atoms
+                                          std::vector< std::vector<double> >& atoms_in_cells_array     // output array of positions and moments of atoms in cells
+                                         );
 
       /*--------------------------------------------------------*/
       /*Function to send cells field to be output in cfg file   */

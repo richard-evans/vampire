@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Andrea Meo and Richard F L Evans 2016. All rights reserved.
+//   (c) Andrea Meo, Sarah Jenkins and Richard F L Evans 2020. All rights reserved.
 //
 //------------------------------------------------------------------------------
 //
@@ -13,15 +13,9 @@
 #include <cstdlib>
 #include <iostream>
 
-// C library headers
-#include <fenv.h>
-#include <signal.h>
-
 // Vampire headers
-#include "cells.hpp" // needed for cells::cell_id_array but to be removed
 #include "dipole.hpp"
 #include "vio.hpp"
-#include "vutil.hpp"
 
 // dipole module headers
 #include "internal.hpp"
@@ -37,13 +31,14 @@ namespace dipole{
       // explictly from the atomistic coordinates. Longer range tensors assume
       // the dipole-dipole form.
       //------------------------------------------------------------------------
-      void compute_intra_tensor(const int i,
-                                const int j,
+      void compute_intra_tensor(const int celli,
+                                const int cellj,
                                 const int lc,
-                                std::vector <int>& cells_num_atoms_in_cell, /// number of atoms in each cell
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_x,
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_y,
-                                std::vector < std::vector <double> >& cells_atom_in_cell_coords_array_z){
+                                const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                                const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
+                                const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                               ){
+
 
          // Here we start
          // initialise temp vectors
@@ -55,70 +50,65 @@ namespace dipole{
          double tmp_rij_intra_yz = 0.0;
          double tmp_rij_intra_zz = 0.0;
 
-         const int mmax = cells_num_atoms_in_cell[i];
+         const int num_atoms = global_atoms_in_cell_count[celli];
 
-        	for(int pi=0; pi<mmax; pi++){
-
-              const double cix = cells_atom_in_cell_coords_array_x[i][pi];
-              const double ciy = cells_atom_in_cell_coords_array_y[i][pi];
-              const double ciz = cells_atom_in_cell_coords_array_z[i][pi];
-
-              // use double loops to avoid if pi != qj statement
-              for(int qj=0; qj<pi; qj++){
-
-                 const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix; //cells_atom_in_cell_coords_array_x[i][pi];
-                 const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy; //cells_atom_in_cell_coords_array_y[i][pi];
-                 const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz; //cells_atom_in_cell_coords_array_z[i][pi];
-
-                 const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
-
-                 const double ex = rx*rij;
-                 const double ey = ry*rij;
-                 const double ez = rz*rij;
-
-                 const double rij3 = (rij*rij*rij); // Angstroms
-
-                 tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
-                 tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);
-                 tmp_rij_intra_xz += ((3.0*ex*ez      )*rij3);
-
-                 tmp_rij_intra_yy += ((3.0*ey*ey - 1.0)*rij3);
-                 tmp_rij_intra_yz += ((3.0*ey*ez      )*rij3);
-                 tmp_rij_intra_zz += ((3.0*ez*ez - 1.0)*rij3);
-
-              }
-              for(int qj=pi+1; qj<mmax; qj++){
-
-                 const double rx = cells_atom_in_cell_coords_array_x[j][qj] - cix; //cells_atom_in_cell_coords_array_x[i][pi];
-                 const double ry = cells_atom_in_cell_coords_array_y[j][qj] - ciy; //cells_atom_in_cell_coords_array_y[i][pi];
-                 const double rz = cells_atom_in_cell_coords_array_z[j][qj] - ciz; //cells_atom_in_cell_coords_array_z[i][pi];
-
-                 const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
-
-                 const double ex = rx*rij;
-                 const double ey = ry*rij;
-                 const double ez = rz*rij;
-
-                 const double rij3 = (rij*rij*rij); // Angstroms
-
-                 tmp_rij_intra_xx += ((3.0*ex*ex - 1.0)*rij3);
-                 tmp_rij_intra_xy += ((3.0*ex*ey      )*rij3);
-                 tmp_rij_intra_xz += ((3.0*ex*ez      )*rij3);
-
-                 tmp_rij_intra_yy += ((3.0*ey*ey - 1.0)*rij3);
-                 tmp_rij_intra_yz += ((3.0*ey*ez      )*rij3);
-                 tmp_rij_intra_zz += ((3.0*ez*ez - 1.0)*rij3);
-
-          	}
+         // search for cells i and j in local atom-cells list
+         int cell_with_atoms_index_i = -1;
+         for(int idx = 0; idx < atoms_in_cells_array.size(); idx++){
+            const int cell = list_of_cells_with_atoms[idx];
+            if( cell == celli ) cell_with_atoms_index_i = idx;
          }
 
-         dipole::internal::rij_tensor_xx[lc][i] =  (tmp_rij_intra_xx);
-         dipole::internal::rij_tensor_xy[lc][i] =  (tmp_rij_intra_xy);
-         dipole::internal::rij_tensor_xz[lc][i] =  (tmp_rij_intra_xz);
+         // check that proper cell is found
+         if( cell_with_atoms_index_i == -1 ){
+            std::cerr << "Programmer error! cell " << celli << " is not found in list of local cells with atomic positions!" << std::endl;
+         }
+         const int ci = cell_with_atoms_index_i;
 
-         dipole::internal::rij_tensor_yy[lc][i] =  (tmp_rij_intra_yy);
-      	dipole::internal::rij_tensor_yz[lc][i] =  (tmp_rij_intra_yz);
-         dipole::internal::rij_tensor_zz[lc][i] =  (tmp_rij_intra_zz);
+         // loop over all atoms in cell i
+         for(int pi = 0; pi < num_atoms; pi++){
+
+            const double cix = atoms_in_cells_array[ci][4*pi+0];
+            const double ciy = atoms_in_cells_array[ci][4*pi+1];
+            const double ciz = atoms_in_cells_array[ci][4*pi+2];
+
+            // loop over all atoms in cell for j < i (do half a full i-j loop)
+            for( int qj = 0; qj < pi; qj++){
+
+               const double rx = atoms_in_cells_array[ci][4*qj+0] - cix;
+               const double ry = atoms_in_cells_array[ci][4*qj+1] - ciy;
+               const double rz = atoms_in_cells_array[ci][4*qj+2] - ciz;
+
+               const double rij = 1.0/sqrt(rx*rx+ry*ry+rz*rz); //Reciprocal of the distance
+               const double rij3 = (rij*rij*rij); // Angstroms
+
+               // for i -> j
+               const double ex = rx*rij;
+               const double ey = ry*rij;
+               const double ez = rz*rij;
+
+               // for j->i ex -> -ex, but squared in tensor so simple factor 2
+               tmp_rij_intra_xx += 2.0*((3.0*ex*ex - 1.0)*rij3);
+               tmp_rij_intra_xy += 2.0*((3.0*ex*ey      )*rij3);
+               tmp_rij_intra_xz += 2.0*((3.0*ex*ez      )*rij3);
+
+               tmp_rij_intra_yy += 2.0*((3.0*ey*ey - 1.0)*rij3);
+               tmp_rij_intra_yz += 2.0*((3.0*ey*ez      )*rij3);
+               tmp_rij_intra_zz += 2.0*((3.0*ez*ez - 1.0)*rij3);
+
+            }
+         }
+
+         // normalisation factor accounting for i/j interactions (only symmetry of tensor is important)
+         const double inorm = 1.0 / ( double(num_atoms) * double(num_atoms) );
+
+         dipole::internal::rij_tensor_xx[lc][celli] =  (tmp_rij_intra_xx) * inorm;
+         dipole::internal::rij_tensor_xy[lc][celli] =  (tmp_rij_intra_xy) * inorm;
+         dipole::internal::rij_tensor_xz[lc][celli] =  (tmp_rij_intra_xz) * inorm;
+
+         dipole::internal::rij_tensor_yy[lc][celli] =  (tmp_rij_intra_yy) * inorm;
+         dipole::internal::rij_tensor_yz[lc][celli] =  (tmp_rij_intra_yz) * inorm;
+         dipole::internal::rij_tensor_zz[lc][celli] =  (tmp_rij_intra_zz) * inorm;
 
          // Uncomment in case you want to check the tensor components
          // std::cout << "\n############# INTRA ###################\n";
@@ -129,15 +119,7 @@ namespace dipole{
          // std::cout << "\n################################\n";
          // std::cout << std::endl;
 
-      	dipole::internal::rij_tensor_xx[lc][i] = dipole::internal::rij_tensor_xx[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-         dipole::internal::rij_tensor_xy[lc][i] = dipole::internal::rij_tensor_xy[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-         dipole::internal::rij_tensor_xz[lc][i] = dipole::internal::rij_tensor_xz[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-
-         dipole::internal::rij_tensor_yy[lc][i] = dipole::internal::rij_tensor_yy[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-         dipole::internal::rij_tensor_yz[lc][i] = dipole::internal::rij_tensor_yz[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-         dipole::internal::rij_tensor_zz[lc][i] = dipole::internal::rij_tensor_zz[lc][i]/(double(cells_num_atoms_in_cell[i]) * double(cells_num_atoms_in_cell[j]));
-
-      }  // End of funtion calculating Intra component of dipole tensor
+      }  // End of function calculating Intra component of dipole tensor
 
    } // End of namespace internal
 } // End of namespace dipole

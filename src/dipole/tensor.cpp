@@ -11,19 +11,13 @@
 // C standard library headers
 #include <cmath>
 #include <cstdlib>
-#include <iostream>
-
-// C library headers
-#include <fenv.h>
-#include <signal.h>
 
 // Vampire headers
-#include "cells.hpp" // needed for cells::cell_id_array but to be removed
+#include "cells.hpp" // needed for cells::macrocell_size but to be removed
 #include "dipole.hpp"
 #include "vio.hpp"
 #include "vutil.hpp"
-#include "atoms.hpp"
-#include "sim.hpp"
+#include "atoms.hpp" // needed fro m spin array but to be removed
 
 // dipole module headers
 #include "internal.hpp"
@@ -64,91 +58,38 @@ namespace dipole{
          //------------------------------------------------------
          #ifdef MPICF
 
-            const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+            // all processors wait here before starting the timer
+            vmpi::barrier();
 
-            std::vector<double> atom_pos_x(num_local_atoms,0.0);
-            std::vector<double> atom_pos_y(num_local_atoms,0.0);
-            std::vector<double> atom_pos_z(num_local_atoms,0.0);
+            // get realspace cutoff distance
+            const double real_cutoff = dipole::cutoff * cells::macro_cell_size;
 
-            for(int atom=0; atom<num_local_atoms; atom++){
-               atom_pos_x[atom]=atom_coords_x[atom];
-               atom_pos_y[atom]=atom_coords_y[atom];
-               atom_pos_z[atom]=atom_coords_z[atom];
-            }
+            std::vector< std::vector<double> > atoms_in_cells_array; // 2D list of [cell][atom] for local cells needed for computing dipole tensor
+            std::vector<int> list_of_atoms_with_cells; // list of cell IDs to enable parsing of atomistic data
 
-            for(int lc=0; lc<cells_num_cells; lc++){
-               // resize arrays
-               cells_atom_in_cell_coords_array_x[lc].resize(cells_num_atoms_in_cell[lc]);
-               cells_atom_in_cell_coords_array_y[lc].resize(cells_num_atoms_in_cell[lc]);
-               cells_atom_in_cell_coords_array_z[lc].resize(cells_num_atoms_in_cell[lc]);
-               cells_index_atoms_array[lc].resize(cells_num_atoms_in_cell[lc]);
-            }
-
-            // Call parallelisation function
-            // Exchange cells data
-            dipole::internal::send_recv_cells_data(dipole::internal::proc_cell_index_array1D,
-                                                   cells_atom_in_cell_coords_array_x,
-                                                   cells_atom_in_cell_coords_array_y,
-                                                   cells_atom_in_cell_coords_array_z,
-                                                   cells_index_atoms_array,
-                                                   cells_pos_and_mom_array,
-                                                   cells_num_atoms_in_cell,
-                                                   cells::cell_id_array,
-                                                   cells_local_cell_array,
-                                                   cells_num_local_cells,
-                                                   cells_num_cells);
-
-            // Exchange atoms data
-            dipole::internal::send_recv_atoms_data(dipole::internal::proc_cell_index_array1D,
-                                                   cells::cell_id_array,
-                                                   cells_local_cell_array,
-                                                   atom_pos_x,
-                                                   atom_pos_y,
-                                                   atom_pos_z,
-                                                   atom_type_array, // atomic moments (from dipole;:internal::atom_type_array)
-                                                   cells_atom_in_cell_coords_array_x,
-                                                   cells_atom_in_cell_coords_array_y,
-                                                   cells_atom_in_cell_coords_array_z,
-                                                   cells_index_atoms_array,
-                                                   cells_pos_and_mom_array,
-                                                   cells_num_atoms_in_cell,
-                                                   cells_num_local_cells,
-                                                   cells_num_cells,
-                                                   cells_macro_cell_size);
-
-            // Reorder data structure
-            dipole::internal::sort_data(dipole::internal::proc_cell_index_array1D,
-                                        cells::cell_id_array,
-                                        cells_atom_in_cell_coords_array_x,
-                                        cells_atom_in_cell_coords_array_y,
-                                        cells_atom_in_cell_coords_array_z,
-                                        cells_index_atoms_array,
-                                        cells_pos_and_mom_array,
-                                        cells_num_atoms_in_cell,
-                                        cells_num_local_cells,
-                                        cells_num_cells);
-
-            // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
-            for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
-               if(cells_num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
-                  cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
-               }
-            }
-
-            // Clear memory
-            cells_num_atoms_in_cell_global.clear();
-
-            // Clear atom_pos_x,y,z
-            atom_pos_x.clear();
-            atom_pos_y.clear();
-            atom_pos_z.clear();
+            // distribute atomistic data to enable tensor dipole calculation
+            initialise_atomistic_cell_data(cells_num_cells,
+                                           cells_num_local_cells,
+                                           real_cutoff,                     // cutoff range for dipole tensor construction (Angstroms)
+                                           cells_num_atoms_in_cell,         // number of atoms in each cell (local CPU)
+                                           cells_local_cell_array,          // numerical list of cells containing atoms on local processor
+                                           cells_num_atoms_in_cell_global,  // number of atoms in each cell
+                                           cells_pos_and_mom_array,         // array of positions and cell moments
+                                           cells_index_atoms_array,         // 2D array of [cells][atomID]
+                                           atom_coords_x,                   // input arrays of atom coordinates
+                                           atom_coords_y,                   //
+                                           atom_coords_z,                   //
+                                           atoms::m_spin_array,             // input array of atom moments (Bohr magnetons)
+                                           list_of_atoms_with_cells,        // 2D list of [cell][atom] for local cells needed for computing dipole tensor (output)
+                                           atoms_in_cells_array             // list of cell IDs to enable parsing of atomistic data (output)
+                                          );
 
          #endif
 
          // Assign updated value of cells_num_atoms_in_cell to dipole::dipole_cells_num_atoms_in_cell. It is needed to print the config file. The actual value cells::num_atoms_in_cell is not changed instead
-         dipole::dipole_cells_num_atoms_in_cell=cells_num_atoms_in_cell;
+         dipole::dipole_cells_num_atoms_in_cell = cells_num_atoms_in_cell;
 
-         // calculate matrix prefactors
+         // print informative message to user
          zlog << zTs() << "Precalculating rij matrix for dipole calculation using tensor solver... " << std::endl;
          std::cout     << "Precalculating rij matrix for dipole calculation using tensor solver"     << std::flush;
 
@@ -158,51 +99,68 @@ namespace dipole{
          // start timer
          timer.start();
 
-         dipole::atomistic_dd_neighbourlist_start.resize(atoms::num_atoms,0.0);
-         dipole::atomistic_dd_neighbourlist_end.resize(atoms::num_atoms,0.0);
+         //--------------------------------------------------------------------------------------------
+         // Compute the dipole tensor
+         //--------------------------------------------------------------------------------------------
 
          // loop over local cells
-         for(int lc=0;lc<cells_num_local_cells;lc++){
+         for( int lc = 0; lc < cells_num_local_cells; lc++){
 
             // print out progress to screen
-            if(fmod(ceil(lc),ceil(cells_num_local_cells)/10.0) == 0) std::cout << "." << std::flush;
+            if(fmod(ceil(lc),ceil(cells_num_local_cells)/10) == 0) std::cout << "." << std::flush;
 
-            // reference global cell ID
-            //int i = cells_local_cell_array[lc];
-            int i = cells::cell_id_array[lc];
-            if(cells_num_atoms_in_cell[i]>0){
+            // get global cell ID of source cell
+            int celli = cells_local_cell_array[lc];
+
+            // check that local cell contains some local atoms (if not we don't need the tensor)
+            if( cells_num_atoms_in_cell[celli] > 0 ){
             //std::cout << i << '\t' << "interaction" << "\t"  << cells_num_cells << "\t" << cells_num_atoms_in_cell[i] <<  std::endl;
 
-
             	// Loop over all other cells to calculate contribution to local cell
-               for(int j=0;j<cells_num_cells;j++){
-                  //if (i == 0 ) std::cout << j << "\t" << cells_num_atoms_in_cell[j] << std::endl;
-                  /*==========================================================*/
-                  /* Calculation of inter part of dipolar tensor              */
-                  /*==========================================================*/
-                  if (cells_num_atoms_in_cell[j]!=0){
-                	   if(i!=j){
+               for( int cellj = 0; cellj < cells_num_cells; cellj++ ){
 
+                  //--------------------------------------------------------------
+                  // Calculation of inter part of dipolar tensor
+                  //--------------------------------------------------------------
+                  if ( cells_num_atoms_in_cell_global[cellj] > 0 ){ // only calculate interaction if there are atoms in remote cell
+
+                     // check if cell is not the same
+                	   if( celli != cellj ){
                         // calculate inter term of dipolar tensor
-                        compute_inter_tensor(cells_macro_cell_size,i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z, 0);
+                        compute_inter_tensor(celli,
+                                             cellj,
+                                             lc,
+                                             real_cutoff,
+                                             cells_num_atoms_in_cell_global,
+                                             cells_pos_and_mom_array,
+                                             list_of_atoms_with_cells,
+                                             atoms_in_cells_array);
 
                      } // End of Inter part
 
-                     /*==========================================================*/
-                     /* Calculation of intra part of dipolar tensor              */
-                     /*==========================================================*/
-                     else if( i==j && cells_num_atoms_in_cell[j]!=0){
+                     //--------------------------------------------------------------
+                     // Calculation of intra part of dipolar tensor
+                     //--------------------------------------------------------------
+                     else if( celli == cellj ){
 
                         //Compute inter component of dipolar tensor
-                        compute_intra_tensor(i,j,lc,cells_num_atoms_in_cell,cells_atom_in_cell_coords_array_x,cells_atom_in_cell_coords_array_y,cells_atom_in_cell_coords_array_z);
+                        compute_intra_tensor(celli,
+                                             cellj,
+                                             lc,
+                                             cells_num_atoms_in_cell_global,
+                                             list_of_atoms_with_cells,
+                                             atoms_in_cells_array);
+
                      }
-               // End of Intra part
-                  if (dipole::internal::rij_tensor_xx[lc][j]*dipole::internal::rij_tensor_xx[lc][j] < 1e-15) dipole::internal::rij_tensor_xx[lc][j] =0;
-                  if (dipole::internal::rij_tensor_xy[lc][j]*dipole::internal::rij_tensor_xy[lc][j] < 1e-15) dipole::internal::rij_tensor_xy[lc][j] =0;
-                  if (dipole::internal::rij_tensor_xz[lc][j]*dipole::internal::rij_tensor_xz[lc][j] < 1e-15) dipole::internal::rij_tensor_xz[lc][j] =0;
-                  if (dipole::internal::rij_tensor_yy[lc][j]*dipole::internal::rij_tensor_yy[lc][j] < 1e-15) dipole::internal::rij_tensor_yy[lc][j] =0;
-                  if (dipole::internal::rij_tensor_yz[lc][j]*dipole::internal::rij_tensor_yz[lc][j] < 1e-15) dipole::internal::rij_tensor_yz[lc][j] =0;
-                  if (dipole::internal::rij_tensor_zz[lc][j]*dipole::internal::rij_tensor_zz[lc][j] < 1e-15) dipole::internal::rij_tensor_zz[lc][j] =0;
+                     // End of Intra part
+
+                     // check for close to zero value tensors and round down to zero
+                     if (dipole::internal::rij_tensor_xx[lc][cellj]*dipole::internal::rij_tensor_xx[lc][cellj] < 1e-15) dipole::internal::rij_tensor_xx[lc][cellj] = 0.0;
+                     if (dipole::internal::rij_tensor_xy[lc][cellj]*dipole::internal::rij_tensor_xy[lc][cellj] < 1e-15) dipole::internal::rij_tensor_xy[lc][cellj] = 0.0;
+                     if (dipole::internal::rij_tensor_xz[lc][cellj]*dipole::internal::rij_tensor_xz[lc][cellj] < 1e-15) dipole::internal::rij_tensor_xz[lc][cellj] = 0.0;
+                     if (dipole::internal::rij_tensor_yy[lc][cellj]*dipole::internal::rij_tensor_yy[lc][cellj] < 1e-15) dipole::internal::rij_tensor_yy[lc][cellj] = 0.0;
+                     if (dipole::internal::rij_tensor_yz[lc][cellj]*dipole::internal::rij_tensor_yz[lc][cellj] < 1e-15) dipole::internal::rij_tensor_yz[lc][cellj] = 0.0;
+                     if (dipole::internal::rij_tensor_zz[lc][cellj]*dipole::internal::rij_tensor_zz[lc][cellj] < 1e-15) dipole::internal::rij_tensor_zz[lc][cellj] = 0.0;
                //   std::cout << i<< '\t' <<j << '\t' <<   dipole::internal::rij_tensor_xx[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xy[lc][j]<< '\t' <<  dipole::internal::rij_tensor_xz[lc][j]<< '\t' <<  dipole::internal::rij_tensor_yy[lc][j] << '\t' <<  dipole::internal::rij_tensor_yz[lc][j] << '\t' <<  dipole::internal::rij_tensor_zz[lc][j] << std::endl;
                }
                }

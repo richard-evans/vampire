@@ -17,6 +17,7 @@ intra.o \
 macrocell.o \
 memory.o \
 mpi.o \
+mpi2.o \
 output_atomistic_field.o \
 tensor.o \
 update.o
