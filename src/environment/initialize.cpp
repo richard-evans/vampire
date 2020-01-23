@@ -157,7 +157,7 @@ namespace environment{
                 double pos_y = current_cell_size*y + env::shield_min_y[shield] + current_cell_size/2.0 ;// + current_cell_size/2.0;
                 double pos_z = current_cell_size*z + env::shield_min_z[shield] + current_cell_size/2.0 ;// + current_cell_size/2.0;
 
-               //std::cout << "here" << '\t' << shield << '\t' << current_cell_size << '\t' << env::shield_min_x[shield] << '\t' <<env::shield_min_y[shield] << '\t' <<env::shield_min_z[shield] << '\t' << pos_x << '\t' << pos_y << '\t' << pos_z << std::endl;
+            //   std::cout << "here" << '\t' << shield << '\t' << current_cell_size << '\t' << env::shield_min_x[shield] << '\t' <<env::shield_min_y[shield] << '\t' <<env::shield_min_z[shield] << '\t' << pos_x << '\t' << pos_y << '\t' << pos_z << std::endl;
                 size_x.push_back(current_cell_size);
                 size_y.push_back(current_cell_size);
                 size_z.push_back(current_cell_size);
@@ -171,7 +171,7 @@ namespace environment{
 
          // std::cout <<  tmp_x.size() <<std::endl;
             //     std::cout << "created initial cells " <<std::endl;
-          //std::cin.get();
+         // std::cin.get();
 
           for (int cell = 0; cell < tmp_x.size(); cell ++ ){
 

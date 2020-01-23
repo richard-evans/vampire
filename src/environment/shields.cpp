@@ -446,6 +446,7 @@ int read_in_shield_info(){
         double g=atof(value.c_str());
         vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_min_x[super_index-1] = g;
+        std::cout << word << '\t' << env::shield_min_x[super_index-1] << '\t' << super_index - 1 <<std::endl;
 
       }
 
