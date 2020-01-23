@@ -113,6 +113,15 @@ void all_reduce_sum(std::vector<double>& array){
 
 }
 
+void all_reduce_sum(std::vector<int>& array){
+
+   #ifdef MPICF
+      // Perform MPI reduce for MPI code
+      MPI_Allreduce(MPI_IN_PLACE, &array[0], array.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   #endif
+
+}
+
 //--------------------------------------------------------------------------------------
 // Function to collate an array on master from distributed components on all processors
 //--------------------------------------------------------------------------------------
