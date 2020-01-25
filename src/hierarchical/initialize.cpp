@@ -78,7 +78,13 @@ namespace hierarchical{
 // of cells is only a few MB per process)
 //
 //----------------------------------------------------------------------------
-void initialize(double system_dimensions_x, double system_dimensions_y, double system_dimensions_z){
+void initialize(const double system_dimensions_x,
+                const double system_dimensions_y,
+                const double system_dimensions_z,
+                std::vector<double>& atom_coords_x, //atomic coordinates
+                std::vector<double>& atom_coords_y,
+                std::vector<double>& atom_coords_z,
+                int num_atoms){
 
    // store segment timings for optional printing
    std::vector <double> segment_time(9,0.0);
@@ -118,24 +124,20 @@ void initialize(double system_dimensions_x, double system_dimensions_y, double s
    ha::cells_level_end_index.resize(ha::num_levels,0.0);
    ha::interaction_range.resize(ha::num_levels,0.0);
 
-   std::vector < std::vector < double > > cells_atom_in_cell_coords_array_x;
-   std::vector < std::vector < double > > cells_atom_in_cell_coords_array_y;
-   std::vector < std::vector < double > > cells_atom_in_cell_coords_array_z;
    std::vector < std::vector < int > > cells_index_atoms_array;
 
    std::vector < int > cells_num_atoms_in_cell;
+   std::vector < int > cells_num_atoms_in_cell_global;
    std::vector < int > cells_local_cell_array;
    std::vector <  double > cells_pos_and_mom_array;
    int cells_num_cells = cells::num_cells;
    int cells_num_local_cells = cells::num_local_cells;
 
    // allocate data for 2D arrays
-   cells_atom_in_cell_coords_array_x.resize(cells::num_cells);
-   cells_atom_in_cell_coords_array_y.resize(cells::num_cells);
-   cells_atom_in_cell_coords_array_z.resize(cells::num_cells);
    cells_index_atoms_array.resize(cells::num_cells);
 
    cells_num_atoms_in_cell.resize(cells::num_cells);
+   cells_num_atoms_in_cell_global.resize(cells::num_cells);
    cells_local_cell_array.resize(cells::num_local_cells);
    cells_pos_and_mom_array.resize(cells::num_cells*4);
 
@@ -143,7 +145,9 @@ void initialize(double system_dimensions_x, double system_dimensions_y, double s
    for(int i = 0; i < cells_num_cells; i++){
 
       // copy number of atoms in each cell
-      cells_num_atoms_in_cell[i] = cells::num_atoms_in_cell[i];
+      cells_num_atoms_in_cell[i]        = cells::num_atoms_in_cell[i];
+      cells_num_atoms_in_cell_global[i] = cells::num_atoms_in_cell_global[i];
+
 
       // populate cell and moment array
       cells_pos_and_mom_array[4*i + 0] = cells::pos_and_mom_array[4*i + 0];
@@ -152,17 +156,11 @@ void initialize(double system_dimensions_x, double system_dimensions_y, double s
       cells_pos_and_mom_array[4*i + 3] = cells::pos_and_mom_array[4*i + 3];
 
       // resize second dimension of arrays
-      cells_atom_in_cell_coords_array_x[i].resize(cells::num_atoms_in_cell[i]);
-      cells_atom_in_cell_coords_array_y[i].resize(cells::num_atoms_in_cell[i]);
-      cells_atom_in_cell_coords_array_z[i].resize(cells::num_atoms_in_cell[i]);
       cells_index_atoms_array[i].resize(cells::num_atoms_in_cell[i]);
 
       // copy a list of atoms in each cell
       for (int atom = 0; atom <cells_num_atoms_in_cell[i]; atom ++ ){
          cells_index_atoms_array[i][atom] = cells::index_atoms_array[i][atom];
-         cells_atom_in_cell_coords_array_x[i][atom] = cells::atom_in_cell_coords_array_x[i][atom];
-         cells_atom_in_cell_coords_array_y[i][atom] = cells::atom_in_cell_coords_array_y[i][atom];
-         cells_atom_in_cell_coords_array_z[i][atom] = cells::atom_in_cell_coords_array_z[i][atom];
       }
 
    }
@@ -191,77 +189,43 @@ void initialize(double system_dimensions_x, double system_dimensions_y, double s
 
    #ifdef MPICF
 
-   // store the number of local atoms
-   const int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      // all processors wait here before starting the timer
+      vmpi::barrier();
 
-   // copy the local atomic positions to temporary data structures
-   std::vector<double> atom_pos_x(num_local_atoms,0.0);
-   std::vector<double> atom_pos_y(num_local_atoms,0.0);
-   std::vector<double> atom_pos_z(num_local_atoms,0.0);
+      // get realspace cutoff distance
+      const double real_cutoff = dipole::cutoff * cells::macro_cell_size;
 
-   for(int atom=0; atom<num_local_atoms; atom++){
-      atom_pos_x[atom]=atoms::x_coord_array[atom];
-      atom_pos_y[atom]=atoms::y_coord_array[atom];
-      atom_pos_z[atom]=atoms::z_coord_array[atom];
-   }
+      std::vector< std::vector<double> > atoms_in_cells_array; // 2D list of [cell][atom] for local cells needed for computing dipole tensor
+      std::vector<int> list_of_atoms_with_cells; // list of cell IDs to enable parsing of atomistic data
 
-   // swap cells data between processors
-   dipole::internal::send_recv_cells_data(dipole::internal::proc_cell_index_array1D,
-                                      cells_atom_in_cell_coords_array_x,
-                                      cells_atom_in_cell_coords_array_y,
-                                      cells_atom_in_cell_coords_array_z,
-                                      cells_index_atoms_array,
-                                      cells_pos_and_mom_array,
-                                      cells_num_atoms_in_cell,
-                                      cells::cell_id_array,
-                                      cells_local_cell_array,
-                                      cells_num_local_cells,
-                                      cells_num_cells);
-
-   // Exchange atoms data
-   dipole::internal::send_recv_atoms_data(dipole::internal::proc_cell_index_array1D,
-                                     cells::cell_id_array,
-                                     cells_local_cell_array,
-                                     atom_pos_x,
-                                     atom_pos_y,
-                                     atom_pos_z,
-                                     dipole::internal::atom_type_array, // atomic moments (from dipole;:internal::atom_type_array)
-                                     cells_atom_in_cell_coords_array_x,
-                                     cells_atom_in_cell_coords_array_y,
-                                     cells_atom_in_cell_coords_array_z,
-                                     cells_index_atoms_array,
-                                     cells_pos_and_mom_array,
-                                     cells_num_atoms_in_cell,
-                                     cells_num_local_cells,
-                                     cells_num_cells,
-                                     cells::macro_cell_size);
-
-   // sort data somehow
-   dipole::internal::sort_data(dipole::internal::proc_cell_index_array1D,
-                             cells::cell_id_array,
-                             cells_atom_in_cell_coords_array_x,
-                             cells_atom_in_cell_coords_array_y,
-                             cells_atom_in_cell_coords_array_z,
-                             cells_index_atoms_array,
-                             cells_pos_and_mom_array,
-                             cells_num_atoms_in_cell,
-                             cells_num_local_cells,
-                             cells_num_cells);
-
-   // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
-   for(unsigned int i=0; i<cells::num_atoms_in_cell_global.size(); i++){
-      if(cells::num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
-         cells_num_atoms_in_cell[i] = cells::num_atoms_in_cell_global[i];
-         // std::cout <<"CELLS" <<  cells_atom_in_cell_coords_array_x.size() <<std::endl;
-      }
-   }
-
-   // Clear atom_pos_x,y,z (but does not deallocate until out of scope)
-   atom_pos_x.clear();
-   atom_pos_y.clear();
-   atom_pos_z.clear();
+      // distribute atomistic data to enable tensor dipole calculation
+      dipole::internal::initialise_atomistic_cell_data(cells_num_cells,
+                                                       cells_num_local_cells,
+                                                       real_cutoff,                     // cutoff range for dipole tensor construction (Angstroms)
+                                                       cells_num_atoms_in_cell,         // number of atoms in each cell (local CPU)
+                                                       cells_local_cell_array,          // numerical list of cells containing atoms on local processor
+                                                       cells_num_atoms_in_cell_global,  // number of atoms in each cell
+                                                       cells_pos_and_mom_array,         // array of positions and cell moments
+                                                       cells_index_atoms_array,         // 2D array of [cells][atomID]
+                                                       atom_coords_x,                   // input arrays of atom coordinates
+                                                       atom_coords_y,                   //
+                                                       atom_coords_z,                   //
+                                                       atoms::m_spin_array,             // input array of atom moments (Bohr magnetons)
+                                                       list_of_atoms_with_cells,        // 2D list of [cell][atom] for local cells needed for computing dipole tensor (output)
+                                                       atoms_in_cells_array             // list of cell IDs to enable parsing of atomistic data (output)
+                                                      );
 
    #endif
+
+   // Assign updated value of cells_num_atoms_in_cell to dipole::dipole_cells_num_atoms_in_cell. It is needed to print the config file. The actual value cells::num_atoms_in_cell is not changed instead
+   dipole::dipole_cells_num_atoms_in_cell = cells_num_atoms_in_cell;
+
+   // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
+   for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
+      //if(cells_num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
+         dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
+      //}
+   }
 
    // stop the timer for segment 2 and save it
    timer.stop();
@@ -715,31 +679,77 @@ void initialize(double system_dimensions_x, double system_dimensions_y, double s
 
    //std::cout << cells_num_local_cells << std::endl;
 
+   // loop over all local cells which need to be calculated
    for(int lc=0; lc<cells_num_local_cells; lc++){
-      //   start timer
+
+      // get the global cell ID
       int cell_i = cells::cell_id_array[lc];
 
+      // only calculate interaction for local cells with atoms
       if (cells_num_atoms_in_cell[cell_i] != 0){
 
+         // for each cell loop over cel-cell interactions for all levels, getting frirst and last interactions
          const int start = ha::interaction_list_start_index[lc];
          const int end = ha::interaction_list_end_index[lc];
          // std::cerr << cell_i << '\t' << "interaction" << "\t" << end - start << "\t" << cells_num_cells << "\t" << cells_num_atoms_in_cell[cell_i] << std::endl;
 
-         for(int j = start;j<end;j++){
+         // now loop over all interactions
+         for(int j = start; j < end; j++){
 
+            // get global cell_j ID
             int cell_j = ha::interaction_list[j];
 
-            // if (cell_i == 0) std::cout << cell_j <<  "\t" << ha::cell_positions[cell_j*3 + 0] << "\t" << ha::cell_positions[cell_j*3 + 1] << "\t" << ha::cell_positions[cell_j*3 + 2] <<  "\t" <<ha::cell_dimensions[cell_j*3 + 0] << "\t" <<ha::cell_dimensions[cell_j*3 + 1] <<"\t" <<ha::cell_dimensions[cell_j*3 + 2] << std::endl;
-            if ( cells_num_atoms_in_cell[cell_j] != 0 && cell_j < ha::num_zero_level_cells){
+            // only calculate interaction if there are atoms in remote cell - I dont understand either of these conditions!
+            // 1) why does the local number of atoms in the cell matter - surely the global number is more meaningful?
+            // 2) why would I only want to calculate interactions with zero-level cells??? surely we want all interactions?
+            if ( cells_num_atoms_in_cell_global[cell_j] != 0 && cell_j < ha::num_zero_level_cells){
 
-               //   if ( cells_num_atoms_in_cell[cell_j] == 0 && cell_i == 0) std::cout << "HHHHM" << cell_j <<  "\t" << cells_num_atoms_in_cell[cell_j] << std::endl;
-               // if cell is not the same, compute the inter tensor else compute the intra tensor
-               if(cell_i!=cell_j) {
-                  ha::calc_inter(cell_i,cell_j,j, cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z);
-               }
-               else if (cell_i == cell_j){
-                  ha::calc_intra(cell_i,cell_j,j, cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z);
-               }
+               //--------------------------------------------------------------
+               // Calculation of inter part of dipolar tensor
+               //--------------------------------------------------------------
+               // check that remote cell is actually magnetic
+               //if ( cells_num_atoms_in_cell_global[cell_j] > 0 ){
+
+                  // check if cell is not the same
+                  if( cell_i != cell_j ){
+                     // calculate inter term of dipolar tensor
+                     internal::calc_inter(cell_i,
+                                          cell_j,
+                                          j,
+                                          real_cutoff,
+                                          cells_num_atoms_in_cell_global,
+                                          cells_pos_and_mom_array,
+                                          list_of_atoms_with_cells,
+                                          atoms_in_cells_array);
+
+                  } // End of Inter part
+
+                  //--------------------------------------------------------------
+                  // Calculation of intra part of dipolar tensor
+                  //--------------------------------------------------------------
+                  else if( cell_i == cell_j ){
+
+                     //Compute inter component of dipolar tensor
+                     internal::calc_intra(cell_i,
+                                          cell_j,
+                                          j,
+                                          cells_num_atoms_in_cell_global,
+                                          list_of_atoms_with_cells,
+                                          atoms_in_cells_array);
+
+                  }
+                  // End of Intra part
+               //}
+               //    // check for close to zero value tensors and round down to zero
+               //
+               // //   if ( cells_num_atoms_in_cell[cell_j] == 0 && cell_i == 0) std::cout << "HHHHM" << cell_j <<  "\t" << cells_num_atoms_in_cell[cell_j] << std::endl;
+               // // if cell is not the same, compute the inter tensor else compute the intra tensor
+               // if(cell_i!=cell_j) {
+               //    ha::calc_inter(cell_i,cell_j,j, cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z);
+               // }
+               // else if (cell_i == cell_j){
+               //    ha::calc_intra(cell_i,cell_j,j, cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z);
+               // }
 
                // zero excessively small components (avoids round off errors comparing different calculation methods)
                if (ha::rij_tensor_xx[j]*ha::rij_tensor_xx[j] < 1e-15) ha::rij_tensor_xx[j] =0;

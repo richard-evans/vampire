@@ -119,7 +119,7 @@ namespace dipole{
          case dipole::internal::hierarchical:
             std::cout     << "Initialising dipole field calculation using hierarchical solver" << std::endl;
             zlog << zTs() << "Initialising dipole field calculation using hierarchical solver" << std::endl;
-            hierarchical::initialize(cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2]);
+            hierarchical::initialize(cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2], atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
             break;
 
          case dipole::internal::fft:
