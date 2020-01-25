@@ -158,9 +158,9 @@ namespace dipole{
             dipole::internal::rij_tensor_zz[lc][cellj] =  (tmp_rij_inter_zz) * inorm;
 
             //if (i == 0) std::cout << "atom" <<  '\t' << i <<'\t' << j << "\t" << dipole::internal::rij_tensor_xx[lc][j] << "\t" << dipole::internal::rij_tensor_xy[lc][j] << '\t' <<dipole::internal::rij_tensor_xz[lc][j] << std::endl;
-            // // Uncomment in case you want to print the tensor components
+            // Uncomment in case you want to print the tensor components
             // std::cout << "\n############# INTER ###################\n";
-            // std::cout << "lc = " << lc << "\tj = " << j << "\tNat_i\t" << cells_num_atoms_in_cell[i] << "\tNat_j\t" << cells_num_atoms_in_cell[j] << std::endl;
+            // std::cout << "lc = " << lc << "\tj = " << cellj << "\tNat_i\t" << num_i_atoms << "\tNat_j\t" << num_j_atoms << std::endl;
             // std::cout << tmp_rij_inter_xx << "\t" << tmp_rij_inter_xy << "\t" << tmp_rij_inter_xz << "\n";
             // std::cout << tmp_rij_inter_xy << "\t" << tmp_rij_inter_yy << "\t" << tmp_rij_inter_yz << "\n";
             // std::cout << tmp_rij_inter_xz << "\t" << tmp_rij_inter_yz << "\t" << tmp_rij_inter_zz << "\n";

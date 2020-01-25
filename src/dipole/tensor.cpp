@@ -89,6 +89,13 @@ namespace dipole{
          // Assign updated value of cells_num_atoms_in_cell to dipole::dipole_cells_num_atoms_in_cell. It is needed to print the config file. The actual value cells::num_atoms_in_cell is not changed instead
          dipole::dipole_cells_num_atoms_in_cell = cells_num_atoms_in_cell;
 
+         // After transferring the data across cores, assign value cells_num_atoms_in_cell[] from cells_num_atoms_in_cell_global[]
+         for(unsigned int i=0; i<cells_num_atoms_in_cell_global.size(); i++){
+            //if(cells_num_atoms_in_cell_global[i]>0 && cells_num_atoms_in_cell[i]==0){
+               dipole::internal::cells_num_atoms_in_cell[i] = cells_num_atoms_in_cell_global[i];
+            //}
+         }
+
          // print informative message to user
          zlog << zTs() << "Precalculating rij matrix for dipole calculation using tensor solver... " << std::endl;
          std::cout     << "Precalculating rij matrix for dipole calculation using tensor solver"     << std::flush;

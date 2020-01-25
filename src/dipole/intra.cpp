@@ -112,7 +112,7 @@ namespace dipole{
 
          // Uncomment in case you want to check the tensor components
          // std::cout << "\n############# INTRA ###################\n";
-         // std::cout << "lc = " << lc << "\tj = " << j << std::endl;
+         // std::cout << "lc = " << lc << "\ti = " << celli << std::endl;
          // std::cout << tmp_rij_intra_xx << "\t" << tmp_rij_intra_xy << "\t" << tmp_rij_intra_xz << "\n";
          // std::cout << tmp_rij_intra_xy << "\t" << tmp_rij_intra_yy << "\t" << tmp_rij_intra_yz << "\n";
          // std::cout << tmp_rij_intra_xz << "\t" << tmp_rij_intra_yz << "\t" << tmp_rij_intra_zz << "\n";
