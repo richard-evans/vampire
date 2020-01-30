@@ -69,44 +69,49 @@ namespace environment
             if(temperature<=shield_Tc[shield]) pf = one_o_2_chi_para*(1.0 - m_squared/m_e_squared);
             else pf = -2.0*one_o_2_chi_para*(1.0 + Tc_o_Tc_m_T*3.0*m_squared/5.0);
 
-                  double exchange_field[3]={0.0,0.0,0.0};
-            if (num_cells > 1){
-              //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
-               //loops over cells with an interaction from the neighbour lists
-               const int start = neighbour_list_start_index[cell];
-               const int end =   neighbour_list_end_index[cell] +1;
-               for(int j = start;j<end;j++){
+            std::vector < double> exchange_field(3,0.0);
 
-                  const int cellj = neighbour_list_array[j];
-                  int shieldj = shield_number[cellj];
-                  const double Ar = shield_A[shield][shieldj]*2.0/(Ms[cell]);
-                  const double Acx = Ar*cell_size_z[cell]*cell_size_y[cell];
-                  const double Acy = Ar*cell_size_z[cell]*cell_size_x[cell];
-                  const double Acz = Ar*cell_size_x[cell]*cell_size_y[cell];
-
-                  //calculate |mj|
-                  const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
-                  //calcaultes the temperature dependant terms
-                  const double AT = pow(mj,1.66);
-                  const double ECx = AT*Acx;
-                  const double ECy = AT*Acy;
-                  const double ECz = AT*Acz;
-                  //calcualtes the exchange field from i to j
-                  exchange_field[0] -= ECx*(x_array[cellj] - x_array[cell]);
-                  exchange_field[1] -= ECy*(y_array[cellj] - y_array[cell]);
-                  exchange_field[2] -= ECz*(z_array[cellj] - z_array[cell]);
-
-               }
-            }
+            // if (num_cells > 1){
+            //                      std::cout << cell << '\t' << x_array.size() << std::endl;
+            //   //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
+            //    //loops over cells with an interaction from the neighbour lists
+            //    const int start = neighbour_list_start_index[cell];
+            //    const int end =   neighbour_list_end_index[cell] +1;
+            //    for(int j = start;j<end;j++){
+            //
+            //       const int cellj = neighbour_list_array[j];
+            //       int shieldj = shield_number[cellj];
+            //       // if shield
+            //       const double Ar = shield_A[shield][shieldj]*2.0/(Ms[cell]);
+            //       const double Acx = Ar*cell_size_z[cell]*cell_size_y[cell];
+            //       const double Acy = Ar*cell_size_z[cell]*cell_size_x[cell];
+            //       const double Acz = Ar*cell_size_x[cell]*cell_size_y[cell];
+            //       //
+            //       //calculate |mj|
+            //       const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
+            //       //calcaultes the temperature dependant terms
+            //       const double AT = pow(mj,1.66);
+            //       const double ECx = AT*Acx;
+            //       const double ECy = AT*Acy;
+            //       const double ECz = AT*Acz;
+            //       //calcualtes the exchange field from i to j
+            //       //double E = - ECx; //
+            //       exchange_field[0] -= ECx*(x_array[cellj] - x_array[cell]);
+            //       exchange_field[1] -= ECy*(y_array[cellj] - y_array[cell]);
+            //       exchange_field[2] -= ECz*(z_array[cellj] - z_array[cell]);
+            //
+            //    }
+            // }
 
 
             //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-            spin_field[0] = pf*m[0] + exchange_field[0] + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[0] + shield_Hext_x[shield]  + env_field_uv[0];// + bias_field_x[cell]+ dipole_field_x[cell];
-            spin_field[1] = pf*m[1] + exchange_field[1] + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[1] + shield_Hext_y[shield]  + env_field_uv[1];// + bias_field_y[cell] + dipole_field_y[cell];
-            spin_field[2] = pf*m[2] + exchange_field[2]                                               + shield_Hext_z[shield]  + env_field_uv[2];// + bias_field_z[cell]+ dipole_field_z[cell];
-          //    std::cout << "x" << '\t' << pf  << '\t' << m[0] << '\t' << exchange_field[0] << "\t" << dipole_field_x[cell] << "\t" << spin_field[0] <<std::endl;
-          //    std::cout << "y" << '\t' << pf  << '\t' << m[1] << '\t' << exchange_field[1] << "\t" << dipole_field_y[cell] << "\t" << spin_field[1] <<std::endl;
-          //    std::cout << "z" << '\t' << pf  << '\t' << m[2] << '\t' << exchange_field[2] << "\t" << dipole_field_z[cell] << "\t" << spin_field[2] <<std::endl;
+            spin_field[0] = pf*m[0];// + exchange_field[0] ;//+ ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[0] + shield_Hext_x[shield]  + env_field_uv[0];// + bias_field_x[cell]+ dipole_field_x[cell];
+            spin_field[1] = pf*m[1];// + exchange_field[1] ;//+ ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[1] + shield_Hext_y[shield]  + env_field_uv[1];// + bias_field_y[cell] + dipole_field_y[cell];
+            spin_field[2] = pf*m[2];// + exchange_field[2]  ;//                                             + shield_Hext_z[shield]  + env_field_uv[2];// + bias_field_z[cell]+ dipole_field_z[cell];
+            //  std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << '\t' << m[0] << '\t' << m[1] << "\t" << m[2] <<std::endl;
+            //  std::cout << "x" << '\t' << bias_field_x[cell]  << '\t' << m[0] << '\t' << exchange_field[0] << "\t" << dipole_field_x[cell] << "\t" << spin_field[0] <<std::endl;
+            //  std::cout << "y" << '\t' << bias_field_y[cell]  << '\t' << m[1] << '\t' << exchange_field[1] << "\t" << dipole_field_y[cell] << "\t" << spin_field[1] <<std::endl;
+            //  std::cout << "z" << '\t' << bias_field_z[cell]  << '\t' << m[2] << '\t' << exchange_field[2] << "\t" << dipole_field_z[cell] << "\t" << spin_field[2] <<std::endl;
               if (spin_field[0] != spin_field[0] ){
                 std::cout << "Error in environment"<<std::endl;
                 std::cin.get();

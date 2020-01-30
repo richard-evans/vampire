@@ -124,8 +124,8 @@ int init(){
 		unit[22]="eV/T";		conversion[22]=1.602176487e-19;	type[22]="moment";		// Electron volts/Tesla
 		unit[23]="erg/Oe";	conversion[23]=1.0E-3; 				type[23]="moment";		// Erg/Oersted
 		// Magnetisation
-		unit[24]="A/m";		conversion[24]=2.17987208E-18;	type[24]="magnetisation";	// Amps/metre
-		unit[25]="emu/cc";	conversion[25]=2.17987208E-21; 	type[25]="magnetisation";	// emu/cubic cm
+		unit[24]="A/m";		conversion[24]=1e-30;				type[24]="magnetisation";	// Amps/metre
+		unit[25]="emu/cc";	conversion[25]=1e-27;			 	type[25]="magnetisation";	// emu/cubic cm
 		unit[26]="J/T/AAA";	conversion[26]=1.0;					type[26]="magnetisation";	// Joule/Tesla/Angstrom cubed
 		// Anisotropy
 		unit[27]="J/atom";	conversion[27]=1.0; 					type[27]="anisotropy";		// Joules/Atom

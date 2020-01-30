@@ -87,6 +87,7 @@ namespace dipole{
              		dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
              		dipole::cells_field_array_z[i]+=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);
                   // Demag field
+					//	std::cout << "DEMAG\t" << cells::mag_array_x[j] << '\t' << imuB << '\t' <<  mx << '\t' << my << '\t' << mz << '\t' << internal::rij_tensor_xx[lc][j] << '\t' << dipole::cells_field_array_x[i] << std::endl;
                   dipole::cells_mu0Hd_field_array_x[i] +=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
                   dipole::cells_mu0Hd_field_array_y[i] +=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
                   dipole::cells_mu0Hd_field_array_z[i] +=(mx*internal::rij_tensor_xz[lc][j] + my*internal::rij_tensor_yz[lc][j] + mz*internal::rij_tensor_zz[lc][j]);

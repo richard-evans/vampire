@@ -84,42 +84,24 @@ int in_shield(double x, double y, double z,int shield){
     double xmax = env::shield_max_x[shield];
     double zmin = env::shield_min_z[shield];
     double zmax = env::shield_max_z[shield];
+    if (xmax == x) xmax = xmax+ 0.1;
+    if (xmin == x) xmax = xmax + 0.1;
+    double g2 = -10*(zmax-zmin)*1/(x-xmax) + zmin;
+    double g  =  10*(zmax-zmin)*1/(x-xmin) + zmin;
 
-    double f = exp((x-xmax)*0.01);
-    double f2 = exp((-x+(xmax-xmin)-xmax)*0.01);
-    double fmin = exp((xmin-xmax)*0.01);
-    double fmax = exp((xmax-xmax)*0.01);
-    double g = zmin+(zmax-zmin)*(f-fmin)/(fmax-fmin);
-    double g2 = zmin+(zmax-zmin)*(f2-fmin)/(fmax-fmin);
-
-  //  if (x !=xmax){
-      g2 = -10*(zmax-zmin)*1/(x-xmax) + zmin;
-  //  }
-  //  else g2 = 100000;
-
-  //  if (x !=xmin){
-    g =  10*(zmax-zmin)*1/(x-xmin) + zmin;
-  //  }
-  //  else g = 1000000;
-
-
-    //std::cout <<  g << '\t' << z << '\t' << zmax << std::endl;
-
+    std::cout <<x << '\t' << xmax << '\t' << xmin << "\t" << zmax << '\t' << zmin << "\t" <<  g << "\t" << g2 << '\t' << z << std::endl;
      if(g < z && env::pos_or_neg[shield] == "pos" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
-         z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){//}&& z <= zmax && x <= xmax && x >= xmin && z >= zmin && env::pos_or_neg[shield] == "pos") {
-    //  std::cout << "neg" <<std::endl;
-      //     std::cout << x << '\t'  << z << '\t' <<g2 << '\t' << g << '\t' <<  std::endl;
+         z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){
       return 1;
      }
      else if( g2 < z && env::pos_or_neg[shield] == "neg" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
          z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){ //z <= zmax && x <= xmax && x >= xmin && z >= zmin) {
-       return 1;
+         return 1;
      }
      else{
-    //          std::cout << "not in" <<std::endl;
-              return 0;
+        return 0;
      }
 
 
@@ -137,18 +119,19 @@ else   return 0;
 int bias_shields(){
 
   double shield_Ms = 1;
-  double x_size = dim[1];
-  double y_size = 1000000;
-  double z_size = dim[2];
+  double x_size = 200;
+  double y_size = 100000;
+  double z_size = 160;//dim[2];
 
   double x_pos = x_size/2.0;
   double y_pos;
-  double z_pos = dim[2]/2.0;
+  double z_pos = z_size/2.0;
 
   double y_pos_1 = -y_size/2.0;
-  double y_pos_2 =  y_size/2.0 +dim[0];
+  double y_pos_2 =  y_size/2.0 + 200;
 
-
+ // std::cout << dim[0] << '\t' << dim[1] << '\t' << dim[2] << std::endl;
+ // std::cin.get();
    double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
     for (int cell = 0; cell < num_cells; cell ++){
@@ -172,9 +155,11 @@ int bias_shields(){
        if (shield == 0) y_pos = y_pos_1;
        if (shield == 1) y_pos = y_pos_2;
        //calculates the vector in A from the cell to the shields
-       double x = sqrt((x_cell - x_pos)*(x_cell - x_pos));
-       double y = sqrt((y_cell - y_pos)*(y_cell - y_pos));
+       double x = sqrt((y_cell - x_pos)*(y_cell - x_pos));
+       double y = sqrt((x_cell - y_pos)*(x_cell - y_pos));
        double z = sqrt((z_cell - z_pos)*(z_cell - z_pos));
+
+      // if (cell == 934)  std::cout << x_cell << '\t' << y_cell << '\t' << z_cell << '\t' << x_pos << '\t' << y_pos << '\t' << z_pos <<  "\t" <<  x << '\t' << y << '\t' << z << std::endl;
 
        double Bx = 0.0;
        double By = 0.0;
@@ -205,22 +190,22 @@ int bias_shields(){
                  double r = sqrt(xp*xp + yp*yp + zp*zp);
 
                  Bx = Bx + m1klm * log(zp + r);
-                 By = By - m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                 By = By + m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
                  Bz = Bz + m1klm * log(xp + r);
 
-
+            //     std::cout << k << '\t' << l << '\t' << m << '\t' << Bx << '\t' << By << '\t' << Bz << "\t" << std::endl;
               }
            }
        }
-       bias_field_x[cell] = bias_field_x[cell] + By*prefactor;
+       bias_field_x[cell] = bias_field_x[cell] - By*prefactor;
        bias_field_y[cell] = bias_field_y[cell] + Bx*prefactor;
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 
      }
-  //  std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
+   // std::cout << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
 
   }
-//std::cin.get();
+///std::cin.get();
 
 
 
@@ -446,7 +431,7 @@ int read_in_shield_info(){
         double g=atof(value.c_str());
         vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_min_x[super_index-1] = g;
-        std::cout << word << '\t' << env::shield_min_x[super_index-1] << '\t' << super_index - 1 <<std::endl;
+      //  std::cout << word << '\t' << env::shield_min_x[super_index-1] << '\t' << super_index - 1 <<std::endl;
 
       }
 

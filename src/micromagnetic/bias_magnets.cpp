@@ -36,7 +36,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
   //THIS IS CORRECT I KNOW THE X AND Y ARE MISSED UP! THIS IS BECAUE MS is assumed to be along y but i need it along x so i have switched x and y then switched them back at the end
 
   double shield_Ms = 1;
-  double x_size =system_dimensions_y*bias_magnets_max_width - system_dimensions_y*bias_magnets_min_width;
+  double x_size = system_dimensions_y*bias_magnets_max_width - system_dimensions_y*bias_magnets_min_width;
   double y_size = 1000000;
   double z_size = system_dimensions_z*bias_magnets_max_height - system_dimensions_z*bias_magnets_min_height;
 
@@ -63,7 +63,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
     bias_field_y[cell] = 0;
     bias_field_z[cell] = 0;
 
-//      //cell position in Angstrom
+     //cell position in Angstrom
      double x_cell = cells::pos_and_mom_array[4*cell + 0];
      double y_cell = cells::pos_and_mom_array[4*cell + 1];
      double z_cell = cells::pos_and_mom_array[4*cell + 2];
@@ -79,8 +79,8 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
        if (shield == 0) y_pos = y_pos_1;
        if (shield == 1) y_pos = y_pos_2;
        //calculates the vector in A from the cell to the shields
-       double x = sqrt((x_cell - x_pos)*(x_cell - x_pos));
-       double y = sqrt((y_cell - y_pos)*(y_cell - y_pos));
+       double x = sqrt((y_cell - x_pos)*(y_cell - x_pos));
+       double y = sqrt((x_cell - y_pos)*(x_cell - y_pos));
        double z = sqrt((z_cell - z_pos)*(z_cell - z_pos));
 
        double Bx = 0.0;
