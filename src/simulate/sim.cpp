@@ -301,30 +301,30 @@ int run(){
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
-	if (micromagnetic::discretisation_type > 0)
-	micromagnetic::initialize(cells::num_local_cells,
-									  cells::num_cells,
-									  stats::num_atoms,
-									  mp::num_materials,
-									  cells::atom_cell_id_array,
-									  atoms::neighbour_list_array,
-									  atoms::neighbour_list_start_index,
-									  atoms::neighbour_list_end_index,
-									  atoms::type_array,
-									  mp::material,
-									  atoms::x_coord_array,
-									  atoms::y_coord_array,
-									  atoms::z_coord_array,
-									  cells::volume_array,
-									  sim::temperature,
-									  cells::num_atoms_in_unit_cell,
-									  cs::system_dimensions[0],
-									  cs::system_dimensions[1],
-									  cs::system_dimensions[2],
-									  cells::local_cell_array);
-
-
-	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
+	// if (micromagnetic::discretisation_type > 0)
+	// micromagnetic::initialize(cells::num_local_cells,
+	// 								  cells::num_cells,
+	// 								  stats::num_atoms,
+	// 								  mp::num_materials,
+	// 								  cells::atom_cell_id_array,
+	// 								  atoms::neighbour_list_array,
+	// 								  atoms::neighbour_list_start_index,
+	// 								  atoms::neighbour_list_end_index,
+	// 								  atoms::type_array,
+	// 								  mp::material,
+	// 								  atoms::x_coord_array,
+	// 								  atoms::y_coord_array,
+	// 								  atoms::z_coord_array,
+	// 								  cells::volume_array,
+	// 								  sim::temperature,
+	// 								  cells::num_atoms_in_unit_cell,
+	// 								  cs::system_dimensions[0],
+	// 								  cs::system_dimensions[1],
+	// 								  cs::system_dimensions[2],
+	// 								  cells::local_cell_array);
+	//
+	//
+	// if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
 
 
 
@@ -652,12 +652,12 @@ void integrate_serial(uint64_t n_steps){
       case 0: // LLG Heun
          for(uint64_t ti=0;ti<n_steps;ti++){
             // Optionally select GPU accelerated version
-            if(gpu::acceleration) gpu::llg_heun();
+            //if(gpu::acceleration) gpu::llg_heun();
             // Otherwise use CPU version
-            else sim::LLG_Heun();
-				if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0){
-					environment::LLB(sim::temperature, sim::H_applied,sim::H_vec[0],sim::H_vec[1],sim::H_vec[2],mp::dt);
-				}
+            //else sim::LLG_Heun();
+			//	if (environment::enabled && (sim::time)%environment::num_atomic_steps_env ==0){
+				//	environment::LLB(sim::temperature, sim::H_applied,sim::H_vec[0],sim::H_vec[1],sim::H_vec[2],mp::dt);
+			//	}
             // Increment time
             increment_time();
          }
