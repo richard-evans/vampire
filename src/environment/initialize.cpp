@@ -64,7 +64,7 @@ namespace environment{
        double mm_size_x, mm_size_y,mm_size_z;
        double env_size_x, env_size_y,env_size_z;
 
-       env::shield_shape.resize(env::num_shields,"cube");
+       env::shield_shape.resize(env::num_shields+1,"cube");
        env::shield_ms.resize(env::num_shields+1, 1e-21);
        env::shield_Tc.resize(env::num_shields+1, 600);
        env::shield_A.resize(env::num_shields+1);

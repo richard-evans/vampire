@@ -324,7 +324,7 @@ int run(){
 									  cells::local_cell_array);
 
 
-	//if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
+	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
 
 
 
@@ -750,14 +750,14 @@ int integrate_mpi(uint64_t n_steps){
 				#else
 					sim::LLG_Heun_mpi();
 					//calcualte the field from the environment
-				// 	if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0)
-				// 		environment::LLB(sim::temperature,
-				// 								sim::H_applied,
-				// 								sim::H_vec[0],
-				// 								sim::H_vec[1],
-				// 								sim::H_vec[2],
-				// 								mp::dt);
-				 #endif
+					if (environment::enabled &&  (sim::time)%environment::num_atomic_steps_env ==0)
+						environment::LLB(sim::temperature,
+												sim::H_applied,
+												sim::H_vec[0],
+												sim::H_vec[1],
+												sim::H_vec[2],
+												mp::dt);
+				#endif
 			#endif
 				// increment time
 				increment_time();

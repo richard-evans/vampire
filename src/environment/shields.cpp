@@ -89,7 +89,7 @@ int in_shield(double x, double y, double z,int shield){
     double g2 = -10*(zmax-zmin)*1/(x-xmax) + zmin;
     double g  =  10*(zmax-zmin)*1/(x-xmin) + zmin;
 
-    std::cout <<x << '\t' << xmax << '\t' << xmin << "\t" << zmax << '\t' << zmin << "\t" <<  g << "\t" << g2 << '\t' << z << std::endl;
+   // std::cout <<x << '\t' << xmax << '\t' << xmin << "\t" << zmax << '\t' << zmin << "\t" <<  g << "\t" << g2 << '\t' << z << std::endl;
      if(g < z && env::pos_or_neg[shield] == "pos" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
          z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){
