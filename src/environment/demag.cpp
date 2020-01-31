@@ -284,9 +284,7 @@ namespace environment{
         double self_demag = eightPI_three_cell_volume;
         //std::cout << self_demag << std::endl;
         // Normalise cell magnetisation by the Bohr magneton
-      //  const double mx_i = x_mag_array[cell_i]*imuB;
-      //  const double my_i = y_mag_array[cell_i]*imuB;
-      //  const double mz_i = z_mag_array[cell_i]*imuB;
+
      //      std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;
         // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
         dipole_field_x[cell_i] = 0.0;//self_demag * mx_i*0.0; //*0.0
@@ -297,25 +295,24 @@ namespace environment{
         for(int cell_j = 0; cell_j<num_cells;cell_j++){
 
           int j = interaction_no;
-      //    if (shield_number[cell_j] == num_shields && shield_number[cell_i] == num_shields){
+
           const double mx = x_mag_array[cell_j]*imuB;
-          const double my = 0.0;//y_mag_array[cell_j]*imuB;
-          const double mz = 0.0;//z_mag_array[cell_j]*imuB;
+          const double my = y_mag_array[cell_j]*imuB;
+          const double mz = z_mag_array[cell_j]*imuB;
+        //if (cell_i == 0)std::cout<< cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
           dipole_field_x[cell_i]      +=(mx*rij_tensor_xx[j] + my*rij_tensor_xy[j] + mz*rij_tensor_xz[j]);
           dipole_field_y[cell_i]      +=(mx*rij_tensor_xy[j] + my*rij_tensor_yy[j] + mz*rij_tensor_yz[j]);
           dipole_field_z[cell_i]      +=(mx*rij_tensor_xz[j] + my*rij_tensor_yz[j] + mz*rij_tensor_zz[j]);
-         // std::cout<< "M\t" << cell_i << '\t' <<  cell_j << "\t" <<  x_mag_array[cell_j] << '\t' << imuB <<'\t' << mx << '\t' << my << '\t' << mz << "\t" << dipole_field_x[cell_i] << std::endl;
-      //   }
           interaction_no ++;
           // Demag field
-      //   std::cout << rij_tensor_xx[j] << '\t' << rij_tensor_xy[j] << '\t' << rij_tensor_xz[j] << '\t' << rij_tensor_yy[j] << '\t' << rij_tensor_yz[j] << '\t' << rij_tensor_zz[j] << '\t' <<std::endl;
+        // std::cout << rij_tensor_xx[j] << '\t' << rij_tensor_xy[j] << '\t' << rij_tensor_xz[j] << '\t' << rij_tensor_yy[j] << '\t' << rij_tensor_yz[j] << '\t' << rij_tensor_zz[j] << '\t' <<std::endl;
         }
      //   std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
 
         dipole_field_x[cell_i] = dipole_field_x[cell_i] * 9.27400915e-01;
         dipole_field_y[cell_i] = dipole_field_y[cell_i] * 9.27400915e-01;
         dipole_field_z[cell_i] = dipole_field_z[cell_i] * 9.27400915e-01;
-        //std::cout << sim::time << '\t' << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
+       // std::cout << sim::time << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
       }
     //  saves the dipole field for each cell to the environment cell for use in the environment module
       // for(int lc=0; lc<cells::num_local_cells; lc++){
@@ -461,16 +458,18 @@ namespace environment{
 //              }
 //            }
 // //std::cin.get();
+  //  std::ofstream ofile;
+  // ofile.open("field.txt");
 //          //saves the dipole field for each cell to the environment cell for use in the environment module
          for(int lc=0; lc<cells::num_local_cells; lc++){
             int cell = cells::cell_id_array[lc];
             int env_cell = list_env_cell_atomistic_cell[cell];
             //std::cout << cell << '\t' << env_cell <<std::endl;
-            environment_field_x[cell] = dipole_field_x[env_cell];// + bias_field_x[env_cell];
-            environment_field_y[cell] = dipole_field_y[env_cell];// + bias_field_y[env_cell];
-            environment_field_z[cell] = dipole_field_z[env_cell];// + bias_field_z[env_cell];
-         //   std::cout <<"DEMAG" <<  cell << '\t' << cell_coords_array_x[env_cell] << '\t' <<cell_coords_array_y[env_cell] << '\t' <<cell_coords_array_z[env_cell] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' << environment_field_z[cell] << std::endl;
-          //  ofile << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
+            environment_field_x[cell] = dipole_field_x[env_cell] + bias_field_x[env_cell];
+            environment_field_y[cell] = dipole_field_y[env_cell] + bias_field_y[env_cell];
+            environment_field_z[cell] = dipole_field_z[env_cell] + bias_field_z[env_cell];
+
+            //std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
 
          }
 //    //      //end the FFT only compilation

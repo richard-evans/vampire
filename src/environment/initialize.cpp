@@ -54,7 +54,7 @@ namespace environment{
    void initialize(double system_dimensions_x, double system_dimensions_y, double system_dimensions_z){
 
 
-       std::cout << "Initialising environment module" << std::endl;
+   //    std::cout << "Initialising environment module" << std::endl;
 
 
        env::env_field_uv[0] = env::env_field_uv[0]*env::env_field;
@@ -64,7 +64,7 @@ namespace environment{
        double mm_size_x, mm_size_y,mm_size_z;
        double env_size_x, env_size_y,env_size_z;
 
-       env::shield_shape.resize(env::num_shields+1,"cube");
+       env::shield_shape.resize(env::num_shields,"cube");
        env::shield_ms.resize(env::num_shields+1, 1e-21);
        env::shield_Tc.resize(env::num_shields+1, 600);
        env::shield_A.resize(env::num_shields+1);
@@ -73,23 +73,23 @@ namespace environment{
        env::shield_ku.resize(env::num_shields+1, 0);
        env::shield_alpha.resize(env::num_shields+1, 1.0);
        env::shield_gamma.resize(env::num_shields+1,1.0);
-       env::shield_max_x.resize(env::num_shields+1,-1000);
-       env::shield_max_y.resize(env::num_shields+1,-1000);
-       env::shield_max_z.resize(env::num_shields+1,-1000);
-       env::shield_min_x.resize(env::num_shields+1,-1500);
-       env::shield_min_y.resize(env::num_shields+1,-1500);
-       env::shield_min_z.resize(env::num_shields+1,-1500);
-       env::shield_max_cell_size.resize(env::num_shields+1,200);
-       env::shield_min_cell_size.resize(env::num_shields+1,10);
-       env::shield_Hext_x.resize(env::num_shields+1,0);
-       env::shield_Hext_y.resize(env::num_shields+1,0);
-       env::shield_Hext_z.resize(env::num_shields+1,0);
-       env::pos_or_neg.resize(env::num_shields+1,"pos");
-       env::H_strength.resize(env::num_shields+1,0);
-       env::initial_spin_x.resize(env::num_shields+1,0);
-       env::initial_spin_y.resize(env::num_shields+1,0);
-       env::initial_spin_z.resize(env::num_shields+1,1);
-       env::random_spins.resize(env::num_shields+1,false);
+       env::shield_max_x.resize(env::num_shields,1000);
+       env::shield_max_y.resize(env::num_shields,1000);
+       env::shield_max_z.resize(env::num_shields,1000);
+       env::shield_min_x.resize(env::num_shields,500);
+       env::shield_min_y.resize(env::num_shields,500);
+       env::shield_min_z.resize(env::num_shields,500);
+       env::shield_max_cell_size.resize(env::num_shields,100);
+       env::shield_min_cell_size.resize(env::num_shields,10);
+       env::shield_Hext_x.resize(env::num_shields,0);
+       env::shield_Hext_y.resize(env::num_shields,0);
+       env::shield_Hext_z.resize(env::num_shields,0);
+       env::pos_or_neg.resize(env::num_shields,"pos");
+       env::H_strength.resize(env::num_shields,0);
+       env::initial_spin_x.resize(env::num_shields,0);
+       env::initial_spin_y.resize(env::num_shields,0);
+       env::initial_spin_z.resize(env::num_shields,1);
+       env::random_spins.resize(env::num_shields,false);
 
 
        int a = env::read_in_shield_info();
@@ -98,9 +98,9 @@ namespace environment{
          env::shield_Hext_x[shield] = env::shield_Hext_x[shield]*env::H_strength[shield];
          env::shield_Hext_y[shield] = env::shield_Hext_y[shield]*env::H_strength[shield];
          env::shield_Hext_z[shield] = env::shield_Hext_z[shield]*env::H_strength[shield];
-         //std::cout << env::shield_Hext_x[shield] << '\t' << env::shield_Hext_y[shield] << '\t' << env::shield_Hext_z[shield] <<std::endl;
+         std::cout << env::shield_Hext_x[shield] << '\t' << env::shield_Hext_y[shield] << '\t' << env::shield_Hext_z[shield] <<std::endl;
        }
-       std::cout << "shield info read in " <<std::endl;
+   //    std::cout << "shield info read in " <<std::endl;
 
        double dx,dy,dz;
 
@@ -144,8 +144,8 @@ namespace environment{
         // std::cout <<"A" <<  env::num_cells_x << '\t' << env::num_cells_y << '\t' << env::num_cells_z <<std::endl;
           //                    std::cin.get();
          //calculates the minimum and maximum positions of each cell for calcualtions of which cell the atomistic atoms are in later
-      //   std::cout << shield << '\t' <<  tmp_x.size() << "\t" << env::cell_coords_array_x.size() << "\t" << n_cell <<std::endl;
-      //   std::cout << env::num_cells_x  << '\t' << env::num_cells_y  << "\t"  << env::num_cells_z << "\t" << env::shield_max_cell_size[shield]<< "\t" << dx << "\t" << dy << "\t" << dz << std::endl;
+   //      std::cout << shield << '\t' <<  tmp_x.size() << "\t" << env::cell_coords_array_x.size() << "\t" << n_cell <<std::endl;
+   //      std::cout << env::num_cells_x  << '\t' << env::num_cells_y  << "\t"  << env::num_cells_z << "\t" << env::shield_max_cell_size[shield]<< "\t" << dx << "\t" << dy << "\t" << dz << std::endl;
        for (int x = 0; x < env::num_cells_x; x++){
           for (int y = 0; y < env::num_cells_y; y++){
              for (int z = 0; z < env::num_cells_z; z++){
@@ -157,7 +157,7 @@ namespace environment{
                 double pos_y = current_cell_size*y + env::shield_min_y[shield] + current_cell_size/2.0 ;// + current_cell_size/2.0;
                 double pos_z = current_cell_size*z + env::shield_min_z[shield] + current_cell_size/2.0 ;// + current_cell_size/2.0;
 
-            //   std::cout << "here" << '\t' << shield << '\t' << current_cell_size << '\t' << env::shield_min_x[shield] << '\t' <<env::shield_min_y[shield] << '\t' <<env::shield_min_z[shield] << '\t' << pos_x << '\t' << pos_y << '\t' << pos_z << std::endl;
+            //   std::cout << "here" << '\t' << pos_x << '\t' << pos_y << '\t' << pos_z << std::endl;
                 size_x.push_back(current_cell_size);
                 size_y.push_back(current_cell_size);
                 size_z.push_back(current_cell_size);
@@ -169,9 +169,9 @@ namespace environment{
             }
           }
 
-         // std::cout <<  tmp_x.size() <<std::endl;
-            //     std::cout << "created initial cells " <<std::endl;
-         // std::cin.get();
+          std::cout <<  tmp_x.size() <<std::endl;
+      //           std::cout << "created initial cells " <<std::endl;
+        //  std::cin.get();
 
           for (int cell = 0; cell < tmp_x.size(); cell ++ ){
 
@@ -216,6 +216,7 @@ namespace environment{
                   env::cell_size_z.push_back(size_z[cell]);
                   env::cell_volume.push_back(size_x[cell]*size_y[cell]*size_z[cell]);
                   env::Ms.push_back(env::shield_ms[shield]*env::cell_volume[n_cell]);
+                  //std::cout << env::shield_ms[shield] << '\t' << env::cell_volume[n_cell] << std::endl;
                   env::ku.push_back(-env::shield_ku[shield]/env::cell_volume[n_cell]);
                   x_max.push_back(tmp_x[cell] + size_x[cell]/2.0);
                   x_min.push_back(tmp_x[cell] - size_x[cell]/2.0);
@@ -223,8 +224,12 @@ namespace environment{
                   y_min.push_back(tmp_y[cell] - size_y[cell]/2.0);
                   z_max.push_back(tmp_z[cell] + size_z[cell]/2.0);
                   z_min.push_back(tmp_z[cell] - size_z[cell]/2.0);
+                  env::x_mag_array.push_back(0.0);
+                  env::y_mag_array.push_back(0.0);
+                  env::z_mag_array.push_back(0.0);
                   env::shield_number.push_back(shield);
-                  pfile2 << shield << '\t' << n_cell << '\t' <<  tmp_x[cell] << '\t' << tmp_y[cell] << '\t' << tmp_z[cell] << "\t" << size_x[cell] << '\t' << size_y[cell]<< '\t' << size_z[cell] <<  std::endl;
+                  env::env_cell_is_in_atomistic_region.push_back(0);
+                  pfile2 << N << '\t' << n_cell << '\t' <<  tmp_x[cell] << '\t' << tmp_y[cell] << '\t' << tmp_z[cell] << "\t" << size_x[cell] << '\t' << size_y[cell]<< '\t' << size_z[cell] <<  std::endl;
                   n_cell ++;
 
                 }
@@ -233,41 +238,19 @@ namespace environment{
             //  std::cout << "END\t" << shield << '\t' <<  tmp_x.size() << "\t" << env::cell_coords_array_x.size() << "\t" << n_cell <<std::endl;
             //  std::cin.get();
             }
-               //std::cin.get();
+
 
        env::num_cells = n_cell;
-       std::cout << "Number of environment cells: " << env::num_cells << std::endl;
+      // std::cout << "Number of environment cells: " << env::num_cells <<  "\t cell size: " <<   env::cell_volume[0] << "\t" << std::endl;
 
        //convert Ms from input to Ms = ms/V and Ku = ku/V
 
 
 
-       //resize arrays
-       env::x_mag_array.resize(env::num_cells,0.0);
-       env::y_mag_array.resize(env::num_cells,0.0);
-       env::z_mag_array.resize(env::num_cells,0.0);
-
-       env::bias_field_x.resize(env::num_cells,0.0);
-       env::bias_field_y.resize(env::num_cells,0.0);
-       env::bias_field_z.resize(env::num_cells,0.0);
-
-       env::dipole_field_x.resize(env::num_cells,0.0);
-       env::dipole_field_y.resize(env::num_cells,0.0);
-       env::dipole_field_z.resize(env::num_cells,0.0);
-
-       env::neighbour_list_start_index.resize(env::num_cells,0.0);
-       env::neighbour_list_end_index.resize(env::num_cells,0.0);
-
-       env::list_env_cell_atomistic_cell.resize(cells::num_cells,0);
-       env::env_cell_is_in_atomistic_region.resize(env::num_cells,0);
-
-       environment_field_x.resize(cells::num_cells,0.0);
-       environment_field_y.resize(cells::num_cells,0.0);
-       environment_field_z.resize(cells::num_cells,0.0);
 
 
 
-       std::cout << "Identifying environment cells which are atomistic" << std::endl;
+   //    std::cout << "Identifying environment cells which are atomistic" << std::endl;
 
        //loops over all atomistic cells to determine if the atomsitic simulation lies within an environment cell
 
@@ -279,6 +262,8 @@ namespace environment{
        //    pfile << cell << "\t" << cells::pos_and_mom_array[4*cell + 0] << "\t" << cells::pos_and_mom_array[4*cell + 1] << "\t" << cells::pos_and_mom_array[4*cell + 2] <<  "\t" <<  cells::mag_array_x[cell] << '\t' << cells::mag_array_y[cell] << '\t' << cells::mag_array_z[cell] <<std::endl;
        //
        // }
+
+      env::list_env_cell_atomistic_cell.resize(cells::num_cells,0);
 
        for(int lc=0; lc<cells::num_local_cells; lc++){
           int cell = cells::cell_id_array[lc];
@@ -297,7 +282,7 @@ namespace environment{
           for (int env_cell = 0; env_cell < env::num_cells; env_cell++){
 
              //if atom is within environment
-          //   std::cout << x << '\t' << y << '\t' << z << '\t' << x_max[env_cell] << '\t' << y_max[env_cell] << '\t' << z_max[env_cell] <<std::endl;
+         //   std::cout << x << '\t' << y << '\t' << z << '\t' << x_max[env_cell] << '\t' << y_max[env_cell] << '\t' << z_max[env_cell] <<std::endl;
              if (x < x_max[env_cell] && x > x_min[env_cell] && y < y_max[env_cell] && y > y_min[env_cell] && z < z_max[env_cell] && z > z_min[env_cell]){
                 //then the magnetisation of the enciroment cell is a sum of all atomistic atoms in that cell
                 //adds the cell to the list of atomistic cells
@@ -324,21 +309,50 @@ namespace environment{
             env::cell_volume.push_back(cells::macro_cell_size_x*cells::macro_cell_size_y*cells::macro_cell_size_z);
             env::Ms.push_back(1e-21);
             env::ku.push_back(0);
-            env::shield_number.push_back(env::num_shields);
+            env::shield_number.push_back(0);
             env::list_env_cell_atomistic_cell[cell] = env_cell;
             //this cell is an atomistic cell.
             env::env_cell_is_in_atomistic_region.push_back(1);
             env::x_mag_array.push_back(cells::mag_array_x[cell]);
             env::y_mag_array.push_back(cells::mag_array_y[cell]);
             env::z_mag_array.push_back(cells::mag_array_z[cell]);
-            pfile2 << env::num_shields << '\t' << env_cell << '\t' <<  x << '\t' << y << '\t' << z << "\t" << cells::macro_cell_size_x << '\t' << cells::macro_cell_size_y << '\t' << cells::macro_cell_size_z <<  std::endl;
+            pfile2 << 234 << '\t' << env_cell << '\t' <<  x << '\t' << y << '\t' << z << "\t" << cells::macro_cell_size_x << '\t' << cells::macro_cell_size_y << '\t' << cells::macro_cell_size_z <<  std::endl;
           }
        }
+
+   //    std::cout << "end of identification" << std::endl;
+       //resize arrays
+       env::bias_field_x.resize(env::num_cells,0.0);
+       env::bias_field_y.resize(env::num_cells,0.0);
+       env::bias_field_z.resize(env::num_cells,0.0);
+
+       env::dipole_field_x.resize(env::num_cells,0.0);
+       env::dipole_field_y.resize(env::num_cells,0.0);
+       env::dipole_field_z.resize(env::num_cells,0.0);
+
+       env::neighbour_list_start_index.resize(env::num_cells,0.0);
+       env::neighbour_list_end_index.resize(env::num_cells,0.0);
+
+       env::env_cell_is_in_atomistic_region.resize(env::num_cells,0);
+
+       environment_field_x.resize(cells::num_cells,0.0);
+       environment_field_y.resize(cells::num_cells,0.0);
+       environment_field_z.resize(cells::num_cells,0.0);
+
+    //   std::cin.get();
+
+        // std::ofstream pfile2;
+        // pfile2.open("m2.txt");
+       //
+       // for (int cell = 0; cell < env::num_cells; cell++){
+       //    pfile2 << cell << "\t" << env::cell_coords_array_x[cell] << "\t" << env::cell_coords_array_y[cell] << "\t" << env::cell_coords_array_z[cell] <<  "\t" <<  env::x_mag_array[cell] << '\t' << env::y_mag_array[cell] << '\t' << env::z_mag_array[cell] <<std::endl;
+       //  }
+
        //calcualtes the neighbour lists for each cell.
        //if cells are neighbours add them to the neighbour list array_index
        //each cell has a start and end index index. the neighbours for each cell are within these index
 
-       std::cout << "Calculating neighbour list for environment cells" << std::endl;
+   //    std::cout << "Calculating neighbour list for environment cells" << "\t" << env::num_cells <<env::cell_coords_array_x.size() << "\t" << env::cell_size_x.size() << '\t' <<  env::neighbour_list_end_index.size() << std::endl;
        // This is massively inefficient for large numbers of cells
        // better to store x,y,z cell associations and calculate neighbours directly - RE
        int array_index = 0;
@@ -370,6 +384,10 @@ namespace environment{
              }
           }
        }
+
+   //    std::cout << "End of enighbou list calculation" << "\t" << env::num_cells <<env::cell_coords_array_x.size() << "\t" << env::cell_size_x.size() << '\t' <<  env::neighbour_list_end_index.size() << std::endl;
+       // This is massively inefficient for large numbers of cells
+
     //   std::cin.get();
 
 
@@ -384,18 +402,6 @@ namespace environment{
 
           // calculate if cell is part of shield structure
           bool included = true;//internal::in_shield(env::cell_coords_array_x[cell], env::cell_coords_array_y[cell], env::cell_coords_array_z[cell]);
-        //  std::cout << env::cell_coords_array_x[cell] << '\t' <<  env::cell_coords_array_y[cell] << '\t' <<  env::cell_coords_array_z[cell] << "\t" << included << std::endl;
-          //std::cout << env::shift[0] << '\t' << env::cell_coords_array_y[cell] << '\t' << env::shift[2] << '\t' << env_size_x << '\t' << env_size_y << '\t' << env_size_z << '\t' << std::endl;
-          // if (env::shift[0] < 0 && env::cell_coords_array_x[cell] < -env::shift[0]) included = false;
-          // else if (env::shift[0] >= 0 && env::cell_coords_array_x[cell] > env_size_x + 15)  included = false;
-          //
-          // if (env::shift[1] >= 0 && env::cell_coords_array_y[cell] > env_size_y + 15)  included = false;
-          // else if (env::shift[1] < 0 && env::cell_coords_array_y[cell] < -env::shift[1]) included = false;
-          //
-          // if (env::shift[2] >= 0 && env::cell_coords_array_z[cell] > env_size_z + 15)  included = false;
-          // else if (env::shift[2] < 0 && env::cell_coords_array_z[cell] < -env::shift[2]) included = false;
-             // check environment cell is in shields and not atomistic
-
 
              if (env::env_cell_is_in_atomistic_region[cell] == 0 && included){
                 env::none_atomistic_cells.push_back(cell);
@@ -408,37 +414,63 @@ namespace environment{
              }
              // otherwise don't add it to anything
        }
+
+      // std::cout << "worked out which cells are atomistic/env" << "\t" << env::Ms.size() <<env::initial_spin_x.size() << "\t" <<std::endl;
+       // This is massively inefficient for large numbers of cells
+
       // std::cin.get();
 
        //initialise the direction of the cell magnetisation
        //if the initial spin configuration is set to random - give each cell a random magnetisation
 
-          for (int cl = 0; cl < env::num_cells; cl++){
+          for (int cl = 0; cl < env::num_env_cells; cl++){
              int cell = env::none_atomistic_cells[cl];
              int shield = env::shield_number[cell];
-             if (env::random_spins[shield]){
-             //if within the system
-                env::x_mag_array[cell] = m_e*mtrandom::gaussian()*env::Ms[cell];
-                env::y_mag_array[cell] = m_e*mtrandom::gaussian()*env::Ms[cell];
-                env::z_mag_array[cell] = m_e*mtrandom::gaussian()*env::Ms[cell];
-              }
-              else{
-                env::x_mag_array[cell] = env::initial_spin_x[shield]*env::Ms[cell];
-                env::y_mag_array[cell] = env::initial_spin_y[shield]*env::Ms[cell];
-                env::z_mag_array[cell] = env::initial_spin_z[shield]*env::Ms[cell];
-
-              }
+            // std::cout << shield << "\t" << cell << "\t" << env::random_spins.size() << "\t" << env::x_mag_array.size() << std::endl;
+             // if (env::random_spins[shield]){
+             // //if within the system
+             //    env::x_mag_array[cell] = m_e*mtrandom::gaussian()*env::Ms[cell];
+             //    env::y_mag_array[cell] = m_e*mtrandom::gaussian()*env::Ms[cell];
+             //    env::z_mag_array[cell] = m_e*mtrandom::gaussian()*env::Ms[cell];
+             //  }
+             //  else{
+                env::x_mag_array[cell] = 1.0*env::Ms[cell];//env::initial_spin_x[shield]*env::Ms[cell];
+                env::y_mag_array[cell] = 0.0*env::Ms[cell];//env::initial_spin_y[shield]*env::Ms[cell];
+                env::z_mag_array[cell] = 0.0*env::Ms[cell];//env::initial_spin_z[shield]*env::Ms[cell];
+            //    std::cout << env::x_mag_array[cell] << "\t" << env::Ms[cell] <<  std::endl;
+             // }
           }
 
-       env::one_o_chi_para.resize(env::num_cells,0.1);
-       env::one_o_chi_perp.resize(env::num_cells,0.1);
 
-//      env::bias_shields();
+      //    std::cout << "set M" << "\t" << std::endl;//env::num_cells <<env::cell_coords_array_x.size() << "\t" << env::cell_size_x.size() << '\t' <<  env::neighbour_list_end_index.size() << std::endl;
+
+       env::one_o_chi_para.resize(env::num_env_cells,0.1);
+       env::one_o_chi_perp.resize(env::num_env_cells,0.1);
+
+      // std::cout << env::num_env_cells << "\t" << env::atomistic_cells.size() << '\t' << '\t' << env::num_cells << std::endl;
+
+      //env::bias_shields();
 
     //initalise the demag fields
-//    env::initialise_demag_fields();
+    env::initialise_demag_fields();
 
-   std::cout << "GOT HERE" << std::endl;
+       // std::ofstream mfile;
+       // mfile.open("m3.txt");
+       //
+       // for (int cell = 0; cell < cells::num_cells; cell++)
+       // mfile<< cells::pos_and_mom_array[4*cell+0] + env::shift[0]<< '\t' << cells::pos_and_mom_array[4*cell+1]  +env::shift[1]<< '\t' << cells::pos_and_mom_array[4*cell+2]+env::shift[2] << '\t' << cells::mag_array_x[cell] <<'\t' << cells::mag_array_y[cell] <<'\t' << cells::mag_array_z[cell] <<std::endl;
+       //
+       //
+       //
+       //
+       // std::ofstream pfile;
+       // pfile.open("m2.txt");
+       //
+       // for (int cell = 0; cell < env::num_cells; cell++){
+       //    pfile << cell << "\t" << env::cell_coords_array_x[cell]<< "\t" << env::cell_coords_array_y[cell]<< "\t" << env::cell_coords_array_z[cell]  <<  "\t" <<  env::x_mag_array[cell] << '\t' << env::y_mag_array[cell] << '\t' << env::z_mag_array[cell] <<std::endl;
+       //  }
+//          std::cin.get();
+
 
       return;
 

@@ -18,7 +18,6 @@
 #include "vio.hpp"
 #include "errors.hpp"
 #include <algorithm>
-#include <algorithm>
 // C++ headers
 #include <math.h>
 
@@ -84,24 +83,46 @@ int in_shield(double x, double y, double z,int shield){
     double xmax = env::shield_max_x[shield];
     double zmin = env::shield_min_z[shield];
     double zmax = env::shield_max_z[shield];
-    if (xmax == x) xmax = xmax+ 0.1;
-    if (xmin == x) xmax = xmax + 0.1;
-    double g2 = -10*(zmax-zmin)*1/(x-xmax) + zmin;
-    double g  =  10*(zmax-zmin)*1/(x-xmin) + zmin;
 
-   // std::cout <<x << '\t' << xmax << '\t' << xmin << "\t" << zmax << '\t' << zmin << "\t" <<  g << "\t" << g2 << '\t' << z << std::endl;
+    double f = exp((x-xmax)*0.01);
+    double f2 = exp((-x+(xmax-xmin)-xmax)*0.01);
+    double fmin = exp((xmin-xmax)*0.01);
+    double fmax = exp((xmax-xmax)*0.01);
+    double g = zmin+(zmax-zmin)*(f-fmin)/(fmax-fmin);
+    double g2 = zmin+(zmax-zmin)*(f2-fmin)/(fmax-fmin);
+
+  //  if (x !=xmax){
+      g2 = -10*(zmax-zmin)*1/(x-xmax) + zmin;
+  //  }
+  //  else g2 = 100000;
+
+  //  if (x !=xmin){
+    g =  10*(zmax-zmin)*1/(x-xmin) + zmin;
+  //  }
+  //  else g = 1000000;
+
+
+    //std::cout <<  g << '\t' << z << '\t' << zmax << std::endl;
+
      if(g < z && env::pos_or_neg[shield] == "pos" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
-         z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){
+         z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){//}&& z <= zmax && x <= xmax && x >= xmin && z >= zmin && env::pos_or_neg[shield] == "pos") {
+    //  std::cout << "neg" <<std::endl;
+      //     std::cout << x << '\t'  << z << '\t' <<g2 << '\t' << g << '\t' <<  std::endl;
       return 1;
      }
      else if( g2 < z && env::pos_or_neg[shield] == "neg" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
          z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){ //z <= zmax && x <= xmax && x >= xmin && z >= zmin) {
-         return 1;
+      // std::cout << "pos" <<std::endl;
+  //    std::cout << x << '\t'  << z << '\t' <<g2 << '\t' << g << '\t' <<  std::endl;
+
+      // std::cout << zmin << '\t' << zmax << "\t" << xmin << '\t' << xmax << '\t' << g2 << '\t' << g << '\t' << x << '\t'  << z << '\t' << std::endl;
+       return 1;
      }
      else{
-        return 0;
+    //          std::cout << "not in" <<std::endl;
+              return 0;
      }
 
 
@@ -119,19 +140,18 @@ else   return 0;
 int bias_shields(){
 
   double shield_Ms = 1;
-  double x_size = 200;
-  double y_size = 100000;
-  double z_size = 160;//dim[2];
+  double x_size = dim[1];
+  double y_size = 1000000;
+  double z_size = dim[2];
 
   double x_pos = x_size/2.0;
   double y_pos;
-  double z_pos = z_size/2.0;
+  double z_pos = dim[2]/2.0;
 
   double y_pos_1 = -y_size/2.0;
-  double y_pos_2 =  y_size/2.0 + 200;
+  double y_pos_2 =  y_size/2.0 +dim[0];
 
- // std::cout << dim[0] << '\t' << dim[1] << '\t' << dim[2] << std::endl;
- // std::cin.get();
+
    double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
     for (int cell = 0; cell < num_cells; cell ++){
@@ -155,11 +175,9 @@ int bias_shields(){
        if (shield == 0) y_pos = y_pos_1;
        if (shield == 1) y_pos = y_pos_2;
        //calculates the vector in A from the cell to the shields
-       double x = sqrt((y_cell - x_pos)*(y_cell - x_pos));
-       double y = sqrt((x_cell - y_pos)*(x_cell - y_pos));
+       double x = sqrt((x_cell - x_pos)*(x_cell - x_pos));
+       double y = sqrt((y_cell - y_pos)*(y_cell - y_pos));
        double z = sqrt((z_cell - z_pos)*(z_cell - z_pos));
-
-      // if (cell == 934)  std::cout << x_cell << '\t' << y_cell << '\t' << z_cell << '\t' << x_pos << '\t' << y_pos << '\t' << z_pos <<  "\t" <<  x << '\t' << y << '\t' << z << std::endl;
 
        double Bx = 0.0;
        double By = 0.0;
@@ -193,19 +211,19 @@ int bias_shields(){
                  By = By + m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
                  Bz = Bz + m1klm * log(xp + r);
 
-            //     std::cout << k << '\t' << l << '\t' << m << '\t' << Bx << '\t' << By << '\t' << Bz << "\t" << std::endl;
+
               }
            }
        }
-       bias_field_x[cell] = bias_field_x[cell] - By*prefactor;
+       bias_field_x[cell] = bias_field_x[cell] + By*prefactor;
        bias_field_y[cell] = bias_field_y[cell] + Bx*prefactor;
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 
      }
-   // std::cout << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
+  //  std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
 
   }
-///std::cin.get();
+//std::cin.get();
 
 
 
@@ -409,11 +427,9 @@ int read_in_shield_info(){
 
       }
 
-
       std::string test="shield-type";
       if(word==test){
         if (value == "cube"){
-
           env::shield_shape[super_index-1] = value;
         }
         else if (value == "exponential"){
@@ -425,6 +441,7 @@ int read_in_shield_info(){
         env::pos_or_neg[super_index-1] = value;
 
       }
+
 
       test="minimum-x";
       if(word==test){
@@ -535,32 +552,33 @@ int read_in_shield_info(){
          env::shield_Hext_y[super_index] =u.at(1);
          env::shield_Hext_z[super_index] =u.at(2);
       }
-      test="initial-spin-direction";
-      if(word==test){
-         // first test for random spins
-         test="random";
-         if(value==test){
-            env::random_spins[super_index]=true;
-         }
-         else{
-            // temporary storage container
-            std::vector<double> u(3);
-            // read values from string
-            u=vin::doubles_from_string(value);
-        //    vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-        //    vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-        //    vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-
-            // Copy sanitised unit vector to material
-            env::initial_spin_x[super_index]=u.at(0);
-            env::initial_spin_y[super_index]=u.at(1);
-            env::initial_spin_z[super_index]=u.at(2);
-
-            // ensure random spins is unset
-            env::random_spins[super_index]=false;
-         }
-         // return
-      }
+      // test="initial-spin-direction";
+      // if(word==test){
+      //    // first test for random spins
+      //    test="random";
+      //    if(value==test){
+      //       env::random_spins[super_index]=true;
+      //    }
+      //    else{
+      //       // temporary storage container
+      //       std::vector<double> u(3);
+      //       // read values from string
+      //       u=vin::doubles_from_string(value);
+      //   //    vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+      //   //    vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+      //   //    vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+      //
+      //       // Copy sanitised unit vector to material
+      //       env::initial_spin_x[super_index]=u.at(0);
+      //       env::initial_spin_y[super_index]=u.at(1);
+      //       env::initial_spin_z[super_index]=u.at(2);
+      //
+      //       // ensure random spins is unset
+      //       env::random_spins[super_index]=false;
+      //    }
+      //    // return
+      //    return true;
+      // }
 
 
 
