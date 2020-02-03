@@ -117,6 +117,8 @@ namespace micromagnetic{
 
       }
 
+      std::cout << "FIELD"  <<std::endl;
+
       //calcualtes thesigma values
       double sigma_para = sqrt(2*kB*temperature*alpha_para[cell]/(ms[cell]*mp::dt));
    //   double sigma_perp = sqrt(2*kB*temperature*(alpha_perp[cell]-alpha_para[cell])/(mp::dt*ms[cell]*alpha_perp[cell]*alpha_perp[cell]));
@@ -125,7 +127,7 @@ namespace micromagnetic{
       spin_field[0] =ext_field[0] + exchange_field[0] - one_o_chi_perp[cell]*m[0]*m_e[cell]*ku_x[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];
       spin_field[1] =ext_field[1] + exchange_field[1] - one_o_chi_perp[cell]*m[1]*m_e[cell]*ku_y[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];
       spin_field[2] =ext_field[2] + exchange_field[2] - one_o_chi_perp[cell]*m[2]*m_e[cell]*ku_z[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];
-    //  if (cell == 0 ) std::cerr << spin_field[0] << '\t' << spin_field[1] << "\t" << spin_field[2] << std::endl;
+   //    std::cerr << spin_field[0] << '\t' << spin_field[1] << "\t" << spin_field[2] << std::endl;
 
     if (dipole::activated){
    // std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
@@ -143,12 +145,14 @@ namespace micromagnetic{
          spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
          spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
          spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+        std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell] << '\t' << environment::environment_field_z[cell] << std::endl;
       }
 
       if (sim::track_field_x.size() != 0 ){
         spin_field[0] = spin_field[0] + sim::track_field_x[cell];
         spin_field[1] = spin_field[1] + sim::track_field_y[cell];
         spin_field[2] = spin_field[2] + sim::track_field_z[cell];
+        std::cout << sim::track_field_x[cell] << '\t' << sim::track_field_y[cell] << '\t' << sim::track_field_z[cell] << '\t' << std::endl;
       }
 
 
