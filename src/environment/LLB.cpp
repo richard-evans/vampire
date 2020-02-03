@@ -345,7 +345,7 @@ namespace environment{
                #endif
 
                //outputs magnetisation
-            //   if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) 	int a = env::output();
+            if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) 	int a = env::output();
 
 
          return 0;

@@ -52,7 +52,7 @@ namespace environment{
          mx[shield] = mx[shield]/magm;
          my[shield] = my[shield]/magm;
          mz[shield] = mz[shield]/magm;
-         std::cout << env::num_shields << '\t' << shield << "\t" << mx[shield] << '\t' << my[shield]<< '\t' << mz[shield] << '\t' <<std::endl;
+      //   std::cout << env::num_shields << '\t' << shield << "\t" << mx[shield] << '\t' << my[shield]<< '\t' << mz[shield] << '\t' <<std::endl;
         // outputs to th  e file environment_output
         env::o_file << mx[shield] << '\t' << my[shield]<< '\t' << mz[shield] << '\t' <<  magm/msat << '\t';
 
