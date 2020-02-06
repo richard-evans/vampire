@@ -64,7 +64,7 @@ namespace environment{
        double mm_size_x, mm_size_y,mm_size_z;
        double env_size_x, env_size_y,env_size_z;
 
-       env::shield_shape.resize(env::num_shields,"cube");
+       env::shield_shape.resize(env::num_shields+1,"cube");
        env::shield_ms.resize(env::num_shields+1, 1e-21);
        env::shield_Tc.resize(env::num_shields+1, 600);
        env::shield_A.resize(env::num_shields+1);
@@ -73,23 +73,23 @@ namespace environment{
        env::shield_ku.resize(env::num_shields+1, 0);
        env::shield_alpha.resize(env::num_shields+1, 1.0);
        env::shield_gamma.resize(env::num_shields+1,1.0);
-       env::shield_max_x.resize(env::num_shields,1000);
-       env::shield_max_y.resize(env::num_shields,1000);
-       env::shield_max_z.resize(env::num_shields,1000);
-       env::shield_min_x.resize(env::num_shields,500);
-       env::shield_min_y.resize(env::num_shields,500);
-       env::shield_min_z.resize(env::num_shields,500);
-       env::shield_max_cell_size.resize(env::num_shields,100);
-       env::shield_min_cell_size.resize(env::num_shields,10);
-       env::shield_Hext_x.resize(env::num_shields,0);
-       env::shield_Hext_y.resize(env::num_shields,0);
-       env::shield_Hext_z.resize(env::num_shields,0);
-       env::pos_or_neg.resize(env::num_shields,"pos");
-       env::H_strength.resize(env::num_shields,0);
-       env::initial_spin_x.resize(env::num_shields,0);
-       env::initial_spin_y.resize(env::num_shields,0);
-       env::initial_spin_z.resize(env::num_shields,1);
-       env::random_spins.resize(env::num_shields,false);
+       env::shield_max_x.resize(env::num_shields+1,1000);
+       env::shield_max_y.resize(env::num_shields+1,1000);
+       env::shield_max_z.resize(env::num_shields+1,1000);
+       env::shield_min_x.resize(env::num_shields+1,500);
+       env::shield_min_y.resize(env::num_shields+1,500);
+       env::shield_min_z.resize(env::num_shields+1,500);
+       env::shield_max_cell_size.resize(env::num_shields+1,100);
+       env::shield_min_cell_size.resize(env::num_shields+1,10);
+       env::shield_Hext_x.resize(env::num_shields+1,0);
+       env::shield_Hext_y.resize(env::num_shields+1,0);
+       env::shield_Hext_z.resize(env::num_shields+1,0);
+       env::pos_or_neg.resize(env::num_shields+1,"pos");
+       env::H_strength.resize(env::num_shields+1,0);
+       env::initial_spin_x.resize(env::num_shields+1,0);
+       env::initial_spin_y.resize(env::num_shields+1,0);
+       env::initial_spin_z.resize(env::num_shields+1,1);
+       env::random_spins.resize(env::num_shields+1,false);
 
 
        int a = env::read_in_shield_info();
@@ -309,7 +309,7 @@ namespace environment{
             env::cell_volume.push_back(cells::macro_cell_size_x*cells::macro_cell_size_y*cells::macro_cell_size_z);
             env::Ms.push_back(1e-21);
             env::ku.push_back(0);
-            env::shield_number.push_back(0);
+            env::shield_number.push_back(env::num_shields);
             env::list_env_cell_atomistic_cell[cell] = env_cell;
             //this cell is an atomistic cell.
             env::env_cell_is_in_atomistic_region.push_back(1);
