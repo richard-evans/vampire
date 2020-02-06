@@ -98,7 +98,7 @@ namespace environment{
          env::shield_Hext_x[shield] = env::shield_Hext_x[shield]*env::H_strength[shield];
          env::shield_Hext_y[shield] = env::shield_Hext_y[shield]*env::H_strength[shield];
          env::shield_Hext_z[shield] = env::shield_Hext_z[shield]*env::H_strength[shield];
-         std::cout << env::shield_Hext_x[shield] << '\t' << env::shield_Hext_y[shield] << '\t' << env::shield_Hext_z[shield] <<std::endl;
+      //   std::cout << env::shield_Hext_x[shield] << '\t' << env::shield_Hext_y[shield] << '\t' << env::shield_Hext_z[shield] <<std::endl;
        }
    //    std::cout << "shield info read in " <<std::endl;
 

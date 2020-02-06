@@ -140,7 +140,7 @@ namespace micromagnetic{
         spin_field[1] = spin_field[1] + bias_field_y[cell];
         spin_field[2] = spin_field[2] + bias_field_z[cell];
       }
-      //
+      
       if (environment::enabled){
          spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
          spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
