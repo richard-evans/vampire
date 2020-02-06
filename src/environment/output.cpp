@@ -29,10 +29,10 @@ namespace environment{
 
       int output(){
 
-        std::vector <double> mx(env::num_shields,0.0);
-        std::vector <double> my(env::num_shields,0.0);
-        std::vector <double> mz(env::num_shields,0.0);
-         std::vector <double> ml(env::num_shields,0.0);
+        std::vector <double> mx(env::num_shields+1,0.0);
+        std::vector <double> my(env::num_shields+1,0.0);
+        std::vector <double> mz(env::num_shields+1,0.0);
+         std::vector <double> ml(env::num_shields+1,0.0);
 
          //calcualtes the mean mx,my,mz,ml for all cells.
          for (int cell = 0; cell < num_cells; cell++){
