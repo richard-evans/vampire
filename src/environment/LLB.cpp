@@ -310,8 +310,6 @@ namespace environment{
                   z_heun_array[cell] = xyz[2];
 
                }
-            //   std::cout << "HERE6" << std::endl;
-
 
                for (int i = my_env_start_index; i < my_env_end_index; i++){
                   int cell = env::none_atomistic_cells[i];
@@ -319,7 +317,6 @@ namespace environment{
                   env::y_mag_array[cell] = 0.0;
                   env::z_mag_array[cell] = 0.0;
                }
-         //      std::cout << "HERE7" << std::endl;
 
 
                //calcualtes the new magnetisations from the heun and euler deltas
@@ -333,9 +330,7 @@ namespace environment{
                   env::x_mag_array[cell] = x_array[cell]*env::Ms[cell];
                   env::y_mag_array[cell] = y_array[cell]*env::Ms[cell];
                   env::z_mag_array[cell] = z_array[cell]*env::Ms[cell];
-                  }
-
-//                  std::cout << "HERE8" <<std::endl;// "\t" <<  x_array[cell] << '\t' <<  y_array[cell] << '\t' <<  z_array[cell] << std::endl;
+               }
 
 
                #ifdef MPICF

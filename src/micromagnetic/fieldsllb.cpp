@@ -139,10 +139,11 @@ namespace micromagnetic{
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
     //  std::cout << cell << '\t' << pinning_field_x[cell] << '\t' << pinning_field_y[cell] << '\t' << pinning_field_z[cell] << std::endl;
     //  std::cout << cell_material_array[cell]<<'\t' << pinning_field_x[cell]  + exchange_field[0] << '\t' << pinning_field_y[cell]  + exchange_field[1]<< "\t" << pinning_field_z[cell]  + exchange_field[2] << std::endl;
-      spin_field[0] = pf*m[0] + ext_field[0]  + pinning_field_x[cell]  + exchange_field[0] + ku_x[cell]*one_o_chi_perp[cell]*m[0] + HSTTx;// + dipole::cells_field_array_x[cell];
-      spin_field[1] = pf*m[1] + ext_field[1]  + pinning_field_y[cell]  + exchange_field[1] + ku_y[cell]*one_o_chi_perp[cell]*m[1] + HSTTy;// + dipole::cells_field_array_y[cell];
-      spin_field[2] = pf*m[2] + ext_field[2]  + pinning_field_z[cell]  + exchange_field[2] + ku_z[cell]*one_o_chi_perp[cell]*m[2] + HSTTz;// + dipole::cells_field_array_z[cell];
-    //  std::cout << ku_x[cell]*one_o_chi_perp[cell] << '\t' << ku_y[cell]*one_o_chi_perp[cell] << '\t' << ku_z[cell]*one_o_chi_perp[cell] << std::endl;
+      spin_field[0] = pf*m[0] + ext_field[0]  + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0] + HSTTx;// + dipole::cells_field_array_x[cell];
+      spin_field[1] = pf*m[1] + ext_field[1]  + pinning_field_y[cell]  + exchange_field[1] - ku_y[cell]*one_o_chi_perp[cell]*m[1] + HSTTy;// + dipole::cells_field_array_y[cell];
+      spin_field[2] = pf*m[2] + ext_field[2]  + pinning_field_z[cell]  + exchange_field[2] - ku_z[cell]*one_o_chi_perp[cell]*m[2] + HSTTz;// + dipole::cells_field_array_z[cell];
+      // if (cell_material_array[cell] == 2)    std::cout << pf << '\t' << m[0] << '\t' << m[1] << '\t' << m[2] << "\t" << pinning_field_x[cell] << '\t' << pinning_field_y[cell] << '\t' << pinning_field_z[cell] << '\t' << exchange_field[0] << '\t' << exchange_field[1] << '\t' << exchange_field[2] << "\t" << ext_field[0] << '\t' << ext_field[1] << '\t' << ext_field[2] <<std::endl;
+   //if (cell_material_array[cell] == 2)  std::cout << ku_x[cell] << '\t' << one_o_chi_perp[cell] << '\t' << ku_y[cell] << '\t' << ku_z[cell] << std::endl;
         //if (cell ==0)		std::cout  << "inside\t" <<   dipole::cells_field_array_x[0] << '\t' << dipole::cells_field_array_y[0] << '\t' << dipole::cells_field_array_z[0] <<std::endl;
  //       std::cin.get();
   //}
@@ -152,7 +153,7 @@ namespace micromagnetic{
     //    spin_field[1] = spin_field[1] + dipole::cells_field_array_y[cell];
     //    spin_field[2] = spin_field[2] + dipole::cells_field_array_z[cell];
     // }
- // std::cout << "SP" << spin_field[0] << "\t" << spin_field[1] << '\t' << spin_field[2] << std::endl;
+ // // std::cout << "SP" << spin_field[0] << "\t" << spin_field[1] << '\t' << spin_field[2] << std::endl;
     if (environment::enabled){
    //if (cell_material_array[cell] == 2) std::cout << "env" << '\t' << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << std::endl;
        spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
@@ -160,15 +161,15 @@ namespace micromagnetic{
        spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
     }
 
-     // if (sim::track_field_x.size() != 0 ){
-     //   spin_field[0] = spin_field[0] + sim::track_field_x[cell];
-     //   spin_field[1] = spin_field[1] + sim::track_field_y[cell];
-     //   spin_field[2] = spin_field[2] + sim::track_field_z[cell];
-     //   ///std::cout <<sim::time << '\t' << cell << '\t' << sim::track_field_x[cell] << '\t' << sim::track_field_y[cell] << "\t" <<sim::track_field_z[cell] <<std::endl;
-     // }
+     if (sim::track_field_x.size() != 0 ){
+       spin_field[0] = spin_field[0] + sim::track_field_x[cell];
+       spin_field[1] = spin_field[1] + sim::track_field_y[cell];
+       spin_field[2] = spin_field[2] + sim::track_field_z[cell];
+       ///std::cout <<sim::time << '\t' << cell << '\t' << sim::track_field_x[cell] << '\t' << sim::track_field_y[cell] << "\t" <<sim::track_field_z[cell] <<std::endl;
+     }
 
      if (bias_magnets == true){
-   //     std::cout << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2]<< "\t" << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
+   //    std::cout << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2]<< "\t" << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
        spin_field[0] = spin_field[0] + bias_field_x[cell];
        spin_field[1] = spin_field[1] + bias_field_y[cell];
        spin_field[2] = spin_field[2] + bias_field_z[cell];

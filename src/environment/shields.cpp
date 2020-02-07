@@ -208,7 +208,7 @@ int bias_shields(){
                  double r = sqrt(xp*xp + yp*yp + zp*zp);
 
                  Bx = Bx + m1klm * log(zp + r);
-                 By = By + m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                 By = By - m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
                  Bz = Bz + m1klm * log(xp + r);
 
 
@@ -220,7 +220,7 @@ int bias_shields(){
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 
      }
-  //  std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
+   // / std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
 
   }
 //std::cin.get();
