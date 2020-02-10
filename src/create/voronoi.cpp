@@ -118,55 +118,59 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	if (create::internal::grain_poission){
 
-		std::ofstream file;
-	   file.open("dist");
-
-		int sdx = cs::system_dimensions[0];
-		int sdy = cs::system_dimensions[1];
-		double gs = grain_cell_size_x/2.0;
-
-
-		std::random_device rd;
-      std::mt19937 gen(rd());
-		//variance = exp ( 2.0 * mu + sigma * sigma ) * ( exp ( sigma * sigma ) - 1.0 );
-		//mean = exp ( mu + 0.5 * sigma * sigma );
-		std::lognormal_distribution<> d(log(grain_cell_size_x), grain_sd );
-		std::cout << grain_cell_size_x << "\t" << grain_sd<< std::endl;
-		double initial_grain_pos_x = sdx/2.0;
-		double initial_grain_pos_y = sdy/2.0;
-		double initial_grain_r = d(gen)/2.0;
-		while (initial_grain_r > 2*grain_cell_size_x){
-			initial_grain_r = d(gen)/2.0;
-		}
-		int maxattempts1 = 10;
-		int maxattempts2 = 1000;
-
 		std::vector <double> grains_x;
 		std::vector <double> grains_y;
 		std::vector <double> grains_r;
 		std::vector <bool> active;
-		grain=0;
-		grains_x.push_back(initial_grain_pos_x);
-		grains_y.push_back(initial_grain_pos_y);
-		grains_r.push_back(initial_grain_r);
-		active.push_back(true);
-		grain_coord_array.push_back(std::vector <double>());
-		grain_vertices_array.push_back(std::vector <std::vector <double> >());
-		grain_coord_array[grain].push_back(initial_grain_pos_x);
-		grain_coord_array[grain].push_back(initial_grain_pos_y);
-		int num_active_grains = 1;
-		int N = 0 ;
-		grain++;
-		double PI = 3.14159265;
-		file << initial_grain_pos_x << '\t' << initial_grain_pos_y << '\t' << initial_grain_r << std::endl;
-		for (int attempt = 0; attempt < maxattempts1; attempt ++){
+		int sdx = cs::system_dimensions[0];
+		int sdy = cs::system_dimensions[1];
+		double gs = grain_cell_size_x/2.0;
+		std::ofstream file;
+		file.open("dist");
+		if (vmpi::my_rank == 0){
+
+
+
+			std::random_device rd;
+	      std::mt19937 gen(rd());
+			//variance = exp ( 2.0 * mu + sigma * sigma ) * ( exp ( sigma * sigma ) - 1.0 );
+			//mean = exp ( mu + 0.5 * sigma * sigma );
+			std::lognormal_distribution<> d(log(grain_cell_size_x), grain_sd );
+		//	std::cout << grain_cell_size_x << "\t" << grain_sd<< std::endl;
+			double initial_grain_pos_x = sdx/2.0;
+			double initial_grain_pos_y = sdy/2.0;
+			double initial_grain_r = 0.0;
+			initial_grain_r = d(gen)/2.0;
+
+			while (initial_grain_r > 2*grain_cell_size_x){
+				initial_grain_r = d(gen)/2.0;
+			}
+
+			std::cerr << initial_grain_r << std::endl;
+
+			int maxattempts1 = 10;
+			int maxattempts2 = 1000;
+			grain=0;
+			grains_x.push_back(initial_grain_pos_x);
+			grains_y.push_back(initial_grain_pos_y);
+			grains_r.push_back(initial_grain_r);
+			active.push_back(true);
+			int num_active_grains = 1;
+			int N = 0 ;
+			grain++;
+			double PI = 3.14159265;
+
+			file << initial_grain_pos_x << '\t' << initial_grain_pos_y << '\t' << initial_grain_r << std::endl;
+
+		// for (int attempt = 0; attempt < maxattempts1; attempt ++){
 			for (int g =0; g < grains_x.size() ; g++){
-				double r = d(gen)/2.0;
-			//	std::cout << r << "\t" << grain_cell_size_x+ grain_sd*grain_cell_size_x << "\t" << grain_cell_size_x << std::endl;
+				double r = 0.0;
+				r = d(gen)/2.0;
+				//	std::cout << r << "\t" << grain_cell_size_x+ grain_sd*grain_cell_size_x << "\t" << grain_cell_size_x << std::endl;
 				while (r > grain_cell_size_x + grain_sd*grain_cell_size_x || r < grain_cell_size_x - grain_sd*grain_cell_size_x){
 					r = d(gen)/2.0;
-			//		std::cout << "A" <<std::endl;
- 				}
+				}
+
 			//	std::cout << r << std::endl;
 				bool added =false;
 				int attempt2 = 0;
@@ -175,10 +179,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 					int i = int(mtrandom::grnd()*grains_x.size());
 
 				   double r1 = mtrandom::grnd();
-			      double r2 = mtrandom::grnd();
+					double r2 = mtrandom::grnd();
 			      double theta = r1*PI;
 			      double phi = r2*PI*2;
-					//file << number << std::endl;
 					double min_distance = grains_r[i] + r;
 					double max_distance = min_distance;
 					double max_minus_min = max_distance - min_distance;
@@ -191,7 +194,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			      dy = dy/ddxdy;
 			      double x = grains_x[i] + d*dx + min_distance*dx;
 			      double y = grains_y[i] + d*dy + min_distance*dy;
-					if (x <= 2*sdx && y <= 2*sdy & x >= 0  - 2*grain_cell_size_x && y >= 0 - 2*grain_cell_size_y){
+					if (x <= 5*sdx && y <= 5*sdy & x >= 0  - 5*grain_cell_size_x && y >= 0 - 5*grain_cell_size_y){
 						int within =0;
 				       for (int grain = 0; grain < grains_x.size(); grain ++ ){
 				   		double dx2 = grains_x[grain] - x;
@@ -234,14 +237,9 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 							  if (ymove) y = tempy;
 
 							}
-
-							//file << grain << '\t' << x/10 << '\t' << y/10 << '\t' << r/10 << std::endl;
+						//	file << x << '\t' << y << '\t' << r << std::endl;
+					//		std::cout << grain << '\t' << x << '\t' << y << '\t' << r << std::endl;
 					      grains_x.push_back(x);
-							file << x << '\t' << y << '\t' << r << std::endl;
-							grain_coord_array.push_back(std::vector <double>());
-							grain_vertices_array.push_back(std::vector <std::vector <double> >());
-							grain_coord_array[grain].push_back(x);
-							grain_coord_array[grain].push_back(y);
 					      grains_y.push_back(y);
 					      grains_r.push_back(r);
 					      active.push_back(true);
@@ -252,7 +250,34 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 					}
 				}
 			}
+		//	std::cout << "grains" << std::endl;
 		}
+		 vmpi::barrier();
+
+		#ifdef MPICF
+			MPI_Allreduce(MPI_IN_PLACE, &grain,     1,    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
+		#endif
+		#ifdef MPICF
+			if (vmpi::my_rank != 0){
+				grains_x.resize(grain,0.0);
+				grains_y.resize(grain,0.0);
+			}
+		#endif
+		#ifdef MPICF
+			MPI_Allreduce(MPI_IN_PLACE, &grains_x[0],     grain,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+			MPI_Allreduce(MPI_IN_PLACE, &grains_y[0],     grain,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+		#endif
+
+
+		for(int grain=0;grain<grains_x.size();grain++){
+			grain_coord_array.push_back(std::vector <double>());
+			grain_coord_array[grain].reserve(2);
+			grain_vertices_array.push_back(std::vector <std::vector <double> >());
+			grain_coord_array[grain].push_back(grains_x[grain]);
+			grain_coord_array[grain].push_back(grains_y[grain]);
+		}
+		double frac = 0.0;
+		if (vmpi::my_rank == 0){
 		double sumV = 0;
 		double sumR = 0;
 		for (int i = 0; i < grains_x.size(); i ++){
@@ -265,29 +290,39 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		std::sort(grains_r.begin(),grains_r.end());
 		int index = grains_r.size()/2;
 		double Mr = (grains_r[index-1] + grains_r[index])/2;
-		std::cout<< "Median temperature: " << Mr << std::endl;
-		std::cout<< "Mean temperature: " << avR << std::endl;
+		std::cout<< "Median grain size: " << Mr << std::endl;
+		std::cout<< "Mean grain size: " << avR << std::endl;
 		double totalV = (2*sdx + 2*grain_cell_size_x)*(2*sdy + 2*grain_cell_size_y);
-	 	double frac = sumV/totalV;
+	 	frac = sumV/totalV;
 		 std::cout<< " frac: " << frac << std::endl;
 		 std::cout << grain_cell_size_x/2.0 - avR << "\t" <<  2.0*(grain_cell_size_x/2.0 - avR)/grain_cell_size_x << std::endl;
 		 frac = frac + (grain_cell_size_x/2.0 - avR)/grain_cell_size_x;
-	 //	std::cout << sumV << '\t' << totalV << '\t' << frac  << "\t" << grains_x.size() << '\t'<<  grain_coord_array.size() << std::endl;
-
-		for (int i = 0; i < grain_coord_array.size(); i ++){
-		//	double r = grains_r[i];
-		grain_coord_array[i][0] = grain_coord_array[i][0]* frac;
-		grain_coord_array[i][1] = grain_coord_array[i][1]* frac;
-		//	sd = sd + sqrt(r*r - Mr*Mr);
-		//	file << grain << '\t' << grain_coord_array[i][0]/10 << '\t' << grain_coord_array[i][1]/10 << '\t' << grains_r[i]/10 << std::endl;
+	 	std::cout << grain << "\t" << grains_x.size() << '\t'<<  grain_coord_array.size() << std::endl;
 		}
 
-	 }
+
+		#ifdef MPICF
+			MPI_Allreduce(MPI_IN_PLACE, &frac,     1,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+		#endif
+
+
+		for (int i = 0; i < grain_coord_array.size(); i ++){
+			//	double r = grains_r[i];
+			grain_coord_array[i][0] = grain_coord_array[i][0]* frac;
+			grain_coord_array[i][1] = grain_coord_array[i][1]* frac;
+			//	sd = sd + sqrt(r*r - Mr*Mr);
+			if (vmpi::my_rank == 0)	file << grain_coord_array[i][0]/10 << '\t' << grain_coord_array[i][1]/10 << '\t' << grains_r[i]/10 << std::endl;
+
+		}
+
+	 	}
+
 
 		// ----------------------- old version -------------------------------------
 
 	else{
 		//Calculate pointers
+		grain =0;
 		for(int grain2=0;grain2<init_num_grains;grain2++){
 			grain_coord_array.push_back(std::vector <double>());
 			grain_coord_array[grain2].reserve(2);
@@ -308,7 +343,6 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	}
 
 
-
 	// ----------------------- end of old version -------------------------------------
 
 	//-----------------------
@@ -321,10 +355,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		zlog << zTs() << "Error! - No grains found in structure - Increase system dimensions" << std::endl;
 		err::vexit();
 	}
-
    // Calculate Voronoi construction using qhull removing boundary grains (false)
 	create::internal::populate_vertex_points(grain_coord_array, grain_vertices_array, true);
-
 
 	// Shrink Voronoi vertices in reduced coordinates to get spacing
 	double shrink_factor = create::internal::voronoi_grain_size/(create::internal::voronoi_grain_size+create::internal::voronoi_grain_spacing);
@@ -385,8 +417,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	double avR = sumR/R_med.size();
 	std::sort(R_med.begin(),R_med.end());
 	int index = R_med.size()/2;
-	std::cout<< "Median temperature: " << (R_med[index-1] + R_med[index])/2 << std::endl;
-	std::cout<< "Mean temperature: " << avR << std::endl;
+	std::cout<< "Median grain size: " << (R_med[index-1] + R_med[index])/2 << std::endl;
+	std::cout<< "Mean grain size: " << avR << std::endl;
 
 
 
@@ -410,26 +442,30 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	supercell_array.resize(dx);
 	for(int i=0;i<dx;i++) supercell_array[i].resize(dy);
-
 	// loop over atoms and populate supercell array
 	for(unsigned int atom=0;atom<catom_array.size();atom++){
+		//std::cout <<
 		int cx = int (catom_array[atom].x/unit_cell.dimensions[0]);
 		int cy = int (catom_array[atom].y/unit_cell.dimensions[1]);
 		supercell_array.at(cx).at(cy).push_back(atom);
+	//	std::cout << dx << '\t' << dy << '\t' << atom << '\t' << cx << '\t' << cy << '\t' << catom_array.size() <<"\t" << supercell_array.size() << "\t" << supercell_array.at(cx).size() <<  std::endl;
 	}
 
 	// Determine order for core-shell grains
    std::list<create::internal::core_radius_t> material_order(0);
+
    for(int mat=0;mat<mp::num_materials;mat++){
       create::internal::core_radius_t tmp;
       tmp.mat=mat;
       tmp.radius=mp::material[mat].core_shell_size;
       material_order.push_back(tmp);
    }
+
    // sort by increasing radius
    material_order.sort(create::internal::compare_radius);
 
 	std::cout <<"Generating Voronoi Grains";
+
 	zlog << zTs() << "Generating Voronoi Grains";
 
    // arrays to store list of grain vertices
@@ -517,6 +553,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 			}
 		}
 	}
+
 	terminaltextcolor(GREEN);
 	std::cout << "done!" << std::endl;
 	terminaltextcolor(WHITE);
