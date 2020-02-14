@@ -48,7 +48,7 @@ namespace create_voronoi{
 	bool rounded=false;
 	double area_cutoff=0.8;
 	double voronoi_sd=0.15;			/// Standard Deviation of voronoi grains
-
+	bool include_boundary_grains_real = false;
 }
 
 namespace cs{

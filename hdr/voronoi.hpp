@@ -32,6 +32,7 @@ namespace create_voronoi{
 	extern bool rounded;
 	extern double voronoi_sd;			/// Standard Deviation of voronoi grains
 	extern double area_cutoff;
+	extern bool include_boundary_grains_real;
 }
 
 #endif //CREATE_VORONOI_H_
