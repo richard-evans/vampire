@@ -152,7 +152,7 @@ int bias_shields(){
   double y_pos_2 =  y_size/2.0 +dim[0];
 
 
-   double prefactor = shield_Ms/(4.0*M_PI);
+   double prefactor = shield_Ms;///(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
     for (int cell = 0; cell < num_cells; cell ++){
 
