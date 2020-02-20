@@ -58,7 +58,7 @@ namespace micromagnetic{
       extern double shield_Ms;
       extern double bias_magnets_max_width;
       extern double bias_magnets_min_width;
-
+      extern double bias_magnet_ms_input;
       extern double overlap_area;
 
       extern int bias_magnets_gap;

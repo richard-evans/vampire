@@ -180,6 +180,13 @@ namespace micromagnetic{
          micromagnetic::internal::pinning_field_height =h;
          return true;
       }
+      test="bias-magnet-Ms";
+      if(word==test){
+         double h=atof(value.c_str());
+         vin::check_for_valid_value(h, word, line, prefix, unit, "mm_energy", 1, 100000000,"input","1 A - 100000 A");
+         micromagnetic::internal::bias_magnet_ms_input =h;
+         return true;
+      }
 
 
       //--------------------------------------------------------------------

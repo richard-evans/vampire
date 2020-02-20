@@ -35,7 +35,7 @@ namespace micromagnetic{
    std::vector <int> list_of_none_atomistic_atoms(0);
    std::vector <int> list_of_micromagnetic_cells(0);
    std::vector <int> list_of_empty_micromagnetic_cells(0);
-
+   double bias_magnet_ms_input = 1.0;
    //sets initial values to 0
    int number_of_atomistic_atoms = 0;
    int number_of_none_atomistic_atoms = 0;

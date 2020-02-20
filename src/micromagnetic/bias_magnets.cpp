@@ -35,7 +35,7 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
 
   //THIS IS CORRECT I KNOW THE X AND Y ARE MISSED UP! THIS IS BECAUE MS is assumed to be along y but i need it along x so i have switched x and y then switched them back at the end
 
-  double shield_Ms = 1;
+  double shield_Ms = bias_magnet_ms_input;
   double x_size = system_dimensions_y*bias_magnets_max_width - system_dimensions_y*bias_magnets_min_width;
   double y_size = 1000000;
   double z_size = system_dimensions_z*bias_magnets_max_height - system_dimensions_z*bias_magnets_min_height;
