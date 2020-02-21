@@ -183,7 +183,7 @@ namespace micromagnetic{
       test="bias-magnet-Ms";
       if(word==test){
          double h=atof(value.c_str());
-         vin::check_for_valid_value(h, word, line, prefix, unit, "mm_energy", 1, 100000000,"input","1 A - 100000 A");
+         vin::check_for_valid_value(h, word, line, prefix, unit, "mm_energy", -100000000, 100000000,"input","-100000000 - 100000");
          micromagnetic::internal::bias_magnet_ms_input =h;
          return true;
       }
