@@ -39,6 +39,7 @@ namespace unitcell{
       //------------------------------------------------------------------------
       if(uc::internal::crystal_structure      == "sc"       ) uc::internal::build_simple_cubic(           unit_cell );
       else if(uc::internal::crystal_structure == "bcc"      ) uc::internal::build_body_centred_cubic(     unit_cell );
+      else if(uc::internal::crystal_structure == "bcc-110"  ) uc::internal::build_body_centred_cubic_110( unit_cell );
       else if(uc::internal::crystal_structure == "fcc"      ) uc::internal::build_face_centred_cubic(     unit_cell );
       else if(uc::internal::crystal_structure == "hcp"      ) uc::internal::build_hexagonal_close_packed( unit_cell );
       else if(uc::internal::crystal_structure == "kagome"   ) uc::internal::build_kagome(                 unit_cell );
