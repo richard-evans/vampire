@@ -328,7 +328,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	grains::num_grains = int(grain_coord_array.size());
 
 	// sort atoms by grain number
-	sort_atoms_by_grain(catom_array);
+	create::internal::sort_atoms_by_grain(catom_array);
 
 	return EXIT_SUCCESS;
 }
