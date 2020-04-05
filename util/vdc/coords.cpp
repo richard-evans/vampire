@@ -304,11 +304,6 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
       double y = vdc::coordinates[3*atom + 1];
       double z = vdc::coordinates[3*atom + 2];
 
-      // add coordinates to running total
-      ave[0] += x;
-      ave[1] += y;
-      ave[2] += z;
-
       // calculate min and max
       if(x > max[0]) max[0] = x;
       if(y > max[1]) max[1] = y;
@@ -327,11 +322,6 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
       double y = vdc::nm_coordinates[3*atom + 1];
       double z = vdc::nm_coordinates[3*atom + 2];
 
-      // add coordinates to running total
-      ave[0] += x;
-      ave[1] += y;
-      ave[2] += z;
-
       // calculate min and max
       if(x > max[0]) max[0] = x;
       if(y > max[1]) max[1] = y;
@@ -347,21 +337,10 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
    vdc::system_size[1] = max[1] - min[1];
    vdc::system_size[2] = max[2] - min[2];
 
-   std::cout << "Max and Mins" << std::endl;
-   std::cout << "X: " << max[0] << "\t" << min[0] << std::endl;
-   std::cout << "Y: " << max[1] << "\t" << min[1] << std::endl;
-   std::cout << "Z: " << max[2] << "\t" << min[2] << std::endl;
-
-   std::cout << "System size:" << std::endl;
-   std::cout << system_size[0] << "\t" << system_size[1] << "\t" << system_size[2] << std::endl;
-
    // save system centre
    vdc::system_centre[0] = (max[0] + min[0])/2.0;
    vdc::system_centre[1] = (max[1] + min[1])/2.0;
    vdc::system_centre[2] = (max[2] + min[2])/2.0;
-
-   std::cout << "System centre:" << std::endl;
-   std::cout << system_centre[0] << "\t" << system_centre[1] << "\t" << system_centre[2] << std::endl;
 
    return;
 }
@@ -384,11 +363,6 @@ void slice_system(){
    xmax = (slice_parameters[1]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0]+tol;
    ymax = (slice_parameters[3]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1]+tol;
    zmax = (slice_parameters[5]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]+tol;
-
-   std::cout << "Slice min and max:" << std::endl;
-   std::cout << "X: " << xmin << "\t" << xmax << std::endl;
-   std::cout << "Y: " << ymin << "\t" << ymax << std::endl;
-   std::cout << "Z: " << zmin << "\t" << zmax << std::endl;
 
    // No slice defined, all atoms are included
    if (vdc::slice_type == "no-slice"){
