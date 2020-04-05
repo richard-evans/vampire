@@ -67,15 +67,21 @@ void output_inc_file(unsigned int spin_file_id){
       std::stringstream otext;
 
       // write to output text stream in parallel
-      #pragma omp for
       for( auto &atom : vdc::sliced_atoms_list ){
 
          // get magnetization for colour contrast
-         const double sx = spins[3*atom+0];
-         const double sy = spins[3*atom+1];
-         const double sz = spins[3*atom+2];
+         double sx = spins[3*atom+0];
+         double sy = spins[3*atom+1];
+         double sz = spins[3*atom+2];
 
-         // calculate rgb components based on magnetization
+         // flip antiferromagnetic spins if required
+         if (std::find(afm_materials.begin(), afm_materials.end(), vdc::type[atom]+1) != afm_materials.end() ){
+            sx = -sx;
+            sy = -sy;
+            sz = -sz;
+         }
+
+         // calculate rgb components based on spin orientation
          vdc::rgb(sx, sy, sz, red, green, blue);
 
          // format text for povray file
@@ -103,7 +109,6 @@ void output_inc_file(unsigned int spin_file_id){
       std::stringstream otext;
 
       // write to output text stream in parallel
-      #pragma omp for
       for( auto &atom : vdc::sliced_nm_atoms_list ){
 
          // format text for povray file

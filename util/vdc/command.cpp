@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2017. All rights reserved.
+//   (c) Richard F L Evans, Daniel Meilak 2017-2019. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -125,6 +125,18 @@ int command( int argc, char* argv[] ){
 
             // work through vector and extract values
             extract_materials(temp_str, vdc::remove_materials);
+      }
+      //------------------------------------------------------------------------
+      // Check for user specified antiferromagnetic material spins to flip in
+      // povray visualisation
+      //------------------------------------------------------------------------
+      else if (sw == "--afm"){
+
+            // check number of args not exceeded
+            check_arg(arg, argc, argv, temp_str, "Error - expected at least one variable." );
+
+            // work through vector and extract values
+            extract_materials(temp_str, vdc::afm_materials);
       }
       //------------------------------------------------------------------------
       // Check for slice parameters

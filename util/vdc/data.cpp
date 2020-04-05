@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2017. All rights reserved.
+//   (c) Richard F L Evans, Daniel Meilak 2017-2019. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -57,6 +57,7 @@ namespace vdc{
    // slice parameters for cutting the original system
    std::vector<double> slice_parameters = {0.0,1.0,0.0,1.0,0.0,1.0};
    std::vector<int> remove_materials(0);
+   std::vector<int> afm_materials(0);
    std::vector<int> atoms_list(0);
    std::vector<int> nm_atoms_list(0);
    std::vector<int> sliced_atoms_list(0);

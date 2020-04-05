@@ -24,9 +24,6 @@ namespace gpu{
    //-------------------------------------------------------------------------------
    void initialize(){
 
-      // flag to check for successful initialization
-      bool initialized=false;
-
       #ifdef CUDA
          initialized = vcuda::initialize(gpu::cpu_stats);
       #elif OPENCL

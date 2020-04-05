@@ -51,7 +51,6 @@ void output_xyz_file(){
       std::stringstream otext;
 
       // write magnetic atoms to output text stream in parallel
-      #pragma omp for
       for( auto &atom : vdc::sliced_atoms_list ){
 
          // get atom type
@@ -65,7 +64,6 @@ void output_xyz_file(){
       } // end of parallel for
 
       // write non-magnetic atoms
-      #pragma omp for
       for( auto &atom : vdc::sliced_nm_atoms_list ){
 
          // get atom type
