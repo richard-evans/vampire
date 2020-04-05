@@ -40,9 +40,12 @@ The following commands control generation of the simulated system, including dim
 
 {\zicf create:particle-centre-offset}\addcontentsline{toc}{subsection}{create:particle-parity} shifts the origin of a particle to the centre of the nearest unit cell.\\ \par
 
-{\zicf create:crystal-structure = string [sc,fcc,bcc,hcp,rocksalt; default sc]}
-\addcontentsline{toc}{subsection}{create:crystal-structure} Defines the default
-crystal lattice to be generated.\\ \par
+{\zicf create:crystal-structure = string [sc, fcc, bcc, hcp, heusler, kagome, rocksalt, spinel; default sc]}
+\addcontentsline{toc}{subsection}{create:crystal-structure}
+Defines the default crystal lattice to be generated. The code supports the basic metallic crystal types
+simple cubic (sc), body-centred-cubic (bcc), face-centred-cubic (fcc) and hexagonal close-packed (hcp).
+The code also supports important magnetic structures such as Heusler alloys (heusler), rock-salt such as
+NiO (rocksalt)spinels such as magnetite (spinel) and kagome lattices. \\ \par
 
 {\zicf create:single-spin flag}\addcontentsline{toc}{subsection}{create:single-spin} Overrides all create options and generates a single isolated spin.\\ \par
 
@@ -244,7 +247,7 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 {\zicf sim:program = temperature-pulse}\addcontentsline{toc}{subsubsection}{temperature-pulse}\\
 
 {\zicf sim:program = cmc-anisotropy}\addcontentsline{toc}{subsubsection}{cmc-anisotropy}\\
-   Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques. 
+   Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques.
 %    Hybrid-CMC \\
 %    Reverse-Hybrid-CMC x
 %    LaGrange-Multiplier x
@@ -286,7 +289,7 @@ The number of time steps that statistics are taken over, including the \textit{m
 {\zicf sim:equilibration-temperature}\addcontentsline{toc}{subsection}{sim:equilibration-temperature}\\
    The temperature at which a simulation equilibrates, for example, prior to the temperature pulse in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:temperature}\addcontentsline{toc}{subsection}{sim:temperature}\\
-   The temperature of the simulation. 
+   The temperature of the simulation.
 
 {\zicf sim:temperature-increment}\addcontentsline{toc}{subsection}{sim:temperature-increment}\\
    The temperature step size in a simulation over a temperature series, such as \textit{sim:program = curie-temperature}.\\
@@ -429,7 +432,7 @@ The adaptive move performs a gaussian move with a tuned trial width to attempt t
 The following commands control what data is output to the \textit{output} file.
 The order in which they appear is the order in which they appear in the \textit{output} file.
 Most options output a single column of data, but some output multiple columns, particularly
-vector data or parameters related to materials, where one column per material is output. Note 
+vector data or parameters related to materials, where one column per material is output. Note
 that this means that for vector data, one set of columns per material is output.\\
 
 {\zicf output:time-steps}\addcontentsline{toc}{subsection}{output:time-steps} outputs

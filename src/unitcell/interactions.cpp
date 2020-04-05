@@ -34,6 +34,7 @@ namespace local{
       int idx; // unit cell number
       int idy;
       int idz;
+      bool nm;
    };
 
 }
@@ -79,6 +80,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.idx = x; // unit cell id
                tmp.idy = y;
                tmp.idz = z;
+               tmp.nm = unit_cell.atom[a].nm;
                ratoms.push_back(tmp);
             }
          }
@@ -106,8 +108,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
             const double ry = ratoms[j].y - ratoms[i].y;
             const double rz = ratoms[j].z - ratoms[i].z;
             double range_sq = rx*rx + ry*ry + rz*rz;
+            bool magnetic = !(ratoms[i].nm || ratoms[j].nm);
             // check for rij < rcut and i!= j
-            if( range_sq < rcutsq && i != j ){
+            if( range_sq < rcutsq && i != j && magnetic ){
                // Neighbour found
                uc::interaction_t tmp;
 
@@ -160,14 +163,14 @@ void calculate_interactions(unit_cell_t& unit_cell){
    unit_cell.biquadratic.normalise_exchange();
 
    // Output interactions to screen
-   /*for(int i=0; i<unit_cell.interaction.size(); i++){
-      std::cerr << i << "\t" << unit_cell.interaction[i].i << "\t"
-                << unit_cell.interaction[i].j << "\t"
-                << unit_cell.interaction[i].dx << "\t"
-                << unit_cell.interaction[i].dy << "\t"
-                << unit_cell.interaction[i].dz << "\t"
-                << unit_cell.interaction[i].rij << "\t"
-                << unit_cell.interaction[i].Jij[0][0] << std::endl;
+   /*for(int i=0; i<unit_cell.bilinear.interaction.size(); i++){
+      std::cerr << i << "\t" << unit_cell.bilinear.interaction[i].i << "\t"
+                << unit_cell.bilinear.interaction[i].j << "\t"
+                << unit_cell.bilinear.interaction[i].dx << "\t"
+                << unit_cell.bilinear.interaction[i].dy << "\t"
+                << unit_cell.bilinear.interaction[i].dz << "\t"
+                << unit_cell.bilinear.interaction[i].rij << "\t"
+                << unit_cell.bilinear.interaction[i].Jij[0][0] << std::endl;
    }*/
 
    // Check for interactions

@@ -67,6 +67,7 @@ void output_inc_file(unsigned int spin_file_id){
       std::stringstream otext;
 
       // write to output text stream in parallel
+      #pragma omp for
       for( auto &atom : vdc::sliced_atoms_list ){
 
          // get magnetization for colour contrast
@@ -109,6 +110,7 @@ void output_inc_file(unsigned int spin_file_id){
       std::stringstream otext;
 
       // write to output text stream in parallel
+      #pragma omp for
       for( auto &atom : vdc::sliced_nm_atoms_list ){
 
          // format text for povray file

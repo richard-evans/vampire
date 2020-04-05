@@ -144,6 +144,13 @@ namespace create{
       extern void teardrop(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void truncated_octahedron(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
 
+      extern void particle(std::vector<cs::catom_t> &);
+      extern void particle_array(std::vector<cs::catom_t> &);
+      extern void hex_particle_array(std::vector<cs::catom_t> &);
+      extern void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array);
+      extern void sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array);
+      extern void clear_atoms(std::vector<cs::catom_t> &);
+
       extern void voronoi_substructure(std::vector<cs::catom_t> & catom_array);
 
       void voronoi_grain_rounding(std::vector <std::vector <double> > & grain_coord_array,

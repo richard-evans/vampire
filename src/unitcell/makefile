@@ -15,9 +15,13 @@ read_interactions.o \
 set_exchange_type.o \
 sc.o \
 bcc.o \
+bcc110.o \
 fcc.o \
 hcp.o \
+heusler.o \
+kagome.o \
 rocksalt.o \
+spinel.o \
 verify.o
 
 # Append module objects to global tree
