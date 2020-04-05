@@ -127,6 +127,18 @@ int command( int argc, char* argv[] ){
             extract_materials(temp_str, vdc::remove_materials);
       }
       //------------------------------------------------------------------------
+      // Check for user specified antiferromagnetic material spins to flip in
+      // povray visualisation
+      //------------------------------------------------------------------------
+      else if (sw == "--afm"){
+
+            // check number of args not exceeded
+            check_arg(arg, argc, argv, temp_str, "Error - expected at least one variable." );
+
+            // work through vector and extract values
+            extract_materials(temp_str, vdc::afm_materials);
+      }
+      //------------------------------------------------------------------------
       // Check for slice parameters
       //------------------------------------------------------------------------
       else if (sw == "--slice"){

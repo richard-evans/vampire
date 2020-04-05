@@ -304,11 +304,6 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
       double y = vdc::coordinates[3*atom + 1];
       double z = vdc::coordinates[3*atom + 2];
 
-      // add coordinates to running total
-      ave[0] += x;
-      ave[1] += y;
-      ave[2] += z;
-
       // calculate min and max
       if(x > max[0]) max[0] = x;
       if(y > max[1]) max[1] = y;
@@ -327,11 +322,6 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
       double y = vdc::nm_coordinates[3*atom + 1];
       double z = vdc::nm_coordinates[3*atom + 2];
 
-      // add coordinates to running total
-      ave[0] += x;
-      ave[1] += y;
-      ave[2] += z;
-
       // calculate min and max
       if(x > max[0]) max[0] = x;
       if(y > max[1]) max[1] = y;
@@ -347,26 +337,10 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
    vdc::system_size[1] = max[1] - min[1];
    vdc::system_size[2] = max[2] - min[2];
 
-   // number of atoms
-   unsigned int n = magnetic_list.size() + non_magnetic_list.size();
-
    // save system centre
-   vdc::system_centre[0] = ave[0]/double(n);
-   vdc::system_centre[1] = ave[1]/double(n);
-   vdc::system_centre[2] = ave[2]/double(n);
-
-   // std::cout << "System Dimensions:" << std::endl;
-   // std::cout << system_size[0] << " " << system_size[1] << " " << system_size[2] << std::endl;
-   // std::cout << "System Centre:" << std::endl;
-   // std::cout << system_centre[0] << " " << system_centre[1] << " " << system_centre[2] << std::endl;
-   //
-   // std::cout << "Slice Parameter:" << std::endl;
-   // std::cout << slice_parameters[0] << " " << slice_parameters[1]
-   //           << " " << slice_parameters[2] << " " << slice_parameters[3]
-   //           << " " << slice_parameters[4] << " " << slice_parameters[5] << std::endl;
-   // std::cout << "xmin= " << xmin << "\txmax= " << xmax << std::endl;
-   // std::cout << "ymin= " << ymin << "\tymax= " << ymax << std::endl;
-   // std::cout << "zmin= " << zmin << "\tzmax= " << zmax << std::endl;
+   vdc::system_centre[0] = (max[0] + min[0])/2.0;
+   vdc::system_centre[1] = (max[1] + min[1])/2.0;
+   vdc::system_centre[2] = (max[2] + min[2])/2.0;
 
    return;
 }

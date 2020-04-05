@@ -114,9 +114,10 @@ bool read_spin_metadata(unsigned int file_id){
 
    // check for open file, if not open then end program, end of snapshots
    if(!smfile.is_open()){
-      std::cerr << "Error! Spins metadata file spins-" << std::setfill('0') << std::setw(8)
-      << file_id << ".meta cannot be opened. Exiting" << std::endl;
-      exit(1);
+         //std::cerr << "Error! Spins metadata file spins-" << std::setfill('0') << std::setw(8)
+         //<< file_id << ".meta cannot be opened. Exiting" << std::endl;
+         //exit(1);
+      return false;
    }
 
    // Metafile found - inform the user and process data
