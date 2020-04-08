@@ -28,7 +28,7 @@ namespace stats{
 //------------------------------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------------------------------
-standard_deviation_statistic_t::standard_deviation_statistic_t (){}
+//standard_deviation_statistic_t::standard_deviation_statistic_t (){}
 
 //------------------------------------------------------------------------------------------------------
 // Function to initialize data structures
@@ -135,10 +135,10 @@ std::string standard_deviation_statistic_t::output_standard_deviation(bool heade
 
        }else{
           for(int id=0; id< num_elements -1; ++id){ // ignore last element as always contains non-magnetic atoms
-             result <<"ID" + std::to_string(id) + "_std_x"
-                    <<"ID" + std::to_string(id) + "_std_y" 
-                    <<"ID" + std::to_string(id) + "_std_z"
-                    <<"ID" + std::to_string(id) + "_std_l";
+             result <<name + std::to_string(id) + "_std_x"
+                    <<name + std::to_string(id) + "_std_y" 
+                    <<name + std::to_string(id) + "_std_z"
+                    <<name + std::to_string(id) + "_std_l";
              }
        }
 

@@ -24,7 +24,7 @@ namespace stats{
 //------------------------------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------------------------------
-susceptibility_statistic_t::susceptibility_statistic_t (){}
+//susceptibility_statistic_t::susceptibility_statistic_t (){}
 
 //------------------------------------------------------------------------------------------------------
 // Function to initialize data structures
@@ -166,10 +166,10 @@ std::string susceptibility_statistic_t::output_mean_susceptibility(const double 
    }
    }else{
        for(int id=0; id< num_elements - 1; ++id){ // ignore last element as always contains non-magnetic atoms
-          result << "ID" + std::to_string(id) + "_sus_x"
-                 << "ID" + std::to_string(id) + "_sus_y"
-                 << "ID" + std::to_string(id) + "_sus_z"
-                 << "ID" + std::to_string(id) + "_sus_m";
+          result << name + std::to_string(id) + "_sus_x"
+                 << name + std::to_string(id) + "_sus_y"
+                 << name + std::to_string(id) + "_sus_z"
+                 << name + std::to_string(id) + "_sus_m";
        }
    }
    return result.str();

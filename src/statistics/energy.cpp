@@ -37,7 +37,7 @@ namespace stats{
 //------------------------------------------------------------------------------------------------------
 // Constructor to initialize data structures
 //------------------------------------------------------------------------------------------------------
-energy_statistic_t::energy_statistic_t (): initialized(false){}
+//energy_statistic_t::energy_statistic_t (): initialized(false){}
 
 //------------------------------------------------------------------------------------------------------
 // Function to determine if class is properly initialized
@@ -427,7 +427,7 @@ std::string energy_statistic_t::output_energy(enum energy_t energy_type,bool hea
    // could run all of the for loops as one outside the switch. -AJN
    if(header){
        for(int mask_id=0;mask_id<mask_size; ++mask_id){
-           result<<"ID" + std::to_string(mask_id) + "_E"+std::to_string(energy_type) + "_Energy";
+           result<<name + std::to_string(mask_id) + "_E"+std::to_string(energy_type) + "_Energy";
        }
    }else{
    // output correct energy type (in Joules)
@@ -482,7 +482,7 @@ std::string energy_statistic_t::output_mean_energy(enum energy_t energy_type,boo
    // could run all of the for loops as one outside the switch. -AJN
    if(header){
        for(int mask_id=0;mask_id<mask_size; ++mask_id){
-           result << "ID" + std::to_string(mask_id) + "_E" + std::to_string(energy_type) + "_Energy";
+           result << name + std::to_string(mask_id) + "_E" + std::to_string(energy_type) + "_Energy";
        }
    }else{
    // output correct energy type (in Joules)

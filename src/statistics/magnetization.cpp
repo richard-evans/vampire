@@ -39,7 +39,7 @@ namespace stats{
 //------------------------------------------------------------------------------------------------------
 // Constructor to initialize data structures
 //------------------------------------------------------------------------------------------------------
-magnetization_statistic_t::magnetization_statistic_t (): initialized(false){}
+//magnetization_statistic_t::magnetization_statistic_t (std::string n): initialized(false){}
 
 //------------------------------------------------------------------------------------------------------
 // Function to determine if class is properly initialized
@@ -238,10 +238,10 @@ std::string magnetization_statistic_t::output_normalized_magnetization(bool head
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){
-         result << "ID" + std::to_string(mask_id) + "M_norm_x"
-                << "ID" + std::to_string(mask_id) + "M_norm_y"
-                << "ID" + std::to_string(mask_id) + "M_norm_z"
-                << "ID" + std::to_string(mask_id) + "M_norm_l";
+         result << name + std::to_string(mask_id) + "M_norm_x"
+                << name + std::to_string(mask_id) + "M_norm_y"
+                << name + std::to_string(mask_id) + "M_norm_z"
+                << name + std::to_string(mask_id) + "M_norm_l";
       }else{
          result << magnetization[4*mask_id + 0] //<< "\t"
                 << magnetization[4*mask_id + 1] //<< "\t"
@@ -272,10 +272,10 @@ std::string magnetization_statistic_t::output_magnetization(bool header){
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
    if(header){
-      result << "ID" + std::to_string(mask_id) + "M_x"
-             << "ID" + std::to_string(mask_id) + "M_y"
-             << "ID" + std::to_string(mask_id) + "M_z"
-             << "ID" + std::to_string(mask_id) + "M_l";
+      result << name + std::to_string(mask_id) + "M_x"
+             << name + std::to_string(mask_id) + "M_y"
+             << name + std::to_string(mask_id) + "M_z"
+             << name + std::to_string(mask_id) + "M_l";
    }
    else{
       result << magnetization[4*mask_id + 0]
@@ -307,7 +307,7 @@ std::string magnetization_statistic_t::output_normalized_magnetization_length(bo
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
        if(header){
-           result << "ID" + std::to_string(mask_id) + "M_norm_l";
+           result << name + std::to_string(mask_id) + "M_norm_l";
        }else{
           result << magnetization[4*mask_id + 3];
        }
@@ -339,10 +339,10 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization(bool
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){
-         result << "ID" + std::to_string(mask_id) + "M_norm_mean_x"
-                << "ID" + std::to_string(mask_id) + "M_norm_mean_y"
-                << "ID" + std::to_string(mask_id) + "M_norm_mean_z"
-                << "ID" + std::to_string(mask_id) + "M_norm_mean_l";
+         result << name + std::to_string(mask_id) + "M_norm_mean_x"
+                << name + std::to_string(mask_id) + "M_norm_mean_y"
+                << name + std::to_string(mask_id) + "M_norm_mean_z"
+                << name + std::to_string(mask_id) + "M_norm_mean_l";
       }
       else{
          result << mean_magnetization[4*mask_id + 0]*ic
@@ -377,7 +377,7 @@ std::string magnetization_statistic_t::output_normalized_mean_magnetization_leng
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
        if(header){
-           result << "ID" + std::to_string(mask_id) + "M_norm_mean_l";
+           result << name + std::to_string(mask_id) + "M_norm_mean_l";
        }else{
            result << mean_magnetization[4*mask_id + 3]*ic;
        }
@@ -414,7 +414,7 @@ std::string magnetization_statistic_t::output_normalized_magnetization_dot_produ
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){
-         result << "ID" + std::to_string(mask_id) + "M_norm_dot_B";
+         result << name + std::to_string(mask_id) + "M_norm_dot_B";
       }
       else{
          const double mm  = magnetization[4*mask_id + 3];
@@ -450,7 +450,7 @@ std::string magnetization_statistic_t::output_mean_magnetization_length(bool hea
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
        if(header){
-           result << "ID" + std::to_string(mask_id) + "M_mean_l"; 
+           result << name + std::to_string(mask_id) + "M_mean_l"; 
        }else{
            result << mean_magnetization[4*mask_id + 3]*saturation[mask_id]*ic;
        }
@@ -481,10 +481,10 @@ std::string magnetization_statistic_t::output_mean_magnetization(bool header){
    // loop over all magnetization values
    for(int mask_id=0; mask_id<mask_size; ++mask_id){
       if(header){
-         result << "ID" + std::to_string(mask_id) + "M_mean_x"
-                << "ID" + std::to_string(mask_id) + "M_mean_y" 
-                << "ID" + std::to_string(mask_id) + "M_mean_z" 
-                << "ID" + std::to_string(mask_id) + "M_mean_l"; 
+         result << name + std::to_string(mask_id) + "M_mean_x"
+                << name + std::to_string(mask_id) + "M_mean_y" 
+                << name + std::to_string(mask_id) + "M_mean_z" 
+                << name + std::to_string(mask_id) + "M_mean_l"; 
       }
       else{
          result << mean_magnetization[4*mask_id + 0]*ic
