@@ -92,6 +92,7 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 namespace vout{
 
    void output_switch(std::ostream& stream,unsigned int idx,bool header){
+      //stream.precision(vout::precision);
       switch(idx){
       	case 0:
       		vout::time(stream,header);
