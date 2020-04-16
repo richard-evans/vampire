@@ -10,7 +10,8 @@ finalize.o \
 initialize.o \
 interface.o \
 llg_heun.o \
-statistics.o
+statistics.o \
+transfer.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/gpu/,$(gpu_objects))

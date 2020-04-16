@@ -56,9 +56,13 @@ namespace unitcell{
       //-------------------------------------------------------------------------
       void build_simple_cubic(unitcell::unit_cell_t& unit_cell);
       void build_body_centred_cubic(unitcell::unit_cell_t& unit_cell);
+      void build_body_centred_cubic_110(unitcell::unit_cell_t& unit_cell);
       void build_face_centred_cubic(unitcell::unit_cell_t& unit_cell);
       void build_hexagonal_close_packed(unitcell::unit_cell_t& unit_cell);
+      void build_kagome(unitcell::unit_cell_t& unit_cell);
       void build_rock_salt(unitcell::unit_cell_t& unit_cell);
+      void build_heusler(unitcell::unit_cell_t& unit_cell);
+      void build_spinel(unitcell::unit_cell_t& unit_cell);
       void calculate_interactions(unit_cell_t& unit_cell);
       void read_unit_cell(unit_cell_t & unit_cell, std::string filename);
       void read_biquadratic_interactions(unit_cell_t & unit_cell,

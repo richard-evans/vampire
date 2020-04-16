@@ -317,7 +317,7 @@ tidy:
 	@rm -f src/*/*~
 
 vdc:
-	$(MAKE) -B -C util/vdc/
+	$(MAKE) -C util/vdc/
 
 install:
 	echo "Preparing installation package"

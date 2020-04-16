@@ -470,12 +470,6 @@ namespace vin{
             }
         }
         //-------------------------------------------------------------------
-        test="enable-dipole-fields";
-        if(word==test){
-            sim::hamiltonian_simulation_flags[4]=1;
-            return EXIT_SUCCESS;
-        }
-        //-------------------------------------------------------------------
         test="enable-fmr-field";
         if(word==test){
             sim::hamiltonian_simulation_flags[5]=1;

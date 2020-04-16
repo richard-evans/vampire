@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2017. All rights reserved.
+//   (c) Richard F L Evans, Daniel Meilak 2017-2019. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -24,6 +24,16 @@ namespace vdc{
    extern bool xyz;
    extern bool povray;
    extern bool cells;
+   extern bool vtk;
+   extern bool txt;
+   extern bool x_vector;
+   extern bool z_vector;
+
+   // keyword variables
+   extern std::string colour_keyword;
+   extern std::string custom_colourmap_file;
+   extern bool x_axis_colour;
+   extern std::string slice_type;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -39,11 +49,22 @@ namespace vdc{
 
    extern uint64_t num_atoms;
 
+   extern unsigned int vdc_start_file_id;
+   extern unsigned int vdc_final_file_id;
    extern unsigned int start_file_id;
    extern unsigned int final_file_id;
 
    extern double system_size[3];
    extern double system_centre[3];
+
+   // slice parameters for cutting the original system
+   extern std::vector<double> slice_parameters;
+   extern std::vector<int> remove_materials;
+   extern std::vector<int> afm_materials;
+   extern std::vector<int> atoms_list;
+   extern std::vector<int> nm_atoms_list;
+   extern std::vector<int> sliced_atoms_list;
+   extern std::vector<int> sliced_nm_atoms_list;
 
    extern std::vector<material_t> materials;
 
@@ -52,6 +73,11 @@ namespace vdc{
 
    extern std::vector<double> coordinates;
    extern std::vector<double> spins;
+
+   // axis vectors for povray colouring
+   extern std::vector<double> vector_z;
+   extern std::vector<double> vector_y;
+   extern std::vector<double> vector_x;
 
    // non-magnetic atom data
    extern uint64_t num_nm_atoms;
@@ -74,21 +100,27 @@ namespace vdc{
    extern std::vector <std::string> nm_filenames;
 
    // Functions
+   int command( int argc, char* argv[]);
    void process_coordinates();
    void process_spins();
 
    // forward function declarations
    void read_nm_metadata();
    void read_nm_data();
+   void slice_nm_system();
 
    void output_xyz_file();
    void output_inc_file(unsigned int spin_file_id);
    void output_povray_file();
+   void output_vtk_file(unsigned int spin_file_id);
+   void output_txt_file(unsigned int file_id);
 
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);
 
-   void rgb( const double& ireal, double &red, double &green, double &blue);
+   void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
+
+   int colourwheel ( std::vector<std::vector<double>>& colourmap );
 
 }
 
