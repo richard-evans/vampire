@@ -29,9 +29,11 @@ namespace vout{
 
    bool custom_precision = false; // enable user selectable precision for data output
    unsigned int precision = 6; // variable to control output precision (digits)
+   int fw_size = 11;
+   int fw_size_int = 11;
    bool fixed = false; // fixed precision output
    bool header_option = false; // output column headers on output file
-
+   int max_header=14;
 	// Namespace variable declarations
 	std::vector<unsigned int> file_output_list(0);
 	std::vector<unsigned int> screen_output_list(0);
