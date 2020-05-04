@@ -177,57 +177,7 @@ int create();
 ///
 int create_crystal_structure(std::vector<cs::catom_t> &);
 
-/// @brief This is the brief (one line only) description of the function.
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    05/03/2010
-///
-/// @param[in] input variable
-/// @param[out] ouput variable
-/// @param[in,out] input/output variable
-/// @return variable returned from the function
-///
-/// @internal
-///	Created:		05/03/2010
-///	Revision:	  ---
-///=====================================================================================
-///
-int create_system_type(std::vector<cs::catom_t> &);
-
-/// @brief This is the brief (one line only) description of the function.
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2010. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, rfle500@york.ac.uk
-/// @version 1.0
-/// @date    05/03/2010
-///
-/// @param[in] input variable
-/// @param[out] ouput variable
-/// @param[in,out] input/output variable
-/// @return variable returned from the function
-///
-/// @internal
-///	Created:		05/03/2010
-///	Revision:	  ---
-///=====================================================================================
-///
-//int create_neighbourlist(std::vector<cs::catom_t> &, std::vector<std::vector <neighbour_t> > &);
-
-
 int voronoi_film(std::vector<cs::catom_t> &);
-
-int sort_atoms_by_grain(std::vector<cs::catom_t> &);
-void clear_atoms(std::vector<cs::catom_t> &);
 
 void generate_multilayers(std::vector<cs::catom_t> & catom_array);
 
@@ -241,8 +191,10 @@ namespace create{
 	// Variable for total number of atoms that are not filler
 	extern int num_total_atoms_non_filler;
 
+
 	// Functions
    void initialize();
+   int create_system_type(std::vector<cs::catom_t> &);
 	bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
 

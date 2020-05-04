@@ -20,6 +20,12 @@
 // program header
 #include "vdc.hpp"
 
+#ifdef _OPENMP
+   #include <omp.h>
+#else
+   #define omp_get_thread_num() 0
+#endif
+
 namespace vdc{
 
 // forward function declarations
@@ -37,33 +43,46 @@ void output_xyz_file(){
    ofile.open("crystal.xyz");
 
    // output number of atoms
-   ofile << vdc::num_atoms + vdc::num_nm_atoms << "\n\n";
+   ofile << vdc::sliced_atoms_list.size() + vdc::sliced_nm_atoms_list.size() << "\n\n";
 
-   // write magnetic atoms
-   for(uint64_t atom = 0; atom < vdc::num_atoms; atom++){
+   #pragma omp parallel
+   {
 
-      // get atom type
-      int type_id = vdc::type[atom];
+      std::stringstream otext;
 
-      ofile << materials[type_id].element << "\t" <<
-               vdc::coordinates[3*atom + 0] << "\t" <<
-               vdc::coordinates[3*atom + 1] << "\t" <<
-               vdc::coordinates[3*atom + 2] << "\n";
+      // write magnetic atoms to output text stream in parallel
+      #pragma omp for
+      for( auto &atom : vdc::sliced_atoms_list ){
 
-   }
+         // get atom type
+         int type_id = vdc::type[atom];
 
-   // write non-magnetic atoms
-   for(uint64_t atom = 0; atom < vdc::num_nm_atoms; atom++){
+         otext << materials[type_id].element << "\t" <<
+                  vdc::coordinates[3*atom + 0] << "\t" <<
+                  vdc::coordinates[3*atom + 1] << "\t" <<
+                  vdc::coordinates[3*atom + 2] << "\n";
 
-      // get atom type
-      int type_id = vdc::nm_type[atom];
+      } // end of parallel for
 
-      ofile << materials[type_id].element << "\t" <<
-               vdc::nm_coordinates[3*atom + 0] << "\t" <<
-               vdc::nm_coordinates[3*atom + 1] << "\t" <<
-               vdc::nm_coordinates[3*atom + 2] << "\n";
+      // write non-magnetic atoms
+      #pragma omp for
+      for( auto &atom : vdc::sliced_nm_atoms_list ){
 
-   }
+         // get atom type
+         int type_id = vdc::nm_type[atom];
+
+         otext << materials[type_id].element << "\t" <<
+                  vdc::nm_coordinates[3*atom + 0] << "\t" <<
+                  vdc::nm_coordinates[3*atom + 1] << "\t" <<
+                  vdc::nm_coordinates[3*atom + 2] << "\n";
+
+      } // end of parallel for
+
+      // force each thread to write to file in order
+      #pragma omp critical
+      ofile << otext.str();
+
+   } // end of parallel region
 
    ofile << std::flush;
    ofile.close();
