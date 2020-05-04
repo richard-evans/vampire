@@ -532,6 +532,33 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		atoms::y_total_spin_field_array[atom]+=hy;
 		atoms::z_total_spin_field_array[atom]+=hz;
 
+		//----------------------------------------------------------------------------------
+		// Spin orbit torque (SOT) field
+		//----------------------------------------------------------------------------------
+
+		// reset temporary variables for field components
+		hx = 0.0;
+		hy = 0.0;
+		hz = 0.0;
+
+		// save polarization to temporary constant
+		const double sotpx = SOT_spin_polarization_unit_vector[0];
+		const double sotpy = SOT_spin_polarization_unit_vector[1];
+		const double sotpz = SOT_spin_polarization_unit_vector[2];
+
+		const double sotaj = SOT_DL[material];
+		const double sotbj = SOT_FL[material];
+
+		// calculate field
+		hx += sotaj*(sy*sotpz - sz*sotpy) + sotbj*sotpx;
+		hy += sotaj*(sz*sotpx - sx*sotpz) + sotbj*sotpy;
+		hz += sotaj*(sx*sotpy - sy*sotpx) + sotbj*sotpz;
+
+		// save field to spin field array
+		atoms::x_total_spin_field_array[atom]+=hx;
+		atoms::y_total_spin_field_array[atom]+=hy;
+		atoms::z_total_spin_field_array[atom]+=hz;
+
 	}
 
 	return;

@@ -24,11 +24,16 @@ namespace sim{
       // unroll slonczewski torque arrays
       sim::internal::slonczewski_aj.resize(num_materials,0.0);
       sim::internal::slonczewski_bj.resize(num_materials,0.0);
+      // unroll spin orbit torque arrays
+      sim::internal::SOT_DL.resize(num_materials,0.0);
+      sim::internal::SOT_FL.resize(num_materials,0.0);
       // loop over materials set by user
       for(unsigned int m=0; m<sim::internal::mp.size(); ++m){
          // copy values set by user to arrays
          if(sim::internal::mp[m].slonczewski_aj.is_set()) sim::internal::slonczewski_aj[m] = sim::internal::mp[m].slonczewski_aj.get();
          if(sim::internal::mp[m].slonczewski_bj.is_set()) sim::internal::slonczewski_bj[m] = sim::internal::mp[m].slonczewski_bj.get();
+         if(sim::internal::mp[m].SOT_DL.is_set()) sim::internal::SOT_DL[m] = sim::internal::mp[m].SOT_DL.get();
+         if(sim::internal::mp[m].SOT_FL.is_set()) sim::internal::SOT_FL[m] = sim::internal::mp[m].SOT_FL.get();
       }
 
       return;
