@@ -43,6 +43,9 @@ namespace st{
 
       int config_file_counter = 0; // spin torque config file counter
 
+      int free_layer = 0;       /// index of free layer in magnetic tunnel junction
+      int reference_layer = 0;  /// index of reference layer in magnetic tunnel junction
+
       double je; // = 1.0e11; // current (C/s/m^2)
       double initial_beta;
       
