@@ -74,6 +74,7 @@ namespace st{
             double exp_t = exp(-MgO_thickness/0.25e-9);
 
             double jtunnel = st::internal::je*0.5*(plus_cos+0.5*minus_cos)*exp_t;
+//            std::cout << "t_MgO=( " << create::get_material_height_min(FL) << " - " << create::get_material_height_max(RL) << " ) = " << MgO_thickness << "\tJe\t" << st::internal::je << "\tJe_tun\t" << jtunnel << std::endl;
 
             //set the current je and spin poralisation parameters
             je = jtunnel;
@@ -134,7 +135,7 @@ namespace st{
             st::internal::j [3*idx+1] = st::internal::initial_beta*je*st::internal::initial_m[1];
             st::internal::j [3*idx+2] = st::internal::initial_beta*je*st::internal::initial_m[2];
 
-        //std::cout<< st::internal::initial_beta << "\t" << st::internal::j[0] << "\t" << st::internal::j[1]  << "\t" << st::internal::j[2]  << "\t" << std::endl;
+//            std::cout<< st::internal::initial_beta << "\t" << st::internal::j[0] << "\t" << st::internal::j[1]  << "\t" << st::internal::j[2]  << "\t" << std::endl;
 
             // loop over all cells in stack after first (idx+1)
             for(int cell=idx+1; cell<idx+num_microcells_per_stack; ++cell){
@@ -288,25 +289,42 @@ namespace st{
                const double jmy = Bc*je*m.y - twoDo*pre_jmy;
                const double jmz = Bc*je*m.z - twoDo*pre_jmz;
 
-               // Save values for the spin accumulation
-               st::internal::sa[cellx] = sax;
-               st::internal::sa[celly] = say;
-               st::internal::sa[cellz] = saz;
+               if(st::internal::cell_natom[cell]>0){
+                  // Save values for the spin accumulation
+                  st::internal::sa[cellx] = sax;
+                  st::internal::sa[celly] = say;
+                  st::internal::sa[cellz] = saz;
 
-               // Save values for the spin current
-               st::internal::j[cellx] = jmx;
-               st::internal::j[celly] = jmy;
-               st::internal::j[cellz] = jmz;
+                  // Save values for the spin current
+                  st::internal::j[cellx] = jmx;
+                  st::internal::j[celly] = jmy;
+                  st::internal::j[cellz] = jmz;
 
-               // Calculate spin torque energy for cell (Joules)
-               st::internal::spin_torque[cellx] = microcell_volume * st::internal::sd_exchange[cell] * sax * i_e * i_muB;
-               st::internal::spin_torque[celly] = microcell_volume * st::internal::sd_exchange[cell] * say * i_e * i_muB;
-               st::internal::spin_torque[cellz] = microcell_volume * st::internal::sd_exchange[cell] * saz * i_e * i_muB;
+                  // Calculate spin torque energy for cell (Joules)
+                  st::internal::spin_torque[cellx] = microcell_volume * st::internal::sd_exchange[cell] * sax * i_e * i_muB;
+                  st::internal::spin_torque[celly] = microcell_volume * st::internal::sd_exchange[cell] * say * i_e * i_muB;
+                  st::internal::spin_torque[cellz] = microcell_volume * st::internal::sd_exchange[cell] * saz * i_e * i_muB;
+               }
+               else{
+                  // Save values for the spin accumulation
+                  st::internal::sa[cellx] = st::internal::sa[pcellx];
+                  st::internal::sa[celly] = st::internal::sa[pcelly];
+                  st::internal::sa[cellz] = st::internal::sa[pcellz];
 
+                  // Save values for the spin current
+                  st::internal::j[cellx] = st::internal::j[pcellx];
+                  st::internal::j[celly] = st::internal::j[pcelly];
+                  st::internal::j[cellz] = st::internal::j[pcellz];
 
-              //--------------------------------------------
-              // Step 5 calculate the spin torque of each cell
-              //--------------------------------------------
+                  // Calculate spin torque energy for cell (Joules)
+                  st::internal::spin_torque[cellx] = st::internal::spin_torque[pcellx];
+                  st::internal::spin_torque[celly] = st::internal::spin_torque[pcelly];
+                  st::internal::spin_torque[cellz] = st::internal::spin_torque[pcellz];
+               }
+
+               //--------------------------------------------
+               // Step 5 calculate the spin torque of each cell
+               //--------------------------------------------
 
                //convert M of previous cell into basis b1, b2, b3
 
@@ -366,7 +384,6 @@ namespace st{
                 st::internal::nast[cellx] = bj*SxSp[0];
                 st::internal::nast[celly] = bj*SxSp[1];
                 st::internal::nast[cellz] = bj*SxSp[2];
-
 
 
             } // end of cell loop
