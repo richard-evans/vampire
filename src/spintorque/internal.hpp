@@ -41,6 +41,9 @@ namespace st{
 
       extern int config_file_counter; // spin torque config file counter
 
+      extern int free_layer;       /// index of free layer in magnetic tunnel junction
+      extern int reference_layer;  /// index of reference layer in magnetic tunnel junction
+
       extern double je; // current (C/s)
       extern double initial_beta;
       extern double rel_angle;
