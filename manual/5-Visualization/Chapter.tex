@@ -13,8 +13,9 @@
 
 \section*{Getting started}
 \addcontentsline{toc}{section}{Getting started}
-To generate the positions of your atoms, multiple parameters must be set in the input file, depending on the number of cores the simulation is run on.
-min/max\\
+To generate the positions of your atoms, config:atoms must be set in the input file. This will produce .data and .meta files containing the atomic and spin configuration of your system. Their frequency can be adjusted using the config:atoms-output-rate paramter.\\
+
+In addition, the format of the output can be text or binary format, the latter can help with particulary large systems. Files written in binary format are system specific and usually cannot be read by vdc compiled on separate hardware.\\
 
 \subsection*{input}
 {\footnotesize
@@ -23,18 +24,16 @@ min/max\\
 # data output
 #------------------------------------------
 config:atoms
-config:output-nodes = 12
-config:output-rate     = 1000
-config:output-format = binary
+config:output-nodes      = 12
+config:atoms-output-rate = 1000
+config:output-format     = binary
 \end{verbatim}
 }
-
-add descriptors for each parameter\\
 
 \section*{Atomic visualization with rasmol}
 \addcontentsline{toc}{section}{Atomic visualization with rasmol}
 
-To visualise your system using Rasmol, simply run vdc in the same directory as your output. The config:output files must be present.\\
+To visualise your system using Rasmol, simply run vdc in the same directory as your output. The config:atoms files must be present.\\
 
 This produced a file called crystal.xyz, which is a chemical file format with information on the atomic positions. The format of the .xyz format is as follows:\\
 
