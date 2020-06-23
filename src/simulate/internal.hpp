@@ -49,12 +49,17 @@ namespace sim{
       struct mp_t{
          set_double_t slonczewski_aj; // adiabatic torque
          set_double_t slonczewski_bj; // field torque (non-adiabatic)
+         set_double_t SOT_DL; // damping-like SOT torque
+         set_double_t SOT_FL; // field-like SOT torque (non-adiabatic)
       };
 
       extern std::vector<sim::internal::mp_t> mp; // array of material properties
       extern std::vector<double> slonczewski_aj; // array of adiabatic spin torques
       extern std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques
       extern std::vector<double> slonczewski_spin_polarization_unit_vector; // spin polarization direction
+      extern std::vector<double> SOT_DL; // array of adiabatic spin torques
+      extern std::vector<double> SOT_FL; // array of non-adiabatic spin torques
+      extern std::vector<double> SOT_spin_polarization_unit_vector; // spin polarization direction
 
 
 

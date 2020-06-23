@@ -46,6 +46,18 @@ namespace sim{
          sim::internal::slonczewski_spin_polarization_unit_vector = u;
          return true;
       }
+      //-------------------------------------------------------------------
+      test="SOT-spin-polarization-unit-vector";
+      if(word==test){
+         std::vector<double> u(3);
+         u=vin::doubles_from_string(value);
+         // Test for valid range
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+         // save sanitized unit vector
+         sim::internal::SOT_spin_polarization_unit_vector = u;
+         return true;
+      }
+      //-------------------------------------------------------------------
       test="preconditioning-steps";
       if(word==test){
          int n = atoi(value.c_str());
@@ -132,6 +144,30 @@ namespace sim{
          // Test for valid range
          vin::check_for_valid_value(bj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
          sim::internal::mp[super_index].slonczewski_bj.set(bj);
+         return true;
+      }
+      //------------------------------------------------------------
+      test="SOT-damping-like-torque";
+      /*
+         damping-like parameter for material in spin orbit torque calculation
+         */
+      if(word==test){
+         double aj=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", -1.0e2, 1.0e2,"input","-100 - 100T");
+         sim::internal::mp[super_index].SOT_DL.set(aj);
+         return true;
+      }
+      //------------------------------------------------------------
+      test="SOT-field-like-torque";
+      /*
+         field-like parameter for material in spin orbit torque calculation
+         */
+      if(word==test){
+         double bj=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", -1.0e2, 1.0e2,"input","-100 - 100T");
+         sim::internal::mp[super_index].SOT_FL.set(bj);
          return true;
       }
       //--------------------------------------------------------------------
