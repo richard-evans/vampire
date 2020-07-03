@@ -50,6 +50,7 @@ namespace internal
    extern int output_atoms_config_rate; // rate to output atoms
 
    extern bool output_cells_config; // flag to enable cells output
+   extern bool output_cells_config_continuous; // flag to enable continuous output of cells configurations
    extern int output_cells_config_rate; // rate to output cells
 
    extern int output_rate_counter_coords;

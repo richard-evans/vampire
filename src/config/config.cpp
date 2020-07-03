@@ -137,7 +137,7 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    //------------------------------------------------------
    // cells output if enabled and the time is right
    //------------------------------------------------------
-   if ((config::internal::output_cells_config == true) && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
+   if ((config::internal::output_cells_config == true) && (config::internal::output_cells_config_continuous == true)  && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
    {
       // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
       if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
@@ -167,6 +167,13 @@ void output(){ // should include variables for data to be outputted, eg spins, c
             }
          }
       }
+   }
+   else if ((config::internal::output_cells_config == true) && (config::internal::output_cells_config_continuous == false) && (sim::time ==  sim::total_time))
+   {
+
+   	config::internal::legacy_cells_coords();
+   	config::internal::legacy_cells();
+
    }
 
    // increment rate counter
