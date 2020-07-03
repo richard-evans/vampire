@@ -35,9 +35,37 @@ namespace config{
       // System output config variables
       std::string test="atoms";
       if(word==test){
-         internal::output_atoms_config=true;
-         return EXIT_SUCCESS;
+          test="end";
+          if(value==test){
+              internal::output_atoms_config=true; // Save atomic configuration
+              internal::output_atoms_config_continuous=false; // do not save atomic configuration at the end of simulation
+              return EXIT_SUCCESS;
+          }
+          test="continuous";
+          if(value==test){
+              internal::output_atoms_config=true; // Save atomic configuration
+              internal::output_atoms_config_continuous=true; // save atomic configuration during simulation
+              return EXIT_SUCCESS;
+          }
+          test="";
+          if(value==test){
+              internal::output_atoms_config=true; // Save atomic configuration
+              internal::output_atoms_config_continuous=true; // save atomic configuration during simulation
+              return EXIT_SUCCESS;
+          }
+          else{
+              terminaltextcolor(RED);
+              std::cerr << "Error - value for \'config:" << word << "\' must be one of:" << std::endl;
+              std::cerr << "\t\"end\"" << std::endl;
+              std::cerr << "\t\"continuous\"" << std::endl;
+              terminaltextcolor(WHITE);
+              err::vexit();
+          }
       }
+//      if(word==test){
+//         internal::output_atoms_config=true;
+//         return EXIT_SUCCESS;
+//      }
       //-----------------------------------------
       test="atoms-output-rate";
       if(word==test){

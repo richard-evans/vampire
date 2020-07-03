@@ -46,6 +46,7 @@ namespace internal
    extern bool initialised; // flag to signify if config has been initialised
 
    extern bool output_atoms_config; // flag to enable atoms output
+   extern bool output_atoms_config_continuous; // flag to enable continuous output of atomic configurations
    extern int output_atoms_config_rate; // rate to output atoms
 
    extern bool output_cells_config; // flag to enable cells output

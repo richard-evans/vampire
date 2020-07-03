@@ -72,7 +72,7 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    //------------------------------------------------------
    // atoms output if enabled and the time is right
    //------------------------------------------------------
-   if ((config::internal::output_atoms_config == true) && (sim::output_rate_counter % config::internal::output_atoms_config_rate == 0))
+   if ((config::internal::output_atoms_config == true) && (config::internal::output_atoms_config_continuous == true) && (sim::output_rate_counter % config::internal::output_atoms_config_rate == 0))
    {
 
       // If using GPU acceleration then synchonise spins from device
@@ -119,6 +119,19 @@ void output(){ // should include variables for data to be outputted, eg spins, c
             }
          }
       }
+   }
+   // Print only at the end of simulation
+   else if ((config::internal::output_atoms_config == true) && (config::internal::output_atoms_config_continuous == false) && (sim::time ==  sim::total_time))
+   {
+
+      // If using GPU acceleration then synchonise spins from device
+      gpu::config::synchronise();
+
+      config::internal::atoms_coords();
+      if(atoms::num_non_magnetic_atoms > 0) config::internal::atoms_non_magnetic();
+      config::internal::atoms(); // call function to output spins coords
+      config::internal::output_rate_counter_coords++; //update the counter
+
    }
 
    //------------------------------------------------------
