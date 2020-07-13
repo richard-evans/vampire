@@ -121,7 +121,7 @@ void output(){ // should include variables for data to be outputted, eg spins, c
       }
    }
    // Print only at the end of simulation
-   else if ((config::internal::output_atoms_config == true) && (config::internal::output_atoms_config_continuous == false) && (sim::time ==  sim::total_time))
+   else if ((config::internal::output_atoms_config == true) && (config::internal::output_atoms_config_continuous == false) && (sim::time ==  sim::total_time+sim::equilibration_time))
    {
 
       // If using GPU acceleration then synchonise spins from device
@@ -168,7 +168,8 @@ void output(){ // should include variables for data to be outputted, eg spins, c
          }
       }
    }
-   else if ((config::internal::output_cells_config == true) && (config::internal::output_cells_config_continuous == false) && (sim::time ==  sim::total_time))
+   // Print only at the end of simulation
+   else if ((config::internal::output_cells_config == true) && (config::internal::output_cells_config_continuous == false) && (sim::time ==  sim::total_time+sim::equilibration_time))
    {
 
    	config::internal::legacy_cells_coords();
