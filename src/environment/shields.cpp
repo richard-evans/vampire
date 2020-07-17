@@ -88,21 +88,20 @@ int in_shield(double x, double y, double z,int shield){
     double f2 = exp((-x+(xmax-xmin)-xmax)*0.01);
     double fmin = exp((xmin-xmax)*0.01);
     double fmax = exp((xmax-xmax)*0.01);
-    double g = zmin+(zmax-zmin)*(f-fmin)/(fmax-fmin);
-    double g2 = zmin+(zmax-zmin)*(f2-fmin)/(fmax-fmin);
+    double g;// = zmin+(zmax-zmin)*(f-fmin)/(fmax-fmin);
+    double g2;// = zmin+(zmax-zmin)*(f2-fmin)/(fmax-fmin);
+   if (x !=xmax){
+      g2 = -10*(zmax-zmin)/(x-xmax) + zmin;
+    }
+    else g2 = 100000;
 
-  //  if (x !=xmax){
-      g2 = -10*(zmax-zmin)*1/(x-xmax) + zmin;
-  //  }
-  //  else g2 = 100000;
-
-  //  if (x !=xmin){
-    g =  10*(zmax-zmin)*1/(x-xmin) + zmin;
-  //  }
-  //  else g = 1000000;
+    if (x !=xmin){
+    g =  10*(zmax-zmin)/(x-xmin) + zmin;
+    }
+    else g = 1000000;
 
 
-    //std::cout <<  g << '\t' << z << '\t' << zmax << std::endl;
+   // std::cout <<  g2 <<"\t" <<   z << "\t" << zmax << '\t' <<  zmin << "\t" << xmax << "\t" << x << std::endl;
 
      if(g < z && env::pos_or_neg[shield] == "pos" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
@@ -114,7 +113,7 @@ int in_shield(double x, double y, double z,int shield){
      else if( g2 < z && env::pos_or_neg[shield] == "neg" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
          z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){ //z <= zmax && x <= xmax && x >= xmin && z >= zmin) {
-      // std::cout << "pos" <<std::endl;
+   //    std::cout << "neg" <<std::endl;
   //    std::cout << x << '\t'  << z << '\t' <<g2 << '\t' << g << '\t' <<  std::endl;
 
       // std::cout << zmin << '\t' << zmax << "\t" << xmin << '\t' << xmax << '\t' << g2 << '\t' << g << '\t' << x << '\t'  << z << '\t' << std::endl;
@@ -531,7 +530,7 @@ int read_in_shield_info(){
       test="A";
       if(word==test){
         double g=atof(value.c_str());
-        vin::check_for_valid_positive_value(g, word, 1, "environment", unit, "exchange", 0, 1e19 ,"shield_geom","0 - 1e-19");
+        vin::check_for_valid_value(g, word, 1, "environment", unit, "exchange", 0, 1e19 ,"shield_geom","0 - 1e-19");
         env::shield_A[super_index-1][sub_index-1] = g;
         //std::cout << super_index << '\t' << sub_index << '\t' << g << std::endl;
       }
@@ -552,30 +551,31 @@ int read_in_shield_info(){
          env::shield_Hext_y[super_index] =u.at(1);
          env::shield_Hext_z[super_index] =u.at(2);
       }
-      // test="initial-spin-direction";
-      // if(word==test){
+      test="initial-spin-direction";
+      if(word==test){
       //    // first test for random spins
       //    test="random";
       //    if(value==test){
       //       env::random_spins[super_index]=true;
       //    }
       //    else{
-      //       // temporary storage container
-      //       std::vector<double> u(3);
-      //       // read values from string
-      //       u=vin::doubles_from_string(value);
-      //   //    vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-      //   //    vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-      //   //    vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-      //
-      //       // Copy sanitised unit vector to material
-      //       env::initial_spin_x[super_index]=u.at(0);
-      //       env::initial_spin_y[super_index]=u.at(1);
-      //       env::initial_spin_z[super_index]=u.at(2);
-      //
-      //       // ensure random spins is unset
-      //       env::random_spins[super_index]=false;
-      //    }
+            // temporary storage container
+            std::vector<double> u(3);
+            // read values from string
+            u=vin::doubles_from_string(value);
+            std::cout << super_index << '\t' << u.at(0) <<std::endl;
+          // vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+          // vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+          // vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+
+            // Copy sanitised unit vector to material
+            env::initial_spin_x[super_index-1]=u.at(0);
+            env::initial_spin_y[super_index-1]=u.at(1);
+            env::initial_spin_z[super_index-1]=u.at(2);
+
+            // ensure random spins is unset
+            env::random_spins[super_index-1]=false;
+         }
       //    // return
       //    return true;
       // }
