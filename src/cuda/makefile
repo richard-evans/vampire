@@ -41,7 +41,8 @@ CUDA_MATRIX_TYPE = CSR
 #CUDA_MATRIX_TYPE = DIA
 #CUDA_MATRIX_TYPE = ELL
 
-CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++11
+#CUDA_CFLAGS= -O3 -I./hdr/cusplibrary-0.5.1 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++11
+CUDA_CFLAGS= -O3 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++11
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
 	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS) $(CUDA_PR) -DCUDA_MATRIX=$(CUDA_MATRIX_TYPE)
