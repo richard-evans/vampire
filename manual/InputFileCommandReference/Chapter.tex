@@ -656,11 +656,16 @@ These options enable the output of spin configuration snapshots during the
 simulation. The configurations can then be visualised using povray or other
 software generated with the vampire data converter (vdc) utility.\\
 
-{\zicf config:atoms flag}\addcontentsline{toc}{subsection}{config:atoms} enables
-the output of atomic spin configurations.\\
+{\zicf config:atoms flag [default false]}\addcontentsline{toc}{subsection}{config:atoms} 
+enables the output of atomic spin configurations either at the end of the simulations or during the simulation. The options are:
+\begin{itemize}
+  \item[] config:atoms - to output continuously during the simulation
+  \item[] config:atoms=continuous - to output continuously during the simulation (same as previous option)
+  \item[] config:atoms=end - to output at the end of the simulation
+\end{itemize}
 
 {\zicf config:atoms-output-rate = int [0+, default 1000]}\addcontentsline{toc}{subsection}{config:atoms-output-rate}
-determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}.\\
+determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}. It is considered only if \textit{config:atoms=continuous} or is \textit{empty}.\\
 
 The following options allow a cubic slice of the total configuration data to
 be output to the configuration file. This is useful for reducing disk usage and
@@ -690,11 +695,16 @@ of the data slice to be outputted to the configuration file.\\
 determines the maximum z value (as a fraction of the total system dimensions)
 of the data slice to be outputted to the configuration file.\\
 
-{\zicf config:macro-cells}\addcontentsline{toc}{subsection}{config:macro-cells}
-enables the output of macro cell spin configurations.\\
+{\zicf config:macro-cells flag [default false]}\addcontentsline{toc}{subsection}{config:macro-cells}
+enables the output of macro cell spin configurations either at the end of the simulations or during the simulation. The options are:
+\begin{itemize}
+  \item[] config:macro-cells - to output continuously during the simulation
+  \item[] config:macro-cells=continuous - to output continuously during the simulation (same as previous option)
+  \item[] config:macro-cells=end - to output at the end of the simulation
+\end{itemize}
 
 {\zicf config:macro-cells-output-rate}\addcontentsline{toc}{subsection}{config:macro-cells-output-rate}\\
-determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}.\\
+determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}. It is considered only if \textit{config:macro-cells=continuous} or is \textit{empty}\\
 
 {\zicf config:output-format = exclusive string [default text]}\addcontentsline{toc}{subsection}{config:output-format}
 specifies the format of the configuration data. Available options are:
