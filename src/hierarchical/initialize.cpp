@@ -187,8 +187,6 @@ void initialize(const double system_dimensions_x,
    // restart the timer
    timer.start();
 
-   #ifdef MPICF
-
       // all processors wait here before starting the timer
       vmpi::barrier();
 
@@ -198,7 +196,7 @@ void initialize(const double system_dimensions_x,
       std::vector< std::vector<double> > atoms_in_cells_array; // 2D list of [cell][atom] for local cells needed for computing dipole tensor
       std::vector<int> list_of_atoms_with_cells; // list of cell IDs to enable parsing of atomistic data
 
-      // distribute atomistic data to enable tensor dipole calculation
+      // distribute atomistic data to enable hierarchical dipole calculation
       dipole::internal::initialise_atomistic_cell_data(cells_num_cells,
                                                        cells_num_local_cells,
                                                        real_cutoff,                     // cutoff range for dipole tensor construction (Angstroms)
@@ -214,8 +212,6 @@ void initialize(const double system_dimensions_x,
                                                        list_of_atoms_with_cells,        // 2D list of [cell][atom] for local cells needed for computing dipole tensor (output)
                                                        atoms_in_cells_array             // list of cell IDs to enable parsing of atomistic data (output)
                                                       );
-
-   #endif
 
    // Assign updated value of cells_num_atoms_in_cell to dipole::dipole_cells_num_atoms_in_cell. It is needed to print the config file. The actual value cells::num_atoms_in_cell is not changed instead
    dipole::dipole_cells_num_atoms_in_cell = cells_num_atoms_in_cell;

@@ -56,7 +56,6 @@ namespace dipole{
          //------------------------------------------------------
          // Collate atom coordinates for local cells
          //------------------------------------------------------
-         #ifdef MPICF
 
             // all processors wait here before starting the timer
             vmpi::barrier();
@@ -83,8 +82,6 @@ namespace dipole{
                                            list_of_atoms_with_cells,        // 2D list of [cell][atom] for local cells needed for computing dipole tensor (output)
                                            atoms_in_cells_array             // list of cell IDs to enable parsing of atomistic data (output)
                                           );
-
-         #endif
 
          // Assign updated value of cells_num_atoms_in_cell to dipole::dipole_cells_num_atoms_in_cell. It is needed to print the config file. The actual value cells::num_atoms_in_cell is not changed instead
          dipole::dipole_cells_num_atoms_in_cell = cells_num_atoms_in_cell;

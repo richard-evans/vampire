@@ -46,7 +46,7 @@ namespace internal{
          std::vector< std::vector<double> >& atoms_in_cells_array     // output array of positions and moments of atoms in cells
       ){
 
-         //return;
+         #ifdef MPICF
          // print informative message to user
          std::cout << "Transferring atomistic data for parallel dipole initialisation " << std::flush;
          zlog << zTs() << "Transferring atomistic data for parallel dipole initialisation" << std::endl;
@@ -241,7 +241,6 @@ namespace internal{
          std::vector<int> num_cells_to_recv( vmpi::num_processors );
 
          // exchange send and receive counts
-         //MPI_Alltoall(const void* sendbuf, int sendcount, MPI_Datatype sendtype, void* recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm)
          #ifdef MPICF
             MPI_Alltoall(&num_atoms_to_send[0], 1, MPI_INT, &num_atoms_to_recv[0], 1, MPI_INT, MPI_COMM_WORLD);
             MPI_Alltoall(&num_cells_to_send[0], 1, MPI_INT, &num_cells_to_recv[0], 1, MPI_INT, MPI_COMM_WORLD);
@@ -314,6 +313,7 @@ namespace internal{
 
          // send receive all data asynchronously
          {
+
             // array of MPI requests
             std::vector<MPI_Request> requests(0);
 
@@ -875,6 +875,29 @@ namespace internal{
 
          std::cout << "done! [ " << timer.elapsed_time() << " s ]" << std::endl;
          zlog << zTs() << "Transfer of atomistic data for dipole calculation complete. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+
+         #else
+
+            // loop over all cell identifying all cells with atoms
+            for(int cell=0; cell<num_cells; cell++){
+               if(global_atoms_in_cell_count[cell] > 0){
+                  // add cell with > 0 atoms to list
+                  list_of_cells_with_atoms.push_back(cell);
+                  atoms_in_cells_array.push_back(std::vector<double>());
+                  const int last_cell_index = atoms_in_cells_array.size()-1;
+                  atoms_in_cells_array[last_cell_index].reserve(4*global_atoms_in_cell_count[cell]);
+                  // loop over all atoms in cell and add to condensed list
+                  for(int atom_index = 0; atom_index < global_atoms_in_cell_count[cell]; atom_index++){
+                     const int atom = index_atoms_array[cell][atom_index];
+                     atoms_in_cells_array[last_cell_index].push_back(atoms_coords_x[atom]);
+                     atoms_in_cells_array[last_cell_index].push_back(atoms_coords_y[atom]);
+                     atoms_in_cells_array[last_cell_index].push_back(atoms_coords_z[atom]);
+                     atoms_in_cells_array[last_cell_index].push_back(atoms_moments [atom]);
+                  }
+               }
+            }
+
+         #endif
 
          return;
 
