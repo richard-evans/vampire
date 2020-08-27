@@ -154,7 +154,7 @@ namespace environment{
       test="damping-constant";
       if(word==test){
          double a=atof(value.c_str());
-         vin::check_for_valid_positive_value(a, word, line, prefix, unit, "none", 0,1,"input","0- 1");
+         vin::check_for_valid_value(a, word, line, prefix, unit, "none", 0,1,"input","0- 1");
          env::alpha =a;
          return true;
       }

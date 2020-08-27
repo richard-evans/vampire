@@ -434,9 +434,10 @@ namespace environment{
              //    env::z_mag_array[cell] = m_e*mtrandom::gaussian()*env::Ms[cell];
              //  }
              //  else{
-                env::x_mag_array[cell] = 1.0*env::Ms[cell];//env::initial_spin_x[shield]*env::Ms[cell];
-                env::y_mag_array[cell] = 0.0*env::Ms[cell];//env::initial_spin_y[shield]*env::Ms[cell];
-                env::z_mag_array[cell] = 0.0*env::Ms[cell];//env::initial_spin_z[shield]*env::Ms[cell];
+
+                env::x_mag_array[cell] = env::initial_spin_x[shield]*env::Ms[cell];
+                env::y_mag_array[cell] = env::initial_spin_y[shield]*env::Ms[cell];
+                env::z_mag_array[cell] = env::initial_spin_z[shield]*env::Ms[cell];
             //    std::cout << env::x_mag_array[cell] << "\t" << env::Ms[cell] <<  std::endl;
              // }
           }
