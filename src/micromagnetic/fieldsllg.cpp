@@ -99,7 +99,6 @@ namespace micromagnetic{
 
               }
            }
-           // std::cout << mat << '\t' << matj << "\t" << mp::material[mat].override_atomsitic[matj] << std::endl;
 
            if (mp::material[mat].override_atomsitic[matj] == true){
              //double Area = cells::macro_cell_size*cells::macro_cell_size;
@@ -117,7 +116,6 @@ namespace micromagnetic{
 
       }
 
-      std::cout << "FIELD"  <<std::endl;
 
       //calcualtes thesigma values
       double sigma_para = sqrt(2*kB*temperature*alpha_para[cell]/(ms[cell]*mp::dt));
@@ -140,7 +138,7 @@ namespace micromagnetic{
         spin_field[1] = spin_field[1] + bias_field_y[cell];
         spin_field[2] = spin_field[2] + bias_field_z[cell];
       }
-      
+
       if (environment::enabled){
          spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
          spin_field[1] = spin_field[1] + environment::environment_field_y[cell];

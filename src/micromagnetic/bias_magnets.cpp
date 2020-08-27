@@ -46,9 +46,6 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
 
   double y_pos_1 = - y_size/2 - bias_magnets_gap;
   double y_pos_2 =   y_size/2 + system_dimensions_x + bias_magnets_gap;
-//
-
-//  std::cout << y_pos_1 << '\t' << y_pos_2 << '\t' << x_pos << '\t' << z_pos << std::endl;
 
    double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
@@ -119,16 +116,11 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
               }
            }
        }
-   //     std::cout << cell << '\t' << shield << '\t' <<  bias_field_x[cell] << '\t' << By*prefactor << std::endl;
-
-      // std::cout << shield << '\t' << cell << '\t' << Bx << "\t" << By << '\t' << Bz <<  '\t' << prefactor << std::endl;
        bias_field_x[cell] = bias_field_x[cell] + By*prefactor;
        bias_field_y[cell] = bias_field_y[cell] + Bx*prefactor;
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
-   //    std::cout << cell << '\t' << shield << '\t' <<  bias_field_x[cell] << '\t' << By*prefactor << std::endl;
 
      }
-     std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t'  << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<  "\t" << z_cell << std::endl;
 
   }
 return 0;

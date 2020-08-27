@@ -41,7 +41,6 @@ namespace micromagnetic {
             N[cell]++;
          }
          for (int cell = 0; cell < num_cells; cell++)
-        // std::cout << N[cell] << '\t' << ms[cell]/cells::volume_array[cell] << std::endl;
          //std::cin.get();
          #ifdef MPICF
             MPI_Allreduce(MPI_IN_PLACE, &ms[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
