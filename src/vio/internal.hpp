@@ -116,12 +116,15 @@ namespace vout{
    void mean_material_specific_heat(std::ostream& stream,bool header);
    void material_total_energy(std::ostream& stream,bool header);
    void material_mean_total_energy(std::ostream& stream,bool header);
+   void MRresistance(std::ostream& stream, bool header);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp
    //-------------------------------------------------------------------------
    void data();
    void zLogTsInit(std::string tmp);
+
+
 
 }
 

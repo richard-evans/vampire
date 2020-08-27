@@ -184,6 +184,9 @@ int create(){
       vmpi::num_core_atoms = atoms::num_atoms;
    #endif
 
+   // set the number of local atoms on process (all atoms in serial)
+   vmpi::num_local_atoms = num_local_atoms;
+
 	// Set grain and cell variables for simulation
 	grains::set_properties();
    cells::initialize(cs::system_dimensions[0],

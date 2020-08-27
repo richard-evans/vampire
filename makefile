@@ -12,13 +12,19 @@ export OMPI_CXX=g++ -std=c++0x
 # Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
+
+# Include the FFTW library by uncommenting the -DFFT (off by default)
+export incFFT= #-DFFT
+
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
-LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-MPICC=mpicxx -DMPICF
+ICC=icc -DCOMP='"Intel C++ Compiler"' $(incFFT)
+GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' $(incFFT)
+LLVM=g++ -DCOMP='"LLVM C++ Compiler"' $(incFFT)
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' $(incFFT)
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' $(incFFT)
+MPICC=mpicxx -DMPICF $(incFFT)
+
+LIBS=-lstdc++ -lm -lfftw3 -L/opt/local/lib/
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
@@ -27,7 +33,7 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=
+
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 
 # Debug Flags
@@ -130,9 +136,11 @@ include src/constants/makefile
 include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
+include src/hierarchical/makefile
 include src/ltmp/makefile
 include src/main/makefile
 include src/montecarlo/makefile
+include src/micromagnetic/makefile
 include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
@@ -140,6 +148,7 @@ include src/simulate/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
+include src/environment/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile

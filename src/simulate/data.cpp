@@ -20,6 +20,33 @@ namespace sim{
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
 
+   std::vector < double > track_field_x;
+   std::vector < double > track_field_y;
+   std::vector < double > track_field_z;
+
+   double track_Ms = 0.1;
+   double track_bit_width = 800;
+   double track_bit_size = 1000;
+   double track_bit_depth = 600;
+   double cross_track_velocity = 0.0;
+   double down_track_velocity = 0.0;
+
+   double initial_down_track_position = 0.0;
+   double initial_cross_track_position = 0.0;
+
+   int track_num_bits_per_track = 1;
+   int track_num_tracks = 1;
+
+   double track_bit_gap = 10.0;
+	 double track_track_gap = 10.0;
+
+   // distance of tracks from read head
+   double track_fly_height = 100.0; // Angstroms
+
+   double LFA_scan_field_step = 0.01;
+
+   bool track_ms_file = false;
+
    int num_monte_carlo_preconditioning_steps(0);
 
    uint64_t time         = 0; // time step counter

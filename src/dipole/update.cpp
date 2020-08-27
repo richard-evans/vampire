@@ -22,6 +22,7 @@
 #include "vio.hpp"
 #include "vmpi.hpp"
 #include "cells.hpp"
+#include "sim.hpp"
 #include "errors.hpp"
 
 // dipole module headers
@@ -80,6 +81,7 @@ namespace dipole{
          		   const double mx = cells::mag_array_x[j]*imuB;
          		   const double my = cells::mag_array_y[j]*imuB;
          		   const double mz = cells::mag_array_z[j]*imuB;
+					//	if (i == 0)std::cout<< i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
 
              		dipole::cells_field_array_x[i]+=(mx*internal::rij_tensor_xx[lc][j] + my*internal::rij_tensor_xy[lc][j] + mz*internal::rij_tensor_xz[lc][j]);
              		dipole::cells_field_array_y[i]+=(mx*internal::rij_tensor_xy[lc][j] + my*internal::rij_tensor_yy[lc][j] + mz*internal::rij_tensor_yz[lc][j]);
@@ -95,7 +97,10 @@ namespace dipole{
             dipole::cells_field_array_x[i] = dipole::cells_field_array_x[i] * 9.27400915e-01;
             dipole::cells_field_array_y[i] = dipole::cells_field_array_y[i] * 9.27400915e-01;
             dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.27400915e-01;
-            // Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
+			 	//dp_fields << sim::time << '\t' << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] << '\t' << std::endl;
+				//dp_fields <<sim::time << "\t" <<  dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i]  << "\t" << cells::pos_and_mom_array[4*i+0] << '\t' << cells_pos_and_mom_array[4*i+1] << '\t' << cells_pos_and_mom_array[4*i+2] << std::endl;
+
+				// Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
             // of magnetisation and volume in angstrom
             dipole::cells_mu0Hd_field_array_x[i] = dipole::cells_mu0Hd_field_array_x[i] * 9.27400915e-01;
             dipole::cells_mu0Hd_field_array_y[i] = dipole::cells_mu0Hd_field_array_y[i] * 9.27400915e-01;

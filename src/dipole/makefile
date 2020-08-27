@@ -8,6 +8,8 @@ atomistic.o \
 data.o \
 energy.o \
 field.o \
+fft_update.o \
+info.o \
 initialize.o \
 interface.o \
 inter.o \
@@ -15,6 +17,7 @@ intra.o \
 macrocell.o \
 memory.o \
 mpi.o \
+mpi2.o \
 output_atomistic_field.o \
 tensor.o \
 update.o

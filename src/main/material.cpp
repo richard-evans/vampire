@@ -68,6 +68,14 @@ materials_t::materials_t ():
 		geometry_coords[i][0]=0.0;
 		geometry_coords[i][1]=0.0;
 	}
+
+	SAF.resize(mp::max_materials);
+	enable_SAF = false;
+	// array variables
+
+ 	EF_MM.resize(mp::max_materials);
+ 	override_atomsitic.resize(mp::max_materials);
+
 	// array variables
    Jij_matrix_SI.resize(mp::max_materials);
    Jij_matrix.resize(mp::max_materials);
@@ -86,6 +94,8 @@ materials_t::materials_t ():
 	applied_field_unit_vector.at(1)=0.0;
 	applied_field_unit_vector.at(2)=1.0;
 
+	pinning_field_unit_vector.resize(3,0.0);
+	
 	// FMR field direction default initialisation
 	fmr_field_unit_vector.at(0)=0.0;
 	fmr_field_unit_vector.at(1)=0.0;

@@ -76,7 +76,7 @@ namespace program{
          stats::num_atoms = atoms::num_atoms;
       #endif
 
-      std::cerr << "A" << stats::num_atoms << "\t" << grains::num_grains << std::endl;
+      //std::cerr << "A" << stats::num_atoms << "\t" << grains::num_grains << std::endl;
 
       //Calculates how many atoms are in the top layer of each sublattice in each grain.
       for (int atom = 0; atom < stats::num_atoms; atom++){
@@ -84,7 +84,7 @@ namespace program{
          for (int neighbour = atoms::neighbour_list_start_index[atom]; neighbour < atoms::neighbour_list_end_index[atom]; neighbour ++){
             // explain what if statement is testing - yes Sarah...
             //std::cout << atom << "\t" << neighbour <<atoms::type_array[atom] << '\t' << atoms::type_array[atoms::neighbour_list_array[neighbour]] << std::endl;
-            if ((atoms::type_array[atom] >3) && (atoms::type_array[atoms::neighbour_list_array[neighbour]] < 4)){
+            if ((atoms::type_array[atom] >3) && atoms::type_array[atom] != 8 && (atoms::type_array[atoms::neighbour_list_array[neighbour]] < 4) && atoms::type_array[atoms::neighbour_list_array[neighbour]] != 8){
                //         std::cerr << atoms::grain_array[atom] << "\t"<< atoms::type_array[atoms::neighbour_list_array[neighbour]] << "\t" << atoms::type_array[atom] <<endl;
                No_in_Sublattice[atoms::type_array[atoms::neighbour_list_array[neighbour]]][atoms::grain_array[atom]]++;
                // cerr << No_in_Sublattice[atoms::type_array[atoms::neighbour_list_array[neighbour]]][atoms::grain_array[atom]]<<endl;
@@ -101,13 +101,13 @@ namespace program{
          }
 
       }
-      std::cerr << "before" << Local_Sub[0] << '\t' << Local_Sub[1] << '\t' << Local_Sub[2] << '\t' << Local_Sub[3] << std::endl;
+   //   std::cerr << "before" << Local_Sub[0] << '\t' << Local_Sub[1] << '\t' << Local_Sub[2] << '\t' << Local_Sub[3] << std::endl;
 
       #ifdef MPICF
          MPI_Allreduce(MPI_IN_PLACE, &Local_Sub[0],grains::num_grains*4,MPI_INT,MPI_SUM, MPI_COMM_WORLD);
       #endif
 
-      std::cerr<< "after" << Local_Sub[0] << '\t' << Local_Sub[1] << '\t' << Local_Sub[2] << '\t' << Local_Sub[3] << std::endl;
+      //std::cerr<< "after" << Local_Sub[0] << '\t' << Local_Sub[1] << '\t' << Local_Sub[2] << '\t' << Local_Sub[3] << std::endl;
 
       int l =0;
 
@@ -162,8 +162,8 @@ namespace program{
             }
          }
       }
-      
-      std::cout << "a" <<std::endl;
+
+
       for (int i = 0; i <stats::num_atoms; i++){
          //	std::cout << atoms::type_array[i] << "\t" << atoms::z_spin_array[i] <<std::endl;
          if(atoms::type_array[i] > 3){
