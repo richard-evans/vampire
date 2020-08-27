@@ -180,7 +180,9 @@ int LLB( std::vector <int>& local_cell_array,
       x_array[cell] = x_mag_array[cell]*ims;
       y_array[cell] = y_mag_array[cell]*ims;
       z_array[cell] = z_mag_array[cell]*ims;
+			std::cout <<cells::volume_array[cell] << '\t' <<  mm::ms[cell] << '\t'<< cells::volume_array[cell] * mm::ms[cell] << '\t' <<  x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << "\t" << std::endl;
    }
+	 std::cin.get();
 
    //save this new m as the initial value, so it can be saved and used in the final equation.
    for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
