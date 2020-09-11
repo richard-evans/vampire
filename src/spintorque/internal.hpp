@@ -66,7 +66,6 @@ namespace st{
       extern std::vector<double> coeff_nast;
 
       extern std::vector<double> cell_natom;
-      extern std::vector<double> cell_mus;
 
 
       // three-vector arrays
