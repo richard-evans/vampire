@@ -81,7 +81,6 @@ namespace micromagnetic{
             int cell = cell_array[atom];
             int mat = type_array[atom];
             ku[cell] = ku[cell] - anisotropy::internal::mp[mat].ku2;//mp::material[mat].Ku1_SI; //need to add a function here to access anisotropy module
-          //  std::cout << anisotropy::internal::mp[mat].ku_vector[0] << '\t' << anisotropy::internal::mp[mat].ku_vector[1] << '\t' << anisotropy::internal::mp[mat].ku_vector[2] << '\t' << anisotropy::internal::mp[mat].ku2 << std::endl;
             ku_x[cell] = ku_x[cell] + anisotropy::internal::mp[mat].ku_vector[0];
             ku_y[cell] = ku_y[cell] + anisotropy::internal::mp[mat].ku_vector[1];
             ku_z[cell] = ku_z[cell] + anisotropy::internal::mp[mat].ku_vector[2];
@@ -114,7 +113,7 @@ namespace micromagnetic{
            e2[cell][0] =e2[cell][0]/normal;
            e2[cell][1] =e2[cell][1]/normal;
            e2[cell][2] =e2[cell][2]/normal;
-          // std::cout << RN[0] << '\t' << RN[1] << '\t' << RN[2] << '\t' << ku_uv[cell][0] << '\t' << ku_uv[cell][1] << '\t' << ku_uv[cell][2] << '\t' << e1[cell][0] << '\t' << e1[cell][1] << '\t' << e1[cell][2] << '\t' << e2[cell][0] << '\t' << e2[cell][1] << '\t' << e2[cell][2] << '\t' << std::endl;
+           
            ku_x[cell] = ku[cell] * sqrt(e1[cell][0]*e1[cell][0] + e2[cell][0]*e2[cell][0]);
            ku_y[cell] = ku[cell] * sqrt(e1[cell][1]*e1[cell][1] + e2[cell][1]*e2[cell][1]);
            ku_z[cell] = ku[cell] * sqrt(e1[cell][2]*e1[cell][2] + e2[cell][2]*e2[cell][2]);

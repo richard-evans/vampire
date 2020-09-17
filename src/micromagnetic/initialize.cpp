@@ -110,7 +110,7 @@ void initialize(int num_local_cells,
    if (discretisation_type == 1){
       for (int lc = 0; lc < num_local_cells; lc++){
          int cell = local_cell_array[lc];
-         std::cout <<x_coord_array[cell] << '\t' <<y_coord_array[cell] << '\t' <<z_coord_array[cell] << '\t' <<  mm::ms[cell] << std::endl;
+      //   std::cout <<x_coord_array[cell] << '\t' <<y_coord_array[cell] << '\t' <<z_coord_array[cell] << '\t' <<  mm::ms[cell] << std::endl;
          if (mm::Tc[cell] < 0) {
             discretisation_type = 2;
          }

@@ -116,17 +116,14 @@ namespace micromagnetic{
          int end = mm::fields_neighbouring_atoms_end[i];
          sim::calculate_spin_fields(begin,end);								//calls the function from the usual atomsitic vampire
          sim::calculate_external_fields(begin,end);						//external fields on each atom from the atomistic vampire.
-    ///     std::cout << "begin:\t" << begin << '\t' <<  "end:\t" << end << '\t' << std::endl;
       }
 
 //std::cin.get();
 
       //Calculate Euler gradients
       for(int atom_list=0;atom_list<number_of_atomistic_atoms;atom_list++){
-//        std::cout << number_of_atomistic_atoms << std::endl;
          //calcualtes the atom if from the atom list
          int atom = list_of_atomistic_atoms[atom_list];
-//         std::cout << atom << std::endl;
          //sets the material for each atom
          const int imaterial=atoms::type_array[atom];
 
@@ -139,7 +136,6 @@ namespace micromagnetic{
          const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom],
             atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom],
             atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]};
-          //     std::cout << H[0] << '\t' << H[1] << '\t' << H[2] <<"\t" << S[0] << '\t' << S[1] << '\t' << S[2] <<  std::endl;
             // Calculate Delta S
             xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
             xyz[1]=(one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
@@ -170,7 +166,6 @@ namespace micromagnetic{
          // Copy new spins to spin array
          //Calculate Euler gradients
          for(int atom_list=0;atom_list<number_of_atomistic_atoms;atom_list++){
-   //        std::cout << number_of_atomistic_atoms << std::endl;
             //calcualtes the atom if from the atom list
             int atom = list_of_atomistic_atoms[atom_list];
        		atoms::x_spin_array[atom]=x_spin_storage_array[atom];
@@ -204,7 +199,6 @@ namespace micromagnetic{
             const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom] + mp::material[imaterial].pinning_field_unit_vector[0],
                atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom] + mp::material[imaterial].pinning_field_unit_vector[1],
                atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom] + mp::material[imaterial].pinning_field_unit_vector[2]};
-            //   std::cout << H[0] << '\t' << H[1] << '\t' << H[2]<<"\t" << S[0] << '\t' << S[1] << '\t' << S[2] << std::endl;
 
                // Calculate Delta S
                xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
