@@ -31,7 +31,9 @@ namespace environment{
    std::vector < double > environment_field_x;
    std::vector < double > environment_field_y;
    std::vector < double > environment_field_z;
-
+   std::vector < double > atomistic_environment_field_x;
+   std::vector < double > atomistic_environment_field_y;
+   std::vector < double > atomistic_environment_field_z;
    std::vector < double > atomic_field_x;
    std::vector < double > atomic_field_y;
    std::vector < double > atomic_field_z;

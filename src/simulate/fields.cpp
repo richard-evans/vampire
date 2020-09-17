@@ -36,6 +36,7 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
+#include "environment.hpp"
 #include "dipole.hpp"
 #include "ltmp.hpp"
 #include "random.hpp"
@@ -250,6 +251,15 @@ int calculate_applied_fields(const int start_index,const int end_index){
 			//		std::cout << atom << '\t' << micromagnetic::atomistic_bias_field_x[atom] << '\t' << std::endl;
 				}
 	}
+	if(environment::enabled == true){
+		for(int atom=start_index;atom<end_index;atom++){
+			atoms::x_total_external_field_array[atom] += environment::atomistic_environment_field_x[atom];
+			atoms::y_total_external_field_array[atom] += environment::atomistic_environment_field_y[atom];
+			atoms::z_total_external_field_array[atom] += environment::atomistic_environment_field_z[atom];
+	//		std::cout << atom << '\t' << micromagnetic::atomistic_bias_field_x[atom] << '\t' << std::endl;
+		}
+	}
+
 
 	return 0;
 

@@ -15,8 +15,10 @@
 // micromagnetic module headers
 #include "internal.hpp"
 #include "sim.hpp"
+#include "atoms.hpp"
 #include <math.h>
 #include "cells.hpp"
+#include "vio.hpp"
 #ifdef FFT
 #include <fftw3.h>
 #endif
@@ -273,6 +275,13 @@ namespace environment{
 
       int calculate_demag_fields(){
 
+         // For MPI version, only add local atoms
+          #ifdef MPICF
+             int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+          #else
+             int num_local_atoms = atoms::num_atoms;
+          #endif
+
         int interaction_no = 0;
            const double imuB = 1.0/9.27400915e-24;
 
@@ -478,9 +487,13 @@ namespace environment{
          //   std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
 
          }
-      //   std::cin.get();
-//    //      //end the FFT only compilation
-//          #endif
+         for (int atom =0; atom < num_local_atoms; atom++){
+            int cell = cells::atom_cell_id_array[atom];
+            atomistic_environment_field_x[atom] = environment_field_x[cell];
+            atomistic_environment_field_y[atom] = environment_field_y[cell];
+            atomistic_environment_field_z[atom] = environment_field_z[cell];
+         }
+
          return 0;
 
       }

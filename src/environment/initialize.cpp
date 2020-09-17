@@ -22,6 +22,7 @@
 // environment module headers
 #include "internal.hpp"
 #include "sim.hpp"
+#include "atoms.hpp"
 #include "cells.hpp"
 #include "vmpi.hpp"
 
@@ -335,9 +336,19 @@ namespace environment{
 
        env::env_cell_is_in_atomistic_region.resize(env::num_cells,0);
 
+       // For MPI version, only add local atoms
+        #ifdef MPICF
+           int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+        #else
+           int num_local_atoms = atoms::num_atoms;
+        #endif
+
        environment_field_x.resize(cells::num_cells,0.0);
        environment_field_y.resize(cells::num_cells,0.0);
        environment_field_z.resize(cells::num_cells,0.0);
+       atomistic_environment_field_x.resize(num_local_atoms,0.0);
+       atomistic_environment_field_y.resize(num_local_atoms,0.0);
+       atomistic_environment_field_z.resize(num_local_atoms,0.0);
 
     //   std::cin.get();
 
