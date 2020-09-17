@@ -49,6 +49,7 @@
 #include "program.hpp"
 #include "cells.hpp"
 #include "../cells/internal.hpp"
+#include "../micromagnetic/internal.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
@@ -300,8 +301,7 @@ int run(){
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
-
-	if (micromagnetic::discretisation_type > 0)
+	if (micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets == true)
 	micromagnetic::initialize(cells::num_local_cells,
 									  cells::num_cells,
 									  stats::num_atoms,

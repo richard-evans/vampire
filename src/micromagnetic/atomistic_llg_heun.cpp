@@ -238,9 +238,9 @@ namespace micromagnetic{
                atoms::y_spin_array[atom]=S_new[1];
                atoms::z_spin_array[atom]=S_new[2];
             }
+            if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1)  micromagnetic::MR_resistance = mm::calculate_resistance();
 
             return EXIT_SUCCESS;
          }
-
 
       }

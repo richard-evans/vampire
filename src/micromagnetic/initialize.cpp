@@ -54,6 +54,7 @@ void initialize(int num_local_cells,
                 double system_dimensions_z,
                 std::vector<int> local_cell_array){
 
+   if (micromagnetic::discretisation_type != 0){
    // Output informative message to user
    std::cout << "Initialising micromagnetic module" << std::endl;
 
@@ -89,9 +90,7 @@ void initialize(int num_local_cells,
    mm::pinning_field_y.resize(num_cells,0.0);
    mm::pinning_field_z.resize(num_cells,0.0);
    mm::cell_material_array.resize(num_cells,0.0);
-   mm::bias_field_x.resize(num_cells,0.0);
-   mm::bias_field_y.resize(num_cells,0.0);
-   mm::bias_field_z.resize(num_cells,0.0);
+
 
    // These functions vectors with the parameters calcualted from the function
    mm::ms =                   mm::calculate_ms(num_local_cells,num_atoms,num_cells, cell_array, type_array,material,local_cell_array);
@@ -332,14 +331,30 @@ void initialize(int num_local_cells,
          }
       }
    }
-
+   }
    //--------------------------------------------------------------------------------------------------
    // Initialise bias magnets
    //--------------------------------------------------------------------------------------------------
    if(mm::bias_magnets == true){
+      mm::bias_field_x.resize(num_cells,0.0);
+      mm::bias_field_y.resize(num_cells,0.0);
+      mm::bias_field_z.resize(num_cells,0.0);
+      atomistic_bias_field_x.resize(num_atoms,0.0);
+      atomistic_bias_field_y.resize(num_atoms,0.0);
+      atomistic_bias_field_z.resize(num_atoms,0.0);
       mm::calculate_bias_magnets(system_dimensions_x,system_dimensions_y,system_dimensions_z);
-   }
+      //std::cin.get();
+      for (int atom =0; atom < num_atoms; atom++){
+         int cell = cell_array[atom];
+         //std::cout << atom << '\t' << cell << '\t' <<  mm::bias_field_x[cell] << '\t' << atomistic_bias_field_x[atom] << std::endl;
+         atomistic_bias_field_x[atom] = mm::bias_field_x[cell];
+         atomistic_bias_field_y[atom] = mm::bias_field_y[cell];
+         atomistic_bias_field_z[atom] = mm::bias_field_z[cell];
+      //   std::cout << atom << '\t' << cell << '\t' <<  mm::bias_field_x[cell] << '\t' << atomistic_bias_field_x[atom] << std::endl;
+      }
 
+   }
+      //std::cin.get();
    return;
 
 }

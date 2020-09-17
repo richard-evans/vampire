@@ -43,6 +43,7 @@
 #include "spintorque.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
+#include "../micromagnetic/internal.hpp"
 
 // sim module header
 #include "internal.hpp"
@@ -239,6 +240,15 @@ int calculate_applied_fields(const int start_index,const int end_index){
 			atoms::y_total_external_field_array[atom] += HD[1];
 			atoms::z_total_external_field_array[atom] += HD[2];
 		}
+	}
+
+	if(micromagnetic::internal::bias_magnets == true){
+				for(int atom=start_index;atom<end_index;atom++){
+					atoms::x_total_external_field_array[atom] += micromagnetic::atomistic_bias_field_x[atom];
+					atoms::y_total_external_field_array[atom] += micromagnetic::atomistic_bias_field_y[atom];
+					atoms::z_total_external_field_array[atom] += micromagnetic::atomistic_bias_field_z[atom];
+			//		std::cout << atom << '\t' << micromagnetic::atomistic_bias_field_x[atom] << '\t' << std::endl;
+				}
 	}
 
 	return 0;
