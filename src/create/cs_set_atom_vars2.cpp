@@ -10,26 +10,20 @@
 //------------------------------------------------------------------------------
 //
 
-// C++ standard library headers
-#include <iostream>
-#include <vector>
-
 // VAMPIRE headers
 #include "anisotropy.hpp"
 #include "atoms.hpp"
 #include "cells.hpp"
-#include "create.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
-#include "grains.hpp"
-#include "material.hpp"
 #include "neighbours.hpp"
 #include "random.hpp"
-#include "sim.hpp"
-#include "stats.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+
+// Add internal module header file
+#include "internal.hpp"
 
 namespace create{
 namespace internal{
@@ -89,7 +83,7 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 
    // Set custom RNG for spin initialisation
    MTRand random_spin_rng;
-   random_spin_rng.seed(vmpi::parallel_rng_seed(123456));
+   random_spin_rng.seed(vmpi::parallel_rng_seed(create::internal::spin_init_seed));
 
 	for(int atom=0;atom<atoms::num_atoms;atom++){
 

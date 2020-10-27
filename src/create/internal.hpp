@@ -105,6 +105,7 @@ namespace create{
       extern int grain_seed;  // random seed to control grain structure generation
       extern int dilute_seed; // random seed to control dilution of atoms
       extern int mixing_seed; // random seed to control intermixing of atoms
+      extern int spin_init_seed; // random seed to control ranomised spin directions
 
       extern double faceted_particle_100_radius; // 100 facet radius
       extern double faceted_particle_110_radius; // 110 facet radius
