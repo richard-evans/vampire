@@ -120,6 +120,22 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      test = "second-order-triaxial-anisotropy-vector";
+      if( word == test ){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         //vin::check_for_valid_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku_vectoral_vector_x[super_index] = u[0];
+         internal::ku_vectoral_vector_y[super_index] = u[1];
+         internal::ku_vectoral_vector_z[super_index] = u[2];
+         internal::enable_vectoral_anisotropy = true;
+         return true;
+      }
+
       test = "fourth-order-uniaxial-anisotropy-constant";
       if( word == test ){
          double ku4 = atof(value.c_str());

@@ -1,4 +1,4 @@
-#--------------------------------------------------------------
+#---#--------------------------------------------------------------
 #          Makefile for anisotropy module
 #--------------------------------------------------------------
 
@@ -19,7 +19,8 @@ lattice.o \
 neel.o \
 uniaxial_second_order.o \
 uniaxial_fourth_order.o \
-uniaxial_sixth_order.o
+uniaxial_sixth_order.o \
+vectoral_second_order.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/anisotropy/,$(anisotropy_objects))

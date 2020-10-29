@@ -59,6 +59,13 @@ namespace anisotropy{
       // unrolled arrays for storing easy axes for each material
       std::vector<evec_t> ku_vector(0); // 001 easy axis direction
 
+      std::vector<double> ku_vectoral_vector_x(100,0); // unit vector defining axis for uniaxial anisotropy
+      std::vector<double> ku_vectoral_vector_y(100,0); // unit vector defining axis for uniaxial anisotropy
+      std::vector<double> ku_vectoral_vector_z(100,0); // unit vector defining axis for uniaxial aniso
+
+
+      bool enable_vectoral_anisotropy = false;
+
       bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
    	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
       double nearest_neighbour_distance      = 1.e9; // Control surface anisotropy nearest neighbour distance

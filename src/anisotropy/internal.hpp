@@ -194,6 +194,11 @@ namespace anisotropy{
       extern double neel_exponential_range;          // r0 value for range dependence of Neel anisotropy
       extern double neel_exponential_factor;         // F value for range dependence of Neel anisotropy
 
+      extern bool enable_vectoral_anisotropy;
+      extern std::vector<double> ku_vectoral_vector_x; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku_vectoral_vector_y; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku_vectoral_vector_z; // unit vector defining axis for uniaxial anisotropy
+
       // arrays for storing unrolled parameters for lattice anisotropy
       extern std::vector<double> klattice_array; // anisoptropy constant
 
@@ -209,6 +214,16 @@ namespace anisotropy{
                                         std::vector<double>& field_array_z,
                                         const int start_index,
                                         const int end_index);
+
+       void vectoral_second_order_fields(std::vector<double>& spin_array_x,
+                                         std::vector<double>& spin_array_y,
+                                         std::vector<double>& spin_array_z,
+                                         std::vector<int>&    atom_material_array,
+                                         std::vector<double>& field_array_x,
+                                         std::vector<double>& field_array_y,
+                                         std::vector<double>& field_array_z,
+                                         const int start_index,
+                                         const int end_index);
 
       void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
