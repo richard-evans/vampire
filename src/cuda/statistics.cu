@@ -371,13 +371,13 @@ namespace vcuda{
                if (rol == 3) val += mask[i] == bin ? mu_s : 0;
             }
 
-            typedef cub::BlockReduce<cu_real_t, 512> BlockReduce;
-            __shared__ typename BlockReduce::TempStorage temp_storage;
-            val = BlockReduce(temp_storage).Sum(val);
+            //typedef cub::BlockReduce<cu_real_t, 512> BlockReduce;
+            //__shared__ typename BlockReduce::TempStorage temp_storage;
+            //val = BlockReduce(temp_storage).Sum(val);
 
-            if (threadIdx.x == 0) {
-               hist[4 * bin + rol] += val;
-            }
+            //if (threadIdx.x == 0) {
+            //   hist[4 * bin + rol] += val;
+            //}
          }
 
          /**
