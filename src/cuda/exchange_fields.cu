@@ -9,10 +9,6 @@
 
 #include <vector>
 
-
-//#include "cusp/array2d.h"
-//#include "cusp/coo_matrix.h"
-//#include "cusp/print.h"
 #include "cusparse.h"
 
 int calculate_exchange_fields(int, int);
@@ -304,7 +300,6 @@ namespace vcuda
             coo_rows_d.cu_index_array_t::~cu_index_array_t();
             coo_cols_d.cu_index_array_t::~cu_index_array_t();
             coo_vals_d.cu_real_array_t::~cu_real_array_t();
-
 
             // destroy vector and matrix descriptors
             cusparseDestroyDnVec(vecX);

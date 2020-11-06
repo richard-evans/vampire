@@ -21,11 +21,6 @@
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
 #include <thrust/tuple.h>
-//#include <cusp/copy.h>
-//#include <cusp/csr_matrix.h>
-//#include <cusp/dia_matrix.h>
-//#include <cusp/ell_matrix.h>
-//#include <cusp/multiply.h>
 #include "cusparse.h"
 
 // Vampire headers
