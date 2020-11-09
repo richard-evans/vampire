@@ -105,8 +105,6 @@ namespace vcuda
 
             const int Natoms = ::atoms::num_atoms;
 
-            std::cout << Natoms << std::endl;
-
             spin3N.assign( 3*::atoms::num_atoms, 0);
             field3N.assign( 3*::atoms::num_atoms, 0);
 

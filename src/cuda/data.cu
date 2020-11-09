@@ -28,9 +28,11 @@ namespace vcuda{
          cu_real_array_t x_spin_array(0UL);
          cu_real_array_t y_spin_array(0UL);
          cu_real_array_t z_spin_array(0UL);
+
          cu_real_array_t x_coord_array(0UL);
          cu_real_array_t y_coord_array(0UL);
          cu_real_array_t z_coord_array(0UL);
+
          cu_index_array_t type_array(0UL);
          cu_index_array_t cell_array(0UL);
          cu_index_array_t limits(0UL);
@@ -45,12 +47,15 @@ namespace vcuda{
          cu_real_array_t x_coord_array(0UL);
          cu_real_array_t y_coord_array(0UL);
          cu_real_array_t z_coord_array(0UL);
+
          cu_real_array_t x_mag_array(0UL);
          cu_real_array_t y_mag_array(0UL);
          cu_real_array_t z_mag_array(0UL);
+
          cu_real_array_t x_field_array(0UL);
          cu_real_array_t y_field_array(0UL);
          cu_real_array_t z_field_array(0UL);
+
          cu_real_array_t volume_array(0UL);
          cu_index_array_t num_atoms(0UL);
       } /* cells */
@@ -63,9 +68,11 @@ namespace vcuda{
       cu_real_array_t x_total_spin_field_array(0UL);
       cu_real_array_t y_total_spin_field_array(0UL);
       cu_real_array_t z_total_spin_field_array(0UL);
+
       cu_real_array_t x_total_external_field_array(0UL);
       cu_real_array_t y_total_external_field_array(0UL);
       cu_real_array_t z_total_external_field_array(0UL);
+
       cu_real_array_t x_dipolar_field_array(0UL);
       cu_real_array_t y_dipolar_field_array(0UL);
       cu_real_array_t z_dipolar_field_array(0UL);
