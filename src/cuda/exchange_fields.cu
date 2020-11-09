@@ -61,24 +61,24 @@ namespace vcuda
          size_t buffer_size = 0;
 
          // Routine to sort the coo sparse matrix by the row major order index
-         void sort_coo_list(std::vector<int> &rows, std::vector<int> &cols, std::vector<double> &vals, const int Nrows, const int Ncols )
+         void sort_coo_list(std::vector<size_t> &rows, std::vector<size_t> &cols, std::vector<double> &vals, const size_t Nrows, const size_t Ncols )
          {
              // Create a list of id-value pairs
-             std::vector< std::pair<int,double> > list;
+             std::vector< std::pair<size_t,double> > list;
 
              // Calculate the row major order index and create pair list
-             for ( int i = 0; i < vals.size(); i++ ) {
-                 int id = cols[i] + rows[i]*Ncols;
+             for ( size_t i = 0; i < vals.size(); i++ ) {
+                 size_t id = cols[i] + rows[i]*Ncols;
                  list.push_back( std::make_pair(id, vals[i]));
              }
 
              std::sort( list.begin(), list.end() );
 
              // Overwrite the input vectors with sorted list
-             for( int i = 0; i < list.size(); i++) {
-                 int id = list[i].first;
-                 int row = int( id / Ncols);
-                 int col = id % Ncols;
+             for( size_t i = 0; i < list.size(); i++) {
+                 size_t id = list[i].first;
+                 size_t row = size_t( id / Ncols);
+                 size_t col = id % Ncols;
                  rows[i] = row;
                  cols[i] = col;
                  vals[i] = list[i].second;
@@ -105,12 +105,14 @@ namespace vcuda
 
             const int Natoms = ::atoms::num_atoms;
 
+            std::cout << Natoms << std::endl;
+
             spin3N.assign( 3*::atoms::num_atoms, 0);
             field3N.assign( 3*::atoms::num_atoms, 0);
 
             //Local storage for nbr list
-            std::vector<int> row_inds;
-            std::vector<int> col_inds;
+            std::vector<size_t> row_inds;
+            std::vector<size_t> col_inds;
             std::vector<double> vals;
 
             // tolerance to ignore exchange components
