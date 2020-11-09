@@ -26,6 +26,7 @@ namespace vcuda
 
 
          bool exchange_initialised = false;
+         bool empty_exchange = true;
 
          bool J_isot_initialised = false;
          bool J_vect_initialised = false;
@@ -173,116 +174,121 @@ namespace vcuda
 
             zlog << zTs() << "Expanded CPU nbr list to 3N by 3N format, no. of non-zeros is :" << vals.size() << " with a tol = " << tol << std::endl;
 
-
             Ncols = 3*Natoms;
             Nrows = 3*Natoms;
             Nnz = vals.size();
 
-            // sort coo list to make sure the data is sequential
-            sort_coo_list(row_inds, col_inds, vals, Nrows, Ncols);
-
-            // allocate space for the device data
-            coo_rows_d.resize(Nnz);
-            coo_cols_d.resize(Nnz);
-            coo_vals_d.resize(Nnz);
-            csr_rows_d.resize(Nrows+1);
-
-            //Copy COO matrix storage arrays to the device
-            thrust::copy( row_inds.begin(), row_inds.end(), coo_rows_d.begin());
-            thrust::copy( col_inds.begin(), col_inds.end(), coo_cols_d.begin());
-            thrust::copy( vals.begin(), vals.end(), coo_vals_d.begin());
-
-            // initialise cusparse handle
-            status = cusparseCreate(&handle);
-            if (status != CUSPARSE_STATUS_SUCCESS) {
-                std::cerr << "Failed to initialise CUSPARSE library!" << std::endl;
-                return 1;
-            }
-
-            // cusparse routine to convert coo row data into csr row offsets
-            status = cusparseXcoo2csr(  handle,
-                                        thrust::raw_pointer_cast( coo_rows_d.data()),
-                                        Nnz,
-                                        Ncols,
-                                        thrust::raw_pointer_cast( csr_rows_d.data()),
-                                        CUSPARSE_INDEX_BASE_ZERO);
-
-            // create the CSR descriptor for CUSPARSE
-            status = cusparseCreateCsr(&J_matrix_d, Nrows, Ncols, Nnz,
-                                      thrust::raw_pointer_cast(csr_rows_d.data()),
-                                      thrust::raw_pointer_cast(coo_cols_d.data()),
-                                      thrust::raw_pointer_cast(coo_vals_d.data()),
-                                      CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
-                                      CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
-
-             if (status != CUSPARSE_STATUS_SUCCESS) {
-                 std::cerr << "Failed to initialsie sparse matrix descriptor!" << std::endl;
-                 return 1;
-             }
+            if ( Nnz > 0) {
 
 
-             // Create the dense vector descriptors for the input and output (Y = A*X)
-             cusparseCreateDnVec( &vecX, Ncols, thrust::raw_pointer_cast( spin3N.data()), CUDA_R_64F );
-             cusparseCreateDnVec( &vecY, Nrows, thrust::raw_pointer_cast( field3N.data()), CUDA_R_64F );
+                // sort coo list to make sure the data is sequential
+                sort_coo_list(row_inds, col_inds, vals, Nrows, Ncols);
+
+                // allocate space for the device data
+                coo_rows_d.resize(Nnz);
+                coo_cols_d.resize(Nnz);
+                coo_vals_d.resize(Nnz);
+                csr_rows_d.resize(Nrows+1);
+
+                //Copy COO matrix storage arrays to the device
+                thrust::copy( row_inds.begin(), row_inds.end(), coo_rows_d.begin());
+                thrust::copy( col_inds.begin(), col_inds.end(), coo_cols_d.begin());
+                thrust::copy( vals.begin(), vals.end(), coo_vals_d.begin());
+
+                // initialise cusparse handle
+                status = cusparseCreate(&handle);
+                if (status != CUSPARSE_STATUS_SUCCESS) {
+                    std::cerr << "Failed to initialise CUSPARSE library!" << std::endl;
+                    return 1;
+                }
+
+                // cusparse routine to convert coo row data into csr row offsets
+                status = cusparseXcoo2csr(  handle,
+                                            thrust::raw_pointer_cast( coo_rows_d.data()),
+                                            Nnz,
+                                            Ncols,
+                                            thrust::raw_pointer_cast( csr_rows_d.data()),
+                                            CUSPARSE_INDEX_BASE_ZERO);
+
+                // create the CSR descriptor for CUSPARSE
+                status = cusparseCreateCsr(&J_matrix_d, Nrows, Ncols, Nnz,
+                                          thrust::raw_pointer_cast(csr_rows_d.data()),
+                                          thrust::raw_pointer_cast(coo_cols_d.data()),
+                                          thrust::raw_pointer_cast(coo_vals_d.data()),
+                                          CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
+                                          CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
+
+                 if (status != CUSPARSE_STATUS_SUCCESS) {
+                     std::cerr << "Failed to initialsie sparse matrix descriptor!" << std::endl;
+                     return 1;
+                 }
+
+
+                 // Create the dense vector descriptors for the input and output (Y = A*X)
+                 cusparseCreateDnVec( &vecX, Ncols, thrust::raw_pointer_cast( spin3N.data()), CUDA_R_64F );
+                 cusparseCreateDnVec( &vecY, Nrows, thrust::raw_pointer_cast( field3N.data()), CUDA_R_64F );
 
 
 
 
-            // allocate an external buffer if needed
-            status = cusparseSpMV_bufferSize(handle,
-                                CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                &alpha, J_matrix_d, vecX, &beta, vecY,
-                                CUDA_R_64F,
-                                CUSPARSE_CSRMV_ALG1,
-                                &buffer_size);
+                // allocate an external buffer if needed
+                status = cusparseSpMV_bufferSize(handle,
+                                    CUSPARSE_OPERATION_NON_TRANSPOSE,
+                                    &alpha, J_matrix_d, vecX, &beta, vecY,
+                                    CUDA_R_64F,
+                                    CUSPARSE_CSRMV_ALG1,
+                                    &buffer_size);
 
-            cudaMalloc(&spmv_buffer_d, buffer_size);
+                cudaMalloc(&spmv_buffer_d, buffer_size);
 
 
-            // Declare a local matrix on the host using coordinate format to be filled
-            //cusp::coo_matrix< int, cu::cu_real_t, cusp::host_memory> J_matrix_h;
+                // Declare a local matrix on the host using coordinate format to be filled
+                //cusp::coo_matrix< int, cu::cu_real_t, cusp::host_memory> J_matrix_h;
 
-            // Set COO matrix to size 3Natoms by 3Natoms with number of non-zeros found
-            //J_matrix_h.resize(
-            //        3*::atoms::num_atoms,
-            //        3*::atoms::num_atoms,
-            //        vals.size()
-            //        );
+                // Set COO matrix to size 3Natoms by 3Natoms with number of non-zeros found
+                //J_matrix_h.resize(
+                //        3*::atoms::num_atoms,
+                //        3*::atoms::num_atoms,
+                //        vals.size()
+                //        );
 
-            // copy in to CUSP COO matrix for easy conversion
-            //for( int i = 0; i < vals.size(); i++) {
-            //    J_matrix_h.row_indices[i] = row_inds[i];
-            //    J_matrix_h.column_indices[i] = col_inds[i];
-            //    J_matrix_h.values[i] = vals[i];
-            //}
+                // copy in to CUSP COO matrix for easy conversion
+                //for( int i = 0; i < vals.size(); i++) {
+                //    J_matrix_h.row_indices[i] = row_inds[i];
+                //    J_matrix_h.column_indices[i] = col_inds[i];
+                //    J_matrix_h.values[i] = vals[i];
+                //}
 
-            // Use the sort member function to double check ordering before convert
-            //J_matrix_h.sort_by_row_and_column();
+                // Use the sort member function to double check ordering before convert
+                //J_matrix_h.sort_by_row_and_column();
 
-            // Black magic to turn CUDA_MATRIX into a string
-            #define STRING(s) #s
-            #define VALSTRING(s) STRING(s)
+                // Black magic to turn CUDA_MATRIX into a string
+                #define STRING(s) #s
+                #define VALSTRING(s) STRING(s)
 
-            // Print out informative message
-            //zlog << zTs() << "Attempting matrix conversion from COO to " << VALSTRING(CUDA_MATRIX) << " and transferring to device..." << std::endl;
+                // Print out informative message
+                //zlog << zTs() << "Attempting matrix conversion from COO to " << VALSTRING(CUDA_MATRIX) << " and transferring to device..." << std::endl;
 
-            //cusp::convert( J_matrix_h, J_matrix_d);
+                //cusp::convert( J_matrix_h, J_matrix_d);
 
-            zlog << zTs() << "Matrix conversion and transfer complete." << std::endl;
+                zlog << zTs() << "Matrix conversion and transfer complete." << std::endl;
+
+                empty_exchange = false;
+                switch( ::exchange::get_exchange_type())
+                {
+                    case 0: // Isotropic
+                        J_isot_initialised = true;
+                        break;
+                    case 1: // Vectorial
+                        J_vect_initialised = true;
+                        break;
+                    case 2: // Tensor
+                        J_tens_initialised = true;
+                        break;
+                }
+            } // End if number of non-zeros greater than zero
 
             exchange_initialised = true;
-            switch( ::exchange::get_exchange_type())
-            {
-                case 0: // Isotropic
-                    J_isot_initialised = true;
-                    break;
-                case 1: // Vectorial
-                    J_vect_initialised = true;
-                    break;
-                case 2: // Tensor
-                    J_tens_initialised = true;
-                    break;
-            }
 
             check_device_memory(__FILE__,__LINE__);
             check_cuda_errors(__FILE__,__LINE__);
@@ -301,22 +307,24 @@ namespace vcuda
             coo_cols_d.cu_index_array_t::~cu_index_array_t();
             coo_vals_d.cu_real_array_t::~cu_real_array_t();
 
-            // destroy vector and matrix descriptors
-            cusparseDestroyDnVec(vecX);
-            cusparseDestroyDnVec(vecY);
-            status = cusparseDestroySpMat(J_matrix_d);
+            if( !empty_exchange ) {
+                // destroy vector and matrix descriptors
+                cusparseDestroyDnVec(vecX);
+                cusparseDestroyDnVec(vecY);
+                status = cusparseDestroySpMat(J_matrix_d);
 
-            if (status != CUSPARSE_STATUS_SUCCESS) {
-                std::cerr << "Matrix descriptor destruction failed" << std::endl;
-                return 1;
-            }
+                if (status != CUSPARSE_STATUS_SUCCESS) {
+                    std::cerr << "Matrix descriptor destruction failed" << std::endl;
+                    return 1;
+                }
 
-            // destroy cusparse handle
-            status = cusparseDestroy(handle);
-            handle = 0;
-            if (status != CUSPARSE_STATUS_SUCCESS) {
-                std::cerr << "CUSPARSE Library release of resources failed" << std::endl;
-                return 1;
+                // destroy cusparse handle
+                status = cusparseDestroy(handle);
+                handle = 0;
+                if (status != CUSPARSE_STATUS_SUCCESS) {
+                    std::cerr << "CUSPARSE Library release of resources failed" << std::endl;
+                    return 1;
+                }
             }
 
             check_cuda_errors(__FILE__,__LINE__);
@@ -330,37 +338,35 @@ namespace vcuda
 
             if( !exchange_initialised) initialise_exchange();
 
-            thrust::copy( cu::atoms::x_spin_array.begin(), cu::atoms::x_spin_array.end(), spin3N.begin());
-            thrust::copy( cu::atoms::y_spin_array.begin(), cu::atoms::y_spin_array.end(), spin3N.begin() + ::atoms::num_atoms);
-            thrust::copy( cu::atoms::z_spin_array.begin(), cu::atoms::z_spin_array.end(), spin3N.begin() + 2*::atoms::num_atoms);
+            if( !empty_exchange) {
+                thrust::copy( cu::atoms::x_spin_array.begin(), cu::atoms::x_spin_array.end(), spin3N.begin());
+                thrust::copy( cu::atoms::y_spin_array.begin(), cu::atoms::y_spin_array.end(), spin3N.begin() + ::atoms::num_atoms);
+                thrust::copy( cu::atoms::z_spin_array.begin(), cu::atoms::z_spin_array.end(), spin3N.begin() + 2*::atoms::num_atoms);
 
-            check_cuda_errors(__FILE__,__LINE__);
-            //cusp::multiply(
-            //      J_matrix_d,
-            //      spin3N,
-            //      field3N);
+                check_cuda_errors(__FILE__,__LINE__);
 
-            // cusparseSpMV using CSR algorithm 1
-            status = cusparseSpMV(  handle,
-                                    CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                    &alpha,
-                                    J_matrix_d,
-                                    vecX,
-                                    &beta,
-                                    vecY,
-                                    CUDA_R_64F,
-                                    CUSPARSE_CSRMV_ALG1,
-                                    spmv_buffer_d);
+                // cusparseSpMV using CSR algorithm 1
+                status = cusparseSpMV(  handle,
+                                        CUSPARSE_OPERATION_NON_TRANSPOSE,
+                                        &alpha,
+                                        J_matrix_d,
+                                        vecX,
+                                        &beta,
+                                        vecY,
+                                        CUDA_R_64F,
+                                        CUSPARSE_CSRMV_ALG1,
+                                        spmv_buffer_d);
 
-            if (status != CUSPARSE_STATUS_SUCCESS) {
-                std::cerr << "Matrix-vector multiplication failed" << std::endl;
-                return 1;
+                if (status != CUSPARSE_STATUS_SUCCESS) {
+                    std::cerr << "Matrix-vector multiplication failed" << std::endl;
+                    return 1;
+                }
+
+                check_cuda_errors(__FILE__,__LINE__);
+                thrust::copy( field3N.begin(), field3N.begin() + ::atoms::num_atoms, cu::x_total_spin_field_array.begin() );
+                thrust::copy( field3N.begin() + ::atoms::num_atoms, field3N.begin() + 2*::atoms::num_atoms, cu::y_total_spin_field_array.begin() );
+                thrust::copy( field3N.begin() + 2*::atoms::num_atoms, field3N.end(), cu::z_total_spin_field_array.begin() );
             }
-
-            check_cuda_errors(__FILE__,__LINE__);
-            thrust::copy( field3N.begin(), field3N.begin() + ::atoms::num_atoms, cu::x_total_spin_field_array.begin() );
-            thrust::copy( field3N.begin() + ::atoms::num_atoms, field3N.begin() + 2*::atoms::num_atoms, cu::y_total_spin_field_array.begin() );
-            thrust::copy( field3N.begin() + 2*::atoms::num_atoms, field3N.end(), cu::z_total_spin_field_array.begin() );
 
 
             check_cuda_errors(__FILE__,__LINE__);
