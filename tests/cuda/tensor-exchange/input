@@ -42,7 +42,7 @@ sim:time-step=1.0E-15
 #------------------------------------------
 sim:program = time-series
 sim:integrator = llg-heun
-gpu:acceleration=off
+gpu:acceleration=on
 gpu:calculate-statistics-on-cpu=true
 
 
