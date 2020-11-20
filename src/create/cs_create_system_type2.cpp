@@ -343,7 +343,7 @@ void dilute (std::vector<cs::catom_t> & catom_array){
 }
 
 void geometry (std::vector<cs::catom_t> & catom_array){
-	// check calling of routine if error checking is activated
+   // check calling of routine if error checking is activated
 	if(err::check==true){std::cout << "cs::geometry has been called" << std::endl;}
 
 	// Check for any geometry
@@ -364,11 +364,16 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 
 		// loop over all atoms
 		for(unsigned int atom=0;atom<catom_array.size();atom++){
-
+         catom_array[atom].material=0;
+			catom_array[atom].include=false;
 			// check for geometry information
-			const int geo=mp::material[catom_array[atom].material].geometry;
-
-			// if exists, then remove atoms outside polygon
+         const int atom_uc_cat = catom_array[atom].uc_category;
+         bool included = false;
+         for(int mat=0;mat<mp::num_materials;mat++){
+         const int mat_uc_cat = create::internal::mp[mat].unit_cell_category;
+         if (atom_uc_cat == mat_uc_cat){
+         //std::cout <<mp::num_materials << '\t' << atom_uc_cat << "\t" << mat_uc_cat<< "\t" << mat << std::endl;
+			const int geo=mp::material[mat].geometry;
 			if(geo!=0){
 				double x = catom_array[atom].x;
 				double y = catom_array[atom].y;
@@ -376,18 +381,25 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 				std::vector<double> py(geo);
 				// Initialise polygon points
 				for(int p=0;p<geo;p++){
-					px[p]=mp::material[catom_array[atom].material].geometry_coords[p][0]*cs::system_dimensions[0];
-					py[p]=mp::material[catom_array[atom].material].geometry_coords[p][1]*cs::system_dimensions[1];
+					px[p]=mp::material[mat].geometry_coords[p][0]*cs::system_dimensions[0];
+					py[p]=mp::material[mat].geometry_coords[p][1]*cs::system_dimensions[1];
+      //         std::cout << mat << "\t" << px[p] << '\t' << py[p] << std::endl;
 				}
+         //   std::cout << mat << "\t" << atom << "\t" << vmath::point_in_polygon2(x,y,px,py,geo) << '\t' << x << '\t' << y << std::endl;
 				// check if point is outside of polygon, if so delete it
-				if(vmath::point_in_polygon2(x,y,px,py,geo)==false){
-					catom_array[atom].include=false;
+            if(vmath::point_in_polygon2(x,y,px,py,geo)==true){
+         //      std::cout << "TRUE" << std::endl;
+               catom_array[atom].material=mat;
+               catom_array[atom].include=true;
+            }
+			//	if(vmath::point_in_polygon2(x,y,px,py,geo)==false){
+
+		//			catom_array[atom].include=false;
 				}
 			}
-
-		}
-
+      }
 	}
+   }
 	else{
 
 		// Re-identify all atoms as material 0 and exclude by default
@@ -396,16 +408,17 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 			catom_array[atom].include=false;
 		}
 
-		// loop over all materials and include according to geometry
-
-		// determine z-bounds for materials
 		std::vector<double> mat_min(mp::num_materials);
 		std::vector<double> mat_max(mp::num_materials);
+    std::vector<double> mat_min_x(mp::num_materials);
+		std::vector<double> mat_max_x(mp::num_materials);
 
 		// initialise array to hold z-bound information in real space
 		for(int mat=0;mat<mp::num_materials;mat++){
 			mat_min[mat]=create::internal::mp[mat].min*cs::system_dimensions[2];
 			mat_max[mat]=create::internal::mp[mat].max*cs::system_dimensions[2];
+      //mat_min_x[mat]=0.0*cs::system_dimensions[0];
+      //mat_max_x[mat]=0.5*cs::system_dimensions[0];
 			// alloys generally are not defined by height, and so have max = 0.0
 			if(mat_max[mat]<0.0000001) mat_max[mat]=-0.1;
 		}
@@ -432,6 +445,7 @@ void geometry (std::vector<cs::catom_t> & catom_array){
 					double x = catom_array[atom].x;
 					double y = catom_array[atom].y;
 					const double z = catom_array[atom].z;
+         // std::cout << x << '\t' << mat_min_x[mat] << '\t' << mat_max_x[mat] <<std::endl;
 					if((z>=mat_min[mat]) && (z<mat_max[mat]) && (vmath::point_in_polygon2(x,y,px,py,geo)==true)){
 						catom_array[atom].material=mat;
 						catom_array[atom].include=true;

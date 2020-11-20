@@ -15,10 +15,11 @@
 // Vampire headers
 //#include "atoms.hpp" // for exchange list type defs
 #include "exchange.hpp"
+#include "atoms.hpp"
 
 // exchange module headers
 #include "internal.hpp"
-
+#include <iostream>
 namespace exchange{
 
 namespace internal{
@@ -65,6 +66,14 @@ namespace internal{
 
    					const int natom = neighbour_list_array[nn]; // get neighbouring atom number
    					const double Jij = i_exchange_list[ neighbour_interaction_type_array[nn] ].Jij; // get exchange constant between atoms
+                  // const double dx = atoms::x_coord_array[atom] - atoms::x_coord_array[natom];
+   					// if (dx > cs::system_dimensions[0]-200) {
+                  //  std::cout << "edge" << atoms::x_coord_array[atom] << '\t' <<atoms::x_coord_array[natom] << '\t' <<  Jij << std::endl;
+                  //  std::cin.get();
+                  // }
+                  //
+                  // std::cout  << atoms::x_coord_array[atom] << '\t' <<atoms::x_coord_array[natom] << '\t' <<  Jij << std::endl;
+                  //
 
    					hx += Jij * spin_array_x[natom]; // add exchange fields
    					hy += Jij * spin_array_y[natom];
