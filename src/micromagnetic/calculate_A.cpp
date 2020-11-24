@@ -102,14 +102,15 @@ namespace micromagnetic{
                case 0: // isotropic
 
                //loops over all atoms
+            //   std::cout << num_local_atoms << std::endl;
                for (int atom = 0; atom <num_local_atoms; atom++){
                   //saves the cell the atom is in and the material
                   const int cell  = cell_array[atom];
                   const int mat   = type_array[atom];
-
                   //the nearest neighbours are stored in an array - for each atom the start and end index for the array are found,
                   const int start = atoms::neighbour_list_start_index[atom];
                   const int end   = atoms::neighbour_list_end_index[atom] + 1;
+              //    std::cout << "cell:\t" << cell << '\t' <<"mat:\t"  << mat << "\t" << start << '\t' << end << std::endl;
                   //loops over all nearest neighbours
                   for(int nn=start;nn<end;nn++){
                      //calcualted the atom id and cell id of the nn atom
@@ -127,6 +128,7 @@ namespace micromagnetic{
 
                         //Jij is stored as Jij/mu_s so to get Jij we have to multiply by mu_s
                         //Jij = sum(Jij*distance)
+                      //  std::cout << Jij << std::endl;
                         const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij*mp::material[mat].mu_s_SI;
                         a2d[cell][ncell] += Jij*d2;
                         num_interactions_cell[cell][ncell] ++;
@@ -162,6 +164,7 @@ namespace micromagnetic{
                for (int j = 0; j < num_cells; j++){
                   a_test[count] = a2d[i][j];
                   N[count] = num_interactions_cell[i][j];
+            //    if (vmpi::my_rank == 0)  std::cerr << i << '\t' << j << '\t' << a2d[i][j] << '\t' << num_interactions_cell[i][j] <<std::endl;
                   count++;
                }
             }
@@ -180,6 +183,8 @@ namespace micromagnetic{
                a2d[i][j] = a_test[count];
                num_interactions_cell[i][j] = N[count];
                j++;
+               //same!
+            //   std::cout << i << '\t' << j << '\t' << a_test[count] << '\t' << num_interactions_cell[i][j] <<std::endl;
                if (j == num_cells) {
                   i ++;
                   j = 0;
@@ -214,7 +219,8 @@ namespace micromagnetic{
                         macro_neighbour_list_array.push_back(cellj);                                        //if the interaction is non zero add the cell to the neighbourlist
                         a.push_back(-(a2d[celli][cellj]/(4*atomic_volume)));//*cell_size)/(2.0*ms[celli]*atomic_volume*num_interactions_cell[celli][cellj]));
                         //calcualtes the exchange interaction for the cells.                           //the end index is updated for each cell so is given the value for the last cell.
-                        a[array_index] = (a[array_index]*2*cell_size)/(ms[celli]*N); //*N instead od numinteraction
+                  //      std::cout << celli << '\t' << cellj << '\t' << a[array_index] << '\t' << cell_size << '\t' << ms[celli] << '\t' << N << "\t" << (a[array_index]*2*cell_size)/(ms[celli]*N) << std::endl;
+                        a[array_index] = (a[array_index]*2*cell_size)/(ms[celli]*N); //*N instead od numinteraction                        a[array_index] = (a[array_index]*2*cell_size)/(ms[celli]*N); //*N instead od numinteraction
                         macro_neighbour_list_end_index[celli] = array_index;
                         //the end index is updated for each cell so is given the value for the last cell.
                         array_index ++;

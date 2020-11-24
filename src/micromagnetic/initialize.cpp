@@ -54,6 +54,7 @@ void initialize(int num_local_cells,
                 double system_dimensions_z,
                 std::vector<int> local_cell_array){
 
+
    if (micromagnetic::discretisation_type != 0){
    // Output informative message to user
    std::cout << "Initialising micromagnetic module" << std::endl;
@@ -102,6 +103,27 @@ void initialize(int num_local_cells,
    mm::A =                    mm::calculate_a(num_atoms_interactions, num_cells, num_local_cells,cell_array, neighbour_list_array, neighbour_list_start_index,
                                               neighbour_list_end_index, type_array,  material, volume_array, x_coord_array,
                                               y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
+
+
+
+for (int lc = 0; lc < num_local_cells; lc++){
+ int cell = local_cell_array[lc];
+ //std::cerr <<cell << '\t' <<  mm::ms[cell] << '\t' << mm::alpha[cell] << '\t' << mm::Tc[cell] << '\t' << mm::ku[cell] << '\t' << mm::gamma[cell] << std::endl;
+}
+
+for (int lc = 0; lc < num_local_cells; lc++){
+  int cell = local_cell_array[lc];
+   //loops over all other cells with interactions to this cell
+   const int start = mm::macro_neighbour_list_start_index[cell];
+   const int end = mm::macro_neighbour_list_end_index[cell] +1;
+
+   for(int j = start;j< end;j++){
+      // calculate reduced exchange constant factor
+    //  if (vmpi::my_rank == 0) std::cerr << cell << '\t' << j << '\t' << mm::A[j] <<std::endl;
+
+        }
+     }
+
 
 
    //---------------------------------------------------------------------------
@@ -350,7 +372,7 @@ void initialize(int num_local_cells,
        #else
           int num_local_atoms = atoms::num_atoms;
        #endif
-       
+
       for (int atom =0; atom < num_local_atoms; atom++){
          int cell = cell_array[atom];
          //std::cout << atom << '\t' << cell << '\t' <<  mm::bias_field_x[cell] << '\t' << atomistic_bias_field_x[atom] << std::endl;
@@ -361,7 +383,7 @@ void initialize(int num_local_cells,
       }
 
    }
-      //std::cin.get();
+    //  std::cin.get();
    return;
 
 }

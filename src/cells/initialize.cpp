@@ -148,7 +148,7 @@ namespace cells{
 
 
       // Assign atoms to cells
-      for(int atom=0;atom<num_local_atoms;atom++){
+      for(int atom=0;atom<num_local_atoms+vmpi::num_halo_atoms;atom++){
          // temporary for atom coordinates
          double c[3];
          // convert atom coordinates to st reference frame

@@ -40,7 +40,7 @@ namespace micromagnetic {
             ms[cell] = ms[cell] + material[mat].mu_s_SI;
             N[cell]++;
          }
-         for (int cell = 0; cell < num_cells; cell++)
+        // for (int cell = 0; cell < num_cells; cell++)
          //std::cin.get();
          #ifdef MPICF
             MPI_Allreduce(MPI_IN_PLACE, &ms[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
