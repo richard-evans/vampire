@@ -158,6 +158,7 @@ int LLB( std::vector <int>& local_cell_array,
    // import micromagnetic arrays for brevity
    using namespace micromagnetic_arrays;
 
+//std::cout << num_cells <<std::endl;
 	// Check for initialisation of LLG integration arrays
 	if(LLG_set== false) micromagnetic::micromagnetic_init(num_cells, x_mag_array, y_mag_array, z_mag_array);
 

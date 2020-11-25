@@ -127,9 +127,11 @@ namespace micromagnetic{
   		double HSTTz = staj*(x_array[cell]*stpy - y_array[cell]*stpx) + stbj*stpz;
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] = pf*m[0] + ext_field[0]  + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0] + HSTTx;// + dipole::cells_field_array_x[cell];
-      spin_field[1] = pf*m[1] + ext_field[1]  + pinning_field_y[cell]  + exchange_field[1] - ku_y[cell]*one_o_chi_perp[cell]*m[1] + HSTTy;// + dipole::cells_field_array_y[cell];
-      spin_field[2] = pf*m[2] + ext_field[2]  + pinning_field_z[cell]  + exchange_field[2] - ku_z[cell]*one_o_chi_perp[cell]*m[2] + HSTTz;// + dipole::cells_field_array_z[cell];
+      spin_field[0] = pf*m[0] + ext_field[0] + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0] + HSTTx;// + dipole::cells_field_array_x[cell];
+      spin_field[1] = pf*m[1] + ext_field[1] + pinning_field_y[cell]  + exchange_field[1] - ku_y[cell]*one_o_chi_perp[cell]*m[1] + HSTTy;// + dipole::cells_field_array_y[cell];
+      spin_field[2] = pf*m[2] + ext_field[2] + pinning_field_z[cell]  + exchange_field[2] - ku_z[cell]*one_o_chi_perp[cell]*m[2] + HSTTz;// + dipole::cells_field_array_z[cell];
+    //  std::cout << ext_field[0] << '\t' << pf << '\t' << m[0] << "\t" << ku_x[cell] << '\t' <<one_o_chi_perp[cell] <<  std::endl;
+    //  std::cin.get();
       // if (cell_material_array[cell] == 2)    std::cout << pf << '\t' << m[0] << '\t' << m[1] << '\t' << m[2] << "\t" << pinning_field_x[cell] << '\t' << pinning_field_y[cell] << '\t' << pinning_field_z[cell] << '\t' << exchange_field[0] << '\t' << exchange_field[1] << '\t' << exchange_field[2] << "\t" << ext_field[0] << '\t' << ext_field[1] << '\t' << ext_field[2] <<std::endl;
    //if (cell_material_array[cell] == 2)  std::cout << ku_x[cell] << '\t' << one_o_chi_perp[cell] << '\t' << ku_y[cell] << '\t' << ku_z[cell] << std::endl;
         //if (cell ==0)		std::cout  << "inside\t" <<   dipole::cells_field_array_x[0] << '\t' << dipole::cells_field_array_y[0] << '\t' << dipole::cells_field_array_z[0] <<std::endl;

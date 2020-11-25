@@ -61,6 +61,7 @@ void initialize(int num_local_cells,
 
    // Determine number of local atoms for parallel computation
    int num_atoms_interactions;
+
    #ifdef MPICF
       num_atoms_interactions = vmpi::num_core_atoms+vmpi::num_bdry_atoms + vmpi::num_halo_atoms;
       num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
@@ -119,7 +120,8 @@ for (int lc = 0; lc < num_local_cells; lc++){
 
    for(int j = start;j< end;j++){
       // calculate reduced exchange constant factor
-    //  if (vmpi::my_rank == 0) std::cerr << cell << '\t' << j << '\t' << mm::A[j] <<std::endl;
+       //if (vmpi::my_rank == 1)
+  //     std::cerr << cell << '\t' << j << '\t' << mm::A[j] <<std::endl;
 
         }
      }

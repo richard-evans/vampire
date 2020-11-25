@@ -863,6 +863,7 @@ void multiscale_simulation_steps(int n_steps){
          cells::volume_array);
 
          //if LLB run an LLB step
+
          else micromagnetic::LLB(cells::local_cell_array,
             n_steps,
             cells::num_cells,
