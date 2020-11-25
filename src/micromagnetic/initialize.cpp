@@ -274,8 +274,23 @@ for (int lc = 0; lc < num_local_cells; lc++){
    for (int atom = 0; atom < num_atoms_interactions; atom ++){
       int mat = type_array[atom];
       int cell = cell_array[atom];
-      mm::cell_material_array[cell] = mat;
+      if ( mm::cell_material_array[cell] < mat){
+        mm::cell_material_array[cell] = mat;
+      }
    }
+    // for (int cell = 0; cell < num_cells; cell++ ){
+    //    int mat = mm::cell_material_array[cell];
+    //    if (vmpi::my_rank == 0) std::cerr << cell << '\t' << mat << std::endl;
+    //  }
+
+   #ifdef MPICF
+      MPI_Allreduce(MPI_IN_PLACE, &mm::cell_material_array[0],     num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+   #endif
+
+   // for (int cell = 0; cell < num_cells; cell++ ){
+   //    int mat = mm::cell_material_array[cell];
+   //    if (vmpi::my_rank == 1) std::cerr << cell << '\t' << mat << std::endl;
+   //  }
 
    //--------------------------------------------------------------------------------------------------
    // Pre-calculate SAF properties
@@ -311,7 +326,6 @@ for (int lc = 0; lc < num_local_cells; lc++){
          mm::pinning_field_x[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[0];
          mm::pinning_field_y[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[1];
          mm::pinning_field_z[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[2];
-         //   std::cout <<  mm::pinning_field_x[cell] << '\t' << mm::pinning_field_y[cell] << '\t' <<  mm::pinning_field_z[cell] << std::endl;
 
          // std::cout <<prefactor*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor2*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor3*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor4*mp::material[mat].pinning_field_unit_vector[2] <<  std::endl;
          //               n_cells
@@ -329,6 +343,11 @@ for (int lc = 0; lc < num_local_cells; lc++){
          mm::pinning_field_z[cell] = 2.0*mm::pinning_field_z[cell]/cells::macro_cell_size_z;
       }
    }
+   // loop over all cells
+  //  for (int cell = 0; cell < cells::num_cells; cell++ ){
+  //          int mat = mm::cell_material_array[cell];
+  // //   std::cout << cell << "\t" << mat << '\t' << mm::pinning_field_x[cell] << '\t' << mm::pinning_field_y[cell] << '\t' <<  mm::pinning_field_z[cell] << std::endl;
+  //  }
 
    //--------------------------------------------------------------------------------------------------
    // Initialise restistance calculation
