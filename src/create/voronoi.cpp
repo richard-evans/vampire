@@ -22,6 +22,14 @@
 //
 // ----------------------------------------------------------------------------
 //
+
+#include <random>
+#include <cmath>
+#include <list>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 #include "create.hpp"
 #include "errors.hpp"
 #include "grains.hpp"
@@ -34,12 +42,6 @@
 #include "voronoi.hpp"
 #include <algorithm>
 
-#include <random>
-#include <cmath>
-#include <list>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 #include "internal.hpp"
 
