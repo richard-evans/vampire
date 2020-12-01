@@ -55,7 +55,7 @@ namespace environment{
    void initialize(double system_dimensions_x, double system_dimensions_y, double system_dimensions_z){
 
 
-   //    std::cout << "Initialising environment module" << std::endl;
+       std::cout << "Initialising environment module" << std::endl;
 
 
        env::env_field_uv[0] = env::env_field_uv[0]*env::env_field;
@@ -101,7 +101,7 @@ namespace environment{
          env::shield_Hext_z[shield] = env::shield_Hext_z[shield]*env::H_strength[shield];
       //   std::cout << env::shield_Hext_x[shield] << '\t' << env::shield_Hext_y[shield] << '\t' << env::shield_Hext_z[shield] <<std::endl;
        }
-   //    std::cout << "shield info read in " <<std::endl;
+    //   std::cout << "shield info read in " <<std::endl;
 
        double dx,dy,dz;
 
@@ -121,7 +121,7 @@ namespace environment{
        env::o_file.open("env_output");
 
        int n_cell = 0;
-       std::cout << env::num_shields <<std::endl;
+      // std::cout << env::num_shields <<std::endl;
 
 
        for (int shield = 0; shield < env::num_shields; shield++){
@@ -171,7 +171,7 @@ namespace environment{
           }
 
           std::cout <<  tmp_x.size() <<std::endl;
-      //           std::cout << "created initial cells " <<std::endl;
+          //       std::cout << "created initial cells " <<std::endl;
         //  std::cin.get();
 
           for (int cell = 0; cell < tmp_x.size(); cell ++ ){
@@ -242,7 +242,7 @@ namespace environment{
 
 
        env::num_cells = n_cell;
-      // std::cout << "Number of environment cells: " << env::num_cells <<  "\t cell size: " <<   env::cell_volume[0] << "\t" << std::endl;
+    //   std::cout << "Number of environment cells: " << env::num_cells <<  "\t cell size: " <<   env::cell_volume[0] << "\t" << std::endl;
 
        //convert Ms from input to Ms = ms/V and Ku = ku/V
 
@@ -251,7 +251,7 @@ namespace environment{
 
 
 
-   //    std::cout << "Identifying environment cells which are atomistic" << std::endl;
+  //     std::cout << "Identifying environment cells which are atomistic" << std::endl;
 
        //loops over all atomistic cells to determine if the atomsitic simulation lies within an environment cell
 
@@ -321,7 +321,7 @@ namespace environment{
           }
        }
 
-   //    std::cout << "end of identification" << std::endl;
+    //   std::cout << "end of identification" << std::endl;
        //resize arrays
        env::bias_field_x.resize(env::num_cells,0.0);
        env::bias_field_y.resize(env::num_cells,0.0);
@@ -351,6 +351,7 @@ namespace environment{
        atomistic_environment_field_z.resize(num_local_atoms,0.0);
 
     //   std::cin.get();
+  //  std::cout << "resized arrays" << std::endl;
 
         // std::ofstream pfile2;
         // pfile2.open("m2.txt");
@@ -366,6 +367,7 @@ namespace environment{
    //    std::cout << "Calculating neighbour list for environment cells" << "\t" << env::num_cells <<env::cell_coords_array_x.size() << "\t" << env::cell_size_x.size() << '\t' <<  env::neighbour_list_end_index.size() << std::endl;
        // This is massively inefficient for large numbers of cells
        // better to store x,y,z cell associations and calculate neighbours directly - RE
+
        int array_index = 0;
        for (int celli = 0; celli < env::num_cells; celli ++){
           double xi = env::cell_coords_array_x[celli];
@@ -391,12 +393,12 @@ namespace environment{
                 env::neighbour_list_array.push_back(cellj);                                        //if the interaction is non zero add the cell to the neighbourlist
                 env::neighbour_list_end_index[celli] = array_index;                                //the end index is updated for each cell so is given the value for the last cell.
                 array_index ++;
-      //          std::cout << celli << '\t' << cellj << std::endl;
+          //      std::cout << celli << '\t' << cellj << std::endl;
              }
           }
        }
 
-   //    std::cout << "End of enighbou list calculation" << "\t" << env::num_cells <<env::cell_coords_array_x.size() << "\t" << env::cell_size_x.size() << '\t' <<  env::neighbour_list_end_index.size() << std::endl;
+    //   std::cout << "End of enighbou list calculation" << "\t" << env::num_cells <<env::cell_coords_array_x.size() << "\t" << env::cell_size_x.size() << '\t' <<  env::neighbour_list_end_index.size() << std::endl;
        // This is massively inefficient for large numbers of cells
 
     //   std::cin.get();
@@ -425,8 +427,8 @@ namespace environment{
              }
              // otherwise don't add it to anything
        }
-
-      // std::cout << "worked out which cells are atomistic/env" << "\t" << env::Ms.size() <<env::initial_spin_x.size() << "\t" <<std::endl;
+//
+//       std::cout << "worked out which cells are atomistic/env" << "\t" << env::Ms.size() <<env::initial_spin_x.size() << "\t" <<std::endl;
        // This is massively inefficient for large numbers of cells
 
       // std::cin.get();
@@ -452,19 +454,19 @@ namespace environment{
             //    std::cout << env::x_mag_array[cell] << "\t" << env::Ms[cell] <<  std::endl;
              // }
           }
-
-
-      //    std::cout << "set M" << "\t" << std::endl;//env::num_cells <<env::cell_coords_array_x.size() << "\t" << env::cell_size_x.size() << '\t' <<  env::neighbour_list_end_index.size() << std::endl;
+//
+//
+  //        std::cout << "set M" << "\t" << std::endl;//env::num_cells <<env::cell_coords_array_x.size() << "\t" << env::cell_size_x.size() << '\t' <<  env::neighbour_list_end_index.size() << std::endl;
 
        env::one_o_chi_para.resize(env::num_env_cells,0.1);
        env::one_o_chi_perp.resize(env::num_env_cells,0.1);
 
-      // std::cout << env::num_env_cells << "\t" << env::atomistic_cells.size() << '\t' << '\t' << env::num_cells << std::endl;
+    //   std::cout << env::num_env_cells << "\t" << env::atomistic_cells.size() << '\t' << '\t' << env::num_cells << std::endl;
 
       //env::bias_shields();
 
     //initalise the demag fields
-    env::initialise_demag_fields();
+  //  env::initialise_demag_fields();
 
        // std::ofstream mfile;
        // mfile.open("m3.txt");

@@ -186,9 +186,9 @@ namespace environment{
             //   std::cout << "HERE2" << std::endl;
 
                //iff FFt is enabled calculate the demag fields.
-            //   #ifdef FFT
-               if (sim::time %demag_update_rate == 0) env::calculate_demag_fields();
-            //   #endif
+              #ifdef FFT
+              if (sim::time %demag_update_rate == 0) env::calculate_demag_fields();
+              #endif
                //std::vector < double > mm_env_exchange(num_cells,0.0);
                //std::vector < double > env_mm_exchange(mm::num_cells,0.0);
 
@@ -255,13 +255,15 @@ namespace environment{
 
                }
 
-
-
-               #ifdef MPICF
-               MPI_Allreduce(MPI_IN_PLACE, &x_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               MPI_Allreduce(MPI_IN_PLACE, &y_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               #endif
+//                    for (int i =0; i <num_env_cells; i++){
+  //        if (vmpi::my_rank == 1)     std::cerr << i << "\t" << x_spin_storage_array[i] << "\t" << my_env_start_index << '\t' << my_env_end_index << "\t" << num_env_cells << std::endl;
+    //         }
+            //   std::cout << x_spin_storage_array.size() <<  "\t" << num_cells << std::endl;
+                #ifdef MPICF
+              MPI_Allreduce(MPI_IN_PLACE, &x_spin_storage_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+                MPI_Allreduce(MPI_IN_PLACE, &y_spin_storage_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+                MPI_Allreduce(MPI_IN_PLACE, &z_spin_storage_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+                #endif
 
          //     std::cout << "HERE5" << std::endl;
 
@@ -332,16 +334,16 @@ namespace environment{
                   env::z_mag_array[cell] = z_array[cell]*env::Ms[cell];
                }
 
-
+//
                #ifdef MPICF
-               MPI_Allreduce(MPI_IN_PLACE, &env::x_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               MPI_Allreduce(MPI_IN_PLACE, &env::y_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               MPI_Allreduce(MPI_IN_PLACE, &env::z_mag_array[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+               MPI_Allreduce(MPI_IN_PLACE, &env::x_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+               MPI_Allreduce(MPI_IN_PLACE, &env::y_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+               MPI_Allreduce(MPI_IN_PLACE, &env::z_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
                #endif
-
-               //outputs magnetisation
-            if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) 	int a = env::output();
-
+//
+// //               outputs magnetisation
+           if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) 	int a = env::output();
+//
 
          return 0;
 
