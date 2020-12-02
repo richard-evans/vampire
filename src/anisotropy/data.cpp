@@ -59,12 +59,26 @@ namespace anisotropy{
       // unrolled arrays for storing easy axes for each material
       std::vector<evec_t> ku_vector(0); // 001 easy axis direction
 
-      std::vector<double> ku_vectoral_vector_x(100,0); // unit vector defining axis for uniaxial anisotropy
-      std::vector<double> ku_vectoral_vector_y(100,0); // unit vector defining axis for uniaxial anisotropy
-      std::vector<double> ku_vectoral_vector_z(100,0); // unit vector defining axis for uniaxial aniso
+      std::vector<double> ku_triaxial_vector_x(100,0); // unit vector defining axis for triaxial anisotropy
+      std::vector<double> ku_triaxial_vector_y(100,0); //
+      std::vector<double> ku_triaxial_vector_z(100,0); //
+
+      std::vector<double> ku4_triaxial_vector_x(100,0); // unit vector defining axis for triaxial anisotropy
+      std::vector<double> ku4_triaxial_vector_y(100,0); //
+      std::vector<double> ku4_triaxial_vector_z(100,0); //
 
 
-      bool enable_vectoral_anisotropy = false;
+      std::vector<double> ku_triaxial_constant_x(100,0); // constant for triaxial anisotropy 2nd order
+      std::vector<double> ku_triaxial_constant_y(100,0); // normalised for minimal orthogonal set
+      std::vector<double> ku_triaxial_constant_z(100,0); //
+
+      std::vector<double> ku4_triaxial_constant_x(100,0); // constant for triaxial anisotropy 4th order
+      std::vector<double> ku4_triaxial_constant_y(100,0); // normalised for minimal orthogonal set
+      std::vector<double> ku4_triaxial_constant_z(100,0); // 
+
+
+      bool enable_triaxial_anisotropy = false;
+      bool enable_triaxial_fourth_order = false;
 
       bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
    	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms

@@ -20,7 +20,7 @@ neel.o \
 uniaxial_second_order.o \
 uniaxial_fourth_order.o \
 uniaxial_sixth_order.o \
-vectoral_second_order.o
+triaxial_fixed_basis.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/anisotropy/,$(anisotropy_objects))

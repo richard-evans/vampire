@@ -194,10 +194,24 @@ namespace anisotropy{
       extern double neel_exponential_range;          // r0 value for range dependence of Neel anisotropy
       extern double neel_exponential_factor;         // F value for range dependence of Neel anisotropy
 
-      extern bool enable_vectoral_anisotropy;
-      extern std::vector<double> ku_vectoral_vector_x; // unit vector defining axis for uniaxial anisotropy
-      extern std::vector<double> ku_vectoral_vector_y; // unit vector defining axis for uniaxial anisotropy
-      extern std::vector<double> ku_vectoral_vector_z; // unit vector defining axis for uniaxial anisotropy
+      extern bool enable_triaxial_anisotropy;
+      extern bool enable_triaxial_fourth_order;
+      extern std::vector<double> ku_triaxial_vector_x; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku_triaxial_vector_y; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku_triaxial_vector_z; // unit vector defining axis for uniaxial anisotropy
+
+      extern std::vector<double> ku4_triaxial_vector_x; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku4_triaxial_vector_y; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku4_triaxial_vector_z; // unit vector defining axis for uniaxial anisotropy
+
+      extern std::vector<double> ku_triaxial_constant_x; // constant for triaxial anisotropy 2nd order
+      extern std::vector<double> ku_triaxial_constant_y; // normalised for minimal orthogonal set
+      extern std::vector<double> ku_triaxial_constant_z; //
+
+      extern std::vector<double> ku4_triaxial_constant_x; // constant for triaxial anisotropy 4th order
+      extern std::vector<double> ku4_triaxial_constant_y; // normalised for minimal orthogonal set
+      extern std::vector<double> ku4_triaxial_constant_z; // 
+
 
       // arrays for storing unrolled parameters for lattice anisotropy
       extern std::vector<double> klattice_array; // anisoptropy constant
@@ -215,15 +229,15 @@ namespace anisotropy{
                                         const int start_index,
                                         const int end_index);
 
-       void vectoral_second_order_fields(std::vector<double>& spin_array_x,
-                                         std::vector<double>& spin_array_y,
-                                         std::vector<double>& spin_array_z,
-                                         std::vector<int>&    atom_material_array,
-                                         std::vector<double>& field_array_x,
-                                         std::vector<double>& field_array_y,
-                                         std::vector<double>& field_array_z,
-                                         const int start_index,
-                                         const int end_index);
+       void triaxial_second_order_fields_fixed_basis(std::vector<double>& spin_array_x,
+                                                     std::vector<double>& spin_array_y,
+                                                     std::vector<double>& spin_array_z,
+                                                     std::vector<int>&    atom_material_array,
+                                                     std::vector<double>& field_array_x,
+                                                     std::vector<double>& field_array_y,
+                                                     std::vector<double>& field_array_z,
+                                                     const int start_index,
+                                                     const int end_index);
 
       void uniaxial_fourth_order_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
@@ -301,6 +315,12 @@ namespace anisotropy{
                                            const double sx,
                                            const double sy,
                                            const double sz);
+
+      double triaxial_second_order_energy_fied_basis( const int atom,
+                                                      const int mat,
+                                                      const double sx,
+                                                      const double sy,
+                                                      const double sz);
 
       double uniaxial_fourth_order_energy(const int atom,
                                           const int mat,

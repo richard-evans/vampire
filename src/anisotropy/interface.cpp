@@ -110,6 +110,7 @@ namespace anisotropy{
       //------------------------------------------------------------
       // Check for material properties
       //------------------------------------------------------------
+      //Minimal orthogonality TBD
       std::string test  = "second-order-uniaxial-anisotropy-constant"; // new form (preferred)
       std::string test2 = "uniaxial-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
       if( (word == test) || (word == test2) ){
@@ -120,22 +121,58 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      //Minimal orthogonality TBD
       test = "second-order-triaxial-anisotropy-vector";
       if( word == test ){
          std::vector<double> u(3);
          // read values from string
          u = vin::doubles_from_string(value);
-         std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
          // check for sane input and normalise if necessary
          //vin::check_for_valid_vector(u, word, line, prefix, "material");
          // Copy sanitised unit vector to material
-         internal::ku_vectoral_vector_x[super_index] = u[0];
-         internal::ku_vectoral_vector_y[super_index] = u[1];
-         internal::ku_vectoral_vector_z[super_index] = u[2];
-         internal::enable_vectoral_anisotropy = true;
+         internal::ku_triaxial_vector_x[super_index] = u[0];
+         internal::ku_triaxial_vector_y[super_index] = u[1];
+         internal::ku_triaxial_vector_z[super_index] = u[2];
+         internal::enable_triaxial_anisotropy = true;
          return true;
       }
+      //Triaxial anisotropy in second and fourth order
+      test="second-order-triaxial-anisotropy-constant";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         //vin::check_for_valid_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku_triaxial_constant_x[super_index] = u[0];
+         internal::ku_triaxial_constant_y[super_index] = u[1];
+         internal::ku_triaxial_constant_z[super_index] = u[2];
+         internal::enable_triaxial_anisotropy = true;
+         return true;
 
+      }
+      test="fourth-order-triaxial-anisotropy-constant";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         //vin::check_for_valid_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku4_triaxial_constant_x[super_index] = u[0];
+         internal::ku4_triaxial_constant_y[super_index] = u[1];
+         internal::ku4_triaxial_constant_z[super_index] = u[2];
+         internal::enable_triaxial_fourth_order = true;
+         return true;
+
+      }
+
+      //------------------------------------------------------------
+      //Minimal orthogonality TBD
       test = "fourth-order-uniaxial-anisotropy-constant";
       if( word == test ){
          double ku4 = atof(value.c_str());
@@ -145,6 +182,7 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      //Minimal orthogonality
       test = "sixth-order-uniaxial-anisotropy-constant";
       if( word == test ){
          double ku6 = atof(value.c_str());
@@ -154,6 +192,7 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      //Minimal orthogonality
       test = "fourth-order-cubic-anisotropy-constant"; // new form (preferred)
       test2  = "cubic-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
       if( (word == test) || (word == test2) ){
@@ -165,6 +204,7 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      //Minimal orthogonality
       test = "sixth-order-cubic-anisotropy-constant";
       if( word == test ){
          double kc6 = atof(value.c_str());
