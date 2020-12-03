@@ -450,6 +450,11 @@ namespace vin{
                 sim::program=51;
                 return EXIT_SUCCESS;
             }
+            test="domain-wall";
+            if(value==test){
+                sim::program=52;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
@@ -1394,6 +1399,11 @@ namespace vin{
            stats::calculate_material_energy = true;
            output_list.push_back(64);
            return EXIT_SUCCESS;
+        }
+        test="domain-wall-centre";
+        if(word==test){
+            output_list.push_back(65);
+            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="gnuplot-array-format";

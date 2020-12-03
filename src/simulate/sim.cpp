@@ -478,6 +478,13 @@ int run(){
 	     	}
 		  	program::setting_process();
 		    break;
+		 case 52:
+			if(vmpi::my_rank==0){
+				 std::cout << "Domain walls..." << std::endl;
+				 zlog << "Domain walls..." << std::endl;
+			}
+			program::domain_wall();
+			 break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;

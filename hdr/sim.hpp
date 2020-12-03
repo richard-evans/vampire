@@ -180,6 +180,11 @@ namespace sim{
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;
 
+	extern int domain_wall_axis;
+   extern double domain_wall_position;
+	extern double domain_wall_discretisation;
+   extern double domain_wall_centre;
+	extern std::vector < bool > anti_PBC;
 }
 
 /*namespace ckp{
