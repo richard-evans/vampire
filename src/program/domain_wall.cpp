@@ -44,52 +44,25 @@ void domain_wall(){
     num_averages = num_averages/2.0;
     int num_dw_cells = (cs::system_dimensions[sim::domain_wall_axis])/sim::domain_wall_discretisation + 1;
     std::vector <double > atom_to_cell_array(num_local_atoms,0);
-    std::vector < std::vector < double > > mag;
-    std::vector < std::vector < double > > initial_mag;
+		std::vector  < double > mag_x;
+		std::vector  < double > mag_y;
+    std::vector  < double > mag_z;
     std::vector < std::vector < double > > counter;
     std::vector < std::vector < double > > sum_mag;
-    std::vector < std::vector < double > > num_atoms_in_cell;
+    std::vector < int > num_atoms_in_cell;
 
     sum_mag.resize(num_dw_cells*3);
-    num_atoms_in_cell.resize(num_dw_cells*3);
+		num_atoms_in_cell.resize(num_dw_cells*mp::num_materials);
+		mag_x.resize(num_dw_cells*mp::num_materials);
+		mag_y.resize(num_dw_cells*mp::num_materials);
+		mag_z.resize(num_dw_cells*mp::num_materials);
     counter.resize(num_dw_cells*3);
-    initial_mag.resize(num_dw_cells*3);
-    mag.resize(num_dw_cells*3);
 
     for (int i = 0; i < num_dw_cells*3; ++i)
     {
       sum_mag[i].resize(mp::num_materials);
-       num_atoms_in_cell[i].resize(mp::num_materials);
        counter[i].resize(mp::num_materials);
-       initial_mag[i].resize(mp::num_materials);
-       mag[i].resize(mp::num_materials);
     }
-
-   //works out which atoms are in which cells and sets cells based on wether the domain wall
-   //is along x or y or z
-
-   if (sim::domain_wall_axis == 0){
-      for(int atom=0;atom<num_local_atoms;atom++){
-         int mat = atoms::type_array[atom];
-         int cell = atoms::x_coord_array[atom]/sim::domain_wall_discretisation;
-         atom_to_cell_array[atom] = cell;
-         num_atoms_in_cell[cell][mat] ++;
-		//	if (cell > num_dw_cells) std::cout << atoms::x_coord_array[atom] << '\t' << sim::domain_wall_discretisation <<std::endl;
-      }
-   }
-   // if (sim::domain_wall_axis == 1){
-   //    for(int atom=0;atom<num_local_atoms;atom++){
-   //       int cell = atoms::y_coord_array[atom]/sim::domain_wall_discretisation;
-   //       atom_to_cell_array[atom] = cell;
-	 //
-   //    }
-   // }
-   // if (sim::domain_wall_axis == 2){
-   //    for(int atom=0;atom<num_local_atoms;atom++){
-   //       int cell = atoms::z_coord_array[atom]/sim::domain_wall_discretisation;
-   //       atom_to_cell_array[atom] = cell;
-   //    }
-   // }
 
 
    //reverses the magentisation of atoms further away than the domain wall distance.
@@ -103,26 +76,26 @@ void domain_wall(){
              }
          }
       }
-			//
-      // if (sim::domain_wall_axis == 1){
-      //    for(int atom=0;atom<num_local_atoms;atom++){
-      //       if (atoms::y_coord_array[atom] > cs::system_dimensions[1]*sim::domain_wall_position){
-      //          atoms::x_spin_array[atom] = -atoms::x_spin_array[atom];
-      //          atoms::y_spin_array[atom] = -atoms::y_spin_array[atom];
-      // 	      atoms::z_spin_array[atom] = -atoms::z_spin_array[atom];
-      //        }
-      //    }
-      // }
-			//
-      // if (sim::domain_wall_axis == 2){
-      //    for(int atom=0;atom<num_local_atoms;atom++){
-      //       if (atoms::z_coord_array[atom] > cs::system_dimensions[2]*sim::domain_wall_position){
-      //          atoms::x_spin_array[atom] = -atoms::x_spin_array[atom];
-      //          atoms::y_spin_array[atom] = -atoms::y_spin_array[atom];
-      // 	      atoms::z_spin_array[atom] = -atoms::z_spin_array[atom];
-      //        }
-      //    }
-      // }
+
+      if (sim::domain_wall_axis == 1){
+         for(int atom=0;atom<num_local_atoms;atom++){
+            if (atoms::y_coord_array[atom] > cs::system_dimensions[1]*sim::domain_wall_position){
+               atoms::x_spin_array[atom] = -atoms::x_spin_array[atom];
+               atoms::y_spin_array[atom] = -atoms::y_spin_array[atom];
+      	      atoms::z_spin_array[atom] = -atoms::z_spin_array[atom];
+             }
+         }
+      }
+
+      if (sim::domain_wall_axis == 2){
+         for(int atom=0;atom<num_local_atoms;atom++){
+            if (atoms::z_coord_array[atom] > cs::system_dimensions[2]*sim::domain_wall_position){
+               atoms::x_spin_array[atom] = -atoms::x_spin_array[atom];
+               atoms::y_spin_array[atom] = -atoms::y_spin_array[atom];
+      	      atoms::z_spin_array[atom] = -atoms::z_spin_array[atom];
+             }
+         }
+      }
    }
 
 	if (sim::anti_PBC[0] || sim::anti_PBC[1] || sim::anti_PBC[2]){
@@ -132,21 +105,22 @@ void domain_wall(){
 			for(int nn=start;nn<end;nn++){
 				const int natom = atoms::neighbour_list_array[nn];
 				if (sim::anti_PBC[0] == true){
-					const double dx = atoms::x_coord_array[atom] - atoms::x_coord_array[natom];
-					if (dx > cs::system_dimensions[0]-5){
+					const double dx = (atoms::x_coord_array[atom] - atoms::x_coord_array[natom])*(atoms::x_coord_array[atom] - atoms::x_coord_array[natom]);
+					if (dx > (cs::system_dimensions[0]-5)*(cs::system_dimensions[0]-5)){
 						atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij = -1.0*atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
+					//	std::cout << "APB" << "\t" << atoms::x_coord_array[atom] << "\t" << atoms::x_coord_array[natom] << std::endl;
 					}
 				}
 				if (sim::anti_PBC[1] == true){
 
-					const double dy = atoms::y_coord_array[atom] - atoms::y_coord_array[natom];
-					if (dy > cs::system_dimensions[1]-20){
+					const double dy = (atoms::y_coord_array[atom] - atoms::y_coord_array[natom])*(atoms::y_coord_array[atom] - atoms::y_coord_array[natom]);
+					if (dy > (cs::system_dimensions[1]-5)*(cs::system_dimensions[1]-5)){
 					atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij = -1.0*atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
 					}
 				}
 				if (sim::anti_PBC[2] == true){
-					const double dz = atoms::z_coord_array[atom] - atoms::z_coord_array[natom];
-					if (dz > cs::system_dimensions[2]-20){
+					const double dz = (atoms::z_coord_array[atom] - atoms::z_coord_array[natom])*(atoms::z_coord_array[atom] - atoms::z_coord_array[natom]);
+					if (dz > (cs::system_dimensions[2]-5)*(cs::system_dimensions[2]-5)){
 					atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij = -1.0*atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij * -1;
 				}
 				}
@@ -154,7 +128,43 @@ void domain_wall(){
 		}
 	}
 
-//std::cout << "end loop" << std::endl;
+
+	//works out which atoms are in which cells and sets cells based on wether the domain wall
+	//is along x or y or z
+
+	if (sim::domain_wall_axis == 0){
+		 for(int atom=0;atom<num_local_atoms;atom++){
+				int mat = atoms::type_array[atom];
+				int cell = atoms::x_coord_array[atom]/sim::domain_wall_discretisation;
+				atom_to_cell_array[atom] = cell;
+				num_atoms_in_cell[num_dw_cells*mat + cell] ++;
+	 //	if (cell > num_dw_cells) std::cout << atoms::x_coord_array[atom] << '\t' << sim::domain_wall_discretisation <<std::endl;
+		 }
+	}
+	if (sim::domain_wall_axis == 1){
+		 for(int atom=0;atom<num_local_atoms;atom++){
+			 int mat = atoms::type_array[atom];
+				int cell = atoms::y_coord_array[atom]/sim::domain_wall_discretisation;
+				atom_to_cell_array[atom] = cell;
+				num_atoms_in_cell[num_dw_cells*mat + cell] ++;
+		 }
+	}
+	if (sim::domain_wall_axis == 2){
+		 for(int atom=0;atom<num_local_atoms;atom++){
+			 int mat = atoms::type_array[atom];
+				int cell = atoms::z_coord_array[atom]/sim::domain_wall_discretisation;
+				atom_to_cell_array[atom] = cell;
+				num_atoms_in_cell[num_dw_cells*mat + cell] ++;
+
+		 }
+	}
+
+
+
+	#ifdef MPICF
+		MPI_Allreduce(MPI_IN_PLACE, &num_atoms_in_cell[0],     num_dw_cells*mp::num_materials,    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
+  #endif
+
 
    // Set equilibration temperature only if continue checkpoint not loaded
    if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag){}
@@ -199,14 +209,20 @@ void domain_wall(){
       for (int cell = 0; cell < num_dw_cells; cell++){
          for (int mat = 0; mat < mp::num_materials; mat ++){
       //      std::cout << mat << '\t' << cell << "\t" << mag[cell*3 + 0][mat] << "\t" << mag[cell*3 + 1][mat] << "\t" << mag[cell*3 + 2][mat] << std::endl;
-            mag[3*cell + 0][mat] = 0;
-            mag[3*cell + 1][mat] = 0;
-            mag[3*cell + 2][mat] = 0;
-            initial_mag[3*cell + 0][mat] = 0;
-            initial_mag[3*cell + 1][mat] = 0;
-            initial_mag[3*cell + 2][mat] = 0;
+            mag_x[num_dw_cells*mat + cell] = 0.0;
+            mag_y[num_dw_cells*mat + cell] = 0.0;
+            mag_z[num_dw_cells*mat + cell] = 0.0;
          }
       }
+
+			#ifdef MPICF
+			MPI_Allreduce(MPI_IN_PLACE, &mag_x[0],     num_dw_cells*mp::num_materials,    MPI_DOUBLE,    MPI_MIN, MPI_COMM_WORLD);
+			MPI_Allreduce(MPI_IN_PLACE, &mag_y[0],     num_dw_cells*mp::num_materials,    MPI_DOUBLE,    MPI_MIN, MPI_COMM_WORLD);
+			 MPI_Allreduce(MPI_IN_PLACE, &mag_z[0],     num_dw_cells*mp::num_materials,    MPI_DOUBLE,    MPI_MIN, MPI_COMM_WORLD);
+		//	MPI_Allreduce(MPI_IN_PLACE, &num_atoms_in_cell[0],     num_dw_cells*mp::num_materials,    MPI_INT,    MPI_MIN, MPI_COMM_WORLD);
+		 #endif
+
+
 
 	//	std::cout << "initially set cells" << std::endl;
 
@@ -225,41 +241,32 @@ void domain_wall(){
       for(int atom=0;atom<num_local_atoms;atom++){
          int cell = atom_to_cell_array[atom];
          int mat = atoms::type_array[atom];
-		//	std::cout << atom << '\t' << cell << "\t" << mat << "\t" << num_local_atoms << "\t" << atoms::x_spin_array.size() << "\t" << initial_mag.size() << "\t" << initial_mag[0].size() << std::endl;
-         initial_mag[cell*3 + 0][mat] += atoms::x_spin_array[atom];
-	//		std::cout << "a" << std::endl;
-         initial_mag[cell*3 + 1][mat] += atoms::y_spin_array[atom];
-	//		std::cout << "a" << std::endl;
-
-         initial_mag[cell*3 + 2][mat] += atoms::z_spin_array[atom];
-	//		std::cout << "a" << std::endl;
-
-      //   if (mat == 0) myfile << cell << "\t" << mag[cell*3 + 0][mat] << "\t" << mag[cell*3 + 1][mat] << "\t" << mag[cell*3 + 2][mat] << std::endl;
-
+         mag_x[num_dw_cells*mat + cell] += atoms::x_spin_array[atom];
+         mag_y[num_dw_cells*mat + cell] += atoms::y_spin_array[atom];
+         mag_z[num_dw_cells*mat + cell] += atoms::z_spin_array[atom];
       }
-	//	std::cout << "loop over atoms" << std::endl;
 
-	//	for (int cell = 0; cell < num_dw_cells; cell++){
-       for (int cell = num_averages; cell < num_dw_cells - num_averages; cell++){
-          int mat = 0;
-         // mag[cell*3 + 0][mat] = initial_mag[cell*3 + 0][mat]/num_atoms_in_cell[cell][mat];
-         // mag[cell*3 + 1][mat] = initial_mag[cell*3 + 1][mat]/num_atoms_in_cell[cell][mat];
-         // mag[cell*3 + 2][mat] = initial_mag[cell*3 + 2][mat]/num_atoms_in_cell[cell][mat];
-         for (int i = cell - num_averages; i < cell + num_averages; i ++  ){
-            mag[cell*3 + 0][mat] = mag[cell*3 + 0][mat] + initial_mag[i*3 + 0][mat]/(num_atoms_in_cell[i][mat]*num_averages*2+1);
-            mag[cell*3 + 1][mat] = mag[cell*3 + 1][mat] + initial_mag[i*3 + 1][mat]/(num_atoms_in_cell[i][mat]*num_averages*2+1);
-            mag[cell*3 + 2][mat] = mag[cell*3 + 2][mat] + initial_mag[i*3 + 2][mat]/(num_atoms_in_cell[i][mat]*num_averages*2+1);
-          }
-         //mag[cell*3 + 0][mat]= mag[cell*3 + 0][mat]/(num_averages+1);
-         myfile << cell << '\t'<< '\t' << mag[cell*3 + 0][mat] << "\t" << mag[cell*3 + 1][mat] << "\t" << mag[cell*3 + 2][mat] <<"\t" << std::endl;// av_dl << std::endl;//'\t' << sum_mag[new_pos*3 + 0][mat] << "\t" << sum_mag[new_pos*3 + 1][mat] << "\t" << sum_mag[new_pos*3 + 2][mat] << "\t" << counter[new_pos][mat] << "\t" << dl[cell][mat] << std::endl;
 
+			#ifdef MPICF
+			MPI_Allreduce(MPI_IN_PLACE, &mag_x[0],     num_dw_cells*mp::num_materials,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+			MPI_Allreduce(MPI_IN_PLACE, &mag_y[0],     num_dw_cells*mp::num_materials,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+ 	     MPI_Allreduce(MPI_IN_PLACE, &mag_z[0],     num_dw_cells*mp::num_materials,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+		 #endif
+	//	 std::cout << "a" <<std::endl;
+
+		 for (int cell = 0; cell < num_dw_cells; cell++){
+          for (int mat = 0; mat < mp::num_materials; mat ++){
+						if (num_atoms_in_cell[num_dw_cells*mat + cell] > 0){
+         			// mag_x[num_dw_cells*mat + cell] = mag_x[num_dw_cells*mat + cell]/num_atoms_in_cell[num_dw_cells*mat + cell];
+         	 	 // mag_y[num_dw_cells*mat + cell] = mag_y[num_dw_cells*mat + cell]/num_atoms_in_cell[num_dw_cells*mat + cell];
+         			// mag_z[num_dw_cells*mat + cell] = mag_z[num_dw_cells*mat + cell]/num_atoms_in_cell[num_dw_cells*mat + cell];
+							//std::cout << cell <<"\t" <<  mat << '\t' << mag_x[num_dw_cells*mat + cell] /num_atoms_in_cell[num_dw_cells*mat + cell]  << "\t" << mag_y[num_dw_cells*mat + cell] /num_atoms_in_cell[num_dw_cells*mat + cell]  << "\t" << mag_z[num_dw_cells*mat + cell]  << "\t" << num_atoms_in_cell[num_dw_cells*mat + cell]  <<  std::endl;// av_dl << std::endl;//'\t' << sum_mag[new_pos*3 + 0][mat] << "\t" << sum_mag[new_pos*3 + 1][mat] << "\t" << sum_mag[new_pos*3 + 2][mat] << "\t" << counter[new_pos][mat] << "\t" << dl[cell][mat] << std::endl;
+
+        	myfile << cell <<"\t" <<  mat << '\t' << mag_x[num_dw_cells*mat + cell] /num_atoms_in_cell[num_dw_cells*mat + cell]  << "\t" << mag_y[num_dw_cells*mat + cell] /num_atoms_in_cell[num_dw_cells*mat + cell]  << "\t" << mag_z[num_dw_cells*mat + cell]  << "\t" << num_atoms_in_cell[num_dw_cells*mat + cell]  <<  std::endl;// av_dl << std::endl;//'\t' << sum_mag[new_pos*3 + 0][mat] << "\t" << sum_mag[new_pos*3 + 1][mat] << "\t" << sum_mag[new_pos*3 + 2][mat] << "\t" << counter[new_pos][mat] << "\t" << dl[cell][mat] << std::endl;
+				}
       }
-		// for (int cell = num_averages +1; cell < num_dw_cells - num_averages ; cell++){
-		// 	if (sim::anti_PBC[0] == true){
-		// 		val = mag[cell*3 + 0][0]*mag[(cell-1)*3 + 0][0];
-		// 	}
-		// }
-		//
+		}
+
       // double max_dl = 0;
       // double centre = 0;
       // std::vector < std::vector < double > > dl;
