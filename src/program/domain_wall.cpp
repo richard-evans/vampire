@@ -97,28 +97,38 @@ void domain_wall(){
          }
       }
    }
-
+//	 std::cout << sim::anti_PBC[0] << '\t' <<  sim::anti_PBC[1] << '\t' <<  sim::anti_PBC[2] <<std::endl;
 	if (sim::anti_PBC[0] || sim::anti_PBC[1] || sim::anti_PBC[2]){
 		for (int atom = 0; atom <num_local_atoms; atom++){
 			const int start = atoms::neighbour_list_start_index[atom];
 			const int end   = atoms::neighbour_list_end_index[atom] + 1;
 			for(int nn=start;nn<end;nn++){
 				const int natom = atoms::neighbour_list_array[nn];
+
 				if (sim::anti_PBC[0] == true){
+					#ifdef MPICF
+						if (atoms::x_coord_array[natom] < 0 || atoms::x_coord_array[natom] > cs::system_dimensions[0] || atoms::x_coord_array[atom] < 0 || atoms::x_coord_array[atom] > cs::system_dimensions[0]){
+							atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij = -1.0*atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
+						//	std::cout << atoms::x_coord_array[natom] << '\t' << atoms::x_coord_array[atom] << std::endl;
+						}
+					#else
 					const double dx = (atoms::x_coord_array[atom] - atoms::x_coord_array[natom])*(atoms::x_coord_array[atom] - atoms::x_coord_array[natom]);
-					if (dx > (cs::system_dimensions[0]-5)*(cs::system_dimensions[0]-5)){
+					if (dx > (cs::system_dimensions[0]-10)*(cs::system_dimensions[0]-10)){
 						atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij = -1.0*atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
-					//	std::cout << "APB" << "\t" << atoms::x_coord_array[atom] << "\t" << atoms::x_coord_array[natom] << std::endl;
+			//			std::cout << "APB" << "\t" << atoms::x_coord_array[atom] << "\t" << atoms::x_coord_array[natom] << std::endl;
 					}
+					#endif
+
 				}
 				if (sim::anti_PBC[1] == true){
-
+			//		std::cout << "y" << std::endl;
 					const double dy = (atoms::y_coord_array[atom] - atoms::y_coord_array[natom])*(atoms::y_coord_array[atom] - atoms::y_coord_array[natom]);
 					if (dy > (cs::system_dimensions[1]-5)*(cs::system_dimensions[1]-5)){
 					atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij = -1.0*atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij;
 					}
 				}
 				if (sim::anti_PBC[2] == true){
+		//								std::cout << "z" << std::endl;
 					const double dz = (atoms::z_coord_array[atom] - atoms::z_coord_array[natom])*(atoms::z_coord_array[atom] - atoms::z_coord_array[natom]);
 					if (dz > (cs::system_dimensions[2]-5)*(cs::system_dimensions[2]-5)){
 					atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij = -1.0*atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij * -1;
