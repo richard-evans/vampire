@@ -170,11 +170,14 @@ namespace anisotropy{
       extern bool enable_cubic_sixth_order;     // Flag to enable calculation of sixth order cubic  anisotropy
       extern bool enable_cubic_fourth_order_rotation; // Flag to enable calculation of rotated cubic anisotropy
 
+      extern bool enable_triaxial_anisotropy_rotated;
+      extern bool enable_triaxial_fourth_order_rotated;
+      extern bool enable_triaxial_anisotropy;
+      extern bool enable_triaxial_fourth_order;
+
       extern bool enable_neel_anisotropy; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
       extern bool enable_lattice_anisotropy; // Flag to turn on lattice anisotropy calculation
       extern bool enable_random_anisotropy; // Flag to enable random anisitropy initialisation
-
-
 
       // arrays for storing 1D collapsed Neel tensor
       extern std::vector<double> neel_tensor;
@@ -196,10 +199,8 @@ namespace anisotropy{
       extern double neel_exponential_range;          // r0 value for range dependence of Neel anisotropy
       extern double neel_exponential_factor;         // F value for range dependence of Neel anisotropy
 
-      extern bool enable_triaxial_anisotropy;
-      extern bool  enable_triaxial_fourth_order;
-      extern std::vector<double>  triaxial_second_order_fixed_basis;
-      extern std::vector<double>  triaxial_fourth_order_fixed_basis;
+      extern std::vector<bool> triaxial_second_order_fixed_basis;
+      extern std::vector<bool> triaxial_fourth_order_fixed_basis;
 
       extern std::vector<double> ku_triaxial_vector_x; // unit vector defining axis for uniaxial anisotropy
       extern std::vector<double> ku_triaxial_vector_y; // unit vector defining axis for uniaxial anisotropy

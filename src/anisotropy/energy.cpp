@@ -45,6 +45,11 @@ namespace anisotropy{
       if(internal::enable_neel_anisotropy)               energy += internal::neel_energy(atom, mat, sx, sy, sz);
       if(internal::enable_lattice_anisotropy)            energy += internal::lattice_energy(atom, mat, sx, sy, sz, temperature);
 
+      if(internal::enable_triaxial_anisotropy)           energy += internal::triaxial_second_order_energy_fixed_basis(atom, mat, sx, sy, sz);
+      if(internal::enable_triaxial_anisotropy_rotated)   energy += internal::triaxial_second_order_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_triaxial_fourth_order)         energy += internal::triaxial_fourth_order_energy_fixed_basis(atom, mat, sx, sy, sz);
+      if(internal::enable_triaxial_fourth_order_rotated) energy += internal::triaxial_fourth_order_energy(atom, mat, sx, sy, sz);
+
       return energy;
 
    }

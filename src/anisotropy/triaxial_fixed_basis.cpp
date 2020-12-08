@@ -94,24 +94,22 @@ namespace anisotropy{
       // Function to add second order uniaxial anisotropy in x,y and z
       // E = 2/3 * - ku2 (1/2)  * (3sz^2 - 1) == -ku2 sz^2 + const
       //---------------------------------------------------------------------------------
-       double triaxial_second_order_energy_fixed_basis(const int atom,
+      double triaxial_second_order_energy_fixed_basis(const int atom,
+                                                      const int mat,
+                                                      const double sx,
+                                                      const double sy,
+                                                      const double sz){
 
-                                           const int mat,
-                                           const double sx,
-                                           const double sy,
-                                           const double sz){
+         // get reduced anisotropy constant ku/mu_s (Tesla)
+         const double kx = internal::ku_triaxial_vector_x[mat];
+         const double ky = internal::ku_triaxial_vector_y[mat];
+         const double kz = internal::ku_triaxial_vector_z[mat];
 
-          // get reduced anisotropy constant ku/mu_s (Tesla)
+         const double energy = (sx*sx*kx + sy*sy*ky + sz*sz*kz);
 
-          const double kx = internal::ku_triaxial_vector_x[mat];
-          const double ky = internal::ku_triaxial_vector_y[mat];
-          const double kz = internal::ku_triaxial_vector_z[mat];
+         return -(energy);
 
-	      const double energy = (sx*sx*kx + sy*sy*ky + sz*sz*kz);
-
-          return -(energy);
-
-       }
+      }
 
       void triaxial_fourth_order_fields_fixed_basis(std::vector<double>& spin_array_x,
                                                     std::vector<double>& spin_array_y,
