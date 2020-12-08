@@ -61,10 +61,8 @@ namespace anisotropy{
          //if not enabled then do nothing
         if(!internal::enable_triaxial_anisotropy_rotated) return;
 
-         // rescaling prefactor
-         // E = 2/3 * - ku2 (1/2)  * (3sz^2 - 1) == -ku2 sz^2 + const
-         // H = -dE/dS = +2ku2 sz
-          const double scale = 2.0; // 2*2/3 = 2 Factor to rescale anisotropies to usual scale
+         // rescaling prefactor from derivative
+          const double scale = 2.0;
          //
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -106,14 +104,29 @@ namespace anisotropy{
                                           const double sy,
                                           const double sz){
 
-       // get reduced anisotropy constant ku/mu_s (Tesla)
-       const double kx = internal::ku_triaxial_vector_x[mat];
-       const double ky = internal::ku_triaxial_vector_y[mat];
-       const double kz = internal::ku_triaxial_vector_z[mat];
+         // Get basis vectors
+         const double eA[3] = {internal::ku4_triaxial_basis1x[mat],internal::ku4_triaxial_basis1y[mat],internal::ku4_triaxial_basis1z[mat]};
+         const double eB[3] = {internal::ku4_triaxial_basis2x[mat],internal::ku4_triaxial_basis2y[mat],internal::ku4_triaxial_basis2z[mat]};
+         const double eC[3] = {internal::ku4_triaxial_basis3x[mat],internal::ku4_triaxial_basis3y[mat],internal::ku4_triaxial_basis3z[mat]};
 
-       const double energy = (sx*sx*kx + sy*sy*ky + sz*sz*kz);
+         // compute dot products with each basis vector
+         const double sdoteA = eA[0]*sx + eA[1]*sy + eA[2]*sz;
+         const double sdoteB = eB[0]*sx + eB[1]*sy + eB[2]*sz;
+         const double sdoteC = eC[0]*sx + eC[1]*sy + eC[2]*sz;
 
-       return -(energy);
+         // get reduced anisotropy constant ku/mu_s (Tesla)
+         const double kA = internal::ku4_triaxial_vector_x[mat];
+         const double kB = internal::ku4_triaxial_vector_y[mat];
+         const double kC = internal::ku4_triaxial_vector_z[mat];
+
+         // compute send and fourth order components
+         const double sdoteA2 = sdoteA*sdoteA;
+         const double sdoteB2 = sdoteB*sdoteB;
+         const double sdoteC2 = sdoteC*sdoteC;
+
+         const double energy = kA*sdoteA2 + kB*sdoteB2 + kC*sdoteC2;
+
+         return -(energy);
 
       }
 
@@ -130,12 +143,8 @@ namespace anisotropy{
          // if not enabled then do nothing
          if(!internal::enable_triaxial_fourth_order_rotated) return;
 
-         // constant factors
-         const double oneo8 = 1.0/8.0;
-
          // rescaling prefactor
-         const double scale = oneo8*2.0/3.0; // Factor to rescale anisotropies to usual scale
-
+         const double sixtyothirtyfive = 60.0/35.0;
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -143,14 +152,13 @@ namespace anisotropy{
             // get atom material
             const int mat = atom_material_array[atom];
 
-            double eA[3] = {internal::ku4_triaxial_basis1x[mat],internal::ku4_triaxial_basis1y[mat],internal::ku4_triaxial_basis1z[mat]};
-            double eB[3] = {internal::ku4_triaxial_basis2x[mat],internal::ku4_triaxial_basis2y[mat],internal::ku4_triaxial_basis2z[mat]};
-            double eC[3] = {internal::ku4_triaxial_basis3x[mat],internal::ku4_triaxial_basis3y[mat],internal::ku4_triaxial_basis3z[mat]};
+            const double eA[3] = {internal::ku4_triaxial_basis1x[mat],internal::ku4_triaxial_basis1y[mat],internal::ku4_triaxial_basis1z[mat]};
+            const double eB[3] = {internal::ku4_triaxial_basis2x[mat],internal::ku4_triaxial_basis2y[mat],internal::ku4_triaxial_basis2z[mat]};
+            const double eC[3] = {internal::ku4_triaxial_basis3x[mat],internal::ku4_triaxial_basis3y[mat],internal::ku4_triaxial_basis3z[mat]};
 
             const double sx = spin_array_x[atom]; // store spin direction in temporary variables
             const double sy = spin_array_y[atom];
             const double sz = spin_array_z[atom];
-
 
             // get reduced anisotropy constant ku/mu_s
             const double kA = internal::ku4_triaxial_vector_x[mat];
@@ -166,10 +174,9 @@ namespace anisotropy{
             const double sdoteC3 = sdoteC*sdoteC*sdoteC;
 
             // calculate field (double negative from scale factor and negative derivative)
-            //const double k4 = scale*(140.0*sdotk3 - 60.0*sdotk);
-            const double k4A = scale*(sdoteA3 - (60.0/35.0)*sdoteA);
-            const double k4B = scale*(sdoteB3 - (60.0/35.0)*sdoteB);
-            const double k4C = scale*(sdoteC3 - (60.0/35.0)*sdoteC);
+            const double k4A = 4.0*sdoteA3 - sixtyothirtyfive*sdoteA;
+            const double k4B = 4.0*sdoteB3 - sixtyothirtyfive*sdoteB;
+            const double k4C = 4.0*sdoteC3 - sixtyothirtyfive*sdoteC;
 
             field_array_x[atom] += kA*eA[0]*k4A +kB*eB[0]*k4B +kC*eC[0]*k4C;
             field_array_y[atom] += kA*eA[1]*k4A +kB*eB[1]*k4B +kC*eC[1]*k4C;
@@ -187,25 +194,43 @@ namespace anisotropy{
       // Function to add fourth order uniaxial anisotropy
       // E = 2/3 * - (1/8)  * (35sz^4 - 30sz^2 + 3)
       //---------------------------------------------------------------------------------
+      const double thirty_over_thirtyfive = 30.0/35.0; // file level constant for speed
+      //
       double triaxial_fourth_order_energy(const int atom,
                                           const int mat,
                                           const double sx,
                                           const double sy,
                                           const double sz){
 
+         // Get basis vectors
+         const double eA[3] = {internal::ku4_triaxial_basis1x[mat],internal::ku4_triaxial_basis1y[mat],internal::ku4_triaxial_basis1z[mat]};
+         const double eB[3] = {internal::ku4_triaxial_basis2x[mat],internal::ku4_triaxial_basis2y[mat],internal::ku4_triaxial_basis2z[mat]};
+         const double eC[3] = {internal::ku4_triaxial_basis3x[mat],internal::ku4_triaxial_basis3y[mat],internal::ku4_triaxial_basis3z[mat]};
+
+         // compute dot products with each basis vector
+         const double sdoteA = eA[0]*sx + eA[1]*sy + eA[2]*sz;
+         const double sdoteB = eB[0]*sx + eB[1]*sy + eB[2]*sz;
+         const double sdoteC = eC[0]*sx + eC[1]*sy + eC[2]*sz;
+
          // get reduced anisotropy constant ku/mu_s (Tesla)
+         const double kA = internal::ku4_triaxial_vector_x[mat];
+         const double kB = internal::ku4_triaxial_vector_y[mat];
+         const double kC = internal::ku4_triaxial_vector_z[mat];
 
-         const double kx = internal::ku4_triaxial_vector_x[mat];
-         const double ky = internal::ku4_triaxial_vector_y[mat];
-         const double kz = internal::ku4_triaxial_vector_z[mat];
+         // compute send and fourth order components
+         const double sdoteA2 = sdoteA*sdoteA;
+         const double sdoteB2 = sdoteB*sdoteB;
+         const double sdoteC2 = sdoteC*sdoteC;
 
-         const double sdotk  = (sx*kx + sy*ky + sz*kz);
-         const double sdotk2 = sdotk*sdotk;
+         const double sdoteA4 = sdoteA2*sdoteA2;
+         const double sdoteB4 = sdoteB2*sdoteB2;
+         const double sdoteC4 = sdoteC2*sdoteC2;
 
-         // factor = 2/3 * -1/8 = -1/12 = -0.08333333333
-         //return -0.08333333333*(35.0*sdotk2*sdotk2 - 30.0*sdotk2);
-	      const double thirty_over_thirtyfive = 30.0/35.0;
-         return -0.08333333333*(sdotk2*sdotk2 -  thirty_over_thirtyfive*sdotk2);
+         const double energy = kA*(sdoteA4 - thirty_over_thirtyfive*sdoteA2) +
+                               kB*(sdoteB4 - thirty_over_thirtyfive*sdoteB2) +
+                               kC*(sdoteC4 - thirty_over_thirtyfive*sdoteC2);
+
+         return -energy;
 
       }
 

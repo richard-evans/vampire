@@ -49,23 +49,19 @@ namespace anisotropy{
       //
       //--------------------------------------------------------------------------------------------------------------
       void triaxial_second_order_fields_fixed_basis(std::vector<double>& spin_array_x,
-                                        std::vector<double>& spin_array_y,
-                                        std::vector<double>& spin_array_z,
-                                        std::vector<int>&    atom_material_array,
-                                        std::vector<double>& field_array_x,
-                                        std::vector<double>& field_array_y,
-                                        std::vector<double>& field_array_z,
-                                        const int start_index,
-                                        const int end_index){
+                                                    std::vector<double>& spin_array_y,
+                                                    std::vector<double>& spin_array_z,
+                                                    std::vector<int>&    atom_material_array,
+                                                    std::vector<double>& field_array_x,
+                                                    std::vector<double>& field_array_y,
+                                                    std::vector<double>& field_array_z,
+                                                    const int start_index,
+                                                    const int end_index){
 
          //if not enabled then do nothing
-        if(!internal::enable_triaxial_anisotropy) return;
+         if(!internal::enable_triaxial_anisotropy) return;
 
-         // rescaling prefactor
-         // E = 2/3 * - ku2 (1/2)  * (3sz^2 - 1) == -ku2 sz^2 + const
-         // H = -dE/dS = +2ku2 sz
-          const double scale = 2.0; // 2*2/3 = 2 Factor to rescale anisotropies to usual scale
-         //
+         const double scale = 2.0;
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
 
@@ -84,6 +80,7 @@ namespace anisotropy{
             field_array_x[atom] += scale*kx*sx;
             field_array_y[atom] += scale*ky*sy;
             field_array_z[atom] += scale*kz*sz;
+
         }
 
          return;
@@ -125,10 +122,7 @@ namespace anisotropy{
          if(!internal::enable_triaxial_fourth_order) return;
 
          // constant factors
-         const double oneo8 = 1.0/8.0;
-
-         // rescaling prefactor
-         const double scale = oneo8*2.0/3.0; // Factor to rescale anisotropies to usual scale
+         const double sixtyothirtyfive = 60.0/35.0;
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -140,22 +134,18 @@ namespace anisotropy{
             const double sy = spin_array_y[atom];
             const double sz = spin_array_z[atom];
 
-
             // get reduced anisotropy constant ku/mu_s
             const double kx = internal::ku4_triaxial_vector_x[mat];
             const double ky = internal::ku4_triaxial_vector_y[mat];
             const double kz = internal::ku4_triaxial_vector_z[mat];
 
-            const double sdotk  = (sx*kx + sy*ky + sz*kz);
-            const double sdotk3 = sdotk*sdotk*sdotk;
+            const double sx3 = sx*sx*sx;
+            const double sy3 = sy*sy*sy;
+            const double sz3 = sz*sz*sz;
 
-            // calculate field (double negative from scale factor and negative derivative)
-            //const double k4 = scale*(140.0*sdotk3 - 60.0*sdotk);
-            const double k4 = scale*(sdotk3 - (60.0/35.0)*sdotk);
-
-            field_array_x[atom] += kx*k4;
-            field_array_y[atom] += ky*k4;
-            field_array_z[atom] += kz*k4;
+            field_array_x[atom] += kx*(4.0*sx3 - sixtyothirtyfive*sx);
+            field_array_y[atom] += ky*(4.0*sy3 - sixtyothirtyfive*sy);
+            field_array_z[atom] += kz*(4.0*sz3 - sixtyothirtyfive*sz);
 
          }
 
@@ -165,7 +155,7 @@ namespace anisotropy{
 
       //---------------------------------------------------------------------------------
       // Function to add fourth order uniaxial anisotropy
-      // E = 2/3 * - (1/8)  * (35sz^4 - 30sz^2 + 3)
+      const double thirty_over_thirtyfive = 30.0/35.0;
       //---------------------------------------------------------------------------------
       double triaxial_fourth_order_energy_fixed_basis(const int atom,
                                           const int mat,
@@ -174,18 +164,23 @@ namespace anisotropy{
                                           const double sz){
 
          // get reduced anisotropy constant ku/mu_s (Tesla)
-
          const double kx = internal::ku4_triaxial_vector_x[mat];
          const double ky = internal::ku4_triaxial_vector_y[mat];
          const double kz = internal::ku4_triaxial_vector_z[mat];
 
-         const double sdotk  = (sx*kx + sy*ky + sz*kz);
-         const double sdotk2 = sdotk*sdotk;
+         const double sx2 = sx*sx;
+         const double sy2 = sy*sy;
+         const double sz2 = sz*sz;
 
-         // factor = 2/3 * -1/8 = -1/12 = -0.08333333333
-         //return -0.08333333333*(35.0*sdotk2*sdotk2 - 30.0*sdotk2);
-	     const double thirty_over_thirtyfive = 30.0/35.0;
-         return -0.08333333333*(sdotk2*sdotk2 -  thirty_over_thirtyfive*sdotk2);
+         const double sx4 = sx2*sx2;
+         const double sy4 = sy2*sy2;
+         const double sz4 = sz2*sz2;
+
+         const double energy = kx*(sx4 - thirty_over_thirtyfive*sx2) +
+                               ky*(sy4 - thirty_over_thirtyfive*sy2) +
+                               kz*(sz4 - thirty_over_thirtyfive*sz2);
+
+         return -(energy);
 
       }
 
