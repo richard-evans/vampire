@@ -67,21 +67,39 @@ namespace anisotropy{
       std::vector<double> ku4_triaxial_vector_y(100,0); //
       std::vector<double> ku4_triaxial_vector_z(100,0); //
 
+      //basis vectors for second order triaxial - must be orthogonality
+      std::vector < double > ku_triaxial_basis1x(100,0.0);
+      std::vector < double > ku_triaxial_basis1y(100,0.0);
+      std::vector < double > ku_triaxial_basis1z(100,0.0);
 
-      std::vector<double> ku_triaxial_constant_x(100,0); // constant for triaxial anisotropy 2nd order
-      std::vector<double> ku_triaxial_constant_y(100,0); // normalised for minimal orthogonal set
-      std::vector<double> ku_triaxial_constant_z(100,0); //
+      std::vector < double > ku_triaxial_basis2x(100,0.0);
+      std::vector < double > ku_triaxial_basis2y(100,0.0);
+      std::vector < double > ku_triaxial_basis2z(100,0.0);
 
-      std::vector<double> ku4_triaxial_constant_x(100,0); // constant for triaxial anisotropy 4th order
-      std::vector<double> ku4_triaxial_constant_y(100,0); // normalised for minimal orthogonal set
-      std::vector<double> ku4_triaxial_constant_z(100,0); // 
+      std::vector < double > ku_triaxial_basis3x(100,0.0);
+      std::vector < double > ku_triaxial_basis3y(100,0.0);
+      std::vector < double > ku_triaxial_basis3z(100,0.0);
 
+      //basis vectors for fourth order triaxial - must be orthogonality
+      std::vector < double > ku4_triaxial_basis1x(100,0.0);
+      std::vector < double > ku4_triaxial_basis1y(100,0.0);
+      std::vector < double > ku4_triaxial_basis1z(100,0.0);
 
-      bool enable_triaxial_anisotropy = false;
-      bool enable_triaxial_fourth_order = false;
+      std::vector < double > ku4_triaxial_basis2x(100,0.0);
+      std::vector < double > ku4_triaxial_basis2y(100,0.0);
+      std::vector < double > ku4_triaxial_basis2z(100,0.0);
+
+      std::vector < double > ku4_triaxial_basis3x(100,0.0);
+      std::vector < double > ku4_triaxial_basis3y(100,0.0);
+      std::vector < double > ku4_triaxial_basis3z(100,0.0);
+
+      bool  enable_triaxial_anisotropy = false;
+      bool  enable_triaxial_fourth_order = false;
+      std::vector<double>  triaxial_second_order_fixed_basis(100,true);
+      std::vector<double>  triaxial_fourth_order_fixed_basis(100,true);
 
       bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
-   	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
+   	  unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
       double nearest_neighbour_distance      = 1.e9; // Control surface anisotropy nearest neighbour distance
       bool neel_range_dependent              = false; // Enable range dependent Neel anisotropy Lij = L0 exp(-F(r-r0)/r0 )
       double neel_exponential_range          = 2.5; // r0 value for range dependence of Neel anisotropy

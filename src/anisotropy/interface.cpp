@@ -120,53 +120,144 @@ namespace anisotropy{
          internal::enable_uniaxial_second_order = true; // Switch on second order tensor calculation for all spins
          return true;
       }
-      //------------------------------------------------------------
-      //Minimal orthogonality TBD
-      test = "second-order-triaxial-anisotropy-vector";
-      if( word == test ){
+
+    //  Triaxial anisotropy in second and fourth order
+      test="second-order-triaxial-anisotropy-vector";
+      if(word == test){
          std::vector<double> u(3);
          // read values from string
          u = vin::doubles_from_string(value);
          //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
          // check for sane input and normalise if necessary
-         //vin::check_for_valid_vector(u, word, line, prefix, "material");
+         vin::check_for_valid_vector(u, word, line, prefix, unit, "anisotropy", -1e-10, 1e-10,"material"," < +/- 1.0e-10");
          // Copy sanitised unit vector to material
          internal::ku_triaxial_vector_x[super_index] = u[0];
          internal::ku_triaxial_vector_y[super_index] = u[1];
          internal::ku_triaxial_vector_z[super_index] = u[2];
          internal::enable_triaxial_anisotropy = true;
          return true;
+
       }
-      //Triaxial anisotropy in second and fourth order
-      test="second-order-triaxial-anisotropy-constant";
+      test="fourth-order-triaxial-anisotropy-vector";
       if(word == test){
          std::vector<double> u(3);
          // read values from string
          u = vin::doubles_from_string(value);
          //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
          // check for sane input and normalise if necessary
-         //vin::check_for_valid_vector(u, word, line, prefix, "material");
+         vin::check_for_valid_vector(u, word, line, prefix, unit, "anisotropy", -1e-10, 1e-10,"material"," < +/- 1.0e-10");
          // Copy sanitised unit vector to material
-         internal::ku_triaxial_constant_x[super_index] = u[0];
-         internal::ku_triaxial_constant_y[super_index] = u[1];
-         internal::ku_triaxial_constant_z[super_index] = u[2];
-         internal::enable_triaxial_anisotropy = true;
+         internal::ku4_triaxial_vector_x[super_index] = u[0];
+         internal::ku4_triaxial_vector_y[super_index] = u[1];
+         internal::ku4_triaxial_vector_z[super_index] = u[2];
+         internal::enable_triaxial_fourth_order = true;
          return true;
 
       }
-      test="fourth-order-triaxial-anisotropy-constant";
+
+      test="second-order-triaxial-basis-vector-1";
       if(word == test){
          std::vector<double> u(3);
          // read values from string
          u = vin::doubles_from_string(value);
          //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
          // check for sane input and normalise if necessary
-         //vin::check_for_valid_vector(u, word, line, prefix, "material");
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
          // Copy sanitised unit vector to material
-         internal::ku4_triaxial_constant_x[super_index] = u[0];
-         internal::ku4_triaxial_constant_y[super_index] = u[1];
-         internal::ku4_triaxial_constant_z[super_index] = u[2];
-         internal::enable_triaxial_fourth_order = true;
+         internal::ku_triaxial_basis1x[super_index] = u[0];
+         internal::ku_triaxial_basis1y[super_index] = u[1];
+         internal::ku_triaxial_basis1z[super_index] = u[2];
+         internal::triaxial_second_order_fixed_basis[super_index] = false;
+      //   std::cout << u[0] << '\t' << u[1] << '\t' << u[2] << "\t" << super_index <<  std::endl;
+      //   std::cin.get();
+         return true;
+
+      }
+
+      test="second-order-triaxial-basis-vector-2";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+        vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku_triaxial_basis2x[super_index] = u[0];
+         internal::ku_triaxial_basis2y[super_index] = u[1];
+         internal::ku_triaxial_basis2z[super_index] = u[2];
+         internal::triaxial_second_order_fixed_basis[super_index] = false;
+         return true;
+
+      }
+
+      test="second-order-triaxial-basis-vector-3";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku_triaxial_basis3x[super_index] = u[0];
+         internal::ku_triaxial_basis3y[super_index] = u[1];
+         internal::ku_triaxial_basis3z[super_index] = u[2];
+         internal::triaxial_second_order_fixed_basis[super_index] = false;
+         return true;
+
+      }
+
+
+      test="fourth-order-triaxial-basis-vector-1";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku4_triaxial_basis1x[super_index] = u[0];
+         internal::ku4_triaxial_basis1y[super_index] = u[1];
+         internal::ku4_triaxial_basis1z[super_index] = u[2];
+         internal::triaxial_fourth_order_fixed_basis[super_index] = false;
+      //   std::cout << u[0] << '\t' << u[1] << '\t' << u[2] << "\t" << super_index <<  std::endl;
+      //   std::cin.get();
+         return true;
+
+      }
+
+      test="fourth-order-triaxial-basis-vector-2";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku4_triaxial_basis2x[super_index] = u[0];
+         internal::ku4_triaxial_basis2y[super_index] = u[1];
+         internal::ku4_triaxial_basis2z[super_index] = u[2];
+         internal::triaxial_fourth_order_fixed_basis[super_index] = false;
+         return true;
+
+      }
+
+      test="fourth-order-triaxial-basis-vector-3";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku4_triaxial_basis3x[super_index] = u[0];
+         internal::ku4_triaxial_basis3y[super_index] = u[1];
+         internal::ku4_triaxial_basis3z[super_index] = u[2];
+         internal::triaxial_fourth_order_fixed_basis[super_index] = false;
          return true;
 
       }
