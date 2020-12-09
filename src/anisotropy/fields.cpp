@@ -60,6 +60,9 @@ namespace anisotropy{
       // sixth order uniaxial anisotropy
       internal::uniaxial_sixth_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 
+      // fourth order rotational anisotropy
+      internal::rotational_fourth_order_fields_fixed_basis(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
+
       // fourth order cubic anisotropy
       internal::cubic_fourth_order_fields(spin_array_x, spin_array_y, spin_array_z, type_array, field_array_x, field_array_y, field_array_z, start_index, end_index);
 

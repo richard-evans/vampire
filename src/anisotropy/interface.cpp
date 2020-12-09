@@ -436,6 +436,18 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      // Fourth order rotational anisotropy
+      //------------------------------------------------------------
+      test = "fourth-order-rotational-anisotropy-constant";
+      if(word == test){
+         double k4r = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(k4r, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
+         internal::mp[super_index].k4r = k4r;
+         internal::enable_fourth_order_rotational = true;
+         return true;
+      }
+      //------------------------------------------------------------
       /*test="uniaxial-anisotropy-tensor";
       if(word==test){
          std::vector<double> t;
