@@ -62,7 +62,6 @@ namespace sim{
       extern std::vector<double> SOT_spin_polarization_unit_vector; // spin polarization direction
 
 
-
    } // end of internal namespace
 } // end of sim namespace
 

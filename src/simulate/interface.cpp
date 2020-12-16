@@ -157,6 +157,14 @@ namespace sim{
          sim::domain_wall_position = tt;
          return true;
       }
+      test="domain-wall-width";
+      if(word==test){
+         double tt = atof(value.c_str()); // convert string to uint64_t
+         vin::check_for_valid_value(tt, word, line, prefix, unit, "length", 0, 1000,"input","0 - 1 A");
+         sim::domain_wall_width = tt;
+         return true;
+      }
+
 
       //--------------------------------------------------------------------
       // input parameter not found here
@@ -184,6 +192,17 @@ namespace sim{
          // Test for valid range
          vin::check_for_valid_value(aj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
          sim::internal::mp[super_index].slonczewski_aj.set(aj);
+         return true;
+      }
+      test="domain-wall-second-magnetisation-vector";
+      if(word==test){
+       std::vector<double> u(3);
+       u=vin::doubles_from_string(value);
+        vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+        std::cout << sim::domain_wall_second_vector_x.size() << "\t" << super_index << "\t" << u[0] << '\t' << u[1] << '\t' << u[2] <<std::endl;
+        sim::domain_wall_second_vector_x[super_index] = u[0];
+        sim::domain_wall_second_vector_y[super_index] = u[1];
+        sim::domain_wall_second_vector_z[super_index] = u[2];
          return true;
       }
       //------------------------------------------------------------
@@ -222,6 +241,9 @@ namespace sim{
          sim::internal::mp[super_index].SOT_FL.set(bj);
          return true;
       }
+
+
+
       //--------------------------------------------------------------------
       // keyword not found
       //--------------------------------------------------------------------

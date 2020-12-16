@@ -32,7 +32,11 @@ namespace sim{
    double domain_wall_position = 0.25;
    double domain_wall_discretisation = 10;
    double domain_wall_centre = 0;
+   double domain_wall_width = 10.0;
    std::vector <bool > anti_PBC(3,false);
+   std::vector < double > domain_wall_second_vector_x(100,0);
+   std::vector < double > domain_wall_second_vector_y(100,0);
+   std::vector < double > domain_wall_second_vector_z(100,1.0);
 
    namespace internal{
       //----------------------------------------------------------------------------
