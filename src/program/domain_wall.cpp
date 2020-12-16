@@ -61,15 +61,27 @@
 
 		 std::cout << sim::domain_wall_width << "\t" << sim::domain_wall_position*cs::system_dimensions[0] << "\t" << num_dw_cells << std::endl;
 
+
+
 	    //reverses the magentisation of atoms further away than the domain wall distance.
 			if (!sim::load_checkpoint_flag){
 	       if (sim::domain_wall_axis == 0){
 	          for(int atom=0;atom<num_local_atoms;atom++){
-	             if (atoms::x_coord_array[atom] > cs::system_dimensions[0]*sim::domain_wall_position){
+
+	             if (atoms::x_coord_array[atom] > cs::system_dimensions[0]*sim::domain_wall_position -sim::domain_wall_width/2.0){
 	 							int mat = atoms::type_array[atom];
-	                atoms::x_spin_array[atom] = sim::domain_wall_second_vector_x[mat];
-	                atoms::y_spin_array[atom] = sim::domain_wall_second_vector_y[mat];
-	       	      	atoms::z_spin_array[atom] = sim::domain_wall_second_vector_z[mat];
+									double pos = (atoms::x_coord_array[atom] - cs::system_dimensions[0]*sim::domain_wall_position + sim::domain_wall_width/2.0)/sim::domain_wall_width;
+									if (pos > 1) pos = 1;
+									if (pos < 0) pos = 0;
+									double dx = -atoms::x_spin_array[atom] + sim::domain_wall_second_vector_x[mat];
+									double dy = -atoms::y_spin_array[atom] + sim::domain_wall_second_vector_y[mat];
+									double dz = -atoms::z_spin_array[atom] + sim::domain_wall_second_vector_z[mat];
+									double mx = atoms::x_spin_array[atom] + dx*pos;
+									double my = atoms::y_spin_array[atom] + dy*pos;
+									double mz = atoms::z_spin_array[atom] + dz*pos;
+	                atoms::x_spin_array[atom] = mx;
+	                atoms::y_spin_array[atom] = my;
+	       	      	atoms::z_spin_array[atom] = mz;
 					//				std::cout << atom << '\t' << atoms::x_spin_array[atom] << '\t' << atoms::y_spin_array[atom] << '\t' << atoms::z_spin_array[atom] << '\t' << sim::domain_wall_second_vector_x[mat] << '\t' << sim::domain_wall_second_vector_y[mat] << '\t' << sim::domain_wall_second_vector_z[mat] << '\t' <<std::endl;
 	              }
 	          }
