@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
+//   (c) Sarah Jenkins and Richard F L Evans 2020. All rights reserved.
 //
-//   Email: sw766@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -31,22 +31,24 @@ namespace anisotropy{
       //---------------------------------------------------------------------------------
       // Function to add fourth order uniaxial anisotropy along vector e
       //
-      //  Higher order anisotropies generally need to be described using spherical harmonics. The usual form (a
-      //  series in S leads to cross pollution of terms, giving strange temperature dependencies.
+      //  Higher order anisotropies generally need to be described using orthogonal
+      //  functions. The usual form (a series in S leads to cross pollution of terms,
+      //  giving strange temperature dependencies.
       //
-      //  The harmonics are described with Legendre polynomials with even order, which for 2nd, 4th and 6th are:
-      //  ( http://en.wikipedia.org/wiki/Legendre_polynomials )
+      //  The anisotropies are described with a minimal orthogonal set expansion,
+      //  preserving the orthogonality of different orders while being simple to
+      //  implement and understand. Explicity the energies are described by normalising
+      //  the inner summation of the 2,4,6 order spherical harmonics to the prefactor
+      //  of the highest order term with an abritrary shift so that E(0) = 0.
       //
-      //  k2(sz) = - (1/2)  * (3sz^2 - 1)
-      //  k4(sz) = - (1/8)  * (35sz^4 - 30sz^2 + 3)
-      //  k6(sz) = - (1/16) * (231sz^6 - 315*sz^4 + 105sz^2 - 5)
+      //  k2(sz) = k2 (1 - sz^2)
+      //  k4(sz) = k4 (sz^4 - 30sz^2 / 35 - 5/35)
+      //  k6(sz) = k6 (sz^6 - 315*sz^4/231 + 105sz^2/231 - 5/231)
       //
-      //  The harmonics feature an arbritrary 2/3 factor compared with the usual form, and so in VAMPIRE these are
-      //  renormalised to maintain consistency for the 2nd order terms.
-      //
-      //  The field induced by the harmonics is given by the first derivative w.r.t. sz. This can be projected onto
-      //  any arbritrary direction ex,ey,ez allowing higher order anisotropy terms along any direction. This
-      //  direction is shared with the other uniaxial anisotropy coefficients since they should not be used
+      //  The field induced by the harmonics is given by the first derivative w.r.t. sz.
+      //  This can be projected onto any arbritrary direction ex,ey,ez allowing higher
+      //  order anisotropy terms along any direction. This direction is shared with the
+      //  other uniaxial anisotropy coefficients since they should not be used
       //  simultaneously.
       //
       //--------------------------------------------------------------------------------------------------------------
@@ -64,10 +66,7 @@ namespace anisotropy{
          if(!internal::enable_uniaxial_fourth_order) return;
 
          // constant factors
-         const double oneo8 = 1.0/8.0;
-
-         // rescaling prefactor
-         const double scale = oneo8*2.0/3.0; // Factor to rescale anisotropies to usual scale
+         const double sixtyothirtyfive = 60.0/35.0;
 
          // Loop over all atoms between start and end index
          for(int atom = start_index; atom < end_index; atom++){
@@ -90,7 +89,7 @@ namespace anisotropy{
             const double sdote3 = sdote*sdote*sdote;
 
             // calculate field (double negative from scale factor and negative derivative)
-            const double k4 = scale*ku4*(140.0*sdote3 - 60.0*sdote);
+            const double k4 = -ku4*(4.0*sdote3 - sixtyothirtyfive*sdote);
 
             field_array_x[atom] += ex*k4;
             field_array_y[atom] += ey*k4;
@@ -104,8 +103,11 @@ namespace anisotropy{
 
       //---------------------------------------------------------------------------------
       // Function to add fourth order uniaxial anisotropy
-      // E = 2/3 * - (1/8)  * (35sz^4 - 30sz^2 + 3)
       //---------------------------------------------------------------------------------
+      // file scope constant
+      const double fiveothirtyfive  = 5.0  / 35.0;
+      const double thirtyothirtyfive = 30.0 / 35.0;
+
       double uniaxial_fourth_order_energy(const int atom,
                                           const int mat,
                                           const double sx,
@@ -115,6 +117,7 @@ namespace anisotropy{
          // get reduced anisotropy constant ku/mu_s (Tesla)
          const double ku4 = internal::ku4[mat];
 
+
          const double ex = internal::ku_vector[mat].x;
          const double ey = internal::ku_vector[mat].y;
          const double ez = internal::ku_vector[mat].z;
@@ -122,8 +125,7 @@ namespace anisotropy{
          const double sdote  = (sx*ex + sy*ey + sz*ez);
          const double sdote2 = sdote*sdote;
 
-         // factor = 2/3 * -1/8 = -1/12 = -0.08333333333
-         return -0.08333333333*ku4*(35.0*sdote2*sdote2 - 30.0*sdote2);
+         return ku4*(sdote2*sdote2 - thirtyothirtyfive*sdote2 - fiveothirtyfive);
 
       }
 
