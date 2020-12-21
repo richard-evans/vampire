@@ -110,9 +110,11 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	// Spin Dependent Extra Fields
 	if(sim::lagrange_multiplier==true) calculate_lagrange_fields(start_index,end_index);
 
-	calculate_full_spin_fields(start_index,end_index);
+	// Add spin torque fields
+	if(sim::internal::enable_spin_torque_fields == true) calculate_full_spin_fields(start_index,end_index);
 
 	return 0;
+
 }
 
 int calculate_external_fields(const int start_index,const int end_index){
@@ -510,6 +512,7 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		// get material parameter
 		const int material=atoms::type_array[atom];
 
+		const double alpha = mp::material[material].alpha;
 		//----------------------------------------------------------------------------------
 		// Slonczewski spin torque field
 		//----------------------------------------------------------------------------------
@@ -523,23 +526,13 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double stbj = slonczewski_bj[material];
 
 		// calculate field
-		hx += staj*(sy*stpz - sz*stpy) + stbj*stpx;
-		hy += staj*(sz*stpx - sx*stpz) + stbj*stpy;
-		hz += staj*(sx*stpy - sy*stpx) + stbj*stpz;
-
-		// save field to spin field array
-		atoms::x_total_spin_field_array[atom]+=hx;
-		atoms::y_total_spin_field_array[atom]+=hy;
-		atoms::z_total_spin_field_array[atom]+=hz;
+		hx += (staj-alpha*stbj)*(sy*stpz - sz*stpy) + (stbj-alpha*staj)*stpx;
+		hy += (staj-alpha*stbj)*(sz*stpx - sx*stpz) + (stbj-alpha*staj)*stpy;
+		hz += (staj-alpha*stbj)*(sx*stpy - sy*stpx) + (stbj-alpha*staj)*stpz;
 
 		//----------------------------------------------------------------------------------
 		// Spin orbit torque (SOT) field
 		//----------------------------------------------------------------------------------
-
-		// reset temporary variables for field components
-		hx = 0.0;
-		hy = 0.0;
-		hz = 0.0;
 
 		// save polarization to temporary constant
 		const double sotpx = SOT_spin_polarization_unit_vector[0];
@@ -550,11 +543,13 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double sotbj = SOT_FL[material];
 
 		// calculate field
-		hx += sotaj*(sy*sotpz - sz*sotpy) + sotbj*sotpx;
-		hy += sotaj*(sz*sotpx - sx*sotpz) + sotbj*sotpy;
-		hz += sotaj*(sx*sotpy - sy*sotpx) + sotbj*sotpz;
+		hx += (sotaj-alpha*sotbj)*(sy*sotpz - sz*sotpy) + (sotbj-alpha*sotaj)*sotpx;
+		hy += (sotaj-alpha*sotbj)*(sz*sotpx - sx*sotpz) + (sotbj-alpha*sotaj)*sotpy;
+		hz += (sotaj-alpha*sotbj)*(sx*sotpy - sy*sotpx) + (sotbj-alpha*sotaj)*sotpz;
 
+		//----------------------------------------------------------------------------------
 		// save field to spin field array
+		//----------------------------------------------------------------------------------
 		atoms::x_total_spin_field_array[atom]+=hx;
 		atoms::y_total_spin_field_array[atom]+=hy;
 		atoms::z_total_spin_field_array[atom]+=hz;
