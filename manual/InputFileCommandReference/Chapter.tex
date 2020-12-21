@@ -89,23 +89,29 @@ repeatable results for the same simulation. The seed determines the actual
 sequence of numbers and is used to generate a different alloy distribution.
 Note that different numbers of cores will change the structure that is generated.\\
 
-{\zicf create:grain-random-seed integer [default 683614233]}
+{\zicf create:grain-random-seed integer [default 1527349271]}
 \addcontentsline{toc}{subsection}{create:grain-random-seed}
 Sets the random seed for the psuedo random number generator for generating random
 grain structures. \\
 
-{\zicf create:dilution-random-seed integer [default 683614233]}
+{\zicf create:dilution-random-seed integer [default 465865253]}
 \addcontentsline{toc}{subsection}{create:dilution-random-seed}
 Sets the random seed for the psuedo random number generator for diluting the
 atoms, leading to a different realization of a dilute material. Note that
 different numbers of cores will change the structure that is generated.\\
 
-{\zicf create:intermixing-random-seed integer [default 683614233]}
+{\zicf create:intermixing-random-seed integer [default 100181363]}
 \addcontentsline{toc}{subsection}{create:intermixing-random-seed}
 Sets the random seed for the psuedo random number generator for calculating
 intermixing of materials. A different seed will lead to a different realization
 of a dilute material. Note that different numbers of cores will change the
 structure that is generated.\\
+
+{\zicf create:spin-initialisation-random-seed = integer [default 123456]}
+\addcontentsline{toc}{subsection}{create:intermixing-random-seed}
+Sets the random seed for the psuedo random number generator for initialising
+spin directions. Note that different numbers of cores will change the
+spin positions that are generated.\\
 
 \section*{System dimensions}
 \addcontentsline{toc}{section}{System dimensions}
@@ -656,7 +662,7 @@ These options enable the output of spin configuration snapshots during the
 simulation. The configurations can then be visualised using povray or other
 software generated with the vampire data converter (vdc) utility.\\
 
-{\zicf config:atoms flag [default false]}\addcontentsline{toc}{subsection}{config:atoms} 
+{\zicf config:atoms flag [default false]}\addcontentsline{toc}{subsection}{config:atoms}
 enables the output of atomic spin configurations either at the end of the simulations or during the simulation. The options are:
 \begin{itemize}
   \item[] config:atoms - to output continuously during the simulation

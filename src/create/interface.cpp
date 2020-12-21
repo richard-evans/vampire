@@ -511,6 +511,14 @@ namespace create{
          create::internal::mixing_seed = mrs;
          return true;
       }
+      //--------------------------------------------------------------------
+      test="spin-initialisation-random-seed";
+      if(word==test){
+         int sirs=atoi(value.c_str());
+         vin::check_for_valid_int(sirs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::spin_init_seed = sirs;
+         return true;
+      }
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);

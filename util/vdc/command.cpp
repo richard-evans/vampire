@@ -241,10 +241,13 @@ int command( int argc, char* argv[] ){
          vdc::x_axis_colour = true;
 
       }
-      else if ( sw == "--custom_colourmap" ){
+      else if ( sw == "--custom-colourmap" ){
 
          // check number of args not exceeded
          check_arg(arg, argc, argv, temp_str, "Error - expected custom colourmap name.");
+
+         // set colour_keyword to "custom" 
+         vdc::colour_keyword = "custom";
 
          // set custom map file name
          vdc::custom_colourmap_file = temp_str;

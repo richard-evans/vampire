@@ -53,6 +53,8 @@ namespace sim{
          set_double_t SOT_FL; // field-like SOT torque (non-adiabatic)
       };
 
+      extern bool enable_spin_torque_fields; // flag to enable spin torque fields
+
       extern std::vector<sim::internal::mp_t> mp; // array of material properties
       extern std::vector<double> slonczewski_aj; // array of adiabatic spin torques
       extern std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques

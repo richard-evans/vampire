@@ -68,7 +68,6 @@ namespace st{
       std::vector<double> coeff_ast; // adiabatic spin torque
       std::vector<double> coeff_nast; // non-adiabatic spin torque
       std::vector<double> cell_natom;
-      std::vector<double> cell_mus;
 
 
       // three-vector arrays
