@@ -19,8 +19,9 @@ namespace sim{
    namespace internal{
 
       //-----------------------------------------------------------------------------
-      // Internal shared variables used for the simulation
+      // Internal data types used for simulation module
       //-----------------------------------------------------------------------------
+
       // simple initialised class for set variables
       class set_double_t{
 
@@ -53,6 +54,9 @@ namespace sim{
          set_double_t SOT_FL; // field-like SOT torque (non-adiabatic)
       };
 
+      //-----------------------------------------------------------------------------
+      // Internal shared variables used for the simulation
+      //-----------------------------------------------------------------------------
       extern std::vector<sim::internal::mp_t> mp; // array of material properties
       extern std::vector<double> slonczewski_aj; // array of adiabatic spin torques
       extern std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques
@@ -61,7 +65,8 @@ namespace sim{
       extern std::vector<double> SOT_FL; // array of non-adiabatic spin torques
       extern std::vector<double> SOT_spin_polarization_unit_vector; // spin polarization direction
 
-
+      // shared Functions
+      void llg_quantum_step();
 
    } // end of internal namespace
 } // end of sim namespace

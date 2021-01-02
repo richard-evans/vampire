@@ -36,6 +36,11 @@
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
+
+	// enumerated list for integrators
+	enum integrator_t{ llg_heun = 0, monte_carlo = 1, llg_midpoint = 2,
+							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5};
+
 	extern std::ofstream mag_file;
 	extern uint64_t time;
 	extern uint64_t total_time;
@@ -117,7 +122,7 @@ namespace sim{
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 
-	extern int integrator;
+	extern integrator_t integrator; // variable to specify integrator
 	extern int program;
 
    // Local system variables

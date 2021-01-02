@@ -106,6 +106,56 @@ namespace sim{
          sim::partial_time = tt;
          return true;
       }
+      test = "integrator";
+      if( word == test ){
+         //--------------------------------------------------------------------
+         test="llg-heun";
+         if( value == test ){
+            sim::integrator = sim::llg_heun;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="monte-carlo";
+         if( value == test ){
+            sim::integrator = sim::monte_carlo;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="llg-midpoint";
+         if( value == test ){
+            sim::integrator = sim::llg_midpoint;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="constrained-monte-carlo";
+         if( value == test ){
+            sim::integrator = sim::cmc;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="hybrid-constrained-monte-carlo";
+         if( value == test ){
+            sim::integrator = sim::hybrid_cmc;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="llg-quantum";
+         if( value == test ){
+            sim::integrator = sim::llg_quantum;
+            return true;
+         }
+         else{
+            terminaltextcolor(RED);
+               std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+               std::cerr << "\t\"llg-heun\"" << std::endl;
+               std::cerr << "\t\"llg-midpoint\"" << std::endl;
+               std::cerr << "\t\"llg-quantum\"" << std::endl;
+               std::cerr << "\t\"monte-carlo\"" << std::endl;
+               std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+          }
+      }
       //--------------------------------------------------------------------
       // input parameter not found here
       return false;

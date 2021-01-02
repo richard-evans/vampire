@@ -314,46 +314,8 @@ namespace vin{
         //-------------------------------------------------------------------
         // System simulation variables
         //-------------------------------------------------------------------
-        std::string test="integrator";
-        if(word==test){
-            test="llg-heun";
-            if(value==test){
-                sim::integrator=0;
-                return EXIT_SUCCESS;
-            }
-            test="monte-carlo";
-            if(value==test){
-                sim::integrator=1;
-                return EXIT_SUCCESS;
-            }
-            test="llg-midpoint";
-            if(value==test){
-                sim::integrator=2;
-                return EXIT_SUCCESS;
-            }
-            test="constrained-monte-carlo";
-            if(value==test){
-                sim::integrator=3;
-                return EXIT_SUCCESS;
-            }
-            test="hybrid-constrained-monte-carlo";
-            if(value==test){
-                sim::integrator=4;
-                return EXIT_SUCCESS;
-            }
-            else{
-            terminaltextcolor(RED);
-                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-                std::cerr << "\t\"llg-heun\"" << std::endl;
-                std::cerr << "\t\"llg-midpoint\"" << std::endl;
-                std::cerr << "\t\"monte-carlo\"" << std::endl;
-                std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
-            terminaltextcolor(WHITE);
-                err::vexit();
-            }
-        }
         //-------------------------------------------------------------------
-        test="program";
+        std::string test="program";
         if(word==test){
             test="benchmark";
             if(value==test){

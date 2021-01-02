@@ -146,7 +146,6 @@ namespace sim{
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-	int integrator=0; /// 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC
 	int program=0;
 
 
@@ -492,7 +491,7 @@ int run(){
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
    //------------------------------------------------
-   if(sim::integrator==1){
+   if(sim::integrator == sim::monte_carlo){
       std::cout << "Monte Carlo statistics:" << std::endl;
       std::cout << "\tTotal moves: " << long(sim::mc_statistics_moves) << std::endl;
       std::cout << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
@@ -502,7 +501,7 @@ int run(){
       zlog << zTs() << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
       zlog << zTs() << "\t" << (sim::mc_statistics_reject/sim::mc_statistics_moves)*100.0                              << "% Rejected" << std::endl;
    }
-   if(sim::integrator==3 || sim::integrator==4){
+   if(sim::integrator == sim::cmc || sim::integrator == sim::hybrid_cmc){
       std::cout << "Constrained Monte Carlo statistics:" << std::endl;
       std::cout << "\tTotal moves: " << montecarlo::cmc::mc_total << std::endl;
       std::cout << "\t" << (montecarlo::cmc::mc_success/montecarlo::cmc::mc_total)*100.0    << "% Accepted" << std::endl;
@@ -632,6 +631,14 @@ void integrate_serial(uint64_t n_steps){
 		case 4: // Hybrid Constrained Monte Carlo
 			for(uint64_t ti=0;ti<n_steps;ti++){
 				montecarlo::cmc_mc_step();
+				// increment time
+				increment_time();
+			}
+			break;
+
+		case sim::llg_quantum: // LLG quantum noise
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				sim::internal::llg_quantum_step();
 				// increment time
 				increment_time();
 			}

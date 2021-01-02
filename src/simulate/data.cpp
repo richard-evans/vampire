@@ -19,6 +19,8 @@ namespace sim{
    //----------------------------------------------------------------------------
    // Shared variables used with main vampire code
    //---------------------------------------------------------------------------
+   integrator_t integrator = llg_heun; // variable to specify integrator
+
 
    int num_monte_carlo_preconditioning_steps(0);
 
@@ -29,6 +31,7 @@ namespace sim{
    uint64_t equilibration_time = 0; // equilibration time steps
 
    namespace internal{
+
       //----------------------------------------------------------------------------
       // Shared variables used within sim module
       //---------------------------------------------------------------------------
