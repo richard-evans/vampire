@@ -104,31 +104,34 @@ namespace exchange{
             // function to get a list of exchange values for a certain materil pair and neighbour number
             std::vector<double> get_exchange_values(int material_i, int material_j, int neighbour){
 
+               // initialise a vector to return exchange values
+               std::vector<double> exchange_values(1,0.0);
+
                // check for valid array access
                bool ok = true;
                if(material_i > max_materials-1) ok = false;
                if(material_j > max_materials-1) ok = false;
                if(neighbour > max_neighbours-1) ok = false;
 
-               // indices are OK, check size of data requested
-               //if(ok){
-               //   if( !(exchange_matrix_array[material_i][material_j][neighbour] = exchange_values.size() > 0) ) ok = false;
-               //}
+               // if out of bounds access, this means constant was never set so assume zero
+               if(!ok) return exchange_values;
 
-               // if something is wrong, output message and quit program
-               if(!ok){
-                  std::cerr     << "Programmer error! Out of range exchange interaction in exchange_matrix_4D is being accessed: mi: " << material_i << " mj: " << material_j << " nn: " << neighbour << std::endl;
-                  zlog << zTs() << "Programmer error! Out of range exchange interaction in exchange_matrix_4D is being accessed: mi: " << material_i << " mj: " << material_j << " nn: " << neighbour << std::endl;
-                  err::vexit();
-               }
-
-               // all ok - now return data (single value array if empty)
-               std::vector<double> exchange_values(1,0.0);
+               // array index value is valid, so return values (single value, Jij=0.0 array if empty)
                if(exchange_matrix_array[material_i][material_j][neighbour].size() > 0){
                   exchange_values = exchange_matrix_array[material_i][material_j][neighbour];
                }
+
+               // return exchange values
                return exchange_values;
 
+            }
+
+            int get_max_shells(){
+               return max_neighbours;
+            }
+
+            int get_max_materials(){
+               return max_materials;
             }
 
       };

@@ -23,6 +23,30 @@
 
 namespace exchange{
 
+   // Error function when non-symmetric exchange interactions are detected
+   void exchange_error(int i, int j, int s, std::vector<double> Jij, std::vector<double> Jji){
+
+      // Error found - report to user (in terms of material ID and shell and terminate program
+      terminaltextcolor(RED);
+         std::cerr << "Error! Non-symmetric exchange interactions for materials " << i+1 << " and " << j+1 << " in shell " << s+1 << "." << std::endl;
+         std::cerr << "See log file for details. Exiting ungracefully." << std::endl;
+      terminaltextcolor(WHITE);
+
+      // report detailed info in the log file
+      zlog << zTs() << "Error! Non-symmetric exchange interactions for materials " << i+1 << " and " << j+1 << " in shell " << s+1 << std::endl;
+      zlog << zTs() << "\tmaterial[" << i+1 << "]:exchange-matrix-" << s+1 << "-nn[" << j+1 << "] = ";
+         for(int vi = 0; vi < Jij.size(); vi++) zlog << Jij[vi] << "\t";
+         zlog << std::endl;
+      zlog << zTs() << "\tmaterial[" << j+1 << "]:exchange-matrix-" << s+1 << "-nn[" << i+1 << "] = ";
+         for(int vi = 0; vi < Jji.size(); vi++) zlog << Jji[vi] << "\t";
+         zlog << std::endl;
+      zlog << zTs() << "\tThe definition of Heisenberg exchange requires that there are the same number of values and that these values are the same. Exiting." << std::endl;
+
+      // exit program ungracefully
+      err::vexit();
+
+   }
+
    //----------------------------------------------------------------------------
    // Function to initialize exchange module
    //----------------------------------------------------------------------------
@@ -54,7 +78,44 @@ namespace exchange{
       //ofile.close();
 
       //-----------------------------------------------------------------------------
+      // Check that exchange matrix is symmetric for i->j and j->i interactions
+      //-----------------------------------------------------------------------------
+      const int max_materials = exchange::internal::bilinear_exchange_constants.get_max_materials();
+      const int max_shells = exchange::internal::bilinear_exchange_constants.get_max_shells();
+      // loop over half of exchange matrix of set values to check symmetry
+      for(int i = 0; i < max_materials; i++){
+         for(int j = 0; j < i; j++){
+            for(int s = 0; s < max_shells; s++){
+               // get i->j exchange
+               std::vector<double> Jij = exchange::internal::bilinear_exchange_constants.get_exchange_values(i,j,s);
+               // get j->i exchange
+               std::vector<double> Jji = exchange::internal::bilinear_exchange_constants.get_exchange_values(j,i,s);
+               // check for same number of exchange values
+               if( Jij.size() != Jji.size() ) exchange_error(i, j, s, Jij, Jji);
 
+               // check for rational values for all elements
+               for(int v = 0 ; v < Jij.size() ; v++){
+
+                  // Check for non-zero value (avoids divide by zero)
+                  if(fabs( Jji[v] ) > 0.0){
+
+                     // Calculate ratio of i->j / j-> exchange constants
+                     double ratio = Jij[v] / Jji[v];
+
+                     // Check that ratio ~ 1.0 for symmetric exchange interactions
+                     if( (ratio < 0.99999) || (ratio > 1.00001) ) exchange_error(i, j , s, Jij, Jji);
+
+                  }
+                  else{
+                     // Jji is zero, now check for Jij == 0.0+tolerance
+                     if(fabs( Jij[v] ) > 1.0e-200) exchange_error(i, j, s, Jij, Jji);
+                  }
+               }
+            }
+         }
+      }
+
+      //-----------------------------------------------------------------------------
       // save type of interaction template and if material file constants are used
       exchange::internal::exchange_type = cs::unit_cell.bilinear.exchange_type;
       exchange::internal::use_material_exchange_constants = cs::unit_cell.bilinear.use_material_exchange_constants;
