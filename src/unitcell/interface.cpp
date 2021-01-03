@@ -138,6 +138,11 @@ namespace unitcell{
                uc::internal::exchange_function = uc::internal::nearest_neighbour;
                return true;
             }
+            test="shell";
+            if(value==test){
+               uc::internal::exchange_function = uc::internal::shell;
+               return true;
+            }
             test="exponential";
             if(value==test){
                uc::internal::exchange_function = uc::internal::exponential;

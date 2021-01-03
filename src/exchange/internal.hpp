@@ -122,8 +122,8 @@ namespace exchange{
                   err::vexit();
                }
 
-               // all ok - now return data (zero size array if empty)
-               std::vector<double> exchange_values;
+               // all ok - now return data (single value array if empty)
+               std::vector<double> exchange_values(1,0.0);
                if(exchange_matrix_array[material_i][material_j][neighbour].size() > 0){
                   exchange_values = exchange_matrix_array[material_i][material_j][neighbour];
                }
