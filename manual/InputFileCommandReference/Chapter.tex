@@ -42,10 +42,7 @@ The following commands control generation of the simulated system, including dim
 
 {\zicf create:crystal-structure = string [sc, fcc, bcc, hcp, heusler, kagome, rocksalt, spinel; default sc]}
 \addcontentsline{toc}{subsection}{create:crystal-structure}
-Defines the default crystal lattice to be generated. The code supports the basic metallic crystal types
-simple cubic (sc), body-centred-cubic (bcc), face-centred-cubic (fcc) and hexagonal close-packed (hcp).
-The code also supports important magnetic structures such as Heusler alloys (heusler), rock-salt such as
-NiO (rocksalt)spinels such as magnetite (spinel) and kagome lattices. \\ \par
+Defines the default crystal lattice to be generated. The code supports the basic metallic crystal types simple cubic (sc), body-centred-cubic (bcc), face-centred-cubic (fcc) and hexagonal close-packed (hcp). The code also supports important magnetic structures such as Heusler alloys (heusler), rock-salt such as NiO (rocksalt) spinels such as magnetite (spinel) and kagome lattices. \\ \par
 
 {\zicf create:single-spin flag}\addcontentsline{toc}{subsection}{create:single-spin} Overrides all create options and generates a single isolated spin.\\ \par
 
@@ -119,40 +116,113 @@ The commands here determine the dimensions of the generated system.\\
 
 {\zicf dimensions:unit-cell-size = float [0.1 \AA - 10 $\mu$ m, default 3.54 \AA]}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size} Defines the size of the unit cell.\\ \par
 
-{\zicf dimensions:unit-cell-size-x}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-x} Defines the size of the unit cell if asymmetric.\\ \par
+{\zicf dimensions:unit-cell-size-x}
+\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-x} Defines the size
+of the unit cell if asymmetric.\\ \par
 
-{\zicf dimensions:unit-cell-size-x}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-y} Defines the size of the unit cell if asymmetric.\\ \par
+{\zicf dimensions:unit-cell-size-x}
+\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-y} Defines the size
+of the unit cell if asymmetric.\\ \par
 
-{\zicf dimensions:unit-cell-size-z}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-z} Defines the size of the unit cell if asymmetric.\\ \par
+{\zicf dimensions:unit-cell-size-z}
+\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-z} Defines the size
+of the unit cell if asymmetric.\\ \par
 
-{\zicf dimensions:system-size}\addcontentsline{toc}{subsection}{dimensions:system-size} Defines the size of the symmetric bulk crystal. \\ \par
+{\zicf dimensions:system-size}
+\addcontentsline{toc}{subsection}{dimensions:system-size} Defines the size of
+the symmetric bulk crystal. \\ \par
 
-{\zicf dimensions:system-size-x}\addcontentsline{toc}{subsection}{dimensions:system-size-x} Defines the total size if the system along the $x$-axis.\\ \par
+{\zicf dimensions:system-size-x}
+\addcontentsline{toc}{subsection}{dimensions:system-size-x} Defines the total
+size if the system along the $x$-axis.\\ \par
 
-{\zicf dimensions:system-size-y}\addcontentsline{toc}{subsection}{dimensions:system-size-y} Defines the total size if the system along the $y$-axis.\\ \par
+{\zicf dimensions:system-size-y}
+\addcontentsline{toc}{subsection}{dimensions:system-size-y} Defines the total
+size if the system along the $y$-axis.\\ \par
 
-{\zicf dimensions:system-size-z}\addcontentsline{toc}{subsection}{dimensions:system-size-z} Defines the total size if the system along the $z$-axis.\\ \par
+{\zicf dimensions:system-size-z}
+\addcontentsline{toc}{subsection}{dimensions:system-size-z} Defines the total
+size if the system along the $z$-axis.\\ \par
 
-{\zicf dimensions:particle-size = float}\addcontentsline{toc}{subsection}{dimensions:particle-size} Defines the size of particles cut from the bulk crystal.\\ \par
+{\zicf dimensions:particle-size = float}
+\addcontentsline{toc}{subsection}{dimensions:particle-size} Defines the size of
+particles cut from the bulk crystal.\\ \par
 
-{\zicf dimensions:particle-spacing}\addcontentsline{toc}{subsection}{dimensions:particle-spacing} Defines the spacing between particles in particle arrays or voronoi media.\\ \par
+{\zicf dimensions:particle-spacing}
+\addcontentsline{toc}{subsection}{dimensions:particle-spacing}
+Defines the spacing between particles in particle arrays or voronoi media.\\ \par
 
 
-{\zicf dimensions:particle-shape-factor-x = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-x} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $x$ direction. This property scales the as a fraction of the particle-size along the $x$-direction.\\
+{\zicf dimensions:particle-shape-factor-x = float [0.001-1, default 1.0]}
+\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-x}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $x$
+direction. This property scales the as a fraction of the particle-size along the
+$x$-direction.\\
 
-{\zicf dimensions:particle-shape-factor-y = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-y} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $y$ direction. This property scales the as a fraction of the particle-size along the $y$-direction.\\
+{\zicf dimensions:particle-shape-factor-y = float [0.001-1, default 1.0]}
+\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-y}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $y$
+direction. This property scales the as a fraction of the particle-size along the
+$y$-direction.\\
 
-{\zicf dimensions:particle-shape-factor-z = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $z$ direction. This property scales the as a fraction of the particle-size along the $z$-direction.\\
+{\zicf dimensions:particle-shape-factor-z = float [0.001-1, default 1.0]}
+\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $z$
+direction. This property scales the as a fraction of the particle-size along the
+$z$-direction.\\
 
-{\zicf dimensions:particle-array-offset-x [0-10$^4$ \AA]}\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-x} Translates the 2-D particle array the chosen distance along the x-direction.\\
+{\zicf dimensions:particle-array-offset-x [0-10$^4$ \AA]}
+\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-x}
+Translates the 2-D particle array the chosen distance along the x-direction.\\
 
-{\zicf dimensions:particle-array-offset-y}\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y}  Translates the 2-D particle array the chosen distance along the y-direction.\\
+{\zicf dimensions:particle-array-offset-y}
+\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y}
+Translates the 2-D particle array the chosen distance along the y-direction.\\
 
-{\zicf dimensions:double macro-cell-size}\addcontentsline{toc}{subsection}{dimensions:macro-cell-size} determines the macro cell size for calculation of the demagnetizing field and output of the magnetic configuration. Finer discretisation leads to more accurate results at the cost of significantly longer run times. The cell size should always be less than the system size, as highly asymmetric cells will leads to significant errors in the demagnetisation field calculation.
+{\zicf dimensions:double macro-cell-size}
+\addcontentsline{toc}{subsection}{dimensions:macro-cell-size}
+determines the macro cell size for calculation of the demagnetizing field and
+output of the magnetic configuration. Finer discretisation leads to more
+accurate results at the cost of significantly longer run times. The cell size
+should always be less than the system size, as highly asymmetric cells will
+lead to significant errors in the demagnetisation field calculation.
+
+\section*{Exchange calculation}
+\addcontentsline{toc}{section}{Exchange calculation}
+The following commands control the calculation of built-in exchange interactions
+ for the system.\\
+
+{\zicf exchange:interaction-range}\addcontentsline{toc}
+{subsection}{exchange:interaction-range double default [1.0]}
+  Determines the cutoff range exchange interactions for built-in crystal
+  structures in terms of the nearest neighbour range. Larger ranges will
+  enable more interactions via an exchange function which can include 2nd-10th
+  nearest neighbour interaction shells or exponential functions. Note that
+  longer ranged interactions are slower to calculate. In shell mode the computed
+  interaction shells are printed in the log file.\\
+
+{\zicf exchange:function}\addcontentsline{toc}
+{subsection}{exchange:function string default [nearest-neighbour]}
+  Determines the type of interaction to be used in the spin Hamiltonian. The
+  default \textit{nearest-neighbour} option forces nearest neighbour
+  interactions only. The \textit{shell} option groups neighbours at the same
+  interaction distance into shells which can then be assigned different exchange
+  constants. The \textit{exponential} option implements an exponential decay
+  that is useful for simulating spin glasses and systems such as NdFeB where
+  there are no well-defined neighbour shells.\\
+
+{\zicf exchange:dmi-cutoff-range}\addcontentsline{toc}
+{subsection}{exchange:dmi-cutoff-range double default [1.0]}
+  Determines the cutoff range for i-j-k interactions for the built-in DMI in \vampire.
+
 
 \section*{Anisotropy calculation}
 \addcontentsline{toc}{section}{Anisotropy calculation}
-The following commands control the calculation of the magnetic anisotropy energy for the system.
+The following commands control the calculation of the magnetic anisotropy energy for the system.\\
+
 {\zicf anisotropy:surface-anisotropy-threshold}\addcontentsline{toc}
 {subsection}{anisotropy:surface-anisotropy-threshold}
   integer default [native]
