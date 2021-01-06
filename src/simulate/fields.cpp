@@ -526,9 +526,9 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double stbj = slonczewski_bj[material];
 
 		// calculate field
-		hx += (staj-alpha*stbj)*(sy*stpz - sz*stpy) + (stbj-alpha*staj)*stpx;
-		hy += (staj-alpha*stbj)*(sz*stpx - sx*stpz) + (stbj-alpha*staj)*stpy;
-		hz += (staj-alpha*stbj)*(sx*stpy - sy*stpx) + (stbj-alpha*staj)*stpz;
+		hx += (staj-alpha*stbj)*(sy*stpz - sz*stpy) + (stbj+alpha*staj)*stpx;
+		hy += (staj-alpha*stbj)*(sz*stpx - sx*stpz) + (stbj+alpha*staj)*stpy;
+		hz += (staj-alpha*stbj)*(sx*stpy - sy*stpx) + (stbj+alpha*staj)*stpz;
 
 		//----------------------------------------------------------------------------------
 		// Spin orbit torque (SOT) field
@@ -543,9 +543,9 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double sotbj = SOT_FL[material];
 
 		// calculate field
-		hx += (sotaj-alpha*sotbj)*(sy*sotpz - sz*sotpy) + (sotbj-alpha*sotaj)*sotpx;
-		hy += (sotaj-alpha*sotbj)*(sz*sotpx - sx*sotpz) + (sotbj-alpha*sotaj)*sotpy;
-		hz += (sotaj-alpha*sotbj)*(sx*sotpy - sy*sotpx) + (sotbj-alpha*sotaj)*sotpz;
+		hx += (sotaj+alpha*sotbj)*(sy*sotpz - sz*sotpy) + (sotbj-alpha*sotaj)*sotpx;
+		hy += (sotaj+alpha*sotbj)*(sz*sotpx - sx*sotpz) + (sotbj-alpha*sotaj)*sotpy;
+		hz += (sotaj+alpha*sotbj)*(sx*sotpy - sy*sotpx) + (sotbj-alpha*sotaj)*sotpz;
 
 		//----------------------------------------------------------------------------------
 		// save field to spin field array
