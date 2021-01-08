@@ -23,6 +23,7 @@ namespace vdc{
    bool povray   = false; // flag to specify povray file output
    bool cells    = false; // flag to specify cells output
    bool vtk      = false; // flag to specify vtk output
+   bool ssc      = false; // flag to specify spin-spin correlation
    bool txt      = false; // flag to specify plain text output
    bool x_vector = false; // flag to specify direction of povray colouring
    bool z_vector = false; // flag to specify plane for povray colouring
@@ -88,5 +89,14 @@ namespace vdc{
    std::vector <std::string> coord_filenames(0);
    std::vector <std::string> spin_filenames(0);
    std::vector <std::string> nm_filenames(0);
+
+   // arrays for storing time-averaged spin-spin correlations
+   std::vector<double> ssc_counts(0); // number of counts
+   std::vector<double> ssc_correl(0); // sum of correlations
+   double ssc_magnetization; // sum snapshot magnetizations
+   double ssc_snapshots; // number of snapshots
+   double ssc_num_bins;  // number of bins for correlations
+   double ssc_bin_width; // width of each bin (Agstroms)
+   double ssc_inv_bin_width; // 1/bin width
 
 } // end of namespace vdc

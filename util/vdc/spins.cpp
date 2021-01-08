@@ -39,6 +39,8 @@ void process_spins(){
 
    if(vdc::cells) vdc::initialise_cells();
 
+   if(vdc::ssc) vdc::initialise_ssc();
+
    unsigned int last_file_id = max_file_id;
 
    // loop over all spin files
@@ -64,6 +66,9 @@ void process_spins(){
       // output plain text file
       if(vdc::txt) output_txt_file(file_id);
 
+      // compute spin-spin correlation
+      if(vdc::ssc) output_ssc_file(file_id);
+
       last_file_id = file_id;
 
    }
@@ -74,6 +79,9 @@ void process_spins(){
 
    // output povray file
    if(vdc::povray) output_povray_file();
+
+   // output average ssc
+   if(vdc::ssc) output_average_ssc_file();
 
    return;
 

@@ -25,6 +25,7 @@ namespace vdc{
    extern bool povray;
    extern bool cells;
    extern bool vtk;
+   extern bool ssc; // flag to specify spin-spin correlation
    extern bool txt;
    extern bool x_vector;
    extern bool z_vector;
@@ -99,6 +100,15 @@ namespace vdc{
    extern std::vector <std::string> spin_filenames;
    extern std::vector <std::string> nm_filenames;
 
+   // arrays for storing time-averaged spin-spin correlations
+   extern std::vector<double> ssc_counts; // number of counts
+   extern std::vector<double> ssc_correl; // sum of correlations
+   extern double ssc_magnetization; // sum snapshot magnetizations
+   extern double ssc_snapshots; // number of snapshots
+   extern double ssc_num_bins;  // number of bins for correlations
+   extern double ssc_bin_width; // width of each bin (Agstroms)
+   extern double ssc_inv_bin_width; // 1/bin width
+
    // Functions
    int command( int argc, char* argv[]);
    void process_coordinates();
@@ -113,7 +123,11 @@ namespace vdc{
    void output_inc_file(unsigned int spin_file_id);
    void output_povray_file();
    void output_vtk_file(unsigned int spin_file_id);
-   void output_txt_file(unsigned int file_id);
+   void output_ssc_file(unsigned int spin_file_id);
+   void output_txt_file(unsigned int spin_file_id);
+
+   void initialise_ssc();   
+   void output_average_ssc_file();
 
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);

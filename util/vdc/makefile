@@ -12,7 +12,7 @@ LIBS=-lstdc++
 
 # Flags
 GCC_CFLAGS=-O3 -std=c++0x
-#GCC_CFLAGS=-O3 -std=c++0x -fopenmp
+#GCC_CFLAGS=-O3 -std=c++0x -fopenmp -funroll-loops -mavx2
 
 # Objects
 OBJECTS= \
@@ -26,6 +26,7 @@ obj/main.o \
 obj/non_magnetic.o \
 obj/povray.o \
 obj/spins.o \
+obj/ssc.o \
 obj/text.o \
 obj/vtk.o \
 obj/xyz.o
