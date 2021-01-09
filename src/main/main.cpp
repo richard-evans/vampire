@@ -77,7 +77,7 @@ int main(int argc, char* argv[]){
       std::cout << std::endl;
       std::cout << "  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>" << std::endl;
       std::cout << std::endl;
-      std::cout << "  Contributors: Andrea Meo, Andrew Naden, Matthew Ellis," << std::endl;
+      std::cout << "  Contributors: Sarah Jenkins, Andrea Meo, Andrew Naden, Matthew Ellis," << std::endl;
       std::cout << "                Oscar Arbelaez, Sam Morris, Rory Pond, Weijia Fan," << std::endl;
       std::cout << "                Phanwadee Chureemart, Sarah Jenkins, Joe Barker, " << std::endl;
       std::cout << "                Thomas Ostler, Andreas Biternas, Roy W Chantrell," << std::endl;
