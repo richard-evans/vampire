@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2019. All rights reserved.
+//   (c) Richard F L Evans 2020. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -71,6 +71,8 @@ void output_ssc_file(unsigned int spin_file_id){
    //--------------------------------------------------------------------------------------------------------------
    // Spin-spin correlation calculation (radially symmetric)
    //
+   // https://en.wikipedia.org/wiki/Correlation_function_(statistical_mechanics)
+   //
    // C(r) = < S(r) . S(r+dr) > - < M >
    //
    // Data is binned according intratomic distance dr
@@ -127,8 +129,8 @@ void output_ssc_file(unsigned int spin_file_id){
             const double rij = sqrt(dx*dx + dy*dy + dz*dz);
             const int index = int(rij * inv_bin_width);
 
-            correl[index] += sx+sy+sz;
-            counts[index] += 1.0;
+            thread_correl[index] += sx+sy+sz;
+            thread_counts[index] += 1.0;
 
          }
       }
