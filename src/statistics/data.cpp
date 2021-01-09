@@ -14,20 +14,34 @@
 
 namespace stats{
 
+   bool calculate_system_energy                 = false;
+   bool calculate_material_energy               = false;
    bool calculate_system_magnetization          = true;
    bool calculate_material_magnetization        = false;
    bool calculate_height_magnetization          = false;
    bool calculate_material_height_magnetization = false;
+   bool calculate_system_specific_heat          = false;
+   bool calculate_material_specific_heat        = false;
+   bool calculate_material_standard_deviation   = false;
    bool calculate_system_susceptibility         = false;
-   bool calculate_material_susceptibility         = false;
+   bool calculate_material_susceptibility       = false;
 
-   magnetization_statistic_t system_magnetization;
-   magnetization_statistic_t material_magnetization;
-   magnetization_statistic_t height_magnetization;
-   magnetization_statistic_t material_height_magnetization;
+   energy_statistic_t system_energy("s");
+   energy_statistic_t material_energy("m");
 
-   susceptibility_statistic_t system_susceptibility;
-   susceptibility_statistic_t material_susceptibility;
+   //torque_statistic_t system_torque;
+
+   magnetization_statistic_t system_magnetization("s");
+   magnetization_statistic_t material_magnetization("m");
+   magnetization_statistic_t height_magnetization("h");
+   magnetization_statistic_t material_height_magnetization("mh");
+
+   specific_heat_statistic_t system_specific_heat("s");
+   specific_heat_statistic_t material_specific_heat("m");
+
+   standard_deviation_statistic_t material_standard_deviation("m");
+   susceptibility_statistic_t system_susceptibility("s");
+   susceptibility_statistic_t material_susceptibility("m");
 
    //-----------------------------------------------------------------------------
    // Shared variables used for statistics calculation

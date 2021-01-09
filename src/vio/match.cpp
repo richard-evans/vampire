@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <sstream>
+#include <iostream>
 
 // Vampire headers
 // Headers
@@ -31,6 +32,7 @@
 #include "cells.hpp"
 #include "voronoi.hpp"
 #include "ltmp.hpp"
+#include "montecarlo.hpp"
 #include "random.hpp"
 #include "spintorque.hpp"
 #include "unitcell.hpp"
@@ -74,6 +76,7 @@ namespace vin{
         else if(dipole::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(montecarlo::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -82,12 +85,11 @@ namespace vin{
         //===================================================================
         // Test for create variables
         //===================================================================
-        else
-        test="create";
-        if(key==test){
-            int frs=vin::match_create(word, value, unit, line);
-            return frs;
-        }
+        //test="create";
+        //if(key==test){
+        //    int frs=vin::match_create(word, value, unit, line);
+        //    return frs;
+        //}
         //===================================================================
         // Test for dimension variables
         //===================================================================
@@ -175,335 +177,19 @@ namespace vin{
 
     } // end of match function
 
-    int match_create(string const word, string const value, string const unit, int const line){
-        ///-------------------------------------------------------------------
-        /// system_creation_flags[1] - Set system particle shape
-        ///-------------------------------------------------------------------
+    //int match_create(string const word, string const value, string const unit, int const line){
+    //    //--------------------------------------------------------------------
+    //    // keyword not found
+    //    //--------------------------------------------------------------------
+    //    else{
+    //    terminaltextcolor(RED);
+    //        std::cerr << "Error - Unknown control statement \'create:" << word << "\' on line " << line << " of input file" << std::endl;
+    //        terminaltextcolor(WHITE);
+    //    return EXIT_FAILURE;
+    //    }
 
-        std::string prefix="create:";
-
-        // cs::system_creation_flags needs refactoring for readability and bug resistance
-        std::string test="full";
-        if(word==test){
-            cs::system_creation_flags[1]=0;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="cube";
-        if(word==test){
-            cs::system_creation_flags[1]=1;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="cylinder";
-        if(word==test){
-            cs::system_creation_flags[1]=2;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="ellipsoid";
-        if(word==test){
-            cs::system_creation_flags[1]=3;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="sphere";
-        if(word==test){
-            cs::system_creation_flags[1]=4;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="truncated-octahedron";
-        if(word==test){
-            cs::system_creation_flags[1]=5;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="tear-drop";
-        if(word==test){
-            cs::system_creation_flags[1]=6;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        // system_creation_flags[2] - Set system type
-        //-------------------------------------------------------------------
-        test="particle";
-        if(word==test){
-            cs::system_creation_flags[2]=0;
-            return EXIT_SUCCESS;
-        }
-        else
-        test="particle-array";
-        if(word==test){
-            cs::system_creation_flags[2]=1;
-            return EXIT_SUCCESS;
-        }
-        else
-        test="hexagonal-particle-array";
-        if(word==test){
-            cs::system_creation_flags[2]=2;
-            return EXIT_SUCCESS;
-        }
-        else
-        test="voronoi-film";
-        if(word==test){
-            cs::system_creation_flags[2]=3;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="voronoi-size-variance";
-        if(word==test){
-            double vsd=atof(value.c_str());
-            check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-            create_voronoi::voronoi_sd=vsd;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="voronoi-row-offset";
-        if(word==test){
-            create_voronoi::parity=1;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="voronoi-random-seed";
-        if(word==test){
-            int vs=atoi(value.c_str());
-            check_for_valid_int(vs, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
-            mtrandom::voronoi_seed=vs;
-                return EXIT_SUCCESS;
-        }
-        else
-        test="voronoi-rounded-grains";
-        if(word==test){
-            create_voronoi::rounded=true;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="voronoi-rounded-grains-area";
-        if(word==test){
-            double vsd=atof(value.c_str());
-            check_for_valid_value(vsd, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-            create_voronoi::area_cutoff=vsd;
-            return EXIT_SUCCESS;
-        }
-        else
-        //-------------------------------------------------------------------
-        test="particle-centre-offset"; //parity
-        if(word==test){
-            cs::particle_creation_parity=1;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="single-spin";
-        if(word==test){
-            cs::single_spin=true;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="periodic-boundaries-x";
-        if(word==test){
-            cs::pbc[0]=true;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="periodic-boundaries-y";
-        if(word==test){
-            cs::pbc[1]=true;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="periodic-boundaries-z";
-        if(word==test){
-            cs::pbc[2]=true;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        else
-        test="select-material-by-geometry";
-        if(word==test){
-            cs::SelectMaterialByGeometry=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::SelectMaterialByGeometry=false;
-            }
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="fill-core-shell-particles";
-        if(word==test){
-            cs::fill_core_shell=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::fill_core_shell=false;
-            }
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness";
-        if(word==test){
-            cs::interfacial_roughness=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::interfacial_roughness=false;
-            }
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="material-interfacial-roughness";
-        if(word==test){
-            cs::interfacial_roughness_local_height_field=true; // default
-            // also check for value
-            std::string VFalse="false";
-            if(value==VFalse){
-                cs::interfacial_roughness_local_height_field=false;
-            }
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-random-seed";
-        if(word==test){
-            unsigned int vs=atoi(value.c_str());
-            cs::interfacial_roughness_random_seed=vs;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-number-of-seed-points";
-        if(word==test){
-            int sc=atoi(value.c_str());
-            check_for_valid_int(sc, word, line, prefix, 0, 100000,"input","0 - 100,000");
-            cs::interfacial_roughness_seed_count=sc;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-type";
-        if(word==test){
-            std::string loctest="peaks";
-            if(value==loctest){
-                cs::interfacial_roughness_type=1;
-                return EXIT_SUCCESS;
-            }
-            else
-            loctest="troughs";
-            if(value==loctest){
-                cs::interfacial_roughness_type=-1;
-                return EXIT_SUCCESS;
-            }
-            else{
-                cs::interfacial_roughness_type=0;
-                return EXIT_SUCCESS;
-            }
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-seed-radius";
-        if(word==test){
-            double irsr=atof(value.c_str());
-            // Test for valid range
-            check_for_valid_value(irsr, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 1 micrometre");
-            cs::interfacial_roughness_mean_seed_radius=irsr;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-seed-radius-variance";
-        if(word==test){
-            double irsrv=atof(value.c_str());
-            // Test for valid range
-            check_for_valid_value(irsrv, word, line, prefix, unit, "none", 0.0, 1.0,"input","0.0 - 1.0");
-            cs::interfacial_roughness_seed_radius_variance=irsrv;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-mean-height";
-        if(word==test){
-            double irmh=atof(value.c_str());
-            // Test for valid range
-            check_for_valid_value(irmh, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-            cs::interfacial_roughness_mean_seed_height=irmh;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-maximum-height";
-        if(word==test){
-            double shm=atof(value.c_str());
-            // Test for valid range
-            check_for_valid_value(shm, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-            cs::interfacial_roughness_seed_height_max=shm;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="interfacial-roughness-height-field-resolution";
-        if(word==test){
-            double irhfr=atof(value.c_str());
-            // Test for valid range
-            check_for_valid_value(irhfr, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 Angstroms - 10 nanometres");
-            cs::interfacial_roughness_height_field_resolution=irhfr;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="multilayers";
-        if(word==test){
-            int nmul=atoi(value.c_str());
-            // Test for valid range
-            check_for_valid_int(nmul, word, line, prefix, 1, 100,"input","1 - 100, specifying the number of multilayers to be generated");
-            cs::multilayers = true;
-            cs::num_multilayers = nmul;
-            return EXIT_SUCCESS;
-        }
-        //--------------------------------------------------------------------
-        test="height-categorization";
-        if(word==test){
-            // Test for different options
-            test="default";
-            if(value==test){
-                // do nothing
-                return EXIT_SUCCESS;
-            }
-            test="multilayers";
-            if(value==test){
-                cs::multilayer_height_category = true;
-                return EXIT_SUCCESS;
-            }
-            else{
-                terminaltextcolor(RED);
-                std::cerr << "Error - value for \'create:" << word << "\' must be one of:" << std::endl;
-                std::cerr << "\t\"default\"" << std::endl;
-                std::cerr << "\t\"multilayers\"" << std::endl;
-                zlog << zTs() << "Error - value for \'create:" << word << "\' must be one of:" << std::endl;
-                zlog << zTs() << "\t\"default\"" << std::endl;
-                zlog << zTs() << "\t\"multilayers\"" << std::endl;
-                terminaltextcolor(WHITE);
-                err::vexit();
-            }
-        }
-        //--------------------------------------------------------------------
-        // keyword not found
-        //--------------------------------------------------------------------
-        else{
-        terminaltextcolor(RED);
-            std::cerr << "Error - Unknown control statement \'create:" << word << "\' on line " << line << " of input file" << std::endl;
-            terminaltextcolor(WHITE);
-        return EXIT_FAILURE;
-        }
-
-        return EXIT_SUCCESS;
-    }
+    //    return EXIT_SUCCESS;
+    //}
 
     int match_dimension(string const word, string const value, string const unit, int const line){
         //-------------------------------------------------------------------
@@ -782,12 +468,6 @@ namespace vin{
             terminaltextcolor(WHITE);
             err::vexit();
             }
-        }
-        //-------------------------------------------------------------------
-        test="enable-dipole-fields";
-        if(word==test){
-            sim::hamiltonian_simulation_flags[4]=1;
-            return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="enable-fmr-field";
@@ -1208,42 +888,6 @@ namespace vin{
             sim::constraint_phi_delta=angle;
             return EXIT_SUCCESS;
         }
-        //--------------------------------------------------------------------
-        test="monte-carlo-algorithm";
-        if(word==test){
-            // include namesapce here to access enum values
-            using namespace sim;
-            test="spin-flip";
-            if(value==test){
-                sim::mc_algorithm=spin_flip;
-                return EXIT_SUCCESS;
-            }
-            test="uniform";
-            if(value==test){
-                sim::mc_algorithm=uniform;
-                return EXIT_SUCCESS;
-            }
-            test="angle";
-            if(value==test){
-                sim::mc_algorithm=angle;
-                return EXIT_SUCCESS;
-            }
-            test="hinzke-nowak";
-            if(value==test){
-                sim::mc_algorithm=hinzke_nowak;
-                return EXIT_SUCCESS;
-            }
-            else{
-            terminaltextcolor(RED);
-                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-                std::cerr << "\t\"spin-flip\"" << std::endl;
-                std::cerr << "\t\"uniform\"" << std::endl;
-                std::cerr << "\t\"angle\"" << std::endl;
-                std::cerr << "\t\"hinzke-nowak\"" << std::endl;
-            terminaltextcolor(WHITE);
-                err::vexit();
-            }
-        }
         //-------------------------------------------------------------------
         test="save-checkpoint";
         if(word==test){
@@ -1299,6 +943,44 @@ namespace vin{
                 terminaltextcolor(WHITE);
                 err::vexit();
             }
+        }
+        //-------------------------------------------------------------------
+        test="load-checkpoint-if-exists";
+        if(word==test){
+          // determine checkpoint file name
+          std::stringstream chkfilenamess;
+          chkfilenamess << "vampire" << vmpi::my_rank << ".chk";
+          std::string chkfilename = chkfilenamess.str();
+
+          // open checkpoint file
+          std::ofstream chkfile(chkfilename.c_str(),std::ios::in);
+          bool exists=chkfile.good();
+          chkfile.close();
+          if(exists){
+            test="restart";
+            if(value==test){
+                sim::load_checkpoint_flag=true; // Load spin configurations
+                sim::load_checkpoint_continue_flag=false; // Restart simulation with checkpoint configuration
+                return EXIT_SUCCESS;
+            }
+            test="continue";
+            if(value==test){
+                sim::load_checkpoint_flag=true; // Load spin configurations
+                sim::load_checkpoint_continue_flag=true; // Continue simulation from saved time with checkpoint configuration
+                return EXIT_SUCCESS;
+            }
+            else{
+                terminaltextcolor(RED);
+                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+                std::cerr << "\t\"restart\"" << std::endl;
+                std::cerr << "\t\"continue\"" << std::endl;
+                terminaltextcolor(WHITE);
+                err::vexit();
+            }
+          }
+          else{
+            return EXIT_SUCCESS; // No checkpoint file
+          }
         }
         //--------------------------------------------------------------------
         test="fmr-field-strength";
@@ -1495,6 +1177,15 @@ namespace vin{
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
+        test="material-standard-deviation";
+        if(word==test){
+            // Set flags for calculations of standard deviation and magnetization
+            stats::calculate_material_standard_deviation=true;
+            stats::calculate_material_magnetization=true;
+            output_list.push_back(999); //AJN
+            return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
         test="mean-susceptibility";
         if(word==test){
             // Set flags for calculations of susceptibility and magnetization
@@ -1553,70 +1244,70 @@ namespace vin{
         test="total-energy";
         if(word==test){
             output_list.push_back(27);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-total-energy";
         if(word==test){
             output_list.push_back(28);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="anisotropy-energy";
         if(word==test){
             output_list.push_back(29);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-anisotropy-energy";
         if(word==test){
             output_list.push_back(30);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="exchange-energy";
         if(word==test){
             output_list.push_back(35);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-exchange-energy";
         if(word==test){
             output_list.push_back(36);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="applied-field-energy";
         if(word==test){
             output_list.push_back(37);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-applied-field-energy";
         if(word==test){
             output_list.push_back(38);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="magnetostatic-energy";
         if(word==test){
             output_list.push_back(39);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="mean-magnetostatic-energy";
         if(word==test){
             output_list.push_back(40);
-            stats::calculate_energy=true;
+            stats::calculate_system_energy = true;
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
@@ -1673,6 +1364,36 @@ namespace vin{
             vmpi::DetailedMPITiming=true;
             output_list.push_back(60);
             return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
+        test="mean-specific-heat";
+        if(word==test){
+           stats::calculate_system_energy = true;
+           stats::calculate_system_specific_heat = true;
+           output_list.push_back(61);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-specific-heat";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           stats::calculate_material_specific_heat = true;
+           output_list.push_back(62);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-total-energy";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           output_list.push_back(63);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="material-mean-total-energy";
+        if(word==test){
+           stats::calculate_material_energy = true;
+           output_list.push_back(64);
+           return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="gnuplot-array-format";
@@ -1799,7 +1520,7 @@ namespace vin{
 
         // resize temporary materials array for storage of variables
         read_material.resize(mp::max_materials);
-        cmc::cmc_mat.resize(mp::max_materials);
+        montecarlo::cmc::cmc_mat.resize(mp::max_materials);
 
             // Print informative message to zlog file
         zlog << zTs() << "Opening material file \"" << matfile << "\"." << std::endl;
@@ -2238,7 +1959,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2254,7 +1975,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_min=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_min=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2270,7 +1991,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_max=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_max=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2286,7 +2007,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=360.0)){
-                    cmc::cmc_mat[super_index].constraint_theta_delta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_theta_delta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2302,7 +2023,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_min=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_min=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2318,7 +2039,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2334,7 +2055,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_max=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_max=angle;
                     return EXIT_SUCCESS;
                 }
                 else{
@@ -2350,7 +2071,7 @@ namespace vin{
                 double angle=atof(value.c_str());
                 // Test for valid range
                 if((angle>=0.0) && (angle<=180.0)){
-                    cmc::cmc_mat[super_index].constraint_phi_delta=angle;
+                    montecarlo::cmc::cmc_mat[super_index].constraint_phi_delta=angle;
                     return EXIT_SUCCESS;
                 }
                 else{

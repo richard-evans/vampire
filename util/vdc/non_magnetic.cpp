@@ -114,7 +114,7 @@ void read_nm_metadata(){
 
    if(vdc::verbose) std::cout << "   Number of files: " << num_coord_files << std::endl;
 
-   for(int file = 0; file < num_coord_files; file++){
+   for(unsigned int file = 0; file < num_coord_files; file++){
       getline(cmfile, line);
       line.erase(remove(line.begin(), line.end(), '\t'), line.end());
       line.erase(remove(line.begin(), line.end(), ' '), line.end());
@@ -210,6 +210,12 @@ void read_nm_data(){
 
       }
 
+   }
+
+   // create vector list of non magnetic atom indices
+   vdc::nm_atoms_list.resize(vdc::num_nm_atoms);
+   for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+      vdc::nm_atoms_list.push_back(atom);
    }
 
    // output informative message to user

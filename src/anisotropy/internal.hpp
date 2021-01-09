@@ -3,9 +3,9 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Sam Westmoreland and Richard Evans 2017. All rights reserved.
+//   (c) Roberto Moreno Ortega, Sam Westmoreland and Richard Evans 2017. All rights reserved.
 //
-//   Email: sw766@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
 //
@@ -96,7 +96,10 @@ namespace anisotropy{
             std::vector<double> kij; // surface/Neel anisotropy pair constant
 
             std::vector<double> ku_vector; // unit vector defining axis for uniaxial anisotropy
-            std::vector<double> kc_vector; // unit vector defining axis for cubic anisotropy
+
+            std::vector<double> kc_vector1; // first unit vector defining axis for cubic anisotropy
+            std::vector<double> kc_vector2; // second unit vector defining axis for cubic anisotropy
+            std::vector<double> kc_vector3; // third unit vector defining axis for cubic anisotropy
 
             std::vector<double> ku_tensor; // uniaxial second order anisotropy tensor
             std::vector<double> kc_tensor; // cubic fourth order anisotropy tensor
@@ -127,11 +130,21 @@ namespace anisotropy{
                ku_vector[2] = 1.0;
 
                // set default uniaxial and cubic directions
-               kc_vector.resize(3); // resize to three elements
+               kc_vector1.resize(3); // resize to three elements
+               kc_vector2.resize(3); // resize to three elements
+               kc_vector3.resize(3); // resize to three elements
 
-               kc_vector[0] = 0.0; // set direction along [0,0,1]
-               kc_vector[1] = 0.0;
-               kc_vector[2] = 1.0;
+               kc_vector1[0] = 1.0; // set direction alon [1,0,0]
+               kc_vector1[1] = 0.0;
+               kc_vector1[2] = 0.0;
+
+               kc_vector2[0] = 0.0; // set direction alon [0,1,0]
+               kc_vector2[1] = 1.0;
+               kc_vector2[2] = 0.0;
+
+               kc_vector3[0] = 0.0; // set direction alon [0,0,1]
+               kc_vector3[1] = 0.0;
+               kc_vector3[2] = 1.0;
 
                // set tensors as empty by default
                ku_tensor.resize(9, 0.0);
@@ -155,6 +168,7 @@ namespace anisotropy{
 
       extern bool enable_cubic_fourth_order;    // Flag to enable calculation of fourth order cubic anisotropy
       extern bool enable_cubic_sixth_order;     // Flag to enable calculation of sixth order cubic  anisotropy
+      extern bool enable_cubic_fourth_order_rotation; // Flag to enable calculation of rotated cubic anisotropy
 
       extern bool enable_neel_anisotropy; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
       extern bool enable_lattice_anisotropy; // Flag to turn on lattice anisotropy calculation
@@ -172,12 +186,13 @@ namespace anisotropy{
 
       // unrolled arrays for storing easy axes for each material
       extern std::vector<evec_t> ku_vector; // 001 easy axis direction
-      extern std::vector<evec_t> kc_vector; // 001 vector for cubic anisotropy
-      //extern std::vector<evec_t> kc_vector_b(0); // 100 vector for cubic anisotropy
 
-      extern bool native_neel_anisotropy_threshold; // enables site-dependent surface threshold
+      extern bool native_neel_anisotropy_threshold;  // enables site-dependent surface threshold
       extern unsigned int neel_anisotropy_threshold; // global threshold for surface atoms
-      extern double nearest_neighbour_distance; // Control surface anisotropy nearest neighbour distance
+      extern double nearest_neighbour_distance;      // Control surface anisotropy nearest neighbour distance
+      extern bool neel_range_dependent;              // Enable range dependent Neel anisotropy Lij = L0 exp(-F(r-r0)/r0)
+      extern double neel_exponential_range;          // r0 value for range dependence of Neel anisotropy
+      extern double neel_exponential_factor;         // F value for range dependence of Neel anisotropy
 
       // arrays for storing unrolled parameters for lattice anisotropy
       extern std::vector<double> klattice_array; // anisoptropy constant
@@ -224,6 +239,16 @@ namespace anisotropy{
                                      std::vector<double>& field_array_z,
                                      const int start_index,
                                      const int end_index);
+
+      void cubic_fourth_order_rotation_fields(std::vector<double>& spin_array_x,
+                                              std::vector<double>& spin_array_y,
+                                              std::vector<double>& spin_array_z,
+                                              std::vector<int>&    atom_material_array,
+                                              std::vector<double>& field_array_x,
+                                              std::vector<double>& field_array_y,
+                                              std::vector<double>& field_array_z,
+                                              const int start_index,
+                                              const int end_index);
 
       void cubic_sixth_order_fields( std::vector<double>& spin_array_x,
                                      std::vector<double>& spin_array_y,
@@ -280,6 +305,12 @@ namespace anisotropy{
                                        const double sy,
                                        const double sz);
 
+      double cubic_fourth_order_rotation_energy(const int atom,
+                                       const int mat,
+                                       const double sx,
+                                       const double sy,
+                                       const double sz);
+
       double cubic_sixth_order_energy( const int atom,
                                        const int mat,
                                        const double sx,
@@ -295,7 +326,7 @@ namespace anisotropy{
       double lattice_energy(const int atom, const int mat, const double sx, const double sy, const double sz, const double temperature);
 
       void initialise_neel_anisotropy_tensor(std::vector <std::vector <bool> >& nearest_neighbour_interactions_list,
-                                             std::vector<std::vector <cs::neighbour_t> >& cneighbourlist);
+                                             std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
 
    } // end of internal namespace
 

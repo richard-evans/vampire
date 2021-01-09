@@ -44,6 +44,7 @@ namespace anisotropy{
 
       bool enable_cubic_fourth_order    = false; // Flag to enable calculation of fourth order cubic anisotropy
       bool enable_cubic_sixth_order     = false; // Flag to enable calculation of sixth order cubic  anisotropy
+      bool enable_cubic_fourth_order_rotation = false; // Flag to enable calculation of rotated cubic anisotropy
 
       // array for storing 1D second order collapsed tensor for Neel anisotropy
       std::vector<double> neel_tensor(0);
@@ -57,12 +58,13 @@ namespace anisotropy{
 
       // unrolled arrays for storing easy axes for each material
       std::vector<evec_t> ku_vector(0); // 001 easy axis direction
-      std::vector<evec_t> kc_vector(0); // 001 vector for cubic anisotropy
-      //std::vector<evec_t> kc_vector_b(0); // 100 vector for cubic anisotropy
 
       bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
    	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms
       double nearest_neighbour_distance      = 1.e9; // Control surface anisotropy nearest neighbour distance
+      bool neel_range_dependent              = false; // Enable range dependent Neel anisotropy Lij = L0 exp(-F(r-r0)/r0 )
+      double neel_exponential_range          = 2.5; // r0 value for range dependence of Neel anisotropy
+      double neel_exponential_factor         = 5.53; // F value for range dependence of Neel anisotropy (default assumes nnn fraction of 10% of nn value)
 
       // arrays for storing unrolled parameters for lattice anisotropy
       std::vector<double> klattice_array(0); // anisoptropy constant

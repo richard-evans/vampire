@@ -19,7 +19,7 @@
 namespace vinfo{
 
    // variable string to store version number of code
-   std::string vampire_version = "5.0.0"; // vampire code version
+   std::string vampire_version = "5.0.1"; // vampire code version
 
    // wrapper function to return vampire version
    std::string version(){

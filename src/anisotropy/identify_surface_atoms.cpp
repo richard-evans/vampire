@@ -29,9 +29,9 @@
 namespace anisotropy{
 
    //---------------------------------------------------------------------------
-   // Function to calculate surface anisotropy tensor
+   // Function to identify less than fully coordinated atoms
    //---------------------------------------------------------------------------
-   void identify_surface_atoms(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <cs::neighbour_t> > & cneighbourlist){
+   void identify_surface_atoms(std::vector<cs::catom_t> & catom_array, std::vector<std::vector <neighbours::neighbour_t> > & cneighbourlist){
 
       // initialise surface threshold if not overidden by input file
       if(internal::neel_anisotropy_threshold == 123456789) internal::neel_anisotropy_threshold = cs::unit_cell.surface_threshold;
@@ -57,7 +57,7 @@ namespace anisotropy{
       //--------------------------------------------------------------------------------------------
 
       // vector to store interactions within range
-      std::vector<bool> nn_interaction(cs::unit_cell.interaction.size(),false);
+      std::vector<bool> nn_interaction(cs::unit_cell.bilinear.interaction.size(),false);
 
       // save nn_distance for performance
       const double rsq = internal::nearest_neighbour_distance * internal::nearest_neighbour_distance;
@@ -68,20 +68,20 @@ namespace anisotropy{
       const double ucdz = cs::unit_cell.dimensions[2];
 
       // loop over all interactions in unit cell
-      for(unsigned int itr = 0; itr < cs::unit_cell.interaction.size(); itr++){
+      for(unsigned int itr = 0; itr < cs::unit_cell.bilinear.interaction.size(); itr++){
 
          // get distance to neighbouring unit cell in unit cells
-         double nndx = double(cs::unit_cell.interaction[itr].dx);
-         double nndy = double(cs::unit_cell.interaction[itr].dy);
-         double nndz = double(cs::unit_cell.interaction[itr].dz);
+         double nndx = double(cs::unit_cell.bilinear.interaction[itr].dx);
+         double nndy = double(cs::unit_cell.bilinear.interaction[itr].dy);
+         double nndz = double(cs::unit_cell.bilinear.interaction[itr].dz);
 
          // load positions of i and j atoms to temporary coordinates and convert to angstroms
-         double ix = (cs::unit_cell.atom[cs::unit_cell.interaction[itr].i].x) * ucdx;
-         double iy = (cs::unit_cell.atom[cs::unit_cell.interaction[itr].i].y) * ucdy;
-         double iz = (cs::unit_cell.atom[cs::unit_cell.interaction[itr].i].z) * ucdz;
-         double jx = (cs::unit_cell.atom[cs::unit_cell.interaction[itr].j].x + nndx)*ucdx;
-         double jy = (cs::unit_cell.atom[cs::unit_cell.interaction[itr].j].y + nndy)*ucdy;
-         double jz = (cs::unit_cell.atom[cs::unit_cell.interaction[itr].j].z + nndz)*ucdz;
+         double ix = (cs::unit_cell.atom[cs::unit_cell.bilinear.interaction[itr].i].x) * ucdx;
+         double iy = (cs::unit_cell.atom[cs::unit_cell.bilinear.interaction[itr].i].y) * ucdy;
+         double iz = (cs::unit_cell.atom[cs::unit_cell.bilinear.interaction[itr].i].z) * ucdz;
+         double jx = (cs::unit_cell.atom[cs::unit_cell.bilinear.interaction[itr].j].x + nndx)*ucdx;
+         double jy = (cs::unit_cell.atom[cs::unit_cell.bilinear.interaction[itr].j].y + nndy)*ucdy;
+         double jz = (cs::unit_cell.atom[cs::unit_cell.bilinear.interaction[itr].j].z + nndz)*ucdz;
 
          // calculate reduced coordinates
          double dx = jx - ix;

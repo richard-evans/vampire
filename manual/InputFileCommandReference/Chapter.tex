@@ -40,9 +40,12 @@ The following commands control generation of the simulated system, including dim
 
 {\zicf create:particle-centre-offset}\addcontentsline{toc}{subsection}{create:particle-parity} shifts the origin of a particle to the centre of the nearest unit cell.\\ \par
 
-{\zicf create:crystal-structure = string [sc,fcc,bcc,hcp,rocksalt; default sc]}
-\addcontentsline{toc}{subsection}{create:crystal-structure} Defines the default
-crystal lattice to be generated.\\ \par
+{\zicf create:crystal-structure = string [sc, fcc, bcc, hcp, heusler, kagome, rocksalt, spinel; default sc]}
+\addcontentsline{toc}{subsection}{create:crystal-structure}
+Defines the default crystal lattice to be generated. The code supports the basic metallic crystal types
+simple cubic (sc), body-centred-cubic (bcc), face-centred-cubic (fcc) and hexagonal close-packed (hcp).
+The code also supports important magnetic structures such as Heusler alloys (heusler), rock-salt such as
+NiO (rocksalt)spinels such as magnetite (spinel) and kagome lattices. \\ \par
 
 {\zicf create:single-spin flag}\addcontentsline{toc}{subsection}{create:single-spin} Overrides all create options and generates a single isolated spin.\\ \par
 
@@ -86,23 +89,29 @@ repeatable results for the same simulation. The seed determines the actual
 sequence of numbers and is used to generate a different alloy distribution.
 Note that different numbers of cores will change the structure that is generated.\\
 
-{\zicf create:grain-random-seed integer [default 683614233]}
+{\zicf create:grain-random-seed integer [default 1527349271]}
 \addcontentsline{toc}{subsection}{create:grain-random-seed}
 Sets the random seed for the psuedo random number generator for generating random
 grain structures. \\
 
-{\zicf create:dilution-random-seed integer [default 683614233]}
+{\zicf create:dilution-random-seed integer [default 465865253]}
 \addcontentsline{toc}{subsection}{create:dilution-random-seed}
 Sets the random seed for the psuedo random number generator for diluting the
 atoms, leading to a different realization of a dilute material. Note that
 different numbers of cores will change the structure that is generated.\\
 
-{\zicf create:intermixing-random-seed integer [default 683614233]}
+{\zicf create:intermixing-random-seed integer [default 100181363]}
 \addcontentsline{toc}{subsection}{create:intermixing-random-seed}
 Sets the random seed for the psuedo random number generator for calculating
 intermixing of materials. A different seed will lead to a different realization
 of a dilute material. Note that different numbers of cores will change the
 structure that is generated.\\
+
+{\zicf create:spin-initialisation-random-seed = integer [default 123456]}
+\addcontentsline{toc}{subsection}{create:intermixing-random-seed}
+Sets the random seed for the psuedo random number generator for initialising
+spin directions. Note that different numbers of cores will change the
+spin positions that are generated.\\
 
 \section*{System dimensions}
 \addcontentsline{toc}{section}{System dimensions}
@@ -165,6 +174,32 @@ The following commands control the calculation of the magnetic anisotropy energy
   interactions. Internally this sets a large threshold, and so specifying
   anisotropy:surface-anisotropy-threshold will override this flag.\\
 
+{\zicf anisotropy:neel-anisotropy-exponential-range}\addcontentsline{toc}
+{subsection}{anisotropy:neel-anisotropy-exponential-range}
+  float default [$2.5$]
+  Enables an exponentially range dependent N\'eel pair anisotropy so that
+  lattice distortions and strains change the magnetoelastic compling strength.
+  In the usual form the method only takes into account the symmetry ($L_{ij}(r)
+  = const$). The value should be set to the typical lattice parameter otherwise
+  the total anisotropy will be significantly higher or lower than expected. The
+  functional form of the range dependence is
+  \begin{equation}
+     L_{ij}(r_{ij}) = L_0 \exp\left(-F\frac{r_{ij} - r_0}{r_{0}}\right)
+  \end{equation}
+  where $r_{ij}$ is the pair separation, $r_0$ is the exponential range,
+  $F$ is the exponential factor and $L_0$ is the usual N\'eel anisotropy constant.
+  The functional form assures that at the first neighbour distance the value of
+  the N\'eel anisotropy constant is the same as would be without the range-
+  dependent form.\\
+
+{\zicf anisotropy:neel-anisotropy-exponential-factor}\addcontentsline{toc}
+{subsection}{anisotropy:neel-anisotropy-exponential-factor}
+   float default [$5.52$]
+   Enables an exponentially range dependent N\'eel pair anisotropy so that
+   lattice distortions and strains change the magnetoelastic compling strength.
+   In the usual form the method only takes into account the symmetry ($L_{ij}(r)
+   = const$). The prefactor controls the falloff with increasing range/\\
+
 \section*{Dipole field calculation}
 \addcontentsline{toc}{section}{Dipole field calculation}
 The following commands control the calculation of the dipole-dipole field. By
@@ -180,6 +215,7 @@ Declares the solver to be used for the dipole calculation. Available options are
 \begin{itemize}
   \item[] macrocell
   \item[] tensor
+  \item[] atomistic
 \end{itemize}
 
 \section*{Simulation Control}
@@ -217,7 +253,7 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 {\zicf sim:program = temperature-pulse}\addcontentsline{toc}{subsubsection}{temperature-pulse}\\
 
 {\zicf sim:program = cmc-anisotropy}\addcontentsline{toc}{subsubsection}{cmc-anisotropy}\\
-
+   Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques.
 %    Hybrid-CMC \\
 %    Reverse-Hybrid-CMC x
 %    LaGrange-Multiplier x
@@ -236,38 +272,50 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
    Number of timesteps between recalculation of the demag field. Default value is suitable for slow calculations, fast dynamics will generally require much faster update rates.\\
 
 {\zicf sim:time-step}\addcontentsline{toc}{subsection}{sim:time-step}\\
+   The timestep for the evolution of the system, determines how long a simulation will take.\\
 
 {\zicf sim:total-time-steps}\addcontentsline{toc}{subsection}{sim:total-time-steps}\\
+   The total number of time steps the program will run for.\\
 
 {\zicf sim:loop-time-steps}\addcontentsline{toc}{subsection}{sim:loop-time-steps}\\
+The number of time steps that statistics are taken over, including the \textit{mean-magnetisation} and \textit{material-standard-deviation}. This takes place after sim:equilibration time steps have passed in simulations such as \textit{program:curie-temperature}.\\
 
 {\zicf sim:time-steps-increment}\addcontentsline{toc}{subsection}{sim:time-steps-increment}\\
 
 {\zicf sim:equilibration-time-steps}\addcontentsline{toc}{subsection}{sim:equilibration-time-steps}\\
-
+   The number of simulation time steps that the system is allowed to equilibrate for at each temperature. Statistics are not taken over this range.\\
 {\zicf sim:simulation-cycles}\addcontentsline{toc}{subsection}{sim:simulation-cycles}\\
 
 {\zicf sim:maximum-temperature}\addcontentsline{toc}{subsection}{sim:maximum-temperature}\\
+   The maximum temperature in a simulation over a temperature series, such as \textit{sim:program = curie-temperature}.\\
 
 {\zicf sim:minimum-temperature}\addcontentsline{toc}{subsection}{sim:minimum-temperature}\\
+   The minimum temperature in a simulation over a temperature series, such as \textit{sim:program = curie-temperature}.\\
 
 {\zicf sim:equilibration-temperature}\addcontentsline{toc}{subsection}{sim:equilibration-temperature}\\
-
+   The temperature at which a simulation equilibrates, for example, prior to the temperature pulse in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:temperature}\addcontentsline{toc}{subsection}{sim:temperature}\\
+   The temperature of the simulation.
 
 {\zicf sim:temperature-increment}\addcontentsline{toc}{subsection}{sim:temperature-increment}\\
+   The temperature step size in a simulation over a temperature series, such as \textit{sim:program = curie-temperature}.\\
 
 {\zicf sim:cooling-time}\addcontentsline{toc}{subsection}{sim:cooling-time}\\
 
 {\zicf sim:laser-pulse-temporal-profile}\addcontentsline{toc}{subsection}{sim:laser-pulse-temporal-profile}
-    square
-    two-temperature
-    double-pulse-two-temperature
-    double-pulse-square\\
+   The shape of the laser temperature pulse in time, used in \textit{sim:program = temperature-pulse}.\\
+  \begin{itemize}
+    \item[] square
+    \item[] two-temperature
+    \item[] double-pulse-two-temperature
+    \item[] double-pulse-square\\
+  \end{itemize}
 
 {\zicf sim:laser-pulse-time}\addcontentsline{toc}{subsection}{sim:laser-pulse-time}\\
+   The length of the laser temperature pulse in time, used in \textit{sim:program = temperature-pulse}.\\
 
 {\zicf sim:laser-pulse-power}\addcontentsline{toc}{subsection}{sim:laser-pulse-power}\\
+   The fluence of the laser temperature pulse, used in \textit{sim:program = temperature-pulse}.\\
 
 {\zicf sim:second-laser-pulse-time}\addcontentsline{toc}{subsection}{sim:second-laser-pulse-time}\\
 
@@ -280,26 +328,29 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 {\zicf sim:two-temperature-heat-sink-coupling}\addcontentsline{toc}{subsection}{sim:two-temperature-heat-sink-coupling}\\
 
 {\zicf sim:two-temperature-electron-heat-capacity}\addcontentsline{toc}{subsection}{sim:two-temperature-electron-heat-capacity}\\
-
+   The heat capacity of the electrons in the system, used in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:two-temperature-phonon-heat-capacity}\addcontentsline{toc}{subsection}{sim:two-temperature-phonon-heat-capacity}\\
-
+   The heat capacity of the phonons in the system, used in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:two-temperature-electron-phonon-coupling}\addcontentsline{toc}{subsection}{sim:two-temperature-electron-phonon-coupling}\\
-
+   Dictates the heat exchange coupling between the electrons and the phonons in the system, used in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:cooling-function}\addcontentsline{toc}{subsection}{sim:cooling-function}
-    exponential
-    gaussian
-    double-gaussian
-    linear\\
-
+   Dictates the shape of the cooling curve in \textit{sim:program = field-cool} simulations. Choose from:
+\begin{itemize}
+    \item[] exponential
+    \item[] gaussian
+    \item[] double-gaussian
+    \item[] linear\\
+\end{itemize}
 {\zicf sim:applied-field-strength}\addcontentsline{toc}{subsection}{sim:applied-field-strength}\\
+   The strength of the applied external field acting on the system.\\
 
 %{\zicf   minimum-applied-field-strength x
 {\zicf  sim:maximum-applied-field-strength}\addcontentsline{toc}{subsection}{sim:maximum-applied-field-strength}\\
-
+   The maximum strength of the applied external field acting on the system, in a magnetisation field series simulation such as \textit{sim:program = hysteresis-loop}. In this simulation, this maximum is the maximum magnitude, and dictates both the maximum and minimum ($\pm$) magnetisation in the target direction.\\
 {\zicf sim:equilibration-applied-field-strength}\addcontentsline{toc}{subsection}{sim:equilibration-applied-field-strength}\\
-
+   The strength of the applied external field the system equilibrates in, in a magnetisation field series simulation such as \textit{sim:program = hysteresis-loop}.\\
 {\zicf sim:applied-field-strength-increment}\addcontentsline{toc}{subsection}{sim:applied-field-strength-increment}\\
-
+   The increment in the strength of the applied external field acting on the system, in a magnetisation field series simulation such as \textit{sim:program = hysteresis-loop}.\\
 {\zicf sim:applied-field-angle-theta}\addcontentsline{toc}{subsection}{sim:applied-field-angle-theta}\\
 
 {\zicf sim:applied-field-angle-phi}\addcontentsline{toc}{subsection}{sim:applied-field-angle-phi}\\
@@ -332,38 +383,44 @@ $ is the demagnetisation factor of the macroscopic sample. The components of the
 {\zicf sim:constraint-rotation-update}\addcontentsline{toc}{subsection}{sim:constraint-rotation-update}\\
 
 {\zicf sim:constraint-angle-theta = float (default 0)}\addcontentsline{toc}{subsection}{sim:constraint-angle-theta}
-    When a constrained integrator is used in a normal program, this variable controls the angle of the magnetisation of the. Whole system from the x-axis [degrees]. In constrained simulations (such as c,c anisotropy) this has no effect.\\
+    When a constrained integrator is used in a normal program, this variable controls the angle of the magnetisation of the whole system from the x-axis [degrees]. In constrained simulations (such as cmc anisotropy) this has no effect.\\
 
 {\zicf  sim:constraint-angle-theta-minimum float (default 0)}\addcontentsline{toc}{subsection}{sim:constraint-angle-theta-minimum}\\
-
+    The minimum angle of theta that the global magnetisation is constrained to in a constrained angle series, used in \textit{sim:program = cmc-anisotropy}.\\
 {\zicf  sim:constraint-angle-theta-maximum}\addcontentsline{toc}{subsection}{sim:constraint-angle-theta-maximum}\\
-
+    The maximum angle of theta that the global magnetisation is constrained to in a constrained angle series, used in \textit{sim:program = cmc-anisotropy}.\\
 {\zicf  sim:constraint-angle-theta-increment = float 0.001-360 (default 5)}\addcontentsline{toc}{subsection}{sim:constraint-angle-theta-increment}
-    Incremental Change of angle of m from z-direction in constrained simulations. Controls the resolution of \\
+    Incremental Change of the angle of global magnetisation from z-direction in constrained simulations. Controls the resolution of the angular sweep.\\
 
 {\zicf sim:constraint-angle-phi}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi}\\
-
+    When a constrained integrator is used in a normal program, this variable controls the angle of the magnetisation of the whole system from the x-axis [degrees]. In constrained simulations (such as cmc anisotropy) this has no effect.\\
 {\zicf sim:constraint-angle-phi-minimum}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-minimum}\\
-
+    The minimum angle of phi that the global magnetisation is constrained to in a constrained angle series, used in \textit{sim:program = cmc-anisotropy}.\\
 {\zicf sim:constraint-angle-phi-maximum}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-maximum}\\
-
+    The maximum angle of phi that the global magnetisation is constrained to in a constrained angle series, used in \textit{sim:program = cmc-anisotropy}.\\
 {\zicf sim:constraint-angle-phi-increment}\addcontentsline{toc}{subsection}{sim:constraint-angle-phi-increment}\\
-
-{\zicf sim:monte-carlo-algorithm}\addcontentsline{toc}{subsection}{sim:monte-carlo-algorithm}
+    Incremental Change of the angle of global magnetisation from z-direction in constrained simulations. Controls the resolution of the angular sweep.\\
+{\zicf sim:monte-carlo-algorithm}\addcontentsline{toc}{subsection}{sim:monte-carlo-algorithm} selects the trial move algorithm for use with the Monte Carlo solver. The following options are available:
 \begin{itemize}
+  \item[] adaptive (default)
   \item[] spin-flip
   \item[] uniform
   \item[] angle
   \item[] hinzke-nowak
 \end{itemize}
+The adaptive move performs a gaussian move with a tuned trial width to attempt to maintain a 50\% acceptance probability, and is the most efficient method in most cases. A spin flip flips the direction of the spin 180$^{\circ}$ and can be used to perform Ising-type simulations for a uniform starting configuration. Uniform moves a spin to a random location on the unit sphere. Angle performs a gaussian move with a parametric estimate of the optimal width. Hinzke-Nowak performs a random combination of spin-flip, uniform and angle type-moves.\\
 
 {\zicf sim:checkpoint flag [default false]}\addcontentsline{toc}{subsection}{sim:checkpoint}
-    Enables checkpointing of spin configuration at end of simulation
-sim:save-checkpoint=end
-sim:save-checkpoint=continuous
-sim:save-checkpoint-rate=1
-sim:load-checkpoint=restart
-sim:load-checkpoint=continue\\
+    Enables checkpointing of spin configuration at end of the simulation. The options are:
+
+\begin{itemize}
+  \item[] sim:save-checkpoint=end
+  \item[] sim:save-checkpoint=continuous
+  \item[] sim:save-checkpoint-rate=1
+  \item[] sim:load-checkpoint=restart
+  \item[] sim:load-checkpoint=continue
+\end{itemize}
+.\\
 
 {\zicf sim:preconditioning-steps
     integer [default 0]}\addcontentsline{toc}{subsection}{sim:preconditioning-steps}
@@ -381,7 +438,8 @@ sim:load-checkpoint=continue\\
 The following commands control what data is output to the \textit{output} file.
 The order in which they appear is the order in which they appear in the \textit{output} file.
 Most options output a single column of data, but some output multiple columns, particularly
-vector data or parameters related to materials, where one column per material is output.\\
+vector data or parameters related to materials, where one column per material is output. Note
+that this means that for vector data, one set of columns per material is output.\\
 
 {\zicf output:time-steps}\addcontentsline{toc}{subsection}{output:time-steps} outputs
 the number of time steps (or Monte Carlo steps) completed during the simulation so far.\\
@@ -501,14 +559,27 @@ outputs the components of the magnetic susceptibility $\chi$. The magnetic susce
 \end{equation*}
 where $\alpha = x,y,z,m$ giving the directional components of the magnetization in $x$, $y$ and $z$
 respectively as well as the longitudinal susceptibility $\chi_m$. The data is output in four columns
-$\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$. The susceptibility is useful for identifying the critical
-temperature for a system as well as atomistic parametrization of the micromagnetic
+$\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$ in units of Tesla$^{-1}$. The susceptibility is useful for identifying the critical
+temperature for a system as well as atomistic parameterisation of the micromagnetic
 Landau-Lifshitz-Bloch (LLB) equation.\\
 
 {\zicf output:material-mean-susceptibility}\addcontentsline{toc}{subsection}{output:mean-material-susceptibility} outputs
 the components of the magnetic susceptibility $\chi$ for each defined material in the system. The data is output in sets of
 four columns $\chi_x$, $\chi_y$, $\chi_z$, and $\chi_m$ for each material. In multi-sublattice systems the susceptibility of
 each sublattice can be different.\\
+
+{\zicf output:material-standard-deviation}\addcontentsline{toc}{subsection}{output:material-standard-deviation} outputs
+the standard deviation in the components of the instantaneous normalized magnetization for each material in the simulation.
+The data is output in blocks of four columns, with one block per material defined in
+the \textit{material} file, e.g.
+
+\begin{center}
+$\left[ \hat{\sigma_1^x} \textrm{,} \hat{\sigma_1^y} \textrm{,} \hat{\sigma_1^z} \textrm{,} \sigma_{|m_1|} \right]$,
+$\left[ \hat{\sigma_2^x} \textrm{,} \hat{\sigma_2^y} \textrm{,} \hat{\sigma_2^z} \textrm{,} \sigma_{|m_2|} \right]$ ...
+$\left[ \hat{\sigma_n^x} \textrm{,} \hat{\sigma_n^y} \textrm{,} \hat{\sigma_n^z} \textrm{,} \sigma_{|m_n|} \right]$
+\end{center}
+
+The statistic is taken over the range of values gathered during the \textit{loop-time-steps} after equilibration.\\
 
 {\zicf output:electron-temperature}\addcontentsline{toc}{subsection}{output:electron-temperature} outputs the instantaneous electron temperature as calculated from the two temperature model.\\
 
@@ -540,6 +611,26 @@ each sublattice can be different.\\
 
 {\zicf output:mean-magnetostatic-energy}\addcontentsline{toc}{subsection}{output:mean-magnetostatic-energy}\\
 
+{\zicf output:material-total-energy}\addcontentsline{toc}{subsection}{output:material-total-energy} outputs
+the total energy of each material in the system.\\
+
+{\zicf output:material-mean-total-energy}\addcontentsline{toc}{subsection}{output:material-mean-total-energy} outputs
+the mean total energy of each material in the system.\\
+
+{\zicf output:mean-specific-heat}\addcontentsline{toc}{subsection}{output:mean-specific-heat} outputs the mean
+total specific heat $C_{\mathrm{v}}$ defined by:
+\begin{equation*}
+C_{\mathrm{v}} = \frac{\left(\langle U^2 \rangle - \langle U \rangle^2 \right)}{k_{\mathrm{B}} T^2}
+\end{equation*}
+where $U$ is the internal (total) energy, $T$ is the system temperature and $k_{\mathrm{B}}$ is the Boltzmann
+constant. The outputted value has units of $k_{\mathrm{B}}$ per spin. For classical magnets the specific heat
+tends to a non-zero constant approaching zero temperature. When using spin temperature rescaling the specific
+heat tends to zero as expected for a quantum system.\\
+
+{\zicf output:material-mean-specific-heat}\addcontentsline{toc}{subsection}{output:material-mean-specific-heat} outputs the
+mean specific heat for each defined material in the system in units of $k_{\mathrm{B}}$ per spin. The data is formatted as
+one column per material.\\
+
 {\zicf output:mpi-timings}\addcontentsline{toc}{subsection}{output:mpi-timings}\\
 
 {\zicf output:gnuplot-array-format}\addcontentsline{toc}{subsection}{output:gnuplot-array-format}\\
@@ -562,17 +653,25 @@ is 6 digits of precision. \\
 the formatting to be used for data written to the output file or printed to screen. The default is false which
 ignores trailing zeros in the output.\\
 
+{\zicf output:column-headers= flag [default false]}\addcontentsline{toc}{subsection}{output:column-headers} controls
+the headers at the top of output columns in the output file. The default is false which writes no headers.\\
+
 \section*{Configuration output}
 \addcontentsline{toc}{section}{Configuration output}
 These options enable the output of spin configuration snapshots during the
 simulation. The configurations can then be visualised using povray or other
 software generated with the vampire data converter (vdc) utility.\\
 
-{\zicf config:atoms flag}\addcontentsline{toc}{subsection}{config:atoms} enables
-the output of atomic spin configurations.\\
+{\zicf config:atoms flag [default false]}\addcontentsline{toc}{subsection}{config:atoms}
+enables the output of atomic spin configurations either at the end of the simulations or during the simulation. The options are:
+\begin{itemize}
+  \item[] config:atoms - to output continuously during the simulation
+  \item[] config:atoms=continuous - to output continuously during the simulation (same as previous option)
+  \item[] config:atoms=end - to output at the end of the simulation
+\end{itemize}
 
 {\zicf config:atoms-output-rate = int [0+, default 1000]}\addcontentsline{toc}{subsection}{config:atoms-output-rate}
-determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}.\\
+determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}. It is considered only if \textit{config:atoms=continuous} or is \textit{empty}.\\
 
 The following options allow a cubic slice of the total configuration data to
 be output to the configuration file. This is useful for reducing disk usage and
@@ -602,11 +701,16 @@ of the data slice to be outputted to the configuration file.\\
 determines the maximum z value (as a fraction of the total system dimensions)
 of the data slice to be outputted to the configuration file.\\
 
-{\zicf config:macro-cells}\addcontentsline{toc}{subsection}{config:macro-cells}
-enables the output of macro cell spin configurations.\\
+{\zicf config:macro-cells flag [default false]}\addcontentsline{toc}{subsection}{config:macro-cells}
+enables the output of macro cell spin configurations either at the end of the simulations or during the simulation. The options are:
+\begin{itemize}
+  \item[] config:macro-cells - to output continuously during the simulation
+  \item[] config:macro-cells=continuous - to output continuously during the simulation (same as previous option)
+  \item[] config:macro-cells=end - to output at the end of the simulation
+\end{itemize}
 
 {\zicf config:macro-cells-output-rate}\addcontentsline{toc}{subsection}{config:macro-cells-output-rate}\\
-determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}.\\
+determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}. It is considered only if \textit{config:macro-cells=continuous} or is \textit{empty}\\
 
 {\zicf config:output-format = exclusive string [default text]}\addcontentsline{toc}{subsection}{config:output-format}
 specifies the format of the configuration data. Available options are:

@@ -34,6 +34,7 @@ namespace create{
          int grain_seed  = 1527349271; // random seed to control grain structure generation
          int dilute_seed = 465865253;  // random seed to control dilution of atoms
          int mixing_seed = 100181363;  // random seed to control intermixing of atoms
+         int spin_init_seed = 123456;  // random seed to control ranomised spin directions
 
          double faceted_particle_100_radius = 1.0; // 100 facet particle radius
          double faceted_particle_110_radius = 1.0; // 110 facet particle radius
