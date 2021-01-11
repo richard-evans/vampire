@@ -183,19 +183,7 @@ namespace sim{
       if((unsigned int) super_index + 1 > sim::internal::mp.size() && super_index + 1 < 101) sim::internal::mp.resize(super_index + 1);
 
       //------------------------------------------------------------
-      std::string test  = "slonczewski-adiabatic-spin-torque";
-      std::string test2 = "spin-transfer-torque";
-      std::string test3 = "antidamping-torque";
-      // aj parameter for material in slonczewski torque calculation
-      if( word==test || word==test2 || word==test3 ){
-         double aj=atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
-         sim::internal::mp[super_index].slonczewski_aj.set(aj);
-         sim::internal::enable_spin_torque_fields = true;
-         return true;
-      }
-      test="domain-wall-second-magnetisation-vector";
+      std::string test="domain-wall-second-magnetisation-vector";
       if(word==test){
        std::vector<double> u(3);
        u=vin::doubles_from_string(value);
@@ -207,9 +195,24 @@ namespace sim{
          return true;
       }
       //------------------------------------------------------------
+      test  = "slonczewski-adiabatic-spin-torque";
+      std::string test2 = "spin-transfer-torque";
+      std::string test3 = "antidamping-torque";
+      std::string test4 = "slonczewski-relaxation-spin-torque";
+      // aj parameter for material in slonczewski torque calculation
+      if( word==test || word==test2 || word==test3 || word==test4){
+         double aj=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
+         sim::internal::mp[super_index].slonczewski_aj.set(aj);
+         sim::internal::enable_spin_torque_fields = true;
+         return true;
+      }
+      //------------------------------------------------------------
       test  = "slonczewski-non-adiabatic-spin-torque";
       test2 = "precession-torque";
       test3 = "field-like-torque";
+      test4 = "slonczewski-precession-spin-torque";
       // bj parameter for material in slonczewski torque calculation
       if( word==test || word==test2 || word==test3 ){
          double bj=atof(value.c_str());
@@ -220,9 +223,9 @@ namespace sim{
          return true;
       }
       //------------------------------------------------------------
-      test  = "spin-orbit-torque";
-      test2 = "spin-orbit-anti-damping-torque";
-      // damping-like parameter for material in spin orbit torque calculation
+      // field-like parameter for material in spin orbit torque calculation
+      test  = "spin-orbit-anti-damping-torque";
+      test2 = "spin-orbit-relaxation-torque";
       if( word==test || word==test2 ){
          double aj=atof(value.c_str());
          // Test for valid range
@@ -232,10 +235,11 @@ namespace sim{
          return true;
       }
       //------------------------------------------------------------
-      test  = "spin-orbit-precession-torque";
-      test2 = "spin-orbit-field-like-torque";
-      // field-like parameter for material in spin orbit torque calculation
-      if( word==test || word==test2 ){
+      test  = "spin-orbit-torque";
+      test2 = "spin-orbit-precession-torque";
+      test3 = "spin-orbit-field-like-torque";
+      // damping-like parameter for material in spin orbit torque calculation
+      if( word==test || word==test2 || word==test3 ){
          double bj=atof(value.c_str());
          // Test for valid range
          vin::check_for_valid_value(bj, word, line, prefix, unit, "field", -1.0e2, 1.0e2,"input","-100 - 100T");
@@ -243,9 +247,6 @@ namespace sim{
          sim::internal::enable_spin_torque_fields = true;
          return true;
       }
-
-
-
       //--------------------------------------------------------------------
       // keyword not found
       //--------------------------------------------------------------------
