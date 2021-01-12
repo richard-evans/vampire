@@ -68,7 +68,10 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for( auto &atom : vdc::sliced_atoms_list ){
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
          // get magnetization for colour contrast
          double sx = spins[3*atom+0];
@@ -111,7 +114,10 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for( auto &atom : vdc::sliced_nm_atoms_list ){
+      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_nm_atoms_list[i];
 
          // format text for povray file
          otext << "spinm"<< nm_type[atom] << "(" <<
