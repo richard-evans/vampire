@@ -192,11 +192,18 @@ void output_povray_file(){
    pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
    pfile << "#declare Final_Frame = " << vdc::final_file_id << ";" << std::endl;
 
+   //---------------------------------------------------------------------------
    // Determine non-magnetic materials looping over all non-magnetic atoms
+   //---------------------------------------------------------------------------
    std::vector<bool> is_nm_mat(vdc::materials.size(),false);
-   for( auto &atom : vdc::sliced_nm_atoms_list ){
+   for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+      // get atom ID
+      unsigned int atom = vdc::sliced_nm_atoms_list[i];
+
       const int mat = vdc::nm_type[atom];
       is_nm_mat[mat] = true;
+
    }
 
    // Output material specific macros

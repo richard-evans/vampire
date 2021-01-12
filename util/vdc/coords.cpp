@@ -297,7 +297,10 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
    double ave[3] = {0.0, 0.0, 0.0};
 
    // loop through all magnetic atoms
-   for( auto &atom : magnetic_list ){
+   for(int i=0; i < magnetic_list.size(); i++){
+
+      // get atom ID
+      unsigned int atom = magnetic_list[i];
 
       // temporary variables
       double x = vdc::coordinates[3*atom + 0];
@@ -315,7 +318,10 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
    }
 
    // loop through all non-magnetic atoms
-   for( auto &atom : non_magnetic_list ){
+   for(int i=0; i < non_magnetic_list.size(); i++){
+
+      // get atom ID
+      unsigned int atom = non_magnetic_list[i];
 
       // temporary variables
       double x = vdc::nm_coordinates[3*atom + 0];
@@ -519,16 +525,34 @@ void slice_system(){
    }
 
    if ( remove_materials.size() != 0 ){
+
       std::vector<int> temp_list(0), temp_nm_list(0);
-      for( auto &atom : vdc::sliced_atoms_list ){
-         for ( auto &material : remove_materials ){
+      // loop over atoms in slice
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
+
+         // loop over materials
+         for(int m=0; m < remove_materials.size(); m++){
+
+            int material = remove_materials[m];
+
             if ( vdc::type[atom] != (material-1) ){
                temp_list.push_back(atom);
             }
          }
       }
-      for( auto &atom : vdc::sliced_nm_atoms_list ){
-         for ( auto &material : remove_materials ){
+      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_nm_atoms_list[i];
+
+         // loop over materials
+         for(int m=0; m < remove_materials.size(); m++){
+
+            int material = remove_materials[m];
+
             if ( vdc::nm_type[atom] != (material-1) ){
                temp_nm_list.push_back(atom);
             }
