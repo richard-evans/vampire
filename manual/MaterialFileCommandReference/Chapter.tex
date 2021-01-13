@@ -15,13 +15,120 @@ defines an identifying name for the material with a maximum length of xx charact
 
 {\zicf material:damping-constant = float [0.0-10.0; default 1.0]}\addcontentsline{toc}{subsection}{material:damping-constant} defines the phenomenological relaxation rate (damping) in dynamic simulations using the LLG equation. For equilibrium properties the damping should be set to 1 (critical damping), while for realistic dynamics the damping should be representative of the material. Typical values range from 0.005 to 0.1 for most materials.\\
 
-{\zicf material:exchange-matrix[index] = float [default 0.0 J/link]}\addcontentsline{toc}{subsection}{material:exchange-matrix} Defines the pairwise exchange energy between atoms of type index and neighbour-index. The pair wise exchange energy is independent of the coordination number, and so the total exchange integral will depend on the number of nearest neighbours for the crystal lattice. The exchange energy must be defined between all material pairs in the simulation, with positive values representing ferromagnetic coupling, and negative values representing anti ferromagnetic coupling. For a ferromagnet with nearest neighbour exchange, the pairwise exchange energy can be found from the Curie temperature by the meanfield expression:
+{\zicf material:exchange-matrix[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix} Defines the pairwise
+exchange energy between atoms of type index and neighbour-index. The pair wise
+exchange energy is independent of the coordination number, and so the total
+exchange integral will depend on the number of nearest neighbours for the
+crystal lattice. The exchange energy must be defined between all material pairs
+in the simulation, with positive values representing ferromagnetic coupling, and
+negative values representing anti ferromagnetic coupling. For a ferromagnet with
+nearest neighbour exchange, the pairwise exchange energy can be found from the
+Curie temperature by the meanfield expression:
 \begin{equation*}
 \Jij = \frac{3\kB\Tc}{\epsilon z}
 \end{equation*}
-where $\Jij$ is the exchange energy, $\kB$ is the Boltzmann constant, $\Tc$ is the Curie temperature, $z$ is the coordination number (number of nearest neighbours) and $\epsilon$ is a correction factor to account for spin wave fluctuations in different crystal lattices. If a custom unit cell file is used the exchange values defined here are ignored.\\
+where $\Jij$ is the exchange energy, $\kB$ is the Boltzmann constant, $\Tc$ is
+ the Curie temperature, $z$ is the coordination number (number of nearest
+ neighbours) and $\epsilon$ is a correction factor to account for spin wave
+ fluctuations in different crystal lattices. If a custom unit cell file is used
+ the exchange values defined here are ignored.\\
 
-%{\zicf material:total-exchange-matrix[j] = float [default 12x5.6 J/link]}\addcontentsline{toc}{subsection}{material:second-uniaxial-anisotropy-constant} defines the total exchange energy between atoms of type index  and  neighbour-index. The  total exchange energy is divided equally between the nearest neighbouring atoms. Unlike the pair wise exchange energy, the total exchange energy also corrects for the spin wave fluctuations arising from the coordination number in the bulk crystal. As with the pairwise exchange energy, the total exchange energy must be defined between all material pairs in the simulation, with positive values representing ferromagnetic coupling, and negative values representing anti ferromagnetic coupling. For a ferromagnet with nearest neighbour exchange, the total exchange energy can be found from the Curie temperature by the meanfield expression:
+{\zicf material:exchange-matrix-1st-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-1st-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the first nearest neighbour shell when using the built in
+exchange functions. This is exactly the same as the usual parameter
+exchange-matrix[index] but with a more specific syntax including the shell
+number of 1.
+
+{\zicf material:exchange-matrix-2nd-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-2nd-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the second nearest neighbour shell when using the built in
+exchange functions. If you are using the generic crystal structures available in
+ \vampire, then it is possible to define a longer ranged Hamiltonian with
+ next-nearest up to 10th nearest neighbour interactions. The interaction shells
+ refer to sets of neighbours with the same interaction range from a target atom.
+ To define a longer range Hamiltonian you need to define the input file
+ parameters \textit{exchange:interaction-range = $R$} and
+ \textit{exchange:function = shell}, where $R$ is the interaction range as a
+ multiple of the nearest neighbour distance. When these options are defined,
+ the number of computed shells is printed in the log file along with their
+ distance and coordination number. For the common crystal structures the shell
+ coordinations are well know. Note that longer ranged Hamiltonians will
+ naturally be slower due to the larger number of computed exchange interactions.
+ For more than ten shells or asymmetric crystals with different interactions
+ along different crystal directions the unit cell file is still required.
+
+{\zicf material:exchange-matrix-3rd-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-3rd-nn} Defines the
+pairwise exchange energy between atoms of type index and neighbour-index for the
+third nearest neighbour shell when using the built in exchange functions. See
+2nd neighbour description for more details on using this feature.
+
+{\zicf material:exchange-matrix-4th-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-4th-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the fourth nearest neighbour shell when using the built in
+exchange functions. See 2nd neighbour description for more details on using this feature.
+
+
+{\zicf material:exchange-matrix-5th-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-5th-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the fifth nearest neighbour shell when using the built in
+exchange functions. See 2nd neighbour description for more details on using this feature.
+
+
+{\zicf material:exchange-matrix-6th-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-6th-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the sixth nearest neighbour shell when using the built in
+exchange functions. See 2nd neighbour description for more details on using this feature.
+
+
+{\zicf material:exchange-matrix-7th-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-7th-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the seventh nearest neighbour shell when using the built in
+exchange functions. See 2nd neighbour description for more details on using this feature.
+
+
+{\zicf material:exchange-matrix-8th-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-8th-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the eighth nearest neighbour shell when using the built in
+exchange functions. See 2nd neighbour description for more details on using this feature.
+
+
+{\zicf material:exchange-matrix-9th-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-9th-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the ninth nearest neighbour shell when using the built in
+exchange functions. See 2nd neighbour description for more details on using this feature.
+
+
+{\zicf material:exchange-matrix-10th-nn[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:exchange-matrix-10th-nn}
+Defines the pairwise exchange energy between atoms of type index and
+neighbour-index for the tenth nearest neighbour shell when using the built in
+exchange functions. See 2nd neighbour description for more details on using this feature.
+
+
+
+%{\zicf material:total-exchange-matrix[j] = float [default 12x5.6 J/link]}
+\addcontentsline{toc}{subsection}{material:second-uniaxial-anisotropy-constant}
+defines the total exchange energy between atoms of type index  and
+neighbour-index. The  total exchange energy is divided equally between the
+nearest neighbouring atoms. Unlike the pair wise exchange energy, the total
+exchange energy also corrects for the spin wave fluctuations arising from the
+coordination number in the bulk crystal. As with the pairwise exchange energy,
+the total exchange energy must be defined between all material pairs in the
+simulation, with positive values representing ferromagnetic coupling, and
+negative values representing anti ferromagnetic coupling. For a ferromagnet
+with nearest neighbour exchange, the total exchange energy can be found from
+the Curie temperature by the meanfield expression:
 
 %where Jij is the exchange energy, Kbps is the Boltzmann constant, and Tc is the Curie temperature. If a custom unit cell is used the exchange values defined here are ignored.\\
 
