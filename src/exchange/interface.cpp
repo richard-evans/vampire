@@ -109,15 +109,6 @@ namespace exchange{
          return true;
       }
       //------------------------------------------------------------------------
-      test = "biquadratic-exchange";
-      if( word == test ){
-         double bqe = atof(value.c_str());
-         vin::check_for_valid_value(bqe, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
-         internal::mp[super_index].bqe[sub_index] = bqe;
-         exchange::biquadratic = true; // Switch on biquadratic exchange
-         return true;
-      }
-      //------------------------------------------------------------------------
       test = "exchange-matrix";
       if( word == test ){
          read_exchange_values(super_index, sub_index, 0, word, prefix, value, unit, line, internal::bilinear_exchange_constants);
@@ -183,7 +174,83 @@ namespace exchange{
          read_exchange_values(super_index, sub_index, 9, word, prefix, value, unit, line, internal::bilinear_exchange_constants);
          return true;
       }
-
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 0, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-1st-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 0, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-2nd-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 1, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-3rd-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 2, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-4th-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 3, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-5th-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 4, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-6th-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 5, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-7th-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 6, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-8th-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 6, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-9th-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 8, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //------------------------------------------------------------------------
+      test = "biquadratic-exchange-matrix-10th-nn";
+      if( word == test ){
+         read_exchange_values(super_index, sub_index, 9, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
+         exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

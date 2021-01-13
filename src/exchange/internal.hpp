@@ -101,7 +101,7 @@ namespace exchange{
 
             }
 
-            // function to get a list of exchange values for a certain materil pair and neighbour number
+            // function to get a list of exchange values for a certain material pair and neighbour number
             std::vector<double> get_exchange_values(int material_i, int material_j, int neighbour){
 
                // initialise a vector to return exchange values
@@ -146,14 +146,12 @@ namespace exchange{
          public:
 
             // variables
-            std::vector<double> bqe; // Biquadratic exchange constant
             std::vector<double> dmi; // Dzyaloshinskii-Moriya interaction constant
 
             // constructor
             mp_t (const unsigned int max_materials = 100)
             {
                // resize arrays to correct size
-               bqe.resize(max_materials, 0.0); // initialise biquadratic constants to zero
                dmi.resize(max_materials, 0.0); // initialise pair anisotropy constants to zero
 
             }; // end of constructor
