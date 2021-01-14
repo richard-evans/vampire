@@ -55,7 +55,7 @@ namespace exchange{
             // function to resize storage array
             void resize(const int num_materials, const int num_neighbours){
 
-               std::cout << "Setting storage size to " << num_materials << " materials and " << num_neighbours << " neighbours" << std::endl;
+               //std::cout << "Setting storage size to " << num_materials << " materials and " << num_neighbours << " neighbours" << std::endl;
 
                for(int i = 0; i < num_materials; i++){
                   exchange_matrix_array.resize(num_materials);

@@ -72,6 +72,24 @@ namespace unitcell{
             uc::internal::crystal_structure=cs;
             return true;
          }
+         //--------------------------------------------------------------------
+         test="crystal-sublattice-materials";
+         if(word==test){
+            string t = "true";
+            string f = "false";
+            if(value==t){
+               uc::internal::sublattice_materials = true;
+               return true;
+            }
+            else if(value==f){
+               uc::internal::sublattice_materials = false;
+               return true;
+            }
+            else {
+               uc::internal::sublattice_materials = true;
+               return true;
+            }
+         }
       }
       // Check for final prefix
       prefix="dimensions";

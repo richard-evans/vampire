@@ -42,7 +42,20 @@ The following commands control generation of the simulated system, including dim
 
 {\zicf create:crystal-structure = string [sc, fcc, bcc, hcp, heusler, kagome, rocksalt, spinel; default sc]}
 \addcontentsline{toc}{subsection}{create:crystal-structure}
-Defines the default crystal lattice to be generated. The code supports the basic metallic crystal types simple cubic (sc), body-centred-cubic (bcc), face-centred-cubic (fcc) and hexagonal close-packed (hcp). The code also supports important magnetic structures such as Heusler alloys (heusler), rock-salt such as NiO (rocksalt) spinels such as magnetite (spinel) and kagome lattices. \\ \par
+Defines the default crystal lattice to be generated. The code supports the basic
+ metallic crystal types simple cubic (sc), body-centred-cubic (bcc),
+ face-centred-cubic (fcc) and hexagonal close-packed (hcp). The code also
+ supports important magnetic structures such as Heusler alloys (heusler),
+ rock-salt such as NiO (rocksalt) spinels such as magnetite (spinel) and kagome
+ lattices. \\ \par
+
+{\zicf create:crystal-sublattice-materials = flag [true, false]; default false]}
+\addcontentsline{toc}{subsection}{create:crystal-sublatice-materials}
+When set or defined as true, simple crystals with more than one atom per unit
+cell (bcc, bcc110, fcc, hpc, and kagome) will allocate each atom in the unit
+cell to a different material. The material allocation to atomic sites can then
+be done using the usual \textit{material:unit-cell-category} flags in the
+material file, in much the same way as for complex crystals. \\ \par
 
 {\zicf create:single-spin flag}\addcontentsline{toc}{subsection}{create:single-spin} Overrides all create options and generates a single isolated spin.\\ \par
 

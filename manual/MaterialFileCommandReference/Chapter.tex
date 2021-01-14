@@ -31,8 +31,9 @@ Curie temperature by the meanfield expression:
 where $\Jij$ is the exchange energy, $\kB$ is the Boltzmann constant, $\Tc$ is
  the Curie temperature, $z$ is the coordination number (number of nearest
  neighbours) and $\epsilon$ is a correction factor to account for spin wave
- fluctuations in different crystal lattices. If a custom unit cell file is used
- the exchange values defined here are ignored.\\
+ fluctuations in different crystal lattices. If a custom unit cell file with
+ non-normalised exchange interactions is used the exchange values defined here
+ are ignored.\\
 
 {\zicf material:exchange-matrix-1st-nn[index] = float [default 0.0 J/link]}
 \addcontentsline{toc}{subsection}{material:exchange-matrix-1st-nn}
@@ -40,7 +41,7 @@ Defines the pairwise exchange energy between atoms of type index and
 neighbour-index for the first nearest neighbour shell when using the built in
 exchange functions. This is exactly the same as the usual parameter
 exchange-matrix[index] but with a more specific syntax including the shell
-number of 1.
+number of 1.\\
 
 {\zicf material:exchange-matrix-2nd-nn[index] = float [default 0.0 J/link]}
 \addcontentsline{toc}{subsection}{material:exchange-matrix-2nd-nn}
@@ -59,78 +60,35 @@ exchange functions. If you are using the generic crystal structures available in
  coordinations are well know. Note that longer ranged Hamiltonians will
  naturally be slower due to the larger number of computed exchange interactions.
  For more than ten shells or asymmetric crystals with different interactions
- along different crystal directions the unit cell file is still required.
+ along different crystal directions the unit cell file is still required.\\
 
 {\zicf material:exchange-matrix-3rd-nn[index] = float [default 0.0 J/link]}
 \addcontentsline{toc}{subsection}{material:exchange-matrix-3rd-nn} Defines the
 pairwise exchange energy between atoms of type index and neighbour-index for the
 third nearest neighbour shell when using the built in exchange functions. See
-2nd neighbour description for more details on using this feature.
+2nd neighbour description for more details on using this feature.\\
 
-{\zicf material:exchange-matrix-4th-nn[index] = float [default 0.0 J/link]}
+{\zicf material:exchange-matrix-(4th-10th)-nn[index] = float [default 0.0 J/link]}
 \addcontentsline{toc}{subsection}{material:exchange-matrix-4th-nn}
 Defines the pairwise exchange energy between atoms of type index and
 neighbour-index for the fourth nearest neighbour shell when using the built in
-exchange functions. See 2nd neighbour description for more details on using this feature.
+exchange functions. See 2nd neighbour description for more details on using this feature.\\
 
-
-{\zicf material:exchange-matrix-5th-nn[index] = float [default 0.0 J/link]}
-\addcontentsline{toc}{subsection}{material:exchange-matrix-5th-nn}
-Defines the pairwise exchange energy between atoms of type index and
-neighbour-index for the fifth nearest neighbour shell when using the built in
-exchange functions. See 2nd neighbour description for more details on using this feature.
-
-
-{\zicf material:exchange-matrix-6th-nn[index] = float [default 0.0 J/link]}
-\addcontentsline{toc}{subsection}{material:exchange-matrix-6th-nn}
-Defines the pairwise exchange energy between atoms of type index and
-neighbour-index for the sixth nearest neighbour shell when using the built in
-exchange functions. See 2nd neighbour description for more details on using this feature.
-
-
-{\zicf material:exchange-matrix-7th-nn[index] = float [default 0.0 J/link]}
-\addcontentsline{toc}{subsection}{material:exchange-matrix-7th-nn}
-Defines the pairwise exchange energy between atoms of type index and
-neighbour-index for the seventh nearest neighbour shell when using the built in
-exchange functions. See 2nd neighbour description for more details on using this feature.
-
-
-{\zicf material:exchange-matrix-8th-nn[index] = float [default 0.0 J/link]}
-\addcontentsline{toc}{subsection}{material:exchange-matrix-8th-nn}
-Defines the pairwise exchange energy between atoms of type index and
-neighbour-index for the eighth nearest neighbour shell when using the built in
-exchange functions. See 2nd neighbour description for more details on using this feature.
-
-
-{\zicf material:exchange-matrix-9th-nn[index] = float [default 0.0 J/link]}
-\addcontentsline{toc}{subsection}{material:exchange-matrix-9th-nn}
-Defines the pairwise exchange energy between atoms of type index and
-neighbour-index for the ninth nearest neighbour shell when using the built in
-exchange functions. See 2nd neighbour description for more details on using this feature.
-
-
-{\zicf material:exchange-matrix-10th-nn[index] = float [default 0.0 J/link]}
-\addcontentsline{toc}{subsection}{material:exchange-matrix-10th-nn}
-Defines the pairwise exchange energy between atoms of type index and
-neighbour-index for the tenth nearest neighbour shell when using the built in
-exchange functions. See 2nd neighbour description for more details on using this feature.
-
-
+{\zicf material:biquadratic-exchange-matrix[index] = float [default 0.0 J/link]}
+\addcontentsline{toc}{subsection}{material:biquadratic-exchange-matrix}
+Defines the pairwise biquadratic exchange energy between atoms of type index
+and neighbour-index. The pair wise exchange energy is independent of the
+coordination number, and so the total exchange integral will depend on the
+number of neighbours for the crystal lattice. The exchange energy must be defined
+between all material pairs in the simulation, with positive values representing
+ferromagnetic coupling, and negative values representing anti ferromagnetic
+coupling. The biquadratic exchange Hamiltonian is given by the expression
+\begin{equation*}
+E^{\mathrm{BQ}} = \sum_{i<j} \Jij^{\mathrm{BQ}} \left( \sms_i \cdot \sms_j \right)^2
+\end{equation*}
+where $\Jij^{\mathrm{BQ}}$ is the biquadratic exchange energy. \\
 
 %{\zicf material:total-exchange-matrix[j] = float [default 12x5.6 J/link]}
-\addcontentsline{toc}{subsection}{material:second-uniaxial-anisotropy-constant}
-defines the total exchange energy between atoms of type index  and
-neighbour-index. The  total exchange energy is divided equally between the
-nearest neighbouring atoms. Unlike the pair wise exchange energy, the total
-exchange energy also corrects for the spin wave fluctuations arising from the
-coordination number in the bulk crystal. As with the pairwise exchange energy,
-the total exchange energy must be defined between all material pairs in the
-simulation, with positive values representing ferromagnetic coupling, and
-negative values representing anti ferromagnetic coupling. For a ferromagnet
-with nearest neighbour exchange, the total exchange energy can be found from
-the Curie temperature by the meanfield expression:
-
-%where Jij is the exchange energy, Kbps is the Boltzmann constant, and Tc is the Curie temperature. If a custom unit cell is used the exchange values defined here are ignored.\\
 
 {\zicf material:atomic-spin-moment = float [0.01+ \muB, default 1.72 \muB]}\addcontentsline{toc}{subsection}{material:atomic-spin-moment}
 Defines the local effective spin moment for each atomic site. Atomic moments can be found from ab-initio calculations or derived from low temperature measurements of the saturation magnetisation. The atomic spin moments are related to the macroscopic magnetisation by the expression:
@@ -167,7 +125,7 @@ harmonics.\\
 \addcontentsline{toc}{subsection}{material:cubic-anisotropy-constant}
 Defines the local cubic magnetocrystalline anisotropy constant at each atomic site. The anisotropy energy is given by the expression
 \begin{equation*}
-E_i = -\frac{\kc}{2} (S_x^4 + S_y^4 + S_z^4)
+E_i = +\frac{\kc}{2} (S_x^4 + S_y^4 + S_z^4)
 \end{equation*}
 where $S_{x,y,z}$ are the components of the local spin direction and \kc is
 the cubic anisotropy constant. Positive values of \kc give a preferred easy
@@ -333,6 +291,24 @@ to ignore them for improved accuracy.\\
   %fmr-field-unit-vector
   %applied-field-strength
   %applied-field-unit-vector
+
+{\zicf material:unit-cell-category = int [ default 0 ]}
+\addcontentsline{toc}{subsection}{material:unit-cell-category} is a keyword
+which allocates different materials to different atoms in the unit cell. In
+complex crystals such as spinel and rocksalt, the material allocations of
+different atoms in the unit cell are defined by the structure. For example, in
+the rocksalt structure there are two distinct types of atoms. Material 1
+could be allocated to this site using \textit{material[1]:unit-cell-category = 1},
+and a second material could be allocated to the second site using
+\textit{material[2]:unit-cell-category = 2}. The default value of this variable
+is 0, and so for complex crystals only a single site is defined and the other
+sites will not be generated unless a material is attached to it in this way.
+
+This keyword also works with the \textit{create:crystal-sublattice-materials}
+flag to allocate different materials to different sites in the simple crystals
+bcc, fcc, hcp and kagome. This feature is especially useful for simulating
+simple antiferromagnets and materials with different kinds of defects or site
+specific alloying.
 
 \section*{Example material files}
 \addcontentsline{toc}{section}{Example material files}

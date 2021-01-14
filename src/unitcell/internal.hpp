@@ -51,6 +51,8 @@ namespace unitcell{
       extern double exchange_interaction_range;
       extern double exchange_decay;
 
+      extern bool sublattice_materials; // flag to enable identification of atoms in simple crystals by material
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
