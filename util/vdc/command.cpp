@@ -73,6 +73,9 @@ int command( int argc, char* argv[] ){
       else if (sw == "--text"){
          vdc::txt = true;
       }
+      else if (sw == "--ssc" || sw == "--spin-spin-correlation"){
+         vdc::ssc = true;
+      }
       //------------------------------------------------------------------------
       // Check for verbose output
       //------------------------------------------------------------------------
@@ -246,7 +249,7 @@ int command( int argc, char* argv[] ){
          // check number of args not exceeded
          check_arg(arg, argc, argv, temp_str, "Error - expected custom colourmap name.");
 
-         // set colour_keyword to "custom" 
+         // set colour_keyword to "custom"
          vdc::colour_keyword = "custom";
 
          // set custom map file name
@@ -267,12 +270,13 @@ int command( int argc, char* argv[] ){
    //---------------------------------------------------------------------------
 
    // check that some kind of data output is requested
-   if( !vdc::xyz && !vdc::povray && !vdc::vtk && !vdc::txt ){
+   if( !vdc::xyz && !vdc::povray && !vdc::vtk && !vdc::txt && !vdc::ssc ){
       std::cerr << "Error! No output data formats requested. Available options are: " << std::endl;
       std::cerr << "\t\t --xyz    Data output in .xyz format for viewing in rasmol/jmol" << std::endl;
       std::cerr << "\t\t --povray Data output in PoVRAY format for rendering" << std::endl;
       std::cerr << "\t\t --vtk    Data output in VTK format for viewing in Paraview" << std::endl;
       std::cerr << "\t\t --text   Data output in plain text format for plotting in gnuplot/excel etc" << std::endl;
+      std::cerr << "\t\t --ssc    Spin-spin correlation data in text format" << std::endl;
       return EXIT_FAILURE;
    }
 

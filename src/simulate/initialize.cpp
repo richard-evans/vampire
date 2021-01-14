@@ -3,7 +3,7 @@
 // This source file is part of the VAMPIRE open source package under the
 // GNU GPL (version 2) licence (see licence file for details).
 //
-// (c) R F L Evans 2014. All rights reserved.
+// (c) R F L Evans 2020. All rights reserved.
 //
 //-----------------------------------------------------------------------------
 
@@ -21,19 +21,21 @@ namespace sim{
    //-------------------------------------------------------------------------------
    void initialize(int num_materials){
 
-      // unroll slonczewski torque arrays
-      sim::internal::slonczewski_aj.resize(num_materials,0.0);
-      sim::internal::slonczewski_bj.resize(num_materials,0.0);
+      // unroll slonczewski spin transfer torque arrays
+      sim::internal::stt_rj.resize(num_materials,0.0);
+      sim::internal::stt_pj.resize(num_materials,0.0);
+
       // unroll spin orbit torque arrays
-      sim::internal::SOT_DL.resize(num_materials,0.0);
-      sim::internal::SOT_FL.resize(num_materials,0.0);
+      sim::internal::sot_rj.resize(num_materials,0.0);
+      sim::internal::sot_pj.resize(num_materials,0.0);
+
       // loop over materials set by user
       for(unsigned int m=0; m<sim::internal::mp.size(); ++m){
          // copy values set by user to arrays
-         if(sim::internal::mp[m].slonczewski_aj.is_set()) sim::internal::slonczewski_aj[m] = sim::internal::mp[m].slonczewski_aj.get();
-         if(sim::internal::mp[m].slonczewski_bj.is_set()) sim::internal::slonczewski_bj[m] = sim::internal::mp[m].slonczewski_bj.get();
-         if(sim::internal::mp[m].SOT_DL.is_set()) sim::internal::SOT_DL[m] = sim::internal::mp[m].SOT_DL.get();
-         if(sim::internal::mp[m].SOT_FL.is_set()) sim::internal::SOT_FL[m] = sim::internal::mp[m].SOT_FL.get();
+         if(sim::internal::mp[m].stt_rj.is_set()) sim::internal::stt_rj[m] = sim::internal::mp[m].stt_rj.get();
+         if(sim::internal::mp[m].stt_pj.is_set()) sim::internal::stt_pj[m] = sim::internal::mp[m].stt_pj.get();
+         if(sim::internal::mp[m].sot_rj.is_set()) sim::internal::sot_rj[m] = sim::internal::mp[m].sot_rj.get();
+         if(sim::internal::mp[m].sot_pj.is_set()) sim::internal::sot_pj[m] = sim::internal::mp[m].sot_pj.get();
       }
 
       return;

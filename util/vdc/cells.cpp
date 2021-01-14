@@ -35,7 +35,10 @@ namespace vdc{
       const double cell_size = 10.0; // cell size (angstroms)
 
       // calculate minima and maxima
-      for( auto &atom : vdc::sliced_atoms_list ){
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
          const double x = vdc::coordinates[3*atom+0];
          const double y = vdc::coordinates[3*atom+1];
@@ -110,7 +113,10 @@ namespace vdc{
       const unsigned int d[3] = { num_cells[0], num_cells[1], num_cells[2] };
 
       // Assign atoms to cells
-      for( auto &atom : vdc::sliced_atoms_list ){
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
          // temporary for atom coordinates
          double c[3] = { vdc::coordinates[3*atom+0] - atoms_min[0],
@@ -150,7 +156,10 @@ namespace vdc{
       }
 
       // calculate cell magnetizations in 1D
-      for( auto &atom : vdc::sliced_atoms_list ){
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
          const unsigned int mat = vdc::type[atom];
          const double mu = vdc::materials[mat].moment;

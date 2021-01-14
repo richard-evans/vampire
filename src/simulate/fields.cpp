@@ -518,34 +518,37 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		//----------------------------------------------------------------------------------
 
 		// save polarization to temporary constant
-		const double stpx = slonczewski_spin_polarization_unit_vector[0];
-		const double stpy = slonczewski_spin_polarization_unit_vector[1];
-		const double stpz = slonczewski_spin_polarization_unit_vector[2];
+		const double stpx = stt_polarization_unit_vector[0];
+		const double stpy = stt_polarization_unit_vector[1];
+		const double stpz = stt_polarization_unit_vector[2];
 
-		const double staj = slonczewski_aj[material];
-		const double stbj = slonczewski_bj[material];
+		const double strj = stt_rj[material];
+		const double stpj = stt_pj[material];
+
+		const double lambda = 0.0;
+		const double factor = 1.0 / (1.0 + lambda*(sx*stpx + sy*stpy + sz*stpz) );
 
 		// calculate field
-		hx += (staj-alpha*stbj)*(sy*stpz - sz*stpy) + (stbj+alpha*staj)*stpx;
-		hy += (staj-alpha*stbj)*(sz*stpx - sx*stpz) + (stbj+alpha*staj)*stpy;
-		hz += (staj-alpha*stbj)*(sx*stpy - sy*stpx) + (stbj+alpha*staj)*stpz;
+		hx += factor * ( (strj-alpha*stpj)*(sy*stpz - sz*stpy) + (stpj+alpha*strj)*stpx );
+		hy += factor * ( (strj-alpha*stpj)*(sz*stpx - sx*stpz) + (stpj+alpha*strj)*stpy );
+		hz += factor * ( (strj-alpha*stpj)*(sx*stpy - sy*stpx) + (stpj+alpha*strj)*stpz );
 
 		//----------------------------------------------------------------------------------
 		// Spin orbit torque (SOT) field
 		//----------------------------------------------------------------------------------
 
 		// save polarization to temporary constant
-		const double sotpx = SOT_spin_polarization_unit_vector[0];
-		const double sotpy = SOT_spin_polarization_unit_vector[1];
-		const double sotpz = SOT_spin_polarization_unit_vector[2];
+		const double sotpx = sot_polarization_unit_vector[0];
+		const double sotpy = sot_polarization_unit_vector[1];
+		const double sotpz = sot_polarization_unit_vector[2];
 
-		const double sotaj = SOT_DL[material];
-		const double sotbj = SOT_FL[material];
+		const double sotrj = sot_rj[material];
+		const double sotpj = sot_pj[material];
 
 		// calculate field
-		hx += (sotaj+alpha*sotbj)*(sy*sotpz - sz*sotpy) + (sotbj-alpha*sotaj)*sotpx;
-		hy += (sotaj+alpha*sotbj)*(sz*sotpx - sx*sotpz) + (sotbj-alpha*sotaj)*sotpy;
-		hz += (sotaj+alpha*sotbj)*(sx*sotpy - sy*sotpx) + (sotbj-alpha*sotaj)*sotpz;
+		hx += (sotrj-alpha*sotpj)*(sy*sotpz - sz*sotpy) + (sotpj+alpha*sotrj)*sotpx;
+		hy += (sotrj-alpha*sotpj)*(sz*sotpx - sx*sotpz) + (sotpj+alpha*sotrj)*sotpy;
+		hz += (sotrj-alpha*sotpj)*(sx*sotpy - sy*sotpx) + (sotpj+alpha*sotrj)*sotpz;
 
 		//----------------------------------------------------------------------------------
 		// save field to spin field array

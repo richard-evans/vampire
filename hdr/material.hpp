@@ -84,8 +84,6 @@ namespace mp
 		double magnetisation;
 
 		double gamma_rel;
-		std::vector<std::vector<double> >Jij_matrix_SI;
-		std::vector<std::vector<double> >Jij_matrix;
 		double initial_spin[3];
 		bool random_spins;
 
