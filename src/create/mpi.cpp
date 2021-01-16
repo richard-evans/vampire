@@ -282,15 +282,16 @@ namespace create{
          timer.start();
 
          // Send/receive number of boundary/halo atoms (manual all-to-all - better as proper all to all)
-         for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+         /*for(int cpu=0;cpu<vmpi::num_processors;cpu++){
             requests.push_back(req);
             MPI_Isend(&num_send_atoms[cpu],1,MPI_INT,cpu,35, MPI_COMM_WORLD, &requests.back());
             requests.push_back(req);
             MPI_Irecv(&num_recv_atoms[cpu],1,MPI_INT,cpu,35, MPI_COMM_WORLD, &requests.back());
          }
-
          stati.resize(requests.size());
-         MPI_Waitall(requests.size(),&requests[0],&stati[0]);
+         MPI_Waitall(requests.size(),&requests[0],&stati[0]);*/
+
+         MPI_Alltoall(&num_send_atoms[0], 1, MPI_INT, &num_recv_atoms[0], 1, MPI_INT, MPI_COMM_WORLD);
 
          timer.stop();
 
