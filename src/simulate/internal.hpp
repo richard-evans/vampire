@@ -47,18 +47,24 @@ namespace sim{
       };
 
       struct mp_t{
-         set_double_t stt_rj; // spin tranfer relaxation torque
-         set_double_t stt_pj; // spin transfer precession torque
-         set_double_t sot_rj; // spin orbit relaxation torque
-         set_double_t sot_pj; // spin orbit precession torque
+         set_double_t stt_asm; // spin tranfer torque asymmetry
+         set_double_t stt_rj;  // spin tranfer relaxation torque
+         set_double_t stt_pj;  // spin transfer precession torque
+         set_double_t sot_asm; // spin orbit torque asymmetry
+         set_double_t sot_rj;  // spin orbit relaxation torque
+         set_double_t sot_pj;  // spin orbit precession torque
       };
 
       extern bool enable_spin_torque_fields; // flag to enable spin torque fields
 
       extern std::vector<sim::internal::mp_t> mp; // array of material properties
+
+      extern std::vector<double> stt_asm; // array of spin transfer torque asymmetry
       extern std::vector<double> stt_rj; // array of adiabatic spin torques
       extern std::vector<double> stt_pj; // array of non-adiabatic spin torques
       extern std::vector<double> stt_polarization_unit_vector; // stt spin polarization direction
+
+      extern std::vector<double> sot_asm; // array of spin orbit torque asymmetry
       extern std::vector<double> sot_rj; // array of adiabatic spin torques
       extern std::vector<double> sot_pj; // array of non-adiabatic spin torques
       extern std::vector<double> sot_polarization_unit_vector; // sot spin polarization direction

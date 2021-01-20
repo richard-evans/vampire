@@ -525,8 +525,8 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double strj = stt_rj[material];
 		const double stpj = stt_pj[material];
 
-		const double lambda = 0.0;
-		const double factor = 1.0 / (1.0 + lambda*(sx*stpx + sy*stpy + sz*stpz) );
+		const double stt_lambda = stt_asm[material];
+		const double factor = 1.0 / (1.0 + stt_lambda*(sx*stpx + sy*stpy + sz*stpz) );
 
 		// calculate field
 		hx += factor * ( (strj-alpha*stpj)*(sy*stpz - sz*stpy) + (stpj+alpha*strj)*stpx );
@@ -545,10 +545,13 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double sotrj = sot_rj[material];
 		const double sotpj = sot_pj[material];
 
+		const double sot_lambda = sot_asm[material];
+		const double sot_factor = 1.0 / (1.0 + sot_lambda*(sx*sotpx + sy*sotpy + sz*sotpz) );
+
 		// calculate field
-		hx += (sotrj-alpha*sotpj)*(sy*sotpz - sz*sotpy) + (sotpj+alpha*sotrj)*sotpx;
-		hy += (sotrj-alpha*sotpj)*(sz*sotpx - sx*sotpz) + (sotpj+alpha*sotrj)*sotpy;
-		hz += (sotrj-alpha*sotpj)*(sx*sotpy - sy*sotpx) + (sotpj+alpha*sotrj)*sotpz;
+		hx += sot_factor * ( (sotrj-alpha*sotpj)*(sy*sotpz - sz*sotpy) + (sotpj+alpha*sotrj)*sotpx );
+		hy += sot_factor * ( (sotrj-alpha*sotpj)*(sz*sotpx - sx*sotpz) + (sotpj+alpha*sotrj)*sotpy );
+		hz += sot_factor * ( (sotrj-alpha*sotpj)*(sx*sotpy - sy*sotpx) + (sotpj+alpha*sotrj)*sotpz );
 
 		//----------------------------------------------------------------------------------
 		// save field to spin field array

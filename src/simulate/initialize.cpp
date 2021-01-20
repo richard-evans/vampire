@@ -32,10 +32,13 @@ namespace sim{
       // loop over materials set by user
       for(unsigned int m=0; m<sim::internal::mp.size(); ++m){
          // copy values set by user to arrays
-         if(sim::internal::mp[m].stt_rj.is_set()) sim::internal::stt_rj[m] = sim::internal::mp[m].stt_rj.get();
-         if(sim::internal::mp[m].stt_pj.is_set()) sim::internal::stt_pj[m] = sim::internal::mp[m].stt_pj.get();
-         if(sim::internal::mp[m].sot_rj.is_set()) sim::internal::sot_rj[m] = sim::internal::mp[m].sot_rj.get();
-         if(sim::internal::mp[m].sot_pj.is_set()) sim::internal::sot_pj[m] = sim::internal::mp[m].sot_pj.get();
+         if(sim::internal::mp[m].stt_asm.is_set()) sim::internal::stt_asm[m] = sim::internal::mp[m].stt_asm.get();
+         if(sim::internal::mp[m].stt_rj.is_set())  sim::internal::stt_rj[m]  = sim::internal::mp[m].stt_rj.get();
+         if(sim::internal::mp[m].stt_pj.is_set())  sim::internal::stt_pj[m]  = sim::internal::mp[m].stt_pj.get();
+
+         if(sim::internal::mp[m].sot_asm.is_set()) sim::internal::sot_asm[m] = sim::internal::mp[m].sot_asm.get();
+         if(sim::internal::mp[m].sot_rj.is_set())  sim::internal::sot_rj[m]  = sim::internal::mp[m].sot_rj.get();
+         if(sim::internal::mp[m].sot_pj.is_set())  sim::internal::sot_pj[m]  = sim::internal::mp[m].sot_pj.get();
       }
 
       return;
