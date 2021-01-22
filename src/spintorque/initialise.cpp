@@ -106,7 +106,6 @@ void initialise(const double system_dimensions_x,
    st::internal::coeff_ast.resize(array_size);
    st::internal::coeff_nast.resize(array_size);
    st::internal::cell_natom.resize(array_size);
-   st::internal::cell_mus.resize(array_size);
 
 
    const int three_vec_array_size = 3*array_size;

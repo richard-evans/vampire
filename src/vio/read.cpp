@@ -13,7 +13,9 @@
 // C++ standard library headers
 #include <algorithm>
 #include <sstream>
-
+#include <cstring>
+#include <string>
+#include <iostream>
 // Vampire headers
 #include "vio.hpp"
 #include "errors.hpp"
@@ -86,9 +88,14 @@ namespace vin{
 		zlog << zTs() << "Parsing system parameters from main input file." << std::endl;
 
 		int line_counter=0;
+
+      // Comment and delimiter characters for "input" type files.
+      char delim[] = ":=!";
+
 		// Loop over all lines and pass keyword to matching function
 		while (! inputfile.eof() ){
 			line_counter++;
+
 			// read in whole line
 			std::string line;
 			getline(inputfile,line);
@@ -107,85 +114,27 @@ namespace vin{
 			std::string unit="";
 
 			// get size of string
-			int linelength = line.length();
-			int last=0;
 
-			// set character triggers
-			const char* colon=":";	// Word identifier
-			const char* eq="=";		// Value identifier
-			const char* exc="!";		// Unit identifier
-			const char* hash="#";	// Comment identifier
-			//const char* arrow=">";	// List identifier
+         // remove everything after comment character
+         line = line.substr(0,line.find('#')) ;
 
-			// Determine key by looping over characters in line
-			for(int i=0;i<linelength;i++){
-				char c=line.at(i);
-				last=i;
+         // convert to c-string style, for tokenisation
+         std::vector<char> cstr(line.begin(),line.end());
 
-				// if character is not ":" or "=" or "!" or "#" interpret as key
-				if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
-					key.push_back(c);
-				}
-				else break;
-			}
-			const int end_key=last;
+         // add null terminator, to insure that strtok cannot run over into previously used memory.
+         cstr.push_back('\0');
 
-			// Determine the rest
-			for(int i=end_key;i<linelength;i++){
+         // tokenise the string, using delimiters from above
+         char *token = strtok(&cstr[0],delim); // first call of strtok sets the string to tokenise.
+         for (int count = 0; count < 4 && token !=NULL; count++){
+             if (count==0){key=token;}       // Format is always the same
+             else if(count==1){word=token;}  // but breaks if EOL found
+             else if(count==2){value=token;} // so if unused, keywords will remain as ""
+             else if(count==3){unit=token;}
+             token = strtok(NULL,delim);
+         };
 
-				char c=line.at(i);
-				//last=i;
-					// period found - interpret as word
-					if(c== *colon){
-						for(int j=i+1;j<linelength;j++){
-							// if character is not special add to value
-							char c=line.at(j);
-							if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
-								word.push_back(c);
-							}
-							// if character is special then go back to main loop
-							else{
-								i=j-1;
-								break;
-							}
-						}
-					}
-					// equals found - interpret as value
-					else if(c== *eq){
-						for(int j=i+1;j<linelength;j++){
-							// if character is not special add to value
-							char c=line.at(j);
-							if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
-								value.push_back(c);
-							}
-							// if character is special then go back to main loop
-							else{
-								i=j-1;
-								break;
-							}
-						}
-					}
-					// exclaimation mark found - interpret as unit
-					else if(c== *exc){
-						for(int j=i+1;j<linelength;j++){
-							// if character is not special add to value
-							char c=line.at(j);
-							if((c != *colon) && (c != *eq) && (c != *exc) && (c != *hash)){
-								unit.push_back(c);
-							}
-							// if character is special then go back to main loop
-							else{
-								i=j-1;
-								break;
-							}
-						}
-					}
-					// hash found - interpret as comment
-					else if(c== *hash){
-						break;
-					}
-					//break;
-			}
+         // tidy up
 			string empty="";
 			if(key!=empty){
 			//std::cout << "\t" << "key:  " << key << std::endl;

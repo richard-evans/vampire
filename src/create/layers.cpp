@@ -20,7 +20,7 @@ namespace create{
 namespace internal{
 
 //------------------------------------------------------------------------------
-//   Function to detertmine atom material allocation based on z-height
+//   Function to determine atom material allocation based on z-height
 //   For unit cells with multiple materials this allocation respects the
 //   initial material allocation
 //------------------------------------------------------------------------------
@@ -69,7 +69,9 @@ void layers(std::vector<cs::catom_t> & catom_array){
 		}
 
 		// Delete unneeded atoms
-		clear_atoms(catom_array);
+      // Edit - (not sure why it does that here - causes unfiller atoms to be removed from system)
+      // removed this call for now (June 2019)
+		//clear_atoms(catom_array);
 
 	}
 

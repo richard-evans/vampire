@@ -38,6 +38,21 @@ namespace unitcell{
       unsigned int lc; /// lattice category
       unsigned int hc; /// height category
       unsigned int ni; /// number of interactions
+      bool nm; // non-magnetic atom (no interactions are calculated)
+
+      // constructor
+      atom_t():
+         x(0.0),
+         y(0.0),
+         z(0.0),
+         mat(0),
+         lc(0),
+         hc(0),
+         ni(0),
+         nm(false)
+      {
+      };
+
 	};
 
    //---------------------------------------------------------------------------
@@ -47,6 +62,7 @@ namespace unitcell{
 	public:
       unsigned int i; /// atom unit cell id
       unsigned int j; /// neighbour atom unit cell id
+      unsigned int shell; // shell number of interaction
       int dx; /// delta x in unit cells
       int dy; /// delta y in unit cells
       int dz; /// delta z in unit cells
@@ -62,6 +78,7 @@ namespace unitcell{
 
       exchange::exchange_t exchange_type; // exchange type to use in simulation
       bool use_material_exchange_constants; // flag to enable material exchange parameters
+      int num_unit_cell_atoms; // number of atoms in unit cell
 
       // list of interactions in each unit cell
       std::vector <unitcell::interaction_t> interaction;
@@ -95,6 +112,9 @@ namespace unitcell{
       // normalisation function to achieve same exchange sum as nn approximation
       void normalise_exchange();
       void normalise_exponential_exchange();
+
+      // function to find crystal shells
+      void find_shells();
 
    };
 

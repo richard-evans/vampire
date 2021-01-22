@@ -18,6 +18,7 @@
 
 // Vampire headers
 #include "dipole.hpp"
+#include "gpu.hpp"
 #include "vmpi.hpp"
 #include "cells.hpp"
 #include "vio.hpp"
@@ -56,6 +57,9 @@ namespace dipole{
 			   //if updated record last time at update
 			   dipole::internal::update_time = sim_time;
 
+            // for gpu acceleration, transfer spin positions now (does nothing for serial)
+            gpu::transfer_spin_positions_from_gpu_to_cpu();
+
             switch (dipole::internal::solver){
 
                case dipole::internal::macrocell:
@@ -71,6 +75,9 @@ namespace dipole{
                   break;
 
             }
+
+            // for gpu acceleration, transfer calculated fields now (does nothing for serial)
+            gpu::transfer_dipole_fields_from_cpu_to_gpu();
 
 		   } // End of check for update rate
 		} // end of check for update time

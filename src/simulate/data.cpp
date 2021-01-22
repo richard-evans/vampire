@@ -34,9 +34,21 @@ namespace sim{
    namespace internal{
       //----------------------------------------------------------------------------
       // Shared variables used within sim module
-      //---------------------------------------------------------------------------
+      //----------------------------------------------------------------------------
+      bool enable_spin_torque_fields = false; // flag to enable spin torque fields
+
       std::vector<sim::internal::mp_t> mp; // array of material properties
-      std::vector<double> slonczewski_spin_polarization_unit_vector(3,0.0); // spin polarization direction
+
+      std::vector<double> stt_asm; // array of spin transfer torque asymmetry
+      std::vector<double> stt_rj; // array of adiabatic spin torques
+      std::vector<double> stt_pj; // array of non-adiabatic spin torques
+      std::vector<double> stt_polarization_unit_vector(3,0.0); // stt spin polarization direction
+
+      std::vector<double> sot_asm; // array of spin orbit torque asymmetry
+      std::vector<double> sot_rj; // array of adiabatic spin torques
+      std::vector<double> sot_pj; // array of non-adiabatic spin torques
+      std::vector<double> sot_polarization_unit_vector(3,0.0); // sot spin polarization direction
+
 
 
    } // end of internal namespace

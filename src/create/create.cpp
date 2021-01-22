@@ -132,7 +132,7 @@ int create(){
 	cs::create_crystal_structure(catom_array);
 
 	// Cut system to the correct type, species etc
-	cs::create_system_type(catom_array);
+	create::create_system_type(catom_array);
 
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
@@ -180,6 +180,8 @@ int create(){
       int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    #else
       int num_local_atoms = atoms::num_atoms;
+      // set number of core atoms for serial code (to allow wraper functions to work seamlessly)
+      vmpi::num_core_atoms = atoms::num_atoms;
    #endif
 
 	// Set grain and cell variables for simulation

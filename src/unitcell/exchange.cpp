@@ -38,6 +38,10 @@ double exchange(double range_sq, double nn_cutoff_sq){
          break;
       }
 
+      case shell:{
+         return 1.0;
+      }
+
       case exponential:{
          return exp(-sqrt(range_sq)/uc::internal::exchange_decay);
          break;

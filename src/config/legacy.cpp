@@ -140,7 +140,7 @@ double legacy_atoms(){
       cfg_file_ofstr << "Time: " << double(sim::time) * mp::dt_SI << std::endl;
       cfg_file_ofstr << "Field: " << sim::H_applied << std::endl;
       cfg_file_ofstr << "Temperature: " << sim::temperature << std::endl;
-      cfg_file_ofstr << "Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
+      cfg_file_ofstr << "Magnetisation: " << stats::system_magnetization.output_normalized_magnetization(false) << std::endl;
       cfg_file_ofstr << "Number of Materials: " << mp::num_materials << std::endl;
       for (int mat = 0; mat < mp::num_materials; mat++)
       {
@@ -400,7 +400,7 @@ void legacy_cells()
       cfg_file_ofstr << "# Time: " << double(sim::time) * mp::dt_SI << std::endl;
       cfg_file_ofstr << "# Field: " << sim::H_applied << std::endl;
       cfg_file_ofstr << "# Temperature: " << sim::temperature << std::endl;
-      cfg_file_ofstr << "# Magnetisation: " << stats::system_magnetization.output_normalized_magnetization() << std::endl;
+      cfg_file_ofstr << "# Magnetisation: " << stats::system_magnetization.output_normalized_magnetization(false) << std::endl;
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
 
       // Root process now outputs the cell magnetisations

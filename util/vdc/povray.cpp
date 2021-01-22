@@ -18,16 +18,24 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 // program header
 #include "vdc.hpp"
+
+// openmp header
+#ifdef _OPENMP
+   #include <omp.h>
+#else
+   #define omp_get_thread_num() 0
+#endif
 
 namespace vdc{
 
 // forward function declarations
 
 //------------------------------------------------------------------------------
-// Function to output crystal.xyz file compatible with rasmol
+// Function to output spins.inc file compatible with povray
 //------------------------------------------------------------------------------
 void output_inc_file(unsigned int spin_file_id){
 
@@ -39,7 +47,7 @@ void output_inc_file(unsigned int spin_file_id){
 	std::string incpov_file = incpov_file_sstr.str();
 
    // output informative message to user
-   std::cout << "   Writing povray file " << incpov_file << "..." << std::flush;
+   if(vdc::verbose) std::cout << "   Writing povray file " << incpov_file << "..." << std::flush;
 
    // temporary variables defining spin colours
    double red=0.0, green=0.0, blue=1.0;
@@ -48,37 +56,86 @@ void output_inc_file(unsigned int spin_file_id){
    std::ofstream incfile;
    incfile.open(incpov_file.c_str());
 
-   for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+   //---------------------------------------------------------------------------
+   // parallelise stream formatting for better performance
+   // step 1: parallel formatted output to stringstream in memory
+   // step 2: binary write of formatted text to output file (awesomely fast!)
+   //---------------------------------------------------------------------------
+   #pragma omp parallel
+   {
 
-      // get z-magnetization for colour constrast
-      const double sz = spins[3*atom+2];
+      std::stringstream otext;
 
-      // calculate rgb components based on z magnetization
-      vdc::rgb(sz, red, green, blue);
+      // write to output text stream in parallel
+      #pragma omp for
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
 
-      std::stringstream line;
-      line << "spinm"<< type[atom] << "(" <<
-              coordinates[3*atom+0]-vdc::system_centre[0] << "," << coordinates[3*atom+1]-vdc::system_centre[1] << "," << coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
-              spins[3*atom+0] << "," << spins[3*atom+1] << "," << spins[3*atom+2] << "," <<
-              red << "," << green << "," << blue << ")\n";
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
-      incfile << line.str();
+         // get magnetization for colour contrast
+         double sx = spins[3*atom+0];
+         double sy = spins[3*atom+1];
+         double sz = spins[3*atom+2];
 
-   }
+         // flip antiferromagnetic spins if required
+         if (std::find(afm_materials.begin(), afm_materials.end(), vdc::type[atom]+1) != afm_materials.end() ){
+            sx = -sx;
+            sy = -sy;
+            sz = -sz;
+         }
 
+         // calculate rgb components based on spin orientation
+         vdc::rgb(sx, sy, sz, red, green, blue);
+
+         // format text for povray file
+         otext << "spinm"<< type[atom] << "(" <<
+                  coordinates[3*atom+0]-vdc::system_centre[0] << "," << coordinates[3*atom+1]-vdc::system_centre[1] << "," << coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
+                  spins[3*atom+0] << "," << spins[3*atom+1] << "," << spins[3*atom+2] << "," <<
+                  red << "," << green << "," << blue << ")\n";
+
+      } // end of parallel for
+
+      // force each thread to write to file in order
+      #pragma omp critical
+      incfile << otext.str();
+
+   } // end of parallel region
+
+   //---------------------------------------------------------------------------
    // write non-magnetic atoms to inc file
-   for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+   //---------------------------------------------------------------------------
+   // parallelise stream formatting for better performance
+   //---------------------------------------------------------------------------
+   #pragma omp parallel
+   {
 
-      std::stringstream line;
-      line << "spinm"<< nm_type[atom] << "(" <<
-              nm_coordinates[3*atom+0]-vdc::system_centre[0] << "," << nm_coordinates[3*atom+1]-vdc::system_centre[1] << "," << nm_coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
-              0.0 << "," << 0.0 << "," << 0.0 << "," << // no spin
-              0.3 << "," << 0.3 << "," << 0.3 << ")\n"; // grey colour by default
+      std::stringstream otext;
 
-      incfile << line.str();
+      // write to output text stream in parallel
+      #pragma omp for
+      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
 
-   }
+         // get atom ID
+         unsigned int atom = vdc::sliced_nm_atoms_list[i];
 
+         // format text for povray file
+         otext << "spinm"<< nm_type[atom] << "(" <<
+                  nm_coordinates[3*atom+0]-vdc::system_centre[0] << "," <<
+                  nm_coordinates[3*atom+1]-vdc::system_centre[1] << "," <<
+                  nm_coordinates[3*atom+2]-vdc::system_centre[2] << "," <<
+                  0.0 << "," << 0.0 << "," << 0.0 << "," << // no spin
+                  0.3 << "," << 0.3 << "," << 0.3 << ")\n"; // grey colour by default
+
+      } // end of parallel for
+
+      // force each thread to write to file in order
+      #pragma omp critical
+      incfile << otext.str();
+
+   } // end of parallel region
+
+   // flush data to include file and close
    incfile << std::flush;
    incfile.close();
 
@@ -90,7 +147,7 @@ void output_inc_file(unsigned int spin_file_id){
 }
 
 //------------------------------------------------------------------------------
-// Function to output crystal.xyz file compatible with rasmol
+// Function to output spins.pov file compatible with povray
 //------------------------------------------------------------------------------
 void output_povray_file(){
 
@@ -135,54 +192,63 @@ void output_povray_file(){
    pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
    pfile << "#declare Final_Frame = " << vdc::final_file_id << ";" << std::endl;
 
+   //---------------------------------------------------------------------------
    // Determine non-magnetic materials looping over all non-magnetic atoms
+   //---------------------------------------------------------------------------
    std::vector<bool> is_nm_mat(vdc::materials.size(),false);
-   for(uint64_t atom = 0; atom < vdc::num_nm_atoms; atom++){
+   for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+      // get atom ID
+      unsigned int atom = vdc::sliced_nm_atoms_list[i];
+
       const int mat = vdc::nm_type[atom];
       is_nm_mat[mat] = true;
+
    }
 
    // Output material specific macros
-	for(int imat=0; imat < vdc::materials.size(); imat++){
-      if(is_nm_mat[imat] == false){
-   		pfile << "#declare sscale"<< imat << "=2.0;" << std::endl;
-   		pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
-   		pfile << "#declare cscale"<< imat << "=3.54;" << std::endl;
-   		pfile << "#declare cones"<< imat << "=0;" << std::endl;
-   		pfile << "#declare arrows"<< imat << "=1;" << std::endl;
-   		pfile << "#declare spheres"<< imat << "=1;" << std::endl;
-   		pfile << "#declare cubes" << imat << "=0;" << std::endl;
-   		pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
-   		pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
-   		pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz, cr,cg,cb)" << std::endl;
-   		pfile << "union{" << std::endl;
-   		pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
-   		pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
-   		pfile << "#if(cones"<< imat << ") cone {<cx+0.5*sx*sscale" << imat << ",cy+0.5*sy*sscale"<< imat << ",cz+0.5*sz*sscale"<< imat << ">,0.0 <cx-0.5*sx*sscale"<< imat << ",cy-0.5*sy*sscale"<< imat << ",cz-0.5*sz*sscale"<< imat << ">,sscale" << imat << "*0.5} #end" << std::endl;
-   		pfile << "#if(arrows" << imat << ") cylinder {<cx+sx*0.5*sscale"<< imat <<",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<
-   					">,<cx-sx*0.5*sscale"<< imat <<",cy-sy*0.5*sscale"<< imat <<",cz-sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.12}";
-   		pfile << "cone {<cx+sx*0.5*1.6*sscale"<< imat <<",cy+sy*0.5*1.6*sscale"<< imat <<",cz+sz*0.5*1.6*sscale"<< imat <<">,sscale"<< imat <<"*0.0 <cx+sx*0.5*sscale"<< imat <<
-   					",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.2} #end" << std::endl;
-   		pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
-   		pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
-   		pfile << "}" << std::endl;
-   		pfile << "#end" << std::endl;
-      }
-      else{
-         pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
-         pfile << "#declare cscale"<< imat << "=0.1;" << std::endl;
-         pfile << "#declare spheres"<< imat << "=1;" << std::endl;
-         pfile << "#declare cubes" << imat << "=1;" << std::endl;
-         pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
-         pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
-         pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz,cr,cg,cb)" << std::endl;
-         pfile << "union{" << std::endl;
-         pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
-         pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
-         pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
-         pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
-         pfile << "}" << std::endl;
-         pfile << "#end" << std::endl;
+	for(unsigned int imat=0; imat < vdc::materials.size(); imat++){
+      if (std::find(remove_materials.begin(), remove_materials.end(), imat+1) == remove_materials.end() ){
+         if(is_nm_mat[imat] == false){
+      		pfile << "#declare sscale"<< imat << "=2.0;" << std::endl;
+      		pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
+      		pfile << "#declare cscale"<< imat << "=3.54;" << std::endl;
+      		pfile << "#declare cones"<< imat << "=0;" << std::endl;
+      		pfile << "#declare arrows"<< imat << "=1;" << std::endl;
+      		pfile << "#declare spheres"<< imat << "=1;" << std::endl;
+      		pfile << "#declare cubes" << imat << "=0;" << std::endl;
+      		pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
+      		pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+      		pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz, cr,cg,cb)" << std::endl;
+      		pfile << "union{" << std::endl;
+      		pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
+      		pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
+      		pfile << "#if(cones"<< imat << ") cone {<cx+0.5*sx*sscale" << imat << ",cy+0.5*sy*sscale"<< imat << ",cz+0.5*sz*sscale"<< imat << ">,0.0 <cx-0.5*sx*sscale"<< imat << ",cy-0.5*sy*sscale"<< imat << ",cz-0.5*sz*sscale"<< imat << ">,sscale" << imat << "*0.5} #end" << std::endl;
+      		pfile << "#if(arrows" << imat << ") cylinder {<cx+sx*0.5*sscale"<< imat <<",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<
+      					">,<cx-sx*0.5*sscale"<< imat <<",cy-sy*0.5*sscale"<< imat <<",cz-sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.12}";
+      		pfile << "cone {<cx+sx*0.5*1.6*sscale"<< imat <<",cy+sy*0.5*1.6*sscale"<< imat <<",cz+sz*0.5*1.6*sscale"<< imat <<">,sscale"<< imat <<"*0.0 <cx+sx*0.5*sscale"<< imat <<
+      					",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.2} #end" << std::endl;
+      		pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
+      		pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
+      		pfile << "}" << std::endl;
+      		pfile << "#end" << std::endl;
+         }
+         else{
+            pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
+            pfile << "#declare cscale"<< imat << "=0.1;" << std::endl;
+            pfile << "#declare spheres"<< imat << "=1;" << std::endl;
+            pfile << "#declare cubes" << imat << "=1;" << std::endl;
+            pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
+            pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+            pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz,cr,cg,cb)" << std::endl;
+            pfile << "union{" << std::endl;
+            pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
+            pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
+            pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
+            pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
+            pfile << "}" << std::endl;
+            pfile << "#end" << std::endl;
+         }
       }
 	}
    // frame specific povray output

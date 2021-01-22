@@ -108,6 +108,24 @@ bool match_material(string const word, string const value, string const unit, in
       st::internal::mp[super_index].sd_exchange=sd;
       return true;
    }
+   //--------------------------------------------------------------------
+   test="spin-torque-free-layer";
+   /*
+    * Spin torque free layer flag
+    */
+   if(word==test){
+      st::internal::free_layer = super_index;
+      return true;
+   }
+   //--------------------------------------------------------------------
+   test="spin-torque-reference-layer";
+   /*
+    * Spin torque free layer flag
+    */
+   if(word==test){
+      st::internal::reference_layer = super_index;
+      return true;
+   }
 
    //--------------------------------------------------------------------
    // keyword not found
