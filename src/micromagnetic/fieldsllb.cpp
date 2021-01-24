@@ -145,7 +145,7 @@ namespace micromagnetic{
     }
  // std::cout << "SP" << spin_field[0] << "\t" << spin_field[1] << '\t' << spin_field[2] << std::endl;
     if (environment::enabled){
-    std::cout << "env" << '\t' << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << std::endl;
+  //  std::cout << "env" << '\t' << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << std::endl;
        spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
        spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
        spin_field[2] = spin_field[2] + environment::environment_field_z[cell];

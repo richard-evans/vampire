@@ -325,7 +325,7 @@ namespace environment{
         dipole_field_x[cell_i] = dipole_field_x[cell_i]*9.27400915e-01;
         dipole_field_y[cell_i] = dipole_field_y[cell_i]*9.27400915e-01;
         dipole_field_z[cell_i] = dipole_field_z[cell_i]*9.27400915e-01;
-       std::cout << sim::time << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
+    //   std::cout << sim::time << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
       }
     // std::cout << interaction_no << '\t' << num_cells*num_cells << std::endl;
     // std::cin.get();
@@ -338,10 +338,10 @@ namespace environment{
          environment_field_y[cell] = dipole_field_y[env_cell];// + bias_field_y[env_cell];
          environment_field_z[cell] = dipole_field_z[env_cell];//+ bias_field_z[env_cell];
 
-        std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
+      //  std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
 
       }
-        std::cin.get();
+      //  std::cin.get();
 //          #ifdef FFT
 //          //initalise all components of M and H arrays to 0
 //          for (int id = 0; id < eight_num_cells; id++){
