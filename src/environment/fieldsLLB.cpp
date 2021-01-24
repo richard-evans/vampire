@@ -45,7 +45,7 @@ namespace environment
 
             //the temperature is usually used as a reduced temperature.
             const double reduced_temperature = temperature/shield_Tc[shield];
-            const double Tc_o_Tc_m_T = shield_Tc[shield]/(temperature - shield_Tc[shield]);
+            const double Tc_o_Tc_m_T = shield_Tc[shield]/(shield_Tc[shield] - temperature);
 
             //calcualtes m_e, and alpha temeprature dependant
             if (temperature<=shield_Tc[shield]){
@@ -68,7 +68,7 @@ namespace environment
             double pf;
             if(temperature<=shield_Tc[shield]) pf = one_o_2_chi_para*(1.0 - m_squared/m_e_squared);
             else pf = -2.0*one_o_2_chi_para*(1.0 + Tc_o_Tc_m_T*3.0*m_squared/5.0);
-
+          //  std::cout << cell << '\t' << pf << '\t' << temperature << '\t' << shield_Tc[shield] << '\t' << m_squared << '\t' << m_e_squared << '\t' << one_o_2_chi_para << '\t' << Tc_o_Tc_m_T <<std::endl;
                   double exchange_field[3]={0.0,0.0,0.0};
             if (num_cells > 1){
               //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
@@ -99,11 +99,11 @@ namespace environment
                }
             }
 
-
+          //  std::cout << cell << "\t" <<  pf << std::endl;
             //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-            spin_field[0] = pf*m[0] + exchange_field[0];// + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[0] + shield_Hext_x[0]  + env_field_uv[0] + bias_field_x[cell];//+ dipole_field_x[cell];// + env_field_uv[0] + bias_field_x[cell];
-            spin_field[1] = pf*m[1] + exchange_field[1];// + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[1] + shield_Hext_y[1]  + env_field_uv[1] + bias_field_y[cell];// + dipole_field_y[cell];// + env_field_uv[1] + bias_field_y[cell];
-            spin_field[2] = pf*m[2] + exchange_field[2];//                                               + shield_Hext_z[2]  + env_field_uv[2] + bias_field_z[cell];//+ dipole_field_z[cell];// + env_field_uv[2] + bias_field_z[cell];
+            spin_field[0] = pf*m[0] + exchange_field[0] + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[0] + shield_Hext_x[0]  + env_field_uv[0] + bias_field_x[cell];//+ dipole_field_x[cell];// + env_field_uv[0] + bias_field_x[cell];
+            spin_field[1] = pf*m[1] + exchange_field[1] + ku[cell]/Ms[cell]*one_o_chi_perp[cell]*m[1] + shield_Hext_y[1]  + env_field_uv[1] + bias_field_y[cell];// + dipole_field_y[cell];// + env_field_uv[1] + bias_field_y[cell];
+            spin_field[2] = pf*m[2] + exchange_field[2]                                               + shield_Hext_z[2]  + env_field_uv[2] + bias_field_z[cell];//+ dipole_field_z[cell];// + env_field_uv[2] + bias_field_z[cell];
           //    std::cout << "x" << '\t' << pf  << '\t' << m[0] << '\t' << exchange_field[0] << "\t" << dipole_field_x[cell] << "\t" << spin_field[0] <<std::endl;
           //    std::cout << "y" << '\t' << pf  << '\t' << m[1] << '\t' << exchange_field[1] << "\t" << dipole_field_y[cell] << "\t" << spin_field[1] <<std::endl;
           //    std::cout << "z" << '\t' << pf  << '\t' << m[2] << '\t' << exchange_field[2] << "\t" << dipole_field_z[cell] << "\t" << spin_field[2] <<std::endl;

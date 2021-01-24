@@ -466,7 +466,7 @@ namespace environment{
       //env::bias_shields();
 
     //initalise the demag fields
-  //  env::initialise_demag_fields();
+    env::initialise_demag_fields();
 
        // std::ofstream mfile;
        // mfile.open("m3.txt");

@@ -48,8 +48,8 @@ namespace environment{
                 double rx2 = cell_coords_array_x[cellj] - cell_coords_array_x[celli];
                 double ry2 = cell_coords_array_y[cellj] - cell_coords_array_y[celli];
                 double rz2 = cell_coords_array_z[cellj] - cell_coords_array_z[celli];
-                double rij = sqrt(rx2*rx2+ry2*ry2+rz2*rz2); //Reciprocal of the distance
-                double rij_1 = 1.0/rij;
+                double rij = sqrt(rx2*rx2+ry2*ry2+rz2*rz2);
+                double rij_1 = 1.0/rij;//Reciprocal of the distance
 
                   // define unitarian distance vectors
 
@@ -309,8 +309,8 @@ namespace environment{
              int j = interaction_no;
 
              const double mx = x_mag_array[cell_j]*imuB;
-             const double my = 0.0;//y_mag_array[cell_j]*imuB;
-             const double mz = 0.0;//z_mag_array[cell_j]*imuB;
+             const double my = y_mag_array[cell_j]*imuB;
+             const double mz = z_mag_array[cell_j]*imuB;
            //std::cout<< cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
              dipole_field_x[cell_i]      +=(mx*rij_tensor_xx[j] + my*rij_tensor_xy[j] + mz*rij_tensor_xz[j]);
              dipole_field_y[cell_i]      +=(mx*rij_tensor_xy[j] + my*rij_tensor_yy[j] + mz*rij_tensor_yz[j]);
@@ -325,23 +325,23 @@ namespace environment{
         dipole_field_x[cell_i] = dipole_field_x[cell_i]*9.27400915e-01;
         dipole_field_y[cell_i] = dipole_field_y[cell_i]*9.27400915e-01;
         dipole_field_z[cell_i] = dipole_field_z[cell_i]*9.27400915e-01;
-       // std::cout << sim::time << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
+       std::cout << sim::time << cell_i << '\t' << dipole_field_x[cell_i] << '\t' << dipole_field_y[cell_i] << '\t' << dipole_field_z[cell_i] << '\t' << std::endl;
       }
-//      std::cout << interaction_no << '\t' << num_cells*num_cells << std::endl;
-   //   std::cin.get();
-    //  saves the dipole field for each cell to the environment cell for use in the environment module
-      // for(int lc=0; lc<cells::num_local_cells; lc++){
-      //    int cell = cells::cell_id_array[lc];
-      //    int env_cell = list_env_cell_atomistic_cell[cell];
-      //    //std::cout << cell << '\t' << env_cell <<std::endl;
-      //    environment_field_x[cell] = dipole_field_x[env_cell] + bias_field_x[env_cell];
-      //    environment_field_y[cell] = dipole_field_y[env_cell] + bias_field_y[env_cell];
-      //    environment_field_z[cell] = dipole_field_z[env_cell] + bias_field_z[env_cell];
-      //
-      // //  std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
-      //
-      // }
+    // std::cout << interaction_no << '\t' << num_cells*num_cells << std::endl;
+    // std::cin.get();
+    // saves the dipole field for each cell to the environment cell for use in the environment module
+      for(int lc=0; lc<cells::num_local_cells; lc++){
+         int cell = cells::cell_id_array[lc];
+         int env_cell = list_env_cell_atomistic_cell[cell];
+         //std::cout << cell << '\t' << env_cell <<std::endl;
+         environment_field_x[cell] = dipole_field_x[env_cell];// + bias_field_x[env_cell];
+         environment_field_y[cell] = dipole_field_y[env_cell];// + bias_field_y[env_cell];
+         environment_field_z[cell] = dipole_field_z[env_cell];//+ bias_field_z[env_cell];
 
+        std::cout << cells::pos_and_mom_array[4*cell+0] << '\t' << cells::pos_and_mom_array[4*cell+1] << '\t' << cells::pos_and_mom_array[4*cell+2] << '\t' << environment_field_x[cell] << '\t' << environment_field_y[cell] << '\t' <<environment_field_z[cell] << '\t' << std::endl;
+
+      }
+        std::cin.get();
 //          #ifdef FFT
 //          //initalise all components of M and H arrays to 0
 //          for (int id = 0; id < eight_num_cells; id++){

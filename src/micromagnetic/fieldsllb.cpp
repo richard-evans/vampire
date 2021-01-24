@@ -136,34 +136,34 @@ namespace micromagnetic{
    //if (cell_material_array[cell] == 2)  std::cout << ku_x[cell] << '\t' << one_o_chi_perp[cell] << '\t' << ku_y[cell] << '\t' << ku_z[cell] << std::endl;
         //if (cell ==0)		std::cout  << "inside\t" <<   dipole::cells_field_array_x[0] << '\t' << dipole::cells_field_array_y[0] << '\t' << dipole::cells_field_array_z[0] <<std::endl;
  //       std::cin.get();
-  //}
-    //  if (dipole::activated){
-    // // std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
-    //    spin_field[0] = spin_field[0] + dipole::cells_field_array_x[cell];
-    //    spin_field[1] = spin_field[1] + dipole::cells_field_array_y[cell];
-    //    spin_field[2] = spin_field[2] + dipole::cells_field_array_z[cell];
-    // }
- // // std::cout << "SP" << spin_field[0] << "\t" << spin_field[1] << '\t' << spin_field[2] << std::endl;
-   //  if (environment::enabled){
-   // //if (cell_material_array[cell] == 2) std::cout << "env" << '\t' << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << std::endl;
-   //     spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
-   //     spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
-   //     spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
-   //  }
-   //
-   //   if (sim::track_field_x.size() != 0 ){
-   //     spin_field[0] = spin_field[0] + sim::track_field_x[cell];
-   //     spin_field[1] = spin_field[1] + sim::track_field_y[cell];
-   //     spin_field[2] = spin_field[2] + sim::track_field_z[cell];
-   //     ///std::cout <<sim::time << '\t' << cell << '\t' << sim::track_field_x[cell] << '\t' << sim::track_field_y[cell] << "\t" <<sim::track_field_z[cell] <<std::endl;
-   //   }
-   //
-   //   if (bias_magnets == true){
-   // //    std::cout << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2]<< "\t" << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
-   //     spin_field[0] = spin_field[0] + bias_field_x[cell];
-   //     spin_field[1] = spin_field[1] + bias_field_y[cell];
-   //     spin_field[2] = spin_field[2] + bias_field_z[cell];
-   //   }
+//  }
+     if (dipole::activated){
+    // std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
+       spin_field[0] = spin_field[0] + dipole::cells_field_array_x[cell];
+       spin_field[1] = spin_field[1] + dipole::cells_field_array_y[cell];
+       spin_field[2] = spin_field[2] + dipole::cells_field_array_z[cell];
+    }
+ // std::cout << "SP" << spin_field[0] << "\t" << spin_field[1] << '\t' << spin_field[2] << std::endl;
+    if (environment::enabled){
+    std::cout << "env" << '\t' << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << std::endl;
+       spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
+       spin_field[1] = spin_field[1] + environment::environment_field_y[cell];
+       spin_field[2] = spin_field[2] + environment::environment_field_z[cell];
+    }
+
+     if (sim::track_field_x.size() != 0 ){
+       spin_field[0] = spin_field[0] + sim::track_field_x[cell];
+       spin_field[1] = spin_field[1] + sim::track_field_y[cell];
+       spin_field[2] = spin_field[2] + sim::track_field_z[cell];
+       ///std::cout <<sim::time << '\t' << cell << '\t' << sim::track_field_x[cell] << '\t' << sim::track_field_y[cell] << "\t" <<sim::track_field_z[cell] <<std::endl;
+     }
+
+     if (bias_magnets == true){
+   //    std::cout << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2]<< "\t" << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<std::endl;
+       spin_field[0] = spin_field[0] + bias_field_x[cell];
+       spin_field[1] = spin_field[1] + bias_field_y[cell];
+       spin_field[2] = spin_field[2] + bias_field_z[cell];
+     }
 
       //std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
       return spin_field;

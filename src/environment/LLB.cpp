@@ -186,9 +186,10 @@ namespace environment{
             //   std::cout << "HERE2" << std::endl;
 
                //iff FFt is enabled calculate the demag fields.
-              #ifdef FFT
-              if (sim::time %demag_update_rate == 0) env::calculate_demag_fields();
-              #endif
+              // #ifdef FFT
+              // if (sim::time %demag_update_rate == 0) env::calculate_demag_fields();
+              // #endif
+            if (sim::time %demag_update_rate == 0)   env::calculate_demag_fields();
                //std::vector < double > mm_env_exchange(num_cells,0.0);
                //std::vector < double > env_mm_exchange(mm::num_cells,0.0);
 
@@ -207,7 +208,7 @@ namespace environment{
                   m[2] = z_array[cell];
                   //std::cout << "HERE3" << "\t" << m[0] << '\t' << m[1] << "\t" << m[2] << std::endl;
                   spin_field = env::calculate_llb_fields(m, temperature, cell, x_array,y_array,z_array);
-
+                //  std::cout << "field\t" << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2] <<std::endl;
                   //calcualte the noise terms
                   double sigma_para = sqrt(2*kB*temperature*env::alpha_para/(env::Ms[cell]*dt));
                   double sigma_perp = sqrt(2*kB*temperature*(env::alpha_perp-env::alpha_para)/(dt*env::Ms[cell]*env::alpha_perp*env::alpha_perp));
@@ -240,21 +241,22 @@ namespace environment{
                   x_euler_array[cell] = xyz[0];
                   y_euler_array[cell] = xyz[1];
                   z_euler_array[cell] = xyz[2];
-                  //std::cout << xyz[0] << '\t' << xyz[1] << '\t' << xyz[2] << "\t" << m[0] << '\t' << m[1] << '\t' << m[2] <<"\t" <<  SdotH << "\t" << one_o_m_squared << '\t' << env::alpha_para << '\t' << env::alpha_perp << std::endl;
+                //  std::cout << "xyz\t" << xyz[0] << '\t' << xyz[1] << '\t' << xyz[2] << "\t" << m[0] << '\t' << m[1] << '\t' << m[2] <<"\t" <<  SdotH << "\t" << one_o_m_squared << '\t' << env::alpha_para << '\t' << env::alpha_perp << std::endl;
 
                }
       //         std::cout << "HERE4" << std::endl;
-            //std::cin.get();
+        //    std::cin.get();
                //save the euler step to a spin storage array
                for (int i = my_env_start_index; i < my_env_end_index; i++){
                   int cell = env::none_atomistic_cells[i];
                   x_spin_storage_array[cell] = x_array[cell] + x_euler_array[cell]*dt;
                   y_spin_storage_array[cell] = y_array[cell] + y_euler_array[cell]*dt;
                   z_spin_storage_array[cell] = z_array[cell] + z_euler_array[cell]*dt;
-               //   std::cout << x_spin_storage_array[cell] << '\t' << y_spin_storage_array[cell] << '\t' << z_spin_storage_array[cell] << std::endl;
+          //        std::cout << "storage" << '\t' << x_spin_storage_array[cell] << '\t' << y_spin_storage_array[cell] << '\t' << z_spin_storage_array[cell] << std::endl;
 
                }
 
+        //    std::cin.get();
 //                    for (int i =0; i <num_env_cells; i++){
   //        if (vmpi::my_rank == 1)     std::cerr << i << "\t" << x_spin_storage_array[i] << "\t" << my_env_start_index << '\t' << my_env_end_index << "\t" << num_env_cells << std::endl;
     //         }
@@ -275,8 +277,12 @@ namespace environment{
                   m[1] = y_spin_storage_array[cell];
                   m[2] = z_spin_storage_array[cell];
 
+            //      std::cout << "storage" << '\t' << x_spin_storage_array[cell] << '\t' << y_spin_storage_array[cell] << '\t' << z_spin_storage_array[cell] << std::endl;
+
+
                   //calcualte spin fields
                   spin_field = env::calculate_llb_fields(m, temperature, cell, x_spin_storage_array, y_spin_storage_array, z_spin_storage_array);
+            //      std::cout << "field\t" << spin_field[0] << '\t' << spin_field[1] << '\t' << spin_field[2] <<std::endl;
 
                   double sigma_para = sqrt(2.0*kB*temperature*env::alpha_para/(env::Ms[cell]*dt)); //why 1e-27
                   double sigma_perp = sqrt(2.0*kB*temperature*(env::alpha_perp-env::alpha_para)/(dt*env::Ms[cell]*env::alpha_perp*env::alpha_perp));
@@ -310,8 +316,11 @@ namespace environment{
                   x_heun_array[cell] = xyz[0];
                   y_heun_array[cell] = xyz[1];
                   z_heun_array[cell] = xyz[2];
+        //          std::cout << "xyz\t" << xyz[0] << '\t' << xyz[1] << '\t' << xyz[2] << "\t" << m[0] << '\t' << m[1] << '\t' << m[2] <<"\t" <<  SdotH << "\t" << one_o_m_squared << '\t' << env::alpha_para << '\t' << env::alpha_perp << std::endl;
 
                }
+
+          //  std::cin.get();
 
                for (int i = my_env_start_index; i < my_env_end_index; i++){
                   int cell = env::none_atomistic_cells[i];
@@ -332,14 +341,24 @@ namespace environment{
                   env::x_mag_array[cell] = x_array[cell]*env::Ms[cell];
                   env::y_mag_array[cell] = y_array[cell]*env::Ms[cell];
                   env::z_mag_array[cell] = z_array[cell]*env::Ms[cell];
+          //        std::cout << env::x_mag_array[cell] << '\t' <<env::y_mag_array[cell] << '\t' << env::z_mag_array[cell] <<std::endl;
                }
 
+          //     std::cin.get();
+
 //
-               #ifdef MPICF
-               MPI_Allreduce(MPI_IN_PLACE, &env::x_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               MPI_Allreduce(MPI_IN_PLACE, &env::y_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               MPI_Allreduce(MPI_IN_PLACE, &env::z_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-               #endif
+               // #ifdef MPICF
+               // MPI_Allreduce(MPI_IN_PLACE, &env::x_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+               // MPI_Allreduce(MPI_IN_PLACE, &env::y_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+               // MPI_Allreduce(MPI_IN_PLACE, &env::z_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+               // #endif
+
+               for (int i = my_env_start_index; i < my_env_end_index; i++){
+                  int cell = env::none_atomistic_cells[i];
+
+              //    std::cout << env::x_mag_array[cell] << '\t' <<env::y_mag_array[cell] << '\t' << env::z_mag_array[cell] <<std::endl;
+               }
+          //     std::cin.get();
 //
 // //               outputs magnetisation
            if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) 	int a = env::output();
