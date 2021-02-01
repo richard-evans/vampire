@@ -49,9 +49,6 @@ void output_inc_file(unsigned int spin_file_id){
    // output informative message to user
    if(vdc::verbose) std::cout << "   Writing povray file " << incpov_file << "..." << std::flush;
 
-   // temporary variables defining spin colours
-   double red=0.0, green=0.0, blue=1.0;
-
    // open incfile
    std::ofstream incfile;
    incfile.open(incpov_file.c_str());
@@ -84,6 +81,9 @@ void output_inc_file(unsigned int spin_file_id){
             sy = -sy;
             sz = -sz;
          }
+
+         // temporary thread private variables defining spin colours
+         double red=0.0, green=0.0, blue=1.0;
 
          // calculate rgb components based on spin orientation
          vdc::rgb(sx, sy, sz, red, green, blue);
