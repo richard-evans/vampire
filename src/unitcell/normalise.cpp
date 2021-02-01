@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2020. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -33,6 +33,11 @@ void unitcell::exchange_template_t::normalise_exchange(){
       case internal::nearest_neighbour:
          return;
          break;
+
+      case internal::shell:{
+         return;
+         break;
+      }
 
       case internal::exponential:
          normalise_exponential_exchange();

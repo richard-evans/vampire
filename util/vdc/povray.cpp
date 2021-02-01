@@ -49,9 +49,6 @@ void output_inc_file(unsigned int spin_file_id){
    // output informative message to user
    if(vdc::verbose) std::cout << "   Writing povray file " << incpov_file << "..." << std::flush;
 
-   // temporary variables defining spin colours
-   double red=0.0, green=0.0, blue=1.0;
-
    // open incfile
    std::ofstream incfile;
    incfile.open(incpov_file.c_str());
@@ -68,7 +65,10 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for( auto &atom : vdc::sliced_atoms_list ){
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
          // get magnetization for colour contrast
          double sx = spins[3*atom+0];
@@ -81,6 +81,9 @@ void output_inc_file(unsigned int spin_file_id){
             sy = -sy;
             sz = -sz;
          }
+
+         // temporary thread private variables defining spin colours
+         double red=0.0, green=0.0, blue=1.0;
 
          // calculate rgb components based on spin orientation
          vdc::rgb(sx, sy, sz, red, green, blue);
@@ -111,7 +114,10 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for( auto &atom : vdc::sliced_nm_atoms_list ){
+      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_nm_atoms_list[i];
 
          // format text for povray file
          otext << "spinm"<< nm_type[atom] << "(" <<
@@ -186,11 +192,18 @@ void output_povray_file(){
    pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
    pfile << "#declare Final_Frame = " << vdc::final_file_id << ";" << std::endl;
 
+   //---------------------------------------------------------------------------
    // Determine non-magnetic materials looping over all non-magnetic atoms
+   //---------------------------------------------------------------------------
    std::vector<bool> is_nm_mat(vdc::materials.size(),false);
-   for( auto &atom : vdc::sliced_nm_atoms_list ){
+   for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+      // get atom ID
+      unsigned int atom = vdc::sliced_nm_atoms_list[i];
+
       const int mat = vdc::nm_type[atom];
       is_nm_mat[mat] = true;
+
    }
 
    // Output material specific macros

@@ -35,7 +35,7 @@ namespace unitcell{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
-      enum exchange_function_t { nearest_neighbour, exponential };
+      enum exchange_function_t { nearest_neighbour, shell, exponential };
 
       //-------------------------------------------------------------------------
       // Internal shared variables
@@ -50,6 +50,8 @@ namespace unitcell{
       extern exchange_function_t exchange_function;
       extern double exchange_interaction_range;
       extern double exchange_decay;
+
+      extern bool sublattice_materials; // flag to enable identification of atoms in simple crystals by material
 
       //-------------------------------------------------------------------------
       // Internal function declarations

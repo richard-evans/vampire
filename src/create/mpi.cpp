@@ -23,7 +23,7 @@
 #include "errors.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
-
+#include "vutil.hpp"
 
 
 #ifdef MPICF
@@ -125,8 +125,18 @@ namespace create{
          zlog << zTs() << "Copying halo atoms to other processors..." << std::endl;
          std::cout << "Copying halo atoms to other processors..." << std::flush;
 
+         // instantiate timers
+         vutil::vtimer_t timer;
+         vutil::vtimer_t mtimer;
+
          // Record initial number of atoms
          //const int num_local_atoms=catom_array.size();
+
+         // start timers
+         mtimer.start();
+         timer.start();
+
+         zlog << zTs() << "   Determining CPU ranges in x,y,z" << std::endl;
 
          // Populate atoms with correct cpuid
          for(unsigned int atom=0; atom < catom_array.size(); atom++){
@@ -162,6 +172,10 @@ namespace create{
             cpu_range_array2D[cpu][5]=cpu_range_array[6*cpu+5];
          }
 
+         timer.stop();
+
+         zlog << zTs() << "     Completed. Time taken: " << timer.elapsed_time() << " s" << std::endl;
+
          // Determine number of atoms on local CPU needed by other CPUs
          std::vector<int> num_send_atoms(vmpi::num_processors,0);
          std::vector<int> num_recv_atoms(vmpi::num_processors,0);
@@ -182,6 +196,11 @@ namespace create{
          const int sx = cs::total_num_unit_cells[0];
          const int sy = cs::total_num_unit_cells[1];
          const int sz = cs::total_num_unit_cells[2];
+
+         // start timer
+         timer.start();
+
+         zlog << zTs() << "   Determining atoms needed by remote CPUs" << std::endl;
 
          for(unsigned int atom=0;atom<catom_array.size();atom++){
             const double x = catom_array[atom].x;
@@ -248,6 +267,10 @@ namespace create{
             }
          }
 
+         timer.stop();
+
+         zlog << zTs() << "     Completed. Time taken: " << timer.elapsed_time() << " s" << std::endl;
+
          // Calulate number of virtual particles for each cpu
          for(int cpu=0;cpu<vmpi::num_processors;cpu++) num_send_atoms[cpu]=virtual_particle_array[cpu].size();
 
@@ -255,16 +278,24 @@ namespace create{
          std::vector<MPI_Status> stati(0);
          MPI_Request req;
 
-         // Send/receive number of boundary/halo atoms
-         for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+         zlog << zTs() << "   Sharing number of atoms to be sent/received from each CPU" << std::endl;
+         timer.start();
+
+         // Send/receive number of boundary/halo atoms (manual all-to-all - better as proper all to all)
+         /*for(int cpu=0;cpu<vmpi::num_processors;cpu++){
             requests.push_back(req);
             MPI_Isend(&num_send_atoms[cpu],1,MPI_INT,cpu,35, MPI_COMM_WORLD, &requests.back());
             requests.push_back(req);
             MPI_Irecv(&num_recv_atoms[cpu],1,MPI_INT,cpu,35, MPI_COMM_WORLD, &requests.back());
          }
-
          stati.resize(requests.size());
-         MPI_Waitall(requests.size(),&requests[0],&stati[0]);
+         MPI_Waitall(requests.size(),&requests[0],&stati[0]);*/
+
+         MPI_Alltoall(&num_send_atoms[0], 1, MPI_INT, &num_recv_atoms[0], 1, MPI_INT, MPI_COMM_WORLD);
+
+         timer.stop();
+
+         zlog << zTs() << "     Completed. Time taken: " << timer.elapsed_time() << " s" << std::endl;
 
          // Calculate total number of boundary and halo atoms on local CPU
          int num_halo_atoms=0;
@@ -332,6 +363,9 @@ namespace create{
       int send_index=0;
       int recv_index=0;
 
+      zlog << zTs() << "   Sending boundary atom data to all relevant CPUs" << std::endl;
+      timer.start();
+
       // Exchange boundary/halo data
       for(int cpu=0;cpu<vmpi::num_processors;cpu++){
          if(num_send_atoms[cpu]>0){
@@ -370,6 +404,10 @@ namespace create{
       stati.resize(requests.size());
       MPI_Waitall(requests.size(),&requests[0],&stati[0]);
 
+      timer.stop();
+
+      zlog << zTs() << "     Completed. Time taken: " << timer.elapsed_time() << " s" << std::endl;
+
       // Populate halo atoms with data
       for(int index=0;index<num_halo_atoms;index++){
          int atom = catom_array.size();
@@ -387,15 +425,18 @@ namespace create{
          catom_array[atom].uc_id = recv_mpi_uc_id_array[index];
       }
 
-      zlog << zTs() << "\tdone!" << std::endl;
+      // wait for everyone
+      vmpi::barrier();
+
+      mtimer.stop();
+
+      zlog << zTs() << "\tdone! Total time taken: " << mtimer.elapsed_time() << std::endl;
+
       if(vmpi::my_rank == 0){
          terminaltextcolor(GREEN);
          std::cout << "done!" << std::endl;
          terminaltextcolor(WHITE);
       }
-
-
-      vmpi::barrier();// wait for everyone
 
       return;
 
@@ -756,6 +797,18 @@ namespace create{
          // check calling of routine if error checking is activated
          if(err::check==true){std::cout << "vmpi::init_mpi_comms has been called" << std::endl;}
 
+         zlog << zTs() << "Initialising MPI communications..." << std::endl;
+         std::cout << "Initialising MPI communications..." << std::flush;
+
+         // instantiate timers
+         vutil::vtimer_t mtimer;
+
+         // Record initial number of atoms
+         //const int num_local_atoms=catom_array.size();
+
+         // start timers
+         mtimer.start();
+
          // Initialise array with number of transfers from and to all CPU's
          vmpi::recv_num_array.resize(vmpi::num_processors);
          vmpi::send_num_array.resize(vmpi::num_processors);
@@ -799,7 +852,7 @@ namespace create{
          std::vector<MPI_Status> stati(0);
          MPI_Request req;
 
-         for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+         /*for(int cpu=0;cpu<vmpi::num_processors;cpu++){
             requests.push_back(req);
             MPI_Isend(&vmpi::recv_num_array[cpu],1,MPI_INT,cpu,60, MPI_COMM_WORLD, &requests.back());
             requests.push_back(req);
@@ -807,7 +860,10 @@ namespace create{
          }
 
          stati.resize(requests.size());
-         MPI_Waitall(requests.size(),&requests[0],&stati[0]);
+         MPI_Waitall(requests.size(),&requests[0],&stati[0]);*/
+
+         // Get number of spins I need to send to each CPU
+         MPI_Alltoall(&vmpi::recv_num_array[0], 1, MPI_INT, &vmpi::send_num_array[0], 1, MPI_INT, MPI_COMM_WORLD);
 
          // Find total number of boundary atoms I need to send and calculate start index
          int num_boundary_swaps=0;
@@ -825,6 +881,16 @@ namespace create{
          // Send and receive atom numbers requested/to be sent
          requests.resize(0);
 
+         // post receieves from all processors in advance of data sending
+         for(int cpu=0;cpu<vmpi::num_processors;cpu++){
+            // check that i have at least one data point to receive
+            if(vmpi::send_num_array[cpu] > 0 ){
+               int rsi=vmpi::send_start_index_array[cpu];
+               requests.push_back(req);
+               MPI_Irecv(&vmpi::send_atom_translation_array[rsi],vmpi::send_num_array[cpu],MPI_INT,cpu,61, MPI_COMM_WORLD, &requests.back());
+            }
+         }
+
          for(int cpu=0;cpu<vmpi::num_processors;cpu++){
             // Pack remote atom number into 1D array
             //std::vector<int> recv_data(vmpi::recv_num_array[cpu]); // This is very BAD! isend returns immediately, but local array is detroyed = memory mess!
@@ -834,11 +900,16 @@ namespace create{
                int remote_atom_number=catom_array[local_atom_number].mpi_atom_number;
                recv_data[si+index]=remote_atom_number;
             }
-            int rsi=vmpi::send_start_index_array[cpu];
-            requests.push_back(req);
-            MPI_Isend(&recv_data[si],vmpi::recv_num_array[cpu],MPI_INT,cpu,61, MPI_COMM_WORLD, &requests.back());
-            requests.push_back(req);
-            MPI_Irecv(&vmpi::send_atom_translation_array[rsi],vmpi::send_num_array[cpu],MPI_INT,cpu,61, MPI_COMM_WORLD, &requests.back());
+            // check that i have at least one data point to send
+            if(vmpi::recv_num_array[cpu] > 0 ){
+               requests.push_back(req);
+               MPI_Isend(&recv_data[si],vmpi::recv_num_array[cpu],MPI_INT,cpu,61, MPI_COMM_WORLD, &requests.back());
+            }
+            // check that i have at least one data point to receive
+            /*if(vmpi::send_num_array[cpu] > 0 ){
+               requests.push_back(req);
+               MPI_Irecv(&vmpi::send_atom_translation_array[rsi],vmpi::send_num_array[cpu],MPI_INT,cpu,61, MPI_COMM_WORLD, &requests.back());
+            }*/
          }
 
          stati.resize(requests.size());
@@ -878,7 +949,19 @@ namespace create{
             }
          }
 
+         // wait for everyone
+         vmpi::barrier();
+
+         // stop the timer
+         mtimer.stop();
+
+         zlog << zTs() << "\tdone! Total time taken: " << mtimer.elapsed_time() << std::endl;
+         if(vmpi::my_rank == 0){
+            std::cout << "done!" << std::endl;
+         }
+
          return;
+
       }
 
    } // end of internal namespace

@@ -50,6 +50,7 @@ void build_kagome(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[0].x = 0.0;
    unit_cell.atom[0].y = 0.0;
    unit_cell.atom[0].z = 0.0;
+   unit_cell.atom[0].mat = uc::internal::sublattice_materials ? 0 : 0; // if sublattice material is defined, then identify at as same as ID
    unit_cell.atom[0].lc = 0;
    unit_cell.atom[0].hc = 0;
    unit_cell.atom[0].ni = 3;
@@ -57,6 +58,7 @@ void build_kagome(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[1].x = 1.0/3.0;
    unit_cell.atom[1].y = 0.0;
    unit_cell.atom[1].z = 0.0;
+   unit_cell.atom[1].mat = uc::internal::sublattice_materials ? 1 : 0; // if sublattice material is defined, then identify at as same as ID
    unit_cell.atom[1].lc = 1;
    unit_cell.atom[1].hc = 0;
    unit_cell.atom[1].ni = 3;
@@ -64,6 +66,7 @@ void build_kagome(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[2].x = 0.5;
    unit_cell.atom[2].y = 0.5;
    unit_cell.atom[2].z = 0.0;
+   unit_cell.atom[2].mat = uc::internal::sublattice_materials ? 2 : 0; // if sublattice material is defined, then identify at as same as ID
    unit_cell.atom[2].lc = 0;
    unit_cell.atom[2].hc = 0;
    unit_cell.atom[2].ni = 3;
@@ -71,6 +74,7 @@ void build_kagome(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[3].x = 5.0/6.0;
    unit_cell.atom[3].y = 0.5;
    unit_cell.atom[3].z = 0.0;
+   unit_cell.atom[3].mat = uc::internal::sublattice_materials ? 3 : 0; // if sublattice material is defined, then identify at as same as ID
    unit_cell.atom[3].lc = 3;
    unit_cell.atom[3].hc = 0;
    unit_cell.atom[3].ni = 3;

@@ -13,6 +13,7 @@ normalise.o \
 read.o \
 read_interactions.o \
 set_exchange_type.o \
+shells.o \
 sc.o \
 bcc.o \
 bcc110.o \

@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=44;
+	const int max_units=49;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -148,6 +148,12 @@ int init(){
 		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
       // New
       unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
+      unit[44]="Ohm-m";		conversion[44]=1.0; 			      type[44]="resistivity";		// Ohm metres
+
+      unit[45]="V";		   conversion[45]=1.0; 			      type[45]="potential";		// volts
+      unit[46]="mV";		   conversion[46]=1.0e-3; 			   type[46]="potential";		// Millivolts
+      unit[47]="uV";	    	conversion[47]=1.0e-6; 			   type[47]="potential";		// Microvolts
+      unit[48]="nV";		   conversion[48]=1.0e-9; 			   type[48]="potential";		// Nanovolts
 
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag

@@ -1,15 +1,16 @@
 #--------------------------------------------------------------
-#                 Makefile for sim module
+#          Makefile for spintransport module
 #--------------------------------------------------------------
 
 # List module object filenames
-sim_objects=\
+spintransport_objects =\
 data.o \
-increment_time.o \
+field.o \
 initialize.o \
-initialize_modules.o \
 interface.o \
-llg_quantum.o
+magnetization.o \
+resistance.o \
+update.o
 
 # Append module objects to global tree
-OBJECTS+=$(addprefix obj/simulate/,$(sim_objects))
+OBJECTS+=$(addprefix obj/spintransport/,$(spintransport_objects))

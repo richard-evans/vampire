@@ -21,6 +21,7 @@
 #include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
+#include "spintransport.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -29,7 +30,7 @@ namespace vout{
 	// Output Function 0
     std::string generic_output_int(std::string str,uint64_t i, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size_int); 
+      vout::fixed_width_output result(res,vout::fw_size_int);
       if(header){
            result << str;
         }
@@ -40,7 +41,7 @@ namespace vout{
     }
     std::string generic_output_double(std::string str,double d, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       if(header){
            result << str;
         }
@@ -72,7 +73,7 @@ namespace vout{
    // Output Function 4 - with Header
    void Hvec(std::ostream& stream, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       if(header) result << "B_vector_x" << "B_vector_y" << "B_vector_z";
       else result << sim::H_vec[0] << sim::H_vec[1] << sim::H_vec[2];
       stream << result.str();
@@ -160,7 +161,7 @@ namespace vout{
       if(vout::custom_precision){
          res.precision(vout::precision);
       }
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       if(header){
          result << "Tot_torque_x"
                 << "Tot_torque_y"
@@ -179,7 +180,7 @@ namespace vout{
       if(vout::custom_precision){
          res.precision(vout::precision);
       }
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       if(header){
          result << "Mean_torque_x"
                 << "Mean_torque_y"
@@ -206,7 +207,7 @@ namespace vout{
    // Output Function 18 - with Header
    void material_constraint_phi(std::ostream& stream, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::num_materials;mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_Con_phi";
@@ -221,7 +222,7 @@ namespace vout{
    // Output Function 19 - with Header
    void material_constraint_theta(std::ostream& stream, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::num_materials;mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_Con_theta";
@@ -239,7 +240,7 @@ namespace vout{
       if(vout::custom_precision){
          res.precision(vout::precision);
       }
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::num_materials;mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_Mean_tor_x"
@@ -272,7 +273,7 @@ namespace vout{
    // Output Function 23 - with Header
    void material_temperature(std::ostream& stream, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::material.size();mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_Temp";
@@ -287,7 +288,7 @@ namespace vout{
    // Output Function 24 - with Header
    void material_applied_field_strength(std::ostream& stream, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::material.size();mat++){
          if(header){
             result << "ID" + std::to_string(mat) + "_H";
@@ -302,7 +303,7 @@ namespace vout{
    // Output Function 25 - with Header
    void material_fmr_field_strength(std::ostream& stream, bool header){
       std::ostringstream res;
-      vout::fixed_width_output result(res,vout::fw_size); 
+      vout::fixed_width_output result(res,vout::fw_size);
 
       const double real_time=sim::time*mp::dt_SI;
 
@@ -481,4 +482,14 @@ namespace vout{
       stream << stats::material_energy.output_mean_energy(stats::total,header);
    }
 
+   // Output Function 65
+   void resistance(std::ostream& stream, bool header){
+      stream << generic_output_double("resistance", spin_transport::total_resistance, header);
+   }
+   // Output Function 66
+   void current(std::ostream& stream, bool header){
+      stream << generic_output_double("current", spin_transport::total_current, header);
+   }
+
+   // Output 67 reserved for voltage
 }

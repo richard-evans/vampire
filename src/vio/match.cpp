@@ -35,6 +35,7 @@
 #include "montecarlo.hpp"
 #include "random.hpp"
 #include "spintorque.hpp"
+#include "spintransport.hpp"
 #include "unitcell.hpp"
 
 // vio module headers
@@ -79,6 +80,7 @@ namespace vin{
         else if(montecarlo::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(spin_transport::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
 
@@ -1358,6 +1360,19 @@ namespace vin{
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
+        test="resistance";
+        if(word==test){
+           output_list.push_back(65);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="current";
+        if(word==test){
+           output_list.push_back(66);
+           return EXIT_SUCCESS;
+        }
+        // reserve 67 for voltage
+        //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;
@@ -2355,6 +2370,7 @@ namespace vin{
             else if(exchange::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+            else if(spin_transport::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
