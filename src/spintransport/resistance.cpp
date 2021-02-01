@@ -72,20 +72,20 @@ void calculate_magnetoresistance(){
             const double mjx = st::internal::cell_magnetization[3*cell+0] * jsat;
             const double mjy = st::internal::cell_magnetization[3*cell+1] * jsat;
             const double mjz = st::internal::cell_magnetization[3*cell+2] * jsat;
-
+            const double alpha = st::internal::cell_alpha[cell];
             const double mi_dot_mj = ( mix*mjx + miy*mjy + miz*mjz );
 
             // calculate resistance (need to include T dependence of Rep here)
             total_stack_resistance += Rep + 0.5*Rsp*(1.0 - mi_dot_mj);
 
             // calculate relavtive contributions of adiabatic and non-adiabatic spin torque
-            const double staj = st::internal::cell_slonczewski_aj[cell];
-            const double stbj = st::internal::cell_slonczewski_bj[cell];
+            const double strj = st::internal::cell_relaxation_torque_rj[cell];
+            const double stpj = st::internal::cell_precession_torque_pj[cell];
 
             // calculate field without current based on relative magnetization orientations
-            const double hx = staj*(mjy*miz - mjz*miy) + stbj*mix;
-            const double hy = staj*(mjz*mix - mjx*miz) + stbj*miy;
-            const double hz = staj*(mjx*miy - mjy*mix) + stbj*miz;
+            const double hx = (strj-alpha*stpj)*(mjy*miz - mjz*miy) + (stpj+alpha*strj)*mix;
+            const double hy = (strj-alpha*stpj)*(mjz*mix - mjx*miz) + (stpj+alpha*strj)*miy;
+            const double hz = (strj-alpha*stpj)*(mjx*miy - mjy*mix) + (stpj+alpha*strj)*miz;
 
             // save field (without current factor)
             st::internal::cell_spin_torque_fields[3*cell+0] = hx;

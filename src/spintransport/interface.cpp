@@ -204,7 +204,7 @@ namespace spin_transport{
          // Set resistivity for atom type
          double rho = vin::str_to_double(value);
          vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 1.0e-20, 1.0e20,"input","1E-20 - 1E20 Ohm metres");
-         st::internal::mp[super_index].resistivity = rho;
+         st::internal::mp[super_index].resistivity.set(rho);
          return true;
       }
       //---------------------------------------------------------------------------
@@ -216,7 +216,7 @@ namespace spin_transport{
          // Set resistivity for atom type
          double rho = vin::str_to_double(value);
          vin::check_for_valid_value(rho, word, line, prefix, unit, "resistivity", 0.0, 1.0e20,"input","0.0 - 1E20 Ohm metres");
-         st::internal::mp[super_index].spin_resistivity = rho;
+         st::internal::mp[super_index].spin_resistivity.set(rho);
          return true;
       }
       //---------------------------------------------------------------------------
@@ -228,6 +228,26 @@ namespace spin_transport{
          st::internal::mp[super_index].tunnel_barrier = true;
          return true;
       }*/
+      //------------------------------------------------------------
+      test  = "spin-transport-relaxation-torque";
+      // aj parameter for material in slonczewski torque calculation
+      if( word==test ){
+         double aj=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", -1.0e-2, 1.0e2,"input","-100 - 100T");
+         st::internal::mp[super_index].stt_rj.set(aj);
+         return true;
+      }
+      //------------------------------------------------------------
+      test = "spin-transport-precession-torque";
+      // bj parameter for material in slonczewski torque calculation
+      if( word==test ){
+         double bj=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", -1.0e-2, 1.0e2,"input","-100 - 100T");
+         st::internal::mp[super_index].stt_pj.set(bj);
+         return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

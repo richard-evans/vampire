@@ -39,14 +39,13 @@ namespace spin_transport{
                    const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
                    const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
                    const int num_materials,    // number of materials
-                   const std::vector<double>& slonczewski_aj, // material specific slonczewski_aj prefactor
-                   const std::vector<double>& slonczewski_bj, // material specific slonczewski_bj prefactor
                    const uint64_t num_atoms,   // number of atoms
                    const std::vector<int>& atoms_type_array, // material types of atoms
                    const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
                    const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
                    const std::vector<double>& atoms_z_coord_array, // z-coordinates of atoms
                    const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
+                   const std::vector<double>& material_damping_array, // array of material level damping constants
                    const std::vector<bool>& is_magnetic_material, // array of size num_mat to state whether material is magnetic (true) or not (false)
                    const std::vector<cs::nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
    );

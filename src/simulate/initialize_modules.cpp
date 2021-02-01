@@ -110,6 +110,7 @@ void initialize_modules(){
 
    // array of size num_mat to state whether material is magnetic (true) or not (false)
    std::vector<bool> is_magnetic_material(mp::num_materials);
+   std::vector<double> material_alpha_array(mp::num_materials, 0.0);
 
    // loop over all materials to identify non-magnetic ones
    for(int mat = 0 ; mat < mp::num_materials ; mat++){
@@ -119,20 +120,20 @@ void initialize_modules(){
       else{
          is_magnetic_material[mat] = true;
       }
+      material_alpha_array[mat] = mp::material[mat].alpha;
    }
 
    spin_transport::initialize(cs::system_dimensions[0],
                               cs::system_dimensions[1],
                               cs::system_dimensions[2],
                               mp::num_materials,
-                              sim::slonczewski_aj,
-                              sim::slonczewski_bj,
                               num_local_atoms,
                               atoms::type_array,
                               atoms::x_coord_array,
                               atoms::y_coord_array,
                               atoms::z_coord_array,
                               atoms::m_spin_array,
+                              material_alpha_array,
                               is_magnetic_material,
                               cs::non_magnetic_atoms_array);
 

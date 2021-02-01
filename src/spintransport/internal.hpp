@@ -34,7 +34,30 @@ namespace spin_transport{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
+      // simple initialised class for set variables
+      class set_double_t{
 
+      private:
+         double value; // value
+         bool setf; // flag specifiying variable has been set
+
+      public:
+         // class functions
+         // constructor
+         set_double_t() : value(0.0), setf(false) { }
+
+         // setting function
+         void set(double in_value){
+            value = in_value;
+            setf = true;
+         };
+
+         // get value function
+         double get(){ return value; };
+         // check if variable is set
+         bool is_set(){ return setf; };
+
+      };
       //-----------------------------------------------------------------------------
       // materials class for storing exchange material parameters
       //-----------------------------------------------------------------------------
@@ -47,15 +70,17 @@ namespace spin_transport{
             //----------------
             // variables
             //----------------
-            double resistivity;      // spin-independent resistivity (Ohm m)
-            double spin_resistivity; // spin-dependent resistivity (Ohm m)
+            set_double_t resistivity;      // spin-independent resistivity (Ohm m)
+            set_double_t spin_resistivity; // spin-dependent resistivity (Ohm m)
+            set_double_t stt_rj;           // spin transport relaxation torque
+            set_double_t stt_pj;           // spin transport precession torque
 
             // constructor
-            mp_t (const unsigned int max_materials = 100):
-            	resistivity(1.68e-8),     // default value is for copper (Cu)
-               spin_resistivity(0.0)     // default value is for copper (Cu)
-            {
-
+            mp_t (const unsigned int max_materials = 100) {
+               resistivity.set(1.68e-8); // default value is for copper (Cu)
+               spin_resistivity.set(0.0); // default value is for copper (Cu)
+               stt_rj.set(0.0); // default value is for copper (Cu)
+               stt_pj.set(0.0); // default value is for copper (Cu)
             }; // end of constructor
 
       }; // end of exchange::internal::mp class
@@ -102,12 +127,13 @@ namespace spin_transport{
 
       // arrays to store cell properties
       extern std::vector <bool> magnetic;                    // boolean array to determine if cell is magnetic or not
+      extern std::vector <double> cell_alpha;                // cell magnetization (average of constituent atoms)
       extern std::vector <double> cell_magnetization;        // 3N normalised magnetization in each cell
       extern std::vector <double> cell_isaturation;          // inverse magnetic saturation at T=0 in each cell
       extern std::vector <double> cell_position;             // 3N array of cell positions (origin)
       extern std::vector <double> cell_spin_torque_fields;   // 3N array of cell spin torque fields
-      extern std::vector <double> cell_slonczewski_aj;       // cell specific prefactors for spin-torque aJ
-      extern std::vector <double> cell_slonczewski_bj;       // cell specific prefactors for spin-torque bJ
+      extern std::vector <double> cell_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
+      extern std::vector <double> cell_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
 
       // array to store which cell each atom is in
       extern std::vector <unsigned int> atom_in_cell;

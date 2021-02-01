@@ -37,14 +37,13 @@ namespace spin_transport{
                    const double system_size_y, // maximum dimensions of system along y-direction (angstroms)
                    const double system_size_z, // maximum dimensions of system along z-direction (angstroms)
                    const int num_materials,    // number of materials
-                   const std::vector<double>& slonczewski_aj, // material specific slonczewski_aj prefactor
-                   const std::vector<double>& slonczewski_bj, // material specific slonczewski_bj prefactor
                    const uint64_t num_atoms,   // number of local atoms
                    const std::vector<int>& atoms_type_array, // material types of atoms
                    const std::vector<double>& atoms_x_coord_array, // x-coordinates of atoms
                    const std::vector<double>& atoms_y_coord_array, // y-coordinates of atoms
                    const std::vector<double>& atoms_z_coord_array, // z-coordinates of atoms
                    const std::vector<double>& atoms_m_spin_array,  // moments of atoms (muB)
+                   const std::vector<double>& material_damping_array, // array of material level damping constants
                    const std::vector<bool>& is_magnetic_material, // array of size num_mat to state whether material is magnetic (true) or not (false)
                    const std::vector<cs::nm_atom_t> non_magnetic_atoms_array // list of non-magnetic atoms
    ){
@@ -83,7 +82,7 @@ namespace spin_transport{
       zlog << zTs() << "Initializing spin transport module" << std::endl;
 
       // If st material parameters uninitialised then initialise with default parameters
-      if(spin_transport::internal::mp.size() == 0){
+      if(spin_transport::internal::mp.size() != num_materials){
          spin_transport::internal::mp.resize(num_materials);
       }
 
@@ -239,12 +238,15 @@ namespace spin_transport{
       st::internal::cell_resistance.resize(st::internal::total_num_cells,0.0); // also stores accumulated resistance before averaging
       st::internal::cell_spin_resistance.resize(st::internal::total_num_cells,0.0); // also stores accumulated spin resistance before averaging
 
+      // resize array to store average damping constant alpha in each cell
+      st::internal::cell_alpha.resize(st::internal::total_num_cells,0.0); // also stores accumulated resistance before averaging
+
       // resize array to store inverse total moment m_s (T = 0)
       st::internal::cell_isaturation.resize(st::internal::total_num_cells,1.0); // also stores accumulated moment before inversion
 
       // resize arrays to store slonczewski prefactors
-      st::internal::cell_slonczewski_aj.resize(st::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
-      st::internal::cell_slonczewski_bj.resize(st::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
+      st::internal::cell_relaxation_torque_rj.resize(st::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
+      st::internal::cell_precession_torque_pj.resize(st::internal::total_num_cells,0.0); // also stores accumulated parameters before averaging
 
       // Temporary arrays to accumulate intermediate values
       std::vector<uint64_t> total_num_atoms_in_cell(    st::internal::total_num_cells, 0  ); // array to store total number of magnetic and non-magnetic atoms in cell
@@ -282,8 +284,9 @@ namespace spin_transport{
                double spin_resistivity = 0.0;
                double spin_resistivity_sq = 0.0;
                double total_moment = 0.0;
-               double total_aj = 0.0; // spin torque prefactor parameter
-               double total_bj = 0.0; // spin torque prefactor parameter
+               double total_alpha = 0.0; // damping constant
+               double total_rj = 0.0; // spin torque prefactor parameter
+               double total_pj = 0.0; // spin torque prefactor parameter
 
                // check for cells with only non-magnetic atoms = keep
                uint64_t num_magnetic_atoms = 0.0; // counter for number of actually magnetic atoms
@@ -296,10 +299,10 @@ namespace spin_transport{
                   int mat = atoms_type_array[atomID]; // get material type
 
                   // add resistivities
-                  resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
-                  resistivity_sq += st::internal::mp[mat].resistivity * st::internal::mp[mat].resistivity; // add resistivity^2 to total
-                  spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
-                  spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
+                  resistivity += st::internal::mp[mat].resistivity.get(); // add resistivity to total
+                  resistivity_sq += st::internal::mp[mat].resistivity.get() * st::internal::mp[mat].resistivity.get(); // add resistivity^2 to total
+                  spin_resistivity += st::internal::mp[mat].spin_resistivity.get(); // add spin resistivity to total
+                  spin_resistivity_sq += st::internal::mp[mat].spin_resistivity.get() * st::internal::mp[mat].spin_resistivity.get(); // add spin resistivity^2 to total
 
                   // check that atom is magnetic
                   if(is_magnetic_material[mat] == true){
@@ -309,10 +312,11 @@ namespace spin_transport{
 
                      // calculate total moment
                      total_moment += atoms_m_spin_array[atomID];
+                     total_alpha  += material_damping_array[mat];
 
                      // calculate total prefactor parameters
-                     total_aj += slonczewski_aj[mat];
-                     total_bj += slonczewski_bj[mat];
+                     total_rj += st::internal::mp[mat].stt_rj.get();
+                     total_pj += st::internal::mp[mat].stt_pj.get();
 
                   }
 
@@ -321,18 +325,19 @@ namespace spin_transport{
                // non-magnetic (remove) atoms
                for(unsigned int atom = 0; atom < cells3D[i][j][k].nm_atom.size(); atom++ ){
                   int mat = non_magnetic_atoms_array[atom].mat; // get material type
-                  resistivity += st::internal::mp[mat].resistivity; // add resistivity to total
-                  resistivity_sq += st::internal::mp[mat].resistivity * st::internal::mp[mat].resistivity; // add resistivity^2 to total
-                  spin_resistivity += st::internal::mp[mat].spin_resistivity; // add spin resistivity to total
-                  spin_resistivity_sq += st::internal::mp[mat].spin_resistivity * st::internal::mp[mat].spin_resistivity; // add spin resistivity^2 to total
+                  resistivity += st::internal::mp[mat].resistivity.get(); // add resistivity to total
+                  resistivity_sq += st::internal::mp[mat].resistivity.get() * st::internal::mp[mat].resistivity.get(); // add resistivity^2 to total
+                  spin_resistivity += st::internal::mp[mat].spin_resistivity.get(); // add spin resistivity to total
+                  spin_resistivity_sq += st::internal::mp[mat].spin_resistivity.get() * st::internal::mp[mat].spin_resistivity.get(); // add spin resistivity^2 to total
                }
 
                // save accumulated values
                st::internal::cell_resistance[cell] = resistivity;
                st::internal::cell_spin_resistance[cell] = spin_resistivity;
-               st::internal::cell_slonczewski_aj[cell] = total_aj;
-               st::internal::cell_slonczewski_bj[cell] = total_bj;
+               st::internal::cell_relaxation_torque_rj[cell] = total_rj;
+               st::internal::cell_precession_torque_pj[cell] = total_pj;
                st::internal::cell_isaturation[cell] = total_moment; // (mu_B)
+               st::internal::cell_alpha[cell] = total_alpha; // total damping
 
                total_num_atoms_in_cell[cell]    = num_atoms_in_cell;    // store total number of magnetic and non-magnetic atoms in cell
                total_num_magnetic_atoms[cell]   = num_magnetic_atoms;   // store total number of magnetic atoms in cell in double format for normalisation
@@ -350,15 +355,16 @@ namespace spin_transport{
          // cast to int for MPI
          int bufsize = st::internal::total_num_cells;
          // reduce all cell totals onto all processors
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_resistance[0],      bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_resistance[0], bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_slonczewski_aj[0],  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_slonczewski_bj[0],  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_isaturation[0],     bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &total_num_magnetic_atoms[0],           bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &total_num_atoms_in_cell[0],            bufsize, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &total_resistivity_sq[0],               bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &total_spin_resistivity_sq[0],          bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_resistance[0],             bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_spin_resistance[0],        bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_relaxation_torque_rj[0],   bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_precession_torque_pj[0],   bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_isaturation[0],            bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &st::internal::cell_alpha[0],                  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &total_num_magnetic_atoms[0],                  bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &total_num_atoms_in_cell[0],                   bufsize, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &total_resistivity_sq[0],                      bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &total_spin_resistivity_sq[0],                 bufsize, MPI_DOUBLE,   MPI_SUM, MPI_COMM_WORLD);
       #endif
 
       //-----------------------------------------------------------------------------------------------
@@ -404,8 +410,9 @@ namespace spin_transport{
                      // calculate mean spin torque prefactor parameters for magnetic cells
                      const double count = total_num_magnetic_atoms[cell]; // number of magnetic atoms in cell
                      const double total_moment = st::internal::cell_isaturation[cell]; // total magnetic moment
-                     st::internal::cell_slonczewski_aj[cell] = st::internal::cell_slonczewski_aj[cell] * one_o_gamma_e / (count * total_moment);
-                     st::internal::cell_slonczewski_bj[cell] = st::internal::cell_slonczewski_bj[cell] * one_o_gamma_e / (count * total_moment);
+                     st::internal::cell_relaxation_torque_rj[cell] = st::internal::cell_relaxation_torque_rj[cell] * one_o_gamma_e / (count * total_moment);
+                     st::internal::cell_precession_torque_pj[cell] = st::internal::cell_precession_torque_pj[cell] * one_o_gamma_e / (count * total_moment);
+                     st::internal::cell_alpha[cell] = st::internal::cell_alpha[cell] / count;
                   }
 
                   // calculate average resistivity
@@ -534,6 +541,7 @@ namespace spin_transport{
                      st::internal::cell_magnetization[3*i+0] << "\t" <<
                      st::internal::cell_magnetization[3*i+1] << "\t" <<
                      st::internal::cell_magnetization[3*i+2] << "\t" <<
+                     st::internal::cell_alpha[i] << "\t" <<
                      st::internal::cell_resistance[i] << "\t" <<
                      st::internal::cell_spin_resistance[i] << std::endl;
          }

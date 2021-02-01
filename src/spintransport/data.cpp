@@ -66,12 +66,13 @@ namespace spin_transport{
 
       // arrays to store cell properties
       std::vector <bool> magnetic;                    // boolean array to determine if cell is magnetic or not
+      std::vector <double> cell_alpha;                // cell magnetization (average of constituent atoms)
       std::vector <double> cell_magnetization;        // 3N normalised magnetization in each cell
       std::vector <double> cell_isaturation;          // inverse magnetic saturation at T=0 in each cell
       std::vector <double> cell_position;             // 3N array of cell positions (origin)
       std::vector <double> cell_spin_torque_fields;   // 3N array of cell spin torque fields
-      std::vector <double> cell_slonczewski_aj;       // cell specific prefactors for spin-torque aJ
-      std::vector <double> cell_slonczewski_bj;       // cell specific prefactors for spin-torque bJ
+      std::vector <double> cell_relaxation_torque_rj; // cell specific prefactors for spin-torque relaxation bj
+      std::vector <double> cell_precession_torque_pj; // cell specific prefactors for spin-torque precession aj
 
       // array to store which cell each atom is in
       std::vector <unsigned int> atom_in_cell;

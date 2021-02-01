@@ -28,9 +28,6 @@ namespace sim{
    uint64_t partial_time = 1000; // same as time-step-increment
    uint64_t equilibration_time = 0; // equilibration time steps
 
-   std::vector<double> slonczewski_aj; // array of adiabatic spin torques
-   std::vector<double> slonczewski_bj; // array of non-adiabatic spin torques
-
    namespace internal{
       //----------------------------------------------------------------------------
       // Shared variables used within sim module
