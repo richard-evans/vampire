@@ -118,6 +118,7 @@ namespace vout{
    void material_mean_total_energy(std::ostream& stream,bool header);
    void resistance(std::ostream& stream, bool header);
    void current(std::ostream& stream, bool header);
+   void domain_wall_position(std::ostream& stream,bool header);
 
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp

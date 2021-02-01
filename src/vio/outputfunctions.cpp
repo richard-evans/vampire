@@ -486,10 +486,15 @@ namespace vout{
    void resistance(std::ostream& stream, bool header){
       stream << generic_output_double("resistance", spin_transport::total_resistance, header);
    }
+
    // Output Function 66
    void current(std::ostream& stream, bool header){
       stream << generic_output_double("current", spin_transport::total_current, header);
    }
 
-   // Output 67 reserved for voltage
+   // Output Function 67
+   void domain_wall_position(std::ostream& stream, bool header){
+      stream << sim::domain_wall_centre;
+   }
+
 }

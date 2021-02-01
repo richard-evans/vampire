@@ -255,16 +255,19 @@ namespace vout{
       		break;
 			case 63:
 				vout::material_total_energy(stream,header);
-			break;
+				break;
 			case 64:
 				vout::material_mean_total_energy(stream,header);
-			break;
+				break;
 			case 65:
 				vout::resistance(stream, header);
 			  	break;
 			case 66:
 			  	vout::current(stream, header);
 			  	break;
+			case 67:
+				vout::domain_wall_position(stream,header);
+				break;
 			case 999: //AJN
 				vout::standard_deviation(stream,header);
 				break;

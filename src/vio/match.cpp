@@ -414,6 +414,11 @@ namespace vin{
                 sim::program=51;
                 return EXIT_SUCCESS;
             }
+            test="domain-wall";
+            if(value==test){
+                sim::program=52;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
@@ -1371,8 +1376,14 @@ namespace vin{
            output_list.push_back(66);
            return EXIT_SUCCESS;
         }
-        // reserve 67 for voltage
         //--------------------------------------------------------------------
+        test="domain-wall-centre";
+        if(word==test){
+            output_list.push_back(67);
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        // reserve 68 for voltage
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;
