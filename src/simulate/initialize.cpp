@@ -22,10 +22,12 @@ namespace sim{
    void initialize(int num_materials){
 
       // unroll slonczewski spin transfer torque arrays
+      sim::internal::stt_asm.resize(num_materials,0.0);
       sim::internal::stt_rj.resize(num_materials,0.0);
       sim::internal::stt_pj.resize(num_materials,0.0);
 
       // unroll spin orbit torque arrays
+      sim::internal::sot_asm.resize(num_materials,0.0);
       sim::internal::sot_rj.resize(num_materials,0.0);
       sim::internal::sot_pj.resize(num_materials,0.0);
 
