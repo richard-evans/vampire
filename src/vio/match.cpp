@@ -963,7 +963,7 @@ namespace vin{
         test="fmr-field-frequency";
         if(word==test){
             double w = atof(value.c_str());
-            check_for_valid_value(w, word, line, prefix, unit, "none", 0.0, 1.0e4,"input","0 - 10,000 GHz");
+            check_for_valid_value(w, word, line, prefix, unit, "frequency", 0.0, 1.0e14,"input","0 - 10,000 GHz");
             sim::fmr_field_frequency = w;
             return EXIT_SUCCESS;
         }
@@ -2222,53 +2222,21 @@ namespace vin{
             //--------------------------------------------------------------------
             test="fmr-field-strength";
             if(word==test){
-                double H=atof(value.c_str());
-                // test for unit
-                string unit_type="field";
-                // if no unit given, assume internal
-                if(unit.size() != 0){
-                    units::convert(unit,H,unit_type);
-                }
-                string str="field";
-                if(unit_type==str){
-                    // Test for valid range
-                    if((H>=0.0) && (H<1.0E5)){
-                        read_material[super_index].applied_field_strength=H;
-                        // set local fmr flag
-                        sim::local_fmr_field=true;
-                        return EXIT_SUCCESS;
-                    }
-                    else{
-                        terminaltextcolor(RED);
-                        std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E5" << std::endl;
-                        terminaltextcolor(WHITE);
-                        err::vexit();
-                    }
-                }
-                else{
-                    terminaltextcolor(RED);
-                    std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
-                    terminaltextcolor(WHITE);
-                    err::vexit();
-                }
+               double H = atof(value.c_str());
+               check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e5,"material","0 - 10,000 T");
+               read_material[super_index].fmr_field_strength=H;
+               // set local fmr flag
+               sim::local_fmr_field=true;
+               return EXIT_SUCCESS;
             }
             //--------------------------------------------------------------------
             test="fmr-field-frequency";
-            if(word==test){
-                double f=atof(value.c_str());
-                // Test for valid range
-                if((f>=0.0) && (f<1.0E20)){
-                    read_material[super_index].fmr_field_frequency=f;
-                    // set local fmr flag
-                    sim::local_fmr_field=true;
-                    return EXIT_SUCCESS;
-                }
-                else{
-                    terminaltextcolor(RED);
-                    std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E20" << std::endl;
-                    terminaltextcolor(WHITE);
-                    err::vexit();
-                }
+            if( word == test ){
+               double f = atof(value.c_str());
+               check_for_valid_value(f, word, line, prefix, unit, "frequency", 0.0, 1.0e14,"material","0 - 10,000 GHz");
+               read_material[super_index].fmr_field_frequency = f;
+               sim::local_fmr_field = true;
+               return EXIT_SUCCESS;
             }
             //------------------------------------------------------------
             test="fmr-field-unit-vector";

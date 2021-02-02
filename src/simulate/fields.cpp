@@ -397,7 +397,7 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 
 	// Calculate fmr constants
 	const double real_time = sim::time*mp::dt_SI;
-	const double omega = sim::fmr_field_frequency*1.e9; // Hz
+	const double omega = sim::fmr_field_frequency; // Hz
 	const double Hfmrx = sim::fmr_field_unit_vector[0];
 	const double Hfmry = sim::fmr_field_unit_vector[1];
 	const double Hfmrz = sim::fmr_field_unit_vector[2];
@@ -416,11 +416,12 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 
 		// Loop over all materials
 		for(unsigned int mat=0;mat<mp::material.size();mat++){
-			const double Hsinwt_local=mp::material[mat].fmr_field_strength*sin(2.0*M_PI*real_time*mp::material[mat].fmr_field_frequency);
+			const double Hsinwt_local = mp::material[mat].fmr_field_strength * sin( 2.0 * M_PI * real_time * mp::material[mat].fmr_field_frequency );
 
 			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[0]);
 			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[1]);
 			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[2]);
+
 		}
 
 		// Add local field AND global field
