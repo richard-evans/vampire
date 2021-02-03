@@ -29,10 +29,12 @@ namespace vdc{
    //---------------------------------------------------------------------------
    void initialise_cells(){
 
+      if(vdc::verbose) std::cout << "Initialising cell data and allocating atoms to cells..." << std::flush;
+
       double atoms_min[3] = { 1.0e123, 1.0e123, 1.0e123 };
       double atoms_max[3] = { 0.0, 0.0, 0.0 };
 
-      const double cell_size = 10.0; // cell size (angstroms)
+      const double cell_size = vdc::cell_size; // cell size (angstroms)
 
       // calculate minima and maxima
       for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
@@ -72,13 +74,8 @@ namespace vdc{
       // total number of materials + 1
       const unsigned int tmid = 1+vdc::materials.size();
 
-      vdc::cell_coords.resize(3*total_cells, 0.0);
-      vdc::cell_magnetization.resize(total_cells);
-      for(unsigned int i = 0; i < vdc::total_cells; i++){
-         vdc::cell_magnetization[i].resize(tmid);
-         // stored as mx, my, mz, |m| sets
-         for(unsigned int j=0; j< tmid; j++) vdc::cell_magnetization[i][j].resize(4,0.0); // initialise cell magnetization to zero
-      }
+      // arrays to store initial cell corrdinates
+      std::vector<double> init_cell_coords(3*total_cells, 0.0);
 
       // allocate cell memory in 3D and store 1D cell id
       int cell = 0;
@@ -96,9 +93,9 @@ namespace vdc{
                supercell_array[i][j][k]=cell;
 
                // calculate cell coordinates
-               cell_coords[3*cell + 0] = (double(i) + 0.0) * cell_size;
-               cell_coords[3*cell + 1] = (double(j) + 0.0) * cell_size;
-               cell_coords[3*cell + 2] = (double(k) + 0.0) * cell_size;
+               init_cell_coords[3*cell + 0] = (double(i) + 0.0) * cell_size;
+               init_cell_coords[3*cell + 1] = (double(j) + 0.0) * cell_size;
+               init_cell_coords[3*cell + 2] = (double(k) + 0.0) * cell_size;
 
                // increment cell number
                cell++;
@@ -112,7 +109,12 @@ namespace vdc{
       // Determine number of cells in x,y,z
       const unsigned int d[3] = { num_cells[0], num_cells[1], num_cells[2] };
 
+      // calculate number of atoms in each cell
+      std::vector<unsigned int> init_num_atoms_in_cell(vdc::total_cells);
+
+      //------------------------------------------------------------------------
       // Assign atoms to cells
+      //------------------------------------------------------------------------
       for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID
@@ -129,10 +131,66 @@ namespace vdc{
                         int( c[2] / cell_size ) };
 
          // Assign atom to cell
-         vdc::atom_cell_id[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
+         int cellid = supercell_array[scc[0]][scc[1]][scc[2]];
+         vdc::atom_cell_id[atom] = cellid;
 
+         // accumulate number of atoms in each cell
+         init_num_atoms_in_cell[cellid]++;
 
       }
+
+      // accumulate total number of cells with atoms
+      unsigned num_cells_with_atoms = 0;
+
+      // determine old and new cell numbers (default is number of cells, out of range)
+      std::vector<unsigned int> new_cell_number(total_cells, total_cells);
+
+      for( unsigned int cell = 0; cell < total_cells; cell++){
+         if( init_num_atoms_in_cell[cell] > 0){
+
+            // save new cell number for this cell
+            new_cell_number[cell] = num_cells_with_atoms;
+
+            // save cell coordinates
+            vdc::cell_coords.push_back( init_cell_coords[3*cell + 0] );
+            vdc::cell_coords.push_back( init_cell_coords[3*cell + 1] );
+            vdc::cell_coords.push_back( init_cell_coords[3*cell + 2] );
+
+            // save number of atoms in final cell array
+            vdc::num_atoms_in_cell.push_back(init_num_atoms_in_cell[cell]);
+
+            // increment number of cells;
+            num_cells_with_atoms++;
+
+         }
+      }
+
+      // determine new cell numbers for each atom
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+         const unsigned int old_cell = vdc::atom_cell_id[i];
+         const unsigned int new_cell = new_cell_number[old_cell];
+
+         // check that new cell number is less than total number of cells with atoms
+         if(new_cell < num_cells_with_atoms){
+            vdc::atom_cell_id[i] = new_cell;
+         }
+         else{
+            std::cerr << "Error - new cell ID " << new_cell << " is larger than number of cells " << num_cells_with_atoms << " with atoms in cell initialisation." << std::endl;
+         }
+
+      }
+
+      // Now redfine total number of atoms
+      vdc::total_cells = num_cells_with_atoms;
+
+      vdc::cell_magnetization.resize(vdc::total_cells);
+      for(unsigned int i = 0; i < vdc::total_cells; i++){
+         vdc::cell_magnetization[i].resize(tmid);
+         // stored as mx, my, mz, |m| sets
+         for(unsigned int j=0; j< tmid; j++) vdc::cell_magnetization[i][j].resize(4,0.0); // initialise cell magnetization to zero
+      }
+
+      if(vdc::verbose) std::cout << " done!" << std::endl;
 
       return;
 
@@ -192,7 +250,9 @@ namespace vdc{
             const double mm = vdc::cell_magnetization[cell][m][3];
 
             const double norm = sqrt(mx*mx + my*my + mz*mz);
-            const double inorm = 1.0/norm;
+
+            // calculate inverse norm if norm is greater than 1e-9, otherwise zero
+            const double inorm = norm < 1.0e-9 ? 0.0 : 1.0/norm;
 
             vdc::cell_magnetization[cell][m][0] = mx*inorm;
             vdc::cell_magnetization[cell][m][1] = my*inorm;
@@ -201,7 +261,7 @@ namespace vdc{
             // set magnetization of final cell to actual magnetization in mu_B
             if(m == tmid -1) vdc::cell_magnetization[cell][m][3] = norm; // mu_B
             // Otherwise normalise for material magnetization
-            else vdc::cell_magnetization[cell][m][3] = norm/mm; // m/m_s
+            else mm < 1.0e-9 ? 0.0 : vdc::cell_magnetization[cell][m][3] = norm/mm; // m/m_s
 
          }
 	 }
@@ -221,11 +281,18 @@ namespace vdc{
 
       ofile.open(cell_file_name.c_str());
 
+      // write header
+      ofile << "#cellx\tcelly\tcellz\t";
+      for( unsigned int m = 0; m < tmid-1; m++) ofile << "m"<< m << "mx\t" << "m"<< m << "my\t" << "m"<< m << "mz\t" <<  "m"<< m << "|m|\t";
+      ofile << "tot_mx\t" << "tot_my\t" << "tot_mz\t" << "tot_m(muB)\t";
+      ofile << "num_atoms" << std::endl;
+
       for( unsigned int cell = 0; cell < total_cells; cell++){
          ofile << vdc::cell_coords[3*cell + 0] << "\t" << vdc::cell_coords[3*cell + 1] << "\t" << vdc::cell_coords[3*cell + 2] << "\t";
          for( unsigned int m = 0; m < tmid; m++){
             ofile << vdc::cell_magnetization[cell][m][0] << "\t" << vdc::cell_magnetization[cell][m][1] << "\t" << vdc::cell_magnetization[cell][m][2] << "\t" << vdc::cell_magnetization[cell][m][3] << "\t";
          }
+         ofile << num_atoms_in_cell[cell];
          ofile << "\n";
 
          // output new lines after each row of x,y,z for gnuplot compatible data (to be fixed)

@@ -76,12 +76,14 @@ namespace vdc{
    std::vector<double> nm_coordinates(0);
 
    // cell data
+   double cell_size = 10.0; // Angstroms
    unsigned int total_cells = 0;
    unsigned int nx_cells = 1;
    unsigned int ny_cells = 1;
    unsigned int nz_cells = 1;
 
    std::vector<int> atom_cell_id;
+   std::vector<int> num_atoms_in_cell;
    std::vector<double> cell_coords;
    std::vector< std::vector< std::vector <double> > > cell_magnetization;
 

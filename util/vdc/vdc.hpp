@@ -86,12 +86,15 @@ namespace vdc{
    extern std::vector<int> nm_type;
    extern std::vector<double> nm_coordinates;
 
+   // cell data
+   extern double cell_size; // Angstroms
    extern unsigned int total_cells;
    extern unsigned int nx_cells;
    extern unsigned int ny_cells;
    extern unsigned int nz_cells;
 
    extern std::vector<int> atom_cell_id;
+   extern std::vector<int> num_atoms_in_cell;
    extern std::vector<double> cell_coords;
    extern std::vector< std::vector< std::vector <double> > > cell_magnetization;
 
@@ -126,7 +129,7 @@ namespace vdc{
    void output_ssc_file(unsigned int spin_file_id);
    void output_txt_file(unsigned int spin_file_id);
 
-   void initialise_ssc();   
+   void initialise_ssc();
    void output_average_ssc_file();
 
    void initialise_cells();
