@@ -61,6 +61,11 @@ namespace vdc{
       unsigned int ny = ceil( (atoms_max[1] - atoms_min[1])/cell_size );
       unsigned int nz = ceil( (atoms_max[2] - atoms_min[2])/cell_size );
 
+      // check for zero cell size and ensure a minimum of 1 cell in x,y,z
+      if( nx == 0 ) nx = 1;
+      if( ny == 0 ) ny = 1;
+      if( nz == 0 ) nz = 1;
+
       // save in vdc namespace for calculating newlines for gnuplot compatible 3d data
       vdc::nx_cells = nx;
       vdc::ny_cells = ny;
@@ -129,6 +134,14 @@ namespace vdc{
          int scc[3] = { int( c[0] / cell_size ),
                         int( c[1] / cell_size ),
                         int( c[2] / cell_size ) };
+
+         // check super cell coordinates are in range
+         /*bool error = false;
+         for(int j=0; j<3; j++) if(scc[j] >= d[j]) error=true;
+         if(error){
+            std::cout << "Error! super cell coordinates " << scc[0] << "," << scc[1] << "," << scc[2] << " are out of maximum compute range " << d[0] << "," << d[1] << "," << d[2] << std::endl;
+            exit(1);
+         }*/
 
          // Assign atom to cell
          int cellid = supercell_array[scc[0]][scc[1]][scc[2]];
