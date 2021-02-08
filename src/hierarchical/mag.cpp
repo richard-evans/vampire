@@ -11,6 +11,7 @@
 
 // C++ standard library headers
 #include <cstdlib>
+#include <iostream>
 
 // Vampire headers
 #include "cells.hpp" // needed for dp::cell_id_array but to be removed
@@ -22,6 +23,7 @@
 
 // alias internal hierarchical namespace for brevity
 namespace ha = hierarchical::internal;
+using namespace std;
 
 namespace hierarchical{
 namespace internal{
@@ -45,29 +47,29 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
       // get cell ID for global array
       const int cell = cells::cell_id_array[cell_index];
 
-      ha::mag_array_x[cell] = 0.0;
-      ha::mag_array_y[cell] = 0.0;
-      ha::mag_array_z[cell] = 0.0;
+      ha::mag_array_x[cell] = cells::mag_array_x[cell];
+      ha::mag_array_y[cell] = cells::mag_array_y[cell];
+      ha::mag_array_z[cell] = cells::mag_array_z[cell];
 
    }
 
    // calculate total moment in each local cell looping over local atoms
-   for(int atom = 0; atom < vmpi::num_local_atoms; ++atom) {
-
-      // get cell_ID for atom
-      const int cell = cells::atom_cell_id_array[atom];
-
-      // copy spin moment to temporary variable for performance
-      const double mus = m_spin_array[atom];
-
-      // Consider only magnetic elements
-      if( magnetic[atom] ){
-         ha::mag_array_x[cell] += x_spin_array[atom] * mus;
-         ha::mag_array_y[cell] += y_spin_array[atom] * mus;
-         ha::mag_array_z[cell] += z_spin_array[atom] * mus;
-      }
-
-   }
+   // for(int atom = 0; atom < vmpi::num_local_atoms; ++atom) {
+   //
+   //    // get cell_ID for atom
+   //    const int cell = cells::atom_cell_id_array[atom];
+   //
+   //    // copy spin moment to temporary variable for performance
+   //    const double mus = m_spin_array[atom];
+   //
+   //    // Consider only magnetic elements
+   //    if( magnetic[atom] ){
+   //       ha::mag_array_x[cell] += x_spin_array[atom] * mus;
+   //       ha::mag_array_y[cell] += y_spin_array[atom] * mus;
+   //       ha::mag_array_z[cell] += z_spin_array[atom] * mus;
+   //    }
+   //
+   // }
 
    //--------------------------------------------------------------------------------------
    // loop over all hierarchical levels, computing partial cell magnetizations at level L
@@ -102,6 +104,7 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
             ha::mag_array_z[cell] += ha::mag_array_z[subcell];
 
          }
+      //   std::cout << ha::mag_array_x[cell] << '\t' << ha::mag_array_y[cell] << '\t' << ha::mag_array_z[cell] << '\t' << std::endl;
       }
    }
 
