@@ -42,32 +42,41 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
                                           std::vector < bool >& magnetic){ // is magnetic
 
    // initialise local cells to zero (distributed operation)
-   for(int cell_index = 0; cell_index < cells::num_local_cells; ++cell_index ) {
+   for(int cell_index = 0; cell_index < ha::mag_array_x.size() ; ++cell_index ) {
 
-      // get cell ID for global array
-      const int cell = cells::cell_id_array[cell_index];
+      // // get cell ID for global array
+      // const int cell = cells::cell_id_array[cell_index];
 
-      ha::mag_array_x[cell] = cells::mag_array_x[cell];
-      ha::mag_array_y[cell] = cells::mag_array_y[cell];
-      ha::mag_array_z[cell] = cells::mag_array_z[cell];
+      ha::mag_array_x[cell_index] = 0.0;//cells::mag_array_x[cell];
+      ha::mag_array_y[cell_index] = 0.0;//cells::mag_array_y[cell];
+      ha::mag_array_z[cell_index] = 0.0;//cells::mag_array_z[cell];
 
    }
 
-   // calculate total moment in each local cell looping over local atoms
-   // for(int atom = 0; atom < vmpi::num_local_atoms; ++atom) {
-   //
-   //    // get cell_ID for atom
-   //    const int cell = cells::atom_cell_id_array[atom];
-   //
-   //    // copy spin moment to temporary variable for performance
-   //    const double mus = m_spin_array[atom];
-   //
-   //    // Consider only magnetic elements
-   //    if( magnetic[atom] ){
-   //       ha::mag_array_x[cell] += x_spin_array[atom] * mus;
-   //       ha::mag_array_y[cell] += y_spin_array[atom] * mus;
-   //       ha::mag_array_z[cell] += z_spin_array[atom] * mus;
-   //    }
+   // initialise local cells to zero (distributed operation)
+      // for(int cell_index = 0; cell_index < cells::num_local_cells; ++cell_index ) {
+      //    // get cell ID for global array
+      //    const int cell = cells::cell_id_array[cell_index];
+      //    ha::mag_array_x[cell] = cells::mag_array_x[cell];
+      //    ha::mag_array_y[cell] = cells::mag_array_y[cell];
+      //    ha::mag_array_z[cell] = cells::mag_array_z[cell];
+      // }
+
+   calculate total moment in each local cell looping over local atoms
+   for(int atom = 0; atom < vmpi::num_local_atoms; ++atom) {
+
+      // get cell_ID for atom
+      const int cell = cells::atom_cell_id_array[atom];
+
+      // copy spin moment to temporary variable for performance
+      const double mus = m_spin_array[atom];
+
+      // Consider only magnetic elements
+      if( magnetic[atom] ){
+         ha::mag_array_x[cell] += x_spin_array[atom] * mus;
+         ha::mag_array_y[cell] += y_spin_array[atom] * mus;
+         ha::mag_array_z[cell] += z_spin_array[atom] * mus;
+      }
    //
    // }
 
@@ -88,9 +97,6 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
          int end_cell_in_cell = ha::cells_in_cells_end_index[cell];
 
          // initialise higher level L cell magnetization to zero
-         ha::mag_array_x[cell] = 0.0;
-         ha::mag_array_y[cell] = 0.0;
-         ha::mag_array_z[cell] = 0.0;
 
          // loop over all L-1 level cells and accumulate magnetization
          for (int cell_in_cell = start_cell_in_cell; cell_in_cell < end_cell_in_cell; cell_in_cell++){
@@ -104,7 +110,7 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
             ha::mag_array_z[cell] += ha::mag_array_z[subcell];
 
          }
-      //   std::cout << ha::mag_array_x[cell] << '\t' << ha::mag_array_y[cell] << '\t' << ha::mag_array_z[cell] << '\t' << std::endl;
+      //  std::cout << ha::mag_array_x[cell] << '\t' << ha::mag_array_y[cell] << '\t' << ha::mag_array_z[cell] << '\t' << std::endl;
       }
    }
 
