@@ -62,7 +62,7 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
       //    ha::mag_array_z[cell] = cells::mag_array_z[cell];
       // }
 
-   calculate total moment in each local cell looping over local atoms
+   //calculate total moment in each local cell looping over local atoms
    for(int atom = 0; atom < vmpi::num_local_atoms; ++atom) {
 
       // get cell_ID for atom
@@ -78,7 +78,7 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
          ha::mag_array_z[cell] += z_spin_array[atom] * mus;
       }
    //
-   // }
+    }
 
    //--------------------------------------------------------------------------------------
    // loop over all hierarchical levels, computing partial cell magnetizations at level L

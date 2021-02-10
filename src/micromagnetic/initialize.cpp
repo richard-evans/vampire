@@ -107,24 +107,24 @@ void initialize(int num_local_cells,
 
 
 
-for (int lc = 0; lc < num_local_cells; lc++){
- int cell = local_cell_array[lc];
- //std::cerr <<cell << '\t' <<  mm::ms[cell] << '\t' << mm::alpha[cell] << '\t' << mm::Tc[cell] << '\t' << mm::ku[cell] << '\t' << mm::gamma[cell] << std::endl;
-}
+// for (int lc = 0; lc < num_local_cells; lc++){
+//  int cell = local_cell_array[lc];
+//  //std::cerr <<cell << '\t' <<  mm::ms[cell] << '\t' << mm::alpha[cell] << '\t' << mm::Tc[cell] << '\t' << mm::ku[cell] << '\t' << mm::gamma[cell] << std::endl;
+// }
 
-for (int lc = 0; lc < num_local_cells; lc++){
-  int cell = local_cell_array[lc];
-   //loops over all other cells with interactions to this cell
-   const int start = mm::macro_neighbour_list_start_index[cell];
-   const int end = mm::macro_neighbour_list_end_index[cell] +1;
-
-   for(int j = start;j< end;j++){
-      // calculate reduced exchange constant factor
-       //if (vmpi::my_rank == 1)
-  //     std::cerr << cell << '\t' << j << '\t' << mm::A[j] <<std::endl;
-
-        }
-     }
+// for (int lc = 0; lc < num_local_cells; lc++){
+//   int cell = local_cell_array[lc];
+//    //loops over all other cells with interactions to this cell
+//    const int start = mm::macro_neighbour_list_start_index[cell];
+//    const int end = mm::macro_neighbour_list_end_index[cell] +1;
+//
+//    for(int j = start;j< end;j++){
+//       // calculate reduced exchange constant factor
+//        //if (vmpi::my_rank == 1)
+//   //     std::cerr << cell << '\t' << j << '\t' << mm::A[j] <<std::endl;
+//
+//         }
+//      }
 
 
 

@@ -136,14 +136,13 @@ namespace micromagnetic{
    //if (cell_material_array[cell] == 2)  std::cout << ku_x[cell] << '\t' << one_o_chi_perp[cell] << '\t' << ku_y[cell] << '\t' << ku_z[cell] << std::endl;
         //if (cell ==0)		std::cout  << "inside\t" <<   dipole::cells_field_array_x[0] << '\t' << dipole::cells_field_array_y[0] << '\t' << dipole::cells_field_array_z[0] <<std::endl;
  //       std::cin.get();
-//  }
+// //  }
      if (dipole::activated){
     // std::cout << environment::environment_field_x[cell] << '\t' << environment::environment_field_x[cell]  << '\t' << environment::environment_field_x[cell] << std::endl;
        spin_field[0] = spin_field[0] + dipole::cells_field_array_x[cell];
        spin_field[1] = spin_field[1] + dipole::cells_field_array_y[cell];
        spin_field[2] = spin_field[2] + dipole::cells_field_array_z[cell];
     }
- // std::cout << "SP" << spin_field[0] << "\t" << spin_field[1] << '\t' << spin_field[2] << std::endl;
     if (environment::enabled){
   //  std::cout << "env" << '\t' << environment::environment_field_x[cell] << '\t' << environment::environment_field_y[cell]  << '\t' << environment::environment_field_z[cell] << std::endl;
        spin_field[0] = spin_field[0] + environment::environment_field_x[cell];
