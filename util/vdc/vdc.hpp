@@ -33,6 +33,7 @@ namespace vdc{
    // keyword variables
    extern std::string colour_keyword;
    extern std::string custom_colourmap_file;
+   extern std::vector<std::vector<double>> colourmap;
    extern bool x_axis_colour;
    extern std::string slice_type;
 
@@ -122,23 +123,36 @@ namespace vdc{
    void read_nm_data();
    void slice_nm_system();
 
+   // XYZ
    void output_xyz_file();
-   void output_inc_file(unsigned int spin_file_id);
-   void output_povray_file();
+
+   // VTK
    void output_vtk_file(unsigned int spin_file_id);
-   void output_ssc_file(unsigned int spin_file_id);
+   
+   // TXT
    void output_txt_file(unsigned int spin_file_id);
 
+   // Povray
+   void initialise_povray();
+   void output_inc_file(unsigned int spin_file_id);
+   void output_povray_file();
+   
+      // Colour
+      void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
+      void initialise_colourwheel();
+
+
+   // SSC
    void initialise_ssc();
    void output_average_ssc_file();
+    void output_ssc_file(unsigned int spin_file_id);
+ 
 
+   // CELL
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);
 
-   void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
-
-   int colourwheel ( std::vector<std::vector<double>>& colourmap );
-
+   
 }
 
 #endif //VDC_H_

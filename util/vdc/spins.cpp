@@ -41,6 +41,8 @@ void process_spins(){
 
    if(vdc::ssc) vdc::initialise_ssc();
 
+   if(vdc::povray) vdc::initialise_povray();
+
    unsigned int last_file_id = max_file_id;
 
    // loop over all spin files
