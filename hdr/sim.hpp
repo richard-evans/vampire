@@ -231,6 +231,13 @@ namespace sim{
 	extern std::vector < double > domain_wall_second_vector_y;
 	extern std::vector < double > domain_wall_second_vector_z;
 
+	//------------------------------------------------------------------------
+   // getter functions to give access to internal sim variables
+   //------------------------------------------------------------------------
+   std::vector<double> get_stt_polarization_unit_vector(); // unit vector spin polarization
+   std::vector<double> get_stt_rj(); // array of stt relaxation constants
+   std::vector<double> get_stt_pj(); // array of stt precession constants
+
 }
 
 /*namespace ckp{

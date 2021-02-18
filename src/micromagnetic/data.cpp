@@ -139,6 +139,14 @@ namespace micromagnetic{
       std::vector<double> macro_neighbour_list_end_index;
       std::vector<double> macro_neighbour_list_array;
 
+      // spin transfer torque polarization vector
+      double sttpx=0.0;
+      double sttpy=0.0;
+      double sttpz=0.0;
+
+      // array to store cell level spin transfer torque parameters
+      std::vector<double> stt_rj;
+      std::vector<double> stt_pj;
 
    } // end of internal namespace
 

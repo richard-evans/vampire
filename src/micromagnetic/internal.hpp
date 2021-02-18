@@ -107,6 +107,15 @@ namespace micromagnetic{
       extern std::vector<double> fields_neighbouring_atoms_begin;
       extern std::vector<double> fields_neighbouring_atoms_end;
 
+      // spin transfer torque polarization vector
+      extern double sttpx;
+      extern double sttpy;
+      extern double sttpz;
+
+      // array to store cell level spin transfer torque parameters
+      extern std::vector<double> stt_rj;
+      extern std::vector<double> stt_pj;
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
@@ -150,6 +159,10 @@ namespace micromagnetic{
 
       std::vector<double> calculate_ku(const int num_atoms, const int num_cells, const std::vector<int> cell_array,  const std::vector<int> type_array,
                                         std::vector <mp::materials_t> material);
+
+      // calculate spin transfer torque parameters
+      void calculate_stt(const int num_atoms, const int num_cells, const std::vector<int>& cell_array, const std::vector<int>& type_array,
+                         std::vector <mp::materials_t>& material, std::vector<double>& stt_rj, std::vector<double>& stt_pj);
 
       std::vector<double> calculate_ms(int num_local_cells,const int num_atoms, const int num_cells,std::vector<int> cell_array, const std::vector<int> type_array,
                                         std::vector <mp::materials_t> material,std::vector <int >local_cell_array);

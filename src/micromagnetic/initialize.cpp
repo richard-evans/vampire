@@ -15,18 +15,18 @@
 
 // Vampire headers
 #include "micromagnetic.hpp"
-
-// micromagnetic module headers
-#include "internal.hpp"
+#include "atoms.hpp"
 #include "material.hpp"
 #include "cells.hpp"
-#include "../create/internal.hpp"
-#include "atoms.hpp"
+#include "sim.hpp"
+#include "../create/internal.hpp" // please fix
 #include "vmpi.hpp"
 #include "vio.hpp"
 
+// micromagnetic module headers
+#include "internal.hpp"
+
 namespace mm = micromagnetic::internal;
-using namespace std;
 
 namespace micromagnetic{
 
@@ -64,7 +64,7 @@ void initialize(int num_local_cells,
 
    #ifdef MPICF
       num_atoms_interactions = vmpi::num_core_atoms+vmpi::num_bdry_atoms + vmpi::num_halo_atoms;
-      num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms; // only consider local atoms in MPI
    #else
       num_atoms_interactions = num_atoms;
    #endif
@@ -105,7 +105,8 @@ void initialize(int num_local_cells,
                                               neighbour_list_end_index, type_array,  material, volume_array, x_coord_array,
                                               y_coord_array, z_coord_array, num_atoms_in_unit_cell, local_cell_array);
 
-
+   // calculate spin transfer torque parameters
+   mm::calculate_stt(num_atoms, num_cells, cell_array, type_array, material, mm::stt_rj, mm::stt_pj);
 
 // for (int lc = 0; lc < num_local_cells; lc++){
 //  int cell = local_cell_array[lc];

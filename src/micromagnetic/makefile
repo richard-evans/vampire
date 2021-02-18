@@ -14,6 +14,7 @@ calculate_gamma.o \
 calculate_ku.o \
 calculate_ms.o \
 calculate_tc.o \
+calculate_stt.o \
 data.o \
 initialize.o \
 interface.o \

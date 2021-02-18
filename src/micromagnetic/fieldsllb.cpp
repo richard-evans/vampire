@@ -27,6 +27,8 @@
 #include "spintorque.hpp"
 #include "environment.hpp"
 
+// shorthand for brevity
+namespace mm = micromagnetic::internal;
 
 namespace micromagnetic{
 
@@ -117,19 +119,15 @@ namespace micromagnetic{
          }
       }
 
-      // please add access functions to the main sim headre file
-      const double stpx = sim::internal::stt_polarization_unit_vector[0];
-  		const double stpy = sim::internal::stt_polarization_unit_vector[1];
-  		const double stpz = sim::internal::stt_polarization_unit_vector[2];
-
-  		const double strj = sim::internal::stt_rj[mat];
-  		const double stpj = sim::internal::stt_pj[mat];
+      // get cell level spin transfer torque parameters
+  		const double strj  = mm::stt_rj[cell];
+  		const double stpj  = mm::stt_pj[cell];
       const double alpha = alpha_perp[cell]; // get local cell alpha
 
       // calculate field
-		double hsttx = (strj-alpha*stpj)*(my*stpz - mz*stpy) + (stpj+alpha*strj)*stpx;
-		double hstty = (strj-alpha*stpj)*(mz*stpx - mx*stpz) + (stpj+alpha*strj)*stpy;
-		double hsttz = (strj-alpha*stpj)*(mx*stpy - my*stpx) + (stpj+alpha*strj)*stpz;
+		double hsttx = (strj-alpha*stpj)*(my*mm::sttpz - mz*mm::sttpy) + (stpj+alpha*strj)*mm::sttpx;
+		double hstty = (strj-alpha*stpj)*(mz*mm::sttpx - mx*mm::sttpz) + (stpj+alpha*strj)*mm::sttpy;
+		double hsttz = (strj-alpha*stpj)*(mx*mm::sttpy - my*mm::sttpx) + (stpj+alpha*strj)*mm::sttpz;
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
       spin_field[0] = pf*m[0] + ext_field[0] + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0] + hsttx;// + dipole::cells_field_array_x[cell];

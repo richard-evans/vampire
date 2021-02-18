@@ -11,21 +11,21 @@
 //
 
 // Vampire headers
-#include "micromagnetic.hpp"
 #include "cells.hpp"
 #include "../cells/internal.hpp"
-#include "internal.hpp"
-
-// micromagnetic module headers
-#include <stdlib.h>
-#include <vector>
-#include "errors.hpp"
-#include "vio.hpp"
-#include "sim.hpp"
-#include "random.hpp"
 #include "dipole.hpp"
 #include "environment.hpp"
+#include "errors.hpp"
+#include "micromagnetic.hpp"
+#include "random.hpp"
+#include "sim.hpp"
+#include "vio.hpp"
 
+// micromagnetic module headers
+#include "internal.hpp"
+
+// shorthand for brevity
+namespace mm = micromagnetic::internal;
 
 namespace micromagnetic{
 
@@ -39,6 +39,10 @@ namespace micromagnetic{
                                                std::vector<double>& y_array,
                                                std::vector<double>& z_array){
 
+      // temporary constants for brevity
+      const double mx = m[0];
+      const double my = m[1];
+      const double mz = m[2];
 
        std::vector<double> spin_field(3,0.0);
 
@@ -116,15 +120,23 @@ namespace micromagnetic{
 
       }
 
+  		const double strj  = mm::stt_rj[cell];
+  		const double stpj  = mm::stt_pj[cell];
+      const double alpha = alpha_perp[cell]; // get local cell alpha
+
+      // calculate field
+		double hsttx = (strj-alpha*stpj)*(my*mm::sttpz - mz*mm::sttpy) + (stpj+alpha*strj)*mm::sttpx;
+		double hstty = (strj-alpha*stpj)*(mz*mm::sttpx - mx*mm::sttpz) + (stpj+alpha*strj)*mm::sttpy;
+		double hsttz = (strj-alpha*stpj)*(mx*mm::sttpy - my*mm::sttpx) + (stpj+alpha*strj)*mm::sttpz;
 
       //calcualtes thesigma values
       double sigma_para = sqrt(2*kB*temperature*alpha_para[cell]/(ms[cell]*mp::dt));
    //   double sigma_perp = sqrt(2*kB*temperature*(alpha_perp[cell]-alpha_para[cell])/(mp::dt*ms[cell]*alpha_perp[cell]*alpha_perp[cell]));
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] =ext_field[0] + exchange_field[0] - one_o_chi_perp[cell]*m[0]*m_e[cell]*ku_x[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_x[cell];
-      spin_field[1] =ext_field[1] + exchange_field[1] - one_o_chi_perp[cell]*m[1]*m_e[cell]*ku_y[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_y[cell];
-      spin_field[2] =ext_field[2] + exchange_field[2] - one_o_chi_perp[cell]*m[2]*m_e[cell]*ku_z[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_z[cell];
+      spin_field[0] =ext_field[0] + exchange_field[0] - one_o_chi_perp[cell]*m[0]*m_e[cell]*ku_x[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_x[cell] + hsttx;
+      spin_field[1] =ext_field[1] + exchange_field[1] - one_o_chi_perp[cell]*m[1]*m_e[cell]*ku_y[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_y[cell] + hstty;
+      spin_field[2] =ext_field[2] + exchange_field[2] - one_o_chi_perp[cell]*m[2]*m_e[cell]*ku_z[cell]  + sigma_para*mtrandom::gaussian() + pinning_field_z[cell] + hsttz;
    //    std::cerr << spin_field[0] << '\t' << spin_field[1] << "\t" << spin_field[2] << std::endl;
 
     if (dipole::activated){

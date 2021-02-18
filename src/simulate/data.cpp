@@ -91,7 +91,21 @@ namespace sim{
       std::vector<double> sot_pj; // array of non-adiabatic spin torques
       std::vector<double> sot_polarization_unit_vector(3,0.0); // sot spin polarization direction
 
-
    } // end of internal namespace
+
+   //------------------------------------------------------------------------
+   // getter functions to give access to internal variables
+   //------------------------------------------------------------------------
+   std::vector<double> get_stt_polarization_unit_vector(){
+      return sim::internal::stt_polarization_unit_vector;
+   }
+
+   std::vector<double> get_stt_rj(){
+      return sim::internal::stt_rj;
+   }
+
+   std::vector<double> get_stt_pj(){
+      return sim::internal::stt_pj;
+   }
 
 } // end of sim namespace
