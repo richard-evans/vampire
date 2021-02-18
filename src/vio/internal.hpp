@@ -119,6 +119,9 @@ namespace vout{
    void mean_material_specific_heat(std::ostream& stream,bool header);
    void material_total_energy(std::ostream& stream,bool header);
    void material_mean_total_energy(std::ostream& stream,bool header);
+   void resistance(std::ostream& stream, bool header);
+   void current(std::ostream& stream, bool header);
+   void domain_wall_position(std::ostream& stream,bool header);
    void MRresistance(std::ostream& stream, bool header);
 
    //-------------------------------------------------------------------------

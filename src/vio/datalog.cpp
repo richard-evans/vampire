@@ -61,9 +61,13 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 	char directory [256];
 
 	#ifdef WIN_COMPILE
-		_getcwd(directory, sizeof(directory));
+		if(_getcwd(directory, sizeof(directory)) == NULL){
+            std::cerr << "Fatal getcwd error in datalog." << std::endl;
+        }
 	#else
-		getcwd(directory, sizeof(directory));
+		if(getcwd(directory, sizeof(directory)) == NULL){
+            std::cerr << "Fatal getcwd error in datalog." << std::endl;
+        }
 	#endif
 
 	//------------------------------------
@@ -88,6 +92,7 @@ void write_output_file_header(std::ofstream& ofile, std::vector<unsigned int>& f
 namespace vout{
 
    void output_switch(std::ostream& stream,unsigned int idx,bool header){
+      //stream.precision(vout::precision);
       switch(idx){
       	case 0:
       		vout::time(stream,header);
@@ -254,21 +259,30 @@ namespace vout{
          case 64:
             vout::material_mean_total_energy(stream,header);
             break;
-         case 65:
+			case 65:
+				vout::resistance(stream, header);
+			  	break;
+			case 66:
+			  	vout::current(stream, header);
+			  	break;
+			case 67:
+				vout::domain_wall_position(stream,header);
+				break;
+			case 68:
             vout::MRresistance(stream,header);
             break;
-				case 66:
-					 vout::lfa_ms(stream,header);
-					 break;
-				case 67:
-	          vout::x_track_pos(stream,header);
-	          break;
-				case 68:
-						vout::z_track_pos(stream,header);
-						break;
-         case 999: //AJN
-            vout::standard_deviation(stream,header);
-            break;
+			case 69:
+			 	vout::lfa_ms(stream,header);
+				break;
+			case 70:
+				vout::x_track_pos(stream,header);
+				break;
+			case 71:
+				vout::z_track_pos(stream,header);
+				break;
+			case 999: //AJN
+				vout::standard_deviation(stream,header);
+				break;
       }
 
       return;
@@ -358,9 +372,13 @@ namespace vout{
    	char directory [256];
 
    	#ifdef WIN_COMPILE
-   		_getcwd(directory, sizeof(directory));
+   		if(_getcwd(directory, sizeof(directory)) == NULL){
+            std::cerr << "Fatal getcwd error in datalog." << std::endl;
+        }
    	#else
-   		getcwd(directory, sizeof(directory));
+   		if(getcwd(directory, sizeof(directory)) == NULL){
+            std::cerr << "Fatal getcwd error in datalog." << std::endl;
+        }
    	#endif
 
       // write system and version information

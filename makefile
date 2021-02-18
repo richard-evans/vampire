@@ -145,6 +145,7 @@ include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
 include src/simulate/makefile
+include src/spintransport/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
@@ -326,7 +327,7 @@ tidy:
 	@rm -f src/*/*~
 
 vdc:
-	$(MAKE) -B -C util/vdc/
+	$(MAKE) -C util/vdc/
 
 install:
 	echo "Preparing installation package"

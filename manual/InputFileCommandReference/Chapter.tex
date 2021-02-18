@@ -40,9 +40,22 @@ The following commands control generation of the simulated system, including dim
 
 {\zicf create:particle-centre-offset}\addcontentsline{toc}{subsection}{create:particle-parity} shifts the origin of a particle to the centre of the nearest unit cell.\\ \par
 
-{\zicf create:crystal-structure = string [sc,fcc,bcc,hcp,rocksalt; default sc]}
-\addcontentsline{toc}{subsection}{create:crystal-structure} Defines the default
-crystal lattice to be generated.\\ \par
+{\zicf create:crystal-structure = string [sc, fcc, bcc, hcp, heusler, kagome, rocksalt, spinel; default sc]}
+\addcontentsline{toc}{subsection}{create:crystal-structure}
+Defines the default crystal lattice to be generated. The code supports the basic
+ metallic crystal types simple cubic (sc), body-centred-cubic (bcc),
+ face-centred-cubic (fcc) and hexagonal close-packed (hcp). The code also
+ supports important magnetic structures such as Heusler alloys (heusler),
+ rock-salt such as NiO (rocksalt) spinels such as magnetite (spinel) and kagome
+ lattices. \\ \par
+
+{\zicf create:crystal-sublattice-materials = flag [true, false]; default false]}
+\addcontentsline{toc}{subsection}{create:crystal-sublatice-materials}
+When set or defined as true, simple crystals with more than one atom per unit
+cell (bcc, bcc110, fcc, hpc, and kagome) will allocate each atom in the unit
+cell to a different material. The material allocation to atomic sites can then
+be done using the usual \textit{material:unit-cell-category} flags in the
+material file, in much the same way as for complex crystals. \\ \par
 
 {\zicf create:single-spin flag}\addcontentsline{toc}{subsection}{create:single-spin} Overrides all create options and generates a single isolated spin.\\ \par
 
@@ -86,23 +99,29 @@ repeatable results for the same simulation. The seed determines the actual
 sequence of numbers and is used to generate a different alloy distribution.
 Note that different numbers of cores will change the structure that is generated.\\
 
-{\zicf create:grain-random-seed integer [default 683614233]}
+{\zicf create:grain-random-seed integer [default 1527349271]}
 \addcontentsline{toc}{subsection}{create:grain-random-seed}
 Sets the random seed for the psuedo random number generator for generating random
 grain structures. \\
 
-{\zicf create:dilution-random-seed integer [default 683614233]}
+{\zicf create:dilution-random-seed integer [default 465865253]}
 \addcontentsline{toc}{subsection}{create:dilution-random-seed}
 Sets the random seed for the psuedo random number generator for diluting the
 atoms, leading to a different realization of a dilute material. Note that
 different numbers of cores will change the structure that is generated.\\
 
-{\zicf create:intermixing-random-seed integer [default 683614233]}
+{\zicf create:intermixing-random-seed integer [default 100181363]}
 \addcontentsline{toc}{subsection}{create:intermixing-random-seed}
 Sets the random seed for the psuedo random number generator for calculating
 intermixing of materials. A different seed will lead to a different realization
 of a dilute material. Note that different numbers of cores will change the
 structure that is generated.\\
+
+{\zicf create:spin-initialisation-random-seed = integer [default 123456]}
+\addcontentsline{toc}{subsection}{create:intermixing-random-seed}
+Sets the random seed for the psuedo random number generator for initialising
+spin directions. Note that different numbers of cores will change the
+spin positions that are generated.\\
 
 \section*{System dimensions}
 \addcontentsline{toc}{section}{System dimensions}
@@ -110,40 +129,113 @@ The commands here determine the dimensions of the generated system.\\
 
 {\zicf dimensions:unit-cell-size = float [0.1 \AA - 10 $\mu$ m, default 3.54 \AA]}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size} Defines the size of the unit cell.\\ \par
 
-{\zicf dimensions:unit-cell-size-x}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-x} Defines the size of the unit cell if asymmetric.\\ \par
+{\zicf dimensions:unit-cell-size-x}
+\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-x} Defines the size
+of the unit cell if asymmetric.\\ \par
 
-{\zicf dimensions:unit-cell-size-x}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-y} Defines the size of the unit cell if asymmetric.\\ \par
+{\zicf dimensions:unit-cell-size-x}
+\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-y} Defines the size
+of the unit cell if asymmetric.\\ \par
 
-{\zicf dimensions:unit-cell-size-z}\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-z} Defines the size of the unit cell if asymmetric.\\ \par
+{\zicf dimensions:unit-cell-size-z}
+\addcontentsline{toc}{subsection}{dimensions:unit-cell-size-z} Defines the size
+of the unit cell if asymmetric.\\ \par
 
-{\zicf dimensions:system-size}\addcontentsline{toc}{subsection}{dimensions:system-size} Defines the size of the symmetric bulk crystal. \\ \par
+{\zicf dimensions:system-size}
+\addcontentsline{toc}{subsection}{dimensions:system-size} Defines the size of
+the symmetric bulk crystal. \\ \par
 
-{\zicf dimensions:system-size-x}\addcontentsline{toc}{subsection}{dimensions:system-size-x} Defines the total size if the system along the $x$-axis.\\ \par
+{\zicf dimensions:system-size-x}
+\addcontentsline{toc}{subsection}{dimensions:system-size-x} Defines the total
+size if the system along the $x$-axis.\\ \par
 
-{\zicf dimensions:system-size-y}\addcontentsline{toc}{subsection}{dimensions:system-size-y} Defines the total size if the system along the $y$-axis.\\ \par
+{\zicf dimensions:system-size-y}
+\addcontentsline{toc}{subsection}{dimensions:system-size-y} Defines the total
+size if the system along the $y$-axis.\\ \par
 
-{\zicf dimensions:system-size-z}\addcontentsline{toc}{subsection}{dimensions:system-size-z} Defines the total size if the system along the $z$-axis.\\ \par
+{\zicf dimensions:system-size-z}
+\addcontentsline{toc}{subsection}{dimensions:system-size-z} Defines the total
+size if the system along the $z$-axis.\\ \par
 
-{\zicf dimensions:particle-size = float}\addcontentsline{toc}{subsection}{dimensions:particle-size} Defines the size of particles cut from the bulk crystal.\\ \par
+{\zicf dimensions:particle-size = float}
+\addcontentsline{toc}{subsection}{dimensions:particle-size} Defines the size of
+particles cut from the bulk crystal.\\ \par
 
-{\zicf dimensions:particle-spacing}\addcontentsline{toc}{subsection}{dimensions:particle-spacing} Defines the spacing between particles in particle arrays or voronoi media.\\ \par
+{\zicf dimensions:particle-spacing}
+\addcontentsline{toc}{subsection}{dimensions:particle-spacing}
+Defines the spacing between particles in particle arrays or voronoi media.\\ \par
 
 
-{\zicf dimensions:particle-shape-factor-x = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-x} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $x$ direction. This property scales the as a fraction of the particle-size along the $x$-direction.\\
+{\zicf dimensions:particle-shape-factor-x = float [0.001-1, default 1.0]}
+\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-x}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $x$
+direction. This property scales the as a fraction of the particle-size along the
+$x$-direction.\\
 
-{\zicf dimensions:particle-shape-factor-y = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-y} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $y$ direction. This property scales the as a fraction of the particle-size along the $y$-direction.\\
+{\zicf dimensions:particle-shape-factor-y = float [0.001-1, default 1.0]}
+\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-y}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $y$
+direction. This property scales the as a fraction of the particle-size along the
+$y$-direction.\\
 
-{\zicf dimensions:particle-shape-factor-z = float [0.001-1, default 1.0]}\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z} Modifies the default particle shape to create elongated particles. The selected particle shape is modified by changing the effective particle size in the $z$ direction. This property scales the as a fraction of the particle-size along the $z$-direction.\\
+{\zicf dimensions:particle-shape-factor-z = float [0.001-1, default 1.0]}
+\addcontentsline{toc}{subsection}{dimensions:particle-shape-factor-z}
+Modifies the default particle shape to create elongated particles. The selected
+particle shape is modified by changing the effective particle size in the $z$
+direction. This property scales the as a fraction of the particle-size along the
+$z$-direction.\\
 
-{\zicf dimensions:particle-array-offset-x [0-10$^4$ \AA]}\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-x} Translates the 2-D particle array the chosen distance along the x-direction.\\
+{\zicf dimensions:particle-array-offset-x [0-10$^4$ \AA]}
+\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-x}
+Translates the 2-D particle array the chosen distance along the x-direction.\\
 
-{\zicf dimensions:particle-array-offset-y}\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y}  Translates the 2-D particle array the chosen distance along the y-direction.\\
+{\zicf dimensions:particle-array-offset-y}
+\addcontentsline{toc}{subsection}{dimensions:particle-array-offset-y}
+Translates the 2-D particle array the chosen distance along the y-direction.\\
 
-{\zicf dimensions:double macro-cell-size}\addcontentsline{toc}{subsection}{dimensions:macro-cell-size} determines the macro cell size for calculation of the demagnetizing field and output of the magnetic configuration. Finer discretisation leads to more accurate results at the cost of significantly longer run times. The cell size should always be less than the system size, as highly asymmetric cells will leads to significant errors in the demagnetisation field calculation.
+{\zicf dimensions:double macro-cell-size}
+\addcontentsline{toc}{subsection}{dimensions:macro-cell-size}
+determines the macro cell size for calculation of the demagnetizing field and
+output of the magnetic configuration. Finer discretisation leads to more
+accurate results at the cost of significantly longer run times. The cell size
+should always be less than the system size, as highly asymmetric cells will
+lead to significant errors in the demagnetisation field calculation.
+
+\section*{Exchange calculation}
+\addcontentsline{toc}{section}{Exchange calculation}
+The following commands control the calculation of built-in exchange interactions
+ for the system.\\
+
+{\zicf exchange:interaction-range}\addcontentsline{toc}
+{subsection}{exchange:interaction-range double default [1.0]}
+  Determines the cutoff range exchange interactions for built-in crystal
+  structures in terms of the nearest neighbour range. Larger ranges will
+  enable more interactions via an exchange function which can include 2nd-10th
+  nearest neighbour interaction shells or exponential functions. Note that
+  longer ranged interactions are slower to calculate. In shell mode the computed
+  interaction shells are printed in the log file.\\
+
+{\zicf exchange:function}\addcontentsline{toc}
+{subsection}{exchange:function string default [nearest-neighbour]}
+  Determines the type of interaction to be used in the spin Hamiltonian. The
+  default \textit{nearest-neighbour} option forces nearest neighbour
+  interactions only. The \textit{shell} option groups neighbours at the same
+  interaction distance into shells which can then be assigned different exchange
+  constants. The \textit{exponential} option implements an exponential decay
+  that is useful for simulating spin glasses and systems such as NdFeB where
+  there are no well-defined neighbour shells.\\
+
+{\zicf exchange:dmi-cutoff-range}\addcontentsline{toc}
+{subsection}{exchange:dmi-cutoff-range double default [1.0]}
+  Determines the cutoff range for i-j-k interactions for the built-in DMI in \vampire.
+
 
 \section*{Anisotropy calculation}
 \addcontentsline{toc}{section}{Anisotropy calculation}
-The following commands control the calculation of the magnetic anisotropy energy for the system.
+The following commands control the calculation of the magnetic anisotropy energy for the system.\\
+
 {\zicf anisotropy:surface-anisotropy-threshold}\addcontentsline{toc}
 {subsection}{anisotropy:surface-anisotropy-threshold}
   integer default [native]
@@ -244,7 +336,7 @@ where $T$ is the temperature, $T_{\mathrm{C}}$ is the Curie temperature, and $\b
 {\zicf sim:program = temperature-pulse}\addcontentsline{toc}{subsubsection}{temperature-pulse}\\
 
 {\zicf sim:program = cmc-anisotropy}\addcontentsline{toc}{subsubsection}{cmc-anisotropy}\\
-   Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques. 
+   Iterates through a series of angles at which the global magnetisation is contrained, allowing individual spins to vary, but preventing the system from reaching a true equilibrium. This allows for the examination of magnetocrystalline anisotropy energy and restoring torques.
 %    Hybrid-CMC \\
 %    Reverse-Hybrid-CMC x
 %    LaGrange-Multiplier x
@@ -286,7 +378,7 @@ The number of time steps that statistics are taken over, including the \textit{m
 {\zicf sim:equilibration-temperature}\addcontentsline{toc}{subsection}{sim:equilibration-temperature}\\
    The temperature at which a simulation equilibrates, for example, prior to the temperature pulse in \textit{sim:program = temperature-pulse}.\\
 {\zicf sim:temperature}\addcontentsline{toc}{subsection}{sim:temperature}\\
-   The temperature of the simulation. 
+   The temperature of the simulation.
 
 {\zicf sim:temperature-increment}\addcontentsline{toc}{subsection}{sim:temperature-increment}\\
    The temperature step size in a simulation over a temperature series, such as \textit{sim:program = curie-temperature}.\\
@@ -429,7 +521,7 @@ The adaptive move performs a gaussian move with a tuned trial width to attempt t
 The following commands control what data is output to the \textit{output} file.
 The order in which they appear is the order in which they appear in the \textit{output} file.
 Most options output a single column of data, but some output multiple columns, particularly
-vector data or parameters related to materials, where one column per material is output. Note 
+vector data or parameters related to materials, where one column per material is output. Note
 that this means that for vector data, one set of columns per material is output.\\
 
 {\zicf output:time-steps}\addcontentsline{toc}{subsection}{output:time-steps} outputs
@@ -653,11 +745,16 @@ These options enable the output of spin configuration snapshots during the
 simulation. The configurations can then be visualised using povray or other
 software generated with the vampire data converter (vdc) utility.\\
 
-{\zicf config:atoms flag}\addcontentsline{toc}{subsection}{config:atoms} enables
-the output of atomic spin configurations.\\
+{\zicf config:atoms flag [default false]}\addcontentsline{toc}{subsection}{config:atoms}
+enables the output of atomic spin configurations either at the end of the simulations or during the simulation. The options are:
+\begin{itemize}
+  \item[] config:atoms - to output continuously during the simulation
+  \item[] config:atoms=continuous - to output continuously during the simulation (same as previous option)
+  \item[] config:atoms=end - to output at the end of the simulation
+\end{itemize}
 
 {\zicf config:atoms-output-rate = int [0+, default 1000]}\addcontentsline{toc}{subsection}{config:atoms-output-rate}
-determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}.\\
+determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}. It is considered only if \textit{config:atoms=continuous} or is \textit{empty}.\\
 
 The following options allow a cubic slice of the total configuration data to
 be output to the configuration file. This is useful for reducing disk usage and
@@ -687,11 +784,16 @@ of the data slice to be outputted to the configuration file.\\
 determines the maximum z value (as a fraction of the total system dimensions)
 of the data slice to be outputted to the configuration file.\\
 
-{\zicf config:macro-cells}\addcontentsline{toc}{subsection}{config:macro-cells}
-enables the output of macro cell spin configurations.\\
+{\zicf config:macro-cells flag [default false]}\addcontentsline{toc}{subsection}{config:macro-cells}
+enables the output of macro cell spin configurations either at the end of the simulations or during the simulation. The options are:
+\begin{itemize}
+  \item[] config:macro-cells - to output continuously during the simulation
+  \item[] config:macro-cells=continuous - to output continuously during the simulation (same as previous option)
+  \item[] config:macro-cells=end - to output at the end of the simulation
+\end{itemize}
 
 {\zicf config:macro-cells-output-rate}\addcontentsline{toc}{subsection}{config:macro-cells-output-rate}\\
-determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}.\\
+determines the rate configuration files are outputted as a multiple of \textit{sim:time-steps-increment}. It is considered only if \textit{config:macro-cells=continuous} or is \textit{empty}\\
 
 {\zicf config:output-format = exclusive string [default text]}\addcontentsline{toc}{subsection}{config:output-format}
 specifies the format of the configuration data. Available options are:

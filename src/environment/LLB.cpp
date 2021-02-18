@@ -193,12 +193,12 @@ namespace environment{
                //std::vector < double > mm_env_exchange(num_cells,0.0);
                //std::vector < double > env_mm_exchange(mm::num_cells,0.0);
 
-               for (int i = 0; i < environment::num_interactions; i ++ ){
-                  int mm_cell = environment::list_of_mm_cells_with_neighbours[i];
-                  int env_cell = environment::list_of_env_cells_with_neighbours[i];
-                  double overlap = list_of_overlap_area[i];
+               //for (int i = 0; i < environment::num_interactions; i ++ ){
+                  //int mm_cell = environment::list_of_mm_cells_with_neighbours[i];
+                  //int env_cell = environment::list_of_env_cells_with_neighbours[i];
+                  //double overlap = list_of_overlap_area[i];
 
-               }
+               //}
 
 //std::cout << "HERE3" <<std::endl;
                for (int i = my_env_start_index; i < my_env_end_index; i++){
@@ -353,15 +353,15 @@ namespace environment{
                // MPI_Allreduce(MPI_IN_PLACE, &env::z_mag_array[0],     num_env_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
                // #endif
 
-               for (int i = my_env_start_index; i < my_env_end_index; i++){
-                  int cell = env::none_atomistic_cells[i];
+               //for (int i = my_env_start_index; i < my_env_end_index; i++){
+                  //int cell = env::none_atomistic_cells[i];
 
               //    std::cout << env::x_mag_array[cell] << '\t' <<env::y_mag_array[cell] << '\t' << env::z_mag_array[cell] <<std::endl;
-               }
+               //}
           //     std::cin.get();
 //
 // //               outputs magnetisation
-           if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) 	int a = env::output();
+           if (sim::time %(vout::output_rate*1000) == 0 && vmpi::my_rank == 0 ) env::output();
 //
 
          return 0;

@@ -84,10 +84,10 @@ int in_shield(double x, double y, double z,int shield){
     double zmin = env::shield_min_z[shield];
     double zmax = env::shield_max_z[shield];
 
-    double f = exp((x-xmax)*0.01);
-    double f2 = exp((-x+(xmax-xmin)-xmax)*0.01);
-    double fmin = exp((xmin-xmax)*0.01);
-    double fmax = exp((xmax-xmax)*0.01);
+    //double f = exp((x-xmax)*0.01);
+    //double f2 = exp((-x+(xmax-xmin)-xmax)*0.01);
+    //double fmin = exp((xmin-xmax)*0.01);
+    //double fmax = exp((xmax-xmax)*0.01);
     double g;// = zmin+(zmax-zmin)*(f-fmin)/(fmax-fmin);
     double g2;// = zmin+(zmax-zmin)*(f2-fmin)/(fmax-fmin);
    if (x !=xmax){
@@ -237,7 +237,7 @@ int read_in_shield_info(){
   std::ifstream ifile;
   ifile.open("shield_geom");
 
-  int shield_number;
+  //int shield_number;
   string shield_type;
 
   if (ifile.good()){
@@ -595,6 +595,9 @@ int read_in_shield_info(){
     //          err::vexit();
     //       }
      }
+
+     return 0;
+
   }
 
 

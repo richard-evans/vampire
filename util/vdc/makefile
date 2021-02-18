@@ -12,17 +12,23 @@ LIBS=-lstdc++
 
 # Flags
 GCC_CFLAGS=-O3 -std=c++0x
+#GCC_CFLAGS=-O3 -std=c++0x -fopenmp -funroll-loops -mavx2
 
 # Objects
 OBJECTS= \
 obj/cells.o \
 obj/colour.o \
+obj/colourmaps.o \
+obj/command.o \
 obj/coords.o \
 obj/data.o \
 obj/main.o \
 obj/non_magnetic.o \
 obj/povray.o \
 obj/spins.o \
+obj/ssc.o \
+obj/text.o \
+obj/vtk.o \
 obj/xyz.o
 
 EXECUTABLE=vdc
@@ -31,7 +37,7 @@ all: $(OBJECTS) gcc
 
 # Serial Targets
 gcc: $(OBJECTS)
-	$(GCC) $(OBJECTS) $(LIBS) -o $(EXECUTABLE)
+	$(GCC) $(OBJECTS) $(GCC_CFLAGS) $(LIBS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: ./%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<

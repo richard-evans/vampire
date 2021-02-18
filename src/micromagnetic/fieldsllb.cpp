@@ -32,7 +32,7 @@ namespace micromagnetic{
 
    namespace internal{
 
-      std::vector<double> calculate_llb_fields(std::vector <double > m,
+      std::vector<double> calculate_llb_fields(std::vector <double> m,
                                                double temperature,
                                                int num_cells,
                                                int cell,
@@ -70,6 +70,9 @@ namespace micromagnetic{
         alpha_para[cell] = 0.001;
       }
 
+      const double mx = m[0];
+      const double my = m[1];
+      const double mz = m[2];
 
       //m and me are usually used squared
       const double m_e_squared = m_e[cell]*m_e[cell];
@@ -114,22 +117,24 @@ namespace micromagnetic{
          }
       }
 
-      const double stpx = sim::internal::slonczewski_spin_polarization_unit_vector[0];
-  		const double stpy = sim::internal::slonczewski_spin_polarization_unit_vector[1];
-  		const double stpz = sim::internal::slonczewski_spin_polarization_unit_vector[2];
+      // please add access functions to the main sim headre file
+      const double stpx = sim::internal::stt_polarization_unit_vector[0];
+  		const double stpy = sim::internal::stt_polarization_unit_vector[1];
+  		const double stpz = sim::internal::stt_polarization_unit_vector[2];
 
-  		const double staj = sim::internal::slonczewski_aj[mat];
-  		const double stbj = sim::internal::slonczewski_bj[mat];
+  		const double strj = sim::internal::stt_rj[mat];
+  		const double stpj = sim::internal::stt_pj[mat];
+      const double alpha = alpha_perp[cell]; // get local cell alpha
 
-  		// calculate field
-  		double HSTTx = staj*(y_array[cell]*stpz - z_array[cell]*stpy) + stbj*stpx;
-  		double HSTTy = staj*(z_array[cell]*stpx - x_array[cell]*stpz) + stbj*stpy;
-  		double HSTTz = staj*(x_array[cell]*stpy - y_array[cell]*stpx) + stbj*stpz;
+      // calculate field
+		double hsttx = (strj-alpha*stpj)*(my*stpz - mz*stpy) + (stpj+alpha*strj)*stpx;
+		double hstty = (strj-alpha*stpj)*(mz*stpx - mx*stpz) + (stpj+alpha*strj)*stpy;
+		double hsttz = (strj-alpha*stpj)*(mx*stpy - my*stpx) + (stpj+alpha*strj)*stpz;
 
       //Sum H = H_exch + H_A +H_exch_grains +H_App + H+dip
-      spin_field[0] = pf*m[0] + ext_field[0] + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0] + HSTTx;// + dipole::cells_field_array_x[cell];
-      spin_field[1] = pf*m[1] + ext_field[1] + pinning_field_y[cell]  + exchange_field[1] - ku_y[cell]*one_o_chi_perp[cell]*m[1] + HSTTy;// + dipole::cells_field_array_y[cell];
-      spin_field[2] = pf*m[2] + ext_field[2] + pinning_field_z[cell]  + exchange_field[2] - ku_z[cell]*one_o_chi_perp[cell]*m[2] + HSTTz;// + dipole::cells_field_array_z[cell];
+      spin_field[0] = pf*m[0] + ext_field[0] + pinning_field_x[cell]  + exchange_field[0] - ku_x[cell]*one_o_chi_perp[cell]*m[0] + hsttx;// + dipole::cells_field_array_x[cell];
+      spin_field[1] = pf*m[1] + ext_field[1] + pinning_field_y[cell]  + exchange_field[1] - ku_y[cell]*one_o_chi_perp[cell]*m[1] + hstty;// + dipole::cells_field_array_y[cell];
+      spin_field[2] = pf*m[2] + ext_field[2] + pinning_field_z[cell]  + exchange_field[2] - ku_z[cell]*one_o_chi_perp[cell]*m[2] + hsttz;// + dipole::cells_field_array_z[cell];
     //  std::cout << ext_field[0] << '\t' << pf << '\t' << m[0] << "\t" << ku_x[cell] << '\t' <<one_o_chi_perp[cell] <<  std::endl;
     //  std::cin.get();
       // if (cell_material_array[cell] == 2)    std::cout << pf << '\t' << m[0] << '\t' << m[1] << '\t' << m[2] << "\t" << pinning_field_x[cell] << '\t' << pinning_field_y[cell] << '\t' << pinning_field_z[cell] << '\t' << exchange_field[0] << '\t' << exchange_field[1] << '\t' << exchange_field[2] << "\t" << ext_field[0] << '\t' << ext_field[1] << '\t' << ext_field[2] <<std::endl;

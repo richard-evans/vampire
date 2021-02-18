@@ -12,6 +12,7 @@
 
 // C++ standard library headers
 #include <sstream>
+#include <iostream>
 
 // Vampire headers
 // Headers
@@ -35,6 +36,7 @@
 #include "montecarlo.hpp"
 #include "random.hpp"
 #include "spintorque.hpp"
+#include "spintransport.hpp"
 #include "unitcell.hpp"
 #include "micromagnetic.hpp"
 // vio module headers
@@ -81,6 +83,7 @@ namespace vin{
         else if(montecarlo::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(spin_transport::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -317,46 +320,8 @@ namespace vin{
         //-------------------------------------------------------------------
         // System simulation variables
         //-------------------------------------------------------------------
-        std::string test="integrator";
-        if(word==test){
-            test="llg-heun";
-            if(value==test){
-                sim::integrator=0;
-                return EXIT_SUCCESS;
-            }
-            test="monte-carlo";
-            if(value==test){
-                sim::integrator=1;
-                return EXIT_SUCCESS;
-            }
-            test="llg-midpoint";
-            if(value==test){
-                sim::integrator=2;
-                return EXIT_SUCCESS;
-            }
-            test="constrained-monte-carlo";
-            if(value==test){
-                sim::integrator=3;
-                return EXIT_SUCCESS;
-            }
-            test="hybrid-constrained-monte-carlo";
-            if(value==test){
-                sim::integrator=4;
-                return EXIT_SUCCESS;
-            }
-            else{
-            terminaltextcolor(RED);
-                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-                std::cerr << "\t\"llg-heun\"" << std::endl;
-                std::cerr << "\t\"llg-midpoint\"" << std::endl;
-                std::cerr << "\t\"monte-carlo\"" << std::endl;
-                std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
-            terminaltextcolor(WHITE);
-                err::vexit();
-            }
-        }
         //-------------------------------------------------------------------
-        test="program";
+        std::string test="program";
         if(word==test){
             test="benchmark";
             if(value==test){
@@ -463,7 +428,11 @@ namespace vin{
                 sim::program=60;
                 return EXIT_SUCCESS;
             }
-
+            test="domain-wall";
+            if(value==test){
+                sim::program=61;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                         std::cout << word << '\t' << test << std::endl;
@@ -483,12 +452,6 @@ namespace vin{
             terminaltextcolor(WHITE);
             err::vexit();
             }
-        }
-        //-------------------------------------------------------------------
-        test="enable-dipole-fields";
-        if(word==test){
-            sim::hamiltonian_simulation_flags[4]=1;
-            return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
         test="enable-fmr-field";
@@ -1087,6 +1050,44 @@ namespace vin{
                 err::vexit();
             }
         }
+        //-------------------------------------------------------------------
+        test="load-checkpoint-if-exists";
+        if(word==test){
+          // determine checkpoint file name
+          std::stringstream chkfilenamess;
+          chkfilenamess << "vampire" << vmpi::my_rank << ".chk";
+          std::string chkfilename = chkfilenamess.str();
+
+          // open checkpoint file
+          std::ofstream chkfile(chkfilename.c_str(),std::ios::in);
+          bool exists=chkfile.good();
+          chkfile.close();
+          if(exists){
+            test="restart";
+            if(value==test){
+                sim::load_checkpoint_flag=true; // Load spin configurations
+                sim::load_checkpoint_continue_flag=false; // Restart simulation with checkpoint configuration
+                return EXIT_SUCCESS;
+            }
+            test="continue";
+            if(value==test){
+                sim::load_checkpoint_flag=true; // Load spin configurations
+                sim::load_checkpoint_continue_flag=true; // Continue simulation from saved time with checkpoint configuration
+                return EXIT_SUCCESS;
+            }
+            else{
+                terminaltextcolor(RED);
+                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+                std::cerr << "\t\"restart\"" << std::endl;
+                std::cerr << "\t\"continue\"" << std::endl;
+                terminaltextcolor(WHITE);
+                err::vexit();
+            }
+          }
+          else{
+            return EXIT_SUCCESS; // No checkpoint file
+          }
+        }
         //--------------------------------------------------------------------
         test="fmr-field-strength";
         if(word==test){
@@ -1099,7 +1100,7 @@ namespace vin{
         test="fmr-field-frequency";
         if(word==test){
             double w = atof(value.c_str());
-            check_for_valid_value(w, word, line, prefix, unit, "none", 0.0, 1.0e4,"input","0 - 10,000 GHz");
+            check_for_valid_value(w, word, line, prefix, unit, "frequency", 0.0, 1.0e14,"input","0 - 10,000 GHz");
             sim::fmr_field_frequency = w;
             return EXIT_SUCCESS;
         }
@@ -1528,6 +1529,25 @@ namespace vin{
         return EXIT_SUCCESS;
      }
         //--------------------------------------------------------------------
+        test="resistance";
+        if(word==test){
+           output_list.push_back(65);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="current";
+        if(word==test){
+           output_list.push_back(66);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="domain-wall-centre";
+        if(word==test){
+            output_list.push_back(67);
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        // reserve 68 for voltage
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;
@@ -2373,53 +2393,21 @@ namespace vin{
             //--------------------------------------------------------------------
             test="fmr-field-strength";
             if(word==test){
-                double H=atof(value.c_str());
-                // test for unit
-                string unit_type="field";
-                // if no unit given, assume internal
-                if(unit.size() != 0){
-                    units::convert(unit,H,unit_type);
-                }
-                string str="field";
-                if(unit_type==str){
-                    // Test for valid range
-                    if((H>=0.0) && (H<1.0E5)){
-                        read_material[super_index].applied_field_strength=H;
-                        // set local fmr flag
-                        sim::local_fmr_field=true;
-                        return EXIT_SUCCESS;
-                    }
-                    else{
-                        terminaltextcolor(RED);
-                        std::cerr << "Error - sim:" << word << " on line " << line << " of input file must be in the range 0 - 1.0E5" << std::endl;
-                        terminaltextcolor(WHITE);
-                        err::vexit();
-                    }
-                }
-                else{
-                    terminaltextcolor(RED);
-                    std::cerr << "Error on line " << line << " of material file - unit type \'" << unit_type << "\' is invalid for parameter material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E5" << std::endl;
-                    terminaltextcolor(WHITE);
-                    err::vexit();
-                }
+               double H = atof(value.c_str());
+               check_for_valid_value(H, word, line, prefix, unit, "field", 0.0, 1.0e5,"material","0 - 10,000 T");
+               read_material[super_index].fmr_field_strength=H;
+               // set local fmr flag
+               sim::local_fmr_field=true;
+               return EXIT_SUCCESS;
             }
             //--------------------------------------------------------------------
             test="fmr-field-frequency";
-            if(word==test){
-                double f=atof(value.c_str());
-                // Test for valid range
-                if((f>=0.0) && (f<1.0E20)){
-                    read_material[super_index].fmr_field_frequency=f;
-                    // set local fmr flag
-                    sim::local_fmr_field=true;
-                    return EXIT_SUCCESS;
-                }
-                else{
-                    terminaltextcolor(RED);
-                    std::cerr << "Error on line " << line << " of material file - material[" << super_index+1 << "]:"<< word << " is outside of valid range 0.0 - 1.0E20" << std::endl;
-                    terminaltextcolor(WHITE);
-                    err::vexit();
-                }
+            if( word == test ){
+               double f = atof(value.c_str());
+               check_for_valid_value(f, word, line, prefix, unit, "frequency", 0.0, 1.0e14,"material","0 - 10,000 GHz");
+               read_material[super_index].fmr_field_frequency = f;
+               sim::local_fmr_field = true;
+               return EXIT_SUCCESS;
             }
             //------------------------------------------------------------
             test="fmr-field-unit-vector";
@@ -2534,6 +2522,7 @@ namespace vin{
             else if(exchange::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(sim::match_material_parameter(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
+            else if(spin_transport::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(environment::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;

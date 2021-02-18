@@ -289,9 +289,9 @@ namespace environment{
 
       for(int cell_i = 0; cell_i<num_cells;cell_i++){
 
-        const double V = cell_volume[cell_i];
-        const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
-        double self_demag = eightPI_three_cell_volume;
+        //const double V = cell_volume[cell_i];
+        //const double eightPI_three_cell_volume = 8.0*M_PI/(3.0*V);
+        //double self_demag = eightPI_three_cell_volume;
         // Normalise cell magnetisation by the Bohr magneton
 
         //std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;

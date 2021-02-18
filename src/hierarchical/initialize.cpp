@@ -569,7 +569,6 @@ namespace hierarchical{
                timer.start();
 
                std::cout << cells_num_local_cells << std::endl;
-               int id = 0;
                 for(int lc=0; lc<cells_num_local_cells; lc++){
                 //   start timer
                    int cell_i = cells::cell_id_array[lc];

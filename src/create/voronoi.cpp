@@ -125,10 +125,8 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 		int sdx = cs::system_dimensions[0];
 		int sdy = cs::system_dimensions[1];
-		double gs = grain_cell_size_x/2.0;
 
-
-		std::random_device rd;
+		//std::random_device rd;
       std::mt19937 gen(12345);
 		//variance = exp ( 2.0 * mu + sigma * sigma ) * ( exp ( sigma * sigma ) - 1.0 );
 		//mean = exp ( mu + 0.5 * sigma * sigma );
@@ -157,7 +155,6 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 		grain_coord_array[grain].push_back(initial_grain_pos_x);
 		grain_coord_array[grain].push_back(initial_grain_pos_y);
 		int num_active_grains = 1;
-		int N = 0 ;
 		grain++;
 		double PI = 3.14159265;
 		file << initial_grain_pos_x << '\t' << initial_grain_pos_y << '\t' << initial_grain_r << std::endl;
@@ -541,7 +538,7 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 	grains::num_grains = int(grain_coord_array.size());
 
 	// sort atoms by grain number
-	sort_atoms_by_grain(catom_array);
+	create::internal::sort_atoms_by_grain(catom_array);
 
 // 	for(unsigned int grain=0;grain<grain_coord_array.size();grain++){
 // 		file1<< "h"<< grain << '\t' << grain_coord_array[grain][0] << '\t' << grain_coord_array[grain][1] << "\t" << delta_particle_x << std::endl;

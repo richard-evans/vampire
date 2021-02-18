@@ -49,4 +49,23 @@ uint64_t str_to_uint64(std::string input_str){
 
 }
 
+//------------------------------------------------------------------------------
+// Simple function to convert string to double
+//------------------------------------------------------------------------------
+double str_to_double(std::string input_str){
+
+   // intermediate double variable
+   double value = 0.0;
+
+   // load value into std::sstream for safe type conversion
+   std::stringstream value_ss(input_str);
+
+   // read value into double
+   value_ss >> value;
+
+   // return double value
+   return value;
+
+}
+
 } // end of namespace vin

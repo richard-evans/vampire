@@ -77,11 +77,7 @@ materials_t::materials_t ():
  	override_atomsitic.resize(mp::max_materials);
 
 	// array variables
-   Jij_matrix_SI.resize(mp::max_materials);
-   Jij_matrix.resize(mp::max_materials);
    for(int i=0; i<mp::max_materials; i++){
-      Jij_matrix_SI[i].resize(3,0.0);
-      Jij_matrix[i].resize(3,0.0);
 		intermixing[i]=0.0;
 		alloy[i]=0.0;
 	}
@@ -108,9 +104,6 @@ int materials_t::print(){
 	std::cout << " Material " << name << std::endl;
 	std::cout << "----------------------------------------------------------------" << std::endl;
 	std::cout << "alpha          = " << alpha << std::endl;
-	for(int j=0;j<num_materials;j++){
-      std::cout << " Jij_matrix_SI[" << j << "] = " << Jij_matrix_SI[j][0] << std::endl;
-	}
 	std::cout << "mu_s_SI        = " << mu_s_SI << std::endl;
 	std::cout << "gamma_rel      = " << gamma_rel << std::endl;
 

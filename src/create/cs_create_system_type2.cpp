@@ -51,20 +51,17 @@
 // Internal create header
 #include "internal.hpp"
 
-namespace cs{
+namespace create{
 
    //----------------------------------------
    // function prototypes
    //----------------------------------------
-   int particle(std::vector<cs::catom_t> &);
-   int particle_array(std::vector<cs::catom_t> &);
 
    int intermixing(std::vector<cs::catom_t> &);
    void dilute(std::vector<cs::catom_t> &);
    void geometry(std::vector<cs::catom_t> &);
    void fill(std::vector<cs::catom_t> &);
    void roughness(std::vector<cs::catom_t> &);
-   void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array);
 
 //======================================================================
 //                         create_system_type
@@ -87,15 +84,15 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	//----------------------------------------------------------------------------------
 	switch(cs::system_creation_flags[2]){
 		case 0: // Isolated particle
-			particle(catom_array);
+			internal::particle(catom_array);
 			break;
 
 		case 1: // Cubic Particle Array
-			particle_array(catom_array);
+			internal::particle_array(catom_array);
 			break;
 
 		case 2: // Hexagonal Particle Array
-			//hex_particle_array(catom_array);
+			internal::hex_particle_array(catom_array);
 			break;
 
 		case 3: // Voronoi Granular Film
@@ -137,7 +134,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	dilute(catom_array);
 
 	// Delete unneeded atoms
-	clear_atoms(catom_array);
+	create::internal::clear_atoms(catom_array);
 
 	// Calculate final atomic composition
 	create::internal::calculate_atomic_composition(catom_array);
@@ -183,344 +180,7 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	return 0;
 }
 
-int particle(std::vector<cs::catom_t> & catom_array){
-	//====================================================================================
-	//
-	//										particle
-	//
-	//					Subroutine to cut single particle from lattice
-	//
-	//							Version 1.0 R Evans 22/09/2008
-	//
-	//====================================================================================
-
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){std::cout << "cs::particle has been called" << std::endl;}
-
-	//---------------------------------------------------
-	// Set particle origin to atom at centre of lattice
-	//---------------------------------------------------
-
-	std::vector<double> particle_origin(3,0.0);
-
-	particle_origin[0] = cs::system_dimensions[0]*0.5;
-	particle_origin[1] = cs::system_dimensions[1]*0.5;
-	particle_origin[2] = cs::system_dimensions[2]*0.5;
-
-   centre_particle_on_atom(particle_origin, catom_array);
-
-	// check for move in particle origin and that unit cell size < 0.5 system size
-	if(cs::particle_creation_parity==1 &&
-		(2.0*unit_cell.dimensions[0]<cs::system_dimensions[0]) &&
-		(2.0*unit_cell.dimensions[1]<cs::system_dimensions[1]) &&
-		(2.0*unit_cell.dimensions[2]<cs::system_dimensions[2])){
-		particle_origin[0]+=unit_cell.dimensions[0]*0.5;
-		particle_origin[1]+=unit_cell.dimensions[1]*0.5;
-		particle_origin[2]+=unit_cell.dimensions[2]*0.5;
-	}
-
-	// Use particle type flags to determine which particle shape to cut
-	switch(cs::system_creation_flags[1]){
-		case 0: // Bulk
-			create::internal::bulk(catom_array);
-			break;
-		case 1: // Cube
-			create::internal::cube(particle_origin,catom_array,0);
-			break;
-		case 2: // Cylinder
-			create::internal::cylinder(particle_origin,catom_array,0);
-			break;
-      case 3: // Ellipsoid
-         create::internal::ellipsoid(particle_origin,catom_array,0);
-         break;
-		case 4: // Sphere
-			create::internal::sphere(particle_origin,catom_array,0);
-			break;
-		case 5: // Truncated Octahedron
-			create::internal::truncated_octahedron(particle_origin,catom_array,0);
-			break;
-		case 6: // Teardrop
-			create::internal::teardrop(particle_origin,catom_array,0);
-			break;
-      case 7: // Faceted particle
-   		create::internal::faceted(particle_origin,catom_array,0);
-   		break;
-		case 8: // Cone
-			create::internal::cone(particle_origin,catom_array,0);
-			break;
-      case 9: // Bubble
-         create::internal::bubble(particle_origin,catom_array,0);
-         break;
-      case 10: // Ellipse
-         create::internal::ellipse(particle_origin,catom_array,0);
-         break;
-		default:
-			std::cout << "Unknown particle type requested for single particle system" << std::endl;
-			err::vexit();
-	}
-
-	return EXIT_SUCCESS;
-}
-
-int particle_array(std::vector<cs::catom_t> & catom_array){
-	//====================================================================================
-	//
-	//									particle_array
-	//
-	//					Subroutine to cut many particles from lattice
-	//					in a cubic configuration
-	//
-	//							Version 1.0 R Evans 23/09/2008
-	//
-	//
-	//====================================================================================
-
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::particle_array has been called" << std::endl;}
-
-	// Set number of particles in x and y directions
-	const double repeat_size = cs::particle_scale+cs::particle_spacing;
-	int num_x_particle = vmath::iceil(cs::system_dimensions[0]/repeat_size);
-	int num_y_particle = vmath::iceil(cs::system_dimensions[1]/repeat_size);
-
-	// Loop to generate cubic lattice points
-	int particle_number=0;
-
-	std::vector<double> particle_origin(3,0.0);
-
-	for (int x_particle=0;x_particle < num_x_particle;x_particle++){
-		for (int y_particle=0;y_particle < num_y_particle;y_particle++){
-
-			// Determine particle origin
-			particle_origin[0] = double(x_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_x;
-			particle_origin[1] = double(y_particle)*repeat_size + cs::particle_scale*0.5 + cs::particle_array_offset_y;
-			particle_origin[2] = double(vmath::iround(cs::system_dimensions[2]/(2.0*unit_cell.dimensions[2])))*unit_cell.dimensions[2];
-
-         centre_particle_on_atom(particle_origin, catom_array);
-
-			if(cs::particle_creation_parity==1){
-				particle_origin[0]+=unit_cell.dimensions[0]*0.5;
-				particle_origin[1]+=unit_cell.dimensions[1]*0.5;
-				particle_origin[2]+=unit_cell.dimensions[2]*0.5;
-			}
-			// Check to see if a complete particle fits within the system bounds
-			if((particle_origin[0]<=(cs::system_dimensions[0]-cs::particle_scale*0.5)) &&
-				(particle_origin[1]<=(cs::system_dimensions[1]-cs::particle_scale*0.5))){
-
-				// Use particle type flags to determine which particle shape to cut
-				switch(cs::system_creation_flags[1]){
-					case 0: // Bulk
-						create::internal::bulk(catom_array);
-						break;
-					case 1: // Cube
-						create::internal::cube(particle_origin,catom_array,particle_number);
-						break;
-					case 2: // Cylinder
-						create::internal::cylinder(particle_origin,catom_array,particle_number);
-						break;
-               case 3: // Ellipsoid
-                  create::internal::ellipsoid(particle_origin,catom_array,particle_number);
-                  break;
-					case 4: // Sphere
-						create::internal::sphere(particle_origin,catom_array,particle_number);
-						break;
-					case 5: // Truncated Octahedron
-						create::internal::truncated_octahedron(particle_origin,catom_array,particle_number);
-						break;
-					case 6: // Teardrop
-						create::internal::teardrop(particle_origin,catom_array,particle_number);
-						break;
-               case 7: // Faceted particle
-                  create::internal::faceted(particle_origin,catom_array,particle_number);
-                  break;
-		         case 8: // Cone
-			         create::internal::cone(particle_origin,catom_array,particle_number);
-			         break;
-               case 9: // Bubble
-                  create::internal::bubble(particle_origin,catom_array,particle_number);
-                  break;
-               case 10: // Ellipse
-                  create::internal::ellipse(particle_origin,catom_array,0);
-                  break;
-					default:
-						std::cout << "Unknown particle type requested for single particle system" << std::endl;
-						err::vexit();
-				}
-				// Increment Particle Number Counter
-				particle_number++;
-			}
-		}
-	}
-	grains::num_grains = particle_number;
-
-	// Check for no generated particles and print error message
-	if(particle_number==0){
-		zlog << zTs() << "Error: no particles generated in particle array." << std::endl;
-		zlog << zTs() << "Info: Particle arrays require that at least 1 complete particle fits within the system dimensions." << std::endl;
-		zlog << zTs() << "Info: Increase x and y system dimensions to at least one particle-scale." << std::endl;
-	}
-
-	// Re-order atoms by particle number
-	sort_atoms_by_grain(catom_array);
-
-	return EXIT_SUCCESS;
-}
 /*
-int hex_particle_array(int cs_num_atoms,int** cs_coord_array,int* particle_include_array){
-	//====================================================================================
-	//
-	//									particle_array
-	//
-	//					Subroutine to cut many particles from lattice
-	//					in a cubic configuration
-	//
-	//							Version 1.0 R Evans 28/10/2008
-	//
-	//					Note: particle counter doesn't do anything (yet)
-	//
-	//====================================================================================
-
-	//---------------------------------------------------
-	// Local variables
-	//---------------------------------------------------
-
-	int particle_origin[3];
-	int atom;
-	int particle_number, x_particle, y_particle, num_x_particle, num_y_particle;
-	int particle_parity;
-	//int distance_squared, min_distance_squared, closest_atom;
-
-	int particle_coords[3], int_particle_scale,int_particle_spacing;
-	int int_system_dimensions[3];
-
-	//----------------------------------------------------------
-	// check calling of routine if error checking is activated
-	//----------------------------------------------------------
-	if(err::check==true){std::cout << "particle_array has been called" << std::endl;}
-
-	//----------------------------------------------------------
-	// set initial particle number
-	//----------------------------------------------------------
-
-	particle_number = 0;
-
-	//----------------------------------------------------------
-	// Set number of particles in x and y directions
-	//----------------------------------------------------------
-
-	num_x_particle = 2+iround(material_parameters::system_dimensions[0]/material_parameters::particle_scale);
-	num_y_particle = 2+iround(material_parameters::system_dimensions[1]/material_parameters::particle_scale);
-
-	//----------------------------------------------------------
-	// Set integer equivalents of system/particle dimensions
-	//----------------------------------------------------------
-
-	//calculate int particle radius
-	int_particle_scale = iround(material_parameters::particle_scale/(material_parameters::lattice_constant[1]));
-	//int_particle_spacing = iround(material_parameters::particle_spacing/(2.0*material_parameters::lattice_constant[1]));
-
-	//double delta_particle_x_const = material_parameters::particle_scale/(material_parameters::lattice_constant[1]);
-	//double delta_particle_y_const = material_parameters::particle_scale/(material_parameters::lattice_constant[2])*sqrt(3.0);
-	double delta_particle_x = (material_parameters::particle_scale + material_parameters::particle_spacing)/(material_parameters::lattice_constant[1]);
-	double delta_particle_y = ((material_parameters::particle_scale + material_parameters::particle_spacing)/(material_parameters::lattice_constant[2]))*sqrt(3.0);
-	double delta_particle_x_parity = delta_particle_x*0.5;
-	double delta_particle_y_parity = delta_particle_y*0.5;
-
-	int_system_dimensions[0] = int(material_parameters::system_dimensions[0]/material_parameters::lattice_constant[0]);
-	int_system_dimensions[1] = int(material_parameters::system_dimensions[1]/material_parameters::lattice_constant[1]);
-	int_system_dimensions[2] = int(material_parameters::system_dimensions[2]/material_parameters::lattice_constant[2]);
-
-	//---------------------------------------------------------
-	// Loop to generate cubic hexagonal lattice points
-	//---------------------------------------------------------
-
-	for (x_particle=0;x_particle < num_x_particle;x_particle++){
-		for (y_particle=0;y_particle < num_y_particle;y_particle++){
-			for (particle_parity=0;particle_parity<2;particle_parity++){
-
-				//---------------------------------------------------
-				// Determine particle coordinates
-				//---------------------------------------------------
-
-				//particle_coords[0] = 2*x_particle*(int_particle_scale + int_particle_spacing) + 2*int_particle_scale + (particle_parity*(int_particle_scale + int_particle_spacing));
-				//particle_coords[1] = 2*y_particle*(int_particle_scale + int_particle_spacing) + 2*int_particle_scale + (particle_parity*(int_particle_scale + int_particle_spacing));
-				//particle_coords[2] = int_system_dimensions[2]/2;
-				particle_coords[0] = iround((1.0+particle_parity)*delta_particle_x_parity + delta_particle_x*x_particle);
-				particle_coords[1] = iround((1.0+particle_parity)*delta_particle_y_parity + delta_particle_y*y_particle);
-				particle_coords[2] = int_system_dimensions[2]/2;
-
-		//---------------------------------------------------
-		// Set particle origin to particle coords
-		//---------------------------------------------------
-
-		particle_origin[0] = 2*particle_coords[0];
-		particle_origin[1] = 6*particle_coords[1];
-		particle_origin[2] = 2*particle_coords[2];
-
-		if(mp::particle_creation_parity==1){
-			std::string cs = "sc";
-			if(mp::crystal_structure==cs){
-				particle_origin[0]+=1;
-				particle_origin[1]+=3;
-				particle_origin[2]+=1;
-			}
-			cs = "fcc";
-			if(mp::crystal_structure==cs){
-				particle_origin[0]+=1;
-				particle_origin[1]+=3;
-				particle_origin[2]+=1;
-			}
-		}
-		//-------------------------------------------------------------------
-		// Check to see if a complete particle fits within the system bounds
-		//-------------------------------------------------------------------
-
-		//std::cout << particle_origin[0] << "\t" << 2*(int_system_dimensions[0]-int_particle_scale) << "\t"
-		//	 << particle_origin[1] << "\t" << 6*(int_system_dimensions[1]-int_particle_scale) << std::endl;
-
-
-		if((particle_origin[0]<2*(int_system_dimensions[0]-int_particle_scale)) &&
-		   (particle_origin[1]<6*(int_system_dimensions[1]-int_particle_scale))){
-			//------------------------------------------------------------------
-			// Use particle type flags to determine which particle shape to cut
-			//------------------------------------------------------------------
-			switch(material_parameters::system_creation_flags[1]){
-				case 0: // Bulk
-					for(atom=0;atom<cs_num_atoms;atom++) particle_include_array[atom]=1;
-					std::cout << "Warning - bulk particle type requested for particle array system" << std::endl;
-					return 0;
-					break;
-				case 2: // Cylinder
-					cs_cylinder(cs_num_atoms,cs_coord_array,particle_include_array,particle_origin);
-					break;
-				case 4: // Sphere
-					cs_sphere(cs_num_atoms,cs_coord_array,particle_include_array,particle_origin);
-					break;
-				case 5: // Truncated Octahedron
-					cs_truncated_octahedron(cs_num_atoms,cs_coord_array,particle_include_array,particle_origin);
-					break;
-
-				default:
-					std::cout << "Unknown particle type requested for single particle system" << std::endl;
-					err::vexit();
-				}
-
-			//------------------------------------------------------------------
-			// Increment Particle Number Counter
-			//------------------------------------------------------------------
-			particle_number++;
-		   }
-		   }
-		}
-	}
-
-	return 0;
-}
-*/
-/*
-
 int pop_template_2D(int** template_array_2D,int cs_num_atoms,int** cs_coord_array,int* particle_include_array,int* template_bounds){
 
 	//====================================================================================
@@ -554,6 +214,7 @@ int pop_template_2D(int** template_array_2D,int cs_num_atoms,int** cs_coord_arra
 
 }
 */
+namespace internal{
 
 void clear_atoms(std::vector<cs::catom_t> & catom_array){
 
@@ -613,33 +274,6 @@ void clear_atoms(std::vector<cs::catom_t> & catom_array){
    return;
 
 }
-
-// comparison function
-bool compare(cs::catom_t first,cs::catom_t second){
-	if(first.grain<second.grain) return true;
-	else return false;
-}
-
-int sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array){
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "cs::sort_atoms_by_grain has been called" << std::endl;}
-
-	// Get number of atoms
-	const int num_atoms=catom_array.size();
-
-	// Create list object
-	std::list <cs::catom_t> catom_list(num_atoms);
-
-	// copy data to list
-	copy(catom_array.begin(), catom_array.end(), catom_list.begin());
-
-	// sort date in list
-	catom_list.sort(compare);
-
-	// copy list to data
-	copy(catom_list.begin(), catom_list.end(), catom_array.begin());
-
-	return EXIT_SUCCESS;
 }
 
 int intermixing(std::vector<cs::catom_t> & catom_array){
@@ -860,81 +494,6 @@ void fill(std::vector<cs::catom_t> & catom_array){
 
 }
 
-//------------------------------------------------------------------------------------------------------
-// Function to alter particle origin to be centred on an atom
-//------------------------------------------------------------------------------------------------------
-void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array){
 
-   vmpi::barrier();
 
-   // set initial max range
-   double max_range_sq = 1e123;
-   unsigned int nearest; // nearest atom to initial particle origin
-
-   // copy to temporary for speed
-   const double prx = particle_origin[0];
-   const double pry = particle_origin[1];
-   const double prz = particle_origin[2];
-
-   // loop over all atoms to find closest atom
-   for(int atom=0;atom<catom_array.size();atom++){
-      double dx = catom_array[atom].x - prx;
-      double dy = catom_array[atom].y - pry;
-      double dz = catom_array[atom].z - prz;
-      double r = dx*dx + dy*dy + dz*dz;
-      if(r < max_range_sq){
-         max_range_sq = r;
-         nearest = atom;
-      }
-   }
-
-   // set particle origin to nearest atom
-   particle_origin[0] = catom_array[nearest].x;
-   particle_origin[1] = catom_array[nearest].y;
-   particle_origin[2] = catom_array[nearest].z;
-
-   //-----------------------------------------------------
-   // For parallel reduce on all CPUs
-   //-----------------------------------------------------
-   #ifdef MPICF
-
-      // set up array to get ranges from all CPUs on rank 0
-      std::vector<double> ranges;
-      if(vmpi::my_rank == 0) ranges.resize(vmpi::num_processors, 1.e123);
-      else ranges.resize(1,0.0); // one value sufficient on all other CPUs
-
-      // gather max ranges from all cpus on root (1 data point from each process)
-      MPI_Gather(&max_range_sq, 1, MPI_DOUBLE, &ranges[0], 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-      // variable to store rank of minimum range
-      unsigned int rank_of_min_range=0;
-
-      // work out minimum range on root
-      if(vmpi::my_rank==0){
-
-         double min_range = 1.e123;
-
-         // loop over all ranges and determine minimum and cpu location
-         for(int i=0; i<ranges.size(); i++){
-            if(ranges[i] < min_range){
-               min_range = ranges[i];
-               rank_of_min_range = i;
-            }
-         }
-      }
-
-      // broadcast id of nearest to all cpus from root
-      MPI_Bcast(&rank_of_min_range, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
-
-      // broadcast position to all cpus
-      MPI_Bcast(&particle_origin[0], 3, MPI_DOUBLE, rank_of_min_range, MPI_COMM_WORLD);
-
-      vmpi::barrier();
-
-   #endif
-
-   return;
-
-}
-
-} // end of namespace
+} // end of namespace create

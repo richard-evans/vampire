@@ -39,7 +39,7 @@ namespace micromagnetic{
        double area = overlap_area*1e-8;
 
        double Rmin = Ra/area;
-       double one_o_Rmin = 1.0/Rmin;
+       //double one_o_Rmin = 1.0/Rmin;
        double sum_one_o_R = 0.0;
 
    //    std::cout <<resistance_layer_1 << '\t' << resistance_layer_2 << '\t' << Ra << '\t' << area << std::endl;

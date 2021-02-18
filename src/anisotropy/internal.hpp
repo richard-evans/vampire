@@ -91,6 +91,8 @@ namespace anisotropy{
             double kc4; // fourth order cubic anisotropy constant (Kc1)
             double kc6; // sixth order cubic anisotropy constant (Kc2)
 
+            double k4r; // fourth order rotational anisotropy constant (k4r)
+
             double k_lattice; // uniaxial lattice anisotropy constant
 
             std::vector<double> kij; // surface/Neel anisotropy pair constant
@@ -170,6 +172,13 @@ namespace anisotropy{
       extern bool enable_cubic_sixth_order;     // Flag to enable calculation of sixth order cubic  anisotropy
       extern bool enable_cubic_fourth_order_rotation; // Flag to enable calculation of rotated cubic anisotropy
 
+      extern bool enable_fourth_order_rotational; // Flag to enable 4th order rotational anisotropy
+
+      extern bool enable_triaxial_anisotropy_rotated;
+      extern bool enable_triaxial_fourth_order_rotated;
+      extern bool enable_triaxial_anisotropy;
+      extern bool enable_triaxial_fourth_order;
+
       extern bool enable_neel_anisotropy; // Flag to turn on Neel anisotropy calculation (memory intensive at startup)
       extern bool enable_lattice_anisotropy; // Flag to turn on lattice anisotropy calculation
       extern bool enable_random_anisotropy; // Flag to enable random anisitropy initialisation
@@ -183,6 +192,7 @@ namespace anisotropy{
       extern std::vector<double> ku6;
       extern std::vector<double> kc4;
       extern std::vector<double> kc6;
+      extern std::vector<double> k4r;
 
       // unrolled arrays for storing easy axes for each material
       extern std::vector<evec_t> ku_vector; // 001 easy axis direction
@@ -194,6 +204,43 @@ namespace anisotropy{
       extern double neel_exponential_range;          // r0 value for range dependence of Neel anisotropy
       extern double neel_exponential_factor;         // F value for range dependence of Neel anisotropy
 
+      extern std::vector<bool> triaxial_second_order_fixed_basis;
+      extern std::vector<bool> triaxial_fourth_order_fixed_basis;
+
+      extern std::vector<double> ku_triaxial_vector_x; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku_triaxial_vector_y; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku_triaxial_vector_z; // unit vector defining axis for uniaxial anisotropy
+
+      extern std::vector<double> ku4_triaxial_vector_x; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku4_triaxial_vector_y; // unit vector defining axis for uniaxial anisotropy
+      extern std::vector<double> ku4_triaxial_vector_z; // unit vector defining axis for uniaxial anisotropy
+
+      //basis vectors for second order triaxial - must be orthogonality
+      extern std::vector < double > ku_triaxial_basis1x;
+      extern std::vector < double > ku_triaxial_basis1y;
+      extern std::vector < double > ku_triaxial_basis1z;
+
+      extern std::vector < double > ku_triaxial_basis2x;
+      extern std::vector < double > ku_triaxial_basis2y;
+      extern std::vector < double > ku_triaxial_basis2z;
+
+      extern std::vector < double > ku_triaxial_basis3x;
+      extern std::vector < double > ku_triaxial_basis3y;
+      extern std::vector < double > ku_triaxial_basis3z;
+
+      //basis vectors for fourth order triaxial - must be orthogonality
+      extern std::vector < double > ku4_triaxial_basis1x;
+      extern std::vector < double > ku4_triaxial_basis1y;
+      extern std::vector < double > ku4_triaxial_basis1z;
+
+      extern std::vector < double > ku4_triaxial_basis2x;
+      extern std::vector < double > ku4_triaxial_basis2y;
+      extern std::vector < double > ku4_triaxial_basis2z;
+
+      extern std::vector < double > ku4_triaxial_basis3x;
+      extern std::vector < double > ku4_triaxial_basis3y;
+      extern std::vector < double > ku4_triaxial_basis3z;
+
       // arrays for storing unrolled parameters for lattice anisotropy
       extern std::vector<double> klattice_array; // anisoptropy constant
 
@@ -201,6 +248,47 @@ namespace anisotropy{
       // internal function declarations
       //-------------------------------------------------------------------------
       void uniaxial_second_order_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+
+
+       void triaxial_second_order_fields_fixed_basis(std::vector<double>& spin_array_x,
+                                                     std::vector<double>& spin_array_y,
+                                                     std::vector<double>& spin_array_z,
+                                                     std::vector<int>&    atom_material_array,
+                                                     std::vector<double>& field_array_x,
+                                                     std::vector<double>& field_array_y,
+                                                     std::vector<double>& field_array_z,
+                                                     const int start_index,
+                                                     const int end_index);
+
+      void triaxial_second_order_fields(std::vector<double>& spin_array_x,
+                                                    std::vector<double>& spin_array_y,
+                                                    std::vector<double>& spin_array_z,
+                                                    std::vector<int>&    atom_material_array,
+                                                    std::vector<double>& field_array_x,
+                                                    std::vector<double>& field_array_y,
+                                                    std::vector<double>& field_array_z,
+                                                    const int start_index,
+                                                    const int end_index);
+
+     void triaxial_fourth_order_fields_fixed_basis(std::vector<double>& spin_array_x,
+                                                  std::vector<double>& spin_array_y,
+                                                  std::vector<double>& spin_array_z,
+                                                  std::vector<int>&    atom_material_array,
+                                                  std::vector<double>& field_array_x,
+                                                  std::vector<double>& field_array_y,
+                                                  std::vector<double>& field_array_z,
+                                                  const int start_index,
+                                                  const int end_index);
+
+      void triaxial_fourth_order_fields(std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
                                         std::vector<int>&    atom_material_array,
@@ -221,6 +309,16 @@ namespace anisotropy{
                                         const int end_index);
 
       void uniaxial_sixth_order_fields( std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);
+
+      void rotational_fourth_order_fields_fixed_basis( std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
                                         std::vector<double>& spin_array_z,
                                         std::vector<int>&    atom_material_array,
@@ -287,6 +385,31 @@ namespace anisotropy{
                                            const double sy,
                                            const double sz);
 
+      double triaxial_second_order_energy_fixed_basis(const int atom,
+                                                      const int mat,
+                                                      const double sx,
+                                                      const double sy,
+                                                      const double sz);
+
+      double triaxial_fourth_order_energy_fixed_basis(const int atom,
+                                                      const int mat,
+                                                      const double sx,
+                                                      const double sy,
+                                                      const double sz);
+
+      double triaxial_second_order_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+      double triaxial_fourth_order_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);
+
+
       double uniaxial_fourth_order_energy(const int atom,
                                           const int mat,
                                           const double sx,
@@ -299,6 +422,12 @@ namespace anisotropy{
                                           const double sy,
                                           const double sz);
 
+      double rotational_fourth_order_energy_fixed_basis( const int atom,
+                                                         const int mat,
+                                                         const double sx,
+                                                         const double sy,
+                                                         const double sz);
+
       double cubic_fourth_order_energy(const int atom,
                                        const int mat,
                                        const double sx,
@@ -310,6 +439,7 @@ namespace anisotropy{
                                        const double sx,
                                        const double sy,
                                        const double sz);
+
 
       double cubic_sixth_order_energy( const int atom,
                                        const int mat,

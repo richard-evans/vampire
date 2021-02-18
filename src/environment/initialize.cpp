@@ -62,8 +62,8 @@ namespace environment{
        env::env_field_uv[1] = env::env_field_uv[1]*env::env_field;
        env::env_field_uv[2] = env::env_field_uv[2]*env::env_field;
 
-       double mm_size_x, mm_size_y,mm_size_z;
-       double env_size_x, env_size_y,env_size_z;
+       //double mm_size_x, mm_size_y,mm_size_z;
+       //double env_size_x, env_size_y,env_size_z;
 
        env::shield_shape.resize(env::num_shields+1,"cube");
        env::shield_ms.resize(env::num_shields+1, 1e-21);
@@ -93,7 +93,7 @@ namespace environment{
        env::random_spins.resize(env::num_shields+1,false);
 
 
-       int a = env::read_in_shield_info();
+       env::read_in_shield_info();
 
        for (int shield=0; shield < env::num_shields; shield++){
          env::shield_Hext_x[shield] = env::shield_Hext_x[shield]*env::H_strength[shield];
@@ -406,7 +406,7 @@ namespace environment{
 
        //calcualtes me
 
-         double m_e = pow((env::shield_Tc[0]-sim::temperature)/(env::shield_Tc[0]),0.365);
+         //double m_e = pow((env::shield_Tc[0]-sim::temperature)/(env::shield_Tc[0]),0.365);
 
 
        //adds all cells which are not within the atomistic section to the the none atomsitic cells list or the atomistic cells list

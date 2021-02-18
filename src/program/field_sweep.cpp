@@ -130,7 +130,7 @@ int field_sweep(){
 	else sim::integrate(sim::equilibration_time);
 
    // Hinc must be positive
-	int iHinc=vmath::iround(double(fabs(sim::Hinc))*1.0E6);
+	//int iHinc=vmath::iround(double(fabs(sim::Hinc))*1.0E6);
 	double field = Hstart;
 	bool run = true;
 		// Perform Field loop-field

@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2017. All rights reserved.
+//   (c) Richard F L Evans 2020. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -23,6 +23,8 @@
 
 // Vampire headers
 #include "exchange.hpp"
+#include "errors.hpp"
+#include "vio.hpp"
 
 // exchange module headers
 #include "internal.hpp"
@@ -34,6 +36,106 @@ namespace exchange{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
+      // data type for storing long range user definable long range exchange
+      // interactions. In general data can be num_materials * num_materials * 10 * 9
+      // elements large, and so we store the data in compact arrays so that only
+      // defined materials are stored, and only the righ number of values.
+      // access is horrible so class includes set and get functions to make things
+      // easier programatically. In the end these values are just unrolled into the
+      // usual exchange list.
+      //
+      class exchange_matrix_4D_t{
+
+         private:
+            int max_materials; // number of materials needed to store user input data
+            int max_neighbours; // number of neighbour needed (determines range of interaction)
+            // lovely 4D array for storing [materiali][materialj][neighbour][Jijs]
+            std::vector< std::vector< std::vector< std::vector <double> > > > exchange_matrix_array;
+
+            // function to resize storage array
+            void resize(const int num_materials, const int num_neighbours){
+
+               //std::cout << "Setting storage size to " << num_materials << " materials and " << num_neighbours << " neighbours" << std::endl;
+
+               for(int i = 0; i < num_materials; i++){
+                  exchange_matrix_array.resize(num_materials);
+                  for(int j = 0; j < num_materials; j++){
+                     exchange_matrix_array[i].resize(num_materials);
+                     for(int k = 0; k < num_neighbours; k++) exchange_matrix_array[i][j].resize(num_neighbours);
+                  }
+               }
+               // save maximum array sizes
+               max_materials  = num_materials;
+               max_neighbours = num_neighbours;
+               return;
+            }
+
+         public:
+
+            // constructor
+            exchange_matrix_4D_t(){
+               // set initial sizes of zero
+               max_materials = 0;
+               max_neighbours = 0;
+               // resize storage
+               resize(max_materials, max_neighbours);
+            };
+
+            // function to set a particular set of exchange values
+            void set_exchange_values(int material_i, int material_j, int neighbour, std::vector<double> exchange_values){
+
+               // check for expansion of storage size
+               int new_max_materials = max_materials;
+               if( material_i > new_max_materials-1 ) new_max_materials = material_i+1;
+               if( material_j > new_max_materials-1 ) new_max_materials = material_j+1;
+
+               int new_max_neighbours = max_neighbours;
+               if( neighbour > new_max_neighbours-1 ) new_max_neighbours = neighbour+1;
+
+               if( new_max_materials > max_materials || new_max_neighbours > max_neighbours) resize(new_max_materials, new_max_neighbours);
+
+               // now add exchange values in-place
+               exchange_matrix_array[material_i][material_j][neighbour] = exchange_values;
+
+               return;
+
+            }
+
+            // function to get a list of exchange values for a certain material pair and neighbour number
+            std::vector<double> get_exchange_values(int material_i, int material_j, int neighbour){
+
+               // initialise a vector to return exchange values
+               std::vector<double> exchange_values(1,0.0);
+
+               // check for valid array access
+               bool ok = true;
+               if(material_i > max_materials-1) ok = false;
+               if(material_j > max_materials-1) ok = false;
+               if(neighbour > max_neighbours-1) ok = false;
+
+               // if out of bounds access, this means constant was never set so assume zero
+               if(!ok) return exchange_values;
+
+               // array index value is valid, so return values (single value, Jij=0.0 array if empty)
+               if(exchange_matrix_array[material_i][material_j][neighbour].size() > 0){
+                  exchange_values = exchange_matrix_array[material_i][material_j][neighbour];
+               }
+
+               // return exchange values
+               return exchange_values;
+
+            }
+
+            int get_max_shells(){
+               return max_neighbours;
+            }
+
+            int get_max_materials(){
+               return max_materials;
+            }
+
+      };
+
       //-----------------------------------------------------------------------------
       // materials class for storing exchange material parameters
       //-----------------------------------------------------------------------------
@@ -44,14 +146,12 @@ namespace exchange{
          public:
 
             // variables
-            std::vector<double> bqe; // Biquadratic exchange constant
             std::vector<double> dmi; // Dzyaloshinskii-Moriya interaction constant
 
             // constructor
             mp_t (const unsigned int max_materials = 100)
             {
                // resize arrays to correct size
-               bqe.resize(max_materials, 0.0); // initialise biquadratic constants to zero
                dmi.resize(max_materials, 0.0); // initialise pair anisotropy constants to zero
 
             }; // end of constructor
@@ -62,6 +162,9 @@ namespace exchange{
       // Internal shared variables
       //-------------------------------------------------------------------------
       extern std::vector<internal::mp_t> mp; // array of material properties
+
+      extern exchange_matrix_4D_t bilinear_exchange_constants; // array of exchange constants
+      extern exchange_matrix_4D_t biquadratic_exchange_constants; // array of biquadratic exchange constants
 
       extern bool enable_dmi; // flag to enable dmi calculation
 
