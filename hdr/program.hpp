@@ -56,7 +56,8 @@ namespace program
 	extern int LLB_Boltzmann();
 	extern int timestep_scaling();
 	extern void boltzmann_dist();
-  extern void setting_process();
+  	extern void setting_process();
+  	extern void boltzmann_dist_micromagnetic_llg();
 
 }
 

@@ -423,6 +423,11 @@ namespace vin{
                sim::program=52;
                return EXIT_SUCCESS;
             }
+            test="diagnostic-boltzmann-micromagnetic-llg";
+            if(value==test){
+                sim::program=53;
+                return EXIT_SUCCESS;
+            }
             test="field-sweep";
             if(value==test){
                 sim::program=60;

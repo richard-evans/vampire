@@ -485,6 +485,14 @@ int run(){
 			program::tracks();
 			break;
 
+		case 53:
+			if(vmpi::my_rank==0){
+				std::cout << "diagnostic-boltzmann-micromganetic-llg..." << std::endl;
+				zlog << "diagnostic-boltzmann-micromganetic-llg..." << std::endl;
+			}
+			program::boltzmann_dist_micromagnetic_llg();
+			break;
+
 		case 60:
 			if(vmpi::my_rank==0){
 				std::cout << "field-sweep..." << std::endl;

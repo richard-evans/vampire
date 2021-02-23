@@ -52,14 +52,6 @@ namespace micromagnetic{
    //sets the integrator to be LLB if none is specified
    int integrator = 1;
 
-
-   //variables for boltzman
-   std::vector < std::vector < double > > P;
-
-   std::vector < double > P1D(1001,0.0);
-
-   bool boltzman = false;
-
    double mean_M=0.0;
    double counter=0.0;
 
@@ -71,12 +63,14 @@ namespace micromagnetic{
       // Shared variables inside micromagnetic module
       //------------------------------------------------------------------------
 
+      bool temperature_dependent_parameters = true; // flag to set temperature dependent micrmagnetic parameters
+
       int my_num_micromagnetic_cells;
       int my_start_index; // first cell to intergrate on local (my) cpu
       int my_end_index;  // last cell +1 to intergrate on local (my) cpu
 
       double bias_magnets_max_height = 1.0;
-      double bias_magnets_min_height= 0.0;
+      double bias_magnets_min_height = 0.0;
       double bias_magnet_ms_input = 1.0;
 
       double bias_magnets_max_width = 1.0;
@@ -98,6 +92,7 @@ namespace micromagnetic{
       std::vector < double > bias_field_z;
 
       bool bias_magnets = false;
+
       //stores the micromagnetic properties of the macrocells
       std::vector<double> A;
       std::vector<double> alpha;

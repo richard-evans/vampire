@@ -47,6 +47,8 @@ namespace micromagnetic{
       // Internal shared variables
       //-------------------------------------------------------------------------
 
+      extern bool temperature_dependent_parameters; // flag to set temperature dependent micrmagnetic parameters
+
       extern std::vector < double > bias_field_x;
       extern std::vector < double > bias_field_y;
       extern std::vector < double > bias_field_z;
@@ -178,13 +180,23 @@ namespace micromagnetic{
                                                 std::vector<double>& y_array,
                                                 std::vector<double>& z_array);
 
-      std::vector<double> calculate_llg_fields(std::vector <double > m,
-                                                double temperature,
-                                                int num_cells,
-                                                int cell,
-                                                std::vector<double>& x_array,
-                                                std::vector<double>& y_array,
-                                                std::vector<double>& z_array);
+      void calculate_llg_external_fields(const double temperature,
+                                         const int num_cells,
+                                         std::vector<double>& x_array,
+                                         std::vector<double>& y_array,
+                                         std::vector<double>& z_array,
+                                         std::vector<double>& x_total_external_field_array,
+                                         std::vector<double>& y_total_external_field_array,
+                                         std::vector<double>& z_total_external_field_array);
+
+      void calculate_llg_spin_fields(const double temperature,
+                                     const int num_cells,
+                                     std::vector<double>& mx_array, // Normalised magnetic moment unit vector
+                                     std::vector<double>& my_array, // Normalised magnetic moment unit vector
+                                     std::vector<double>& mz_array, // Normalised magnetic moment unit vector
+                                     std::vector<double>& x_total_spin_field_array,   // total magnetic field
+                                     std::vector<double>& y_total_spin_field_array,   // total magnetic field
+                                     std::vector<double>& z_total_spin_field_array);  // total magnetic field
 
       void output_system_parameters(std::vector<double>& pos_and_mom_array,
                                     std::vector<double>& x_mag_array,

@@ -34,6 +34,7 @@ namespace micromagnetic{
       std::string prefix="micromagnetic";
       if(key!=prefix) return false;
 
+      //--------------------------------------------------------------------
       std::string test="integrator";
       if(word==test){
          test="llg";
@@ -55,6 +56,7 @@ namespace micromagnetic{
             err::vexit();
          }
       }
+      //--------------------------------------------------------------------
       test="atomistic-steps-per-micromagnetic-step";
       if(word==test){
          double dt=atof(value.c_str());
@@ -62,13 +64,7 @@ namespace micromagnetic{
          micromagnetic::num_atomic_steps_mm =dt;
          return true;
       }
-
-      test="output-boltzman";
-      if(word==test){
-         boltzman =true;
-         return true;
-      }
-
+      //--------------------------------------------------------------------
       test="discretisation"; // whether the material is micromagnetic or atomistic
       if(word==test){
 
@@ -103,13 +99,13 @@ namespace micromagnetic{
 
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="pinning-field-correction";
       if(word==test){
          micromagnetic::internal::mm_correction = true;
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="resistance-GMR";
       if(word==test){
          double h = atof(value.c_str());
@@ -117,7 +113,7 @@ namespace micromagnetic{
          micromagnetic::internal::res_GMR = h;
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="resistance-RA";
       if(word==test){
          double h = atof(value.c_str());
@@ -125,13 +121,13 @@ namespace micromagnetic{
          micromagnetic::internal::res_RA = h;
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="bias-magnets";
       if(word==test){
          micromagnetic::internal::bias_magnets = true;
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="bias-magnets-max-height";
       if(word==test){
          double h = atof(value.c_str());
@@ -139,7 +135,7 @@ namespace micromagnetic{
          vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="bias-magnets-min-height";
       if(word==test){
          double h = atof(value.c_str());
@@ -147,7 +143,7 @@ namespace micromagnetic{
          vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="bias-magnets-max-width";
       if(word==test){
          double h = atof(value.c_str());
@@ -155,7 +151,7 @@ namespace micromagnetic{
          vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="bias-magnets-min-width";
       if(word==test){
          double h = atof(value.c_str());
@@ -163,8 +159,7 @@ namespace micromagnetic{
          vin::check_for_valid_value(h, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
          return true;
       }
-
-
+      //--------------------------------------------------------------------
       test="bias-magnets-gap";
       if(word==test){
          double h = atof(value.c_str());
@@ -172,7 +167,7 @@ namespace micromagnetic{
          micromagnetic::internal::bias_magnets_gap = h;
          return true;
       }
-
+      //--------------------------------------------------------------------
       test="pinning-field-height";
       if(word==test){
          double h=atof(value.c_str());
@@ -180,6 +175,7 @@ namespace micromagnetic{
          micromagnetic::internal::pinning_field_height =h;
          return true;
       }
+      //--------------------------------------------------------------------
       test="bias-magnet-Ms";
       if(word==test){
          double h=atof(value.c_str());
@@ -187,7 +183,13 @@ namespace micromagnetic{
          micromagnetic::internal::bias_magnet_ms_input =h;
          return true;
       }
-
+      //--------------------------------------------------------------------
+      test="temperature-dependent-parameters";
+      if(word==test){
+         bool tf = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         micromagnetic::internal::temperature_dependent_parameters = tf;
+         return true;
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found
