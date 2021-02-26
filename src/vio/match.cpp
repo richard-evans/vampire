@@ -1542,13 +1542,13 @@ namespace vin{
         //--------------------------------------------------------------------
         test="current";
         if(word==test){
-           output_list.push_back(66);
+           output_list.push_back(71);
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="domain-wall-centre";
         if(word==test){
-            output_list.push_back(67);
+            output_list.push_back(70);
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------

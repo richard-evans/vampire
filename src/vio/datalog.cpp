@@ -253,36 +253,33 @@ namespace vout{
       	case 62:
       		vout::mean_material_specific_heat(stream,header);
       		break;
-         case 63:
+        case 63:
             vout::material_total_energy(stream,header);
             break;
-         case 64:
+        case 64:
             vout::material_mean_total_energy(stream,header);
             break;
-			case 65:
-				vout::resistance(stream, header);
-			  	break;
-			case 66:
-			  	vout::current(stream, header);
-			  	break;
-			case 67:
-				vout::domain_wall_position(stream,header);
-				break;
-			case 68:
-            vout::MRresistance(stream,header);
-            break;
-			case 69:
-			 	vout::lfa_ms(stream,header);
-				break;
-			case 70:
-				vout::x_track_pos(stream,header);
-				break;
-			case 71:
-				vout::z_track_pos(stream,header);
-				break;
-			case 999: //AJN
-				vout::standard_deviation(stream,header);
-				break;
+		case 71:
+			vout::current(stream, header);
+			break;
+		case 70:
+			vout::domain_wall_position(stream,header);
+			break;
+		case 65:
+		vout::MRresistance(stream,header);
+		break;
+		case 66:
+			vout::lfa_ms(stream,header);
+			break;
+		case 67:
+			vout::x_track_pos(stream,header);
+			break;
+		case 68:
+			vout::z_track_pos(stream,header);
+			break;
+		case 999: //AJN
+			vout::standard_deviation(stream,header);
+			break;
       }
 
       return;

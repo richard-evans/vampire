@@ -110,31 +110,6 @@ void mm::calculate_llg_spin_fields(const double temperature,
             // calculate reduced exchange constant factor
             double Ac = A[j]*std::pow(mj,1.71);
 
-            // get materials of local and neighbouring cell
-            // int mat  = cell_material_array[cell];
-            // int matj = cell_material_array[cellj];
-
-            // // Check if spaced SAF is included
-            // if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
-
-            //    // check that materials are different
-            //    if (mat != matj){
-
-            //       // why mj^1.66?? need to check how this actually works. why / ms[cell]?
-            //       Ac = -pow(mj,1.66)*prefactor[matj]*mp::material[mat].SAF[matj];
-            //       //if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
-
-            //    }
-            // }
-
-            // // what does this do?
-            // if (mp::material[mat].override_atomsitic[matj] == true){
-            //    //double Area = cells::macro_cell_size*cells::macro_cell_size;
-            //    //double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
-            //    //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
-            //    Ac = 2.0*std::pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
-            // }
-
             // Add field from cell to total exchange field (at equillibrium this term goes to zero)
             exchange_field[0] -= Ac*(mx_array[cellj]*m_e[cellj] - mx*me);
             exchange_field[1] -= Ac*(my_array[cellj]*m_e[cellj] - my*me);

@@ -331,7 +331,10 @@ namespace micromagnetic{
          }
       }
 
-      if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1)  micromagnetic::MR_resistance = mm::calculate_resistance();
+      if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 && sim::time%sim::partial_time)  {
+         micromagnetic::MR_resistance = mm::calculate_resistance();
+        // std::cout << micromagnetic::MR_resistance  << std::endl;
+      }
 
       return 0;
 

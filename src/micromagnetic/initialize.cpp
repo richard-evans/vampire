@@ -108,24 +108,27 @@ void initialize(int num_local_cells,
    // calculate spin transfer torque parameters
    mm::calculate_stt(num_atoms, num_cells, cell_array, type_array, material, mm::stt_rj, mm::stt_pj);
 
-// for (int lc = 0; lc < num_local_cells; lc++){
-//  int cell = local_cell_array[lc];
-//  //std::cerr <<cell << '\t' <<  mm::ms[cell] << '\t' << mm::alpha[cell] << '\t' << mm::Tc[cell] << '\t' << mm::ku[cell] << '\t' << mm::gamma[cell] << std::endl;
-// }
+std::ofstream ofile("initial_parameters.txt"); 
 
-// for (int lc = 0; lc < num_local_cells; lc++){
-//   int cell = local_cell_array[lc];
-//    //loops over all other cells with interactions to this cell
-//    const int start = mm::macro_neighbour_list_start_index[cell];
-//    const int end = mm::macro_neighbour_list_end_index[cell] +1;
-//
-//    for(int j = start;j< end;j++){
-//       // calculate reduced exchange constant factor
-//        //if (vmpi::my_rank == 1)
-//   //     std::cerr << cell << '\t' << j << '\t' << mm::A[j] <<std::endl;
-//
-//         }
-//      }
+for (int lc = 0; lc < num_local_cells; lc++){
+ int cell = local_cell_array[lc];
+ ofile<<cell << '\t' <<  mm::ms[cell] << '\t' << mm::alpha[cell] << '\t' << mm::Tc[cell] << '\t' << mm::ku[cell] << '\t' << mm::gamma[cell] << std::endl;
+}
+std::ofstream ofile2("exchange.txt"); 
+for (int lc = 0; lc < num_local_cells; lc++){
+  int cell = local_cell_array[lc];
+   //loops over all other cells with interactions to this cell
+   const int start = mm::macro_neighbour_list_start_index[cell];
+   const int end = mm::macro_neighbour_list_end_index[cell] +1;
+if (vmpi::my_rank ==0){
+   for(int j = start;j< end;j++){
+      const int cellj = mm::macro_neighbour_list_array[j];
+      // calculate reduced exchange constant factor
+      ofile2 << cell << '\t' << cellj << '\t' << mm::A[j] <<std::endl;
+
+        }
+     }
+}
 
 
 

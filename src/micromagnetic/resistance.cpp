@@ -42,7 +42,7 @@ namespace micromagnetic{
        //double one_o_Rmin = 1.0/Rmin;
        double sum_one_o_R = 0.0;
 
-   //    std::cout <<resistance_layer_1 << '\t' << resistance_layer_2 << '\t' << Ra << '\t' << area << std::endl;
+     // std::cout <<resistance_layer_1 << '\t' << resistance_layer_2 << '\t' << Ra << '\t' << area << std::endl;
        int i = 0;
        for (int lc = 0; lc < cells::num_local_cells; lc++){
 
@@ -79,11 +79,13 @@ namespace micromagnetic{
               double R = Rmin*(change);
 
               sum_one_o_R = sum_one_o_R + 1.0/R;
+              //std::cout << cell << '\t' << cellj << '\t' << dot_product << '\t' << costheta << '\t' << R << '\t' <<sum_one_o_R <<std::endl;
               i ++ ;
             }
           }
         }
       }
+//      std::cout << "a" <<std::endl;
       return i*1.0/sum_one_o_R;
     }
    }
