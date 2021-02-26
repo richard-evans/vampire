@@ -111,34 +111,34 @@ void mm::calculate_llg_spin_fields(const double temperature,
             double Ac = A[j]*std::pow(mj,1.71);
 
             // get materials of local and neighbouring cell
-            int mat  = cell_material_array[cell];
-            int matj = cell_material_array[cellj];
+            // int mat  = cell_material_array[cell];
+            // int matj = cell_material_array[cellj];
 
-            // Check if spaced SAF is included
-            if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
+            // // Check if spaced SAF is included
+            // if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
 
-               // check that materials are different
-               if (mat != matj){
+            //    // check that materials are different
+            //    if (mat != matj){
 
-                  // why mj^1.66?? need to check how this actually works. why / ms[cell]?
-                  Ac = std::pow(mj,1.66)*area*mp::material[mat].SAF[matj]/ms[cell];
-                  //if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
+            //       // why mj^1.66?? need to check how this actually works. why / ms[cell]?
+            //       Ac = -pow(mj,1.66)*prefactor[matj]*mp::material[mat].SAF[matj];
+            //       //if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
 
-               }
-            }
+            //    }
+            // }
 
-            // what does this do?
-            if (mp::material[mat].override_atomsitic[matj] == true){
-               //double Area = cells::macro_cell_size*cells::macro_cell_size;
-               //double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
-               //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
-               Ac = 2.0*std::pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
-            }
+            // // what does this do?
+            // if (mp::material[mat].override_atomsitic[matj] == true){
+            //    //double Area = cells::macro_cell_size*cells::macro_cell_size;
+            //    //double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
+            //    //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
+            //    Ac = 2.0*std::pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
+            // }
 
             // Add field from cell to total exchange field (at equillibrium this term goes to zero)
-            exchange_field[0] += Ac*(mx_array[cellj]*m_e[cellj] - mx*me);
-            exchange_field[1] += Ac*(my_array[cellj]*m_e[cellj] - my*me);
-            exchange_field[2] += Ac*(mz_array[cellj]*m_e[cellj] - mz*me);
+            exchange_field[0] -= Ac*(mx_array[cellj]*m_e[cellj] - mx*me);
+            exchange_field[1] -= Ac*(my_array[cellj]*m_e[cellj] - my*me);
+            exchange_field[2] -= Ac*(mz_array[cellj]*m_e[cellj] - mz*me);
 
          } // end of loop over cells
 
@@ -154,9 +154,9 @@ void mm::calculate_llg_spin_fields(const double temperature,
 		const double hstty = (strj-alpha*stpj)*(mz*mm::sttpx - mx*mm::sttpz) + (stpj+alpha*strj)*mm::sttpy;
 		const double hsttz = (strj-alpha*stpj)*(mx*mm::sttpy - my*mm::sttpx) + (stpj+alpha*strj)*mm::sttpz;
 
-      x_total_spin_field_array[cell] = exchange_field[0] + one_o_chi_perp[cell]*mx*me*ku_x[cell] + hsttx;
-      x_total_spin_field_array[cell] = exchange_field[1] + one_o_chi_perp[cell]*my*me*ku_y[cell] + hstty;
-      x_total_spin_field_array[cell] = exchange_field[2] + one_o_chi_perp[cell]*mz*me*ku_z[cell] + hsttz;
+      x_total_spin_field_array[cell] = exchange_field[0] - one_o_chi_perp[cell]*mx*me*ku_x[cell] + hsttx;
+      y_total_spin_field_array[cell] = exchange_field[1] - one_o_chi_perp[cell]*my*me*ku_y[cell] + hstty;
+      z_total_spin_field_array[cell] = exchange_field[2] - one_o_chi_perp[cell]*mz*me*ku_z[cell] + hsttz;
 
    } // end of loop over cells
 

@@ -314,6 +314,46 @@ void initialize(int num_local_cells,
    }
 
    //--------------------------------------------------------------------------------------------------
+   //Replace atomsitic fields with SAF accross the boundary
+   //--------------------------------------------------------------------------------------------------
+   double area = cells::macro_cell_size*cells::macro_cell_size;
+   for (int cell = 0; cell < num_cells; cell++ ){
+
+      //double zi = cells::pos_and_mom_array[4*cell+2];
+      const int mat = mm::cell_material_array[cell];
+      const int start = mm::macro_neighbour_list_start_index[cell]; // save start index for neighbour list
+      const int end = mm::macro_neighbour_list_end_index[cell] +1;  // save end index for neighbour list
+         // loop over neighbouring cells
+         for(int j = start;j< end;j++){
+
+            const int cellj = mm::macro_neighbour_list_array[j];
+            const int matj = mm::cell_material_array[cellj];
+            // Check if spaced SAF is included
+            if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
+
+               // check that materials are different
+               if (mat != matj){
+
+                  // why mj^1.66?? need to check how this actually works. why / ms[cell]?
+                  //Ac = -prefactor[matj]*mp::material[mat].SAF[matj];
+                  mm::A[j] = -area*mp::material[mat].SAF[matj]/mm::ms[cell];
+                  //if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
+
+               }
+            }
+
+            // what does this do?
+            if (mp::material[mat].override_atomsitic[matj] == true){
+               //double Area = cells::macro_cell_size*cells::macro_cell_size;
+               //double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
+               //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
+               mm::A[j] = 2.0*mp::material[mat].EF_MM[matj]/(mm::ms[cell]);
+            }
+
+         }
+   }
+
+   //--------------------------------------------------------------------------------------------------
    // Initialise pinning field calculation
    //--------------------------------------------------------------------------------------------------
    for (int cell = 0; cell < num_cells; cell++ ){

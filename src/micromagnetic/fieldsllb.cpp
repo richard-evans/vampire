@@ -98,20 +98,20 @@ namespace micromagnetic{
             // calculate reduced exchange constant factor
             const int cellj = macro_neighbour_list_array[j];
             const double mj = sqrt(x_array[cellj]*x_array[cellj] + y_array[cellj]*y_array[cellj] + z_array[cellj]*z_array[cellj]);
-            double Ac = A[j]*pow(mj,1.66);
+            double Ac = A[j]*pow(mj,1.71);
 
-            int matj =cell_material_array[cellj];
-            if (cell != cellj){
-            if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
-              if (mat != matj){
-              Ac = -pow(mj,1.66)*prefactor[matj]*mp::material[mat].SAF[matj];
+         //    int matj =cell_material_array[cellj];
+             if (cell != cellj){
+         //    if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
+         //      if (mat != matj){
+         //      Ac = -pow(mj,1.66)*prefactor[matj]*mp::material[mat].SAF[matj];
 
-              }
-           }
+         //      }
+         //   }
 
-           if (mp::material[mat].override_atomsitic[matj] == true){
-             Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
-           }
+         //   if (mp::material[mat].override_atomsitic[matj] == true){
+         //     Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
+         //   }
             exchange_field[0] -= Ac*(x_array[cellj] - x_array[cell]);
             exchange_field[1] -= Ac*(y_array[cellj] - y_array[cell]);
             exchange_field[2] -= Ac*(z_array[cellj] - z_array[cell]);
