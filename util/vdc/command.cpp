@@ -61,11 +61,11 @@ int command( int argc, char* argv[] ){
       if (sw == "--xyz"){
          vdc::xyz = true;
       }
-      // xyz coordinate file output
+      // pov coordinate file output
       else if (sw == "--povray"){
          vdc::povray = true;
       }
-      // xyz coordinate file output
+      // vtk coordinate file output
       else if (sw == "--vtk"){
          vdc::vtk = true;
       }
@@ -258,7 +258,6 @@ int command( int argc, char* argv[] ){
             return EXIT_FAILURE;
             ////terminaltextcolor(WHITE);
          }
-
       }
       else if ( sw == "--3D" ){
 

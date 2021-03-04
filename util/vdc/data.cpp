@@ -31,6 +31,7 @@ namespace vdc{
    // keyword variables
    std::string colour_keyword = "CBWR";
    std::string custom_colourmap_file;
+   std::vector<std::vector<double>> colourmap(256, std::vector<double>(3));
    bool x_axis_colour = false;
    std::string slice_type = "no-slice";
 

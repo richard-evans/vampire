@@ -301,8 +301,7 @@ void hsi2rgb( double& red, double& green, double& blue, double& hue, double& int
 // x-values [0-255], y-values rgb [0-1]
 //------------------------------------------------------------------------------
 void interpolate( double angle, double& red, double& green, double& blue ){
-
-   std::vector<std::vector<double>> colourmap(256, std::vector<double>(3));
+   
    std::vector<double> m(3), c(3), ymin(3), ymax(3);
    int xmin, xmax;
 
@@ -310,12 +309,9 @@ void interpolate( double angle, double& red, double& green, double& blue ){
    xmin = int(std::floor(angle));
    xmax = int(std::ceil(angle));
 
-   // initialise colourwheel
-   vdc::colourwheel( colourmap );
-
    // find colorval associated with min and max
-   ymin = colourmap[xmin];
-   ymax = colourmap[xmax];
+   ymin = vdc::colourmap[xmin];
+   ymax = vdc::colourmap[xmax];
 
    // if different: work out gradients and intersects
    if ( ymin == ymax ) {

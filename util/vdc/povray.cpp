@@ -34,6 +34,16 @@ namespace vdc{
 
 // forward function declarations
 
+
+//------------------------------------------------------------------------------
+// Initialise Povray colourwheel
+//------------------------------------------------------------------------------
+void initialise_povray() {
+
+   vdc::initialise_colourwheel();
+
+}
+
 //------------------------------------------------------------------------------
 // Function to output spins.inc file compatible with povray
 //------------------------------------------------------------------------------
