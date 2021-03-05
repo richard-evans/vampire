@@ -164,14 +164,14 @@ void mm::calculate_llg_external_fields(const double temperature,
       y_total_external_field_array[cell] = mm::ext_field[1] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_y[cell];
       z_total_external_field_array[cell] = mm::ext_field[2] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_z[cell];
 
-      // optionally add dipole field
+     // optionally add dipole field
       if (dipole::activated){
          x_total_external_field_array[cell] += dipole::cells_field_array_x[cell];
          y_total_external_field_array[cell] += dipole::cells_field_array_y[cell];
          z_total_external_field_array[cell] += dipole::cells_field_array_z[cell];
       }
 
-      // optionally add bias magnet fields
+      // // optionally add bias magnet fields
       if (bias_magnets == true){
          x_total_external_field_array[cell] += bias_field_x[cell];
          y_total_external_field_array[cell] += bias_field_y[cell];

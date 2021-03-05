@@ -44,9 +44,8 @@ namespace micromagnetic{
 
      // std::cout <<resistance_layer_1 << '\t' << resistance_layer_2 << '\t' << Ra << '\t' << area << std::endl;
        int i = 0;
-       for (int lc = 0; lc < cells::num_local_cells; lc++){
+      for (int  cell = 0; cell < cells::num_cells; cell++){
 
-         int cell = cells::local_cell_array[lc];
          int mat  = cell_material_array[cell];
          if (mat == resistance_layer_1 ){
 
