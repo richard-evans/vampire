@@ -419,21 +419,30 @@ namespace vin{
                 sim::program=52;
                 return EXIT_SUCCESS;
             }
+            test="exchange-stiffness";
+            if(value==test){
+                sim::program=53;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
                 std::cerr << "\t\"benchmark\"" << std::endl;
+                std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
+                std::cerr << "\t\"curie-temperature\"" << std::endl;
+                std::cerr << "\t\"domain-wall\"" << std::endl;
+                std::cerr << "\t\"effective-damping\"" << std::endl;
+                std::cerr << "\t\"exchange-stiffness\"" << std::endl;
+                std::cerr << "\t\"field-cool\"" << std::endl;
+                std::cerr << "\t\"laser-pulse\"" << std::endl;
+                std::cerr << "\t\"localised-field-cool\"" << std::endl;
+                std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
                 std::cerr << "\t\"time-series\"" << std::endl;
                 std::cerr << "\t\"hysteresis-loop\"" << std::endl;
-                std::cerr << "\t\"static-hysteresis-loop\"" << std::endl;
-                std::cerr << "\t\"curie-temperature\"" << std::endl;
-                std::cerr << "\t\"field-cool\"" << std::endl;
-                std::cerr << "\t\"localised-field-cool\"" << std::endl;
-                std::cerr << "\t\"laser-pulse\"" << std::endl;
-                std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
+                std::cerr << "\t\"partial-hysteresis-loop\"" << std::endl;
                 std::cerr << "\t\"hybrid-cmc\"" << std::endl;
                 std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
-                std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
+                std::cerr << "\t\"static-hysteresis-loop\"" << std::endl;
             terminaltextcolor(WHITE);
             err::vexit();
             }

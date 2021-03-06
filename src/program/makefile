@@ -8,6 +8,7 @@ bmark.o \
 cmc_anisotropy.o \
 curie_temperature.o \
 diagnostics.o \
+exchange_stiffness.o \
 field_cool.o \
 local_field_cool.o \
 hamr.o \

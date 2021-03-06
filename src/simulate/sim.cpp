@@ -436,20 +436,30 @@ int run(){
 			program::boltzmann_dist();
 			break;
 
-	    case 51:
-		  	if(vmpi::my_rank==0){
-		       std::cout << "Setting..." << std::endl;
-		       zlog << "Setting..." << std::endl;
-	     	}
-		  	program::setting_process();
-		    break;
-		 case 52:
-			if(vmpi::my_rank==0){
-				 std::cout << "Domain walls..." << std::endl;
-				 zlog << "Domain walls..." << std::endl;
+		case 51:
+		 	if(vmpi::my_rank==0){
+		      std::cout << "Setting..." << std::endl;
+		      zlog << "Setting..." << std::endl;
+
+			}
+			program::setting_process();
+		   break;
+		//------------------------------------------------------------------------
+		case 52:
+		 	if(vmpi::my_rank==0){
+				std::cout << "Domain walls..." << std::endl;
+				zlog << "Domain walls..." << std::endl;
 			}
 			program::domain_wall();
-			 break;
+			break;
+		//------------------------------------------------------------------------
+		case 53:
+		 	if(vmpi::my_rank==0){
+				std::cout << "exchange stiffness..." << std::endl;
+				zlog << "exchange stiffness..." << std::endl;
+			}
+			program::exchange_stiffness();
+			break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
