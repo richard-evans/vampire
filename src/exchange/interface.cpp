@@ -254,7 +254,7 @@ namespace exchange{
       }
       test = "IrMn";
       if( word == test ){
-         internal::IrMn[super_index] = true; // Switch on biquadratic exchange
+         internal::IrMn[super_index] = true; // Switch on IrMn simulations
          return true;
       }
       //--------------------------------------------------------------------

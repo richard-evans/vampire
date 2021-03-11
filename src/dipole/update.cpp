@@ -58,7 +58,6 @@ namespace dipole{
     	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
          int i = cells::cell_id_array[lc];
-      std::cout << i << std::endl;
         	if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
             // Self demagnetisation factor multiplying m(i)
