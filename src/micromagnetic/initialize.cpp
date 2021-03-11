@@ -113,22 +113,13 @@ std::ofstream ofile("initial_parameters.txt");
 for (int lc = 0; lc < num_local_cells; lc++){
  int cell = local_cell_array[lc];
  ofile<<cell << '\t' <<  mm::ms[cell] << '\t' << mm::alpha[cell] << '\t' << mm::Tc[cell] << '\t' << mm::ku[cell] << '\t' << mm::gamma[cell] << std::endl;
-}
-std::ofstream ofile2("exchange.txt"); 
-for (int lc = 0; lc < num_local_cells; lc++){
-  int cell = local_cell_array[lc];
-   //loops over all other cells with interactions to this cell
-   const int start = mm::macro_neighbour_list_start_index[cell];
-   const int end = mm::macro_neighbour_list_end_index[cell] +1;
-if (vmpi::my_rank ==0){
-   for(int j = start;j< end;j++){
-      const int cellj = mm::macro_neighbour_list_array[j];
-      // calculate reduced exchange constant factor
-      ofile2 << cell << '\t' << cellj << '\t' << mm::A[j] <<std::endl;
 
-        }
-     }
 }
+for (int proc = 0; proc < vmpi::num_processors; proc++ ){
+ if (vmpi::my_rank == proc)   std::cerr << proc << "\t" << mm::macro_neighbour_list_array.size() << "\t" <<  std::endl;
+
+}
+
 
 
 
@@ -244,6 +235,23 @@ if (vmpi::my_rank ==0){
       }
 
    }
+
+// std::ofstream ofile2("exchange.txt"); 
+// for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
+//   int cell = list_of_micromagnetic_cells[lc];
+//    //loops over all other cells with interactions to this cell
+//    const int start = mm::macro_neighbour_list_start_index[cell];
+//    const int end = mm::macro_neighbour_list_end_index[cell] +1;
+//    std::cerr << vmpi::my_rank << '\t' << cell << '\t' << start << '\t' << end << "\t" << number_of_micromagnetic_cells << std::endl;
+// if (vmpi::my_rank ==0){
+//    for(int j = start;j< end;j++){
+//       const int cellj = mm::macro_neighbour_list_array[j];
+//       // calculate reduced exchange constant factor
+//      // ofile2 << cell << '\t' << cellj << '\t' << mm::A[j] <<std::endl;
+
+//         }
+//      }
+// }
 
    //-------------------------------------------------------------------------------------------
    // for field calculations you need to access the atoms in numerically consecutive lists.

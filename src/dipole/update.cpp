@@ -48,11 +48,17 @@ namespace dipole{
       // Define constant imuB = 1/muB to normalise to unitarian values the cell magnetisation
       const double imuB = 1.0/9.27400915e-24;
 
+       for (int i = 0 ; i < cells::num_cells; i ++){
+         dipole::cells_field_array_x[i] = -100000.0;
+         dipole::cells_field_array_y[i] = -100000.0;
+         dipole::cells_field_array_z[i] = -100000.0;
+       }
+       
 		// loop over local cells
     	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
          int i = cells::cell_id_array[lc];
-
+      std::cout << i << std::endl;
         	if(dipole::internal::cells_num_atoms_in_cell[i]>0){
 
             // Self demagnetisation factor multiplying m(i)
@@ -108,5 +114,15 @@ namespace dipole{
             dipole::cells_mu0Hd_field_array_z[i] = dipole::cells_mu0Hd_field_array_z[i] * 9.27400915e-01;
      		}
     	}
+
+      #ifdef MPICF
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0],     cells::num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0],     cells::num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0],     cells::num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+      #endif
+      //  for (int i = 0 ; i < cells::num_cells; i ++){
+      //     std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
+      //  }
+      //  std::cin.get();
 	} // end of dipole::internal::update_field() function
 } // end of dipole namespace
