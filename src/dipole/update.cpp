@@ -70,9 +70,9 @@ namespace dipole{
             const double mz_i = cells::mag_array_z[i]*imuB;
 
             // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
-            dipole::cells_field_array_x[i] = self_demag * mx_i*0.0; //*0.0
-            dipole::cells_field_array_y[i] = self_demag * my_i*0.0; //*0.0
-            dipole::cells_field_array_z[i] = self_demag * mz_i*0.0; //*0.0
+            dipole::cells_field_array_x[i] = self_demag * mx_i;//*0.0; //*0.0
+            dipole::cells_field_array_y[i] = self_demag * my_i;//*0.0; //*0.0
+            dipole::cells_field_array_z[i] = self_demag * mz_i;//*0.0; //*0.0
             // Add self demag to Hdemag --> To get only dipole-dipole contribution comment this and initialise to zero
             dipole::cells_mu0Hd_field_array_x[i] = -0.5*self_demag * mx_i;
             dipole::cells_mu0Hd_field_array_y[i] = -0.5*self_demag * my_i;
@@ -105,7 +105,6 @@ namespace dipole{
             dipole::cells_field_array_z[i] = dipole::cells_field_array_z[i] * 9.27400915e-01;
 			 	//dp_fields << sim::time << '\t' << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] << '\t' << std::endl;
 				//dp_fields <<sim::time << "\t" <<  dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i]  << "\t" << cells::pos_and_mom_array[4*i+0] << '\t' << cells_pos_and_mom_array[4*i+1] << '\t' << cells_pos_and_mom_array[4*i+2] << std::endl;
-
 				// Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
             // of magnetisation and volume in angstrom
             dipole::cells_mu0Hd_field_array_x[i] = dipole::cells_mu0Hd_field_array_x[i] * 9.27400915e-01;
@@ -115,13 +114,16 @@ namespace dipole{
     	}
 
       #ifdef MPICF
-         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0],     cells::num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0],     cells::num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0],     cells::num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
       #endif
-      //  for (int i = 0 ; i < cells::num_cells; i ++){
-      //     std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
-      //  }
-      //  std::cin.get();
+       for (int i = 0 ; i < dipole::internal::cells_num_cells; i ++){
+         if (dipole::cells_field_array_x[i] < -1000) dipole::cells_field_array_x[i] = 0.0;
+         if (dipole::cells_field_array_y[i] < -1000) dipole::cells_field_array_y[i] = 0.0;
+         if (dipole::cells_field_array_z[i] < -1000) dipole::cells_field_array_z[i] = 0.0;
+       //  std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
+         
+       }
 	} // end of dipole::internal::update_field() function
 } // end of dipole namespace

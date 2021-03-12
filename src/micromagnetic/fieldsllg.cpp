@@ -41,11 +41,7 @@ void mm::calculate_llg_spin_fields(const double temperature,
                                std::vector<double>& z_total_spin_field_array){  // total magnetic field
 
    // Loop over all micromagnetic cells - should this be all cells?
-   for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
-
-      // determine cell ID of cell
-      int cell = list_of_micromagnetic_cells[lc];
-
+   for (int cell = 0; cell < num_cells; cell++){
       // Optionally determine temperature dependent constants
       if(mm::temperature_dependent_parameters){
 
