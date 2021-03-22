@@ -36,13 +36,13 @@ namespace micromagnetic{
        double GMR_o_2 = GMR/2.0;
 
        double Ra = res_RA;
-       double area = overlap_area*1e-8;
+      double area = overlap_area*1e-8;
 
        double Rmin = Ra/area;
        //double one_o_Rmin = 1.0/Rmin;
        double sum_one_o_R = 0.0;
 
-     // std::cout <<resistance_layer_1 << '\t' << resistance_layer_2 << '\t' << Ra << '\t' << area << std::endl;
+    // std::cout <<res_RA << '\t' << Rmin <<"\t" <<  overlap_area <<'\t' << cells::num_cells << '\t' << Ra << '\t' << area << std::endl;
        int i = 0;
       for (int  cell = 0; cell < cells::num_cells; cell++){
 
@@ -56,7 +56,7 @@ namespace micromagnetic{
            my_i = cells::mag_array_y[cell];
            mz_i = cells::mag_array_z[cell];
 
-           mod_i =sqrt(sqrt(mx_i*mx_i+my_i*my_i)*sqrt(mx_i*mx_i+my_i*my_i) +mz_i*mz_i);
+           mod_i =sqrt(mx_i*mx_i+my_i*my_i +mz_i*mz_i);
 
            for(int j = start;j< end;j++){
 
@@ -70,10 +70,10 @@ namespace micromagnetic{
               my_j = cells::mag_array_y[cellj];
               mz_j = cells::mag_array_z[cellj];
 
-              mod_j =sqrt(sqrt(mx_j*mx_j+my_j*my_j)*sqrt(mx_j*mx_j+my_j*my_j) +mz_j*mz_j);
+              mod_j =sqrt(mx_j*mx_j+my_j*my_j +mz_j*mz_j); 
 
               double dot_product = mx_i*mx_j + my_i*my_j + mz_i*mz_j;
-               double costheta = dot_product/(mod_i*mod_j);
+              double costheta = dot_product/(mod_i*mod_j);
               double change  = 1- GMR_o_2*costheta;
               double R = Rmin*(change);
 

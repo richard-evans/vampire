@@ -237,6 +237,30 @@ int run(){
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
 
+   // Initialize GPU acceleration if enabled
+   if(gpu::acceleration) gpu::initialize();
+	if (micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets == true)
+	micromagnetic::initialize(cells::num_local_cells,
+									  cells::num_cells,
+									  stats::num_atoms,
+									  mp::num_materials,
+									  cells::atom_cell_id_array,
+									  atoms::neighbour_list_array,
+									  atoms::neighbour_list_start_index,
+									  atoms::neighbour_list_end_index,
+									  atoms::type_array,
+									  mp::material,
+									  atoms::x_coord_array,
+									  atoms::y_coord_array,
+									  atoms::z_coord_array,
+									  cells::volume_array,
+									  sim::temperature,
+									  cells::num_atoms_in_unit_cell,
+									  cs::system_dimensions[0],
+									  cs::system_dimensions[1],
+									  cs::system_dimensions[2],
+									  cells::local_cell_array);
+									  
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,
                      cells::num_cells,
@@ -264,29 +288,7 @@ int run(){
                      atoms::num_atoms
    );
 
-   // Initialize GPU acceleration if enabled
-   if(gpu::acceleration) gpu::initialize();
-	if (micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets == true)
-	micromagnetic::initialize(cells::num_local_cells,
-									  cells::num_cells,
-									  stats::num_atoms,
-									  mp::num_materials,
-									  cells::atom_cell_id_array,
-									  atoms::neighbour_list_array,
-									  atoms::neighbour_list_start_index,
-									  atoms::neighbour_list_end_index,
-									  atoms::type_array,
-									  mp::material,
-									  atoms::x_coord_array,
-									  atoms::y_coord_array,
-									  atoms::z_coord_array,
-									  cells::volume_array,
-									  sim::temperature,
-									  cells::num_atoms_in_unit_cell,
-									  cs::system_dimensions[0],
-									  cs::system_dimensions[1],
-									  cs::system_dimensions[2],
-									  cells::local_cell_array);
+
 
 
 	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
