@@ -22,6 +22,7 @@
 #include "../create/internal.hpp" // please fix
 #include "vmpi.hpp"
 #include "vio.hpp"
+#include "create.hpp"
 
 // micromagnetic module headers
 #include "internal.hpp"
@@ -423,7 +424,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
             double dy = cells::pos_and_mom_array[cell*4 +1] - cells::pos_and_mom_array[cellj*4 +1];
             double dz = cells::pos_and_mom_array[cell*4 +2] - cells::pos_and_mom_array[cellj*4 +2];
 
-            if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < 3.54*3.54 && dy*dy < 3.54*3.54){
+            if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
              //  std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
          // std::cout <<  dx << '\t' << dy << "\t" << dz << "/t" << mat << "/t" << matj << std::endl;
             //         std::cout << mm::resistance_layer_1 << '\t' << mm::resistance_layer_2 <<std::endl;
