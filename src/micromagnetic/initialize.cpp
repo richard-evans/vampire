@@ -22,6 +22,7 @@
 #include "../create/internal.hpp" // please fix
 #include "vmpi.hpp"
 #include "vio.hpp"
+#include "create.hpp"
 
 // micromagnetic module headers
 #include "internal.hpp"
@@ -407,19 +408,27 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
    if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 ){
 
       // loop over all cells
+      std::cout <<"CELLS" <<  cells::num_cells << '\t' << cells::pos_and_mom_array.size() <<std::endl;
       for (int cell = 0; cell < cells::num_cells; cell++ ){
 
          int mat = mm::cell_material_array[cell];
          const int start = mm::macro_neighbour_list_start_index[cell];
          const int end = mm::macro_neighbour_list_end_index[cell] +1;
+         //      std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] <<  "\t" << cells::pos_and_mom_array[cell*4 +3] << "\t" << mat << std::endl;//'\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
 
          for(int j = start;j< end;j++){
             // calculate reduced exchange constant factor
             const int cellj = mm::macro_neighbour_list_array[j];
             int matj =mm::cell_material_array[cellj];
+            double dx = cells::pos_and_mom_array[cell*4 +0] - cells::pos_and_mom_array[cellj*4 +0];
+            double dy = cells::pos_and_mom_array[cell*4 +1] - cells::pos_and_mom_array[cellj*4 +1];
+            double dz = cells::pos_and_mom_array[cell*4 +2] - cells::pos_and_mom_array[cellj*4 +2];
 
-            if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2){
-               //      std::cout << mm::resistance_layer_1 << '\t' << mm::resistance_layer_2 <<
+            if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
+             //  std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
+         // std::cout <<  dx << '\t' << dy << "\t" << dz << "/t" << mat << "/t" << matj << std::endl;
+            //         std::cout << mm::resistance_layer_1 << '\t' << mm::resistance_layer_2 <<std::endl;
+        //       std::cout << cell << '\t' << cellj << "\t" <<mat << '\t' << matj << std::endl;// x_coord_array[cell] << "\t" <<y_coord_array[cell] << "\t" <<z_coord_array[cell] << "\t" <<  x_coord_array[cellj] << "\t" <<y_coord_array[cellj] << "\t" <<z_coord_array[cellj] << "\t" <<std::endl;
                mm::overlap_area = mm::overlap_area + cells::macro_cell_size_x*cells::macro_cell_size_y;
 
             }
@@ -462,3 +471,4 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
 }
 
 } // end of micromagnetic namespace
+ 

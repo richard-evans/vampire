@@ -157,7 +157,6 @@ namespace micromagnetic{
                break;
             }
 
-
             //unrolls the 2D array of how many interactions accross each boundary into a 1D array.
             int count =0;
             for (int i = 0; i < num_cells; i ++){
