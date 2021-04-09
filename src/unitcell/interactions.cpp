@@ -34,6 +34,7 @@ namespace local{
       int idx; // unit cell number
       int idy;
       int idz;
+      bool nm;
    };
 
 }
@@ -54,6 +55,10 @@ void calculate_interactions(unit_cell_t& unit_cell){
    const double ucsx = unit_cell.dimensions[0];
    const double ucsy = unit_cell.dimensions[1];
    const double ucsz = unit_cell.dimensions[2];
+
+   // save number of atoms in unit cell
+   unit_cell.bilinear.num_unit_cell_atoms = unit_cell.atom.size();
+   unit_cell.biquadratic.num_unit_cell_atoms = unit_cell.atom.size();
 
    // determine number of unit cells in x,y and z
    const int nx = 1 + 2*ceil(rcut); // number of replicated cells in x,y,z
@@ -79,6 +84,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.idx = x; // unit cell id
                tmp.idy = y;
                tmp.idz = z;
+               tmp.nm = unit_cell.atom[a].nm;
                ratoms.push_back(tmp);
             }
          }
@@ -106,8 +112,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
             const double ry = ratoms[j].y - ratoms[i].y;
             const double rz = ratoms[j].z - ratoms[i].z;
             double range_sq = rx*rx + ry*ry + rz*rz;
+            bool magnetic = !(ratoms[i].nm || ratoms[j].nm);
             // check for rij < rcut and i!= j
-            if( range_sq < rcutsq && i != j ){
+            if( range_sq < rcutsq && i != j && magnetic ){
                // Neighbour found
                uc::interaction_t tmp;
 
@@ -123,6 +130,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
                // save interaction range
                tmp.rij = sqrt(range_sq);
 
+               // save initial shell
+               tmp.shell = 0;
+
                // Determine normalised exchange constants
                tmp.Jij[0][0] = uc::internal::exchange(range_sq, nnrcut_sq); // xx
                tmp.Jij[0][1] = 0.0; // xy
@@ -136,7 +146,10 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.Jij[2][1] = 0.0; // zy
                tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq); // zz
 
-               unit_cell.interaction.push_back(tmp);
+               unit_cell.bilinear.interaction.push_back(tmp);
+
+               // save same interactions for biquadratic exchange
+               unit_cell.biquadratic.interaction.push_back(tmp);
 
             }
          }
@@ -145,29 +158,58 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
    // Set calculated interactions range
    int interaction_range=0;
-   for(int i=0; i<unit_cell.interaction.size(); i++){
-      if(abs(unit_cell.interaction[i].dx)>interaction_range) interaction_range=abs(unit_cell.interaction[i].dx);
-      if(abs(unit_cell.interaction[i].dy)>interaction_range) interaction_range=abs(unit_cell.interaction[i].dy);
-      if(abs(unit_cell.interaction[i].dz)>interaction_range) interaction_range=abs(unit_cell.interaction[i].dz);
+   for(int i=0; i<unit_cell.bilinear.interaction.size(); i++){
+      if(abs(unit_cell.bilinear.interaction[i].dx)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dx);
+      if(abs(unit_cell.bilinear.interaction[i].dy)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dy);
+      if(abs(unit_cell.bilinear.interaction[i].dz)>interaction_range) interaction_range=abs(unit_cell.bilinear.interaction[i].dz);
    }
    unit_cell.interaction_range = interaction_range;
 
    // Normalise exchange interactions
-   uc::internal::normalise_exchange(unit_cell);
+   unit_cell.bilinear.normalise_exchange();
+   unit_cell.biquadratic.normalise_exchange();
+
+   // Find shells for neighbours
+   unit_cell.bilinear.find_shells();
 
    // Output interactions to screen
-   /*for(int i=0; i<unit_cell.interaction.size(); i++){
-      std::cerr << i << "\t" << unit_cell.interaction[i].i << "\t"
-                << unit_cell.interaction[i].j << "\t"
-                << unit_cell.interaction[i].dx << "\t"
-                << unit_cell.interaction[i].dy << "\t"
-                << unit_cell.interaction[i].dz << "\t"
-                << unit_cell.interaction[i].rij << "\t"
-                << unit_cell.interaction[i].Jij[0][0] << std::endl;
+   /*for(int i=0; i<unit_cell.bilinear.interaction.size(); i++){
+      std::cerr << i << "\t" << unit_cell.bilinear.interaction[i].i << "\t"
+                << unit_cell.bilinear.interaction[i].j << "\t"
+                << unit_cell.bilinear.interaction[i].dx << "\t"
+                << unit_cell.bilinear.interaction[i].dy << "\t"
+                << unit_cell.bilinear.interaction[i].dz << "\t"
+                << unit_cell.bilinear.interaction[i].rij << "\t"
+                << unit_cell.bilinear.interaction[i].Jij[0][0] << std::endl;
+   }*/
+
+   // Output interactions including shell ID and lattice vectors to screen
+   /*for(int i=0; i<unit_cell.bilinear.interaction.size(); i++){
+      // Determine unit cell id for i and j atoms
+      int idi = unit_cell.bilinear.interaction[i].i;
+      int idj = unit_cell.bilinear.interaction[i].j;
+
+      double jx = unit_cell.atom[idj].x + double(unit_cell.bilinear.interaction[i].dx);
+      double jy = unit_cell.atom[idj].y + double(unit_cell.bilinear.interaction[i].dy);
+      double jz = unit_cell.atom[idj].z + double(unit_cell.bilinear.interaction[i].dz);
+
+      // Determine unit cell offsets
+      double dx = jx - unit_cell.atom[idi].x;
+      double dy = jy - unit_cell.atom[idi].y;
+      double dz = jz - unit_cell.atom[idi].z;
+
+      std::cerr << i << "\t" << unit_cell.bilinear.interaction[i].i << "\t"
+                << unit_cell.bilinear.interaction[i].j << "\t"
+                << unit_cell.bilinear.interaction[i].shell << "\t"
+                << dx << "\t"
+                << dy << "\t"
+                << dz << "\t"
+                << unit_cell.bilinear.interaction[i].rij << "\t"
+                << unit_cell.bilinear.interaction[i].Jij[0][0] << std::endl;
    }*/
 
    // Check for interactions
-   if(unit_cell.interaction.size()==0){
+   if(unit_cell.bilinear.interaction.size()==0){
       terminaltextcolor(RED);
       std::cerr << "Error! No interactions generated for " << uc::internal::crystal_structure << " crystal structure. Try increasing the interaction range. Aborting." << std::endl;
       terminaltextcolor(WHITE);

@@ -56,6 +56,8 @@ vampire_manual.synctex.gz
 *.cfg
 *.data
 *.meta
+*.vtu
+*.txt
 crystal.xyz
 log
 grain
@@ -84,5 +86,12 @@ cfg2povray
 cfg2rasmol
 log.*
 run/unit-cell-creator
+
+#----------------------------------------------
+# Eclipse project files and folders
+#----------------------------------------------
+.cproject
+.project
+.settings/
 
 #EOF

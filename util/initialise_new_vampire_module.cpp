@@ -35,11 +35,11 @@
 #include <sstream>
 #include <string>
 #include "stdlib.h"
-#include <algorithm> 
+#include <algorithm>
 
 // Forward declaration of functions
-void process_command_line(int argc, char* argv[], std::string& namespace_name, std::string& author, std::string& email);
-std::string create_file_header(std::string author, std::string email);
+void process_command_line(int argc, char* argv[], std::string& namespace_name, std::string& author, std::string& email, std::string& year);
+std::string create_file_header(std::string author, std::string email, std::string year);
 bool file_exists(const std::string& file_name);
 void create_data(const std::string& file_header, const std::string& namespace_name);
 void create_interface(const std::string& file_header, const std::string& namespace_name);
@@ -60,12 +60,13 @@ int main(int argc, char* argv[]){
    std::string namespace_name="";
    std::string author="";
    std::string email="";
+   std::string year="2018";
 
    // determine namespace name, author and email from command line
-   process_command_line(argc, argv, namespace_name, author, email);
+   process_command_line(argc, argv, namespace_name, author, email, year);
 
    // create file header
-   std::string file_header = create_file_header(author, email);
+   std::string file_header = create_file_header(author, email, year);
 
    // Generate data.cpp
    create_data(file_header, namespace_name);
@@ -95,7 +96,8 @@ int main(int argc, char* argv[]){
 void process_command_line(int argc, char* argv[],
                           std::string& namespace_name,
                           std::string& author,
-                          std::string& email){
+                          std::string& email,
+                          std::string& year){
 
    std::cout << "Processing command line arguments" << std::endl;
 
@@ -143,6 +145,20 @@ void process_command_line(int argc, char* argv[],
             exit(EXIT_FAILURE);
          }
       }
+      //---------------------------------------------
+      // year
+      //---------------------------------------------
+      else if(sw=="--year"){
+         // check number of args not exceeded
+         if(arg+1 < argc){
+            arg++;
+            year = std::string(argv[arg]);
+         }
+         else{
+            std::cerr << "Error - no year specified for \'--year\' command line option" << std::endl;
+            exit(EXIT_FAILURE);
+         }
+      }
       else{
          std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
          exit(EXIT_FAILURE);
@@ -174,6 +190,7 @@ void process_command_line(int argc, char* argv[],
    std::cout << "   Namespace name:  " << namespace_name << std::endl;
    std::cout << "   Author:          " << author << std::endl;
    std::cout << "   Email:           " << email << std::endl;
+   std::cout << "   Year:            " << year << std::endl;
    std::cout << "Are these correct (Y/N)? ";
    std::string check;
    check = std::cin.get();
@@ -191,7 +208,7 @@ void process_command_line(int argc, char* argv[],
 //---------------------------------------------------------------------------
 // Function to create file header
 //---------------------------------------------------------------------------
-std::string create_file_header(std::string author, std::string email){
+std::string create_file_header(std::string author, std::string email, std::string year){
 
    // dec;are temporary string stream
    std::stringstream cfh_ss;
@@ -201,7 +218,7 @@ std::string create_file_header(std::string author, std::string email){
    cfh_ss << "//   Free BSD licence (see licence file for details).\n";
    cfh_ss << "//\n";
    if(author != blank){
-      cfh_ss << "//   (c) " << author << " 2016. All rights reserved.\n";
+      cfh_ss << "//   (c) " << author << " " << year << ". All rights reserved.\n";
       cfh_ss << "//\n";
    }
    if(email  != blank){
@@ -269,6 +286,8 @@ void create_data(const std::string& file_header, const std::string& nn){
    ofile << "      //------------------------------------------------------------------------" << std::endl;
    ofile << "      // Shared variables inside " << nn << " module" << std::endl;
    ofile << "      //------------------------------------------------------------------------\n" << std::endl;
+   ofile << "      bool enabled; // bool to enable module\n" << std::endl;
+   ofile << "      std::vector<internal::mp_t> mp; // array of material properties\n" << std::endl;
    ofile << "   } // end of internal namespace\n" << std::endl;
    ofile << "} // end of " << nn << " namespace\n" << std::endl;
 
@@ -324,6 +343,8 @@ void create_interface(const std::string& file_header, const std::string& nn){
    ofile << "   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index){\n" << std::endl;
    ofile << "      // add prefix string" << std::endl;
    ofile << "      std::string prefix=\"material:\";\n" << std::endl;
+   ofile << "      // Check for material id > current array size and if so dynamically expand mp array" << std::endl;
+   ofile << "      if((unsigned int) super_index + 1 > internal::mp.size() && super_index + 1 < 101) internal::mp.resize(super_index + 1);\n" << std::endl;
    ofile << "      //--------------------------------------------------------------------" << std::endl;
    ofile << "      // Keyword not found" << std::endl;
    ofile << "      //--------------------------------------------------------------------" << std::endl;
@@ -421,9 +442,28 @@ void create_internal(const std::string& file_header, const std::string& nn){
    ofile << "      //-------------------------------------------------------------------------" << std::endl;
    ofile << "      // Internal data type definitions" << std::endl;
    ofile << "      //-------------------------------------------------------------------------\n" << std::endl;
+   ofile << "      //-----------------------------------------------------------------------------" << std::endl;
+   ofile << "      // internal materials class for storing material parameters" << std::endl;
+   ofile << "      //-----------------------------------------------------------------------------" << std::endl;
+   ofile << "      class mp_t{\n" << std::endl;
+   ofile << "          private:\n" << std::endl;
+   ofile << "          public:\n" << std::endl;
+   ofile << "             //------------------------------" << std::endl;
+   ofile << "             // material parameter variables" << std::endl;
+   ofile << "             //------------------------------" << std::endl;
+   ofile << "             double test;\n" << std::endl;
+   ofile << "             // constructor" << std::endl;
+   ofile << "             mp_t (const unsigned int max_materials = 100):" << std::endl;
+   ofile << "                test(0.0) // constructor initialisation of test variable" << std::endl;
+   ofile << "             {" << std::endl;
+   ofile << "                // constructor body for initialising more complex data/arrays" << std::endl;
+   ofile << "             }; // end of constructor\n" << std::endl;
+   ofile << "       }; // end of internal::mp class\n" << std::endl;
    ofile << "      //-------------------------------------------------------------------------" << std::endl;
    ofile << "      // Internal shared variables" << std::endl;
    ofile << "      //-------------------------------------------------------------------------\n" << std::endl;
+   ofile << "      extern bool enabled; // bool to enable module\n" << std::endl;
+   ofile << "      extern std::vector<internal::mp_t> mp; // array of material properties\n" << std::endl;
    ofile << "      //-------------------------------------------------------------------------" << std::endl;
    ofile << "      // Internal function declarations" << std::endl;
    ofile << "      //-------------------------------------------------------------------------\n" << std::endl;

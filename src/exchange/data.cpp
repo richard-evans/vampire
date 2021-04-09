@@ -23,6 +23,7 @@ namespace exchange{
    //------------------------------------------------------------------------------
    // Externally visible variables
    //------------------------------------------------------------------------------
+   bool biquadratic = false; // flag to enable biquadratic exchange calculation
 
    namespace internal{
 
@@ -31,13 +32,29 @@ namespace exchange{
       //------------------------------------------------------------------------
       std::vector<internal::mp_t> mp; // array of material properties
 
+      exchange_matrix_4D_t bilinear_exchange_constants; // array of exchange constants
+      exchange_matrix_4D_t biquadratic_exchange_constants; // array of biquadratic exchange constants
+
       bool enable_dmi = false; // flag to enable dmi calculation
 
       double dmi_cutoff_range = 2.6; // cutoff range for DMI calculation (Ångstroms)
 
       exchange_t exchange_type = isotropic; // exchange type to use in simulation
+      exchange_t biquadratic_exchange_type = isotropic; // biquadratic exchange type to use in simulation
+
+      exchange_t minimum_needed_exchange_type = isotropic; // minimum support required for bilinear exchange type (for vectorial constants and DMI)
 
       bool use_material_exchange_constants = true; // flag to enable material exchange parameters
+      bool use_material_biquadratic_exchange_constants = true; // flag to enable material biquadratic exchange parameters
+
+      std::vector <int> biquadratic_neighbour_list_array; // 1D list of biquadratic neighbours
+      std::vector <int> biquadratic_neighbour_interaction_type_array; // 1D list of biquadratic exchange interaction types
+      std::vector <int> biquadratic_neighbour_list_start_index; // list of first biquadratic neighbour for atom i
+      std::vector <int> biquadratic_neighbour_list_end_index;   // list of last biquadratic neighbour for atom i
+
+      std::vector <exchange::internal::value_t  > bq_i_exchange_list(0); // list of isotropic biquadratic exchange constants
+      std::vector <exchange::internal::vector_t > bq_v_exchange_list(0); // list of vectorial biquadratic exchange constants
+      std::vector <exchange::internal::tensor_t > bq_t_exchange_list(0); // list of tensorial biquadratic exchange constants
 
    } // end of internal namespace
 

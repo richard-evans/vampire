@@ -54,6 +54,7 @@ namespace dipole{
       // Shared variables inside dipole module
       //------------------------------------------------------------------------
       bool initialised=false;
+      bool output_atomistic_dipole_field = false; // flag to toggle output of atomic resolution dipole field
 
       int update_time=-1; /// last update time
 
@@ -82,6 +83,30 @@ namespace dipole{
 
       std::vector<double> cells_pos_and_mom_array;
       std::vector < int > proc_cell_index_array1D;
+
+
+      //------------------------------------------------------------------------
+      // data structures for atomistic solver
+      // (copy of all atom positions and spins on all processors)
+      //------------------------------------------------------------------------
+
+      int num_local_atoms = 0; // number of local atoms (my processor)
+      int total_num_atoms = 0; // number of total atoms (all processors)
+
+      // arrays to store atomic coordinates
+      std::vector <double> cx(0);
+      std::vector <double> cy(0);
+      std::vector <double> cz(0);
+
+      // arrays to store atomic spins
+      std::vector <double> sx(0);
+      std::vector <double> sy(0);
+      std::vector <double> sz(0);
+      std::vector <double> sm(0);
+
+      // arrays for calculating displacements for parallelisation
+      std::vector <int> receive_counts(0);
+      std::vector <int> receive_displacements(0);
 
       //------------------------------------------------------------------------
       // Shared functions inside dipole module

@@ -20,9 +20,11 @@
 // exchange module headers
 #include "internal.hpp"
 
-namespace exchange{
+namespace unitcell{
 
    //------------------------------------------------------------------------------
+   //
+   //    Member function of exchange template class
    //
    //    Function to set the type of exchange used in the code from a string
    //    processed from the unit cell file. Default is normalised isotropic
@@ -33,7 +35,7 @@ namespace exchange{
    //    unit cell file.
    //
    //------------------------------------------------------------------------------
-   unsigned int set_exchange_type(std::string exchange_type_string){
+   unsigned int unitcell::exchange_template_t::set_exchange_type(std::string exchange_type_string){
 
       //----------------------------------------
       // check for standard isotropic exchange
@@ -42,10 +44,10 @@ namespace exchange{
       if(isotropic_str == exchange_type_string){
 
          // set exchange type
-         exchange::internal::exchange_type = internal::isotropic;
+         exchange_type = exchange::isotropic;
 
          // unset normalization flag
-         exchange::internal::use_material_exchange_constants = false;
+         use_material_exchange_constants = false;
 
          return 1; // number of exchange interactions
 
@@ -58,10 +60,10 @@ namespace exchange{
       if(vectorial_str == exchange_type_string){
 
          // set exchange type
-         exchange::internal::exchange_type = internal::vectorial;
+         exchange_type = exchange::vectorial;
 
          // unset normalization flag
-         exchange::internal::use_material_exchange_constants = false;
+         use_material_exchange_constants = false;
 
          return 3; // number of exchange interactions
 
@@ -74,10 +76,10 @@ namespace exchange{
       if(tensorial_str == exchange_type_string){
 
          // set exchange type
-         exchange::internal::exchange_type = internal::tensorial;
+         exchange_type = exchange::tensorial;
 
          // unset normalization flag
-         exchange::internal::use_material_exchange_constants = false;
+         use_material_exchange_constants = false;
 
          return 9; // number of exchange interactions
 
@@ -90,10 +92,10 @@ namespace exchange{
       if(norm_isotropic_str == exchange_type_string){
 
          // set exchange type
-         exchange::internal::exchange_type = internal::isotropic;
+         exchange_type = exchange::isotropic;
 
          // unset normalization flag
-         exchange::internal::use_material_exchange_constants = true;
+         use_material_exchange_constants = true;
 
          return 1; // number of exchange interactions
 
@@ -106,10 +108,10 @@ namespace exchange{
       if(norm_vectorial_str == exchange_type_string){
 
          // set exchange type
-         exchange::internal::exchange_type = internal::vectorial;
+         exchange_type = exchange::vectorial;
 
          // unset normalization flag
-         exchange::internal::use_material_exchange_constants = true;
+         use_material_exchange_constants = true;
 
          return 3; // number of exchange interactions
 
@@ -122,18 +124,18 @@ namespace exchange{
       if(norm_tensorial_str == exchange_type_string){
 
          // set exchange type
-         exchange::internal::exchange_type = internal::tensorial;
+         exchange_type = exchange::tensorial;
 
          // unset normalization flag
-         exchange::internal::use_material_exchange_constants = true;
+         use_material_exchange_constants = true;
 
          return 9; // number of exchange interactions
 
       }
 
       terminaltextcolor(RED);
-         zlog << zTs() << "\nError: Unkown exchange type \"" << exchange_type_string << "\" in unit cell file. Exiting!" << std::endl;
-         std::cerr     << "\nError: Unkown exchange type \"" << exchange_type_string << "\" in unit cell file. Exiting!" << std::endl;
+         zlog << zTs() << "\nError: Unknown exchange type \"" << exchange_type_string << "\" in unit cell file. Exiting!" << std::endl;
+         std::cerr     << "\nError: Unknown exchange type \"" << exchange_type_string << "\" in unit cell file. Exiting!" << std::endl;
       terminaltextcolor(WHITE);
 
       // exit program
@@ -143,4 +145,4 @@ namespace exchange{
 
    }
 
-} // end of exchange namespace
+} // end of unitcell namespace

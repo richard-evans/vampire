@@ -36,6 +36,11 @@
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
+
+	// enumerated list for integrators
+	enum integrator_t{ llg_heun = 0, monte_carlo = 1, llg_midpoint = 2,
+							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5};
+
 	extern std::ofstream mag_file;
 	extern uint64_t time;
 	extern uint64_t total_time;
@@ -92,9 +97,7 @@ namespace sim{
 	extern double constraint_theta_delta; /// loop angle delta [degrees]
 
 	// Monte Carlo variables
-	extern double mc_delta_angle; /// Tuned angle for Monte Carlo trial move
-	enum mc_algorithms { spin_flip, uniform, angle, hinzke_nowak};
-   extern mc_algorithms mc_algorithm; /// Selected algorith for Monte Carlo simulations
+   extern int num_monte_carlo_preconditioning_steps;
 
 	extern double head_position[2];
 	extern double head_speed;
@@ -119,7 +122,7 @@ namespace sim{
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 
-	extern int integrator;
+	extern integrator_t integrator; // variable to specify integrator
 	extern int program;
 
    // Local system variables
@@ -159,15 +162,10 @@ namespace sim{
 	extern int LLG_Midpoint();
 	extern int LLG_Midpoint_mpi();
 	extern int LLG_Midpoint_cuda();
-	extern int MonteCarlo();
-	extern int ConstrainedMonteCarlo();
-	extern int ConstrainedMonteCarloMonteCarlo();
-	extern void mc_move(const std::valarray<double>&, std::valarray<double>&);
+
 
 	// Integrator initialisers
-	extern void CMCinit();
 	extern int LLGinit();
-	extern void CMCMCinit();
 
 	// Field and energy functions
 	extern double calculate_spin_energy(const int atom);
@@ -187,61 +185,16 @@ namespace sim{
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;
 
-}
+	 extern int domain_wall_axis;
+   extern double domain_wall_position;
+	 extern double domain_wall_discretisation;
+	 extern double domain_wall_centre;
+   extern double domain_wall_width;
+	 extern std::vector < bool > anti_PBC;
 
-namespace cmc{
-
-	class cmc_material_t {
-	public:
-
-		double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
-		double constraint_phi_min; /// loop angle min [degrees]
-		double constraint_phi_max; /// loop angle max [degrees]
-		double constraint_phi_delta; /// loop angle delta [degrees]
-
-		double constraint_theta; /// Constrained minimisation vector (rotational) [degrees]
-		double constraint_theta_min; /// loop angle min [degrees]
-		double constraint_theta_max; /// loop angle max [degrees]
-		double constraint_theta_delta; /// loop angle delta [degrees]
-
-		// performance optimised rotational matrices
-		double ppolar_vector[3];
-		double ppolar_matrix[3][3];
-		double ppolar_matrix_tp[3][3];
-
-		// vector magnetisation
-		double M_other[3];
-
-	cmc_material_t():
-		constraint_phi(0.0),
-		constraint_phi_min(0.0),
-		constraint_phi_max(0.0),
-		constraint_phi_delta(5.0),
-		constraint_theta(0.0),
-		constraint_theta_min(0.0),
-		constraint_theta_max(0.0),
-		constraint_theta_delta(5.0)
-
-	{
-
-	//for(int i=0;i<100;i++){
-	//	geometry_coords[i][0]=0.0;
-	//	geometry_coords[i][1]=0.0;
-	//}
-}
-	};
-
-	extern std::vector<cmc_material_t> cmc_mat;
-
-	extern bool is_initialised;
-
-	extern int active_material; /// material in current hybrid loop
-
-	extern std::vector<std::vector< int > > atom_list;
-	extern double mc_success;
-	extern double mc_total;
-	extern double sphere_reject;
-	extern double energy_reject;
+	 extern std::vector < double > domain_wall_second_vector_x;
+	 extern std::vector < double > domain_wall_second_vector_y;
+	 extern std::vector < double > domain_wall_second_vector_z;
 }
 
 /*namespace ckp{

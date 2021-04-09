@@ -36,7 +36,7 @@ void update_dipolar_fields ()
 {
 
    // check if dipole calculation is enabled
-   if(sim::hamiltonian_simulation_flags[4]!=1) return;
+   if(!::dipole::activated) return;
 
    // check for previous demag update at same time (avoids recalculation in Heun scheme)
    if (::sim::time == ::dipole::update_time) return;

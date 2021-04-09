@@ -65,6 +65,28 @@ namespace anisotropy{
           internal::neel_anisotropy_threshold = 1000000000;
           return true;
       }
+      //-------------------------------------------------------------------
+      test="neel-anisotropy-exponential-factor";
+      if(word==test){
+          // Enable range dependent Neel anisotropy Lij(r) = exp(-F(r-r0)/r0)
+          // F should be steepness of function indicating rate of decay with r
+          double F = atof(value.c_str());
+          vin::check_for_valid_value(F, word, line, prefix, unit, "none", 0.01, 100.0,"input","0.01 - 100");
+          internal::neel_exponential_factor = F;
+          internal::neel_range_dependent = true;
+          return true;
+      }
+      //-------------------------------------------------------------------
+      test="neel-anisotropy-exponential-range";
+      if(word==test){
+          // Enable range dependent Neel anisotropy Lij(r) = exp(-F(r-r0)/r0)
+          // r should be approximately nearest neighbour range ~ 2.5 angstroms
+          double r = atof(value.c_str());
+          vin::check_for_valid_value(r, word, line, prefix, unit, "length", 0.0001, 1000.0,"input","0.0001 - 1,000");
+          internal::neel_exponential_range = r;
+          internal::neel_range_dependent = true;
+          return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -88,6 +110,7 @@ namespace anisotropy{
       //------------------------------------------------------------
       // Check for material properties
       //------------------------------------------------------------
+      //Minimal orthogonality TBD
       std::string test  = "second-order-uniaxial-anisotropy-constant"; // new form (preferred)
       std::string test2 = "uniaxial-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
       if( (word == test) || (word == test2) ){
@@ -97,7 +120,150 @@ namespace anisotropy{
          internal::enable_uniaxial_second_order = true; // Switch on second order tensor calculation for all spins
          return true;
       }
+
+    //  Triaxial anisotropy in second and fourth order
+      test="second-order-triaxial-anisotropy-vector";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_vector(u, word, line, prefix, unit, "anisotropy", -1e-10, 1e-10,"material"," < +/- 1.0e-10");
+         // Copy sanitised unit vector to material
+         internal::ku_triaxial_vector_x[super_index] = u[0];
+         internal::ku_triaxial_vector_y[super_index] = u[1];
+         internal::ku_triaxial_vector_z[super_index] = u[2];
+         internal::enable_triaxial_anisotropy = true;
+         return true;
+
+      }
+      test="fourth-order-triaxial-anisotropy-vector";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_vector(u, word, line, prefix, unit, "anisotropy", -1e-10, 1e-10,"material"," < +/- 1.0e-10");
+         // Copy sanitised unit vector to material
+         internal::ku4_triaxial_vector_x[super_index] = u[0];
+         internal::ku4_triaxial_vector_y[super_index] = u[1];
+         internal::ku4_triaxial_vector_z[super_index] = u[2];
+         internal::enable_triaxial_fourth_order = true;
+         return true;
+
+      }
+
+      test="second-order-triaxial-basis-vector-1";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku_triaxial_basis1x[super_index] = u[0];
+         internal::ku_triaxial_basis1y[super_index] = u[1];
+         internal::ku_triaxial_basis1z[super_index] = u[2];
+         internal::triaxial_second_order_fixed_basis[super_index] = false;
+      //   std::cout << u[0] << '\t' << u[1] << '\t' << u[2] << "\t" << super_index <<  std::endl;
+      //   std::cin.get();
+         return true;
+
+      }
+
+      test="second-order-triaxial-basis-vector-2";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+        vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku_triaxial_basis2x[super_index] = u[0];
+         internal::ku_triaxial_basis2y[super_index] = u[1];
+         internal::ku_triaxial_basis2z[super_index] = u[2];
+         internal::triaxial_second_order_fixed_basis[super_index] = false;
+         return true;
+
+      }
+
+      test="second-order-triaxial-basis-vector-3";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku_triaxial_basis3x[super_index] = u[0];
+         internal::ku_triaxial_basis3y[super_index] = u[1];
+         internal::ku_triaxial_basis3z[super_index] = u[2];
+         internal::triaxial_second_order_fixed_basis[super_index] = false;
+         return true;
+
+      }
+
+
+      test="fourth-order-triaxial-basis-vector-1";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku4_triaxial_basis1x[super_index] = u[0];
+         internal::ku4_triaxial_basis1y[super_index] = u[1];
+         internal::ku4_triaxial_basis1z[super_index] = u[2];
+         internal::triaxial_fourth_order_fixed_basis[super_index] = false;
+      //   std::cout << u[0] << '\t' << u[1] << '\t' << u[2] << "\t" << super_index <<  std::endl;
+      //   std::cin.get();
+         return true;
+
+      }
+
+      test="fourth-order-triaxial-basis-vector-2";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku4_triaxial_basis2x[super_index] = u[0];
+         internal::ku4_triaxial_basis2y[super_index] = u[1];
+         internal::ku4_triaxial_basis2z[super_index] = u[2];
+         internal::triaxial_fourth_order_fixed_basis[super_index] = false;
+         return true;
+
+      }
+
+      test="fourth-order-triaxial-basis-vector-3";
+      if(word == test){
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         //std::cout << u[0] << '\t' << u[1] << "\t" << u[2] << std::endl;
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::ku4_triaxial_basis3x[super_index] = u[0];
+         internal::ku4_triaxial_basis3y[super_index] = u[1];
+         internal::ku4_triaxial_basis3z[super_index] = u[2];
+         internal::triaxial_fourth_order_fixed_basis[super_index] = false;
+         return true;
+
+      }
+
       //------------------------------------------------------------
+      //Minimal orthogonality TBD
       test = "fourth-order-uniaxial-anisotropy-constant";
       if( word == test ){
          double ku4 = atof(value.c_str());
@@ -107,6 +273,7 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      //Minimal orthogonality
       test = "sixth-order-uniaxial-anisotropy-constant";
       if( word == test ){
          double ku6 = atof(value.c_str());
@@ -116,6 +283,7 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      //Minimal orthogonality
       test = "fourth-order-cubic-anisotropy-constant"; // new form (preferred)
       test2  = "cubic-anisotropy-constant"; // legacy form (deprecated but probably never obsoleted)
       if( (word == test) || (word == test2) ){
@@ -123,10 +291,11 @@ namespace anisotropy{
          // Test for valid range
          vin::check_for_valid_value(kc4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].kc4 = kc4;
-         internal::enable_cubic_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
+         if(internal::enable_cubic_fourth_order_rotation == false) internal::enable_cubic_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
          return true;
       }
       //------------------------------------------------------------
+      //Minimal orthogonality
       test = "sixth-order-cubic-anisotropy-constant";
       if( word == test ){
          double kc6 = atof(value.c_str());
@@ -230,8 +399,10 @@ namespace anisotropy{
          }
          return true;
       }
-      //------------------------------------------------------------
-      test = "cubic-anisotropy-direction";
+      //--------------------------------------
+      // Direction 1
+      //--------------------------------------
+      test = "cubic-anisotropy-direction-1";
       if(word == test){
          // temporary storage container
          std::vector<double> u(3);
@@ -240,7 +411,40 @@ namespace anisotropy{
          // check for sane input and normalise if necessary
          vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
          // Copy sanitised unit vector to material
-         internal::mp[super_index].kc_vector = u;
+         internal::mp[super_index].kc_vector1 = u;
+         // enable rotated anisotropy and disable normal anisotropy
+         internal::enable_cubic_fourth_order_rotation = true;
+         internal::enable_cubic_fourth_order = false;
+         return true;
+      }
+      //--------------------------------------
+      // Direction 2
+      //--------------------------------------
+      test = "cubic-anisotropy-direction-2";
+      if(word == test){
+         // temporary storage container
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::mp[super_index].kc_vector2 = u;
+         // enable rotated anisotropy and disable normal anisotropy
+         internal::enable_cubic_fourth_order_rotation = true;
+         internal::enable_cubic_fourth_order = false;
+         return true;
+      }
+      //------------------------------------------------------------
+      // Fourth order rotational anisotropy
+      //------------------------------------------------------------
+      test = "fourth-order-rotational-anisotropy-constant";
+      if(word == test){
+         double k4r = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(k4r, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
+         internal::mp[super_index].k4r = k4r;
+         internal::enable_fourth_order_rotational = true;
          return true;
       }
       //------------------------------------------------------------

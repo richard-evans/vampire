@@ -105,6 +105,7 @@ namespace create{
       extern int grain_seed;  // random seed to control grain structure generation
       extern int dilute_seed; // random seed to control dilution of atoms
       extern int mixing_seed; // random seed to control intermixing of atoms
+      extern int spin_init_seed; // random seed to control ranomised spin directions
 
       extern double faceted_particle_100_radius; // 100 facet radius
       extern double faceted_particle_110_radius; // 110 facet radius
@@ -126,6 +127,9 @@ namespace create{
       //-----------------------------------------------------------------------------
       // Internal functions for create module
       //-----------------------------------------------------------------------------
+      void set_atom_vars(std::vector<cs::catom_t> &, neighbours::list_t& bilinear, neighbours::list_t& biquadratic);
+
+
       extern void alloy(std::vector<cs::catom_t> & catom_array);
       extern void layers(std::vector<cs::catom_t> & catom_array);
       extern void roughness(std::vector<cs::catom_t> & catom_array);
@@ -134,11 +138,19 @@ namespace create{
       extern void cone(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void cube(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void cylinder(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+      extern void ellipse(std::vector<double>& particle_origin,std::vector<cs::catom_t> & catom_array, const int grain);
       extern void ellipsoid(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void faceted(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void sphere(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void teardrop(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
       extern void truncated_octahedron(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
+
+      extern void particle(std::vector<cs::catom_t> &);
+      extern void particle_array(std::vector<cs::catom_t> &);
+      extern void hex_particle_array(std::vector<cs::catom_t> &);
+      extern void centre_particle_on_atom(std::vector<double>& particle_origin, std::vector<cs::catom_t>& catom_array);
+      extern void sort_atoms_by_grain(std::vector<cs::catom_t> & catom_array);
+      extern void clear_atoms(std::vector<cs::catom_t> &);
 
       extern void voronoi_substructure(std::vector<cs::catom_t> & catom_array);
 
@@ -150,6 +162,14 @@ namespace create{
                                   bool include_boundary_grains);
 
       extern bool compare_radius(core_radius_t first,core_radius_t second);
+      extern void calculate_atomic_composition(std::vector<cs::catom_t> & catom_array);
+
+      // MPI functions
+      extern void copy_halo_atoms(std::vector<cs::catom_t> & catom_array);
+      extern void identify_mpi_boundary_atoms(std::vector<cs::catom_t> & catom_array, neighbours::list_t & cneighbourlist);
+      extern void mark_non_interacting_halo(std::vector<cs::catom_t>& catom_array);
+      extern void sort_atoms_by_mpi_type(std::vector<cs::catom_t> & catom_array, neighbours::list_t& bilinear, neighbours::list_t& biquadratic);
+      extern void init_mpi_comms(std::vector<cs::catom_t> & catom_array);
 
    } // end of internal namespace
 } // end of create namespace

@@ -34,7 +34,7 @@ namespace vopencl
       void update_dipolar_fields(void) noexcept
       {
          // dipole calculations enabled?
-         if (::sim::hamiltonian_simulation_flags[4]!=1) return;
+         if (!::dipole::activated) return;
 
          // check for previous demag update at same time
          if (::sim::time == ::demag::update_time) return;

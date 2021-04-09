@@ -48,6 +48,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
+#include "montecarlo.hpp"
 #include "program.hpp"
 #include "random.hpp"
 #include "sim.hpp"
@@ -114,7 +115,7 @@ void cmc_anisotropy(){
 		while(sim::constraint_phi<=sim::constraint_phi_max){
 
 			// Re-initialise spin moments for CMC
-			sim::CMCinit();
+			montecarlo::CMCinit();
 
 			// Set starting temperature
          // if checkpoint is loaded, then update minimum values of temperature

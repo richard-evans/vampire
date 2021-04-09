@@ -34,10 +34,14 @@ void read_spin_data(unsigned int file_id);
 //------------------------------------------------------------------------------
 void process_spins(){
 
-   int min_file_id = 0;
-   int max_file_id = 99999999;
+   unsigned int min_file_id = vdc::vdc_start_file_id;
+   unsigned int max_file_id = vdc::vdc_final_file_id;
 
    if(vdc::cells) vdc::initialise_cells();
+
+   if(vdc::ssc) vdc::initialise_ssc();
+
+   if(vdc::povray) vdc::initialise_povray();
 
    unsigned int last_file_id = max_file_id;
 
@@ -58,15 +62,28 @@ void process_spins(){
 
       if(vdc::cells) vdc::output_cell_file(file_id);
 
+      // output vtk file
+      if(vdc::vtk) output_vtk_file(file_id);
+
+      // output plain text file
+      if(vdc::txt) output_txt_file(file_id);
+
+      // compute spin-spin correlation
+      if(vdc::ssc) output_ssc_file(file_id);
+
       last_file_id = file_id;
 
    }
 
    // set global start and end file id
+   vdc::start_file_id = min_file_id;
    vdc::final_file_id = last_file_id;
 
    // output povray file
    if(vdc::povray) output_povray_file();
+
+   // output average ssc
+   if(vdc::ssc) output_average_ssc_file();
 
    return;
 
@@ -107,6 +124,9 @@ bool read_spin_metadata(unsigned int file_id){
 
    // check for open file, if not open then end program, end of snapshots
    if(!smfile.is_open()){
+         //std::cerr << "Error! Spins metadata file spins-" << std::setfill('0') << std::setw(8)
+         //<< file_id << ".meta cannot be opened. Exiting" << std::endl;
+         //exit(1);
       return false;
    }
 
@@ -129,7 +149,7 @@ bool read_spin_metadata(unsigned int file_id){
 
    vdc::spin_filenames.resize(0);
 
-   for(int file = 0; file < num_spin_files; file++){
+   for(unsigned int file = 0; file < num_spin_files; file++){
       getline(smfile, line);
       line.erase(remove(line.begin(), line.end(), '\t'), line.end());
       line.erase(remove(line.begin(), line.end(), ' '), line.end());
@@ -198,7 +218,6 @@ void read_spin_data(unsigned int file_id){
                ss >> num_atoms_in_file; // interpret as uint64_t
             }
             double x,y,z;
-            int type_id, category_id;
             // loop over all atoms in file and load as x,y,z sets
             for(uint64_t idx = 0; idx < num_atoms_in_file; idx++){
                getline(ifile, line);

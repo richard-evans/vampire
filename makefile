@@ -87,10 +87,6 @@ obj/simulate/fields.o \
 obj/simulate/LLB.o \
 obj/simulate/LLGHeun.o \
 obj/simulate/LLGMidpoint.o \
-obj/simulate/mc.o \
-obj/simulate/mc_moves.o \
-obj/simulate/cmc.o \
-obj/simulate/cmc_mc.o \
 obj/simulate/sim.o \
 obj/simulate/standard_programs.o \
 obj/spintorque/data.o \
@@ -101,11 +97,6 @@ obj/spintorque/magnetization.o \
 obj/spintorque/matrix.o \
 obj/spintorque/output.o \
 obj/spintorque/spinaccumulation.o \
-obj/statistics/data.o \
-obj/statistics/initialize.o \
-obj/statistics/magnetization.o \
-obj/statistics/statistics.o \
-obj/statistics/susceptibility.o \
 obj/utility/checkpoint.o \
 obj/utility/errors.o \
 obj/utility/statistics.o \
@@ -132,17 +123,22 @@ obj/qvoronoi/userprintf_rbox.o\
 
 # Include supplementary makefiles
 include src/anisotropy/makefile
+include src/cells/makefile
 include src/create/makefile
 include src/config/makefile
-include src/cells/makefile
+include src/constants/makefile
 include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
 include src/ltmp/makefile
 include src/main/makefile
+include src/montecarlo/makefile
 include src/mpi/makefile
+include src/neighbours/makefile
 include src/program/makefile
 include src/simulate/makefile
+include src/spintransport/makefile
+include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
 
@@ -322,7 +318,7 @@ tidy:
 	@rm -f src/*/*~
 
 vdc:
-	$(MAKE) -B -C util/vdc/
+	$(MAKE) -C util/vdc/
 
 install:
 	echo "Preparing installation package"

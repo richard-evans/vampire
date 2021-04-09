@@ -37,9 +37,11 @@ namespace config{
       bool initialised = false; // flag to signify if config has been initialised
 
       bool output_atoms_config = false; // flag to enable atoms output
+      bool output_atoms_config_continuous = false; // flag to enable atoms output
       int output_atoms_config_rate = 1000; // rate to output atoms
 
       bool output_cells_config = false; // flag to enable cells output
+      bool output_cells_config_continuous = false; // flag to enable cells output
       int output_cells_config_rate = 1000; // rate to output cells
 
       int output_rate_counter_coords = 0;

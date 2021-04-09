@@ -41,6 +41,8 @@ using std::string;
 
 namespace vmpi{
 
+   extern bool master;              // boolean variable (only true on master process)
+   extern int master_id;            // MPI process ID for master process
 	extern int my_rank; 					///< Local CPU ID
 	extern int num_processors;			///< Total number of CPUs
 	extern int mpi_mode; 				///< MPI Simulation Mode (0 = Geometric Decomposition, 1 = Replicated Data, 2 = Statistical Parallelism)
@@ -96,15 +98,10 @@ namespace vmpi{
 	#endif
 
 	//functions declarations
-	extern int initialise(int argc, char *argv[]);
+	extern void initialise(int argc, char *argv[]);
 	extern int hosts();
 	extern int finalise();
    extern void geometric_decomposition(int, double []);
-	extern int crystal_xyz(std::vector<cs::catom_t> &);
-	extern int copy_halo_atoms(std::vector<cs::catom_t> &);
-	extern int set_replicated_data(std::vector<cs::catom_t> &);
-	extern int identify_boundary_atoms(std::vector<cs::catom_t> &, std::vector<std::vector <cs::neighbour_t> > &);
-	extern int init_mpi_comms(std::vector<cs::catom_t> & catom_array);
 	extern double SwapTimer(double, double&);
 
    // functions for sending/receiving halo data
@@ -113,6 +110,11 @@ namespace vmpi{
 
 	// wrapper functions avoiding MPI library
 	extern void barrier();
+   extern uint64_t reduce_sum(uint64_t local);
+   extern uint64_t all_reduce_sum(uint64_t local);
+   extern void collate(std::vector<double>& input, std::vector<double>& output);
+   extern void counts_and_displacements(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
+   extern void fast_collate(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
 
    // function to seed random numbers in parallel
    uint32_t parallel_rng_seed(int seed);
