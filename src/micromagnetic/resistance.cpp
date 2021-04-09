@@ -42,7 +42,7 @@ namespace micromagnetic{
        //double one_o_Rmin = 1.0/Rmin;
        double sum_one_o_R = 0.0;
 
-    // std::cout <<res_RA << '\t' << Rmin <<"\t" <<  overlap_area <<'\t' << cells::num_cells << '\t' << Ra << '\t' << area << std::endl;
+ //   std::cout <<res_RA << '\t' << Rmin <<"\t" <<  overlap_area <<'\t' << cells::num_cells << '\t' << Ra << '\t' << area << std::endl;
        int i = 0;
       for (int  cell = 0; cell < cells::num_cells; cell++){
 

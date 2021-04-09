@@ -160,6 +160,7 @@ void mm::calculate_llg_external_fields(const double temperature,
       y_total_external_field_array[cell] = mm::ext_field[1] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_y[cell];
       z_total_external_field_array[cell] = mm::ext_field[2] + sigma_perp*mtrandom::gaussian() + mm::pinning_field_z[cell];
 
+   //   std::cout << pinning_field_y[cell] <<std::endl;
      // optionally add dipole field
       if (dipole::activated){
          x_total_external_field_array[cell] += dipole::cells_field_array_x[cell];

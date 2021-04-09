@@ -130,7 +130,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
    if (discretisation_type == 1){
       for (int lc = 0; lc < num_local_cells; lc++){
          int cell = local_cell_array[lc];
-      //   std::cout <<x_coord_array[cell] << '\t' <<y_coord_array[cell] << '\t' <<z_coord_array[cell] << '\t' <<  mm::ms[cell] << std::endl;
+       //  std::cout <<type_array[cell] << "\t" << x_coord_array[cell] << '\t' <<y_coord_array[cell] << '\t' <<z_coord_array[cell] << '\t' <<  mm::ms[cell] << std::endl;
          if (mm::Tc[cell] < 0) {
             discretisation_type = 2;
          }
@@ -284,12 +284,28 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
    // Save the cell material type to enable setting material specific properties
    // taking average over constituent atoms
    //-------------------------------------------------------------------------------------------
+   std::vector< std::vector < int> > counter;
+   counter.resize(num_cells);
+   for (int i = 0; i < num_cells; ++i)
+    counter[i].resize(num_materials);
+
    for (int atom = 0; atom < num_atoms_interactions; atom ++){
       int mat = type_array[atom];
       int cell = cell_array[atom];
-      if ( mm::cell_material_array[cell] < mat){
-        mm::cell_material_array[cell] = mat;
+      counter[cell][mat] ++;
+      // if ( mm::cell_material_array[cell] < mat){
+      //   mm::cell_material_array[cell] = mat;
+      // }
+   }
+   for (int cell = 0; cell < num_cells; cell ++ ){
+            int largest = 0;
+   for (int mat = 0; mat < num_materials; mat++){
+
+      if (counter[cell][mat] > largest){
+         mm::cell_material_array[cell] = mat;
+         largest = counter[cell][mat];
       }
+   }
    }
     // for (int cell = 0; cell < num_cells; cell++ ){
     //    int mat = mm::cell_material_array[cell];
@@ -316,6 +332,8 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
       int mat = mm::cell_material_array[cell];
       mm::mat_vol[mat] = mm::mat_vol[mat] + volume_array[cell];
       mm::mat_ms[mat] = mm::mat_ms[mat] + mm::ms[cell];
+       std::cout <<mm::cell_material_array[cell] << "\t" << x_coord_array[cell] << '\t' <<y_coord_array[cell] << '\t' <<z_coord_array[cell] << '\t' <<  mm::ms[cell] << std::endl;
+      //std::cout << 
    }
    for (int mat = 0; mat < mp::num_materials; mat++ ){
       double min=create::internal::mp[mat].min;
@@ -341,27 +359,28 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
             const int cellj = mm::macro_neighbour_list_array[j];
             const int matj = mm::cell_material_array[cellj];
             // Check if spaced SAF is included
-            if (mp::material[mat].enable_SAF == true && mp::material[matj].enable_SAF == true){
-
+          //  std::cout << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;
+            if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj){
                // check that materials are different
-               if (mat != matj){
+            
+               std::cout << "enter2" << std::endl;
 
                   // why mj^1.66?? need to check how this actually works. why / ms[cell]?
                   //Ac = -prefactor[matj]*mp::material[mat].SAF[matj];
                   mm::A[j] = -area*mp::material[mat].SAF[matj]/mm::ms[cell];
                   //if (mm_correction == true) Ac = 2*Ac/cells::macro_cell_size[2];
 
-               }
             }
+      
 
-            // what does this do?
+            // option to override atomistic exchange with a micromagnetic value
             if (mp::material[mat].override_atomsitic[matj] == true){
                //double Area = cells::macro_cell_size*cells::macro_cell_size;
                //double Volume = cells::macro_cell_size*cells::macro_cell_size*cells::macro_cell_size;
                //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
                mm::A[j] = 2.0*mp::material[mat].EF_MM[matj]/(mm::ms[cell]);
             }
-
+        //    std::cout << mat << '\t' << matj << "\t" << mm::A[j]  <<std::endl;
          }
    }
 
@@ -380,6 +399,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
          mm::pinning_field_y[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[1];
          mm::pinning_field_z[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[2];
 
+      std::cout << mm::prefactor[mat] << '\t' << mm::pinning_field_x[cell] << "\t" << mm::pinning_field_y[cell] << "\t" << mm::pinning_field_z[cell] << "\t" << std::endl;
          // std::cout <<prefactor*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor2*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor3*mp::material[mat].pinning_field_unit_vector[2] << '\t' << prefactor4*mp::material[mat].pinning_field_unit_vector[2] <<  std::endl;
          //               n_cells
 
@@ -414,7 +434,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
          int mat = mm::cell_material_array[cell];
          const int start = mm::macro_neighbour_list_start_index[cell];
          const int end = mm::macro_neighbour_list_end_index[cell] +1;
-         //      std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] <<  "\t" << cells::pos_and_mom_array[cell*4 +3] << "\t" << mat << std::endl;//'\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
+              std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] <<  "\t" << cells::pos_and_mom_array[cell*4 +3] << "\t" << mat << std::endl;//'\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
 
          for(int j = start;j< end;j++){
             // calculate reduced exchange constant factor
@@ -423,13 +443,14 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
             double dx = cells::pos_and_mom_array[cell*4 +0] - cells::pos_and_mom_array[cellj*4 +0];
             double dy = cells::pos_and_mom_array[cell*4 +1] - cells::pos_and_mom_array[cellj*4 +1];
             double dz = cells::pos_and_mom_array[cell*4 +2] - cells::pos_and_mom_array[cellj*4 +2];
-
-            if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
-             //  std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
+//std::cout << cell << '\t' << cellj << '\t' << mat << '\t' << matj << "\t" << mm::resistance_layer_2 << '\t' << mm::resistance_layer_1 <<"\t" << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << dx << "\t" << dy << '\t' << dz << std::endl;
+            if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2){//} && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
+     //          std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
          // std::cout <<  dx << '\t' << dy << "\t" << dz << "/t" << mat << "/t" << matj << std::endl;
             //         std::cout << mm::resistance_layer_1 << '\t' << mm::resistance_layer_2 <<std::endl;
         //       std::cout << cell << '\t' << cellj << "\t" <<mat << '\t' << matj << std::endl;// x_coord_array[cell] << "\t" <<y_coord_array[cell] << "\t" <<z_coord_array[cell] << "\t" <<  x_coord_array[cellj] << "\t" <<y_coord_array[cellj] << "\t" <<z_coord_array[cellj] << "\t" <<std::endl;
                mm::overlap_area = mm::overlap_area + cells::macro_cell_size_x*cells::macro_cell_size_y;
+             //  std::cout << cell << '\t' << cellj << "\t" <<mm::overlap_area << std::endl;// x_coord_array[cell] << "\t" <<y_coord_array[cell] << "\t" <<z_coord_array[cell] << "\t" <<  x_coord_array[cellj] << "\t" <<y_coord_array[cellj] << "\t" <<z_coord_array[cellj] << "\t" <<std::endl;
 
             }
          }

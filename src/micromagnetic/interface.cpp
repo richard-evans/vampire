@@ -244,6 +244,7 @@ namespace micromagnetic{
          vin::read_material[super_index].SAF[sub_index] = J;
          vin::read_material[super_index].enable_SAF = true;
          vin::read_material[sub_index].enable_SAF = true;
+         std::cout << super_index << '\t' << sub_index << std::endl;
          return true;
       }
 
