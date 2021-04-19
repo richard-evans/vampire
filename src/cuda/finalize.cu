@@ -51,6 +51,7 @@ namespace vcuda{
          // De-allocate the exchange fields
          cu::exchange::finalise_exchange();
 
+         /*
          cu::atoms::x_spin_array.cu_real_array_t::~cu_real_array_t ();
          cu::atoms::y_spin_array.cu_real_array_t::~cu_real_array_t ();
          cu::atoms::z_spin_array.cu_real_array_t::~cu_real_array_t ();
@@ -119,6 +120,7 @@ namespace vcuda{
          cu::stats::material_height_mask.cu_index_array_t::~cu_index_array_t ();
          cu::stats::material_height_magnetization.cu_real_array_t::~cu_real_array_t ();
          cu::stats::material_height_mean_magnetization.cu_real_array_t::~cu_real_array_t ();
+         */
 
       }
    } /* internal */

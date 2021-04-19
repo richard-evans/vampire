@@ -32,17 +32,26 @@ namespace vcuda
          bool J_vect_initialised = false;
          bool J_tens_initialised = false;
 
-         cu_real_array_t   spin3N;
-         cu_real_array_t   field3N;
+        cu_real_t *d_spin3n;
+        cu_real_t *d_field3n;
+
+        //cu_real_array_t   spin3N;
+        //cu_real_array_t   field3N;
 
          cusparseDnVecDescr_t vecX, vecY;
          cu_exch_mat_t  J_matrix_d;
 
          // Arrays to store the coo and csr matrix
-         cu_index_array_t csr_rows_d;
-         cu_index_array_t coo_rows_d;
-         cu_index_array_t coo_cols_d;
-         cu_real_array_t  coo_vals_d;
+        int *d_csr_rows;
+        int *d_coo_rows;
+        int *d_coo_cols;
+
+        cu_real_t *d_coo_vals;
+
+        //cu_index_array_t csr_rows_d;
+        //cu_index_array_t coo_rows_d;
+        //cu_index_array_t coo_cols_d;
+        //cu_real_array_t  coo_vals_d;
 
          int Nrows = 0;
          int Ncols = 0;
@@ -105,8 +114,14 @@ namespace vcuda
 
             const int Natoms = ::atoms::num_atoms;
 
-            spin3N.assign( 3*::atoms::num_atoms, 0);
-            field3N.assign( 3*::atoms::num_atoms, 0);
+            cudaMalloc((void**)&d_spin3n, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+            cudaMalloc((void**)&d_field3n, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+            // NOTE: This will NOT work for values other than 0
+            cudaMemset(d_spin3n, 0, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+            cudaMemset(d_field3n, 0, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+
+            //spin3N.assign( 3*::atoms::num_atoms, 0);
+            //field3N.assign( 3*::atoms::num_atoms, 0);
 
             //Local storage for nbr list
             std::vector<size_t> row_inds;
@@ -185,16 +200,28 @@ namespace vcuda
                 sort_coo_list(row_inds, col_inds, vals, Nrows, Ncols);
 
                 // allocate space for the device data
+                /*
                 coo_rows_d.resize(Nnz);
                 coo_cols_d.resize(Nnz);
                 coo_vals_d.resize(Nnz);
                 csr_rows_d.resize(Nrows+1);
+                */
+                cudaMalloc((void**)&d_coo_rows, Nnz * sizeof(int));
+                cudaMalloc((void**)&d_coo_cols, Nnz * sizeof(int));
+                cudaMalloc((void**)&d_csr_rows, (Nnz + 1) * sizeof(int));
+                cudaMalloc((void**)&d_coo_vals, Nnz * sizeof(float));
+
+                cudaMemcpy(d_coo_rows, row_inds.data(), Nnz * sizeof(int), cudaMemcpyHostToDevice);
+                cudaMemcpy(d_coo_cols, row_inds.data(), Nnz * sizeof(int), cudaMemcpyHostToDevice);
+                cudaMemcpy(d_coo_vals, row_inds.data(), Nnz * sizeof(float), cudaMemcpyHostToDevice);
+
 
                 //Copy COO matrix storage arrays to the device
+                /*
                 thrust::copy( row_inds.begin(), row_inds.end(), coo_rows_d.begin());
                 thrust::copy( col_inds.begin(), col_inds.end(), coo_cols_d.begin());
                 thrust::copy( vals.begin(), vals.end(), coo_vals_d.begin());
-
+                */
                 // initialise cusparse handle
                 status = cusparseCreate(&handle);
                 if (status != CUSPARSE_STATUS_SUCCESS) {
@@ -204,17 +231,22 @@ namespace vcuda
 
                 // cusparse routine to convert coo row data into csr row offsets
                 status = cusparseXcoo2csr(  handle,
-                                            thrust::raw_pointer_cast( coo_rows_d.data()),
+                                            d_coo_rows,
+                                            //thrust::raw_pointer_cast( coo_rows_d.data()),
                                             Nnz,
                                             Ncols,
-                                            thrust::raw_pointer_cast( csr_rows_d.data()),
+                                            d_csr_rows,
+                                            //thrust::raw_pointer_cast( csr_rows_d.data()),
                                             CUSPARSE_INDEX_BASE_ZERO);
 
                 // create the CSR descriptor for CUSPARSE
                 status = cusparseCreateCsr(&J_matrix_d, Nrows, Ncols, Nnz,
-                                          thrust::raw_pointer_cast(csr_rows_d.data()),
-                                          thrust::raw_pointer_cast(coo_cols_d.data()),
-                                          thrust::raw_pointer_cast(coo_vals_d.data()),
+                                            d_csr_rows,
+                                            d_coo_cols,
+                                            d_coo_vals,
+                                          //thrust::raw_pointer_cast(csr_rows_d.data()),
+                                          //thrust::raw_pointer_cast(coo_cols_d.data()),
+                                          //thrust::raw_pointer_cast(coo_vals_d.data()),
                                           CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
                                           CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
 
@@ -225,8 +257,10 @@ namespace vcuda
 
 
                  // Create the dense vector descriptors for the input and output (Y = A*X)
-                 cusparseCreateDnVec( &vecX, Ncols, thrust::raw_pointer_cast( spin3N.data()), CUDA_R_64F );
-                 cusparseCreateDnVec( &vecY, Nrows, thrust::raw_pointer_cast( field3N.data()), CUDA_R_64F );
+                 //cusparseCreateDnVec( &vecX, Ncols, thrust::raw_pointer_cast( spin3N.data()), CUDA_R_64F );
+                 //cusparseCreateDnVec( &vecY, Nrows, thrust::raw_pointer_cast( field3N.data()), CUDA_R_64F );
+                 cusparseCreateDnVec( &vecX, Ncols, d_spin3n, CUDA_R_64F );
+                 cusparseCreateDnVec( &vecY, Nrows, d_field3n, CUDA_R_64F );
 
 
 
@@ -298,14 +332,22 @@ namespace vcuda
 
          int finalise_exchange()
          {
-            spin3N.cu_real_array_t::~cu_real_array_t();
-            field3N.cu_real_array_t::~cu_real_array_t();
+            cudaFree(d_spin3n);
+            cudaFree(d_field3n);
+            //spin3N.cu_real_array_t::~cu_real_array_t();
+            //field3N.cu_real_array_t::~cu_real_array_t();
             //J_matrix_d.cu_exch_mat_t::~cu_exch_mat_t ();
 
-            csr_rows_d.cu_index_array_t::~cu_index_array_t();
-            coo_rows_d.cu_index_array_t::~cu_index_array_t();
-            coo_cols_d.cu_index_array_t::~cu_index_array_t();
-            coo_vals_d.cu_real_array_t::~cu_real_array_t();
+            cudaFree(d_csr_rows);
+            cudaFree(d_coo_rows);
+            cudaFree(d_coo_cols);
+            cudaFree(d_coo_vals);
+
+
+            //csr_rows_d.cu_index_array_t::~cu_index_array_t();
+            //coo_rows_d.cu_index_array_t::~cu_index_array_t();
+            //coo_cols_d.cu_index_array_t::~cu_index_array_t();
+            //coo_vals_d.cu_real_array_t::~cu_real_array_t();
 
             if( !empty_exchange ) {
                 // destroy vector and matrix descriptors
@@ -339,10 +381,14 @@ namespace vcuda
             if( !exchange_initialised) initialise_exchange();
 
             if( !empty_exchange) {
+                cudaMemcpy(d_spin3n, cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(d_spin3n + ::atoms::num_atoms, cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(d_spin3n + 2 * ::atoms::num_atoms, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                /*
                 thrust::copy( cu::atoms::x_spin_array.begin(), cu::atoms::x_spin_array.end(), spin3N.begin());
                 thrust::copy( cu::atoms::y_spin_array.begin(), cu::atoms::y_spin_array.end(), spin3N.begin() + ::atoms::num_atoms);
                 thrust::copy( cu::atoms::z_spin_array.begin(), cu::atoms::z_spin_array.end(), spin3N.begin() + 2*::atoms::num_atoms);
-
+                */
                 check_cuda_errors(__FILE__,__LINE__);
 
                 // cusparseSpMV using CSR algorithm 1
@@ -363,9 +409,16 @@ namespace vcuda
                 }
 
                 check_cuda_errors(__FILE__,__LINE__);
+
+                cudaMemcpy(cu::d_x_spin_field, d_spin3n, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::d_y_spin_field, d_spin3n + ::atoms::num_atoms, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::d_z_spin_field, d_spin3n + 3 * ::atoms::num_atoms, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+
+                /*
                 thrust::copy( field3N.begin(), field3N.begin() + ::atoms::num_atoms, cu::x_total_spin_field_array.begin() );
                 thrust::copy( field3N.begin() + ::atoms::num_atoms, field3N.begin() + 2*::atoms::num_atoms, cu::y_total_spin_field_array.begin() );
                 thrust::copy( field3N.begin() + 2*::atoms::num_atoms, field3N.end(), cu::z_total_spin_field_array.begin() );
+                */
             }
 
 

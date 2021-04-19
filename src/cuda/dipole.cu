@@ -55,7 +55,7 @@ void update_dipolar_fields ()
     * Figure out addresses in device memory space
     */
 
-   cu_real_t * d_x_mag = thrust::raw_pointer_cast(
+   /*cu_real_t * d_x_mag = thrust::raw_pointer_cast(
          cu::cells::x_mag_array.data());
    cu_real_t * d_y_mag = thrust::raw_pointer_cast(
          cu::cells::y_mag_array.data());
@@ -78,16 +78,16 @@ void update_dipolar_fields ()
          cu::cells::y_field_array.data());
    cu_real_t * d_z_cell_field = thrust::raw_pointer_cast(
          cu::cells::z_field_array.data());
-
+*/
    /*
     * Update cell dipolar fields
     */
 
    update_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
-         d_x_mag, d_y_mag, d_z_mag,
-         d_x_coord, d_y_coord, d_z_coord,
-         d_volume,
-         d_x_cell_field, d_y_cell_field, d_z_cell_field,
+         cu::cells::d_x_mag, cu::cells::d_y_mag, cu::cells::d_z_mag,
+         cu::cells::d_x_coord, cu::cells::d_y_coord, cu::cells::d_z_coord,
+         cu::cells::d_volume,
+         cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
          ::cells::num_cells
          );
 
@@ -97,6 +97,7 @@ void update_dipolar_fields ()
     * Update atomistic dipolar fields
     */
 
+    /*
    int * d_cells =
       thrust::raw_pointer_cast(cu::atoms::cell_array.data());
 
@@ -106,11 +107,11 @@ void update_dipolar_fields ()
          cu::y_dipolar_field_array.data());
    cu_real_t * d_z_atom_field = thrust::raw_pointer_cast(
          cu::z_dipolar_field_array.data());
-
+      */
    update_atomistic_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
-         d_x_cell_field, d_y_cell_field, d_z_cell_field,
-         d_x_atom_field, d_y_atom_field, d_z_atom_field,
-         d_cells,
+         cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
+         cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
+         cu::atoms::d_cells,
          ::atoms::num_atoms
          );
 
@@ -119,7 +120,8 @@ void update_dipolar_fields ()
 
 void update_cell_magnetizations ()
 {
-   cu_real_t * d_x_spin = thrust::raw_pointer_cast(
+   /*
+      cu_real_t * d_x_spin = thrust::raw_pointer_cast(
          cu::atoms::x_spin_array.data());
    cu_real_t * d_y_spin = thrust::raw_pointer_cast(
          cu::atoms::y_spin_array.data());
@@ -141,11 +143,16 @@ void update_cell_magnetizations ()
          cu::cells::y_mag_array.data());
    cu_real_t * d_z_mag = thrust::raw_pointer_cast(
          cu::cells::z_mag_array.data());
-
+   */
    /*
     * Update cell magnetizations
     */
 
+    cudaMemset(cu::cells::d_x_mag, 0, ::cells::num_cells * sizeof(cu_real_t));
+    cudaMemset(cu::cells::d_y_mag, 0, ::cells::num_cells * sizeof(cu_real_t));
+    cudaMemset(cu::cells::d_z_mag, 0, ::cells::num_cells * sizeof(cu_real_t));
+
+/*
    thrust::fill(
          cu::cells::x_mag_array.begin(),
          cu::cells::x_mag_array.end(),
@@ -158,18 +165,20 @@ void update_cell_magnetizations ()
          cu::cells::z_mag_array.begin(),
          cu::cells::z_mag_array.end(),
          0.0);
-
+*/
    update_cell_magnetization <<< cu::grid_size, cu::block_size >>> (
-         d_x_spin, d_y_spin, d_z_spin,
-         d_materials, d_cells,
-         d_material_params,
-         d_x_mag, d_y_mag, d_z_mag,
+         cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
+         cu::atoms::d_materials, cu::atoms::d_cells,
+         cu::mp::d_material_params,
+         cu::cells::d_x_mag, cu::cells::d_y_mag, cu::cells::d_z_mag,
          ::atoms::num_atoms
          );
 
    check_cuda_errors (__FILE__, __LINE__);
 }
 
+// Some data is read only (material, cell, material_params)
+// and access in non-coalesced manner - should benefit from const __restrict__
 __global__ void update_cell_magnetization (
       cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
       int * material, int * cell,
@@ -188,6 +197,9 @@ __global__ void update_cell_magnetization (
          i < n_atoms;
          i += blockDim.x * gridDim.x)
    {
+      // What are the ranges and general layout of mid and cid
+      // Could stuff be moved to shared memory and
+      // warp reduction used to avoid atomicAdd?
       int mid = material[i];
       int cid = cell[i];
       cu_real_t mu_s = material_params[mid].mu_s_si;
@@ -197,6 +209,8 @@ __global__ void update_cell_magnetization (
    }
 }
 
+// Same as above - some data is read only, although looks like it's
+// at least accessed in contoguous manner
 __global__ void update_dipolar_fields (
       cu_real_t * x_mag, cu_real_t * y_mag, cu_real_t * z_mag,
       cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
@@ -218,6 +232,8 @@ __global__ void update_dipolar_fields (
       /*
       * Inverse volume from the number of atoms in macro-cell
       */
+      // DEFINES ? 4.0 * PI / 3 is constant
+      // Should be optimised out anyway?
       cu_real_t vol_prefac = - 4.0 * M_PI / (3.0 * volume[i]);
       cu_real_t prefactor = 1.0e+23; // 1e-7/1e30
 
@@ -227,11 +243,15 @@ __global__ void update_dipolar_fields (
 
       for (int j = 0; j < n_cells; j++)
       {
+         // Jeeeesh
          if (i == j) continue;
+         // That's redundant though, isn't it?
          cu_real_t omx = x_mag[i];
          cu_real_t omy = y_mag[i];
          cu_real_t omz = z_mag[i];
 
+         // Make use of float3?
+         // Store in AoS instead of separate arrays?
          cu_real_t dx = x_coord[j] - cx;
          cu_real_t dy = y_coord[j] - cy;
          cu_real_t dz = z_coord[j] - cz;
@@ -249,6 +269,7 @@ __global__ void update_dipolar_fields (
          field_z += (3.0 * sdote * dz * drij - omz) * drij3;
       }
 
+      // Same AoS argument as above?
       x_dip_field[i] = prefactor * field_x;
       y_dip_field[i] = prefactor * field_y;
       z_dip_field[i] = prefactor * field_z;
@@ -268,6 +289,8 @@ __global__ void update_atomistic_dipolar_fields (
          i < n_atoms;
          i += blockDim.x * gridDim.x)
    {
+      // I bet this is non-coalescing?
+      // Can it somehow be made coalescing with shared memory?
       int cid = cell[i];
       x_dip_field[i] = x_cell_field[cid];
       y_dip_field[i] = y_cell_field[cid];

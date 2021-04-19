@@ -16,6 +16,7 @@
 #include "cuda_utils.hpp"
 #include "internal.hpp"
 #include "statistics.hpp"
+#include "typedefs.hpp"
 
 #ifdef CUDA
 namespace cu = vcuda::internal;
@@ -34,9 +35,14 @@ namespace vcuda{
             if(vcuda::internal::stats::use_cpu){
 
 				   // copy spin data to CPU
+               /*
                thrust::copy(internal::atoms::x_spin_array.begin(),internal::atoms::x_spin_array.end(),::atoms::x_spin_array.begin());
                thrust::copy(internal::atoms::y_spin_array.begin(),internal::atoms::y_spin_array.end(),::atoms::y_spin_array.begin());
                thrust::copy(internal::atoms::z_spin_array.begin(),internal::atoms::z_spin_array.end(),::atoms::z_spin_array.begin());
+               */
+               cudaMemcpy(::atoms::x_spin_array.data(), internal::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+               cudaMemcpy(::atoms::y_spin_array.data(), internal::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+               cudaMemcpy(::atoms::z_spin_array.data(), internal::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
 
                // call cpu statistics functions
                if(::stats::calculate_system_magnetization)          ::stats::system_magnetization.calculate_magnetization(::atoms::x_spin_array, ::atoms::y_spin_array, ::atoms::z_spin_array, ::atoms::m_spin_array);
@@ -216,7 +222,7 @@ namespace vcuda{
             cu_real_t * d_accu = thrust::raw_pointer_cast (
                   mean_stat.data());
 
-            cu_real_t * d_x_spin = thrust::raw_pointer_cast(
+            /*cu_real_t * d_x_spin = thrust::raw_pointer_cast(
                   cu::atoms::x_spin_array.data());
             cu_real_t * d_y_spin = thrust::raw_pointer_cast(
                   cu::atoms::y_spin_array.data());
@@ -224,16 +230,14 @@ namespace vcuda{
                   cu::atoms::z_spin_array.data());
             cu_real_t * d_spin_norm = thrust::raw_pointer_cast(
                   cu::atoms::spin_norm_array.data());
-
+            */
             int n_bins = mask_size;
             int n_atoms = mask.size ();
 
             if (n_bins < 8) {
                hist_by_key_smaller_mask <<< n_bins * 4, 512 >>> (
-                     d_x_spin,
-                     d_y_spin,
-                     d_z_spin,
-                     d_spin_norm,
+                     cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
+                     cu::atoms::d_spin_norm,
                      d_mask,
                      d_stat,
                      n_bins,
@@ -248,10 +252,8 @@ namespace vcuda{
 
                int n_bytes = 4 * mask_size * sizeof(cu_real_array_t::value_type);
                hist_by_key_small_mask <<< cu::grid_size, cu::block_size, n_bytes >>> (
-                     d_x_spin,
-                     d_y_spin,
-                     d_z_spin,
-                     d_spin_norm,
+                     cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
+                     cu::atoms::d_spin_norm,
                      d_mask,
                      d_stat,
                      n_bins,
@@ -265,10 +267,8 @@ namespace vcuda{
                // Use the brute force implementation
 
                hist_by_key_big_mask <<< cu::grid_size, cu::block_size >>> (
-                     d_x_spin,
-                     d_y_spin,
-                     d_z_spin,
-                     d_spin_norm,
+                     cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
+                     cu::atoms::d_spin_norm,
                      d_mask,
                      d_stat,
                      n_bins,
