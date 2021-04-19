@@ -19,6 +19,7 @@
 
 #include "exchange_fields.hpp"
 #include "statistics.hpp"
+#include "cuda_utils.hpp"
 
 #ifdef CUDA
 namespace cu = vcuda::internal;
@@ -47,10 +48,12 @@ namespace vcuda{
       void __finalize ()
       {
 
+         check_cuda_errors (__FILE__, __LINE__);
          std::cout << "CUDA time taken \t" << cuda_timer.seconds_elapsed() << std::endl;
          // De-allocate the exchange fields
          cu::exchange::finalise_exchange();
 
+         check_cuda_errors (__FILE__, __LINE__);
          /*
          cu::atoms::x_spin_array.cu_real_array_t::~cu_real_array_t ();
          cu::atoms::y_spin_array.cu_real_array_t::~cu_real_array_t ();

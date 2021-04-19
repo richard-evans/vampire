@@ -412,7 +412,7 @@ namespace vcuda
 
                 cudaMemcpy(cu::d_x_spin_field, d_spin3n, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
                 cudaMemcpy(cu::d_y_spin_field, d_spin3n + ::atoms::num_atoms, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(cu::d_z_spin_field, d_spin3n + 3 * ::atoms::num_atoms, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::d_z_spin_field, d_spin3n + 2 * ::atoms::num_atoms, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
 
                 /*
                 thrust::copy( field3N.begin(), field3N.begin() + ::atoms::num_atoms, cu::x_total_spin_field_array.begin() );

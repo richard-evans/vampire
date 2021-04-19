@@ -193,7 +193,7 @@ namespace vcuda{
                ::atoms::z_spin_array.end(),
                cu::atoms::z_spin_array.begin()
                );
-         */     
+         */
          /*
           * Allocate memory in the device and transfer the
           * coordinates of the atoms.
@@ -253,7 +253,7 @@ namespace vcuda{
 
          cudaMalloc((void**)&cu::atoms::d_cells, ::atoms::num_atoms * sizeof(int));
          cudaMemcpy(cu::atoms::d_cells, ::atoms::cell_array.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
-         
+
 
          /*cu::atoms::cell_array.resize(::atoms::num_atoms);
 
@@ -304,20 +304,20 @@ namespace vcuda{
             ::atoms::x_total_spin_field_array.end(),
             cu::x_total_spin_field_array.begin()
          );
-         
+
          thrust::copy(
             ::atoms::y_total_spin_field_array.begin(),
             ::atoms::y_total_spin_field_array.end(),
             cu::y_total_spin_field_array.begin()
          );
-         
+
          thrust::copy(
             ::atoms::z_total_spin_field_array.begin(),
             ::atoms::z_total_spin_field_array.end(),
             cu::z_total_spin_field_array.begin()
          );
          */
-         
+
          /*
           * Allocate memory in the device and transfer the
           * total external field in each atom.
@@ -362,7 +362,7 @@ namespace vcuda{
          cudaMalloc((void**)&cu::d_x_dip_field, ::atoms::num_atoms * sizeof(cu_real_t));
          cudaMalloc((void**)&cu::d_y_dip_field, ::atoms::num_atoms * sizeof(cu_real_t));
          cudaMalloc((void**)&cu::d_z_dip_field, ::atoms::num_atoms * sizeof(cu_real_t));
-         
+
          cudaMemcpy(cu::d_x_dip_field, ::dipole::atom_dipolar_field_array_x.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
          cudaMemcpy(cu::d_y_dip_field, ::dipole::atom_dipolar_field_array_y.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
          cudaMemcpy(cu::d_z_dip_field, ::dipole::atom_dipolar_field_array_z.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
@@ -429,7 +429,7 @@ namespace vcuda{
          cu::cells::x_mag_array.resize(::cells::num_cells);
          cu::cells::y_mag_array.resize(::cells::num_cells);
          cu::cells::z_mag_array.resize(::cells::num_cells);
-         
+
          thrust::copy(::cells::mag_array_x.begin(), ::cells::mag_array_x.end(), cu::cells::x_mag_array.begin());
          thrust::copy(::cells::mag_array_y.begin(), ::cells::mag_array_y.end(), cu::cells::y_mag_array.begin());
          thrust::copy(::cells::mag_array_z.begin(), ::cells::mag_array_z.end(), cu::cells::z_mag_array.begin());
@@ -539,7 +539,7 @@ namespace vcuda{
           */
           cudaMalloc((void**)&cu::mp::d_material_params, num_mats * sizeof(material_parameters_t));
           cudaMemcpy(cu::mp::d_material_params, _materials.data(), num_mats * sizeof(material_parameters_t), cudaMemcpyHostToDevice);
- 
+
          /*
          cu::mp::materials.resize(num_mats);
          thrust::copy(
@@ -596,23 +596,23 @@ namespace vcuda{
 
          cudaMemcpy(cu::atoms::d_limits, limits_h.data(), (::atoms::num_atoms + 1) * sizeof(int), cudaMemcpyHostToDevice);
          cudaMemcpy(cu::atoms::d_neighbours, ::atoms::neighbour_list_array.data(), ::atoms::neighbour_list_array.size() * sizeof(int), cudaMemcpyHostToDevice);
-         
+
          /*
          cu::atoms::limits.resize( ::atoms::num_atoms + 1);
          cu::atoms::neighbours.resize( ::atoms::neighbour_list_array.size() );
-         
+
          thrust::copy(
             limits_h.begin(),
             limits_h.end(),
             cu::atoms::limits.begin()
          );
-         
+
          thrust::copy(
             ::atoms::neighbour_list_array.begin(),
             ::atoms::neighbour_list_array.end(),
             cu::atoms::neighbours.begin()
          );
-         
+
          */
 
 
