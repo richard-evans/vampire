@@ -122,7 +122,7 @@ namespace exchange{
                         zlog << zTs() << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting" << std::endl;
                         err::vexit();
                      }
-                     if (imaterial == 4) std::cout << imaterial << '\t' << jmaterial << "\t" << d << '\t' << J  << "\t" << atoms::v_exchange_list[nn].Jij[0] <<  std::endl;
+                   //  if (imaterial == 4) std::cout << imaterial << '\t' << jmaterial << "\t" << d << '\t' << J  << "\t" << atoms::v_exchange_list[nn].Jij[0] <<  std::endl;
       					// reset interaction id to neighbour number - causes segfault if nn out of range
       					atoms::neighbour_interaction_type_array[nn] = nn;
       				}
