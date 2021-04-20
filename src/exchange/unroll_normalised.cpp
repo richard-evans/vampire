@@ -83,6 +83,24 @@ namespace exchange{
       					const int jmaterial = atoms::type_array[natom];
       					atoms::v_exchange_list.push_back(tmp_zvec);
                      // get unit cell interaction id
+                     double J = 1.0;
+                      // //calculate the distance between the atoms to see if its a NN or NNN interaction
+                      double dx = atoms::x_coord_array[atom] - atoms::x_coord_array[natom];
+                      double dy = atoms::y_coord_array[atom] - atoms::y_coord_array[natom];
+                      double dz = atoms::z_coord_array[atom] - atoms::z_coord_array[natom];
+
+                      double d = sqrt(sqrt(dx*dx + dy*dy)*sqrt(dx*dx + dy*dy) + dz*dz);
+
+                      if (imaterial > 3 || jmaterial > 3){
+
+                         //std::cout << "enter" <<std::endl;
+                         if (d  > 2.8) J = 0.0;
+                         else {
+                           J = -1.0;
+                        //   std::cout << d << std::endl;
+                         }
+                      }
+                     // std::cout << imaterial << "\t" << jmaterial << "\t" << d << "\t" << J << std::endl; 
                      int i = atoms::neighbour_interaction_type_array[nn];
                      // get shell ID for interaction
                      const int shell = cs::unit_cell.bilinear.interaction[i].shell;
@@ -90,20 +108,21 @@ namespace exchange{
                      std::vector<double> Jij = internal::bilinear_exchange_constants.get_exchange_values(imaterial, jmaterial, shell);
                      // set exchange field, normalising to mu_s^i
                      if( Jij.size() == 3 ){
-                        atoms::v_exchange_list[nn].Jij[0] = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * Jij[0] * imus;
-                        atoms::v_exchange_list[nn].Jij[1] = cs::unit_cell.bilinear.interaction[i].Jij[1][1] * Jij[1] * imus;
-                        atoms::v_exchange_list[nn].Jij[2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * Jij[2] * imus;
+                        atoms::v_exchange_list[nn].Jij[0] = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * Jij[0] * imus*J;
+                        atoms::v_exchange_list[nn].Jij[1] = cs::unit_cell.bilinear.interaction[i].Jij[1][1] * Jij[1] * imus*J;
+                        atoms::v_exchange_list[nn].Jij[2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * Jij[2] * imus*J;
                      }
                      else if( Jij.size() == 1 ){
-                        atoms::v_exchange_list[nn].Jij[0] = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * Jij[0] * imus;
-                        atoms::v_exchange_list[nn].Jij[1] = cs::unit_cell.bilinear.interaction[i].Jij[1][1] * Jij[0] * imus;
-                        atoms::v_exchange_list[nn].Jij[2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * Jij[0] * imus;
+                        atoms::v_exchange_list[nn].Jij[0] = cs::unit_cell.bilinear.interaction[i].Jij[0][0] * Jij[0] * imus*J;
+                        atoms::v_exchange_list[nn].Jij[1] = cs::unit_cell.bilinear.interaction[i].Jij[1][1] * Jij[0] * imus*J;
+                        atoms::v_exchange_list[nn].Jij[2] = cs::unit_cell.bilinear.interaction[i].Jij[2][2] * Jij[0] * imus*J;
                      }
                      else{
                         std::cerr     << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting" << std::endl;
                         zlog << zTs() << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting" << std::endl;
                         err::vexit();
                      }
+                     if (imaterial == 4) std::cout << imaterial << '\t' << jmaterial << "\t" << d << '\t' << J  << "\t" << atoms::v_exchange_list[nn].Jij[0] <<  std::endl;
       					// reset interaction id to neighbour number - causes segfault if nn out of range
       					atoms::neighbour_interaction_type_array[nn] = nn;
       				}
