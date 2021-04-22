@@ -269,13 +269,13 @@ namespace vcuda{
 
          // This is actually used in Thrust algorithms in statistics.cu
          // Leave it for now
-         cu::atoms::spin_norm_array.resize(::atoms::num_atoms);
+         //cu::atoms::spin_norm_array.resize(::atoms::num_atoms);
 
-         thrust::copy(
-               ::atoms::m_spin_array.begin(),
-               ::atoms::m_spin_array.end(),
-               cu::atoms::spin_norm_array.begin()
-               );
+         //thrust::copy(
+         //      ::atoms::m_spin_array.begin(),
+         //      ::atoms::m_spin_array.end(),
+         //      cu::atoms::spin_norm_array.begin()
+         //      );
 
          return true;
       }
@@ -637,57 +637,6 @@ namespace vcuda{
 
       bool __initialize_stats ()
       {
-         std::vector<int> mask;
-         std::vector<double> saturations;
-
-         ::stats::system_magnetization.get_mask(mask, saturations);
-
-         cu::stats::system_mask_size = saturations.size();
-         cu::stats::system_mask.resize(mask.size());
-         thrust::copy (
-               mask.begin(),
-               mask.end(),
-               cu::stats::system_mask.begin()
-               );
-         cu::stats::system_magnetization.resize(4 * saturations.size());
-         cu::stats::system_mean_magnetization.resize(4 * saturations.size());
-         check_cuda_errors (__FILE__, __LINE__);
-
-         ::stats::material_magnetization.get_mask(mask, saturations);
-         cu::stats::material_mask_size = saturations.size();
-         cu::stats::material_mask.resize(mask.size());
-         thrust::copy (
-               mask.begin(),
-               mask.end(),
-               cu::stats::material_mask.begin()
-               );
-         cu::stats::material_magnetization.resize(4 * saturations.size());
-         cu::stats::material_mean_magnetization.resize(4 * saturations.size());
-         check_cuda_errors (__FILE__, __LINE__);
-
-         ::stats::height_magnetization.get_mask(mask, saturations);
-         cu::stats::height_mask_size = saturations.size();
-         cu::stats::height_mask.resize(mask.size());
-         thrust::copy (
-               mask.begin(),
-               mask.end(),
-               cu::stats::height_mask.begin()
-               );
-         cu::stats::height_magnetization.resize(4 * saturations.size());
-         cu::stats::height_mean_magnetization.resize(4 * saturations.size());
-         check_cuda_errors (__FILE__, __LINE__);
-
-         ::stats::material_height_magnetization.get_mask(mask, saturations);
-         cu::stats::material_height_mask_size = saturations.size();
-         cu::stats::material_height_mask.resize(mask.size());
-         thrust::copy (
-               mask.begin(),
-               mask.end(),
-               cu::stats::material_height_mask.begin()
-               );
-         cu::stats::material_height_magnetization.resize(4 * saturations.size());
-         cu::stats::material_height_mean_magnetization.resize(4 * saturations.size());
-         check_cuda_errors (__FILE__, __LINE__);
 
          return true;
 

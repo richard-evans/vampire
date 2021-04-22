@@ -46,10 +46,6 @@ namespace vcuda
          extern int *d_limits;
          extern int *d_neighbours;
 
-         extern cu_real_array_t x_spin_array;
-         extern cu_real_array_t y_spin_array;
-         extern cu_real_array_t z_spin_array;
-
          /*
          extern cu_real_array_t x_coord_array;
          extern cu_real_array_t y_coord_array;
@@ -65,7 +61,6 @@ namespace vcuda
          /*
           * Unrolled spin norm array
           */
-         extern cu_real_array_t spin_norm_array;
 
       } /* atoms */
 
@@ -88,27 +83,11 @@ namespace vcuda
          extern cu_real_t *d_volume;
          extern cu_real_t *d_num_atoms;
 
-         extern cu_real_array_t x_coord_array;
-         extern cu_real_array_t y_coord_array;
-         extern cu_real_array_t z_coord_array;
-
-         extern cu_real_array_t x_mag_array;
-         extern cu_real_array_t y_mag_array;
-         extern cu_real_array_t z_mag_array;
-
-         extern cu_real_array_t x_field_array;
-         extern cu_real_array_t y_field_array;
-         extern cu_real_array_t z_field_array;
-
-         extern cu_real_array_t volume_array;
-
-         extern cu_index_array_t num_atoms;
       } /* cells */
 
       namespace mp
       {
          extern material_parameters_t *d_material_params;
-         extern cu_material_array_t materials;
       } /* mp */
 
       extern cu_real_t *d_x_spin_field;
@@ -123,21 +102,10 @@ namespace vcuda
       extern cu_real_t *d_y_dip_field;
       extern cu_real_t *d_z_dip_field;
 
-      extern cu_real_array_t x_total_spin_field_array;
-      extern cu_real_array_t y_total_spin_field_array;
-      extern cu_real_array_t z_total_spin_field_array;
-
-      extern cu_real_array_t x_total_external_field_array;
-      extern cu_real_array_t y_total_external_field_array;
-      extern cu_real_array_t z_total_external_field_array;
-
       /*
        * Required by the total external field calculator
        * and the dipolar field updater
        */
-      extern cu_real_array_t x_dipolar_field_array;
-      extern cu_real_array_t y_dipolar_field_array;
-      extern cu_real_array_t z_dipolar_field_array;
 
       /*
        * cuRAND states

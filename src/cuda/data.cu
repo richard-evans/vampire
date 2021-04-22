@@ -29,10 +29,6 @@ namespace vcuda{
          cu_real_t *d_y_spin;
          cu_real_t *d_z_spin;
 
-         cu_real_array_t x_spin_array(0UL);
-         cu_real_array_t y_spin_array(0UL);
-         cu_real_array_t z_spin_array(0UL);
-
          cu_real_t *d_x_coord;
          cu_real_t *d_y_coord;
          cu_real_t *d_z_coord;
@@ -50,11 +46,6 @@ namespace vcuda{
          int *d_neighbours;
 
          cu_real_t *d_spin_norm;
-
-         cu_index_array_t limits(0UL);
-         cu_index_array_t neighbours(0UL);
-
-         cu_real_array_t spin_norm_array(0UL);
 
       } /* atoms */
 
@@ -97,7 +88,6 @@ namespace vcuda{
       namespace mp
       {
          material_parameters_t *d_material_params;
-         cu_material_array_t materials(0UL);
       } /* mp */
 
       // Back to the top namespace
@@ -120,7 +110,7 @@ namespace vcuda{
       cu_real_array_t x_total_external_field_array(0UL);
       cu_real_array_t y_total_external_field_array(0UL);
       cu_real_array_t z_total_external_field_array(0UL);
-      
+
       cu_real_array_t x_dipolar_field_array(0UL);
       cu_real_array_t y_dipolar_field_array(0UL);
       cu_real_array_t z_dipolar_field_array(0UL);
@@ -134,22 +124,6 @@ namespace vcuda{
          bool use_cpu = false;
          long counter(0L);
 
-         cu_index_array_t system_mask(0UL);
-         cu_real_array_t  system_magnetization(0UL);
-         cu_real_array_t  system_mean_magnetization(0UL);
-         int system_mask_size(0UL);
-         cu_index_array_t material_mask(0UL);
-         cu_real_array_t  material_magnetization(0UL);
-         cu_real_array_t  material_mean_magnetization(0UL);
-         int material_mask_size(0UL);
-         cu_index_array_t height_mask(0UL);
-         cu_real_array_t  height_magnetization(0UL);
-         cu_real_array_t  height_mean_magnetization(0UL);
-         int height_mask_size(0UL);
-         cu_index_array_t material_height_mask(0UL);
-         cu_real_array_t  material_height_magnetization(0UL);
-         cu_real_array_t  material_height_mean_magnetization(0UL);
-         int material_height_mask_size(0UL);
       } /* stats */
 
    } // end of internal namespace
