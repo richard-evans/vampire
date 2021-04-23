@@ -75,58 +75,6 @@ namespace vcuda{
       void update_cell_magnetizations ();
 
       /*
-       * Shared functors for thrust
-       */
-
-      template <typename T>
-         struct plusone_functor
-         {
-            __host__ __device__
-               int operator() (const T& item) const
-               {
-                  return item + T(1);
-               }
-         };
-
-      template <typename T>
-         struct scalar_product_functor
-         : public thrust::binary_function<
-           thrust::tuple<T, T, T>, T, thrust::tuple<T, T, T> >
-      {
-
-         typedef thrust::tuple<T, T, T> VecT3;
-
-         __host__ __device__
-            VecT3 operator () (const VecT3& a, const T& c)
-            {
-               return thrust::make_tuple(
-                     thrust::get<0>(a) * c,
-                     thrust::get<1>(a) * c,
-                     thrust::get<2>(a) * c);
-            }
-      };
-
-      template <typename T>
-         struct tuple3_plus_functor
-         : public thrust::binary_function<
-           thrust::tuple<T, T, T>,
-           thrust::tuple<T, T, T>,
-           thrust::tuple<T, T, T> >
-      {
-         typedef thrust::tuple<T, T, T> Tuple3;
-         __host__ __device__ Tuple3 operator () (
-               const Tuple3 & a, const Tuple3 & b)
-         {
-            return thrust::make_tuple(
-                  thrust::get<0>(a) + thrust::get<0>(b),
-                  thrust::get<1>(a) + thrust::get<1>(b),
-                  thrust::get<2>(a) + thrust::get<2>(b));
-         }
-      };
-
-
-
-      /*
        * Shared device functions
        */
 
