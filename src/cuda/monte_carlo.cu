@@ -6,6 +6,8 @@
 #include "internal.hpp"
 #include "data.hpp"
 
+#include "spin_fields.hpp"
+
 #include "monte_carlo.hpp"
 
 #include <vector>
@@ -54,6 +56,8 @@ namespace vcuda
 
             // device array for atoms in (sub lattice)
             int * d_sl_atoms;
+
+            int * d_accepted;
 
             int64_t             seed;
             curandGenerator_t   gen;
@@ -185,6 +189,7 @@ namespace vcuda
                 cudaMalloc((void**)&d_rand_accept, 3*::atoms::num_atoms * sizeof(cu_real_t));
 
                 cudaMalloc((void**)&d_sl_atoms, ::atoms::num_atoms * sizeof(int));
+                cudaMalloc((void**)&d_accepted, ::atoms::num_atoms * sizeof(int));
 
                 colour_split();
 
@@ -221,6 +226,7 @@ namespace vcuda
                 cudaFree(d_rand_accept);
 
                 cudaFree(d_sl_atoms);
+                cudaFree(d_accepted);
             }
 
 
@@ -233,6 +239,7 @@ namespace vcuda
                     vcuda::internal::material_parameters_t * material_params,
                     cu_real_t *rand_spin,
                     cu_real_t *rand_accept,
+                    int * accepted,
                     cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
                     cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
                     const cu_real_t step_size, const cu_real_t global_temperature, const size_t N){
@@ -263,17 +270,18 @@ namespace vcuda
 
                     cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
 
-                    nsx /= mod_s;
-                    nsy /= mod_s;
-                    nsz /= mod_s;
+                    nsx /= mod_s; nsy /= mod_s; nsz /= mod_s;
 
-                    cu_real_t E = 0.0;
+                    cu_real_t Eold = ::vcuda::internal::uniaxial_anisotropy_energy(mat, sx, sy, sz);
+                    cu_real_t Enew = ::vcuda::internal::uniaxial_anisotropy_energy(mat, nsx, nsy, nsz);
+                    cu_real_t dE = (Enew - Eold)/(1.38064852e-23*global_temperature);
 
                     cu_real_t r_accept = rand_accept[atom];
-                    if ( r_accept < exp(-E/global_temperature) ){
+                    if ( r_accept < exp(-dE) ){
                         x_spin[atom] = nsx;
                         y_spin[atom] = nsy;
                         z_spin[atom] = nsz;
+                        accepted[i + sl_start] = 1;
                     }
 
 
@@ -290,6 +298,7 @@ namespace vcuda
                 curandGenerateNormalDouble( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
                 curandGenerateUniformDouble( gen, d_rand_accept, 3*::atoms::num_atoms);
 
+                cudaMemset(d_accepted, 0, ::atoms::num_atoms*sizeof(int));
 
                 // Calculate external fields (fixed for integration step)
                 cu::update_external_fields ();
@@ -302,6 +311,7 @@ namespace vcuda
                             d_sl_atoms,
                             ::cu::atoms::d_materials, cu::mp::d_material_params,
                             d_rand_spin, d_rand_accept,
+                            d_accepted,
                             ::cu::atoms::d_x_spin, ::cu::atoms::d_y_spin, ::cu::atoms::d_z_spin,
                             ::cu::d_x_external_field, ::cu::d_y_external_field, ::cu::d_z_external_field,
                             step_size, sim::temperature, colour_list[i].size());

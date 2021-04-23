@@ -18,6 +18,8 @@
 #include "data.hpp"
 #include "internal.hpp"
 
+#include "spin_fields.hpp"
+
 // Conditional compilation of all cuda code
 #ifdef CUDA
 
@@ -65,8 +67,28 @@ void update_spin_fields ()
 }
 
 //------------------------------------------------------------------------------
-// Kernel function to calculate external fields
+// Device function for uniaxial anisotropy
 //------------------------------------------------------------------------------
+
+__device__ cu_real_t uniaxial_anisotropy_energy(cu::material_parameters_t &material,
+        cu_real_t sx, cu_real_t sy, cu_real_t sz)
+{
+      cu_real_t ex = material.anisotropy_unit_x;
+      cu_real_t ey = material.anisotropy_unit_y;
+      cu_real_t ez = material.anisotropy_unit_z;
+
+      cu_real_t sdote = sx * ex + sy * ey + sz * ez;
+
+      cu_real_t k2 = material.sh2 * material.i_mu_s_si;
+      cu_real_t E = -k2 * sdote * sdote;
+
+      return E;
+}
+
+
+
+
+
 __global__ void update_non_exchange_spin_fields_kernel (
       int * material,
       cu::material_parameters_t * material_params,

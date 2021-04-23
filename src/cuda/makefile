@@ -53,7 +53,7 @@ CUDA_MATRIX_TYPE = CSR
 CUDA_CFLAGS= -O3 -I./hdr -DCUDA $(CUDA_ARCH) --use_fast_math -ftz=true -std=c++14 -Wno-deprecated-gpu-targets
 
 $(CUDA_OBJECTS): obj/%.o: src/%.cu
-	$(NVCC) $< -c -o $@ $(CUDA_CFLAGS) $(CUDA_PR) -DCUDA_MATRIX=$(CUDA_MATRIX_TYPE)
+	$(NVCC) $< -dc -o $@ $(CUDA_CFLAGS) $(CUDA_PR) -DCUDA_MATRIX=$(CUDA_MATRIX_TYPE)
 
 # Target to link the CUDA enabled vampire
 ifeq ($(shell uname -s), Darwin)
