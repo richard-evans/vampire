@@ -31,6 +31,8 @@
 #include "exchange_fields.hpp"
 #include "statistics.hpp"
 
+#include "monte_carlo.hpp"
+
 #ifdef CUDA
 namespace cu = ::vcuda::internal;
 #endif
@@ -140,6 +142,9 @@ namespace vcuda{
          std::cerr << "Failed to initialise exchange" << std::endl;
          success = false;
       }
+
+
+      cu::mc::initialise();
 
       // Successful initialization
       return success;

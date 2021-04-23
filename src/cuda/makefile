@@ -20,7 +20,8 @@ CUDA_OBJECTS= \
 	obj/cuda/llg_heun.o \
 	obj/cuda/spin_fields.o \
 	obj/cuda/statistics.o \
-	obj/cuda/transfer.o
+	obj/cuda/transfer.o \
+	obj/cuda/monte_carlo.o
 
 CUDA_ARCH=\
 -gencode arch=compute_35,code=sm_35 \

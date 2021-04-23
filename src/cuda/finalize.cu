@@ -20,6 +20,8 @@
 #include "exchange_fields.hpp"
 #include "statistics.hpp"
 
+#include "monte_carlo.hpp"
+
 #include <cuda_profiler_api.h>
 
 #ifdef CUDA
@@ -37,6 +39,8 @@ namespace vcuda{
 #ifdef CUDA
 
       vcuda::internal::__finalize ();
+
+      vcuda::internal::mc::finalise();
       cudaProfilerStop();
 #endif
 
