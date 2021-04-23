@@ -12,10 +12,32 @@
 
 namespace vcuda
 {
+
+
+   //--------------------------------------------------------------------------
+   // Function to perform a single Monte Carlo step
+   //--------------------------------------------------------------------------
+   void mc_step(){
+
+      #ifdef CUDA
+        // check for cuda initialization, and initialize if necessary
+        if (!internal::mc::initialised) internal::mc::initialise();
+        // perform a single LLG Heun step
+        internal::mc::__mc_step();
+
+      #endif
+
+      return;
+   }
+
+
     namespace internal
     {
         namespace mc
         {
+
+            bool initialised(false);
+
             // Number of sublattices
             int M;
 
@@ -180,6 +202,13 @@ namespace vcuda
 
                 cudaMemcpy(d_sl_atoms, h_sl_atoms.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
 
+                std::cout << "Trying a step..."<< std::endl;
+
+                __mc_step();
+                std::cout << "Done"<< std::endl;
+
+                initialised = true;
+
                 return 0;
             }
 
@@ -252,7 +281,7 @@ namespace vcuda
 
             }
 
-            void step()
+            void __mc_step()
             {
                 // Check for cuda errors in file, line
                 check_cuda_errors (__FILE__, __LINE__);

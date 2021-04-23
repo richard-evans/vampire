@@ -19,8 +19,11 @@ namespace vcuda {
     namespace internal {
         namespace mc {
 
+            extern bool initialised;
+
             int initialise();
             void finalise();
+            void __mc_step();
         }
     }
 
