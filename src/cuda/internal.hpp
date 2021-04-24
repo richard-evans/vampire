@@ -134,7 +134,9 @@ namespace vcuda{
             cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
             cu_real_t * volume,
             cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
-            int n_cells
+				cu_real_t * d_tensor_xx, cu_real_t * d_tensor_xy, cu_real_t * d_tensor_xz,
+				cu_real_t * d_tensor_yy, cu_real_t * d_tensor_yz, cu_real_t * d_tensor_zz,
+            int n_local_cells, int n_cells
             );
 
       __global__ void update_atomistic_dipolar_fields (

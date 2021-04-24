@@ -50,6 +50,37 @@ void update_dipolar_fields ()
    update_cell_magnetizations ();
 
    check_cuda_errors (__FILE__, __LINE__);
+   
+   int num_local_cells = ::dipole::get_tot_num_local_cells();
+   int num_cells = ::dipole::get_tot_num_cells();
+   std::vector<double> tensor_xx = ::dipole::get_tensor_1D_xx();
+   std::vector<double> tensor_xy = ::dipole::get_tensor_1D_xy();
+   std::vector<double> tensor_xz = ::dipole::get_tensor_1D_xz();
+   std::vector<double> tensor_yy = ::dipole::get_tensor_1D_yy();
+   std::vector<double> tensor_yz = ::dipole::get_tensor_1D_yz();
+   std::vector<double> tensor_zz = ::dipole::get_tensor_1D_zz();
+
+   cu_real_t *d_tensor_xx ;
+   cu_real_t *d_tensor_xy ;
+   cu_real_t *d_tensor_xz ;
+   cu_real_t *d_tensor_yy ;
+   cu_real_t *d_tensor_yz ;
+   cu_real_t *d_tensor_zz ;
+   
+   cudaMalloc((void**)&d_tensor_xx, tensor_xx.size() * sizeof(cu_real_t));
+   cudaMalloc((void**)&d_tensor_xy, tensor_xy.size() * sizeof(cu_real_t));
+   cudaMalloc((void**)&d_tensor_xz, tensor_xz.size() * sizeof(cu_real_t));
+   cudaMalloc((void**)&d_tensor_yy, tensor_yy.size() * sizeof(cu_real_t));
+   cudaMalloc((void**)&d_tensor_yz, tensor_yz.size() * sizeof(cu_real_t));
+   cudaMalloc((void**)&d_tensor_zz, tensor_zz.size() * sizeof(cu_real_t));
+   
+   cudaMemcpy(d_tensor_xx, tensor_xx.data(), tensor_xx.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(d_tensor_xy, tensor_xy.data(), tensor_xy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(d_tensor_xz, tensor_xz.data(), tensor_xz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(d_tensor_yy, tensor_yy.data(), tensor_yy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(d_tensor_yz, tensor_yz.data(), tensor_yz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(d_tensor_zz, tensor_zz.data(), tensor_zz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+   
 
    /*
     * Figure out addresses in device memory space
@@ -88,7 +119,11 @@ void update_dipolar_fields ()
          cu::cells::d_x_coord, cu::cells::d_y_coord, cu::cells::d_z_coord,
          cu::cells::d_volume,
          cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
-         ::cells::num_cells
+         d_tensor_xx, d_tensor_xy, d_tensor_xz,
+         d_tensor_yy, d_tensor_yz, d_tensor_zz,
+         num_local_cells,
+         num_cells
+//         ::cells::num_cells
          );
 
    check_cuda_errors (__FILE__, __LINE__);
@@ -216,7 +251,9 @@ __global__ void update_dipolar_fields (
       cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
       cu_real_t * volume,
       cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
-      int n_cells
+      cu_real_t * d_tensor_xx, cu_real_t * d_tensor_xy, cu_real_t * d_tensor_xz,
+      cu_real_t * d_tensor_yy, cu_real_t * d_tensor_yz, cu_real_t * d_tensor_zz,
+      int n_local_cells, int n_cells
       )
 {
    for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -234,7 +271,7 @@ __global__ void update_dipolar_fields (
       */
       // DEFINES ? 4.0 * PI / 3 is constant
       // Should be optimised out anyway?
-      cu_real_t vol_prefac = - 4.0 * M_PI / (3.0 * volume[i]);
+      cu_real_t vol_prefac = 8.0 * M_PI / (3.0 * volume[i]);
       cu_real_t prefactor = 1.0e+23; // 1e-7/1e30
 
       cu_real_t field_x = vol_prefac * mx;
