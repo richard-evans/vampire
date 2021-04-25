@@ -129,6 +129,7 @@ void update_dipolar_fields ()
          cu::cells::d_x_coord, cu::cells::d_y_coord, cu::cells::d_z_coord,
          cu::cells::d_volume,
          cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
+         cu::cells::d_x_cell_mu0H_field, cu::cells::d_y_cell_mu0H_field, cu::cells::d_z_cell_mu0H_field,
          d_tensor_xx, d_tensor_xy, d_tensor_xz,
          d_tensor_yy, d_tensor_yz, d_tensor_zz,
          d_cell_id_array,
@@ -263,6 +264,7 @@ __global__ void update_dipolar_fields (
       cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
       cu_real_t * volume,
       cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
+      cu_real_t * x_cell_mu0H_field, cu_real_t * y_cell_mu0H_field, cu_real_t * z_cell_mu0H_field,
       cu_real_t * d_tensor_xx, cu_real_t * d_tensor_xy, cu_real_t * d_tensor_xz,
       cu_real_t * d_tensor_yy, cu_real_t * d_tensor_yz, cu_real_t * d_tensor_zz,
       int * d_cell_id_array,
@@ -275,7 +277,7 @@ __global__ void update_dipolar_fields (
    cu_real_t prefactor = 9.27400915e-01;     // prefactor = mu_B * (mu_0/(4*pi) /1e-30)
 
    // Define counter for 1D dipole tensor
-   int rij_index = 0;
+   int i_1Dindex = 0;
 
    for ( int lc = blockIdx.x * blockDim.x + threadIdx.x;
          lc < n_local_cells;
@@ -330,13 +332,13 @@ __global__ void update_dipolar_fields (
                cu_real_t my_j = y_mag[j] * imuB;
                cu_real_t mz_j = z_mag[j] * imuB;
 
-               field_x += (mx_j * d_tensor_xx[rij_index] + my_j * d_tensor_xy[rij_index] + mz_j * d_tensor_xz[rij_index]);
-               field_y += (mx_j * d_tensor_xy[rij_index] + my_j * d_tensor_yy[rij_index] + mz_j * d_tensor_yz[rij_index]);
-               field_z += (mx_j * d_tensor_xz[rij_index] + my_j * d_tensor_yz[rij_index] + mz_j * d_tensor_zz[rij_index]);
+               field_x += (mx_j * d_tensor_xx[i_1Dindex] + my_j * d_tensor_xy[i_1Dindex] + mz_j * d_tensor_xz[i_1Dindex]);
+               field_y += (mx_j * d_tensor_xy[i_1Dindex] + my_j * d_tensor_yy[i_1Dindex] + mz_j * d_tensor_yz[i_1Dindex]);
+               field_z += (mx_j * d_tensor_xz[i_1Dindex] + my_j * d_tensor_yz[i_1Dindex] + mz_j * d_tensor_zz[i_1Dindex]);
 
-               mu0Hd_field_x += (mx_j * d_tensor_xx[rij_index] + my_j * d_tensor_xy[rij_index] + mz_j * d_tensor_xz[rij_index]);
-               mu0Hd_field_y += (mx_j * d_tensor_xy[rij_index] + my_j * d_tensor_yy[rij_index] + mz_j * d_tensor_yz[rij_index]);
-               mu0Hd_field_z += (mx_j * d_tensor_xz[rij_index] + my_j * d_tensor_yz[rij_index] + mz_j * d_tensor_zz[rij_index]);
+               mu0Hd_field_x += (mx_j * d_tensor_xx[i_1Dindex] + my_j * d_tensor_xy[i_1Dindex] + mz_j * d_tensor_xz[i_1Dindex]);
+               mu0Hd_field_y += (mx_j * d_tensor_xy[i_1Dindex] + my_j * d_tensor_yy[i_1Dindex] + mz_j * d_tensor_yz[i_1Dindex]);
+               mu0Hd_field_z += (mx_j * d_tensor_xz[i_1Dindex] + my_j * d_tensor_yz[i_1Dindex] + mz_j * d_tensor_zz[i_1Dindex]);
 
                /*
                // Make use of float3?
@@ -359,7 +361,7 @@ __global__ void update_dipolar_fields (
                */
             }
             else{ // Increase counter if cell j is empty
-               rij_index++;
+               i_1Dindex++;
             } // end if cell i is not empty
          } // end for loop over n_cells
 
@@ -367,9 +369,13 @@ __global__ void update_dipolar_fields (
          x_cell_field[i] = prefactor * field_x;
          y_cell_field[i] = prefactor * field_y;
          z_cell_field[i] = prefactor * field_z;
+
+         x_cell_mu0H_field[i] = prefactor * mu0Hd_field_x;
+         y_cell_mu0H_field[i] = prefactor * mu0Hd_field_y;
+         z_cell_mu0H_field[i] = prefactor * mu0Hd_field_z;
       }
       else{ // Increase counter if cell i is empty
-         rij_index++;
+         i_1Dindex++;
       } // end if cell j is not empty
    } // end for loop over n_local_cells
 }
@@ -397,6 +403,11 @@ __global__ void update_atomistic_dipolar_fields (
 }
 
 } // end of internal namespace
+
+void update_dipolar_fields (){
+//    std::cout << "Updating dipolar filed with GPU" << std::endl;
+    cu::update_dipolar_fields();
+}
 
 } // end of vcuda namespace
 

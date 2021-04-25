@@ -64,6 +64,10 @@ namespace vcuda{
          cu_real_t *d_y_cell_field;
          cu_real_t *d_z_cell_field;
 
+         cu_real_t *d_x_cell_mu0H_field;
+         cu_real_t *d_y_cell_mu0H_field;
+         cu_real_t *d_z_cell_mu0H_field;
+
          /*
          cu_real_array_t x_coord_array(0UL);
          cu_real_array_t y_coord_array(0UL);

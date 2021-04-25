@@ -52,9 +52,13 @@ void transfer_spin_positions_from_gpu_to_cpu(){
 //------------------------------------------------------------------------------
 void transfer_dipole_fields_from_cpu_to_gpu(){
 
-   cudaMemcpy(::atoms::x_spin_array.data(), cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(::atoms::y_spin_array.data(), cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(::atoms::z_spin_array.data(), cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(::dipole::atom_dipolar_field_array_x.data(), cu::d_x_dip_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(::dipole::atom_dipolar_field_array_y.data(), cu::d_y_dip_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(::dipole::atom_dipolar_field_array_z.data(), cu::d_z_dip_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+
+   cudaMemcpy(::dipole::atom_mu0demag_field_array_x.data(), cu::d_x_mu0H_dip_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(::dipole::atom_mu0demag_field_array_y.data(), cu::d_y_mu0H_dip_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(::dipole::atom_mu0demag_field_array_z.data(), cu::d_z_mu0H_dip_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
 
    /*
    thrust::copy(::dipole::atom_dipolar_field_array_x.begin(),::dipole::atom_dipolar_field_array_x.end(), cu::x_dipolar_field_array.begin());

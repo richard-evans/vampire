@@ -67,7 +67,11 @@ namespace dipole{
                   break;
 
                case dipole::internal::tensor:
+						#ifdef CUDA
+               	gpu::update_dipolar_fields();
+						#else
                   dipole::internal::calculate_macrocell_dipole_field();
+						#endif
                   break;
 
                case dipole::internal::atomistic:
