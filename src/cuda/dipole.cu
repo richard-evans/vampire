@@ -50,9 +50,19 @@ void update_dipolar_fields ()
    update_cell_magnetizations ();
 
    check_cuda_errors (__FILE__, __LINE__);
-   
+
    int num_local_cells = ::dipole::get_tot_num_local_cells();
    int num_cells = ::dipole::get_tot_num_cells();
+
+   int *d_cell_id_array;
+   cudaMalloc((void**)&d_cell_id_array, ::cells::cell_id_array.size() * sizeof(int));
+   cudaMemcpy(d_cell_id_array, ::cells::cell_id_array.data(), ::cells::cell_id_array.size() * sizeof(int), cudaMemcpyHostToDevice);
+
+   std::vector<int> num_atoms_in_cell = ::dipole::get_num_atoms_in_cell_array();
+   int *d_num_atoms_in_cell;
+   cudaMalloc((void**)&d_num_atoms_in_cell, num_atoms_in_cell.size() * sizeof(int));
+   cudaMemcpy(d_num_atoms_in_cell, num_atoms_in_cell.data(), num_atoms_in_cell.size() * sizeof(int), cudaMemcpyHostToDevice);
+
    std::vector<double> tensor_xx = ::dipole::get_tensor_1D_xx();
    std::vector<double> tensor_xy = ::dipole::get_tensor_1D_xy();
    std::vector<double> tensor_xz = ::dipole::get_tensor_1D_xz();
@@ -66,21 +76,21 @@ void update_dipolar_fields ()
    cu_real_t *d_tensor_yy ;
    cu_real_t *d_tensor_yz ;
    cu_real_t *d_tensor_zz ;
-   
+
    cudaMalloc((void**)&d_tensor_xx, tensor_xx.size() * sizeof(cu_real_t));
    cudaMalloc((void**)&d_tensor_xy, tensor_xy.size() * sizeof(cu_real_t));
    cudaMalloc((void**)&d_tensor_xz, tensor_xz.size() * sizeof(cu_real_t));
    cudaMalloc((void**)&d_tensor_yy, tensor_yy.size() * sizeof(cu_real_t));
    cudaMalloc((void**)&d_tensor_yz, tensor_yz.size() * sizeof(cu_real_t));
    cudaMalloc((void**)&d_tensor_zz, tensor_zz.size() * sizeof(cu_real_t));
-   
+
    cudaMemcpy(d_tensor_xx, tensor_xx.data(), tensor_xx.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
    cudaMemcpy(d_tensor_xy, tensor_xy.data(), tensor_xy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
    cudaMemcpy(d_tensor_xz, tensor_xz.data(), tensor_xz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
    cudaMemcpy(d_tensor_yy, tensor_yy.data(), tensor_yy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
    cudaMemcpy(d_tensor_yz, tensor_yz.data(), tensor_yz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
    cudaMemcpy(d_tensor_zz, tensor_zz.data(), tensor_zz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-   
+
 
    /*
     * Figure out addresses in device memory space
@@ -121,6 +131,8 @@ void update_dipolar_fields ()
          cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
          d_tensor_xx, d_tensor_xy, d_tensor_xz,
          d_tensor_yy, d_tensor_yz, d_tensor_zz,
+         d_cell_id_array,
+         d_num_atoms_in_cell,
          num_local_cells,
          num_cells
 //         ::cells::num_cells
@@ -250,67 +262,116 @@ __global__ void update_dipolar_fields (
       cu_real_t * x_mag, cu_real_t * y_mag, cu_real_t * z_mag,
       cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
       cu_real_t * volume,
-      cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+      cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
       cu_real_t * d_tensor_xx, cu_real_t * d_tensor_xy, cu_real_t * d_tensor_xz,
       cu_real_t * d_tensor_yy, cu_real_t * d_tensor_yz, cu_real_t * d_tensor_zz,
+      int * d_cell_id_array,
+      int * d_num_atoms_in_cell,
       int n_local_cells, int n_cells
       )
 {
-   for ( int i = blockIdx.x * blockDim.x + threadIdx.x;
-         i < n_cells;
-         i += blockDim.x * gridDim.x)
+
+   cu_real_t imuB = 1.0/9.27400915e-24;
+   cu_real_t prefactor = 9.27400915e-01;     // prefactor = mu_B * (mu_0/(4*pi) /1e-30)
+
+   // Define counter for 1D dipole tensor
+   int rij_index = 0;
+
+   for ( int lc = blockIdx.x * blockDim.x + threadIdx.x;
+         lc < n_local_cells;
+         lc += blockDim.x * gridDim.x)
    {
-      cu_real_t mx = x_mag[i];
-      cu_real_t my = y_mag[i];
-      cu_real_t mz = z_mag[i];
-      cu_real_t cx = x_coord[i];
-      cu_real_t cy = y_coord[i];
-      cu_real_t cz = z_coord[i];
-      /*
-      * Inverse volume from the number of atoms in macro-cell
-      */
-      // DEFINES ? 4.0 * PI / 3 is constant
-      // Should be optimised out anyway?
-      cu_real_t vol_prefac = 8.0 * M_PI / (3.0 * volume[i]);
-      cu_real_t prefactor = 1.0e+23; // 1e-7/1e30
 
-      cu_real_t field_x = vol_prefac * mx;
-      cu_real_t field_y = vol_prefac * my;
-      cu_real_t field_z = vol_prefac * mz;
+      int i = d_cell_id_array[lc]; //::cells::cell_id_array[lc];
 
-      for (int j = 0; j < n_cells; j++)
-      {
-         // Jeeeesh
-         if (i == j) continue;
-         // That's redundant though, isn't it?
-         cu_real_t omx = x_mag[i];
-         cu_real_t omy = y_mag[i];
-         cu_real_t omz = z_mag[i];
+      if(d_num_atoms_in_cell[i]>0){
 
-         // Make use of float3?
-         // Store in AoS instead of separate arrays?
-         cu_real_t dx = x_coord[j] - cx;
-         cu_real_t dy = y_coord[j] - cy;
-         cu_real_t dz = z_coord[j] - cz;
+         /*
+         cu_real_t cx = x_coord[i];
+         cu_real_t cy = y_coord[i];
+         cu_real_t cz = z_coord[i];
+         */
 
-         cu_real_t drij = rsqrt(dx * dx + dy * dy + dz * dz);
-         cu_real_t drij3 = drij * drij * drij;
+         /*
+         * Inverse volume from the number of atoms in macro-cell
+         */
+         // DEFINES ? 4.0 * PI / 3 is constant
+         // Should be optimised out anyway?
+         /*
+         cu_real_t vol_prefac = -4.0 * M_PI / (3.0 * volume[i]);
+         cu_real_t prefactor = 1.0e+23; // 1e-7/1e30
+         */
 
-         cu_real_t sdote = (
-               omx * dx * drij +
-               omy * dy * drij +
-               omz * dz * drij);
+         cu_real_t self_demag = 8.0 * M_PI / (3.0 * volume[i]);
 
-         field_x += (3.0 * sdote * dx * drij - omx) * drij3;
-         field_y += (3.0 * sdote * dy * drij - omy) * drij3;
-         field_z += (3.0 * sdote * dz * drij - omz) * drij3;
+         // Normalise cells magnetisation
+         cu_real_t mx_i = x_mag[i] * imuB;
+         cu_real_t my_i = y_mag[i] * imuB;
+         cu_real_t mz_i = z_mag[i] * imuB;
+
+         // Add self-demagnetisation term
+         cu_real_t field_x = self_demag * mx_i * 0.0;
+         cu_real_t field_y = self_demag * my_i * 0.0;
+         cu_real_t field_z = self_demag * mz_i * 0.0;
+
+         // Add self-demagnetisation term
+         cu_real_t mu0Hd_field_x = -0.5 * self_demag * mx_i;
+         cu_real_t mu0Hd_field_y = -0.5 * self_demag * my_i;
+         cu_real_t mu0Hd_field_z = -0.5 * self_demag * mz_i;
+
+
+         for ( int j = blockIdx.x * blockDim.x + threadIdx.x;
+              j < n_cells;
+              j += blockDim.x * gridDim.x)
+         {
+            if(d_num_atoms_in_cell[j]>0){
+
+               cu_real_t mx_j = x_mag[j] * imuB;
+               cu_real_t my_j = y_mag[j] * imuB;
+               cu_real_t mz_j = z_mag[j] * imuB;
+
+               field_x += (mx_j * d_tensor_xx[rij_index] + my_j * d_tensor_xy[rij_index] + mz_j * d_tensor_xz[rij_index]);
+               field_y += (mx_j * d_tensor_xy[rij_index] + my_j * d_tensor_yy[rij_index] + mz_j * d_tensor_yz[rij_index]);
+               field_z += (mx_j * d_tensor_xz[rij_index] + my_j * d_tensor_yz[rij_index] + mz_j * d_tensor_zz[rij_index]);
+
+               mu0Hd_field_x += (mx_j * d_tensor_xx[rij_index] + my_j * d_tensor_xy[rij_index] + mz_j * d_tensor_xz[rij_index]);
+               mu0Hd_field_y += (mx_j * d_tensor_xy[rij_index] + my_j * d_tensor_yy[rij_index] + mz_j * d_tensor_yz[rij_index]);
+               mu0Hd_field_z += (mx_j * d_tensor_xz[rij_index] + my_j * d_tensor_yz[rij_index] + mz_j * d_tensor_zz[rij_index]);
+
+               /*
+               // Make use of float3?
+               // Store in AoS instead of separate arrays?
+               cu_real_t dx = x_coord[j] - cx;
+               cu_real_t dy = y_coord[j] - cy;
+               cu_real_t dz = z_coord[j] - cz;
+
+               cu_real_t drij = rsqrt(dx * dx + dy * dy + dz * dz);
+               cu_real_t drij3 = drij * drij * drij;
+
+               cu_real_t sdote = (
+                     omx * dx * drij +
+                     omy * dy * drij +
+                     omz * dz * drij);
+
+               field_x += (3.0 * sdote * dx * drij - omx) * drij3;
+               field_y += (3.0 * sdote * dy * drij - omy) * drij3;
+               field_z += (3.0 * sdote * dz * drij - omz) * drij3;
+               */
+            }
+            else{ // Increase counter if cell j is empty
+               rij_index++;
+            } // end if cell i is not empty
+         } // end for loop over n_cells
+
+         // Same AoS argument as above?
+         x_cell_field[i] = prefactor * field_x;
+         y_cell_field[i] = prefactor * field_y;
+         z_cell_field[i] = prefactor * field_z;
       }
-
-      // Same AoS argument as above?
-      x_dip_field[i] = prefactor * field_x;
-      y_dip_field[i] = prefactor * field_y;
-      z_dip_field[i] = prefactor * field_z;
-   }
+      else{ // Increase counter if cell i is empty
+         rij_index++;
+      } // end if cell j is not empty
+   } // end for loop over n_local_cells
 }
 
 __global__ void update_atomistic_dipolar_fields (

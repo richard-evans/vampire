@@ -367,6 +367,14 @@ namespace vcuda{
          cudaMemcpy(cu::d_y_dip_field, ::dipole::atom_dipolar_field_array_y.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
          cudaMemcpy(cu::d_z_dip_field, ::dipole::atom_dipolar_field_array_z.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
 
+         cudaMalloc((void**)&cu::d_x_mu0H_dip_field, ::atoms::num_atoms * sizeof(cu_real_t));
+         cudaMalloc((void**)&cu::d_y_mu0H_dip_field, ::atoms::num_atoms * sizeof(cu_real_t));
+         cudaMalloc((void**)&cu::d_z_mu0H_dip_field, ::atoms::num_atoms * sizeof(cu_real_t));
+
+         cudaMemcpy(cu::d_x_mu0H_dip_field, ::dipole::atom_mu0demag_field_array_x.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::d_y_mu0H_dip_field, ::dipole::atom_mu0demag_field_array_x.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::d_z_mu0H_dip_field, ::dipole::atom_mu0demag_field_array_x.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+
          /*
          cu::x_dipolar_field_array.resize(::atoms::num_atoms);
          cu::y_dipolar_field_array.resize(::atoms::num_atoms);

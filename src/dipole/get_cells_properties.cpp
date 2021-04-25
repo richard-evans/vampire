@@ -19,6 +19,13 @@
 namespace dipole{
 
    //------------------------------------------------------------------------------
+   // Function to return internal num_atoms_in_cell vector
+   //------------------------------------------------------------------------------
+   std::vector<int> get_num_atoms_in_cell_array(){
+      return internal::cells_num_atoms_in_cell;
+   }
+
+   //------------------------------------------------------------------------------
    // Function to return number of atoms in cell
    //------------------------------------------------------------------------------
    unsigned int get_num_atoms_in_cell(const int cell){

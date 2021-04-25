@@ -102,6 +102,10 @@ namespace vcuda
       extern cu_real_t *d_y_dip_field;
       extern cu_real_t *d_z_dip_field;
 
+      extern cu_real_t *d_x_muH_dip_field;
+      extern cu_real_t *d_y_muH_dip_field;
+      extern cu_real_t *d_z_muH_dip_field;
+
       /*
        * Required by the total external field calculator
        * and the dipolar field updater
