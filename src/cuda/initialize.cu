@@ -395,7 +395,7 @@ namespace vcuda{
          cu::cells::z_coord_array.resize(::cells::num_cells);
          */
          // unroll 4N array to N
-         std::vector<double> pos(::cells::num_cells,0.0);
+         std::vector<cu_real_t> pos(::cells::num_cells,0.0);
          for(int cell = 0; cell < pos.size(); cell++) pos[cell] = ::cells::pos_and_mom_array[4*cell+0]; // x
 
          //thrust::copy(pos.begin(), pos.end(), cu::cells::x_coord_array.begin());

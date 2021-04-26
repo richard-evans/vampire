@@ -62,18 +62,18 @@ namespace vcuda
          cusparseStatus_t status;
 
          // Constants for the matrix-vector product y = alpha*A*x + beta*y
-         double alpha = 1.0;
-         double beta = 0.0;
+         cu_real_t alpha = 1.0;
+         cu_real_t beta = 0.0;
 
          // Buffer workspace for the spmv product
          void * spmv_buffer_d = NULL;
          size_t buffer_size = 0;
 
          // Routine to sort the coo sparse matrix by the row major order index
-         void sort_coo_list(std::vector<int> &rows, std::vector<int> &cols, std::vector<double> &vals, const size_t Nrows, const size_t Ncols )
+         void sort_coo_list(std::vector<int> &rows, std::vector<int> &cols, std::vector<cu_real_t> &vals, const size_t Nrows, const size_t Ncols )
          {
              // Create a list of id-value pairs
-             std::vector< std::pair<size_t,double> > list;
+             std::vector< std::pair<int, cu_real_t> > list;
 
              // Calculate the row major order index and create pair list
              for ( size_t i = 0; i < vals.size(); i++ ) {
@@ -88,6 +88,7 @@ namespace vcuda
                  size_t id = list[i].first;
                  size_t row = size_t( id / Ncols);
                  size_t col = id % Ncols;
+                 // Is that ok to do, or are we going to truncate?
                  rows[i] = row;
                  cols[i] = col;
                  vals[i] = list[i].second;
@@ -128,8 +129,10 @@ namespace vcuda
             //Local storage for nbr list
             std::vector<int> row_inds;
             std::vector<int> col_inds;
-            std::vector<double> vals;
+            std::vector<cu_real_t> vals;
 
+            // NOTE: Below calculations have been left in double precision
+            // for now !!
             // tolerance to ignore exchange components
             const double tol = 1e-10;
             // loop over all atoms
@@ -211,11 +214,11 @@ namespace vcuda
                 cudaMalloc((void**)&d_coo_rows, Nnz * sizeof(int));
                 cudaMalloc((void**)&d_coo_cols, Nnz * sizeof(int));
                 cudaMalloc((void**)&d_csr_rows, (Nrows + 1) * sizeof(int));
-                cudaMalloc((void**)&d_coo_vals, Nnz * sizeof(double));
+                cudaMalloc((void**)&d_coo_vals, Nnz * sizeof(cu_real_t));
 
                 cudaMemcpy(d_coo_rows, row_inds.data(), Nnz * sizeof(int), cudaMemcpyHostToDevice);
                 cudaMemcpy(d_coo_cols, col_inds.data(), Nnz * sizeof(int), cudaMemcpyHostToDevice);
-                cudaMemcpy(d_coo_vals, vals.data(), Nnz * sizeof(double), cudaMemcpyHostToDevice);
+                cudaMemcpy(d_coo_vals, vals.data(), Nnz * sizeof(cu_real_t), cudaMemcpyHostToDevice);
 
 
                 //Copy COO matrix storage arrays to the device
@@ -264,9 +267,6 @@ namespace vcuda
                  cusparseCreateDnVec( &vecX, Ncols, d_spin3n, CUDA_R_64F );
                  cusparseCreateDnVec( &vecY, Nrows, d_field3n, CUDA_R_64F );
 
-
-
-
                 // allocate an external buffer if needed
                 status = cusparseSpMV_bufferSize(handle,
                                     CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -276,7 +276,6 @@ namespace vcuda
                                     &buffer_size);
 
                 cudaMalloc(&spmv_buffer_d, buffer_size);
-
 
                 // Declare a local matrix on the host using coordinate format to be filled
                 //cusp::coo_matrix< int, cu::cu_real_t, cusp::host_memory> J_matrix_h;
@@ -344,7 +343,6 @@ namespace vcuda
             cudaFree(d_coo_rows);
             cudaFree(d_coo_cols);
             cudaFree(d_coo_vals);
-
 
             //csr_rows_d.cu_index_array_t::~cu_index_array_t();
             //coo_rows_d.cu_index_array_t::~cu_index_array_t();
