@@ -110,7 +110,7 @@ void mc_step(std::vector<double> &x_spin_array,
       }
 
       // calculate new adaptive step sigma angle
-      if(montecarlo::internal::algorithm == montecarlo::internal::adaptive){
+      if(montecarlo::algorithm == montecarlo::adaptive){
          const double last_rejection_rate = statistics_reject / statistics_moves;
          const double factor = 0.5 / last_rejection_rate;
          montecarlo::internal::adaptive_sigma *= factor;

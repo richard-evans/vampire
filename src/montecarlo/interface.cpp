@@ -37,27 +37,27 @@ namespace montecarlo{
       if( word == test ){
          test = "adaptive";
          if(value == test){
-            montecarlo::internal::algorithm = montecarlo::internal::adaptive;
+            montecarlo::algorithm = montecarlo::adaptive;
             return true;
          }
          test = "spin-flip";
          if( value == test ){
-            montecarlo::internal::algorithm = montecarlo::internal::spin_flip;
+            montecarlo::algorithm = montecarlo::spin_flip;
             return true;
          }
          test = "uniform";
          if( value == test ){
-            montecarlo::internal::algorithm = montecarlo::internal::uniform;
+            montecarlo::algorithm = montecarlo::uniform;
             return true;
          }
          test = "angle";
          if( value == test ){
-            montecarlo::internal::algorithm = montecarlo::internal::angle;
+            montecarlo::algorithm = montecarlo::angle;
             return true;
          }
          test = "hinzke-nowak";
          if( value == test ){
-            montecarlo::internal::algorithm = montecarlo::internal::hinzke_nowak;
+            montecarlo::algorithm = montecarlo::hinzke_nowak;
             return true;
          }
          else{
