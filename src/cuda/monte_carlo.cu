@@ -5,6 +5,7 @@
 #include "cuda_utils.hpp"
 #include "internal.hpp"
 #include "data.hpp"
+#include "material.hpp"
 
 #include "spin_fields.hpp"
 
@@ -24,7 +25,7 @@ namespace vcuda
       #ifdef CUDA
         // check for cuda initialization, and initialize if necessary
         if (!internal::mc::initialised) internal::mc::initialise();
-        // perform a single LLG Heun step
+        // perform a single monte carlo step
         internal::mc::__mc_step();
 
       #endif
@@ -204,7 +205,6 @@ namespace vcuda
                     }
                 }
 
-
                 cudaMemcpy(d_sl_atoms, h_sl_atoms.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
 
                 std::cout << "Trying a step..."<< std::endl;
@@ -228,9 +228,6 @@ namespace vcuda
                 cudaFree(d_sl_atoms);
                 cudaFree(d_accepted);
             }
-
-
-
 
             __global__ void monte_carlo_sublattice_step(
                     const int sl_start,
@@ -264,18 +261,135 @@ namespace vcuda
                     cu_real_t sy = y_spin[atom];
                     cu_real_t sz = z_spin[atom];
 
-                    cu_real_t nsx = rand_spin[atom];
-                    cu_real_t nsy = rand_spin[atom+N];
-                    cu_real_t nsz = rand_spin[atom+2*N];
+                    // new spin direction
+                    cu_real_t nsx, nsy, nsz;
 
-                    cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+                    // run chosen move type
+                    // Select algorithm using case statement
 
-                    nsx /= mod_s; nsy /= mod_s; nsz /= mod_s;
+                    
+                    switch(montecarlo::algorithm){
 
+                        case adaptive:
+                        {      
+                            
+                            nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+                            nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+                            nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+            
+                            cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+            
+                            nsx /= mod_s;
+                            nsy /= mod_s;
+                            nsz /= mod_s;
+                            break;
+                        }
+                        case spin_flip:
+                            nsx = -sx;
+                            nsy = -sy;
+                            nsz = -sz;
+                            break;
+                        
+                        case uniform:
+                        {      
+                            nsx = rand_spin[atom];
+                            nsy = rand_spin[atom+N];
+                            nsz = rand_spin[atom+2*N];
+            
+                            cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+            
+                            nsx /= mod_s;
+                            nsy /= mod_s;
+                            nsz /= mod_s;
+                            break;
+                        }
+                        
+                        case angle:
+                        {      
+                            
+                            nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+                            nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+                            nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+            
+                            cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+            
+                            nsx /= mod_s;
+                            nsy /= mod_s;
+                            nsz /= mod_s;
+                            break;
+                        }
+                        case hinzke_nowak:
+                        {
+                            switch(pick_move){
+                                case 0: // spin flip
+                                    nsx = -sx;
+                                    nsy = -sy;
+                                    nsz = -sz;
+                                    break;
+                                case 1: // uniform
+                                {      
+                                    nsx = rand_spin[atom];
+                                    nsy = rand_spin[atom+N];
+                                    nsz = rand_spin[atom+2*N];
+                    
+                                    cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+                    
+                                    nsx /= mod_s;
+                                    nsy /= mod_s;
+                                    nsz /= mod_s;
+                                    break;
+                                }
+                                
+                                case 2: // angle 
+                                {      
+                            
+                                    nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+                                    nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+                                    nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+                    
+                                    cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+                    
+                                    nsx /= mod_s;
+                                    nsy /= mod_s;
+                                    nsz /= mod_s;
+                                    break;
+                                }
+                                default: // angle
+                                {      
+                            
+                                    nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+                                    nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+                                    nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
+                    
+                                    cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+                    
+                                    nsx /= mod_s;
+                                    nsy /= mod_s;
+                                    nsz /= mod_s;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        default: // adaptive
+                        {      
+                            
+                            nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+                            nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+                            nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+            
+                            cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+            
+                            nsx /= mod_s;
+                            nsy /= mod_s;
+                            nsz /= mod_s;
+                            break;
+                        }
+                    }
+
+                    // Calculate current energy
                     cu_real_t Eold = ::vcuda::internal::uniaxial_anisotropy_energy(mat, sx, sy, sz);
                     cu_real_t Enew = ::vcuda::internal::uniaxial_anisotropy_energy(mat, nsx, nsy, nsz);
-
-
 
                     cu_real_t dE = (Enew - Eold)/(1.38064852e-23*global_temperature);
 
@@ -286,10 +400,7 @@ namespace vcuda
                         z_spin[atom] = nsz;
                         accepted[i + sl_start] = 1;
                     }
-
-
                 }
-
             }
 
             void __mc_step()
@@ -323,7 +434,6 @@ namespace vcuda
 
 
                 }
-
             }
         }
     }
