@@ -8,6 +8,8 @@ atomistic.o \
 data.o \
 energy.o \
 field.o \
+get_cells_properties.o \
+get_tensor.o \
 initialize.o \
 interface.o \
 inter.o \
