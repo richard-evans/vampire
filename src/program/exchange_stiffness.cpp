@@ -17,12 +17,11 @@
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "material.hpp"
+#include "montecarlo.hpp"
 #include "program.hpp"
-//#include "random.hpp"
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
-//#include "vmath.hpp"
 
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
@@ -32,8 +31,8 @@ namespace program{
 //--------------------------------------------------------------------------------
 // constants but can be moved to input parameters if need be
 //--------------------------------------------------------------------------------
-const double exchange_stiffness_max_constraint_angle   = 30.0; // degrees
-const double exchange_stiffness_delta_constraint_angle = 5.0; // degrees
+const double exchange_stiffness_max_constraint_angle   = 181.0; // degrees
+const double exchange_stiffness_delta_constraint_angle = 45.0; // degrees
 const double pi180 = M_PI/180.0;
 
 //--------------------------------------------------------------------------------
@@ -183,13 +182,18 @@ void exchange_stiffness(){
 		}
 
 		// reset hybrid CMC constraints
-		//mc::cmc_mc_set_constraints(constraint_mask, constraint_directions);
-
-		// equilibrate ground state structure at zero kelvin
-		for(int ztime = 0; ztime < 500; ztime++) sim::integrate(1);
+		std::vector<double> phi_theta_constraints(6, 0.0);
+		phi_theta_constraints[2] = constraint_theta; // set middle plane angle from z to theta
+		std::vector<bool> constrained(3,false);
+		constrained[0] = true;
+		constrained[1] = true;
+		montecarlo::initialise_masked_cmc_mc(constraint_mask.size(), constraint_mask, constrained, phi_theta_constraints);
 
 		// initialise temperature
 		sim::temperature=sim::Tmin;
+
+		// equilibrate ground state structure at zero kelvin
+		for(int ztime = 0; ztime < 500; ztime++) sim::integrate(1);
 
 		// Perform Temperature Loop
 		while( sim::temperature <= sim::Tmax){
@@ -225,9 +229,9 @@ void exchange_stiffness(){
 			vout::data();
 
 			// calculate and store mean torques
-			ofile << sim::temperature << "\t" << double(constraint_theta) << "\t" << magnetizations[0]/counter << "\t" <<  magnetizations[1]/counter <<
-						torques[0]*inv_n_atm_p1/counter << "\t" << torques[1]*inv_n_atm_p1/counter << torques[2]*inv_n_atm_p1/counter <<
-						torques[3]*inv_n_atm_p2/counter << "\t" << torques[4]*inv_n_atm_p2/counter << torques[5]*inv_n_atm_p2/counter << std::endl;
+			ofile << sim::temperature << "\t" << double(constraint_theta) << "\t" << magnetizations[0]/counter << "\t" <<  magnetizations[1]/counter << "\t" <<
+						torques[0]*inv_n_atm_p1/counter << "\t" << torques[1]*inv_n_atm_p1/counter << "\t" << torques[2]*inv_n_atm_p1/counter << "\t" <<
+						torques[3]*inv_n_atm_p2/counter << "\t" << torques[4]*inv_n_atm_p2/counter << "\t" << torques[5]*inv_n_atm_p2/counter << std::endl;
 
 			// Increment temperature
 			sim::temperature+=sim::delta_temperature;
@@ -380,17 +384,17 @@ void calculate_torque(const std::vector<int>& mask,
 			const double mu = mp::material[mat].mu_s_SI;
 
 			// Store local spin in Sand local field in H
-			const double S[3] = { atoms::x_spin_array[atom] * mu,
-										 atoms::y_spin_array[atom] * mu,
-										 atoms::z_spin_array[atom] * mu };
+			const double S[3] = { atoms::x_spin_array[atom],
+										 atoms::y_spin_array[atom],
+										 atoms::z_spin_array[atom]};
 
 			const double H[3] = { atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom],
 										 atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom],
 										 atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] };
 
-			total_torques[3*mask_id + 0] += S[1]*H[2] - S[2]*H[1];
-			total_torques[3*mask_id + 1] += S[2]*H[0] - S[0]*H[2];
-			total_torques[3*mask_id + 2] += S[0]*H[1] - S[1]*H[0];
+			total_torques[3*mask_id + 0] += mu*(S[1]*H[2] - S[2]*H[1]);
+			total_torques[3*mask_id + 1] += mu*(S[2]*H[0] - S[0]*H[2]);
+			total_torques[3*mask_id + 2] += mu*(S[0]*H[1] - S[1]*H[0]);
 
 			mm[3*mask_id+0] += S[0];
 			mm[3*mask_id+1] += S[1];
@@ -398,13 +402,20 @@ void calculate_torque(const std::vector<int>& mask,
 
 			counter[mask_id] += 1.0;
 
+			std::cout << "\t" << mask_id << "\t" << S[0] << "\t" << S[1] << "\t" << S[2] << std::endl;
+
 		}
 
-		// calculate magnetizations for planes 1 and 2
-		total_magnetizations[0] += sqrt(mm[0]*mm[0] + mm[1]*mm[1] + mm[2]*mm[2]) / counter[0];
-		total_magnetizations[1] += sqrt(mm[3]*mm[3] + mm[4]*mm[4] + mm[5]*mm[5]) / counter[1];
-
 	}
+
+	std::cout << counter[0] << "\t" << counter[1] << "\t";
+	for(int i=0; i<6; i++) std::cout << mm[i] << "\t";
+	std::cout << std::endl;
+	std::cin.get();
+
+	// calculate magnetizations for planes 1 and 2
+	total_magnetizations[0] += sqrt(mm[0]*mm[0] + mm[1]*mm[1] + mm[2]*mm[2]) / counter[0];
+	total_magnetizations[1] += sqrt(mm[3]*mm[3] + mm[4]*mm[4] + mm[5]*mm[5]) / counter[1];
 
 	return;
 
