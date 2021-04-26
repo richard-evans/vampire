@@ -209,11 +209,11 @@ namespace vcuda
                 cudaMalloc((void**)&d_coo_rows, Nnz * sizeof(int));
                 cudaMalloc((void**)&d_coo_cols, Nnz * sizeof(int));
                 cudaMalloc((void**)&d_csr_rows, (Nnz + 1) * sizeof(int));
-                cudaMalloc((void**)&d_coo_vals, Nnz * sizeof(float));
+                cudaMalloc((void**)&d_coo_vals, Nnz * sizeof(double));
 
                 cudaMemcpy(d_coo_rows, row_inds.data(), Nnz * sizeof(int), cudaMemcpyHostToDevice);
-                cudaMemcpy(d_coo_cols, row_inds.data(), Nnz * sizeof(int), cudaMemcpyHostToDevice);
-                cudaMemcpy(d_coo_vals, row_inds.data(), Nnz * sizeof(float), cudaMemcpyHostToDevice);
+                cudaMemcpy(d_coo_cols, cols_inds.data(), Nnz * sizeof(int), cudaMemcpyHostToDevice);
+                cudaMemcpy(d_coo_vals, vals.data(), Nnz * sizeof(double), cudaMemcpyHostToDevice);
 
 
                 //Copy COO matrix storage arrays to the device
