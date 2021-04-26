@@ -274,6 +274,9 @@ namespace vcuda
 
                     cu_real_t Eold = ::vcuda::internal::uniaxial_anisotropy_energy(mat, sx, sy, sz);
                     cu_real_t Enew = ::vcuda::internal::uniaxial_anisotropy_energy(mat, nsx, nsy, nsz);
+
+
+
                     cu_real_t dE = (Enew - Eold)/(1.38064852e-23*global_temperature);
 
                     cu_real_t r_accept = rand_accept[atom];
