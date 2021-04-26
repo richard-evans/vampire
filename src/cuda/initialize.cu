@@ -399,19 +399,19 @@ namespace vcuda{
          for(int cell = 0; cell < pos.size(); cell++) pos[cell] = ::cells::pos_and_mom_array[4*cell+0]; // x
 
          //thrust::copy(pos.begin(), pos.end(), cu::cells::x_coord_array.begin());
-         cudaMemcpy(cu::cells::d_x_coord, pos.data(), ::cells::num_cells, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_x_coord, pos.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
 
          // unroll 4N array to N
          for(int cell = 0; cell < pos.size(); cell++) pos[cell] = ::cells::pos_and_mom_array[4*cell+1]; // y
 
          //thrust::copy(pos.begin(), pos.end(), cu::cells::y_coord_array.begin());
-         cudaMemcpy(cu::cells::d_y_coord, pos.data(), ::cells::num_cells, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_y_coord, pos.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
 
          // unroll 4N array to N
          for(int cell = 0; cell < pos.size(); cell++) pos[cell] = ::cells::pos_and_mom_array[4*cell+2]; // z
 
          //thrust::copy(pos.begin(), pos.end(), cu::cells::z_coord_array.begin());
-         cudaMemcpy(cu::cells::d_z_coord, pos.data(), ::cells::num_cells, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_z_coord, pos.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
 
          //-----------------------------------------------------
          // Allocate memory and initialize cell magnetization
@@ -444,8 +444,8 @@ namespace vcuda{
          cudaMalloc((void**)&cu::cells::d_z_cell_field, ::cells::num_cells * sizeof(cu_real_t));
 
          cudaMemcpy(cu::cells::d_x_cell_field, ::cells::field_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_y_cell_field, ::cells::field_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_z_cell_field, ::cells::field_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_y_cell_field, ::cells::field_array_y.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_z_cell_field, ::cells::field_array_z.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
 
          /*
          cu::cells::x_field_array.resize(::cells::num_cells);
