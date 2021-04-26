@@ -132,18 +132,18 @@ namespace dipole{
 
             int type = dipole::internal::atom_type_array[atom];
 
-            if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==0){
+            if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==false){
 
                // Copy B-field from macrocell to atomistic spin
                // Copy B-field from macrocell to atomistic spin
-               dipole::atom_dipolar_field_array_x[atom] = 0.0;//dipole::cells_field_array_x[cell];
-               dipole::atom_dipolar_field_array_y[atom] = 0.0;//dipole::cells_field_array_y[cell];
-               dipole::atom_dipolar_field_array_z[atom] = 0.0;//dipole::cells_field_array_z[cell];
+               dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
+               dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
+               dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
 
                // Unroll Hdemag field
-               dipole::atom_mu0demag_field_array_x[atom] = 0.0;//dipole::cells_mu0Hd_field_array_x[cell];
-               dipole::atom_mu0demag_field_array_y[atom] = 0.0;//dipole::cells_mu0Hd_field_array_y[cell];
-               dipole::atom_mu0demag_field_array_z[atom] = 0.0;//dipole::cells_mu0Hd_field_array_z[cell];
+               dipole::atom_mu0demag_field_array_x[atom] = dipole::cells_mu0Hd_field_array_x[cell];
+               dipole::atom_mu0demag_field_array_y[atom] = dipole::cells_mu0Hd_field_array_y[cell];
+               dipole::atom_mu0demag_field_array_z[atom] = dipole::cells_mu0Hd_field_array_z[cell];
 
             }
          }
