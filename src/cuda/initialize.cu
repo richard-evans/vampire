@@ -150,6 +150,28 @@ namespace vcuda{
       return false;
 #endif
    }
+   
+
+   bool initialize_dipole(){
+#ifdef CUDA
+
+      bool success = true;
+
+      // Initialise dipole
+      if( cu::__initialize_dipole() != EXIT_SUCCESS)
+      {
+         std::cerr << "Failed to initialise dipole" << std::endl;
+         success = false;
+      }
+
+      // Successful initialization
+      return success;
+#else
+      // Default (initializtion failed)
+      return false;
+#endif
+   }
+
 
 #ifdef CUDA
 
@@ -493,6 +515,40 @@ namespace vcuda{
                cu::cells::num_atoms.begin()
                );
          */
+         return true;
+      }
+      
+      bool __initialize_dipole(){
+         
+         std::vector<double> tensor_xx = ::dipole::get_tensor_1D_xx();
+         std::vector<double> tensor_xy = ::dipole::get_tensor_1D_xy();
+         std::vector<double> tensor_xz = ::dipole::get_tensor_1D_xz();
+         std::vector<double> tensor_yy = ::dipole::get_tensor_1D_yy();
+         std::vector<double> tensor_yz = ::dipole::get_tensor_1D_yz();
+         std::vector<double> tensor_zz = ::dipole::get_tensor_1D_zz();
+
+         cudaMalloc((void**)&cu::cells::d_tensor_xx, tensor_xx.size() * sizeof(cu_real_t));
+         cudaMalloc((void**)&cu::cells::d_tensor_xy, tensor_xy.size() * sizeof(cu_real_t));
+         cudaMalloc((void**)&cu::cells::d_tensor_xz, tensor_xz.size() * sizeof(cu_real_t));
+         cudaMalloc((void**)&cu::cells::d_tensor_yy, tensor_yy.size() * sizeof(cu_real_t));
+         cudaMalloc((void**)&cu::cells::d_tensor_yz, tensor_yz.size() * sizeof(cu_real_t));
+         cudaMalloc((void**)&cu::cells::d_tensor_zz, tensor_zz.size() * sizeof(cu_real_t));
+
+         cudaMemcpy(cu::cells::d_tensor_xx, tensor_xx.data(), tensor_xx.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_xy, tensor_xy.data(), tensor_xy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_xz, tensor_xz.data(), tensor_xz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_yy, tensor_yy.data(), tensor_yy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_yz, tensor_yz.data(), tensor_yz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_zz, tensor_zz.data(), tensor_zz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         
+         // Free memory
+         std::vector<double>().swap(tensor_xx);
+         std::vector<double>().swap(tensor_xy);
+         std::vector<double>().swap(tensor_xz);
+         std::vector<double>().swap(tensor_yy);
+         std::vector<double>().swap(tensor_yz);
+         std::vector<double>().swap(tensor_zz);
+         
          return true;
       }
 

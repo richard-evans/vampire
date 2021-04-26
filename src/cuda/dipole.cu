@@ -63,34 +63,6 @@ void update_dipolar_fields ()
    cudaMalloc((void**)&d_num_atoms_in_cell, num_atoms_in_cell.size() * sizeof(int));
    cudaMemcpy(d_num_atoms_in_cell, num_atoms_in_cell.data(), num_atoms_in_cell.size() * sizeof(int), cudaMemcpyHostToDevice);
 
-   std::vector<double> tensor_xx = ::dipole::get_tensor_1D_xx();
-   std::vector<double> tensor_xy = ::dipole::get_tensor_1D_xy();
-   std::vector<double> tensor_xz = ::dipole::get_tensor_1D_xz();
-   std::vector<double> tensor_yy = ::dipole::get_tensor_1D_yy();
-   std::vector<double> tensor_yz = ::dipole::get_tensor_1D_yz();
-   std::vector<double> tensor_zz = ::dipole::get_tensor_1D_zz();
-
-   cu_real_t *d_tensor_xx ;
-   cu_real_t *d_tensor_xy ;
-   cu_real_t *d_tensor_xz ;
-   cu_real_t *d_tensor_yy ;
-   cu_real_t *d_tensor_yz ;
-   cu_real_t *d_tensor_zz ;
-
-   cudaMalloc((void**)&d_tensor_xx, tensor_xx.size() * sizeof(cu_real_t));
-   cudaMalloc((void**)&d_tensor_xy, tensor_xy.size() * sizeof(cu_real_t));
-   cudaMalloc((void**)&d_tensor_xz, tensor_xz.size() * sizeof(cu_real_t));
-   cudaMalloc((void**)&d_tensor_yy, tensor_yy.size() * sizeof(cu_real_t));
-   cudaMalloc((void**)&d_tensor_yz, tensor_yz.size() * sizeof(cu_real_t));
-   cudaMalloc((void**)&d_tensor_zz, tensor_zz.size() * sizeof(cu_real_t));
-
-   cudaMemcpy(d_tensor_xx, tensor_xx.data(), tensor_xx.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(d_tensor_xy, tensor_xy.data(), tensor_xy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(d_tensor_xz, tensor_xz.data(), tensor_xz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(d_tensor_yy, tensor_yy.data(), tensor_yy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(d_tensor_yz, tensor_yz.data(), tensor_yz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(d_tensor_zz, tensor_zz.data(), tensor_zz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-
 
    /*
     * Figure out addresses in device memory space
@@ -130,8 +102,8 @@ void update_dipolar_fields ()
          cu::cells::d_volume,
          cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
          cu::cells::d_x_cell_mu0H_field, cu::cells::d_y_cell_mu0H_field, cu::cells::d_z_cell_mu0H_field,
-         d_tensor_xx, d_tensor_xy, d_tensor_xz,
-         d_tensor_yy, d_tensor_yz, d_tensor_zz,
+         cu::cells::d_tensor_xx, cu::cells::d_tensor_xy, cu::cells::d_tensor_xz,
+         cu::cells::d_tensor_yy, cu::cells::d_tensor_yz, cu::cells::d_tensor_zz,
          d_cell_id_array,
          d_num_atoms_in_cell,
          num_local_cells,
@@ -374,8 +346,8 @@ __global__ void update_dipolar_fields (
          y_cell_mu0H_field[i] = prefactor * mu0Hd_field_y;
          z_cell_mu0H_field[i] = prefactor * mu0Hd_field_z;
       }
-      else{ // Increase counter if cell i is empty
-         i_1Dindex++;
+      else{ // Increase counter of n_cells if cell i is empty to go to next i
+         i_1Dindex += n_cells;
       } // end if cell j is not empty
    } // end for loop over n_local_cells
 }

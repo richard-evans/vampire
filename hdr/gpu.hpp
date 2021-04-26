@@ -32,6 +32,7 @@ namespace gpu{
    //-----------------------------------------------------------------------------
    extern bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
    extern void initialize();
+   extern void initialize_dipole();
    extern void llg_heun();
    extern void finalize();
    extern void transfer_spin_positions_from_gpu_to_cpu();

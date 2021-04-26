@@ -55,6 +55,7 @@ namespace vcuda{
       bool __initialize_atoms ();
       bool __initialize_fields ();
       bool __initialize_cells ();
+      bool __initialize_dipole ();
       bool __initialize_materials ();
       bool __initialize_topology ();
       bool __initialize_curand ();

@@ -84,6 +84,13 @@ namespace vcuda
          extern cu_real_t *d_y_cell_mu0H_field;
          extern cu_real_t *d_z_cell_mu0H_field;
 
+         extern cu_real_t *d_tensor_xx;
+         extern cu_real_t *d_tensor_xy;
+         extern cu_real_t *d_tensor_xz;
+         extern cu_real_t *d_tensor_yy;
+         extern cu_real_t *d_tensor_yz;
+         extern cu_real_t *d_tensor_zz;
+
          extern cu_real_t *d_volume;
          extern cu_real_t *d_num_atoms;
 
