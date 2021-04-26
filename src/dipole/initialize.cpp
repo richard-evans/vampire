@@ -146,11 +146,7 @@ namespace dipole{
       timer.start();
 
       // now calculate fields at zero time
-      #ifdef CUDA
-         gpu::update_dipolar_fields();
-      #else
-         dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array);
-      #endif
+      dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array);
 
       // hold parallel calculation until all processors have completed the update
       vmpi::barrier();

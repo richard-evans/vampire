@@ -158,7 +158,7 @@ namespace vcuda{
       bool success = true;
 
       // Initialise dipole
-      if( cu::__initialize_dipole() != EXIT_SUCCESS)
+      if( cu::__initialize_dipole() != true)
       {
          std::cerr << "Failed to initialise dipole" << std::endl;
          success = false;
@@ -533,6 +533,9 @@ namespace vcuda{
          cudaMalloc((void**)&cu::cells::d_tensor_yy, tensor_yy.size() * sizeof(cu_real_t));
          cudaMalloc((void**)&cu::cells::d_tensor_yz, tensor_yz.size() * sizeof(cu_real_t));
          cudaMalloc((void**)&cu::cells::d_tensor_zz, tensor_zz.size() * sizeof(cu_real_t));
+         
+         check_cuda_errors(__FILE__,__LINE__);
+         
 
          cudaMemcpy(cu::cells::d_tensor_xx, tensor_xx.data(), tensor_xx.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
          cudaMemcpy(cu::cells::d_tensor_xy, tensor_xy.data(), tensor_xy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
@@ -540,14 +543,8 @@ namespace vcuda{
          cudaMemcpy(cu::cells::d_tensor_yy, tensor_yy.data(), tensor_yy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
          cudaMemcpy(cu::cells::d_tensor_yz, tensor_yz.data(), tensor_yz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
          cudaMemcpy(cu::cells::d_tensor_zz, tensor_zz.data(), tensor_zz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         
-         // Free memory
-         std::vector<double>().swap(tensor_xx);
-         std::vector<double>().swap(tensor_xy);
-         std::vector<double>().swap(tensor_xz);
-         std::vector<double>().swap(tensor_yy);
-         std::vector<double>().swap(tensor_yz);
-         std::vector<double>().swap(tensor_zz);
+
+         check_device_memory(__FILE__,__LINE__);
          
          return true;
       }
