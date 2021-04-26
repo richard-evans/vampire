@@ -21,58 +21,62 @@
 #include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
-#include "micromagnetic.hpp"
+#include "spintransport.hpp"
 
 // vio module headers
 #include "internal.hpp"
 
 namespace vout{
 	// Output Function 0
-
+    std::string generic_output_int(std::string str,uint64_t i, bool header){
+      std::ostringstream res;
+      vout::fixed_width_output result(res,vout::fw_size_int);
+      if(header){
+           result << str;
+        }
+      else{
+           result << i;
+        }
+      return result.str();
+    }
+    std::string generic_output_double(std::string str,double d, bool header){
+      std::ostringstream res;
+      vout::fixed_width_output result(res,vout::fw_size);
+      if(header){
+           result << str;
+        }
+      else{
+           result << d;
+        }
+      return result.str();
+    }
     // why don't we do the fixed width stuff here? Yep - TBD
     void time(std::ostream& stream, bool header){
-      if(header){
-         stream << "Time_steps" << "\t";
-      }
-      else{
-         stream << sim::time << "\t";
-      }
+       stream << generic_output_int("Time_steps", sim::time,header);
    }
 
    // Output Function 1 - with Header
    void real_time(std::ostream& stream, bool header){
-      if(header){
-         stream << "Real_time" << "\t";
-      }
-      else{
-         stream << sim::time*mp::dt_SI << "\t";
-      }
+      stream << generic_output_double("Real_time",sim::time*mp::dt_SI,header);
    }
 
    // Output Function 2 - with Header
    void temperature(std::ostream& stream, bool header){
-      if(header){
-         stream << "Temperature" << "\t";
-      }
-      else{
-         stream << sim::temperature << "\t";
-      }
+      stream << generic_output_double("Temperature" ,sim::temperature,header);
    }
 
    // Output Function 3 - with Header
    void Happ(std::ostream& stream, bool header){
-      if(header){
-         stream << "B_applied" << "\t";
-      }
-      else{
-         stream << sim::H_applied << "\t";
-      }
+      stream << generic_output_double("B_applied" ,sim::H_applied,header);
    }
 
    // Output Function 4 - with Header
    void Hvec(std::ostream& stream, bool header){
-      if(header) stream << "B_vector_x" << "\t" << "B_vector_y" << "\t" << "B_vector_z" << "\t";
-      else stream << sim::H_vec[0] << "\t"<< sim::H_vec[1] << "\t"<< sim::H_vec[2] << "\t";
+      std::ostringstream res;
+      vout::fixed_width_output result(res,vout::fw_size);
+      if(header) result << "B_vector_x" << "B_vector_y" << "B_vector_z";
+      else result << sim::H_vec[0] << sim::H_vec[1] << sim::H_vec[2];
+      stream << result.str();
    }
 
    // Output Function 5 - with Header
@@ -84,7 +88,7 @@ namespace vout{
    // Output Function 6 - with Header
    void magm(std::ostream& stream, bool header){
       // header included in function
-      stream << stats::system_magnetization.output_normalized_magnetization_length(header) << "\t";
+      stream << stats::system_magnetization.output_normalized_magnetization_length(header);
    }
 
    // Output Function 7 - with Header
@@ -153,89 +157,103 @@ namespace vout{
 
    // Output Function 14 - with Header
    void systorque(std::ostream& stream, bool header){
-      if(header){
-         stream << "Total_torque_x" << "\t";
-         stream << "Total_torque_y" << "\t";
-         stream << "Total_torque_z" << "\t";
-      }else{
-         stream << stats::total_system_torque[0] << "\t";
-         stream << stats::total_system_torque[1] << "\t";
-         stream << stats::total_system_torque[2] << "\t";
+      std::ostringstream res;
+      if(vout::custom_precision){
+         res.precision(vout::precision);
       }
+      vout::fixed_width_output result(res,vout::fw_size);
+      if(header){
+         result << "Tot_torque_x"
+                << "Tot_torque_y"
+                << "Tot_torque_z";
+      }else{
+         result << stats::total_system_torque[0]
+                << stats::total_system_torque[1]
+                << stats::total_system_torque[2];
+      }
+      stream << result.str();
    }
 
    // Output Function 15 - with Header
    void mean_systorque(std::ostream& stream, bool header){
+      std::ostringstream res;
+      if(vout::custom_precision){
+         res.precision(vout::precision);
+      }
+      vout::fixed_width_output result(res,vout::fw_size);
       if(header){
-         stream << "Mean_torque_x" << "\t";
-         stream << "Mean_torque_y" << "\t";
-         stream << "Mean_torque_z" << "\t";
+         result << "Mean_torque_x"
+                << "Mean_torque_y"
+                << "Mean_torque_z";
       }
       else{
-         stream << stats::total_mean_system_torque[0]/stats::torque_data_counter << "\t";
-         stream << stats::total_mean_system_torque[1]/stats::torque_data_counter << "\t";
-         stream << stats::total_mean_system_torque[2]/stats::torque_data_counter << "\t";
+         result << stats::total_mean_system_torque[0]/stats::torque_data_counter
+                << stats::total_mean_system_torque[1]/stats::torque_data_counter
+                << stats::total_mean_system_torque[2]/stats::torque_data_counter;
       }
+      stream << result.str();
    }
 
    // Output Function 16 - with Header
    void constraint_phi(std::ostream& stream, bool header){
-      if(header){
-         stream << "Constraint_phi" << "\t";
-      }
-      else{
-         stream << sim::constraint_phi << "\t";
-      }
+      stream << generic_output_double("Con_phi",sim::constraint_phi,header);
    }
 
    // Output Function 17 - with Header
    void constraint_theta(std::ostream& stream, bool header){
-      if(header){
-         stream << "Constraint_theta" << "\t";
-      }
-      else{
-         stream << sim::constraint_theta << "\t";
-      }
+      stream << generic_output_double("Con_theta",sim::constraint_theta,header);
    }
 
    // Output Function 18 - with Header
    void material_constraint_phi(std::ostream& stream, bool header){
+      std::ostringstream res;
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::num_materials;mat++){
          if(header){
-            stream << "ID" << mat << "_Constraint_phi" << "\t";
+            result << "ID" + std::to_string(mat) + "_Con_phi";
          }
          else{
-            stream << montecarlo::cmc::cmc_mat[mat].constraint_phi << "\t";
+            result << montecarlo::cmc::cmc_mat[mat].constraint_phi;
          }
       }
+      stream << result.str();
    }
 
    // Output Function 19 - with Header
    void material_constraint_theta(std::ostream& stream, bool header){
+      std::ostringstream res;
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::num_materials;mat++){
          if(header){
-            stream << "ID" << mat << "_Constraint_theta" << "\t";
+            result << "ID" + std::to_string(mat) + "_Con_theta";
          }
          else{
-            stream << montecarlo::cmc::cmc_mat[mat].constraint_theta << "\t";
+            result << montecarlo::cmc::cmc_mat[mat].constraint_theta;
          }
       }
+      stream << result.str();
    }
 
    // Output Function 20
    void material_mean_systorque(std::ostream& stream, bool header){
+      std::ostringstream res;
+      if(vout::custom_precision){
+         res.precision(vout::precision);
+      }
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::num_materials;mat++){
          if(header){
-            stream << "ID" << mat << "_Mean_torque_x" << "\t";
-            stream << "ID" << mat << "_Mean_torque_y" << "\t";
-            stream << "ID" << mat << "_Mean_torque_z" << "\t";
+            result << "ID" + std::to_string(mat) + "_Mean_tor_x"
+                   << "ID" + std::to_string(mat) + "_Mean_tor_y"
+                   << "ID" + std::to_string(mat) + "_Mean_tor_z";
          }
          else{
-            stream << stats::sublattice_mean_torque_x_array[mat] / stats::torque_data_counter << "\t";
-            stream << stats::sublattice_mean_torque_y_array[mat] / stats::torque_data_counter << "\t";
-            stream << stats::sublattice_mean_torque_z_array[mat] / stats::torque_data_counter << "\t";
+            result << stats::sublattice_mean_torque_x_array[mat] / stats::torque_data_counter
+                   << stats::sublattice_mean_torque_y_array[mat] / stats::torque_data_counter
+                   << stats::sublattice_mean_torque_z_array[mat] / stats::torque_data_counter;
          }
       }
+      stream << result.str();
    }
 
    // Output Function 21 - with Header
@@ -249,51 +267,56 @@ namespace vout{
    }
    // Output Function 22
    void phonon_temperature(std::ostream& stream, bool header){
-      if(header){
-         stream << "Phonon_temp" << "\t";
-      }
-      else{
-         stream << sim::TTTp << "\t";
-      }
+     stream << generic_output_double("Phonon_temp",sim::TTTp,header);
    }
 
    // Output Function 23 - with Header
    void material_temperature(std::ostream& stream, bool header){
+      std::ostringstream res;
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::material.size();mat++){
          if(header){
-            stream << "ID" << mat << "_Temp" << "\t";
+            result << "ID" + std::to_string(mat) + "_Temp";
          }
          else{
-            stream << mp::material[mat].temperature << "\t";
+            result << mp::material[mat].temperature << "\t";
          }
       }
+      stream << result.str();
    }
 
    // Output Function 24 - with Header
    void material_applied_field_strength(std::ostream& stream, bool header){
+      std::ostringstream res;
+      vout::fixed_width_output result(res,vout::fw_size);
       for(int mat=0;mat<mp::material.size();mat++){
          if(header){
-            stream << "ID" << mat << "_H" << "\t";
+            result << "ID" + std::to_string(mat) + "_H";
          }
          else{
-            stream << mp::material[mat].applied_field_strength << "\t";
+            result << mp::material[mat].applied_field_strength;
          }
       }
+      stream << result.str();
    }
 
    // Output Function 25 - with Header
    void material_fmr_field_strength(std::ostream& stream, bool header){
+      std::ostringstream res;
+      vout::fixed_width_output result(res,vout::fw_size);
+
       const double real_time=sim::time*mp::dt_SI;
 
       for(int mat=0;mat<mp::material.size();mat++){
          if(header){
-            stream << "ID" << mat << "_fmr_H" << "\t";
+            result << "ID" + std::to_string(mat) + "_fmr_H";
          }
          else{
             const double Hsinwt_local=mp::material[mat].fmr_field_strength*sin(2.0*M_PI*real_time*mp::material[mat].fmr_field_frequency);
-            stream << Hsinwt_local << "\t";
+            result << Hsinwt_local;
          }
       }
+      stream << result.str();
    }
 
 	// Output Function 26 - with Header
@@ -459,14 +482,19 @@ namespace vout{
       stream << stats::material_energy.output_mean_energy(stats::total,header);
    }
 
-   // Output Function 65 - with Header
-   void MRresistance(std::ostream& stream, bool header){
-      if(header){
-         stream << "MR" << "\t";
-      }
-      else{
-         stream << micromagnetic::MR_resistance << "\t";
-      }
+   // Output Function 65
+   void resistance(std::ostream& stream, bool header){
+      stream << generic_output_double("resistance", spin_transport::total_resistance, header);
+   }
+
+   // Output Function 66
+   void current(std::ostream& stream, bool header){
+      stream << generic_output_double("current", spin_transport::total_current, header);
+   }
+
+   // Output Function 67
+   void domain_wall_position(std::ostream& stream, bool header){
+      stream << sim::domain_wall_centre;
    }
 
 }

@@ -290,6 +290,13 @@ void CMCMCinit(){
 //------------------------------------------------------------------------------
 int cmc_mc_step(){
 
+	// check for masked version of cmc
+	// (assumes programmer has initialised it properly)
+	if(cmc::masked_cmc){
+		montecarlo::cmc_mc_step_mask();
+		return 0;
+	}
+
 	// Check for calling of function
 	if(err::check==true) std::cout << "montecarlo::ConstrainedMonteCarlo has been called" << std::endl;
 

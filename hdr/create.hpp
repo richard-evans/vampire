@@ -197,6 +197,8 @@ namespace create{
    int create_system_type(std::vector<cs::catom_t> &);
 	bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+	double get_material_height_min(const int material);
+	double get_material_height_max(const int material);
 
 
 } // end of namespace create

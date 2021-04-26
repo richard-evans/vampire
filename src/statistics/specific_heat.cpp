@@ -28,7 +28,7 @@ namespace stats{
 //------------------------------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------------------------------
-specific_heat_statistic_t::specific_heat_statistic_t (){}
+//specific_heat_statistic_t::specific_heat_statistic_t (){}
 
 //------------------------------------------------------------------------------------------------------
 // Function to initialize data structures
@@ -134,7 +134,7 @@ std::string specific_heat_statistic_t::output_mean_specific_heat(const double te
       const double sh = prefactor * ( ( mean_specific_heat_squared[id] * imean_counter ) - ( mean_specific_heat[id] * mean_specific_heat[id] * imean_counter_sq) );
 
       if(header){
-          result<<"ID"<<id<<"_spec_heat"<<"\t";
+          result<<name<<id<<"_spec_heat"<<"\t";
       }else{
           result << sh << "\t";
       }

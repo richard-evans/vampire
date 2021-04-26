@@ -61,17 +61,41 @@ int command( int argc, char* argv[] ){
       if (sw == "--xyz"){
          vdc::xyz = true;
       }
-      // xyz coordinate file output
+      // pov coordinate file output
       else if (sw == "--povray"){
          vdc::povray = true;
       }
-      // xyz coordinate file output
+      // vtk coordinate file output
       else if (sw == "--vtk"){
          vdc::vtk = true;
       }
       // plain text file output
       else if (sw == "--text"){
          vdc::txt = true;
+      }
+      else if (sw == "--ssc" || sw == "--spin-spin-correlation"){
+         vdc::ssc = true;
+      }
+      // plain text file output
+      else if (sw == "--cells"){
+         vdc::cells = true;
+      }
+      //------------------------------------------------------------------------
+      // Check for cell size
+      //------------------------------------------------------------------------
+      else if (sw == "--cell-size"){
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - size of cells in Angstroms." );
+
+         if ( stof(temp_str) >= 0.5 ){
+            // set cell size
+            vdc::cell_size = stof(temp_str);
+         }
+         else{
+            std::cerr << "Error - cell size must be greater than 0.5 Angstroms."
+                      << std::endl;
+            return EXIT_FAILURE;
+         }
       }
       //------------------------------------------------------------------------
       // Check for verbose output
@@ -125,6 +149,18 @@ int command( int argc, char* argv[] ){
 
             // work through vector and extract values
             extract_materials(temp_str, vdc::remove_materials);
+      }
+      //------------------------------------------------------------------------
+      // Check for user specified antiferromagnetic material spins to flip in
+      // povray visualisation
+      //------------------------------------------------------------------------
+      else if (sw == "--afm"){
+
+            // check number of args not exceeded
+            check_arg(arg, argc, argv, temp_str, "Error - expected at least one variable." );
+
+            // work through vector and extract values
+            extract_materials(temp_str, vdc::afm_materials);
       }
       //------------------------------------------------------------------------
       // Check for slice parameters
@@ -222,17 +258,19 @@ int command( int argc, char* argv[] ){
             return EXIT_FAILURE;
             ////terminaltextcolor(WHITE);
          }
-
       }
       else if ( sw == "--3D" ){
 
          vdc::x_axis_colour = true;
 
       }
-      else if ( sw == "--custom_colourmap" ){
+      else if ( sw == "--custom-colourmap" ){
 
          // check number of args not exceeded
          check_arg(arg, argc, argv, temp_str, "Error - expected custom colourmap name.");
+
+         // set colour_keyword to "custom"
+         vdc::colour_keyword = "custom";
 
          // set custom map file name
          vdc::custom_colourmap_file = temp_str;
@@ -252,12 +290,14 @@ int command( int argc, char* argv[] ){
    //---------------------------------------------------------------------------
 
    // check that some kind of data output is requested
-   if( !vdc::xyz && !vdc::povray && !vdc::vtk && !vdc::txt ){
+   if( !vdc::xyz && !vdc::povray && !vdc::vtk && !vdc::txt && !vdc::ssc && !vdc::cells){
       std::cerr << "Error! No output data formats requested. Available options are: " << std::endl;
       std::cerr << "\t\t --xyz    Data output in .xyz format for viewing in rasmol/jmol" << std::endl;
       std::cerr << "\t\t --povray Data output in PoVRAY format for rendering" << std::endl;
       std::cerr << "\t\t --vtk    Data output in VTK format for viewing in Paraview" << std::endl;
       std::cerr << "\t\t --text   Data output in plain text format for plotting in gnuplot/excel etc" << std::endl;
+      std::cerr << "\t\t --cells  Data output in plain text format in cells" << std::endl;
+      std::cerr << "\t\t --ssc    Spin-spin correlation data in text format" << std::endl;
       return EXIT_FAILURE;
    }
 

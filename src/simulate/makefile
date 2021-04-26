@@ -5,8 +5,11 @@
 # List module object filenames
 sim_objects=\
 data.o \
+increment_time.o \
 initialize.o \
-interface.o
+initialize_modules.o \
+interface.o \
+llg_quantum.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/simulate/,$(sim_objects))

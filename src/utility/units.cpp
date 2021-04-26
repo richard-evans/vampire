@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=47;
+	const int max_units=57;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -148,11 +148,23 @@ int init(){
 		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
       // New
       unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
+      unit[44]="Ohm-m";		conversion[44]=1.0; 			      type[44]="resistivity";		// Ohm metres
+
+      unit[45]="V";		   conversion[45]=1.0; 			      type[45]="potential";		// volts
+      unit[46]="mV";		   conversion[46]=1.0e-3; 			   type[46]="potential";		// Millivolts
+      unit[47]="uV";	    	conversion[47]=1.0e-6; 			   type[47]="potential";		// Microvolts
+      unit[48]="nV";		   conversion[48]=1.0e-9; 			   type[48]="potential";		// Nanovolts
+
+		unit[49]="Hz";		   conversion[49]=1.0; 			      type[49]="frequency";		// Hz
+      unit[50]="kHz";		conversion[50]=1.0e3; 			   type[50]="frequency";		// kHz
+      unit[51]="MHz";	   conversion[51]=1.0e6; 			   type[51]="frequency";		// MHz
+      unit[52]="GHz";		conversion[52]=1.0e9; 			   type[52]="frequency";		// GHz
+      unit[53]="THz";		conversion[53]=1.0e12; 			   type[53]="frequency";		// THz
 
 		// exchange (Internal unit J/Angstrom)
-		unit[44]="J/m";		conversion[44]=1.0E-10; 			type[44]="exchange";		// Joules/metres squared
-    	unit[45]="erg/cm";	conversion[45]=1.0E-15; 			type[45]="exchange";		// erg/cm squared
-	 	unit[46]="erg/cm2";	conversion[46]=1.0e-23; 			type[46]="mm_energy";		// erg/cm2 squared to J/A2
+		unit[54]="J/m";		conversion[54]=1.0E-10; 			type[54]="exchange";		// Joules/metres squared
+    	unit[55]="erg/cm";	conversion[55]=1.0E-15; 			type[55]="exchange";		// erg/cm squared
+	 	unit[56]="erg/cm2";	conversion[56]=1.0e-23; 			type[56]="mm_energy";		// erg/cm2 squared to J/A2
 
       //
 

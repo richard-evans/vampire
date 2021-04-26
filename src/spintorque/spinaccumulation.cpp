@@ -51,74 +51,69 @@ namespace st{
          st::internal::three_vector_t b2(0.0,1.0,0.0);
          st::internal::three_vector_t b3(0.0,0.0,1.0);
 
-
-
          // set local constants
          double je = st::internal::je; // current (C/s)
 
-     //---------------------------------------------------------------------------------------------------
-          //set parameters for TMR calculation
-          if(st::internal::TMRenable == true){
- 	    int FL = mp::num_materials-1;
-	    double dot = st::internal::magx_mat[0]*st::internal::magx_mat[FL]+
-	                 st::internal::magy_mat[0]*st::internal::magy_mat[FL]+
-	                 st::internal::magz_mat[0]*st::internal::magz_mat[FL];
+         //---------------------------------------------------------------------------------------------------
+         //set parameters for TMR calculation
+         if(st::internal::TMRenable == true){
+            int FL =	st::internal::free_layer;
+            int RL =	st::internal::reference_layer;
+            double dot = st::internal::magx_mat[RL]*st::internal::magx_mat[FL]+
+                         st::internal::magy_mat[RL]*st::internal::magy_mat[FL]+
+                         st::internal::magz_mat[RL]*st::internal::magz_mat[FL];
 
-      // RE - this code is not general! Needs to be fixed. Placeholder added in the meantime
-	   //double MgO_thickness = (mp::material[2].min - mp::material[1].max)*cs::system_dimensions[2]*1.0e-10;
-      double MgO_thickness = 0.1*cs::system_dimensions[2]*1.0e-10;
+            // RE - this code is not general! Needs to be fixed. Placeholder added in the meantime
+            // AM (2020) - Code fixed, but still codes refers to MTJ RL/barrier/FL specifically
+            double MgO_thickness = (create::get_material_height_min(FL)-create::get_material_height_max(RL))*cs::system_dimensions[2]*1.0e-10;
 
-	    //calculate the relative angle of two FMs
-	    st::internal::rel_angle = acos(dot);
-	    double plus_cos = 1.0+cos(st::internal::rel_angle);
-	    double minus_cos = 1.0-cos(st::internal::rel_angle);
-	    double exp_t = exp(-MgO_thickness/0.25e-9);
+            //calculate the relative angle of two FMs
+            st::internal::rel_angle = acos(dot);
+            double plus_cos = 1.0+cos(st::internal::rel_angle);
+            double minus_cos = 1.0-cos(st::internal::rel_angle);
+            double exp_t = exp(-MgO_thickness/0.25e-9);
 
-	    double jtunnel = st::internal::je*0.5*(plus_cos+0.5*minus_cos)*exp_t;
+            double jtunnel = st::internal::je*0.5*(plus_cos+0.5*minus_cos)*exp_t;
+//            std::cout << "t_MgO=( " << create::get_material_height_min(FL) << " - " << create::get_material_height_max(RL) << " ) = " << MgO_thickness << "\tJe\t" << st::internal::je << "\tJe_tun\t" << jtunnel << std::endl;
 
-	    //set the current je and spin poralisation parameters
-	    je = jtunnel;
-	    st::internal::default_properties.beta_cond = st::internal::mp[0].beta_cond*0.5*(plus_cos+0.5*minus_cos)*exp_t;
-       	    st::internal::default_properties.beta_diff = st::internal::mp[0].beta_diff*0.5*(plus_cos+0.5*minus_cos)*exp_t;
+            //set the current je and spin poralisation parameters
+            je = jtunnel;
+            // AM (2020) - I think the default parameters should be rescaled by same factor as tunnelling current and not changed using those of material 0 arbitrarily
+            st::internal::default_properties.beta_cond *= /*st::internal::mp[0].beta_cond**/0.5*(plus_cos+0.5*minus_cos)*exp_t;
+            st::internal::default_properties.beta_diff *= /*st::internal::mp[0].beta_diff**/0.5*(plus_cos+0.5*minus_cos)*exp_t;
 
+            // Calculate spin torque parameters
+            for(int cell=0; cell<st::internal::beta_cond.size(); ++cell){
 
-	 // Calculate spin torque parameters
-        for(int cell=0; cell<st::internal::beta_cond.size(); ++cell){
+               // check for zero atoms in cell
+               if(st::internal::cell_natom[cell] <= 0.0001){
+                  st::internal::beta_cond[cell]   = st::internal::default_properties.beta_cond;
+                  st::internal::beta_diff[cell]   = st::internal::default_properties.beta_diff;
 
-	    // check for zero atoms in cell
-	    if(st::internal::cell_natom[cell] <= 0.0001){
-		st::internal::beta_cond[cell]   = st::internal::default_properties.beta_cond;
-		st::internal::beta_diff[cell]   = st::internal::default_properties.beta_diff;
+                  const double hbar = 1.05457162e-34;
+                  const double B  = st::internal::beta_cond[cell];
+                  const double Bp = st::internal::beta_diff[cell];
+                  const double lambda_sdl = st::internal::lambda_sdl[cell];
+                  const double Do = st::internal::diffusion[cell];
+                  const double Jsd = st::internal::sd_exchange[cell];
 
-		const double hbar = 1.05457162e-34;
-		const double B  = st::internal::beta_cond[cell];
-		const double Bp = st::internal::beta_diff[cell];
-		const double lambda_sdl = st::internal::lambda_sdl[cell];
-		const double Do = st::internal::diffusion[cell];
-		const double Jsd = st::internal::sd_exchange[cell];
+                  const double BBp = 1.0/sqrt(1.0-B*Bp);
+                  const double lambda_sf = lambda_sdl*BBp;
+                  const double lambda_j = sqrt(2.0*hbar*Do/Jsd); // Angstroms
+                  const double lambda_sf2 = lambda_sf*lambda_sf;
+                  const double lambda_j2 = lambda_j*lambda_j;
 
-		const double BBp = 1.0/sqrt(1.0-B*Bp);
-		const double lambda_sf = lambda_sdl*BBp;
-		const double lambda_j = sqrt(2.0*hbar*Do/Jsd); // Angstroms
-		const double lambda_sf2 = lambda_sf*lambda_sf;
-		const double lambda_j2 = lambda_j*lambda_j;
+                  std::complex<double> inside (1.0/lambda_sf2, -1.0/lambda_j2);
+                  std::complex<double> inv_lplus = sqrt(inside);
 
-		std::complex<double> inside (1.0/lambda_sf2, -1.0/lambda_j2);
-		std::complex<double> inv_lplus = sqrt(inside);
+                  st::internal::a[cell] =  real(inv_lplus);
+                  st::internal::b[cell] = -imag(inv_lplus);
+               }
+            }
+            st::internal::output_base_microcell_data();
+         }
 
-		st::internal::a[cell] =  real(inv_lplus);
-		st::internal::b[cell] = -imag(inv_lplus);
-
-
-	     }
-        }
-
-	   st::internal::output_base_microcell_data();
-
- 	 }
-
-   //---------------------------------------------------------------------------------------------------
-
+         //---------------------------------------------------------------------------------------------------
 
          const double i_muB = 1.0/9.274e-24; // J/T
          const double i_e = 1.0/1.60217662e-19; // electronic charge (Coulombs)
@@ -126,15 +121,12 @@ namespace st{
                                           st::internal::micro_cell_size *
                                           st::internal::micro_cell_thickness)*1.e-30; // m^3
 
-
          // loop over all 1D stacks (in parallel)
          for(int stack=0; stack <num_stacks; ++stack){
             // determine starting cell in stack
             const int idx = stack_index[stack];
 
             // set initial values
-
-
             st::internal::sa[3*idx+0] = 0.0;
             st::internal::sa[3*idx+1] = 0.0;
             st::internal::sa[3*idx+2] = 0.0; //10.e6;// st::internal::default_properties.sa_infinity;
@@ -143,9 +135,7 @@ namespace st{
             st::internal::j [3*idx+1] = st::internal::initial_beta*je*st::internal::initial_m[1];
             st::internal::j [3*idx+2] = st::internal::initial_beta*je*st::internal::initial_m[2];
 
-
-        //std::cout<< st::internal::initial_beta << "\t" << st::internal::j[0] << "\t" << st::internal::j[1]  << "\t" << st::internal::j[2]  << "\t" << std::endl;
-
+//            std::cout<< st::internal::initial_beta << "\t" << st::internal::j[0] << "\t" << st::internal::j[1]  << "\t" << st::internal::j[2]  << "\t" << std::endl;
 
             // loop over all cells in stack after first (idx+1)
             for(int cell=idx+1; cell<idx+num_microcells_per_stack; ++cell){
@@ -179,9 +169,9 @@ namespace st{
                   m.z = 0.0;
                }
                if(pmodm > 1.e-8){
-                  pm.x = pm.x/modm;
-                  pm.y = pm.y/modm;
-                  pm.z = pm.z/modm;
+                  pm.x = pm.x/pmodm;
+                  pm.y = pm.y/pmodm;
+                  pm.z = pm.z/pmodm;
                }
                else{
                   pm.x = 0.0;
@@ -299,25 +289,42 @@ namespace st{
                const double jmy = Bc*je*m.y - twoDo*pre_jmy;
                const double jmz = Bc*je*m.z - twoDo*pre_jmz;
 
-               // Save values for the spin accumulation
-               st::internal::sa[cellx] = sax;
-               st::internal::sa[celly] = say;
-               st::internal::sa[cellz] = saz;
+               if(st::internal::cell_natom[cell]>0){
+                  // Save values for the spin accumulation
+                  st::internal::sa[cellx] = sax;
+                  st::internal::sa[celly] = say;
+                  st::internal::sa[cellz] = saz;
 
-               // Save values for the spin current
-               st::internal::j[cellx] = jmx;
-               st::internal::j[celly] = jmy;
-               st::internal::j[cellz] = jmz;
+                  // Save values for the spin current
+                  st::internal::j[cellx] = jmx;
+                  st::internal::j[celly] = jmy;
+                  st::internal::j[cellz] = jmz;
 
-               // Calculate spin torque energy for cell (Joules)
-               st::internal::spin_torque[cellx] = microcell_volume * st::internal::sd_exchange[cell] * sax * i_e * i_muB;
-               st::internal::spin_torque[celly] = microcell_volume * st::internal::sd_exchange[cell] * say * i_e * i_muB;
-               st::internal::spin_torque[cellz] = microcell_volume * st::internal::sd_exchange[cell] * saz * i_e * i_muB;
+                  // Calculate spin torque energy for cell (Joules)
+                  st::internal::spin_torque[cellx] = microcell_volume * st::internal::sd_exchange[cell] * sax * i_e * i_muB;
+                  st::internal::spin_torque[celly] = microcell_volume * st::internal::sd_exchange[cell] * say * i_e * i_muB;
+                  st::internal::spin_torque[cellz] = microcell_volume * st::internal::sd_exchange[cell] * saz * i_e * i_muB;
+               }
+               else{
+                  // Save values for the spin accumulation
+                  st::internal::sa[cellx] = st::internal::sa[pcellx];
+                  st::internal::sa[celly] = st::internal::sa[pcelly];
+                  st::internal::sa[cellz] = st::internal::sa[pcellz];
 
+                  // Save values for the spin current
+                  st::internal::j[cellx] = st::internal::j[pcellx];
+                  st::internal::j[celly] = st::internal::j[pcelly];
+                  st::internal::j[cellz] = st::internal::j[pcellz];
 
-              //--------------------------------------------
-              // Step 5 calculate the spin torque of each cell
-              //--------------------------------------------
+                  // Calculate spin torque energy for cell (Joules)
+                  st::internal::spin_torque[cellx] = st::internal::spin_torque[pcellx];
+                  st::internal::spin_torque[celly] = st::internal::spin_torque[pcelly];
+                  st::internal::spin_torque[cellz] = st::internal::spin_torque[pcellz];
+               }
+
+               //--------------------------------------------
+               // Step 5 calculate the spin torque of each cell
+               //--------------------------------------------
 
                //convert M of previous cell into basis b1, b2, b3
 
@@ -377,7 +384,6 @@ namespace st{
                 st::internal::nast[cellx] = bj*SxSp[0];
                 st::internal::nast[celly] = bj*SxSp[1];
                 st::internal::nast[cellz] = bj*SxSp[2];
-
 
 
             } // end of cell loop

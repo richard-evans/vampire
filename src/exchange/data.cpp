@@ -32,6 +32,9 @@ namespace exchange{
       //------------------------------------------------------------------------
       std::vector<internal::mp_t> mp; // array of material properties
 
+      exchange_matrix_4D_t bilinear_exchange_constants; // array of exchange constants
+      exchange_matrix_4D_t biquadratic_exchange_constants; // array of biquadratic exchange constants
+
       bool enable_dmi = false; // flag to enable dmi calculation
 
       double dmi_cutoff_range = 2.6; // cutoff range for DMI calculation (Ångstroms)

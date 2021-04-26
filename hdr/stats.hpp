@@ -94,7 +94,9 @@ namespace stats
       friend class specific_heat_statistic_t;
 
    public:
-      energy_statistic_t ();
+      energy_statistic_t (std::string n):initialized(false){
+        name = n;
+      };
       bool is_initialized();
       void set_mask(const int in_mask_size, const std::vector<int> in_mask);
       void get_mask(std::vector<int>& out_mask, std::vector<double>& out_normalisation);
@@ -143,6 +145,8 @@ namespace stats
       std::vector<int> zero_list;
       std::vector<double> normalisation;
 
+      std::string name;
+
    };
 
    //----------------------------------
@@ -153,7 +157,9 @@ namespace stats
       friend class susceptibility_statistic_t;
       friend class standard_deviation_statistic_t;
       public:
-         magnetization_statistic_t ();
+         magnetization_statistic_t (std::string n):initialized(false){
+           name = n;
+         };
          bool is_initialized();
          void set_mask(const int mask_size, std::vector<int> inmask, const std::vector<double>& mm);
          void get_mask(std::vector<int>& out_mask, std::vector<double>& out_saturation);
@@ -180,6 +186,7 @@ namespace stats
          std::vector<double> mean_magnetization;
          std::vector<int> zero_list;
          std::vector<double> saturation;
+         std::string name;
 
    };
 
@@ -189,7 +196,9 @@ namespace stats
    class specific_heat_statistic_t{
 
       public:
-         specific_heat_statistic_t ();
+         specific_heat_statistic_t (std::string n):initialized(false){
+           name = n;
+         };
          void initialize(energy_statistic_t& energy_statistic);
          void calculate(const std::vector<double>& energy);
          void reset_averages();
@@ -204,6 +213,8 @@ namespace stats
          std::vector<double> mean_specific_heat_squared;
          std::vector<double> normalisation;
 
+         std:: string name;
+
    };
 
    //----------------------------------
@@ -212,7 +223,9 @@ namespace stats
    class susceptibility_statistic_t{
 
       public:
-         susceptibility_statistic_t ();
+         susceptibility_statistic_t (std::string n):initialized(false){
+           name = n;
+         };
          void initialize(magnetization_statistic_t& mag_stat);
          void calculate(const std::vector<double>& magnetization);
          void reset_averages();
@@ -228,6 +241,7 @@ namespace stats
          std::vector<double> mean_absolute_susceptibility;
          std::vector<double> mean_absolute_susceptibility_squared;
          std::vector<double> saturation;
+         std::string name;
 
    };
    //----------------------------------
@@ -236,7 +250,9 @@ namespace stats
    class standard_deviation_statistic_t{ // AJN
 
       public:
-         standard_deviation_statistic_t ();
+         standard_deviation_statistic_t (std::string n):initialized(false){
+           name=n;
+         };
          void initialize(magnetization_statistic_t& mag_stat);
          void update(const std::vector<double>& magnetization);
          void reset_averages();
@@ -251,6 +267,7 @@ namespace stats
          double res2;
          std::vector<double> residual_sq;// running squared residual for each direction
          std::vector<double> mean; // running mean for each direction
+         std::string name;
 
    };
 

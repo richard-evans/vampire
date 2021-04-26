@@ -34,6 +34,16 @@ namespace vdc{
 
 // forward function declarations
 
+
+//------------------------------------------------------------------------------
+// Initialise Povray colourwheel
+//------------------------------------------------------------------------------
+void initialise_povray() {
+
+   vdc::initialise_colourwheel();
+
+}
+
 //------------------------------------------------------------------------------
 // Function to output spins.inc file compatible with povray
 //------------------------------------------------------------------------------
@@ -48,9 +58,6 @@ void output_inc_file(unsigned int spin_file_id){
 
    // output informative message to user
    if(vdc::verbose) std::cout << "   Writing povray file " << incpov_file << "..." << std::flush;
-
-   // temporary variables defining spin colours
-   double red=0.0, green=0.0, blue=1.0;
 
    // open incfile
    std::ofstream incfile;
@@ -68,14 +75,27 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for( auto &atom : vdc::sliced_atoms_list ){
+      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
          // get magnetization for colour contrast
-         const double sx = spins[3*atom+0];
-         const double sy = spins[3*atom+1];
-         const double sz = spins[3*atom+2];
+         double sx = spins[3*atom+0];
+         double sy = spins[3*atom+1];
+         double sz = spins[3*atom+2];
 
-         // calculate rgb components based on magnetization
+         // flip antiferromagnetic spins if required
+         if (std::find(afm_materials.begin(), afm_materials.end(), vdc::type[atom]+1) != afm_materials.end() ){
+            sx = -sx;
+            sy = -sy;
+            sz = -sz;
+         }
+
+         // temporary thread private variables defining spin colours
+         double red=0.0, green=0.0, blue=1.0;
+
+         // calculate rgb components based on spin orientation
          vdc::rgb(sx, sy, sz, red, green, blue);
 
          // format text for povray file
@@ -104,7 +124,10 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for( auto &atom : vdc::sliced_nm_atoms_list ){
+      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_nm_atoms_list[i];
 
          // format text for povray file
          otext << "spinm"<< nm_type[atom] << "(" <<
@@ -179,11 +202,18 @@ void output_povray_file(){
    pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
    pfile << "#declare Final_Frame = " << vdc::final_file_id << ";" << std::endl;
 
+   //---------------------------------------------------------------------------
    // Determine non-magnetic materials looping over all non-magnetic atoms
+   //---------------------------------------------------------------------------
    std::vector<bool> is_nm_mat(vdc::materials.size(),false);
-   for( auto &atom : vdc::sliced_nm_atoms_list ){
+   for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+      // get atom ID
+      unsigned int atom = vdc::sliced_nm_atoms_list[i];
+
       const int mat = vdc::nm_type[atom];
       is_nm_mat[mat] = true;
+
    }
 
    // Output material specific macros

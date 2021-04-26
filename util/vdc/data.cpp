@@ -23,6 +23,7 @@ namespace vdc{
    bool povray   = false; // flag to specify povray file output
    bool cells    = false; // flag to specify cells output
    bool vtk      = false; // flag to specify vtk output
+   bool ssc      = false; // flag to specify spin-spin correlation
    bool txt      = false; // flag to specify plain text output
    bool x_vector = false; // flag to specify direction of povray colouring
    bool z_vector = false; // flag to specify plane for povray colouring
@@ -30,6 +31,7 @@ namespace vdc{
    // keyword variables
    std::string colour_keyword = "CBWR";
    std::string custom_colourmap_file;
+   std::vector<std::vector<double>> colourmap(256, std::vector<double>(3));
    bool x_axis_colour = false;
    std::string slice_type = "no-slice";
 
@@ -57,6 +59,7 @@ namespace vdc{
    // slice parameters for cutting the original system
    std::vector<double> slice_parameters = {0.0,1.0,0.0,1.0,0.0,1.0};
    std::vector<int> remove_materials(0);
+   std::vector<int> afm_materials(0);
    std::vector<int> atoms_list(0);
    std::vector<int> nm_atoms_list(0);
    std::vector<int> sliced_atoms_list(0);
@@ -74,12 +77,14 @@ namespace vdc{
    std::vector<double> nm_coordinates(0);
 
    // cell data
+   double cell_size = 10.0; // Angstroms
    unsigned int total_cells = 0;
    unsigned int nx_cells = 1;
    unsigned int ny_cells = 1;
    unsigned int nz_cells = 1;
 
    std::vector<int> atom_cell_id;
+   std::vector<int> num_atoms_in_cell;
    std::vector<double> cell_coords;
    std::vector< std::vector< std::vector <double> > > cell_magnetization;
 
@@ -87,5 +92,14 @@ namespace vdc{
    std::vector <std::string> coord_filenames(0);
    std::vector <std::string> spin_filenames(0);
    std::vector <std::string> nm_filenames(0);
+
+   // arrays for storing time-averaged spin-spin correlations
+   std::vector<double> ssc_counts(0); // number of counts
+   std::vector<double> ssc_correl(0); // sum of correlations
+   double ssc_magnetization; // sum snapshot magnetizations
+   double ssc_snapshots; // number of snapshots
+   double ssc_num_bins;  // number of bins for correlations
+   double ssc_bin_width; // width of each bin (Agstroms)
+   double ssc_inv_bin_width; // 1/bin width
 
 } // end of namespace vdc

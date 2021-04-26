@@ -15,6 +15,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 // Vampire headers
 #include "errors.hpp"
@@ -27,7 +28,7 @@ namespace stats{
 //------------------------------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------------------------------
-standard_deviation_statistic_t::standard_deviation_statistic_t (){}
+//standard_deviation_statistic_t::standard_deviation_statistic_t (){}
 
 //------------------------------------------------------------------------------------------------------
 // Function to initialize data structures
@@ -108,13 +109,14 @@ void standard_deviation_statistic_t::reset_averages(){
 std::string standard_deviation_statistic_t::output_standard_deviation(bool header){
 
    // result string stream
-   std::ostringstream result;
+   std::ostringstream res;
 
    // set custom precision if enabled
    if(vout::custom_precision){
-      result.precision(vout::precision);
-      if(vout::fixed) result.setf( std::ios::fixed, std::ios::floatfield );
+      res.precision(vout::precision);
+      if(vout::fixed) res.setf( std::ios::fixed, std::ios::floatfield );
    }
+   vout::fixed_width_output result(res,vout::fw_size); 
    if(!header){
        // determine inverse mean counter and its square
        const double imean_counter = 1.0/mean_counter;
@@ -127,13 +129,16 @@ std::string standard_deviation_statistic_t::output_standard_deviation(bool heade
           const double std_z = sqrt(residual_sq[4*id + 2]*imean_counter);
           const double std_m = sqrt(residual_sq[4*id + 3]*imean_counter);
 
-          result <<std_x << "\t" << std_y << "\t" << std_z << "\t" << std_m << "\t";
+          result <<std_x << std_y << std_z << std_m;
           //result <<std_x << "\t" <<std_y  << "\t" << std_z << "\t" << mean_counter << "\t";
           }
 
        }else{
           for(int id=0; id< num_elements -1; ++id){ // ignore last element as always contains non-magnetic atoms
-             result <<"ID"<<id<<"_std_x" << "\t" <<"ID"<<id<<"_std_y" << "\t" <<"ID"<<id<<"_std_z" << "\t"<<"ID"<<id<<"_std_l" << "\t";
+             result <<name + std::to_string(id) + "_std_x"
+                    <<name + std::to_string(id) + "_std_y" 
+                    <<name + std::to_string(id) + "_std_z"
+                    <<name + std::to_string(id) + "_std_l";
              }
        }
 
