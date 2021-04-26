@@ -109,9 +109,9 @@ namespace micromagnetic{
            }
 
            if (mp::material[mat].override_atomsitic[matj] == true){
-             double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
-             double Volume = cells::macro_cell_size_x*cells::macro_cell_size_y*cells::macro_cell_size_z;
-             double Ac2 = Ac;
+             //double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
+             //double Volume = cells::macro_cell_size_x*cells::macro_cell_size_y*cells::macro_cell_size_z;
+             //double Ac2 = Ac;
              Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]);
            }
         //   std::cout << cell << '\t' << cellj << '\t' << -Ac << '\t' <<  std::endl;
@@ -122,12 +122,12 @@ namespace micromagnetic{
          }
       }
 
-      const double stpx = sim::internal::slonczewski_spin_polarization_unit_vector[0];
-  		const double stpy = sim::internal::slonczewski_spin_polarization_unit_vector[1];
-  		const double stpz = sim::internal::slonczewski_spin_polarization_unit_vector[2];
+      const double stpx = 0.0; //sim::internal::slonczewski_spin_polarization_unit_vector[0];
+  		const double stpy = 0.0; //sim::internal::slonczewski_spin_polarization_unit_vector[1];
+  		const double stpz = 0.0; //sim::internal::slonczewski_spin_polarization_unit_vector[2];
 
-  		const double staj = sim::internal::slonczewski_aj[mat];
-  		const double stbj = sim::internal::slonczewski_bj[mat];
+  		const double staj = 0.0; //sim::internal::slonczewski_aj[mat];
+  		const double stbj = 0.0; //sim::internal::slonczewski_bj[mat];
 
   		// calculate field
   		double HSTTx = staj*(y_array[cell]*stpz - z_array[cell]*stpy) + stbj*stpx;

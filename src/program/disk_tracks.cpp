@@ -118,7 +118,7 @@ void create_tracks(){
    std::ifstream ifile;
    ifile.open("track_ms");
 
-   int i = 0;
+   //int i = 0;
 
    int track_num;
    int bit_num;
@@ -151,7 +151,7 @@ void create_tracks(){
 
    // temporary constants defining half sizes of bits
    const double xb = tp::bit_size*0.5;
-   const double yb = tp::bit_depth*0.5;
+   //const double yb = tp::bit_depth*0.5;
    const double zb = tp::bit_width*0.5;
 
    int bit = 0;
@@ -313,7 +313,7 @@ void tracks(){
     std::ifstream ifile;
     ifile.open("track_ms");
 
-    int i = 0;
+    //int i = 0;
 
     int track_num;
     int bit_num;
@@ -356,7 +356,7 @@ void tracks(){
 
    // temporary constants defining half sizes of bits
    const double xb = tp::bit_size*0.5;
-   const double yb = tp::bit_depth*0.5;
+   //const double yb = tp::bit_depth*0.5;
    const double zb = tp::bit_width*0.5;
 
    int bit = 0;
@@ -443,7 +443,7 @@ else {
 
    std::ofstream ofile;
    ofile.open ("position.txt");
-   int step = 0;
+   //int step = 0;
 
 
    double max = tp::Ms;

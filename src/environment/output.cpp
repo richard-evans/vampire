@@ -43,7 +43,7 @@ namespace environment{
             ml =  ml + Ms;
          }
 
-         double msat = ml;
+         //double msat = ml;
          double magm = sqrt(mx*mx + my*my + mz*mz);
          mx = mx/magm;
          my = my/magm;

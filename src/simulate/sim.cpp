@@ -867,7 +867,7 @@ void multiscale_simulation_steps(int n_steps){
          if (micromagnetic::number_of_atomistic_atoms > 0) micromagnetic::atomistic_LLG_Heun();
 
          //incremenet time
-         sim::increment_time();
+         sim::internal::increment_time();
       }
 
    }

@@ -62,11 +62,11 @@ bool in_shield(double x, double y, double z){
   else if (expoential_shields){
 
    // height of inner sensor region
-   const double stack_height = 200; // Angstroms
+   //const double stack_height = 200; // Angstroms
 
-   const double xr = x;
-   const double yr = y;
-   const double zr = z; // reduced height
+   //const double xr = x;
+   //const double yr = y;
+   //const double zr = z; // reduced height
 
 //   Bottom shield
   //  if(zr < 300.0 && zr > 0.0) return true;

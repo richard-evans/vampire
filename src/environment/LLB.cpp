@@ -151,7 +151,7 @@ namespace environment{
                }
 
 
-               const double kB = 1.3806503e-23;
+               //const double kB = 1.3806503e-23;
                std::vector<double> m(3,0.0);
                std::vector<double> spin_field(3,0.0);
 
@@ -181,12 +181,13 @@ namespace environment{
                //std::vector < double > mm_env_exchange(num_cells,0.0);
                //std::vector < double > env_mm_exchange(mm::num_cells,0.0);
 
-               for (int i = 0; i < environment::num_interactions; i ++ ){
-                  int mm_cell = environment::list_of_mm_cells_with_neighbours[i];
-                  int env_cell = environment::list_of_env_cells_with_neighbours[i];
-                  double overlap = list_of_overlap_area[i];
+               //for (int i = 0; i < environment::num_interactions; i ++ ){
+                  //int mm_cell = environment::list_of_mm_cells_with_neighbours[i];
+                  //int env_cell = environment::list_of_env_cells_with_neighbours[i];
+                  //double overlap = list_of_overlap_area[i];
 
-               }
+               //}
+
                if (sim::time%1000) env::output();
 
          return 0;

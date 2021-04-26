@@ -20,10 +20,7 @@
 #include "errors.hpp"
 #include "LLG.hpp"
 #include "material.hpp"
-
-//Function prototypes
-int calculate_spin_fields(const int,const int);
-int calculate_external_fields(const int,const int);
+#include "sim.hpp"
 
 namespace LLGQ_arrays{
 
@@ -147,8 +144,8 @@ void llg_quantum_step(){
 	}
 
 	// Calculate fields
-	calculate_spin_fields(0,num_atoms);
-	calculate_external_fields(0,num_atoms);
+	sim::calculate_spin_fields(0,num_atoms);
+	sim::calculate_external_fields(0,num_atoms);
 
 	// Calculate Euler Step
 	for(int atom=0;atom<num_atoms;atom++){
@@ -199,7 +196,7 @@ void llg_quantum_step(){
 	}
 
 	// Recalculate spin dependent fields
-	calculate_spin_fields(0,num_atoms);
+	sim::calculate_spin_fields(0,num_atoms);
 
 	// Calculate Heun Gradients
 	for(int atom=0;atom<num_atoms;atom++){

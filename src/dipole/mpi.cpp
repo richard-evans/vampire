@@ -557,8 +557,8 @@ namespace dipole{
          //    } //end else statement
          // }
 
-         const double is = sizeof(int);
-         const double ds = sizeof(double);
+         //const double is = sizeof(int);
+         //const double ds = sizeof(double);
 
          /*double mem_tot =  double(list_cpu_to_send_to.size())*is +
                            double(list_cells_to_send.size())*is +

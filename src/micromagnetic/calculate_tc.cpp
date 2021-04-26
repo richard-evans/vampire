@@ -44,7 +44,7 @@ namespace micromagnetic {
          #ifdef MPICF
              num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
           #else
-             num_atoms = num_atoms;
+             //num_atoms = num_atoms;
           #endif
 
          //-----------------------------------------------------------------------
@@ -65,10 +65,10 @@ namespace micromagnetic {
               const int mat   = type_array[atom];
               N[cell]++;
               for(int nn=start;nn<end;nn++){
-			       const int natom = atoms::neighbour_list_array[nn];
-              const int nmat   = type_array[atom];
-                const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij*mp::material[mat].mu_s_SI;
-                J[cell] = J[cell] +  Jij;
+			        //const int natom = atoms::neighbour_list_array[nn];
+                 //const int nmat   = type_array[atom];
+                 const double Jij=atoms::i_exchange_list[atoms::neighbour_interaction_type_array[nn]].Jij*mp::material[mat].mu_s_SI;
+                 J[cell] = J[cell] +  Jij;
               }
             }
 

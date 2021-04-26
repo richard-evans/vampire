@@ -215,7 +215,7 @@ namespace micromagnetic{
         std::vector < double > temp(num_cells,0);
 
 
-        int num_calculations = mm::fields_neighbouring_atoms_begin.size();
+        //int num_calculations = mm::fields_neighbouring_atoms_begin.size();
 
         for (int atom = 0; atom < num_atoms_interactions; atom ++){
            int mat = type_array[atom];
@@ -244,11 +244,11 @@ namespace micromagnetic{
 
         for (int cell = 0; cell < num_cells; cell++ ){
 
-           double zi = cells::pos_and_mom_array[4*cell+2];
+           //double zi = cells::pos_and_mom_array[4*cell+2];
             int mat = mm::cell_material_array[cell];
 
             if (mp::material[mat].pinning_field_unit_vector[0]+ mp::material[mat].pinning_field_unit_vector[1] + mp::material[mat].pinning_field_unit_vector[2]!= 0.0){
-              double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
+              //double Area = cells::macro_cell_size_x*cells::macro_cell_size_y;
             //  std::cout << mp::material[mat].pinning_field_unit_vector[0] << '\t' <<mp::material[mat].pinning_field_unit_vector[1] << '\t' << mp::material[mat].pinning_field_unit_vector[2] << '\t' << mm::ms[cell] << '\t' << Area << std::endl;
                mm::pinning_field_x[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[0];
                mm::pinning_field_y[cell] = mm::prefactor[mat]*mp::material[mat].pinning_field_unit_vector[1];
@@ -304,7 +304,7 @@ namespace micromagnetic{
 
         if (mm::bias_magnets == true){
 
-          int a = mm::calculate_bias_magnets(system_dimensions_x,system_dimensions_y,system_dimensions_z);
+          mm::calculate_bias_magnets(system_dimensions_x,system_dimensions_y,system_dimensions_z);
 
         }
         std::cout << "end of micromangetic initialisation" << std::endl;
