@@ -10,6 +10,8 @@ energy.o \
 field.o \
 fft_update.o \
 info.o \
+get_cells_properties.o \
+get_tensor.o \
 initialize.o \
 interface.o \
 inter.o \

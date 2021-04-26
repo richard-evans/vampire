@@ -236,6 +236,9 @@ int run(){
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
 
+   // Initialize GPU acceleration if enabled
+   if(gpu::acceleration) gpu::initialize();
+
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,
                      cells::num_cells,
@@ -290,8 +293,6 @@ int run(){
 
 
 	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
-
-
 
    // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){

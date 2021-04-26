@@ -19,6 +19,7 @@
 
 #include "exchange_fields.hpp"
 #include "statistics.hpp"
+#include "cuda_utils.hpp"
 
 #ifdef CUDA
 namespace cu = vcuda::internal;
@@ -47,39 +48,40 @@ namespace vcuda{
       void __finalize ()
       {
 
+         check_cuda_errors (__FILE__, __LINE__);
          std::cout << "CUDA time taken \t" << cuda_timer.seconds_elapsed() << std::endl;
          // De-allocate the exchange fields
          cu::exchange::finalise_exchange();
 
+         check_cuda_errors (__FILE__, __LINE__);
+         /*
          cu::atoms::x_spin_array.cu_real_array_t::~cu_real_array_t ();
          cu::atoms::y_spin_array.cu_real_array_t::~cu_real_array_t ();
          cu::atoms::z_spin_array.cu_real_array_t::~cu_real_array_t ();
+
          cu::atoms::x_coord_array.cu_real_array_t::~cu_real_array_t ();
          cu::atoms::y_coord_array.cu_real_array_t::~cu_real_array_t ();
          cu::atoms::z_coord_array.cu_real_array_t::~cu_real_array_t ();
+
          cu::atoms::type_array.cu_index_array_t::~cu_index_array_t ();
          cu::atoms::cell_array.cu_index_array_t::~cu_index_array_t ();
          cu::atoms::limits.cu_index_array_t::~cu_index_array_t ();
          cu::atoms::neighbours.cu_index_array_t::~cu_index_array_t ();
+
          cu::atoms::spin_norm_array.cu_real_array_t::~cu_real_array_t ();
-
-         exchange::Jxx_vals_d.cu_real_array_t::~cu_real_array_t ();
-         exchange::Jyy_vals_d.cu_real_array_t::~cu_real_array_t ();
-         exchange::Jzz_vals_d.cu_real_array_t::~cu_real_array_t ();
-
-         cu::exchange::J_xx_mat_d.cu_exch_mat_t::~cu_exch_mat_t ();
-         cu::exchange::J_yy_mat_d.cu_exch_mat_t::~cu_exch_mat_t ();
-         cu::exchange::J_zz_mat_d.cu_exch_mat_t::~cu_exch_mat_t ();
 
          cu::cells::x_coord_array.cu_real_array_t::~cu_real_array_t ();
          cu::cells::y_coord_array.cu_real_array_t::~cu_real_array_t ();
          cu::cells::z_coord_array.cu_real_array_t::~cu_real_array_t ();
+
          cu::cells::x_mag_array.cu_real_array_t::~cu_real_array_t ();
          cu::cells::y_mag_array.cu_real_array_t::~cu_real_array_t ();
          cu::cells::z_mag_array.cu_real_array_t::~cu_real_array_t ();
+
          cu::cells::x_field_array.cu_real_array_t::~cu_real_array_t ();
          cu::cells::y_field_array.cu_real_array_t::~cu_real_array_t ();
          cu::cells::z_field_array.cu_real_array_t::~cu_real_array_t ();
+
          cu::cells::volume_array.cu_real_array_t::~cu_real_array_t ();
          cu::cells::num_atoms.cu_index_array_t::~cu_index_array_t ();
 
@@ -88,9 +90,11 @@ namespace vcuda{
          cu::x_total_spin_field_array.cu_real_array_t::~cu_real_array_t ();
          cu::y_total_spin_field_array.cu_real_array_t::~cu_real_array_t ();
          cu::z_total_spin_field_array.cu_real_array_t::~cu_real_array_t ();
+
          cu::x_total_external_field_array.cu_real_array_t::~cu_real_array_t ();
          cu::y_total_external_field_array.cu_real_array_t::~cu_real_array_t ();
          cu::z_total_external_field_array.cu_real_array_t::~cu_real_array_t ();
+
          cu::x_dipolar_field_array.cu_real_array_t::~cu_real_array_t ();
          cu::y_dipolar_field_array.cu_real_array_t::~cu_real_array_t ();
          cu::z_dipolar_field_array.cu_real_array_t::~cu_real_array_t ();
@@ -119,6 +123,7 @@ namespace vcuda{
          cu::stats::material_height_mask.cu_index_array_t::~cu_index_array_t ();
          cu::stats::material_height_magnetization.cu_real_array_t::~cu_real_array_t ();
          cu::stats::material_height_mean_magnetization.cu_real_array_t::~cu_real_array_t ();
+         */
 
       }
    } /* internal */
