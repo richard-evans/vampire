@@ -32,8 +32,10 @@ namespace internal{
    // new type definitions
    #ifdef CUDA_DP
       typedef double cu_real_t;
+      const cudaDataType CUSPARSE_REAL = CUDA_R_64F;
    #else
       typedef float cu_real_t;
+      const cudaDataType CUSPARSE_REAL = CUDA_R_32F;
    #endif
 
    //typedef cusp::array1d<cu_real_t, cusp::device_memory> cu_real_array_t;

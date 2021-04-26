@@ -253,7 +253,7 @@ namespace vcuda
                                           //thrust::raw_pointer_cast(coo_cols_d.data()),
                                           //thrust::raw_pointer_cast(coo_vals_d.data()),
                                           CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
-                                          CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
+                                          CUSPARSE_INDEX_BASE_ZERO, CUSPARSE_REAL);
 
                  if (status != CUSPARSE_STATUS_SUCCESS) {
                      std::cerr << "Failed to initialsie sparse matrix descriptor!" << std::endl;
@@ -264,14 +264,14 @@ namespace vcuda
                  // Create the dense vector descriptors for the input and output (Y = A*X)
                  //cusparseCreateDnVec( &vecX, Ncols, thrust::raw_pointer_cast( spin3N.data()), CUDA_R_64F );
                  //cusparseCreateDnVec( &vecY, Nrows, thrust::raw_pointer_cast( field3N.data()), CUDA_R_64F );
-                 cusparseCreateDnVec( &vecX, Ncols, d_spin3n, CUDA_R_64F );
-                 cusparseCreateDnVec( &vecY, Nrows, d_field3n, CUDA_R_64F );
+                 cusparseCreateDnVec( &vecX, Ncols, d_spin3n, CUSPARSE_REAL );
+                 cusparseCreateDnVec( &vecY, Nrows, d_field3n, CUSPARSE_REAL );
 
                 // allocate an external buffer if needed
                 status = cusparseSpMV_bufferSize(handle,
                                     CUSPARSE_OPERATION_NON_TRANSPOSE,
                                     &alpha, J_matrix_d, vecX, &beta, vecY,
-                                    CUDA_R_64F,
+                                    CUSPARSE_REAL,
                                     CUSPARSE_CSRMV_ALG1,
                                     &buffer_size);
 
@@ -399,7 +399,7 @@ namespace vcuda
                                         vecX,
                                         &beta,
                                         vecY,
-                                        CUDA_R_64F,
+                                        CUSPARSE_REAL,
                                         CUSPARSE_CSRMV_ALG1,
                                         spmv_buffer_d);
 
