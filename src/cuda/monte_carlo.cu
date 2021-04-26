@@ -320,6 +320,9 @@ namespace vcuda
                         }
                         case hinzke_nowak:
                         {
+
+                            // const int pick_move=int(3.0*mtrandom::grnd());
+
                             switch(pick_move){
                                 case 0: // spin flip
                                     nsx = -sx;
