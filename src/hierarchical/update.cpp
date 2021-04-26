@@ -44,15 +44,22 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
    // update hierarchical magnetization in cells
    hierarchical::internal::calculate_hierarchical_magnetisation(x_spin_array, y_spin_array, z_spin_array, m_spin_array, magnetic);
 
- // instantiate timer
+   // instantiate timer
    vutil::vtimer_t timer;
 
- //   start timer
-    timer.start();
+   //   start timer
+   timer.start();
+
+   // new - for micromagnetic?
+   // for (int i = 0 ; i < cells::num_cells; i ++){
+   //    dipole::cells_field_array_x[i] = -100000.0;
+   //    dipole::cells_field_array_y[i] = -100000.0;
+   //    dipole::cells_field_array_z[i] = -100000.0;
+   // }
 
 	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
       int cell_i = cells::cell_id_array[lc];
-//   std::cout <<"C\t" << cell_i << '\t' << cells::mag_array_x[cell_i]*1.0/9.27400915e-24 <<'\t' << cells::mag_array_y[cell_i]*1.0/9.27400915e-24 <<'\t' << cells::mag_array_z[cell_i]*1.0/9.27400915e-24 <<std::endl;
+      //   std::cout <<"C\t" << cell_i << '\t' << cells::mag_array_x[cell_i]*1.0/9.27400915e-24 <<'\t' << cells::mag_array_y[cell_i]*1.0/9.27400915e-24 <<'\t' << cells::mag_array_z[cell_i]*1.0/9.27400915e-24 <<std::endl;
 
 
       const int start = ha::interaction_list_start_index[lc];
@@ -107,11 +114,25 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       dipole::cells_mu0Hd_field_array_z[cell_i] = dipole::cells_mu0Hd_field_array_z[cell_i] * 9.27400915e-01;
  //if (cell_i == 0) std::cout << sim::time << '\t' << cell_i << '\t' <<  dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
 
-}
+   }
+
+   // Parallel reduction - needed for micromagnetic??
+   // #ifdef MPICF
+   //    MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_x[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+   //    MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_y[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+   //    MPI_Allreduce(MPI_IN_PLACE, &dipole::cells_field_array_z[0],     dipole::internal::cells_num_cells,    MPI_DOUBLE,    MPI_MAX, MPI_COMM_WORLD);
+   // #endif
+   //
+   // for (int i = 0 ; i < dipole::internal::cells_num_cells; i++){
+   //    if (dipole::cells_field_array_x[i] < -1000) dipole::cells_field_array_x[i] = 0.0;
+   //    if (dipole::cells_field_array_y[i] < -1000) dipole::cells_field_array_y[i] = 0.0;
+   //    if (dipole::cells_field_array_z[i] < -1000) dipole::cells_field_array_z[i] = 0.0;
+   //    // std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
+   // }
    timer.stop();
-  //std::cout << "\tdone! [ " << timer.elapsed_time() << " s ]" << std::endl;
-// zlog << zTs() <<  "\tDIPOLE UPDATE. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
-std::cout << "dipole update time " << timer.elapsed_time() << " s" << std::endl;
+   //std::cout << "\tdone! [ " << timer.elapsed_time() << " s ]" << std::endl;
+   // zlog << zTs() <<  "\tDIPOLE UPDATE. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+   std::cout << "dipole update time " << timer.elapsed_time() << " s" << std::endl;
 
 
    return;
