@@ -11,6 +11,9 @@
 
 #include "monte_carlo.hpp"
 
+
+#include "../src/montecarlo/internal.hpp"
+
 #include <vector>
 
 namespace vcuda
@@ -187,7 +190,7 @@ namespace vcuda
 
 
                 cudaMalloc((void**)&d_rand_spin, 3*::atoms::num_atoms * sizeof(cu_real_t));
-                cudaMalloc((void**)&d_rand_accept, 3*::atoms::num_atoms * sizeof(cu_real_t));
+                cudaMalloc((void**)&d_rand_accept, ::atoms::num_atoms * sizeof(cu_real_t));
 
                 cudaMalloc((void**)&d_sl_atoms, ::atoms::num_atoms * sizeof(int));
                 cudaMalloc((void**)&d_accepted, ::atoms::num_atoms * sizeof(int));
@@ -208,6 +211,9 @@ namespace vcuda
                 cudaMemcpy(d_sl_atoms, h_sl_atoms.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
 
                 std::cout << "Trying a step..."<< std::endl;
+                std::cerr << ::atoms::x_spin_array[0] << "  ";
+                std::cerr << ::atoms::y_spin_array[0] << "  ";
+                std::cerr << ::atoms::z_spin_array[0] << std::endl;
 
                 __mc_step();
                 std::cout << "Done"<< std::endl;
@@ -237,9 +243,10 @@ namespace vcuda
                     cu_real_t *rand_spin,
                     cu_real_t *rand_accept,
                     int * accepted,
-                    cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
+                    cu_real_t * spin3n,
                     cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
-                    const cu_real_t step_size, const cu_real_t global_temperature, const size_t N){
+                    int *csr_rows, int* csr_cols, cu_real_t *vals,
+                    const cu_real_t step_size, const cu_real_t global_temperature, const int Natoms, const int N, ::montecarlo::algorithm_t algorithm){
 
                 // Loop over blocks for large systems > ~100k spins
                 for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -257,9 +264,9 @@ namespace vcuda
                     cu::material_parameters_t mat = material_params[mid];
 
                     // load spin direction to registers for later multiple reuse
-                    cu_real_t sx = x_spin[atom];
-                    cu_real_t sy = y_spin[atom];
-                    cu_real_t sz = z_spin[atom];
+                    cu_real_t sx = spin3n[atom];
+                    cu_real_t sy = spin3n[atom + Natoms];
+                    cu_real_t sz = spin3n[atom] + 2*Natoms;
 
                     // new spin direction
                     cu_real_t nsx, nsy, nsz;
@@ -267,61 +274,62 @@ namespace vcuda
                     // run chosen move type
                     // Select algorithm using case statement
 
-                    
-                    switch(montecarlo::algorithm){
 
-                        case adaptive:
-                        {      
-                            
+                    switch(algorithm){
+
+                        case ::montecarlo::adaptive:
+                        {
+
                             nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
                             nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
                             nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
-            
+
                             cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
-            
+
                             nsx /= mod_s;
                             nsy /= mod_s;
                             nsz /= mod_s;
                             break;
                         }
-                        case spin_flip:
+                        case ::montecarlo::spin_flip:
                             nsx = -sx;
                             nsy = -sy;
                             nsz = -sz;
                             break;
-                        
-                        case uniform:
-                        {      
+
+                        case ::montecarlo::uniform:
+                        {
                             nsx = rand_spin[atom];
                             nsy = rand_spin[atom+N];
                             nsz = rand_spin[atom+2*N];
-            
+
                             cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
-            
+
                             nsx /= mod_s;
                             nsy /= mod_s;
                             nsz /= mod_s;
                             break;
                         }
-                        
-                        case angle:
-                        {      
-                            
+
+                        case ::montecarlo::angle:
+                        {
+
                             nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
                             nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
                             nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
-            
+
                             cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
-            
+
                             nsx /= mod_s;
                             nsy /= mod_s;
                             nsz /= mod_s;
                             break;
                         }
-                        case hinzke_nowak:
+                        case ::montecarlo::hinzke_nowak:
                         {
 
                             // const int pick_move=int(3.0*mtrandom::grnd());
+                            const int pick_move = 1;
 
                             switch(pick_move){
                                 case 0: // spin flip
@@ -330,42 +338,42 @@ namespace vcuda
                                     nsz = -sz;
                                     break;
                                 case 1: // uniform
-                                {      
+                                {
                                     nsx = rand_spin[atom];
                                     nsy = rand_spin[atom+N];
                                     nsz = rand_spin[atom+2*N];
-                    
+
                                     cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
-                    
+
                                     nsx /= mod_s;
                                     nsy /= mod_s;
                                     nsz /= mod_s;
                                     break;
                                 }
-                                
-                                case 2: // angle 
-                                {      
-                            
+
+                                case 2: // angle
+                                {
+
                                     nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
                                     nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
                                     nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
-                    
+
                                     cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
-                    
+
                                     nsx /= mod_s;
                                     nsy /= mod_s;
                                     nsz /= mod_s;
                                     break;
                                 }
                                 default: // angle
-                                {      
-                            
+                                {
+
                                     nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
                                     nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
                                     nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::delta_angle;
-                    
+
                                     cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
-                    
+
                                     nsx /= mod_s;
                                     nsy /= mod_s;
                                     nsz /= mod_s;
@@ -375,14 +383,14 @@ namespace vcuda
                             break;
                         }
                         default: // adaptive
-                        {      
-                            
+                        {
+
                             nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
                             nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
                             nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
-            
+
                             cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
-            
+
                             nsx /= mod_s;
                             nsy /= mod_s;
                             nsz /= mod_s;
@@ -390,19 +398,44 @@ namespace vcuda
                         }
                     }
 
+                    nsx = rand_spin[atom];      // old_spin[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+                    nsy = rand_spin[atom+N];    // old_spin[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+                    nsz = rand_spin[atom+2*N];  // old_spin[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+
+                    cu_real_t mod_s = sqrt(nsx*nsx + nsy*nsy + nsz*nsz);
+
+                    nsx /= mod_s;
+                    nsy /= mod_s;
+                    nsz /= mod_s;
+
                     // Calculate current energy
                     cu_real_t Eold = ::vcuda::internal::uniaxial_anisotropy_energy(mat, sx, sy, sz);
                     cu_real_t Enew = ::vcuda::internal::uniaxial_anisotropy_energy(mat, nsx, nsy, nsz);
 
-                    cu_real_t dE = (Enew - Eold)/(1.38064852e-23*global_temperature);
+                    cu_real_t hx = ::vcuda::internal::exchange::exchange_field_component(csr_cols, csr_rows, vals, spin3n, atom);
+                    cu_real_t hy = ::vcuda::internal::exchange::exchange_field_component(csr_cols, csr_rows, vals, spin3n, atom+Natoms);
+                    cu_real_t hz = ::vcuda::internal::exchange::exchange_field_component(csr_cols, csr_rows, vals, spin3n, atom+2*Natoms);
+
+
+                    cu_real_t dEx = -0.5*mat.mu_s_si*((nsx-sx)*hx + (nsy-sy)*hy + (nsz - sz)*hz);
+
+
+                    cu_real_t dE = (Enew - Eold + dEx)/(1.38064852e-23*global_temperature);
 
                     cu_real_t r_accept = rand_accept[atom];
-                    if ( r_accept < exp(-dE) ){
-                        x_spin[atom] = nsx;
-                        y_spin[atom] = nsy;
-                        z_spin[atom] = nsz;
+                    if ( r_accept <= exp(-dE) ){
+                        spin3n[atom] = nsx;
+                        spin3n[atom+Natoms] = nsy;
+                        spin3n[atom+2*Natoms] = nsz;
                         accepted[i + sl_start] = 1;
                     }
+                    x_ext_field[atom] = r_accept;
+                    y_ext_field[atom] = dEx;
+                    z_ext_field[atom] = exp(-dE);
+                    x_ext_field[atom] = hx;
+                    y_ext_field[atom] = hy;
+                    z_ext_field[atom] = hz;
+
                 }
             }
 
@@ -411,14 +444,19 @@ namespace vcuda
                 // Check for cuda errors in file, line
                 check_cuda_errors (__FILE__, __LINE__);
 
+                cudaMemcpy(cu::exchange::d_spin3n, 				            cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::exchange::d_spin3n + ::atoms::num_atoms, 	cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+
                 // generate 3 random doubles per atom
                 curandGenerateNormalDouble( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
-                curandGenerateUniformDouble( gen, d_rand_accept, 3*::atoms::num_atoms);
+                curandGenerateUniformDouble( gen, d_rand_accept, ::atoms::num_atoms);
 
                 cudaMemset(d_accepted, 0, ::atoms::num_atoms*sizeof(int));
 
                 // Calculate external fields (fixed for integration step)
                 cu::update_external_fields ();
+
 
                 //Iterate over all the sublattices
                 for( int i = 0; i < M; i++){
@@ -429,14 +467,32 @@ namespace vcuda
                             ::cu::atoms::d_materials, cu::mp::d_material_params,
                             d_rand_spin, d_rand_accept,
                             d_accepted,
-                            ::cu::atoms::d_x_spin, ::cu::atoms::d_y_spin, ::cu::atoms::d_z_spin,
+                            ::cu::exchange::d_spin3n,
                             ::cu::d_x_external_field, ::cu::d_y_external_field, ::cu::d_z_external_field,
-                            step_size, sim::temperature, colour_list[i].size());
+                            ::vcuda::internal::exchange::d_csr_rows, ::vcuda::internal::exchange::d_coo_cols, ::vcuda::internal::exchange::d_coo_vals,
+                            step_size, sim::temperature, colour_list[i].size(), ::atoms::num_atoms, ::montecarlo::algorithm);
 
 
 
 
                 }
+
+                cudaMemcpy(cu::atoms::d_x_spin, cu::exchange::d_spin3n, 				            ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::atoms::d_y_spin, cu::exchange::d_spin3n + ::atoms::num_atoms, 		::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::atoms::d_z_spin, cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, 	::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+
+
+                //Output debugging
+                //std::vector<double> hx, hy, hz;
+                //hx.resize(::atoms::num_atoms);
+                //hy.resize(::atoms::num_atoms);
+                //hz.resize(::atoms::num_atoms);
+                //cudaMemcpy(hx.data(), cu::d_x_external_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+                //cudaMemcpy(hy.data(), cu::d_y_external_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+                //cudaMemcpy(hz.data(), cu::d_z_external_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+
+                //std::cerr << hx[0] << "  " << hy[0] << "  " << hz[0] << std::endl;
+
             }
         }
     }

@@ -74,6 +74,9 @@ namespace vcuda{
       void update_dipolar_fields ();
       void update_cell_magnetizations ();
 
+
+
+
       /*
        * Shared device functions
        */
