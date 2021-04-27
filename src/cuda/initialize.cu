@@ -483,8 +483,8 @@ namespace vcuda{
          cudaMalloc((void**)&cu::cells::d_z_cell_mu0H_field, ::cells::num_cells * sizeof(cu_real_t));
 
          cudaMemcpy(cu::cells::d_x_cell_mu0H_field, ::dipole::cells_mu0Hd_field_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_y_cell_mu0H_field, ::dipole::cells_mu0Hd_field_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_z_cell_mu0H_field, ::dipole::cells_mu0Hd_field_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_y_cell_mu0H_field, ::dipole::cells_mu0Hd_field_array_y.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_z_cell_mu0H_field, ::dipole::cells_mu0Hd_field_array_z.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
 
          /*
          cu::cells::x_field_array.resize(::cells::num_cells);

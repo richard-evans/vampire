@@ -34,8 +34,6 @@ namespace internal{
 
 void update_dipolar_fields ()
 {
-    std::cout << "update_dipolar_field() called" << std::endl;
-
    // check if dipole calculation is enabled
    if(!::dipole::activated) return;
 
@@ -131,7 +129,9 @@ void update_dipolar_fields ()
       */
    update_atomistic_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
          cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
+         cu::cells::d_x_cell_mu0H_field, cu::cells::d_y_cell_mu0H_field, cu::cells::d_z_cell_mu0H_field,
          cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
+         cu::d_x_mu0H_dip_field, cu::d_y_mu0H_dip_field, cu::d_z_mu0H_dip_field,
          cu::atoms::d_cells,
          ::atoms::num_atoms
          );
@@ -358,7 +358,9 @@ __global__ void update_dipolar_fields (
 
 __global__ void update_atomistic_dipolar_fields (
       cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
+      cu_real_t * x_cell_mu0H_field, cu_real_t * y_cell_mu0H_field, cu_real_t * z_cell_mu0H_field,
       cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+      cu_real_t * x_mu0H_dip_field, cu_real_t * y_mu0H_dip_field, cu_real_t * z_mu0H_dip_field,
       int * cell, int n_atoms
       )
 {
@@ -375,6 +377,10 @@ __global__ void update_atomistic_dipolar_fields (
       x_dip_field[i] = x_cell_field[cid];
       y_dip_field[i] = y_cell_field[cid];
       z_dip_field[i] = z_cell_field[cid];
+
+      x_mu0H_dip_field[i] = x_cell_mu0H_field[cid];
+      y_mu0H_dip_field[i] = y_cell_mu0H_field[cid];
+      z_mu0H_dip_field[i] = z_cell_mu0H_field[cid];
    }
 }
 
