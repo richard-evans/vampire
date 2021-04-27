@@ -35,7 +35,6 @@ namespace montecarlo{
       // Shared variables inside montecarlo module
       //------------------------------------------------------------------------
 
-
       // Materials variables
       int num_materials;
       std::vector<double> temperature_rescaling_alpha;
