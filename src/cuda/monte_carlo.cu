@@ -297,7 +297,7 @@ namespace vcuda
 
                         case ::montecarlo::adaptive:
                         {
-                            // TODO add in adaptive_sigma 
+                            // TODO add in adaptive_sigma
                             nsx = sx + rand_spin[atom]; // * montecarlo::internal::adaptive_sigma;
                             nsy = sy + rand_spin[atom+N]; // * montecarlo::internal::adaptive_sigma;
                             nsz = sz + rand_spin[atom+2*N]; // * montecarlo::internal::adaptive_sigma;
@@ -478,7 +478,7 @@ namespace vcuda
                     cu_real_t hz = ::vcuda::internal::exchange::exchange_field_component(csr_cols, csr_rows, vals, spin3n, atom+2*Natoms);
 
 
-                    cu_real_t dEx = -0.5*mat.mu_s_si*((nsx-sx)*hx + (nsy-sy)*hy + (nsz - sz)*hz);
+                    cu_real_t dEx = -mat.mu_s_si*((nsx-sx)*hx + (nsy-sy)*hy + (nsz - sz)*hz);
 
 
                     cu_real_t dE = (Enew - Eold + dEx)/(1.38064852e-23*global_temperature);
