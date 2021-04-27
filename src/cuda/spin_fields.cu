@@ -79,7 +79,7 @@ __device__ cu_real_t uniaxial_anisotropy_energy(cu::material_parameters_t &mater
 
       cu_real_t sdote = sx * ex + sy * ey + sz * ez;
 
-      cu_real_t k2 = material.sh2 * material.i_mu_s_si;
+      cu_real_t k2 = material.sh2 * material.mu_s_si;
       cu_real_t E = -k2 * sdote * sdote;
 
       return E;

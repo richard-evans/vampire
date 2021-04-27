@@ -12,6 +12,7 @@
 #include "montecarlo.hpp"
 #include "monte_carlo.hpp"
 
+
 #include <vector>
 
 namespace vcuda

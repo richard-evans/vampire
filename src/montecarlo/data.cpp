@@ -45,7 +45,7 @@ namespace montecarlo{
       double delta_angle = 0.1;     // Tuned angle for Monte Carlo trial move
       double adaptive_sigma = 60.0; // sigma trial width for adaptive move
       std::vector<double> Sold(3);
-   	std::vector<double> Snew(3);
+      std::vector<double> Snew(3);
 
       //MC-MPI variables
       std::vector<std::vector<int> > c_octants; //Core atoms of each octant
