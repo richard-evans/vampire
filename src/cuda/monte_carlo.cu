@@ -247,7 +247,7 @@ namespace vcuda
                     cu_real_t * spin3n,
                     cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
                     int *csr_rows, int* csr_cols, cu_real_t *vals,
-                    const cu_real_t step_size, const cu_real_t global_temperature, const int Natoms, const int N, ::montecarlo::algorithm_t algorithm){
+                    const cu_real_t step_size, const cu_real_t global_temperature, const int N, const int Natoms, ::montecarlo::algorithm_t algorithm){
 
                 // Loop over blocks for large systems > ~100k spins
                 for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -284,7 +284,7 @@ namespace vcuda
                     // load spin direction to registers for later multiple reuse
                     cu_real_t sx = spin3n[atom];
                     cu_real_t sy = spin3n[atom + Natoms];
-                    cu_real_t sz = spin3n[atom] + 2*Natoms;
+                    cu_real_t sz = spin3n[atom + 2*Natoms];
 
                     // new spin direction
                     cu_real_t nsx, nsy, nsz;
@@ -453,6 +453,20 @@ namespace vcuda
                             break;
                         }
                     }
+                    nsx = rand_spin[atom];      // sx[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+                    nsy = rand_spin[atom+N];    // sx[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+                    nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
+
+                    // find length using appropriate device sqrt function
+#ifdef CUDA_DP
+                    double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+#else
+                    float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+#endif
+
+                    nsx *= mod_s;
+                    nsy *= mod_s;
+                    nsz *= mod_s;
 
                     // Calculate current energy
                     cu_real_t Eold = ::vcuda::internal::uniaxial_anisotropy_energy(mat, sx, sy, sz);
@@ -471,21 +485,22 @@ namespace vcuda
                     cu_real_t r_accept = rand_accept[atom];
 
                     #ifdef CUDA_DP
-                        if ( r_accept < exp(-dE) ){
+                    if ( r_accept < exp(-dE) ){
                     #else
-                        if ( r_accept < __expf(-dE) ){
+                    if ( r_accept < __expf(-dE) ){
                     #endif
                         spin3n[atom] = nsx;
                         spin3n[atom+Natoms] = nsy;
                         spin3n[atom+2*Natoms] = nsz;
                         accepted[i + sl_start] = 1;
                     }
-                    x_ext_field[atom] = r_accept;
-                    y_ext_field[atom] = dEx;
-                    z_ext_field[atom] = exp(-dE);
-                    x_ext_field[atom] = hx;
-                    y_ext_field[atom] = hy;
-                    z_ext_field[atom] = hz;
+                    //x_ext_field[atom] = rand_accept[atom];
+                    //y_ext_field[atom] = rand_spin[atom];
+                    //z_ext_field[atom] = rand_spin[atom+Natoms];
+                    //x_ext_field[atom] = hx;
+                    //y_ext_field[atom] = hy;
+                    //z_ext_field[atom] = hz;
+
 
                 }
             }
@@ -503,10 +518,19 @@ namespace vcuda
                 curandGenerateNormalDouble( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
                 curandGenerateUniformDouble( gen, d_rand_accept, ::atoms::num_atoms);
 
+
+                cudaThreadSynchronize();
+                cudaError_t error = cudaGetLastError();
+                if(error != cudaSuccess)
+                {
+                    printf("CUDA error at %s:%i: %s\n", __FILE__, __LINE__, cudaGetErrorString(error));
+                    exit(-1);
+                }
+
                 cudaMemset(d_accepted, 0, ::atoms::num_atoms*sizeof(int));
 
                 // Calculate external fields (fixed for integration step)
-                cu::update_external_fields ();
+                //cu::update_external_fields ();
 
 
                 //Iterate over all the sublattices
