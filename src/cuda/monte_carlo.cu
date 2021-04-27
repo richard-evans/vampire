@@ -13,6 +13,8 @@
 #include "monte_carlo.hpp"
 
 
+#include "../src/montecarlo/internal.hpp"
+
 #include <vector>
 
 namespace vcuda
@@ -189,7 +191,7 @@ namespace vcuda
 
 
                 cudaMalloc((void**)&d_rand_spin, 3*::atoms::num_atoms * sizeof(cu_real_t));
-                cudaMalloc((void**)&d_rand_accept, 3*::atoms::num_atoms * sizeof(cu_real_t));
+                cudaMalloc((void**)&d_rand_accept, ::atoms::num_atoms * sizeof(cu_real_t));
 
                 cudaMalloc((void**)&d_sl_atoms, ::atoms::num_atoms * sizeof(int));
                 cudaMalloc((void**)&d_accepted, ::atoms::num_atoms * sizeof(int));
@@ -210,6 +212,9 @@ namespace vcuda
                 cudaMemcpy(d_sl_atoms, h_sl_atoms.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
 
                 std::cout << "Trying a step..."<< std::endl;
+                std::cerr << ::atoms::x_spin_array[0] << "  ";
+                std::cerr << ::atoms::y_spin_array[0] << "  ";
+                std::cerr << ::atoms::z_spin_array[0] << std::endl;
 
                 __mc_step();
                 std::cout << "Done"<< std::endl;
@@ -239,9 +244,10 @@ namespace vcuda
                     cu_real_t *rand_spin,
                     cu_real_t *rand_accept,
                     int * accepted,
-                    cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin,
+                    cu_real_t * spin3n,
                     cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
-                    const cu_real_t step_size, const cu_real_t global_temperature, const size_t N){
+                    int *csr_rows, int* csr_cols, cu_real_t *vals,
+                    const cu_real_t step_size, const cu_real_t global_temperature, const int Natoms, const int N, ::montecarlo::algorithm_t algorithm){
 
                 // Loop over blocks for large systems > ~100k spins
                 for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -259,7 +265,7 @@ namespace vcuda
                     cu::material_parameters_t mat = material_params[mid];
 
                     // material dependent temperature rescaling
-                    // this probably needs to be move outside of monte_carlo_sublattice_step and sigma given as parameter
+                     // this probably needs to be move outside of monte_carlo_sublattice_step and sigma given as parameter
                     cu_real_t alpha = mat.temperature_rescaling_alpha;
                     cu_real_t Tc    = mat.temperature_rescaling_Tc;
                     #ifdef CUDA_DP
@@ -268,7 +274,7 @@ namespace vcuda
                         cu_real_t rescaled_temperature = global_temperature < Tc ? Tc*__fpow(global_temperature/Tc,alpha) : global_temperature;
                     #endif
                     cu_real_t rescaled_material_kBTBohr = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
-                    sigma = rescaled_temperature < 1.0 ? 0.02 :
+
                     #ifdef CUDA_DP
                         cu_real_t sigma = rescaled_temperature < 1.0 ? 0.02 : pow(1.0/rescaled_material_kBTBohr,0.2)*0.08;
                     #else
@@ -276,9 +282,9 @@ namespace vcuda
                     #endif
 
                     // load spin direction to registers for later multiple reuse
-                    cu_real_t sx = x_spin[atom];
-                    cu_real_t sy = y_spin[atom];
-                    cu_real_t sz = z_spin[atom];
+                    cu_real_t sx = spin3n[atom];
+                    cu_real_t sy = spin3n[atom + Natoms];
+                    cu_real_t sz = spin3n[atom] + 2*Natoms;
 
                     // new spin direction
                     cu_real_t nsx, nsy, nsz;
@@ -286,81 +292,81 @@ namespace vcuda
                     // run chosen move type
                     // Select algorithm using case statement
 
-                    
-                    switch(montecarlo::algorithm){ // need to move montecarlo::algorithm to device
 
-                        case adaptive:
-                        {      
-                            
+                    switch(algorithm){ // need to move montecarlo::algorithm to device
+
+                        case ::montecarlo::adaptive:
+                        {
+
                             nsx = rand_spin[atom];      // sx[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
                             nsy = rand_spin[atom+N];    // sx[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
                             nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
-            
+
                             // find length using appropriate device sqrt function
                             #ifdef CUDA_DP
                                 double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #else
                                 float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #endif
-                                
-                            
-            
+
+
+
                             nsx *= mod_s;
                             nsy *= mod_s;
                             nsz *= mod_s;
                             break;
                         }
-                        case spin_flip:
+                        case ::montecarlo::spin_flip:
                             nsx = -sx;
                             nsy = -sy;
                             nsz = -sz;
                             break;
-                        
-                        case uniform:
-                        {      
+
+                        case ::montecarlo::uniform:
+                        {
                             nsx = rand_spin[atom];
                             nsy = rand_spin[atom+N];
                             nsz = rand_spin[atom+2*N];
-            
+
                             // find length using appropriate device sqrt function
                             #ifdef CUDA_DP
                                 double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #else
                                 float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #endif
-            
-                            nsx *= mod_s;
-                            nsy *= mod_s;
-                            nsz *= mod_s;
-                            break;
-                        }
-                        
-                        case angle:
-                        {      
-                            
-                            nsx = rand_spin[atom];      // sx[0] + mtrandom::gaussian() * sigma;
-                            nsy = rand_spin[atom+N];    // sx[1] + mtrandom::gaussian() * sigma;
-                            nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * sigma;
-            
-                            // find length using appropriate device sqrt function
-                            #ifdef CUDA_DP
-                                double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
-                            #else
-                                float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
-                            #endif
-            
+
                             nsx *= mod_s;
                             nsy *= mod_s;
                             nsz *= mod_s;
                             break;
                         }
 
-                        case hinzke_nowak:
+                        case ::montecarlo::angle:
+                        {
+
+                            nsx = rand_spin[atom];      // sx[0] + mtrandom::gaussian() * sigma;
+                            nsy = rand_spin[atom+N];    // sx[1] + mtrandom::gaussian() * sigma;
+                            nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * sigma;
+
+                            // find length using appropriate device sqrt function
+                            #ifdef CUDA_DP
+                                double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                            #else
+                                float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                            #endif
+
+                            nsx *= mod_s;
+                            nsy *= mod_s;
+                            nsz *= mod_s;
+                            break;
+                        }
+
+                        case ::montecarlo::hinzke_nowak:
                         {
 
                             // const int pick_move=int(3.0*mtrandom::grnd());
                             // mtrandom::grnd() is a random number in the half open interval [1,0)
-
+                            int pick_move = 1;
                             switch(pick_move){
                                 case 0: // spin flip
                                     nsx = -sx;
@@ -368,57 +374,57 @@ namespace vcuda
                                     nsz = -sz;
                                     break;
                                 case 1: // uniform
-                                {      
+                                {
                                     nsx = rand_spin[atom];
                                     nsy = rand_spin[atom+N];
                                     nsz = rand_spin[atom+2*N];
-                    
+
                                     // find length using appropriate device sqrt function
                                     #ifdef CUDA_DP
                                         double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #else
                                         float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #endif
-                    
+
                                     nsx *= mod_s;
                                     nsy *= mod_s;
                                     nsz *= mod_s;
                                     break;
                                 }
-                                
-                                case 2: // angle 
-                                {      
-                            
+
+                                case 2: // angle
+                                {
+
                                     nsx = rand_spin[atom];      // sx[0] + mtrandom::gaussian() * sigma;
                                     nsy = rand_spin[atom+N];    // sx[1] + mtrandom::gaussian() * sigma;
                                     nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * sigma;
-                    
+
                                     // find length using appropriate device sqrt function
                                     #ifdef CUDA_DP
                                         double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #else
                                         float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #endif
-                    
+
                                     nsx *= mod_s;
                                     nsy *= mod_s;
                                     nsz *= mod_s;
                                     break;
                                 }
                                 default: // angle
-                                {      
-                            
+                                {
+
                                     nsx = rand_spin[atom];      // sx[0] + mtrandom::gaussian() * sigma;
                                     nsy = rand_spin[atom+N];    // sx[1] + mtrandom::gaussian() * sigma;
                                     nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * sigma;
-                    
+
                                     // find length using appropriate device sqrt function
                                     #ifdef CUDA_DP
                                         double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #else
                                         float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #endif
-                    
+
                                     nsx *= mod_s;
                                     nsy *= mod_s;
                                     nsz *= mod_s;
@@ -428,19 +434,19 @@ namespace vcuda
                             break;
                         }
                         default: // adaptive
-                        {      
-                            
+                        {
+
                             nsx = rand_spin[atom];      // sx[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
                             nsy = rand_spin[atom+N];    // sx[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
                             nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
-            
+
                             // find length using appropriate device sqrt function
                             #ifdef CUDA_DP
                                 double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #else
                                 float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #endif
-            
+
                             nsx *= mod_s;
                             nsy *= mod_s;
                             nsz *= mod_s;
@@ -452,19 +458,35 @@ namespace vcuda
                     cu_real_t Eold = ::vcuda::internal::uniaxial_anisotropy_energy(mat, sx, sy, sz);
                     cu_real_t Enew = ::vcuda::internal::uniaxial_anisotropy_energy(mat, nsx, nsy, nsz);
 
-                    cu_real_t dE = (Enew - Eold)/(1.38064852e-23*global_temperature);
+                    cu_real_t hx = ::vcuda::internal::exchange::exchange_field_component(csr_cols, csr_rows, vals, spin3n, atom);
+                    cu_real_t hy = ::vcuda::internal::exchange::exchange_field_component(csr_cols, csr_rows, vals, spin3n, atom+Natoms);
+                    cu_real_t hz = ::vcuda::internal::exchange::exchange_field_component(csr_cols, csr_rows, vals, spin3n, atom+2*Natoms);
+
+
+                    cu_real_t dEx = -0.5*mat.mu_s_si*((nsx-sx)*hx + (nsy-sy)*hy + (nsz - sz)*hz);
+
+
+                    cu_real_t dE = (Enew - Eold + dEx)/(1.38064852e-23*global_temperature);
 
                     cu_real_t r_accept = rand_accept[atom];
+
                     #ifdef CUDA_DP
                         if ( r_accept < exp(-dE) ){
                     #else
                         if ( r_accept < __expf(-dE) ){
                     #endif
-                        x_spin[atom] = nsx;
-                        y_spin[atom] = nsy;
-                        z_spin[atom] = nsz;
+                        spin3n[atom] = nsx;
+                        spin3n[atom+Natoms] = nsy;
+                        spin3n[atom+2*Natoms] = nsz;
                         accepted[i + sl_start] = 1;
                     }
+                    x_ext_field[atom] = r_accept;
+                    y_ext_field[atom] = dEx;
+                    z_ext_field[atom] = exp(-dE);
+                    x_ext_field[atom] = hx;
+                    y_ext_field[atom] = hy;
+                    z_ext_field[atom] = hz;
+
                 }
             }
 
@@ -473,14 +495,19 @@ namespace vcuda
                 // Check for cuda errors in file, line
                 check_cuda_errors (__FILE__, __LINE__);
 
+                cudaMemcpy(cu::exchange::d_spin3n, 				            cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::exchange::d_spin3n + ::atoms::num_atoms, 	cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+
                 // generate 3 random doubles per atom
                 curandGenerateNormalDouble( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
-                curandGenerateUniformDouble( gen, d_rand_accept, 3*::atoms::num_atoms);
+                curandGenerateUniformDouble( gen, d_rand_accept, ::atoms::num_atoms);
 
                 cudaMemset(d_accepted, 0, ::atoms::num_atoms*sizeof(int));
 
                 // Calculate external fields (fixed for integration step)
                 cu::update_external_fields ();
+
 
                 //Iterate over all the sublattices
                 for( int i = 0; i < M; i++){
@@ -491,11 +518,29 @@ namespace vcuda
                             ::cu::atoms::d_materials, cu::mp::d_material_params,
                             d_rand_spin, d_rand_accept,
                             d_accepted,
-                            ::cu::atoms::d_x_spin, ::cu::atoms::d_y_spin, ::cu::atoms::d_z_spin,
+                            ::cu::exchange::d_spin3n,
                             ::cu::d_x_external_field, ::cu::d_y_external_field, ::cu::d_z_external_field,
-                            step_size, sim::temperature, colour_list[i].size());
+                            ::vcuda::internal::exchange::d_csr_rows, ::vcuda::internal::exchange::d_coo_cols, ::vcuda::internal::exchange::d_coo_vals,
+                            step_size, sim::temperature, colour_list[i].size(), ::atoms::num_atoms, ::montecarlo::algorithm);
 
                 }
+
+                cudaMemcpy(cu::atoms::d_x_spin, cu::exchange::d_spin3n, 				            ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::atoms::d_y_spin, cu::exchange::d_spin3n + ::atoms::num_atoms, 		::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                cudaMemcpy(cu::atoms::d_z_spin, cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, 	::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+
+
+                //Output debugging
+                //std::vector<double> hx, hy, hz;
+                //hx.resize(::atoms::num_atoms);
+                //hy.resize(::atoms::num_atoms);
+                //hz.resize(::atoms::num_atoms);
+                //cudaMemcpy(hx.data(), cu::d_x_external_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+                //cudaMemcpy(hy.data(), cu::d_y_external_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+                //cudaMemcpy(hz.data(), cu::d_z_external_field, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+
+                //std::cerr << hx[0] << "  " << hy[0] << "  " << hz[0] << std::endl;
+
             }
         }
     }
