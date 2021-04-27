@@ -34,6 +34,7 @@ namespace internal{
 
 void update_dipolar_fields ()
 {
+    std::cout << "update_dipolar_field() called" << std::endl;
 
    // check if dipole calculation is enabled
    if(!::dipole::activated) return;
@@ -136,6 +137,9 @@ void update_dipolar_fields ()
          );
 
    check_cuda_errors (__FILE__, __LINE__);
+   
+   // Transfer cells dipolar fields from gpu to cpu
+   vcuda::transfer_dipole_cells_fields_from_gpu_to_cpu();
 }
 
 void update_cell_magnetizations ()
