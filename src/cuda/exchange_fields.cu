@@ -53,9 +53,9 @@ namespace vcuda
         //cu_index_array_t coo_cols_d;
         //cu_real_array_t  coo_vals_d;
 
-         int Nrows = 0;
-         int Ncols = 0;
-         int Nnz = 0;
+         size_t Nrows = 0;
+         size_t Ncols = 0;
+         size_t Nnz = 0;
 
          // CUSPARSE contex handle and error
          cusparseHandle_t handle=0;
@@ -73,7 +73,7 @@ namespace vcuda
          void sort_coo_list(std::vector<int> &rows, std::vector<int> &cols, std::vector<cu_real_t> &vals, const size_t Nrows, const size_t Ncols )
          {
              // Create a list of id-value pairs
-             std::vector< std::pair<int, cu_real_t> > list;
+             std::vector< std::pair<size_t, cu_real_t> > list;
 
              // Calculate the row major order index and create pair list
              for ( size_t i = 0; i < vals.size(); i++ ) {

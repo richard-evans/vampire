@@ -166,10 +166,10 @@ namespace vcuda{
          cu::atoms::y_spin_array.resize(::atoms::num_atoms);
          cu::atoms::z_spin_array.resize(::atoms::num_atoms);
          */
-
+        
          size_t num_bytes = ::atoms::num_atoms * sizeof(cu_real_t);
 
-         cudaMalloc((void**)&cu::atoms::d_x_spin, num_bytes);
+	 cudaMalloc((void**)&cu::atoms::d_x_spin, num_bytes);
          cudaMalloc((void**)&cu::atoms::d_y_spin, num_bytes);
          cudaMalloc((void**)&cu::atoms::d_z_spin, num_bytes);
          /* Need to be careful here
