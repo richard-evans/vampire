@@ -34,10 +34,13 @@ namespace vcuda{
 //------------------------------------------------------------------------------
 void transfer_spin_positions_from_gpu_to_cpu(){
 
-   cudaMemcpy(::atoms::x_spin_array.data(), cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
-   cudaMemcpy(::atoms::y_spin_array.data(), cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
-   cudaMemcpy(::atoms::z_spin_array.data(), cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
-   
+   cudaMemcpy(internal::h_x_spin_transfer_buffer, internal::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+   cudaMemcpy(internal::h_y_spin_transfer_buffer, internal::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+   cudaMemcpy(internal::h_z_spin_transfer_buffer, internal::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyDeviceToHost);
+
+   std::copy(internal::h_x_spin_transfer_buffer, internal::h_x_spin_transfer_buffer + ::atoms::num_atoms, ::atoms::x_spin_array.begin());
+   std::copy(internal::h_y_spin_transfer_buffer, internal::h_y_spin_transfer_buffer + ::atoms::num_atoms, ::atoms::y_spin_array.begin());
+   std::copy(internal::h_z_spin_transfer_buffer, internal::h_z_spin_transfer_buffer + ::atoms::num_atoms, ::atoms::z_spin_array.begin());
    /*
    thrust::copy(internal::atoms::x_spin_array.begin(),internal::atoms::x_spin_array.end(),::atoms::x_spin_array.begin());
    thrust::copy(internal::atoms::y_spin_array.begin(),internal::atoms::y_spin_array.end(),::atoms::y_spin_array.begin());
@@ -52,9 +55,13 @@ void transfer_spin_positions_from_gpu_to_cpu(){
 //------------------------------------------------------------------------------
 void transfer_dipole_fields_from_cpu_to_gpu(){
 
-   cudaMemcpy(::atoms::x_spin_array.data(), cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(::atoms::y_spin_array.data(), cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
-   cudaMemcpy(::atoms::z_spin_array.data(), cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+   std::copy(::atoms::x_spin_array.begin(), ::atoms::x_spin_array.end(), internal::h_x_spin_transfer_buffer);
+   std::copy(::atoms::y_spin_array.begin(), ::atoms::y_spin_array.end(), internal::h_y_spin_transfer_buffer);
+   std::copy(::atoms::z_spin_array.begin(), ::atoms::z_spin_array.end(), internal::h_z_spin_transfer_buffer);
+
+   cudaMemcpy(internal::atoms::d_x_spin, internal::h_x_spin_transfer_buffer, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(internal::atoms::d_y_spin, internal::h_y_spin_transfer_buffer, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
+   cudaMemcpy(internal::atoms::d_z_spin, internal::h_z_spin_transfer_buffer, ::atoms::num_atoms * sizeof(cu::cu_real_t), cudaMemcpyHostToDevice);
 
    /*
    thrust::copy(::dipole::atom_dipolar_field_array_x.begin(),::dipole::atom_dipolar_field_array_x.end(), cu::x_dipolar_field_array.begin());

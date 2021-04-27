@@ -20,6 +20,10 @@ namespace vcuda{
 
    namespace internal{
 
+      cu_real_t *h_x_spin_transfer_buffer;
+      cu_real_t *h_y_spin_transfer_buffer;
+      cu_real_t *h_z_spin_transfer_buffer;
+
       namespace atoms
       {
          /*

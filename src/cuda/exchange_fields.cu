@@ -134,7 +134,7 @@ namespace vcuda
             // NOTE: Below calculations have been left in double precision
             // for now !!
             // tolerance to ignore exchange components
-            const double tol = 1e-10;
+            const cu_real_t tol = 1e-10;
             // loop over all atoms
             for(int atom = 0; atom < ::atoms::num_atoms; ++atom){
 
@@ -154,7 +154,7 @@ namespace vcuda
                     {
                         case 0: // Isotropic
                             for ( int a = 0; a < 3; a++){
-                                double Jab = ::atoms::i_exchange_list[iid].Jij;
+                                cu_real_t Jab = ::atoms::i_exchange_list[iid].Jij;
                                 if( fabs(Jab) > tol) {
                                     row_inds.push_back( atom + a*Natoms);
                                     col_inds.push_back( natom + a*Natoms);
@@ -165,7 +165,7 @@ namespace vcuda
 
                         case 1: // Vectorial
                             for ( int a = 0; a < 3; a++){
-                                double Jab = ::atoms::v_exchange_list[iid].Jij[a];
+                                cu_real_t Jab = ::atoms::v_exchange_list[iid].Jij[a];
                                 if( fabs(Jab) > tol) {
                                     row_inds.push_back( atom + a*Natoms);
                                     col_inds.push_back( natom + a*Natoms);
@@ -177,7 +177,7 @@ namespace vcuda
                         case 2: // Tensor
                             for ( int a = 0; a < 3; a++){
                                 for ( int b = 0; b < 3; b++){
-                                    double Jab = ::atoms::t_exchange_list[iid].Jij[a][b];
+                                    cu_real_t Jab = ::atoms::t_exchange_list[iid].Jij[a][b];
                                     if( fabs(Jab) > tol) {
                                         row_inds.push_back( atom + a*Natoms);
                                         col_inds.push_back( natom + b*Natoms);
