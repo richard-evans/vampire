@@ -249,11 +249,8 @@ __global__ void update_dipolar_fields (
       )
 {
 
-   cu_real_t imuB = 1.0/9.27400915e-24;
-   cu_real_t prefactor = 9.27400915e-01;     // prefactor = mu_B * (mu_0/(4*pi) /1e-30)
-
-   // Define counter for 1D dipole tensor
-   int i_1Dindex = 0;
+   const cu_real_t imuB = 1.0/9.27400915e-24;
+   const cu_real_t prefactor = 9.27400915e-01;     // prefactor = mu_B * (mu_0/(4*pi) /1e-30)
 
    for ( int lc = blockIdx.x * blockDim.x + threadIdx.x;
          lc < n_local_cells;
@@ -262,97 +259,48 @@ __global__ void update_dipolar_fields (
 
       int i = d_cell_id_array[lc]; //::cells::cell_id_array[lc];
 
-      if(d_num_atoms_in_cell[i]>0){
 
-         /*
-         cu_real_t cx = x_coord[i];
-         cu_real_t cy = y_coord[i];
-         cu_real_t cz = z_coord[i];
-         */
+      const cu_real_t self_demag = 8.0 * M_PI / (3.0 * volume[i]);
 
-         /*
-         * Inverse volume from the number of atoms in macro-cell
-         */
-         // DEFINES ? 4.0 * PI / 3 is constant
-         // Should be optimised out anyway?
-         /*
-         cu_real_t vol_prefac = -4.0 * M_PI / (3.0 * volume[i]);
-         cu_real_t prefactor = 1.0e+23; // 1e-7/1e30
-         */
+//         // Normalise cells magnetisation
+//         cu_real_t mx_i = x_mag[i] * imuB;
+//         cu_real_t my_i = y_mag[i] * imuB;
+//         cu_real_t mz_i = z_mag[i] * imuB;
 
-         cu_real_t self_demag = 8.0 * M_PI / (3.0 * volume[i]);
+      // Initialise field for cell i 
+      cu_real_t field_x = 0.0;
+      cu_real_t field_y = 0.0;
+      cu_real_t field_z = 0.0;
 
-         // Normalise cells magnetisation
-         cu_real_t mx_i = x_mag[i] * imuB;
-         cu_real_t my_i = y_mag[i] * imuB;
-         cu_real_t mz_i = z_mag[i] * imuB;
-
-         // Add self-demagnetisation term
-         cu_real_t field_x = self_demag * mx_i * 0.0;
-         cu_real_t field_y = self_demag * my_i * 0.0;
-         cu_real_t field_z = self_demag * mz_i * 0.0;
-
-         // Add self-demagnetisation term
-         cu_real_t mu0Hd_field_x = -0.5 * self_demag * mx_i;
-         cu_real_t mu0Hd_field_y = -0.5 * self_demag * my_i;
-         cu_real_t mu0Hd_field_z = -0.5 * self_demag * mz_i;
+//    // Add self-demagnetisation term
+//       cu_real_t mu0Hd_field_x = -0.5 * self_demag * mx_i;
+//       cu_real_t mu0Hd_field_y = -0.5 * self_demag * my_i;
+//       cu_real_t mu0Hd_field_z = -0.5 * self_demag * mz_i;
 
 
-         for ( int j = blockIdx.x * blockDim.x + threadIdx.x;
-              j < n_cells;
-              j += blockDim.x * gridDim.x)
-         {
-            if(d_num_atoms_in_cell[j]>0){
+      for ( int j = 0; j < n_cells; j ++){
 
-               cu_real_t mx_j = x_mag[j] * imuB;
-               cu_real_t my_j = y_mag[j] * imuB;
-               cu_real_t mz_j = z_mag[j] * imuB;
+         const int k = lc * n_cells + j; 
 
-               field_x += (mx_j * d_tensor_xx[i_1Dindex] + my_j * d_tensor_xy[i_1Dindex] + mz_j * d_tensor_xz[i_1Dindex]);
-               field_y += (mx_j * d_tensor_xy[i_1Dindex] + my_j * d_tensor_yy[i_1Dindex] + mz_j * d_tensor_yz[i_1Dindex]);
-               field_z += (mx_j * d_tensor_xz[i_1Dindex] + my_j * d_tensor_yz[i_1Dindex] + mz_j * d_tensor_zz[i_1Dindex]);
+         cu_real_t mx_j = x_mag[j] * imuB;
+         cu_real_t my_j = y_mag[j] * imuB;
+         cu_real_t mz_j = z_mag[j] * imuB;
 
-               mu0Hd_field_x += (mx_j * d_tensor_xx[i_1Dindex] + my_j * d_tensor_xy[i_1Dindex] + mz_j * d_tensor_xz[i_1Dindex]);
-               mu0Hd_field_y += (mx_j * d_tensor_xy[i_1Dindex] + my_j * d_tensor_yy[i_1Dindex] + mz_j * d_tensor_yz[i_1Dindex]);
-               mu0Hd_field_z += (mx_j * d_tensor_xz[i_1Dindex] + my_j * d_tensor_yz[i_1Dindex] + mz_j * d_tensor_zz[i_1Dindex]);
+         field_x += (mx_j * d_tensor_xx[k] + my_j * d_tensor_xy[k] + mz_j * d_tensor_xz[k]);
+         field_y += (mx_j * d_tensor_xy[k] + my_j * d_tensor_yy[k] + mz_j * d_tensor_yz[k]);
+         field_z += (mx_j * d_tensor_xz[k] + my_j * d_tensor_yz[k] + mz_j * d_tensor_zz[k]);
 
-               /*
-               // Make use of float3?
-               // Store in AoS instead of separate arrays?
-               cu_real_t dx = x_coord[j] - cx;
-               cu_real_t dy = y_coord[j] - cy;
-               cu_real_t dz = z_coord[j] - cz;
+      } // end for loop over n_cells
 
-               cu_real_t drij = rsqrt(dx * dx + dy * dy + dz * dz);
-               cu_real_t drij3 = drij * drij * drij;
+      // Update cells dipolar field
+      x_cell_field[i] = prefactor * field_x;
+      y_cell_field[i] = prefactor * field_y;
+      z_cell_field[i] = prefactor * field_z;
 
-               cu_real_t sdote = (
-                     omx * dx * drij +
-                     omy * dy * drij +
-                     omz * dz * drij);
-
-               field_x += (3.0 * sdote * dx * drij - omx) * drij3;
-               field_y += (3.0 * sdote * dy * drij - omy) * drij3;
-               field_z += (3.0 * sdote * dz * drij - omz) * drij3;
-               */
-            }
-            else{ // Increase counter if cell j is empty
-               i_1Dindex++;
-            } // end if cell i is not empty
-         } // end for loop over n_cells
-
-         // Same AoS argument as above?
-         x_cell_field[i] = prefactor * field_x;
-         y_cell_field[i] = prefactor * field_y;
-         z_cell_field[i] = prefactor * field_z;
-
-         x_cell_mu0H_field[i] = prefactor * mu0Hd_field_x;
-         y_cell_mu0H_field[i] = prefactor * mu0Hd_field_y;
-         z_cell_mu0H_field[i] = prefactor * mu0Hd_field_z;
-      }
-      else{ // Increase counter of n_cells if cell i is empty to go to next i
-         i_1Dindex += n_cells;
-      } // end if cell j is not empty
+      // Add self-demagnetisation term for mu0Hd
+      x_cell_mu0H_field[i] = prefactor * (field_x + (-0.5 * self_demag * x_mag[i] * imuB));
+      y_cell_mu0H_field[i] = prefactor * (field_y + (-0.5 * self_demag * y_mag[i] * imuB));
+      z_cell_mu0H_field[i] = prefactor * (field_z + (-0.5 * self_demag * z_mag[i] * imuB));
    } // end for loop over n_local_cells
 }
 
