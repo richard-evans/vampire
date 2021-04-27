@@ -27,13 +27,13 @@ namespace montecarlo{
 
    bool mc_parallel_initialized;
 
+   // Monte Carlo update algorithm
+   algorithm_t algorithm = adaptive;
+
    namespace internal{
       //------------------------------------------------------------------------
       // Shared variables inside montecarlo module
       //------------------------------------------------------------------------
-
-      // Monte Carlo update algorithm
-      algorithm_t algorithm = adaptive;
 
       // Materials variables
       int num_materials;
