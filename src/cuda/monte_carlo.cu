@@ -257,7 +257,8 @@ namespace vcuda
                     // Load parameters to local variables from memory
                     cu::material_parameters_t mat = material_params[mid];
 
-                    // material dependent temperature rescaling 
+                    // material dependent temperature rescaling
+                    // this probably needs to be move outside of monte_carlo_sublattice_step and sigma given as parameter
                     cu_real_t alpha = mat.temperature_rescaling_alpha;
                     cu_real_t Tc    = mat.temperature_rescaling_Tc;
                     #ifdef CUDA_DP
