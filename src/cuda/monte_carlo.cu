@@ -298,9 +298,9 @@ namespace vcuda
                         case ::montecarlo::adaptive:
                         {
                             // TODO add in adaptive_sigma 
-                            nsx = sx[0] + rand_spin[atom]; // * montecarlo::internal::adaptive_sigma;
-                            nsy = sx[1] + rand_spin[atom+N]; // * montecarlo::internal::adaptive_sigma;
-                            nsz = sx[2] + rand_spin[atom+2*N]; // * montecarlo::internal::adaptive_sigma;
+                            nsx = sx + rand_spin[atom]; // * montecarlo::internal::adaptive_sigma;
+                            nsy = sy + rand_spin[atom+N]; // * montecarlo::internal::adaptive_sigma;
+                            nsz = sz + rand_spin[atom+2*N]; // * montecarlo::internal::adaptive_sigma;
 
                             // find length using appropriate device sqrt function
                             #ifdef CUDA_DP
@@ -344,9 +344,9 @@ namespace vcuda
                         case ::montecarlo::angle:
                         {
 
-                            nsx = sx[0] + rand_spin[atom]     * sigma;
-                            nsy = sx[1] + rand_spin[atom+N]   * sigma;
-                            nsz = sx[2] + rand_spin[atom+2*N] * sigma;
+                            nsx = sx + rand_spin[atom]     * sigma;
+                            nsy = sy + rand_spin[atom+N]   * sigma;
+                            nsz = sz + rand_spin[atom+2*N] * sigma;
 
                             // find length using appropriate device sqrt function
                             #ifdef CUDA_DP
@@ -395,9 +395,9 @@ namespace vcuda
                                 case 2: // angle
                                 {
 
-                                    nsx = sx[0] + rand_spin[atom]     * sigma;
-                                    nsy = sx[1] + rand_spin[atom+N]   * sigma;
-                                    nsz = sx[2] + rand_spin[atom+2*N] * sigma;
+                                    nsx = sx + rand_spin[atom]     * sigma;
+                                    nsy = sy + rand_spin[atom+N]   * sigma;
+                                    nsz = sz + rand_spin[atom+2*N] * sigma;
 
                                     // find length using appropriate device sqrt function
                                     #ifdef CUDA_DP
@@ -414,9 +414,9 @@ namespace vcuda
                                 default: // angle
                                 {
 
-                                    nsx = sx[0] + rand_spin[atom]     * sigma;
-                                    nsy = sx[1] + rand_spin[atom+N]   * sigma;
-                                    nsz = sx[2] + rand_spin[atom+2*N] * sigma;
+                                    nsx = sx + rand_spin[atom]     * sigma;
+                                    nsy = sy + rand_spin[atom+N]   * sigma;
+                                    nsz = sz + rand_spin[atom+2*N] * sigma;
 
                                     // find length using appropriate device sqrt function
                                     #ifdef CUDA_DP
@@ -437,9 +437,9 @@ namespace vcuda
                         {
 
                             // TODO add in adaptive_sigma
-                            nsx = sx[0] + rand_spin[atom]; //* montecarlo::internal::adaptive_sigma;
-                            nsy = sx[1] + rand_spin[atom+N]; //* montecarlo::internal::adaptive_sigma;
-                            nsz = sx[2] + rand_spin[atom+2*N]; //* montecarlo::internal::adaptive_sigma;
+                            nsx = sx + rand_spin[atom]; //* montecarlo::internal::adaptive_sigma;
+                            nsy = sy + rand_spin[atom+N]; //* montecarlo::internal::adaptive_sigma;
+                            nsz = sz + rand_spin[atom+2*N]; //* montecarlo::internal::adaptive_sigma;
 
                             // find length using appropriate device sqrt function
                             #ifdef CUDA_DP
