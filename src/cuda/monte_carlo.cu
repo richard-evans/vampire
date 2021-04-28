@@ -6,11 +6,15 @@
 #include "internal.hpp"
 #include "data.hpp"
 #include "material.hpp"
+#include "random.hpp"
+#include "cuda.hpp"
 
 #include "spin_fields.hpp"
 
 #include "montecarlo.hpp"
 #include "monte_carlo.hpp"
+
+#include <thrust/device_vector.h>
 
 
 #include "../src/montecarlo/internal.hpp"
@@ -187,7 +191,7 @@ namespace vcuda
             {
 
                 curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
-                curandSetPseudoRandomGeneratorSeed(gen, 1234ULL);
+                curandSetPseudoRandomGeneratorSeed(gen, mtrandom::integration_seed);
 
 
                 cudaMalloc((void**)&d_rand_spin, 3*::atoms::num_atoms * sizeof(cu_real_t));
@@ -511,11 +515,16 @@ namespace vcuda
                 // Check for cuda errors in file, line
                 check_cuda_errors (__FILE__, __LINE__);
 
+                // Load separate spin vectors into single array
                 cudaMemcpy(cu::exchange::d_spin3n, 				            cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
                 cudaMemcpy(cu::exchange::d_spin3n + ::atoms::num_atoms, 	cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
                 cudaMemcpy(cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::exchange::d_spin3n, 				            ::atoms::x_spin_array.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+                //cudaMemcpy(cu::exchange::d_spin3n + ::atoms::num_atoms, 	::atoms::y_spin_array.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+                //cudaMemcpy(cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, ::atoms::z_spin_array.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
 
-                // generate 3 random doubles per atom
+
+                // generate 3 random doubles per atom for the trial spin and 1 for the acceptance
                 curandGenerateNormalDouble( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
                 curandGenerateUniformDouble( gen, d_rand_accept, ::atoms::num_atoms);
 
@@ -555,6 +564,16 @@ namespace vcuda
                 cudaMemcpy(cu::atoms::d_z_spin, cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, 	::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
 
 
+                // wrap raw pointer with a device_ptr
+                thrust::device_ptr<int> dev_ptr(d_accepted);
+                // total number of accepted moves
+                int sum = thrust::reduce(dev_ptr, dev_ptr + ::atoms::num_atoms);
+
+                // Save statistics to sim namespace variable
+                sim::mc_statistics_moves += ::atoms::num_atoms;
+                sim::mc_statistics_reject += (::atoms::num_atoms - sum);
+
+                vcuda::transfer_spin_positions_from_gpu_to_cpu();
                 //Output debugging
                 //std::vector<double> hx, hy, hz;
                 //hx.resize(::atoms::num_atoms);
