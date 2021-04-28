@@ -456,20 +456,6 @@ namespace vcuda
                             break;
                         }
                     }
-                    nsx = rand_spin[atom];      // sx[0] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
-                    nsy = rand_spin[atom+N];    // sx[1] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
-                    nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
-
-                    // find length using appropriate device sqrt function
-                    #ifdef CUDA_DP
-                        double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
-                    #else
-                        float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
-                    #endif
-
-                    nsx *= mod_s;
-                    nsy *= mod_s;
-                    nsz *= mod_s;
 
                     // Calculate current energy
                     cu_real_t Eold = ::vcuda::internal::uniaxial_anisotropy_energy(mat, sx, sy, sz);
