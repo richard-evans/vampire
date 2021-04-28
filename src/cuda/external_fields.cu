@@ -141,9 +141,15 @@ __global__ void update_external_fields_kernel (
          float rsigma = sigma*sqrtf(resc_temp);
       #endif
 
-      field_x = rsigma * curand_normal_double (&local_state);
-      field_y = rsigma * curand_normal_double (&local_state);
-      field_z = rsigma * curand_normal_double (&local_state);
+      #ifdef CUDA_DP
+         field_x = rsigma * curand_normal_double (&local_state);
+         field_y = rsigma * curand_normal_double (&local_state);
+         field_z = rsigma * curand_normal_double (&local_state);
+      #else
+         field_x = rsigma * curand_normal(&local_state);
+         field_y = rsigma * curand_normal(&local_state);
+         field_z = rsigma * curand_normal(&local_state);
+      #endif
 
       // Local applied field
       cu_real_t norm_h = mat.applied_field_strength;
