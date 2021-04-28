@@ -253,11 +253,11 @@ namespace vcuda
                     int *csr_rows, int* csr_cols, cu_real_t *vals,
                     const cu_real_t step_size, const cu_real_t global_temperature, const int N, const int Natoms, ::montecarlo::algorithm_t algorithm){
 
-                // Loop over blocks for large systems > ~100k spins
-                for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
-                        i < N;
-                        i += blockDim.x * gridDim.x)
-                {
+                    // Loop over blocks for large systems > ~100k spins
+                    for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+                            i < N;
+                            i += blockDim.x * gridDim.x)
+                    {
 
                     // load an atom from the current sublattice
                     int atom = sl_atoms[i+sl_start];
@@ -269,7 +269,7 @@ namespace vcuda
                     cu::material_parameters_t mat = material_params[mid];
 
                     // material dependent temperature rescaling
-                     // this probably needs to be move outside of monte_carlo_sublattice_step and sigma given as parameter
+                    // this probably needs to be move outside of monte_carlo_sublattice_step and sigma given as parameter
                     cu_real_t alpha = mat.temperature_rescaling_alpha;
                     cu_real_t Tc    = mat.temperature_rescaling_Tc;
                     #ifdef CUDA_DP
@@ -295,8 +295,6 @@ namespace vcuda
 
                     // run chosen move type
                     // Select algorithm using case statement
-
-
                     switch(algorithm){
 
                         case ::montecarlo::adaptive:
@@ -463,11 +461,11 @@ namespace vcuda
                     nsz = rand_spin[atom+2*N];  // sx[2] + mtrandom::gaussian() * montecarlo::internal::adaptive_sigma;
 
                     // find length using appropriate device sqrt function
-#ifdef CUDA_DP
-                    double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
-#else
-                    float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
-#endif
+                    #ifdef CUDA_DP
+                        double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                    #else
+                        float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                    #endif
 
                     nsx *= mod_s;
                     nsy *= mod_s;
