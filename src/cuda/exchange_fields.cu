@@ -116,12 +116,12 @@ namespace vcuda
 
             const int Natoms = ::atoms::num_atoms;
 
-            cudaMalloc((void**)&d_spin3n, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
-            cudaMalloc((void**)&d_field3n, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+            //cudaMalloc((void**)&d_spin3n, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+            //cudaMalloc((void**)&d_field3n, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
 
             // NOTE: This will NOT work for values other than 0
-            cudaMemset(d_spin3n, 0, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
-            cudaMemset(d_field3n, 0, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+            //cudaMemset(d_spin3n, 0, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
+            //cudaMemset(d_field3n, 0, 3 * ::atoms::num_atoms * sizeof(cu_real_t));
 
             //spin3N.assign( 3*::atoms::num_atoms, 0);
             //field3N.assign( 3*::atoms::num_atoms, 0);
@@ -264,8 +264,10 @@ namespace vcuda
                  // Create the dense vector descriptors for the input and output (Y = A*X)
                  //cusparseCreateDnVec( &vecX, Ncols, thrust::raw_pointer_cast( spin3N.data()), CUDA_R_64F );
                  //cusparseCreateDnVec( &vecY, Nrows, thrust::raw_pointer_cast( field3N.data()), CUDA_R_64F );
-                 cusparseCreateDnVec( &vecX, Ncols, d_spin3n, CUSPARSE_REAL );
-                 cusparseCreateDnVec( &vecY, Nrows, d_field3n, CUSPARSE_REAL );
+                 //cusparseCreateDnVec( &vecX, Ncols, d_spin3n, CUSPARSE_REAL );
+                 //cusparseCreateDnVec( &vecY, Nrows, d_field3n, CUSPARSE_REAL );
+                 cusparseCreateDnVec( &vecX, Ncols, cu::atoms::d_spin, CUSPARSE_REAL );
+                 cusparseCreateDnVec( &vecY, Nrows, cu::d_spin_field, CUSPARSE_REAL );
 
                 // allocate an external buffer if needed
                 status = cusparseSpMV_bufferSize(handle,
@@ -333,8 +335,8 @@ namespace vcuda
 
          int finalise_exchange()
          {
-            cudaFree(d_spin3n);
-            cudaFree(d_field3n);
+            //cudaFree(d_spin3n);
+            //cudaFree(d_field3n);
             //spin3N.cu_real_array_t::~cu_real_array_t();
             //field3N.cu_real_array_t::~cu_real_array_t();
             //J_matrix_d.cu_exch_mat_t::~cu_exch_mat_t ();
@@ -381,9 +383,9 @@ namespace vcuda
             if( !exchange_initialised) initialise_exchange();
 
             if( !empty_exchange) {
-                cudaMemcpy(d_spin3n, 				cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(d_spin3n + ::atoms::num_atoms, 	cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(d_spin3n + 2 * ::atoms::num_atoms, 	cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(d_spin3n, 				cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(d_spin3n + ::atoms::num_atoms, 	cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(d_spin3n + 2 * ::atoms::num_atoms, 	cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
                 /*
                 thrust::copy( cu::atoms::x_spin_array.begin(), cu::atoms::x_spin_array.end(), spin3N.begin());
                 thrust::copy( cu::atoms::y_spin_array.begin(), cu::atoms::y_spin_array.end(), spin3N.begin() + ::atoms::num_atoms);
@@ -410,9 +412,9 @@ namespace vcuda
 
                 check_cuda_errors(__FILE__,__LINE__);
 
-                cudaMemcpy(cu::d_x_spin_field, d_field3n, 				::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(cu::d_y_spin_field, d_field3n + ::atoms::num_atoms, 		::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(cu::d_z_spin_field, d_field3n + 2 * ::atoms::num_atoms, 	::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::d_x_spin_field, d_field3n, 				::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::d_y_spin_field, d_field3n + ::atoms::num_atoms, 		::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::d_z_spin_field, d_field3n + 2 * ::atoms::num_atoms, 	::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
 
                 /*
                 thrust::copy( field3N.begin(), field3N.begin() + ::atoms::num_atoms, cu::x_total_spin_field_array.begin() );

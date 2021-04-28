@@ -92,7 +92,13 @@ namespace vcuda{
             cudaMalloc((void**)&cu::llg::d_y_spin_buffer, ::atoms::num_atoms * sizeof(cu_real_t));
             cudaMalloc((void**)&cu::llg::d_z_spin_buffer, ::atoms::num_atoms * sizeof(cu_real_t));
 
-            cudaMalloc((void**)&cu::llg::d_ds_x, ::atoms::num_atoms * sizeof(cu_real_t));
+            // Initial copy to the buffer
+	    // This is later taken care of inside the corrector step kernel
+            cudaMemcpy(cu::llg::d_x_spin_buffer, cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            cudaMemcpy(cu::llg::d_y_spin_buffer, cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            cudaMemcpy(cu::llg::d_z_spin_buffer, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            
+	    cudaMalloc((void**)&cu::llg::d_ds_x, ::atoms::num_atoms * sizeof(cu_real_t));
             cudaMalloc((void**)&cu::llg::d_ds_y, ::atoms::num_atoms * sizeof(cu_real_t));
             cudaMalloc((void**)&cu::llg::d_ds_z, ::atoms::num_atoms * sizeof(cu_real_t));
 
@@ -147,9 +153,9 @@ namespace vcuda{
             //thrust::copy (cu::atoms::z_spin_array.begin(),cu::atoms::z_spin_array.end(),cu::llg::z_spin_buffer_array.begin());
 
             // D2D copy - is it really necessary?
-            cudaMemcpy(cu::llg::d_x_spin_buffer, cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-            cudaMemcpy(cu::llg::d_y_spin_buffer, cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-            cudaMemcpy(cu::llg::d_z_spin_buffer, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            //cudaMemcpy(cu::llg::d_x_spin_buffer, cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            //cudaMemcpy(cu::llg::d_y_spin_buffer, cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            //cudaMemcpy(cu::llg::d_z_spin_buffer, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
 
             #ifdef CUDA_SPIN_DEBUG
                // Output first spin position
@@ -372,10 +378,19 @@ namespace vcuda{
                   float mods = __frsqrt_rn(S_x*S_x + S_y*S_y + S_z*S_z);
                #endif
 
+	       cu_real_t sp_x_new = mods * S_x;
+	       cu_real_t sp_y_new = mods * S_y;
+	       cu_real_t sp_z_new = mods * S_z;
+
                // save final spin direction to spin array
-               x_spin[atom] = mods * S_x;
-               y_spin[atom] = mods * S_y;
-               z_spin[atom] = mods * S_z;
+               x_spin[atom] = sp_x_new;
+               y_spin[atom] = sp_y_new;
+               z_spin[atom] = sp_z_new;
+
+	       // Update the spin buffer
+               x_spin_buffer[atom] = sp_x_new;
+               y_spin_buffer[atom] = sp_y_new;
+               z_spin_buffer[atom] = sp_z_new;
 
             }
          }

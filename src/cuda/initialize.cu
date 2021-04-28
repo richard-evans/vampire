@@ -169,10 +169,18 @@ namespace vcuda{
         
          size_t num_bytes = ::atoms::num_atoms * sizeof(cu_real_t);
 
+	 cudaMalloc((void**)&cu::atoms::d_spin, num_bytes * 3);
+
+         cu::atoms::d_x_spin = cu::atoms::d_spin;
+         cu::atoms::d_y_spin = cu::atoms::d_spin + ::atoms::num_atoms;
+         cu::atoms::d_z_spin = cu::atoms::d_spin + 2 * ::atoms::num_atoms;
+
+	 /*
 	 cudaMalloc((void**)&cu::atoms::d_x_spin, num_bytes);
          cudaMalloc((void**)&cu::atoms::d_y_spin, num_bytes);
          cudaMalloc((void**)&cu::atoms::d_z_spin, num_bytes);
-         /* Need to be careful here
+         */
+	 /* Need to be careful here
          The device code can use SP or DP,
          but the host code seems to rely exclusively on DP */
 
@@ -308,9 +316,15 @@ namespace vcuda{
          std::vector<cu_real_t> tmp_buffer;
          tmp_buffer.resize(::atoms::num_atoms);
 
-         cudaMalloc((void**)&cu::d_x_spin_field, num_bytes);
-         cudaMalloc((void**)&cu::d_y_spin_field, num_bytes);
-         cudaMalloc((void**)&cu::d_z_spin_field, num_bytes);
+         //cudaMalloc((void**)&cu::d_x_spin_field, num_bytes);
+         //cudaMalloc((void**)&cu::d_y_spin_field, num_bytes);
+         //cudaMalloc((void**)&cu::d_z_spin_field, num_bytes);
+
+         cudaMalloc((void**)&cu::d_spin_field, num_bytes * 3);
+
+	 cu::d_x_spin_field = cu::d_spin_field;
+	 cu::d_y_spin_field = cu::d_spin_field + ::atoms::num_atoms;
+	 cu::d_z_spin_field = cu::d_spin_field + 2 * ::atoms::num_atoms;
 
          std::copy(::atoms::x_total_spin_field_array.begin(), ::atoms::x_total_spin_field_array.end(), tmp_buffer.begin());
          cudaMemcpy(cu::d_x_spin_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
