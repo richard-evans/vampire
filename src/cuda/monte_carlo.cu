@@ -216,9 +216,14 @@ namespace vcuda
                 cudaMemcpy(d_sl_atoms, h_sl_atoms.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
 
                 std::cout << "Trying a step..."<< std::endl;
-                std::cerr << ::atoms::x_spin_array[0] << "  ";
-                std::cerr << ::atoms::y_spin_array[0] << "  ";
-                std::cerr << ::atoms::z_spin_array[0] << std::endl;
+
+                cudaThreadSynchronize();
+                cudaError_t error = cudaGetLastError();
+                if(error != cudaSuccess)
+                {
+                    printf("CUDA error at %s:%i: %s\n", __FILE__, __LINE__, cudaGetErrorString(error));
+                    exit(-1);
+                }
 
                 __mc_step();
                 std::cout << "Done"<< std::endl;
@@ -500,12 +505,9 @@ namespace vcuda
                 check_cuda_errors (__FILE__, __LINE__);
 
                 // Load separate spin vectors into single array
-                cudaMemcpy(cu::exchange::d_spin3n, 				            cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(cu::exchange::d_spin3n + ::atoms::num_atoms, 	cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                //cudaMemcpy(cu::exchange::d_spin3n, 				            ::atoms::x_spin_array.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-                //cudaMemcpy(cu::exchange::d_spin3n + ::atoms::num_atoms, 	::atoms::y_spin_array.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-                //cudaMemcpy(cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, ::atoms::z_spin_array.data(), ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+                //cudaMemcpy(cu::exchange::d_spin3n, 				            cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::exchange::d_spin3n + ::atoms::num_atoms, 	cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
 
 
                 // generate 3 random doubles per atom for the trial spin and 1 for the acceptance
@@ -513,13 +515,6 @@ namespace vcuda
                 curandGenerateUniformDouble( gen, d_rand_accept, ::atoms::num_atoms);
 
 
-                cudaThreadSynchronize();
-                cudaError_t error = cudaGetLastError();
-                if(error != cudaSuccess)
-                {
-                    printf("CUDA error at %s:%i: %s\n", __FILE__, __LINE__, cudaGetErrorString(error));
-                    exit(-1);
-                }
 
                 cudaMemset(d_accepted, 0, ::atoms::num_atoms*sizeof(int));
 
@@ -536,7 +531,7 @@ namespace vcuda
                             ::cu::atoms::d_materials, cu::mp::d_material_params,
                             d_rand_spin, d_rand_accept,
                             d_accepted,
-                            ::cu::exchange::d_spin3n,
+                            ::cu::atoms::d_spin,
                             ::cu::d_x_external_field, ::cu::d_y_external_field, ::cu::d_z_external_field,
                             ::vcuda::internal::exchange::d_csr_rows, ::vcuda::internal::exchange::d_coo_cols, ::vcuda::internal::exchange::d_coo_vals,
                             step_size, sim::temperature, colour_list[i].size(), ::atoms::num_atoms,
@@ -544,9 +539,9 @@ namespace vcuda
 
                 }
 
-                cudaMemcpy(cu::atoms::d_x_spin, cu::exchange::d_spin3n, 				            ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(cu::atoms::d_y_spin, cu::exchange::d_spin3n + ::atoms::num_atoms, 		::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
-                cudaMemcpy(cu::atoms::d_z_spin, cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, 	::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::atoms::d_x_spin, cu::exchange::d_spin3n, 				            ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::atoms::d_y_spin, cu::exchange::d_spin3n + ::atoms::num_atoms, 		::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+                //cudaMemcpy(cu::atoms::d_z_spin, cu::exchange::d_spin3n + 2 * ::atoms::num_atoms, 	::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
 
 
                 // wrap raw pointer with a device_ptr
