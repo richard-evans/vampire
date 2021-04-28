@@ -251,7 +251,8 @@ namespace vcuda
                     cu_real_t * spin3n,
                     cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
                     int *csr_rows, int* csr_cols, cu_real_t *vals,
-                    const cu_real_t step_size, const cu_real_t global_temperature, const int N, const int Natoms, ::montecarlo::algorithm_t algorithm){
+                    const cu_real_t step_size, const cu_real_t global_temperature, const int N, const int Natoms,
+                    ::montecarlo::algorithm_t algorithm, cu_real_t adaptive_sigma){
 
                     // Loop over blocks for large systems > ~100k spins
                     for ( size_t i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -269,7 +270,6 @@ namespace vcuda
                     cu::material_parameters_t mat = material_params[mid];
 
                     // material dependent temperature rescaling
-                    // this probably needs to be move outside of monte_carlo_sublattice_step and sigma given as parameter
                     cu_real_t alpha = mat.temperature_rescaling_alpha;
                     cu_real_t Tc    = mat.temperature_rescaling_Tc;
                     #ifdef CUDA_DP
@@ -300,9 +300,9 @@ namespace vcuda
                         case ::montecarlo::adaptive:
                         {
                             // TODO add in adaptive_sigma
-                            nsx = sx + rand_spin[atom]; // * montecarlo::internal::adaptive_sigma;
-                            nsy = sy + rand_spin[atom+N]; // * montecarlo::internal::adaptive_sigma;
-                            nsz = sz + rand_spin[atom+2*N]; // * montecarlo::internal::adaptive_sigma;
+                            nsx = sx + rand_spin[atom] * adaptive_sigma;
+                            nsy = sy + rand_spin[atom+N] * adaptive_sigma;
+                            nsz = sz + rand_spin[atom+2*N] * adaptive_sigma;
 
                             // find length using appropriate device sqrt function
                             #ifdef CUDA_DP
@@ -439,9 +439,9 @@ namespace vcuda
                         {
 
                             // TODO add in adaptive_sigma
-                            nsx = sx + rand_spin[atom]; //* montecarlo::internal::adaptive_sigma;
-                            nsy = sy + rand_spin[atom+N]; //* montecarlo::internal::adaptive_sigma;
-                            nsz = sz + rand_spin[atom+2*N]; //* montecarlo::internal::adaptive_sigma;
+                            nsx = sx + rand_spin[atom] * adaptive_sigma;
+                            nsy = sy + rand_spin[atom+N] * adaptive_sigma;
+                            nsz = sz + rand_spin[atom+2*N] * adaptive_sigma;
 
                             // find length using appropriate device sqrt function
                             #ifdef CUDA_DP
@@ -539,7 +539,8 @@ namespace vcuda
                             ::cu::exchange::d_spin3n,
                             ::cu::d_x_external_field, ::cu::d_y_external_field, ::cu::d_z_external_field,
                             ::vcuda::internal::exchange::d_csr_rows, ::vcuda::internal::exchange::d_coo_cols, ::vcuda::internal::exchange::d_coo_vals,
-                            step_size, sim::temperature, colour_list[i].size(), ::atoms::num_atoms, ::montecarlo::algorithm);
+                            step_size, sim::temperature, colour_list[i].size(), ::atoms::num_atoms,
+                            ::montecarlo::algorithm, (cu_real_t)::montecarlo::internal::adaptive_sigma );
 
                 }
 
@@ -551,11 +552,21 @@ namespace vcuda
                 // wrap raw pointer with a device_ptr
                 thrust::device_ptr<int> dev_ptr(d_accepted);
                 // total number of accepted moves
-                int sum = thrust::reduce(dev_ptr, dev_ptr + ::atoms::num_atoms);
+                int accepted_moves = thrust::reduce(dev_ptr, dev_ptr + ::atoms::num_atoms);
+                int rejected_moves = ::atoms::num_atoms - accepted_moves;
+
+                // calculate new adaptive step sigma angle
+                if (::montecarlo::algorithm == ::montecarlo::adaptive){
+                    const cu_real_t last_rejection_rate = rejected_moves/::atoms::num_atoms;
+                    const cu_real_t factor = 0.5 / last_rejection_rate;
+                    ::montecarlo::internal::adaptive_sigma *= factor;
+                    // check for excessive range (too small angles takes too long to grow, too large doesn't improve performance) and truncate
+                    if (::montecarlo::internal::adaptive_sigma > 60.0 || ::montecarlo::internal::adaptive_sigma < 1e-5) montecarlo::internal::adaptive_sigma = 60.0;
+                }
 
                 // Save statistics to sim namespace variable
                 sim::mc_statistics_moves += ::atoms::num_atoms;
-                sim::mc_statistics_reject += (::atoms::num_atoms - sum);
+                sim::mc_statistics_reject += rejected_moves;
 
                 vcuda::transfer_spin_positions_from_gpu_to_cpu();
                 //Output debugging
