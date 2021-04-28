@@ -58,6 +58,8 @@ namespace dipole{
 	   //-------------------------------------------------------------------------------------
       // Check for dipole calculation enabled, if not do nothing
       //-------------------------------------------------------------------------------------
+      
+      std::cout << dipole::activated << std::endl;
       if(!dipole::activated) return;
 
 		// check for prior initialisation
@@ -154,11 +156,10 @@ namespace dipole{
 
       // now calculate fields at zero time
 
-      #ifdef CUDA
-         gpu::update_dipolar_fields();
-      #else
-         dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array, atom_moments, magnetic);
-      #endif
+      std::cout << "Fields inisitlaesd" <<std::endl;
+      dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array, atom_moments, magnetic);
+      std::cout << "Fields calcualted" <<std::endl;
+
 
       // hold parallel calculation until all processors have completed the update
       vmpi::barrier();

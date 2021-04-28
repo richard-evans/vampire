@@ -21,13 +21,15 @@ namespace vcuda{
    // Functions for cuda GPU acceleration
    //-----------------------------------------------------------------------------
    extern bool initialize(bool cpu_stats);
-   extern bool initialize_dipole();
+   extern bool initialize_tensor_dipole();
+   extern bool initialize_hierarchical_dipole();
    extern void llg_heun();
    extern void stats_update();
    extern void finalize();
    extern void transfer_spin_positions_from_gpu_to_cpu();
    extern void transfer_dipole_fields_from_cpu_to_gpu();
    extern void update_dipolar_fields();
+   extern void update_hierarchical_dipolar_fields();
 
    namespace config{
       extern void synchronise();

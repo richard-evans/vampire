@@ -13,6 +13,7 @@
 
 // Vampire headers
 #include "anisotropy.hpp"
+#include "hierarchical.hpp"
 #include "atoms.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
@@ -152,13 +153,14 @@ namespace vcuda{
    }
    
 
-   bool initialize_dipole(){
-#ifdef CUDA
-
+  bool initialize_tensor_dipole(){
+    #ifdef CUDA
+      std::cout << "INITALISE_TENSOR" << std::endl;
       bool success = true;
 
       // Initialise dipole
-      if( cu::__initialize_dipole() != EXIT_SUCCESS)
+      if( cu::__initialize_tensor_dipole() != EXIT_SUCCESS)
+      //if( cu::__initialize_hierarchical_dipole() != EXIT_SUCCESS)
       {
          std::cerr << "Failed to initialise dipole" << std::endl;
          success = false;
@@ -166,11 +168,32 @@ namespace vcuda{
 
       // Successful initialization
       return success;
-#else
+    #else
       // Default (initializtion failed)
       return false;
-#endif
+    #endif
    }
+
+
+   bool initialize_hierarchical_dipole(){
+    #ifdef CUDA
+    
+          bool success = true;
+    
+          // Initialise dipole
+          if( cu::__initialize_hierarchical_dipole() != EXIT_SUCCESS)
+          {
+             std::cerr << "Failed to initialise dipole" << std::endl;
+             success = false;
+          }
+    
+          // Successful initialization
+          return success;
+    #else
+          // Default (initializtion failed)
+          return false;
+    #endif
+       }
 
 
 #ifdef CUDA
@@ -441,20 +464,7 @@ namespace vcuda{
          for(int cell = 0; cell < pos.size(); cell++) pos[cell] = ::cells::pos_and_mom_array[4*cell+2]; // z
 
          //thrust::copy(pos.begin(), pos.end(), cu::cells::z_coord_array.begin());
-         cudaMemcpy(cu::cells::d_z_coord, pos.data(), ::cells::num_cells, cudaMemcpyHostToDevice);
-
-         //-----------------------------------------------------
-         // Allocate memory and initialize cell magnetization
-         //-----------------------------------------------------
-
-         cudaMalloc((void**)&cu::cells::d_x_mag, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMalloc((void**)&cu::cells::d_y_mag, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMalloc((void**)&cu::cells::d_z_mag, ::cells::num_cells * sizeof(cu_real_t));
-
-         cudaMemcpy(cu::cells::d_x_mag, ::cells::mag_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_y_mag, ::cells::mag_array_y.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_z_mag, ::cells::mag_array_z.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-
+         cudaMemcpy(cu::cells::d_z_coord, pos.data(), ::cells::num_cells, cudaMemcpyHostToDevice); 
          /*
          cu::cells::x_mag_array.resize(::cells::num_cells);
          cu::cells::y_mag_array.resize(::cells::num_cells);
@@ -464,7 +474,7 @@ namespace vcuda{
          thrust::copy(::cells::mag_array_y.begin(), ::cells::mag_array_y.end(), cu::cells::y_mag_array.begin());
          thrust::copy(::cells::mag_array_z.begin(), ::cells::mag_array_z.end(), cu::cells::z_mag_array.begin());
          */
-
+         
          //----------------------------------------------
          // Allocate memory and initialize cell fields
          //----------------------------------------------
@@ -518,8 +528,22 @@ namespace vcuda{
          return true;
       }
       
-      bool __initialize_dipole(){
-         
+      bool __initialize_tensor_dipole(){
+
+
+        cudaMalloc((void**)&cu::cells::d_x_mag, ::cells::num_cells * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_y_mag, ::cells::num_cells * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_z_mag, ::cells::num_cells * sizeof(cu_real_t));
+
+        cudaMemcpy(cu::cells::d_x_mag, ::cells::mag_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_y_mag, ::cells::mag_array_y.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_z_mag, ::cells::mag_array_z.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+
+        
+          //-----------------------------------------------------
+         // Allocate memory and initialize tensor
+         //--------------
+
          std::vector<double> tensor_xx = ::dipole::get_tensor_1D_xx();
          std::vector<double> tensor_xy = ::dipole::get_tensor_1D_xy();
          std::vector<double> tensor_xz = ::dipole::get_tensor_1D_xz();
@@ -548,9 +572,76 @@ namespace vcuda{
          std::vector<double>().swap(tensor_yy);
          std::vector<double>().swap(tensor_yz);
          std::vector<double>().swap(tensor_zz);
-         
-         return true;
+         std::cout << "A" << std::endl;
+         return EXIT_SUCCESS;
       }
+
+      bool __initialize_hierarchical_dipole(){
+         
+        std::vector<double> mx = ::hierarchical::get_cell_mag_x();
+        std::vector<double> my = ::hierarchical::get_cell_mag_y();
+        std::vector<double> mz = ::hierarchical::get_cell_mag_z();
+
+        cudaMalloc((void**)&cu::cells::d_x_mag, mx.size() * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_y_mag, mx.size() * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_z_mag, mx.size() * sizeof(cu_real_t));
+
+        cudaMemcpy(cu::cells::d_x_mag, mx.data(), mx.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_y_mag, my.data(), my.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_z_mag, mz.data(), mz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+
+        std::vector<double>().swap(mx);
+        std::vector<double>().swap(my);
+        std::vector<double>().swap(mz);
+
+        
+         //-----------------------------------------------------
+        // Allocate memory and initialize tensor
+        //------------------------------------------------------
+
+        std::vector<double> tensor_xx = ::hierarchical::get_tensor_1D_xx();
+        std::vector<double> tensor_xy = ::hierarchical::get_tensor_1D_xy();
+        std::vector<double> tensor_xz = ::hierarchical::get_tensor_1D_xz();
+        std::vector<double> tensor_yy = ::hierarchical::get_tensor_1D_yy();
+        std::vector<double> tensor_yz = ::hierarchical::get_tensor_1D_yz();
+        std::vector<double> tensor_zz = ::hierarchical::get_tensor_1D_zz();
+        std::vector<int> interactions = ::hierarchical::get_interaction_list();
+        std::vector<int> interactions_start = ::hierarchical::get_interaction_list_start();
+        std::vector<int> interactions_end = ::hierarchical::get_interaction_list_end();
+
+        cudaMalloc((void**)&cu::cells::d_tensor_xx, tensor_xx.size() * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_tensor_xy, tensor_xy.size() * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_tensor_xz, tensor_xz.size() * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_tensor_yy, tensor_yy.size() * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_tensor_yz, tensor_yz.size() * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_tensor_zz, tensor_zz.size() * sizeof(cu_real_t));
+        cudaMalloc((void**)&cu::cells::d_interaction_list, interactions.size() * sizeof(int));
+        cudaMalloc((void**)&cu::cells::d_interaction_list_start, interactions_start.size() * sizeof(int));
+        cudaMalloc((void**)&cu::cells::d_interaction_list_end, interactions_end.size() * sizeof(int));
+
+        cudaMemcpy(cu::cells::d_tensor_xx, tensor_xx.data(), tensor_xx.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_tensor_xy, tensor_xy.data(), tensor_xy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_tensor_xz, tensor_xz.data(), tensor_xz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_tensor_yy, tensor_yy.data(), tensor_yy.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_tensor_yz, tensor_yz.data(), tensor_yz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_tensor_zz, tensor_zz.data(), tensor_zz.size() * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_interaction_list, interactions.data(), interactions.size() * sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_interaction_list_start, interactions_start.data(), interactions_start.size() * sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(cu::cells::d_interaction_list_end, interactions_end.data(), interactions_end.size() * sizeof(int), cudaMemcpyHostToDevice);
+        
+        // Free memory
+        std::vector<double>().swap(tensor_xx);
+        std::vector<double>().swap(tensor_xy);
+        std::vector<double>().swap(tensor_xz);
+        std::vector<double>().swap(tensor_yy);
+        std::vector<double>().swap(tensor_yz);
+        std::vector<double>().swap(tensor_zz);
+        std::vector<int>().swap(interactions);
+        std::vector<int>().swap(interactions_start);
+        std::vector<int>().swap(interactions_end);
+        
+        return EXIT_SUCCESS;
+     }
 
       bool __initialize_materials ()
       {

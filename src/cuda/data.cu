@@ -75,6 +75,10 @@ namespace vcuda{
          cu_real_t *d_tensor_yz;
          cu_real_t *d_tensor_zz;
 
+         int *d_interaction_list;
+         int *d_interaction_list_start;
+         int *d_interaction_list_end;
+
          /*
          cu_real_array_t x_coord_array(0UL);
          cu_real_array_t y_coord_array(0UL);

@@ -91,6 +91,10 @@ namespace vcuda
          extern cu_real_t *d_tensor_yz;
          extern cu_real_t *d_tensor_zz;
 
+         extern int *d_interaction_list;
+         extern int *d_interaction_list_start;
+         extern int *d_interaction_list_end;
+
          extern cu_real_t *d_volume;
          extern cu_real_t *d_num_atoms;
 

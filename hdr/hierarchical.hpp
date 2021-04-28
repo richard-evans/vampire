@@ -36,6 +36,20 @@ namespace hierarchical{
                    std::vector<double>& atom_coords_z,
                    int num_atoms);
 
+   std::vector<double> get_tensor_1D_xx();
+   std::vector<double> get_tensor_1D_xy();
+   std::vector<double> get_tensor_1D_xz();
+   std::vector<double> get_tensor_1D_yy();
+   std::vector<double> get_tensor_1D_yz();
+   std::vector<double> get_tensor_1D_zz();
+   std::vector<int> get_interaction_list();
+   std::vector<int> get_interaction_list_start();
+   std::vector<int> get_interaction_list_end();
+   std::vector<double> get_cell_mag_x();
+   std::vector<double> get_cell_mag_y();
+   std::vector<double> get_cell_mag_z();
+   int get_num_cells();
+
    //---------------------------------------------------------------------------
    // Function to process input file parameters for hierarchical module
    //---------------------------------------------------------------------------

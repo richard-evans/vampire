@@ -14,6 +14,8 @@
 #include "gpu.hpp"
 #include "cuda.hpp"
 #include "errors.hpp"
+#include "dipole.hpp"
+#include "../dipole/internal.hpp"
 #include "vio.hpp"
 #include "vopencl.hpp"
 
@@ -52,7 +54,14 @@ namespace gpu{
       if( !gpu::initialized ) return;
 
       #ifdef CUDA
-         vcuda::initialize_dipole();
+        switch (dipole::internal::solver){
+          case dipole::internal::tensor:
+         vcuda::initialize_tensor_dipole();
+         break;
+          case dipole::internal::hierarchical:
+         vcuda::initialize_hierarchical_dipole();
+         break;
+        }
       #elif OPENCL
          vopencl::initialize_dipole();
       #endif

@@ -237,7 +237,12 @@ int run(){
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
 
    // Initialize GPU acceleration if enabled
-   if(gpu::acceleration) gpu::initialize();
+    std::cout <<"GP" <<  gpu::acceleration << std::endl;
+
+   if(gpu::acceleration) {
+     gpu::initialize();
+    std::cout << "GPU INITALISEC" << std::endl;
+   }
 
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,

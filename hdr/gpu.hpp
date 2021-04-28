@@ -37,7 +37,8 @@ namespace gpu{
    extern void finalize();
    extern void transfer_spin_positions_from_gpu_to_cpu();
    extern void transfer_dipole_fields_from_cpu_to_gpu();
-   extern void update_dipolar_fields();
+   extern void update_tensor_dipolar_fields();
+   extern void update_hierarchical_dipolar_fields();
 
    //-----------------------------------------------------------------------------
    // Functions for GPU configuration output

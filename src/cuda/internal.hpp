@@ -55,7 +55,8 @@ namespace vcuda{
       bool __initialize_atoms ();
       bool __initialize_fields ();
       bool __initialize_cells ();
-      bool __initialize_dipole ();
+      bool __initialize_tensor_dipole ();
+      bool __initialize_hierarchical_dipole ();
       bool __initialize_materials ();
       bool __initialize_topology ();
       bool __initialize_curand ();
@@ -72,7 +73,8 @@ namespace vcuda{
 
       void update_spin_fields ();
       void update_external_fields ();
-      void update_dipolar_fields ();
+      void update_tensor_dipolar_fields ();
+      void update_hierarchical_dipolar_fields ();
       void update_cell_magnetizations ();
 
       /*
@@ -130,7 +132,7 @@ namespace vcuda{
             int num_atoms
             );
 
-      __global__ void update_dipolar_fields (
+      __global__ void update_tensor_dipolar_fields (
             cu_real_t * x_mag, cu_real_t * y_mag, cu_real_t * z_mag,
             cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
             cu_real_t * volume,
@@ -141,6 +143,20 @@ namespace vcuda{
             int * d_cell_id_array,
             int * d_num_atoms_in_cell,
             int n_local_cells, int n_cells
+            );
+
+      __global__ void update_hierarchical_dipolar_fields (
+            cu_real_t * x_mag, cu_real_t * y_mag, cu_real_t * z_mag,
+            cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
+            cu_real_t * volume,
+            cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
+            cu_real_t * x_cell_mu0H_field, cu_real_t * y_cell_mu0H_field, cu_real_t * z_cell_mu0H_field,
+            cu_real_t * d_tensor_xx, cu_real_t * d_tensor_xy, cu_real_t * d_tensor_xz,
+            cu_real_t * d_tensor_yy, cu_real_t * d_tensor_yz, cu_real_t * d_tensor_zz,
+            int * d_cell_id_array,
+            int * d_num_atoms_in_cell,
+            int n_local_cells, int n_cells,
+            int * d_interaction_list, int * d_interaction_list_start, int * interactions_end
             );
 
       __global__ void update_atomistic_dipolar_fields (

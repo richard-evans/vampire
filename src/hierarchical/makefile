@@ -11,6 +11,7 @@ intra.o \
 inter.o \
 interface.o \
 mag.o \
+get_cell_properties.o \
 update.o
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/hierarchical/,$(hierarchical_objects))

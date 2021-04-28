@@ -50,7 +50,7 @@ namespace dipole{
 
       // return if dipole field not enabled
       if(!dipole::activated) return;
-
+    std::cout << dipole::internal::solver << "\t" << std::endl;
 		// prevent double calculation for split integration (MPI)
 		if(dipole::internal::update_time != sim_time){
 
@@ -65,24 +65,31 @@ namespace dipole{
 
             switch (dipole::internal::solver){
 
-               case dipole::internal::macrocell:
+              case dipole::internal::macrocell:
+                dipole::internal::calculate_macrocell_dipole_field();
+                break;
+
+              case dipole::internal::tensor:
+						    #ifdef CUDA
+                std::cout << "tensor" << std::endl;
+               	  gpu::update_tensor_dipolar_fields();
+					      #else
                   dipole::internal::calculate_macrocell_dipole_field();
-                  break;
+						    #endif
+              break;
 
-               case dipole::internal::tensor:
-						#ifdef CUDA
-               	   gpu::update_dipolar_fields();
-						#else
-                     dipole::internal::calculate_macrocell_dipole_field();
-						#endif
-                  break;
+              case dipole::internal::atomistic:
+                dipole::internal::calculate_atomistic_dipole_field(x_spin_array, y_spin_array, z_spin_array);
+              break;
 
-               case dipole::internal::atomistic:
-                  dipole::internal::calculate_atomistic_dipole_field(x_spin_array, y_spin_array, z_spin_array);
-                  break;
+              case dipole::internal::hierarchical:
+               	#ifdef CUDA
+                std::cout << "hierarchical" << std::endl;
 
-               case dipole::internal::hierarchical:
+               	  gpu::update_hierarchical_dipolar_fields();
+						    #else
                   hierarchical::update(x_spin_array, y_spin_array, z_spin_array, m_spin_array, magnetic);
+						    #endif
                   break;
 
                case dipole::internal::fft:
