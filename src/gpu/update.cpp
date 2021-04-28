@@ -20,8 +20,8 @@ namespace gpu{
 //------------------------------------------------------------------------------
 void update_dipolar_fields(){
 
-   // check for gpu functions and data initialised
-   if( !gpu::initialized ) return;
+//   // check for gpu functions and data initialised
+//   if( !gpu::initialized ) return;
 
    #ifdef CUDA
       vcuda::update_dipolar_fields();
