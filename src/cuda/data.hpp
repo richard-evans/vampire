@@ -94,6 +94,9 @@ namespace vcuda
          extern cu_real_t *d_volume;
          extern cu_real_t *d_num_atoms;
 
+         extern int *d_cell_id_array;
+         extern int *d_num_atoms_in_cell;
+
       } /* cells */
 
       namespace mp

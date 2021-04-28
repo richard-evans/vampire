@@ -94,6 +94,10 @@ namespace vcuda{
 
          //cu_real_array_t volume_array(0UL);
          //cu_index_array_t num_atoms(0UL);
+         
+         int *d_cell_id_array;
+         int *d_num_atoms_in_cell;
+ 
       } /* cells */
 
       namespace mp

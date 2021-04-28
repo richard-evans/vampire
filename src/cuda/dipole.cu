@@ -50,47 +50,9 @@ void update_dipolar_fields ()
 
    check_cuda_errors (__FILE__, __LINE__);
 
-   int num_local_cells = ::dipole::get_tot_num_local_cells();
-   int num_cells = ::dipole::get_tot_num_cells();
+//   int num_local_cells = ::dipole::get_tot_num_local_cells();
+//   int num_cells = ::dipole::get_tot_num_cells();
 
-   int *d_cell_id_array;
-   cudaMalloc((void**)&d_cell_id_array, ::cells::cell_id_array.size() * sizeof(int));
-   cudaMemcpy(d_cell_id_array, ::cells::cell_id_array.data(), ::cells::cell_id_array.size() * sizeof(int), cudaMemcpyHostToDevice);
-
-   std::vector<int> num_atoms_in_cell = ::dipole::get_num_atoms_in_cell_array();
-   int *d_num_atoms_in_cell;
-   cudaMalloc((void**)&d_num_atoms_in_cell, num_atoms_in_cell.size() * sizeof(int));
-   cudaMemcpy(d_num_atoms_in_cell, num_atoms_in_cell.data(), num_atoms_in_cell.size() * sizeof(int), cudaMemcpyHostToDevice);
-
-
-   /*
-    * Figure out addresses in device memory space
-    */
-
-   /*cu_real_t * d_x_mag = thrust::raw_pointer_cast(
-         cu::cells::x_mag_array.data());
-   cu_real_t * d_y_mag = thrust::raw_pointer_cast(
-         cu::cells::y_mag_array.data());
-   cu_real_t * d_z_mag = thrust::raw_pointer_cast(
-         cu::cells::z_mag_array.data());
-
-   cu_real_t * d_x_coord = thrust::raw_pointer_cast(
-         cu::cells::x_coord_array.data());
-   cu_real_t * d_y_coord = thrust::raw_pointer_cast(
-         cu::cells::y_coord_array.data());
-   cu_real_t * d_z_coord = thrust::raw_pointer_cast(
-         cu::cells::z_coord_array.data());
-
-   cu_real_t * d_volume = thrust::raw_pointer_cast(
-         cu::cells::volume_array.data());
-
-   cu_real_t * d_x_cell_field = thrust::raw_pointer_cast(
-         cu::cells::x_field_array.data());
-   cu_real_t * d_y_cell_field = thrust::raw_pointer_cast(
-         cu::cells::y_field_array.data());
-   cu_real_t * d_z_cell_field = thrust::raw_pointer_cast(
-         cu::cells::z_field_array.data());
-*/
    /*
     * Update cell dipolar fields
     */
@@ -103,11 +65,12 @@ void update_dipolar_fields ()
          cu::cells::d_x_cell_mu0H_field, cu::cells::d_y_cell_mu0H_field, cu::cells::d_z_cell_mu0H_field,
          cu::cells::d_tensor_xx, cu::cells::d_tensor_xy, cu::cells::d_tensor_xz,
          cu::cells::d_tensor_yy, cu::cells::d_tensor_yz, cu::cells::d_tensor_zz,
-         d_cell_id_array,
-         d_num_atoms_in_cell,
-         num_local_cells,
-         num_cells
-//         ::cells::num_cells
+         cu::cells::d_cell_id_array,
+         cu::cells::d_num_atoms_in_cell,
+//         num_local_cells,
+//         num_cells
+         ::cells::num_local_cells,
+         ::cells::num_cells
          );
 
    check_cuda_errors (__FILE__, __LINE__);
@@ -116,17 +79,6 @@ void update_dipolar_fields ()
     * Update atomistic dipolar fields
     */
 
-    /*
-   int * d_cells =
-      thrust::raw_pointer_cast(cu::atoms::cell_array.data());
-
-   cu_real_t * d_x_atom_field = thrust::raw_pointer_cast(
-         cu::x_dipolar_field_array.data());
-   cu_real_t * d_y_atom_field = thrust::raw_pointer_cast(
-         cu::y_dipolar_field_array.data());
-   cu_real_t * d_z_atom_field = thrust::raw_pointer_cast(
-         cu::z_dipolar_field_array.data());
-      */
    update_atomistic_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
          cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
          cu::cells::d_x_cell_mu0H_field, cu::cells::d_y_cell_mu0H_field, cu::cells::d_z_cell_mu0H_field,
@@ -258,8 +210,6 @@ __global__ void update_dipolar_fields (
    {
 
       int i = d_cell_id_array[lc]; //::cells::cell_id_array[lc];
-
-
       const cu_real_t self_demag = 8.0 * M_PI / (3.0 * volume[i]);
 
 //         // Normalise cells magnetisation
