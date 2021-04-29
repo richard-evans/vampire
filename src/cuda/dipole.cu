@@ -46,8 +46,6 @@ void update_dipolar_fields ()
    // save last time of demag update
    ::dipole::update_time = ::sim::time;
    
-//   std::cout << "update_dipolar_field()" << std::endl;
-
    update_cell_magnetizations ();
 
    check_cuda_errors (__FILE__, __LINE__);
@@ -58,7 +56,6 @@ void update_dipolar_fields ()
    /*
     * Update cell dipolar fields
     */
-//   std::cout << "update_dipolar_field kernel" << std::endl;
 
    update_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
          cu::cells::d_x_mag, cu::cells::d_y_mag, cu::cells::d_z_mag,
@@ -81,7 +78,6 @@ void update_dipolar_fields ()
    /*
     * Update atomistic dipolar fields
     */
-//   std::cout << "update_atomistic_dipolar_field kernel" << std::endl;
 
    update_atomistic_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
          cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
@@ -93,8 +89,6 @@ void update_dipolar_fields ()
          );
 
    check_cuda_errors (__FILE__, __LINE__);
-   
-//   std::cout << "transferring from gpu to cpu" << std::endl;
    
 //   // Transfer cells dipolar fields from gpu to cpu
 //   vcuda::transfer_dipole_cells_fields_from_gpu_to_cpu();
@@ -297,7 +291,6 @@ __global__ void update_atomistic_dipolar_fields (
 } // end of internal namespace
 
 void update_dipolar_fields (){
-//    std::cout << "Updating dipolar filed with GPU" << std::endl;
     cu::update_dipolar_fields();
 }
 
