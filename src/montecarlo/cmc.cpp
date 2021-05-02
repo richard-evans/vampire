@@ -20,6 +20,7 @@
 #include "atoms.hpp"
 #include "errors.hpp"
 #include "material.hpp"
+#include "montecarlo.hpp"
 #include "random.hpp"
 #include "sim.hpp"
 #include "vmath.hpp"
@@ -353,6 +354,8 @@ int cmc_step(){
 		M_other[2] = M_other[2] + atoms::z_spin_array[atom] * mu;
 	}
 
+	double statistics_reject = 0.0; // counter for number of rejected moves (for adaptive algorothm)
+
 	for (int mcs=0;mcs<atoms::num_atoms;mcs++){
 		// Randomly select spin number 1
 		atom_number1 = int(mtrandom::grnd()*atoms::num_atoms);
@@ -483,6 +486,7 @@ int cmc_step(){
 					atoms::z_spin_array[atom_number2] = spin2_initial[2];
 
 					cmc::energy_reject += 1.0;
+					statistics_reject += 1.0;
 				}
 			//}
 		}
@@ -492,10 +496,22 @@ int cmc_step(){
 			atoms::y_spin_array[atom_number1] = spin1_initial[1];
 			atoms::z_spin_array[atom_number1] = spin1_initial[2];
 			cmc::sphere_reject+=1.0;
+			statistics_reject += 1.0;
 		}
 
 		cmc::mc_total += 1.0;
 	}
+
+	// calculate new adaptive step sigma angle
+	if(montecarlo::internal::algorithm == montecarlo::internal::adaptive){
+		const double statistics_moves = atoms::num_atoms;
+		const double last_rejection_rate = statistics_reject / statistics_moves;
+		const double factor = 0.5 / last_rejection_rate;
+		montecarlo::internal::adaptive_sigma *= factor;
+		// check for excessive range (too small angle takes too long to grow, too large does not improve performance) and truncate
+		if (montecarlo::internal::adaptive_sigma > 60.0 || montecarlo::internal::adaptive_sigma < 1e-5) montecarlo::internal::adaptive_sigma = 60.0;
+	}
+
 	return EXIT_SUCCESS;
 }
 

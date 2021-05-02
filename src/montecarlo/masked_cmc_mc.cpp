@@ -256,6 +256,8 @@ void cmc_mc_step_mask(){
 		cmc::cmc_mask[mask_id].M_other[2] += atoms::z_spin_array[atom];
 	}
 
+	double statistics_reject = 0.0; // counter for number of rejected moves (for adaptive algorothm)
+
 	//---------------------------------------------------------------------------
 	// make a sequence of Monte Carlo moves
 	//---------------------------------------------------------------------------
@@ -311,6 +313,7 @@ void cmc_mc_step_mask(){
 					atoms::y_spin_array[atom1] = spin1_initial[1];
 					atoms::z_spin_array[atom1] = spin1_initial[2];
                cmc::energy_reject += 1.0;
+					statistics_reject += 1.0;
 				}
 			}
 		}
@@ -436,6 +439,8 @@ void cmc_mc_step_mask(){
 					atoms::z_spin_array[atom2] = spin2_initial[2];
 
 					cmc::energy_reject += 1.0;
+					statistics_reject += 1.0;
+
 				}
 			}
 			// if s2 not on unit sphere
@@ -444,11 +449,22 @@ void cmc_mc_step_mask(){
 				atoms::y_spin_array[atom1] = spin1_initial[1];
 				atoms::z_spin_array[atom1] = spin1_initial[2];
 				cmc::sphere_reject+=1.0;
+				statistics_reject += 1.0;
 			}
 		} // end of cmc move
 		cmc::mc_total += 1.0;
 
 	} // end of mc loop
+
+	// calculate new adaptive step sigma angle
+	if(montecarlo::internal::algorithm == montecarlo::internal::adaptive){
+		const double statistics_moves = atoms::num_atoms;
+		const double last_rejection_rate = statistics_reject / statistics_moves;
+		const double factor = 0.5 / last_rejection_rate;
+		montecarlo::internal::adaptive_sigma *= factor;
+		// check for excessive range (too small angle takes too long to grow, too large does not improve performance) and truncate
+		if (montecarlo::internal::adaptive_sigma > 60.0 || montecarlo::internal::adaptive_sigma < 1e-5) montecarlo::internal::adaptive_sigma = 60.0;
+	}
 
 	return;
 
