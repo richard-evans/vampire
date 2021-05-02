@@ -22,9 +22,11 @@ obj/colourmaps.o \
 obj/command.o \
 obj/coords.o \
 obj/data.o \
+obj/functions.o \
 obj/main.o \
 obj/non_magnetic.o \
 obj/povray.o \
+obj/read.o \
 obj/spins.o \
 obj/ssc.o \
 obj/text.o \

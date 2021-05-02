@@ -294,10 +294,10 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
 
    double min[3] = {1e20, 1e20, 1e20};
    double max[3] = {0.0, 0.0, 0.0};
-   double ave[3] = {0.0, 0.0, 0.0};
+   //double ave[3] = {0.0, 0.0, 0.0};
 
    // loop through all magnetic atoms
-   for(int i=0; i < magnetic_list.size(); i++){
+   for(size_t i=0; i < magnetic_list.size(); i++){
 
       // get atom ID
       unsigned int atom = magnetic_list[i];
@@ -318,7 +318,7 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
    }
 
    // loop through all non-magnetic atoms
-   for(int i=0; i < non_magnetic_list.size(); i++){
+   for(size_t i=0; i < non_magnetic_list.size(); i++){
 
       // get atom ID
       unsigned int atom = non_magnetic_list[i];
@@ -371,7 +371,7 @@ void slice_system(){
    zmax = (slice_parameters[5]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]+tol;
 
    // No slice defined, all atoms are included
-   if (vdc::slice_type == "no-slice"){
+   if (vdc::slice_type == vdc::no_slice){
       vdc::sliced_atoms_list.resize(vdc::num_atoms);
       for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
          vdc::sliced_atoms_list[atom] = atom;
@@ -383,7 +383,7 @@ void slice_system(){
    }
 
    // User defines a volume, only atoms inside are included
-   else if (vdc::slice_type == "slice"){
+   else if (vdc::slice_type == vdc::slice){
       for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
 
          x = vdc::coordinates[3*atom + 0];
@@ -417,7 +417,7 @@ void slice_system(){
    }
 
    // User defines a volume, only atoms outside are included
-   else if (vdc::slice_type == "slice-void"){
+   else if (vdc::slice_type == vdc::slice_void){
       for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
 
          x = vdc::coordinates[3*atom + 0];
@@ -448,7 +448,7 @@ void slice_system(){
    // Equation of ellipse in 3D
    // (x-x1)^2/a^2 + (y-y1)^2/b^2 + (z-z1)^2/c^2 = 1
    // (x1,y1,z1) is the centre and a,b,c are the axis radii
-   else if (vdc::slice_type == "slice-sphere"){
+   else if (vdc::slice_type == vdc::slice_sphere){
       double a, b, c;
 
       // work out radii of the ellipse
@@ -490,7 +490,7 @@ void slice_system(){
          }
       }
    }
-   else if (vdc::slice_type == "slice-cylinder"){
+   else if (vdc::slice_type == vdc::slice_cylinder){
       // only show inner cylinder of particles
       double a,b;
 
@@ -528,13 +528,13 @@ void slice_system(){
 
       std::vector<int> temp_list(0), temp_nm_list(0);
       // loop over atoms in slice
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_atoms_list[i];
 
          // loop over materials
-         for(int m=0; m < remove_materials.size(); m++){
+         for(size_t m=0; m < remove_materials.size(); m++){
 
             int material = remove_materials[m];
 
@@ -543,13 +543,13 @@ void slice_system(){
             }
          }
       }
-      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_nm_atoms_list[i];
 
          // loop over materials
-         for(int m=0; m < remove_materials.size(); m++){
+         for(size_t m=0; m < remove_materials.size(); m++){
 
             int material = remove_materials[m];
 

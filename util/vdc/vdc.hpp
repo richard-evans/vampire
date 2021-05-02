@@ -16,8 +16,13 @@
 // C++ standard library headers
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <functional>
 
 namespace vdc{
+
+   // input filename
+   extern std::string input_file;
 
    // program option flags
    extern bool verbose;
@@ -34,12 +39,14 @@ namespace vdc{
    extern std::string colour_keyword;
    extern std::string custom_colourmap_file;
    extern std::vector<std::vector<double>> colourmap;
+   extern std::vector<std::string> colourmaps;
    extern bool x_axis_colour;
-   extern std::string slice_type;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
+   enum slice_t{ no_slice, slice, slice_void, slice_sphere, slice_cylinder};
    extern format_t format;
+   extern slice_t slice_type;
 
    // simple struct to store material parameters
    struct material_t{
@@ -48,6 +55,16 @@ namespace vdc{
       std::string name;
       std::string element;
    };
+
+   // struct to hold input parameters, value and line in input file for error check
+   struct input_t{
+      std::string key;
+      std::vector<std::string> value;
+      unsigned int line_number;
+   };
+
+   // unordered map of input keys to function wrappers
+   extern std::unordered_map<std::string,std::function<void(const input_t&)>> key_list;
 
    extern uint64_t num_atoms;
 
@@ -113,12 +130,17 @@ namespace vdc{
    extern double ssc_bin_width; // width of each bin (Agstroms)
    extern double ssc_inv_bin_width; // 1/bin width
 
-   // Functions
-   int command( int argc, char* argv[]);
+   //==========================================
+   // Forward function declarations
+   //==========================================
+
+   // main
+   void command( int argc, char* argv[]);
+   void read_and_set();
    void process_coordinates();
    void process_spins();
 
-   // forward function declarations
+   // non-magnetic
    void read_nm_metadata();
    void read_nm_data();
    void slice_nm_system();
@@ -137,22 +159,36 @@ namespace vdc{
    void output_inc_file(unsigned int spin_file_id);
    void output_povray_file();
    
-      // Colour
-      void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
-      void initialise_colourwheel();
+   // Colour
+   void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
+   void initialise_colourwheel();
 
 
    // SSC
    void initialise_ssc();
    void output_average_ssc_file();
-    void output_ssc_file(unsigned int spin_file_id);
+   void output_ssc_file(unsigned int spin_file_id);
  
 
    // CELL
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);
 
-   
+   // setting functions
+   void set_frame_start(const input_t &input);
+   void set_frame_final(const input_t &input);
+   void set_remove_materials(const input_t &input);
+   void set_afm(const input_t &input);
+   void set_slice(const input_t &input);
+   void set_slice_void(const input_t &input);
+   void set_slice_sphere(const input_t &input); 
+   void set_slice_cylinder(const input_t &input);
+   void set_vector_z(const input_t &input);
+   void set_vector_x(const input_t &input);
+   void set_colourmap(const input_t &input);
+   void set_custom_colourmap(const input_t &input);
+   void set_3D(const input_t &input);
+
 }
 
 #endif //VDC_H_

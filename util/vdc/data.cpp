@@ -17,6 +17,9 @@
 
 namespace vdc{
 
+   // input filename
+   std::string input_file = "vdc_input";
+
    // program option flags
    bool verbose  = false; // flag to specify verbosity of output to user
    bool xyz      = false; // flag to specify crystal.xyz file output
@@ -29,11 +32,12 @@ namespace vdc{
    bool z_vector = false; // flag to specify plane for povray colouring
 
    // keyword variables
-   std::string colour_keyword = "CBWR";
+   std::string colour_keyword = "cbwr";
    std::string custom_colourmap_file;
    std::vector<std::vector<double>> colourmap(256, std::vector<double>(3));
+   std::vector<std::string> colourmaps = {"c2", "bwr", "cbwr", "rainbow"};
    bool x_axis_colour = false;
-   std::string slice_type = "no-slice";
+   slice_t slice_type = no_slice;
 
    format_t format;
 
@@ -86,12 +90,12 @@ namespace vdc{
    std::vector<int> atom_cell_id;
    std::vector<int> num_atoms_in_cell;
    std::vector<double> cell_coords;
-   std::vector< std::vector< std::vector <double> > > cell_magnetization;
+   std::vector<std::vector<std::vector <double>>> cell_magnetization;
 
    // array to store subsidiary data file names
-   std::vector <std::string> coord_filenames(0);
-   std::vector <std::string> spin_filenames(0);
-   std::vector <std::string> nm_filenames(0);
+   std::vector<std::string> coord_filenames(0);
+   std::vector<std::string> spin_filenames(0);
+   std::vector<std::string> nm_filenames(0);
 
    // arrays for storing time-averaged spin-spin correlations
    std::vector<double> ssc_counts(0); // number of counts
@@ -101,5 +105,38 @@ namespace vdc{
    double ssc_num_bins;  // number of bins for correlations
    double ssc_bin_width; // width of each bin (Agstroms)
    double ssc_inv_bin_width; // 1/bin width
+
+   // unordered map of input key string to function wrapper
+   std::unordered_map<std::string, std::function<void(const input_t&)>> key_list = {
+
+      // frame start and end
+      {"frame-start",set_frame_start},
+      {"start-frame",set_frame_start},
+      {"frame-final",set_frame_final},
+      {"final-frame",set_frame_final},
+      {"frame-end"  ,set_frame_final},
+      // remove materials
+      {"remove-material" , set_remove_materials},
+      {"remove-materials", set_remove_materials},
+      // antiferromagnetic materials
+      {"antiferromagnetic-materials", set_afm},
+      {"afm", set_afm},
+      // slices
+      {"slice", set_slice},
+      {"slice-void", set_slice_void},
+      {"void-slice", set_slice_void},
+      {"slice-sphere", set_slice_sphere},
+      {"sphere-slice", set_slice_sphere},
+      {"slice-cylinder", set_slice_cylinder},
+      // colourmap
+      {"vector-z", set_vector_z},
+      {"z-vector", set_vector_z},
+      {"vector-x", set_vector_x},
+      {"x-vector", set_vector_x},
+      {"colourmap", set_colourmap},
+      {"colormap" , set_colourmap},
+      {"custom-colormap"  , set_custom_colourmap},
+      {"custom-colourmap" , set_custom_colourmap}
+   };
 
 } // end of namespace vdc
