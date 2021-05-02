@@ -37,7 +37,7 @@ namespace vdc{
       const double cell_size = vdc::cell_size; // cell size (angstroms)
 
       // calculate minima and maxima
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_atoms_list[i];
@@ -89,7 +89,7 @@ namespace vdc{
       supercell_array.resize(num_cells[0]);
       for(unsigned int i=0;i<num_cells[0];++i){
          supercell_array[i].resize(num_cells[1]);
-         for(int j=0;j<num_cells[1];++j){
+         for(unsigned int j=0;j<num_cells[1];++j){
             supercell_array[i][j].resize(num_cells[2]);
             // store cell coordinates
             for(unsigned int k=0; k<num_cells[2]; ++k){
@@ -111,8 +111,8 @@ namespace vdc{
       // Allocate storage for cell id for each atom
       vdc::atom_cell_id.resize(vdc::sliced_atoms_list.size(),0);
 
-      // Determine number of cells in x,y,z
-      const unsigned int d[3] = { num_cells[0], num_cells[1], num_cells[2] };
+      // Determine number of cells in x,y,z (unused)
+      // const unsigned int d[3] = { num_cells[0], num_cells[1], num_cells[2] };
 
       // calculate number of atoms in each cell
       std::vector<unsigned int> init_num_atoms_in_cell(vdc::total_cells);
@@ -120,7 +120,7 @@ namespace vdc{
       //------------------------------------------------------------------------
       // Assign atoms to cells
       //------------------------------------------------------------------------
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_atoms_list[i];
@@ -179,7 +179,7 @@ namespace vdc{
       }
 
       // determine new cell numbers for each atom
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
          const unsigned int old_cell = vdc::atom_cell_id[i];
          const unsigned int new_cell = new_cell_number[old_cell];
 
@@ -227,7 +227,7 @@ namespace vdc{
       }
 
       // calculate cell magnetizations in 1D
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_atoms_list[i];

@@ -54,7 +54,7 @@ void output_vtk_file(unsigned int spin_file_id){
    vtkfile << "         <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
 
 
-	for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+	for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
 		// get atom ID
 		unsigned int atom = vdc::sliced_atoms_list[i];
@@ -66,7 +66,7 @@ void output_vtk_file(unsigned int spin_file_id){
    vtkfile << "      </Points>" << std::endl;
    vtkfile << "      <PointData Vectors=\"vector\">" << std::endl;
    vtkfile << "         <DataArray type=\"Float32\" Name=\"spin\" NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
-	for(int i=0; i < vdc::atoms_list.size(); i++){
+	for(size_t i=0; i < vdc::atoms_list.size(); i++){
 
 		// get atom ID
 		unsigned int atom = vdc::atoms_list[i];
@@ -76,7 +76,7 @@ void output_vtk_file(unsigned int spin_file_id){
    vtkfile << std::endl;
    vtkfile << "         </DataArray>" << std::endl;
    vtkfile << "         <DataArray type=\"Float32\" Name=\"moment\" format=\"ascii\">" << std::endl;
-	for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+	for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
 		// get atom ID
 		unsigned int atom = vdc::sliced_atoms_list[i];
@@ -88,7 +88,7 @@ void output_vtk_file(unsigned int spin_file_id){
    vtkfile << std::endl;
    vtkfile << "         </DataArray>" << std::endl;
    vtkfile << "         <DataArray type=\"Int32\" Name=\"ID\" format=\"ascii\">" << std::endl;
-	for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+	for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
 		// get atom ID
 		unsigned int atom = vdc::sliced_atoms_list[i];

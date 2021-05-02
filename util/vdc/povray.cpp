@@ -75,7 +75,7 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_atoms_list[i];
@@ -124,7 +124,7 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_nm_atoms_list[i];
@@ -206,7 +206,7 @@ void output_povray_file(){
    // Determine non-magnetic materials looping over all non-magnetic atoms
    //---------------------------------------------------------------------------
    std::vector<bool> is_nm_mat(vdc::materials.size(),false);
-   for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+   for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
 
       // get atom ID
       unsigned int atom = vdc::sliced_nm_atoms_list[i];
