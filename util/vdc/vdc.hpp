@@ -18,6 +18,7 @@
 #include <vector>
 #include <unordered_map>
 #include <functional>
+#include <string>
 
 namespace vdc{
 
@@ -41,6 +42,7 @@ namespace vdc{
    extern std::vector<std::vector<double>> colourmap;
    extern std::vector<std::string> colourmaps;
    extern bool x_axis_colour;
+   extern bool default_camera_pos;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
@@ -64,7 +66,7 @@ namespace vdc{
    };
 
    // unordered map of input keys to function wrappers
-   extern std::unordered_map<std::string,std::function<void(const input_t&)>> key_list;
+   extern const std::unordered_map<std::string,std::function<void(const input_t&)>> key_list;
 
    extern uint64_t num_atoms;
 
@@ -97,6 +99,16 @@ namespace vdc{
    extern std::vector<double> vector_z;
    extern std::vector<double> vector_y;
    extern std::vector<double> vector_x;
+
+   // povray camera settings
+   extern std::vector<double> camera_pos;
+   extern std::vector<double> camera_look_at;
+   extern double camera_zoom;
+   extern std::string background_colour;
+
+   // povray shape sizes
+   extern std::vector<double> atom_sizes;
+   extern std::vector<double> arrow_sizes;
 
    // non-magnetic atom data
    extern uint64_t num_nm_atoms;
@@ -188,7 +200,12 @@ namespace vdc{
    void set_colourmap(const input_t &input);
    void set_custom_colourmap(const input_t &input);
    void set_3D(const input_t &input);
-
+   void set_camera_position(const input_t &input);
+   void set_camera_look_at(const input_t &input);
+   void set_camera_zoom(const input_t &input);
+   void set_background_colour(const input_t &input);
+   void set_atom_sizes(const input_t &input);
+   void set_arrow_sizes(const input_t &input);
 }
 
 #endif //VDC_H_

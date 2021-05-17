@@ -28,7 +28,7 @@ void set_frame_start(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"frame-start\"\n\nExpects 1 argument: unsigned int\n\n"
+      std::cout << "\"frame-start\"\tExpects 1 argument: unsigned int\n\n"
                 << "Sets initial frame for Povray rendering.\n\n"
                 << "Default: frame-start = " << vdc::start_file_id << std::endl;
       std::exit(EXIT_SUCCESS);
@@ -40,7 +40,8 @@ void set_frame_start(const input_t &input){
    int frame = std::stoi(input.value[0]);
    if (frame >= 0){ vdc::vdc_start_file_id = frame; }
    else {
-      std::cerr << "Error - frame index cannot be negative." << std::endl;
+      std::cerr << "Error - frame index cannot be negative in '" << input.key << "' on line "
+                << input.line_number << "of input file '" << vdc::input_file << "'\n";
       std::exit(EXIT_FAILURE);
    }
 }
@@ -53,8 +54,8 @@ void set_frame_final(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"frame-final\"\n\nExpects 1 argument: unsigned int\n\n"
-                << "Sets final frame for Povray rendering.\n"
+      std::cout << "\"frame-final\"\tExpects 1 argument: unsigned int\n\n"
+                << "Sets final frame for Povray rendering.\n\n"
                 << "Default: frame-final = " << vdc::final_file_id << std::endl;
       std::exit(EXIT_SUCCESS);
    }
@@ -65,7 +66,8 @@ void set_frame_final(const input_t &input){
    int frame = std::stoi(input.value[0]);
    if (frame >= 0){ vdc::vdc_final_file_id = frame; }
    else {
-      std::cerr << "Error - frame index cannot be negative." << std::endl;
+      std::cerr << "Error - frame index cannot be negative in '" << input.key << "' on line "
+                << input.line_number << "of input file '" << vdc::input_file << "'\n";
       std::exit(EXIT_FAILURE);
    }
 }
@@ -77,9 +79,10 @@ void set_remove_materials(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"remove-materials\"\n\nExpects 1 or more arguments: unsigned int\n\n"
-                << "Remove material IDs from visualisation. IDs start from 1.\n"
-                << "Default: remove-materials = [empty]\n";
+      std::cout << "\"remove-materials\"\tExpects 1 or more arguments: unsigned int\n\n"
+                << "Remove material IDs from visualisation. IDs start from 1.\n\n"
+                << "Default: [not set]\n"
+                << "Example usage: remove-materials = 1,2\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -98,9 +101,10 @@ void set_afm(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"afm\"\n\nExpects 1 or more arguments: unsigned int\n\n"
-                << "Chosen material IDs are flipped in Povray visualisation. IDs start from 1.\n"
-                << "Default: afm = [empty]\n";
+      std::cout << "\"afm\"\tExpects 1 or more arguments: unsigned int\n\n"
+                << "Chosen material IDs are flipped in Povray visualisation. IDs start from 1.\n\n"
+                << "Default: [not set]\n"
+                << "Example usage: afm = 1,2\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -112,15 +116,15 @@ void set_afm(const input_t &input){
    }
 }
 
-//------------------------------------------------------------------------
-// Slice parameters
-//------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+// Slice parameters cut system along x,y,z-axis directions, keeping inner atoms
+//--------------------------------------------------------------------------------
 void set_slice(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"slice\"\n\nExpects 6 arguments: real, in range (0,1)\n\n"
-                << "Removes atoms outside of defined cube [xmin,xmax,ymin,ymax,zmin,zmax].\n"
+      std::cout << "\"slice\"\tExpects 6 arguments: real, in range (0,1)\n\n"
+                << "Removes atoms outside of defined cube [xmin,xmax,ymin,ymax,zmin,zmax].\n\n"
                 << "Default: slice = 0.0,1.0,0.0,1.0,0.0,1.0\n";
       std::exit(EXIT_SUCCESS);
    }
@@ -128,14 +132,14 @@ void set_slice(const input_t &input){
    // check args
    arg_count(input, 6, "eq");
 
-   // conver to double and store
+   // convert to double and store
    for (int i=0; i<6; i++){
 
       double val = std::stod(input.value[i]);
       if (val >= -0.000001 && val <= 1.000001){ vdc::slice_parameters[i] = val; }
       else {
          std::cerr << "Error - fractional coords must be in range (0,1) in '" << input.key << "' on line "
-             << input.line_number << " of input file '" << vdc::input_file << std::endl;
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
          std::exit(EXIT_FAILURE);  
       }
    }
@@ -143,15 +147,15 @@ void set_slice(const input_t &input){
    vdc::slice_type = vdc::slice;
 }
 
-//------------------------------------------------------------------------
-// Slice void parameters
-//------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
+// Slice void parameters cut system along x,y,z-axis directions, keeping outer atoms
+//--------------------------------------------------------------------------------------
 void set_slice_void(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"slice-void\"\n\nExpects 6 arguments: real, in range (0,1)\n\n"
-                << "Atoms inside defined cube [xmin,xmax,ymin,ymax,zmin,zmax] are removed.\n"
+      std::cout << "\"slice-void\"\tExpects 6 arguments: real, in range (0,1)\n\n"
+                << "Atoms inside defined cube [xmin,xmax,ymin,ymax,zmin,zmax] are removed.\n\n"
                 << "Default: slice = 0.0,1.0,0.0,1.0,0.0,1.0\n";
       std::exit(EXIT_SUCCESS);
    }
@@ -166,7 +170,7 @@ void set_slice_void(const input_t &input){
       if (val >= -0.000001 && val <= 1.000001){ vdc::slice_parameters[i] = val; }
       else {
          std::cerr << "Error - fractional coords must be in range (0,1) in '" << input.key << "' on line "
-             << input.line_number << " of input file '" << vdc::input_file << std::endl;
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
          std::exit(EXIT_FAILURE);  
       }
    }
@@ -174,15 +178,15 @@ void set_slice_void(const input_t &input){
    vdc::slice_type = vdc::slice_void;
 }
 
-//------------------------------------------------------------------------
-// Slice sphere parameters
-//------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+// Slice sphere parameters cut system using x,y,z-axis coords, keeping inner atoms
+//--------------------------------------------------------------------------------
 void set_slice_sphere(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"slice-sphere\"\n\nExpects 3 arguments: real, in range (0,1)\n\n"
-                << "Removes atoms outside of defined ellipsoid [xfrac,yfrac,zfrac].\n"
+      std::cout << "\"slice-sphere\"\tExpects 3 arguments: real, in range (0,1)\n\n"
+                << "Removes atoms outside of defined ellipsoid [xfrac,yfrac,zfrac].\n\n"
                 << "Default: slice = 1.0,1.0,1.0\n";
       std::exit(EXIT_SUCCESS);
    }
@@ -197,7 +201,7 @@ void set_slice_sphere(const input_t &input){
       if (val >= -0.000001 && val <= 1.000001){ vdc::slice_parameters[i] = val; }
       else {
          std::cerr << "Error - fractional coords must be in range (0,1) in '" << input.key << "' on line "
-             << input.line_number << " of input file '" << vdc::input_file << std::endl;
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
          std::exit(EXIT_FAILURE);  
       }
    }
@@ -205,15 +209,15 @@ void set_slice_sphere(const input_t &input){
    vdc::slice_type = vdc::slice_sphere;
 }
 
-//------------------------------------------------------------------------
-// Slice sphere parameters
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------
+// Slice cylinder parameters cut system using x,y,z-axis coords, keeping inner atoms
+//----------------------------------------------------------------------------------
 void set_slice_cylinder(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"slice-cylinder\"\n\nExpects 4 arguments: real, in range (0,1)\n\n"
-                << "Removes atoms outside of defined cylinder [xfrac,yfrac,zmin,zmax] along z-axis.\n"
+      std::cout << "\"slice-cylinder\"\tExpects 4 arguments: real, in range (0,1)\n\n"
+                << "Removes atoms outside of defined cylinder [xfrac,yfrac,zmin,zmax] along z-axis.\n\n"
                 << "Default: slice = 1.0,1.0,1.0\n";
       std::exit(EXIT_SUCCESS);
    }
@@ -228,7 +232,7 @@ void set_slice_cylinder(const input_t &input){
       if (val >= -0.000001 && val <= 1.000001){ vdc::slice_parameters[i] = val; }
       else {
          std::cerr << "Error - fractional coords must be in range (0,1) in '" << input.key << "' on line "
-             << input.line_number << " of input file '" << vdc::input_file << std::endl;
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
          std::exit(EXIT_FAILURE);  
       }
    }
@@ -236,12 +240,15 @@ void set_slice_cylinder(const input_t &input){
    vdc::slice_type = vdc::slice_cylinder;
 }
 
+//----------------------------------------------------------------------------------
+// Set z-vector direction which defines principal colour axis
+//----------------------------------------------------------------------------------
 void set_vector_z(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"vector-z\"\n\nExpects 3 arguments: real (brackets and comma optional)\n\n"
-                << "Redefine z-axis orientation in cartesian coords.\n"
+      std::cout << "\"vector-z\"\tExpects 3 arguments: real (brackets and comma optional)\n\n"
+                << "Redefine z-axis orientation in cartesian coords.\n\n"
                 << "Default: vector-z = {0.0,0.0,1.0}\n";
       std::exit(EXIT_SUCCESS);
    }
@@ -261,12 +268,15 @@ void set_vector_z(const input_t &input){
    vdc::z_vector = true;
 }
 
+//----------------------------------------------------------------------------------
+// Set x-vector direction which defines secondary colour axis
+//----------------------------------------------------------------------------------
 void set_vector_x(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"vector-x\"\n\nExpects 3 arguments: real (brackets and comma optional)\n\n"
-                << "Redefine x-axis orientation in cartesian coords. vector-z must also be defined.\n"
+      std::cout << "\"vector-x\"\tExpects 3 arguments: real (brackets and comma optional)\n\n"
+                << "Redefine x-axis orientation in cartesian coords. vector-z must also be defined.\n\n"
                 << "Default: vector-x = {1.0,0.0,0.0}\n";
       std::exit(EXIT_SUCCESS);
    }
@@ -286,16 +296,19 @@ void set_vector_x(const input_t &input){
    vdc::x_vector = true;
 }
 
+//----------------------------------------------------------------------------------
+// Choose predefined colourmap
+//----------------------------------------------------------------------------------
 void set_colourmap(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"colourmap\"\n\nExpects 1 argument: string\n\n"
+      std::cout << "\"colourmap\"\tExpects 1 argument: string\n\n"
                 << "Choose preset colourmap. Availible maps: ";
                 for (const std::string &map : vdc::colourmaps){
                    std::cout << map << " ";
                 }
-      std::cout << "\nDefault: colourmap = CBWR\n";
+      std::cout << "\n\nDefault: colourmap = CBWR\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -311,13 +324,17 @@ void set_colourmap(const input_t &input){
    }
 }
 
+//----------------------------------------------------------------------------------
+// Use 3D colouring scheme
+//----------------------------------------------------------------------------------
 void set_3D(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"3D\"\n\nExpects 1 argument: true or false\n\n"
-                << "Enables brighness variation in Povray acorrding to spin component along vector-x.\n"
-                << "Default: 3D = false\n";
+      std::cout << "\"3D\"\tExpects 1 argument: true or false\n\n"
+                << "Enables brighness variation in Povray acorrding to spin component along vector-x.\n\n"
+                << "Default: [not set]\n"
+                << "Example usage: 3D = true\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -330,19 +347,23 @@ void set_3D(const input_t &input){
    else if (value == "false"){ vdc::x_axis_colour = false;}
    else {
       std::cerr << "Error - Expected true/false instead of " << value << " in " << input.key
-                << "' on line " << input.line_number << " of input file '" << vdc::input_file << "'.\n";
+                << "' on line " << input.line_number << " of input file '" << vdc::input_file << "'\n";
       std::exit(EXIT_FAILURE);
    }
 }
 
+//----------------------------------------------------------------------------------
+// Set user-provided colourmap
+//----------------------------------------------------------------------------------
 void set_custom_colourmap(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"custom-colourmap\"\n\nExpects 1 argument: filename\n\n"
+      std::cout << "\"custom-colourmap\"\tExpects 1 argument: filename\n\n"
                 << "Povray uses User defined colourmap. Filename must contain 256 colours in RGB format:\n"
                 << "3 columns of space separated reals in range (0,1).\n\n"
-                << "Default: [empty]\n";
+                << "Default: [not set]\n"
+                << "Example usage: custom_colourmap = colourmapfile.txt \n";       
       std::exit(EXIT_SUCCESS);
    }
 
@@ -356,7 +377,185 @@ void set_custom_colourmap(const input_t &input){
    vdc::custom_colourmap_file = input.value[0];
 }
 
-// check number of args provided is correct
+//----------------------------------------------------------------------------------
+// Set povray camera location
+//----------------------------------------------------------------------------------
+void set_camera_position(const input_t &input){
+
+   // print help message if argument is "-h"
+      if (input.value[0] == "-h"){
+      std::cout << "\"camera_position\"\tExpects 3 arguments: real, in range (-1,1)\n\n"
+                << "Povray camera position, set using fractional coords.\n"
+                << "Camera distance from look at point is calculated automatically however\n"
+                << "it can be changed by using camera_zoom.\n\n"
+                << "Default: [not set]\n"
+                << "Example usage: camera_position = (1,1,1)\n";
+      std::exit(EXIT_SUCCESS);
+   }
+
+   // check args
+   arg_count(input,3,"eq");
+
+   // convert to double and store
+   for (int i=0; i<3; i++){
+
+      double val = std::stod(input.value[i]);
+      if (val >= -1.000001 && val <= 1.000001){ vdc::camera_pos[i] = val; }
+      else {
+         std::cerr << "Error - fractional coords must be in range (-1,1) in '" << input.key << "' on line "
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
+         std::exit(EXIT_FAILURE);  
+      }
+   }
+
+   // set default camera pos flag to false
+   vdc::default_camera_pos = false;
+}
+
+//----------------------------------------------------------------------------------
+// Set povray camera look at position
+//----------------------------------------------------------------------------------
+void set_camera_look_at(const input_t &input){
+
+   // print help message if argument is "-h"
+      if (input.value[0] == "-h"){
+      std::cout << "\"camera_look_at\"\tExpects 3 arguments: real, in range (-1,1)\n\n"
+                << "Povray camera look at position, set using fractional coords.\n"
+                << "The position is a location in the bounding box of the system, with centre (0,0,0).\n\n"
+                << "Default: camera_look_at = (0.0,0.0,0.0)\n";
+      std::exit(EXIT_SUCCESS);
+   }
+
+   // check args
+   arg_count(input,3,"eq");
+
+   // convert to double and store
+   for (int i=0; i<3; i++){
+
+      double val = std::stod(input.value[i]);
+      if (val >= -1.000001 && val <= 1.000001){ vdc::camera_look_at[i] = val; }
+      else {
+         std::cerr << "Error - fractional coords must be in range (-1,1) in '" << input.key << "' on line "
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
+         std::exit(EXIT_FAILURE);  
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------
+// Set povray camera distance multiplier
+//----------------------------------------------------------------------------------
+void set_camera_zoom(const input_t &input){
+
+   // print help message if argument is "-h"
+      if (input.value[0] == "-h"){
+      std::cout << "\"camera_zoom\"\tExpects 1 argument: positive real\n\n"
+                << "Povray camera zoom multiplier.\n"
+                << "The default distance from the camera is automatically calculated according to the size of the system.\n"
+                << "This can be increased or reduced using camera_zoom to multiply the default distance. Values lower\n"
+                << "than 1.0 reduce the distance, while values above 1.0 increase it.\n\n"
+                << "Default: camera_zoom = 1.0\n";
+      std::exit(EXIT_SUCCESS);
+   }
+
+   // check args
+   arg_count(input,1,"eq");
+
+   // set value, must be greater than 0
+   vdc::camera_zoom = std::stod(input.value[0]);
+   if (vdc::camera_zoom <= 0.0){
+      std::cerr << "Error - camera zoom must be greater than 0.0, in '" << input.key << "' on line "
+                << input.line_number << "of input file '" << vdc::input_file << "'\n";
+      std::exit(EXIT_FAILURE);
+   }
+}
+
+//----------------------------------------------------------------------------------
+// Set povray background colour
+//----------------------------------------------------------------------------------
+void set_background_colour(const input_t &input){
+
+   // print help message if argument is "-h"
+      if (input.value[0] == "-h"){
+      std::cout << "\"background_colour\"\tExpects 1 argument: positive real\n\n"
+                << "Povray background colour.\n"
+                << "Povray includes various predefined colours such as \"White\",\"Black\",\"Gray\".\n"
+                << "A list of these names and their rgb values can be found at: https://github.com/POV-Ray/povray/blob/master/distribution/include/colors.inc\n"
+                << "Note: misspelled colour names will not be detected by vdc but will cause errors in Povray.\n\n"
+                << "Default: background_colour = " << vdc::background_colour << "\n";
+      std::exit(EXIT_SUCCESS);
+   }
+
+   // check args
+   arg_count(input,1,"eq");
+
+   // set value
+   vdc::background_colour = input.value[0];
+}
+
+//----------------------------------------------------------------------------------
+// Set povray atom size
+//----------------------------------------------------------------------------------
+void set_atom_sizes(const input_t &input){
+
+   // print help message if argument is "-h"
+      if (input.value[0] == "-h"){
+      std::cout << "\"atom_sizes\"\tExpects 1 or more arguments: positive real\n\n"
+                << "Povray atom sizes. Atoms are represented by spheres with a defined radius.\n"
+                << "Individual materials can have different atom sizes.\n\n"
+                << "Default: all atoms are set to " << vdc::atom_sizes[0] 
+                << "\nExample usage: atom_sizes = {1.2,2.0}\t// set mat1: 1.2 and mat2: 2.0\n";
+      std::exit(EXIT_SUCCESS);
+   }
+
+   // check args
+   arg_count(input,1,"ge");
+
+   // convert to double and store
+   vdc::atom_sizes.clear();
+   for (const std::string &value : input.value){
+
+      vdc::atom_sizes.push_back(std::stod(value));
+      if (vdc::atom_sizes.back() <= 0.0){
+         std::cerr << "Error - atom size must be greater than 0.0 in '" << input.key << "' on line "
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
+         std::exit(EXIT_FAILURE);  
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------
+// Set povray arrow size
+//----------------------------------------------------------------------------------
+void set_arrow_sizes(const input_t &input){
+
+   // print help message if argument is "-h"
+      if (input.value[0] == "-h"){
+      std::cout << "\"arrow_sizes\"\tExpects 1 or more arguments: positive real\n\n"
+                << "Povray arrow sizes.\n"
+                << "Individual materials can have different arrow sizes.\n\n"
+                << "Default: all arrows are set to " << vdc::arrow_sizes[0] 
+                << "\nExample usage: arrow_sizes = {1.2,2.0}\t// set mat1: 1.2 and mat2: 2.0\n";
+      std::exit(EXIT_SUCCESS);
+   }
+
+   // check args
+   arg_count(input,1,"ge");
+
+   // convert to double and store
+   vdc::arrow_sizes.clear();
+   for (const std::string &value : input.value){
+
+      vdc::arrow_sizes.push_back(std::stod(value));
+      if (vdc::arrow_sizes.back() <= 0.0){
+         std::cerr << "Error - arrow size must be greater than 0.0 in '" << input.key << "' on line "
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
+         std::exit(EXIT_FAILURE);  
+      }
+   }
+}
+
+// bookkeeping functino to check number of args provided is correct
 void arg_count(const input_t &input, size_t args_required, std::string requirement){
 
    const size_t &num_args = input.value.size();
@@ -367,21 +566,21 @@ void arg_count(const input_t &input, size_t args_required, std::string requireme
       else {
          std::cerr << "Error - expected " << args_required << " arguments in " << input.key
                    << "' on line " << input.line_number << " of input file '" << vdc::input_file
-                   << ".\nInstead got " << num_args << ".\n"; 
+                   << "'\nInstead got " << num_args << ".\n"; 
       }
    }
    else if (requirement == "ge"){
       if (num_args >= args_required){ return; }
       else {
          std::cerr << "Error - too few arguments passed to '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << std::endl;
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
       }
    }
    else if (requirement == "le"){
       if (num_args <= args_required){ return; }
       else {
          std::cerr << "Error - too many arguments passed to '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << std::endl;
+                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
       }
    }
    else {

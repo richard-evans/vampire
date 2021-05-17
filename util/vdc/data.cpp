@@ -38,6 +38,7 @@ namespace vdc{
    std::vector<std::string> colourmaps = {"c2", "bwr", "cbwr", "rainbow"};
    bool x_axis_colour = false;
    slice_t slice_type = no_slice;
+   bool default_camera_pos = true;
 
    format_t format;
 
@@ -74,6 +75,16 @@ namespace vdc{
    std::vector<double> vector_y = {0.0,1.0,0.0};
    std::vector<double> vector_x = {1.0,0.0,0.0};
 
+   // povray camera settings
+   std::vector<double> camera_pos    = {0.0,0.0,1.0};
+   std::vector<double> camera_look_at = {0.0,0.0,0.0};
+   double camera_zoom = 1.0;
+   std::string background_colour = "Gray30";
+
+   // povray shape sizes
+   std::vector<double> atom_sizes  = {1.2};
+   std::vector<double> arrow_sizes = {2.0};
+
    // non-magnetic atom data
    uint64_t num_nm_atoms = 0;
    std::vector<int> nm_category(0);
@@ -107,14 +118,14 @@ namespace vdc{
    double ssc_inv_bin_width; // 1/bin width
 
    // unordered map of input key string to function wrapper
-   std::unordered_map<std::string, std::function<void(const input_t&)>> key_list = {
+   const std::unordered_map<std::string, std::function<void(const input_t&)>> key_list = {
 
       // frame start and end
-      {"frame-start",set_frame_start},
-      {"start-frame",set_frame_start},
-      {"frame-final",set_frame_final},
-      {"final-frame",set_frame_final},
-      {"frame-end"  ,set_frame_final},
+      {"frame-start", set_frame_start},
+      {"start-frame", set_frame_start},
+      {"frame-final", set_frame_final},
+      {"final-frame", set_frame_final},
+      {"frame-end"  , set_frame_final},
       // remove materials
       {"remove-material" , set_remove_materials},
       {"remove-materials", set_remove_materials},
@@ -122,21 +133,34 @@ namespace vdc{
       {"antiferromagnetic-materials", set_afm},
       {"afm", set_afm},
       // slices
-      {"slice", set_slice},
-      {"slice-void", set_slice_void},
-      {"void-slice", set_slice_void},
-      {"slice-sphere", set_slice_sphere},
-      {"sphere-slice", set_slice_sphere},
+      {"slice"         , set_slice},
+      {"slice-void"    , set_slice_void},
+      {"void-slice"    , set_slice_void},
+      {"slice-sphere"  , set_slice_sphere},
+      {"sphere-slice"  , set_slice_sphere},
       {"slice-cylinder", set_slice_cylinder},
       // colourmap
-      {"vector-z", set_vector_z},
-      {"z-vector", set_vector_z},
-      {"vector-x", set_vector_x},
-      {"x-vector", set_vector_x},
+      {"vector-z" , set_vector_z},
+      {"z-vector" , set_vector_z},
+      {"vector-x" , set_vector_x},
+      {"x-vector" , set_vector_x},
       {"colourmap", set_colourmap},
       {"colormap" , set_colourmap},
-      {"custom-colormap"  , set_custom_colourmap},
-      {"custom-colourmap" , set_custom_colourmap}
+      {"custom-colormap" , set_custom_colourmap},
+      {"custom-colourmap", set_custom_colourmap},
+      // povray camera settings
+      {"camera_position", set_camera_position},
+      {"camera_look_at" , set_camera_look_at},
+      {"camera_lookat"  , set_camera_look_at},
+      {"camera_zoom"    , set_camera_zoom},
+      // povray background colour
+      {"background_colour", set_background_colour},
+      {"background_color" , set_background_colour},
+      // povray shape sizes
+      {"atom_sizes" , set_atom_sizes},
+      {"atom_size"  , set_atom_sizes},
+      {"arrow_sizes", set_arrow_sizes},
+      {"arrow_size" , set_arrow_sizes}
    };
 
 } // end of namespace vdc
