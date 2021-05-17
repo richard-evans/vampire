@@ -12,7 +12,7 @@
 %opt/vampire/cfg2xx\\
 
 \section*{Getting started}
-\addcontentsline{toc}{section}{Getting started}
+\phantomsection\addcontentsline{toc}{section}{Getting started}
 To generate the positions of your atoms, config:atoms must be set in the input file. This will produce .data and .meta files containing the atomic and spin configuration of your system. Their frequency can be adjusted using the config:atoms-output-rate paramter or they can be set to be output at the end of the simulation solely.\\
 
 In addition, the format of the output can be text or binary format, the latter can help with particulary large systems. Files written in binary format are system specific and usually cannot be read by vdc compiled on separate hardware.\\
@@ -31,7 +31,7 @@ config:output-format     = binary
 }
 
 \section*{Atomic visualization with rasmol}
-\addcontentsline{toc}{section}{Atomic visualization with rasmol}
+\phantomsection\addcontentsline{toc}{section}{Atomic visualization with rasmol}
 
 To visualise your system using Rasmol, simply run vdc in the same directory as your output. The config:atoms files must be present.\\
 
@@ -50,7 +50,7 @@ comment line
 The element in the .xyz file does not necessarily need to be the same as the atoms used in your system. They can instead be chosen for a different colour palette depending on the users requirements.
 
 \section*{Atomic visualization with POV-Ray}
-\addcontentsline{toc}{section}{Atomic visualization with POV-Ray}
+\phantomsection\addcontentsline{toc}{section}{Atomic visualization with POV-Ray}
 
 To produce pictures of your material of punishable quality and high configurability, it is also possible to use POV-Ray. After running vdc, the file "spins.pov" contains all the necessary information and an image may be produced by using:
 
@@ -246,11 +246,11 @@ In some cases whole materials are not relevant for visualisation purposes and ca
 POV-Ray visualization of antiferromagnets can be difficult due to the contrast of colours of antiparallel spins. To remedy this, it is possible to define materials as antiferromagnetic. These materials will have their colours flipped so that they match neighbouring spins while their spin direction remains antiferromagnetic.
 
 \section*{Micromagnetic visualization with PovRAY}
-\addcontentsline{toc}{section}{Micromagnetic visualization with PovRAY}
+\phantomsection\addcontentsline{toc}{section}{Micromagnetic visualization with PovRAY}
 cell2povray\\
 macros\\
 customization\\
 colouring options\\
 
 \section*{Visualization Movies}
-\addcontentsline{toc}{section}{Visualization Movies}
+\phantomsection\addcontentsline{toc}{section}{Visualization Movies}
