@@ -62,4 +62,4 @@ clean:
 
 purge:
 	@rm -f obj/*.o
-	@rm -f $(EXECUTABLE)
+	@rm -f $(EXECUTABLE) $(EXECUTABLE)-debug
