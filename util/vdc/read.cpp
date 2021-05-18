@@ -76,6 +76,9 @@ void read(std::vector<input_t> &input_list){
       // remove everything after comment character
       line = line.substr(0,line.find('#'));
 
+      // skip empty lines
+      if (line.empty()){ continue; }
+
       input_t input;
       bool key_set = false;
 
