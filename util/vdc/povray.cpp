@@ -192,9 +192,9 @@ void output_povray_file(){
 	pfile << "#include \"metals.inc\""	<< std::endl;
 	pfile << "#include \"screen.inc\""	<< std::endl;
    // look at position
-	pfile << "#declare LX=" << vdc::camera_look_at[0] << ";" << std::endl;
-	pfile << "#declare LY=" << vdc::camera_look_at[1] << ";" << std::endl;
-	pfile << "#declare LZ=" << vdc::camera_look_at[2] << ";" << std::endl;
+	pfile << "#declare LX=" << vdc::camera_look_at[0]*dim[0]/2.0 << ";" << std::endl;
+	pfile << "#declare LY=" << vdc::camera_look_at[1]*dim[1]/2.0 << ";" << std::endl;
+	pfile << "#declare LZ=" << vdc::camera_look_at[2]*dim[2]/2.0 << ";" << std::endl;
    // camera position
 	pfile << "#declare CX=" << size*vec[0]*6.0*vdc::camera_zoom << ";" << std::endl;
 	pfile << "#declare CY=" << size*vec[1]*6.0*vdc::camera_zoom << ";" << std::endl;
