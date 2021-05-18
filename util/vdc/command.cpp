@@ -100,6 +100,11 @@ void command( int argc, char* argv[] ){
          // check number of args not exceeded
          check_arg(arg, argc, argv, temp_str, "Error - no parameter specified for "+sw+" command line option." );
 
+         // change temp_str to lowercase for comparison
+         for (char &c : temp_str){
+            c = std::tolower(c);
+         }
+
          // check if parameter exists
          if (vdc::key_list.find(temp_str) == vdc::key_list.end()){
             std::cerr << "Error - No matching parameter '" << temp_str << "'.\n";
