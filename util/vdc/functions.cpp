@@ -123,7 +123,7 @@ void set_slice(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"slice\"\tExpects 6 arguments: real, in range (0,1)\n\n"
+      std::cout << "\"slice\"\t\tExpects 6 arguments: real, in range (0,1)\n\n"
                 << "Removes atoms outside of defined cube [xmin,xmax,ymin,ymax,zmin,zmax].\n\n"
                 << "Default: slice = 0.0,1.0,0.0,1.0,0.0,1.0\n";
       std::exit(EXIT_SUCCESS);
@@ -156,7 +156,8 @@ void set_slice_void(const input_t &input){
    if (input.value[0] == "-h"){
       std::cout << "\"slice-void\"\tExpects 6 arguments: real, in range (0,1)\n\n"
                 << "Atoms inside defined cube [xmin,xmax,ymin,ymax,zmin,zmax] are removed.\n\n"
-                << "Default: slice = 0.0,1.0,0.0,1.0,0.0,1.0\n";
+                << "Default: [not set]\n"
+                << "Example usage: slice-void = 0.1,0.9,0.1,0.9,0.1,0.9\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -187,7 +188,8 @@ void set_slice_sphere(const input_t &input){
    if (input.value[0] == "-h"){
       std::cout << "\"slice-sphere\"\tExpects 3 arguments: real, in range (0,1)\n\n"
                 << "Removes atoms outside of defined ellipsoid [xfrac,yfrac,zfrac].\n\n"
-                << "Default: slice = 1.0,1.0,1.0\n";
+                << "Default: [not set]\n"
+                << "Example usage: slice-sphere = 0.5,1.0,1.0\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -384,12 +386,12 @@ void set_camera_position(const input_t &input){
 
    // print help message if argument is "-h"
       if (input.value[0] == "-h"){
-      std::cout << "\"camera_position\"\tExpects 3 arguments: real, in range (-1,1)\n\n"
+      std::cout << "\"camera-position\"\tExpects 3 arguments: real, in range (-1,1)\n\n"
                 << "Povray camera position, set using fractional coords.\n"
                 << "Camera distance from look at point is calculated automatically however\n"
-                << "it can be changed by using camera_zoom.\n\n"
+                << "it can be changed by using camera-zoom.\n\n"
                 << "Default: [not set]\n"
-                << "Example usage: camera_position = (1,1,1)\n";
+                << "Example usage: camera-position = (1,1,1)\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -419,10 +421,10 @@ void set_camera_look_at(const input_t &input){
 
    // print help message if argument is "-h"
       if (input.value[0] == "-h"){
-      std::cout << "\"camera_look_at\"\tExpects 3 arguments: real, in range (-1,1)\n\n"
+      std::cout << "\"camera-look-at\"\tExpects 3 arguments: real, in range (-1,1)\n\n"
                 << "Povray camera look at position, set using fractional coords.\n"
                 << "The position is a location in the bounding box of the system, with centre (0,0,0).\n\n"
-                << "Default: camera_look_at = (0.0,0.0,0.0)\n";
+                << "Default: camera-look-at = (0.0,0.0,0.0)\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -449,12 +451,12 @@ void set_camera_zoom(const input_t &input){
 
    // print help message if argument is "-h"
       if (input.value[0] == "-h"){
-      std::cout << "\"camera_zoom\"\tExpects 1 argument: positive real\n\n"
+      std::cout << "\"camera-zoom\"\tExpects 1 argument: positive real\n\n"
                 << "Povray camera zoom multiplier.\n"
                 << "The default distance from the camera is automatically calculated according to the size of the system.\n"
                 << "This can be increased or reduced using camera_zoom to multiply the default distance. Values lower\n"
                 << "than 1.0 reduce the distance, while values above 1.0 increase it.\n\n"
-                << "Default: camera_zoom = 1.0\n";
+                << "Default: camera-zoom = 1.0\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -477,12 +479,12 @@ void set_background_colour(const input_t &input){
 
    // print help message if argument is "-h"
       if (input.value[0] == "-h"){
-      std::cout << "\"background_colour\"\tExpects 1 argument: positive real\n\n"
+      std::cout << "\"background-colour\"\tExpects 1 argument: positive real\n\n"
                 << "Povray background colour.\n"
                 << "Povray includes various predefined colours such as \"White\",\"Black\",\"Gray\".\n"
                 << "A list of these names and their rgb values can be found at: https://github.com/POV-Ray/povray/blob/master/distribution/include/colors.inc\n"
                 << "Note: misspelled colour names will not be detected by vdc but will cause errors in Povray.\n\n"
-                << "Default: background_colour = " << vdc::background_colour << "\n";
+                << "Default: background-colour = " << vdc::background_colour << "\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -491,6 +493,9 @@ void set_background_colour(const input_t &input){
 
    // set value
    vdc::background_colour = input.value[0];
+
+   // preset colour in Povray are capitalised
+   vdc::background_colour[0] = std::toupper(vdc::background_colour[0]);
 }
 
 //----------------------------------------------------------------------------------
@@ -500,11 +505,11 @@ void set_atom_sizes(const input_t &input){
 
    // print help message if argument is "-h"
       if (input.value[0] == "-h"){
-      std::cout << "\"atom_sizes\"\tExpects 1 or more arguments: positive real\n\n"
+      std::cout << "\"atom-sizes\"\tExpects 1 or more arguments: positive real\n\n"
                 << "Povray atom sizes. Atoms are represented by spheres with a defined radius.\n"
                 << "Individual materials can have different atom sizes.\n\n"
                 << "Default: all atoms are set to " << vdc::atom_sizes[0] 
-                << "\nExample usage: atom_sizes = {1.2,2.0}\t// set mat1: 1.2 and mat2: 2.0\n";
+                << "\nExample usage: atom-sizes = {1.2,2.0}\t// set mat1: 1.2 and mat2: 2.0\n";
       std::exit(EXIT_SUCCESS);
    }
 
@@ -531,11 +536,11 @@ void set_arrow_sizes(const input_t &input){
 
    // print help message if argument is "-h"
       if (input.value[0] == "-h"){
-      std::cout << "\"arrow_sizes\"\tExpects 1 or more arguments: positive real\n\n"
+      std::cout << "\"arrow-sizes\"\tExpects 1 or more arguments: positive real\n\n"
                 << "Povray arrow sizes.\n"
                 << "Individual materials can have different arrow sizes.\n\n"
                 << "Default: all arrows are set to " << vdc::arrow_sizes[0] 
-                << "\nExample usage: arrow_sizes = {1.2,2.0}\t// set mat1: 1.2 and mat2: 2.0\n";
+                << "\nExample usage: arrow-sizes = {1.2,2.0}\t// set mat1: 1.2 and mat2: 2.0\n";
       std::exit(EXIT_SUCCESS);
    }
 

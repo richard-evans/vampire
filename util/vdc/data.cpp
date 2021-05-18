@@ -148,19 +148,20 @@ namespace vdc{
       {"colormap" , set_colourmap},
       {"custom-colormap" , set_custom_colourmap},
       {"custom-colourmap", set_custom_colourmap},
+      {"3d", set_3D},
       // povray camera settings
-      {"camera_position", set_camera_position},
-      {"camera_look_at" , set_camera_look_at},
-      {"camera_lookat"  , set_camera_look_at},
-      {"camera_zoom"    , set_camera_zoom},
+      {"camera-position", set_camera_position},
+      {"camera-look-at" , set_camera_look_at},
+      {"camera-lookat"  , set_camera_look_at},
+      {"camera-zoom"    , set_camera_zoom},
       // povray background colour
-      {"background_colour", set_background_colour},
-      {"background_color" , set_background_colour},
+      {"background-colour", set_background_colour},
+      {"background-color" , set_background_colour},
       // povray shape sizes
-      {"atom_sizes" , set_atom_sizes},
-      {"atom_size"  , set_atom_sizes},
-      {"arrow_sizes", set_arrow_sizes},
-      {"arrow_size" , set_arrow_sizes}
+      {"atom-sizes" , set_atom_sizes},
+      {"atom-size"  , set_atom_sizes},
+      {"arrow-sizes", set_arrow_sizes},
+      {"arrow-size" , set_arrow_sizes}
    };
 
 } // end of namespace vdc
