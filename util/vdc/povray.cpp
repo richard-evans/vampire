@@ -175,12 +175,14 @@ void output_povray_file(){
       vec[0] = (1.0/dim[0]);
       vec[1] = (1.0/dim[1]);
       vec[2] = (1.0/dim[2]);
-      double mag_vec = sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);
-      vec[0]/=mag_vec;
-      vec[1]/=mag_vec;
-      vec[2]/=mag_vec;
    }
    else { vec = vdc::camera_pos; }
+
+   // normalise camera position vector
+   double mag_vec = sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);
+   vec[0]/=mag_vec;
+   vec[1]/=mag_vec;
+   vec[2]/=mag_vec;
 
    pfile << "//-------------------------------------------------------------------------" << std::endl;
    pfile << "// Povray file generated using vampire" << std::endl;
