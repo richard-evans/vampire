@@ -77,7 +77,10 @@ void read(std::vector<input_t> &input_list){
       line = line.substr(0,line.find('#'));
 
       // skip empty lines
-      if (line.empty()){ continue; }
+      if (line.empty()){
+         line_number++;
+         continue;
+      }
 
       input_t input;
       bool key_set = false;
