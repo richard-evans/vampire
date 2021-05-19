@@ -454,7 +454,7 @@ void set_camera_zoom(const input_t &input){
       std::cout << "\"camera-zoom\"\tExpects 1 argument: positive real\n\n"
                 << "Povray camera zoom multiplier.\n"
                 << "The default distance from the camera is automatically calculated according to the size of the system.\n"
-                << "This can be increased or reduced using camera_zoom to multiply the default distance. Values lower\n"
+                << "This can be increased or reduced using camera-zoom to multiply the default distance. Values lower\n"
                 << "than 1.0 reduce the distance, while values above 1.0 increase it.\n\n"
                 << "Default: camera-zoom = 1.0\n";
       std::exit(EXIT_SUCCESS);
