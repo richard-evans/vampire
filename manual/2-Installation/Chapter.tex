@@ -11,23 +11,25 @@ This chapter covers the requirements, installation and support for \vampire on d
 
 \section*{Binary installation}
 \phantomsection\addcontentsline{toc}{section}{Binary installation}
-Compiled binaries of the latest release version are available to download from:\\
+Compiled binaries of the latest release version are available to download from:
 
+\noindent
 \begin{minipage}[c]{\textwidth}
 \centering
 https://vampire.york.ac.uk/download/
-\end{minipage}\\
+\end{minipage}
 
 \noindent for Linux and Mac$^{\mathrm{TM}}$ OS X platforms. For the Linux and Mac OS X releases, a simple installation script \textit{install.sh} installs the binary in \textit{/opt/vampire/} and appends the directory to your environment path. On Windows the recommended method is to use the \textit{Linux subsystem for windows} developer feature which adds a linux subsystem that is capable of running the standard linux binary. A copy of qvoronoi is integrated into \vampire for generating granular structures. 
 
 \section*{Compiling from source}
 \phantomsection\addcontentsline{toc}{section}{Compiling from source}
-The best way to get the vampire source code is using git, a distributed version control program which enables changes in the code to be tracked. Git is readily available on linux (\textit{git-core} package on ubuntu) and Mac (via MacPorts). To get vampire from the Github repository checkout your own copy of the repository using:\\
+The best way to get the vampire source code is using git, a distributed version control program which enables changes in the code to be tracked. Git is readily available on linux (\textit{git-core} package on ubuntu) and Mac (via MacPorts). To get vampire from the Github repository checkout your own copy of the repository using:
 
+\noindent
 \begin{minipage}[c]{\textwidth}
 \centering
 git clone git://github.com/richard-evans/vampire.git
-\end{minipage}\\
+\end{minipage}
 
 This way, updates to the code can be easily merged with the downloaded version. Compiling is generally as easy as running \textit{make} in Unix platforms. In addition, on a multicore processor compilation can be parallelised using the \textit{-j $N_t$} option, where $N_t$ is the number of threads to use.
 
@@ -71,19 +73,21 @@ To run the code in all version, you first need to specify an input file and mate
 
 \section*{Unix/Linux and macOS}
 \phantomsection\addcontentsline{toc}{section}{Running on Unix/Linux and macOS}
-In the directory including the input and material files, typing\\
+In the directory including the input and material files, typing
 
+\noindent
 \begin{minipage}[c]{\textwidth}
 \centering
 ./vampire-serial
-\end{minipage}\\
+\end{minipage}
 
-\noindent will run the code in serial mode. For the parallel mode with openmpi,\\
+\noindent will run the code in serial mode. For the parallel mode with openmpi,
 
+\noindent
 \begin{minipage}[c]{\textwidth}
 \centering
 mpirun -np 2 vampire-parallel
-\end{minipage}\\
+\end{minipage}
 
 \noindent will run the code in parallel mode, on 2 CPUs. Increasing the \textit{-np} argument will run on more cores.
 
@@ -93,42 +97,45 @@ Once you have installed Linux subsystem for Windows, you can run the code by lau
 
 \section*{Log file}
 \phantomsection\addcontentsline{toc}{section}{Log file}
-When you run the program it will output some program information to screen to indicate that the program is running listing some details about the developers and some steps on the program execution. There are also options to tell the program to output simulation data to screen to see how the simulation is progressing. In addition, a \textit{log} file is produced which provides more detail about the execution of the program and progress including timestamps, and errors that may occur and certain performance metrics, such as time to update the dipole field or output a spin configuration file. A sample screen output header from the program is shown below.\\
+When you run the program it will output some program information to screen to indicate that the program is running listing some details about the developers and some steps on the program execution. There are also options to tell the program to output simulation data to screen to see how the simulation is progressing. In addition, a \textit{log} file is produced which provides more detail about the execution of the program and progress including timestamps, and errors that may occur and certain performance metrics, such as time to update the dipole field or output a spin configuration file. A sample screen output header from the program is shown below.
 
+\noindent
 \begin{minipage}[c]{\textwidth}
+\begingroup
+\fontsize{7.5}{7.5}\selectfont
 \begin{verbatim}
+                                               _          
+                                              (_)         
+                  __   ____ _ _ __ ___  _ __  _ _ __ ___ 
+                  \ \ / / _` | '_ ` _ \| '_ \| | '__/ _ \
+                   \ V / (_| | | | | | | |_) | | | |  __/
+                    \_/ \__,_|_| |_| |_| .__/|_|_|  \___|
+                                       | |               
+                                       |_|               
 
-                                                _          
-                                               (_)         
-                    __   ____ _ _ __ ___  _ __  _ _ __ ___ 
-                    \ \ / / _` | '_ ` _ \| '_ \| | '__/ _ \
-                     \ V / (_| | | | | | | |_) | | | |  __/
-                      \_/ \__,_|_| |_| |_| .__/|_|_|  \___|
-                                         | |               
-                                         |_|               
+                    Version 5.0.0 Aug 25 2018 23:01:25
 
-                      Version 5.0.0 Aug 25 2018 23:01:25
+            Git commit: 4377c4a8c3b2334decf6b3892542927fcaddebc7
 
-             Git commit: 4377c4a8c3b2334decf6b3892542927fcaddebc7
+Licensed under the GNU Public License(v2). See licence file for details.
 
-  Licensed under the GNU Public License(v2). See licence file for details.
+Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>
 
-  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>
+Contributors: Andrea Meo, Rory Pond, Weijia Fan,
+              Phanwadee Chureemart, Sarah Jenkins, Joe Barker, 
+              Thomas Ostler, Andreas Biternas, Roy W Chantrell,
+              Wu Hong-Ye, Matthew Ellis, Razvan Ababei, 
+              Sam Westmoreland, Oscar Arbelaez, Sam Morris
 
-  Contributors: Andrea Meo, Rory Pond, Weijia Fan,
-                Phanwadee Chureemart, Sarah Jenkins, Joe Barker, 
-                Thomas Ostler, Andreas Biternas, Roy W Chantrell,
-                Wu Hong-Ye, Matthew Ellis, Razvan Ababei, 
-                Sam Westmoreland, Oscar Arbelaez, Sam Morris
- 
-                Compiled with:  LLVM C++ Compiler
-                Compiler Flags: 
+              Compiled with:  LLVM C++ Compiler
+              Compiler Flags: 
 
-  Vampire includes a copy of the qhull library from C.B. Barber and
-  The Geometry Center and may be obtained via http from www.qhull.org.
+Vampire includes a copy of the qhull library from C.B. Barber and
+The Geometry Center and may be obtained via http from www.qhull.org.
 
 \end{verbatim}
-\end{minipage}\\
+\endgroup
+\end{minipage}
 
 
 

@@ -24,6 +24,9 @@
 %\usepackage{xunicode}
 %\usepackage{xltxtra}
 \usepackage{xspace}
+\usepackage[indent,skip=0.9\baselineskip plus2pt]{parskip}
+\usepackage{tabularx}
+\usepackage{longtable}
 
 \defaultfontfeatures{Ligatures=TeX}
 
@@ -40,18 +43,20 @@
 
 \fontsize{4}{8}\selectfont
 
+%\setlength{\parskip}{10pt}
+
+
 % Define fonts
 \newfontfamily\chapterfont[]{Open Sans}
 \newfontfamily\titlefont[Scale=1.5]{Open Sans Bold}
-\newfontfamily\normalfont{Open Sans}
+%\newfontfamily\normalfont{Open Sans}
 \newfontfamily\lightfont{Open Sans Light}
 \newfontfamily\sectionfont[Scale=1.1,Color=ZSGrey]{Open Sans}
 \newfontfamily\subsectionfont[Scale=1.0]{Open Sans}
 \newfontfamily\subsubsectionfont[]{Open Sans Italic}
 \newfontfamily\digitfont[]{Open Sans}
 \newfontfamily\commandfont[Scale=1.0]{Open Sans Bold}
-% Set formats for each heading level
-%\titleformat*{\chapter}{\Large\bfseries\sectionfont}
+
 \titleformat{\chapter}[display]
 {\chapterfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}\titleformat*{\section}{\sectionfont}
 \titleformat*{\subsection}{\small\bfseries\subsectionfont}
@@ -162,6 +167,7 @@
 \newcommand{\muB}{\ensuremath{\mu_\mathrm{B}}\xspace}
 
 \newcommand{\vampire}{{\small VAMPIRE}\xspace}
+\newcommand{\vdc}{{\small VDC}\xspace}
 
 \newcommand{\uvec}[1]{\ensuremath{\boldsymbol{\hat{\textbf{#1}}}}}
 
