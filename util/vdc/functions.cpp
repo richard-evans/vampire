@@ -20,6 +20,7 @@ namespace vdc {
 
 // forward function declaration
 void arg_count(const input_t &input, size_t args_required, std::string requirement);
+void error_message(const input_t &input, std::string message);
 
 //------------------------------------------------------------------------------
 // User specified initial frame to render
@@ -37,12 +38,14 @@ void set_frame_start(const input_t &input){
    // check args
    arg_count(input, 1, "eq");
 
-   int frame = std::stoi(input.value[0]);
-   if (frame >= 0){ vdc::vdc_start_file_id = frame; }
-   else {
-      std::cerr << "Error - frame index cannot be negative in '" << input.key << "' on line "
-                << input.line_number << "of input file '" << vdc::input_file << "'\n";
-      std::exit(EXIT_FAILURE);
+   // catch invalid conversion
+   try { vdc::vdc_start_file_id = std::stoi(input.value[0]); }
+   catch(...){ error_message(input,"invalid argument"); }
+
+   // check frame range
+   if (vdc::vdc_start_file_id < 0){ error_message(input,"frame index cannot be negative"); }
+      else if (vdc::vdc_start_file_id > vdc::vdc_final_file_id){
+      error_message(input,"start frame must be lower than start frame,");
    }
 }
 
@@ -63,12 +66,14 @@ void set_frame_final(const input_t &input){
    // check args
    arg_count(input, 1, "eq");
 
-   int frame = std::stoi(input.value[0]);
-   if (frame >= 0){ vdc::vdc_final_file_id = frame; }
-   else {
-      std::cerr << "Error - frame index cannot be negative in '" << input.key << "' on line "
-                << input.line_number << "of input file '" << vdc::input_file << "'\n";
-      std::exit(EXIT_FAILURE);
+   // catch invalid conversion
+   try{ vdc::vdc_final_file_id = std::stoi(input.value[0]); }
+   catch(...){ error_message(input,"invalid argument"); }
+
+   // check frame range
+   if (vdc::vdc_final_file_id < 0){ error_message(input,"frame index cannot be negative"); }
+   else if (vdc::vdc_final_file_id < vdc::vdc_start_file_id){
+      error_message(input,"final frame must be higher than start frame,");
    }
 }
 
@@ -89,8 +94,12 @@ void set_remove_materials(const input_t &input){
    // check args
    arg_count(input, 1, "ge");
 
+   // add to remove_materials list
    for (const std::string &mat : input.value){
-      vdc::remove_materials.push_back(std::stoi(mat));
+
+      // catch invalid conversion
+      try{ vdc::remove_materials.push_back(std::stoi(mat)); }
+      catch(...){ error_message(input,"invalid argument"); }
    }
 }
 
@@ -111,8 +120,12 @@ void set_afm(const input_t &input){
    // check args
    arg_count(input, 1, "ge");
 
+   // add to afm_materials list
    for (const std::string &mat : input.value){
-      vdc::afm_materials.push_back(std::stoi(mat));
+
+      // catch invalid conversion
+      try{ vdc::afm_materials.push_back(std::stoi(mat)); }
+      catch(...){ error_message(input,"invalid argument"); }
    }
 }
 
@@ -135,12 +148,13 @@ void set_slice(const input_t &input){
    // convert to double and store
    for (int i=0; i<6; i++){
 
-      double val = std::stod(input.value[i]);
-      if (val >= -0.000001 && val <= 1.000001){ vdc::slice_parameters[i] = val; }
-      else {
-         std::cerr << "Error - fractional coords must be in range (0,1) in '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-         std::exit(EXIT_FAILURE);  
+      // catch invalid conversion
+      try { vdc::slice_parameters[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
+
+      // check range
+      if (vdc::slice_parameters[i] < -0.000001 || vdc::slice_parameters[i] > 1.000001){ 
+         error_message(input,"fractional coords must be in range (0,1)");
       }
    }
 
@@ -167,12 +181,13 @@ void set_slice_void(const input_t &input){
    // conver to double and store
    for (int i=0; i<6; i++){
 
-      double val = std::stod(input.value[i]);
-      if (val >= -0.000001 && val <= 1.000001){ vdc::slice_parameters[i] = val; }
-      else {
-         std::cerr << "Error - fractional coords must be in range (0,1) in '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-         std::exit(EXIT_FAILURE);  
+      // catch invalid conversion
+      try { vdc::slice_parameters[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
+
+      // check range
+      if (vdc::slice_parameters[i] < -0.000001 || vdc::slice_parameters[i] > 1.000001){ 
+         error_message(input,"fractional coords must be in range (0,1)");
       }
    }
 
@@ -199,12 +214,13 @@ void set_slice_sphere(const input_t &input){
    // conver to double and store
    for (int i=0; i<3; i++){
 
-      double val = std::stod(input.value[i]);
-      if (val >= -0.000001 && val <= 1.000001){ vdc::slice_parameters[i] = val; }
-      else {
-         std::cerr << "Error - fractional coords must be in range (0,1) in '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-         std::exit(EXIT_FAILURE);  
+      // catch invalid conversion
+      try { vdc::slice_parameters[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
+
+      // check range
+      if (vdc::slice_parameters[i] < -0.000001 || vdc::slice_parameters[i] > 1.000001){
+         error_message(input,"fractional coords must be in range (0,1)");
       }
    }
 
@@ -230,12 +246,13 @@ void set_slice_cylinder(const input_t &input){
    // conver to double and store
    for (int i=0; i<4; i++){
 
-      double val = std::stod(input.value[i]);
-      if (val >= -0.000001 && val <= 1.000001){ vdc::slice_parameters[i] = val; }
-      else {
-         std::cerr << "Error - fractional coords must be in range (0,1) in '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-         std::exit(EXIT_FAILURE);  
+      // catch invalid conversion
+      try { vdc::slice_parameters[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
+
+      // check range
+      if (vdc::slice_parameters[i] < -0.000001 || vdc::slice_parameters[i] > 1.000001){ 
+         error_message(input,"fractional coords must be in range (0,1)"); 
       }
    }
 
@@ -259,7 +276,8 @@ void set_vector_z(const input_t &input){
    arg_count(input,3,"eq");
 
    for (int i=0; i<3; i++){
-      vdc::vector_z[i] = std::stod(input.value[i]);
+      try { vdc::vector_z[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
    }
 
    double length = std::sqrt(vector_z[0]*vector_z[0] + vector_z[1]*vector_z[1] + vector_z[2]*vector_z[2]);
@@ -287,7 +305,8 @@ void set_vector_x(const input_t &input){
    arg_count(input,3,"eq");
 
    for (int i=0; i<3; i++){
-      vdc::vector_x[i] = std::stod(input.value[i]);
+      try { vdc::vector_x[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
    }
 
    double length = std::sqrt(vector_x[0]*vector_x[0] + vector_x[1]*vector_x[1] + vector_x[2]*vector_x[2]);
@@ -320,10 +339,7 @@ void set_colourmap(const input_t &input){
    if (std::find(vdc::colourmaps.begin(),vdc::colourmaps.end(),input.value[0]) != vdc::colourmaps.end() ){
       vdc::colour_keyword = input.value[0];
    }
-   else {
-      std::cerr << "Error - Colourmap keyword does not match." << std::endl;
-      std::exit(EXIT_FAILURE);
-   }
+   else { error_message(input,"colourmap keyword does not match,"); }
 }
 
 //----------------------------------------------------------------------------------
@@ -347,11 +363,7 @@ void set_3D(const input_t &input){
 
    if      (value == "true" ){ vdc::x_axis_colour = true; }
    else if (value == "false"){ vdc::x_axis_colour = false;}
-   else {
-      std::cerr << "Error - Expected true/false instead of " << value << " in " << input.key
-                << "' on line " << input.line_number << " of input file '" << vdc::input_file << "'\n";
-      std::exit(EXIT_FAILURE);
-   }
+   else { error_message(input,"expected true/false instead of '"+value+"'"); }
 }
 
 //----------------------------------------------------------------------------------
@@ -385,7 +397,7 @@ void set_custom_colourmap(const input_t &input){
 void set_camera_position(const input_t &input){
 
    // print help message if argument is "-h"
-      if (input.value[0] == "-h"){
+   if (input.value[0] == "-h"){
       std::cout << "\"camera-position\"\tExpects 3 arguments: real, in range (-1,1)\n\n"
                 << "Povray camera position, set using fractional coords.\n"
                 << "Camera distance from look at point is calculated automatically however\n"
@@ -401,12 +413,13 @@ void set_camera_position(const input_t &input){
    // convert to double and store
    for (int i=0; i<3; i++){
 
-      double val = std::stod(input.value[i]);
-      if (val >= -1.000001 && val <= 1.000001){ vdc::camera_pos[i] = val; }
-      else {
-         std::cerr << "Error - fractional coords must be in range (-1,1) in '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-         std::exit(EXIT_FAILURE);  
+      // catch invalid conversion
+      try{ vdc::camera_pos[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
+
+      // check argument range
+      if (vdc::camera_pos[i] < -1.000001 || vdc::camera_pos[i] > 1.000001){
+         error_message(input,"fractional coords must be in range (-1,1)");
       }
    }
 
@@ -420,7 +433,7 @@ void set_camera_position(const input_t &input){
 void set_camera_look_at(const input_t &input){
 
    // print help message if argument is "-h"
-      if (input.value[0] == "-h"){
+   if (input.value[0] == "-h"){
       std::cout << "\"camera-look-at\"\tExpects 3 arguments: real, in range (-1,1)\n\n"
                 << "Povray camera look at position, set using fractional coords.\n"
                 << "The position is a location in the bounding box of the system, with centre (0,0,0).\n\n"
@@ -434,12 +447,13 @@ void set_camera_look_at(const input_t &input){
    // convert to double and store
    for (int i=0; i<3; i++){
 
-      double val = std::stod(input.value[i]);
-      if (val >= -1.000001 && val <= 1.000001){ vdc::camera_look_at[i] = val; }
-      else {
-         std::cerr << "Error - fractional coords must be in range (-1,1) in '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-         std::exit(EXIT_FAILURE);  
+      // catch invalid conversion
+      try{ vdc::camera_look_at[i] = std::stod(input.value[i]); }
+      catch(...){ error_message(input,"invalid argument"); }
+
+      // check range
+      if (vdc::camera_look_at[i] < -1.000001 || vdc::camera_look_at[i] > 1.000001){ 
+         error_message(input,"fractional coords must be in range (-1,1)"); 
       }
    }
 }
@@ -450,7 +464,7 @@ void set_camera_look_at(const input_t &input){
 void set_camera_zoom(const input_t &input){
 
    // print help message if argument is "-h"
-      if (input.value[0] == "-h"){
+   if (input.value[0] == "-h"){
       std::cout << "\"camera-zoom\"\tExpects 1 argument: positive real\n\n"
                 << "Povray camera zoom multiplier.\n"
                 << "The default distance from the camera is automatically calculated according to the size of the system.\n"
@@ -464,11 +478,11 @@ void set_camera_zoom(const input_t &input){
    arg_count(input,1,"eq");
 
    // set value, must be greater than 0
-   vdc::camera_zoom = std::stod(input.value[0]);
+   try { vdc::camera_zoom = std::stod(input.value[0]); }
+   catch(...){ error_message(input,"invalid argument"); }
+
    if (vdc::camera_zoom <= 0.0){
-      std::cerr << "Error - camera zoom must be greater than 0.0, in '" << input.key << "' on line "
-                << input.line_number << "of input file '" << vdc::input_file << "'\n";
-      std::exit(EXIT_FAILURE);
+      error_message(input,"camera zoom must be greater than 0.0,");
    }
 }
 
@@ -478,7 +492,7 @@ void set_camera_zoom(const input_t &input){
 void set_background_colour(const input_t &input){
 
    // print help message if argument is "-h"
-      if (input.value[0] == "-h"){
+   if (input.value[0] == "-h"){
       std::cout << "\"background-colour\"\tExpects 1 argument: positive real\n\n"
                 << "Povray background colour.\n"
                 << "Povray includes various predefined colours such as \"White\",\"Black\",\"Gray\".\n"
@@ -504,7 +518,7 @@ void set_background_colour(const input_t &input){
 void set_atom_sizes(const input_t &input){
 
    // print help message if argument is "-h"
-      if (input.value[0] == "-h"){
+   if (input.value[0] == "-h"){
       std::cout << "\"atom-sizes\"\tExpects 1 or more arguments: positive real\n\n"
                 << "Povray atom sizes. Atoms are represented by spheres with a defined radius.\n"
                 << "Individual materials can have different atom sizes.\n\n"
@@ -520,11 +534,13 @@ void set_atom_sizes(const input_t &input){
    vdc::atom_sizes.clear();
    for (const std::string &value : input.value){
 
-      vdc::atom_sizes.push_back(std::stod(value));
+      // catch invalid conversion
+      try { vdc::atom_sizes.push_back(std::stod(value)); }
+      catch(...){ error_message(input,"invalid argument"); }
+
+      // check range
       if (vdc::atom_sizes.back() <= 0.0){
-         std::cerr << "Error - atom size must be greater than 0.0 in '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-         std::exit(EXIT_FAILURE);  
+         error_message(input,"atom size must be greater than 0.0"); 
       }
    }
 }
@@ -535,7 +551,7 @@ void set_atom_sizes(const input_t &input){
 void set_arrow_sizes(const input_t &input){
 
    // print help message if argument is "-h"
-      if (input.value[0] == "-h"){
+   if (input.value[0] == "-h"){
       std::cout << "\"arrow-sizes\"\tExpects 1 or more arguments: positive real\n\n"
                 << "Povray arrow sizes.\n"
                 << "Individual materials can have different arrow sizes.\n\n"
@@ -551,11 +567,13 @@ void set_arrow_sizes(const input_t &input){
    vdc::arrow_sizes.clear();
    for (const std::string &value : input.value){
 
-      vdc::arrow_sizes.push_back(std::stod(value));
+      // catch invalid conversion
+      try { vdc::arrow_sizes.push_back(std::stod(value)); }
+      catch(...){ error_message(input,"invalid argument"); }
+
+      // check range
       if (vdc::arrow_sizes.back() <= 0.0){
-         std::cerr << "Error - arrow size must be greater than 0.0 in '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-         std::exit(EXIT_FAILURE);  
+         error_message(input,"atom size must be greater than 0.0");  
       }
    }
 }
@@ -592,6 +610,14 @@ void arg_count(const input_t &input, size_t args_required, std::string requireme
       std::cerr << "Bad requirement: " << requirement << std::endl;
       std::exit(EXIT_FAILURE);
    }
+   
+   std::exit(EXIT_FAILURE);
+}
+
+// output error message and exit
+void error_message(const input_t &input, std::string message){
+   std::cerr << "Error - " << message << " in '" << input.key << "' on line "
+             << input.line_number << " of input file '" << vdc::input_file << "'\n";
    
    std::exit(EXIT_FAILURE);
 }
