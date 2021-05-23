@@ -38,13 +38,15 @@ void set_frame_start(const input_t &input){
    // check args
    arg_count(input, 1, "eq");
 
+   // cannot be negative
+   if (input.value[0][0] == '-'){ error_message(input,"frame index cannot be negative"); }
+
    // catch invalid conversion
    try { vdc::vdc_start_file_id = std::stoi(input.value[0]); }
    catch(...){ error_message(input,"invalid argument"); }
 
    // check frame range
-   if (vdc::vdc_start_file_id < 0){ error_message(input,"frame index cannot be negative"); }
-      else if (vdc::vdc_start_file_id > vdc::vdc_final_file_id){
+   if (vdc::vdc_start_file_id > vdc::vdc_final_file_id){
       error_message(input,"start frame must be lower than start frame,");
    }
 }
@@ -66,13 +68,15 @@ void set_frame_final(const input_t &input){
    // check args
    arg_count(input, 1, "eq");
 
+   // cannot be negative
+   if (input.value[0][0] == '-'){ error_message(input,"frame index cannot be negative"); }
+
    // catch invalid conversion
    try{ vdc::vdc_final_file_id = std::stoi(input.value[0]); }
    catch(...){ error_message(input,"invalid argument"); }
 
    // check frame range
-   if (vdc::vdc_final_file_id < 0){ error_message(input,"frame index cannot be negative"); }
-   else if (vdc::vdc_final_file_id < vdc::vdc_start_file_id){
+   if (vdc::vdc_final_file_id < vdc::vdc_start_file_id){
       error_message(input,"final frame must be higher than start frame,");
    }
 }
