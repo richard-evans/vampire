@@ -440,10 +440,10 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
             // calculate reduced exchange constant factor
             const int cellj = mm::macro_neighbour_list_array[j];
             int matj =mm::cell_material_array[cellj];
-            double dx = cells::pos_and_mom_array[cell*4 +0] - cells::pos_and_mom_array[cellj*4 +0];
-            double dy = cells::pos_and_mom_array[cell*4 +1] - cells::pos_and_mom_array[cellj*4 +1];
-            double dz = cells::pos_and_mom_array[cell*4 +2] - cells::pos_and_mom_array[cellj*4 +2];
-//std::cout << cell << '\t' << cellj << '\t' << mat << '\t' << matj << "\t" << mm::resistance_layer_2 << '\t' << mm::resistance_layer_1 <<"\t" << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << dx << "\t" << dy << '\t' << dz << std::endl;
+            double dx = cells::pos_array[cell*3 +0] - cells::pos_array[cellj*3 +0];
+            double dy = cells::pos_array[cell*3 +1] - cells::pos_array[cellj*3 +1];
+            double dz = cells::pos_array[cell*3 +2] - cells::pos_array[cellj*3 +2];
+std::cout << cell << '\t' << cellj << '\t' << mat << '\t' << matj << "\t" << mm::resistance_layer_2 << '\t' << mm::resistance_layer_1 <<"\t" << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << dx << "\t" << dy << '\t' << dz << std::endl;
             if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2){//} && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
      //          std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
          // std::cout <<  dx << '\t' << dy << "\t" << dz << "/t" << mat << "/t" << matj << std::endl;

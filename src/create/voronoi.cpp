@@ -283,8 +283,6 @@ int voronoi_film(std::vector<cs::catom_t> & catom_array){
 
 	 }
 
-		// ----------------------- old version -------------------------------------
-
 	else{
 		//Calculate pointers
 		for(int grain2=0;grain2<init_num_grains;grain2++){

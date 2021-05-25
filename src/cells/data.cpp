@@ -57,6 +57,7 @@ namespace cells{
    std::vector<double> field_array_z;
 
    std::vector<double> pos_and_mom_array; /// arrays to store cells positions
+   std::vector<double> pos_array; /// arrays to store cells positions
 
    std::vector < double > num_macro_cells_fft(3,10.0); /// macro-cells size (A)
    std::vector<double> fft_cell_id_array; /// arrays to store cells positions
