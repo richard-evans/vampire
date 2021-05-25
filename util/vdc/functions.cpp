@@ -149,20 +149,24 @@ void set_slice(const input_t &input){
    // check args
    arg_count(input, 6, "eq");
 
+   slice_t slice;
+   slice.type = vdc::box;
+   slice.param.resize(6);
+
    // convert to double and store
    for (int i=0; i<6; i++){
 
       // catch invalid conversion
-      try { vdc::slice_parameters[i] = std::stod(input.value[i]); }
+      try { slice.param[i] = std::stod(input.value[i]); }
       catch(...){ error_message(input,"invalid argument"); }
 
       // check range
-      if (vdc::slice_parameters[i] < -0.000001 || vdc::slice_parameters[i] > 1.000001){ 
+      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){ 
          error_message(input,"fractional coords must be in range (0,1)");
       }
    }
 
-   vdc::slice_type = vdc::slice;
+   vdc::slices.push_back(slice);
 }
 
 //--------------------------------------------------------------------------------------
@@ -182,20 +186,24 @@ void set_slice_void(const input_t &input){
    // check args
    arg_count(input, 6, "eq");
 
+   slice_t slice;
+   slice.type = vdc::box_void;
+   slice.param.resize(6);
+
    // conver to double and store
    for (int i=0; i<6; i++){
 
       // catch invalid conversion
-      try { vdc::slice_parameters[i] = std::stod(input.value[i]); }
+      try { slice.param[i] = std::stod(input.value[i]); }
       catch(...){ error_message(input,"invalid argument"); }
 
       // check range
-      if (vdc::slice_parameters[i] < -0.000001 || vdc::slice_parameters[i] > 1.000001){ 
+      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){ 
          error_message(input,"fractional coords must be in range (0,1)");
       }
    }
 
-   vdc::slice_type = vdc::slice_void;
+   vdc::slices.push_back(slice);
 }
 
 //--------------------------------------------------------------------------------
@@ -205,8 +213,9 @@ void set_slice_sphere(const input_t &input){
 
    // print help message if argument is "-h"
    if (input.value[0] == "-h"){
-      std::cout << "\"slice-sphere\"\tExpects 3 arguments: real, in range (0,1)\n\n"
-                << "Removes atoms outside of defined ellipsoid [xfrac,yfrac,zfrac].\n\n"
+      std::cout << "\"slice-sphere\"\tExpects 3 arguments: positive real\n\n"
+                << "Removes atoms inside of defined ellipsoid [xfrac,yfrac,zfrac].\n"
+                << "Setting arguments to 1 excludes corners of system.\n\n"
                 << "Default: [not set]\n"
                 << "Example usage: slice-sphere = 0.5,1.0,1.0\n";
       std::exit(EXIT_SUCCESS);
@@ -215,20 +224,24 @@ void set_slice_sphere(const input_t &input){
    // check args
    arg_count(input, 3, "eq");
 
+   slice_t slice;
+   slice.type = vdc::sphere;
+   slice.param.resize(3);
+
    // conver to double and store
    for (int i=0; i<3; i++){
 
       // catch invalid conversion
-      try { vdc::slice_parameters[i] = std::stod(input.value[i]); }
+      try { slice.param[i] = std::stod(input.value[i]); }
       catch(...){ error_message(input,"invalid argument"); }
 
       // check range
-      if (vdc::slice_parameters[i] < -0.000001 || vdc::slice_parameters[i] > 1.000001){
-         error_message(input,"fractional coords must be in range (0,1)");
+      if (slice.param[i] < -0.000001){
+         error_message(input,"fractional coords must be greater than 0");
       }
    }
 
-   vdc::slice_type = vdc::slice_sphere;
+   vdc::slices.push_back(slice);
 }
 
 //----------------------------------------------------------------------------------
@@ -247,20 +260,24 @@ void set_slice_cylinder(const input_t &input){
    // check args
    arg_count(input, 4, "eq");
 
+   slice_t slice;
+   slice.type = vdc::cylinder;
+   slice.param.resize(4);
+
    // conver to double and store
    for (int i=0; i<4; i++){
 
       // catch invalid conversion
-      try { vdc::slice_parameters[i] = std::stod(input.value[i]); }
+      try { slice.param[i] = std::stod(input.value[i]); }
       catch(...){ error_message(input,"invalid argument"); }
 
       // check range
-      if (vdc::slice_parameters[i] < -0.000001 || vdc::slice_parameters[i] > 1.000001){ 
+      if (slice.param[i] < -0.000001 || slice.param[i] > 1.000001){ 
          error_message(input,"fractional coords must be in range (0,1)"); 
       }
    }
 
-   vdc::slice_type = vdc::slice_cylinder;
+   vdc::slices.push_back(slice);
 }
 
 //----------------------------------------------------------------------------------

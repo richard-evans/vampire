@@ -46,9 +46,8 @@ namespace vdc{
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
-   enum slice_t{ no_slice, slice, slice_void, slice_sphere, slice_cylinder};
+   enum slice_type{ box, box_void, sphere, cylinder};
    extern format_t format;
-   extern slice_t slice_type;
 
    // simple struct to store material parameters
    struct material_t{
@@ -65,11 +64,22 @@ namespace vdc{
       unsigned int line_number;
    };
 
+   // struct to hold slice information
+   struct slice_t{
+      enum slice_type type;
+      std::vector<double> param;
+      std::vector<double> bound;
+   };
+
+   // vector of slices
+   extern std::vector<slice_t> slices;
+
    // unordered map of input keys to function wrappers
    extern const std::unordered_map<std::string,std::function<void(const input_t&)>> key_list;
 
    extern uint64_t num_atoms;
 
+   // two sets of ids required
    extern unsigned int vdc_start_file_id;
    extern unsigned int vdc_final_file_id;
    extern unsigned int start_file_id;

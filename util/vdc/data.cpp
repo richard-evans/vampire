@@ -37,7 +37,6 @@ namespace vdc{
    std::vector<std::vector<double>> colourmap(256, std::vector<double>(3));
    std::vector<std::string> colourmaps = {"c2", "bwr", "cbwr", "rainbow"};
    bool x_axis_colour = false;
-   slice_t slice_type = no_slice;
    bool default_camera_pos = true;
 
    format_t format;
@@ -69,6 +68,9 @@ namespace vdc{
    std::vector<int> nm_atoms_list(0);
    std::vector<int> sliced_atoms_list(0);
    std::vector<int> sliced_nm_atoms_list(0);
+
+   // user defined slices
+   std::vector<slice_t> slices;
 
    // axis vectors for povray colouring
    std::vector<double> vector_z = {0.0,0.0,1.0};
