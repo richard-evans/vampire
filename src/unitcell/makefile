@@ -13,11 +13,18 @@ normalise.o \
 read.o \
 read_interactions.o \
 set_exchange_type.o \
+shells.o \
 sc.o \
 bcc.o \
+bcc110.o \
 fcc.o \
 hcp.o \
+heusler.o \
+honeycomb.o \
+honeycomb-a.o \
+kagome.o \
 rocksalt.o \
+spinel.o \
 verify.o
 
 # Append module objects to global tree

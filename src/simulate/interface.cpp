@@ -36,16 +36,28 @@ namespace sim{
       //----------------------------------
       // Now test for all valid options
       //----------------------------------
-      std::string test="slonczewski-spin-polarization-unit-vector";
+      std::string test="spin-transfer-torque-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);
          u=vin::doubles_from_string(value);
          // Test for valid range
          vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
          // save sanitized unit vector
-         sim::internal::slonczewski_spin_polarization_unit_vector = u;
+         sim::internal::stt_polarization_unit_vector = u;
          return true;
       }
+      //-------------------------------------------------------------------
+      test="spin-orbit-torque-polarization-unit-vector";
+      if(word==test){
+         std::vector<double> u(3);
+         u=vin::doubles_from_string(value);
+         // Test for valid range
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+         // save sanitized unit vector
+         sim::internal::sot_polarization_unit_vector = u;
+         return true;
+      }
+      //-------------------------------------------------------------------
       test="preconditioning-steps";
       if(word==test){
          int n = atoi(value.c_str());
@@ -94,6 +106,121 @@ namespace sim{
          sim::partial_time = tt;
          return true;
       }
+      test = "integrator";
+      if( word == test ){
+         //--------------------------------------------------------------------
+         test="llg-heun";
+         if( value == test ){
+            sim::integrator = sim::llg_heun;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="monte-carlo";
+         if( value == test ){
+            sim::integrator = sim::monte_carlo;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="llg-midpoint";
+         if( value == test ){
+            sim::integrator = sim::llg_midpoint;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="constrained-monte-carlo";
+         if( value == test ){
+            sim::integrator = sim::cmc;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="hybrid-constrained-monte-carlo";
+         if( value == test ){
+            sim::integrator = sim::hybrid_cmc;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="llg-quantum";
+         if( value == test ){
+            sim::integrator = sim::llg_quantum;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         else{
+            terminaltextcolor(RED);
+               std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
+               std::cerr << "\t\"llg-heun\"" << std::endl;
+               std::cerr << "\t\"llg-midpoint\"" << std::endl;
+               std::cerr << "\t\"llg-quantum\"" << std::endl;
+               std::cerr << "\t\"monte-carlo\"" << std::endl;
+               std::cerr << "\t\"constrained-monte-carlo\"" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+          }
+      }
+      //--------------------------------------------------------------------
+      test="domain-wall-axis";
+      if(word==test){
+         //vin::check_for_valid_int(tt, word, line, prefix, 0, max_time,"input","0 - "+max_time_str);
+         if (value == "x") {
+         sim::domain_wall_axis = 0;
+         }
+         else if (value == "y") {
+         sim::domain_wall_axis = 1;
+         }
+         else if (value == "z") {
+         sim::domain_wall_axis = 2;
+         }
+         else {
+            std::cout << "domain wall axis must equal x or y or z" <<std::endl;
+            return false;
+         }
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="domain-wall-discretisation";
+      if(word==test){
+         double tt = atof(value.c_str()); // convert string to uint64_t
+         vin::check_for_valid_value(tt, word, line, prefix, unit, "length", 10, 1000,"input","10 - 1 A");
+         sim::domain_wall_discretisation = tt;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="domain-wall-anti-pbc-x";
+      if(word==test){
+         sim::anti_PBC[0] = true;
+         cs::pbc[0]=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="domain-wall-anti-pbc-y";
+      if(word==test){
+         sim::anti_PBC[1] = true;
+         cs::pbc[1]=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="domain-wall-anti-pbc-z";
+      if(word==test){
+         sim::anti_PBC[2] = true;
+         cs::pbc[2]=true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="domain-wall-position";
+      if(word==test){
+         double tt = atof(value.c_str()); // convert string to uint64_t
+         vin::check_for_valid_value(tt, word, line, prefix, unit, "none", 0, 1,"input","0 - 1");
+         sim::domain_wall_position = tt;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="domain-wall-width";
+      if(word==test){
+         double tt = atof(value.c_str()); // convert string to uint64_t
+         vin::check_for_valid_value(tt, word, line, prefix, unit, "length", 0, 1000,"input","0 - 1 A");
+         sim::domain_wall_width = tt;
+         return true;
+      }
       //--------------------------------------------------------------------
       // input parameter not found here
       return false;
@@ -111,27 +238,88 @@ namespace sim{
       if((unsigned int) super_index + 1 > sim::internal::mp.size() && super_index + 1 < 101) sim::internal::mp.resize(super_index + 1);
 
       //------------------------------------------------------------
-      std::string test="slonczewski-adiabatic-spin-torque";
-      /*
-         aj parameter for material in slonczewski torque calculation
-         */
+      std::string test="domain-wall-second-magnetisation-vector";
       if(word==test){
-         double aj=atof(value.c_str());
-         // Test for valid range
-         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
-         sim::internal::mp[super_index].slonczewski_aj.set(aj);
+         std::vector<double> u(3);
+         u=vin::doubles_from_string(value);
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "input");
+         std::cout << sim::domain_wall_second_vector_x.size() << "\t" << super_index << "\t" << u[0] << '\t' << u[1] << '\t' << u[2] <<std::endl;
+         sim::domain_wall_second_vector_x[super_index] = u[0];
+         sim::domain_wall_second_vector_y[super_index] = u[1];
+         sim::domain_wall_second_vector_z[super_index] = u[2];
          return true;
       }
       //------------------------------------------------------------
-      test="slonczewski-non-adiabatic-spin-torque";
-      /*
-         bj parameter for material in slonczewski torque calculation
-         */
-      if(word==test){
+      test  = "spin-transfer-relaxation-torque";
+      std::string test2 = "slonczewski-adiabatic-spin-torque";
+      std::string test3 = "spin-transfer-torque";
+      std::string test4 = "antidamping-torque";
+      // aj parameter for material in slonczewski torque calculation
+      if( word==test || word==test2 || word==test3 || word==test4){
+         double aj=atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", -1.0e-2, 1.0e2,"input","-100 - 100T");
+         sim::internal::mp[super_index].stt_rj.set(aj);
+         sim::internal::enable_spin_torque_fields = true;
+         return true;
+      }
+      //------------------------------------------------------------
+      test2 = "spin-transfer-precession-torque";
+      test  = "slonczewski-non-adiabatic-spin-torque";
+      test3 = "field-like-torque";
+      test4 = "slonczewski-precession-spin-torque";
+      // bj parameter for material in slonczewski torque calculation
+      if( word==test || word==test2 || word==test3 ){
          double bj=atof(value.c_str());
          // Test for valid range
-         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", 0.0, 1.0e2,"input","0 - 100T");
-         sim::internal::mp[super_index].slonczewski_bj.set(bj);
+         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", -1.0e-2, 1.0e2,"input","-100 - 100T");
+         sim::internal::mp[super_index].stt_pj.set(bj);
+         sim::internal::enable_spin_torque_fields = true;
+         return true;
+      }
+      //------------------------------------------------------------
+      test = "spin-transfer-torque-asymmetry";
+      // damping-like parameter for material in spin orbit torque calculation
+      if( word==test ){
+         double sttasm = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(sttasm, word, line, prefix, unit, "", 0.0, 1.0e2,"input","0 - 100");
+         sim::internal::mp[super_index].stt_asm.set(sttasm);
+         return true;
+      }
+      //------------------------------------------------------------
+      // field-like parameter for material in spin orbit torque calculation
+      test = "spin-orbit-relaxation-torque";
+      test2 = "spin-orbit-anti-damping-torque";
+      if( word==test || word==test2 ){
+         double aj = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(aj, word, line, prefix, unit, "field", -1.0e2, 1.0e2,"input","-100 - 100T");
+         sim::internal::mp[super_index].sot_rj.set(aj);
+         sim::internal::enable_spin_torque_fields = true;
+         return true;
+      }
+      //------------------------------------------------------------
+      test = "spin-orbit-precession-torque";
+      test2 = "spin-orbit-torque";
+      test3 = "spin-orbit-field-like-torque";
+      // damping-like parameter for material in spin orbit torque calculation
+      if( word==test || word==test2 || word==test3 ){
+         double bj = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(bj, word, line, prefix, unit, "field", -1.0e2, 1.0e2,"input","-100 - 100T");
+         sim::internal::mp[super_index].sot_pj.set(bj);
+         sim::internal::enable_spin_torque_fields = true;
+         return true;
+      }
+      //------------------------------------------------------------
+      test = "spin-orbit-torque-asymmetry";
+      // damping-like parameter for material in spin orbit torque calculation
+      if( word==test ){
+         double sotasm = atof(value.c_str());
+         // Test for valid range
+         vin::check_for_valid_value(sotasm, word, line, prefix, unit, "", 0.0, 1.0e2,"input","0 - 100");
+         sim::internal::mp[super_index].sot_asm.set(sotasm);
          return true;
       }
       //--------------------------------------------------------------------

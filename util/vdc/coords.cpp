@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2017. All rights reserved.
+//   (c) Richard F L Evans, Daniel Meilak 2017-2019. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -28,6 +28,12 @@ namespace vdc{
 // forward function declarations
 void read_coord_metadata();
 void read_coord_data();
+void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& non_magnetic_list);
+void slice_system();
+bool box_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound);
+bool sphere_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound);
+bool cylinder_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound);
+
 
 //------------------------------------------------------------------------------
 // Wrapper function to read coordinate metafile to initialise data structures
@@ -42,10 +48,19 @@ void process_coordinates(){
    vdc::read_coord_data();
 
    // load non-magnetic data files
-   read_nm_metadata();
-   read_nm_data();
+   vdc::read_nm_metadata();
+   vdc::read_nm_data();
 
-   // output xyz file
+   // Calculate system dimensions
+   vdc::calculate_system_extent(vdc::atoms_list,vdc::nm_atoms_list);
+
+   // Create list of atoms in slice
+   vdc::slice_system();
+
+   // Calculate systenm dimensions after slicing
+   vdc::calculate_system_extent(vdc::sliced_atoms_list,vdc::sliced_nm_atoms_list);
+
+   // output xyz file;
    if(vdc::xyz) output_xyz_file();
 
    return;
@@ -144,7 +159,7 @@ void read_coord_metadata(){
    line.erase (line.begin(), line.begin()+20);
    num_materials=atoi(line.c_str());
 
-   // Tell the user about the total number of atoms if verbosity is required
+   // Tell the user about the total number of materials if verbosity is required
    if(vdc::verbose) std::cout << "   Number of materials: " << num_materials << std::endl;
 
    // now read in material data
@@ -170,7 +185,7 @@ void read_coord_metadata(){
 
    if(vdc::verbose) std::cout << "   Number of files: " << num_coord_files << std::endl;
 
-   for(int file = 0; file < num_coord_files; file++){
+   for(unsigned int file = 0; file < num_coord_files; file++){
       getline(cmfile, line);
       line.erase(remove(line.begin(), line.end(), '\t'), line.end());
       line.erase(remove(line.begin(), line.end(), ' '), line.end());
@@ -263,32 +278,38 @@ void read_coord_data(){
             ifile.close();
             break;
          }
-
       }
 
    }
 
-   // output informative message to user
-   if(vdc::verbose) std::cout << "done!" << std::endl;
+   // create vector list of atom indices
+   vdc::atoms_list.resize(vdc::num_atoms);
+   for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+      vdc::atoms_list.push_back(atom);
+   }
 
-   //---------------------------------------------------------------
-   // calculate system extent and centre
-   //---------------------------------------------------------------
+   return;
+}
+
+//------------------------------------------------------------------------------
+// calculate system extent and centre
+//------------------------------------------------------------------------------
+void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& non_magnetic_list){
+
    double min[3] = {1e20, 1e20, 1e20};
    double max[3] = {0.0, 0.0, 0.0};
-   double ave[3] = {0.0, 0.0, 0.0};
+   //double ave[3] = {0.0, 0.0, 0.0};
 
-   for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+   // loop through all magnetic atoms
+   for(size_t i=0; i < magnetic_list.size(); i++){
+
+      // get atom ID
+      unsigned int atom = magnetic_list[i];
 
       // temporary variables
       double x = vdc::coordinates[3*atom + 0];
       double y = vdc::coordinates[3*atom + 1];
       double z = vdc::coordinates[3*atom + 2];
-
-      // add coordinates to running total
-      ave[0] += x;
-      ave[1] += y;
-      ave[2] += z;
 
       // calculate min and max
       if(x > max[0]) max[0] = x;
@@ -298,7 +319,27 @@ void read_coord_data(){
       if(x < min[0]) min[0] = x;
       if(y < min[1]) min[1] = y;
       if(z < min[2]) min[2] = z;
+   }
 
+   // loop through all non-magnetic atoms
+   for(size_t i=0; i < non_magnetic_list.size(); i++){
+
+      // get atom ID
+      unsigned int atom = non_magnetic_list[i];
+
+      // temporary variables
+      double x = vdc::nm_coordinates[3*atom + 0];
+      double y = vdc::nm_coordinates[3*atom + 1];
+      double z = vdc::nm_coordinates[3*atom + 2];
+
+      // calculate min and max
+      if(x > max[0]) max[0] = x;
+      if(y > max[1]) max[1] = y;
+      if(z > max[2]) max[2] = z;
+
+      if(x < min[0]) min[0] = x;
+      if(y < min[1]) min[1] = y;
+      if(z < min[2]) min[2] = z;
    }
 
    // save system dimensions
@@ -307,12 +348,200 @@ void read_coord_data(){
    vdc::system_size[2] = max[2] - min[2];
 
    // save system centre
-   vdc::system_centre[0] = ave[0]/double(vdc::num_atoms);
-   vdc::system_centre[1] = ave[1]/double(vdc::num_atoms);
-   vdc::system_centre[2] = ave[2]/double(vdc::num_atoms);
+   vdc::system_centre[0] = (max[0] + min[0])/2.0;
+   vdc::system_centre[1] = (max[1] + min[1])/2.0;
+   vdc::system_centre[2] = (max[2] + min[2])/2.0;
 
    return;
-
 }
 
+//---------------------------------------------------------------
+// Find list of atoms in user defined slice
+//---------------------------------------------------------------
+void slice_system(){
+   
+   // work out borders for slice param
+   for (slice_t &slice : vdc::slices){
+
+      switch (slice.type){
+      // group box and box void as min and max ranges are the same
+      case vdc::box :
+      case vdc::box_void :
+         slice.bound.resize(6); // xmin,xmax,ymin,ymax,zmin,zmax
+
+         // min
+         slice.bound[0] = (slice.param[0]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0];
+         slice.bound[2] = (slice.param[2]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1];
+         slice.bound[4] = (slice.param[4]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
+
+         // max
+         slice.bound[1] = (slice.param[1]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0];
+         slice.bound[3] = (slice.param[3]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1];
+         slice.bound[5] = (slice.param[5]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
+         break;
+      
+      case vdc::sphere :
+         slice.bound.resize(3); // a,b,c
+
+         // work out radii of the ellipse
+         slice.bound[0] = vdc::system_size[0]*slice.param[0]/2.0;
+         slice.bound[1] = vdc::system_size[1]*slice.param[1]/2.0;
+         slice.bound[2] = vdc::system_size[2]*slice.param[2]/2.0;
+         break;
+      
+      case vdc::cylinder :
+         slice.bound.resize(4); // a,b,zmin,zmax
+
+         slice.bound[0] = vdc::system_size[0]*slice.param[0]/2.0;
+         slice.bound[1] = vdc::system_size[1]*slice.param[1]/2.0;
+         slice.bound[2] = (slice.param[2]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
+         slice.bound[3] = (slice.param[3]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
+         break;
+      }
+   }
+
+   // find all valid atoms in slices
+   for (unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+
+      // remove materials defined by user
+      if ( std::find(vdc::remove_materials.begin(), vdc::remove_materials.end(), vdc::type[atom]+1) != vdc::remove_materials.end() ){
+         continue;
+      }
+
+      // if no slices defined, include all atoms
+      if ( vdc::slices.empty() ){
+         vdc::sliced_atoms_list.push_back(atom);
+      }
+      // otherwise include all atoms in any slice
+      else {
+
+         // atom coords
+         double x = vdc::coordinates[3*atom + 0];
+         double y = vdc::coordinates[3*atom + 1];
+         double z = vdc::coordinates[3*atom + 2];
+
+         for (slice_t slice : slices){
+
+            // flag to show atom is in any slice
+            bool in_bounds = false;
+
+            switch (slice.type){
+            case vdc::box :
+               in_bounds = box_slice(x,y,z,slice.bound);
+               break;
+            
+            case vdc::box_void :
+               in_bounds = !box_slice(x,y,z,slice.bound);
+               break;
+            
+            case vdc::sphere :
+               in_bounds = sphere_slice(x,y,z,slice.bound);
+               break;
+
+            case vdc::cylinder :
+               in_bounds = cylinder_slice(x,y,z,slice.bound);
+               break;
+
+            default:
+               std::cerr << "Error - unknown slice type, probably a mistake in command.cpp" << std::endl;
+               std::exit(EXIT_FAILURE);
+            }
+
+            // if the atom is in any slice, add to final list and stop checking others
+            if (in_bounds){ 
+               vdc::sliced_atoms_list.push_back(atom);
+               break;
+            }
+         }
+      }
+   }
+
+   // find all valid non_magnetic atoms in slices
+   for (unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+
+      // remove materials defined by user
+      if ( std::find(vdc::remove_materials.begin(), vdc::remove_materials.end(), vdc::nm_type[atom]+1) != vdc::remove_materials.end() ){
+         continue;
+      }
+
+      // if no slices defined, include all atoms
+      if ( vdc::slices.empty() ){
+         vdc::sliced_nm_atoms_list.push_back(atom);
+      }
+      // otherwise include all atoms in any slice
+      else {
+
+         // atom coords
+         double x = vdc::nm_coordinates[3*atom + 0];
+         double y = vdc::nm_coordinates[3*atom + 1];
+         double z = vdc::nm_coordinates[3*atom + 2];
+
+         for (slice_t slice : slices){
+
+            // flag to show atom is in any slice
+            bool in_bounds = false;
+
+            switch (slice.type){
+            case vdc::box :
+               in_bounds = box_slice(x,y,z,slice.bound);
+               break;
+            
+            case vdc::box_void :
+               in_bounds = !box_slice(x,y,z,slice.bound);
+               break;
+            
+            case vdc::sphere :
+               in_bounds = sphere_slice(x,y,z,slice.bound);
+               break;
+
+            case vdc::cylinder :
+               in_bounds = cylinder_slice(x,y,z,slice.bound);
+               break;
+
+            default:
+               std::cerr << "Error - unknown slice type, probably a mistake in command.cpp" << std::endl;
+               std::exit(EXIT_FAILURE);
+            }
+
+            // if the atom is in any slice, add to final list and stop checking others
+            if (in_bounds){ 
+               vdc::sliced_nm_atoms_list.push_back(atom);
+               break;
+            }
+         }
+      }
+   } 
+
+   // output informative message to user
+   if(vdc::verbose) std::cout << "done!" << std::endl;
+
+   return;
 }
+
+bool box_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound){
+
+   return (x >= bound[0] && x <= bound[1]) && (y >= bound[2] && y <= bound[3]) && (z >= bound[4] && z <= bound[5]);   
+}
+
+bool sphere_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound){
+
+   double temp = 0;
+
+   temp += (x - vdc::system_centre[0])*(x - vdc::system_centre[0])/(bound[0]*bound[0]);
+   temp += (y - vdc::system_centre[1])*(y - vdc::system_centre[1])/(bound[1]*bound[1]);
+   temp += (z - vdc::system_centre[2])*(z - vdc::system_centre[2])/(bound[2]*bound[2]);
+
+   return temp <= 1.0;
+}
+
+bool cylinder_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound){
+
+   double temp = 0;
+
+   temp += (x - vdc::system_centre[0])*(x - vdc::system_centre[0])/(bound[0]*bound[0]);
+   temp += (y - vdc::system_centre[1])*(y - vdc::system_centre[1])/(bound[1]*bound[1]);
+
+   return temp<=1.0 && z>=bound[2] && z<=bound[3];
+}
+
+} // end of namespace vdc

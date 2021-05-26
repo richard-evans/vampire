@@ -43,7 +43,7 @@ void output_xyz_file(){
    ofile.open("crystal.xyz");
 
    // output number of atoms
-   ofile << vdc::num_atoms + vdc::num_nm_atoms << "\n\n";
+   ofile << vdc::sliced_atoms_list.size() + vdc::sliced_nm_atoms_list.size() << "\n\n";
 
    #pragma omp parallel
    {
@@ -52,7 +52,10 @@ void output_xyz_file(){
 
       // write magnetic atoms to output text stream in parallel
       #pragma omp for
-      for(uint64_t atom = 0; atom < vdc::num_atoms; atom++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_atoms_list[i];
 
          // get atom type
          int type_id = vdc::type[atom];
@@ -66,7 +69,10 @@ void output_xyz_file(){
 
       // write non-magnetic atoms
       #pragma omp for
-      for(uint64_t atom = 0; atom < vdc::num_nm_atoms; atom++){
+      for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+
+         // get atom ID
+         unsigned int atom = vdc::sliced_nm_atoms_list[i];
 
          // get atom type
          int type_id = vdc::nm_type[atom];

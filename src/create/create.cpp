@@ -132,7 +132,7 @@ int create(){
 	cs::create_crystal_structure(catom_array);
 
 	// Cut system to the correct type, species etc
-	cs::create_system_type(catom_array);
+	create::create_system_type(catom_array);
 
 	// Copy atoms for interprocessor communications
 	#ifdef MPICF
@@ -177,63 +177,14 @@ int create(){
 
    // Determine number of local atoms
    #ifdef MPICF
-      int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
    #else
-      int num_local_atoms = atoms::num_atoms;
+      // set number of core atoms for serial code (to allow wraper functions to work seamlessly)
+      vmpi::num_core_atoms = atoms::num_atoms;
    #endif
 
 	// Set grain and cell variables for simulation
 	grains::set_properties();
-   cells::initialize(cs::system_dimensions[0],
-                  cs::system_dimensions[1],
-                  cs::system_dimensions[2],
-                  cs::unit_cell.dimensions[0],
-                  cs::unit_cell.dimensions[1],
-                  cs::unit_cell.dimensions[2],
-                  atoms::x_coord_array,
-                  atoms::y_coord_array,
-                  atoms::z_coord_array,
-                  atoms::type_array,
-                  atoms::cell_array,
-						create::num_total_atoms_non_filler,
-                  atoms::num_atoms
-      );
 
-   //----------------------------------------
-   // Initialise spin torque data
-   //----------------------------------------
-   st::initialise(cs::system_dimensions[0],
-                  cs::system_dimensions[1],
-                  cs::system_dimensions[2],
-                  atoms::x_coord_array,
-                  atoms::y_coord_array,
-                  atoms::z_coord_array,
-                  atoms::type_array,
-                  num_local_atoms);
-
-   //----------------------------------------
-   // Initialise local temperature data
-   //----------------------------------------
-   ltmp::initialise(cs::system_dimensions[0],
-                  cs::system_dimensions[1],
-                  cs::system_dimensions[2],
-                  atoms::x_coord_array,
-                  atoms::y_coord_array,
-                  atoms::z_coord_array,
-                  atoms::type_array,
-                  num_local_atoms,
-                  sim::Teq,
-                  sim::pump_power,
-                  sim::pump_time,
-                  sim::TTG,
-                  sim::TTCe,
-                  sim::TTCl,
-                  mp::dt_SI,
-					   sim::Tmin,
-					   sim::Tmax);
-
-
-	//std::cout << num_atoms << std::endl;
 	#ifdef MPICF
 		//std::cout << "Outputting coordinate data" << std::endl;
 		//vmpi::crystal_xyz(catom_array);

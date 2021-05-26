@@ -146,7 +146,6 @@ namespace sim{
 
 	int system_simulation_flags;
 	int hamiltonian_simulation_flags[10];
-	int integrator=0; /// 0 = LLG Heun; 1= MC; 2 = LLG Midpoint; 3 = CMC
 	int program=0;
 
 
@@ -169,43 +168,6 @@ namespace sim{
    // Monte Carlo statistics counters
    double mc_statistics_moves = 0.0;
    double mc_statistics_reject = 0.0;
-
-/// @brief Function to increment time counter and associted variables
-///
-/// @section License
-/// Use of this code, either in source or compiled form, is subject to license from the authors.
-/// Copyright \htmlonly &copy \endhtmlonly Richard Evans, 2009-2011. All Rights Reserved.
-///
-/// @section Information
-/// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.1
-/// @date    09/03/2011
-///
-/// @return EXIT_SUCCESS
-///
-/// @internal
-///	Created:		02/10/2008
-///	Revision:	1.1 09/03/2011
-///=====================================================================================
-///
-	void increment_time(){
-
-      // set flag checkpoint_loaded_flag to false since first step of simulations was performed
-      sim::checkpoint_loaded_flag=false;
-
-		sim::time++;
-		sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
-
-      // Update dipole fields
-		dipole::calculate_field(sim::time, atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array);
-
-		if(sim::lagrange_multiplier) update_lagrange_lambda();
-      st::update_spin_torque_fields(atoms::x_spin_array,
-                                  atoms::y_spin_array,
-                                  atoms::z_spin_array,
-                                  atoms::type_array,
-                                  mp::mu_s_array);
-	}
 
 /// @brief Function to run one a single program
 ///
@@ -234,6 +196,9 @@ int run(){
 
 	// Initialise simulation data structures
 	sim::initialize(mp::num_materials);
+
+   // Initialize vampire modules
+   sim::internal::initialize_modules();
 
    montecarlo::initialize();
 
@@ -478,6 +443,13 @@ int run(){
 	     	}
 		  	program::setting_process();
 		    break;
+		 case 52:
+			if(vmpi::my_rank==0){
+				 std::cout << "Domain walls..." << std::endl;
+				 zlog << "Domain walls..." << std::endl;
+			}
+			program::domain_wall();
+			 break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
@@ -492,7 +464,7 @@ int run(){
    //------------------------------------------------
    // Output Monte Carlo statistics if applicable
    //------------------------------------------------
-   if(sim::integrator==1){
+   if(sim::integrator == sim::monte_carlo){
       std::cout << "Monte Carlo statistics:" << std::endl;
       std::cout << "\tTotal moves: " << long(sim::mc_statistics_moves) << std::endl;
       std::cout << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
@@ -502,7 +474,7 @@ int run(){
       zlog << zTs() << "\t" << ((sim::mc_statistics_moves - sim::mc_statistics_reject)/sim::mc_statistics_moves)*100.0 << "% Accepted" << std::endl;
       zlog << zTs() << "\t" << (sim::mc_statistics_reject/sim::mc_statistics_moves)*100.0                              << "% Rejected" << std::endl;
    }
-   if(sim::integrator==3 || sim::integrator==4){
+   if(sim::integrator == sim::cmc || sim::integrator == sim::hybrid_cmc){
       std::cout << "Constrained Monte Carlo statistics:" << std::endl;
       std::cout << "\tTotal moves: " << montecarlo::cmc::mc_total << std::endl;
       std::cout << "\t" << (montecarlo::cmc::mc_success/montecarlo::cmc::mc_total)*100.0    << "% Accepted" << std::endl;
@@ -601,7 +573,7 @@ void integrate_serial(uint64_t n_steps){
             // Otherwise use CPU version
             else sim::LLG_Heun();
             // Increment time
-            increment_time();
+            sim::internal::increment_time();
          }
          break;
 
@@ -609,7 +581,7 @@ void integrate_serial(uint64_t n_steps){
 			for(uint64_t ti=0;ti<n_steps;ti++){
 				montecarlo::mc_step(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::num_atoms, atoms::type_array);
 				// increment time
-				increment_time();
+				sim::internal::increment_time();
 			}
 			break;
 
@@ -617,7 +589,7 @@ void integrate_serial(uint64_t n_steps){
          for(uint64_t ti=0;ti<n_steps;ti++){
             sim::LLG_Midpoint();
             // increment time
-            increment_time();
+            sim::internal::increment_time();
          }
          break;
 
@@ -625,7 +597,7 @@ void integrate_serial(uint64_t n_steps){
 			for(uint64_t ti=0;ti<n_steps;ti++){
 				montecarlo::cmc_step();
 				// increment time
-				increment_time();
+				sim::internal::increment_time();
 			}
 			break;
 
@@ -633,7 +605,15 @@ void integrate_serial(uint64_t n_steps){
 			for(uint64_t ti=0;ti<n_steps;ti++){
 				montecarlo::cmc_mc_step();
 				// increment time
-				increment_time();
+				sim::internal::increment_time();
+			}
+			break;
+
+		case sim::llg_quantum: // LLG quantum noise
+			for(uint64_t ti=0;ti<n_steps;ti++){
+				sim::internal::llg_quantum_step();
+				// increment time
+				sim::internal::increment_time();
 			}
 			break;
 
@@ -687,7 +667,7 @@ int integrate_mpi(uint64_t n_steps){
 				#endif
 			#endif
 				// increment time
-				increment_time();
+				sim::internal::increment_time();
 			}
 			break;
 
@@ -704,7 +684,7 @@ int integrate_mpi(uint64_t n_steps){
             #endif
 
 				// increment time
-				increment_time();
+				sim::internal::increment_time();
 			}
 			break;
 
@@ -719,7 +699,7 @@ int integrate_mpi(uint64_t n_steps){
 				#endif
 			#endif
 				// increment time
-				increment_time();
+				sim::internal::increment_time();
 			}
 			break;
 
@@ -730,7 +710,7 @@ int integrate_mpi(uint64_t n_steps){
 				terminaltextcolor(WHITE);
 				err::vexit();
 				// increment time
-				increment_time();
+				sim::internal::increment_time();
 			}
 			break;
 

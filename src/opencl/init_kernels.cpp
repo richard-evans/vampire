@@ -29,7 +29,7 @@ namespace vcl = ::vopencl::internal;
 static void init_dipole(void)
 {
    // dipole calculations enabled?
-   if (::sim::hamiltonian_simulation_flags[4]==1)
+   if (::dipole::activated)
    {
       vcl::set_kernel_args(vcl::update_dip,
                            vcl::cells::mag_array.buffer(),

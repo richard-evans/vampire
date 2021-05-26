@@ -17,6 +17,8 @@
 namespace vmpi{
 
    bool master = false; // boolean variable (only true on master process)
+   int master_id = 0; // MPI process ID for master process
+
    int mpi_mode=0;
    unsigned int ppn=1;  ///< Processors per node
    int my_rank=0;
@@ -60,5 +62,5 @@ namespace vmpi{
    std::vector<MPI_Request> requests(0);
    std::vector<MPI_Status> stati(0);
    #endif
-   
+
 }

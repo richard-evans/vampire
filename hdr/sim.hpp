@@ -36,6 +36,11 @@
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
+
+	// enumerated list for integrators
+	enum integrator_t{ llg_heun = 0, monte_carlo = 1, llg_midpoint = 2,
+							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5};
+
 	extern std::ofstream mag_file;
 	extern uint64_t time;
 	extern uint64_t total_time;
@@ -117,7 +122,7 @@ namespace sim{
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 
-	extern int integrator;
+	extern integrator_t integrator; // variable to specify integrator
 	extern int program;
 
    // Local system variables
@@ -180,6 +185,16 @@ namespace sim{
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;
 
+	 extern int domain_wall_axis;
+   extern double domain_wall_position;
+	 extern double domain_wall_discretisation;
+	 extern double domain_wall_centre;
+   extern double domain_wall_width;
+	 extern std::vector < bool > anti_PBC;
+
+	 extern std::vector < double > domain_wall_second_vector_x;
+	 extern std::vector < double > domain_wall_second_vector_y;
+	 extern std::vector < double > domain_wall_second_vector_z;
 }
 
 /*namespace ckp{

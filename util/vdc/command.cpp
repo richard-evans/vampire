@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2017. All rights reserved.
+//   (c) Richard F L Evans, Daniel Meilak 2017-2019. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -15,6 +15,8 @@
 #include <sstream>
 #include <cmath>
 #include <vector>
+#include <algorithm>
+#include <fstream>
 
 // program header
 #include "vdc.hpp"
@@ -22,14 +24,16 @@
 namespace vdc{
 
 // forward function declarations
-int extract( std::string arg_string, std::vector<double>& arg_vector );
-int check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output );
-void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x );
+// void extract_vector( std::string arg_string, std::vector<double>& arg_vector );
+// void extract_materials( std::string arg_string, std::vector<int>& arg_vector);
+// void extract_slice_param( std::string arg_string, std::vector<double>& arg_vector, int number_of_param);
+void check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output );
+void init_vector_y();
 
 //------------------------------------------------------------------------------
 // Command line parsing function
 //------------------------------------------------------------------------------
-int command( int argc, char* argv[] ){
+void command( int argc, char* argv[] ){
 // Command line options for utility to be implemented:
 //    --xyz - generate xyz file
 //    --povray - generate povray files
@@ -55,246 +59,115 @@ int command( int argc, char* argv[] ){
       //------------------------------------------------------------------------
       // Check for appropriate data outputs
       //------------------------------------------------------------------------
-      // xyz coordinate file output
-      if (sw == "--xyz"){
-         vdc::xyz = true;
-      }
-      // xyz coordinate file output
-      else if (sw == "--povray"){
-         vdc::povray = true;
-      }
-      // xyz coordinate file output
-      else if (sw == "--vtk"){
-         vdc::vtk = true;
-      }
-      // plain text file output
-      else if (sw == "--text"){
-         vdc::txt = true;
+      if      (sw == "--xyz"   ){ vdc::xyz    = true; } // xyz coordinate file output
+      else if (sw == "--povray"){ vdc::povray = true; } // pov coordinate file output
+      else if (sw == "--vtk"   ){ vdc::vtk    = true; } // vtk coordinate file output
+      else if (sw == "--text"  ){ vdc::txt    = true; } // plain text file output
+      else if (sw == "--cells" ){ vdc::cells  = true; }
+      else if (sw == "--ssc" || sw == "--spin-spin-correlation"){ vdc::ssc = true; }
+      //------------------------------------------------------------------------
+      // Check for cell size
+      //------------------------------------------------------------------------
+      else if (sw == "--cell-size"){
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - size of cells in Angstroms." );
+
+         // set cell size
+         if ( stof(temp_str) >= 0.5 ){ vdc::cell_size = stof(temp_str); }
+         else{
+            std::cerr << "Error - cell size must be greater than 0.5 Angstroms." << std::endl;
+            std::exit(EXIT_FAILURE);
+         }
       }
       //------------------------------------------------------------------------
       // Check for verbose output
       //------------------------------------------------------------------------
-      else if (sw == "--verbose"){
-         vdc::verbose = true;
+      else if (sw == "--verbose" || sw == "-v"){ vdc::verbose = true; }
+      //------------------------------------------------------------------------
+      // Input file name
+      //------------------------------------------------------------------------
+      else if (sw == "--input-file"){
+         // check number of args not exceeded
+         check_arg(arg, argc, argv, temp_str, "Error - no file specified for \'--input-file\' command line option." );
+
+         // set input_file name
+         vdc::input_file = temp_str;
       }
       //------------------------------------------------------------------------
-      // Check for colour mapping parameters
+      // Help information
       //------------------------------------------------------------------------
-      else if (sw == "--vector-z"){
-
+      else if (sw == "--help" || sw == "-h"){
          // check number of args not exceeded
-         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables in brackets." );
+         check_arg(arg, argc, argv, temp_str, "Error - no parameter specified for "+sw+" command line option." );
 
-         // work through vector and extract values
-         extract(temp_str, vdc::vector_z );
-
-         // confirm initialisation of z-axis
-         z_vector = true;
-      }
-      else if (sw == "--vector-x"){
-
-         // check number of args not exceeded
-         check_arg(arg, argc, argv, temp_str, "Error - expected 3 comma separated variables in brackets." );
-
-         // work through vector and extract values
-         extract(temp_str, vdc::vector_x );
-
-         // confirm initialisation of x-axis
-         x_vector = true;
-      }
-      else if (sw == "--colourmap"){
-
-         // check number of args not exceeded
-         check_arg(arg, argc, argv, temp_str, "Error - expected colourmap keyword." );
-
-         if ( temp_str == "C2" ){
-            vdc::colour_keyword = temp_str;
-         }
-         else if (temp_str == "BWR" ){
-            vdc::colour_keyword = temp_str;
-         }
-         else if (temp_str == "Rainbow" ){
-            vdc::colour_keyword = temp_str;
-         }
-         else {
-            ////terminaltextcolor(RED);
-            std::cerr << "Error - Colourmap keyword does not match."
-                      << std::endl;
-            return EXIT_FAILURE;
-            ////terminaltextcolor(WHITE);
+         // change temp_str to lowercase for comparison
+         for (char &c : temp_str){
+            c = std::tolower(c);
          }
 
+         // check if parameter exists
+         if (vdc::key_list.find(temp_str) == vdc::key_list.end()){
+            std::cerr << "Error - No matching parameter '" << temp_str << "'.\n";
+            std::exit(EXIT_FAILURE);
+         }
+
+         input_t input;
+
+         // create argument to pass to function wrapper
+         input.value = {"-h"};
+
+         // pass to function wrapper
+         vdc::key_list.at(temp_str)(input);
       }
-      else if ( sw == "--2D" ){
+      // else if (sw == "--gen-input" || sw == "--generate-input"){
 
-         vdc::z_axis_colour = false;
+      //    // open input file to write to
+      //    std::ofstream input_file(vdc::input_file);
 
-      }
-      else if ( sw == "--custom_colourmap" ){
+      //    // check if file open was success
+      //    if (!input_file.is_open()){
+      //       std::cerr << "Error - Unable to open '" << vdc::input_file << "'.\n";
+      //       std::exit(EXIT_FAILURE);
+      //    }
 
-         // check number of args not exceeded
-         check_arg(arg, argc, argv, temp_str, "Error - expected custom colourmap name.");
+      //    input_file << "#=================================\n"
+      //               << "# Povray Parameters\n"
+      //               << "#=================================\n\n"
+      //               << "colourmap = CBWR\n"
+      //               << ""
+                    
 
-         // set custom map file name
-         vdc::custom_colourmap_file = temp_str;
 
-      }
+
+      //    std::exit(EXIT_SUCCESS);
+      // }
       else {
-         ////terminaltextcolor(RED);
-         std::cerr << "Error - unknown command line parameter \'" << sw << "\'"
-                   << std::endl;
-         ////terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
+         std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
+         std::exit(EXIT_FAILURE);
       }
    }
 
    //---------------------------------------------------------------------------
-   // Additional checks on input parameters
+   // Additional checks on command line parameters
    //---------------------------------------------------------------------------
 
    // check that some kind of data output is requested
-   if( !vdc::xyz && !vdc::povray && !vdc::vtk && !vdc::txt ){
+   if( !vdc::xyz && !vdc::povray && !vdc::vtk && !vdc::txt && !vdc::ssc && !vdc::cells){
       std::cerr << "Error! No output data formats requested. Available options are: " << std::endl;
       std::cerr << "\t\t --xyz    Data output in .xyz format for viewing in rasmol/jmol" << std::endl;
       std::cerr << "\t\t --povray Data output in PoVRAY format for rendering" << std::endl;
       std::cerr << "\t\t --vtk    Data output in VTK format for viewing in Paraview" << std::endl;
       std::cerr << "\t\t --text   Data output in plain text format for plotting in gnuplot/excel etc" << std::endl;
-      return EXIT_FAILURE;
+      std::cerr << "\t\t --cells  Data output in plain text format in cells" << std::endl;
+      std::cerr << "\t\t --ssc    Spin-spin correlation data in text format" << std::endl;
+      std::exit(EXIT_FAILURE);
    }
-
-   // check for valid axis initialisations
-   if ( z_vector && !x_vector ){
-
-      // check for a z-axis with vector_z[2] = 0
-      // (Hence z_vector lies in xy-plane)
-      if ( (-0.000001 < vdc::vector_z[2]) && (vdc::vector_z[2] < 0.000001) ){
-         // x-axis will lie along {0,0,1}
-         vdc::vector_x = {0.0, 0.0, 1.0};
-
-         // find vector_y
-         init_vector_y( vdc::vector_z, vdc::vector_x );
-      }
-      else {
-         // find x-axis which lies on plane with normal vector_z
-         // (there must exist a vector with coor {1,0,x} normal to z_vector )
-         vdc::vector_x = {1.0, 0.0, -1.0*vdc::vector_z[0]/vdc::vector_z[2]};
-
-         // find vector_y
-         init_vector_y( vdc::vector_z, vdc::vector_x );
-      }
-   }
-   else if ( !z_vector && x_vector ){
-
-      // x-axis cannot be initialised alone
-      ////terminaltextcolor(RED);
-      std::cerr << "Error - x-axis cannot be initialised alone."
-                << "\n" << "To use 1D colour scheme, initialise z-axis instead"
-                << std::endl;
-      ////terminaltextcolor(WHITE);
-      return EXIT_FAILURE;
-   }
-   else if ( z_vector && x_vector ){
-
-      // check if input axes are orthogonal
-      double zdotx;
-      zdotx = vdc::vector_z[0]*vdc::vector_x[0] + vdc::vector_z[1]*vdc::vector_x[1] + vdc::vector_z[2]*vdc::vector_x[2];
-
-      if ( (zdotx > 0.000001) || (zdotx < -0.000001) ){
-         ////terminaltextcolor(RED);
-         std::cerr << "Error - input axes are not orthogonal." << std::endl;
-         ////terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
-
-   }
-   return EXIT_SUCCESS;
-
 }
-
-//------------------------------------------------------------------------------
-// Extracts 3D vector coordinates from string: {x,y,z} or (x,y,z)
-// where x,y and z are type double
-//------------------------------------------------------------------------------
-int extract( std::string arg_string, std::vector<double>& arg_vector ){
-   int marker = 0; // position in the vector string
-
-   // check for opening brackets
-   if ( (arg_string[marker] != '(') && (arg_string[marker] != '{') ){
-      ////terminaltextcolor(RED);
-      std::cerr << "Error - brackets required around 3 comma separated values"
-                << std::endl;
-      ////terminaltextcolor(WHITE);
-      return EXIT_FAILURE;
-   }
-
-   // move to next character
-   marker++;
-
-   // read coordinates
-   for ( int i = 0; i < 3; i++){
-      std::string tmp_string;
-
-      // read coordinate-value
-      int j = 0;
-
-      while ( (arg_string[marker] != ',') && (arg_string[marker] != '}') && (arg_string[marker] != ')') ){
-         tmp_string.push_back(arg_string[marker]);
-
-         // move through number
-         marker++;
-         j++;
-      }
-
-      arg_vector[i] = std::stod(tmp_string);
-
-      // skip comma, check for closing brackets
-      if ( arg_string[marker] == ',' ){
-         marker++;
-      }
-      else if ( ((arg_string[marker] != ')') && (arg_string[marker] != '}' )) && ( i == 2 ) ){
-         ////terminaltextcolor(RED);
-         std::cerr << "Error - brackets required around 3 comma separated values"
-                   << std::endl;
-         ////terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
-      else if ( ((arg_string[marker] == ')') || (arg_string[marker] == '}')) && ( i != 2 ) ){
-         ////terminaltextcolor(RED)
-         std::cerr << "Error - three coordinates required"
-                   << std::endl;
-         ////terminaltextcolor(WHITE);
-         return EXIT_FAILURE;
-      }
-
-   }
-
-   // normalise arg_vector
-   double length;
-   length = std::sqrt( arg_vector[0]*arg_vector[0] + arg_vector[1]*arg_vector[1] + arg_vector[2]*arg_vector[2] );
-   arg_vector[0] = arg_vector[0]/length;
-   arg_vector[1] = arg_vector[1]/length;
-   arg_vector[2] = arg_vector[2]/length;
-
-   return EXIT_SUCCESS;
-}
-
-//------------------------------------------------------------------------------
-// Perform cross product of input vectors vector_x and vector_z to get vector_y
-//------------------------------------------------------------------------------
-void init_vector_y(std::vector<double> vector_z, std::vector<double> vector_x ){
-
-   vdc::vector_y[0] = vdc::vector_z[1]*vdc::vector_x[2] - vdc::vector_x[1]*vdc::vector_z[2];
-   vdc::vector_y[1] = vdc::vector_x[0]*vdc::vector_z[2] - vdc::vector_z[0]*vdc::vector_x[2];
-   vdc::vector_y[2] = vdc::vector_z[0]*vdc::vector_x[1] - vdc::vector_x[0]*vdc::vector_z[1];
-
-   return;
-}
-
 
 //------------------------------------------------------------------------------
 // Check number of command line args not exceeded
 //------------------------------------------------------------------------------
-int check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output ){
+void check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output ){
 
    if (arg+1 < argc){
       arg++;
@@ -302,12 +175,8 @@ int check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::str
    }
    else {
       std::cerr << error_output << std::endl;
-
-      return EXIT_FAILURE;
+      std::exit(EXIT_FAILURE);
    }
-
-   return EXIT_SUCCESS;
-
 }
 
 } // end of namespace vdc

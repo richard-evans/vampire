@@ -121,7 +121,7 @@ namespace dipole{
             break;
 
          case dipole::internal::atomistic:
-            dipole::internal::initialize_atomistic_solver(num_atoms, atom_coords_x, atom_coords_y, atom_coords_z, atom_moments);
+            dipole::internal::initialize_atomistic_solver(num_atoms, atom_coords_x, atom_coords_y, atom_coords_z, atom_moments, atom_type_array);
             break;
 
       }

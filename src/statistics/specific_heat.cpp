@@ -28,7 +28,7 @@ namespace stats{
 //------------------------------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------------------------------
-specific_heat_statistic_t::specific_heat_statistic_t (){}
+//specific_heat_statistic_t::specific_heat_statistic_t (){}
 
 //------------------------------------------------------------------------------------------------------
 // Function to initialize data structures
@@ -109,7 +109,7 @@ void specific_heat_statistic_t::reset_averages(){
 //------------------------------------------------------------------------------------------------------
 // Function to output mean specific_heat values as string
 //------------------------------------------------------------------------------------------------------
-std::string specific_heat_statistic_t::output_mean_specific_heat(const double temperature){
+std::string specific_heat_statistic_t::output_mean_specific_heat(const double temperature,bool header){
 
    // result string stream
    std::ostringstream result;
@@ -133,7 +133,11 @@ std::string specific_heat_statistic_t::output_mean_specific_heat(const double te
       const double prefactor = itemp2 / normalisation[id]; // in 1 / Kelvin per spin
       const double sh = prefactor * ( ( mean_specific_heat_squared[id] * imean_counter ) - ( mean_specific_heat[id] * mean_specific_heat[id] * imean_counter_sq) );
 
-      result << sh << "\t";
+      if(header){
+          result<<name<<id<<"_spec_heat"<<"\t";
+      }else{
+          result << sh << "\t";
+      }
 
    }
 
