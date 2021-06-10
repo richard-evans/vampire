@@ -27,7 +27,7 @@ namespace internal{
 // Function to determine exchange energy based on interaction range and
 // exchange interaction function
 //------------------------------------------------------------------------
-double exchange(double range_sq, double nn_cutoff_sq){
+double exchange(double range_sq, double nn_cutoff_sq, int i_mat, int j_mat){
 
    // Select program to run
    switch(uc::internal::exchange_function){
@@ -45,6 +45,22 @@ double exchange(double range_sq, double nn_cutoff_sq){
       case exponential:{
          return exp(-sqrt(range_sq)/uc::internal::exchange_decay);
          break;
+      }
+
+      case NdFeB_exponential:{
+         double A=36.9434;
+         double B=1.25094;
+         double C=-0.229572;
+         const double Fe_ratio=0.69618016759*1.07692307692; // 560/520 = 1.07692307692
+         const double J0Nd=Fe_ratio*4.06835e-20/16.0;
+         // NdFe interaction
+         if ((i_mat == 0 && j_mat == 1) || (i_mat == 1 && j_mat == 0) ){
+            return 0.45*J0Nd;
+         }
+         // FeFe interaction
+         if ((i_mat == j_mat) && i_mat == 1){
+            return 2.0*2.179872e-21*(A*exp(-B*sqrt(range_sq))+C)*Fe_ratio;
+         }
       }
 
       default:{

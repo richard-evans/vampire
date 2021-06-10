@@ -35,7 +35,7 @@ namespace unitcell{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
-      enum exchange_function_t { nearest_neighbour, shell, exponential };
+      enum exchange_function_t { nearest_neighbour, shell, exponential, NdFeB_exponential };
 
       //-------------------------------------------------------------------------
       // Internal shared variables
@@ -67,6 +67,7 @@ namespace unitcell{
       void build_rock_salt(unitcell::unit_cell_t& unit_cell);
       void build_heusler(unitcell::unit_cell_t& unit_cell);
       void build_spinel(unitcell::unit_cell_t& unit_cell);
+      void build_NdFeB(unitcell::unit_cell_t& unit_cell);
       void calculate_interactions(unit_cell_t& unit_cell);
       void read_unit_cell(unit_cell_t & unit_cell, std::string filename);
       void read_biquadratic_interactions(unit_cell_t & unit_cell,
@@ -76,7 +77,7 @@ namespace unitcell{
                                          unsigned int& line_counter,
                                          int& interaction_range);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
-      double exchange(double range_sq, double nn_cutoff_sq);
+      double exchange(double range_sq, double nn_cutoff_sq, int i_mat, int j_mat);
 
    } // end of internal namespace
 
