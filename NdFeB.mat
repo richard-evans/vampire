@@ -1,5 +1,5 @@
 #-----------------
-materials:num-materials = 2
+materials:num-materials = 3
 #-----------------
 material[1]:material-name=Neodymium
 material[1]:damping-constant=1.0

@@ -12,8 +12,8 @@ create:crystal-structure = NdFeB
 dimensions:unit-cell-size = 8.8 !A
 
 dimensions:system-size = 8.8 !nm
-#dimensions:system-size-y = 8.8 !nm
-#dimensions:system-size-z = 8.8 !nm
+dimensions:system-size-y = 8.8 !nm
+dimensions:system-size-z = 12.2 !nm
 
 #------------------------------------------
 # Material Files:
@@ -25,9 +25,11 @@ material:file = NdFeB.mat
 sim:minimum-temperature = 0
 sim:maximum-temperature = 1500
 sim:temperature-increment = 25
-sim:equilibration-time-steps = 10000
-sim:loop-time-steps = 10000
+sim:equilibration-time-steps = 100
+sim:loop-time-steps = 100
 sim:time-steps-increment = 1
+
+exchange:function = exponential
 
 #------------------------------------------
 # Program and integrator details

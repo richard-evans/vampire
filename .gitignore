@@ -95,3 +95,6 @@ run/unit-cell-creator
 .settings/
 
 #EOF
+.vscode/configurationCache.log
+.vscode/dryrun.log
+.gitignore
