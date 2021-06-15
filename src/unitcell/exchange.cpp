@@ -27,6 +27,15 @@ namespace internal{
 // Function to determine exchange energy based on interaction range and
 // exchange interaction function
 //------------------------------------------------------------------------
+
+double exponential_exchange(double range_sq){
+   return exp(-sqrt(range_sq)/uc::internal::exchange_decay);
+}
+
+double exponential_exchange(double range_sq, double epA, double epB, double epC){
+   return epA*exp(-epB*sqrt(range_sq)/uc::internal::exchange_decay) + epC;
+}
+
 double exchange(double range_sq, double nn_cutoff_sq, int i_mat, int j_mat){
 
    // Select program to run
@@ -43,7 +52,7 @@ double exchange(double range_sq, double nn_cutoff_sq, int i_mat, int j_mat){
       }
 
       case exponential:{
-         return exp(-sqrt(range_sq)/uc::internal::exchange_decay);
+         return exponential_exchange(range_sq, exchange_parameter_A, exchange_parameter_B, exchange_parameter_C);
          break;
       }
 

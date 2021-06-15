@@ -174,6 +174,30 @@ namespace unitcell{
                terminaltextcolor(WHITE);
                err::vexit();
             }
+         }  //------------------------------------------------------------
+         test="parameter-A";
+         if(word==test){
+            double epA = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(epA, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 10000.0");
+            uc::internal::exchange_parameter_A = epA;
+            return true;
+         }
+         test="parameter-B";
+         if (word==test){
+            double epB = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(epB, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 10000.0");
+            uc::internal::exchange_parameter_B = epB;
+            return true;
+         }
+         test="parameter-C";
+         if (word==test){
+            double epC = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(epC, word, line, prefix, unit, "length", -10000.0, 10000.0,"input","-10000.0 - 10000.0");
+            uc::internal::exchange_parameter_C = epC;
+            return true;
          }
       }
       //--------------------------------------------------------------------

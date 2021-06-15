@@ -98,3 +98,6 @@ run/unit-cell-creator
 .vscode/configurationCache.log
 .vscode/dryrun.log
 .gitignore
+src/unitcell/exchange.cpp
+.vscode/targets.log
+.vscode/targets.log
