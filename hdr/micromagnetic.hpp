@@ -93,7 +93,7 @@ namespace micromagnetic{
             std::vector <double>& volume_array);
 
     //micromagnetic LLG
-    int LLG( std::vector <int> local_cell_array,
+    int LLG( std::vector <int> &local_cell_array,
              int num_steps,
              int num_cells,
              int num_local_cells,
@@ -106,7 +106,7 @@ namespace micromagnetic{
              double Hz,
              double H,
              double dt,
-             std::vector <double> volume_array);
+             std::vector <double> &volume_array);
 
    //-----------------------------------------------------------------------------
    // Function to initialise micromagnetic module

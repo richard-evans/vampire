@@ -112,7 +112,7 @@ namespace micromagnetic{
    }
 
 
-   int LLG( std::vector <int> local_cell_array,
+   int LLG( std::vector <int> &local_cell_array,
             int num_steps,
             int num_cells,                     // number of cells (all processors)
             int num_local_cells,               // number of cells (local processor)
@@ -123,7 +123,7 @@ namespace micromagnetic{
             double Hx, double Hy, double Hz,   // External applied direction
             double H,                          // External applied field (Tesla)
             double dt,                         // timestep (gamma*dt)
-            std::vector <double> volume_array  // volume of each magnetic_cell
+            std::vector <double> &volume_array  // volume of each magnetic_cell
    ){
 
       using namespace micromagnetic_arrays_llg;
