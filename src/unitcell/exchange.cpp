@@ -33,7 +33,7 @@ double exponential_exchange(double range_sq){
 }
 
 double exponential_exchange(double range_sq, double epA, double epB, double epC){
-   return epA*exp(-epB*sqrt(range_sq)/uc::internal::exchange_decay) + epC;
+   return epA*exp(-sqrt(range_sq)/uc::internal::exchange_decay) + epC;
 }
 
 double exchange(double range_sq, double nn_cutoff_sq, int i_mat, int j_mat){
