@@ -143,7 +143,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.Jij[0][0] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // xx
                tmp.Jij[0][1] = 0.0; // xy
                tmp.Jij[0][2] = 0.0; // xz
-               //std::cout << tmp.Jij[0][0] << std::endl;
+
                tmp.Jij[1][0] = 0.0; // yx
                tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // yy
                tmp.Jij[1][2] = 0.0; // yz
@@ -174,11 +174,6 @@ void calculate_interactions(unit_cell_t& unit_cell){
    // Normalise exchange interactions
    unit_cell.bilinear.normalise_exchange();
    unit_cell.biquadratic.normalise_exchange();
-
-   // print Jij[0][0] for all atoms.
-   //for (int i=0; i < unit_cell.bilinear.interaction.size(); ++i){
-   //   std::cout << unit_cell.bilinear.interaction[i].Jij[0][0] << std::endl;
-   //}
 
    // Find shells for neighbours
    unit_cell.bilinear.find_shells();

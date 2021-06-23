@@ -50,10 +50,8 @@ namespace unitcell{
       extern exchange_function_t exchange_function;
       extern double exchange_interaction_range;
       extern double exchange_decay;
-
-      extern double exchange_parameter_A;
-      extern double exchange_parameter_B;
-      extern double exchange_parameter_C;
+      extern double exchange_multiplier;
+      extern double exchange_shift;
 
       extern bool sublattice_materials; // flag to enable identification of atoms in simple crystals by material
 

@@ -149,6 +149,22 @@ namespace unitcell{
             uc::internal::exchange_decay = dl;
             return true;
          }         //--------------------------------------------------------------------
+         test="decay-multiplier";
+         if(word==test){
+            double dm = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(dm, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 10000.0");
+            uc::internal::exchange_multiplier = dm;
+            return true;
+         }
+         test="decay-shift";
+         if (word==test){
+            double ds = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(ds, word, line, prefix, unit, "length", -10000.0, 10000.0,"input","-10000.0 - 10000.0");
+            uc::internal::exchange_shift = ds;
+            return true;
+         }
          test="function";
          if(word==test){
             test="nearest-neighbour";
@@ -175,30 +191,6 @@ namespace unitcell{
                err::vexit();
             }
          }  //------------------------------------------------------------
-         test="parameter-A";
-         if(word==test){
-            double epA = atof(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_value(epA, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 10000.0");
-            uc::internal::exchange_parameter_A = epA;
-            return true;
-         }
-         test="parameter-B";
-         if (word==test){
-            double epB = atof(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_value(epB, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 10000.0");
-            uc::internal::exchange_parameter_B = epB;
-            return true;
-         }
-         test="parameter-C";
-         if (word==test){
-            double epC = atof(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_value(epC, word, line, prefix, unit, "length", -10000.0, 10000.0,"input","-10000.0 - 10000.0");
-            uc::internal::exchange_parameter_C = epC;
-            return true;
-         }
       }
       //--------------------------------------------------------------------
       // Keyword not found

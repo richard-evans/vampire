@@ -622,8 +622,8 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[64].mat  = 2;
    unit_cell.atom[64].lc   = 64;
    unit_cell.atom[64].hc   = 0;
-   unit_cell.atom[64].nm   = true;
-   unit_cell.atom[64].ni   = 12;
+   unit_cell.atom[64].nm   = true; //boron
+   unit_cell.atom[64].ni   = 0;
    //-----------------------------
    unit_cell.atom[65].x    = 0.629;
    unit_cell.atom[65].y    = 0.371;
@@ -632,7 +632,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[65].lc   = 65;
    unit_cell.atom[65].hc   = 0;
    unit_cell.atom[65].nm   = true;
-   unit_cell.atom[65].ni   = 12;
+   unit_cell.atom[65].ni   = 0;
    //-----------------------------
    unit_cell.atom[66].x    = 0.871;
    unit_cell.atom[66].y    = 0.871;
@@ -641,7 +641,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[66].lc   = 66;
    unit_cell.atom[66].hc   = 2;
    unit_cell.atom[66].nm   = true;
-   unit_cell.atom[66].ni   = 12;
+   unit_cell.atom[66].ni   = 0;
    //-----------------------------
    unit_cell.atom[67].x    = 0.129;
    unit_cell.atom[67].y    = 0.129;
@@ -650,7 +650,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[67].lc   = 67;
    unit_cell.atom[67].hc   = 2;
    unit_cell.atom[67].nm   = true;
-   unit_cell.atom[67].ni   = 12;
+   unit_cell.atom[67].ni   = 0;
 
    unit_cell.cutoff_radius = 0.40; // normalised to x-axis unit cell length
 

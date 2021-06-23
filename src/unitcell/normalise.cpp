@@ -71,25 +71,19 @@ void unitcell::exchange_template_t::normalise_exponential_exchange(){
 
    // normalise to get same sum as for nearest neighbours
    const double inv_norm_factor = expected_sum/sum;
-   //std::cout << "Inversion_norm_factor = " << inv_norm_factor << std::endl;
    for(int i=0; i<interaction.size(); i++){
       interaction[i].Jij[0][0] *= inv_norm_factor;
-      //std::cout << interaction[i].Jij[0][0] << std::endl;
       interaction[i].Jij[1][1] *= inv_norm_factor;
       interaction[i].Jij[2][2] *= inv_norm_factor;
    }
 
-   double nsum = 0.0;
-   for(int i=0; i<interaction.size(); i++){
-      nsum += interaction[i].Jij[0][0]; // xx only since J is a trace anyway
-   }
+   //double nsum = 0.0;
+   //for(int i=0; i<interaction.size(); i++){
+   //   nsum += interaction[i].Jij[0][0]; // xx only since J is a trace anyway
+   //}
 
    // output sum and normalised sum to screen
-   std::cout << expected_sum << "\t" << sum << "\t" << nsum << std::endl;
-
-   //for (int i = 0; i < interaction.size(); ++i){
-   //   std::cout << interaction[i].Jij[0][0] << std::endl;
-   //}
+   //std::cout << expected_sum << "\t" << sum << "\t" << nsum << std::endl;
 
    return;
 
