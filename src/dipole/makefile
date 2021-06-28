@@ -22,8 +22,8 @@ mpi2.o \
 output_atomistic_field.o \
 tensor.o \
 update.o \
-fft_macrocell.o
-#fft_atomistic.o \
+fft_macrocell.o \
+fft_atomistic.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/dipole/,$(dipole_objects))

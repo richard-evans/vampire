@@ -89,6 +89,11 @@ namespace dipole{
                   dipole::internal::update_field_fft();
                   break;
 
+               case dipole::internal::atomisticfft:
+                  dipole::internal::atomistic_fft::update_field_atomistic_fft();
+                  break;
+
+
             }
 
             // // for gpu acceleration, transfer calculated fields now (does nothing for serial)
