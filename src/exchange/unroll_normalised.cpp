@@ -98,6 +98,9 @@ namespace exchange{
       					atoms::v_exchange_list.push_back(tmp_zvec);
                      // get unit cell interaction id
                      double J = 1.0;
+                     Mn2Au1 = true;
+                     Mn2Au2 = true;
+
                      if (Mn2Au1 == false || Mn2Au2 == false ){
                       // //calculate the distance between the atoms to see if its a NN or NNN interaction
                       double dx = atoms::x_coord_array[atom] - atoms::x_coord_array[natom];
@@ -115,8 +118,9 @@ namespace exchange{
                            J = -1.0;
                         //   std::cout << d << std::endl;
                          }
+                      std::cout << imaterial << "\t" << jmaterial << "\t" << d <<  "\t" << J << std::endl; 
                       }
-                     // std::cout << imaterial << "\t" << jmaterial << "\t" << d << "\t" << J << std::endl; 
+                     J = 1.0;
                      int i = atoms::neighbour_interaction_type_array[nn];
                      // get shell ID for interaction
                      const int shell = cs::unit_cell.bilinear.interaction[i].shell;
