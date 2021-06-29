@@ -485,6 +485,14 @@ int run(){
 			}
 			program::domain_wall();
 			 break;
+         case 53:
+			if(vmpi::my_rank==0){
+				std::cout << "mm-A-calculation..." << std::endl;
+				zlog << "mm-A-calculation..." << std::endl;
+			}
+			program::mm_A_calculation();
+			break;
+
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;

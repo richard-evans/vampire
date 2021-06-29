@@ -23,6 +23,7 @@ temperature_pulse.o \
 localised_temperature_pulse.o \
 effective_damping.o \
 domain_wall.o \
+micromagnetic_A_calculation.o \
 fmr.o
 
 # Append module objects to global tree

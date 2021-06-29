@@ -47,6 +47,7 @@ namespace unitcell{
       extern double unit_cell_size_y;
       extern double unit_cell_size_z;
 
+
       extern exchange_function_t exchange_function;
       extern double exchange_interaction_range;
       extern double exchange_decay;

@@ -455,6 +455,11 @@ namespace vin{
                 sim::program=52;
                 return EXIT_SUCCESS;
             }
+            test="mm-A-calculation";
+            if(value==test){
+                sim::program=53;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;

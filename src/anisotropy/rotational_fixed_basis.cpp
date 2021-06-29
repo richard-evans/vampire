@@ -35,7 +35,8 @@ namespace anisotropy{
       //
       // E_4r = 1 + Sz^4 - 8Sx^2 + 8Sx^2Sz^2 + 8Sx^4 - 2Sz^2
       //      = 1 + Sz^4 - 8Sy^2 + 8Sy^2Sz^2 + 8Sy^4 - 2Sz^2
-      //
+      // E_4r = 1 - 8*Sx^2  + 8*Sx^4
+
       // The associated internal field (-dE/dS) is then
       //
       // Hx = 16 Sx (1 - Sz^2 + 2Sx^2)
