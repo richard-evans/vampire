@@ -75,7 +75,7 @@ namespace dipole{
             // is the number of cells.
             //
             //------------------------------------------------------------------------------
-
+            #ifdef FFT
 
             bool FFT_initialised = false;
 
@@ -107,7 +107,7 @@ namespace dipole{
 
             double delta_fn ( const int i, const int j) { return (i==j) ? 1 : 0;}
 
-
+            #endif
             //-----------------------------------------------------------------------------
             // Function to initialise dipole field calculation using FFT solver
             //-----------------------------------------------------------------------------

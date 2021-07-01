@@ -75,7 +75,7 @@ namespace dipole{
         //
         //------------------------------------------------------------------------------
 
-
+#ifdef FFT
         bool FFT_initialised = false;
 
         double          *M_r;       // Spatial Magnetisation
@@ -111,7 +111,7 @@ namespace dipole{
         //-----------------------------------------------------------------------------
         // Function to initialise dipole field calculation using FFT solver
         //-----------------------------------------------------------------------------
-
+#endif
         void initialize_fft_solver(){
 
 #ifdef FFT

@@ -74,7 +74,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
       const double mx_i = cells::mag_array_x[cell_i]*imuB;
       const double my_i = cells::mag_array_y[cell_i]*imuB;
       const double mz_i = cells::mag_array_z[cell_i]*imuB;
-   //      std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;
+      //   std::cout << cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << std::endl;
       // Add self-demagnetisation as mu_0/4_PI * 8PI*m_cell/3V
       dipole::cells_field_array_x[cell_i] = 0.0;//self_demag * mx_i*0.0; //*0.0
       dipole::cells_field_array_y[cell_i] = 0.0;//self_demag * my_i*0.0; //*0.0
@@ -90,7 +90,7 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
         const double mx = ha::mag_array_x[cell_j]; //*imuB;
         const double my = ha::mag_array_y[cell_j]; //*imuB;
         const double mz = ha::mag_array_z[cell_j]; //*imuB;
-      //if (cell_i == 0)std::cout<< cell_i << '\t' << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
+    //  std::cout<< cell_j << '\t' << mx*ha::rij_tensor_xx[j] + my*ha::rij_tensor_xy[j] + mz*ha::rij_tensor_xz[j] << "\t" << mx_i << '\t' << my_i << '\t' << mz_i << "\t" <<  cell_j << '\t' << mx << '\t' << my << '\t' << mz <<std::endl;
         dipole::cells_field_array_x[cell_i]      +=(mx*ha::rij_tensor_xx[j] + my*ha::rij_tensor_xy[j] + mz*ha::rij_tensor_xz[j]);
         dipole::cells_field_array_y[cell_i]      +=(mx*ha::rij_tensor_xy[j] + my*ha::rij_tensor_yy[j] + mz*ha::rij_tensor_yz[j]);
         dipole::cells_field_array_z[cell_i]      +=(mx*ha::rij_tensor_xz[j] + my*ha::rij_tensor_yz[j] + mz*ha::rij_tensor_zz[j]);
@@ -98,21 +98,24 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
        dipole::cells_mu0Hd_field_array_x[cell_i] +=(mx*ha::rij_tensor_xx[j] + my*ha::rij_tensor_xy[j] + mz*ha::rij_tensor_xz[j]);
        dipole::cells_mu0Hd_field_array_y[cell_i] +=(mx*ha::rij_tensor_xy[j] + my*ha::rij_tensor_yy[j] + mz*ha::rij_tensor_yz[j]);
        dipole::cells_mu0Hd_field_array_z[cell_i] +=(mx*ha::rij_tensor_xz[j] + my*ha::rij_tensor_yz[j] + mz*ha::rij_tensor_zz[j]);
-      // std::cout << rij_tensor_xx[j] << '\t' << rij_tensor_xy[j] << '\t' << rij_tensor_xz[j] << '\t' << rij_tensor_yy[j] << '\t' << rij_tensor_yz[j] << '\t' << rij_tensor_zz[j] << '\t' <<std::endl;
+     //  std::cout << ha::rij_tensor_xx[j] << '\t' << ha::rij_tensor_xy[j] << '\t' << ha::rij_tensor_xz[j] << '\t' << ha::rij_tensor_yy[j] << '\t' << ha::rij_tensor_yz[j] << '\t' << ha::rij_tensor_zz[j] << '\t' <<std::endl;
+     //  std::cout <<mx << "\t" << my << "\t" << mz << std::endl; //"\t" << ha::rij_tensor_xz[j] << "\t" <<mz*ha::rij_tensor_xz[j] << std::endl;// "\t" << mz*ha::rij_tensor_yz[j] << "\t" << mz*ha::rij_tensor_zz[j]  << "\t" << mz_i << "\t"  << '\t' << ha::rij_tensor_xz[j]  << '\t' << ha::rij_tensor_yz[j] << '\t' << ha::rij_tensor_zz[j] << '\t' <<std::endl;
+      //std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
+
       }
-   //   std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
+      //std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
 
       dipole::cells_field_array_x[cell_i]       = dipole::cells_field_array_x[cell_i] * 9.27400915e-01;
       dipole::cells_field_array_y[cell_i]       = dipole::cells_field_array_y[cell_i] * 9.27400915e-01;
       dipole::cells_field_array_z[cell_i]       = dipole::cells_field_array_z[cell_i] * 9.27400915e-01;
-      //dp_fields << sim::time << '\t' << cell_i << '\t' << dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
+      dp_fields << sim::time << '\t' << cell_i << '\t' << dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
 
       // Multiply Hdemg by mu_0/4pi * 1e30 * mu_B to account for normalisation
       // of magnetisation and volume in angstrom
       dipole::cells_mu0Hd_field_array_x[cell_i] = dipole::cells_mu0Hd_field_array_x[cell_i] * 9.27400915e-01;
       dipole::cells_mu0Hd_field_array_y[cell_i] = dipole::cells_mu0Hd_field_array_y[cell_i] * 9.27400915e-01;
       dipole::cells_mu0Hd_field_array_z[cell_i] = dipole::cells_mu0Hd_field_array_z[cell_i] * 9.27400915e-01;
- //if (cell_i == 0) std::cout << sim::time << '\t' << cell_i << '\t' <<  dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
+std::cout << sim::time << '\t' << cell_i << '\t' <<  dipole::cells_field_array_x[cell_i] << '\t' << dipole::cells_field_array_y[cell_i] << '\t' << dipole::cells_field_array_z[cell_i] << '\t' << std::endl;
 
    }
 
