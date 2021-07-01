@@ -16,24 +16,13 @@ export OMPI_CXX=g++ -std=c++11
 # Include the FFTW library by uncommenting the -DFFT (off by default)
 export incFFT= #-DFFT
 
-# Compilers
-<<<<<<< HEAD
-ICC=icc -DCOMP='"Intel C++ Compiler"' $(incFFT)
-GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' $(incFFT)
-LLVM=g++ -DCOMP='"LLVM C++ Compiler"' $(incFFT)
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' $(incFFT)
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' $(incFFT)
-MPICC=mpicxx -DMPICF $(incFFT)
 
-LIBS=-lstdc++ -lm -lfftw3 -L/opt/local/lib/
-=======
 ICC=icc -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
->>>>>>> origin/cuda_dipole
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
