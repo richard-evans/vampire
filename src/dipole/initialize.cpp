@@ -129,6 +129,13 @@ namespace dipole{
             dipole::internal::initialize_fft_solver();
             break;
 
+        case dipole::internal::atomisticfft:
+            std::cout     << "Initialising dipole field calculation using atomistic FFT solver" << std::endl;
+            zlog << zTs() << "Initialising dipole field calculation using atomistic FFT solver" << std::endl;
+            dipole::internal::atomistic_fft::initialize_atomistic_fft_solver();
+            break;
+
+
       }
       // Set initialised flag
       dipole::internal::initialised=true;

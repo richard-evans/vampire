@@ -14,15 +14,27 @@ export OMPI_CXX=g++ -std=c++11
 #export MPICH_CXX=bgxlc++
 
 # Include the FFTW library by uncommenting the -DFFT (off by default)
-export incFFT= #-DFFT
+export incFFT= -DFFT -DFFTW_OMP -fopenmp
+export FFTLIBS= -lfftw3_omp -lfftw3
 
+# Compilers
+#<<<<<<< HEAD
+ICC=icc -DCOMP='"Intel C++ Compiler"' $(incFFT)
+GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' $(incFFT)
+LLVM=g++ -DCOMP='"LLVM C++ Compiler"' $(incFFT)
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' $(incFFT)
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' $(incFFT)
+MPICC=mpicxx -DMPICF $(incFFT)
 
-ICC=icc -DCOMP='"Intel C++ Compiler"'
-GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
-LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
-PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
-IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
-MPICC=mpicxx -DMPICF
+LIBS= -lstdc++ -lm $(FFTLIBS) -L/opt/local/lib/
+#=======
+#ICC=icc -DCOMP='"Intel C++ Compiler"'
+#GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
+#LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
+#PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
+#IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+#MPICC=mpicxx -DMPICF
+#>>>>>>> origin/cuda_dipole
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
@@ -188,7 +200,7 @@ all: serial parallel vdc
 
 # Serial Targets
 serial: $(OBJECTS)
-	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_LDFLAGS)  $(OBJECTS) $(LIBS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
@@ -244,7 +256,7 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(PEXECUTABLE)
+	$(MPICC) $(GCC_LDFLAGS) $(MPI_OBJECTS) $(LIBS) -o $(PEXECUTABLE)
 
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<

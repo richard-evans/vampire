@@ -58,7 +58,7 @@ void build_body_centred_cubic(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[1].x=0.5;
    unit_cell.atom[1].y=0.5;
    unit_cell.atom[1].z=0.5;
-   unit_cell.atom[1].mat = uc::internal::sublattice_materials ? 1 : 0; // if sublattice material is defined, then identify at as same as ID  
+   unit_cell.atom[1].mat = uc::internal::sublattice_materials ? 1 : 0; // if sublattice material is defined, then identify at as same as ID
    unit_cell.atom[1].lc=1;
    unit_cell.atom[1].hc=1;
    unit_cell.atom[1].ni=8;
