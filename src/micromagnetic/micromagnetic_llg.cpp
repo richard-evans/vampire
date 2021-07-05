@@ -163,7 +163,7 @@ namespace micromagnetic{
          x_initial_spin_array[cell] = mx; // normalised magnetizations
          y_initial_spin_array[cell] = my;
          z_initial_spin_array[cell] = mz;
-
+        // std::cout << "start " << cell << "\t"<< mx << "\t" << my << "\t" << mz << std::endl;
       }
 
       // Calculate spin dependent and external fields
@@ -305,6 +305,7 @@ namespace micromagnetic{
          cells::mag_array_x[cell] = x_array[cell]*ms;
          cells::mag_array_y[cell] = y_array[cell]*ms;
          cells::mag_array_z[cell] = z_array[cell]*ms;
+     //    std::cout << "end " << cell << "\t"<< cells::mag_array_x[cell]/ms  << "\t" << cells::mag_array_y[cell]/ms  << "\t" << cells::mag_array_z[cell]/ms  << std::endl;
 
       }
 
@@ -319,21 +320,27 @@ namespace micromagnetic{
       	MPI_Allreduce(MPI_IN_PLACE, &z_array[0],            num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       #endif
 
-      //updates atom magnetisations
-      if (discretisation_type  == 2 || sim::time%vout::output_rate -1){
-         for(int atom_list=0;atom_list<number_of_none_atomistic_atoms;atom_list++){
-            int atom = list_of_none_atomistic_atoms[atom_list];
-            int cell = cells::atom_cell_id_array[atom];
-            atoms::x_spin_array[atom] = x_array[cell]*mm::m_e[cell];
-            atoms::y_spin_array[atom] = y_array[cell]*mm::m_e[cell];
-            atoms::z_spin_array[atom] = z_array[cell]*mm::m_e[cell];
-            atoms::m_spin_array[atom] = mm::m_e[cell];
-         }
-      }
+     // updates atom magnetisations
+      // if (discretisation_type  == 2 || sim::time%vout::output_rate -1){
+      //    for(int atom_list=0;atom_list<number_of_none_atomistic_atoms;atom_list++){
+      //       int atom = list_of_none_atomistic_atoms[atom_list];
+      //       int cell = cells::atom_cell_id_array[atom];
+      //       double me = mm::m_e[cell];
+      //       atoms::x_spin_array[atom] = x_array[cell]*me;
+      //       atoms::y_spin_array[atom] = y_array[cell]*me;
+      //       atoms::z_spin_array[atom] = z_array[cell]*me;
+      //       atoms::m_spin_array[atom] = me;
+      //    }
+      // }
 
-      if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 && sim::time%sim::partial_time)  {
+      if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 && sim::time%sim::partial_time == 0)  {
          micromagnetic::MR_resistance = mm::calculate_resistance();
         // std::cout << micromagnetic::MR_resistance  << std::endl;
+      }
+      if (sim::time%sim::partial_time == 0) {
+
+         //std::cout << sim::time%sim::partial_time << "\t" << sim::time << "\t" << sim::partial_time << std::endl;
+         mm::outputs();
       }
 
       return 0;

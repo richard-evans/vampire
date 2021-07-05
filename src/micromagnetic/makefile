@@ -23,6 +23,7 @@ fieldsllg.o \
 micromagnetic_llb.o \
 micromagnetic_llg.o \
 print.o \
-resistance.o
+resistance.o \
+output.o
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/micromagnetic/,$(micromagnetic_objects))

@@ -496,6 +496,43 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
       }
 
    }
+   if (discretisation_type == 1){
+      for(int i=0; i<cells::num_cells; ++i) {
+         cells::mag_array_x[i] = 0.0;
+         cells::mag_array_y[i] = 0.0;
+         cells::mag_array_z[i] = 0.0;
+      }
+
+      #ifdef MPICF
+         int num_local_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      #else
+         int num_local_atoms = num_atoms;
+      #endif
+
+      // calulate total moment in each cell
+      for(int i=0;i<num_local_atoms;++i) {
+         int cell = cells::atom_cell_id_array[i];
+         int type = type_array[i];
+         //// Consider only cells with n_atoms != 0
+         //if(cells::num_atoms_in_cell[cell]>0){
+            const double mus = mp::material[type].mu_s_SI;
+            // Consider only magnetic elements
+            if(mp::material[type].non_magnetic==0){
+               cells::mag_array_x[cell] += atoms::x_spin_array[i]*mus;
+               cells::mag_array_y[cell] += atoms::y_spin_array[i]*mus;
+               cells::mag_array_z[cell] += atoms::z_spin_array[i]*mus;
+            }
+         //}
+      }
+
+      #ifdef MPICF
+      // Reduce magnetisation on all nodes
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_x[0],   cells::mag_array_x.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],   cells::mag_array_y.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],   cells::mag_array_z.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
+      #endif
+      }
+   //}
     //  std::cin.get();
    return;
 

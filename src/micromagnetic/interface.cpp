@@ -190,6 +190,34 @@ namespace micromagnetic{
          micromagnetic::internal::temperature_dependent_parameters = tf;
          return true;
       }
+      test="output-magnetisation";
+      if(word==test){
+         micromagnetic::internal::output_m = true;
+         micromagnetic::internal::output_list.push_back(0);
+         return true;
+      }
+      test="output-applied-field";
+      if(word==test){
+         micromagnetic::internal::output_applied_field = true;
+         micromagnetic::internal::output_list.push_back(1);
+
+         return true;
+      }
+
+      test="output-temperature";
+      if(word==test){
+         micromagnetic::internal::output_temperature = true;
+         micromagnetic::internal::output_list.push_back(2);
+
+         return true;
+      }
+      test="output-time";
+      if(word==test){
+         micromagnetic::internal::output_time = true;
+         micromagnetic::internal::output_list.push_back(3);
+
+         return true;
+      }
 
       //--------------------------------------------------------------------
       // Keyword not found

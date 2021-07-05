@@ -28,6 +28,9 @@
 
 // micromagnetic module headers
 #include "internal.hpp"
+#include <iostream>
+#include <fstream>  
+
 
 namespace micromagnetic{
 
@@ -43,6 +46,12 @@ namespace micromagnetic{
       extern bool mm_correction;
       extern double res_GMR;
       extern double res_RA;
+      extern std::ofstream mm_output;
+      extern bool output_applied_field;
+      extern bool output_m;
+      extern bool output_time;
+      extern bool output_temperature;
+      extern std::vector <int> output_list;
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
@@ -202,6 +211,7 @@ namespace micromagnetic{
                                     std::vector<double>& x_mag_array,
                                     std::vector<double>& y_mag_array,
                                     std::vector<double>& z_mag_array);
+       void outputs();
 
    } // end of internal namespace
 

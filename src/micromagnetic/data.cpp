@@ -17,6 +17,8 @@
 
 // micromagnetic module headers
 #include "internal.hpp"
+#include <iostream>
+#include <fstream>  
 
 namespace micromagnetic{
 
@@ -43,6 +45,7 @@ namespace micromagnetic{
    int number_of_none_atomistic_atoms = 0;
    int number_of_micromagnetic_cells = 0;
 
+
    //is the discretisation of each cell microamgnetic or atomistic
    std::vector < bool > cell_discretisation_micromagnetic;
 
@@ -63,12 +66,17 @@ namespace micromagnetic{
       // Shared variables inside micromagnetic module
       //------------------------------------------------------------------------
 
+      bool output_applied_field = false;
+      bool output_m = false;
+      bool output_time = false;
+      bool output_temperature = false;
+      std::vector <int> output_list;
       bool temperature_dependent_parameters = true; // flag to set temperature dependent micrmagnetic parameters
 
       int my_num_micromagnetic_cells;
       int my_start_index; // first cell to intergrate on local (my) cpu
       int my_end_index;  // last cell +1 to intergrate on local (my) cpu
-
+      std::ofstream mm_output("mm_output");
       double bias_magnets_max_height = 1.0;
       double bias_magnets_min_height = 0.0;
       double bias_magnet_ms_input = 1.0;
