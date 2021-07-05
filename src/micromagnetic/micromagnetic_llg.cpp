@@ -321,17 +321,17 @@ namespace micromagnetic{
       #endif
 
      // updates atom magnetisations
-      // if (discretisation_type  == 2 || sim::time%vout::output_rate -1){
-      //    for(int atom_list=0;atom_list<number_of_none_atomistic_atoms;atom_list++){
-      //       int atom = list_of_none_atomistic_atoms[atom_list];
-      //       int cell = cells::atom_cell_id_array[atom];
-      //       double me = mm::m_e[cell];
-      //       atoms::x_spin_array[atom] = x_array[cell]*me;
-      //       atoms::y_spin_array[atom] = y_array[cell]*me;
-      //       atoms::z_spin_array[atom] = z_array[cell]*me;
-      //       atoms::m_spin_array[atom] = me;
-      //    }
-      // }
+       if (discretisation_type  ==2){
+         for(int atom_list=0;atom_list<number_of_none_atomistic_atoms;atom_list++){
+            int atom = list_of_none_atomistic_atoms[atom_list];
+            int cell = cells::atom_cell_id_array[atom];
+            double me = mm::m_e[cell];
+            atoms::x_spin_array[atom] = x_array[cell]*me;
+            atoms::y_spin_array[atom] = y_array[cell]*me;
+            atoms::z_spin_array[atom] = z_array[cell]*me;
+            atoms::m_spin_array[atom] = me;
+         }
+      }
 
       if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 && sim::time%sim::partial_time == 0)  {
          micromagnetic::MR_resistance = mm::calculate_resistance();
