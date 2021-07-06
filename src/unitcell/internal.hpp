@@ -79,7 +79,7 @@ namespace unitcell{
                                          unsigned int& line_counter,
                                          int& interaction_range);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
-      double exchange(double range_sq, double nn_cutoff_sq, int i_mat, int j_mat);
+      double exchange(double range_sq, double nn_cutoff_sq);
 
    } // end of internal namespace
 

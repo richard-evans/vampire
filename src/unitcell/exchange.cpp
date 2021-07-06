@@ -28,7 +28,7 @@ namespace internal{
 // exchange interaction function
 //------------------------------------------------------------------------
 
-double exchange(double range_sq, double nn_cutoff_sq, int i_mat, int j_mat){
+double exchange(double range_sq, double nn_cutoff_sq){
 
    // Select program to run
    switch(uc::internal::exchange_function){
