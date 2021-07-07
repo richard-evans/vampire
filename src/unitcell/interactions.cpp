@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack B Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -59,6 +59,12 @@ void calculate_interactions(unit_cell_t& unit_cell){
    // save number of atoms in unit cell
    unit_cell.bilinear.num_unit_cell_atoms = unit_cell.atom.size();
    unit_cell.biquadratic.num_unit_cell_atoms = unit_cell.atom.size();
+
+   // set number of interactions per atom
+   for (int i = 0; i < unit_cell.atom.size(); ++i){
+      unit_cell.bilinear.ni.push_back(unit_cell.atom[i].ni);
+      unit_cell.biquadratic.ni.push_back(unit_cell.atom[i].ni);
+   }
 
    // determine number of unit cells in x,y and z
    const int nx = 1 + 2*ceil(rcut); // number of replicated cells in x,y,z
@@ -141,7 +147,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.Jij[1][0] = 0.0; // yx
                tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq); // yy
                tmp.Jij[1][2] = 0.0; // yz
-
+               
                tmp.Jij[2][0] = 0.0; // zx
                tmp.Jij[2][1] = 0.0; // zy
                tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq); // zz

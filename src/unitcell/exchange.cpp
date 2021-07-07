@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack B Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -27,6 +27,7 @@ namespace internal{
 // Function to determine exchange energy based on interaction range and
 // exchange interaction function
 //------------------------------------------------------------------------
+
 double exchange(double range_sq, double nn_cutoff_sq){
 
    // Select program to run
@@ -43,7 +44,7 @@ double exchange(double range_sq, double nn_cutoff_sq){
       }
 
       case exponential:{
-         return exp(-sqrt(range_sq)/uc::internal::exchange_decay);
+         return uc::internal::exchange_multiplier*exp(-sqrt(range_sq)/uc::internal::exchange_decay) + uc::internal::exchange_shift;
          break;
       }
 
