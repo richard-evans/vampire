@@ -80,43 +80,43 @@ namespace exchange{
       			for(int atom = 0; atom < atoms::num_atoms; atom++){
       				const int imaterial = atoms::type_array[atom];
                   const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
-                  if (imaterial < 3 || imaterial == 7 || imaterial == 8 || imaterial == 9){
-                     Mn2Au1 = true;
-                  }
-                  else{
-                     Mn2Au1 = false;
-                  }
-      				for(int nn = atoms::neighbour_list_start_index[atom];nn <= atoms::neighbour_list_end_index[atom]; nn++){
+                  // if (imaterial < 3 || imaterial == 7 || imaterial == 8 || imaterial == 9){
+                  //    Mn2Au1 = true;
+                  // }
+                  // else{
+                  //    Mn2Au1 = false;
+                  // }
+      		      for(int nn = atoms::neighbour_list_start_index[atom];nn <= atoms::neighbour_list_end_index[atom]; nn++){
       					const int natom = atoms::neighbour_list_array[nn];
       					const int jmaterial = atoms::type_array[natom];
-                     if (jmaterial < 3 || jmaterial == 7 || jmaterial == 8 || jmaterial == 9){
-                        Mn2Au2 = true;
-                     }
-                     else{
-                        Mn2Au2 = false;
-                     }
+                     // if (jmaterial < 3 || jmaterial == 7 || jmaterial == 8 || jmaterial == 9){
+                     //    Mn2Au2 = true;
+                     // }
+                     // else{
+                     //    Mn2Au2 = false;
+                     // }
       					atoms::v_exchange_list.push_back(tmp_zvec);
                      // get unit cell interaction id
                      double J = 1.0;
-                     if (Mn2Au1 == false || Mn2Au2 == false ){
-                      // //calculate the distance between the atoms to see if its a NN or NNN interaction
-                      double dx = atoms::x_coord_array[atom] - atoms::x_coord_array[natom];
-                      double dy = atoms::y_coord_array[atom] - atoms::y_coord_array[natom];
-                      double dz = atoms::z_coord_array[atom] - atoms::z_coord_array[natom];
+                     // if (Mn2Au1 == false || Mn2Au2 == false ){
+                     //  // //calculate the distance between the atoms to see if its a NN or NNN interaction
+                     //  double dx = atoms::x_coord_array[atom] - atoms::x_coord_array[natom];
+                     //  double dy = atoms::y_coord_array[atom] - atoms::y_coord_array[natom];
+                     //  double dz = atoms::z_coord_array[atom] - atoms::z_coord_array[natom];
 
-                      double d = sqrt(dx*dx + dy*dy + dz*dz);
+                     //  double d = sqrt(dx*dx + dy*dy + dz*dz);
 
 
-                         //std::cout << "enter" <<std::endl;
-                     if (d  > 2.8) {
-                        J = 0.0;
-                     }
-                     else {
-                           J = -1.0;
-                        //   std::cout << d << std::endl;
-                         }
-                      std::cout << imaterial << "\t" << jmaterial << "\t" << d << "\t" << J << std::endl; 
-                      }
+                     //     //std::cout << "enter" <<std::endl;
+                     // if (d  > 2.8) {
+                     //    J = 0.0;
+                     // }
+                     // else {
+                     //       J = -1.0;
+                     //    //   std::cout << d << std::endl;
+                     //     }
+                     //  std::cout << imaterial << "\t" << jmaterial << "\t" << d << "\t" << J << std::endl; 
+                     //  }
      
                      int i = atoms::neighbour_interaction_type_array[nn];
                      // get shell ID for interaction

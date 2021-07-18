@@ -86,7 +86,7 @@
 	              }
 	          }
 	       }
-				 if (sim::domain_wall_axis == 2){
+				 if (sim::domain_wall_axis == 2){ 
 						for(int atom=0;atom<num_local_atoms;atom++){
 				//			std::cout <<" here" << "\t" << atom << '\t' <<  atoms::z_coord_array[atom] << "\t" << cs::system_dimensions[2] << "\t" << sim::domain_wall_position  << '\t'<< sim::domain_wall_width/2.0 << "\t" << cs::system_dimensions[2]*sim::domain_wall_position -sim::domain_wall_width/2.0 << std::endl;
 							 if (atoms::z_coord_array[atom] > cs::system_dimensions[2]*sim::domain_wall_position -sim::domain_wall_width/2.0){
