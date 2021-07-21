@@ -204,6 +204,14 @@ namespace micromagnetic{
          return true;
       }
 
+            test="output-resistance";
+      if(word==test){
+         micromagnetic::internal::output_resistance = true;
+         micromagnetic::internal::output_list.push_back(4);
+
+         return true;
+      }
+
       test="output-temperature";
       if(word==test){
          micromagnetic::internal::output_temperature = true;

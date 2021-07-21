@@ -70,6 +70,7 @@ namespace micromagnetic{
       bool output_m = false;
       bool output_time = false;
       bool output_temperature = false;
+      bool output_resistance = false;
       std::vector <int> output_list;
       bool temperature_dependent_parameters = true; // flag to set temperature dependent micrmagnetic parameters
 

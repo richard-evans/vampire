@@ -51,6 +51,7 @@ namespace micromagnetic{
       extern bool output_m;
       extern bool output_time;
       extern bool output_temperature;
+      extern bool output_resistance;
       extern std::vector <int> output_list;
       //-------------------------------------------------------------------------
       // Internal shared variables
