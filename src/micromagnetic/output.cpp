@@ -24,7 +24,6 @@ namespace mm = micromagnetic::internal;
 
 namespace micromagnetic{
 
-   namespace internal{
 
       void outputs(){
          std::string str;
@@ -37,30 +36,30 @@ namespace micromagnetic{
          //   std::cout << i << '\t' << "\t" << output_list.size() << "\t" << output_list[i] << std::endl;
 
 
-      if (output_list[i] == 3){
+      if (internal::output_list[i] == 3){
 
          str_time = std::to_string(sim::time) + "\t";
             str.append(str_time); 
       }
-      if (output_list[i] == 2){
+      if (internal::output_list[i] == 2){
 
          str_temp = std::to_string(sim::temperature) + "\t";
          str.append(str_temp);  
       }
 
-      if (output_list[i] == 1){
+      if (internal::output_list[i] == 1){
 
          str_H = std::to_string(sim::H_applied) + "\t";
          str.append(str_H);  
       }
 
-      if (output_list[i] == 4){
+      if (internal::output_list[i] == 4){
 
-         str_R = std::to_string(calculate_resistance()) + "\t";
+         str_R = std::to_string(internal::calculate_resistance()) + "\t";
          str.append(str_R);  
       }
 
-      if (output_list[i] == 0){
+      if (internal::output_list[i] == 0){
 
 
       std::vector <double> mx(mp::num_materials,0);
@@ -104,9 +103,8 @@ namespace micromagnetic{
 
 
 
-   mm_output << str << std::endl;
+   internal::mm_output << str << std::endl;
 
       }
-   }
 }
    

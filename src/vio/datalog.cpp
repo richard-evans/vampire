@@ -21,6 +21,7 @@
 #include "grains.hpp"
 #include "sim.hpp"
 #include "vio.hpp"
+#include "micromagnetic.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -394,6 +395,8 @@ namespace vout{
    //-------------------------------------------
 	void data(){
 
+
+      //if(micromagnetic::discretisation_type != 1){
 		// check calling of routine if error checking is activated
 		if(err::check==true){std::cout << "vout::data has been called" << std::endl;}
 
@@ -503,7 +506,10 @@ namespace vout{
 
 		// optionally save checkpoint file
 		if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();
-
+     // }
+      if (micromagnetic::discretisation_type ==1){
+         micromagnetic::outputs();
+      }
       return;
 
    } // end of data()

@@ -20,6 +20,7 @@
 // hierarchical module headers
 #include "hierarchical.hpp"
 #include "internal.hpp"
+#include "micromagnetic.hpp"
 
 // alias internal hierarchical namespace for brevity
 namespace ha = hierarchical::internal;
@@ -41,6 +42,8 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
                                           std::vector <double>& m_spin_array, // atomic spin moment
                                           std::vector < bool >& magnetic){ // is magnetic
 
+
+   if(micromagnetic::discretisation_type != 1){
    // initialise local cells to zero (distributed operation)
    for(int cell_index = 0; cell_index < ha::mag_array_x.size() ; ++cell_index ) {
 
@@ -79,6 +82,7 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
       }
    //
     }
+   }
 
    //--------------------------------------------------------------------------------------
    // loop over all hierarchical levels, computing partial cell magnetizations at level L

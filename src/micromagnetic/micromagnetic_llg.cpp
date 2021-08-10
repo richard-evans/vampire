@@ -333,15 +333,15 @@ namespace micromagnetic{
          }
       }
 
-      if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1 && sim::time%sim::partial_time == 0)  {
-         micromagnetic::MR_resistance = mm::calculate_resistance();
-        // std::cout << micromagnetic::MR_resistance  << std::endl;
-      }
-      if (sim::time%sim::partial_time == 0) {
+      // if (enable_resistance && mm::resistance_layer_2 != mm::resistance_layer_1)  {
+      //    micromagnetic::MR_resistance = mm::calculate_resistance();
+      //   // std::cout << micromagnetic::MR_resistance  << std::endl;
+      // }
+      // if (sim::time%sim::partial_time == 0) {
 
-         //std::cout << sim::time%sim::partial_time << "\t" << sim::time << "\t" << sim::partial_time << std::endl;
-         mm::outputs();
-      }
+      //    //std::cout << sim::time%sim::partial_time << "\t" << sim::time << "\t" << sim::partial_time << std::endl;
+      //    mm::outputs();
+      // }
 
       return 0;
 

@@ -212,7 +212,6 @@ namespace micromagnetic{
                                     std::vector<double>& x_mag_array,
                                     std::vector<double>& y_mag_array,
                                     std::vector<double>& z_mag_array);
-       void outputs();
 
    } // end of internal namespace
 

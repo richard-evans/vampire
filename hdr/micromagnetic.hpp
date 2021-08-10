@@ -66,6 +66,8 @@ namespace micromagnetic{
    extern std::vector < std::vector < double > > P;
    extern std::vector < double > P1D;
 
+   void outputs();
+
    //--------------------------------------------------------------------
    //     Function declorations
    //--------------------------------------------------------------------

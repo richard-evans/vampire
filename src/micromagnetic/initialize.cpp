@@ -360,15 +360,16 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
             const int matj = mm::cell_material_array[cellj];
             // Check if spaced SAF is included
 
-          //  std::cout << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;
+
             if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj){
                // check that materials are different
-            
+            std::cout <<"SAF" << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;            
              //  std::cout << "enter2" << std::endl;
                double dx = cells::pos_array[cell*3 +0] - cells::pos_array[cellj*3 +0];
                double dy = cells::pos_array[cell*3 +1] - cells::pos_array[cellj*3 +1];
                double dz = cells::pos_array[cell*3 +2] - cells::pos_array[cellj*3 +2];
-               if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
+               //if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
+               if (dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
    
                   // why mj^1.66?? need to check how this actually works. why / ms[cell]?
                   //Ac = -prefactor[matj]*mp::material[mat].SAF[matj];
@@ -389,7 +390,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
                //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
                mm::A[j] = 2.0*mp::material[mat].EF_MM[matj]/(mm::ms[cell]);
             }
-        //    std::cout << mat << '\t' << matj << "\t" << mm::A[j]  <<std::endl;
+            std::cout << mat << '\t' << matj << "\t" << mm::A[j]  <<std::endl;
          }
    }
 
