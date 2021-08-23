@@ -83,6 +83,27 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
    //
     }
    }
+   else {
+         for(int cell_index = 0; cell_index < ha::mag_array_x.size() ; ++cell_index ) {
+
+      // // get cell ID for global array
+      // const int cell = cells::cell_id_array[cell_index];
+
+      ha::mag_array_x[cell_index] = 0.0;//cells::mag_array_x[cell];
+      ha::mag_array_y[cell_index] = 0.0;//cells::mag_array_y[cell];
+      ha::mag_array_z[cell_index] = 0.0;//cells::mag_array_z[cell];
+
+   }
+
+   // initialise local cells to zero (distributed operation)
+      for (int lc = 0; lc < micromagnetic::number_of_micromagnetic_cells; lc++){
+         int cell = cells::cell_id_array[lc];
+         ha::mag_array_x[cell] = cells::mag_array_x[cell];
+         ha::mag_array_y[cell] = cells::mag_array_y[cell];
+         ha::mag_array_z[cell] = cells::mag_array_z[cell];
+      }
+      
+   }
 
    //--------------------------------------------------------------------------------------
    // loop over all hierarchical levels, computing partial cell magnetizations at level L
