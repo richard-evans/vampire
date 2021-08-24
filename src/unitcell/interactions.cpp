@@ -64,6 +64,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
    for (int i = 0; i < unit_cell.atom.size(); ++i){
       unit_cell.bilinear.ni.push_back(unit_cell.atom[i].ni);
       unit_cell.biquadratic.ni.push_back(unit_cell.atom[i].ni);
+      //if (unit_cell.atom[i].mat + 1 > uc::internal::num_materials){
+      //   num_materials = unit_cell.atom[i].mat + 1;
+      //}
    }
 
    // determine number of unit cells in x,y and z
@@ -140,17 +143,17 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.shell = 0;
 
                // Determine normalised exchange constants
-               tmp.Jij[0][0] = uc::internal::exchange(range_sq, nnrcut_sq); // xx
+               tmp.Jij[0][0] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // xx
                tmp.Jij[0][1] = 0.0; // xy
                tmp.Jij[0][2] = 0.0; // xz
 
                tmp.Jij[1][0] = 0.0; // yx
-               tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq); // yy
+               tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // yy
                tmp.Jij[1][2] = 0.0; // yz
                
                tmp.Jij[2][0] = 0.0; // zx
                tmp.Jij[2][1] = 0.0; // zy
-               tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq); // zz
+               tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // zz
 
                unit_cell.bilinear.interaction.push_back(tmp);
 

@@ -28,7 +28,7 @@ namespace internal{
 // exchange interaction function
 //------------------------------------------------------------------------
 
-double exchange(double range_sq, double nn_cutoff_sq){
+double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j){
 
    // Select program to run
    switch(uc::internal::exchange_function){
@@ -45,6 +45,15 @@ double exchange(double range_sq, double nn_cutoff_sq){
 
       case exponential:{
          return uc::internal::exchange_multiplier*exp(-sqrt(range_sq)/uc::internal::exchange_decay) + uc::internal::exchange_shift;
+         break;
+      }
+
+      case material_exponential:{
+         double A = uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_multiplier;
+         double B = uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_length;
+         double C = uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_shift;
+         return A*exp(-sqrt(range_sq)/B) + C;
+         //return uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_multiplier*exp(-sqrt(range_sq)/uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_length) + uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_shift;
          break;
       }
 

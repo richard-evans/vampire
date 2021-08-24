@@ -35,7 +35,7 @@ namespace unitcell{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
-      enum exchange_function_t { nearest_neighbour, shell, exponential, NdFeB_exponential};
+      enum exchange_function_t { nearest_neighbour, shell, exponential, material_exponential};
 
       //-------------------------------------------------------------------------
       // Internal shared variables
@@ -52,6 +52,7 @@ namespace unitcell{
       extern double exchange_decay;
       extern double exchange_multiplier;
       extern double exchange_shift;
+      extern std::vector <std::vector <exchange_parameters_t>> material_exchange_parameters;
 
       extern bool sublattice_materials; // flag to enable identification of atoms in simple crystals by material
 
@@ -79,7 +80,7 @@ namespace unitcell{
                                          unsigned int& line_counter,
                                          int& interaction_range);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
-      double exchange(double range_sq, double nn_cutoff_sq);
+      double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j);
 
    } // end of internal namespace
 
