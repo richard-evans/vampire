@@ -250,6 +250,7 @@ namespace unitcell{
                std::cerr << "Error - value for \'exchange:" << word << "\' must be one of:" << std::endl;
                std::cerr << "\t\"nearest-neighbour\"" << std::endl;
                std::cerr << "\t\"exponential\"" << std::endl;
+               std::cerr << "\t\"material-exponential\"" << std::endl;
                terminaltextcolor(WHITE);
                err::vexit();
             }
