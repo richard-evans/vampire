@@ -76,14 +76,17 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
    // Otherwise for micromagnetic simulations use cell arrays
    else {
 
+      // inverse Bohr magneton
+      const double imuB = 1.0/9.27400915e-24;
+
       // initialise locally integrated cells to cell magnetization values
       for (int lc = 0; lc < micromagnetic::number_of_micromagnetic_cells; lc++){
 
          const int cell = micromagnetic::list_of_micromagnetic_cells[lc];
 
-         ha::mag_array_x[cell] = cells::mag_array_x[cell];
-         ha::mag_array_y[cell] = cells::mag_array_y[cell];
-         ha::mag_array_z[cell] = cells::mag_array_z[cell];
+         ha::mag_array_x[cell] = cells::mag_array_x[cell]*imuB;
+         ha::mag_array_y[cell] = cells::mag_array_y[cell]*imuB;
+         ha::mag_array_z[cell] = cells::mag_array_z[cell]*imuB;
 
       }
 

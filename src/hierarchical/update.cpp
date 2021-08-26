@@ -111,11 +111,11 @@ void update(std::vector <double>& x_spin_array, // atomic spin directions
          dipole::cells_field_array_y[cell_i]      +=(mx*ha::rij_tensor_xy[j] + my*ha::rij_tensor_yy[j] + mz*ha::rij_tensor_yz[j]);
          dipole::cells_field_array_z[cell_i]      +=(mx*ha::rij_tensor_xz[j] + my*ha::rij_tensor_yz[j] + mz*ha::rij_tensor_zz[j]);
 
-        // Demag field
-        dipole::cells_mu0Hd_field_array_x[cell_i] +=(mx*ha::rij_tensor_xx[j] + my*ha::rij_tensor_xy[j] + mz*ha::rij_tensor_xz[j]);
-        dipole::cells_mu0Hd_field_array_y[cell_i] +=(mx*ha::rij_tensor_xy[j] + my*ha::rij_tensor_yy[j] + mz*ha::rij_tensor_yz[j]);
-        dipole::cells_mu0Hd_field_array_z[cell_i] +=(mx*ha::rij_tensor_xz[j] + my*ha::rij_tensor_yz[j] + mz*ha::rij_tensor_zz[j]);
-        // std::cout << rij_tensor_xx[j] << '\t' << rij_tensor_xy[j] << '\t' << rij_tensor_xz[j] << '\t' << rij_tensor_yy[j] << '\t' << rij_tensor_yz[j] << '\t' << rij_tensor_zz[j] << '\t' <<std::endl;
+         // Demag field
+         dipole::cells_mu0Hd_field_array_x[cell_i] +=(mx*ha::rij_tensor_xx[j] + my*ha::rij_tensor_xy[j] + mz*ha::rij_tensor_xz[j]);
+         dipole::cells_mu0Hd_field_array_y[cell_i] +=(mx*ha::rij_tensor_xy[j] + my*ha::rij_tensor_yy[j] + mz*ha::rij_tensor_yz[j]);
+         dipole::cells_mu0Hd_field_array_z[cell_i] +=(mx*ha::rij_tensor_xz[j] + my*ha::rij_tensor_yz[j] + mz*ha::rij_tensor_zz[j]);
+         // std::cout << rij_tensor_xx[j] << '\t' << rij_tensor_xy[j] << '\t' << rij_tensor_xz[j] << '\t' << rij_tensor_yy[j] << '\t' << rij_tensor_yz[j] << '\t' << rij_tensor_zz[j] << '\t' <<std::endl;
 
       }
       //   std::cout <<"D\t" << cell_i << '\t' << dipole::cells_field_array_x[cell_i] <<'\t' << dipole::cells_field_array_y[cell_i] <<'\t' << dipole::cells_field_array_z[cell_i] <<std::endl;
