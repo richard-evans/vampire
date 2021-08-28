@@ -35,7 +35,9 @@ namespace environment{
      extern std::vector < double > environment_field_x;
      extern std::vector < double > environment_field_y;
      extern std::vector < double > environment_field_z;
-
+     extern std::vector < double > atomistic_environment_field_x;
+     extern std::vector < double > atomistic_environment_field_y;
+     extern std::vector < double > atomistic_environment_field_z;
      //initialises the field from the atomic caluclation to the environment.
      extern std::vector < double > atomic_field_x;
      extern std::vector < double > atomic_field_y;

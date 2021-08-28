@@ -14,6 +14,7 @@ calculate_gamma.o \
 calculate_ku.o \
 calculate_ms.o \
 calculate_tc.o \
+calculate_stt.o \
 data.o \
 initialize.o \
 interface.o \
@@ -21,6 +22,8 @@ fieldsllb.o \
 fieldsllg.o \
 micromagnetic_llb.o \
 micromagnetic_llg.o \
-resistance.o
+print.o \
+resistance.o \
+output.o
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/micromagnetic/,$(micromagnetic_objects))

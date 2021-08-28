@@ -40,11 +40,20 @@ namespace environment{
          return true;
       }
 
+      test="number-of-shields";
+      if(word==test){
+         double g=atof(value.c_str());
+         //vin::check_for_valid_value(g, word, line, prefix, unit, "int", 0, 1.0e8,"input","0 Angstroms - 10 millimetre");
+         env::num_shields = g;
+         return true;
+      }
+
       test="square-shields";
       if(word==test){
          env::square_shields = true;
          return true;
       }
+
       test="exponential-shields";
       if(word==test){
          env::expoential_shields = true;
@@ -62,6 +71,11 @@ namespace environment{
       test="LFA-scan";
       if(word==test){
          env::LFA_scan =true;
+         return true;
+      }
+      test="ouput-cell-mag";
+      if(word==test){
+         env::env_output_info =true;
          return true;
       }
 
@@ -100,57 +114,32 @@ namespace environment{
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "length", 10, 1.0e6,"input","10 Angstroms - 0.1 millimetre");
-         env::cell_size[0] =d;
-         env::cell_size[1] =d;
-         env::cell_size[2] =d;
+         env::cell_size =d;
          return true;
       }
       test="cell-size-x";
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "length", 10, 1.0e6,"input","10 Angstroms - 0.1 millimetre");
-         env::cell_size[0] =d;
+         env::cell_size =d;
          return true;
       }
       test="cell-size-y";
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "length", 10, 1.0e6,"input","10 Angstroms - 0.1 millimetre");
-         env::cell_size[1] =d;
+         env::cell_size =d;
          return true;
       }
       test="cell-size-z";
       if(word==test){
          double d=atof(value.c_str());
          vin::check_for_valid_positive_value(d, word, line, prefix, unit, "length", 10, 1.0e6,"input","10 Angstroms - 0.1 millimetre");
-         env::cell_size[2] =d;
+         env::cell_size =d;
          return true;
       }
 
-      test="exchange-constant";
-      if(word==test){
-         double exc=atof(value.c_str());
-         // allowable values 0 - 1e-9 J/m == 1e-19 J/Angstrom
-         vin::check_for_valid_positive_value(exc, word, line, prefix, unit, "exchange", 0, 1e-19 ,"input","0 - 1e-19");
-         env::A =-exc;
 
-         return true;
-      }
-
-      test="uniaxial-anisotropy-constant";
-      if(word==test){
-         double k=atof(value.c_str());
-         vin::check_for_valid_value(k, word, line, prefix, unit, "anisotropy", 0,1e-15 ,"input","0 - 1e-18");
-         env::ku =k;
-         return true;
-      }
-      test="Ms";
-      if(word==test){
-         double A=atof(value.c_str());
-         vin::check_for_valid_positive_value(A, word, line, prefix, unit, "magnetisation", 1e-35,1e-15 ,"input","1e-32 - 1e-18");
-         env::Ms =A;
-         return true;
-      }
       //initialuse the number of atomsitic steps per micromagnetic step
       test="atomistic-steps-per-env-step";
       if(word==test){
@@ -161,18 +150,11 @@ namespace environment{
       }
 
 
-      test="Tc";
-      if(word==test){
-         double T=atof(value.c_str());
-         vin::check_for_valid_positive_value(T, word, line, prefix, unit, "none", 0, 10000,"input","0 - 10,000");
-         env::Tc =T;
-         return true;
-      }
 
       test="damping-constant";
       if(word==test){
          double a=atof(value.c_str());
-         vin::check_for_valid_positive_value(a, word, line, prefix, unit, "none", 0,1,"input","0- 1");
+         vin::check_for_valid_value(a, word, line, prefix, unit, "none", 0,1,"input","0- 1");
          env::alpha =a;
          return true;
       }
@@ -204,33 +186,6 @@ namespace environment{
          double g=atof(value.c_str());
          vin::check_for_valid_positive_value(g, word, line, prefix, unit, "none", 0,1,"input","0- 1");
          env::gamma =g;
-         return true;
-      }
-      test="initial-spin-direction";
-      if(word==test){
-         // first test for random spins
-         test="random";
-         if(value==test){
-            env::random_spins=true;
-         }
-         else{
-            // temporary storage container
-            std::vector<double> u(3);
-            // read values from string
-            u=vin::doubles_from_string(value);
-            vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-            vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-            vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-
-            // Copy sanitised unit vector to material
-            env::initial_spin[0]=u.at(0);
-            env::initial_spin[1]=u.at(1);
-            env::initial_spin[2]=u.at(2);
-
-            // ensure random spins is unset
-            env::random_spins=false;
-         }
-         // return
          return true;
       }
 

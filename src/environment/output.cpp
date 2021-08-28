@@ -29,42 +29,49 @@ namespace environment{
 
       int output(){
 
-         double mx = 0;
-         double my = 0;
-         double mz = 0;
-         double ml = 0;
+        std::vector <double> mx(env::num_shields+1,0.0);
+        std::vector <double> my(env::num_shields+1,0.0);
+        std::vector <double> mz(env::num_shields+1,0.0);
+         std::vector <double> ml(env::num_shields+1,0.0);
 
          //calcualtes the mean mx,my,mz,ml for all cells.
          for (int cell = 0; cell < num_cells; cell++){
+           int shield = env::shield_number[cell];
 
-            mx =  mx + x_mag_array[cell];
-            my =  my + y_mag_array[cell];
-            mz =  mz + z_mag_array[cell];
-            ml =  ml + Ms;
+            mx[shield] =  mx[shield] + x_mag_array[cell];
+            my[shield] =  my[shield] + y_mag_array[cell];
+            mz[shield] =  mz[shield] + z_mag_array[cell];
+            ml[shield] =  ml[shield] + Ms[cell];
          }
 
-         //double msat = ml;
-         double magm = sqrt(mx*mx + my*my + mz*mz);
-         mx = mx/magm;
-         my = my/magm;
-         mz = mz/magm;
+         env::o_file <<sim::time << '\t' << sim::temperature << "\t";
 
-         //outputs to the file environment_output
-//         std::cout <<sim::time << '\t' << sim::temperature << "\t" << mx << '\t' << my<< '\t' << mz << '\t' <<  magm/msat << std::endl;
+         for (int shield = 0; shield < env::num_shields; shield++){
+         double msat = ml[shield];
+         double magm = sqrt(mx[shield]*mx[shield] + my[shield]*my[shield] + mz[shield]*mz[shield]);
+         mx[shield] = mx[shield]/magm;
+         my[shield] = my[shield]/magm;
+         mz[shield] = mz[shield]/magm;
+      //   std::cout << env::num_shields << '\t' << shield << "\t" << mx[shield] << '\t' << my[shield]<< '\t' << mz[shield] << '\t' <<std::endl;
+        // outputs to th  e file environment_output
+        env::o_file << mx[shield] << '\t' << my[shield]<< '\t' << mz[shield] << '\t' <<  magm/msat << '\t';
 
+      }
+      env::o_file << std::endl;
+        if (env::env_output_info){
+         std::stringstream filename_sstr;
+         filename_sstr << "env_cell_config" << sim::time << ".txt";
+         std::ofstream pfile;
+         pfile.open(filename_sstr.str());
 
-         // std::stringstream filename_sstr;
-         // filename_sstr << "env_cell_config" << sim::time << ".txt";
-         // std::ofstream pfile;
-         // pfile.open(filename_sstr.str());
          //
-         // //
-         // for (int i = 0; i < env::num_env_cells; i++){
-         //    int cell = env::none_atomistic_cells[i];
-         // //for(int cell = 0; cell < num_cells; cell++){
-         // //
-         // 	pfile << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' <<std::endl;
-         // }
+         for (int i = 0; i < env::num_env_cells; i++){
+            int cell = env::none_atomistic_cells[i];
+         //for(int cell = 0; cell < num_cells; cell++){
+         //
+         	pfile << cell_coords_array_x[cell] << '\t' << cell_coords_array_y[cell] << '\t' << cell_coords_array_z[cell] << '\t' <<x_mag_array[cell] << '\t' << y_mag_array[cell] << '\t' << z_mag_array[cell] << '\t' << std::endl;
+         }
+       }
 
          return 0;
       }

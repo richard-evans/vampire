@@ -20,6 +20,7 @@
 #include "errors.hpp"
 #include "vmpi.hpp"
 #include "create.hpp"
+#include "micromagnetic.hpp"
 
 #include "atoms.hpp"
 
@@ -34,6 +35,7 @@ namespace cells{
    //int mag(const double time_from_start){
    int mag(){
 
+      if(micromagnetic::discretisation_type != 1){
      // check calling of routine if error checking is activated
       if(err::check==true) std::cout << "cells::mag has been called" << std::endl;
 
@@ -71,6 +73,7 @@ namespace cells{
       MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_y[0],   cells::mag_array_y.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
       MPI_Allreduce(MPI_IN_PLACE, &cells::mag_array_z[0],   cells::mag_array_z.size(),   MPI_DOUBLE,MPI_SUM, MPI_COMM_WORLD);
       #endif
+      }
 
       return EXIT_SUCCESS;
 

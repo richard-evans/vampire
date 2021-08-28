@@ -21,7 +21,7 @@ namespace micromagnetic{
 
    namespace internal{
 
-      //calcualtes gyromagnetic ratio (gamma) for each cell from the individual atom properties.
+      //calculates gyromagnetic ratio (gamma) for each cell from the individual atom properties.
       //gamma = sum(gamma)/N for each cell
 
       std::vector<double> calculate_gamma(int num_atoms,
@@ -44,17 +44,21 @@ namespace micromagnetic{
             N[cell_array[atom]]++;
          }
 
-         // Reduce sum of Jij and N on all processors
+         // Reduce sum of gamma and N on all processors
          #ifdef MPICF
             MPI_Allreduce(MPI_IN_PLACE, &gamma[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             MPI_Allreduce(MPI_IN_PLACE, &N[0], num_cells, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
 
          //calculates gamma/N
-         for (int i = 0; i < num_local_cells; i++){
-            int cell = local_cell_array[i];
+         for (int cell = 0; cell < num_cells; cell++){
             gamma[cell] = gamma[cell]/N[cell];
          }
+
+         // reduce final gamma values on all cells
+         #ifdef MPICF
+            MPI_Allreduce(MPI_IN_PLACE, &gamma[0], num_cells, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+         #endif
 
          return gamma;                     //returns a 1D array of values of gamma for each cell
 

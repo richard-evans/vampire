@@ -32,10 +32,13 @@ namespace micromagnetic{
 
    extern bool enable_resistance;
    //initialises the lists of atomstic/micromagnetic atoms for multiscale simulations
-   extern std::vector < double > list_of_atomistic_atoms;
-   extern std::vector < double > list_of_none_atomistic_atoms;
-   extern std::vector < double > list_of_micromagnetic_cells;
+   extern std::vector <int> list_of_atomistic_atoms;
+   extern std::vector <int> list_of_none_atomistic_atoms;
+   extern std::vector <int> list_of_micromagnetic_cells;
    extern std::vector <int> list_of_empty_micromagnetic_cells;
+   extern std::vector <double> atomistic_bias_field_x;
+   extern std::vector <double> atomistic_bias_field_y;
+   extern std::vector <double> atomistic_bias_field_z;
    //variables to store the numbers of atomistic/ microamgnetic atoms for multiscale simulations
    extern int number_of_atomistic_atoms;
    extern int number_of_none_atomistic_atoms;
@@ -63,6 +66,8 @@ namespace micromagnetic{
    extern std::vector < std::vector < double > > P;
    extern std::vector < double > P1D;
 
+   void outputs();
+
    //--------------------------------------------------------------------
    //     Function declorations
    //--------------------------------------------------------------------
@@ -74,7 +79,7 @@ namespace micromagnetic{
    int atomistic_LLGinit();
 
    //micromagnetic LLB
-   int LLB( std::vector <int> local_cell_array,
+   int LLB( std::vector <int>& local_cell_array,
             int num_steps,
             int num_cells,
             int num_local_cells,
@@ -87,10 +92,10 @@ namespace micromagnetic{
             double Hz,
             double H,
             double dt,
-            std::vector <double> volume_array);
+            std::vector <double>& volume_array);
 
     //micromagnetic LLG
-    int LLG( std::vector <int> local_cell_array,
+    int LLG( std::vector <int> &local_cell_array,
              int num_steps,
              int num_cells,
              int num_local_cells,
@@ -103,7 +108,7 @@ namespace micromagnetic{
              double Hz,
              double H,
              double dt,
-             std::vector <double> volume_array);
+             std::vector <double> &volume_array);
 
    //-----------------------------------------------------------------------------
    // Function to initialise micromagnetic module

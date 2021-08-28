@@ -181,7 +181,8 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
          if(vertex_number==0) inf=true;
          //std::cout <<i << '\t' <<  vertex_array[vertex_number][0] << '\t' << vertex_array[vertex_number][1] << '\t' << cs::system_dimensions[0] << '\t' << cs::system_dimensions[1] <<std::endl;
          // Check for whether boundary grains are included or removed
-         if(include_boundary_grains){
+         if(create_voronoi::include_boundary_grains_real){
+            //std::cout << "A" << std::endl;
             // check for bounded grains with vertices outside bounding box and truncate to system edges
             if(vertex_array[vertex_number][0] < -0.5*cs::system_dimensions[0]) vertex_array[vertex_number][0] = 0.0;
             if(vertex_array[vertex_number][0] >  1.5*cs::system_dimensions[0]) vertex_array[vertex_number][0] = cs::system_dimensions[0];

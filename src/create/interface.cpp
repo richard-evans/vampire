@@ -190,6 +190,12 @@ namespace create{
             return true;
         }
         else
+        test="voronoi-include-boundary-grains";
+        if(word==test){
+            create_voronoi::include_boundary_grains_real=true;
+            return true;
+        }
+        else
         //-------------------------------------------------------------------
         test="voronoi-rounded-grains-area";
         if(word==test){

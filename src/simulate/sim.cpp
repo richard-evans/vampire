@@ -49,6 +49,7 @@
 #include "program.hpp"
 #include "cells.hpp"
 #include "../cells/internal.hpp"
+#include "../micromagnetic/internal.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
@@ -239,6 +240,28 @@ int run(){
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
 
+	if (micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets == true)
+	micromagnetic::initialize(cells::num_local_cells,
+									  cells::num_cells,
+									  stats::num_atoms,
+									  mp::num_materials,
+									  cells::atom_cell_id_array,
+									  atoms::neighbour_list_array,
+									  atoms::neighbour_list_start_index,
+									  atoms::neighbour_list_end_index,
+									  atoms::type_array,
+									  mp::material,
+									  atoms::x_coord_array,
+									  atoms::y_coord_array,
+									  atoms::z_coord_array,
+									  cells::volume_array,
+									  sim::temperature,
+									  cells::num_atoms_in_unit_cell,
+									  cs::system_dimensions[0],
+									  cs::system_dimensions[1],
+									  cs::system_dimensions[2],
+									  cells::local_cell_array);
+
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,
                      cells::num_cells,
@@ -266,30 +289,7 @@ int run(){
                      atoms::num_atoms
    );
 
-   // Initialize GPU acceleration if enabled
-   if(gpu::acceleration) gpu::initialize();
 
-	if (micromagnetic::discretisation_type > 0)
-	micromagnetic::initialize(cells::num_local_cells,
-									  cells::num_cells,
-									  stats::num_atoms,
-									  mp::num_materials,
-									  cells::atom_cell_id_array,
-									  atoms::neighbour_list_array,
-									  atoms::neighbour_list_start_index,
-									  atoms::neighbour_list_end_index,
-									  atoms::type_array,
-									  mp::material,
-									  atoms::x_coord_array,
-									  atoms::y_coord_array,
-									  atoms::z_coord_array,
-									  cells::volume_array,
-									  sim::temperature,
-									  cells::num_atoms_in_unit_cell,
-									  cs::system_dimensions[0],
-									  cs::system_dimensions[1],
-									  cs::system_dimensions[2],
-									  cells::local_cell_array);
 
 
 	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
@@ -469,24 +469,13 @@ int run(){
 			}
 			program::boltzmann_dist();
 			break;
-
-
-		case 70:
-			if(vmpi::my_rank==0){
-			std::cout << "field-sweep..." << std::endl;
-			zlog << "field-sweep..." << std::endl;
-		}
-		program::field_sweep();
-		break;
-
 		case 51:
-		 	if(vmpi::my_rank==0){
-		      std::cout << "Setting..." << std::endl;
-		      zlog << "Setting..." << std::endl;
-
+			if(vmpi::my_rank==0){
+				std::cout << "Setting..." << std::endl;
+				zlog << "Setting..." << std::endl;
 			}
 			program::setting_process();
-		   break;
+			break;
 		//------------------------------------------------------------------------
 		case 52:
 		 	if(vmpi::my_rank==0){
@@ -512,6 +501,29 @@ int run(){
 			program::mm_A_calculation();
 			break;
 		//------------------------------------------------------------------------
+		case 70:
+			if(vmpi::my_rank==0){
+				std::cout << "field-sweep..." << std::endl;
+				zlog << "field-sweep..." << std::endl;
+			}
+			program::field_sweep();
+		break;
+		//------------------------------------------------------------------------
+		case 72:
+			if(vmpi::my_rank==0){
+				std::cout << "Tracks..." << std::endl;
+				zlog << "Tracks..." << std::endl;
+			}
+			program::tracks();
+			break;
+		//------------------------------------------------------------------------
+		case 73:
+			if(vmpi::my_rank==0){
+				std::cout << "diagnostic-boltzmann-micromganetic-llg..." << std::endl;
+				zlog << "diagnostic-boltzmann-micromganetic-llg..." << std::endl;
+			}
+			program::boltzmann_dist_micromagnetic_llg();
+			break;
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
@@ -856,6 +868,7 @@ void multiscale_simulation_steps(int n_steps){
          cells::volume_array);
 
          //if LLB run an LLB step
+
          else micromagnetic::LLB(cells::local_cell_array,
             n_steps,
             cells::num_cells,

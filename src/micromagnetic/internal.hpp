@@ -28,6 +28,9 @@
 
 // micromagnetic module headers
 #include "internal.hpp"
+#include <iostream>
+#include <fstream>  
+
 
 namespace micromagnetic{
 
@@ -43,9 +46,18 @@ namespace micromagnetic{
       extern bool mm_correction;
       extern double res_GMR;
       extern double res_RA;
+      extern std::ofstream mm_output;
+      extern bool output_applied_field;
+      extern bool output_m;
+      extern bool output_time;
+      extern bool output_temperature;
+      extern bool output_resistance;
+      extern std::vector <int> output_list;
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
+
+      extern bool temperature_dependent_parameters; // flag to set temperature dependent micrmagnetic parameters
 
       extern std::vector < double > bias_field_x;
       extern std::vector < double > bias_field_y;
@@ -58,7 +70,7 @@ namespace micromagnetic{
       extern double shield_Ms;
       extern double bias_magnets_max_width;
       extern double bias_magnets_min_width;
-
+      extern double bias_magnet_ms_input;
       extern double overlap_area;
 
       extern int bias_magnets_gap;
@@ -80,6 +92,7 @@ namespace micromagnetic{
       extern std::vector<double> ku_y;
       extern std::vector<double> ku_z;
       extern std::vector<double> ms;
+      extern std::vector<double> T;
       extern std::vector<double> Tc;
       extern std::vector <double> mat_vol;
       extern std::vector <double> mat_ms;
@@ -106,10 +119,18 @@ namespace micromagnetic{
       extern std::vector<double> fields_neighbouring_atoms_begin;
       extern std::vector<double> fields_neighbouring_atoms_end;
 
+      // spin transfer torque polarization vector
+      extern double sttpx;
+      extern double sttpy;
+      extern double sttpz;
+
+      // array to store cell level spin transfer torque parameters
+      extern std::vector<double> stt_rj;
+      extern std::vector<double> stt_pj;
+
       //-------------------------------------------------------------------------
       // Internal function declarations
       //-------------------------------------------------------------------------
-
 
       double calculate_resistance();
       int calculate_bias_magnets(double sx, double sy, double sz);
@@ -133,15 +154,27 @@ namespace micromagnetic{
       std::vector<double> calculate_alpha(int num_local_cells,int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array,
                                           std::vector <mp::materials_t> material,std::vector <int >local_cell_array);
 
-      std::vector<double> calculate_chi_para(int num_local_cells,std::vector<int>local_cell_array,int num_cells, double T);
+      void calculate_chi_perp(int num_mm_cells,
+                             std::vector<int>& list_of_mm_cells,
+                             std::vector<double>& chi_perp,
+                             std::vector<double>& T,
+                             std::vector<double>& Tc);
 
-      std::vector<double> calculate_chi_perp(int num_local_cells,std::vector<int>local_cell_array,int num_cells, double T);
+     void calculate_chi_para(int num_mm_cells,
+                             std::vector<int>& list_of_mm_cells,
+                             std::vector<double>& chi_para,
+                             std::vector<double>& T,
+                             std::vector<double>& Tc);
 
       std::vector<double> calculate_gamma(int num_atoms, int num_cells, std::vector<int> cell_array, const std::vector<int> type_array,
                                           std::vector <mp::materials_t> material, int num_local_cells,  std::vector<int>local_cell_array);
 
       std::vector<double> calculate_ku(const int num_atoms, const int num_cells, const std::vector<int> cell_array,  const std::vector<int> type_array,
                                         std::vector <mp::materials_t> material);
+
+      // calculate spin transfer torque parameters
+      void calculate_stt(const int num_atoms, const int num_cells, const std::vector<int>& cell_array, const std::vector<int>& type_array,
+                         std::vector <mp::materials_t>& material, std::vector<double>& stt_rj, std::vector<double>& stt_pj);
 
       std::vector<double> calculate_ms(int num_local_cells,const int num_atoms, const int num_cells,std::vector<int> cell_array, const std::vector<int> type_array,
                                         std::vector <mp::materials_t> material,std::vector <int >local_cell_array);
@@ -157,15 +190,28 @@ namespace micromagnetic{
                                                 std::vector<double>& y_array,
                                                 std::vector<double>& z_array);
 
-      std::vector<double> calculate_llg_fields(std::vector <double > m,
-                                                double temperature,
-                                                int num_cells,
-                                                int cell,
-                                                std::vector<double>& x_array,
-                                                std::vector<double>& y_array,
-                                                std::vector<double>& z_array);
+      void calculate_llg_external_fields(const double temperature,
+                                         const int num_cells,
+                                         std::vector<double>& x_array,
+                                         std::vector<double>& y_array,
+                                         std::vector<double>& z_array,
+                                         std::vector<double>& x_total_external_field_array,
+                                         std::vector<double>& y_total_external_field_array,
+                                         std::vector<double>& z_total_external_field_array);
 
+      void calculate_llg_spin_fields(const double temperature,
+                                     const int num_cells,
+                                     std::vector<double>& mx_array, // Normalised magnetic moment unit vector
+                                     std::vector<double>& my_array, // Normalised magnetic moment unit vector
+                                     std::vector<double>& mz_array, // Normalised magnetic moment unit vector
+                                     std::vector<double>& x_total_spin_field_array,   // total magnetic field
+                                     std::vector<double>& y_total_spin_field_array,   // total magnetic field
+                                     std::vector<double>& z_total_spin_field_array);  // total magnetic field
 
+      void output_system_parameters(std::vector<double>& pos_and_mom_array,
+                                    std::vector<double>& x_mag_array,
+                                    std::vector<double>& y_mag_array,
+                                    std::vector<double>& z_mag_array);
 
    } // end of internal namespace
 

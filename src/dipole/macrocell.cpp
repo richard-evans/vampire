@@ -196,7 +196,7 @@ namespace dipole{
                   	dipole::internal::rij_tensor_yy[lc][j] = ((3.0*ey*ey - 1.0)*rij3);
                   	dipole::internal::rij_tensor_yz[lc][j] = ( 3.0*ey*ez      )*rij3 ;
                   	dipole::internal::rij_tensor_zz[lc][j] = ((3.0*ez*ez - 1.0)*rij3);
-
+                  //   std::cout << dipole::internal::rij_tensor_xx[lc][j] << std::endl;
                   }
 
                   /*==========================================================*/
@@ -291,7 +291,7 @@ namespace dipole{
                }
    			}
    		}
-
+         //std::cin.get();
          // hold parallel calculation until all processors have completed the dipole calculation
          vmpi::barrier();
 

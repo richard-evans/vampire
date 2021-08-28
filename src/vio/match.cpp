@@ -433,6 +433,21 @@ namespace vin{
                 sim::program=54;
                 return EXIT_SUCCESS;
             }
+            test="field-sweep";
+            if(value==test){
+                sim::program=70;
+                return EXIT_SUCCESS;
+            }
+            test="disk-tracks";
+            if(value==test){
+               sim::program=72;
+               return EXIT_SUCCESS;
+            }
+            test="diagnostic-boltzmann-micromagnetic-llg";
+            if(value==test){
+                sim::program=73;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                         std::cout << word << '\t' << test << std::endl;
@@ -822,7 +837,7 @@ namespace vin{
      test="track-bit-size-x";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10000000");
         sim::track_bit_size = m;
         return EXIT_SUCCESS;
      }
@@ -830,7 +845,7 @@ namespace vin{
      test="track-bit-size-z";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10000000");
         sim::track_bit_width = m;
         return EXIT_SUCCESS;
      }
@@ -838,8 +853,8 @@ namespace vin{
      test="track-bit-size-y";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
-        sim::track_bit_size = m;
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 10000000.0,"input","0.0 - 10000000");
+        sim::track_bit_depth = m;
         return EXIT_SUCCESS;
      }
      test="track-fly-height";
@@ -871,13 +886,17 @@ namespace vin{
        sim::LFA_scan_field_step = m;
        return EXIT_SUCCESS;
      }
+     test="LFA";
+     if(word==test){
+       sim::LFA = true;
+       return EXIT_SUCCESS;
+     }
 
      test="num-tracks";
      if(word==test){
         double m=atof(value.c_str());
         check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 100,"input","0.0 - 100");
         sim::track_num_tracks = m;
-        std::cout << "N" << m << std::endl;
         return EXIT_SUCCESS;
      }
      test="num-bits-per-track";
@@ -896,7 +915,7 @@ namespace vin{
      test="x-velocity";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360.0,"input","0.0 - 360.0 degrees");
         sim::cross_track_velocity = m;
         return EXIT_SUCCESS;
      }
@@ -905,7 +924,7 @@ namespace vin{
      test="z-velocity";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360.0,"input","0.0 - 360.0 degrees");
         sim::down_track_velocity = m;
         return EXIT_SUCCESS;
      }
@@ -913,14 +932,14 @@ namespace vin{
      test="initial-x-position";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
+        check_for_valid_value(m, word, line, prefix, unit, "length", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
         sim::initial_cross_track_position = m;
         return EXIT_SUCCESS;
      }
      test="initial-z-position";
      if(word==test){
         double m=atof(value.c_str());
-        check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
+        check_for_valid_value(m, word, line, prefix, unit, "length", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
         sim::initial_down_track_position = m;
         return EXIT_SUCCESS;
      }
@@ -1148,12 +1167,6 @@ namespace vin{
             output_list.push_back(2);
             return EXIT_SUCCESS;
         }
-        test="magneto-resistance";
-        if(word==test){
-          micromagnetic::enable_resistance = true;
-          output_list.push_back(65);
-          return EXIT_SUCCESS;
-       }
         else
         //--------------------------------------------------------------------
         test="applied-field-strength";
@@ -1526,7 +1539,29 @@ namespace vin{
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
-        // reserve 68 for voltage
+        test="magneto-resistance";
+        if(word==test){
+           micromagnetic::enable_resistance = true;
+           output_list.push_back(68);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="lfa-ms";
+        if(word==test){
+           output_list.push_back(69);
+           return EXIT_SUCCESS;
+        }
+        test="track-pos-x";
+        if(word==test){
+           output_list.push_back(70);
+           return EXIT_SUCCESS;
+        }
+        test="track-pos-z";
+        if(word==test){
+           output_list.push_back(71);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;

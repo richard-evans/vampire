@@ -6,6 +6,7 @@
 environment_objects =\
 calculate_chi_perp.o \
 calculate_chi_para.o \
+corners.o \
 data.o \
 demag.o \
 fieldsLLB.o \

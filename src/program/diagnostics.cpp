@@ -141,24 +141,106 @@ namespace program{
          }
       }
 
-   	// Find max probability and max P
-   	double maxp=0.0;
-   	double maxP=0.0;
-   	for(int b=0;b<181;b++){
-   		double energy = anisotropy::get_anisotropy_constant(0); // get anisotropy constant for material 0
-   		double P = sin(double (b)*M_PI/180)*exp((energy*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0))/(sim::temperature*1.3806503e-23));
-   		if((bin[b])>maxp) maxp=bin[b];
-   		if(P>maxP) maxP=P;
-   	}
+      // Find max probability and max P
+      double maxPK = 0.0;
+      double maxPH = 0.0;
+      double maxP  = 0.0;
+      for(int b=0;b<181;b++){
+         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
+         double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
+         if((bin[b])>maxP) maxP=bin[b];
+         if(PK>maxPK) maxPK=PK;
+         if(PH>maxPH) maxPH=PH;
+      }
 
-   	// Output data
-   	zmag << "# " << anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23) << std::endl;
-   	for(int b=0;b<181;b++){
-         double energy = anisotropy::get_anisotropy_constant(0); // get anisotropy constant for material 0
-   		double P = sin(double (b)*M_PI/180)*exp((energy*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0))/(sim::temperature*1.3806503e-23));
-   		zmag << b << "\t" << (bin[b]+bin[180-b])/(2.0*maxp) << "\t" << P/maxP << std::endl;
-   	}
+      std::ofstream ofile("boltzmann-distribution.txt");
 
+      // Output data
+      ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23) << std::endl;
+      ofile << "# Field:               " << sim::H_applied << "\t" << sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23) << std::endl;
+      ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/9.274e-24 << "\t" << sim::temperature << std::endl;
+      for(int b=0;b<181;b++){
+         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
+         double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
+         ofile << b << "\t" << bin[b]/maxP << "\t" << (bin[b]+bin[180-b])/(2.0*maxP) << "\t" << PK/maxPK << "\t" << PH/maxPH << std::endl;
+      }
+
+      // close Boltzmann file
+      ofile.close();
+
+   }
+
+   void boltzmann_dist_micromagnetic_llg(){
+
+      // check calling of routine if error checking is activated
+      if(err::check==true) std::cout << "program::boltzmann_dist has been called" << std::endl;
+
+      // array for binning spin angle
+      std::vector<double> bin(181,0.0);
+
+      // Equilibrate system
+      sim::integrate(sim::equilibration_time);
+
+      // Simulate system
+      while(sim::time<sim::total_time+sim::equilibration_time){
+
+         // Integrate system
+         sim::integrate(sim::partial_time);
+
+         // Calculate magnetisation statistics
+         for(int atom=0; atom<atoms::num_atoms; atom++){
+            const double mx = atoms::x_spin_array[atom];
+            const double my = atoms::y_spin_array[atom];
+            const double mz = atoms::z_spin_array[atom];
+            const double mm = sqrt(mx*mx + my*my + mz*mz);
+            double angle = acos(mz/mm)*180.0/M_PI;
+            double id = vmath::iround(angle+0.5);
+            //std::cout << id << "\t" << angle << "\t" << mx << "\t" << my << "\t" << mz << "\t" << mm << std::endl;
+            bin[id]+=1.0;
+         }
+
+         // Calculate magnetisation statistics
+         stats::mag_m();
+
+         // Output data
+         vout::data();
+
+      }
+
+      // Find max probability and max P
+      double maxPK = 0.0;
+      double maxPH = 0.0;
+      double maxP  = 0.0;
+      for(int b=0;b<181;b++){
+         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
+         double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
+         if((bin[b])>maxP) maxP=bin[b];
+         if(PK>maxPK) maxPK=PK;
+         if(PH>maxPH) maxPH=PH;
+      }
+
+      std::ofstream ofile("boltzmann-distribution.txt");
+
+      // Output data
+      ofile << "# Anisotropy:          " << anisotropy::get_anisotropy_constant(0) << "\t" << anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23) << std::endl;
+      ofile << "# Field:               " << sim::H_applied << "\t" << sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23) << std::endl;
+      ofile << "# Moment, Temperature: " << mp::material[0].mu_s_SI/9.274e-24 << "\t" << sim::temperature << std::endl;
+      for(int b=0;b<181;b++){
+         double energyK = anisotropy::get_anisotropy_constant(0)/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double energyH = sim::H_applied*mp::material[0].mu_s_SI/(sim::temperature*1.3806503e-23); // get anisotropy constant for material 0
+         double PK = sin(double (b)*M_PI/180.0)*exp(energyK*sin(double (b)*M_PI/180.0)*sin(double (b)*M_PI/180.0));
+         double PH = sin(double (b)*M_PI/180.0)*exp(energyH*cos(double (b)*M_PI/180.0));
+         ofile << b << "\t" << bin[b]/maxP << "\t" << (bin[b]+bin[180-b])/(2.0*maxP) << "\t" << PK/maxPK << "\t" << PH/maxPH << std::endl;
+      }
+
+      // close Boltzmann file
+      ofile.close();
 
    }
 

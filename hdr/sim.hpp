@@ -36,7 +36,7 @@
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
-	
+
 	//track parameters
 	extern double track_Ms;
 	extern double track_bit_width;
@@ -52,6 +52,10 @@ namespace sim{
 	extern int track_num_bits_per_track;
 	extern int track_num_tracks;
 	extern double LFA_scan_field_step;
+	extern double Ms;
+	extern double track_pos_x;
+	extern double track_pos_z;
+	extern bool LFA;
 
 	// distance of tracks from read head
 	extern double track_fly_height; // Angstroms
@@ -226,6 +230,13 @@ namespace sim{
 	extern std::vector < double > domain_wall_second_vector_x;
 	extern std::vector < double > domain_wall_second_vector_y;
 	extern std::vector < double > domain_wall_second_vector_z;
+
+	//------------------------------------------------------------------------
+   // getter functions to give access to internal sim variables
+   //------------------------------------------------------------------------
+   std::vector<double> get_stt_polarization_unit_vector(); // unit vector spin polarization
+   std::vector<double> get_stt_rj(); // array of stt relaxation constants
+   std::vector<double> get_stt_pj(); // array of stt precession constants
 
 }
 

@@ -35,8 +35,8 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
 
   //THIS IS CORRECT I KNOW THE X AND Y ARE MISSED UP! THIS IS BECAUE MS is assumed to be along y but i need it along x so i have switched x and y then switched them back at the end
 
-  double shield_Ms = 1;
-  double x_size =system_dimensions_y*bias_magnets_max_width - system_dimensions_y*bias_magnets_min_width;
+  double shield_Ms = bias_magnet_ms_input;
+  double x_size = system_dimensions_y*bias_magnets_max_width - system_dimensions_y*bias_magnets_min_width;
   double y_size = 1000000;
   double z_size = system_dimensions_z*bias_magnets_max_height - system_dimensions_z*bias_magnets_min_height;
 
@@ -46,24 +46,23 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
 
   double y_pos_1 = - y_size/2 - bias_magnets_gap;
   double y_pos_2 =   y_size/2 + system_dimensions_x + bias_magnets_gap;
-//
 
-//  std::cout << y_pos_1 << '\t' << y_pos_2 << '\t' << x_pos << '\t' << z_pos << std::endl;
+  // std::cout << shield_Ms << '\t' <<  x_size << '\t' << y_size << '\t' << z_size << "\t" << system_dimensions_x << '\t' << system_dimensions_y << '\t' << system_dimensions_z << "\t" << bias_magnets_min_width << '\t' << bias_magnets_min_height << '\t' << bias_magnets_gap<< "\t" << x_pos << "\t" << z_pos << '\t' << y_pos_1 << '\t' << y_pos_2 << std::endl;
 
    double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
 
-  for (int lc = 0; lc < cells::num_local_cells; lc++){
+   for ( int i = 0 ; i < cells::num_cells; i++ ){
+      bias_field_x[i] = 0;
+      bias_field_y[i] = 0;
+      bias_field_z[i] = 0;
+   }
 
-    int cell = cells::local_cell_array[lc];
+  for (int lc = 0; lc < cells::num_cells; lc++){
 
+    int cell = lc;//cells::local_cell_array[lc];
 
-
-    bias_field_x[cell] = 0;
-    bias_field_y[cell] = 0;
-    bias_field_z[cell] = 0;
-
-//      //cell position in Angstrom
+     //cell position in Angstrom
      double x_cell = cells::pos_and_mom_array[4*cell + 0];
      double y_cell = cells::pos_and_mom_array[4*cell + 1];
      double z_cell = cells::pos_and_mom_array[4*cell + 2];
@@ -78,9 +77,10 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
 
        if (shield == 0) y_pos = y_pos_1;
        if (shield == 1) y_pos = y_pos_2;
+
        //calculates the vector in A from the cell to the shields
-       double x = sqrt((x_cell - x_pos)*(x_cell - x_pos));
-       double y = sqrt((y_cell - y_pos)*(y_cell - y_pos));
+       double x = sqrt((y_cell - x_pos)*(y_cell - x_pos));
+       double y = sqrt((x_cell - y_pos)*(x_cell - y_pos));
        double z = sqrt((z_cell - z_pos)*(z_cell - z_pos));
 
        double Bx = 0.0;
@@ -112,23 +112,28 @@ int calculate_bias_magnets(double system_dimensions_x,double system_dimensions_y
                  double r = sqrt(xp*xp + yp*yp + zp*zp);
 
                  Bx = Bx + m1klm * log(zp + r);
-                 By = By + m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                 By = By - m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
                  Bz = Bz + m1klm * log(xp + r);
 
 
               }
            }
        }
-
-    //   std::cout << cell << '\t' << Bx << "\t" << By << '\t' << Bz <<  '\t' << prefactor << std::endl;
        bias_field_x[cell] = bias_field_x[cell] + By*prefactor;
        bias_field_y[cell] = bias_field_y[cell] + Bx*prefactor;
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
-
+     // std::cout << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << '\t' <<std::endl;
      }
-     std::cout <<"total" << '\t' << cell << '\t' << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] <<  "\t" << z_cell << std::endl;
 
   }
+
+   // #ifdef MPICF
+   //    MPI_Allreduce(MPI_IN_PLACE, &bias_field_x[0],     cells::num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+   //    MPI_Allreduce(MPI_IN_PLACE, &bias_field_y[0],     cells::num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+   //    MPI_Allreduce(MPI_IN_PLACE, &bias_field_z[0],     cells::num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+   // #endif
+
+
 return 0;
  }
 }

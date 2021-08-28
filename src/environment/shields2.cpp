@@ -18,6 +18,7 @@
 #include "vio.hpp"
 #include "errors.hpp"
 #include <algorithm>
+#include <algorithm>
 // C++ headers
 #include <math.h>
 
@@ -84,24 +85,25 @@ int in_shield(double x, double y, double z,int shield){
     double zmin = env::shield_min_z[shield];
     double zmax = env::shield_max_z[shield];
 
-    //double f = exp((x-xmax)*0.01);
-    //double f2 = exp((-x+(xmax-xmin)-xmax)*0.01);
-    //double fmin = exp((xmin-xmax)*0.01);
-    //double fmax = exp((xmax-xmax)*0.01);
-    double g;// = zmin+(zmax-zmin)*(f-fmin)/(fmax-fmin);
-    double g2;// = zmin+(zmax-zmin)*(f2-fmin)/(fmax-fmin);
-   if (x !=xmax){
-      g2 = -10*(zmax-zmin)/(x-xmax) + zmin;
-    }
-    else g2 = 100000;
+    double f = exp((x-xmax)*0.01);
+    double f2 = exp((-x+(xmax-xmin)-xmax)*0.01);
+    double fmin = exp((xmin-xmax)*0.01);
+    double fmax = exp((xmax-xmax)*0.01);
+    double g = zmin+(zmax-zmin)*(f-fmin)/(fmax-fmin);
+    double g2 = zmin+(zmax-zmin)*(f2-fmin)/(fmax-fmin);
 
-    if (x !=xmin){
-    g =  10*(zmax-zmin)/(x-xmin) + zmin;
-    }
-    else g = 1000000;
+  //  if (x !=xmax){
+      g2 = -10*(zmax-zmin)*1/(x-xmax) + zmin;
+  //  }
+  //  else g2 = 100000;
+
+  //  if (x !=xmin){
+    g =  10*(zmax-zmin)*1/(x-xmin) + zmin;
+  //  }
+  //  else g = 1000000;
 
 
-   // std::cout <<  g2 <<"\t" <<   z << "\t" << zmax << '\t' <<  zmin << "\t" << xmax << "\t" << x << std::endl;
+    //std::cout <<  g << '\t' << z << '\t' << zmax << std::endl;
 
      if(g < z && env::pos_or_neg[shield] == "pos" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
@@ -113,10 +115,6 @@ int in_shield(double x, double y, double z,int shield){
      else if( g2 < z && env::pos_or_neg[shield] == "neg" && x >= env::shield_min_x[shield] && x <= env::shield_max_x[shield] &&
          y >= env::shield_min_y[shield] && y <= env::shield_max_y[shield] &&
          z >= env::shield_min_z[shield] && z <= env::shield_max_z[shield]){ //z <= zmax && x <= xmax && x >= xmin && z >= zmin) {
-   //    std::cout << "neg" <<std::endl;
-  //    std::cout << x << '\t'  << z << '\t' <<g2 << '\t' << g << '\t' <<  std::endl;
-
-      // std::cout << zmin << '\t' << zmax << "\t" << xmin << '\t' << xmax << '\t' << g2 << '\t' << g << '\t' << x << '\t'  << z << '\t' << std::endl;
        return 1;
      }
      else{
@@ -151,7 +149,7 @@ int bias_shields(){
   double y_pos_2 =  y_size/2.0 +dim[0];
 
 
-   double prefactor = shield_Ms;///(4.0*M_PI);
+   double prefactor = shield_Ms/(4.0*M_PI);
   //save this new m as the initial value, so it can be saved and used in the final equation.
     for (int cell = 0; cell < num_cells; cell ++){
 
@@ -207,7 +205,7 @@ int bias_shields(){
                  double r = sqrt(xp*xp + yp*yp + zp*zp);
 
                  Bx = Bx + m1klm * log(zp + r);
-                 By = By - m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
+                 By = By + m1klm * sign(yp) * sign(xp) * atan(xabs * zp / (yabs * r));
                  Bz = Bz + m1klm * log(xp + r);
 
 
@@ -219,7 +217,7 @@ int bias_shields(){
        bias_field_z[cell] = bias_field_z[cell] + Bz*prefactor;
 
      }
-   // / std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
+  //  std::cout << bias_field_x[cell] << '\t' << bias_field_y[cell] << '\t' << bias_field_z[cell] << std::endl;
 
   }
 //std::cin.get();
@@ -237,7 +235,7 @@ int read_in_shield_info(){
   std::ifstream ifile;
   ifile.open("shield_geom");
 
-  //int shield_number;
+  int shield_number;
   string shield_type;
 
   if (ifile.good()){
@@ -426,9 +424,11 @@ int read_in_shield_info(){
 
       }
 
+
       std::string test="shield-type";
       if(word==test){
         if (value == "cube"){
+
           env::shield_shape[super_index-1] = value;
         }
         else if (value == "exponential"){
@@ -441,13 +441,12 @@ int read_in_shield_info(){
 
       }
 
-
       test="minimum-x";
       if(word==test){
-        double g=atof(value.c_str());
+        double g=atof(value.c_str());x
+        std::cout << "min x: " << '\t' << g << std::endl;
         vin::check_for_valid_value(g, word, 1, "environment", unit, "length", -1e10, 1e10,"shield_geom","-100 - 100 cms");
         env::shield_min_x[super_index-1] = g;
-      //  std::cout << word << '\t' << env::shield_min_x[super_index-1] << '\t' << super_index - 1 <<std::endl;
 
       }
 
@@ -494,6 +493,7 @@ int read_in_shield_info(){
         double g=atof(value.c_str());
         vin::check_for_valid_value(g, word, 1, "environment", unit, "length", 20, 2000,"shield_geom","2 nm to 100 nm");
         env::shield_max_cell_size[super_index-1] = g;
+        std::cout << "max" << "\t" << g << std::endl;
 
       }
 
@@ -530,7 +530,7 @@ int read_in_shield_info(){
       test="A";
       if(word==test){
         double g=atof(value.c_str());
-        vin::check_for_valid_value(g, word, 1, "environment", unit, "exchange", 0, 1e19 ,"shield_geom","0 - 1e-19");
+        vin::check_for_valid_positive_value(g, word, 1, "environment", unit, "exchange", 0, 1e19 ,"shield_geom","0 - 1e-19");
         env::shield_A[super_index-1][sub_index-1] = g;
         //std::cout << super_index << '\t' << sub_index << '\t' << g << std::endl;
       }
@@ -553,32 +553,31 @@ int read_in_shield_info(){
       }
       test="initial-spin-direction";
       if(word==test){
-      //    // first test for random spins
-      //    test="random";
-      //    if(value==test){
-      //       env::random_spins[super_index]=true;
-      //    }
-      //    else{
+         // first test for random spins
+         test="random";
+         if(value==test){
+            env::random_spins[super_index]=true;
+         }
+         else{
             // temporary storage container
             std::vector<double> u(3);
             // read values from string
             u=vin::doubles_from_string(value);
-            std::cout << super_index << '\t' << u.at(0) <<std::endl;
-          // vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-          // vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "none", 0,1,"input","0- 1");
-          // vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+        //    vin::check_for_valid_value(u.at(0), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+        //    vin::check_for_valid_value(u.at(1), word, line, prefix, unit, "none", 0,1,"input","0- 1");
+        //    vin::check_for_valid_value(u.at(2), word, line, prefix, unit, "none", 0,1,"input","0- 1");
 
             // Copy sanitised unit vector to material
-            env::initial_spin_x[super_index-1]=u.at(0);
-            env::initial_spin_y[super_index-1]=u.at(1);
-            env::initial_spin_z[super_index-1]=u.at(2);
+            env::initial_spin_x[super_index]=u.at(0);
+            env::initial_spin_y[super_index]=u.at(1);
+            env::initial_spin_z[super_index]=u.at(2);
 
             // ensure random spins is unset
-            env::random_spins[super_index-1]=false;
+            env::random_spins[super_index]=false;
          }
-      //    // return
-      //    return true;
-      // }
+         // return
+         return true;
+      }
 
 
 
@@ -595,9 +594,6 @@ int read_in_shield_info(){
     //          err::vexit();
     //       }
      }
-
-     return 0;
-
   }
 
 

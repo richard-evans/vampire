@@ -115,6 +115,8 @@ namespace cells{
                // associate cell with position i,j,k
                supercell_array[i][j][k]=cell;
                // increment cell number
+
+               
                cell++;
             }
          }
@@ -148,7 +150,7 @@ namespace cells{
 
 
       // Assign atoms to cells
-      for(int atom=0;atom<num_local_atoms;atom++){
+      for(int atom=0;atom<num_local_atoms+vmpi::num_halo_atoms;atom++){
          // temporary for atom coordinates
          double c[3];
          // convert atom coordinates to st reference frame
@@ -201,6 +203,7 @@ namespace cells{
 
       // Resize new cell arrays
       cells::pos_and_mom_array.resize(4*cells::num_cells,0.0);
+      cells::pos_array.resize(3*cells::num_cells,0.0);
 
       cells::mag_array_x.resize(cells::num_cells,0.0);
       cells::mag_array_y.resize(cells::num_cells,0.0);
@@ -217,7 +220,6 @@ namespace cells{
       cells::internal::total_moment_array.resize(cells::num_cells,0.0);
 
       cells::fft_cell_id_array.resize(cells::num_cells,0.0);
-
       // Now add atoms to each cell as magnetic 'centre of mass'
       int num_atoms_magnetic = 0;  /// number of magnetic atoms
       for(int atom=0;atom<num_local_atoms;atom++){
@@ -226,12 +228,16 @@ namespace cells{
          int type = atoms::type_array[atom];
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
+         cells::pos_array[3*local_cell+0] += atom_coords_x[atom];
+         cells::pos_array[3*local_cell+1] += atom_coords_y[atom];
+         cells::pos_array[3*local_cell+2] += atom_coords_z[atom];
          if(mp::material[type].non_magnetic==0){
 
             cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+1] += atom_coords_y[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+2] += atom_coords_z[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+3] += mus;
+
 
             cells::num_atoms_in_cell[local_cell]++;
             num_atoms_magnetic++;
@@ -250,6 +256,7 @@ namespace cells{
       #ifdef MPICF
          MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &cells::pos_array[0],     cells::pos_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          cells::num_atoms_in_cell_global.resize(cells::num_cells);
          cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
          MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
@@ -275,7 +282,12 @@ namespace cells{
             cells::pos_and_mom_array[4*local_cell+2] = cells::pos_and_mom_array[4*local_cell+2]/(cells::pos_and_mom_array[4*local_cell+3]);
 
             cells::volume_array[local_cell] = double(cells::num_atoms_in_cell[local_cell])*atomic_volume;
+            cells::pos_array[3*local_cell+0] = cells::pos_array[3*local_cell+0]/cells::num_atoms_in_cell[local_cell];
+            cells::pos_array[3*local_cell+1] = cells::pos_array[3*local_cell+1]/cells::num_atoms_in_cell[local_cell];
+            cells::pos_array[3*local_cell+2] = cells::pos_array[3*local_cell+2]/cells::num_atoms_in_cell[local_cell];
+         
          }
+
       }
 
       // Resize 2D arrays to store cell - atom informations

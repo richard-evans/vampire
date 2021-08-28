@@ -15,6 +15,7 @@
 // micromagnetic module headers
 #include "internal.hpp"
 #include "material.hpp"
+#include "cells.hpp"
 #include "random.hpp"
 #include "../anisotropy/internal.hpp"
 
@@ -81,7 +82,6 @@ namespace micromagnetic{
             int cell = cell_array[atom];
             int mat = type_array[atom];
             ku[cell] = ku[cell] - anisotropy::internal::mp[mat].ku2;//mp::material[mat].Ku1_SI; //need to add a function here to access anisotropy module
-          //  std::cout << anisotropy::internal::mp[mat].ku_vector[0] << '\t' << anisotropy::internal::mp[mat].ku_vector[1] << '\t' << anisotropy::internal::mp[mat].ku_vector[2] << '\t' << anisotropy::internal::mp[mat].ku2 << std::endl;
             ku_x[cell] = ku_x[cell] + anisotropy::internal::mp[mat].ku_vector[0];
             ku_y[cell] = ku_y[cell] + anisotropy::internal::mp[mat].ku_vector[1];
             ku_z[cell] = ku_z[cell] + anisotropy::internal::mp[mat].ku_vector[2];
@@ -89,14 +89,14 @@ namespace micromagnetic{
 
 
 
-         #ifdef MPICF
-         MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-         #endif
+         // #ifdef MPICF
+         //    MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         //    MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         //    MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+         // #endif
 
-
-         for (int cell = 0; cell < num_cells; cell++){
+         for (int lc = 0; lc < cells::num_local_cells; lc++){
+           int cell = cells::local_cell_array[lc];
 
            double normal = sqrt(ku_x[cell]*ku_x[cell] + ku_y[cell]*ku_y[cell]  + ku_z[cell]*ku_z[cell]);
            ku_uv[cell][0] =ku_x[cell]/normal;
@@ -114,18 +114,22 @@ namespace micromagnetic{
            e2[cell][0] =e2[cell][0]/normal;
            e2[cell][1] =e2[cell][1]/normal;
            e2[cell][2] =e2[cell][2]/normal;
-          // std::cout << RN[0] << '\t' << RN[1] << '\t' << RN[2] << '\t' << ku_uv[cell][0] << '\t' << ku_uv[cell][1] << '\t' << ku_uv[cell][2] << '\t' << e1[cell][0] << '\t' << e1[cell][1] << '\t' << e1[cell][2] << '\t' << e2[cell][0] << '\t' << e2[cell][1] << '\t' << e2[cell][2] << '\t' << std::endl;
+
            ku_x[cell] = ku[cell] * sqrt(e1[cell][0]*e1[cell][0] + e2[cell][0]*e2[cell][0]);
            ku_y[cell] = ku[cell] * sqrt(e1[cell][1]*e1[cell][1] + e2[cell][1]*e2[cell][1]);
            ku_z[cell] = ku[cell] * sqrt(e1[cell][2]*e1[cell][2] + e2[cell][2]*e2[cell][2]);
-
+           //std::cout << cell << '\t' <<ku[cell] << '\t' <<  ku_x[cell] << '\t' <<  ku_y[cell] << '\t' <<  ku_z[cell] << '\t' << std::endl;
 
         }
+
         #ifdef MPICF
-        MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+           MPI_Allreduce(MPI_IN_PLACE, &ku_x[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+           MPI_Allreduce(MPI_IN_PLACE, &ku_y[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
+           MPI_Allreduce(MPI_IN_PLACE, &ku_z[0],     num_cells,    MPI_DOUBLE,    MPI_SUM, MPI_COMM_WORLD);
         #endif
+
+        // why is this summed again?
+
 
 
 

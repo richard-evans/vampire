@@ -56,6 +56,7 @@ namespace cells{
    extern std::vector<double> field_array_z;
 
    extern std::vector<double> pos_and_mom_array;
+   extern std::vector<double> pos_array;
 
    extern std::vector < double > num_macro_cells_fft; /// lateral size of local macro-cells (A)
    extern std::vector<double> fft_cell_id_array;
