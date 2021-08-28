@@ -3,48 +3,50 @@
 This chapter covers the requirements, installation and support for \vampire on different platforms. 
 
 \section*{System Requirements}
-\addcontentsline{toc}{section}{System Requirements}
+\phantomsection\addcontentsline{toc}{section}{System Requirements}
 \vampire is designed to be generally portable and compilable on Linux, Unix, Mac OSX and Windows with a range of different compilers. By design the software has a very minimal dependence on external libraries to aid compilation on the widest possible range of platforms without needing to first install and configure a large number of other packages. \vampire is designed to be maximally efficient on high performance computing clusters and scalable to thousands of processors, and as such is the recommended platform if you have access to appropriate resources. 
 
 \subsection*{Hardware Requirements}
 \vampire has been successfully tested on a wide variety of x86 and power PC processors. Memory requirements are generally relatively modest for most systems, though larger simulations will require significantly more memory. \vampire is generally computationally limited, and so the faster the clock speed and number of processor cores the better.
 
 \section*{Binary installation}
-\addcontentsline{toc}{section}{Binary installation}
-Compiled binaries of the latest release version are available to download from:\\
+\phantomsection\addcontentsline{toc}{section}{Binary installation}
+Compiled binaries of the latest release version are available to download from:
 
+\noindent
 \begin{minipage}[c]{\textwidth}
 \centering
 https://vampire.york.ac.uk/download/
-\end{minipage}\\
+\end{minipage}
 
 \noindent for Linux and Mac$^{\mathrm{TM}}$ OS X platforms. For the Linux and Mac OS X releases, a simple installation script \textit{install.sh} installs the binary in \textit{/opt/vampire/} and appends the directory to your environment path. On Windows the recommended method is to use the \textit{Linux subsystem for windows} developer feature which adds a linux subsystem that is capable of running the standard linux binary. A copy of qvoronoi is integrated into \vampire for generating granular structures. 
 
 \section*{Compiling from source}
-\addcontentsline{toc}{section}{Compiling from source}
-The best way to get the vampire source code is using git, a distributed version control program which enables changes in the code to be tracked. Git is readily available on linux (\textit{git-core} package on ubuntu) and Mac (via MacPorts). To get vampire from the Github repository checkout your own copy of the repository using:\\
+\phantomsection\addcontentsline{toc}{section}{Compiling from source}
+The best way to get the vampire source code is using git, a distributed version control program which enables changes in the code to be tracked. Git is readily available on linux (\textit{git-core} package on ubuntu) and Mac (via MacPorts). To get vampire from the Github repository checkout your own copy of the repository using:
 
+\noindent
 \begin{minipage}[c]{\textwidth}
 \centering
 git clone git://github.com/richard-evans/vampire.git
-\end{minipage}\\
+\end{minipage}
 
 This way, updates to the code can be easily merged with the downloaded version. Compiling is generally as easy as running \textit{make} in Unix platforms. In addition, on a multicore processor compilation can be parallelised using the \textit{-j $N_t$} option, where $N_t$ is the number of threads to use.
 
 \subsection*{Compiling on Linux}
-\addcontentsline{toc}{subsection}{Compiling on Linux}
+\phantomsection\addcontentsline{toc}{subsection}{Compiling on Linux}
 In order to compile in linux, a working set of development tools are needed, which on ubuntu includes the packages \textit{build-essential} and \textit{g++}. 
 \vampire should compile without issue following a simple \textit{make} command in the source directory.
 
 For the parallel version, a working installation of openmpi is recommended, which must usually include a version of the development tools (\textit{openmpi-bin} and \textit{openmpi-dev} packages on ubuntu). Compilation is usually straightforward using \textit{make parallel}.
 
 \subsection*{Compiling on Mac OSX}
-\addcontentsline{toc}{subsection}{Compiling on Mac OSX} With OS X, compilation from source requires a working installation of Xcode, available for free from the Mac App Store. In addition command line tools must also be installed. A working installation of MacPorts is recommended to provide access to a wide range of open source libraries and tools such as openmpi, rasmol and povray. For the serial version, compilation is the same as for linux, following a simple \textit{make serial-llvm} command in the source directory.
+\phantomsection\addcontentsline{toc}{subsection}{Compiling on Mac OSX} With OS X, compilation from source requires a working installation of Xcode, available for free from the Mac App Store. In addition command line tools must also be installed. A working installation of MacPorts is recommended to provide access to a wide range of open source libraries and tools such as openmpi, rasmol and povray. For the serial version, compilation is the same as for linux, following a simple \textit{make serial-llvm} command in the source directory.
 
 Similarly for the parallel version, openmpi needs to be installed via MacPorts, and compilation is usually straightforward using \textit{make parallel-llvm}.
 
 \subsection*{Compiling on Windows}
-\addcontentsline{toc}{subsection}{Compiling on Windows}
+\phantomsection\addcontentsline{toc}{subsection}{Compiling on Windows}
 The recommended way to use vampire on Windows is to install Linux subsystem for windows 10 (see https://docs.microsoft.com/en-us/windows/wsl/install-win10). Older versions of windows are no longer supported. Once installed, you can download the serial linux binary as for linux and run as normal from the command line.
 
 %In order to compile the code on Windows systems you will need to have Microsoft Visual Studio 2010 or later and open the file  Vampire.vcxproj with it. The project has two versions: Debug and Release, where you can choose the current one in the drop-down menu on the top toolbar. The first is for debugging the code and the executable which is created will not be a stand-alone executable. The Release version is for creating a stand-alone executables for the serial version. Click Build>Project to compile the code.
@@ -52,11 +54,11 @@ The recommended way to use vampire on Windows is to install Linux subsystem for 
 %Finally, you can compile a 64-bit version if you choose from the drop down menu in the top toolbar in MS Visual Studio. (It writes ``Win32'' so when you click it the x64 option will appear).
 
 \subsection*{Compiling for ARCHER/Cray systems}
-\addcontentsline{toc}{subsection}{Compiling for ARCHER}
+\phantomsection\addcontentsline{toc}{subsection}{Compiling for ARCHER}
 ARCHER is the UK national supercomputer and includes custom compilers developed by Cray Inc. However, performance is generally better for the gnu compiler collection and so there is an optimized makefile option for compilation on the ARCHER and similar Cray XC30 systems. To compile, you need to swap the environment to the GNU compiler suite using \textit{module swap PrgEnv-cray PrgEnv-gnu}. You can then compile with \textit{make parallel-archer} which will compile a parallel binary.
 
 \subsection*{Compiling for GPU acceleration with CUDA (beta)}
-\addcontentsline{toc}{subsection}{Compiling for GPU}
+\phantomsection\addcontentsline{toc}{subsection}{Compiling for GPU}
 The latest release includes a CUDA implementation for GPU accelerated atomistic spin dynamics. To compile the CUDA version of the code, you need to install the CUDA drivers and runtime. Once installed, compilation should be straightforward using \textit{make gcc-cuda}. By default, the binary includes device code for a wide range of architectures. Depending on your device/card, you may need to modify the device code generation option in the makefile.
 
 %------------------------------------------------------------------------
@@ -70,69 +72,74 @@ The latest release includes a CUDA implementation for GPU accelerated atomistic 
 To run the code in all version, you first need to specify an input file and material file, which must reside in the same directory where you run the code. Example files are available in the source code distribution, or from the Download section of the website (http://vampire.york.ac.uk/download/index.html).
 
 \section*{Unix/Linux and macOS}
-\addcontentsline{toc}{section}{Running on Unix/Linux and macOS}
-In the directory including the input and material files, typing\\
+\phantomsection\addcontentsline{toc}{section}{Running on Unix/Linux and macOS}
+In the directory including the input and material files, typing
 
+\noindent
 \begin{minipage}[c]{\textwidth}
 \centering
 ./vampire-serial
-\end{minipage}\\
+\end{minipage}
 
-\noindent will run the code in serial mode. For the parallel mode with openmpi,\\
+\noindent will run the code in serial mode. For the parallel mode with openmpi,
 
+\noindent
 \begin{minipage}[c]{\textwidth}
 \centering
 mpirun -np 2 vampire-parallel
-\end{minipage}\\
+\end{minipage}
 
 \noindent will run the code in parallel mode, on 2 CPUs. Increasing the \textit{-np} argument will run on more cores.
 
 \section*{Windows}
-\addcontentsline{toc}{section}{Running on Windows}
+\phantomsection\addcontentsline{toc}{section}{Running on Windows}
 Once you have installed Linux subsystem for Windows, you can run the code by launching bash for windows and following the instructions for Unix/Linux systems above.
 
 \section*{Log file}
-\addcontentsline{toc}{section}{Log file}
-When you run the program it will output some program information to screen to indicate that the program is running listing some details about the developers and some steps on the program execution. There are also options to tell the program to output simulation data to screen to see how the simulation is progressing. In addition, a \textit{log} file is produced which provides more detail about the execution of the program and progress including timestamps, and errors that may occur and certain performance metrics, such as time to update the dipole field or output a spin configuration file. A sample screen output header from the program is shown below.\\
+\phantomsection\addcontentsline{toc}{section}{Log file}
+When you run the program it will output some program information to screen to indicate that the program is running listing some details about the developers and some steps on the program execution. There are also options to tell the program to output simulation data to screen to see how the simulation is progressing. In addition, a \textit{log} file is produced which provides more detail about the execution of the program and progress including timestamps, and errors that may occur and certain performance metrics, such as time to update the dipole field or output a spin configuration file. A sample screen output header from the program is shown below.
 
+\noindent
 \begin{minipage}[c]{\textwidth}
+\begingroup
+\fontsize{7.5}{7.5}\selectfont
 \begin{verbatim}
+                                               _          
+                                              (_)         
+                  __   ____ _ _ __ ___  _ __  _ _ __ ___ 
+                  \ \ / / _` | '_ ` _ \| '_ \| | '__/ _ \
+                   \ V / (_| | | | | | | |_) | | | |  __/
+                    \_/ \__,_|_| |_| |_| .__/|_|_|  \___|
+                                       | |               
+                                       |_|               
 
-                                                _          
-                                               (_)         
-                    __   ____ _ _ __ ___  _ __  _ _ __ ___ 
-                    \ \ / / _` | '_ ` _ \| '_ \| | '__/ _ \
-                     \ V / (_| | | | | | | |_) | | | |  __/
-                      \_/ \__,_|_| |_| |_| .__/|_|_|  \___|
-                                         | |               
-                                         |_|               
+                    Version 5.0.0 Aug 25 2018 23:01:25
 
-                      Version 5.0.0 Aug 25 2018 23:01:25
+            Git commit: 4377c4a8c3b2334decf6b3892542927fcaddebc7
 
-             Git commit: 4377c4a8c3b2334decf6b3892542927fcaddebc7
+Licensed under the GNU Public License(v2). See licence file for details.
 
-  Licensed under the GNU Public License(v2). See licence file for details.
+Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>
 
-  Lead Developer: Richard F L Evans <richard.evans@york.ac.uk>
+Contributors: Andrea Meo, Rory Pond, Weijia Fan,
+              Phanwadee Chureemart, Sarah Jenkins, Joe Barker, 
+              Thomas Ostler, Andreas Biternas, Roy W Chantrell,
+              Wu Hong-Ye, Matthew Ellis, Razvan Ababei, 
+              Sam Westmoreland, Oscar Arbelaez, Sam Morris
 
-  Contributors: Andrea Meo, Rory Pond, Weijia Fan,
-                Phanwadee Chureemart, Sarah Jenkins, Joe Barker, 
-                Thomas Ostler, Andreas Biternas, Roy W Chantrell,
-                Wu Hong-Ye, Matthew Ellis, Razvan Ababei, 
-                Sam Westmoreland, Oscar Arbelaez, Sam Morris
- 
-                Compiled with:  LLVM C++ Compiler
-                Compiler Flags: 
+              Compiled with:  LLVM C++ Compiler
+              Compiler Flags: 
 
-  Vampire includes a copy of the qhull library from C.B. Barber and
-  The Geometry Center and may be obtained via http from www.qhull.org.
+Vampire includes a copy of the qhull library from C.B. Barber and
+The Geometry Center and may be obtained via http from www.qhull.org.
 
 \end{verbatim}
-\end{minipage}\\
+\endgroup
+\end{minipage}
 
 
 
 %\section*{Support}
-%\addcontentsline{toc}{section}{Support}
+%\phantomsection\addcontentsline{toc}{section}{Support}
 %As \textit{free} software, there are no guarantees of support for \vampire
 

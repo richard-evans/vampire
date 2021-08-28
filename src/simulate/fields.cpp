@@ -41,6 +41,7 @@
 #include "random.hpp"
 #include "sim.hpp"
 #include "spintorque.hpp"
+#include "spintransport.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
 
@@ -64,7 +65,9 @@ void calculate_fmr_fields(const int,const int);
 void calculate_lagrange_fields(const int,const int);
 void calculate_full_spin_fields(const int start_index,const int end_index);
 
-int calculate_spin_fields(const int start_index,const int end_index){
+namespace sim{
+
+void calculate_spin_fields(const int start_index,const int end_index){
 
 	///======================================================
 	/// 		Subroutine to calculate spin dependent fields
@@ -113,11 +116,11 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	// Add spin torque fields
 	if(sim::internal::enable_spin_torque_fields == true) calculate_full_spin_fields(start_index,end_index);
 
-	return 0;
-
+	return;
 }
 
-int calculate_external_fields(const int start_index,const int end_index){
+
+void calculate_external_fields(const int start_index,const int end_index){
 	///======================================================
 	/// 		Subroutine to calculate external fields
 	///
@@ -159,13 +162,17 @@ int calculate_external_fields(const int start_index,const int end_index){
    // Get updated spin torque fields
    st::get_spin_torque_fields(atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array, start_index, end_index);
 
+   // Get updated spin torque fields
+   spin_transport::calculate_field(start_index, end_index, atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array);
+
 	// FMR Fields only for fmr program
 	if(sim::enable_fmr) calculate_fmr_fields(start_index,end_index);
 
 	// Dipolar Fields
 	calculate_dipolar_fields(start_index,end_index);
 
-	return 0;
+	return;
+}
 }
 
 int calculate_applied_fields(const int start_index,const int end_index){
@@ -393,7 +400,7 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 
 	// Calculate fmr constants
 	const double real_time = sim::time*mp::dt_SI;
-	const double omega = sim::fmr_field_frequency*1.e9; // Hz
+	const double omega = sim::fmr_field_frequency; // Hz
 	const double Hfmrx = sim::fmr_field_unit_vector[0];
 	const double Hfmry = sim::fmr_field_unit_vector[1];
 	const double Hfmrz = sim::fmr_field_unit_vector[2];
@@ -412,11 +419,12 @@ void calculate_fmr_fields(const int start_index,const int end_index){
 
 		// Loop over all materials
 		for(unsigned int mat=0;mat<mp::material.size();mat++){
-			const double Hsinwt_local=mp::material[mat].fmr_field_strength*sin(2.0*M_PI*real_time*mp::material[mat].fmr_field_frequency);
+			const double Hsinwt_local = mp::material[mat].fmr_field_strength * sin( 2.0 * M_PI * real_time * mp::material[mat].fmr_field_frequency );
 
 			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[0]);
 			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[1]);
 			H_fmr_local.push_back(Hsinwt_local*mp::material[mat].fmr_field_unit_vector[2]);
+
 		}
 
 		// Add local field AND global field
@@ -525,8 +533,8 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double strj = stt_rj[material];
 		const double stpj = stt_pj[material];
 
-		const double lambda = 0.0;
-		const double factor = 1.0 / (1.0 + lambda*(sx*stpx + sy*stpy + sz*stpz) );
+		const double stt_lambda = stt_asm[material];
+		const double factor = 1.0 / (1.0 + stt_lambda*(sx*stpx + sy*stpy + sz*stpz) );
 
 		// calculate field
 		hx += factor * ( (strj-alpha*stpj)*(sy*stpz - sz*stpy) + (stpj+alpha*strj)*stpx );
@@ -545,10 +553,13 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double sotrj = sot_rj[material];
 		const double sotpj = sot_pj[material];
 
+		const double sot_lambda = sot_asm[material];
+		const double sot_factor = 1.0 / (1.0 + sot_lambda*(sx*sotpx + sy*sotpy + sz*sotpz) );
+
 		// calculate field
-		hx += (sotrj-alpha*sotpj)*(sy*sotpz - sz*sotpy) + (sotpj+alpha*sotrj)*sotpx;
-		hy += (sotrj-alpha*sotpj)*(sz*sotpx - sx*sotpz) + (sotpj+alpha*sotrj)*sotpy;
-		hz += (sotrj-alpha*sotpj)*(sx*sotpy - sy*sotpx) + (sotpj+alpha*sotrj)*sotpz;
+		hx += sot_factor * ( (sotrj-alpha*sotpj)*(sy*sotpz - sz*sotpy) + (sotpj+alpha*sotrj)*sotpx );
+		hy += sot_factor * ( (sotrj-alpha*sotpj)*(sz*sotpx - sx*sotpz) + (sotpj+alpha*sotrj)*sotpy );
+		hz += sot_factor * ( (sotrj-alpha*sotpj)*(sx*sotpy - sy*sotpx) + (sotpj+alpha*sotrj)*sotpz );
 
 		//----------------------------------------------------------------------------------
 		// save field to spin field array

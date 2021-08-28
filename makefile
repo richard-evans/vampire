@@ -5,20 +5,29 @@
 #===================================================================
 
 # Specify compiler for MPI compilation with openmpi
-export OMPI_CXX=g++ -std=c++0x
+export OMPI_CXX=g++ -std=c++11
 
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 # Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
+
+# Include the FFTW library by uncommenting the -DFFT (off by default)
+#export incFFT= -DFFT -DFFTW_OMP -fopenmp
+#export FFTLIBS= -lfftw3_omp -lfftw3
+
 # Compilers
-ICC=icc -DCOMP='"Intel C++ Compiler"'
+ICC=icc -std=c++0x -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
 PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
+MPIICC=mpiicpc -DMPICF
+
+LIBS= -lstdc++
+#-lm $(FFTLIBS) -L/opt/local/lib/
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
@@ -27,7 +36,7 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=
+
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 
 # Debug Flags
@@ -39,7 +48,6 @@ GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds
 
 PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
 PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
-
 IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 
@@ -47,8 +55,8 @@ LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I.
 LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi
 
 # Performance Flags
-ICC_CFLAGS= -O3 -axSSE3 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
-ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axSSE3
+ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
+ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axCORE-AVX2
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
@@ -130,16 +138,20 @@ include src/constants/makefile
 include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
+include src/hierarchical/makefile
 include src/ltmp/makefile
 include src/main/makefile
 include src/montecarlo/makefile
+include src/micromagnetic/makefile
 include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
 include src/simulate/makefile
+include src/spintransport/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
+include src/environment/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile
@@ -180,13 +192,13 @@ all: serial parallel vdc
 
 # Serial Targets
 serial: $(OBJECTS)
-	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_LDFLAGS)  $(OBJECTS) $(LIBS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
 serial-intel: $(ICC_OBJECTS)
-	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)
+	$(ICC) $(ICC_LDFLAGS) $(LIBS) $(ICC_OBJECTS) -o $(EXECUTABLE)-intel
 
 $(ICC_OBJECTS): obj/%_i.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_CFLAGS) $(OPTIONS) $<
@@ -216,7 +228,7 @@ $(LLVMDB_OBJECTS): obj/%_llvmdb.o: src/%.cpp
 	$(LLVM) -c -o $@ $(LLVM_DBCFLAGS) $(OPTIONS) $<
 
 intel-debug: $(ICCDB_OBJECTS)
-	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)
+	$(ICC) $(ICC_DBLFLAGS) $(LIBS) $(ICCDB_OBJECTS) -o $(EXECUTABLE)-intel-debug
 
 $(ICCDB_OBJECTS): obj/%_idb.o: src/%.cpp
 	$(ICC) -c -o $@ $(ICC_DBCFLAGS) $(OPTIONS) $<
@@ -236,16 +248,16 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(PEXECUTABLE)
+	$(MPICC) $(GCC_LDFLAGS) $(MPI_OBJECTS) $(LIBS) -o $(PEXECUTABLE)
 
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
 
 parallel-intel: $(MPI_ICC_OBJECTS)
-	$(MPICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)
+	$(MPIICC) $(ICC_LDFLAGS) $(LIBS) $(MPI_ICC_OBJECTS) -o $(PEXECUTABLE)-intel
 
 $(MPI_ICC_OBJECTS): obj/%_i_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(ICC_CFLAGS) $<intel: $(MPI_ICC_OBJECTS)
+	$(MPIICC) -c -o $@ $(ICC_CFLAGS) $<
 
 parallel-cray: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CRAY_LDFLAGS) $(LIBS) $(MPI_CRAY_OBJECTS) -o $(PEXECUTABLE)
@@ -284,10 +296,10 @@ $(MPI_GCCDB_OBJECTS): obj/%_gdb_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_DBCFLAGS) $(OPTIONS) $<
 
 parallel-intel-debug: $(MPI_ICCDB_OBJECTS)
-	$(MPICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(PEXECUTABLE)
+	$(MPIICC) $(ICC_DBLFLAGS) $(LIBS) $(MPI_ICCDB_OBJECTS) -o $(PEXECUTABLE)-intel-debug
 
 $(MPI_ICCDB_OBJECTS): obj/%_idb_mpi.o: src/%.cpp
-	$(MPICC) -c -o $@ $(ICC_DBCFLAGS) $(OPTIONS) $<
+	$(MPIICC) -c -o $@ $(ICC_DBCFLAGS) $(OPTIONS) $<
 
 parallel-cray-debug: $(MPI_CRAY_OBJECTS)
 	$(MPICC) $(CCC_LDFLAGS) $(LIBS) $(MPI_CRAYDB_OBJECTS) -o $(PEXECUTABLE)
@@ -308,7 +320,7 @@ clean:
 purge:
 	@rm -f obj/*.o
 	@rm -f obj/*/*.o
-	@rm -f vampire
+	@rm -f vampire-*
 
 tidy:
 	@rm -f *~
@@ -318,6 +330,12 @@ tidy:
 
 vdc:
 	$(MAKE) -C util/vdc/
+
+vdc-debug:
+	$(MAKE) -C util/vdc/ gcc-debug
+
+vdc-purge:
+	$(MAKE) -C util/vdc/ purge
 
 install:
 	echo "Preparing installation package"

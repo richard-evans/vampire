@@ -35,9 +35,7 @@ namespace program{
 void mm_A_calculation(){
 
 	// check calling of routine if error checking is activated
-	if(err::check==true) std::cout << "program::A_calcaultion has been called" << std::endl;
-
-	double temp=sim::temperature;
+	if(err::check==true) std::cout << "program::A_calcultion has been called" << std::endl;
 
    double Jx,Jy,Jz;
    const double atomic_volume =  1e-30*unitcell::internal::unit_cell_size_x*unitcell::internal::unit_cell_size_x*unitcell::internal::unit_cell_size_x/cs::unit_cell.atom.size();
@@ -49,7 +47,7 @@ void mm_A_calculation(){
 
       for(int nn = atoms::neighbour_list_start_index[atom];nn <= atoms::neighbour_list_end_index[atom]; nn++){
          const int natom = atoms::neighbour_list_array[nn];
-         const int jmaterial = atoms::type_array[natom];
+         //const int jmaterial = atoms::type_array[natom];
          double dx = (atoms::x_coord_array[atom] - atoms::x_coord_array[natom]);
          double dy = (atoms::y_coord_array[atom] - atoms::y_coord_array[natom]);
          double dz = (atoms::z_coord_array[atom] - atoms::z_coord_array[natom]);

@@ -47,6 +47,7 @@ namespace montecarlo{
    void mc_step(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, int num_atoms, std::vector<int> &type_array);
    int cmc_step();
    int cmc_mc_step();
+   void cmc_mc_step_mask();
    void mc_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, std::vector<int> &type_array);
 
    //---------------------------------------------------------------------------
@@ -57,6 +58,11 @@ namespace montecarlo{
    void CMCMCinit();
    void mc_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
                          double min_dim[3], double max_dim[3]);
+
+   void initialise_masked_cmc_mc(const int num_sets,                       // number of sets of constrained and unconstrained atoms
+										   const std::vector<int>& mask,             // unique ID for N sets of atoms with different constraints
+										   const std::vector<bool>& constrained,     // flag to indicate if atom set with mask index is constrained
+										   const std::vector<double>& constraints);  // list of 2N vectors listing constraint angles theta and phi
 
    extern bool mc_parallel_initialized;
 
@@ -74,6 +80,8 @@ namespace montecarlo{
 
    	class cmc_material_t {
    	public:
+
+         bool constrained; // flag indicating if atoms are constrained
 
    		double constraint_phi; /// Constrained minimisation vector (azimuthal) [degrees]
    		double constraint_phi_min; /// loop angle min [degrees]
@@ -93,7 +101,12 @@ namespace montecarlo{
    		// vector magnetisation
    		double M_other[3];
 
+         double sx; // derived direction based on angle
+         double sy;
+         double sz;
+
       	cmc_material_t():
+            constrained(false),
       		constraint_phi(0.0),
       		constraint_phi_min(0.0),
       		constraint_phi_max(0.0),
@@ -101,8 +114,10 @@ namespace montecarlo{
       		constraint_theta(0.0),
       		constraint_theta_min(0.0),
       		constraint_theta_max(0.0),
-      		constraint_theta_delta(5.0)
-
+      		constraint_theta_delta(5.0),
+            sx(0.0),
+            sy(0.0),
+            sz(1.0)
       	{
 
       	//for(int i=0;i<100;i++){
@@ -116,6 +131,7 @@ namespace montecarlo{
    	extern std::vector<cmc_material_t> cmc_mat;
 
    	extern bool is_initialised;
+      extern bool masked_cmc;
 
    	extern int active_material; /// material in current hybrid loop
 

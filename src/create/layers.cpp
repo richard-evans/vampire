@@ -25,9 +25,9 @@ namespace internal{
 //   initial material allocation
 //------------------------------------------------------------------------------
 void layers(std::vector<cs::catom_t> & catom_array){
-
    // If z-height material selection is enabled then do so
 	if(create::internal::select_material_by_z_height){
+
 
 		// Check for interfacial roughness and call custom material assignment routine
 		if(cs::interfacial_roughness) create::internal::roughness(catom_array);

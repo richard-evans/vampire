@@ -237,8 +237,8 @@ namespace exchange{
       // Internal function declarations
       //-------------------------------------------------------------------------
       void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
-      void unroll_exchange_interactions();
-      void unroll_normalised_exchange_interactions();
+      void unroll_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear);
+      void unroll_normalised_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear);
       void unroll_normalised_biquadratic_exchange_interactions();
       void exchange_fields(const int start_index, // first atom for exchange interactions to be calculated
                            const int end_index, // last +1 atom to be calculated

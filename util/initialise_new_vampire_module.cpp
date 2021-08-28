@@ -286,6 +286,8 @@ void create_data(const std::string& file_header, const std::string& nn){
    ofile << "      //------------------------------------------------------------------------" << std::endl;
    ofile << "      // Shared variables inside " << nn << " module" << std::endl;
    ofile << "      //------------------------------------------------------------------------\n" << std::endl;
+   ofile << "      bool enabled; // bool to enable module\n" << std::endl;
+   ofile << "      std::vector<internal::mp_t> mp; // array of material properties\n" << std::endl;
    ofile << "   } // end of internal namespace\n" << std::endl;
    ofile << "} // end of " << nn << " namespace\n" << std::endl;
 
@@ -341,6 +343,8 @@ void create_interface(const std::string& file_header, const std::string& nn){
    ofile << "   bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index){\n" << std::endl;
    ofile << "      // add prefix string" << std::endl;
    ofile << "      std::string prefix=\"material:\";\n" << std::endl;
+   ofile << "      // Check for material id > current array size and if so dynamically expand mp array" << std::endl;
+   ofile << "      if((unsigned int) super_index + 1 > internal::mp.size() && super_index + 1 < 101) internal::mp.resize(super_index + 1);\n" << std::endl;
    ofile << "      //--------------------------------------------------------------------" << std::endl;
    ofile << "      // Keyword not found" << std::endl;
    ofile << "      //--------------------------------------------------------------------" << std::endl;
@@ -438,9 +442,28 @@ void create_internal(const std::string& file_header, const std::string& nn){
    ofile << "      //-------------------------------------------------------------------------" << std::endl;
    ofile << "      // Internal data type definitions" << std::endl;
    ofile << "      //-------------------------------------------------------------------------\n" << std::endl;
+   ofile << "      //-----------------------------------------------------------------------------" << std::endl;
+   ofile << "      // internal materials class for storing material parameters" << std::endl;
+   ofile << "      //-----------------------------------------------------------------------------" << std::endl;
+   ofile << "      class mp_t{\n" << std::endl;
+   ofile << "          private:\n" << std::endl;
+   ofile << "          public:\n" << std::endl;
+   ofile << "             //------------------------------" << std::endl;
+   ofile << "             // material parameter variables" << std::endl;
+   ofile << "             //------------------------------" << std::endl;
+   ofile << "             double test;\n" << std::endl;
+   ofile << "             // constructor" << std::endl;
+   ofile << "             mp_t (const unsigned int max_materials = 100):" << std::endl;
+   ofile << "                test(0.0) // constructor initialisation of test variable" << std::endl;
+   ofile << "             {" << std::endl;
+   ofile << "                // constructor body for initialising more complex data/arrays" << std::endl;
+   ofile << "             }; // end of constructor\n" << std::endl;
+   ofile << "       }; // end of internal::mp class\n" << std::endl;
    ofile << "      //-------------------------------------------------------------------------" << std::endl;
    ofile << "      // Internal shared variables" << std::endl;
    ofile << "      //-------------------------------------------------------------------------\n" << std::endl;
+   ofile << "      extern bool enabled; // bool to enable module\n" << std::endl;
+   ofile << "      extern std::vector<internal::mp_t> mp; // array of material properties\n" << std::endl;
    ofile << "      //-------------------------------------------------------------------------" << std::endl;
    ofile << "      // Internal function declarations" << std::endl;
    ofile << "      //-------------------------------------------------------------------------\n" << std::endl;

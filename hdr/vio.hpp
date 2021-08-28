@@ -49,6 +49,7 @@ extern std::ofstream zinfo;
 extern std::ofstream zmag;
 extern std::ofstream zgrain;
 extern std::ofstream zlog;
+extern std::ofstream dp_fields;
 
 enum textcolor {
    RED=31,
@@ -96,7 +97,9 @@ namespace vin{
    // function to read file on master process and return a std::string of its contents
    extern std::string get_string(std::string const filename, std::string source_file_name, int line);
 
-   uint64_t str_to_uint64(std::string input_str);
+   // simple functions to extract variables from strings
+   extern uint64_t str_to_uint64(std::string input_str);
+   extern double str_to_double(std::string input_str);
 
    extern std::vector<mp::materials_t> read_material;
 

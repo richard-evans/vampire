@@ -63,6 +63,8 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
    atoms::grain_array.resize(    atoms::num_atoms,0);
    atoms::cell_array.resize(     atoms::num_atoms,0);
 
+   atoms::magnetic.resize(       atoms::num_atoms,0);
+
 	atoms::x_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_spin_field_array.resize(atoms::num_atoms,0.0);
 	atoms::z_total_spin_field_array.resize(atoms::num_atoms,0.0);
@@ -116,6 +118,11 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 		atoms::y_spin_array[atom]=sy*modS;
 		atoms::z_spin_array[atom]=sz*modS;
       atoms::m_spin_array[atom]=mp::material[mat].mu_s_SI/9.27400915e-24;
+
+      // generate list of magnetic atoms
+      if( mp::material[mat].non_magnetic == 0 ) atoms::magnetic[atom] = true;
+      else atoms::magnetic[atom] = false;
+
 	}
 
    //---------------------------------------------------------------------------

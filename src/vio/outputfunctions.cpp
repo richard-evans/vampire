@@ -21,6 +21,7 @@
 #include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
+#include "spintransport.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -481,6 +482,17 @@ namespace vout{
       stream << stats::material_energy.output_mean_energy(stats::total,header);
    }
 
+   // Output Function 65
+   void resistance(std::ostream& stream, bool header){
+      stream << generic_output_double("resistance", spin_transport::total_resistance, header);
+   }
+
+   // Output Function 66
+   void current(std::ostream& stream, bool header){
+      stream << generic_output_double("current", spin_transport::total_current, header);
+   }
+
+   // Output Function 67
    void domain_wall_position(std::ostream& stream, bool header){
       stream << sim::domain_wall_centre;
    }

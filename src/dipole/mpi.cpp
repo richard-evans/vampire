@@ -23,6 +23,7 @@
 #include "errors.hpp"
 #include "vio.hpp"
 #include "vmpi.hpp"
+#include "vutil.hpp"
 
 #include "atoms.hpp"
 
@@ -170,33 +171,74 @@ namespace dipole{
                                double cells_macro_cell_size
       ){
 
-         // temporary variables to send and receive data
-         std::vector<int> list_cpu_to_send_to;
-         std::vector<int> list_cells_to_send;
-         std::vector<int> list_cells_to_recv;
-         int num_send_atoms;
-         int num_send_cells;
-         std::vector<int> mpi_send_atoms_cell;
-         std::vector<int> mpi_send_num_atoms_in_cell;
-         std::vector<int> mpi_send_atoms_id;
-         std::vector<double> mpi_send_atoms_pos_x;
-         std::vector<double> mpi_send_atoms_pos_y;
-         std::vector<double> mpi_send_atoms_pos_z;
-         std::vector<double> mpi_send_atoms_mom;
-         std::vector<double> mpi_send_cells_pos_mom;
+        // initiate timer
+        vutil::vtimer_t timer;
 
-         int num_recv_atoms;
-         int num_recv_cells;
-         std::vector<int> mpi_recv_atoms_cell;
-         std::vector<int> mpi_recv_num_atoms_in_cell;
-         std::vector<int> mpi_recv_atoms_id;
-         std::vector<double> mpi_recv_atoms_pos_x;
-         std::vector<double> mpi_recv_atoms_pos_y;
-         std::vector<double> mpi_recv_atoms_pos_z;
-         std::vector<double> mpi_recv_atoms_mom;
-         std::vector<double> mpi_recv_cells_pos_mom;
+        // start timer
+        timer.start();
 
+        // temporary variables to send and receive data
+        std::vector<int> list_cpu_to_send_to;
+        std::vector<int> list_cells_to_send;
+        std::vector<int> list_cells_to_recv;
+        int num_send_atoms;
+        std::vector<int> mpi_send_atoms_cell;
+        std::vector<int> mpi_send_num_atoms_in_cell;
+        std::vector<int> mpi_send_atoms_id;
+        std::vector<double> mpi_send_atoms_pos_x;
+        std::vector<double> mpi_send_atoms_pos_y;
+        std::vector<double> mpi_send_atoms_pos_z;
+        std::vector<double> mpi_send_atoms_mom;
+        std::vector<double> mpi_send_cells_pos_mom;
 
+        int num_recv_atoms;
+        int num_recv_cells;
+        std::vector < int > mpi_recv_atoms_cell;
+        std::vector < int > mpi_recv_num_atoms_in_cell;
+        std::vector < int > mpi_recv_atoms_id;
+        std::vector < double > mpi_recv_atoms_pos_x;
+        std::vector < double > mpi_recv_atoms_pos_y;
+        std::vector < double > mpi_recv_atoms_pos_z;
+        std::vector < double > mpi_recv_atoms_mom;
+        std::vector < double > mpi_recv_cells_pos_mom;
+
+        std::vector < std::vector < int > > mpi_2d_send_atoms_id;
+        std::vector < std::vector < int > > mpi_2d_send_atoms_cell;
+        std::vector < std::vector < int > > mpi_2d_send_num_atoms_in_cell;
+        std::vector < std::vector < double > > mpi_2d_send_atoms_pos_x;
+        std::vector < std::vector < double > > mpi_2d_send_atoms_pos_y;
+        std::vector < std::vector < double > > mpi_2d_send_atoms_pos_z;
+        std::vector < std::vector < double > > mpi_2d_send_atoms_mom;
+        std::vector < std::vector < double > > mpi_2d_send_cells_pos_mom;
+
+        mpi_2d_send_atoms_id.resize(vmpi::num_processors);
+        mpi_2d_send_atoms_cell.resize(vmpi::num_processors);
+        mpi_2d_send_num_atoms_in_cell.resize(vmpi::num_processors);
+        mpi_2d_send_atoms_pos_x.resize(vmpi::num_processors);
+        mpi_2d_send_atoms_pos_y.resize(vmpi::num_processors);
+        mpi_2d_send_atoms_pos_z.resize(vmpi::num_processors);
+        mpi_2d_send_atoms_mom.resize(vmpi::num_processors);
+        mpi_2d_send_cells_pos_mom.resize(vmpi::num_processors);
+
+        std::vector <int>  receive_counts(vmpi::num_processors,0);
+        std::vector <int>  receive_counts_cell(vmpi::num_processors,0);
+        std::vector <int>  receive_counts_2(vmpi::num_processors,0);
+        std::vector <int>  receive_displacements(vmpi::num_processors,0);
+        std::vector <int>  receive_displacements_cells(vmpi::num_processors,0);
+        std::vector <int>  receive_displacements_four_cells(vmpi::num_processors,0);
+        std::vector <int>  counter(vmpi::num_processors,0);
+        std::vector <int>  counter_cells(vmpi::num_processors,0);
+        std::vector <int>  counter_four_cells(vmpi::num_processors,0);
+        std::vector <int>  one_count(vmpi::num_processors,vmpi::num_processors);
+        std::vector <int>  one_displacements(vmpi::num_processors,0);
+        std::vector <int>  recv_counter(vmpi::num_processors,0);
+        std::vector <int>  recv_counter_cells(vmpi::num_processors,0);
+        std::vector <int>  recv_counter_four_cells(vmpi::num_processors,0);
+        std::vector <int>  final_recieve_counter(vmpi::num_processors,0);
+        std::vector <int>  final_recieve_counter_cells(vmpi::num_processors,0);
+        std::vector <int>  final_recieve_counter_four_cells(vmpi::num_processors,0);
+
+        //loop to calcualte if two cells are within the dipole cut off range.
          for(int cpu=0; cpu<vmpi::num_processors; cpu++){
             num_send_atoms = 0;
             int size = ceil(cells_pos_and_mom_array.size()/4.0);
@@ -228,160 +270,297 @@ namespace dipole{
             }
          }
 
-         // Calculate total storage
 
+         // Calculate total storage
+         vmpi::barrier();
+         //can maybe be replaced by proc == vmpir::my_rank
          for(int proc=0; proc<vmpi::num_processors; proc++){
             if(vmpi::my_rank == proc){
+               //loops over cells tou are sending form your cpu (cpu send).
+               // for(unsigned int i=0; i<list_cpu_to_send_to.size(); i++){
+               //
+               //    int cpu_recv = list_cpu_to_send_to[i];
+               //    int cell_send = list_cells_to_send[i];
+               //
+               //    receive_counts[cpu_recv] += cells_num_atoms_in_cell[cell_send];
+               //    receive_counts_cell[cpu_recv] += 1;
+               // }
 
-               for(int cpu=0; cpu<vmpi::num_processors; cpu++){
-                  int counter = 0;
-                  int counter_cells = 0;
-                  if(cpu != vmpi::my_rank){
-                     num_send_atoms = 0;
-                     num_send_cells = 0;
-                     for(unsigned int i=0; i<list_cpu_to_send_to.size(); i++){
-                        int cpu_recv = list_cpu_to_send_to[i];
-                        int cell_send = list_cells_to_send[i];
-                        if(cpu_recv==cpu){
-                           num_send_cells++;
-                           num_send_atoms += cells_num_atoms_in_cell[cell_send];
-                           // resize arrays
-                           mpi_send_atoms_id.resize((num_send_atoms));
-                           mpi_send_atoms_cell.resize((num_send_atoms));
-                           mpi_send_atoms_pos_x.resize((num_send_atoms));
-                           mpi_send_atoms_pos_y.resize((num_send_atoms));
-                           mpi_send_atoms_pos_z.resize((num_send_atoms));
-                           mpi_send_atoms_mom.resize((num_send_atoms));
-                           mpi_send_num_atoms_in_cell.resize((num_send_cells));
-                           mpi_send_cells_pos_mom.resize((4*num_send_cells));
+               // for (int i = 0; i < vmpi::num_processors; ++i)   {
+               //    // resize arrays
+               //    mpi_2d_send_atoms_id[i].resize(receive_counts[cpu_recv]);
+               //    mpi_2d_send_atoms_pos_x[i].resize(receive_counts[cpu_recv]);
+               //    mpi_2d_send_atoms_pos_y[i].resize(receive_counts[cpu_recv]);
+               //    mpi_2d_send_atoms_pos_z[i].resize(receive_counts[cpu_recv]);
+               //    mpi_2d_send_atoms_mom[i].resize(receive_counts[cpu_recv]);
+               //    mpi_2d_send_atoms_cell[i].resize(receive_counts[cpu_recv]);
+               //    mpi_2d_send_num_atoms_in_cell[i].resize(receive_counts[cpu_recv]);
+               //    mpi_2d_send_cells_pos_mom[i].resize(4*receive_counts_cell[cpu_recv]);
+               // }
 
-                           // store data about recv cell
-                           mpi_send_num_atoms_in_cell[counter_cells] = cells_num_atoms_in_cell[cell_send];
-                           mpi_send_cells_pos_mom[4*counter_cells+0] = cells_pos_and_mom_array[4*cell_send+0];
-                           mpi_send_cells_pos_mom[4*counter_cells+1] = cells_pos_and_mom_array[4*cell_send+1];
-                           mpi_send_cells_pos_mom[4*counter_cells+2] = cells_pos_and_mom_array[4*cell_send+2];
-                           // save tmp atoms data to be sent
-                           for(int j=0; j<cells_num_atoms_in_cell[cell_send]; j++){
-                              mpi_send_atoms_cell[counter]  = cell_send;
-                              mpi_send_atoms_id[counter]    = cells_index_atoms_array[cell_send][j];
-                              int atom_id                   = mpi_send_atoms_id[counter];
-                              mpi_send_atoms_pos_x[counter] = atom_pos_x[atom_id];
-                              mpi_send_atoms_pos_y[counter] = atom_pos_y[atom_id];
-                              mpi_send_atoms_pos_z[counter] = atom_pos_z[atom_id];
-                              int type                      = atom_type_array[atom_id];
-                              const double mus              = mp::material[type].mu_s_SI/9.27400915e-24;
-                              mpi_send_atoms_mom[counter]   = mus;
-                              counter++;
-                           }
-                           counter_cells++;
-                        }
-                     }
-                     // Send num_of_atoms to be received and allocate memory in arrays
-                     // my_rank send data to other cpus
-                     // int cpu_send = vmpi::my_rank; // unused variable
-                     int cpu_recv = cpu;
-                     MPI_Send(&num_send_cells,           1,                MPI_INT,    cpu_recv, 111, MPI_COMM_WORLD);
-                     MPI_Send(&num_send_atoms,           1,                MPI_INT,    cpu_recv, 103, MPI_COMM_WORLD);
-                     MPI_Send(&mpi_send_atoms_id[0],     num_send_atoms,   MPI_INT,    cpu_recv, 104, MPI_COMM_WORLD);
-                     MPI_Send(&mpi_send_atoms_pos_x[0],  num_send_atoms,   MPI_DOUBLE, cpu_recv, 105, MPI_COMM_WORLD);
-                     MPI_Send(&mpi_send_atoms_pos_y[0],  num_send_atoms,   MPI_DOUBLE, cpu_recv, 106, MPI_COMM_WORLD);
-                     MPI_Send(&mpi_send_atoms_pos_z[0],  num_send_atoms,   MPI_DOUBLE, cpu_recv, 107, MPI_COMM_WORLD);
-                     MPI_Send(&mpi_send_atoms_mom[0],    num_send_atoms,   MPI_DOUBLE, cpu_recv, 108, MPI_COMM_WORLD);
-                     MPI_Send(&mpi_send_atoms_cell[0],   num_send_atoms,   MPI_INT,    cpu_recv, 109, MPI_COMM_WORLD);
-                     MPI_Send(&mpi_send_num_atoms_in_cell[0],  num_send_cells,   MPI_INT,    cpu_recv, 110, MPI_COMM_WORLD);
-                     MPI_Send(&mpi_send_cells_pos_mom[0],  4*num_send_cells,   MPI_DOUBLE,   cpu_recv, 113, MPI_COMM_WORLD);
-                  } //end if(cpu!=vmpi::my_rank)
+            //}
+
+               //loops over cells tou are sending form your cpu (cpu send).
+               for(unsigned int i=0; i<list_cpu_to_send_to.size(); i++){
+
+                  //determine cpu to send cell too
+                  int cpu_recv = list_cpu_to_send_to[i];
+                  //which cell youre sending
+                  int cell_send = list_cells_to_send[i];
+
+                  //determine total number of cells/atoms sent to each processor so far,
+                  receive_counts[cpu_recv] += cells_num_atoms_in_cell[cell_send];
+                  receive_counts_cell[cpu_recv] += 1;
                }
 
-
-            }
-            // if I am not =proc, then I recv data
-            else{
-               //fprintf(stderr," >>> rank %d is receiving data from proc %d <<<<< \n",vmpi::my_rank,proc);
-               int cpu_send = proc;
-               // int cpu_recv = vmpi::my_rank; // unused variable
-               // my_rank receives number of objects that hav been sent from other cpus
-               MPI_Recv(&num_recv_cells, 1, MPI_INT, cpu_send, 111, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&num_recv_atoms, 1, MPI_INT, cpu_send, 103, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-               // resize tmp recv arrays
-               mpi_recv_atoms_id.resize(num_recv_atoms);
-               mpi_recv_atoms_pos_x.resize(num_recv_atoms);
-               mpi_recv_atoms_pos_y.resize(num_recv_atoms);
-               mpi_recv_atoms_pos_z.resize(num_recv_atoms);
-               mpi_recv_atoms_mom.resize(num_recv_atoms);
-               mpi_recv_atoms_cell.resize(num_recv_atoms);
-               mpi_recv_num_atoms_in_cell.resize(num_recv_cells);
-               mpi_recv_cells_pos_mom.resize(4*num_recv_cells);
-
-               // receive data for arrays
-               MPI_Recv(&mpi_recv_atoms_id[0],     num_recv_atoms, MPI_INT,      cpu_send, 104, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_atoms_pos_x[0],  num_recv_atoms, MPI_DOUBLE,   cpu_send, 105, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_atoms_pos_y[0],  num_recv_atoms, MPI_DOUBLE,   cpu_send, 106, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_atoms_pos_z[0],  num_recv_atoms, MPI_DOUBLE,   cpu_send, 107, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_atoms_mom[0],    num_recv_atoms, MPI_DOUBLE,   cpu_send, 108, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_atoms_cell[0],   num_recv_atoms, MPI_INT,      cpu_send, 109, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_num_atoms_in_cell[0],   num_recv_cells, MPI_INT,      cpu_send, 110, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-               MPI_Recv(&mpi_recv_cells_pos_mom[0],   4*num_recv_cells,   MPI_DOUBLE,   cpu_send, 113, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-
-               std::vector<int> recv_cell_id(num_recv_cells);
-               std::vector<int> old_size_array(num_recv_cells,0);
-               std::vector<bool> bool_array(num_recv_cells,1); /// bool arrays to check whether a cell has been already considered
-               int cell = 0;
-               for(int lc=0; lc<num_recv_cells; lc++){
-                  int cell_recv_counter=0;
+               for (int i = 0; i < vmpi::num_processors; ++i)   {
                   // resize arrays
-                  for(unsigned int i=cells_num_cells; i<proc_cell_index_array1D.size(); i++){
-                     cell = i;
-                     int size = cells_index_atoms_array[cell].size();
-                     old_size_array[lc]=size;
-                     if((mpi_recv_cells_pos_mom[4*lc+0]==cells_pos_and_mom_array[4*cell+0]) &&
-                     (mpi_recv_cells_pos_mom[4*lc+1]==cells_pos_and_mom_array[4*cell+1]) &&
-                     (mpi_recv_cells_pos_mom[4*lc+2]==cells_pos_and_mom_array[4*cell+2]) && bool_array[lc]!=0){
-
-                        recv_cell_id[lc] = cell;
-
-                        cell_recv_counter++;
-                        bool_array[lc]=0;
-                     }
-                     else if((mpi_recv_cells_pos_mom[4*lc+0]==cells_pos_and_mom_array[4*cell+0]) &&
-                     (mpi_recv_cells_pos_mom[4*lc+1]==cells_pos_and_mom_array[4*cell+1]) &&
-                     (mpi_recv_cells_pos_mom[4*lc+2]==cells_pos_and_mom_array[4*cell+2]) && bool_array[lc]==0){
-                        cells_num_atoms_in_cell[cell]=0;
-                     }
-                  }
+                  mpi_2d_send_atoms_id[i].resize(receive_counts[i]);
+                  mpi_2d_send_atoms_pos_x[i].resize(receive_counts[i]);
+                  mpi_2d_send_atoms_pos_y[i].resize(receive_counts[i]);
+                  mpi_2d_send_atoms_pos_z[i].resize(receive_counts[i]);
+                  mpi_2d_send_atoms_mom[i].resize(receive_counts[i]);
+                  mpi_2d_send_atoms_cell[i].resize(receive_counts[i]);
+                  mpi_2d_send_num_atoms_in_cell[i].resize(receive_counts[i]);
+                  mpi_2d_send_cells_pos_mom[i].resize(4*receive_counts_cell[i]);
                }
 
-               int counter_atoms=0;
-               for(int lc=0; lc<num_recv_cells; lc++){
-                  // if there is only one cell with that coord
-                  int cell = recv_cell_id[lc];
-                  int old_size = cells_index_atoms_array[cell].size();
-                  cells_num_atoms_in_cell[cell] += mpi_recv_num_atoms_in_cell[lc];
+               for(unsigned int i=0; i<list_cpu_to_send_to.size(); i++){
 
-                  cells_atom_in_cell_coords_array_x[cell].resize(mpi_recv_num_atoms_in_cell[lc]+old_size);
-                  cells_atom_in_cell_coords_array_y[cell].resize(mpi_recv_num_atoms_in_cell[lc]+old_size);
-                  cells_atom_in_cell_coords_array_z[cell].resize(mpi_recv_num_atoms_in_cell[lc]+old_size);
-                  cells_index_atoms_array[cell].resize(mpi_recv_num_atoms_in_cell[lc]+old_size);
+                  //determine cpu to send cell too
+                  int cpu_recv = list_cpu_to_send_to[i];
+                  //which cell youre sending
+                  int cell_send = list_cells_to_send[i];
 
-                  for(int atom=0; atom<mpi_recv_num_atoms_in_cell[lc]; atom++){
-                     int id = atom+old_size;
-                     cells_index_atoms_array[cell][id]           = mpi_recv_atoms_id[counter_atoms];
-                     cells_atom_in_cell_coords_array_x[cell][id] = mpi_recv_atoms_pos_x[counter_atoms];
-                     cells_atom_in_cell_coords_array_y[cell][id] = mpi_recv_atoms_pos_y[counter_atoms];
-                     cells_atom_in_cell_coords_array_z[cell][id] = mpi_recv_atoms_pos_z[counter_atoms];
+                  // store data about recv cell
+                  //stored in a 2d array for each cpu that receives data - for the gather command later.
+                  int N_cell                                        = counter_cells[cpu_recv];
+                  mpi_2d_send_num_atoms_in_cell[cpu_recv][N_cell]   = cells_num_atoms_in_cell[cell_send];
+                  mpi_2d_send_cells_pos_mom[cpu_recv][4*N_cell+0]   = cells_pos_and_mom_array[4*cell_send+0];
+                  mpi_2d_send_cells_pos_mom[cpu_recv][4*N_cell+1]   = cells_pos_and_mom_array[4*cell_send+1];
+                  mpi_2d_send_cells_pos_mom[cpu_recv][4*N_cell+2]   = cells_pos_and_mom_array[4*cell_send+2];
+                  mpi_2d_send_cells_pos_mom[cpu_recv][4*N_cell+3]   = cells_pos_and_mom_array[4*cell_send+3];
+                  //std::cout <<"initiual\t" <<  N_cell << '\t' <<  cpu_recv << "\t" << cell_send << '\t' << cells_num_atoms_in_cell[cell_send] << '\t' << cells_pos_and_mom_array[4*cell_send+0] << '\t'<<std::endl;
 
-                     counter_atoms++;
+
+                  // save tmp atoms data to be sent
+                  for(int j=0; j<cells_num_atoms_in_cell[cell_send]; j++){
+
+                     int N                                  = counter[cpu_recv];
+                     int atom_id                            = cells_index_atoms_array[cell_send][j];
+                     int type                               = atom_type_array[atom_id];
+                     const double mus                       = mp::material[type].mu_s_SI/9.27400915e-24;
+                     mpi_2d_send_atoms_cell[cpu_recv][N]    = cell_send;
+                     mpi_2d_send_atoms_id[cpu_recv][N]      = atom_id;
+                     mpi_2d_send_atoms_pos_x[cpu_recv][N]   = atom_pos_x[atom_id];
+                     mpi_2d_send_atoms_pos_y[cpu_recv][N]   = atom_pos_y[atom_id];
+                     mpi_2d_send_atoms_pos_z[cpu_recv][N]   = atom_pos_z[atom_id];
+                     mpi_2d_send_atoms_mom[cpu_recv][N]     = mus;
+                     counter[cpu_recv]++;
+                     //std::cout << j << '\t' <<  atom_id << "\t" << atom_pos_x[atom_id] << '\t' << atom_pos_y[atom_id] << '\t' << atom_pos_z[atom_id] << '\t'<<std::endl;
+
                   }
+                  counter_cells[cpu_recv]++;
+                  counter_four_cells[cpu_recv] +=4;
+                  //counts the number of cells
                }
-            } //end else statement
+            }
          }
 
-         const double is = sizeof(int);
-         const double ds = sizeof(double);
 
-         double mem_tot =  double(list_cpu_to_send_to.size())*is +
+         //calcualte the displacesments for the gather command
+         for (int proc_rec = 1; proc_rec < vmpi::num_processors; proc_rec ++){
+             one_displacements[proc_rec] = one_displacements[proc_rec-1] + vmpi::num_processors;
+          }
+
+          //calculate the total number of things sent.
+         int total = one_displacements[vmpi::num_processors-1] + one_count[vmpi::num_processors - 1];
+
+         //resize the receive arrays
+         recv_counter.resize(total);
+         recv_counter_cells.resize(total);
+         recv_counter_four_cells.resize(total);
+
+
+        for (int proc_recv = 0; proc_recv < vmpi::num_processors; proc_recv ++){
+           MPI_Gatherv(&receive_counts[0],      vmpi::num_processors, MPI_INT, &recv_counter[0],         &one_count[0], &one_displacements[0], MPI_INT, proc_recv, MPI_COMM_WORLD);
+           MPI_Gatherv(&receive_counts_cell[0], vmpi::num_processors, MPI_INT, &recv_counter_cells[0],   &one_count[0], &one_displacements[0], MPI_INT, proc_recv, MPI_COMM_WORLD);
+        }
+
+
+         int recv = 0;
+         int send = 0;
+
+
+
+         for (int i= 0; i < vmpi::num_processors*vmpi::num_processors; i ++){
+
+            if (recv == vmpi::my_rank){
+               final_recieve_counter[send]            = recv_counter[i];
+               final_recieve_counter_cells[send]      = recv_counter_cells[i];
+               final_recieve_counter_four_cells[send] = final_recieve_counter_cells[send]*4;
+            }
+
+            recv++;
+
+            if (recv > vmpi::num_processors -1){
+             recv = 0;
+             send = send +1;
+            }
+       }
+
+
+
+
+       for (int proc_rec = 1; proc_rec < vmpi::num_processors; proc_rec ++){
+          receive_displacements[proc_rec]             = receive_displacements[proc_rec-1]          + final_recieve_counter[proc_rec-1];
+          receive_displacements_cells[proc_rec]       = receive_displacements_cells[proc_rec-1]    + final_recieve_counter_cells[proc_rec-1];
+          receive_displacements_four_cells[proc_rec]  = receive_displacements_cells[proc_rec]*4;
+        }
+
+
+
+        //last index+ number in final displacement!
+        num_recv_atoms = receive_displacements[vmpi::num_processors -1]       + final_recieve_counter[vmpi::num_processors -1];
+        num_recv_cells = receive_displacements_cells[vmpi::num_processors -1] + final_recieve_counter_cells[vmpi::num_processors -1];
+
+        mpi_recv_atoms_id.resize(num_recv_atoms);
+        mpi_recv_atoms_pos_x.resize(num_recv_atoms);
+        mpi_recv_atoms_pos_y.resize(num_recv_atoms);
+        mpi_recv_atoms_pos_z.resize(num_recv_atoms);
+        mpi_recv_atoms_mom.resize(num_recv_atoms);
+        mpi_recv_atoms_cell.resize(num_recv_atoms);
+        mpi_recv_num_atoms_in_cell.resize(num_recv_cells);
+        mpi_recv_cells_pos_mom.resize(4*num_recv_cells);
+
+
+
+
+
+        for (int proc_recv = 0; proc_recv < vmpi::num_processors; proc_recv ++){
+
+           int N        = counter[proc_recv];
+           int N_cells  = counter_cells[proc_recv];
+           //If N ==0 skip
+
+           mpi_send_atoms_id.resize(N);
+           mpi_send_atoms_pos_x.resize(N);
+           mpi_send_atoms_pos_y.resize(N);
+           mpi_send_atoms_pos_z.resize(N);
+           mpi_send_atoms_mom.resize(N);
+           mpi_send_atoms_cell.resize(N);
+           mpi_send_num_atoms_in_cell.resize(N_cells);
+           mpi_send_cells_pos_mom.resize(4*N_cells);
+
+
+           for (int i = 0; i < N;i++){
+             mpi_send_atoms_id[i]               = mpi_2d_send_atoms_id[proc_recv][i];
+             mpi_send_atoms_pos_x[i]            = mpi_2d_send_atoms_pos_x[proc_recv][i];
+             mpi_send_atoms_pos_y[i]            = mpi_2d_send_atoms_pos_y[proc_recv][i];
+             mpi_send_atoms_pos_z[i]            = mpi_2d_send_atoms_pos_z[proc_recv][i];
+             mpi_send_atoms_mom[i]              = mpi_2d_send_atoms_mom[proc_recv][i];
+             mpi_send_atoms_cell[i]             = mpi_2d_send_atoms_cell[proc_recv][i];
+            //std::cout << proc_recv << '\t' << i << '\t' <<  mpi_send_atoms_id[i] << "\t" << mpi_send_atoms_pos_x[i] << '\t' << mpi_send_atoms_pos_y[i] << '\t' << mpi_send_atoms_pos_z[i] << '\t'<<std::endl;
+            //std::cout << i << '\t' <<  proc_recv << '\t' << cells_num_atoms_in_cell[cell_send] << '\t' << cells_pos_and_mom_array[4*cell_send+0] << '\t'<<std::endl;
+
+            }
+            //std::cout <<"N\t" <<  N_cells << std::endl;
+            for (int i = 0; i < N_cells;i++){
+               mpi_send_cells_pos_mom[4*i + 0]  = mpi_2d_send_cells_pos_mom[proc_recv][4*i + 0];
+               mpi_send_cells_pos_mom[4*i + 1]  = mpi_2d_send_cells_pos_mom[proc_recv][4*i + 1];
+               mpi_send_cells_pos_mom[4*i + 2]  = mpi_2d_send_cells_pos_mom[proc_recv][4*i + 2];
+               mpi_send_cells_pos_mom[4*i + 3]  = mpi_2d_send_cells_pos_mom[proc_recv][4*i + 3];
+               mpi_send_num_atoms_in_cell[i]    = mpi_2d_send_num_atoms_in_cell[proc_recv][i];
+            //   std::cout << i << '\t' << proc_recv << '\t' << mpi_send_num_atoms_in_cell[i] << '\t' <<  mpi_send_cells_pos_mom[4*i + 0] << "\t" << mpi_send_cells_pos_mom[4*i + 1] << '\t' << mpi_send_cells_pos_mom[4*i + 2] << '\t' << mpi_send_cells_pos_mom[4*i + 3] << '\t'<<std::endl;
+             }
+
+             MPI_Gatherv(&mpi_send_atoms_id[0],          counter[proc_recv],              MPI_INT,    &mpi_recv_atoms_id[0],           &final_recieve_counter[0],             &receive_displacements[0],             MPI_INT,    proc_recv, MPI_COMM_WORLD);
+             MPI_Gatherv(&mpi_send_atoms_pos_x[0],       counter[proc_recv],              MPI_DOUBLE, &mpi_recv_atoms_pos_x[0],        &final_recieve_counter[0],             &receive_displacements[0],             MPI_DOUBLE, proc_recv, MPI_COMM_WORLD);
+             MPI_Gatherv(&mpi_send_atoms_pos_y[0],       counter[proc_recv],              MPI_DOUBLE, &mpi_recv_atoms_pos_y[0],        &final_recieve_counter[0],             &receive_displacements[0],             MPI_DOUBLE, proc_recv, MPI_COMM_WORLD);
+             MPI_Gatherv(&mpi_send_atoms_pos_z[0],       counter[proc_recv],              MPI_DOUBLE, &mpi_recv_atoms_pos_z[0],        &final_recieve_counter[0],             &receive_displacements[0],             MPI_DOUBLE, proc_recv, MPI_COMM_WORLD);
+             MPI_Gatherv(&mpi_send_atoms_mom[0],         counter[proc_recv],              MPI_DOUBLE, &mpi_recv_atoms_mom[0],          &final_recieve_counter[0],             &receive_displacements[0],             MPI_DOUBLE, proc_recv, MPI_COMM_WORLD);
+             MPI_Gatherv(&mpi_send_atoms_cell[0],        counter[proc_recv],              MPI_INT,    &mpi_recv_atoms_cell[0],         &final_recieve_counter[0],             &receive_displacements[0],             MPI_INT,    proc_recv, MPI_COMM_WORLD);
+             MPI_Gatherv(&mpi_send_num_atoms_in_cell[0], counter_cells[proc_recv],        MPI_INT,    &mpi_recv_num_atoms_in_cell[0],  &final_recieve_counter_cells[0],       &receive_displacements_cells[0],       MPI_INT,    proc_recv, MPI_COMM_WORLD);
+             MPI_Gatherv(&mpi_send_cells_pos_mom[0],     counter_four_cells[proc_recv],   MPI_DOUBLE, &mpi_recv_cells_pos_mom[0],      &final_recieve_counter_four_cells[0],  &receive_displacements_four_cells[0],  MPI_DOUBLE, proc_recv, MPI_COMM_WORLD);
+          }
+
+
+
+          // std:: cout<<  "number of received cells:\t" << num_recv_cells <<std::endl;
+          // std:: cout<<  "proc cell index 1D:\t" << proc_cell_index_array1D.size() <<std::endl;
+          // std:: cout<<  "cells num cells:\t" << cells_num_cells <<std::endl;
+         std::vector<int>  recv_cell_id(num_recv_cells);
+         std::vector<int>  old_size_array(num_recv_cells,0);
+         std::vector<bool> bool_array(num_recv_cells,1); /// bool arrays to check whether a cell has been already considered
+
+         int cell = 0;
+         for(int lc=0; lc<num_recv_cells; lc++){
+            int cell_recv_counter=0;
+            // resize arrays
+         //   std::cout <<lc << '\t' <<  mpi_recv_cells_pos_mom[4*lc+0] << '\t' << mpi_recv_cells_pos_mom[4*lc+1] << '\t' << mpi_recv_cells_pos_mom[4*lc+2] << '\t' << mpi_recv_cells_pos_mom[4*lc+3] <<std::endl;
+            for(unsigned int i=cells_num_cells; i<proc_cell_index_array1D.size(); i++){
+               cell = i;
+               int size = cells_index_atoms_array[cell].size();
+               old_size_array[lc]=size;
+               //std::cout << lc << '\t' << cell << "\t" << cells_num_cells << '\t' << proc_cell_index_array1D.size() << "\t" << mpi_recv_cells_pos_mom[4*lc+0]<< "\t" << cells_pos_and_mom_array[4*cell+0]  << "\t" << mpi_recv_cells_pos_mom[4*lc+1]<< "\t" << cells_pos_and_mom_array[4*cell+1]  << "\t" << mpi_recv_cells_pos_mom[4*lc+2]<< "\t" << cells_pos_and_mom_array[4*cell+2] << "\t" << bool_array[lc] << std::endl;
+
+               if((mpi_recv_cells_pos_mom[4*lc+0] == cells_pos_and_mom_array[4*cell+0]) &&
+               (mpi_recv_cells_pos_mom[4*lc+1]    == cells_pos_and_mom_array[4*cell+1]) &&
+               (mpi_recv_cells_pos_mom[4*lc+2]    == cells_pos_and_mom_array[4*cell+2]) && bool_array[lc]!=0){
+               //   std::cout << "A" << std::endl;
+                  recv_cell_id[lc] = cell;
+                  //std::cout << lc << '\t' << cell << std::endl;// "\t" << cells_num_cells << '\t' << proc_cell_index_array1D.size() << "\t" << num_recv_cells<< std::endl;
+
+
+                  cell_recv_counter++;
+                  bool_array[lc]=0;
+               }
+               else if((mpi_recv_cells_pos_mom[4*lc+0] == cells_pos_and_mom_array[4*cell+0]) &&
+                       (mpi_recv_cells_pos_mom[4*lc+1] == cells_pos_and_mom_array[4*cell+1]) &&
+                       (mpi_recv_cells_pos_mom[4*lc+2] == cells_pos_and_mom_array[4*cell+2]) && bool_array[lc]==0){
+                     //     std::cout << "B" << std::endl;
+
+                          cells_num_atoms_in_cell[cell]=0;
+               }
+            }
+         }
+
+
+
+
+         int counter_atoms=0;
+         for(int lc=0; lc<num_recv_cells; lc++){
+            // if there is only one cell with that coord
+            int cell = recv_cell_id[lc];
+            int old_size = cells_index_atoms_array[cell].size();
+            cells_num_atoms_in_cell[cell] += mpi_recv_num_atoms_in_cell[lc];
+            //std::cout <<cell << '\t' <<  lc << "\t" << num_recv_cells << '\t' << mpi_recv_num_atoms_in_cell[lc] << '\t' << cells_num_atoms_in_cell[cell] <<std::endl;
+
+            cells_atom_in_cell_coords_array_x[cell].resize(mpi_recv_num_atoms_in_cell[lc]+old_size);
+            cells_atom_in_cell_coords_array_y[cell].resize(mpi_recv_num_atoms_in_cell[lc]+old_size);
+            cells_atom_in_cell_coords_array_z[cell].resize(mpi_recv_num_atoms_in_cell[lc]+old_size);
+            cells_index_atoms_array[cell].resize(mpi_recv_num_atoms_in_cell[lc]+old_size);
+
+            for(int atom=0; atom<mpi_recv_num_atoms_in_cell[lc]; atom++){
+               int id = atom+old_size;
+               cells_index_atoms_array[cell][id]           = mpi_recv_atoms_id[counter_atoms];
+               cells_atom_in_cell_coords_array_x[cell][id] = mpi_recv_atoms_pos_x[counter_atoms];
+               cells_atom_in_cell_coords_array_y[cell][id] = mpi_recv_atoms_pos_y[counter_atoms];
+               cells_atom_in_cell_coords_array_z[cell][id] = mpi_recv_atoms_pos_z[counter_atoms];
+
+               counter_atoms++;
+            }
+         }
+
+
+
+         //    } //end else statement
+         // }
+
+         //const double is = sizeof(int);
+         //const double ds = sizeof(double);
+
+         /*double mem_tot =  double(list_cpu_to_send_to.size())*is +
                            double(list_cells_to_send.size())*is +
                            double(list_cells_to_recv.size())*is +
                            double(mpi_send_atoms_cell.size())*is +
@@ -399,14 +578,12 @@ namespace dipole{
                            double(mpi_recv_atoms_pos_y.size())*ds +
                            double(mpi_recv_atoms_pos_z.size())*ds +
                            double(mpi_recv_atoms_mom.size())*ds +
-                           double(mpi_recv_cells_pos_mom.size())*ds;
+                           double(mpi_recv_cells_pos_mom.size())*ds;*/
 
-         double global_tot = 0.0;
-
-         MPI_Reduce(&mem_tot, &global_tot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-
-         std::cout << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB" << std::endl;
-         zlog << zTs() << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB"<< std::endl;
+         //double global_tot = 0.0;
+         //MPI_Reduce(&mem_tot, &global_tot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+         //std::cout << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB" << std::endl;
+         //zlog << zTs() << "Total memory for tensor construction (all CPUS): " << global_tot*1.0e-6 << " MB"<< std::endl;
 
          // Free memory
          list_cpu_to_send_to.clear();
@@ -429,7 +606,11 @@ namespace dipole{
          mpi_recv_atoms_mom.clear();
          mpi_recv_cells_pos_mom.clear();
 
+         // stop timer
+         timer.stop();
+
          return EXIT_SUCCESS;
+
       }
 
       /*------------------------------------------------*/

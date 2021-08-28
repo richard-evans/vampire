@@ -20,6 +20,8 @@ bcc110.o \
 fcc.o \
 hcp.o \
 heusler.o \
+honeycomb.o \
+honeycomb-a.o \
 kagome.o \
 rocksalt.o \
 spinel.o \

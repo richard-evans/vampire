@@ -25,7 +25,11 @@ namespace montecarlo{
    // Externally visible variables
    //------------------------------------------------------------------------------
 
-   bool mc_parallel_initialized;
+   bool mc_parallel_initialized = false;
+
+   namespace cmc{
+      bool masked_cmc = false;
+   }
 
    namespace internal{
       //------------------------------------------------------------------------

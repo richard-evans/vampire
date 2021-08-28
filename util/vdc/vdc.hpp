@@ -16,8 +16,14 @@
 // C++ standard library headers
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <functional>
+#include <string>
 
 namespace vdc{
+
+   // input filename
+   extern std::string input_file;
 
    // program option flags
    extern bool verbose;
@@ -33,11 +39,14 @@ namespace vdc{
    // keyword variables
    extern std::string colour_keyword;
    extern std::string custom_colourmap_file;
+   extern std::vector<std::vector<double>> colourmap;
+   extern std::vector<std::string> colourmaps;
    extern bool x_axis_colour;
-   extern std::string slice_type;
+   extern bool default_camera_pos;
 
    // enumerated integers for option selection
    enum format_t{ binary = 0, text = 1};
+   enum slice_type{ box, box_void, sphere, cylinder};
    extern format_t format;
 
    // simple struct to store material parameters
@@ -48,8 +57,29 @@ namespace vdc{
       std::string element;
    };
 
+   // struct to hold input parameters, value and line in input file for error check
+   struct input_t{
+      std::string key;
+      std::vector<std::string> value;
+      unsigned int line_number;
+   };
+
+   // struct to hold slice information
+   struct slice_t{
+      enum slice_type type;
+      std::vector<double> param;
+      std::vector<double> bound;
+   };
+
+   // vector of slices
+   extern std::vector<slice_t> slices;
+
+   // unordered map of input keys to function wrappers
+   extern const std::unordered_map<std::string,std::function<void(const input_t&)>> key_list;
+
    extern uint64_t num_atoms;
 
+   // two sets of ids required
    extern unsigned int vdc_start_file_id;
    extern unsigned int vdc_final_file_id;
    extern unsigned int start_file_id;
@@ -80,18 +110,31 @@ namespace vdc{
    extern std::vector<double> vector_y;
    extern std::vector<double> vector_x;
 
+   // povray camera settings
+   extern std::vector<double> camera_pos;
+   extern std::vector<double> camera_look_at;
+   extern double camera_zoom;
+   extern std::string background_colour;
+
+   // povray shape sizes
+   extern std::vector<double> atom_sizes;
+   extern std::vector<double> arrow_sizes;
+
    // non-magnetic atom data
    extern uint64_t num_nm_atoms;
    extern std::vector<int> nm_category;
    extern std::vector<int> nm_type;
    extern std::vector<double> nm_coordinates;
 
+   // cell data
+   extern double cell_size; // Angstroms
    extern unsigned int total_cells;
    extern unsigned int nx_cells;
    extern unsigned int ny_cells;
    extern unsigned int nz_cells;
 
    extern std::vector<int> atom_cell_id;
+   extern std::vector<int> num_atoms_in_cell;
    extern std::vector<double> cell_coords;
    extern std::vector< std::vector< std::vector <double> > > cell_magnetization;
 
@@ -109,33 +152,70 @@ namespace vdc{
    extern double ssc_bin_width; // width of each bin (Agstroms)
    extern double ssc_inv_bin_width; // 1/bin width
 
-   // Functions
-   int command( int argc, char* argv[]);
+   //==========================================
+   // Forward function declarations
+   //==========================================
+
+   // main
+   void command( int argc, char* argv[]);
+   void read_and_set();
    void process_coordinates();
    void process_spins();
 
-   // forward function declarations
+   // non-magnetic
    void read_nm_metadata();
    void read_nm_data();
    void slice_nm_system();
 
+   // XYZ
    void output_xyz_file();
-   void output_inc_file(unsigned int spin_file_id);
-   void output_povray_file();
+
+   // VTK
    void output_vtk_file(unsigned int spin_file_id);
-   void output_ssc_file(unsigned int spin_file_id);
+   
+   // TXT
    void output_txt_file(unsigned int spin_file_id);
 
-   void initialise_ssc();   
-   void output_average_ssc_file();
+   // Povray
+   void initialise_povray();
+   void output_inc_file(unsigned int spin_file_id);
+   void output_povray_file();
+   
+   // Colour
+   void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
+   void initialise_colourwheel();
 
+
+   // SSC
+   void initialise_ssc();
+   void output_average_ssc_file();
+   void output_ssc_file(unsigned int spin_file_id);
+ 
+
+   // CELL
    void initialise_cells();
    void output_cell_file(unsigned int spin_file_id);
 
-   void rgb( const double& sx, const double& sy, const double& sz, double &red, double &green, double &blue);
-
-   int colourwheel ( std::vector<std::vector<double>>& colourmap );
-
+   // setting functions
+   void set_frame_start(const input_t &input);
+   void set_frame_final(const input_t &input);
+   void set_remove_materials(const input_t &input);
+   void set_afm(const input_t &input);
+   void set_slice(const input_t &input);
+   void set_slice_void(const input_t &input);
+   void set_slice_sphere(const input_t &input); 
+   void set_slice_cylinder(const input_t &input);
+   void set_vector_z(const input_t &input);
+   void set_vector_x(const input_t &input);
+   void set_colourmap(const input_t &input);
+   void set_custom_colourmap(const input_t &input);
+   void set_3D(const input_t &input);
+   void set_camera_position(const input_t &input);
+   void set_camera_look_at(const input_t &input);
+   void set_camera_zoom(const input_t &input);
+   void set_background_colour(const input_t &input);
+   void set_atom_sizes(const input_t &input);
+   void set_arrow_sizes(const input_t &input);
 }
 
 #endif //VDC_H_

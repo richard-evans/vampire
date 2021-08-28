@@ -78,15 +78,15 @@ namespace cells{
       // Calculate number of microcells
       //-------------------------------------------------------------------------------------
       // determine number of stacks in x and y (global)
-      unsigned int dx =  static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cells::macro_cell_size));
-      unsigned int dy =  static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cells::macro_cell_size));
-      unsigned int dz =  static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cells::macro_cell_size));
+      unsigned int dx =  static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cells::macro_cell_size_x));
+      unsigned int dy =  static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cells::macro_cell_size_y));
+      unsigned int dz =  static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cells::macro_cell_size_z));
 
       cells::num_cells = dx*dy*dz;
       cells::internal::cell_position_array.resize(3*cells::num_cells);
 
       //std::cout << " variable cells::num_cells = " << cells::num_cells << std::endl;
-      zlog << zTs() << "Macrocell size = " << cells::macro_cell_size << " Angstroms" << std::endl;
+      zlog << zTs() << "Macrocell size = " << cells::macro_cell_size_x<< "," <<cells::macro_cell_size_y<< "," <<cells::macro_cell_size_z<<  " Angstroms" << std::endl;
       zlog << zTs() << "Macrocells in x,y,z: " << dx << "\t" << dy << "\t" << dz << std::endl;
       zlog << zTs() << "Total number of macrocells: " << cells::num_cells << std::endl;
       zlog << zTs() << "Memory required for macrocell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
@@ -122,7 +122,9 @@ namespace cells{
 
       // Determine number of cells in x,y,z
       const int d[3]={ncx,ncy,ncz};
-      const double cs[3] = {cells::macro_cell_size, cells::macro_cell_size, cells::macro_cell_size}; // cell size
+      const double cs[3] = {cells::macro_cell_size_x, cells::macro_cell_size_y, cells::macro_cell_size_z}; // cell size
+
+      std::vector < double > cell_lattice(3*cells::num_cells,0.0);
 
      // For MPI version, only add local atoms
       #ifdef MPICF
@@ -182,6 +184,15 @@ namespace cells{
          }
          // If no error for range then assign atom to cell
          cells::atom_cell_id_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
+
+      //   if (scc[0] > num_macro_cells_fft[0]) num_macro_cells_fft[0] = scc[0];
+      //   if (scc[1] > num_macro_cells_fft[1]) num_macro_cells_fft[1] = scc[1];
+      //   if (scc[2] > num_macro_cells_fft[2]) num_macro_cells_fft[2] = scc[2];
+         //std::cout << scc[0] << '\t' << scc[1] << '\t' << scc[2] << std::endl;
+         //   std::cout << "supercell" << '\t' << cells::atom_cell_id_array[atom] << '\t' << scc[0] << '\t' << scc[1] << '\t' << scc[2] << std::endl;
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+0] = scc[0];
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+1] = scc[1];
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+2] = scc[2];
       }
 
       //-------------------------------------------------------------------------------------
@@ -204,6 +215,8 @@ namespace cells{
       cells::volume_array.resize(cells::num_cells,0.0);
 
       cells::internal::total_moment_array.resize(cells::num_cells,0.0);
+
+      cells::fft_cell_id_array.resize(cells::num_cells,0.0);
 
       // Now add atoms to each cell as magnetic 'centre of mass'
       int num_atoms_magnetic = 0;  /// number of magnetic atoms
@@ -328,6 +341,21 @@ namespace cells{
 
       // Precalculate cell magnetisation
       cells::mag();
+
+//       for(int lc = 0; lc < cells::num_local_cells; lc++){
+//
+//        // get cell index
+//         int i = cells::cell_id_array[lc];
+//
+//         //save x,y,z lattice coordiantes for use in the fft
+//         int x = cell_lattice[3*i+0];
+//         int y = cell_lattice[3*i+1];
+//         int z = cell_lattice[3*i+2];
+//
+//         //save the cell_id for use in the fft
+//       //  fft_cell_id_array[i] = (x*2*(num_macro_cells_fft[2]+1) + y)*2*(num_macro_cells_fft[1] +1) + z;
+// //        std::cout <<i << '\t' << fft_cell_id_array[i] << '\t' << x << '\t' << y << '\t' << z << '\t' << "\t" << fft_maxx_lattice+1 << '\t' << fft_maxy_lattice+1 << '\t' << fft_maxz_lattice+1 << std::endl;
+//       }
 
       return;
    }

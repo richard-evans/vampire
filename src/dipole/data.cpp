@@ -16,6 +16,8 @@
 // dipole module headers
 #include "internal.hpp"
 
+
+
 namespace dipole{
 
    //------------------------------------------------------------------------------
@@ -25,6 +27,8 @@ namespace dipole{
    int update_time=-1; /// last update time
 
    bool activated=false;
+
+   //std::ofstream field("dipole-field");
 
    // define arrays for B-field
    std::vector < double > cells_field_array_x;
@@ -42,14 +46,25 @@ namespace dipole{
    std::vector < double > atom_mu0demag_field_array_y;
    std::vector < double > atom_mu0demag_field_array_z;
 
+   std::vector<int> atomistic_dd_neighbourlist;
+   std::vector<int> atomistic_dd_neighbourlist_start;
+   std::vector<int> atomistic_dd_neighbourlist_end;
+
    std::vector <int> dipole_cells_num_atoms_in_cell;
 
    double cutoff = 2.0;  /// cutoff distance between cells over which bare macro cell model can be applied
                          /// N.B.: after 12 cells inter-intra method is equivalent to bare macrocell method.
                          /// Although, 2 cells is enough because there are other error sources limiting the accuracy.
+   double atomistic_cutoff = 20.0; //distance in A;
+   bool atomsitic_tensor_enabled = true;
 
    namespace internal{
 
+      std::vector < int > cell_dx;
+      std::vector < int > cell_dy;
+      std::vector < int > cell_dz;
+      std::vector < std::vector < std::vector<int> > > idarray;
+      //std::ofstream output_field;
       //------------------------------------------------------------------------
       // Shared variables inside dipole module
       //------------------------------------------------------------------------
@@ -112,7 +127,57 @@ namespace dipole{
       // Shared functions inside dipole module
       //------------------------------------------------------------------------
       void update_field();
+      #ifdef FFT
+         fftw_plan MxP,MyP,MzP;
+         fftw_plan HxP,HyP,HzP;
+         fftw_complex *N2xx0; //3D Array for dipolar field
+         fftw_complex *N2xy0;
+         fftw_complex *N2xz0;
 
+         fftw_complex *N2yx0; //3D Array for dipolar field
+         fftw_complex *N2yy0;
+         fftw_complex *N2yz0;
+
+         fftw_complex *N2zx0; //3D Array for dipolar field
+         fftw_complex *N2zy0;
+         fftw_complex *N2zz0;
+
+         fftw_complex *N2xx; //3D Array for dipolar field
+         fftw_complex *N2xy;
+         fftw_complex *N2xz;
+
+         fftw_complex *N2yx; //3D Array for dipolar field
+         fftw_complex *N2yy;
+         fftw_complex *N2yz;
+
+         fftw_complex *N2zx; //3D Array for dipolar field
+         fftw_complex *N2zy;
+         fftw_complex *N2zz;
+
+
+         fftw_complex *Mx_in; //3D Array for dipolar field
+         fftw_complex *My_in;
+         fftw_complex *Mz_in;
+
+         fftw_complex *Hx_in; //3D Array for dipolar field
+         fftw_complex *Hy_in;
+         fftw_complex *Hz_in;
+
+         fftw_complex *Mx_out; //3D Array for dipolar field
+         fftw_complex *My_out;
+         fftw_complex *Mz_out;
+
+         fftw_complex *Hx_out; //3D Array for dipolar field
+         fftw_complex *Hy_out;
+         fftw_complex *Hz_out;
+
+         //stores number of macrocells in x,y,z
+         unsigned int num_macro_cells_x;
+         unsigned int num_macro_cells_y;
+         unsigned int num_macro_cells_z;
+         unsigned int eight_num_cells;
+      #endif
+      void update_field_fft();
    } // end of internal namespace
 
 } // end of dipole namespace

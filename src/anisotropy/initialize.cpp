@@ -31,19 +31,26 @@ namespace anisotropy{
                     std::vector<double>& mu_s_array // array of magnetic moments
                    ){
 
-      /* output informative message */
-      zlog << zTs() << "Initialising data structures for anisotropy calculation." << std::endl;
-
-      /* check for prior initialisation */
-      if (internal::initialised){
-         zlog << zTs() << "Warning: Anisotropy calculation already initialised. Continuing." << std::endl;
-         return;
-      }
 
       //---------------------------------------------------------------------
       // get number of materials for simulation
       //---------------------------------------------------------------------
-      const unsigned int num_materials = mu_s_array.size();
+      unsigned int init_num_materials = internal::mp.size();
+
+      // if no anisotropy constants initialised, then make sure anisotropy array is the correct size
+      if(init_num_materials == 0) internal::mp.resize(mu_s_array.size());
+
+      // set actual number of materials
+      const unsigned int num_materials = internal::mp.size();
+
+      // output informative message
+      zlog << zTs() << "Initialising data structures for anisotropy calculation for " << num_materials << " materials" << std::endl;
+
+      // check for prior initialisation
+      if (internal::initialised){
+         zlog << zTs() << "Warning: Anisotropy calculation already initialised. Continuing." << std::endl;
+         return;
+      }
 
       //---------------------------------------------------------------------
       // Unroll inverse mu_S array for materials to convert Joules to Tesla
