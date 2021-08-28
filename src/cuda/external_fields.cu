@@ -56,6 +56,9 @@ void update_external_fields (){
    const cu_real_t Hz = sim::H_vec[2]*sim::H_applied;
    const int num_atoms = ::atoms::num_atoms;
 
+//   // update dipole field
+//    update_dipolar_fields();  //-- disabled  as causes NaN and deferred to CPU code for now
+
    // Call kernel to calculate external fields
    cu::update_external_fields_kernel <<< cu::grid_size, cu::block_size >>> (
          cu::atoms::d_materials, cu::mp::d_material_params,
@@ -68,9 +71,6 @@ void update_external_fields (){
 
    // Check for errors
    check_cuda_errors (__FILE__, __LINE__);
-
-   // update dipole field
-   // update_dipolar_fields(); -- disabled  as causes NaN and deferred to CPU code for now
 
    // std::ofstream fields("should_be_normal.txt");
    // for (size_t i = 0; i < cu::x_total_external_field_array.size(); ++i) {
@@ -174,6 +174,8 @@ __global__ void update_external_fields_kernel (
       field_x += x_dip_field[atom];
       field_y += y_dip_field[atom];
       field_z += z_dip_field[atom];
+      
+//      printf("       %d  %lf  %lf  %lf\n",atom,x_dip_field[atom],y_dip_field[atom],z_dip_field[atom]);
 
       // Write back to main memory
       x_ext_field[atom] = field_x;

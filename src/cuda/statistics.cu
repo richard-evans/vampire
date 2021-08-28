@@ -82,8 +82,6 @@ namespace vcuda{
                  if(::stats::calculate_material_height_magnetization) ::stats::material_height_magnetization.reset_magnetization_averages();
                  return;
              }
-
-
          }
 
    } /* stats */

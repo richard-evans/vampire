@@ -156,6 +156,28 @@ namespace vcuda{
 #endif
    }
 
+
+   bool initialize_dipole(){
+#ifdef CUDA
+
+      bool success = true;
+
+      // Initialise dipole
+      if( cu::__initialize_dipole() != true)
+      {
+         std::cerr << "Failed to initialise dipole" << std::endl;
+         success = false;
+      }
+
+      // Successful initialization
+      return success;
+#else
+      // Default (initializtion failed)
+      return false;
+#endif
+   }
+
+
 #ifdef CUDA
 
    namespace internal {
@@ -282,7 +304,8 @@ namespace vcuda{
           */
 
          cudaMalloc((void**)&cu::atoms::d_cells, ::atoms::num_atoms * sizeof(int));
-         cudaMemcpy(cu::atoms::d_cells, ::atoms::cell_array.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
+//         cudaMemcpy(cu::atoms::d_cells, ::atoms::cell_array.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::atoms::d_cells, ::cells::atom_cell_id_array.data(), ::atoms::num_atoms * sizeof(int), cudaMemcpyHostToDevice);
 
 
          /*cu::atoms::cell_array.resize(::atoms::num_atoms);
@@ -416,6 +439,17 @@ namespace vcuda{
          std::copy(::dipole::atom_dipolar_field_array_z.begin(), ::dipole::atom_dipolar_field_array_z.end(), tmp_buffer.begin());
          cudaMemcpy(cu::d_z_dip_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
 
+         cudaMalloc((void**)&cu::d_x_mu0H_dip_field, num_bytes);
+         cudaMalloc((void**)&cu::d_y_mu0H_dip_field, num_bytes);
+         cudaMalloc((void**)&cu::d_z_mu0H_dip_field, num_bytes);
+
+         std::copy(::dipole::atom_mu0demag_field_array_x.begin(), ::dipole::atom_mu0demag_field_array_x.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::d_x_mu0H_dip_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+         std::copy(::dipole::atom_mu0demag_field_array_y.begin(), ::dipole::atom_mu0demag_field_array_y.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::d_y_mu0H_dip_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+         std::copy(::dipole::atom_mu0demag_field_array_z.begin(), ::dipole::atom_mu0demag_field_array_z.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::d_z_mu0H_dip_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+
          /*
          cu::x_dipolar_field_array.resize(::atoms::num_atoms);
          cu::y_dipolar_field_array.resize(::atoms::num_atoms);
@@ -434,9 +468,13 @@ namespace vcuda{
           * Allocate memory and initialize coordinates
           */
 
-         cudaMalloc((void**)&cu::cells::d_x_coord, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMalloc((void**)&cu::cells::d_y_coord, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMalloc((void**)&cu::cells::d_z_coord, ::cells::num_cells * sizeof(cu_real_t));
+         size_t num_bytes = ::cells::num_cells * sizeof(cu_real_t);
+         std::vector<cu_real_t> tmp_buffer;
+         tmp_buffer.resize(::cells::num_cells);
+
+         cudaMalloc((void**)&cu::cells::d_x_coord, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_y_coord, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_z_coord, num_bytes);
 
 
          /*cu::cells::x_coord_array.resize(::cells::num_cells);
@@ -466,13 +504,16 @@ namespace vcuda{
          // Allocate memory and initialize cell magnetization
          //-----------------------------------------------------
 
-         cudaMalloc((void**)&cu::cells::d_x_mag, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMalloc((void**)&cu::cells::d_y_mag, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMalloc((void**)&cu::cells::d_z_mag, ::cells::num_cells * sizeof(cu_real_t));
+         cudaMalloc((void**)&cu::cells::d_x_mag, num_bytes );
+         cudaMalloc((void**)&cu::cells::d_y_mag, num_bytes );
+         cudaMalloc((void**)&cu::cells::d_z_mag, num_bytes );
 
-         cudaMemcpy(cu::cells::d_x_mag, ::cells::mag_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_y_mag, ::cells::mag_array_y.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_z_mag, ::cells::mag_array_z.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         std::copy(::cells::mag_array_x.begin(), ::cells::mag_array_x.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_x_mag, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+         std::copy(::cells::mag_array_y.begin(), ::cells::mag_array_y.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_y_mag, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+         std::copy(::cells::mag_array_z.begin(), ::cells::mag_array_z.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_z_mag, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
 
          /*
          cu::cells::x_mag_array.resize(::cells::num_cells);
@@ -488,14 +529,6 @@ namespace vcuda{
          // Allocate memory and initialize cell fields
          //----------------------------------------------
 
-         cudaMalloc((void**)&cu::cells::d_x_cell_field, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMalloc((void**)&cu::cells::d_y_cell_field, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMalloc((void**)&cu::cells::d_z_cell_field, ::cells::num_cells * sizeof(cu_real_t));
-
-         cudaMemcpy(cu::cells::d_x_cell_field, ::cells::field_array_x.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_y_cell_field, ::cells::field_array_y.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-         cudaMemcpy(cu::cells::d_z_cell_field, ::cells::field_array_z.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
-
          /*
          cu::cells::x_field_array.resize(::cells::num_cells);
          cu::cells::y_field_array.resize(::cells::num_cells);
@@ -509,8 +542,9 @@ namespace vcuda{
           * Copy volume and number of atoms for each cell
           */
 
-         cudaMalloc((void**)&cu::cells::d_volume, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMemcpy(cu::cells::d_volume, ::cells::volume_array.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMalloc((void**)&cu::cells::d_volume, num_bytes);
+         std::copy(::cells::volume_array.begin(), ::cells::volume_array.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_volume, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
 
          /*
          cu::cells::volume_array.resize(::cells::num_cells);
@@ -522,8 +556,8 @@ namespace vcuda{
                );
          */
 
-         cudaMalloc((void**)&cu::cells::d_num_atoms, ::cells::num_cells * sizeof(cu_real_t));
-         cudaMemcpy(cu::cells::d_num_atoms, ::cells::num_atoms_in_cell.data(), ::cells::num_cells * sizeof(cu_real_t), cudaMemcpyHostToDevice);
+         cudaMalloc((void**)&cu::cells::d_num_atoms, ::cells::num_cells * sizeof(int));
+         cudaMemcpy(cu::cells::d_num_atoms, ::cells::num_atoms_in_cell.data(), ::cells::num_cells * sizeof(int), cudaMemcpyHostToDevice);
 
          /*
          cu::cells::num_atoms.resize(::cells::num_cells);
@@ -534,6 +568,86 @@ namespace vcuda{
                cu::cells::num_atoms.begin()
                );
          */
+
+         cudaMalloc((void**)&cu::cells::d_cell_id_array, ::cells::cell_id_array.size() * sizeof(int));
+         cudaMemcpy(cu::cells::d_cell_id_array, ::cells::cell_id_array.data(), ::cells::cell_id_array.size() * sizeof(int), cudaMemcpyHostToDevice);
+
+         return true;
+      }
+
+      bool __initialize_dipole(){
+
+         // Initialise and copy dipolar fields for cells. 
+         // It's done here because otherwise these objects are not yet initialised on the host when initialise_dipole() is called
+         size_t num_bytes = ::cells::num_cells * sizeof(cu_real_t);
+         std::vector<cu_real_t> tmp_buffer;
+         tmp_buffer.resize(::cells::num_cells);
+
+         cudaMalloc((void**)&cu::cells::d_x_cell_field, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_y_cell_field, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_z_cell_field, num_bytes);
+
+         std::copy(::dipole::cells_field_array_x.begin(), ::dipole::cells_field_array_x.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_x_cell_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+         std::copy(::dipole::cells_field_array_y.begin(), ::dipole::cells_field_array_y.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_y_cell_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+         std::copy(::dipole::cells_field_array_z.begin(), ::dipole::cells_field_array_z.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_z_cell_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+
+         check_cuda_errors(__FILE__,__LINE__);
+
+         cudaMalloc((void**)&cu::cells::d_x_cell_mu0H_field, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_y_cell_mu0H_field, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_z_cell_mu0H_field, num_bytes);
+
+         std::copy(::dipole::cells_mu0Hd_field_array_x.begin(), ::dipole::cells_mu0Hd_field_array_x.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_x_cell_mu0H_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+         std::copy(::dipole::cells_mu0Hd_field_array_y.begin(), ::dipole::cells_mu0Hd_field_array_y.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_y_cell_mu0H_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+         std::copy(::dipole::cells_mu0Hd_field_array_z.begin(), ::dipole::cells_mu0Hd_field_array_z.end(), tmp_buffer.begin());
+         cudaMemcpy(cu::cells::d_z_cell_mu0H_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+
+         check_cuda_errors(__FILE__,__LINE__);
+
+         std::vector<int> num_atoms_in_cell = ::dipole::get_num_atoms_in_cell_array();
+         cudaMalloc((void**)&cu::cells::d_num_atoms_in_cell, num_atoms_in_cell.size() * sizeof(int));
+         cudaMemcpy(cu::cells::d_num_atoms_in_cell, num_atoms_in_cell.data(), num_atoms_in_cell.size() * sizeof(int), cudaMemcpyHostToDevice);
+
+         check_cuda_errors(__FILE__,__LINE__);
+         
+         // Initialise and copy dipolar tensor
+
+         // Copy into <cu_real_t> vectors to avoid having to perform later std::copy()
+         num_bytes = ::cells::num_cells * ::cells::num_local_cells * sizeof(cu_real_t);
+
+         std::vector<cu_real_t> tensor_xx = ::dipole::get_tensor_1D_xx();
+         std::vector<cu_real_t> tensor_xy = ::dipole::get_tensor_1D_xy();
+         std::vector<cu_real_t> tensor_xz = ::dipole::get_tensor_1D_xz();
+         std::vector<cu_real_t> tensor_yy = ::dipole::get_tensor_1D_yy();
+         std::vector<cu_real_t> tensor_yz = ::dipole::get_tensor_1D_yz();
+         std::vector<cu_real_t> tensor_zz = ::dipole::get_tensor_1D_zz(); 
+
+         cudaMalloc((void**)&cu::cells::d_tensor_xx, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_tensor_xy, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_tensor_xz, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_tensor_yy, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_tensor_yz, num_bytes);
+         cudaMalloc((void**)&cu::cells::d_tensor_zz, num_bytes);
+
+         cudaMemcpy(cu::cells::d_tensor_xx, tensor_xx.data(), num_bytes, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_xy, tensor_xy.data(), num_bytes, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_xz, tensor_xz.data(), num_bytes, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_yy, tensor_yy.data(), num_bytes, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_yz, tensor_yz.data(), num_bytes, cudaMemcpyHostToDevice);
+         cudaMemcpy(cu::cells::d_tensor_zz, tensor_zz.data(), num_bytes, cudaMemcpyHostToDevice);
+
+         check_cuda_errors(__FILE__,__LINE__);
+
+         check_device_memory(__FILE__,__LINE__);
+
+
+
+
          return true;
       }
 
