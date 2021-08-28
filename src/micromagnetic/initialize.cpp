@@ -109,7 +109,7 @@ void initialize(int num_local_cells,
    // calculate spin transfer torque parameters
    mm::calculate_stt(num_atoms, num_cells, cell_array, type_array, material, mm::stt_rj, mm::stt_pj);
 
-std::ofstream ofile("initial_parameters.txt"); 
+std::ofstream ofile("initial_parameters.txt");
 
 for (int lc = 0; lc < num_local_cells; lc++){
  int cell = local_cell_array[lc];
@@ -237,7 +237,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
 
    }
 
-// std::ofstream ofile2("exchange.txt"); 
+// std::ofstream ofile2("exchange.txt");
 // for (int lc = 0; lc < number_of_micromagnetic_cells; lc++){
 //   int cell = list_of_micromagnetic_cells[lc];
 //    //loops over all other cells with interactions to this cell
@@ -333,7 +333,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
       mm::mat_vol[mat] = mm::mat_vol[mat] + volume_array[cell];
       mm::mat_ms[mat] = mm::mat_ms[mat] + mm::ms[cell];
       // std::cout <<mm::cell_material_array[cell] << "\t" << x_coord_array[cell] << '\t' <<y_coord_array[cell] << '\t' <<z_coord_array[cell] << '\t' <<  mm::ms[cell] << std::endl;
-      //std::cout << 
+      //std::cout <<
    }
    for (int mat = 0; mat < mp::num_materials; mat++ ){
       double min=create::internal::mp[mat].min;
@@ -363,14 +363,14 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
 
             if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj){
                // check that materials are different
-            std::cout <<"SAF" << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;            
+            std::cout <<"SAF" << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;
              //  std::cout << "enter2" << std::endl;
                double dx = cells::pos_array[cell*3 +0] - cells::pos_array[cellj*3 +0];
                double dy = cells::pos_array[cell*3 +1] - cells::pos_array[cellj*3 +1];
-               double dz = cells::pos_array[cell*3 +2] - cells::pos_array[cellj*3 +2];
+               //double dz = cells::pos_array[cell*3 +2] - cells::pos_array[cellj*3 +2];
                //if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
                if (dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
-   
+
                   // why mj^1.66?? need to check how this actually works. why / ms[cell]?
                   //Ac = -prefactor[matj]*mp::material[mat].SAF[matj];
                   mm::A[j] = -area*mp::material[mat].SAF[matj]/mm::ms[cell];
@@ -381,7 +381,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
                   mm::A[j] = 0.0;
                }
             }
-      
+
 
             // option to override atomistic exchange with a micromagnetic value
             if (mp::material[mat].override_atomsitic[matj] == true){
@@ -445,7 +445,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
          int mat = mm::cell_material_array[cell];
          const int start = mm::macro_neighbour_list_start_index[cell];
          const int end = mm::macro_neighbour_list_end_index[cell] +1;
-       //       std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] <<  "\t" << cells::pos_and_mom_array[cell*4 +3] << "\t" << mat << std::endl;//'\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
+       //       std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] <<  "\t" << cells::pos_and_mom_array[cell*4 +3] << "\t" << mat << std::endl;//'\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl;
 
          for(int j = start;j< end;j++){
             // calculate reduced exchange constant factor
@@ -453,10 +453,10 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
             int matj =mm::cell_material_array[cellj];
             double dx = cells::pos_array[cell*3 +0] - cells::pos_array[cellj*3 +0];
             double dy = cells::pos_array[cell*3 +1] - cells::pos_array[cellj*3 +1];
-            double dz = cells::pos_array[cell*3 +2] - cells::pos_array[cellj*3 +2];
+            //double dz = cells::pos_array[cell*3 +2] - cells::pos_array[cellj*3 +2];
 //std::cout << cell << '\t' << cellj << '\t' << mat << '\t' << matj << "\t" << mm::resistance_layer_2 << '\t' << mm::resistance_layer_1 <<"\t" << cells::pos_array[cell*3 +0] << '\t' << cells::pos_array[cell*3 +1] << '\t' << cells::pos_array[cell*3 +2] << '\t' <<  cells::pos_array[cellj*3 +1] << '\t' << cells::pos_array[cellj*3 +2] << '\t' << dx << "\t" << dy << '\t' << dz << std::endl;
             if (mat == mm::resistance_layer_1 && matj == mm::resistance_layer_2 && dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
-     //          std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl; 
+     //          std::cout << cells::pos_and_mom_array[cell*4 +0] << '\t' << cells::pos_and_mom_array[cell*4 +1] << '\t' << cells::pos_and_mom_array[cell*4 +2] << '\t' <<cells::pos_and_mom_array[cellj*4 +0] << '\t' <<  cells::pos_and_mom_array[cellj*4 +1] << '\t' << cells::pos_and_mom_array[cellj*4 +2] << '\t' << std::endl;
       //    std::cout <<  dx << '\t' << dy << "\t" << dz << "\t" << mat << "\t" << matj << std::endl;
             //         std::cout << mm::resistance_layer_1 << '\t' << mm::resistance_layer_2 <<std::endl;
         //       std::cout << cell << '\t' << cellj << "\t" <<mat << '\t' << matj << std::endl;// x_coord_array[cell] << "\t" <<y_coord_array[cell] << "\t" <<z_coord_array[cell] << "\t" <<  x_coord_array[cellj] << "\t" <<y_coord_array[cellj] << "\t" <<z_coord_array[cellj] << "\t" <<std::endl;
@@ -540,4 +540,3 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
 }
 
 } // end of micromagnetic namespace
- 

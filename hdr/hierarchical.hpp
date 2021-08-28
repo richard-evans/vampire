@@ -28,7 +28,13 @@ namespace hierarchical{
    //-----------------------------------------------------------------------------
    // Function to initialise hierarchical module
    //-----------------------------------------------------------------------------
-   void initialize(double system_dimensions_x, double system_dimensions_y, double system_dimensions_z);
+   void initialize(const double system_dimensions_x,
+                   const double system_dimensions_y,
+                   const double system_dimensions_z,
+                   std::vector<double>& atom_coords_x, //atomic coordinates
+                   std::vector<double>& atom_coords_y,
+                   std::vector<double>& atom_coords_z,
+                   int num_atoms);
 
    //---------------------------------------------------------------------------
    // Function to process input file parameters for hierarchical module

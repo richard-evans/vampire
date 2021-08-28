@@ -1,0 +1,62 @@
+#------------------------------------------
+# Sample vampire input file to perform
+# benchmark calculation for v4.0
+#
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+create:crystal-structure=fcc
+
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+#------------------------------------------
+# System Dimensions:
+#------------------------------------------
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 10 !nm
+dimensions:system-size-y = 10 !nm
+dimensions:system-size-z = 0.7 !nm
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file=Co.mat
+
+#exchange:dmi-cutoff-range = 5.01 !A # sc
+exchange:dmi-cutoff-range = 3.55 !A # fcc
+
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:equilibration-temperature = 100.0
+sim:equilibration-time-steps = 10
+sim:temperature=0.0
+sim:time-steps-increment=10
+sim:total-time-steps=20000
+sim:time-step=1.0E-15
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program = time-series
+sim:integrator = llg-heun
+gpu:acceleration=on
+gpu:calculate-statistics-on-cpu=true
+
+
+#------------------------------------------
+# data output
+#------------------------------------------
+output:real-time
+output:temperature
+output:magnetisation
+output:magnetisation-length
+output:output-rate = 1000
+
+config:atoms
+config:atoms-output-rate = 100
+
+screen:time-steps
+screen:magnetisation-length

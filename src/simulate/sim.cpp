@@ -239,6 +239,7 @@ int run(){
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
+
 	if (micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets == true)
 	micromagnetic::initialize(cells::num_local_cells,
 									  cells::num_cells,
@@ -260,7 +261,7 @@ int run(){
 									  cs::system_dimensions[1],
 									  cs::system_dimensions[2],
 									  cells::local_cell_array);
-									  
+
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,
                      cells::num_cells,
@@ -292,8 +293,6 @@ int run(){
 
 
 	if(environment::enabled) environment::initialize(cs::system_dimensions[0],cs::system_dimensions[1],cs::system_dimensions[2]);
-
-
 
    // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
@@ -470,7 +469,6 @@ int run(){
 			}
 			program::boltzmann_dist();
 			break;
-
 		case 51:
 			if(vmpi::my_rank==0){
 				std::cout << "Setting..." << std::endl;
@@ -478,16 +476,40 @@ int run(){
 			}
 			program::setting_process();
 			break;
-
+		//------------------------------------------------------------------------
 		case 52:
+		 	if(vmpi::my_rank==0){
+				std::cout << "Domain walls..." << std::endl;
+				zlog << "Domain walls..." << std::endl;
+			}
+			program::domain_wall();
+			break;
+		//------------------------------------------------------------------------
+		case 53:
+		 	if(vmpi::my_rank==0){
+				std::cout << "exchange stiffness..." << std::endl;
+				zlog << "exchange stiffness..." << std::endl;
+			}
+			program::exchange_stiffness();
+			break;
+		//------------------------------------------------------------------------
+		case 70:
+			if(vmpi::my_rank==0){
+				std::cout << "field-sweep..." << std::endl;
+				zlog << "field-sweep..." << std::endl;
+			}
+			program::field_sweep();
+		break;
+		//------------------------------------------------------------------------
+		case 72:
 			if(vmpi::my_rank==0){
 				std::cout << "Tracks..." << std::endl;
 				zlog << "Tracks..." << std::endl;
 			}
 			program::tracks();
 			break;
-
-		case 53:
+		//------------------------------------------------------------------------
+		case 73:
 			if(vmpi::my_rank==0){
 				std::cout << "diagnostic-boltzmann-micromganetic-llg..." << std::endl;
 				zlog << "diagnostic-boltzmann-micromganetic-llg..." << std::endl;
@@ -495,21 +517,7 @@ int run(){
 			program::boltzmann_dist_micromagnetic_llg();
 			break;
 
-		case 60:
-			if(vmpi::my_rank==0){
-				std::cout << "field-sweep..." << std::endl;
-				zlog << "field-sweep..." << std::endl;
-			}
-			program::field_sweep();
-			break;
 
-		case 61:
-			if(vmpi::my_rank==0){
-				std::cout << "Domain walls..." << std::endl;
-				zlog << "Domain walls..." << std::endl;
-			}
-			program::domain_wall();
-			break;
 
 		default:{
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;

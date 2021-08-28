@@ -116,6 +116,7 @@ namespace vmpi{
    extern uint64_t all_reduce_sum(uint64_t local);
    extern double all_reduce_sum(double local);
    extern void all_reduce_sum(std::vector<double>& array);
+   extern void all_reduce_sum(std::vector<int>& array);
 
    extern void collate(std::vector<double>& input, std::vector<double>& output);
    extern void counts_and_displacements(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);

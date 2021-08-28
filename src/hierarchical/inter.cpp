@@ -37,119 +37,154 @@ namespace ha = hierarchical::internal;
 
 namespace hierarchical{
 
-  void ha::calc_inter(int cell_i, int cell_j, int interaction_no, std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_x, std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_y, std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_z){
+   //------------------------------------------------------------------------
+   // Function to calculate inter component of dipole tensors.
+   //
+   // The tensors between local cells with the cutoff range are calculated
+   // explictly from the atomistic coordinates. Longer range tensors assume
+   // the dipole-dipole form.
+   //------------------------------------------------------------------------
+   void ha::calc_inter(const int celli,                                                // global ID of cell i
+                       const int cellj,                                                // global ID of cell i
+                       const int interaction_no,                                       // ID of interaction in 1D list
+                       const double cutoff,                                            // cutoff range for dipole tensor construction (Angstroms)
+                       const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                       const std::vector<double>& cells_pos_and_mom_array,             // array of positions and cell moments
+                       const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
+                       const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                       ){
 
+        // create temporary variables to store components of tensor
+        double tmp_rij_inter_xx = 0.0;
+        double tmp_rij_inter_xy = 0.0;
+        double tmp_rij_inter_xz = 0.0;
 
-     // instantiate timer
-//     vutil::vtimer_t timer;
-   //std::cout << dipole::cutoff*cells::macro_cell_size << std::endl;
-   //timer.start();
-    // create temporary variable to store components of tensor
-    double tmp_rij_inter_xx = 0.0;
-    double tmp_rij_inter_xy = 0.0;
-    double tmp_rij_inter_xz = 0.0;
+        double tmp_rij_inter_yy = 0.0;
+        double tmp_rij_inter_yz = 0.0;
+        double tmp_rij_inter_zz = 0.0;
 
-    double tmp_rij_inter_yy = 0.0;
-    double tmp_rij_inter_yz = 0.0;
-    double tmp_rij_inter_zz = 0.0;
+        // Calculate distance vectors between cells
+        const double rx = ha::cell_positions_mom[4*cellj+0] - ha::cell_positions_mom[4*celli+0];
+        const double ry = ha::cell_positions_mom[4*cellj+1] - ha::cell_positions_mom[4*celli+1];
+        const double rz = ha::cell_positions_mom[4*cellj+2] - ha::cell_positions_mom[4*celli+2];
 
+        // calculate square of distance for cutoff evaluation
+        const double r2 = rx*rx + ry*ry + rz*rz;
 
+        // If distance between macro-cells > cutoff nm => continuum approach (bare macro-cell method)
+        if( r2 > cutoff*cutoff ){
 
+           const double rij = 1.0/sqrt(r2); // Reciprocal of the distance
 
-       // Calculate distance vectors between cells
-       double rx2 = ha::cell_positions_mom[4*cell_j+0] - ha::cell_positions_mom[4*cell_i+0];
-       double ry2 = ha::cell_positions_mom[4*cell_j+1] - ha::cell_positions_mom[4*cell_i+1];
-       double rz2 = ha::cell_positions_mom[4*cell_j+2] - ha::cell_positions_mom[4*cell_i+2];
-       double rij = sqrt(rx2*rx2+ry2*ry2+rz2*rz2); //Reciprocal of the distance
-       double rij_1 = 1.0/rij;
-      //if (cell_i == 0) std::cout <<rij << std::endl;
-   //std::cout << rij << '\t' << cells::macro_cell_size_x << '\t' << dipole::cutoff << std::endl;
-      if( rij/cells::macro_cell_size_x > dipole::cutoff){
-      //if (rij > dipole::cutoff*internal::av_cell_size){
-   //   std::cout << cell_j << '\t'<< rij << '\t' << "macrocell" <<std::endl;
+           //std::cout << dipole::atomistic_cutoff <<std::endl;
+           // define unitarian distance vectors
+           const double ex = rx*rij;
+           const double ey = ry*rij;
+           const double ez = rz*rij;
 
-                  // define unitarian distance vectors
+           const double rij3 = (rij*rij*rij); // Angstroms
 
-         const double ex = rx2*rij_1;
-         const double ey = ry2*rij_1;
-         const double ez = rz2*rij_1;
+           // calculate dipolar matrix for 6 entries because of symmetry
+           // (changed from addition to assignment in this version)
+           ha::rij_tensor_xx[interaction_no] = ((3.0*ex*ex - 1.0)*rij3);
+           ha::rij_tensor_xy[interaction_no] = ((3.0*ex*ey      )*rij3);
+           ha::rij_tensor_xz[interaction_no] = ((3.0*ex*ez      )*rij3);
 
-         const double rij3 = (rij_1*rij_1*rij_1); // Angstroms
+           ha::rij_tensor_yy[interaction_no] = ((3.0*ey*ey - 1.0)*rij3);
+           ha::rij_tensor_yz[interaction_no] = ((3.0*ey*ez      )*rij3);
+           ha::rij_tensor_zz[interaction_no] = ((3.0*ez*ez - 1.0)*rij3);
 
-         // calculate dipolar matrix for 6 entries because of symmetry
-         ha::rij_tensor_xx[interaction_no] += ((3.0*ex*ex - 1.0)*rij3);
-         ha::rij_tensor_xy[interaction_no] += ((3.0*ex*ey      )*rij3);
-         ha::rij_tensor_xz[interaction_no] += ((3.0*ex*ez      )*rij3);
+        }
 
-         ha::rij_tensor_yy[interaction_no] += ((3.0*ey*ey - 1.0)*rij3);
-         ha::rij_tensor_yz[interaction_no] += ((3.0*ey*ez      )*rij3);
-         ha::rij_tensor_zz[interaction_no] += ((3.0*ez*ez - 1.0)*rij3);
-         // if (ha::rij_tensor_zz[interaction_no] != ha::rij_tensor_zz[interaction_no])  {std::cout << "zero" <<std::endl;
-         // std::cin.get();}
-         //std::cout << cell_i << '\t' << cell_j << '\t' << ha::cell_positions_mom[4*cell_j+0] << '\t'  << ha::cell_positions_mom[4*cell_i+0] << "\t" << ha::rij_tensor_xx[interaction_no] << std::endl;
+        //--------------------------------------------------------------------------
+        // If distance between macro-cells < cutoff ==> apply inter-intra method
+        //--------------------------------------------------------------------------
+        else if( r2 <= cutoff*cutoff){
 
-      }
+           const int num_i_atoms = global_atoms_in_cell_count[celli];
+           const int num_j_atoms = global_atoms_in_cell_count[cellj];
 
+           // search for cells i and j in local atom-cells list
+           int cell_with_atoms_index_i = -1;
+           int cell_with_atoms_index_j = -1;
+           for(int idx = 0; idx < atoms_in_cells_array.size(); idx++){
+              const int cell = list_of_cells_with_atoms[idx];
+              if( cell == celli ) cell_with_atoms_index_i = idx;
+              if( cell == cellj ) cell_with_atoms_index_j = idx;
+           }
 
-         //--------------------------------------------------------------------------
-         // If distance between macro-cells < cutoff ==> apply inter-intra method
-         //--------------------------------------------------------------------------
-           else if(rij/cells::macro_cell_size_x <= dipole::cutoff){
+           // check that proper cell is found
+           if( cell_with_atoms_index_i == -1 ){
+              std::cerr << "Programmer error! cell " << celli << " is not found in list of local cells with atomic positions!" << std::endl;
+           }
+           if( cell_with_atoms_index_j == -1 ){
+              std::cerr << "Programmer error! cell " << cellj << " is not found in list of local cells with atomic positions!" << std::endl;
+           }
+           const int ci = cell_with_atoms_index_i;
+           const int cj = cell_with_atoms_index_j;
 
-             for(int pi=0; pi<ha::num_atoms_in_cell[cell_i]; pi++){
-// //
-               const double cix = cells_atom_in_cell_coords_array_x[cell_i][pi];
-               const double ciy = cells_atom_in_cell_coords_array_y[cell_i][pi];
-               const double ciz = cells_atom_in_cell_coords_array_z[cell_i][pi];
-//
-                 for(int qj=0; qj<ha::num_atoms_in_cell[cell_j]; qj++){
+           // loop over all atoms in cell i
+           for(int pi = 0; pi < num_i_atoms; pi++){
 
-                  const double dx = cells_atom_in_cell_coords_array_x[cell_j][qj] - cix;
-                  const double dy = cells_atom_in_cell_coords_array_y[cell_j][qj] - ciy;
-                  const double dz = cells_atom_in_cell_coords_array_z[cell_j][qj] - ciz;
+              const double cix = atoms_in_cells_array[ci][4*pi+0];
+              const double ciy = atoms_in_cells_array[ci][4*pi+1];
+              const double ciz = atoms_in_cells_array[ci][4*pi+2];
 
-                  rij = 1.0/sqrt(dx*dx+dy*dy+dz*dz);  //Reciprocal of the distance
+              // loop over all atoms in cell j
+              for( int qj = 0; qj < num_j_atoms; qj++){
 
-                  const double ex = dx*rij;
-                  const double ey = dy*rij;
-                  const double ez = dz*rij;
+                 const double rx = atoms_in_cells_array[cj][4*qj+0] - cix;
+                 const double ry = atoms_in_cells_array[cj][4*qj+1] - ciy;
+                 const double rz = atoms_in_cells_array[cj][4*qj+2] - ciz;
 
-                  const double rij3 = (rij*rij*rij); // Angstroms
+                 const double dist = sqrt(rx*rx+ry*ry+rz*rz);
+                 const double rij = 1.0/dist;  //Reciprocal of the distance
 
-                  tmp_rij_inter_xx += ((3.0*ex*ex - 1.0)*rij3);
-                  tmp_rij_inter_xy += ((3.0*ex*ey      )*rij3);
-                  tmp_rij_inter_xz += ((3.0*ex*ez      )*rij3);
+                 // if (dist <  dipole::atomistic_cutoff ){
+                 // add to Jij somehow :P
 
-                  tmp_rij_inter_yy += ((3.0*ey*ey - 1.0)*rij3);
-                  tmp_rij_inter_yz += ((3.0*ey*ez      )*rij3);
-                  tmp_rij_inter_zz += ((3.0*ez*ez - 1.0)*rij3);
-                  }
-               }
-//              //std::cout << interaction_no << '\t' << ha::rij_tensor_xx.size() <<std::endl;
-            ha::rij_tensor_xx[interaction_no] =  (tmp_rij_inter_xx);
-            ha::rij_tensor_xy[interaction_no] =  (tmp_rij_inter_xy);
-            ha::rij_tensor_xz[interaction_no] =  (tmp_rij_inter_xz);
+                 const double ex = rx*rij;
+                 const double ey = ry*rij;
+                 const double ez = rz*rij;
 
-            ha::rij_tensor_yy[interaction_no] =  (tmp_rij_inter_yy);
-            ha::rij_tensor_yz[interaction_no] =  (tmp_rij_inter_yz);
-            ha::rij_tensor_zz[interaction_no] =  (tmp_rij_inter_zz);
+                 const double rij3 = (rij*rij*rij); // Angstroms
 
-//          // //    // Normalisation by the number of atoms in the cell. This is required for the correct evaluation of the field in the update.cpp routine
-            ha::rij_tensor_xx[interaction_no] = ha::rij_tensor_xx[interaction_no]/(double(ha::num_atoms_in_cell[cell_i]) * double(ha::num_atoms_in_cell[cell_j]));
-            ha::rij_tensor_xy[interaction_no] = ha::rij_tensor_xy[interaction_no]/(double(ha::num_atoms_in_cell[cell_i]) * double(ha::num_atoms_in_cell[cell_j]));
-            ha::rij_tensor_xz[interaction_no] = ha::rij_tensor_xz[interaction_no]/(double(ha::num_atoms_in_cell[cell_i]) * double(ha::num_atoms_in_cell[cell_j]));
+                 tmp_rij_inter_xx += ((3.0*ex*ex - 1.0)*rij3);
+                 tmp_rij_inter_xy += ((3.0*ex*ey      )*rij3);
+                 tmp_rij_inter_xz += ((3.0*ex*ez      )*rij3);
 
-            ha::rij_tensor_yy[interaction_no] = ha::rij_tensor_yy[interaction_no]/(double(ha::num_atoms_in_cell[cell_i]) * double(ha::num_atoms_in_cell[cell_j]));
-            ha::rij_tensor_yz[interaction_no] = ha::rij_tensor_yz[interaction_no]/(double(ha::num_atoms_in_cell[cell_i]) * double(ha::num_atoms_in_cell[cell_j]));
-            ha::rij_tensor_zz[interaction_no] = ha::rij_tensor_zz[interaction_no]/(double(ha::num_atoms_in_cell[cell_i]) * double(ha::num_atoms_in_cell[cell_j]));
+                 tmp_rij_inter_yy += ((3.0*ey*ey - 1.0)*rij3);
+                 tmp_rij_inter_yz += ((3.0*ey*ez      )*rij3);
+                 tmp_rij_inter_zz += ((3.0*ez*ez - 1.0)*rij3);
 
-            }  // End of Inter part calculated atomicstically
-//  timer.stop();
-// // std::cout <<"cell\t" << cell_i <<   "\tdone! [ " << timer.elapsed_time() << " s ]" << std::endl;
-// zlog << zTs() << "cell\t" << cell_i <<   "\tPrecalculation of rij matrix for dipole calculation complete. Time taken: " << timer.elapsed_time() << " s"<< std::endl;
+              }
+           }
 
-      return;
+           // normalisation factor accounting for i/j interactions (only symmetry of tensor is important)
+           const double inorm = 1.0 / double( double(num_i_atoms) * double(num_j_atoms) );
 
-  } //function
+           ha::rij_tensor_xx[interaction_no] =  (tmp_rij_inter_xx) * inorm;
+           ha::rij_tensor_xy[interaction_no] =  (tmp_rij_inter_xy) * inorm;
+           ha::rij_tensor_xz[interaction_no] =  (tmp_rij_inter_xz) * inorm;
+
+           ha::rij_tensor_yy[interaction_no] =  (tmp_rij_inter_yy) * inorm;
+           ha::rij_tensor_yz[interaction_no] =  (tmp_rij_inter_yz) * inorm;
+           ha::rij_tensor_zz[interaction_no] =  (tmp_rij_inter_zz) * inorm;
+
+           //if (i == 0) std::cout << "atom" <<  '\t' << i <<'\t' << j << "\t" << dipole::internal::rij_tensor_xx[lc][j] << "\t" << dipole::internal::rij_tensor_xy[lc][j] << '\t' <<dipole::internal::rij_tensor_xz[lc][j] << std::endl;
+           // Uncomment in case you want to print the tensor components
+           // std::cout << "\n############# INTER ###################\n";
+           // std::cout << "interaction = " << interaction_no << "\tj = " << cellj << "\tNat_i\t" << num_i_atoms << "\tNat_j\t" << num_j_atoms << std::endl;
+           // std::cout << tmp_rij_inter_xx << "\t" << tmp_rij_inter_xy << "\t" << tmp_rij_inter_xz << "\n";
+           // std::cout << tmp_rij_inter_xy << "\t" << tmp_rij_inter_yy << "\t" << tmp_rij_inter_yz << "\n";
+           // std::cout << tmp_rij_inter_xz << "\t" << tmp_rij_inter_yz << "\t" << tmp_rij_inter_zz << "\n";
+           // std::cout << "\n################################\n";
+           // std::cout << std::endl;
+
+        }  // End of Inter part calculated atomicstically
+
+        return;
+
+   }  // End of function calculating inter component of dipole tensor
 
 } // end of hierarchical namespace

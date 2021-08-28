@@ -1,0 +1,19 @@
+#===================================================
+# Sample vampire material file V3+
+#===================================================
+
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=1
+#---------------------------------------------------
+# Material 1 Cobalt Generic
+#---------------------------------------------------
+material[1]:material-name=Co
+material[1]:damping-constant=1.0
+material[1]:exchange-matrix[1]=10.0e-21
+material[1]:atomic-spin-moment=1.72 !muB
+material[1]:uniaxial-anisotropy-constant=0.0
+material[1]:material-element=Ag
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0

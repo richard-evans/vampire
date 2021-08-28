@@ -16,6 +16,7 @@
 // Vampire headers
 #include "cells.hpp" // needed for dp::cell_id_array but to be removed
 #include "vmpi.hpp"
+#include "atoms.hpp"
 
 // hierarchical module headers
 #include "hierarchical.hpp"
@@ -118,7 +119,7 @@ void calculate_hierarchical_magnetisation(std::vector <double>& x_spin_array, //
             ha::mag_array_x[cell] += ha::mag_array_x[subcell];
             ha::mag_array_y[cell] += ha::mag_array_y[subcell];
             ha::mag_array_z[cell] += ha::mag_array_z[subcell];
-
+         //   std::cout << ha::mag_array_z[cell] <<std::endl;
          }
          //  std::cout << ha::mag_array_x[cell] << '\t' << ha::mag_array_y[cell] << '\t' << ha::mag_array_z[cell] << '\t' << std::endl;
 

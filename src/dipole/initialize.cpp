@@ -16,16 +16,13 @@
 // Vampire headers
 #include "cells.hpp"
 #include "dipole.hpp"
+#include "gpu.hpp"
 #include "vio.hpp"
 #include "vutil.hpp"
 #include "hierarchical.hpp"
 
-
- // dipole module headers
- #include "internal.hpp"
-#include "../hierarchical/internal.hpp"
-
-namespace ha = hierarchical::internal;
+// dipole module headers
+#include "internal.hpp"
 
 namespace dipole{
 
@@ -65,14 +62,9 @@ namespace dipole{
 
 		// check for prior initialisation
 		if(dipole::internal::initialised){
-      	zlog << zTs() << "Warning:  Dipole field calculation already initialised. Continuing." << std::endl;
+      	zlog << zTs() << "Warning: Dipole field calculation already initialised. Continuing." << std::endl;
       	return;
 		}
-
-      // output informative message
-      std::cout << "Initialising dipole field calculation" << std::endl;
-		zlog << zTs() << "Initialising dipole field calculation" << std::endl;
-
 
       if(vmpi::my_rank==0) dp_fields.open("dipole-field");
 
@@ -92,28 +84,15 @@ namespace dipole{
 
       dipole::internal::cells_pos_and_mom_array    = cells_pos_and_mom_array;
 
-
-
-		//-------------------------------------------------------------------------------------
-		// Starting calculation of dipolar field
-		//-------------------------------------------------------------------------------------
-      if (dipole::internal::solver != dipole::internal::hierarchical){
-         // Check memory requirements and print to screen
-         zlog << zTs() << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-         std::cout     << "Fast dipole field calculation has been enabled and requires " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_local_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-
-         zlog << zTs() << "Total memory for dipole calculation (all CPUs): " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-         std::cout << "Total memory for dipole calculation (all CPUs): " << double(dipole::internal::cells_num_cells)*double(dipole::internal::cells_num_cells*6)*8.0/1.0e6 << " MB of RAM" << std::endl;
-
-         zlog << zTs() << "Number of local cells for dipole calculation = " << dipole::internal::cells_num_local_cells << std::endl;
-         zlog << zTs() << "Number of total cells for dipole calculation = " << dipole::internal::cells_num_cells << std::endl;
-      }
       //----------------------------------------------------------
-      // Calculation of dipolar tensor
+      // initialise dipole solver
       //----------------------------------------------------------
       switch (dipole::internal::solver){
 
          case dipole::internal::macrocell:
+            std::cout     << "Initialising dipole field calculation using macrocell solver" << std::endl;
+   		   zlog << zTs() << "Initialising dipole field calculation using macrocell solver" << std::endl;
+            internal::output_dipole_solver_mem_info(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
             dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
             dipole::internal::initialize_macrocell_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
                                                        dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, dipole::internal::cells_pos_and_mom_array,
@@ -122,24 +101,49 @@ namespace dipole{
             break;
 
          case dipole::internal::tensor:
+            std::cout     << "Initialising dipole field calculation using tensor solver" << std::endl;
+            zlog << zTs() << "Initialising dipole field calculation using tensor solver" << std::endl;
+            internal::output_dipole_solver_mem_info(dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells);
             dipole::internal::allocate_memory(cells_num_local_cells, cells_num_cells);
             dipole::internal::initialize_tensor_solver(cells_num_atoms_in_unit_cell, dipole::internal::cells_num_cells, dipole::internal::cells_num_local_cells, cells_macro_cell_size, dipole::internal::cells_local_cell_array,
                                                        dipole::internal::cells_num_atoms_in_cell, cells_num_atoms_in_cell_global, cells_index_atoms_array, dipole::internal::cells_volume_array, dipole::internal::cells_pos_and_mom_array,
                                                        cells_atom_in_cell_coords_array_x, cells_atom_in_cell_coords_array_y, cells_atom_in_cell_coords_array_z,
                                                        dipole::internal::atom_type_array, dipole::internal::atom_cell_id_array, atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
             break;
+
          case dipole::internal::atomistic:
+            std::cout     << "Initialising dipole field calculation using atomistic solver" << std::endl;
+            zlog << zTs() << "Initialising dipole field calculation using atomistic solver" << std::endl;
             dipole::internal::initialize_atomistic_solver(num_atoms, atom_coords_x, atom_coords_y, atom_coords_z, atom_moments, atom_type_array);
             break;
+
          case dipole::internal::hierarchical:
-            hierarchical::initialize(cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2]);
+            std::cout     << "Initialising dipole field calculation using hierarchical solver" << std::endl;
+            zlog << zTs() << "Initialising dipole field calculation using hierarchical solver" << std::endl;
+            hierarchical::initialize(cs::system_dimensions[0], cs::system_dimensions[1], cs::system_dimensions[2], atom_coords_x, atom_coords_y, atom_coords_z, dipole::internal::num_atoms);
             break;
+
          case dipole::internal::fft:
+            std::cout     << "Initialising dipole field calculation using FFT solver" << std::endl;
+            zlog << zTs() << "Initialising dipole field calculation using FFT solver" << std::endl;
             dipole::internal::initialize_fft_solver();
             break;
+
+        case dipole::internal::atomisticfft:
+            std::cout     << "Initialising dipole field calculation using atomistic FFT solver" << std::endl;
+            zlog << zTs() << "Initialising dipole field calculation using atomistic FFT solver" << std::endl;
+            dipole::internal::atomistic_fft::initialize_atomistic_fft_solver();
+            break;
+
+
       }
       // Set initialised flag
       dipole::internal::initialised=true;
+
+      // Initialise dipole on GPU if CUDA is active
+      #ifdef CUDA
+         gpu::initialize_dipole();
+      #endif
 
       //------------------------------------------------------------------------
       // Precalculate dipole field and time for performance
@@ -156,7 +160,16 @@ namespace dipole{
       timer.start();
 
       // now calculate fields at zero time
-      dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array, atom_moments, magnetic);
+
+      #ifdef CUDA
+         gpu::update_dipolar_fields();
+      #else
+         dipole::calculate_field(0, x_spin_array, y_spin_array, z_spin_array, atom_moments, magnetic);
+      #endif
+
+      // hold parallel calculation until all processors have completed the update
+      vmpi::barrier();
+
 
       // stop timer
       timer.stop();
@@ -178,18 +191,6 @@ namespace dipole{
 
 
       if (dipole::internal::solver == dipole::internal::hierarchical){
-
-         //---------------------------------------------------------------------
-         // Check memory requirements and print to screen
-         //---------------------------------------------------------------------
-
-         const double total_memory = vmpi::reduce_sum( double(ha::interaction_list.size() ) * 6.0 * 8.0 / 1.0e6 ); // in Megabytes
-
-         zlog << zTs() << "Total memory for hierarchical dipole calculation (all CPUs): " << total_memory << " MB of RAM" << std::endl;
-         std::cout << "Total memory for hierarchical dipole calculation (all CPUs): " << total_memory << " MB of RAM" << std::endl;
-
-         zlog << zTs() << "Number of local cells for hierarchical dipole calculation = " << dipole::internal::cells_num_local_cells << std::endl;
-         zlog << zTs() << "Number of total cells for hierarchical dipole calculation = " << dipole::internal::cells_num_cells << std::endl;
 
                //Every cpus print to check dipolar matrix inter term
                // RFLE - currently commented out as caused a sagfault and not that important

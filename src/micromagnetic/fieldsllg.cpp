@@ -83,7 +83,7 @@ void mm::calculate_llg_spin_fields(const double temperature,
       //------------------------------------------------------------------------
 
       // calculate cross-sectional area of cells
-      const double area = cells::macro_cell_size_x * cells::macro_cell_size_y;
+      //const double area = cells::macro_cell_size_x * cells::macro_cell_size_y;
 
       // Temporary variable to calculate total exchange field
       double exchange_field[3]={ 0.0, 0.0, 0.0 };

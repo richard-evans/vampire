@@ -88,7 +88,7 @@ namespace micromagnetic{
       //calculates the exchage fields as me^1.66 *A*(xi-xj)/m_e^2
       //array to store the exchanege field
       double exchange_field[3]={0.0,0.0,0.0};
-      int mat  = cell_material_array[cell];
+      //int mat  = cell_material_array[cell];
       if (num_cells > 1){
          //loops over all other cells with interactions to this cell
          const int start = macro_neighbour_list_start_index[cell];

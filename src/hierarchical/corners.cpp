@@ -11,24 +11,10 @@
 //
 
 // C++ standard library headers
-// C++ standard library headers
-#include <string>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-// C library headers
-#include <fenv.h>
-#include <signal.h>
-#include <math.h>
-// Vampire headers
-#include "cells.hpp" // needed for cells::cell_id_array but to be removed
-#include "dipole.hpp"
-#include "vio.hpp"
-#include "vutil.hpp"
-#include "atoms.hpp"
+#include <vector>
+
 // Vampire headers
 #include "hierarchical.hpp"
-
 
 // hierarchical module headers
 #include "internal.hpp"
@@ -36,19 +22,18 @@
 using namespace std;
 
 namespace hierarchical{
+namespace internal{
 
    //------------------------------------------------------------------------------
-   // Externally visible variables
+   // Function to compute the coordinates of the corners of a cube cnetred on x,y,z
+   // and returning a 2D array corner[id][x,y,z]
    //------------------------------------------------------------------------------
+   std::vector < std::vector < double> > calculate_corners(double x, double y, double z, double cell_size_x, double cell_size_y, double cell_size_z){
 
-   namespace internal{
-
-    std::vector < std::vector < double> > calculate_corners(double x, double y, double z, double cell_size_x, double cell_size_y, double cell_size_z){
-
+      // vector to store function result
       std::vector < std::vector < double> >corners;
       corners.resize(8);
-      for (int i = 0; i < 8; ++i)
-        corners[i].resize(3,0.0);
+      for (int i = 0; i < 8; ++i) corners[i].resize(3,0.0);
 
       double min_x = x - cell_size_x/2.0;
       double min_y = y - cell_size_y/2.0;
@@ -88,5 +73,6 @@ namespace hierarchical{
       return corners;
 
     }
-}
-}
+
+} // end of internal namespace
+} // end of hierarchical namespace

@@ -53,7 +53,7 @@ namespace dipole{
          dipole::cells_field_array_y[i] = -100000.0;
          dipole::cells_field_array_z[i] = -100000.0;
        }
-       
+
 		// loop over local cells
     	for(int lc=0;lc<dipole::internal::cells_num_local_cells;lc++){
 
@@ -123,7 +123,7 @@ namespace dipole{
          if (dipole::cells_field_array_y[i] < -1000) dipole::cells_field_array_y[i] = 0.0;
          if (dipole::cells_field_array_z[i] < -1000) dipole::cells_field_array_z[i] = 0.0;
        //  std::cout << i << '\t' << dipole::cells_field_array_x[i] << '\t' << dipole::cells_field_array_y[i] << '\t' << dipole::cells_field_array_z[i] <<std::endl;
-         
+
        }
 	} // end of dipole::internal::update_field() function
 } // end of dipole namespace

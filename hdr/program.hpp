@@ -50,7 +50,9 @@ namespace program
    extern void fmr();
 	extern void tracks();
 	extern void field_sweep();
+	extern void fmr();
    extern void domain_wall();
+   extern void exchange_stiffness();
 
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();

@@ -60,8 +60,8 @@ namespace dipole{
 			   //if updated record last time at update
 			   dipole::internal::update_time = sim_time;
 
-            // for gpu acceleration, transfer spin positions now (does nothing for serial)
-            gpu::transfer_spin_positions_from_gpu_to_cpu();
+            // // for gpu acceleration, transfer spin positions now (does nothing for serial)
+            // gpu::transfer_spin_positions_from_gpu_to_cpu();
 
             switch (dipole::internal::solver){
 
@@ -70,7 +70,11 @@ namespace dipole{
                   break;
 
                case dipole::internal::tensor:
-                  dipole::internal::calculate_macrocell_dipole_field();
+						#ifdef CUDA
+               	   gpu::update_dipolar_fields();
+						#else
+                     dipole::internal::calculate_macrocell_dipole_field();
+						#endif
                   break;
 
                case dipole::internal::atomistic:
@@ -85,10 +89,15 @@ namespace dipole{
                   dipole::internal::update_field_fft();
                   break;
 
+               case dipole::internal::atomisticfft:
+                  dipole::internal::atomistic_fft::update_field_atomistic_fft();
+                  break;
+
+
             }
 
-            // for gpu acceleration, transfer calculated fields now (does nothing for serial)
-            gpu::transfer_dipole_fields_from_cpu_to_gpu();
+            // // for gpu acceleration, transfer calculated fields now (does nothing for serial)
+            // gpu::transfer_dipole_fields_from_cpu_to_gpu();
 
 		   } // End of check for update rate
 		} // end of check for update time
@@ -132,18 +141,18 @@ namespace dipole{
 
             int type = dipole::internal::atom_type_array[atom];
 
-            if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==0){
+            if(dipole::internal::cells_num_atoms_in_cell[cell]>0 && mp::material[type].non_magnetic==false){
 
                // Copy B-field from macrocell to atomistic spin
                // Copy B-field from macrocell to atomistic spin
-               dipole::atom_dipolar_field_array_x[atom] = 0.0;//dipole::cells_field_array_x[cell];
-               dipole::atom_dipolar_field_array_y[atom] = 0.0;//dipole::cells_field_array_y[cell];
-               dipole::atom_dipolar_field_array_z[atom] = 0.0;//dipole::cells_field_array_z[cell];
+               dipole::atom_dipolar_field_array_x[atom] = dipole::cells_field_array_x[cell];
+               dipole::atom_dipolar_field_array_y[atom] = dipole::cells_field_array_y[cell];
+               dipole::atom_dipolar_field_array_z[atom] = dipole::cells_field_array_z[cell];
 
                // Unroll Hdemag field
-               dipole::atom_mu0demag_field_array_x[atom] = 0.0;//dipole::cells_mu0Hd_field_array_x[cell];
-               dipole::atom_mu0demag_field_array_y[atom] = 0.0;//dipole::cells_mu0Hd_field_array_y[cell];
-               dipole::atom_mu0demag_field_array_z[atom] = 0.0;//dipole::cells_mu0Hd_field_array_z[cell];
+               dipole::atom_mu0demag_field_array_x[atom] = dipole::cells_mu0Hd_field_array_x[cell];
+               dipole::atom_mu0demag_field_array_y[atom] = dipole::cells_mu0Hd_field_array_y[cell];
+               dipole::atom_mu0demag_field_array_z[atom] = dipole::cells_mu0Hd_field_array_z[cell];
 
             }
          }

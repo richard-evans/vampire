@@ -418,24 +418,29 @@ namespace vin{
                 sim::program=51;
                 return EXIT_SUCCESS;
             }
-            test="disk-tracks";
+            test="domain-wall";
             if(value==test){
-               sim::program=52;
-               return EXIT_SUCCESS;
+                sim::program=52;
+                return EXIT_SUCCESS;
             }
-            test="diagnostic-boltzmann-micromagnetic-llg";
+            test="exchange-stiffness";
             if(value==test){
                 sim::program=53;
                 return EXIT_SUCCESS;
             }
             test="field-sweep";
             if(value==test){
-                sim::program=60;
+                sim::program=70;
                 return EXIT_SUCCESS;
             }
-            test="domain-wall";
+            test="disk-tracks";
             if(value==test){
-                sim::program=61;
+               sim::program=72;
+               return EXIT_SUCCESS;
+            }
+            test="diagnostic-boltzmann-micromagnetic-llg";
+            if(value==test){
+                sim::program=73;
                 return EXIT_SUCCESS;
             }
             else{
@@ -443,17 +448,21 @@ namespace vin{
                         std::cout << word << '\t' << test << std::endl;
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
                 std::cerr << "\t\"benchmark\"" << std::endl;
+                std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
+                std::cerr << "\t\"curie-temperature\"" << std::endl;
+                std::cerr << "\t\"domain-wall\"" << std::endl;
+                std::cerr << "\t\"effective-damping\"" << std::endl;
+                std::cerr << "\t\"exchange-stiffness\"" << std::endl;
+                std::cerr << "\t\"field-cool\"" << std::endl;
+                std::cerr << "\t\"laser-pulse\"" << std::endl;
+                std::cerr << "\t\"localised-field-cool\"" << std::endl;
+                std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
                 std::cerr << "\t\"time-series\"" << std::endl;
                 std::cerr << "\t\"hysteresis-loop\"" << std::endl;
-                std::cerr << "\t\"static-hysteresis-loop\"" << std::endl;
-                std::cerr << "\t\"curie-temperature\"" << std::endl;
-                std::cerr << "\t\"field-cool\"" << std::endl;
-                std::cerr << "\t\"localised-field-cool\"" << std::endl;
-                std::cerr << "\t\"laser-pulse\"" << std::endl;
-                std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
+                std::cerr << "\t\"partial-hysteresis-loop\"" << std::endl;
                 std::cerr << "\t\"hybrid-cmc\"" << std::endl;
                 std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
-                std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
+                std::cerr << "\t\"static-hysteresis-loop\"" << std::endl;
             terminaltextcolor(WHITE);
             err::vexit();
             }
@@ -1506,33 +1515,6 @@ namespace vin{
            output_list.push_back(64);
            return EXIT_SUCCESS;
         }
-        test="magneto-resistance";
-        if(word==test){
-          micromagnetic::enable_resistance = true;
-          output_list.push_back(65);
-          return EXIT_SUCCESS;
-       }
-        //--------------------------------------------------------------------
-        test="lfa-ms";
-        if(word==test){
-           output_list.push_back(66);
-           return EXIT_SUCCESS;
-        }
-        test="track-pos-x";
-        if(word==test){
-           output_list.push_back(67);
-           return EXIT_SUCCESS;
-        }
-        test="track-pos-z";
-        if(word==test){
-           output_list.push_back(68);
-           return EXIT_SUCCESS;
-        }
-         test="track-field";
-         if(word==test){
-        output_list.push_back(69);
-        return EXIT_SUCCESS;
-     }
         //--------------------------------------------------------------------
         test="resistance";
         if(word==test){
@@ -1542,17 +1524,39 @@ namespace vin{
         //--------------------------------------------------------------------
         test="current";
         if(word==test){
-           output_list.push_back(71);
+           output_list.push_back(66);
            return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
         test="domain-wall-centre";
         if(word==test){
-            output_list.push_back(70);
+            output_list.push_back(67);
             return EXIT_SUCCESS;
         }
         //--------------------------------------------------------------------
-        // reserve 68 for voltage
+        test="magneto-resistance";
+        if(word==test){
+           micromagnetic::enable_resistance = true;
+           output_list.push_back(68);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
+        test="lfa-ms";
+        if(word==test){
+           output_list.push_back(69);
+           return EXIT_SUCCESS;
+        }
+        test="track-pos-x";
+        if(word==test){
+           output_list.push_back(70);
+           return EXIT_SUCCESS;
+        }
+        test="track-pos-z";
+        if(word==test){
+           output_list.push_back(71);
+           return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
         test="gnuplot-array-format";
         if(word==test){
             vout::gnuplot_array_format=true;

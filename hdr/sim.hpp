@@ -216,15 +216,15 @@ namespace sim{
    extern bool   lagrange_multiplier;
    extern void   update_lagrange_lambda();
 
-   // Monte Carlo statistics counters
+	// Monte Carlo statistics counters
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;
 
 	extern int domain_wall_axis;
-   extern double domain_wall_position;
+	extern double domain_wall_position;
 	extern double domain_wall_discretisation;
 	extern double domain_wall_centre;
-   extern double domain_wall_width;
+	extern double domain_wall_width;
 	extern std::vector < bool > anti_PBC;
 
 	extern std::vector < double > domain_wall_second_vector_x;

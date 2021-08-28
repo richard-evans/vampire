@@ -86,15 +86,24 @@ namespace hierarchical{
                                                 std::vector <double>& m_spin_array, // atomic spin moment
                                                 std::vector < bool >& magnetic);    // is magnetic);
 
-      void calc_intra(int cell_i, int cell_j, int interaction_no,
-                      std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_x,
-                      std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_y,
-                      std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_z);
+      // new version of inter tensor method
+      void calc_inter(const int celli,                                                // global ID of cell i
+                      const int cellj,                                                // global ID of cell i
+                      const int interaction_no,                                       // interaction number
+                      const double cutoff,                                            // cutoff range for dipole tensor construction (Angstroms)
+                      const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                      const std::vector<double>& cells_pos_and_mom_array,             // array of positions and cell moments
+                      const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
+                      const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                     );
 
-      void calc_inter(int cell_i, int cell_j, int interaction_no,
-                      std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_x,
-                      std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_y,
-                      std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_z);
+      void calc_intra(const int celli,                                                // global ID of cell i
+                      const int cellj,                                                // global ID of cell i
+                      const int interaction_no,                                       // interaction number
+                      const std::vector<int>& global_atoms_in_cell_count,             // number of atoms in each cell (all CPUs)
+                      const std::vector<int>& list_of_cells_with_atoms,               // list of cells to access atoms
+                      const std::vector< std::vector<double> >& atoms_in_cells_array  // output array of positions and moments of atoms in cells
+                     );
 
       void calc_tensor(int cells_num_local_cells,
                        std::vector < std::vector < double > >& cells_atom_in_cell_coords_array_x,
