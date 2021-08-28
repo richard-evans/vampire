@@ -534,4 +534,45 @@ double minimum3(double first, double second, double third){
    return minimum;
 }
 
+//--------------------------------------------------------------------------------
+// Function to implement linear regression, extracting gradient m and intercept c
+//--------------------------------------------------------------------------------
+void regression(std::vector<double>& x, std::vector<double>& y, double& m, double& c){
+
+	// check sizes of x and y arrays are the same
+	if( x.size() != y.size() ){
+	 	std::cerr << "Error in linear regression: x and y array sizes are not the same!" << std::endl;
+	 	err::vexit();
+	}
+
+	// calculate number of points in data set
+	const double num_points = double( x.size() );
+
+	// calculate mean x value
+	double sum_x = 0.0;
+	for(int i=0; i < x.size(); i++) sum_x += x[i];
+
+	// calculate mean y value
+	double sum_y = 0.0;
+	for(int i=0; i < y.size(); i++) sum_y += y[i];
+
+	// determine sum of squares of x-deviations
+	double sum_xx = 0.0;
+	for(int i=0; i< x.size(); i++) sum_xx += x[i]*x[i];
+
+	// determine sum of squares of xy-deviations
+	double sum_xy	= 0.0;
+	for(int i=0; i< x.size(); i++) sum_xy += x[i]*y[i];
+
+	// compute gradient
+	m = (num_points * sum_xy - sum_x * sum_y) / ( num_points * sum_xx - sum_x * sum_x );
+
+	// compute intercept
+	c = ( sum_y - m * sum_x ) / num_points;
+
+	return;
+
+}
+
+
 } // end of namespcae vmath

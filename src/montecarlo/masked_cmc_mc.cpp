@@ -137,7 +137,7 @@ void mask_polar_rot_matrix(std::vector<cmc_material_t>& cmc_mask){
 void initialise_masked_cmc_mc(const int num_sets,                       // number of sets of constrained and unconstrained atoms
 										const std::vector<int>& mask,             // unique ID for N sets of atoms with different constraints
 										const std::vector<bool>& constrained,     // flag to indicate if atom set with mask index is constrained
-										const std::vector<double>& constraints){  // list of 2N vectors listing constraint angles theta and phi
+										const std::vector<double>& constraints){  // list of 2N vectors listing constraint angles theta (from z) and phi (from x)
 
 	//-----------------------------------------------------
 	// initialise masked cmc properties

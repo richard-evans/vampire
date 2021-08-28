@@ -22,6 +22,8 @@
 #include "sim.hpp"
 #include "stats.hpp"
 #include "vio.hpp"
+#include "vmath.hpp"
+
 
 int calculate_spin_fields(const int,const int);
 int calculate_external_fields(const int,const int);
@@ -31,8 +33,8 @@ namespace program{
 //--------------------------------------------------------------------------------
 // constants but can be moved to input parameters if need be
 //--------------------------------------------------------------------------------
-const double exchange_stiffness_max_constraint_angle   = 181.0; // degrees
-const double exchange_stiffness_delta_constraint_angle = 45.0; // degrees
+const double exchange_stiffness_max_constraint_angle   = 180.01; // degrees
+const double exchange_stiffness_delta_constraint_angle =  5; // 22.5 degrees
 const double pi180 = M_PI/180.0;
 
 //--------------------------------------------------------------------------------
@@ -71,7 +73,7 @@ void calculate_torque(const std::vector<int>& mask,
 //   integrated freely (standard Monte Carlo) allowing the determination of
 //   exchange stiffness in ferri and collinear and non-collinear
 //   antiferromagnets. The direction of the first plane of atoms is chosen
-//   along z. The middle plane is the rotated in the x-z plane for small angles
+//   along z. The middle plane is the rotated in the y-z plane for small angles
 //   (up to 30 degrees) to determine the torque curve <T>(theta). Linear
 //   regression is then used to determine the gradient d<T>/dtheta and by
 //   quadrature extract the change in free energy DF(theta).
@@ -81,7 +83,8 @@ void calculate_torque(const std::vector<int>& mask,
 //         Eex = A <m1><m2> cos theta
 //
 //   we extract the effective exchange coupling for a given system and
-//   temperature. Note, this program only works in serial.
+//   temperature. Note, this program only works in serial due to the use of the
+//   constrained monte carlo method.
 //
 //--------------------------------------------------------------------------------
 void exchange_stiffness(){
@@ -148,6 +151,17 @@ void exchange_stiffness(){
 	const double inv_n_atm_p1 = 1.0 / double( n_atm_p1 );
 	const double inv_n_atm_p2 = 1.0 / double( n_atm_p2 );
 
+	// Data structure to store torque curves data[torques][temperatures]
+	std::vector< std::vector<double> > torque_data;
+	std::vector< std::vector<double> > m1_data; // mean magnetization (layer 1)
+	std::vector< std::vector<double> > m2_data; // mean magnetization (layer 2)
+	std::vector< double > angles;
+	std::vector< double > temperatures;
+	//int count = 0;
+	//for(double constraint_theta = 0.0; constraint_theta < mt; constraint_theta += dt) count++;
+	//const int num_angles = count;
+	//torque_data.resize(num_angle)
+
 	// Open output file for torque data
 	std::ofstream ofile;
 	ofile.open("exchange-stiffness-torques.txt");
@@ -155,14 +169,25 @@ void exchange_stiffness(){
 	//---------------------------------------------------------------------------
 	// Main exchange calculation program
 	//---------------------------------------------------------------------------
-	const int mt = exchange_stiffness_max_constraint_angle;
-	const int dt = exchange_stiffness_delta_constraint_angle;
+	const double mt = exchange_stiffness_max_constraint_angle;
+	const double dt = exchange_stiffness_delta_constraint_angle;
+
+	// set constraint phi component
+	const double constraint_phi = 90.0;
+	const double cosphi = cos(constraint_phi*pi180);
+	const double sinphi = sin(constraint_phi*pi180);
 
 	// loop over constraint angles ct (constraint_theta)
-	for(int constraint_theta = 0.0; constraint_theta < mt; constraint_theta += dt){
+	for(double constraint_theta = 0.0; constraint_theta < mt; constraint_theta += dt){
+
+		// push back data to store calculated torques and angles
+		angles.push_back(constraint_theta*pi180); // radians
+		m1_data.push_back( std::vector<double>() );
+		m2_data.push_back( std::vector<double>() );
+		torque_data.push_back( std::vector<double>() );
 
 		// initialise new spin positions (half rotation from 1st plane to mid plane, then second half rotation to max plane)
-		for( int atom = 0 ; atom < atoms::num_atoms; atom++){
+		for( int atom = 0 ; atom < atoms::num_atoms; atom++ ){
 
 			// get material ID
 			const int mat = atoms::type_array[atom];
@@ -170,23 +195,28 @@ void exchange_stiffness(){
 			// if constrained material initialise normal profile (constant angle)
 			if( mat == constrained_material_id){
 				const double theta = double(constraint_theta); // angle from z per fractional coordinate
-				atoms::x_spin_array[atom] = sin( theta * pi180 * fractional_coordinates[atom] );
-				atoms::y_spin_array[atom] = 0.0;
+				atoms::x_spin_array[atom] = cosphi*sin( theta * pi180 * fractional_coordinates[atom] );
+				atoms::y_spin_array[atom] = sinphi*sin( theta * pi180 * fractional_coordinates[atom] );
 				atoms::z_spin_array[atom] = cos( theta * pi180 * fractional_coordinates[atom] );
 			}
+			// otherwise assume initial spin direction for sublattice (should work OK for most ferro, ferri and antiferromagnets)
 			else{
 				atoms::x_spin_array[atom] = mp::material[mat].initial_spin[0];
 				atoms::y_spin_array[atom] = mp::material[mat].initial_spin[1];
 				atoms::z_spin_array[atom] = mp::material[mat].initial_spin[2];
 			}
+
 		}
 
 		// reset hybrid CMC constraints
-		std::vector<double> phi_theta_constraints(6, 0.0);
+		std::vector<double> phi_theta_constraints(6, 0.0); // sets of (theta,phi)
+		phi_theta_constraints[0] = 0.0; // set first plane along z
+		phi_theta_constraints[1] = 0.0; // set first plane along z
 		phi_theta_constraints[2] = constraint_theta; // set middle plane angle from z to theta
+		phi_theta_constraints[3] = constraint_phi;   // set middle plane angle from z to theta
 		std::vector<bool> constrained(3,false);
-		constrained[0] = true;
-		constrained[1] = true;
+		constrained[0] = true; // constrain first plane
+		constrained[1] = true; // constrain middle plane
 		montecarlo::initialise_masked_cmc_mc(constraint_mask.size(), constraint_mask, constrained, phi_theta_constraints);
 
 		// initialise temperature
@@ -194,6 +224,9 @@ void exchange_stiffness(){
 
 		// equilibrate ground state structure at zero kelvin
 		for(int ztime = 0; ztime < 500; ztime++) sim::integrate(1);
+
+		// reset temperature array
+		temperatures.resize(0);
 
 		// Perform Temperature Loop
 		while( sim::temperature <= sim::Tmax){
@@ -233,8 +266,16 @@ void exchange_stiffness(){
 						torques[0]*inv_n_atm_p1/counter << "\t" << torques[1]*inv_n_atm_p1/counter << "\t" << torques[2]*inv_n_atm_p1/counter << "\t" <<
 						torques[3]*inv_n_atm_p2/counter << "\t" << torques[4]*inv_n_atm_p2/counter << "\t" << torques[5]*inv_n_atm_p2/counter << std::endl;
 
+			// store computed net torque in data array
+			temperatures.push_back(sim::temperature);
+			const int end = torque_data.size()-1;
+			const double net_torque = torques[3]*inv_n_atm_p2/counter - torques[0]*inv_n_atm_p1/counter;
+			m1_data[end].push_back(magnetizations[0]/counter);
+			m2_data[end].push_back(magnetizations[1]/counter);
+			torque_data[end].push_back(net_torque);
+
 			// Increment temperature
-			sim::temperature+=sim::delta_temperature;
+			sim::temperature += sim::delta_temperature;
 
 		} // end of temperature loop
 
@@ -243,7 +284,44 @@ void exchange_stiffness(){
 	// close output file
 	ofile.close();
 
-	// perform linear regression
+	//--------------------------------------------------------------------------------------------------
+	// perform linear regression to extract T(theta)
+	//--------------------------------------------------------------------------------------------------
+
+	// output data for checking
+	/*for(int i=0; i<torque_data.size(); i++){
+		std::cout << angles[i] << "\t";
+		for(int j=0; j<torque_data[i].size(); j++){
+			std::cout << torque_data[i][j] << "\t" << m1_data[i][j] << "\t" << m2_data[i][j] << "\t";
+		}
+		std::cout << std::endl;
+	}*/
+
+	// data structure to store torques in linear memory
+	std::vector<double> torque1D( angles.size() );
+
+	std::cout << "---------------------------------------------------------------" << std::endl;
+	std::cout << " Final exchange fitting" << std::endl;
+	std::cout << "---------------------------------------------------------------" << std::endl;
+
+	// loop over all temperatures
+	for(int j = 0; j < temperatures.size(); j++){
+
+		// populate 1D data for fitting
+		for(int i = 0; i < torque_data.size(); i++) torque1D[i] = torque_data[i][j];
+
+		double m = 0.0;
+		double c = 0.0;
+
+		// compute gradient and intercept
+		vmath::regression(angles, torque1D, m, c);
+
+		// output resulting gradient to screen
+		std::cout << temperatures[j] << "\t" << m << "\t" << c << std::endl;
+
+	}
+
+
 
 	return;
 
@@ -312,7 +390,7 @@ void set_constraint_mask(const std::vector<double>& coordinates, // atomic coord
 	int num_atoms_in_plane_1 = 0;
 	int num_atoms_in_plane_2 = 0;
 
-	// calculate fractioanl extent of atoms
+	// calculate fractional extent of atoms
 	// (this is not absolute, so there may be some atoms with fractional coordinates < 0 and >1)
 	const double inv_delta = 2.0 / (max_coord - min_coord);
 
@@ -359,7 +437,9 @@ void set_constraint_mask(const std::vector<double>& coordinates, // atomic coord
 	return;
 
 }
-
+//------------------------------------------------------------------------------
+// Function to calculate equal and opposite torques on each constrained plane
+//------------------------------------------------------------------------------
 void calculate_torque(const std::vector<int>& mask,
 							 const std::vector<int>& material,
 							 std::vector<double>& total_torques,
@@ -370,6 +450,7 @@ void calculate_torque(const std::vector<int>& mask,
 	calculate_external_fields(0,atoms::num_atoms);
 
 	double mm[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+	double tt[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 	double counter[2] = { 0.0, 0.0 };
 
 	for(int atom = 0; atom < mask.size(); atom++){
@@ -392,26 +473,30 @@ void calculate_torque(const std::vector<int>& mask,
 										 atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom],
 										 atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] };
 
-			total_torques[3*mask_id + 0] += mu*(S[1]*H[2] - S[2]*H[1]);
-			total_torques[3*mask_id + 1] += mu*(S[2]*H[0] - S[0]*H[2]);
-			total_torques[3*mask_id + 2] += mu*(S[0]*H[1] - S[1]*H[0]);
+			// compute torques
+			const double ttx = mu*(S[1]*H[2] - S[2]*H[1]);
+			const double tty = mu*(S[2]*H[0] - S[0]*H[2]);
+			const double ttz = mu*(S[0]*H[1] - S[1]*H[0]);
 
+			// accumulate torques for local sum
+			tt[3*mask_id + 0] += ttx;
+			tt[3*mask_id + 1] += tty;
+			tt[3*mask_id + 2] += ttz;
+
+			// accumulate spin moments for local sum
 			mm[3*mask_id+0] += S[0];
 			mm[3*mask_id+1] += S[1];
 			mm[3*mask_id+2] += S[2];
 
+			// update counter for each mask
 			counter[mask_id] += 1.0;
-
-			std::cout << "\t" << mask_id << "\t" << S[0] << "\t" << S[1] << "\t" << S[2] << std::endl;
 
 		}
 
 	}
 
-	std::cout << counter[0] << "\t" << counter[1] << "\t";
-	for(int i=0; i<6; i++) std::cout << mm[i] << "\t";
-	std::cout << std::endl;
-	std::cin.get();
+	// copy local torques to main total torque array
+	for(int i=0; i<6; i++) total_torques[i] += tt[i];
 
 	// calculate magnetizations for planes 1 and 2
 	total_magnetizations[0] += sqrt(mm[0]*mm[0] + mm[1]*mm[1] + mm[2]*mm[2]) / counter[0];
