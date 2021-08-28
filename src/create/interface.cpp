@@ -368,6 +368,12 @@ namespace create{
             return true;
         }
         //--------------------------------------------------------------------
+        test="grains-poission"; //parity
+        if(word==test){
+           create::internal::grain_poission=true;
+           return true;
+        }
+        //--------------------------------------------------------------------
         test="height-categorization";
         if(word==test){
             // Test for different options

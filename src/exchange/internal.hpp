@@ -228,6 +228,7 @@ namespace exchange{
       extern std::vector <int> biquadratic_neighbour_interaction_type_array; // 1D list of biquadratic exchange interaction types
       extern std::vector <int> biquadratic_neighbour_list_start_index; // list of first biquadratic neighbour for atom i
       extern std::vector <int> biquadratic_neighbour_list_end_index;   // list of last biquadratic neighbour for atom i
+      extern std::vector <bool> IrMn;   // list of last biquadratic neighbour for atom i
 
       extern std::vector <exchange::internal::value_t > bq_i_exchange_list; // list of isotropic biquadratic exchange constants
       extern std::vector <exchange::internal::vector_t> bq_v_exchange_list; // list of vectorial biquadratic exchange constants
@@ -237,8 +238,8 @@ namespace exchange{
       // Internal function declarations
       //-------------------------------------------------------------------------
       void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
-      void unroll_exchange_interactions();
-      void unroll_normalised_exchange_interactions();
+      void unroll_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear);
+      void unroll_normalised_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear);
       void unroll_normalised_biquadratic_exchange_interactions();
       void exchange_fields(const int start_index, // first atom for exchange interactions to be calculated
                            const int end_index, // last +1 atom to be calculated

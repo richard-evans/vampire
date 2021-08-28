@@ -5,14 +5,20 @@
 #===================================================================
 
 # Specify compiler for MPI compilation with openmpi
-export OMPI_CXX=g++ -std=c++0x
+export OMPI_CXX=g++ -std=c++11
 
 #export OMPI_CXX=icc
 #export OMPI_CXX=pathCC
 # Specify compiler for MPI compilation with mpich
 #export MPICH_CXX=g++
 #export MPICH_CXX=bgxlc++
+
+# Include the FFTW library by uncommenting the -DFFT (off by default)
+export incFFT= -DFFT -DFFTW_OMP -fopenmp
+export FFTLIBS= -lfftw3_omp -lfftw3
+
 # Compilers
+<<<<<<< HEAD
 ICC=icc -std=c++0x -DCOMP='"Intel C++ Compiler"'
 GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"'
 LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
@@ -20,6 +26,25 @@ PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
 IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
 MPICC=mpicxx -DMPICF
 MPIICC=mpiicpc -DMPICF
+=======
+#<<<<<<< HEAD
+ICC=icc -DCOMP='"Intel C++ Compiler"' $(incFFT)
+GCC=g++ -std=c++0x -DCOMP='"GNU C++ Compiler"' $(incFFT)
+LLVM=g++ -DCOMP='"LLVM C++ Compiler"' $(incFFT)
+PCC=pathCC -DCOMP='"Pathscale C++ Compiler"' $(incFFT)
+IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"' $(incFFT)
+MPICC=mpicxx -DMPICF $(incFFT)
+
+LIBS= -lstdc++ -lm $(FFTLIBS) -L/opt/local/lib/
+#=======
+#ICC=icc -DCOMP='"Intel C++ Compiler"'
+#GCC=g++ -std=c++11 -DCOMP='"GNU C++ Compiler"'
+#LLVM=g++ -DCOMP='"LLVM C++ Compiler"'
+#PCC=pathCC -DCOMP='"Pathscale C++ Compiler"'
+#IBM=bgxlc++ -DCOMP='"IBM XLC++ Compiler"'
+#MPICC=mpicxx -DMPICF
+#>>>>>>> origin/cuda_dipole
+>>>>>>> hierarchical
 
 CCC_CFLAGS=-I./hdr -I./src/qvoronoi -O0
 CCC_LDFLAGS=-I./hdr -I./src/qvoronoi -O0
@@ -28,7 +53,7 @@ export LANG=C
 export LC_ALL=C
 
 # LIBS
-LIBS=
+
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
 
 # Debug Flags
@@ -131,9 +156,11 @@ include src/constants/makefile
 include src/dipole/makefile
 include src/exchange/makefile
 include src/gpu/makefile
+include src/hierarchical/makefile
 include src/ltmp/makefile
 include src/main/makefile
 include src/montecarlo/makefile
+include src/micromagnetic/makefile
 include src/mpi/makefile
 include src/neighbours/makefile
 include src/program/makefile
@@ -142,6 +169,7 @@ include src/spintransport/makefile
 include src/statistics/makefile
 include src/unitcell/makefile
 include src/vio/makefile
+include src/environment/makefile
 
 # Cuda must be last for some odd reason
 include src/cuda/makefile
@@ -182,7 +210,7 @@ all: serial parallel vdc
 
 # Serial Targets
 serial: $(OBJECTS)
-	$(GCC) $(GCC_LDFLAGS) $(LIBS) $(OBJECTS) -o $(EXECUTABLE)
+	$(GCC) $(GCC_LDFLAGS)  $(OBJECTS) $(LIBS) -o $(EXECUTABLE)
 
 $(OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<
@@ -238,7 +266,7 @@ $(PCCDB_OBJECTS): obj/%_pdb.o: src/%.cpp
 # MPI Targets
 
 parallel: $(MPI_OBJECTS)
-	$(MPICC) $(GCC_LDFLAGS) $(LIBS) $(MPI_OBJECTS) -o $(PEXECUTABLE)
+	$(MPICC) $(GCC_LDFLAGS) $(MPI_OBJECTS) $(LIBS) -o $(PEXECUTABLE)
 
 $(MPI_OBJECTS): obj/%_mpi.o: src/%.cpp
 	$(MPICC) -c -o $@ $(GCC_CFLAGS) $(OPTIONS) $<

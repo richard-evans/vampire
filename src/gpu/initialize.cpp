@@ -42,4 +42,22 @@ namespace gpu{
       return;
    }
 
+
+   //-------------------------------------------------------------------------------
+   // Function to call correct initialization function depending on cuda,opencl etc
+   //-------------------------------------------------------------------------------
+   void initialize_dipole(){
+
+      // check for gpu functions and data initialised
+      if( !gpu::initialized ) return;
+
+      #ifdef CUDA
+         vcuda::initialize_dipole();
+      #elif OPENCL
+         vopencl::initialize_dipole();
+      #endif
+
+      return;
+   }
+
 } // end of namespace gpu

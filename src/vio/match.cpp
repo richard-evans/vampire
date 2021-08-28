@@ -22,6 +22,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
+#include "environment.hpp"
 #include "material.hpp"
 #include "gpu.hpp"
 #include "grains.hpp"
@@ -37,9 +38,10 @@
 #include "spintorque.hpp"
 #include "spintransport.hpp"
 #include "unitcell.hpp"
-
+#include "micromagnetic.hpp"
 // vio module headers
 #include "internal.hpp"
+#include "../create/internal.hpp"
 
 namespace vin{
 
@@ -70,6 +72,7 @@ namespace vin{
         //-------------------------------------------------------------------
         // Call module input parameters
         //-------------------------------------------------------------------
+      //  std::cout << "YAY" <<std::endl;
         if(ltmp::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(anisotropy::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(cells::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -83,7 +86,8 @@ namespace vin{
         else if(spin_transport::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(unitcell::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
-
+        else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         //===================================================================
         // Test for create variables
         //===================================================================
@@ -426,6 +430,7 @@ namespace vin{
             }
             else{
             terminaltextcolor(RED);
+                        std::cout << word << '\t' << test << std::endl;
                 std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
                 std::cerr << "\t\"benchmark\"" << std::endl;
                 std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
@@ -796,6 +801,124 @@ namespace vin{
             mtrandom::integration_seed=is;
             return EXIT_SUCCESS;
         }
+        test="track-Ms";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "magnetisation", 0.0, 360.0,"input","0.0 - 100");
+        sim::track_Ms = m;
+        return EXIT_SUCCESS;
+     }
+     test="track-file";
+     if(word==test){
+          sim::track_ms_file=true; // Save checkpoint
+          return EXIT_SUCCESS;
+     }
+
+     test="track-bit-size-x";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
+        sim::track_bit_size = m;
+        return EXIT_SUCCESS;
+     }
+
+     test="track-bit-size-z";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
+        sim::track_bit_width = m;
+        return EXIT_SUCCESS;
+     }
+
+     test="track-bit-size-y";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 360000.0,"input","0.0 - 100");
+        sim::track_bit_size = m;
+        return EXIT_SUCCESS;
+     }
+     test="track-fly-height";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 100");
+        sim::track_fly_height = m;
+        return EXIT_SUCCESS;
+     }
+
+     test="track-gap-between-bits";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 100");
+        sim::track_bit_gap = m;
+        return EXIT_SUCCESS;
+     }
+     test="track-gap-between-tracks";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "length", 0.0, 36000.0,"input","0.0 - 100");
+        sim::track_track_gap = m;
+        return EXIT_SUCCESS;
+     }
+     test="LFA-track-field-step";
+     if(word==test){
+       double m=atof(value.c_str());
+       check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 36000.0,"input","0.0 - 100");
+       sim::LFA_scan_field_step = m;
+       return EXIT_SUCCESS;
+     }
+
+     test="num-tracks";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 100,"input","0.0 - 100");
+        sim::track_num_tracks = m;
+        std::cout << "N" << m << std::endl;
+        return EXIT_SUCCESS;
+     }
+     test="num-bits-per-track";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 100.0,"input","0.0 - 100");
+        sim::track_num_bits_per_track = m;
+        std::cout << "N" << m << std::endl;
+
+        return EXIT_SUCCESS;
+     }
+
+
+
+     //--------------------------------------------------------------------
+     test="x-velocity";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+        sim::cross_track_velocity = m;
+        return EXIT_SUCCESS;
+     }
+
+     //--------------------------------------------------------------------
+     test="z-velocity";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "none", 0.0, 360.0,"input","0.0 - 360.0 degrees");
+        sim::down_track_velocity = m;
+        return EXIT_SUCCESS;
+     }
+     //--------------------------------------------------------------------
+     test="initial-x-position";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
+        sim::initial_cross_track_position = m;
+        return EXIT_SUCCESS;
+     }
+     test="initial-z-position";
+     if(word==test){
+        double m=atof(value.c_str());
+        check_for_valid_value(m, word, line, prefix, unit, "none", -100000000.0, 10000000.0,"input","0.0 - 360.0 degrees");
+        sim::initial_down_track_position = m;
+        return EXIT_SUCCESS;
+     }
         //--------------------------------------------------------------------
         test="constraint-rotation-update";
         if(word==test){
@@ -1020,6 +1143,12 @@ namespace vin{
             output_list.push_back(2);
             return EXIT_SUCCESS;
         }
+        test="magneto-resistance";
+        if(word==test){
+          micromagnetic::enable_resistance = true;
+          output_list.push_back(65);
+          return EXIT_SUCCESS;
+       }
         else
         //--------------------------------------------------------------------
         test="applied-field-strength";
@@ -1488,6 +1617,13 @@ namespace vin{
             output_list.push_back(22);
             return EXIT_SUCCESS;
         }
+        test="magneto-resistance";
+        if(word==test){
+          //std::cout << "A" <<std::endl;
+          micromagnetic::enable_resistance = true;
+          output_list.push_back(65);
+          return EXIT_SUCCESS;
+       }
         else
         //-------------------------------------------------------------------
         test="output-rate";
@@ -2321,6 +2457,7 @@ namespace vin{
             The default value is false for all materials. Valid values are
             true, false or (blank) [same as true].
             */
+
             if(word==test){
                test="keep";
                // keep all atoms in simulation (for efficient parallelization)
@@ -2352,6 +2489,7 @@ namespace vin{
             //-------------------------------------------------------------------
             // Call module input parameters
             //-------------------------------------------------------------------
+
             else if(anisotropy::match_material_parameter(word, value, unit, line, super_index, sub_index, mp::max_materials)) return EXIT_SUCCESS;
             else if(create::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(dipole::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
@@ -2360,6 +2498,8 @@ namespace vin{
             else if(st::match_material(word, value, unit, line, super_index)) return EXIT_SUCCESS;
             else if(spin_transport::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
             else if(unitcell::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(micromagnetic::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
+            else if(environment::match_material_parameter(word, value, unit, line, super_index, sub_index)) return EXIT_SUCCESS;
 
             //--------------------------------------------------------------------
             // keyword not found

@@ -34,13 +34,13 @@ namespace exchange{
    // This requires additional memory since each interaction is potentially
    // unique, requiring that the whole exchange list be unrolled
    //----------------------------------------------------------------------------
-   void unroll_normalised_exchange_interactions(){
+   void unroll_normalised_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear2){
 
    	// temporary class variables
    	zval_t tmp_zval;
    	zvec_t tmp_zvec;
    	zten_t tmp_zten;
-
+//std::cout << "EXC" << std::endl;
    	switch(exchange::internal::exchange_type){
    		case exchange::isotropic:
    			// unroll material calculations
@@ -48,13 +48,34 @@ namespace exchange{
    			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
    			atoms::i_exchange_list.reserve(atoms::neighbour_list_array.size());
    			// loop over all interactions
-   			for(int atom = 0; atom < atoms::num_atoms; atom++){
+            for(int atom = 0; atom < atoms::num_atoms; atom++){
    				const int imaterial = atoms::type_array[atom];
                const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
    				for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; nn++){
    					const int natom = atoms::neighbour_list_array[nn];
    					const int jmaterial = atoms::type_array[natom];
    					atoms::i_exchange_list.push_back(tmp_zval);
+                  double J = 1.0;
+                  // //calculate the distance between the atoms to see if its a NN or NNN interaction
+                  double dx = atoms::x_coord_array[atom] - atoms::x_coord_array[natom];
+                  double dy = atoms::y_coord_array[atom] - atoms::y_coord_array[natom];
+                  double dz = atoms::z_coord_array[atom] - atoms::z_coord_array[natom];
+
+                  double d = sqrt(sqrt(dx*dx + dy*dy)*sqrt(dx*dx + dy*dy) + dz*dz);
+
+                  if (IrMn[imaterial] && IrMn[jmaterial]){
+
+                     //std::cout << "enter" <<std::endl;
+                     if (d  > 2.6 && d < 2.7 ) J = 1.0;
+                     else if (d  > 3.7 && d <3.8 ) J = -0.8;
+                  }
+                  else {
+                  //   std::cout << "not enter" <<std::endl;
+                     if (d  > 2.6 && d < 2.7 ) J = 1.0;
+                     else if (d  > 3.7 && d <3.8 ) J = 0.0;
+                  }
+
+                //  std::cout << J << std::endl;
                   // get unit cell interaction id
                   int i = atoms::neighbour_interaction_type_array[nn];
                   // get shell ID for interaction

@@ -426,16 +426,16 @@ namespace vout{
          }
       }
 
-		// Only output 1/output_rate time steps// This is all serialised inside the write_output fn - AJN
-		if(sim::time%vout::output_rate==0){
-            write_out(zmag,file_output_list);
-		} // end of if statement for output rate
+      // Only output 1/output_rate time steps// This is all serialised inside the write_output fn - AJN
+      if(sim::time%vout::output_rate==0){
+         write_out(zmag,file_output_list);
+      } // end of if statement for output rate
 
-		if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
-            write_out(std::cout,screen_output_list);
-		} // End of if statement to output data to screen
+      if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
+         write_out(std::cout,screen_output_list);
+      } // End of if statement to output data to screen
 
-		if(sim::time%vout::output_grain_rate==0){
+      if(sim::time%vout::output_grain_rate==0){
 
    		// calculate grain magnetisations
    		grains::mag();

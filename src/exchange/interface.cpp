@@ -94,6 +94,7 @@ namespace exchange{
       // Check for empty material parameter array and resize to avoid segmentation fault
       if(internal::mp.size() == 0){
          internal::mp.resize(max_materials);
+         internal::IrMn.resize(max_materials);
       }
 
       //------------------------------------------------------------
@@ -249,6 +250,11 @@ namespace exchange{
       if( word == test ){
          read_exchange_values(super_index, sub_index, 9, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
          exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      test = "IrMn";
+      if( word == test ){
+         internal::IrMn[super_index] = true; // Switch on biquadratic exchange
          return true;
       }
       //--------------------------------------------------------------------

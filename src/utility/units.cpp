@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=54;
+	const int max_units=57;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -160,6 +160,13 @@ int init(){
       unit[51]="MHz";	   conversion[51]=1.0e6; 			   type[51]="frequency";		// MHz
       unit[52]="GHz";		conversion[52]=1.0e9; 			   type[52]="frequency";		// GHz
       unit[53]="THz";		conversion[53]=1.0e12; 			   type[53]="frequency";		// THz
+
+		// exchange (Internal unit J/Angstrom)
+		unit[54]="J/m";		conversion[54]=1.0E-10; 			type[54]="exchange";		// Joules/metres squared
+    	unit[55]="erg/cm";	conversion[55]=1.0E-15; 			type[55]="exchange";		// erg/cm squared
+	 	unit[56]="erg/cm2";	conversion[56]=1.0e-23; 			type[56]="mm_energy";		// erg/cm2 squared to J/A2
+
+      //
 
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag

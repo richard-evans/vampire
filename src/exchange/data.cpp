@@ -51,6 +51,7 @@ namespace exchange{
       std::vector <int> biquadratic_neighbour_interaction_type_array; // 1D list of biquadratic exchange interaction types
       std::vector <int> biquadratic_neighbour_list_start_index; // list of first biquadratic neighbour for atom i
       std::vector <int> biquadratic_neighbour_list_end_index;   // list of last biquadratic neighbour for atom i
+      std::vector <bool> IrMn;   // list of last biquadratic neighbour for atom i
 
       std::vector <exchange::internal::value_t  > bq_i_exchange_list(0); // list of isotropic biquadratic exchange constants
       std::vector <exchange::internal::vector_t > bq_v_exchange_list(0); // list of vectorial biquadratic exchange constants

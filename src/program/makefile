@@ -23,6 +23,8 @@ time_series.o \
 temperature_pulse.o \
 localised_temperature_pulse.o \
 effective_damping.o \
+disk_tracks.o \
+field_sweep.o \
 domain_wall.o \
 fmr.o
 

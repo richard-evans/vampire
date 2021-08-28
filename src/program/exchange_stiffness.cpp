@@ -25,9 +25,6 @@
 #include "vmath.hpp"
 
 
-int calculate_spin_fields(const int,const int);
-int calculate_external_fields(const int,const int);
-
 namespace program{
 
 //--------------------------------------------------------------------------------
@@ -446,8 +443,8 @@ void calculate_torque(const std::vector<int>& mask,
 							 std::vector<double>& total_magnetizations){
 
 	// calculate net fields on all spins
-	calculate_spin_fields(0,atoms::num_atoms);
-	calculate_external_fields(0,atoms::num_atoms);
+	sim::calculate_spin_fields(0,atoms::num_atoms);
+	sim::calculate_external_fields(0,atoms::num_atoms);
 
 	double mm[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 	double tt[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };

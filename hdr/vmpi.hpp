@@ -50,6 +50,7 @@ namespace vmpi{
 	extern int num_core_atoms;			///< Number of atoms on local CPU with no external communication
 	extern int num_bdry_atoms;			///< Number of atoms on local CPU with external communication
 	extern int num_halo_atoms;			///< Number of atoms on remote CPUs needed for boundary atom integration
+   extern int num_local_atoms;       // number of atoms on local processor
 
 	extern int num_io_processors;		///< Total number of CPUs that perform IO
 	extern int size_io_group;			///< Size of io mpi groups
@@ -111,7 +112,12 @@ namespace vmpi{
 	// wrapper functions avoiding MPI library
 	extern void barrier();
    extern uint64_t reduce_sum(uint64_t local);
+   extern double reduce_sum(double local);
    extern uint64_t all_reduce_sum(uint64_t local);
+   extern double all_reduce_sum(double local);
+   extern void all_reduce_sum(std::vector<double>& array);
+   extern void all_reduce_sum(std::vector<int>& array);
+
    extern void collate(std::vector<double>& input, std::vector<double>& output);
    extern void counts_and_displacements(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);
    extern void fast_collate(std::vector<double>& input, std::vector<double>& output, std::vector<int>& counts, std::vector<int>& displacements);

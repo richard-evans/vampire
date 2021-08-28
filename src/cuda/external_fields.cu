@@ -37,9 +37,10 @@ namespace internal{
 void update_external_fields (){
 
     // Find the addresses in the device address space
-   int * d_materials = thrust::raw_pointer_cast(cu::atoms::type_array.data());
-   cu::material_parameters_t * d_material_params = thrust::raw_pointer_cast (cu::mp::materials.data());
+   //int * d_materials = thrust::raw_pointer_cast(cu::atoms::type_array.data());
+   //cu::material_parameters_t * d_material_params = thrust::raw_pointer_cast (cu::mp::materials.data());
 
+   /*
    cu_real_t * d_x_dip_field = thrust::raw_pointer_cast(cu::x_dipolar_field_array.data());
    cu_real_t * d_y_dip_field = thrust::raw_pointer_cast(cu::y_dipolar_field_array.data());
    cu_real_t * d_z_dip_field = thrust::raw_pointer_cast(cu::z_dipolar_field_array.data());
@@ -47,7 +48,7 @@ void update_external_fields (){
    cu_real_t * d_x_ext_field = thrust::raw_pointer_cast(cu::x_total_external_field_array.data());
    cu_real_t * d_y_ext_field = thrust::raw_pointer_cast(cu::y_total_external_field_array.data());
    cu_real_t * d_z_ext_field = thrust::raw_pointer_cast(cu::z_total_external_field_array.data());
-
+   */
    // copy simulation variables to temporary constants
    const cu_real_t global_temperature = sim::temperature;
    const cu_real_t Hx = sim::H_vec[0]*sim::H_applied;
@@ -57,10 +58,9 @@ void update_external_fields (){
 
    // Call kernel to calculate external fields
    cu::update_external_fields_kernel <<< cu::grid_size, cu::block_size >>> (
-         d_materials,
-         d_material_params,
-         d_x_dip_field, d_y_dip_field, d_z_dip_field,
-         d_x_ext_field, d_y_ext_field, d_z_ext_field,
+         cu::atoms::d_materials, cu::mp::d_material_params,
+         cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
+         cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
          cu::d_rand_state,
          global_temperature,
          Hx, Hy, Hz,
