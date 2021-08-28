@@ -52,7 +52,7 @@ void output_xyz_file(){
 
       // write magnetic atoms to output text stream in parallel
       #pragma omp for
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_atoms_list[i];
@@ -69,7 +69,7 @@ void output_xyz_file(){
 
       // write non-magnetic atoms
       #pragma omp for
-      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_nm_atoms_list[i];

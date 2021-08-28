@@ -45,6 +45,7 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
    sy2 = vdc::vector_y[0]*sx + vdc::vector_y[1]*sy + vdc::vector_y[2]*sz;
    sz2 = vdc::vector_z[0]*sx + vdc::vector_z[1]*sy + vdc::vector_z[2]*sz;
 
+<<<<<<< HEAD
    // BROKEN for x-z rotations...
    // in y,z plane, angle = the spin direction
    //yz_angle = std::atan2(sy2,sz2);
@@ -52,17 +53,22 @@ void rgb( const double& sx, const double& sy, const double& sz, double& red, dou
 
    //if ( (sy2 == 0) && (sz2 == 0) ) yz_angle = pi/2;
    //yz_angle = std::fmod(yz_angle + 2*pi, 2*pi);  // range [0-2pi]
+=======
+   // in y,z plane, angle = the spin direction in the range [0-2pi]
+   yz_angle = std::acos(sz2);
+>>>>>>> vdc
 
    // to apply colourmap, need value between 0-255
    yz_angle = scale(0.0, 255.0, 0.0, 2.0*pi, yz_angle);
 
    // find rgb values
+   // this is a linear interpolation. In future, may want to implement cubic interp
    interpolate( yz_angle, red, green, blue );
 
    // by default the x-component is ignored and the system is coloured as 2D
    // if --3D is used, colours are brighter/darker according to the x-component
    // of the magnetisation
-   if ( vdc::x_axis_colour == true ){
+   if ( vdc::x_axis_colour ){
 
       // temp values for hue, saturation and light
       hue = 0.0;
@@ -303,7 +309,7 @@ void hsi2rgb( double& red, double& green, double& blue, double& hue, double& int
 }
 
 //------------------------------------------------------------------------------
-// Find point between integer colorvals using y=mx+c
+// Find point between integer colorvals using y=mx+c (linear interpolation)
 // x-values [0-255], y-values rgb [0-1]
 //------------------------------------------------------------------------------
 void interpolate( double angle, double& red, double& green, double& blue ){

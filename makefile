@@ -321,6 +321,12 @@ tidy:
 vdc:
 	$(MAKE) -C util/vdc/
 
+vdc-debug:
+	$(MAKE) -C util/vdc/ gcc-debug
+
+vdc-purge:
+	$(MAKE) -C util/vdc/ purge
+
 install:
 	echo "Preparing installation package"
 	rm -rf vampire.pkg
