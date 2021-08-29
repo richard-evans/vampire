@@ -13,14 +13,6 @@
 
 // CUDA and thrust headers
 #include <curand_kernel.h>
-#include <thrust/copy.h>
-#include <thrust/device_ptr.h>
-#include <thrust/device_vector.h>
-#include <thrust/fill.h>
-#include <thrust/host_vector.h>
-#include <thrust/iterator/constant_iterator.h>
-#include <thrust/iterator/zip_iterator.h>
-#include <thrust/tuple.h>
 #include "cusparse.h"
 
 // Vampire headers
@@ -40,14 +32,16 @@ namespace internal{
    // new type definitions
    #ifdef CUDA_DP
       typedef double cu_real_t;
+      const cudaDataType CUSPARSE_REAL = CUDA_R_64F;
    #else
       typedef float cu_real_t;
+      const cudaDataType CUSPARSE_REAL = CUDA_R_32F;
    #endif
 
    //typedef cusp::array1d<cu_real_t, cusp::device_memory> cu_real_array_t;
    //typedef cusp::array1d<int, cusp::device_memory> cu_index_array_t;
-   typedef thrust::device_vector<double> cu_real_array_t;
-   typedef thrust::device_vector<int>    cu_index_array_t;
+   //typedef thrust::device_vector<double> cu_real_array_t;
+   //typedef thrust::device_vector<int>    cu_index_array_t;
 
    // Compile-time selectable matrix structure
    /*
@@ -88,7 +82,7 @@ namespace internal{
    };
 
    // Type definition for array of material parameters
-   typedef thrust::device_vector<material_parameters_t> cu_material_array_t;
+   //typedef thrust::device_vector<material_parameters_t> cu_material_array_t;
 
 } // end of internal namespace
 

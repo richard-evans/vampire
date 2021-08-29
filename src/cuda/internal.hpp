@@ -55,6 +55,7 @@ namespace vcuda{
       bool __initialize_atoms ();
       bool __initialize_fields ();
       bool __initialize_cells ();
+      bool __initialize_dipole ();
       bool __initialize_materials ();
       bool __initialize_topology ();
       bool __initialize_curand ();
@@ -74,55 +75,6 @@ namespace vcuda{
       void update_dipolar_fields ();
       void update_cell_magnetizations ();
 
-      /*
-       * Shared functors for thrust
-       */
-
-      template <typename T>
-         struct plusone_functor
-         {
-            __host__ __device__
-               int operator() (const T& item) const
-               {
-                  return item + T(1);
-               }
-         };
-
-      template <typename T>
-         struct scalar_product_functor
-         : public thrust::binary_function<
-           thrust::tuple<T, T, T>, T, thrust::tuple<T, T, T> >
-      {
-
-         typedef thrust::tuple<T, T, T> VecT3;
-
-         __host__ __device__
-            VecT3 operator () (const VecT3& a, const T& c)
-            {
-               return thrust::make_tuple(
-                     thrust::get<0>(a) * c,
-                     thrust::get<1>(a) * c,
-                     thrust::get<2>(a) * c);
-            }
-      };
-
-      template <typename T>
-         struct tuple3_plus_functor
-         : public thrust::binary_function<
-           thrust::tuple<T, T, T>,
-           thrust::tuple<T, T, T>,
-           thrust::tuple<T, T, T> >
-      {
-         typedef thrust::tuple<T, T, T> Tuple3;
-         __host__ __device__ Tuple3 operator () (
-               const Tuple3 & a, const Tuple3 & b)
-         {
-            return thrust::make_tuple(
-                  thrust::get<0>(a) + thrust::get<0>(b),
-                  thrust::get<1>(a) + thrust::get<1>(b),
-                  thrust::get<2>(a) + thrust::get<2>(b));
-         }
-      };
 
 
 
@@ -185,13 +137,20 @@ namespace vcuda{
             cu_real_t * x_mag, cu_real_t * y_mag, cu_real_t * z_mag,
             cu_real_t * x_coord, cu_real_t * y_coord, cu_real_t * z_coord,
             cu_real_t * volume,
-            cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
-            int n_cells
+            cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
+            cu_real_t * x_cell_mu0H_field, cu_real_t * y_cell_mu0H_field, cu_real_t * z_cell_mu0H_field,
+            cu_real_t * d_tensor_xx, cu_real_t * d_tensor_xy, cu_real_t * d_tensor_xz,
+            cu_real_t * d_tensor_yy, cu_real_t * d_tensor_yz, cu_real_t * d_tensor_zz,
+            int * d_cell_id_array,
+            int * d_num_atoms_in_cell,
+            int n_local_cells, int n_cells
             );
 
       __global__ void update_atomistic_dipolar_fields (
             cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
+            cu_real_t * x_cell_mu0H_field, cu_real_t * y_cell_mu0H_field, cu_real_t * z_cell_mu0H_field,
             cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+            cu_real_t * x_mu0H_dip_field, cu_real_t * y_mu0H_dip_field, cu_real_t * z_mu0H_dip_field,
             int * cells, int n_atoms
             );
 

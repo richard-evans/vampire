@@ -30,6 +30,11 @@
 
 namespace montecarlo{
 
+   //-------------------------------------------------------------------------
+   // Internal shared variables
+   //-------------------------------------------------------------------------
+
+
    namespace internal{
 
       //-------------------------------------------------------------------------
@@ -39,9 +44,6 @@ namespace montecarlo{
       //-------------------------------------------------------------------------
       // Internal shared variables
       //-------------------------------------------------------------------------
-      enum algorithm_t { adaptive, spin_flip, uniform, angle, hinzke_nowak };
-
-      extern algorithm_t algorithm; // Selected algorithm for Monte Carlo simulations
 
       //Materials Variables
       extern int num_materials;
