@@ -280,14 +280,14 @@ namespace vcuda
                     #ifdef CUDA_DP
                         cu_real_t rescaled_temperature = global_temperature < Tc ? Tc*pow(global_temperature/Tc,alpha) : global_temperature;
                     #else
-                        cu_real_t rescaled_temperature = global_temperature < Tc ? Tc*__fpow(global_temperature/Tc,alpha) : global_temperature;
+                        cu_real_t rescaled_temperature = global_temperature < Tc ? Tc* __powf(global_temperature/Tc,alpha) : global_temperature;
                     #endif
                     cu_real_t rescaled_material_kBTBohr = 9.27400915e-24/(rescaled_temperature*1.3806503e-23);
 
                     #ifdef CUDA_DP
                         cu_real_t sigma = rescaled_temperature < 1.0 ? 0.02 : pow(1.0/rescaled_material_kBTBohr,0.2)*0.08;
                     #else
-                        cu_real_t sigma = rescaled_temperature < 1.0 ? 0.02 :__fpow(1.0/rescaled_material_kBTBohr,0.2)*0.08;
+                        cu_real_t sigma = rescaled_temperature < 1.0 ? 0.02 :__powf(1.0/rescaled_material_kBTBohr,0.2)*0.08;
                     #endif
 
                     // load spin direction to registers for later multiple reuse
@@ -313,7 +313,7 @@ namespace vcuda
                             #ifdef CUDA_DP
                                 double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #else
-                                float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                                float mod_s  = 1.0 / __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #endif
 
 
@@ -339,7 +339,7 @@ namespace vcuda
                             #ifdef CUDA_DP
                                 double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #else
-                                float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                                float mod_s  = 1.0 / __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #endif
 
                             nsx *= mod_s;
@@ -359,7 +359,7 @@ namespace vcuda
                             #ifdef CUDA_DP
                                 double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #else
-                                float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                                float mod_s  = 1.0 / __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #endif
 
                             nsx *= mod_s;
@@ -390,7 +390,7 @@ namespace vcuda
                                     #ifdef CUDA_DP
                                         double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #else
-                                        float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                                        float mod_s  = 1.0 / __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #endif
 
                                     nsx *= mod_s;
@@ -410,7 +410,7 @@ namespace vcuda
                                     #ifdef CUDA_DP
                                         double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #else
-                                        float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                                        float mod_s  = 1.0 /__frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #endif
 
                                     nsx *= mod_s;
@@ -429,7 +429,7 @@ namespace vcuda
                                     #ifdef CUDA_DP
                                         double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #else
-                                        float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                                        float mod_s  = 1.0 / __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                                     #endif
 
                                     nsx *= mod_s;
@@ -452,7 +452,7 @@ namespace vcuda
                             #ifdef CUDA_DP
                                 double mod_s = 1.0 / __dsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #else
-                                float mod_s  = __frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
+                                float mod_s  = 1.0 /__frsqrt_rn(nsx*nsx + nsy*nsy + nsz*nsz);
                             #endif
 
                             nsx *= mod_s;
@@ -511,8 +511,13 @@ namespace vcuda
 
 
                 // generate 3 random doubles per atom for the trial spin and 1 for the acceptance
-                curandGenerateNormalDouble( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
-                curandGenerateUniformDouble( gen, d_rand_accept, ::atoms::num_atoms);
+                #ifdef CUDA_DP
+                    curandGenerateNormalDouble( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
+                    curandGenerateUniformDouble( gen, d_rand_accept, ::atoms::num_atoms);
+                #else
+                    curandGenerateNormal( gen, d_rand_spin, 3*::atoms::num_atoms, 0.0, 1.0);
+                    curandGenerateUniform( gen, d_rand_accept, ::atoms::num_atoms);
+                #endif
 
 
 
