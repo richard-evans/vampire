@@ -22,68 +22,64 @@ namespace dipole{
    //------------------------------------------------------------------------------
    // Functions to return unrolled dipole tensor
    //------------------------------------------------------------------------------
-   std::vector<double> get_tensor_1D_xx(){
-      std::vector<double> tensor_unrolled_xx;
-      for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
-      	for(unsigned int j=0; j<dipole::internal::rij_tensor_xx[lc].size(); j++){
-				tensor_unrolled_xx.push_back( dipole::internal::rij_tensor_xx[lc][j] );
-      	}
+   std::vector<double> unroll_tensor(const int element, double dummy){
+      std::vector<double> out;
+      // Select which component of tensor to unrol since it belongs to dipole::internal
+      std::vector<std::vector<double>> in;
+      switch(element){
+         case 1:
+            in = dipole::internal::rij_tensor_xx;
+            break;
+         case 2:
+            in = dipole::internal::rij_tensor_xy;
+            break;
+         case 3:
+            in = dipole::internal::rij_tensor_xz;
+            break;
+         case 4:
+            in = dipole::internal::rij_tensor_yy;
+            break;
+         case 5:
+            in = dipole::internal::rij_tensor_yz;
+            break;
+         case 6:
+            in = dipole::internal::rij_tensor_zz;
+            break;
       }
-      return tensor_unrolled_xx;
+      for(uint64_t lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
+      	for(uint64_t j=0; j<in[lc].size(); j++){ out.push_back( in[lc][j] ); }
+      }
+      return out;
    }
 
-   std::vector<double> get_tensor_1D_xy(){
-      std::vector<double> tensor_unrolled_xy;
-      for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
-      	for(unsigned int j=0; j<dipole::internal::rij_tensor_xy[lc].size(); j++){
-				tensor_unrolled_xy.push_back( dipole::internal::rij_tensor_xy[lc][j] );
-      	}
+   std::vector<float> unroll_tensor(const int element, float dummy){
+      std::vector<float> out;
+      // Select which component of tensor to unrol since it belongs to dipole::internal
+      std::vector<std::vector<double>> in;
+      switch(element){
+         case 1:
+            in = dipole::internal::rij_tensor_xx;
+            break;
+         case 2:
+            in = dipole::internal::rij_tensor_xy;
+            break;
+         case 3:
+            in = dipole::internal::rij_tensor_xz;
+            break;
+         case 4:
+            in = dipole::internal::rij_tensor_yy;
+            break;
+         case 5:
+            in = dipole::internal::rij_tensor_yz;
+            break;
+         case 6:
+            in = dipole::internal::rij_tensor_zz;
+            break;
       }
-      return tensor_unrolled_xy;
+      for(uint64_t lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
+      	for(uint64_t j=0; j<in[lc].size(); j++){ out.push_back( in[lc][j] ); }
+      }
+      return out;
    }
 
-   std::vector<double> get_tensor_1D_xz(){
-      std::vector<double> tensor_unrolled_xz;
-      for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
-      	for(unsigned int j=0; j<dipole::internal::rij_tensor_xz[lc].size(); j++){
-				tensor_unrolled_xz.push_back( dipole::internal::rij_tensor_xz[lc][j] );
-      	}
-      }
-      return tensor_unrolled_xz;
-   }
-
-   std::vector<double> get_tensor_1D_yy(){
-      std::vector<double> tensor_unrolled_yy;
-      for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
-      	for(unsigned int j=0; j<dipole::internal::rij_tensor_yy[lc].size(); j++){
-				tensor_unrolled_yy.push_back( dipole::internal::rij_tensor_yy[lc][j] );
-      	}
-      }
-      return tensor_unrolled_yy;
-   }
-
-   std::vector<double> get_tensor_1D_yz(){
-      std::vector<double> tensor_unrolled_yz;
-      for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
-      	for(unsigned int j=0; j<dipole::internal::rij_tensor_yz[lc].size(); j++){
-				tensor_unrolled_yz.push_back( dipole::internal::rij_tensor_yz[lc][j] );
-      	}
-      }
-      return tensor_unrolled_yz;
-   }
-
-   std::vector<double> get_tensor_1D_zz(){
-      std::vector<double> tensor_unrolled_zz;
-      for(int lc=0; lc<dipole::internal::cells_num_local_cells; lc++){
-      	for(unsigned int j=0; j<dipole::internal::rij_tensor_zz[lc].size(); j++){
-				tensor_unrolled_zz.push_back( dipole::internal::rij_tensor_zz[lc][j] );
-      	}
-      }
-      return tensor_unrolled_zz;
-   }
-
-} // end of dipole namespace
-
-
-
-
+}

@@ -620,12 +620,13 @@ namespace vcuda{
          // Copy into <cu_real_t> vectors to avoid having to perform later std::copy()
          num_bytes = ::cells::num_cells * ::cells::num_local_cells * sizeof(cu_real_t);
 
-         std::vector<cu_real_t> tensor_xx = ::dipole::get_tensor_1D_xx();
-         std::vector<cu_real_t> tensor_xy = ::dipole::get_tensor_1D_xy();
-         std::vector<cu_real_t> tensor_xz = ::dipole::get_tensor_1D_xz();
-         std::vector<cu_real_t> tensor_yy = ::dipole::get_tensor_1D_yy();
-         std::vector<cu_real_t> tensor_yz = ::dipole::get_tensor_1D_yz();
-         std::vector<cu_real_t> tensor_zz = ::dipole::get_tensor_1D_zz(); 
+         cu_real_t precision; // dummy variable to allow overflow
+         std::vector<cu_real_t> tensor_xx = ::dipole::unroll_tensor(1, precision);
+         std::vector<cu_real_t> tensor_xy = ::dipole::unroll_tensor(2, precision);
+         std::vector<cu_real_t> tensor_xz = ::dipole::unroll_tensor(3, precision);
+         std::vector<cu_real_t> tensor_yy = ::dipole::unroll_tensor(4, precision);
+         std::vector<cu_real_t> tensor_yz = ::dipole::unroll_tensor(5, precision);
+         std::vector<cu_real_t> tensor_zz = ::dipole::unroll_tensor(6, precision);
 
          cudaMalloc((void**)&cu::cells::d_tensor_xx, num_bytes);
          cudaMalloc((void**)&cu::cells::d_tensor_xy, num_bytes);

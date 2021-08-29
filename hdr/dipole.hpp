@@ -114,12 +114,8 @@ namespace dipole{
    unsigned int get_num_atoms_in_cell(const int cell);
    unsigned int get_tot_num_cells();
    unsigned int get_tot_num_local_cells();
-   std::vector<double> get_tensor_1D_xx();
-   std::vector<double> get_tensor_1D_xy();
-   std::vector<double> get_tensor_1D_xz();
-   std::vector<double> get_tensor_1D_yy();
-   std::vector<double> get_tensor_1D_yz();
-   std::vector<double> get_tensor_1D_zz();
+   std::vector<double> unroll_tensor(const int element, double dummy);
+   std::vector<float>  unroll_tensor(const int element, float dummy);
 
 } // end of dipole namespace
 
