@@ -26,6 +26,7 @@ namespace vmpi{
    int num_core_atoms;
    int num_bdry_atoms;
    int num_halo_atoms;
+   int num_local_atoms; // number of local atoms on processor
 
    bool replicated_data_staged=false;
 

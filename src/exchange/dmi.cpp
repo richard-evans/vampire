@@ -108,10 +108,10 @@ namespace internal{
                      double ejk[3]={eik[0] - eij[0], eik[1] - eij[1], eik[2] - eij[2]};
                      const double mod_ejk_sq = ejk[0]*ejk[0] + ejk[1]*ejk[1] + ejk[2]*ejk[2];
 
-                     /*ofile << i << "\t" << nj << "\t" << nk << std::endl <<
-                              "\t\teik: " << eik[0] << "\t" << eik[1] << "\t" << eik[2] << std::endl <<
-                              "\t\teij: " << eij[0] << "\t" << eij[1] << "\t" << eij[2] << std::endl <<
-                              "\t\tejk: " << ejk[0] << "\t" << ejk[1] << "\t" << ejk[2] << std::endl;*/
+                   //  ofile << i << "\t" << nj << "\t" << nk << std::endl <<
+                     //         "\t\teik: " << eik[0] << "\t" << eik[1] << "\t" << eik[2] << std::endl <<
+                       //       "\t\teij: " << eij[0] << "\t" << eij[1] << "\t" << eij[2] << std::endl <<
+                         //     "\t\tejk: " << ejk[0] << "\t" << ejk[1] << "\t" << ejk[2] << std::endl;
 
                      // check if both ik and jk are closer than cutoff range and i != j
                      // before computing DMI
@@ -174,13 +174,13 @@ namespace internal{
                         tmp_tensor[6] -= Dij * +Dy; // Jzx
                         tmp_tensor[7] -= Dij * -Dx; // Jzy
 
-                        /*ofile << i << "\t" << nj << "\t" << nk << "\t|\t" << Dx << "\t" << Dy << "\t" << Dz << "\t" << Dij << "\t|\t" <<
+                  /*      std::cout << i << "\t" << nj << "\t" << nk << "\t|\t" << Dx << "\t" << Dy << "\t" << Dz << "\t" << Dij << "\t|\t" <<
                                  " eik: " << eik[0] << "\t" << eik[1] << "\t" << eik[2] << "\t|\t" <<
                                  " ejk: " << ejk[0] << "\t" << ejk[1] << "\t" << ejk[2] << "\t|\t" <<
                                  tmp_tensor [0] << "\t" << Dij * +Dz      << "\t" << Dij * -Dy << "\t" <<
                                  Dij * -Dz      << "\t" << tmp_tensor [4] << "\t" << Dij * +Dx << "\t" <<
-                                 Dij * +Dy << "\t" << Dij * -Dx << "\t" << tmp_tensor [8] << "\n" << std::flush;*/
-
+                                 Dij * +Dy << "\t" << Dij * -Dx << "\t" << tmp_tensor [8] << "\n" << std::flush;
+*/
                      } // end of cutoff range if
 
                   } // end of k != j if
@@ -189,11 +189,11 @@ namespace internal{
 
             } // end of i!= j if
 
-            /*ofile << "-------------------" << std::endl;
-            ofile << i << "\t" << nj << "\t" <<
-                     tmp_tensor [0] << "\t" << tmp_tensor [1] << "\t" << tmp_tensor [2] << "\t" <<
-                     tmp_tensor [3] << "\t" << tmp_tensor [4] << "\t" << tmp_tensor [5] << "\t" <<
-                     tmp_tensor [6] << "\t" << tmp_tensor [7] << "\t" << tmp_tensor [8] << "\n" << std::flush;*/
+            //ofile << "-------------------" << std::endl;
+          // std::cout << i << "\t" << nj << "\t" << imat << '\t' << jmat << '\t'<<
+            //         tmp_tensor [0] << "\t" << tmp_tensor [1] << "\t" << tmp_tensor [2] << "\t" <<
+              //       tmp_tensor [3] << "\t" << tmp_tensor [4] << "\t" << tmp_tensor [5] << "\t" <<
+                //     tmp_tensor [6] << "\t" << tmp_tensor [7] << "\t" << tmp_tensor [8] << "\n" << std::endl;
 
             // save tensor for interaction i-j
             atoms::t_exchange_list[counter].Jij[0][0] += tmp_tensor [0];

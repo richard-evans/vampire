@@ -41,15 +41,6 @@ namespace vcuda
           * Private data
           */
          extern bool initialized;
-         extern cu_real_array_t x_spin_buffer_array;
-         extern cu_real_array_t y_spin_buffer_array;
-         extern cu_real_array_t z_spin_buffer_array;
-
-         extern cu_real_array_t dS_x_array;
-         extern cu_real_array_t dS_y_array;
-         extern cu_real_array_t dS_z_array;
-
-         extern thrust::device_vector<heun_parameters_t> heun_parameters_device;
 
          /*
           * Internal functions

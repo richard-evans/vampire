@@ -34,7 +34,7 @@ namespace exchange{
    // This requires additional memory since each interaction is potentially
    // unique, requiring that the whole exchange list be unrolled
    //----------------------------------------------------------------------------
-   void unroll_normalised_exchange_interactions(){
+   void unroll_normalised_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear2){
 
    	// temporary class variables
    	zval_t tmp_zval;
@@ -48,7 +48,7 @@ namespace exchange{
    			zlog << zTs() << "Unrolled exchange template requires " << 1.0*double(atoms::neighbour_list_array.size())*double(sizeof(double))*1.0e-6 << "MB RAM" << std::endl;
    			atoms::i_exchange_list.reserve(atoms::neighbour_list_array.size());
    			// loop over all interactions
-   			for(int atom = 0; atom < atoms::num_atoms; atom++){
+            for(int atom = 0; atom < atoms::num_atoms; atom++){
    				const int imaterial = atoms::type_array[atom];
                const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
    				for(int nn = atoms::neighbour_list_start_index[atom]; nn <= atoms::neighbour_list_end_index[atom]; nn++){
@@ -78,7 +78,7 @@ namespace exchange{
       			for(int atom = 0; atom < atoms::num_atoms; atom++){
       				const int imaterial = atoms::type_array[atom];
                   const double imus = 1.0 / mp::material[imaterial].mu_s_SI; // get inverse spin moment
-      				for(int nn = atoms::neighbour_list_start_index[atom];nn <= atoms::neighbour_list_end_index[atom]; nn++){
+      		      for(int nn = atoms::neighbour_list_start_index[atom];nn <= atoms::neighbour_list_end_index[atom]; nn++){
       					const int natom = atoms::neighbour_list_array[nn];
       					const int jmaterial = atoms::type_array[natom];
       					atoms::v_exchange_list.push_back(tmp_zvec);
@@ -104,6 +104,7 @@ namespace exchange{
                         zlog << zTs() << "Programmer error! Exchange values size of " << Jij.size() << " must be 1 or 3 values. Exiting" << std::endl;
                         err::vexit();
                      }
+                   //  if (imaterial == 4) std::cout << imaterial << '\t' << jmaterial << "\t" << d << '\t' << J  << "\t" << atoms::v_exchange_list[nn].Jij[0] <<  std::endl;
       					// reset interaction id to neighbour number - causes segfault if nn out of range
       					atoms::neighbour_interaction_type_array[nn] = nn;
       				}

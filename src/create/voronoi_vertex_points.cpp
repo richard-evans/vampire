@@ -170,6 +170,8 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
       int vertex_number;		// temporary vertex number
       vertices_file >> num_assoc_vertices;
       bool inf=false;
+
+      //std::cout << i << '\t' << num_assoc_vertices <<std::endl;
       for(int j=0;j<num_assoc_vertices;j++){
          vertices_file >> vertex_number;
          //grain_vertices_array[i].push_back(std::vector <double>());
@@ -177,27 +179,39 @@ void populate_vertex_points(std::vector <std::vector <double> > & grain_coord_ar
          //grain_vertices_array[i][j].push_back(vertex_array[vertex_number][1]);
          // check for unbounded grains
          if(vertex_number==0) inf=true;
-
+         //std::cout <<i << '\t' <<  vertex_array[vertex_number][0] << '\t' << vertex_array[vertex_number][1] << '\t' << cs::system_dimensions[0] << '\t' << cs::system_dimensions[1] <<std::endl;
          // Check for whether boundary grains are included or removed
-         if(include_boundary_grains){
+         if(create_voronoi::include_boundary_grains_real){
+            //std::cout << "A" << std::endl;
             // check for bounded grains with vertices outside bounding box and truncate to system edges
             if(vertex_array[vertex_number][0] < -0.5*cs::system_dimensions[0]) vertex_array[vertex_number][0] = 0.0;
             if(vertex_array[vertex_number][0] >  1.5*cs::system_dimensions[0]) vertex_array[vertex_number][0] = cs::system_dimensions[0];
             if(vertex_array[vertex_number][1] < -0.5*cs::system_dimensions[1]) vertex_array[vertex_number][1] = 0.0;
             if(vertex_array[vertex_number][1] >  1.5*cs::system_dimensions[1]) vertex_array[vertex_number][1] = cs::system_dimensions[1];
             // check for bounded grains with vertices outside bounding box
-            if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>cs::system_dimensions[0])) inf=true;
-            if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>cs::system_dimensions[1])) inf=true;
+            if(vertex_array[vertex_number][0]<0.0) {
+               vertex_array[vertex_number][0] = 0.0;
+            }
+            if (vertex_array[vertex_number][0]>cs::system_dimensions[0]){
+               vertex_array[vertex_number][0] = cs::system_dimensions[0];
+            }
+            if(vertex_array[vertex_number][1]<0.0){
+               vertex_array[vertex_number][1] = 0.0;
+            }
+            if (vertex_array[vertex_number][1]>cs::system_dimensions[1]) {
+               vertex_array[vertex_number][1] = cs::system_dimensions[1];
+            }
          }
-         else{
-            // check for bounded grains with vertices outside bounding box
-            if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>cs::system_dimensions[0])) inf=true;
-            if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>cs::system_dimensions[1])) inf=true;
-         }
+          else{
+             // check for bounded grains with vertices outside bounding box
+             if((vertex_array[vertex_number][0]<0.0) || (vertex_array[vertex_number][0]>cs::system_dimensions[0])) inf=true;
+             if((vertex_array[vertex_number][1]<0.0) || (vertex_array[vertex_number][1]>cs::system_dimensions[1])) inf=true;
+          }
          grain_vertices_array[i].push_back(std::vector <double>());
          grain_vertices_array[i][j].push_back(vertex_array[vertex_number][0]);
          grain_vertices_array[i][j].push_back(vertex_array[vertex_number][1]);
       }
+
 
       //-------------------------------------------------------------------
       // Set unbounded grains to zero vertices for later removal

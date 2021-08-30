@@ -75,7 +75,7 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_atoms_list[i];
@@ -124,7 +124,7 @@ void output_inc_file(unsigned int spin_file_id){
 
       // write to output text stream in parallel
       #pragma omp for
-      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+      for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
 
          // get atom ID
          unsigned int atom = vdc::sliced_nm_atoms_list[i];
@@ -165,48 +165,58 @@ void output_povray_file(){
 	pfile.open("spins.pov");
 
    // Calculate location of camera
-   double dim[3] = {vdc::system_size[0]+0.001, vdc::system_size[1]+0.001, vdc::system_size[2]+0.001};
-   double vec[3];
+   std::vector<double> dim = {vdc::system_size[0]+0.001, vdc::system_size[1]+0.001, vdc::system_size[2]+0.001};
+   std::vector<double> vec(3);
 
+   // direction camera looks (normalised)
+   // technically only position if lookat is not (0,0,0)
 	double size = sqrt(dim[0]*dim[0] + dim[1]*dim[1] + dim[2]*dim[2]);
-	vec[0] = (1.0/dim[0]);
-	vec[1] = (1.0/dim[1]);
-	vec[2] = (1.0/dim[2]);
-	double mag_vec = sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);
-	vec[0]/=mag_vec;
-	vec[1]/=mag_vec;
-	vec[2]/=mag_vec;
+   if (default_camera_pos){
+      vec[0] = (1.0/dim[0]);
+      vec[1] = (1.0/dim[1]);
+      vec[2] = (1.0/dim[2]);
+   }
+   else { vec = vdc::camera_pos; }
+
+   // normalise camera position vector
+   double mag_vec = sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);
+   vec[0]/=mag_vec;
+   vec[1]/=mag_vec;
+   vec[2]/=mag_vec;
 
    pfile << "//-------------------------------------------------------------------------" << std::endl;
    pfile << "// Povray file generated using vampire" << std::endl;
    pfile << "//-------------------------------------------------------------------------" << std::endl;
-   pfile << "#version 3.5;" << std::endl;
-	pfile << "#include \"colors.inc\"" << std::endl;
+   pfile << "#version 3.5;"            << std::endl;
+	pfile << "#include \"colors.inc\""  << std::endl;
 	pfile << "#include \"metals.inc\""	<< std::endl;
 	pfile << "#include \"screen.inc\""	<< std::endl;
-	pfile << "#declare LX=0.0;" << std::endl;
-	pfile << "#declare LY=0.0;" << std::endl;
-	pfile << "#declare LZ=0.0;" << std::endl;
-	pfile << "#declare CX=" << size*vec[0]*6.0 << ";" << std::endl;
-	pfile << "#declare CY=" << size*vec[1]*6.0 << ";" << std::endl;
-	pfile << "#declare CZ=" << size*vec[2]*6.0 << ";" << std::endl;
+   // look at position
+	pfile << "#declare LX=" << vdc::camera_look_at[0]*dim[0]/2.0 << ";" << std::endl;
+	pfile << "#declare LY=" << vdc::camera_look_at[1]*dim[1]/2.0 << ";" << std::endl;
+	pfile << "#declare LZ=" << vdc::camera_look_at[2]*dim[2]/2.0 << ";" << std::endl;
+   // camera position
+	pfile << "#declare CX=" << size*vec[0]*6.0*vdc::camera_zoom << ";" << std::endl;
+	pfile << "#declare CY=" << size*vec[1]*6.0*vdc::camera_zoom << ";" << std::endl;
+	pfile << "#declare CZ=" << size*vec[2]*6.0*vdc::camera_zoom << ";" << std::endl;
 	pfile << "#declare ref=0.05;" << std::endl;
 	pfile << "global_settings { assumed_gamma 2.0 }" << std::endl;
-	pfile << "background { color Gray30 }" << std::endl;
+   // background colour
+	pfile << "background { color " << vdc::background_colour << " }" << std::endl;
 
 	pfile << "Set_Camera(<CX,CY,CZ>, <LX,LY,LZ>, 15)" << std::endl;
-	pfile << "Set_Camera_Aspect(4,3)" << std::endl;
+	pfile << "Set_Camera_Aspect(4,3)"  << std::endl;
 	pfile << "Set_Camera_Sky(<0,0,1>)" << std::endl;
 	pfile << "light_source { <2*CX, 2*CY, 2*CZ> color White}" << std::endl;
 
    pfile << "#declare Initial_Frame = " << vdc::start_file_id << ";" << std::endl;
-   pfile << "#declare Final_Frame = " << vdc::final_file_id << ";" << std::endl;
+   pfile << "#declare Final_Frame = "   << vdc::final_file_id << ";" << std::endl;
 
    //---------------------------------------------------------------------------
    // Determine non-magnetic materials looping over all non-magnetic atoms
    //---------------------------------------------------------------------------
    std::vector<bool> is_nm_mat(vdc::materials.size(),false);
-   for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
+   for(size_t i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
 
       // get atom ID
       unsigned int atom = vdc::sliced_nm_atoms_list[i];
@@ -216,47 +226,54 @@ void output_povray_file(){
 
    }
 
+   // check there are shape sizes defined for all materials
+   while (vdc::atom_sizes.size()  < vdc::materials.size()){ vdc::atom_sizes.push_back(1.2);  }
+   while (vdc::arrow_sizes.size() < vdc::materials.size()){ vdc::arrow_sizes.push_back(2.0); }
+
    // Output material specific macros
 	for(unsigned int imat=0; imat < vdc::materials.size(); imat++){
       if (std::find(remove_materials.begin(), remove_materials.end(), imat+1) == remove_materials.end() ){
          if(is_nm_mat[imat] == false){
-      		pfile << "#declare sscale"<< imat << "=2.0;" << std::endl;
-      		pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
-      		pfile << "#declare cscale"<< imat << "=3.54;" << std::endl;
-      		pfile << "#declare cones"<< imat << "=0;" << std::endl;
-      		pfile << "#declare arrows"<< imat << "=1;" << std::endl;
+            // sscale affects the spin arrow 
+      		pfile << "#declare sscale" << imat << "=" << vdc::arrow_sizes[imat] << ";" << std::endl;
+            // rscale affects sphere(atom) size
+      		pfile << "#declare rscale" << imat << "=" << vdc::atom_sizes[imat]  << ";" << std::endl;
+            // cscale affects cube size
+      		pfile << "#declare cscale" << imat << "=3.54;" << std::endl;
+      		pfile << "#declare cones"  << imat << "=0;" << std::endl;
+      		pfile << "#declare arrows" << imat << "=1;" << std::endl;
       		pfile << "#declare spheres"<< imat << "=1;" << std::endl;
-      		pfile << "#declare cubes" << imat << "=0;" << std::endl;
+      		pfile << "#declare cubes"  << imat << "=0;" << std::endl;
       		pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
-      		pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+      		pfile << "#declare spincolor" << imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
       		pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz, cr,cg,cb)" << std::endl;
-      		pfile << "union{" << std::endl;
+      		pfile << "union{"      << std::endl;
       		pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
-      		pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
-      		pfile << "#if(cones"<< imat << ") cone {<cx+0.5*sx*sscale" << imat << ",cy+0.5*sy*sscale"<< imat << ",cz+0.5*sz*sscale"<< imat << ">,0.0 <cx-0.5*sx*sscale"<< imat << ",cy-0.5*sy*sscale"<< imat << ",cz-0.5*sz*sscale"<< imat << ">,sscale" << imat << "*0.5} #end" << std::endl;
-      		pfile << "#if(arrows" << imat << ") cylinder {<cx+sx*0.5*sscale"<< imat <<",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<
+      		pfile << "#if(cubes"   << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
+      		pfile << "#if(cones"   << imat << ") cone {<cx+0.5*sx*sscale" << imat << ",cy+0.5*sy*sscale"<< imat << ",cz+0.5*sz*sscale"<< imat << ">,0.0 <cx-0.5*sx*sscale"<< imat << ",cy-0.5*sy*sscale"<< imat << ",cz-0.5*sz*sscale"<< imat << ">,sscale" << imat << "*0.5} #end" << std::endl;
+      		pfile << "#if(arrows"  << imat << ") cylinder {<cx+sx*0.5*sscale"<< imat <<",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<
       					">,<cx-sx*0.5*sscale"<< imat <<",cy-sy*0.5*sscale"<< imat <<",cz-sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.12}";
       		pfile << "cone {<cx+sx*0.5*1.6*sscale"<< imat <<",cy+sy*0.5*1.6*sscale"<< imat <<",cz+sz*0.5*1.6*sscale"<< imat <<">,sscale"<< imat <<"*0.0 <cx+sx*0.5*sscale"<< imat <<
       					",cy+sy*0.5*sscale"<< imat <<",cz+sz*0.5*sscale"<< imat <<">,sscale"<< imat <<"*0.2} #end" << std::endl;
       		pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
       		pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
-      		pfile << "}" << std::endl;
+      		pfile << "}"    << std::endl;
       		pfile << "#end" << std::endl;
          }
          else{
-            pfile << "#declare rscale"<< imat << "=1.2;" << std::endl;
-            pfile << "#declare cscale"<< imat << "=0.1;" << std::endl;
-            pfile << "#declare spheres"<< imat << "=1;" << std::endl;
-            pfile << "#declare cubes" << imat << "=1;" << std::endl;
+            pfile << "#declare rscale" << imat << "=" << vdc::atom_sizes[imat]  << ";" << std::endl;
+            pfile << "#declare cscale" << imat << "=0.1;" << std::endl;
+            pfile << "#declare spheres"<< imat << "=1;"   << std::endl;
+            pfile << "#declare cubes"  << imat << "=1;"   << std::endl;
             pfile << "#declare spincolors"<< imat << "=1;" << std::endl;
-            pfile << "#declare spincolor"<< imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
-            pfile << "#macro spinm"<< imat << "(cx,cy,cz,sx,sy,sz,cr,cg,cb)" << std::endl;
-            pfile << "union{" << std::endl;
-            pfile << "#if(spheres" << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
-            pfile << "#if(cubes" << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
+            pfile << "#declare spincolor" << imat << "=pigment {color rgb < 0.1 0.1 0.1 >};" << std::endl;
+            pfile << "#macro spinm"  << imat << "(cx,cy,cz,sx,sy,sz,cr,cg,cb)" << std::endl;
+            pfile << "union{"        << std::endl;
+            pfile << "#if(spheres"   << imat << ") sphere {<cx,cy,cz>,0.5*rscale"<< imat << "} #end" << std::endl;
+            pfile << "#if(cubes"     << imat << ") box {<cx-cscale"<< imat << "*0.5,cy-cscale" << imat << "*0.5,cz-cscale"<< imat << "*0.5>,<cx+cscale"<< imat << "*0.5,cy+cscale" << imat << "*0.5,cz+cscale"<< imat << "*0.5>} #end" << std::endl;
             pfile << "#if(spincolors"<< imat << ") texture { pigment {color rgb <cr cg cb>}finish {reflection {ref} diffuse 1 ambient 0}}" << std::endl;
             pfile << "#else texture { spincolor"<< imat << " finish {reflection {ref} diffuse 1 ambient 0}} #end" << std::endl;
-            pfile << "}" << std::endl;
+            pfile << "}"    << std::endl;
             pfile << "#end" << std::endl;
          }
       }
@@ -274,13 +291,13 @@ void output_povray_file(){
 	pifile.open("spins.ini");
 
    pifile << "Input_File_Name = \"spins.pov\"" << std::endl;
-   pifile << "Width = 800" << std::endl;
-   pifile << "Height = 600" << std::endl;
-   pifile << "Antialias = On" << std::endl;
-   pifile << "Antialias_Threshold = 0.3" << std::endl;
-   pifile << "Output_File_Type = N" << std::endl;
+   pifile << "Width = 800"                     << std::endl;
+   pifile << "Height = 600"                    << std::endl;
+   pifile << "Antialias = On"                  << std::endl;
+   pifile << "Antialias_Threshold = 0.3"       << std::endl;
+   pifile << "Output_File_Type = N"            << std::endl;
    pifile << "Initial_Frame = " << vdc::start_file_id << std::endl;
-   pifile << "Final_Frame = " << vdc::final_file_id << std::endl;
+   pifile << "Final_Frame = "   << vdc::final_file_id << std::endl;
 
    pifile.close();
 

@@ -78,15 +78,15 @@ namespace cells{
       // Calculate number of microcells
       //-------------------------------------------------------------------------------------
       // determine number of stacks in x and y (global)
-      unsigned int dx =  static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cells::macro_cell_size));
-      unsigned int dy =  static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cells::macro_cell_size));
-      unsigned int dz =  static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cells::macro_cell_size));
+      unsigned int dx =  static_cast<unsigned int>(ceil((system_dimensions_x+0.01)/cells::macro_cell_size_x));
+      unsigned int dy =  static_cast<unsigned int>(ceil((system_dimensions_y+0.01)/cells::macro_cell_size_y));
+      unsigned int dz =  static_cast<unsigned int>(ceil((system_dimensions_z+0.01)/cells::macro_cell_size_z));
 
       cells::num_cells = dx*dy*dz;
       cells::internal::cell_position_array.resize(3*cells::num_cells);
 
       //std::cout << " variable cells::num_cells = " << cells::num_cells << std::endl;
-      zlog << zTs() << "Macrocell size = " << cells::macro_cell_size << " Angstroms" << std::endl;
+      zlog << zTs() << "Macrocell size = " << cells::macro_cell_size_x<< "," <<cells::macro_cell_size_y<< "," <<cells::macro_cell_size_z<<  " Angstroms" << std::endl;
       zlog << zTs() << "Macrocells in x,y,z: " << dx << "\t" << dy << "\t" << dz << std::endl;
       zlog << zTs() << "Total number of macrocells: " << cells::num_cells << std::endl;
       zlog << zTs() << "Memory required for macrocell arrays: " << 80.0*double(cells::num_cells)/1.0e6 << " MB" << std::endl;
@@ -115,6 +115,8 @@ namespace cells{
                // associate cell with position i,j,k
                supercell_array[i][j][k]=cell;
                // increment cell number
+
+               
                cell++;
             }
          }
@@ -122,7 +124,9 @@ namespace cells{
 
       // Determine number of cells in x,y,z
       const int d[3]={ncx,ncy,ncz};
-      const double cs[3] = {cells::macro_cell_size, cells::macro_cell_size, cells::macro_cell_size}; // cell size
+      const double cs[3] = {cells::macro_cell_size_x, cells::macro_cell_size_y, cells::macro_cell_size_z}; // cell size
+
+      std::vector < double > cell_lattice(3*cells::num_cells,0.0);
 
      // For MPI version, only add local atoms
       #ifdef MPICF
@@ -146,7 +150,7 @@ namespace cells{
 
 
       // Assign atoms to cells
-      for(int atom=0;atom<num_local_atoms;atom++){
+      for(int atom=0;atom<num_local_atoms+vmpi::num_halo_atoms;atom++){
          // temporary for atom coordinates
          double c[3];
          // convert atom coordinates to st reference frame
@@ -182,6 +186,15 @@ namespace cells{
          }
          // If no error for range then assign atom to cell
          cells::atom_cell_id_array[atom] = supercell_array[scc[0]][scc[1]][scc[2]];
+
+      //   if (scc[0] > num_macro_cells_fft[0]) num_macro_cells_fft[0] = scc[0];
+      //   if (scc[1] > num_macro_cells_fft[1]) num_macro_cells_fft[1] = scc[1];
+      //   if (scc[2] > num_macro_cells_fft[2]) num_macro_cells_fft[2] = scc[2];
+         //std::cout << scc[0] << '\t' << scc[1] << '\t' << scc[2] << std::endl;
+         //   std::cout << "supercell" << '\t' << cells::atom_cell_id_array[atom] << '\t' << scc[0] << '\t' << scc[1] << '\t' << scc[2] << std::endl;
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+0] = scc[0];
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+1] = scc[1];
+      //   cell_lattice[3*cells::atom_cell_id_array[atom]+2] = scc[2];
       }
 
       //-------------------------------------------------------------------------------------
@@ -190,6 +203,7 @@ namespace cells{
 
       // Resize new cell arrays
       cells::pos_and_mom_array.resize(4*cells::num_cells,0.0);
+      cells::pos_array.resize(3*cells::num_cells,0.0);
 
       cells::mag_array_x.resize(cells::num_cells,0.0);
       cells::mag_array_y.resize(cells::num_cells,0.0);
@@ -205,6 +219,7 @@ namespace cells{
 
       cells::internal::total_moment_array.resize(cells::num_cells,0.0);
 
+      cells::fft_cell_id_array.resize(cells::num_cells,0.0);
       // Now add atoms to each cell as magnetic 'centre of mass'
       int num_atoms_magnetic = 0;  /// number of magnetic atoms
       for(int atom=0;atom<num_local_atoms;atom++){
@@ -213,12 +228,16 @@ namespace cells{
          int type = atoms::type_array[atom];
          const double mus = mp::material[type].mu_s_SI;
          // Consider only magnetic elements
+         cells::pos_array[3*local_cell+0] += atom_coords_x[atom];
+         cells::pos_array[3*local_cell+1] += atom_coords_y[atom];
+         cells::pos_array[3*local_cell+2] += atom_coords_z[atom];
          if(mp::material[type].non_magnetic==0){
 
             cells::pos_and_mom_array[4*local_cell+0] += atom_coords_x[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+1] += atom_coords_y[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+2] += atom_coords_z[atom]*mus;
             cells::pos_and_mom_array[4*local_cell+3] += mus;
+
 
             cells::num_atoms_in_cell[local_cell]++;
             num_atoms_magnetic++;
@@ -237,6 +256,7 @@ namespace cells{
       #ifdef MPICF
          MPI_Allreduce(MPI_IN_PLACE, &cells::num_atoms_in_cell[0],     cells::num_atoms_in_cell.size(),    MPI_INT,    MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, &cells::pos_and_mom_array[0],     cells::pos_and_mom_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, &cells::pos_array[0],     cells::pos_array.size(),    MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          cells::num_atoms_in_cell_global.resize(cells::num_cells);
          cells::num_atoms_in_cell_global = cells::num_atoms_in_cell;
          MPI_Allreduce(MPI_IN_PLACE, &num_atoms_magnetic, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
@@ -262,7 +282,12 @@ namespace cells{
             cells::pos_and_mom_array[4*local_cell+2] = cells::pos_and_mom_array[4*local_cell+2]/(cells::pos_and_mom_array[4*local_cell+3]);
 
             cells::volume_array[local_cell] = double(cells::num_atoms_in_cell[local_cell])*atomic_volume;
+            cells::pos_array[3*local_cell+0] = cells::pos_array[3*local_cell+0]/cells::num_atoms_in_cell[local_cell];
+            cells::pos_array[3*local_cell+1] = cells::pos_array[3*local_cell+1]/cells::num_atoms_in_cell[local_cell];
+            cells::pos_array[3*local_cell+2] = cells::pos_array[3*local_cell+2]/cells::num_atoms_in_cell[local_cell];
+         
          }
+
       }
 
       // Resize 2D arrays to store cell - atom informations
@@ -328,6 +353,21 @@ namespace cells{
 
       // Precalculate cell magnetisation
       cells::mag();
+
+//       for(int lc = 0; lc < cells::num_local_cells; lc++){
+//
+//        // get cell index
+//         int i = cells::cell_id_array[lc];
+//
+//         //save x,y,z lattice coordiantes for use in the fft
+//         int x = cell_lattice[3*i+0];
+//         int y = cell_lattice[3*i+1];
+//         int z = cell_lattice[3*i+2];
+//
+//         //save the cell_id for use in the fft
+//       //  fft_cell_id_array[i] = (x*2*(num_macro_cells_fft[2]+1) + y)*2*(num_macro_cells_fft[1] +1) + z;
+// //        std::cout <<i << '\t' << fft_cell_id_array[i] << '\t' << x << '\t' << y << '\t' << z << '\t' << "\t" << fft_maxx_lattice+1 << '\t' << fft_maxy_lattice+1 << '\t' << fft_maxz_lattice+1 << std::endl;
+//       }
 
       return;
    }

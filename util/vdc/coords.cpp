@@ -30,6 +30,10 @@ void read_coord_metadata();
 void read_coord_data();
 void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& non_magnetic_list);
 void slice_system();
+bool box_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound);
+bool sphere_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound);
+bool cylinder_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound);
+
 
 //------------------------------------------------------------------------------
 // Wrapper function to read coordinate metafile to initialise data structures
@@ -294,10 +298,10 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
 
    double min[3] = {1e20, 1e20, 1e20};
    double max[3] = {0.0, 0.0, 0.0};
-   double ave[3] = {0.0, 0.0, 0.0};
+   //double ave[3] = {0.0, 0.0, 0.0};
 
    // loop through all magnetic atoms
-   for(int i=0; i < magnetic_list.size(); i++){
+   for(size_t i=0; i < magnetic_list.size(); i++){
 
       // get atom ID
       unsigned int atom = magnetic_list[i];
@@ -318,7 +322,7 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
    }
 
    // loop through all non-magnetic atoms
-   for(int i=0; i < non_magnetic_list.size(); i++){
+   for(size_t i=0; i < non_magnetic_list.size(); i++){
 
       // get atom ID
       unsigned int atom = non_magnetic_list[i];
@@ -355,212 +359,158 @@ void calculate_system_extent(std::vector<int>& magnetic_list, std::vector<int>& 
 // Find list of atoms in user defined slice
 //---------------------------------------------------------------
 void slice_system(){
-   double xmin, xmax, x;
-   double ymin, ymax, y;
-   double zmin, zmax, z;
-   double tol = 0.000000001;
+   
+   // work out borders for slice param
+   for (slice_t &slice : vdc::slices){
 
-   // work out _min, _max real values from fractional coordinates in
-   // slice_parameters. Also add a tolerance for double comparisons
-   xmin = (slice_parameters[0]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0]-tol;
-   ymin = (slice_parameters[2]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1]-tol;
-   zmin = (slice_parameters[4]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]-tol;
+      switch (slice.type){
+      // group box and box void as min and max ranges are the same
+      case vdc::box :
+      case vdc::box_void :
+         slice.bound.resize(6); // xmin,xmax,ymin,ymax,zmin,zmax
 
-   xmax = (slice_parameters[1]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0]+tol;
-   ymax = (slice_parameters[3]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1]+tol;
-   zmax = (slice_parameters[5]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]+tol;
+         // min
+         slice.bound[0] = (slice.param[0]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0];
+         slice.bound[2] = (slice.param[2]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1];
+         slice.bound[4] = (slice.param[4]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
 
-   // No slice defined, all atoms are included
-   if (vdc::slice_type == "no-slice"){
-      vdc::sliced_atoms_list.resize(vdc::num_atoms);
-      for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
-         vdc::sliced_atoms_list[atom] = atom;
-      }
-      vdc::sliced_nm_atoms_list.resize(vdc::num_nm_atoms);
-      for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
-         vdc::sliced_nm_atoms_list[atom] = atom;
+         // max
+         slice.bound[1] = (slice.param[1]*vdc::system_size[0])-(vdc::system_size[0]*0.5)+vdc::system_centre[0];
+         slice.bound[3] = (slice.param[3]*vdc::system_size[1])-(vdc::system_size[1]*0.5)+vdc::system_centre[1];
+         slice.bound[5] = (slice.param[5]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
+         break;
+      
+      case vdc::sphere :
+         slice.bound.resize(3); // a,b,c
+
+         // work out radii of the ellipse
+         slice.bound[0] = vdc::system_size[0]*slice.param[0]/2.0;
+         slice.bound[1] = vdc::system_size[1]*slice.param[1]/2.0;
+         slice.bound[2] = vdc::system_size[2]*slice.param[2]/2.0;
+         break;
+      
+      case vdc::cylinder :
+         slice.bound.resize(4); // a,b,zmin,zmax
+
+         slice.bound[0] = vdc::system_size[0]*slice.param[0]/2.0;
+         slice.bound[1] = vdc::system_size[1]*slice.param[1]/2.0;
+         slice.bound[2] = (slice.param[2]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
+         slice.bound[3] = (slice.param[3]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2];
+         break;
       }
    }
 
-   // User defines a volume, only atoms inside are included
-   else if (vdc::slice_type == "slice"){
-      for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
+   // find all valid atoms in slices
+   for (unsigned int atom = 0; atom < vdc::num_atoms; atom++){
 
-         x = vdc::coordinates[3*atom + 0];
-         y = vdc::coordinates[3*atom + 1];
-         z = vdc::coordinates[3*atom + 2];
+      // remove materials defined by user
+      if ( std::find(vdc::remove_materials.begin(), vdc::remove_materials.end(), vdc::type[atom]+1) != vdc::remove_materials.end() ){
+         continue;
+      }
 
-         // choose only atoms within boundaries
-         if ( (x >= xmin) && (x <= xmax) ){
-            if ( (y >= ymin) && (y <= ymax) ){
-               if ( (z >= zmin) && (z <= zmax) ){
-                  vdc::sliced_atoms_list.push_back(atom);
-               }
+      // if no slices defined, include all atoms
+      if ( vdc::slices.empty() ){
+         vdc::sliced_atoms_list.push_back(atom);
+      }
+      // otherwise include all atoms in any slice
+      else {
+
+         // atom coords
+         double x = vdc::coordinates[3*atom + 0];
+         double y = vdc::coordinates[3*atom + 1];
+         double z = vdc::coordinates[3*atom + 2];
+
+         for (slice_t slice : slices){
+
+            // flag to show atom is in any slice
+            bool in_bounds = false;
+
+            switch (slice.type){
+            case vdc::box :
+               in_bounds = box_slice(x,y,z,slice.bound);
+               break;
+            
+            case vdc::box_void :
+               in_bounds = !box_slice(x,y,z,slice.bound);
+               break;
+            
+            case vdc::sphere :
+               in_bounds = sphere_slice(x,y,z,slice.bound);
+               break;
+
+            case vdc::cylinder :
+               in_bounds = cylinder_slice(x,y,z,slice.bound);
+               break;
+
+            default:
+               std::cerr << "Error - unknown slice type, probably a mistake in command.cpp" << std::endl;
+               std::exit(EXIT_FAILURE);
+            }
+
+            // if the atom is in any slice, add to final list and stop checking others
+            if (in_bounds){ 
+               vdc::sliced_atoms_list.push_back(atom);
+               break;
             }
          }
       }
-      for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
+   }
 
-         x = vdc::nm_coordinates[3*atom + 0];
-         y = vdc::nm_coordinates[3*atom + 1];
-         z = vdc::nm_coordinates[3*atom + 2];
+   // find all valid non_magnetic atoms in slices
+   for (unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
 
-         // choose only atoms within boundaries
-         if ( (x >= xmin) && (x <= xmax) ){
-            if ( (y >= ymin) && (y <= ymax) ){
-               if ( (z >= zmin) && (z <= zmax) ){
-                  vdc::sliced_nm_atoms_list.push_back(atom);
-               }
+      // remove materials defined by user
+      if ( std::find(vdc::remove_materials.begin(), vdc::remove_materials.end(), vdc::nm_type[atom]+1) != vdc::remove_materials.end() ){
+         continue;
+      }
+
+      // if no slices defined, include all atoms
+      if ( vdc::slices.empty() ){
+         vdc::sliced_nm_atoms_list.push_back(atom);
+      }
+      // otherwise include all atoms in any slice
+      else {
+
+         // atom coords
+         double x = vdc::nm_coordinates[3*atom + 0];
+         double y = vdc::nm_coordinates[3*atom + 1];
+         double z = vdc::nm_coordinates[3*atom + 2];
+
+         for (slice_t slice : slices){
+
+            // flag to show atom is in any slice
+            bool in_bounds = false;
+
+            switch (slice.type){
+            case vdc::box :
+               in_bounds = box_slice(x,y,z,slice.bound);
+               break;
+            
+            case vdc::box_void :
+               in_bounds = !box_slice(x,y,z,slice.bound);
+               break;
+            
+            case vdc::sphere :
+               in_bounds = sphere_slice(x,y,z,slice.bound);
+               break;
+
+            case vdc::cylinder :
+               in_bounds = cylinder_slice(x,y,z,slice.bound);
+               break;
+
+            default:
+               std::cerr << "Error - unknown slice type, probably a mistake in command.cpp" << std::endl;
+               std::exit(EXIT_FAILURE);
+            }
+
+            // if the atom is in any slice, add to final list and stop checking others
+            if (in_bounds){ 
+               vdc::sliced_nm_atoms_list.push_back(atom);
+               break;
             }
          }
       }
-   }
-
-   // User defines a volume, only atoms outside are included
-   else if (vdc::slice_type == "slice-void"){
-      for(unsigned int atom = 0; atom < vdc::num_atoms; atom++){
-
-         x = vdc::coordinates[3*atom + 0];
-         y = vdc::coordinates[3*atom + 1];
-         z = vdc::coordinates[3*atom + 2];
-
-         // choose only atoms within boundaries
-         if (! (((x >= xmin) && (x <= xmax)) && ((y >= ymin) && (y <= ymax)) && ((z >= zmin) && (z <= zmax))) ){
-            vdc::sliced_atoms_list.push_back(atom);
-         }
-
-      }
-      for(unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
-
-         x = vdc::nm_coordinates[3*atom + 0];
-         y = vdc::nm_coordinates[3*atom + 1];
-         z = vdc::nm_coordinates[3*atom + 2];
-
-         // choose only atoms within boundaries
-         if (! (((x >= xmin) && (x <= xmax)) && ((y >= ymin) && (y <= ymax)) && ((z >= zmin) && (z <= zmax))) ){
-            vdc::sliced_nm_atoms_list.push_back(atom);
-         }
-      }
-   }
-
-   // Remove ellipsoid from centre of particle with diameters determined by
-   // slice_parameters
-   // Equation of ellipse in 3D
-   // (x-x1)^2/a^2 + (y-y1)^2/b^2 + (z-z1)^2/c^2 = 1
-   // (x1,y1,z1) is the centre and a,b,c are the axis radii
-   else if (vdc::slice_type == "slice-sphere"){
-      double a, b, c;
-
-      // work out radii of the ellipse
-      a = vdc::system_size[0]*vdc::slice_parameters[0]/2.0;
-      b = vdc::system_size[1]*vdc::slice_parameters[1]/2.0;
-      c = vdc::system_size[2]*vdc::slice_parameters[2]/2.0;
-
-      // chose only atoms within sphere at the centre of the system
-      for (unsigned int atom = 0; atom < vdc::num_atoms; atom++){
-
-         x = vdc::coordinates[3*atom + 0];
-         y = vdc::coordinates[3*atom + 1];
-         z = vdc::coordinates[3*atom + 2];
-
-         double temp = 0;
-
-         temp += (x - system_centre[0])*(x - system_centre[0])/(a*a);
-         temp += (y - system_centre[1])*(y - system_centre[1])/(b*b);
-         temp += (z - system_centre[2])*(z - system_centre[2])/(c*c);
-
-         if ( temp >= 1.0 ){
-            vdc::sliced_atoms_list.push_back(atom);
-         }
-      }
-      for (unsigned int atom = 0; atom < vdc::num_nm_atoms; atom++){
-
-         x = vdc::nm_coordinates[3*atom + 0];
-         y = vdc::nm_coordinates[3*atom + 1];
-         z = vdc::nm_coordinates[3*atom + 2];
-
-         double temp = 0;
-
-         temp += (x - system_centre[0])*(x - system_centre[0])/(a*a);
-         temp += (y - system_centre[1])*(y - system_centre[1])/(b*b);
-         temp += (z - system_centre[2])*(z - system_centre[2])/(c*c);
-
-         if ( temp >= 1.0 ){
-            vdc::sliced_nm_atoms_list.push_back(atom);
-         }
-      }
-   }
-   else if (vdc::slice_type == "slice-cylinder"){
-      // only show inner cylinder of particles
-      double a,b;
-
-      // work out radii of the ellipse
-      a = vdc::system_size[0]*vdc::slice_parameters[0]/2.0;
-      b = vdc::system_size[1]*vdc::slice_parameters[1]/2.0;
-      zmin = (slice_parameters[2]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]-tol;
-      zmax = (slice_parameters[3]*vdc::system_size[2])-(vdc::system_size[2]*0.5)+vdc::system_centre[2]+tol;
-
-      // chose only atoms within cylinder at the centre of the system
-      for (unsigned int atom = 0; atom < vdc::num_atoms; atom++){
-
-         x = vdc::coordinates[3*atom + 0];
-         y = vdc::coordinates[3*atom + 1];
-         z = vdc::coordinates[3*atom + 2];
-
-         double temp = 0;
-
-         temp += (x - system_centre[0])*(x - system_centre[0])/(a*a);
-         temp += (y - system_centre[1])*(y - system_centre[1])/(b*b);
-
-         if ( (temp <= 1.0) && (z >= zmin) && (z <= zmax) ){
-            vdc::sliced_atoms_list.push_back(atom);
-         }
-      }
-   }
-   else {
-      std::cerr << "Error - unknown slice type, probably a mistake in command.cpp"
-                << std::endl;
-
-      std::exit(EXIT_FAILURE);
-   }
-
-   if ( remove_materials.size() != 0 ){
-
-      std::vector<int> temp_list(0), temp_nm_list(0);
-      // loop over atoms in slice
-      for(int i=0; i < vdc::sliced_atoms_list.size(); i++){
-
-         // get atom ID
-         unsigned int atom = vdc::sliced_atoms_list[i];
-
-         // loop over materials
-         for(int m=0; m < remove_materials.size(); m++){
-
-            int material = remove_materials[m];
-
-            if ( vdc::type[atom] != (material-1) ){
-               temp_list.push_back(atom);
-            }
-         }
-      }
-      for(int i=0; i < vdc::sliced_nm_atoms_list.size(); i++){
-
-         // get atom ID
-         unsigned int atom = vdc::sliced_nm_atoms_list[i];
-
-         // loop over materials
-         for(int m=0; m < remove_materials.size(); m++){
-
-            int material = remove_materials[m];
-
-            if ( vdc::nm_type[atom] != (material-1) ){
-               temp_nm_list.push_back(atom);
-            }
-         }
-      }
-      vdc::sliced_atoms_list.swap(temp_list);
-      vdc::sliced_nm_atoms_list.swap(temp_nm_list);
-   }
+   } 
 
    // output informative message to user
    if(vdc::verbose) std::cout << "done!" << std::endl;
@@ -568,4 +518,30 @@ void slice_system(){
    return;
 }
 
+bool box_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound){
+
+   return (x >= bound[0] && x <= bound[1]) && (y >= bound[2] && y <= bound[3]) && (z >= bound[4] && z <= bound[5]);   
 }
+
+bool sphere_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound){
+
+   double temp = 0;
+
+   temp += (x - vdc::system_centre[0])*(x - vdc::system_centre[0])/(bound[0]*bound[0]);
+   temp += (y - vdc::system_centre[1])*(y - vdc::system_centre[1])/(bound[1]*bound[1]);
+   temp += (z - vdc::system_centre[2])*(z - vdc::system_centre[2])/(bound[2]*bound[2]);
+
+   return temp <= 1.0;
+}
+
+bool cylinder_slice(const double &x, const double &y, const double &z, const std::vector<double> &bound){
+
+   double temp = 0;
+
+   temp += (x - vdc::system_centre[0])*(x - vdc::system_centre[0])/(bound[0]*bound[0]);
+   temp += (y - vdc::system_centre[1])*(y - vdc::system_centre[1])/(bound[1]*bound[1]);
+
+   return temp<=1.0 && z>=bound[2] && z<=bound[3];
+}
+
+} // end of namespace vdc

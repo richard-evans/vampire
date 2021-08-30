@@ -117,7 +117,7 @@ int LLB_Boltzmann(){
 		}
 		// Simulate system
 		for(sim::time=0;sim::time<10000000;sim::time+=1){
-			// Calculate LLG
+			// Calculate LLB
 			sim::LLB(1);
 			  if(sim::time%100000==0){
 				  std::cout << sim::time << std::endl;
@@ -127,7 +127,7 @@ int LLB_Boltzmann(){
 				double S[3] = {atoms::x_spin_array[0],atoms::y_spin_array[0],atoms::z_spin_array[0]};
 				double mag_m=sqrt(S[0]*S[0]+S[1]*S[1]+S[2]*S[2]);
 				double mz=S[2];
-				double mx=sqrt(S[0]*S[0]); //sqrt(S[0]*S[0]+S[1]*S[1]);
+				double mx=sqrt(S[0]*S[0]); 
 				int para = int(mz*100.0+0.5);
 				int perp = int(mx*100.0+0.5);
 				int para1D = int(mag_m*1000.0+0.5);

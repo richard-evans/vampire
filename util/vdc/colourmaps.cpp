@@ -32,7 +32,7 @@ void initialise_colourwheel( ){
 
    // colour_keyword is an external global variable
 
-   if (vdc::colour_keyword == "CBWR"){
+   if (vdc::colour_keyword == "cbwr"){
       // Cyclic red-white-blue-white-red colour map (edited)
       // cyclic_wrwbw_40-90_c42_n256
       vdc::colourmap[0] = {0.789622,0.192610,0.091622};
@@ -292,7 +292,7 @@ void initialise_colourwheel( ){
       vdc::colourmap[254] = {0.789234,0.191163,0.090390};
       vdc::colourmap[255] = {0.789161,0.190892,0.090163};
    }
-   else if ( vdc::colour_keyword == "C2" ){
+   else if ( vdc::colour_keyword == "c2" ){
       // Good cyclic map with four distinct colours allowing
       // four orientations or phase angles to be visualised.
       // cyclic_mygbm_30-95_c78_n256
@@ -553,7 +553,7 @@ void initialise_colourwheel( ){
       vdc::colourmap[254] = {0.923611,0.316999,0.957797};
       vdc::colourmap[255] = {0.930949,0.324889,0.953227};
    }
-   else if ( vdc::colour_keyword == "BWR" ){
+   else if ( vdc::colour_keyword == "bwr" ){
       // Standard blue-white-red diverging colour map with
       // end colours matched for lightness and chroma.
       // diverging_bwr_40-95_c42_n256
@@ -814,7 +814,7 @@ void initialise_colourwheel( ){
       vdc::colourmap[254] = {0.755534,0.036080,0.029827};
       vdc::colourmap[255] = {0.752427,0.008418,0.021805};
    }
-   else if ( vdc::colour_keyword == "Rainbow" ){
+   else if ( vdc::colour_keyword == "rainbow"){
       // Rainbow map that can also be used as a diverging map
       // with yellow as the reference centre colour.
       // diverging-rainbow_bgymr_45-85_c67_n256

@@ -21,6 +21,7 @@
 #include "montecarlo.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
+#include "micromagnetic.hpp"
 #include "spintransport.hpp"
 
 // vio module headers
@@ -255,6 +256,7 @@ namespace vout{
       }
       stream << result.str();
    }
+
 
    // Output Function 21 - with Header
    void mean_system_susceptibility(std::ostream& stream, bool header){
@@ -497,4 +499,43 @@ namespace vout{
       stream << sim::domain_wall_centre;
    }
 
+   // Output Function 68
+   void MRresistance(std::ostream& stream, bool header){
+      if(header){
+         stream << "MR" << "\t";
+      }
+      else{
+         stream << micromagnetic::MR_resistance << "\t";
+      }
+   }
+
+   // Output Function 69
+   void lfa_ms(std::ostream& stream, bool header){
+      if(header){
+         stream << "MS" << "\t";
+      }
+      else{
+         stream << sim::Ms << "\t";
+      }
+   }
+
+   // Output Function 70
+   void x_track_pos(std::ostream& stream, bool header){
+      if(header){
+         stream << "x-pos" << "\t";
+      }
+      else{
+         stream << sim::track_pos_x << "\t";
+      }
+   }
+
+   // Output Function 71
+   void z_track_pos(std::ostream& stream, bool header){
+      if(header){
+         stream << "z pos" << "\t";
+      }
+      else{
+         stream << sim::track_pos_z << "\t";
+      }
+   }
 }

@@ -36,6 +36,7 @@
 #include "material.hpp"
 #include "errors.hpp"
 #include "exchange.hpp"
+#include "environment.hpp"
 #include "dipole.hpp"
 #include "ltmp.hpp"
 #include "random.hpp"
@@ -44,6 +45,7 @@
 #include "spintransport.hpp"
 #include "stats.hpp"
 #include "vmpi.hpp"
+#include "../micromagnetic/internal.hpp"
 
 // sim module header
 #include "internal.hpp"
@@ -65,7 +67,9 @@ void calculate_fmr_fields(const int,const int);
 void calculate_lagrange_fields(const int,const int);
 void calculate_full_spin_fields(const int start_index,const int end_index);
 
-int calculate_spin_fields(const int start_index,const int end_index){
+namespace sim{
+
+void calculate_spin_fields(const int start_index,const int end_index){
 
 	///======================================================
 	/// 		Subroutine to calculate spin dependent fields
@@ -114,11 +118,12 @@ int calculate_spin_fields(const int start_index,const int end_index){
 	// Add spin torque fields
 	if(sim::internal::enable_spin_torque_fields == true) calculate_full_spin_fields(start_index,end_index);
 
-	return 0;
+	return;
 
 }
 
-int calculate_external_fields(const int start_index,const int end_index){
+
+void calculate_external_fields(const int start_index,const int end_index){
 	///======================================================
 	/// 		Subroutine to calculate external fields
 	///
@@ -169,7 +174,8 @@ int calculate_external_fields(const int start_index,const int end_index){
 	// Dipolar Fields
 	calculate_dipolar_fields(start_index,end_index);
 
-	return 0;
+	return;
+}
 }
 
 int calculate_applied_fields(const int start_index,const int end_index){
@@ -242,6 +248,24 @@ int calculate_applied_fields(const int start_index,const int end_index){
 			atoms::z_total_external_field_array[atom] += HD[2];
 		}
 	}
+
+	if(micromagnetic::internal::bias_magnets == true){
+				for(int atom=start_index;atom<end_index;atom++){
+					atoms::x_total_external_field_array[atom] += micromagnetic::atomistic_bias_field_x[atom];
+					atoms::y_total_external_field_array[atom] += micromagnetic::atomistic_bias_field_y[atom];
+					atoms::z_total_external_field_array[atom] += micromagnetic::atomistic_bias_field_z[atom];
+			//		std::cout << atom << '\t' << micromagnetic::atomistic_bias_field_x[atom] << '\t' << std::endl;
+				}
+	}
+	if(environment::enabled == true){
+		for(int atom=start_index;atom<end_index;atom++){
+			atoms::x_total_external_field_array[atom] += environment::atomistic_environment_field_x[atom];
+			atoms::y_total_external_field_array[atom] += environment::atomistic_environment_field_y[atom];
+			atoms::z_total_external_field_array[atom] += environment::atomistic_environment_field_z[atom];
+	//		std::cout << atom << '\t' << micromagnetic::atomistic_bias_field_x[atom] << '\t' << std::endl;
+		}
+	}
+
 
 	return 0;
 

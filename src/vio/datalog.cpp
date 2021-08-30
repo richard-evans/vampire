@@ -21,6 +21,7 @@
 #include "grains.hpp"
 #include "sim.hpp"
 #include "vio.hpp"
+#include "micromagnetic.hpp"
 
 // vio module headers
 #include "internal.hpp"
@@ -268,9 +269,22 @@ namespace vout{
 			case 67:
 				vout::domain_wall_position(stream,header);
 				break;
+			case 68:
+				vout::MRresistance(stream,header);
+				break;
+			case 69:
+				vout::lfa_ms(stream,header);
+				break;
+			case 70:
+				vout::x_track_pos(stream,header);
+				break;
+			case 71:
+				vout::z_track_pos(stream,header);
+				break;
 			case 999: //AJN
 				vout::standard_deviation(stream,header);
 				break;
+
       }
 
       return;
@@ -385,6 +399,8 @@ namespace vout{
    //-------------------------------------------
 	void data(){
 
+
+      //if(micromagnetic::discretisation_type != 1){
 		// check calling of routine if error checking is activated
 		if(err::check==true){std::cout << "vout::data has been called" << std::endl;}
 
@@ -426,16 +442,16 @@ namespace vout{
          }
       }
 
-		// Only output 1/output_rate time steps// This is all serialised inside the write_output fn - AJN
-		if(sim::time%vout::output_rate==0){
-            write_out(zmag,file_output_list);
-		} // end of if statement for output rate
+      // Only output 1/output_rate time steps// This is all serialised inside the write_output fn - AJN
+      if(sim::time%vout::output_rate==0){
+         write_out(zmag,file_output_list);
+      } // end of if statement for output rate
 
-		if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
-            write_out(std::cout,screen_output_list);
-		} // End of if statement to output data to screen
+      if(sim::time%vout::output_rate==0){ // needs to be altered to separate variable at some point
+         write_out(std::cout,screen_output_list);
+      } // End of if statement to output data to screen
 
-		if(sim::time%vout::output_grain_rate==0){
+      if(sim::time%vout::output_grain_rate==0){
 
    		// calculate grain magnetisations
    		grains::mag();
@@ -494,7 +510,10 @@ namespace vout{
 
 		// optionally save checkpoint file
 		if(sim::save_checkpoint_flag==true && sim::save_checkpoint_continuous_flag==true && sim::time%sim::save_checkpoint_rate==0) save_checkpoint();
-
+     // }
+      if (micromagnetic::discretisation_type ==1){
+         micromagnetic::outputs();
+      }
       return;
 
    } // end of data()
