@@ -47,6 +47,17 @@ namespace internal{
 //------------------------------------------------------------------------------
 void calculate_interactions(unit_cell_t& unit_cell){
 
+   // Resize material-exponential material_exchange_parameters tensor from 100x100
+   if (exchange_function == material_exponential){
+      unsigned int num_uc_materials = 0;
+      for (int i = 0; i < unit_cell.atom.size(); ++i){
+         if (unit_cell.atom[i].mat > num_uc_materials) num_uc_materials = unit_cell.atom[i].mat;
+      }
+      ++num_uc_materials;
+      material_exchange_parameters.resize(num_uc_materials, std::vector<exchange_parameters_t>(num_uc_materials));
+   }
+   
+
    // determine neighbour range
    const double rcut = unit_cell.cutoff_radius*exchange_interaction_range*1.001; // reduced to unit cell units
    const double rcutsq = rcut*rcut; // reduced to unit cell units
@@ -130,6 +141,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
                // Determine unit cell id for i and j atoms
                tmp.i = ratoms[i].id;
                tmp.j = ratoms[j].id;
+
+               tmp.mat_i = ratoms[i].mat;
+               tmp.mat_j = ratoms[j].mat;
 
                // Determine unit cell offsets
                tmp.dx = ratoms[j].idx - ratoms[i].idx;

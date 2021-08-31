@@ -62,6 +62,8 @@ namespace unitcell{
 	public:
       unsigned int i; /// atom unit cell id
       unsigned int j; /// neighbour atom unit cell id
+      unsigned int mat_i; /// atom material category
+      unsigned int mat_j; /// neighbour material category
       unsigned int shell; // shell number of interaction
       int dx; /// delta x in unit cells
       int dy; /// delta y in unit cells
@@ -129,6 +131,7 @@ namespace unitcell{
       // normalisation function to achieve same exchange sum as nn approximation
       void normalise_exchange();
       void normalise_exponential_exchange();
+      void normalise_material_exponential_exchange();
 
       // function to find crystal shells
       void find_shells();

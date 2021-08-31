@@ -165,16 +165,17 @@ namespace unitcell{
             uc::internal::exchange_shift = ds;
             return true;
          }
-         test="ucc-number";
-         if (word == test){
-            int un = atoi(value.c_str());
-            // Test for valid range
-            vin::check_for_valid_int(un, word, line, prefix, 1, 100, "input", "1 - 100");
-            internal::material_exchange_parameters.resize(un, std::vector <exchange_parameters_t>(un));
-            return true;
-         }
+         //test="ucc-number";
+         //if (word == test){
+         //   int un = atoi(value.c_str());
+         //   // Test for valid range
+         //   vin::check_for_valid_int(un, word, line, prefix, 1, 100, "input", "1 - 100");
+         //   internal::material_exchange_parameters.resize(un, std::vector <exchange_parameters_t>(un));
+         //   return true;
+         //}
          //--------------------------------------------------------------------
          test="ucc-exchange-parameters";
+         /*
          if (word == test){
             std::stringstream stream(value);
             int i, j;
@@ -197,7 +198,7 @@ namespace unitcell{
             stream.str(std::string(""));
             return true;
          }
-         /*
+         */
          if (word.length() >= 29 ){
             if (word.substr(0, 23) == test){
                std::string a = "";
@@ -217,12 +218,18 @@ namespace unitcell{
                }
                std::stringstream stream(value);
                stream >> internal::material_exchange_parameters[a_int][b_int].decay_multiplier;
+               std::cout << internal::material_exchange_parameters[a_int][b_int].decay_multiplier << std::endl;
+               stream.ignore();
                stream >> internal::material_exchange_parameters[a_int][b_int].decay_length;
+               std::cout << internal::material_exchange_parameters[a_int][b_int].decay_length << std::endl;
+               stream.ignore();
                stream >> internal::material_exchange_parameters[a_int][b_int].decay_shift;
+               std::cout << internal::material_exchange_parameters[a_int][b_int].decay_shift << std::endl;
                stream.str(std::string());
+               return true;
             }
          }
-         */
+         //-----------------------
          test="function";
          if(word==test){
             test="nearest-neighbour";
