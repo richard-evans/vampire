@@ -165,40 +165,8 @@ namespace unitcell{
             uc::internal::exchange_shift = ds;
             return true;
          }
-         //test="ucc-number";
-         //if (word == test){
-         //   int un = atoi(value.c_str());
-         //   // Test for valid range
-         //   vin::check_for_valid_int(un, word, line, prefix, 1, 100, "input", "1 - 100");
-         //   internal::material_exchange_parameters.resize(un, std::vector <exchange_parameters_t>(un));
-         //   return true;
-         //}
          //--------------------------------------------------------------------
          test="ucc-exchange-parameters";
-         /*
-         if (word == test){
-            std::stringstream stream(value);
-            int i, j;
-            double dm, dl, ds;
-            stream >> i;
-            stream.ignore();
-            stream >> j;
-            stream.ignore();
-            stream >> dm;
-            vin::check_for_valid_value(dm, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 10000.0");
-            internal::material_exchange_parameters[i - 1][j - 1].decay_multiplier = dm;
-            stream.ignore();
-            stream >> dl;
-            vin::check_for_valid_value(dl, word, line, prefix, unit, "length", -0.1, 100.0,"input","-0.1 - 100.0 Angstroms");
-            internal::material_exchange_parameters[i - 1][j - 1].decay_length = dl;
-            stream.ignore();
-            stream >> ds;
-            vin::check_for_valid_value(ds, word, line, prefix, unit, "length", -10000.0, 10000.0,"input","-10000.0 - 10000.0");
-            internal::material_exchange_parameters[i - 1][j - 1].decay_shift = ds;
-            stream.str(std::string(""));
-            return true;
-         }
-         */
          if (word.length() >= 29 ){
             if (word.substr(0, 23) == test){
                std::string a = "";
@@ -218,13 +186,10 @@ namespace unitcell{
                }
                std::stringstream stream(value);
                stream >> internal::material_exchange_parameters[a_int][b_int].decay_multiplier;
-               std::cout << internal::material_exchange_parameters[a_int][b_int].decay_multiplier << std::endl;
                stream.ignore();
                stream >> internal::material_exchange_parameters[a_int][b_int].decay_length;
-               std::cout << internal::material_exchange_parameters[a_int][b_int].decay_length << std::endl;
                stream.ignore();
                stream >> internal::material_exchange_parameters[a_int][b_int].decay_shift;
-               std::cout << internal::material_exchange_parameters[a_int][b_int].decay_shift << std::endl;
                stream.str(std::string());
                return true;
             }
