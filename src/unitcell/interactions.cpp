@@ -47,7 +47,7 @@ namespace internal{
 //------------------------------------------------------------------------------
 void calculate_interactions(unit_cell_t& unit_cell){
 
-   // Resize material-exponential material_exchange_parameters tensor from 100x100
+   // Resize material-exponential material_exchange_parameters tensor from 100x100 if this exchange type is chosen
    if (exchange_function == material_exponential){
       unsigned int num_uc_materials = 0;
       for (int i = 0; i < unit_cell.atom.size(); ++i){
@@ -75,9 +75,6 @@ void calculate_interactions(unit_cell_t& unit_cell){
    for (int i = 0; i < unit_cell.atom.size(); ++i){
       unit_cell.bilinear.ni.push_back(unit_cell.atom[i].ni);
       unit_cell.biquadratic.ni.push_back(unit_cell.atom[i].ni);
-      //if (unit_cell.atom[i].mat + 1 > uc::internal::num_materials){
-      //   num_materials = unit_cell.atom[i].mat + 1;
-      //}
    }
 
    // determine number of unit cells in x,y and z
@@ -142,6 +139,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.i = ratoms[i].id;
                tmp.j = ratoms[j].id;
 
+               // Determine unit cell material for i and j atoms
                tmp.mat_i = ratoms[i].mat;
                tmp.mat_j = ratoms[j].mat;
 

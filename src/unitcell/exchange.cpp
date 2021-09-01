@@ -59,7 +59,6 @@ double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j){
             else Jij = 0.000001;
          }
          return Jij;
-         //return uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_multiplier*exp(-sqrt(range_sq)/uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_length) + uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_shift;
          break;
       }
 

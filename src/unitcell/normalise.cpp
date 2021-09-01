@@ -125,7 +125,8 @@ void unitcell::exchange_template_t::normalise_material_exponential_exchange(){
          }
       }
    }
-
+   
+   // Calculate normalised exchange energies
    for(int i=0; i<interaction.size(); ++i){
       int min_mat = std::min(interaction[i].mat_i, interaction[i].mat_j);
       int max_mat = std::max(interaction[i].mat_i, interaction[i].mat_j);
