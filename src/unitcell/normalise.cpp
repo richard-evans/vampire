@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2020. All rights reserved.
+//   (c) Richard F L Evans 2020, Jack B Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -43,6 +43,10 @@ void unitcell::exchange_template_t::normalise_exchange(){
          normalise_exponential_exchange();
          break;
 
+      case internal::material_exponential:
+         normalise_material_exponential_exchange();
+         break;
+
       default:
          return;
 
@@ -77,10 +81,10 @@ void unitcell::exchange_template_t::normalise_exponential_exchange(){
       interaction[i].Jij[2][2] *= inv_norm_factor;
    }
 
-   double nsum = 0.0;
-   for(int i=0; i<interaction.size(); i++){
-      nsum += interaction[i].Jij[0][0]; // xx only since J is a trace anyway
-   }
+   //double nsum = 0.0;
+   //for(int i=0; i<interaction.size(); i++){
+   //   nsum += interaction[i].Jij[0][0]; // xx only since J is a trace anyway
+   //}
 
    // output sum and normalised sum to screen
    //std::cout << expected_sum << "\t" << sum << "\t" << nsum << std::endl;
@@ -88,5 +92,52 @@ void unitcell::exchange_template_t::normalise_exponential_exchange(){
    return;
 
 }
+
+void unitcell::exchange_template_t::normalise_material_exponential_exchange(){
+
+   int num_materials = 3;
+
+   // Calculate expected number of interactions for different material pairs. Stored by [lowest mat cat][highest mat cat]
+   std::vector <std::vector <double>> material_expected_sum(num_materials, std::vector<double>(num_materials, 0.0));
+
+   for (int i = 0; i < interaction.size(); ++i){
+      int min_mat = std::min(interaction[i].mat_i, interaction[i].mat_j);
+      int max_mat = std::max(interaction[i].mat_i, interaction[i].mat_j);
+      material_expected_sum[min_mat][max_mat] += 1.0;
+   }
+
+   // Calculate sum of interaction energies for different material category pairs. Stored by [lowest mat cat][highest mat cat]
+   std::vector <std::vector <double>> material_sum(num_materials, std::vector<double>(num_materials, 0.0));
+
+   for(int i=0; i<interaction.size(); ++i){
+      int min_mat = std::min(interaction[i].mat_i, interaction[i].mat_j);
+      int max_mat = std::max(interaction[i].mat_i, interaction[i].mat_j);
+      material_sum[min_mat][max_mat] += interaction[i].Jij[0][0]; // xx only since J is a trace anyway
+   }
+
+   // Obtain inverse normalisation factors for different material category pairs. Stored by [lowest mat cat][highest mat cat]
+   std::vector <std::vector <double>> mat_inv_norm_factor(num_materials, std::vector<double>(num_materials, 0.0));
+   
+   for(int i = 0; i < mat_inv_norm_factor.size(); ++i){
+      for (int j = 0; j < mat_inv_norm_factor.size(); ++j){
+         if(j >= i){
+            mat_inv_norm_factor[i][j] = material_expected_sum[i][j]/material_sum[i][j];
+         }
+      }
+   }
+
+   for(int i=0; i<interaction.size(); ++i){
+      int min_mat = std::min(interaction[i].mat_i, interaction[i].mat_j);
+      int max_mat = std::max(interaction[i].mat_i, interaction[i].mat_j);
+      interaction[i].Jij[0][0] *= mat_inv_norm_factor[min_mat][max_mat];
+      interaction[i].Jij[1][1] *= mat_inv_norm_factor[min_mat][max_mat];
+      interaction[i].Jij[2][2] *= mat_inv_norm_factor[min_mat][max_mat];
+   }
+
+   return;
+
+}
+
+
 
 } // end if namespace unitcell

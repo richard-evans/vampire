@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack B. Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -62,6 +62,8 @@ namespace unitcell{
 	public:
       unsigned int i; /// atom unit cell id
       unsigned int j; /// neighbour atom unit cell id
+      unsigned int mat_i; /// atom material category
+      unsigned int mat_j; /// neighbour material category
       unsigned int shell; // shell number of interaction
       int dx; /// delta x in unit cells
       int dy; /// delta y in unit cells
@@ -69,6 +71,23 @@ namespace unitcell{
       double rij; // interaction range (unit cells)
       double Jij[3][3]; /// Exchange tensor
 	};
+
+   //------------------------------------------------------------------------
+   // Class to hold exchange function parameters
+   //------------------------------------------------------------------------
+   class exchange_parameters_t{
+      public:
+         double decay_length;
+         double decay_multiplier;
+         double decay_shift;
+
+      exchange_parameters_t():
+         decay_length(0.4),
+         decay_multiplier(0.0),
+         decay_shift(0.0)
+      {
+      };
+   };
 
    //---------------------------------------------------------------------------
    // Unit cell exchange template class definition
@@ -112,6 +131,7 @@ namespace unitcell{
       // normalisation function to achieve same exchange sum as nn approximation
       void normalise_exchange();
       void normalise_exponential_exchange();
+      void normalise_material_exponential_exchange();
 
       // function to find crystal shells
       void find_shells();

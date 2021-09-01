@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -36,9 +36,14 @@ namespace unitcell{
       double unit_cell_size_y = 3.54;
       double unit_cell_size_z = 3.54;
 
+      int max_unit_cell_material = 100;
+
       exchange_function_t exchange_function = nearest_neighbour;
       double exchange_interaction_range = 1.0;
       double exchange_decay = 0.4; // Angstroms
+      double exchange_multiplier = 1.0;
+      double exchange_shift = 0.0;
+      std::vector <std::vector <exchange_parameters_t>> material_exchange_parameters(max_unit_cell_material, std::vector <exchange_parameters_t>(max_unit_cell_material));
 
       bool sublattice_materials = false; // flag to enable identification of atoms in simple crystals by material
 

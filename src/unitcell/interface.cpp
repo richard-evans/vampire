@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack B Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -149,6 +149,52 @@ namespace unitcell{
             uc::internal::exchange_decay = dl;
             return true;
          }         //--------------------------------------------------------------------
+         test="decay-multiplier";
+         if(word==test){
+            double dm = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(dm, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 10000.0");
+            uc::internal::exchange_multiplier = dm;
+            return true;
+         }
+         test="decay-shift";
+         if (word==test){
+            double ds = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(ds, word, line, prefix, unit, "length", -10000.0, 10000.0,"input","-10000.0 - 10000.0");
+            uc::internal::exchange_shift = ds;
+            return true;
+         }
+         //--------------------------------------------------------------------
+         test="ucc-exchange-parameters";
+         if (word.length() >= 29 ){
+            if (word.substr(0, 23) == test){
+               std::string a = "";
+               std::string b = "";
+               int count;
+               for (int i = 1; word.at(23 + i) != ']'; ++i){
+                  count = i;
+               }
+               a = word.substr(24, count);
+               for (int i = 1; word.at(25 + count + i) != ']'; ++i){
+                  b.push_back(word.at(25 + count + i));
+               }
+               int a_int = stoi(a);
+               int b_int = stoi(b);
+               if (internal::material_exchange_parameters.size() < std::max(a_int, b_int)) {
+                  internal::material_exchange_parameters.resize(std::max(a_int, b_int), std::vector <exchange_parameters_t>(std::max(a_int,b_int)));
+               }
+               std::stringstream stream(value);
+               stream >> internal::material_exchange_parameters[a_int][b_int].decay_multiplier;
+               stream.ignore();
+               stream >> internal::material_exchange_parameters[a_int][b_int].decay_length;
+               stream.ignore();
+               stream >> internal::material_exchange_parameters[a_int][b_int].decay_shift;
+               stream.str(std::string());
+               return true;
+            }
+         }
+         //-----------------------
          test="function";
          if(word==test){
             test="nearest-neighbour";
@@ -166,15 +212,21 @@ namespace unitcell{
                uc::internal::exchange_function = uc::internal::exponential;
                return true;
             }
+            test="material-exponential";
+            if(value==test){
+               uc::internal::exchange_function = uc::internal::material_exponential;
+               return true;
+            }
             else{
                terminaltextcolor(RED);
                std::cerr << "Error - value for \'exchange:" << word << "\' must be one of:" << std::endl;
                std::cerr << "\t\"nearest-neighbour\"" << std::endl;
                std::cerr << "\t\"exponential\"" << std::endl;
+               std::cerr << "\t\"material-exponential\"" << std::endl;
                terminaltextcolor(WHITE);
                err::vexit();
             }
-         }
+         }  //------------------------------------------------------------
       }
       //--------------------------------------------------------------------
       // Keyword not found
