@@ -55,15 +55,25 @@ namespace vcuda{
          bool initialized(false);
 
          // arrays for storing temporary spin data for integration
-         cu_real_array_t x_spin_buffer_array(0UL);
+         /*cu_real_array_t x_spin_buffer_array(0UL);
          cu_real_array_t y_spin_buffer_array(0UL);
          cu_real_array_t z_spin_buffer_array(0UL);
          cu_real_array_t dS_x_array(0UL);
          cu_real_array_t dS_y_array(0UL);
          cu_real_array_t dS_z_array(0UL);
+         */
 
          // array for storing heun integration prefactors
-         thrust::device_vector<heun_parameters_t> heun_parameters_device(0UL);
+         //thrust::device_vector<heun_parameters_t> heun_parameters_device(0UL);
+         heun_parameters_t *d_heun_params;
+
+         cu_real_t *d_x_spin_buffer;
+         cu_real_t *d_y_spin_buffer;
+         cu_real_t *d_z_spin_buffer;
+
+         cu_real_t *d_ds_x;
+         cu_real_t *d_ds_y;
+         cu_real_t *d_ds_z;
 
          //-----------------------------------------------------------
          // Function to initialize LLG variables on device
@@ -71,17 +81,31 @@ namespace vcuda{
          void __llg_init (){
 
             // Reserve space for the buffers
-            cu::llg::x_spin_buffer_array.resize(::atoms::num_atoms);
-            cu::llg::y_spin_buffer_array.resize(::atoms::num_atoms);
-            cu::llg::z_spin_buffer_array.resize(::atoms::num_atoms);
+            //cu::llg::x_spin_buffer_array.resize(::atoms::num_atoms);
+            //cu::llg::y_spin_buffer_array.resize(::atoms::num_atoms);
+            //cu::llg::z_spin_buffer_array.resize(::atoms::num_atoms);
+            //cu::llg::dS_x_array.resize(::atoms::num_atoms);
+            //cu::llg::dS_y_array.resize(::atoms::num_atoms);
+            //cu::llg::dS_z_array.resize(::atoms::num_atoms);
 
-            cu::llg::dS_x_array.resize(::atoms::num_atoms);
-            cu::llg::dS_y_array.resize(::atoms::num_atoms);
-            cu::llg::dS_z_array.resize(::atoms::num_atoms);
+            cudaMalloc((void**)&cu::llg::d_x_spin_buffer, ::atoms::num_atoms * sizeof(cu_real_t));
+            cudaMalloc((void**)&cu::llg::d_y_spin_buffer, ::atoms::num_atoms * sizeof(cu_real_t));
+            cudaMalloc((void**)&cu::llg::d_z_spin_buffer, ::atoms::num_atoms * sizeof(cu_real_t));
+
+            // Initial copy to the buffer
+	    // This is later taken care of inside the corrector step kernel
+            cudaMemcpy(cu::llg::d_x_spin_buffer, cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            cudaMemcpy(cu::llg::d_y_spin_buffer, cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            cudaMemcpy(cu::llg::d_z_spin_buffer, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            
+	    cudaMalloc((void**)&cu::llg::d_ds_x, ::atoms::num_atoms * sizeof(cu_real_t));
+            cudaMalloc((void**)&cu::llg::d_ds_y, ::atoms::num_atoms * sizeof(cu_real_t));
+            cudaMalloc((void**)&cu::llg::d_ds_z, ::atoms::num_atoms * sizeof(cu_real_t));
 
             // Initialize host array for heun parameters
             size_t num_mats = ::mp::num_materials;
-            thrust::host_vector<heun_parameters_t> heun_parameters_host(num_mats);
+            //thrust::host_vector<heun_parameters_t> heun_parameters_host(num_mats);
+            std::vector<heun_parameters_t> h_heun_params(num_mats);
 
             // loop over all materials and determine prefactor constants
             for (size_t i = 0; i < num_mats; i++){
@@ -91,22 +115,24 @@ namespace vcuda{
                double gamma = ::mp::material[i].gamma_rel;
 
                // save derived variables to host array
-               heun_parameters_host[i].prefactor = -gamma / (1.0 + alpha * alpha);
-               heun_parameters_host[i].lambda_times_prefactor = -gamma * alpha / (1.0 + alpha * alpha);
+               h_heun_params.at(i).prefactor = -gamma / (1.0 + alpha * alpha);
+               h_heun_params.at(i).lambda_times_prefactor = -gamma * alpha / (1.0 + alpha * alpha);
 
                #ifdef CUDA_SPIN_DEBUG
 					   // output variables to screen for debugging
                   std::cout << "Heun parameters: "
-									 << heun_parameters_host[i].prefactor << " "
-									 << heun_parameters_host[i].lambda_times_prefactor << std::endl;
+									 << h_heun_params.at(i).prefactor << " "
+									 << h_heun_params.at(i).lambda_times_prefactor << std::endl;
                #endif
 
             }
 
             // resize device parameter array to correct size
-            cu::llg::heun_parameters_device.resize(num_mats);
+            //cu::llg::heun_parameters_device.resize(num_mats);
             // copy host array to device
-            thrust::copy(heun_parameters_host.begin(),heun_parameters_host.end(),cu::llg::heun_parameters_device.begin());
+            //thrust::copy(heun_parameters_host.begin(),heun_parameters_host.end(),cu::llg::heun_parameters_device.begin());
+            cudaMalloc((void**)&cu::llg::d_heun_params, num_mats * sizeof(heun_parameters_t));
+            cudaMemcpy(cu::llg::d_heun_params, h_heun_params.data(), num_mats * sizeof(heun_parameters_t), cudaMemcpyHostToDevice);
 
             // set flag to indicate data initialization
             initialized=true;
@@ -122,9 +148,14 @@ namespace vcuda{
          void __llg_step(){
 
             // Make a device to device (D2D) copy of initial spin directions
-            thrust::copy (cu::atoms::x_spin_array.begin(),cu::atoms::x_spin_array.end(),cu::llg::x_spin_buffer_array.begin());
-            thrust::copy (cu::atoms::y_spin_array.begin(),cu::atoms::y_spin_array.end(),cu::llg::y_spin_buffer_array.begin());
-            thrust::copy (cu::atoms::z_spin_array.begin(),cu::atoms::z_spin_array.end(),cu::llg::z_spin_buffer_array.begin());
+            //thrust::copy (cu::atoms::x_spin_array.begin(),cu::atoms::x_spin_array.end(),cu::llg::x_spin_buffer_array.begin());
+            //thrust::copy (cu::atoms::y_spin_array.begin(),cu::atoms::y_spin_array.end(),cu::llg::y_spin_buffer_array.begin());
+            //thrust::copy (cu::atoms::z_spin_array.begin(),cu::atoms::z_spin_array.end(),cu::llg::z_spin_buffer_array.begin());
+
+            // D2D copy - is it really necessary?
+            //cudaMemcpy(cu::llg::d_x_spin_buffer, cu::atoms::d_x_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            //cudaMemcpy(cu::llg::d_y_spin_buffer, cu::atoms::d_y_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
+            //cudaMemcpy(cu::llg::d_z_spin_buffer, cu::atoms::d_z_spin, ::atoms::num_atoms * sizeof(cu_real_t), cudaMemcpyDeviceToDevice);
 
             #ifdef CUDA_SPIN_DEBUG
                // Output first spin position
@@ -134,15 +165,15 @@ namespace vcuda{
             #endif
 
             // Cast device pointers for calling kernel function calls
-            cu_real_t * d_x_spin = thrust::raw_pointer_cast(cu::atoms::x_spin_array.data());
-            cu_real_t * d_y_spin = thrust::raw_pointer_cast(cu::atoms::y_spin_array.data());
-            cu_real_t * d_z_spin = thrust::raw_pointer_cast(cu::atoms::z_spin_array.data());
+            //cu_real_t * d_x_spin = thrust::raw_pointer_cast(cu::atoms::x_spin_array.data());
+            //cu_real_t * d_y_spin = thrust::raw_pointer_cast(cu::atoms::y_spin_array.data());
+            //cu_real_t * d_z_spin = thrust::raw_pointer_cast(cu::atoms::z_spin_array.data());
 
-            int * d_materials = thrust::raw_pointer_cast(cu::atoms::type_array.data());
+            //int * d_materials = thrust::raw_pointer_cast(cu::atoms::type_array.data());
 
-            cu::heun_parameters_t * d_heun_params = thrust::raw_pointer_cast (cu::llg::heun_parameters_device.data());
+            //cu::heun_parameters_t * d_heun_params = thrust::raw_pointer_cast (cu::llg::heun_parameters_device.data());
 
-            cu_real_t * d_x_spin_field = thrust::raw_pointer_cast(cu::x_total_spin_field_array.data());
+            /*cu_real_t * d_x_spin_field = thrust::raw_pointer_cast(cu::x_total_spin_field_array.data());
             cu_real_t * d_y_spin_field = thrust::raw_pointer_cast(cu::y_total_spin_field_array.data());
             cu_real_t * d_z_spin_field = thrust::raw_pointer_cast(cu::z_total_spin_field_array.data());
 
@@ -157,7 +188,7 @@ namespace vcuda{
             cu_real_t * dS_x_dptr = thrust::raw_pointer_cast(cu::llg::dS_x_array.data());
             cu_real_t * dS_y_dptr = thrust::raw_pointer_cast(cu::llg::dS_y_array.data());
             cu_real_t * dS_z_dptr = thrust::raw_pointer_cast(cu::llg::dS_z_array.data());
-
+            */
             // Calculate spin dependent fields
             cu::update_spin_fields ();
 
@@ -169,11 +200,11 @@ namespace vcuda{
 
             // Invoke kernel for heun predictor step
             cu::llg::llg_heun_predictor_step <<< cu::grid_size, cu::block_size >>> (
-               d_materials, d_heun_params,
-					d_x_spin, d_y_spin, d_z_spin,
-               d_x_spin_field, d_y_spin_field, d_z_spin_field,
-               d_x_external_field, d_y_external_field, d_z_external_field,
-               dS_x_dptr, dS_y_dptr, dS_z_dptr,
+               cu::atoms::d_materials, cu::llg::d_heun_params,
+					cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
+               cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field,
+               cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+               cu::llg::d_ds_x, cu::llg::d_ds_y, cu::llg::d_ds_z,
                ::mp::dt, ::atoms::num_atoms);
 
             #ifdef CUDA_SPIN_DEBUG
@@ -194,12 +225,12 @@ namespace vcuda{
 
             // Invoke kernel for heun corrector step
             cu::llg::llg_heun_corrector_step <<< cu::grid_size, cu::block_size >>> (
-               d_materials, d_heun_params,
-					d_x_spin, d_y_spin, d_z_spin,
-               d_x_spin_field, d_y_spin_field, d_z_spin_field,
-               d_x_external_field, d_y_external_field, d_z_external_field,
-               d_x_spin_buffer, d_y_spin_buffer, d_z_spin_buffer,
-               dS_x_dptr, dS_y_dptr, dS_z_dptr,
+               cu::atoms::d_materials, cu::llg::d_heun_params,
+					cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
+               cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field,
+               cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+               cu::llg::d_x_spin_buffer, cu::llg::d_y_spin_buffer, cu::llg::d_z_spin_buffer,
+               cu::llg::d_ds_x, cu::llg::d_ds_y, cu::llg::d_ds_z,
                ::mp::dt, ::atoms::num_atoms);
 
             check_cuda_errors (__FILE__, __LINE__);
@@ -347,10 +378,19 @@ namespace vcuda{
                   float mods = __frsqrt_rn(S_x*S_x + S_y*S_y + S_z*S_z);
                #endif
 
+	       cu_real_t sp_x_new = mods * S_x;
+	       cu_real_t sp_y_new = mods * S_y;
+	       cu_real_t sp_z_new = mods * S_z;
+
                // save final spin direction to spin array
-               x_spin[atom] = mods * S_x;
-               y_spin[atom] = mods * S_y;
-               z_spin[atom] = mods * S_z;
+               x_spin[atom] = sp_x_new;
+               y_spin[atom] = sp_y_new;
+               z_spin[atom] = sp_z_new;
+
+	       // Update the spin buffer
+               x_spin_buffer[atom] = sp_x_new;
+               y_spin_buffer[atom] = sp_y_new;
+               z_spin_buffer[atom] = sp_z_new;
 
             }
          }

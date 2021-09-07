@@ -94,4 +94,9 @@ run/unit-cell-creator
 .project
 .settings/
 
+#----------------------------------------------
+# VS code project files and folders
+#----------------------------------------------
+.vscode/
+
 #EOF

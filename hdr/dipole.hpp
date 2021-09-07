@@ -110,6 +110,13 @@ namespace dipole{
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
 
+   std::vector<int> get_num_atoms_in_cell_array();
+   unsigned int get_num_atoms_in_cell(const int cell);
+   unsigned int get_tot_num_cells();
+   unsigned int get_tot_num_local_cells();
+   std::vector<double> unroll_tensor(const int element, double dummy);
+   std::vector<float>  unroll_tensor(const int element, float dummy);
+
 } // end of dipole namespace
 
 #endif //DIPOLE_H_

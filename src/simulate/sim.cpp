@@ -231,6 +231,9 @@ int run(){
    // Precalculate initial statistics
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
 
+   // Initialize GPU acceleration if enabled
+   if(gpu::acceleration) gpu::initialize();
+
    // initialise dipole field calculation
    dipole::initialize(cells::num_atoms_in_unit_cell,
                      cells::num_cells,
@@ -256,9 +259,6 @@ int run(){
                      atoms::m_spin_array,
                      atoms::num_atoms
    );
-
-   // Initialize GPU acceleration if enabled
-   if(gpu::acceleration) gpu::initialize();
 
    // For MPI version, calculate initialisation time
 	if(vmpi::my_rank==0){
@@ -550,12 +550,12 @@ int integrate(uint64_t n_steps){
 ///
 /// @section Information
 /// @author  Richard Evans, richard.evans@york.ac.uk
-/// @version 1.1
-/// @date    10/06/2015
+/// @version 1.2
+/// @date    23/04/2021
 ///
 /// @internal
 ///	Created:		05/02/2011
-///	Revision:	  ---
+///	Revision:	    23/04/2021
 ///=====================================================================================
 ///
 void integrate_serial(uint64_t n_steps){
@@ -579,7 +579,12 @@ void integrate_serial(uint64_t n_steps){
 
 		case 1: // Montecarlo
 			for(uint64_t ti=0;ti<n_steps;ti++){
-				montecarlo::mc_step(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::num_atoms, atoms::type_array);
+
+                // Optionally select GPU accelerated version
+                if(gpu::acceleration) gpu::mc_step();
+
+                else montecarlo::mc_step(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::num_atoms, atoms::type_array);
+
 				// increment time
 				sim::internal::increment_time();
 			}
