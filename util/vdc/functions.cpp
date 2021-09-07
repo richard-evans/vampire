@@ -614,7 +614,7 @@ void arg_count(const input_t &input, size_t args_required, std::string requireme
       if (num_args == args_required){ return; }
       else {
          std::cerr << "Error - expected " << args_required << " arguments in '" << input.key
-                   << location_message << "\nInstead got " << num_args << ".\n"; 
+                   << location_message << "Instead got " << num_args << "\n"; 
       }
    }
    else if (requirement == "ge"){
