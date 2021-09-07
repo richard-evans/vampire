@@ -39,6 +39,9 @@ namespace vdc{
    bool x_axis_colour = false;
    bool default_camera_pos = true;
 
+   // list of input file parameters set in command line (to check for double usage)
+   std::vector<std::string> cmdl_parameters;
+
    format_t format;
 
    uint64_t num_atoms = 0;

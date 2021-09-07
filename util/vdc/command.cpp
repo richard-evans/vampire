@@ -14,6 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <cctype>
 #include <vector>
 #include <algorithm>
 #include <fstream>
@@ -27,7 +28,7 @@ namespace vdc{
 // void extract_vector( std::string arg_string, std::vector<double>& arg_vector );
 // void extract_materials( std::string arg_string, std::vector<int>& arg_vector);
 // void extract_slice_param( std::string arg_string, std::vector<double>& arg_vector, int number_of_param);
-void check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output );
+void check_arg( int &arg, int argc, char* argv[], std::string &temp_str, std::string error_output );
 void init_vector_y();
 
 //------------------------------------------------------------------------------
@@ -55,6 +56,9 @@ void command( int argc, char* argv[] ){
 
       // read prefix
       std::string sw=argv[arg];
+
+      // convert to lowercase
+      for (char &c : sw){ c = std::tolower(c); }
 
       //------------------------------------------------------------------------
       // Check for appropriate data outputs
@@ -119,28 +123,74 @@ void command( int argc, char* argv[] ){
          // pass to function wrapper
          vdc::key_list.at(temp_str)(input);
       }
-      // else if (sw == "--gen-input" || sw == "--generate-input"){
+      //------------------------------------------------------------------------
+      // check for input file parameters passed in command line (parameters must use -- notation)
+      //------------------------------------------------------------------------
+      else if ( vdc::key_list.count(sw.substr(2)) ){
 
-      //    // open input file to write to
-      //    std::ofstream input_file(vdc::input_file);
+         input_t input;
 
-      //    // check if file open was success
-      //    if (!input_file.is_open()){
-      //       std::cerr << "Error - Unable to open '" << vdc::input_file << "'.\n";
-      //       std::exit(EXIT_FAILURE);
-      //    }
+         // set key. line number is set to -1 for error checking
+         input.key = sw.substr(2);
+         input.line_number = -1;
 
-      //    input_file << "#=================================\n"
-      //               << "# Povray Parameters\n"
-      //               << "#=================================\n\n"
-      //               << "colourmap = CBWR\n"
-      //               << ""
-                    
+         // extract and sanitize parameter arguments, if any
+         if (++arg < argc){
+            temp_str = argv[arg];
 
+            std::string delimiters = ",(){}[]:=!";
+            std::string temp_val;
+         
+            // stop adding arguments when a command line paramter is reached (i.e. something starting with -- or -h)
+            while ( !(temp_str[0] == '-' && (temp_str[1] == '-' || std::isalpha(temp_str[1]))) ){
 
+               // work through argument
+               for (char &c : temp_str){
 
-      //    std::exit(EXIT_SUCCESS);
-      // }
+                  // if uppercase, make lowercase
+                  c = std::tolower(c);
+
+                  // skip delimiters and push last value
+                  if (delimiters.find(c) != std::string::npos){
+
+                     // in case delimiters follow each other
+                     if (temp_val == ""){ continue; }
+                     
+                     // add to values
+                     input.value.push_back(temp_val);
+
+                     temp_val.clear();
+                  }
+                  // otherwise add char to temp_val
+                  else { temp_val.push_back(c); }
+
+               }
+
+               // push back last value if not empty and clear temp_val
+               if (temp_val != ""){ 
+                  input.value.push_back(temp_val);
+                  temp_val.clear();
+               }
+
+               // if more arguments remain, move to next, else finished
+               if (++arg < argc){ temp_str = argv[arg]; }
+               else { break; }
+            }
+
+            // reduce arg to process next parameter again
+            arg--;
+         }
+
+         // keep track of parameter to check it is not used agin in input file
+         // slices are excluded as multiple can be defined
+         if (input.key.find("slice") == std::string::npos){
+            vdc::cmdl_parameters.push_back(input.key);
+         }
+         
+
+         // set parameters using function wrapper and arguments
+         vdc::key_list.at(input.key)(input);
+      }
       else {
          std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
          std::exit(EXIT_FAILURE);
@@ -167,12 +217,9 @@ void command( int argc, char* argv[] ){
 //------------------------------------------------------------------------------
 // Check number of command line args not exceeded
 //------------------------------------------------------------------------------
-void check_arg( int& arg, int argc, char* argv[], std::string& temp_str, std::string error_output ){
+void check_arg( int &arg, int argc, char* argv[], std::string &temp_str, std::string error_output ){
 
-   if (arg+1 < argc){
-      arg++;
-      temp_str = argv[arg];
-   }
+   if (++arg < argc){ temp_str = argv[arg]; }
    else {
       std::cerr << error_output << std::endl;
       std::exit(EXIT_FAILURE);
