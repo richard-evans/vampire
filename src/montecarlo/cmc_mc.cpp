@@ -546,7 +546,7 @@ int cmc_mc_step(){
 	} // end of mc loop
 
 	// calculate new adaptive step sigma angle
-	if(montecarlo::internal::algorithm == montecarlo::internal::adaptive){
+	if(montecarlo::algorithm == montecarlo::adaptive){
 		const double statistics_moves = atoms::num_atoms;
 		const double last_rejection_rate = statistics_reject / statistics_moves;
 		const double factor = 0.5 / last_rejection_rate;

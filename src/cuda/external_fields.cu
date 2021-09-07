@@ -56,6 +56,9 @@ void update_external_fields (){
    const cu_real_t Hz = sim::H_vec[2]*sim::H_applied;
    const int num_atoms = ::atoms::num_atoms;
 
+//   // update dipole field
+//    update_dipolar_fields();  //-- disabled  as causes NaN and deferred to CPU code for now
+
    // Call kernel to calculate external fields
    cu::update_external_fields_kernel <<< cu::grid_size, cu::block_size >>> (
          cu::atoms::d_materials, cu::mp::d_material_params,
@@ -68,9 +71,6 @@ void update_external_fields (){
 
    // Check for errors
    check_cuda_errors (__FILE__, __LINE__);
-
-   // update dipole field
-   // update_dipolar_fields(); -- disabled  as causes NaN and deferred to CPU code for now
 
    // std::ofstream fields("should_be_normal.txt");
    // for (size_t i = 0; i < cu::x_total_external_field_array.size(); ++i) {
@@ -141,9 +141,15 @@ __global__ void update_external_fields_kernel (
          float rsigma = sigma*sqrtf(resc_temp);
       #endif
 
-      field_x = rsigma * curand_normal_double (&local_state);
-      field_y = rsigma * curand_normal_double (&local_state);
-      field_z = rsigma * curand_normal_double (&local_state);
+      #ifdef CUDA_DP
+         field_x = rsigma * curand_normal_double (&local_state);
+         field_y = rsigma * curand_normal_double (&local_state);
+         field_z = rsigma * curand_normal_double (&local_state);
+      #else
+         field_x = rsigma * curand_normal(&local_state);
+         field_y = rsigma * curand_normal(&local_state);
+         field_z = rsigma * curand_normal(&local_state);
+      #endif
 
       // Local applied field
       cu_real_t norm_h = mat.applied_field_strength;
@@ -168,6 +174,8 @@ __global__ void update_external_fields_kernel (
       field_x += x_dip_field[atom];
       field_y += y_dip_field[atom];
       field_z += z_dip_field[atom];
+      
+//      printf("       %d  %lf  %lf  %lf\n",atom,x_dip_field[atom],y_dip_field[atom],z_dip_field[atom]);
 
       // Write back to main memory
       x_ext_field[atom] = field_x;

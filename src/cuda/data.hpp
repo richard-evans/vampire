@@ -27,12 +27,18 @@ namespace vcuda
    namespace internal
    {
 
+      extern cu_real_t *h_x_spin_transfer_buffer;
+      extern cu_real_t *h_y_spin_transfer_buffer;
+      extern cu_real_t *h_z_spin_transfer_buffer;
+
       namespace atoms
       {
 
          extern cu_real_t *d_x_spin;
          extern cu_real_t *d_y_spin;
          extern cu_real_t *d_z_spin;
+
+         extern cu_real_t *d_spin;
 
          extern cu_real_t *d_x_coord;
          extern cu_real_t *d_y_coord;
@@ -94,6 +100,9 @@ namespace vcuda
          extern cu_real_t *d_volume;
          extern cu_real_t *d_num_atoms;
 
+         extern int *d_cell_id_array;
+         extern int *d_num_atoms_in_cell;
+
       } /* cells */
 
       namespace mp
@@ -104,6 +113,8 @@ namespace vcuda
       extern cu_real_t *d_x_spin_field;
       extern cu_real_t *d_y_spin_field;
       extern cu_real_t *d_z_spin_field;
+
+      extern cu_real_t *d_spin_field;
 
       extern cu_real_t *d_x_external_field;
       extern cu_real_t *d_y_external_field;

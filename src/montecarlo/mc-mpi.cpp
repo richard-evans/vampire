@@ -278,7 +278,7 @@ void mc_step_parallel(std::vector<double> &x_spin_array,
    MPI_Allreduce(&statistics_reject, &global_statistics_reject, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
    // calculate new adaptive step sigma angle (on per-processor basis using local, not global stats)
-   if(montecarlo::internal::algorithm == montecarlo::internal::adaptive){
+   if(montecarlo::algorithm == montecarlo::adaptive){
       const double last_rejection_rate = statistics_reject / statistics_moves;
       const double factor = 0.5 / last_rejection_rate;
       montecarlo::internal::adaptive_sigma *= factor;

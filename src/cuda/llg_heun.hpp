@@ -28,11 +28,11 @@ namespace vcuda
          /**
           * @var gamma_rel / (1 + alpha ** 2)
           */
-         double prefactor;
+         cu_real_t prefactor;
          /**
           * @var lambda * prefactor
           */
-         double lambda_times_prefactor;
+         cu_real_t lambda_times_prefactor;
       };
 
       namespace llg
