@@ -179,8 +179,8 @@ namespace unitcell{
                for (int i = 1; word.at(25 + count + i) != ']'; ++i){
                   b.push_back(word.at(25 + count + i));
                }
-               int a_int = stoi(a);
-               int b_int = stoi(b);
+               int a_int = stoi(a) - 1;
+               int b_int = stoi(b) - 1;
                if (internal::material_exchange_parameters.size() < std::max(a_int, b_int)) {
                   internal::material_exchange_parameters.resize(std::max(a_int, b_int), std::vector <exchange_parameters_t>(std::max(a_int,b_int)));
                }
