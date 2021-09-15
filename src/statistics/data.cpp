@@ -25,6 +25,8 @@ namespace stats{
    bool calculate_material_standard_deviation   = false;
    bool calculate_system_susceptibility         = false;
    bool calculate_material_susceptibility       = false;
+   bool calculate_system_spin_temperature       = false;
+   bool calculate_material_spin_temperature     = false;
 
    energy_statistic_t system_energy("s");
    energy_statistic_t material_energy("m");
@@ -42,6 +44,9 @@ namespace stats{
    standard_deviation_statistic_t material_standard_deviation("m");
    susceptibility_statistic_t system_susceptibility("s");
    susceptibility_statistic_t material_susceptibility("m");
+
+   spin_temperature_statistic_t system_spin_temperature("s"); 
+   spin_temperature_statistic_t material_spin_temperature("m"); 
 
    //-----------------------------------------------------------------------------
    // Shared variables used for statistics calculation

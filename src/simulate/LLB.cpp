@@ -237,9 +237,9 @@ int LLB_serial_heun(const int num_steps){
 
 			// Store local spin in Sand local field in H
 			const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
-			const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom],
-										atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom],
-										atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]};
+			const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom]+atoms::thermal_x_field[atom],
+								atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom]+atoms::thermal_y_field[atom],
+								atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]+atoms::thermal_z_field[atom]};
 			const double H_perp[3]={H[0]+Htx_perp[atom], H[1]+Hty_perp[atom], H[2]+Htz_perp[atom]};
 			const double H_para[3]={H[0]+Htx_para[atom], H[1]+Hty_para[atom], H[2]+Htz_para[atom]};
 			const double one_o_m_squared = 1.0/(S[1]*S[1]+S[2]*S[2]+S[0]*S[0]);
@@ -303,9 +303,9 @@ int LLB_serial_heun(const int num_steps){
 
 			// Store local spin in Sand local field in H
 			const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
-			const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom],
-										atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom],
-										atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]};
+			const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom]+atoms::thermal_x_field[atom],
+								atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom]+atoms::thermal_y_field[atom],
+								atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]+atoms::thermal_z_field[atom]};
 			const double H_perp[3]={H[0]+Htx_perp[atom], H[1]+Hty_perp[atom], H[2]+Htz_perp[atom]};
 			const double H_para[3]={H[0]+Htx_para[atom], H[1]+Hty_para[atom], H[2]+Htz_para[atom]};
 			const double one_o_m_squared = 1.0/(S[1]*S[1]+S[2]*S[2]+S[0]*S[0]);

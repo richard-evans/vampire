@@ -255,6 +255,8 @@ void temperature_pulse(){
 	sim::TTTe=sim::temperature;
 	sim::TTTp=sim::temperature;
 
+	
+
    // If local temperature is set then also initalise local temperatures
    if(sim::local_temperature==true){
       for(unsigned int mat=0;mat<mp::material.size();mat++){
