@@ -133,9 +133,9 @@ namespace micromagnetic{
 
          // Store local spin in S and local field in H
          const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
-         const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom],
-            atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom],
-            atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom]};
+         const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom] + atoms::thermal_x_field[atom],
+            atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom] + atoms::thermal_y_field[atom],
+            atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom] + atoms::thermal_z_field[atom]};
             // Calculate Delta S
             xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
             xyz[1]=(one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
@@ -196,9 +196,9 @@ namespace micromagnetic{
 
             // Store local spin in Sand local field in H
             const double S[3] = {atoms::x_spin_array[atom],atoms::y_spin_array[atom],atoms::z_spin_array[atom]};
-            const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom] + mp::material[imaterial].pinning_field_unit_vector[0],
-               atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom] + mp::material[imaterial].pinning_field_unit_vector[1],
-               atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom] + mp::material[imaterial].pinning_field_unit_vector[2]};
+            const double H[3] = {atoms::x_total_spin_field_array[atom]+atoms::x_total_external_field_array[atom] + atoms::thermal_x_field[atom] + mp::material[imaterial].pinning_field_unit_vector[0],
+               atoms::y_total_spin_field_array[atom]+atoms::y_total_external_field_array[atom] + atoms::thermal_x_field[atom]+ mp::material[imaterial].pinning_field_unit_vector[1],
+               atoms::z_total_spin_field_array[atom]+atoms::z_total_external_field_array[atom] + atoms::thermal_x_field[atom]+ mp::material[imaterial].pinning_field_unit_vector[2]};
 
                // Calculate Delta S
                xyz[0]=(one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));

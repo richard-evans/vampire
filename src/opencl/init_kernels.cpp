@@ -61,6 +61,7 @@ static void init_external_fields(void)
                            vcl::mp::materials,
                            vcl::dipolar_field_array.buffer(),
                            vcl::total_external_field_array.buffer(),
+                           vcl::thermal_field_array.buffer(),
                            vcl::rng::grands,
                            vcl::real_t(sim::H_vec[0] * sim::H_applied),
                            vcl::real_t(sim::H_vec[1] * sim::H_applied),
@@ -74,6 +75,7 @@ static void init_external_fields(void)
                            vcl::mp::materials,
                            vcl::dipolar_field_array.buffer(),
                            vcl::total_external_field_array.buffer(),
+                           vcl::thermal_field_array.buffer(),
                            vcl::rng::grands_copy,
                            vcl::real_t(sim::H_vec[0] * sim::H_applied),
                            vcl::real_t(sim::H_vec[1] * sim::H_applied),
@@ -86,6 +88,7 @@ static void init_external_fields(void)
                         vcl::mp::materials,
                         vcl::dipolar_field_array.buffer(),
                         vcl::total_external_field_array.buffer(),
+                        vcl::thermal_field_array.buffer(),
                         vcl::rng::grands,
                         vcl::real_t(sim::H_vec[0] * sim::H_applied),
                         vcl::real_t(sim::H_vec[1] * sim::H_applied),
@@ -248,6 +251,7 @@ static void init_llg(void)
                         vcl::atoms::spin_array.buffer(),
                         vcl::total_spin_field_array.buffer(),
                         vcl::total_external_field_array.buffer(),
+                        vcl::thermal_field_array.buffer(),
                         vcl::llg::dS_array.buffer());
 
    vcl::set_kernel_args(vcl::llg::corrector_step,
@@ -256,6 +260,7 @@ static void init_llg(void)
                         vcl::atoms::spin_array.buffer(),
                         vcl::total_spin_field_array.buffer(),
                         vcl::total_external_field_array.buffer(),
+                        vcl::thermal_field_array.buffer(),
                         vcl::llg::spin_buffer_array.buffer(),
                         vcl::llg::dS_array.buffer());
 

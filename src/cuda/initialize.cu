@@ -401,6 +401,17 @@ namespace vcuda{
          cudaMemcpy(cu::d_z_external_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
 
 
+         cudaMalloc((void**)&cu::d_thermal_x_field, num_bytes);
+         cudaMalloc((void**)&cu::d_thermal_y_field, num_bytes);
+         cudaMalloc((void**)&cu::d_thermal_z_field, num_bytes);
+         
+         std::copy(::atoms::thermal_x_field.begin(), ::atoms::thermal_x_field.end(), temp_buffer.begin());
+         cudaMemcpy(cu::d_thermal_x_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+          std::copy(::atoms::thermal_y_field.begin(), ::atoms::thermal_y_field.end(), temp_buffer.begin());
+         cudaMemcpy(cu::d_thermal_y_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+          std::copy(::atoms::thermal_z_field.begin(), ::atoms::thermal_z_field.end(), temp_buffer.begin());
+         cudaMemcpy(cu::d_thermal_z_field, tmp_buffer.data(), num_bytes, cudaMemcpyHostToDevice);
+
          /*cu::x_total_external_field_array.resize(::atoms::num_atoms);
          cu::y_total_external_field_array.resize(::atoms::num_atoms);
          cu::z_total_external_field_array.resize(::atoms::num_atoms);

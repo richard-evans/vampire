@@ -76,16 +76,16 @@ namespace ltmp{
    //-----------------------------------------------------------------------------
    // Function for adding local thermal fields to external field array
    //-----------------------------------------------------------------------------
-   void get_localised_thermal_fields(std::vector<double>& x_total_external_field_array,
-                               std::vector<double>& y_total_external_field_array,
-                               std::vector<double>& z_total_external_field_array,
+   void get_localised_thermal_fields(std::vector<double>& thermal_x_field,
+                               std::vector<double>& thermal_y_field,
+                               std::vector<double>& thermal_z_field,
                                const int start_index,
                                const int end_index){
 
       // Add spin torque fields
-      for(int i=start_index; i<end_index; ++i) x_total_external_field_array[i] += ltmp::internal::x_field_array[i];
-      for(int i=start_index; i<end_index; ++i) y_total_external_field_array[i] += ltmp::internal::y_field_array[i];
-      for(int i=start_index; i<end_index; ++i) z_total_external_field_array[i] += ltmp::internal::z_field_array[i];
+      for(int i=start_index; i<end_index; ++i) thermal_x_field[i] += ltmp::internal::x_field_array[i];
+      for(int i=start_index; i<end_index; ++i) thermal_y_field[i] += ltmp::internal::y_field_array[i];
+      for(int i=start_index; i<end_index; ++i) thermal_z_field[i] += ltmp::internal::z_field_array[i];
 
       return;
    }

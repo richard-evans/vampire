@@ -204,6 +204,7 @@ namespace vcuda{
 					cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
                cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field,
                cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+               cu::d_thermal_x_field, cu::d_thermal_y_field, cu::d_z_thermal_field,
                cu::llg::d_ds_x, cu::llg::d_ds_y, cu::llg::d_ds_z,
                ::mp::dt, ::atoms::num_atoms);
 
@@ -229,6 +230,7 @@ namespace vcuda{
 					cu::atoms::d_x_spin, cu::atoms::d_y_spin, cu::atoms::d_z_spin,
                cu::d_x_spin_field, cu::d_y_spin_field, cu::d_z_spin_field,
                cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+               cu::d_thermal_x_field, cu::d_thermal_y_field, cu::d_z_thermal_field,
                cu::llg::d_x_spin_buffer, cu::llg::d_y_spin_buffer, cu::llg::d_z_spin_buffer,
                cu::llg::d_ds_x, cu::llg::d_ds_y, cu::llg::d_ds_z,
                ::mp::dt, ::atoms::num_atoms);
@@ -249,6 +251,7 @@ namespace vcuda{
                cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin, // contains initial spin
                cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
                cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+               cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
                cu_real_t * dSx, cu_real_t * dSy, cu_real_t * dSz,
                cu_real_t dt, size_t num_atoms){
 
@@ -271,9 +274,9 @@ namespace vcuda{
                cu_real_t sz = z_spin[atom];
 
                // calculate total field
-               cu_real_t H_x = x_sp_field[atom] + x_ext_field[atom];
-               cu_real_t H_y = y_sp_field[atom] + y_ext_field[atom];
-               cu_real_t H_z = z_sp_field[atom] + z_ext_field[atom];
+               cu_real_t H_x = x_sp_field[atom] + x_ext_field[atom] + x_thermal_field[atom];
+               cu_real_t H_y = y_sp_field[atom] + y_ext_field[atom] + y_thermal_field[atom];
+               cu_real_t H_z = z_sp_field[atom] + z_ext_field[atom] + z_thermal_field[atom];
 
                // calculate s x h
                cu_real_t sxh_x = sy * H_z - sz * H_y;
@@ -326,6 +329,7 @@ namespace vcuda{
                cu_real_t * x_spin, cu_real_t * y_spin, cu_real_t * z_spin, // spin from predictor step
                cu_real_t * x_sp_field, cu_real_t * y_sp_field, cu_real_t * z_sp_field,
                cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+               cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
                cu_real_t * x_spin_buffer, cu_real_t * y_spin_buffer, cu_real_t * z_spin_buffer, // initial spin
                cu_real_t * dSx, cu_real_t * dSy, cu_real_t * dSz,
                cu_real_t dt, size_t num_atoms
@@ -348,9 +352,9 @@ namespace vcuda{
                cu_real_t spin_z = z_spin[atom];
 
                //the field
-               cu_real_t H_x = x_sp_field[atom] + x_ext_field[atom];
-               cu_real_t H_y = y_sp_field[atom] + y_ext_field[atom];
-               cu_real_t H_z = z_sp_field[atom] + z_ext_field[atom];
+               cu_real_t H_x = x_sp_field[atom] + x_ext_field[atom] + x_thermal_field[atom];
+               cu_real_t H_y = y_sp_field[atom] + y_ext_field[atom] + y_thermal_field[atom];
+               cu_real_t H_z = z_sp_field[atom] + z_ext_field[atom] + z_thermal_field[atom];
 
                // calculate components
                cu_real_t SxH_x = spin_y * H_z - spin_z * H_y;

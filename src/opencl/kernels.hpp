@@ -30,6 +30,9 @@ namespace vopencl
       // external fields
       extern cl::Kernel update_ext;
 
+      //thermal fields
+      extern cl::Kernel update_therm;
+      
       // spin fields
       extern cl::Kernel update_nexch_spin_fields;
 

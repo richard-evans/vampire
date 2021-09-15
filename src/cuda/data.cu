@@ -123,6 +123,10 @@ namespace vcuda{
       cu_real_t *d_y_external_field;
       cu_real_t *d_z_external_field;
 
+      cu_real_t *d_thermal_x_field;
+      cu_real_t *d_thermal_y_field;
+      cu_real_t *d_thermal_z_field;
+
       cu_real_t *d_x_dip_field;
       cu_real_t *d_y_dip_field;
       cu_real_t *d_z_dip_field;

@@ -48,6 +48,7 @@ namespace vopencl
          extern double mat_mul;
          extern double rng;
          extern double external_fields;
+        // extern double thermal_fields;
          extern double predictor_step;
          extern double corrector_step;
 #endif // OPENCL_TIME_KERNELS

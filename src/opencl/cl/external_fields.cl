@@ -15,6 +15,7 @@ void update_external_fields(const __global int    *const restrict material,
                             const __constant material_parameters_t *const restrict material_params,
                             const __global vec_t  *const restrict dip_field,
                                   __global vec_t  *const restrict ext_field,
+                                  __global vec_t  *const restrict thermal_field,
                             const __global real_t *const restrict gaussian_rand,
                             const real_t Hx,
                             const real_t Hy,
@@ -52,6 +53,7 @@ void update_external_fields(const __global int    *const restrict material,
       field += norm_h * h + Happ;
 
       // ext_field[i] = field + dip_field[i]
-      VEC_STORE(ext_field, i, field + VEC_LOAD(dip_field, i));
+      VEC_STORE(ext_field, i, VEC_LOAD(dip_field, i));
+      VEC_STORE(thermal_field, i, VEC_LOAD(field, i));
    }
 }

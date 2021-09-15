@@ -275,7 +275,7 @@ namespace vout{
         case 999: //AJN
       		vout::standard_deviation(stream,header);
       		break;
-=======
+//=======
 
       }
 

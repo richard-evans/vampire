@@ -61,6 +61,11 @@ namespace micromagnetic_arrays_llg{
    std::vector <double> y_total_external_field_array;
    std::vector <double> z_total_external_field_array;
 
+   std::vector <double> thermal_x_field;
+   std::vector <double> thermal_y_field;
+   std::vector <double> thermal_z_field;
+
+
    std::vector <double> x_total_spin_field_array;
    std::vector <double> y_total_spin_field_array;
    std::vector <double> z_total_spin_field_array;
@@ -101,6 +106,10 @@ namespace micromagnetic{
       x_total_external_field_array.resize(num_cells,0.0);
       y_total_external_field_array.resize(num_cells,0.0);
       z_total_external_field_array.resize(num_cells,0.0);
+
+      thermal_x_field.resize(num_cells, 0.0);
+      thermal_y_field.resize(num_cells, 0.0);
+      thermal_z_field.resize(num_cells, 0.0);
 
       x_total_spin_field_array.resize(num_cells,0.0);
       y_total_spin_field_array.resize(num_cells,0.0);
@@ -168,7 +177,7 @@ namespace micromagnetic{
 
       // Calculate spin dependent and external fields
       mm::calculate_llg_spin_fields    (temperature, num_cells, x_array,y_array,z_array, x_total_spin_field_array, y_total_spin_field_array, z_total_spin_field_array);
-      mm::calculate_llg_external_fields(temperature, num_cells, x_array,y_array,z_array, x_total_external_field_array, y_total_external_field_array, z_total_external_field_array);
+      mm::calculate_llg_external_fields(temperature, num_cells, x_array,y_array,z_array, x_total_external_field_array, y_total_external_field_array, z_total_external_field_array, thermal_x_field, thermal_y_field, thermal_z_field);
 
       //---------------------------------------------------------------------------
       // calculates the euler step
@@ -182,9 +191,9 @@ namespace micromagnetic{
          const double alpha_oneplusalpha_sq = mm::alpha_perp[cell] * one_oneplusalpha_sq;
 
          const double S[3] = {x_array[cell], y_array[cell], z_array[cell]};
-         const double H[3] = {x_total_spin_field_array[cell] + x_total_external_field_array[cell],
-                              y_total_spin_field_array[cell] + y_total_external_field_array[cell],
-                              z_total_spin_field_array[cell] + z_total_external_field_array[cell]};
+         const double H[3] = {x_total_spin_field_array[cell] + x_total_external_field_array[cell] + thermal_x_field[cell],
+                              y_total_spin_field_array[cell] + y_total_external_field_array[cell] + thermal_y_field[cell],
+                              z_total_spin_field_array[cell] + z_total_external_field_array[cell] + thermal_z_field[cell]};
 
          // calculates the delta S stores in euler array
          x_euler_array[cell] = (one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
@@ -242,10 +251,10 @@ namespace micromagnetic{
          const double alpha_oneplusalpha_sq = mm::alpha_perp[cell] * one_oneplusalpha_sq;
 
          const double S[3] = {x_spin_storage_array[cell], y_spin_storage_array[cell], z_spin_storage_array[cell]};
-         const double H[3] = {x_total_spin_field_array[cell] + x_total_external_field_array[cell],
-                              y_total_spin_field_array[cell] + y_total_external_field_array[cell],
-                              z_total_spin_field_array[cell] + z_total_external_field_array[cell]};
-
+         const double H[3] = {x_total_spin_field_array[cell] + x_total_external_field_array[cell] + thermal_x_field[cell],
+                              y_total_spin_field_array[cell] + y_total_external_field_array[cell] + thermal_y_field[cell],
+                              z_total_spin_field_array[cell] + z_total_external_field_array[cell] + thermal_z_field[cell]};
+                              
          //saves delta to xyz
          x_heun_array[cell] = (one_oneplusalpha_sq)*(S[1]*H[2]-S[2]*H[1]) + (alpha_oneplusalpha_sq)*(S[1]*(S[0]*H[1]-S[1]*H[0])-S[2]*(S[2]*H[0]-S[0]*H[2]));
          y_heun_array[cell] = (one_oneplusalpha_sq)*(S[2]*H[0]-S[0]*H[2]) + (alpha_oneplusalpha_sq)*(S[2]*(S[1]*H[2]-S[2]*H[1])-S[0]*(S[0]*H[1]-S[1]*H[0]));
