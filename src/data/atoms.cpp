@@ -56,7 +56,7 @@ namespace atoms{
 	std::vector <double> x_spin_array(0);
 	std::vector <double> y_spin_array(0);
 	std::vector <double> z_spin_array(0);
-   std::vector <double> m_spin_array(0);
+    std::vector <double> m_spin_array(0);
 
 	std::vector <double> x_total_spin_field_array(0);		/// Total spin dependent fields
 	std::vector <double> y_total_spin_field_array(0);		/// Total spin dependent fields
@@ -73,6 +73,7 @@ namespace atoms{
 	std::vector <zten_t> t_exchange_list(0);
 
    std::vector <bool> surface_array(0); // flag to identify atom as surface
+   std::vector <bool> magnetic(0); // flag to identify atom as being magnetic
 
    std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
 

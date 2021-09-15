@@ -70,6 +70,7 @@ tags
 MAT.mat
 UC.ucf
 exchange-template
+mm_output
 
 #----------------------------------------------
 # Executables
@@ -93,5 +94,10 @@ run/unit-cell-creator
 .cproject
 .project
 .settings/
+
+#----------------------------------------------
+# VS code project files and folders
+#----------------------------------------------
+.vscode/
 
 #EOF

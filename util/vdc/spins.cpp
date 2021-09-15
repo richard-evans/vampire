@@ -26,7 +26,7 @@ namespace vdc{
 
 // forward function declarations
 bool read_spin_metadata(unsigned int file_id);
-void read_spin_data(unsigned int file_id);
+void read_spin_data();
 
 //------------------------------------------------------------------------------
 // Wrapper function to read coordinate metafile to initialise data structures
@@ -41,6 +41,8 @@ void process_spins(){
 
    if(vdc::ssc) vdc::initialise_ssc();
 
+   if(vdc::povray) vdc::initialise_povray();
+
    unsigned int last_file_id = max_file_id;
 
    // loop over all spin files
@@ -53,7 +55,7 @@ void process_spins(){
       if(!success) break;
 
       // read coordinate data
-      vdc::read_spin_data(file_id);
+      vdc::read_spin_data();
 
       // output povray file
       if(vdc::povray) output_inc_file(file_id);
@@ -163,7 +165,7 @@ bool read_spin_metadata(unsigned int file_id){
 //------------------------------------------------------------------------------
 // Function to read in coordinate data from subsidiary files
 //------------------------------------------------------------------------------
-void read_spin_data(unsigned int file_id){
+void read_spin_data(){
 
    if(vdc::verbose) std::cout << "   Reading spin data... " << std::flush;
 

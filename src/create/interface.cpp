@@ -190,6 +190,12 @@ namespace create{
             return true;
         }
         else
+        test="voronoi-include-boundary-grains";
+        if(word==test){
+            create_voronoi::include_boundary_grains_real=true;
+            return true;
+        }
+        else
         //-------------------------------------------------------------------
         test="voronoi-rounded-grains-area";
         if(word==test){
@@ -366,6 +372,12 @@ namespace create{
             cs::multilayers = true;
             cs::num_multilayers = nmul;
             return true;
+        }
+        //--------------------------------------------------------------------
+        test="grains-poission"; //parity
+        if(word==test){
+           create::internal::grain_poission=true;
+           return true;
         }
         //--------------------------------------------------------------------
         test="height-categorization";

@@ -79,13 +79,21 @@ namespace mp
 		string name;
 		string element;
 
+
+		bool micromagnetic_enabled;
+		std::vector<double> SAF;
+		bool enable_SAF;
+		std::vector < double > pinning_field_unit_vector;
+		double pinning_field_strength;
+
+		std::vector< double> EF_MM;
+		std::vector<bool> override_atomsitic;
+
 		double alpha;
 		double mu_s_SI;
 		double magnetisation;
 
 		double gamma_rel;
-		std::vector<std::vector<double> >Jij_matrix_SI;
-		std::vector<std::vector<double> >Jij_matrix;
 		double initial_spin[3];
 		bool random_spins;
 

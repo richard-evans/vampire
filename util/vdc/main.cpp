@@ -12,21 +12,22 @@
 
 // C++ standard library headers
 #include <iostream>
+#include <string>
 
 // program header
 #include "vdc.hpp"
 
 int main(int argc, char* argv[]){
 
-   // process command line arguments
-   int matchcheck = vdc::command(argc, argv);
-   if (matchcheck == EXIT_FAILURE){
-      return EXIT_FAILURE;
-   }
-
    std::cout << "|------------------------------------------------------------|" << std::endl;
    std::cout << "|              Vampire Data Converter for v5+                |" << std::endl;
    std::cout << "|------------------------------------------------------------|" << std::endl;
+
+   // process command line arguments
+   vdc::command(argc, argv);
+
+   // process input file
+   vdc::read_and_set();
 
    // process coordinates
    vdc::process_coordinates();
@@ -35,5 +36,4 @@ int main(int argc, char* argv[]){
    vdc::process_spins();
 
    return EXIT_SUCCESS;
-
 }

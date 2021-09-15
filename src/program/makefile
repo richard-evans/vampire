@@ -8,6 +8,7 @@ bmark.o \
 cmc_anisotropy.o \
 curie_temperature.o \
 diagnostics.o \
+exchange_stiffness.o \
 field_cool.o \
 local_field_cool.o \
 hamr.o \
@@ -22,6 +23,10 @@ time_series.o \
 temperature_pulse.o \
 localised_temperature_pulse.o \
 effective_damping.o \
+disk_tracks.o \
+field_sweep.o \
+domain_wall.o \
+micromagnetic_A_calculation.o \
 fmr.o
 
 # Append module objects to global tree

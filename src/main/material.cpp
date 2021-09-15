@@ -68,12 +68,16 @@ materials_t::materials_t ():
 		geometry_coords[i][0]=0.0;
 		geometry_coords[i][1]=0.0;
 	}
+
+	SAF.resize(mp::max_materials);
+	enable_SAF = false;
 	// array variables
-   Jij_matrix_SI.resize(mp::max_materials);
-   Jij_matrix.resize(mp::max_materials);
+
+ 	EF_MM.resize(mp::max_materials);
+ 	override_atomsitic.resize(mp::max_materials);
+
+	// array variables
    for(int i=0; i<mp::max_materials; i++){
-      Jij_matrix_SI[i].resize(3,0.0);
-      Jij_matrix[i].resize(3,0.0);
 		intermixing[i]=0.0;
 		alloy[i]=0.0;
 	}
@@ -86,6 +90,8 @@ materials_t::materials_t ():
 	applied_field_unit_vector.at(1)=0.0;
 	applied_field_unit_vector.at(2)=1.0;
 
+	pinning_field_unit_vector.resize(3,0.0);
+	
 	// FMR field direction default initialisation
 	fmr_field_unit_vector.at(0)=0.0;
 	fmr_field_unit_vector.at(1)=0.0;
@@ -98,9 +104,6 @@ int materials_t::print(){
 	std::cout << " Material " << name << std::endl;
 	std::cout << "----------------------------------------------------------------" << std::endl;
 	std::cout << "alpha          = " << alpha << std::endl;
-	for(int j=0;j<num_materials;j++){
-      std::cout << " Jij_matrix_SI[" << j << "] = " << Jij_matrix_SI[j][0] << std::endl;
-	}
 	std::cout << "mu_s_SI        = " << mu_s_SI << std::endl;
 	std::cout << "gamma_rel      = " << gamma_rel << std::endl;
 

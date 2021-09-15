@@ -15,7 +15,8 @@
 // Vampire headers
 //#include "atoms.hpp" // for exchange list type defs
 #include "exchange.hpp"
-
+#include "dipole.hpp"
+#include <iostream>
 // exchange module headers
 #include "internal.hpp"
 
@@ -163,6 +164,26 @@ namespace internal{
    			break;
 
    		}
+
+         // if (dipole::atomsitic_tensor_enabled){
+         //
+         //    for(int atom = start_index; atom < end_index; ++atom){
+         //       // temporray constants for loop start and end indices
+         //       const int start = dipole::atomistic_dd_neighbourlist_start[atom];
+         //       const int end   = dipole::atomistic_dd_neighbourlist_end[atom]+1;
+         //       std::cout << atom << '\t' << start << '\t' << end << std::endl;
+         //       // loop over all neighbours
+         //       for(int nn = start; nn < end; ++nn){
+         //          int atomj = dipole::atomistic_dd_neighbourlist[nn];
+         //       //   std::cout <<"NN:\t" << atom << '\t' << atomj << '\t' <<  std::endl;
+         //       }
+         //    }
+         //
+         //
+         //    }
+
+
+
 
    		return;
 

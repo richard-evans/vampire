@@ -3,7 +3,7 @@
 \vampire is a powerful software package, capable of simulating many different systems and the determination of parameters such as coercivity, Curie and N\'eel temperatures, reversal dynamics, statistical behaviour and more. This chapter contains an overview of the capabilities of \vampire and how to use them.
 
 \section*{Feature Overview}
-\addcontentsline{toc}{section}{Feature Overview}
+\phantomsection\addcontentsline{toc}{section}{Feature Overview}
 The features of the \vampire code are split into three main categories: material parameters, structural parameters, and simulation parameters. Details of these parameters are given in the following chapters, but between them they define the parameters for a particular simulation.
 
 \subsection*{Materials}
@@ -13,16 +13,16 @@ Material parameters essentially define the magnetic properties of a class of ato
 Structural parameters define properties such as the system size, shape, particle size, or voronoi grain structures. In combination with material parameters they essentially define the system to be simulated. 
 
 \subsection*{Simulations}
-\vampire includes a number of built-in simulations for determining the most common magnetic properties of a system,ê for example Curie temperature, hysteresis loops, or even a time series. Additionally the parameters for these simulations, such as applied field, maximum temperature, temperature increment, etc. can be set. 
+\vampire includes a number of built-in simulations for determining the most common magnetic properties of a system,ÔøΩ for example Curie temperature, hysteresis loops, or even a time series. Additionally the parameters for these simulations, such as applied field, maximum temperature, temperature increment, etc. can be set. 
 
 \section*{Input and Output Files}
-\addcontentsline{toc}{section}{Input and Output Files}
+\phantomsection\addcontentsline{toc}{section}{Input and Output Files}
 \vampire requires at least two files to run a simulation, the \textit{input} file and the \textit{material} file. The \textit{input} file defines all the properties of the simulated system, such as the dimensions or particle shape, as well as the simulation parameters and program output. The \textit{material} file defines the properties of all the materials used in the simulation, and is usually given the \textit{.mat} file extension. A sample material file \textit{Co.mat} is included with the code which defines a minimum set of parameters for Co. 
 
 The output of the code includes a main \textit{output} file, which records data such as the magnetisation, timesteps, temperature etc. The format of the \textit{output} file is fully customisable, so that the amount of output data is limited to what is useful. In addition to the output file, the other main available outputs are spin configuration files, which with post-processing allow output of snapshots of the magnetic configurations during the simulation.
 
 \section*{Sample input files}
-\addcontentsline{toc}{section}{Sample input files}
+\phantomsection\addcontentsline{toc}{section}{Sample input files}
 Sample input and output files are included in the source code distribution, but the files for a simple test simulation which computes the time dependence of the magnetisation of a cubic system are given here.
 
 \subsection*{input}
@@ -51,7 +51,11 @@ dimensions:system-size-z = 7.7 !nm
 # Material Files:
 #------------------------------------------
 material:file = Co.mat
+\end{verbatim}
+}
 
+{\footnotesize
+\begin{verbatim}
 #------------------------------------------
 # Simulation attributes:
 #------------------------------------------
@@ -78,6 +82,7 @@ screen:time-steps
 screen:magnetisation-length
 \end{verbatim}
 }
+
 \subsection*{Co.mat}
 {\footnotesize
 \begin{verbatim}

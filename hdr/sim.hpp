@@ -36,6 +36,43 @@
 enum pump_functions_t {square=0, two_temperature, double_pump_two_temperature, double_pump_square};
 
 namespace sim{
+
+	//track parameters
+	extern double track_Ms;
+	extern double track_bit_width;
+	extern double track_bit_depth;
+	extern double track_bit_size;
+
+	extern double track_bit_gap;
+	extern double track_track_gap;
+
+	extern double cross_track_velocity;
+	extern double down_track_velocity;
+
+	extern int track_num_bits_per_track;
+	extern int track_num_tracks;
+	extern double LFA_scan_field_step;
+	extern double Ms;
+	extern double track_pos_x;
+	extern double track_pos_z;
+	extern bool LFA;
+
+	// distance of tracks from read head
+	extern double track_fly_height; // Angstroms
+
+	extern double initial_down_track_position;
+	extern double initial_cross_track_position;
+
+	extern bool track_ms_file;
+
+	extern std::vector < double > track_field_x;
+	extern std::vector < double > track_field_y;
+	extern std::vector < double > track_field_z;
+
+	// enumerated list for integrators
+	enum integrator_t{ llg_heun = 0, monte_carlo = 1, llg_midpoint = 2,
+							 cmc = 3, hybrid_cmc = 4, llg_quantum = 5};
+
 	extern std::ofstream mag_file;
 	extern uint64_t time;
 	extern uint64_t total_time;
@@ -117,7 +154,7 @@ namespace sim{
 	extern int system_simulation_flags;
 	extern int hamiltonian_simulation_flags[10];
 
-	extern int integrator;
+	extern integrator_t integrator; // variable to specify integrator
 	extern int program;
 
    // Local system variables
@@ -167,6 +204,9 @@ namespace sim{
    extern double spin_applied_field_energy(const double, const double, const double);
    extern double spin_magnetostatic_energy(const int, const double, const double, const double);
 
+	void calculate_spin_fields(const int start_index,const int end_index);
+	void calculate_external_fields(const int start_index,const int end_index);
+
    // LaGrange multiplier variables
    extern double lagrange_lambda_x;
    extern double lagrange_lambda_y;
@@ -176,9 +216,27 @@ namespace sim{
    extern bool   lagrange_multiplier;
    extern void   update_lagrange_lambda();
 
-   // Monte Carlo statistics counters
+	// Monte Carlo statistics counters
    extern double mc_statistics_moves;
    extern double mc_statistics_reject;
+
+	extern int domain_wall_axis;
+	extern double domain_wall_position;
+	extern double domain_wall_discretisation;
+	extern double domain_wall_centre;
+	extern double domain_wall_width;
+	extern std::vector < bool > anti_PBC;
+
+	extern std::vector < double > domain_wall_second_vector_x;
+	extern std::vector < double > domain_wall_second_vector_y;
+	extern std::vector < double > domain_wall_second_vector_z;
+
+	//------------------------------------------------------------------------
+   // getter functions to give access to internal sim variables
+   //------------------------------------------------------------------------
+   std::vector<double> get_stt_polarization_unit_vector(); // unit vector spin polarization
+   std::vector<double> get_stt_rj(); // array of stt relaxation constants
+   std::vector<double> get_stt_pj(); // array of stt precession constants
 
 }
 

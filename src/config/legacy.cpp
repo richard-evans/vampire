@@ -25,6 +25,7 @@
 // Vampire headers
 #include "atoms.hpp"
 #include "cells.hpp"
+#include "constants.hpp"
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "LLG.hpp"
@@ -403,10 +404,12 @@ void legacy_cells()
       cfg_file_ofstr << "# Magnetisation: " << stats::system_magnetization.output_normalized_magnetization(false) << std::endl;
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
 
+      const double inv_muB = 1.0 / constants::muB;
+
       // Root process now outputs the cell magnetisations
       for (int cell = 0; cell < cells::num_cells; cell++){
          if (cells::num_atoms_in_cell_global[cell] > 0){
-            cfg_file_ofstr << cells::mag_array_x[cell] << "\t" << cells::mag_array_y[cell] << "\t" << cells::mag_array_z[cell] << "\t";
+            cfg_file_ofstr << cells::mag_array_x[cell]*inv_muB << "\t" << cells::mag_array_y[cell]*inv_muB << "\t" << cells::mag_array_z[cell]*inv_muB << "\t";
             if(dipole::activated) cfg_file_ofstr << dipole::cells_field_array_x[cell] << "\t" << dipole::cells_field_array_y[cell] << "\t" << dipole::cells_field_array_z[cell] << "\n";
             else cfg_file_ofstr << "\n";
          }
@@ -508,8 +511,8 @@ void legacy_cells_coords()
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
       cfg_file_ofstr << "# Number of cells: " << cells::num_cells << std::endl;
       cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
-      cfg_file_ofstr << "#" << std::endl;
-      cfg_file_ofstr << "#" << std::endl;
+      cfg_file_ofstr << "# cell size: " << cells::macro_cell_size_x << "\t" << cells::macro_cell_size_y << "\t" << cells::macro_cell_size_z << "\t" <<std::endl;
+      cfg_file_ofstr << "#------------------------------------------------------" << std::endl;
       cfg_file_ofstr << "#" << std::endl;
       cfg_file_ofstr << "#" << std::endl;
       cfg_file_ofstr << "#" << std::endl;

@@ -32,6 +32,10 @@ namespace cells{
    int num_cells; /// number of macro-cells
    int num_local_cells=0; /// number of macro-cells
    double macro_cell_size = 10.0; /// macro-cells size (A)
+   double macro_cell_size_x = 10.0; /// macro-cells size (A)
+   double macro_cell_size_y = 10.0; /// macro-cells size (A)
+   double macro_cell_size_z = 10.0; /// macro-cells size (A)
+
 
    std::vector <int> local_cell_array;
    std::vector<int> num_atoms_in_cell; /// number of atoms in each cell
@@ -53,6 +57,10 @@ namespace cells{
    std::vector<double> field_array_z;
 
    std::vector<double> pos_and_mom_array; /// arrays to store cells positions
+   std::vector<double> pos_array; /// arrays to store cells positions
+
+   std::vector < double > num_macro_cells_fft(3,10.0); /// macro-cells size (A)
+   std::vector<double> fft_cell_id_array; /// arrays to store cells positions
 
    //---------------------------------------------------------------------------
    // Function to calculate magnetisation in cells

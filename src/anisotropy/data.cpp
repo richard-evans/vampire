@@ -42,9 +42,16 @@ namespace anisotropy{
       bool enable_uniaxial_fourth_order = false; // Flag to enable calculation of fourth order anisotropy
       bool enable_uniaxial_sixth_order  = false; // Flag to enable calculation of sixth order anisotropy
 
+      bool enable_fourth_order_rotational = false; // Flag to enable 4th order rotational anisotropy
+
       bool enable_cubic_fourth_order    = false; // Flag to enable calculation of fourth order cubic anisotropy
       bool enable_cubic_sixth_order     = false; // Flag to enable calculation of sixth order cubic  anisotropy
       bool enable_cubic_fourth_order_rotation = false; // Flag to enable calculation of rotated cubic anisotropy
+
+      bool  enable_triaxial_anisotropy = false;
+      bool  enable_triaxial_fourth_order = false;
+      bool  enable_triaxial_anisotropy_rotated = false;
+      bool  enable_triaxial_fourth_order_rotated = false;
 
       // array for storing 1D second order collapsed tensor for Neel anisotropy
       std::vector<double> neel_tensor(0);
@@ -55,9 +62,47 @@ namespace anisotropy{
       std::vector<double> ku6(0);
       std::vector<double> kc4(0);
       std::vector<double> kc6(0);
+      std::vector<double> k4r(0);
 
       // unrolled arrays for storing easy axes for each material
       std::vector<evec_t> ku_vector(0); // 001 easy axis direction
+
+      std::vector<double> ku_triaxial_vector_x(100,0); // unit vector defining axis for triaxial anisotropy
+      std::vector<double> ku_triaxial_vector_y(100,0); //
+      std::vector<double> ku_triaxial_vector_z(100,0); //
+
+      std::vector<double> ku4_triaxial_vector_x(100,0); // unit vector defining axis for triaxial anisotropy
+      std::vector<double> ku4_triaxial_vector_y(100,0); //
+      std::vector<double> ku4_triaxial_vector_z(100,0); //
+
+      //basis vectors for second order triaxial - must be orthogonality
+      std::vector < double > ku_triaxial_basis1x(100,0.0);
+      std::vector < double > ku_triaxial_basis1y(100,0.0);
+      std::vector < double > ku_triaxial_basis1z(100,0.0);
+
+      std::vector < double > ku_triaxial_basis2x(100,0.0);
+      std::vector < double > ku_triaxial_basis2y(100,0.0);
+      std::vector < double > ku_triaxial_basis2z(100,0.0);
+
+      std::vector < double > ku_triaxial_basis3x(100,0.0);
+      std::vector < double > ku_triaxial_basis3y(100,0.0);
+      std::vector < double > ku_triaxial_basis3z(100,0.0);
+
+      //basis vectors for fourth order triaxial - must be orthogonality
+      std::vector < double > ku4_triaxial_basis1x(100,0.0);
+      std::vector < double > ku4_triaxial_basis1y(100,0.0);
+      std::vector < double > ku4_triaxial_basis1z(100,0.0);
+
+      std::vector < double > ku4_triaxial_basis2x(100,0.0);
+      std::vector < double > ku4_triaxial_basis2y(100,0.0);
+      std::vector < double > ku4_triaxial_basis2z(100,0.0);
+
+      std::vector < double > ku4_triaxial_basis3x(100,0.0);
+      std::vector < double > ku4_triaxial_basis3y(100,0.0);
+      std::vector < double > ku4_triaxial_basis3z(100,0.0);
+
+      std::vector<bool> triaxial_second_order_fixed_basis(100,true);
+      std::vector<bool> triaxial_fourth_order_fixed_basis(100,true);
 
       bool native_neel_anisotropy_threshold  = false; // enables site-dependent surface threshold
    	unsigned int neel_anisotropy_threshold = 123456789; // global threshold for surface atoms

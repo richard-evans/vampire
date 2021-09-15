@@ -59,7 +59,7 @@
 ///
 namespace units {
 
-	const int max_units=44;
+	const int max_units=57;
 
 	const double pi=M_PI;
 	//const double bohr_magneton=7.0;
@@ -124,8 +124,8 @@ int init(){
 		unit[22]="eV/T";		conversion[22]=1.602176487e-19;	type[22]="moment";		// Electron volts/Tesla
 		unit[23]="erg/Oe";	conversion[23]=1.0E-3; 				type[23]="moment";		// Erg/Oersted
 		// Magnetisation
-		unit[24]="A/m";		conversion[24]=2.17987208E-18;	type[24]="magnetisation";	// Amps/metre
-		unit[25]="emu/cc";	conversion[25]=2.17987208E-21; 	type[25]="magnetisation";	// emu/cubic cm
+		unit[24]="A/m";		conversion[24]=1e-30;				type[24]="magnetisation";	// Amps/metre
+		unit[25]="emu/cc";	conversion[25]=1e-27;			 	type[25]="magnetisation";	// emu/cubic cm
 		unit[26]="J/T/AAA";	conversion[26]=1.0;					type[26]="magnetisation";	// Joule/Tesla/Angstrom cubed
 		// Anisotropy
 		unit[27]="J/atom";	conversion[27]=1.0; 					type[27]="anisotropy";		// Joules/Atom
@@ -148,6 +148,25 @@ int init(){
 		unit[42]="zs";			conversion[42]=1.0E-21;				type[42]="time"; // zeptoseconds
       // New
       unit[43]="zJ";			conversion[43]=1.0E-21; 			type[43]="energy";		// zeptoJoules
+      unit[44]="Ohm-m";		conversion[44]=1.0; 			      type[44]="resistivity";		// Ohm metres
+
+      unit[45]="V";		   conversion[45]=1.0; 			      type[45]="potential";		// volts
+      unit[46]="mV";		   conversion[46]=1.0e-3; 			   type[46]="potential";		// Millivolts
+      unit[47]="uV";	    	conversion[47]=1.0e-6; 			   type[47]="potential";		// Microvolts
+      unit[48]="nV";		   conversion[48]=1.0e-9; 			   type[48]="potential";		// Nanovolts
+
+		unit[49]="Hz";		   conversion[49]=1.0; 			      type[49]="frequency";		// Hz
+      unit[50]="kHz";		conversion[50]=1.0e3; 			   type[50]="frequency";		// kHz
+      unit[51]="MHz";	   conversion[51]=1.0e6; 			   type[51]="frequency";		// MHz
+      unit[52]="GHz";		conversion[52]=1.0e9; 			   type[52]="frequency";		// GHz
+      unit[53]="THz";		conversion[53]=1.0e12; 			   type[53]="frequency";		// THz
+
+		// exchange (Internal unit J/Angstrom)
+		unit[54]="J/m";		conversion[54]=1.0E-10; 			type[54]="exchange";			// Joules/metres squared
+    	unit[55]="erg/cm";	conversion[55]=1.0E-15; 			type[55]="exchange";			// erg/cm squared
+	 	unit[56]="erg/cm2";	conversion[56]=1.0e-23; 			type[56]="mm_energy";		// erg/cm2 squared to J/A2
+
+      //
 
       // temperature C, F, K; angles degrees, rad, mrad;
 		// Set initialised flag

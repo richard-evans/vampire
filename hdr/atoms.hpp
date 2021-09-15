@@ -111,6 +111,7 @@ namespace atoms
 
 
    extern std::vector <bool> surface_array; // flag to identify atom as surface
+   extern std::vector <bool> magnetic; // flag to identify atom as being magnetic
 
    extern std::vector <uvec_t> neighbour_eij_array; // unrolled list of eij unit vectors between neighbouring atoms
 

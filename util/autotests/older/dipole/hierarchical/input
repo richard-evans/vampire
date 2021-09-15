@@ -1,0 +1,45 @@
+#------------------------------------------
+# Sample vampire input file to perform
+# benchmark calculation for v4.0
+#
+#------------------------------------------
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+dimensions:unit-cell-size = 3.54 !A
+dimensions:system-size-x = 20 !nm
+dimensions:system-size-y = 20 !nm
+dimensions:system-size-z = 1 !nm
+
+cells:macro-cell-size = 1 !nm
+dipole:solver = hierarchical
+#dipole:solver = tensor
+
+#------------------------------------------
+# Material Files:
+#------------------------------------------
+material:file = Co.mat
+
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:temperature = 0.0
+sim:time-steps-increment = 1000
+sim:total-time-steps = 10000
+sim:time-step = 1 !fs
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program = benchmark
+sim:integrator = llg-heun
+
+#------------------------------------------
+# data output
+#------------------------------------------
+output:real-time
+output:magnetisation
+
+screen:time-steps
+screen:magnetisation-length
