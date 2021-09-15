@@ -117,6 +117,12 @@ namespace vout{
    void material_total_energy(std::ostream& stream,bool header);
    void material_mean_total_energy(std::ostream& stream,bool header);
 
+   void system_spin_temperature(std::ostream& stream, bool header);
+   void material_spin_temperature(std::ostream& stream, bool header);
+   void mean_system_spin_temperature(std::ostream& stream, bool header);
+   void mean_material_spin_temperature(std::ostream& stream, bool header);
+
+
    //-------------------------------------------------------------------------
    // Funciton protypes for functions inside: datalog.cpp
    //-------------------------------------------------------------------------

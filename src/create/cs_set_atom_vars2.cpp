@@ -69,6 +69,10 @@ void set_atom_vars(std::vector<cs::catom_t> & catom_array,
 	atoms::x_total_external_field_array.resize(atoms::num_atoms,0.0);
 	atoms::y_total_external_field_array.resize(atoms::num_atoms,0.0);
 	atoms::z_total_external_field_array.resize(atoms::num_atoms,0.0);
+	atoms::thermal_x_field.resize(atoms::num_atoms, 0.0);
+	atoms::thermal_y_field.resize(atoms::num_atoms, 0.0);
+	atoms::thermal_z_field.resize(atoms::num_atoms, 0.0);
+
 //	atoms::x_dipolar_field_array.resize(atoms::num_atoms,0.0);
 //	atoms::y_dipolar_field_array.resize(atoms::num_atoms,0.0);
 //	atoms::z_dipolar_field_array.resize(atoms::num_atoms,0.0);

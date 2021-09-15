@@ -152,11 +152,21 @@ int mag_m(){
       stats::sublattice_mean_torque_y_array.resize(mp::num_materials,0.0);
       stats::sublattice_mean_torque_z_array.resize(mp::num_materials,0.0);
 
+	if (calculate_system_spin_temperature) {
+		stats::system_spin_temperature.reset();
+	}
+	if (calculate_material_spin_temperature) {
+		stats::material_spin_temperature.reset();
+	}
+
       // Set initilaised flag to true
       stats::is_initialised=true;
 
    }
-
+ 	if(sim::integrator) { //calculation of spin temperature requires spin and field arrays
+        calculate_spin_fields(0, stats::num_atoms);
+        calculate_external_fields(0, stats::num_atoms);
+    }
    // update statistics - need to eventually replace mag_m() with stats::update()...
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
 

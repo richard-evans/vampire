@@ -56,6 +56,15 @@ namespace stats{
          if(stats::calculate_system_susceptibility)         stats::system_susceptibility.calculate(stats::system_magnetization.get_magnetization());
          if(stats::calculate_material_susceptibility)       stats::material_susceptibility.calculate(stats::material_magnetization.get_magnetization());
 
+         if(stats::calculate_system_spin_temperature)       stats::system_spin_temperature.calculate(sx,sy,sz,mm,
+                                                               atoms::x_total_spin_field_array, atoms::y_total_spin_field_array, atoms::z_total_spin_field_array,
+                                                               atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array);
+                                                              
+                                                            
+         if(stats::calculate_material_spin_temperature)     stats::material_spin_temperature.calculate(sx,sy,sz,mm,
+                                                               atoms::x_total_spin_field_array, atoms::y_total_spin_field_array, atoms::z_total_spin_field_array,
+                                                               atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array);
+                                                     
       }
 
       return;
@@ -92,6 +101,8 @@ namespace stats{
          if(stats::calculate_system_susceptibility) stats::system_susceptibility.reset_averages();
          if(stats::calculate_material_susceptibility) stats::material_susceptibility.reset_averages();
 
+         if(stats::calculate_system_spin_temperature)       stats::system_spin_temperature.reset();
+         if(stats::calculate_material_spin_temperature)     stats::material_spin_temperature.reset();
       }
 
       return;

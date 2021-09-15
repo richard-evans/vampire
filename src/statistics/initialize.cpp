@@ -131,6 +131,10 @@ namespace stats{
       if(stats::calculate_system_susceptibility) stats::system_susceptibility.initialize(stats::system_magnetization);
       if(stats::calculate_material_susceptibility) stats::material_susceptibility.initialize(stats::material_magnetization);
 
+      //spin temperature
+      if(stats::calculate_system_spin_temperature) stats::system_spin_temperature.set_mask(stats::system_magnetization.get_mask_length(), stats::system_magnetization.get_mask_only());
+      if(stats::calculate_material_spin_temperature) stats::material_spin_temperature.set_mask(stats::material_magnetization.get_mask_length(), stats::material_magnetization.get_mask_only());
+      
       return;
 
    }

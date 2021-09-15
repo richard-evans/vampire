@@ -258,8 +258,20 @@ namespace vout{
                  break;
               case 64:
                  vout::material_mean_total_energy(stream,header);
-                 break;
-              case 999: //AJN
+				 break;
+		case 65:
+			vout::system_spin_temperature(stream, header);
+			break;
+		case 66:
+			vout::material_spin_temperature(stream, header);
+			break;
+       case 67:
+			vout::mean_system_spin_temperature(stream, header);
+			break;
+		case 68:
+			vout::mean_material_spin_temperature(stream, header);
+			break;
+        case 999: //AJN
       		vout::standard_deviation(stream,header);
       		break;
       }
