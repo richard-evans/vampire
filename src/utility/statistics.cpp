@@ -162,8 +162,8 @@ int mag_m(){
 
    }
  	if(sim::integrator) { //calculation of spin temperature requires spin and field arrays
-        calculate_spin_fields(0, stats::num_atoms);
-        calculate_external_fields(0, stats::num_atoms);
+        sim::calculate_spin_fields(0, stats::num_atoms);
+        sim::calculate_external_fields(0, stats::num_atoms);
     }
    // update statistics - need to eventually replace mag_m() with stats::update()...
    stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);

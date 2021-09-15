@@ -63,6 +63,7 @@ namespace vopencl
    {
       cl::Kernel update_nexch_spin_fields;
       cl::Kernel update_ext;
+      cl::Kernel update_therm;
 
       namespace rng
       {

@@ -1577,7 +1577,7 @@ namespace vin{
         }
                 //--------------------------------------------------------------------
         
-        test = "system-spin-temperature";
+        test = "spin-temperature";
         if (word == test) {
             stats::calculate_system_spin_temperature = true;
             stats::calculate_system_magnetization = true; //override magnetisation flag
@@ -1591,7 +1591,7 @@ namespace vin{
             output_list.push_back(66);
             return EXIT_SUCCESS;
         }
-        test = "mean-system-spin-temperature";
+        test = "mean-spin-temperature";
         if (word == test) {
             stats::calculate_system_spin_temperature = true;
             stats::calculate_system_magnetization = true;

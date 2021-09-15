@@ -64,6 +64,7 @@ void update_external_fields (){
          cu::atoms::d_materials, cu::mp::d_material_params,
          cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
          cu::d_x_external_field, cu::d_y_external_field, cu::d_z_external_field,
+         cu::d_thermal_x_field, cu::d_thermal_y_field, cu::d_thermal_z_field,
          cu::d_rand_state,
          global_temperature,
          Hx, Hy, Hz,
@@ -96,6 +97,7 @@ __global__ void update_external_fields_kernel (
       vcuda::internal::material_parameters_t * material_params,
       cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
       cu_real_t * x_ext_field, cu_real_t * y_ext_field, cu_real_t * z_ext_field,
+      cu_real_t * x_thermal_field, cu_real_t * y_thermal_field, cu_real_t * z_thermal_field,
       curandState * rand_states,
       cu_real_t global_temperature,
       cu_real_t Hx_app, cu_real_t Hy_app, cu_real_t Hz_app,
@@ -122,6 +124,9 @@ __global__ void update_external_fields_kernel (
       cu_real_t field_y = 0.0;
       cu_real_t field_z = 0.0;
 
+      cu_real_t therm_x = 0.0;
+      cu_real_t therm_y = 0.0;
+      cu_real_t therm_z = 0.0;
       /*
       * TODO: HAMR fields
       */
@@ -142,13 +147,13 @@ __global__ void update_external_fields_kernel (
       #endif
 
       #ifdef CUDA_DP
-         field_x = rsigma * curand_normal_double (&local_state);
-         field_y = rsigma * curand_normal_double (&local_state);
-         field_z = rsigma * curand_normal_double (&local_state);
+         therm_x = rsigma * curand_normal_double (&local_state);
+         therm_y = rsigma * curand_normal_double (&local_state);
+         therm_z = rsigma * curand_normal_double (&local_state);
       #else
-         field_x = rsigma * curand_normal(&local_state);
-         field_y = rsigma * curand_normal(&local_state);
-         field_z = rsigma * curand_normal(&local_state);
+         therm_x = rsigma * curand_normal(&local_state);
+         therm_y = rsigma * curand_normal(&local_state);
+         therm_z = rsigma * curand_normal(&local_state);
       #endif
 
       // Local applied field
@@ -181,6 +186,10 @@ __global__ void update_external_fields_kernel (
       x_ext_field[atom] = field_x;
       y_ext_field[atom] = field_y;
       z_ext_field[atom] = field_z;
+
+      x_thermal_field[atom] = therm_x;
+      y_thermal_field[atom] = therm_y;
+      z_thermal_field[atom] = therm_z;
 
       // Write local curand state back to global memory
       rand_states[tid] = local_state;
