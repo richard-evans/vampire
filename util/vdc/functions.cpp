@@ -605,27 +605,25 @@ void arg_count(const input_t &input, size_t args_required, std::string requireme
    const size_t &num_args = input.value.size();
    std::string many_or_few;
 
+   // location message for input file or command line parameters
+   std::string location_message;
+   if (input.line_number == -1){ location_message = "' passed in the command line\n"; }
+   else { location_message = "' on line " + std::to_string(input.line_number) + " of input file '" + vdc::input_file + "'\n"; } 
+
    if (requirement == "eq"){
       if (num_args == args_required){ return; }
       else {
-         std::cerr << "Error - expected " << args_required << " arguments in " << input.key
-                   << "' on line " << input.line_number << " of input file '" << vdc::input_file
-                   << "'\nInstead got " << num_args << ".\n"; 
+         std::cerr << "Error - expected " << args_required << " arguments in '" << input.key
+                   << location_message << "Instead got " << num_args << "\n"; 
       }
    }
    else if (requirement == "ge"){
       if (num_args >= args_required){ return; }
-      else {
-         std::cerr << "Error - too few arguments passed to '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-      }
+      else { std::cerr << "Error - too few arguments passed to '" << input.key << location_message; }
    }
    else if (requirement == "le"){
       if (num_args <= args_required){ return; }
-      else {
-         std::cerr << "Error - too many arguments passed to '" << input.key << "' on line "
-                   << input.line_number << " of input file '" << vdc::input_file << "'\n";
-      }
+      else { std::cerr << "Error - too many arguments passed to '" << input.key << location_message; }
    }
    else {
       std::cerr << "Bad requirement: " << requirement << std::endl;
@@ -637,8 +635,13 @@ void arg_count(const input_t &input, size_t args_required, std::string requireme
 
 // output error message and exit
 void error_message(const input_t &input, std::string message){
-   std::cerr << "Error - " << message << " in '" << input.key << "' on line "
-             << input.line_number << " of input file '" << vdc::input_file << "'\n";
+
+   // location message for input file or command line parameters
+   std::string location_message;
+   if (input.line_number == -1){ location_message = "' passed in the command line\n"; }
+   else { location_message = "' on line " + std::to_string(input.line_number) + " of input file '" + vdc::input_file + "'\n"; }
+
+   std::cerr << "Error - " << message << " in '" << input.key << location_message;
    
    std::exit(EXIT_FAILURE);
 }

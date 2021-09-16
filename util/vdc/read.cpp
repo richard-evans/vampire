@@ -15,7 +15,7 @@
 #include<fstream>
 #include<locale>
 #include<cctype>
-
+#include<algorithm>
 
 // vdc headers
 #include"vdc.hpp"
@@ -68,7 +68,6 @@ void read(std::vector<input_t> &input_list){
 
    // temp variables
    std::string temp_val;
-   std::vector<std::string> temp_vector;
 
    // work through input_file
    while(std::getline(input_file,line)){
@@ -107,9 +106,7 @@ void read(std::vector<input_t> &input_list){
             temp_val.clear();
          }
          // otherwise add char to temp_val
-         else {
-            temp_val.push_back(c);
-         }
+         else { temp_val.push_back(c); }
       }
 
       // push back last value if not empty
@@ -124,7 +121,6 @@ void read(std::vector<input_t> &input_list){
       // add to input_list and empty temp storage
       input.line_number = line_number;
       input_list.push_back(input);
-      temp_vector.clear();
       temp_val.clear();
       line_number++;
    }
@@ -139,6 +135,14 @@ void set(const std::vector<input_t> &input_list){
 
    // loop through input lines
    for (const input_t &input : input_list){
+
+      // if key has already been set at command line, print warning and skip
+      if (std::find(vdc::cmdl_parameters.begin(), vdc::cmdl_parameters.end(), input.key) != vdc::cmdl_parameters.end() ){
+         std::cerr << "Warning - the parameter '" << input.key << "' has been set in the command line\n"
+                   << "The same parameter on line " << input.line_number << " of input file '" << vdc::input_file
+                   << "' is being ignored\n";
+         continue;
+      }
 
       // check key, print error if not found
       if (vdc::key_list.find(input.key) == vdc::key_list.end()){

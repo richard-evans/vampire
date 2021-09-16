@@ -16,7 +16,7 @@ The \vampire data converter, or \vdc, is run to produce the input files needed. 
 \textit{vdc -{}-povray}
 \end{minipage}
 
-%opt/vampire/cfg2xx\\
+Note that all command line parameters passed to vdc are not case sensitive.
 
 \section*{Getting started}
 \phantomsection\addcontentsline{toc}{section}{Getting started}
@@ -86,7 +86,7 @@ For example, to render frame 9 only, you could use:
 
 \noindent where the "-W" and "-H" flags define the width and heigh of the image (the resolution), and "+A" is used for antialiasing.
 
-Output from \vdc can be customised in several ways by using a separate \vdc input file. The \vdc input file is a plain text file containing parameters and arguments which change the output behaviour. Comments can be included with the '\#' symbol and the special characters ' ,()\{\}[]:=!' can also be used but are ignored by \vdc.  By default this file is called \textit{vdc-input}, and is read automatically. To change the name of the \vdc input file, a command line parameter can be used:
+Output from \vdc can be customised in several ways, either by passing parameters to the command line (using the '\textit{--}' notation), or by using a separate \vdc input file. The \vdc input file is a plain text file containing parameters and arguments which change the output behaviour. This should be helpful when many parameters, or multiple vdc runs with the same parameters, are needed. Comments can be included with the '\#' symbol and the special characters ' ,()\{\}[]:=!' can also be used but are ignored by \vdc.  By default this file is called \textit{vdc-input}, and is read automatically. To change the name of the \vdc input file, a command line parameter can be used:
 
 \noindent
 \begin{minipage}[c]{\textwidth}
@@ -94,7 +94,7 @@ Output from \vdc can be customised in several ways by using a separate \vdc inpu
 \textit{vdc -{}-input-file [filename]}
 \end{minipage}
 
-There are many command line options that can be used to change all visualisation outputs including Rasmol, Jmol and POV-Ray. To get help with the usage of these parameters outside of the manual, it is also possible to print help messages from the command line by using the \textit{-h} or \textit{-{}-help} command line argument, followed by the name of a \textit{vdc-input} file parameter:
+There are many options that can be used to change all visualisation outputs including Rasmol, Jmol and POV-Ray. To get help with the usage of these parameters outside of the manual, it is also possible to print help messages from the command line by using the \textit{-h} or \textit{-{}-help} command line argument, followed by the name of a \textit{vdc-input} file parameter:
 
 \noindent
 \begin{minipage}[c]{\textwidth}
