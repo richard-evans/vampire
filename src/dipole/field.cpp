@@ -70,11 +70,11 @@ namespace dipole{
                   break;
 
                case dipole::internal::tensor:
-						#ifdef CUDA
+                  #ifdef CUDA
                	   gpu::update_dipolar_fields();
-						#else
+                  #else
                      dipole::internal::calculate_macrocell_dipole_field();
-						#endif
+                  #endif
                   break;
 
                case dipole::internal::atomistic:
@@ -98,6 +98,8 @@ namespace dipole{
 
             // // for gpu acceleration, transfer calculated fields now (does nothing for serial)
             // gpu::transfer_dipole_fields_from_cpu_to_gpu();
+            // // for gpu acceleration, transfer calculated cells dipolar fields now (does nothing for serial)
+            // gpu::transfer_dipole_cells_fields_from_gpu_to_cpu();
 
 		   } // End of check for update rate
 		} // end of check for update time

@@ -21,6 +21,10 @@
 #include "statistics.hpp"
 #include "cuda_utils.hpp"
 
+#include "monte_carlo.hpp"
+
+#include <cuda_profiler_api.h>
+
 #ifdef CUDA
 namespace cu = vcuda::internal;
 #endif
@@ -37,6 +41,8 @@ namespace vcuda{
 
       vcuda::internal::__finalize ();
 
+      vcuda::internal::mc::finalise();
+      cudaProfilerStop();
 #endif
 
       return;

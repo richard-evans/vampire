@@ -39,7 +39,7 @@ void mc_adaptive(const std::vector<double>&, std::vector<double>&);
 void mc_move(const std::vector<double>& old_spin, std::vector<double>& new_spin){
 
    // Reference enum list for readability
-   using namespace montecarlo::internal;
+   using namespace montecarlo;
 
    // Select algorithm using case statement
    switch(algorithm){

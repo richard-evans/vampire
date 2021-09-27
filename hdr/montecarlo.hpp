@@ -71,6 +71,12 @@ namespace montecarlo{
    //---------------------------------------------------------------------------
    void monte_carlo_preconditioning();
 
+
+   enum algorithm_t { adaptive, spin_flip, uniform, angle, hinzke_nowak };
+
+   extern algorithm_t algorithm; // Selected algorithm for Monte Carlo simulations
+
+
    //---------------------------------------------------------------------------
    // CMC namespace; must be given external access to be initialised by
    // match.cpp and, and data can be accessed by sim.cpp and outputfunctions.cpp

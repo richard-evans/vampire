@@ -75,6 +75,9 @@ namespace vcuda{
       void update_dipolar_fields ();
       void update_cell_magnetizations ();
 
+
+
+
       /*
        * Shared device functions
        */
@@ -145,7 +148,9 @@ namespace vcuda{
 
       __global__ void update_atomistic_dipolar_fields (
             cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
+            cu_real_t * x_cell_mu0H_field, cu_real_t * y_cell_mu0H_field, cu_real_t * z_cell_mu0H_field,
             cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+            cu_real_t * x_mu0H_dip_field, cu_real_t * y_mu0H_dip_field, cu_real_t * z_mu0H_dip_field,
             int * cells, int n_atoms
             );
 

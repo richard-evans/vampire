@@ -34,7 +34,6 @@ namespace internal{
 
 void update_dipolar_fields ()
 {
-
    // check if dipole calculation is enabled
    if(!::dipole::activated) return;
 
@@ -46,52 +45,14 @@ void update_dipolar_fields ()
 
    // save last time of demag update
    ::dipole::update_time = ::sim::time;
-
+   
    update_cell_magnetizations ();
 
    check_cuda_errors (__FILE__, __LINE__);
 
-   int num_local_cells = ::dipole::get_tot_num_local_cells();
-   int num_cells = ::dipole::get_tot_num_cells();
+//   int num_local_cells = ::dipole::get_tot_num_local_cells();
+//   int num_cells = ::dipole::get_tot_num_cells();
 
-   int *d_cell_id_array;
-   cudaMalloc((void**)&d_cell_id_array, ::cells::cell_id_array.size() * sizeof(int));
-   cudaMemcpy(d_cell_id_array, ::cells::cell_id_array.data(), ::cells::cell_id_array.size() * sizeof(int), cudaMemcpyHostToDevice);
-
-   std::vector<int> num_atoms_in_cell = ::dipole::get_num_atoms_in_cell_array();
-   int *d_num_atoms_in_cell;
-   cudaMalloc((void**)&d_num_atoms_in_cell, num_atoms_in_cell.size() * sizeof(int));
-   cudaMemcpy(d_num_atoms_in_cell, num_atoms_in_cell.data(), num_atoms_in_cell.size() * sizeof(int), cudaMemcpyHostToDevice);
-
-
-   /*
-    * Figure out addresses in device memory space
-    */
-
-   /*cu_real_t * d_x_mag = thrust::raw_pointer_cast(
-         cu::cells::x_mag_array.data());
-   cu_real_t * d_y_mag = thrust::raw_pointer_cast(
-         cu::cells::y_mag_array.data());
-   cu_real_t * d_z_mag = thrust::raw_pointer_cast(
-         cu::cells::z_mag_array.data());
-
-   cu_real_t * d_x_coord = thrust::raw_pointer_cast(
-         cu::cells::x_coord_array.data());
-   cu_real_t * d_y_coord = thrust::raw_pointer_cast(
-         cu::cells::y_coord_array.data());
-   cu_real_t * d_z_coord = thrust::raw_pointer_cast(
-         cu::cells::z_coord_array.data());
-
-   cu_real_t * d_volume = thrust::raw_pointer_cast(
-         cu::cells::volume_array.data());
-
-   cu_real_t * d_x_cell_field = thrust::raw_pointer_cast(
-         cu::cells::x_field_array.data());
-   cu_real_t * d_y_cell_field = thrust::raw_pointer_cast(
-         cu::cells::y_field_array.data());
-   cu_real_t * d_z_cell_field = thrust::raw_pointer_cast(
-         cu::cells::z_field_array.data());
-*/
    /*
     * Update cell dipolar fields
     */
@@ -104,11 +65,12 @@ void update_dipolar_fields ()
          cu::cells::d_x_cell_mu0H_field, cu::cells::d_y_cell_mu0H_field, cu::cells::d_z_cell_mu0H_field,
          cu::cells::d_tensor_xx, cu::cells::d_tensor_xy, cu::cells::d_tensor_xz,
          cu::cells::d_tensor_yy, cu::cells::d_tensor_yz, cu::cells::d_tensor_zz,
-         d_cell_id_array,
-         d_num_atoms_in_cell,
-         num_local_cells,
-         num_cells
-//         ::cells::num_cells
+         cu::cells::d_cell_id_array,
+         cu::cells::d_num_atoms_in_cell,
+//         num_local_cells,
+//         num_cells
+         ::cells::num_local_cells,
+         ::cells::num_cells
          );
 
    check_cuda_errors (__FILE__, __LINE__);
@@ -117,25 +79,19 @@ void update_dipolar_fields ()
     * Update atomistic dipolar fields
     */
 
-    /*
-   int * d_cells =
-      thrust::raw_pointer_cast(cu::atoms::cell_array.data());
-
-   cu_real_t * d_x_atom_field = thrust::raw_pointer_cast(
-         cu::x_dipolar_field_array.data());
-   cu_real_t * d_y_atom_field = thrust::raw_pointer_cast(
-         cu::y_dipolar_field_array.data());
-   cu_real_t * d_z_atom_field = thrust::raw_pointer_cast(
-         cu::z_dipolar_field_array.data());
-      */
    update_atomistic_dipolar_fields <<< cu::grid_size, cu::block_size >>> (
          cu::cells::d_x_cell_field, cu::cells::d_y_cell_field, cu::cells::d_z_cell_field,
+         cu::cells::d_x_cell_mu0H_field, cu::cells::d_y_cell_mu0H_field, cu::cells::d_z_cell_mu0H_field,
          cu::d_x_dip_field, cu::d_y_dip_field, cu::d_z_dip_field,
+         cu::d_x_mu0H_dip_field, cu::d_y_mu0H_dip_field, cu::d_z_mu0H_dip_field,
          cu::atoms::d_cells,
          ::atoms::num_atoms
          );
 
    check_cuda_errors (__FILE__, __LINE__);
+   
+//   // Transfer cells dipolar fields from gpu to cpu
+//   vcuda::transfer_dipole_cells_fields_from_gpu_to_cpu();
 }
 
 void update_cell_magnetizations ()
@@ -245,11 +201,8 @@ __global__ void update_dipolar_fields (
       )
 {
 
-   cu_real_t imuB = 1.0/9.27400915e-24;
-   cu_real_t prefactor = 9.27400915e-01;     // prefactor = mu_B * (mu_0/(4*pi) /1e-30)
-
-   // Define counter for 1D dipole tensor
-   int i_1Dindex = 0;
+   const cu_real_t imuB = 1.0/9.27400915e-24;
+   const cu_real_t prefactor = 9.27400915e-01;     // prefactor = mu_B * (mu_0/(4*pi) /1e-30)
 
    for ( int lc = blockIdx.x * blockDim.x + threadIdx.x;
          lc < n_local_cells;
@@ -257,104 +210,59 @@ __global__ void update_dipolar_fields (
    {
 
       int i = d_cell_id_array[lc]; //::cells::cell_id_array[lc];
+      const cu_real_t self_demag = 8.0 * M_PI / (3.0 * volume[i]);
 
-      if(d_num_atoms_in_cell[i]>0){
+//         // Normalise cells magnetisation
+//         cu_real_t mx_i = x_mag[i] * imuB;
+//         cu_real_t my_i = y_mag[i] * imuB;
+//         cu_real_t mz_i = z_mag[i] * imuB;
 
-         /*
-         cu_real_t cx = x_coord[i];
-         cu_real_t cy = y_coord[i];
-         cu_real_t cz = z_coord[i];
-         */
+      // Initialise field for cell i 
+      cu_real_t field_x = 0.0;
+      cu_real_t field_y = 0.0;
+      cu_real_t field_z = 0.0;
 
-         /*
-         * Inverse volume from the number of atoms in macro-cell
-         */
-         // DEFINES ? 4.0 * PI / 3 is constant
-         // Should be optimised out anyway?
-         /*
-         cu_real_t vol_prefac = -4.0 * M_PI / (3.0 * volume[i]);
-         cu_real_t prefactor = 1.0e+23; // 1e-7/1e30
-         */
-
-         cu_real_t self_demag = 8.0 * M_PI / (3.0 * volume[i]);
-
-         // Normalise cells magnetisation
-         cu_real_t mx_i = x_mag[i] * imuB;
-         cu_real_t my_i = y_mag[i] * imuB;
-         cu_real_t mz_i = z_mag[i] * imuB;
-
-         // Add self-demagnetisation term
-         cu_real_t field_x = self_demag * mx_i * 0.0;
-         cu_real_t field_y = self_demag * my_i * 0.0;
-         cu_real_t field_z = self_demag * mz_i * 0.0;
-
-         // Add self-demagnetisation term
-         cu_real_t mu0Hd_field_x = -0.5 * self_demag * mx_i;
-         cu_real_t mu0Hd_field_y = -0.5 * self_demag * my_i;
-         cu_real_t mu0Hd_field_z = -0.5 * self_demag * mz_i;
+//    // Add self-demagnetisation term
+//       cu_real_t mu0Hd_field_x = -0.5 * self_demag * mx_i;
+//       cu_real_t mu0Hd_field_y = -0.5 * self_demag * my_i;
+//       cu_real_t mu0Hd_field_z = -0.5 * self_demag * mz_i;
 
 
-         for ( int j = blockIdx.x * blockDim.x + threadIdx.x;
-              j < n_cells;
-              j += blockDim.x * gridDim.x)
-         {
-            if(d_num_atoms_in_cell[j]>0){
+      for ( int j = 0; j < n_cells; j ++){
 
-               cu_real_t mx_j = x_mag[j] * imuB;
-               cu_real_t my_j = y_mag[j] * imuB;
-               cu_real_t mz_j = z_mag[j] * imuB;
+         const int k = lc * n_cells + j; 
 
-               field_x += (mx_j * d_tensor_xx[i_1Dindex] + my_j * d_tensor_xy[i_1Dindex] + mz_j * d_tensor_xz[i_1Dindex]);
-               field_y += (mx_j * d_tensor_xy[i_1Dindex] + my_j * d_tensor_yy[i_1Dindex] + mz_j * d_tensor_yz[i_1Dindex]);
-               field_z += (mx_j * d_tensor_xz[i_1Dindex] + my_j * d_tensor_yz[i_1Dindex] + mz_j * d_tensor_zz[i_1Dindex]);
+         cu_real_t mx_j = x_mag[j] * imuB;
+         cu_real_t my_j = y_mag[j] * imuB;
+         cu_real_t mz_j = z_mag[j] * imuB;
 
-               mu0Hd_field_x += (mx_j * d_tensor_xx[i_1Dindex] + my_j * d_tensor_xy[i_1Dindex] + mz_j * d_tensor_xz[i_1Dindex]);
-               mu0Hd_field_y += (mx_j * d_tensor_xy[i_1Dindex] + my_j * d_tensor_yy[i_1Dindex] + mz_j * d_tensor_yz[i_1Dindex]);
-               mu0Hd_field_z += (mx_j * d_tensor_xz[i_1Dindex] + my_j * d_tensor_yz[i_1Dindex] + mz_j * d_tensor_zz[i_1Dindex]);
+         field_x += (mx_j * d_tensor_xx[k] + my_j * d_tensor_xy[k] + mz_j * d_tensor_xz[k]);
+         field_y += (mx_j * d_tensor_xy[k] + my_j * d_tensor_yy[k] + mz_j * d_tensor_yz[k]);
+         field_z += (mx_j * d_tensor_xz[k] + my_j * d_tensor_yz[k] + mz_j * d_tensor_zz[k]);
+//         printf("   %d %d %d  %lf  %lf  %lf\n",lc,i,j,mx_j * d_tensor_xx[k] + my_j * d_tensor_xy[k] + mz_j * d_tensor_xz[k], mx_j * d_tensor_xy[k] + my_j * d_tensor_yy[k] + mz_j * d_tensor_yz[k], mx_j * d_tensor_xz[k] + my_j * d_tensor_yz[k] + mz_j * d_tensor_zz[k]);
 
-               /*
-               // Make use of float3?
-               // Store in AoS instead of separate arrays?
-               cu_real_t dx = x_coord[j] - cx;
-               cu_real_t dy = y_coord[j] - cy;
-               cu_real_t dz = z_coord[j] - cz;
+      } // end for loop over n_cells
 
-               cu_real_t drij = rsqrt(dx * dx + dy * dy + dz * dz);
-               cu_real_t drij3 = drij * drij * drij;
+      // Update cells dipolar field
+      x_cell_field[i] = prefactor * field_x;
+      y_cell_field[i] = prefactor * field_y;
+      z_cell_field[i] = prefactor * field_z;
 
-               cu_real_t sdote = (
-                     omx * dx * drij +
-                     omy * dy * drij +
-                     omz * dz * drij);
+      // Add self-demagnetisation term for mu0Hd
+      x_cell_mu0H_field[i] = prefactor * (field_x + (-0.5 * self_demag * x_mag[i] * imuB));
+      y_cell_mu0H_field[i] = prefactor * (field_y + (-0.5 * self_demag * y_mag[i] * imuB));
+      z_cell_mu0H_field[i] = prefactor * (field_z + (-0.5 * self_demag * z_mag[i] * imuB));
 
-               field_x += (3.0 * sdote * dx * drij - omx) * drij3;
-               field_y += (3.0 * sdote * dy * drij - omy) * drij3;
-               field_z += (3.0 * sdote * dz * drij - omz) * drij3;
-               */
-            }
-            else{ // Increase counter if cell j is empty
-               i_1Dindex++;
-            } // end if cell i is not empty
-         } // end for loop over n_cells
-
-         // Same AoS argument as above?
-         x_cell_field[i] = prefactor * field_x;
-         y_cell_field[i] = prefactor * field_y;
-         z_cell_field[i] = prefactor * field_z;
-
-         x_cell_mu0H_field[i] = prefactor * mu0Hd_field_x;
-         y_cell_mu0H_field[i] = prefactor * mu0Hd_field_y;
-         z_cell_mu0H_field[i] = prefactor * mu0Hd_field_z;
-      }
-      else{ // Increase counter of n_cells if cell i is empty to go to next i
-         i_1Dindex += n_cells;
-      } // end if cell j is not empty
+//      printf("%d  %lf  %lf  %lf\n",i,x_cell_field[i],y_cell_field[i],z_cell_field[i]);
+      
    } // end for loop over n_local_cells
 }
 
 __global__ void update_atomistic_dipolar_fields (
       cu_real_t * x_cell_field, cu_real_t * y_cell_field, cu_real_t * z_cell_field,
+      cu_real_t * x_cell_mu0H_field, cu_real_t * y_cell_mu0H_field, cu_real_t * z_cell_mu0H_field,
       cu_real_t * x_dip_field, cu_real_t * y_dip_field, cu_real_t * z_dip_field,
+      cu_real_t * x_mu0H_dip_field, cu_real_t * y_mu0H_dip_field, cu_real_t * z_mu0H_dip_field,
       int * cell, int n_atoms
       )
 {
@@ -371,13 +279,18 @@ __global__ void update_atomistic_dipolar_fields (
       x_dip_field[i] = x_cell_field[cid];
       y_dip_field[i] = y_cell_field[cid];
       z_dip_field[i] = z_cell_field[cid];
+
+      x_mu0H_dip_field[i] = x_cell_mu0H_field[cid];
+      y_mu0H_dip_field[i] = y_cell_mu0H_field[cid];
+      z_mu0H_dip_field[i] = z_cell_mu0H_field[cid];
+      
+//      printf("%d  %lf  %lf  %lf\n",i,x_dip_field[i],y_dip_field[i],z_dip_field[i]);
    }
 }
 
 } // end of internal namespace
 
 void update_dipolar_fields (){
-//    std::cout << "Updating dipolar filed with GPU" << std::endl;
     cu::update_dipolar_fields();
 }
 
