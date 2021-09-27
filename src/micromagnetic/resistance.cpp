@@ -65,12 +65,21 @@ namespace micromagnetic{
             int matj =cell_material_array[cellj];
 
             if (mat == resistance_layer_1 && matj == resistance_layer_2){
+
+               // calculate distance between cells in x,y
+               double dx = cells::pos_array[cell*3 +0] - cells::pos_array[cellj*3 +0];
+               double dy = cells::pos_array[cell*3 +1] - cells::pos_array[cellj*3 +1];
+
+               // check that cells are on top of each other
+               if (dx*dx < cs::unit_cell.dimensions[0]*cs::unit_cell.dimensions[0] && dy*dy < cs::unit_cell.dimensions[1]*cs::unit_cell.dimensions[1]){
+
+
           //    std::cout << cell << '\t' << cellj << '\t' << dot_product << '\t' << costheta << '\t' << R << '\t' <<sum_one_o_R <<std::endl;
               mx_j = cells::mag_array_x[cellj];
               my_j = cells::mag_array_y[cellj];
               mz_j = cells::mag_array_z[cellj];
 
-              mod_j =sqrt(mx_j*mx_j+my_j*my_j +mz_j*mz_j); 
+              mod_j =sqrt(mx_j*mx_j+my_j*my_j +mz_j*mz_j);
 
               double dot_product = mx_i*mx_j + my_i*my_j + mz_i*mz_j;
               double costheta = dot_product/(mod_i*mod_j);
@@ -80,6 +89,7 @@ namespace micromagnetic{
               sum_one_o_R = sum_one_o_R + 1.0/R;
               //std::cout << cell << '\t' << cellj << '\t' << dot_product << '\t' << costheta << '\t' << R << '\t' <<sum_one_o_R <<std::endl;
               i ++ ;
+           }
             }
           }
         }

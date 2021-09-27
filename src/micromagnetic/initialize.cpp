@@ -60,6 +60,9 @@ void initialize(int num_local_cells,
    // Output informative message to user
    std::cout << "Initialising micromagnetic module" << std::endl;
 
+   // initialise data output file
+   mm::mm_output.open("mm_output.txt");
+
    // Determine number of local atoms for parallel computation
    int num_atoms_interactions;
 
@@ -346,7 +349,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
    //--------------------------------------------------------------------------------------------------
    //Replace atomsitic fields with SAF accross the boundary
    //--------------------------------------------------------------------------------------------------
-   double area = cells::macro_cell_size*cells::macro_cell_size;
+   double area = cells::macro_cell_size_x*cells::macro_cell_size_y;
    for (int cell = 0; cell < num_cells; cell++ ){
 
       //double zi = cells::pos_and_mom_array[4*cell+2];
@@ -363,7 +366,7 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
 
             if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj){
                // check that materials are different
-            std::cout <<"SAF" << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;
+            //std::cout <<"SAF" << mat << "\t" << matj << "\t" << mp::material[mat].enable_SAF << "\t" << mp::material[matj].enable_SAF << std::endl;
              //  std::cout << "enter2" << std::endl;
                double dx = cells::pos_array[cell*3 +0] - cells::pos_array[cellj*3 +0];
                double dy = cells::pos_array[cell*3 +1] - cells::pos_array[cellj*3 +1];
@@ -390,7 +393,8 @@ for (int proc = 0; proc < vmpi::num_processors; proc++ ){
                //Ac = -2*pow(mj,1.66)*mp::material[mat].EF_MM[matj]/(ms[cell]*Area);
                mm::A[j] = 2.0*mp::material[mat].EF_MM[matj]/(mm::ms[cell]);
             }
-            std::cout << mat << '\t' << matj << "\t" << mm::A[j]  <<std::endl;
+            // Output SAF coupling for testing
+            //if (mp::material[mat].enable_SAF && mp::material[matj].enable_SAF && mat != matj) std::cout << cell << '\t' << cellj << "\t" << mm::A[j]  <<std::endl;
          }
    }
 

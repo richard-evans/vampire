@@ -18,7 +18,7 @@
 // micromagnetic module headers
 #include "internal.hpp"
 #include <iostream>
-#include <fstream>  
+#include <fstream>
 
 namespace micromagnetic{
 
@@ -77,7 +77,7 @@ namespace micromagnetic{
       int my_num_micromagnetic_cells;
       int my_start_index; // first cell to intergrate on local (my) cpu
       int my_end_index;  // last cell +1 to intergrate on local (my) cpu
-      std::ofstream mm_output("mm_output");
+      std::ofstream mm_output;
       double bias_magnets_max_height = 1.0;
       double bias_magnets_min_height = 0.0;
       double bias_magnet_ms_input = 1.0;
