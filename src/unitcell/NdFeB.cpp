@@ -46,7 +46,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.shape[2][2] = 1;
 
    unit_cell.lcsize = 68;
-   unit_cell.hcsize = 4;
+   unit_cell.hcsize = 6;            // Heights sets are [0], [0.114, 0.127, 0.176, 0.204, 0.246], [0.254, 0.296, 0.324, 0.373, 0.386], [0.5], 0.5 added to second and third set for other sets. Also notice how third set is 0.5 - first set.
    unit_cell.interaction_range = 1;
    unit_cell.atom.resize(68);
    unit_cell.surface_threshold = 10;
@@ -75,7 +75,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[2].z     = 0.5;
    unit_cell.atom[2].mat   = 0;
    unit_cell.atom[2].lc    = 2;
-   unit_cell.atom[2].hc    = 2;
+   unit_cell.atom[2].hc    = 3;
    unit_cell.atom[2].nm    = false;
    unit_cell.atom[2].ni    = 12;
    //-----------------------------
@@ -84,7 +84,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[3].z     = 0.5;
    unit_cell.atom[3].mat   = 0;
    unit_cell.atom[3].lc    = 3;
-   unit_cell.atom[3].hc    = 2;
+   unit_cell.atom[3].hc    = 3;
    unit_cell.atom[3].nm    = false;
    unit_cell.atom[3].ni    = 12;
    //-----------------------------
@@ -111,7 +111,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[6].z     = 0.5;
    unit_cell.atom[6].mat   = 0;
    unit_cell.atom[6].lc    = 6;
-   unit_cell.atom[6].hc    = 2;
+   unit_cell.atom[6].hc    = 3;
    unit_cell.atom[6].nm    = false;
    unit_cell.atom[6].ni    = 12;
    //-----------------------------
@@ -120,7 +120,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[7].z     = 0.5;
    unit_cell.atom[7].mat   = 0;
    unit_cell.atom[7].lc    = 7;
-   unit_cell.atom[7].hc    = 2;
+   unit_cell.atom[7].hc    = 3;
    unit_cell.atom[7].nm    = false;
    unit_cell.atom[7].ni    = 12;
    //-----------------------------
@@ -147,7 +147,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[10].z    = 0.627;
    unit_cell.atom[10].mat  = 1;
    unit_cell.atom[10].lc   = 10;
-   unit_cell.atom[10].hc   = 3;
+   unit_cell.atom[10].hc   = 4;
    unit_cell.atom[10].nm   = false;
    unit_cell.atom[10].ni   = 12;
    //-----------------------------
@@ -156,7 +156,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[11].z    = 0.627;
    unit_cell.atom[11].mat  = 1;
    unit_cell.atom[11].lc   = 11;
-   unit_cell.atom[11].hc   = 3;
+   unit_cell.atom[11].hc   = 4;
    unit_cell.atom[11].nm   = false;
    unit_cell.atom[11].ni   = 12;
    //-----------------------------
@@ -165,7 +165,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[12].z    = 0.373;
    unit_cell.atom[12].mat  = 1;
    unit_cell.atom[12].lc   = 12;
-   unit_cell.atom[12].hc   = 1;
+   unit_cell.atom[12].hc   = 2;
    unit_cell.atom[12].nm   = false;
    unit_cell.atom[12].ni   = 12;
    //-----------------------------
@@ -174,7 +174,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[13].z    = 0.373;
    unit_cell.atom[13].mat  = 1;
    unit_cell.atom[13].lc   = 13;
-   unit_cell.atom[13].hc   = 1;
+   unit_cell.atom[13].hc   = 2;
    unit_cell.atom[13].nm   = false;
    unit_cell.atom[13].ni   = 12;
    //-----------------------------
@@ -183,7 +183,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[14].z    = 0.873;
    unit_cell.atom[14].mat  = 1;
    unit_cell.atom[14].lc   = 14;
-   unit_cell.atom[14].hc   = 3;
+   unit_cell.atom[14].hc   = 5;
    unit_cell.atom[14].nm   = false;
    unit_cell.atom[14].ni   = 12;
    //-----------------------------
@@ -192,7 +192,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[15].z    = 0.873;
    unit_cell.atom[15].mat  = 1;
    unit_cell.atom[15].lc   = 15;
-   unit_cell.atom[15].hc   = 3;
+   unit_cell.atom[15].hc   = 5;
    unit_cell.atom[15].nm   = false;
    unit_cell.atom[15].ni   = 12;
    //-----------------------------
@@ -201,7 +201,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[16].z    = 0.873;
    unit_cell.atom[16].mat  = 1;
    unit_cell.atom[16].lc   = 16;
-   unit_cell.atom[16].hc   = 3;
+   unit_cell.atom[16].hc   = 5;
    unit_cell.atom[16].nm   = false;
    unit_cell.atom[16].ni   = 12;
    //-----------------------------
@@ -210,7 +210,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[17].z    = 0.873;
    unit_cell.atom[17].mat  = 1;
    unit_cell.atom[17].lc   = 17;
-   unit_cell.atom[17].hc   = 3;
+   unit_cell.atom[17].hc   = 5;
    unit_cell.atom[17].nm   = false;
    unit_cell.atom[17].ni   = 12;
    //-----------------------------
@@ -219,7 +219,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[18].z    = 0.373;
    unit_cell.atom[18].mat  = 1;
    unit_cell.atom[18].lc   = 18;
-   unit_cell.atom[18].hc   = 1;
+   unit_cell.atom[18].hc   = 2;
    unit_cell.atom[18].nm   = false;
    unit_cell.atom[18].ni   = 12;
    //-----------------------------
@@ -228,7 +228,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[19].z    = 0.373;
    unit_cell.atom[19].mat  = 1;
    unit_cell.atom[19].lc   = 19;
-   unit_cell.atom[19].hc   = 1;
+   unit_cell.atom[19].hc   = 2;
    unit_cell.atom[19].nm   = false;
    unit_cell.atom[19].ni   = 12;
    //-----------------------------
@@ -237,7 +237,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[20].z    = 0.627;
    unit_cell.atom[20].mat  = 1;
    unit_cell.atom[20].lc   = 20;
-   unit_cell.atom[20].hc   = 3;
+   unit_cell.atom[20].hc   = 4;
    unit_cell.atom[20].nm   = false;
    unit_cell.atom[20].ni   = 12;
    //-----------------------------
@@ -246,7 +246,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[21].z    = 0.627;
    unit_cell.atom[21].mat  = 1;
    unit_cell.atom[21].lc   = 21;
-   unit_cell.atom[21].hc   = 3;
+   unit_cell.atom[21].hc   = 4;
    unit_cell.atom[21].nm   = false;
    unit_cell.atom[21].ni   = 12;
    //-----------------------------
@@ -291,7 +291,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[26].z    = 0.676;
    unit_cell.atom[26].mat  = 1;
    unit_cell.atom[26].lc   = 26;
-   unit_cell.atom[26].hc   = 3;
+   unit_cell.atom[26].hc   = 4;
    unit_cell.atom[26].nm   = false;
    unit_cell.atom[26].ni   = 12;
    //-----------------------------
@@ -300,7 +300,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[27].z    = 0.676;
    unit_cell.atom[27].mat  = 1;
    unit_cell.atom[27].lc   = 27;
-   unit_cell.atom[27].hc   = 3;
+   unit_cell.atom[27].hc   = 4;
    unit_cell.atom[27].nm   = false;
    unit_cell.atom[27].ni   = 12;
    //-----------------------------
@@ -309,7 +309,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[28].z    = 0.324;
    unit_cell.atom[28].mat  = 1;
    unit_cell.atom[28].lc   = 28;
-   unit_cell.atom[28].hc   = 1;
+   unit_cell.atom[28].hc   = 2;
    unit_cell.atom[28].nm   = false;
    unit_cell.atom[28].ni   = 12;
    //-----------------------------
@@ -318,7 +318,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[29].z    = 0.324;
    unit_cell.atom[29].mat  = 1;
    unit_cell.atom[29].lc   = 29;
-   unit_cell.atom[29].hc   = 1;
+   unit_cell.atom[29].hc   = 2;
    unit_cell.atom[29].nm   = false;
    unit_cell.atom[29].ni   = 12;
    //-----------------------------
@@ -327,7 +327,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[30].z    = 0.824;
    unit_cell.atom[30].mat  = 1;
    unit_cell.atom[30].lc   = 30;
-   unit_cell.atom[30].hc   = 3;
+   unit_cell.atom[30].hc   = 5;
    unit_cell.atom[30].nm   = false;
    unit_cell.atom[30].ni   = 12;
    //-----------------------------
@@ -336,7 +336,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[31].z    = 0.824;
    unit_cell.atom[31].mat  = 1;
    unit_cell.atom[31].lc   = 31;
-   unit_cell.atom[31].hc   = 3;
+   unit_cell.atom[31].hc   = 5;
    unit_cell.atom[31].nm   = false;
    unit_cell.atom[31].ni   = 12;
    //-----------------------------
@@ -345,7 +345,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[32].z    = 0.824;
    unit_cell.atom[32].mat  = 1;
    unit_cell.atom[32].lc   = 32;
-   unit_cell.atom[32].hc   = 3;
+   unit_cell.atom[32].hc   = 5;
    unit_cell.atom[32].nm   = false;
    unit_cell.atom[32].ni   = 12;
    //-----------------------------
@@ -354,7 +354,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[33].z    = 0.824;
    unit_cell.atom[33].mat  = 1;
    unit_cell.atom[33].lc   = 33;
-   unit_cell.atom[33].hc   = 3;
+   unit_cell.atom[33].hc   = 5;
    unit_cell.atom[33].nm   = false;
    unit_cell.atom[33].ni   = 12;
    //-----------------------------
@@ -363,7 +363,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[34].z    = 0.324;
    unit_cell.atom[34].mat  = 1;
    unit_cell.atom[34].lc   = 34;
-   unit_cell.atom[34].hc   = 1;
+   unit_cell.atom[34].hc   = 2;
    unit_cell.atom[34].nm   = false;
    unit_cell.atom[34].ni   = 12;
    //-----------------------------
@@ -372,7 +372,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[35].z    = 0.324;
    unit_cell.atom[35].mat  = 1;
    unit_cell.atom[35].lc   = 35;
-   unit_cell.atom[35].hc   = 1;
+   unit_cell.atom[35].hc   = 2;
    unit_cell.atom[35].nm   = false;
    unit_cell.atom[35].ni   = 12;
    //-----------------------------
@@ -381,7 +381,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[36].z    = 0.676;
    unit_cell.atom[36].mat  = 1;
    unit_cell.atom[36].lc   = 36;
-   unit_cell.atom[36].hc   = 3;
+   unit_cell.atom[36].hc   = 4;
    unit_cell.atom[36].nm   = false;
    unit_cell.atom[36].ni   = 12;
    //-----------------------------
@@ -390,7 +390,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[37].z    = 0.676;
    unit_cell.atom[37].mat  = 1;
    unit_cell.atom[37].lc   = 37;
-   unit_cell.atom[37].hc   = 3;
+   unit_cell.atom[37].hc   = 4;
    unit_cell.atom[37].nm   = false;
    unit_cell.atom[37].ni   = 12;
    //-----------------------------
@@ -435,7 +435,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[42].z    = 0.704;
    unit_cell.atom[42].mat  = 1;
    unit_cell.atom[42].lc   = 42;
-   unit_cell.atom[42].hc   = 3;
+   unit_cell.atom[42].hc   = 4;
    unit_cell.atom[42].nm   = false;
    unit_cell.atom[42].ni   = 12;
    //-----------------------------
@@ -444,7 +444,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[43].z    = 0.704;
    unit_cell.atom[43].mat  = 1;
    unit_cell.atom[43].lc   = 43;
-   unit_cell.atom[43].hc   = 3;
+   unit_cell.atom[43].hc   = 4;
    unit_cell.atom[43].nm   = false;
    unit_cell.atom[43].ni   = 12;
    //-----------------------------
@@ -453,7 +453,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[44].z    = 0.296;
    unit_cell.atom[44].mat  = 1;
    unit_cell.atom[44].lc   = 44;
-   unit_cell.atom[44].hc   = 1;
+   unit_cell.atom[44].hc   = 2;
    unit_cell.atom[44].nm   = false;
    unit_cell.atom[44].ni   = 12;
    //-----------------------------
@@ -462,7 +462,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[45].z    = 0.296;
    unit_cell.atom[45].mat  = 1;
    unit_cell.atom[45].lc   = 45;
-   unit_cell.atom[45].hc   = 1;
+   unit_cell.atom[45].hc   = 2;
    unit_cell.atom[45].nm   = false;
    unit_cell.atom[45].ni   = 12;
    //-----------------------------
@@ -471,7 +471,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[46].z    = 0.796;
    unit_cell.atom[46].mat  = 1;
    unit_cell.atom[46].lc   = 46;
-   unit_cell.atom[46].hc   = 3;
+   unit_cell.atom[46].hc   = 5;
    unit_cell.atom[46].nm   = false;
    unit_cell.atom[46].ni   = 12;
    //-----------------------------
@@ -480,7 +480,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[47].z   = 0.796;
    unit_cell.atom[47].mat = 1;
    unit_cell.atom[47].lc  = 47;
-   unit_cell.atom[47].hc  = 3;
+   unit_cell.atom[47].hc  = 5;
    unit_cell.atom[47].nm  = false;
    unit_cell.atom[47].ni    = 12;
    //-----------------------------
@@ -507,7 +507,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[50].z    = 0.746;
    unit_cell.atom[50].mat  = 1;
    unit_cell.atom[50].lc   = 50;
-   unit_cell.atom[50].hc   = 3;
+   unit_cell.atom[50].hc   = 4;
    unit_cell.atom[50].nm   = false;
    unit_cell.atom[50].ni   = 12;
    //-----------------------------
@@ -516,7 +516,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[51].z    = 0.746;
    unit_cell.atom[51].mat  = 1;
    unit_cell.atom[51].lc   = 51;
-   unit_cell.atom[51].hc   = 3;
+   unit_cell.atom[51].hc   = 4;
    unit_cell.atom[51].nm   = false;
    unit_cell.atom[51].ni   = 12;
    //-----------------------------
@@ -525,7 +525,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[52].z    = 0.254;
    unit_cell.atom[52].mat  = 1;
    unit_cell.atom[52].lc   = 52;
-   unit_cell.atom[52].hc   = 1;
+   unit_cell.atom[52].hc   = 2;
    unit_cell.atom[52].nm   = false;
    unit_cell.atom[52].ni   = 12;
    //-----------------------------
@@ -534,7 +534,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[53].z    = 0.254;
    unit_cell.atom[53].mat  = 1;
    unit_cell.atom[53].lc   = 53;
-   unit_cell.atom[53].hc   = 1;
+   unit_cell.atom[53].hc   = 2;
    unit_cell.atom[53].nm   = false;
    unit_cell.atom[53].ni   = 12;
    //-----------------------------
@@ -543,7 +543,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[54].z    = 0.754;
    unit_cell.atom[54].mat  = 1;
    unit_cell.atom[54].lc   = 54;
-   unit_cell.atom[54].hc   = 3;
+   unit_cell.atom[54].hc   = 5;
    unit_cell.atom[54].nm   = false;
    unit_cell.atom[54].ni   = 12;
    //-----------------------------
@@ -552,7 +552,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[55].z    = 0.754;
    unit_cell.atom[55].mat  = 1;
    unit_cell.atom[55].lc   = 55;
-   unit_cell.atom[55].hc   = 3;
+   unit_cell.atom[55].hc   = 5;
    unit_cell.atom[55].nm   = false;
    unit_cell.atom[55].ni   = 12;
    //-----------------------------
@@ -570,7 +570,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[57].z    = 0.614;
    unit_cell.atom[57].mat  = 1;
    unit_cell.atom[57].lc   = 57;
-   unit_cell.atom[57].hc   = 3;
+   unit_cell.atom[57].hc   = 4;
    unit_cell.atom[57].nm   = false;
    unit_cell.atom[57].ni   = 12;
    //-----------------------------
@@ -579,7 +579,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[58].z    = 0.386;
    unit_cell.atom[58].mat  = 1;
    unit_cell.atom[58].lc   = 58;
-   unit_cell.atom[58].hc   = 1;
+   unit_cell.atom[58].hc   = 2;
    unit_cell.atom[58].nm   = false;
    unit_cell.atom[58].ni   = 12;
    //-----------------------------
@@ -588,7 +588,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[59].z    = 0.886;
    unit_cell.atom[59].mat  = 1;
    unit_cell.atom[59].lc   = 59;
-   unit_cell.atom[59].hc   = 3;
+   unit_cell.atom[59].hc   = 5;
    unit_cell.atom[59].nm   = false;
    unit_cell.atom[59].ni   = 12;
    //-----------------------------
@@ -606,7 +606,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[61].z    = 0.5;
    unit_cell.atom[61].mat  = 1;
    unit_cell.atom[61].lc   = 61;
-   unit_cell.atom[61].hc   = 2;
+   unit_cell.atom[61].hc   = 3;
    unit_cell.atom[61].nm   = false;
    unit_cell.atom[61].ni   = 12;
    //-----------------------------
@@ -615,7 +615,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[62].z    = 0.5;
    unit_cell.atom[62].mat  = 1;
    unit_cell.atom[62].lc   = 62;
-   unit_cell.atom[62].hc   = 2;
+   unit_cell.atom[62].hc   = 3;
    unit_cell.atom[62].nm   = false;
    unit_cell.atom[62].ni   = 12;
    //-----------------------------
@@ -651,7 +651,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[66].z    = 0.5;
    unit_cell.atom[66].mat  = 2;
    unit_cell.atom[66].lc   = 66;
-   unit_cell.atom[66].hc   = 2;
+   unit_cell.atom[66].hc   = 3;
    unit_cell.atom[66].nm   = true;
    unit_cell.atom[66].ni   = 0;
    //-----------------------------
@@ -660,7 +660,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[67].z    = 0.5;
    unit_cell.atom[67].mat  = 2;
    unit_cell.atom[67].lc   = 67;
-   unit_cell.atom[67].hc   = 2;
+   unit_cell.atom[67].hc   = 3;
    unit_cell.atom[67].nm   = true;
    unit_cell.atom[67].ni   = 0;
 
