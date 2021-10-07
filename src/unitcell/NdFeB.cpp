@@ -565,7 +565,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[56].nm   = false;
    unit_cell.atom[56].ni   = 12;
    //-----------------------------
-   unit_cell.atom[57].x    = 0;
+   unit_cell.atom[57].x    = 0.0;
    unit_cell.atom[57].y    = 0;
    unit_cell.atom[57].z    = 0.614;
    unit_cell.atom[57].mat  = 1;
@@ -574,7 +574,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[57].nm   = false;
    unit_cell.atom[57].ni   = 12;
    //-----------------------------
-   unit_cell.atom[58].x    = 0;
+   unit_cell.atom[58].x    = 0.0;
    unit_cell.atom[58].y    = 0;
    unit_cell.atom[58].z    = 0.386;
    unit_cell.atom[58].mat  = 1;
@@ -592,16 +592,16 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[59].nm   = false;
    unit_cell.atom[59].ni   = 12;
    //-----------------------------
-   unit_cell.atom[60].x    = 0;
+   unit_cell.atom[60].x    = 0.0;
    unit_cell.atom[60].y    = 0.5;
-   unit_cell.atom[60].z    = 0;
+   unit_cell.atom[60].z    = 0.0;
    unit_cell.atom[60].mat  = 1;
    unit_cell.atom[60].lc   = 60;
    unit_cell.atom[60].hc   = 0;
    unit_cell.atom[60].nm   = false;
    unit_cell.atom[60].ni   = 12;
    //-----------------------------
-   unit_cell.atom[61].x    = 0;
+   unit_cell.atom[61].x    = 0.0;
    unit_cell.atom[61].y    = 0.5;
    unit_cell.atom[61].z    = 0.5;
    unit_cell.atom[61].mat  = 1;
@@ -611,7 +611,7 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[61].ni   = 12;
    //-----------------------------
    unit_cell.atom[62].x    = 0.5;
-   unit_cell.atom[62].y    = 0;
+   unit_cell.atom[62].y    = 0.0;
    unit_cell.atom[62].z    = 0.5;
    unit_cell.atom[62].mat  = 1;
    unit_cell.atom[62].lc   = 62;
@@ -620,8 +620,8 @@ void build_NdFeB(unitcell::unit_cell_t& unit_cell){
    unit_cell.atom[62].ni   = 12;
    //-----------------------------
    unit_cell.atom[63].x    = 0.5;
-   unit_cell.atom[63].y    = 0;
-   unit_cell.atom[63].z    = 0;
+   unit_cell.atom[63].y    = 0.0;
+   unit_cell.atom[63].z    = 0.0;
    unit_cell.atom[63].mat  = 1;
    unit_cell.atom[63].lc   = 63;
    unit_cell.atom[63].hc   = 0;

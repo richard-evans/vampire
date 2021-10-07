@@ -120,8 +120,9 @@ void unitcell::exchange_template_t::normalise_material_exponential_exchange(){
    
    for(int i = 0; i < mat_inv_norm_factor.size(); ++i){
       for (int j = 0; j < mat_inv_norm_factor.size(); ++j){
-         if(j >= i){
-            mat_inv_norm_factor[i][j] = material_expected_sum[i][j]/material_sum[i][j];
+         if(j >= i){ // Only need to do this set of possibities due to symmetry of the problem
+            if(material_sum[i][j] < 0.000000001) mat_inv_norm_factor[i][j] = 0; // Prevents division by zero when exchange function is set to zero
+            else mat_inv_norm_factor[i][j] = material_expected_sum[i][j]/material_sum[i][j]; // Calculates the standard inv_norm_factor
          }
       }
    }

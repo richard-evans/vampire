@@ -53,11 +53,6 @@ double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j){
          double B = uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_length;
          double C = uc::internal::material_exchange_parameters[std::min(mat_i, mat_j)][std::max(mat_i, mat_j)].decay_shift;
          double Jij = A*exp(-sqrt(range_sq)/B) + C;
-         // Prevent division by zero in material_exponential normalisation for insignificantly interacting, but magnetic, atoms
-         if (std::abs(Jij) < 0.000001){
-            if (Jij < 0) Jij = -0.000001;
-            else Jij = 0.000001;
-         }
          return Jij;
          break;
       }
