@@ -38,7 +38,7 @@ namespace unitcell{
       enum exchange_function_t { nearest_neighbour, shell, exponential, material_exponential};
 
       //-------------------------------------------------------------------------
-      // Internal shared variables
+      // Internal shared variables set by input file
       //-------------------------------------------------------------------------
 	   extern std::string crystal_structure;
 	   extern std::string unit_cell_filename;

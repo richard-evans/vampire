@@ -38,6 +38,7 @@ namespace unitcell{
 
       int max_unit_cell_material = 100;
 
+      // Parameters to be taken in at input for exchange function functionality      
       exchange_function_t exchange_function = nearest_neighbour;
       double exchange_interaction_range = 1.0;
       double exchange_decay = 0.4; // Angstroms

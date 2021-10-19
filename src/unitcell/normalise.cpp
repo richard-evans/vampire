@@ -82,12 +82,11 @@ void unitcell::exchange_template_t::normalise_exponential_exchange(){
       interaction[i].Jij[2][2] *= inv_norm_factor;
    }
 
+   // output sum and normalised sum to screen
    //double nsum = 0.0;
    //for(int i=0; i<interaction.size(); i++){
    //   nsum += interaction[i].Jij[0][0]; // xx only since J is a trace anyway
    //}
-
-   // output sum and normalised sum to screen
    //std::cout << expected_sum << "\t" << sum << "\t" << nsum << std::endl;
 
    return;

@@ -165,35 +165,6 @@ namespace unitcell{
             uc::internal::exchange_shift = ds;
             return true;
          }
-         //--------------------------------------------------------------------
-         test="ucc-exchange-parameters";
-         if (word.length() >= 29 ){
-            if (word.substr(0, 23) == test){
-               std::string a = "";
-               std::string b = "";
-               int count;
-               for (int i = 1; word.at(23 + i) != ']'; ++i){
-                  count = i;
-               }
-               a = word.substr(24, count);
-               for (int i = 1; word.at(25 + count + i) != ']'; ++i){
-                  b.push_back(word.at(25 + count + i));
-               }
-               int a_int = stoi(a) - 1;
-               int b_int = stoi(b) - 1;
-               if (internal::material_exchange_parameters.size() < std::max(a_int, b_int)) {
-                  internal::material_exchange_parameters.resize(std::max(a_int, b_int), std::vector <exchange_parameters_t>(std::max(a_int,b_int)));
-               }
-               std::stringstream stream(value);
-               stream >> internal::material_exchange_parameters[a_int][b_int].decay_multiplier;
-               stream.ignore();
-               stream >> internal::material_exchange_parameters[a_int][b_int].decay_length;
-               stream.ignore();
-               stream >> internal::material_exchange_parameters[a_int][b_int].decay_shift;
-               stream.str(std::string());
-               return true;
-            }
-         }
          //-----------------------
          test="function";
          if(word==test){
@@ -264,11 +235,8 @@ namespace unitcell{
             
             // Set values
             internal::material_exchange_parameters[superIndex][subIndex].decay_multiplier = u.at(0);
-            //std::cout << superIndex << " " << subIndex << " " << internal::material_exchange_parameters[superIndex][subIndex].decay_multiplier << std::endl;
             internal::material_exchange_parameters[superIndex][subIndex].decay_length = u.at(1);
-            //std::cout << superIndex << " " << subIndex << " " << internal::material_exchange_parameters[superIndex][subIndex].decay_length << std::endl;
             internal::material_exchange_parameters[superIndex][subIndex].decay_shift = u.at(2);
-            //std::cout << superIndex << " " << subIndex << " " << internal::material_exchange_parameters[superIndex][subIndex].decay_shift << std::endl;
             return true;
          }
       }

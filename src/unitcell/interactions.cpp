@@ -71,7 +71,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
    unit_cell.bilinear.num_unit_cell_atoms = unit_cell.atom.size();
    unit_cell.biquadratic.num_unit_cell_atoms = unit_cell.atom.size();
 
-   // set number of interactions per atom
+   // set number of interactions per atom used for exchange normalisation
    for (int i = 0; i < unit_cell.atom.size(); ++i){
       unit_cell.bilinear.ni.push_back(unit_cell.atom[i].ni);
       unit_cell.biquadratic.ni.push_back(unit_cell.atom[i].ni);
@@ -162,7 +162,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.Jij[1][0] = 0.0; // yx
                tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // yy
                tmp.Jij[1][2] = 0.0; // yz
-               
+
                tmp.Jij[2][0] = 0.0; // zx
                tmp.Jij[2][1] = 0.0; // zy
                tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // zz
