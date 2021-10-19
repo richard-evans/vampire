@@ -53,7 +53,7 @@ namespace unitcell{
       extern double exchange_decay;
       extern double exchange_multiplier;
       extern double exchange_shift;
-      extern std::vector <std::vector <exchange_parameters_t>> material_exchange_parameters;
+      extern std::vector <std::vector <exchange_parameters_t> > material_exchange_parameters;
 
       extern bool sublattice_materials; // flag to enable identification of atoms in simple crystals by material
 
