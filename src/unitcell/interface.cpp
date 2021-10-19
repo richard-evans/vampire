@@ -165,6 +165,13 @@ namespace unitcell{
             uc::internal::exchange_shift = ds;
             return true;
          }
+         test="RKKYkf";
+         if(word==test){
+            double kf = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(kf, word, line, prefix, unit, "length", 0.0, 1e19, "input", "0.0 - 100000.0");
+            return true;
+         }
          //-----------------------
          test="function";
          if(word==test){
@@ -188,12 +195,18 @@ namespace unitcell{
                uc::internal::exchange_function = uc::internal::material_exponential;
                return true;
             }
+            test="RKKY";
+            if(value==test){
+               uc::internal::exchange_function = uc::internal::RKKY;
+               return true;
+            }
             else{
                terminaltextcolor(RED);
                std::cerr << "Error - value for \'exchange:" << word << "\' must be one of:" << std::endl;
                std::cerr << "\t\"nearest-neighbour\"" << std::endl;
                std::cerr << "\t\"exponential\"" << std::endl;
                std::cerr << "\t\"material-exponential\"" << std::endl;
+               std::cerr << "\t\"RKKY\"" << std::endl;
                terminaltextcolor(WHITE);
                err::vexit();
             }

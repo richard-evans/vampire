@@ -48,7 +48,7 @@ namespace internal{
 void calculate_interactions(unit_cell_t& unit_cell){
 
    // Resize material-exponential material_exchange_parameters tensor from 100x100 if this exchange type is chosen
-   if (exchange_function == material_exponential){
+   if (exchange_function == material_exponential || exchange_function == material_exponential || exchange_function == RKKY){
       unsigned int num_uc_materials = 0;
       for (int i = 0; i < unit_cell.atom.size(); ++i){
          if (unit_cell.atom[i].mat > num_uc_materials) num_uc_materials = unit_cell.atom[i].mat;

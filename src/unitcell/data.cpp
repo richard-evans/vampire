@@ -44,6 +44,7 @@ namespace unitcell{
       double exchange_decay = 0.4; // Angstroms
       double exchange_multiplier = 1.0;
       double exchange_shift = 0.0;
+      double RKKYkf = 1.0;
       std::vector <std::vector <exchange_parameters_t> > material_exchange_parameters(max_unit_cell_material, std::vector <exchange_parameters_t>(max_unit_cell_material));
 
       bool sublattice_materials = false; // flag to enable identification of atoms in simple crystals by material

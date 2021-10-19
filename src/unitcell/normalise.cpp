@@ -48,6 +48,9 @@ void unitcell::exchange_template_t::normalise_exchange(){
          normalise_material_exponential_exchange();
          break;
 
+      case internal::RKKY:
+         normalise_material_exponential_exchange();
+
       default:
          return;
 
