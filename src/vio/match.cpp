@@ -183,6 +183,15 @@ namespace vin{
 
     } // end of match function
 
+    int match(string const key, string const word, string const value, string const unit, int const line, int const superIndex, int const subIndex){
+        if(unitcell::match_input_parameter(key, word, value, unit, line, superIndex, subIndex)) return EXIT_SUCCESS;
+        else
+            terminaltextcolor(RED);
+            std::cerr << "Error - Unknown control statement \'" << key <<":"<< word << "\' on line " << line << " of input file" << std::endl;
+            terminaltextcolor(WHITE);
+            return EXIT_FAILURE;
+    }
+
     //int match_create(string const word, string const value, string const unit, int const line){
     //    //--------------------------------------------------------------------
     //    // keyword not found

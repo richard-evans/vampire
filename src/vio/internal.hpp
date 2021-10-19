@@ -36,6 +36,7 @@ namespace vin{
    //Funciton protypes for functions inside: match.cpp
    //----------------------------------------------------------------------------------
    int match(std::string const, std::string const, std::string const, std::string const, int const);
+   int match(std::string const, std::string const, std::string const, std::string const, int const, int const, int const);
    int match_create(std::string const, std::string const, std::string const, int const);
    int match_dimension(std::string const, std::string const, std::string const, int const);
    int match_sim(std::string const, std::string const, std::string const, int const);

@@ -171,6 +171,7 @@ namespace unitcell{
    // Function to process input file parameters for unitcell module
    //---------------------------------------------------------------------------
    bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line, int const superIndex, int const subIndex);
 
    //---------------------------------------------------------------------------
    // Function to process material parameters

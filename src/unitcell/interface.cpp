@@ -235,6 +235,50 @@ namespace unitcell{
 
    }
 
+   // Overloaded match_input_parameter to take in functionalities with super and sub indicies
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line, int superIndex, int subIndex){
+      
+      std::string prefix = "exchange";
+      std::string test = "";
+
+      if(key == prefix){
+         test = "unit-cell-category-exchange-parameters";
+         if (word == test){
+            // Temporary storage container
+            std::vector<double> u(3);
+
+            // Read values from string into container
+            u = vin::doubles_from_string(value);
+
+            // Check for valid vector
+            std::vector <double> range_min(0);  // Holds minimum values for each vector element
+            range_min.push_back(0.0);
+            range_min.push_back(0.1);
+            range_min.push_back(-10000);
+            std::vector <double> range_max(0);  // Holds maximum values for each vector element
+            range_max.push_back(10000);
+            range_max.push_back(100);
+            range_max.push_back(10000);
+
+            vin::check_for_valid_vector(u, word, line, prefix, unit, "length", range_min, range_max, "input", "A = 0.0 - 10000, B = 0.1 - 100, C = -10000 - 10000");
+            
+            // Set values
+            internal::material_exchange_parameters[superIndex][subIndex].decay_multiplier = u.at(0);
+            //std::cout << superIndex << " " << subIndex << " " << internal::material_exchange_parameters[superIndex][subIndex].decay_multiplier << std::endl;
+            internal::material_exchange_parameters[superIndex][subIndex].decay_length = u.at(1);
+            //std::cout << superIndex << " " << subIndex << " " << internal::material_exchange_parameters[superIndex][subIndex].decay_length << std::endl;
+            internal::material_exchange_parameters[superIndex][subIndex].decay_shift = u.at(2);
+            //std::cout << superIndex << " " << subIndex << " " << internal::material_exchange_parameters[superIndex][subIndex].decay_shift << std::endl;
+            return true;
+         }
+      }
+      //--------------------------------------------------------------------
+      // Keyword not found
+      //--------------------------------------------------------------------
+      return false;
+
+   }
+
    //---------------------------------------------------------------------------
    // Function to process material parameters
    //---------------------------------------------------------------------------

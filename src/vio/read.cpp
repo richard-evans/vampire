@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans and Rory Pond 2016. All rights reserved.
+//   (c) Richard F L Evans and Rory Pond 2016. (Jack Collings 2021) All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk and rory.pond@york.ac.uk
 //
@@ -92,6 +92,7 @@ namespace vin{
 
       // Comment and delimiter characters for "input" type files.
       char delim[] = ":=!";
+		char delim2[] = "[]";
 
 		// Loop over all lines and pass keyword to matching function
 		while (! inputfile.eof() ){
@@ -110,14 +111,29 @@ namespace vin{
 
 			// strip key,word,unit,value
 			std::string key="";
+			std::string tmpWord="";
 			std::string word="";
+			std::string superIndexString = "";
+			std::string subIndexString = "";
 			std::string value="";
 			std::string unit="";
 
 			// get size of string
 
          // remove everything after comment character
-         line = line.substr(0,line.find('#')) ;
+         line = line.substr(0,line.find('#'));
+
+			//for (int i = 0; i < line.length(); ++i){
+			//	int start = 0;
+			//	if (line.at(i) == ':'){
+			//		key = line.substr(0, i + 1 - start);
+			//		start = i;
+			//	}
+			//	else if(line.at(i) == '[' && word == "" ){
+			//		word = line.substr(start, i);
+			//	}
+			//	else if line.at()
+			//}
 
          // convert to c-string style, for tokenisation
          std::vector<char> cstr(line.begin(),line.end());
@@ -128,24 +144,63 @@ namespace vin{
          // tokenise the string, using delimiters from above
          char *token = strtok(&cstr[0],delim); // first call of strtok sets the string to tokenise.
          for (int count = 0; count < 4 && token !=NULL; count++){
-             if (count==0){key=token;}       // Format is always the same
-             else if(count==1){word=token;}  // but breaks if EOL found
-             else if(count==2){value=token;} // so if unused, keywords will remain as ""
-             else if(count==3){unit=token;}
-             token = strtok(NULL,delim);
+            if (count==0){key=token;}       // Format is always the same
+            else if(count==1){tmpWord=token;}  // but breaks if EOL found
+            else if(count==2){value=token;} // so if unused, keywords will remain as ""
+            else if(count==3){unit=token;}
+            token = strtok(NULL,delim);
          };
 
-         // tidy up
-			string empty="";
-			if(key!=empty){
-	//		std::cout << "\t" << "key:  " << key << std::endl;
-//			std::cout << "\t" << "word: " << word << std::endl;
-//			std::cout << "\t" << "value:" << value << std::endl;
-//		   std::cout << "\t" << "unit: " << unit << std::endl;
-			int matchcheck = match(key, word, value, unit, line_counter);
-			if(matchcheck==EXIT_FAILURE){
-				err::vexit();
+			// Break up tmpWord into the word, superIndex and subIndex (similar to above)
+			std::vector<char> wordcstr(tmpWord.begin(), tmpWord.end());
+			wordcstr.push_back('\0');
+			char *wordToken = strtok(&wordcstr[0],delim2);
+			for (int count = 0; count < 3 && wordToken != NULL; ++count){
+				if (count == 0){word=wordToken;}
+				else if (count == 1){superIndexString=wordToken;}
+				else if (count == 2){subIndexString=wordToken;}
+				wordToken = strtok(NULL, delim2);
 			}
+
+         // Change super/sub indicies from string to int form
+			string empty="";
+	
+			int superIndex = 0;
+			int subIndex = 0;
+
+			if(subIndexString != empty){
+				subIndex = stoi(subIndexString);
+				superIndex = stoi(superIndexString);
+			}
+			else if(superIndexString != empty){
+				superIndex = stoi(superIndexString);
+			}
+
+			// Call different overloads depending on whether super and sub indicies are present
+			if(key != empty && superIndex == 0 && subIndex == 0){
+				//	std::cout << "\t" << "key:  " << key << std::endl;
+				//	std::cout << "\t" << "word: " << word << std::endl;
+				//	std::cout << "\t" << "value:" << value << std::endl;
+				// std::cout << "\t" << "unit: " << unit << std::endl;
+				int matchcheck = match(key, word, value, unit, line_counter);
+				if(matchcheck==EXIT_FAILURE){
+					err::vexit();
+				}
+			}
+			else if (key != empty && superIndex != 0 && subIndex != 0){
+				//std::cout << "\t" << "key:				" << key << std::endl;
+				//std::cout << "\t" << "word: 			" << word << std::endl;
+				//std::cout << "\t" << "value:			" << value << std::endl;
+				//std::cout << "\t" << "unit:			" << unit << std::endl;
+				//std::cout << "\t" << "superIndex:	" << superIndex << std::endl;
+				//std::cout << "\t" << "subIndex:		" << subIndex << std::endl;
+				int matchcheck = match(key, word, value, unit, line_counter, superIndex - 1, subIndex - 1);
+				if(matchcheck == EXIT_FAILURE){
+					err::vexit();
+				}
+			}
+			else if (key != empty && superIndex != 0){
+				err::vexit();	// There are no functionalities in vampire which use only a superIndex in the input file.
 			}
 		}
 
