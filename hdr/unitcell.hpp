@@ -129,9 +129,8 @@ namespace unitcell{
       void verify(std::string filename);
 
       // normalisation function to achieve same exchange sum as nn approximation
-      void normalise_exchange();
-      void normalise_exponential_exchange();
-      void normalise_material_exponential_exchange();
+      void normalise_exchange(double nn_cutoff);
+      void normalise_functional_exchange(double nn_cutoff);
 
       // function to find crystal shells
       void find_shells();

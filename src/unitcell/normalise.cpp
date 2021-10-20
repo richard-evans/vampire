@@ -26,7 +26,7 @@ namespace unitcell{
 //------------------------------------------------------------------------
 // Class function to normalise exchange interactions
 //------------------------------------------------------------------------
-void unitcell::exchange_template_t::normalise_exchange(){
+void unitcell::exchange_template_t::normalise_exchange(double nn_cutoff){
 
    // Select program to run
    switch(uc::internal::exchange_function){
@@ -41,15 +41,15 @@ void unitcell::exchange_template_t::normalise_exchange(){
       }
 
       case internal::exponential:
-         normalise_exponential_exchange();
+         normalise_functional_exchange(nn_cutoff);
          break;
 
       case internal::material_exponential:
-         normalise_material_exponential_exchange();
+         normalise_functional_exchange(nn_cutoff);
          break;
 
       case internal::RKKY:
-         normalise_material_exponential_exchange();
+         normalise_functional_exchange(nn_cutoff);
 
       default:
          return;
@@ -63,40 +63,8 @@ void unitcell::exchange_template_t::normalise_exchange(){
 //------------------------------------------------------------------------
 // Function to normalise exchange interactions
 //------------------------------------------------------------------------
-void unitcell::exchange_template_t::normalise_exponential_exchange(){
 
-   // calculate expected sum from all nearest neighbours
-   double expected_sum = 0.0;
-   for(int a=0; a<ni.size(); a++){
-      expected_sum += double(ni[a]);
-   }
-
-   // calculate actual sum of all interactions
-   double sum = 0.0;
-   for(int i=0; i<interaction.size(); i++){
-      sum += interaction[i].Jij[0][0]; // xx only since J is a trace anyway
-   }
-
-   // normalise to get same sum as for nearest neighbours
-   const double inv_norm_factor = expected_sum/sum;
-   for(int i=0; i<interaction.size(); i++){
-      interaction[i].Jij[0][0] *= inv_norm_factor;
-      interaction[i].Jij[1][1] *= inv_norm_factor;
-      interaction[i].Jij[2][2] *= inv_norm_factor;
-   }
-
-   // output sum and normalised sum to screen
-   //double nsum = 0.0;
-   //for(int i=0; i<interaction.size(); i++){
-   //   nsum += interaction[i].Jij[0][0]; // xx only since J is a trace anyway
-   //}
-   //std::cout << expected_sum << "\t" << sum << "\t" << nsum << std::endl;
-
-   return;
-
-}
-
-void unitcell::exchange_template_t::normalise_material_exponential_exchange(){
+void unitcell::exchange_template_t::normalise_functional_exchange(double nn_cutoff){
 
    const int num_materials = internal::material_exchange_parameters.size();
 
@@ -109,7 +77,9 @@ void unitcell::exchange_template_t::normalise_material_exponential_exchange(){
    for (int i = 0; i < interaction.size(); ++i){
       int min_mat = std::min(interaction[i].mat_i, interaction[i].mat_j);
       int max_mat = std::max(interaction[i].mat_i, interaction[i].mat_j);
-      ++material_expected_sum[min_mat][max_mat];
+      if(interaction[i].rij < nn_cutoff){
+         ++material_expected_sum[min_mat][max_mat];
+      }
       material_sum[min_mat][max_mat] += interaction[i].Jij[1][1]; // xx only since J is a trace anyway
    }
 

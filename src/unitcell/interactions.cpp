@@ -187,8 +187,10 @@ void calculate_interactions(unit_cell_t& unit_cell){
    unit_cell.interaction_range = interaction_range;
 
    // Normalise exchange interactions
-   unit_cell.bilinear.normalise_exchange();
-   unit_cell.biquadratic.normalise_exchange();
+
+   double nn_cutoff = unit_cell.cutoff_radius*1.001;
+   unit_cell.bilinear.normalise_exchange(nn_cutoff);
+   unit_cell.biquadratic.normalise_exchange(nn_cutoff);
 
    // Find shells for neighbours
    unit_cell.bilinear.find_shells();
