@@ -276,7 +276,7 @@ namespace create{
 
          std::vector<MPI_Request> requests(0);
          std::vector<MPI_Status> stati(0);
-         MPI_Request req;
+         MPI_Request req = MPI_REQUEST_NULL;
 
          zlog << zTs() << "   Sharing number of atoms to be sent/received from each CPU" << std::endl;
          timer.start();
@@ -850,7 +850,7 @@ namespace create{
          // Get number of spins I need to send to each CPU
          std::vector<MPI_Request> requests(0);
          std::vector<MPI_Status> stati(0);
-         MPI_Request req;
+         MPI_Request req = MPI_REQUEST_NULL;
 
          /*for(int cpu=0;cpu<vmpi::num_processors;cpu++){
             requests.push_back(req);
