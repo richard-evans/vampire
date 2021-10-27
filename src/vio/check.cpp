@@ -387,4 +387,72 @@ namespace vin{
 
     }
 
+    void check_for_valid_vector(std::vector<double>& u, /// unit vector
+                                std::string word, /// input file keyword
+                                int line, /// input file line
+                                std::string prefix, /// input file prefix
+                                std::string unit, /// unit specified in input file
+                                std::string unit_type, /// expected unit type
+                                const std::vector <double>& range_min, /// acceptable minimum value for variable
+                                const std::vector <double>& range_max, /// acceptable maximum value for variable
+                                std::string input_file_type, ///input file name
+                                std::string range_text) /// customised text
+    {
+
+       //---------------------------------------------------------------------------
+       // Check for valid unit
+       //---------------------------------------------------------------------------
+
+       for(int idx=0; idx<u.size(); ++idx){
+
+          double value = u.at(idx);
+          double minvalue = range_min.at(idx);
+          double maxvalue = range_max.at(idx);
+
+          // Define test unit
+       	std::string test_unit_type=unit_type;
+
+       	// Define integer for unit conversion status
+       	int convert_status=0;
+
+       	// If no unit given, assume internal, otherwise convert to internal units
+       	if(unit.size() != 0) convert_status = units::convert(unit,value,test_unit_type);
+
+       	// Test for valid conversion
+       	if(convert_status==EXIT_FAILURE){
+       		terminaltextcolor(RED);
+       		std::cerr << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+       		terminaltextcolor(WHITE);
+       		zlog << zTs() << "Error: Unit \'" << unit << "\' specified on line " << line << " of " << input_file_type << " file is not a valid unit." << std::endl;
+       		err::vexit();
+       	}
+
+       	// Test for change in unit type in case of wrong unit type
+       	if(unit_type!=test_unit_type){
+       		terminaltextcolor(RED);
+       		std::cerr << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+       		terminaltextcolor(WHITE);
+       		zlog << zTs() << "Error: Unit \'" << unit << "\' of type \'" << test_unit_type << "\' specified on line " << line << " of " << input_file_type << " is invalid for parameter " << prefix << word << "."<< std::endl;
+       		err::vexit();
+       	}
+
+          // Check for valid range
+          if((value<minvalue) || (value>maxvalue)){
+             terminaltextcolor(RED);
+             std::cerr << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+             terminaltextcolor(WHITE);
+       	   zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+             err::vexit();
+          }
+
+          // save value back to array
+          u.at(idx) = value;
+
+       }
+
+       // Success - input is sane!
+       return;
+
+    }
+
 }

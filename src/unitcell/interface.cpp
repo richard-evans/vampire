@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack B Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -149,6 +149,30 @@ namespace unitcell{
             uc::internal::exchange_decay = dl;
             return true;
          }         //--------------------------------------------------------------------
+         test="decay-multiplier";
+         if(word==test){
+            double dm = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(dm, word, line, prefix, unit, "length", 0.0, 10000.0,"input","0.0 - 10000.0");
+            uc::internal::exchange_multiplier = dm;
+            return true;
+         }
+         test="decay-shift";
+         if (word==test){
+            double ds = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(ds, word, line, prefix, unit, "length", -10000.0, 10000.0,"input","-10000.0 - 10000.0");
+            uc::internal::exchange_shift = ds;
+            return true;
+         }
+         test="RKKYkf";
+         if(word==test){
+            double kf = atof(value.c_str());
+            // Test for valid range
+            vin::check_for_valid_value(kf, word, line, prefix, unit, "length", 0.0, 1e19, "input", "0.0 - 100000.0");
+            return true;
+         }
+         //-----------------------
          test="function";
          if(word==test){
             test="nearest-neighbour";
@@ -166,14 +190,67 @@ namespace unitcell{
                uc::internal::exchange_function = uc::internal::exponential;
                return true;
             }
+            test="material-exponential";
+            if(value==test){
+               uc::internal::exchange_function = uc::internal::material_exponential;
+               return true;
+            }
+            test="RKKY";
+            if(value==test){
+               uc::internal::exchange_function = uc::internal::RKKY;
+               return true;
+            }
             else{
                terminaltextcolor(RED);
                std::cerr << "Error - value for \'exchange:" << word << "\' must be one of:" << std::endl;
                std::cerr << "\t\"nearest-neighbour\"" << std::endl;
                std::cerr << "\t\"exponential\"" << std::endl;
+               std::cerr << "\t\"material-exponential\"" << std::endl;
+               std::cerr << "\t\"RKKY\"" << std::endl;
                terminaltextcolor(WHITE);
                err::vexit();
             }
+         }  //------------------------------------------------------------
+      }
+      //--------------------------------------------------------------------
+      // Keyword not found
+      //--------------------------------------------------------------------
+      return false;
+
+   }
+
+   // Overloaded match_input_parameter to take in functionalities with super and sub indicies
+   bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line, int superIndex, int subIndex){
+      
+      std::string prefix = "exchange";
+      std::string test = "";
+
+      if(key == prefix){
+         test = "unit-cell-category-exchange-parameters";
+         if (word == test){
+            // Temporary storage container
+            std::vector<double> u(3);
+
+            // Read values from string into container
+            u = vin::doubles_from_string(value);
+
+            // Check for valid vector
+            std::vector <double> range_min(0);  // Holds minimum values for each vector element
+            range_min.push_back(0.0);
+            range_min.push_back(0.1);
+            range_min.push_back(-10000);
+            std::vector <double> range_max(0);  // Holds maximum values for each vector element
+            range_max.push_back(10000);
+            range_max.push_back(100);
+            range_max.push_back(10000);
+
+            vin::check_for_valid_vector(u, word, line, prefix, unit, "length", range_min, range_max, "input", "A = 0.0 - 10000, B = 0.1 - 100, C = -10000 - 10000");
+            
+            // Set values
+            internal::material_exchange_parameters[superIndex][subIndex].decay_multiplier = u.at(0);
+            internal::material_exchange_parameters[superIndex][subIndex].decay_length = u.at(1);
+            internal::material_exchange_parameters[superIndex][subIndex].decay_shift = u.at(2);
+            return true;
          }
       }
       //--------------------------------------------------------------------

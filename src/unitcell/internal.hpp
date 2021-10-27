@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack B Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -35,10 +35,10 @@ namespace unitcell{
       //-------------------------------------------------------------------------
       // Internal data type definitions
       //-------------------------------------------------------------------------
-      enum exchange_function_t { nearest_neighbour, shell, exponential };
+      enum exchange_function_t { nearest_neighbour, shell, exponential, material_exponential, RKKY};
 
       //-------------------------------------------------------------------------
-      // Internal shared variables
+      // Internal shared variables set by input file
       //-------------------------------------------------------------------------
 	   extern std::string crystal_structure;
 	   extern std::string unit_cell_filename;
@@ -48,9 +48,13 @@ namespace unitcell{
       extern double unit_cell_size_z;
 
 
-      extern exchange_function_t exchange_function;
-      extern double exchange_interaction_range;
-      extern double exchange_decay;
+      extern exchange_function_t exchange_function; // exchange function type
+      extern double exchange_interaction_range; // multiples of interaction radius used
+      extern double exchange_decay; // exponential function parameter
+      extern double exchange_multiplier; // exponential function parameter
+      extern double exchange_shift; // exponential function parameter
+      extern double RKKYkf; // RKKY function parameter
+      extern std::vector <std::vector <exchange_parameters_t> > material_exchange_parameters; // holds exponential exchange parameters for material-wise exchange
 
       extern bool sublattice_materials; // flag to enable identification of atoms in simple crystals by material
 
@@ -68,6 +72,7 @@ namespace unitcell{
       void build_rock_salt(unitcell::unit_cell_t& unit_cell);
       void build_heusler(unitcell::unit_cell_t& unit_cell);
       void build_spinel(unitcell::unit_cell_t& unit_cell);
+      void build_NdFeB(unitcell::unit_cell_t& unit_cell);
       void calculate_interactions(unit_cell_t& unit_cell);
       void read_unit_cell(unit_cell_t & unit_cell, std::string filename);
       void read_biquadratic_interactions(unit_cell_t & unit_cell,
@@ -77,7 +82,7 @@ namespace unitcell{
                                          unsigned int& line_counter,
                                          int& interaction_range);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
-      double exchange(double range_sq, double nn_cutoff_sq);
+      double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j);
 
    } // end of internal namespace
 

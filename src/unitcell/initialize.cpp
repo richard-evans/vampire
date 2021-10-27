@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack B Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -48,6 +48,7 @@ namespace unitcell{
       else if(uc::internal::crystal_structure == "rocksalt"       ) uc::internal::build_rock_salt(              unit_cell );
       else if(uc::internal::crystal_structure == "heusler"        ) uc::internal::build_heusler(                unit_cell );
       else if(uc::internal::crystal_structure == "spinel"         ) uc::internal::build_spinel(                 unit_cell );
+      else if(uc::internal::crystal_structure == "NdFeB"          ) uc::internal::build_NdFeB(                  unit_cell );
       // Otherwise print an error to user
       else{
          terminaltextcolor(RED);

@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2016. All rights reserved.
+//   (c) Richard F L Evans 2016, Jack B Collings 2021. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -47,6 +47,17 @@ namespace internal{
 //------------------------------------------------------------------------------
 void calculate_interactions(unit_cell_t& unit_cell){
 
+   // Resize material-exponential material_exchange_parameters tensor from 100x100 if this exchange type is chosen
+   if (exchange_function == material_exponential || exchange_function == material_exponential || exchange_function == RKKY){
+      unsigned int num_uc_materials = 0;
+      for (int i = 0; i < unit_cell.atom.size(); ++i){
+         if (unit_cell.atom[i].mat > num_uc_materials) num_uc_materials = unit_cell.atom[i].mat;
+      }
+      ++num_uc_materials;
+      material_exchange_parameters.resize(num_uc_materials, std::vector<exchange_parameters_t>(num_uc_materials));
+   }
+   
+
    // determine neighbour range
    const double rcut = unit_cell.cutoff_radius*exchange_interaction_range*1.001; // reduced to unit cell units
    const double rcutsq = rcut*rcut; // reduced to unit cell units
@@ -59,6 +70,12 @@ void calculate_interactions(unit_cell_t& unit_cell){
    // save number of atoms in unit cell
    unit_cell.bilinear.num_unit_cell_atoms = unit_cell.atom.size();
    unit_cell.biquadratic.num_unit_cell_atoms = unit_cell.atom.size();
+
+   // set number of interactions per atom used for exchange normalisation
+   for (int i = 0; i < unit_cell.atom.size(); ++i){
+      unit_cell.bilinear.ni.push_back(unit_cell.atom[i].ni);
+      unit_cell.biquadratic.ni.push_back(unit_cell.atom[i].ni);
+   }
 
    // determine number of unit cells in x,y and z
    const int nx = 1 + 2*ceil(rcut); // number of replicated cells in x,y,z
@@ -122,6 +139,10 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.i = ratoms[i].id;
                tmp.j = ratoms[j].id;
 
+               // Determine unit cell material for i and j atoms
+               tmp.mat_i = ratoms[i].mat;
+               tmp.mat_j = ratoms[j].mat;
+
                // Determine unit cell offsets
                tmp.dx = ratoms[j].idx - ratoms[i].idx;
                tmp.dy = ratoms[j].idy - ratoms[i].idy;
@@ -134,17 +155,17 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.shell = 0;
 
                // Determine normalised exchange constants
-               tmp.Jij[0][0] = uc::internal::exchange(range_sq, nnrcut_sq); // xx
+               tmp.Jij[0][0] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // xx
                tmp.Jij[0][1] = 0.0; // xy
                tmp.Jij[0][2] = 0.0; // xz
 
                tmp.Jij[1][0] = 0.0; // yx
-               tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq); // yy
+               tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // yy
                tmp.Jij[1][2] = 0.0; // yz
 
                tmp.Jij[2][0] = 0.0; // zx
                tmp.Jij[2][1] = 0.0; // zy
-               tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq); // zz
+               tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // zz
 
                unit_cell.bilinear.interaction.push_back(tmp);
 
