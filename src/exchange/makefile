@@ -15,6 +15,7 @@ get_exchange_type.o \
 initialize.o \
 initialize_biquadratic.o \
 interface.o \
+kitaev.o \
 unroll_normalised.o \
 unroll_normalised_biquadratic.o \
 unroll.o

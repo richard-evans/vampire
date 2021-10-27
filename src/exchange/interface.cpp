@@ -72,8 +72,17 @@ namespace exchange{
       if(word==test){
           double cr = atof(value.c_str());
           // Test for valid range
-          vin::check_for_valid_value(cr, word, line, prefix, unit, "length", 0.0, 1.0e9,"input","0.0 - 1e9");
+          vin::check_for_valid_value(cr, word, line, prefix, unit, "length", 0.0, 1.0e3,"input","0.0 - 1e3");
           internal::dmi_cutoff_range = cr;
+          return true;
+      }
+      //-------------------------------------------------------------------
+      test="kitaev-cutoff-range";
+      if(word==test){
+          double cr = atof(value.c_str());
+          // Test for valid range
+          vin::check_for_valid_value(cr, word, line, prefix, unit, "length", 0.0, 1e3,"input","0.0 - 1e3");
+          internal::kitaev_cutoff_range = cr;
           return true;
       }
       //--------------------------------------------------------------------
@@ -249,6 +258,15 @@ namespace exchange{
       if( word == test ){
          read_exchange_values(super_index, sub_index, 9, word, prefix, value, unit, line, internal::biquadratic_exchange_constants);
          exchange::biquadratic = true; // Switch on biquadratic exchange
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test = "kitaev-constant"; // short form
+      if( word == test ){
+         double k = atof(value.c_str());
+         vin::check_for_valid_value(k, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e17");
+         internal::mp[super_index].kitaev[sub_index] = k;
+         internal::enable_kitaev = true; // Switch on kitaev calculation and fully unrolled tensorial anisotropy
          return true;
       }
       //--------------------------------------------------------------------

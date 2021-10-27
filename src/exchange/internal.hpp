@@ -147,12 +147,14 @@ namespace exchange{
 
             // variables
             std::vector<double> dmi; // Dzyaloshinskii-Moriya interaction constant
+            std::vector<double> kitaev; // Dzyaloshinskii-Moriya interaction constant
 
             // constructor
             mp_t (const unsigned int max_materials = 100)
             {
                // resize arrays to correct size
                dmi.resize(max_materials, 0.0); // initialise pair anisotropy constants to zero
+               kitaev.resize(max_materials, 0.0); // initialise pair anisotropy constants to zero
 
             }; // end of constructor
 
@@ -167,8 +169,10 @@ namespace exchange{
       extern exchange_matrix_4D_t biquadratic_exchange_constants; // array of biquadratic exchange constants
 
       extern bool enable_dmi; // flag to enable dmi calculation
+      extern bool enable_kitaev; // flag to enable kitaev calculation
 
       extern double dmi_cutoff_range; // cutoff range for DMI calculation (Ångstroms)
+      extern double kitaev_cutoff_range; // cutoff range for Kitaev calculation (Ångstroms)
 
       extern exchange_t exchange_type; // exchange type to use in simulation
       extern exchange_t biquadratic_exchange_type; // biquadratic exchange type to use in simulation
@@ -237,6 +241,7 @@ namespace exchange{
       // Internal function declarations
       //-------------------------------------------------------------------------
       void calculate_dmi(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
+      void calculate_kitaev(std::vector<std::vector <neighbours::neighbour_t> >& cneighbourlist);
       void unroll_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear);
       void unroll_normalised_exchange_interactions(std::vector<std::vector <neighbours::neighbour_t> >& bilinear);
       void unroll_normalised_biquadratic_exchange_interactions();

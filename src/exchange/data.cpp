@@ -36,8 +36,10 @@ namespace exchange{
       exchange_matrix_4D_t biquadratic_exchange_constants; // array of biquadratic exchange constants
 
       bool enable_dmi = false; // flag to enable dmi calculation
+      bool enable_kitaev = false; // flag to enable Kitaev calculation
 
       double dmi_cutoff_range = 2.6; // cutoff range for DMI calculation (Ångstroms)
+      double kitaev_cutoff_range = 2.6; // cutoff range for Kitaev calculation (Ångstroms)
 
       exchange_t exchange_type = isotropic; // exchange type to use in simulation
       exchange_t biquadratic_exchange_type = isotropic; // biquadratic exchange type to use in simulation
