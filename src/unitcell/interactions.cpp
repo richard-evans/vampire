@@ -47,16 +47,6 @@ namespace internal{
 //------------------------------------------------------------------------------
 void calculate_interactions(unit_cell_t& unit_cell){
 
-   // Resize material_exchange_parameters tensor from 100x100 if this exchange type is chosen
-   //if (exchange_function == material_exponential || exchange_function == material_exponential || exchange_function == RKKY){
-   //   unsigned int num_uc_materials = 0;
-   //   for (int i = 0; i < unit_cell.atom.size(); ++i){
-   //      if (unit_cell.atom[i].mat > num_uc_materials) num_uc_materials = unit_cell.atom[i].mat;
-   //   }
-   //   ++num_uc_materials;
-   //   material_exchange_parameters.resize(num_uc_materials, std::vector<exchange_parameters_t>(num_uc_materials));
-   //}
-
    // Also resize material-exchange-nn-cutoff tensor
    unsigned int num_uc_materials = 0;
    for (int i = 0; i < unit_cell.atom.size(); ++i){
@@ -71,7 +61,6 @@ void calculate_interactions(unit_cell_t& unit_cell){
 
    // determine neighbour range
    const double rcut = unit_cell.cutoff_radius*exchange_interaction_range*1.001; // reduced to unit cell units
-   const double rcutsq = rcut*rcut; // reduced to unit cell units
 
    // Set ranges using cutoff factors
    for (int i = 0; i < num_uc_materials; ++i){
