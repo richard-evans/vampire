@@ -28,13 +28,13 @@ namespace internal{
 // exchange interaction function
 //------------------------------------------------------------------------
 
-double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j){
+double exchange(double range, double cutoff, int mat_i, int mat_j){
 
    // Select program to run
    switch(uc::internal::exchange_function){
 
       case nearest_neighbour:{
-         if(range_sq <= nn_cutoff_sq) return 1.0;
+         if(range <= cutoff) return 1.0;
          else return 0.0;
          break;
       }
@@ -54,7 +54,7 @@ double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j){
                }
             }
          }
-         return uc::internal::exchange_multiplier*exp(-sqrt(range_sq)/uc::internal::exchange_decay) + uc::internal::exchange_shift;
+         return uc::internal::exchange_multiplier*exp(-range/uc::internal::exchange_decay) + uc::internal::exchange_shift;
          break;
       }
 
@@ -64,19 +64,18 @@ double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j){
          double A = uc::internal::material_exchange_parameters[min][max].decay_multiplier; // only need min and max due to symmetry of exchange
          double B = uc::internal::material_exchange_parameters[min][max].decay_length;
          double C = uc::internal::material_exchange_parameters[min][max].decay_shift;
-         double Jij = A*exp(-sqrt(range_sq)/B) + C;
+         double Jij = A*exp(-range/B) + C;
          return Jij;
          break;
       }
 
       case RKKY:{
-         double range = sqrt(range_sq);
          return (sin(2*RKKYkf*range) - 2*RKKYkf*range*cos(2*RKKYkf*range))/((RKKYkf*range)*(RKKYkf*range)*(RKKYkf*range)*(RKKYkf*range));
          break;
       }
 
       default:{
-         if(range_sq <= nn_cutoff_sq) return 1.0;
+         if(range <= cutoff) return 1.0;
          else return 0.0;
       }
    }

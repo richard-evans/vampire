@@ -26,7 +26,7 @@ namespace unitcell{
 //------------------------------------------------------------------------
 // Class function to normalise exchange interactions
 //------------------------------------------------------------------------
-void unitcell::exchange_template_t::normalise_exchange(double nn_cutoff){
+void unitcell::exchange_template_t::normalise_exchange(std::vector < std::vector <double>> &nn_cutoff_range){
 
    // Select program to run
    switch(uc::internal::exchange_function){
@@ -41,15 +41,15 @@ void unitcell::exchange_template_t::normalise_exchange(double nn_cutoff){
       }
 
       case internal::exponential:
-         normalise_functional_exchange(nn_cutoff);
+         normalise_functional_exchange(nn_cutoff_range);
          break;
 
       case internal::material_exponential:
-         normalise_functional_exchange(nn_cutoff);
+         normalise_functional_exchange(nn_cutoff_range);
          break;
 
       case internal::RKKY:
-         normalise_functional_exchange(nn_cutoff);
+         normalise_functional_exchange(nn_cutoff_range);
 
       default:
          return;
@@ -64,7 +64,7 @@ void unitcell::exchange_template_t::normalise_exchange(double nn_cutoff){
 // Function to normalise exchange interactions
 //------------------------------------------------------------------------
 
-void unitcell::exchange_template_t::normalise_functional_exchange(double nn_cutoff){
+void unitcell::exchange_template_t::normalise_functional_exchange(std::vector < std::vector <double> > &nn_cutoff_range){
 
    const int num_materials = internal::material_exchange_parameters.size();
 
@@ -77,7 +77,7 @@ void unitcell::exchange_template_t::normalise_functional_exchange(double nn_cuto
    for (int i = 0; i < interaction.size(); ++i){
       int min_mat = std::min(interaction[i].mat_i, interaction[i].mat_j);
       int max_mat = std::max(interaction[i].mat_i, interaction[i].mat_j);
-      if(interaction[i].rij < nn_cutoff){
+      if(interaction[i].rij < nn_cutoff_range[min_mat][max_mat]){
          ++material_expected_sum[min_mat][max_mat];
       }
       material_sum[min_mat][max_mat] += interaction[i].Jij[1][1]; // xx only since J is a trace anyway

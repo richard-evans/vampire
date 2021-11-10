@@ -145,7 +145,7 @@ namespace unitcell{
          if(word==test){
             double dl=atof(value.c_str());
             // Test for valid range
-            vin::check_for_valid_value(dl, word, line, prefix, unit, "length", 0.1, 100.0,"input","1.0 - 100.0 Angstroms");
+            vin::check_for_valid_value(dl, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 - 100.0 Angstroms");
             uc::internal::exchange_decay = dl;
             return true;
          }         //--------------------------------------------------------------------
@@ -204,6 +204,7 @@ namespace unitcell{
                terminaltextcolor(RED);
                std::cerr << "Error - value for \'exchange:" << word << "\' must be one of:" << std::endl;
                std::cerr << "\t\"nearest-neighbour\"" << std::endl;
+               std::cerr << "\t\"shell\"" << std::endl;
                std::cerr << "\t\"exponential\"" << std::endl;
                std::cerr << "\t\"material-exponential\"" << std::endl;
                std::cerr << "\t\"RKKY\"" << std::endl;
@@ -237,19 +238,33 @@ namespace unitcell{
             // Check for valid vector
             std::vector <double> range_min(0);  // Holds minimum values for each vector element
             range_min.push_back(0.0);
-            range_min.push_back(0.1);
+            range_min.push_back(0.001);
             range_min.push_back(-10000);
             std::vector <double> range_max(0);  // Holds maximum values for each vector element
             range_max.push_back(10000);
             range_max.push_back(100);
             range_max.push_back(10000);
 
-            vin::check_for_valid_vector(u, word, line, prefix, unit, "length", range_min, range_max, "input", "A = 0.0 - 10000, B = 0.1 - 100, C = -10000 - 10000");
+            vin::check_for_valid_vector(u, word, line, prefix, unit, "length", range_min, range_max, "input", "A = 0.0 - 10000, B = 0.001 - 100, C = -10000 - 10000");
             
             // Set values
             internal::material_exchange_parameters[superIndex][subIndex].decay_multiplier = u.at(0);
             internal::material_exchange_parameters[superIndex][subIndex].decay_length = u.at(1);
             internal::material_exchange_parameters[superIndex][subIndex].decay_shift = u.at(2);
+            return true;
+         }
+         test = "nn-cutoff-range";
+         if (word == test){
+            double nncr=atof(value.c_str());
+            vin::check_for_valid_value(nncr, word, line, prefix, unit, "none", 0.0, 1000.0,"input","0.0 - 1000.0 default nearest neighbour distances");
+            internal::nn_cutoff_range[superIndex][subIndex] *= nncr;
+            return true;
+         }
+         test = "interaction-cutoff-range";
+         if (word == test){
+            double icr = atof(value.c_str());
+            vin::check_for_valid_value(icr, word, line, prefix, unit, "none", 1.0, 1000.0,"input","1.0 - 1000.0 nearest neighbour distances");
+            internal::interaction_cutoff_range[superIndex][subIndex] *= icr;
             return true;
          }
       }

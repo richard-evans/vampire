@@ -46,6 +46,8 @@ namespace unitcell{
       double exchange_shift = 0.0;
       double RKKYkf = 1.0;
       std::vector <std::vector <exchange_parameters_t> > material_exchange_parameters(max_unit_cell_material, std::vector <exchange_parameters_t>(max_unit_cell_material));
+      std::vector <std::vector <double> > nn_cutoff_range(max_unit_cell_material, std::vector <double>(max_unit_cell_material, 1.0));
+      std::vector < std::vector <double> > interaction_cutoff_range(max_unit_cell_material, std::vector <double>(max_unit_cell_material, 1.0));
 
       bool sublattice_materials = false; // flag to enable identification of atoms in simple crystals by material
 
