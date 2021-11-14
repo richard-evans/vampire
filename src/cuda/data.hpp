@@ -27,12 +27,18 @@ namespace vcuda
    namespace internal
    {
 
+      extern cu_real_t *h_x_spin_transfer_buffer;
+      extern cu_real_t *h_y_spin_transfer_buffer;
+      extern cu_real_t *h_z_spin_transfer_buffer;
+
       namespace atoms
       {
 
          extern cu_real_t *d_x_spin;
          extern cu_real_t *d_y_spin;
          extern cu_real_t *d_z_spin;
+
+         extern cu_real_t *d_spin;
 
          extern cu_real_t *d_x_coord;
          extern cu_real_t *d_y_coord;
@@ -80,8 +86,22 @@ namespace vcuda
          extern cu_real_t *d_y_cell_field;
          extern cu_real_t *d_z_cell_field;
 
+         extern cu_real_t *d_x_cell_mu0H_field;
+         extern cu_real_t *d_y_cell_mu0H_field;
+         extern cu_real_t *d_z_cell_mu0H_field;
+
+         extern cu_real_t *d_tensor_xx;
+         extern cu_real_t *d_tensor_xy;
+         extern cu_real_t *d_tensor_xz;
+         extern cu_real_t *d_tensor_yy;
+         extern cu_real_t *d_tensor_yz;
+         extern cu_real_t *d_tensor_zz;
+
          extern cu_real_t *d_volume;
          extern cu_real_t *d_num_atoms;
+
+         extern int *d_cell_id_array;
+         extern int *d_num_atoms_in_cell;
 
       } /* cells */
 
@@ -94,6 +114,8 @@ namespace vcuda
       extern cu_real_t *d_y_spin_field;
       extern cu_real_t *d_z_spin_field;
 
+      extern cu_real_t *d_spin_field;
+
       extern cu_real_t *d_x_external_field;
       extern cu_real_t *d_y_external_field;
       extern cu_real_t *d_z_external_field;
@@ -101,6 +123,10 @@ namespace vcuda
       extern cu_real_t *d_x_dip_field;
       extern cu_real_t *d_y_dip_field;
       extern cu_real_t *d_z_dip_field;
+
+      extern cu_real_t *d_x_mu0H_dip_field;
+      extern cu_real_t *d_y_mu0H_dip_field;
+      extern cu_real_t *d_z_mu0H_dip_field;
 
       /*
        * Required by the total external field calculator

@@ -51,4 +51,22 @@ void transfer_dipole_fields_from_cpu_to_gpu(){
 
 }
 
+//------------------------------------------------------------------------------
+// Wrapper function to transfer dipole field data from GPU to CPU
+//------------------------------------------------------------------------------
+void transfer_dipole_cells_fields_from_gpu_to_cpu(){
+
+   // check for gpu functions and data initialised
+   if( !gpu::initialized ) return;
+
+   #ifdef CUDA
+      vcuda::transfer_dipole_cells_fields_from_gpu_to_cpu();
+   #elif OPENCL
+      // vopencl::transfer_dipole_cells_fields_from_gpu_to_cpu(); TBD
+   #endif
+
+   return;
+
+}
+
 } // end of gpu namespace

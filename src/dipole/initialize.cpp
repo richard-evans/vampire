@@ -16,6 +16,7 @@
 // Vampire headers
 #include "cells.hpp"
 #include "dipole.hpp"
+#include "gpu.hpp"
 #include "vio.hpp"
 #include "vutil.hpp"
 
@@ -128,6 +129,11 @@ namespace dipole{
 
       // Set initialised flag
       dipole::internal::initialised=true;
+
+      // Initialise dipole on GPU if CUDA is active
+      #ifdef CUDA
+         gpu::initialize_dipole();
+      #endif
 
       //------------------------------------------------------------------------
       // Precalculate dipole field and time for performance
