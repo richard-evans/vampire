@@ -55,6 +55,8 @@ namespace unitcell{
       extern double exchange_shift; // exponential function parameter
       extern double RKKYkf; // RKKY function parameter
       extern std::vector <std::vector <exchange_parameters_t> > material_exchange_parameters; // holds exponential exchange parameters for material-wise exchange
+      extern std::vector <std::vector <double> > nn_cutoff_range; // holds nearest neighbour cut-off ranges between different unit cell categories.
+      extern std::vector <std::vector <double> > interaction_cutoff_range; // holds interaction cut-off ranges.
 
       extern bool sublattice_materials; // flag to enable identification of atoms in simple crystals by material
 
@@ -82,7 +84,7 @@ namespace unitcell{
                                          unsigned int& line_counter,
                                          int& interaction_range);
       void verify_exchange_interactions(unit_cell_t & unit_cell, std::string filename);
-      double exchange(double range_sq, double nn_cutoff_sq, int mat_i, int mat_j);
+      double exchange(double range, double cutoff, int mat_i, int mat_j);
 
    } // end of internal namespace
 

@@ -47,20 +47,28 @@ namespace internal{
 //------------------------------------------------------------------------------
 void calculate_interactions(unit_cell_t& unit_cell){
 
-   // Resize material-exponential material_exchange_parameters tensor from 100x100 if this exchange type is chosen
-   if (exchange_function == material_exponential || exchange_function == material_exponential || exchange_function == RKKY){
-      unsigned int num_uc_materials = 0;
-      for (int i = 0; i < unit_cell.atom.size(); ++i){
+   // Also resize material-exchange-nn-cutoff tensor
+   unsigned int num_uc_materials = 0;
+   for (int i = 0; i < unit_cell.atom.size(); ++i){
          if (unit_cell.atom[i].mat > num_uc_materials) num_uc_materials = unit_cell.atom[i].mat;
       }
-      ++num_uc_materials;
+   ++num_uc_materials; // since unit cell category has the -1 shift
+   nn_cutoff_range.resize(num_uc_materials, std::vector<double>(num_uc_materials));
+   interaction_cutoff_range.resize(num_uc_materials, std::vector<double>(num_uc_materials));
+   if (exchange_function == material_exponential || exchange_function == material_exponential || exchange_function == RKKY){
       material_exchange_parameters.resize(num_uc_materials, std::vector<exchange_parameters_t>(num_uc_materials));
    }
-   
 
    // determine neighbour range
    const double rcut = unit_cell.cutoff_radius*exchange_interaction_range*1.001; // reduced to unit cell units
-   const double rcutsq = rcut*rcut; // reduced to unit cell units
+
+   // Set ranges using cutoff factors
+   for (int i = 0; i < num_uc_materials; ++i){
+      for (int j = 0; j < num_uc_materials; ++j){
+         nn_cutoff_range[i][j] *= 1.000001*unit_cell.cutoff_radius;
+         interaction_cutoff_range[i][j] *= nn_cutoff_range[i][j]*exchange_interaction_range;
+      }
+   }
 
    // temporary for unit cell size
    const double ucsx = unit_cell.dimensions[0];
@@ -113,7 +121,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
    int mid_cell_y = (ny-1)/2;
    int mid_cell_z = (nz-1)/2;
 
-   const double nnrcut_sq = unit_cell.cutoff_radius*unit_cell.cutoff_radius*1.001*1.001; // nearest neighbour cutoff radius
+   //const double nnrcut_sq = unit_cell.cutoff_radius*unit_cell.cutoff_radius*1.001*1.001; // nearest neighbour cutoff radius
 
    // loop over all i atoms
    for(int i=0; i < ratoms.size(); ++i){
@@ -129,9 +137,10 @@ void calculate_interactions(unit_cell_t& unit_cell){
             const double ry = ratoms[j].y - ratoms[i].y;
             const double rz = ratoms[j].z - ratoms[i].z;
             double range_sq = rx*rx + ry*ry + rz*rz;
+            double range = sqrt(range_sq);
             bool magnetic = !(ratoms[i].nm || ratoms[j].nm);
             // check for rij < rcut and i!= j
-            if( range_sq < rcutsq && i != j && magnetic ){
+            if( range < interaction_cutoff_range[ratoms[i].mat][ratoms[j].mat] && i != j && magnetic ){
                // Neighbour found
                uc::interaction_t tmp;
 
@@ -149,23 +158,23 @@ void calculate_interactions(unit_cell_t& unit_cell){
                tmp.dz = ratoms[j].idz - ratoms[i].idz;
 
                // save interaction range
-               tmp.rij = sqrt(range_sq);
+               tmp.rij = range;
 
                // save initial shell
                tmp.shell = 0;
 
                // Determine normalised exchange constants
-               tmp.Jij[0][0] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // xx
+               tmp.Jij[0][0] = uc::internal::exchange(range, interaction_cutoff_range[ratoms[i].mat][ratoms[j].mat], ratoms[i].mat, ratoms[j].mat); // xx
                tmp.Jij[0][1] = 0.0; // xy
                tmp.Jij[0][2] = 0.0; // xz
 
                tmp.Jij[1][0] = 0.0; // yx
-               tmp.Jij[1][1] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // yy
+               tmp.Jij[1][1] = uc::internal::exchange(range, interaction_cutoff_range[ratoms[i].mat][ratoms[j].mat], ratoms[i].mat, ratoms[j].mat); // yy
                tmp.Jij[1][2] = 0.0; // yz
 
                tmp.Jij[2][0] = 0.0; // zx
                tmp.Jij[2][1] = 0.0; // zy
-               tmp.Jij[2][2] = uc::internal::exchange(range_sq, nnrcut_sq, ratoms[i].mat, ratoms[j].mat); // zz
+               tmp.Jij[2][2] = uc::internal::exchange(range, interaction_cutoff_range[ratoms[i].mat][ratoms[j].mat], ratoms[i].mat, ratoms[j].mat); // zz
 
                unit_cell.bilinear.interaction.push_back(tmp);
 
@@ -187,8 +196,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
    unit_cell.interaction_range = interaction_range;
 
    // Normalise exchange interactions
-   unit_cell.bilinear.normalise_exchange();
-   unit_cell.biquadratic.normalise_exchange();
+
+   unit_cell.bilinear.normalise_exchange(nn_cutoff_range);
+   unit_cell.biquadratic.normalise_exchange(nn_cutoff_range);
 
    // Find shells for neighbours
    unit_cell.bilinear.find_shells();
