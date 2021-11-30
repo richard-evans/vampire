@@ -36,6 +36,7 @@ namespace anisotropy{
       // if not enabled then do nothing
       if(internal::enable_uniaxial_second_order)         energy += internal::uniaxial_second_order_energy(atom, mat, sx, sy, sz);
       if(internal::enable_uniaxial_fourth_order)         energy += internal::uniaxial_fourth_order_energy(atom, mat, sx, sy, sz);
+      if(internal::enable_biaxial_fourth_order_simple)   energy += internal::biaxial_fourth_order_simple_energy(atom, mat, sx, sy, sz);
       if(internal::enable_uniaxial_sixth_order)          energy += internal::uniaxial_sixth_order_energy (atom, mat, sx, sy, sz);
 
       if(internal::enable_cubic_fourth_order)            energy += internal::cubic_fourth_order_energy(atom, mat, sx, sy, sz);
