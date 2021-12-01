@@ -47,7 +47,7 @@ namespace internal{
 //------------------------------------------------------------------------------
 void calculate_interactions(unit_cell_t& unit_cell){
 
-   // Also resize material-exchange-nn-cutoff tensor
+   // Resize material-exchange-nn-cutoff tensor
    unsigned int num_uc_materials = 0;
    for (int i = 0; i < unit_cell.atom.size(); ++i){
          if (unit_cell.atom[i].mat > num_uc_materials) num_uc_materials = unit_cell.atom[i].mat;
@@ -55,9 +55,10 @@ void calculate_interactions(unit_cell_t& unit_cell){
    ++num_uc_materials; // since unit cell category has the -1 shift
    nn_cutoff_range.resize(num_uc_materials, std::vector<double>(num_uc_materials));
    interaction_cutoff_range.resize(num_uc_materials, std::vector<double>(num_uc_materials));
-   if (exchange_function == material_exponential || exchange_function == material_exponential || exchange_function == RKKY){
+   if (exchange_function == exponential || exchange_function == material_exponential || exchange_function == RKKY){
       material_exchange_parameters.resize(num_uc_materials, std::vector<exchange_parameters_t>(num_uc_materials));
    }
+   else material_exchange_parameters.clear();
 
    // determine neighbour range
    const double rcut = unit_cell.cutoff_radius*exchange_interaction_range*1.001; // reduced to unit cell units
@@ -69,6 +70,7 @@ void calculate_interactions(unit_cell_t& unit_cell){
          interaction_cutoff_range[i][j] *= nn_cutoff_range[i][j]*exchange_interaction_range;
       }
    }
+   if (exchange_function == internal::shell || exchange_function == internal::nearest_neighbour) nn_cutoff_range.clear();
 
    // temporary for unit cell size
    const double ucsx = unit_cell.dimensions[0];
