@@ -60,14 +60,14 @@ void calculate_interactions(unit_cell_t& unit_cell){
    }
    else material_exchange_parameters.clear();
 
-   // determine neighbour range
-   const double rcut = unit_cell.cutoff_radius*exchange_interaction_range*1.001; // reduced to unit cell units
-
-   // Set ranges using cutoff factors
+   // Set nn and interaction ranges using cutoff factors
+   double max_rcut = 0; // Max rcut used to find number of unit cells to get all interactions/nearest neighbours
    for (int i = 0; i < num_uc_materials; ++i){
       for (int j = 0; j < num_uc_materials; ++j){
          nn_cutoff_range[i][j] *= 1.000001*unit_cell.cutoff_radius;
          interaction_cutoff_range[i][j] *= nn_cutoff_range[i][j]*exchange_interaction_range;
+         double tmp_r = std::max(nn_cutoff_range[i][j], interaction_cutoff_range[i][j]);
+         if (tmp_r > max_rcut) max_rcut = tmp_r;
       }
    }
    if (exchange_function == internal::shell || exchange_function == internal::nearest_neighbour) nn_cutoff_range.clear();
@@ -88,9 +88,9 @@ void calculate_interactions(unit_cell_t& unit_cell){
    }
 
    // determine number of unit cells in x,y and z
-   const int nx = 1 + 2*ceil(rcut); // number of replicated cells in x,y,z
-   const int ny = 1 + 2*ceil(rcut);
-   const int nz = 1 + 2*ceil(rcut);
+   const int nx = 1 + 2*ceil(max_rcut); // number of replicated cells in x,y,z
+   const int ny = 1 + 2*ceil(max_rcut);
+   const int nz = 1 + 2*ceil(max_rcut);
 
    zlog << zTs() << "Generating neighbour interactions for a lattice of " << nx << " x " << ny << " x " << nz << " unit cells for neighbour calculation" << std::endl;
 
