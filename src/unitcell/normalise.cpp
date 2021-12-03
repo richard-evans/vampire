@@ -26,7 +26,7 @@ namespace unitcell{
 //------------------------------------------------------------------------
 // Class function to normalise exchange interactions
 //------------------------------------------------------------------------
-void unitcell::exchange_template_t::normalise_exchange(std::vector < std::vector <double>> &nn_cutoff_range){
+void unitcell::exchange_template_t::normalise_exchange(std::vector < std::vector <double> > &nn_cutoff_range){
 
    // Select program to run
    switch(uc::internal::exchange_function){

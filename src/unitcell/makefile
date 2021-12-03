@@ -26,6 +26,7 @@ kagome.o \
 rocksalt.o \
 spinel.o \
 NdFeB.o\
+SmFeN.o\
 verify.o
 
 # Append module objects to global tree
