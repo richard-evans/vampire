@@ -118,6 +118,7 @@ namespace anisotropy{
                ku6(0.0), // set initial value of ku6 to zero
                kc4(0.0), // set initial value of kc4 to zero
                kc6(0.0), // set initial value of kc6 to zero
+               k4r(0.0), // set initial value of k4r to zero
                k_lattice(0.0), // set initial value of k_lattice to zero
                random_anisotropy(false), // disable random anisotropy
                random_grain_anisotropy(false) // disable random grain anisotropy
