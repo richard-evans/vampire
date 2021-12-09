@@ -55,8 +55,8 @@ void read(std::vector<input_t> &input_list){
    // check if input file exists
    std::ifstream input_file(vdc::input_file);
    if (!input_file.is_open()){
-      std::cerr << "No input file proved. Running default configuration." << std::endl;
-      return; 
+      //std::cerr << "No input file provided. Running default configuration." << std::endl;
+      return;
    }
    else { std::cout << "Reading from input file '" << vdc::input_file << "'\n"; }
 
@@ -89,13 +89,13 @@ void read(std::vector<input_t> &input_list){
 
          // if uppercase, make lowercase
          c = std::tolower(c);
-         
+
          // skip delimiters and push last value
          if (delimiters.find(c) != std::string::npos){
 
             // in case delimiters follow each other
             if (temp_val == ""){ continue; }
-            
+
             // set key or add to values
             if (key_set){ input.value.push_back(temp_val); }
             else {
@@ -115,7 +115,7 @@ void read(std::vector<input_t> &input_list){
          else {
                   key_set = true;
                   input.key = temp_val;
-         } 
+         }
       }
 
       // add to input_list and empty temp storage
@@ -160,7 +160,7 @@ void set(const std::vector<input_t> &input_list){
 // Additional checks on input file parameters
 //---------------------------------------------------------------------------
 void checks(){
-   
+
    // check for valid axis initialisations
    if ( z_vector && !x_vector ){
 
