@@ -49,6 +49,9 @@ namespace vdc{
    enum slice_type{ box, box_void, sphere, cylinder};
    extern format_t format;
 
+   // list of input file parameters set in command line (to check for double usage)
+   extern std::vector<std::string> cmdl_parameters;
+
    // simple struct to store material parameters
    struct material_t{
       int id;
@@ -61,7 +64,7 @@ namespace vdc{
    struct input_t{
       std::string key;
       std::vector<std::string> value;
-      unsigned int line_number;
+      int line_number;
    };
 
    // struct to hold slice information
