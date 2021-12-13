@@ -96,8 +96,15 @@ run/unit-cell-creator
 .settings/
 
 #----------------------------------------------
+<<<<<<< HEAD
 # VS code project files and folders
+=======
+# Vscode and Clang project files and folders
+>>>>>>> vdc
 #----------------------------------------------
 .vscode/
+.cache/
+.clang-tidy
 
+temp/*
 #EOF

@@ -273,6 +273,16 @@ namespace anisotropy{
          return true;
       }
       //------------------------------------------------------------
+      //Implementation of biaxial fourth-order anisotropy (simple version)
+      test = "fourth-order-biaxial-anisotropy-constant";
+      if( word == test ){
+         double ku4 = atof(value.c_str());
+         vin::check_for_valid_value(ku4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
+         internal::mp[super_index].ku4 = ku4;
+         internal::enable_biaxial_fourth_order_simple = true;
+         return true;
+      }
+      //------------------------------------------------------------      
       //Minimal orthogonality
       test = "sixth-order-uniaxial-anisotropy-constant";
       if( word == test ){

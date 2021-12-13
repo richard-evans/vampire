@@ -15,7 +15,7 @@
 #include<fstream>
 #include<locale>
 #include<cctype>
-
+#include<algorithm>
 
 // vdc headers
 #include"vdc.hpp"
@@ -55,8 +55,8 @@ void read(std::vector<input_t> &input_list){
    // check if input file exists
    std::ifstream input_file(vdc::input_file);
    if (!input_file.is_open()){
-      std::cerr << "No input file proved. Running default configuration." << std::endl;
-      return; 
+      //std::cerr << "No input file provided. Running default configuration." << std::endl;
+      return;
    }
    else { std::cout << "Reading from input file '" << vdc::input_file << "'\n"; }
 
@@ -68,7 +68,6 @@ void read(std::vector<input_t> &input_list){
 
    // temp variables
    std::string temp_val;
-   std::vector<std::string> temp_vector;
 
    // work through input_file
    while(std::getline(input_file,line)){
@@ -90,13 +89,13 @@ void read(std::vector<input_t> &input_list){
 
          // if uppercase, make lowercase
          c = std::tolower(c);
-         
+
          // skip delimiters and push last value
          if (delimiters.find(c) != std::string::npos){
 
             // in case delimiters follow each other
             if (temp_val == ""){ continue; }
-            
+
             // set key or add to values
             if (key_set){ input.value.push_back(temp_val); }
             else {
@@ -107,9 +106,7 @@ void read(std::vector<input_t> &input_list){
             temp_val.clear();
          }
          // otherwise add char to temp_val
-         else {
-            temp_val.push_back(c);
-         }
+         else { temp_val.push_back(c); }
       }
 
       // push back last value if not empty
@@ -118,13 +115,12 @@ void read(std::vector<input_t> &input_list){
          else {
                   key_set = true;
                   input.key = temp_val;
-         } 
+         }
       }
 
       // add to input_list and empty temp storage
       input.line_number = line_number;
       input_list.push_back(input);
-      temp_vector.clear();
       temp_val.clear();
       line_number++;
    }
@@ -139,6 +135,14 @@ void set(const std::vector<input_t> &input_list){
 
    // loop through input lines
    for (const input_t &input : input_list){
+
+      // if key has already been set at command line, print warning and skip
+      if (std::find(vdc::cmdl_parameters.begin(), vdc::cmdl_parameters.end(), input.key) != vdc::cmdl_parameters.end() ){
+         std::cerr << "Warning - the parameter '" << input.key << "' has been set in the command line\n"
+                   << "The same parameter on line " << input.line_number << " of input file '" << vdc::input_file
+                   << "' is being ignored\n";
+         continue;
+      }
 
       // check key, print error if not found
       if (vdc::key_list.find(input.key) == vdc::key_list.end()){
@@ -156,7 +160,7 @@ void set(const std::vector<input_t> &input_list){
 // Additional checks on input file parameters
 //---------------------------------------------------------------------------
 void checks(){
-   
+
    // check for valid axis initialisations
    if ( z_vector && !x_vector ){
 
