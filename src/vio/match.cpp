@@ -1492,6 +1492,13 @@ namespace vin{
             output_list.push_back(52);
             return EXIT_SUCCESS;
         }
+        //--------------------------------------------------------------------
+        test="mean-height-magnetisation-length-normalised";
+        if(word==test){
+            stats::calculate_height_magnetization=true;
+            output_list.push_back(53);
+            return EXIT_SUCCESS;
+        }
         //-------------------------------------------------------------------
         test="mpi-timings";
         if(word==test){

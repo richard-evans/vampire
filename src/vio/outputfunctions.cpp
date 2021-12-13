@@ -453,10 +453,15 @@ namespace vout{
 		stream << stats::height_magnetization.output_mean_magnetization_length(header);
 	}
 
-	// Output Function 51 - with Header
+	// Output Function 52 - with Header
    void mean_height_magnetisation(std::ostream& stream, bool header){
 		stream << stats::height_magnetization.output_mean_magnetization(header);
 	}
+
+   // Output Function 53 - with Header
+   void mean_height_magnetisation_length_normalised(std::ostream& stream, bool header){
+      stream << stats::height_magnetization.output_normalized_mean_magnetization_length(header);
+   }
 
 	// Output Function 60
 	void MPITimings(std::ostream& stream, bool header){

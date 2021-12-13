@@ -114,6 +114,7 @@ namespace vout{
    void mean_material_susceptibility(std::ostream& stream,bool header);
    void mean_height_magnetisation_length(std::ostream& stream,bool header);
    void mean_height_magnetisation(std::ostream& stream,bool header);
+   void mean_height_magnetisation_length_normalised(std::ostream& stream,bool header);
 
    void MPITimings(std::ostream& stream,bool header);
    void mean_system_specific_heat(std::ostream& stream,bool header);
