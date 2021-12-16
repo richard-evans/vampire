@@ -145,7 +145,7 @@ namespace unitcell{
          if(word==test){
             double dl=atof(value.c_str());
             // Test for valid range
-            vin::check_for_valid_value(dl, word, line, prefix, unit, "length", 0.1, 100.0,"input","0.1 - 100.0 Angstroms");
+            vin::check_for_valid_value(dl, word, line, prefix, unit, "length", 0.001, 100.0,"input","0.001 - 100.0 Angstroms");
             uc::internal::exchange_decay = dl;
             return true;
          }         //--------------------------------------------------------------------
