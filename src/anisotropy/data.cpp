@@ -40,6 +40,7 @@ namespace anisotropy{
 
       bool enable_uniaxial_second_order = false; // Flag to enable calculation of second order anisotropy
       bool enable_uniaxial_fourth_order = false; // Flag to enable calculation of fourth order anisotropy
+      bool enable_biaxial_fourth_order_simple = false; // Flag to enable calculation of the simple version of the fourth order anisotropy
       bool enable_uniaxial_sixth_order  = false; // Flag to enable calculation of sixth order anisotropy
 
       bool enable_fourth_order_rotational = false; // Flag to enable 4th order rotational anisotropy
@@ -66,6 +67,9 @@ namespace anisotropy{
 
       // unrolled arrays for storing easy axes for each material
       std::vector<evec_t> ku_vector(0); // 001 easy axis direction
+
+      std::vector<evec_t> u1_vector(0); // Unit vector along [110]
+      std::vector<evec_t> u2_vector(0); // Unit vector along [1-10]
 
       std::vector<double> ku_triaxial_vector_x(100,0); // unit vector defining axis for triaxial anisotropy
       std::vector<double> ku_triaxial_vector_y(100,0); //

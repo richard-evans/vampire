@@ -99,6 +99,9 @@ namespace anisotropy{
 
             std::vector<double> ku_vector; // unit vector defining axis for uniaxial anisotropy
 
+            std::vector<double> u1_vector; // unit vector defining axis for uniaxial anisotropy
+            std::vector<double> u2_vector; // unit vector defining axis for uniaxial anisotropy                        
+
             std::vector<double> kc_vector1; // first unit vector defining axis for cubic anisotropy
             std::vector<double> kc_vector2; // second unit vector defining axis for cubic anisotropy
             std::vector<double> kc_vector3; // third unit vector defining axis for cubic anisotropy
@@ -132,6 +135,19 @@ namespace anisotropy{
                ku_vector[0] = 0.0; // set direction along [0,0,1]
                ku_vector[1] = 0.0;
                ku_vector[2] = 1.0;
+
+               const double oneosqrt2 = 1.0/sqrt(2.0);
+
+               u1_vector.resize(3); // resize to three elements
+               u2_vector.resize(3); // resize to three elements
+
+               u1_vector[0] = oneosqrt2*1.0; // set direction along [1,1,0]
+               u1_vector[1] = oneosqrt2*1.0;
+               u1_vector[2] = 0.0;      
+
+               u2_vector[0] = oneosqrt2*1.0; // set direction along [1,-1,0]
+               u2_vector[1] = -oneosqrt2*1.0;
+               u2_vector[2] = 0.0;                             
 
                // set default uniaxial and cubic directions
                kc_vector1.resize(3); // resize to three elements
@@ -168,6 +184,7 @@ namespace anisotropy{
 
       extern bool enable_uniaxial_second_order; // Flag to enable calculation of second order uniaxial anisotropy
       extern bool enable_uniaxial_fourth_order; // Flag to enable calculation of fourth order uniaxial anisotropy
+      extern bool enable_biaxial_fourth_order_simple; // Flag to enable calculation of simplified fourth order biaxial anisotropy
       extern bool enable_uniaxial_sixth_order;  // Flag to enable calculation of sixth order uniaxial anisotropy
 
       extern bool enable_cubic_fourth_order;    // Flag to enable calculation of fourth order cubic anisotropy
@@ -260,7 +277,7 @@ namespace anisotropy{
                                         const int end_index);
 
 
-       void triaxial_second_order_fields_fixed_basis(std::vector<double>& spin_array_x,
+      void triaxial_second_order_fields_fixed_basis(std::vector<double>& spin_array_x,
                                                      std::vector<double>& spin_array_y,
                                                      std::vector<double>& spin_array_z,
                                                      std::vector<int>&    atom_material_array,
@@ -280,7 +297,7 @@ namespace anisotropy{
                                                     const int start_index,
                                                     const int end_index);
 
-     void triaxial_fourth_order_fields_fixed_basis(std::vector<double>& spin_array_x,
+      void triaxial_fourth_order_fields_fixed_basis(std::vector<double>& spin_array_x,
                                                   std::vector<double>& spin_array_y,
                                                   std::vector<double>& spin_array_z,
                                                   std::vector<int>&    atom_material_array,
@@ -309,6 +326,16 @@ namespace anisotropy{
                                         std::vector<double>& field_array_z,
                                         const int start_index,
                                         const int end_index);
+
+      void biaxial_fourth_order_simple_fields(std::vector<double>& spin_array_x,
+                                        std::vector<double>& spin_array_y,
+                                        std::vector<double>& spin_array_z,
+                                        std::vector<int>&    atom_material_array,
+                                        std::vector<double>& field_array_x,
+                                        std::vector<double>& field_array_y,
+                                        std::vector<double>& field_array_z,
+                                        const int start_index,
+                                        const int end_index);                                        
 
       void uniaxial_sixth_order_fields( std::vector<double>& spin_array_x,
                                         std::vector<double>& spin_array_y,
@@ -417,6 +444,12 @@ namespace anisotropy{
                                           const double sx,
                                           const double sy,
                                           const double sz);
+
+      double biaxial_fourth_order_simple_energy(const int atom,
+                                          const int mat,
+                                          const double sx,
+                                          const double sy,
+                                          const double sz);                                          
 
       double uniaxial_sixth_order_energy( const int atom,
                                           const int mat,

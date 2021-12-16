@@ -20,6 +20,7 @@ neel.o \
 rotational_fixed_basis.o \
 uniaxial_second_order.o \
 uniaxial_fourth_order.o \
+biaxial_fourth_order_simple.o \
 uniaxial_sixth_order.o \
 triaxial_fixed_basis.o \
 triaxial_rotational.o
