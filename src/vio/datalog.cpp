@@ -248,6 +248,8 @@ namespace vout{
 		case 53:
 			vout::mean_height_magnetisation_length_normalised(stream,header);
 			break;
+		case 54:
+			vout::material_mean_height_magnetisation_length_normalised(stream,header);
       	case 60:
       		vout::MPITimings(stream,header);
       		break;

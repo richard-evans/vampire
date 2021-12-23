@@ -1500,6 +1500,13 @@ namespace vin{
             return EXIT_SUCCESS;
         }
         //-------------------------------------------------------------------
+        test="material-mean-height-magnetisation-length-normalised";
+        if(word==test){
+            stats::calculate_material_height_magnetization=true;
+            output_list.push_back(54);
+            return EXIT_SUCCESS;
+        }
+        //-------------------------------------------------------------------
         test="mpi-timings";
         if(word==test){
             vmpi::DetailedMPITiming=true;

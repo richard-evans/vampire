@@ -463,6 +463,11 @@ namespace vout{
       stream << stats::height_magnetization.output_normalized_mean_magnetization_length(header);
    }
 
+   // Output Function 54 - with Header
+   void material_mean_height_magnetisation_length_normalised(std::ostream& stream, bool header){
+      stream << stats::material_height_magnetization.output_normalized_mean_magnetization_length(header);
+   }
+
 	// Output Function 60
 	void MPITimings(std::ostream& stream, bool header){
 		stream << vmpi::AverageComputeTime+vmpi::AverageWaitTime << "\t" << vmpi::AverageComputeTime << "\t" << vmpi::AverageWaitTime;
