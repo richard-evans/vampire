@@ -457,6 +457,11 @@ namespace vin{
                 sim::program=73;
                 return EXIT_SUCCESS;
             }
+            test="reverse-curie-temperature";
+            if(value==test){
+                sim::program=74;
+                return EXIT_SUCCESS;
+            }
             else{
             terminaltextcolor(RED);
                         std::cout << word << '\t' << test << std::endl;
@@ -464,6 +469,7 @@ namespace vin{
                 std::cerr << "\t\"benchmark\"" << std::endl;
                 std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
                 std::cerr << "\t\"curie-temperature\"" << std::endl;
+                std::cerr << "\t\"reverse-curie-temperature\"" << std::endl;
                 std::cerr << "\t\"domain-wall\"" << std::endl;
                 std::cerr << "\t\"effective-damping\"" << std::endl;
                 std::cerr << "\t\"exchange-stiffness\"" << std::endl;

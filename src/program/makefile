@@ -7,6 +7,7 @@ program_objects =\
 bmark.o \
 cmc_anisotropy.o \
 curie_temperature.o \
+reverse_curie_temperature.o \
 diagnostics.o \
 exchange_stiffness.o \
 field_cool.o \

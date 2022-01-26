@@ -37,6 +37,7 @@ namespace program
 	extern int static_hysteresis();
    extern void partial_hysteresis_loop();
 	extern int curie_temperature();
+   extern int reverse_curie_temperature();
 	extern void field_cool();
 	extern void local_field_cool();
 	extern void temperature_pulse();

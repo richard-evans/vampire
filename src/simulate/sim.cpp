@@ -525,6 +525,15 @@ int run(){
 			program::boltzmann_dist_micromagnetic_llg();
 			break;
 		default:{
+		//------------------------------------------------------------------------
+
+		case 74:
+			if(vmpi::my_rank==0){
+				std::cout << "Reverse-Curie-Temperature..." << std::endl;
+				zlog << "Reverse-Curie-Temperature..." << std::endl;
+			}
+			program::reverse_curie_temperature();
+			break;
 			std::cerr << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			zlog << "Unknown Internal Program ID "<< sim::program << " requested, exiting" << std::endl;
 			exit (EXIT_FAILURE);
