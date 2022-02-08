@@ -70,7 +70,7 @@ void update_external_fields (){
    check_cuda_errors (__FILE__, __LINE__);
 
    // update dipole field
-   update_dipolar_fields();
+   // update_dipolar_fields(); -- disabled  as causes NaN and deferred to CPU code for now
 
    // std::ofstream fields("should_be_normal.txt");
    // for (size_t i = 0; i < cu::x_total_external_field_array.size(); ++i) {

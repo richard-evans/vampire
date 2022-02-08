@@ -65,6 +65,28 @@ namespace anisotropy{
           internal::neel_anisotropy_threshold = 1000000000;
           return true;
       }
+      //-------------------------------------------------------------------
+      test="neel-anisotropy-exponential-factor";
+      if(word==test){
+          // Enable range dependent Neel anisotropy Lij(r) = exp(-F(r-r0)/r0)
+          // F should be steepness of function indicating rate of decay with r
+          double F = atof(value.c_str());
+          vin::check_for_valid_value(F, word, line, prefix, unit, "none", 0.01, 100.0,"input","0.01 - 100");
+          internal::neel_exponential_factor = F;
+          internal::neel_range_dependent = true;
+          return true;
+      }
+      //-------------------------------------------------------------------
+      test="neel-anisotropy-exponential-range";
+      if(word==test){
+          // Enable range dependent Neel anisotropy Lij(r) = exp(-F(r-r0)/r0)
+          // r should be approximately nearest neighbour range ~ 2.5 angstroms
+          double r = atof(value.c_str());
+          vin::check_for_valid_value(r, word, line, prefix, unit, "length", 0.0001, 1000.0,"input","0.0001 - 1,000");
+          internal::neel_exponential_range = r;
+          internal::neel_range_dependent = true;
+          return true;
+      }
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -123,7 +145,7 @@ namespace anisotropy{
          // Test for valid range
          vin::check_for_valid_value(kc4, word, line, prefix, unit, "energy", -1e-17, 1e-17,"material"," < +/- 1.0e-17 J/atom");
          internal::mp[super_index].kc4 = kc4;
-         internal::enable_cubic_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
+         if(internal::enable_cubic_fourth_order_rotation == false) internal::enable_cubic_fourth_order = true; // Switch on second order tensor calculation for all spins (from spherical harmonics)
          return true;
       }
       //------------------------------------------------------------
@@ -230,8 +252,10 @@ namespace anisotropy{
          }
          return true;
       }
-      //------------------------------------------------------------
-      test = "cubic-anisotropy-direction";
+      //--------------------------------------
+      // Direction 1
+      //--------------------------------------
+      test = "cubic-anisotropy-direction-1";
       if(word == test){
          // temporary storage container
          std::vector<double> u(3);
@@ -240,7 +264,28 @@ namespace anisotropy{
          // check for sane input and normalise if necessary
          vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
          // Copy sanitised unit vector to material
-         internal::mp[super_index].kc_vector = u;
+         internal::mp[super_index].kc_vector1 = u;
+         // enable rotated anisotropy and disable normal anisotropy
+         internal::enable_cubic_fourth_order_rotation = true;
+         internal::enable_cubic_fourth_order = false;
+         return true;
+      }
+      //--------------------------------------
+      // Direction 2
+      //--------------------------------------
+      test = "cubic-anisotropy-direction-2";
+      if(word == test){
+         // temporary storage container
+         std::vector<double> u(3);
+         // read values from string
+         u = vin::doubles_from_string(value);
+         // check for sane input and normalise if necessary
+         vin::check_for_valid_unit_vector(u, word, line, prefix, "material");
+         // Copy sanitised unit vector to material
+         internal::mp[super_index].kc_vector2 = u;
+         // enable rotated anisotropy and disable normal anisotropy
+         internal::enable_cubic_fourth_order_rotation = true;
+         internal::enable_cubic_fourth_order = false;
          return true;
       }
       //------------------------------------------------------------
