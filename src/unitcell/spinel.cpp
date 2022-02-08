@@ -275,7 +275,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[24].lc  = 24;
 	unit_cell.atom[24].hc  = 1;
 	unit_cell.atom[24].ni  = 12;
-   unit_cell.atom[24].nm  = true;
+   unit_cell.atom[24].nm  = false;
 	//-----------------------------
 	unit_cell.atom[25].x   = 0.375;
 	unit_cell.atom[25].y   = 0.875;
@@ -284,7 +284,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[25].lc  = 25;
 	unit_cell.atom[25].hc  = 5;
 	unit_cell.atom[25].ni  = 12;
-   unit_cell.atom[25].nm  = true;
+   unit_cell.atom[25].nm  = false;
 	//-----------------------------
 	unit_cell.atom[26].x   = 0.875;
 	unit_cell.atom[26].y   = 0.625;
@@ -293,7 +293,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[26].lc  = 26;
 	unit_cell.atom[26].hc  = 3;
 	unit_cell.atom[26].ni  = 12;
-   unit_cell.atom[26].nm  = true;
+   unit_cell.atom[26].nm  = false;
 	//-----------------------------
 	unit_cell.atom[27].x   = 0.625;
 	unit_cell.atom[27].y   = 0.375;
@@ -302,7 +302,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[27].lc  = 27;
 	unit_cell.atom[27].hc  = 7;
 	unit_cell.atom[27].ni  = 12;
-   unit_cell.atom[27].nm  = true;
+   unit_cell.atom[27].nm  = false;
 	//-----------------------------
 	unit_cell.atom[28].x   = 0.875;
 	unit_cell.atom[28].y   = 0.375;
@@ -311,7 +311,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[28].lc  = 28;
 	unit_cell.atom[28].hc  = 1;
 	unit_cell.atom[28].ni  = 12;
-   unit_cell.atom[28].nm  = true;
+   unit_cell.atom[28].nm  = false;
 	//-----------------------------
 	unit_cell.atom[29].x   = 0.625;
 	unit_cell.atom[29].y   = 0.625;
@@ -320,7 +320,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[29].lc  = 29;
 	unit_cell.atom[29].hc  = 5;
 	unit_cell.atom[29].ni  = 12;
-   unit_cell.atom[29].nm  = true;
+   unit_cell.atom[29].nm  = false;
 	//-----------------------------
 	unit_cell.atom[30].x   = 0.375;
 	unit_cell.atom[30].y   = 0.125;
@@ -329,7 +329,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[30].lc  = 30;
 	unit_cell.atom[30].hc  = 7;
 	unit_cell.atom[30].ni  = 12;
-   unit_cell.atom[30].nm  = true;
+   unit_cell.atom[30].nm  = false;
 	//-----------------------------
 	unit_cell.atom[31].x   = 0.125;
 	unit_cell.atom[31].y   = 0.875;
@@ -338,7 +338,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[31].lc  = 31;
 	unit_cell.atom[31].hc  = 3;
 	unit_cell.atom[31].ni  = 12;
-   unit_cell.atom[31].nm  = true;
+   unit_cell.atom[31].nm  = false;
 	//-----------------------------
 	unit_cell.atom[32].x   = 0.125;
 	unit_cell.atom[32].y   = 0.625;
@@ -347,7 +347,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[32].lc  = 32;
 	unit_cell.atom[32].hc  = 5;
 	unit_cell.atom[32].ni  = 12;
-   unit_cell.atom[32].nm  = true;
+   unit_cell.atom[32].nm  = false;
 	//-----------------------------
 	unit_cell.atom[33].x   = 0.375;
 	unit_cell.atom[33].y   = 0.375;
@@ -356,7 +356,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[33].lc  = 33;
 	unit_cell.atom[33].hc  = 1;
 	unit_cell.atom[33].ni  = 12;
-   unit_cell.atom[33].nm  = true;
+   unit_cell.atom[33].nm  = false;
 	//-----------------------------
 	unit_cell.atom[34].x   = 0.875;
 	unit_cell.atom[34].y   = 0.125;
@@ -365,7 +365,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[34].lc  = 34;
 	unit_cell.atom[34].hc  = 7;
 	unit_cell.atom[34].ni  = 12;
-   unit_cell.atom[34].nm  = true;
+   unit_cell.atom[34].nm  = false;
 	//-----------------------------
 	unit_cell.atom[35].x   = 0.625;
 	unit_cell.atom[35].y   = 0.875;
@@ -374,7 +374,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[35].lc  = 35;
 	unit_cell.atom[35].hc  = 3;
 	unit_cell.atom[35].ni  = 12;
-   unit_cell.atom[35].nm  = true;
+   unit_cell.atom[35].nm  = false;
 	//-----------------------------
 	unit_cell.atom[36].x   = 0.875;
 	unit_cell.atom[36].y   = 0.875;
@@ -383,7 +383,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[36].lc  = 36;
 	unit_cell.atom[36].hc  = 5;
 	unit_cell.atom[36].ni  = 12;
-   unit_cell.atom[36].nm  = true;
+   unit_cell.atom[36].nm  = false;
 	//-----------------------------
 	unit_cell.atom[37].x   = 0.625;
 	unit_cell.atom[37].y   = 0.125;
@@ -392,7 +392,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[37].lc  = 37;
 	unit_cell.atom[37].hc  = 1;
 	unit_cell.atom[37].ni  = 12;
-   unit_cell.atom[37].nm  = true;
+   unit_cell.atom[37].nm  = false;
 	//-----------------------------
 	unit_cell.atom[38].x   = 0.375;
 	unit_cell.atom[38].y   = 0.625;
@@ -401,7 +401,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[38].lc  = 38;
 	unit_cell.atom[38].hc  = 3;
 	unit_cell.atom[38].ni  = 12;
-   unit_cell.atom[38].nm  = true;
+   unit_cell.atom[38].nm  = false;
 	//-----------------------------
 	unit_cell.atom[39].x   = 0.125;
 	unit_cell.atom[39].y   = 0.375;
@@ -410,7 +410,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[39].lc  = 39;
 	unit_cell.atom[39].hc  = 7;
 	unit_cell.atom[39].ni  = 12;
-   unit_cell.atom[39].nm  = true;
+   unit_cell.atom[39].nm  = false;
 	//-----------------------------
 	unit_cell.atom[40].x   = 0.625;
 	unit_cell.atom[40].y   = 0.125;
@@ -419,7 +419,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[40].lc  = 40;
 	unit_cell.atom[40].hc  = 5;
 	unit_cell.atom[40].ni  = 12;
-   unit_cell.atom[40].nm  = true;
+   unit_cell.atom[40].nm  = false;
 	//-----------------------------
 	unit_cell.atom[41].x   = 0.875;
 	unit_cell.atom[41].y   = 0.875;
@@ -428,7 +428,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[41].lc  = 41;
 	unit_cell.atom[41].hc  = 1;
 	unit_cell.atom[41].ni  = 12;
-   unit_cell.atom[41].nm  = true;
+   unit_cell.atom[41].nm  = false;
 	//-----------------------------
 	unit_cell.atom[42].x   = 0.375;
 	unit_cell.atom[42].y   = 0.625;
@@ -437,7 +437,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[42].lc  = 42;
 	unit_cell.atom[42].hc  = 7;
 	unit_cell.atom[42].ni  = 12;
-   unit_cell.atom[42].nm  = true;
+   unit_cell.atom[42].nm  = false;
 	//-----------------------------
 	unit_cell.atom[43].x   = 0.125;
 	unit_cell.atom[43].y   = 0.375;
@@ -446,7 +446,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[43].lc  = 43;
 	unit_cell.atom[43].hc  = 3;
 	unit_cell.atom[43].ni  = 12;
-   unit_cell.atom[43].nm  = true;
+   unit_cell.atom[43].nm  = false;
 	//-----------------------------
 	unit_cell.atom[44].x   = 0.375;
 	unit_cell.atom[44].y   = 0.375;
@@ -455,7 +455,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[44].lc  = 44;
 	unit_cell.atom[44].hc  = 5;
 	unit_cell.atom[44].ni  = 12;
-   unit_cell.atom[44].nm  = true;
+   unit_cell.atom[44].nm  = false;
 	//-----------------------------
 	unit_cell.atom[45].x   = 0.125;
 	unit_cell.atom[45].y   = 0.625;
@@ -464,7 +464,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[45].lc  = 45;
 	unit_cell.atom[45].hc  = 1;
 	unit_cell.atom[45].ni  = 12;
-   unit_cell.atom[45].nm  = true;
+   unit_cell.atom[45].nm  = false;
 	//-----------------------------
 	unit_cell.atom[46].x   = 0.875;
 	unit_cell.atom[46].y   = 0.125;
@@ -473,7 +473,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[46].lc  = 46;
 	unit_cell.atom[46].hc  = 3;
 	unit_cell.atom[46].ni  = 12;
-   unit_cell.atom[46].nm  = true;
+   unit_cell.atom[46].nm  = false;
 	//-----------------------------
 	unit_cell.atom[47].x   = 0.625;
 	unit_cell.atom[47].y   = 0.875;
@@ -482,7 +482,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[47].lc  = 47;
 	unit_cell.atom[47].hc  = 7;
 	unit_cell.atom[47].ni  = 12;
-   unit_cell.atom[47].nm  = true;
+   unit_cell.atom[47].nm  = false;
 	//-----------------------------
 	unit_cell.atom[48].x   = 0.625;
 	unit_cell.atom[48].y   = 0.625;
@@ -491,7 +491,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[48].lc  = 48;
 	unit_cell.atom[48].hc  = 1;
 	unit_cell.atom[48].ni  = 12;
-   unit_cell.atom[48].nm  = true;
+   unit_cell.atom[48].nm  = false;
 	//-----------------------------
 	unit_cell.atom[49].x   = 0.875;
 	unit_cell.atom[49].y   = 0.375;
@@ -500,7 +500,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[49].lc  = 49;
 	unit_cell.atom[49].hc  = 5;
 	unit_cell.atom[49].ni  = 12;
-   unit_cell.atom[49].nm  = true;
+   unit_cell.atom[49].nm  = false;
 	//-----------------------------
 	unit_cell.atom[50].x   = 0.375;
 	unit_cell.atom[50].y   = 0.125;
@@ -509,7 +509,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[50].lc  = 50;
 	unit_cell.atom[50].hc  = 3;
 	unit_cell.atom[50].ni  = 12;
-   unit_cell.atom[50].nm  = true;
+   unit_cell.atom[50].nm  = false;
 	//-----------------------------
 	unit_cell.atom[51].x   = 0.125;
 	unit_cell.atom[51].y   = 0.875;
@@ -518,7 +518,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[51].lc  = 51;
 	unit_cell.atom[51].hc  = 7;
 	unit_cell.atom[51].ni  = 12;
-   unit_cell.atom[51].nm  = true;
+   unit_cell.atom[51].nm  = false;
 	//-----------------------------
 	unit_cell.atom[52].x   = 0.375;
 	unit_cell.atom[52].y   = 0.875;
@@ -527,7 +527,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[52].lc  = 52;
 	unit_cell.atom[52].hc  = 1;
 	unit_cell.atom[52].ni  = 12;
-   unit_cell.atom[52].nm  = true;
+   unit_cell.atom[52].nm  = false;
 	//-----------------------------
 	unit_cell.atom[53].x   = 0.125;
 	unit_cell.atom[53].y   = 0.125;
@@ -536,7 +536,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[53].lc  = 53;
 	unit_cell.atom[53].hc  = 5;
 	unit_cell.atom[53].ni  = 12;
-   unit_cell.atom[53].nm  = true;
+   unit_cell.atom[53].nm  = false;
 	//-----------------------------
 	unit_cell.atom[54].x   = 0.875;
 	unit_cell.atom[54].y   = 0.625;
@@ -545,7 +545,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[54].lc  = 54;
 	unit_cell.atom[54].hc  = 7;
 	unit_cell.atom[54].ni  = 12;
-   unit_cell.atom[54].nm  = true;
+   unit_cell.atom[54].nm  = false;
 	//-----------------------------
 	unit_cell.atom[55].x   = 0.625;
 	unit_cell.atom[55].y   = 0.375;
@@ -554,7 +554,7 @@ void build_spinel(unitcell::unit_cell_t& unit_cell){
 	unit_cell.atom[55].lc  = 55;
 	unit_cell.atom[55].hc  = 3;
 	unit_cell.atom[55].ni  = 12;
-   unit_cell.atom[55].nm  = true;
+   unit_cell.atom[55].nm  = false;
 
    unit_cell.cutoff_radius = 0.434; // normalised to unit cell size
 
