@@ -25,6 +25,7 @@ honeycomb-a.o \
 kagome.o \
 rocksalt.o \
 spinel.o \
+spinel-layered.o \
 NdFeB.o\
 SmFeN.o\
 verify.o
