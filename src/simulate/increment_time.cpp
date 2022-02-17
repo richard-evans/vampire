@@ -37,7 +37,7 @@ void increment_time(){
    sim::checkpoint_loaded_flag=false;
 
 	sim::time++;
-	sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
+	// sim::head_position[0]+=sim::head_speed*mp::dt_SI*1.0e10;
 
    // Update dipole fields
    dipole::calculate_field(sim::time, atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::magnetic);

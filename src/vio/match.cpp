@@ -23,6 +23,7 @@
 #include "errors.hpp"
 #include "exchange.hpp"
 #include "environment.hpp"
+#include "hamr.hpp"
 #include "material.hpp"
 #include "gpu.hpp"
 #include "grains.hpp"
@@ -88,6 +89,7 @@ namespace vin{
         else if(vio::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(micromagnetic::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(environment::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(hamr::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         //===================================================================
         // Test for create variables
         //===================================================================

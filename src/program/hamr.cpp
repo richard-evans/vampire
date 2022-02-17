@@ -36,7 +36,7 @@
 /// @date    10/06/2011
 /// @internal
 ///	Created:		10/06/2011
-///	Revision:	--
+///	Revision:	Andrea Meo, Feb 2022
 ///=====================================================================================
 ///
 
@@ -46,6 +46,7 @@
 // Vampire Header files
 #include "atoms.hpp"
 #include "errors.hpp"
+#include "hamr.hpp"
 #include "material.hpp"
 #include "program.hpp"
 #include "random.hpp"
@@ -72,54 +73,51 @@ namespace program{
 ///
 /// @internal
 ///	Created:		10/06/2011
-///	Revision:	--
+///	Revision:	Andrea Meo, 2022
 ///=====================================================================================
 ///
-void hamr(){
+	void hamr(){
 
-	// check calling of routine if error checking is activated
-	if(err::check==true){std::cout << "program::hamr has been called" << std::endl;}
+		// check calling of routine if error checking is activated
+		if(err::check==true){std::cout << "program::hamr has been called" << std::endl;}
 
-		// Set equilibration temperature and field
-		sim::temperature=sim::Teq;
+			// Set equilibration temperature and field
+			sim::temperature=sim::Teq;
 		
-		// Disable laser
-		sim::head_laser_on=false;
+			// Disable laser
+			hamr::head_laser_on=false;
 
-		// Equilibrate system
-		while(sim::time<sim::equilibration_time){
+			// Equilibrate system
+			while(sim::time<sim::equilibration_time){
 			
-			sim::integrate(sim::partial_time);
+				sim::integrate(sim::partial_time);
 			
+				// Calculate magnetisation statistics
+				stats::mag_m();
+			
+				// Output data
+				vout::data();
+			}
+
+			// now enable laser
+			hamr::head_laser_on=true;
+			// Perform harm continuous simulation
+			hamr::hamr_continuous();
+
+			//-------------------------------------------------------------------------//
+			// force outputting at end of simulation after laser has been switched off
+			//-------------------------------------------------------------------------//
+			// Disable laser
+			hamr::head_laser_on=false;
+			std::cout << ">>>> Disabling laser and integrating system for 1 time-step" << std::endl;
+			// Integrate
+			sim::integrate(1);
 			// Calculate magnetisation statistics
 			stats::mag_m();
-			
 			// Output data
 			vout::data();
-		}
+			std::cout << ">>>> Outputting system at the end of HAMR simulations\n" << std::endl;
 
-		// now enable laser
-		sim::head_position[0]=0.0;
-		sim::head_position[1]=cs::system_dimensions[1]*0.5; // A
-		sim::head_speed=30.0; // nm/ns
-		sim::head_laser_on=true;
-		
-		int start_time=sim::time;
-		
-		// Perform HAMR
-		while(sim::time<sim::total_time+start_time){
-			
-			// Integrate system
-			sim::integrate(sim::partial_time);
-			
-			// Calculate magnetisation statistics
-			stats::mag_m();
-
-			// Output data
-			vout::data();
-
-		}
-	
-} // end of hamr()
+	} // end of hamr()
 
 }//end of namespace program

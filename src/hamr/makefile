@@ -1,0 +1,18 @@
+#------------------------------------------------------------------
+#          Makefile for hamr module
+#--------------------------------------------------------------
+
+# List module object filenames
+hamr_objects =\
+data.o \
+fields.o \
+field_profiles.o \
+hamr_continuous.o \
+initialize.o \
+interface.o \
+temp_profiles.o
+
+
+
+# Append module objects to global tree
+OBJECTS+=$(addprefix obj/hamr/,$(hamr_objects))
