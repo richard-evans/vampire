@@ -32,12 +32,13 @@ namespace hamr{
                                        const double DeltaT 
                                        ){
 
-			const double laser_sigma_x = hamr::internal::fwhm_x / sqrt(8.0*log(2.0));
-			const double laser_sigma_y = hamr::internal::fwhm_y / sqrt(8.0*log(2.0));
-			const double laser_sigma_x2 = laser_sigma_x * laser_sigma_x;
-			const double laser_sigma_y2 = laser_sigma_y * laser_sigma_y;
-		   const double px = hamr::internal::head_position[0];
-		   const double py = hamr::internal::head_position[1];
+			// const double denominator = 1.0/ sqrt(8.0*log(2.0));
+			// const double laser_sigma_x = hamr::internal::fwhm_x * denominator;
+			// const double laser_sigma_y = hamr::internal::fwhm_y * denominator;
+			const double laser_sigma_x2 = hamr::internal::laser_sigma_x * hamr::internal::laser_sigma_x;
+			const double laser_sigma_y2 = hamr::internal::laser_sigma_y * hamr::internal::laser_sigma_y;
+			const double px = hamr::internal::head_position_x;
+			const double py = hamr::internal::head_position_y;
 			const double cx = hamr::internal::atom_coords_x[atom]; 
 			const double cy = hamr::internal::atom_coords_y[atom]; 
 			const double cx2 = (cx-px)*(cx-px);

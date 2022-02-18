@@ -143,7 +143,9 @@ void initialize_modules(){
    //----------------------------------------
 	hamr::initialize(sim::Hmin,
 				      sim::Hmax,
-				      cs::system_dimensions,
+				      cs::system_dimensions[0],
+				      cs::system_dimensions[1],
+				      cs::system_dimensions[2],
 				      atoms::x_coord_array,
 				      atoms::y_coord_array,
 				      atoms::z_coord_array,

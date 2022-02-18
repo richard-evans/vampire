@@ -22,7 +22,9 @@ namespace hamr{
    //-----------------------------------------------------------------------------
    void initialize(const double Hmin,
                    const double Hmax,
-                   const double system_dimensions[3],
+                   const double system_dimensions_x,
+                   const double system_dimensions_y,
+                   const double system_dimensions_z,
                    const std::vector<double>& atom_coords_x,
                    const std::vector<double>& atom_coords_y,
                    const std::vector<double>& atom_coords_z,

@@ -49,9 +49,9 @@ namespace hamr{
 		const double DeltaT = Tmax - Tmin;
 
 		// declare head-field variables hamr::internal::H_bounds_min[0]
-		const double H_osc_amplit=hamr::internal::H_osc_amplit; 
-		const double Hloc_parity_field=H_applied*(-1.0)*double(2*(int(hamr::internal::head_position[0]/H_osc_amplit)%2)-1);
-		//const double Hloc_parity_field=H_applied;
+		// const double H_osc_amplit=hamr::internal::H_osc_amplit; 
+		// const double Hloc_parity_field=H_applied*(-1.0)*double(2*(int(hamr::internal::head_position_x/H_osc_amplit)%2)-1);
+		const double Hloc_parity_field=H_applied;
 
 		// Add localised thermal field
 		generate (x_total_external_field_array.begin()+start_index,x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
