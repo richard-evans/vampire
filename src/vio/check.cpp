@@ -455,4 +455,41 @@ namespace vin{
 
     }
 
+
+    ///
+    /// Function to check for vector with valid values for bit sequence:
+	 /// only -1, 0, 1 values are accepted
+    ///-------------------------------------------------------------------------
+    ///
+	void check_for_valid_bitsequence(std::vector<int>& u, /// vector of integers
+                                std::string word, /// input file keyword
+                                int line, /// input file line
+                                std::string prefix, /// input file prefix
+                                int range_min, /// acceptable minimum value for variable
+                                int range_max, /// acceptable maximum value for variable
+                                std::string input_file_type, ///input file name
+                                std::string range_text) /// customised text
+   {
+
+      for(int idx=0; idx<u.size(); ++idx){
+
+         int value = u.at(idx);
+         int minvalue = range_min;
+         int maxvalue = range_max;
+
+         // Check for valid range
+         if((value<minvalue) || (value>maxvalue)){
+            terminaltextcolor(RED);
+            std::cerr << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+            terminaltextcolor(WHITE);
+            zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+            err::vexit();
+         }
+         // save value back to array
+         u.at(idx) = value;
+      }
+      // Success - input is sane!
+      return;
+   }
+
 }
