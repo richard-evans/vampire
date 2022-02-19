@@ -47,8 +47,8 @@ namespace hamr{
 		const uint64_t bit_time   = int((BL/speed)/mp::dt_SI);
 		const uint64_t extra_time = 0; //int(((BL*0.5)/speed)/mp::dt_SI);  // time to sweeping across half of bit size necessary to cover initial distance of head from track
 		const uint64_t NPS_time   = int((NPS/speed)/mp::dt_SI); // time to cover extra sweeping due to NPS
-		const uint64_t track_time = n_bits_per_tack*bit_time + extra_time*2 + NPS_time; 
-		const uint64_t total_time =  n_bits * bit_time + extra_time*2 + NPS_time;
+		const uint64_t track_time = n_bits_per_tack*bit_time + extra_time*2; 
+		const uint64_t total_time =  n_bits * bit_time + extra_time*2;
 		const uint64_t ramp_time = int(hamr::internal::H_ramp_time/mp::dt_SI);
 		// Initial head position
 		hamr::internal::head_position_x = head_position_initial;	
@@ -71,7 +71,7 @@ namespace hamr{
 			uint64_t tmp_time = 0;
 
 			hamr::internal::head_position_x = head_position_initial;	
-			hamr::internal::head_position_y = 0.5*hamr::internal::system_dimensions_y + track*TW;
+			hamr::internal::head_position_y = TW*(0.5 + track);
 			zlog << zTs() << "New head position:" << hamr::internal::head_position_x*0.1 << ", " << hamr::internal::head_position_y*0.1 << " nm" << std::endl;
 
 			track = int(bit_tot/n_bits_per_tack);
@@ -80,7 +80,7 @@ namespace hamr{
 				// track = int(bit_tot/n_bits_per_tack);
 				// bit = bit_tot - track*n_bits_per_tack;
 				hamr::internal::head_position_x = head_position_initial + (speed/**1e-10*/) * tmp_time * mp::dt_SI + BL*bit;
-				hamr::internal::head_position_y = 0.5*hamr::internal::system_dimensions_y + track*TW;
+				hamr::internal::head_position_y = TW*(0.5 + track);
 				int H_app_dir = hamr::internal::bit_sequence[bit_tot];
 
 				// Update applied field value depending on trapezoidal time profile
