@@ -61,6 +61,7 @@ namespace hamr{
 		if(hamr::head_laser_on){
 			for(int atom=start_index;atom<end_index;atom++){
 				const int imaterial=hamr::internal::atom_type_array[atom];
+				// Get local temperature filed from application of heat profile
 				const double sqrt_T = hamr::internal::calculate_gaussian_profile(atom, Tmin, DeltaT);
 				const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
 				hamr::internal::x_field_array[atom] *= H_th_sigma;
