@@ -1,35 +1,51 @@
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
-//  Vampire - A code for atomistic simulation of magnetic materials
+//   This file is part of the VAMPIRE open source package under the
+//   Free BSD licence (see licence file for details).
 //
-//  Copyright (C) 2009-2012 R.F.L.Evans
+//   (c) Richard F L Evans 2022. All rights reserved.
 //
-//  Email:richard.evans@york.ac.uk
+//   Email: richard.evans@york.ac.uk
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful, but
-//  WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-//
-// ----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 #ifndef PROGRAM_H_
 #define PROGRAM_H_
+
+// C++ standard library headers
+#include <string>
+
+// Vampire headers
+#include "program.hpp"
 
 //==========================================================
 // Namespace program
 //==========================================================
 namespace program
 {
+
+	//---------------------------------------------------------------------------
+	// Externally visible variables
+	//---------------------------------------------------------------------------
+	extern int program; // program type to be run in vampire
+
+	extern double fractional_electric_field_strength; // factor controlling strength of stt/sot and voltage
+
+	//---------------------------------------------------------------------------
+	// Function to initialise program module
+	//---------------------------------------------------------------------------
+	void initialize();
+
+	//---------------------------------------------------------------------------
+	// Function to process input file parameters for program module
+	//---------------------------------------------------------------------------
+	bool match_input_parameter(std::string const key, std::string const word, std::string const value, std::string const unit, int const line);
+
+	//---------------------------------------------------------------------------
+	// Function to process material parameters
+	//---------------------------------------------------------------------------
+	bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index);
+
 	// program functions
 	extern int bmark();
 	extern void time_series();
@@ -54,6 +70,7 @@ namespace program
    extern void domain_wall();
    extern void mm_A_calculation();
    extern void exchange_stiffness();
+	extern void electrical_pulse();
 
 	// Sundry programs and diagnostics not under general release
 	extern int LLB_Boltzmann();

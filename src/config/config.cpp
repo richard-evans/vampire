@@ -16,6 +16,7 @@
 #include "atoms.hpp"
 #include "config.hpp"
 #include "gpu.hpp"
+#include "program.hpp"
 #include "sim.hpp"
 
 // config module headers
@@ -79,7 +80,7 @@ void output(){ // should include variables for data to be outputted, eg spins, c
       gpu::config::synchronise();
 
       // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
-      if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
+      if ((program::program != 2) && (program::program != 3) && (program::program != 12))
       {
 
          //Always output coordinates the first time (re-)started, otherwise the spins coordinates won't be printed
@@ -92,7 +93,7 @@ void output(){ // should include variables for data to be outputted, eg spins, c
 
       }
       // for hysteresis programs
-      else if ((sim::program == 2) || (sim::program ==3) || (sim::program ==12))
+      else if ((program::program == 2) || (program::program ==3) || (program::program ==12))
       {
          // output config only in range [minField_1;maxField_1] for descending branch
          if (sim::parity < 0)
@@ -140,13 +141,13 @@ void output(){ // should include variables for data to be outputted, eg spins, c
    if ((config::internal::output_cells_config == true) && (config::internal::output_cells_config_continuous == true)  && (sim::output_rate_counter % config::internal::output_cells_config_rate == 0))
    {
       // for all programs except hysteresis(=2), static-hysteresis(=3) and partial-hysteresis(=12)
-      if ((sim::program != 2) && (sim::program != 3) && (sim::program != 12))
+      if ((program::program != 2) && (program::program != 3) && (program::program != 12))
       {
          if (sim::output_cells_file_counter == 0) config::internal::legacy_cells_coords();
          config::internal::legacy_cells();
       }
       // for hysteresis programs
-      else if ((sim::program == 2) || (sim::program ==3) || (sim::program ==12))
+      else if ((program::program == 2) || (program::program ==3) || (program::program ==12))
       {
          // output config only in range [minField_1;maxField_1] for decreasing field
          if (sim::parity < 0)

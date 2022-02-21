@@ -34,6 +34,7 @@
 #include "voronoi.hpp"
 #include "ltmp.hpp"
 #include "montecarlo.hpp"
+#include "program.hpp"
 #include "random.hpp"
 #include "spintorque.hpp"
 #include "spintransport.hpp"
@@ -81,6 +82,7 @@ namespace vin{
         else if(gpu::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(exchange::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(montecarlo::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
+        else if(program::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(sim::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(st::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
         else if(spin_transport::match_input_parameter(key, word, value, unit, line)) return EXIT_SUCCESS;
@@ -329,160 +331,9 @@ namespace vin{
         //-------------------------------------------------------------------
         // System simulation variables
         //-------------------------------------------------------------------
+
         //-------------------------------------------------------------------
-        std::string test="program";
-        if(word==test){
-            test="benchmark";
-            if(value==test){
-                sim::program=0;
-                return EXIT_SUCCESS;
-            }
-            test="time-series";
-            if(value==test){
-                sim::program=1;
-                return EXIT_SUCCESS;
-            }
-            test="hysteresis-loop";
-            if(value==test){
-                sim::program=2;
-                return EXIT_SUCCESS;
-            }
-            test="static-hysteresis-loop";
-            if(value==test){
-                sim::program=3;
-                return EXIT_SUCCESS;
-            }
-            test="curie-temperature";
-            if(value==test){
-                sim::program=4;
-                return EXIT_SUCCESS;
-            }
-            test="field-cool";
-            if(value==test){
-                sim::program=5;
-                return EXIT_SUCCESS;
-            }
-            test="localised-field-cool";
-            if(value==test){
-                sim::program=16;
-                return EXIT_SUCCESS;
-            }
-            test="laser-pulse";
-            if(value==test){
-                sim::program=6;
-                return EXIT_SUCCESS;
-            }
-            test="hamr-simulation";
-            if(value==test){
-                sim::program=7;
-                return EXIT_SUCCESS;
-            }
-            test="cmc-anisotropy";
-            if(value==test){
-                sim::program=8;
-                return EXIT_SUCCESS;
-            }
-            test="hybrid-cmc";
-            if(value==test){
-                sim::program=9;
-                return EXIT_SUCCESS;
-            }
-            test="reverse-hybrid-cmc";
-            if(value==test){
-                sim::program=10;
-                return EXIT_SUCCESS;
-            }
-            test="LaGrange-Multiplier";
-            if(value==test){
-                sim::program=11;
-                return EXIT_SUCCESS;
-            }
-            test="partial-hysteresis-loop";
-            if(value==test){
-                sim::program=12;
-                return EXIT_SUCCESS;
-            }
-            test="localised-temperature-pulse";
-            if(value==test){
-                sim::program=13;
-                return EXIT_SUCCESS;
-            }
-            test="effective-damping";
-            if(value==test){
-                sim::program=14;
-                return EXIT_SUCCESS;
-            }
-            test="fmr";
-            if(value==test){
-                sim::program=15;
-                return EXIT_SUCCESS;
-            }
-            test="diagnostic-boltzmann";
-            if(value==test){
-                sim::program=50;
-                return EXIT_SUCCESS;
-            }
-            test="setting";
-            if(value==test){
-                sim::program=51;
-                return EXIT_SUCCESS;
-            }
-            test="domain-wall";
-            if(value==test){
-                sim::program=52;
-                return EXIT_SUCCESS;
-            }
-            test="exchange-stiffness";
-            if(value==test){
-                sim::program=53;
-                return EXIT_SUCCESS;
-            }
-            test="mm-A-calculation";
-            if(value==test){
-                sim::program=54;
-                return EXIT_SUCCESS;
-            }
-            test="field-sweep";
-            if(value==test){
-                sim::program=70;
-                return EXIT_SUCCESS;
-            }
-            test="disk-tracks";
-            if(value==test){
-               sim::program=72;
-               return EXIT_SUCCESS;
-            }
-            test="diagnostic-boltzmann-micromagnetic-llg";
-            if(value==test){
-                sim::program=73;
-                return EXIT_SUCCESS;
-            }
-            else{
-            terminaltextcolor(RED);
-                        std::cout << word << '\t' << test << std::endl;
-                std::cerr << "Error - value for \'sim:" << word << "\' must be one of:" << std::endl;
-                std::cerr << "\t\"benchmark\"" << std::endl;
-                std::cerr << "\t\"cmc-anisotropy\"" << std::endl;
-                std::cerr << "\t\"curie-temperature\"" << std::endl;
-                std::cerr << "\t\"domain-wall\"" << std::endl;
-                std::cerr << "\t\"effective-damping\"" << std::endl;
-                std::cerr << "\t\"exchange-stiffness\"" << std::endl;
-                std::cerr << "\t\"field-cool\"" << std::endl;
-                std::cerr << "\t\"laser-pulse\"" << std::endl;
-                std::cerr << "\t\"localised-field-cool\"" << std::endl;
-                std::cerr << "\t\"localised-temperature-pulse\"" << std::endl;
-                std::cerr << "\t\"time-series\"" << std::endl;
-                std::cerr << "\t\"hysteresis-loop\"" << std::endl;
-                std::cerr << "\t\"partial-hysteresis-loop\"" << std::endl;
-                std::cerr << "\t\"hybrid-cmc\"" << std::endl;
-                std::cerr << "\t\"reverse-hybrid-cmc\"" << std::endl;
-                std::cerr << "\t\"static-hysteresis-loop\"" << std::endl;
-            terminaltextcolor(WHITE);
-            err::vexit();
-            }
-        }
-        //-------------------------------------------------------------------
-        test="enable-fmr-field";
+        std::string test="enable-fmr-field";
         if(word==test){
             sim::hamiltonian_simulation_flags[5]=1;
             return EXIT_SUCCESS;
