@@ -281,6 +281,8 @@ namespace vout{
 			case 71:
 				vout::z_track_pos(stream,header);
 				break;
+			case 72:
+			   vout::fractional_electric_field_strength(stream, header);
 			case 999: //AJN
 				vout::standard_deviation(stream,header);
 				break;

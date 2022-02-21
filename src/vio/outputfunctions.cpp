@@ -19,6 +19,7 @@
 #include "grains.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
+#include "program.hpp"
 #include "stats.hpp"
 #include "sim.hpp"
 #include "micromagnetic.hpp"
@@ -538,4 +539,10 @@ namespace vout{
          stream << sim::track_pos_z << "\t";
       }
    }
+
+   // Output Function 72
+   void fractional_electric_field_strength(std::ostream& stream, bool header){
+      stream << generic_output_double("frac_voltage", program::fractional_electric_field_strength, header);
+   }
+
 }

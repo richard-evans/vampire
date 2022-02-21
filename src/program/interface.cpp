@@ -195,7 +195,7 @@ namespace program{
       if(word == test){
          double pt = atof(value.c_str()); // convert string to uint64_t
          // Test for valid range
-         vin::check_for_valid_value(pt, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
+         vin::check_for_valid_positive_value(pt, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
          // save sanitized value
          program::internal::electrical_pulse_time = pt;
          return true;
@@ -205,7 +205,7 @@ namespace program{
       if(word == test){
          double rt = atof(value.c_str()); // convert string to uint64_t
          // Test for valid range
-         vin::check_for_valid_value(rt, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
+         vin::check_for_valid_positive_value(rt, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
          // save sanitized value
          program::internal::electrical_pulse_rise_time = rt;
          return true;
@@ -215,7 +215,7 @@ namespace program{
       if(word == test){
          double ft = atof(value.c_str()); // convert string to uint64_t
          // Test for valid range
-         vin::check_for_valid_value(ft, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
+         vin::check_for_valid_positive_value(ft, word, line, prefix, unit, "time", 0.0, 1.0,"input","0.0 - 1s");
          // save sanitized value
          program::internal::electrical_pulse_fall_time = ft;
          return true;

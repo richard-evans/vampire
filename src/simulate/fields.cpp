@@ -556,7 +556,7 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double stpj = stt_pj[material];
 
 		const double stt_lambda = stt_asm[material];
-		const double factor = 1.0 / (1.0 + stt_lambda*(sx*stpx + sy*stpy + sz*stpz) );
+		const double factor = program::fractional_electric_field_strength / (1.0 + stt_lambda*(sx*stpx + sy*stpy + sz*stpz) );
 
 		// calculate field
 		hx += factor * ( (strj-alpha*stpj)*(sy*stpz - sz*stpy) + (stpj+alpha*strj)*stpx );
@@ -576,7 +576,7 @@ void calculate_full_spin_fields(const int start_index,const int end_index){
 		const double sotpj = sot_pj[material];
 
 		const double sot_lambda = sot_asm[material];
-		const double sot_factor = 1.0 / (1.0 + sot_lambda*(sx*sotpx + sy*sotpy + sz*sotpz) );
+		const double sot_factor = program::fractional_electric_field_strength / (1.0 + sot_lambda*(sx*sotpx + sy*sotpy + sz*sotpz) );
 
 		// calculate field
 		hx += sot_factor * ( (sotrj-alpha*sotpj)*(sy*sotpz - sz*sotpy) + (sotpj+alpha*sotrj)*sotpx );
