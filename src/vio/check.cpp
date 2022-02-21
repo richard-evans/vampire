@@ -69,9 +69,9 @@ namespace vin{
         // Check for valid range
         if((fabs(value)<range_min) || (fabs(value)>range_max)){
             terminaltextcolor(RED);
-            std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+            std::cerr << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
             terminaltextcolor(WHITE);
-            zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+            zlog << zTs() << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
             err::vexit();
         }
 
@@ -102,9 +102,9 @@ namespace vin{
       // check for positive value
       if(value < 0.0){
           terminaltextcolor(RED);
-          std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be a positive constant " << range_text << "." << std::endl;
+          std::cerr << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be a positive constant " << range_text << "." << std::endl;
           terminaltextcolor(WHITE);
-          zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be a positive constant " << range_text << "." << std::endl;
+          zlog << zTs() << "Error: " << prefix << ":"<< word << " on line " << line << " of " << input_file_type << " file must be a positive constant " << range_text << "." << std::endl;
           err::vexit();
       }
 
@@ -129,9 +129,9 @@ namespace vin{
         // Check for valid range
         if((value<range_min) || (value>range_max)){
         terminaltextcolor(RED);
-            std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+            std::cerr << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
             terminaltextcolor(WHITE);
-        zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+        zlog << zTs() << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
             err::vexit();
         }
 
@@ -157,9 +157,9 @@ namespace vin{
         // Check for valid range
         if((value<range_min) || (value>range_max)){
         terminaltextcolor(RED);
-            std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+            std::cerr << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
             terminaltextcolor(WHITE);
-        zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+        zlog << zTs() << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
             err::vexit();
         }
 
@@ -222,9 +222,9 @@ namespace vin{
 
         // Invalid input - print error and exit
         terminaltextcolor(RED);
-        std::cerr << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
+        std::cerr << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
         terminaltextcolor(WHITE);
-        zlog << zTs() << "Error: " << prefix << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
+        zlog << zTs() << "Error: " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be true or false." << std::endl;
         err::vexit();
 
         return false;
@@ -244,9 +244,9 @@ namespace vin{
         // check size
         if(u.size()!=3){
         terminaltextcolor(RED);
-            std::cerr << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+            std::cerr << "Error: unit-vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
             terminaltextcolor(WHITE);
-        zlog << zTs() << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+        zlog << zTs() << "Error: unit-vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
             err::vexit();
         }
 
@@ -256,9 +256,9 @@ namespace vin{
         // Check for correct length unit vector
         if(ULength < 1.0e-9){
         terminaltextcolor(RED);
-            std::cerr << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
+            std::cerr << "Error: unit-vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
             terminaltextcolor(WHITE);
-        zlog << zTs() << "Error: unit-vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
+        zlog << zTs() << "Error: unit-vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be normalisable (possibly all zero)." << std::endl;
             err::vexit();
         }
         u.at(0)/=ULength;
@@ -284,31 +284,31 @@ namespace vin{
        // check size
        if(u.size()!=3){
     	  terminaltextcolor(RED);
-          std::cerr << "Error: vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+          std::cerr << "Error: vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
           terminaltextcolor(WHITE);
-    	  zlog << zTs() << "Error: vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
+    	  zlog << zTs() << "Error: vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must have three values." << std::endl;
           err::vexit();
        }
        // Check for valid range
        if(fabs(u.at(0)) >1.e10){
     	  terminaltextcolor(RED);
-          std::cerr << "Error: first element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+          std::cerr << "Error: first element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           terminaltextcolor(WHITE);
-    	  zlog << zTs() << "Error: first element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+    	  zlog << zTs() << "Error: first element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           err::vexit();
        }
        if(fabs(u.at(1)) >1.e10){
     	  terminaltextcolor(RED);
-          std::cerr << "Error: second element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+          std::cerr << "Error: second element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           terminaltextcolor(WHITE);
-    	  zlog << zTs() << "Error: second element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+    	  zlog << zTs() << "Error: second element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           err::vexit();
        }
        if(fabs(u.at(2)) >1.e10){
     	  terminaltextcolor(RED);
-          std::cerr << "Error: third element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+          std::cerr << "Error: third element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           terminaltextcolor(WHITE);
-    	  zlog << zTs() << "Error: third element of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
+    	  zlog << zTs() << "Error: third element of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be between +/- 1e10." << std::endl;
           err::vexit();
        }
 
@@ -439,9 +439,9 @@ namespace vin{
           // Check for valid range
           if((value<minvalue) || (value>maxvalue)){
              terminaltextcolor(RED);
-             std::cerr << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+             std::cerr << "Error: element " << idx+1 << " of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
              terminaltextcolor(WHITE);
-       	   zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
+       	   zlog << zTs() << "Error: element " << idx+1 << " of vector variable " << prefix << ":" << word << " on line " << line << " of " << input_file_type << " file must be in the range " << range_text << "." << std::endl;
              err::vexit();
           }
 
