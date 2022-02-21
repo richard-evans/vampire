@@ -52,6 +52,9 @@ namespace hamr{
       // Save value of local num atoms and resize field arrays
       //-------------------------------------------------------
       hamr::internal::num_local_atoms = num_local_atoms;
+      hamr::internal::x_field_array.resize(num_local_atoms, 0.0); // arrays to store atomic hamr fields
+      hamr::internal::y_field_array.resize(num_local_atoms, 0.0);
+      hamr::internal::z_field_array.resize(num_local_atoms, 0.0);
 
       hamr::internal::system_dimensions_x = system_dimensions_x;
       hamr::internal::system_dimensions_y = system_dimensions_y;

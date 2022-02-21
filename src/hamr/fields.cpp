@@ -54,18 +54,18 @@ namespace hamr{
 		const double Hloc_parity_field=H_applied;
 
 		// Add localised thermal field
-		generate (x_total_external_field_array.begin()+start_index,x_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-		generate (y_total_external_field_array.begin()+start_index,y_total_external_field_array.begin()+end_index, mtrandom::gaussian);
-		generate (z_total_external_field_array.begin()+start_index,z_total_external_field_array.begin()+end_index, mtrandom::gaussian);
+		generate (hamr::internal::x_field_array.begin()+start_index,hamr::internal::x_field_array.begin()+end_index, mtrandom::gaussian);
+		generate (hamr::internal::y_field_array.begin()+start_index,hamr::internal::y_field_array.begin()+end_index, mtrandom::gaussian);
+		generate (hamr::internal::z_field_array.begin()+start_index,hamr::internal::z_field_array.begin()+end_index, mtrandom::gaussian);
 
 		if(hamr::head_laser_on){
 			for(int atom=start_index;atom<end_index;atom++){
 				const int imaterial=hamr::internal::atom_type_array[atom];
 				const double sqrt_T = hamr::internal::calculate_gaussian_profile(atom, Tmin, DeltaT);
 				const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
-				x_total_external_field_array[atom] *= H_th_sigma; 
-				y_total_external_field_array[atom] *= H_th_sigma; 
-				z_total_external_field_array[atom] *= H_th_sigma; 
+				hamr::internal::x_field_array[atom] *= H_th_sigma;
+				hamr::internal::y_field_array[atom] *= H_th_sigma;
+				hamr::internal::z_field_array[atom] *= H_th_sigma;
 			}
 
 			// Add localised applied field
@@ -82,9 +82,9 @@ namespace hamr{
 			for(int atom=start_index;atom<end_index;atom++){
 				const int imaterial=hamr::internal::atom_type_array[atom];
 				const double H_th_sigma = sqrt_T*mp::material[imaterial].H_th_sigma;
-				x_total_external_field_array[atom] *= H_th_sigma; 
-				y_total_external_field_array[atom] *= H_th_sigma; 
-				z_total_external_field_array[atom] *= H_th_sigma; 
+				x_total_external_field_array[atom] = hamr::internal::x_field_array[atom] * H_th_sigma; 
+				y_total_external_field_array[atom] = hamr::internal::y_field_array[atom] * H_th_sigma; 
+				z_total_external_field_array[atom] = hamr::internal::z_field_array[atom] * H_th_sigma; 
 			}
 		} // end of global temperature and field
 

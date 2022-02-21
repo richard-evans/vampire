@@ -77,18 +77,15 @@ namespace hamr{
 				const double Hloc_min_y = hamr::internal::head_position_y - hamr::internal::H_bounds_y;
 				const double Hloc_max_y = hamr::internal::head_position_y + hamr::internal::H_bounds_y;
 
-				double Hx=0.0;
-				double Hy=0.0;
-				double Hz=0.0;
 				// If atoms within field box, apply external field
 				if((cx >= Hloc_min_x) && (cx <= Hloc_max_x) && (cy >= Hloc_min_y) && (cy <= Hloc_max_y)){
-					Hx = Hvecx*Hloc_parity_field;
-					Hy = Hvecy*Hloc_parity_field;
-					Hz = Hvecz*Hloc_parity_field;
+					hamr::internal::x_field_array[atom] = Hvecx*Hloc_parity_field;
+					hamr::internal::y_field_array[atom] = Hvecy*Hloc_parity_field;
+					hamr::internal::z_field_array[atom] = Hvecz*Hloc_parity_field;
 				}
-				x_total_external_field_array[atom] += Hx;
-				y_total_external_field_array[atom] += Hy;
-				z_total_external_field_array[atom] += Hz;
+				x_total_external_field_array[atom] += hamr::internal::x_field_array[atom];
+				y_total_external_field_array[atom] += hamr::internal::y_field_array[atom];
+				z_total_external_field_array[atom] += hamr::internal::z_field_array[atom];
 			}
 
 			return;
