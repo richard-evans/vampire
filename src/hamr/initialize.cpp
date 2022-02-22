@@ -12,6 +12,7 @@
 
 // Vampire headers
 #include "errors.hpp"
+// #include "gpu.hpp"
 #include "hamr.hpp"
 #include "vio.hpp"
 
@@ -39,6 +40,11 @@ namespace hamr{
                    const int num_local_atoms
                   ){
    
+		// If program:hamr-simulation not requested, then stop 
+      if(!hamr::run_program){
+         return;
+      }
+
       // output informative message
       zlog << zTs() << "Initialising data structures for hamr calculation." << std::endl;
 
@@ -67,15 +73,15 @@ namespace hamr{
       hamr::internal::Hmin = Hmin;
       hamr::internal::Hmax = Hmax;
 
-		// Calibrate head region to be not larger than system size
-		if(hamr::internal::H_bounds_x > hamr::internal::system_dimensions_x){ hamr::internal::H_bounds_x = hamr::internal::system_dimensions_x;}
-		if(hamr::internal::H_bounds_y > hamr::internal::system_dimensions_y){ hamr::internal::H_bounds_y = hamr::internal::system_dimensions_y;}
+      // Calibrate head region to be not larger than system size
+      if(hamr::internal::H_bounds_x > hamr::internal::system_dimensions_x){ hamr::internal::H_bounds_x = hamr::internal::system_dimensions_x;}
+      if(hamr::internal::H_bounds_y > hamr::internal::system_dimensions_y){ hamr::internal::H_bounds_y = hamr::internal::system_dimensions_y;}
 
       const double one_over_sqrt = 1.0/sqrt(8.0*log(2.0));
       hamr::internal::laser_sigma_x = hamr::internal::fwhm_x * one_over_sqrt;
       hamr::internal::laser_sigma_y = hamr::internal::fwhm_y * one_over_sqrt;
 
-		// Calculate max number of allowed tracks and bits-per-track in the system
+      // Calculate max number of allowed tracks and bits-per-track in the system
       hamr::internal::num_tracks = floor((hamr::internal::system_dimensions_y-1.0)/hamr::internal::track_size);
       hamr::internal::bits_per_tack = floor((hamr::internal::system_dimensions_x-1.0)/hamr::internal::bit_size);
 
@@ -83,11 +89,15 @@ namespace hamr{
       hamr::internal::create_singletone_vector();
 
       // Check that provided bit sequence is consistent with input data and system dimensions
-		hamr::internal::check_sequence_length();
-
+      hamr::internal::check_sequence_length();
 
       // Set initialised flag
       hamr::internal::initialised = true;
+
+      // // Initialise hamr on GPU if CUDA is active
+      // #ifdef CUDA
+      //    gpu::initialize_hamr();
+      // #endif
 
       return;
    }
