@@ -78,6 +78,7 @@ namespace vout{
    void material_constraint_phi(std::ostream& stream,bool header);
    void material_constraint_theta(std::ostream& stream,bool header);
    void material_mean_systorque(std::ostream& stream,bool header);
+   void material_torque(std::ostream& stream, bool header);
    void standard_deviation(std::ostream& stream,bool header);
    void mean_system_susceptibility(std::ostream& stream,bool header);
    void phonon_temperature(std::ostream& stream,bool header);

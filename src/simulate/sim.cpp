@@ -234,7 +234,13 @@ int run(){
    }
 
    // Precalculate initial statistics
-   stats::update(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::m_spin_array, atoms::type_array, sim::temperature);
+   stats::update(atoms::x_spin_array, 				  		atoms::y_spin_array, 				    atoms::z_spin_array,
+					  atoms::x_total_spin_field_array,     atoms::y_total_spin_field_array, 	 atoms::z_total_spin_field_array,
+					  atoms::x_total_external_field_array, atoms::y_total_external_field_array, atoms::z_total_external_field_array,
+					  atoms::m_spin_array, 					   atoms::type_array, 						 sim::temperature);
+
+	// resst statistical averages
+	stats::reset();
 
    // Initialize GPU acceleration if enabled
    if(gpu::acceleration) gpu::initialize();
@@ -242,7 +248,7 @@ int run(){
 	if (micromagnetic::discretisation_type > 0 || micromagnetic::internal::bias_magnets == true)
 	micromagnetic::initialize(cells::num_local_cells,
 									  cells::num_cells,
-									  stats::num_atoms,
+									  atoms::num_atoms,
 									  mp::num_materials,
 									  cells::atom_cell_id_array,
 									  atoms::neighbour_list_array,

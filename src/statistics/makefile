@@ -12,7 +12,8 @@ magnetization.o \
 specific_heat.o \
 standard_deviation.o\
 statistics.o \
-susceptibility.o
+susceptibility.o \
+torque.o
 
 # Append module objects to global tree
 OBJECTS+=$(addprefix obj/statistics/,$(statistics_objects))

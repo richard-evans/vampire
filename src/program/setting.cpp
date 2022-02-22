@@ -70,16 +70,16 @@ namespace program{
       std::vector <int> Largest_Sublattice(grains::num_grains,0);
       std::vector <int> Max_atoms(grains::num_grains,0);
 
-      #ifdef MPICF
-         stats::num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
-      #else
-         stats::num_atoms = atoms::num_atoms;
-      #endif
+      //#ifdef MPICF
+      //   atoms::num_atoms = vmpi::num_core_atoms+vmpi::num_bdry_atoms;
+      //#else
+      //   atoms::num_atoms = atoms::num_atoms;
+      //#endif
 
-      //std::cerr << "A" << stats::num_atoms << "\t" << grains::num_grains << std::endl;
+      //std::cerr << "A" << atoms::num_atoms << "\t" << grains::num_grains << std::endl;
 
       //Calculates how many atoms are in the top layer of each sublattice in each grain.
-      for (int atom = 0; atom < stats::num_atoms; atom++){
+      for (int atom = 0; atom < atoms::num_atoms; atom++){
 
          for (int neighbour = atoms::neighbour_list_start_index[atom]; neighbour < atoms::neighbour_list_end_index[atom]; neighbour ++){
             // explain what if statement is testing - yes Sarah...
@@ -164,7 +164,7 @@ namespace program{
       }
 
 
-      for (int i = 0; i <stats::num_atoms; i++){
+      for (int i = 0; i <atoms::num_atoms; i++){
          //	std::cout << atoms::type_array[i] << "\t" << atoms::z_spin_array[i] <<std::endl;
          if(atoms::type_array[i] > 3){
             atoms::x_spin_array[i] = sim::H_vec[0];

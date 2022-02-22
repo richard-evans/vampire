@@ -129,10 +129,10 @@ namespace vout{
       		vout::mdoth(stream,header);
       		break;
       	case 14:
-      		vout::systorque(stream,header);
+      		vout::systorque(stream, header);
       		break;
       	case 15:
-      		vout::mean_systorque(stream,header);
+      		vout::mean_systorque(stream, header);
       		break;
       	case 16:
       		vout::constraint_phi(stream,header);
@@ -147,7 +147,7 @@ namespace vout{
       		vout::material_constraint_theta(stream,header);
       		break;
       	case 20:
-      		vout::material_mean_systorque(stream,header);
+      		vout::material_mean_systorque(stream, header);
       		break;
       	case 21:
       		vout::mean_system_susceptibility(stream,header);
@@ -180,7 +180,7 @@ namespace vout{
       		vout::mean_total_anisotropy_energy(stream,header);
       		break;
       	case 31:
-      		//vout::total_cubic_anisotropy_energy(stream,header);
+      		vout::material_torque(stream, header);
       		break;
       	case 32:
       		//vout::mean_total_cubic_anisotropy_energy(stream,header);

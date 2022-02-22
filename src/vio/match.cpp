@@ -1109,7 +1109,7 @@ namespace vin{
         //--------------------------------------------------------------------
         test="total-torque";
         if(word==test){
-            stats::calculate_torque=true;
+            stats::calculate_system_torque = true;
             output_list.push_back(14);
             return EXIT_SUCCESS;
         }
@@ -1117,7 +1117,7 @@ namespace vin{
         //--------------------------------------------------------------------
         test="mean-total-torque";
         if(word==test){
-            stats::calculate_torque=true;
+            stats::calculate_system_torque = true;
             output_list.push_back(15);
             return EXIT_SUCCESS;
         }
@@ -1125,7 +1125,7 @@ namespace vin{
         //--------------------------------------------------------------------
         test="constraint-phi";
         if(word==test){
-            stats::calculate_torque=true;
+            //stats::calculate_torque=true;
             output_list.push_back(16);
             return EXIT_SUCCESS;
         }
@@ -1133,7 +1133,7 @@ namespace vin{
         //--------------------------------------------------------------------
         test="constraint-theta";
         if(word==test){
-            stats::calculate_torque=true;
+            //stats::calculate_torque=true;
             output_list.push_back(17);
             return EXIT_SUCCESS;
         }
@@ -1141,7 +1141,7 @@ namespace vin{
         //--------------------------------------------------------------------
         test="material-constraint-phi";
         if(word==test){
-            stats::calculate_torque=true;
+            //stats::calculate_torque=true;
             output_list.push_back(18);
             return EXIT_SUCCESS;
         }
@@ -1149,15 +1149,22 @@ namespace vin{
         //--------------------------------------------------------------------
         test="material-constraint-theta";
         if(word==test){
-            stats::calculate_torque=true;
+            //stats::calculate_torque=true;
             output_list.push_back(19);
             return EXIT_SUCCESS;
         }
         else
         //--------------------------------------------------------------------
+        test="material-torque";
+        if(word==test){
+            stats::calculate_material_torque = true;
+            output_list.push_back(31);
+            return EXIT_SUCCESS;
+        }
+        //--------------------------------------------------------------------
         test="material-mean-torque";
         if(word==test){
-            stats::calculate_torque=true;
+            stats::calculate_material_torque = true;
             output_list.push_back(20);
             return EXIT_SUCCESS;
         }
