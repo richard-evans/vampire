@@ -40,9 +40,12 @@ namespace stats
    //-------------------------------------------------
 
    // Control functions
-   void initialize(const int num_atoms, const int num_materials,
+   void initialize(const int num_atoms,
+                   const int num_materials,
+                   const int num_grains,
                    const std::vector<double>& magnetic_moment_array,
                    const std::vector<int>& material_type_array,
+                   const std::vector<int>& grain_array,
                    const std::vector<int>& height_category_array,
                    const std::vector<bool>& non_magnetic_materials_array);
 
@@ -53,26 +56,36 @@ namespace stats
 	// Function to reset average statistics counters
    void reset();
 
-   // Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
-   extern bool calculate_system_energy;
-   extern bool calculate_material_energy;
-   extern bool calculate_system_magnetization;
-   extern bool calculate_material_magnetization;
-   extern bool calculate_height_magnetization;
-   extern bool calculate_material_height_magnetization;
+	// Statistics control flags (to be moved internally when long-awaited refactoring of vio is done)
+	extern bool calculate_system_energy;
+	extern bool calculate_grain_energy;
+	extern bool calculate_material_energy;
+
+	extern bool calculate_system_magnetization;
+	extern bool calculate_grain_magnetization;
+	extern bool calculate_material_magnetization;
+	extern bool calculate_height_magnetization;
+	extern bool calculate_material_height_magnetization;
+
 	extern bool calculate_system_torque;
+	extern bool calculate_grain_torque;
 	extern bool calculate_material_torque;
-   extern bool calculate_system_specific_heat;
-   extern bool calculate_material_specific_heat;
-   extern bool calculate_material_standard_deviation;
-   extern bool calculate_system_susceptibility;
-   extern bool calculate_material_susceptibility;
 
-   // forward declaration of friend classes
-   class susceptibility_statistic_t;
-   class specific_heat_statistic_t;
+	extern bool calculate_system_specific_heat;
+	extern bool calculate_grain_specific_heat;
+	extern bool calculate_material_specific_heat;
 
-   class standard_deviation_statistic_t;
+	extern bool calculate_material_standard_deviation;
+
+	extern bool calculate_system_susceptibility;
+	extern bool calculate_grain_susceptibility;
+	extern bool calculate_material_susceptibility;
+
+	// forward declaration of friend classes
+	class susceptibility_statistic_t;
+	class specific_heat_statistic_t;
+
+	class standard_deviation_statistic_t;
    //----------------------------------
    // Energy class definition
    //----------------------------------
@@ -299,20 +312,25 @@ namespace stats
 	// Statistics class instantiations
    //----------------------------------
 	extern energy_statistic_t system_energy;
-   extern energy_statistic_t material_energy;
+	extern energy_statistic_t grain_energy;
+	extern energy_statistic_t material_energy;
 
    extern magnetization_statistic_t system_magnetization;
-   extern magnetization_statistic_t material_magnetization;
+	extern magnetization_statistic_t grain_magnetization;
+	extern magnetization_statistic_t material_magnetization;
    extern magnetization_statistic_t height_magnetization;
    extern magnetization_statistic_t material_height_magnetization;
 
 	extern torque_statistic_t system_torque;
+	extern torque_statistic_t grain_torque;
 	extern torque_statistic_t material_torque;
 
    extern specific_heat_statistic_t system_specific_heat;
+	extern specific_heat_statistic_t grain_specific_heat;
    extern specific_heat_statistic_t material_specific_heat;
 
    extern susceptibility_statistic_t system_susceptibility;
+	extern susceptibility_statistic_t grain_susceptibility;
    extern susceptibility_statistic_t material_susceptibility;
 
    extern standard_deviation_statistic_t material_standard_deviation;

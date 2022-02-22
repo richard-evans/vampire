@@ -18,8 +18,10 @@ namespace stats{
 
    void initialize(const int num_atoms,
                    const int num_materials,
+                   const int num_grains,
                    const std::vector<double>& magnetic_moment_array,
                    const std::vector<int>& material_type_array,
+                   const std::vector<int>& grain_array,
                    const std::vector<int>& height_category_array,
                    const std::vector<bool>& non_magnetic_materials_array){
 
@@ -49,6 +51,19 @@ namespace stats{
       //------------------------------------------------------------------------
       // material energy
       //------------------------------------------------------------------------
+      if(stats::calculate_grain_energy){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = num_materials;
+            // other atoms assigned to material level masks
+            else mask[atom] = grain_array[atom];
+         }
+         stats::material_energy.set_mask(num_grains+1,mask);
+      }
+
+      //------------------------------------------------------------------------
+      // material energy
+      //------------------------------------------------------------------------
       if(stats::calculate_material_energy){
          for(int atom=0; atom < stats::num_atoms; ++atom){
             // ignore non-magnetic atoms in stats calculation by assigning them to last mask
@@ -70,6 +85,19 @@ namespace stats{
             else mask[atom] = 0;
          }
          stats::system_magnetization.set_mask(1+1,mask,magnetic_moment_array);
+      }
+
+      //------------------------------------------------------------------------
+      // grain magnetization
+      //------------------------------------------------------------------------
+      if(stats::calculate_grain_magnetization){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
+            // all other atoms are included
+            else mask[atom] = grain_array[atom];
+         }
+         stats::system_magnetization.set_mask(num_grains+1, mask, magnetic_moment_array);
       }
 
       //------------------------------------------------------------------------
@@ -147,6 +175,19 @@ namespace stats{
       }
 
       //------------------------------------------------------------------------
+      // grain torque
+      //------------------------------------------------------------------------
+      if(stats::calculate_grain_torque){
+         for(int atom=0; atom < stats::num_atoms; ++atom){
+            // ignore non-magnetic atoms in stats calculation by assigning them to last mask
+            if(non_magnetic_materials_array[material_type_array[atom]]) mask[atom] = 1;
+            // all other atoms are included
+            else mask[atom] = grain_array[atom];
+         }
+         stats::system_torque.set_mask(num_grains+1, mask, magnetic_moment_array);
+      }
+
+      //------------------------------------------------------------------------
       // material torque
       //------------------------------------------------------------------------
       if(stats::calculate_material_torque){
@@ -163,6 +204,7 @@ namespace stats{
       // system specific heat
       //------------------------------------------------------------------------
       if(stats::calculate_system_specific_heat)   stats::system_specific_heat.initialize(stats::system_energy);
+      if(stats::calculate_grain_specific_heat)    stats::grain_specific_heat.initialize(stats::grain_energy);
       if(stats::calculate_material_specific_heat) stats::material_specific_heat.initialize(stats::material_energy);
 
       //------------------------------------------------------------------------
@@ -173,7 +215,8 @@ namespace stats{
       //------------------------------------------------------------------------
       // system susceptibility
       //------------------------------------------------------------------------
-      if(stats::calculate_system_susceptibility) stats::system_susceptibility.initialize(stats::system_magnetization);
+      if(stats::calculate_system_susceptibility)   stats::system_susceptibility.initialize(stats::system_magnetization);
+      if(stats::calculate_grain_susceptibility)    stats::grain_susceptibility.initialize(stats::grain_magnetization);
       if(stats::calculate_material_susceptibility) stats::material_susceptibility.initialize(stats::material_magnetization);
 
       return;

@@ -53,6 +53,7 @@
 #include "dipole.hpp"
 #include "errors.hpp"
 #include "gpu.hpp"
+#include "grains.hpp"
 #include "environment.hpp"
 #include "material.hpp"
 #include "montecarlo.hpp"
@@ -230,7 +231,7 @@ int run(){
       for(int m = 0; m < mp::num_materials; m++){
          if( mp::material[m].non_magnetic == 2 ) non_magnetic_materials_array[m] = true;
       }
-      stats::initialize(num_atoms_for_statistics, mp::num_materials, atoms::m_spin_array, atoms::type_array, atoms::category_array, non_magnetic_materials_array);
+      stats::initialize(num_atoms_for_statistics, mp::num_materials, grains::num_grains, atoms::m_spin_array, atoms::type_array, atoms::grain_array, atoms::category_array, non_magnetic_materials_array);
    }
 
    // Precalculate initial statistics and then reset averages
